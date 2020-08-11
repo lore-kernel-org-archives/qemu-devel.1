@@ -2,56 +2,49 @@ Return-Path: <SRS0=wQM/=BV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED3D9C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 14:29:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7062C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 14:32:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BDC1B2078E
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 14:29:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDC1B2078E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
+	by mail.kernel.org (Postfix) with ESMTPS id 808FF204FD
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 14:32:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 808FF204FD
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35252 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40466 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5VHp-0000Lx-Tf
-	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 10:29:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39782)
+	id 1k5VK5-0002f9-IH
+	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 10:32:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40062)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1k5VGs-0007tv-1d
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 10:28:58 -0400
-Received: from mx2.suse.de ([195.135.220.15]:51614)
+ (Exim 4.90_1) (envelope-from <mwilck@suse.com>) id 1k5VHh-0000Rl-0J
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 10:29:49 -0400
+Received: from mx2.suse.de ([195.135.220.15]:51894)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1k5VGn-000373-8c
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 10:28:56 -0400
+ (Exim 4.90_1) (envelope-from <mwilck@suse.com>) id 1k5VHe-0003B6-3o
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 10:29:48 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
- by mx2.suse.de (Postfix) with ESMTP id A9ABFB169;
- Tue, 11 Aug 2020 14:29:09 +0000 (UTC)
-Subject: Re: [RFC v3 8/8] cpus: extract out hvf-specific code to
- target/i386/hvf/
-From: Claudio Fontana <cfontana@suse.de>
-To: Roman Bolshakov <r.bolshakov@yadro.com>
-References: <20200803090533.7410-1-cfontana@suse.de>
- <20200803090533.7410-9-cfontana@suse.de>
- <20200811090034.GB62204@SPB-NB-133.local>
- <1e6f2876-4226-b25d-a551-ca22661898ce@suse.de>
-Message-ID: <f251ae23-75bf-4d50-0965-1288cf4aba6a@suse.de>
-Date: Tue, 11 Aug 2020 16:28:47 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ by mx2.suse.de (Postfix) with ESMTP id B0480B169;
+ Tue, 11 Aug 2020 14:30:05 +0000 (UTC)
+From: mwilck@suse.com
+To: "Michael S. Tsirkin" <mst@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Jason Wang <jasowang@redhat.com>
+Subject: [PATCH v3] virtio-rng: return available data with O_NONBLOCK
+Date: Tue, 11 Aug 2020 16:28:21 +0200
+Message-Id: <20200811142821.12323-1-mwilck@suse.com>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
-In-Reply-To: <1e6f2876-4226-b25d-a551-ca22661898ce@suse.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=195.135.220.15; envelope-from=cfontana@suse.de;
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=195.135.220.15; envelope-from=mwilck@suse.com;
  helo=mx2.suse.de
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/11 02:05:49
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic]
@@ -73,200 +66,170 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Pavel Dovgalyuk <dovgaluk@ispras.ru>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, haxm-team@intel.com,
- Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, Colin Xu <colin.xu@intel.com>,
- Wenchao Wang <wenchao.wang@intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Sunil Muthuswamy <sunilmut@microsoft.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: virtualization@lists.linux-foundation.org, Martin Wilck <mwilck@suse.com>,
+ Amit Shah <amit@kernel.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/11/20 3:42 PM, Claudio Fontana wrote:
-> On 8/11/20 11:00 AM, Roman Bolshakov wrote:
->> On Mon, Aug 03, 2020 at 11:05:33AM +0200, Claudio Fontana wrote:
->>> register a "CpusAccel" interface for HVF as well.
->>>
->>> Signed-off-by: Claudio Fontana <cfontana@suse.de>
->>> ---
->>>  softmmu/cpus.c                |  63 --------------------
->>>  target/i386/hvf/Makefile.objs |   2 +-
->>>  target/i386/hvf/hvf-cpus.c    | 131 ++++++++++++++++++++++++++++++++++++++++++
->>>  target/i386/hvf/hvf-cpus.h    |  17 ++++++
->>>  target/i386/hvf/hvf.c         |   3 +
->>>  5 files changed, 152 insertions(+), 64 deletions(-)
->>>  create mode 100644 target/i386/hvf/hvf-cpus.c
->>>  create mode 100644 target/i386/hvf/hvf-cpus.h
->>>
->>> diff --git a/softmmu/cpus.c b/softmmu/cpus.c
->>> index 586b4acaab..d327b2685c 100644
->>> --- a/softmmu/cpus.c
->>> +++ b/softmmu/cpus.c
->>> @@ -33,7 +33,6 @@
->>>  #include "exec/gdbstub.h"
->>>  #include "sysemu/hw_accel.h"
->>>  #include "sysemu/kvm.h"
->>> -#include "sysemu/hvf.h"
->>
->> I wonder if the declarations should be moved from sysemu/hvf.h to
->> someplace inside target/i386/hvf/:
->>
->> int hvf_init_vcpu(CPUState *);
->> int hvf_vcpu_exec(CPUState *);
->> void hvf_cpu_synchronize_state(CPUState *);
->> void hvf_cpu_synchronize_post_reset(CPUState *);
->> void hvf_cpu_synchronize_post_init(CPUState *);
->> void hvf_cpu_synchronize_pre_loadvm(CPUState *);
->> void hvf_vcpu_destroy(CPUState *);
->>
->> They're not used outside of target/i386/hvf/
->>
->> I also wonder if we need stubs at all?
+From: Martin Wilck <mwilck@suse.com>
 
-Ah, missed this,
+If a program opens /dev/hwrng with O_NONBLOCK and uses poll() and
+non-blocking read() to retrieve random data, it ends up in a tight
+loop with poll() always returning POLLIN and read() returning EAGAIN.
+This repeats forever until some process makes a blocking read() call.
+The reason is that virtio_read() always returns 0 in non-blocking mode,
+even if data is available. Worse, it fetches random data from the
+hypervisor after every non-blocking call, without ever using this data.
 
-yes good catch! I think we can remove quite a few stubs and not only for HVF!
+The following test program illustrates the behavior and can be used
+for testing and experiments. The problem will only be seen if all
+tasks use non-blocking access; otherwise the blocking reads will
+"recharge" the random pool and cause other, non-blocking reads to
+succeed at least sometimes.
 
-Thanks a lot,
+/* Whether to use non-blocking mode in a task, problem occurs if CONDITION is 1 */
+//#define CONDITION (getpid() % 2 != 0)
 
-Claudio
+static volatile sig_atomic_t stop;
+static void handler(int sig __attribute__((unused))) { stop = 1; }
 
+static void loop(int fd, int sec)
+{
+	struct pollfd pfd = { .fd = fd, .events  = POLLIN, };
+	unsigned long errors = 0, eagains = 0, bytes = 0, succ = 0;
+	int size, rc, rd;
 
->>
->>>  #include "exec/exec-all.h"
->>>  #include "qemu/thread.h"
->>>  #include "qemu/plugin.h"
->>> @@ -391,48 +390,6 @@ void qemu_wait_io_event(CPUState *cpu)
->>>      qemu_wait_io_event_common(cpu);
->>>  }
->>>  
->>> -/* The HVF-specific vCPU thread function. This one should only run when the host
->>> - * CPU supports the VMX "unrestricted guest" feature. */
->>> -static void *qemu_hvf_cpu_thread_fn(void *arg)
->>> -{
->>> -    CPUState *cpu = arg;
->>> -
->>> -    int r;
->>> -
->>> -    assert(hvf_enabled());
->>> -
->>> -    rcu_register_thread();
->>> -
->>> -    qemu_mutex_lock_iothread();
->>> -    qemu_thread_get_self(cpu->thread);
->>> -
->>> -    cpu->thread_id = qemu_get_thread_id();
->>> -    cpu->can_do_io = 1;
->>> -    current_cpu = cpu;
->>> -
->>> -    hvf_init_vcpu(cpu);
->>> -
->>> -    /* signal CPU creation */
->>> -    cpu_thread_signal_created(cpu);
->>> -    qemu_guest_random_seed_thread_part2(cpu->random_seed);
->>> -
->>> -    do {
->>> -        if (cpu_can_run(cpu)) {
->>> -            r = hvf_vcpu_exec(cpu);
->>> -            if (r == EXCP_DEBUG) {
->>> -                cpu_handle_guest_debug(cpu);
->>> -            }
->>> -        }
->>> -        qemu_wait_io_event(cpu);
->>> -    } while (!cpu->unplug || cpu_can_run(cpu));
->>> -
->>> -    hvf_vcpu_destroy(cpu);
->>> -    cpu_thread_signal_destroyed(cpu);
->>> -    qemu_mutex_unlock_iothread();
->>> -    rcu_unregister_thread();
->>> -    return NULL;
->>> -}
->>> -
->>>  void cpus_kick_thread(CPUState *cpu)
->>>  {
->>>  #ifndef _WIN32
->>> @@ -603,24 +560,6 @@ void cpu_remove_sync(CPUState *cpu)
->>>      qemu_mutex_lock_iothread();
->>>  }
->>>  
->>> -static void qemu_hvf_start_vcpu(CPUState *cpu)
->>> -{
->>> -    char thread_name[VCPU_THREAD_NAME_SIZE];
->>> -
->>> -    /* HVF currently does not support TCG, and only runs in
->>> -     * unrestricted-guest mode. */
->>> -    assert(hvf_enabled());
->>> -
->>> -    cpu->thread = g_malloc0(sizeof(QemuThread));
->>> -    cpu->halt_cond = g_malloc0(sizeof(QemuCond));
->>> -    qemu_cond_init(cpu->halt_cond);
->>> -
->>> -    snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "CPU %d/HVF",
->>> -             cpu->cpu_index);
->>> -    qemu_thread_create(cpu->thread, thread_name, qemu_hvf_cpu_thread_fn,
->>> -                       cpu, QEMU_THREAD_JOINABLE);
->>> -}
->>> -
->>>  void cpus_register_accel(CpusAccel *ca)
->>>  {
->>>      assert(ca != NULL);
->>> @@ -648,8 +587,6 @@ void qemu_init_vcpu(CPUState *cpu)
->>>      if (cpus_accel) {
->>>          /* accelerator already implements the CpusAccel interface */
->>>          cpus_accel->create_vcpu_thread(cpu);
->>> -    } else if (hvf_enabled()) {
->>> -        qemu_hvf_start_vcpu(cpu);
->>>      } else {
->>>          assert(0);
->>>      }
->>> diff --git a/target/i386/hvf/Makefile.objs b/target/i386/hvf/Makefile.objs
->>> index 927b86bc67..af9f7dcfc1 100644
->>> --- a/target/i386/hvf/Makefile.objs
->>> +++ b/target/i386/hvf/Makefile.objs
->>> @@ -1,2 +1,2 @@
->>> -obj-y += hvf.o
->>> +obj-y += hvf.o hvf-cpus.o
->>>  obj-y += x86.o x86_cpuid.o x86_decode.o x86_descr.o x86_emu.o x86_flags.o x86_mmu.o x86hvf.o x86_task.o
->>> diff --git a/target/i386/hvf/hvf-cpus.c b/target/i386/hvf/hvf-cpus.c
->>> new file mode 100644
->>> index 0000000000..9540157f1e
->>> --- /dev/null
->>> +++ b/target/i386/hvf/hvf-cpus.c
->>
->> I'd prefer singular form in variables and file names. More on that in
->> the comment to patch 2.
->>
->> Besides that it works fine,
->>
->> Reviewed-by: Roman Bolshakov <r.bolshakov@yadro.com>
->> Tested-by: Roman Bolshakov <r.bolshakov@yadro.com>
->>
->> Regards,
->> Roman
->>
-> 
-> Hi Roman,
-> 
-> thanks, sure lets discuss more the naming stuff on patch 2.
-> 
-> I noticed a missing chunk in this patch, ie, it leaves a lingering
-> 
-> } else if (hvf_enabled()) {
-> 
-> in cpu_synchronize_pre_loadvm().
-> 
-> that needs to be elided, should not change the behavior, but who knows. I will respin this one in the next version.
-> 
-> Thank you!
-> 
-> Claudio
-> 
-> 
-> 
+	srandom(getpid());
+	if (CONDITION && fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) | O_NONBLOCK) == -1)
+		perror("fcntl");
+	size = MINBUFSIZ + random() % (MAXBUFSIZ - MINBUFSIZ + 1);
+
+	for(;;) {
+		char buf[size];
+
+		if (stop)
+			break;
+		rc = poll(&pfd, 1, sec);
+		if (rc > 0) {
+			rd = read(fd, buf, sizeof(buf));
+			if (rd == -1 && errno == EAGAIN)
+				eagains++;
+			else if (rd == -1)
+				errors++;
+			else {
+				succ++;
+				bytes += rd;
+				write(1, buf, sizeof(buf));
+			}
+		} else if (rc == -1) {
+			if (errno != EINTR)
+				perror("poll");
+			break;
+		} else
+			fprintf(stderr, "poll: timeout\n");
+	}
+	fprintf(stderr,
+		"pid %d %sblocking, bufsize %d, %d seconds, %lu bytes read, %lu success, %lu eagain, %lu errors\n",
+		getpid(), CONDITION ? "non-" : "", size, sec, bytes, succ, eagains, errors);
+}
+
+int main(void)
+{
+	int fd;
+
+	fork(); fork();
+	fd = open("/dev/hwrng", O_RDONLY);
+	if (fd == -1) {
+		perror("open");
+		return 1;
+	};
+	signal(SIGALRM, handler);
+	alarm(SECONDS);
+	loop(fd, SECONDS);
+	close(fd);
+	wait(NULL);
+	return 0;
+}
+
+void loop(int fd)
+{
+        struct pollfd pfd0 = { .fd = fd, .events  = POLLIN, };
+        int rc;
+        unsigned int n;
+
+        for (n = LOOPS; n > 0; n--) {
+                struct pollfd pfd = pfd0;
+                char buf[SIZE];
+
+                rc = poll(&pfd, 1, 1);
+                if (rc > 0) {
+                        int rd = read(fd, buf, sizeof(buf));
+
+                        if (rd == -1)
+                                perror("read");
+                        else
+                                printf("read %d bytes\n", rd);
+                } else if (rc == -1)
+                        perror("poll");
+                else
+                        fprintf(stderr, "timeout\n");
+
+        }
+}
+
+int main(void)
+{
+        int fd;
+
+        fd = open("/dev/hwrng", O_RDONLY|O_NONBLOCK);
+        if (fd == -1) {
+                perror("open");
+                return 1;
+        };
+        loop(fd);
+        close(fd);
+        return 0;
+}
+
+This can be observed in the real word e.g. with nested qemu/KVM virtual
+machines, if both the "outer" and "inner" VMs have a virtio-rng device.
+If the "inner" VM requests random data, qemu running in the "outer" VM
+uses this device in a non-blocking manner like the test program above.
+
+Fix it by returning available data if a previous hypervisor call has
+completed. I tested this patch with the program above, and with rng-tools.
+
+v2 -> v3: Simplified the implementation as suggested by Laurent Vivier
+
+Signed-off-by: Martin Wilck <mwilck@suse.com>
+---
+ drivers/char/hw_random/virtio-rng.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/char/hw_random/virtio-rng.c b/drivers/char/hw_random/virtio-rng.c
+index a90001e02bf7..8eaeceecb41e 100644
+--- a/drivers/char/hw_random/virtio-rng.c
++++ b/drivers/char/hw_random/virtio-rng.c
+@@ -65,7 +65,7 @@ static int virtio_read(struct hwrng *rng, void *buf, size_t size, bool wait)
+ 		register_buffer(vi, buf, size);
+ 	}
+ 
+-	if (!wait)
++	if (!wait && !completion_done(&vi->have_data))
+ 		return 0;
+ 
+ 	ret = wait_for_completion_killable(&vi->have_data);
+@@ -74,7 +74,7 @@ static int virtio_read(struct hwrng *rng, void *buf, size_t size, bool wait)
+ 
+ 	vi->busy = false;
+ 
+-	return vi->data_avail;
++	return min_t(size_t, size, vi->data_avail);
+ }
+ 
+ static void virtio_cleanup(struct hwrng *rng)
+-- 
+2.28.0
 
 
