@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27D28C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 11:49:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06266C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 11:49:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E0F242075D
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 11:49:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C53332075D
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 11:49:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f9CoLIEt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0F242075D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cFxWb7rL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C53332075D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32840 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32978 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5Smc-0000Rn-11
-	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 07:49:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55630)
+	id 1k5Smh-0000VB-0V
+	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 07:49:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55580)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
- id 1k5SiC-0002cG-Ah
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 07:45:00 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:43092
+ id 1k5Shy-00027Q-Fx
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 07:44:46 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:28434
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
- id 1k5SiA-0008O7-Hh
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 07:45:00 -0400
+ id 1k5Shw-0008Lp-M5
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 07:44:46 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597146297;
+ s=mimecast20190719; t=1597146283;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=URgG/GQpF3hxWKP3cotTkm5KWSX2MRj+zKuw0yApTls=;
- b=f9CoLIEtf+tQvtVGsF5ytGuLZOGhV1jGKjKizRsNBXjNxb4A6ze9g2XwWi7yHSJL1+tXIf
- epXKBTSlycw4cpMri1LY0+m7amgdgj7j+g0ktKMIpXPUNfjNHny1jsVzph/ghIIfZNzB9P
- JP7O2czD8/7Vsj5u3QDGYySpoc/MoNA=
+ bh=w+40PRmSG+ie3kIVNK984GsCnZNEYARZaSwfaWAALM4=;
+ b=cFxWb7rLnIEtcGzh1HAt/d/vsvxU4FVJ97cZBjfDBgnBUfF/SYAH/cKJ68FCx8V4Fc0we7
+ 9sBwhZXHotGCJ/bXNyTUUOQ6DuVteB4F5rbLmTkCL7TGt0UpW7NHuljebFQOH+AFeUvmlx
+ jxtV61ARMnPswamOeD+nGzf3/fhBn2A=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-111-IDx7D9ygN06mMvLOfUanVA-1; Tue, 11 Aug 2020 07:44:54 -0400
-X-MC-Unique: IDx7D9ygN06mMvLOfUanVA-1
+ us-mta-364-np2jQmmYOmCKKacUNOl_NA-1; Tue, 11 Aug 2020 07:44:40 -0400
+X-MC-Unique: np2jQmmYOmCKKacUNOl_NA-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6005D1005510;
- Tue, 11 Aug 2020 11:44:53 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B7C3E800465;
+ Tue, 11 Aug 2020 11:44:38 +0000 (UTC)
 Received: from localhost.localdomain (unknown [10.74.8.55])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 88CCE5FC01;
- Tue, 11 Aug 2020 11:44:48 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 634135F9DB;
+ Tue, 11 Aug 2020 11:44:32 +0000 (UTC)
 From: P J P <ppandit@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>,
  Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH v4 9/9] memory: assert MemoryRegionOps callbacks are defined
-Date: Tue, 11 Aug 2020 17:11:33 +0530
-Message-Id: <20200811114133.672647-10-ppandit@redhat.com>
+Subject: [PATCH v4 7/9] tz-ppc: add dummy read/write methods
+Date: Tue, 11 Aug 2020 17:11:31 +0530
+Message-Id: <20200811114133.672647-8-ppandit@redhat.com>
 In-Reply-To: <20200811114133.672647-1-ppandit@redhat.com>
 References: <20200811114133.672647-1-ppandit@redhat.com>
 MIME-Version: 1.0
@@ -74,10 +74,10 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=ppandit@redhat.com;
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=ppandit@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/11 04:41:55
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/11 06:40:20
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
 X-Spam_bar: ----
@@ -109,49 +109,44 @@ Sender: "Qemu-devel"
 
 From: Prasad J Pandit <pjp@fedoraproject.org>
 
-When registering a MemoryRegionOps object, assert that its
-read/write callback methods are defined. This avoids potential
-guest crash via a NULL pointer dereference.
+Add tz-ppc-dummy mmio read/write methods to avoid assert failure
+during initialisation.
 
-Suggested-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Li Qiang <liq3ea@gmail.com>
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
 ---
- softmmu/memory.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+ hw/misc/tz-ppc.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
 Update v4: add Reviewed-by tag
-  -> https://lists.nongnu.org/archive/html/qemu-devel/2020-07/msg05324.html
+  -> https://lists.nongnu.org/archive/html/qemu-devel/2020-07/msg05303.html
 
-diff --git a/softmmu/memory.c b/softmmu/memory.c
-index af25987518..1f4b37b3a6 100644
---- a/softmmu/memory.c
-+++ b/softmmu/memory.c
-@@ -1485,7 +1485,13 @@ void memory_region_init_io(MemoryRegion *mr,
-                            uint64_t size)
- {
-     memory_region_init(mr, owner, name, size);
--    mr->ops = ops ? ops : &unassigned_mem_ops;
-+    if (ops) {
-+        assert(ops->read || ops->read_with_attrs);
-+        assert(ops->write || ops->write_with_attrs);
-+        mr->ops = ops;
-+    } else {
-+        mr->ops = &unassigned_mem_ops;
-+    }
-     mr->opaque = opaque;
-     mr->terminates = true;
+diff --git a/hw/misc/tz-ppc.c b/hw/misc/tz-ppc.c
+index 6431257b52..36495c68e7 100644
+--- a/hw/misc/tz-ppc.c
++++ b/hw/misc/tz-ppc.c
+@@ -196,7 +196,21 @@ static bool tz_ppc_dummy_accepts(void *opaque, hwaddr addr,
+     g_assert_not_reached();
  }
-@@ -1663,6 +1669,8 @@ void memory_region_init_rom_device_nomigrate(MemoryRegion *mr,
- {
-     Error *err = NULL;
-     assert(ops);
-+    assert(ops->read || ops->read_with_attrs);
-+    assert(ops->write || ops->write_with_attrs);
-     memory_region_init(mr, owner, name, size);
-     mr->ops = ops;
-     mr->opaque = opaque;
+ 
++static uint64_t tz_ppc_dummy_read(void *opaque, hwaddr addr, unsigned size)
++{
++    g_assert_not_reached();
++}
++
++static void tz_ppc_dummy_write(void *opaque, hwaddr addr,
++                                        uint64_t data, unsigned size)
++{
++    g_assert_not_reached();
++}
++
+ static const MemoryRegionOps tz_ppc_dummy_ops = {
++    /* define r/w methods to avoid assert failure in memory_region_init_io */
++    .read = tz_ppc_dummy_read,
++    .write = tz_ppc_dummy_write,
+     .valid.accepts = tz_ppc_dummy_accepts,
+ };
+ 
 -- 
 2.26.2
 
