@@ -8,72 +8,72 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E62FBC433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 15:41:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 487A0C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 15:43:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B5B8D2076C
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 15:41:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 09E6922B49
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 15:43:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DyZDG/iQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5B8D2076C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J/P1S8TW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09E6922B49
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38014 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41068 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5WOt-0005kF-17
-	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 11:41:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59680)
+	id 1k5WRQ-00073x-96
+	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 11:43:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60174)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1k5WOA-0005EA-Qx
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 11:40:34 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:36111)
+ (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1k5WQV-0006HO-TY
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 11:42:59 -0400
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:45235)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1k5WO9-00040X-6j
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 11:40:34 -0400
-Received: by mail-ot1-x344.google.com with SMTP id x24so10463274otp.3
- for <qemu-devel@nongnu.org>; Tue, 11 Aug 2020 08:40:32 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1k5WQU-00049y-4L
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 11:42:59 -0400
+Received: by mail-oi1-x242.google.com with SMTP id o21so12579842oie.12
+ for <qemu-devel@nongnu.org>; Tue, 11 Aug 2020 08:42:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=VvCDwEUqFSp8193AGfTq0mG7xTrs09bACAepJfYSZAs=;
- b=DyZDG/iQr7NnpDh1gjUBmh9Ce+EPzdj/rCoh9fdA35V+QHtuCBh7qtpww8vIkYm2Gn
- NktYZQ2S0ERQsKcgmka8N+MzW8nQyxKu9+es1XydbYbmB0afyXAcSPC6xvd12snqCY06
- NridyLP+gjsPAuy0m0Gi9F0OyeBbUSvu8XP1AEInE0foeB0AHplK88AsGiFlT5GSYBlT
- 9sJntc0We0XhjHIqH3bXC6T10eS3CBp6Vr4cQ4wuAXLFxHJoXq+ztEc4q07j4wc0UHXG
- 1liFOW6ccG8JfnDHHZe8bNLdNFgKqXwzHXy9MBvkb+EX+fUt6vUWk+V2vMc84Exq3t5f
- Zj3g==
+ bh=j4Ij35fRpTx09Eu9TXQeLgPpnNUgEAdrNeYMHBaYYuw=;
+ b=J/P1S8TWP7ixA7KKfaPf/ccM/4d3DTbAQsvonZoM71Mf86jKFOGMIqZ4PRn1Zh1+BF
+ E2sIbBzAp2uB3Ix/v1JUEPZ+p8ulph2hFteykO1hTNF6+geYYj1orw1d+AunB0lDGMAK
+ LM8p/g9DfAwKu7ua6J/u2POOkpEpK20QE4TMHvhOKYYHiqK2JUYkuZB/uTxpfu49hDbN
+ tsEgP8jeHC2ibCnTOsoAlbGb3SfNuTYzlzB50AWTDAZt30tW/H1oFG75LJ7Q9Sp+/zYw
+ bM8MahSdUT3r5gZSa8Pd4b9QRaByAPMcCptDJnYQeWhwJqzvQ/cdUYdwLLCCHOCUqRPy
+ e7dA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=VvCDwEUqFSp8193AGfTq0mG7xTrs09bACAepJfYSZAs=;
- b=F5pEozkAgSG96zZSpnY5PFU5Q56YHKwphoF0vCnC6GfjKXD5OtKHszC5JU/CrftBUq
- sRsA1rw34W3536o7KEDmN/IFfHTy0zXtfBqmY7xjNhjNAVcKccCgJY+BqCYtw/Bsqvb2
- NDKoBfnao3rAXwGjoWkVaa20oFNOqkidbh1w7kw6DGERoT2wJ9JwSok9KrhV7bEjfUER
- RshprIP6gO0K56IvjSaomB5nEJnldM/S5mIisIqb+jzNLQMmnWSo2K6B3f8Sd581Qt1K
- ptPzIeveKv13WyHu3Cw0wRkmWkL0SsSAr840LqZ+Cbe4sMfnLh1J5Hyl2W5iKB5YoG87
- Ry/w==
-X-Gm-Message-State: AOAM532PMDgo0pOcz4N94BkopFPMtoYRk8kHiRW46k80UIhXPYMvOZ19
- xUIdtZslSfIR0wyIxoM8SkR+JLeQO0k3U/oL64k=
-X-Google-Smtp-Source: ABdhPJyE8X2ugzqMSoIWreJ1dXVSZoFIY/i6/Odq4kN/UBZ6hBcMMDO/f4dWAf8JJutJpCZaWZrDsQ2eo1F/WHBcIkI=
-X-Received: by 2002:a9d:2926:: with SMTP id d35mr5277350otb.181.1597160431532; 
- Tue, 11 Aug 2020 08:40:31 -0700 (PDT)
+ bh=j4Ij35fRpTx09Eu9TXQeLgPpnNUgEAdrNeYMHBaYYuw=;
+ b=VdCoqkqe8s9q3k8XDOK8u+SnNZzHe7qSfe+Hxbxc0tBurJJXIa7Gp9JQMNJHbiIn2A
+ pCqqrBckUdO/p5CZIGLiyRKARexRPK+1SK0BG8k/YntUdfy12dehYGROU2mi/LL6mv9G
+ oHTSBHcjtcGV2NdYqFRlH1tIl3694BlVlqUBUclYf+PnD07uhYz50kWgxmmKAcfmx3E6
+ IqMzQwW16SyTzaE7UXBNNViPbasVktq6mTXd/DFxXiZ/XNf9lPLIgmkbn9+cPtqGleWZ
+ dugpKdz23wcrN0Vjyu2Gq4iXdDgJQUhohEZ9ut2AhmTFvveCvj6RzOMoDhE/iCyfLg9p
+ 1FgA==
+X-Gm-Message-State: AOAM532gocpKJzZJCX1loim7SnUuYzbshpWxIHutTBCf5/lyuoFwUd5O
+ uZkzg2hGfxA61L0OIA0ir+/P/6JK8Fv26gQSTcM=
+X-Google-Smtp-Source: ABdhPJwZ7LzJxAExm0USwyLI6Muo1ryPnpfx6aM8fMUr5vCoWdCjwLxob0mT+0wtBm3w9QlYImTywEAzxTOVCI6M2v4=
+X-Received: by 2002:aca:1117:: with SMTP id 23mr4059999oir.97.1597160576791;
+ Tue, 11 Aug 2020 08:42:56 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200811114133.672647-1-ppandit@redhat.com>
- <20200811114133.672647-8-ppandit@redhat.com>
-In-Reply-To: <20200811114133.672647-8-ppandit@redhat.com>
+ <20200811114133.672647-6-ppandit@redhat.com>
+In-Reply-To: <20200811114133.672647-6-ppandit@redhat.com>
 From: Li Qiang <liq3ea@gmail.com>
-Date: Tue, 11 Aug 2020 23:39:55 +0800
-Message-ID: <CAKXe6SKKY77u08iYEq039mGu_c0Qf=KyvNFk05ZDmLKSkuetfg@mail.gmail.com>
-Subject: Re: [PATCH v4 7/9] tz-ppc: add dummy read/write methods
+Date: Tue, 11 Aug 2020 23:42:20 +0800
+Message-ID: <CAKXe6SLmTYsV1WYmPRWNgcFgT8=Q8pqeKBOsgQtad_wnLYYDjA@mail.gmail.com>
+Subject: Re: [PATCH v4 5/9] nvram: add nrf51_soc flash read method
 To: P J P <ppandit@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::344;
- envelope-from=liq3ea@gmail.com; helo=mail-ot1-x344.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::242;
+ envelope-from=liq3ea@gmail.com; helo=mail-oi1-x242.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -112,51 +112,52 @@ P J P <ppandit@redhat.com> =E4=BA=8E2020=E5=B9=B48=E6=9C=8811=E6=97=A5=E5=
 >
 > From: Prasad J Pandit <pjp@fedoraproject.org>
 >
-> Add tz-ppc-dummy mmio read/write methods to avoid assert failure
-> during initialisation.
+> Add nrf51_soc mmio read method to avoid NULL pointer dereference
+> issue.
 >
+> Reported-by: Lei Sun <slei.casper@gmail.com>
 > Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 > Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
 
 Reviewed-by: Li Qiang <liq3ea@gmail.com>
 
 > ---
->  hw/misc/tz-ppc.c | 14 ++++++++++++++
->  1 file changed, 14 insertions(+)
+>  hw/nvram/nrf51_nvm.c | 10 ++++++++++
+>  1 file changed, 10 insertions(+)
 >
-> Update v4: add Reviewed-by tag
->   -> https://lists.nongnu.org/archive/html/qemu-devel/2020-07/msg05303.ht=
+> Update v4: add explanatory comment and Reviewed-by tag
+>   -> https://lists.nongnu.org/archive/html/qemu-devel/2020-07/msg05309.ht=
 ml
 >
-> diff --git a/hw/misc/tz-ppc.c b/hw/misc/tz-ppc.c
-> index 6431257b52..36495c68e7 100644
-> --- a/hw/misc/tz-ppc.c
-> +++ b/hw/misc/tz-ppc.c
-> @@ -196,7 +196,21 @@ static bool tz_ppc_dummy_accepts(void *opaque, hwadd=
-r addr,
->      g_assert_not_reached();
->  }
->
-> +static uint64_t tz_ppc_dummy_read(void *opaque, hwaddr addr, unsigned si=
-ze)
-> +{
-> +    g_assert_not_reached();
-> +}
-> +
-> +static void tz_ppc_dummy_write(void *opaque, hwaddr addr,
-> +                                        uint64_t data, unsigned size)
-> +{
-> +    g_assert_not_reached();
-> +}
-> +
->  static const MemoryRegionOps tz_ppc_dummy_ops =3D {
-> +    /* define r/w methods to avoid assert failure in memory_region_init_=
-io */
-> +    .read =3D tz_ppc_dummy_read,
-> +    .write =3D tz_ppc_dummy_write,
->      .valid.accepts =3D tz_ppc_dummy_accepts,
+> diff --git a/hw/nvram/nrf51_nvm.c b/hw/nvram/nrf51_nvm.c
+> index f2283c1a8d..7b3460d52d 100644
+> --- a/hw/nvram/nrf51_nvm.c
+> +++ b/hw/nvram/nrf51_nvm.c
+> @@ -273,6 +273,15 @@ static const MemoryRegionOps io_ops =3D {
+>          .endianness =3D DEVICE_LITTLE_ENDIAN,
 >  };
 >
+> +static uint64_t flash_read(void *opaque, hwaddr offset, unsigned size)
+> +{
+> +    /*
+> +     * This is a rom_device MemoryRegion which is always in
+> +     * romd_mode (we never put it in MMIO mode), so reads always
+> +     * go directly to RAM and never come here.
+> +     */
+> +    g_assert_not_reached();
+> +}
+>
+>  static void flash_write(void *opaque, hwaddr offset, uint64_t value,
+>          unsigned int size)
+> @@ -300,6 +309,7 @@ static void flash_write(void *opaque, hwaddr offset, =
+uint64_t value,
+>
+>
+>  static const MemoryRegionOps flash_ops =3D {
+> +    .read =3D flash_read,
+>      .write =3D flash_write,
+>      .valid.min_access_size =3D 4,
+>      .valid.max_access_size =3D 4,
 > --
 > 2.26.2
 >
