@@ -2,79 +2,82 @@ Return-Path: <SRS0=wQM/=BV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.6 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-20.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
+	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A24D5C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 07:11:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 329EDC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 07:12:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 669F620774
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 07:11:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EB04B20774
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 07:12:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="O6hVlZtv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 669F620774
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qA3kiYx7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB04B20774
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40220 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40580 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5ORn-00068e-Jh
-	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 03:11:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52750)
+	id 1k5OS1-0006IL-7g
+	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 03:12:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52776)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from
- <3QUQyXwMKCpIEyI2AA270.yA8C08G-z0H079A929G.AD2@flex--scw.bounces.google.com>)
- id 1k5OQ2-0004t0-3K
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 03:09:58 -0400
-Received: from mail-pf1-x449.google.com ([2607:f8b0:4864:20::449]:42474)
+ <3RUQyXwMKCpYI2M6EE6B4.2ECG4CK-34L4BDED6DK.EH6@flex--scw.bounces.google.com>)
+ id 1k5OQ4-0004ug-KZ
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 03:10:00 -0400
+Received: from mail-yb1-xb4a.google.com ([2607:f8b0:4864:20::b4a]:53319)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from
- <3QUQyXwMKCpIEyI2AA270.yA8C08G-z0H079A929G.AD2@flex--scw.bounces.google.com>)
- id 1k5OQ0-0000kU-2l
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 03:09:57 -0400
-Received: by mail-pf1-x449.google.com with SMTP id b142so9802616pfb.9
- for <qemu-devel@nongnu.org>; Tue, 11 Aug 2020 00:09:54 -0700 (PDT)
+ <3RUQyXwMKCpYI2M6EE6B4.2ECG4CK-34L4BDED6DK.EH6@flex--scw.bounces.google.com>)
+ id 1k5OQ3-0000kk-1J
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 03:10:00 -0400
+Received: by mail-yb1-xb4a.google.com with SMTP id d26so15749429yba.20
+ for <qemu-devel@nongnu.org>; Tue, 11 Aug 2020 00:09:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:message-id:mime-version:subject:from:to:cc;
- bh=YlydLVrlvFblK0TD+YtiVGIDjzrVf7sjzFdGecIMIpo=;
- b=O6hVlZtveM1/xpWIeGlSXem4AkewZ5ecxb7OipY1IPkrM56Xe+uRWg9iZ1UB9xdwx0
- 4Mu5kK1NduXp8GMyEHVYTVAewu0cFpIl3f+35LgTYoGIljLJSIxHVimJGMCOXXHe2wTv
- HqMiUplNci1y7qtUOR1NSxIIuxJ071LYfsc/2ZIuKF3NZg6cFWVqEAFN77S3CteLb6hF
- VEjkAchWK4nkKQG31uX8KDUNqRKTDdx00d3MmHeRuVh20MuHieXb7Lig7BPg7O5APbiL
- iuZUJ3X8afpBRD1CxR2NNmD/grVvMUv8CHYVgM4w8Xygrn+NQ8JVkqkgCW4z1WD9R7ss
- xt6A==
+ h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+ :cc; bh=KOl6cq6IjMqpEhD/kHPtyKl8qR4OtmqTxSk98Aj4Ezw=;
+ b=qA3kiYx7CMnnRBAOMofzmp6ZPT++yucztp/xlZzbakC5dC8zSvVTtwRBPmPBo99F34
+ ++Hm6EF+AKCjzjAErpMW2VyQatr1IlYn2P58vkxsBN80Zs9lUHBF+W2Il1EuI2/mJMg4
+ xbJL3MtjsRbXLGvKRkWlRXdwcDFG5M+Ef2Eu4iaq+f0rcI+W3aABIc3WAJT9BvIgs9kX
+ bcKYWdf0apz3YPW5yrwj0gFQxb9m3ehW8Fq5SRq4qmkuS01ctEImLHGUENuQio2O4X0O
+ dKfBePYgAE56QzVdzRavwYygdM5GOj3lFNg7iRGwwQwnkMCLz9HuElyVrnNohNpV/ZVM
+ KW1Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
- bh=YlydLVrlvFblK0TD+YtiVGIDjzrVf7sjzFdGecIMIpo=;
- b=CHZIZIS12tmKDr+v8N9Pk+0uG75KIbneTuwRMXpGLQ0aoHS28vpqphowKW/pyZlSsW
- 0fHeXhTvhz16jSzjS48gf5FakJqQ0iMSBqclyC6anxFNorxvPyyqe6CfqvEnYhxX6Zx9
- 2NwFPI6/QdVxff3SXAUqUY3Z3FEvoUdzGKtAtnE6RC79BZWZf4lR7gh6PMfnMPFTsfog
- Pnv588mQ4UJzGwZhgBQLTuJMrPHZc/ucSuvTouEbjM7NSxknHmarfmukLP7tic7UDHq3
- 69P0fLqr39vf166SBvoPMyq1/us5StecuK5VgaEC9hQnM0W1SAfprJGTWqbx1vFJ4CFn
- SpJg==
-X-Gm-Message-State: AOAM532meYKNk2f0UT89ElcfM4FN2wZcK+yRyJ6N/stmhnGTL4PJLJI4
- g+BOc6iu57A5S0jQYYDbaIb4IZafUSy9XVT7guMSHT/HNrLHjDjuvB3IP8egNiWegIFNYeycH4S
- 0XQzEvLdll/CrYuFvjugB2fJjZ3ZjvDHbjppnTrDehawtyyQ4w9Ww
-X-Google-Smtp-Source: ABdhPJyuVgfOsbj9sx8QIJVRGbbeuEEgIoOReOCMiktYU8Iy4oVMZ0usw/eoiSxW+Mmu8m4LwMXJhQ4=
-X-Received: by 2002:a63:c902:: with SMTP id o2mr25371615pgg.264.1597129793318; 
- Tue, 11 Aug 2020 00:09:53 -0700 (PDT)
-Date: Tue, 11 Aug 2020 00:09:40 -0700
-Message-Id: <cover.1597129029.git.scw@google.com>
+ h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+ :references:subject:from:to:cc;
+ bh=KOl6cq6IjMqpEhD/kHPtyKl8qR4OtmqTxSk98Aj4Ezw=;
+ b=g0V57tCWa1NctTf8zF2dvCyEZhxWVDecBMiVLqLclPBf7Pp7Dox1ydsk+pJCONs1WD
+ m6I71mWu/IWSXrIZWziV75qclS5rY1i/Bd1QSHrSULHnSGAot5bKnH4mkiRKbfWO5pf3
+ eUaGPnjcyaUAF9LazzK9v4jbsyJwSR92SDGaI+3VAnobWxpMN8li07Z4O9j3c1fGPGDq
+ Z0ubA8oL0U/nyFti1fRvadYLzS4SK4BZVon35gfQTDIJyOfKJcGjVyrTbTdzPr/Dw94p
+ bMIqWsJpz0twdhR0h5pQoN4wdNgewY3YcF+bjVtz4nbIJZlx5oM6P3qgHJ3tY5nP1Tup
+ ulKQ==
+X-Gm-Message-State: AOAM531Ipsa5KXjYF2xkJ0GaNbhxBZQ8yL3qSQmPnnGADkx+b2oJTuPD
+ 6VsSGiCNC8L/C6PVHo8uIRWXKZrXk6dOkmLRpeV5kn1p524d22yJbc/RYyEHMBNGgHrOQty64rt
+ eG57/5O6UCk2ahcXbkgO7q2JWIVYAMjf+cFI+UK2pSc/lxIKO9KP0
+X-Google-Smtp-Source: ABdhPJywbTZAZr4pvyFKc4CT+AEyzs28KTLqCHe8wOL1Urxw3v8g5ZU5uYhUch0tPH1IMgjzjt9YnnU=
+X-Received: by 2002:a25:83c1:: with SMTP id v1mr44915743ybm.264.1597129797343; 
+ Tue, 11 Aug 2020 00:09:57 -0700 (PDT)
+Date: Tue, 11 Aug 2020 00:09:42 -0700
+In-Reply-To: <cover.1597129029.git.scw@google.com>
+Message-Id: <71ad91e4ee9f41f439086d8f9de60501ad304859.1597129029.git.scw@google.com>
 Mime-Version: 1.0
+References: <cover.1597129029.git.scw@google.com>
 X-Mailer: git-send-email 2.28.0.220.ged08abb693-goog
-Subject: [PATCH v2 0/8] fcntl, sockopt, and ioctl options
+Subject: [PATCH v2 2/8] linux-user: add missing UDP get/setsockopt option
 From: Shu-Chun Weng <scw@google.com>
 To: qemu-devel@nongnu.org
 Cc: Shu-Chun Weng <scw@google.com>, laurent@vivier.eu
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::449;
- envelope-from=3QUQyXwMKCpIEyI2AA270.yA8C08G-z0H079A929G.AD2@flex--scw.bounces.google.com;
- helo=mail-pf1-x449.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::b4a;
+ envelope-from=3RUQyXwMKCpYI2M6EE6B4.2ECG4CK-34L4BDED6DK.EH6@flex--scw.bounces.google.com;
+ helo=mail-yb1-xb4a.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -105
@@ -100,70 +103,76 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Laurent,
+SOL_UDP manipulate options at UDP level. All six options currently defined
+in linux source include/uapi/linux/udp.h take integer values.
 
-This is a series of 8 patches in 4 groups, putting into a single thread for
-easier tracking.
-
-[PATCH v2 1/8] linux-user: Support F_ADD_SEALS and F_GET_SEALS fcntls
-  An incidental follow up on
-  https://lists.nongnu.org/archive/html/qemu-devel/2019-09/msg01925.html
-
-[PATCH v2 2/8] linux-user: add missing UDP get/setsockopt option
-[PATCH v2 3/8] linux-user: add missing IPv6 get/setsockopt option
-[PATCH v2 4/8] linux-user: Add IPv6 options to do_print_sockopt()
-  Updated https://lists.nongnu.org/archive/html/qemu-devel/2019-09/msg01317.html
-  to consistently add them in get/setsockopt
-
-[PATCH v2 5/8] linux-user: Update SO_TIMESTAMP to SO_TIMESTAMP_OLD/NEW
-[PATCH v2 6/8] linux-user: setsockopt() SO_TIMESTAMPNS and SO_TIMESTAMPING
-  Updated https://lists.nongnu.org/archive/html/qemu-devel/2019-09/msg01319.html
-  to only use TARGET_SO_*_OLD/NEW
-
-[PATCH v2 7/8] thunk: supports flexible arrays
-[PATCH v2 8/8] linux-user: Add support for SIOCETHTOOL ioctl
-  Updated https://lists.nongnu.org/archive/html/qemu-devel/2019-08/msg05090.html
-
+Signed-off-by: Shu-Chun Weng <scw@google.com>
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+---
 v1 -> v2:
-  Address comments on the first 5 (was 3) patches.
-  Fix style problems.
+  Split out SOL_UDP into own patch.
+  Updated do_print_sockopt().
 
-Shu-Chun Weng (8):
-  linux-user: Support F_ADD_SEALS and F_GET_SEALS fcntls
-  linux-user: add missing UDP get/setsockopt option
-  linux-user: add missing IPv6 get/setsockopt option
-  linux-user: Add IPv6 options to do_print_sockopt()
-  linux-user: Update SO_TIMESTAMP to SO_TIMESTAMP_OLD/NEW
-  linux-user: setsockopt() SO_TIMESTAMPNS and SO_TIMESTAMPING
-  thunk: supports flexible arrays
-  linux-user: Add support for SIOCETHTOOL ioctl
+ linux-user/strace.c  | 6 ++++++
+ linux-user/syscall.c | 7 +++++--
+ 2 files changed, 11 insertions(+), 2 deletions(-)
 
- include/exec/user/thunk.h              |  24 +
- linux-user/Makefile.objs               |   3 +-
- linux-user/alpha/sockbits.h            |  21 +-
- linux-user/ethtool.c                   | 840 +++++++++++++++++++++++++
- linux-user/ethtool.h                   |  20 +
- linux-user/ethtool_entries.h           | 107 ++++
- linux-user/generic/sockbits.h          |  17 +-
- linux-user/hppa/sockbits.h             |  20 +-
- linux-user/ioctls.h                    |   2 +
- linux-user/mips/sockbits.h             |  16 +-
- linux-user/qemu.h                      |   1 +
- linux-user/sparc/sockbits.h            |  21 +-
- linux-user/strace.c                    | 188 +++++-
- linux-user/syscall.c                   | 286 ++++++++-
- linux-user/syscall_defs.h              |  26 +-
- linux-user/syscall_types.h             | 280 +++++++++
- tests/tcg/multiarch/ethtool.c          | 423 +++++++++++++
- tests/tcg/multiarch/socket_timestamp.c | 540 ++++++++++++++++
- thunk.c                                | 152 ++++-
- 19 files changed, 2916 insertions(+), 71 deletions(-)
- create mode 100644 linux-user/ethtool.c
- create mode 100644 linux-user/ethtool.h
- create mode 100644 linux-user/ethtool_entries.h
- create mode 100644 tests/tcg/multiarch/ethtool.c
- create mode 100644 tests/tcg/multiarch/socket_timestamp.c
-
+diff --git a/linux-user/strace.c b/linux-user/strace.c
+index 4fff24b880..854b54a2ad 100644
+--- a/linux-user/strace.c
++++ b/linux-user/strace.c
+@@ -7,6 +7,7 @@
+ #include <sys/mount.h>
+ #include <arpa/inet.h>
+ #include <netinet/tcp.h>
++#include <netinet/udp.h>
+ #include <linux/if_packet.h>
+ #include <linux/netlink.h>
+ #include <sched.h>
+@@ -2190,6 +2191,11 @@ static void do_print_sockopt(const char *name, abi_long arg1)
+         print_raw_param(TARGET_ABI_FMT_ld, optname, 0);
+         print_pointer(optval, 0);
+         break;
++    case SOL_UDP:
++        qemu_log("SOL_UDP,");
++        print_raw_param(TARGET_ABI_FMT_ld, optname, 0);
++        print_pointer(optval, 0);
++        break;
+     case SOL_IP:
+         qemu_log("SOL_IP,");
+         print_raw_param(TARGET_ABI_FMT_ld, optname, 0);
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 5645862798..177eec5201 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -53,6 +53,7 @@
+ //#include <sys/user.h>
+ #include <netinet/ip.h>
+ #include <netinet/tcp.h>
++#include <netinet/udp.h>
+ #include <linux/wireless.h>
+ #include <linux/icmp.h>
+ #include <linux/icmpv6.h>
+@@ -1938,7 +1939,8 @@ static abi_long do_setsockopt(int sockfd, int level, int optname,
+ 
+     switch(level) {
+     case SOL_TCP:
+-        /* TCP options all take an 'int' value.  */
++    case SOL_UDP:
++        /* TCP and UDP options all take an 'int' value.  */
+         if (optlen < sizeof(uint32_t))
+             return -TARGET_EINVAL;
+ 
+@@ -2586,7 +2588,8 @@ get_timeout:
+         }
+         break;
+     case SOL_TCP:
+-        /* TCP options all take an 'int' value.  */
++    case SOL_UDP:
++        /* TCP and UDP options all take an 'int' value.  */
+     int_case:
+         if (get_user_u32(len, optlen))
+             return -TARGET_EFAULT;
 -- 
 2.28.0.220.ged08abb693-goog
 
