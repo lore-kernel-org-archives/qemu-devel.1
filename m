@@ -2,75 +2,102 @@ Return-Path: <SRS0=wQM/=BV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7CADC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 15:34:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A5C7C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 15:34:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9193A20768
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 15:34:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9193A20768
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 36F6420768
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 15:34:23 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="TfR6sWWO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36F6420768
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60928 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33032 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5WI3-0003A9-Og
-	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 11:34:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56286)
+	id 1k5WIA-0003IJ-DX
+	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 11:34:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57192)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1k5WEJ-0007j0-Rg
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 11:30:23 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:36645
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1k5WEH-0002P7-Kn
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 11:30:22 -0400
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-22-E2JI0fNdN9Gw7T28fXJKgA-1; Tue, 11 Aug 2020 11:30:16 -0400
-X-MC-Unique: E2JI0fNdN9Gw7T28fXJKgA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2960919067E0;
- Tue, 11 Aug 2020 15:30:15 +0000 (UTC)
-Received: from bahia.lan (ovpn-112-38.ams2.redhat.com [10.36.112.38])
- by smtp.corp.redhat.com (Postfix) with ESMTP id F137D8AD10;
- Tue, 11 Aug 2020 15:30:13 +0000 (UTC)
-Subject: [PATCH 2/2] spapr/nvram: Allocate enough space for all -prom-env
- options
-From: Greg Kurz <groug@kaod.org>
-To: Thomas Huth <thuth@redhat.com>
-Date: Tue, 11 Aug 2020 17:30:13 +0200
-Message-ID: <159715981316.1635409.16117540313443167075.stgit@bahia.lan>
-In-Reply-To: <159715979684.1635409.14107632395902701971.stgit@bahia.lan>
-References: <159715979684.1635409.14107632395902701971.stgit@bahia.lan>
-User-Agent: StGit/0.21
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=groug@kaod.org
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: kaod.org
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: softfail client-ip=205.139.110.120; envelope-from=groug@kaod.org;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/11 02:18:06
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -12
-X-Spam_score: -1.3
-X-Spam_bar: -
-X-Spam_report: (-1.3 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_SOFTFAIL=0.665 autolearn=no autolearn_force=no
+ (Exim 4.90_1) (envelope-from <gromero@linux.ibm.com>)
+ id 1k5WHK-0002JB-6o; Tue, 11 Aug 2020 11:33:30 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:14920
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <gromero@linux.ibm.com>)
+ id 1k5WHH-0002ml-Lq; Tue, 11 Aug 2020 11:33:29 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 07BFWc5f152677; Tue, 11 Aug 2020 11:33:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
+ h=from : to : cc : subject : date : message-id; s=pp1;
+ bh=PPx92utNEw+9BKUJJHztx9+w7ik/s8LH2Fe2Gp49uoM=;
+ b=TfR6sWWOo2aI2bTLC2GPiCXmItW8QQnH2gZW46BukYUxvb39HEV9hozyOQXBkWWd4RV0
+ wcWZ05NKlH+eAeG8di6NfRBpZ7vp+7UYP/jgyIQA3dfEFk8cotcqTLnVEoOMpjTzC4rJ
+ uzPOGUuVH6uGdH0yNt1Vg9C9XO5fEMKd5s9Q97C7uliba1gGIG2JnRV76MRpImmCgpvM
+ C0S8gBFEH/tF3nNmVAAO5Q6fCipQAKC4QzF2wtg4YjfyBYJ95PzXvNlUDYN6ues0KqH5
+ SLKfqyZhJzS0v4gaLjT9x1swN4ssm52ETCPD8qFxYWDe1ov5D7A3bKEn2a5fCSXCFH3G 6w== 
+Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com
+ [169.63.121.186])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 32usrygq7d-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 11 Aug 2020 11:33:12 -0400
+Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
+ by ppma03wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 07BFKAVm017862;
+ Tue, 11 Aug 2020 15:33:12 GMT
+Received: from b01cxnp22035.gho.pok.ibm.com (b01cxnp22035.gho.pok.ibm.com
+ [9.57.198.25]) by ppma03wdc.us.ibm.com with ESMTP id 32skp92f6a-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 11 Aug 2020 15:33:12 +0000
+Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com
+ [9.57.199.111])
+ by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 07BFXClH54198572
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 11 Aug 2020 15:33:12 GMT
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id EDC56AC05E;
+ Tue, 11 Aug 2020 15:33:11 +0000 (GMT)
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id BBFCBAC059;
+ Tue, 11 Aug 2020 15:33:08 +0000 (GMT)
+Received: from pub.ltc.br.ibm.com (unknown [9.80.200.46])
+ by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
+ Tue, 11 Aug 2020 15:33:08 +0000 (GMT)
+From: Gustavo Romero <gromero@linux.ibm.com>
+To: qemu-ppc@nongnu.org
+Subject: [PATCH v2] target/ppc: Integrate icount to purr, vtb, and tbu40
+Date: Tue, 11 Aug 2020 12:32:35 -0300
+Message-Id: <20200811153235.4527-1-gromero@linux.ibm.com>
+X-Mailer: git-send-email 2.17.1
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
+ definitions=2020-08-11_14:2020-08-11,
+ 2020-08-11 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ mlxlogscore=786 phishscore=0
+ spamscore=0 malwarescore=0 lowpriorityscore=0 impostorscore=0 mlxscore=0
+ adultscore=0 priorityscore=1501 clxscore=1011 bulkscore=0 suspectscore=1
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2008110105
+Received-SPF: pass client-ip=148.163.158.5; envelope-from=gromero@linux.ibm.com;
+ helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/11 09:33:21
+X-ACL-Warn: Detected OS   = Linux 3.x [generic]
+X-Spam_score_int: -36
+X-Spam_score: -3.7
+X-Spam_bar: ---
+X-Spam_report: (-3.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -83,55 +110,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Laurent Vivier <laurent@vivier.eu>, David Gibson <david@gibson.dropbear.id.au>
+Cc: peter.maydell@linaro.org, clg@kaod.org, david@gibson.dropbear.id.au,
+ qemu-devel@nongnu.org, gromero@linux.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Since commit 61f20b9dc5b7 ("spapr_nvram: Pre-initialize the NVRAM to
-support the -prom-env parameter"), pseries machines can pre-initialize
-the "system" partition in the NVRAM with the data passed to all -prom-env
-parameters on the QEMU command line.
+Currently if option '-icount auto' is passed to the QEMU TCG to enable
+counting instructions the VM crashes with the following error report when
+Linux runs on it:
 
-In this cases it is assumed that all the data fits in 64 KiB, but the user
-can easily pass more and crash QEMU:
+qemu-system-ppc64: Bad icount read
 
-$ qemu-system-ppc64 -M pseries $(for ((x=3D0;x<128;x++)); do \
-  echo -n " -prom-env "$(for ((y=3D0;y<1024;y++)); do echo -n x ; done) ; \
-  done) # this requires ~128 Kib
-malloc(): corrupted top size
-Aborted (core dumped)
+This happens because read/write access to the SPRs PURR, VTB, and TBU40
+is not integrated to the icount framework.
 
-Call chrp_nvram_create_system_partition() first with its recently added
-parameter dry_run set to false, to know the required size and allocate
-the NVRAM buffer accordingly.
+This commit fixes that issue by making the read/write access of these
+SPRs aware of icount framework, adding the proper gen_io_start() calls
+before calling the helpers to load/store these SPRs in TCG and ensuring
+that the associated TBs end immediately after, accordingly to what's in
+docs/devel/tcg-icount.rst.
 
-Fixes: 61f20b9dc5b7 ("spapr_nvram: Pre-initialize the NVRAM to support the =
--prom-env parameter")
-Signed-off-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: Gustavo Romero <gromero@linux.ibm.com>
 ---
- hw/nvram/spapr_nvram.c |    4 ++++
- 1 file changed, 4 insertions(+)
+ target/ppc/translate_init.inc.c | 30 ++++++++++++++++++++++++++++++
+ 1 file changed, 30 insertions(+)
 
-diff --git a/hw/nvram/spapr_nvram.c b/hw/nvram/spapr_nvram.c
-index 992b818d34e7..1b74bec6200a 100644
---- a/hw/nvram/spapr_nvram.c
-+++ b/hw/nvram/spapr_nvram.c
-@@ -165,6 +165,10 @@ static void spapr_nvram_realize(SpaprVioDevice *dev, E=
-rror **errp)
-         if (ret < 0) {
-             return;
-         }
-+    } else if (nb_prom_envs > 0) {
-+        nvram->size =3D chrp_nvram_create_system_partition(NULL,
-+                                                         MIN_NVRAM_SIZE / =
-4,
-+                                                         true);
-     } else {
-         nvram->size =3D DEFAULT_NVRAM_SIZE;
-     }
-
+diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.inc.c
+index 7e66822b5d..ccf9ce3441 100644
+--- a/target/ppc/translate_init.inc.c
++++ b/target/ppc/translate_init.inc.c
+@@ -284,12 +284,24 @@ static void spr_write_atbu(DisasContext *ctx, int sprn, int gprn)
+ ATTRIBUTE_UNUSED
+ static void spr_read_purr(DisasContext *ctx, int gprn, int sprn)
+ {
++    if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
++        gen_io_start();
++    }
+     gen_helper_load_purr(cpu_gpr[gprn], cpu_env);
++    if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
++        gen_stop_exception(ctx);
++    }
+ }
+ 
+ static void spr_write_purr(DisasContext *ctx, int sprn, int gprn)
+ {
++    if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
++        gen_io_start();
++    }
+     gen_helper_store_purr(cpu_env, cpu_gpr[gprn]);
++    if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
++        gen_stop_exception(ctx);
++    }
+ }
+ 
+ /* HDECR */
+@@ -319,17 +331,35 @@ static void spr_write_hdecr(DisasContext *ctx, int sprn, int gprn)
+ 
+ static void spr_read_vtb(DisasContext *ctx, int gprn, int sprn)
+ {
++    if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
++        gen_io_start();
++    }
+     gen_helper_load_vtb(cpu_gpr[gprn], cpu_env);
++    if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
++        gen_stop_exception(ctx);
++    }
+ }
+ 
+ static void spr_write_vtb(DisasContext *ctx, int sprn, int gprn)
+ {
++    if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
++        gen_io_start();
++    }
+     gen_helper_store_vtb(cpu_env, cpu_gpr[gprn]);
++    if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
++        gen_stop_exception(ctx);
++    }
+ }
+ 
+ static void spr_write_tbu40(DisasContext *ctx, int sprn, int gprn)
+ {
++    if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
++        gen_io_start();
++    }
+     gen_helper_store_tbu40(cpu_env, cpu_gpr[gprn]);
++    if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
++        gen_stop_exception(ctx);
++    }
+ }
+ 
+ #endif
+-- 
+2.17.1
 
 
