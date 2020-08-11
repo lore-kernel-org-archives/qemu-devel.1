@@ -5,81 +5,86 @@ X-Spam-Level:
 X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42301C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 13:21:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7FF4C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 13:26:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CC42E2076C
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 13:21:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 30B0620658
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 13:26:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="HS90rcj9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC42E2076C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="K7DEz6FR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30B0620658
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gmx.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49122 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52186 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5UDp-0001eS-OV
-	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 09:21:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45506)
+	id 1k5UIH-00036s-18
+	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 09:26:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45358)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <n54@gmx.com>) id 1k5TwO-0000Aw-Uh
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 09:03:44 -0400
-Received: from mout.gmx.net ([212.227.15.18]:52061)
+ (Exim 4.90_1) (envelope-from <n54@gmx.com>) id 1k5Tw2-00009H-VH
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 09:03:22 -0400
+Received: from mout.gmx.net ([212.227.15.18]:53981)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <n54@gmx.com>) id 1k5TwJ-0000ys-4M
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 09:03:44 -0400
+ (Exim 4.90_1) (envelope-from <n54@gmx.com>) id 1k5Tw0-0000wY-MH
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 09:03:22 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
- s=badeba3b8450; t=1597150999;
- bh=aUBrCx4sXxdG+1ILPPgPFZrC8Y73fTamyWqAlWMdfPo=;
+ s=badeba3b8450; t=1597150993;
+ bh=ZKmjV+nVw1aJ6gZD2QzOEI785zynAMn0St417dViqGo=;
  h=X-UI-Sender-Class:From:To:Cc:Subject:Date:In-Reply-To:References;
- b=HS90rcj9oT+iXe6snxtwvVO3n/RL+H2jx/MuYWwGykSAZqPpyLYKxXTfj34+mHOCA
- 8n+mrI9lsRzNIwmsPA5kq3TvnwXEhGtIfqeF9iPojfNk9ZNpTnTLVoCLCln6TlMBUd
- UkfY4nbzXyTDreDPTUIyCxDvM/elE/Vp90KfNkQo=
+ b=K7DEz6FRRd0Tq/ninwHrZLaPLNnIPIlWmu3hS0ZPt+TmLy1EZL+paj9dp2gOyduOg
+ t006qn60SMG6wB3k7lm6VuOjsNE/W163DeDYhZhpuwWEL9zqoiNsxS8si47N4UyPjZ
+ pv2W4yAZkcGqA9njnXsA0n9mFxgrwEGf1czWIPFA=
 X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
 Received: from localhost.localdomain ([89.79.191.25]) by mail.gmx.com
  (mrgmx004 [212.227.17.184]) with ESMTPSA (Nemesis) id
- 1MRCK6-1kJpQ21tES-00NC9E; Tue, 11 Aug 2020 15:03:18 +0200
+ 1Msq2E-1kyQ2L0Ehc-00tCye; Tue, 11 Aug 2020 15:03:13 +0200
 From: Kamil Rytarowski <n54@gmx.com>
 To: rth@twiddle.net, ehabkost@redhat.com, slp@redhat.com, pbonzini@redhat.com,
  peter.maydell@linaro.org, philmd@redhat.com, max@m00nbsd.net,
  jmcneill@invisible.ca
-Subject: [PATCH v5 3/4] Introduce the NVMM impl
-Date: Tue, 11 Aug 2020 15:01:52 +0200
-Message-Id: <20200811130153.4948-3-n54@gmx.com>
+Subject: [PATCH v5 2/4] Add the NetBSD Virtual Machine Monitor accelerator.
+Date: Tue, 11 Aug 2020 15:01:51 +0200
+Message-Id: <20200811130153.4948-2-n54@gmx.com>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20200811130153.4948-1-n54@gmx.com>
 References: <20200206213232.1918-2-n54@gmx.com>
  <20200811130153.4948-1-n54@gmx.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:+m6HwbGsfFo2znSzod9CGx/QmClrzhbqtHWv9u69nBIoxj9F4B9
- rcKPMf3pG3NRR7/HjxOZp9aUd7YjJifHWlExZP7Pf5EvU7JZos9F1DUyxC/UKeKxC0f6EtU
- /mQJTt2LOtHG2DG4CntlOPnE2g+WK92nqLuhkl6b8pFV85nSn/S+6SONcIVoectbGbsXzvg
- IGVLrJUI9uqfKZYEcyeLg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:ssAOMXb2L2g=:GkvDdyUTGwDp2m7a+7JYej
- +zFcsobbFRfY/rPH18CV3D1ogzCvxvy0W5J6IhmUq5GFTMdKMuP9tbSsIfGm6AExVlgBo3TG4
- TI2xfaeoSw9D5xJV7n/QDQZAXfaW1qODj1rs6XLJIjUlpWuayqX5dgBuIc0gONXr9YBZTbQ9D
- MGzRmgrjEjj+zwrvtXyzMy87CpgJtTjmv1U5eQV8gSUfXLWILI/uPt+YRiK6vg6YtWZ3dCOq4
- ulkgEXVTsn5IH+UVk7gVLn7+PRu0B5NLYXbzPh6i8yg66bgZi2rG1J6ZHupR5Y8hFMBf90Be/
- bTfmSJzTAsGyfikff0yE/lJO4XEypgU9rir9OcPXiriWR9Uy4Ez94PnLiJOzBRMvXGBre5qnE
- OyIrZMfmmTE1cAJQWqg/Tpt3EpaX9CxCjVJQQJ4dlAeVSFwEL/3t0dNIITPcCN9p6OwmH0NMY
- jmXryRyE5ntbY/Mj73R0+yzM53SWwk4NXrZLePOgcMt3uzyWWidZu+eX2sU4+zLtN+JEJUXRW
- u4goVhmiUTHyMK3QtC1iYvU25jT0DuG/nGipy8ErifL7qEQEm9STcmH1jDoC3xbVXWy0x5I3E
- gdqclY+Hi/L4N4ojoeoy6HT8zg1x0ftuIQvElZt6N4DJUZn3GCphT1tOXUJZWxc8dE5tD/sQv
- O0gexdt+gTPZZvKC2uSQsL2WaoITfBbH01jTVW74kj7+7a5ZCTlyeZBNgIuAiFvwAdMxqTx4v
- 6a1UeA+2ChNkO5ciC0DC8hL5XhTiB/TQOxPSm6kXgopvGrajl74/nave4GUkQLC7bSCpyJ8bT
- Qy0+LORBl79i+xo3Ej/raxPg+93zaxBUIm5o1b2B+ApVY+BrCqhs+PT1YlQpdm8sXaFIOlSPB
- F5Me/+szGGUK0DeN7cH6TdieKZhxSaD9dF7T96+p357FN5rWxsT7qRxUawiWCf0ZXJUq9nDeA
- 15GtRQFPgRkdfB4K5ZU0aOo0T+jftMkp7guP8E+w96pq+JpItBpBonJxR7dx8DaLOh5x1ZSpG
- ihA44sFHDlS0MLtke9DL6TRGvDJTiQPi6SBaibhAmFaAHdz8nqKd7CSHtYK7wLZwo0VmEXLon
- Jdl8mnuXeri7BtRPTiMLQki5xACXdoUgrwBnbFOGZH8C8tctgUEBjfm41pWuxfK/3WGzrgUP4
- zy98e4PcDWYg+ng0aaWqMDiMVt+Jf2B8xbKyBhonyxnqPAOhQ3Zp+c+EDmAeJx/YC1vv6GR3q
- J8y47J7u51A2gmx8Q
+X-Provags-ID: V03:K1:5BOdXnJPvmwV9SRxtIJqAsCk02FdnU78VuEDhPMPTzqvSqJE9m7
+ aSv9Rao6GL44in2noDbfJ1NJYcKBVNst1EiwJmgLkI8EnYrgTj6+ar5Jfap1VSwZgVqYe8D
+ LRfbmF+ZQrH+00iU04kh5i3evY6/UVTQK8+UvZ6i0PpsVQxVl7t1y6uLkFh4lsU1HiPHZjr
+ 3w/ko9rgAU5EV2i90l6TQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:zTsCPHH0A/w=:gpbtEZcTVwURgt8FqFW8ZF
+ ed+wTOvWEwUbRQEKsPpCZCejzfwlJjI/Ox5eW+z4h5+I3Nw9T6urBIUHfsLfcIdSz2Qr5mEu2
+ UG+FocTsFj2CdpgWI6Wr546AvV/Fy8k1pwUQEG1sk21a/qOynMTLxoBFjjdhZPAPS9UGmWtOK
+ fdRjSry2apP/dRFjaeHmV7AiePYT4LHgdISlC1PBCl8/lpfFT8/FP9uTVZHkKMv0ZNgGTl0i0
+ +EPpa+JBpizxSiNLD9dqHfcVjBKh5GzrUKVEsu0v1cWjk+qG49T43fmSZD6PtOJP7zs2C8Oif
+ msGKU1lXaqbNANogwDDRDVVhEkJC9CqnHNh9/ne0b++jsnsb6Ap1f3lJ/TljoA7W1kJndkd9l
+ PN6vCib5POGsheWHP3TW7UgIyTDvsGyiHLgjgHI2+QO4XAWaRu68gfwhk3heqIZzZgIBSbDEZ
+ NCk+63rnOc8v7GIKSVrBLETmxHkMN6D4V6fN1L/jQ6rbHvkMvIudBlPZ8Iwo613BsVD45oPsT
+ zoXY3I6IKtbWtNjrDDUJfZZYD8UNI1cUcF8o78U8gAPGx1xCPxpCLPP+9f1EgIhfOKX8VN7wl
+ D2Di5PwNSumx8EwOsvWZgFiFiAUglpPZLY+F5ReAosQwYQQ5S5/9z9uJLV9ARTscIOOyInBnH
+ F5tCOEOS7KQzBJ8HVUqvh2qeBX3DIaUITT4KAp3eFHxzqFZ0TvNtoly5psg/bnr9Oi/Gbhw9F
+ 93Mkp49cN6Lz2KICteSfOHik8/mi5Pl+UUiyTp2dDrSipeA6F/IzJ+miRq4IAo1S9D+MxrbU4
+ slGZB3bLXXmEcCf+8rO6EClMSnB4fH8K5AdVOL3GFzc1VsIGnMfj7H5vgPJRQh8XmQjhFTvXI
+ QNNtW6ddgFvUTtNpTKk5n5Wn7Ym++3/KFy0ST4beoy6nKbPVonT1U/a+ZAtIWv06pN5ycRROt
+ lVwqBl6AdTGg1vWHaTEUy+JYDiRBcqJx/FtzaxoCzn5sfUDyV7cAByXghxh2UUdniiwU87pYa
+ NqZVQehKqEFLFl0KMzT6kQZtEO7UdBKi9cqpMKX0uiy8norRpyNX+MUyIJEBdLbGvt4eUybMw
+ n4GxhIfdy51U1rKt82sb+AdjUJLBfNExRfclrGUE+ocGJYoDuO772KsB9ocY6gjmZ/WstNi5j
+ xLIOZ/E4zQ/B+o0qGN0FSf8FlySnShu3b/Njoqrcz9W87LjIOgwSDcZ1HNQiA92BAFQ4BrlA7
+ x2AgQ/fpF40454+z4UOYF+dqGaG2YFzNnLAHyVrPr6U6Hs79Jk8KcIB+yqOz5z6iCs/aKODV+
+ edftvSuawVn2l25skbTKtHoqfuN4e1czrCVbLZIgp3QFOkBuzAU4DwLHkw6h8cgfc8t/n+iJE
+ ZH4ejKxE9Dqf2podvTefRWcXbGzBBIf8U/9j0v6So8FEzWOTtCeszZhZ++636Q1wAk4E0DqL3
+ 7eYzrZYv9D7OA2jw6AcqWHuI/LjJqCR+TAT2Rl4+KqR3uubOBHmjYi/7Uhq8lpkg8FN1rOuX4
+ mAkF5TSaFjKNjnT08viIzykQ=
 Received-SPF: pass client-ip=212.227.15.18; envelope-from=n54@gmx.com;
  helo=mout.gmx.net
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/11 09:02:59
@@ -111,1292 +116,181 @@ Sender: "Qemu-devel"
 
 From: Maxime Villard <max@m00nbsd.net>
 
-Implements the NetBSD Virtual Machine Monitor (NVMM) target. Which
-acts as a hypervisor accelerator for QEMU on the NetBSD platform. This ena=
-bles
-QEMU much greater speed over the emulated x86_64 path's that are taken on
-NetBSD today.
+Introduces the configure support for the new NetBSD Virtual Machine Monito=
+r that
+allows for hypervisor acceleration from usermode components on the NetBSD
+platform.
 
 Signed-off-by: Maxime Villard <max@m00nbsd.net>
 Signed-off-by: Kamil Rytarowski <n54@gmx.com>
 Reviewed-by: Sergio Lopez <slp@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Tested-by: Jared McNeill <jmcneill@invisible.ca>
 =2D--
- target/i386/Makefile.objs |    1 +
- target/i386/nvmm-all.c    | 1226 +++++++++++++++++++++++++++++++++++++
- 2 files changed, 1227 insertions(+)
- create mode 100644 target/i386/nvmm-all.c
+ configure       | 37 +++++++++++++++++++++++++++++++++++++
+ qemu-options.hx | 10 +++++-----
+ 2 files changed, 42 insertions(+), 5 deletions(-)
 
-diff --git a/target/i386/Makefile.objs b/target/i386/Makefile.objs
-index 0b93143e27..ff0df68404 100644
-=2D-- a/target/i386/Makefile.objs
-+++ b/target/i386/Makefile.objs
-@@ -18,6 +18,7 @@ obj-$(CONFIG_HAX) +=3D hax-all.o hax-mem.o hax-posix.o
- endif
- obj-$(CONFIG_HVF) +=3D hvf/
- obj-$(CONFIG_WHPX) +=3D whpx-all.o
-+obj-$(CONFIG_NVMM) +=3D nvmm-all.o
- endif
- obj-$(CONFIG_SEV) +=3D sev.o
- obj-$(call lnot,$(CONFIG_SEV)) +=3D sev-stub.o
-diff --git a/target/i386/nvmm-all.c b/target/i386/nvmm-all.c
-new file mode 100644
-index 0000000000..408f7305b9
-=2D-- /dev/null
-+++ b/target/i386/nvmm-all.c
-@@ -0,0 +1,1226 @@
-+/*
-+ * Copyright (c) 2018-2019 Maxime Villard, All rights reserved.
-+ *
-+ * NetBSD Virtual Machine Monitor (NVMM) accelerator for QEMU.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or lat=
-er.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "cpu.h"
-+#include "exec/address-spaces.h"
-+#include "exec/ioport.h"
-+#include "qemu-common.h"
-+#include "strings.h"
-+#include "sysemu/accel.h"
-+#include "sysemu/nvmm.h"
-+#include "sysemu/runstate.h"
-+#include "sysemu/sysemu.h"
-+#include "sysemu/cpus.h"
-+#include "qemu/main-loop.h"
-+#include "qemu/error-report.h"
-+#include "qemu/queue.h"
-+#include "qapi/error.h"
-+#include "migration/blocker.h"
-+
-+#include <nvmm.h>
-+
-+struct qemu_vcpu {
-+    struct nvmm_vcpu vcpu;
-+    uint8_t tpr;
-+    bool stop;
-+
-+    /* Window-exiting for INTs/NMIs. */
-+    bool int_window_exit;
-+    bool nmi_window_exit;
-+
-+    /* The guest is in an interrupt shadow (POP SS, etc). */
-+    bool int_shadow;
-+};
-+
-+struct qemu_machine {
-+    struct nvmm_capability cap;
-+    struct nvmm_machine mach;
-+};
-+
-+/* ----------------------------------------------------------------------=
----- */
-+
-+static bool nvmm_allowed;
-+static struct qemu_machine qemu_mach;
-+
-+static struct qemu_vcpu *
-+get_qemu_vcpu(CPUState *cpu)
-+{
-+    return (struct qemu_vcpu *)cpu->hax_vcpu;
+diff --git a/configure b/configure
+index 2acc4d1465..fb9ffba2bf 100755
+=2D-- a/configure
++++ b/configure
+@@ -246,6 +246,17 @@ supported_whpx_target() {
+     return 1
+ }
+
++supported_nvmm_target() {
++    test "$nvmm" =3D "yes" || return 1
++    glob "$1" "*-softmmu" || return 1
++    case "${1%-softmmu}" in
++        i386|x86_64)
++            return 0
++        ;;
++    esac
++    return 1
 +}
 +
-+static struct nvmm_machine *
-+get_nvmm_mach(void)
-+{
-+    return &qemu_mach.mach;
-+}
-+
-+/* ----------------------------------------------------------------------=
----- */
-+
-+static void
-+nvmm_set_segment(struct nvmm_x64_state_seg *nseg, const SegmentCache *qse=
-g)
-+{
-+    uint32_t attrib =3D qseg->flags;
-+
-+    nseg->selector =3D qseg->selector;
-+    nseg->limit =3D qseg->limit;
-+    nseg->base =3D qseg->base;
-+    nseg->attrib.type =3D __SHIFTOUT(attrib, DESC_TYPE_MASK);
-+    nseg->attrib.s =3D __SHIFTOUT(attrib, DESC_S_MASK);
-+    nseg->attrib.dpl =3D __SHIFTOUT(attrib, DESC_DPL_MASK);
-+    nseg->attrib.p =3D __SHIFTOUT(attrib, DESC_P_MASK);
-+    nseg->attrib.avl =3D __SHIFTOUT(attrib, DESC_AVL_MASK);
-+    nseg->attrib.l =3D __SHIFTOUT(attrib, DESC_L_MASK);
-+    nseg->attrib.def =3D __SHIFTOUT(attrib, DESC_B_MASK);
-+    nseg->attrib.g =3D __SHIFTOUT(attrib, DESC_G_MASK);
-+}
-+
-+static void
-+nvmm_set_registers(CPUState *cpu)
-+{
-+    struct CPUX86State *env =3D (CPUArchState *)cpu->env_ptr;
-+    struct nvmm_machine *mach =3D get_nvmm_mach();
-+    struct qemu_vcpu *qcpu =3D get_qemu_vcpu(cpu);
-+    struct nvmm_vcpu *vcpu =3D &qcpu->vcpu;
-+    struct nvmm_x64_state *state =3D vcpu->state;
-+    uint64_t bitmap;
-+    size_t i;
-+    int ret;
-+
-+    assert(cpu_is_stopped(cpu) || qemu_cpu_is_self(cpu));
-+
-+    /* GPRs. */
-+    state->gprs[NVMM_X64_GPR_RAX] =3D env->regs[R_EAX];
-+    state->gprs[NVMM_X64_GPR_RCX] =3D env->regs[R_ECX];
-+    state->gprs[NVMM_X64_GPR_RDX] =3D env->regs[R_EDX];
-+    state->gprs[NVMM_X64_GPR_RBX] =3D env->regs[R_EBX];
-+    state->gprs[NVMM_X64_GPR_RSP] =3D env->regs[R_ESP];
-+    state->gprs[NVMM_X64_GPR_RBP] =3D env->regs[R_EBP];
-+    state->gprs[NVMM_X64_GPR_RSI] =3D env->regs[R_ESI];
-+    state->gprs[NVMM_X64_GPR_RDI] =3D env->regs[R_EDI];
-+#ifdef TARGET_X86_64
-+    state->gprs[NVMM_X64_GPR_R8]  =3D env->regs[R_R8];
-+    state->gprs[NVMM_X64_GPR_R9]  =3D env->regs[R_R9];
-+    state->gprs[NVMM_X64_GPR_R10] =3D env->regs[R_R10];
-+    state->gprs[NVMM_X64_GPR_R11] =3D env->regs[R_R11];
-+    state->gprs[NVMM_X64_GPR_R12] =3D env->regs[R_R12];
-+    state->gprs[NVMM_X64_GPR_R13] =3D env->regs[R_R13];
-+    state->gprs[NVMM_X64_GPR_R14] =3D env->regs[R_R14];
-+    state->gprs[NVMM_X64_GPR_R15] =3D env->regs[R_R15];
-+#endif
-+
-+    /* RIP and RFLAGS. */
-+    state->gprs[NVMM_X64_GPR_RIP] =3D env->eip;
-+    state->gprs[NVMM_X64_GPR_RFLAGS] =3D env->eflags;
-+
-+    /* Segments. */
-+    nvmm_set_segment(&state->segs[NVMM_X64_SEG_CS], &env->segs[R_CS]);
-+    nvmm_set_segment(&state->segs[NVMM_X64_SEG_DS], &env->segs[R_DS]);
-+    nvmm_set_segment(&state->segs[NVMM_X64_SEG_ES], &env->segs[R_ES]);
-+    nvmm_set_segment(&state->segs[NVMM_X64_SEG_FS], &env->segs[R_FS]);
-+    nvmm_set_segment(&state->segs[NVMM_X64_SEG_GS], &env->segs[R_GS]);
-+    nvmm_set_segment(&state->segs[NVMM_X64_SEG_SS], &env->segs[R_SS]);
-+
-+    /* Special segments. */
-+    nvmm_set_segment(&state->segs[NVMM_X64_SEG_GDT], &env->gdt);
-+    nvmm_set_segment(&state->segs[NVMM_X64_SEG_LDT], &env->ldt);
-+    nvmm_set_segment(&state->segs[NVMM_X64_SEG_TR], &env->tr);
-+    nvmm_set_segment(&state->segs[NVMM_X64_SEG_IDT], &env->idt);
-+
-+    /* Control registers. */
-+    state->crs[NVMM_X64_CR_CR0] =3D env->cr[0];
-+    state->crs[NVMM_X64_CR_CR2] =3D env->cr[2];
-+    state->crs[NVMM_X64_CR_CR3] =3D env->cr[3];
-+    state->crs[NVMM_X64_CR_CR4] =3D env->cr[4];
-+    state->crs[NVMM_X64_CR_CR8] =3D qcpu->tpr;
-+    state->crs[NVMM_X64_CR_XCR0] =3D env->xcr0;
-+
-+    /* Debug registers. */
-+    state->drs[NVMM_X64_DR_DR0] =3D env->dr[0];
-+    state->drs[NVMM_X64_DR_DR1] =3D env->dr[1];
-+    state->drs[NVMM_X64_DR_DR2] =3D env->dr[2];
-+    state->drs[NVMM_X64_DR_DR3] =3D env->dr[3];
-+    state->drs[NVMM_X64_DR_DR6] =3D env->dr[6];
-+    state->drs[NVMM_X64_DR_DR7] =3D env->dr[7];
-+
-+    /* FPU. */
-+    state->fpu.fx_cw =3D env->fpuc;
-+    state->fpu.fx_sw =3D (env->fpus & ~0x3800) | ((env->fpstt & 0x7) << 1=
-1);
-+    state->fpu.fx_tw =3D 0;
-+    for (i =3D 0; i < 8; i++) {
-+        state->fpu.fx_tw |=3D (!env->fptags[i]) << i;
-+    }
-+    state->fpu.fx_opcode =3D env->fpop;
-+    state->fpu.fx_ip.fa_64 =3D env->fpip;
-+    state->fpu.fx_dp.fa_64 =3D env->fpdp;
-+    state->fpu.fx_mxcsr =3D env->mxcsr;
-+    state->fpu.fx_mxcsr_mask =3D 0x0000FFFF;
-+    assert(sizeof(state->fpu.fx_87_ac) =3D=3D sizeof(env->fpregs));
-+    memcpy(state->fpu.fx_87_ac, env->fpregs, sizeof(env->fpregs));
-+    for (i =3D 0; i < 16; i++) {
-+        memcpy(&state->fpu.fx_xmm[i].xmm_bytes[0],
-+            &env->xmm_regs[i].ZMM_Q(0), 8);
-+        memcpy(&state->fpu.fx_xmm[i].xmm_bytes[8],
-+            &env->xmm_regs[i].ZMM_Q(1), 8);
-+    }
-+
-+    /* MSRs. */
-+    state->msrs[NVMM_X64_MSR_EFER] =3D env->efer;
-+    state->msrs[NVMM_X64_MSR_STAR] =3D env->star;
-+#ifdef TARGET_X86_64
-+    state->msrs[NVMM_X64_MSR_LSTAR] =3D env->lstar;
-+    state->msrs[NVMM_X64_MSR_CSTAR] =3D env->cstar;
-+    state->msrs[NVMM_X64_MSR_SFMASK] =3D env->fmask;
-+    state->msrs[NVMM_X64_MSR_KERNELGSBASE] =3D env->kernelgsbase;
-+#endif
-+    state->msrs[NVMM_X64_MSR_SYSENTER_CS]  =3D env->sysenter_cs;
-+    state->msrs[NVMM_X64_MSR_SYSENTER_ESP] =3D env->sysenter_esp;
-+    state->msrs[NVMM_X64_MSR_SYSENTER_EIP] =3D env->sysenter_eip;
-+    state->msrs[NVMM_X64_MSR_PAT] =3D env->pat;
-+    state->msrs[NVMM_X64_MSR_TSC] =3D env->tsc;
-+
-+    bitmap =3D
-+        NVMM_X64_STATE_SEGS |
-+        NVMM_X64_STATE_GPRS |
-+        NVMM_X64_STATE_CRS  |
-+        NVMM_X64_STATE_DRS  |
-+        NVMM_X64_STATE_MSRS |
-+        NVMM_X64_STATE_FPU;
-+
-+    ret =3D nvmm_vcpu_setstate(mach, vcpu, bitmap);
-+    if (ret =3D=3D -1) {
-+        error_report("NVMM: Failed to set virtual processor context,"
-+            " error=3D%d", errno);
-+    }
-+}
-+
-+static void
-+nvmm_get_segment(SegmentCache *qseg, const struct nvmm_x64_state_seg *nse=
-g)
-+{
-+    qseg->selector =3D nseg->selector;
-+    qseg->limit =3D nseg->limit;
-+    qseg->base =3D nseg->base;
-+
-+    qseg->flags =3D
-+        __SHIFTIN((uint32_t)nseg->attrib.type, DESC_TYPE_MASK) |
-+        __SHIFTIN((uint32_t)nseg->attrib.s, DESC_S_MASK) |
-+        __SHIFTIN((uint32_t)nseg->attrib.dpl, DESC_DPL_MASK) |
-+        __SHIFTIN((uint32_t)nseg->attrib.p, DESC_P_MASK) |
-+        __SHIFTIN((uint32_t)nseg->attrib.avl, DESC_AVL_MASK) |
-+        __SHIFTIN((uint32_t)nseg->attrib.l, DESC_L_MASK) |
-+        __SHIFTIN((uint32_t)nseg->attrib.def, DESC_B_MASK) |
-+        __SHIFTIN((uint32_t)nseg->attrib.g, DESC_G_MASK);
-+}
-+
-+static void
-+nvmm_get_registers(CPUState *cpu)
-+{
-+    struct CPUX86State *env =3D (CPUArchState *)cpu->env_ptr;
-+    struct nvmm_machine *mach =3D get_nvmm_mach();
-+    struct qemu_vcpu *qcpu =3D get_qemu_vcpu(cpu);
-+    struct nvmm_vcpu *vcpu =3D &qcpu->vcpu;
-+    X86CPU *x86_cpu =3D X86_CPU(cpu);
-+    struct nvmm_x64_state *state =3D vcpu->state;
-+    uint64_t bitmap, tpr;
-+    size_t i;
-+    int ret;
-+
-+    assert(cpu_is_stopped(cpu) || qemu_cpu_is_self(cpu));
-+
-+    bitmap =3D
-+        NVMM_X64_STATE_SEGS |
-+        NVMM_X64_STATE_GPRS |
-+        NVMM_X64_STATE_CRS  |
-+        NVMM_X64_STATE_DRS  |
-+        NVMM_X64_STATE_MSRS |
-+        NVMM_X64_STATE_FPU;
-+
-+    ret =3D nvmm_vcpu_getstate(mach, vcpu, bitmap);
-+    if (ret =3D=3D -1) {
-+        error_report("NVMM: Failed to get virtual processor context,"
-+            " error=3D%d", errno);
-+    }
-+
-+    /* GPRs. */
-+    env->regs[R_EAX] =3D state->gprs[NVMM_X64_GPR_RAX];
-+    env->regs[R_ECX] =3D state->gprs[NVMM_X64_GPR_RCX];
-+    env->regs[R_EDX] =3D state->gprs[NVMM_X64_GPR_RDX];
-+    env->regs[R_EBX] =3D state->gprs[NVMM_X64_GPR_RBX];
-+    env->regs[R_ESP] =3D state->gprs[NVMM_X64_GPR_RSP];
-+    env->regs[R_EBP] =3D state->gprs[NVMM_X64_GPR_RBP];
-+    env->regs[R_ESI] =3D state->gprs[NVMM_X64_GPR_RSI];
-+    env->regs[R_EDI] =3D state->gprs[NVMM_X64_GPR_RDI];
-+#ifdef TARGET_X86_64
-+    env->regs[R_R8]  =3D state->gprs[NVMM_X64_GPR_R8];
-+    env->regs[R_R9]  =3D state->gprs[NVMM_X64_GPR_R9];
-+    env->regs[R_R10] =3D state->gprs[NVMM_X64_GPR_R10];
-+    env->regs[R_R11] =3D state->gprs[NVMM_X64_GPR_R11];
-+    env->regs[R_R12] =3D state->gprs[NVMM_X64_GPR_R12];
-+    env->regs[R_R13] =3D state->gprs[NVMM_X64_GPR_R13];
-+    env->regs[R_R14] =3D state->gprs[NVMM_X64_GPR_R14];
-+    env->regs[R_R15] =3D state->gprs[NVMM_X64_GPR_R15];
-+#endif
-+
-+    /* RIP and RFLAGS. */
-+    env->eip =3D state->gprs[NVMM_X64_GPR_RIP];
-+    env->eflags =3D state->gprs[NVMM_X64_GPR_RFLAGS];
-+
-+    /* Segments. */
-+    nvmm_get_segment(&env->segs[R_ES], &state->segs[NVMM_X64_SEG_ES]);
-+    nvmm_get_segment(&env->segs[R_CS], &state->segs[NVMM_X64_SEG_CS]);
-+    nvmm_get_segment(&env->segs[R_SS], &state->segs[NVMM_X64_SEG_SS]);
-+    nvmm_get_segment(&env->segs[R_DS], &state->segs[NVMM_X64_SEG_DS]);
-+    nvmm_get_segment(&env->segs[R_FS], &state->segs[NVMM_X64_SEG_FS]);
-+    nvmm_get_segment(&env->segs[R_GS], &state->segs[NVMM_X64_SEG_GS]);
-+
-+    /* Special segments. */
-+    nvmm_get_segment(&env->gdt, &state->segs[NVMM_X64_SEG_GDT]);
-+    nvmm_get_segment(&env->ldt, &state->segs[NVMM_X64_SEG_LDT]);
-+    nvmm_get_segment(&env->tr, &state->segs[NVMM_X64_SEG_TR]);
-+    nvmm_get_segment(&env->idt, &state->segs[NVMM_X64_SEG_IDT]);
-+
-+    /* Control registers. */
-+    env->cr[0] =3D state->crs[NVMM_X64_CR_CR0];
-+    env->cr[2] =3D state->crs[NVMM_X64_CR_CR2];
-+    env->cr[3] =3D state->crs[NVMM_X64_CR_CR3];
-+    env->cr[4] =3D state->crs[NVMM_X64_CR_CR4];
-+    tpr =3D state->crs[NVMM_X64_CR_CR8];
-+    if (tpr !=3D qcpu->tpr) {
-+        qcpu->tpr =3D tpr;
-+        cpu_set_apic_tpr(x86_cpu->apic_state, tpr);
-+    }
-+    env->xcr0 =3D state->crs[NVMM_X64_CR_XCR0];
-+
-+    /* Debug registers. */
-+    env->dr[0] =3D state->drs[NVMM_X64_DR_DR0];
-+    env->dr[1] =3D state->drs[NVMM_X64_DR_DR1];
-+    env->dr[2] =3D state->drs[NVMM_X64_DR_DR2];
-+    env->dr[3] =3D state->drs[NVMM_X64_DR_DR3];
-+    env->dr[6] =3D state->drs[NVMM_X64_DR_DR6];
-+    env->dr[7] =3D state->drs[NVMM_X64_DR_DR7];
-+
-+    /* FPU. */
-+    env->fpuc =3D state->fpu.fx_cw;
-+    env->fpstt =3D (state->fpu.fx_sw >> 11) & 0x7;
-+    env->fpus =3D state->fpu.fx_sw & ~0x3800;
-+    for (i =3D 0; i < 8; i++) {
-+        env->fptags[i] =3D !((state->fpu.fx_tw >> i) & 1);
-+    }
-+    env->fpop =3D state->fpu.fx_opcode;
-+    env->fpip =3D state->fpu.fx_ip.fa_64;
-+    env->fpdp =3D state->fpu.fx_dp.fa_64;
-+    env->mxcsr =3D state->fpu.fx_mxcsr;
-+    assert(sizeof(state->fpu.fx_87_ac) =3D=3D sizeof(env->fpregs));
-+    memcpy(env->fpregs, state->fpu.fx_87_ac, sizeof(env->fpregs));
-+    for (i =3D 0; i < 16; i++) {
-+        memcpy(&env->xmm_regs[i].ZMM_Q(0),
-+            &state->fpu.fx_xmm[i].xmm_bytes[0], 8);
-+        memcpy(&env->xmm_regs[i].ZMM_Q(1),
-+            &state->fpu.fx_xmm[i].xmm_bytes[8], 8);
-+    }
-+
-+    /* MSRs. */
-+    env->efer =3D state->msrs[NVMM_X64_MSR_EFER];
-+    env->star =3D state->msrs[NVMM_X64_MSR_STAR];
-+#ifdef TARGET_X86_64
-+    env->lstar =3D state->msrs[NVMM_X64_MSR_LSTAR];
-+    env->cstar =3D state->msrs[NVMM_X64_MSR_CSTAR];
-+    env->fmask =3D state->msrs[NVMM_X64_MSR_SFMASK];
-+    env->kernelgsbase =3D state->msrs[NVMM_X64_MSR_KERNELGSBASE];
-+#endif
-+    env->sysenter_cs  =3D state->msrs[NVMM_X64_MSR_SYSENTER_CS];
-+    env->sysenter_esp =3D state->msrs[NVMM_X64_MSR_SYSENTER_ESP];
-+    env->sysenter_eip =3D state->msrs[NVMM_X64_MSR_SYSENTER_EIP];
-+    env->pat =3D state->msrs[NVMM_X64_MSR_PAT];
-+    env->tsc =3D state->msrs[NVMM_X64_MSR_TSC];
-+
-+    x86_update_hflags(env);
-+}
-+
-+static bool
-+nvmm_can_take_int(CPUState *cpu)
-+{
-+    struct CPUX86State *env =3D (CPUArchState *)cpu->env_ptr;
-+    struct qemu_vcpu *qcpu =3D get_qemu_vcpu(cpu);
-+    struct nvmm_vcpu *vcpu =3D &qcpu->vcpu;
-+    struct nvmm_machine *mach =3D get_nvmm_mach();
-+
-+    if (qcpu->int_window_exit) {
-+        return false;
-+    }
-+
-+    if (qcpu->int_shadow || !(env->eflags & IF_MASK)) {
-+        struct nvmm_x64_state *state =3D vcpu->state;
-+
-+        /* Exit on interrupt window. */
-+        nvmm_vcpu_getstate(mach, vcpu, NVMM_X64_STATE_INTR);
-+        state->intr.int_window_exiting =3D 1;
-+        nvmm_vcpu_setstate(mach, vcpu, NVMM_X64_STATE_INTR);
-+
-+        return false;
-+    }
-+
-+    return true;
-+}
-+
-+static bool
-+nvmm_can_take_nmi(CPUState *cpu)
-+{
-+    struct qemu_vcpu *qcpu =3D get_qemu_vcpu(cpu);
-+
-+    /*
-+     * Contrary to INTs, NMIs always schedule an exit when they are
-+     * completed. Therefore, if window-exiting is enabled, it means
-+     * NMIs are blocked.
-+     */
-+    if (qcpu->nmi_window_exit) {
-+        return false;
-+    }
-+
-+    return true;
-+}
-+
-+/*
-+ * Called before the VCPU is run. We inject events generated by the I/O
-+ * thread, and synchronize the guest TPR.
-+ */
-+static void
-+nvmm_vcpu_pre_run(CPUState *cpu)
-+{
-+    struct CPUX86State *env =3D (CPUArchState *)cpu->env_ptr;
-+    struct nvmm_machine *mach =3D get_nvmm_mach();
-+    struct qemu_vcpu *qcpu =3D get_qemu_vcpu(cpu);
-+    struct nvmm_vcpu *vcpu =3D &qcpu->vcpu;
-+    X86CPU *x86_cpu =3D X86_CPU(cpu);
-+    struct nvmm_x64_state *state =3D vcpu->state;
-+    struct nvmm_vcpu_event *event =3D vcpu->event;
-+    bool has_event =3D false;
-+    bool sync_tpr =3D false;
-+    uint8_t tpr;
-+    int ret;
-+
-+    qemu_mutex_lock_iothread();
-+
-+    tpr =3D cpu_get_apic_tpr(x86_cpu->apic_state);
-+    if (tpr !=3D qcpu->tpr) {
-+        qcpu->tpr =3D tpr;
-+        sync_tpr =3D true;
-+    }
-+
-+    /*
-+     * Force the VCPU out of its inner loop to process any INIT requests
-+     * or commit pending TPR access.
-+     */
-+    if (cpu->interrupt_request & (CPU_INTERRUPT_INIT | CPU_INTERRUPT_TPR)=
-) {
-+        cpu->exit_request =3D 1;
-+    }
-+
-+    if (!has_event && (cpu->interrupt_request & CPU_INTERRUPT_NMI)) {
-+        if (nvmm_can_take_nmi(cpu)) {
-+            cpu->interrupt_request &=3D ~CPU_INTERRUPT_NMI;
-+            event->type =3D NVMM_VCPU_EVENT_INTR;
-+            event->vector =3D 2;
-+            has_event =3D true;
-+        }
-+    }
-+
-+    if (!has_event && (cpu->interrupt_request & CPU_INTERRUPT_HARD)) {
-+        if (nvmm_can_take_int(cpu)) {
-+            cpu->interrupt_request &=3D ~CPU_INTERRUPT_HARD;
-+            event->type =3D NVMM_VCPU_EVENT_INTR;
-+            event->vector =3D cpu_get_pic_interrupt(env);
-+            has_event =3D true;
-+        }
-+    }
-+
-+    /* Don't want SMIs. */
-+    if (cpu->interrupt_request & CPU_INTERRUPT_SMI) {
-+        cpu->interrupt_request &=3D ~CPU_INTERRUPT_SMI;
-+    }
-+
-+    if (sync_tpr) {
-+        ret =3D nvmm_vcpu_getstate(mach, vcpu, NVMM_X64_STATE_CRS);
-+        if (ret =3D=3D -1) {
-+            error_report("NVMM: Failed to get CPU state,"
-+                " error=3D%d", errno);
-+        }
-+
-+        state->crs[NVMM_X64_CR_CR8] =3D qcpu->tpr;
-+
-+        ret =3D nvmm_vcpu_setstate(mach, vcpu, NVMM_X64_STATE_CRS);
-+        if (ret =3D=3D -1) {
-+            error_report("NVMM: Failed to set CPU state,"
-+                " error=3D%d", errno);
-+        }
-+    }
-+
-+    if (has_event) {
-+        ret =3D nvmm_vcpu_inject(mach, vcpu);
-+        if (ret =3D=3D -1) {
-+            error_report("NVMM: Failed to inject event,"
-+                " error=3D%d", errno);
-+        }
-+    }
-+
-+    qemu_mutex_unlock_iothread();
-+}
-+
-+/*
-+ * Called after the VCPU ran. We synchronize the host view of the TPR and
-+ * RFLAGS.
-+ */
-+static void
-+nvmm_vcpu_post_run(CPUState *cpu, struct nvmm_vcpu_exit *exit)
-+{
-+    struct qemu_vcpu *qcpu =3D get_qemu_vcpu(cpu);
-+    struct CPUX86State *env =3D (CPUArchState *)cpu->env_ptr;
-+    X86CPU *x86_cpu =3D X86_CPU(cpu);
-+    uint64_t tpr;
-+
-+    env->eflags =3D exit->exitstate.rflags;
-+    qcpu->int_shadow =3D exit->exitstate.int_shadow;
-+    qcpu->int_window_exit =3D exit->exitstate.int_window_exiting;
-+    qcpu->nmi_window_exit =3D exit->exitstate.nmi_window_exiting;
-+
-+    tpr =3D exit->exitstate.cr8;
-+    if (qcpu->tpr !=3D tpr) {
-+        qcpu->tpr =3D tpr;
-+        qemu_mutex_lock_iothread();
-+        cpu_set_apic_tpr(x86_cpu->apic_state, qcpu->tpr);
-+        qemu_mutex_unlock_iothread();
-+    }
-+}
-+
-+/* ----------------------------------------------------------------------=
----- */
-+
-+static void
-+nvmm_io_callback(struct nvmm_io *io)
-+{
-+    MemTxAttrs attrs =3D { 0 };
-+    int ret;
-+
-+    ret =3D address_space_rw(&address_space_io, io->port, attrs, io->data=
-,
-+        io->size, !io->in);
-+    if (ret !=3D MEMTX_OK) {
-+        error_report("NVMM: I/O Transaction Failed "
-+            "[%s, port=3D%u, size=3D%zu]", (io->in ? "in" : "out"),
-+            io->port, io->size);
-+    }
-+
-+    /* Needed, otherwise infinite loop. */
-+    current_cpu->vcpu_dirty =3D false;
-+}
-+
-+static void
-+nvmm_mem_callback(struct nvmm_mem *mem)
-+{
-+    cpu_physical_memory_rw(mem->gpa, mem->data, mem->size, mem->write);
-+
-+    /* XXX Needed, otherwise infinite loop. */
-+    current_cpu->vcpu_dirty =3D false;
-+}
-+
-+static struct nvmm_assist_callbacks nvmm_callbacks =3D {
-+    .io =3D nvmm_io_callback,
-+    .mem =3D nvmm_mem_callback
-+};
-+
-+/* ----------------------------------------------------------------------=
----- */
-+
-+static int
-+nvmm_handle_mem(struct nvmm_machine *mach, struct nvmm_vcpu *vcpu)
-+{
-+    int ret;
-+
-+    ret =3D nvmm_assist_mem(mach, vcpu);
-+    if (ret =3D=3D -1) {
-+        error_report("NVMM: Mem Assist Failed [gpa=3D%p]",
-+            (void *)vcpu->exit->u.mem.gpa);
-+    }
-+
-+    return ret;
-+}
-+
-+static int
-+nvmm_handle_io(struct nvmm_machine *mach, struct nvmm_vcpu *vcpu)
-+{
-+    int ret;
-+
-+    ret =3D nvmm_assist_io(mach, vcpu);
-+    if (ret =3D=3D -1) {
-+        error_report("NVMM: I/O Assist Failed [port=3D%d]",
-+            (int)vcpu->exit->u.io.port);
-+    }
-+
-+    return ret;
-+}
-+
-+static int
-+nvmm_handle_rdmsr(struct nvmm_machine *mach, CPUState *cpu,
-+    struct nvmm_vcpu_exit *exit)
-+{
-+    struct qemu_vcpu *qcpu =3D get_qemu_vcpu(cpu);
-+    struct nvmm_vcpu *vcpu =3D &qcpu->vcpu;
-+    X86CPU *x86_cpu =3D X86_CPU(cpu);
-+    struct nvmm_x64_state *state =3D vcpu->state;
-+    uint64_t val;
-+    int ret;
-+
-+    switch (exit->u.rdmsr.msr) {
-+    case MSR_IA32_APICBASE:
-+        val =3D cpu_get_apic_base(x86_cpu->apic_state);
-+        break;
-+    case MSR_MTRRcap:
-+    case MSR_MTRRdefType:
-+    case MSR_MCG_CAP:
-+    case MSR_MCG_STATUS:
-+        val =3D 0;
-+        break;
-+    default: /* More MSRs to add? */
-+        val =3D 0;
-+        error_report("NVMM: Unexpected RDMSR 0x%x, ignored",
-+            exit->u.rdmsr.msr);
-+        break;
-+    }
-+
-+    ret =3D nvmm_vcpu_getstate(mach, vcpu, NVMM_X64_STATE_GPRS);
-+    if (ret =3D=3D -1) {
-+        return -1;
-+    }
-+
-+    state->gprs[NVMM_X64_GPR_RAX] =3D (val & 0xFFFFFFFF);
-+    state->gprs[NVMM_X64_GPR_RDX] =3D (val >> 32);
-+    state->gprs[NVMM_X64_GPR_RIP] =3D exit->u.rdmsr.npc;
-+
-+    ret =3D nvmm_vcpu_setstate(mach, vcpu, NVMM_X64_STATE_GPRS);
-+    if (ret =3D=3D -1) {
-+        return -1;
-+    }
-+
-+    return 0;
-+}
-+
-+static int
-+nvmm_handle_wrmsr(struct nvmm_machine *mach, CPUState *cpu,
-+    struct nvmm_vcpu_exit *exit)
-+{
-+    struct qemu_vcpu *qcpu =3D get_qemu_vcpu(cpu);
-+    struct nvmm_vcpu *vcpu =3D &qcpu->vcpu;
-+    X86CPU *x86_cpu =3D X86_CPU(cpu);
-+    struct nvmm_x64_state *state =3D vcpu->state;
-+    uint64_t val;
-+    int ret;
-+
-+    val =3D exit->u.wrmsr.val;
-+
-+    switch (exit->u.wrmsr.msr) {
-+    case MSR_IA32_APICBASE:
-+        cpu_set_apic_base(x86_cpu->apic_state, val);
-+        break;
-+    case MSR_MTRRdefType:
-+    case MSR_MCG_STATUS:
-+        break;
-+    default: /* More MSRs to add? */
-+        error_report("NVMM: Unexpected WRMSR 0x%x [val=3D0x%lx], ignored"=
-,
-+            exit->u.wrmsr.msr, val);
-+        break;
-+    }
-+
-+    ret =3D nvmm_vcpu_getstate(mach, vcpu, NVMM_X64_STATE_GPRS);
-+    if (ret =3D=3D -1) {
-+        return -1;
-+    }
-+
-+    state->gprs[NVMM_X64_GPR_RIP] =3D exit->u.wrmsr.npc;
-+
-+    ret =3D nvmm_vcpu_setstate(mach, vcpu, NVMM_X64_STATE_GPRS);
-+    if (ret =3D=3D -1) {
-+        return -1;
-+    }
-+
-+    return 0;
-+}
-+
-+static int
-+nvmm_handle_halted(struct nvmm_machine *mach, CPUState *cpu,
-+    struct nvmm_vcpu_exit *exit)
-+{
-+    struct CPUX86State *env =3D (CPUArchState *)cpu->env_ptr;
-+    int ret =3D 0;
-+
-+    qemu_mutex_lock_iothread();
-+
-+    if (!((cpu->interrupt_request & CPU_INTERRUPT_HARD) &&
-+          (env->eflags & IF_MASK)) &&
-+        !(cpu->interrupt_request & CPU_INTERRUPT_NMI)) {
-+        cpu->exception_index =3D EXCP_HLT;
-+        cpu->halted =3D true;
-+        ret =3D 1;
-+    }
-+
-+    qemu_mutex_unlock_iothread();
-+
-+    return ret;
-+}
-+
-+static int
-+nvmm_inject_ud(struct nvmm_machine *mach, struct nvmm_vcpu *vcpu)
-+{
-+    struct nvmm_vcpu_event *event =3D vcpu->event;
-+
-+    event->type =3D NVMM_VCPU_EVENT_EXCP;
-+    event->vector =3D 6;
-+    event->u.excp.error =3D 0;
-+
-+    return nvmm_vcpu_inject(mach, vcpu);
-+}
-+
-+static int
-+nvmm_vcpu_loop(CPUState *cpu)
-+{
-+    struct CPUX86State *env =3D (CPUArchState *)cpu->env_ptr;
-+    struct nvmm_machine *mach =3D get_nvmm_mach();
-+    struct qemu_vcpu *qcpu =3D get_qemu_vcpu(cpu);
-+    struct nvmm_vcpu *vcpu =3D &qcpu->vcpu;
-+    X86CPU *x86_cpu =3D X86_CPU(cpu);
-+    struct nvmm_vcpu_exit *exit =3D vcpu->exit;
-+    int ret;
-+
-+    /*
-+     * Some asynchronous events must be handled outside of the inner
-+     * VCPU loop. They are handled here.
-+     */
-+    if (cpu->interrupt_request & CPU_INTERRUPT_INIT) {
-+        nvmm_cpu_synchronize_state(cpu);
-+        do_cpu_init(x86_cpu);
-+        /* set int/nmi windows back to the reset state */
-+    }
-+    if (cpu->interrupt_request & CPU_INTERRUPT_POLL) {
-+        cpu->interrupt_request &=3D ~CPU_INTERRUPT_POLL;
-+        apic_poll_irq(x86_cpu->apic_state);
-+    }
-+    if (((cpu->interrupt_request & CPU_INTERRUPT_HARD) &&
-+         (env->eflags & IF_MASK)) ||
-+        (cpu->interrupt_request & CPU_INTERRUPT_NMI)) {
-+        cpu->halted =3D false;
-+    }
-+    if (cpu->interrupt_request & CPU_INTERRUPT_SIPI) {
-+        nvmm_cpu_synchronize_state(cpu);
-+        do_cpu_sipi(x86_cpu);
-+    }
-+    if (cpu->interrupt_request & CPU_INTERRUPT_TPR) {
-+        cpu->interrupt_request &=3D ~CPU_INTERRUPT_TPR;
-+        nvmm_cpu_synchronize_state(cpu);
-+        apic_handle_tpr_access_report(x86_cpu->apic_state, env->eip,
-+            env->tpr_access_type);
-+    }
-+
-+    if (cpu->halted) {
-+        cpu->exception_index =3D EXCP_HLT;
-+        atomic_set(&cpu->exit_request, false);
-+        return 0;
-+    }
-+
-+    qemu_mutex_unlock_iothread();
-+    cpu_exec_start(cpu);
-+
-+    /*
-+     * Inner VCPU loop.
-+     */
-+    do {
-+        if (cpu->vcpu_dirty) {
-+            nvmm_set_registers(cpu);
-+            cpu->vcpu_dirty =3D false;
-+        }
-+
-+        if (qcpu->stop) {
-+            cpu->exception_index =3D EXCP_INTERRUPT;
-+            qcpu->stop =3D false;
-+            ret =3D 1;
-+            break;
-+        }
-+
-+        nvmm_vcpu_pre_run(cpu);
-+
-+        if (atomic_read(&cpu->exit_request)) {
-+            qemu_cpu_kick_self();
-+        }
-+
-+        ret =3D nvmm_vcpu_run(mach, vcpu);
-+        if (ret =3D=3D -1) {
-+            error_report("NVMM: Failed to exec a virtual processor,"
-+                " error=3D%d", errno);
-+            break;
-+        }
-+
-+        nvmm_vcpu_post_run(cpu, exit);
-+
-+        switch (exit->reason) {
-+        case NVMM_VCPU_EXIT_NONE:
-+            break;
-+        case NVMM_VCPU_EXIT_MEMORY:
-+            ret =3D nvmm_handle_mem(mach, vcpu);
-+            break;
-+        case NVMM_VCPU_EXIT_IO:
-+            ret =3D nvmm_handle_io(mach, vcpu);
-+            break;
-+        case NVMM_VCPU_EXIT_INT_READY:
-+        case NVMM_VCPU_EXIT_NMI_READY:
-+        case NVMM_VCPU_EXIT_TPR_CHANGED:
-+            break;
-+        case NVMM_VCPU_EXIT_HALTED:
-+            ret =3D nvmm_handle_halted(mach, cpu, exit);
-+            break;
-+        case NVMM_VCPU_EXIT_SHUTDOWN:
-+            qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
-+            cpu->exception_index =3D EXCP_INTERRUPT;
-+            ret =3D 1;
-+            break;
-+        case NVMM_VCPU_EXIT_RDMSR:
-+            ret =3D nvmm_handle_rdmsr(mach, cpu, exit);
-+            break;
-+        case NVMM_VCPU_EXIT_WRMSR:
-+            ret =3D nvmm_handle_wrmsr(mach, cpu, exit);
-+            break;
-+        case NVMM_VCPU_EXIT_MONITOR:
-+        case NVMM_VCPU_EXIT_MWAIT:
-+            ret =3D nvmm_inject_ud(mach, vcpu);
-+            break;
-+        default:
-+            error_report("NVMM: Unexpected VM exit code 0x%lx [hw=3D0x%lx=
-]",
-+                exit->reason, exit->u.inv.hwcode);
-+            nvmm_get_registers(cpu);
-+            qemu_mutex_lock_iothread();
-+            qemu_system_guest_panicked(cpu_get_crash_info(cpu));
-+            qemu_mutex_unlock_iothread();
-+            ret =3D -1;
-+            break;
-+        }
-+    } while (ret =3D=3D 0);
-+
-+    cpu_exec_end(cpu);
-+    qemu_mutex_lock_iothread();
-+    current_cpu =3D cpu;
-+
-+    atomic_set(&cpu->exit_request, false);
-+
-+    return ret < 0;
-+}
-+
-+/* ----------------------------------------------------------------------=
----- */
-+
-+static void
-+do_nvmm_cpu_synchronize_state(CPUState *cpu, run_on_cpu_data arg)
-+{
-+    nvmm_get_registers(cpu);
-+    cpu->vcpu_dirty =3D true;
-+}
-+
-+static void
-+do_nvmm_cpu_synchronize_post_reset(CPUState *cpu, run_on_cpu_data arg)
-+{
-+    nvmm_set_registers(cpu);
-+    cpu->vcpu_dirty =3D false;
-+}
-+
-+static void
-+do_nvmm_cpu_synchronize_post_init(CPUState *cpu, run_on_cpu_data arg)
-+{
-+    nvmm_set_registers(cpu);
-+    cpu->vcpu_dirty =3D false;
-+}
-+
-+static void
-+do_nvmm_cpu_synchronize_pre_loadvm(CPUState *cpu, run_on_cpu_data arg)
-+{
-+    cpu->vcpu_dirty =3D true;
-+}
-+
-+void nvmm_cpu_synchronize_state(CPUState *cpu)
-+{
-+    if (!cpu->vcpu_dirty) {
-+        run_on_cpu(cpu, do_nvmm_cpu_synchronize_state, RUN_ON_CPU_NULL);
-+    }
-+}
-+
-+void nvmm_cpu_synchronize_post_reset(CPUState *cpu)
-+{
-+    run_on_cpu(cpu, do_nvmm_cpu_synchronize_post_reset, RUN_ON_CPU_NULL);
-+}
-+
-+void nvmm_cpu_synchronize_post_init(CPUState *cpu)
-+{
-+    run_on_cpu(cpu, do_nvmm_cpu_synchronize_post_init, RUN_ON_CPU_NULL);
-+}
-+
-+void nvmm_cpu_synchronize_pre_loadvm(CPUState *cpu)
-+{
-+    run_on_cpu(cpu, do_nvmm_cpu_synchronize_pre_loadvm, RUN_ON_CPU_NULL);
-+}
-+
-+/* ----------------------------------------------------------------------=
----- */
-+
-+static Error *nvmm_migration_blocker;
-+
-+static void
-+nvmm_ipi_signal(int sigcpu)
-+{
-+    struct qemu_vcpu *qcpu;
-+
-+    if (current_cpu) {
-+        qcpu =3D get_qemu_vcpu(current_cpu);
-+        qcpu->stop =3D true;
-+    }
-+}
-+
-+static void
-+nvmm_init_cpu_signals(void)
-+{
-+    struct sigaction sigact;
-+    sigset_t set;
-+
-+    /* Install the IPI handler. */
-+    memset(&sigact, 0, sizeof(sigact));
-+    sigact.sa_handler =3D nvmm_ipi_signal;
-+    sigaction(SIG_IPI, &sigact, NULL);
-+
-+    /* Allow IPIs on the current thread. */
-+    sigprocmask(SIG_BLOCK, NULL, &set);
-+    sigdelset(&set, SIG_IPI);
-+    pthread_sigmask(SIG_SETMASK, &set, NULL);
-+}
-+
-+int
-+nvmm_init_vcpu(CPUState *cpu)
-+{
-+    struct nvmm_machine *mach =3D get_nvmm_mach();
-+    struct nvmm_vcpu_conf_cpuid cpuid;
-+    struct nvmm_vcpu_conf_tpr tpr;
-+    Error *local_error =3D NULL;
-+    struct qemu_vcpu *qcpu;
-+    int ret, err;
-+
-+    nvmm_init_cpu_signals();
-+
-+    if (nvmm_migration_blocker =3D=3D NULL) {
-+        error_setg(&nvmm_migration_blocker,
-+            "NVMM: Migration not supported");
-+
-+        (void)migrate_add_blocker(nvmm_migration_blocker, &local_error);
-+        if (local_error) {
-+            error_report_err(local_error);
-+            migrate_del_blocker(nvmm_migration_blocker);
-+            error_free(nvmm_migration_blocker);
-+            return -EINVAL;
-+        }
-+    }
-+
-+    qcpu =3D g_malloc0(sizeof(*qcpu));
-+    if (qcpu =3D=3D NULL) {
-+        error_report("NVMM: Failed to allocate VCPU context.");
-+        return -ENOMEM;
-+    }
-+
-+    ret =3D nvmm_vcpu_create(mach, cpu->cpu_index, &qcpu->vcpu);
-+    if (ret =3D=3D -1) {
-+        err =3D errno;
-+        error_report("NVMM: Failed to create a virtual processor,"
-+            " error=3D%d", err);
-+        g_free(qcpu);
-+        return -err;
-+    }
-+
-+    memset(&cpuid, 0, sizeof(cpuid));
-+    cpuid.mask =3D 1;
-+    cpuid.leaf =3D 0x00000001;
-+    cpuid.u.mask.set.edx =3D CPUID_MCE | CPUID_MCA | CPUID_MTRR;
-+    ret =3D nvmm_vcpu_configure(mach, &qcpu->vcpu, NVMM_VCPU_CONF_CPUID,
-+        &cpuid);
-+    if (ret =3D=3D -1) {
-+        err =3D errno;
-+        error_report("NVMM: Failed to configure a virtual processor,"
-+            " error=3D%d", err);
-+        g_free(qcpu);
-+        return -err;
-+    }
-+
-+    ret =3D nvmm_vcpu_configure(mach, &qcpu->vcpu, NVMM_VCPU_CONF_CALLBAC=
-KS,
-+        &nvmm_callbacks);
-+    if (ret =3D=3D -1) {
-+        err =3D errno;
-+        error_report("NVMM: Failed to configure a virtual processor,"
-+            " error=3D%d", err);
-+        g_free(qcpu);
-+        return -err;
-+    }
-+
-+    if (qemu_mach.cap.arch.vcpu_conf_support & NVMM_CAP_ARCH_VCPU_CONF_TP=
-R) {
-+        memset(&tpr, 0, sizeof(tpr));
-+        tpr.exit_changed =3D 1;
-+        ret =3D nvmm_vcpu_configure(mach, &qcpu->vcpu, NVMM_VCPU_CONF_TPR=
-, &tpr);
-+        if (ret =3D=3D -1) {
-+            err =3D errno;
-+            error_report("NVMM: Failed to configure a virtual processor,"
-+                " error=3D%d", err);
-+            g_free(qcpu);
-+            return -err;
-+        }
-+    }
-+
-+    cpu->vcpu_dirty =3D true;
-+    cpu->hax_vcpu =3D (struct hax_vcpu_state *)qcpu;
-+
-+    return 0;
-+}
-+
-+int
-+nvmm_vcpu_exec(CPUState *cpu)
-+{
-+    int ret, fatal;
-+
-+    while (1) {
-+        if (cpu->exception_index >=3D EXCP_INTERRUPT) {
-+            ret =3D cpu->exception_index;
-+            cpu->exception_index =3D -1;
-+            break;
-+        }
-+
-+        fatal =3D nvmm_vcpu_loop(cpu);
-+
-+        if (fatal) {
-+            error_report("NVMM: Failed to execute a VCPU.");
-+            abort();
-+        }
-+    }
-+
-+    return ret;
-+}
-+
-+void
-+nvmm_destroy_vcpu(CPUState *cpu)
-+{
-+    struct nvmm_machine *mach =3D get_nvmm_mach();
-+    struct qemu_vcpu *qcpu =3D get_qemu_vcpu(cpu);
-+
-+    nvmm_vcpu_destroy(mach, &qcpu->vcpu);
-+    g_free(cpu->hax_vcpu);
-+}
-+
-+/* ----------------------------------------------------------------------=
----- */
-+
-+static void
-+nvmm_update_mapping(hwaddr start_pa, ram_addr_t size, uintptr_t hva,
-+    bool add, bool rom, const char *name)
-+{
-+    struct nvmm_machine *mach =3D get_nvmm_mach();
-+    int ret, prot;
-+
-+    if (add) {
-+        prot =3D PROT_READ | PROT_EXEC;
-+        if (!rom) {
-+            prot |=3D PROT_WRITE;
-+        }
-+        ret =3D nvmm_gpa_map(mach, hva, start_pa, size, prot);
-+    } else {
-+        ret =3D nvmm_gpa_unmap(mach, hva, start_pa, size);
-+    }
-+
-+    if (ret =3D=3D -1) {
-+        error_report("NVMM: Failed to %s GPA range '%s' PA:%p, "
-+            "Size:%p bytes, HostVA:%p, error=3D%d",
-+            (add ? "map" : "unmap"), name, (void *)(uintptr_t)start_pa,
-+            (void *)size, (void *)hva, errno);
-+    }
-+}
-+
-+static void
-+nvmm_process_section(MemoryRegionSection *section, int add)
-+{
-+    MemoryRegion *mr =3D section->mr;
-+    hwaddr start_pa =3D section->offset_within_address_space;
-+    ram_addr_t size =3D int128_get64(section->size);
-+    unsigned int delta;
-+    uintptr_t hva;
-+
-+    if (!memory_region_is_ram(mr)) {
-+        return;
-+    }
-+
-+    /* Adjust start_pa and size so that they are page-aligned. */
-+    delta =3D qemu_real_host_page_size - (start_pa & ~qemu_real_host_page=
-_mask);
-+    delta &=3D ~qemu_real_host_page_mask;
-+    if (delta > size) {
-+        return;
-+    }
-+    start_pa +=3D delta;
-+    size -=3D delta;
-+    size &=3D qemu_real_host_page_mask;
-+    if (!size || (start_pa & ~qemu_real_host_page_mask)) {
-+        return;
-+    }
-+
-+    hva =3D (uintptr_t)memory_region_get_ram_ptr(mr) +
-+        section->offset_within_region + delta;
-+
-+    nvmm_update_mapping(start_pa, size, hva, add,
-+        memory_region_is_rom(mr), mr->name);
-+}
-+
-+static void
-+nvmm_region_add(MemoryListener *listener, MemoryRegionSection *section)
-+{
-+    memory_region_ref(section->mr);
-+    nvmm_process_section(section, 1);
-+}
-+
-+static void
-+nvmm_region_del(MemoryListener *listener, MemoryRegionSection *section)
-+{
-+    nvmm_process_section(section, 0);
-+    memory_region_unref(section->mr);
-+}
-+
-+static void
-+nvmm_transaction_begin(MemoryListener *listener)
-+{
-+    /* nothing */
-+}
-+
-+static void
-+nvmm_transaction_commit(MemoryListener *listener)
-+{
-+    /* nothing */
-+}
-+
-+static void
-+nvmm_log_sync(MemoryListener *listener, MemoryRegionSection *section)
-+{
-+    MemoryRegion *mr =3D section->mr;
-+
-+    if (!memory_region_is_ram(mr)) {
-+        return;
-+    }
-+
-+    memory_region_set_dirty(mr, 0, int128_get64(section->size));
-+}
-+
-+static MemoryListener nvmm_memory_listener =3D {
-+    .begin =3D nvmm_transaction_begin,
-+    .commit =3D nvmm_transaction_commit,
-+    .region_add =3D nvmm_region_add,
-+    .region_del =3D nvmm_region_del,
-+    .log_sync =3D nvmm_log_sync,
-+    .priority =3D 10,
-+};
-+
-+static void
-+nvmm_ram_block_added(RAMBlockNotifier *n, void *host, size_t size)
-+{
-+    struct nvmm_machine *mach =3D get_nvmm_mach();
-+    uintptr_t hva =3D (uintptr_t)host;
-+    int ret;
-+
-+    ret =3D nvmm_hva_map(mach, hva, size);
-+
-+    if (ret =3D=3D -1) {
-+        error_report("NVMM: Failed to map HVA, HostVA:%p "
-+            "Size:%p bytes, error=3D%d",
-+            (void *)hva, (void *)size, errno);
-+    }
-+}
-+
-+static struct RAMBlockNotifier nvmm_ram_notifier =3D {
-+    .ram_block_added =3D nvmm_ram_block_added
-+};
-+
-+/* ----------------------------------------------------------------------=
----- */
-+
-+static void
-+nvmm_handle_interrupt(CPUState *cpu, int mask)
-+{
-+    cpu->interrupt_request |=3D mask;
-+
-+    if (!qemu_cpu_is_self(cpu)) {
-+        qemu_cpu_kick(cpu);
-+    }
-+}
-+
-+/* ----------------------------------------------------------------------=
----- */
-+
-+static int
-+nvmm_accel_init(MachineState *ms)
-+{
-+    int ret, err;
-+
-+    ret =3D nvmm_init();
-+    if (ret =3D=3D -1) {
-+        err =3D errno;
-+        error_report("NVMM: Initialization failed, error=3D%d", errno);
-+        return -err;
-+    }
-+
-+    ret =3D nvmm_capability(&qemu_mach.cap);
-+    if (ret =3D=3D -1) {
-+        err =3D errno;
-+        error_report("NVMM: Unable to fetch capability, error=3D%d", errn=
-o);
-+        return -err;
-+    }
-+    if (qemu_mach.cap.version !=3D NVMM_KERN_VERSION) {
-+        error_report("NVMM: Unsupported version %u", qemu_mach.cap.versio=
-n);
-+        return -EPROGMISMATCH;
-+    }
-+    if (qemu_mach.cap.state_size !=3D sizeof(struct nvmm_x64_state)) {
-+        error_report("NVMM: Wrong state size %u", qemu_mach.cap.state_siz=
-e);
-+        return -EPROGMISMATCH;
-+    }
-+
-+    ret =3D nvmm_machine_create(&qemu_mach.mach);
-+    if (ret =3D=3D -1) {
-+        err =3D errno;
-+        error_report("NVMM: Machine creation failed, error=3D%d", errno);
-+        return -err;
-+    }
-+
-+    memory_listener_register(&nvmm_memory_listener, &address_space_memory=
-);
-+    ram_block_notifier_add(&nvmm_ram_notifier);
-+
-+    cpu_interrupt_handler =3D nvmm_handle_interrupt;
-+
-+    printf("NetBSD Virtual Machine Monitor accelerator is operational\n")=
-;
-+    return 0;
-+}
-+
-+int
-+nvmm_enabled(void)
-+{
-+    return nvmm_allowed;
-+}
-+
-+static void
-+nvmm_accel_class_init(ObjectClass *oc, void *data)
-+{
-+    AccelClass *ac =3D ACCEL_CLASS(oc);
-+    ac->name =3D "NVMM";
-+    ac->init_machine =3D nvmm_accel_init;
-+    ac->allowed =3D &nvmm_allowed;
-+}
-+
-+static const TypeInfo nvmm_accel_type =3D {
-+    .name =3D ACCEL_CLASS_NAME("nvmm"),
-+    .parent =3D TYPE_ACCEL,
-+    .class_init =3D nvmm_accel_class_init,
-+};
-+
-+static void
-+nvmm_type_init(void)
-+{
-+    type_register_static(&nvmm_accel_type);
-+}
-+
-+type_init(nvmm_type_init);
+ supported_target() {
+     case "$1" in
+         *-softmmu)
+@@ -273,6 +284,7 @@ supported_target() {
+     supported_hax_target "$1" && return 0
+     supported_hvf_target "$1" && return 0
+     supported_whpx_target "$1" && return 0
++    supported_nvmm_target "$1" && return 0
+     print_error "TCG disabled, but hardware accelerator not available for=
+ '$target'"
+     return 1
+ }
+@@ -395,6 +407,7 @@ kvm=3D"no"
+ hax=3D"no"
+ hvf=3D"no"
+ whpx=3D"no"
++nvmm=3D"no"
+ rdma=3D""
+ pvrdma=3D""
+ gprof=3D"no"
+@@ -847,6 +860,7 @@ DragonFly)
+ NetBSD)
+   bsd=3D"yes"
+   hax=3D"yes"
++  nvmm=3D"yes"
+   make=3D"${MAKE-gmake}"
+   audio_drv_list=3D"oss try-sdl"
+   audio_possible_drivers=3D"oss sdl"
+@@ -1233,6 +1247,10 @@ for opt do
+   ;;
+   --enable-whpx) whpx=3D"yes"
+   ;;
++  --disable-nvmm) nvmm=3D"no"
++  ;;
++  --enable-nvmm) nvmm=3D"yes"
++  ;;
+   --disable-tcg-interpreter) tcg_interpreter=3D"no"
+   ;;
+   --enable-tcg-interpreter) tcg_interpreter=3D"yes"
+@@ -1879,6 +1897,7 @@ disabled with --disable-FEATURE, default is enabled =
+if available:
+   hax             HAX acceleration support
+   hvf             Hypervisor.framework acceleration support
+   whpx            Windows Hypervisor Platform acceleration support
++  nvmm            NetBSD Virtual Machine Monitor acceleration support
+   rdma            Enable RDMA-based migration
+   pvrdma          Enable PVRDMA support
+   vde             support for vde network
+@@ -2965,6 +2984,20 @@ if test "$whpx" !=3D "no" ; then
+     fi
+ fi
+
++##########################################
++# NetBSD Virtual Machine Monitor (NVMM) accelerator check
++if test "$nvmm" !=3D "no" ; then
++    if check_include "nvmm.h" ; then
++        nvmm=3D"yes"
++	LIBS=3D"-lnvmm $LIBS"
++    else
++        if test "$nvmm" =3D "yes"; then
++            feature_not_found "NVMM" "NVMM is not available"
++        fi
++        nvmm=3D"no"
++    fi
++fi
++
+ ##########################################
+ # Sparse probe
+ if test "$sparse" !=3D "no" ; then
+@@ -6934,6 +6967,7 @@ echo "KVM support       $kvm"
+ echo "HAX support       $hax"
+ echo "HVF support       $hvf"
+ echo "WHPX support      $whpx"
++echo "NVMM support      $nvmm"
+ echo "TCG support       $tcg"
+ if test "$tcg" =3D "yes" ; then
+     echo "TCG debug enabled $debug_tcg"
+@@ -8332,6 +8366,9 @@ fi
+ if test "$target_aligned_only" =3D "yes" ; then
+   echo "TARGET_ALIGNED_ONLY=3Dy" >> $config_target_mak
+ fi
++if supported_nvmm_target $target; then
++    echo "CONFIG_NVMM=3Dy" >> $config_target_mak
++fi
+ if test "$target_bigendian" =3D "yes" ; then
+   echo "TARGET_WORDS_BIGENDIAN=3Dy" >> $config_target_mak
+ fi
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 708583b4ce..697accaa7e 100644
+=2D-- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -26,7 +26,7 @@ DEF("machine", HAS_ARG, QEMU_OPTION_machine, \
+     "-machine [type=3D]name[,prop[=3Dvalue][,...]]\n"
+     "                selects emulated machine ('-machine help' for list)\=
+n"
+     "                property accel=3Daccel1[:accel2[:...]] selects accel=
+erator\n"
+-    "                supported accelerators are kvm, xen, hax, hvf, whpx =
+or tcg (default: tcg)\n"
++    "                supported accelerators are kvm, xen, hax, hvf, nvmm,=
+ whpx or tcg (default: tcg)\n"
+     "                vmport=3Don|off|auto controls emulation of vmport (d=
+efault: auto)\n"
+     "                dump-guest-core=3Don|off include guest memory in a c=
+ore dump (default=3Don)\n"
+     "                mem-merge=3Don|off controls memory merge support (de=
+fault: on)\n"
+@@ -58,7 +58,7 @@ SRST
+
+     ``accel=3Daccels1[:accels2[:...]]``
+         This is used to enable an accelerator. Depending on the target
+-        architecture, kvm, xen, hax, hvf, whpx or tcg can be available.
++        architecture, kvm, xen, hax, hvf, nvmm, whpx or tcg can be availa=
+ble.
+         By default, tcg is used. If there is more than one accelerator
+         specified, the next one is used if the previous one fails to
+         initialize.
+@@ -119,7 +119,7 @@ ERST
+
+ DEF("accel", HAS_ARG, QEMU_OPTION_accel,
+     "-accel [accel=3D]accelerator[,prop[=3Dvalue][,...]]\n"
+-    "                select accelerator (kvm, xen, hax, hvf, whpx or tcg;=
+ use 'help' for a list)\n"
++    "                select accelerator (kvm, xen, hax, hvf, nvmm, whpx o=
+r tcg; use 'help' for a list)\n"
+     "                igd-passthru=3Don|off (enable Xen integrated Intel g=
+raphics passthrough, default=3Doff)\n"
+     "                kernel-irqchip=3Don|off|split controls accelerated i=
+rqchip support (default=3Don)\n"
+     "                kvm-shadow-mem=3Dsize of KVM shadow MMU in bytes\n"
+@@ -128,8 +128,8 @@ DEF("accel", HAS_ARG, QEMU_OPTION_accel,
+ SRST
+ ``-accel name[,prop=3Dvalue[,...]]``
+     This is used to enable an accelerator. Depending on the target
+-    architecture, kvm, xen, hax, hvf, whpx or tcg can be available. By
+-    default, tcg is used. If there is more than one accelerator
++    architecture, kvm, xen, hax, hvf, nvmm whpx or tcg can be available.
++    By default, tcg is used. If there is more than one accelerator
+     specified, the next one is used if the previous one fails to
+     initialize.
+
 =2D-
 2.28.0
 
