@@ -2,92 +2,81 @@ Return-Path: <SRS0=wQM/=BV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7CC9C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 09:03:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7827C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 09:06:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AEF4220772
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 09:03:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=yadro.com header.i=@yadro.com header.b="IjVBAfMN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AEF4220772
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yadro.com
+	by mail.kernel.org (Postfix) with ESMTPS id 93F4520772
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 09:06:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93F4520772
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57702 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34996 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5QBl-0000bT-VR
-	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 05:03:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49220)
+	id 1k5QEl-000329-LD
+	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 05:06:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50578)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
- id 1k5Q9A-0005Y0-1f
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 05:00:40 -0400
-Received: from mta-02.yadro.com ([89.207.88.252]:48288 helo=mta-01.yadro.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
- id 1k5Q97-0005fx-Tw
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 05:00:39 -0400
-Received: from localhost (unknown [127.0.0.1])
- by mta-01.yadro.com (Postfix) with ESMTP id 94D644C891;
- Tue, 11 Aug 2020 09:00:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=yadro.com; h=
- in-reply-to:content-disposition:content-type:content-type
- :mime-version:references:message-id:subject:subject:from:from
- :date:date:received:received:received; s=mta-01; t=1597136435;
- x=1598950836; bh=TLUxIGIrCoQ+l97qrxDN7W89EQeIFmLtsweJ8KLKis0=; b=
- IjVBAfMNmJvUjkIqLR5a1Z1KcsiOuot5TNl5TjhfceEbcqIYd7SappFDOPirSSZ3
- YseCSFTiru0z3+LjYwgk6HY66hPV244+VLWXEiUc98p+zl9YRrINTDgHMo/ZeUd8
- vDuON8/R1KLvYzh+vxT1Y8d2T1JQcX0ZwDa9ez278Qg=
-X-Virus-Scanned: amavisd-new at yadro.com
-Received: from mta-01.yadro.com ([127.0.0.1])
- by localhost (mta-01.yadro.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id fUixNqVIGzle; Tue, 11 Aug 2020 12:00:35 +0300 (MSK)
-Received: from T-EXCH-02.corp.yadro.com (t-exch-02.corp.yadro.com
- [172.17.10.102])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
- (No client certificate requested)
- by mta-01.yadro.com (Postfix) with ESMTPS id 0C7F54C84A;
- Tue, 11 Aug 2020 12:00:35 +0300 (MSK)
-Received: from localhost (172.17.204.212) by T-EXCH-02.corp.yadro.com
- (172.17.10.102) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P384) id 15.1.669.32; Tue, 11
- Aug 2020 12:00:34 +0300
-Date: Tue, 11 Aug 2020 12:00:34 +0300
-From: Roman Bolshakov <r.bolshakov@yadro.com>
-To: Claudio Fontana <cfontana@suse.de>
-Subject: Re: [RFC v3 8/8] cpus: extract out hvf-specific code to
- target/i386/hvf/
-Message-ID: <20200811090034.GB62204@SPB-NB-133.local>
-References: <20200803090533.7410-1-cfontana@suse.de>
- <20200803090533.7410-9-cfontana@suse.de>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k5QEB-0002bd-0f
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 05:05:51 -0400
+Received: from indium.canonical.com ([91.189.90.7]:48114)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k5QE8-0006Nx-UP
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 05:05:50 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1k5QE6-0003pw-RA
+ for <qemu-devel@nongnu.org>; Tue, 11 Aug 2020 09:05:46 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id C75922E808D
+ for <qemu-devel@nongnu.org>; Tue, 11 Aug 2020 09:05:46 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20200803090533.7410-9-cfontana@suse.de>
-X-Originating-IP: [172.17.204.212]
-X-ClientProxiedBy: T-EXCH-01.corp.yadro.com (172.17.10.101) To
- T-EXCH-02.corp.yadro.com (172.17.10.102)
-Received-SPF: pass client-ip=89.207.88.252; envelope-from=r.bolshakov@yadro.com;
- helo=mta-01.yadro.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/11 04:59:29
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 11 Aug 2020 08:58:50 -0000
+From: "Tony.LI" <1890545@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: ajbennee bigboy0822 pmaydell
+X-Launchpad-Bug-Reporter: Tony.LI (bigboy0822)
+X-Launchpad-Bug-Modifier: Tony.LI (bigboy0822)
+References: <159670025270.3099.13280483088179052036.malonedeb@gac.canonical.com>
+Message-Id: <159713633047.21231.9338139093164603548.malone@chaenomeles.canonical.com>
+Subject: [Bug 1890545] Re: (ARM64) qemu-x86_64+schroot(Debian bullseye) can't
+ run chrome and can't load HTML
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="6a138c03da9cc3e2e03f6dd3bbb4a615b0be6ec2";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 20a369a26c1dfbde3680083db24c0b9ab4836e71
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/11 04:25:48
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -96,167 +85,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Pavel Dovgalyuk <dovgaluk@ispras.ru>,
- Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, haxm-team@intel.com,
- Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, Colin Xu <colin.xu@intel.com>,
- Wenchao Wang <wenchao.wang@intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Sunil Muthuswamy <sunilmut@microsoft.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Reply-To: Bug 1890545 <1890545@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Aug 03, 2020 at 11:05:33AM +0200, Claudio Fontana wrote:
-> register a "CpusAccel" interface for HVF as well.
-> 
-> Signed-off-by: Claudio Fontana <cfontana@suse.de>
-> ---
->  softmmu/cpus.c                |  63 --------------------
->  target/i386/hvf/Makefile.objs |   2 +-
->  target/i386/hvf/hvf-cpus.c    | 131 ++++++++++++++++++++++++++++++++++++++++++
->  target/i386/hvf/hvf-cpus.h    |  17 ++++++
->  target/i386/hvf/hvf.c         |   3 +
->  5 files changed, 152 insertions(+), 64 deletions(-)
->  create mode 100644 target/i386/hvf/hvf-cpus.c
->  create mode 100644 target/i386/hvf/hvf-cpus.h
-> 
-> diff --git a/softmmu/cpus.c b/softmmu/cpus.c
-> index 586b4acaab..d327b2685c 100644
-> --- a/softmmu/cpus.c
-> +++ b/softmmu/cpus.c
-> @@ -33,7 +33,6 @@
->  #include "exec/gdbstub.h"
->  #include "sysemu/hw_accel.h"
->  #include "sysemu/kvm.h"
-> -#include "sysemu/hvf.h"
+Hi,Alex.It can't work.And I find some thing:
 
-I wonder if the declarations should be moved from sysemu/hvf.h to
-someplace inside target/i386/hvf/:
+$ glxinfo | grep -i open
 
-int hvf_init_vcpu(CPUState *);
-int hvf_vcpu_exec(CPUState *);
-void hvf_cpu_synchronize_state(CPUState *);
-void hvf_cpu_synchronize_post_reset(CPUState *);
-void hvf_cpu_synchronize_post_init(CPUState *);
-void hvf_cpu_synchronize_pre_loadvm(CPUState *);
-void hvf_vcpu_destroy(CPUState *);
+radeon: Failed to get PCI ID, error number -38
+libGL error: failed to create dri screen
+libGL error: failed to load driver: radeonsi
+libGL error: failed to get magic
+libGL error: failed to load driver: radeonsi
+OpenGL vendor string: VMware, Inc.
+OpenGL renderer string: Gallium 0.4 on llvmpipe (LLVM 3.9, 128 bits)
+OpenGL core profile version string: 3.3 (Core Profile) Mesa 13.0.6
+OpenGL core profile shading language version string: 3.30
+OpenGL core profile context flags: (none)
+OpenGL core profile profile mask: core profile
+OpenGL core profile extensions:
+OpenGL version string: 3.0 Mesa 13.0.6
+OpenGL shading language version string: 1.30
+OpenGL context flags: (none)
+OpenGL extensions:
+OpenGL ES profile version string: OpenGL ES 3.0 Mesa 13.0.6
+OpenGL ES profile shading language version string: OpenGL ES GLSL ES 3.00
+OpenGL ES profile extensions:
 
-They're not used outside of target/i386/hvf/
+So=EF=BC=8Ccould it be a problem with the PCI? I see a lot of questions abo=
+ut
+PCI when use qemu-system.But=EF=BC=8Cwhat should I do?And I use qemu-user l=
+ike
+qemu-x86_64-static.
 
-I also wonder if we need stubs at all?
+-- =
 
->  #include "exec/exec-all.h"
->  #include "qemu/thread.h"
->  #include "qemu/plugin.h"
-> @@ -391,48 +390,6 @@ void qemu_wait_io_event(CPUState *cpu)
->      qemu_wait_io_event_common(cpu);
->  }
->  
-> -/* The HVF-specific vCPU thread function. This one should only run when the host
-> - * CPU supports the VMX "unrestricted guest" feature. */
-> -static void *qemu_hvf_cpu_thread_fn(void *arg)
-> -{
-> -    CPUState *cpu = arg;
-> -
-> -    int r;
-> -
-> -    assert(hvf_enabled());
-> -
-> -    rcu_register_thread();
-> -
-> -    qemu_mutex_lock_iothread();
-> -    qemu_thread_get_self(cpu->thread);
-> -
-> -    cpu->thread_id = qemu_get_thread_id();
-> -    cpu->can_do_io = 1;
-> -    current_cpu = cpu;
-> -
-> -    hvf_init_vcpu(cpu);
-> -
-> -    /* signal CPU creation */
-> -    cpu_thread_signal_created(cpu);
-> -    qemu_guest_random_seed_thread_part2(cpu->random_seed);
-> -
-> -    do {
-> -        if (cpu_can_run(cpu)) {
-> -            r = hvf_vcpu_exec(cpu);
-> -            if (r == EXCP_DEBUG) {
-> -                cpu_handle_guest_debug(cpu);
-> -            }
-> -        }
-> -        qemu_wait_io_event(cpu);
-> -    } while (!cpu->unplug || cpu_can_run(cpu));
-> -
-> -    hvf_vcpu_destroy(cpu);
-> -    cpu_thread_signal_destroyed(cpu);
-> -    qemu_mutex_unlock_iothread();
-> -    rcu_unregister_thread();
-> -    return NULL;
-> -}
-> -
->  void cpus_kick_thread(CPUState *cpu)
->  {
->  #ifndef _WIN32
-> @@ -603,24 +560,6 @@ void cpu_remove_sync(CPUState *cpu)
->      qemu_mutex_lock_iothread();
->  }
->  
-> -static void qemu_hvf_start_vcpu(CPUState *cpu)
-> -{
-> -    char thread_name[VCPU_THREAD_NAME_SIZE];
-> -
-> -    /* HVF currently does not support TCG, and only runs in
-> -     * unrestricted-guest mode. */
-> -    assert(hvf_enabled());
-> -
-> -    cpu->thread = g_malloc0(sizeof(QemuThread));
-> -    cpu->halt_cond = g_malloc0(sizeof(QemuCond));
-> -    qemu_cond_init(cpu->halt_cond);
-> -
-> -    snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "CPU %d/HVF",
-> -             cpu->cpu_index);
-> -    qemu_thread_create(cpu->thread, thread_name, qemu_hvf_cpu_thread_fn,
-> -                       cpu, QEMU_THREAD_JOINABLE);
-> -}
-> -
->  void cpus_register_accel(CpusAccel *ca)
->  {
->      assert(ca != NULL);
-> @@ -648,8 +587,6 @@ void qemu_init_vcpu(CPUState *cpu)
->      if (cpus_accel) {
->          /* accelerator already implements the CpusAccel interface */
->          cpus_accel->create_vcpu_thread(cpu);
-> -    } else if (hvf_enabled()) {
-> -        qemu_hvf_start_vcpu(cpu);
->      } else {
->          assert(0);
->      }
-> diff --git a/target/i386/hvf/Makefile.objs b/target/i386/hvf/Makefile.objs
-> index 927b86bc67..af9f7dcfc1 100644
-> --- a/target/i386/hvf/Makefile.objs
-> +++ b/target/i386/hvf/Makefile.objs
-> @@ -1,2 +1,2 @@
-> -obj-y += hvf.o
-> +obj-y += hvf.o hvf-cpus.o
->  obj-y += x86.o x86_cpuid.o x86_decode.o x86_descr.o x86_emu.o x86_flags.o x86_mmu.o x86hvf.o x86_task.o
-> diff --git a/target/i386/hvf/hvf-cpus.c b/target/i386/hvf/hvf-cpus.c
-> new file mode 100644
-> index 0000000000..9540157f1e
-> --- /dev/null
-> +++ b/target/i386/hvf/hvf-cpus.c
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1890545
 
-I'd prefer singular form in variables and file names. More on that in
-the comment to patch 2.
+Title:
+  (ARM64) qemu-x86_64+schroot(Debian bullseye) can't run chrome and
+  can't load HTML
 
-Besides that it works fine,
+Status in QEMU:
+  New
 
-Reviewed-by: Roman Bolshakov <r.bolshakov@yadro.com>
-Tested-by: Roman Bolshakov <r.bolshakov@yadro.com>
+Bug description:
+  First I creat a file system that is debian(bullseye amd64)on arm64
+  machine=EF=BC=8Cthen I download google-chrome=EF=BC=8Chowever, when I ran=
+ Google
+  browser, some errors occurred.
 
-Regards,
-Roman
+  $ google-chrome --no-sandbox
+  or =
+
+  $ qemu-x86_64-static google-chrome --no-sandbox
+
+  qemu: uncaught target signal 5 (Trace/breakpoint trap) - core dumped
+  qemu: uncaught target signal 5 (Trace/breakpoint trap) - core dumped
+  [1661:1661:0806/074307.502638:ERROR:nacl_fork_delegate_linux.cc(323)] Bad=
+ NaCl helper startup ack (0 bytes)
+  [1664:1664:0806/074307.504159:ERROR:nacl_fork_delegate_linux.cc(323)] Bad=
+ NaCl helper startup ack (0 bytes)
+  qemu: uncaught target signal 5 (Trace/breakpoint trap) - core dumped
+  qemu: uncaught target signal 5 (Trace/breakpoint trap) - core dumped
+  [1637:1678:0806/074308.337567:ERROR:file_path_watcher_linux.cc(315)] inot=
+ify_init() failed: Function not implemented (38)
+  Fontconfig warning: "/etc/fonts/fonts.conf", line 100: unknown element "b=
+lank"
+  qemu: unknown option 'type=3Dutility'
+  [1637:1680:0806/074313.598432:FATAL:gpu_data_manager_impl_private.cc(439)=
+] GPU process isn't usable. Goodbye.
+  qemu: uncaught target signal 5 (Trace/breakpoint trap) - core dumped
+  Trace/breakpoint trap
+
+  Why?
+  And then I run firefox,it can be opened, but it can't load any web pages =
+and HTML.
+  I really need help=EF=BC=81
+  Thank.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1890545/+subscriptions
 
