@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A27AC433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 11:48:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27D28C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 11:49:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D63FF2075D
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 11:48:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E0F242075D
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 11:49:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P2b7zlnC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D63FF2075D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f9CoLIEt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0F242075D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56706 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32840 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5SlM-00075m-3d
-	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 07:48:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55522)
+	id 1k5Smc-0000Rn-11
+	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 07:49:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55630)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
- id 1k5Shk-0001cx-VV
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 07:44:32 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:24411
+ id 1k5SiC-0002cG-Ah
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 07:45:00 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:43092
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
- id 1k5Shj-0008Jl-7q
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 07:44:32 -0400
+ id 1k5SiA-0008O7-Hh
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 07:45:00 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597146270;
+ s=mimecast20190719; t=1597146297;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=eKki41DYt9nTQoYvIlZc35X3B/aFJttnQIh3V+LVOus=;
- b=P2b7zlnCpF8/cEkyqTq7sJDpz8UL/bsL7BpIUbApy/uJLLPUg0iR8ltxT08wg2rRnkfOCb
- Yd1b3JiLfATZ2Dle124lCr/zfzbqEclouNbJqyY1z0PylCoEXByDsWejpRc4Bo4cvR9tR+
- pCsHDBbaoAD93cX+8aH6gltYADgDMbs=
+ bh=URgG/GQpF3hxWKP3cotTkm5KWSX2MRj+zKuw0yApTls=;
+ b=f9CoLIEtf+tQvtVGsF5ytGuLZOGhV1jGKjKizRsNBXjNxb4A6ze9g2XwWi7yHSJL1+tXIf
+ epXKBTSlycw4cpMri1LY0+m7amgdgj7j+g0ktKMIpXPUNfjNHny1jsVzph/ghIIfZNzB9P
+ JP7O2czD8/7Vsj5u3QDGYySpoc/MoNA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-274-SMJQo0VbOkKV1YUBZFTUGw-1; Tue, 11 Aug 2020 07:44:26 -0400
-X-MC-Unique: SMJQo0VbOkKV1YUBZFTUGw-1
+ us-mta-111-IDx7D9ygN06mMvLOfUanVA-1; Tue, 11 Aug 2020 07:44:54 -0400
+X-MC-Unique: IDx7D9ygN06mMvLOfUanVA-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3A2C2108E;
- Tue, 11 Aug 2020 11:44:25 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6005D1005510;
+ Tue, 11 Aug 2020 11:44:53 +0000 (UTC)
 Received: from localhost.localdomain (unknown [10.74.8.55])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id AB1931C4;
- Tue, 11 Aug 2020 11:44:16 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 88CCE5FC01;
+ Tue, 11 Aug 2020 11:44:48 +0000 (UTC)
 From: P J P <ppandit@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>,
  Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH v4 5/9] nvram: add nrf51_soc flash read method
-Date: Tue, 11 Aug 2020 17:11:29 +0530
-Message-Id: <20200811114133.672647-6-ppandit@redhat.com>
+Subject: [PATCH v4 9/9] memory: assert MemoryRegionOps callbacks are defined
+Date: Tue, 11 Aug 2020 17:11:33 +0530
+Message-Id: <20200811114133.672647-10-ppandit@redhat.com>
 In-Reply-To: <20200811114133.672647-1-ppandit@redhat.com>
 References: <20200811114133.672647-1-ppandit@redhat.com>
 MIME-Version: 1.0
@@ -74,10 +74,10 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=ppandit@redhat.com;
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=ppandit@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/11 06:40:20
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/11 04:41:55
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
 X-Spam_bar: ----
@@ -109,47 +109,49 @@ Sender: "Qemu-devel"
 
 From: Prasad J Pandit <pjp@fedoraproject.org>
 
-Add nrf51_soc mmio read method to avoid NULL pointer dereference
-issue.
+When registering a MemoryRegionOps object, assert that its
+read/write callback methods are defined. This avoids potential
+guest crash via a NULL pointer dereference.
 
-Reported-by: Lei Sun <slei.casper@gmail.com>
+Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Li Qiang <liq3ea@gmail.com>
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
 ---
- hw/nvram/nrf51_nvm.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ softmmu/memory.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-Update v4: add explanatory comment and Reviewed-by tag
-  -> https://lists.nongnu.org/archive/html/qemu-devel/2020-07/msg05309.html
+Update v4: add Reviewed-by tag
+  -> https://lists.nongnu.org/archive/html/qemu-devel/2020-07/msg05324.html
 
-diff --git a/hw/nvram/nrf51_nvm.c b/hw/nvram/nrf51_nvm.c
-index f2283c1a8d..7b3460d52d 100644
---- a/hw/nvram/nrf51_nvm.c
-+++ b/hw/nvram/nrf51_nvm.c
-@@ -273,6 +273,15 @@ static const MemoryRegionOps io_ops = {
-         .endianness = DEVICE_LITTLE_ENDIAN,
- };
- 
-+static uint64_t flash_read(void *opaque, hwaddr offset, unsigned size)
-+{
-+    /*
-+     * This is a rom_device MemoryRegion which is always in
-+     * romd_mode (we never put it in MMIO mode), so reads always
-+     * go directly to RAM and never come here.
-+     */
-+    g_assert_not_reached();
-+}
- 
- static void flash_write(void *opaque, hwaddr offset, uint64_t value,
-         unsigned int size)
-@@ -300,6 +309,7 @@ static void flash_write(void *opaque, hwaddr offset, uint64_t value,
- 
- 
- static const MemoryRegionOps flash_ops = {
-+    .read = flash_read,
-     .write = flash_write,
-     .valid.min_access_size = 4,
-     .valid.max_access_size = 4,
+diff --git a/softmmu/memory.c b/softmmu/memory.c
+index af25987518..1f4b37b3a6 100644
+--- a/softmmu/memory.c
++++ b/softmmu/memory.c
+@@ -1485,7 +1485,13 @@ void memory_region_init_io(MemoryRegion *mr,
+                            uint64_t size)
+ {
+     memory_region_init(mr, owner, name, size);
+-    mr->ops = ops ? ops : &unassigned_mem_ops;
++    if (ops) {
++        assert(ops->read || ops->read_with_attrs);
++        assert(ops->write || ops->write_with_attrs);
++        mr->ops = ops;
++    } else {
++        mr->ops = &unassigned_mem_ops;
++    }
+     mr->opaque = opaque;
+     mr->terminates = true;
+ }
+@@ -1663,6 +1669,8 @@ void memory_region_init_rom_device_nomigrate(MemoryRegion *mr,
+ {
+     Error *err = NULL;
+     assert(ops);
++    assert(ops->read || ops->read_with_attrs);
++    assert(ops->write || ops->write_with_attrs);
+     memory_region_init(mr, owner, name, size);
+     mr->ops = ops;
+     mr->opaque = opaque;
 -- 
 2.26.2
 
