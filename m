@@ -2,81 +2,64 @@ Return-Path: <SRS0=wQM/=BV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A7F4C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 21:12:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A1BBC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 21:13:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 233B620756
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 21:12:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 233B620756
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 524E920756
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 21:13:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 524E920756
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55740 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58010 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5bZ3-0007QB-Cu
-	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 17:12:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53626)
+	id 1k5bZr-0008Kx-LW
+	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 17:12:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52064)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k5bY5-0006aJ-KB
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 17:11:10 -0400
-Received: from indium.canonical.com ([91.189.90.7]:39218)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k5bY3-0002ct-B0
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 17:11:09 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1k5bY0-0005Ad-Ku
- for <qemu-devel@nongnu.org>; Tue, 11 Aug 2020 21:11:04 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 8D1292E809C
- for <qemu-devel@nongnu.org>; Tue, 11 Aug 2020 21:11:04 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 11 Aug 2020 21:02:59 -0000
-From: Alexander Bulekov <1810000@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: usb xhci
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: a1xndr balaton-4 benquike bugs-syssec th-huth
-X-Launchpad-Bug-Reporter: PH (benquike)
-X-Launchpad-Bug-Modifier: Alexander Bulekov (a1xndr)
-References: <154603590627.5548.1380267988808710453.malonedeb@wampee.canonical.com>
-Message-Id: <159717977974.22566.17246830439718265798.malone@chaenomeles.canonical.com>
-Subject: [Bug 1810000] Re: qemu system emulator crashed when using xhci usb
- controller
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="6a138c03da9cc3e2e03f6dd3bbb4a615b0be6ec2";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 10342e82fba0d56d819cf293bff2d9374ad8f796
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/11 17:11:05
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1k5bQo-0002Yp-NV
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 17:03:38 -0400
+Received: from mx2.suse.de ([195.135.220.15]:57706)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1k5bQk-0001dP-85
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 17:03:38 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+ by mx2.suse.de (Postfix) with ESMTP id A3A7BAF82;
+ Tue, 11 Aug 2020 21:03:53 +0000 (UTC)
+From: Claudio Fontana <cfontana@suse.de>
+To: Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Roman Bolshakov <r.bolshakov@yadro.com>
+Subject: [RFC v4 06/14] cpus: extract out hax-specific code to target/i386/
+Date: Tue, 11 Aug 2020 23:03:18 +0200
+Message-Id: <20200811210326.4425-7-cfontana@suse.de>
+X-Mailer: git-send-email 2.16.4
+In-Reply-To: <20200811210326.4425-1-cfontana@suse.de>
+References: <20200811210326.4425-1-cfontana@suse.de>
+Received-SPF: pass client-ip=195.135.220.15; envelope-from=cfontana@suse.de;
+ helo=mx2.suse.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/11 02:05:49
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -85,78 +68,422 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1810000 <1810000@bugs.launchpad.net>
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Pavel Dovgalyuk <dovgaluk@ispras.ru>,
+ Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>, Wenchao Wang <wenchao.wang@intel.com>,
+ Colin Xu <colin.xu@intel.com>, Claudio Fontana <cfontana@suse.de>,
+ haxm-team@intel.com, Sunil Muthuswamy <sunilmut@microsoft.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Here's a QTest reproducer:
+register a "CpusAccel" interface for HAX as well.
 
-cat << EOF | ./i386-softmmu/qemu-system-i386 \
--device nec-usb-xhci -trace usb\* \
--device usb-audio -device usb-storage,drive=3Dmydrive \
--drive id=3Dmydrive,file=3Dnull-co://,size=3D2M,format=3Draw,if=3Dnone \
--nodefaults -nographic -qtest stdio
-outl 0xcf8 0x80001016
-outl 0xcfc 0x3c319f0d
-outl 0xcf8 0x80001004
-outl 0xcfc 0xc77695e
-writel 0x9f0d000000000040 0xffffd855
-writeq 0x9f0d000000002000 0xff2f9e0000000000
-write 0x1d 0x1 0x27
-write 0x2d 0x1 0x2e
-write 0x17232 0x1 0x03
-write 0x17254 0x1 0x05
-write 0x17276 0x1 0x72
-write 0x17278 0x1 0x02
-write 0x3d 0x1 0x27
-write 0x40 0x1 0x2e
-write 0x41 0x1 0x72
-write 0x42 0x1 0x01
-write 0x4d 0x1 0x2e
-write 0x4f 0x1 0x01
-writel 0x9f0d000000002000 0x0
-write 0x2007d 0x1 0x2e
-writeq 0x9f0d000000002000 0x514ef013d000009
-write 0x20096 0x1 0x23
-write 0x20098 0x1 0x08
-write 0x2009c 0x1 0xfe
-write 0x2009d 0x1 0x08
-write 0x200ad 0x1 0x10
-writeq 0x9f0d000000002000 0x100ef0100000009
-EOF
+Signed-off-by: Claudio Fontana <cfontana@suse.de>
+---
+ softmmu/cpus.c            | 80 +-------------------------------------------
+ target/i386/Makefile.objs |  5 +--
+ target/i386/hax-all.c     |  6 +++-
+ target/i386/hax-cpus.c    | 85 +++++++++++++++++++++++++++++++++++++++++++++++
+ target/i386/hax-cpus.h    | 17 ++++++++++
+ target/i386/hax-i386.h    |  2 ++
+ target/i386/hax-posix.c   | 12 +++++++
+ target/i386/hax-windows.c | 20 +++++++++++
+ 8 files changed, 145 insertions(+), 82 deletions(-)
+ create mode 100644 target/i386/hax-cpus.c
+ create mode 100644 target/i386/hax-cpus.h
 
--- =
+diff --git a/softmmu/cpus.c b/softmmu/cpus.c
+index bd535c68e0..c314e22bd2 100644
+--- a/softmmu/cpus.c
++++ b/softmmu/cpus.c
+@@ -33,7 +33,6 @@
+ #include "exec/gdbstub.h"
+ #include "sysemu/hw_accel.h"
+ #include "sysemu/kvm.h"
+-#include "sysemu/hax.h"
+ #include "sysemu/hvf.h"
+ #include "sysemu/whpx.h"
+ #include "exec/exec-all.h"
+@@ -179,9 +178,6 @@ void cpu_synchronize_state(CPUState *cpu)
+     if (cpus_accel && cpus_accel->synchronize_state) {
+         cpus_accel->synchronize_state(cpu);
+     }
+-    if (hax_enabled()) {
+-        hax_cpu_synchronize_state(cpu);
+-    }
+     if (whpx_enabled()) {
+         whpx_cpu_synchronize_state(cpu);
+     }
+@@ -192,9 +188,6 @@ void cpu_synchronize_post_reset(CPUState *cpu)
+     if (cpus_accel && cpus_accel->synchronize_post_reset) {
+         cpus_accel->synchronize_post_reset(cpu);
+     }
+-    if (hax_enabled()) {
+-        hax_cpu_synchronize_post_reset(cpu);
+-    }
+     if (whpx_enabled()) {
+         whpx_cpu_synchronize_post_reset(cpu);
+     }
+@@ -205,9 +198,6 @@ void cpu_synchronize_post_init(CPUState *cpu)
+     if (cpus_accel && cpus_accel->synchronize_post_init) {
+         cpus_accel->synchronize_post_init(cpu);
+     }
+-    if (hax_enabled()) {
+-        hax_cpu_synchronize_post_init(cpu);
+-    }
+     if (whpx_enabled()) {
+         whpx_cpu_synchronize_post_init(cpu);
+     }
+@@ -218,9 +208,6 @@ void cpu_synchronize_pre_loadvm(CPUState *cpu)
+     if (cpus_accel && cpus_accel->synchronize_pre_loadvm) {
+         cpus_accel->synchronize_pre_loadvm(cpu);
+     }
+-    if (hax_enabled()) {
+-        hax_cpu_synchronize_pre_loadvm(cpu);
+-    }
+     if (hvf_enabled()) {
+         hvf_cpu_synchronize_pre_loadvm(cpu);
+     }
+@@ -416,35 +403,6 @@ void qemu_wait_io_event(CPUState *cpu)
+     qemu_wait_io_event_common(cpu);
+ }
+ 
+-static void *qemu_hax_cpu_thread_fn(void *arg)
+-{
+-    CPUState *cpu = arg;
+-    int r;
+-
+-    rcu_register_thread();
+-    qemu_mutex_lock_iothread();
+-    qemu_thread_get_self(cpu->thread);
+-
+-    cpu->thread_id = qemu_get_thread_id();
+-    current_cpu = cpu;
+-    hax_init_vcpu(cpu);
+-    cpu_thread_signal_created(cpu);
+-    qemu_guest_random_seed_thread_part2(cpu->random_seed);
+-
+-    do {
+-        if (cpu_can_run(cpu)) {
+-            r = hax_smp_cpu_exec(cpu);
+-            if (r == EXCP_DEBUG) {
+-                cpu_handle_guest_debug(cpu);
+-            }
+-        }
+-
+-        qemu_wait_io_event(cpu);
+-    } while (!cpu->unplug || cpu_can_run(cpu));
+-    rcu_unregister_thread();
+-    return NULL;
+-}
+-
+ /* The HVF-specific vCPU thread function. This one should only run when the host
+  * CPU supports the VMX "unrestricted guest" feature. */
+ static void *qemu_hvf_cpu_thread_fn(void *arg)
+@@ -529,12 +487,6 @@ static void *qemu_whpx_cpu_thread_fn(void *arg)
+     return NULL;
+ }
+ 
+-#ifdef _WIN32
+-static void CALLBACK dummy_apc_func(ULONG_PTR unused)
+-{
+-}
+-#endif
+-
+ void cpus_kick_thread(CPUState *cpu)
+ {
+ #ifndef _WIN32
+@@ -553,10 +505,6 @@ void cpus_kick_thread(CPUState *cpu)
+     if (!qemu_cpu_is_self(cpu)) {
+         if (whpx_enabled()) {
+             whpx_vcpu_kick(cpu);
+-        } else if (!QueueUserAPC(dummy_apc_func, cpu->hThread, 0)) {
+-            fprintf(stderr, "%s: QueueUserAPC failed with error %lu\n",
+-                    __func__, GetLastError());
+-            exit(1);
+         }
+     }
+ #endif
+@@ -567,14 +515,7 @@ void qemu_cpu_kick(CPUState *cpu)
+     qemu_cond_broadcast(cpu->halt_cond);
+     if (cpus_accel && cpus_accel->kick_vcpu_thread) {
+         cpus_accel->kick_vcpu_thread(cpu);
+-    } else {
+-        if (hax_enabled()) {
+-            /*
+-             * FIXME: race condition with the exit_request check in
+-             * hax_vcpu_hax_exec
+-             */
+-            cpu->exit_request = 1;
+-        }
++    } else { /* default */
+         cpus_kick_thread(cpu);
+     }
+ }
+@@ -722,23 +663,6 @@ void cpu_remove_sync(CPUState *cpu)
+     qemu_mutex_lock_iothread();
+ }
+ 
+-static void qemu_hax_start_vcpu(CPUState *cpu)
+-{
+-    char thread_name[VCPU_THREAD_NAME_SIZE];
+-
+-    cpu->thread = g_malloc0(sizeof(QemuThread));
+-    cpu->halt_cond = g_malloc0(sizeof(QemuCond));
+-    qemu_cond_init(cpu->halt_cond);
+-
+-    snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "CPU %d/HAX",
+-             cpu->cpu_index);
+-    qemu_thread_create(cpu->thread, thread_name, qemu_hax_cpu_thread_fn,
+-                       cpu, QEMU_THREAD_JOINABLE);
+-#ifdef _WIN32
+-    cpu->hThread = qemu_thread_get_handle(cpu->thread);
+-#endif
+-}
+-
+ static void qemu_hvf_start_vcpu(CPUState *cpu)
+ {
+     char thread_name[VCPU_THREAD_NAME_SIZE];
+@@ -800,8 +724,6 @@ void qemu_init_vcpu(CPUState *cpu)
+     if (cpus_accel) {
+         /* accelerator already implements the CpusAccel interface */
+         cpus_accel->create_vcpu_thread(cpu);
+-    } else if (hax_enabled()) {
+-        qemu_hax_start_vcpu(cpu);
+     } else if (hvf_enabled()) {
+         qemu_hvf_start_vcpu(cpu);
+     } else if (whpx_enabled()) {
+diff --git a/target/i386/Makefile.objs b/target/i386/Makefile.objs
+index 0b93143e27..ee5a8fd4b4 100644
+--- a/target/i386/Makefile.objs
++++ b/target/i386/Makefile.objs
+@@ -10,11 +10,12 @@ obj-y += machine.o arch_memory_mapping.o arch_dump.o monitor.o
+ obj-$(CONFIG_KVM) += kvm.o
+ obj-$(CONFIG_HYPERV) += hyperv.o
+ obj-$(call lnot,$(CONFIG_HYPERV)) += hyperv-stub.o
++obj-$(CONFIG_HAX) += hax-all.o hax-mem.o hax-cpus.o
+ ifeq ($(CONFIG_WIN32),y)
+-obj-$(CONFIG_HAX) += hax-all.o hax-mem.o hax-windows.o
++obj-$(CONFIG_HAX) += hax-windows.o
+ endif
+ ifeq ($(CONFIG_POSIX),y)
+-obj-$(CONFIG_HAX) += hax-all.o hax-mem.o hax-posix.o
++obj-$(CONFIG_HAX) += hax-posix.o
+ endif
+ obj-$(CONFIG_HVF) += hvf/
+ obj-$(CONFIG_WHPX) += whpx-all.o
+diff --git a/target/i386/hax-all.c b/target/i386/hax-all.c
+index c93bb23a44..b66ddeb8bf 100644
+--- a/target/i386/hax-all.c
++++ b/target/i386/hax-all.c
+@@ -32,9 +32,10 @@
+ #include "sysemu/accel.h"
+ #include "sysemu/reset.h"
+ #include "sysemu/runstate.h"
+-#include "qemu/main-loop.h"
+ #include "hw/boards.h"
+ 
++#include "hax-cpus.h"
++
+ #define DEBUG_HAX 0
+ 
+ #define DPRINTF(fmt, ...) \
+@@ -374,6 +375,9 @@ static int hax_accel_init(MachineState *ms)
+                 !ret ? "working" : "not working",
+                 !ret ? "fast virt" : "emulation");
+     }
++    if (ret == 0) {
++        cpus_register_accel(&hax_cpus);
++    }
+     return ret;
+ }
+ 
+diff --git a/target/i386/hax-cpus.c b/target/i386/hax-cpus.c
+new file mode 100644
+index 0000000000..69a4162939
+--- /dev/null
++++ b/target/i386/hax-cpus.c
+@@ -0,0 +1,85 @@
++/*
++ * QEMU HAX support
++ *
++ * Copyright IBM, Corp. 2008
++ *           Red Hat, Inc. 2008
++ *
++ * Authors:
++ *  Anthony Liguori   <aliguori@us.ibm.com>
++ *  Glauber Costa     <gcosta@redhat.com>
++ *
++ * Copyright (c) 2011 Intel Corporation
++ *  Written by:
++ *  Jiang Yunhong<yunhong.jiang@intel.com>
++ *  Xin Xiaohui<xiaohui.xin@intel.com>
++ *  Zhang Xiantao<xiantao.zhang@intel.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ *
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/error-report.h"
++#include "qemu/main-loop.h"
++#include "hax-i386.h"
++#include "sysemu/runstate.h"
++#include "sysemu/cpus.h"
++#include "qemu/guest-random.h"
++
++#include "hax-cpus.h"
++
++static void *hax_cpu_thread_fn(void *arg)
++{
++    CPUState *cpu = arg;
++    int r;
++
++    rcu_register_thread();
++    qemu_mutex_lock_iothread();
++    qemu_thread_get_self(cpu->thread);
++
++    cpu->thread_id = qemu_get_thread_id();
++    hax_init_vcpu(cpu);
++    cpu_thread_signal_created(cpu);
++    qemu_guest_random_seed_thread_part2(cpu->random_seed);
++
++    do {
++        if (cpu_can_run(cpu)) {
++            r = hax_smp_cpu_exec(cpu);
++            if (r == EXCP_DEBUG) {
++                cpu_handle_guest_debug(cpu);
++            }
++        }
++
++        qemu_wait_io_event(cpu);
++    } while (!cpu->unplug || cpu_can_run(cpu));
++    rcu_unregister_thread();
++    return NULL;
++}
++
++static void hax_start_vcpu_thread(CPUState *cpu)
++{
++    char thread_name[VCPU_THREAD_NAME_SIZE];
++
++    cpu->thread = g_malloc0(sizeof(QemuThread));
++    cpu->halt_cond = g_malloc0(sizeof(QemuCond));
++    qemu_cond_init(cpu->halt_cond);
++
++    snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "CPU %d/HAX",
++             cpu->cpu_index);
++    qemu_thread_create(cpu->thread, thread_name, hax_cpu_thread_fn,
++                       cpu, QEMU_THREAD_JOINABLE);
++#ifdef _WIN32
++    cpu->hThread = qemu_thread_get_handle(cpu->thread);
++#endif
++}
++
++CpusAccel hax_cpus = {
++    .create_vcpu_thread = hax_start_vcpu_thread,
++    .kick_vcpu_thread = hax_kick_vcpu_thread,
++
++    .synchronize_post_reset = hax_cpu_synchronize_post_reset,
++    .synchronize_post_init = hax_cpu_synchronize_post_init,
++    .synchronize_state = hax_cpu_synchronize_state,
++    .synchronize_pre_loadvm = hax_cpu_synchronize_pre_loadvm,
++};
+diff --git a/target/i386/hax-cpus.h b/target/i386/hax-cpus.h
+new file mode 100644
+index 0000000000..ac3cf1f8ae
+--- /dev/null
++++ b/target/i386/hax-cpus.h
+@@ -0,0 +1,17 @@
++/*
++ * Accelerator CPUS Interface
++ *
++ * Copyright 2020 SUSE LLC
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
++
++#ifndef HAX_CPUS_H
++#define HAX_CPUS_H
++
++#include "sysemu/cpus.h"
++
++extern CpusAccel hax_cpus;
++
++#endif /* HAX_CPUS_H */
+diff --git a/target/i386/hax-i386.h b/target/i386/hax-i386.h
+index ec28708185..48c4abe14e 100644
+--- a/target/i386/hax-i386.h
++++ b/target/i386/hax-i386.h
+@@ -60,6 +60,8 @@ int hax_inject_interrupt(CPUArchState *env, int vector);
+ struct hax_vm *hax_vm_create(struct hax_state *hax, int max_cpus);
+ int hax_vcpu_run(struct hax_vcpu_state *vcpu);
+ int hax_vcpu_create(int id);
++void hax_kick_vcpu_thread(CPUState *cpu);
++
+ int hax_sync_vcpu_state(CPUArchState *env, struct vcpu_state_t *state,
+                         int set);
+ int hax_sync_msr(CPUArchState *env, struct hax_msr_data *msrs, int set);
+diff --git a/target/i386/hax-posix.c b/target/i386/hax-posix.c
+index 5f9d1b803d..6fb7867d11 100644
+--- a/target/i386/hax-posix.c
++++ b/target/i386/hax-posix.c
+@@ -16,6 +16,8 @@
+ 
+ #include "target/i386/hax-i386.h"
+ 
++#include "sysemu/cpus.h"
++
+ hax_fd hax_mod_open(void)
+ {
+     int fd = open("/dev/HAX", O_RDWR);
+@@ -292,3 +294,13 @@ int hax_inject_interrupt(CPUArchState *env, int vector)
+ 
+     return ioctl(fd, HAX_VCPU_IOCTL_INTERRUPT, &vector);
+ }
++
++void hax_kick_vcpu_thread(CPUState *cpu)
++{
++    /*
++     * FIXME: race condition with the exit_request check in
++     * hax_vcpu_hax_exec
++     */
++    cpu->exit_request = 1;
++    cpus_kick_thread(cpu);
++}
+diff --git a/target/i386/hax-windows.c b/target/i386/hax-windows.c
+index 863c2bcc19..469b48e608 100644
+--- a/target/i386/hax-windows.c
++++ b/target/i386/hax-windows.c
+@@ -463,3 +463,23 @@ int hax_inject_interrupt(CPUArchState *env, int vector)
+         return 0;
+     }
+ }
++
++static void CALLBACK dummy_apc_func(ULONG_PTR unused)
++{
++}
++
++void hax_kick_vcpu_thread(CPUState *cpu)
++{
++    /*
++     * FIXME: race condition with the exit_request check in
++     * hax_vcpu_hax_exec
++     */
++    cpu->exit_request = 1;
++    if (!qemu_cpu_is_self(cpu)) {
++        if (!QueueUserAPC(dummy_apc_func, cpu->hThread, 0)) {
++            fprintf(stderr, "%s: QueueUserAPC failed with error %lu\n",
++                    __func__, GetLastError());
++            exit(1);
++        }
++    }
++}
+-- 
+2.16.4
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1810000
-
-Title:
-  qemu system emulator crashed when using xhci usb controller
-
-Status in QEMU:
-  New
-
-Bug description:
-  I am testing usb-bt-dongle device on xchi host controller, and found
-  that the qemu crashed directly with an assertion failer.
-
-  Here is the information to reproduce the crash:
-
-  Qemu git revision: 9b2e891ec5ccdb4a7d583b77988848282606fdea
-  System emulator: qemu-x86_64
-  VM image: https://people.debian.org/~aurel32/qemu/amd64/debian_squeeze_am=
-d64_desktop.qcow2
-  CommandLine: qemu-system-x86_64 -M q35 -device qemu-xhci,id=3Dxhci -enabl=
-e-kvm -device usb-bt-dongle  -hda ./debian_wheezy_amd64_standard.qcow2
-
-  Error message:
-
-  qemu-system-x86_64: /build/qemu-
-  Eap4uc/qemu-2.11+dfsg/hw/usb/core.c:592: usb_packet_copy: Assertion
-  `p->actual_length + bytes <=3D iov->size' failed.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1810000/+subscriptions
 
