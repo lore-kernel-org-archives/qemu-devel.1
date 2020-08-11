@@ -2,84 +2,85 @@ Return-Path: <SRS0=wQM/=BV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.6 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+X-Spam-Status: No, score=-20.6 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
-	version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF88FC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 00:47:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0BC2C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 00:47:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A7C93206C3
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 00:47:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 690BA206C3
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 00:47:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tXNZogih"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7C93206C3
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bIlur3C/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 690BA206C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41016 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41704 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5IS3-0000D1-SP
-	for qemu-devel@archiver.kernel.org; Mon, 10 Aug 2020 20:47:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46662)
+	id 1k5ISA-0000Uo-HN
+	for qemu-devel@archiver.kernel.org; Mon, 10 Aug 2020 20:47:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46780)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from
- <3VeoxXwsKCvAZkcaffWegWfYggYdW.UgeiWem-VWnWdfgfYfm.gjY@flex--hskinnemoen.bounces.google.com>)
- id 1k5IQl-0006vz-8v
- for qemu-devel@nongnu.org; Mon, 10 Aug 2020 20:46:19 -0400
-Received: from mail-pg1-x549.google.com ([2607:f8b0:4864:20::549]:37130)
+ <3WuoxXwsKCvUephfkkbjlbkdlldib.Zljnbjr-absbiklkdkr.lod@flex--hskinnemoen.bounces.google.com>)
+ id 1k5IQr-00074g-4A
+ for qemu-devel@nongnu.org; Mon, 10 Aug 2020 20:46:25 -0400
+Received: from mail-yb1-xb49.google.com ([2607:f8b0:4864:20::b49]:51573)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from
- <3VeoxXwsKCvAZkcaffWegWfYggYdW.UgeiWem-VWnWdfgfYfm.gjY@flex--hskinnemoen.bounces.google.com>)
- id 1k5IQi-0004gA-Qa
- for qemu-devel@nongnu.org; Mon, 10 Aug 2020 20:46:18 -0400
-Received: by mail-pg1-x549.google.com with SMTP id x3so2303345pga.4
- for <qemu-devel@nongnu.org>; Mon, 10 Aug 2020 17:46:15 -0700 (PDT)
+ <3WuoxXwsKCvUephfkkbjlbkdlldib.Zljnbjr-absbiklkdkr.lod@flex--hskinnemoen.bounces.google.com>)
+ id 1k5IQm-0004gv-Hi
+ for qemu-devel@nongnu.org; Mon, 10 Aug 2020 20:46:24 -0400
+Received: by mail-yb1-xb49.google.com with SMTP id e12so9555700ybc.18
+ for <qemu-devel@nongnu.org>; Mon, 10 Aug 2020 17:46:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:message-id:mime-version:subject:from:to:cc
- :content-transfer-encoding;
- bh=vHecJPJoAi9bnfUUclQxvlcEQbztqI627ADIGlzbloM=;
- b=tXNZogihX1/oBpLy59HZ/X3s4szAprBGfiYLox1OkLtY4hY2HbKv6v893I5I53PA54
- JnO/ejwfMJQdgH6V/3hZ8f1hdkhtoA0bPPxWL2YVDkvQSqJxTRrrP6sdOzpoX2LKQYsK
- xMi0eFDfQwEtkbPL4Ct2U2VkLT76E6kQArwWgMctMW3VWWkz7iZvVm9EeaLf4cuOdzBN
- w4N6QGSdP1kfIan1iyV5ZFJS62mb3YKJx41psSH67L2/gcUfUhyWWjGSRHyI7G34dy6s
- GrxM3kXY9m8bvxl3DiGdeEjuyFofA88z2SlwZdI/BR/aCNp+ScaX5IPI5OGpt6hjJ1wg
- 6IUg==
+ h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+ :cc:content-transfer-encoding;
+ bh=tTUc6EnNHaC915Kzw2DgK3O5SLcFCKbiog2G3mSfUS8=;
+ b=bIlur3C/5jsOMifFXFAYhaNsIpVVnafPur1kfRmQYzA2wvSacfIY92ZCcA0CNaxd8+
+ A36GtS1JYq8U9dXAOC9tMl1R3iGW2KRexf41AsoiaDB1kIHsbh/pywinSiFsVD6pah3r
+ TxC4fDBekL1k6HJXcHikh+8UoqB4nnNe5yzwd5V98TXIIP1PevU/uhF1ZNsbkhHpvYX3
+ Agof0oxPYahEbyrGYdkBV3pwZ0AurZbBt8XLzhy82tZWtFVMJbspFFRZpoOurxdxxxP3
+ CTPZeW+cQ9GnJ0PKlUGRzpINYIO9E7BJcEca37DBUPo71VbgzHNxjyuyIHOS057SRj7L
+ 5y5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc
- :content-transfer-encoding;
- bh=vHecJPJoAi9bnfUUclQxvlcEQbztqI627ADIGlzbloM=;
- b=ZA4UxI9hQU4MLR+oauEXnKwlQQ3shR5jn4oYYAf/xY8WIOAxcio2AAH803gpkxmcqQ
- 37jy7Kf4U2tJgm9K+yB24NStZCMiSgyd7sV4174U0sH3k+syND4tHx80arqegPEttOig
- GASIDiZ1+oDvffshN5oIpXsfIj/JzEY+bkCtk/YXQ7+AdU83m61WLLJ3QUIZZYx58ih+
- pGjjboZXudCN+Jur4f+oQeP56zqBw8XAltqyRaivdiblfSqZ2HbII5I1Ez/kTCIgb6eG
- vwiFrovzgQsZtJ63oVy5Ch/nt+veSonq7TLqJ50Tc7EZbFwN8Y+/WAR9FNfyobe9l+dw
- Mydw==
-X-Gm-Message-State: AOAM532w7WDPLPg9Oe6089Pbs35Wrz0jLomanlC1tWhmLGN92PN6nGJS
- qhRMxxhBbsts+uNV5ZRnNhot91Qvi19HCfVsGQ==
-X-Google-Smtp-Source: ABdhPJwF94Hwt96+7xOIf0CF7OW+A0Yjh4oajxQ3JN1UxiRNbFg2xpuEOmBhhdAPOII+pnfCXsp/9Cvmf5NfqaCItA==
-X-Received: by 2002:a17:90a:f014:: with SMTP id
- bt20mr283988pjb.0.1597106773704; 
- Mon, 10 Aug 2020 17:46:13 -0700 (PDT)
-Date: Tue, 11 Aug 2020 00:45:54 +0000
-Message-Id: <20200811004607.2133149-1-hskinnemoen@google.com>
+ h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+ :references:subject:from:to:cc:content-transfer-encoding;
+ bh=tTUc6EnNHaC915Kzw2DgK3O5SLcFCKbiog2G3mSfUS8=;
+ b=pX4K5Ileyad7W/IdfZhWaUwD8aKpw548YOQLB1If3nIKOGHVltN1IKF8qcpJqzFgKY
+ ynV72yJQ7wJP48naOgeWXxpYw3AOPhcNPh6vcmDc3GH3GZPFjM096/L0V2oiqM3TTNz3
+ bDZqgq/TgGxTWgbHAs8jNCSQSxg/1nXLzHMLxbKQrUB7qi7bc9xeUpZggtew3kxs51mj
+ PNZRuXUBrRlxlzyHg/QJFxdqgmCW8TCI1/+92uIsM+F5CsrkRv49zxUh88Gag29OKBVV
+ M1cfO1IM/P9vcsnqvrEXM2lt+vTfsGn4Jn88WM9IMCf2Nop6p2DZJGczHBf8+/bw7hha
+ KKvw==
+X-Gm-Message-State: AOAM532hlmXNUwTa8wsAhJSInVtyEa7qs8QkZb8V3Xh2hFXkhQVDZ8h2
+ rLcezliI0TeAgTkd9pca0x3NQNDlOJNg5aSkkw==
+X-Google-Smtp-Source: ABdhPJzUSyGSOh+s/yVq5U2aQwxnJyI5SuKP5kNnJu62wEO3Q2UrzrLPp0Uj7HNlBytBA4PE/SZ9mUSNhTDWSvyBug==
+X-Received: by 2002:a25:d347:: with SMTP id e68mr44294173ybf.123.1597106778935; 
+ Mon, 10 Aug 2020 17:46:18 -0700 (PDT)
+Date: Tue, 11 Aug 2020 00:45:57 +0000
+In-Reply-To: <20200811004607.2133149-1-hskinnemoen@google.com>
+Message-Id: <20200811004607.2133149-4-hskinnemoen@google.com>
 Mime-Version: 1.0
+References: <20200811004607.2133149-1-hskinnemoen@google.com>
 X-Mailer: git-send-email 2.28.0.236.gb10cc79966-goog
-Subject: [PATCH v7 00/13] Add Nuvoton NPCM730/NPCM750 SoCs and two BMC machines
+Subject: [PATCH v7 03/13] hw/timer: Add NPCM7xx Timer device model
 From: Havard Skinnemoen <hskinnemoen@google.com>
 To: peter.maydell@linaro.org, f4bug@amsat.org, clg@kaod.org, joel@jms.id.au
 Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, Avi.Fishman@nuvoton.com, 
  kfting@nuvoton.com, Havard Skinnemoen <hskinnemoen@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::549;
- envelope-from=3VeoxXwsKCvAZkcaffWegWfYggYdW.UgeiWem-VWnWdfgfYfm.gjY@flex--hskinnemoen.bounces.google.com;
- helo=mail-pg1-x549.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::b49;
+ envelope-from=3WuoxXwsKCvUephfkkbjlbkdlldib.Zljnbjr-absbiklkdkr.lod@flex--hskinnemoen.bounces.google.com;
+ helo=mail-yb1-xb49.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -105
@@ -88,7 +89,7 @@ X-Spam_bar: ----------
 X-Spam_report: (-10.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001, USER_IN_DEF_DKIM_WL=-7.5 autolearn=ham autolearn_force=no
+ USER_IN_DEF_DKIM_WL=-7.5 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,265 +106,679 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I also pushed this and the previous two patchsets to my qemu fork on github=
-.
-The branches are named npcm7xx-v[1-7].
+The NPCM730 and NPCM750 SoCs have three timer modules each holding five
+timers and some shared registers (e.g. interrupt status).
 
-  https://github.com/hskinnemoen/qemu
+Each timer runs at 25 MHz divided by a prescaler, and counts down from a
+configurable initial value to zero. When zero is reached, the interrupt
+flag for the timer is set, and the timer is disabled (one-shot mode) or
+reloaded from its initial value (periodic mode).
 
-This patch series models enough of the Nuvoton NPCM730 and NPCM750 SoCs to =
-boot
-an OpenBMC image built for quanta-gsj. This includes device models for:
+This implementation is sufficient to boot a Linux kernel configured for
+NPCM750. Note that the kernel does not seem to actually turn on the
+interrupts.
 
-  - Global Configuration Registers
-  - Clock Control
-  - Timers
-  - Fuses
-  - Memory Controller
-  - Flash Controller
-
-These modules, along with the existing Cortex A9 CPU cores and built-in
-peripherals, are integrated into a NPCM730 or NPCM750 SoC, which in turn fo=
-rm
-the foundation for the quanta-gsj and npcm750-evb machines, respectively. T=
-he
-two SoCs are very similar; the only difference is that NPCM730 is missing s=
-ome
-peripherals that NPCM750 has, and which are not considered essential for
-datacenter use (e.g. graphics controllers). For more information, see
-
-https://www.nuvoton.com/products/cloud-computing/ibmc/
-
-Both quanta-gsj and npcm750-evb correspond to real boards supported by Open=
-BMC.
-At the end of the series, qemu can boot an OpenBMC image built for one of t=
-hese
-boards with some minor modifications.
-
-The patches in this series were developed by Google and reviewed by Nuvoton=
-. We
-will be maintaining the machine and peripheral support together.
-
-The data sheet for these SoCs is not generally available. Please let me kno=
-w if
-more comments are needed to understand the device behavior.
-
-Changes since v6:
-
-  - Use size_to_str to report DRAM sizes in npcm7xx_gcr.
-  - Simplify the interrupt logic in npcm7xx_timer.
-  - Update global bios_name instead of temporary.
-  - Add npcm7xx_bootrom to MAINTAINERS and pc-bios/README.
-  - Use a predefined name for the gsj boot image in the acceptance test.
-
-Changes since v5:
-
-  - Boot ROM included, as a git submodule and a binary blob, and loaded by
-    default, so the -bios option is usually not necessary anymore.
-  - Two acceptance tests added (openbmc image boot, and direct kernel boot)=
-.
-  - npcm7xx_load_kernel() moved to SoC code.
-  - NPCM7XX_TIMER_REF_HZ definition moved to CLK header.
-  - Comments added clarifying available SPI flash chip selects.
-  - Error handling adjustments:
-      - Errors from CPU and GCR realization are propagated through the SoC
-        since they may be triggered by user-configurable parameters.
-      - Machine init uses error_fatal instead of error_abort for SoC
-        realization flash init. This makes error messages more helpful.
-      - Comments added to indicate whether peripherals may fail to realize.
-      - Use ERRP_GUARD() instead of Error *err when possible.
-  - Default CPU type is now set, and attempting to set it to anything else
-    will fail.
-  - Format string fixes (use HWADDR_PRIx, etc.)
-  - Simplified memory size encoding and error checking in npcm7xx_gcr.
-  - Encapsulate non-obvious pointer subtraction into helper functions in th=
-e
-    FIU and TIMER modules.
-  - Incorporate review feedback into the FIU module:
-      - Add select/deselect trace events.
-      - Use npcm7xx_fiu_{de,}select() consistently.
-      - Use extract/deposit in more places for consistency.
-      - Use -Wimplicit-fallthrough compatible fallthrough comments.
-      - Use qdev_init_gpio_out_named instead of sysbus_init_irq for chip
-        selects.
-  - Incorporate review feedback into the TIMER module:
-      - Assert that we never pause a timer that has already expired, instea=
-d of
-        trying to handle it. This should be safe since QEMU_CLOCK_VIRTUAL i=
-s
-        stopped while this code is running.
-      - Simplify the switch blocks in the read and write handlers.
-
-I made a change to error out if a flash drive was not specified, but revert=
-ed
-it because it caused make check to fail (qom-test). When specifying a NULL
-block device, the m25p flash device initializes its in-memory storage with =
-0xff
-and doesn't attempt to write anything back. This seems correct to me.
-
-Changes since v4:
-
-  - OTP cleanups suggested by Philippe Mathieu-Daud=C3=A9.
-      - Added fuse array definitions based on public Nuvoton bootblock code=
-.
-      - Moved class structure to .c file since it's only used internally.
-      - Readability improvements.
-  - Split the first patch and folded parts of it into three other patches s=
-o
-    that CONFIG_NPCM7XX is only enabled after the initial NPCM7xx machine
-    support is added.
-  - DRAM init moved to machine init code.
-  - Consistently use lower-case hex literals.
-  - Switched to fine-grained unimplemented devices, based on public bootblo=
-ck
-    source code. Added a tiny SRAM that got left out previously.
-  - Simplified error handling in npcm7xx_realize() since the board code wil=
-l
-    abort anyway, and SoCs are not hot-pluggable.
-
-Changes since v3:
-
-  - License headers are now GPL v2-or-later throughout.
-  - Added vmstate throughout (except the memory controller, which doesn't
-    really have any state worth saving). Successfully booted a gsj image
-    with two stop/savevm/quit/loadvm cycles along the way.
-      - JFFS2 really doesn't like it if I let qemu keep running after savev=
-m,
-        and then jump back in time with loadvm. I assume this is expected.
-  - Fixed an error API violation in npcm7xx_realize, removed pointless erro=
-r
-    check after object_property_set_link().
-  - Switched the OTP device to use an embedded array instead of a g_malloc0=
-'d
-    one because I couldn't figure out how to set up vmstate for the latter.
-
-Changes since v2:
-
-  - Simplified the MAINTAINERS entry.
-  - Added link to OpenPOWER jenkins for gsj BMC images.
-  - Reverted the smpboot change, back to byte swapping.
-  - Adapted to upstream API changes:
-      - sysbus_init_child_obj -> object_initialize_child
-      - object_property_set_bool -> qdev_realize / sysbus_realize
-      - ssi_create_slave_no_init -> qdev_new
-      - qdev_init_nofail -> qdev_realize_and_unref
-      - ssi_auto_connect_slaves removed
-  - Moved Boot ROM loading from soc to machine init.
-  - Plumbed power-on-straps property from GCR to the machine init code so i=
-t
-    can be properly initialized. Turns out npcm750 memory init doesn't work
-    without this. npcm730 is fine either way, though I'm not sure why.
-  - Reworked the flash init code so it looks more like aspeed (i.e. the fla=
-sh
-    device gets added even if there's no drive).
-
-Changes since v1 (requested by reviewers):
-
-  - Clarify the source of CLK reset values.
-  - Made smpboot a constant byte array, eliinated byte swapping.
-  - NPCM7xxState now stores an array of ARMCPUs, not pointers to ARMCPUs.
-  - Clarify why EL3 is disabled.
-  - Introduce NPCM7XX_NUM_IRQ constant.
-  - Set the number of CPUs according to SoC variant, and disallow command l=
-ine
-    overrides (i.e. you can no longer override the number of CPUs with the =
--smp
-    parameter). This is trying to follow the spirit of
-    https://patchwork.kernel.org/patch/11595407/.
-  - Switch register operations to DEVICE_LITTLE_ENDIAN throughout.
-  - Machine documentation added (new patch).
-
-Changes since v1 to support flash booting:
-
-  - GCR reset value changes to get past memory initialization when booting
-    from flash (patches 2 and 5):
-      - INTCR2 now indicates that the DDR controller is initialized.
-      - INTCR3 is initialized according to DDR memory size. A realize()
-	method was implemented to achieve this.
-  - Refactor the machine initialization a bit to make it easier to drop in
-    machine-specific flash initialization (patch 6).
-  - Extend the series with additional patches to enable booting from flash:
-      - Boot ROM (through the -bios option).
-      - OTP (fuse) controller.
-      - Memory Controller stub (just enough to skip memory training).
-      - Flash controller.
-      - Board-specific flash initialization.
-
-Thanks for reviewing,
-
-Havard
-
-Havard Skinnemoen (13):
-  hw/misc: Add NPCM7xx System Global Control Registers device model
-  hw/misc: Add NPCM7xx Clock Controller device model
-  hw/timer: Add NPCM7xx Timer device model
-  hw/arm: Add NPCM730 and NPCM750 SoC models
-  hw/arm: Add two NPCM7xx-based machines
-  roms: Add virtual Boot ROM for NPCM7xx SoCs
-  hw/arm: Load -bios image as a boot ROM for npcm7xx
-  hw/nvram: NPCM7xx OTP device model
-  hw/mem: Stubbed out NPCM7xx Memory Controller model
-  hw/ssi: NPCM7xx Flash Interface Unit device model
-  hw/arm: Wire up BMC boot flash for npcm750-evb and quanta-gsj
-  docs/system: Add Nuvoton machine documentation
-  tests/acceptance: console boot tests for quanta-gsj
-
- .gitmodules                            |   3 +
- MAINTAINERS                            |  10 +
- Makefile                               |   1 +
- default-configs/arm-softmmu.mak        |   1 +
- docs/system/arm/nuvoton.rst            |  90 +++++
- docs/system/target-arm.rst             |   1 +
- hw/arm/Kconfig                         |   9 +
- hw/arm/Makefile.objs                   |   1 +
- hw/arm/npcm7xx.c                       | 500 +++++++++++++++++++++++
- hw/arm/npcm7xx_boards.c                | 192 +++++++++
- hw/mem/Makefile.objs                   |   1 +
- hw/mem/npcm7xx_mc.c                    |  84 ++++
- hw/misc/Makefile.objs                  |   2 +
- hw/misc/npcm7xx_clk.c                  | 234 +++++++++++
- hw/misc/npcm7xx_gcr.c                  | 228 +++++++++++
- hw/misc/trace-events                   |   8 +
- hw/nvram/Makefile.objs                 |   1 +
- hw/nvram/npcm7xx_otp.c                 | 424 +++++++++++++++++++
- hw/ssi/Makefile.objs                   |   1 +
- hw/ssi/npcm7xx_fiu.c                   | 539 +++++++++++++++++++++++++
- hw/ssi/trace-events                    |  11 +
- hw/timer/Makefile.objs                 |   1 +
- hw/timer/npcm7xx_timer.c               | 485 ++++++++++++++++++++++
- hw/timer/trace-events                  |   5 +
- include/hw/arm/npcm7xx.h               | 111 +++++
- include/hw/mem/npcm7xx_mc.h            |  36 ++
- include/hw/misc/npcm7xx_clk.h          |  72 ++++
- include/hw/misc/npcm7xx_gcr.h          |  76 ++++
- include/hw/nvram/npcm7xx_otp.h         |  88 ++++
- include/hw/ssi/npcm7xx_fiu.h           | 100 +++++
- include/hw/timer/npcm7xx_timer.h       |  96 +++++
- pc-bios/README                         |   6 +
- pc-bios/npcm7xx_bootrom.bin            | Bin 0 -> 768 bytes
- roms/Makefile                          |   7 +
- roms/vbootrom                          |   1 +
- tests/acceptance/boot_linux_console.py |  65 +++
- 36 files changed, 3490 insertions(+)
- create mode 100644 docs/system/arm/nuvoton.rst
- create mode 100644 hw/arm/npcm7xx.c
- create mode 100644 hw/arm/npcm7xx_boards.c
- create mode 100644 hw/mem/npcm7xx_mc.c
- create mode 100644 hw/misc/npcm7xx_clk.c
- create mode 100644 hw/misc/npcm7xx_gcr.c
- create mode 100644 hw/nvram/npcm7xx_otp.c
- create mode 100644 hw/ssi/npcm7xx_fiu.c
+Reviewed-by: Tyrone Ting <kfting@nuvoton.com>
+Reviewed-by: Joel Stanley <joel@jms.id.au>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Signed-off-by: Havard Skinnemoen <hskinnemoen@google.com>
+---
+ hw/timer/Makefile.objs           |   1 +
+ hw/timer/npcm7xx_timer.c         | 485 +++++++++++++++++++++++++++++++
+ hw/timer/trace-events            |   5 +
+ include/hw/timer/npcm7xx_timer.h |  96 ++++++
+ 4 files changed, 587 insertions(+)
  create mode 100644 hw/timer/npcm7xx_timer.c
- create mode 100644 include/hw/arm/npcm7xx.h
- create mode 100644 include/hw/mem/npcm7xx_mc.h
- create mode 100644 include/hw/misc/npcm7xx_clk.h
- create mode 100644 include/hw/misc/npcm7xx_gcr.h
- create mode 100644 include/hw/nvram/npcm7xx_otp.h
- create mode 100644 include/hw/ssi/npcm7xx_fiu.h
  create mode 100644 include/hw/timer/npcm7xx_timer.h
- create mode 100644 pc-bios/npcm7xx_bootrom.bin
- create mode 160000 roms/vbootrom
 
+diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
+index 1303b13e0d..d245b73571 100644
+--- a/hw/timer/Makefile.objs
++++ b/hw/timer/Makefile.objs
+@@ -14,6 +14,7 @@ common-obj-$(CONFIG_IMX) +=3D imx_epit.o
+ common-obj-$(CONFIG_IMX) +=3D imx_gpt.o
+ common-obj-$(CONFIG_LM32) +=3D lm32_timer.o
+ common-obj-$(CONFIG_MILKYMIST) +=3D milkymist-sysctl.o
++common-obj-$(CONFIG_NPCM7XX) +=3D npcm7xx_timer.o
+ common-obj-$(CONFIG_NRF51_SOC) +=3D nrf51_timer.o
+=20
+ common-obj-$(CONFIG_ALTERA_TIMER) +=3D altera_timer.o
+diff --git a/hw/timer/npcm7xx_timer.c b/hw/timer/npcm7xx_timer.c
+new file mode 100644
+index 0000000000..5e4fc72252
+--- /dev/null
++++ b/hw/timer/npcm7xx_timer.c
+@@ -0,0 +1,485 @@
++/*
++ * Nuvoton NPCM7xx Timer Controller
++ *
++ * Copyright 2020 Google LLC
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License as published by the
++ * Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful, but WIT=
+HOUT
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
++ * for more details.
++ */
++
++#include "qemu/osdep.h"
++
++#include "hw/irq.h"
++#include "hw/misc/npcm7xx_clk.h"
++#include "hw/timer/npcm7xx_timer.h"
++#include "migration/vmstate.h"
++#include "qemu/bitops.h"
++#include "qemu/error-report.h"
++#include "qemu/log.h"
++#include "qemu/module.h"
++#include "qemu/timer.h"
++#include "qemu/units.h"
++#include "trace.h"
++
++/* Register field definitions. */
++#define NPCM7XX_TCSR_CEN                BIT(30)
++#define NPCM7XX_TCSR_IE                 BIT(29)
++#define NPCM7XX_TCSR_PERIODIC           BIT(27)
++#define NPCM7XX_TCSR_CRST               BIT(26)
++#define NPCM7XX_TCSR_CACT               BIT(25)
++#define NPCM7XX_TCSR_RSVD               0x21ffff00
++#define NPCM7XX_TCSR_PRESCALE_START     0
++#define NPCM7XX_TCSR_PRESCALE_LEN       8
++
++/*
++ * Returns the index of timer in the tc->timer array. This can be used to
++ * locate the registers that belong to this timer.
++ */
++static int npcm7xx_timer_index(NPCM7xxTimerCtrlState *tc, NPCM7xxTimer *ti=
+mer)
++{
++    int index =3D timer - tc->timer;
++
++    g_assert(index >=3D 0 && index < NPCM7XX_TIMERS_PER_CTRL);
++
++    return index;
++}
++
++/* Return the value by which to divide the reference clock rate. */
++static uint32_t npcm7xx_timer_prescaler(const NPCM7xxTimer *t)
++{
++    return extract32(t->tcsr, NPCM7XX_TCSR_PRESCALE_START,
++                     NPCM7XX_TCSR_PRESCALE_LEN) + 1;
++}
++
++/* Convert a timer cycle count to a time interval in nanoseconds. */
++static int64_t npcm7xx_timer_count_to_ns(NPCM7xxTimer *t, uint32_t count)
++{
++    int64_t ns =3D count;
++
++    ns *=3D NANOSECONDS_PER_SECOND / NPCM7XX_TIMER_REF_HZ;
++    ns *=3D npcm7xx_timer_prescaler(t);
++
++    return ns;
++}
++
++/* Convert a time interval in nanoseconds to a timer cycle count. */
++static uint32_t npcm7xx_timer_ns_to_count(NPCM7xxTimer *t, int64_t ns)
++{
++    int64_t count;
++
++    count =3D ns / (NANOSECONDS_PER_SECOND / NPCM7XX_TIMER_REF_HZ);
++    count /=3D npcm7xx_timer_prescaler(t);
++
++    return count;
++}
++
++/*
++ * Raise the interrupt line if there's a pending interrupt and interrupts =
+are
++ * enabled for this timer. If not, lower it.
++ */
++static void npcm7xx_timer_check_interrupt(NPCM7xxTimer *t)
++{
++    NPCM7xxTimerCtrlState *tc =3D t->ctrl;
++    int index =3D npcm7xx_timer_index(tc, t);
++    bool pending =3D (t->tcsr & NPCM7XX_TCSR_IE) && (tc->tisr & BIT(index)=
+);
++
++    qemu_set_irq(t->irq, pending);
++    trace_npcm7xx_timer_irq(DEVICE(tc)->canonical_path, index, pending);
++}
++
++/* Start or resume the timer. */
++static void npcm7xx_timer_start(NPCM7xxTimer *t)
++{
++    int64_t now;
++
++    now =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
++    t->expires_ns =3D now + t->remaining_ns;
++    timer_mod(&t->qtimer, t->expires_ns);
++}
++
++/*
++ * Called when the counter reaches zero. Sets the interrupt flag, and eith=
+er
++ * restarts or disables the timer.
++ */
++static void npcm7xx_timer_reached_zero(NPCM7xxTimer *t)
++{
++    NPCM7xxTimerCtrlState *tc =3D t->ctrl;
++    int index =3D npcm7xx_timer_index(tc, t);
++
++    tc->tisr |=3D BIT(index);
++
++    if (t->tcsr & NPCM7XX_TCSR_PERIODIC) {
++        t->remaining_ns =3D npcm7xx_timer_count_to_ns(t, t->ticr);
++        if (t->tcsr & NPCM7XX_TCSR_CEN) {
++            npcm7xx_timer_start(t);
++        }
++    } else {
++        t->tcsr &=3D ~(NPCM7XX_TCSR_CEN | NPCM7XX_TCSR_CACT);
++    }
++
++    npcm7xx_timer_check_interrupt(t);
++}
++
++/* Stop counting. Record the time remaining so we can continue later. */
++static void npcm7xx_timer_pause(NPCM7xxTimer *t)
++{
++    int64_t now;
++
++    timer_del(&t->qtimer);
++    now =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
++    t->remaining_ns =3D t->expires_ns - now;
++    g_assert(t->remaining_ns > 0);
++}
++
++/*
++ * Restart the timer from its initial value. If the timer was enabled and =
+stays
++ * enabled, adjust the QEMU timer according to the new count. If the timer=
+ is
++ * transitioning from disabled to enabled, the caller is expected to start=
+ the
++ * timer later.
++ */
++static void npcm7xx_timer_restart(NPCM7xxTimer *t, uint32_t old_tcsr)
++{
++    t->remaining_ns =3D npcm7xx_timer_count_to_ns(t, t->ticr);
++
++    if (old_tcsr & t->tcsr & NPCM7XX_TCSR_CEN) {
++        npcm7xx_timer_start(t);
++    }
++}
++
++/* Register read and write handlers */
++
++static void npcm7xx_timer_write_tcsr(NPCM7xxTimer *t, uint32_t new_tcsr)
++{
++    uint32_t old_tcsr =3D t->tcsr;
++
++    if (new_tcsr & NPCM7XX_TCSR_RSVD) {
++        qemu_log_mask(LOG_GUEST_ERROR, "%s: reserved bits in 0x%08x ignore=
+d\n",
++                      __func__, new_tcsr);
++        new_tcsr &=3D ~NPCM7XX_TCSR_RSVD;
++    }
++    if (new_tcsr & NPCM7XX_TCSR_CACT) {
++        qemu_log_mask(LOG_GUEST_ERROR, "%s: read-only bits in 0x%08x ignor=
+ed\n",
++                      __func__, new_tcsr);
++        new_tcsr &=3D ~NPCM7XX_TCSR_CACT;
++    }
++
++    t->tcsr =3D (t->tcsr & NPCM7XX_TCSR_CACT) | new_tcsr;
++
++    if ((old_tcsr ^ new_tcsr) & NPCM7XX_TCSR_IE) {
++        npcm7xx_timer_check_interrupt(t);
++    }
++    if (new_tcsr & NPCM7XX_TCSR_CRST) {
++        npcm7xx_timer_restart(t, old_tcsr);
++        t->tcsr &=3D ~NPCM7XX_TCSR_CRST;
++    }
++    if ((old_tcsr ^ new_tcsr) & NPCM7XX_TCSR_CEN) {
++        if (new_tcsr & NPCM7XX_TCSR_CEN) {
++            npcm7xx_timer_start(t);
++        } else {
++            npcm7xx_timer_pause(t);
++        }
++    }
++}
++
++static void npcm7xx_timer_write_ticr(NPCM7xxTimer *t, uint32_t new_ticr)
++{
++    t->ticr =3D new_ticr;
++
++    npcm7xx_timer_restart(t, t->tcsr);
++}
++
++static uint32_t npcm7xx_timer_read_tdr(NPCM7xxTimer *t)
++{
++    if (t->tcsr & NPCM7XX_TCSR_CEN) {
++        int64_t now =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
++
++        return npcm7xx_timer_ns_to_count(t, t->expires_ns - now);
++    }
++
++    return npcm7xx_timer_ns_to_count(t, t->remaining_ns);
++}
++
++static hwaddr npcm7xx_tcsr_index(hwaddr reg)
++{
++    switch (reg) {
++    case NPCM7XX_TIMER_TCSR0:
++        return 0;
++    case NPCM7XX_TIMER_TCSR1:
++        return 1;
++    case NPCM7XX_TIMER_TCSR2:
++        return 2;
++    case NPCM7XX_TIMER_TCSR3:
++        return 3;
++    case NPCM7XX_TIMER_TCSR4:
++        return 4;
++    default:
++        g_assert_not_reached();
++    }
++}
++
++static hwaddr npcm7xx_ticr_index(hwaddr reg)
++{
++    switch (reg) {
++    case NPCM7XX_TIMER_TICR0:
++        return 0;
++    case NPCM7XX_TIMER_TICR1:
++        return 1;
++    case NPCM7XX_TIMER_TICR2:
++        return 2;
++    case NPCM7XX_TIMER_TICR3:
++        return 3;
++    case NPCM7XX_TIMER_TICR4:
++        return 4;
++    default:
++        g_assert_not_reached();
++    }
++}
++
++static hwaddr npcm7xx_tdr_index(hwaddr reg)
++{
++    switch (reg) {
++    case NPCM7XX_TIMER_TDR0:
++        return 0;
++    case NPCM7XX_TIMER_TDR1:
++        return 1;
++    case NPCM7XX_TIMER_TDR2:
++        return 2;
++    case NPCM7XX_TIMER_TDR3:
++        return 3;
++    case NPCM7XX_TIMER_TDR4:
++        return 4;
++    default:
++        g_assert_not_reached();
++    }
++}
++
++static uint64_t npcm7xx_timer_read(void *opaque, hwaddr offset, unsigned s=
+ize)
++{
++    NPCM7xxTimerCtrlState *s =3D opaque;
++    uint64_t value =3D 0;
++    hwaddr reg;
++
++    reg =3D offset / sizeof(uint32_t);
++    switch (reg) {
++    case NPCM7XX_TIMER_TCSR0:
++    case NPCM7XX_TIMER_TCSR1:
++    case NPCM7XX_TIMER_TCSR2:
++    case NPCM7XX_TIMER_TCSR3:
++    case NPCM7XX_TIMER_TCSR4:
++        value =3D s->timer[npcm7xx_tcsr_index(reg)].tcsr;
++        break;
++
++    case NPCM7XX_TIMER_TICR0:
++    case NPCM7XX_TIMER_TICR1:
++    case NPCM7XX_TIMER_TICR2:
++    case NPCM7XX_TIMER_TICR3:
++    case NPCM7XX_TIMER_TICR4:
++        value =3D s->timer[npcm7xx_ticr_index(reg)].ticr;
++        break;
++
++    case NPCM7XX_TIMER_TDR0:
++    case NPCM7XX_TIMER_TDR1:
++    case NPCM7XX_TIMER_TDR2:
++    case NPCM7XX_TIMER_TDR3:
++    case NPCM7XX_TIMER_TDR4:
++        value =3D npcm7xx_timer_read_tdr(&s->timer[npcm7xx_tdr_index(reg)]=
+);
++        break;
++
++    case NPCM7XX_TIMER_TISR:
++        value =3D s->tisr;
++        break;
++
++    case NPCM7XX_TIMER_WTCR:
++        value =3D s->wtcr;
++        break;
++
++    default:
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "%s: invalid offset 0x%04" HWADDR_PRIx "\n",
++                      __func__, offset);
++        break;
++    }
++
++    trace_npcm7xx_timer_read(DEVICE(s)->canonical_path, offset, value);
++
++    return value;
++}
++
++static void npcm7xx_timer_write(void *opaque, hwaddr offset,
++                                uint64_t v, unsigned size)
++{
++    uint32_t reg =3D offset / sizeof(uint32_t);
++    NPCM7xxTimerCtrlState *s =3D opaque;
++    uint32_t value =3D v;
++
++    trace_npcm7xx_timer_write(DEVICE(s)->canonical_path, offset, value);
++
++    switch (reg) {
++    case NPCM7XX_TIMER_TCSR0:
++    case NPCM7XX_TIMER_TCSR1:
++    case NPCM7XX_TIMER_TCSR2:
++    case NPCM7XX_TIMER_TCSR3:
++    case NPCM7XX_TIMER_TCSR4:
++        npcm7xx_timer_write_tcsr(&s->timer[npcm7xx_tcsr_index(reg)], value=
+);
++        return;
++
++    case NPCM7XX_TIMER_TICR0:
++    case NPCM7XX_TIMER_TICR1:
++    case NPCM7XX_TIMER_TICR2:
++    case NPCM7XX_TIMER_TICR3:
++    case NPCM7XX_TIMER_TICR4:
++        npcm7xx_timer_write_ticr(&s->timer[npcm7xx_ticr_index(reg)], value=
+);
++        return;
++
++    case NPCM7XX_TIMER_TDR0:
++    case NPCM7XX_TIMER_TDR1:
++    case NPCM7XX_TIMER_TDR2:
++    case NPCM7XX_TIMER_TDR3:
++    case NPCM7XX_TIMER_TDR4:
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "%s: register @ 0x%04" HWADDR_PRIx " is read-only\n"=
+,
++                      __func__, offset);
++        return;
++
++    case NPCM7XX_TIMER_TISR:
++        s->tisr &=3D ~value;
++        return;
++
++    case NPCM7XX_TIMER_WTCR:
++        qemu_log_mask(LOG_UNIMP, "%s: WTCR write not implemented: 0x%08x\n=
+",
++                      __func__, value);
++        return;
++    }
++
++    qemu_log_mask(LOG_GUEST_ERROR,
++                  "%s: invalid offset 0x%04" HWADDR_PRIx "\n",
++                  __func__, offset);
++}
++
++static const struct MemoryRegionOps npcm7xx_timer_ops =3D {
++    .read       =3D npcm7xx_timer_read,
++    .write      =3D npcm7xx_timer_write,
++    .endianness =3D DEVICE_LITTLE_ENDIAN,
++    .valid      =3D {
++        .min_access_size        =3D 4,
++        .max_access_size        =3D 4,
++        .unaligned              =3D false,
++    },
++};
++
++/* Called when the QEMU timer expires. */
++static void npcm7xx_timer_expired(void *opaque)
++{
++    NPCM7xxTimer *t =3D opaque;
++
++    if (t->tcsr & NPCM7XX_TCSR_CEN) {
++        npcm7xx_timer_reached_zero(t);
++    }
++}
++
++static void npcm7xx_timer_enter_reset(Object *obj, ResetType type)
++{
++    NPCM7xxTimerCtrlState *s =3D NPCM7XX_TIMER(obj);
++    int i;
++
++    for (i =3D 0; i < NPCM7XX_TIMERS_PER_CTRL; i++) {
++        NPCM7xxTimer *t =3D &s->timer[i];
++
++        timer_del(&t->qtimer);
++        t->expires_ns =3D 0;
++        t->remaining_ns =3D 0;
++        t->tcsr =3D 0x00000005;
++        t->ticr =3D 0x00000000;
++    }
++
++    s->tisr =3D 0x00000000;
++    s->wtcr =3D 0x00000400;
++}
++
++static void npcm7xx_timer_hold_reset(Object *obj)
++{
++    NPCM7xxTimerCtrlState *s =3D NPCM7XX_TIMER(obj);
++    int i;
++
++    for (i =3D 0; i < NPCM7XX_TIMERS_PER_CTRL; i++) {
++        qemu_irq_lower(s->timer[i].irq);
++    }
++}
++
++static void npcm7xx_timer_realize(DeviceState *dev, Error **errp)
++{
++    NPCM7xxTimerCtrlState *s =3D NPCM7XX_TIMER(dev);
++    SysBusDevice *sbd =3D &s->parent;
++    int i;
++
++    for (i =3D 0; i < NPCM7XX_TIMERS_PER_CTRL; i++) {
++        NPCM7xxTimer *t =3D &s->timer[i];
++        t->ctrl =3D s;
++        timer_init_ns(&t->qtimer, QEMU_CLOCK_VIRTUAL, npcm7xx_timer_expire=
+d, t);
++        sysbus_init_irq(sbd, &t->irq);
++    }
++
++    memory_region_init_io(&s->iomem, OBJECT(s), &npcm7xx_timer_ops, s,
++                          TYPE_NPCM7XX_TIMER, 4 * KiB);
++    sysbus_init_mmio(sbd, &s->iomem);
++}
++
++static const VMStateDescription vmstate_npcm7xx_timer =3D {
++    .name =3D "npcm7xx-timer",
++    .version_id =3D 0,
++    .minimum_version_id =3D 0,
++    .fields =3D (VMStateField[]) {
++        VMSTATE_TIMER(qtimer, NPCM7xxTimer),
++        VMSTATE_INT64(expires_ns, NPCM7xxTimer),
++        VMSTATE_INT64(remaining_ns, NPCM7xxTimer),
++        VMSTATE_UINT32(tcsr, NPCM7xxTimer),
++        VMSTATE_UINT32(ticr, NPCM7xxTimer),
++        VMSTATE_END_OF_LIST(),
++    },
++};
++
++static const VMStateDescription vmstate_npcm7xx_timer_ctrl =3D {
++    .name =3D "npcm7xx-timer-ctrl",
++    .version_id =3D 0,
++    .minimum_version_id =3D 0,
++    .fields =3D (VMStateField[]) {
++        VMSTATE_UINT32(tisr, NPCM7xxTimerCtrlState),
++        VMSTATE_UINT32(wtcr, NPCM7xxTimerCtrlState),
++        VMSTATE_STRUCT_ARRAY(timer, NPCM7xxTimerCtrlState,
++                             NPCM7XX_TIMERS_PER_CTRL, 0, vmstate_npcm7xx_t=
+imer,
++                             NPCM7xxTimer),
++        VMSTATE_END_OF_LIST(),
++    },
++};
++
++static void npcm7xx_timer_class_init(ObjectClass *klass, void *data)
++{
++    ResettableClass *rc =3D RESETTABLE_CLASS(klass);
++    DeviceClass *dc =3D DEVICE_CLASS(klass);
++
++    dc->desc =3D "NPCM7xx Timer Controller";
++    dc->realize =3D npcm7xx_timer_realize;
++    dc->vmsd =3D &vmstate_npcm7xx_timer_ctrl;
++    rc->phases.enter =3D npcm7xx_timer_enter_reset;
++    rc->phases.hold =3D npcm7xx_timer_hold_reset;
++}
++
++static const TypeInfo npcm7xx_timer_info =3D {
++    .name               =3D TYPE_NPCM7XX_TIMER,
++    .parent             =3D TYPE_SYS_BUS_DEVICE,
++    .instance_size      =3D sizeof(NPCM7xxTimerCtrlState),
++    .class_init         =3D npcm7xx_timer_class_init,
++};
++
++static void npcm7xx_timer_register_type(void)
++{
++    type_register_static(&npcm7xx_timer_info);
++}
++type_init(npcm7xx_timer_register_type);
+diff --git a/hw/timer/trace-events b/hw/timer/trace-events
+index 447b7c405b..ee66d8c84f 100644
+--- a/hw/timer/trace-events
++++ b/hw/timer/trace-events
+@@ -66,6 +66,11 @@ cmsdk_apb_dualtimer_read(uint64_t offset, uint64_t data,=
+ unsigned size) "CMSDK A
+ cmsdk_apb_dualtimer_write(uint64_t offset, uint64_t data, unsigned size) "=
+CMSDK APB dualtimer write: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %u"
+ cmsdk_apb_dualtimer_reset(void) "CMSDK APB dualtimer: reset"
+=20
++# npcm7xx_timer.c
++npcm7xx_timer_read(const char *id, uint64_t offset, uint64_t value) " %s o=
+ffset: 0x%04" PRIx64 " value 0x%08" PRIx64
++npcm7xx_timer_write(const char *id, uint64_t offset, uint64_t value) "%s o=
+ffset: 0x%04" PRIx64 " value 0x%08" PRIx64
++npcm7xx_timer_irq(const char *id, int timer, int state) "%s timer %d state=
+ %d"
++
+ # nrf51_timer.c
+ nrf51_timer_read(uint8_t timer_id, uint64_t addr, uint32_t value, unsigned=
+ size) "timer %u read addr 0x%" PRIx64 " data 0x%" PRIx32 " size %u"
+ nrf51_timer_write(uint8_t timer_id, uint64_t addr, uint32_t value, unsigne=
+d size) "timer %u write addr 0x%" PRIx64 " data 0x%" PRIx32 " size %u"
+diff --git a/include/hw/timer/npcm7xx_timer.h b/include/hw/timer/npcm7xx_ti=
+mer.h
+new file mode 100644
+index 0000000000..94900a7877
+--- /dev/null
++++ b/include/hw/timer/npcm7xx_timer.h
+@@ -0,0 +1,96 @@
++/*
++ * Nuvoton NPCM7xx Timer Controller
++ *
++ * Copyright 2020 Google LLC
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License as published by the
++ * Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful, but WIT=
+HOUT
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
++ * for more details.
++ */
++#ifndef NPCM7XX_TIMER_H
++#define NPCM7XX_TIMER_H
++
++#include "exec/memory.h"
++#include "hw/sysbus.h"
++#include "qemu/timer.h"
++
++/* Each Timer Module (TIM) instance holds five 25 MHz timers. */
++#define NPCM7XX_TIMERS_PER_CTRL (5)
++
++/**
++ * enum NPCM7xxTimerRegisters - 32-bit register indices.
++ */
++enum NPCM7xxTimerRegisters {
++    NPCM7XX_TIMER_TCSR0,
++    NPCM7XX_TIMER_TCSR1,
++    NPCM7XX_TIMER_TICR0,
++    NPCM7XX_TIMER_TICR1,
++    NPCM7XX_TIMER_TDR0,
++    NPCM7XX_TIMER_TDR1,
++    NPCM7XX_TIMER_TISR,
++    NPCM7XX_TIMER_WTCR,
++    NPCM7XX_TIMER_TCSR2,
++    NPCM7XX_TIMER_TCSR3,
++    NPCM7XX_TIMER_TICR2,
++    NPCM7XX_TIMER_TICR3,
++    NPCM7XX_TIMER_TDR2,
++    NPCM7XX_TIMER_TDR3,
++    NPCM7XX_TIMER_TCSR4         =3D 0x0040 / sizeof(uint32_t),
++    NPCM7XX_TIMER_TICR4         =3D 0x0048 / sizeof(uint32_t),
++    NPCM7XX_TIMER_TDR4          =3D 0x0050 / sizeof(uint32_t),
++    NPCM7XX_TIMER_NR_REGS,
++};
++
++typedef struct NPCM7xxTimerCtrlState NPCM7xxTimerCtrlState;
++
++/**
++ * struct NPCM7xxTimer - Individual timer state.
++ * @irq: GIC interrupt line to fire on expiration (if enabled).
++ * @qtimer: QEMU timer that notifies us on expiration.
++ * @expires_ns: Absolute virtual expiration time.
++ * @remaining_ns: Remaining time until expiration if timer is paused.
++ * @tcsr: The Timer Control and Status Register.
++ * @ticr: The Timer Initial Count Register.
++ */
++typedef struct NPCM7xxTimer {
++    NPCM7xxTimerCtrlState *ctrl;
++
++    qemu_irq    irq;
++    QEMUTimer   qtimer;
++    int64_t     expires_ns;
++    int64_t     remaining_ns;
++
++    uint32_t    tcsr;
++    uint32_t    ticr;
++} NPCM7xxTimer;
++
++/**
++ * struct NPCM7xxTimerCtrlState - Timer Module device state.
++ * @parent: System bus device.
++ * @iomem: Memory region through which registers are accessed.
++ * @tisr: The Timer Interrupt Status Register.
++ * @wtcr: The Watchdog Timer Control Register.
++ * @timer: The five individual timers managed by this module.
++ */
++struct NPCM7xxTimerCtrlState {
++    SysBusDevice parent;
++
++    MemoryRegion iomem;
++
++    uint32_t    tisr;
++    uint32_t    wtcr;
++
++    NPCM7xxTimer timer[NPCM7XX_TIMERS_PER_CTRL];
++};
++
++#define TYPE_NPCM7XX_TIMER "npcm7xx-timer"
++#define NPCM7XX_TIMER(obj)                                              \
++    OBJECT_CHECK(NPCM7xxTimerCtrlState, (obj), TYPE_NPCM7XX_TIMER)
++
++#endif /* NPCM7XX_TIMER_H */
 --=20
 2.28.0.236.gb10cc79966-goog
 
