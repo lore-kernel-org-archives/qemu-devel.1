@@ -2,119 +2,89 @@ Return-Path: <SRS0=wQM/=BV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 763A8C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 13:58:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DCB0C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 14:06:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 40C04204FD
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 13:58:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 40C04204FD
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id C25BE2076C
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 14:06:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PHbOP4em"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C25BE2076C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48576 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52142 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5UnN-0006Xj-EI
-	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 09:58:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59296)
+	id 1k5Uui-0008PL-Or
+	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 10:06:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32830)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1k5Uma-00067f-Rq
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 09:57:41 -0400
-Received: from mout.kundenserver.de ([212.227.126.131]:34767)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1k5UmX-0007hx-OZ
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 09:57:40 -0400
-Received: from [192.168.100.1] ([82.252.135.186]) by mrelayeu.kundenserver.de
- (mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1N32y5-1kqyXQ3gxJ-013KW7; Tue, 11 Aug 2020 15:57:26 +0200
-Subject: Re: [PATCH] linux-user: Fix 'utimensat()' implementation
-To: Filip Bozuta <Filip.Bozuta@syrmia.com>, qemu-devel@nongnu.org
-References: <20200811113101.6636-1-Filip.Bozuta@syrmia.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <852cc928-7d6c-a899-2274-27b501f8f55d@vivier.eu>
-Date: Tue, 11 Aug 2020 15:57:24 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1k5UtK-0007gi-D8
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 10:04:43 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:27076
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1k5UtH-0008Oc-Jk
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 10:04:37 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1597154674;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=373tXi6BgM2eT+WfXFomKbGoYckt44JdH9aYg+3AQw8=;
+ b=PHbOP4emyHVqCzD97NHAhzJT4/6WMzWOx73X+OK67hzgq1NoYFeL+qMunZ/W8SSSOBQtL7
+ gzL55ZO397HJ1DtX3FFbJOqpE4ITDZYkZ9wAomg6MnKdqZ2Xi8iWZPKLPVGUF/uoDBxCWE
+ OFTjPUbC82fZ7yOvKu/oSVbMjyjENK4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-158-kNX2jZg-NH2zJr-vG4uEGA-1; Tue, 11 Aug 2020 10:04:31 -0400
+X-MC-Unique: kNX2jZg-NH2zJr-vG4uEGA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A7312102C803;
+ Tue, 11 Aug 2020 14:04:24 +0000 (UTC)
+Received: from localhost (ovpn-114-197.ams2.redhat.com [10.36.114.197])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 23DB865C6E;
+ Tue, 11 Aug 2020 14:04:23 +0000 (UTC)
+Date: Tue, 11 Aug 2020 15:04:23 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Jagannathan Raman <jag.raman@oracle.com>
+Subject: Re: [PATCH v8 13/20] multi-process: PCI BAR read/write handling for
+ proxy & remote endpoints
+Message-ID: <20200811140423.GB18223@stefanha-x1.localdomain>
+References: <cover.1596217462.git.jag.raman@oracle.com>
+ <3588624b278c97cb3c9d1eeda109ad36af39effc.1596217462.git.jag.raman@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <20200811113101.6636-1-Filip.Bozuta@syrmia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: fr
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:HKbgUmaBKBjb3Ee9Wc28bTcLwPSejlZE0Z+53oZfTrEgsLQxNyV
- b8V2Pha4+qfZJwr/ErsfRvn55aeT4vX/BEErD2UAYHp7yjt0eWORkvfzvUd7fC9u5qF+q+m
- q3Cg0rS9mpYapD07nJWes9T2TXjhOboNKeiOb9Y6cM6ifo6Ew+zF1iFssQ3bsFP7PA/ocoI
- lNmE3d3s1A2+WquWp2UEg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:yFmDSAACFEY=:lJK6Ql472QcxEKGM5JRpC4
- J1hBGvMQYvMswk1qJkjDuSsIJ2frjxLMuwgCGxXs/o41q1ELgTddKJuhYt8ux0OD/EDJOQM11
- 2MFeNSK6u7RocukT28zhaSsRhPK0gmr9RpI5U7jRLOS7MfJ+KSgJ0jsKatxZJJmpiclydPkGk
- 5YFYNfrnpdFwtDI+929A4JVMUz7rF5CbZRBnvuBJjOUqXvzJV/AOdHPNJ11YN51PcNpxjgpc4
- yWc4dmidvBw9RFuEXtkrwaFKgi9UWhV/4VhuH9qBk9K8+qkSlP7ZfqZjsRNm6/7Z9gEbFAdEA
- R0f341N0SKM/oQTx3+bHK6+caWxv90ScPYubeNCzY1QeZw2wt25EtKK0dmo6HgThahrKqdsRj
- v76OE6CWp4IHK5ZR1nJBWX6jYb6PXj67PUgF7C7uAYY48VsrrEawnUO50xtzncmisnRV8CCdk
- oYzkGZtoChh8Ce+ftGKvgv9oggUJV22LoTocgk6ceNhSPBU1Za/DQaoi8HXMd50nVJGPKseBJ
- NTP5SB8BsthNjMCGQhkdICn5zbSOUqdBmHDzzGDQnMBSIM3ZOFCUMmxBGdFuUzZeCPPo+x8+G
- mKXyVL+y8svjtPBAX339pUNHnBvAgPMHogWCdflUKEqj8sXNd4E6tfHDtGIRnGD66Y0dvdIMJ
- mXd2qFTUTcWyEquG0AGY3mRtu/rqeIxofwPw7lJHRM7M9UJ42XCEbmoEtSIMGbNra+3y8GtUC
- D/qJrAsD4omOWqs/RObUBZ3V9A/DnKnhEoBRATCC8+u4QtoezGK4nLLI6zpSQLowPKgvwPWcH
- Hy/ciyY3hQkmsnCaeGORAWiwNoqFXN4kSdcjTzjyb69DMCAE9UsFAGsF2SHGGqdL/tjlcgS
-Received-SPF: none client-ip=212.227.126.131; envelope-from=laurent@vivier.eu;
- helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/11 09:57:36
+In-Reply-To: <3588624b278c97cb3c9d1eeda109ad36af39effc.1596217462.git.jag.raman@oracle.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="jho1yZJdad60DJr+"
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=stefanha@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/11 06:40:20
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -28
-X-Spam_score: -2.9
-X-Spam_bar: --
-X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -127,53 +97,184 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>
+Cc: elena.ufimtseva@oracle.com, fam@euphon.net, swapnil.ingle@nutanix.com,
+ john.g.johnson@oracle.com, qemu-devel@nongnu.org, kraxel@redhat.com,
+ quintela@redhat.com, mst@redhat.com, armbru@redhat.com,
+ kanth.ghatraju@oracle.com, felipe@nutanix.com, thuth@redhat.com,
+ ehabkost@redhat.com, konrad.wilk@oracle.com, dgilbert@redhat.com,
+ alex.williamson@redhat.com, thanos.makatos@nutanix.com, rth@twiddle.net,
+ kwolf@redhat.com, berrange@redhat.com, mreitz@redhat.com,
+ ross.lagerwall@citrix.com, marcandre.lureau@gmail.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 11/08/2020 à 13:31, Filip Bozuta a écrit :
-> Implementation of syscall 'utimensat()' in 'syscall.c' uses functions
-> target_to_host/host_to_target_timespec() to convert values of
-> 'struct timespec' between host and target. However, the implementation
-> doesn't check whether the conversion succeeds and thus can cause an
-> inappropriate error or succeed unappropriately instead of setting errno
-> EFAULT ('Bad address') which is supposed to be set in these cases.
-> 
-> This was confirmed with the LTP test for utimensat ('testcases/utimensat')
-> which fails for test cases when the errno EFAULT is expected. After changes
-> from this patch, the test passes for all test cases.
-> 
-> Signed-off-by: Filip Bozuta <Filip.Bozuta@syrmia.com>
-> ---
->  linux-user/syscall.c | 9 +++++++--
->  1 file changed, 7 insertions(+), 2 deletions(-)
-> 
-> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index 05f03919ff..920656191b 100644
-> --- a/linux-user/syscall.c
-> +++ b/linux-user/syscall.c
-> @@ -11722,8 +11722,13 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
->              if (!arg3) {
->                  tsp = NULL;
->              } else {
-> -                target_to_host_timespec(ts, arg3);
-> -                target_to_host_timespec(ts+1, arg3+sizeof(struct target_timespec));
-> +                if (target_to_host_timespec(ts, arg3)) {
-> +                    return -TARGET_EFAULT;
-> +                }
-> +                if (target_to_host_timespec(ts + 1, arg3 +
-> +                                            sizeof(struct target_timespec))) {
-> +                    return -TARGET_EFAULT;
-> +                }
->                  tsp = ts;
->              }
->              if (!arg2)
-> 
+--jho1yZJdad60DJr+
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Applied to my linux-user-for-5.2 branch.
+On Fri, Jul 31, 2020 at 02:20:20PM -0400, Jagannathan Raman wrote:
+> +static void process_bar_write(QIOChannel *ioc, MPQemuMsg *msg, Error **errp)
+> +{
+> +    BarAccessMsg *bar_access = &msg->data1.bar_access;
+> +    AddressSpace *as =
+> +        bar_access->memory ? &address_space_memory : &address_space_io;
+> +    MPQemuMsg ret = { 0 };
+> +    MemTxResult res;
+> +    uint64_t val;
+> +    Error *local_err = NULL;
+> +
+> +    if (!is_power_of_2(bar_access->size) ||
+> +       (bar_access->size > sizeof(uint64_t))) {
+> +        ret.data1.u64 = UINT64_MAX;
+> +        goto fail;
+> +    }
+> +
+> +    val = cpu_to_le64(bar_access->val);
+> +
+> +    res = address_space_rw(as, bar_access->addr, MEMTXATTRS_UNSPECIFIED,
+> +                           (void *)&val, bar_access->size, true);
+> +
+> +    if (res != MEMTX_OK) {
+> +        error_setg(errp, "Could not perform address space write operation,"
+> +                   " inaccessible address: %lx in pid %d.",
+> +                   bar_access->addr, getpid());
+> +        ret.data1.u64 = -1;
+> +    }
+> +
+> +fail:
+> +    ret.cmd = RET_MSG;
+> +    ret.size = sizeof(ret.data1);
+> +
+> +    mpqemu_msg_send(&ret, ioc, &local_err);
+> +    if (local_err) {
+> +        error_setg(errp, "Error while sending message to proxy "
+> +                   "in remote process pid=%d", getpid());
 
-Thanks,
-Laurent
+There is an assertion failure if res != MEMTX_OK because errp was
+already set. error_setg() must not be called on an Error pointer that
+has already been set.
+
+It is simplest to do:
+
+  mpqemu_msg_send(&ret, ioc, (errp && *errp) ? NULL : &local_err);
+
+> +    }
+> +}
+> +
+> +static void process_bar_read(QIOChannel *ioc, MPQemuMsg *msg, Error **errp)
+> +{
+> +    BarAccessMsg *bar_access = &msg->data1.bar_access;
+> +    MPQemuMsg ret = { 0 };
+> +    AddressSpace *as;
+> +    MemTxResult res;
+> +    uint64_t val = 0;
+> +    Error *local_err = NULL;
+> +
+> +    as = bar_access->memory ? &address_space_memory : &address_space_io;
+> +
+> +    if (!is_power_of_2(bar_access->size) ||
+> +       (bar_access->size > sizeof(uint64_t))) {
+> +        val = UINT64_MAX;
+> +        goto fail;
+> +    }
+> +
+> +    res = address_space_rw(as, bar_access->addr, MEMTXATTRS_UNSPECIFIED,
+> +                           (void *)&val, bar_access->size, false);
+> +
+> +    if (res != MEMTX_OK) {
+> +        error_setg(errp, "Could not perform address space read operation,"
+> +                   " inaccessible address: %lx in pid %d.",
+> +                   bar_access->addr, getpid());
+> +        val = UINT64_MAX;
+> +        goto fail;
+> +    }
+> +
+> +fail:
+> +    ret.cmd = RET_MSG;
+> +    ret.data1.u64 = le64_to_cpu(val);
+> +    ret.size = sizeof(ret.data1);
+> +
+> +    mpqemu_msg_send(&ret, ioc, &local_err);
+> +    if (local_err) {
+> +        error_setg(errp, "Error while sending message to proxy "
+
+Same here.
+
+> +static void send_bar_access_msg(PCIProxyDev *pdev, MemoryRegion *mr,
+> +                                bool write, hwaddr addr, uint64_t *val,
+> +                                unsigned size, bool memory)
+> +{
+> +    MPQemuMsg msg = { 0 };
+> +    long ret = -EINVAL;
+
+long is not guaranteed to be 64-bit. This function supports 64-bit
+accesses to BARs so uint64_t is needed here.
+
+> +    Error *local_err = NULL;
+> +
+> +    msg.bytestream = 0;
+> +    msg.size = sizeof(msg.data1);
+> +    msg.data1.bar_access.addr = mr->addr + addr;
+> +    msg.data1.bar_access.size = size;
+> +    msg.data1.bar_access.memory = memory;
+> +
+> +    if (write) {
+> +        msg.cmd = BAR_WRITE;
+> +        msg.data1.bar_access.val = *val;
+> +    } else {
+> +        msg.cmd = BAR_READ;
+> +    }
+> +
+> +    ret = mpqemu_msg_send_and_await_reply(&msg, pdev->ioc, &local_err);
+> +    if (local_err) {
+> +        error_report("Failed to send BAR command to the remote process.");
+
+Leaks local_err. Please report the error message from local_err and then
+free it.
+
+> +const MemoryRegionOps proxy_mr_ops = {
+> +    .read = proxy_bar_read,
+> +    .write = proxy_bar_write,
+> +    .endianness = DEVICE_NATIVE_ENDIAN,
+> +    .impl = {
+> +        .min_access_size = 1,
+> +        .max_access_size = 1,
+
+Should this be .max_access_size = 8?
+
+> diff --git a/io/mpqemu-link.c b/io/mpqemu-link.c
+> index 5d04b81..82b8465 100644
+> --- a/io/mpqemu-link.c
+> +++ b/io/mpqemu-link.c
+> @@ -269,6 +269,12 @@ bool mpqemu_msg_valid(MPQemuMsg *msg)
+>              return false;
+>          }
+>          break;
+> +    case BAR_WRITE:
+> +    case BAR_READ:
+> +        if ((msg->size != sizeof(msg->data1)) || (msg->num_fds != 0)) {
+
+What about bytestream? It would be cleanest not to send bytestream over
+the wire. Since it is sent today the receiver can be confused if it has
+the wrong value and some mpqemu_msg_valid() cases validate bytestream.
+It is not validate here for some reason.
+
+--jho1yZJdad60DJr+
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl8ypWYACgkQnKSrs4Gr
+c8jPiAgAsHhx7soBe6DpVXNGl4Se9K2+pjKcCF4RMcoIT6xKUMRDn7LMlWopW2wF
+91a5M7khO+Q+VdNZMydc927cjB/hbveO0XbJjf+CEOLhXOWj2RORKVTatm87F81w
+8Hex486RCVERrF5BeGNjKTiPIPKEt9hJOUD7231dbns6sYnde3qEC1SpXBccCBh7
+tUA/0q29sTKMoVRwCS+cYMUDMnmF94XauhjNRym8uJdiw53n+N2OEVasQd32A6Ss
+fWCURPVbT1aoW1joDoROk2u/oDpVadgcavGAMByrrDgCVzBXYYju4FkB/34/zXGq
+iD9AxcAf26LVr9wsYF+nRBK/vsJp5g==
+=YcVy
+-----END PGP SIGNATURE-----
+
+--jho1yZJdad60DJr+--
 
 
