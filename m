@@ -7,39 +7,39 @@ X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AAF63C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 11:04:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 285A9C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 11:04:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7E2CE2076B
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 11:04:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E2CE2076B
+	by mail.kernel.org (Postfix) with ESMTPS id F14992075D
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 11:04:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F14992075D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ispras.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57316 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59474 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5S4Y-0007hh-LO
-	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 07:04:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46126)
+	id 1k5S4s-00008u-6x
+	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 07:04:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46346)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pavel.dovgalyuk@ispras.ru>)
- id 1k5S1x-0002sM-Bb
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 07:01:21 -0400
-Received: from mail.ispras.ru ([83.149.199.84]:42302)
+ id 1k5S2c-00044N-HO
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 07:02:02 -0400
+Received: from mail.ispras.ru ([83.149.199.84]:42438)
  by eggs.gnu.org with esmtps (TLS1.2:DHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pavel.dovgalyuk@ispras.ru>)
- id 1k5S1u-0003Km-Td
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 07:01:20 -0400
+ id 1k5S2a-0003Od-0U
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 07:02:02 -0400
 Received: from [127.0.1.1] (unknown [62.118.151.149])
- by mail.ispras.ru (Postfix) with ESMTPSA id D2C684089EF7;
- Tue, 11 Aug 2020 11:01:16 +0000 (UTC)
-Subject: [PATCH v2 04/14] migration: introduce icount field for snapshots
+ by mail.ispras.ru (Postfix) with ESMTPSA id E7AD94089EF7;
+ Tue, 11 Aug 2020 11:01:56 +0000 (UTC)
+Subject: [PATCH v2 11/14] gdbstub: add reverse step support in replay mode
 From: Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru>
 To: qemu-devel@nongnu.org
-Date: Tue, 11 Aug 2020 14:01:16 +0300
-Message-ID: <159714367656.18946.3762380501960237309.stgit@pasha-ThinkPad-X280>
+Date: Tue, 11 Aug 2020 14:01:56 +0300
+Message-ID: <159714371666.18946.16052695579115520332.stgit@pasha-ThinkPad-X280>
 In-Reply-To: <159714365354.18946.2967871683340522027.stgit@pasha-ThinkPad-X280>
 References: <159714365354.18946.2967871683340522027.stgit@pasha-ThinkPad-X280>
 User-Agent: StGit/0.17.1-dirty
@@ -77,215 +77,269 @@ Sender: "Qemu-devel"
 
 From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 
-Saving icount as a parameters of the snapshot allows navigation between
-them in the execution replay scenario.
-This information can be used for finding a specific snapshot for proceeding
-the recorded execution to the specific moment of the time.
-E.g., 'reverse step' action (introduced in one of the following patches)
-needs to load the nearest snapshot which is prior to the current moment
-of time.
+GDB remote protocol supports two reverse debugging commands:
+reverse step and reverse continue.
+This patch adds support of the first one to the gdbstub.
+Reverse step is intended to step one instruction in the backwards
+direction. This is not possible in regular execution.
+But replayed execution is deterministic, therefore we can load one of
+the prior snapshots and proceed to the desired step. It is equivalent
+to stepping one instruction back.
+There should be at least one snapshot preceding the debugged part of
+the replay log.
 
 Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgalyuk@ispras.ru>
-Acked-by: Markus Armbruster <armbru@redhat.com>
-Acked-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/qapi.c             |   18 ++++++++++++++----
- block/qcow2-snapshot.c   |    2 ++
- blockdev.c               |   10 ++++++++++
- include/block/snapshot.h |    1 +
- migration/savevm.c       |    5 +++++
- qapi/block-core.json     |   10 ++++++++--
- stubs/replay.c           |    5 +++++
- 7 files changed, 45 insertions(+), 6 deletions(-)
+ accel/tcg/translator.c    |    1 +
+ exec.c                    |    7 ++++++
+ gdbstub.c                 |   55 +++++++++++++++++++++++++++++++++++++++++++--
+ include/sysemu/replay.h   |   11 +++++++++
+ replay/replay-debugging.c |   33 +++++++++++++++++++++++++++
+ softmmu/cpus.c            |   14 +++++++++--
+ stubs/replay.c            |    5 ++++
+ 7 files changed, 121 insertions(+), 5 deletions(-)
 
-diff --git a/block/qapi.c b/block/qapi.c
-index afd9f3b4a7..3c73db54c4 100644
---- a/block/qapi.c
-+++ b/block/qapi.c
-@@ -226,6 +226,8 @@ int bdrv_query_snapshot_info_list(BlockDriverState *bs,
-         info->date_nsec     = sn_tab[i].date_nsec;
-         info->vm_clock_sec  = sn_tab[i].vm_clock_nsec / 1000000000;
-         info->vm_clock_nsec = sn_tab[i].vm_clock_nsec % 1000000000;
-+        info->icount        = sn_tab[i].icount;
-+        info->has_icount    = sn_tab[i].icount != -1ULL;
- 
-         info_list = g_new0(SnapshotInfoList, 1);
-         info_list->value = info;
-@@ -658,14 +660,15 @@ BlockStatsList *qmp_query_blockstats(bool has_query_nodes,
- void bdrv_snapshot_dump(QEMUSnapshotInfo *sn)
- {
-     char date_buf[128], clock_buf[128];
-+    char icount_buf[128] = {0};
-     struct tm tm;
-     time_t ti;
-     int64_t secs;
-     char *sizing = NULL;
- 
-     if (!sn) {
--        qemu_printf("%-10s%-20s%11s%20s%15s",
--                    "ID", "TAG", "VM SIZE", "DATE", "VM CLOCK");
-+        qemu_printf("%-10s%-18s%7s%20s%13s%11s",
-+                    "ID", "TAG", "VM SIZE", "DATE", "VM CLOCK", "ICOUNT");
-     } else {
-         ti = sn->date_sec;
-         localtime_r(&ti, &tm);
-@@ -679,11 +682,16 @@ void bdrv_snapshot_dump(QEMUSnapshotInfo *sn)
-                  (int)(secs % 60),
-                  (int)((sn->vm_clock_nsec / 1000000) % 1000));
-         sizing = size_to_str(sn->vm_state_size);
--        qemu_printf("%-10s%-20s%11s%20s%15s",
-+        if (sn->icount != -1ULL) {
-+            snprintf(icount_buf, sizeof(icount_buf),
-+                "%"PRId64, sn->icount);
-+        }
-+        qemu_printf("%-10s%-18s%7s%20s%13s%11s",
-                     sn->id_str, sn->name,
-                     sizing,
-                     date_buf,
--                    clock_buf);
-+                    clock_buf,
-+                    icount_buf);
-     }
-     g_free(sizing);
- }
-@@ -845,6 +853,8 @@ void bdrv_image_info_dump(ImageInfo *info)
-                 .date_nsec = elem->value->date_nsec,
-                 .vm_clock_nsec = elem->value->vm_clock_sec * 1000000000ULL +
-                                  elem->value->vm_clock_nsec,
-+                .icount = elem->value->has_icount ?
-+                          elem->value->icount : -1ULL,
-             };
- 
-             pstrcpy(sn.id_str, sizeof(sn.id_str), elem->value->id);
-diff --git a/block/qcow2-snapshot.c b/block/qcow2-snapshot.c
-index d14e7be1aa..4b127ea6af 100644
---- a/block/qcow2-snapshot.c
-+++ b/block/qcow2-snapshot.c
-@@ -663,6 +663,7 @@ int qcow2_snapshot_create(BlockDriverState *bs, QEMUSnapshotInfo *sn_info)
-     sn->date_sec = sn_info->date_sec;
-     sn->date_nsec = sn_info->date_nsec;
-     sn->vm_clock_nsec = sn_info->vm_clock_nsec;
-+    sn->icount = sn_info->icount;
-     sn->extra_data_size = sizeof(QCowSnapshotExtraData);
- 
-     /* Allocate the L1 table of the snapshot and copy the current one there. */
-@@ -1007,6 +1008,7 @@ int qcow2_snapshot_list(BlockDriverState *bs, QEMUSnapshotInfo **psn_tab)
-         sn_info->date_sec = sn->date_sec;
-         sn_info->date_nsec = sn->date_nsec;
-         sn_info->vm_clock_nsec = sn->vm_clock_nsec;
-+        sn_info->icount = sn->icount;
-     }
-     *psn_tab = sn_tab;
-     return s->nb_snapshots;
-diff --git a/blockdev.c b/blockdev.c
-index 3848a9c8ab..622a436c94 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -59,6 +59,7 @@
- #include "sysemu/arch_init.h"
- #include "sysemu/qtest.h"
- #include "sysemu/runstate.h"
+diff --git a/accel/tcg/translator.c b/accel/tcg/translator.c
+index 603d17ff83..fb1e19c585 100644
+--- a/accel/tcg/translator.c
++++ b/accel/tcg/translator.c
+@@ -17,6 +17,7 @@
+ #include "exec/log.h"
+ #include "exec/translator.h"
+ #include "exec/plugin-gen.h"
 +#include "sysemu/replay.h"
- #include "qemu/cutils.h"
- #include "qemu/help_option.h"
- #include "qemu/main-loop.h"
-@@ -1190,6 +1191,10 @@ SnapshotInfo *qmp_blockdev_snapshot_delete_internal_sync(const char *device,
-     info->vm_state_size = sn.vm_state_size;
-     info->vm_clock_nsec = sn.vm_clock_nsec % 1000000000;
-     info->vm_clock_sec = sn.vm_clock_nsec / 1000000000;
-+    if (sn.icount != -1ULL) {
-+        info->icount = sn.icount;
-+        info->has_icount = true;
-+    }
  
-     return info;
+ /* Pairs with tcg_clear_temp_count.
+    To be called by #TranslatorOps.{translate_insn,tb_stop} if
+diff --git a/exec.c b/exec.c
+index 6f381f98e2..8bcc8180e4 100644
+--- a/exec.c
++++ b/exec.c
+@@ -2750,6 +2750,13 @@ void cpu_check_watchpoint(CPUState *cpu, vaddr addr, vaddr len,
+     QTAILQ_FOREACH(wp, &cpu->watchpoints, entry) {
+         if (watchpoint_address_matches(wp, addr, len)
+             && (wp->flags & flags)) {
++            if (replay_running_debug()) {
++                /*
++                 * Don't process the watchpoints when we are
++                 * in a reverse debugging operation.
++                 */
++                return;
++            }
+             if (flags == BP_MEM_READ) {
+                 wp->flags |= BP_WATCHPOINT_HIT_READ;
+             } else {
+diff --git a/gdbstub.c b/gdbstub.c
+index f3a318cd7f..03c8a491ed 100644
+--- a/gdbstub.c
++++ b/gdbstub.c
+@@ -51,6 +51,7 @@
+ #include "sysemu/runstate.h"
+ #include "hw/semihosting/semihost.h"
+ #include "exec/exec-all.h"
++#include "sysemu/replay.h"
  
-@@ -1350,6 +1355,11 @@ static void internal_snapshot_prepare(BlkActionState *common,
-     sn->date_sec = tv.tv_sec;
-     sn->date_nsec = tv.tv_usec * 1000;
-     sn->vm_clock_nsec = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+ #ifdef CONFIG_USER_ONLY
+ #define GDB_ATTACHED "0"
+@@ -375,6 +376,20 @@ typedef struct GDBState {
+  */
+ static int sstep_flags = SSTEP_ENABLE|SSTEP_NOIRQ|SSTEP_NOTIMER;
+ 
++/* Retrieves flags for single step mode. */
++static int get_sstep_flags(void)
++{
++    /*
++     * In replay mode all events written into the log should be replayed.
++     * That is why NOIRQ flag is removed in this mode.
++     */
 +    if (replay_mode != REPLAY_MODE_NONE) {
-+        sn->icount = replay_get_current_icount();
++        return SSTEP_ENABLE;
 +    } else {
-+        sn->icount = -1ULL;
++        return sstep_flags;
 +    }
++}
++
+ static GDBState gdbserver_state;
  
-     ret1 = bdrv_snapshot_create(bs, sn);
-     if (ret1 < 0) {
-diff --git a/include/block/snapshot.h b/include/block/snapshot.h
-index 2bfcd57578..b0fe42993d 100644
---- a/include/block/snapshot.h
-+++ b/include/block/snapshot.h
-@@ -42,6 +42,7 @@ typedef struct QEMUSnapshotInfo {
-     uint32_t date_sec; /* UTC date of the snapshot */
-     uint32_t date_nsec;
-     uint64_t vm_clock_nsec; /* VM clock relative to boot */
-+    uint64_t icount; /* record/replay step */
- } QEMUSnapshotInfo;
+ static void init_gdbserver_state(void)
+@@ -501,7 +516,7 @@ static int gdb_continue_partial(char *newstates)
+                 break; /* nothing to do here */
+             case 's':
+                 trace_gdbstub_op_stepping(cpu->cpu_index);
+-                cpu_single_step(cpu, sstep_flags);
++                cpu_single_step(cpu, get_sstep_flags());
+                 cpu_resume(cpu);
+                 flag = 1;
+                 break;
+@@ -1874,10 +1889,31 @@ static void handle_step(GdbCmdContext *gdb_ctx, void *user_ctx)
+         gdb_set_cpu_pc((target_ulong)gdb_ctx->params[0].val_ull);
+     }
  
- int bdrv_snapshot_find(BlockDriverState *bs, QEMUSnapshotInfo *sn_info,
-diff --git a/migration/savevm.c b/migration/savevm.c
-index a843d202b5..d56d9729bd 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -2723,6 +2723,11 @@ int save_snapshot(const char *name, Error **errp)
-     sn->date_sec = tv.tv_sec;
-     sn->date_nsec = tv.tv_usec * 1000;
-     sn->vm_clock_nsec = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+    if (replay_mode != REPLAY_MODE_NONE) {
-+        sn->icount = replay_get_current_icount();
+-    cpu_single_step(gdbserver_state.c_cpu, sstep_flags);
++    cpu_single_step(gdbserver_state.c_cpu, get_sstep_flags());
+     gdb_continue();
+ }
+ 
++static void handle_backward(GdbCmdContext *gdb_ctx, void *user_ctx)
++{
++    if (replay_mode != REPLAY_MODE_PLAY) {
++        put_packet("E22");
++    }
++    if (gdb_ctx->num_params == 1) {
++        switch (gdb_ctx->params[0].opcode) {
++        case 's':
++            if (replay_reverse_step()) {
++                gdb_continue();
++            } else {
++                put_packet("E14");
++            }
++            return;
++        }
++    }
++
++    /* Default invalid command */
++    put_packet("");
++}
++
+ static void handle_v_cont_query(GdbCmdContext *gdb_ctx, void *user_ctx)
+ {
+     put_packet("vCont;c;C;s;S");
+@@ -2124,6 +2160,10 @@ static void handle_query_supported(GdbCmdContext *gdb_ctx, void *user_ctx)
+         g_string_append(gdbserver_state.str_buf, ";qXfer:features:read+");
+     }
+ 
++    if (replay_mode == REPLAY_MODE_PLAY) {
++        g_string_append(gdbserver_state.str_buf, ";ReverseStep+");
++    }
++
+     if (gdb_ctx->num_params &&
+         strstr(gdb_ctx->params[0].data, "multiprocess+")) {
+         gdbserver_state.multiprocess = true;
+@@ -2460,6 +2500,17 @@ static int gdb_handle_packet(const char *line_buf)
+             cmd_parser = &step_cmd_desc;
+         }
+         break;
++    case 'b':
++        {
++            static const GdbCmdParseEntry backward_cmd_desc = {
++                .handler = handle_backward,
++                .cmd = "b",
++                .cmd_startswith = 1,
++                .schema = "o0"
++            };
++            cmd_parser = &backward_cmd_desc;
++        }
++        break;
+     case 'F':
+         {
+             static const GdbCmdParseEntry file_io_cmd_desc = {
+diff --git a/include/sysemu/replay.h b/include/sysemu/replay.h
+index 239c01e7df..13a8123b09 100644
+--- a/include/sysemu/replay.h
++++ b/include/sysemu/replay.h
+@@ -75,6 +75,17 @@ void replay_finish(void);
+ void replay_add_blocker(Error *reason);
+ /* Returns name of the replay log file */
+ const char *replay_get_filename(void);
++/*
++ * Start making one step in backward direction.
++ * Used by gdbstub for backwards debugging.
++ * Returns true on success.
++ */
++bool replay_reverse_step(void);
++/*
++ * Returns true if replay module is processing
++ * reverse_continue or reverse_step request
++ */
++bool replay_running_debug(void);
+ 
+ /* Processing the instructions */
+ 
+diff --git a/replay/replay-debugging.c b/replay/replay-debugging.c
+index cfd0221692..aa3ca040e2 100644
+--- a/replay/replay-debugging.c
++++ b/replay/replay-debugging.c
+@@ -22,6 +22,13 @@
+ #include "block/snapshot.h"
+ #include "migration/snapshot.h"
+ 
++static bool replay_is_debugging;
++
++bool replay_running_debug(void)
++{
++    return replay_is_debugging;
++}
++
+ void hmp_info_replay(Monitor *mon, const QDict *qdict)
+ {
+     if (replay_mode == REPLAY_MODE_NONE) {
+@@ -219,3 +226,29 @@ void hmp_replay_seek(Monitor *mon, const QDict *qdict)
+         return;
+     }
+ }
++
++static void replay_stop_vm_debug(void *opaque)
++{
++    replay_is_debugging = false;
++    vm_stop(RUN_STATE_DEBUG);
++    replay_delete_break();
++}
++
++bool replay_reverse_step(void)
++{
++    Error *err = NULL;
++
++    assert(replay_mode == REPLAY_MODE_PLAY);
++
++    if (replay_get_current_icount() != 0) {
++        replay_seek(replay_get_current_icount() - 1, replay_stop_vm_debug, &err);
++        if (err) {
++            error_free(err);
++            return false;
++        }
++        replay_is_debugging = true;
++        return true;
++    }
++
++    return false;
++}
+diff --git a/softmmu/cpus.c b/softmmu/cpus.c
+index a802e899ab..377fe3298c 100644
+--- a/softmmu/cpus.c
++++ b/softmmu/cpus.c
+@@ -1004,9 +1004,17 @@ static bool cpu_can_run(CPUState *cpu)
+ 
+ static void cpu_handle_guest_debug(CPUState *cpu)
+ {
+-    gdb_set_stop_cpu(cpu);
+-    qemu_system_debug_request();
+-    cpu->stopped = true;
++    if (!replay_running_debug()) {
++        gdb_set_stop_cpu(cpu);
++        qemu_system_debug_request();
++        cpu->stopped = true;
 +    } else {
-+        sn->icount = -1ULL;
++        if (!cpu->singlestep_enabled) {
++            cpu_single_step(cpu, SSTEP_ENABLE);
++        } else {
++            cpu_single_step(cpu, 0);
++        }
 +    }
+ }
  
-     if (name) {
-         ret = bdrv_snapshot_find(bs, old_sn, name);
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 197bdc1c36..b32c698da3 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -27,13 +27,18 @@
- #
- # @vm-clock-nsec: fractional part in nano seconds to be used with vm-clock-sec
- #
-+# @icount: Current instruction count. Appears when execution record/replay
-+#          is enabled. Used for "time-traveling" to match the moment
-+#          in the recorded execution with the snapshots. (since 5.2)
-+#
- # Since: 1.3
- #
- ##
- { 'struct': 'SnapshotInfo',
-   'data': { 'id': 'str', 'name': 'str', 'vm-state-size': 'int',
-             'date-sec': 'int', 'date-nsec': 'int',
--            'vm-clock-sec': 'int', 'vm-clock-nsec': 'int' } }
-+            'vm-clock-sec': 'int', 'vm-clock-nsec': 'int',
-+            '*icount': 'int' } }
- 
- ##
- # @ImageInfoSpecificQCow2EncryptionBase:
-@@ -5512,7 +5517,8 @@
- #                    "date-sec": 1000012,
- #                    "date-nsec": 10,
- #                    "vm-clock-sec": 100,
--#                    "vm-clock-nsec": 20
-+#                    "vm-clock-nsec": 20,
-+#                    "icount": 220414
- #      }
- #    }
- #
+ #ifdef CONFIG_LINUX
 diff --git a/stubs/replay.c b/stubs/replay.c
-index 5974ec1f50..eacb366aa8 100644
+index eacb366aa8..d5b52302e9 100644
 --- a/stubs/replay.c
 +++ b/stubs/replay.c
-@@ -88,3 +88,8 @@ int replay_read_random(void *buf, size_t len)
+@@ -93,3 +93,8 @@ uint64_t replay_get_current_icount(void)
  {
      return 0;
  }
 +
-+uint64_t replay_get_current_icount(void)
++bool replay_reverse_step(void)
 +{
-+    return 0;
++    return false;
 +}
 
 
