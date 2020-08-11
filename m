@@ -2,67 +2,70 @@ Return-Path: <SRS0=wQM/=BV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55299C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 11:44:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B941C433E1
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 11:45:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 22DA02075D
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 11:44:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 05FF92076C
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 11:45:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QZFqCUTi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22DA02075D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GYvGm6nX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 05FF92076C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43956 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45772 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5Si2-0001pf-6s
-	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 07:44:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55396)
+	id 1k5SiO-0002aS-8H
+	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 07:45:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55504)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
- id 1k5ShG-0000qi-Os
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 07:44:02 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:51578
+ id 1k5Shb-0001Iy-A2
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 07:44:23 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:49822
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
- id 1k5ShD-0008GX-RB
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 07:44:01 -0400
+ id 1k5ShZ-0008J3-KF
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 07:44:22 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597146238;
+ s=mimecast20190719; t=1597146260;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=5uz2gYR+ZjhCwSBG2btx3/PoRpLKwa9fy3oUhJjbpq4=;
- b=QZFqCUTi8Ih1UL1l0CMgvbMoGWO8GdtBL5ekiZI+pjTuZqGX+DAXOlr4uDjVDzO/Oj9M5W
- CeVZslhcrgP73xO6JE8ibNN0x0OSKuAWYooyJDjspQw8uPw4h6DhuhyUyONpXu7t7YgqxZ
- 2HdaBtdrmE1f9s5ocP9j9aA6Ysb2ZtE=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=O09w58vU600Gb/fgnR/CT6U8ZBX9brZK7maBJW9LFCA=;
+ b=GYvGm6nXpUaYnM6NoAS9+TQjwHLkdHC0l/CmeXEoE2exofIDRWexNcD6PqwBEO6iF+FS2M
+ NpDCExAYREFv06yFJVpJJqxxD/YhwOXIj8SrsOBzA6+An0ZbE4AC9pKt5HJIy6cznGG2E/
+ +BhLx7rhyD5XAioHVuAwfXWGmvyq2wk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-331-fWp5YmqqOAGF-vRn8GpU8Q-1; Tue, 11 Aug 2020 07:43:46 -0400
-X-MC-Unique: fWp5YmqqOAGF-vRn8GpU8Q-1
+ us-mta-184-Vx89aPbXPruKR59sMB_oVQ-1; Tue, 11 Aug 2020 07:44:17 -0400
+X-MC-Unique: Vx89aPbXPruKR59sMB_oVQ-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C23B71005510;
- Tue, 11 Aug 2020 11:43:44 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 174971083;
+ Tue, 11 Aug 2020 11:44:16 +0000 (UTC)
 Received: from localhost.localdomain (unknown [10.74.8.55])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A4DCB5F9DB;
- Tue, 11 Aug 2020 11:43:36 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id BCF6C5F9DF;
+ Tue, 11 Aug 2020 11:44:09 +0000 (UTC)
 From: P J P <ppandit@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>,
  Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH v4 0/9] memory: assert and define MemoryRegionOps callbacks
-Date: Tue, 11 Aug 2020 17:11:24 +0530
-Message-Id: <20200811114133.672647-1-ppandit@redhat.com>
+Subject: [PATCH v4 4/9] prep: add ppc-parity write method
+Date: Tue, 11 Aug 2020 17:11:28 +0530
+Message-Id: <20200811114133.672647-5-ppandit@redhat.com>
+In-Reply-To: <20200811114133.672647-1-ppandit@redhat.com>
+References: <20200811114133.672647-1-ppandit@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Authentication-Results: relay.mimecast.com;
@@ -71,10 +74,10 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=ppandit@redhat.com;
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=ppandit@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/11 04:41:55
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/11 02:18:06
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
@@ -106,40 +109,48 @@ Sender: "Qemu-devel"
 
 From: Prasad J Pandit <pjp@fedoraproject.org>
 
-Hello,
+Add ppc-parity mmio write method to avoid NULL pointer dereference
+issue.
 
-* This series asserts that MemoryRegionOps objects define read/write
-  callback methods. Thus avoids potential NULL pointer dereference.
-  ex. -> https://git.qemu.org/?p=qemu.git;a=commit;h=bb15013ef34617eb1344f5276292cadd326c21b2
+Reported-by: Lei Sun <slei.casper@gmail.com>
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
+Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+---
+ hw/ppc/prep_systemio.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-* Also adds various undefined MemoryRegionOps read/write functions
-  to avoid potential assert failure.
+Update v4: No change, v3 was acked
+  -> https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg09965.html
 
-Thank you.
---
-Prasad J Pandit (9):
-  hw/pci-host: add pci-intack write method
-  pci-host: designware: add pcie-msi read method
-  vfio: add quirk device write method
-  prep: add ppc-parity write method
-  nvram: add nrf51_soc flash read method
-  spapr_pci: add spapr msi read method
-  tz-ppc: add dummy read/write methods
-  imx7-ccm: add digprog mmio write method
-  memory: assert MemoryRegionOps callbacks are defined
-
- hw/misc/imx7_ccm.c       |  8 ++++++++
- hw/misc/tz-ppc.c         | 14 ++++++++++++++
- hw/nvram/nrf51_nvm.c     | 10 ++++++++++
- hw/pci-host/designware.c | 19 +++++++++++++++++++
- hw/pci-host/prep.c       |  8 ++++++++
- hw/ppc/prep_systemio.c   |  8 ++++++++
- hw/ppc/spapr_pci.c       | 14 ++++++++++++--
- hw/vfio/pci-quirks.c     |  8 ++++++++
- softmmu/memory.c         | 10 +++++++++-
- 9 files changed, 96 insertions(+), 3 deletions(-)
-
---
+diff --git a/hw/ppc/prep_systemio.c b/hw/ppc/prep_systemio.c
+index bbc51b6e9a..e583222a1b 100644
+--- a/hw/ppc/prep_systemio.c
++++ b/hw/ppc/prep_systemio.c
+@@ -23,6 +23,7 @@
+  */
+ 
+ #include "qemu/osdep.h"
++#include "qemu/log.h"
+ #include "hw/irq.h"
+ #include "hw/isa/isa.h"
+ #include "hw/qdev-properties.h"
+@@ -235,8 +236,15 @@ static uint64_t ppc_parity_error_readl(void *opaque, hwaddr addr,
+     return val;
+ }
+ 
++static void ppc_parity_error_writel(void *opaque, hwaddr addr,
++                                    uint64_t data, unsigned size)
++{
++    qemu_log_mask(LOG_GUEST_ERROR, "%s: invalid access\n", __func__);
++}
++
+ static const MemoryRegionOps ppc_parity_error_ops = {
+     .read = ppc_parity_error_readl,
++    .write = ppc_parity_error_writel,
+     .valid = {
+         .min_access_size = 4,
+         .max_access_size = 4,
+-- 
 2.26.2
 
 
