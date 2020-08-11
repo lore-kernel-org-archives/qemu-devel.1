@@ -2,80 +2,91 @@ Return-Path: <SRS0=wQM/=BV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C660AC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 16:52:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 607AFC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 17:03:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 833AB2076C
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 16:52:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 130612076B
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 17:03:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hTFl/c6L"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 833AB2076C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TVn7cboY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 130612076B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39042 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44954 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5XVm-0001lB-Nx
-	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 12:52:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45472)
+	id 1k5XgF-0004p5-6Q
+	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 13:03:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48440)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
- id 1k5XTS-0000Fl-6r
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 12:50:06 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:56435
+ (Exim 4.90_1) (envelope-from <eperezma@redhat.com>)
+ id 1k5XfX-0004OI-Bi
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 13:02:35 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:24824
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
- id 1k5XTP-0003EW-QV
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 12:50:05 -0400
+ (Exim 4.90_1) (envelope-from <eperezma@redhat.com>)
+ id 1k5XfV-0004si-4f
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 13:02:34 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597164602;
+ s=mimecast20190719; t=1597165351;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=2PzPA2ZMDExgUN38xf0J24vMOrGNObxbKrt9vOHFlUo=;
- b=hTFl/c6LUjupfSBJEF29C/6/R4I6/S/HJBjwtg0nPPhdZ7gRl4MRCc4Lwy8iMWrSqdXsJL
- giR5hpFgccU9WoBqbT9kJEzb722OqKrK+oHq3HokyCskRM95KYtAU+bUhqcjZ444aHK8M8
- jFbv7YYf5hC/iHOlr9YEtBZp11qXgPc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-225-2qvoDm5VNQa9CcSlhyiHTw-1; Tue, 11 Aug 2020 12:49:59 -0400
-X-MC-Unique: 2qvoDm5VNQa9CcSlhyiHTw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7785B102C803;
- Tue, 11 Aug 2020 16:49:58 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.192.99])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3795610016E8;
- Tue, 11 Aug 2020 16:49:57 +0000 (UTC)
-Date: Tue, 11 Aug 2020 18:49:54 +0200
-From: Andrew Jones <drjones@redhat.com>
-To: Haibo Xu <haibo.xu@linaro.org>
-Subject: Re: [PATCH 7/7] target/arm/cpu: spe: Enable spe to work with host cpu
-Message-ID: <20200811164954.s2sdjzpqpdh2orks@kamzik.brq.redhat.com>
-References: <cover.1596768588.git.haibo.xu@linaro.org>
- <bf909c1f4904a22be0804cae9fd6f38ba4862563.1596768588.git.haibo.xu@linaro.org>
- <20200810111640.ykejphmuyirncjwv@kamzik.brq.redhat.com>
- <CAJc+Z1F_vFdJuy2kZnj0gZSOd_8-=rSfWFHjQSPU5XEKQ2KZkg@mail.gmail.com>
+ bh=+hZTyLJkrEYFqIVAG40xdHZbH7z9NrJCNt+IihoLhxg=;
+ b=TVn7cboYiCuUPbkp+Jx2N+jDQgTpPM5/yvt6YGPMzDP/C3FMwI+krpjU60FefnE9sbk4ck
+ MCL+xmBdW6GiaFaWq+Z4kfEIYEdPydkELLtvgoKUCSZ/GRT2Qos2+UR8yNVjbUpY54mzi4
+ qYmLRn06I0KcFA1yWmsGod1+ZM27oNw=
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
+ [209.85.160.199]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-401-jJhBAX7jM0y49RRQOA89DQ-1; Tue, 11 Aug 2020 13:02:30 -0400
+X-MC-Unique: jJhBAX7jM0y49RRQOA89DQ-1
+Received: by mail-qt1-f199.google.com with SMTP id n12so10241984qtr.6
+ for <qemu-devel@nongnu.org>; Tue, 11 Aug 2020 10:02:30 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=+hZTyLJkrEYFqIVAG40xdHZbH7z9NrJCNt+IihoLhxg=;
+ b=frwAV/BBXi7K0U99fOW/Z9HvRJOgq7RBpAfTJpQ+mHWqaI5937usy8SqUFpeFwhFMP
+ Oom4IgYc0dLJAwhAc+QsWD+VvrjOuSEYDy+ksBGx0JtuigTNeHy+WNG1IVbOjiP/4TFV
+ 82ADpnoZxfz0Pf9AfKQCny2pLCffBPwgD89Jjdi/D/FekZWCOpO82Gpx8mKMUZu+XTAr
+ sEjHxFSUWdH/0mQBnWcl6wG8EBKzYrMm9+HDDRZnVB0WPF4pOxImvsznHxomDJL3vZBt
+ dqKb017ks8GKE7OvWx8QS9lrxis+rQRmerex1vc7Oo+bQC1t8onsV3tzZu+EoPLaou/l
+ ulRw==
+X-Gm-Message-State: AOAM531B0hz8gjO6kK5puawyVKsojqgpwwlqbR0ElffNPKHW1yR74AV5
+ TkOk9Y9mo3ZQXQNd5CvfjDtn8Rg3iN0ERs01eT5j2cpDLFn6frhJXviPelRRV4XAmR/WfKW+PBE
+ ixvgSTxrqF/xxo64vNswrzHhRqKr/WLo=
+X-Received: by 2002:ac8:72cc:: with SMTP id o12mr2047789qtp.27.1597165349440; 
+ Tue, 11 Aug 2020 10:02:29 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxIVFmKLLRciiUUj0PNk7Za7poMaEaPwXuZ6xpeQIAyr+8i+WTHfkCPGza4IE9DWbqGj5/Xk++kjr8ZF5h/JUc=
+X-Received: by 2002:ac8:72cc:: with SMTP id o12mr2047753qtp.27.1597165349053; 
+ Tue, 11 Aug 2020 10:02:29 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAJc+Z1F_vFdJuy2kZnj0gZSOd_8-=rSfWFHjQSPU5XEKQ2KZkg@mail.gmail.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+References: <20200626064122.9252-1-eperezma@redhat.com>
+ <20200626064122.9252-2-eperezma@redhat.com>
+ <20200626212917.GD175520@xz-x1>
+In-Reply-To: <20200626212917.GD175520@xz-x1>
+From: Eugenio Perez Martin <eperezma@redhat.com>
+Date: Tue, 11 Aug 2020 19:01:52 +0200
+Message-ID: <CAJaqyWf5=fwwcgZgOdipt54mq=vPZkQLGp9xWRG7Tnw-E9xjCA@mail.gmail.com>
+Subject: Re: [RFC v2 1/1] memory: Delete assertion in
+ memory_region_unregister_iommu_notifier
+To: Peter Xu <peterx@redhat.com>
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eperezma@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=drjones@redhat.com;
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=eperezma@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/11 10:41:43
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -85,7 +96,7 @@ X-Spam_bar: ----
 X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,90 +109,156 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- philmd@redhat.com, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Yan Zhao <yan.y.zhao@intel.com>,
+ Juan Quintela <quintela@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+ Eric Auger <eric.auger@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Aug 11, 2020 at 11:15:42AM +0800, Haibo Xu wrote:
-> > > +    if (!cpu->has_spe || !kvm_enabled()) {
-> > > +        unset_feature(env, ARM_FEATURE_SPE);
-> > > +    }
+On Fri, Jun 26, 2020 at 11:29 PM Peter Xu <peterx@redhat.com> wrote:
+>
+> Hi, Eugenio,
+>
+> (CCing Eric, Yan and Michael too)
+>
+> On Fri, Jun 26, 2020 at 08:41:22AM +0200, Eugenio P=C3=A9rez wrote:
+> > diff --git a/memory.c b/memory.c
+> > index 2f15a4b250..7f789710d2 100644
+> > --- a/memory.c
+> > +++ b/memory.c
+> > @@ -1915,8 +1915,6 @@ void memory_region_notify_one(IOMMUNotifier *noti=
+fier,
+> >          return;
+> >      }
 > >
-> > I don't think this should be necessary.
-> >
-> 
-> Yes, I have tried to remove this check, and the vSPE can still work
-> correctly.
-> But I don't know whether there are some corner cases that trigger an error.
-> The similar logic is added in commit 929e754d5a to enable vPMU support.
+> > -    assert(entry->iova >=3D notifier->start && entry_end <=3D notifier=
+->end);
+>
+> I can understand removing the assertion should solve the issue, however i=
+mho
+> the major issue is not about this single assertion but the whole addr_mas=
+k
+> issue behind with virtio...
+>
+> For normal IOTLB invalidations, we were trying our best to always make
+> IOMMUTLBEntry contain a valid addr_mask to be 2**N-1.  E.g., that's what =
+we're
+> doing with the loop in vtd_address_space_unmap().
+>
+> But this is not the first time that we may want to break this assumption =
+for
+> virtio so that we make the IOTLB a tuple of (start, len), then that len c=
+an be
+> not a address mask any more.  That seems to be more efficient for things =
+like
+> vhost because iotlbs there are not page based, so it'll be inefficient if=
+ we
+> always guarantee the addr_mask because it'll be quite a lot more roundtri=
+ps of
+> the same range of invalidation.  Here we've encountered another issue of
+> triggering the assertion with virtio-net, but only with the old RHEL7 gue=
+st.
+>
+> I'm thinking whether we can make the IOTLB invalidation configurable by
+> specifying whether the backend of the notifier can handle arbitary addres=
+s
+> range in some way.  So we still have the guaranteed addr_masks by default
+> (since I still don't think totally break the addr_mask restriction is wis=
+e...),
+> however we can allow the special backends to take adavantage of using arb=
+itary
+> (start, len) ranges for reasons like performance.
+>
+> To do that, a quick idea is to introduce a flag IOMMU_NOTIFIER_ARBITRARY_=
+MASK
+> to IOMMUNotifierFlag, to declare that the iommu notifier (and its backend=
+) can
+> take arbitrary address mask, then it can be any value and finally becomes=
+ a
+> length rather than an addr_mask.  Then for every iommu notify() we can di=
+rectly
+> deliver whatever we've got from the upper layer to this notifier.  With t=
+he new
+> flag, vhost can do iommu_notifier_init() with UNMAP|ARBITRARY_MASK so it
+> declares this capability.  Then no matter for device iotlb or normal iotl=
+b, we
+> skip the complicated procedure to split a big range into small ranges tha=
+t are
+> with strict addr_mask, but directly deliver the message to the iommu noti=
+fier.
+> E.g., we can skip the loop in vtd_address_space_unmap() if the notifier i=
+s with
+> ARBITRARY flag set.
+>
+> Then, the assert() is not accurate either, and may become something like:
+>
+> diff --git a/memory.c b/memory.c
+> index 2f15a4b250..99d0492509 100644
+> --- a/memory.c
+> +++ b/memory.c
+> @@ -1906,6 +1906,7 @@ void memory_region_notify_one(IOMMUNotifier *notifi=
+er,
+>  {
+>      IOMMUNotifierFlag request_flags;
+>      hwaddr entry_end =3D entry->iova + entry->addr_mask;
+> +    IOMMUTLBEntry tmp =3D *entry;
+>
+>      /*
+>       * Skip the notification if the notification does not overlap
+> @@ -1915,7 +1916,13 @@ void memory_region_notify_one(IOMMUNotifier *notif=
+ier,
+>          return;
+>      }
+>
+> -    assert(entry->iova >=3D notifier->start && entry_end <=3D notifier->=
+end);
+> +    if (notifier->notifier_flags & IOMMU_NOTIFIER_ARBITRARY_MASK) {
+> +        tmp.iova =3D MAX(tmp.iova, notifier->start);
 
-I think the PMU logic needs a cleanup, rather than to be imitated.
+Hi!
 
-> 
-> > > +
-> > >      if (!arm_feature(env, ARM_FEATURE_EL2)) {
-> > >          /* Disable the hypervisor feature bits in the processor feature
-> > >           * registers if we don't have EL2. These are id_pfr1[15:12] and
-> > > diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-> > > index be045ccc5f..4ea58afc1d 100644
-> > > --- a/target/arm/kvm64.c
-> > > +++ b/target/arm/kvm64.c
-> > > @@ -679,6 +679,7 @@ bool
-> kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
-> > >      features |= 1ULL << ARM_FEATURE_AARCH64;
-> > >      features |= 1ULL << ARM_FEATURE_PMU;
-> > >      features |= 1ULL << ARM_FEATURE_GENERIC_TIMER;
-> > > +    features |= 1ULL << ARM_FEATURE_SPE;
-> >
-> > No, SPE is not a feature we assume is present in v8.0 CPUs.
-> >
-> 
-> Yes, SPE is an optional feature for v8.2. How about changing to the
-> following logic:
-> 
-> spe_supported = ioctl(fdarray[0], KVM_CHECK_EXTENSION, KVM_CAP_ARM_SPE_V1)
-> > 0;
-> if (spe_supported) {
->     features |= 1ULL << ARM_FEATURE_SPE;
-> }
+If I modify the tmp.iova, the guest will complain (in dmesg):
+[  154.426828] DMAR: DRHD: handling fault status reg 2
+[  154.427700] DMAR: [DMA Read] Request device [01:00.0] fault addr
+ffff90d53fada000 [fault reason 04] Access beyond MGAW
 
-Yes, except you need to drop the ARM_FEATURE_SPE define and use the ID
-register bit instead like "sve_supported" does.
+And will not forward packets anymore on that interface. Guests are
+totally ok if I only modify addr_mask.
 
-> 
-> > >
-> > >      ahcf->features = features;
-> > >
-> > > @@ -826,6 +827,14 @@ int kvm_arch_init_vcpu(CPUState *cs)
-> > >      } else {
-> > >          env->features &= ~(1ULL << ARM_FEATURE_PMU);
-> > >      }
-> > > +    if (!kvm_check_extension(cs->kvm_state, KVM_CAP_ARM_SPE_V1)) {
-> > > +        cpu->has_spe = false;
-> > > +    }
-> > > +    if (cpu->has_spe) {
-> > > +        cpu->kvm_init_features[0] |= 1 << KVM_ARM_VCPU_SPE_V1;
-> > > +    } else {
-> > > +        env->features &= ~(1ULL << ARM_FEATURE_SPE);
-> > > +    }
-> >
-> > The PMU code above this isn't a good pattern to copy. The SVE code below
-> > is better. SVE uses an ID bit and doesn't do the redundant KVM cap check.
-> > It'd be nice to cleanup the PMU code (with a separate patch) and then add
-> > SPE in a better way.
-> >
-> 
-> I noticed that Peter had sent out a mail
-> <https://www.mail-archive.com/qemu-devel@nongnu.org/msg727640.html> to talk
-> about the feature-identification strategy.
-> So shall we adapt it to the vPMU and vSPE feature?
+Still investigating the issue.
 
-At least SPE. You'll have to double check that it makes sense to do for
-PMU. But, if so, then it should be done with a separate series.
+Thanks!
 
-Thanks,
-drew
+
+> +        tmp.addr_mask =3D MIN(tmp.addr_mask, notifier->end);
+> +        assert(tmp.iova <=3D tmp.addr_mask);
+> +    } else {
+> +        assert(entry->iova >=3D notifier->start && entry_end <=3D notifi=
+er->end);
+> +    }
+>
+>      if (entry->perm & IOMMU_RW) {
+>          request_flags =3D IOMMU_NOTIFIER_MAP;
+> @@ -1924,7 +1931,7 @@ void memory_region_notify_one(IOMMUNotifier *notifi=
+er,
+>      }
+>
+>      if (notifier->notifier_flags & request_flags) {
+> -        notifier->notify(notifier, entry);
+> +        notifier->notify(notifier, &tmp);
+>      }
+>  }
+>
+> Then we can keep the assert() for e.g. vfio, however vhost can skip it an=
+d even
+> get some further performance boosts..  Does that make sense?
+>
+> Thanks,
+>
+> --
+> Peter Xu
+>
 
 
