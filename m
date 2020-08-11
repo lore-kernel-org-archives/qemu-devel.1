@@ -2,80 +2,104 @@ Return-Path: <SRS0=wQM/=BV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84150C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 11:22:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3584C433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 11:27:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5866B20716
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 11:22:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5866B20716
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 8CC762076B
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 11:27:15 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jKb4/boO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8CC762076B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58912 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33640 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5SLz-0003dL-Ky
-	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 07:22:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50402)
+	id 1k5SR0-00058R-P0
+	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 07:27:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52060)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k5SKi-0002Rw-VK
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 07:20:44 -0400
-Received: from indium.canonical.com ([91.189.90.7]:50818)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k5SKg-0005Zs-NY
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 07:20:44 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1k5SKe-0005wg-I7
- for <qemu-devel@nongnu.org>; Tue, 11 Aug 2020 11:20:40 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 81D332E8082
- for <qemu-devel@nongnu.org>; Tue, 11 Aug 2020 11:20:40 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1k5SQB-0004PB-0C
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 07:26:23 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:50696
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1k5SQ8-0006Ts-2Y
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 07:26:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1597145178;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=iMyfeaWOAmGShheG4PrBuj4YCLetggwAwUSkL1meUIA=;
+ b=jKb4/boOhcGP+35jk+i3ma+KqLfvwtIo+9jaTnZn1wQBs9LHhXzc8nqT69LLgifrgPlj/n
+ HMgF6eidKnc/qdX5ZDnzPlbXiBSKCEk7v9XhuJNEng1uZ7l74Ga8cUbseBA4FtkYBdoPoo
+ GXL3sNUNFHnv85ylnsyzdlrAPNUDQJE=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-440-xlR3MjwENyqjZmBUSTGf9A-1; Tue, 11 Aug 2020 07:26:17 -0400
+X-MC-Unique: xlR3MjwENyqjZmBUSTGf9A-1
+Received: by mail-wr1-f69.google.com with SMTP id z1so5479258wrn.18
+ for <qemu-devel@nongnu.org>; Tue, 11 Aug 2020 04:26:16 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=iMyfeaWOAmGShheG4PrBuj4YCLetggwAwUSkL1meUIA=;
+ b=e5yDw/QkikZp9ku5NU4lXt9jVe61hW6i64hwX4htxGwCeS7p8cg//K5+xnyRia3J6U
+ 576W6rG0VetSSCxwovNHRZczeEus8IYsqZ8H5AdxTIqU8kfhNQmne6VlCF92g9pY8NbW
+ feib2mRAoZtHZ3JtYyE01B0qlFPOmUlUwQbF3k7eoiqwKhWCAN72m9MHxfkh1/zPXQp7
+ CxBO/F44Uxe6SLm2mjpjwZO+vxHHic7YW4gNGvHfJfdSL1/hIbmx0uW3NqArmxSt6W+N
+ VNzLho4Mz3roz8SO5ebURxcnOH4azSVbmTpBZrTJ2Z/Q08b+wZTyYqbKhtkM5PhpxgNi
+ lpxg==
+X-Gm-Message-State: AOAM530U0NUqRLIV+D7CQzbl/WEOf0KLoBM5e3SKNQwD1hFZwZkmoBUc
+ i0aV53jSX4C855l/Dxdf1acBqECULVBfn6c8jU/iS8yj/18oml2TUrVdY9vfhyFVWMQGwLv2UWW
+ 3/rP3602O4n1AAVY=
+X-Received: by 2002:adf:ef08:: with SMTP id e8mr6046653wro.164.1597145174841; 
+ Tue, 11 Aug 2020 04:26:14 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJypnYkMPA7DMqq8CYhuKzDTIAa9ULJQxDDixSYC+mNmXEC6KzTA5hvyRBJb/IiWnr6gFfQg7g==
+X-Received: by 2002:adf:ef08:: with SMTP id e8mr6046629wro.164.1597145174565; 
+ Tue, 11 Aug 2020 04:26:14 -0700 (PDT)
+Received: from redhat.com ([147.161.8.240])
+ by smtp.gmail.com with ESMTPSA id l10sm25455753wru.3.2020.08.11.04.26.10
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 11 Aug 2020 04:26:13 -0700 (PDT)
+Date: Tue, 11 Aug 2020 07:26:01 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: mwilck@suse.com
+Subject: Re: [PATCH v2] virtio-rng: return available data with O_NONBLOCK
+Message-ID: <20200811071726-mutt-send-email-mst@kernel.org>
+References: <20200715133255.10526-1-mwilck@suse.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 11 Aug 2020 11:13:14 -0000
-From: Peter Maydell <1890545@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: ajbennee bigboy0822 pmaydell
-X-Launchpad-Bug-Reporter: Tony.LI (bigboy0822)
-X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
-References: <159670025270.3099.13280483088179052036.malonedeb@gac.canonical.com>
-Message-Id: <159714439499.22224.11686976405479648917.malone@chaenomeles.canonical.com>
-Subject: [Bug 1890545] Re: (ARM64) qemu-x86_64+schroot(Debian bullseye) can't
- run chrome and can't load HTML
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="6a138c03da9cc3e2e03f6dd3bbb4a615b0be6ec2";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 3d175b694a7462008c3d72aa244adabccbb1d4a8
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/11 04:25:48
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200715133255.10526-1-mwilck@suse.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=mst@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/11 02:18:06
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -84,66 +108,179 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1890545 <1890545@bugs.launchpad.net>
+Cc: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org,
+ virtualization@lists.linux-foundation.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-ioctl number 0xc0106467 is DRM_IOCTL_RADEON_INFO. QEMU doesn't support
-that ioctl (each ioctl needs individual handling to convert the data
-structures it uses between the guest and host architecture). If your
-guest binary is trying to make graphics-card specific ioctl calls like
-this then I'm afraid it won't work in QEMU (unless somebody writes the
-QEMU patch to make it support them).
+On Wed, Jul 15, 2020 at 03:32:55PM +0200, mwilck@suse.com wrote:
+> From: Martin Wilck <mwilck@suse.com>
+> 
+> If a program opens /dev/hwrng with O_NONBLOCK and uses poll() and
+> non-blocking read() to retrieve random data, it ends up in a tight
+> loop with poll() always returning POLLIN and read() returning EAGAIN.
+> This repeats forever until some process makes a blocking read() call.
+> The reason is that virtio_read() always returns 0 in non-blocking mode,
+> even if data is available. Worse, it fetches random data from the
+> hypervisor after every non-blocking call, without ever using this data.
+> 
+> The following test program illustrates the behavior and can be used
+> for testing and experiments. The problem will only be seen if all
+> tasks use non-blocking access; otherwise the blocking reads will
+> "recharge" the random pool and cause other, non-blocking reads to
+> succeed at least sometimes.
+> 
+> /* Whether to use non-blocking mode in a task, problem occurs if CONDITION is 1 */
+> //#define CONDITION (getpid() % 2 != 0)
+> 
+> static volatile sig_atomic_t stop;
+> static void handler(int sig __attribute__((unused))) { stop = 1; }
+> 
+> static void loop(int fd, int sec)
+> {
+> 	struct pollfd pfd = { .fd = fd, .events  = POLLIN, };
+> 	unsigned long errors = 0, eagains = 0, bytes = 0, succ = 0;
+> 	int size, rc, rd;
+> 
+> 	srandom(getpid());
+> 	if (CONDITION && fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) | O_NONBLOCK) == -1)
+> 		perror("fcntl");
+> 	size = MINBUFSIZ + random() % (MAXBUFSIZ - MINBUFSIZ + 1);
+> 
+> 	for(;;) {
+> 		char buf[size];
+> 
+> 		if (stop)
+> 			break;
+> 		rc = poll(&pfd, 1, sec);
+> 		if (rc > 0) {
+> 			rd = read(fd, buf, sizeof(buf));
+> 			if (rd == -1 && errno == EAGAIN)
+> 				eagains++;
+> 			else if (rd == -1)
+> 				errors++;
+> 			else {
+> 				succ++;
+> 				bytes += rd;
+> 				write(1, buf, sizeof(buf));
+> 			}
+> 		} else if (rc == -1) {
+> 			if (errno != EINTR)
+> 				perror("poll");
+> 			break;
+> 		} else
+> 			fprintf(stderr, "poll: timeout\n");
+> 	}
+> 	fprintf(stderr,
+> 		"pid %d %sblocking, bufsize %d, %d seconds, %lu bytes read, %lu success, %lu eagain, %lu errors\n",
+> 		getpid(), CONDITION ? "non-" : "", size, sec, bytes, succ, eagains, errors);
+> }
+> 
+> int main(void)
+> {
+> 	int fd;
+> 
+> 	fork(); fork();
+> 	fd = open("/dev/hwrng", O_RDONLY);
+> 	if (fd == -1) {
+> 		perror("open");
+> 		return 1;
+> 	};
+> 	signal(SIGALRM, handler);
+> 	alarm(SECONDS);
+> 	loop(fd, SECONDS);
+> 	close(fd);
+> 	wait(NULL);
+> 	return 0;
+> }
+> 
+> void loop(int fd)
+> {
+>         struct pollfd pfd0 = { .fd = fd, .events  = POLLIN, };
+>         int rc;
+>         unsigned int n;
+> 
+>         for (n = LOOPS; n > 0; n--) {
+>                 struct pollfd pfd = pfd0;
+>                 char buf[SIZE];
+> 
+>                 rc = poll(&pfd, 1, 1);
+>                 if (rc > 0) {
+>                         int rd = read(fd, buf, sizeof(buf));
+> 
+>                         if (rd == -1)
+>                                 perror("read");
+>                         else
+>                                 printf("read %d bytes\n", rd);
+>                 } else if (rc == -1)
+>                         perror("poll");
+>                 else
+>                         fprintf(stderr, "timeout\n");
+> 
+>         }
+> }
+> 
+> int main(void)
+> {
+>         int fd;
+> 
+>         fd = open("/dev/hwrng", O_RDONLY|O_NONBLOCK);
+>         if (fd == -1) {
+>                 perror("open");
+>                 return 1;
+>         };
+>         loop(fd);
+>         close(fd);
+>         return 0;
+> }
+> 
+> This can be observed in the real word e.g. with nested qemu/KVM virtual
+> machines, if both the "outer" and "inner" VMs have a virtio-rng device.
+> If the "inner" VM requests random data, qemu running in the "outer" VM
+> uses this device in a non-blocking manner like the test program above.
+> 
+> Fix it by returning available data if a previous hypervisor call has
+> completed in the meantime. I tested the patch with the program above,
+> and with rng-tools.
+> 
+> Signed-off-by: Martin Wilck <mwilck@suse.com>
+> ---
+>  drivers/char/hw_random/virtio-rng.c | 14 ++++++++++++++
+>  1 file changed, 14 insertions(+)
+> 
+> diff --git a/drivers/char/hw_random/virtio-rng.c b/drivers/char/hw_random/virtio-rng.c
+> index 79a6e47b5fbc..984713b35892 100644
+> --- a/drivers/char/hw_random/virtio-rng.c
+> +++ b/drivers/char/hw_random/virtio-rng.c
+> @@ -59,6 +59,20 @@ static int virtio_read(struct hwrng *rng, void *buf, size_t size, bool wait)
+>  	if (vi->hwrng_removed)
+>  		return -ENODEV;
+>  
+> +	/*
+> +	 * If the previous call was non-blocking, we may have got some
+> +	 * randomness already.
+> +	 */
+> +	if (vi->busy && completion_done(&vi->have_data)) {
+> +		unsigned int len;
+> +
+> +		vi->busy = false;
+> +		len = vi->data_avail > size ? size : vi->data_avail;
+> +		vi->data_avail -= len;
 
--- =
+I wonder what purpose does this line serve: busy is false
+which basically means data_avail is invalid, right?
+A following non blocking call will not enter here.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1890545
+> +		if (len)
+> +			return len;
+> +	}
+> +
+>  	if (!vi->busy) {
+>  		vi->busy = true;
+>  		reinit_completion(&vi->have_data);
 
-Title:
-  (ARM64) qemu-x86_64+schroot(Debian bullseye) can't run chrome and
-  can't load HTML
+> -- 
+> 2.26.2
 
-Status in QEMU:
-  New
-
-Bug description:
-  First I creat a file system that is debian(bullseye amd64)on arm64
-  machine=EF=BC=8Cthen I download google-chrome=EF=BC=8Chowever, when I ran=
- Google
-  browser, some errors occurred.
-
-  $ google-chrome --no-sandbox
-  or =
-
-  $ qemu-x86_64-static google-chrome --no-sandbox
-
-  qemu: uncaught target signal 5 (Trace/breakpoint trap) - core dumped
-  qemu: uncaught target signal 5 (Trace/breakpoint trap) - core dumped
-  [1661:1661:0806/074307.502638:ERROR:nacl_fork_delegate_linux.cc(323)] Bad=
- NaCl helper startup ack (0 bytes)
-  [1664:1664:0806/074307.504159:ERROR:nacl_fork_delegate_linux.cc(323)] Bad=
- NaCl helper startup ack (0 bytes)
-  qemu: uncaught target signal 5 (Trace/breakpoint trap) - core dumped
-  qemu: uncaught target signal 5 (Trace/breakpoint trap) - core dumped
-  [1637:1678:0806/074308.337567:ERROR:file_path_watcher_linux.cc(315)] inot=
-ify_init() failed: Function not implemented (38)
-  Fontconfig warning: "/etc/fonts/fonts.conf", line 100: unknown element "b=
-lank"
-  qemu: unknown option 'type=3Dutility'
-  [1637:1680:0806/074313.598432:FATAL:gpu_data_manager_impl_private.cc(439)=
-] GPU process isn't usable. Goodbye.
-  qemu: uncaught target signal 5 (Trace/breakpoint trap) - core dumped
-  Trace/breakpoint trap
-
-  Why?
-  And then I run firefox,it can be opened, but it can't load any web pages =
-and HTML.
-  I really need help=EF=BC=81
-  Thank.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1890545/+subscriptions
 
