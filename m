@@ -2,56 +2,56 @@ Return-Path: <SRS0=wQM/=BV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.5 required=3.0 tests=BAYES_00,HK_RANDOM_FROM,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.5 required=3.0 tests=BAYES_00,HK_RANDOM_FROM,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,
+	SPF_HELO_NONE,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B463C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 15:02:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC989C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 15:04:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B2A1620771
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 15:02:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2A1620771
+	by mail.kernel.org (Postfix) with ESMTPS id 80D6420771
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 15:04:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80D6420771
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38420 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42490 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5VnK-0006im-VN
-	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 11:02:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48446)
+	id 1k5VpH-0008QV-QA
+	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 11:04:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49166)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1k5Vlc-0005h1-Q2
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 11:00:44 -0400
-Received: from relay68.bu.edu ([128.197.228.73]:50818)
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1k5VnY-0007IB-UM
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 11:02:44 -0400
+Received: from relay64.bu.edu ([128.197.228.104]:45025)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1k5VlW-00071m-W0
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 11:00:43 -0400
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1k5VnT-0007Ks-8v
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 11:02:44 -0400
 X-Envelope-From: alxndr@bu.edu
 X-BU-AUTH: mozz.bu.edu [128.197.127.33]
 Received: from BU-AUTH (localhost.localdomain [127.0.0.1]) (authenticated
  bits=0)
- by relay68.bu.edu (8.14.3/8.14.3) with ESMTP id 07BExvhJ013356
+ by relay64.bu.edu (8.14.3/8.14.3) with ESMTP id 07BF20JM027778
  (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
- Tue, 11 Aug 2020 11:00:00 -0400
-Date: Tue, 11 Aug 2020 10:59:57 -0400
+ Tue, 11 Aug 2020 11:02:01 -0400
+Date: Tue, 11 Aug 2020 11:02:00 -0400
 From: Alexander Bulekov <alxndr@bu.edu>
 To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 131/147] meson: link emulators without Makefile.target
-Message-ID: <20200811145957.bbfq7laqme4rxwsp@mozz.bu.edu>
+Subject: Re: [PATCH 066/147] meson: convert tests/qtest to meson
+Message-ID: <20200811150200.pbbncccm6cao2k55@mozz.bu.edu>
 References: <1597079345-42801-1-git-send-email-pbonzini@redhat.com>
- <1597079345-42801-132-git-send-email-pbonzini@redhat.com>
+ <1597079345-42801-67-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <1597079345-42801-132-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1597079345-42801-67-git-send-email-pbonzini@redhat.com>
 User-Agent: NeoMutt/20180716
-Received-SPF: pass client-ip=128.197.228.73; envelope-from=alxndr@bu.edu;
- helo=relay68.bu.edu
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/11 11:00:38
+Received-SPF: pass client-ip=128.197.228.104; envelope-from=alxndr@bu.edu;
+ helo=relay64.bu.edu
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/11 11:02:38
 X-ACL-Warn: Detected OS   = Linux 2.6.x
 X-Spam_score_int: -31
 X-Spam_score: -3.2
@@ -71,1147 +71,2987 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
- qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Paolo,
-I looked through the code changes related to fuzzing and tested the
-following builds:
- - qemu-fuzz-i386
- - qemu-fuzz-arm
- - qemu-system-i386 (with --enable-fuzzing)
- - configure --enable-fuzzing with GCC (should fail)
- - ./scripts/oss-fuzz/build.sh (in my local environment) 
- - ./scripts/oss-fuzz/build.sh (in the oss-fuzz Docker) 
-I examined the symbols to ensure that the fuzzer linker-script is doing what it
-needs to be doing. The sizes of the binaries have roughly stayed the same, and
-there are no major differences between the symbols.
-Only the oss-fuzz Docker build failed with a complaint about the linker-script,
-but it fails for the current master, too! I think the problem might be related
-to the fact that the docker uses a bleeding edge clang-12 compiler. I'll have
-to look into it more.
-I ran the existing fuzzers for a couple thousand runs. It looks like there is
-some problem with the virtio-scsi arguments, but it's not specific to
-fuzzing. It will probably be caught once this runs through CI:
+On 200810 1907, Paolo Bonzini wrote:
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-./qemu-system-i386 -display none -machine accel=qtest -m 64 -M pc \
--drive id=drv0,if=none,file=null-co://,file.read-zeroes=on,format=raw \
--device virtio-scsi-pci,id=vs0,addr=04.0 \
--device scsi-hd,bus=vs0.0,drive=drv0 \
--drive file=blkdebug::null-co://,file.image.read-zeroes=on,if=none,id=dr1,format=raw,file.align=4k \
--device scsi-hd,drive=dr1,lun=0,scsi-id=1 -qtest /dev/null -qtest-log /dev/null
-
-Immediately crashes with:
-../block.c:442:10: runtime error: index 0 out of bounds for type 'const char *[0]'
-SUMMARY: UndefinedBehaviorSanitizer: undefined-behavior ../block.c:442:10 in 
-../block.c:442:10: runtime error: load of address 0x5581a17161e0 with insufficient space for an object of type 'const char *'
-0x5581a17161e0: note: pointer points here
- 00 00 00 00  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  00 00 00 00
-              ^ 
-SUMMARY: UndefinedBehaviorSanitizer: undefined-behavior ../block.c:442:10 in 
-=================================================================
-==26813==ERROR: AddressSanitizer: global-buffer-overflow on address 0x5581a17161e0 at pc 0x55819e05f1bd bp 0x7ffed60bdcc0 sp 0x7ffed60bdcb8
-READ of size 8 at 0x5581a17161e0 thread T0
-    #0 0x55819e05f1bc in bdrv_format_is_whitelisted /tmp/qemu/build/../block.c:442:10
-    #1 0x55819e05f1bc in bdrv_is_whitelisted /tmp/qemu/build/../block.c:463:12
-    #2 0x55819e075e5f in bdrv_open_common /tmp/qemu/build/../block.c:1680:32
-    #3 0x55819e075e5f in bdrv_open_inherit /tmp/qemu/build/../block.c:3420:11
-    #4 0x55819e07d1db in bdrv_open_child_bs /tmp/qemu/build/../block.c:3053:10
-    #5 0x55819e074b61 in bdrv_open_inherit /tmp/qemu/build/../block.c:3367:19
-    #6 0x55819e07dac4 in bdrv_open /tmp/qemu/build/../block.c:3513:12
-    #7 0x55819e2d78c5 in blk_new_open /tmp/qemu/build/../block/block-backend.c:421:10
-    #8 0x55819d4242ee in blockdev_init /tmp/qemu/build/../blockdev.c:617:15
-    #9 0x55819d4242ee in drive_new /tmp/qemu/build/../blockdev.c:1005:11
-    #10 0x55819da17085 in drive_init_func /tmp/qemu/build/../softmmu/vl.c:1000:12
-    #11 0x55819e61bd4c in qemu_opts_foreach /tmp/qemu/build/../util/qemu-option.c:1172:14
-    #12 0x55819da0aab2 in configure_blockdev /tmp/qemu/build/../softmmu/vl.c:1067:9
-    #13 0x55819da0aab2 in qemu_init /tmp/qemu/build/../softmmu/vl.c:4145:5
-    #14 0x55819c72a5b8 in main /tmp/qemu/build/../softmmu/main.c:48:5
-    #15 0x7faba3b86e0a in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x26e0a)
-    #16 0x55819c680659 in _start (/tmp/qemu/build/qemu-system-i386+0x254d659)
-
-0x5581a17161e0 is located 32 bytes to the left of global variable 'whitelist_ro' defined in '../block.c:437:24' (0x5581a1716200) of size 0
-  'whitelist_ro' is ascii string ''
-0x5581a17161e0 is located 0 bytes to the right of global variable 'whitelist_rw' defined in '../block.c:434:24' (0x5581a17161e0) of size 0
-  'whitelist_rw' is ascii string ''
-SUMMARY: AddressSanitizer: global-buffer-overflow /tmp/qemu/build/../block.c:442:10 in bdrv_format_is_whitelisted
-
-This doesn't happen on master. Since its not related to this patch, and
-I can't think of anything else to test, for the fuzzing changes to this
-patch:
-
+For the fuzzing changes in this patch:
 Reviewed-by: Alexander Bulekov <alxndr@bu.edu>
 
-Thanks!
 -Alex
 
-On 200810 1908, Paolo Bonzini wrote:
-> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
->  .gitlab-ci.yml                            |   6 +-
->  Makefile                                  |  34 +------
->  Makefile.objs                             |  32 -------
->  Makefile.target                           | 153 +-----------------------------
->  configure                                 |  24 ++---
->  docs/devel/blkverify.txt                  |   4 +-
->  docs/devel/testing.rst                    |   4 +-
->  docs/interop/live-block-operations.rst    |   4 +-
->  meson.build                               |  73 +++++++++++++-
->  os-posix.c                                |   2 +-
->  plugins/meson.build                       |  10 +-
->  rules.mak                                 |   1 -
->  scripts/device-crash-test                 |   2 +-
->  scripts/oss-fuzz/build.sh                 |  20 ++--
->  softmmu/Makefile.objs                     |   2 -
->  tests/Makefile.include                    |   4 +-
->  tests/acceptance/avocado_qemu/__init__.py |   3 +-
->  tests/data/acpi/rebuild-expected-aml.sh   |   2 +-
->  tests/multiboot/run_test.sh               |   2 +-
->  tests/qemu-iotests/check                  |   6 +-
->  tests/qtest/fuzz/Makefile.include         |  39 --------
->  tests/qtest/fuzz/i440fx_fuzz.c            |   4 +-
->  tests/qtest/fuzz/meson.build              |  35 +++++++
->  tests/qtest/fuzz/qtest_wrappers.c         |   2 +-
->  tests/qtest/fuzz/virtio_net_fuzz.c        |   3 +-
->  tests/qtest/fuzz/virtio_scsi_fuzz.c       |   8 +-
->  tests/qtest/libqos/qgraph.h               |   2 +-
->  tests/qtest/meson.build                   |   2 +-
->  tests/qtest/rtas-test.c                   |   2 +-
->  tests/tcg/configure.sh                    |   4 +-
->  30 files changed, 168 insertions(+), 321 deletions(-)
->  delete mode 100644 softmmu/Makefile.objs
->  delete mode 100644 tests/qtest/fuzz/Makefile.include
->  create mode 100644 tests/qtest/fuzz/meson.build
+>  meson.build                                      |   3 +
+>  tests/Makefile.include                           |  47 +---
+>  tests/meson.build                                |   1 +
+>  tests/qtest/Makefile.include                     | 332 -----------------------
+>  tests/qtest/ac97-test.c                          |   2 +-
+>  tests/qtest/acpi-utils.h                         |   2 +-
+>  tests/qtest/ahci-test.c                          |   2 +-
+>  tests/qtest/arm-cpu-features.c                   |   2 +-
+>  tests/qtest/boot-order-test.c                    |   2 +-
+>  tests/qtest/boot-sector.c                        |   2 +-
+>  tests/qtest/boot-sector.h                        |   2 +-
+>  tests/qtest/boot-serial-test.c                   |   2 +-
+>  tests/qtest/cdrom-test.c                         |   2 +-
+>  tests/qtest/dbus-vmstate-test.c                  |   2 +-
+>  tests/qtest/device-introspect-test.c             |   2 +-
+>  tests/qtest/device-plug-test.c                   |   2 +-
+>  tests/qtest/drive_del-test.c                     |   2 +-
+>  tests/qtest/ds1338-test.c                        |   2 +-
+>  tests/qtest/e1000-test.c                         |   2 +-
+>  tests/qtest/eepro100-test.c                      |   2 +-
+>  tests/qtest/endianness-test.c                    |   2 +-
+>  tests/qtest/es1370-test.c                        |   2 +-
+>  tests/qtest/fuzz/fuzz.c                          |   2 +-
+>  tests/qtest/fuzz/fuzz.h                          |   2 +-
+>  tests/qtest/fuzz/i440fx_fuzz.c                   |   2 +-
+>  tests/qtest/fuzz/qos_fuzz.c                      |   2 +-
+>  tests/qtest/fuzz/virtio_net_fuzz.c               |   2 +-
+>  tests/qtest/fw_cfg-test.c                        |   2 +-
+>  tests/qtest/hd-geo-test.c                        |   2 +-
+>  tests/qtest/hexloader-test.c                     |   2 +-
+>  tests/qtest/ide-test.c                           |   2 +-
+>  tests/qtest/ipoctal232-test.c                    |   2 +-
+>  tests/qtest/ivshmem-test.c                       |   2 +-
+>  tests/qtest/libqos/aarch64-xlnx-zcu102-machine.c |   4 +-
+>  tests/qtest/libqos/ahci.c                        |   6 +-
+>  tests/qtest/libqos/ahci.h                        |   6 +-
+>  tests/qtest/libqos/arm-imx25-pdk-machine.c       |   6 +-
+>  tests/qtest/libqos/arm-n800-machine.c            |   6 +-
+>  tests/qtest/libqos/arm-raspi2-machine.c          |   4 +-
+>  tests/qtest/libqos/arm-sabrelite-machine.c       |   4 +-
+>  tests/qtest/libqos/arm-smdkc210-machine.c        |   4 +-
+>  tests/qtest/libqos/arm-virt-machine.c            |   6 +-
+>  tests/qtest/libqos/arm-xilinx-zynq-a9-machine.c  |   4 +-
+>  tests/qtest/libqos/e1000e.c                      |   6 +-
+>  tests/qtest/libqos/e1000e.h                      |   2 +-
+>  tests/qtest/libqos/fw_cfg.c                      |   2 +-
+>  tests/qtest/libqos/i2c-imx.c                     |   2 +-
+>  tests/qtest/libqos/i2c-omap.c                    |   2 +-
+>  tests/qtest/libqos/i2c.c                         |   2 +-
+>  tests/qtest/libqos/i2c.h                         |   2 +-
+>  tests/qtest/libqos/libqos-pc.c                   |   6 +-
+>  tests/qtest/libqos/libqos-pc.h                   |   2 +-
+>  tests/qtest/libqos/libqos-spapr.c                |   6 +-
+>  tests/qtest/libqos/libqos-spapr.h                |   2 +-
+>  tests/qtest/libqos/libqos.c                      |   4 +-
+>  tests/qtest/libqos/libqos.h                      |   4 +-
+>  tests/qtest/{ => libqos}/libqtest.h              |   0
+>  tests/qtest/libqos/malloc-pc.c                   |   4 +-
+>  tests/qtest/libqos/malloc-pc.h                   |   2 +-
+>  tests/qtest/libqos/malloc-spapr.c                |   2 +-
+>  tests/qtest/libqos/malloc-spapr.h                |   2 +-
+>  tests/qtest/libqos/malloc.c                      |   2 +-
+>  tests/qtest/libqos/meson.build                   |  57 ++++
+>  tests/qtest/libqos/pci-pc.c                      |   2 +-
+>  tests/qtest/libqos/pci-pc.h                      |   6 +-
+>  tests/qtest/libqos/pci-spapr.c                   |   6 +-
+>  tests/qtest/libqos/pci-spapr.h                   |   6 +-
+>  tests/qtest/libqos/pci.c                         |   4 +-
+>  tests/qtest/libqos/pci.h                         |   2 +-
+>  tests/qtest/libqos/ppc64_pseries-machine.c       |   4 +-
+>  tests/qtest/libqos/qgraph.c                      |   4 +-
+>  tests/qtest/libqos/qgraph.h                      |   6 +-
+>  tests/qtest/libqos/qgraph_internal.h             |   4 +-
+>  tests/qtest/libqos/qos_external.c                |   8 +-
+>  tests/qtest/libqos/qos_external.h                |   4 +-
+>  tests/qtest/libqos/rtas.c                        |   2 +-
+>  tests/qtest/libqos/rtas.h                        |   2 +-
+>  tests/qtest/libqos/sdhci.c                       |   2 +-
+>  tests/qtest/libqos/sdhci.h                       |   2 +-
+>  tests/qtest/libqos/tpci200.c                     |   4 +-
+>  tests/qtest/libqos/usb.c                         |   2 +-
+>  tests/qtest/libqos/usb.h                         |   2 +-
+>  tests/qtest/libqos/virtio-9p.c                   |   4 +-
+>  tests/qtest/libqos/virtio-9p.h                   |   6 +-
+>  tests/qtest/libqos/virtio-balloon.c              |   4 +-
+>  tests/qtest/libqos/virtio-balloon.h              |   6 +-
+>  tests/qtest/libqos/virtio-blk.c                  |   4 +-
+>  tests/qtest/libqos/virtio-blk.h                  |   6 +-
+>  tests/qtest/libqos/virtio-mmio.c                 |   8 +-
+>  tests/qtest/libqos/virtio-mmio.h                 |   4 +-
+>  tests/qtest/libqos/virtio-net.c                  |   4 +-
+>  tests/qtest/libqos/virtio-net.h                  |   6 +-
+>  tests/qtest/libqos/virtio-pci.c                  |  14 +-
+>  tests/qtest/libqos/virtio-pci.h                  |   6 +-
+>  tests/qtest/libqos/virtio-rng.c                  |   4 +-
+>  tests/qtest/libqos/virtio-rng.h                  |   6 +-
+>  tests/qtest/libqos/virtio-scsi.c                 |   4 +-
+>  tests/qtest/libqos/virtio-scsi.h                 |   6 +-
+>  tests/qtest/libqos/virtio-serial.c               |   4 +-
+>  tests/qtest/libqos/virtio-serial.h               |   6 +-
+>  tests/qtest/libqos/virtio.c                      |   2 +-
+>  tests/qtest/libqos/virtio.h                      |   2 +-
+>  tests/qtest/libqos/x86_64_pc-machine.c           |   2 +-
+>  tests/qtest/libqtest-single.h                    |   2 +-
+>  tests/qtest/libqtest.c                           |   2 +-
+>  tests/qtest/m48t59-test.c                        |   2 +-
+>  tests/qtest/machine-none-test.c                  |   2 +-
+>  tests/qtest/megasas-test.c                       |   2 +-
+>  tests/qtest/meson.build                          | 257 ++++++++++++++++++
+>  tests/qtest/microbit-test.c                      |   2 +-
+>  tests/qtest/migration-helpers.h                  |   2 +-
+>  tests/qtest/migration-test.c                     |   4 +-
+>  tests/qtest/modules-test.c                       |   2 +-
+>  tests/qtest/ne2000-test.c                        |   2 +-
+>  tests/qtest/numa-test.c                          |   2 +-
+>  tests/qtest/nvme-test.c                          |   2 +-
+>  tests/qtest/pca9552-test.c                       |   2 +-
+>  tests/qtest/pci-test.c                           |   2 +-
+>  tests/qtest/pcnet-test.c                         |   2 +-
+>  tests/qtest/pflash-cfi02-test.c                  |   2 +-
+>  tests/qtest/pnv-xscom-test.c                     |   2 +-
+>  tests/qtest/prom-env-test.c                      |   2 +-
+>  tests/qtest/pvpanic-test.c                       |   2 +-
+>  tests/qtest/pxe-test.c                           |   2 +-
+>  tests/qtest/q35-test.c                           |   2 +-
+>  tests/qtest/qmp-cmd-test.c                       |   2 +-
+>  tests/qtest/qmp-test.c                           |   2 +-
+>  tests/qtest/qom-test.c                           |   2 +-
+>  tests/qtest/rtas-test.c                          |   2 +-
+>  tests/qtest/sdhci-test.c                         |   2 +-
+>  tests/qtest/spapr-phb-test.c                     |   2 +-
+>  tests/qtest/tco-test.c                           |   2 +-
+>  tests/qtest/test-filter-mirror.c                 |   2 +-
+>  tests/qtest/test-filter-redirector.c             |   2 +-
+>  tests/qtest/test-hmp.c                           |   2 +-
+>  tests/qtest/tpm-crb-swtpm-test.c                 |   2 +-
+>  tests/qtest/tpm-tis-device-swtpm-test.c          |   2 +-
+>  tests/qtest/tpm-tis-swtpm-test.c                 |   2 +-
+>  tests/qtest/tpm-util.c                           |   2 +-
+>  tests/qtest/tulip-test.c                         |   2 +-
+>  tests/qtest/virtio-rng-test.c                    |   2 +-
+>  tests/qtest/virtio-test.c                        |   2 +-
+>  tests/qtest/vmgenid-test.c                       |   2 +-
+>  tests/qtest/vmxnet3-test.c                       |   2 +-
+>  tests/qtest/wdt_ib700-test.c                     |   2 +-
+>  tests/test-qga.c                                 |   2 +-
+>  tests/test-qgraph.c                              |   5 +-
+>  147 files changed, 541 insertions(+), 589 deletions(-)
+>  delete mode 100644 tests/qtest/Makefile.include
+>  rename tests/qtest/{ => libqos}/libqtest.h (100%)
+>  create mode 100644 tests/qtest/libqos/meson.build
+>  create mode 100644 tests/qtest/meson.build
 > 
-> diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
-> index 9820066..b7967b9 100644
-> --- a/.gitlab-ci.yml
-> +++ b/.gitlab-ci.yml
-> @@ -265,9 +265,9 @@ build-tci:
->      - make run-tcg-tests-x86_64-softmmu
->      - make tests/qtest/boot-serial-test tests/qtest/cdrom-test tests/qtest/pxe-test
->      - for tg in $TARGETS ; do
-> -        export QTEST_QEMU_BINARY="${tg}-softmmu/qemu-system-${tg}" ;
-> +        export QTEST_QEMU_BINARY="./qemu-system-${tg}" ;
->          ./tests/qtest/boot-serial-test || exit 1 ;
->          ./tests/qtest/cdrom-test || exit 1 ;
->        done
-> -    - QTEST_QEMU_BINARY="x86_64-softmmu/qemu-system-x86_64" ./tests/qtest/pxe-test
-> -    - QTEST_QEMU_BINARY="s390x-softmmu/qemu-system-s390x" ./tests/qtest/pxe-test -m slow
-> +    - QTEST_QEMU_BINARY="./qemu-system-x86_64" ./tests/qtest/pxe-test
-> +    - QTEST_QEMU_BINARY="./qemu-system-s390x" ./tests/qtest/pxe-test -m slow
-> diff --git a/Makefile b/Makefile
-> index e3ccea0..ebda912 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -105,9 +105,6 @@ include $(SRC_PATH)/rules.mak
->  # lor is defined in rules.mak
->  CONFIG_BLOCK := $(call lor,$(CONFIG_SOFTMMU),$(CONFIG_TOOLS))
->  
-> -generated-files-y += target/s390x/gen-features.h
-> -target/s390x/gen-features.h: Makefile.ninja
-> -
->  generated-files-y += .git-submodule-status
->  
->  # Don't try to regenerate Makefile or configure
-> @@ -171,29 +168,6 @@ config-host.h-timestamp: config-host.mak
->  
->  TARGET_DIRS_RULES := $(foreach t, all fuzz clean install, $(addsuffix /$(t), $(TARGET_DIRS)))
->  
-> -SOFTMMU_ALL_RULES=$(filter %-softmmu/all, $(TARGET_DIRS_RULES))
-> -$(SOFTMMU_ALL_RULES): $(authz-obj-y)
-> -$(SOFTMMU_ALL_RULES): $(block-obj-y)
-> -$(SOFTMMU_ALL_RULES): $(chardev-obj-y)
-> -$(SOFTMMU_ALL_RULES): $(crypto-obj-y)
-> -$(SOFTMMU_ALL_RULES): $(io-obj-y)
-> -$(SOFTMMU_ALL_RULES): $(qom-obj-y)
-> -$(SOFTMMU_ALL_RULES): config-all-devices.mak
-> -
-> -SOFTMMU_FUZZ_RULES=$(filter %-softmmu/fuzz, $(TARGET_DIRS_RULES))
-> -$(SOFTMMU_FUZZ_RULES): $(authz-obj-y)
-> -$(SOFTMMU_FUZZ_RULES): $(block-obj-y)
-> -$(SOFTMMU_FUZZ_RULES): $(chardev-obj-y)
-> -$(SOFTMMU_FUZZ_RULES): $(crypto-obj-y)
-> -$(SOFTMMU_FUZZ_RULES): $(io-obj-y)
-> -$(SOFTMMU_FUZZ_RULES): config-all-devices.mak
-> -$(SOFTMMU_FUZZ_RULES): $(edk2-decompressed)
-> -
-> -# meson: this is sub-optimal but going away after conversion
-> -TARGET_DEPS = $(patsubst %,%-config-target.h, $(TARGET_DIRS))
-> -TARGET_DEPS += $(patsubst %,%-config-devices.h, $(filter %-softmmu,$(TARGET_DIRS)))
-> -TARGET_DEPS += $(patsubst %,libqemu-%.fa, $(TARGET_DIRS))
-> -
->  .PHONY: $(TARGET_DIRS_RULES)
->  # The $(TARGET_DIRS_RULES) are of the form SUBDIR/GOAL, so that
->  # $(dir $@) yields the sub-directory, and $(notdir $@) yields the sub-goal
-> @@ -236,11 +210,7 @@ slirp/all: .git-submodule-status
->  		CC="$(CC)" AR="$(AR)" 	LD="$(LD)" RANLIB="$(RANLIB)"	\
->  		CFLAGS="$(QEMU_CFLAGS) $(CFLAGS)" LDFLAGS="$(QEMU_LDFLAGS)")
->  
-> -$(filter %/all, $(TARGET_DIRS_RULES)): libqemuutil.a $(common-obj-y) \
-> -	$(qom-obj-y) block.syms qemu.syms
-> -
-> -$(filter %/fuzz, $(TARGET_DIRS_RULES)): libqemuutil.a $(common-obj-y) \
-> -	$(qom-obj-y) $(crypto-user-obj-$(CONFIG_USER_ONLY))
-> +$(filter %/all, $(TARGET_DIRS_RULES)):
->  
->  ROM_DIRS = $(addprefix pc-bios/, $(ROMS))
->  ROM_DIRS_RULES=$(foreach t, all clean, $(addsuffix /$(t), $(ROM_DIRS)))
-> @@ -262,8 +232,6 @@ Makefile: $(version-obj-y)
->  
->  ######################################################################
->  
-> -COMMON_LDADDS = libqemuutil.a
-> -
->  clean: recurse-clean
->  # avoid old build problems by removing potentially incorrect old files
->  	rm -f config.mak op-i386.h opc-i386.h gen-op-i386.h op-arm.h opc-arm.h gen-op-arm.h
-> diff --git a/Makefile.objs b/Makefile.objs
-> index 83622c5..5295c3a 100644
-> --- a/Makefile.objs
-> +++ b/Makefile.objs
-> @@ -34,37 +34,5 @@ io-obj-y = io/libio.fa
->  endif # CONFIG_SOFTMMU or CONFIG_TOOLS
->  
->  ######################################################################
-> -# Target independent part of system emulation. The long term path is to
-> -# suppress *all* target specific code in case of system emulation, i.e. a
-> -# single QEMU executable should support all CPUs and machines.
-> -
-> -ifeq ($(CONFIG_SOFTMMU),y)
-> -common-obj-y =
-> -
-> -common-obj-$(CONFIG_AUDIO_ALSA) += audio-alsa$(DSOSUF)
-> -common-obj-$(CONFIG_AUDIO_OSS) += audio-oss$(DSOSUF)
-> -common-obj-$(CONFIG_AUDIO_PA) += audio-pa$(DSOSUF)
-> -common-obj-$(CONFIG_AUDIO_SDL) += audio-sdl$(DSOSUF)
-> -
-> -common-obj-$(if $(CONFIG_CURSES),m) += ui-curses$(DSOSUF)
-> -common-obj-$(if $(CONFIG_GTK),m) += ui-gtk$(DSOSUF)
-> -common-obj-$(if $(CONFIG_SDL),m) += ui-sdl$(DSOSUF)
-> -common-obj-$(if $(CONFIG_SPICE),m) += ui-spice-app$(DSOSUF)
-> -
-> -common-obj-$(if $(CONFIG_CURL),m) += block-curl$(DSOSUF)
-> -common-obj-$(if $(CONFIG_GLUSTERFS),m) += block-gluster$(DSOSUF)
-> -common-obj-$(if $(CONFIG_LIBISCSI),m) += block-iscsi$(DSOSUF)
-> -common-obj-$(if $(CONFIG_LIBNFS),m) += block-nfs$(DSOSUF)
-> -common-obj-$(if $(CONFIG_LIBSSH),m) += block-ssh$(DSOSUF)
-> -common-obj-$(if $(CONFIG_RBD),m) += block-rbd$(DSOSUF)
-> -
-> -common-obj-$(if $(CONFIG_LZFSE),m) += block-dmg-lzfse$(DSOSUF)
-> -common-obj-$(if $(and $(CONFIG_BZIP2),$(CONFIG_DMG)),m) += block-dmg-bz2$(DSOSUF)
-> -
-> -common-obj-y += libqmp.fa
-> -
-> -endif # CONFIG_SOFTMMU
-> -
-> -######################################################################
->  # Resource file for Windows executables
->  version-obj-$(CONFIG_WIN32) += $(BUILD_DIR)/version.o
-> diff --git a/Makefile.target b/Makefile.target
-> index 2b7280b..8ee4c78 100644
-> --- a/Makefile.target
-> +++ b/Makefile.target
-> @@ -6,43 +6,16 @@ include ../config-host.mak
->  include config-target.mak
->  include $(SRC_PATH)/rules.mak
->  
-> -FULL_TARGET_NAME=$(TARGET_NAME)-$(if $(CONFIG_SOFTMMU),softmmu,linux-user)
-> -
-> -ifdef CONFIG_SOFTMMU
-> -include ../$(FULL_TARGET_NAME)-config-devices.mak
-> -endif
-> -
->  $(call set-vpath, $(SRC_PATH):$(BUILD_DIR))
-> -ifdef CONFIG_LINUX
-> -QEMU_CFLAGS += -isystem ../linux-headers
-> -endif
-> -QEMU_CFLAGS += -iquote .. -iquote $(SRC_PATH)/target/$(TARGET_BASE_ARCH) -DNEED_CPU_H
-> -
-> -QEMU_CFLAGS+=-iquote $(SRC_PATH)/include
-> -
-> -QEMU_CFLAGS += -DCONFIG_TARGET=\"../$(FULL_TARGET_NAME)-config-target.h\"
-> -QEMU_CFLAGS += -DCONFIG_DEVICES=\"../$(FULL_TARGET_NAME)-config-devices.h\"
->  
->  ifdef CONFIG_USER_ONLY
->  # user emulator name
->  QEMU_PROG=qemu-$(TARGET_NAME)
-> -QEMU_PROG_BUILD = $(QEMU_PROG)
->  else
->  # system emulator name
->  QEMU_PROG=qemu-system-$(TARGET_NAME)$(EXESUF)
-> -ifneq (,$(findstring -mwindows,$(SDL_LIBS)))
-> -# Terminate program name with a 'w' because the linker builds a windows executable.
-> -QEMU_PROGW=qemu-system-$(TARGET_NAME)w$(EXESUF)
-> -$(QEMU_PROG): $(QEMU_PROGW)
-> -	$(call quiet-command,$(OBJCOPY) --subsystem console $(QEMU_PROGW) $(QEMU_PROG),"GEN","$(TARGET_DIR)$(QEMU_PROG)")
-> -QEMU_PROG_BUILD = $(QEMU_PROGW)
-> -else
-> -QEMU_PROG_BUILD = $(QEMU_PROG)
-> -endif
->  endif
->  
-> -LIBQEMU = ../libqemu-$(FULL_TARGET_NAME).fa
-> -PROGS=$(QEMU_PROG) $(QEMU_PROGW)
->  STPFILES=
->  
->  ifdef CONFIG_TRACE_SYSTEMTAP
-> @@ -98,109 +71,10 @@ stap:
->  endif
->  .PHONY: stap
->  
-> -all: $(PROGS) stap
-> -
-> -# Dummy command so that make thinks it has done something
-> -	@true
-> -
-> -obj-y += $(LIBQEMU)
-> -
-> -obj-y += trace/
-> -
-> -#########################################################
-> -LIBS := $(libs_cpu) $(LIBS)
-> -
-> -#########################################################
-> -# Linux user emulator target
-> -
-> -ifdef CONFIG_LINUX_USER
-> -
-> -QEMU_CFLAGS+=-I$(SRC_PATH)/linux-user/$(TARGET_ABI_DIR) \
-> -             -I$(SRC_PATH)/linux-user/host/$(ARCH) \
-> -             -I$(SRC_PATH)/linux-user \
-> -             -Ilinux-user/$(TARGET_ABI_DIR)
-> -
-> -endif #CONFIG_LINUX_USER
-> -
-> -#########################################################
-> -# BSD user emulator target
-> -
-> -ifdef CONFIG_BSD_USER
-> -
-> -QEMU_CFLAGS+=-I$(SRC_PATH)/bsd-user -I$(SRC_PATH)/bsd-user/$(TARGET_ABI_DIR) \
-> -			 -I$(SRC_PATH)/bsd-user/$(HOST_VARIANT_DIR)
-> -
-> -endif #CONFIG_BSD_USER
-> -
-> -#########################################################
-> -# System emulator target
-> -ifdef CONFIG_SOFTMMU
-> -obj-y += softmmu/
-> -obj-y += gdbstub.o
-> -LIBS := $(libs_softmmu) $(LIBS)
-> -
-> -# Temporary until emulators are linked by Meson
-> -LIBS := $(LIBS) @../block.syms @../qemu.syms
-> -ifneq ($(CONFIG_MODULES),y)
-> -LIBS := $(LIBS) $(ALSA_LIBS) $(OSS_LIBS) $(PULSE_LIBS) $(SDL_LIBS)
-> -LIBS := $(LIBS) $(GTK_LIBS) $(VTE_LIBS) $(X11_LIBS) $(CURSES_LIBS) $(ICONV_LIBS) $(GIO_LIBS)
-> -endif
-> -LIBS := $(LIBS) $(BRLAPI_LIBS) $(SDL_LIBS) $(SPICE_LIBS) $(OPENGL_LIBS) $(SECCOMP_LIBS)
-> -LIBS := $(LIBS) $(COREAUDIO_LIBS) $(DSOUND_LIBS)
-> -LIBS := $(LIBS) $(VDE_LIBS) $(SLIRP_LIBS)
-> -LIBS := $(LIBS) $(LIBUSB_LIBS) $(SMARTCARD_LIBS) $(USB_REDIR_LIBS)
-> -LIBS := $(LIBS) $(VIRGL_LIBS) $(CURSES_LIBS)
-> -
-> -ifeq ($(CONFIG_PLUGIN),y)
-> -ifdef CONFIG_HAS_LD_DYNAMIC_LIST
-> -LIBS += -Wl,--dynamic-list=$(BUILD_DIR)/qemu-plugins-ld.symbols
-> -else
-> -ifdef CONFIG_HAS_LD_EXPORTED_SYMBOLS_LIST
-> -LIBS += -Wl,-exported_symbols_list,$(BUILD_DIR)/qemu-plugins-ld64.symbols
-> -endif
-> -endif
-> -endif
-> -
-> -generated-files-y += hmp-commands.h hmp-commands-info.h
-> -
-> -endif # CONFIG_SOFTMMU
-> -
-> -dummy := $(call unnest-vars,,obj-y)
-> -all-obj-y := $(obj-y)
-> -
-> -include $(SRC_PATH)/Makefile.objs
-> -dummy := $(call fix-paths,../,, \
-> -              authz-obj-y \
-> -              block-obj-y \
-> -              chardev-obj-y \
-> -              crypto-obj-y \
-> -              io-obj-y \
-> -              qom-obj-y)
-> -dummy := $(call unnest-vars,..,common-obj-y)
-> -
-> -all-obj-y += $(common-obj-y)
-> -all-obj-y += $(qom-obj-y)
-> -all-obj-$(CONFIG_SOFTMMU) += $(authz-obj-y)
-> -all-obj-$(CONFIG_SOFTMMU) += $(block-obj-y) $(chardev-obj-y)
-> -all-obj-$(CONFIG_SOFTMMU) += $(crypto-obj-y)
-> -all-obj-$(CONFIG_SOFTMMU) += $(io-obj-y)
-> -
-> -ifdef CONFIG_SOFTMMU
-> -$(QEMU_PROG_BUILD): ../$(FULL_TARGET_NAME)-config-devices.mak
-> -endif
-> -
-> -COMMON_LDADDS = ../libqemuutil.a
-> -
-> -# build either PROG or PROGW
-> -$(QEMU_PROG_BUILD): $(all-obj-y) $(COMMON_LDADDS) $(softmmu-main-y)
-> -	$(call LINK, $(filter-out %.mak, $^))
-> -ifdef CONFIG_DARWIN
-> -	$(call quiet-command,Rez -append $(SRC_PATH)/pc-bios/qemu.rsrc -o $@,"REZ","$(TARGET_DIR)$@")
-> -	$(call quiet-command,SetFile -a C $@,"SETFILE","$(TARGET_DIR)$@")
-> -endif
-> +all: stap
->  
-> -clean: clean-target
-> -	rm -f *.a *~ $(PROGS)
-> +clean:
-> +	rm -f *.a *~
->  	rm -f $(shell find . -name '*.[od]')
->  	rm -f hmp-commands.h gdbstub-xml.c
->  	rm -f trace/generated-helpers.c trace/generated-helpers.c-timestamp
-> @@ -208,26 +82,7 @@ ifdef CONFIG_TRACE_SYSTEMTAP
->  	rm -f *.stp
->  endif
->  
-> -ifdef CONFIG_FUZZ
-> -include $(SRC_PATH)/tests/qtest/fuzz/Makefile.include
-> -include $(SRC_PATH)/tests/qtest/Makefile.include
-> -
-> -fuzz: fuzz-vars
-> -fuzz-vars: QEMU_CFLAGS := $(FUZZ_CFLAGS) $(QEMU_CFLAGS)
-> -fuzz-vars: QEMU_LDFLAGS := $(FUZZ_LDFLAGS) $(QEMU_LDFLAGS)
-> -fuzz-vars: $(QEMU_PROG_FUZZ)
-> -dummy := $(call unnest-vars,, fuzz-obj-y)
-> -
-> -
-> -$(QEMU_PROG_FUZZ): config-devices.mak $(all-obj-y) $(COMMON_LDADDS) $(fuzz-obj-y)
-> -	$(call LINK, $(filter-out %.mak, $^))
-> -
-> -endif
-> -
->  install: all
-> -ifneq ($(PROGS),)
-> -	$(call install-prog,$(PROGS),$(DESTDIR)$(bindir))
-> -endif
->  ifdef CONFIG_TRACE_SYSTEMTAP
->  	$(INSTALL_DIR) "$(DESTDIR)$(qemu_datadir)/../systemtap/tapset"
->  	$(INSTALL_DATA) $(QEMU_PROG).stp-installed "$(DESTDIR)$(qemu_datadir)/../systemtap/tapset/$(QEMU_PROG).stp"
-> @@ -235,4 +90,4 @@ ifdef CONFIG_TRACE_SYSTEMTAP
->  	$(INSTALL_DATA) $(QEMU_PROG)-log.stp "$(DESTDIR)$(qemu_datadir)/../systemtap/tapset/$(QEMU_PROG)-log.stp"
->  endif
->  
-> -Makefile: $(generated-files-y)
-> +.PHONY: all clean install
-> diff --git a/configure b/configure
-> index a912055..23e93aa 100755
-> --- a/configure
-> +++ b/configure
-> @@ -316,7 +316,6 @@ audio_drv_list=""
->  block_drv_rw_whitelist=""
->  block_drv_ro_whitelist=""
->  host_cc="cc"
-> -libs_cpu=""
->  libs_softmmu=""
->  libs_tools=""
->  audio_win_int=""
-> @@ -5417,7 +5416,6 @@ case "$capstone" in
->      else
->        LIBCAPSTONE=libcapstone.a
->      fi
-> -    libs_cpu="-L$PWD/capstone -lcapstone $libs_cpu"
->      capstone_libs="-L$PWD/capstone -lcapstone"
->      capstone_cflags="-I${source_path}/capstone/include"
->      ;;
-> @@ -5426,7 +5424,6 @@ case "$capstone" in
->      capstone_libs="$($pkg_config --libs capstone)"
->      capstone_cflags="$($pkg_config --cflags capstone)"
->      QEMU_CFLAGS="$QEMU_CFLAGS $($pkg_config --cflags capstone)"
-> -    libs_cpu="$($pkg_config --libs capstone) $libs_cpu"
->      ;;
->  
->    no)
-> @@ -6344,7 +6341,10 @@ fi
->  if test "$fuzzing" = "yes" ; then
->    write_c_fuzzer_skeleton
->    if compile_prog "$CPU_CFLAGS -Werror -fsanitize=fuzzer" ""; then
-> -      have_fuzzer=yes
-> +    have_fuzzer=yes
-> +  else
-> +    error_exit "Your compiler doesn't support -fsanitize=fuzzer"
-> +    exit 1
->    fi
->  fi
->  
-> @@ -6844,7 +6844,6 @@ echo "qemu_helperdir=$libexecdir" >> $config_host_mak
->  echo "qemu_localedir=$qemu_localedir" >> $config_host_mak
->  echo "qemu_icondir=$qemu_icondir" >> $config_host_mak
->  echo "qemu_desktopdir=$qemu_desktopdir" >> $config_host_mak
-> -echo "libs_cpu=$libs_cpu" >> $config_host_mak
->  echo "libs_softmmu=$libs_softmmu" >> $config_host_mak
->  echo "GIT=$git" >> $config_host_mak
->  echo "GIT_SUBMODULES=$git_submodules" >> $config_host_mak
-> @@ -7709,14 +7708,7 @@ if test "$have_mlockall" = "yes" ; then
->    echo "HAVE_MLOCKALL=y" >> $config_host_mak
->  fi
->  if test "$fuzzing" = "yes" ; then
-> -  if test "$have_fuzzer" = "yes"; then
-> -    FUZZ_LDFLAGS=" -fsanitize=fuzzer"
-> -    FUZZ_CFLAGS=" -fsanitize=fuzzer"
-> -    QEMU_CFLAGS="$QEMU_CFLAGS -fsanitize=fuzzer-no-link"
-> -  else
-> -    error_exit "Your compiler doesn't support -fsanitize=fuzzer"
-> -    exit 1
-> -  fi
-> +  QEMU_CFLAGS="$QEMU_CFLAGS -fsanitize=fuzzer-no-link"
->  fi
->  
->  if test "$plugins" = "yes" ; then
-> @@ -7832,8 +7824,6 @@ if test "$libudev" != "no"; then
->  fi
->  if test "$fuzzing" != "no"; then
->      echo "CONFIG_FUZZ=y" >> $config_host_mak
-> -    echo "FUZZ_CFLAGS=$FUZZ_CFLAGS" >> $config_host_mak
-> -    echo "FUZZ_LDFLAGS=$FUZZ_LDFLAGS" >> $config_host_mak
->  fi
->  
->  if test "$edk2_blobs" = "yes" ; then
-> @@ -8303,8 +8293,8 @@ if test "$TARGET_ARCH" = "s390x" && test "$target_softmmu" = "yes" && \
->      fi
->  fi
->  
-> -echo "QEMU_LDFLAGS+=$ldflags" >> $config_target_mak
-> -echo "QEMU_CFLAGS+=$cflags" >> $config_target_mak
-> +echo "QEMU_LDFLAGS=$ldflags" >> $config_target_mak
-> +echo "QEMU_CFLAGS=$cflags" >> $config_target_mak
->  
->  done # for target in $targets
->  
-> diff --git a/docs/devel/blkverify.txt b/docs/devel/blkverify.txt
-> index d556dc4..aca826c 100644
-> --- a/docs/devel/blkverify.txt
-> +++ b/docs/devel/blkverify.txt
-> @@ -62,8 +62,8 @@ A more realistic scenario is verifying the installation of a guest OS:
->  
->      $ ./qemu-img create raw.img 16G
->      $ ./qemu-img create -f qcow2 test.qcow2 16G
-> -    $ x86_64-softmmu/qemu-system-x86_64 -cdrom debian.iso \
-> -                                        -drive file=blkverify:raw.img:test.qcow2
-> +    $ ./qemu-system-x86_64 -cdrom debian.iso \
-> +          -drive file=blkverify:raw.img:test.qcow2
->  
->  If the installation is aborted when blkverify detects corruption, use qemu-io
->  to explore the contents of the disk image at the sector in question.
-> diff --git a/docs/devel/testing.rst b/docs/devel/testing.rst
-> index a426469..196e3bc 100644
-> --- a/docs/devel/testing.rst
-> +++ b/docs/devel/testing.rst
-> @@ -819,7 +819,7 @@ the following approaches:
->  1) Set ``qemu_bin``, and use the given binary
->  
->  2) Do not set ``qemu_bin``, and use a QEMU binary named like
-> -   "${arch}-softmmu/qemu-system-${arch}", either in the current
-> +   "qemu-system-${arch}", either in the current
->     working directory, or in the current source tree.
->  
->  The resulting ``qemu_bin`` value will be preserved in the
-> @@ -886,7 +886,7 @@ like the following:
->  
->  .. code::
->  
-> -  PARAMS (key=qemu_bin, path=*, default=x86_64-softmmu/qemu-system-x86_64) => 'x86_64-softmmu/qemu-system-x86_64
-> +  PARAMS (key=qemu_bin, path=*, default=./qemu-system-x86_64) => './qemu-system-x86_64
->  
->  arch
->  ~~~~
-> diff --git a/docs/interop/live-block-operations.rst b/docs/interop/live-block-operations.rst
-> index 48afdc7..e13f5a2 100644
-> --- a/docs/interop/live-block-operations.rst
-> +++ b/docs/interop/live-block-operations.rst
-> @@ -129,7 +129,7 @@ To show some example invocations of command-line, we will use the
->  following invocation of QEMU, with a QMP server running over UNIX
->  socket::
->  
-> -    $ ./x86_64-softmmu/qemu-system-x86_64 -display none -no-user-config \
-> +    $ ./qemu-system-x86_64 -display none -no-user-config \
->          -M q35 -nodefaults -m 512 \
->          -blockdev node-name=node-A,driver=qcow2,file.driver=file,file.node-name=file,file.filename=./a.qcow2 \
->          -device virtio-blk,drive=node-A,id=virtio0 \
-> @@ -694,7 +694,7 @@ instance, with the following invocation.  (As noted earlier, for
->  simplicity's sake, the destination QEMU is started on the same host, but
->  it could be located elsewhere)::
->  
-> -    $ ./x86_64-softmmu/qemu-system-x86_64 -display none -no-user-config \
-> +    $ ./qemu-system-x86_64 -display none -no-user-config \
->          -M q35 -nodefaults -m 512 \
->          -blockdev node-name=node-TargetDisk,driver=qcow2,file.driver=file,file.node-name=file,file.filename=./target-disk.qcow2 \
->          -device virtio-blk,drive=node-TargetDisk,id=virtio0 \
 > diff --git a/meson.build b/meson.build
-> index 420e60b..797e69d 100644
+> index 534ed4c..2ff1be0 100644
 > --- a/meson.build
 > +++ b/meson.build
-> @@ -203,10 +203,12 @@ brlapi = not_found
->  if 'CONFIG_BRLAPI' in config_host
->    brlapi = declare_dependency(link_args: config_host['BRLAPI_LIBS'].split())
->  endif
-> +sdlwindows = false
->  sdl = not_found
->  if 'CONFIG_SDL' in config_host
->    sdl = declare_dependency(compile_args: config_host['SDL_CFLAGS'].split(),
->                             link_args: config_host['SDL_LIBS'].split())
-> +  sdlwindows = config_host['SDL_LIBS'].contains('-mwindows')
->  endif
->  rbd = not_found
->  if 'CONFIG_RBD' in config_host
-> @@ -517,6 +519,7 @@ user_ss = ss.source_set()
->  bsd_user_ss = ss.source_set()
->  linux_user_ss = ss.source_set()
->  specific_ss = ss.source_set()
-> +specific_fuzz_ss = ss.source_set()
+> @@ -523,6 +523,9 @@ subdir('nbd')
+>  subdir('scsi')
+>  subdir('block')
 >  
->  modules = {}
->  hw_arch = {}
-> @@ -731,6 +734,7 @@ specific_ss.add_all(when: 'CONFIG_LINUX_USER', if_true: linux_user_ss)
->  
->  # needed for fuzzing binaries
->  subdir('tests/qtest/libqos')
-> +subdir('tests/qtest/fuzz')
->  
+> +# needed for fuzzing binaries
+> +subdir('tests/qtest/libqos')
+> +
 >  mods = []
 >  block_mods = []
-> @@ -785,6 +789,9 @@ libqmp = static_library('qmp', qmp_ss.sources(),
->  
->  qmp = declare_dependency(link_whole: [libqmp])
->  
-> +softmmu_ss.add(authz, block, chardev, crypto, io, qmp)
-> +common_ss.add(qom, qemuutil)
-> +
->  foreach m : mods
->    shared_module(m['dir'] + '-' + m['name'],
->                  name_prefix: '',
-> @@ -793,7 +800,7 @@ foreach m : mods
->                  install_dir: config_host['qemu_moddir'])
->  endforeach
->  
-> -common_ss.add_all(when: 'CONFIG_SOFTMMU', if_true: softmmu_ss)
-> +common_ss.add_all(when: 'CONFIG_SOFTMMU', if_true: [softmmu_ss])
->  common_ss.add_all(when: 'CONFIG_USER_ONLY', if_true: user_ss)
->  
->  common_all = common_ss.apply(config_all, strict: false)
-> @@ -805,11 +812,17 @@ common_all = static_library('common',
->  
->  feature_to_c = find_program('scripts/feature_to_c.sh')
->  
-> +emulators = []
->  foreach target : target_dirs
->    config_target = config_target_mak[target]
->    target_name = config_target['TARGET_NAME']
->    arch = config_target['TARGET_BASE_ARCH']
->    arch_srcs = []
-> +  arch_deps = []
-> +  c_args = config_target['QEMU_CFLAGS'].split() + ['-DNEED_CPU_H',
-> +                  '-DCONFIG_TARGET="@0@-config-target.h"'.format(target),
-> +                  '-DCONFIG_DEVICES="@0@-config-devices.h"'.format(target)]
-> +  link_args = config_target['QEMU_LDFLAGS'].split()
->  
->    target_inc = [include_directories('target' / config_target['TARGET_BASE_ARCH'])]
->    if host_machine.system() == 'linux'
-> @@ -820,12 +833,15 @@ foreach target : target_dirs
->      target_type='system'
->      t = target_softmmu_arch[arch].apply(config_target, strict: false)
->      arch_srcs += t.sources()
-> +    arch_deps += t.dependencies()
->  
->      hw_dir = target_name == 'sparc64' ? 'sparc64' : arch
->      hw = hw_arch[hw_dir].apply(config_target, strict: false)
->      arch_srcs += hw.sources()
-> +    arch_deps += hw.dependencies()
->  
->      arch_srcs += config_devices_h[target]
-> +    link_args += ['@block.syms', '@qemu.syms']
->    else
->      abi = config_target['TARGET_ABI_DIR']
->      target_type='user'
-> @@ -862,9 +878,11 @@ foreach target : target_dirs
->  
->    t = target_arch[arch].apply(config_target, strict: false)
->    arch_srcs += t.sources()
-> +  arch_deps += t.dependencies()
->  
->    target_common = common_ss.apply(config_target, strict: false)
->    objects = common_all.extract_objects(target_common.sources())
-> +  deps = target_common.dependencies()
->  
->    # TODO: Change to generator once obj-y goes away
->    config_target_h = custom_target(target + '-config-target.h',
-> @@ -875,15 +893,60 @@ foreach target : target_dirs
->  
->    target_specific = specific_ss.apply(config_target, strict: false)
->    arch_srcs += target_specific.sources()
-> +  arch_deps += target_specific.dependencies()
->  
-> -  static_library('qemu-' + target,
-> +  lib = static_library('qemu-' + target,
->                   sources: arch_srcs + [config_target_h] + genh,
->                   objects: objects,
->                   include_directories: target_inc,
-> -                 c_args: ['-DNEED_CPU_H',
-> -                          '-DCONFIG_TARGET="@0@-config-target.h"'.format(target),
-> -                          '-DCONFIG_DEVICES="@0@-config-devices.h"'.format(target)],
-> +                 c_args: c_args,
-> +                 build_by_default: false,
->                   name_suffix: 'fa')
-> +
-> +  if target.endswith('-softmmu')
-> +    execs = [{
-> +      'name': 'qemu-system-' + target_name,
-> +      'gui': false,
-> +      'sources': files('softmmu/main.c'),
-> +      'dependencies': []
-> +    }]
-> +    if sdlwindows
-> +      execs += [{
-> +        'name': 'qemu-system-' + target_name + 'w',
-> +        'gui': true,
-> +        'sources': files('softmmu/main.c'),
-> +        'dependencies': []
-> +      }]
-> +    endif
-> +    if config_host.has_key('CONFIG_FUZZ')
-> +      specific_fuzz = specific_fuzz_ss.apply(config_target, strict: false)
-> +      execs += [{
-> +        'name': 'qemu-fuzz-' + target_name,
-> +        'gui': false,
-> +        'sources': specific_fuzz.sources(),
-> +        'dependencies': specific_fuzz.dependencies(),
-> +        'link_depends': [files('tests/qtest/fuzz/fork_fuzz.ld')],
-> +      }]
-> +    endif
-> +  else
-> +    execs = [{
-> +      'name': 'qemu-' + target_name,
-> +      'gui': false,
-> +      'sources': [],
-> +      'dependencies': []
-> +    }]
-> +  endif
-> +  foreach exe: execs
-> +    emulators += executable(exe['name'], exe['sources'],
-> +               install: true,
-> +               c_args: c_args,
-> +               dependencies: arch_deps + deps + exe['dependencies'],
-> +               objects: lib.extract_all_objects(recursive: true),
-> +               link_language: 'cpp',
-> +               link_depends: [block_syms, qemu_syms] + exe.get('link_depends', []),
-> +               link_args: link_args,
-> +               gui_app: exe['gui'])
-> +  endforeach
->  endforeach
->  
->  # Other build targets
-> diff --git a/os-posix.c b/os-posix.c
-> index 3572db3..8334193 100644
-> --- a/os-posix.c
-> +++ b/os-posix.c
-> @@ -96,7 +96,7 @@ char *os_find_datadir(void)
->      exec_dir = qemu_get_exec_dir();
->      g_return_val_if_fail(exec_dir != NULL, NULL);
->  
-> -    dir = g_build_filename(exec_dir, "..", "pc-bios", NULL);
-> +    dir = g_build_filename(exec_dir, "pc-bios", NULL);
->      if (g_file_test(dir, G_FILE_TEST_IS_DIR)) {
->          return g_steal_pointer(&dir);
->      }
-> diff --git a/plugins/meson.build b/plugins/meson.build
-> index 9608e52..e777230 100644
-> --- a/plugins/meson.build
-> +++ b/plugins/meson.build
-> @@ -1,5 +1,13 @@
-> +if 'CONFIG_HAS_LD_DYNAMIC_LIST' in config_host
-> +  plugin_ldflags = ['-Wl,--dynamic-list=' + (meson.build_root() / 'qemu-plugins-ld.symbols')]
-> +elif 'CONFIG_HAS_LD_EXPORTED_SYMBOLS_LIST' in config_host
-> +  plugin_ldflags = ['-Wl,-exported_symbols_list,' + (meson.build_root() / 'qemu-plugins-ld64.symbols')]
-> +else
-> +  plugin_ldflags = []
-> +endif
-> +
->  specific_ss.add(when: 'CONFIG_PLUGIN', if_true: [files(
->    'loader.c',
->    'core.c',
->    'api.c',
-> -)])
-> +), declare_dependency(link_args: plugin_ldflags)])
-> diff --git a/rules.mak b/rules.mak
-> index 8285fe5..6488dc3 100644
-> --- a/rules.mak
-> +++ b/rules.mak
-> @@ -21,7 +21,6 @@ MAKEFLAGS += -rR
->  %.cpp:
->  %.m:
->  %.mak:
-> -clean-target:
->  
->  # Flags for dependency generation
->  QEMU_DGFLAGS += -MMD -MP -MT $@ -MF $(@D)/$(*F).d
-> diff --git a/scripts/device-crash-test b/scripts/device-crash-test
-> index 305d042..866baf7 100755
-> --- a/scripts/device-crash-test
-> +++ b/scripts/device-crash-test
-> @@ -383,7 +383,7 @@ def binariesToTest(args, testcase):
->      if args.qemu:
->          r = args.qemu
->      else:
-> -        r = glob.glob('./*-softmmu/qemu-system-*')
-> +        r = glob.glob('./qemu-system-*')
->      return r
->  
->  
-> diff --git a/scripts/oss-fuzz/build.sh b/scripts/oss-fuzz/build.sh
-> index 52430cb..f0b7442 100755
-> --- a/scripts/oss-fuzz/build.sh
-> +++ b/scripts/oss-fuzz/build.sh
-> @@ -64,24 +64,26 @@ mkdir -p "$DEST_DIR/lib/"  # Copy the shared libraries here
->  
->  # Build once to get the list of dynamic lib paths, and copy them over
->  ../configure --disable-werror --cc="$CC" --cxx="$CXX" --enable-fuzzing \
-> +    --prefix="$DEST_DIR" --bindir="$DEST_DIR" --datadir="$DEST_DIR/data/" \
->      --extra-cflags="$EXTRA_CFLAGS" --target-list="i386-softmmu"
->  
-> -if ! make "-j$(nproc)" i386-softmmu/fuzz; then
-> +if ! make "-j$(nproc)" qemu-fuzz-i386; then
->      fatal "Build failed. Please specify a compiler with fuzzing support"\
->            "using the \$CC and \$CXX environemnt variables"\
->            "\nFor example: CC=clang CXX=clang++ $0"
->  fi
->  
-> -for i in $(ldd ./i386-softmmu/qemu-fuzz-i386 | cut -f3 -d' '); do
-> +for i in $(ldd ./qemu-fuzz-i386 | cut -f3 -d' '); do
->      cp "$i" "$DEST_DIR/lib/"
->  done
-> -rm ./i386-softmmu/qemu-fuzz-i386
-> +rm qemu-fuzz-i386
->  
->  # Build a second time to build the final binary with correct rpath
-> -../configure --bindir="$DEST_DIR" --datadir="$DEST_DIR/data/" --disable-werror \
-> -    --cc="$CC" --cxx="$CXX" --extra-cflags="$EXTRA_CFLAGS" \
-> -    --extra-ldflags="-Wl,-rpath,'\$\$ORIGIN/lib'"
-> -make "-j$(nproc)" i386-softmmu/fuzz
-> +../configure --disable-werror --cc="$CC" --cxx="$CXX" --enable-fuzzing \
-> +    --prefix="$DEST_DIR" --bindir="$DEST_DIR" --datadir="$DEST_DIR/data/" \
-> +    --extra-cflags="$EXTRA_CFLAGS" --extra-ldflags="-Wl,-rpath,'\$\$ORIGIN/lib'" \
-> +    --target-list="i386-softmmu"
-> +make "-j$(nproc)" qemu-fuzz-i386 V=1
->  
->  # Copy over the datadir
->  cp  -r ../pc-bios/ "$DEST_DIR/pc-bios"
-> @@ -90,9 +92,9 @@ cp  -r ../pc-bios/ "$DEST_DIR/pc-bios"
->  # of available fuzz-targets. Copy over the qemu-fuzz-i386, naming it according
->  # to each available fuzz target (See 05509c8e6d fuzz: select fuzz target using
->  # executable name)
-> -for target in $(./i386-softmmu/qemu-fuzz-i386 | awk '$1 ~ /\*/  {print $2}');
-> +for target in $(./qemu-fuzz-i386 | awk '$1 ~ /\*/  {print $2}');
->  do
-> -    cp ./i386-softmmu/qemu-fuzz-i386 "$DEST_DIR/qemu-fuzz-i386-target-$target"
-> +    cp qemu-fuzz-i386 "$DEST_DIR/qemu-fuzz-i386-target-$target"
->  done
->  
->  echo "Done. The fuzzers are located in $DEST_DIR"
-> diff --git a/softmmu/Makefile.objs b/softmmu/Makefile.objs
-> deleted file mode 100644
-> index ebcfd15..0000000
-> --- a/softmmu/Makefile.objs
-> +++ /dev/null
-> @@ -1,2 +0,0 @@
-> -softmmu-main-y = softmmu/main.o
-> -main.o-cflags := $(GPROF_CFLAGS) $(SDL_CFLAGS)
+>  softmmu_mods = []
 > diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index b6d9661..c3874ca 100644
+> index 676d099..66acf9c 100644
 > --- a/tests/Makefile.include
 > +++ b/tests/Makefile.include
-> @@ -457,7 +457,7 @@ build-tcg-tests-%: $(if $(CONFIG_PLUGIN),plugins)
->  	       	V="$(V)" TARGET="$*" guest-tests, \
->  		"BUILD", "TCG tests for $*")
+> @@ -109,6 +109,7 @@ check-unit-y += tests/test-qht$(EXESUF)
+>  check-unit-y += tests/test-qht-par$(EXESUF)
+>  check-unit-y += tests/test-bitops$(EXESUF)
+>  check-unit-y += tests/test-bitcnt$(EXESUF)
+> +check-unit-y += tests/test-qgraph$(EXESUF)
+>  check-unit-y += tests/check-qom-interface$(EXESUF)
+>  check-unit-y += tests/check-qom-proplist$(EXESUF)
+>  check-unit-y += tests/test-qemu-opts$(EXESUF)
+> @@ -306,19 +307,6 @@ tests/test-qapi-gen-timestamp: \
+>  	@rm -f tests/test-qapi-doc.texi
+>  	@>$@
 >  
-> -run-tcg-tests-%: build-tcg-tests-% %/all
-> +run-tcg-tests-%: build-tcg-tests-% all
->  	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) \
->  		-f $(SRC_PATH)/tests/tcg/Makefile.qemu \
->  		SRC_PATH=$(SRC_PATH) SPEED="$(SPEED)" \
-> @@ -485,7 +485,7 @@ QEMU_IOTESTS_HELPERS-$(call land,$(CONFIG_SOFTMMU),$(CONFIG_LINUX)) = tests/qemu
->  .PHONY: check-tests/check-block.sh
->  check-tests/check-block.sh: tests/check-block.sh qemu-img$(EXESUF) \
->  		qemu-io$(EXESUF) qemu-nbd$(EXESUF) $(QEMU_IOTESTS_HELPERS-y) \
-> -		$(patsubst %,%/all,$(filter %-softmmu,$(TARGET_DIRS)))
-> +		$(patsubst %-softmmu,qemu-system-%,$(filter %-softmmu,$(TARGET_DIRS)))
->  	@$<
+> -tests/qtest/dbus-vmstate1.h tests/qtest/dbus-vmstate1.c: tests/qtest/dbus-vmstate1-gen-timestamp ;
+> -tests/qtest/dbus-vmstate1-gen-timestamp: $(SRC_PATH)/tests/qtest/dbus-vmstate1.xml
+> -	$(call quiet-command,$(GDBUS_CODEGEN) $< \
+> -		--interface-prefix org.qemu --generate-c-code tests/qtest/dbus-vmstate1, \
+> -		"GEN","$(@:%-timestamp=%)")
+> -	@>$@
+> -
+> -tests/qtest/dbus-vmstate-test.o-cflags := -DSRCDIR="$(SRC_PATH)"
+> -tests/qtest/dbus-vmstate1.o-cflags := $(GIO_CFLAGS)
+> -tests/qtest/dbus-vmstate1.o-libs := $(GIO_LIBS)
+> -
+> -tests/qtest/dbus-vmstate-test.o: tests/qtest/dbus-vmstate1.h
+> -
+>  tests/test-string-output-visitor$(EXESUF): tests/test-string-output-visitor.o $(test-qapi-obj-y)
+>  tests/test-string-input-visitor$(EXESUF): tests/test-string-input-visitor.o $(test-qapi-obj-y)
+>  tests/test-qmp-event$(EXESUF): tests/test-qmp-event.o $(test-qapi-obj-y) tests/test-qapi-emit-events.o tests/test-qapi-events.o
+> @@ -333,6 +321,7 @@ tests/test-shift128$(EXESUF): tests/test-shift128.o $(test-util-obj-y)
+>  tests/test-mul64$(EXESUF): tests/test-mul64.o $(test-util-obj-y)
+>  tests/test-bitops$(EXESUF): tests/test-bitops.o $(test-util-obj-y)
+>  tests/test-bitcnt$(EXESUF): tests/test-bitcnt.o $(test-util-obj-y)
+> +tests/test-qgraph$(EXESUF): tests/test-qgraph.o tests/qtest/libqos/qgraph.o $(test-util-obj-y)
+>  tests/test-crypto-hash$(EXESUF): tests/test-crypto-hash.o $(test-crypto-obj-y)
+>  tests/benchmark-crypto-hash$(EXESUF): tests/benchmark-crypto-hash.o $(test-crypto-obj-y)
+>  tests/test-crypto-hmac$(EXESUF): tests/test-crypto-hmac.o $(test-crypto-obj-y)
+> @@ -396,10 +385,8 @@ tests/migration/initrd-stress.img: tests/migration/stress$(EXESUF)
+>  	rm $(INITRD_WORK_DIR)/init
+>  	rmdir $(INITRD_WORK_DIR)
 >  
->  # Python venv for running tests
-> diff --git a/tests/acceptance/avocado_qemu/__init__.py b/tests/acceptance/avocado_qemu/__init__.py
-> index 77d1c1d..db9c0f5 100644
-> --- a/tests/acceptance/avocado_qemu/__init__.py
-> +++ b/tests/acceptance/avocado_qemu/__init__.py
-> @@ -57,8 +57,7 @@ def pick_default_qemu_bin(arch=None):
->      # qemu binary path does not match arch for powerpc, handle it
->      if 'ppc64le' in arch:
->          arch = 'ppc64'
-> -    qemu_bin_relative_path = os.path.join("%s-softmmu" % arch,
-> -                                          "qemu-system-%s" % arch)
-> +    qemu_bin_relative_path = "./qemu-system-%s" % arch
->      if is_readable_executable_file(qemu_bin_relative_path):
->          return qemu_bin_relative_path
+> -include $(SRC_PATH)/tests/qtest/Makefile.include
+> -
+>  tests/test-qga$(EXESUF): qga/qemu-ga$(EXESUF)
+> -tests/test-qga$(EXESUF): tests/test-qga.o $(qtest-obj-y)
+> +tests/test-qga$(EXESUF): tests/test-qga.o tests/qtest/libqtest.o $(test-util-obj-y)
+>  tests/vhost-user-bridge$(EXESUF): tests/vhost-user-bridge.o $(test-util-obj-y) libvhost-user.a
+>  tests/qemu-iotests/socket_scm_helper$(EXESUF): tests/qemu-iotests/socket_scm_helper.o
 >  
-> diff --git a/tests/data/acpi/rebuild-expected-aml.sh b/tests/data/acpi/rebuild-expected-aml.sh
-> index 76cd797..fc78770 100755
-> --- a/tests/data/acpi/rebuild-expected-aml.sh
-> +++ b/tests/data/acpi/rebuild-expected-aml.sh
-> @@ -12,7 +12,7 @@
->  # This work is licensed under the terms of the GNU GPLv2.
->  # See the COPYING.LIB file in the top-level directory.
+> @@ -440,14 +427,6 @@ define do_test_tap
+>  	  "TAP","$@")
+>  endef
 >  
-> -qemu_bins="x86_64-softmmu/qemu-system-x86_64 aarch64-softmmu/qemu-system-aarch64"
-> +qemu_bins="./qemu-system-x86_64 ./qemu-system-aarch64"
+> -.PHONY: $(patsubst %, check-qtest-%, $(QTEST_TARGETS))
+> -$(patsubst %, check-qtest-%, $(QTEST_TARGETS)): check-qtest-%: %-softmmu/all $(check-qtest-y)
+> -	$(call do_test_human,$(check-qtest-$*-y:%=tests/qtest/%$(EXESUF)) $(check-qtest-generic-y:%=tests/qtest/%$(EXESUF)), \
+> -	  QTEST_QEMU_BINARY=$*-softmmu/qemu-system-$* \
+> -	  QTEST_QEMU_IMG=qemu-img$(EXESUF))
+> -
+> -build-qtest: $(patsubst %, %-softmmu/all, $(QTEST_TARGETS)) $(check-qtest-y)
+> -
+>  build-unit: $(check-unit-y)
 >  
->  if [ ! -e "tests/qtest/bios-tables-test" ]; then
->      echo "Test: bios-tables-test is required! Run make check before this script."
-> diff --git a/tests/multiboot/run_test.sh b/tests/multiboot/run_test.sh
-> index 98df91e..f968bf7 100755
-> --- a/tests/multiboot/run_test.sh
-> +++ b/tests/multiboot/run_test.sh
-> @@ -20,7 +20,7 @@
->  # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
->  # THE SOFTWARE.
+>  check-unit: $(check-unit-y)
+> @@ -458,18 +437,9 @@ check-speed: $(check-speed-y)
 >  
-> -QEMU=${QEMU:-"../../x86_64-softmmu/qemu-system-x86_64"}
-> +QEMU=${QEMU:-"../../qemu-system-x86_64"}
+>  # gtester tests with TAP output
 >  
->  run_qemu() {
->      local kernel=$1
-> diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
-> index 0657f72..3ab859a 100755
-> --- a/tests/qemu-iotests/check
-> +++ b/tests/qemu-iotests/check
-> @@ -577,11 +577,11 @@ if [ -z "$QEMU_PROG" ]
->  then
->      if [ -x "$build_iotests/qemu" ]; then
->          export QEMU_PROG="$build_iotests/qemu"
-> -    elif [ -x "$build_root/${qemu_arch}-softmmu/qemu-system-${qemu_arch}" ]; then
-> -        export QEMU_PROG="$build_root/${qemu_arch}-softmmu/qemu-system-${qemu_arch}"
-> +    elif [ -x "$build_root/qemu-system-${qemu_arch}" ]; then
-> +        export QEMU_PROG="$build_root/qemu-system-${qemu_arch}"
->      else
->          pushd "$build_root" > /dev/null
-> -        for binary in *-softmmu/qemu-system-*
-> +        for binary in qemu-system-*
->          do
->              if [ -x "$binary" ]
->              then
-> diff --git a/tests/qtest/fuzz/Makefile.include b/tests/qtest/fuzz/Makefile.include
+> -$(patsubst %, check-report-qtest-%.tap, $(QTEST_TARGETS)): check-report-qtest-%.tap: %-softmmu/all $(check-qtest-y)
+> -	$(call do_test_tap, $(check-qtest-$*-y:%=tests/qtest/%$(EXESUF)) $(check-qtest-generic-y:%=tests/qtest/%$(EXESUF)), \
+> -	  QTEST_QEMU_BINARY=$*-softmmu/qemu-system-$* \
+> -	  QTEST_QEMU_IMG=qemu-img$(EXESUF))
+> -
+>  check-report-unit.tap: $(check-unit-y)
+>  	$(call do_test_tap,$^)
+>  
+> -# Reports and overall runs
+> -
+> -check-report.tap: $(patsubst %,check-report-qtest-%.tap, $(QTEST_TARGETS)) check-report-unit.tap
+> -
+>  # Plugins
+>  ifeq ($(CONFIG_PLUGIN),y)
+>  .PHONY: plugins
+> @@ -580,19 +550,16 @@ check-acceptance: check-venv $(TESTS_RESULTS_DIR) get-vm-images
+>  
+>  # Consolidated targets
+>  
+> -.PHONY: check-block check-qtest check-unit check check-clean get-vm-images
+> -check-qtest: $(patsubst %,check-qtest-%, $(QTEST_TARGETS))
+> +.PHONY: check-block check-unit check check-clean get-vm-images
+>  ifeq ($(CONFIG_TOOLS),y)
+>  check-block: $(patsubst %,check-%, $(check-block-y))
+>  endif
+> -check-build: build-unit build-qtest
+> +check-build: build-unit
+>  
+> -check: check-block check-unit check-qtest
+> +check: check-block check-unit
+>  check-clean:
+>  	rm -rf $(check-unit-y) tests/*.o tests/*/*.o $(QEMU_IOTESTS_HELPERS-y)
+> -	rm -rf $(sort $(foreach target,$(SYSEMU_TARGET_LIST), $(check-qtest-$(target)-y:%=tests/qtest/%$(EXESUF))) $(check-qtest-generic-y:%=tests/qtest/%$(EXESUF)))
+>  	rm -f tests/test-qapi-gen-timestamp
+> -	rm -f tests/qtest/dbus-vmstate1-gen-timestamp
+>  	rm -rf $(TESTS_VENV_DIR) $(TESTS_RESULTS_DIR)
+>  
+>  check: check-block check-qapi-schema check-unit check-qtest check-decodetree
+> @@ -604,7 +571,5 @@ clean: check-clean
+>  all: $(QEMU_IOTESTS_HELPERS-y)
+>  
+>  -include $(wildcard tests/*.d)
+> --include $(wildcard tests/qtest/*.d)
+> --include $(wildcard tests/qtest/libqos/*.d)
+>  
+>  endif
+> diff --git a/tests/meson.build b/tests/meson.build
+> index 8be9c22..d724402 100644
+> --- a/tests/meson.build
+> +++ b/tests/meson.build
+> @@ -8,3 +8,4 @@ if 'CONFIG_TCG' in config_host
+>  endif
+>  
+>  subdir('qapi-schema')
+> +subdir('qtest')
+> diff --git a/tests/qtest/Makefile.include b/tests/qtest/Makefile.include
 > deleted file mode 100644
-> index 5bde793..0000000
-> --- a/tests/qtest/fuzz/Makefile.include
+> index b0204e4..0000000
+> --- a/tests/qtest/Makefile.include
 > +++ /dev/null
-> @@ -1,39 +0,0 @@
-> -QEMU_PROG_FUZZ=qemu-fuzz-$(TARGET_NAME)$(EXESUF)
+> @@ -1,332 +0,0 @@
+> -# All QTests for now are POSIX-only, but the dependencies are
+> -# really in libqtest, not in the testcases themselves.
 > -
-> -fuzz-obj-y += tests/qtest/libqtest.o
-> -fuzz-obj-y += $(libqos-obj-y)
-> -fuzz-obj-y += tests/qtest/fuzz/fuzz.o # Fuzzer skeleton
-> -fuzz-obj-y += tests/qtest/fuzz/fork_fuzz.o
-> -fuzz-obj-y += tests/qtest/fuzz/qos_fuzz.o
-> -fuzz-obj-y += tests/qtest/fuzz/qtest_wrappers.o
+> -check-qtest-generic-y += cdrom-test
+> -check-qtest-generic-y += device-introspect-test
+> -check-qtest-generic-y += machine-none-test
+> -check-qtest-generic-y += qmp-test
+> -check-qtest-generic-y += qmp-cmd-test
+> -check-qtest-generic-y += qom-test
+> -check-qtest-generic-$(CONFIG_MODULES) += modules-test
+> -check-qtest-generic-y += test-hmp
 > -
-> -# Targets
-> -fuzz-obj-$(CONFIG_PCI_I440FX) += tests/qtest/fuzz/i440fx_fuzz.o
-> -fuzz-obj-$(CONFIG_VIRTIO_NET) += tests/qtest/fuzz/virtio_net_fuzz.o
-> -fuzz-obj-$(CONFIG_SCSI) += tests/qtest/fuzz/virtio_scsi_fuzz.o
+> -check-qtest-pci-$(CONFIG_RTL8139_PCI) += rtl8139-test
+> -check-qtest-pci-$(CONFIG_VGA) += display-vga-test
+> -check-qtest-pci-$(CONFIG_HDA) += intel-hda-test
+> -check-qtest-pci-$(CONFIG_IVSHMEM_DEVICE) += ivshmem-test
 > -
-> -FUZZ_CFLAGS += -I$(SRC_PATH)/tests -I$(SRC_PATH)/tests/qtest
+> -DBUS_DAEMON := $(shell which dbus-daemon 2>/dev/null)
+> -ifneq ($(GDBUS_CODEGEN),)
+> -ifneq ($(DBUS_DAEMON),)
+> -# Temporarily disabled due to Patchew failures:
+> -#check-qtest-pci-$(CONFIG_GIO) += dbus-vmstate-test
+> -endif
+> -endif
 > -
-> -# Linker Script to force coverage-counters into known regions which we can mark
-> -# shared
-> -FUZZ_LDFLAGS += -Xlinker -T$(SRC_PATH)/tests/qtest/fuzz/fork_fuzz.ld
+> -check-qtest-i386-$(CONFIG_ISA_TESTDEV) = endianness-test
+> -check-qtest-i386-y += fdc-test
+> -check-qtest-i386-y += ide-test
+> -check-qtest-i386-$(CONFIG_TOOLS) += ahci-test
+> -check-qtest-i386-y += hd-geo-test
+> -check-qtest-i386-y += boot-order-test
+> -check-qtest-i386-y += bios-tables-test
+> -check-qtest-i386-$(CONFIG_SGA) += boot-serial-test
+> -check-qtest-i386-$(CONFIG_SLIRP) += pxe-test
+> -check-qtest-i386-y += rtc-test
+> -check-qtest-i386-$(CONFIG_ISA_IPMI_KCS) += ipmi-kcs-test
+> -ifdef CONFIG_LINUX
+> -check-qtest-i386-$(CONFIG_ISA_IPMI_BT) += ipmi-bt-test
+> -endif
+> -check-qtest-i386-y += i440fx-test
+> -check-qtest-i386-y += fw_cfg-test
+> -check-qtest-i386-y += device-plug-test
+> -check-qtest-i386-y += drive_del-test
+> -check-qtest-i386-$(CONFIG_WDT_IB700) += wdt_ib700-test
+> -check-qtest-i386-y += tco-test
+> -check-qtest-i386-y += $(check-qtest-pci-y)
+> -check-qtest-i386-$(CONFIG_PVPANIC) += pvpanic-test
+> -check-qtest-i386-$(CONFIG_I82801B11) += i82801b11-test
+> -check-qtest-i386-$(CONFIG_IOH3420) += ioh3420-test
+> -check-qtest-i386-$(CONFIG_USB_UHCI) += usb-hcd-uhci-test
+> -check-qtest-i386-$(call land,$(CONFIG_USB_EHCI),$(CONFIG_USB_UHCI)) += usb-hcd-ehci-test
+> -check-qtest-i386-$(CONFIG_USB_XHCI_NEC) += usb-hcd-xhci-test
+> -check-qtest-i386-y += cpu-plug-test
+> -check-qtest-i386-y += q35-test
+> -check-qtest-i386-y += vmgenid-test
+> -check-qtest-i386-$(CONFIG_TPM_CRB) += tpm-crb-swtpm-test
+> -check-qtest-i386-$(CONFIG_TPM_CRB) += tpm-crb-test
+> -check-qtest-i386-$(CONFIG_TPM_TIS_ISA) += tpm-tis-swtpm-test
+> -check-qtest-i386-$(CONFIG_TPM_TIS_ISA) += tpm-tis-test
+> -check-qtest-i386-$(CONFIG_SLIRP) += test-netfilter
+> -check-qtest-i386-$(CONFIG_POSIX) += test-filter-mirror
+> -check-qtest-i386-$(CONFIG_RTL8139_PCI) += test-filter-redirector
+> -check-qtest-i386-y += migration-test
+> -check-qtest-i386-y += test-x86-cpuid-compat
+> -check-qtest-i386-y += numa-test
 > -
-> -FUZZ_LDFLAGS += -Wl,-wrap,qtest_inb
-> -FUZZ_LDFLAGS += -Wl,-wrap,qtest_inw
-> -FUZZ_LDFLAGS += -Wl,-wrap,qtest_inl
-> -FUZZ_LDFLAGS += -Wl,-wrap,qtest_outb
-> -FUZZ_LDFLAGS += -Wl,-wrap,qtest_outw
-> -FUZZ_LDFLAGS += -Wl,-wrap,qtest_outl
-> -FUZZ_LDFLAGS += -Wl,-wrap,qtest_readb
-> -FUZZ_LDFLAGS += -Wl,-wrap,qtest_readw
-> -FUZZ_LDFLAGS += -Wl,-wrap,qtest_readl
-> -FUZZ_LDFLAGS += -Wl,-wrap,qtest_readq
-> -FUZZ_LDFLAGS += -Wl,-wrap,qtest_writeb
-> -FUZZ_LDFLAGS += -Wl,-wrap,qtest_writew
-> -FUZZ_LDFLAGS += -Wl,-wrap,qtest_writel
-> -FUZZ_LDFLAGS += -Wl,-wrap,qtest_writeq
-> -FUZZ_LDFLAGS += -Wl,-wrap,qtest_memread
-> -FUZZ_LDFLAGS += -Wl,-wrap,qtest_bufread
-> -FUZZ_LDFLAGS += -Wl,-wrap,qtest_memwrite
-> -FUZZ_LDFLAGS += -Wl,-wrap,qtest_bufwrite
-> -FUZZ_LDFLAGS += -Wl,-wrap,qtest_memset
-> diff --git a/tests/qtest/fuzz/i440fx_fuzz.c b/tests/qtest/fuzz/i440fx_fuzz.c
-> index f45373f..86796bf 100644
-> --- a/tests/qtest/fuzz/i440fx_fuzz.c
-> +++ b/tests/qtest/fuzz/i440fx_fuzz.c
-> @@ -17,8 +17,8 @@
->  #include "tests/qtest/libqos/pci.h"
->  #include "tests/qtest/libqos/pci-pc.h"
->  #include "fuzz.h"
-> -#include "fuzz/qos_fuzz.h"
-> -#include "fuzz/fork_fuzz.h"
-> +#include "qos_fuzz.h"
-> +#include "fork_fuzz.h"
->  
->  
->  #define I440FX_PCI_HOST_BRIDGE_CFG 0xcf8
-> diff --git a/tests/qtest/fuzz/meson.build b/tests/qtest/fuzz/meson.build
-> new file mode 100644
-> index 0000000..bb0a3f2
-> --- /dev/null
-> +++ b/tests/qtest/fuzz/meson.build
-> @@ -0,0 +1,35 @@
-> +specific_fuzz_ss.add(files('fuzz.c', 'fork_fuzz.c', 'qos_fuzz.c',
-> +                           'qtest_wrappers.c'), qos)
-> +
-> +# Targets
-> +specific_fuzz_ss.add(when: 'CONFIG_I440FX', if_true: files('i440fx_fuzz.c'))
-> +specific_fuzz_ss.add(when: 'CONFIG_VIRTIO_NET', if_true: files('virtio_net_fuzz.c'))
-> +specific_fuzz_ss.add(when: 'CONFIG_VIRTIO_SCSI', if_true: files('virtio_scsi_fuzz.c'))
-> +
-> +# unfortunately declare_dependency does not support link_depends, so
-> +# this will be duplicated in meson.build
-> +fork_fuzz = declare_dependency(
-> +  link_args: ['-fsanitize=fuzzer',
-> +              '-Wl,-T,' + (meson.current_source_dir() / 'fork_fuzz.ld'),
-> +              '-Wl,-wrap,qtest_inb',
-> +              '-Wl,-wrap,qtest_inw',
-> +              '-Wl,-wrap,qtest_inl',
-> +              '-Wl,-wrap,qtest_outb',
-> +              '-Wl,-wrap,qtest_outw',
-> +              '-Wl,-wrap,qtest_outl',
-> +              '-Wl,-wrap,qtest_readb',
-> +              '-Wl,-wrap,qtest_readw',
-> +              '-Wl,-wrap,qtest_readl',
-> +              '-Wl,-wrap,qtest_readq',
-> +              '-Wl,-wrap,qtest_writeb',
-> +              '-Wl,-wrap,qtest_writew',
-> +              '-Wl,-wrap,qtest_writel',
-> +              '-Wl,-wrap,qtest_writeq',
-> +              '-Wl,-wrap,qtest_memread',
-> +              '-Wl,-wrap,qtest_bufread',
-> +              '-Wl,-wrap,qtest_memwrite',
-> +              '-Wl,-wrap,qtest_bufwrite',
-> +              '-Wl,-wrap,qtest_memset']
-> +)
-> +
-> +specific_fuzz_ss.add(fork_fuzz)
-> diff --git a/tests/qtest/fuzz/qtest_wrappers.c b/tests/qtest/fuzz/qtest_wrappers.c
-> index 713c830..0580f8d 100644
-> --- a/tests/qtest/fuzz/qtest_wrappers.c
-> +++ b/tests/qtest/fuzz/qtest_wrappers.c
-> @@ -12,7 +12,7 @@
+> -check-qtest-x86_64-y += $(check-qtest-i386-y)
+> -
+> -check-qtest-avr-y += boot-serial-test
+> -
+> -check-qtest-alpha-y += boot-serial-test
+> -check-qtest-alpha-$(CONFIG_VGA) += display-vga-test
+> -
+> -check-qtest-hppa-y += boot-serial-test
+> -check-qtest-hppa-$(CONFIG_VGA) += display-vga-test
+> -
+> -check-qtest-m68k-y = boot-serial-test
+> -
+> -check-qtest-microblaze-y += boot-serial-test
+> -
+> -check-qtest-mips-$(CONFIG_ISA_TESTDEV) = endianness-test
+> -check-qtest-mips-$(CONFIG_VGA) += display-vga-test
+> -
+> -check-qtest-mips64-$(CONFIG_ISA_TESTDEV) = endianness-test
+> -check-qtest-mips64-$(CONFIG_VGA) += display-vga-test
+> -
+> -check-qtest-mips64el-$(CONFIG_ISA_TESTDEV) = endianness-test
+> -check-qtest-mips64el-$(CONFIG_VGA) += display-vga-test
+> -
+> -check-qtest-moxie-y += boot-serial-test
+> -
+> -check-qtest-ppc-$(CONFIG_ISA_TESTDEV) = endianness-test
+> -check-qtest-ppc-y += boot-order-test
+> -check-qtest-ppc-y += prom-env-test
+> -check-qtest-ppc-y += drive_del-test
+> -check-qtest-ppc-y += boot-serial-test
+> -check-qtest-ppc-$(CONFIG_M48T59) += m48t59-test
+> -
+> -check-qtest-ppc64-y += $(check-qtest-ppc-y)
+> -check-qtest-ppc64-$(CONFIG_PSERIES) += device-plug-test
+> -check-qtest-ppc64-$(CONFIG_POWERNV) += pnv-xscom-test
+> -check-qtest-ppc64-y += migration-test
+> -check-qtest-ppc64-$(CONFIG_PSERIES) += rtas-test
+> -check-qtest-ppc64-$(CONFIG_SLIRP) += pxe-test
+> -check-qtest-ppc64-$(CONFIG_USB_UHCI) += usb-hcd-uhci-test
+> -check-qtest-ppc64-$(CONFIG_USB_XHCI_NEC) += usb-hcd-xhci-test
+> -check-qtest-ppc64-$(CONFIG_SLIRP) += test-netfilter
+> -check-qtest-ppc64-$(CONFIG_POSIX) += test-filter-mirror
+> -check-qtest-ppc64-$(CONFIG_RTL8139_PCI) += test-filter-redirector
+> -check-qtest-ppc64-$(CONFIG_VGA) += display-vga-test
+> -check-qtest-ppc64-y += numa-test
+> -check-qtest-ppc64-$(CONFIG_IVSHMEM_DEVICE) += ivshmem-test
+> -check-qtest-ppc64-y += cpu-plug-test
+> -
+> -check-qtest-sh4-$(CONFIG_ISA_TESTDEV) = endianness-test
+> -
+> -check-qtest-sh4eb-$(CONFIG_ISA_TESTDEV) = endianness-test
+> -
+> -check-qtest-sparc-y += prom-env-test
+> -check-qtest-sparc-y += m48t59-test
+> -check-qtest-sparc-y += boot-serial-test
+> -
+> -check-qtest-sparc64-$(CONFIG_ISA_TESTDEV) = endianness-test
+> -check-qtest-sparc64-y += prom-env-test
+> -check-qtest-sparc64-y += boot-serial-test
+> -
+> -check-qtest-arm-y += arm-cpu-features
+> -check-qtest-arm-y += microbit-test
+> -check-qtest-arm-y += m25p80-test
+> -check-qtest-arm-y += test-arm-mptimer
+> -check-qtest-arm-y += boot-serial-test
+> -check-qtest-arm-y += hexloader-test
+> -check-qtest-arm-$(CONFIG_PFLASH_CFI02) += pflash-cfi02-test
+> -
+> -check-qtest-aarch64-y += arm-cpu-features
+> -check-qtest-aarch64-$(CONFIG_TPM_TIS_SYSBUS) += tpm-tis-device-test
+> -check-qtest-aarch64-$(CONFIG_TPM_TIS_SYSBUS) += tpm-tis-device-swtpm-test
+> -check-qtest-aarch64-y += numa-test
+> -check-qtest-aarch64-y += boot-serial-test
+> -check-qtest-aarch64-y += migration-test
+> -
+> -# TODO: once aarch64 TCG is fixed on ARM 32 bit host, make test unconditional
+> -ifneq ($(ARCH),arm)
+> -check-qtest-aarch64-y += bios-tables-test
+> -endif
+> -
+> -check-qtest-microblazeel-y += $(check-qtest-microblaze-y)
+> -
+> -check-qtest-xtensaeb-y += $(check-qtest-xtensa-y)
+> -
+> -check-qtest-s390x-y = boot-serial-test
+> -check-qtest-s390x-$(CONFIG_SLIRP) += pxe-test
+> -check-qtest-s390x-$(CONFIG_SLIRP) += test-netfilter
+> -check-qtest-s390x-$(CONFIG_POSIX) += test-filter-mirror
+> -check-qtest-s390x-$(CONFIG_POSIX) += test-filter-redirector
+> -check-qtest-s390x-y += drive_del-test
+> -check-qtest-s390x-y += device-plug-test
+> -check-qtest-s390x-y += virtio-ccw-test
+> -check-qtest-s390x-y += cpu-plug-test
+> -check-qtest-s390x-y += migration-test
+> -
+> -# libqos / qgraph :
+> -libqgraph-obj-y = tests/qtest/libqos/qgraph.o
+> -
+> -libqos-core-obj-y = $(libqgraph-obj-y) tests/qtest/libqos/pci.o tests/qtest/libqos/fw_cfg.o
+> -libqos-core-obj-y += tests/qtest/libqos/malloc.o
+> -libqos-core-obj-y += tests/qtest/libqos/libqos.o
+> -libqos-spapr-obj-y = $(libqos-core-obj-y) tests/qtest/libqos/malloc-spapr.o
+> -libqos-spapr-obj-y += tests/qtest/libqos/libqos-spapr.o
+> -libqos-spapr-obj-y += tests/qtest/libqos/rtas.o
+> -libqos-spapr-obj-y += tests/qtest/libqos/pci-spapr.o
+> -libqos-pc-obj-y = $(libqos-core-obj-y) tests/qtest/libqos/pci-pc.o
+> -libqos-pc-obj-y += tests/qtest/libqos/malloc-pc.o tests/qtest/libqos/libqos-pc.o
+> -libqos-pc-obj-y += tests/qtest/libqos/ahci.o
+> -libqos-usb-obj-y = $(libqos-spapr-obj-y) $(libqos-pc-obj-y) tests/qtest/libqos/usb.o
+> -
+> -# qos devices:
+> -libqos-obj-y =  $(libqgraph-obj-y)
+> -libqos-obj-y += $(libqos-pc-obj-y) $(libqos-spapr-obj-y)
+> -libqos-obj-y += tests/qtest/libqos/qos_external.o
+> -libqos-obj-y += tests/qtest/libqos/e1000e.o
+> -libqos-obj-y += tests/qtest/libqos/i2c.o
+> -libqos-obj-y += tests/qtest/libqos/i2c-imx.o
+> -libqos-obj-y += tests/qtest/libqos/i2c-omap.o
+> -libqos-obj-y += tests/qtest/libqos/sdhci.o
+> -libqos-obj-y += tests/qtest/libqos/tpci200.o
+> -libqos-obj-y += tests/qtest/libqos/virtio.o
+> -libqos-obj-$(CONFIG_VIRTFS) += tests/qtest/libqos/virtio-9p.o
+> -libqos-obj-y += tests/qtest/libqos/virtio-balloon.o
+> -libqos-obj-y += tests/qtest/libqos/virtio-blk.o
+> -libqos-obj-y += tests/qtest/libqos/virtio-mmio.o
+> -libqos-obj-y += tests/qtest/libqos/virtio-net.o
+> -libqos-obj-y += tests/qtest/libqos/virtio-pci.o
+> -libqos-obj-y += tests/qtest/libqos/virtio-pci-modern.o
+> -libqos-obj-y += tests/qtest/libqos/virtio-rng.o
+> -libqos-obj-y += tests/qtest/libqos/virtio-scsi.o
+> -libqos-obj-y += tests/qtest/libqos/virtio-serial.o
+> -
+> -# qos machines:
+> -libqos-obj-y += tests/qtest/libqos/aarch64-xlnx-zcu102-machine.o
+> -libqos-obj-y += tests/qtest/libqos/arm-imx25-pdk-machine.o
+> -libqos-obj-y += tests/qtest/libqos/arm-n800-machine.o
+> -libqos-obj-y += tests/qtest/libqos/arm-raspi2-machine.o
+> -libqos-obj-y += tests/qtest/libqos/arm-sabrelite-machine.o
+> -libqos-obj-y += tests/qtest/libqos/arm-smdkc210-machine.o
+> -libqos-obj-y += tests/qtest/libqos/arm-virt-machine.o
+> -libqos-obj-y += tests/qtest/libqos/arm-xilinx-zynq-a9-machine.o
+> -libqos-obj-y += tests/qtest/libqos/ppc64_pseries-machine.o
+> -libqos-obj-y += tests/qtest/libqos/x86_64_pc-machine.o
+> -
+> -# qos tests:
+> -qos-test-obj-y += tests/qtest/qos-test.o
+> -qos-test-obj-y += tests/qtest/ac97-test.o
+> -qos-test-obj-y += tests/qtest/ds1338-test.o
+> -qos-test-obj-y += tests/qtest/e1000-test.o
+> -qos-test-obj-y += tests/qtest/e1000e-test.o
+> -qos-test-obj-y += tests/qtest/eepro100-test.o
+> -qos-test-obj-y += tests/qtest/es1370-test.o
+> -qos-test-obj-y += tests/qtest/ipoctal232-test.o
+> -qos-test-obj-y += tests/qtest/megasas-test.o
+> -qos-test-obj-y += tests/qtest/ne2000-test.o
+> -qos-test-obj-y += tests/qtest/tulip-test.o
+> -qos-test-obj-y += tests/qtest/nvme-test.o
+> -qos-test-obj-y += tests/qtest/pca9552-test.o
+> -qos-test-obj-y += tests/qtest/pci-test.o
+> -qos-test-obj-y += tests/qtest/pcnet-test.o
+> -qos-test-obj-y += tests/qtest/sdhci-test.o
+> -qos-test-obj-y += tests/qtest/spapr-phb-test.o
+> -qos-test-obj-y += tests/qtest/tmp105-test.o
+> -qos-test-obj-y += tests/qtest/usb-hcd-ohci-test.o $(libqos-usb-obj-y)
+> -qos-test-obj-$(CONFIG_VHOST_NET_USER) += tests/qtest/vhost-user-test.o $(chardev-obj-y) $(test-io-obj-y)
+> -qos-test-obj-y += tests/qtest/virtio-test.o
+> -qos-test-obj-$(CONFIG_VIRTFS) += tests/qtest/virtio-9p-test.o
+> -qos-test-obj-y += tests/qtest/virtio-blk-test.o
+> -qos-test-obj-y += tests/qtest/virtio-net-test.o
+> -qos-test-obj-y += tests/qtest/virtio-rng-test.o
+> -qos-test-obj-y += tests/qtest/virtio-scsi-test.o
+> -qos-test-obj-y += tests/qtest/virtio-serial-test.o
+> -qos-test-obj-y += tests/qtest/vmxnet3-test.o
+> -
+> -check-unit-y += tests/test-qgraph$(EXESUF)
+> -tests/test-qgraph$(EXESUF): tests/test-qgraph.o $(libqgraph-obj-y)
+> -
+> -check-qtest-generic-y += qos-test
+> -tests/qtest/qos-test$(EXESUF): $(qos-test-obj-y) $(libqos-obj-y)
+> -
+> -# QTest dependencies:
+> -tests/qtest/qmp-test$(EXESUF): tests/qtest/qmp-test.o
+> -tests/qtest/qmp-cmd-test$(EXESUF): tests/qtest/qmp-cmd-test.o
+> -tests/qtest/device-introspect-test$(EXESUF): tests/qtest/device-introspect-test.o
+> -tests/qtest/rtc-test$(EXESUF): tests/qtest/rtc-test.o
+> -tests/qtest/m48t59-test$(EXESUF): tests/qtest/m48t59-test.o
+> -tests/qtest/hexloader-test$(EXESUF): tests/qtest/hexloader-test.o
+> -tests/qtest/pflash-cfi02$(EXESUF): tests/qtest/pflash-cfi02-test.o
+> -tests/qtest/endianness-test$(EXESUF): tests/qtest/endianness-test.o
+> -tests/qtest/prom-env-test$(EXESUF): tests/qtest/prom-env-test.o $(libqos-obj-y)
+> -tests/qtest/rtas-test$(EXESUF): tests/qtest/rtas-test.o $(libqos-spapr-obj-y)
+> -tests/qtest/fdc-test$(EXESUF): tests/qtest/fdc-test.o
+> -tests/qtest/ide-test$(EXESUF): tests/qtest/ide-test.o $(libqos-pc-obj-y)
+> -tests/qtest/ahci-test$(EXESUF): tests/qtest/ahci-test.o $(libqos-pc-obj-y) qemu-img$(EXESUF)
+> -tests/qtest/ipmi-kcs-test$(EXESUF): tests/qtest/ipmi-kcs-test.o
+> -tests/qtest/ipmi-bt-test$(EXESUF): tests/qtest/ipmi-bt-test.o
+> -tests/qtest/hd-geo-test$(EXESUF): tests/qtest/hd-geo-test.o $(libqos-obj-y)
+> -tests/qtest/boot-order-test$(EXESUF): tests/qtest/boot-order-test.o $(libqos-obj-y)
+> -tests/qtest/boot-serial-test$(EXESUF): tests/qtest/boot-serial-test.o $(libqos-obj-y)
+> -tests/qtest/bios-tables-test$(EXESUF): tests/qtest/bios-tables-test.o \
+> -        tests/qtest/tpm-emu.o $(test-io-obj-y) \
+> -	tests/qtest/boot-sector.o tests/qtest/acpi-utils.o $(libqos-obj-y)
+> -tests/qtest/pxe-test$(EXESUF): tests/qtest/pxe-test.o tests/qtest/boot-sector.o $(libqos-obj-y)
+> -tests/qtest/microbit-test$(EXESUF): tests/qtest/microbit-test.o
+> -tests/qtest/m25p80-test$(EXESUF): tests/qtest/m25p80-test.o
+> -tests/qtest/i440fx-test$(EXESUF): tests/qtest/i440fx-test.o $(libqos-pc-obj-y)
+> -tests/qtest/q35-test$(EXESUF): tests/qtest/q35-test.o $(libqos-pc-obj-y)
+> -tests/qtest/fw_cfg-test$(EXESUF): tests/qtest/fw_cfg-test.o $(libqos-pc-obj-y)
+> -tests/qtest/rtl8139-test$(EXESUF): tests/qtest/rtl8139-test.o $(libqos-pc-obj-y)
+> -tests/qtest/pnv-xscom-test$(EXESUF): tests/qtest/pnv-xscom-test.o
+> -tests/qtest/wdt_ib700-test$(EXESUF): tests/qtest/wdt_ib700-test.o
+> -tests/qtest/tco-test$(EXESUF): tests/qtest/tco-test.o $(libqos-pc-obj-y)
+> -tests/qtest/virtio-ccw-test$(EXESUF): tests/qtest/virtio-ccw-test.o
+> -tests/qtest/display-vga-test$(EXESUF): tests/qtest/display-vga-test.o
+> -tests/qtest/qom-test$(EXESUF): tests/qtest/qom-test.o
+> -tests/qtest/modules-test$(EXESUF): tests/qtest/modules-test.o
+> -tests/qtest/test-hmp$(EXESUF): tests/qtest/test-hmp.o
+> -tests/qtest/machine-none-test$(EXESUF): tests/qtest/machine-none-test.o
+> -tests/qtest/device-plug-test$(EXESUF): tests/qtest/device-plug-test.o
+> -tests/qtest/drive_del-test$(EXESUF): tests/qtest/drive_del-test.o
+> -tests/qtest/pvpanic-test$(EXESUF): tests/qtest/pvpanic-test.o
+> -tests/qtest/i82801b11-test$(EXESUF): tests/qtest/i82801b11-test.o
+> -tests/qtest/intel-hda-test$(EXESUF): tests/qtest/intel-hda-test.o
+> -tests/qtest/ioh3420-test$(EXESUF): tests/qtest/ioh3420-test.o
+> -tests/qtest/usb-hcd-uhci-test$(EXESUF): tests/qtest/usb-hcd-uhci-test.o $(libqos-usb-obj-y)
+> -tests/qtest/usb-hcd-ehci-test$(EXESUF): tests/qtest/usb-hcd-ehci-test.o $(libqos-usb-obj-y)
+> -tests/qtest/usb-hcd-xhci-test$(EXESUF): tests/qtest/usb-hcd-xhci-test.o $(libqos-usb-obj-y)
+> -tests/qtest/cpu-plug-test$(EXESUF): tests/qtest/cpu-plug-test.o
+> -tests/qtest/migration-test$(EXESUF): tests/qtest/migration-test.o tests/qtest/migration-helpers.o
+> -tests/qtest/test-netfilter$(EXESUF): tests/qtest/test-netfilter.o $(qtest-obj-y)
+> -tests/qtest/test-filter-mirror$(EXESUF): tests/qtest/test-filter-mirror.o $(qtest-obj-y)
+> -tests/qtest/test-filter-redirector$(EXESUF): tests/qtest/test-filter-redirector.o $(qtest-obj-y)
+> -tests/qtest/test-x86-cpuid-compat$(EXESUF): tests/qtest/test-x86-cpuid-compat.o $(qtest-obj-y)
+> -tests/qtest/ivshmem-test$(EXESUF): tests/qtest/ivshmem-test.o contrib/ivshmem-server/ivshmem-server.o $(libqos-pc-obj-y) $(libqos-spapr-obj-y)
+> -tests/qtest/dbus-vmstate-test$(EXESUF): tests/qtest/dbus-vmstate-test.o tests/qtest/migration-helpers.o tests/qtest/dbus-vmstate1.o $(libqos-pc-obj-y) $(libqos-spapr-obj-y)
+> -tests/qtest/test-arm-mptimer$(EXESUF): tests/qtest/test-arm-mptimer.o
+> -tests/qtest/numa-test$(EXESUF): tests/qtest/numa-test.o
+> -tests/qtest/vmgenid-test$(EXESUF): tests/qtest/vmgenid-test.o tests/qtest/boot-sector.o tests/qtest/acpi-utils.o
+> -tests/qtest/cdrom-test$(EXESUF): tests/qtest/cdrom-test.o tests/qtest/boot-sector.o $(libqos-obj-y)
+> -tests/qtest/arm-cpu-features$(EXESUF): tests/qtest/arm-cpu-features.o
+> -tests/qtest/tpm-crb-swtpm-test$(EXESUF): tests/qtest/tpm-crb-swtpm-test.o tests/qtest/tpm-emu.o \
+> -	tests/qtest/tpm-util.o tests/qtest/tpm-tests.o $(test-io-obj-y)
+> -tests/qtest/tpm-crb-test$(EXESUF): tests/qtest/tpm-crb-test.o tests/qtest/tpm-emu.o $(test-io-obj-y)
+> -tests/qtest/tpm-tis-swtpm-test$(EXESUF): tests/qtest/tpm-tis-swtpm-test.o tests/qtest/tpm-emu.o \
+> -	tests/qtest/tpm-util.o tests/qtest/tpm-tests.o $(test-io-obj-y)
+> -tests/qtest/tpm-tis-device-swtpm-test$(EXESUF): tests/qtest/tpm-tis-device-swtpm-test.o tests/qtest/tpm-emu.o \
+> -	tests/qtest/tpm-util.o tests/qtest/tpm-tests.o $(test-io-obj-y)
+> -tests/qtest/tpm-tis-test$(EXESUF): tests/qtest/tpm-tis-test.o tests/qtest/tpm-tis-util.o tests/qtest/tpm-emu.o $(test-io-obj-y)
+> -tests/qtest/tpm-tis-device-test$(EXESUF): tests/qtest/tpm-tis-device-test.o tests/qtest/tpm-tis-util.o tests/qtest/tpm-emu.o $(test-io-obj-y)
+> -
+> -# QTest rules
+> -
+> -TARGETS=$(patsubst %-softmmu,%, $(filter %-softmmu,$(TARGET_DIRS)))
+> -QTEST_TARGETS =
+> -# The qtests are not runnable (yet) under TSan due to a known issue.
+> -# https://github.com/google/sanitizers/issues/1116
+> -ifndef CONFIG_TSAN
+> -ifeq ($(CONFIG_POSIX),y)
+> -QTEST_TARGETS = $(TARGETS)
+> -check-qtest-y=$(foreach TARGET,$(TARGETS), $(check-qtest-$(TARGET)-y:%=tests/qtest/%$(EXESUF)))
+> -check-qtest-y += $(check-qtest-generic-y:%=tests/qtest/%$(EXESUF))
+> -endif
+> -endif
+> -
+> -qtest-obj-y = tests/qtest/libqtest.o $(test-util-obj-y)
+> -$(check-qtest-y): $(qtest-obj-y)
+> diff --git a/tests/qtest/ac97-test.c b/tests/qtest/ac97-test.c
+> index b084e31..e09f249 100644
+> --- a/tests/qtest/ac97-test.c
+> +++ b/tests/qtest/ac97-test.c
+> @@ -8,7 +8,7 @@
 >   */
 >  
 >  #include "qemu/osdep.h"
-> -#include "cpu.h"
-> +#include "hw/core/cpu.h"
->  #include "exec/ioport.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qemu/module.h"
+>  #include "libqos/qgraph.h"
+>  #include "libqos/pci.h"
+> diff --git a/tests/qtest/acpi-utils.h b/tests/qtest/acpi-utils.h
+> index 0c86780..261784d 100644
+> --- a/tests/qtest/acpi-utils.h
+> +++ b/tests/qtest/acpi-utils.h
+> @@ -13,7 +13,7 @@
+>  #ifndef TEST_ACPI_UTILS_H
+>  #define TEST_ACPI_UTILS_H
 >  
->  #include "fuzz.h"
-> diff --git a/tests/qtest/fuzz/virtio_net_fuzz.c b/tests/qtest/fuzz/virtio_net_fuzz.c
-> index 277a9e2..0e873ab 100644
-> --- a/tests/qtest/fuzz/virtio_net_fuzz.c
-> +++ b/tests/qtest/fuzz/virtio_net_fuzz.c
-> @@ -61,7 +61,8 @@ static void virtio_net_fuzz_multi(QTestState *s,
->           * backend. Otherwise, always place the input on a virtqueue.
->           */
->          if (vqa.rx && sockfds_initialized) {
-> -            write(sockfds[0], Data, vqa.length);
-> +            int ignored = write(sockfds[0], Data, vqa.length);
-> +            (void) ignored;
->          } else {
->              vqa.rx = 0;
->              uint64_t req_addr = guest_alloc(t_alloc, vqa.length);
-> diff --git a/tests/qtest/fuzz/virtio_scsi_fuzz.c b/tests/qtest/fuzz/virtio_scsi_fuzz.c
-> index 3a9ea13..6ff6fab 100644
-> --- a/tests/qtest/fuzz/virtio_scsi_fuzz.c
-> +++ b/tests/qtest/fuzz/virtio_scsi_fuzz.c
-> @@ -12,10 +12,10 @@
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  
+>  /* DSDT and SSDTs format */
+>  typedef struct {
+> diff --git a/tests/qtest/ahci-test.c b/tests/qtest/ahci-test.c
+> index c8d42ce..ca4294f 100644
+> --- a/tests/qtest/ahci-test.c
+> +++ b/tests/qtest/ahci-test.c
+> @@ -25,7 +25,7 @@
+>  #include "qemu/osdep.h"
+>  #include <getopt.h>
+>  
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "libqos/libqos-pc.h"
+>  #include "libqos/ahci.h"
+>  #include "libqos/pci-pc.h"
+> diff --git a/tests/qtest/arm-cpu-features.c b/tests/qtest/arm-cpu-features.c
+> index f7e062c..77b5e30 100644
+> --- a/tests/qtest/arm-cpu-features.c
+> +++ b/tests/qtest/arm-cpu-features.c
+> @@ -10,7 +10,7 @@
+>   */
+>  #include "qemu/osdep.h"
+>  #include "qemu/bitops.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qapi/qmp/qdict.h"
+>  #include "qapi/qmp/qjson.h"
+>  
+> diff --git a/tests/qtest/boot-order-test.c b/tests/qtest/boot-order-test.c
+> index 2f1c072..fac580d 100644
+> --- a/tests/qtest/boot-order-test.c
+> +++ b/tests/qtest/boot-order-test.c
+> @@ -12,7 +12,7 @@
+>  
+>  #include "qemu/osdep.h"
+>  #include "libqos/fw_cfg.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qapi/qmp/qdict.h"
+>  #include "standard-headers/linux/qemu_fw_cfg.h"
+>  
+> diff --git a/tests/qtest/boot-sector.c b/tests/qtest/boot-sector.c
+> index 9e66c6d..24df5c4 100644
+> --- a/tests/qtest/boot-sector.c
+> +++ b/tests/qtest/boot-sector.c
+> @@ -13,7 +13,7 @@
+>  #include "qemu/osdep.h"
+>  #include "boot-sector.h"
+>  #include "qemu-common.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  
+>  #define LOW(x) ((x) & 0xff)
+>  #define HIGH(x) ((x) >> 8)
+> diff --git a/tests/qtest/boot-sector.h b/tests/qtest/boot-sector.h
+> index 6ee6bb4..b339fde 100644
+> --- a/tests/qtest/boot-sector.h
+> +++ b/tests/qtest/boot-sector.h
+> @@ -14,7 +14,7 @@
+>  #ifndef TEST_BOOT_SECTOR_H
+>  #define TEST_BOOT_SECTOR_H
+>  
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  
+>  /* Create boot disk file. fname must be a suitable string for mkstemp() */
+>  int boot_sector_init(char *fname);
+> diff --git a/tests/qtest/boot-serial-test.c b/tests/qtest/boot-serial-test.c
+> index bfe7624..b6b1c23 100644
+> --- a/tests/qtest/boot-serial-test.c
+> +++ b/tests/qtest/boot-serial-test.c
+> @@ -14,7 +14,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "libqos/libqos-spapr.h"
+>  
+>  static const uint8_t bios_avr[] = {
+> diff --git a/tests/qtest/cdrom-test.c b/tests/qtest/cdrom-test.c
+> index 833a050..e9afab6 100644
+> --- a/tests/qtest/cdrom-test.c
+> +++ b/tests/qtest/cdrom-test.c
+> @@ -11,7 +11,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "boot-sector.h"
+>  #include "qapi/qmp/qdict.h"
+>  
+> diff --git a/tests/qtest/dbus-vmstate-test.c b/tests/qtest/dbus-vmstate-test.c
+> index 2e5e47d..aca9b98 100644
+> --- a/tests/qtest/dbus-vmstate-test.c
+> +++ b/tests/qtest/dbus-vmstate-test.c
+> @@ -1,7 +1,7 @@
+>  #include "qemu/osdep.h"
+>  #include <glib/gstdio.h>
+>  #include <gio/gio.h>
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qemu-common.h"
+>  #include "dbus-vmstate1.h"
+>  #include "migration-helpers.h"
+> diff --git a/tests/qtest/device-introspect-test.c b/tests/qtest/device-introspect-test.c
+> index d68b785..9f22340 100644
+> --- a/tests/qtest/device-introspect-test.c
+> +++ b/tests/qtest/device-introspect-test.c
+> @@ -22,7 +22,7 @@
+>  #include "qapi/qmp/qstring.h"
+>  #include "qapi/qmp/qdict.h"
+>  #include "qapi/qmp/qlist.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  
+>  const char common_args[] = "-nodefaults -machine none";
+>  
+> diff --git a/tests/qtest/device-plug-test.c b/tests/qtest/device-plug-test.c
+> index 318e422..9214892 100644
+> --- a/tests/qtest/device-plug-test.c
+> +++ b/tests/qtest/device-plug-test.c
+> @@ -11,7 +11,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qapi/qmp/qdict.h"
+>  #include "qapi/qmp/qstring.h"
+>  
+> diff --git a/tests/qtest/drive_del-test.c b/tests/qtest/drive_del-test.c
+> index 5f8839b..2ab11ad 100644
+> --- a/tests/qtest/drive_del-test.c
+> +++ b/tests/qtest/drive_del-test.c
+> @@ -11,7 +11,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "libqos/virtio.h"
+>  #include "qapi/qmp/qdict.h"
+>  
+> diff --git a/tests/qtest/ds1338-test.c b/tests/qtest/ds1338-test.c
+> index f6ade9a..c5d46bc 100644
+> --- a/tests/qtest/ds1338-test.c
+> +++ b/tests/qtest/ds1338-test.c
+> @@ -18,7 +18,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "libqos/i2c.h"
+>  
+>  #define DS1338_ADDR 0x68
+> diff --git a/tests/qtest/e1000-test.c b/tests/qtest/e1000-test.c
+> index c387984..ea286d1 100644
+> --- a/tests/qtest/e1000-test.c
+> +++ b/tests/qtest/e1000-test.c
+> @@ -8,7 +8,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qemu/module.h"
+>  #include "libqos/qgraph.h"
+>  #include "libqos/pci.h"
+> diff --git a/tests/qtest/eepro100-test.c b/tests/qtest/eepro100-test.c
+> index 8dbffff..d72ad09 100644
+> --- a/tests/qtest/eepro100-test.c
+> +++ b/tests/qtest/eepro100-test.c
+> @@ -8,7 +8,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qemu/module.h"
+>  #include "libqos/qgraph.h"
+>  #include "libqos/pci.h"
+> diff --git a/tests/qtest/endianness-test.c b/tests/qtest/endianness-test.c
+> index cc088ac..4e79e22 100644
+> --- a/tests/qtest/endianness-test.c
+> +++ b/tests/qtest/endianness-test.c
+> @@ -13,7 +13,7 @@
 >  
 >  #include "qemu/osdep.h"
 >  
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qemu/bswap.h"
+>  
+>  typedef struct TestCase TestCase;
+> diff --git a/tests/qtest/es1370-test.c b/tests/qtest/es1370-test.c
+> index adccdac..2fd7fd2 100644
+> --- a/tests/qtest/es1370-test.c
+> +++ b/tests/qtest/es1370-test.c
+> @@ -8,7 +8,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qemu/module.h"
+>  #include "libqos/qgraph.h"
+>  #include "libqos/pci.h"
+> diff --git a/tests/qtest/fuzz/fuzz.c b/tests/qtest/fuzz/fuzz.c
+> index 031594a..1ceea84 100644
+> --- a/tests/qtest/fuzz/fuzz.c
+> +++ b/tests/qtest/fuzz/fuzz.c
+> @@ -20,7 +20,7 @@
+>  #include "sysemu/sysemu.h"
+>  #include "qemu/main-loop.h"
+>  #include "qemu/rcu.h"
 > -#include "tests/qtest/libqtest.h"
-> -#include "libqos/virtio-scsi.h"
-> -#include "libqos/virtio.h"
-> -#include "libqos/virtio-pci.h"
 > +#include "tests/qtest/libqos/libqtest.h"
-> +#include "tests/qtest/libqos/virtio-scsi.h"
-> +#include "tests/qtest/libqos/virtio.h"
-> +#include "tests/qtest/libqos/virtio-pci.h"
->  #include "standard-headers/linux/virtio_ids.h"
->  #include "standard-headers/linux/virtio_pci.h"
->  #include "standard-headers/linux/virtio_scsi.h"
+>  #include "tests/qtest/libqos/qgraph.h"
+>  #include "fuzz.h"
+>  
+> diff --git a/tests/qtest/fuzz/fuzz.h b/tests/qtest/fuzz/fuzz.h
+> index 9ca3d10..8eb765e 100644
+> --- a/tests/qtest/fuzz/fuzz.h
+> +++ b/tests/qtest/fuzz/fuzz.h
+> @@ -18,7 +18,7 @@
+>  #include "qemu/units.h"
+>  #include "qapi/error.h"
+>  
+> -#include "tests/qtest/libqtest.h"
+> +#include "tests/qtest/libqos/libqtest.h"
+>  
+>  /**
+>   * A libfuzzer fuzzing target
+> diff --git a/tests/qtest/fuzz/i440fx_fuzz.c b/tests/qtest/fuzz/i440fx_fuzz.c
+> index bf966d4..f45373f 100644
+> --- a/tests/qtest/fuzz/i440fx_fuzz.c
+> +++ b/tests/qtest/fuzz/i440fx_fuzz.c
+> @@ -13,7 +13,7 @@
+>  #include "qemu/osdep.h"
+>  
+>  #include "qemu/main-loop.h"
+> -#include "tests/qtest/libqtest.h"
+> +#include "tests/qtest/libqos/libqtest.h"
+>  #include "tests/qtest/libqos/pci.h"
+>  #include "tests/qtest/libqos/pci-pc.h"
+>  #include "fuzz.h"
+> diff --git a/tests/qtest/fuzz/qos_fuzz.c b/tests/qtest/fuzz/qos_fuzz.c
+> index d52f3eb..b943577 100644
+> --- a/tests/qtest/fuzz/qos_fuzz.c
+> +++ b/tests/qtest/fuzz/qos_fuzz.c
+> @@ -25,7 +25,7 @@
+>  #include "sysemu/sysemu.h"
+>  #include "qemu/main-loop.h"
+>  
+> -#include "tests/qtest/libqtest.h"
+> +#include "tests/qtest/libqos/libqtest.h"
+>  #include "tests/qtest/libqos/malloc.h"
+>  #include "tests/qtest/libqos/qgraph.h"
+>  #include "tests/qtest/libqos/qgraph_internal.h"
+> diff --git a/tests/qtest/fuzz/virtio_net_fuzz.c b/tests/qtest/fuzz/virtio_net_fuzz.c
+> index a33bd73..277a9e2 100644
+> --- a/tests/qtest/fuzz/virtio_net_fuzz.c
+> +++ b/tests/qtest/fuzz/virtio_net_fuzz.c
+> @@ -13,7 +13,7 @@
+>  #include "qemu/osdep.h"
+>  
+>  #include "standard-headers/linux/virtio_config.h"
+> -#include "tests/qtest/libqtest.h"
+> +#include "tests/qtest/libqos/libqtest.h"
+>  #include "tests/qtest/libqos/virtio-net.h"
+>  #include "fuzz.h"
+>  #include "fork_fuzz.h"
+> diff --git a/tests/qtest/fw_cfg-test.c b/tests/qtest/fw_cfg-test.c
+> index 5dc807b..95b3907 100644
+> --- a/tests/qtest/fw_cfg-test.c
+> +++ b/tests/qtest/fw_cfg-test.c
+> @@ -12,7 +12,7 @@
+>  
+>  #include "qemu/osdep.h"
+>  
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "standard-headers/linux/qemu_fw_cfg.h"
+>  #include "libqos/fw_cfg.h"
+>  #include "qemu/bswap.h"
+> diff --git a/tests/qtest/hd-geo-test.c b/tests/qtest/hd-geo-test.c
+> index 48e8e02..f7b7cfb 100644
+> --- a/tests/qtest/hd-geo-test.c
+> +++ b/tests/qtest/hd-geo-test.c
+> @@ -19,7 +19,7 @@
+>  #include "qemu-common.h"
+>  #include "qemu/bswap.h"
+>  #include "qapi/qmp/qlist.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "libqos/fw_cfg.h"
+>  #include "libqos/libqos.h"
+>  #include "standard-headers/linux/qemu_fw_cfg.h"
+> diff --git a/tests/qtest/hexloader-test.c b/tests/qtest/hexloader-test.c
+> index 8b7aa2d..5615020 100644
+> --- a/tests/qtest/hexloader-test.c
+> +++ b/tests/qtest/hexloader-test.c
+> @@ -10,7 +10,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  
+>  /* Load 'test.hex' and verify that the in-memory contents are as expected.
+>   * 'test.hex' is a memory test pattern stored in Hexadecimal Object
+> diff --git a/tests/qtest/ide-test.c b/tests/qtest/ide-test.c
+> index 5cfd97f..3f8081e 100644
+> --- a/tests/qtest/ide-test.c
+> +++ b/tests/qtest/ide-test.c
+> @@ -25,7 +25,7 @@
+>  #include "qemu/osdep.h"
+>  
+>  
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "libqos/libqos.h"
+>  #include "libqos/pci-pc.h"
+>  #include "libqos/malloc-pc.h"
+> diff --git a/tests/qtest/ipoctal232-test.c b/tests/qtest/ipoctal232-test.c
+> index 53a8c9b..65ce10b 100644
+> --- a/tests/qtest/ipoctal232-test.c
+> +++ b/tests/qtest/ipoctal232-test.c
+> @@ -8,7 +8,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qemu/module.h"
+>  #include "libqos/qgraph.h"
+>  
+> diff --git a/tests/qtest/ivshmem-test.c b/tests/qtest/ivshmem-test.c
+> index ecda256..d5c8b9f 100644
+> --- a/tests/qtest/ivshmem-test.c
+> +++ b/tests/qtest/ivshmem-test.c
+> @@ -13,7 +13,7 @@
+>  #include "contrib/ivshmem-server/ivshmem-server.h"
+>  #include "libqos/libqos-pc.h"
+>  #include "libqos/libqos-spapr.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qemu-common.h"
+>  
+>  #define TMPSHMSIZE (1 << 20)
+> diff --git a/tests/qtest/libqos/aarch64-xlnx-zcu102-machine.c b/tests/qtest/libqos/aarch64-xlnx-zcu102-machine.c
+> index 8f827ae..79631cc 100644
+> --- a/tests/qtest/libqos/aarch64-xlnx-zcu102-machine.c
+> +++ b/tests/qtest/libqos/aarch64-xlnx-zcu102-machine.c
+> @@ -19,8 +19,8 @@
+>  #include "qemu/osdep.h"
+>  #include "libqtest.h"
+>  #include "qemu/module.h"
+> -#include "libqos/malloc.h"
+> -#include "libqos/qgraph.h"
+> +#include "malloc.h"
+> +#include "qgraph.h"
+>  #include "sdhci.h"
+>  
+>  typedef struct QXlnxZCU102Machine QXlnxZCU102Machine;
+> diff --git a/tests/qtest/libqos/ahci.c b/tests/qtest/libqos/ahci.c
+> index cc1b08e..2946abc 100644
+> --- a/tests/qtest/libqos/ahci.c
+> +++ b/tests/qtest/libqos/ahci.c
+> @@ -25,8 +25,8 @@
+>  #include "qemu/osdep.h"
+>  
+>  #include "libqtest.h"
+> -#include "libqos/ahci.h"
+> -#include "libqos/pci-pc.h"
+> +#include "ahci.h"
+> +#include "pci-pc.h"
+>  
+>  #include "qemu-common.h"
+>  #include "qemu/host-utils.h"
+> @@ -579,7 +579,7 @@ void ahci_write_fis(AHCIQState *ahci, AHCICommand *cmd)
+>      /* NCQ commands use exclusively 8 bit fields and needs no adjustment.
+>       * Only the count field needs to be adjusted for non-NCQ commands.
+>       * The auxiliary FIS fields are defined per-command and are not currently
+> -     * implemented in libqos/ahci.o, but may or may not need to be flipped. */
+> +     * implemented in ahci.o, but may or may not need to be flipped. */
+>      if (!cmd->props->ncq) {
+>          tmp.count = cpu_to_le16(tmp.count);
+>      }
+> diff --git a/tests/qtest/libqos/ahci.h b/tests/qtest/libqos/ahci.h
+> index 44ab110..88835b6 100644
+> --- a/tests/qtest/libqos/ahci.h
+> +++ b/tests/qtest/libqos/ahci.h
+> @@ -25,9 +25,9 @@
+>   * THE SOFTWARE.
+>   */
+>  
+> -#include "libqos/libqos.h"
+> -#include "libqos/pci.h"
+> -#include "libqos/malloc-pc.h"
+> +#include "libqos.h"
+> +#include "pci.h"
+> +#include "malloc-pc.h"
+>  
+>  /*** Supplementary PCI Config Space IDs & Masks ***/
+>  #define PCI_DEVICE_ID_INTEL_Q35_AHCI   (0x2922)
+> diff --git a/tests/qtest/libqos/arm-imx25-pdk-machine.c b/tests/qtest/libqos/arm-imx25-pdk-machine.c
+> index 0da3f19..6692adf 100644
+> --- a/tests/qtest/libqos/arm-imx25-pdk-machine.c
+> +++ b/tests/qtest/libqos/arm-imx25-pdk-machine.c
+> @@ -20,9 +20,9 @@
+>  
+>  #include "qemu/osdep.h"
+>  #include "libqtest.h"
+> -#include "libqos/malloc.h"
+> -#include "libqos/qgraph.h"
+> -#include "libqos/i2c.h"
+> +#include "malloc.h"
+> +#include "qgraph.h"
+> +#include "i2c.h"
+>  
+>  #define ARM_PAGE_SIZE            4096
+>  #define IMX25_PDK_RAM_START      0x80000000
+> diff --git a/tests/qtest/libqos/arm-n800-machine.c b/tests/qtest/libqos/arm-n800-machine.c
+> index 35f8207..ff2049c 100644
+> --- a/tests/qtest/libqos/arm-n800-machine.c
+> +++ b/tests/qtest/libqos/arm-n800-machine.c
+> @@ -20,9 +20,9 @@
+>  
+>  #include "qemu/osdep.h"
+>  #include "libqtest.h"
+> -#include "libqos/malloc.h"
+> -#include "libqos/qgraph.h"
+> -#include "libqos/i2c.h"
+> +#include "malloc.h"
+> +#include "qgraph.h"
+> +#include "i2c.h"
+>  
+>  #define ARM_PAGE_SIZE            4096
+>  #define N800_RAM_START      0x80000000
+> diff --git a/tests/qtest/libqos/arm-raspi2-machine.c b/tests/qtest/libqos/arm-raspi2-machine.c
+> index 8480d80..35bb470 100644
+> --- a/tests/qtest/libqos/arm-raspi2-machine.c
+> +++ b/tests/qtest/libqos/arm-raspi2-machine.c
+> @@ -19,8 +19,8 @@
+>  #include "qemu/osdep.h"
+>  #include "libqtest.h"
+>  #include "qemu/module.h"
+> -#include "libqos/malloc.h"
+> -#include "libqos/qgraph.h"
+> +#include "malloc.h"
+> +#include "qgraph.h"
+>  #include "sdhci.h"
+>  
+>  #define ARM_PAGE_SIZE             4096
+> diff --git a/tests/qtest/libqos/arm-sabrelite-machine.c b/tests/qtest/libqos/arm-sabrelite-machine.c
+> index f6e403b..72425f0 100644
+> --- a/tests/qtest/libqos/arm-sabrelite-machine.c
+> +++ b/tests/qtest/libqos/arm-sabrelite-machine.c
+> @@ -19,8 +19,8 @@
+>  #include "qemu/osdep.h"
+>  #include "libqtest.h"
+>  #include "qemu/module.h"
+> -#include "libqos/malloc.h"
+> -#include "libqos/qgraph.h"
+> +#include "malloc.h"
+> +#include "qgraph.h"
+>  #include "sdhci.h"
+>  
+>  #define ARM_PAGE_SIZE            4096
+> diff --git a/tests/qtest/libqos/arm-smdkc210-machine.c b/tests/qtest/libqos/arm-smdkc210-machine.c
+> index eebac7f..321b882 100644
+> --- a/tests/qtest/libqos/arm-smdkc210-machine.c
+> +++ b/tests/qtest/libqos/arm-smdkc210-machine.c
+> @@ -19,8 +19,8 @@
+>  #include "qemu/osdep.h"
+>  #include "libqtest.h"
+>  #include "qemu/module.h"
+> -#include "libqos/malloc.h"
+> -#include "libqos/qgraph.h"
+> +#include "malloc.h"
+> +#include "qgraph.h"
+>  #include "sdhci.h"
+>  
+>  #define ARM_PAGE_SIZE             4096
+> diff --git a/tests/qtest/libqos/arm-virt-machine.c b/tests/qtest/libqos/arm-virt-machine.c
+> index 9316598..e0f5932 100644
+> --- a/tests/qtest/libqos/arm-virt-machine.c
+> +++ b/tests/qtest/libqos/arm-virt-machine.c
+> @@ -19,9 +19,9 @@
+>  #include "qemu/osdep.h"
+>  #include "libqtest.h"
+>  #include "qemu/module.h"
+> -#include "libqos/malloc.h"
+> -#include "libqos/qgraph.h"
+> -#include "libqos/virtio-mmio.h"
+> +#include "malloc.h"
+> +#include "qgraph.h"
+> +#include "virtio-mmio.h"
+>  
+>  #define ARM_PAGE_SIZE               4096
+>  #define VIRTIO_MMIO_BASE_ADDR       0x0A003E00
+> diff --git a/tests/qtest/libqos/arm-xilinx-zynq-a9-machine.c b/tests/qtest/libqos/arm-xilinx-zynq-a9-machine.c
+> index 473acce..56e53c7 100644
+> --- a/tests/qtest/libqos/arm-xilinx-zynq-a9-machine.c
+> +++ b/tests/qtest/libqos/arm-xilinx-zynq-a9-machine.c
+> @@ -19,8 +19,8 @@
+>  #include "qemu/osdep.h"
+>  #include "libqtest.h"
+>  #include "qemu/module.h"
+> -#include "libqos/malloc.h"
+> -#include "libqos/qgraph.h"
+> +#include "malloc.h"
+> +#include "qgraph.h"
+>  #include "sdhci.h"
+>  
+>  typedef struct QXilinxZynqA9Machine QXilinxZynqA9Machine;
+> diff --git a/tests/qtest/libqos/e1000e.c b/tests/qtest/libqos/e1000e.c
+> index e2927ed..a451f61 100644
+> --- a/tests/qtest/libqos/e1000e.c
+> +++ b/tests/qtest/libqos/e1000e.c
+> @@ -18,13 +18,13 @@
+>  
+>  #include "qemu/osdep.h"
+>  #include "libqtest.h"
+> -#include "libqos/pci-pc.h"
+> +#include "pci-pc.h"
+>  #include "qemu/sockets.h"
+>  #include "qemu/iov.h"
+>  #include "qemu/module.h"
+>  #include "qemu/bitops.h"
+> -#include "libqos/malloc.h"
+> -#include "libqos/qgraph.h"
+> +#include "malloc.h"
+> +#include "qgraph.h"
+>  #include "e1000e.h"
+>  
+>  #define E1000E_IMS      (0x00d0)
+> diff --git a/tests/qtest/libqos/e1000e.h b/tests/qtest/libqos/e1000e.h
+> index 35183b2..a22f5fd 100644
+> --- a/tests/qtest/libqos/e1000e.h
+> +++ b/tests/qtest/libqos/e1000e.h
+> @@ -19,7 +19,7 @@
+>  #ifndef QGRAPH_E1000E_H
+>  #define QGRAPH_E1000E_H
+>  
+> -#include "libqos/qgraph.h"
+> +#include "qgraph.h"
+>  #include "pci.h"
+>  
+>  #define E1000E_RX0_MSG_ID           (0)
+> diff --git a/tests/qtest/libqos/fw_cfg.c b/tests/qtest/libqos/fw_cfg.c
+> index 1f46258..6b8e1ba 100644
+> --- a/tests/qtest/libqos/fw_cfg.c
+> +++ b/tests/qtest/libqos/fw_cfg.c
+> @@ -13,7 +13,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqos/fw_cfg.h"
+> +#include "fw_cfg.h"
+>  #include "libqtest.h"
+>  #include "qemu/bswap.h"
+>  #include "hw/nvram/fw_cfg.h"
+> diff --git a/tests/qtest/libqos/i2c-imx.c b/tests/qtest/libqos/i2c-imx.c
+> index f33ece5..8f9a7e3 100644
+> --- a/tests/qtest/libqos/i2c-imx.c
+> +++ b/tests/qtest/libqos/i2c-imx.c
+> @@ -18,7 +18,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqos/i2c.h"
+> +#include "i2c.h"
+>  
+>  
+>  #include "libqtest.h"
+> diff --git a/tests/qtest/libqos/i2c-omap.c b/tests/qtest/libqos/i2c-omap.c
+> index 9ae8214..eb4e453 100644
+> --- a/tests/qtest/libqos/i2c-omap.c
+> +++ b/tests/qtest/libqos/i2c-omap.c
+> @@ -7,7 +7,7 @@
+>   * See the COPYING file in the top-level directory.
+>   */
+>  #include "qemu/osdep.h"
+> -#include "libqos/i2c.h"
+> +#include "i2c.h"
+>  
+>  
+>  #include "qemu/bswap.h"
+> diff --git a/tests/qtest/libqos/i2c.c b/tests/qtest/libqos/i2c.c
+> index 38f800d..ade1bdb 100644
+> --- a/tests/qtest/libqos/i2c.c
+> +++ b/tests/qtest/libqos/i2c.c
+> @@ -7,7 +7,7 @@
+>   * See the COPYING file in the top-level directory.
+>   */
+>  #include "qemu/osdep.h"
+> -#include "libqos/i2c.h"
+> +#include "i2c.h"
+>  #include "libqtest.h"
+>  
+>  void qi2c_send(QI2CDevice *i2cdev, const uint8_t *buf, uint16_t len)
+> diff --git a/tests/qtest/libqos/i2c.h b/tests/qtest/libqos/i2c.h
+> index c65f087..1341bac 100644
+> --- a/tests/qtest/libqos/i2c.h
+> +++ b/tests/qtest/libqos/i2c.h
+> @@ -10,7 +10,7 @@
+>  #define LIBQOS_I2C_H
+>  
+>  #include "libqtest.h"
+> -#include "libqos/qgraph.h"
+> +#include "qgraph.h"
+>  
+>  typedef struct I2CAdapter I2CAdapter;
+>  struct I2CAdapter {
+> diff --git a/tests/qtest/libqos/libqos-pc.c b/tests/qtest/libqos/libqos-pc.c
+> index d04abc5..db420a5 100644
+> --- a/tests/qtest/libqos/libqos-pc.c
+> +++ b/tests/qtest/libqos/libqos-pc.c
+> @@ -1,7 +1,7 @@
+>  #include "qemu/osdep.h"
+> -#include "libqos/libqos-pc.h"
+> -#include "libqos/malloc-pc.h"
+> -#include "libqos/pci-pc.h"
+> +#include "libqos-pc.h"
+> +#include "malloc-pc.h"
+> +#include "pci-pc.h"
+>  
+>  static QOSOps qos_ops = {
+>      .alloc_init = pc_alloc_init,
+> diff --git a/tests/qtest/libqos/libqos-pc.h b/tests/qtest/libqos/libqos-pc.h
+> index a0e4c45..1a9923e 100644
+> --- a/tests/qtest/libqos/libqos-pc.h
+> +++ b/tests/qtest/libqos/libqos-pc.h
+> @@ -1,7 +1,7 @@
+>  #ifndef LIBQOS_PC_H
+>  #define LIBQOS_PC_H
+>  
+> -#include "libqos/libqos.h"
+> +#include "libqos.h"
+>  
+>  QOSState *qtest_pc_vboot(const char *cmdline_fmt, va_list ap);
+>  QOSState *qtest_pc_boot(const char *cmdline_fmt, ...);
+> diff --git a/tests/qtest/libqos/libqos-spapr.c b/tests/qtest/libqos/libqos-spapr.c
+> index 8766d54..db0e87b 100644
+> --- a/tests/qtest/libqos/libqos-spapr.c
+> +++ b/tests/qtest/libqos/libqos-spapr.c
+> @@ -1,7 +1,7 @@
+>  #include "qemu/osdep.h"
+> -#include "libqos/libqos-spapr.h"
+> -#include "libqos/malloc-spapr.h"
+> -#include "libqos/pci-spapr.h"
+> +#include "libqos-spapr.h"
+> +#include "malloc-spapr.h"
+> +#include "pci-spapr.h"
+>  
+>  static QOSOps qos_ops = {
+>      .alloc_init = spapr_alloc_init,
+> diff --git a/tests/qtest/libqos/libqos-spapr.h b/tests/qtest/libqos/libqos-spapr.h
+> index 49bd72d..c613389 100644
+> --- a/tests/qtest/libqos/libqos-spapr.h
+> +++ b/tests/qtest/libqos/libqos-spapr.h
+> @@ -1,7 +1,7 @@
+>  #ifndef LIBQOS_SPAPR_H
+>  #define LIBQOS_SPAPR_H
+>  
+> -#include "libqos/libqos.h"
+> +#include "libqos.h"
+>  
+>  QOSState *qtest_spapr_vboot(const char *cmdline_fmt, va_list ap);
+>  QOSState *qtest_spapr_boot(const char *cmdline_fmt, ...);
+> diff --git a/tests/qtest/libqos/libqos.c b/tests/qtest/libqos/libqos.c
+> index f229eb2..2251e86 100644
+> --- a/tests/qtest/libqos/libqos.c
+> +++ b/tests/qtest/libqos/libqos.c
+> @@ -2,8 +2,8 @@
+>  #include <sys/wait.h>
+>  
+>  #include "libqtest.h"
+> -#include "libqos/libqos.h"
+> -#include "libqos/pci.h"
+> +#include "libqos.h"
+> +#include "pci.h"
+>  #include "qapi/qmp/qdict.h"
+>  
+>  /*** Test Setup & Teardown ***/
+> diff --git a/tests/qtest/libqos/libqos.h b/tests/qtest/libqos/libqos.h
+> index 8e971c2..e0b2bfe 100644
+> --- a/tests/qtest/libqos/libqos.h
+> +++ b/tests/qtest/libqos/libqos.h
+> @@ -2,8 +2,8 @@
+>  #define LIBQOS_H
+>  
+>  #include "libqtest.h"
+> -#include "libqos/pci.h"
+> -#include "libqos/malloc.h"
+> +#include "pci.h"
+> +#include "malloc.h"
+>  
+>  typedef struct QOSState QOSState;
+>  
+> diff --git a/tests/qtest/libqtest.h b/tests/qtest/libqos/libqtest.h
+> similarity index 100%
+> rename from tests/qtest/libqtest.h
+> rename to tests/qtest/libqos/libqtest.h
+> diff --git a/tests/qtest/libqos/malloc-pc.c b/tests/qtest/libqos/malloc-pc.c
+> index 6f92ce4..16ff960 100644
+> --- a/tests/qtest/libqos/malloc-pc.c
+> +++ b/tests/qtest/libqos/malloc-pc.c
+> @@ -11,8 +11,8 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqos/malloc-pc.h"
+> -#include "libqos/fw_cfg.h"
+> +#include "malloc-pc.h"
+> +#include "fw_cfg.h"
+>  
+>  #include "standard-headers/linux/qemu_fw_cfg.h"
+>  
+> diff --git a/tests/qtest/libqos/malloc-pc.h b/tests/qtest/libqos/malloc-pc.h
+> index 21e75ae..d8d7985 100644
+> --- a/tests/qtest/libqos/malloc-pc.h
+> +++ b/tests/qtest/libqos/malloc-pc.h
+> @@ -13,7 +13,7 @@
+>  #ifndef LIBQOS_MALLOC_PC_H
+>  #define LIBQOS_MALLOC_PC_H
+>  
+> -#include "libqos/malloc.h"
+> +#include "malloc.h"
+>  
+>  void pc_alloc_init(QGuestAllocator *s, QTestState *qts, QAllocOpts flags);
+>  
+> diff --git a/tests/qtest/libqos/malloc-spapr.c b/tests/qtest/libqos/malloc-spapr.c
+> index 2a6b7e3..84862e4 100644
+> --- a/tests/qtest/libqos/malloc-spapr.c
+> +++ b/tests/qtest/libqos/malloc-spapr.c
+> @@ -6,7 +6,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqos/malloc-spapr.h"
+> +#include "malloc-spapr.h"
+>  
+>  #include "qemu-common.h"
+>  
+> diff --git a/tests/qtest/libqos/malloc-spapr.h b/tests/qtest/libqos/malloc-spapr.h
+> index e5fe9bf..f99572f 100644
+> --- a/tests/qtest/libqos/malloc-spapr.h
+> +++ b/tests/qtest/libqos/malloc-spapr.h
+> @@ -8,7 +8,7 @@
+>  #ifndef LIBQOS_MALLOC_SPAPR_H
+>  #define LIBQOS_MALLOC_SPAPR_H
+>  
+> -#include "libqos/malloc.h"
+> +#include "malloc.h"
+>  
+>  void spapr_alloc_init(QGuestAllocator *s, QTestState *qts, QAllocOpts flags);
+>  
+> diff --git a/tests/qtest/libqos/malloc.c b/tests/qtest/libqos/malloc.c
+> index 615422a..f708b01 100644
+> --- a/tests/qtest/libqos/malloc.c
+> +++ b/tests/qtest/libqos/malloc.c
+> @@ -11,7 +11,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqos/malloc.h"
+> +#include "malloc.h"
+>  #include "qemu-common.h"
+>  #include "qemu/host-utils.h"
+>  
+> diff --git a/tests/qtest/libqos/meson.build b/tests/qtest/libqos/meson.build
+> new file mode 100644
+> index 0000000..19931b9
+> --- /dev/null
+> +++ b/tests/qtest/libqos/meson.build
+> @@ -0,0 +1,57 @@
+> +libqos = static_library('qos',
+> +  files('../libqtest.c',
+> +        'qgraph.c',
+> +        'qos_external.c',
+> +        'pci.c',
+> +        'fw_cfg.c',
+> +        'malloc.c',
+> +        'libqos.c',
+> +
+> +        # spapr
+> +        'malloc-spapr.c',
+> +        'libqos-spapr.c',
+> +        'rtas.c',
+> +        'pci-spapr.c',
+> +
+> +        # pc
+> +        'pci-pc.c',
+> +        'malloc-pc.c',
+> +        'libqos-pc.c',
+> +        'ahci.c',
+> +
+> +        # usb
+> +        'usb.c',
+> +
+> +        # qgraph devices:
+> +        'e1000e.c',
+> +        'i2c.c',
+> +        'i2c-imx.c',
+> +        'i2c-omap.c',
+> +        'sdhci.c',
+> +        'tpci200.c',
+> +        'virtio.c',
+> +        'virtio-9p.c',
+> +        'virtio-balloon.c',
+> +        'virtio-blk.c',
+> +        'virtio-mmio.c',
+> +        'virtio-net.c',
+> +        'virtio-pci.c',
+> +        'virtio-pci-modern.c',
+> +        'virtio-rng.c',
+> +        'virtio-scsi.c',
+> +        'virtio-serial.c',
+> +
+> +        # qgraph machines:
+> +        'aarch64-xlnx-zcu102-machine.c',
+> +        'arm-imx25-pdk-machine.c',
+> +        'arm-n800-machine.c',
+> +        'arm-raspi2-machine.c',
+> +        'arm-sabrelite-machine.c',
+> +        'arm-smdkc210-machine.c',
+> +        'arm-virt-machine.c',
+> +        'arm-xilinx-zynq-a9-machine.c',
+> +        'ppc64_pseries-machine.c',
+> +        'x86_64_pc-machine.c',
+> +), build_by_default: false)
+> +
+> +qos = declare_dependency(link_whole: libqos)
+> diff --git a/tests/qtest/libqos/pci-pc.c b/tests/qtest/libqos/pci-pc.c
+> index 3bb2eb3..f978442 100644
+> --- a/tests/qtest/libqos/pci-pc.c
+> +++ b/tests/qtest/libqos/pci-pc.c
+> @@ -12,7 +12,7 @@
+>  
+>  #include "qemu/osdep.h"
+>  #include "libqtest.h"
+> -#include "libqos/pci-pc.h"
+> +#include "pci-pc.h"
+>  #include "qapi/qmp/qdict.h"
+>  #include "hw/pci/pci_regs.h"
+>  
+> diff --git a/tests/qtest/libqos/pci-pc.h b/tests/qtest/libqos/pci-pc.h
+> index 4690005..49ec950 100644
+> --- a/tests/qtest/libqos/pci-pc.h
+> +++ b/tests/qtest/libqos/pci-pc.h
+> @@ -13,9 +13,9 @@
+>  #ifndef LIBQOS_PCI_PC_H
+>  #define LIBQOS_PCI_PC_H
+>  
+> -#include "libqos/pci.h"
+> -#include "libqos/malloc.h"
+> -#include "libqos/qgraph.h"
+> +#include "pci.h"
+> +#include "malloc.h"
+> +#include "qgraph.h"
+>  
+>  typedef struct QPCIBusPC {
+>      QOSGraphObject obj;
+> diff --git a/tests/qtest/libqos/pci-spapr.c b/tests/qtest/libqos/pci-spapr.c
+> index d6f8c01..2622269 100644
+> --- a/tests/qtest/libqos/pci-spapr.c
+> +++ b/tests/qtest/libqos/pci-spapr.c
+> @@ -7,9 +7,9 @@
+>  
+>  #include "qemu/osdep.h"
+>  #include "libqtest.h"
+> -#include "libqos/pci-spapr.h"
+> -#include "libqos/rtas.h"
+> -#include "libqos/qgraph.h"
+> +#include "pci-spapr.h"
+> +#include "rtas.h"
+> +#include "qgraph.h"
+>  
+>  #include "hw/pci/pci_regs.h"
+>  
+> diff --git a/tests/qtest/libqos/pci-spapr.h b/tests/qtest/libqos/pci-spapr.h
+> index d9e2563..20a4371 100644
+> --- a/tests/qtest/libqos/pci-spapr.h
+> +++ b/tests/qtest/libqos/pci-spapr.h
+> @@ -8,9 +8,9 @@
+>  #ifndef LIBQOS_PCI_SPAPR_H
+>  #define LIBQOS_PCI_SPAPR_H
+>  
+> -#include "libqos/malloc.h"
+> -#include "libqos/pci.h"
+> -#include "libqos/qgraph.h"
+> +#include "malloc.h"
+> +#include "pci.h"
+> +#include "qgraph.h"
+>  
+>  /* From include/hw/pci-host/spapr.h */
+>  
+> diff --git a/tests/qtest/libqos/pci.c b/tests/qtest/libqos/pci.c
+> index 2309a72..e1e9618 100644
+> --- a/tests/qtest/libqos/pci.c
+> +++ b/tests/qtest/libqos/pci.c
+> @@ -11,11 +11,11 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqos/pci.h"
+> +#include "pci.h"
+>  
+>  #include "hw/pci/pci_regs.h"
+>  #include "qemu/host-utils.h"
+> -#include "libqos/qgraph.h"
+> +#include "qgraph.h"
+>  
+>  void qpci_device_foreach(QPCIBus *bus, int vendor_id, int device_id,
+>                           void (*func)(QPCIDevice *dev, int devfn, void *data),
+> diff --git a/tests/qtest/libqos/pci.h b/tests/qtest/libqos/pci.h
+> index 590c175..ee64fde 100644
+> --- a/tests/qtest/libqos/pci.h
+> +++ b/tests/qtest/libqos/pci.h
+> @@ -14,7 +14,7 @@
+>  #define LIBQOS_PCI_H
+>  
+>  #include "libqtest.h"
+> -#include "libqos/qgraph.h"
+> +#include "qgraph.h"
+>  
+>  #define QPCI_PIO_LIMIT    0x10000
+>  
+> diff --git a/tests/qtest/libqos/ppc64_pseries-machine.c b/tests/qtest/libqos/ppc64_pseries-machine.c
+> index 5d7bd88..24ca179 100644
+> --- a/tests/qtest/libqos/ppc64_pseries-machine.c
+> +++ b/tests/qtest/libqos/ppc64_pseries-machine.c
+> @@ -18,10 +18,10 @@
+>  
+>  #include "qemu/osdep.h"
+>  #include "libqtest.h"
+> -#include "libqos/qgraph.h"
+> +#include "qgraph.h"
+>  #include "pci-spapr.h"
+>  #include "qemu/module.h"
+> -#include "libqos/malloc-spapr.h"
+> +#include "malloc-spapr.h"
+>  
+>  typedef struct QSPAPR_pci_host QSPAPR_pci_host;
+>  typedef struct Qppc64_pseriesMachine Qppc64_pseriesMachine;
+> diff --git a/tests/qtest/libqos/qgraph.c b/tests/qtest/libqos/qgraph.c
+> index eb0af8a..fc49cfa 100644
+> --- a/tests/qtest/libqos/qgraph.c
+> +++ b/tests/qtest/libqos/qgraph.c
+> @@ -19,8 +19,8 @@
+>  #include "qemu/osdep.h"
+>  #include "libqtest.h"
+>  #include "qemu/queue.h"
+> -#include "libqos/qgraph_internal.h"
+> -#include "libqos/qgraph.h"
+> +#include "qgraph_internal.h"
+> +#include "qgraph.h"
+>  
+>  #define QGRAPH_PRINT_DEBUG 0
+>  #define QOS_ROOT ""
 > diff --git a/tests/qtest/libqos/qgraph.h b/tests/qtest/libqos/qgraph.h
-> index 1054326..5f63d35 100644
+> index db1244e..1054326 100644
 > --- a/tests/qtest/libqos/qgraph.h
 > +++ b/tests/qtest/libqos/qgraph.h
-> @@ -226,7 +226,7 @@ typedef void *(*QOSBeforeTest) (GString *cmd_line, void *arg);
->   *        my_test <--consumed_by-- my_interface <--produces--+
+> @@ -106,7 +106,7 @@ typedef void *(*QOSBeforeTest) (GString *cmd_line, void *arg);
+>   * <example>
+>   *   <title>Creating new driver an its interface</title>
+>   *   <programlisting>
+> - #include "libqos/qgraph.h"
+> + #include "qgraph.h"
+>  
+>   struct My_driver {
+>       QOSGraphObject obj;
+> @@ -190,7 +190,7 @@ typedef void *(*QOSBeforeTest) (GString *cmd_line, void *arg);
+>   * <example>
+>   *   <title>Creating new test</title>
+>   *   <programlisting>
+> - * #include "libqos/qgraph.h"
+> + * #include "qgraph.h"
 >   *
->   * Assuming there the binary is
-> - * QTEST_QEMU_BINARY=x86_64-softmmu/qemu-system-x86_64
-> + * QTEST_QEMU_BINARY=./qemu-system-x86_64
+>   * static void my_test_function(void *obj, void *data)
+>   * {
+> @@ -230,7 +230,7 @@ typedef void *(*QOSBeforeTest) (GString *cmd_line, void *arg);
 >   * a valid test path will be:
 >   * "/x86_64/pc/other_node/my_driver/my_interface/my_test".
 >   *
+> - * Additional examples are also in libqos/test-qgraph.c
+> + * Additional examples are also in test-qgraph.c
+>   *
+>   * Command line:
+>   * Command line is built by using node names and optional arguments
+> diff --git a/tests/qtest/libqos/qgraph_internal.h b/tests/qtest/libqos/qgraph_internal.h
+> index aa3123f..968fa69 100644
+> --- a/tests/qtest/libqos/qgraph_internal.h
+> +++ b/tests/qtest/libqos/qgraph_internal.h
+> @@ -20,11 +20,11 @@
+>  #define QGRAPH_INTERNAL_H
+>  
+>  /* This header is declaring additional helper functions defined in
+> - * libqos/qgraph.c
+> + * qgraph.c
+>   * It should not be included in tests
+>   */
+>  
+> -#include "libqos/qgraph.h"
+> +#include "qgraph.h"
+>  
+>  typedef struct QOSGraphMachine QOSGraphMachine;
+>  typedef enum QOSEdgeType QOSEdgeType;
+> diff --git a/tests/qtest/libqos/qos_external.c b/tests/qtest/libqos/qos_external.c
+> index 0dfc05c..10ee0f7 100644
+> --- a/tests/qtest/libqos/qos_external.c
+> +++ b/tests/qtest/libqos/qos_external.c
+> @@ -24,10 +24,10 @@
+>  #include "qapi/qmp/qstring.h"
+>  #include "qemu/module.h"
+>  #include "qapi/qmp/qlist.h"
+> -#include "libqos/malloc.h"
+> -#include "libqos/qgraph.h"
+> -#include "libqos/qgraph_internal.h"
+> -#include "libqos/qos_external.h"
+> +#include "malloc.h"
+> +#include "qgraph.h"
+> +#include "qgraph_internal.h"
+> +#include "qos_external.h"
+>  
+>  static void machine_apply_to_node(const char *name)
+>  {
+> diff --git a/tests/qtest/libqos/qos_external.h b/tests/qtest/libqos/qos_external.h
+> index 56a2f37..8446e3d 100644
+> --- a/tests/qtest/libqos/qos_external.h
+> +++ b/tests/qtest/libqos/qos_external.h
+> @@ -19,7 +19,9 @@
+>  #ifndef QOS_EXTERNAL_H
+>  #define QOS_EXTERNAL_H
+>  
+> -#include "libqos/malloc.h"
+> +#include "qgraph.h"
+> +
+> +#include "malloc.h"
+>  #include "qapi/qapi-types-machine.h"
+>  #include "qapi/qapi-types-qom.h"
+>  
+> diff --git a/tests/qtest/libqos/rtas.c b/tests/qtest/libqos/rtas.c
+> index d81ff42..db29d55 100644
+> --- a/tests/qtest/libqos/rtas.c
+> +++ b/tests/qtest/libqos/rtas.c
+> @@ -5,7 +5,7 @@
+>  
+>  #include "qemu/osdep.h"
+>  #include "libqtest.h"
+> -#include "libqos/rtas.h"
+> +#include "rtas.h"
+>  
+>  static void qrtas_copy_args(QTestState *qts, uint64_t target_args,
+>                              uint32_t nargs, uint32_t *args)
+> diff --git a/tests/qtest/libqos/rtas.h b/tests/qtest/libqos/rtas.h
+> index 459e23a..f38f99d 100644
+> --- a/tests/qtest/libqos/rtas.h
+> +++ b/tests/qtest/libqos/rtas.h
+> @@ -5,7 +5,7 @@
+>  
+>  #ifndef LIBQOS_RTAS_H
+>  #define LIBQOS_RTAS_H
+> -#include "libqos/malloc.h"
+> +#include "malloc.h"
+>  
+>  int qrtas_get_time_of_day(QTestState *qts, QGuestAllocator *alloc,
+>                            struct tm *tm, uint32_t *ns);
+> diff --git a/tests/qtest/libqos/sdhci.c b/tests/qtest/libqos/sdhci.c
+> index fbf2e36..65f0d07 100644
+> --- a/tests/qtest/libqos/sdhci.c
+> +++ b/tests/qtest/libqos/sdhci.c
+> @@ -18,7 +18,7 @@
+>  
+>  #include "qemu/osdep.h"
+>  #include "libqtest.h"
+> -#include "libqos/qgraph.h"
+> +#include "qgraph.h"
+>  #include "pci.h"
+>  #include "qemu/module.h"
+>  #include "sdhci.h"
+> diff --git a/tests/qtest/libqos/sdhci.h b/tests/qtest/libqos/sdhci.h
+> index 1acd309..22d647b 100644
+> --- a/tests/qtest/libqos/sdhci.h
+> +++ b/tests/qtest/libqos/sdhci.h
+> @@ -19,7 +19,7 @@
+>  #ifndef QGRAPH_QSDHCI_H
+>  #define QGRAPH_QSDHCI_H
+>  
+> -#include "libqos/qgraph.h"
+> +#include "qgraph.h"
+>  #include "pci.h"
+>  
+>  typedef struct QSDHCI QSDHCI;
+> diff --git a/tests/qtest/libqos/tpci200.c b/tests/qtest/libqos/tpci200.c
+> index ae590a4..1787b1f 100644
+> --- a/tests/qtest/libqos/tpci200.c
+> +++ b/tests/qtest/libqos/tpci200.c
+> @@ -10,8 +10,8 @@
+>  #include "qemu/osdep.h"
+>  #include "libqtest.h"
+>  #include "qemu/module.h"
+> -#include "libqos/qgraph.h"
+> -#include "libqos/pci.h"
+> +#include "qgraph.h"
+> +#include "pci.h"
+>  
+>  typedef struct QTpci200 QTpci200;
+>  typedef struct QIpack QIpack;
+> diff --git a/tests/qtest/libqos/usb.c b/tests/qtest/libqos/usb.c
+> index d7a9cb3..8b45b02 100644
+> --- a/tests/qtest/libqos/usb.c
+> +++ b/tests/qtest/libqos/usb.c
+> @@ -14,7 +14,7 @@
+>  #include "qemu/osdep.h"
+>  #include "libqtest.h"
+>  #include "hw/usb/uhci-regs.h"
+> -#include "libqos/usb.h"
+> +#include "usb.h"
+>  
+>  void qusb_pci_init_one(QPCIBus *pcibus, struct qhc *hc, uint32_t devfn, int bar)
+>  {
+> diff --git a/tests/qtest/libqos/usb.h b/tests/qtest/libqos/usb.h
+> index eeced39..50030d7 100644
+> --- a/tests/qtest/libqos/usb.h
+> +++ b/tests/qtest/libqos/usb.h
+> @@ -1,7 +1,7 @@
+>  #ifndef LIBQOS_USB_H
+>  #define LIBQOS_USB_H
+>  
+> -#include "libqos/pci-pc.h"
+> +#include "pci-pc.h"
+>  
+>  struct qhc {
+>      QPCIDevice *dev;
+> diff --git a/tests/qtest/libqos/virtio-9p.c b/tests/qtest/libqos/virtio-9p.c
+> index c87b561..2e30006 100644
+> --- a/tests/qtest/libqos/virtio-9p.c
+> +++ b/tests/qtest/libqos/virtio-9p.c
+> @@ -20,8 +20,8 @@
+>  #include "libqtest.h"
+>  #include "qemu/module.h"
+>  #include "standard-headers/linux/virtio_ids.h"
+> -#include "libqos/virtio-9p.h"
+> -#include "libqos/qgraph.h"
+> +#include "virtio-9p.h"
+> +#include "qgraph.h"
+>  
+>  static QGuestAllocator *alloc;
+>  
+> diff --git a/tests/qtest/libqos/virtio-9p.h b/tests/qtest/libqos/virtio-9p.h
+> index be9621a..b1e6bad 100644
+> --- a/tests/qtest/libqos/virtio-9p.h
+> +++ b/tests/qtest/libqos/virtio-9p.h
+> @@ -19,9 +19,9 @@
+>  #ifndef TESTS_LIBQOS_VIRTIO_9P_H
+>  #define TESTS_LIBQOS_VIRTIO_9P_H
+>  
+> -#include "libqos/qgraph.h"
+> -#include "libqos/virtio.h"
+> -#include "libqos/virtio-pci.h"
+> +#include "qgraph.h"
+> +#include "virtio.h"
+> +#include "virtio-pci.h"
+>  
+>  typedef struct QVirtio9P QVirtio9P;
+>  typedef struct QVirtio9PPCI QVirtio9PPCI;
+> diff --git a/tests/qtest/libqos/virtio-balloon.c b/tests/qtest/libqos/virtio-balloon.c
+> index 9745f4a..a3da5c2 100644
+> --- a/tests/qtest/libqos/virtio-balloon.c
+> +++ b/tests/qtest/libqos/virtio-balloon.c
+> @@ -19,8 +19,8 @@
+>  #include "qemu/osdep.h"
+>  #include "libqtest.h"
+>  #include "qemu/module.h"
+> -#include "libqos/qgraph.h"
+> -#include "libqos/virtio-balloon.h"
+> +#include "qgraph.h"
+> +#include "virtio-balloon.h"
+>  
+>  /* virtio-balloon-device */
+>  static void *qvirtio_balloon_get_driver(QVirtioBalloon *v_balloon,
+> diff --git a/tests/qtest/libqos/virtio-balloon.h b/tests/qtest/libqos/virtio-balloon.h
+> index 5b91930..309894c 100644
+> --- a/tests/qtest/libqos/virtio-balloon.h
+> +++ b/tests/qtest/libqos/virtio-balloon.h
+> @@ -19,9 +19,9 @@
+>  #ifndef TESTS_LIBQOS_VIRTIO_BALLOON_H
+>  #define TESTS_LIBQOS_VIRTIO_BALLOON_H
+>  
+> -#include "libqos/qgraph.h"
+> -#include "libqos/virtio.h"
+> -#include "libqos/virtio-pci.h"
+> +#include "qgraph.h"
+> +#include "virtio.h"
+> +#include "virtio-pci.h"
+>  
+>  typedef struct QVirtioBalloon QVirtioBalloon;
+>  typedef struct QVirtioBalloonPCI QVirtioBalloonPCI;
+> diff --git a/tests/qtest/libqos/virtio-blk.c b/tests/qtest/libqos/virtio-blk.c
+> index 5fc6940..5da0259 100644
+> --- a/tests/qtest/libqos/virtio-blk.c
+> +++ b/tests/qtest/libqos/virtio-blk.c
+> @@ -20,8 +20,8 @@
+>  #include "libqtest.h"
+>  #include "qemu/module.h"
+>  #include "standard-headers/linux/virtio_blk.h"
+> -#include "libqos/qgraph.h"
+> -#include "libqos/virtio-blk.h"
+> +#include "qgraph.h"
+> +#include "virtio-blk.h"
+>  
+>  #define PCI_SLOT                0x04
+>  #define PCI_FN                  0x00
+> diff --git a/tests/qtest/libqos/virtio-blk.h b/tests/qtest/libqos/virtio-blk.h
+> index 5170f13..dcef388 100644
+> --- a/tests/qtest/libqos/virtio-blk.h
+> +++ b/tests/qtest/libqos/virtio-blk.h
+> @@ -19,9 +19,9 @@
+>  #ifndef TESTS_LIBQOS_VIRTIO_BLK_H
+>  #define TESTS_LIBQOS_VIRTIO_BLK_H
+>  
+> -#include "libqos/qgraph.h"
+> -#include "libqos/virtio.h"
+> -#include "libqos/virtio-pci.h"
+> +#include "qgraph.h"
+> +#include "virtio.h"
+> +#include "virtio-pci.h"
+>  
+>  typedef struct QVirtioBlk QVirtioBlk;
+>  typedef struct QVirtioBlkPCI QVirtioBlkPCI;
+> diff --git a/tests/qtest/libqos/virtio-mmio.c b/tests/qtest/libqos/virtio-mmio.c
+> index e0a2bd7..75efda3 100644
+> --- a/tests/qtest/libqos/virtio-mmio.c
+> +++ b/tests/qtest/libqos/virtio-mmio.c
+> @@ -10,10 +10,10 @@
+>  #include "qemu/osdep.h"
+>  #include "libqtest.h"
+>  #include "qemu/module.h"
+> -#include "libqos/virtio.h"
+> -#include "libqos/virtio-mmio.h"
+> -#include "libqos/malloc.h"
+> -#include "libqos/qgraph.h"
+> +#include "virtio.h"
+> +#include "virtio-mmio.h"
+> +#include "malloc.h"
+> +#include "qgraph.h"
+>  #include "standard-headers/linux/virtio_ring.h"
+>  
+>  static uint8_t qvirtio_mmio_config_readb(QVirtioDevice *d, uint64_t off)
+> diff --git a/tests/qtest/libqos/virtio-mmio.h b/tests/qtest/libqos/virtio-mmio.h
+> index 0e45778..30803bc 100644
+> --- a/tests/qtest/libqos/virtio-mmio.h
+> +++ b/tests/qtest/libqos/virtio-mmio.h
+> @@ -10,8 +10,8 @@
+>  #ifndef LIBQOS_VIRTIO_MMIO_H
+>  #define LIBQOS_VIRTIO_MMIO_H
+>  
+> -#include "libqos/virtio.h"
+> -#include "libqos/qgraph.h"
+> +#include "virtio.h"
+> +#include "qgraph.h"
+>  
+>  #define QVIRTIO_MMIO_MAGIC_VALUE        0x000
+>  #define QVIRTIO_MMIO_VERSION            0x004
+> diff --git a/tests/qtest/libqos/virtio-net.c b/tests/qtest/libqos/virtio-net.c
+> index a9e253a..1cae07f 100644
+> --- a/tests/qtest/libqos/virtio-net.c
+> +++ b/tests/qtest/libqos/virtio-net.c
+> @@ -19,8 +19,8 @@
+>  #include "qemu/osdep.h"
+>  #include "libqtest.h"
+>  #include "qemu/module.h"
+> -#include "libqos/qgraph.h"
+> -#include "libqos/virtio-net.h"
+> +#include "qgraph.h"
+> +#include "virtio-net.h"
+>  #include "hw/virtio/virtio-net.h"
+>  
+>  
+> diff --git a/tests/qtest/libqos/virtio-net.h b/tests/qtest/libqos/virtio-net.h
+> index b8cbec0..5ba2161 100644
+> --- a/tests/qtest/libqos/virtio-net.h
+> +++ b/tests/qtest/libqos/virtio-net.h
+> @@ -19,9 +19,9 @@
+>  #ifndef TESTS_LIBQOS_VIRTIO_NET_H
+>  #define TESTS_LIBQOS_VIRTIO_NET_H
+>  
+> -#include "libqos/qgraph.h"
+> -#include "libqos/virtio.h"
+> -#include "libqos/virtio-pci.h"
+> +#include "qgraph.h"
+> +#include "virtio.h"
+> +#include "virtio-pci.h"
+>  
+>  typedef struct QVirtioNet QVirtioNet;
+>  typedef struct QVirtioNetPCI QVirtioNetPCI;
+> diff --git a/tests/qtest/libqos/virtio-pci.c b/tests/qtest/libqos/virtio-pci.c
+> index 62851c2..cd3c0f5 100644
+> --- a/tests/qtest/libqos/virtio-pci.c
+> +++ b/tests/qtest/libqos/virtio-pci.c
+> @@ -9,13 +9,13 @@
+>  
+>  #include "qemu/osdep.h"
+>  #include "libqtest.h"
+> -#include "libqos/virtio.h"
+> -#include "libqos/virtio-pci.h"
+> -#include "libqos/pci.h"
+> -#include "libqos/pci-pc.h"
+> -#include "libqos/malloc.h"
+> -#include "libqos/malloc-pc.h"
+> -#include "libqos/qgraph.h"
+> +#include "virtio.h"
+> +#include "virtio-pci.h"
+> +#include "pci.h"
+> +#include "pci-pc.h"
+> +#include "malloc.h"
+> +#include "malloc-pc.h"
+> +#include "qgraph.h"
+>  #include "standard-headers/linux/virtio_ring.h"
+>  #include "standard-headers/linux/virtio_pci.h"
+>  
+> diff --git a/tests/qtest/libqos/virtio-pci.h b/tests/qtest/libqos/virtio-pci.h
+> index 294d556..f5115ca 100644
+> --- a/tests/qtest/libqos/virtio-pci.h
+> +++ b/tests/qtest/libqos/virtio-pci.h
+> @@ -10,9 +10,9 @@
+>  #ifndef LIBQOS_VIRTIO_PCI_H
+>  #define LIBQOS_VIRTIO_PCI_H
+>  
+> -#include "libqos/virtio.h"
+> -#include "libqos/pci.h"
+> -#include "libqos/qgraph.h"
+> +#include "virtio.h"
+> +#include "pci.h"
+> +#include "qgraph.h"
+>  
+>  typedef struct QVirtioPCIMSIXOps QVirtioPCIMSIXOps;
+>  
+> diff --git a/tests/qtest/libqos/virtio-rng.c b/tests/qtest/libqos/virtio-rng.c
+> index 46f8d95..2e09dd7 100644
+> --- a/tests/qtest/libqos/virtio-rng.c
+> +++ b/tests/qtest/libqos/virtio-rng.c
+> @@ -19,8 +19,8 @@
+>  #include "qemu/osdep.h"
+>  #include "libqtest.h"
+>  #include "qemu/module.h"
+> -#include "libqos/qgraph.h"
+> -#include "libqos/virtio-rng.h"
+> +#include "qgraph.h"
+> +#include "virtio-rng.h"
+>  
+>  /* virtio-rng-device */
+>  static void *qvirtio_rng_get_driver(QVirtioRng *v_rng,
+> diff --git a/tests/qtest/libqos/virtio-rng.h b/tests/qtest/libqos/virtio-rng.h
+> index 9342372..9ca102b 100644
+> --- a/tests/qtest/libqos/virtio-rng.h
+> +++ b/tests/qtest/libqos/virtio-rng.h
+> @@ -19,9 +19,9 @@
+>  #ifndef TESTS_LIBQOS_VIRTIO_RNG_H
+>  #define TESTS_LIBQOS_VIRTIO_RNG_H
+>  
+> -#include "libqos/qgraph.h"
+> -#include "libqos/virtio.h"
+> -#include "libqos/virtio-pci.h"
+> +#include "qgraph.h"
+> +#include "virtio.h"
+> +#include "virtio-pci.h"
+>  
+>  typedef struct QVirtioRng QVirtioRng;
+>  typedef struct QVirtioRngPCI QVirtioRngPCI;
+> diff --git a/tests/qtest/libqos/virtio-scsi.c b/tests/qtest/libqos/virtio-scsi.c
+> index c8c3598..5644e32 100644
+> --- a/tests/qtest/libqos/virtio-scsi.c
+> +++ b/tests/qtest/libqos/virtio-scsi.c
+> @@ -20,8 +20,8 @@
+>  #include "libqtest.h"
+>  #include "qemu/module.h"
+>  #include "standard-headers/linux/virtio_ids.h"
+> -#include "libqos/qgraph.h"
+> -#include "libqos/virtio-scsi.h"
+> +#include "qgraph.h"
+> +#include "virtio-scsi.h"
+>  
+>  /* virtio-scsi-device */
+>  static void *qvirtio_scsi_get_driver(QVirtioSCSI *v_scsi,
+> diff --git a/tests/qtest/libqos/virtio-scsi.h b/tests/qtest/libqos/virtio-scsi.h
+> index 9e3774d..531315e 100644
+> --- a/tests/qtest/libqos/virtio-scsi.h
+> +++ b/tests/qtest/libqos/virtio-scsi.h
+> @@ -19,9 +19,9 @@
+>  #ifndef TESTS_LIBQOS_VIRTIO_SCSI_H
+>  #define TESTS_LIBQOS_VIRTIO_SCSI_H
+>  
+> -#include "libqos/qgraph.h"
+> -#include "libqos/virtio.h"
+> -#include "libqos/virtio-pci.h"
+> +#include "qgraph.h"
+> +#include "virtio.h"
+> +#include "virtio-pci.h"
+>  
+>  typedef struct QVirtioSCSI QVirtioSCSI;
+>  typedef struct QVirtioSCSIPCI QVirtioSCSIPCI;
+> diff --git a/tests/qtest/libqos/virtio-serial.c b/tests/qtest/libqos/virtio-serial.c
+> index b956540..ee34afd 100644
+> --- a/tests/qtest/libqos/virtio-serial.c
+> +++ b/tests/qtest/libqos/virtio-serial.c
+> @@ -19,8 +19,8 @@
+>  #include "qemu/osdep.h"
+>  #include "libqtest.h"
+>  #include "qemu/module.h"
+> -#include "libqos/qgraph.h"
+> -#include "libqos/virtio-serial.h"
+> +#include "qgraph.h"
+> +#include "virtio-serial.h"
+>  
+>  static void *qvirtio_serial_get_driver(QVirtioSerial *v_serial,
+>                                         const char *interface)
+> diff --git a/tests/qtest/libqos/virtio-serial.h b/tests/qtest/libqos/virtio-serial.h
+> index 3328c6c..3db43b2 100644
+> --- a/tests/qtest/libqos/virtio-serial.h
+> +++ b/tests/qtest/libqos/virtio-serial.h
+> @@ -19,9 +19,9 @@
+>  #ifndef TESTS_LIBQOS_VIRTIO_SERIAL_H
+>  #define TESTS_LIBQOS_VIRTIO_SERIAL_H
+>  
+> -#include "libqos/qgraph.h"
+> -#include "libqos/virtio.h"
+> -#include "libqos/virtio-pci.h"
+> +#include "qgraph.h"
+> +#include "virtio.h"
+> +#include "virtio-pci.h"
+>  
+>  typedef struct QVirtioSerial QVirtioSerial;
+>  typedef struct QVirtioSerialPCI QVirtioSerialPCI;
+> diff --git a/tests/qtest/libqos/virtio.c b/tests/qtest/libqos/virtio.c
+> index 9aa3606..6fe7bf9 100644
+> --- a/tests/qtest/libqos/virtio.c
+> +++ b/tests/qtest/libqos/virtio.c
+> @@ -10,7 +10,7 @@
+>  #include "qemu/osdep.h"
+>  #include "qemu/bswap.h"
+>  #include "libqtest.h"
+> -#include "libqos/virtio.h"
+> +#include "virtio.h"
+>  #include "standard-headers/linux/virtio_config.h"
+>  #include "standard-headers/linux/virtio_ring.h"
+>  
+> diff --git a/tests/qtest/libqos/virtio.h b/tests/qtest/libqos/virtio.h
+> index 529ef75..b8bd06e 100644
+> --- a/tests/qtest/libqos/virtio.h
+> +++ b/tests/qtest/libqos/virtio.h
+> @@ -10,7 +10,7 @@
+>  #ifndef LIBQOS_VIRTIO_H
+>  #define LIBQOS_VIRTIO_H
+>  
+> -#include "libqos/malloc.h"
+> +#include "malloc.h"
+>  #include "standard-headers/linux/virtio_ring.h"
+>  
+>  #define QVIRTIO_F_BAD_FEATURE           0x40000000ull
+> diff --git a/tests/qtest/libqos/x86_64_pc-machine.c b/tests/qtest/libqos/x86_64_pc-machine.c
+> index 0edb1c9..ad96742 100644
+> --- a/tests/qtest/libqos/x86_64_pc-machine.c
+> +++ b/tests/qtest/libqos/x86_64_pc-machine.c
+> @@ -18,7 +18,7 @@
+>  
+>  #include "qemu/osdep.h"
+>  #include "libqtest.h"
+> -#include "libqos/qgraph.h"
+> +#include "qgraph.h"
+>  #include "pci-pc.h"
+>  #include "qemu/module.h"
+>  #include "malloc-pc.h"
+> diff --git a/tests/qtest/libqtest-single.h b/tests/qtest/libqtest-single.h
+> index 6f1bb13..176979a 100644
+> --- a/tests/qtest/libqtest-single.h
+> +++ b/tests/qtest/libqtest-single.h
+> @@ -11,7 +11,7 @@
+>  #ifndef LIBQTEST_SINGLE_H
+>  #define LIBQTEST_SINGLE_H
+>  
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  
+>  QTestState *global_qtest __attribute__((common, weak));
+>  
+> diff --git a/tests/qtest/libqtest.c b/tests/qtest/libqtest.c
+> index fd46805..26f1223 100644
+> --- a/tests/qtest/libqtest.c
+> +++ b/tests/qtest/libqtest.c
+> @@ -20,7 +20,7 @@
+>  #include <sys/wait.h>
+>  #include <sys/un.h>
+>  
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qemu-common.h"
+>  #include "qemu/ctype.h"
+>  #include "qemu/cutils.h"
+> diff --git a/tests/qtest/m48t59-test.c b/tests/qtest/m48t59-test.c
+> index b94a123..6db3234 100644
+> --- a/tests/qtest/m48t59-test.c
+> +++ b/tests/qtest/m48t59-test.c
+> @@ -14,7 +14,7 @@
+>  
+>  #include "qemu/osdep.h"
+>  
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  
+>  #define RTC_SECONDS             0x9
+>  #define RTC_MINUTES             0xa
+> diff --git a/tests/qtest/machine-none-test.c b/tests/qtest/machine-none-test.c
+> index 57107f1..aab06b9 100644
+> --- a/tests/qtest/machine-none-test.c
+> +++ b/tests/qtest/machine-none-test.c
+> @@ -14,7 +14,7 @@
+>  
+>  #include "qemu-common.h"
+>  #include "qemu/cutils.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qapi/qmp/qdict.h"
+>  
+>  
+> diff --git a/tests/qtest/megasas-test.c b/tests/qtest/megasas-test.c
+> index d6796b9..eae70ff 100644
+> --- a/tests/qtest/megasas-test.c
+> +++ b/tests/qtest/megasas-test.c
+> @@ -8,7 +8,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qemu/bswap.h"
+>  #include "qemu/module.h"
+>  #include "libqos/qgraph.h"
 > diff --git a/tests/qtest/meson.build b/tests/qtest/meson.build
-> index 30cb88d..8f8fdb1 100644
-> --- a/tests/qtest/meson.build
+> new file mode 100644
+> index 0000000..30cb88d
+> --- /dev/null
 > +++ b/tests/qtest/meson.build
-> @@ -234,7 +234,7 @@ foreach dir : target_dirs
->    qtest_env = environment()
->    qtest_env.set('QTEST_QEMU_IMG', './qemu-img')
->    qtest_env.set('G_TEST_DBUS_DAEMON', meson.source_root() / 'tests/dbus-vmstate-daemon.sh')
-> -  qtest_env.set('QTEST_QEMU_BINARY', '@0@-softmmu/qemu-system-@0@'.format(target_base))
-> +  qtest_env.set('QTEST_QEMU_BINARY', './qemu-system-' + target_base)
->    
->    foreach test : qtests
->      # Executables are shared across targets, declare them only the first time we
+> @@ -0,0 +1,257 @@
+> +# All QTests for now are POSIX-only, but the dependencies are
+> +# really in libqtest, not in the testcases themselves.
+> +if not config_host.has_key('CONFIG_POSIX')
+> +  subdir_done()
+> +endif
+> +
+> +qtests_generic = [
+> +  'cdrom-test',
+> +  'device-introspect-test',
+> +  'machine-none-test',
+> +  'qmp-test',
+> +  'qmp-cmd-test',
+> +  'qom-test',
+> +  'test-hmp',
+> +  'qos-test',
+> +]
+> +if config_host.has_key('CONFIG_MODULES')
+> +  qtests_generic += [ 'modules-test' ]
+> +endif
+> +
+> +qtests_pci = \
+> +  (config_all_devices.has_key('CONFIG_VGA') ? ['display-vga-test'] : []) +                  \
+> +  (config_all_devices.has_key('CONFIG_IVSHMEM_DEVICE') ? ['ivshmem-test'] : [])
+> +
+> +qtests_i386 = \
+> +  (config_host.has_key('CONFIG_SLIRP') ? ['pxe-test', 'test-netfilter'] : []) +             \
+> +  (config_host.has_key('CONFIG_POSIX') ? ['test-filter-mirror'] : []) +                     \
+> +  (have_tools ? ['ahci-test'] : []) +                                                       \
+> +  (config_all_devices.has_key('CONFIG_ISA_TESTDEV') ? ['endianness-test'] : []) +           \
+> +  (config_all_devices.has_key('CONFIG_SGA') ? ['boot-serial-test'] : []) +                  \
+> +  (config_all_devices.has_key('CONFIG_RTL8139_PCI') ? ['test-filter-redirector'] : []) +    \
+> +  (config_all_devices.has_key('CONFIG_ISA_IPMI_KCS') ? ['ipmi-kcs-test'] : []) +            \
+> +  (config_host.has_key('CONFIG_LINUX') and                                                  \
+> +   config_all_devices.has_key('CONFIG_ISA_IPMI_BT') ? ['ipmi-bt-test'] : []) +              \
+> +  (config_all_devices.has_key('CONFIG_WDT_IB700') ? ['wdt_ib700-test'] : []) +              \
+> +  (config_all_devices.has_key('CONFIG_PVPANIC') ? ['pvpanic-test'] : []) +                  \
+> +  (config_all_devices.has_key('CONFIG_HDA') ? ['intel-hda-test'] : []) +                    \
+> +  (config_all_devices.has_key('CONFIG_I82801B11') ? ['i82801b11-test'] : []) +             \
+> +  (config_all_devices.has_key('CONFIG_IOH3420') ? ['ioh3420-test'] : []) +                  \
+> +  (config_all_devices.has_key('CONFIG_USB_UHCI') ? ['usb-hcd-uhci-test'] : []) +            \
+> +  (config_all_devices.has_key('CONFIG_USB_UHCI') and                                        \
+> +   config_all_devices.has_key('CONFIG_USB_EHCI') ? ['usb-hcd-ehci-test'] : []) +            \
+> +  (config_all_devices.has_key('CONFIG_USB_XHCI_NEC') ? ['usb-hcd-xhci-test'] : []) +        \
+> +  (config_all_devices.has_key('CONFIG_TPM_CRB') ? ['tpm-crb-test'] : []) +                  \
+> +  (config_all_devices.has_key('CONFIG_TPM_CRB') ? ['tpm-crb-swtpm-test'] : []) +            \
+> +  (config_all_devices.has_key('CONFIG_TPM_TIS_ISA') ? ['tpm-tis-test'] : []) +              \
+> +  (config_all_devices.has_key('CONFIG_TPM_TIS_ISA') ? ['tpm-tis-swtpm-test'] : []) +        \
+> +  (config_all_devices.has_key('CONFIG_RTL8139_PCI') ? ['rtl8139-test'] : []) +              \
+> +  qtests_pci +                                                                              \
+> +  ['fdc-test',
+> +   'ide-test',
+> +   'ahci-test',
+> +   'hd-geo-test',
+> +   'boot-order-test',
+> +   'bios-tables-test',
+> +   'rtc-test',
+> +   'i440fx-test',
+> +   'fw_cfg-test',
+> +   'device-plug-test',
+> +   'drive_del-test',
+> +   'tco-test',
+> +   'cpu-plug-test',
+> +   'q35-test',
+> +   'vmgenid-test',
+> +   'migration-test',
+> +   'test-x86-cpuid-compat',
+> +   'numa-test']
+> +
+> +dbus_daemon = find_program('dbus-daemon', required: false)
+> +if dbus_daemon.found() and config_host.has_key('GDBUS_CODEGEN')
+> +  # Temporarily disabled due to Patchew failures:
+> +  #qtests_i386 += ['dbus-vmstate-test']
+> +  dbus_vmstate1 = custom_target('dbus-vmstate description',
+> +                                output: ['dbus-vmstate1.h', 'dbus-vmstate1.c'],
+> +                                input: files('dbus-vmstate1.xml'),
+> +                                command: [config_host['GDBUS_CODEGEN'],
+> +                                          '@INPUT@',
+> +                                          '--interface-prefix', 'org.qemu',
+> +                                          '--generate-c-code', '@BASENAME@']).to_list()
+> +else
+> +  dbus_vmstate1 = []
+> +endif
+> +
+> +qtests_x86_64 = qtests_i386
+> +
+> +qtests_alpha = [ 'boot-serial-test' ] +                                                      \
+> +  (config_all_devices.has_key('CONFIG_VGA') ? ['display-vga-test'] : [])
+> +
+> +qtests_avr = [ 'boot-serial-test' ]
+> +
+> +qtests_hppa = [ 'boot-serial-test' ] +                                                       \
+> +  (config_all_devices.has_key('CONFIG_VGA') ? ['display-vga-test'] : [])
+> +
+> +qtests_m68k = [ 'boot-serial-test' ]
+> +qtests_microblaze = [ 'boot-serial-test' ]
+> +qtests_microblazeel = qtests_microblaze
+> +
+> +qtests_mips = \
+> +  (config_all_devices.has_key('CONFIG_ISA_TESTDEV') ? ['endianness-test'] : []) +            \
+> +  (config_all_devices.has_key('CONFIG_VGA') ? ['display-vga-test'] : [])
+> +
+> +qtests_mips64 = \
+> +  (config_all_devices.has_key('CONFIG_ISA_TESTDEV') ? ['endianness-test'] : []) +            \
+> +  (config_all_devices.has_key('CONFIG_VGA') ? ['display-vga-test'] : [])
+> +
+> +qtests_mips64el = \
+> +  (config_all_devices.has_key('CONFIG_ISA_TESTDEV') ? ['endianness-test'] : []) +            \
+> +  (config_all_devices.has_key('CONFIG_VGA') ? ['display-vga-test'] : [])
+> +
+> +qtests_moxie = [ 'boot-serial-test' ]
+> +
+> +qtests_ppc = \
+> +  (config_all_devices.has_key('CONFIG_ISA_TESTDEV') ? ['endianness-test'] : []) +            \
+> +  (config_all_devices.has_key('CONFIG_M48T59') ? ['m48t59-test'] : []) +                     \
+> +  ['boot-order-test', 'prom-env-test', 'drive_del-test', 'boot-serial-test']                 \
+> +
+> +qtests_ppc64 = \
+> +  (config_all_devices.has_key('CONFIG_PSERIES') ? ['device-plug-test'] : []) +               \
+> +  (config_all_devices.has_key('CONFIG_POWERNV') ? ['pnv-xscom-test'] : []) +                 \
+> +  (config_all_devices.has_key('CONFIG_PSERIES') ? ['rtas-test'] : []) +                      \
+> +  (config_host.has_key('CONFIG_SLIRP') ? ['pxe-test', 'test-netfilter'] : []) +              \
+> +  (config_all_devices.has_key('CONFIG_USB_UHCI') ? ['usb-hcd-uhci-test'] : []) +             \
+> +  (config_all_devices.has_key('CONFIG_USB_XHCI_NEC') ? ['usb-hcd-xhci-test'] : []) +         \
+> +  (config_host.has_key('CONFIG_POSIX') ? ['test-filter-mirror'] : []) +                      \
+> +  qtests_pci + ['migration-test', 'numa-test', 'cpu-plug-test']
+> +
+> +qtests_sh4 = (config_all_devices.has_key('CONFIG_ISA_TESTDEV') ? ['endianness-test'] : [])
+> +qtests_sh4eb = (config_all_devices.has_key('CONFIG_ISA_TESTDEV') ? ['endianness-test'] : [])
+> +
+> +qtests_sparc = ['prom-env-test', 'm48t59-test', 'boot-serial-test']
+> +
+> +qtests_sparc64 = \
+> +  (config_all_devices.has_key('CONFIG_ISA_TESTDEV') ? ['endianness-test'] : []) +            \
+> +  ['prom-env-test', 'boot-serial-test']
+> +
+> +qtests_arm = \
+> +  (config_all_devices.has_key('CONFIG_PFLASH_CFI02') ? ['pflash-cfi02-test'] : []) +         \
+> +  ['arm-cpu-features',
+> +   'microbit-test',
+> +   'm25p80-test',
+> +   'test-arm-mptimer',
+> +   'boot-serial-test',
+> +   'hexloader-test']
+> +
+> +# TODO: once aarch64 TCG is fixed on ARM 32 bit host, make bios-tables-test unconditional
+> +qtests_aarch64 = \
+> +  (cpu != 'arm' ? ['bios-tables-test'] : []) +                                                  \
+> +  (config_all_devices.has_key('CONFIG_TPM_TIS_SYSBUS') ? ['tpm-tis-device-test'] : []) +        \
+> +  (config_all_devices.has_key('CONFIG_TPM_TIS_SYSBUS') ? ['tpm-tis-device-swtpm-test'] : []) +  \
+> +  ['numa-test',
+> +   'boot-serial-test',
+> +   'migration-test']
+> +
+> +qtests_s390x = \
+> +  (config_host.has_key('CONFIG_SLIRP') ? ['pxe-test', 'test-netfilter'] : []) +                 \
+> +  (config_host.has_key('CONFIG_POSIX') ? ['test-filter-mirror'] : []) +                         \
+> +  (config_host.has_key('CONFIG_POSIX') ? ['test-filter-redirector'] : []) +                     \
+> +  ['boot-serial-test',
+> +   'drive_del-test',
+> +   'device-plug-test',
+> +   'virtio-ccw-test',
+> +   'cpu-plug-test',
+> +   'migration-test']
+> +
+> +qos_test_ss = ss.source_set()
+> +qos_test_ss.add(
+> +  'ac97-test.c',
+> +  'ds1338-test.c',
+> +  'e1000-test.c',
+> +  'e1000e-test.c',
+> +  'eepro100-test.c',
+> +  'es1370-test.c',
+> +  'ipoctal232-test.c',
+> +  'megasas-test.c',
+> +  'ne2000-test.c',
+> +  'tulip-test.c',
+> +  'nvme-test.c',
+> +  'pca9552-test.c',
+> +  'pci-test.c',
+> +  'pcnet-test.c',
+> +  'sdhci-test.c',
+> +  'spapr-phb-test.c',
+> +  'tmp105-test.c',
+> +  'usb-hcd-ohci-test.c',
+> +  'virtio-test.c',
+> +  'virtio-blk-test.c',
+> +  'virtio-net-test.c',
+> +  'virtio-rng-test.c',
+> +  'virtio-scsi-test.c',
+> +  'virtio-serial-test.c',
+> +  'vmxnet3-test.c',
+> +)
+> +qos_test_ss.add(when: 'CONFIG_VIRTFS', if_true: files('virtio-9p-test.c'))
+> +qos_test_ss.add(when: 'CONFIG_VHOST_USER', if_true: files('vhost-user-test.c'))
+> +
+> +extra_qtest_deps = {
+> +  'bios-tables-test': [io],
+> +  'ivshmem-test': [rt],
+> +  'qos-test': [chardev, io],
+> +  'tpm-crb-swtpm-test': [io],
+> +  'tpm-crb-test': [io],
+> +  'tpm-tis-swtpm-test': [io],
+> +  'tpm-tis-test': [io],
+> +  'tpm-tis-device-swtpm-test': [io],
+> +  'tpm-tis-device-test': [io],
+> +}
+> +extra_qtest_srcs = {
+> +  'bios-tables-test': files('boot-sector.c', 'acpi-utils.c', 'tpm-emu.c'),
+> +  'pxe-test': files('boot-sector.c'),
+> +  'cdrom-test': files('boot-sector.c'),
+> +  'migration-test': files('migration-helpers.c'),
+> +  'ivshmem-test': files('../../contrib/ivshmem-server/ivshmem-server.c'),
+> +  'dbus-vmstate-test': files('migration-helpers.c') + dbus_vmstate1,
+> +  'vmgenid-test': files('boot-sector.c', 'acpi-utils.c'),
+> +  'tpm-crb-swtpm-test': files('tpm-emu.c', 'tpm-util.c', 'tpm-tests.c'),
+> +  'tpm-crb-test': files('tpm-emu.c', 'tpm-util.c', 'tpm-tests.c'),
+> +  'tpm-tis-device-swtpm-test': files('tpm-emu.c', 'tpm-util.c', 'tpm-tis-util.c', 'tpm-tests.c'),
+> +  'tpm-tis-device-test': files('tpm-emu.c', 'tpm-util.c', 'tpm-tis-util.c', 'tpm-tests.c'),
+> +  'tpm-tis-swtpm-test': files('tpm-emu.c', 'tpm-util.c', 'tpm-tis-util.c', 'tpm-tests.c'),
+> +  'tpm-tis-test': files('tpm-emu.c', 'tpm-util.c', 'tpm-tis-util.c', 'tpm-tests.c'),
+> +  'qos-test': qos_test_ss.apply(config_host, strict: false).sources()
+> +}
+> +
+> +
+> +qtest_executables = {}
+> +foreach dir : target_dirs
+> +  if not dir.endswith('-softmmu')
+> +    continue
+> +  endif
+> +
+> +  target_base = dir.split('-')[0]
+> +  qtests = get_variable('qtests_' + target_base, []) + qtests_generic
+> +
+> +  qtest_env = environment()
+> +  qtest_env.set('QTEST_QEMU_IMG', './qemu-img')
+> +  qtest_env.set('G_TEST_DBUS_DAEMON', meson.source_root() / 'tests/dbus-vmstate-daemon.sh')
+> +  qtest_env.set('QTEST_QEMU_BINARY', '@0@-softmmu/qemu-system-@0@'.format(target_base))
+> +  
+> +  foreach test : qtests
+> +    # Executables are shared across targets, declare them only the first time we
+> +    # encounter them
+> +    if not qtest_executables.has_key(test)
+> +      qtest_executables += {
+> +        test: executable(test,
+> +                         files(test + '.c') + extra_qtest_srcs.get(test, []),
+> +                         dependencies: [qemuutil, qos] + extra_qtest_deps.get(test, []))
+> +      }
+> +    endif
+> +    # FIXME: missing dependency on the emulator binary and qemu-img
+> +    test('qtest-@0@: @1@'.format(target_base, test),
+> +         qtest_executables[test],
+> +         env: qtest_env,
+> +         args: ['--tap', '-k'],
+> +         protocol: 'tap',
+> +         suite: ['qtest', 'qtest-' + target_base])
+> +  endforeach
+> +endforeach
+> diff --git a/tests/qtest/microbit-test.c b/tests/qtest/microbit-test.c
+> index 04e199e..2b25557 100644
+> --- a/tests/qtest/microbit-test.c
+> +++ b/tests/qtest/microbit-test.c
+> @@ -16,7 +16,7 @@
+>  
+>  #include "qemu/osdep.h"
+>  #include "exec/hwaddr.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  
+>  #include "hw/arm/nrf51.h"
+>  #include "hw/char/nrf51_uart.h"
+> diff --git a/tests/qtest/migration-helpers.h b/tests/qtest/migration-helpers.h
+> index a11808b..d63bba9 100644
+> --- a/tests/qtest/migration-helpers.h
+> +++ b/tests/qtest/migration-helpers.h
+> @@ -12,7 +12,7 @@
+>  #ifndef MIGRATION_HELPERS_H_
+>  #define MIGRATION_HELPERS_H_
+>  
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  
+>  extern bool got_stop;
+>  
+> diff --git a/tests/qtest/migration-test.c b/tests/qtest/migration-test.c
+> index 21ea5ba..00a233c 100644
+> --- a/tests/qtest/migration-test.c
+> +++ b/tests/qtest/migration-test.c
+> @@ -12,7 +12,7 @@
+>  
+>  #include "qemu/osdep.h"
+>  
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qapi/error.h"
+>  #include "qapi/qmp/qdict.h"
+>  #include "qemu/module.h"
+> @@ -25,7 +25,7 @@
+>  #include "qapi/qobject-output-visitor.h"
+>  
+>  #include "migration-helpers.h"
+> -#include "migration/migration-test.h"
+> +#include "tests/migration/migration-test.h"
+>  
+>  /* TODO actually test the results and get rid of this */
+>  #define qtest_qmp_discard_response(...) qobject_unref(qtest_qmp(__VA_ARGS__))
+> diff --git a/tests/qtest/modules-test.c b/tests/qtest/modules-test.c
+> index 8821768..c238b3f 100644
+> --- a/tests/qtest/modules-test.c
+> +++ b/tests/qtest/modules-test.c
+> @@ -1,5 +1,5 @@
+>  #include "qemu/osdep.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  
+>  const char common_args[] = "-nodefaults -machine none";
+>  
+> diff --git a/tests/qtest/ne2000-test.c b/tests/qtest/ne2000-test.c
+> index 3fc0e55..43cfc45 100644
+> --- a/tests/qtest/ne2000-test.c
+> +++ b/tests/qtest/ne2000-test.c
+> @@ -8,7 +8,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qemu/module.h"
+>  #include "libqos/qgraph.h"
+>  #include "libqos/pci.h"
+> diff --git a/tests/qtest/numa-test.c b/tests/qtest/numa-test.c
+> index e1ed6d4..b25ebf9 100644
+> --- a/tests/qtest/numa-test.c
+> +++ b/tests/qtest/numa-test.c
+> @@ -10,7 +10,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qapi/qmp/qdict.h"
+>  #include "qapi/qmp/qlist.h"
+>  
+> diff --git a/tests/qtest/nvme-test.c b/tests/qtest/nvme-test.c
+> index ff04421..d32c953 100644
+> --- a/tests/qtest/nvme-test.c
+> +++ b/tests/qtest/nvme-test.c
+> @@ -10,7 +10,7 @@
+>  #include "qemu/osdep.h"
+>  #include "qemu/module.h"
+>  #include "qemu/units.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "libqos/qgraph.h"
+>  #include "libqos/pci.h"
+>  
+> diff --git a/tests/qtest/pca9552-test.c b/tests/qtest/pca9552-test.c
+> index d80ed93..42a1312 100644
+> --- a/tests/qtest/pca9552-test.c
+> +++ b/tests/qtest/pca9552-test.c
+> @@ -9,7 +9,7 @@
+>  
+>  #include "qemu/osdep.h"
+>  
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "libqos/qgraph.h"
+>  #include "libqos/i2c.h"
+>  #include "hw/misc/pca9552_regs.h"
+> diff --git a/tests/qtest/pci-test.c b/tests/qtest/pci-test.c
+> index 4b2092b..e15d4d9 100644
+> --- a/tests/qtest/pci-test.c
+> +++ b/tests/qtest/pci-test.c
+> @@ -8,7 +8,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qemu/module.h"
+>  #include "libqos/qgraph.h"
+>  #include "libqos/pci.h"
+> diff --git a/tests/qtest/pcnet-test.c b/tests/qtest/pcnet-test.c
+> index 900944f..7583aeb 100644
+> --- a/tests/qtest/pcnet-test.c
+> +++ b/tests/qtest/pcnet-test.c
+> @@ -8,7 +8,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qemu/module.h"
+>  #include "libqos/qgraph.h"
+>  #include "libqos/pci.h"
+> diff --git a/tests/qtest/pflash-cfi02-test.c b/tests/qtest/pflash-cfi02-test.c
+> index 17aa669..afb702b 100644
+> --- a/tests/qtest/pflash-cfi02-test.c
+> +++ b/tests/qtest/pflash-cfi02-test.c
+> @@ -8,7 +8,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  
+>  /*
+>   * To test the pflash_cfi02 device, we run QEMU with the musicpal machine with
+> diff --git a/tests/qtest/pnv-xscom-test.c b/tests/qtest/pnv-xscom-test.c
+> index 2c46d5c..c8d4043 100644
+> --- a/tests/qtest/pnv-xscom-test.c
+> +++ b/tests/qtest/pnv-xscom-test.c
+> @@ -8,7 +8,7 @@
+>   */
+>  #include "qemu/osdep.h"
+>  
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  
+>  typedef enum PnvChipType {
+>      PNV_CHIP_POWER8E,     /* AKA Murano (default) */
+> diff --git a/tests/qtest/prom-env-test.c b/tests/qtest/prom-env-test.c
+> index 60e6ec3..f41d801 100644
+> --- a/tests/qtest/prom-env-test.c
+> +++ b/tests/qtest/prom-env-test.c
+> @@ -20,7 +20,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "libqos/libqos-spapr.h"
+>  
+>  #define MAGIC   0xcafec0de
+> diff --git a/tests/qtest/pvpanic-test.c b/tests/qtest/pvpanic-test.c
+> index ff9176a..e576394 100644
+> --- a/tests/qtest/pvpanic-test.c
+> +++ b/tests/qtest/pvpanic-test.c
+> @@ -8,7 +8,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qapi/qmp/qdict.h"
+>  
+>  static void test_panic(void)
+> diff --git a/tests/qtest/pxe-test.c b/tests/qtest/pxe-test.c
+> index 1161a77..32bbae3 100644
+> --- a/tests/qtest/pxe-test.c
+> +++ b/tests/qtest/pxe-test.c
+> @@ -15,7 +15,7 @@
+>  #include "qemu/osdep.h"
+>  #include <glib/gstdio.h>
+>  #include "qemu-common.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "boot-sector.h"
+>  #include "libqos/libqos-spapr.h"
+>  
+> diff --git a/tests/qtest/q35-test.c b/tests/qtest/q35-test.c
+> index c922d81..b7cf144 100644
+> --- a/tests/qtest/q35-test.c
+> +++ b/tests/qtest/q35-test.c
+> @@ -10,7 +10,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "libqos/pci.h"
+>  #include "libqos/pci-pc.h"
+>  #include "hw/pci-host/q35.h"
+> diff --git a/tests/qtest/qmp-cmd-test.c b/tests/qtest/qmp-cmd-test.c
+> index f7b1aa7..f34e688 100644
+> --- a/tests/qtest/qmp-cmd-test.c
+> +++ b/tests/qtest/qmp-cmd-test.c
+> @@ -11,7 +11,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qapi/error.h"
+>  #include "qapi/qapi-visit-introspect.h"
+>  #include "qapi/qmp/qdict.h"
+> diff --git a/tests/qtest/qmp-test.c b/tests/qtest/qmp-test.c
+> index 1a8876b..5950c3e 100644
+> --- a/tests/qtest/qmp-test.c
+> +++ b/tests/qtest/qmp-test.c
+> @@ -11,7 +11,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qapi/error.h"
+>  #include "qapi/qapi-visit-control.h"
+>  #include "qapi/qmp/qdict.h"
+> diff --git a/tests/qtest/qom-test.c b/tests/qtest/qom-test.c
+> index 1acf0d7..eb34af8 100644
+> --- a/tests/qtest/qom-test.c
+> +++ b/tests/qtest/qom-test.c
+> @@ -13,7 +13,7 @@
+>  #include "qapi/qmp/qdict.h"
+>  #include "qapi/qmp/qlist.h"
+>  #include "qemu/cutils.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  
+>  static void test_properties(QTestState *qts, const char *path, bool recurse)
+>  {
 > diff --git a/tests/qtest/rtas-test.c b/tests/qtest/rtas-test.c
-> index a7e83e7..16751db 100644
+> index 167b42d..a7e83e7 100644
 > --- a/tests/qtest/rtas-test.c
 > +++ b/tests/qtest/rtas-test.c
-> @@ -31,7 +31,7 @@ int main(int argc, char *argv[])
->      g_test_init(&argc, &argv, NULL);
+> @@ -1,6 +1,6 @@
+>  #include "qemu/osdep.h"
+>  #include "qemu/cutils.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
 >  
->      if (strcmp(arch, "ppc64")) {
-> -        g_printerr("RTAS requires ppc64-softmmu/qemu-system-ppc64\n");
-> +        g_printerr("RTAS requires qemu-system-ppc64\n");
->          exit(EXIT_FAILURE);
->      }
->      qtest_add_func("rtas/get-time-of-day", test_rtas_get_time_of_day);
-> diff --git a/tests/tcg/configure.sh b/tests/tcg/configure.sh
-> index 102578c..7d714f9 100755
-> --- a/tests/tcg/configure.sh
-> +++ b/tests/tcg/configure.sh
-> @@ -193,11 +193,11 @@ for target in $target_list; do
->    case $target in
->      *-linux-user | *-bsd-user)
->        echo "CONFIG_USER_ONLY=y" >> $config_target_mak
-> -      echo "QEMU=\$(BUILD_DIR)/$target/qemu-$arch" >> $config_target_mak
-> +      echo "QEMU=\$(BUILD_DIR)/qemu-$arch" >> $config_target_mak
->        ;;
->      *-softmmu)
->        echo "CONFIG_SOFTMMU=y" >> $config_target_mak
-> -      echo "QEMU=\$(BUILD_DIR)/$target/qemu-system-$arch" >> $config_target_mak
-> +      echo "QEMU=\$(BUILD_DIR)/qemu-system-$arch" >> $config_target_mak
->        ;;
->    esac
+>  #include "libqos/libqos-spapr.h"
+>  #include "libqos/rtas.h"
+> diff --git a/tests/qtest/sdhci-test.c b/tests/qtest/sdhci-test.c
+> index 6275e76..a110cfe 100644
+> --- a/tests/qtest/sdhci-test.c
+> +++ b/tests/qtest/sdhci-test.c
+> @@ -10,7 +10,7 @@
 >  
+>  #include "qemu/osdep.h"
+>  #include "hw/registerfields.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qemu/module.h"
+>  #include "libqos/pci-pc.h"
+>  #include "hw/pci/pci.h"
+> diff --git a/tests/qtest/spapr-phb-test.c b/tests/qtest/spapr-phb-test.c
+> index 093dc22..ea8d596 100644
+> --- a/tests/qtest/spapr-phb-test.c
+> +++ b/tests/qtest/spapr-phb-test.c
+> @@ -9,7 +9,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qemu/module.h"
+>  #include "libqos/qgraph.h"
+>  
+> diff --git a/tests/qtest/tco-test.c b/tests/qtest/tco-test.c
+> index 254f735..47bc7ad 100644
+> --- a/tests/qtest/tco-test.c
+> +++ b/tests/qtest/tco-test.c
+> @@ -9,7 +9,7 @@
+>  
+>  #include "qemu/osdep.h"
+>  
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "libqos/pci.h"
+>  #include "libqos/pci-pc.h"
+>  #include "qapi/qmp/qdict.h"
+> diff --git a/tests/qtest/test-filter-mirror.c b/tests/qtest/test-filter-mirror.c
+> index 1e3ced8..bc0dee6 100644
+> --- a/tests/qtest/test-filter-mirror.c
+> +++ b/tests/qtest/test-filter-mirror.c
+> @@ -10,7 +10,7 @@
+>  
+>  #include "qemu/osdep.h"
+>  #include "qemu-common.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qapi/qmp/qdict.h"
+>  #include "qemu/iov.h"
+>  #include "qemu/sockets.h"
+> diff --git a/tests/qtest/test-filter-redirector.c b/tests/qtest/test-filter-redirector.c
+> index e4d5322..829db8c 100644
+> --- a/tests/qtest/test-filter-redirector.c
+> +++ b/tests/qtest/test-filter-redirector.c
+> @@ -52,7 +52,7 @@
+>  
+>  #include "qemu/osdep.h"
+>  #include "qemu-common.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qapi/qmp/qdict.h"
+>  #include "qemu/iov.h"
+>  #include "qemu/sockets.h"
+> diff --git a/tests/qtest/test-hmp.c b/tests/qtest/test-hmp.c
+> index d5e7ebd..aea1384 100644
+> --- a/tests/qtest/test-hmp.c
+> +++ b/tests/qtest/test-hmp.c
+> @@ -15,7 +15,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  
+>  static int verbose;
+>  
+> diff --git a/tests/qtest/tpm-crb-swtpm-test.c b/tests/qtest/tpm-crb-swtpm-test.c
+> index 55fdb56..1d82a48 100644
+> --- a/tests/qtest/tpm-crb-swtpm-test.c
+> +++ b/tests/qtest/tpm-crb-swtpm-test.c
+> @@ -15,7 +15,7 @@
+>  #include "qemu/osdep.h"
+>  #include <glib/gstdio.h>
+>  
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qemu/module.h"
+>  #include "tpm-tests.h"
+>  #include "hw/acpi/tpm.h"
+> diff --git a/tests/qtest/tpm-tis-device-swtpm-test.c b/tests/qtest/tpm-tis-device-swtpm-test.c
+> index 7b20035..f7126ef 100644
+> --- a/tests/qtest/tpm-tis-device-swtpm-test.c
+> +++ b/tests/qtest/tpm-tis-device-swtpm-test.c
+> @@ -16,7 +16,7 @@
+>  #include "qemu/osdep.h"
+>  #include <glib/gstdio.h>
+>  
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qemu/module.h"
+>  #include "tpm-tests.h"
+>  #include "hw/acpi/tpm.h"
+> diff --git a/tests/qtest/tpm-tis-swtpm-test.c b/tests/qtest/tpm-tis-swtpm-test.c
+> index 90131cb..fa590e6 100644
+> --- a/tests/qtest/tpm-tis-swtpm-test.c
+> +++ b/tests/qtest/tpm-tis-swtpm-test.c
+> @@ -15,7 +15,7 @@
+>  #include "qemu/osdep.h"
+>  #include <glib/gstdio.h>
+>  
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qemu/module.h"
+>  #include "tpm-tests.h"
+>  #include "hw/acpi/tpm.h"
+> diff --git a/tests/qtest/tpm-util.c b/tests/qtest/tpm-util.c
+> index 58a9593..e2b29ef 100644
+> --- a/tests/qtest/tpm-util.c
+> +++ b/tests/qtest/tpm-util.c
+> @@ -15,7 +15,7 @@
+>  #include "qemu/osdep.h"
+>  
+>  #include "hw/acpi/tpm.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "tpm-util.h"
+>  #include "qapi/qmp/qdict.h"
+>  
+> diff --git a/tests/qtest/tulip-test.c b/tests/qtest/tulip-test.c
+> index 2fb6c4d..da16cbf 100644
+> --- a/tests/qtest/tulip-test.c
+> +++ b/tests/qtest/tulip-test.c
+> @@ -8,7 +8,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qemu/module.h"
+>  #include "libqos/qgraph.h"
+>  #include "libqos/pci.h"
+> diff --git a/tests/qtest/virtio-rng-test.c b/tests/qtest/virtio-rng-test.c
+> index 092ba13..e6b8cd8 100644
+> --- a/tests/qtest/virtio-rng-test.c
+> +++ b/tests/qtest/virtio-rng-test.c
+> @@ -8,7 +8,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qemu/module.h"
+>  #include "libqos/qgraph.h"
+>  #include "libqos/virtio-rng.h"
+> diff --git a/tests/qtest/virtio-test.c b/tests/qtest/virtio-test.c
+> index f7c6afd..6313417 100644
+> --- a/tests/qtest/virtio-test.c
+> +++ b/tests/qtest/virtio-test.c
+> @@ -8,7 +8,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qemu/module.h"
+>  #include "libqos/qgraph.h"
+>  #include "libqos/pci.h"
+> diff --git a/tests/qtest/vmgenid-test.c b/tests/qtest/vmgenid-test.c
+> index efba76e..6781a51 100644
+> --- a/tests/qtest/vmgenid-test.c
+> +++ b/tests/qtest/vmgenid-test.c
+> @@ -14,7 +14,7 @@
+>  #include "hw/acpi/acpi-defs.h"
+>  #include "boot-sector.h"
+>  #include "acpi-utils.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qapi/qmp/qdict.h"
+>  
+>  #define VGID_GUID "324e6eaf-d1d1-4bf6-bf41-b9bb6c91fb87"
+> diff --git a/tests/qtest/vmxnet3-test.c b/tests/qtest/vmxnet3-test.c
+> index a810252..97c23fd 100644
+> --- a/tests/qtest/vmxnet3-test.c
+> +++ b/tests/qtest/vmxnet3-test.c
+> @@ -8,7 +8,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qemu/module.h"
+>  #include "libqos/qgraph.h"
+>  #include "libqos/pci.h"
+> diff --git a/tests/qtest/wdt_ib700-test.c b/tests/qtest/wdt_ib700-test.c
+> index 797288d..6c36e43 100644
+> --- a/tests/qtest/wdt_ib700-test.c
+> +++ b/tests/qtest/wdt_ib700-test.c
+> @@ -8,7 +8,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qapi/qmp/qdict.h"
+>  #include "qemu/timer.h"
+>  
+> diff --git a/tests/test-qga.c b/tests/test-qga.c
+> index d1b4c3e..4ac4c22 100644
+> --- a/tests/test-qga.c
+> +++ b/tests/test-qga.c
+> @@ -4,7 +4,7 @@
+>  #include <sys/socket.h>
+>  #include <sys/un.h>
+>  
+> -#include "libqtest.h"
+> +#include "libqos/libqtest.h"
+>  #include "qapi/qmp/qdict.h"
+>  #include "qapi/qmp/qlist.h"
+>  
+> diff --git a/tests/test-qgraph.c b/tests/test-qgraph.c
+> index 5c7e457..267291c 100644
+> --- a/tests/test-qgraph.c
+> +++ b/tests/test-qgraph.c
+> @@ -17,9 +17,8 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> -#include "libqtest.h"
+> -#include "libqos/qgraph.h"
+> -#include "libqos/qgraph_internal.h"
+> +#include "qtest/libqos/qgraph.h"
+> +#include "qtest/libqos/qgraph_internal.h"
+>  
+>  #define MACHINE_PC "x86_64/pc"
+>  #define MACHINE_RASPI2 "arm/raspi2"
 > -- 
 > 1.8.3.1
 > 
