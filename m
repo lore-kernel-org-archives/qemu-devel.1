@@ -2,64 +2,152 @@ Return-Path: <SRS0=wQM/=BV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA6A7C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 13:43:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5023C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 13:55:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9EA99206C3
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 13:43:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EA99206C3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
+	by mail.kernel.org (Postfix) with ESMTPS id A036F204FD
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 13:55:04 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e8L8L86W"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A036F204FD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33468 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41556 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5UZ9-0007xM-Qk
-	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 09:43:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55018)
+	id 1k5Uk3-0003WE-NY
+	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 09:55:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58378)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1k5UYQ-0007KC-D3
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 09:43:02 -0400
-Received: from mx2.suse.de ([195.135.220.15]:53632)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1k5UYO-0005jc-4k
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 09:43:01 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
- by mx2.suse.de (Postfix) with ESMTP id 46810B066;
- Tue, 11 Aug 2020 13:43:19 +0000 (UTC)
-Subject: Re: [RFC v3 8/8] cpus: extract out hvf-specific code to
- target/i386/hvf/
-To: Roman Bolshakov <r.bolshakov@yadro.com>
-References: <20200803090533.7410-1-cfontana@suse.de>
- <20200803090533.7410-9-cfontana@suse.de>
- <20200811090034.GB62204@SPB-NB-133.local>
-From: Claudio Fontana <cfontana@suse.de>
-Message-ID: <1e6f2876-4226-b25d-a551-ca22661898ce@suse.de>
-Date: Tue, 11 Aug 2020 15:42:57 +0200
+ (Exim 4.90_1) (envelope-from <lvivier@redhat.com>)
+ id 1k5UjD-0002tT-Es
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 09:54:11 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:30045
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <lvivier@redhat.com>)
+ id 1k5UjA-00074A-Fo
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 09:54:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1597154046;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=jFIsotAOztqQN5Xmp7XFAJvSetescfVPeYp2nzDwnKA=;
+ b=e8L8L86WZs2F8zZPknJPnxuADh84wJ2h4nLxJk4tlhqaR165PZhXLE88fCA/ScRXhFxews
+ 82bKUqqVVUQMcRPHSKrpmhFs/8HB4g3bpZ3Tl3Zm+N8k/BMxlAHGI32yeFCETHTx39SH5n
+ UhLwhT2h/fWouD1Dt1bUS0LqkrxmIzk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-513-Gvk8o4RYMtGpzj6t5wA46w-1; Tue, 11 Aug 2020 09:54:03 -0400
+X-MC-Unique: Gvk8o4RYMtGpzj6t5wA46w-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0D5411009441;
+ Tue, 11 Aug 2020 13:54:02 +0000 (UTC)
+Received: from [10.36.112.235] (ovpn-112-235.ams2.redhat.com [10.36.112.235])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 26DDF6F14B;
+ Tue, 11 Aug 2020 13:53:55 +0000 (UTC)
+Subject: Re: [PATCH v2] virtio-rng: return available data with O_NONBLOCK
+To: "Michael S. Tsirkin" <mst@redhat.com>
+References: <20200715133255.10526-1-mwilck@suse.com>
+ <7cfc4316-922b-8606-72ce-80205ef55572@redhat.com>
+ <7affb721-9686-1262-b7cf-d9681646b602@redhat.com>
+ <810451cf80032d131d5d3feb4fc8300549516f3d.camel@suse.com>
+ <b764a4bb-b81f-b14f-9b7f-d6d087a8b1ea@redhat.com>
+ <b8b19be7fd9b3fab629506eb30d9f0c820aa57d2.camel@suse.com>
+ <085f699b-e391-7363-b63e-3b11cc04e50d@redhat.com>
+ <20200811090814-mutt-send-email-mst@kernel.org>
+From: Laurent Vivier <lvivier@redhat.com>
+Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
+ mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
+ WoeuLWDmXE7A3oJoIsRecD6BXHTb0OYS20lS608anr3B0xn5g0BX7es9Mw+hV/pL+63EOCVm
+ SUVTEQwbGQN62guOKnJJJfphbbv82glIC/Ei4Ky8BwZkUuXd7d5NFJKC9/GDrbWdj75cDNQx
+ UZ9XXbXEKY9MHX83Uy7JFoiFDMOVHn55HnncflUncO0zDzY7CxFeQFwYRbsCXOUL9yBtqLer
+ Ky8/yjBskIlNrp0uQSt9LMoMsdSjYLYhvk1StsNPg74+s4u0Q6z45+l8RAsgLw5OLtTa+ePM
+ JyS7OIGNYxAX6eZk1+91a6tnqfyPcMbduxyBaYXn94HUG162BeuyBkbNoIDkB7pCByed1A7q
+ q9/FbuTDwgVGVLYthYSfTtN0Y60OgNkWCMtFwKxRaXt1WFA5ceqinN/XkgA+vf2Ch72zBkJL
+ RBIhfOPFv5f2Hkkj0MvsUXpOWaOjatiu0fpPo6Hw14UEpywke1zN4NKubApQOlNKZZC4hu6/
+ 8pv2t4HRi7s0K88jQYBRPObjrN5+owtI51xMaYzvPitHQ2053LmgsOdN9EKOqZeHAYG2SmRW
+ LOxYWKX14YkZI5j/TXfKlTpwSMvXho+efN4kgFvFmP6WT+tPnwARAQABtCNMYXVyZW50IFZp
+ dmllciA8bHZpdmllckByZWRoYXQuY29tPokCOAQTAQIAIgUCVgVQgAIbAwYLCQgHAwIGFQgC
+ CQoLBBYCAwECHgECF4AACgkQ8ww4vT8vvjwpgg//fSGy0Rs/t8cPFuzoY1cex4limJQfReLr
+ SJXCANg9NOWy/bFK5wunj+h/RCFxIFhZcyXveurkBwYikDPUrBoBRoOJY/BHK0iZo7/WQkur
+ 6H5losVZtrotmKOGnP/lJYZ3H6OWvXzdz8LL5hb3TvGOP68K8Bn8UsIaZJoeiKhaNR0sOJyI
+ YYbgFQPWMHfVwHD/U+/gqRhD7apVysxv5by/pKDln1I5v0cRRH6hd8M8oXgKhF2+rAOL7gvh
+ jEHSSWKUlMjC7YwwjSZmUkL+TQyE18e2XBk85X8Da3FznrLiHZFHQ/NzETYxRjnOzD7/kOVy
+ gKD/o7asyWQVU65mh/ECrtjfhtCBSYmIIVkopoLaVJ/kEbVJQegT2P6NgERC/31kmTF69vn8
+ uQyW11Hk8tyubicByL3/XVBrq4jZdJW3cePNJbTNaT0d/bjMg5zCWHbMErUib2Nellnbg6bc
+ 2HLDe0NLVPuRZhHUHM9hO/JNnHfvgiRQDh6loNOUnm9Iw2YiVgZNnT4soUehMZ7au8PwSl4I
+ KYE4ulJ8RRiydN7fES3IZWmOPlyskp1QMQBD/w16o+lEtY6HSFEzsK3o0vuBRBVp2WKnssVH
+ qeeV01ZHw0bvWKjxVNOksP98eJfWLfV9l9e7s6TaAeySKRRubtJ+21PRuYAxKsaueBfUE7ZT
+ 7ze0LUxhdXJlbnQgVml2aWVyIChSZWQgSGF0KSA8bHZpdmllckByZWRoYXQuY29tPokCOAQT
+ AQIAIgUCVgUmGQIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQ8ww4vT8vvjxtNBAA
+ o2xGmbXl9vJQALkj7MVlsMlgewQ1rdoZl+bZ6ythTSBsqwwtl1BUTQGA1GF2LAchRVYca5bJ
+ lw4ai5OdZ/rc5dco2XgrRFtj1np703BzNEhGU1EFxtms/Y9YOobq/GZpck5rK8jV4osEb8oc
+ 3xEgCm/xFwI/2DOe0/s2cHKzRkvdmKWEDhT1M+7UhtSCnloX776zCsrofYiHP2kasFyMa/5R
+ 9J1Rt9Ax/jEAX5vFJ8+NPf68497nBfrAtLM3Xp03YJSr/LDxer44Mevhz8dFw7IMRLhnuSfr
+ 8jP93lr6Wa8zOe3pGmFXZWpNdkV/L0HaeKwTyDKKdUDH4U7SBnE1gcDfe9x08G+oDfVhqED8
+ qStKCxPYxRUKIdUjGPF3f5oj7N56Q5zZaZkfxeLNTQ13LDt3wGbVHyZxzFc81B+qT8mkm74y
+ RbeVSuviPTYjbBQ66GsUgiZZpDUyJ6s54fWqQdJf4VFwd7M/mS8WEejbSjglGHMxMGiBeRik
+ Y0+ur5KAF7z0D1KfW1kHO9ImQ0FbEbMbTMf9u2+QOCrSWOz/rj23EwPrCQ2TSRI2fWakMJZ+
+ zQZvy+ei3D7lZ09I9BT/GfFkTIONgtNfDxwyMc4v4XyP0IvvZs/YZqt7j3atyTZM0S2HSaZ9
+ rXmQYkBt1/u691cZfvy+Tr2xZaDpFcjPkci5Ag0EVgUmGQEQALxSQRbl/QOnmssVDxWhHM5T
+ Gxl7oLNJms2zmBpcmlrIsn8nNz0rRyxT460k2niaTwowSRK8KWVDeAW6ZAaWiYjLlTunoKwv
+ F8vP3JyWpBz0diTxL5o+xpvy/Q6YU3BNefdq8Vy3rFsxgW7mMSrI/CxJ667y8ot5DVugeS2N
+ yHfmZlPGE0Nsy7hlebS4liisXOrN3jFzasKyUws3VXek4V65lHwB23BVzsnFMn/bw/rPliqX
+ Gcwl8CoJu8dSyrCcd1Ibs0/Inq9S9+t0VmWiQWfQkz4rvEeTQkp/VfgZ6z98JRW7S6l6eoph
+ oWs0/ZyRfOm+QVSqRfFZdxdP2PlGeIFMC3fXJgygXJkFPyWkVElr76JTbtSHsGWbt6xUlYHK
+ XWo+xf9WgtLeby3cfSkEchACrxDrQpj+Jt/JFP+q997dybkyZ5IoHWuPkn7uZGBrKIHmBunT
+ co1+cKSuRiSCYpBIXZMHCzPgVDjk4viPbrV9NwRkmaOxVvye0vctJeWvJ6KA7NoAURplIGCq
+ kCRwg0MmLrfoZnK/gRqVJ/f6adhU1oo6z4p2/z3PemA0C0ANatgHgBb90cd16AUxpdEQmOCm
+ dNnNJF/3Zt3inzF+NFzHoM5Vwq6rc1JPjfC3oqRLJzqAEHBDjQFlqNR3IFCIAo4SYQRBdAHB
+ CzkM4rWyRhuVABEBAAGJAh8EGAECAAkFAlYFJhkCGwwACgkQ8ww4vT8vvjwg9w//VQrcnVg3
+ TsjEybxDEUBm8dBmnKqcnTBFmxN5FFtIWlEuY8+YMiWRykd8Ln9RJ/98/ghABHz9TN8TRo2b
+ 6WimV64FmlVn17Ri6FgFU3xNt9TTEChqAcNg88eYryKsYpFwegGpwUlaUaaGh1m9OrTzcQy+
+ klVfZWaVJ9Nw0keoGRGb8j4XjVpL8+2xOhXKrM1fzzb8JtAuSbuzZSQPDwQEI5CKKxp7zf76
+ J21YeRrEW4WDznPyVcDTa+tz++q2S/BpP4W98bXCBIuQgs2m+OflERv5c3Ojldp04/S4NEjX
+ EYRWdiCxN7ca5iPml5gLtuvhJMSy36glU6IW9kn30IWuSoBpTkgV7rLUEhh9Ms82VWW/h2Tx
+ L8enfx40PrfbDtWwqRID3WY8jLrjKfTdR3LW8BnUDNkG+c4FzvvGUs8AvuqxxyHbXAfDx9o/
+ jXfPHVRmJVhSmd+hC3mcQ+4iX5bBPBPMoDqSoLt5w9GoQQ6gDVP2ZjTWqwSRMLzNr37rJjZ1
+ pt0DCMMTbiYIUcrhX8eveCJtY7NGWNyxFCRkhxRuGcpwPmRVDwOl39MB3iTsRighiMnijkbL
+ XiKoJ5CDVvX5yicNqYJPKh5MFXN1bvsBkmYiStMRbrD0HoY1kx5/VozBtc70OU0EB8Wrv9hZ
+ D+Ofp0T3KOr1RUHvCZoLURfFhSQ=
+Message-ID: <a9179d2b-35fb-26ab-1afd-9952cc3ae008@redhat.com>
+Date: Tue, 11 Aug 2020 15:53:54 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200811090034.GB62204@SPB-NB-133.local>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200811090814-mutt-send-email-mst@kernel.org>
 Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=lvivier@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=195.135.220.15; envelope-from=cfontana@suse.de;
- helo=mx2.suse.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/11 02:05:49
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=lvivier@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/11 04:41:55
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -72,188 +160,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Pavel Dovgalyuk <dovgaluk@ispras.ru>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, haxm-team@intel.com,
- Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, Colin Xu <colin.xu@intel.com>,
- Wenchao Wang <wenchao.wang@intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Sunil Muthuswamy <sunilmut@microsoft.com>,
+Cc: Amit Shah <amit@kernel.org>, Jason Wang <jasowang@redhat.com>,
+ qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org,
  =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+ Martin Wilck <mwilck@suse.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/11/20 11:00 AM, Roman Bolshakov wrote:
-> On Mon, Aug 03, 2020 at 11:05:33AM +0200, Claudio Fontana wrote:
->> register a "CpusAccel" interface for HVF as well.
->>
->> Signed-off-by: Claudio Fontana <cfontana@suse.de>
->> ---
->>  softmmu/cpus.c                |  63 --------------------
->>  target/i386/hvf/Makefile.objs |   2 +-
->>  target/i386/hvf/hvf-cpus.c    | 131 ++++++++++++++++++++++++++++++++++++++++++
->>  target/i386/hvf/hvf-cpus.h    |  17 ++++++
->>  target/i386/hvf/hvf.c         |   3 +
->>  5 files changed, 152 insertions(+), 64 deletions(-)
->>  create mode 100644 target/i386/hvf/hvf-cpus.c
->>  create mode 100644 target/i386/hvf/hvf-cpus.h
->>
->> diff --git a/softmmu/cpus.c b/softmmu/cpus.c
->> index 586b4acaab..d327b2685c 100644
->> --- a/softmmu/cpus.c
->> +++ b/softmmu/cpus.c
->> @@ -33,7 +33,6 @@
->>  #include "exec/gdbstub.h"
->>  #include "sysemu/hw_accel.h"
->>  #include "sysemu/kvm.h"
->> -#include "sysemu/hvf.h"
+On 11/08/2020 15:14, Michael S. Tsirkin wrote:
+> On Tue, Aug 11, 2020 at 03:00:14PM +0200, Laurent Vivier wrote:
+>> No problem. This code is tricky and it took me several months to really
+>> start to understand it ...
 > 
-> I wonder if the declarations should be moved from sysemu/hvf.h to
-> someplace inside target/i386/hvf/:
+> Oh great, we actually have someone who understands the code!
+> Maybe you can help me understand: virtio_read
+> takes the buf pointer and puts it in the vq.
+> It can then return to caller (e.g. on a signal).
+> Device can meanwhile write into the buffer.
 > 
-> int hvf_init_vcpu(CPUState *);
-> int hvf_vcpu_exec(CPUState *);
-> void hvf_cpu_synchronize_state(CPUState *);
-> void hvf_cpu_synchronize_post_reset(CPUState *);
-> void hvf_cpu_synchronize_post_init(CPUState *);
-> void hvf_cpu_synchronize_pre_loadvm(CPUState *);
-> void hvf_vcpu_destroy(CPUState *);
+> It looks like if another call then happens, and that
+> other call uses a different buffer, virtio rng
+> will happily return the data written into the
+> original buf pointer, confusing the caller.
 > 
-> They're not used outside of target/i386/hvf/
-> 
-> I also wonder if we need stubs at all?
-> 
->>  #include "exec/exec-all.h"
->>  #include "qemu/thread.h"
->>  #include "qemu/plugin.h"
->> @@ -391,48 +390,6 @@ void qemu_wait_io_event(CPUState *cpu)
->>      qemu_wait_io_event_common(cpu);
->>  }
->>  
->> -/* The HVF-specific vCPU thread function. This one should only run when the host
->> - * CPU supports the VMX "unrestricted guest" feature. */
->> -static void *qemu_hvf_cpu_thread_fn(void *arg)
->> -{
->> -    CPUState *cpu = arg;
->> -
->> -    int r;
->> -
->> -    assert(hvf_enabled());
->> -
->> -    rcu_register_thread();
->> -
->> -    qemu_mutex_lock_iothread();
->> -    qemu_thread_get_self(cpu->thread);
->> -
->> -    cpu->thread_id = qemu_get_thread_id();
->> -    cpu->can_do_io = 1;
->> -    current_cpu = cpu;
->> -
->> -    hvf_init_vcpu(cpu);
->> -
->> -    /* signal CPU creation */
->> -    cpu_thread_signal_created(cpu);
->> -    qemu_guest_random_seed_thread_part2(cpu->random_seed);
->> -
->> -    do {
->> -        if (cpu_can_run(cpu)) {
->> -            r = hvf_vcpu_exec(cpu);
->> -            if (r == EXCP_DEBUG) {
->> -                cpu_handle_guest_debug(cpu);
->> -            }
->> -        }
->> -        qemu_wait_io_event(cpu);
->> -    } while (!cpu->unplug || cpu_can_run(cpu));
->> -
->> -    hvf_vcpu_destroy(cpu);
->> -    cpu_thread_signal_destroyed(cpu);
->> -    qemu_mutex_unlock_iothread();
->> -    rcu_unregister_thread();
->> -    return NULL;
->> -}
->> -
->>  void cpus_kick_thread(CPUState *cpu)
->>  {
->>  #ifndef _WIN32
->> @@ -603,24 +560,6 @@ void cpu_remove_sync(CPUState *cpu)
->>      qemu_mutex_lock_iothread();
->>  }
->>  
->> -static void qemu_hvf_start_vcpu(CPUState *cpu)
->> -{
->> -    char thread_name[VCPU_THREAD_NAME_SIZE];
->> -
->> -    /* HVF currently does not support TCG, and only runs in
->> -     * unrestricted-guest mode. */
->> -    assert(hvf_enabled());
->> -
->> -    cpu->thread = g_malloc0(sizeof(QemuThread));
->> -    cpu->halt_cond = g_malloc0(sizeof(QemuCond));
->> -    qemu_cond_init(cpu->halt_cond);
->> -
->> -    snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "CPU %d/HVF",
->> -             cpu->cpu_index);
->> -    qemu_thread_create(cpu->thread, thread_name, qemu_hvf_cpu_thread_fn,
->> -                       cpu, QEMU_THREAD_JOINABLE);
->> -}
->> -
->>  void cpus_register_accel(CpusAccel *ca)
->>  {
->>      assert(ca != NULL);
->> @@ -648,8 +587,6 @@ void qemu_init_vcpu(CPUState *cpu)
->>      if (cpus_accel) {
->>          /* accelerator already implements the CpusAccel interface */
->>          cpus_accel->create_vcpu_thread(cpu);
->> -    } else if (hvf_enabled()) {
->> -        qemu_hvf_start_vcpu(cpu);
->>      } else {
->>          assert(0);
->>      }
->> diff --git a/target/i386/hvf/Makefile.objs b/target/i386/hvf/Makefile.objs
->> index 927b86bc67..af9f7dcfc1 100644
->> --- a/target/i386/hvf/Makefile.objs
->> +++ b/target/i386/hvf/Makefile.objs
->> @@ -1,2 +1,2 @@
->> -obj-y += hvf.o
->> +obj-y += hvf.o hvf-cpus.o
->>  obj-y += x86.o x86_cpuid.o x86_decode.o x86_descr.o x86_emu.o x86_flags.o x86_mmu.o x86hvf.o x86_task.o
->> diff --git a/target/i386/hvf/hvf-cpus.c b/target/i386/hvf/hvf-cpus.c
->> new file mode 100644
->> index 0000000000..9540157f1e
->> --- /dev/null
->> +++ b/target/i386/hvf/hvf-cpus.c
-> 
-> I'd prefer singular form in variables and file names. More on that in
-> the comment to patch 2.
-> 
-> Besides that it works fine,
-> 
-> Reviewed-by: Roman Bolshakov <r.bolshakov@yadro.com>
-> Tested-by: Roman Bolshakov <r.bolshakov@yadro.com>
-> 
-> Regards,
-> Roman
+> Is that right?
 > 
 
-Hi Roman,
+Yes.
 
-thanks, sure lets discuss more the naming stuff on patch 2.
+hw_random core uses two bufers:
 
-I noticed a missing chunk in this patch, ie, it leaves a lingering
+- rng_fillbuf that is used with a blocking access and protected by the
+reading_mutex. I think this cannot be interrupted by a kill because it's
+in  hwrng_fillfn() and it's kthread.
 
-} else if (hvf_enabled()) {
+- rng_buffer that is used in rng_dev_read() and can be interrupted (it
+is also protected by reading_mutex)
 
-in cpu_synchronize_pre_loadvm().
+But if rng_dev_read() is called with O_NONBLOCK or interrupted and then
+rng_fillbuf starts they can be mixed.
 
-that needs to be elided, should not change the behavior, but who knows. I will respin this one in the next version.
+We have also the first use of rng_buffer in add_early_randomness() that
+use a different size than in rng_dev_read() with the same buffer (and
+this size is 16 whereas the hwrng read API says it must be at least 32...).
 
-Thank you!
+The problem here is core has been developped with synchronicity in mind,
+whereas virtio is asynchronous by definition.
 
-Claudio
+I think we should add some internal buffers in virtio-rng backend. This
+would improve performance (we are at 1 MB/s, I sent a patch to improve
+that, but this doesn't fix the problems above), and allows hw_random
+core to use memory that doesn't need to be compatible with virt_to_page().
 
-
+Thanks,
+Laurent
 
 
