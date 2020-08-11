@@ -2,82 +2,93 @@ Return-Path: <SRS0=wQM/=BV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E1EBC433E3
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 08:51:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30F44C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 09:00:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D820A20756
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 08:51:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D820A20756
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id EB0B6206B5
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 09:00:21 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=yadro.com header.i=@yadro.com header.b="eYMSYHKl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB0B6206B5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yadro.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41462 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46380 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5Q0B-0001un-6T
-	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 04:51:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46844)
+	id 1k5Q8r-0004IE-1j
+	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 05:00:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48796)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k5Pzd-0001UY-BM
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 04:50:49 -0400
-Received: from indium.canonical.com ([91.189.90.7]:44892)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k5Pzb-0004Y4-4Y
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 04:50:49 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1k5PzY-0001mO-V3
- for <qemu-devel@nongnu.org>; Tue, 11 Aug 2020 08:50:44 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id C91EF2E809C
- for <qemu-devel@nongnu.org>; Tue, 11 Aug 2020 08:50:44 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
+ id 1k5Q86-0003bT-MN
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 04:59:34 -0400
+Received: from mta-02.yadro.com ([89.207.88.252]:48220 helo=mta-01.yadro.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
+ id 1k5Q84-0005Qo-Ie
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 04:59:34 -0400
+Received: from localhost (unknown [127.0.0.1])
+ by mta-01.yadro.com (Postfix) with ESMTP id 0D79F4C882;
+ Tue, 11 Aug 2020 08:59:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=yadro.com; h=
+ in-reply-to:content-transfer-encoding:content-disposition
+ :content-type:content-type:mime-version:references:message-id
+ :subject:subject:from:from:date:date:received:received:received;
+ s=mta-01; t=1597136367; x=1598950768; bh=FGhwUNwEaenQWkMMy2IzZ0
+ 9Cj3mVKO3P5YOKEwnD5R8=; b=eYMSYHKlM1VVzdvNVzOC+9eSUIrlME+qeOn3/o
+ /YhjdXXhHMxLIJnJNLTqp00mLVP0ZrXsElmna2jaaSPaEjBp+4rg8Kc1os1O/+hW
+ X+k9PTA1zypiZgqqtUDa09jGdiUTkCTSq9BMdnz8pZT+1226kI8c4EE0ZksAfAlW
+ 6VeVM=
+X-Virus-Scanned: amavisd-new at yadro.com
+Received: from mta-01.yadro.com ([127.0.0.1])
+ by localhost (mta-01.yadro.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id NhphuFSBM8Wd; Tue, 11 Aug 2020 11:59:27 +0300 (MSK)
+Received: from T-EXCH-02.corp.yadro.com (t-exch-02.corp.yadro.com
+ [172.17.10.102])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mta-01.yadro.com (Postfix) with ESMTPS id DD3DE4C84A;
+ Tue, 11 Aug 2020 11:59:26 +0300 (MSK)
+Received: from localhost (172.17.204.212) by T-EXCH-02.corp.yadro.com
+ (172.17.10.102) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P384) id 15.1.669.32; Tue, 11
+ Aug 2020 11:59:26 +0300
+Date: Tue, 11 Aug 2020 11:59:07 +0300
+From: Roman Bolshakov <r.bolshakov@yadro.com>
+To: Claudio Fontana <cfontana@suse.de>
+Subject: Re: [RFC v3 2/8] cpus: prepare new CpusAccel cpu accelerator interface
+Message-ID: <20200811085907.GA62204@SPB-NB-133.local>
+References: <20200803090533.7410-1-cfontana@suse.de>
+ <20200803090533.7410-3-cfontana@suse.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 11 Aug 2020 08:41:37 -0000
-From: =?utf-8?q?Alex_Benn=C3=A9e?= <1890545@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: ajbennee bigboy0822 pmaydell
-X-Launchpad-Bug-Reporter: Tony.LI (bigboy0822)
-X-Launchpad-Bug-Modifier: =?utf-8?q?Alex_Benn=C3=A9e_=28ajbennee=29?=
-References: <159670025270.3099.13280483088179052036.malonedeb@gac.canonical.com>
- <159710866585.21858.2925254319092162760.malone@chaenomeles.canonical.com>
-Message-ID: <874kp9377i.fsf@linaro.org>
-Subject: Re: [Bug 1890545] Re: (ARM64) qemu-x86_64+schroot(Debian bullseye)
- can't run chrome and can't load HTML
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="6a138c03da9cc3e2e03f6dd3bbb4a615b0be6ec2";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 1a4117626b32fd8204d833371a763125b313c5fe
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/11 04:25:48
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200803090533.7410-3-cfontana@suse.de>
+X-Originating-IP: [172.17.204.212]
+X-ClientProxiedBy: T-EXCH-01.corp.yadro.com (172.17.10.101) To
+ T-EXCH-02.corp.yadro.com (172.17.10.102)
+Received-SPF: pass client-ip=89.207.88.252; envelope-from=r.bolshakov@yadro.com;
+ helo=mta-01.yadro.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/11 04:59:29
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -86,75 +97,174 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1890545 <1890545@bugs.launchpad.net>
+Cc: Laurent Vivier <lvivier@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Pavel Dovgalyuk <dovgaluk@ispras.ru>,
+ Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, haxm-team@intel.com,
+ Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>, Colin Xu <colin.xu@intel.com>,
+ Wenchao Wang <wenchao.wang@intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Sunil Muthuswamy <sunilmut@microsoft.com>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20200811084137.G3rq2aYKtfjqHwcW_rlMv9RXYPWUWgGlfSnnwVcAcGc@z>
 
-Tony.LI <1890545@bugs.launchpad.net> writes:
+On Mon, Aug 03, 2020 at 11:05:27AM +0200, Claudio Fontana wrote:
+> The new interface starts unused, will start being used by the
+> next patches.
+> 
+> It provides methods for each accelerator to start a vcpu, kick a vcpu,
+> synchronize state, get cpu virtual clock and elapsed ticks.
+> 
+> Signed-off-by: Claudio Fontana <cfontana@suse.de>
+> ---
+>  hw/core/cpu.c                  |   1 +
+>  hw/i386/x86.c                  |   2 +-
+>  include/sysemu/cpu-timers.h    |   9 +-
+>  include/sysemu/cpus.h          |  36 ++++++++
+>  include/sysemu/hw_accel.h      |  69 ++-------------
+>  softmmu/cpu-timers.c           |   9 +-
+>  softmmu/cpus.c                 | 194 ++++++++++++++++++++++++++++++++---------
+>  stubs/Makefile.objs            |   2 +
+>  stubs/cpu-synchronize-state.c  |  15 ++++
+>  stubs/cpus-get-virtual-clock.c |   8 ++
+>  util/qemu-timer.c              |   8 +-
+>  11 files changed, 231 insertions(+), 122 deletions(-)
+>  create mode 100644 stubs/cpu-synchronize-state.c
+>  create mode 100644 stubs/cpus-get-virtual-clock.c
+> 
+> diff --git a/hw/core/cpu.c b/hw/core/cpu.c
+> index 594441a150..b389a312df 100644
+> --- a/hw/core/cpu.c
+> +++ b/hw/core/cpu.c
+> @@ -33,6 +33,7 @@
+>  #include "hw/qdev-properties.h"
+>  #include "trace-root.h"
+>  #include "qemu/plugin.h"
+> +#include "sysemu/hw_accel.h"
+>  
+>  CPUInterruptHandler cpu_interrupt_handler;
+>  
+> diff --git a/hw/i386/x86.c b/hw/i386/x86.c
+> index 58cf2229d5..00c35bad7e 100644
+> --- a/hw/i386/x86.c
+> +++ b/hw/i386/x86.c
+> @@ -264,7 +264,7 @@ static long get_file_size(FILE *f)
+>  /* TSC handling */
+>  uint64_t cpu_get_tsc(CPUX86State *env)
+>  {
+> -    return cpu_get_ticks();
+> +    return cpus_get_elapsed_ticks();
 
-> Hi,Alex.May be you are right.I don't understand what you want to express.
-> I don't know what causes traps.
-> Is it caused by software, or qemu executes CPU-sensitive instruction simu=
-lation.
+Hi Claudio,
 
-Does it work if you run:
+I still don't understand why plural form of "cpus" is used in files,
+CpusAccel interface name and cpus_ prefix of the functions/variables.
 
-  taskset 1 qemu-x86_64 google-chrome
+Original cpus.c had functions to create CPU threads for multiple
+accelerators, that justified naming of cpus.c. It had TCG, KVM and other
+kinds of vCPUs. After you factor cpus.c into separate implementations of
+CPU interface it should get singular form.
 
--- =
+I’m not a native English speaker but the naming looks confusing to me.
 
-Alex Benn=C3=A9e
+>  }
+>  
+>  /* IRQ handling */
+> diff --git a/softmmu/cpus.c b/softmmu/cpus.c
+> index 54fdb2761c..bad6302ca3 100644
+> --- a/softmmu/cpus.c
+> +++ b/softmmu/cpus.c
+> @@ -87,7 +87,7 @@ bool cpu_is_stopped(CPUState *cpu)
+>      return cpu->stopped || !runstate_is_running();
+>  }
+>  
+> -static inline bool cpu_work_list_empty(CPUState *cpu)
+> +bool cpu_work_list_empty(CPUState *cpu)
+>  {
+>      bool ret;
+>  
+> @@ -97,7 +97,7 @@ static inline bool cpu_work_list_empty(CPUState *cpu)
+>      return ret;
+>  }
+>  
+> -static bool cpu_thread_is_idle(CPUState *cpu)
+> +bool cpu_thread_is_idle(CPUState *cpu)
+>  {
+>      if (cpu->stop || !cpu_work_list_empty(cpu)) {
+>          return false;
+> @@ -215,6 +215,11 @@ void hw_error(const char *fmt, ...)
+>      abort();
+>  }
+>  
+> +/*
+> + * The chosen accelerator is supposed to register this.
+> + */
+> +static CpusAccel *cpus_accel;
+> +
+>  void cpu_synchronize_all_states(void)
+>  {
+>      CPUState *cpu;
+> @@ -251,6 +256,102 @@ void cpu_synchronize_all_pre_loadvm(void)
+>      }
+>  }
+>  
+> +void cpu_synchronize_state(CPUState *cpu)
+> +{
+> +    if (cpus_accel && cpus_accel->synchronize_state) {
+> +        cpus_accel->synchronize_state(cpu);
 
--- =
+I think the condition can be removed altogether if you move it to the
+bootom inside else body. cpu_interrupt_handler and cpu_interrupt() in
+hw/core/cpu.c is an example of that. Likely cpu_interrupt_handler should
+be part of the accel interface. You might also avoid indirected function
+call by using standalone fuction pointer. Like that:
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1890545
 
-Title:
-  (ARM64) qemu-x86_64+schroot(Debian bullseye) can't run chrome and
-  can't load HTML
+void cpu_synchronize_state(CPUState *cpu)
+{
+    if (cpus_accel && cpus_accel->synchronize_state) {
+        cpus_accel->synchronize_state(cpu);
+    }
+    if (kvm_enabled()) {
+        kvm_cpu_synchronize_state(cpu);
+    }
+    else if (hax_enabled()) {
+        hax_cpu_synchronize_state(cpu);
+    }
+    else if (whpx_enabled()) {
+        whpx_cpu_synchronize_state(cpu);
+    } else {
+        cpu_synchronize_state_handler(cpu);
+    }
+}
 
-Status in QEMU:
-  New
+After you finish factoring, it becomes:
 
-Bug description:
-  First I creat a file system that is debian(bullseye amd64)on arm64
-  machine=EF=BC=8Cthen I download google-chrome=EF=BC=8Chowever, when I ran=
- Google
-  browser, some errors occurred.
 
-  $ google-chrome --no-sandbox
-  or =
+void cpu_synchronize_state(CPUState *cpu)
+{
+    cpu_synchronize_state_handler(cpu);
+}
 
-  $ qemu-x86_64-static google-chrome --no-sandbox
+cpu_register_accel would just assign non-NULL function pointer
+from a CPUAccel field over generic_cpu_synchronize_state_handler.
 
-  qemu: uncaught target signal 5 (Trace/breakpoint trap) - core dumped
-  qemu: uncaught target signal 5 (Trace/breakpoint trap) - core dumped
-  [1661:1661:0806/074307.502638:ERROR:nacl_fork_delegate_linux.cc(323)] Bad=
- NaCl helper startup ack (0 bytes)
-  [1664:1664:0806/074307.504159:ERROR:nacl_fork_delegate_linux.cc(323)] Bad=
- NaCl helper startup ack (0 bytes)
-  qemu: uncaught target signal 5 (Trace/breakpoint trap) - core dumped
-  qemu: uncaught target signal 5 (Trace/breakpoint trap) - core dumped
-  [1637:1678:0806/074308.337567:ERROR:file_path_watcher_linux.cc(315)] inot=
-ify_init() failed: Function not implemented (38)
-  Fontconfig warning: "/etc/fonts/fonts.conf", line 100: unknown element "b=
-lank"
-  qemu: unknown option 'type=3Dutility'
-  [1637:1680:0806/074313.598432:FATAL:gpu_data_manager_impl_private.cc(439)=
-] GPU process isn't usable. Goodbye.
-  qemu: uncaught target signal 5 (Trace/breakpoint trap) - core dumped
-  Trace/breakpoint trap
+Regards,
+Roman
 
-  Why?
-  And then I run firefox,it can be opened, but it can't load any web pages =
-and HTML.
-  I really need help=EF=BC=81
-  Thank.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1890545/+subscriptions
+> +    }
+> +    if (kvm_enabled()) {
+> +        kvm_cpu_synchronize_state(cpu);
+> +    }
+> +    if (hax_enabled()) {
+> +        hax_cpu_synchronize_state(cpu);
+> +    }
+> +    if (whpx_enabled()) {
+> +        whpx_cpu_synchronize_state(cpu);
+> +    }
+> +}
+> +
 
