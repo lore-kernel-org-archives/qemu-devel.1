@@ -2,130 +2,98 @@ Return-Path: <SRS0=wQM/=BV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EADD4C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 15:56:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 878B0C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 15:57:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B51B720756
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 15:56:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 51F1020756
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 15:57:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R6sKNhgE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B51B720756
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bz+nEBj7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51F1020756
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57800 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59914 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5Wd5-0005yz-Lo
-	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 11:55:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34128)
+	id 1k5WeR-0006tt-9P
+	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 11:57:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34182)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k5WcP-0005UV-MA
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 11:55:17 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47730
+ (Exim 4.90_1) (envelope-from <nsoffer@redhat.com>)
+ id 1k5Wcm-0005u1-27
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 11:55:40 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:26486
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k5WcO-0005LZ-28
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 11:55:17 -0400
+ (Exim 4.90_1) (envelope-from <nsoffer@redhat.com>)
+ id 1k5Wck-0005Sx-EC
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 11:55:39 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597161314;
+ s=mimecast20190719; t=1597161337;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=3ZibnC//1CFaPoaIP5MyH7z6inKY9T6njZHhqZ2E4Zg=;
- b=R6sKNhgE3zjh1LN2ajx0wirumtAPsDFa9EKRoZFMFeSk1wowLIKjdoTQTAUvPHwW9SZOx1
- dx+HT4Uq/Nvi4OeI2ZPCDWtH1kyabYGy3PPSa8K/NDsMJcXI/ZmeWT03regiDoIcy0aHTn
- rNlUl9xVJ3lnNaP/mjflPzpAoe1jr1M=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-263-fx7LgZnxMH2q8-ho9DH7Tw-1; Tue, 11 Aug 2020 11:55:13 -0400
-X-MC-Unique: fx7LgZnxMH2q8-ho9DH7Tw-1
-Received: by mail-wr1-f70.google.com with SMTP id d6so5745383wrv.23
- for <qemu-devel@nongnu.org>; Tue, 11 Aug 2020 08:55:11 -0700 (PDT)
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=cMF9wCch3Vo3DZkmu3xNhNm/K1u/RMVm799+qfOigrE=;
+ b=bz+nEBj7hwWbW9lbfaJIPxNbStdXiD3Z0la6U7Sltem/hQSC8q+lp2p9AknwDrmjpPcev0
+ cBbjlEVtaVxNqa2CAZKxTRux9NFZVqmwZfzG/e8yxGvb/gJ++Z9S8268Z0ZNAipe8XrOfI
+ rjbESkmhnHiacyffIDKF3X95C8ToCjE=
+Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com
+ [209.85.167.199]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-535-yO5Ml4A3N1WVw6QvTKrspw-1; Tue, 11 Aug 2020 11:54:27 -0400
+X-MC-Unique: yO5Ml4A3N1WVw6QvTKrspw-1
+Received: by mail-oi1-f199.google.com with SMTP id r62so7652390oif.0
+ for <qemu-devel@nongnu.org>; Tue, 11 Aug 2020 08:54:26 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:autocrypt:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=3ZibnC//1CFaPoaIP5MyH7z6inKY9T6njZHhqZ2E4Zg=;
- b=Z6gXLr8BzBDgGo29350KCOLsCm8H2YsxPt8aHrFtXYr4xgHewpd1uP16PE9qYYLNPD
- aOmYglZaeZE0VilL9e1nfUcg3qtgM8BhWuwPrvF0eKuvV0OqVr2QVJ6TI0Z9ob3RrJsr
- 6SYHYp9naBzcwwBCCBbJGv42RhWGhE+4XKnPSfJAfj/SpCFCq+4Xc9aglgVsdldKK77D
- hPAgDyDo8YfhIiFVwIajC5wL/PlinPmvRc3f7OGH8GftaB3Ime8c3ybvGCj2PjF6MSyf
- LDX8qQNZQWrVNLO2hbiKk9nwmobBCmFxChxKo7vV74EOjBQAw1pwCrzoIgasnMRHG1PJ
- Z+2w==
-X-Gm-Message-State: AOAM533wpILPkWVDFCR5U5RPqG0pYvswna5JFjttLuyN0cCHiwy558M8
- HHRPN1pvCEPb2L7j9YJkNlaB0md1tP7wbbJbdCfTtjUQlpGr37eGmiOrhSIdSTI5h95wzup+TXK
- oqDZnIv7IxXRHr+8=
-X-Received: by 2002:a5d:6a8d:: with SMTP id s13mr32199256wru.201.1597161310156; 
- Tue, 11 Aug 2020 08:55:10 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyVyN36Pz25HRDaZWSTxlCupFd9avpc38QuAFhcVT9E50Z6Hi+NFwAoWWhrzj6Oss6gENOhYw==
-X-Received: by 2002:a5d:6a8d:: with SMTP id s13mr32199241wru.201.1597161309962; 
- Tue, 11 Aug 2020 08:55:09 -0700 (PDT)
-Received: from [192.168.1.36] (121.red-81-40-121.staticip.rima-tde.net.
- [81.40.121.121])
- by smtp.gmail.com with ESMTPSA id o2sm26520880wrj.21.2020.08.11.08.55.09
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 11 Aug 2020 08:55:09 -0700 (PDT)
-Subject: Re: [PATCH v2] CODING_STYLE.rst: flesh out our naming conventions.
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
-References: <20200810105147.10670-1-alex.bennee@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <3dfae8bc-7f8d-1b1c-c805-5eab4e8fbb19@redhat.com>
-Date: Tue, 11 Aug 2020 17:55:08 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=cMF9wCch3Vo3DZkmu3xNhNm/K1u/RMVm799+qfOigrE=;
+ b=oMLn+Zh5zsiP1r1HgvTjIH+7CGanHSAIooXHxJB2+wAyHwTfwvinYmiqnAnA77vZ+9
+ 79MdsWuEHbts/3PUwVfRPm5lSJxGOROvHvl6cA8QjjC3lnH36nt4qyA58kPufPxjqmng
+ 9hdFTmE8kLEnDGb1olKlEHp5+e+wvwas5i2n6Mzc0SaWJmjSSxFdV7SW56WrG1r74tNp
+ kAzGm1d537fZF0EZXGi5oD53bQhbLSRSB74FxBMLX/GlKn6LcNxYQJXsE6nGIiqxSgR5
+ NPhJ0d/xrCuM4kKxZ4CaJ1xWEeQsok4J+K6er3dmK7lHgm6jyNdYEYZIheJL4qVFUida
+ 2RLA==
+X-Gm-Message-State: AOAM533KRBO3/r2E3667byj9SGbBWxH4UplXX7ocGo93TNGFwukii/ER
+ y7Wv7hLuGNG2xgDxYuPtgaBpSqk2kpxFjS5pbtV6y9vBdKcGsTWBnQ/75ANpGI5onz85iYp3/kW
+ bQIjBJN719eCjsSAx7CoAClQulojdtgg=
+X-Received: by 2002:a9d:6f85:: with SMTP id h5mr5571120otq.81.1597161265644;
+ Tue, 11 Aug 2020 08:54:25 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy1bXr2TKap/N/+Dz+7mr9dwfeze9j9EI0YH5LK4GhYesmi3ijZ+8M5GwCg65Mn2gTqh4gXQ56aAZ1N3t6Wflk=
+X-Received: by 2002:a9d:6f85:: with SMTP id h5mr5571115otq.81.1597161265449;
+ Tue, 11 Aug 2020 08:54:25 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200810105147.10670-1-alex.bennee@linaro.org>
-Content-Language: en-US
+References: <20200811080830.289136-1-mreitz@redhat.com>
+In-Reply-To: <20200811080830.289136-1-mreitz@redhat.com>
+From: Nir Soffer <nsoffer@redhat.com>
+Date: Tue, 11 Aug 2020 18:54:09 +0300
+Message-ID: <CAMRbyytS0HZLjHVmr4aKC3of4_EDxZXOqOzAornC1WbnYoxN-Q@mail.gmail.com>
+Subject: Re: [PATCH] iotests/259: Fix reference output
+To: Max Reitz <mreitz@redhat.com>
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=nsoffer@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
+Content-Type: multipart/alternative; boundary="000000000000e065cd05ac9c1588"
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=nsoffer@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/11 04:41:55
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/11 02:18:06
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01,
+ RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -138,61 +106,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Kevin Wolf <kwolf@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ qemu-block <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Alex,
+--000000000000e065cd05ac9c1588
+Content-Type: text/plain; charset="UTF-8"
 
-On 8/10/20 12:51 PM, Alex Bennée wrote:
-> Mention a few of the more common naming conventions we follow in the
-> code base including common variable names and function prefix and
-> suffix examples.
-> 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> 
+On Tue, Aug 11, 2020 at 11:08 AM Max Reitz <mreitz@redhat.com> wrote:
+
+> The error message has changed recently, breaking the test.  Fix it.
+>
+> Fixes: a2b333c01880f56056d50c238834d62e32001e54
+>        ("block: nbd: Fix convert qcow2 compressed to nbd")
+>
+
+Thanks for fixing this. I thought that I ran all the tests when I submitted
+the change.
+
+Is this new test that was not available in master when I submitted this, or
+maybe I
+missed something when running the tests?
+
+I think I ran the tests using:
+
+    SPEED=thorough check-block.sh
+
+Nir
+
+
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
 > ---
-...
-> +Function Naming Conventions
-> +---------------------------
-> +
-> +The ``qemu_`` prefix is used for utility functions that are widely
-> +called from across the code-base. This includes wrapped versions of
-> +standard library functions (e.g. qemu_strtol) where the prefix is
-> +added to the function name to alert readers that they are seeing a
-> +wrapped version; otherwise avoid this prefix.
-> +
-> +If there are two versions of a function to be called with or without a
-> +lock held, the function that expects the lock to be already held
-> +usually uses the suffix ``_locked``.
+>  tests/qemu-iotests/259.out | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/tests/qemu-iotests/259.out b/tests/qemu-iotests/259.out
+> index e27b9ff38d..1aaadfda4e 100644
+> --- a/tests/qemu-iotests/259.out
+> +++ b/tests/qemu-iotests/259.out
+> @@ -10,5 +10,5 @@ disk size: unavailable
+>
+>  --- Testing creation for which the node would need to grow ---
+>  Formatting 'TEST_DIR/t.IMGFMT', fmt=qcow2 size=67108864
+> preallocation=metadata
+> -qemu-img: TEST_DIR/t.IMGFMT: Could not resize image: Image format driver
+> does not support resize
+> +qemu-img: TEST_DIR/t.IMGFMT: Could not resize image: Cannot grow NBD nodes
+>  *** done
+> --
+> 2.26.2
+>
+>
+>
 
-And if there is only one version? I'm looking at:
+--000000000000e065cd05ac9c1588
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-  /* With q->lock */
-  static void nvme_kick(NVMeQueuePair *q)
-  {
-  ...
-  }
+<div dir=3D"ltr"><div dir=3D"ltr">On Tue, Aug 11, 2020 at 11:08 AM Max Reit=
+z &lt;<a href=3D"mailto:mreitz@redhat.com">mreitz@redhat.com</a>&gt; wrote:=
+<br></div><div class=3D"gmail_quote"><blockquote class=3D"gmail_quote" styl=
+e=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);paddin=
+g-left:1ex">The error message has changed recently, breaking the test.=C2=
+=A0 Fix it.<br>
+<br>
+Fixes: a2b333c01880f56056d50c238834d62e32001e54<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0(&quot;block: nbd: Fix convert qcow2 compressed =
+to nbd&quot;)<br></blockquote><div><br></div><div>Thanks for fixing this. I=
+ thought that I ran all the tests when I submitted the change.</div><div><b=
+r></div><div>Is this new test that was not available in master when I submi=
+tted this, or maybe I=C2=A0</div><div>missed something=C2=A0when running=C2=
+=A0the tests?</div><div><br></div><div>I think I ran the tests using:</div>=
+<div><br></div><div>=C2=A0 =C2=A0 SPEED=3Dthorough=C2=A0check-block.sh</div=
+><div><br></div><div>Nir</div><div>=C2=A0</div><blockquote class=3D"gmail_q=
+uote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,2=
+04);padding-left:1ex">
+Signed-off-by: Max Reitz &lt;<a href=3D"mailto:mreitz@redhat.com" target=3D=
+"_blank">mreitz@redhat.com</a>&gt;<br>
+---<br>
+=C2=A0tests/qemu-iotests/259.out | 2 +-<br>
+=C2=A01 file changed, 1 insertion(+), 1 deletion(-)<br>
+<br>
+diff --git a/tests/qemu-iotests/259.out b/tests/qemu-iotests/259.out<br>
+index e27b9ff38d..1aaadfda4e 100644<br>
+--- a/tests/qemu-iotests/259.out<br>
++++ b/tests/qemu-iotests/259.out<br>
+@@ -10,5 +10,5 @@ disk size: unavailable<br>
+<br>
+=C2=A0--- Testing creation for which the node would need to grow ---<br>
+=C2=A0Formatting &#39;TEST_DIR/t.IMGFMT&#39;, fmt=3Dqcow2 size=3D67108864 p=
+reallocation=3Dmetadata<br>
+-qemu-img: TEST_DIR/t.IMGFMT: Could not resize image: Image format driver d=
+oes not support resize<br>
++qemu-img: TEST_DIR/t.IMGFMT: Could not resize image: Cannot grow NBD nodes=
+<br>
+=C2=A0*** done<br>
+-- <br>
+2.26.2<br>
+<br>
+<br>
+</blockquote></div></div>
 
-Should the style be enforced here and this function renamed
-nvme_kick_locked()?
-
-In this particular case, I think so, because we also have:
-
-  /* With q->lock */
-  static void nvme_put_free_req_locked(...)
-  {
-  ...
-  }
-
-  /* With q->lock */
-  static void nvme_wake_free_req_locked(NVMeQueuePair *q)
-  {
-  ...
-  }
-
-For more cases:
-
-$ git grep -A1 -i '\/\*.*with.*lock'
+--000000000000e065cd05ac9c1588--
 
 
