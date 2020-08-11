@@ -4,49 +4,47 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4E41C433E0
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 994A1C433DF
 	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 11:05:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9965A2076B
+	by mail.kernel.org (Postfix) with ESMTPS id 67BCD2075D
 	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 11:05:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9965A2076B
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67BCD2075D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ispras.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36764 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36780 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5S5x-0002No-NN
+	id 1k5S5x-0002O5-HB
 	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 07:05:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46192)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46378)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pavel.dovgalyuk@ispras.ru>)
- id 1k5S28-0003Ga-Ac
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 07:01:32 -0400
-Received: from mail.ispras.ru ([83.149.199.84]:42344)
+ id 1k5S2l-0004CR-Og
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 07:02:11 -0400
+Received: from mail.ispras.ru ([83.149.199.84]:42476)
  by eggs.gnu.org with esmtps (TLS1.2:DHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pavel.dovgalyuk@ispras.ru>)
- id 1k5S26-0003Ld-85
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 07:01:31 -0400
+ id 1k5S2k-0003PE-1X
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 07:02:11 -0400
 Received: from [127.0.1.1] (unknown [62.118.151.149])
- by mail.ispras.ru (Postfix) with ESMTPSA id 496F04089F07;
- Tue, 11 Aug 2020 11:01:28 +0000 (UTC)
-Subject: [PATCH v2 06/14] qapi: introduce replay.json for
- record/replay-related stuff
+ by mail.ispras.ru (Postfix) with ESMTPSA id 47C754089EF7;
+ Tue, 11 Aug 2020 11:02:08 +0000 (UTC)
+Subject: [PATCH v2 13/14] replay: describe reverse debugging in docs/replay.txt
 From: Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru>
 To: qemu-devel@nongnu.org
-Date: Tue, 11 Aug 2020 14:01:28 +0300
-Message-ID: <159714368801.18946.17142001761682131437.stgit@pasha-ThinkPad-X280>
+Date: Tue, 11 Aug 2020 14:02:08 +0300
+Message-ID: <159714372804.18946.9062781343195564152.stgit@pasha-ThinkPad-X280>
 In-Reply-To: <159714365354.18946.2967871683340522027.stgit@pasha-ThinkPad-X280>
 References: <159714365354.18946.2967871683340522027.stgit@pasha-ThinkPad-X280>
 User-Agent: StGit/0.17.1-dirty
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Received-SPF: pass client-ip=83.149.199.84;
  envelope-from=pavel.dovgalyuk@ispras.ru; helo=mail.ispras.ru
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/11 07:00:54
@@ -78,133 +76,57 @@ Sender: "Qemu-devel"
 
 From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 
-This patch adds replay.json file. It will be
-used for adding record/replay-related data structures and commands.
+This patch updates the documentation and describes usage of the reverse
+debugging in QEMU+GDB.
 
-Signed-off-by: Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgalyuk@ispras.ru>
 ---
- MAINTAINERS             |    1 +
- include/sysemu/replay.h |    1 +
- qapi/Makefile.objs      |    4 ++--
- qapi/misc.json          |   18 ------------------
- qapi/qapi-schema.json   |    1 +
- qapi/replay.json        |   26 ++++++++++++++++++++++++++
- 6 files changed, 31 insertions(+), 20 deletions(-)
- create mode 100644 qapi/replay.json
+ docs/replay.txt |   33 +++++++++++++++++++++++++++++++++
+ 1 file changed, 33 insertions(+)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 0886eb3d2b..50fc44680c 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -2643,6 +2643,7 @@ F: include/sysemu/replay.h
- F: docs/replay.txt
- F: stubs/replay.c
- F: tests/acceptance/replay_kernel.py
-+F: qapi/replay.json
+diff --git a/docs/replay.txt b/docs/replay.txt
+index 70c27edb36..18d6169f3b 100644
+--- a/docs/replay.txt
++++ b/docs/replay.txt
+@@ -294,6 +294,39 @@ for recording and replaying must contain identical number of ports in record
+ and replay modes, but their backends may differ.
+ E.g., '-serial stdio' in record mode, and '-serial null' in replay mode.
  
- IOVA Tree
- M: Peter Xu <peterx@redhat.com>
-diff --git a/include/sysemu/replay.h b/include/sysemu/replay.h
-index c9c896ae8d..e00ed2f4a5 100644
---- a/include/sysemu/replay.h
-+++ b/include/sysemu/replay.h
-@@ -14,6 +14,7 @@
- 
- #include "qapi/qapi-types-misc.h"
- #include "qapi/qapi-types-run-state.h"
-+#include "qapi/qapi-types-replay.h"
- #include "qapi/qapi-types-ui.h"
- #include "block/aio.h"
- 
-diff --git a/qapi/Makefile.objs b/qapi/Makefile.objs
-index 4673ab7490..eff501a97d 100644
---- a/qapi/Makefile.objs
-+++ b/qapi/Makefile.objs
-@@ -7,8 +7,8 @@ util-obj-y += qapi-util.o
- 
- QAPI_COMMON_MODULES = audio authz block-core block char common control crypto
- QAPI_COMMON_MODULES += dump error introspect job machine migration misc
--QAPI_COMMON_MODULES += net pragma qdev qom rdma rocker run-state sockets tpm
--QAPI_COMMON_MODULES += trace transaction ui
-+QAPI_COMMON_MODULES += net pragma qdev qom rdma replay rocker run-state sockets
-+QAPI_COMMON_MODULES += tpm trace transaction ui
- QAPI_TARGET_MODULES = machine-target misc-target
- QAPI_MODULES = $(QAPI_COMMON_MODULES) $(QAPI_TARGET_MODULES)
- 
-diff --git a/qapi/misc.json b/qapi/misc.json
-index 9d32820dc1..87fcb90135 100644
---- a/qapi/misc.json
-+++ b/qapi/misc.json
-@@ -1556,24 +1556,6 @@
- { 'event': 'ACPI_DEVICE_OST',
-      'data': { 'info': 'ACPIOSTInfo' } }
- 
--##
--# @ReplayMode:
--#
--# Mode of the replay subsystem.
--#
--# @none: normal execution mode. Replay or record are not enabled.
--#
--# @record: record mode. All non-deterministic data is written into the
--#          replay log.
--#
--# @play: replay mode. Non-deterministic data required for system execution
--#        is read from the log.
--#
--# Since: 2.5
--##
--{ 'enum': 'ReplayMode',
--  'data': [ 'none', 'record', 'play' ] }
--
- ##
- # @xen-load-devices-state:
- #
-diff --git a/qapi/qapi-schema.json b/qapi/qapi-schema.json
-index f03ff91ceb..2604fcf6ec 100644
---- a/qapi/qapi-schema.json
-+++ b/qapi/qapi-schema.json
-@@ -82,6 +82,7 @@
- { 'include': 'qdev.json' }
- { 'include': 'machine.json' }
- { 'include': 'machine-target.json' }
-+{ 'include': 'replay.json' }
- { 'include': 'misc.json' }
- { 'include': 'misc-target.json' }
- { 'include': 'audio.json' }
-diff --git a/qapi/replay.json b/qapi/replay.json
-new file mode 100644
-index 0000000000..9e13551d20
---- /dev/null
-+++ b/qapi/replay.json
-@@ -0,0 +1,26 @@
-+# -*- Mode: Python -*-
-+#
++Reverse debugging
++-----------------
 +
-+##
-+# = Record/replay
-+##
++Reverse debugging allows "executing" the program in reverse direction.
++GDB remote protocol supports "reverse step" and "reverse continue"
++commands. The first one steps single instruction backwards in time,
++and the second one finds the last breakpoint in the past.
 +
-+{ 'include': 'common.json' }
++Recorded executions may be used to enable reverse debugging. QEMU can't
++execute the code in backwards direction, but can load a snapshot and
++replay forward to find the desired position or breakpoint.
 +
-+##
-+# @ReplayMode:
-+#
-+# Mode of the replay subsystem.
-+#
-+# @none: normal execution mode. Replay or record are not enabled.
-+#
-+# @record: record mode. All non-deterministic data is written into the
-+#          replay log.
-+#
-+# @play: replay mode. Non-deterministic data required for system execution
-+#        is read from the log.
-+#
-+# Since: 2.5
-+##
-+{ 'enum': 'ReplayMode',
-+  'data': [ 'none', 'record', 'play' ] }
++The following GDB commands are supported:
++ - reverse-stepi (or rsi) - step one instruction backwards
++ - reverse-continue (or rc) - find last breakpoint in the past
++
++Reverse step loads the nearest snapshot and replays the execution until
++the required instruction is met.
++
++Reverse continue may include several passes of examining the execution
++between the snapshots. Each of the passes include the following steps:
++ 1. loading the snapshot
++ 2. replaying to examine the breakpoints
++ 3. if breakpoint or watchpoint was met
++    - loading the snaphot again
++    - replaying to the required breakpoint
++ 4. else
++    - proceeding to the p.1 with the earlier snapshot
++
++Therefore usage of the reverse debugging requires at least one snapshot
++created in advance. See the "Snapshotting" section to learn about running
++record/replay and creating the snapshot in these modes.
++
+ Replay log format
+ -----------------
+ 
 
 
