@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D48A3C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 18:14:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C8C5C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 18:18:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9DF64206B2
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 18:14:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 33FB42076C
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 18:18:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N9GjppG1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9DF64206B2
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ON5UCWpD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33FB42076C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38834 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44698 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5Ymq-000414-UE
-	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 14:14:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35272)
+	id 1k5YrD-0006bE-Gr
+	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 14:18:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36828)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
- id 1k5YkL-0002YC-Di
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 14:11:37 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:51475
+ id 1k5Ypx-0005gr-Ae
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 14:17:25 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23370
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
- id 1k5YkJ-0004bY-EC
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 14:11:37 -0400
+ id 1k5Ypu-0005LD-Db
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 14:17:24 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597169494;
+ s=mimecast20190719; t=1597169840;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=QqRF/4xikJa+obEUFEjMSpHLfuvTg5pyQfZpnzEsxR8=;
- b=N9GjppG17Vp9d818S9w45R7g4HmzM1Cu33s8DZTUIWmcTEMZBt4lVjxTyq/FWaAWSC2+y9
- 2HOY0j6hx5JTH7wqkh+0k78+3coPCmjz9pGLKjgnySwpMrMeB2MrWurzUorUu8Dr/uUFFX
- KLDqM3oxoCXFrJMfSwcjrW4N/Ag5MsI=
+ bh=sVtJMfYTO7u506B3TOgJ6c9mkt85KyhwmdZAgPfPlyY=;
+ b=ON5UCWpDeHQCqTmNi302GXAQ1S0IVFqUpPFRa+X3ZoxIqz9EyLB16DUcjbtZc2kXtI7HCk
+ o85CrNZQ/4oKC1voJOSp1XkwJRmXC3AaVzy0oZOB2FSqQaVf3RObU/Njfe4sm0OD72jW17
+ WUmxdn+CY3mYb/FofeU+1PnaRggp8Ig=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-61-DIL1jsnNO9G0OIrTH8-80A-1; Tue, 11 Aug 2020 14:11:32 -0400
-X-MC-Unique: DIL1jsnNO9G0OIrTH8-80A-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-336-6gxGvoPlOSGzU2hQhOt0cg-1; Tue, 11 Aug 2020 14:17:17 -0400
+X-MC-Unique: 6gxGvoPlOSGzU2hQhOt0cg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 864AB1902EA8;
- Tue, 11 Aug 2020 18:11:31 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 415C7100CCC0;
+ Tue, 11 Aug 2020 18:17:16 +0000 (UTC)
 Received: from x1.home (ovpn-112-71.phx2.redhat.com [10.3.112.71])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8F7196111F;
- Tue, 11 Aug 2020 18:11:24 +0000 (UTC)
-Date: Tue, 11 Aug 2020 12:11:24 -0600
+ by smtp.corp.redhat.com (Postfix) with ESMTP id AA8441001281;
+ Tue, 11 Aug 2020 18:17:10 +0000 (UTC)
+Date: Tue, 11 Aug 2020 12:17:10 -0600
 From: Alex Williamson <alex.williamson@redhat.com>
 To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
-Subject: Re: [RFC PATCH 2/3] util/vfio-helpers: Add trace event to display
- device IRQs available
-Message-ID: <20200811121124.635cdf21@x1.home>
-In-Reply-To: <20200811172845.16698-3-philmd@redhat.com>
+Subject: Re: [RFC PATCH 3/3] util/vfio-helpers: Let qemu_vfio_pci_init_irq
+ take IRQ index argument
+Message-ID: <20200811121710.10ccf015@x1.home>
+In-Reply-To: <20200811172845.16698-4-philmd@redhat.com>
 References: <20200811172845.16698-1-philmd@redhat.com>
- <20200811172845.16698-3-philmd@redhat.com>
+ <20200811172845.16698-4-philmd@redhat.com>
 Organization: Red Hat
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=alex.williamson@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.120;
+Received-SPF: pass client-ip=205.139.110.120;
  envelope-from=alex.williamson@redhat.com; helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/11 04:41:55
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/11 02:18:06
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -106,47 +106,104 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 11 Aug 2020 19:28:44 +0200
+On Tue, 11 Aug 2020 19:28:45 +0200
 Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
 
-> Add a trace event to display the amount of IRQs available
-> on the device.
+> Add a new 'index' argument to qemu_vfio_pci_init_irq() to be able
+> to initialize other IRQs than IRQ #0. Adapt the single user of this
+> API in nvme_init().
+
+This is actually addressing the what the vfio uAPI refers to as the
+subindex, the index is the interrupt type, ex. MSI-X.
+
 >=20
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 > ---
->  util/vfio-helpers.c | 1 +
->  util/trace-events   | 1 +
->  2 files changed, 2 insertions(+)
+>  include/qemu/vfio-helpers.h |  2 +-
+>  block/nvme.c                |  2 +-
+>  util/vfio-helpers.c         | 12 +++++++++---
+>  3 files changed, 11 insertions(+), 5 deletions(-)
 >=20
+> diff --git a/include/qemu/vfio-helpers.h b/include/qemu/vfio-helpers.h
+> index 1f057c2b9e..ff63e75096 100644
+> --- a/include/qemu/vfio-helpers.h
+> +++ b/include/qemu/vfio-helpers.h
+> @@ -27,6 +27,6 @@ void *qemu_vfio_pci_map_bar(QEMUVFIOState *s, int index=
+,
+>  void qemu_vfio_pci_unmap_bar(QEMUVFIOState *s, int index, void *bar,
+>                               uint64_t offset, uint64_t size);
+>  int qemu_vfio_pci_init_irq(QEMUVFIOState *s, EventNotifier *e,
+> -                           int irq_type, Error **errp);
+> +                           int irq_type, unsigned index, Error **errp);
+> =20
+>  #endif
+> diff --git a/block/nvme.c b/block/nvme.c
+> index 374e268915..2b3986b66d 100644
+> --- a/block/nvme.c
+> +++ b/block/nvme.c
+> @@ -757,7 +757,7 @@ static int nvme_init(BlockDriverState *bs, const char=
+ *device, int namespace,
+>      }
+> =20
+>      ret =3D qemu_vfio_pci_init_irq(s->vfio, &s->irq_notifier,
+> -                                 VFIO_PCI_MSIX_IRQ_INDEX, errp);
+> +                                 VFIO_PCI_MSIX_IRQ_INDEX, 0, errp);
+>      if (ret) {
+>          goto out;
+>      }
 > diff --git a/util/vfio-helpers.c b/util/vfio-helpers.c
-> index 6defefcc01..3ad7e6be52 100644
+> index 3ad7e6be52..ba9a869364 100644
 > --- a/util/vfio-helpers.c
 > +++ b/util/vfio-helpers.c
-> @@ -192,6 +192,7 @@ int qemu_vfio_pci_init_irq(QEMUVFIOState *s, EventNot=
-ifier *e,
->          error_setg(errp, "Device interrupt doesn't support eventfd");
+> @@ -173,10 +173,11 @@ void qemu_vfio_pci_unmap_bar(QEMUVFIOState *s, int =
+index, void *bar,
+>  }
+> =20
+>  /**
+> - * Initialize device IRQ with @irq_type and register an event notifier.
+> + * Initialize device IRQ @index with @irq_type
+> + * and register an event notifier.
+>   */
+>  int qemu_vfio_pci_init_irq(QEMUVFIOState *s, EventNotifier *e,
+> -                           int irq_type, Error **errp)
+> +                           int irq_type, unsigned index, Error **errp)
+>  {
+
+
+But MSI-X will expose the VFIO_IRQ_INFO_NORESIZE flag, which means that
+we cannot incrementally enable additional subindexes, aka vectors,
+without first disabling and re-enabling the entire index/irq_type.
+Therefore this is exposing an API that isn't actually supported.
+Thanks,
+
+Alex
+
+>      int r;
+>      struct vfio_irq_set *irq_set;
+> @@ -193,6 +194,11 @@ int qemu_vfio_pci_init_irq(QEMUVFIOState *s, EventNo=
+tifier *e,
 >          return -EINVAL;
 >      }
-> +    trace_qemu_vfio_pci_init_irq(irq_info.count);
+>      trace_qemu_vfio_pci_init_irq(irq_info.count);
+> +    if (index >=3D irq_info.count) {
+> +        error_setg(errp, "Device has %"PRIu32" interrupts (requested ind=
+ex %u)",
+> +                   irq_info.count, index);
+> +        return -EINVAL;
+> +    }
 > =20
 >      irq_set_size =3D sizeof(*irq_set) + sizeof(int32_t);
 >      irq_set =3D g_malloc0(irq_set_size);
-> diff --git a/util/trace-events b/util/trace-events
-> index 0ce42822eb..351dbdbe3c 100644
-> --- a/util/trace-events
-> +++ b/util/trace-events
-> @@ -83,3 +83,4 @@ qemu_vfio_new_mapping(void *s, void *host, size_t size,=
- int index, uint64_t iova
->  qemu_vfio_do_mapping(void *s, void *host, size_t size, uint64_t iova) "s=
- %p host %p size %zu iova 0x%"PRIx64
->  qemu_vfio_dma_map(void *s, void *host, size_t size, bool temporary, uint=
-64_t *iova) "s %p host %p size %zu temporary %d iova %p"
->  qemu_vfio_dma_unmap(void *s, void *host) "s %p host %p"
-> +qemu_vfio_pci_init_irq(uint32_t count) "device interrupt count: %"PRIu32
-
-Knowing the count independent of which index we're looking at doesn't
-seem very useful.  Thanks,
-
-Alex
+> @@ -202,7 +208,7 @@ int qemu_vfio_pci_init_irq(QEMUVFIOState *s, EventNot=
+ifier *e,
+>          .argsz =3D irq_set_size,
+>          .flags =3D VFIO_IRQ_SET_DATA_EVENTFD | VFIO_IRQ_SET_ACTION_TRIGG=
+ER,
+>          .index =3D irq_info.index,
+> -        .start =3D 0,
+> +        .start =3D index,
+>          .count =3D 1,
+>      };
+> =20
 
 
