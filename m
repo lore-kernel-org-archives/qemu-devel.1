@@ -2,64 +2,68 @@ Return-Path: <SRS0=wQM/=BV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7570AC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 15:33:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7CADC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 15:34:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 484A620768
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 15:33:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 484A620768
+	by mail.kernel.org (Postfix) with ESMTPS id 9193A20768
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 15:34:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9193A20768
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57724 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60928 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5WGz-0001rB-De
-	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 11:33:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56112)
+	id 1k5WI3-0003A9-Og
+	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 11:34:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56286)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1k5WE6-0007V2-Sp
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 11:30:10 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:20035
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1k5WEJ-0007j0-Rg
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 11:30:23 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:36645
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1k5WE5-0002I3-G1
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 11:30:10 -0400
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1k5WEH-0002P7-Kn
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 11:30:22 -0400
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-301-xRij0k3iPy25m-_Qm9k_3Q-1; Tue, 11 Aug 2020 11:30:01 -0400
-X-MC-Unique: xRij0k3iPy25m-_Qm9k_3Q-1
+ us-mta-22-E2JI0fNdN9Gw7T28fXJKgA-1; Tue, 11 Aug 2020 11:30:16 -0400
+X-MC-Unique: E2JI0fNdN9Gw7T28fXJKgA-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2880B1005504;
- Tue, 11 Aug 2020 15:30:00 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2960919067E0;
+ Tue, 11 Aug 2020 15:30:15 +0000 (UTC)
 Received: from bahia.lan (ovpn-112-38.ams2.redhat.com [10.36.112.38])
- by smtp.corp.redhat.com (Postfix) with ESMTP id CFC8579CF3;
- Tue, 11 Aug 2020 15:29:57 +0000 (UTC)
-Subject: [PATCH 0/2] spapr/nvram: Fix QEMU crash
+ by smtp.corp.redhat.com (Postfix) with ESMTP id F137D8AD10;
+ Tue, 11 Aug 2020 15:30:13 +0000 (UTC)
+Subject: [PATCH 2/2] spapr/nvram: Allocate enough space for all -prom-env
+ options
 From: Greg Kurz <groug@kaod.org>
 To: Thomas Huth <thuth@redhat.com>
-Date: Tue, 11 Aug 2020 17:29:56 +0200
-Message-ID: <159715979684.1635409.14107632395902701971.stgit@bahia.lan>
+Date: Tue, 11 Aug 2020 17:30:13 +0200
+Message-ID: <159715981316.1635409.16117540313443167075.stgit@bahia.lan>
+In-Reply-To: <159715979684.1635409.14107632395902701971.stgit@bahia.lan>
+References: <159715979684.1635409.14107632395902701971.stgit@bahia.lan>
 User-Agent: StGit/0.21
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=groug@kaod.org
-X-Mimecast-Spam-Score: 0
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: kaod.org
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: softfail client-ip=207.211.31.120; envelope-from=groug@kaod.org;
+Received-SPF: softfail client-ip=205.139.110.120; envelope-from=groug@kaod.org;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/11 04:41:55
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/11 02:18:06
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -12
 X-Spam_score: -1.3
@@ -86,7 +90,13 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This series fixes the following crash:
+Since commit 61f20b9dc5b7 ("spapr_nvram: Pre-initialize the NVRAM to
+support the -prom-env parameter"), pseries machines can pre-initialize
+the "system" partition in the NVRAM with the data passed to all -prom-env
+parameters on the QEMU command line.
+
+In this cases it is assumed that all the data fits in 64 KiB, but the user
+can easily pass more and crash QEMU:
 
 $ qemu-system-ppc64 -M pseries $(for ((x=3D0;x<128;x++)); do \
   echo -n " -prom-env "$(for ((y=3D0;y<1024;y++)); do echo -n x ; done) ; \
@@ -94,26 +104,34 @@ $ qemu-system-ppc64 -M pseries $(for ((x=3D0;x<128;x++)); do \
 malloc(): corrupted top size
 Aborted (core dumped)
 
-This also affects g3beige and mac99 machine types, and probably some
-sparc/sparc64 machine types as well, but I prefer to leave the fixing
-to knowledgeable people.
+Call chrp_nvram_create_system_partition() first with its recently added
+parameter dry_run set to false, to know the required size and allocate
+the NVRAM buffer accordingly.
 
+Fixes: 61f20b9dc5b7 ("spapr_nvram: Pre-initialize the NVRAM to support the =
+-prom-env parameter")
+Signed-off-by: Greg Kurz <groug@kaod.org>
 ---
+ hw/nvram/spapr_nvram.c |    4 ++++
+ 1 file changed, 4 insertions(+)
 
-Greg Kurz (2):
-      nvram: Add dry_run argument to chrp_nvram_create_system_partition()
-      spapr/nvram: Allocate enough space for all -prom-env options
+diff --git a/hw/nvram/spapr_nvram.c b/hw/nvram/spapr_nvram.c
+index 992b818d34e7..1b74bec6200a 100644
+--- a/hw/nvram/spapr_nvram.c
++++ b/hw/nvram/spapr_nvram.c
+@@ -165,6 +165,10 @@ static void spapr_nvram_realize(SpaprVioDevice *dev, E=
+rror **errp)
+         if (ret < 0) {
+             return;
+         }
++    } else if (nb_prom_envs > 0) {
++        nvram->size =3D chrp_nvram_create_system_partition(NULL,
++                                                         MIN_NVRAM_SIZE / =
+4,
++                                                         true);
+     } else {
+         nvram->size =3D DEFAULT_NVRAM_SIZE;
+     }
 
-
- hw/nvram/chrp_nvram.c         |   35 +++++++++++++++++++++++------------
- hw/nvram/mac_nvram.c          |    2 +-
- hw/nvram/spapr_nvram.c        |    7 ++++++-
- hw/sparc/sun4m.c              |    2 +-
- hw/sparc64/sun4u.c            |    2 +-
- include/hw/nvram/chrp_nvram.h |    3 ++-
- 6 files changed, 34 insertions(+), 17 deletions(-)
-
---
-Greg
 
 
