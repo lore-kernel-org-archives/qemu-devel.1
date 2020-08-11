@@ -2,101 +2,86 @@ Return-Path: <SRS0=wQM/=BV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A5C7C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 15:34:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E62FBC433E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 15:41:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 36F6420768
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 15:34:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B5B8D2076C
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 15:41:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="TfR6sWWO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36F6420768
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DyZDG/iQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5B8D2076C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33032 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38014 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5WIA-0003IJ-DX
-	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 11:34:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57192)
+	id 1k5WOt-0005kF-17
+	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 11:41:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59680)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <gromero@linux.ibm.com>)
- id 1k5WHK-0002JB-6o; Tue, 11 Aug 2020 11:33:30 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:14920
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <gromero@linux.ibm.com>)
- id 1k5WHH-0002ml-Lq; Tue, 11 Aug 2020 11:33:29 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 07BFWc5f152677; Tue, 11 Aug 2020 11:33:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
- h=from : to : cc : subject : date : message-id; s=pp1;
- bh=PPx92utNEw+9BKUJJHztx9+w7ik/s8LH2Fe2Gp49uoM=;
- b=TfR6sWWOo2aI2bTLC2GPiCXmItW8QQnH2gZW46BukYUxvb39HEV9hozyOQXBkWWd4RV0
- wcWZ05NKlH+eAeG8di6NfRBpZ7vp+7UYP/jgyIQA3dfEFk8cotcqTLnVEoOMpjTzC4rJ
- uzPOGUuVH6uGdH0yNt1Vg9C9XO5fEMKd5s9Q97C7uliba1gGIG2JnRV76MRpImmCgpvM
- C0S8gBFEH/tF3nNmVAAO5Q6fCipQAKC4QzF2wtg4YjfyBYJ95PzXvNlUDYN6ues0KqH5
- SLKfqyZhJzS0v4gaLjT9x1swN4ssm52ETCPD8qFxYWDe1ov5D7A3bKEn2a5fCSXCFH3G 6w== 
-Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com
- [169.63.121.186])
- by mx0b-001b2d01.pphosted.com with ESMTP id 32usrygq7d-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 11 Aug 2020 11:33:12 -0400
-Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
- by ppma03wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 07BFKAVm017862;
- Tue, 11 Aug 2020 15:33:12 GMT
-Received: from b01cxnp22035.gho.pok.ibm.com (b01cxnp22035.gho.pok.ibm.com
- [9.57.198.25]) by ppma03wdc.us.ibm.com with ESMTP id 32skp92f6a-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 11 Aug 2020 15:33:12 +0000
-Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com
- [9.57.199.111])
- by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 07BFXClH54198572
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 11 Aug 2020 15:33:12 GMT
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id EDC56AC05E;
- Tue, 11 Aug 2020 15:33:11 +0000 (GMT)
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id BBFCBAC059;
- Tue, 11 Aug 2020 15:33:08 +0000 (GMT)
-Received: from pub.ltc.br.ibm.com (unknown [9.80.200.46])
- by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
- Tue, 11 Aug 2020 15:33:08 +0000 (GMT)
-From: Gustavo Romero <gromero@linux.ibm.com>
-To: qemu-ppc@nongnu.org
-Subject: [PATCH v2] target/ppc: Integrate icount to purr, vtb, and tbu40
-Date: Tue, 11 Aug 2020 12:32:35 -0300
-Message-Id: <20200811153235.4527-1-gromero@linux.ibm.com>
-X-Mailer: git-send-email 2.17.1
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
- definitions=2020-08-11_14:2020-08-11,
- 2020-08-11 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- mlxlogscore=786 phishscore=0
- spamscore=0 malwarescore=0 lowpriorityscore=0 impostorscore=0 mlxscore=0
- adultscore=0 priorityscore=1501 clxscore=1011 bulkscore=0 suspectscore=1
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2008110105
-Received-SPF: pass client-ip=148.163.158.5; envelope-from=gromero@linux.ibm.com;
- helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/11 09:33:21
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
-X-Spam_score_int: -36
-X-Spam_score: -3.7
-X-Spam_bar: ---
-X-Spam_report: (-3.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1k5WOA-0005EA-Qx
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 11:40:34 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:36111)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1k5WO9-00040X-6j
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 11:40:34 -0400
+Received: by mail-ot1-x344.google.com with SMTP id x24so10463274otp.3
+ for <qemu-devel@nongnu.org>; Tue, 11 Aug 2020 08:40:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=VvCDwEUqFSp8193AGfTq0mG7xTrs09bACAepJfYSZAs=;
+ b=DyZDG/iQr7NnpDh1gjUBmh9Ce+EPzdj/rCoh9fdA35V+QHtuCBh7qtpww8vIkYm2Gn
+ NktYZQ2S0ERQsKcgmka8N+MzW8nQyxKu9+es1XydbYbmB0afyXAcSPC6xvd12snqCY06
+ NridyLP+gjsPAuy0m0Gi9F0OyeBbUSvu8XP1AEInE0foeB0AHplK88AsGiFlT5GSYBlT
+ 9sJntc0We0XhjHIqH3bXC6T10eS3CBp6Vr4cQ4wuAXLFxHJoXq+ztEc4q07j4wc0UHXG
+ 1liFOW6ccG8JfnDHHZe8bNLdNFgKqXwzHXy9MBvkb+EX+fUt6vUWk+V2vMc84Exq3t5f
+ Zj3g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=VvCDwEUqFSp8193AGfTq0mG7xTrs09bACAepJfYSZAs=;
+ b=F5pEozkAgSG96zZSpnY5PFU5Q56YHKwphoF0vCnC6GfjKXD5OtKHszC5JU/CrftBUq
+ sRsA1rw34W3536o7KEDmN/IFfHTy0zXtfBqmY7xjNhjNAVcKccCgJY+BqCYtw/Bsqvb2
+ NDKoBfnao3rAXwGjoWkVaa20oFNOqkidbh1w7kw6DGERoT2wJ9JwSok9KrhV7bEjfUER
+ RshprIP6gO0K56IvjSaomB5nEJnldM/S5mIisIqb+jzNLQMmnWSo2K6B3f8Sd581Qt1K
+ ptPzIeveKv13WyHu3Cw0wRkmWkL0SsSAr840LqZ+Cbe4sMfnLh1J5Hyl2W5iKB5YoG87
+ Ry/w==
+X-Gm-Message-State: AOAM532PMDgo0pOcz4N94BkopFPMtoYRk8kHiRW46k80UIhXPYMvOZ19
+ xUIdtZslSfIR0wyIxoM8SkR+JLeQO0k3U/oL64k=
+X-Google-Smtp-Source: ABdhPJyE8X2ugzqMSoIWreJ1dXVSZoFIY/i6/Odq4kN/UBZ6hBcMMDO/f4dWAf8JJutJpCZaWZrDsQ2eo1F/WHBcIkI=
+X-Received: by 2002:a9d:2926:: with SMTP id d35mr5277350otb.181.1597160431532; 
+ Tue, 11 Aug 2020 08:40:31 -0700 (PDT)
+MIME-Version: 1.0
+References: <20200811114133.672647-1-ppandit@redhat.com>
+ <20200811114133.672647-8-ppandit@redhat.com>
+In-Reply-To: <20200811114133.672647-8-ppandit@redhat.com>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Tue, 11 Aug 2020 23:39:55 +0800
+Message-ID: <CAKXe6SKKY77u08iYEq039mGu_c0Qf=KyvNFk05ZDmLKSkuetfg@mail.gmail.com>
+Subject: Re: [PATCH v4 7/9] tz-ppc: add dummy read/write methods
+To: P J P <ppandit@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::344;
+ envelope-from=liq3ea@gmail.com; helo=mail-ot1-x344.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -110,98 +95,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, clg@kaod.org, david@gibson.dropbear.id.au,
- qemu-devel@nongnu.org, gromero@linux.ibm.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Prasad J Pandit <pjp@fedoraproject.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Lei Sun <slei.casper@gmail.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Currently if option '-icount auto' is passed to the QEMU TCG to enable
-counting instructions the VM crashes with the following error report when
-Linux runs on it:
+P J P <ppandit@redhat.com> =E4=BA=8E2020=E5=B9=B48=E6=9C=8811=E6=97=A5=E5=
+=91=A8=E4=BA=8C =E4=B8=8B=E5=8D=887:44=E5=86=99=E9=81=93=EF=BC=9A
+>
+> From: Prasad J Pandit <pjp@fedoraproject.org>
+>
+> Add tz-ppc-dummy mmio read/write methods to avoid assert failure
+> during initialisation.
+>
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
 
-qemu-system-ppc64: Bad icount read
+Reviewed-by: Li Qiang <liq3ea@gmail.com>
 
-This happens because read/write access to the SPRs PURR, VTB, and TBU40
-is not integrated to the icount framework.
-
-This commit fixes that issue by making the read/write access of these
-SPRs aware of icount framework, adding the proper gen_io_start() calls
-before calling the helpers to load/store these SPRs in TCG and ensuring
-that the associated TBs end immediately after, accordingly to what's in
-docs/devel/tcg-icount.rst.
-
-Signed-off-by: Gustavo Romero <gromero@linux.ibm.com>
----
- target/ppc/translate_init.inc.c | 30 ++++++++++++++++++++++++++++++
- 1 file changed, 30 insertions(+)
-
-diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.inc.c
-index 7e66822b5d..ccf9ce3441 100644
---- a/target/ppc/translate_init.inc.c
-+++ b/target/ppc/translate_init.inc.c
-@@ -284,12 +284,24 @@ static void spr_write_atbu(DisasContext *ctx, int sprn, int gprn)
- ATTRIBUTE_UNUSED
- static void spr_read_purr(DisasContext *ctx, int gprn, int sprn)
- {
-+    if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
-+        gen_io_start();
-+    }
-     gen_helper_load_purr(cpu_gpr[gprn], cpu_env);
-+    if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
-+        gen_stop_exception(ctx);
-+    }
- }
- 
- static void spr_write_purr(DisasContext *ctx, int sprn, int gprn)
- {
-+    if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
-+        gen_io_start();
-+    }
-     gen_helper_store_purr(cpu_env, cpu_gpr[gprn]);
-+    if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
-+        gen_stop_exception(ctx);
-+    }
- }
- 
- /* HDECR */
-@@ -319,17 +331,35 @@ static void spr_write_hdecr(DisasContext *ctx, int sprn, int gprn)
- 
- static void spr_read_vtb(DisasContext *ctx, int gprn, int sprn)
- {
-+    if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
-+        gen_io_start();
-+    }
-     gen_helper_load_vtb(cpu_gpr[gprn], cpu_env);
-+    if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
-+        gen_stop_exception(ctx);
-+    }
- }
- 
- static void spr_write_vtb(DisasContext *ctx, int sprn, int gprn)
- {
-+    if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
-+        gen_io_start();
-+    }
-     gen_helper_store_vtb(cpu_env, cpu_gpr[gprn]);
-+    if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
-+        gen_stop_exception(ctx);
-+    }
- }
- 
- static void spr_write_tbu40(DisasContext *ctx, int sprn, int gprn)
- {
-+    if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
-+        gen_io_start();
-+    }
-     gen_helper_store_tbu40(cpu_env, cpu_gpr[gprn]);
-+    if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
-+        gen_stop_exception(ctx);
-+    }
- }
- 
- #endif
--- 
-2.17.1
-
+> ---
+>  hw/misc/tz-ppc.c | 14 ++++++++++++++
+>  1 file changed, 14 insertions(+)
+>
+> Update v4: add Reviewed-by tag
+>   -> https://lists.nongnu.org/archive/html/qemu-devel/2020-07/msg05303.ht=
+ml
+>
+> diff --git a/hw/misc/tz-ppc.c b/hw/misc/tz-ppc.c
+> index 6431257b52..36495c68e7 100644
+> --- a/hw/misc/tz-ppc.c
+> +++ b/hw/misc/tz-ppc.c
+> @@ -196,7 +196,21 @@ static bool tz_ppc_dummy_accepts(void *opaque, hwadd=
+r addr,
+>      g_assert_not_reached();
+>  }
+>
+> +static uint64_t tz_ppc_dummy_read(void *opaque, hwaddr addr, unsigned si=
+ze)
+> +{
+> +    g_assert_not_reached();
+> +}
+> +
+> +static void tz_ppc_dummy_write(void *opaque, hwaddr addr,
+> +                                        uint64_t data, unsigned size)
+> +{
+> +    g_assert_not_reached();
+> +}
+> +
+>  static const MemoryRegionOps tz_ppc_dummy_ops =3D {
+> +    /* define r/w methods to avoid assert failure in memory_region_init_=
+io */
+> +    .read =3D tz_ppc_dummy_read,
+> +    .write =3D tz_ppc_dummy_write,
+>      .valid.accepts =3D tz_ppc_dummy_accepts,
+>  };
+>
+> --
+> 2.26.2
+>
 
