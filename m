@@ -2,60 +2,126 @@ Return-Path: <SRS0=wQM/=BV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3492C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 21:07:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77268C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 21:08:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B4016205CB
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 21:07:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4016205CB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
+	by mail.kernel.org (Postfix) with ESMTPS id 2B053205CB
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 21:08:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="CIoK/SUk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B053205CB
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38606 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42210 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5bUV-0000R7-RG
-	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 17:07:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52054)
+	id 1k5bV6-0001sk-B7
+	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 17:08:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52518)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1k5bQo-0002Xi-42
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 17:03:38 -0400
-Received: from mx2.suse.de ([195.135.220.15]:57704)
+ (Exim 4.90_1) (envelope-from <Babu.Moger@amd.com>)
+ id 1k5bSQ-0005Fp-BB
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 17:05:18 -0400
+Received: from mail-bn8nam11on2075.outbound.protection.outlook.com
+ ([40.107.236.75]:54176 helo=NAM11-BN8-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1k5bQk-0001dQ-8B
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 17:03:37 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
- by mx2.suse.de (Postfix) with ESMTP id 0CD2AAF93;
- Tue, 11 Aug 2020 21:03:53 +0000 (UTC)
-From: Claudio Fontana <cfontana@suse.de>
-To: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Roman Bolshakov <r.bolshakov@yadro.com>
-Subject: [RFC v4 05/14] cpus: extract out kvm-specific code to accel/kvm
-Date: Tue, 11 Aug 2020 23:03:17 +0200
-Message-Id: <20200811210326.4425-6-cfontana@suse.de>
-X-Mailer: git-send-email 2.16.4
-In-Reply-To: <20200811210326.4425-1-cfontana@suse.de>
-References: <20200811210326.4425-1-cfontana@suse.de>
-Received-SPF: pass client-ip=195.135.220.15; envelope-from=cfontana@suse.de;
- helo=mx2.suse.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/11 02:05:49
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <Babu.Moger@amd.com>)
+ id 1k5bSM-0001kd-IR
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 17:05:18 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=FcOI+s7eODwLBUDM7xlKW1pN1nZU9+U55Wg6wOwPzAEHYBHicm4IgmlC6PkDoj7tMvLp01HtmbX3jC/GVBtdhGh4Jmw8fPzblWsXMpJItDygAQXhljgPKp59AvuohmpDcVQmwykXh2C0Z0ThNsaTwGOBr8XUtgG2ibRkXvnRI5PaqhapttkljkxUlvt0ULjVJlpvzca9MxaqBlvlcSqkpqILXgnTugzRJ4Nc9qWoCsMuG3mk9XwfMAOpLAzV9l8oHwd3/qNUF8Sg5IFcztm9Cg8zFbaezFCmMb1Nwd2tHE3/kYgUsjiKnHJfpYhI3O+x57iup028ivZIUESxJ4vECg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=C7egGLk8QsqJ8PHc5lFfIiF4fPb7X4JGU5UZfmQDX4E=;
+ b=ELqKyvcYt6yvpzO0lnPXTTmu1zxspD6pmxya2OCzz6rShFHADeoXxyqIJ5wb6IMwH1BcZdog9NGDuL28l+c06Bv41en5VIue7OZde8xCmiadXHIUyVGJKDnh9kBWcLbKddi8NGR49PkexvkGDl0nqT0f+YI9np54wR+UNnSi+TaX2cTj/4Kbz838P74lgWe/0W4pMOVKQ9xJ0vQXQmTAJJ3/rx8ppILtQlKRnXx1po7BM3A8F/8FO/gS3p/8RANLsiLBFsjItMshlSYU5ho59/g6PgNINF1PWmcFAEZOg8ok7OIA1fgGtJjcI/1J8JNOwbLiHCtor+B1fNPHXGj59g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=C7egGLk8QsqJ8PHc5lFfIiF4fPb7X4JGU5UZfmQDX4E=;
+ b=CIoK/SUkiRqtTYd30IN1oAuaEiQYJAWP4cLb4sJsO4S4yEeg7Bh32WOcPVi8CvaVZd+gxenCIjA40E7kuWi84W3t1T8UK0JFeHRKmQ10fBkprQbdcsSCq7mSLoH1xcm7LPQPUsBHljghGFdx4OUEqZmfsUbL14uybziJv7+DO1E=
+Authentication-Results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=amd.com;
+Received: from SN1PR12MB2560.namprd12.prod.outlook.com (2603:10b6:802:26::19)
+ by SA0PR12MB4414.namprd12.prod.outlook.com (2603:10b6:806:9a::11)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3261.19; Tue, 11 Aug
+ 2020 21:04:42 +0000
+Received: from SN1PR12MB2560.namprd12.prod.outlook.com
+ ([fe80::691c:c75:7cc2:7f2c]) by SN1PR12MB2560.namprd12.prod.outlook.com
+ ([fe80::691c:c75:7cc2:7f2c%6]) with mapi id 15.20.3261.024; Tue, 11 Aug 2020
+ 21:04:42 +0000
+Subject: RE: [PATCH v3 2/3] hw/i386: Add a new check to configure smp dies for
+ EPYC
+To: Igor Mammedov <imammedo@redhat.com>
+References: <159681772267.9679.1334429994189974662.stgit@naples-babu.amd.com>
+ <159681797161.9679.5653247810916709875.stgit@naples-babu.amd.com>
+ <20200807212729.1cb2ede0@redhat.com>
+From: Babu Moger <babu.moger@amd.com>
+Message-ID: <b76346d3-de65-9689-36e5-5d071beba78b@amd.com>
+Date: Tue, 11 Aug 2020 16:04:35 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+In-Reply-To: <20200807212729.1cb2ede0@redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: DM6PR07CA0041.namprd07.prod.outlook.com
+ (2603:10b6:5:74::18) To SN1PR12MB2560.namprd12.prod.outlook.com
+ (2603:10b6:802:26::19)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [10.236.31.79] (165.204.77.1) by
+ DM6PR07CA0041.namprd07.prod.outlook.com (2603:10b6:5:74::18) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3283.15 via Frontend Transport; Tue, 11 Aug 2020 21:04:36 +0000
+X-Originating-IP: [165.204.77.1]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 312fae74-ea0b-4f80-39b7-08d83e3a27bb
+X-MS-TrafficTypeDiagnostic: SA0PR12MB4414:
+X-Microsoft-Antispam-PRVS: <SA0PR12MB441421FD2C1EBCE81AFE324B95450@SA0PR12MB4414.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:6790;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: wYXRR2LfuHAYg5lb01nJclTYRZjXyeYL+FwFr1OQLlXn0fjhypwGHUmTv/kmeJTNVL9hkf39PVrqa2uluI5Z7T0zNdZsaMsp3aZ1T/yzJyNMsUDJrUiWr6az0FrUjPYEhjcpuT8Sf9oyGNiUA4efDEMGEeUzjdX2glzbMHoxqZbstlPQNjqo23CGgw9hScjkTTd8kRVyIYHwMzi7I6mHZCxhFhcsUHKuouJxezIYewu2sZHc59pseRRfXXrDSadDij8IbND/m/AzA82pLTBmphdj6g6m916UajJ1gLr7g0VFf/jRkm+62b1H4cg9gdU2ufdotlAoHD7G5+B8JFzx72VkJtEaq/OvR/Q7rIjdDL/acVPcWsjg7sj7DHewcNCz
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:SN1PR12MB2560.namprd12.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(4636009)(346002)(376002)(136003)(396003)(39860400002)(366004)(31686004)(36756003)(66556008)(66946007)(6916009)(186003)(66476007)(44832011)(956004)(2616005)(6486002)(5660300002)(83380400001)(26005)(16526019)(316002)(16576012)(31696002)(54906003)(8936002)(2906002)(52116002)(86362001)(53546011)(478600001)(4326008)(8676002)(43740500002);
+ DIR:OUT; SFP:1101; 
+X-MS-Exchange-AntiSpam-MessageData: GnZu66vA8RL8r1rheTBMeUHeYaOFCeoo90yidnO6/k6o7SIL4kFpuelyejjyeV3DgLjRJJJZ+9wCdwgkEU9VxeePw9NKqom+c3ORBHLMQ6IPlpkrVtSKTYJDnGcrXLrDRg2YOdjdrgRX/Yu+w2OyN8dN15+GuTaNbgeCd2KMpxZOPMCq7oPhNUKqoHIHojTnRbucIkaqOvEYHWYfKgb7CF+Ge1J+6Wgkzhxjg+UT72HeaEfri1QSciuEXMbAn/cSEDLjwnzQNrUX97kzUGAzFXvJygLVDMBOBDpXX/g0d+aiuR3K/tRidZYdwjLSekZ8zg6pwamOrJJxOXO4tNgWr3oT872WW1sceW3xmcArW9Qh6W+EZ2aQ5V5IEK2MWkqbt2B117t2hJnlN/yTN8htORI5glzWosDQsq9E8S/bEEuRjA6y6fUNWebP+DY0R3zmptE+Ej7cvuYs0BF2JJLCS3CO6ynvKGc/pOedd4M75LVJoZdW1+5jozijK5Jv5PliPu6ibZeGPFsp2EoXkftG5IR0MoxHNw9uRd78Ow+UMegBdCbJpiW1PNA6uET4Y9XMpsJkrCefBaqe+536Kg2g01pdHN59uW0Pa4i6bVfudCnV3uVnm+K5hEybnfDI/vIHmdgN26R4RzZxTb6h5QieuA==
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 312fae74-ea0b-4f80-39b7-08d83e3a27bb
+X-MS-Exchange-CrossTenant-AuthSource: SN1PR12MB2560.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Aug 2020 21:04:42.5179 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: WXZRksyk5xapX0yPcbhkmZCuggJRyNYKY4xW8wsMAqjRVFsoLhhwT/uVt6+ShNlI
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4414
+Received-SPF: none client-ip=40.107.236.75; envelope-from=Babu.Moger@amd.com;
+ helo=NAM11-BN8-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/11 17:05:13
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, FORGED_SPF_HELO=1, MSGID_FROM_MTA_HEADER=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_PASS=-0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -68,370 +134,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Pavel Dovgalyuk <dovgaluk@ispras.ru>,
- Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, Wenchao Wang <wenchao.wang@intel.com>,
- Colin Xu <colin.xu@intel.com>, Claudio Fontana <cfontana@suse.de>,
- haxm-team@intel.com, Sunil Muthuswamy <sunilmut@microsoft.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>, "mst@redhat.com" <mst@redhat.com>,
+ "ehabkost@redhat.com" <ehabkost@redhat.com>,
+ "rth@twiddle.net" <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-register a "CpusAccel" interface for KVM as well.
 
-Signed-off-by: Claudio Fontana <cfontana@suse.de>
----
- accel/kvm/Makefile.objs |  2 ++
- accel/kvm/kvm-all.c     | 14 +++++++-
- accel/kvm/kvm-cpus.c    | 88 +++++++++++++++++++++++++++++++++++++++++++++++++
- accel/kvm/kvm-cpus.h    | 17 ++++++++++
- accel/stubs/kvm-stub.c  |  3 +-
- include/sysemu/kvm.h    |  2 +-
- softmmu/cpus.c          | 77 -------------------------------------------
- 7 files changed, 122 insertions(+), 81 deletions(-)
- create mode 100644 accel/kvm/kvm-cpus.c
- create mode 100644 accel/kvm/kvm-cpus.h
 
-diff --git a/accel/kvm/Makefile.objs b/accel/kvm/Makefile.objs
-index fdfa481578..ce0f492b8d 100644
---- a/accel/kvm/Makefile.objs
-+++ b/accel/kvm/Makefile.objs
-@@ -1,2 +1,4 @@
- obj-y += kvm-all.o
-+obj-y += kvm-cpus.o
-+
- obj-$(call lnot,$(CONFIG_SEV)) += sev-stub.o
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index 63ef6af9a1..fbd82cb444 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -44,6 +44,9 @@
- #include "qapi/qapi-types-common.h"
- #include "qapi/qapi-visit-common.h"
- #include "sysemu/reset.h"
-+#include "qemu/guest-random.h"
-+#include "sysemu/hw_accel.h"
-+#include "kvm-cpus.h"
- 
- #include "hw/boards.h"
- 
-@@ -378,7 +381,7 @@ err:
-     return ret;
- }
- 
--int kvm_destroy_vcpu(CPUState *cpu)
-+static int do_kvm_destroy_vcpu(CPUState *cpu)
- {
-     KVMState *s = kvm_state;
-     long mmap_size;
-@@ -412,6 +415,14 @@ err:
-     return ret;
- }
- 
-+void kvm_destroy_vcpu(CPUState *cpu)
-+{
-+    if (do_kvm_destroy_vcpu(cpu) < 0) {
-+        error_report("kvm_destroy_vcpu failed");
-+        exit(EXIT_FAILURE);
-+    }
-+}
-+
- static int kvm_get_vcpu(KVMState *s, unsigned long vcpu_id)
- {
-     struct KVMParkedVcpu *cpu;
-@@ -2232,6 +2243,7 @@ static int kvm_init(MachineState *ms)
-         assert(!ret);
-     }
- 
-+    cpus_register_accel(&kvm_cpus);
-     return 0;
- 
- err:
-diff --git a/accel/kvm/kvm-cpus.c b/accel/kvm/kvm-cpus.c
-new file mode 100644
-index 0000000000..7866a2e9c3
---- /dev/null
-+++ b/accel/kvm/kvm-cpus.c
-@@ -0,0 +1,88 @@
-+/*
-+ * QEMU KVM support
-+ *
-+ * Copyright IBM, Corp. 2008
-+ *           Red Hat, Inc. 2008
-+ *
-+ * Authors:
-+ *  Anthony Liguori   <aliguori@us.ibm.com>
-+ *  Glauber Costa     <gcosta@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/error-report.h"
-+#include "qemu/main-loop.h"
-+#include "sysemu/kvm_int.h"
-+#include "sysemu/runstate.h"
-+#include "sysemu/cpus.h"
-+#include "qemu/guest-random.h"
-+
-+#include "kvm-cpus.h"
-+
-+static void *kvm_vcpu_thread_fn(void *arg)
-+{
-+    CPUState *cpu = arg;
-+    int r;
-+
-+    rcu_register_thread();
-+
-+    qemu_mutex_lock_iothread();
-+    qemu_thread_get_self(cpu->thread);
-+    cpu->thread_id = qemu_get_thread_id();
-+    cpu->can_do_io = 1;
-+    current_cpu = cpu;
-+
-+    r = kvm_init_vcpu(cpu);
-+    if (r < 0) {
-+        error_report("kvm_init_vcpu failed: %s", strerror(-r));
-+        exit(1);
-+    }
-+
-+    kvm_init_cpu_signals(cpu);
-+
-+    /* signal CPU creation */
-+    cpu_thread_signal_created(cpu);
-+    qemu_guest_random_seed_thread_part2(cpu->random_seed);
-+
-+    do {
-+        if (cpu_can_run(cpu)) {
-+            r = kvm_cpu_exec(cpu);
-+            if (r == EXCP_DEBUG) {
-+                cpu_handle_guest_debug(cpu);
-+            }
-+        }
-+        qemu_wait_io_event(cpu);
-+    } while (!cpu->unplug || cpu_can_run(cpu));
-+
-+    kvm_destroy_vcpu(cpu);
-+    cpu_thread_signal_destroyed(cpu);
-+    qemu_mutex_unlock_iothread();
-+    rcu_unregister_thread();
-+    return NULL;
-+}
-+
-+static void kvm_start_vcpu_thread(CPUState *cpu)
-+{
-+    char thread_name[VCPU_THREAD_NAME_SIZE];
-+
-+    cpu->thread = g_malloc0(sizeof(QemuThread));
-+    cpu->halt_cond = g_malloc0(sizeof(QemuCond));
-+    qemu_cond_init(cpu->halt_cond);
-+    snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "CPU %d/KVM",
-+             cpu->cpu_index);
-+    qemu_thread_create(cpu->thread, thread_name, kvm_vcpu_thread_fn,
-+                       cpu, QEMU_THREAD_JOINABLE);
-+}
-+
-+CpusAccel kvm_cpus = {
-+    .create_vcpu_thread = kvm_start_vcpu_thread,
-+
-+    .synchronize_post_reset = kvm_cpu_synchronize_post_reset,
-+    .synchronize_post_init = kvm_cpu_synchronize_post_init,
-+    .synchronize_state = kvm_cpu_synchronize_state,
-+    .synchronize_pre_loadvm = kvm_cpu_synchronize_pre_loadvm,
-+};
-diff --git a/accel/kvm/kvm-cpus.h b/accel/kvm/kvm-cpus.h
-new file mode 100644
-index 0000000000..62fbc911d9
---- /dev/null
-+++ b/accel/kvm/kvm-cpus.h
-@@ -0,0 +1,17 @@
-+/*
-+ * Accelerator CPUS Interface
-+ *
-+ * Copyright 2020 SUSE LLC
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef KVM_CPUS_H
-+#define KVM_CPUS_H
-+
-+#include "sysemu/cpus.h"
-+
-+extern CpusAccel kvm_cpus;
-+
-+#endif /* KVM_CPUS_H */
-diff --git a/accel/stubs/kvm-stub.c b/accel/stubs/kvm-stub.c
-index 82f118d2df..69f8a842da 100644
---- a/accel/stubs/kvm-stub.c
-+++ b/accel/stubs/kvm-stub.c
-@@ -32,9 +32,8 @@ bool kvm_readonly_mem_allowed;
- bool kvm_ioeventfd_any_length_allowed;
- bool kvm_msi_use_devid;
- 
--int kvm_destroy_vcpu(CPUState *cpu)
-+void kvm_destroy_vcpu(CPUState *cpu)
- {
--    return -ENOSYS;
- }
- 
- int kvm_init_vcpu(CPUState *cpu)
-diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-index b4174d941c..7a5f973b6f 100644
---- a/include/sysemu/kvm.h
-+++ b/include/sysemu/kvm.h
-@@ -218,7 +218,7 @@ int kvm_has_intx_set_mask(void);
- 
- int kvm_init_vcpu(CPUState *cpu);
- int kvm_cpu_exec(CPUState *cpu);
--int kvm_destroy_vcpu(CPUState *cpu);
-+void kvm_destroy_vcpu(CPUState *cpu);
- 
- /**
-  * kvm_arm_supports_user_irq
-diff --git a/softmmu/cpus.c b/softmmu/cpus.c
-index 896d508c15..bd535c68e0 100644
---- a/softmmu/cpus.c
-+++ b/softmmu/cpus.c
-@@ -179,9 +179,6 @@ void cpu_synchronize_state(CPUState *cpu)
-     if (cpus_accel && cpus_accel->synchronize_state) {
-         cpus_accel->synchronize_state(cpu);
-     }
--    if (kvm_enabled()) {
--        kvm_cpu_synchronize_state(cpu);
--    }
-     if (hax_enabled()) {
-         hax_cpu_synchronize_state(cpu);
-     }
-@@ -195,9 +192,6 @@ void cpu_synchronize_post_reset(CPUState *cpu)
-     if (cpus_accel && cpus_accel->synchronize_post_reset) {
-         cpus_accel->synchronize_post_reset(cpu);
-     }
--    if (kvm_enabled()) {
--        kvm_cpu_synchronize_post_reset(cpu);
--    }
-     if (hax_enabled()) {
-         hax_cpu_synchronize_post_reset(cpu);
-     }
-@@ -211,9 +205,6 @@ void cpu_synchronize_post_init(CPUState *cpu)
-     if (cpus_accel && cpus_accel->synchronize_post_init) {
-         cpus_accel->synchronize_post_init(cpu);
-     }
--    if (kvm_enabled()) {
--        kvm_cpu_synchronize_post_init(cpu);
--    }
-     if (hax_enabled()) {
-         hax_cpu_synchronize_post_init(cpu);
-     }
-@@ -227,9 +218,6 @@ void cpu_synchronize_pre_loadvm(CPUState *cpu)
-     if (cpus_accel && cpus_accel->synchronize_pre_loadvm) {
-         cpus_accel->synchronize_pre_loadvm(cpu);
-     }
--    if (kvm_enabled()) {
--        kvm_cpu_synchronize_pre_loadvm(cpu);
--    }
-     if (hax_enabled()) {
-         hax_cpu_synchronize_pre_loadvm(cpu);
-     }
-@@ -384,14 +372,6 @@ void run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data)
-     do_run_on_cpu(cpu, func, data, &qemu_global_mutex);
- }
- 
--static void qemu_kvm_destroy_vcpu(CPUState *cpu)
--{
--    if (kvm_destroy_vcpu(cpu) < 0) {
--        error_report("kvm_destroy_vcpu failed");
--        exit(EXIT_FAILURE);
--    }
--}
--
- static void qemu_cpu_stop(CPUState *cpu, bool exit)
- {
-     g_assert(qemu_cpu_is_self(cpu));
-@@ -436,48 +416,6 @@ void qemu_wait_io_event(CPUState *cpu)
-     qemu_wait_io_event_common(cpu);
- }
- 
--static void *qemu_kvm_cpu_thread_fn(void *arg)
--{
--    CPUState *cpu = arg;
--    int r;
--
--    rcu_register_thread();
--
--    qemu_mutex_lock_iothread();
--    qemu_thread_get_self(cpu->thread);
--    cpu->thread_id = qemu_get_thread_id();
--    cpu->can_do_io = 1;
--    current_cpu = cpu;
--
--    r = kvm_init_vcpu(cpu);
--    if (r < 0) {
--        error_report("kvm_init_vcpu failed: %s", strerror(-r));
--        exit(1);
--    }
--
--    kvm_init_cpu_signals(cpu);
--
--    /* signal CPU creation */
--    cpu_thread_signal_created(cpu);
--    qemu_guest_random_seed_thread_part2(cpu->random_seed);
--
--    do {
--        if (cpu_can_run(cpu)) {
--            r = kvm_cpu_exec(cpu);
--            if (r == EXCP_DEBUG) {
--                cpu_handle_guest_debug(cpu);
--            }
--        }
--        qemu_wait_io_event(cpu);
--    } while (!cpu->unplug || cpu_can_run(cpu));
--
--    qemu_kvm_destroy_vcpu(cpu);
--    cpu_thread_signal_destroyed(cpu);
--    qemu_mutex_unlock_iothread();
--    rcu_unregister_thread();
--    return NULL;
--}
--
- static void *qemu_hax_cpu_thread_fn(void *arg)
- {
-     CPUState *cpu = arg;
-@@ -801,19 +739,6 @@ static void qemu_hax_start_vcpu(CPUState *cpu)
- #endif
- }
- 
--static void qemu_kvm_start_vcpu(CPUState *cpu)
--{
--    char thread_name[VCPU_THREAD_NAME_SIZE];
--
--    cpu->thread = g_malloc0(sizeof(QemuThread));
--    cpu->halt_cond = g_malloc0(sizeof(QemuCond));
--    qemu_cond_init(cpu->halt_cond);
--    snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "CPU %d/KVM",
--             cpu->cpu_index);
--    qemu_thread_create(cpu->thread, thread_name, qemu_kvm_cpu_thread_fn,
--                       cpu, QEMU_THREAD_JOINABLE);
--}
--
- static void qemu_hvf_start_vcpu(CPUState *cpu)
- {
-     char thread_name[VCPU_THREAD_NAME_SIZE];
-@@ -875,8 +800,6 @@ void qemu_init_vcpu(CPUState *cpu)
-     if (cpus_accel) {
-         /* accelerator already implements the CpusAccel interface */
-         cpus_accel->create_vcpu_thread(cpu);
--    } else if (kvm_enabled()) {
--        qemu_kvm_start_vcpu(cpu);
-     } else if (hax_enabled()) {
-         qemu_hax_start_vcpu(cpu);
-     } else if (hvf_enabled()) {
--- 
-2.16.4
+> -----Original Message-----
+> From: Igor Mammedov <imammedo@redhat.com>
+> Sent: Friday, August 7, 2020 2:27 PM
+> To: Moger, Babu <Babu.Moger@amd.com>
+> Cc: pbonzini@redhat.com; rth@twiddle.net; ehabkost@redhat.com; qemu-
+> devel@nongnu.org; mst@redhat.com
+> Subject: Re: [PATCH v3 2/3] hw/i386: Add a new check to configure smp dies for
+> EPYC
+> 
+> On Fri, 07 Aug 2020 11:32:51 -0500
+> Babu Moger <babu.moger@amd.com> wrote:
+> 
+> > Adding a new check to warn the users to configure 'dies' when
+> s/warn .../error out .../
+> 
+> > topology is numa configured. It makes it easy to build the topology
+> > for EPYC models.
+> 
+> probably it should mention that will break configs that do not have correct
+> topology configured.
+
+Sure. Will do that.
+
+> 
+> 
+> > Signed-off-by: Babu Moger <babu.moger@amd.com>
+> > ---
+> >  hw/i386/x86.c |    7 +++++++
+> >  1 file changed, 7 insertions(+)
+> >
+> > diff --git a/hw/i386/x86.c b/hw/i386/x86.c index
+> > 67bee1bcb8..2a6ce56ef1 100644
+> > --- a/hw/i386/x86.c
+> > +++ b/hw/i386/x86.c
+> > @@ -138,6 +138,13 @@ void x86_cpus_init(X86MachineState *x86ms, int
+> > default_cpu_version)
+> >
+> >      /* Check for apicid encoding */
+> >      if (cpu_x86_use_epyc_apic_id_encoding(ms->cpu_type)) {
+> > +        if ((ms->numa_state->num_nodes > 0) &&
+> > +            ms->numa_state->num_nodes != (ms->smp.sockets * x86ms-
+> >smp_dies)) {
+> > +            error_setg(&error_fatal, "Numa configuration requires smp 'dies' "
+> > +                       "parameter. Configure the cpu topology properly with "
+> > +                       "max_cpus = sockets * dies * cores * threads");
+> > +            return;
+> > +        }
+> >          x86_set_epyc_topo_handlers(ms);
+> >      }
+> 
+> we also should error out in case
+>     ms->numa_state->num_nodes != (ms->smp.sockets * x86ms->smp_dies and
+> ask user to configure numa to match total number of used dies.
+> 
+
+I have already added the same check above. Do you want anything more?
 
 
