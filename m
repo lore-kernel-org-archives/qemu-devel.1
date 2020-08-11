@@ -2,118 +2,80 @@ Return-Path: <SRS0=wQM/=BV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A38EC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 09:55:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12431C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 10:12:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 22207205CB
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 09:55:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Nc4iEEVV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22207205CB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id DA6C12054F
+	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 10:12:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA6C12054F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60812 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38278 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5R0b-0008GD-Bl
-	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 05:55:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60810)
+	id 1k5RGE-00030K-VW
+	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 06:12:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36646)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1k5Qzt-0007lW-JN
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 05:55:10 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:22832
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1k5Qzr-0003aH-KD
- for qemu-devel@nongnu.org; Tue, 11 Aug 2020 05:55:09 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597139706;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=e5sXfwys3cXceWosYN1YB8vUBkGM3GYeu1+V3LWThlI=;
- b=Nc4iEEVVIfiDh5p5lRpW6UXaLiQhiDnvM5GXSAWSiAt6XS1pLKO6OaCLdeExc27AJq8ULm
- NpwrDk9HWdzwmn/74Di6DZBn39QwrIsEXgGjt3tnUWg4mG6hzDiIftlyE0+SEYIqUSM9vi
- dQLE99jJoca0tq2Vhw54scB4eZF1Tbc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-11-yhWmYdjLN7uqIJeAEeJiLg-1; Tue, 11 Aug 2020 05:55:04 -0400
-X-MC-Unique: yhWmYdjLN7uqIJeAEeJiLg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E5C831940920;
- Tue, 11 Aug 2020 09:55:02 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-113-152.ams2.redhat.com
- [10.36.113.152])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id DD2751A4D9;
- Tue, 11 Aug 2020 09:55:01 +0000 (UTC)
-Subject: Re: [PULL 0/2] Block patches for 5.1.0-rc4
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20200811093505.972894-1-mreitz@redhat.com>
- <CAFEAcA_v=pTcao6-42bQP7yhVq1Zinjk-bbE71Bksu0=LaON0A@mail.gmail.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <615bc8ec-d686-cdd7-88aa-8023c26d6c69@redhat.com>
-Date: Tue, 11 Aug 2020 11:54:59 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k5RFh-0002a9-Gl
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 06:11:29 -0400
+Received: from indium.canonical.com ([91.189.90.7]:35234)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k5RFf-0005rF-FP
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 06:11:29 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1k5RFd-0004dj-J8
+ for <qemu-devel@nongnu.org>; Tue, 11 Aug 2020 10:11:25 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 8C5662E808D
+ for <qemu-devel@nongnu.org>; Tue, 11 Aug 2020 10:11:25 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_v=pTcao6-42bQP7yhVq1Zinjk-bbE71Bksu0=LaON0A@mail.gmail.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
-X-Mimecast-Spam-Score: 0.0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="YOFtc6J9iOIPwCfQbA7qUy8wac6UIV36o"
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=mreitz@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/11 04:41:55
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 11 Aug 2020 10:04:52 -0000
+From: "Tony.LI" <1890545@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: ajbennee bigboy0822 pmaydell
+X-Launchpad-Bug-Reporter: Tony.LI (bigboy0822)
+X-Launchpad-Bug-Modifier: Tony.LI (bigboy0822)
+References: <159670025270.3099.13280483088179052036.malonedeb@gac.canonical.com>
+Message-Id: <159714029272.5932.6550922800623490666.malone@soybean.canonical.com>
+Subject: [Bug 1890545] Re: (ARM64) qemu-x86_64+schroot(Debian bullseye) can't
+ run chrome and can't load HTML
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="6a138c03da9cc3e2e03f6dd3bbb4a615b0be6ec2";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: c7bae8c9b26729ad48adca70a9a07e0ed6becc32
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/11 04:25:48
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -122,65 +84,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Qemu-block <qemu-block@nongnu.org>
+Reply-To: Bug 1890545 <1890545@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---YOFtc6J9iOIPwCfQbA7qUy8wac6UIV36o
-Content-Type: multipart/mixed; boundary="hKxdPI4gH9sZcifcDDp4mcOuwNXrq6R64"
+And I can get some infomation by "qemu-x86_64-static -d strace".
 
---hKxdPI4gH9sZcifcDDp4mcOuwNXrq6R64
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+....
+17344 getdents(8,274880624768,32768,115,274880624899,39) =3D 0
+17344 close(8) =3D 0
+17344 ioctl(7,0xc0406400,0x297330) =3D 0
+17344 ioctl(7,0xc0406400,0x297330) =3D 0
+17344 fstat(7,0x0000004001a0b660) =3D 0
+17344 fcntl(7,F_DUPFD_CLOEXEC,3) =3D 8
+17344 ioctl(8,0xc0406400,0x297330) =3D 0
+17344 ioctl(8,0xc0406400,0x297330) =3D 0
+17344 ioctl(8,0xc0106467,0x1a0b700) =3D -1 errno=3D38 (Function not impleme=
+nted)
+....
 
-On 11.08.20 11:39, Peter Maydell wrote:
-> On Tue, 11 Aug 2020 at 10:35, Max Reitz <mreitz@redhat.com> wrote:
->>
->> Hi,
->>
->> There is a bug in the backup job that breaks backups from images whose
->> size is not aligned to the job's cluster size (i.e., qemu crashes
->> because of a failed assertion).  If this bug makes it into the release,
->> it would be a regression from 5.0.
->>
->> On one hand, this is probably a rare configuration that should not
->> happen in practice.  On the other, it is a regression, and the fix
->> (patch 1) is simple.  So I think it would be good to have this in 5.1.
->=20
-> I'm really reluctant to have to roll an rc4...
+Last ioctl is error,why?It drives me crazy!!!
 
-Well, that=E2=80=99s the information there is on this: Regression, simple f=
-ix,
-but little relevance in practice, and late to the party.
-If, given this, you don=E2=80=99t want to roll an rc4, then that=E2=80=99s =
-how it is.
+-- =
 
-Max
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1890545
 
+Title:
+  (ARM64) qemu-x86_64+schroot(Debian bullseye) can't run chrome and
+  can't load HTML
 
---hKxdPI4gH9sZcifcDDp4mcOuwNXrq6R64--
+Status in QEMU:
+  New
 
---YOFtc6J9iOIPwCfQbA7qUy8wac6UIV36o
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Bug description:
+  First I creat a file system that is debian(bullseye amd64)on arm64
+  machine=EF=BC=8Cthen I download google-chrome=EF=BC=8Chowever, when I ran=
+ Google
+  browser, some errors occurred.
 
------BEGIN PGP SIGNATURE-----
+  $ google-chrome --no-sandbox
+  or =
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl8yavMACgkQ9AfbAGHV
-z0AlxQf9GITV+f5TFh+3amWrg6k+CjHwKUitZ8QzSvL1H0l8EPpBb2WEa8KSvMpM
-5GNN+a4XcMvp+vpjclDjNPCDhoKMEpjaP/1Isxe8G/PTx/+crd3VFwY+slXIl+UZ
-UA7hAqUkoTtXInF/t27gsSJ0DFWo62p6CYsjk23Ne/TBF9SM0XxFxixWA/5MMXpY
-GRiMMrehIBneySyfrytxUs2CdX5wzuk9cbR2CrUUt/UdJ8zpG5rqeAXEURyYk7f2
-FPBLAGrPVP9B17B9B4J+1FXwmkQvCvljHVfl9+JbXcmWe+JnFOAuqul8Dh+DxB7+
-1ZjUzdswU0TcIPiWAcOo/rQEybxg8g==
-=f4t3
------END PGP SIGNATURE-----
+  $ qemu-x86_64-static google-chrome --no-sandbox
 
---YOFtc6J9iOIPwCfQbA7qUy8wac6UIV36o--
+  qemu: uncaught target signal 5 (Trace/breakpoint trap) - core dumped
+  qemu: uncaught target signal 5 (Trace/breakpoint trap) - core dumped
+  [1661:1661:0806/074307.502638:ERROR:nacl_fork_delegate_linux.cc(323)] Bad=
+ NaCl helper startup ack (0 bytes)
+  [1664:1664:0806/074307.504159:ERROR:nacl_fork_delegate_linux.cc(323)] Bad=
+ NaCl helper startup ack (0 bytes)
+  qemu: uncaught target signal 5 (Trace/breakpoint trap) - core dumped
+  qemu: uncaught target signal 5 (Trace/breakpoint trap) - core dumped
+  [1637:1678:0806/074308.337567:ERROR:file_path_watcher_linux.cc(315)] inot=
+ify_init() failed: Function not implemented (38)
+  Fontconfig warning: "/etc/fonts/fonts.conf", line 100: unknown element "b=
+lank"
+  qemu: unknown option 'type=3Dutility'
+  [1637:1680:0806/074313.598432:FATAL:gpu_data_manager_impl_private.cc(439)=
+] GPU process isn't usable. Goodbye.
+  qemu: uncaught target signal 5 (Trace/breakpoint trap) - core dumped
+  Trace/breakpoint trap
 
+  Why?
+  And then I run firefox,it can be opened, but it can't load any web pages =
+and HTML.
+  I really need help=EF=BC=81
+  Thank.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1890545/+subscriptions
 
