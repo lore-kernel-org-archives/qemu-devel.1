@@ -6,63 +6,63 @@ X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8403BC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 11:46:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4609FC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 11:46:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 592E52065C
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 11:46:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 592E52065C
+	by mail.kernel.org (Postfix) with ESMTPS id 1F08A2065C
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 11:46:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F08A2065C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55958 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56212 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5pDY-0004Cc-Ie
-	for qemu-devel@archiver.kernel.org; Wed, 12 Aug 2020 07:46:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46850)
+	id 1k5pDc-0004J1-Cx
+	for qemu-devel@archiver.kernel.org; Wed, 12 Aug 2020 07:46:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46868)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k5pCh-0003DS-0h
- for qemu-devel@nongnu.org; Wed, 12 Aug 2020 07:45:59 -0400
-Received: from indium.canonical.com ([91.189.90.7]:54936)
+ id 1k5pCk-0003FL-BQ
+ for qemu-devel@nongnu.org; Wed, 12 Aug 2020 07:46:02 -0400
+Received: from indium.canonical.com ([91.189.90.7]:55292)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k5pCd-0005qv-ST
- for qemu-devel@nongnu.org; Wed, 12 Aug 2020 07:45:58 -0400
+ id 1k5pCi-0005rb-L3
+ for qemu-devel@nongnu.org; Wed, 12 Aug 2020 07:46:02 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1k5pCa-00076Z-96
- for <qemu-devel@nongnu.org>; Wed, 12 Aug 2020 11:45:52 +0000
+ id 1k5pCh-000786-0G
+ for <qemu-devel@nongnu.org>; Wed, 12 Aug 2020 11:45:59 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 38B7D2E8081
- for <qemu-devel@nongnu.org>; Wed, 12 Aug 2020 11:45:52 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id E2FE52E809C
+ for <qemu-devel@nongnu.org>; Wed, 12 Aug 2020 11:45:58 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 12 Aug 2020 11:35:38 -0000
-From: "Laszlo Ersek \(Red Hat\)" <1888971@bugs.launchpad.net>
+Date: Wed, 12 Aug 2020 11:38:18 -0000
+From: "Laszlo Ersek \(Red Hat\)" <1886602@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Invalid; importance=Undecided;
+X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
  assignee=None; 
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: lersek nareshgs
-X-Launchpad-Bug-Reporter: Naresh GS (nareshgs)
+X-Launchpad-Bug-Commenters: circuitsoft lersek
+X-Launchpad-Bug-Reporter: Alex Austin (circuitsoft)
 X-Launchpad-Bug-Modifier: Laszlo Ersek (Red Hat) (lersek)
-References: <159573587135.29737.8295812528041177661.malonedeb@chaenomeles.canonical.com>
-Message-Id: <159723213886.9816.10098437527462752386.malone@wampee.canonical.com>
-Subject: [Bug 1888971] Re: SMI trigger causes hang with multiple cores
+References: <159408874500.32011.1427435858163411654.malonedeb@gac.canonical.com>
+Message-Id: <159723229878.6313.16578583700046608396.malone@soybean.canonical.com>
+Subject: [Bug 1886602] Re: Windows 10 very slow with OVMF
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="6a138c03da9cc3e2e03f6dd3bbb4a615b0be6ec2";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 04e8123f30d3ac742750d0e9695924b0004694f1
+X-Launchpad-Hash: 5170832016d8df0f5332d94d6c7dcff1e52317b1
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/12 06:10:59
@@ -84,58 +84,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1888971 <1888971@bugs.launchpad.net>
+Reply-To: Bug 1886602 <1886602@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Inactive for ~two weeks, closing.
+Inactive for more than a month, significant amount of info was not
+provided. Closing.
 
 ** Changed in: qemu
        Status: New =3D> Incomplete
-
-** Changed in: qemu
-       Status: Incomplete =3D> Invalid
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1888971
+https://bugs.launchpad.net/bugs/1886602
 
 Title:
-  SMI trigger causes hang with multiple cores
+  Windows 10 very slow with OVMF
 
 Status in QEMU:
-  Invalid
+  Incomplete
 
 Bug description:
-  When using qemu , SMI trigger causes hang/reboot under following
-  conditions:
+  Debian Buster
 
-  1. No KVM but there are more than 1 threads (-smp > 1)
-  2. When using KVM.
+  Kernel 4.19.0-9-amd64
+  qemu-kvm 1:3.1+dfsg-8+deb10u5
+  ovmf 0~20181115.85588389-3+deb10u1
 
-  Info:
-  qemu-system-x86_64 --version
-  QEMU emulator version 2.11.1(Debian 1:2.11+dfsg-1ubuntu7.29)
-  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
+  Machine: Thinkpad T470, i7-7500u, 20GB RAM
+  VM: 4 CPUs, 8GB RAM, Broadwell-noTSX CPU Model
 
-  SMI trigger was done by writing 0x00 in IO port 0xB2.
-
-  Command:
-  No failure in SMI trigger when using the below command:
-  qemu-system-x86_64 -M pc-q35-bionic -smp 1 -bios build/coreboot.rom  -ser=
-ial stdio -hda ../linux.img  -m 2048 | tee 1.txt
-
-  Hang/resets with below commands:
-  qemu-system-x86_64 -M pc-q35-bionic -smp 2 -bios build/coreboot.rom  -ser=
-ial stdio -hda ../linux.img  -m 2048 | tee 1.txt
-
-  sudo qemu-system-x86_64 -M pc-q35-bionic,accel=3Dkvm -smp 1 -bios
-  build/coreboot.rom  -serial stdio -hda ../linux.img  -m 2048 | tee
-  1.txt
+  Windows 10, under this VM, seems to be exceedingly slow with all
+  operations. This is a clean install with very few services running.
+  Task Manager can take 30% CPU looking at an idle system.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1888971/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1886602/+subscriptions
 
