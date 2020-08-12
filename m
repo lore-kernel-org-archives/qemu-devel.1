@@ -2,56 +2,56 @@ Return-Path: <SRS0=vd3Y=BW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76569C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 09:43:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85311C433E4
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 09:43:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3FC0C2076B
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 09:43:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 51C6720838
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 09:43:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=lse.epita.fr header.i=@lse.epita.fr header.b="Xlvk/cTH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3FC0C2076B
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=lse.epita.fr header.i=@lse.epita.fr header.b="em0Vk0YK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51C6720838
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=lse.epita.fr
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58928 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59170 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5nIX-0003V1-Dq
-	for qemu-devel@archiver.kernel.org; Wed, 12 Aug 2020 05:43:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42258)
+	id 1k5nIZ-0003ae-Fg
+	for qemu-devel@archiver.kernel.org; Wed, 12 Aug 2020 05:43:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42274)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <srs0=nna4=bw=lse.epita.fr=cesar.belley@cri.epita.fr>)
- id 1k5nHS-00022d-EK
- for qemu-devel@nongnu.org; Wed, 12 Aug 2020 05:42:46 -0400
-Received: from gate-2.cri.epita.net ([163.5.55.20]:40864
+ id 1k5nHT-00023i-FD
+ for qemu-devel@nongnu.org; Wed, 12 Aug 2020 05:42:47 -0400
+Received: from gate-2.cri.epita.net ([163.5.55.20]:40874
  helo=mail-2.srv.cri.epita.fr)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <srs0=nna4=bw=lse.epita.fr=cesar.belley@cri.epita.fr>)
- id 1k5nHQ-0006kH-BE
- for qemu-devel@nongnu.org; Wed, 12 Aug 2020 05:42:46 -0400
+ id 1k5nHR-0006kM-Py
+ for qemu-devel@nongnu.org; Wed, 12 Aug 2020 05:42:47 -0400
 Received: from MattGorko-Laptop.localdomain (unknown [78.194.154.81])
  (Authenticated sender: cesar.belley)
- by mail-2.srv.cri.epita.fr (Postfix) with ESMTPSA id 2C5DB4150B;
- Wed, 12 Aug 2020 11:42:43 +0200 (CEST)
+ by mail-2.srv.cri.epita.fr (Postfix) with ESMTPSA id 995764150E;
+ Wed, 12 Aug 2020 11:42:44 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=lse.epita.fr; s=cri;
- t=1597225363; bh=mXjkHDuBA2Pelp7FvLqsvotpGAVI+Oj+eqQ5xB79ZVs=;
+ t=1597225364; bh=cvFDhlHRNc+dPkxjMum8CmWTe5nwcNjnFM+clGU5O+A=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=Xlvk/cTHYNzxQP3ZauXx6odIb4WJK1dEADQYWb2ITyIx/IFc5D4ykBSfsvlDiCVW9
- oVwhyNA36YMPx2C6hP5DgyD+zt+vB34o89QnPUByTIbKC3D7etpB+CFRN14WQVb5td
- 7T3XiDtAgCBFcqD984xK7idOaQiEco/ZlRiXWWT8=
+ b=em0Vk0YKIG6rSMG59xPlsBi537X5MJZUR6dbM9NfSZvPO4aASiPLoEydWJWUqUww+
+ C0FfLh7SU9h9uoz9szI+yMvAIQvSf5fIp9plvOTPl3Qa4XHXC9GWUc2PHC6pr05fzt
+ 5wYQcq7jxPISApHzVT89TSXP0HOTbdI5XrrDf0XM=
 From: =?UTF-8?q?C=C3=A9sar=20Belley?= <cesar.belley@lse.epita.fr>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 02/13] docs: Add USB U2F key device documentation
-Date: Wed, 12 Aug 2020 11:41:24 +0200
-Message-Id: <20200812094135.20550-3-cesar.belley@lse.epita.fr>
+Subject: [PATCH 03/13] hw/usb: Add U2F key base class
+Date: Wed, 12 Aug 2020 11:41:25 +0200
+Message-Id: <20200812094135.20550-4-cesar.belley@lse.epita.fr>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20200812094135.20550-1-cesar.belley@lse.epita.fr>
 References: <20200812094135.20550-1-cesar.belley@lse.epita.fr>
@@ -87,126 +87,118 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add USB U2F key device documentation:
-- USB U2F key device
-- Building
-- Using u2f-emulated
-- Using u2f-passthru
-- Libu2f-emu
+This patch adds the specification for the U2F key base class.
+Used to group the common characteristics, this device class will be
+inherited by its two variants, corresponding to the two modes:
+passthrough and emulated
+
+This prepares the U2F devices hierarchy which is as follow:
+USB device -> u2f-key -> {u2f-passthru, u2f-emulated}.
 
 Signed-off-by: César Belley <cesar.belley@lse.epita.fr>
 ---
- docs/u2f.txt | 101 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 101 insertions(+)
- create mode 100644 docs/u2f.txt
+ hw/usb/u2f.h | 92 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 92 insertions(+)
+ create mode 100644 hw/usb/u2f.h
 
-diff --git a/docs/u2f.txt b/docs/u2f.txt
+diff --git a/hw/usb/u2f.h b/hw/usb/u2f.h
 new file mode 100644
-index 0000000000..f60052882e
+index 0000000000..db30f3586b
 --- /dev/null
-+++ b/docs/u2f.txt
-@@ -0,0 +1,101 @@
-+QEMU U2F Key Device Documentation.
++++ b/hw/usb/u2f.h
+@@ -0,0 +1,92 @@
++/*
++ * U2F USB device.
++ *
++ * Copyright (c) 2020 César Belley <cesar.belley@lse.epita.fr>
++ * Written by César Belley <cesar.belley@lse.epita.fr>
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
 +
-+Contents
-+1. USB U2F key device
-+2. Building
-+3. Using u2f-emulated
-+4. Using u2f-passthru
-+5. Libu2f-emu
++#ifndef U2F_H
++#define U2F_H
 +
-+1. USB U2F key device
++#include "hw/qdev-core.h"
 +
-+U2F is an open authentication standard that enables relying parties
-+exposed to the internet to offer a strong second factor option for end
-+user authentication.
++#define U2FHID_PACKET_SIZE 64
++#define U2FHID_PENDING_IN_NUM 32
 +
-+The standard brings many advantages to both parties, client and server,
-+allowing to reduce over-reliance on passwords, it increases authentication
-+security and simplifies passwords.
++typedef struct U2FKeyState U2FKeyState;
++typedef struct U2FKeyInfo U2FKeyInfo;
 +
-+The second factor is materialized by a device implementing the U2F
-+protocol. In case of a USB U2F security key, it is a USB HID device
-+that implements the U2F protocol.
++#define TYPE_U2F_KEY "u2f-key"
++#define U2F_KEY(obj) \
++    OBJECT_CHECK(U2FKeyState, (obj), TYPE_U2F_KEY)
++#define U2F_KEY_CLASS(klass) \
++    OBJECT_CLASS_CHECK(U2FKeyClass, (klass), TYPE_U2F_KEY)
++#define U2F_KEY_GET_CLASS(obj) \
++    OBJECT_GET_CLASS(U2FKeyClass, (obj), TYPE_U2F_KEY)
 +
-+In Qemu, the USB U2F key device offers a dedicated support of U2F, allowing
-+guest USB FIDO/U2F security keys operating in two possible modes:
-+pass-through and emulated.
++/*
++ * Callbacks to be used by the U2F key base device (i.e. hw/u2f.c)
++ * to interact with its variants (i.e. hw/u2f-*.c)
++ */
++typedef struct U2FKeyClass {
++    /*< private >*/
++    USBDeviceClass parent_class;
 +
-+The pass-through mode consists of passing all requests made from the guest
-+to the physical security key connected to the host machine and vice versa.
-+In addition, the dedicated pass-through allows to have a U2F security key
-+shared on several guests which is not possible with a simple host device
-+assignment pass-through.
++    /*< public >*/
++    void (*recv_from_guest)(U2FKeyState *key,
++                            const uint8_t packet[U2FHID_PACKET_SIZE]);
++    void (*realize)(U2FKeyState *key, Error **errp);
++    void (*unrealize)(U2FKeyState *key);
++} U2FKeyClass;
 +
-+The emulated mode consists of completely emulating the behavior of an
-+U2F device through software part. Libu2f-emu is used for that.
++/*
++ * State of the U2F key base device (i.e. hw/u2f.c)
++ */
++typedef struct U2FKeyState {
++    USBDevice dev;
++    USBEndpoint *ep;
++    uint8_t idle;
 +
++    /* Pending packets to be send to the guest */
++    uint8_t pending_in[U2FHID_PENDING_IN_NUM][U2FHID_PACKET_SIZE];
++    uint8_t pending_in_start;
++    uint8_t pending_in_end;
++    uint8_t pending_in_num;
++} U2FKeyState;
 +
-+2. Building
++/*
++ * API to be used by the U2F key device variants (i.e. hw/u2f-*.c)
++ * to interact with the the U2F key base device (i.e. hw/u2f.c)
++ */
++void u2f_send_to_guest(U2FKeyState *key,
++                       const uint8_t packet[U2FHID_PACKET_SIZE]);
 +
-+To ensure the build of the u2f-emulated device variant which depends
-+on libu2f-emu: configuring and building:
++extern const VMStateDescription vmstate_u2f_key;
 +
-+    ./configure --enable-u2f && make
++#define VMSTATE_U2F_KEY(_field, _state) {                            \
++    .name       = (stringify(_field)),                               \
++    .size       = sizeof(U2FKeyState),                               \
++    .vmsd       = &vmstate_u2f_key,                                  \
++    .flags      = VMS_STRUCT,                                        \
++    .offset     = vmstate_offset_value(_state, _field, U2FKeyState), \
++}
 +
-+
-+3. Using u2f-emulated
-+
-+To work, an emulated U2F device must have four elements:
-+ * ec x509 certificate
-+ * ec private key
-+ * counter (four bytes value)
-+ * 48 bytes of entropy (random bits)
-+
-+To use this type of device, this one has to be configured, and these
-+four elements must be passed one way or another.
-+
-+Assuming that you have a working libu2f-emu installed on the host.
-+There are three possible ways of configurations:
-+ * ephemeral
-+ * setup directory
-+ * manual
-+
-+Ephemeral is the simplest way to configure, it lets the device generate
-+all the elements it needs for a single use of the lifetime of the device.
-+
-+    qemu -usb -device u2f-emulated
-+
-+Setup directory allows to configure the device from a directory containing
-+four files:
-+ * certificate.pem: ec x509 certificate
-+ * private-key.pem: ec private key
-+ * counter: counter value
-+ * entropy: 48 bytes of entropy
-+
-+    qemu -usb -device u2f-emulated,dir=$dir
-+
-+Manual allows to configure the device more finely by specifying each
-+of the elements necessary for the device:
-+ * cert
-+ * priv
-+ * counter
-+ * entropy
-+
-+    qemu -usb -device u2f-emulated,cert=$DIR1/$FILE1,priv=$DIR2/$FILE2,counter=$DIR3/$FILE3,entropy=$DIR4/$FILE4
-+
-+
-+4. Using u2f-passthru
-+
-+On the host specify the u2f-passthru device with a suitable hidraw:
-+
-+    qemu -usb -device u2f-passthru,hidraw=/dev/hidraw0
-+
-+
-+5. Libu2f-emu
-+
-+The u2f-emulated device uses libu2f-emu for the U2F key emulation. Libu2f-emu
-+implements completely the U2F protocol device part for all specified
-+transport given by the FIDO Alliance.
-+
-+For more information about libu2f-emu see this page:
-+https://github.com/MattGorko/libu2f-emu.
++#endif /* U2F_H */
 -- 
 2.28.0
 
