@@ -2,74 +2,98 @@ Return-Path: <SRS0=vd3Y=BW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5073EC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 17:11:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3E29C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 17:14:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1FA5C20658
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 17:11:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1FA5C20658
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 9E4B620774
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 17:14:50 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wZ1XVAw0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E4B620774
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59096 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38364 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5uHI-0006JI-5n
-	for qemu-devel@archiver.kernel.org; Wed, 12 Aug 2020 13:11:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53472)
+	id 1k5uKv-0000yh-QM
+	for qemu-devel@archiver.kernel.org; Wed, 12 Aug 2020 13:14:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54618)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1k5uFJ-0003hh-EI
- for qemu-devel@nongnu.org; Wed, 12 Aug 2020 13:09:01 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:24012
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1k5uFG-00088C-KE
- for qemu-devel@nongnu.org; Wed, 12 Aug 2020 13:09:01 -0400
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-466-CY7iEBW0POWQsJrF-4ZH0Q-1; Wed, 12 Aug 2020 13:08:53 -0400
-X-MC-Unique: CY7iEBW0POWQsJrF-4ZH0Q-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 40CCC79EC3;
- Wed, 12 Aug 2020 17:08:52 +0000 (UTC)
-Received: from bahia.lan (ovpn-112-216.ams2.redhat.com [10.36.112.216])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BFC86610F2;
- Wed, 12 Aug 2020 17:08:50 +0000 (UTC)
-Subject: [PATCH v2 1/2] nvram: Add dry_run argument to
- chrp_nvram_create_system_partition()
-From: Greg Kurz <groug@kaod.org>
-To: Thomas Huth <thuth@redhat.com>
-Date: Wed, 12 Aug 2020 19:08:49 +0200
-Message-ID: <159725212986.104309.2950423041317693997.stgit@bahia.lan>
-In-Reply-To: <159725212173.104309.6136813383848717434.stgit@bahia.lan>
-References: <159725212173.104309.6136813383848717434.stgit@bahia.lan>
-User-Agent: StGit/0.21
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1k5uJv-0008IN-78
+ for qemu-devel@nongnu.org; Wed, 12 Aug 2020 13:13:47 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:56109)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1k5uJt-0000Ib-2p
+ for qemu-devel@nongnu.org; Wed, 12 Aug 2020 13:13:46 -0400
+Received: by mail-wm1-x341.google.com with SMTP id 9so2432863wmj.5
+ for <qemu-devel@nongnu.org>; Wed, 12 Aug 2020 10:13:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=f/3cxxeyxzjcfx7o55j+TwOvXxd8MKM8NXgdbS6cIrs=;
+ b=wZ1XVAw0Je3fVAKEORQKO85jzEmsYf3X1C3lge87aOEJ0IlMDc/eRhsolG5aW0DKZ0
+ VZTzdGR8+YEEDa2ic+Amf3sblc/HoQjKB3sU9eEJq9nqb3QX32010ditk82esVUwEQjB
+ nOb0P+jmXxDFx4ak4KMJhFbXXhhHVSnjJc1ZVqQNB7vaWLKQw4k8rc4V94wLVCm0rJqj
+ DSSrDw4Q50Rn4D4rU1w5OsI1dRe/vYwNyyLrh/POqpkgzW39WmRDDrF6Smv+zv8No8GT
+ HAL2oIDyuxASajkz1y4ktmHQnlZuXTOF8Mgmxbj+PzIMMe02TJBqOcvwGlE/1iWj0gOB
+ deYw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=f/3cxxeyxzjcfx7o55j+TwOvXxd8MKM8NXgdbS6cIrs=;
+ b=bzeiIGq1zq9J0gq6+cJcI7o09Ibh72Cf6eojplO3IX7fxDkch+gcEEzs12OGhDz/SN
+ BONAq0TLlBUOsmnSPtypuJaQ/7aG2BMgOCbFDAydfGcf3WUaBGEJRP23AFCrvlT9l/Ns
+ E8QwpKiyasSnl1CHmxLdHKnb6edRG25GWAY0vPl6C4eHlq05NOylBHwmAH7d5olaGg+b
+ 0Lg7yDUJXELIMOcGhMI9qLpobeRsNbJRQxH4YMytyK58q7gcm7vFUh4NFFGfzRS8c982
+ fepdM+P2XRHC83zwHWobo9ROhCGjBBJyRB3IwxwKyYu95SNskf2LP2nt6nYIsSDGTuFT
+ lojg==
+X-Gm-Message-State: AOAM531cYzw8DUX+6dQpCAqew+G6OU2g/z56LZ0OTOPofpREIbcxHJiY
+ QUSOCWkMdeFFXmS2c/A6wYcm9Q==
+X-Google-Smtp-Source: ABdhPJz3iYNu/2Ax4I4Q6JK2Zx9xW6jH+JphQR2O6zY5UyLpP0ucd7azjnZZSr7evkdRpcatCNTRFQ==
+X-Received: by 2002:a7b:c845:: with SMTP id c5mr651879wml.180.1597252421702;
+ Wed, 12 Aug 2020 10:13:41 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id o124sm4903963wmb.2.2020.08.12.10.13.40
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 12 Aug 2020 10:13:40 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 9708C1FF7E;
+ Wed, 12 Aug 2020 18:13:39 +0100 (BST)
+References: <20200812065339.2030527-1-richard.henderson@linaro.org>
+ <20200812065339.2030527-3-richard.henderson@linaro.org>
+ <87k0y419dm.fsf@linaro.org>
+ <cae494be-5077-4f31-fccb-892b0e7a7770@linaro.org>
+User-agent: mu4e 1.5.5; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Subject: Re: [PATCH 2/2] target/arm: Implement an IMPDEF pauth algorithm
+In-reply-to: <cae494be-5077-4f31-fccb-892b0e7a7770@linaro.org>
+Date: Wed, 12 Aug 2020 18:13:39 +0100
+Message-ID: <87zh6zzt18.fsf@linaro.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=groug@kaod.org
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: kaod.org
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: softfail client-ip=205.139.110.120; envelope-from=groug@kaod.org;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/12 10:32:11
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -12
-X-Spam_score: -1.3
-X-Spam_bar: -
-X-Spam_report: (-1.3 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_SOFTFAIL=0.665 autolearn=no autolearn_force=no
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x341.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -82,188 +106,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
- Laurent Vivier <laurent@vivier.eu>, qemu-ppc@nongnu.org,
- John Snow <jsnow@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: mark.rutland@arm.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Since commit 55d9950aaa8e ("nvram: Introduce helper functions for CHRP
-"system" and "free space" partitions") it is possible to pre-initialize
-a "system" partition in the NVRAM with the data passed to all -prom-env
-parameters on the QEMU command line.
 
-Unfortunately, this doesn't take the total size of the data into account
-and chrp_nvram_create_system_partition() may crash at some point if the
-caller hasn't allocated enough space.
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-Add a dry_run argument that causes chrp_nvram_create_system_partition()
-to only return the size of the partition without actually copying data
-into it. This can be used by callers to allocate enough memory.
+> On 8/12/20 2:49 AM, Alex Benn=C3=A9e wrote:
+>>=20
+>> Richard Henderson <richard.henderson@linaro.org> writes:
+>>=20
+>>> Without hardware acceleration, a cryptographically strong
+>>> algorithm is too expensive for pauth_computepac.
+>>>
+>>> Even with hardware accel, we are not currently expecting
+>>> to link the linux-user binaries to any crypto libraries,
+>>> and doing so would generally make the --static build fail.
+>>>
+>>> So choose XXH64 as a reasonably quick and decent hash.
+>>>
+>>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+>>> ---
+>>>  target/arm/pauth_helper.c | 75 ++++++++++++++++++++++++++++++++++++---
+>>>  1 file changed, 70 insertions(+), 5 deletions(-)
+>>>
+>>> diff --git a/target/arm/pauth_helper.c b/target/arm/pauth_helper.c
+>>> index 6dbab03768..f1a4389465 100644
+>>> --- a/target/arm/pauth_helper.c
+>>> +++ b/target/arm/pauth_helper.c
+>>> @@ -207,8 +207,8 @@ static uint64_t tweak_inv_shuffle(uint64_t i)
+>>>      return o;
+>>>  }
+>>>=20=20
+>>> -static uint64_t pauth_computepac(uint64_t data, uint64_t modifier,
+>>> -                                 ARMPACKey key)
+>>> +static uint64_t __attribute__((noinline))
+>>> +pauth_computepac_architected(uint64_t data, uint64_t modifier, ARMPACK=
+ey key)
+>>>  {
+>>>      static const uint64_t RC[5] =3D {
+>>>          0x0000000000000000ull,
+>>> @@ -272,6 +272,71 @@ static uint64_t pauth_computepac(uint64_t data, ui=
+nt64_t modifier,
+>>>      return workingval;
+>>>  }
+>>>=20=20
+>>> +/*
+>>> + * The XXH64 algorithm from
+>>> + * https://github.com/Cyan4973/xxHash/blob/v0.8.0/xxhash.h
+>>> + */
+>>> +#define PRIME64_1   0x9E3779B185EBCA87ULL
+>>> +#define PRIME64_2   0xC2B2AE3D27D4EB4FULL
+>>> +#define PRIME64_3   0x165667B19E3779F9ULL
+>>> +#define PRIME64_4   0x85EBCA77C2B2AE63ULL
+>>> +#define PRIME64_5   0x27D4EB2F165667C5ULL
+>>> +
+>>> +static inline uint64_t XXH64_round(uint64_t acc, uint64_t input)
+>>> +{
+>>> +    return rol64(acc + input * PRIME64_2, 31) * PRIME64_1;
+>>> +}
+>>> +
+>>> +static inline uint64_t XXH64_mergeround(uint64_t acc, uint64_t val)
+>>> +{
+>>> +    return (acc ^ XXH64_round(0, val)) * PRIME64_1 + PRIME64_4;
+>>> +}
+>>> +
+>>> +static inline uint64_t XXH64_avalanche(uint64_t h64)
+>>> +{
+>>> +    h64 ^=3D h64 >> 33;
+>>> +    h64 *=3D PRIME64_2;
+>>> +    h64 ^=3D h64 >> 29;
+>>> +    h64 *=3D PRIME64_3;
+>>> +    /* h64 ^=3D h64 >> 32; -- does not affect high 64 for pauth */
+>>> +    return h64;
+>>> +}
+>>> +
+>>> +static uint64_t __attribute__((noinline))
+>>> +pauth_computepac_impdef(uint64_t data, uint64_t modifier, ARMPACKey ke=
+y)
+>>> +{
+>>> +    uint64_t v1 =3D 1 + PRIME64_1 + PRIME64_2;
+>>> +    uint64_t v2 =3D 1 + PRIME64_2;
+>>> +    uint64_t v3 =3D 1 + 0;
+>>> +    uint64_t v4 =3D 1 - PRIME64_1;
+>>> +    uint64_t h64;
+>>> +
+>>> +    v1 =3D XXH64_round(v1, data);
+>>> +    v2 =3D XXH64_round(v2, modifier);
+>>> +    v3 =3D XXH64_round(v3, key.lo);
+>>> +    v4 =3D XXH64_round(v4, key.hi);
+>>> +
+>>> +    h64 =3D rol64(v1, 1) + rol64(v2, 7) + rol64(v3, 12) + rol64(v4, 18=
+);
+>>> +    h64 =3D XXH64_mergeround(h64, v1);
+>>> +    h64 =3D XXH64_mergeround(h64, v2);
+>>> +    h64 =3D XXH64_mergeround(h64, v3);
+>>> +    h64 =3D XXH64_mergeround(h64, v4);
+>>> +
+>>> +    return XXH64_avalanche(h64);
+>>> +}
+>>=20
+>> You might find it easier to #include "qemu/xxhash.h" which we use for tb
+>> hashing amongst other things.=20=20
+>
+> First, that's the 32-bit version, XXH32.
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
- hw/nvram/chrp_nvram.c         |   34 +++++++++++++++++++++++-----------
- hw/nvram/mac_nvram.c          |    2 +-
- hw/nvram/spapr_nvram.c        |    3 ++-
- hw/sparc/sun4m.c              |    2 +-
- hw/sparc64/sun4u.c            |    2 +-
- include/hw/nvram/chrp_nvram.h |    3 ++-
- 6 files changed, 30 insertions(+), 16 deletions(-)
+Ahh I missed that detail.
 
-diff --git a/hw/nvram/chrp_nvram.c b/hw/nvram/chrp_nvram.c
-index d969f267048e..f5f7b2a97c18 100644
---- a/hw/nvram/chrp_nvram.c
-+++ b/hw/nvram/chrp_nvram.c
-@@ -24,37 +24,48 @@
- #include "hw/nvram/chrp_nvram.h"
- #include "sysemu/sysemu.h"
-=20
--static int chrp_nvram_set_var(uint8_t *nvram, int addr, const char *str)
-+static int chrp_nvram_set_var(uint8_t *nvram, int addr, const char *str,
-+                              bool dry_run)
- {
-     int len;
-=20
-     len =3D strlen(str) + 1;
--    memcpy(&nvram[addr], str, len);
--
-+    if (!dry_run) {
-+        memcpy(&nvram[addr], str, len);
-+    }
-     return addr + len;
- }
-=20
- /**
-  * Create a "system partition", used for the Open Firmware
-- * environment variables.
-+ * environment variables. If @dry_run is false, only returns
-+ * the size of the partition but don't write the data.
-  */
--int chrp_nvram_create_system_partition(uint8_t *data, int min_len)
-+int chrp_nvram_create_system_partition(uint8_t *data, int min_len, bool dr=
-y_run)
- {
-     ChrpNvramPartHdr *part_header;
-     unsigned int i;
-     int end;
-=20
-+    assert(data || dry_run);
-+
-     part_header =3D (ChrpNvramPartHdr *)data;
--    part_header->signature =3D CHRP_NVPART_SYSTEM;
--    pstrcpy(part_header->name, sizeof(part_header->name), "system");
-+
-+    if (!dry_run) {
-+        part_header->signature =3D CHRP_NVPART_SYSTEM;
-+        pstrcpy(part_header->name, sizeof(part_header->name), "system");
-+    }
-=20
-     end =3D sizeof(ChrpNvramPartHdr);
-     for (i =3D 0; i < nb_prom_envs; i++) {
--        end =3D chrp_nvram_set_var(data, end, prom_envs[i]);
-+        end =3D chrp_nvram_set_var(data, end, prom_envs[i], dry_run);
-     }
-=20
-     /* End marker */
--    data[end++] =3D '\0';
-+    if (!dry_run) {
-+        data[end] =3D '\0';
-+    }
-+    end++;
-=20
-     end =3D (end + 15) & ~15;
-     /* XXX: OpenBIOS is not able to grow up a partition. Leave some space =
-for
-@@ -62,8 +73,9 @@ int chrp_nvram_create_system_partition(uint8_t *data, int=
- min_len)
-     if (end < min_len) {
-         end =3D min_len;
-     }
--    chrp_nvram_finish_partition(part_header, end);
--
-+    if (!dry_run) {
-+        chrp_nvram_finish_partition(part_header, end);
-+    }
-     return end;
- }
-=20
-diff --git a/hw/nvram/mac_nvram.c b/hw/nvram/mac_nvram.c
-index beec1c4e4d11..4396f893f14a 100644
---- a/hw/nvram/mac_nvram.c
-+++ b/hw/nvram/mac_nvram.c
-@@ -141,7 +141,7 @@ static void pmac_format_nvram_partition_of(MacIONVRAMSt=
-ate *nvr, int off,
-=20
-     /* OpenBIOS nvram variables partition */
-     sysp_end =3D chrp_nvram_create_system_partition(&nvr->data[off],
--                                                  DEF_SYSTEM_SIZE) + off;
-+                                                  DEF_SYSTEM_SIZE, false) =
-+ off;
-=20
-     /* Free space partition */
-     chrp_nvram_create_free_partition(&nvr->data[sysp_end], len - sysp_end)=
-;
-diff --git a/hw/nvram/spapr_nvram.c b/hw/nvram/spapr_nvram.c
-index 15d08281d411..992b818d34e7 100644
---- a/hw/nvram/spapr_nvram.c
-+++ b/hw/nvram/spapr_nvram.c
-@@ -188,7 +188,8 @@ static void spapr_nvram_realize(SpaprVioDevice *dev, Er=
-ror **errp)
-         }
-     } else if (nb_prom_envs > 0) {
-         /* Create a system partition to pass the -prom-env variables */
--        chrp_nvram_create_system_partition(nvram->buf, MIN_NVRAM_SIZE / 4)=
-;
-+        chrp_nvram_create_system_partition(nvram->buf, MIN_NVRAM_SIZE / 4,
-+                                           false);
-         chrp_nvram_create_free_partition(&nvram->buf[MIN_NVRAM_SIZE / 4],
-                                          nvram->size - MIN_NVRAM_SIZE / 4)=
-;
-     }
-diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
-index 9be930415f8e..61804ccd4286 100644
---- a/hw/sparc/sun4m.c
-+++ b/hw/sparc/sun4m.c
-@@ -143,7 +143,7 @@ static void nvram_init(Nvram *nvram, uint8_t *macaddr,
-     memset(image, '\0', sizeof(image));
-=20
-     /* OpenBIOS nvram variables partition */
--    sysp_end =3D chrp_nvram_create_system_partition(image, 0);
-+    sysp_end =3D chrp_nvram_create_system_partition(image, 0, false);
-=20
-     /* Free space partition */
-     chrp_nvram_create_free_partition(&image[sysp_end], 0x1fd0 - sysp_end);
-diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
-index 9e30203dcc44..2409e739e81b 100644
---- a/hw/sparc64/sun4u.c
-+++ b/hw/sparc64/sun4u.c
-@@ -136,7 +136,7 @@ static int sun4u_NVRAM_set_params(Nvram *nvram, uint16_=
-t NVRAM_size,
-     memset(image, '\0', sizeof(image));
-=20
-     /* OpenBIOS nvram variables partition */
--    sysp_end =3D chrp_nvram_create_system_partition(image, 0);
-+    sysp_end =3D chrp_nvram_create_system_partition(image, 0, false);
-=20
-     /* Free space partition */
-     chrp_nvram_create_free_partition(&image[sysp_end], 0x1fd0 - sysp_end);
-diff --git a/include/hw/nvram/chrp_nvram.h b/include/hw/nvram/chrp_nvram.h
-index 09941a9be454..1d32dbf61331 100644
---- a/include/hw/nvram/chrp_nvram.h
-+++ b/include/hw/nvram/chrp_nvram.h
-@@ -50,7 +50,8 @@ chrp_nvram_finish_partition(ChrpNvramPartHdr *header, uin=
-t32_t size)
-     header->checksum =3D sum & 0xff;
- }
-=20
--int chrp_nvram_create_system_partition(uint8_t *data, int min_len);
-+int chrp_nvram_create_system_partition(uint8_t *data, int min_len,
-+                                       bool dry_run);
- int chrp_nvram_create_free_partition(uint8_t *data, int len);
-=20
- #endif
+> Second, we define xxhash7 there; we would need xxhash8 here.
+
+We could at least put the code in the header with the others.
+
+>
+>
+> r~
 
 
+--=20
+Alex Benn=C3=A9e
 
