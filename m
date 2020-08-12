@@ -6,70 +6,70 @@ X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4638DC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 17:09:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5073EC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 17:11:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 114B72076C
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 17:09:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 114B72076C
+	by mail.kernel.org (Postfix) with ESMTPS id 1FA5C20658
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 17:11:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1FA5C20658
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55740 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59096 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5uGB-0004ps-Bz
-	for qemu-devel@archiver.kernel.org; Wed, 12 Aug 2020 13:09:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53516)
+	id 1k5uHI-0006JI-5n
+	for qemu-devel@archiver.kernel.org; Wed, 12 Aug 2020 13:11:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53472)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1k5uFR-0003wi-4l
- for qemu-devel@nongnu.org; Wed, 12 Aug 2020 13:09:09 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:47237
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1k5uFJ-0003hh-EI
+ for qemu-devel@nongnu.org; Wed, 12 Aug 2020 13:09:01 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:24012
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1k5uFP-00088z-IJ
- for qemu-devel@nongnu.org; Wed, 12 Aug 2020 13:09:08 -0400
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1k5uFG-00088C-KE
+ for qemu-devel@nongnu.org; Wed, 12 Aug 2020 13:09:01 -0400
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-186-4hfQ8wHJOsebyP-8nl8H1Q-1; Wed, 12 Aug 2020 13:09:01 -0400
-X-MC-Unique: 4hfQ8wHJOsebyP-8nl8H1Q-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-466-CY7iEBW0POWQsJrF-4ZH0Q-1; Wed, 12 Aug 2020 13:08:53 -0400
+X-MC-Unique: CY7iEBW0POWQsJrF-4ZH0Q-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B2A051902EA1;
- Wed, 12 Aug 2020 17:08:59 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 40CCC79EC3;
+ Wed, 12 Aug 2020 17:08:52 +0000 (UTC)
 Received: from bahia.lan (ovpn-112-216.ams2.redhat.com [10.36.112.216])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5A9DE19D71;
- Wed, 12 Aug 2020 17:08:58 +0000 (UTC)
-Subject: [PATCH v2 2/2] spapr/nvram: Error out if NVRAM cannot contain all
- -prom-env data
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BFC86610F2;
+ Wed, 12 Aug 2020 17:08:50 +0000 (UTC)
+Subject: [PATCH v2 1/2] nvram: Add dry_run argument to
+ chrp_nvram_create_system_partition()
 From: Greg Kurz <groug@kaod.org>
 To: Thomas Huth <thuth@redhat.com>
-Date: Wed, 12 Aug 2020 19:08:57 +0200
-Message-ID: <159725213748.104309.14834084670144632611.stgit@bahia.lan>
+Date: Wed, 12 Aug 2020 19:08:49 +0200
+Message-ID: <159725212986.104309.2950423041317693997.stgit@bahia.lan>
 In-Reply-To: <159725212173.104309.6136813383848717434.stgit@bahia.lan>
 References: <159725212173.104309.6136813383848717434.stgit@bahia.lan>
 User-Agent: StGit/0.21
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=groug@kaod.org
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: kaod.org
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: softfail client-ip=205.139.110.61; envelope-from=groug@kaod.org;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/12 04:50:17
+Received-SPF: softfail client-ip=205.139.110.120; envelope-from=groug@kaod.org;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/12 10:32:11
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -21
-X-Spam_score: -2.2
-X-Spam_bar: --
-X-Spam_report: (-2.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_SOFTFAIL=0.665 autolearn=ham autolearn_force=no
+X-Spam_score_int: -12
+X-Spam_score: -1.3
+X-Spam_bar: -
+X-Spam_report: (-1.3 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_SOFTFAIL=0.665 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -89,67 +89,181 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Since commit 61f20b9dc5b7 ("spapr_nvram: Pre-initialize the NVRAM to
-support the -prom-env parameter"), pseries machines can pre-initialize
-the "system" partition in the NVRAM with the data passed to all -prom-env
+Since commit 55d9950aaa8e ("nvram: Introduce helper functions for CHRP
+"system" and "free space" partitions") it is possible to pre-initialize
+a "system" partition in the NVRAM with the data passed to all -prom-env
 parameters on the QEMU command line.
 
-In this cases it is assumed that all the data fits in 64 KiB, but the user
-can easily pass more and crash QEMU:
+Unfortunately, this doesn't take the total size of the data into account
+and chrp_nvram_create_system_partition() may crash at some point if the
+caller hasn't allocated enough space.
 
-$ qemu-system-ppc64 -M pseries $(for ((x=3D0;x<128;x++)); do \
-  echo -n " -prom-env "$(for ((y=3D0;y<1024;y++)); do echo -n x ; done) ; \
-  done) # this requires ~128 Kib
-malloc(): corrupted top size
-Aborted (core dumped)
+Add a dry_run argument that causes chrp_nvram_create_system_partition()
+to only return the size of the partition without actually copying data
+into it. This can be used by callers to allocate enough memory.
 
-Call chrp_nvram_create_system_partition() first, with its recently added
-parameter dry_run set to true, in order to know the required size and fail
-gracefully if it's too small.
-
-Reported-by: John Snow <jsnow@redhat.com>
 Signed-off-by: Greg Kurz <groug@kaod.org>
 ---
- hw/nvram/spapr_nvram.c |   15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ hw/nvram/chrp_nvram.c         |   34 +++++++++++++++++++++++-----------
+ hw/nvram/mac_nvram.c          |    2 +-
+ hw/nvram/spapr_nvram.c        |    3 ++-
+ hw/sparc/sun4m.c              |    2 +-
+ hw/sparc64/sun4u.c            |    2 +-
+ include/hw/nvram/chrp_nvram.h |    3 ++-
+ 6 files changed, 30 insertions(+), 16 deletions(-)
 
+diff --git a/hw/nvram/chrp_nvram.c b/hw/nvram/chrp_nvram.c
+index d969f267048e..f5f7b2a97c18 100644
+--- a/hw/nvram/chrp_nvram.c
++++ b/hw/nvram/chrp_nvram.c
+@@ -24,37 +24,48 @@
+ #include "hw/nvram/chrp_nvram.h"
+ #include "sysemu/sysemu.h"
+=20
+-static int chrp_nvram_set_var(uint8_t *nvram, int addr, const char *str)
++static int chrp_nvram_set_var(uint8_t *nvram, int addr, const char *str,
++                              bool dry_run)
+ {
+     int len;
+=20
+     len =3D strlen(str) + 1;
+-    memcpy(&nvram[addr], str, len);
+-
++    if (!dry_run) {
++        memcpy(&nvram[addr], str, len);
++    }
+     return addr + len;
+ }
+=20
+ /**
+  * Create a "system partition", used for the Open Firmware
+- * environment variables.
++ * environment variables. If @dry_run is false, only returns
++ * the size of the partition but don't write the data.
+  */
+-int chrp_nvram_create_system_partition(uint8_t *data, int min_len)
++int chrp_nvram_create_system_partition(uint8_t *data, int min_len, bool dr=
+y_run)
+ {
+     ChrpNvramPartHdr *part_header;
+     unsigned int i;
+     int end;
+=20
++    assert(data || dry_run);
++
+     part_header =3D (ChrpNvramPartHdr *)data;
+-    part_header->signature =3D CHRP_NVPART_SYSTEM;
+-    pstrcpy(part_header->name, sizeof(part_header->name), "system");
++
++    if (!dry_run) {
++        part_header->signature =3D CHRP_NVPART_SYSTEM;
++        pstrcpy(part_header->name, sizeof(part_header->name), "system");
++    }
+=20
+     end =3D sizeof(ChrpNvramPartHdr);
+     for (i =3D 0; i < nb_prom_envs; i++) {
+-        end =3D chrp_nvram_set_var(data, end, prom_envs[i]);
++        end =3D chrp_nvram_set_var(data, end, prom_envs[i], dry_run);
+     }
+=20
+     /* End marker */
+-    data[end++] =3D '\0';
++    if (!dry_run) {
++        data[end] =3D '\0';
++    }
++    end++;
+=20
+     end =3D (end + 15) & ~15;
+     /* XXX: OpenBIOS is not able to grow up a partition. Leave some space =
+for
+@@ -62,8 +73,9 @@ int chrp_nvram_create_system_partition(uint8_t *data, int=
+ min_len)
+     if (end < min_len) {
+         end =3D min_len;
+     }
+-    chrp_nvram_finish_partition(part_header, end);
+-
++    if (!dry_run) {
++        chrp_nvram_finish_partition(part_header, end);
++    }
+     return end;
+ }
+=20
+diff --git a/hw/nvram/mac_nvram.c b/hw/nvram/mac_nvram.c
+index beec1c4e4d11..4396f893f14a 100644
+--- a/hw/nvram/mac_nvram.c
++++ b/hw/nvram/mac_nvram.c
+@@ -141,7 +141,7 @@ static void pmac_format_nvram_partition_of(MacIONVRAMSt=
+ate *nvr, int off,
+=20
+     /* OpenBIOS nvram variables partition */
+     sysp_end =3D chrp_nvram_create_system_partition(&nvr->data[off],
+-                                                  DEF_SYSTEM_SIZE) + off;
++                                                  DEF_SYSTEM_SIZE, false) =
++ off;
+=20
+     /* Free space partition */
+     chrp_nvram_create_free_partition(&nvr->data[sysp_end], len - sysp_end)=
+;
 diff --git a/hw/nvram/spapr_nvram.c b/hw/nvram/spapr_nvram.c
-index 992b818d34e7..c29d797ae1f0 100644
+index 15d08281d411..992b818d34e7 100644
 --- a/hw/nvram/spapr_nvram.c
 +++ b/hw/nvram/spapr_nvram.c
-@@ -145,6 +145,7 @@ static void rtas_nvram_store(PowerPCCPU *cpu, SpaprMach=
-ineState *spapr,
-=20
- static void spapr_nvram_realize(SpaprVioDevice *dev, Error **errp)
- {
-+    ERRP_GUARD();
-     SpaprNvram *nvram =3D VIO_SPAPR_NVRAM(dev);
-     int ret;
-=20
-@@ -187,6 +188,20 @@ static void spapr_nvram_realize(SpaprVioDevice *dev, E=
-rror **errp)
-             return;
+@@ -188,7 +188,8 @@ static void spapr_nvram_realize(SpaprVioDevice *dev, Er=
+ror **errp)
          }
      } else if (nb_prom_envs > 0) {
-+        int len =3D chrp_nvram_create_system_partition(nvram->buf,
-+                                                     MIN_NVRAM_SIZE / 4,
-+                                                     true);
-+
-+        /* Check the partition is large enough for all the -prom-env data =
-*/
-+        if (nvram->size < len) {
-+            error_setg(errp, "-prom-env data requires %d bytes but spapr-n=
-vram "
-+                       "is only %d bytes in size", len, nvram->size);
-+            error_append_hint(errp,
-+                              "Try to pass %d less bytes to -prom-env.\n",
-+                              len - nvram->size);
-+            return;
-+        }
-+
          /* Create a system partition to pass the -prom-env variables */
-         chrp_nvram_create_system_partition(nvram->buf, MIN_NVRAM_SIZE / 4,
-                                            false);
+-        chrp_nvram_create_system_partition(nvram->buf, MIN_NVRAM_SIZE / 4)=
+;
++        chrp_nvram_create_system_partition(nvram->buf, MIN_NVRAM_SIZE / 4,
++                                           false);
+         chrp_nvram_create_free_partition(&nvram->buf[MIN_NVRAM_SIZE / 4],
+                                          nvram->size - MIN_NVRAM_SIZE / 4)=
+;
+     }
+diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
+index 9be930415f8e..61804ccd4286 100644
+--- a/hw/sparc/sun4m.c
++++ b/hw/sparc/sun4m.c
+@@ -143,7 +143,7 @@ static void nvram_init(Nvram *nvram, uint8_t *macaddr,
+     memset(image, '\0', sizeof(image));
+=20
+     /* OpenBIOS nvram variables partition */
+-    sysp_end =3D chrp_nvram_create_system_partition(image, 0);
++    sysp_end =3D chrp_nvram_create_system_partition(image, 0, false);
+=20
+     /* Free space partition */
+     chrp_nvram_create_free_partition(&image[sysp_end], 0x1fd0 - sysp_end);
+diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
+index 9e30203dcc44..2409e739e81b 100644
+--- a/hw/sparc64/sun4u.c
++++ b/hw/sparc64/sun4u.c
+@@ -136,7 +136,7 @@ static int sun4u_NVRAM_set_params(Nvram *nvram, uint16_=
+t NVRAM_size,
+     memset(image, '\0', sizeof(image));
+=20
+     /* OpenBIOS nvram variables partition */
+-    sysp_end =3D chrp_nvram_create_system_partition(image, 0);
++    sysp_end =3D chrp_nvram_create_system_partition(image, 0, false);
+=20
+     /* Free space partition */
+     chrp_nvram_create_free_partition(&image[sysp_end], 0x1fd0 - sysp_end);
+diff --git a/include/hw/nvram/chrp_nvram.h b/include/hw/nvram/chrp_nvram.h
+index 09941a9be454..1d32dbf61331 100644
+--- a/include/hw/nvram/chrp_nvram.h
++++ b/include/hw/nvram/chrp_nvram.h
+@@ -50,7 +50,8 @@ chrp_nvram_finish_partition(ChrpNvramPartHdr *header, uin=
+t32_t size)
+     header->checksum =3D sum & 0xff;
+ }
+=20
+-int chrp_nvram_create_system_partition(uint8_t *data, int min_len);
++int chrp_nvram_create_system_partition(uint8_t *data, int min_len,
++                                       bool dry_run);
+ int chrp_nvram_create_free_partition(uint8_t *data, int len);
+=20
+ #endif
 
 
 
