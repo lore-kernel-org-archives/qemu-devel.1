@@ -2,89 +2,62 @@ Return-Path: <SRS0=vd3Y=BW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.5 required=3.0 tests=BAYES_00,HK_RANDOM_FROM,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9643C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 16:49:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CCB6C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 16:57:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 70F1F2076C
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 16:49:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nLEDyd+z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70F1F2076C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id D3E2520838
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 16:57:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3E2520838
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34198 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42328 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5twH-00032L-LT
-	for qemu-devel@archiver.kernel.org; Wed, 12 Aug 2020 12:49:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46728)
+	id 1k5u3n-0006te-1S
+	for qemu-devel@archiver.kernel.org; Wed, 12 Aug 2020 12:57:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49068)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <hsp.cat7@gmail.com>)
- id 1k5tvY-0002c6-G4
- for qemu-devel@nongnu.org; Wed, 12 Aug 2020 12:48:36 -0400
-Received: from mail-ot1-x335.google.com ([2607:f8b0:4864:20::335]:40594)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <hsp.cat7@gmail.com>)
- id 1k5tvV-0004qT-CC
- for qemu-devel@nongnu.org; Wed, 12 Aug 2020 12:48:36 -0400
-Received: by mail-ot1-x335.google.com with SMTP id h16so2464622oti.7
- for <qemu-devel@nongnu.org>; Wed, 12 Aug 2020 09:48:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=bYqV05IN6FYP3YEVvIYax3XmayJQLqKvuUgZ3/4a2Is=;
- b=nLEDyd+z/IuFR9GNMZI2dsDzttRyYzWYWL6LzS1P6frjcWPgOL+cAf0pYAtm/zsaLi
- YAa9+VJcVa9MASbVH5VAHkkCoJVJqgUENapcl+PTZsf2rqX562QOjqJVDAhRXykialNH
- jnhEzpU2woHXhFKq9NLMTbqvL5cDfnqaRH+uylAgdS2jorKr/DdrXFm7O9VYarzPnJCU
- srDTlQxXssdeflp/b//HvYbK3mQeBoOLiTeFV8EmCiTzj7qrxEzrj6hsNWcUwn7Mhdcq
- 2JwkX8mjZe0HfCQwBXatO9TRZe7OXFRdLiQi0aJCP5h2TtrhUI4rDR6v39QEOGv/y2pX
- mhuQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=bYqV05IN6FYP3YEVvIYax3XmayJQLqKvuUgZ3/4a2Is=;
- b=Ju0c0fkkR9gAXNL9q+m4w8kBj+3LBsiugtxZ2HWBUdATh7slm+DsRPd8eSTQY85+Vy
- MkBOLET/5tSWUCx6R9cQXk7s1bitKYc4tIKDkCAikGYW1CJftVFGieOP4wiX1TwZYnr+
- OLKO2fn8vAKFkTyMytP7G5n/XGecAwXVH3gU4zT5piQf8GU13dR46IQVi3W3gFtO0iTd
- 8UKYoWme0AQuvdISUnyk0hHdD2G0IJX8Ok1wR9bRYZiU+y2iKkzIa6jeRuDKr50+f6tT
- nRMHiJpgLRWRVI4h3ZTSJpVhen69bmLfCvVvRElt8wWeOcfeR8Yf9tgSU6OZrzxZC14W
- f8AQ==
-X-Gm-Message-State: AOAM530b7MOnWe50A7GWl7XaW9R5N/IOtLFrr4ftLgZBHK5elHGy11yB
- bVMUvpuGqHnph4uIp3NoJMm1TYIOvJDfI2KTgR4=
-X-Google-Smtp-Source: ABdhPJzhHY5UKRKM/hZ/77f2eOBC7CIFUBOrcRhjRUh0TLaCWYXhKDjYKfLaDMQAvnRXf6tknJXLjv3ETV+QyGG8tqI=
-X-Received: by 2002:a9d:d84:: with SMTP id 4mr488433ots.173.1597250912181;
- Wed, 12 Aug 2020 09:48:32 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1k5u37-0006AH-MF
+ for qemu-devel@nongnu.org; Wed, 12 Aug 2020 12:56:25 -0400
+Received: from relay68.bu.edu ([128.197.228.73]:42894)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1k5u35-0006Bf-Cv
+ for qemu-devel@nongnu.org; Wed, 12 Aug 2020 12:56:25 -0400
+X-Envelope-From: alxndr@bu.edu
+X-BU-AUTH: mozz.bu.edu [128.197.127.33]
+Received: from BU-AUTH (localhost.localdomain [127.0.0.1]) (authenticated
+ bits=0)
+ by relay68.bu.edu (8.14.3/8.14.3) with ESMTP id 07CGt0hw008117
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+ Wed, 12 Aug 2020 12:55:03 -0400
+Date: Wed, 12 Aug 2020 12:55:00 -0400
+From: Alexander Bulekov <alxndr@bu.edu>
+To: Li Qiang <liq3ea@gmail.com>
+Subject: Re: [Bug 1891354] [NEW] Heap-use-after-free in usb_packet_unmap
+Message-ID: <20200812165500.qxcyyirb3kqzv67o@mozz.bu.edu>
+References: <159724841583.21381.1589855553145708820.malonedeb@chaenomeles.canonical.com>
+ <CAKXe6SKsO-V6GZ9uEUoSvCZgz7fzLkbfs+SWFT-mG_q0RiPErQ@mail.gmail.com>
 MIME-Version: 1.0
-References: <1597079345-42801-1-git-send-email-pbonzini@redhat.com>
- <20200811154241.4vzuxvhbwt7ztfvh@steredhat>
- <CABLmASH9rXQjnYYbADtaq5f4c0uqr+kv10p=hC7GR9wF-EzPUw@mail.gmail.com>
- <2548b5fb-97cd-2d7d-8a7e-33b93f3003cb@amsat.org>
-In-Reply-To: <2548b5fb-97cd-2d7d-8a7e-33b93f3003cb@amsat.org>
-From: Howard Spoelstra <hsp.cat7@gmail.com>
-Date: Wed, 12 Aug 2020 18:48:20 +0200
-Message-ID: <CABLmASG=f0540ZchBkzQneMXVrD1QJ=6C6ZiTN9t7Tkga5cpPg@mail.gmail.com>
-Subject: Re: [PATCH 000/147] Meson integration for 5.2
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Content-Type: multipart/alternative; boundary="0000000000003ce38105acb0f50f"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::335;
- envelope-from=hsp.cat7@gmail.com; helo=mail-ot1-x335.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001, HTML_MESSAGE=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAKXe6SKsO-V6GZ9uEUoSvCZgz7fzLkbfs+SWFT-mG_q0RiPErQ@mail.gmail.com>
+User-Agent: NeoMutt/20180716
+Received-SPF: pass client-ip=128.197.228.73; envelope-from=alxndr@bu.edu;
+ helo=relay68.bu.edu
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/12 12:56:20
+X-ACL-Warn: Detected OS   = Linux 2.6.x
+X-Spam_score_int: -31
+X-Spam_score: -3.2
+X-Spam_bar: ---
+X-Spam_report: (-3.2 / 5.0 requ) BAYES_00=-1.9, HK_RANDOM_ENVFROM=0.001,
+ HK_RANDOM_FROM=1, RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -98,82 +71,277 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel qemu-devel <qemu-devel@nongnu.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ Bug 1891354 <1891354@bugs.launchpad.net>,
+ Qemu Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000003ce38105acb0f50f
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Aug 12, 2020 at 3:24 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
-g>
-wrote:
-
-> Hi Howard,
->
-> On 8/12/20 8:32 AM, Howard Spoelstra wrote:
-> > Hi,
+On 200813 0024, Li Qiang wrote:
+> Alexander Bulekov <1891354@bugs.launchpad.net> 于2020年8月13日周四 上午12:21写道：
 > >
-> > I just compiled qemu-system-ppc using the the meson-poc-next branch wit=
-h:
-> > git clone -b meson-poc-next http://www.github.com/bonzini/qemu
-> > qemu-mesonbuild-next
->
-> I notice you refer to github while Paolo mentioned gitlab in the
-> cover:
->
-> "This is available from https://gitlab.com/bonzini/qemu.git branch"
->
-> I am not sure he maintains both sync, can you retest using the gitlab
-> branch?
->
-> Hi Philippe,
+> > Public bug reported:
+> >
+> > Hello,
+> > Reproducer:
+> >
+> > cat << EOF | ./i386-softmmu/qemu-system-i386 -device nec-usb-xhci \
+> > -trace usb\* -device usb-audio -device usb-storage,drive=mydrive \
+> > -drive id=mydrive,file=null-co://,size=2M,format=raw,if=none \
+> > -nodefaults -nographic -qtest stdio
+> > outl 0xcf8 0x80001010
+> > outl 0xcfc 0xc0202
+> > outl 0xcf8 0x80001004
+> > outl 0xcfc 0x1c77695e
+> > writel 0xc0040 0xffffd855
+> > writeq 0xc2000 0xff05140100000000
+> > write 0x1d 0x1 0x27
+> > write 0x2d 0x1 0x2e
+> > write 0x17232 0x1 0x03
+> > write 0x17254 0x1 0x05
+> > write 0x17276 0x1 0x72
+> > write 0x17278 0x1 0x02
+> > write 0x3d 0x1 0x27
+> > write 0x40 0x1 0x2e
+> > write 0x41 0x1 0x72
+> > write 0x42 0x1 0x01
+> > write 0x4d 0x1 0x2e
+> > write 0x4f 0x1 0x01
+> > write 0x2007c 0x1 0xc7
+> > writeq 0xc2000 0x5c05140100000000
+> > write 0x20070 0x1 0x80
+> > write 0x20078 0x1 0x08
+> > write 0x2007c 0x1 0xfe
+> > write 0x2007d 0x1 0x08
+> > write 0x20081 0x1 0xff
+> > write 0x20082 0x1 0x0b
+> > write 0x20089 0x1 0x8c
+> > write 0x2008d 0x1 0x04
+> > write 0x2009d 0x1 0x10
+> > writeq 0xc2000 0x2505ef019e092f00
+> > EOF
+> >
+> > 20091==ERROR: AddressSanitizer: heap-use-after-free on address 0x611000045030 at pc 0x55db79edeef2 bp 0x7ffc4020b2b0 sp 0x7ffc4020b2a8
+> > READ of size 4 at 0x611000045030 thread T0
+> >     #0 0x55db79edeef1 in usb_packet_unmap hw/usb/libhw.c:64:28
+> >     #1 0x55db79ede66f in usb_packet_map hw/usb/libhw.c:54:5
+> >     #2 0x55db79f6d5f1 in xhci_setup_packet hw/usb/hcd-xhci.c:1618:5
+> >     #3 0x55db79f67143 in xhci_fire_ctl_transfer hw/usb/hcd-xhci.c:1722:9
+> >     #4 0x55db79f67143 in xhci_kick_epctx hw/usb/hcd-xhci.c:1991:13
+> >     #5 0x55db79f8837d in xhci_doorbell_write hw/usb/hcd-xhci.c:3162:13
+> >     #6 0x55db792c6b8e in memory_region_write_accessor softmmu/memory.c:483:5
+> >     #7 0x55db792c658b in access_with_adjusted_size softmmu/memory.c:544:18
+> >     #8 0x55db792c5d9b in memory_region_dispatch_write softmmu/memory.c
+> >     #9 0x55db78d094d2 in flatview_write_continue exec.c:3176:23
+> >     #10 0x55db78cfee6b in flatview_write exec.c:3216:14
+> >     #11 0x55db78cfee6b in address_space_write exec.c:3308:18
+> >     #12 0x55db793072a9 in qtest_process_command softmmu/qtest.c:452:13
+> >     #13 0x55db79304087 in qtest_process_inbuf softmmu/qtest.c:710:9
+> >     #14 0x55db7a7d7293 in fd_chr_read chardev/char-fd.c:68:9
+> >     #15 0x7fc5d7f1a897 in g_main_context_dispatch
+> >     #16 0x55db7aa571b3 in glib_pollfds_poll util/main-loop.c:217:9
+> >     #17 0x55db7aa571b3 in os_host_main_loop_wait util/main-loop.c:240:5
+> >     #18 0x55db7aa571b3 in main_loop_wait util/main-loop.c:516:11
+> >     #19 0x55db79315008 in qemu_main_loop softmmu/vl.c:1676:9
+> >     #20 0x55db7a8860fd in main softmmu/main.c:49:5
+> >
+> > 0x611000045030 is located 48 bytes inside of 256-byte region [0x611000045000,0x611000045100)
+> > freed by thread T0 here:
+> >     #0 0x55db78cac16d in free (build/i386-softmmu/qemu-system-i386+0x250e16d)
+> >     #1 0x55db79f7c0e8 in xhci_ep_nuke_xfers hw/usb/hcd-xhci.c:1252:9
+> >     #2 0x55db79f7b454 in xhci_disable_ep hw/usb/hcd-xhci.c:1279:5
+> >     #3 0x55db79f79af7 in xhci_disable_slot hw/usb/hcd-xhci.c:2048:13
+> >     #4 0x55db79f5aea3 in xhci_reset hw/usb/hcd-xhci.c:2706:9
+> >     #5 0x55db79f82f49 in xhci_oper_write hw/usb/hcd-xhci.c:2966:13
+> >     #6 0x55db792c6b8e in memory_region_write_accessor softmmu/memory.c:483:5
+> >     #7 0x55db792c658b in access_with_adjusted_size softmmu/memory.c:544:18
+> >     #8 0x55db792c5d9b in memory_region_dispatch_write softmmu/memory.c
+> >     #9 0x55db78d094d2 in flatview_write_continue exec.c:3176:23
+> >     #10 0x55db78cfee6b in flatview_write exec.c:3216:14
+> >     #11 0x55db78cfee6b in address_space_write exec.c:3308:18
+> >     #12 0x55db78d01fe7 in address_space_unmap exec.c:3634:9
+> >     #13 0x55db79edebbb in dma_memory_unmap include/sysemu/dma.h:145:5
+> >     #14 0x55db79edebbb in usb_packet_unmap hw/usb/libhw.c:65:9
+> >     #15 0x55db79ede66f in usb_packet_map hw/usb/libhw.c:54:5
+> >     #16 0x55db79f6d5f1 in xhci_setup_packet hw/usb/hcd-xhci.c:1618:5
+> >     #17 0x55db79f67143 in xhci_fire_ctl_transfer hw/usb/hcd-xhci.c:1722:9
+> >     #18 0x55db79f67143 in xhci_kick_epctx hw/usb/hcd-xhci.c:1991:13
+> >     #19 0x55db79f8837d in xhci_doorbell_write hw/usb/hcd-xhci.c:3162:13
+> >     #20 0x55db792c6b8e in memory_region_write_accessor softmmu/memory.c:483:5
+> >     #21 0x55db792c658b in access_with_adjusted_size softmmu/memory.c:544:18
+> >     #22 0x55db792c5d9b in memory_region_dispatch_write softmmu/memory.c
+> >     #23 0x55db78d094d2 in flatview_write_continue exec.c:3176:23
+> >     #24 0x55db78cfee6b in flatview_write exec.c:3216:14
+> >     #25 0x55db78cfee6b in address_space_write exec.c:3308:18
+> >     #26 0x55db793072a9 in qtest_process_command softmmu/qtest.c:452:13
+> >     #27 0x55db79304087 in qtest_process_inbuf softmmu/qtest.c:710:9
+> >     #28 0x55db7a7d7293 in fd_chr_read chardev/char-fd.c:68:9
+> >     #29 0x7fc5d7f1a897 in g_main_context_dispatch
+> >
+> 
+> This issue as far as I can see, is the DMA to MMIO issue.
 
-I have the same issue when building from the gitlab repo just minutes ago:
-qemu-system-ppc-meson-gitlab: Display 'sdl' is not available.
-qemu-system-ppc-meson-gitlab: Display 'gtk' is not available.
+Another one - Interesting...
+So it joins these:
+https://bugs.launchpad.net/qemu/+bug/1888606
+https://bugs.launchpad.net/qemu/+bug/1886362
 
-Best,
-Howard
+Could this one be dealt with by moving xhci_reset into a BH?
+-Alex
 
---0000000000003ce38105acb0f50f
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
-<div dir=3D"ltr" class=3D"gmail_attr">On Wed, Aug 12, 2020 at 3:24 PM Phili=
-ppe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:f4bug@amsat.org">f4bug@amsat.o=
-rg</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margi=
-n:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex=
-">Hi Howard,<br>
-<br>
-On 8/12/20 8:32 AM, Howard Spoelstra wrote:<br>
-&gt; Hi,<br>
-&gt; <br>
-&gt; I just compiled qemu-system-ppc using the the meson-poc-next branch wi=
-th:<br>
-&gt; git clone -b meson-poc-next <a href=3D"http://www.github.com/bonzini/q=
-emu" rel=3D"noreferrer" target=3D"_blank">http://www.github.com/bonzini/qem=
-u</a><br>
-&gt; qemu-mesonbuild-next<br>
-<br>
-I notice you refer to github while Paolo mentioned gitlab in the<br>
-cover:<br>
-<br>
-&quot;This is available from <a href=3D"https://gitlab.com/bonzini/qemu.git=
-" rel=3D"noreferrer" target=3D"_blank">https://gitlab.com/bonzini/qemu.git<=
-/a> branch&quot;<br>
-<br>
-I am not sure he maintains both sync, can you retest using the gitlab<br>
-branch?<br>
-<br></blockquote><div>Hi Philippe,</div><div><br></div><div>I have the same=
- issue when building from the gitlab repo just minutes ago:</div>qemu-syste=
-m-ppc-meson-gitlab: Display &#39;sdl&#39; is not available.</div><div class=
-=3D"gmail_quote"><div class=3D"gmail_quote">qemu-system-ppc-meson-gitlab: D=
-isplay &#39;gtk&#39; is not available.</div><div><br></div><div>Best,</div>=
-<div>Howard<br></div><div><br></div></div></div>
-
---0000000000003ce38105acb0f50f--
+> Thanks,
+> Li Qiang
+> 
+> 
+> > previously allocated by thread T0 here:
+> >     #0 0x55db78cac562 in calloc (build/i386-softmmu/qemu-system-i386+0x250e562)
+> >     #1 0x7fc5d7f20548 in g_malloc0 (/usr/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x54548)
+> >     #2 0x55db79f8837d in xhci_doorbell_write hw/usb/hcd-xhci.c:3162:13
+> >     #3 0x55db792c6b8e in memory_region_write_accessor softmmu/memory.c:483:5
+> >     #4 0x55db792c658b in access_with_adjusted_size softmmu/memory.c:544:18
+> >     #5 0x55db792c5d9b in memory_region_dispatch_write softmmu/memory.c
+> >     #6 0x55db78d094d2 in flatview_write_continue exec.c:3176:23
+> >     #7 0x55db78cfee6b in flatview_write exec.c:3216:14
+> >     #8 0x55db78cfee6b in address_space_write exec.c:3308:18
+> >     #9 0x55db793072a9 in qtest_process_command softmmu/qtest.c:452:13
+> >     #10 0x55db79304087 in qtest_process_inbuf softmmu/qtest.c:710:9
+> >     #11 0x55db7a7d7293 in fd_chr_read chardev/char-fd.c:68:9
+> >     #12 0x7fc5d7f1a897 in g_main_context_dispatch
+> >
+> > -Alex
+> >
+> > ** Affects: qemu
+> >      Importance: Undecided
+> >          Status: New
+> >
+> > --
+> > You received this bug notification because you are a member of qemu-
+> > devel-ml, which is subscribed to QEMU.
+> > https://bugs.launchpad.net/bugs/1891354
+> >
+> > Title:
+> >   Heap-use-after-free in usb_packet_unmap
+> >
+> > Status in QEMU:
+> >   New
+> >
+> > Bug description:
+> >   Hello,
+> >   Reproducer:
+> >
+> >   cat << EOF | ./i386-softmmu/qemu-system-i386 -device nec-usb-xhci \
+> >   -trace usb\* -device usb-audio -device usb-storage,drive=mydrive \
+> >   -drive id=mydrive,file=null-co://,size=2M,format=raw,if=none \
+> >   -nodefaults -nographic -qtest stdio
+> >   outl 0xcf8 0x80001010
+> >   outl 0xcfc 0xc0202
+> >   outl 0xcf8 0x80001004
+> >   outl 0xcfc 0x1c77695e
+> >   writel 0xc0040 0xffffd855
+> >   writeq 0xc2000 0xff05140100000000
+> >   write 0x1d 0x1 0x27
+> >   write 0x2d 0x1 0x2e
+> >   write 0x17232 0x1 0x03
+> >   write 0x17254 0x1 0x05
+> >   write 0x17276 0x1 0x72
+> >   write 0x17278 0x1 0x02
+> >   write 0x3d 0x1 0x27
+> >   write 0x40 0x1 0x2e
+> >   write 0x41 0x1 0x72
+> >   write 0x42 0x1 0x01
+> >   write 0x4d 0x1 0x2e
+> >   write 0x4f 0x1 0x01
+> >   write 0x2007c 0x1 0xc7
+> >   writeq 0xc2000 0x5c05140100000000
+> >   write 0x20070 0x1 0x80
+> >   write 0x20078 0x1 0x08
+> >   write 0x2007c 0x1 0xfe
+> >   write 0x2007d 0x1 0x08
+> >   write 0x20081 0x1 0xff
+> >   write 0x20082 0x1 0x0b
+> >   write 0x20089 0x1 0x8c
+> >   write 0x2008d 0x1 0x04
+> >   write 0x2009d 0x1 0x10
+> >   writeq 0xc2000 0x2505ef019e092f00
+> >   EOF
+> >
+> >   20091==ERROR: AddressSanitizer: heap-use-after-free on address 0x611000045030 at pc 0x55db79edeef2 bp 0x7ffc4020b2b0 sp 0x7ffc4020b2a8
+> >   READ of size 4 at 0x611000045030 thread T0
+> >       #0 0x55db79edeef1 in usb_packet_unmap hw/usb/libhw.c:64:28
+> >       #1 0x55db79ede66f in usb_packet_map hw/usb/libhw.c:54:5
+> >       #2 0x55db79f6d5f1 in xhci_setup_packet hw/usb/hcd-xhci.c:1618:5
+> >       #3 0x55db79f67143 in xhci_fire_ctl_transfer hw/usb/hcd-xhci.c:1722:9
+> >       #4 0x55db79f67143 in xhci_kick_epctx hw/usb/hcd-xhci.c:1991:13
+> >       #5 0x55db79f8837d in xhci_doorbell_write hw/usb/hcd-xhci.c:3162:13
+> >       #6 0x55db792c6b8e in memory_region_write_accessor softmmu/memory.c:483:5
+> >       #7 0x55db792c658b in access_with_adjusted_size softmmu/memory.c:544:18
+> >       #8 0x55db792c5d9b in memory_region_dispatch_write softmmu/memory.c
+> >       #9 0x55db78d094d2 in flatview_write_continue exec.c:3176:23
+> >       #10 0x55db78cfee6b in flatview_write exec.c:3216:14
+> >       #11 0x55db78cfee6b in address_space_write exec.c:3308:18
+> >       #12 0x55db793072a9 in qtest_process_command softmmu/qtest.c:452:13
+> >       #13 0x55db79304087 in qtest_process_inbuf softmmu/qtest.c:710:9
+> >       #14 0x55db7a7d7293 in fd_chr_read chardev/char-fd.c:68:9
+> >       #15 0x7fc5d7f1a897 in g_main_context_dispatch
+> >       #16 0x55db7aa571b3 in glib_pollfds_poll util/main-loop.c:217:9
+> >       #17 0x55db7aa571b3 in os_host_main_loop_wait util/main-loop.c:240:5
+> >       #18 0x55db7aa571b3 in main_loop_wait util/main-loop.c:516:11
+> >       #19 0x55db79315008 in qemu_main_loop softmmu/vl.c:1676:9
+> >       #20 0x55db7a8860fd in main softmmu/main.c:49:5
+> >
+> >   0x611000045030 is located 48 bytes inside of 256-byte region [0x611000045000,0x611000045100)
+> >   freed by thread T0 here:
+> >       #0 0x55db78cac16d in free (build/i386-softmmu/qemu-system-i386+0x250e16d)
+> >       #1 0x55db79f7c0e8 in xhci_ep_nuke_xfers hw/usb/hcd-xhci.c:1252:9
+> >       #2 0x55db79f7b454 in xhci_disable_ep hw/usb/hcd-xhci.c:1279:5
+> >       #3 0x55db79f79af7 in xhci_disable_slot hw/usb/hcd-xhci.c:2048:13
+> >       #4 0x55db79f5aea3 in xhci_reset hw/usb/hcd-xhci.c:2706:9
+> >       #5 0x55db79f82f49 in xhci_oper_write hw/usb/hcd-xhci.c:2966:13
+> >       #6 0x55db792c6b8e in memory_region_write_accessor softmmu/memory.c:483:5
+> >       #7 0x55db792c658b in access_with_adjusted_size softmmu/memory.c:544:18
+> >       #8 0x55db792c5d9b in memory_region_dispatch_write softmmu/memory.c
+> >       #9 0x55db78d094d2 in flatview_write_continue exec.c:3176:23
+> >       #10 0x55db78cfee6b in flatview_write exec.c:3216:14
+> >       #11 0x55db78cfee6b in address_space_write exec.c:3308:18
+> >       #12 0x55db78d01fe7 in address_space_unmap exec.c:3634:9
+> >       #13 0x55db79edebbb in dma_memory_unmap include/sysemu/dma.h:145:5
+> >       #14 0x55db79edebbb in usb_packet_unmap hw/usb/libhw.c:65:9
+> >       #15 0x55db79ede66f in usb_packet_map hw/usb/libhw.c:54:5
+> >       #16 0x55db79f6d5f1 in xhci_setup_packet hw/usb/hcd-xhci.c:1618:5
+> >       #17 0x55db79f67143 in xhci_fire_ctl_transfer hw/usb/hcd-xhci.c:1722:9
+> >       #18 0x55db79f67143 in xhci_kick_epctx hw/usb/hcd-xhci.c:1991:13
+> >       #19 0x55db79f8837d in xhci_doorbell_write hw/usb/hcd-xhci.c:3162:13
+> >       #20 0x55db792c6b8e in memory_region_write_accessor softmmu/memory.c:483:5
+> >       #21 0x55db792c658b in access_with_adjusted_size softmmu/memory.c:544:18
+> >       #22 0x55db792c5d9b in memory_region_dispatch_write softmmu/memory.c
+> >       #23 0x55db78d094d2 in flatview_write_continue exec.c:3176:23
+> >       #24 0x55db78cfee6b in flatview_write exec.c:3216:14
+> >       #25 0x55db78cfee6b in address_space_write exec.c:3308:18
+> >       #26 0x55db793072a9 in qtest_process_command softmmu/qtest.c:452:13
+> >       #27 0x55db79304087 in qtest_process_inbuf softmmu/qtest.c:710:9
+> >       #28 0x55db7a7d7293 in fd_chr_read chardev/char-fd.c:68:9
+> >       #29 0x7fc5d7f1a897 in g_main_context_dispatch
+> >
+> >   previously allocated by thread T0 here:
+> >       #0 0x55db78cac562 in calloc (build/i386-softmmu/qemu-system-i386+0x250e562)
+> >       #1 0x7fc5d7f20548 in g_malloc0 (/usr/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x54548)
+> >       #2 0x55db79f8837d in xhci_doorbell_write hw/usb/hcd-xhci.c:3162:13
+> >       #3 0x55db792c6b8e in memory_region_write_accessor softmmu/memory.c:483:5
+> >       #4 0x55db792c658b in access_with_adjusted_size softmmu/memory.c:544:18
+> >       #5 0x55db792c5d9b in memory_region_dispatch_write softmmu/memory.c
+> >       #6 0x55db78d094d2 in flatview_write_continue exec.c:3176:23
+> >       #7 0x55db78cfee6b in flatview_write exec.c:3216:14
+> >       #8 0x55db78cfee6b in address_space_write exec.c:3308:18
+> >       #9 0x55db793072a9 in qtest_process_command softmmu/qtest.c:452:13
+> >       #10 0x55db79304087 in qtest_process_inbuf softmmu/qtest.c:710:9
+> >       #11 0x55db7a7d7293 in fd_chr_read chardev/char-fd.c:68:9
+> >       #12 0x7fc5d7f1a897 in g_main_context_dispatch
+> >
+> >   -Alex
+> >
+> > To manage notifications about this bug go to:
+> > https://bugs.launchpad.net/qemu/+bug/1891354/+subscriptions
+> >
+> 
 
