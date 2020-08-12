@@ -2,78 +2,80 @@ Return-Path: <SRS0=vd3Y=BW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C11E5C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 06:44:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0841C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 06:45:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9545F20768
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 06:44:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9545F20768
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 8516E206B2
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 06:45:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8516E206B2
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49072 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52826 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5kUS-0007dH-TP
-	for qemu-devel@archiver.kernel.org; Wed, 12 Aug 2020 02:44:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59272)
+	id 1k5kWA-0000oS-SC
+	for qemu-devel@archiver.kernel.org; Wed, 12 Aug 2020 02:45:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59864)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <clg@kaod.org>)
- id 1k5kSm-0006Qu-LH; Wed, 12 Aug 2020 02:42:16 -0400
-Received: from smtpout1.mo529.mail-out.ovh.net ([178.32.125.2]:39495)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <clg@kaod.org>)
- id 1k5kSk-0002Sd-J8; Wed, 12 Aug 2020 02:42:16 -0400
-Received: from mxplan5.mail.ovh.net (unknown [10.109.143.236])
- by mo529.mail-out.ovh.net (Postfix) with ESMTPS id 1CDAA4FA6873;
- Wed, 12 Aug 2020 08:42:03 +0200 (CEST)
-Received: from kaod.org (37.59.142.96) by DAG4EX1.mxp5.local (172.16.2.31)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1979.3; Wed, 12 Aug
- 2020 08:42:02 +0200
-Authentication-Results: garm.ovh; auth=pass
- (GARM-96R0015b8a04de-afec-4df0-9db0-025b39c4e6d3,
- 80543648EB1ACD187FE9A0A2CDDB60F737496A55) smtp.auth=clg@kaod.org
-Subject: Re: [PATCH] arm: aspeed: add strap define `25HZ` of AST2500
-To: Igor Kononenko <i.kononenko@yadro.com>
-References: <20200811203502.20382-1-i.kononenko@yadro.com>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <ec4502e4-942c-4e05-5f76-c300fbd39b63@kaod.org>
-Date: Wed, 12 Aug 2020 08:42:02 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k5kVS-0000Hj-EP
+ for qemu-devel@nongnu.org; Wed, 12 Aug 2020 02:45:02 -0400
+Received: from indium.canonical.com ([91.189.90.7]:48264)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k5kVQ-0002nX-7Y
+ for qemu-devel@nongnu.org; Wed, 12 Aug 2020 02:45:02 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1k5kVO-0003NM-Nz
+ for <qemu-devel@nongnu.org>; Wed, 12 Aug 2020 06:44:58 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id A7C2B2E8074
+ for <qemu-devel@nongnu.org>; Wed, 12 Aug 2020 06:44:58 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20200811203502.20382-1-i.kononenko@yadro.com>
 Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [37.59.142.96]
-X-ClientProxiedBy: DAG4EX1.mxp5.local (172.16.2.31) To DAG4EX1.mxp5.local
- (172.16.2.31)
-X-Ovh-Tracer-GUID: 40e1f6a9-4958-48f8-a6f9-6bbb784699ee
-X-Ovh-Tracer-Id: 10320561499784448806
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedrledugdduuddvucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfhisehtkeertddtfeejnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepjeekudeuudevleegudeugeekleffveeludejteffiedvledvgfekueefudehheefnecukfhppedtrddtrddtrddtpdefjedrheelrddugedvrdelieenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehmgihplhgrnhehrdhmrghilhdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepihdrkhhonhhonhgvnhhkoheshigrughrohdrtghomh
-Received-SPF: pass client-ip=178.32.125.2; envelope-from=clg@kaod.org;
- helo=smtpout1.mo529.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/12 02:42:04
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 12 Aug 2020 06:32:55 -0000
+From: Thomas Huth <1366363@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Triaged; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: highcheng pandan th-huth
+X-Launchpad-Bug-Reporter: Winston Wu (highcheng)
+X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
+References: <20140906165232.5566.76013.malonedeb@wampee.canonical.com>
+Message-Id: <159721397622.5421.16268476536811340780.launchpad@soybean.canonical.com>
+Subject: [Bug 1366363] Re: qemu-git gravis ultrasound not working
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="6a138c03da9cc3e2e03f6dd3bbb4a615b0be6ec2";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 5569a8ec3678320fdb6487b88aef91cccd942969
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/12 02:20:55
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -82,36 +84,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jeffery <andrew@aj.id.au>, Peter Maydell <peter.maydell@linaro.org>,
- "open list:ASPEED BMCs" <qemu-arm@nongnu.org>, Joel Stanley <joel@jms.id.au>,
- "open list:All patches CC here" <qemu-devel@nongnu.org>
+Reply-To: Bug 1366363 <1366363@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/11/20 10:35 PM, Igor Kononenko wrote:
-> Provide a definition for the "25Hz reference clock input mode" strap
-> 
-> Signed-off-by: Igor Kononenko <i.kononenko@yadro.com>
+** Changed in: qemu
+       Status: Incomplete =3D> Triaged
 
-Reviewed-by: Cédric Le Goater <clg@kaod.org>
+-- =
 
-> ---
->  include/hw/misc/aspeed_scu.h | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/include/hw/misc/aspeed_scu.h b/include/hw/misc/aspeed_scu.h
-> index a6739bb846..9cd530afa2 100644
-> --- a/include/hw/misc/aspeed_scu.h
-> +++ b/include/hw/misc/aspeed_scu.h
-> @@ -286,6 +286,7 @@ uint32_t aspeed_scu_get_apb_freq(AspeedSCUState *s);
->  #define SCU_AST2500_HW_STRAP_ESPI_FLASH_ENABLE     (0x1 << 26)
->  #define SCU_AST2500_HW_STRAP_ESPI_ENABLE           (0x1 << 25)
->  #define SCU_AST2500_HW_STRAP_DDR4_ENABLE           (0x1 << 24)
-> +#define SCU_AST2500_HW_STRAP_25HZ_CLOCK_MODE       (0x1 << 23)
->  
->  #define SCU_AST2500_HW_STRAP_ACPI_ENABLE           (0x1 << 19)
->  #define SCU_AST2500_HW_STRAP_USBCKI_FREQ           (0x1 << 18)
-> 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1366363
 
+Title:
+  qemu-git gravis ultrasound not working
+
+Status in QEMU:
+  Triaged
+
+Bug description:
+  Qemu git 2.1.50 with dos622 and windows 3.11.
+
+  Parameter:
+
+  For build: default-configs/sound.mak CONFIG_GUS=3Dy
+
+  Starting parameter: qemu-system-i386 -cpu 486 -m 32M -vga cirrus -hda
+  disk1.img -soundhw gus,pcspk -parallel none -net nic,model=3Dne2k_isa
+  -net user
+
+  The installer of GUS driver 4.11 does not recognize the card. And
+  conscan tells me that ioport 220-240 and not safe for synth base. It
+  seems that there is a port conflict.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1366363/+subscriptions
 
