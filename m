@@ -7,40 +7,40 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87D5BC433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 13:44:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 804C4C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 13:45:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 618FC207F7
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 13:44:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 618FC207F7
+	by mail.kernel.org (Postfix) with ESMTPS id 4EDF5206B2
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 13:45:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4EDF5206B2
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54384 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58662 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5r3O-0002E7-JM
-	for qemu-devel@archiver.kernel.org; Wed, 12 Aug 2020 09:44:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52952)
+	id 1k5r4c-0003wt-L9
+	for qemu-devel@archiver.kernel.org; Wed, 12 Aug 2020 09:45:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53076)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhaolichang@huawei.com>)
- id 1k5noF-0007n5-1E; Wed, 12 Aug 2020 06:16:40 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:58420 helo=huawei.com)
+ id 1k5noS-0007yR-5q; Wed, 12 Aug 2020 06:16:52 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:44036 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhaolichang@huawei.com>)
- id 1k5noC-0002yq-Kq; Wed, 12 Aug 2020 06:16:38 -0400
-Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id BF4864855CED54BD9A35;
- Wed, 12 Aug 2020 18:16:33 +0800 (CST)
-Received: from localhost (10.174.187.253) by DGGEMS401-HUB.china.huawei.com
- (10.3.19.201) with Microsoft SMTP Server id 14.3.487.0; Wed, 12 Aug 2020
- 18:16:24 +0800
+ id 1k5noP-00031Q-Ni; Wed, 12 Aug 2020 06:16:51 -0400
+Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id 38C6F53817313C88D668;
+ Wed, 12 Aug 2020 18:16:46 +0800 (CST)
+Received: from localhost (10.174.187.253) by DGGEMS402-HUB.china.huawei.com
+ (10.3.19.202) with Microsoft SMTP Server id 14.3.487.0; Wed, 12 Aug 2020
+ 18:16:38 +0800
 From: zhaolichang <zhaolichang@huawei.com>
 To: <qemu-trivial@nongnu.org>
-Subject: [PATCH RFC 01/10] qemu/: fix some comment spelling errors
-Date: Wed, 12 Aug 2020 18:14:51 +0800
-Message-ID: <20200812101500.2066-2-zhaolichang@huawei.com>
+Subject: [PATCH RFC 02/10] migration/: fix some comment spelling errors
+Date: Wed, 12 Aug 2020 18:14:52 +0800
+Message-ID: <20200812101500.2066-3-zhaolichang@huawei.com>
 X-Mailer: git-send-email 2.26.2.windows.1
 In-Reply-To: <20200812101500.2066-1-zhaolichang@huawei.com>
 References: <20200812101500.2066-1-zhaolichang@huawei.com>
@@ -49,9 +49,9 @@ Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-Originating-IP: [10.174.187.253]
 X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.35;
+Received-SPF: pass client-ip=45.249.212.32;
  envelope-from=zhaolichang@huawei.com; helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/12 06:15:29
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/12 06:16:46
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
 X-Spam_score_int: -41
 X-Spam_score: -4.2
@@ -79,194 +79,214 @@ Sender: "Qemu-devel"
 
 I found that there are many spelling errors in the comments of qemu,
 so I used the spellcheck tool to check the spelling errors
-and finally found some spelling errors in the folder.
+and finally found some spelling errors in the migration folder.
 
 Signed-off-by: zhaolichang <zhaolichang@huawei.com>
 ---
- Changelog                   | 2 +-
- accel/tcg/user-exec.c       | 2 +-
- audio/audio.c               | 2 +-
- block.c                     | 2 +-
- configure                   | 2 +-
- fsdev/virtfs-proxy-helper.c | 2 +-
- gdbstub.c                   | 2 +-
- hmp-commands.hx             | 2 +-
- libdecnumber/decNumber.c    | 2 +-
- qemu-img.c                  | 2 +-
- qobject/qdict.c             | 2 +-
- rules.mak                   | 2 +-
- scsi/pr-manager-helper.c    | 2 +-
- 13 files changed, 13 insertions(+), 13 deletions(-)
+ migration/colo-failover.c |  2 +-
+ migration/colo.c          |  2 +-
+ migration/multifd.c       |  4 ++--
+ migration/postcopy-ram.c  |  4 ++--
+ migration/postcopy-ram.h  |  2 +-
+ migration/ram.c           | 10 +++++-----
+ migration/rdma.c          |  8 ++++----
+ migration/savevm.c        |  4 ++--
+ 8 files changed, 18 insertions(+), 18 deletions(-)
 
-diff --git a/Changelog b/Changelog
-index 4a90bb9..f7e178c 100644
---- a/Changelog
-+++ b/Changelog
-@@ -241,7 +241,7 @@ version 0.8.0:
- version 0.7.2:
- 
-   - x86_64 fixes (Win2000 and Linux 2.6 boot in 32 bit)
--  - merge self modifying code handling in dirty ram page mecanism.
-+  - merge self modifying code handling in dirty ram page mechanism.
-   - MIPS fixes (Ralf Baechle)
-   - better user net performances
- 
-diff --git a/accel/tcg/user-exec.c b/accel/tcg/user-exec.c
-index d8b027f..d1b3073 100644
---- a/accel/tcg/user-exec.c
-+++ b/accel/tcg/user-exec.c
-@@ -88,7 +88,7 @@ static inline int handle_cpu_signal(uintptr_t pc, siginfo_t *info,
-          * use that value directly.  Within cpu_restore_state_from_tb, we
-          * assume PC comes from GETPC(), as used by the helper functions,
-          * so we adjust the address by -GETPC_ADJ to form an address that
--         * is within the call insn, so that the address does not accidentially
-+         * is within the call insn, so that the address does not accidentally
-          * match the beginning of the next guest insn.  However, when the
-          * pc comes from the signal frame it points to the actual faulting
-          * host memory insn and not the return from a call insn.
-diff --git a/audio/audio.c b/audio/audio.c
-index ce8c6de..1a68cfa 100644
---- a/audio/audio.c
-+++ b/audio/audio.c
-@@ -1674,7 +1674,7 @@ static AudioState *audio_init(Audiodev *dev, const char *name)
-         head = audio_handle_legacy_opts();
-         /*
-          * In case of legacy initialization, all Audiodevs in the list will have
--         * the same configuration (except the driver), so it does't matter which
-+         * the same configuration (except the driver), so it doesn't matter which
-          * one we chose.  We need an Audiodev to set up AudioState before we can
-          * init a driver.  Also note that dev at this point is still in the
-          * list.
-diff --git a/block.c b/block.c
-index d9ac0e0..ba03eaf 100644
---- a/block.c
-+++ b/block.c
-@@ -2602,7 +2602,7 @@ static void bdrv_replace_child_noperm(BdrvChild *child,
- 
- /*
-  * Updates @child to change its reference to point to @new_bs, including
-- * checking and applying the necessary permisson updates both to the old node
-+ * checking and applying the necessary permission updates both to the old node
-  * and to @new_bs.
-  *
-  * NULL is passed as @new_bs for removing the reference before freeing @child.
-diff --git a/configure b/configure
-index 2acc4d1..e34ef0c 100644
---- a/configure
-+++ b/configure
-@@ -3592,7 +3592,7 @@ EOF
-     xfs="yes"
-   else
-     if test "$xfs" = "yes" ; then
--      feature_not_found "xfs" "Instal xfsprogs/xfslibs devel"
-+      feature_not_found "xfs" "Install xfsprogs/xfslibs devel"
-     fi
-     xfs=no
-   fi
-diff --git a/fsdev/virtfs-proxy-helper.c b/fsdev/virtfs-proxy-helper.c
-index de061a8..15c0e79 100644
---- a/fsdev/virtfs-proxy-helper.c
-+++ b/fsdev/virtfs-proxy-helper.c
-@@ -518,7 +518,7 @@ static void statfs_to_prstatfs(ProxyStatFS *pr_stfs, struct statfs *stfs)
- 
- /*
-  * Gets stat/statfs information and packs in out_iovec structure
-- * on success returns number of bytes packed in out_iovec struture
-+ * on success returns number of bytes packed in out_iovec structure
-  * otherwise returns -errno
-  */
- static int do_stat(int type, struct iovec *iovec, struct iovec *out_iovec)
-diff --git a/gdbstub.c b/gdbstub.c
-index f3a318c..bbe66b5 100644
---- a/gdbstub.c
-+++ b/gdbstub.c
-@@ -698,7 +698,7 @@ static uint32_t gdb_get_cpu_pid(CPUState *cpu)
+diff --git a/migration/colo-failover.c b/migration/colo-failover.c
+index e9ca0b4..b717edc 100644
+--- a/migration/colo-failover.c
++++ b/migration/colo-failover.c
+@@ -46,7 +46,7 @@ void failover_request_active(Error **errp)
  {
-     /* TODO: In user mode, we should use the task state PID */
-     if (cpu->cluster_index == UNASSIGNED_CLUSTER_INDEX) {
--        /* Return the default process' PID */
-+        /* Return the default process's PID */
-         int index = gdbserver_state.process_num - 1;
-         return gdbserver_state.processes[index].pid;
+    if (failover_set_state(FAILOVER_STATUS_NONE,
+         FAILOVER_STATUS_REQUIRE) != FAILOVER_STATUS_NONE) {
+-        error_setg(errp, "COLO failover is already actived");
++        error_setg(errp, "COLO failover is already activated");
+         return;
      }
-diff --git a/hmp-commands.hx b/hmp-commands.hx
-index 60f395c..27c4bbe 100644
---- a/hmp-commands.hx
-+++ b/hmp-commands.hx
-@@ -1267,7 +1267,7 @@ ERST
-     },
- SRST
- ``drive_backup``
--  Start a point-in-time copy of a block device to a specificed target.
-+  Start a point-in-time copy of a block device to a specified target.
- ERST
- 
-     {
-diff --git a/libdecnumber/decNumber.c b/libdecnumber/decNumber.c
-index 8c19702..1ffe458 100644
---- a/libdecnumber/decNumber.c
-+++ b/libdecnumber/decNumber.c
-@@ -5626,7 +5626,7 @@ static const uShort LNnn[90] = {
- /*    would certainly save at least one if it were made ten times     */
- /*    bigger, too (for truncated fractions 0.100 through 0.999).      */
- /*    However, for most practical evaluations, at least four or five  */
--/*    iterations will be neede -- so this would only speed up by      */
-+/*    iterations will be needed -- so this would only speed up by      */
- /*    20-25% and that probably does not justify increasing the table  */
- /*    size.							      */
- /*								      */
-diff --git a/qemu-img.c b/qemu-img.c
-index 5308773..26369b8 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -1187,7 +1187,7 @@ static int64_t find_nonzero(const uint8_t *buf, int64_t n)
-  * 'pnum' is set to the number of sectors (including and immediately following
-  * the first one) that are known to be in the same allocated/unallocated state.
-  * The function will try to align the end offset to alignment boundaries so
-- * that the request will at least end aligned and consequtive requests will
-+ * that the request will at least end aligned and consecutive requests will
-  * also start at an aligned offset.
-  */
- static int is_allocated_sectors(const uint8_t *buf, int n, int *pnum,
-diff --git a/qobject/qdict.c b/qobject/qdict.c
-index 526de54..1079bd3 100644
---- a/qobject/qdict.c
-+++ b/qobject/qdict.c
-@@ -33,7 +33,7 @@ QDict *qdict_new(void)
- }
- 
- /**
-- * tdb_hash(): based on the hash agorithm from gdbm, via tdb
-+ * tdb_hash(): based on the hash algorithm from gdbm, via tdb
-  * (from module-init-tools)
-  */
- static unsigned int tdb_hash(const char *name)
-diff --git a/rules.mak b/rules.mak
-index 694865b..07f0b4f 100644
---- a/rules.mak
-+++ b/rules.mak
-@@ -51,7 +51,7 @@ undefined-symbols = $(call find-symbols,$1,awk '$$2=="U"{print $$1}')
- # linking executables that will load them. So we can look up symbol reference
- # in LINK.
- #
--# This is necessary because the exectuable itself may not use the function, in
-+# This is necessary because the executable itself may not use the function, in
- # which case the function would not be linked in. Then the DSO loading will
- # fail because of the missing symbol.
- process-archive-undefs = $(filter-out %.a %.mo,$1) \
-diff --git a/scsi/pr-manager-helper.c b/scsi/pr-manager-helper.c
-index 5acccfb..c16aae4 100644
---- a/scsi/pr-manager-helper.c
-+++ b/scsi/pr-manager-helper.c
-@@ -126,7 +126,7 @@ static int pr_manager_helper_initialize(PRManagerHelper *pr_mgr,
-     qio_channel_set_delay(QIO_CHANNEL(sioc), false);
-     pr_mgr->ioc = QIO_CHANNEL(sioc);
- 
--    /* A simple feature negotation protocol, even though there is
-+    /* A simple feature negotiation protocol, even though there is
-      * no optional feature right now.
+     failover_bh = qemu_bh_new(colo_failover_bh, NULL);
+diff --git a/migration/colo.c b/migration/colo.c
+index ea7d1e9..80788d4 100644
+--- a/migration/colo.c
++++ b/migration/colo.c
+@@ -632,7 +632,7 @@ out:
+     /*
+      * It is safe to unregister notifier after failover finished.
+      * Besides, colo_delay_timer and colo_checkpoint_sem can't be
+-     * released befor unregister notifier, or there will be use-after-free
++     * released before unregister notifier, or there will be use-after-free
+      * error.
       */
-     r = pr_manager_helper_read(pr_mgr, &flags, sizeof(flags), errp);
+     colo_compare_unregister_notifier(&packets_compare_notifier);
+diff --git a/migration/multifd.c b/migration/multifd.c
+index d044120..b4a3ca2 100644
+--- a/migration/multifd.c
++++ b/migration/multifd.c
+@@ -731,7 +731,7 @@ static void multifd_new_send_channel_async(QIOTask *task, gpointer opaque)
+         qemu_sem_post(&p->sem_sync);
+         /*
+          * Although multifd_send_thread is not created, but main migration
+-         * thread neet to judge whether it is running, so we need to mark
++         * thread need to judge whether it is running, so we need to mark
+          * its status.
+          */
+         p->quit = true;
+@@ -1042,7 +1042,7 @@ bool multifd_recv_all_channels_created(void)
+ 
+ /*
+  * Try to receive all multifd channels to get ready for the migration.
+- * - Return true and do not set @errp when correctly receving all channels;
++ * - Return true and do not set @errp when correctly receiving all channels;
+  * - Return false and do not set @errp when correctly receiving the current one;
+  * - Return false and set @errp when failing to receive the current channel.
+  */
+diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+index 1bb22f2..baf094b 100644
+--- a/migration/postcopy-ram.c
++++ b/migration/postcopy-ram.c
+@@ -237,7 +237,7 @@ release_ufd:
+  * request_ufd_features: this function should be called only once on a newly
+  * opened ufd, subsequent calls will lead to error.
+  *
+- * Returns: true on succes
++ * Returns: true on success
+  *
+  * @ufd: fd obtained from userfaultfd syscall
+  * @features: bit mask see UFFD_API_FEATURES
+@@ -807,7 +807,7 @@ static void mark_postcopy_blocktime_end(uintptr_t addr)
+ 
+     low_time_offset = get_low_time_offset(dc);
+     /* lookup cpu, to clear it,
+-     * that algorithm looks straighforward, but it's not
++     * that algorithm looks straightforward, but it's not
+      * optimal, more optimal algorithm is keeping tree or hash
+      * where key is address value is a list of  */
+     for (i = 0; i < smp_cpus; i++) {
+diff --git a/migration/postcopy-ram.h b/migration/postcopy-ram.h
+index 9941feb..6d2b3cf 100644
+--- a/migration/postcopy-ram.h
++++ b/migration/postcopy-ram.h
+@@ -161,7 +161,7 @@ struct PostCopyFD {
+  */
+ void postcopy_register_shared_ufd(struct PostCopyFD *pcfd);
+ void postcopy_unregister_shared_ufd(struct PostCopyFD *pcfd);
+-/* Call each of the shared 'waker's registerd telling them of
++/* Call each of the shared 'waker's registered telling them of
+  * availability of a block.
+  */
+ int postcopy_notify_shared_wake(RAMBlock *rb, uint64_t offset);
+diff --git a/migration/ram.c b/migration/ram.c
+index 76d4fee..c5f36ae 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -256,7 +256,7 @@ int64_t ramblock_recv_bitmap_send(QEMUFile *file,
+     /*
+      * Always use little endian when sending the bitmap. This is
+      * required that when source and destination VMs are not using the
+-     * same endianess. (Note: big endian won't work.)
++     * same endianness. (Note: big endian won't work.)
+      */
+     bitmap_to_le(le_bitmap, block->receivedmap, nbits);
+ 
+@@ -275,7 +275,7 @@ int64_t ramblock_recv_bitmap_send(QEMUFile *file,
+     qemu_put_buffer(file, (const uint8_t *)le_bitmap, size);
+     /*
+      * Mark as an end, in case the middle part is screwed up due to
+-     * some "misterious" reason.
++     * some "mysterious" reason.
+      */
+     qemu_put_be64(file, RAMBLOCK_RECV_BITMAP_ENDING);
+     qemu_fflush(file);
+@@ -718,7 +718,7 @@ static int save_xbzrle_page(RAMState *rs, uint8_t **current_data,
+     /*
+      * Reaching here means the page has hit the xbzrle cache, no matter what
+      * encoding result it is (normal encoding, overflow or skipping the page),
+-     * count the page as encoded. This is used to caculate the encoding rate.
++     * count the page as encoded. This is used to calculate the encoding rate.
+      *
+      * Example: 2 pages (8KB) being encoded, first page encoding generates 2KB,
+      * 2nd page turns out to be skipped (i.e. no new bytes written to the
+@@ -3705,7 +3705,7 @@ int ram_dirty_bitmap_reload(MigrationState *s, RAMBlock *block)
+ 
+     /*
+      * Note: see comments in ramblock_recv_bitmap_send() on why we
+-     * need the endianess convertion, and the paddings.
++     * need the endianness conversion, and the paddings.
+      */
+     local_size = ROUND_UP(local_size, 8);
+ 
+@@ -3743,7 +3743,7 @@ int ram_dirty_bitmap_reload(MigrationState *s, RAMBlock *block)
+     }
+ 
+     /*
+-     * Endianess convertion. We are during postcopy (though paused).
++     * Endianness conversion. We are during postcopy (though paused).
+      * The dirty bitmap won't change. We can directly modify it.
+      */
+     bitmap_from_le(block->bmap, le_bitmap, nbits);
+diff --git a/migration/rdma.c b/migration/rdma.c
+index bea6532..c399c86 100644
+--- a/migration/rdma.c
++++ b/migration/rdma.c
+@@ -1510,7 +1510,7 @@ static int qemu_rdma_wait_comp_channel(RDMAContext *rdma)
+     } else {
+         /* This is the source side, we're in a separate thread
+          * or destination prior to migration_fd_process_incoming()
+-         * after postcopy, the destination also in a seprate thread.
++         * after postcopy, the destination also in a separate thread.
+          * we can't yield; so we have to poll the fd.
+          * But we need to be able to handle 'cancel' or an error
+          * without hanging forever.
+@@ -2267,7 +2267,7 @@ static inline int qemu_rdma_buffer_mergable(RDMAContext *rdma,
+  *    chunk, then start a new chunk and flush() the old chunk.
+  * 3. To keep the hardware busy, we also group chunks into batches
+  *    and only require that a batch gets acknowledged in the completion
+- *    qeueue instead of each individual chunk.
++ *    queue instead of each individual chunk.
+  */
+ static int qemu_rdma_write(QEMUFile *f, RDMAContext *rdma,
+                            uint64_t block_offset, uint64_t offset,
+@@ -3149,7 +3149,7 @@ static size_t qemu_rdma_save_page(QEMUFile *f, void *opaque,
+     if (size > 0) {
+         /*
+          * Add this page to the current 'chunk'. If the chunk
+-         * is full, or the page doen't belong to the current chunk,
++         * is full, or the page doesn't belong to the current chunk,
+          * an actual RDMA write will occur and a new chunk will be formed.
+          */
+         ret = qemu_rdma_write(f, rdma, block_offset, offset, size);
+@@ -4102,7 +4102,7 @@ void rdma_start_outgoing_migration(void *opaque,
+         goto err;
+     }
+ 
+-    /* RDMA postcopy need a seprate queue pair for return path */
++    /* RDMA postcopy need a separate queue pair for return path */
+     if (migrate_postcopy()) {
+         rdma_return_path = qemu_rdma_data_init(host_port, errp);
+ 
+diff --git a/migration/savevm.c b/migration/savevm.c
+index a843d20..62a4f04 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -2795,7 +2795,7 @@ void qmp_xen_save_devices_state(const char *filename, bool has_live, bool live,
+ 
+     if (!has_live) {
+         /* live default to true so old version of Xen tool stack can have a
+-         * successfull live migration */
++         * successful live migration */
+         live = true;
+     }
+ 
+@@ -2818,7 +2818,7 @@ void qmp_xen_save_devices_state(const char *filename, bool has_live, bool live,
+          * "xen-save-devices-state" and in case of migration failure, libxl
+          * would call "cont".
+          * So call bdrv_inactivate_all (release locks) here to let the other
+-         * side of the migration take controle of the images.
++         * side of the migration take control of the images.
+          */
+         if (live && !saved_vm_running) {
+             ret = bdrv_inactivate_all();
 -- 
 2.26.2.windows.1
 
