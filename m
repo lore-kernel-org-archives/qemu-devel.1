@@ -7,43 +7,42 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60075C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 18:38:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 939C1C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 18:38:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E071B2078B
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 18:38:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E071B2078B
+	by mail.kernel.org (Postfix) with ESMTPS id 6F5D72078B
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 18:38:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F5D72078B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34856 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35302 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5veC-0001bC-RI
-	for qemu-devel@archiver.kernel.org; Wed, 12 Aug 2020 14:38:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46398)
+	id 1k5veH-0001lw-IL
+	for qemu-devel@archiver.kernel.org; Wed, 12 Aug 2020 14:38:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46356)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1k5vYq-0000Un-Do
- for qemu-devel@nongnu.org; Wed, 12 Aug 2020 14:33:16 -0400
-Received: from mx2.suse.de ([195.135.220.15]:40892)
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1k5vYk-0000Mr-JR
+ for qemu-devel@nongnu.org; Wed, 12 Aug 2020 14:33:10 -0400
+Received: from mx2.suse.de ([195.135.220.15]:40782)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1k5vYo-0002EM-O3
- for qemu-devel@nongnu.org; Wed, 12 Aug 2020 14:33:16 -0400
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1k5vYd-0002Du-J5
+ for qemu-devel@nongnu.org; Wed, 12 Aug 2020 14:33:10 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
- by mx2.suse.de (Postfix) with ESMTP id BC259AF99;
- Wed, 12 Aug 2020 18:33:23 +0000 (UTC)
+ by mx2.suse.de (Postfix) with ESMTP id 85603AF6D;
+ Wed, 12 Aug 2020 18:33:20 +0000 (UTC)
 From: Claudio Fontana <cfontana@suse.de>
 To: Paolo Bonzini <pbonzini@redhat.com>,
  =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
  Peter Maydell <peter.maydell@linaro.org>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  Roman Bolshakov <r.bolshakov@yadro.com>
-Subject: [PATCH v5 14/14] kvm: remove kvm specific functions from global
- includes
-Date: Wed, 12 Aug 2020 20:32:50 +0200
-Message-Id: <20200812183250.9221-15-cfontana@suse.de>
+Subject: [PATCH v5 09/14] cpus: cleanup now unneeded includes
+Date: Wed, 12 Aug 2020 20:32:45 +0200
+Message-Id: <20200812183250.9221-10-cfontana@suse.de>
 X-Mailer: git-send-email 2.16.4
 In-Reply-To: <20200812183250.9221-1-cfontana@suse.de>
 References: <20200812183250.9221-1-cfontana@suse.de>
@@ -82,92 +81,34 @@ Sender: "Qemu-devel"
 
 Signed-off-by: Claudio Fontana <cfontana@suse.de>
 ---
- accel/kvm/kvm-cpus.h   |  7 +++++++
- accel/stubs/kvm-stub.c | 22 ----------------------
- include/sysemu/kvm.h   |  7 -------
- 3 files changed, 7 insertions(+), 29 deletions(-)
+ softmmu/cpus.c | 7 -------
+ 1 file changed, 7 deletions(-)
 
-diff --git a/accel/kvm/kvm-cpus.h b/accel/kvm/kvm-cpus.h
-index 62fbc911d9..2060a878f0 100644
---- a/accel/kvm/kvm-cpus.h
-+++ b/accel/kvm/kvm-cpus.h
-@@ -14,4 +14,11 @@
- 
- extern CpusAccel kvm_cpus;
- 
-+int kvm_init_vcpu(CPUState *cpu);
-+int kvm_cpu_exec(CPUState *cpu);
-+void kvm_destroy_vcpu(CPUState *cpu);
-+void kvm_cpu_synchronize_post_reset(CPUState *cpu);
-+void kvm_cpu_synchronize_post_init(CPUState *cpu);
-+void kvm_cpu_synchronize_pre_loadvm(CPUState *cpu);
-+
- #endif /* KVM_CPUS_H */
-diff --git a/accel/stubs/kvm-stub.c b/accel/stubs/kvm-stub.c
-index 69f8a842da..680e099463 100644
---- a/accel/stubs/kvm-stub.c
-+++ b/accel/stubs/kvm-stub.c
-@@ -32,15 +32,6 @@ bool kvm_readonly_mem_allowed;
- bool kvm_ioeventfd_any_length_allowed;
- bool kvm_msi_use_devid;
- 
--void kvm_destroy_vcpu(CPUState *cpu)
--{
--}
--
--int kvm_init_vcpu(CPUState *cpu)
--{
--    return -ENOSYS;
--}
--
- void kvm_flush_coalesced_mmio_buffer(void)
- {
- }
-@@ -49,19 +40,6 @@ void kvm_cpu_synchronize_state(CPUState *cpu)
- {
- }
- 
--void kvm_cpu_synchronize_post_reset(CPUState *cpu)
--{
--}
--
--void kvm_cpu_synchronize_post_init(CPUState *cpu)
--{
--}
--
--int kvm_cpu_exec(CPUState *cpu)
--{
--    abort();
--}
--
- bool kvm_has_sync_mmu(void)
- {
-     return false;
-diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-index 7a5f973b6f..bb03e0c68b 100644
---- a/include/sysemu/kvm.h
-+++ b/include/sysemu/kvm.h
-@@ -216,10 +216,6 @@ int kvm_has_many_ioeventfds(void);
- int kvm_has_gsi_routing(void);
- int kvm_has_intx_set_mask(void);
- 
--int kvm_init_vcpu(CPUState *cpu);
--int kvm_cpu_exec(CPUState *cpu);
--void kvm_destroy_vcpu(CPUState *cpu);
--
- /**
-  * kvm_arm_supports_user_irq
-  *
-@@ -479,9 +475,6 @@ int kvm_physical_memory_addr_from_host(KVMState *s, void *ram_addr,
- #endif /* NEED_CPU_H */
- 
- void kvm_cpu_synchronize_state(CPUState *cpu);
--void kvm_cpu_synchronize_post_reset(CPUState *cpu);
--void kvm_cpu_synchronize_post_init(CPUState *cpu);
--void kvm_cpu_synchronize_pre_loadvm(CPUState *cpu);
- 
- void kvm_init_cpu_signals(CPUState *cpu);
- 
+diff --git a/softmmu/cpus.c b/softmmu/cpus.c
+index f99942fd9d..1125fb5fc9 100644
+--- a/softmmu/cpus.c
++++ b/softmmu/cpus.c
+@@ -29,20 +29,13 @@
+ #include "qapi/qapi-commands-misc.h"
+ #include "qapi/qapi-events-run-state.h"
+ #include "qapi/qmp/qerror.h"
+-#include "sysemu/tcg.h"
+ #include "exec/gdbstub.h"
+ #include "sysemu/hw_accel.h"
+-#include "sysemu/kvm.h"
+ #include "exec/exec-all.h"
+ #include "qemu/thread.h"
+ #include "qemu/plugin.h"
+ #include "sysemu/cpus.h"
+-#include "qemu/main-loop.h"
+-#include "qemu/option.h"
+-#include "qemu/bitmap.h"
+-#include "qemu/seqlock.h"
+ #include "qemu/guest-random.h"
+-#include "tcg/tcg.h"
+ #include "hw/nmi.h"
+ #include "sysemu/replay.h"
+ #include "sysemu/runstate.h"
 -- 
 2.16.4
 
