@@ -2,88 +2,89 @@ Return-Path: <SRS0=vd3Y=BW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-16.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B862C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 15:11:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D550C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 15:14:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5E96220781
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 15:11:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4853E20781
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 15:14:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="M945kNsQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E96220781
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QCi1hw2b"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4853E20781
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59004 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33432 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5sPm-0000hy-JQ
-	for qemu-devel@archiver.kernel.org; Wed, 12 Aug 2020 11:11:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49892)
+	id 1k5sSP-0001tt-Ih
+	for qemu-devel@archiver.kernel.org; Wed, 12 Aug 2020 11:14:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50632)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1k5sP0-0000GC-15
- for qemu-devel@nongnu.org; Wed, 12 Aug 2020 11:10:54 -0400
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:41825)
+ id 1k5sRr-0001Tf-DG
+ for qemu-devel@nongnu.org; Wed, 12 Aug 2020 11:13:51 -0400
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:40059)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1k5sOy-0000r5-AD
- for qemu-devel@nongnu.org; Wed, 12 Aug 2020 11:10:53 -0400
-Received: by mail-pf1-x441.google.com with SMTP id a79so1167994pfa.8
- for <qemu-devel@nongnu.org>; Wed, 12 Aug 2020 08:10:51 -0700 (PDT)
+ id 1k5sRp-0001Aq-JN
+ for qemu-devel@nongnu.org; Wed, 12 Aug 2020 11:13:51 -0400
+Received: by mail-pl1-x642.google.com with SMTP id u10so1238846plr.7
+ for <qemu-devel@nongnu.org>; Wed, 12 Aug 2020 08:13:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=ph3yn6NSHab5GEJht0sxVWjuqL19952d1xRJxAkl8V8=;
- b=M945kNsQyniAaUMS1ZHwaYkxrhBUCHL0Cl8yKBG1U/NM+jjzEqe89dpJBHxFHDiX67
- JSpbcmxd+c6VsBl78AKPqPK4GqCge0g21pjGlWoWF/b++bd84Cz/Hpx1fd9kE1zl4MAj
- V15HYdBPRp50i9F/M95/JmG3eLstX0H8ZhcFEAfVjleL3zYeKEKREaIujAPzy98IZD4n
- eQ1zuwl3yaO4/LiG9Dh2/VJe6PTIXLqJNzVF2QiqNkxO3ZpZtrAtuVCwA9xGSghIQ4Y+
- WnIhZvfRaJMClORT0JXmOYAxtFeGLANnib4Zl4gqQjRl796Ty7xw3rqWnnzK4BlrLgJE
- PGiw==
+ bh=18aOA1MNEE+Phk17HQBJnjlxX6VZcW+X0ASFM82g6e4=;
+ b=QCi1hw2bYQ2acKaMI8Gc7YwlUubguadvnrJSIR1ShM2dqrvdWE06rrcU5iuqqZVCAW
+ sdmN30eOBZ90OhXgs8m3WT2IelH+oP6vESfV7iNfOZjIhhQNOMlPdu7pNBhxCdw0Ftqg
+ iJMLF04OBiVVL7ZmzF4zP9KYFcUkNj31RelWDB+F5fhiiomDEMyXE7cianlYP6Cvbp6Q
+ MvJDjTl5ZsodkTsLeHRGj2UvxPEskL1oKWZ9BZE/xHFhg6Ha0BVuvt1saYftXsukGytG
+ LWROnE5CjjZ7vg22EF3bL2BY4YFoP7PHjyrY52Lo4i8J1aTgEk/biY+UPPv9yzsWBcvs
+ 5UsQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=ph3yn6NSHab5GEJht0sxVWjuqL19952d1xRJxAkl8V8=;
- b=J6gPjGR8ZpTdmmH6HAw+SPKoW8a356/FneMMPcaOq9lSQAW+nYRnqXkZRhW/gFBge+
- IPEkC6g097xO/1VwfC6aJVwb6s7/SX0drb8+FA9VKi01WVlN1BVfvE3RSZPjrO26iMQ2
- E2Yn1pfPEtk86XycwdrgHx1zT97dLpOtfweKnJv9NyqIVLPsUR4Yzks/8/5InAcWd29l
- 37Q4GxkILJ9RRfJ823eFUsIYYX6XvUrETv67RuAb6jeYdFZvJVXiZoVXIiS6H31Euk9X
- RUtad2YGwNdZCV70AOZfxRI6GGMKo24z6k61IVEGJbR1s0wxj0Fhmu9dtCb4yvfSpbAC
- fzJw==
-X-Gm-Message-State: AOAM531KhyVlk4LPNxcIVZ6sycfuGdV8Z5ODkt2supjK1iDIiNHad6vm
- gm9sqrhPqqrI+kzRrq8Ub3Zgjg==
-X-Google-Smtp-Source: ABdhPJw/pxQmeUUHnZGnJiBpIwIPRM6LZbL51oFTmTkOVU09a6RhjeHrWSV9QgyYzr2gLoRTpdj7+A==
-X-Received: by 2002:a65:6119:: with SMTP id z25mr5746737pgu.52.1597245050488; 
- Wed, 12 Aug 2020 08:10:50 -0700 (PDT)
+ bh=18aOA1MNEE+Phk17HQBJnjlxX6VZcW+X0ASFM82g6e4=;
+ b=hqWU3bWwygSOxdYScKV9mrHZTwbtE12lpqrVmllyrh0YWvYd7PHvgcO8MwuxFxCgwf
+ Z8l2wUaxZ7xy49PEe6sdYFUOyGj+aVgbOEF5ROSl2SKcBU29kk7mHnOAYfiSakuCtNyW
+ 9khN3526/tstuVyD//8muLBuaGQL3AImqCx/IoRgma+IBMT8TkuFpylzMXZ3ekTyXJmg
+ g8XjTz86V1d7AYVWqmFdSyY5TB1ikM/1CqQXaz3lHM/lOH4hyhsJcTpe/LUP2QJp3odf
+ Xjd3pT9jikkH/lFwRDZNDU8vTVhuHkRSk7yIu9ajc5PRn/qSJYAJcOhFlogtOgYyHeh9
+ ZgMw==
+X-Gm-Message-State: AOAM530aL/AqwjiY8bRsXDD1jlCFLcRVggwNw6wrnF0CNOakzLKQyIrL
+ KLusPMJ3JBamfvMceiqEi5LXpg==
+X-Google-Smtp-Source: ABdhPJxmhH/qjZUFwAI4GgAt+f9RaNw14SVRijb+d3e8gOkjMqfr13sZO5Tkx73NeycU27ggUVctdA==
+X-Received: by 2002:a17:90a:cf95:: with SMTP id
+ i21mr462257pju.135.1597245227874; 
+ Wed, 12 Aug 2020 08:13:47 -0700 (PDT)
 Received: from [192.168.1.11] ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id il13sm2652920pjb.0.2020.08.12.08.10.48
+ by smtp.gmail.com with ESMTPSA id t25sm2760712pfe.51.2020.08.12.08.13.46
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 12 Aug 2020 08:10:49 -0700 (PDT)
-Subject: Re: [PATCH 1/2] target/arm: Add cpu property to control pauth
-To: Andrew Jones <drjones@redhat.com>
+ Wed, 12 Aug 2020 08:13:47 -0700 (PDT)
+Subject: Re: [PATCH 2/2] target/arm: Implement an IMPDEF pauth algorithm
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 References: <20200812065339.2030527-1-richard.henderson@linaro.org>
- <20200812065339.2030527-2-richard.henderson@linaro.org>
- <20200812110049.ghtvl7dmtspkfdor@kamzik.brq.redhat.com>
+ <20200812065339.2030527-3-richard.henderson@linaro.org>
+ <87k0y419dm.fsf@linaro.org>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <2219f3f9-7894-f898-0cad-43eccaa2a70d@linaro.org>
-Date: Wed, 12 Aug 2020 08:10:47 -0700
+Message-ID: <cae494be-5077-4f31-fccb-892b0e7a7770@linaro.org>
+Date: Wed, 12 Aug 2020 08:13:45 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200812110049.ghtvl7dmtspkfdor@kamzik.brq.redhat.com>
+In-Reply-To: <87k0y419dm.fsf@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::441;
- envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x441.google.com
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::642;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x642.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -105,56 +106,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mark.rutland@arm.com, peter.maydell@linaro.org, alex.bennee@linaro.org,
- qemu-devel@nongnu.org
+Cc: mark.rutland@arm.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/12/20 4:00 AM, Andrew Jones wrote:
-> On Tue, Aug 11, 2020 at 11:53:38PM -0700, Richard Henderson wrote:
->> The crypto overhead of emulating pauth can be significant for
->> some workloads.  Add an enumeration property that allows the
->> feature to be turned off, on with the architected algorithm,
->> or on with an implementation defined algorithm.
+On 8/12/20 2:49 AM, Alex Bennée wrote:
+> 
+> Richard Henderson <richard.henderson@linaro.org> writes:
+> 
+>> Without hardware acceleration, a cryptographically strong
+>> algorithm is too expensive for pauth_computepac.
 >>
->> The architected algorithm is quite expensive to emulate;
->> using another algorithm may allow hardware acceleration.
+>> Even with hardware accel, we are not currently expecting
+>> to link the linux-user binaries to any crypto libraries,
+>> and doing so would generally make the --static build fail.
+>>
+>> So choose XXH64 as a reasonably quick and decent hash.
 >>
 >> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 >> ---
->>  target/arm/cpu64.c | 64 ++++++++++++++++++++++++++++++++++++++++++++++
->>  1 file changed, 64 insertions(+)
+>>  target/arm/pauth_helper.c | 75 ++++++++++++++++++++++++++++++++++++---
+>>  1 file changed, 70 insertions(+), 5 deletions(-)
 >>
->> diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
->> index dd696183df..3181d0e2f8 100644
->> --- a/target/arm/cpu64.c
->> +++ b/target/arm/cpu64.c
->> @@ -572,6 +572,69 @@ void aarch64_add_sve_properties(Object *obj)
->>      }
+>> diff --git a/target/arm/pauth_helper.c b/target/arm/pauth_helper.c
+>> index 6dbab03768..f1a4389465 100644
+>> --- a/target/arm/pauth_helper.c
+>> +++ b/target/arm/pauth_helper.c
+>> @@ -207,8 +207,8 @@ static uint64_t tweak_inv_shuffle(uint64_t i)
+>>      return o;
 >>  }
 >>  
->> +static const char * const pauth_names[] = {
->> +    "off", "impdef", "arch"
->> +};
+>> -static uint64_t pauth_computepac(uint64_t data, uint64_t modifier,
+>> -                                 ARMPACKey key)
+>> +static uint64_t __attribute__((noinline))
+>> +pauth_computepac_architected(uint64_t data, uint64_t modifier, ARMPACKey key)
+>>  {
+>>      static const uint64_t RC[5] = {
+>>          0x0000000000000000ull,
+>> @@ -272,6 +272,71 @@ static uint64_t pauth_computepac(uint64_t data, uint64_t modifier,
+>>      return workingval;
+>>  }
+>>  
+>> +/*
+>> + * The XXH64 algorithm from
+>> + * https://github.com/Cyan4973/xxHash/blob/v0.8.0/xxhash.h
+>> + */
+>> +#define PRIME64_1   0x9E3779B185EBCA87ULL
+>> +#define PRIME64_2   0xC2B2AE3D27D4EB4FULL
+>> +#define PRIME64_3   0x165667B19E3779F9ULL
+>> +#define PRIME64_4   0x85EBCA77C2B2AE63ULL
+>> +#define PRIME64_5   0x27D4EB2F165667C5ULL
+>> +
+>> +static inline uint64_t XXH64_round(uint64_t acc, uint64_t input)
+>> +{
+>> +    return rol64(acc + input * PRIME64_2, 31) * PRIME64_1;
+>> +}
+>> +
+>> +static inline uint64_t XXH64_mergeround(uint64_t acc, uint64_t val)
+>> +{
+>> +    return (acc ^ XXH64_round(0, val)) * PRIME64_1 + PRIME64_4;
+>> +}
+>> +
+>> +static inline uint64_t XXH64_avalanche(uint64_t h64)
+>> +{
+>> +    h64 ^= h64 >> 33;
+>> +    h64 *= PRIME64_2;
+>> +    h64 ^= h64 >> 29;
+>> +    h64 *= PRIME64_3;
+>> +    /* h64 ^= h64 >> 32; -- does not affect high 64 for pauth */
+>> +    return h64;
+>> +}
+>> +
+>> +static uint64_t __attribute__((noinline))
+>> +pauth_computepac_impdef(uint64_t data, uint64_t modifier, ARMPACKey key)
+>> +{
+>> +    uint64_t v1 = 1 + PRIME64_1 + PRIME64_2;
+>> +    uint64_t v2 = 1 + PRIME64_2;
+>> +    uint64_t v3 = 1 + 0;
+>> +    uint64_t v4 = 1 - PRIME64_1;
+>> +    uint64_t h64;
+>> +
+>> +    v1 = XXH64_round(v1, data);
+>> +    v2 = XXH64_round(v2, modifier);
+>> +    v3 = XXH64_round(v3, key.lo);
+>> +    v4 = XXH64_round(v4, key.hi);
+>> +
+>> +    h64 = rol64(v1, 1) + rol64(v2, 7) + rol64(v3, 12) + rol64(v4, 18);
+>> +    h64 = XXH64_mergeround(h64, v1);
+>> +    h64 = XXH64_mergeround(h64, v2);
+>> +    h64 = XXH64_mergeround(h64, v3);
+>> +    h64 = XXH64_mergeround(h64, v4);
+>> +
+>> +    return XXH64_avalanche(h64);
+>> +}
 > 
-> Hi Richard,
-> 
-> Please add three boolean properties, rather than one enum:
-> 
-> pauth:            enable support of the pauth feature
-> pauth-fast:       enable QEMU's fast non-cryptographic hash for pauth
->                   (pauth must be enabled)
-> pauth-arch:       enable the architected algorithm for pauth
->                   (pauth must be enabled)
-> 
-> These booleans can then be added to the cpu feature probing list used by
-> qmp_query_cpu_model_expansion()
+> You might find it easier to #include "qemu/xxhash.h" which we use for tb
+> hashing amongst other things.  
 
-Why are 3 booleans better than one enum?
-
-I'd forgotten about qmp_query_cpu_model_expansion(); can it not take anything
-but booleans?
+First, that's the 32-bit version, XXH32.
+Second, we define xxhash7 there; we would need xxhash8 here.
 
 
 r~
