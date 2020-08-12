@@ -2,70 +2,93 @@ Return-Path: <SRS0=vd3Y=BW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,DATE_IN_PAST_96_XX,
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A23F1C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 12:44:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FF2DC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 12:44:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 69E572080C
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 12:44:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 183852080C
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 12:44:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="csLEt7qd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69E572080C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hddHoqa+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 183852080C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49024 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51356 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5q6s-0004qL-K1
-	for qemu-devel@archiver.kernel.org; Wed, 12 Aug 2020 08:44:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34494)
+	id 1k5q7N-0005oR-DF
+	for qemu-devel@archiver.kernel.org; Wed, 12 Aug 2020 08:44:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34278)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <2149675b195f2d9a1a4e3b966d45aba234def69b@lizzy.crudebyte.com>)
- id 1k5q5l-0003dd-2r
- for qemu-devel@nongnu.org; Wed, 12 Aug 2020 08:42:53 -0400
-Received: from lizzy.crudebyte.com ([91.194.90.13]:56371)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <2149675b195f2d9a1a4e3b966d45aba234def69b@lizzy.crudebyte.com>)
- id 1k5q5j-0005LK-3Z
- for qemu-devel@nongnu.org; Wed, 12 Aug 2020 08:42:52 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=crudebyte.com; s=lizzy; h=Cc:To:Subject:Date:From:References:In-Reply-To:
- Message-Id:Content-Type:Content-Transfer-Encoding:MIME-Version:Content-ID:
- Content-Description; bh=unQfnj6mpPoLDVHn4tXX/N0gZw0MtjfRUKRtvJv8mDw=; b=csLEt
- 7qdw3ERfh9ujByDILLeJdsoCFwAmf6NAaYUbkhj5Jip3DIv5zm3sgkC1EUleCemVV5WH8xk4bG4F3
- +G1xr56XnQUs2R4iEPe9/Tcmpm8AEwj2+AijnM+iUOPyHotaq7oLGlKys9ciFY/3KHN9j1NRWyGmz
- I+qS6zXTFWlVG7ke/uKftk6wTCt/vaUEsmxVaRE+WvNrPVqXB57oqWjo+Ym8is9AgUidtBtiWyplf
- 84PWigJuGmwbyslE8SzF5YkkoYy4wRZmD0lCK9aeI2078YVffsbNVYxJ9N9UHzNmXi+rBKwasF+d7
- JUO7sp3oj5MQY4J1vky2k8Lb2egPQ==;
-Message-Id: <2149675b195f2d9a1a4e3b966d45aba234def69b.1597226797.git.qemu_oss@crudebyte.com>
-In-Reply-To: <cover.1597226797.git.qemu_oss@crudebyte.com>
-References: <cover.1597226797.git.qemu_oss@crudebyte.com>
-From: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Date: Wed, 29 Jul 2020 10:12:33 +0200
-Subject: [PULL 4/7] 9pfs: add new function v9fs_co_readdir_many()
-To: qemu-devel@nongnu.org,
-    Peter Maydell <peter.maydell@linaro.org>
-Cc: Greg Kurz <groug@kaod.org>
-Received-SPF: none client-ip=91.194.90.13;
- envelope-from=2149675b195f2d9a1a4e3b966d45aba234def69b@lizzy.crudebyte.com;
- helo=lizzy.crudebyte.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/12 08:16:56
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: 13
-X-Spam_score: 1.3
-X-Spam_bar: +
-X-Spam_report: (1.3 / 5.0 requ) BAYES_00=-1.9, DATE_IN_PAST_96_XX=3.405,
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1k5q4v-00021b-QF
+ for qemu-devel@nongnu.org; Wed, 12 Aug 2020 08:42:01 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52436
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1k5q4r-0005Mt-VM
+ for qemu-devel@nongnu.org; Wed, 12 Aug 2020 08:42:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1597236116;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=SLcDcsZ3wRT78IqeZRBvSe3SK+fiWRDFcpLbPralw5U=;
+ b=hddHoqa+0nI379TNQchC05ajLNFuofuKjg45hPxc2kDQzeKneGBF8DcPkZ5yegeNBlh/qi
+ 5ZLOnN844i9ycu4JXlAYdKLeEonF2yY71lu3obbHGJ8/jANexFVmuN3m26WKSvuVKypFxO
+ rPdiLRJGRSJdnG8ZxCOpaO4sNYurkbo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-283-prUl_djuMDWTTUV5WMH6UA-1; Wed, 12 Aug 2020 08:41:52 -0400
+X-MC-Unique: prUl_djuMDWTTUV5WMH6UA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B821918551A9;
+ Wed, 12 Aug 2020 12:41:51 +0000 (UTC)
+Received: from [10.36.113.93] (ovpn-113-93.ams2.redhat.com [10.36.113.93])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 36E5B5D9D7;
+ Wed, 12 Aug 2020 12:41:50 +0000 (UTC)
+Subject: Re: [PATCH v2 5/5] hw/arm/virt: Implement kvm-steal-time
+To: Andrew Jones <drjones@redhat.com>, qemu-devel@nongnu.org,
+ qemu-arm@nongnu.org
+References: <20200805091640.11134-1-drjones@redhat.com>
+ <20200805091640.11134-6-drjones@redhat.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <89849f50-c0f3-6d3a-46c8-245257384df2@redhat.com>
+Date: Wed, 12 Aug 2020 14:41:48 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
+MIME-Version: 1.0
+In-Reply-To: <20200805091640.11134-6-drjones@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eric.auger@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.120;
+ envelope-from=eric.auger@redhat.com; helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/12 06:16:38
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001,
- URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -78,270 +101,554 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The newly added function v9fs_co_readdir_many() retrieves multiple
-directory entries with a single fs driver request. It is intended to
-replace uses of v9fs_co_readdir(), the latter only retrieves a
-single directory entry per fs driver request instead.
+Drew,
 
-The reason for this planned replacement is that for every fs driver
-request the coroutine is dispatched from main I/O thread to a
-background I/O thread and eventually dispatched back to main I/O
-thread. Hopping between threads adds latency. So if a 9pfs Treaddir
-request reads a large amount of directory entries, this currently
-sums up to huge latencies of several hundred ms or even more. So
-using v9fs_co_readdir_many() instead of v9fs_co_readdir() will
-provide significant performance improvements.
+On 8/5/20 11:16 AM, Andrew Jones wrote:
+> We add the kvm-steal-time CPU property and implement it for machvirt.
+> A tiny bit of refactoring was also done to allow pmu and pvtime to
+> use the same vcpu device helper functions.
+> 
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
+> ---
+>  docs/system/arm/cpu-features.rst | 11 +++++
+>  hw/arm/virt.c                    | 43 ++++++++++++++++--
+>  include/hw/arm/virt.h            |  5 +++
+>  target/arm/cpu.c                 | 10 +++++
+>  target/arm/cpu.h                 |  4 ++
+>  target/arm/kvm.c                 | 20 +++++++++
+>  target/arm/kvm32.c               |  5 +++
+>  target/arm/kvm64.c               | 77 +++++++++++++++++++++++++++++---
+>  target/arm/kvm_arm.h             | 30 +++++++++++++
+>  target/arm/monitor.c             |  2 +-
+>  tests/qtest/arm-cpu-features.c   | 25 +++++++++--
+>  11 files changed, 219 insertions(+), 13 deletions(-)
+> 
+> diff --git a/docs/system/arm/cpu-features.rst b/docs/system/arm/cpu-features.rst
+> index 2d5c06cd016b..35196a6b759d 100644
+> --- a/docs/system/arm/cpu-features.rst
+> +++ b/docs/system/arm/cpu-features.rst
+> @@ -200,6 +200,17 @@ the list of KVM VCPU features and their descriptions.
+>                             adjustment, also restoring the legacy (pre-5.0)
+>                             behavior.
+>  
+> +  kvm-steal-time           Since v5.2, kvm-steal-time is enabled by
+> +                           default when KVM is enabled, the feature is
+> +                           supported, and the guest is 64-bit.
+> +
+> +                           When kvm-steal-time is enabled a 64-bit guest
+> +                           can account for time its CPUs were not running
+> +                           due to the host not scheduling the corresponding
+> +                           VCPU threads.  The accounting statistics may
+> +                           influence the guest scheduler behavior and/or be
+> +                           exposed to the guest userspace.
+> +
+>  SVE CPU Properties
+>  ==================
+>  
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index 6797eb397a7a..12efc2f095cb 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -151,6 +151,7 @@ static const MemMapEntry base_memmap[] = {
+>      [VIRT_PCDIMM_ACPI] =        { 0x09070000, MEMORY_HOTPLUG_IO_LEN },
+>      [VIRT_ACPI_GED] =           { 0x09080000, ACPI_GED_EVT_SEL_LEN },
+>      [VIRT_NVDIMM_ACPI] =        { 0x09090000, NVDIMM_ACPI_IO_LEN},
+> +    [VIRT_PVTIME] =             { 0x090a0000, 0x00010000 },
+>      [VIRT_MMIO] =               { 0x0a000000, 0x00000200 },
+>      /* ...repeating for a total of NUM_VIRTIO_TRANSPORTS, each of that size */
+>      [VIRT_PLATFORM_BUS] =       { 0x0c000000, 0x02000000 },
+> @@ -1666,15 +1667,39 @@ static void finalize_gic_version(VirtMachineState *vms)
+>   * virt_cpu_post_init() must be called after the CPUs have
+>   * been realized and the GIC has been created.
+>   */
+> -static void virt_cpu_post_init(VirtMachineState *vms)
+> +static void virt_cpu_post_init(VirtMachineState *vms, int max_cpus,
+> +                               MemoryRegion *sysmem)
+>  {
+> -    bool aarch64, pmu;
+> +    bool aarch64, pmu, steal_time;
+>      CPUState *cpu;
+>  
+>      aarch64 = object_property_get_bool(OBJECT(first_cpu), "aarch64", NULL);
+>      pmu = object_property_get_bool(OBJECT(first_cpu), "pmu", NULL);
+> +    steal_time = object_property_get_bool(OBJECT(first_cpu),
+> +                                          "kvm-steal-time", NULL);
+>  
+>      if (kvm_enabled()) {> +        hwaddr pvtime_reg_base = vms->memmap[VIRT_PVTIME].base;
+> +        hwaddr pvtime_reg_size = vms->memmap[VIRT_PVTIME].size;
+> +
+> +        if (steal_time) {
+> +            MemoryRegion *pvtime = g_new(MemoryRegion, 1);
+> +            hwaddr pvtime_size = max_cpus * PVTIME_SIZE_PER_CPU;
+> +
+> +            /* The memory region size must be a multiple of host page size. */
+> +            pvtime_size = REAL_HOST_PAGE_ALIGN(pvtime_size);
+> +
+> +            if (pvtime_size > pvtime_reg_size) {
+> +                error_report("pvtime requires a %ld byte memory region for "
+> +                             "%d CPUs, but only %ld has been reserved",
+> +                             pvtime_size, max_cpus, pvtime_reg_size);
+> +                exit(1);
+> +            }
+> +
+> +            memory_region_init_ram(pvtime, NULL, "pvtime", pvtime_size, NULL);
+> +            memory_region_add_subregion(sysmem, pvtime_reg_base, pvtime);
+> +        }
+> +
+>          CPU_FOREACH(cpu) {
+>              if (pmu) {
+>                  assert(arm_feature(&ARM_CPU(cpu)->env, ARM_FEATURE_PMU));
+> @@ -1683,6 +1708,10 @@ static void virt_cpu_post_init(VirtMachineState *vms)
+>                  }
+>                  kvm_arm_pmu_init(cpu);
+>              }
+> +            if (steal_time) {
+> +                kvm_arm_pvtime_init(cpu, pvtime_reg_base +
+> +                                         cpu->cpu_index * PVTIME_SIZE_PER_CPU);
+> +            }
+>          }
+>      } else {
+>          if (aarch64 && vms->highmem) {
+> @@ -1853,6 +1882,11 @@ static void machvirt_init(MachineState *machine)
+>              object_property_set_bool(cpuobj, "kvm-no-adjvtime", true, NULL);
+>          }
+>  
+> +        if (vmc->no_kvm_steal_time &&
+> +            object_property_find(cpuobj, "kvm-steal-time", NULL)) {
+> +            object_property_set_bool(cpuobj, "kvm-steal-time", false, NULL);
+> +        }
+> +
+>          if (vmc->no_pmu && object_property_find(cpuobj, "pmu", NULL)) {
+>              object_property_set_bool(cpuobj, "pmu", false, NULL);
+>          }
+> @@ -1924,7 +1958,7 @@ static void machvirt_init(MachineState *machine)
+>  
+>      create_gic(vms);
+>  
+> -    virt_cpu_post_init(vms);
+> +    virt_cpu_post_init(vms, possible_cpus->len, sysmem);
+>  
+>      fdt_add_pmu_nodes(vms);
+>  
+> @@ -2566,8 +2600,11 @@ DEFINE_VIRT_MACHINE_AS_LATEST(5, 2)
+>  
+>  static void virt_machine_5_1_options(MachineClass *mc)
+>  {
+> +    VirtMachineClass *vmc = VIRT_MACHINE_CLASS(OBJECT_CLASS(mc));
+> +
+>      virt_machine_5_2_options(mc);
+>      compat_props_add(mc->compat_props, hw_compat_5_1, hw_compat_5_1_len);
+> +    vmc->no_kvm_steal_time = true;
+>  }
+>  DEFINE_VIRT_MACHINE(5, 1)
+>  
+> diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
+> index dff67e1bef03..5fb43a009f7a 100644
+> --- a/include/hw/arm/virt.h
+> +++ b/include/hw/arm/virt.h
+> @@ -53,6 +53,9 @@
+>  
+>  #define PPI(irq) ((irq) + 16)
+>  
+> +/* See Linux kernel arch/arm64/include/asm/pvclock-abi.h */
+> +#define PVTIME_SIZE_PER_CPU 64
+> +
+>  enum {
+>      VIRT_FLASH,
+>      VIRT_MEM,
+> @@ -80,6 +83,7 @@ enum {
+>      VIRT_PCDIMM_ACPI,
+>      VIRT_ACPI_GED,
+>      VIRT_NVDIMM_ACPI,
+> +    VIRT_PVTIME,
+>      VIRT_LOWMEMMAP_LAST,
+>  };
+>  
+> @@ -126,6 +130,7 @@ typedef struct {
+>      bool no_ged;   /* Machines < 4.2 has no support for ACPI GED device */
+>      bool kvm_no_adjvtime;
+>      bool acpi_expose_flash;
+> +    bool no_kvm_steal_time;
+>  } VirtMachineClass;
+>  
+>  typedef struct {
+> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+> index 111579554fb9..866d0a9fb146 100644
+> --- a/target/arm/cpu.c
+> +++ b/target/arm/cpu.c
+> @@ -1308,6 +1308,16 @@ void arm_cpu_finalize_features(ARMCPU *cpu, Error **errp)
+>              return;
+>          }
+>      }
+> +
+> +    if (kvm_enabled()) {
+> +#ifdef TARGET_AARCH64
+> +        kvm_arm_steal_time_finalize(cpu, &local_err);
+> +        if (local_err != NULL) {
+> +            error_propagate(errp, local_err);
+> +            return;
+> +        }
+> +#endif
+> +    }
+>  }
+>  
+>  static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
+> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> index 9e8ed423ea1d..a4d4cb640c77 100644
+> --- a/target/arm/cpu.h
+> +++ b/target/arm/cpu.h
+> @@ -24,6 +24,7 @@
+>  #include "hw/registerfields.h"
+>  #include "cpu-qom.h"
+>  #include "exec/cpu-defs.h"
+> +#include "qapi/qapi-types-common.h"
+>  
+>  /* ARM processors have a weak memory model */
+>  #define TCG_GUEST_DEFAULT_MO      (0)
+> @@ -859,6 +860,9 @@ struct ARMCPU {
+>      bool kvm_vtime_dirty;
+>      uint64_t kvm_vtime;
+>  
+> +    /* KVM steal time */
+> +    OnOffAuto kvm_steal_time;
+> +
+>      /* Uniprocessor system with MP extensions */
+>      bool mp_is_up;
+>  
+> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+> index 8bb7318378b5..093a290453f6 100644
+> --- a/target/arm/kvm.c
+> +++ b/target/arm/kvm.c
+> @@ -192,6 +192,18 @@ static void kvm_no_adjvtime_set(Object *obj, bool value, Error **errp)
+>      ARM_CPU(obj)->kvm_adjvtime = !value;
+>  }
+>  
+> +#ifdef TARGET_AARCH64
+> +static bool kvm_steal_time_get(Object *obj, Error **errp)
+> +{
+> +    return ARM_CPU(obj)->kvm_steal_time != ON_OFF_AUTO_OFF;
+> +}
+> +
+> +static void kvm_steal_time_set(Object *obj, bool value, Error **errp)
+> +{
+> +    ARM_CPU(obj)->kvm_steal_time = value ? ON_OFF_AUTO_ON : ON_OFF_AUTO_OFF;
+> +}
+> +#endif
+> +
+>  /* KVM VCPU properties should be prefixed with "kvm-". */
+>  void kvm_arm_add_vcpu_properties(Object *obj)
+>  {
+> @@ -207,6 +219,14 @@ void kvm_arm_add_vcpu_properties(Object *obj)
+>                                          "the virtual counter. VM stopped time "
+>                                          "will be counted.");
+>      }
+> +
+> +#ifdef TARGET_AARCH64
+> +    cpu->kvm_steal_time = ON_OFF_AUTO_AUTO;
+> +    object_property_add_bool(obj, "kvm-steal-time", kvm_steal_time_get,
+> +                             kvm_steal_time_set);
+> +    object_property_set_description(obj, "kvm-steal-time",
+> +                                    "Set off to disable KVM steal time.");
+> +#endif
+>  }
+>  
+>  bool kvm_arm_pmu_supported(void)
+> diff --git a/target/arm/kvm32.c b/target/arm/kvm32.c
+> index 0af46b41c847..d3f3195077fa 100644
+> --- a/target/arm/kvm32.c
+> +++ b/target/arm/kvm32.c
+> @@ -560,6 +560,11 @@ void kvm_arm_pmu_init(CPUState *cs)
+>      qemu_log_mask(LOG_UNIMP, "%s: not implemented\n", __func__);
+>  }
+>  
+> +void kvm_arm_pvtime_init(CPUState *cs, uint64_t ipa)
+> +{
+> +    qemu_log_mask(LOG_UNIMP, "%s: not implemented\n", __func__);
+> +}
+> +
+>  #define ARM_REG_DFSR  ARM_CP15_REG32(0, 5, 0, 0)
+>  #define ARM_REG_TTBCR ARM_CP15_REG32(0, 2, 0, 2)
+>  /*
+> diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+> index 116923790550..4de1eeb723ac 100644
+> --- a/target/arm/kvm64.c
+> +++ b/target/arm/kvm64.c
+> @@ -17,6 +17,7 @@
+>  #include <linux/kvm.h>
+>  
+>  #include "qemu-common.h"
+> +#include "qapi/error.h"
+>  #include "cpu.h"
+>  #include "qemu/timer.h"
+>  #include "qemu/error-report.h"
+> @@ -398,19 +399,20 @@ static CPUWatchpoint *find_hw_watchpoint(CPUState *cpu, target_ulong addr)
+>      return NULL;
+>  }
+>  
+> -static bool kvm_arm_pmu_set_attr(CPUState *cs, struct kvm_device_attr *attr)
+> +static bool kvm_arm_set_device_attr(CPUState *cs, struct kvm_device_attr *attr,
+> +                                    const char *name)
+>  {
+>      int err;
+>  
+>      err = kvm_vcpu_ioctl(cs, KVM_HAS_DEVICE_ATTR, attr);
+>      if (err != 0) {
+> -        error_report("PMU: KVM_HAS_DEVICE_ATTR: %s", strerror(-err));
+> +        error_report("%s: KVM_HAS_DEVICE_ATTR: %s", name, strerror(-err));
+>          return false;
+>      }
+>  
+>      err = kvm_vcpu_ioctl(cs, KVM_SET_DEVICE_ATTR, attr);
+>      if (err != 0) {
+> -        error_report("PMU: KVM_SET_DEVICE_ATTR: %s", strerror(-err));
+> +        error_report("%s: KVM_SET_DEVICE_ATTR: %s", name, strerror(-err));
+>          return false;
+>      }
+>  
+> @@ -427,7 +429,7 @@ void kvm_arm_pmu_init(CPUState *cs)
+>      if (!ARM_CPU(cs)->has_pmu) {
+>          return;
+>      }
+> -    if (!kvm_arm_pmu_set_attr(cs, &attr)) {
+> +    if (!kvm_arm_set_device_attr(cs, &attr, "PMU")) {
+>          error_report("failed to init PMU");
+>          abort();
+>      }
+> @@ -444,12 +446,29 @@ void kvm_arm_pmu_set_irq(CPUState *cs, int irq)
+>      if (!ARM_CPU(cs)->has_pmu) {
+>          return;
+>      }
+> -    if (!kvm_arm_pmu_set_attr(cs, &attr)) {
+> +    if (!kvm_arm_set_device_attr(cs, &attr, "PMU")) {
+>          error_report("failed to set irq for PMU");
+>          abort();
+>      }
+>  }
+>  
+> +void kvm_arm_pvtime_init(CPUState *cs, uint64_t ipa)
+> +{
+> +    struct kvm_device_attr attr = {
+> +        .group = KVM_ARM_VCPU_PVTIME_CTRL,
+> +        .attr = KVM_ARM_VCPU_PVTIME_IPA,
+> +        .addr = (uint64_t)&ipa,
+> +    };
+> +
+> +    if (ARM_CPU(cs)->kvm_steal_time == ON_OFF_AUTO_OFF) {
+> +        return;
+> +    }
+> +    if (!kvm_arm_set_device_attr(cs, &attr, "PVTIME IPA")) {
+> +        error_report("failed to init PVTIME IPA");
+> +        abort();
+> +    }
+> +}
+> +
+>  static int read_sys_reg32(int fd, uint32_t *pret, uint64_t id)
+>  {
+>      uint64_t ret;
+> @@ -652,6 +671,54 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
+>      return true;
+>  }
+>  
+> +void kvm_arm_steal_time_finalize(ARMCPU *cpu, Error **errp)
+> +{
+> +    static bool has_steal_time;
+> +    static bool probed;
+> +    int fdarray[3];
+> +
+> +    if (!probed) {
+> +        probed = true;
+> +        if (kvm_check_extension(kvm_state, KVM_CAP_VCPU_ATTRIBUTES)) {
+> +            if (!kvm_arm_create_scratch_host_vcpu(NULL, fdarray, NULL)) {
+> +                error_report("Failed to create scratch VCPU");
+> +                abort();
+> +            }
+> +
+> +            has_steal_time = kvm_device_check_attr(fdarray[2],
+> +                                                   KVM_ARM_VCPU_PVTIME_CTRL,
+> +                                                   KVM_ARM_VCPU_PVTIME_IPA);
+> +
+> +            kvm_arm_destroy_scratch_host_vcpu(fdarray);
+> +        }
+> +    }
+> +
+> +    if (cpu->kvm_steal_time == ON_OFF_AUTO_AUTO) {
+> +        if (!has_steal_time || !arm_feature(&cpu->env, ARM_FEATURE_AARCH64)) {
+> +            cpu->kvm_steal_time = ON_OFF_AUTO_OFF;
+> +        } else {
+> +            cpu->kvm_steal_time = ON_OFF_AUTO_ON;
+> +        }
+> +    } else if (cpu->kvm_steal_time == ON_OFF_AUTO_ON) {
+> +        if (!has_steal_time) {
+> +            error_setg(errp, "'kvm-steal-time' cannot be enabled "
+> +                             "on this host");
+> +            return;
+> +        } else if (!arm_feature(&cpu->env, ARM_FEATURE_AARCH64)) {
+> +            /*
+> +             * DEN0057A chapter 2 says "This specification only covers
+> +             * systems in which the Execution state of the hypervisor
+> +             * as well as EL1 of virtual machines is AArch64.". And,
+> +             * to ensure that, the smc/hvc calls are only specified as
+> +             * smc64/hvc64.
+> +             */
+> +            error_setg(errp, "'kvm-steal-time' cannot be enabled "
+> +                             "for AArch32 guests");
+> +            return;
+> +        }
+> +    }
+> +}
+> +
+>  bool kvm_arm_aarch32_supported(void)
+>  {
+>      return kvm_check_extension(kvm_state, KVM_CAP_ARM_EL1_32BIT);
+> diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
+> index 0da00eb6b20c..4a8969505967 100644
+> --- a/target/arm/kvm_arm.h
+> +++ b/target/arm/kvm_arm.h
+> @@ -267,6 +267,16 @@ void kvm_arm_set_cpu_features_from_host(ARMCPU *cpu);
+>   */
+>  void kvm_arm_add_vcpu_properties(Object *obj);
+>  
+> +/**
+> + * kvm_arm_steal_time_finalize:
+> + * @cpu: ARMCPU for which to finalize kvm-steal-time
+> + * @errp: Pointer to Error* for error propagation
+> + *
+> + * Validate the kvm-steal-time property selection and set its default
+> + * based on KVM support and guest configuration.
+> + */
+> +void kvm_arm_steal_time_finalize(ARMCPU *cpu, Error **errp);
+> +
+>  /**
+>   * kvm_arm_aarch32_supported:
+>   *
+> @@ -340,6 +350,16 @@ int kvm_arm_vgic_probe(void);
+>  
+>  void kvm_arm_pmu_set_irq(CPUState *cs, int irq);
+>  void kvm_arm_pmu_init(CPUState *cs);
+> +
+> +/**
+> + * kvm_arm_pvtime_init:
+> + * @cs: CPUState
+> + * @ipa: Per-vcpu guest physical base address of the pvtime structures
+> + *
+> + * Initializes PVTIME for the VCPU, setting the PVTIME IPA to @ipa.
+> + */
+> +void kvm_arm_pvtime_init(CPUState *cs, uint64_t ipa);
+> +
+>  int kvm_arm_set_irq(int cpu, int irqtype, int irq, int level);
+>  
+>  #else
+> @@ -393,6 +413,16 @@ static inline void kvm_arm_pmu_init(CPUState *cs)
+>      g_assert_not_reached();
+>  }
+>  
+> +static inline void kvm_arm_pvtime_init(CPUState *cs, uint64_t ipa)
+> +{
+> +    g_assert_not_reached();
+> +}
+> +
+> +static inline void kvm_arm_steal_time_finalize(ARMCPU *cpu, Error **errp)
+> +{
+> +    g_assert_not_reached();
+> +}
+> +
+>  static inline void kvm_arm_sve_get_vls(CPUState *cs, unsigned long *map)
+>  {
+>      g_assert_not_reached();
+> diff --git a/target/arm/monitor.c b/target/arm/monitor.c
+> index ba6e01abd037..bd3590604a71 100644
+> --- a/target/arm/monitor.c
+> +++ b/target/arm/monitor.c
+> @@ -103,7 +103,7 @@ static const char *cpu_model_advertised_features[] = {
+>      "sve128", "sve256", "sve384", "sve512",
+>      "sve640", "sve768", "sve896", "sve1024", "sve1152", "sve1280",
+>      "sve1408", "sve1536", "sve1664", "sve1792", "sve1920", "sve2048",
+> -    "kvm-no-adjvtime",
+> +    "kvm-no-adjvtime", "kvm-steal-time",
+>      NULL
+>  };
+>  
+> diff --git a/tests/qtest/arm-cpu-features.c b/tests/qtest/arm-cpu-features.c
+> index f7e062c1891e..91b181f38268 100644
+> --- a/tests/qtest/arm-cpu-features.c
+> +++ b/tests/qtest/arm-cpu-features.c
+> @@ -452,6 +452,7 @@ static void test_query_cpu_model_expansion(const void *data)
+>      assert_set_feature(qts, "max", "pmu", true);
+>  
+>      assert_has_not_feature(qts, "max", "kvm-no-adjvtime");
+> +    assert_has_not_feature(qts, "max", "kvm-steal-time");
+>  
+>      if (g_str_equal(qtest_get_arch(), "aarch64")) {
+>          assert_has_feature_enabled(qts, "max", "aarch64");
+> @@ -493,6 +494,7 @@ static void test_query_cpu_model_expansion_kvm(const void *data)
+>      assert_set_feature(qts, "host", "kvm-no-adjvtime", false);
+>  
+>      if (g_str_equal(qtest_get_arch(), "aarch64")) {
+> +        bool kvm_supports_steal_time;
+>          bool kvm_supports_sve;
+>          char max_name[8], name[8];
+>          uint32_t max_vq, vq;
+> @@ -500,6 +502,10 @@ static void test_query_cpu_model_expansion_kvm(const void *data)
+>          QDict *resp;
+>          char *error;
+>  
+> +        assert_error(qts, "cortex-a15",
+> +            "We cannot guarantee the CPU type 'cortex-a15' works "
+> +            "with KVM on this host", NULL);
+> +
+>          assert_has_feature_enabled(qts, "host", "aarch64");
+>  
+>          /* Enabling and disabling pmu should always work. */
+> @@ -507,16 +513,26 @@ static void test_query_cpu_model_expansion_kvm(const void *data)
+>          assert_set_feature(qts, "host", "pmu", false);
+>          assert_set_feature(qts, "host", "pmu", true);
+>  
+> -        assert_error(qts, "cortex-a15",
+> -            "We cannot guarantee the CPU type 'cortex-a15' works "
+> -            "with KVM on this host", NULL);
+> -
+> +        /*
+> +         * Some features would be enabled by default, but they're disabled
+> +         * because this instance of KVM doesn't support them. Test that the
+> +         * features are present, and, when enabled, issue further tests.
+> +         */
+> +        assert_has_feature(qts, "host", "kvm-steal-time");
+>          assert_has_feature(qts, "host", "sve");
+> +
+>          resp = do_query_no_props(qts, "host");
+> +        kvm_supports_steal_time = resp_get_feature(resp, "kvm-steal-time");
+>          kvm_supports_sve = resp_get_feature(resp, "sve");
+>          vls = resp_get_sve_vls(resp);
+>          qobject_unref(resp);
+>  
+> +        if (kvm_supports_steal_time) {
+> +            /* If we have steal-time then we should be able to toggle it. */
+> +            assert_set_feature(qts, "host", "kvm-steal-time", false);
+> +            assert_set_feature(qts, "host", "kvm-steal-time", true);
+> +        }
+> +
+>          if (kvm_supports_sve) {
+>              g_assert(vls != 0);
+>              max_vq = 64 - __builtin_clzll(vls);
+> @@ -577,6 +593,7 @@ static void test_query_cpu_model_expansion_kvm(const void *data)
+>          assert_has_not_feature(qts, "host", "aarch64");
+>          assert_has_not_feature(qts, "host", "pmu");
+>          assert_has_not_feature(qts, "host", "sve");
+> +        assert_has_not_feature(qts, "host", "kvm-steal-time");
+>      }
+>  
+>      qtest_quit(qts);
+> 
+This looks good to me
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Message-Id: <73dc827a12ef577ae7e644dcf34a5c0e443ab42f.1596012787.git.qemu_oss@crudebyte.com>
-Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
----
- hw/9pfs/9p.h    |  22 +++++++
- hw/9pfs/codir.c | 171 ++++++++++++++++++++++++++++++++++++++++++++++++
- hw/9pfs/coth.h  |   3 +
- 3 files changed, 196 insertions(+)
+Thanks
 
-diff --git a/hw/9pfs/9p.h b/hw/9pfs/9p.h
-index 561774e843..93b7030edf 100644
---- a/hw/9pfs/9p.h
-+++ b/hw/9pfs/9p.h
-@@ -215,6 +215,28 @@ static inline void v9fs_readdir_init(V9fsDir *dir)
-     qemu_co_mutex_init(&dir->readdir_mutex);
- }
- 
-+/**
-+ * Type for 9p fs drivers' (a.k.a. 9p backends) result of readdir requests,
-+ * which is a chained list of directory entries.
-+ */
-+typedef struct V9fsDirEnt {
-+    /* mandatory (must not be NULL) information for all readdir requests */
-+    struct dirent *dent;
-+    /*
-+     * optional (may be NULL): A full stat of each directory entry is just
-+     * done if explicitly told to fs driver.
-+     */
-+    struct stat *st;
-+    /*
-+     * instead of an array, directory entries are always returned as
-+     * chained list, that's because the amount of entries retrieved by fs
-+     * drivers is dependent on the individual entries' name (since response
-+     * messages are size limited), so the final amount cannot be estimated
-+     * before hand
-+     */
-+    struct V9fsDirEnt *next;
-+} V9fsDirEnt;
-+
- /*
-  * Filled by fs driver on open and other
-  * calls.
-diff --git a/hw/9pfs/codir.c b/hw/9pfs/codir.c
-index 24e1955ab2..1f70a58df5 100644
---- a/hw/9pfs/codir.c
-+++ b/hw/9pfs/codir.c
-@@ -39,6 +39,10 @@ static int do_readdir(V9fsPDU *pdu, V9fsFidState *fidp, struct dirent **dent)
-     return err;
- }
- 
-+/*
-+ * TODO: This will be removed for performance reasons.
-+ * Use v9fs_co_readdir_many() instead.
-+ */
- int coroutine_fn v9fs_co_readdir(V9fsPDU *pdu, V9fsFidState *fidp,
-                                  struct dirent **dent)
- {
-@@ -53,6 +57,173 @@ int coroutine_fn v9fs_co_readdir(V9fsPDU *pdu, V9fsFidState *fidp,
-     return err;
- }
- 
-+/*
-+ * This is solely executed on a background IO thread.
-+ *
-+ * See v9fs_co_readdir_many() (as its only user) below for details.
-+ */
-+static int do_readdir_many(V9fsPDU *pdu, V9fsFidState *fidp,
-+                           struct V9fsDirEnt **entries, off_t offset,
-+                           int32_t maxsize, bool dostat)
-+{
-+    V9fsState *s = pdu->s;
-+    V9fsString name;
-+    int len, err = 0;
-+    int32_t size = 0;
-+    off_t saved_dir_pos;
-+    struct dirent *dent;
-+    struct V9fsDirEnt *e = NULL;
-+    V9fsPath path;
-+    struct stat stbuf;
-+
-+    *entries = NULL;
-+    v9fs_path_init(&path);
-+
-+    /*
-+     * TODO: Here should be a warn_report_once() if lock failed.
-+     *
-+     * With a good 9p client we should not get into concurrency here,
-+     * because a good client would not use the same fid for concurrent
-+     * requests. We do the lock here for safety reasons though. However
-+     * the client would then suffer performance issues, so better log that
-+     * issue here.
-+     */
-+    v9fs_readdir_lock(&fidp->fs.dir);
-+
-+    /* seek directory to requested initial position */
-+    if (offset == 0) {
-+        s->ops->rewinddir(&s->ctx, &fidp->fs);
-+    } else {
-+        s->ops->seekdir(&s->ctx, &fidp->fs, offset);
-+    }
-+
-+    /* save the directory position */
-+    saved_dir_pos = s->ops->telldir(&s->ctx, &fidp->fs);
-+    if (saved_dir_pos < 0) {
-+        err = saved_dir_pos;
-+        goto out;
-+    }
-+
-+    while (true) {
-+        /* interrupt loop if request was cancelled by a Tflush request */
-+        if (v9fs_request_cancelled(pdu)) {
-+            err = -EINTR;
-+            break;
-+        }
-+
-+        /* get directory entry from fs driver */
-+        err = do_readdir(pdu, fidp, &dent);
-+        if (err || !dent) {
-+            break;
-+        }
-+
-+        /*
-+         * stop this loop as soon as it would exceed the allowed maximum
-+         * response message size for the directory entries collected so far,
-+         * because anything beyond that size would need to be discarded by
-+         * 9p controller (main thread / top half) anyway
-+         */
-+        v9fs_string_init(&name);
-+        v9fs_string_sprintf(&name, "%s", dent->d_name);
-+        len = v9fs_readdir_response_size(&name);
-+        v9fs_string_free(&name);
-+        if (size + len > maxsize) {
-+            /* this is not an error case actually */
-+            break;
-+        }
-+
-+        /* append next node to result chain */
-+        if (!e) {
-+            *entries = e = g_malloc0(sizeof(V9fsDirEnt));
-+        } else {
-+            e = e->next = g_malloc0(sizeof(V9fsDirEnt));
-+        }
-+        e->dent = g_malloc0(sizeof(struct dirent));
-+        memcpy(e->dent, dent, sizeof(struct dirent));
-+
-+        /* perform a full stat() for directory entry if requested by caller */
-+        if (dostat) {
-+            err = s->ops->name_to_path(
-+                &s->ctx, &fidp->path, dent->d_name, &path
-+            );
-+            if (err < 0) {
-+                err = -errno;
-+                break;
-+            }
-+
-+            err = s->ops->lstat(&s->ctx, &path, &stbuf);
-+            if (err < 0) {
-+                err = -errno;
-+                break;
-+            }
-+
-+            e->st = g_malloc0(sizeof(struct stat));
-+            memcpy(e->st, &stbuf, sizeof(struct stat));
-+        }
-+
-+        size += len;
-+        saved_dir_pos = dent->d_off;
-+    }
-+
-+    /* restore (last) saved position */
-+    s->ops->seekdir(&s->ctx, &fidp->fs, saved_dir_pos);
-+
-+out:
-+    v9fs_readdir_unlock(&fidp->fs.dir);
-+    v9fs_path_free(&path);
-+    if (err < 0) {
-+        return err;
-+    }
-+    return size;
-+}
-+
-+/**
-+ * @brief Reads multiple directory entries in one rush.
-+ *
-+ * Retrieves the requested (max. amount of) directory entries from the fs
-+ * driver. This function must only be called by the main IO thread (top half).
-+ * Internally this function call will be dispatched to a background IO thread
-+ * (bottom half) where it is eventually executed by the fs driver.
-+ *
-+ * @discussion Acquiring multiple directory entries in one rush from the fs
-+ * driver, instead of retrieving each directory entry individually, is very
-+ * beneficial from performance point of view. Because for every fs driver
-+ * request latency is added, which in practice could lead to overall
-+ * latencies of several hundred ms for reading all entries (of just a single
-+ * directory) if every directory entry was individually requested from fs
-+ * driver.
-+ *
-+ * @note You must @b ALWAYS call @c v9fs_free_dirents(entries) after calling
-+ * v9fs_co_readdir_many(), both on success and on error cases of this
-+ * function, to avoid memory leaks once @p entries are no longer needed.
-+ *
-+ * @param pdu - the causing 9p (T_readdir) client request
-+ * @param fidp - already opened directory where readdir shall be performed on
-+ * @param entries - output for directory entries (must not be NULL)
-+ * @param offset - initial position inside the directory the function shall
-+ *                 seek to before retrieving the directory entries
-+ * @param maxsize - maximum result message body size (in bytes)
-+ * @param dostat - whether a stat() should be performed and returned for
-+ *                 each directory entry
-+ * @returns resulting response message body size (in bytes) on success,
-+ *          negative error code otherwise
-+ */
-+int coroutine_fn v9fs_co_readdir_many(V9fsPDU *pdu, V9fsFidState *fidp,
-+                                      struct V9fsDirEnt **entries,
-+                                      off_t offset, int32_t maxsize,
-+                                      bool dostat)
-+{
-+    int err = 0;
-+
-+    if (v9fs_request_cancelled(pdu)) {
-+        return -EINTR;
-+    }
-+    v9fs_co_run_in_worker({
-+        err = do_readdir_many(pdu, fidp, entries, offset, maxsize, dostat);
-+    });
-+    return err;
-+}
-+
- off_t v9fs_co_telldir(V9fsPDU *pdu, V9fsFidState *fidp)
- {
-     off_t err;
-diff --git a/hw/9pfs/coth.h b/hw/9pfs/coth.h
-index c2cdc7a9ea..fd4a45bc7c 100644
---- a/hw/9pfs/coth.h
-+++ b/hw/9pfs/coth.h
-@@ -49,6 +49,9 @@
- void co_run_in_worker_bh(void *);
- int coroutine_fn v9fs_co_readlink(V9fsPDU *, V9fsPath *, V9fsString *);
- int coroutine_fn v9fs_co_readdir(V9fsPDU *, V9fsFidState *, struct dirent **);
-+int coroutine_fn v9fs_co_readdir_many(V9fsPDU *, V9fsFidState *,
-+                                      struct V9fsDirEnt **, off_t, int32_t,
-+                                      bool);
- off_t coroutine_fn v9fs_co_telldir(V9fsPDU *, V9fsFidState *);
- void coroutine_fn v9fs_co_seekdir(V9fsPDU *, V9fsFidState *, off_t);
- void coroutine_fn v9fs_co_rewinddir(V9fsPDU *, V9fsFidState *);
--- 
-2.20.1
+Eric
 
 
