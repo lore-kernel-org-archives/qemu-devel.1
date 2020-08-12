@@ -2,83 +2,127 @@ Return-Path: <SRS0=vd3Y=BW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A99AC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 16:26:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1666C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 16:27:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B25CF2076B
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 16:25:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6A3AC2076B
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 16:27:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="vCdMdhnS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B25CF2076B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IkDa50g+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A3AC2076B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59362 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33294 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5tZe-0005x6-R1
-	for qemu-devel@archiver.kernel.org; Wed, 12 Aug 2020 12:25:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41492)
+	id 1k5tb6-0006tg-ND
+	for qemu-devel@archiver.kernel.org; Wed, 12 Aug 2020 12:27:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41748)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1k5tZ2-0005Rk-H6
- for qemu-devel@nongnu.org; Wed, 12 Aug 2020 12:25:20 -0400
-Received: from mail-oo1-xc42.google.com ([2607:f8b0:4864:20::c42]:41055)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1k5tZ0-0001ty-31
- for qemu-devel@nongnu.org; Wed, 12 Aug 2020 12:25:20 -0400
-Received: by mail-oo1-xc42.google.com with SMTP id x6so589905ooe.8
- for <qemu-devel@nongnu.org>; Wed, 12 Aug 2020 09:25:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=2BIijTWrevAbVLlEX3UfcGW+Iiyb0QKduM+DMpfHslw=;
- b=vCdMdhnSOTO0BltC2QFvYoPtma9IVY1RC0a81qn6oALwXFsVUa6Akf01V8QG908JWT
- nNs9wEHwWUflPA84ga11DfI4Yv813GQzu50Lbh9zX2cHAhzfJGTyl3+YGx53/FhljsHL
- nCqObQmtuVWgJHoC9HzixxysgXep39ug3G5x1HcGf0JMbUlUlehY5T+JEkwul8v810Hf
- KJL+iNQTRLv3eUPQ4/TclxL6XqfoVB0syn5krgtMHJ580s6s/fqwG2rlVrXxV02DGBiK
- aSC139L6/7JZILoJbqDnsGTgGum1R5Bzhrlc4Rz2DYwxX3d1XT50nhpWDM5T4ltV9ICa
- pAMA==
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k5taV-0006SF-NT
+ for qemu-devel@nongnu.org; Wed, 12 Aug 2020 12:26:51 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42299)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k5taS-0002A1-TH
+ for qemu-devel@nongnu.org; Wed, 12 Aug 2020 12:26:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1597249608;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=XpRlUkQFf6AHIug+gP70NucqP83ene4yqqQ+ezAfHLM=;
+ b=IkDa50g+XR3GBoE3/q4ix2JVTmvmWStI8Sqz48zj5GH0C5vkcSApMG6xsdrDSxmlZEreJE
+ /eG1xMcag3d7CukY9+cU8gJFJWKr1QpNFfVSoIx3GD/fLM+nHurBAj0BmherW9y4e7Uv77
+ qE6go97wdIl4Ha/xX5Rv6e/Cc8e0FxQ=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-515-xoEQs_PEMqmITVw465TGLg-1; Wed, 12 Aug 2020 12:26:42 -0400
+X-MC-Unique: xoEQs_PEMqmITVw465TGLg-1
+Received: by mail-wm1-f71.google.com with SMTP id v8so870191wma.6
+ for <qemu-devel@nongnu.org>; Wed, 12 Aug 2020 09:26:41 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=2BIijTWrevAbVLlEX3UfcGW+Iiyb0QKduM+DMpfHslw=;
- b=dyJeo8jqG9XZR8lrbhODSvKbLfeK/PABsJkXxMhU8q+VzBO2uVCH3Eze+wm5gaBHua
- 6snd/JyiyXWWehgnOw29QZF6zRTjX1o1Pam5/69EK7x9kHyN4Q+mlWFsGC/j0i5S9zKv
- QdtvBwGOtUTZGo51RE+7WHavRVbcCv7Ek1LJKYnw/auDTehnRjLPvh0i6AqR6E7Hs/4t
- Eed5CRWPiOijKZe2APLnrnriMgy2XwSL3MNkWXAnjgUSJn4hYLregnBlipqjY191lR9g
- 9BbHsi6nwcBecefaetO09/fWNBUkW/HSrSlieTxZWkWjNA/G+EyQtiwThP0C+7dT3ebL
- 6d3g==
-X-Gm-Message-State: AOAM530a13IfJJJLIKzK5fXTRVdzs0LKu6J6rjmhmGUZ4MU6NJIcX0CQ
- PZHiBdesYHE2G66MB0PH48fSCpVjrU5qNE345P922Q==
-X-Google-Smtp-Source: ABdhPJzm6ActKGqgPID4oT3K5ao6QwOWwEo84h8SPSpc9CjF4NPHO0kmtWhscj3SXPHqdERgQbn5CPDpdwkoRSqHyFE=
-X-Received: by 2002:a4a:4201:: with SMTP id h1mr713583ooj.1.1597249516642;
- Wed, 12 Aug 2020 09:25:16 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=XpRlUkQFf6AHIug+gP70NucqP83ene4yqqQ+ezAfHLM=;
+ b=JJ2nDJRk1BMmNb5War5IGftwHSflZvqHbP6CLZ+kjQYk9Bj+d0yUrIKfhU62uJa0nO
+ hw8IlGUxx8bPGw6gUYVvaysv+BaMdsZbKwfLU/64BJvJkTA5tXw+fMlNUlL1C3eRZ6/O
+ zs0G62hRBafQYm6zqOmDRkk/34Y2tlhbZ7BtI2xq1/tdR61brPlqiHmXioyG7KPPfzAV
+ 6qivPJlmEn1tm4TrGtDWLrBBNtYM0PZmJsFyEnutom8Xcz+k8ESSNTPYW4OZAQjcnDcP
+ +n3jmTfh2NPXr6kjRNVuUvcLuZQC8Zx1nSbfNvRGFznuVmuhzeae8iaCjVq2okezoPu5
+ l3Gw==
+X-Gm-Message-State: AOAM530G8j3k6KYaU5EMsQLszdnVsWzMaS5wRnRPtQ2wTFhSjcWCwyo1
+ qGTQdPpQgP660rXn3mWHSvXrjZ6Nk5oDaeC0BxBwiF5K7hj/fLlymcTAmUyCXaV36kVshOGFxp9
+ YtqHC3skfvMSWXuc=
+X-Received: by 2002:adf:eb89:: with SMTP id t9mr34511wrn.65.1597249600951;
+ Wed, 12 Aug 2020 09:26:40 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxcjaSv7dCidP1+iRkgHfd9C0vVJdYFMtazrraHQSiZkOiLy937x1GYO+GS8WyOYJktRYYkyw==
+X-Received: by 2002:adf:eb89:: with SMTP id t9mr34491wrn.65.1597249600677;
+ Wed, 12 Aug 2020 09:26:40 -0700 (PDT)
+Received: from [192.168.1.36] (121.red-81-40-121.staticip.rima-tde.net.
+ [81.40.121.121])
+ by smtp.gmail.com with ESMTPSA id y145sm4773770wmd.48.2020.08.12.09.26.39
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 12 Aug 2020 09:26:39 -0700 (PDT)
+Subject: Re: [PULL 3/3] configure: Allow to build tools without pixman
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+References: <20200724164258.24886-1-kraxel@redhat.com>
+ <20200724164258.24886-4-kraxel@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <f1fbe9b9-575e-b55f-8596-754a82654b5c@redhat.com>
+Date: Wed, 12 Aug 2020 18:26:38 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-References: <159724841583.21381.1589855553145708820.malonedeb@chaenomeles.canonical.com>
-In-Reply-To: <159724841583.21381.1589855553145708820.malonedeb@chaenomeles.canonical.com>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Thu, 13 Aug 2020 00:24:40 +0800
-Message-ID: <CAKXe6SKsO-V6GZ9uEUoSvCZgz7fzLkbfs+SWFT-mG_q0RiPErQ@mail.gmail.com>
-Subject: Re: [Bug 1891354] [NEW] Heap-use-after-free in usb_packet_unmap
-To: Bug 1891354 <1891354@bugs.launchpad.net>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::c42;
- envelope-from=liq3ea@gmail.com; helo=mail-oo1-xc42.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+In-Reply-To: <20200724164258.24886-4-kraxel@redhat.com>
+Content-Language: en-US
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/12 12:26:44
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -93,296 +137,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Qemu Developers <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ qemu-arm@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Alexander Bulekov <1891354@bugs.launchpad.net> =E4=BA=8E2020=E5=B9=B48=E6=
-=9C=8813=E6=97=A5=E5=91=A8=E5=9B=9B =E4=B8=8A=E5=8D=8812:21=E5=86=99=E9=81=
-=93=EF=BC=9A
->
-> Public bug reported:
->
-> Hello,
-> Reproducer:
->
-> cat << EOF | ./i386-softmmu/qemu-system-i386 -device nec-usb-xhci \
-> -trace usb\* -device usb-audio -device usb-storage,drive=3Dmydrive \
-> -drive id=3Dmydrive,file=3Dnull-co://,size=3D2M,format=3Draw,if=3Dnone \
-> -nodefaults -nographic -qtest stdio
-> outl 0xcf8 0x80001010
-> outl 0xcfc 0xc0202
-> outl 0xcf8 0x80001004
-> outl 0xcfc 0x1c77695e
-> writel 0xc0040 0xffffd855
-> writeq 0xc2000 0xff05140100000000
-> write 0x1d 0x1 0x27
-> write 0x2d 0x1 0x2e
-> write 0x17232 0x1 0x03
-> write 0x17254 0x1 0x05
-> write 0x17276 0x1 0x72
-> write 0x17278 0x1 0x02
-> write 0x3d 0x1 0x27
-> write 0x40 0x1 0x2e
-> write 0x41 0x1 0x72
-> write 0x42 0x1 0x01
-> write 0x4d 0x1 0x2e
-> write 0x4f 0x1 0x01
-> write 0x2007c 0x1 0xc7
-> writeq 0xc2000 0x5c05140100000000
-> write 0x20070 0x1 0x80
-> write 0x20078 0x1 0x08
-> write 0x2007c 0x1 0xfe
-> write 0x2007d 0x1 0x08
-> write 0x20081 0x1 0xff
-> write 0x20082 0x1 0x0b
-> write 0x20089 0x1 0x8c
-> write 0x2008d 0x1 0x04
-> write 0x2009d 0x1 0x10
-> writeq 0xc2000 0x2505ef019e092f00
-> EOF
->
-> 20091=3D=3DERROR: AddressSanitizer: heap-use-after-free on address 0x6110=
-00045030 at pc 0x55db79edeef2 bp 0x7ffc4020b2b0 sp 0x7ffc4020b2a8
-> READ of size 4 at 0x611000045030 thread T0
->     #0 0x55db79edeef1 in usb_packet_unmap hw/usb/libhw.c:64:28
->     #1 0x55db79ede66f in usb_packet_map hw/usb/libhw.c:54:5
->     #2 0x55db79f6d5f1 in xhci_setup_packet hw/usb/hcd-xhci.c:1618:5
->     #3 0x55db79f67143 in xhci_fire_ctl_transfer hw/usb/hcd-xhci.c:1722:9
->     #4 0x55db79f67143 in xhci_kick_epctx hw/usb/hcd-xhci.c:1991:13
->     #5 0x55db79f8837d in xhci_doorbell_write hw/usb/hcd-xhci.c:3162:13
->     #6 0x55db792c6b8e in memory_region_write_accessor softmmu/memory.c:48=
-3:5
->     #7 0x55db792c658b in access_with_adjusted_size softmmu/memory.c:544:1=
-8
->     #8 0x55db792c5d9b in memory_region_dispatch_write softmmu/memory.c
->     #9 0x55db78d094d2 in flatview_write_continue exec.c:3176:23
->     #10 0x55db78cfee6b in flatview_write exec.c:3216:14
->     #11 0x55db78cfee6b in address_space_write exec.c:3308:18
->     #12 0x55db793072a9 in qtest_process_command softmmu/qtest.c:452:13
->     #13 0x55db79304087 in qtest_process_inbuf softmmu/qtest.c:710:9
->     #14 0x55db7a7d7293 in fd_chr_read chardev/char-fd.c:68:9
->     #15 0x7fc5d7f1a897 in g_main_context_dispatch
->     #16 0x55db7aa571b3 in glib_pollfds_poll util/main-loop.c:217:9
->     #17 0x55db7aa571b3 in os_host_main_loop_wait util/main-loop.c:240:5
->     #18 0x55db7aa571b3 in main_loop_wait util/main-loop.c:516:11
->     #19 0x55db79315008 in qemu_main_loop softmmu/vl.c:1676:9
->     #20 0x55db7a8860fd in main softmmu/main.c:49:5
->
-> 0x611000045030 is located 48 bytes inside of 256-byte region [0x611000045=
-000,0x611000045100)
-> freed by thread T0 here:
->     #0 0x55db78cac16d in free (build/i386-softmmu/qemu-system-i386+0x250e=
-16d)
->     #1 0x55db79f7c0e8 in xhci_ep_nuke_xfers hw/usb/hcd-xhci.c:1252:9
->     #2 0x55db79f7b454 in xhci_disable_ep hw/usb/hcd-xhci.c:1279:5
->     #3 0x55db79f79af7 in xhci_disable_slot hw/usb/hcd-xhci.c:2048:13
->     #4 0x55db79f5aea3 in xhci_reset hw/usb/hcd-xhci.c:2706:9
->     #5 0x55db79f82f49 in xhci_oper_write hw/usb/hcd-xhci.c:2966:13
->     #6 0x55db792c6b8e in memory_region_write_accessor softmmu/memory.c:48=
-3:5
->     #7 0x55db792c658b in access_with_adjusted_size softmmu/memory.c:544:1=
-8
->     #8 0x55db792c5d9b in memory_region_dispatch_write softmmu/memory.c
->     #9 0x55db78d094d2 in flatview_write_continue exec.c:3176:23
->     #10 0x55db78cfee6b in flatview_write exec.c:3216:14
->     #11 0x55db78cfee6b in address_space_write exec.c:3308:18
->     #12 0x55db78d01fe7 in address_space_unmap exec.c:3634:9
->     #13 0x55db79edebbb in dma_memory_unmap include/sysemu/dma.h:145:5
->     #14 0x55db79edebbb in usb_packet_unmap hw/usb/libhw.c:65:9
->     #15 0x55db79ede66f in usb_packet_map hw/usb/libhw.c:54:5
->     #16 0x55db79f6d5f1 in xhci_setup_packet hw/usb/hcd-xhci.c:1618:5
->     #17 0x55db79f67143 in xhci_fire_ctl_transfer hw/usb/hcd-xhci.c:1722:9
->     #18 0x55db79f67143 in xhci_kick_epctx hw/usb/hcd-xhci.c:1991:13
->     #19 0x55db79f8837d in xhci_doorbell_write hw/usb/hcd-xhci.c:3162:13
->     #20 0x55db792c6b8e in memory_region_write_accessor softmmu/memory.c:4=
-83:5
->     #21 0x55db792c658b in access_with_adjusted_size softmmu/memory.c:544:=
-18
->     #22 0x55db792c5d9b in memory_region_dispatch_write softmmu/memory.c
->     #23 0x55db78d094d2 in flatview_write_continue exec.c:3176:23
->     #24 0x55db78cfee6b in flatview_write exec.c:3216:14
->     #25 0x55db78cfee6b in address_space_write exec.c:3308:18
->     #26 0x55db793072a9 in qtest_process_command softmmu/qtest.c:452:13
->     #27 0x55db79304087 in qtest_process_inbuf softmmu/qtest.c:710:9
->     #28 0x55db7a7d7293 in fd_chr_read chardev/char-fd.c:68:9
->     #29 0x7fc5d7f1a897 in g_main_context_dispatch
->
+Hi,
 
-This issue as far as I can see, is the DMA to MMIO issue.
+On 7/24/20 6:42 PM, Gerd Hoffmann wrote:
+> From: Thomas Huth <thuth@redhat.com>
+> 
+> If pixman is not installed, it is currently not possible to run:
+> 
+>  .../configure  --disable-system --enable-tools
+> 
+> Seems like there was a dependency from one of the required source
+> files to pixman in the past, but since commit 1ac0206b2ae1ffaeec56
+> ("qemu-timer.c: Trim list of included headers"), this dependency
+> should be gone. Thus allow to compile the tools without pixman now.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> Message-id: 20200723141123.14765-1-thuth@redhat.com
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+>  configure | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/configure b/configure
+> index 4bd80ed507aa..2acc4d1465f8 100755
+> --- a/configure
+> +++ b/configure
+> @@ -4065,7 +4065,7 @@ fi
+>  ##########################################
+>  # pixman support probe
+>  
+> -if test "$want_tools" = "no" && test "$softmmu" = "no"; then
+> +if test "$softmmu" = "no"; then
+>    pixman_cflags=
+>    pixman_libs=
+>  elif $pkg_config --atleast-version=0.21.8 pixman-1 > /dev/null 2>&1; then
+> 
+
+This commit broke my '--disable-system --disable-user --enable-tools' build:
+
+$ make vhost-user-gpu
+...
+  LINK    vhost-user-gpu
+/usr/bin/ld: contrib/vhost-user-gpu/vhost-user-gpu.o: in function
+`vg_resource_create_2d':
+contrib/vhost-user-gpu/vhost-user-gpu.c:322: undefined reference to
+`pixman_image_create_bits'
+/usr/bin/ld: contrib/vhost-user-gpu/vhost-user-gpu.o: in function
+`vg_resource_destroy':
+contrib/vhost-user-gpu/vhost-user-gpu.c:381: undefined reference to
+`pixman_image_unref'
+/usr/bin/ld: contrib/vhost-user-gpu/vhost-user-gpu.o: in function
+`vg_transfer_to_host_2d':
+contrib/vhost-user-gpu/vhost-user-gpu.c:538: undefined reference to
+`pixman_image_get_format'
+/usr/bin/ld: contrib/vhost-user-gpu/vhost-user-gpu.c:540: undefined
+reference to `pixman_image_get_stride'
+/usr/bin/ld: contrib/vhost-user-gpu/vhost-user-gpu.c:543: undefined
+reference to `pixman_image_get_width'
+/usr/bin/ld: contrib/vhost-user-gpu/vhost-user-gpu.c:544: undefined
+reference to `pixman_image_get_data'
+/usr/bin/ld: contrib/vhost-user-gpu/vhost-user-gpu.c:556: undefined
+reference to `pixman_image_get_stride'
+/usr/bin/ld: contrib/vhost-user-gpu/vhost-user-gpu.c:557: undefined
+reference to `pixman_image_get_height'
+/usr/bin/ld: contrib/vhost-user-gpu/vhost-user-gpu.c:555: undefined
+reference to `pixman_image_get_data'
+/usr/bin/ld: contrib/vhost-user-gpu/vhost-user-gpu.o: in function
+`vg_resource_flush':
+contrib/vhost-user-gpu/vhost-user-gpu.c:693: undefined reference to
+`pixman_region_init_rect'
+/usr/bin/ld: contrib/vhost-user-gpu/vhost-user-gpu.c:705: undefined
+reference to `pixman_region_init'
+/usr/bin/ld: contrib/vhost-user-gpu/vhost-user-gpu.c:706: undefined
+reference to `pixman_region_init_rect'
+/usr/bin/ld: contrib/vhost-user-gpu/vhost-user-gpu.c:709: undefined
+reference to `pixman_region_intersect'
+/usr/bin/ld: contrib/vhost-user-gpu/vhost-user-gpu.c:711: undefined
+reference to `pixman_region_extents'
+/usr/bin/ld: contrib/vhost-user-gpu/vhost-user-gpu.c:731: undefined
+reference to `pixman_image_get_format'
+/usr/bin/ld: contrib/vhost-user-gpu/vhost-user-gpu.c:731: undefined
+reference to `pixman_image_get_format'
+/usr/bin/ld: contrib/vhost-user-gpu/vhost-user-gpu.c:747: undefined
+reference to `pixman_image_get_format'
+/usr/bin/ld: contrib/vhost-user-gpu/vhost-user-gpu.c:747: undefined
+reference to `pixman_image_create_bits'
+/usr/bin/ld: contrib/vhost-user-gpu/vhost-user-gpu.c:753: undefined
+reference to `pixman_image_composite'
+/usr/bin/ld: contrib/vhost-user-gpu/vhost-user-gpu.c:758: undefined
+reference to `pixman_image_unref'
+/usr/bin/ld: contrib/vhost-user-gpu/vhost-user-gpu.c:762: undefined
+reference to `pixman_region_fini'
+/usr/bin/ld: contrib/vhost-user-gpu/vhost-user-gpu.c:763: undefined
+reference to `pixman_region_fini'
+/usr/bin/ld: contrib/vhost-user-gpu/vhost-user-gpu.c:765: undefined
+reference to `pixman_region_fini'
+/usr/bin/ld: contrib/vhost-user-gpu/vhost-user-gpu.o: in function
+`update_cursor_data_simple':
+contrib/vhost-user-gpu/vhost-user-gpu.c:863: undefined reference to
+`pixman_image_get_width'
+/usr/bin/ld: contrib/vhost-user-gpu/vhost-user-gpu.c:864: undefined
+reference to `pixman_image_get_height'
+/usr/bin/ld: contrib/vhost-user-gpu/vhost-user-gpu.c:865: undefined
+reference to `pixman_image_get_format'
+/usr/bin/ld: contrib/vhost-user-gpu/vhost-user-gpu.c:865: undefined
+reference to `pixman_image_get_format'
+/usr/bin/ld: contrib/vhost-user-gpu/vhost-user-gpu.c:868: undefined
+reference to `pixman_image_get_data'
+collect2: error: ld returned 1 exit status
+make: *** [Makefile:730: vhost-user-gpu] Error 1
 
 Thanks,
-Li Qiang
 
+Phil.
 
-> previously allocated by thread T0 here:
->     #0 0x55db78cac562 in calloc (build/i386-softmmu/qemu-system-i386+0x25=
-0e562)
->     #1 0x7fc5d7f20548 in g_malloc0 (/usr/lib/x86_64-linux-gnu/libglib-2.0=
-.so.0+0x54548)
->     #2 0x55db79f8837d in xhci_doorbell_write hw/usb/hcd-xhci.c:3162:13
->     #3 0x55db792c6b8e in memory_region_write_accessor softmmu/memory.c:48=
-3:5
->     #4 0x55db792c658b in access_with_adjusted_size softmmu/memory.c:544:1=
-8
->     #5 0x55db792c5d9b in memory_region_dispatch_write softmmu/memory.c
->     #6 0x55db78d094d2 in flatview_write_continue exec.c:3176:23
->     #7 0x55db78cfee6b in flatview_write exec.c:3216:14
->     #8 0x55db78cfee6b in address_space_write exec.c:3308:18
->     #9 0x55db793072a9 in qtest_process_command softmmu/qtest.c:452:13
->     #10 0x55db79304087 in qtest_process_inbuf softmmu/qtest.c:710:9
->     #11 0x55db7a7d7293 in fd_chr_read chardev/char-fd.c:68:9
->     #12 0x7fc5d7f1a897 in g_main_context_dispatch
->
-> -Alex
->
-> ** Affects: qemu
->      Importance: Undecided
->          Status: New
->
-> --
-> You received this bug notification because you are a member of qemu-
-> devel-ml, which is subscribed to QEMU.
-> https://bugs.launchpad.net/bugs/1891354
->
-> Title:
->   Heap-use-after-free in usb_packet_unmap
->
-> Status in QEMU:
->   New
->
-> Bug description:
->   Hello,
->   Reproducer:
->
->   cat << EOF | ./i386-softmmu/qemu-system-i386 -device nec-usb-xhci \
->   -trace usb\* -device usb-audio -device usb-storage,drive=3Dmydrive \
->   -drive id=3Dmydrive,file=3Dnull-co://,size=3D2M,format=3Draw,if=3Dnone =
-\
->   -nodefaults -nographic -qtest stdio
->   outl 0xcf8 0x80001010
->   outl 0xcfc 0xc0202
->   outl 0xcf8 0x80001004
->   outl 0xcfc 0x1c77695e
->   writel 0xc0040 0xffffd855
->   writeq 0xc2000 0xff05140100000000
->   write 0x1d 0x1 0x27
->   write 0x2d 0x1 0x2e
->   write 0x17232 0x1 0x03
->   write 0x17254 0x1 0x05
->   write 0x17276 0x1 0x72
->   write 0x17278 0x1 0x02
->   write 0x3d 0x1 0x27
->   write 0x40 0x1 0x2e
->   write 0x41 0x1 0x72
->   write 0x42 0x1 0x01
->   write 0x4d 0x1 0x2e
->   write 0x4f 0x1 0x01
->   write 0x2007c 0x1 0xc7
->   writeq 0xc2000 0x5c05140100000000
->   write 0x20070 0x1 0x80
->   write 0x20078 0x1 0x08
->   write 0x2007c 0x1 0xfe
->   write 0x2007d 0x1 0x08
->   write 0x20081 0x1 0xff
->   write 0x20082 0x1 0x0b
->   write 0x20089 0x1 0x8c
->   write 0x2008d 0x1 0x04
->   write 0x2009d 0x1 0x10
->   writeq 0xc2000 0x2505ef019e092f00
->   EOF
->
->   20091=3D=3DERROR: AddressSanitizer: heap-use-after-free on address 0x61=
-1000045030 at pc 0x55db79edeef2 bp 0x7ffc4020b2b0 sp 0x7ffc4020b2a8
->   READ of size 4 at 0x611000045030 thread T0
->       #0 0x55db79edeef1 in usb_packet_unmap hw/usb/libhw.c:64:28
->       #1 0x55db79ede66f in usb_packet_map hw/usb/libhw.c:54:5
->       #2 0x55db79f6d5f1 in xhci_setup_packet hw/usb/hcd-xhci.c:1618:5
->       #3 0x55db79f67143 in xhci_fire_ctl_transfer hw/usb/hcd-xhci.c:1722:=
-9
->       #4 0x55db79f67143 in xhci_kick_epctx hw/usb/hcd-xhci.c:1991:13
->       #5 0x55db79f8837d in xhci_doorbell_write hw/usb/hcd-xhci.c:3162:13
->       #6 0x55db792c6b8e in memory_region_write_accessor softmmu/memory.c:=
-483:5
->       #7 0x55db792c658b in access_with_adjusted_size softmmu/memory.c:544=
-:18
->       #8 0x55db792c5d9b in memory_region_dispatch_write softmmu/memory.c
->       #9 0x55db78d094d2 in flatview_write_continue exec.c:3176:23
->       #10 0x55db78cfee6b in flatview_write exec.c:3216:14
->       #11 0x55db78cfee6b in address_space_write exec.c:3308:18
->       #12 0x55db793072a9 in qtest_process_command softmmu/qtest.c:452:13
->       #13 0x55db79304087 in qtest_process_inbuf softmmu/qtest.c:710:9
->       #14 0x55db7a7d7293 in fd_chr_read chardev/char-fd.c:68:9
->       #15 0x7fc5d7f1a897 in g_main_context_dispatch
->       #16 0x55db7aa571b3 in glib_pollfds_poll util/main-loop.c:217:9
->       #17 0x55db7aa571b3 in os_host_main_loop_wait util/main-loop.c:240:5
->       #18 0x55db7aa571b3 in main_loop_wait util/main-loop.c:516:11
->       #19 0x55db79315008 in qemu_main_loop softmmu/vl.c:1676:9
->       #20 0x55db7a8860fd in main softmmu/main.c:49:5
->
->   0x611000045030 is located 48 bytes inside of 256-byte region [0x6110000=
-45000,0x611000045100)
->   freed by thread T0 here:
->       #0 0x55db78cac16d in free (build/i386-softmmu/qemu-system-i386+0x25=
-0e16d)
->       #1 0x55db79f7c0e8 in xhci_ep_nuke_xfers hw/usb/hcd-xhci.c:1252:9
->       #2 0x55db79f7b454 in xhci_disable_ep hw/usb/hcd-xhci.c:1279:5
->       #3 0x55db79f79af7 in xhci_disable_slot hw/usb/hcd-xhci.c:2048:13
->       #4 0x55db79f5aea3 in xhci_reset hw/usb/hcd-xhci.c:2706:9
->       #5 0x55db79f82f49 in xhci_oper_write hw/usb/hcd-xhci.c:2966:13
->       #6 0x55db792c6b8e in memory_region_write_accessor softmmu/memory.c:=
-483:5
->       #7 0x55db792c658b in access_with_adjusted_size softmmu/memory.c:544=
-:18
->       #8 0x55db792c5d9b in memory_region_dispatch_write softmmu/memory.c
->       #9 0x55db78d094d2 in flatview_write_continue exec.c:3176:23
->       #10 0x55db78cfee6b in flatview_write exec.c:3216:14
->       #11 0x55db78cfee6b in address_space_write exec.c:3308:18
->       #12 0x55db78d01fe7 in address_space_unmap exec.c:3634:9
->       #13 0x55db79edebbb in dma_memory_unmap include/sysemu/dma.h:145:5
->       #14 0x55db79edebbb in usb_packet_unmap hw/usb/libhw.c:65:9
->       #15 0x55db79ede66f in usb_packet_map hw/usb/libhw.c:54:5
->       #16 0x55db79f6d5f1 in xhci_setup_packet hw/usb/hcd-xhci.c:1618:5
->       #17 0x55db79f67143 in xhci_fire_ctl_transfer hw/usb/hcd-xhci.c:1722=
-:9
->       #18 0x55db79f67143 in xhci_kick_epctx hw/usb/hcd-xhci.c:1991:13
->       #19 0x55db79f8837d in xhci_doorbell_write hw/usb/hcd-xhci.c:3162:13
->       #20 0x55db792c6b8e in memory_region_write_accessor softmmu/memory.c=
-:483:5
->       #21 0x55db792c658b in access_with_adjusted_size softmmu/memory.c:54=
-4:18
->       #22 0x55db792c5d9b in memory_region_dispatch_write softmmu/memory.c
->       #23 0x55db78d094d2 in flatview_write_continue exec.c:3176:23
->       #24 0x55db78cfee6b in flatview_write exec.c:3216:14
->       #25 0x55db78cfee6b in address_space_write exec.c:3308:18
->       #26 0x55db793072a9 in qtest_process_command softmmu/qtest.c:452:13
->       #27 0x55db79304087 in qtest_process_inbuf softmmu/qtest.c:710:9
->       #28 0x55db7a7d7293 in fd_chr_read chardev/char-fd.c:68:9
->       #29 0x7fc5d7f1a897 in g_main_context_dispatch
->
->   previously allocated by thread T0 here:
->       #0 0x55db78cac562 in calloc (build/i386-softmmu/qemu-system-i386+0x=
-250e562)
->       #1 0x7fc5d7f20548 in g_malloc0 (/usr/lib/x86_64-linux-gnu/libglib-2=
-.0.so.0+0x54548)
->       #2 0x55db79f8837d in xhci_doorbell_write hw/usb/hcd-xhci.c:3162:13
->       #3 0x55db792c6b8e in memory_region_write_accessor softmmu/memory.c:=
-483:5
->       #4 0x55db792c658b in access_with_adjusted_size softmmu/memory.c:544=
-:18
->       #5 0x55db792c5d9b in memory_region_dispatch_write softmmu/memory.c
->       #6 0x55db78d094d2 in flatview_write_continue exec.c:3176:23
->       #7 0x55db78cfee6b in flatview_write exec.c:3216:14
->       #8 0x55db78cfee6b in address_space_write exec.c:3308:18
->       #9 0x55db793072a9 in qtest_process_command softmmu/qtest.c:452:13
->       #10 0x55db79304087 in qtest_process_inbuf softmmu/qtest.c:710:9
->       #11 0x55db7a7d7293 in fd_chr_read chardev/char-fd.c:68:9
->       #12 0x7fc5d7f1a897 in g_main_context_dispatch
->
->   -Alex
->
-> To manage notifications about this bug go to:
-> https://bugs.launchpad.net/qemu/+bug/1891354/+subscriptions
->
 
