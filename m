@@ -2,94 +2,86 @@ Return-Path: <SRS0=vd3Y=BW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C6E6C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 22:49:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81A29C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 22:49:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 694AE20771
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 22:49:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 49FA020771
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 22:49:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="iAVPicas"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 694AE20771
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f8kStcDp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49FA020771
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39780 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40736 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5zZ1-00008b-L9
-	for qemu-devel@archiver.kernel.org; Wed, 12 Aug 2020 18:49:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39632)
+	id 1k5zZC-0000Wi-Ik
+	for qemu-devel@archiver.kernel.org; Wed, 12 Aug 2020 18:49:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41088)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=486123ee4=alistair.francis@wdc.com>)
- id 1k5zQa-0002RU-9o
- for qemu-devel@nongnu.org; Wed, 12 Aug 2020 18:41:00 -0400
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:29831)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=486123ee4=alistair.francis@wdc.com>)
- id 1k5zQU-0005qq-PC
- for qemu-devel@nongnu.org; Wed, 12 Aug 2020 18:40:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1597272054; x=1628808054;
- h=from:to:cc:subject:date:message-id:in-reply-to:
- references:mime-version:content-transfer-encoding;
- bh=9/GVwxO9Y3Bxpp+1tZOJ0aoCrDUf93MJirTx6uG5M4Y=;
- b=iAVPicasqjIPCjbaLUPeS+CQE051axDOxASjE9+ucuoa+IMfb58YkMf/
- Pr2N+6BotTGWkvBFAzxU6ebdWTKHSz15swXfpiX+1uzkWjtt3IoU/15w2
- SpbOE4SEbpFR8/piCH98TnN6kWuufLWOeJoFyvS1UG39XwtwfEd//dpJR
- LFPVZ8ljXPyj5bWRZDAFUxZJZIcg7Tp2jQF+oKu1zD/e9t7TrX3nP5kBu
- QfC+fUf3vve2mpWBzjLg/F+t4kAhuR5fCOgKRIpbt9DCYQBetWkMLUcw5
- aYIpGmwDsV+I+s3nc7rMTJeIhJ6nbK5w201OsiK84fl2LpMDnYwAKMegQ A==;
-IronPort-SDR: t4Mi2qP23n4Dqy0Rd+9Zzr/hpQUmvCrQC+rOVvzZFy+/3xk1QDLCfnUCmqcMv2takBDtnY96xB
- JiKQRHabWjgJlLQQoDfvNFU1tAnTJlvUB8+cknZmC+9Em7nYlVb/CBzCgidRhAZT7j5h9JNwc2
- N/IZSqPDqsvfC6whIjaNB0STa6W47aZatM8Lz3VvlGQUS9MH4bSTR7Y9kuTb9e1rq/lBAJI8od
- 0AZy0n2QHyFU++UAUqrf/nnJO+Zuqyj/4tLdNmCduoVWeY46aJTsNJgV92XkMA6/FAVYtyq7Jk
- L2I=
-X-IronPort-AV: E=Sophos;i="5.76,305,1592841600"; d="scan'208";a="254208932"
-Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com)
- ([199.255.45.15])
- by ob1.hgst.iphmx.com with ESMTP; 13 Aug 2020 06:40:49 +0800
-IronPort-SDR: iDH33lXy13VC088L5dDJzIu2cTYULzQ/y1cmZwI0nz8vwbqZOyvCLhgqDyH+DZDWR1pvW3XvSo
- 6zHe2Nh1oDww==
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
- by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 12 Aug 2020 15:27:57 -0700
-IronPort-SDR: EmCWnjfJHfCgyN0JsbGnif6YrOfVM4WxC/xPby7d9Xex6XaHlMBaZl+imSO98fA6IK1Xu36fp8
- Ufh0TnlO5NLw==
-WDCIronportException: Internal
-Received: from jbfyk72.ad.shared (HELO risc6-mainframe.hgst.com)
- ([10.86.59.14])
- by uls-op-cesaip01.wdc.com with ESMTP; 12 Aug 2020 15:40:47 -0700
-From: Alistair Francis <alistair.francis@wdc.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 11/20] roms/opensbi: Upgrade from v0.7 to v0.8
-Date: Wed, 12 Aug 2020 15:30:36 -0700
-Message-Id: <20200812223045.96803-12-alistair.francis@wdc.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20200812223045.96803-1-alistair.francis@wdc.com>
-References: <20200812223045.96803-1-alistair.francis@wdc.com>
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1k5zXJ-0005YL-Ly; Wed, 12 Aug 2020 18:47:57 -0400
+Received: from mail-io1-xd41.google.com ([2607:f8b0:4864:20::d41]:32796)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1k5zXH-0006XX-Kc; Wed, 12 Aug 2020 18:47:57 -0400
+Received: by mail-io1-xd41.google.com with SMTP id g14so4936876iom.0;
+ Wed, 12 Aug 2020 15:47:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=8Jfo10by6vLJkKTgo0CG0I2kxEsku2VxYeFJyvTMWvc=;
+ b=f8kStcDpzJ4gIuv49bvC7mVydWVxphVJBKoeMDRLETbCaiAozY4RkFoZBGxrO1kgIa
+ Gu+87JR/K3wqRGirouDlQsB6y9QlrJnVUgrDPt5uBUN6fnzvQnLof3rhTD4D0hqBoDuU
+ YMxnSPoi4LF7b1ZvwgStPw0XWFhuCHFi3GAqKrPMmWva1KuNipwtSRlbv0oOTmqmp/u7
+ HpXIlgUeW/TZN4Wiu9WyXXbCj7alP/PO/JhpppzQVvX3Yl5SKWFTqqXEtNHBxvF/2RCW
+ a/TKuT4I64mLRArqmudfiK2Ha8PzQNxf8rFQIUbayQ1hLQ42EWLZKjflo1U7Cp3aHO8N
+ cQhw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=8Jfo10by6vLJkKTgo0CG0I2kxEsku2VxYeFJyvTMWvc=;
+ b=aRTh0bWoFH1cYqi7BU7SyU2Te5n1b23XyTyrvlAaspT8IVM6/SkavsSdsJj/7YHlLm
+ zcF6uy2pLnHnUPkmv0j3vPOAtkGO59xdBIRUWIHVOj4VV40D+YYeniPIQqAX/Cay7mT2
+ XMpVQZT1hAKEtEh4FrxETPymcfD7Jvj1sA6byoUoeSlEVRcu6Lbp/bLlGkyafa6tDiRh
+ rgiV0YbRWaCZo0u6Z72RevGr0/uDGPL3MVimvX/LfQ87TDsa5cmsoWXt1tIafIZa1JOC
+ 3wvBYb4+RgMw1hHO31bEvIJ1heXvoWYmcIhu+dNNNvw9Y/WWhNlfpRQX7Dd89rlfosEh
+ D/cw==
+X-Gm-Message-State: AOAM5329bzagA65AS04+bq4nEhLk6jbOFxA0pMaE17yznzHpZmHXrf6L
+ cvtxkYeRV784GSmyiSwLBsK0FtrJ5aP/susAwaY=
+X-Google-Smtp-Source: ABdhPJzUl6WNvt7Kbk4mAUNazbx06sjXR8lXfRFaWq4xtfT9B1f5hgmhVU/zTEnVTwzVKkjMv0jQflPFzGzWAM7PXDA=
+X-Received: by 2002:a6b:400e:: with SMTP id k14mr1970776ioa.175.1597272473800; 
+ Wed, 12 Aug 2020 15:47:53 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=68.232.141.245;
- envelope-from=prvs=486123ee4=alistair.francis@wdc.com;
- helo=esa1.hgst.iphmx.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/12 18:40:48
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -43
-X-Spam_score: -4.4
-X-Spam_bar: ----
-X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+References: <20200729112801.108985-1-anup.patel@wdc.com>
+ <20200729112801.108985-2-anup.patel@wdc.com>
+In-Reply-To: <20200729112801.108985-2-anup.patel@wdc.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Wed, 12 Aug 2020 15:37:27 -0700
+Message-ID: <CAKmqyKOhbRDdf6eHuiytftzj5KHFYcrgwp2zkTPfkRcNn=MsYQ@mail.gmail.com>
+Subject: Re: [PATCH 1/3] target/riscv: Optional feature to provide trapped
+ instruction in CSRs
+To: Anup Patel <anup.patel@wdc.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::d41;
+ envelope-from=alistair23@gmail.com; helo=mail-io1-xd41.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,125 +94,199 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Anup Patel <anup@brainfault.org>, Bin Meng <bin.meng@windriver.com>,
- Alistair Francis <alistair.francis@wdc.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>, Anup Patel <anup@brainfault.org>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Atish Patra <atish.patra@wdc.com>, Alistair Francis <Alistair.Francis@wdc.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Bin Meng <bin.meng@windriver.com>
+On Wed, Jul 29, 2020 at 4:29 AM Anup Patel <anup.patel@wdc.com> wrote:
+>
+> The RISC-V spec allows implementations to provide trapped instruction
+> opcode in MTVAL/STVAL CSR for illegal/virtual instruction traps. This
+> is totally optional and most RISC-V implementations always set zero
+> in the MTVAL/STVAL CSR for illegal/virtual instruction traps.
+>
+> When trapped instruction opcode is available in MTVAL/STVAL CSR, the
+> M-mode runtime firmware (and Hypervisors) can skip unprivlege access
+> for reading trapped instruction opcode which in-turn will speed-up
+> the illegal/virtual instruction trap handling.
+>
+> This patch implements RISCV_FEATURE_TINST feature which when enabled
+> provides original trapped instruction opcode in MTVAL/STVAL CSRs for
+> illegal/virtual instruction trap.
+>
+> Signed-off-by: Anup Patel <anup.patel@wdc.com>
 
-Upgrade OpenSBI from v0.7 to v0.8.
-
-The v0.8 release includes the following commits:
-
-1bb00ab lib: No need to provide default PMP region using platform callbacks
-a9eac67 include: sbi_platform: Combine reboot and shutdown into one callback
-6585fab lib: utils: Add SiFive test device
-4781545 platform: Add Nuclei UX600 platform
-3a326af scripts: adapt binary archive script for Nuclei UX600
-5bdf022 firmware: fw_base: Remove CSR_MTVEC update check
-e6c1345 lib: utils/serial: Skip baudrate config if input frequency is zero
-01a8c8e lib: utils: Improve fdt_parse_uart8250() API
-0a0093b lib: utils: Add fdt_parse_uart8250_node() function
-243b0d0 lib: utils: Remove redundant clint_ipi_sync() declaration
-e3ad7c1 lib: utils: Rename fdt_parse_clint() to fdt_parse_compat_addr()
-a39cd6f lib: utils: Add FDT match table based node lookup
-dd33b9e lib: utils: Make fdt_get_node_addr_size() public function
-66185b3 lib: utils: Add fdt_parse_sifive_uart_node() function
-19e966b lib: utils: Add fdt_parse_hart_id() function
-44dd7be lib: utils: Add fdt_parse_max_hart_id() API
-f0eb503 lib: utils: Add fdt_parse_plic_node() function
-1ac794c include: Add array_size() macro
-8ff2b94 lib: utils: Add simple FDT timer framework
-76f0f81 lib: utils: Add simple FDT ipi framework
-75322a6 lib: utils: Add simple FDT irqchip framework
-76a8940 lib: utils: Add simple FDT serial framework
-7cc6fa4 lib: utils: Add simple FDT reset framework
-4d06353 firmware: fw_base: Introduce optional fw_platform_init()
-f1aa9e5 platform: Add generic FDT based platform support
-1f21b99 lib: sbi: Print platform hart count at boot time
-2ba7087 scripts: Add generic platform to create-binary-archive.sh
-4f18c6e platform: generic: Add Sifive FU540 TLB flush range limit override
-13717a8 platform: Remove qemu/virt directory
-65c06b0 platform: Remove spike directory
-d626037 docs: Add missing links in platform.md
-7993ca2 include: sbi: Remove redundant page table related defines
-5338679 lib: sbi_tlb: Fix remote TLB HFENCE VVMA implementation
-dc38929 lib: sbi: Improve misa_string() implementation
-433bac7 docs: platform/generic: Add details about stdout-path DT property
-b4efa70 docs: platform/generic: Add details about IPI and timer expectations
-dfd9dd6 docs: Add platform requirements document
-c2286b6 docs: Fix ordering of pages in table of contents
-7be75f5 docs: Don't use italic text in page title
-63a513e lib: Rename unprivileged trap handler
-aef9a60 lib: Add csr detect support
-13ca20d lib: Create a separate math helper function file
-79d0fad lib: utils: Update reserved memory fdt node even if PMP is not present
-6a053f6 lib: Add support for hart specific features
-b2df751 platform: Move platform features to hart
-4938024 platform: fpga: Remove redundant platform specific features
-ec0d2a7 lib: timer: Provide a hart based timer feature
-1f235ec lib: Add platform features in boot time print
-22c4334 lib: Add hart features in boot time print
-36833ab lib: Optimize inline assembly for unprivilege access functions
-38a4b54 firmware: Correct spelling mistakes
-28b4052 lib: sbi: detect features before everything else in sbi_hart_init()
-4984183 lib: sbi: Improve get_feature_str() implementation and usage
-3aa1036 lib: sbi: Remove extra spaces from boot time prints
-3a8fc81 lib: sbi: Print platform HART count just before boot HART id
-63b0f5f include: sbi: Use scratch pointer as parmeter in HART feature APIs
-2966510 lib: sbi: Few cosmetic improvements to HART feature detection
-a38bea9 lib: sbi_hart: Detect number of supported PMP regions
-89ba634 include: sbi: Add firmware extension constants
-73d6ef3 lib: utils: Remove redundant parameters from PLIC init functions
-446a9c6 lib: utils: Allow PLIC functions to be used for multiple PLICs
-2c685c2 lib: utils: Extend fdt_find_match() Implementation
-d30bb68 lib: utils/irqchip: Initialize all matching irqchip DT nodes
-a9a9751 lib: utils: Allow CLINT functions to be used for multiple CLINTs
-569dd64 lib: utils: Add fdt_parse_clint_node() function
-6956e83 lib: utils/ipi: Initialize all matching ipi DT nodes
-a63f05f lib: utils/timer: Initialize all matching timer DT nodes
-30b6040 Makefile: Fix builtin DTB compilation for out-of-tree platforms
-64f1408 firmware: fw_base: Make builtin DTB available to fw_platform_init()
-4ce6b7a firmware: fw_base: Don't OR forced FW_OPTIONS
-86ec534 firmware: Allow fw_platform_init() to return updated FDT location
-c6c65ee Makefile: Preprocess builtin DTS
-4e3876d Makefile: Add mechanism for platforms to have multiple builtin DTBs
-72019ee platform: kendryte/k210: Use new mechanism of builtin DTB
-51f0e4a firmware: Remove FW_PAYLOAD_FDT and related documentation
-1b8c012 lib: Add RISC-V hypervisor v0.6.1 support
-79bfd67 docs: Use doxygen config to mark the main page
-106b888 docs: Remove redundant documentation about combined payload use case
-9802906 platform: Add AE350 platform specific SBI handler
-32f87e5 platform: Add AE350 cache control SBIs
-e2c3f01 lib: Fix __sbi_hfence_gvma_vmid_gpa() and __sbi_hfence_vvma_asid_va()
-6966ad0 platform/lib: Allow the OS to map the regions that are protected by PMP
-518e85c platform: Update Nuclei ux600 platform support
-d5725c2 lib: Don't print delegation CSRs if there is no S-Mode
-637b348 lib: Fix the SBI_HART_HAS_MCOUNTEREN feature check
-db56ef3 platform: Add support for Shakti C-class SoC from IIT-M
-9bd5f8f lib: sbi: Fix 32/64 bits variable compatibility
-2314101 lib: Don't return any invalid error from SBI ecall
-a98258d include: Bump-up version to 0.8
-
-Signed-off-by: Bin Meng <bin.meng@windriver.com>
-Reviewed-by: Anup Patel <anup@brainfault.org>
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Message-Id: <1596439832-29238-3-git-send-email-bmeng.cn@gmail.com>
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
----
- roms/opensbi | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/roms/opensbi b/roms/opensbi
-index 9f1b72ce66..a98258d0b5 160000
---- a/roms/opensbi
-+++ b/roms/opensbi
-@@ -1 +1 @@
--Subproject commit 9f1b72ce66d659e91013b358939e832fb27223f5
-+Subproject commit a98258d0b537a295f517bbc8d813007336731fa9
--- 
-2.27.0
+Alistair
 
+> ---
+>  target/riscv/cpu.c        |  7 +++++++
+>  target/riscv/cpu.h        | 11 ++++++++++-
+>  target/riscv/cpu_helper.c |  6 ++++++
+>  target/riscv/translate.c  | 14 +++++++++++++-
+>  4 files changed, 36 insertions(+), 2 deletions(-)
+>
+> diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+> index eeb91f8513..ec098e445e 100644
+> --- a/target/riscv/cpu.c
+> +++ b/target/riscv/cpu.c
+> @@ -317,6 +317,7 @@ void restore_state_to_opc(CPURISCVState *env, TranslationBlock *tb,
+>                            target_ulong *data)
+>  {
+>      env->pc = data[0];
+> +    env->trap_insn = data[1];
+>  }
+>
+>  static void riscv_cpu_reset(DeviceState *dev)
+> @@ -332,6 +333,7 @@ static void riscv_cpu_reset(DeviceState *dev)
+>      env->mstatus &= ~(MSTATUS_MIE | MSTATUS_MPRV);
+>      env->mcause = 0;
+>      env->pc = env->resetvec;
+> +    env->trap_insn = 0;
+>  #endif
+>      cs->exception_index = EXCP_NONE;
+>      env->load_res = -1;
+> @@ -387,6 +389,10 @@ static void riscv_cpu_realize(DeviceState *dev, Error **errp)
+>          set_feature(env, RISCV_FEATURE_PMP);
+>      }
+>
+> +    if (cpu->cfg.tinst) {
+> +        set_feature(env, RISCV_FEATURE_TINST);
+> +    }
+> +
+>      /* If misa isn't set (rv32 and rv64 machines) set it here */
+>      if (!env->misa) {
+>          /* Do some ISA extension error checking */
+> @@ -487,6 +493,7 @@ static Property riscv_cpu_properties[] = {
+>      DEFINE_PROP_STRING("priv_spec", RISCVCPU, cfg.priv_spec),
+>      DEFINE_PROP_BOOL("mmu", RISCVCPU, cfg.mmu, true),
+>      DEFINE_PROP_BOOL("pmp", RISCVCPU, cfg.pmp, true),
+> +    DEFINE_PROP_BOOL("tinst", RISCVCPU, cfg.tinst, false),
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+>
+> diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+> index 1bb5271511..33984539d7 100644
+> --- a/target/riscv/cpu.h
+> +++ b/target/riscv/cpu.h
+> @@ -26,6 +26,12 @@
+>
+>  #define TCG_GUEST_DEFAULT_MO 0
+>
+> +/*
+> + * RISC-V-specific extra insn start words:
+> + * 1: Original instruction opcode
+> + */
+> +#define TARGET_INSN_START_EXTRA_WORDS 1
+> +
+>  #define TYPE_RISCV_CPU "riscv-cpu"
+>
+>  #define RISCV_CPU_TYPE_SUFFIX "-" TYPE_RISCV_CPU
+> @@ -70,7 +76,8 @@
+>  enum {
+>      RISCV_FEATURE_MMU,
+>      RISCV_FEATURE_PMP,
+> -    RISCV_FEATURE_MISA
+> +    RISCV_FEATURE_MISA,
+> +    RISCV_FEATURE_TINST
+>  };
+>
+>  #define PRIV_VERSION_1_10_0 0x00011000
+> @@ -97,6 +104,7 @@ struct CPURISCVState {
+>      target_ulong frm;
+>
+>      target_ulong badaddr;
+> +    target_ulong trap_insn;
+>      target_ulong guest_phys_fault_addr;
+>
+>      target_ulong priv_ver;
+> @@ -264,6 +272,7 @@ typedef struct RISCVCPU {
+>          char *user_spec;
+>          bool mmu;
+>          bool pmp;
+> +        bool tinst;
+>      } cfg;
+>  } RISCVCPU;
+>
+> diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
+> index eccd80cfef..e4bd45d66a 100644
+> --- a/target/riscv/cpu_helper.c
+> +++ b/target/riscv/cpu_helper.c
+> @@ -864,6 +864,12 @@ void riscv_cpu_do_interrupt(CPUState *cs)
+>          case RISCV_EXCP_STORE_PAGE_FAULT:
+>              tval = env->badaddr;
+>              break;
+> +        case RISCV_EXCP_VIRT_INSTRUCTION_FAULT:
+> +        case RISCV_EXCP_ILLEGAL_INST:
+> +            if (riscv_feature(env, RISCV_FEATURE_TINST)) {
+> +                tval = env->trap_insn;
+> +            }
+> +            break;
+>          default:
+>              break;
+>          }
+> diff --git a/target/riscv/translate.c b/target/riscv/translate.c
+> index 1d973b62e9..03954bff62 100644
+> --- a/target/riscv/translate.c
+> +++ b/target/riscv/translate.c
+> @@ -56,6 +56,8 @@ typedef struct DisasContext {
+>         to reset this known value.  */
+>      int frm;
+>      bool ext_ifencei;
+> +    /* TCG op of the current insn_start.  */
+> +    TCGOp *insn_start;
+>  } DisasContext;
+>
+>  #ifdef TARGET_RISCV64
+> @@ -717,6 +719,13 @@ static bool gen_shift(DisasContext *ctx, arg_r *a,
+>  /* Include the auto-generated decoder for 16 bit insn */
+>  #include "decode_insn16.inc.c"
+>
+> +static inline void decode_save_opc(DisasContext *ctx, target_ulong opc)
+> +{
+> +    assert(ctx->insn_start != NULL);
+> +    tcg_set_insn_start_param(ctx->insn_start, 1, opc);
+> +    ctx->insn_start = NULL;
+> +}
+> +
+>  static void decode_opc(CPURISCVState *env, DisasContext *ctx, uint16_t opcode)
+>  {
+>      /* check for compressed insn */
+> @@ -724,6 +733,7 @@ static void decode_opc(CPURISCVState *env, DisasContext *ctx, uint16_t opcode)
+>          if (!has_ext(ctx, RVC)) {
+>              gen_exception_illegal(ctx);
+>          } else {
+> +            decode_save_opc(ctx, opcode);
+>              ctx->pc_succ_insn = ctx->base.pc_next + 2;
+>              if (!decode_insn16(ctx, opcode)) {
+>                  /* fall back to old decoder */
+> @@ -734,6 +744,7 @@ static void decode_opc(CPURISCVState *env, DisasContext *ctx, uint16_t opcode)
+>          uint32_t opcode32 = opcode;
+>          opcode32 = deposit32(opcode32, 16, 16,
+>                               translator_lduw(env, ctx->base.pc_next + 2));
+> +        decode_save_opc(ctx, opcode32);
+>          ctx->pc_succ_insn = ctx->base.pc_next + 4;
+>          if (!decode_insn32(ctx, opcode32)) {
+>              gen_exception_illegal(ctx);
+> @@ -773,7 +784,8 @@ static void riscv_tr_insn_start(DisasContextBase *dcbase, CPUState *cpu)
+>  {
+>      DisasContext *ctx = container_of(dcbase, DisasContext, base);
+>
+> -    tcg_gen_insn_start(ctx->base.pc_next);
+> +    tcg_gen_insn_start(ctx->base.pc_next, 0);
+> +    ctx->insn_start = tcg_last_op();
+>  }
+>
+>  static bool riscv_tr_breakpoint_check(DisasContextBase *dcbase, CPUState *cpu,
+> --
+> 2.25.1
+>
+>
 
