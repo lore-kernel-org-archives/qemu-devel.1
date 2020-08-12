@@ -1,98 +1,82 @@
-Return-Path: <SRS0=wQM/=BV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=vd3Y=BW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED412C433E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 22:52:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EABDC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 00:41:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B6509206DA
-	for <qemu-devel@archiver.kernel.org>; Tue, 11 Aug 2020 22:52:57 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="a1kZ7hl2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B6509206DA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
+	by mail.kernel.org (Postfix) with ESMTPS id D50D22080C
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 00:41:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D50D22080C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33864 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33112 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5d8a-0003V1-VE
-	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 18:52:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40554)
+	id 1k5epq-0007pm-Vn
+	for qemu-devel@archiver.kernel.org; Tue, 11 Aug 2020 20:41:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56318)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=485daf1e4=dmitry.fomichev@wdc.com>)
- id 1k5d7J-0001xS-Of; Tue, 11 Aug 2020 18:51:37 -0400
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:19427)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=485daf1e4=dmitry.fomichev@wdc.com>)
- id 1k5d7G-0004Nx-RQ; Tue, 11 Aug 2020 18:51:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1597186294; x=1628722294;
- h=from:to:cc:subject:date:message-id:in-reply-to:
- references:mime-version:content-transfer-encoding;
- bh=ucFbWE2g3XOws9r1kF87iHZx2m/T2BIkWc3UeuAWIW0=;
- b=a1kZ7hl2ObhZdnYzwV22o9IVOXDv6bqEuBvUUsOJSwJEw1yk8QaEXOlx
- euSU0wxUIm+hYP0Knvp0S51FB94FfD/XOWo5/C7NF3yhw4TR7wCV/JUYo
- asZ1xcEduG19H//WkbF6mdNIeLUGDxzKE6d/3y7kCW2wqcbhUOyOAszfZ
- yRqjygl1NpsM0iVkhTSOLlP3cfnprqGEVeZjP4Eg7oo6AkgI/wn1hdWhy
- /EyhRWkgBDf5g0AgGsSUzncr6Qd9KIyk1Ca0xy1SaIVdkBZ6txFmIocPb
- RkLPiZrw7/Mewxq46gOoXjwh4s5k9QYBIquV7pqPNnjDiq8iTm6JhzbBU w==;
-IronPort-SDR: xktr7LALH1FzUagKxUIGWNmYk/TnAGvIlwJtkb/qE0tSLj0A2hvxP4Kyxl3logs5xMSpo8o+Dh
- AWXM+5FAsjkPHcFHFNrv+PjZNJbAviboJoGiSyBQeLEqR0kDvV75UF5DKyuAqLoU4OuZmlVZ1K
- +b9W44kXRJrPEMPlXQliUufG+tleDMfuLt3VA3/smSXzD19RE65IhZS7MObDysVarEcBFdvx5H
- s34eCeVuGr/9O1pG78TackJEumd8OkO40vIq6+2ExloEtkyyqaz/epPFgq1bykAY3qmYioV4Lj
- krI=
-X-IronPort-AV: E=Sophos;i="5.76,302,1592841600"; d="scan'208";a="144706611"
-Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com)
- ([199.255.45.15])
- by ob1.hgst.iphmx.com with ESMTP; 12 Aug 2020 06:51:33 +0800
-IronPort-SDR: g4uEnXc4TxoX8qbVqQ0FaQumcXLm4LuZ7Nh5fNEkXl062qHqbSvunSNC91alyPAOcHIkvPdAEV
- wRLDahgHHv6w==
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
- by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 11 Aug 2020 15:38:43 -0700
-IronPort-SDR: 5MPKS1jip1vB1RRIKqrsSmLj0Xlh2HjWNGP5G7KSVe8POHkoApdkLYkUuhBVeT2goeoIcdfy3g
- R0GR3iW0TugA==
-WDCIronportException: Internal
-Received: from unknown (HELO redsun50.ssa.fujisawa.hgst.com) ([10.149.66.24])
- by uls-op-cesaip02.wdc.com with ESMTP; 11 Aug 2020 15:51:32 -0700
-From: Dmitry Fomichev <dmitry.fomichev@wdc.com>
-To: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>,
- Maxim Levitsky <mlevitsky@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: [PATCH 2/2] scsi-generic: Fix HM-zoned device scan
-Date: Wed, 12 Aug 2020 07:51:22 +0900
-Message-Id: <20200811225122.17342-3-dmitry.fomichev@wdc.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20200811225122.17342-1-dmitry.fomichev@wdc.com>
-References: <20200811225122.17342-1-dmitry.fomichev@wdc.com>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k5ep2-0007Np-PS
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 20:40:52 -0400
+Received: from indium.canonical.com ([91.189.90.7]:39812)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k5ep0-0007Bl-48
+ for qemu-devel@nongnu.org; Tue, 11 Aug 2020 20:40:52 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1k5eoy-0000KB-5g
+ for <qemu-devel@nongnu.org>; Wed, 12 Aug 2020 00:40:48 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id F25572E808D
+ for <qemu-devel@nongnu.org>; Wed, 12 Aug 2020 00:40:47 +0000 (UTC)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.71.154.42;
- envelope-from=prvs=485daf1e4=dmitry.fomichev@wdc.com; helo=esa4.hgst.iphmx.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/11 18:51:29
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -43
-X-Spam_score: -4.4
-X-Spam_bar: ----
-X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 12 Aug 2020 00:35:26 -0000
+From: TheCatFelix <1884684@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: thecatfelix
+X-Launchpad-Bug-Reporter: TheCatFelix (thecatfelix)
+X-Launchpad-Bug-Modifier: TheCatFelix (thecatfelix)
+References: <159287262873.13509.14889128175029136647.malonedeb@wampee.canonical.com>
+Message-Id: <159719252686.22410.14525350364562879837.malone@chaenomeles.canonical.com>
+Subject: [Bug 1884684] Re: QEMU 5.0: Guest VM hangs/freeze when unplugging USB
+ device
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="6a138c03da9cc3e2e03f6dd3bbb4a615b0be6ec2";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 8b8dd302d208aec5b409e45f5a669d3bd006650f
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/11 20:40:48
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001,
  URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -101,86 +85,209 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Dmitry Fomichev <dmitry.fomichev@wdc.com>,
- Damien Le Moal <damien.lemoal@wdc.com>,
- Alistair Francis <alistair.francis@wdc.com>, qemu-devel@nongnu.org,
- qemu-block@nongnu.org
+Reply-To: Bug 1884684 <1884684@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Several important steps during device scan depend on SCSI type of the
-device. For example, max_transfer property is only determined and
-assigned if the device has the type of TYPE_DISK.
+I do get get the same backtrace in gdb every time every time when we
+reproduce the hang:
 
-Host-managed ZBC disks retain most of the properties of regular SCSI
-drives, but they have their own SCSI device type, 0x14. This prevents
-the proper assignment of max_transfer property for HM-zoned devices in
-scsi-generic driver leading to I/O errors if the maximum i/o size
-calculated at the guest exceeds the host value.
+(gdb) thread apply all bt
 
-To fix this, define TYPE_ZBC to have the standard value from SCSI ZBC
-standard spec. Several scan steps that were previously done only for
-TYPE_DISK devices, are now performed for the SCSI devices having
-TYPE_ZBC too.
+Thread 9 (Thread 0x7fd1415ff700 (LWP 3202)):
+#0  0x00007fd323d154bf in __GI___poll (fds=3D0x7fd1415fe6c0, nfds=3D2, time=
+out=3D-1) at ../sysdeps/unix/sysv/linux/poll.c:29
+#1  0x00007fd324978bb2 in ?? () from target:/lib/x86_64-linux-gnu/libusb-1.=
+0.so.0
+#2  0x00007fd323defea7 in start_thread (arg=3D<optimized out>) at pthread_c=
+reate.c:477
+#3  0x00007fd323d1feaf in clone () at ../sysdeps/unix/sysv/linux/x86_64/clo=
+ne.S:95
 
-Reported-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Signed-off-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
----
- hw/scsi/scsi-generic.c   | 10 ++++++----
- include/scsi/constants.h |  1 +
- 2 files changed, 7 insertions(+), 4 deletions(-)
+Thread 8 (Thread 0x7fd1437fe700 (LWP 3171)):
+#0  0x00007fd323d16d87 in ioctl () at ../sysdeps/unix/syscall-template.S:120
+#1  0x000055a5daef74f7 in kvm_vcpu_ioctl ()
+#2  0x000055a5daef7631 in kvm_cpu_exec ()
+#3  0x000055a5daedaede in ?? ()
+#4  0x000055a5db32194b in ?? ()
+#5  0x00007fd323defea7 in start_thread (arg=3D<optimized out>) at pthread_c=
+reate.c:477
+#6  0x00007fd323d1feaf in clone () at ../sysdeps/unix/sysv/linux/x86_64/clo=
+ne.S:95
 
-diff --git a/hw/scsi/scsi-generic.c b/hw/scsi/scsi-generic.c
-index 86ed0a3822..2cb23ca891 100644
---- a/hw/scsi/scsi-generic.c
-+++ b/hw/scsi/scsi-generic.c
-@@ -162,7 +162,8 @@ static void scsi_handle_inquiry_reply(SCSIGenericReq *r, SCSIDevice *s)
-         }
-     }
- 
--    if (s->type == TYPE_DISK && (r->req.cmd.buf[1] & 0x01)) {
-+    if ((s->type == TYPE_DISK || s->type == TYPE_ZBC) &&
-+        (r->req.cmd.buf[1] & 0x01)) {
-         page = r->req.cmd.buf[2];
-         if (page == 0xb0) {
-             uint32_t max_transfer =
-@@ -299,10 +300,11 @@ static void scsi_read_complete(void * opaque, int ret)
-     }
-     blk_set_guest_block_size(s->conf.blk, s->blocksize);
- 
--    /* Patch MODE SENSE device specific parameters if the BDS is opened
-+    /*
-+     * Patch MODE SENSE device specific parameters if the BDS is opened
-      * readonly.
-      */
--    if ((s->type == TYPE_DISK || s->type == TYPE_TAPE) &&
-+    if ((s->type == TYPE_DISK || s->type == TYPE_TAPE || s->type == TYPE_ZBC) &&
-         blk_is_read_only(s->conf.blk) &&
-         (r->req.cmd.buf[0] == MODE_SENSE ||
-          r->req.cmd.buf[0] == MODE_SENSE_10) &&
-@@ -617,7 +619,7 @@ static void scsi_generic_read_device_identification(SCSIDevice *s)
- void scsi_generic_read_device_inquiry(SCSIDevice *s)
- {
-     scsi_generic_read_device_identification(s);
--    if (s->type == TYPE_DISK) {
-+    if (s->type == TYPE_DISK || s->type == TYPE_ZBC) {
-         scsi_generic_set_vpd_bl_emulation(s);
-     } else {
-         s->needs_vpd_bl_emulation = false;
-diff --git a/include/scsi/constants.h b/include/scsi/constants.h
-index 874176019e..2a32c08b5e 100644
---- a/include/scsi/constants.h
-+++ b/include/scsi/constants.h
-@@ -218,6 +218,7 @@
- #define TYPE_ENCLOSURE      0x0d    /* Enclosure Services Device */
- #define TYPE_RBC            0x0e    /* Simplified Direct-Access Device */
- #define TYPE_OSD            0x11    /* Object-storage Device */
-+#define TYPE_ZBC            0x14    /* Host-managed Zoned SCSI Device */
- #define TYPE_WLUN           0x1e    /* Well known LUN */
- #define TYPE_NOT_PRESENT    0x1f
- #define TYPE_INACTIVE       0x20
--- 
-2.21.0
+Thread 7 (Thread 0x7fd143fff700 (LWP 3170)):
+#0  0x00007fd323d16d87 in ioctl () at ../sysdeps/unix/syscall-template.S:120
+#1  0x000055a5daef74f7 in kvm_vcpu_ioctl ()
+#2  0x000055a5daef7631 in kvm_cpu_exec ()
+#3  0x000055a5daedaede in ?? ()
+#4  0x000055a5db32194b in ?? ()
+#5  0x00007fd323defea7 in start_thread (arg=3D<optimized out>) at pthread_c=
+reate.c:477
+#6  0x00007fd323d1feaf in clone () at ../sysdeps/unix/sysv/linux/x86_64/clo=
+ne.S:95
 
+Thread 6 (Thread 0x7fd150dfd700 (LWP 3169)):
+#0  __lll_lock_wait (futex=3Dfutex@entry=3D0x55a5db80a540, private=3D0) at =
+lowlevellock.c:52
+#1  0x00007fd323df2843 in __GI___pthread_mutex_lock (mutex=3D0x55a5db80a540=
+) at ../nptl/pthread_mutex_lock.c:80
+#2  0x000055a5db321b43 in qemu_mutex_lock_impl ()
+#3  0x000055a5daedac8e in qemu_mutex_lock_iothread_impl ()
+#4  0x000055a5dae92ac9 in ?? ()
+#5  0x000055a5dae97de7 in flatview_read_continue ()
+#6  0x000055a5dae98023 in ?? ()
+#7  0x000055a5dae9813b in address_space_read_full ()
+#8  0x000055a5daef78cf in kvm_cpu_exec ()
+#9  0x000055a5daedaede in ?? ()
+#10 0x000055a5db32194b in ?? ()
+#11 0x00007fd323defea7 in start_thread (arg=3D<optimized out>) at pthread_c=
+reate.c:477
+#12 0x00007fd323d1feaf in clone () at ../sysdeps/unix/sysv/linux/x86_64/clo=
+ne.S:95
+
+Thread 5 (Thread 0x7fd1515fe700 (LWP 3168)):
+#0  __lll_lock_wait (futex=3Dfutex@entry=3D0x55a5db80a540, private=3D0) at =
+lowlevellock.c:52
+#1  0x00007fd323df2843 in __GI___pthread_mutex_lock (mutex=3D0x55a5db80a540=
+) at ../nptl/pthread_mutex_lock.c:80
+#2  0x000055a5db321b43 in qemu_mutex_lock_impl ()
+#3  0x000055a5daedac8e in qemu_mutex_lock_iothread_impl ()
+#4  0x000055a5dae92ac9 in ?? ()
+#5  0x000055a5dae97de7 in flatview_read_continue ()
+#6  0x000055a5dae98023 in ?? ()
+#7  0x000055a5dae9813b in address_space_read_full ()
+#8  0x000055a5daef78cf in kvm_cpu_exec ()
+#9  0x000055a5daedaede in ?? ()
+#10 0x000055a5db32194b in ?? ()
+#11 0x00007fd323defea7 in start_thread (arg=3D<optimized out>) at pthread_c=
+reate.c:477
+#12 0x00007fd323d1feaf in clone () at ../sysdeps/unix/sysv/linux/x86_64/clo=
+ne.S:95
+
+Thread 4 (Thread 0x7fd151dff700 (LWP 3167)):
+#0  __lll_lock_wait (futex=3Dfutex@entry=3D0x55a5db80a540, private=3D0) at =
+lowlevellock.c:52
+#1  0x00007fd323df2843 in __GI___pthread_mutex_lock (mutex=3D0x55a5db80a540=
+) at ../nptl/pthread_mutex_lock.c:80
+--Type <RET> for more, q to quit, c to continue without paging--
+#2  0x000055a5db321b43 in qemu_mutex_lock_impl ()
+#3  0x000055a5daedac8e in qemu_mutex_lock_iothread_impl ()
+#4  0x000055a5dae92ac9 in ?? ()
+#5  0x000055a5dae97de7 in flatview_read_continue ()
+#6  0x000055a5dae98023 in ?? ()
+#7  0x000055a5dae9813b in address_space_read_full ()
+#8  0x000055a5daef78cf in kvm_cpu_exec ()
+#9  0x000055a5daedaede in ?? ()
+#10 0x000055a5db32194b in ?? ()
+#11 0x00007fd323defea7 in start_thread (arg=3D<optimized out>) at pthread_c=
+reate.c:477
+#12 0x00007fd323d1feaf in clone () at ../sysdeps/unix/sysv/linux/x86_64/clo=
+ne.S:95
+
+Thread 3 (Thread 0x7fd320d97700 (LWP 3166)):
+#0  0x00007fd323d154bf in __GI___poll (fds=3D0x7fd318003180, nfds=3D3, time=
+out=3D-1) at ../sysdeps/unix/sysv/linux/poll.c:29
+#1  0x00007fd324a097ee in ?? () from target:/lib/x86_64-linux-gnu/libglib-2=
+.0.so.0
+#2  0x00007fd324a09b53 in g_main_loop_run () from target:/lib/x86_64-linux-=
+gnu/libglib-2.0.so.0
+#3  0x000055a5db016c71 in ?? ()
+#4  0x000055a5db32194b in ?? ()
+#5  0x00007fd323defea7 in start_thread (arg=3D<optimized out>) at pthread_c=
+reate.c:477
+#6  0x00007fd323d1feaf in clone () at ../sysdeps/unix/sysv/linux/x86_64/clo=
+ne.S:95
+
+Thread 2 (Thread 0x7fd3224de700 (LWP 3156)):
+#0  syscall () at ../sysdeps/unix/sysv/linux/x86_64/syscall.S:38
+#1  0x000055a5db3226fa in qemu_event_wait ()
+#2  0x000055a5db33466a in ?? ()
+#3  0x000055a5db32194b in ?? ()
+#4  0x00007fd323defea7 in start_thread (arg=3D<optimized out>) at pthread_c=
+reate.c:477
+#5  0x00007fd323d1feaf in clone () at ../sysdeps/unix/sysv/linux/x86_64/clo=
+ne.S:95
+
+Thread 1 (Thread 0x7fd3224dff40 (LWP 3148)):
+#0  0x00007fd323d154bf in __GI___poll (fds=3D0x55a5dca30150, nfds=3D3, time=
+out=3D3) at ../sysdeps/unix/sysv/linux/poll.c:29
+#1  0x00007fd324971f4d in ?? () from target:/lib/x86_64-linux-gnu/libusb-1.=
+0.so.0
+#2  0x00007fd32497316c in libusb_handle_events_timeout_completed () from ta=
+rget:/lib/x86_64-linux-gnu/libusb-1.0.so.0
+#3  0x000055a5db18edc7 in ?? ()
+#4  0x000055a5db18efab in ?? ()
+#5  0x000055a5db31abf7 in aio_bh_poll ()
+#6  0x000055a5db31e3fe in aio_dispatch ()
+#7  0x000055a5db31aace in ?? ()
+#8  0x00007fd324a095fd in g_main_context_dispatch () from target:/lib/x86_6=
+4-linux-gnu/libglib-2.0.so.0
+#9  0x000055a5db31d638 in main_loop_wait ()
+#10 0x000055a5dafad309 in qemu_main_loop ()
+#11 0x000055a5dae9125e in main ()
+(gdb)
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1884684
+
+Title:
+  QEMU 5.0: Guest VM hangs/freeze when unplugging USB device
+
+Status in QEMU:
+  New
+
+Bug description:
+  Setup:
+
+  Host: Debian/SID, Kernel 5.6, QEMU 5.0
+  Guest: Windows 10 VM with PCI and USB device passthrough.
+
+  Problem: Guest VM suddenly hangs when pulling USB device out from the
+  Host.
+
+  Observations:
+   - Issue appears to be related to QEMU 5.0
+     - It started after an upgrade to QEMU 5.0.
+     - Downgrading only QEMU on multiple systems fixes the issue.
+
+   - Issue is very reproducible.
+     - Most of the time within a few attempts of pulling/reconnecting the d=
+evice.
+     - Issue happens with multiple devices (I did try standard HID devices,=
+ a webcam and an x-ray sensor).
+
+   - Guest just hangs.
+     - Display output remains on last frame shown.
+     - Ping to Guest immediately stops working.
+     - Logs in the Guest stop logging immediately.
+
+   - Host is fine and thinks the Guest is fine. =
+
+     - Guest continues to show as running in "virsh list".
+     - No suspicious entries in the QEMU logs.
+     - No suspicious entries in Host syslogs/messages.
+     - Host can can kill guest "virsh destroy" and respawn fine.
+
+   - Issue seems widespread.
+     - Multiple similar reports from ProxMox users after upgrade to ProxMox=
+ 6.2 for both Windows and Linux guests (First version that uses QEMU 5.0)
+
+  https://forum.proxmox.com/threads/vm-freezes-when-disconnecting-usb-keybo=
+ard-and-mouse.70287/
+  https://forum.proxmox.com/threads/usb-drive-crashes-vm.70214/
+  https://forum.proxmox.com/threads/latest-proxmox-usb-disconnects-freeze-k=
+vm.70398/
+  https://forum.proxmox.com/threads/vm-with-gpu-passthrough-freezes-when-tu=
+rning-off-monitor-after-proxmox-6-2-upgrade.69821/
+  https://forum.proxmox.com/threads/vm-with-gpu-passthrough-freezes-when-tu=
+rning-off-monitor-after-proxmox-6-2-upgrade.69824/
+
+  I'd be more than happy any debugs that might be helpful.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1884684/+subscriptions
 
