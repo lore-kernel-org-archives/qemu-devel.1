@@ -7,66 +7,66 @@ X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D966C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 13:58:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2321DC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 13:58:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 36577206B2
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 13:58:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D6921206B2
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 13:58:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=syrmia.com header.i=@syrmia.com header.b="tJ9fFueF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36577206B2
+	dkim=pass (1024-bit key) header.d=syrmia.com header.i=@syrmia.com header.b="PGpjPCM/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6921206B2
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=syrmia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43866 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43952 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5rH8-0001jC-FK
-	for qemu-devel@archiver.kernel.org; Wed, 12 Aug 2020 09:58:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56218)
+	id 1k5rHA-0001lG-1p
+	for qemu-devel@archiver.kernel.org; Wed, 12 Aug 2020 09:58:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56240)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <Filip.Bozuta@syrmia.com>)
- id 1k5rGP-0000wu-3M
- for qemu-devel@nongnu.org; Wed, 12 Aug 2020 09:57:57 -0400
+ id 1k5rGR-0000xW-9n
+ for qemu-devel@nongnu.org; Wed, 12 Aug 2020 09:57:59 -0400
 Received: from mail-eopbgr80112.outbound.protection.outlook.com
  ([40.107.8.112]:43264 helo=EUR04-VI1-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <Filip.Bozuta@syrmia.com>)
- id 1k5rGM-0007KP-OA
- for qemu-devel@nongnu.org; Wed, 12 Aug 2020 09:57:56 -0400
+ id 1k5rGP-0007KP-Is
+ for qemu-devel@nongnu.org; Wed, 12 Aug 2020 09:57:59 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Z3gNQWtUzc1oYlB92H0yDq4KD7b/JBgGznZ4SEcP+iuTBjyhIV+h2zVrhrNLJoyUIwaswguY/gf44+71KvLE1OTTG0FrDczfuahp/xS31ltry97KMFboduhwv2BELssKgOv/YL3SrqofDg1VNRPc/Ft3vVhInOqUalWh5i9536fwSTtae5n9Hs8R1f/1sbtog2X/5MZqIeIMxJ/PDxRJxvIveIg/O63JctPojRoGpUDUxIiSh/eqXvP2Op1jAMMCw8lpBUHICAJYllU1oOMnUlQ8onOrgk1DEXXcOTFvFhTnSpQavimrW08DcBOJq7/IMyTUvhFFswwtW8ciieVgwg==
+ b=ONGPKyfLEM3rnyTGHCUB2L4TjUhmUnY0fpspRzuLUX8sfYKUBymtOZQ3jrjNjgYYv3dOExRKoqJeezWTP4q9KT10vCjfo0Riw61lXMD/psl7eQugTOe+Mw3EKC28bNT0E3W6RVCejU8cHpJPdMAbB0QlkiyxJnhIDW9P2K1HOQEAxsqqzkOCa4J8Phqh1Bbt4t+H0AgIg6Hlc8RT+ADFMpSl7WlSwZlUDPtK1WkV+aQRtigMyrvQdY7V3XvEmj5ZsaRJKwr+2zkk22fGxad+ozJbz/9fCSBJp08b1dbofqOZKdDf2d5wBSFZTwzD5MABkRdqmj8TMcZbcu1dnLRZuw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=UBt+LLF1Q7yg/tD4FIKHbIf3GeErDHR6nQfQxhRgU1Q=;
- b=oLNHP5T6YIMI8z0Iye+zcAMCDLiDujSdIeQHcN+9CEvFU+YBD3xnHMyGFHiYskT5L2rfLg/vaUuVkL6PmJOXiOL18qcrD4BYMplDib7FfEgBkDUwWZM8yJowl3qiha3x/isyseJQJ0vfucDz67Fs087Av/kJT9tVjD7ioBzYvXfobV4ciRlRluago7GjH/eDlII00O7UnTu2cj/StRFaDbrcN3ZSnDae2N6553trRF8rTSLd2wxbo6LdWRhIzOnJvbKd3Lg7qno5uEIXT19m3ZP3J0TGi87VVZtljHEMCrMDi5IlzrBKXEwYD6OrpEfwXoFA0g/M60ssjLOqDCIN4w==
+ bh=xoSs1F1XuJ97JwuSV0UpM8yNCLM+4UxxRCCkK98LvrM=;
+ b=Iae7627lXnAksXhIH6f6SKWWeP2V2A4EBTE3Z3I0T37V3W3UKDnQIah4QYEAXb3KMVBzdhp2ZX8SQL8I9nVXQziWxyXZ4B+aPCBScsB2EyYeh0YKg11rtFZAW22mX3b2pVt/YRw+RVS/yalfUuWNp6DNnjExC855Q1RpVavOt4D8HhYBHW8IuS5fgCGm9aGFwCu7uP+v2hULYMN/A71uAmYRDE1FfF4+5/qh2GRhcN6i1s1jDwKR0JFGRUI1FS59kvO+i6y563j9JH1muhyI+AD17Fc4JTts21ePU4nmWcoBVzeSPL56OFD4qIJAunsSGJwY68x1/1nkUnoKGgH9Fg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=syrmia.com; dmarc=pass action=none header.from=syrmia.com;
  dkim=pass header.d=syrmia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=syrmia.com;
  s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=UBt+LLF1Q7yg/tD4FIKHbIf3GeErDHR6nQfQxhRgU1Q=;
- b=tJ9fFueF0JQCNwl8kFF1DMq6OAoOTCiDZVQmr79XqhAG0JqZA3n2gRwgdMpeHCoJNFNKNwav0TQyzNoY8GVPGKczbvyeSI5V8RAn4nqUbTkoKdoiBHQ6jcvhNpctl5qVzs7oNd/dQsb46sXOVhDsBz15yQiD8euhiFoR8cuDbZs=
+ bh=xoSs1F1XuJ97JwuSV0UpM8yNCLM+4UxxRCCkK98LvrM=;
+ b=PGpjPCM/VdNv4H8R2/mTWhgfkHnQXrVPk43VQ4vqgXvLvxnZybkKRPiExHBvh+veZ/Gakh3kIK2cgl21PZ+aCTaf0BrBwZo2zUFn0E7hJP3ZSbmA3Zvl45r4LlxrfgC1YFKx8qVSzCdJp8woHsZuu6XIYBT6sOGSLWDRUbQNlJQ=
 Authentication-Results: nongnu.org; dkim=none (message not signed)
  header.d=none;nongnu.org; dmarc=none action=none header.from=syrmia.com;
 Received: from VE1PR03MB5246.eurprd03.prod.outlook.com (2603:10a6:802:a1::22)
  by VI1PR03MB4928.eurprd03.prod.outlook.com (2603:10a6:803:b6::28)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3261.20; Wed, 12 Aug
- 2020 13:57:18 +0000
+ 2020 13:57:19 +0000
 Received: from VE1PR03MB5246.eurprd03.prod.outlook.com
  ([fe80::3568:5b4f:ab6b:e362]) by VE1PR03MB5246.eurprd03.prod.outlook.com
  ([fe80::3568:5b4f:ab6b:e362%6]) with mapi id 15.20.3261.024; Wed, 12 Aug 2020
- 13:57:18 +0000
+ 13:57:19 +0000
 From: Filip Bozuta <Filip.Bozuta@syrmia.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 1/2] linux-user: Add support for 'ppoll_time64()' and
- 'pselect6_time64()'
-Date: Wed, 12 Aug 2020 15:57:02 +0200
-Message-Id: <20200812135703.39404-2-Filip.Bozuta@syrmia.com>
+Subject: [PATCH 2/2] linux-user: Add support for 'utimensat_time64()' and
+ 'semtimedop_time64()'
+Date: Wed, 12 Aug 2020 15:57:03 +0200
+Message-Id: <20200812135703.39404-3-Filip.Bozuta@syrmia.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200812135703.39404-1-Filip.Bozuta@syrmia.com>
 References: <20200812135703.39404-1-Filip.Bozuta@syrmia.com>
@@ -84,29 +84,29 @@ Received: from localhost.localdomain (147.91.217.238) by
 X-Mailer: git-send-email 2.25.1
 X-Originating-IP: [147.91.217.238]
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 02fea6d4-3ada-4ba0-2349-08d83ec7a089
+X-MS-Office365-Filtering-Correlation-Id: 81a69fe3-8e2b-472e-9445-08d83ec7a0fc
 X-MS-TrafficTypeDiagnostic: VI1PR03MB4928:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <VI1PR03MB492850D0D9CCD3431C7197C4EB420@VI1PR03MB4928.eurprd03.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:6790;
+X-Microsoft-Antispam-PRVS: <VI1PR03MB4928D253E4BA7D2EE8E2DA01EB420@VI1PR03MB4928.eurprd03.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: QDgxGWhj9hPUOlryD23PJAsyAx1uUAgzEu56J1aWJ/yVcDkqLkS7QcHrd9oCSbaLvyjBzzyFQMvw1SVR83FBzEE04cM43A3JIuwLmJxSNFNURph9pchYY0/peEOUDDdqt6rgqhiH9XKRo7ZVkzs23FDTlezH7E1uhpTf/ZaZ84HH5tztekK+gSa7jcIwNB4aDTEGkKAra5y6rZVV57Kq5XchCDEcWHXV3oTl4VCXSx+ASIDD01foPv+W75qWZtYvFTRK40kJq6BKY1CYwmBCeK2FRFIPGdAw8wsI6tXtc3ErL5ey4OgaL4kbzrRhsBG3x0yRLcbX6argkS8scPmZci2sG4jysGBPE3AysfpYVG9YkugZipwEJ3eAK0iF3KEYEA5PMmrmss1zg5bNIySK+PHaG/ejtSL0TDeXaNHCKeBq3OzRjX2pf3+ymLzhbOShMhSYLV7NUuDP6VWWeJX6+A==
+X-Microsoft-Antispam-Message-Info: RUIzv4trut09maOPWNBdbUylat8O2xFx3nuSUbNLMsxdjlHJL7tvhXQEbrmIs4d0wigHKWLfWdSCrW6BTvbODM8CZ8xTzlYRBBRX99VrtK2/K8Ymyj2HpkfW56auuKvfEn5FeawR5cs/lmWJzegCpQ+ZZEYCD07OrT+zrl96QEjrZI4sTr4YmtH7hNyRsAlaesys6nFi9BHPHDYJ+hsoEdTHS6jOkTDMZabFErazkRUN3kNJ3RyJsSEhlP7Bx4Z78AukgPYPTcE7gLBqKLoFxTzIW7ULuPQW8UVoC68elZ7Y/lGR3BVbkKi2dSj0TP3/Ke/jdtkkswvzB2JW8aWohts+SguN4EGwHD2n7TFjym8oreOCK8IUfiLSV6KXMrZbS4CF3VLspBYRqsOudNriDnmLsCvZhnIZTHcs8eUrX8m98Wtym+TFBjq8/i2ViVTRgxrrEaM6BQjwF8C5HVXkJQ==
 X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
  IPV:NLI; SFV:NSPM; H:VE1PR03MB5246.eurprd03.prod.outlook.com; PTR:; CAT:NONE;
  SFTY:;
  SFS:(396003)(376002)(136003)(39830400003)(346002)(366004)(107886003)(36756003)(1076003)(6506007)(966005)(5660300002)(956004)(6486002)(6666004)(6512007)(6916009)(54906003)(86362001)(66476007)(26005)(52116002)(8676002)(66556008)(66946007)(2906002)(508600001)(316002)(8936002)(16526019)(186003)(69590400007)(4326008)(2616005)(83380400001);
  DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: +KTLzsaSjjouhHvn3FXgcnO12qKLnR6nhxlnY2lCqz9slmid1kq7boEY5lzAipkqUO7COG+Een84Cyk6QNKutyo/FWhLjfdZxBrmnGdlyQZcP/EKsselQrloSYoBG2oSLJEbKZ91eYCyb3eIGDlMmkbH8SiMpzCtOtgyevqUvNfH4/LYMMQCPhTGy8YL3Rppd2TN3qH8pPlc8lYkqV1I0Z15jdZedBstTJLBRYJ3bBPd8/MOGCpk323U0DQfcUbYpxolem7Yuy8jOUcgTWwwXM8Xb+ACaowJYahuZyDdCL8iiG35gtHBspj6qLGdfinWYhSIPf3wfaDt0++EUX53IWa8v3xhfbQgKF7xrvFrZpNMcS9cm2gIzpXvH6x1omNu4x0Mx6qkowyXIsThHllN2AzqtficqVu0qJu1AIgPlN606XJmQl4kqUgb5aPxEt9h3O2kcRyKwGTajULLu/0y46PQnziTm5whdsCcoEhq7MQbdnWSKdZQFnYxiX3DxWmsdQLNRjzPgqe5b9V8uagxYtlRbcRD96Y7gGlqRh4mXGaJYKixSdhKO9o1cZprlLzUmrcF8BlL5Bg8RB/Z5Hy5zp+crTNfuQlQb/FmBgBAlhfv7CMhjxZVstXFnjibaAmcRSgwe7426DNrKC8XUfTRQw==
+X-MS-Exchange-AntiSpam-MessageData: DhBNAbiduKVzJIlwLyxvifmtbWSQwxsDvfe2lmISY86MLIGqKyjiSSBUULfeiqMxQmw9KbzXxIKyi6gi8/dVu9La3CxwOV2ObSVQeJ3WElM9+6MfmZb2NCTBykWo0HzeVKFLeRydTYGJsaJnjnZXoJaRe+LQhBXIqdtaClNQcrssI5eNqvBdx6Wcdhjc6CulzIM6lT4jx1HdWLi23ELsxn+qLRka9fq0oPyWpB6UXTQxTU1A6AKDlevqbfYlficQmS+lTXJZ8bE4FojtWJFSVtvUVabisTP665rZBKkQjj51Fb+c6BpD0sCJDtSx0iiLPR56GimlTAyjxxJ4flaMdqF5H1O+QJD6lFonCQD4zATfcbFdmJZA3v3+L9FnsXVirg5ykeWG1SxM7Exw68cjXHm4TBCejHhbE+6SDyCt14EGHF4pn0kr2k7SnQgzugLFfyWqfXRJmvj1xUyZ2NTRoKRSLELSL8mQKnUof6XnmynfX9F6lxweo2yvyj9xrxjvN1mVHdcazxVv3NYwFHkc3MiNs5fyMXbeDdLeFbV1jVkA7AAsOMg56InRAhwGzHSNkhUGB5cfXplGtk/bXIBQbfP66J9Abi0mCFEHsika+fPflSjG+CRsbPp7FpgX5C6cXUk7Ix8K3Tt6uoZgvykA1g==
 X-OriginatorOrg: syrmia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 02fea6d4-3ada-4ba0-2349-08d83ec7a089
+X-MS-Exchange-CrossTenant-Network-Message-Id: 81a69fe3-8e2b-472e-9445-08d83ec7a0fc
 X-MS-Exchange-CrossTenant-AuthSource: VE1PR03MB5246.eurprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Aug 2020 13:57:18.7630 (UTC)
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Aug 2020 13:57:19.4705 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 19214a73-c1ab-4e19-8f59-14bdcb09a66e
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: aLzqxTOeAKh13T+F3Ybbunt/GezR0JgEkDrJvPDZdPlHsdeulFNY2XEbNPaa49tiSlS5k4ujuMt1Oe3E5h7VFg==
+X-MS-Exchange-CrossTenant-UserPrincipalName: Qnle+ouFYwSrgS5m1xuzv1rZXVWoZUadtLToYv7JJSNSFT2emE+CQvAVVyJrhTD0kVjQO9EvSj8zR6XfA4vgxg==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR03MB4928
 Received-SPF: pass client-ip=40.107.8.112;
  envelope-from=Filip.Bozuta@syrmia.com;
@@ -140,230 +140,157 @@ Sender: "Qemu-devel"
 
 This patch introduces functionality for following time64 syscalls:
 
-*ppoll_time64
+*utimensat_time64()
 
-    This is a year 2038 safe variant of:
+    int utimensat(int dirfd, const char *pathname,
+                  const struct timespec times[2], int flags);
+    -- change file timestamps with nanosecond precision --
+    man page: https://man7.org/linux/man-pages/man2/utimensat.2.html
 
-    int poll(struct pollfd *fds, nfds_t nfds, int timeout)
-    -- wait for some event on a file descriptor --
-    man page: https://man7.org/linux/man-pages/man2/ppoll.2.html
+*semtimedop_time64()
 
-*pselect6_time64
-
-    This is a year 2038 safe variant of:
-
-    int pselect6(int nfds, fd_set *readfds, fd_set *writefds,
-                 fd_set *exceptfds, const struct timespec *timeout,
-                 const sigset_t *sigmask);
-    -- synchronous I/O multiplexing --
-    man page: https://man7.org/linux/man-pages/man2/pselect6.2.html
+    int semtimedop(int semid, struct sembuf *sops, size_t nsops,
+                   const struct timespec *timeout);
+    -- System V semaphore operations --
+    man page: https://www.man7.org/linux/man-pages/man2/semtimedop.2.html
 
 Implementation notes:
 
-    Year 2038 safe syscalls in this patch were implemented
-    with the same code as their regular variants (ppoll() and pselect()).
-    A switch/case statement was used to call an apropriate converting
-    function for 'struct timespec' between target and host.
-    (target_to_host/host_to_target_timespec() for regular and
-     target_to_host/host_to_target_timespec64() for time64 variants)
+   Syscall 'utimensat_time64()' is implemented in similar way as its
+   regular variants only difference being that time64 converting function
+   is used to convert values of 'struct timespec' between host and target
+   ('target_to_host_timespec64()').
+
+   For syscall 'semtimedop_time64()' and additional argument is added
+   in function 'do_semtimedop()' through which the aproppriate 'struct timespec'
+   converting function is called (0 for regular target_to_host_timespec()
+   and anything else for target_to_host_timespec64()). For 'do_ipc()' an
+   check was added as that additional argument: 'TARGET_ABI_BITS == 64'.
 
 Signed-off-by: Filip Bozuta <Filip.Bozuta@syrmia.com>
 ---
- linux-user/syscall.c | 101 ++++++++++++++++++++++++++++++++++++-------
- 1 file changed, 86 insertions(+), 15 deletions(-)
+ linux-user/syscall.c | 55 ++++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 46 insertions(+), 9 deletions(-)
 
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 1211e759c2..8f63a46f58 100644
+index 8f63a46f58..44a13c5ec2 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -397,7 +397,7 @@ static int sys_getcwd1(char *buf, size_t size)
-   return strlen(buf)+1;
- }
- 
--#ifdef TARGET_NR_utimensat
-+#if defined(TARGET_NR_utimensat)
- #if defined(__NR_utimensat)
- #define __NR_sys_utimensat __NR_utimensat
- _syscall4(int,sys_utimensat,int,dirfd,const char *,pathname,
-@@ -763,11 +763,11 @@ safe_syscall5(int, waitid, idtype_t, idtype, id_t, id, siginfo_t *, infop, \
-               int, options, struct rusage *, rusage)
- safe_syscall3(int, execve, const char *, filename, char **, argv, char **, envp)
- #if defined(TARGET_NR_select) || defined(TARGET_NR__newselect) || \
--    defined(TARGET_NR_pselect6)
-+    defined(TARGET_NR_pselect6) || defined(TARGET_NR_pselect6_time64)
- safe_syscall6(int, pselect6, int, nfds, fd_set *, readfds, fd_set *, writefds, \
-               fd_set *, exceptfds, struct timespec *, timeout, void *, sig)
- #endif
--#if defined(TARGET_NR_ppoll) || defined(TARGET_NR_poll)
-+#if defined(TARGET_NR_ppoll) || defined(TARGET_NR_ppoll_time64)
- safe_syscall5(int, ppoll, struct pollfd *, ufds, unsigned int, nfds,
-               struct timespec *, tsp, const sigset_t *, sigmask,
-               size_t, sigsetsize)
-@@ -984,7 +984,7 @@ abi_long do_brk(abi_ulong new_brk)
- }
- 
- #if defined(TARGET_NR_select) || defined(TARGET_NR__newselect) || \
--    defined(TARGET_NR_pselect6)
-+    defined(TARGET_NR_pselect6) || defined(TARGET_NR_pselect6_time64)
- static inline abi_long copy_from_user_fdset(fd_set *fds,
-                                             abi_ulong target_fds_addr,
-                                             int n)
-@@ -1252,7 +1252,8 @@ static inline abi_long target_to_host_timespec(struct timespec *host_ts,
- }
+@@ -1253,7 +1253,8 @@ static inline abi_long target_to_host_timespec(struct timespec *host_ts,
  #endif
  
--#if defined(TARGET_NR_clock_settime64) || defined(TARGET_NR_futex_time64)
-+#if defined(TARGET_NR_clock_settime64) || defined(TARGET_NR_futex_time64) || \
-+    defined(TARGET_NR_pselect6_time64) || defined(TARGET_NR_ppoll_time64)
+ #if defined(TARGET_NR_clock_settime64) || defined(TARGET_NR_futex_time64) || \
+-    defined(TARGET_NR_pselect6_time64) || defined(TARGET_NR_ppoll_time64)
++    defined(TARGET_NR_pselect6_time64) || defined(TARGET_NR_ppoll_time64) || \
++    defined(TARGET_NR_utimensat_time64) || defined(TARGET_NR_semtimedop_time64)
  static inline abi_long target_to_host_timespec64(struct timespec *host_ts,
                                                   abi_ulong target_addr)
  {
-@@ -9043,8 +9044,13 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
- #endif
-         return ret;
- #endif
-+#if defined(TARGET_NR_pselect6) || defined(TARGET_NR_pselect6_time64)
- #ifdef TARGET_NR_pselect6
-     case TARGET_NR_pselect6:
-+#endif
-+#ifdef TARGET_NR_pselect6_time64
-+    case TARGET_NR_pselect6_time64:
-+#endif
-         {
-             abi_long rfd_addr, wfd_addr, efd_addr, n, ts_addr;
-             fd_set rfds, wfds, efds;
-@@ -9088,8 +9094,21 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-              * use the do_select() helper ...
-              */
-             if (ts_addr) {
--                if (target_to_host_timespec(&ts, ts_addr)) {
--                    return -TARGET_EFAULT;
-+                switch (num) {
-+#ifdef TARGET_NR_pselect6
-+                case TARGET_NR_pselect6:
-+                    if (target_to_host_timespec(&ts, ts_addr)) {
-+                        return -TARGET_EFAULT;
-+                    }
-+                    break;
-+#endif
-+#ifdef TARGET_NR_pselect6_time64
-+                case TARGET_NR_pselect6_time64:
-+                    if (target_to_host_timespec64(&ts, ts_addr)) {
-+                        return -TARGET_EFAULT;
-+                    }
-+                    break;
-+#endif
-                 }
-                 ts_ptr = &ts;
-             } else {
-@@ -9140,8 +9159,22 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-                 if (efd_addr && copy_to_user_fdset(efd_addr, &efds, n))
-                     return -TARGET_EFAULT;
+@@ -3886,7 +3887,7 @@ static inline abi_long target_to_host_sembuf(struct sembuf *host_sembuf,
+ }
  
--                if (ts_addr && host_to_target_timespec(ts_addr, &ts))
--                    return -TARGET_EFAULT;
-+                switch (num) {
-+#ifdef TARGET_NR_pselect6
-+                case TARGET_NR_pselect6:
-+                    if (ts_addr && host_to_target_timespec(ts_addr, &ts)) {
-+                        return -TARGET_EFAULT;
-+                    }
-+                break;
+ #if defined(TARGET_NR_ipc) || defined(TARGET_NR_semop) || \
+-    defined(TARGET_NR_semtimedop)
++    defined(TARGET_NR_semtimedop) || defined(TARGET_NR_semtimedop_time64)
+ 
+ /*
+  * This macro is required to handle the s390 variants, which passes the
+@@ -3903,7 +3904,7 @@ static inline abi_long target_to_host_sembuf(struct sembuf *host_sembuf,
+ static inline abi_long do_semtimedop(int semid,
+                                      abi_long ptr,
+                                      unsigned nsops,
+-                                     abi_long timeout)
++                                     abi_long timeout, int time64)
+ {
+     struct sembuf sops[nsops];
+     struct timespec ts, *pts = NULL;
+@@ -3911,7 +3912,10 @@ static inline abi_long do_semtimedop(int semid,
+ 
+     if (timeout) {
+         pts = &ts;
+-        if (target_to_host_timespec(pts, timeout)) {
++        if (!time64 && target_to_host_timespec(pts, timeout)) {
++            return -TARGET_EFAULT;
++        }
++        if (time64 && target_to_host_timespec64(pts, timeout)) {
+             return -TARGET_EFAULT;
+         }
+     }
+@@ -4426,7 +4430,7 @@ static abi_long do_ipc(CPUArchState *cpu_env,
+ 
+     switch (call) {
+     case IPCOP_semop:
+-        ret = do_semtimedop(first, ptr, second, 0);
++        ret = do_semtimedop(first, ptr, second, 0, 0);
+         break;
+     case IPCOP_semtimedop:
+     /*
+@@ -4436,9 +4440,9 @@ static abi_long do_ipc(CPUArchState *cpu_env,
+      * to a struct timespec where the generic variant uses fifth parameter.
+      */
+ #if defined(TARGET_S390X)
+-        ret = do_semtimedop(first, ptr, second, third);
++        ret = do_semtimedop(first, ptr, second, third, TARGET_ABI_BITS == 64);
+ #else
+-        ret = do_semtimedop(first, ptr, second, fifth);
++        ret = do_semtimedop(first, ptr, second, fifth, TARGET_ABI_BITS == 64);
+ #endif
+         break;
+ 
+@@ -9783,11 +9787,15 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+ #endif
+ #ifdef TARGET_NR_semop
+     case TARGET_NR_semop:
+-        return do_semtimedop(arg1, arg2, arg3, 0);
++        return do_semtimedop(arg1, arg2, arg3, 0, 0);
+ #endif
+ #ifdef TARGET_NR_semtimedop
+     case TARGET_NR_semtimedop:
+-        return do_semtimedop(arg1, arg2, arg3, arg4);
++        return do_semtimedop(arg1, arg2, arg3, arg4, 0);
 +#endif
-+#ifdef TARGET_NR_pselect6_time64
-+                case TARGET_NR_pselect6_time64:
-+                    if (ts_addr && host_to_target_timespec64(ts_addr, &ts)) {
-+                        return -TARGET_EFAULT;
-+                    }
-+                break;
-+#endif
-+                }
-             }
++#ifdef TARGET_NR_semtimedop_time64
++    case TARGET_NR_semtimedop_time64:
++        return do_semtimedop(arg1, arg2, arg3, arg4, 1);
+ #endif
+ #ifdef TARGET_NR_semctl
+     case TARGET_NR_semctl:
+@@ -11969,6 +11977,35 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
          }
          return ret;
-@@ -10076,12 +10109,16 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-     case TARGET_NR__newselect:
-         return do_select(arg1, arg2, arg3, arg4, arg5);
  #endif
--#if defined(TARGET_NR_poll) || defined(TARGET_NR_ppoll)
-+#if defined(TARGET_NR_poll) || defined(TARGET_NR_ppoll) || \
-+    defined(TARGET_NR_ppoll_time64)
- # ifdef TARGET_NR_poll
-     case TARGET_NR_poll:
- # endif
- # ifdef TARGET_NR_ppoll
-     case TARGET_NR_ppoll:
-+# endif
-+# ifdef TARGET_NR_ppoll_time64
-+    case TARGET_NR_ppoll_time64:
- # endif
-         {
-             struct target_pollfd *target_pfd;
-@@ -10110,17 +10147,38 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-             }
- 
-             switch (num) {
--# ifdef TARGET_NR_ppoll
-+#if defined(TARGET_NR_ppoll) || defined(TARGET_NR_ppoll_time64)
-+#ifdef TARGET_NR_ppoll
-             case TARGET_NR_ppoll:
++#ifdef TARGET_NR_utimensat_time64
++    case TARGET_NR_utimensat_time64:
++        {
++            struct timespec *tsp, ts[2];
++            if (!arg3) {
++                tsp = NULL;
++            } else {
++                if (target_to_host_timespec64(ts, arg3)) {
++                    return -TARGET_EFAULT;
++                }
++                if (target_to_host_timespec64(ts + 1, arg3 +
++                                     sizeof(struct target__kernel_timespec))) {
++                    return -TARGET_EFAULT;
++                }
++                tsp = ts;
++            }
++            if (!arg2)
++                ret = get_errno(sys_utimensat(arg1, NULL, tsp, arg4));
++            else {
++                p = lock_user_string(arg2);
++                if (!p) {
++                    return -TARGET_EFAULT;
++                }
++                ret = get_errno(sys_utimensat(arg1, path(p), tsp, arg4));
++                unlock_user(p, arg2, 0);
++            }
++        }
++        return ret;
 +#endif
-+#ifdef TARGET_NR_ppoll_time64
-+            case TARGET_NR_ppoll_time64:
-+#endif
-             {
-                 struct timespec _timeout_ts, *timeout_ts = &_timeout_ts;
-                 target_sigset_t *target_set;
-                 sigset_t _set, *set = &_set;
- 
-                 if (arg3) {
--                    if (target_to_host_timespec(timeout_ts, arg3)) {
--                        unlock_user(target_pfd, arg1, 0);
--                        return -TARGET_EFAULT;
-+                    switch (num) {
-+#ifdef TARGET_NR_ppoll
-+                    case TARGET_NR_ppoll:
-+                        if (target_to_host_timespec(timeout_ts, arg3)) {
-+                            unlock_user(target_pfd, arg1, 0);
-+                            return -TARGET_EFAULT;
-+                        }
-+                    break;
-+#endif
-+#ifdef TARGET_NR_ppoll_time64
-+                    case TARGET_NR_ppoll_time64:
-+                        if (target_to_host_timespec64(timeout_ts, arg3)) {
-+                            unlock_user(target_pfd, arg1, 0);
-+                            return -TARGET_EFAULT;
-+                        }
-+                    break;
-+#endif
-+                    default:
-+                        g_assert_not_reached();
-                     }
-                 } else {
-                     timeout_ts = NULL;
-@@ -10146,7 +10204,20 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-                                            set, SIGSET_T_SIZE));
- 
-                 if (!is_error(ret) && arg3) {
--                    host_to_target_timespec(arg3, timeout_ts);
-+                    switch (num) {
-+#ifdef TARGET_NR_ppoll
-+                    case TARGET_NR_ppoll:
-+                        host_to_target_timespec(arg3, timeout_ts);
-+                        break;
-+#endif
-+#ifdef TARGET_NR_ppoll_time64
-+                    case TARGET_NR_ppoll_time64:
-+                        host_to_target_timespec64(arg3, timeout_ts);
-+                        break;
-+#endif
-+                    default:
-+                        g_assert_not_reached();
-+                    }
-                 }
-                 if (arg4) {
-                     unlock_user(target_set, arg4, 0);
+ #ifdef TARGET_NR_futex
+     case TARGET_NR_futex:
+         return do_futex(arg1, arg2, arg3, arg4, arg5, arg6);
 -- 
 2.25.1
 
