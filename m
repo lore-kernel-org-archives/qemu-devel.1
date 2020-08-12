@@ -2,81 +2,93 @@ Return-Path: <SRS0=vd3Y=BW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59F77C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 06:51:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6C83C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 06:54:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 30E7B20781
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 06:51:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30E7B20781
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 922842076B
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 06:54:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pEoJd4lD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 922842076B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59740 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36550 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5kc5-0003vm-HN
-	for qemu-devel@archiver.kernel.org; Wed, 12 Aug 2020 02:51:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33026)
+	id 1k5kek-00062l-SD
+	for qemu-devel@archiver.kernel.org; Wed, 12 Aug 2020 02:54:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33782)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k5kb8-0002ed-VH
- for qemu-devel@nongnu.org; Wed, 12 Aug 2020 02:50:54 -0400
-Received: from indium.canonical.com ([91.189.90.7]:49796)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1k5kdt-0005Dm-LC
+ for qemu-devel@nongnu.org; Wed, 12 Aug 2020 02:53:45 -0400
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:39063)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k5kb7-0003ag-9b
- for qemu-devel@nongnu.org; Wed, 12 Aug 2020 02:50:54 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1k5kb5-00043H-SQ
- for <qemu-devel@nongnu.org>; Wed, 12 Aug 2020 06:50:51 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id D5EEE2E808B
- for <qemu-devel@nongnu.org>; Wed, 12 Aug 2020 06:50:51 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 12 Aug 2020 06:44:39 -0000
-From: John Paul Adrian Glaubitz <1815911@bugs.launchpad.net>
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1k5kdr-000412-SD
+ for qemu-devel@nongnu.org; Wed, 12 Aug 2020 02:53:45 -0400
+Received: by mail-pl1-x644.google.com with SMTP id z20so668039plo.6
+ for <qemu-devel@nongnu.org>; Tue, 11 Aug 2020 23:53:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=hRnoFEnKBhkgA2clRhmlEpGopkDGft0FGQ1sbW5/fwI=;
+ b=pEoJd4lD2pzXeFTBowHd8mepclvEYhF5He9ADrurkYy7Tf0x+nfElE8jQNEqVgDjXg
+ UVMYowNBlzy9R5ly3L6kNZ3KEz/q+73yR79r2CZBdwU2O2VgIl3pODujhwVJ3lgXpBtb
+ Njg1eJoqsT4AVNf8GtJ7NMBT+UsUHQ6Exuq5/qKgKO1UJsjmb7Rdt5a3Xxo7VbPL1+a9
+ UgS03hgYoKpXYecr9qrdB204bkYQgpOAdViA4uiyBGTCmmnBJueupCR4CXKKbeUHFAor
+ QyyJ7agVJFAWxxQ9BG/FGiKWI7Pn6BAsaAzI3owoBncGXzQObP7JUs9n8S2/EPeVqrGN
+ Us1w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=hRnoFEnKBhkgA2clRhmlEpGopkDGft0FGQ1sbW5/fwI=;
+ b=Mv+bngaNVH3kSgkRB9fntgo3D9cl4hd685kq/R5eTl1bLRHjNZlyhQ1Mwy040LSwXc
+ q5s76NR4M8kAIUinaIDdH6g9TIvd6WcREFccRc30bEmQYfX+djWUg5MqOzowRix0Lt0a
+ 5tABaqCy3OXgCeB0+z38ojaBtd/b2ctHN5xON1yEEEJ93PjlRIZzodAV1uFq4LStREvo
+ hPxntoGmHz7PqymK5LFsA5FwMjn0K8zROqgjLWkayrtZJmKgQ/SXtwY4e23A2SseYF+w
+ ovhAeV1pJ2UnH7VZuAVUsxbsHRtZADXrA1qfxbtRnB6zlwHDHXHEP/fiNkd0hI7KpY8D
+ p53w==
+X-Gm-Message-State: AOAM5327SGP8w3No8/ENRmabKUl65ylSW043oSMKWsXlKJ9WFaRiWMdr
+ ph72aWk7hIRqvdz1A1tv/LCD/ZDq3Y0=
+X-Google-Smtp-Source: ABdhPJzaOFcBbY/EPG2gULPCfcwocH2iSWDgUD49cyovgtiTJ+bZV8xpiZH1ct0uQYDk8hrYbZubZA==
+X-Received: by 2002:a17:90a:ce0c:: with SMTP id
+ f12mr4427045pju.44.1597215221220; 
+ Tue, 11 Aug 2020 23:53:41 -0700 (PDT)
+Received: from localhost.localdomain ([71.212.141.89])
+ by smtp.gmail.com with ESMTPSA id b26sm1242781pff.54.2020.08.11.23.53.40
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 11 Aug 2020 23:53:40 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: anarchetic glaubitz laurent-vivier th-huth
-X-Launchpad-Bug-Reporter: John Paul Adrian Glaubitz (glaubitz)
-X-Launchpad-Bug-Modifier: John Paul Adrian Glaubitz (glaubitz)
-References: <155015240171.6215.11220706309348619396.malonedeb@soybean.canonical.com>
-Message-Id: <159721467970.26332.7793954831830318240.malone@gac.canonical.com>
-Subject: [Bug 1815911] Re: aptitude crashes qemu-m68k with handle_cpu_signal
- received signal outside vCPU context
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="6a138c03da9cc3e2e03f6dd3bbb4a615b0be6ec2";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 8570d384238e8e2f107ec580b0a4d47f1b61757c
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/12 02:20:55
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
+Subject: [PATCH 0/2] target/arm: Implement an IMPDEF pauth algorithm
+Date: Tue, 11 Aug 2020 23:53:37 -0700
+Message-Id: <20200812065339.2030527-1-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.25.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::644;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x644.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -85,62 +97,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1815911 <1815911@bugs.launchpad.net>
+Cc: mark.rutland@arm.com, peter.maydell@linaro.org, alex.bennee@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Just verified it with a very recently compiled version of QEMU from git
-master and, indeed, the bug seems to be fixed as I can no longer
-reproduce the crash. The command executes correctly.
+With recent linux kernels, which are built with pauth
+enabled, boot times have been significantly impacted.
+It turns out the architected pac algorithm is expensive
+to implement without hardware accel.
 
-I guess it's safe to mark this as fixed.
+I tried replacing this with AES128, which most hosts
+have in hardware.  I did manage to make this perform
+fairly well, but it *really* depends on the quality of
+the crypto library shipped by the OS:
 
--- =
+(0) For reference, pauth_computepac_architected consumes
+    about 80% of the total runtime for a debug-enabled
+    kernel build.  That's a 400% slowdown.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1815911
+(1) libgcrypt performed well, with 15% of the total runtime,
+    or about 18% slowdown.
 
-Title:
-  aptitude crashes qemu-m68k with handle_cpu_signal received signal
-  outside vCPU context
+(2a) libnettle, as shipped by ubuntu 18, does not have
+     the x86_64 aes instruction set enabled, and so is not
+     using the available hw accel.  That took about 40% of
+     the total runtime or 170% slowdown.
 
-Status in QEMU:
-  Incomplete
+(2b) Rebuilding libnettle locally, with --enable-fat, and
+     using LD_LIBRARY_PATH to replace the system version,
+     worked fairly well, with about 20% of the total runtime
+     or 25% slowdown.
 
-Bug description:
-  When building a package with sbuild on Debian, sbuild can use aptitude
-  to resolve dependencies.
+(2c) libnettle doesn't have support for armv8, ppc or s390.
+     Those hosts should *really* be using libgcrypt.
 
-  Recently, some changes introduced to aptitude or related packages
-  cause qemu to crash:
+But, silly me, I had used --target-list=aarch64-softmmu for
+this testing, in order to speed up the builds.  When I went
+back to building aarch64-linux-user, I was reminded that we
+don't link linux-user binaries against the crypto libraries.
+And those crypto libraries are usually only distributed as
+shared libraries, which would cause problems for --static.
 
-  (sid-m68k-sbuild)root@nofan:/# aptitude -y --without-recommends -o Dpkg::=
-Options::=3D--force-confold -o Aptitude::CmdLine::Ignore-Trust-Violations=
-=3Dfalse -o Aptitude::ProblemResolver::StepScore=3D100 -o Aptitude::Problem=
-Resolver::SolutionCost=3D"safety, priority, non-default-versions" -o Aptitu=
-de::ProblemResolver::Hints::KeepDummy=3D"reject sbuild-build-depends-core-d=
-ummy :UNINST" -o Aptitude::ProblemResolver::Keep-All-Level=3D55000 -o Aptit=
-ude::ProblemResolver::Remove-Essential-Level=3Dmaximum install vim
-  Warning: Invalid locale (please review locale settings, this might lead t=
-o problems later):
-    locale::facet::_S_create_c_locale name not valid
-  The following NEW packages will be installed:
-    libgpm2{a} vim vim-common{a} vim-runtime{a} xxd{a} =
+I very briefly looked into doing my own aes implementation,
+with host cpu detection.  But aside from the ugliness of that,
+it begs the question of what to do if there's no host accel.
 
-  0 packages upgraded, 5 newly installed, 0 to remove and 1 not upgraded.
-  Need to get 7225 kB/7260 kB of archives. After unpacking 33.5 MB will be =
-used.
-  qemu:handle_cpu_signal received signal outside vCPU context @ pc=3D0x6019=
-d1bf
-  qemu:handle_cpu_signal received signal outside vCPU context @ pc=3D0x601b=
-64ab
-  Segmentation fault
-  (sid-m68k-sbuild)root@nofan:/#
+I settled on a fast non-cryptographic hash with about 10% overhead.
 
-  The crash does not reproduce on real hardware running Debian unstable.
+I added a -cpu max,pauth={off,impdef,arch} property to choose
+between the different algorithms.  The default remains arch,
+since that's what 5.0 and 5.1 shipped.  We can discuss whether
+it makes sense to change the default for "max".
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1815911/+subscriptions
+
+r~
+
+
+Richard Henderson (2):
+  target/arm: Add cpu property to control pauth
+  target/arm: Implement an IMPDEF pauth algorithm
+
+ target/arm/cpu64.c        | 64 +++++++++++++++++++++++++++++++++
+ target/arm/pauth_helper.c | 75 ++++++++++++++++++++++++++++++++++++---
+ 2 files changed, 134 insertions(+), 5 deletions(-)
+
+-- 
+2.25.1
+
 
