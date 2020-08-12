@@ -2,73 +2,89 @@ Return-Path: <SRS0=vd3Y=BW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A7F1C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 09:45:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0304C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 09:45:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 36C4520838
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 09:45:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7E9BF206DA
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 09:45:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=lse.epita.fr header.i=@lse.epita.fr header.b="Se968BH6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36C4520838
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=lse.epita.fr
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i2Fr3Y/s"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E9BF206DA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39432 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41230 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5nK2-0006zQ-7A
-	for qemu-devel@archiver.kernel.org; Wed, 12 Aug 2020 05:45:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42324)
+	id 1k5nKP-0007hA-PR
+	for qemu-devel@archiver.kernel.org; Wed, 12 Aug 2020 05:45:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42602)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <srs0=nna4=bw=lse.epita.fr=cesar.belley@cri.epita.fr>)
- id 1k5nHV-00026a-45
- for qemu-devel@nongnu.org; Wed, 12 Aug 2020 05:42:49 -0400
-Received: from gate-2.cri.epita.net ([163.5.55.20]:40886
- helo=mail-2.srv.cri.epita.fr)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <srs0=nna4=bw=lse.epita.fr=cesar.belley@cri.epita.fr>)
- id 1k5nHS-0006kT-S2
- for qemu-devel@nongnu.org; Wed, 12 Aug 2020 05:42:48 -0400
-Received: from MattGorko-Laptop.localdomain (unknown [78.194.154.81])
- (Authenticated sender: cesar.belley)
- by mail-2.srv.cri.epita.fr (Postfix) with ESMTPSA id 96F9D415C6;
- Wed, 12 Aug 2020 11:42:45 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=lse.epita.fr; s=cri;
- t=1597225365; bh=btRqdaUXVRbDKjkqGiCstodc5y/Je6n9QgR65B0DETM=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=Se968BH6gAtXshSMnb2cmrIEKara0yfaAZe2E70KuKTp1tgV1Fna0E2bEzb8iN4+s
- ZlQI021gGsARm+ZCck+2IizIEB24rEn+YFCmfsVUksaH2Qcp8f6nkj5KnwgsNO3/hz
- fR4OpRLmKNapqoDXCd0bpdEWOFzj0N/qbKTn5YMI=
-From: =?UTF-8?q?C=C3=A9sar=20Belley?= <cesar.belley@lse.epita.fr>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 05/13] hw/usb: Add U2F key passthru mode
-Date: Wed, 12 Aug 2020 11:41:27 +0200
-Message-Id: <20200812094135.20550-6-cesar.belley@lse.epita.fr>
-X-Mailer: git-send-email 2.28.0
-In-Reply-To: <20200812094135.20550-1-cesar.belley@lse.epita.fr>
-References: <20200812094135.20550-1-cesar.belley@lse.epita.fr>
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1k5nIR-0003kf-KF
+ for qemu-devel@nongnu.org; Wed, 12 Aug 2020 05:43:47 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33101
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1k5nIO-0006py-1E
+ for qemu-devel@nongnu.org; Wed, 12 Aug 2020 05:43:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1597225422;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=WKLO7yyv5ntdbIaBRtMGcZmUc3SBFtDHhXuYVBS0KzI=;
+ b=i2Fr3Y/sKr9WqKewmYEvBsUJKHd5zI5BtxqwT37A7xc/IAI136BiBFJvhMZMBpYbKfV19H
+ X/8pG6tIr+OC/jFHntdgBh3X6ArIGEfDi/KLncgAQyUZgTUYr0iuisfmcLHAloix5zc66o
+ lHHyeH1PS8QSdi7V+q9h7/bag4EyxW0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-118-LUMCcGi-PbacDzQWuO_z_A-1; Wed, 12 Aug 2020 05:43:40 -0400
+X-MC-Unique: LUMCcGi-PbacDzQWuO_z_A-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6EEA31005E6B;
+ Wed, 12 Aug 2020 09:43:39 +0000 (UTC)
+Received: from work-vm (ovpn-113-233.ams2.redhat.com [10.36.113.233])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0C5F860BF3;
+ Wed, 12 Aug 2020 09:43:37 +0000 (UTC)
+Date: Wed, 12 Aug 2020 10:43:35 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: "Longpeng(Mike)" <longpeng2@huawei.com>
+Subject: Re: [PATCH 1/2] migration: unify the framework of socket-type channel
+Message-ID: <20200812094335.GA2810@work-vm>
+References: <20200806074030.174-1-longpeng2@huawei.com>
+ <20200806074030.174-2-longpeng2@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=163.5.55.20;
- envelope-from=srs0=nna4=bw=lse.epita.fr=cesar.belley@cri.epita.fr;
- helo=mail-2.srv.cri.epita.fr
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/12 05:42:10
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -16
-X-Spam_score: -1.7
-X-Spam_bar: -
-X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_INVALID=0.1,
- DKIM_SIGNED=0.1, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
+In-Reply-To: <20200806074030.174-2-longpeng2@huawei.com>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
+X-Mimecast-Spam-Score: 0.003
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/12 04:27:07
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -81,469 +97,239 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?C=C3=A9sar=20Belley?= <cesar.belley@lse.epita.fr>,
- kraxel@redhat.com
+Cc: arei.gonglei@huawei.com, qemu-devel@nongnu.org, quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch adds the U2F key pass-through mode.
+* Longpeng(Mike) (longpeng2@huawei.com) wrote:
+> Currently, the only difference of tcp channel and unix channel in
+> migration/socket.c is the way to build SocketAddress, but socket_parse()
+> can handle these two types, so use it to instead of tcp_build_address()
+> and unix_build_address().
+> 
+> The socket-type channel can be further unified based on the up, this
+> would be helpful for us to add other socket-type channels.
+> 
+> Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
 
-The pass-through mode consists of passing all requests made from the
-guest to the physical security key connected to the host machine and
-vice versa.
+Nice; this saves a chunk of code.
 
-In addition, the dedicated pass-through allows to have a U2F security key
-shared on several guests which is not possible with a simple host device
-assignment pass-through.
 
-The pass-through mode is associated with a device inheriting from
-u2f-key base.
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-To work, it needs the path to a U2F hidraw, obtained from the Qemu
-command line, and passed by the user:
-
-    qemu -usb -device u2f-passthru,hidraw=/dev/hidrawX
-
-Autoscan and U2F compatibility checking features are given at the end
-of the patch series.
-
-Signed-off-by: César Belley <cesar.belley@lse.epita.fr>
----
- hw/usb/u2f-passthru.c | 423 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 423 insertions(+)
- create mode 100644 hw/usb/u2f-passthru.c
-
-diff --git a/hw/usb/u2f-passthru.c b/hw/usb/u2f-passthru.c
-new file mode 100644
-index 0000000000..106b5abf9e
---- /dev/null
-+++ b/hw/usb/u2f-passthru.c
-@@ -0,0 +1,423 @@
-+/*
-+ * U2F USB Passthru device.
-+ *
-+ * Copyright (c) 2020 César Belley <cesar.belley@lse.epita.fr>
-+ * Written by César Belley <cesar.belley@lse.epita.fr>
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/module.h"
-+#include "qemu/main-loop.h"
-+#include "qemu/error-report.h"
-+#include "qapi/error.h"
-+#include "hw/qdev-properties.h"
-+#include "hw/usb.h"
-+#include "migration/vmstate.h"
-+
-+#include "u2f.h"
-+
-+#define NONCE_SIZE 8
-+#define BROADCAST_CID 0xFFFFFFFF
-+#define TRANSACTION_TIMEOUT 120000
-+
-+struct transaction {
-+    uint32_t cid;
-+    uint16_t resp_bcnt;
-+    uint16_t resp_size;
-+
-+    /* Nonce for broadcast isolation */
-+    uint8_t nonce[NONCE_SIZE];
-+};
-+
-+typedef struct U2FPassthruState U2FPassthruState;
-+
-+#define CURRENT_TRANSACTIONS_NUM 4
-+
-+struct U2FPassthruState {
-+    U2FKeyState base;
-+
-+    /* Host device */
-+    char *hidraw;
-+    int hidraw_fd;
-+
-+    /* Current Transactions */
-+    struct transaction current_transactions[CURRENT_TRANSACTIONS_NUM];
-+    uint8_t current_transactions_start;
-+    uint8_t current_transactions_end;
-+    uint8_t current_transactions_num;
-+
-+    /* Transaction time checking */
-+    int64_t last_transaction_time;
-+    QEMUTimer timer;
-+};
-+
-+#define TYPE_U2F_PASSTHRU "u2f-passthru"
-+#define PASSTHRU_U2F_KEY(obj) \
-+    OBJECT_CHECK(U2FPassthruState, (obj), TYPE_U2F_PASSTHRU)
-+
-+/* Init packet sizes */
-+#define PACKET_INIT_HEADER_SIZE 7
-+#define PACKET_INIT_DATA_SIZE (U2FHID_PACKET_SIZE - PACKET_INIT_HEADER_SIZE)
-+
-+/* Cont packet sizes */
-+#define PACKET_CONT_HEADER_SIZE 5
-+#define PACKET_CONT_DATA_SIZE (U2FHID_PACKET_SIZE - PACKET_CONT_HEADER_SIZE)
-+
-+struct packet_init {
-+    uint32_t cid;
-+    uint8_t cmd;
-+    uint8_t bcnth;
-+    uint8_t bcntl;
-+    uint8_t data[PACKET_INIT_DATA_SIZE];
-+} QEMU_PACKED;
-+
-+static inline uint32_t packet_get_cid(const void *packet)
-+{
-+    return *((uint32_t *)packet);
-+}
-+
-+static inline bool packet_is_init(const void *packet)
-+{
-+    return ((uint8_t *)packet)[4] & (1 << 7);
-+}
-+
-+static inline uint16_t packet_init_get_bcnt(
-+        const struct packet_init *packet_init)
-+{
-+    uint16_t bcnt = 0;
-+    bcnt |= packet_init->bcnth << 8;
-+    bcnt |= packet_init->bcntl;
-+
-+    return bcnt;
-+}
-+
-+static void u2f_passthru_reset(U2FPassthruState *key)
-+{
-+    timer_del(&key->timer);
-+    qemu_set_fd_handler(key->hidraw_fd, NULL, NULL, key);
-+    key->last_transaction_time = 0;
-+    key->current_transactions_start = 0;
-+    key->current_transactions_end = 0;
-+    key->current_transactions_num = 0;
-+}
-+
-+static void u2f_timeout_check(void *opaque)
-+{
-+    U2FPassthruState *key = opaque;
-+    int64_t time = qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL);
-+
-+    if (time > key->last_transaction_time + TRANSACTION_TIMEOUT) {
-+        u2f_passthru_reset(key);
-+    } else {
-+        timer_mod(&key->timer, time + TRANSACTION_TIMEOUT / 4);
-+    }
-+}
-+
-+static int u2f_transaction_get_index(U2FPassthruState *key, uint32_t cid)
-+{
-+    for (int i = 0; i < key->current_transactions_num; ++i) {
-+        int index = (key->current_transactions_start + i)
-+            % CURRENT_TRANSACTIONS_NUM;
-+        if (cid == key->current_transactions[index].cid) {
-+            return index;
-+        }
-+    }
-+    return -1;
-+}
-+
-+static struct transaction *u2f_transaction_get(U2FPassthruState *key,
-+                                               uint32_t cid)
-+{
-+    int index = u2f_transaction_get_index(key, cid);
-+    if (index < 0) {
-+        return NULL;
-+    }
-+    return &key->current_transactions[index];
-+}
-+
-+static struct transaction *u2f_transaction_get_from_nonce(U2FPassthruState *key,
-+                                const uint8_t nonce[NONCE_SIZE])
-+{
-+    for (int i = 0; i < key->current_transactions_num; ++i) {
-+        int index = (key->current_transactions_start + i)
-+            % CURRENT_TRANSACTIONS_NUM;
-+        if (key->current_transactions[index].cid == BROADCAST_CID
-+            && memcmp(nonce, key->current_transactions[index].nonce,
-+                      NONCE_SIZE) == 0) {
-+            return &key->current_transactions[index];
-+        }
-+    }
-+    return NULL;
-+}
-+
-+static void u2f_transaction_close(U2FPassthruState *key, uint32_t cid)
-+{
-+    int index, next_index;
-+    index = u2f_transaction_get_index(key, cid);
-+    if (index < 0) {
-+        return;
-+    }
-+    next_index = (index + 1) % CURRENT_TRANSACTIONS_NUM;
-+
-+    /* Rearrange to ensure the oldest is at the start position */
-+    while (next_index != key->current_transactions_end) {
-+        memcpy(&key->current_transactions[index],
-+               &key->current_transactions[next_index],
-+               sizeof(struct transaction));
-+
-+        index = next_index;
-+        next_index = (index + 1) % CURRENT_TRANSACTIONS_NUM;
-+    }
-+
-+    key->current_transactions_end = index;
-+    --key->current_transactions_num;
-+
-+    if (key->current_transactions_num == 0) {
-+        u2f_passthru_reset(key);
-+    }
-+}
-+
-+static void u2f_transaction_add(U2FPassthruState *key, uint32_t cid,
-+                                const uint8_t nonce[NONCE_SIZE])
-+{
-+    uint8_t index;
-+    struct transaction *transaction;
-+
-+    if (key->current_transactions_num >= CURRENT_TRANSACTIONS_NUM) {
-+        /* Close the oldest transaction */
-+        index = key->current_transactions_start;
-+        transaction = &key->current_transactions[index];
-+        u2f_transaction_close(key, transaction->cid);
-+    }
-+
-+    /* Index */
-+    index = key->current_transactions_end;
-+    key->current_transactions_end = (index + 1) % CURRENT_TRANSACTIONS_NUM;
-+    ++key->current_transactions_num;
-+
-+    /* Transaction */
-+    transaction = &key->current_transactions[index];
-+    transaction->cid = cid;
-+    transaction->resp_bcnt = 0;
-+    transaction->resp_size = 0;
-+
-+    /* Nonce */
-+    if (nonce != NULL) {
-+        memcpy(transaction->nonce, nonce, NONCE_SIZE);
-+    }
-+}
-+
-+static void u2f_passthru_read(void *opaque);
-+
-+static void u2f_transaction_start(U2FPassthruState *key,
-+                                  const struct packet_init *packet_init)
-+{
-+    int64_t time;
-+
-+    /* Transaction */
-+    if (packet_init->cid == BROADCAST_CID) {
-+        u2f_transaction_add(key, packet_init->cid, packet_init->data);
-+    } else {
-+        u2f_transaction_add(key, packet_init->cid, NULL);
-+    }
-+
-+    /* Time */
-+    time = qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL);
-+    if (key->last_transaction_time == 0) {
-+        qemu_set_fd_handler(key->hidraw_fd, u2f_passthru_read, NULL, key);
-+        timer_init_ms(&key->timer, QEMU_CLOCK_VIRTUAL, u2f_timeout_check, key);
-+        timer_mod(&key->timer, time + TRANSACTION_TIMEOUT / 4);
-+    }
-+    key->last_transaction_time = time;
-+}
-+
-+static void u2f_passthru_recv_from_host(U2FPassthruState *key,
-+                                    const uint8_t packet[U2FHID_PACKET_SIZE])
-+{
-+    struct transaction *transaction;
-+    uint32_t cid;
-+
-+    /* Retrieve transaction */
-+    cid = packet_get_cid(packet);
-+    if (cid == BROADCAST_CID) {
-+        struct packet_init *packet_init;
-+        if (!packet_is_init(packet)) {
-+            return;
-+        }
-+        packet_init = (struct packet_init *)packet;
-+        transaction = u2f_transaction_get_from_nonce(key, packet_init->data);
-+    } else {
-+        transaction = u2f_transaction_get(key, cid);
-+    }
-+
-+    /* Ignore no started transaction */
-+    if (transaction == NULL) {
-+        return;
-+    }
-+
-+    if (packet_is_init(packet)) {
-+        struct packet_init *packet_init = (struct packet_init *)packet;
-+        transaction->resp_bcnt = packet_init_get_bcnt(packet_init);
-+        transaction->resp_size = PACKET_INIT_DATA_SIZE;
-+
-+        if (packet_init->cid == BROADCAST_CID) {
-+            /* Nonce checking for legitimate response */
-+            if (memcmp(transaction->nonce, packet_init->data, NONCE_SIZE)
-+                != 0) {
-+                return;
-+            }
-+        }
-+    } else {
-+        transaction->resp_size += PACKET_CONT_DATA_SIZE;
-+    }
-+
-+    /* Transaction end check */
-+    if (transaction->resp_size >= transaction->resp_bcnt) {
-+        u2f_transaction_close(key, cid);
-+    }
-+    u2f_send_to_guest(&key->base, packet);
-+}
-+
-+static void u2f_passthru_read(void *opaque)
-+{
-+    U2FPassthruState *key = opaque;
-+    U2FKeyState *base = &key->base;
-+    uint8_t packet[2 * U2FHID_PACKET_SIZE];
-+    int ret;
-+
-+    /* Full size base queue check */
-+    if (base->pending_in_num >= U2FHID_PENDING_IN_NUM) {
-+        return;
-+    }
-+
-+    ret = read(key->hidraw_fd, packet, sizeof(packet));
-+    if (ret < 0) {
-+        /* Detach */
-+        if (base->dev.attached) {
-+            usb_device_detach(&base->dev);
-+            u2f_passthru_reset(key);
-+        }
-+        return;
-+    }
-+    if (ret != U2FHID_PACKET_SIZE) {
-+        return;
-+    }
-+    u2f_passthru_recv_from_host(key, packet);
-+}
-+
-+static void u2f_passthru_recv_from_guest(U2FKeyState *base,
-+                                    const uint8_t packet[U2FHID_PACKET_SIZE])
-+{
-+    U2FPassthruState *key = PASSTHRU_U2F_KEY(base);
-+    uint8_t host_packet[U2FHID_PACKET_SIZE + 1];
-+    ssize_t written;
-+
-+    if (packet_is_init(packet)) {
-+        u2f_transaction_start(key, (struct packet_init *)packet);
-+    }
-+
-+    host_packet[0] = 0;
-+    memcpy(host_packet + 1, packet, U2FHID_PACKET_SIZE);
-+
-+    written = write(key->hidraw_fd, host_packet, sizeof(host_packet));
-+    if (written != sizeof(host_packet)) {
-+        error_report("%s: Bad written size (req 0x%lx, val 0x%lx)",
-+                     TYPE_U2F_PASSTHRU, sizeof(host_packet), written);
-+    }
-+}
-+
-+static void u2f_passthru_unrealize(U2FKeyState *base)
-+{
-+    U2FPassthruState *key = PASSTHRU_U2F_KEY(base);
-+
-+    u2f_passthru_reset(key);
-+    qemu_close(key->hidraw_fd);
-+}
-+
-+static void u2f_passthru_realize(U2FKeyState *base, Error **errp)
-+{
-+    U2FPassthruState *key = PASSTHRU_U2F_KEY(base);
-+    int fd;
-+
-+    if (key->hidraw == NULL) {
-+        error_setg(errp, "%s: Missing hidraw", TYPE_U2F_PASSTHRU);
-+        return;
-+    }
-+
-+    fd = qemu_open(key->hidraw, O_RDWR);
-+    if (fd < 0) {
-+        error_setg(errp, "%s: Failed to open %s", TYPE_U2F_PASSTHRU,
-+                   key->hidraw);
-+        return;
-+    }
-+    key->hidraw_fd = fd;
-+    u2f_passthru_reset(key);
-+}
-+
-+static int u2f_passthru_post_load(void *opaque, int version_id)
-+{
-+    U2FPassthruState *key = opaque;
-+    u2f_passthru_reset(key);
-+    return 0;
-+}
-+
-+static const VMStateDescription u2f_passthru_vmstate = {
-+    .name = "u2f-key-passthru",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .post_load = u2f_passthru_post_load,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_U2F_KEY(base, U2FPassthruState),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static Property u2f_passthru_properties[] = {
-+    DEFINE_PROP_STRING("hidraw", U2FPassthruState, hidraw),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void u2f_passthru_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+    U2FKeyClass *kc = U2F_KEY_CLASS(klass);
-+
-+    kc->realize = u2f_passthru_realize;
-+    kc->unrealize = u2f_passthru_unrealize;
-+    kc->recv_from_guest = u2f_passthru_recv_from_guest;
-+    dc->desc = "QEMU U2F passthrough key";
-+    dc->vmsd = &u2f_passthru_vmstate;
-+    device_class_set_props(dc, u2f_passthru_properties);
-+}
-+
-+static const TypeInfo u2f_key_passthru_info = {
-+    .name = TYPE_U2F_PASSTHRU,
-+    .parent = TYPE_U2F_KEY,
-+    .instance_size = sizeof(U2FPassthruState),
-+    .class_init = u2f_passthru_class_init
-+};
-+
-+static void u2f_key_passthru_register_types(void)
-+{
-+    type_register_static(&u2f_key_passthru_info);
-+}
-+
-+type_init(u2f_key_passthru_register_types)
+> ---
+>  migration/migration.c | 18 ++++++-------
+>  migration/socket.c    | 72 +++++++++++----------------------------------------
+>  migration/socket.h    | 11 +++-----
+>  3 files changed, 26 insertions(+), 75 deletions(-)
+> 
+> diff --git a/migration/migration.c b/migration/migration.c
+> index 8fe3633..3160b95 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -377,21 +377,20 @@ void migrate_add_address(SocketAddress *address)
+>  
+>  void qemu_start_incoming_migration(const char *uri, Error **errp)
+>  {
+> -    const char *p;
+> +    const char *p = NULL;
+>  
+>      qapi_event_send_migration(MIGRATION_STATUS_SETUP);
+>      if (!strcmp(uri, "defer")) {
+>          deferred_incoming_migration(errp);
+> -    } else if (strstart(uri, "tcp:", &p)) {
+> -        tcp_start_incoming_migration(p, errp);
+> +    } else if (strstart(uri, "tcp:", &p) ||
+> +               strstart(uri, "unix:", NULL)) {
+> +        socket_start_incoming_migration(p ? p : uri, errp);
+>  #ifdef CONFIG_RDMA
+>      } else if (strstart(uri, "rdma:", &p)) {
+>          rdma_start_incoming_migration(p, errp);
+>  #endif
+>      } else if (strstart(uri, "exec:", &p)) {
+>          exec_start_incoming_migration(p, errp);
+> -    } else if (strstart(uri, "unix:", &p)) {
+> -        unix_start_incoming_migration(p, errp);
+>      } else if (strstart(uri, "fd:", &p)) {
+>          fd_start_incoming_migration(p, errp);
+>      } else {
+> @@ -2064,7 +2063,7 @@ void qmp_migrate(const char *uri, bool has_blk, bool blk,
+>  {
+>      Error *local_err = NULL;
+>      MigrationState *s = migrate_get_current();
+> -    const char *p;
+> +    const char *p = NULL;
+>  
+>      if (!migrate_prepare(s, has_blk && blk, has_inc && inc,
+>                           has_resume && resume, errp)) {
+> @@ -2072,16 +2071,15 @@ void qmp_migrate(const char *uri, bool has_blk, bool blk,
+>          return;
+>      }
+>  
+> -    if (strstart(uri, "tcp:", &p)) {
+> -        tcp_start_outgoing_migration(s, p, &local_err);
+> +    if (strstart(uri, "tcp:", &p) ||
+> +        strstart(uri, "unix:", NULL)) {
+> +        socket_start_outgoing_migration(s, p ? p : uri, &local_err);
+>  #ifdef CONFIG_RDMA
+>      } else if (strstart(uri, "rdma:", &p)) {
+>          rdma_start_outgoing_migration(s, p, &local_err);
+>  #endif
+>      } else if (strstart(uri, "exec:", &p)) {
+>          exec_start_outgoing_migration(s, p, &local_err);
+> -    } else if (strstart(uri, "unix:", &p)) {
+> -        unix_start_outgoing_migration(s, p, &local_err);
+>      } else if (strstart(uri, "fd:", &p)) {
+>          fd_start_outgoing_migration(s, p, &local_err);
+>      } else {
+> diff --git a/migration/socket.c b/migration/socket.c
+> index 97c9efd..6016642 100644
+> --- a/migration/socket.c
+> +++ b/migration/socket.c
+> @@ -50,34 +50,6 @@ int socket_send_channel_destroy(QIOChannel *send)
+>      return 0;
+>  }
+>  
+> -static SocketAddress *tcp_build_address(const char *host_port, Error **errp)
+> -{
+> -    SocketAddress *saddr;
+> -
+> -    saddr = g_new0(SocketAddress, 1);
+> -    saddr->type = SOCKET_ADDRESS_TYPE_INET;
+> -
+> -    if (inet_parse(&saddr->u.inet, host_port, errp)) {
+> -        qapi_free_SocketAddress(saddr);
+> -        return NULL;
+> -    }
+> -
+> -    return saddr;
+> -}
+> -
+> -
+> -static SocketAddress *unix_build_address(const char *path)
+> -{
+> -    SocketAddress *saddr;
+> -
+> -    saddr = g_new0(SocketAddress, 1);
+> -    saddr->type = SOCKET_ADDRESS_TYPE_UNIX;
+> -    saddr->u.q_unix.path = g_strdup(path);
+> -
+> -    return saddr;
+> -}
+> -
+> -
+>  struct SocketConnectData {
+>      MigrationState *s;
+>      char *hostname;
+> @@ -109,9 +81,10 @@ static void socket_outgoing_migration(QIOTask *task,
+>      object_unref(OBJECT(sioc));
+>  }
+>  
+> -static void socket_start_outgoing_migration(MigrationState *s,
+> -                                            SocketAddress *saddr,
+> -                                            Error **errp)
+> +static void
+> +socket_start_outgoing_migration_internal(MigrationState *s,
+> +                                         SocketAddress *saddr,
+> +                                         Error **errp)
+>  {
+>      QIOChannelSocket *sioc = qio_channel_socket_new();
+>      struct SocketConnectData *data = g_new0(struct SocketConnectData, 1);
+> @@ -135,27 +108,18 @@ static void socket_start_outgoing_migration(MigrationState *s,
+>                                       NULL);
+>  }
+>  
+> -void tcp_start_outgoing_migration(MigrationState *s,
+> -                                  const char *host_port,
+> -                                  Error **errp)
+> +void socket_start_outgoing_migration(MigrationState *s,
+> +                                     const char *str,
+> +                                     Error **errp)
+>  {
+>      Error *err = NULL;
+> -    SocketAddress *saddr = tcp_build_address(host_port, &err);
+> +    SocketAddress *saddr = socket_parse(str, &err);
+>      if (!err) {
+> -        socket_start_outgoing_migration(s, saddr, &err);
+> +        socket_start_outgoing_migration_internal(s, saddr, &err);
+>      }
+>      error_propagate(errp, err);
+>  }
+>  
+> -void unix_start_outgoing_migration(MigrationState *s,
+> -                                   const char *path,
+> -                                   Error **errp)
+> -{
+> -    SocketAddress *saddr = unix_build_address(path);
+> -    socket_start_outgoing_migration(s, saddr, errp);
+> -}
+> -
+> -
+>  static void socket_accept_incoming_migration(QIONetListener *listener,
+>                                               QIOChannelSocket *cioc,
+>                                               gpointer opaque)
+> @@ -173,8 +137,9 @@ static void socket_accept_incoming_migration(QIONetListener *listener,
+>  }
+>  
+>  
+> -static void socket_start_incoming_migration(SocketAddress *saddr,
+> -                                            Error **errp)
+> +static void
+> +socket_start_incoming_migration_internal(SocketAddress *saddr,
+> +                                         Error **errp)
+>  {
+>      QIONetListener *listener = qio_net_listener_new();
+>      size_t i;
+> @@ -207,20 +172,13 @@ static void socket_start_incoming_migration(SocketAddress *saddr,
+>      }
+>  }
+>  
+> -void tcp_start_incoming_migration(const char *host_port, Error **errp)
+> +void socket_start_incoming_migration(const char *str, Error **errp)
+>  {
+>      Error *err = NULL;
+> -    SocketAddress *saddr = tcp_build_address(host_port, &err);
+> +    SocketAddress *saddr = socket_parse(str, &err);
+>      if (!err) {
+> -        socket_start_incoming_migration(saddr, &err);
+> +        socket_start_incoming_migration_internal(saddr, &err);
+>      }
+>      qapi_free_SocketAddress(saddr);
+>      error_propagate(errp, err);
+>  }
+> -
+> -void unix_start_incoming_migration(const char *path, Error **errp)
+> -{
+> -    SocketAddress *saddr = unix_build_address(path);
+> -    socket_start_incoming_migration(saddr, errp);
+> -    qapi_free_SocketAddress(saddr);
+> -}
+> diff --git a/migration/socket.h b/migration/socket.h
+> index 528c3b0..891dbcc 100644
+> --- a/migration/socket.h
+> +++ b/migration/socket.h
+> @@ -23,13 +23,8 @@
+>  void socket_send_channel_create(QIOTaskFunc f, void *data);
+>  int socket_send_channel_destroy(QIOChannel *send);
+>  
+> -void tcp_start_incoming_migration(const char *host_port, Error **errp);
+> +void socket_start_incoming_migration(const char *str, Error **errp);
+>  
+> -void tcp_start_outgoing_migration(MigrationState *s, const char *host_port,
+> -                                  Error **errp);
+> -
+> -void unix_start_incoming_migration(const char *path, Error **errp);
+> -
+> -void unix_start_outgoing_migration(MigrationState *s, const char *path,
+> -                                   Error **errp);
+> +void socket_start_outgoing_migration(MigrationState *s, const char *str,
+> +                                     Error **errp);
+>  #endif
+> -- 
+> 1.8.3.1
+> 
 -- 
-2.28.0
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
