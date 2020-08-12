@@ -2,96 +2,139 @@ Return-Path: <SRS0=vd3Y=BW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B8F1C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 21:34:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45189C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 22:32:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 22BF720781
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 21:34:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 098C320774
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 22:32:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pbeqsBjO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22BF720781
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="sxhMSrut";
+	dkim=pass (1024-bit key) header.d=qualcomm.onmicrosoft.com header.i=@qualcomm.onmicrosoft.com header.b="FRTyY8MJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 098C320774
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=quicinc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41056 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56262 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5yOD-0005vW-9t
-	for qemu-devel@archiver.kernel.org; Wed, 12 Aug 2020 17:34:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53670)
+	id 1k5zIQ-0000ID-8I
+	for qemu-devel@archiver.kernel.org; Wed, 12 Aug 2020 18:32:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37516)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1k5yNR-0005Gg-UY
- for qemu-devel@nongnu.org; Wed, 12 Aug 2020 17:33:42 -0400
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:45312)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1k5yNO-0006Gt-Cl
- for qemu-devel@nongnu.org; Wed, 12 Aug 2020 17:33:41 -0400
-Received: by mail-pl1-x642.google.com with SMTP id bh1so1669540plb.12
- for <qemu-devel@nongnu.org>; Wed, 12 Aug 2020 14:33:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=C5MvkIBVFLX8HRTh+OLegEEsjltSHnz6HzBtZTno2sU=;
- b=pbeqsBjORuu/+EgIYzzFaL7/c6+ThCvNOAENbW6j/meSz1meM5XEWq2qiX97MPS7s2
- QmQfSzpu+iEw8WelV6L5SP0/sD4rkX3tS3rvVtDy1nb1O/Pf9ZEcw4xNNhkIyKnrd4vP
- a2jEEFpFkFrFnS1w2Kw8xx+FMLaH3kaufzCgSlhD64vkAobAQor8kWuqSKOwcifpm32b
- gui65SBQywSpS0bU1O684ETL+R7ouKhB791ENtXOvTK5/dR+SAvh2lFm8cOfXDywY9QB
- BNFTYf1e3804/uDLmiNt0tOcB/rYLvBo55J4CoWwthPvL5oo6UwbAome5/h0n5ogyVkP
- Xx/A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=C5MvkIBVFLX8HRTh+OLegEEsjltSHnz6HzBtZTno2sU=;
- b=YdKR8o1yNPNgKOJxXERwY1vzlU/Ehmf5I2k0CuY49IN/o7ScvJNp0L//07l/YdnXhm
- raC0jRGKoBAf1GlyykV0MslmhI6f+6B2hGSH17uEyCNQ3Vtaa0++Z53qFq7i/eC9rFvp
- NWN8apVEV3oj9KIrauCjgpzfW0a1I5nKnNNbu2+L2uKJj6EtgE3cEaA7d6wwYaJPQnEE
- Ak6H6DeVhgSLU+lxcersxydP5VA1lBQuQR7kw3Qdho16LxqiQ8LnTHi13ku192VW6auu
- pACMyXBXU2Vo42rMDNZzSopD+RNDwsCZopOwdVS0VPyfDFlRfSO7TOhZg3JxVfyae2BL
- ZvlQ==
-X-Gm-Message-State: AOAM530uD10ldA1MyQk9H1UGbHfxJOxWEps7GLgQSwwcto4ju9K96LXT
- iRdcvkL1+aXr2LKhvbU9oX8ux6XK1Pg=
-X-Google-Smtp-Source: ABdhPJzsuvEQlI5kKGuCaaSrts0bPC1ClDJjuhYv3k0taoegT7scYSk17Hu0FnE2tE8aK6/lPXVGWg==
-X-Received: by 2002:a17:90b:23c8:: with SMTP id
- md8mr2074702pjb.176.1597268016017; 
- Wed, 12 Aug 2020 14:33:36 -0700 (PDT)
-Received: from [192.168.1.11] ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id f27sm3385524pfk.217.2020.08.12.14.33.34
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 12 Aug 2020 14:33:35 -0700 (PDT)
-Subject: Re: [PATCH v2] target/ppc: Integrate icount to purr, vtb, and tbu40
-To: Gustavo Romero <gromero@linux.ibm.com>, qemu-ppc@nongnu.org
-References: <20200811153235.4527-1-gromero@linux.ibm.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <5944440c-73ac-8c21-9f02-fee91a3a2dfd@linaro.org>
-Date: Wed, 12 Aug 2020 14:33:33 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <steplong@quicinc.com>)
+ id 1k5zHd-00085A-DL
+ for qemu-devel@nongnu.org; Wed, 12 Aug 2020 18:31:45 -0400
+Received: from alexa-out-sd-01.qualcomm.com ([199.106.114.38]:14358)
+ by eggs.gnu.org with esmtps (TLS1.2:RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <steplong@quicinc.com>)
+ id 1k5zHa-0004ci-EL
+ for qemu-devel@nongnu.org; Wed, 12 Aug 2020 18:31:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
+ t=1597271502; x=1628807502;
+ h=from:to:cc:subject:date:message-id:
+ content-transfer-encoding:mime-version;
+ bh=5vXaj8h4jSfsMCA4uaUM4pwzKoIw8oeRk9VeqAWv1qY=;
+ b=sxhMSrutKsDw9fGMV0ndpUEimBnY8PRHinUhxFgOD37l0TG8/exBdHLg
+ RHUsuDLoCCxxQezwFJx/q0bKtLZAz4liI7Ww3kwMOE2hK2jTFmEiDpL3c
+ olRiJ6wAcd3JO0EyNKa7+Tfmr5RvMQFA0QDhjUMtwBm5XlCl7D2ifHOHm Q=;
+Received: from unknown (HELO ironmsg02-sd.qualcomm.com) ([10.53.140.142])
+ by alexa-out-sd-01.qualcomm.com with ESMTP; 12 Aug 2020 15:31:27 -0700
+Received: from nasanexm03e.na.qualcomm.com ([10.85.0.48])
+ by ironmsg02-sd.qualcomm.com with ESMTP/TLS/AES256-SHA;
+ 12 Aug 2020 15:31:27 -0700
+Received: from NASANEXM01F.na.qualcomm.com (10.85.0.32) by
+ nasanexm03e.na.qualcomm.com (10.85.0.48) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.2; Wed, 12 Aug 2020 15:31:27 -0700
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (199.106.107.6)
+ by NASANEXM01F.na.qualcomm.com (10.85.0.32) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2 via Frontend Transport; Wed, 12 Aug 2020 15:31:26 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=eGKlWyfPM+jclq4RMaL2sxfovqmfq/jQYaMW2TEzeof9U6anr7jnyEmwkvVm4JuwRMcnqTmWGEOpAybDwtX6dhBcg0dyp6wcovsghVfhQHVcxINIoLvYUAfZbmXxztOTUJIRkWrjDVU2JkdP2dcac1Vx9qj+NVCllk3xtwcf9kZNawTskJsy2yKZOeth3edM80h6b6/kobMEy+T0M4FNta2yQ98JoJg09RnBjIuZZBv4JJq6S104+OaYlTN+59HgstE73+PH3OT/5RxcQJWog7dhhpsyNs9cKLJryz3mLO0fWMQXxaR8WoXTdHiO9Y+e2xkD2c4zCjKKuL25UKk81w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=f97E6sqCmlg17sL6HSNhlisXn4riXKD+XnyDYVUqf74=;
+ b=HVpgfsbrAaZPRngoKgjN3LmJRtICAFXKS9i116lcx83VDvxsbv5xGSUpmNUv1dpxhOkIE3ur7HE/7xHpTykn27EbofoNPusI4G+qQUObZ4ik8AVYB8dAGa3T+yz3F+RwI8xr334qbiSDcegC0djPNmlXmDLTCnhCDaRTBRGeXkgsAG+7BG2fCdKvsP9KRrRKtBQDCo93RJJyhMt9R6JfE/y21WNxc085yowMCWDrLN28FiXvvWy9vJwZBVrOa4FQuMP8IScsVYNweE0JPbKR1KBso6m+qlUjDJPLK12iwoUlnsLsADoWihqYGzDXXRjI+4wPx8VdHIN6jf+w3IJBFQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=quicinc.com; dmarc=pass action=none header.from=quicinc.com;
+ dkim=pass header.d=quicinc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=qualcomm.onmicrosoft.com; s=selector1-qualcomm-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=f97E6sqCmlg17sL6HSNhlisXn4riXKD+XnyDYVUqf74=;
+ b=FRTyY8MJ/1zkH89bh6cW7j+neJoeqtSBFFLs3yS5mnmlpW3mh7Ov6lGqCPyBBf0RFYjRXPsvm/55zXRBt3pFJGmhJBztSMzUYT0K0UozXUkINEEaOOLC/eH0H0MDN2SkMoWU6huIa1vgZwgLpfPjCrhIn/AyA6oqKp3OAABI6Ao=
+Authentication-Results: nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=none action=none header.from=quicinc.com;
+Received: from MWHPR0201MB3547.namprd02.prod.outlook.com
+ (2603:10b6:301:7b::24) by MWHPR0201MB3481.namprd02.prod.outlook.com
+ (2603:10b6:301:7c::19) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3261.19; Wed, 12 Aug
+ 2020 22:31:25 +0000
+Received: from MWHPR0201MB3547.namprd02.prod.outlook.com
+ ([fe80::f80c:adc3:1c7d:e2f2]) by MWHPR0201MB3547.namprd02.prod.outlook.com
+ ([fe80::f80c:adc3:1c7d:e2f2%7]) with mapi id 15.20.3261.024; Wed, 12 Aug 2020
+ 22:31:25 +0000
+From: Stephen Long <steplong@quicinc.com>
+To: <qemu-devel@nongnu.org>
+Subject: [PATCH] tcg: Fix tcg gen for vectorized absolute value
+Date: Wed, 12 Aug 2020 15:31:10 -0700
+Message-ID: <20200812223110.229-1-steplong@quicinc.com>
+X-Mailer: git-send-email 2.25.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: BYAPR01CA0046.prod.exchangelabs.com (2603:10b6:a03:94::23)
+ To MWHPR0201MB3547.namprd02.prod.outlook.com
+ (2603:10b6:301:7b::24)
 MIME-Version: 1.0
-In-Reply-To: <20200811153235.4527-1-gromero@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::642;
- envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x642.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from STEPLONG.qualcomm.com (76.167.74.154) by
+ BYAPR01CA0046.prod.exchangelabs.com (2603:10b6:a03:94::23) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3283.15 via Frontend Transport; Wed, 12 Aug 2020 22:31:24 +0000
+X-Mailer: git-send-email 2.25.1
+X-Originating-IP: [76.167.74.154]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: b1fcab1c-c0f8-4811-5e41-08d83f0f7242
+X-MS-TrafficTypeDiagnostic: MWHPR0201MB3481:
+X-Microsoft-Antispam-PRVS: <MWHPR0201MB34812754FC1C6574F5E18BC3C7420@MWHPR0201MB3481.namprd02.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:6790;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 2b3C3RZrnwioVFS6dSo/8wEWnYonxv+/YIUq2pMQ6qQfw6a7qyW2ymCGPs/Qqi0yQG/Q7tzOxgF78jaA5Eca7XRkzA8NqtMSnfDEx8HezLNqrrFnNeMt46SdFdBzOQTbr7byTWr/8uloL4+KwVRnyVI4Ua3YTOVBwqW4JCLC/xqO0hx4MRCkF0B0hotcDdP4NN4k0spFB6U9Yob3+qTJeV0Ee0Ccw+GostdqAih4rIZNh6xL7vumJa8rFnX/LIDqfxscyrThG3glCj11YOKlYyhmCQUJXvpKQOiu9Mi7o6lyrVmvRYGSDmHZ21dgZSBp
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:MWHPR0201MB3547.namprd02.prod.outlook.com; PTR:; CAT:NONE;
+ SFTY:;
+ SFS:(366004)(346002)(396003)(376002)(39860400002)(136003)(6666004)(5660300002)(6506007)(2906002)(6512007)(8676002)(4326008)(508600001)(83380400001)(6916009)(956004)(316002)(2616005)(6486002)(66946007)(36756003)(26005)(1076003)(66556008)(66476007)(86362001)(8936002)(186003)(52116002)(16526019);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: kp8SjDOoDnSvqqUwnF/+uPiVrs+MMJfkvjH6zbFdPIafBqeZWBVFpD2TZT2+EXarn5PNxqfuo2riQJ1JdhaCKlrl23SPrtOJ5gGn+o5kYBtCDtu3tzFgOJxWVM3rf7mPMIwe+HLE9xQYcyN9opjGkqgHc6y8Kx2KJHXG81NcAFBKiIvWirSXf/9q4frqwNjLAUrdmdFfxNyylrkf3xv/3Ce4ALM+W2eiNfrw9rsd6bwqLb430/p9aUYi/331ftpBzWChSXAGosUbZdZMGOKkgWlhUVvUU9a/92V6v7FWDyILTd64sSz+BERhf6FNsnGz57KOBYx526kLMSsZM0v+JBV5yWDfNEmsaTMkb2YTPzknTitDl1+9AAmkvudPgoxFjFFtK0qolOi4w3z53JOTaMK612v68D3+RxJVL+Gq2Bfm8QqTPQ7v701XZgdY5NRRis4EoR8y8sl+oWAPESxGPdxEDKD8LluPUZExEKpVjQOlnskxU1YErY609YNBdj5ec8I7RvowpcWZlAaREVBV250Y6kL3HnR5yH7rN22qLHvr50hQ18/yxZGcH7Jn963+09nugruXcT7gtFDpj+Y7pwMNczaPz7ewjMg3WSfO28UMyCB4m+7so8WgVGYlErf0jFXcllOZ9l1nYHkJSeR0mg==
+X-MS-Exchange-CrossTenant-Network-Message-Id: b1fcab1c-c0f8-4811-5e41-08d83f0f7242
+X-MS-Exchange-CrossTenant-AuthSource: MWHPR0201MB3547.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Aug 2020 22:31:25.0104 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 98e9ba89-e1a1-4e38-9007-8bdabc25de1d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: rcjz1cmaNxsr4KmYJojL8ovsORn7aqzo3NO/kYqd19zsDOWjaSIzh6Le8pDcLDQ5rWJiKQymkUD4035cFCzZ7A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR0201MB3481
+X-OriginatorOrg: quicinc.com
+Received-SPF: pass client-ip=199.106.114.38; envelope-from=steplong@quicinc.com;
+ helo=alexa-out-sd-01.qualcomm.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/12 18:31:39
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -43
+X-Spam_score: -4.4
+X-Spam_bar: ----
+X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -104,34 +147,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, clg@kaod.org,
- david@gibson.dropbear.id.au
+Cc: richard.henderson@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/11/20 8:32 AM, Gustavo Romero wrote:
-> Currently if option '-icount auto' is passed to the QEMU TCG to enable
-> counting instructions the VM crashes with the following error report when
-> Linux runs on it:
-> 
-> qemu-system-ppc64: Bad icount read
-> 
-> This happens because read/write access to the SPRs PURR, VTB, and TBU40
-> is not integrated to the icount framework.
-> 
-> This commit fixes that issue by making the read/write access of these
-> SPRs aware of icount framework, adding the proper gen_io_start() calls
-> before calling the helpers to load/store these SPRs in TCG and ensuring
-> that the associated TBs end immediately after, accordingly to what's in
-> docs/devel/tcg-icount.rst.
-> 
-> Signed-off-by: Gustavo Romero <gromero@linux.ibm.com>
-> ---
->  target/ppc/translate_init.inc.c | 30 ++++++++++++++++++++++++++++++
->  1 file changed, 30 insertions(+)
+---
+ tcg/tcg-op-gvec.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+qemu was generating buggy tcg for arm64's vectorized absolute value
+insn when the machine didn't support avx insns.
 
-r~
+Subtracting a mask of -1 for each negative element doesn't
+add 1 to each negative element. For example, subtracting a mask of
+0xffff_ffff_ffff_ffff only adds one to the low byte because
+~0xffff_ffff_ffff_ffff + 1 is just 1, instead of 0x0101_0101_0101_0101.
+
+diff --git a/tcg/tcg-op-gvec.c b/tcg/tcg-op-gvec.c
+index 3707c0e..793d4ba 100644
+--- a/tcg/tcg-op-gvec.c
++++ b/tcg/tcg-op-gvec.c
+@@ -2264,12 +2264,13 @@ static void gen_absv_mask(TCGv_i64 d, TCGv_i64 b, unsigned vece)
+     tcg_gen_muli_i64(t, t, (1 << nbit) - 1);
+ 
+     /*
+-     * Invert (via xor -1) and add one (via sub -1).
++     * Invert (via xor -1) and add one.
+      * Because of the ordering the msb is cleared,
+      * so we never have carry into the next element.
+      */
+     tcg_gen_xor_i64(d, b, t);
+-    tcg_gen_sub_i64(d, d, t);
++    tcg_gen_andi_i64(t, t, dup_const(vece, 1));
++    tcg_gen_add_i64(d, d, t);
+ 
+     tcg_temp_free_i64(t);
+ }
+-- 
+1.9.1
+
 
