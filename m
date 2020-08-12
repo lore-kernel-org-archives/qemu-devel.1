@@ -7,85 +7,84 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79050C433E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 17:43:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D624C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 17:43:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4589920781
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 17:43:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3AFF320781
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 17:43:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Hj5vqABs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4589920781
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="O9eg6aBh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3AFF320781
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51362 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51700 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5umm-0002Qs-E9
-	for qemu-devel@archiver.kernel.org; Wed, 12 Aug 2020 13:43:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34008)
+	id 1k5umq-0002ZY-DK
+	for qemu-devel@archiver.kernel.org; Wed, 12 Aug 2020 13:43:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34088)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1k5ulI-0000r0-Te
- for qemu-devel@nongnu.org; Wed, 12 Aug 2020 13:42:05 -0400
-Received: from mail-pl1-x630.google.com ([2607:f8b0:4864:20::630]:43622)
+ id 1k5ulc-000106-Sx
+ for qemu-devel@nongnu.org; Wed, 12 Aug 2020 13:42:25 -0400
+Received: from mail-pg1-x536.google.com ([2607:f8b0:4864:20::536]:39840)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1k5ulG-000402-J5
- for qemu-devel@nongnu.org; Wed, 12 Aug 2020 13:42:04 -0400
-Received: by mail-pl1-x630.google.com with SMTP id t10so1424572plz.10
- for <qemu-devel@nongnu.org>; Wed, 12 Aug 2020 10:42:02 -0700 (PDT)
+ id 1k5ula-00041I-Pa
+ for qemu-devel@nongnu.org; Wed, 12 Aug 2020 13:42:24 -0400
+Received: by mail-pg1-x536.google.com with SMTP id v15so1410945pgh.6
+ for <qemu-devel@nongnu.org>; Wed, 12 Aug 2020 10:42:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=3EbHHfdO2Kojsq2nCAoTefRRXvkT4TJdjU8l8Tz3ZzU=;
- b=Hj5vqABslG2N57YVmUiLBs/EnQJ3wRCal/9tdTmkJYFBr0/OBxTrs/JzcCqaM+wT6r
- JARHb3NsWWQbCjMRRBZvQi3FdztGavqG+toVBWULGY6wfIrfCCaRZFFuhVdx8tMtPkNs
- GBYenDMlAC35gnAWTRjwv21Ef4ubpCW2ybrfe/Ss0j+Hzfkj9tgJVJadqGtrDxpDK0W+
- JIJNX2cxtALhg5zKY5bfu0E8PonEMKqbumq7eVEo7TjpKBEC/XQPvQ0Y1IAi1ZHwozWd
- QbK1dA6Qs4rBrjo+SAcSCihUx0zu0zntrzTrnwP5cYZ8O6sUF70yieGf7ET6p+YLmXDj
- fQoA==
+ bh=u7BM2p5+FEA0d8s/HZAHAVuYnzAPBWAFYsCbsMv++3w=;
+ b=O9eg6aBhWrHnARr9rkmQBoyCuKwcVhrcMyEXkQ9iiQ9qFfckDXe2dqAP0iEhBTzBkn
+ YQ9nyR8BUNnfNgrr/egG2TYkrrl6AecLBG1mMDfy/XY69/+6idYfJh8WK6yb0aDw/6FS
+ /M7HmAOEVvrUjKJJxIvpwZQezNT+E2469X/AabWcfp0EETQJIVkNjKX/I4fIl2Jkx0IH
+ mDCImgMVdxH7wl3PYqPJaGiUy79fOLuayatFAvFzbAN27heNUPkkxTlIr085omjmAVYH
+ eBnM3YWwh/kgmiKCkLE6FO/Xqm/3TKNpyNpmH37hav0zUUbPk6Biep22j0n6stFXwkP5
+ sLNQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=3EbHHfdO2Kojsq2nCAoTefRRXvkT4TJdjU8l8Tz3ZzU=;
- b=OdI3LaicAzxbYam0dpQ9XVaIeHtbCuT1L17yx1FL4HGLe403lcGwPFGkTKpOaiJxQJ
- lHsXFrYI2D/v8NfVLvHpJ0ubRfOhbEcK8d6i9Z83JuLvjTDTXk2zrfH898d+PXa1xprR
- 6zuaqJ4iII4bMOhZHAMEVzkuMZxltxaBJvNu53z2ShCzAk+Qava78VLyLrCVwvKOEZBz
- 9SDopsk+jea+SNHw6VIqv6jE9yDq3OoCv1OzPrPmruYpkQsgdg/EUakk40RqWF++fD0i
- 86nz24HuVB+pQnTAMqQtXaU7AltME1Vs0IGOmUpgXhhcqaYOKCAmg/gizFPXblekcKIQ
- jM2A==
-X-Gm-Message-State: AOAM531c/E93uhdAhiOTAuTLtb/VgPPtzutQfBFdgYdeaUCx4PgXRgGB
- tCe4YcVoRs8+bvooDk5SsNPbCw==
-X-Google-Smtp-Source: ABdhPJwtoDGB5QiHESS7d67eGqoTCumeL2j7dvOvNcMbRj8N8AsHzqIk0JPJs+gJHmavYijHyUouXg==
-X-Received: by 2002:a17:902:9a09:: with SMTP id
- v9mr443210plp.331.1597254121111; 
- Wed, 12 Aug 2020 10:42:01 -0700 (PDT)
+ bh=u7BM2p5+FEA0d8s/HZAHAVuYnzAPBWAFYsCbsMv++3w=;
+ b=QGM8hNjAsSBLhfRomGDGspeydsQbZ0lK0Zm7YkYwjFix9Vp9f75qhyJKe5PLRdCfaa
+ sPQzUTtfasiVkONuvijd7/mIi97pqa23LP2E2V16SVAcp364XS0w7vSGalY3e/pQYTU7
+ /Ao9MojRfiIBZNh0wEgpzpVg/rFGjGIbDEqiTFnbosp+QtuCdDywExcgHVoaVIpAe3Dz
+ HcsqY+IYKgaxUnJValbDYV5cFaTj18sW+pdoSQioblRKIHjYwiCuODCldEFNMU+FWCe6
+ dtOAlBj/kROlElqEmNpYU0jY3HpxiuLEk6WQ+QqDBIS32FPENAeTPjbH23NIVVgFalDB
+ R4GA==
+X-Gm-Message-State: AOAM533f6Z08/pEyaTTl1V3WxUnomQUBacfp7k2Bk2FKOV9BBKnfFp+p
+ 0Kd/op4ehoWdqkzJ0kdf/PKGIA==
+X-Google-Smtp-Source: ABdhPJwWcyHFijdnawXtblspEgA4GBN//wgMyuHwjDkTxzh6aT7Uomw8zlqLlbhHmjTmcikuO1aH9g==
+X-Received: by 2002:a05:6a00:81:: with SMTP id c1mr618343pfj.189.1597254141529; 
+ Wed, 12 Aug 2020 10:42:21 -0700 (PDT)
 Received: from [192.168.1.11] ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id 63sm3015942pfu.196.2020.08.12.10.41.59
+ by smtp.gmail.com with ESMTPSA id j10sm3007746pff.171.2020.08.12.10.42.20
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 12 Aug 2020 10:42:00 -0700 (PDT)
-Subject: Re: [PATCH-for-5.2 1/4] hw/char/serial: Replace commented DPRINTF()
- by trace event
+ Wed, 12 Aug 2020 10:42:20 -0700 (PDT)
+Subject: Re: [PATCH-for-5.2 2/4] hw/char/serial: Remove old DEBUG_SERIAL
+ commented code
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
  qemu-devel@nongnu.org
 References: <20200806130340.17316-1-f4bug@amsat.org>
- <20200806130340.17316-2-f4bug@amsat.org>
+ <20200806130340.17316-3-f4bug@amsat.org>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <768423f6-a9b9-0e5d-6cf9-71189bfc0d8f@linaro.org>
-Date: Wed, 12 Aug 2020 10:41:58 -0700
+Message-ID: <750a1691-5926-1917-5a26-81a73044a24b@linaro.org>
+Date: Wed, 12 Aug 2020 10:42:18 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200806130340.17316-2-f4bug@amsat.org>
+In-Reply-To: <20200806130340.17316-3-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::630;
- envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x630.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::536;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x536.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -116,11 +115,14 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 8/6/20 6:03 AM, Philippe Mathieu-Daudé wrote:
+> All useful DPRINTF() calls have been converted to trace
+> events.  Remove a pointless one in the IOEventHandler,
+> and drop the DEBUG_SERIAL ifdef'ry.
+> 
 > Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 > ---
->  hw/char/serial.c     | 4 +---
->  hw/char/trace-events | 1 +
->  2 files changed, 2 insertions(+), 3 deletions(-)
+>  hw/char/serial.c | 11 -----------
+>  1 file changed, 11 deletions(-)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
