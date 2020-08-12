@@ -2,70 +2,67 @@ Return-Path: <SRS0=vd3Y=BW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 969C0C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 12:23:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E78BC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 12:42:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 43F022245C
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 12:23:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43F022245C
+	by mail.kernel.org (Postfix) with ESMTPS id 61F212080C
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 12:42:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61F212080C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48530 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43324 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5pmx-0000tm-FL
-	for qemu-devel@archiver.kernel.org; Wed, 12 Aug 2020 08:23:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58054)
+	id 1k5q5R-0002ZA-JW
+	for qemu-devel@archiver.kernel.org; Wed, 12 Aug 2020 08:42:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34114)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k5plN-0008Gd-DJ
- for qemu-devel@nongnu.org; Wed, 12 Aug 2020 08:21:49 -0400
-Received: from indium.canonical.com ([91.189.90.7]:37128)
+ id 1k5q4J-0001BL-Pt
+ for qemu-devel@nongnu.org; Wed, 12 Aug 2020 08:41:23 -0400
+Received: from indium.canonical.com ([91.189.90.7]:40486)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k5plI-0002uW-PU
- for qemu-devel@nongnu.org; Wed, 12 Aug 2020 08:21:49 -0400
+ id 1k5q4H-0005FS-Ki
+ for qemu-devel@nongnu.org; Wed, 12 Aug 2020 08:41:23 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1k5plG-0004Fq-Ee
- for <qemu-devel@nongnu.org>; Wed, 12 Aug 2020 12:21:42 +0000
+ id 1k5q4F-0006ej-M9
+ for <qemu-devel@nongnu.org>; Wed, 12 Aug 2020 12:41:19 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 47F302E809C
- for <qemu-devel@nongnu.org>; Wed, 12 Aug 2020 12:21:42 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id A694F2E808C
+ for <qemu-devel@nongnu.org>; Wed, 12 Aug 2020 12:41:19 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 12 Aug 2020 12:07:49 -0000
-From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1858814@bugs.launchpad.net>
+Date: Wed, 12 Aug 2020 12:30:08 -0000
+From: "Laszlo Ersek \(Red Hat\)" <1886602@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
- assignee=philmd@redhat.com; 
-X-Launchpad-Bug-Tags: edk2
+X-Launchpad-Bug: product=qemu; status=Invalid; importance=Undecided;
+ assignee=None; 
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: lersek philmd
-X-Launchpad-Bug-Reporter: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
- =?utf-8?q?=29?=
-X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
- =?utf-8?q?=29?=
-References: <157849903743.2804.3996411796742068143.malonedeb@soybean.canonical.com>
-Message-Id: <159723407001.9637.6372928266158750637.malone@wampee.canonical.com>
-Subject: [Bug 1858814] Re: 'make -C roms efi' does not update edk2 submodules
+X-Launchpad-Bug-Commenters: circuitsoft lersek
+X-Launchpad-Bug-Reporter: Alex Austin (circuitsoft)
+X-Launchpad-Bug-Modifier: Laszlo Ersek (Red Hat) (lersek)
+References: <159408874500.32011.1427435858163411654.malonedeb@gac.canonical.com>
+Message-Id: <159723540922.5476.5951619344484194798.launchpad@soybean.canonical.com>
+Subject: [Bug 1886602] Re: Windows 10 very slow with OVMF
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="6a138c03da9cc3e2e03f6dd3bbb4a615b0be6ec2";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 98059f172d6cd73970511173b5552241c1c9385d
+X-Launchpad-Hash: f0f8626b87b120eab144570ad8ed832a5b23ca94
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/12 06:10:59
@@ -75,8 +72,7 @@ X-Spam_score: -5.9
 X-Spam_bar: -----
 X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
  RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -88,41 +84,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1858814 <1858814@bugs.launchpad.net>
+Reply-To: Bug 1886602 <1886602@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-There might be a big buildsys change in QEMU if we switch to Meson,
-so I'm waiting for that to happen first and then update this ticket.
+** Changed in: qemu
+       Status: Incomplete =3D> Invalid
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1858814
+https://bugs.launchpad.net/bugs/1886602
 
 Title:
-  'make -C roms efi' does not update edk2 submodules
+  Windows 10 very slow with OVMF
 
 Status in QEMU:
-  Confirmed
+  Invalid
 
 Bug description:
-  On a fresh clone, 'make -C roms efi' fails because submodule is not
-  initialized [1]:
+  Debian Buster
 
-  /builds/philmd/qemu/roms/edk2/CryptoPkg/Library/OpensslLib/OpensslLibCryp=
-to.inf(-1): error 000E: File/directory not found in workspace
-  /builds/philmd/qemu/roms/edk2/CryptoPkg/Library/OpensslLib/openssl/e_os.h
-  - Failed -
+  Kernel 4.19.0-9-amd64
+  qemu-kvm 1:3.1+dfsg-8+deb10u5
+  ovmf 0~20181115.85588389-3+deb10u1
 
-  Laszlo suggested [2] it is possibly a regression from commit f3e330e3c319:
-  "roms/Makefile.edk2: don't pull in submodules when building from tarball"
+  Machine: Thinkpad T470, i7-7500u, 20GB RAM
+  VM: 4 CPUs, 8GB RAM, Broadwell-noTSX CPU Model
 
-  [1] https://gitlab.com/philmd/qemu/-/jobs/395644357#L436
-  [2] https://www.mail-archive.com/qemu-devel@nongnu.org/msg668929.html
+  Windows 10, under this VM, seems to be exceedingly slow with all
+  operations. This is a clean install with very few services running.
+  Task Manager can take 30% CPU looking at an idle system.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1858814/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1886602/+subscriptions
 
