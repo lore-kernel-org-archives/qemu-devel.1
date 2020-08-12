@@ -2,100 +2,65 @@ Return-Path: <SRS0=vd3Y=BW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FB51C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 13:25:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DA02C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 13:41:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E7F672080C
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 13:25:08 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F51DG9ow"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E7F672080C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	by mail.kernel.org (Postfix) with ESMTPS id 21D85207DA
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 13:41:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21D85207DA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60746 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40602 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5qke-0000tT-5x
-	for qemu-devel@archiver.kernel.org; Wed, 12 Aug 2020 09:25:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47066)
+	id 1k5r0j-000590-C8
+	for qemu-devel@archiver.kernel.org; Wed, 12 Aug 2020 09:41:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53152)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k5qk4-0000Si-C7
- for qemu-devel@nongnu.org; Wed, 12 Aug 2020 09:24:32 -0400
-Received: from mail-wr1-x436.google.com ([2a00:1450:4864:20::436]:38707)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k5qk2-0002mW-MW
- for qemu-devel@nongnu.org; Wed, 12 Aug 2020 09:24:32 -0400
-Received: by mail-wr1-x436.google.com with SMTP id a14so2031965wra.5
- for <qemu-devel@nongnu.org>; Wed, 12 Aug 2020 06:24:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=EuH22a14Ngp3+O+hW+mT9vPNEBG9MUGijeLlSHk9I1c=;
- b=F51DG9ow9PcwCn+ErPW0SebhhDeqOZEGKYO4/x4XIqBaQl8IcKmRRl9xE3/uSEBa74
- /t0jX9qdjvqkxuuT+40h1TwehqPmRqNety5WGgST7A5WXEsZSvLjtT200vAxAHmL5V2z
- 49vjuvfY8+mPN3fdfIgi+eiDVeTkblID0yWZEYI5CpZNc5jzeNwpPwJLEi1FJuD8L5mw
- YnAfmz3s3MaQzkZujb2k7vzHe9J0ApDknzAs722uoG+v3AIad7qVHdxYG/A5x3wMn+UI
- MHyfPx4bLqKLINZIUieTOqEMso7tgItljQPdZXdyLcbPsqwLw7SuEPteGL5OmdwE+7Wo
- dEuA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=EuH22a14Ngp3+O+hW+mT9vPNEBG9MUGijeLlSHk9I1c=;
- b=E0LC/PQbA9SMNVt51vu24GeHD2s9hZLJtfVVGqMno7X1+kUmq3MUav5JKM78nQaGHB
- GN6pCvJa9j9oHsrBxJfK5pIPDEhYoNHePlAJAIf6XfTGAFMgabevg69Yr3MHaNq1B6/p
- sI4XSB2S9FWFaPRhBdkiuOdn829K0GCvgt5iXeKNHiO/EVFGFtMpFhiOOMuHtkz+P0cq
- 1yGdhKphZpwB8kPQmV23CnNG+IjQ4sWLfLveUkKIoo7I8/7d6V3rrZfF51i0POqcSorh
- 9p5YSpGxzxNzRAOLB6ImoeEYQBxysKFvhB6Px5K3vAsJC49zBkYTcH+4b7sdlpQFQUg4
- MTiw==
-X-Gm-Message-State: AOAM532iJS/z/J8YiCsFBJeyGDGArnv2AYWSW1Zt+q3QX0NcRtN/18+m
- REQuEeLjSw98EEJuURO4MfbUyw0U
-X-Google-Smtp-Source: ABdhPJz3D0BTxgysc19zqT9oKlZ1q4DXMApaG1KMRAjfUFxd6O8nzQdAcLIRaraSnwR3I/bfvHq2gg==
-X-Received: by 2002:adf:dd01:: with SMTP id a1mr11461818wrm.301.1597238668882; 
- Wed, 12 Aug 2020 06:24:28 -0700 (PDT)
-Received: from [192.168.1.36] (121.red-81-40-121.staticip.rima-tde.net.
- [81.40.121.121])
- by smtp.gmail.com with ESMTPSA id c10sm4047337wrx.15.2020.08.12.06.24.27
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 12 Aug 2020 06:24:28 -0700 (PDT)
-Subject: Re: [PATCH 000/147] Meson integration for 5.2
-To: Howard Spoelstra <hsp.cat7@gmail.com>,
- qemu-devel qemu-devel <qemu-devel@nongnu.org>
-References: <1597079345-42801-1-git-send-email-pbonzini@redhat.com>
- <20200811154241.4vzuxvhbwt7ztfvh@steredhat>
- <CABLmASH9rXQjnYYbADtaq5f4c0uqr+kv10p=hC7GR9wF-EzPUw@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <2548b5fb-97cd-2d7d-8a7e-33b93f3003cb@amsat.org>
-Date: Wed, 12 Aug 2020 15:24:27 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.90_1) (envelope-from <zhaolichang@huawei.com>)
+ id 1k5noh-00089V-7L; Wed, 12 Aug 2020 06:17:09 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:59268 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <zhaolichang@huawei.com>)
+ id 1k5nod-00032t-Go; Wed, 12 Aug 2020 06:17:06 -0400
+Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id 64C2ACDF4A67DC2B63FA;
+ Wed, 12 Aug 2020 18:17:00 +0800 (CST)
+Received: from localhost (10.174.187.253) by DGGEMS404-HUB.china.huawei.com
+ (10.3.19.204) with Microsoft SMTP Server id 14.3.487.0; Wed, 12 Aug 2020
+ 18:16:52 +0800
+From: zhaolichang <zhaolichang@huawei.com>
+To: <qemu-trivial@nongnu.org>
+Subject: [PATCH RFC 07/10] block/: fix some comment spelling errors
+Date: Wed, 12 Aug 2020 18:14:57 +0800
+Message-ID: <20200812101500.2066-8-zhaolichang@huawei.com>
+X-Mailer: git-send-email 2.26.2.windows.1
+In-Reply-To: <20200812101500.2066-1-zhaolichang@huawei.com>
+References: <20200812101500.2066-1-zhaolichang@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <CABLmASH9rXQjnYYbADtaq5f4c0uqr+kv10p=hC7GR9wF-EzPUw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::436;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x436.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.174.187.253]
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.35;
+ envelope-from=zhaolichang@huawei.com; helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/12 06:15:29
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
+X-Mailman-Approved-At: Wed, 12 Aug 2020 09:40:49 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,52 +72,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: zhaolichang <zhaolichang@huawei.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Howard,
+I found that there are many spelling errors in the comments of qemu,
+so I used the spellcheck tool to check the spelling errors
+and finally found some spelling errors in the block folder.
 
-On 8/12/20 8:32 AM, Howard Spoelstra wrote:
-> Hi,
-> 
-> I just compiled qemu-system-ppc using the the meson-poc-next branch with:
-> git clone -b meson-poc-next http://www.github.com/bonzini/qemu
-> qemu-mesonbuild-next
+Signed-off-by: zhaolichang <zhaolichang@huawei.com>
+---
+ block/block-copy.c | 2 +-
+ block/linux-aio.c  | 2 +-
+ block/mirror.c     | 2 +-
+ block/vhdx.c       | 2 +-
+ block/vhdx.h       | 4 ++--
+ 5 files changed, 6 insertions(+), 6 deletions(-)
 
-I notice you refer to github while Paolo mentioned gitlab in the
-cover:
+diff --git a/block/block-copy.c b/block/block-copy.c
+index f7428a7..1dfd46a 100644
+--- a/block/block-copy.c
++++ b/block/block-copy.c
+@@ -318,7 +318,7 @@ static coroutine_fn int block_copy_task_run(AioTaskPool *pool,
+  * Do copy of cluster-aligned chunk. Requested region is allowed to exceed
+  * s->len only to cover last cluster when s->len is not aligned to clusters.
+  *
+- * No sync here: nor bitmap neighter intersecting requests handling, only copy.
++ * No sync here: nor bitmap neither intersecting requests handling, only copy.
+  *
+  * Returns 0 on success.
+  */
+diff --git a/block/linux-aio.c b/block/linux-aio.c
+index 3c0527c..772ff86 100644
+--- a/block/linux-aio.c
++++ b/block/linux-aio.c
+@@ -222,7 +222,7 @@ static void qemu_laio_process_completions(LinuxAioState *s)
+ 
+     /* If we are nested we have to notify the level above that we are done
+      * by setting event_max to zero, upper level will then jump out of it's
+-     * own `for` loop.  If we are the last all counters droped to zero. */
++     * own `for` loop.  If we are the last all counters dropped to zero. */
+     s->event_max = 0;
+     s->event_idx = 0;
+ }
+diff --git a/block/mirror.c b/block/mirror.c
+index e8e8844..22d5741 100644
+--- a/block/mirror.c
++++ b/block/mirror.c
+@@ -478,7 +478,7 @@ static uint64_t coroutine_fn mirror_iteration(MirrorBlockJob *s)
+ 
+     job_pause_point(&s->common.job);
+ 
+-    /* Find the number of consective dirty chunks following the first dirty
++    /* Find the number of consecutive dirty chunks following the first dirty
+      * one, and wait for in flight requests in them. */
+     bdrv_dirty_bitmap_lock(s->dirty_bitmap);
+     while (nb_chunks * s->granularity < s->buf_size) {
+diff --git a/block/vhdx.c b/block/vhdx.c
+index 791eb90..84eedee 100644
+--- a/block/vhdx.c
++++ b/block/vhdx.c
+@@ -1073,7 +1073,7 @@ static int vhdx_open(BlockDriverState *bs, QDict *options, int flags,
+         goto fail;
+     }
+ 
+-    /* endian convert populated BAT field entires */
++    /* endian convert populated BAT field entries */
+     for (i = 0; i < s->bat_entries; i++) {
+         s->bat[i] = le64_to_cpu(s->bat[i]);
+     }
+diff --git a/block/vhdx.h b/block/vhdx.h
+index 0b74924..e385e48 100644
+--- a/block/vhdx.h
++++ b/block/vhdx.h
+@@ -212,7 +212,7 @@ typedef struct QEMU_PACKED VHDXLogDataSector {
+     uint32_t    sequence_high;          /* 4 MSB of 8 byte sequence_number */
+     uint8_t     data[4084];             /* raw data, bytes 8-4091 (inclusive).
+                                            see the data descriptor field for the
+-                                           other mising bytes */
++                                           other missing bytes */
+     uint32_t    sequence_low;           /* 4 LSB of 8 byte sequence_number */
+ } VHDXLogDataSector;
+ 
+@@ -257,7 +257,7 @@ typedef struct QEMU_PACKED VHDXMetadataTableHeader {
+ 
+ #define VHDX_META_FLAGS_IS_USER         0x01    /* max 1024 entries */
+ #define VHDX_META_FLAGS_IS_VIRTUAL_DISK 0x02    /* virtual disk metadata if set,
+-                                                   otherwise file metdata */
++                                                   otherwise file metadata */
+ #define VHDX_META_FLAGS_IS_REQUIRED     0x04    /* parse must understand this
+                                                    entry to open the file */
+ typedef struct QEMU_PACKED VHDXMetadataTableEntry {
+-- 
+2.26.2.windows.1
 
-"This is available from https://gitlab.com/bonzini/qemu.git branch"
 
-I am not sure he maintains both sync, can you retest using the gitlab
-branch?
-
-> cd qemu-mesonbuild-next
-> mkdir build
-> cd build
-> ../configure --target-list="ppc-softmmu" --enable-sdl --enable-gtk
-> --disable-werror
-> 
-> qemu-system-ppc is invoked as follows:
-> 
-> ./qemu-system-ppc -L pc-bios \
-> -M mac99,via=pmu -m 512 -sdl \
-> -serial stdio \
-> -drive file=/home/hsp/Mac-disks/9.2.img,format=raw,media=disk \
-> -boot c
-> 
-> Both SDL and GTK GUis are not found, while the configuration overview lists:
-> SDL support: YES
-> GTK support: YES
-> 
-> Terminal says:
-> qemu-system-ppc: Display 'sdl' is not available, or
-> qemu-system-ppc: Display 'gtk' is not available.
-> 
-> So qemu starts with the vnc server only.
-> 
-> Best,
-> Howard
-> 
 
