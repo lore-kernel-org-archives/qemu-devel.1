@@ -7,51 +7,51 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 761ABC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 09:44:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2350FC433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 09:45:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 417252076B
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 09:44:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DD83B2078B
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 09:45:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=lse.epita.fr header.i=@lse.epita.fr header.b="f8t0XvZv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 417252076B
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=lse.epita.fr header.i=@lse.epita.fr header.b="NDeLpgV6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD83B2078B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=lse.epita.fr
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36114 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39094 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5nJQ-0005eb-HI
-	for qemu-devel@archiver.kernel.org; Wed, 12 Aug 2020 05:44:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42232)
+	id 1k5nJw-0006rP-Vs
+	for qemu-devel@archiver.kernel.org; Wed, 12 Aug 2020 05:45:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42344)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <srs0=nna4=bw=lse.epita.fr=cesar.belley@cri.epita.fr>)
- id 1k5nHK-0001tG-9P
- for qemu-devel@nongnu.org; Wed, 12 Aug 2020 05:42:38 -0400
-Received: from gate-2.cri.epita.net ([163.5.55.20]:40856
+ id 1k5nHV-00027p-Qj
+ for qemu-devel@nongnu.org; Wed, 12 Aug 2020 05:42:49 -0400
+Received: from gate-2.cri.epita.net ([163.5.55.20]:40906
  helo=mail-2.srv.cri.epita.fr)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <srs0=nna4=bw=lse.epita.fr=cesar.belley@cri.epita.fr>)
- id 1k5nHI-0006jq-Fq
- for qemu-devel@nongnu.org; Wed, 12 Aug 2020 05:42:38 -0400
+ id 1k5nHU-0006kk-3P
+ for qemu-devel@nongnu.org; Wed, 12 Aug 2020 05:42:49 -0400
 Received: from MattGorko-Laptop.localdomain (unknown [78.194.154.81])
  (Authenticated sender: cesar.belley)
- by mail-2.srv.cri.epita.fr (Postfix) with ESMTPSA id 9582041503;
- Wed, 12 Aug 2020 11:42:34 +0200 (CEST)
+ by mail-2.srv.cri.epita.fr (Postfix) with ESMTPSA id CDDBA415D1;
+ Wed, 12 Aug 2020 11:42:46 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=lse.epita.fr; s=cri;
- t=1597225354; bh=WDA0oI2Z69R2zXIfx2G23h1o+q5997g9l9qIdMw94RQ=;
+ t=1597225366; bh=iKIh0pVXn2xcd5xyw+MbSBYuutfq5VrL5AOyRI9zABo=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=f8t0XvZvW8Sm12f/UNbW9tKYHufmZkuoeLnJeOPQtmLUka6TyIAaDfz54lt7UpLMB
- MWgkiOq7iRR1RuWpf3k8jHG10Ym9YF8gUjZdi7n8D6ek/dcrhBWHtoPEOyypG4xynx
- mPqJSgn8138DNQemMhuAgFb1N3WUuWIeG/moRBfU=
+ b=NDeLpgV64JD0+biihEOHvtimcV+M2KW1v4dSKw01hqlitzCFi5kwj2MHX4n2+cT/H
+ TlqXVDDcrl0T+1IRcw0dIZ7bRbQagFiHiAyMajpGE3eztqjUP5tVhoZDc2tnmAJPH8
+ 9LlrHbkA81W+MpGl2fb/3q5U49EKwB/F3SBsbR4s=
 From: =?UTF-8?q?C=C3=A9sar=20Belley?= <cesar.belley@lse.epita.fr>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 01/13] hw/usb: Regroup USB HID protocol values
-Date: Wed, 12 Aug 2020 11:41:23 +0200
-Message-Id: <20200812094135.20550-2-cesar.belley@lse.epita.fr>
+Subject: [PATCH 08/13] configure: Add USB U2F key device
+Date: Wed, 12 Aug 2020 11:41:30 +0200
+Message-Id: <20200812094135.20550-9-cesar.belley@lse.epita.fr>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20200812094135.20550-1-cesar.belley@lse.epita.fr>
 References: <20200812094135.20550-1-cesar.belley@lse.epita.fr>
@@ -87,152 +87,84 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Group some HID values that are used pretty much everywhere when
-dealing with HID devices.
-
 Signed-off-by: César Belley <cesar.belley@lse.epita.fr>
 ---
- hw/usb/dev-hid.c     | 26 +++++++-------------------
- hw/usb/dev-wacom.c   | 12 +++---------
- include/hw/usb/hid.h | 17 +++++++++++++++++
- 3 files changed, 27 insertions(+), 28 deletions(-)
- create mode 100644 include/hw/usb/hid.h
+ configure | 27 +++++++++++++++++++++++++++
+ 1 file changed, 27 insertions(+)
 
-diff --git a/hw/usb/dev-hid.c b/hw/usb/dev-hid.c
-index 89f63b698b..c73f7b2fe2 100644
---- a/hw/usb/dev-hid.c
-+++ b/hw/usb/dev-hid.c
-@@ -32,21 +32,9 @@
- #include "qemu/module.h"
- #include "qemu/timer.h"
- #include "hw/input/hid.h"
-+#include "hw/usb/hid.h"
- #include "hw/qdev-properties.h"
+diff --git a/configure b/configure
+index 2acc4d1465..3ea5e561ff 100755
+--- a/configure
++++ b/configure
+@@ -447,6 +447,7 @@ trace_file="trace"
+ spice=""
+ rbd=""
+ smartcard=""
++u2f=""
+ libusb=""
+ usb_redir=""
+ opengl=""
+@@ -1390,6 +1391,10 @@ for opt do
+   ;;
+   --enable-smartcard) smartcard="yes"
+   ;;
++  --disable-u2f) u2f="no"
++  ;;
++  --enable-u2f) u2f="yes"
++  ;;
+   --disable-libusb) libusb="no"
+   ;;
+   --enable-libusb) libusb="yes"
+@@ -1899,6 +1904,7 @@ disabled with --disable-FEATURE, default is enabled if available:
+   libiscsi        iscsi support
+   libnfs          nfs support
+   smartcard       smartcard support (libcacard)
++  u2f             U2F support (u2f-emu)
+   libusb          libusb (for usb passthrough)
+   live-block-migration   Block migration in the main migration stream
+   usb-redir       usb network redirection support
+@@ -5250,6 +5256,20 @@ if test "$smartcard" != "no"; then
+     fi
+ fi
  
--/* HID interface requests */
--#define GET_REPORT   0xa101
--#define GET_IDLE     0xa102
--#define GET_PROTOCOL 0xa103
--#define SET_REPORT   0x2109
--#define SET_IDLE     0x210a
--#define SET_PROTOCOL 0x210b
--
--/* HID descriptor types */
--#define USB_DT_HID    0x21
--#define USB_DT_REPORT 0x22
--#define USB_DT_PHY    0x23
--
- typedef struct USBHIDState {
-     USBDevice dev;
-     USBEndpoint *intr;
-@@ -618,38 +606,38 @@ static void usb_hid_handle_control(USBDevice *dev, USBPacket *p,
-             goto fail;
-         }
-         break;
--    case GET_REPORT:
-+    case HID_GET_REPORT:
-         if (hs->kind == HID_MOUSE || hs->kind == HID_TABLET) {
-             p->actual_length = hid_pointer_poll(hs, data, length);
-         } else if (hs->kind == HID_KEYBOARD) {
-             p->actual_length = hid_keyboard_poll(hs, data, length);
-         }
-         break;
--    case SET_REPORT:
-+    case HID_SET_REPORT:
-         if (hs->kind == HID_KEYBOARD) {
-             p->actual_length = hid_keyboard_write(hs, data, length);
-         } else {
-             goto fail;
-         }
-         break;
--    case GET_PROTOCOL:
-+    case HID_GET_PROTOCOL:
-         if (hs->kind != HID_KEYBOARD && hs->kind != HID_MOUSE) {
-             goto fail;
-         }
-         data[0] = hs->protocol;
-         p->actual_length = 1;
-         break;
--    case SET_PROTOCOL:
-+    case HID_SET_PROTOCOL:
-         if (hs->kind != HID_KEYBOARD && hs->kind != HID_MOUSE) {
-             goto fail;
-         }
-         hs->protocol = value;
-         break;
--    case GET_IDLE:
-+    case HID_GET_IDLE:
-         data[0] = hs->idle;
-         p->actual_length = 1;
-         break;
--    case SET_IDLE:
-+    case HID_SET_IDLE:
-         hs->idle = (uint8_t) (value >> 8);
-         hid_set_next_idle(hs);
-         if (hs->kind == HID_MOUSE || hs->kind == HID_TABLET) {
-diff --git a/hw/usb/dev-wacom.c b/hw/usb/dev-wacom.c
-index 8aba44b8bc..76fc5a5dab 100644
---- a/hw/usb/dev-wacom.c
-+++ b/hw/usb/dev-wacom.c
-@@ -29,6 +29,7 @@
- #include "qemu/osdep.h"
- #include "ui/console.h"
- #include "hw/usb.h"
-+#include "hw/usb/hid.h"
- #include "migration/vmstate.h"
- #include "qemu/module.h"
- #include "desc.h"
-@@ -37,13 +38,6 @@
- #define WACOM_GET_REPORT	0x2101
- #define WACOM_SET_REPORT	0x2109
++# check for u2f support
++if test "$u2f" != "no"; then
++    if $pkg_config --atleast-version=0.0.0 u2f-emu; then
++        u2f_emu_cflags=$($pkg_config --cflags u2f-emu)
++        u2f_emu_libs=$($pkg_config --libs u2f-emu)
++        u2f="yes"
++    else
++        if test "$u2f" = "yes"; then
++            feature_not_found "u2f" "Install u2f-emu"
++        fi
++        u2f="no"
++    fi
++fi
++
+ # check for libusb
+ if test "$libusb" != "no" ; then
+     if $pkg_config --atleast-version=1.0.13 libusb-1.0; then
+@@ -6965,6 +6985,7 @@ echo "spice support     $spice $(echo_version $spice $spice_protocol_version/$sp
+ echo "rbd support       $rbd"
+ echo "xfsctl support    $xfs"
+ echo "smartcard support $smartcard"
++echo "U2F support       $u2f"
+ echo "libusb            $libusb"
+ echo "usb net redir     $usb_redir"
+ echo "OpenGL support    $opengl"
+@@ -7543,6 +7564,12 @@ if test "$smartcard" = "yes" ; then
+   echo "SMARTCARD_LIBS=$libcacard_libs" >> $config_host_mak
+ fi
  
--/* HID interface requests */
--#define HID_GET_REPORT		0xa101
--#define HID_GET_IDLE		0xa102
--#define HID_GET_PROTOCOL	0xa103
--#define HID_SET_IDLE		0x210a
--#define HID_SET_PROTOCOL	0x210b
--
- typedef struct USBWacomState {
-     USBDevice dev;
-     USBEndpoint *intr;
-@@ -86,11 +80,11 @@ static const USBDescIface desc_iface_wacom = {
-             /* HID descriptor */
-             .data = (uint8_t[]) {
-                 0x09,          /*  u8  bLength */
--                0x21,          /*  u8  bDescriptorType */
-+                USB_DT_HID,    /*  u8  bDescriptorType */
-                 0x01, 0x10,    /*  u16 HID_class */
-                 0x00,          /*  u8  country_code */
-                 0x01,          /*  u8  num_descriptors */
--                0x22,          /*  u8  type: Report */
-+                USB_DT_REPORT, /*  u8  type: Report */
-                 0x6e, 0,       /*  u16 len */
-             },
-         },
-diff --git a/include/hw/usb/hid.h b/include/hw/usb/hid.h
-new file mode 100644
-index 0000000000..1c142584ff
---- /dev/null
-+++ b/include/hw/usb/hid.h
-@@ -0,0 +1,17 @@
-+#ifndef HW_USB_HID_H
-+#define HW_USB_HID_H
++if test "$u2f" = "yes" ; then
++  echo "CONFIG_U2F=y" >> $config_host_mak
++  echo "U2F_CFLAGS=$u2f_emu_cflags" >> $config_host_mak
++  echo "U2F_LIBS=$u2f_emu_libs" >> $config_host_mak
++fi
 +
-+/* HID interface requests */
-+#define HID_GET_REPORT   0xa101
-+#define HID_GET_IDLE     0xa102
-+#define HID_GET_PROTOCOL 0xa103
-+#define HID_SET_REPORT   0x2109
-+#define HID_SET_IDLE     0x210a
-+#define HID_SET_PROTOCOL 0x210b
-+
-+/* HID descriptor types */
-+#define USB_DT_HID    0x21
-+#define USB_DT_REPORT 0x22
-+#define USB_DT_PHY    0x23
-+
-+#endif
+ if test "$libusb" = "yes" ; then
+   echo "CONFIG_USB_LIBUSB=y" >> $config_host_mak
+   echo "LIBUSB_CFLAGS=$libusb_cflags" >> $config_host_mak
 -- 
 2.28.0
 
