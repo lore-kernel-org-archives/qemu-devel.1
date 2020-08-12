@@ -2,88 +2,121 @@ Return-Path: <SRS0=vd3Y=BW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74106C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 14:01:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5A86C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 14:08:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3BD26207DA
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 14:01:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6FDBD20838
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 14:08:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L9BBNWIl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3BD26207DA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=syrmia.com header.i=@syrmia.com header.b="XM1/Nfl0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6FDBD20838
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=syrmia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49614 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56486 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5rJO-0004A3-Ha
-	for qemu-devel@archiver.kernel.org; Wed, 12 Aug 2020 10:01:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56834)
+	id 1k5rQd-0007MV-M5
+	for qemu-devel@archiver.kernel.org; Wed, 12 Aug 2020 10:08:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59498)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1k5rIg-0003b5-Tx
- for qemu-devel@nongnu.org; Wed, 12 Aug 2020 10:00:18 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:20404
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1k5rIe-0007du-E7
- for qemu-devel@nongnu.org; Wed, 12 Aug 2020 10:00:18 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597240815;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=Lj048Fusy99BryiM3rsXzMbTqEvrtzTWuAc+OspqBB8=;
- b=L9BBNWIloGD3Dki59lQbYUtOtXIKztwaAWXcE1JYLfdb5R595HD1GYpbFt/E0AlOwG4b30
- +PHY31/HqT4AMSGcdtRMF/b9sY4Ig6MccgQD4elKwWktnje89J+m6vD1L0aa0MZfG+6VxR
- kXSlbp90YVLb4yHcVC+HgF/gEGdCSKw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-185-vefFpRkRNIqiQPCSJEmyzg-1; Wed, 12 Aug 2020 10:00:12 -0400
-X-MC-Unique: vefFpRkRNIqiQPCSJEmyzg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5E52A1009443;
- Wed, 12 Aug 2020 14:00:11 +0000 (UTC)
-Received: from localhost (ovpn-114-96.ams2.redhat.com [10.36.114.96])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 02C285D9D7;
- Wed, 12 Aug 2020 14:00:10 +0000 (UTC)
-Date: Wed, 12 Aug 2020 15:00:09 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: "Denis V. Lunev" <den@openvz.org>
-Subject: Re: [PATCH v2 for 5.2 0/3] block: add logging facility for long
- standing IO requests
-Message-ID: <20200812140009.GB112330@stefanha-x1.localdomain>
-References: <20200810101447.7380-1-den@openvz.org>
+ (Exim 4.90_1) (envelope-from <Filip.Bozuta@syrmia.com>)
+ id 1k5rPn-0006vo-Uw
+ for qemu-devel@nongnu.org; Wed, 12 Aug 2020 10:07:39 -0400
+Received: from mail-am6eur05on2132.outbound.protection.outlook.com
+ ([40.107.22.132]:57569 helo=EUR05-AM6-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <Filip.Bozuta@syrmia.com>)
+ id 1k5rPj-0000V7-6E
+ for qemu-devel@nongnu.org; Wed, 12 Aug 2020 10:07:39 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=M5Q7gIuqixhd8+TxrbXUuGUIyv8x9dvAlobNz3Jc2pWnaKZ2ZZUU9ZuM6N17mAG2pLVOFIwScPDW58KgBKStBT/9nvLOL3elLv0u2m9kWMgZ92HvBMYx4AJWHnZm5wa6fKpUE+IeT0MA1CBkltvJVFrp1Ia3WZYdnCC7Xpy7LXhRd4tKMw4Ii5Ur+PxCsoDvbwSlG3dT/uKZCdAhWzi0oesIpsh75C+qJfO9fkLLme1U18aGbDoBvvDexcPdlOSPBYHIcOXWNnt/PwvYFZuMoTZsSuIt4KEhzro65pROnqBN24Xxhyj7dvXycieWFbD6AtySb6iaIvksu4eY3bWLrQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=P7NN3tX4kUtnA6vcqOFhbcMSfroAT6sJnRW1/8Ojqp0=;
+ b=hecjDkEsfH42wiiVMG8rrtTnDT8bF1VoyzcyOQsKzBKmURjXn/AyBVFB0N6zObp3lUK3UjbzyeYPjI5J3yldCH7LSkCBnu0FRm1z8Xq6W725Xhh6cy5pEU/jeJ63bDU/viOSGVNH8siR7EI0n5Obui+f1D2IFnSU+RarHtbgZTWYs6XD49GKSHvzpLlKmTGHxXmVZgQOIqYpy/JtzKc+ui039bxDRvvo0mVd9cmkHAIZBJLnjztDsmtlcU5LvZ5sKAwKrGmvNnZnlX8CXOJR0Oq+SdijWnMhvAIrdDIIpD2oKPA6n0hALmWtpXDFWEJZbME92Yr40ENkTAZjiCJnEQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=syrmia.com; dmarc=pass action=none header.from=syrmia.com;
+ dkim=pass header.d=syrmia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=syrmia.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=P7NN3tX4kUtnA6vcqOFhbcMSfroAT6sJnRW1/8Ojqp0=;
+ b=XM1/Nfl0JADvIKzF1kbvVFPcDdRx1/6pS27U21X9rdDQzQJmzuVup+M7z+UQYB2A1URzzCyck8go0MGVk8dfO6M+GDVKaSjTyW5uP01mjMJijuMC6m0vECZ71QPwjV/UwamSz47ImgTasFxDW4pmCfkvR3hf3i+tk0e+U0lNemA=
+Authentication-Results: nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=none action=none header.from=syrmia.com;
+Received: from VE1PR03MB5246.eurprd03.prod.outlook.com (2603:10a6:802:a1::22)
+ by VE1PR03MB5520.eurprd03.prod.outlook.com (2603:10a6:803:119::11)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3283.16; Wed, 12 Aug
+ 2020 14:07:28 +0000
+Received: from VE1PR03MB5246.eurprd03.prod.outlook.com
+ ([fe80::3568:5b4f:ab6b:e362]) by VE1PR03MB5246.eurprd03.prod.outlook.com
+ ([fe80::3568:5b4f:ab6b:e362%6]) with mapi id 15.20.3261.024; Wed, 12 Aug 2020
+ 14:07:27 +0000
+From: Filip Bozuta <Filip.Bozuta@syrmia.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] linux-user: Fix 'semop()' and 'semtimedop()' implementation
+Date: Wed, 12 Aug 2020 16:07:04 +0200
+Message-Id: <20200812140704.46242-1-Filip.Bozuta@syrmia.com>
+X-Mailer: git-send-email 2.25.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: LO2P265CA0208.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:9e::28) To VE1PR03MB5246.eurprd03.prod.outlook.com
+ (2603:10a6:802:a1::22)
 MIME-Version: 1.0
-In-Reply-To: <20200810101447.7380-1-den@openvz.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="IiVenqGWf+H9Y6IX"
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=stefanha@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/12 06:16:38
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from localhost.localdomain (147.91.217.235) by
+ LO2P265CA0208.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:9e::28) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3283.15 via Frontend Transport; Wed, 12 Aug 2020 14:07:27 +0000
+X-Mailer: git-send-email 2.25.1
+X-Originating-IP: [147.91.217.235]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 102dc633-817c-49b3-389b-08d83ec90ba5
+X-MS-TrafficTypeDiagnostic: VE1PR03MB5520:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <VE1PR03MB552014F2F8B9E5775D5DF8BBEB420@VE1PR03MB5520.eurprd03.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: LhVt0F8li55ADaSTijX+QFEuw5p8iUECunCzjKX0a7cNsudNvWvYROP7gsB8WV7v0KvI65vWocKLX1F4cEjp4HMCCGGAUAMc0Dboj/e9QNYfsDo4JDEBAjT/9BtDuW7bhJBbK7JgY7ahT8SjxJi75MvH1arjVQ/XeITYwgnBFYyooLUd+xQTRdPre3AMD3/DKqen4Lv8+BWW3tXKfA8y/h+IcxEY4pPuqlNFzkSVNRn8Vu9ZEcL5M6I94q4UtaWdhnhgYEdEydIEoYHvk3coffIZ7srqM4uIbm/mZpAgAWrvQyU0A41dzBIIdNQPBUH7YBhiTUa7PKSe27zAtAn3NOG2VFd1BIgQuRMymHrQlP/SBFUGwvNSsmUVDORx5Rda
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:VE1PR03MB5246.eurprd03.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(376002)(366004)(346002)(39830400003)(136003)(396003)(107886003)(6916009)(6512007)(1076003)(6486002)(8936002)(6666004)(69590400007)(54906003)(316002)(4326008)(6506007)(86362001)(36756003)(508600001)(956004)(83380400001)(2616005)(16526019)(186003)(5660300002)(26005)(52116002)(66476007)(66556008)(2906002)(8676002)(66946007);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: ZfRpzbLKgXIejDFccXmJAA0OqoDNpmBS67Zkm5lWqXEhdTo1QNAArCxwu0scTk5HySbV+pIBx5ebhlNxuCkQ455WX5dLpgyxGNLbpkH8oDVAtTau5ijotGM/RbueSqf+rjzjDeHUvaEKN05uKPE1XmYakKy0Q00Jxb4A0adEuFigz6ZZPsmNqx48qCI2qQF9hFvo1jBCm/7Af1LKW2X3nFWkbIIs6ZON2Cm4pcU9q6T6o1IcAY3JdWIK7Hs5HYIPztbvnUgNUf8FcEt2Mlram+O9eVUHo2ghjd43Fs0mVfuhLghubGKAXOL9BjMB9nA0jgu9VwaGg/Cule5V9jbMtTXrcI988rY0j1/f613mM8PSYS+tnMKl8IewNVgf/blSeKcR7tGPQ9KZeZ/rfdXMedsWUV1jFOitV4ObfriDJAnfgtqN3iUQ62b9OLbD1Bv4bkSpG9PpM2jfoKp7feuGastxrHqaVamik0T9ObQIYRUWF3etV9S7JfYDSc6a8pHPqM5ehtGoeuzzYfbLcuUnF63ek9xIdPJ3b4yr882eUqBv+xwZjOE4hG+kUcTLnBxnRkKeHMLPTxa8YJV8Xfv9Hy2XUcSvtks8uzr9u7RupBTwoHeCdto633FSDI3VOjLQRg8C93aZfZ+CiMmpkqe2oA==
+X-OriginatorOrg: syrmia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 102dc633-817c-49b3-389b-08d83ec90ba5
+X-MS-Exchange-CrossTenant-AuthSource: VE1PR03MB5246.eurprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Aug 2020 14:07:27.9649 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 19214a73-c1ab-4e19-8f59-14bdcb09a66e
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: l8e5V0UbcdzyQJqu+V1/iNq2eF7Xa9B3CMdGP1p3Vh4oi/doLQxazfLCVg3LZXisjsEfzhhR7Q9kjEqOtjFdUg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VE1PR03MB5520
+Received-SPF: pass client-ip=40.107.22.132;
+ envelope-from=Filip.Bozuta@syrmia.com;
+ helo=EUR05-AM6-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/12 10:07:33
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -22
+X-Spam_score: -2.3
+X-Spam_bar: --
+X-Spam_report: (-2.3 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
+ RCVD_IN_SORBS_WEB=1.5, SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,62 +129,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: Laurent Vivier <laurent@vivier.eu>, Filip Bozuta <Filip.Bozuta@syrmia.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---IiVenqGWf+H9Y6IX
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+The implementations of syscalls 'semop()' and 'semtimedop()' in
+file 'syscall.c' use function 'target_to_host_sembuf()' to convert
+values of 'struct sembuf' from host to target. However, before this
+conversion it should be check whether the number of semaphore operations
+'nsops' is not bigger than maximum allowed semaphor operations per
+syscall: 'SEMOPM'. In these cases, errno 'E2BIG' ("Arg list too long")
+should be set. But the implementation will set errno 'EFAULT' ("Bad address")
+in this case since the conversion from target to host fails.
 
-On Mon, Aug 10, 2020 at 01:14:44PM +0300, Denis V. Lunev wrote:
-> There are severe delays with IO requests processing if QEMU is running in
-> virtual machine or over software defined storage. Such delays potentially
-> results in unpredictable guest behavior. For example, guests over IDE or
-> SATA drive could remount filesystem read-only if write is performed
-> longer than 10 seconds.
->=20
-> Such reports are very complex to process. Some good starting point for th=
-is
-> seems quite reasonable. This patch provides one. It adds logging of such
-> potentially dangerous long IO operations.
->=20
-> Changed from v2:
-> - removed accidentally added slirp subproject ID
-> - added comment describing timeout selection to patch 3
->=20
-> Changes from v1:
-> - fixed conversions using macros suggested by Stefan
-> - fixed option declaration
-> - enabled by default with patch 3
->=20
-> Signed-off-by: Denis V. Lunev <den@openvz.org>
-> CC: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> CC: Kevin Wolf <kwolf@redhat.com>
-> CC: Max Reitz <mreitz@redhat.com>
-> CC: Stefan Hajnoczi <stefanha@redhat.com>
+This was confirmed with the LTP test for 'semop()' ('ipc/semop/semop02') in
+test case where 'nsops' is greater than SEMOPM with unaproppriate errno EFAULT:
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+semop02.c:130: FAIL: semop failed unexpectedly; expected: E2BIG: EFAULT (14)
 
---IiVenqGWf+H9Y6IX
-Content-Type: application/pgp-signature; name="signature.asc"
+This patch changes this by adding a check whether 'nsops' is bigger than
+'SEMOPM' before the conversion function 'target_to_host_sembuf()' is called.
+After the changes from this patch, the test works fine along with the other
+LTP testcases for 'semop()'):
 
------BEGIN PGP SIGNATURE-----
+semop02.c:126: PASS: semop failed as expected: E2BIG (7)
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl8z9ekACgkQnKSrs4Gr
-c8hRzQf/WXTLzs14ArtBlYmIbCcQGlNymF2xzKZXFvTpdNx6NixfQReeoIMPAQrA
-cv+7hgBheu2mCAIld6D/n5WfH+/dv34vOHtQJ9+UhzeCc5HHJRIflOFJf1wGeUil
-XSSnP3U/Bn3w0cWC8GbK/KeWwT1FrqSjH2P9+QR62NT4YuYitRipo0L7JIIM7WkS
-Uyt+AeHXRm9wLfZu6wKI2IIm1a35JijQ1luN3uPCVremURdpIQDY+pRA3TBylyCg
-6eJDYSPmYT4qDGG4yG2UtpLh7S9RAPfosvcrChNAPjVRPhTZdzw+FOtHQMSvE7ee
-1dRBwAaDkUhek1h1zpUX5B+XJu46gQ==
-=eHN6
------END PGP SIGNATURE-----
+Implementation notes:
 
---IiVenqGWf+H9Y6IX--
+    A target value ('TARGET_SEMOPM') was added for 'SEMOPM' as to be sure
+    in case the value is not available for some targets.
+
+Signed-off-by: Filip Bozuta <Filip.Bozuta@syrmia.com>
+---
+ linux-user/syscall.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 1211e759c2..4743a5bef2 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -3899,6 +3899,8 @@ static inline abi_long target_to_host_sembuf(struct sembuf *host_sembuf,
+   (__nsops), 0, (__sops), (__timeout)
+ #endif
+ 
++#define TARGET_SEMOPM 500
++
+ static inline abi_long do_semtimedop(int semid,
+                                      abi_long ptr,
+                                      unsigned nsops,
+@@ -3915,8 +3917,13 @@ static inline abi_long do_semtimedop(int semid,
+         }
+     }
+ 
+-    if (target_to_host_sembuf(sops, ptr, nsops))
++    if (nsops > TARGET_SEMOPM) {
++        return -TARGET_E2BIG;
++    }
++
++    if (target_to_host_sembuf(sops, ptr, nsops)) {
+         return -TARGET_EFAULT;
++    }
+ 
+     ret = -TARGET_ENOSYS;
+ #ifdef __NR_semtimedop
+-- 
+2.25.1
 
 
