@@ -2,56 +2,59 @@ Return-Path: <SRS0=vd3Y=BW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D075DC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 16:18:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CF03C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 16:19:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9D9E2207DA
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 16:18:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2740D2076B
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 16:19:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="FfpgKeRK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D9E2207DA
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="cxgjsWsQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2740D2076B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=163.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47224 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50400 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5tSQ-0000TK-Pw
-	for qemu-devel@archiver.kernel.org; Wed, 12 Aug 2020 12:18:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39108)
+	id 1k5tTL-0001mv-Fa
+	for qemu-devel@archiver.kernel.org; Wed, 12 Aug 2020 12:19:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39146)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <liq3ea@163.com>) id 1k5tRS-00082Z-B8
- for qemu-devel@nongnu.org; Wed, 12 Aug 2020 12:17:30 -0400
-Received: from mail-m971.mail.163.com ([123.126.97.1]:48202)
+ (Exim 4.90_1) (envelope-from <liq3ea@163.com>) id 1k5tRX-00088v-T5
+ for qemu-devel@nongnu.org; Wed, 12 Aug 2020 12:17:35 -0400
+Received: from mail-m971.mail.163.com ([123.126.97.1]:48532)
  by eggs.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <liq3ea@163.com>) id 1k5tRL-0000r1-1q
- for qemu-devel@nongnu.org; Wed, 12 Aug 2020 12:17:27 -0400
+ (envelope-from <liq3ea@163.com>) id 1k5tRV-0000ro-QH
+ for qemu-devel@nongnu.org; Wed, 12 Aug 2020 12:17:35 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
- s=s110527; h=From:Subject:Date:Message-Id; bh=qJV28RWeXXmja64yCO
- d/BOEjJm7qSWkzCUC8qTqUSb0=; b=FfpgKeRKWFxsRrx9NNrBrE5Y7hIHOH53XJ
- oezCwMMSKDlPno2OFkWv9H9hzSfFCxjEllbe5WRK5YLDGE4GGyu5+/VhOOCkciY+
- PFaw2D7eFn1Kap93BaCHuw/mV/LtzlZ2/Zt62Wjuzp/Rx8xAN/x/Z+U297XYy4ZZ
- hIyYHiQ/8=
+ s=s110527; h=From:Subject:Date:Message-Id; bh=iY81cxWdJw4lIYtwVt
+ sOx9r7yB42oXXD9xUYFBQlRgA=; b=cxgjsWsQAeWhdbx0mu+l9wXhJB9GmGw88W
+ vLNvn6kjFfLI1HS13GTmUk9eWzuGMhYweS9vCFjQfwAhSNUckJ5dP4D+TyjNmBLy
+ 3hig8jen0BqTo5eIV+lS7uIPyBfAr7jzTkGTsrzIpYhvKIPdPARHiayS26LxUbgu
+ 0nLNxyNxU=
 Received: from localhost.localdomain (unknown [115.204.177.14])
- by smtp1 (Coremail) with SMTP id GdxpCgAH5Qz7FTRfW6WfAQ--.825S4;
- Thu, 13 Aug 2020 00:17:00 +0800 (CST)
+ by smtp1 (Coremail) with SMTP id GdxpCgDn3NkZFjRfTrSfAQ--.821S4;
+ Thu, 13 Aug 2020 00:17:30 +0800 (CST)
 From: Li Qiang <liq3ea@163.com>
 To: kraxel@redhat.com
-Subject: [PATCH 0/2] hw: ehci: fix two minor issues
-Date: Wed, 12 Aug 2020 09:16:59 -0700
-Message-Id: <20200812161659.29305-1-liq3ea@163.com>
+Subject: [PATCH 2/2] hw: ehci: check return value of 'usb_packet_map'
+Date: Wed, 12 Aug 2020 09:17:27 -0700
+Message-Id: <20200812161727.29412-1-liq3ea@163.com>
 X-Mailer: git-send-email 2.17.1
-X-CM-TRANSID: GdxpCgAH5Qz7FTRfW6WfAQ--.825S4
-X-Coremail-Antispam: 1Uf129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
- VFW2AGmfu7bjvjm3AaLaJ3UbIYCTnIWIevJa73UjIFyTuYvjxU5jjyUUUUU
+X-CM-TRANSID: GdxpCgDn3NkZFjRfTrSfAQ--.821S4
+X-Coremail-Antispam: 1Uf129KBjvJXoW7uF13AF17CF4rJrW5GF1Utrb_yoW8Jw13p3
+ Z8WF95Kw1ft3Z0qF4fA3WFyr1jyw4vyryIkayxXw1IvwsFg39Yqr109rZ5CFyqqFyrua1U
+ Wr4DXr1Y9a12vrUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+ 9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UhYFZUUUUU=
 X-Originating-IP: [115.204.177.14]
-X-CM-SenderInfo: 5oltjvrd6rljoofrz/1tbiTx1+bVsGVhBhKwAAsQ
+X-CM-SenderInfo: 5oltjvrd6rljoofrz/1tbiKRp+bVXlxT0x-wAAsm
 Received-SPF: pass client-ip=123.126.97.1; envelope-from=liq3ea@163.com;
  helo=mail-m971.mail.163.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/12 11:32:46
@@ -80,16 +83,42 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-There are two minor issues in echi controller.
-The detail is in the patch.
+If 'usb_packet_map' fails, we should stop to process the usb
+request.
 
-Li Qiang (2):
-  hw: ehci: destroy sglist in error path
-  hw: ehci: check return value of 'usb_packet_map'
+Signed-off-by: Li Qiang <liq3ea@163.com>
+---
+ hw/usb/hcd-ehci.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
- hw/usb/hcd-ehci.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
-
+diff --git a/hw/usb/hcd-ehci.c b/hw/usb/hcd-ehci.c
+index 58cceacbf8..4da446d2de 100644
+--- a/hw/usb/hcd-ehci.c
++++ b/hw/usb/hcd-ehci.c
+@@ -1373,7 +1373,10 @@ static int ehci_execute(EHCIPacket *p, const char *action)
+         spd = (p->pid == USB_TOKEN_IN && NLPTR_TBIT(p->qtd.altnext) == 0);
+         usb_packet_setup(&p->packet, p->pid, ep, 0, p->qtdaddr, spd,
+                          (p->qtd.token & QTD_TOKEN_IOC) != 0);
+-        usb_packet_map(&p->packet, &p->sgl);
++        if (usb_packet_map(&p->packet, &p->sgl)) {
++            qemu_sglist_destroy(&p->sgl);
++            return -1;
++        }
+         p->async = EHCI_ASYNC_INITIALIZED;
+     }
+ 
+@@ -1453,7 +1456,10 @@ static int ehci_process_itd(EHCIState *ehci,
+             if (ep && ep->type == USB_ENDPOINT_XFER_ISOC) {
+                 usb_packet_setup(&ehci->ipacket, pid, ep, 0, addr, false,
+                                  (itd->transact[i] & ITD_XACT_IOC) != 0);
+-                usb_packet_map(&ehci->ipacket, &ehci->isgl);
++                if (usb_packet_map(&ehci->ipacket, &ehci->isgl)) {
++                    qemu_sglist_destroy(&ehci->isgl);
++                    return -1;
++                }
+                 usb_handle_packet(dev, &ehci->ipacket);
+                 usb_packet_unmap(&ehci->ipacket, &ehci->isgl);
+             } else {
 -- 
 2.17.1
 
