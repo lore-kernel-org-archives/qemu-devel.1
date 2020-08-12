@@ -2,91 +2,80 @@ Return-Path: <SRS0=vd3Y=BW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AC7BC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 19:00:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A36C5C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 19:03:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EDB4F20774
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 19:00:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7142220838
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 19:03:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hQoQ/7eb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDB4F20774
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m8/5fGRW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7142220838
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37260 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42398 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5vyr-0001Db-8V
-	for qemu-devel@archiver.kernel.org; Wed, 12 Aug 2020 15:00:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51624)
+	id 1k5w1l-0003Wq-O7
+	for qemu-devel@archiver.kernel.org; Wed, 12 Aug 2020 15:03:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54218)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k5vrs-00053g-J0
- for qemu-devel@nongnu.org; Wed, 12 Aug 2020 14:52:56 -0400
-Received: from mail-wm1-x334.google.com ([2a00:1450:4864:20::334]:32842)
+ id 1k5w0p-0002U8-RS; Wed, 12 Aug 2020 15:02:11 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:36953)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k5vrq-0004sM-VA
- for qemu-devel@nongnu.org; Wed, 12 Aug 2020 14:52:56 -0400
-Received: by mail-wm1-x334.google.com with SMTP id f18so4811974wmc.0
- for <qemu-devel@nongnu.org>; Wed, 12 Aug 2020 11:52:54 -0700 (PDT)
+ id 1k5w0o-0006EL-CO; Wed, 12 Aug 2020 15:02:11 -0400
+Received: by mail-wr1-x443.google.com with SMTP id y3so3048601wrl.4;
+ Wed, 12 Aug 2020 12:02:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=+j57N7wW8k9OKW6WuInii83mHFV71fKKjmTxB19zR5c=;
- b=hQoQ/7ebXypQFKqCKX/5hdZbBvScq+ghH95DFIy0FkLQVUayTGaMxCHJfBg9TSBh+t
- F7HNNjbDSKGx5c+qpqv4nr7GxTdZfvU9+P/YTEQwhEC/ZRhY0ldaiZJeUwPc1c7R8PSW
- 0iizUxwsYQLMLXdPfyDBFa1kmz+8Ktmz/TyinBO/8N5mKm4KKvPJ9gD+1xkddUyi5zGv
- i7VfMdvXaRo3aa+k9BP4d4k1WIuolCDsLzyAtKefKKeVia9BO0DAOMd8VOpKyULvV7Pw
- cBOaudDFsePP/w8vYATX4mnSrgvAb9aTISMwSdiOfVANOgxQ4x9XrsbtXtvmj6FpmPJ2
- kXVA==
+ h=sender:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=Uk5BShFRYcQUzFdAQhFuk3duAFMlAohm4jU9MUl0cfA=;
+ b=m8/5fGRWbOuh3Yy68qMUgnuoHOmPCjOb9GnFUYKXuy5U9Ob2+ckHjhxG3s+IxWhC8B
+ 5PhOydsMF5r3E5TSemdqvmJEnwzUwWPkJNoxZCxuinf8S0Y5w46G8zXxcdJNeRG5Q8BD
+ B4zwbusGCYG9nmcbVt7+6C34vURAL/5U6YtbAfh+W5tUtBpFJwRhRQsb1luiks/fR892
+ Qek0c+pflhXZEqihmixQQ01a9kXz2qzDw+agJhVchbvhhqpAmfD3mohhDhxOVK30I8Xy
+ LtynTi5e//YFuNzWjLraR6ogRmzG69KZA75bZlpKYtyTxBdFKOeGcCjcKAxLjpQo+VeI
+ pklw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=+j57N7wW8k9OKW6WuInii83mHFV71fKKjmTxB19zR5c=;
- b=DWU3fJfSaMmtODrHVCSbfFR8AOTKH4Nwi9TeGjTIGrpw+EAZ7a+thU3SgAcWDYi7eS
- WqO9fMwl1KonuY8K5pgO+2kfPWZcEXOpd7uOaVMqiYr3ejwIMrxNyCTU3mWzNvS9t49G
- 0Ndujp3i29tFL7qrXm5Mo5vhOwdgmhgbLRruqyq5URCMp3swZ4yQaN9TmCWddHVqmmJB
- 97mKfoGtLqaYb4EfxYB14muk611ErSjVMhrBKBzn9yhCLPHMxkAGWXQHxU6yv/gRNK0d
- zgn8xtpVFPUg1WowltywA40b+/H5jXaIuLTkZ2oTlPEFitTaXSSM5cUNcpbJIGIfwzR8
- WBTA==
-X-Gm-Message-State: AOAM533fU95VrMG6joXVGLL6FiGIKR5RtjwUC3z0b2Z2coIii0zfMwKz
- RGYd4JcGLcJvNWpnxPe6GCv/3PX6
-X-Google-Smtp-Source: ABdhPJzJnnCqsG1WgttFxNsTPvLsI2CGt6IcjhHDx9/aM7b/5KYBp71kuJXp/pSobCdBynynEE9fMw==
-X-Received: by 2002:a05:600c:21c2:: with SMTP id
- x2mr992194wmj.142.1597258371946; 
- Wed, 12 Aug 2020 11:52:51 -0700 (PDT)
-Received: from [192.168.1.36] (121.red-81-40-121.staticip.rima-tde.net.
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=Uk5BShFRYcQUzFdAQhFuk3duAFMlAohm4jU9MUl0cfA=;
+ b=uBbT7JCZyNt4wjrOYXW3ULk/q8sNWx9JJS7ygBN6Kf2OWvOEIRgLJAesj3ok4UA03W
+ pXKyxwaTO1TAVtvQ29ZVLoFMDKByNQFK6detubGcuAua4clcS0701aGo6NthV4dHwtz9
+ JmBkK7XxuLgkvEzkGpdGAN5Ufmdy5C9nV3RKP8nsb2iryuVvLgAY50p9nyGte5jS7ewk
+ 5Uq6eaFlcOO2lF6027vgr/kb4/vIbJUFqrAn9I9jeMfZ49fnrkCMX327mxE20BOcJBXR
+ ufO36hK42zAsJg2g3dLn2RX+2zbatTe/XAj/TAnCEWYVkQjz6CNcX7DHiUMUvqeLlhYR
+ Pt+A==
+X-Gm-Message-State: AOAM531PtEtxrSdBvNNcZBl48ncU82gAmCIiBhbt09/+CDooAF1WIKn3
+ DM95w2LIny+2lJM0+f7Q6tbOA/fd
+X-Google-Smtp-Source: ABdhPJwSSafyzxx4ZbtFWQuZopYdEokCeKz+Xh+/o3btbsxMzplGmQNKSUqgckSU7q7Qujsl1Cm38g==
+X-Received: by 2002:adf:ba05:: with SMTP id o5mr560781wrg.7.1597258927981;
+ Wed, 12 Aug 2020 12:02:07 -0700 (PDT)
+Received: from x1w.redhat.com (121.red-81-40-121.staticip.rima-tde.net.
  [81.40.121.121])
- by smtp.gmail.com with ESMTPSA id q19sm5366154wrf.48.2020.08.12.11.52.50
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 12 Aug 2020 11:52:51 -0700 (PDT)
-Subject: Re: [PATCH-for-5.2 3/3] hw/misc/unimp: Display the offset with width
- of the region size
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20200807143705.30066-1-f4bug@amsat.org>
- <20200807143705.30066-4-f4bug@amsat.org>
- <d95b2acb-c8e8-91cc-40fd-ed7f4890e4ab@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <38099b57-fa44-a0b1-8b44-24bc8a8a5ccd@amsat.org>
-Date: Wed, 12 Aug 2020 20:52:50 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ by smtp.gmail.com with ESMTPSA id z12sm5689441wrp.20.2020.08.12.12.02.06
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 12 Aug 2020 12:02:07 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 0/3] hw/misc/unimp: Improve how offset/value are displayed
+Date: Wed, 12 Aug 2020 21:02:03 +0200
+Message-Id: <20200812190206.31595-1-f4bug@amsat.org>
+X-Mailer: git-send-email 2.21.3
 MIME-Version: 1.0
-In-Reply-To: <d95b2acb-c8e8-91cc-40fd-ed7f4890e4ab@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::334;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x334.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -108,24 +97,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Cc: qemu-trivial@nongnu.org, Peter Maydell <peter.maydell@linaro.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/12/20 7:34 PM, Richard Henderson wrote:
-> On 8/7/20 7:37 AM, Philippe Mathieu-Daudé wrote:
->> +    s->offset_fmt_width = ROUND_UP(64 - clz64(s->size - 1), 4) >> 2;
-> 
-> Better with DIV_ROUND_UP, I think.  Otherwise,
+This series aims to ease looking at the '-d unimp' output reported
+by the UnimplementedDevice.
 
-Thanks for the tip! (and for reviewing the other series) :)
+- read/write accesses are now aligned
+- the value format width uses the access size
+- the offset (address) uses the size of the memory region it belongs
 
-> 
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> 
-> 
-> r~
-> 
+Series fully reviewed.
+
+Since v1:
+- Use DIV_ROUND_UP instead of ROUND_UP (rth)
+- Added rth R-b tags
+
+$ git backport-diff -u v1 -r origin/master..
+Key:
+[----] : patches are identical
+[####] : number of functional differences between upstream/downstream patch
+[down] : patch is downstream-only
+The flags [FC] indicate (F)unctional and (C)ontextual differences, respectively
+
+001/3:[----] [--] 'hw/misc/unimp: Display value after offset'
+002/3:[----] [--] 'hw/misc/unimp: Display the value with width of the access size'
+003/3:[0002] [FC] 'hw/misc/unimp: Display the offset with width of the region size'
+
+Philippe Mathieu-Daudé (3):
+  hw/misc/unimp: Display value after offset
+  hw/misc/unimp: Display the value with width of the access size
+  hw/misc/unimp: Display the offset with width of the region size
+
+ include/hw/misc/unimp.h |  1 +
+ hw/misc/unimp.c         | 14 ++++++++------
+ 2 files changed, 9 insertions(+), 6 deletions(-)
+
+-- 
+2.21.3
+
 
