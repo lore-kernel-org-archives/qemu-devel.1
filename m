@@ -2,69 +2,68 @@ Return-Path: <SRS0=vd3Y=BW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4538DC433E3
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 11:57:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A7E1C433E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 12:02:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1EB392065C
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 11:57:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1EB392065C
+	by mail.kernel.org (Postfix) with ESMTPS id 3E02F207F7
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 12:02:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E02F207F7
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33532 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47590 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5pNN-0007Nu-Cd
-	for qemu-devel@archiver.kernel.org; Wed, 12 Aug 2020 07:57:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49288)
+	id 1k5pSk-0005AF-Hj
+	for qemu-devel@archiver.kernel.org; Wed, 12 Aug 2020 08:02:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52556)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k5pMR-00067k-JI
- for qemu-devel@nongnu.org; Wed, 12 Aug 2020 07:56:03 -0400
-Received: from indium.canonical.com ([91.189.90.7]:58616)
+ id 1k5pRi-0004L5-D1
+ for qemu-devel@nongnu.org; Wed, 12 Aug 2020 08:01:30 -0400
+Received: from indium.canonical.com ([91.189.90.7]:60660)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k5pMO-0007Bs-E7
- for qemu-devel@nongnu.org; Wed, 12 Aug 2020 07:56:03 -0400
+ id 1k5pRg-0000KK-Cf
+ for qemu-devel@nongnu.org; Wed, 12 Aug 2020 08:01:30 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1k5pML-000073-QL
- for <qemu-devel@nongnu.org>; Wed, 12 Aug 2020 11:55:57 +0000
+ id 1k5pRe-0001Jo-IP
+ for <qemu-devel@nongnu.org>; Wed, 12 Aug 2020 12:01:26 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id B81782E809C
- for <qemu-devel@nongnu.org>; Wed, 12 Aug 2020 11:55:57 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 89D9A2E808B
+ for <qemu-devel@nongnu.org>; Wed, 12 Aug 2020 12:01:26 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 12 Aug 2020 11:45:36 -0000
-From: "Laszlo Ersek \(Red Hat\)" <1858814@bugs.launchpad.net>
+Date: Wed, 12 Aug 2020 11:54:07 -0000
+From: "Laszlo Ersek \(Red Hat\)" <1717708@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
- assignee=philmd@redhat.com; 
-X-Launchpad-Bug-Tags: edk2
+X-Launchpad-Bug: product=qemu; status=Invalid; importance=Undecided;
+ assignee=None; 
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: lersek philmd
-X-Launchpad-Bug-Reporter: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
- =?utf-8?q?=29?=
+X-Launchpad-Bug-Commenters: 0xab brfeng gilius lersek netrolller-3d pmaydell
+ rtfss1 shannon-zhaosl
+X-Launchpad-Bug-Reporter: oscarbg (rtfss1)
 X-Launchpad-Bug-Modifier: Laszlo Ersek (Red Hat) (lersek)
-References: <157849903743.2804.3996411796742068143.malonedeb@soybean.canonical.com>
-Message-Id: <159723273619.27105.8334789053579226482.malone@gac.canonical.com>
-Subject: [Bug 1858814] Re: 'make -C roms efi' does not update edk2 submodules
+References: <150558614762.29770.16367876405044972592.malonedeb@chaenomeles.canonical.com>
+Message-Id: <159723324776.22462.3065989991441109337.malone@chaenomeles.canonical.com>
+Subject: [Bug 1717708] Re: QEMU aarch64 can't run Windows ARM64 iso's
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="6a138c03da9cc3e2e03f6dd3bbb4a615b0be6ec2";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: f6358b7b4541c3ded2b6f02b231e0ae0e7e8b70b
+X-Launchpad-Hash: 6b162d547d92a8720345b3b5a85641108de12eda
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/12 06:10:59
@@ -87,44 +86,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1858814 <1858814@bugs.launchpad.net>
+Reply-To: Bug 1717708 <1717708@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Symptom persists as of v5.1.0, but I don't think it really matters. We
-should close the ticket as wontfix.
+No need to keep this open any longer (no activity for 19 months). Please
+follow the links captured above to the past discussions. There's nothing
+new to add wrt. the situation.
 
 ** Changed in: qemu
-       Status: New =3D> Confirmed
+       Status: New =3D> Invalid
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1858814
+https://bugs.launchpad.net/bugs/1717708
 
 Title:
-  'make -C roms efi' does not update edk2 submodules
+  QEMU aarch64 can't run Windows ARM64 iso's
 
 Status in QEMU:
-  Confirmed
+  Invalid
 
 Bug description:
-  On a fresh clone, 'make -C roms efi' fails because submodule is not
-  initialized [1]:
+  Hi,
+  recently Windows ARM64 ISOs have been posted on the internet..
+  just checked with latest QEMU 2.10 release from =
 
-  /builds/philmd/qemu/roms/edk2/CryptoPkg/Library/OpensslLib/OpensslLibCryp=
-to.inf(-1): error 000E: File/directory not found in workspace
-  /builds/philmd/qemu/roms/edk2/CryptoPkg/Library/OpensslLib/openssl/e_os.h
-  - Failed -
+  https://qemu.weilnetz.de/w64/qemu-w64-setup-20170830.exe =
 
-  Laszlo suggested [2] it is possibly a regression from commit f3e330e3c319:
-  "roms/Makefile.edk2: don't pull in submodules when building from tarball"
+  "h:\qemu\qemu-system-aarch64.exe" -boot d -cdrom h:\iso\16353.1000.170825=
+-1423.RS_PRERELEASE_CLIENTPRO_OEMRET_ARM64FRE_ES-ES.ISO -m 2048 -cpu cortex=
+-a57 -smp 1 -machine virt
+  seems no video output..
+  checked various machine options for example versatilepb (says guest has n=
+ot initialized the guest)..
 
-  [1] https://gitlab.com/philmd/qemu/-/jobs/395644357#L436
-  [2] https://www.mail-archive.com/qemu-devel@nongnu.org/msg668929.html
+  so don't know if it's a QEMU bug or lacking feature but can support
+  running Windows ARM64 builds (would be nice if you can add a
+  Snapdragon835 machine type which is which first machines will be
+  running..)
+
+  =
+
+  note running a Windows x64 ISO with similar parameters works (removing -c=
+pu and -machine as not needed)
+
+  thanks..
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1858814/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1717708/+subscriptions
 
