@@ -2,89 +2,88 @@ Return-Path: <SRS0=vd3Y=BW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 268F6C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 17:50:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29828C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 17:52:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E323E2076C
-	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 17:50:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DA3DA2078B
+	for <qemu-devel@archiver.kernel.org>; Wed, 12 Aug 2020 17:52:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XXx1tdhi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E323E2076C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MqLvu90s"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA3DA2078B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35248 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41298 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k5ut4-0007gq-5j
-	for qemu-devel@archiver.kernel.org; Wed, 12 Aug 2020 13:50:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35318)
+	id 1k5uvf-0001r9-UU
+	for qemu-devel@archiver.kernel.org; Wed, 12 Aug 2020 13:52:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36088)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1k5urM-0006Ho-9a
- for qemu-devel@nongnu.org; Wed, 12 Aug 2020 13:48:20 -0400
-Received: from mail-pf1-x434.google.com ([2607:f8b0:4864:20::434]:43822)
+ id 1k5uv2-0001DW-Vd
+ for qemu-devel@nongnu.org; Wed, 12 Aug 2020 13:52:08 -0400
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:33525)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1k5urK-0004cS-Kv
- for qemu-devel@nongnu.org; Wed, 12 Aug 2020 13:48:20 -0400
-Received: by mail-pf1-x434.google.com with SMTP id y206so1374470pfb.10
- for <qemu-devel@nongnu.org>; Wed, 12 Aug 2020 10:48:18 -0700 (PDT)
+ id 1k5uv1-00052H-EB
+ for qemu-devel@nongnu.org; Wed, 12 Aug 2020 13:52:08 -0400
+Received: by mail-pl1-x642.google.com with SMTP id q19so1460849pll.0
+ for <qemu-devel@nongnu.org>; Wed, 12 Aug 2020 10:52:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=/D9CsbLRGlgR3+bpTAcYqbtG1Xp24A8kPxeMyv55O8I=;
- b=XXx1tdhiUd2M/rp4yUCaZnxIgb5m73w9u7/1yuYjF+8uMZ/9aJqHiohmLeScTWMkIF
- ajP/IlVZJyWUXDSEmsdzFUwIYaKs05p7CvywULLqcQd9P/g7O4rRnn+Di61WgIyDCxHX
- KL2ze7WpwXuvmf/is5v+WIhRs/OLDzo18ZAyaaj6TogPPdTRiFZJI2mP5CqAv6gWRG95
- rgoxYjto+miscIVxgUiflLiHRvSh12br8I2s1TXkLNBGMDaEA1OclgHVmrsU01vaGkPZ
- n5tuMMCyfI2u0haSiYeceWDf8BtM2hHBUn5SYKonejGXL52dXjHjOtzuBa0TWt1btXtY
- Nd5A==
+ bh=0/Y+sjALHjJ7KKcWQrbVOeERCp0R6xL94dZMo5Qlln0=;
+ b=MqLvu90sKaabisuCh5KkqjEkGZu11/YPhAH4reO0cBBTmGA/do4z0SdopDPSh2UrVi
+ yZ8w7mD4SQ1IdBFIkhbJIZ45wZLIUvrjrB41b+R3AJfg/g8Gzn9AUXkAgCtyzzfiuUef
+ TKAGuwwftLa/0VIbpV14Vtvu0XLhZOpdRMyvcF4zOvUhZg3gQHnB829wcUAXRtUiDK4y
+ bSXFydhDbP25OLLAA32CWZ8pHOqI5CUEPvsJl+3u22mQhKZCOX+85kgDVgbJcjgmfxq6
+ 5felMm5Ug8GEtbzHuihu1BF7GulVGpU2TfbTcx5VRcrfy5IbpkqHf62cjSIixRYoGXzW
+ LjnA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=/D9CsbLRGlgR3+bpTAcYqbtG1Xp24A8kPxeMyv55O8I=;
- b=szKLXLt6vC8y4Ybh6DxUDiZCbifi8qqVGkNQQZMKDuOLc47LuiXt76/gCVkTML41sV
- p0+RbZE13DiGySCiGSQIMRZWXQF59MACq5yuVWdcCtRMlGTCbWPkEZNDcX3sAMNM4qAq
- iqKhdm3JspEKaq++0RhoOSFheh7+ODsfp5nHIeuhF4PxW4LYUA/wzSI5NwEoHToGiC0A
- JhOraIIwtbxwlNkFG8NMu3yKmanzHRpKMtZAtQ1eoUu2o5s9zkzholPDDkymibVTkRzo
- 1Q3CFR7PxTYKaYtgxMK7gCTQNmzbGx0lkQDIEqhqLF8VHjZ1rrw3itSk3MAK9aVtVxuZ
- 6WZg==
-X-Gm-Message-State: AOAM5311lnCy438bC0tlEdZi32qGFTRwFJ6KuBEbUZb0ZsftrZVqanrR
- rqIA93kVXVnFQ1qH7trnAm8JRA==
-X-Google-Smtp-Source: ABdhPJz+tccEDGK3D0wrHhXAc37zroiS/qZCLPVTj7AJRXQGxTcpoVRqEdBgU/mHWdpt81lcNGpl+g==
-X-Received: by 2002:a63:d612:: with SMTP id q18mr267547pgg.292.1597254497416; 
- Wed, 12 Aug 2020 10:48:17 -0700 (PDT)
+ bh=0/Y+sjALHjJ7KKcWQrbVOeERCp0R6xL94dZMo5Qlln0=;
+ b=CSgfN+KngfpOaZlDVqmMKd0JWP2mwz9Y3TUZRuEPmSlNixnwI+xVQIGpZVJQZ78W3x
+ 8T/XEnsfuueAI3ggvIXNnSqLPEk8sYfrzB3UPUF7oRWM5g0Y8UY7K4i0Ra107GPkZNYd
+ d/bpSFgyGh6z+sQz6qsHBn2ybqxRoiKRYAGaKEyp5S1sq4cn9W6lZCI3V8XJGKT65Gvz
+ JtMf0f3zMRK/Fi9zHZf2l6RU2121P5DWUJb1ENoYZWT0rQNksjb9CgJ4+HRodor8kqMf
+ gdDwJXO4P8K/kpC44zYsDcPg0pRQZuEbvUrWoGoyMb75qoX87PHfrYBxeNtWbkkr6VrX
+ HEHQ==
+X-Gm-Message-State: AOAM530HxMsshiJzM8HSFE7g/ZCgAqlGyyCmvvVCg6mu9dFr2OE1+j0m
+ yMUlpEt8qHVpfC+Az1BwNQvlhg==
+X-Google-Smtp-Source: ABdhPJzb0+7JlHulT+V7bUib7ZIhnQZwGymFFnu1sJ3gJ1LbVfAI/Y68n8/8VXlSIEtmix4vaAaLIQ==
+X-Received: by 2002:a17:90a:aa90:: with SMTP id
+ l16mr1185854pjq.210.1597254726007; 
+ Wed, 12 Aug 2020 10:52:06 -0700 (PDT)
 Received: from [192.168.1.11] ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id gz7sm2686482pjb.45.2020.08.12.10.48.15
+ by smtp.gmail.com with ESMTPSA id y6sm3108154pfr.61.2020.08.12.10.52.04
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 12 Aug 2020 10:48:16 -0700 (PDT)
-Subject: Re: [PATCH-for-5.2 2/2] hw/core/sysbus: Assert memory region index is
- in range
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- qemu-devel@nongnu.org
-References: <20200806130945.21629-1-f4bug@amsat.org>
- <20200806130945.21629-3-f4bug@amsat.org>
+ Wed, 12 Aug 2020 10:52:05 -0700 (PDT)
+Subject: Re: [PATCH 0/3] target/arm: Complete ISS for MTE tag check fail
+To: Andrey Konovalov <andreyknvl@google.com>
+References: <20200812171946.2044791-1-richard.henderson@linaro.org>
+ <CAAeHK+z=CU5dQepy+SBtVMAp-=k8BODorG768CYwoR3NEKCWFg@mail.gmail.com>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <e3bdbabe-dada-9e7a-14d3-8fbe80cbe823@linaro.org>
-Date: Wed, 12 Aug 2020 10:48:13 -0700
+Message-ID: <b2d524a2-1523-d03a-72a9-407ab03fa897@linaro.org>
+Date: Wed, 12 Aug 2020 10:52:03 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200806130945.21629-3-f4bug@amsat.org>
+In-Reply-To: <CAAeHK+z=CU5dQepy+SBtVMAp-=k8BODorG768CYwoR3NEKCWFg@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::434;
- envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x434.google.com
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::642;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x642.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -106,25 +105,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-trivial@nongnu.org,
- Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: peter.maydell@linaro.org, Vincenzo Frascino <vincenzo.frascino@arm.com>,
+ alex.bennee@linaro.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/6/20 6:09 AM, Philippe Mathieu-Daudé wrote:
-> Devices incorrectly modelled might use invalid index while
-> calling sysbus_mmio_get_region(), leading to OOB access.
-> Help developers by asserting the index is in range.
+On 8/12/20 10:38 AM, Andrey Konovalov wrote:
+> On Wed, Aug 12, 2020 at 7:19 PM Richard Henderson
+> <richard.henderson@linaro.org> wrote:
+>>
+>> As reported by Andrey, I was missing the complete ISS info for
+>> the Data Abort raised upon a synchronous tag check fail.
+>>
+>> The following should fix that.  All the twisty little rules for
+>> the ISS.ISV bit are already handled by merge_syn_data_abort.
+>> Probably the most important bit that was missing was ISS.WnR,
+>> as that is independent of ISS.ISV.
+>>
+>> Andrey, will you please test?
 > 
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> ---
->  hw/core/sysbus.c | 1 +
->  1 file changed, 1 insertion(+)
+> Looks like WnR is now being set properly, but SAS is still always 0.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Are you looking at ESR_EL1?
+
+On page D13-2992 of revision F.a:
+
+# ISV is 0 for all faults reported in ESR_EL1 or ESR_EL3.
+
+which means that ISS[23:14] are RES0, which includes SAS.
 
 
 r~
