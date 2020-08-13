@@ -2,69 +2,71 @@ Return-Path: <SRS0=egLd=BX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 288B5C433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 10:48:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16290C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 10:49:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E37F920781
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 10:48:37 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="gMF2bjCH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E37F920781
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id DD30220781
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 10:49:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD30220781
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53874 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56544 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k6Amj-0004pn-2y
-	for qemu-devel@archiver.kernel.org; Thu, 13 Aug 2020 06:48:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52746)
+	id 1k6AnB-0005t4-3S
+	for qemu-devel@archiver.kernel.org; Thu, 13 Aug 2020 06:49:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53340)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1k6Aja-0008CK-S7; Thu, 13 Aug 2020 06:45:22 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:58949 helo=ozlabs.org)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1k6AjY-0008ME-On; Thu, 13 Aug 2020 06:45:22 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 4BS39z0KLCz9sTj; Thu, 13 Aug 2020 20:45:10 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1597315511;
- bh=q4gYJWkIdYjm9hJUn0/xiTHgYeLWh7RS1NWQY8LP+6c=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=gMF2bjCHtkD7xFunJa98527QPOOQev5LZC/UGN474Bnrq3Kpw4+dTb+hCSWlfZyNI
- 2EV5EIpmDlEDLTL2WsbAtNvxKggHuEnGOsRL7pb8eiXplk20z0msLNOTduOqUJAnu0
- ezRQ2TazWxndsE3yq4u6mt3nHzlvjaU6Q9dIbwxg=
-Date: Thu, 13 Aug 2020 20:28:42 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Greg Kurz <groug@kaod.org>
-Subject: Re: [PATCH 09/14] spapr/kvm: Fix error handling in
- kvmppc_xive_pre_save()
-Message-ID: <20200813102842.GL181791@yekko.fritz.box>
-References: <159707843034.1489912.1082061742626355958.stgit@bahia.lan>
- <159707849455.1489912.6034461176847728064.stgit@bahia.lan>
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1k6AmM-0004XW-L1; Thu, 13 Aug 2020 06:48:14 -0400
+Resent-Date: Thu, 13 Aug 2020 06:48:14 -0400
+Resent-Message-Id: <E1k6AmM-0004XW-L1@lists.gnu.org>
+Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21734)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1k6AmK-0000GF-A9; Thu, 13 Aug 2020 06:48:14 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1597315642; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=IJW50G8/FckcsgsiS7Kc9+etBmzKo0EF+4V8sWJ23gfjqCf9hA/HSxyNv2+xeaREPw75TQy6dnziM6h+20qhhFAEoqdFhFIqbbQALNrbJqwhnHsFMe7i6W1Ozivuwo7ERUymArZ4splUrsqiBH7pS0khTkKYlTcpvia2sDvayKM=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1597315642;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=phrvuSdAwBk3kACzkhf6nN0QCfV6Ft1SxHyayOuK7W4=; 
+ b=XKHyVEVKz5Q0sr6EviU14X+1buuhRjNIxFkTP7VxgwkyHCFV0SNXfclg8iRCqgyEHU2XCzeFtrSBc/VvB1sTy+On82AfKZkAIZNjzabENHgsZ8nIkZChKEbrjMXjlKGJA4YtU3IttpB/e1/7pfcWvlOEh5Fc0Ja/IE+hWkHe5n0=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1597315636000853.2675672060795;
+ Thu, 13 Aug 2020 03:47:16 -0700 (PDT)
+Subject: Re: [PULL 0/9] Tracing patches
+Message-ID: <159731563394.15736.4645467986235495124@66eaa9a8a123>
+In-Reply-To: <20200813052257.226142-1-stefanha@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="p7S+EREVcBHk3zUG"
-Content-Disposition: inline
-In-Reply-To: <159707849455.1489912.6034461176847728064.stgit@bahia.lan>
-Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
- helo=ozlabs.org
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/13 06:45:10
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -9
-X-Spam_score: -1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: stefanha@redhat.com
+Date: Thu, 13 Aug 2020 03:47:16 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o57.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/13 06:32:21
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
 X-Spam_bar: -
-X-Spam_report: (-1.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -77,86 +79,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>,
- qemu-devel@nongnu.org
+Reply-To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, lizhijian@cn.fujitsu.com, mst@redhat.com,
+ jasowang@redhat.com, qemu-devel@nongnu.org, Alistair.Francis@wdc.com,
+ kraxel@redhat.com, sagark@eecs.berkeley.edu, qemu-block@nongnu.org,
+ quintela@redhat.com, david@redhat.com, aleksandar.qemu.devel@gmail.com,
+ marcandre.lureau@redhat.com, aleksandar.rikalo@syrmia.com, dgilbert@redhat.com,
+ alex.williamson@redhat.com, stefanha@redhat.com, qemu-ppc@nongnu.org,
+ david@gibson.dropbear.id.au, kwolf@redhat.com, qemu-riscv@nongnu.org,
+ kbastian@mail.uni-paderborn.de, mreitz@redhat.com, chen.zhang@intel.com,
+ palmer@dabbelt.com, pbonzini@redhat.com, aurelien@aurel32.net,
+ stefanb@linux.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
---p7S+EREVcBHk3zUG
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Mon, Aug 10, 2020 at 06:54:54PM +0200, Greg Kurz wrote:
-> Now that kvmppc_xive_get_queues() returns a negative errno on failure, ch=
-eck
-> with that because it is preferred to local_err. And most of all, propagate
-> it because vmstate expects negative errnos.
->=20
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-
-Fixed a conflict and applied to ppc-for-5.2.
-
-> ---
->  hw/intc/spapr_xive_kvm.c |    7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
->=20
-> diff --git a/hw/intc/spapr_xive_kvm.c b/hw/intc/spapr_xive_kvm.c
-> index f2dda692183b..1686b036eb2d 100644
-> --- a/hw/intc/spapr_xive_kvm.c
-> +++ b/hw/intc/spapr_xive_kvm.c
-> @@ -604,16 +604,17 @@ void kvmppc_xive_synchronize_state(SpaprXive *xive,=
- Error **errp)
->  int kvmppc_xive_pre_save(SpaprXive *xive)
->  {
->      Error *local_err =3D NULL;
-> +    int ret;
-> =20
->      assert(xive->fd !=3D -1);
-> =20
->      /* EAT: there is no extra state to query from KVM */
-> =20
->      /* ENDT */
-> -    kvmppc_xive_get_queues(xive, &local_err);
-> -    if (local_err) {
-> +    ret =3D kvmppc_xive_get_queues(xive, &local_err);
-> +    if (ret < 0) {
->          error_report_err(local_err);
-> -        return -1;
-> +        return ret;
->      }
-> =20
->      return 0;
->=20
->=20
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---p7S+EREVcBHk3zUG
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl81FdoACgkQbDjKyiDZ
-s5LW2g//bVyimU08Lhv86FfCJe1g1KHA+hCGJfjY4VrqFcbux/z+k3RFzEOO5P9V
-ebDFL0+gIocYaxNVh2lE0hu1D6bm4XOzfGCG5/3+CnWQSKcIMRC+5hGggRG6NvTK
-vP5AufCsy7UEMbogcO5iXQzAG9adOsi6sA/cRpg95IBZXMUQWh9VtYf3Be0Ym6gY
-Ubw6i+6VFvu4ZoEKu8yVlWUKxN5QDo17liXbI0nfnZMJo1gZ3nSeQGWzlmiHea+5
-ljInDKWY6nOS0AJm6TKIkkZ1q/p6d9uNdcpFWWN9q7EGQVlfVAr3JLnxMN3K65HU
-szgLC/iqklcLRPIKlmSz330vv0XhnLq2xS+bL16OKHNAd2Pp7qzW0C1HAG5ExqT2
-2sRsTXah/h4z3ywPKKWM1Eijr6lKug0+6jMKo3lB/VtwJbtZnTVsL+As5xkwFxrR
-DP8853YaFoDHD0Q8oEZRNcnG+vlEMVFI2+z3TJhjvI4zuyrjVMW/SsjcHMUf9FPD
-ZvJc7QqiFy2aC7efSmZ9g1M6QjgO3v97fvOtV/58AhXL2TAQMkX1Z+Tm1RMlslpx
-3n/x2KVL01yONQUmN0RfvZdpQUC7EhFIZ98lgTqj6sPZcSukYzzTVrbiEWg4JJMv
-tX/oa/XyauWcYgNBl3lGhhFy+KG7Oc/0riKx0oO6VEtoB0UkUt8=
-=yub7
------END PGP SIGNATURE-----
-
---p7S+EREVcBHk3zUG--
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDgxMzA1MjI1Ny4yMjYx
+NDItMS1zdGVmYW5oYUByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUg
+ZG9ja2VyLXF1aWNrQGNlbnRvczcgYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3Rpbmcg
+Y29tbWFuZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3Rh
+bGxlZCwgeW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFND
+UklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKbWFrZSBkb2NrZXItaW1hZ2UtY2VudG9zNyBWPTEg
+TkVUV09SSz0xCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1xdWlja0BjZW50b3M3IFNIT1dfRU5WPTEg
+Sj0xNCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCiAgVEVTVCAgICBjaGVjay11
+bml0OiB0ZXN0cy90ZXN0LWNoYXIKVW5leHBlY3RlZCBlcnJvciBpbiBvYmplY3RfcHJvcGVydHlf
+dHJ5X2FkZCgpIGF0IC90bXAvcWVtdS10ZXN0L3NyYy9xb20vb2JqZWN0LmM6MTE4MToKYXR0ZW1w
+dCB0byBhZGQgZHVwbGljYXRlIHByb3BlcnR5ICdzZXJpYWwtaWQnIHRvIG9iamVjdCAodHlwZSAn
+Y29udGFpbmVyJykKRVJST1IgdGVzdC1jaGFyIC0gdG9vIGZldyB0ZXN0cyBydW4gKGV4cGVjdGVk
+IDM4LCBnb3QgOSkKbWFrZTogKioqIFtjaGVjay11bml0XSBFcnJvciAxCm1ha2U6ICoqKiBXYWl0
+aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4uCnFlbXUtc3lzdGVtLWFhcmNoNjQ6IC1hY2NlbCBr
+dm06IGludmFsaWQgYWNjZWxlcmF0b3Iga3ZtCnFlbXUtc3lzdGVtLWFhcmNoNjQ6IGZhbGxpbmcg
+YmFjayB0byB0Y2cKLS0tCiAgICByYWlzZSBDYWxsZWRQcm9jZXNzRXJyb3IocmV0Y29kZSwgY21k
+KQpzdWJwcm9jZXNzLkNhbGxlZFByb2Nlc3NFcnJvcjogQ29tbWFuZCAnWydzdWRvJywgJy1uJywg
+J2RvY2tlcicsICdydW4nLCAnLS1sYWJlbCcsICdjb20ucWVtdS5pbnN0YW5jZS51dWlkPTU4MDhj
+OTdjNzExZTQ4NWRiOTc5ZTUyODkyMDc2MTNiJywgJy11JywgJzEwMDMnLCAnLS1zZWN1cml0eS1v
+cHQnLCAnc2VjY29tcD11bmNvbmZpbmVkJywgJy0tcm0nLCAnLWUnLCAnVEFSR0VUX0xJU1Q9Jywg
+Jy1lJywgJ0VYVFJBX0NPTkZJR1VSRV9PUFRTPScsICctZScsICdWPScsICctZScsICdKPTE0Jywg
+Jy1lJywgJ0RFQlVHPScsICctZScsICdTSE9XX0VOVj0xJywgJy1lJywgJ0NDQUNIRV9ESVI9L3Zh
+ci90bXAvY2NhY2hlJywgJy12JywgJy9ob21lL3BhdGNoZXcyLy5jYWNoZS9xZW11LWRvY2tlci1j
+Y2FjaGU6L3Zhci90bXAvY2NhY2hlOnonLCAnLXYnLCAnL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXIt
+dG1wLXdvNHY2bm5wL3NyYy9kb2NrZXItc3JjLjIwMjAtMDgtMTMtMDYuMzIuNDIuMzE4MTM6L3Zh
+ci90bXAvcWVtdTp6LHJvJywgJ3FlbXUvY2VudG9zNycsICcvdmFyL3RtcC9xZW11L3J1bicsICd0
+ZXN0LXF1aWNrJ10nIHJldHVybmVkIG5vbi16ZXJvIGV4aXQgc3RhdHVzIDIuCmZpbHRlcj0tLWZp
+bHRlcj1sYWJlbD1jb20ucWVtdS5pbnN0YW5jZS51dWlkPTU4MDhjOTdjNzExZTQ4NWRiOTc5ZTUy
+ODkyMDc2MTNiCm1ha2VbMV06ICoqKiBbZG9ja2VyLXJ1bl0gRXJyb3IgMQptYWtlWzFdOiBMZWF2
+aW5nIGRpcmVjdG9yeSBgL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLXdvNHY2bm5wL3NyYycK
+bWFrZTogKioqIFtkb2NrZXItcnVuLXRlc3QtcXVpY2tAY2VudG9zN10gRXJyb3IgMgoKcmVhbCAg
+ICAxNG0zMi40NTBzCnVzZXIgICAgMG04LjM4MXMKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxl
+IGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMjAwODEzMDUyMjU3LjIyNjE0Mi0xLXN0ZWZh
+bmhhQHJlZGhhdC5jb20vdGVzdGluZy5kb2NrZXItcXVpY2tAY2VudG9zNy8/dHlwZT1tZXNzYWdl
+LgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9w
+YXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxA
+cmVkaGF0LmNvbQ==
 
