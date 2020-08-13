@@ -2,88 +2,128 @@ Return-Path: <SRS0=egLd=BX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED222C433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 10:41:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 667A8C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 10:41:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B926220771
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 10:41:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 342CB20771
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 10:41:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E/QQHCDX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B926220771
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mymailcheap.com header.i=@mymailcheap.com header.b="cPfgugGS";
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=flygoat.com header.i=@flygoat.com header.b="g1lw3leL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 342CB20771
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=flygoat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36532 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36712 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k6Afn-0005qu-Vd
-	for qemu-devel@archiver.kernel.org; Thu, 13 Aug 2020 06:41:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51016)
+	id 1k6Afr-0005vO-Fk
+	for qemu-devel@archiver.kernel.org; Thu, 13 Aug 2020 06:41:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51038)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1k6AcG-0000f6-5v
- for qemu-devel@nongnu.org; Thu, 13 Aug 2020 06:37:48 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:53844
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1k6AcD-0007RV-Bh
- for qemu-devel@nongnu.org; Thu, 13 Aug 2020 06:37:47 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597315064;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=r5jhfmE78Ank/M8YTF7hOoOkIT3ARZ6eZkmx0dqwLpY=;
- b=E/QQHCDXqYddVRFrzvLjvQKrcP4c8Q9pFYYBPBAv2/E3aAk1gvkx1/Y08i3bz4+zEf86qP
- BKt5OVMi3aeDq9a0OKK/o6wOO3B1njpSGza2ThREndxA+FDGeojt1hocfP7yVF0wKuFX2q
- b62ytB4fPVw7LreWtcfEEL8KqQh6K/4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-570-9K5J73HaP2CUSh8JV8A2jg-1; Thu, 13 Aug 2020 06:37:42 -0400
-X-MC-Unique: 9K5J73HaP2CUSh8JV8A2jg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.90_1) (envelope-from <jiaxun.yang@flygoat.com>)
+ id 1k6AcI-0000kQ-E5
+ for qemu-devel@nongnu.org; Thu, 13 Aug 2020 06:37:50 -0400
+Received: from relay3.mymailcheap.com ([217.182.119.155]:43144)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <jiaxun.yang@flygoat.com>)
+ id 1k6AcE-0007RU-FC
+ for qemu-devel@nongnu.org; Thu, 13 Aug 2020 06:37:49 -0400
+Received: from filter1.mymailcheap.com (filter1.mymailcheap.com
+ [149.56.130.247])
+ by relay3.mymailcheap.com (Postfix) with ESMTPS id 2F3583F15F;
+ Thu, 13 Aug 2020 12:37:43 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+ by filter1.mymailcheap.com (Postfix) with ESMTP id 549F02A0F5;
+ Thu, 13 Aug 2020 06:37:42 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=mymailcheap.com;
+ s=default; t=1597315062;
+ bh=ha+w40Y1MRYmDuCm5TaDdA0ESuZlYJUgJ7J0M1MavJc=;
+ h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
+ b=cPfgugGS2y6JIUF/v8pWtDjoDevp3Rq8j6q4pfflJUPjwkwNuo88UL5eRHdf7YpJu
+ NsX1sgYMWd0pL1q2lPPQTr+dtDMEHmJ1+ZTiZWrUi1MwS/ZPE0UTG14ZYQWmtMXWzm
+ 9tJx+rfHY+tFsgTqPNPvAJlVbBsuU6QqO9TXy2EI=
+X-Virus-Scanned: Debian amavisd-new at filter1.mymailcheap.com
+Received: from filter1.mymailcheap.com ([127.0.0.1])
+ by localhost (filter1.mymailcheap.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id RkdjlC17vZHj; Thu, 13 Aug 2020 06:37:39 -0400 (EDT)
+Received: from mail20.mymailcheap.com (mail20.mymailcheap.com [51.83.111.147])
+ (using TLSv1.2 with cipher ADH-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 16204800465;
- Thu, 13 Aug 2020 10:37:41 +0000 (UTC)
-Received: from gondolin (ovpn-112-216.ams2.redhat.com [10.36.112.216])
- by smtp.corp.redhat.com (Postfix) with ESMTP id AC8E754596;
- Thu, 13 Aug 2020 10:37:39 +0000 (UTC)
-Date: Thu, 13 Aug 2020 12:37:37 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Subject: Re: virtio-vsock requires 'disable-legacy=on' in QEMU 5.1
-Message-ID: <20200813123737.25ba11d2.cohuck@redhat.com>
-In-Reply-To: <20200813102430.vjnc56anqjaxn4tw@steredhat.lan>
-References: <CAGxU2F7pVNWtJG2BM2bk9qtJ_UHgDw4kjVqRmL-=yme7VX83Vg@mail.gmail.com>
- <20200813112820.62ffd63e.cohuck@redhat.com>
- <20200813102430.vjnc56anqjaxn4tw@steredhat.lan>
-Organization: Red Hat GmbH
+ by filter1.mymailcheap.com (Postfix) with ESMTPS;
+ Thu, 13 Aug 2020 06:37:39 -0400 (EDT)
+Received: from [148.251.23.173] (ml.mymailcheap.com [148.251.23.173])
+ by mail20.mymailcheap.com (Postfix) with ESMTP id 1B1C741184;
+ Thu, 13 Aug 2020 10:37:35 +0000 (UTC)
+Authentication-Results: mail20.mymailcheap.com; dkim=pass (1024-bit key;
+ unprotected) header.d=flygoat.com header.i=@flygoat.com header.b="g1lw3leL"; 
+ dkim-atps=neutral
+AI-Spam-Status: Not processed
+Received: from [0.0.0.0] (unknown [103.195.6.80])
+ (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+ key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest
+ SHA256) (No client certificate requested)
+ by mail20.mymailcheap.com (Postfix) with ESMTPSA id 8C3F841184;
+ Thu, 13 Aug 2020 10:37:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=flygoat.com;
+ s=default; t=1597315039;
+ bh=ha+w40Y1MRYmDuCm5TaDdA0ESuZlYJUgJ7J0M1MavJc=;
+ h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
+ b=g1lw3leLGksM7dAb3xHC4ovA0XSRIpMs3DccGzsc8qOD12vFoftWX0Z6HcJSiI5e9
+ 8rk6nPnsDsX39amSI4Bh694tnRugWD+HZHLVP/FuwgD7cihO4YPjvtjXURujI2NWun
+ nGYpFasW1ggtASD7vqf/Jfc822Yt+q4UfAZRMxyA=
+Subject: Re: [PATCH 2/2] target/mips: Add definition of Loongson-3A3000 CPU
+To: Kaige Li <likaige@loongson.cn>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Aurelien Jarno <aurelien@aurel32.net>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
+References: <1597311707-27565-1-git-send-email-likaige@loongson.cn>
+ <1597311707-27565-2-git-send-email-likaige@loongson.cn>
+From: Jiaxun Yang <jiaxun.yang@flygoat.com>
+Message-ID: <7772e88a-1f48-29ef-0004-e6eaa4eb5b60@flygoat.com>
+Date: Thu, 13 Aug 2020 18:37:12 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=cohuck@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=cohuck@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/13 03:44:21
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <1597311707-27565-2-git-send-email-likaige@loongson.cn>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Rspamd-Queue-Id: 1B1C741184
+X-Spamd-Result: default: False [1.40 / 10.00]; RCVD_VIA_SMTP_AUTH(0.00)[];
+ ARC_NA(0.00)[]; R_DKIM_ALLOW(0.00)[flygoat.com:s=default];
+ MID_RHS_MATCH_FROM(0.00)[]; FROM_HAS_DN(0.00)[];
+ TO_DN_SOME(0.00)[]; FREEMAIL_ENVRCPT(0.00)[gmail.com];
+ TO_MATCH_ENVRCPT_ALL(0.00)[]; TAGGED_RCPT(0.00)[];
+ MIME_GOOD(-0.10)[text/plain]; R_SPF_SOFTFAIL(0.00)[~all];
+ RCPT_COUNT_FIVE(0.00)[5]; ML_SERVERS(-3.10)[148.251.23.173];
+ DKIM_TRACE(0.00)[flygoat.com:+];
+ DMARC_POLICY_ALLOW(0.00)[flygoat.com,none];
+ DMARC_POLICY_ALLOW_WITH_FAILURES(0.00)[];
+ FREEMAIL_TO(0.00)[loongson.cn,gmail.com,aurel32.net,syrmia.com];
+ RCVD_NO_TLS_LAST(0.10)[]; FROM_EQ_ENVFROM(0.00)[];
+ MIME_TRACE(0.00)[0:+];
+ ASN(0.00)[asn:24940, ipnet:148.251.0.0/16, country:DE];
+ RCVD_COUNT_TWO(0.00)[2]; SUSPICIOUS_RECIPS(1.50)[];
+ HFILTER_HELO_BAREIP(3.00)[148.251.23.173,1]
+X-Rspamd-Server: mail20.mymailcheap.com
+Received-SPF: pass client-ip=217.182.119.155;
+ envelope-from=jiaxun.yang@flygoat.com; helo=relay3.mymailcheap.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/13 06:37:43
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: 4
+X-Spam_score: 0.4
+X-Spam_bar: /
+X-Spam_report: (0.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, MIME_CHARSET_FARAWAY=2.45,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,118 +136,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Halil Pasic <pasic@linux.ibm.com>, Qinghua Cheng <qcheng@redhat.com>,
- qemu devel list <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 13 Aug 2020 12:24:30 +0200
-Stefano Garzarella <sgarzare@redhat.com> wrote:
 
-> On Thu, Aug 13, 2020 at 11:28:20AM +0200, Cornelia Huck wrote:
-> > On Thu, 13 Aug 2020 11:16:56 +0200
-> > Stefano Garzarella <sgarzare@redhat.com> wrote:
-> >   
-> > > Hi,
-> > > 
-> > > Qinghua discovered that virtio-vsock-pci requires 'disable-legacy=on' in
-> > > QEMU 5.1:
-> > >     $ ./qemu-system-x86_64 ... -device vhost-vsock-pci,guest-cid=5
-> > >     qemu-system-x86_64: -device vhost-vsock-pci,guest-cid=5:
-> > >     device is modern-only, use disable-legacy=on
-> > > 
-> > > Bisecting I found that this behaviour starts from this commit:
-> > > 9b3a35ec82 ("virtio: verify that legacy support is not accidentally on")  
-> > 
-> > Oh, I had heard that from others already, was still trying to figure
-> > out what to do.
-> >   
-> > > 
-> > > IIUC virtio-vsock is modern-only, so I tried this patch and it works:
-> > > 
-> > > diff --git a/hw/virtio/vhost-user-vsock-pci.c b/hw/virtio/vhost-user-vsock-pci.c
-> > > index f4cf95873d..6e4cc874cd 100644
-> > > --- a/hw/virtio/vhost-user-vsock-pci.c
-> > > +++ b/hw/virtio/vhost-user-vsock-pci.c
-> > > @@ -40,6 +40,7 @@ static void vhost_user_vsock_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
-> > >      VHostUserVSockPCI *dev = VHOST_USER_VSOCK_PCI(vpci_dev);
-> > >      DeviceState *vdev = DEVICE(&dev->vdev);
-> > > 
-> > > +    virtio_pci_force_virtio_1(vpci_dev);
-> > >      qdev_realize(vdev, BUS(&vpci_dev->bus), errp);
-> > >  }
-> > > 
-> > > diff --git a/hw/virtio/vhost-vsock-pci.c b/hw/virtio/vhost-vsock-pci.c
-> > > index a815278e69..f641b974e9 100644
-> > > --- a/hw/virtio/vhost-vsock-pci.c
-> > > +++ b/hw/virtio/vhost-vsock-pci.c
-> > > @@ -44,6 +44,7 @@ static void vhost_vsock_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
-> > >      VHostVSockPCI *dev = VHOST_VSOCK_PCI(vpci_dev);
-> > >      DeviceState *vdev = DEVICE(&dev->vdev);
-> > > 
-> > > +    virtio_pci_force_virtio_1(vpci_dev);
-> > >      qdev_realize(vdev, BUS(&vpci_dev->bus), errp);
-> > >  }
-> > > 
-> > > 
-> > > Do you think this is the right approach or is there a better way to
-> > > solve this issue?  
-> > 
-> > We basically have three possible ways to deal with this:
-> > 
-> > - Force it to modern (i.e., what you have been doing; would need the
-> >   equivalent changes in ccw as well.)  
-> 
-> Oo, thanks for pointing out ccw!
-> I don't know ccw well, in this case should we set dev->max_rev to 1 or 2
-> to force to modern?
 
-No, ->max_rev is the wrong side of the limit :) You want
+ÔÚ 2020/8/13 ÏÂÎç5:41, Kaige Li Ð´µÀ:
+> Add definition of the Loongson-3A3000 processor in QEMU.
 
-    ccw_dev->force_revision_1 = true;
+Hi Kaige,
 
-in _instance_init() (see e.g. virtio-ccw-gpu.c).
+We're not defining Loongson-3A3000 in QEMU because we have
+some features like Loongson-EXT2, VTLB not available currently, I'd
+prefer define it after we add these features to TCG.
 
-> 
-> >   Pro: looks like the cleanest approach.
-> >   Con: not sure if we would need backwards compatibility support,
-> >   which looks hairy.  
-> 
-> Not sure too.
+Loongson-3A4000's define is a exception to support KVM.
 
-Yes, I'm not sure at all how to handle user-specified values for
-legacy/modern.
+Thanks.
 
-> 
-> > - Add vsock to the list of devices with legacy support.
-> >   Pro: Existing setups continue to work.
-> >   Con: If vsock is really virtio-1-only, we still carry around
-> >   possibly broken legacy support.  
-> 
-> I'm not sure it is virtio-1-only, but virtio-vsock was introduced in
-> 2016, so I supposed it is modern-only.
+- Jiaxun
 
-Yes, I would guess so as well.
-
-> 
-> How can I verify that? Maybe forcing legacy mode and run some tests.
-
-Probably yes. The likeliest area with issues is probably endianness, so
-maybe with something big endian in the mix?
-
-> 
-> > - Do nothing, have users force legacy off. Bad idea, as ccw has no way
-> >   to do that on the command line.
-> > 
-> > The first option is probably best.
-> >  
-> 
-> Yeah, I agree with you!
-
-Yes, it's really a pity we only noticed this after the release; this
-was supposed to stop new devices with legacy support creeping in, not
-to break existing command lines :(
-
+>
+> Signed-off-by: Kaige Li <likaige@loongson.cn>
+> ---
+>   target/mips/translate_init.inc.c | 24 ++++++++++++++++++++++++
+>   1 file changed, 24 insertions(+)
+>
+> diff --git a/target/mips/translate_init.inc.c b/target/mips/translate_init.inc.c
+> index 0740819..2e98aff 100644
+> --- a/target/mips/translate_init.inc.c
+> +++ b/target/mips/translate_init.inc.c
+> @@ -829,6 +829,30 @@ const mips_def_t mips_defs[] = {
+>           .PABITS = 48,
+>           .insn_flags = CPU_LOONGSON3A,
+>           .mmu_type = MMU_TYPE_R4000,
+> +   },
+> +   {
+> +        .name = "Loongson-3A3000",
+> +        .CP0_PRid = 0x14630d,
+> +        /* 64KB I-cache and d-cache. 4 way with 32 bit cache line size.  */
+> +        .CP0_Config0 = MIPS_CONFIG0 | (0x1 << CP0C0_AR) | (0x2 << CP0C0_AT) |
+> +                       (MMU_TYPE_R4000 << CP0C0_MT),
+> +        .CP0_Config1 = MIPS_CONFIG1 | (1 << CP0C1_FP) | (63 << CP0C1_MMU) |
+> +                       (2 << CP0C1_IS) | (5 << CP0C1_IL) | (3 << CP0C1_IA) |
+> +                       (2 << CP0C1_DS) | (5 << CP0C1_DL) | (3 << CP0C1_DA) |
+> +                       (1 << CP0C1_PC) | (1 << CP0C1_WR) | (1 << CP0C1_EP),
+> +        .CP0_Config2 = MIPS_CONFIG2 | (5 << CP0C2_SS) | (5 << CP0C2_SL) |
+> +                       (15 << CP0C2_SA),
+> +        .CP0_Config3 = MIPS_CONFIG3 | (1 << CP0C3_LPA),
+> +        .SYNCI_Step = 16,
+> +        .CCRes = 2,
+> +        .CP0_Status_rw_bitmask = 0x7DDBFFFF,
+> +        .CP1_fcr0 = (0x5 << FCR0_PRID) | (0x1 << FCR0_REV) | (0x1 << FCR0_F64),
+> +        .CP1_fcr31 = 0,
+> +        .CP1_fcr31_rw_bitmask = 0xFF83FFFF,
+> +        .SEGBITS = 48,
+> +        .PABITS = 48,
+> +        .insn_flags = CPU_LOONGSON3A,
+> +        .mmu_type = MMU_TYPE_R4000,
+>       },
+>       {
+>           .name = "Loongson-3A4000",
 
