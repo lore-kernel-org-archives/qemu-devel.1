@@ -2,131 +2,69 @@ Return-Path: <SRS0=egLd=BX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0ECDC433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 10:43:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE1FDC433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 10:46:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6940A20771
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 10:43:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 98089204FD
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 10:46:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PcHRyc/M"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6940A20771
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="nUnB59lW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 98089204FD
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40604 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45528 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k6Ahp-0007Wz-Np
-	for qemu-devel@archiver.kernel.org; Thu, 13 Aug 2020 06:43:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52130)
+	id 1k6Akc-0001Mb-L9
+	for qemu-devel@archiver.kernel.org; Thu, 13 Aug 2020 06:46:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52682)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k6Agu-0006sB-Uw
- for qemu-devel@nongnu.org; Thu, 13 Aug 2020 06:42:36 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:35954
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k6Agr-000879-GJ
- for qemu-devel@nongnu.org; Thu, 13 Aug 2020 06:42:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597315349;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=gxlDasVghYbwKFLuepg+JPTEz1tT6/aO0i5RF/f86XI=;
- b=PcHRyc/M0oQhV4WsBok0po61nqfvvIeXC4fl6dJkCUaK/sVJAdy3kcWiqunOEq1YQjorG7
- ygDjAdaDWRworK1761qLKdrMI3aHNGQBNyhpBoOIOd+KaE8Ikw7k+yq/kvstGkcbUgHIn9
- u8esbP1Qeb4NlSkkuaiXqtncFEIFA5A=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-491-E6z5WD2dODyoX7ZfJ3ePzQ-1; Thu, 13 Aug 2020 06:42:27 -0400
-X-MC-Unique: E6z5WD2dODyoX7ZfJ3ePzQ-1
-Received: by mail-wm1-f69.google.com with SMTP id h6so1812444wml.8
- for <qemu-devel@nongnu.org>; Thu, 13 Aug 2020 03:42:27 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=gxlDasVghYbwKFLuepg+JPTEz1tT6/aO0i5RF/f86XI=;
- b=uWdg8KxSS22FdjNERCfx5PG/Bw5hW5tzuKYHBpuiw7gK243xSIRRRIi6LTZHMULgzE
- VdrIRkSD/WlRiWPOz0upp3p9w6BvJWz3BqjB02qFRSfZq3GlpI69g5yFKwyRQXl32nIg
- FhXtL6Bdh9/Vyznqu3jVvkrEfb9LDEo9y1eGdKmZfVTAKp3v73DPQcLQKfPISWtATw7J
- qDufgp3zzOqJpIWRvpko0u/Lk2oCXMqW30xj/GLJli/CNVdfC//6hKNJwLSTcphg2rOu
- 5/2oYiYn7wX2HrMzIJoKu+4iA1tillEhT0McIo5BBJFKy1FVX5s39OPS/a2A1iMHhWg4
- PQaA==
-X-Gm-Message-State: AOAM530IkifLIyTPYpjKgX7/X79/Sbx3lHKocM3ncEe3yAtiyU9MoPQ8
- xkZ70WsOdrStUn9bnubJj6XVjQYXnKC6VopdxZ900c1dsjOl8ozqNz+CRAOWAVlRotSXEp+VCTS
- 0Je+I1p8PwOT0vPI=
-X-Received: by 2002:adf:ca06:: with SMTP id o6mr3327216wrh.181.1597315346330; 
- Thu, 13 Aug 2020 03:42:26 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyvHOJ4nNKWb4n1r+cRDiAds7fLbLKAx6i7xGw08iJBrR58yhEZGQFGQ1bAId8FCsGvYcyXHA==
-X-Received: by 2002:adf:ca06:: with SMTP id o6mr3327191wrh.181.1597315346038; 
- Thu, 13 Aug 2020 03:42:26 -0700 (PDT)
-Received: from [192.168.1.36] (121.red-81-40-121.staticip.rima-tde.net.
- [81.40.121.121])
- by smtp.gmail.com with ESMTPSA id e16sm9599778wrx.30.2020.08.13.03.42.24
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 13 Aug 2020 03:42:25 -0700 (PDT)
-Subject: Re: [RFC 1/9] target/arm: convert isar regs to array
-To: Peng Liang <liangpeng10@huawei.com>, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org
-References: <20200813102657.2588720-1-liangpeng10@huawei.com>
- <20200813102657.2588720-2-liangpeng10@huawei.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <6151cd0a-b3ff-ae68-e843-c6b294b846a8@redhat.com>
-Date: Thu, 13 Aug 2020 12:42:24 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1k6AjU-00082V-V0; Thu, 13 Aug 2020 06:45:16 -0400
+Received: from ozlabs.org ([203.11.71.1]:33445)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1k6AjS-0008Jp-M8; Thu, 13 Aug 2020 06:45:16 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 4BS39y41rsz9sTR; Thu, 13 Aug 2020 20:45:10 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1597315510;
+ bh=/bXoBlkPuEm94NqSDycJy5YpVdtBp66SCanUyBKWwfE=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=nUnB59lWXKqAXRE16poKQnzZNcCUDsoEUQDNvQjc2lDy5pEI+LJKPbpQD/Nz17zVo
+ MsmBoqB6yvX+pI57Yk3I3PQBm0QfIp4zzROCGqEIxpl/+fzEHDYEyel8viSTyoye8S
+ T/NtjnmyGWr/0D5OpFyz4Lbo8JqMT3pPR2+cm/go=
+Date: Thu, 13 Aug 2020 20:22:34 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Greg Kurz <groug@kaod.org>
+Subject: Re: [PATCH 05/14] spapr/xive: Rework error handling of
+ kvmppc_xive_cpu_[gs]et_state()
+Message-ID: <20200813102234.GH181791@yekko.fritz.box>
+References: <159707843034.1489912.1082061742626355958.stgit@bahia.lan>
+ <159707846665.1489912.14267225652103441921.stgit@bahia.lan>
 MIME-Version: 1.0
-In-Reply-To: <20200813102657.2588720-2-liangpeng10@huawei.com>
-Content-Language: en-US
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/13 02:03:30
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="oyqLL/JqMvClXZi1"
+Content-Disposition: inline
+In-Reply-To: <159707846665.1489912.14267225652103441921.stgit@bahia.lan>
+Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
+ helo=ozlabs.org
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/13 06:45:10
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -9
+X-Spam_score: -1.0
+X-Spam_bar: -
+X-Spam_report: (-1.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -139,121 +77,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, drjones@redhat.com,
- zhang.zhanghailiang@huawei.com, mst@redhat.com, cohuck@redhat.com,
- xiexiangyou@huawei.com, pbonzini@redhat.com
+Cc: qemu-ppc@nongnu.org, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/13/20 12:26 PM, Peng Liang wrote:
-> The isar in ARMCPU is a struct, each field of which represents an ID
-> register.  It's not convenient for us to support CPU feature in AArch64.
-> So let's change it to an array first and add an enum as the index of the
-> array for convenience.  Since we will never access high 32-bits of ID
-> registers in AArch32, it's harmless to change the ID registers in
-> AArch32 to 64-bits.
-> 
-> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
-> Signed-off-by: Peng Liang <liangpeng10@huawei.com>
+
+--oyqLL/JqMvClXZi1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Mon, Aug 10, 2020 at 06:54:26PM +0200, Greg Kurz wrote:
+> kvm_set_one_reg() returns a negative errno on failure, use that instead
+> of errno. Also propagate it to callers so they can use it to check
+> for failures and hopefully get rid of their local_err boilerplate.
+>=20
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+
+Applied to ppc-for-5.2.
+
 > ---
->  hw/intc/armv7m_nvic.c  |  48 ++++----
->  target/arm/cpu.c       | 232 +++++++++++++++++++-------------------
->  target/arm/cpu.h       | 226 +++++++++++++++++++------------------
->  target/arm/cpu64.c     | 170 ++++++++++++++--------------
->  target/arm/cpu_tcg.c   | 250 +++++++++++++++++++++--------------------
->  target/arm/helper.c    |  54 ++++-----
->  target/arm/internals.h |  15 +--
->  target/arm/kvm64.c     |  72 ++++++------
->  8 files changed, 541 insertions(+), 526 deletions(-)
-
-Please consider using scripts/git.orderfile.
-
-[...]
-> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-> index 9e8ed423ea..5d8074d03b 100644
-> --- a/target/arm/cpu.h
-> +++ b/target/arm/cpu.h
-> @@ -67,6 +67,37 @@
->  #define ARMV7M_EXCP_PENDSV  14
->  #define ARMV7M_EXCP_SYSTICK 15
->  
-> +typedef enum CPUIDReg {
-> +    MIDR_EL1,
-> +    ID_ISAR0,
-> +    ID_ISAR1,
-> +    ID_ISAR2,
-> +    ID_ISAR3,
-> +    ID_ISAR4,
-> +    ID_ISAR5,
-> +    ID_ISAR6,
-> +    ID_MMFR0,
-> +    ID_MMFR1,
-> +    ID_MMFR2,
-> +    ID_MMFR3,
-> +    ID_MMFR4,
-> +    ID_AA64ISAR0,
-> +    ID_AA64ISAR1,
-> +    ID_AA64PFR0,
-> +    ID_AA64PFR1,
-> +    ID_AA64MMFR0,
-> +    ID_AA64MMFR1,
-> +    ID_AA64MMFR2,
-> +    ID_AA64DFR0,
-> +    ID_AA64DFR1,
-> +    ID_DFR0,
-> +    MVFR0,
-> +    MVFR1,
-> +    MVFR2,
-> +    DBGDIDR,
-> +    ID_MAX,
-
-(nitpicking, drop the last comma).
-
-> +} CPUIDReg;
+>  hw/intc/spapr_xive_kvm.c |   15 ++++++++++-----
+>  include/hw/ppc/xive.h    |    4 ++--
+>  2 files changed, 12 insertions(+), 7 deletions(-)
+>=20
+> diff --git a/hw/intc/spapr_xive_kvm.c b/hw/intc/spapr_xive_kvm.c
+> index b2a36fd59dae..5e088ccbf885 100644
+> --- a/hw/intc/spapr_xive_kvm.c
+> +++ b/hw/intc/spapr_xive_kvm.c
+> @@ -73,7 +73,7 @@ static void kvm_cpu_disable_all(void)
+>   * XIVE Thread Interrupt Management context (KVM)
+>   */
+> =20
+> -void kvmppc_xive_cpu_set_state(XiveTCTX *tctx, Error **errp)
+> +int kvmppc_xive_cpu_set_state(XiveTCTX *tctx, Error **errp)
+>  {
+>      SpaprXive *xive =3D SPAPR_XIVE(tctx->xptr);
+>      uint64_t state[2];
+> @@ -86,13 +86,16 @@ void kvmppc_xive_cpu_set_state(XiveTCTX *tctx, Error =
+**errp)
+> =20
+>      ret =3D kvm_set_one_reg(tctx->cs, KVM_REG_PPC_VP_STATE, state);
+>      if (ret !=3D 0) {
+> -        error_setg_errno(errp, errno,
+> +        error_setg_errno(errp, -ret,
+>                           "XIVE: could not restore KVM state of CPU %ld",
+>                           kvm_arch_vcpu_id(tctx->cs));
+> +        return ret;
+>      }
 > +
->  /* For M profile, some registers are banked secure vs non-secure;
->   * these are represented as a 2-element array where the first element
->   * is the non-secure copy and the second is the secure copy.
-> @@ -890,32 +921,7 @@ struct ARMCPU {
->       * field by reading the value from the KVM vCPU.
->       */
->      struct ARMISARegisters {
-> -        uint32_t id_isar0;
-> -        uint32_t id_isar1;
-> -        uint32_t id_isar2;
-> -        uint32_t id_isar3;
-> -        uint32_t id_isar4;
-> -        uint32_t id_isar5;
-> -        uint32_t id_isar6;
-> -        uint32_t id_mmfr0;
-> -        uint32_t id_mmfr1;
-> -        uint32_t id_mmfr2;
-> -        uint32_t id_mmfr3;
-> -        uint32_t id_mmfr4;
-> -        uint32_t mvfr0;
-> -        uint32_t mvfr1;
-> -        uint32_t mvfr2;
-> -        uint32_t id_dfr0;
-> -        uint32_t dbgdidr;
-> -        uint64_t id_aa64isar0;
-> -        uint64_t id_aa64isar1;
-> -        uint64_t id_aa64pfr0;
-> -        uint64_t id_aa64pfr1;
-> -        uint64_t id_aa64mmfr0;
-> -        uint64_t id_aa64mmfr1;
-> -        uint64_t id_aa64mmfr2;
-> -        uint64_t id_aa64dfr0;
-> -        uint64_t id_aa64dfr1;
-> +        uint64_t regs[ID_MAX];
->      } isar;
+> +    return 0;
+>  }
+> =20
+> -void kvmppc_xive_cpu_get_state(XiveTCTX *tctx, Error **errp)
+> +int kvmppc_xive_cpu_get_state(XiveTCTX *tctx, Error **errp)
+>  {
+>      SpaprXive *xive =3D SPAPR_XIVE(tctx->xptr);
+>      uint64_t state[2] =3D { 0 };
+> @@ -102,14 +105,16 @@ void kvmppc_xive_cpu_get_state(XiveTCTX *tctx, Erro=
+r **errp)
+> =20
+>      ret =3D kvm_get_one_reg(tctx->cs, KVM_REG_PPC_VP_STATE, state);
+>      if (ret !=3D 0) {
+> -        error_setg_errno(errp, errno,
+> +        error_setg_errno(errp, -ret,
+>                           "XIVE: could not capture KVM state of CPU %ld",
+>                           kvm_arch_vcpu_id(tctx->cs));
+> -        return;
+> +        return ret;
+>      }
+> =20
+>      /* word0 and word1 of the OS ring. */
+>      *((uint64_t *) &tctx->regs[TM_QW1_OS]) =3D state[0];
+> +
+> +    return 0;
+>  }
+> =20
+>  typedef struct {
+> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
+> index 2d87ed43728a..785c905357dc 100644
+> --- a/include/hw/ppc/xive.h
+> +++ b/include/hw/ppc/xive.h
+> @@ -489,7 +489,7 @@ int kvmppc_xive_source_reset_one(XiveSource *xsrc, in=
+t srcno, Error **errp);
+>  void kvmppc_xive_source_set_irq(void *opaque, int srcno, int val);
+>  int kvmppc_xive_cpu_connect(XiveTCTX *tctx, Error **errp);
+>  void kvmppc_xive_cpu_synchronize_state(XiveTCTX *tctx, Error **errp);
+> -void kvmppc_xive_cpu_get_state(XiveTCTX *tctx, Error **errp);
+> -void kvmppc_xive_cpu_set_state(XiveTCTX *tctx, Error **errp);
+> +int kvmppc_xive_cpu_get_state(XiveTCTX *tctx, Error **errp);
+> +int kvmppc_xive_cpu_set_state(XiveTCTX *tctx, Error **errp);
+> =20
+>  #endif /* PPC_XIVE_H */
+>=20
+>=20
 
-Why not simply this?
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-       uint64_t isar[ID_MAX];
+--oyqLL/JqMvClXZi1
+Content-Type: application/pgp-signature; name="signature.asc"
 
->      uint64_t midr;
->      uint32_t revidr;
-[...]
+-----BEGIN PGP SIGNATURE-----
 
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl81FGoACgkQbDjKyiDZ
+s5IivxAAvJ2Bnuqx7DZm39BEb5eD3PlLp5sY0e1FTVwf6qoYK2/FybW30XGaVM6P
+IXS2VA5GDWYpWzi0fBLH2CCjns8ku7uipTt2Kyug74uUT5hmCRei1TDdG9LFp7m4
+hCFxteYu9XFKeGxbWbd60pVaykRct5Ou/nANojRdqL1Y8PsUjNSt0FA76XAl55WJ
+BR1VTUk7H/+dDLBRK46JK3luQiEK/sQQl8fBfrwE9OSquZqgKNnbML4GDE2OX4Zz
+cQteSZG5e1kNZRhUbUu3ZqqyFKG2qZAXZIZoIRcREBmS1g8kYPKvnNP1AuZ19c3f
+HNNizeDJeTvdtkqHo06gl/luKL+BNdGkcAda2YNawSm08p4cfFNGjPhnHuKZzBxu
+w9p3m5i41wOO/B0mXgtq6R14xT32CWa2jFUPiOZTwtDv+7mZwQFtw94le93UguNj
+23khOtxiRbu+2kDzRkAXTT35yuZ+Y20gv6/XVxOqtolgGY4ptV2UtUt1mgUGCPLU
+ryhXFD2vmhMnOE0QAzNZfK//QapJgrE4W4txIHgoQYTKOjUw1aFw8ttWDL06YcRl
+uwMVuNbK3g91qDBSGzkAaCC3kKgiLqVL2aH4r40o+d/tb1hzyxAqYnWIXaf4s6Gj
+YP2U/26kOpx2k6dINcQmQ5EpnZjLYc7wjgj3GkXFDOZ+2AK5iD4=
+=HzDg
+-----END PGP SIGNATURE-----
+
+--oyqLL/JqMvClXZi1--
 
