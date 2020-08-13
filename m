@@ -2,113 +2,74 @@ Return-Path: <SRS0=egLd=BX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21C61C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 23:04:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7AE0C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 23:04:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D463A20774
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 23:04:04 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="NUHaEQ4R"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D463A20774
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7A77920774
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 23:04:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A77920774
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43016 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45138 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k6MGS-0000sS-4y
-	for qemu-devel@archiver.kernel.org; Thu, 13 Aug 2020 19:04:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44580)
+	id 1k6MH6-0001jj-N6
+	for qemu-devel@archiver.kernel.org; Thu, 13 Aug 2020 19:04:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44794)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <gromero@linux.vnet.ibm.com>)
- id 1k6MFj-0000M4-B6; Thu, 13 Aug 2020 19:03:19 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:23448
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <gromero@linux.vnet.ibm.com>)
- id 1k6MFg-0006ty-VK; Thu, 13 Aug 2020 19:03:19 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 07DN2x7Q011584; Thu, 13 Aug 2020 19:03:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
- h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=/1sBkrNwgaoTTInoJ3KKTUJiZk23gLMZGKOhCYtOyv8=;
- b=NUHaEQ4RVuuqEpiT2Wzu9kjA8loZayicxu7V2P/yg19wp1FPXeKp+lMyTrmekdgy+Yh5
- 6AxWJs6YLrU0jF72kJ+osIJ6ctKO77CutlpwrNlasEdfdMmIixBrZmYfjIJVJHl1HjO8
- Ht+ci08ie9SWi3a/deuYiOYGYLE3ozqQnO/EI3U1wTeBF1V8GRvNmZ/UKdIMrOqu7cfu
- FltiMU9wLkydheoAXxRFiKDYt2hfZoRVXcYvbb0nf0+PdsdAGEfqsyXJ41YMn1iHL8Vx
- qW40ok9jZTR+crRjNQmxa7nXfhS8NhOJWfhdRbRmVcRTFTLjBQMfGkRaNG0pqy1Y+IcU TA== 
-Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com
- [169.55.85.253])
- by mx0b-001b2d01.pphosted.com with ESMTP id 32w6vcn2bg-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 13 Aug 2020 19:03:07 -0400
-Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
- by ppma01wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 07DMiaVU010202;
- Thu, 13 Aug 2020 23:01:56 GMT
-Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com
- [9.57.198.26]) by ppma01wdc.us.ibm.com with ESMTP id 32skp9nqxa-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 13 Aug 2020 23:01:56 +0000
-Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com
- [9.57.199.109])
- by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 07DN1t5q40894782
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 13 Aug 2020 23:01:55 GMT
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id AA54F112065;
- Thu, 13 Aug 2020 23:01:55 +0000 (GMT)
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 05703112064;
- Thu, 13 Aug 2020 23:01:54 +0000 (GMT)
-Received: from oc6336877782.ibm.com (unknown [9.85.187.161])
- by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
- Thu, 13 Aug 2020 23:01:54 +0000 (GMT)
-Subject: Re: [PATCH] spapr/xive: Use xive_source_esb_len()
-To: Greg Kurz <groug@kaod.org>
-References: <159733969034.320580.6571451425779179477.stgit@bahia.lan>
- <b5cfd02b-abf7-8d03-7ae2-1f483bf7b0bc@linux.vnet.ibm.com>
- <20200814000024.3b78d907@bahia.lan>
-From: Gustavo Romero <gromero@linux.vnet.ibm.com>
-Message-ID: <a7a0246e-37f4-c55f-803f-ef1642067988@linux.vnet.ibm.com>
-Date: Thu, 13 Aug 2020 20:01:54 -0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1k6MGS-00011h-KL
+ for qemu-devel@nongnu.org; Thu, 13 Aug 2020 19:04:04 -0400
+Resent-Date: Thu, 13 Aug 2020 19:04:04 -0400
+Resent-Message-Id: <E1k6MGS-00011h-KL@lists.gnu.org>
+Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21388)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1k6MGQ-0006xP-FJ
+ for qemu-devel@nongnu.org; Thu, 13 Aug 2020 19:04:04 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1597359836; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=IHLhWMFm6xQmynYuBe1UlPbb+/SL9d9AO4ZFko2NAH8BFZHAVpR8sUy99wflq3ksz6rCcnvHH5q0socsN7kSZ6oGd0jFVTrwhxn258KKN+trKTqrRHDx5HfRIq4oyuUAon47ZtUUtJkvXXTVq0NNA+9W07wZ393HEZhuzaZnQBE=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1597359836;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=b8cIH4Fss0JW9eOHxIcuukgiZZV7FtGhonljDQ6SfDk=; 
+ b=E+3YrGdq9s5Za3LdWjEWhFLnA+GxY0L2k36LkaTryGFaiU+4ZMaxe+57dy1Peycv0aIv1fDAfqdDEmbYLTk3oYUdGvwijwXluW4QmvIUspxLKW/raLiVqAvlAt+0VGl2I1WDrt0TkcOGoi/ZhRcxm/y1+phMRmSzhzyltUkweEE=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1597359833750253.57637977908792;
+ Thu, 13 Aug 2020 16:03:53 -0700 (PDT)
+Subject: Re: [PATCH 00/41] qom: Automated conversion of type checking
+ boilerplate
+Message-ID: <159735983324.30452.11958140001178661097@66eaa9a8a123>
+In-Reply-To: <20200813222625.243136-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200814000024.3b78d907@bahia.lan>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
- definitions=2020-08-13_17:2020-08-13,
- 2020-08-13 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- adultscore=0 malwarescore=0
- suspectscore=0 mlxlogscore=999 phishscore=0 lowpriorityscore=0
- clxscore=1015 impostorscore=0 mlxscore=0 priorityscore=1501 spamscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2008130159
-Received-SPF: none client-ip=148.163.158.5;
- envelope-from=gromero@linux.vnet.ibm.com; helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/13 19:03:15
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
-X-Spam_score_int: -36
-X-Spam_score: -3.7
-X-Spam_bar: ---
-X-Spam_report: (-3.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001, SPF_NONE=0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: ehabkost@redhat.com
+Date: Thu, 13 Aug 2020 16:03:53 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o53.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/13 19:01:11
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -121,93 +82,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Reply-To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, berrange@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/13/20 7:00 PM, Greg Kurz wrote:
-> On Thu, 13 Aug 2020 17:38:59 -0300
-> Gustavo Romero <gromero@linux.vnet.ibm.com> wrote:
-> 
->> Hi Greg,
->>
-> 
-> Hi Gustavo,
-> 
->> On 8/13/20 2:28 PM, Greg Kurz wrote:
->>> static inline size_t xive_source_esb_len(XiveSource *xsrc)
->>> {
->>>       return (1ull << xsrc->esb_shift) * xsrc->nr_irqs;
->>> }
->>>
->>> Signed-off-by: Greg Kurz <groug@kaod.org>
->>> ---
->>> Follow-up on "ppc/xive: Rework setup of XiveSource::esb_mmio"
->>> http://patchwork.ozlabs.org/project/qemu-devel/patch/159679992680.876294.7520540158586170894.stgit@bahia.lan/
->>> ---
->>>    hw/intc/spapr_xive.c     |    2 +-
->>>    hw/intc/spapr_xive_kvm.c |    2 +-
->>>    2 files changed, 2 insertions(+), 2 deletions(-)
->>>
->>> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
->>> index 3c84f64dc464..4bd0d606ba17 100644
->>> --- a/hw/intc/spapr_xive.c
->>> +++ b/hw/intc/spapr_xive.c
->>> @@ -336,7 +336,7 @@ static void spapr_xive_realize(DeviceState *dev, Error **errp)
->>>        sysbus_init_mmio(SYS_BUS_DEVICE(xive), &end_xsrc->esb_mmio);
->>>    
->>>        /* Set the mapping address of the END ESB pages after the source ESBs */
->>> -    xive->end_base = xive->vc_base + (1ull << xsrc->esb_shift) * xsrc->nr_irqs;
->>> +    xive->end_base = xive->vc_base + xive_source_esb_len(xsrc);
->>>    
->>>        /*
->>>         * Allocate the routing tables
->>> diff --git a/hw/intc/spapr_xive_kvm.c b/hw/intc/spapr_xive_kvm.c
->>> index 82a6f99f022d..3263b982239a 100644
->>> --- a/hw/intc/spapr_xive_kvm.c
->>> +++ b/hw/intc/spapr_xive_kvm.c
->>> @@ -831,7 +831,7 @@ void kvmppc_xive_disconnect(SpaprInterruptController *intc)
->>>    
->>>        /* Clear the KVM mapping */
->>>        xsrc = &xive->source;
->>> -    esb_len = (1ull << xsrc->esb_shift) * xsrc->nr_irqs;
->>> +    esb_len = xive_source_esb_len(xsrc);
->>
->> hrm I'd like to not add another level of indirection here.
->> In this specific case I think it's more clear to read just
->>
->> 1ull << xsrc->esb_shift) * xsrc->nr_irqs
->>
->> and get the idea of one IRQ per ESB page (or pair of pages,
->> for trigger and management), than one having to look at
->> what is inside "a box" called xive_source_esb_len().
->>
->> Wrapping it under another function doesn't help more when
->> reading the code, XIVE is already tricky enough :)
->>
-> 
-> Heh, XIVE is tricky enough that only a few people will dare
-> to touch this code and they'd better already know about the
-> one IRQ per ESB page thingy ;-)
-
-Yea, maybe someday we get a cool documentation on it.
-
-Luckily I came after Benh and Cédric and took some good info from
-OPAL and QEMU code. I found out recently that XIVE support was
-merged into FreeBSD and with that it also came some good comments
-about xive...
-
-
-> More seriously, this is a matter of taste, but since you're likely
-> to be involved in XIVE a bit more than me, I'm perfectly fine with
-> keeping this open-coded.
-
-Thanks, Greg.
-
-Hope there is still some time to enjoy the summer over there :)
-
-
-Cheers,
-Gustavo
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDgxMzIyMjYyNS4yNDMx
+MzYtMS1laGFia29zdEByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUg
+ZG9ja2VyLW1pbmd3QGZlZG9yYSBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBj
+b21tYW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFs
+bGVkLCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NS
+SVBUIEJFR0lOID09PQojISAvYmluL2Jhc2gKZXhwb3J0IEFSQ0g9eDg2XzY0Cm1ha2UgZG9ja2Vy
+LWltYWdlLWZlZG9yYSBWPTEgTkVUV09SSz0xCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1taW5nd0Bm
+ZWRvcmEgSj0xNCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCiAgQ0MgICAgICBz
+dHVicy9lcnJvci1wcmludGYubwogIENDICAgICAgc3R1YnMvZmRzZXQubwogIENDICAgICAgc3R1
+YnMvZ2Ric3R1Yi5vCi90bXAvcWVtdS10ZXN0L3NyYy9kb2NzLy4uL2luY2x1ZGUvZXhlYy9tZW1v
+cnkuaDozNTM6IHdhcm5pbmc6IEZ1bmN0aW9uIHBhcmFtZXRlciBvciBtZW1iZXIgJ3BhcmVudF9j
+bGFzcycgbm90IGRlc2NyaWJlZCBpbiAnSU9NTVVNZW1vcnlSZWdpb25DbGFzcycKL3RtcC9xZW11
+LXRlc3Qvc3JjL2RvY3MvLi4vaW5jbHVkZS9leGVjL21lbW9yeS5oOjM1Mzogd2FybmluZzogRnVu
+Y3Rpb24gcGFyYW1ldGVyIG9yIG1lbWJlciAndHJhbnNsYXRlJyBub3QgZGVzY3JpYmVkIGluICdJ
+T01NVU1lbW9yeVJlZ2lvbkNsYXNzJwovdG1wL3FlbXUtdGVzdC9zcmMvZG9jcy8uLi9pbmNsdWRl
+L2V4ZWMvbWVtb3J5Lmg6MzUzOiB3YXJuaW5nOiBGdW5jdGlvbiBwYXJhbWV0ZXIgb3IgbWVtYmVy
+ICdnZXRfbWluX3BhZ2Vfc2l6ZScgbm90IGRlc2NyaWJlZCBpbiAnSU9NTVVNZW1vcnlSZWdpb25D
+bGFzcycKL3RtcC9xZW11LXRlc3Qvc3JjL2RvY3MvLi4vaW5jbHVkZS9leGVjL21lbW9yeS5oOjM1
+Mzogd2FybmluZzogRnVuY3Rpb24gcGFyYW1ldGVyIG9yIG1lbWJlciAnbm90aWZ5X2ZsYWdfY2hh
+bmdlZCcgbm90IGRlc2NyaWJlZCBpbiAnSU9NTVVNZW1vcnlSZWdpb25DbGFzcycKL3RtcC9xZW11
+LXRlc3Qvc3JjL2RvY3MvLi4vaW5jbHVkZS9leGVjL21lbW9yeS5oOjM1Mzogd2FybmluZzogRnVu
+Y3Rpb24gcGFyYW1ldGVyIG9yIG1lbWJlciAncmVwbGF5JyBub3QgZGVzY3JpYmVkIGluICdJT01N
+VU1lbW9yeVJlZ2lvbkNsYXNzJwovdG1wL3FlbXUtdGVzdC9zcmMvZG9jcy8uLi9pbmNsdWRlL2V4
+ZWMvbWVtb3J5Lmg6MzUzOiB3YXJuaW5nOiBGdW5jdGlvbiBwYXJhbWV0ZXIgb3IgbWVtYmVyICdn
+ZXRfYXR0cicgbm90IGRlc2NyaWJlZCBpbiAnSU9NTVVNZW1vcnlSZWdpb25DbGFzcycKL3RtcC9x
+ZW11LXRlc3Qvc3JjL2RvY3MvLi4vaW5jbHVkZS9leGVjL21lbW9yeS5oOjM1Mzogd2FybmluZzog
+RnVuY3Rpb24gcGFyYW1ldGVyIG9yIG1lbWJlciAnYXR0cnNfdG9faW5kZXgnIG5vdCBkZXNjcmli
+ZWQgaW4gJ0lPTU1VTWVtb3J5UmVnaW9uQ2xhc3MnCi90bXAvcWVtdS10ZXN0L3NyYy9kb2NzLy4u
+L2luY2x1ZGUvZXhlYy9tZW1vcnkuaDozNTM6IHdhcm5pbmc6IEZ1bmN0aW9uIHBhcmFtZXRlciBv
+ciBtZW1iZXIgJ251bV9pbmRleGVzJyBub3QgZGVzY3JpYmVkIGluICdJT01NVU1lbW9yeVJlZ2lv
+bkNsYXNzJwoKV2FybmluZywgdHJlYXRlZCBhcyBlcnJvcjoKL3RtcC9xZW11LXRlc3Qvc3JjL2Rv
+Y3MvLi4vaW5jbHVkZS9leGVjL21lbW9yeS5oOjIzMTpVbmV4cGVjdGVkIGluZGVudGF0aW9uLgog
+IENDICAgICAgc3R1YnMvaW90aHJlYWQtbG9jay5vCiAgQ0MgICAgICBzdHVicy9pcy1kYWVtb25p
+emVkLm8KLS0tCiAgQ0MgICAgICBzdHVicy9yZXBsYXkubwogIENDICAgICAgc3R1YnMvcnVuc3Rh
+dGUtY2hlY2subwogIENDICAgICAgc3R1YnMvc2VtaWhvc3QubwptYWtlOiAqKiogW01ha2VmaWxl
+OjEwOTE6IGRvY3MvZGV2ZWwvaW5kZXguaHRtbF0gRXJyb3IgMgptYWtlOiAqKiogV2FpdGluZyBm
+b3IgdW5maW5pc2hlZCBqb2JzLi4uLgpJbiBmaWxlIGluY2x1ZGVkIGZyb20gL3RtcC9xZW11LXRl
+c3Qvc3JjL2luY2x1ZGUvZXhlYy9tZW1vcnkuaDoyOCwKICAgICAgICAgICAgICAgICBmcm9tIC90
+bXAvcWVtdS10ZXN0L3NyYy9pbmNsdWRlL2h3L2JvYXJkcy5oOjYsCiAgICAgICAgICAgICAgICAg
+ZnJvbSAvdG1wL3FlbXUtdGVzdC9zcmMvaW5jbHVkZS9ody9pMzg2L3BjLmg6NiwKICAgICAgICAg
+ICAgICAgICBmcm9tIC90bXAvcWVtdS10ZXN0L3NyYy9zdHVicy9jbW9zLmM6MjoKL3RtcC9xZW11
+LXRlc3Qvc3JjL2luY2x1ZGUvc3lzZW11L2FjY2VsLmg6NjU6MjI6IGVycm9yOiAnQUNDRUwnIHJl
+ZGVjbGFyZWQgYXMgZGlmZmVyZW50IGtpbmQgb2Ygc3ltYm9sCiAgIDY1IHwgICAgICAgICAgICAg
+ICAgICAgICAgQUNDRUwsIFRZUEVfQUNDRUwpCiAgICAgIHwgICAgICAgICAgICAgICAgICAgICAg
+Xn5+fn4KL3RtcC9xZW11LXRlc3Qvc3JjL2luY2x1ZGUvcW9tL29iamVjdC5oOjU3MTo1OiBub3Rl
+OiBpbiBkZWZpbml0aW9uIG9mIG1hY3JvICdERUNMQVJFX0lOU1RBTkNFX0NIRUNLRVInCi0tLQov
+dXNyL3g4Nl82NC13NjQtbWluZ3czMi9zeXMtcm9vdC9taW5ndy9pbmNsdWRlL3dpbnVzZXIuaDox
+NzU3OjU6IG5vdGU6IHByZXZpb3VzIGRlY2xhcmF0aW9uIG9mICdBQ0NFTCcgd2FzIGhlcmUKIDE3
+NTcgfCAgIH0gQUNDRUwsKkxQQUNDRUw7CiAgICAgIHwgICAgIF5+fn5+Cm1ha2U6ICoqKiBbL3Rt
+cC9xZW11LXRlc3Qvc3JjL3J1bGVzLm1hazo2OTogc3R1YnMvY21vcy5vXSBFcnJvciAxClRyYWNl
+YmFjayAobW9zdCByZWNlbnQgY2FsbCBsYXN0KToKICBGaWxlICIuL3Rlc3RzL2RvY2tlci9kb2Nr
+ZXIucHkiLCBsaW5lIDcwOSwgaW4gPG1vZHVsZT4KICAgIHN5cy5leGl0KG1haW4oKSkKLS0tCiAg
+ICByYWlzZSBDYWxsZWRQcm9jZXNzRXJyb3IocmV0Y29kZSwgY21kKQpzdWJwcm9jZXNzLkNhbGxl
+ZFByb2Nlc3NFcnJvcjogQ29tbWFuZCAnWydzdWRvJywgJy1uJywgJ2RvY2tlcicsICdydW4nLCAn
+LS1sYWJlbCcsICdjb20ucWVtdS5pbnN0YW5jZS51dWlkPWIzY2E1MDAxN2RkNzQ4OTI4MmFjMTc5
+NzJkNzQ1ZTIyJywgJy11JywgJzEwMDMnLCAnLS1zZWN1cml0eS1vcHQnLCAnc2VjY29tcD11bmNv
+bmZpbmVkJywgJy0tcm0nLCAnLWUnLCAnVEFSR0VUX0xJU1Q9JywgJy1lJywgJ0VYVFJBX0NPTkZJ
+R1VSRV9PUFRTPScsICctZScsICdWPScsICctZScsICdKPTE0JywgJy1lJywgJ0RFQlVHPScsICct
+ZScsICdTSE9XX0VOVj0nLCAnLWUnLCAnQ0NBQ0hFX0RJUj0vdmFyL3RtcC9jY2FjaGUnLCAnLXYn
+LCAnL2hvbWUvcGF0Y2hldzIvLmNhY2hlL3FlbXUtZG9ja2VyLWNjYWNoZTovdmFyL3RtcC9jY2Fj
+aGU6eicsICctdicsICcvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtb3QxdTJzaXYvc3JjL2Rv
+Y2tlci1zcmMuMjAyMC0wOC0xMy0xOS4wMS41MS40MzE1Oi92YXIvdG1wL3FlbXU6eixybycsICdx
+ZW11L2ZlZG9yYScsICcvdmFyL3RtcC9xZW11L3J1bicsICd0ZXN0LW1pbmd3J10nIHJldHVybmVk
+IG5vbi16ZXJvIGV4aXQgc3RhdHVzIDIuCmZpbHRlcj0tLWZpbHRlcj1sYWJlbD1jb20ucWVtdS5p
+bnN0YW5jZS51dWlkPWIzY2E1MDAxN2RkNzQ4OTI4MmFjMTc5NzJkNzQ1ZTIyCm1ha2VbMV06ICoq
+KiBbZG9ja2VyLXJ1bl0gRXJyb3IgMQptYWtlWzFdOiBMZWF2aW5nIGRpcmVjdG9yeSBgL3Zhci90
+bXAvcGF0Y2hldy10ZXN0ZXItdG1wLW90MXUyc2l2L3NyYycKbWFrZTogKioqIFtkb2NrZXItcnVu
+LXRlc3QtbWluZ3dAZmVkb3JhXSBFcnJvciAyCgpyZWFsICAgIDJtMy4zNDNzCnVzZXIgICAgMG04
+LjQ1NHMKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9s
+b2dzLzIwMjAwODEzMjIyNjI1LjI0MzEzNi0xLWVoYWJrb3N0QHJlZGhhdC5jb20vdGVzdGluZy5k
+b2NrZXItbWluZ3dAZmVkb3JhLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0
+b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5k
+IHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
 
