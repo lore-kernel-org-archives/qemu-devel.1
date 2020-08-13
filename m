@@ -2,62 +2,64 @@ Return-Path: <SRS0=egLd=BX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E96B2C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 07:10:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09434C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 07:10:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AD545204FD
+	by mail.kernel.org (Postfix) with ESMTPS id BFB8B20716
 	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 07:10:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="MaH5ehXf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD545204FD
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="DETaMtnS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BFB8B20716
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33102 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33060 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k67O5-0000oJ-SZ
+	id 1k67O5-0000nG-JR
 	for qemu-devel@archiver.kernel.org; Thu, 13 Aug 2020 03:10:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36060)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36058)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1k67ND-0008EJ-9D
- for qemu-devel@nongnu.org; Thu, 13 Aug 2020 03:10:03 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:46421 helo=ozlabs.org)
+ id 1k67NC-0008E9-Pl; Thu, 13 Aug 2020 03:10:02 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:57521)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1k67N9-0006xx-Q6
- for qemu-devel@nongnu.org; Thu, 13 Aug 2020 03:10:02 -0400
+ id 1k67NA-0006xw-0u; Thu, 13 Aug 2020 03:10:02 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 4BRyPY67PBz9sTR; Thu, 13 Aug 2020 17:09:53 +1000 (AEST)
+ id 4BRyPZ0w0Gz9sTY; Thu, 13 Aug 2020 17:09:53 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1597302593;
- bh=CDouRUfmn0DVhAqEvIlph0RBDWOAqqou106EFH3BjtY=;
+ d=gibson.dropbear.id.au; s=201602; t=1597302594;
+ bh=CsJpRcdWm/SL1Ph6hNAZXZh6XVb4TrvSx53OGWVifbI=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=MaH5ehXfmBMCqEJirvztntzQ5aCE6Soh9zPQ3Dvgc/L7JRI4H11UZOWbQNVmc71zh
- Y9aDyhEs54wpszQn0q3vdg5xaGznvLQ39fzCTgGEr397nhzivHWCEjhsIC6npznqmi
- 0uyVAGgqeW8upAnztCJYkQD6QLr33SpScQ+ZPxf8=
-Date: Thu, 13 Aug 2020 16:36:44 +1000
+ b=DETaMtnSvCGrBx2+5W3iQ4LlwE7SfHN4znkdQmOSZQciqJwakQSvE7bcjJE2Uy+/1
+ ZSk+e0k7qp1uQg+E5FfKSovekKyDwk3oTSNQ4fKxjg1344zTY5+ABUwLLmM7zm2v86
+ PvYDm+PZAN1p1vZ3S28WC6bxshNdJcRuaXMdBmMQ=
+Date: Thu, 13 Aug 2020 16:43:36 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-To: P J P <ppandit@redhat.com>
-Subject: Re: [PATCH v4 0/9] memory: assert and define MemoryRegionOps callbacks
-Message-ID: <20200813063644.GB17532@yekko.fritz.box>
-References: <20200811114133.672647-1-ppandit@redhat.com>
+To: Greg Kurz <groug@kaod.org>
+Subject: Re: [PATCH v2 2/2] spapr/nvram: Error out if NVRAM cannot contain
+ all -prom-env data
+Message-ID: <20200813064336.GC17532@yekko.fritz.box>
+References: <159725212173.104309.6136813383848717434.stgit@bahia.lan>
+ <159725213748.104309.14834084670144632611.stgit@bahia.lan>
+ <a3b37d03-b8e5-fc1c-7988-4f71cb19c090@vivier.eu>
+ <20200812210654.6ee82d66@bahia.lan>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="3uo+9/B/ebqu+fSQ"
+ protocol="application/pgp-signature"; boundary="PuGuTyElPB9bOcsM"
 Content-Disposition: inline
-In-Reply-To: <20200811114133.672647-1-ppandit@redhat.com>
-Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
+In-Reply-To: <20200812210654.6ee82d66@bahia.lan>
+Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
  helo=ozlabs.org
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/13 03:09:54
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -9
 X-Spam_score: -1.0
 X-Spam_bar: -
@@ -77,39 +79,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Prasad J Pandit <pjp@fedoraproject.org>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- Li Qiang <liq3ea@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Lei Sun <slei.casper@gmail.com>, Alex Williamson <alex.williamson@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: Thomas Huth <thuth@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org,
+ John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---3uo+9/B/ebqu+fSQ
-Content-Type: text/plain; charset=us-ascii
+--PuGuTyElPB9bOcsM
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Aug 11, 2020 at 05:11:24PM +0530, P J P wrote:
-> From: Prasad J Pandit <pjp@fedoraproject.org>
+On Wed, Aug 12, 2020 at 09:06:54PM +0200, Greg Kurz wrote:
+> On Wed, 12 Aug 2020 19:29:26 +0200
+> Laurent Vivier <laurent@vivier.eu> wrote:
 >=20
-> Hello,
+> > Le 12/08/2020 =E0 19:08, Greg Kurz a =E9crit=A0:
+> > > Since commit 61f20b9dc5b7 ("spapr_nvram: Pre-initialize the NVRAM to
+> > > support the -prom-env parameter"), pseries machines can pre-initialize
+> > > the "system" partition in the NVRAM with the data passed to all -prom=
+-env
+> > > parameters on the QEMU command line.
+> > >=20
+> > > In this cases it is assumed that all the data fits in 64 KiB, but the=
+ user
+> > > can easily pass more and crash QEMU:
+> > >=20
+> > > $ qemu-system-ppc64 -M pseries $(for ((x=3D0;x<128;x++)); do \
+> > >   echo -n " -prom-env "$(for ((y=3D0;y<1024;y++)); do echo -n x ; don=
+e) ; \
+> > >   done) # this requires ~128 Kib
+> > > malloc(): corrupted top size
+> > > Aborted (core dumped)
+> > >=20
+> > > Call chrp_nvram_create_system_partition() first, with its recently ad=
+ded
+> > > parameter dry_run set to true, in order to know the required size and=
+ fail
+> > > gracefully if it's too small.
+> >=20
+> > Why do you need the dry_run parameter?
+> > Can't you fail on the normal case?
+> >=20
 >=20
-> * This series asserts that MemoryRegionOps objects define read/write
->   callback methods. Thus avoids potential NULL pointer dereference.
->   ex. -> https://git.qemu.org/?p=3Dqemu.git;a=3Dcommit;h=3Dbb15013ef34617=
-eb1344f5276292cadd326c21b2
+> Not sure what the "normal case" stands for... but basically, only
+> chrp_nvram_create_system_partition() knows the exact size of the
+> partition (ie. size of the header + size of all prom-env strings
+> including the terminal nul + padding to the upper 16-byte aligment).
 >=20
-> * Also adds various undefined MemoryRegionOps read/write functions
->   to avoid potential assert failure.
+> Another solution could be to pass the buffer size and errp to
+> chrp_nvram_create_system_partition() and chrp_nvram_set_var(),
+> and let chrp_nvram_set_var() check it won't memcpy() past the
+> buffer. But this is more code and since this is also used by
+> other machine types, I chose to go for the dry_run parameter.
 
-The overall idea seems fine.  Looks like we could avoid a fair bit of
-boilerplate - and slightly reduce our binary size - by introducing a
-global unimplemented_write() function.
+Hm, it does feel like a more natural interface to me, though, rather
+than always having to call it twice.  Basically just add a "max_size"
+parameter.
+
+> Should I improve the changelog to make this clearer or are
+> you thinking to something else ?
+>=20
+> > Thanks,
+> > Laurent
+> >=20
+> > >=20
+> > > Reported-by: John Snow <jsnow@redhat.com>
+> > > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > > ---
+> > >  hw/nvram/spapr_nvram.c |   15 +++++++++++++++
+> > >  1 file changed, 15 insertions(+)
+> > >=20
+> > > diff --git a/hw/nvram/spapr_nvram.c b/hw/nvram/spapr_nvram.c
+> > > index 992b818d34e7..c29d797ae1f0 100644
+> > > --- a/hw/nvram/spapr_nvram.c
+> > > +++ b/hw/nvram/spapr_nvram.c
+> > > @@ -145,6 +145,7 @@ static void rtas_nvram_store(PowerPCCPU *cpu, Spa=
+prMachineState *spapr,
+> > > =20
+> > >  static void spapr_nvram_realize(SpaprVioDevice *dev, Error **errp)
+> > >  {
+> > > +    ERRP_GUARD();
+> > >      SpaprNvram *nvram =3D VIO_SPAPR_NVRAM(dev);
+> > >      int ret;
+> > > =20
+> > > @@ -187,6 +188,20 @@ static void spapr_nvram_realize(SpaprVioDevice *=
+dev, Error **errp)
+> > >              return;
+> > >          }
+> > >      } else if (nb_prom_envs > 0) {
+> > > +        int len =3D chrp_nvram_create_system_partition(nvram->buf,
+> > > +                                                     MIN_NVRAM_SIZE =
+/ 4,
+> > > +                                                     true);
+> > > +
+> > > +        /* Check the partition is large enough for all the -prom-env=
+ data */
+> > > +        if (nvram->size < len) {
+> > > +            error_setg(errp, "-prom-env data requires %d bytes but s=
+papr-nvram "
+> > > +                       "is only %d bytes in size", len, nvram->size);
+> > > +            error_append_hint(errp,
+> > > +                              "Try to pass %d less bytes to -prom-en=
+v.\n",
+> > > +                              len - nvram->size);
+> > > +            return;
+> > > +        }
+> > > +
+> > >          /* Create a system partition to pass the -prom-env variables=
+ */
+> > >          chrp_nvram_create_system_partition(nvram->buf, MIN_NVRAM_SIZ=
+E / 4,
+> > >                                             false);
+> > >=20
+> > >=20
+> >=20
+>=20
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -117,25 +205,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---3uo+9/B/ebqu+fSQ
+--PuGuTyElPB9bOcsM
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl8033oACgkQbDjKyiDZ
-s5Lnlw//eQ/RhQIAQrLSuTXkaHtck0mxT/ouOXa/FDftJ9jRj0TBLHjQKUcolOD9
-MRs4xbCRCXmrT5EKwFk/B7xljmybpHo+rJqZPZo6h7Ut/3FRZmLruJWMqnDw+5Kn
-6wEyGXxGjN08zt887r6bQVbyI/z8gIc+KPKzbSs58mWuSRhkX/bv0M4Ws1/GSIrY
-p9xTMQ1FJHa3ZHS5/klvbiPgtCL7pmh41Y5UPDml2e0PNmOfzdriGZfo+zrwA61q
-Rm7XcnjHVdQoqDqdyxwsabZCv58Jg2vNbC2ElMdbPNr8SH8WIMD6sot2tsbCgjnh
-i42Tzwi4HGV9xQWW6E92dfj7v1VVMM2JvVLfAmCRoc4IgxrVLC0PpI8cSO1FB+ll
-zn9AaDo3QIysBBiLIMGk/emdmZoRHwK0I9mkISjArWJ+QkpFvm6gxZbBzNKZUdj2
-ucsVXpq6/yk550hs8wtM5e9lENZqkMg/JQ8VnoYyFTv1eiQbSI+pqsqV7pUcTABo
-krGZSeavV2Tv6/GhCrZoKE0VpCJL6uVz7vSszfTb580ytgmrOoc3ARUppijnOo8k
-mZM9US8TWPNfCDAo4OU/R+IDm9DN88p9sDXuqVzsoGHnYTGWy/7bpu2ayYpl7KSy
-qio7rRu8lZa2NI7rn9E15Cu0B19KlgCZkuFTs/52TfpdfVSvm8o=
-=8UTy
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl804RgACgkQbDjKyiDZ
+s5LCkw//Zgt++sjlGb/3tKVIFgK8gbpc7xVe2iEVGTBR5H3cS2ZsSwpq9wtgYONw
+QgjGoNYs5JF/g9+elqhCAV9kzWc48sj2LQMNtMZdUpphQl31g+/7/S5oMUw+KHIK
++NAs7cr2RunW0YSzTtYSweCfK57KrSAhv22THMHtbe6M+wusmguzCtCHvXLcqzT8
+191rI+ED1eE0t5wmrOwvic+9eUTzPHWhIJu6ETnkt6YxhiaAYN944ZCffdRKK5wf
+4+jxXO6Wy3RWJ7KbTgtBqc/HxdmpbDkTl1z6QFzyCSzhQt1QlGvUQsISMYCAJmmK
+oFkeBpJlDWfo7EZv5POTmM+v59kONue2jPX5boTiNxcfeZuhLMe4kU2QQug15UP9
+PKjIQpY4qAhhHGxKBRGyy4HXaE4CfR88iqLo7w1NJpmw5WgDGn4HQxJVfOhqpUrA
+3yUp4yLaudrqwymTgmiLw4SdipsshVwDWJBk8zyfEDjZTTXoDliUoKsK+dmTyvyG
+f0Cck2j56EoTL7sH0cf0nso0MRDxE93mV0kO6mX2u84+HvIlI/Tx3x5ELPbdLY6k
+Atm6cHgFQfVRFSNspu6DgYfglC1zsBKiusZzhKj7NQXTQtHtpR2+gH9UQ3sW6rOK
+f1XR+0GXT3RUQ68w8SsISvKCApNE3H0r7E5woAiAJBUR/aTleps=
+=mFHZ
 -----END PGP SIGNATURE-----
 
---3uo+9/B/ebqu+fSQ--
+--PuGuTyElPB9bOcsM--
 
