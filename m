@@ -2,95 +2,93 @@ Return-Path: <SRS0=egLd=BX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4615BC433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 18:03:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 107DDC433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 18:16:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1542A2078B
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 18:03:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C1EA920791
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 18:16:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jQnrUa/F"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1542A2078B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cTdckqOD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1EA920791
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40358 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46298 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k6HZs-0004ju-CT
-	for qemu-devel@archiver.kernel.org; Thu, 13 Aug 2020 14:03:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49556)
+	id 1k6HmT-00083s-Th
+	for qemu-devel@archiver.kernel.org; Thu, 13 Aug 2020 14:16:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54772)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1k6HZ6-0004Al-8a
- for qemu-devel@nongnu.org; Thu, 13 Aug 2020 14:03:00 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:42287
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1k6HZ3-0003py-Q0
- for qemu-devel@nongnu.org; Thu, 13 Aug 2020 14:02:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597341776;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=m3jp0ScDWzqXX19+zK39QmcbaqlgTEmFgLY+iALF3WY=;
- b=jQnrUa/FYqwQH6Bkizuspm8JHgmHsVNNVDjZFYobq6IEvx/8rBjY2rm4ksKBedbY4hjN/4
- 6dJoOw/UhAdQbqxUJv/LQ14Fp/gfvyZb+ANmhUWiqiVWyhn7UiC7BauVr9Gw72L4A6KNYP
- 6OHNCl3qGs3Z/NUJZhrfmMl/2lIcQ/U=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-391-Cc3uGqGPMs6rtlMVnGrOFw-1; Thu, 13 Aug 2020 14:02:53 -0400
-X-MC-Unique: Cc3uGqGPMs6rtlMVnGrOFw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6C806100A949;
- Thu, 13 Aug 2020 18:02:52 +0000 (UTC)
-Received: from [10.36.113.93] (ovpn-113-93.ams2.redhat.com [10.36.113.93])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id BF9C86FDBA;
- Thu, 13 Aug 2020 18:02:47 +0000 (UTC)
-Subject: Re: [PATCH 07/11] vfio/platform: Remove dead assignment in
- vfio_intp_interrupt()
-To: Alex Williamson <alex.williamson@redhat.com>,
- Chen Qun <kuhn.chenqun@huawei.com>
-References: <20200813073712.4001404-1-kuhn.chenqun@huawei.com>
- <20200813073712.4001404-8-kuhn.chenqun@huawei.com>
- <20200813105911.2312adb5@x1.home>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <681519bf-92ca-6247-490a-e9193b0bd385@redhat.com>
-Date: Thu, 13 Aug 2020 20:02:45 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1k6HlF-0006rU-7s
+ for qemu-devel@nongnu.org; Thu, 13 Aug 2020 14:15:33 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:38866)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1k6HlD-0005xw-KC
+ for qemu-devel@nongnu.org; Thu, 13 Aug 2020 14:15:32 -0400
+Received: by mail-wr1-x441.google.com with SMTP id a14so6135631wra.5
+ for <qemu-devel@nongnu.org>; Thu, 13 Aug 2020 11:15:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=uhfZmbPHKJ0sUv1xRkRKUkWexALtAnTFEYNxyjbUa1U=;
+ b=cTdckqODVxh4M6lfwjvJDi4mnrvDd1F0rjM4zcND0zjpC/4yn+CCb/02TDqTzmO0Dx
+ WcPVPKo1hwkLjgY7IZOF72qRmq3CGcGOv3fTKZngflHrEkvPXpjMoIO7q1yNVIqpJPPC
+ oQvNtsLbAIxp8Wg7QNeKI1Bmur+lLcqCDicp0etG6nWQ3OVSL9oYmJ/RtpYtOKPLkf8B
+ 0ZKf6XTubsrKACw590++XlB+Qu+hxoWUHucksD77y4ihdhca/5UtoRbjDUPLB5zvPt7M
+ dmG3mqM/l/tPCp9PWmukxGcpUD2Ea5IQavDkcQsAcRwuPbdQclCq8bIt72mYGQ1JiQM8
+ psGg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=uhfZmbPHKJ0sUv1xRkRKUkWexALtAnTFEYNxyjbUa1U=;
+ b=FqUMRtX989gFsGnL31q/q5YKoawBpsVBa3I+7sl+AaXRzr5HWWv92s+XJPE+Yy4Ks8
+ LE+NViK3Gzyn+n9XA3hb3IMWECaW5/Lz8D5P4XRUehOSfGNWuedEwQ3Tuf8lZnd95k8f
+ qSO2cVPwIS4dgBzdyTh9B0DwaQg9gVCV3CjkocxLTLGxi5WQN5YwQYpPyRfWpmo9GYTN
+ o3H1AXDgdIaE5J690Sgnv9OxhKXMRvm9BmCxcbW10hvhXDqPjJPWnIg/VbVnvNKNfCqG
+ Wib97oBz1dX1sbGFOp7er6UojxEhH4u4kI+QPkof6zDnl/JRBMWcqpD2Sxnh00VNUXiM
+ E6lg==
+X-Gm-Message-State: AOAM533nQDe/1CmdUEPfjEBo3pDEPEkPhIiahQyyHpbp1uAX0JHxTIzl
+ cvSwWvV9PT4cEwXdeSGtzn65A1M6
+X-Google-Smtp-Source: ABdhPJw7DnHk0n5MkUtYphoS6ugtWuKUcLBCTX35PllCJiRsg2dPVQ+Q+88za48BeEOIP1cQbJuVDw==
+X-Received: by 2002:a5d:6401:: with SMTP id z1mr5112215wru.272.1597342529920; 
+ Thu, 13 Aug 2020 11:15:29 -0700 (PDT)
+Received: from localhost.localdomain (121.red-81-40-121.staticip.rima-tde.net.
+ [81.40.121.121])
+ by smtp.gmail.com with ESMTPSA id h14sm10039926wml.30.2020.08.13.11.15.28
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 13 Aug 2020 11:15:29 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Subject: [RFC PATCH v2 0/3] target/mips: Report unimplemented cache()
+ operations
+Date: Thu, 13 Aug 2020 20:15:24 +0200
+Message-Id: <20200813181527.22551-1-f4bug@amsat.org>
+X-Mailer: git-send-email 2.21.3
 MIME-Version: 1.0
-In-Reply-To: <20200813105911.2312adb5@x1.home>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eric.auger@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=eric.auger@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/13 02:03:30
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::441;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x441.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,68 +101,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Euler Robot <euler.robot@huawei.com>,
- pannengyuan@huawei.com, zhang.zhanghailiang@huawei.com, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Alex,
+Few patches to improve the handling of the 'cache' opcode.
 
-On 8/13/20 6:59 PM, Alex Williamson wrote:
-> On Thu, 13 Aug 2020 15:37:08 +0800
-> Chen Qun <kuhn.chenqun@huawei.com> wrote:
-> 
->> Clang static code analyzer show warning:
->> hw/vfio/platform.c:239:9: warning: Value stored to 'ret' is never read
->>         ret = event_notifier_test_and_clear(intp->interrupt);
->>         ^     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->>
->> Reported-by: Euler Robot <euler.robot@huawei.com>
->> Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
->> ---
->> Cc: Alex Williamson <alex.williamson@redhat.com>
->> Cc: Eric Auger <eric.auger@redhat.com>
->> ---
->>  hw/vfio/platform.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/hw/vfio/platform.c b/hw/vfio/platform.c
->> index ac2cefc9b1..869ed2c39d 100644
->> --- a/hw/vfio/platform.c
->> +++ b/hw/vfio/platform.c
->> @@ -236,7 +236,7 @@ static void vfio_intp_interrupt(VFIOINTp *intp)
->>          trace_vfio_intp_interrupt_set_pending(intp->pin);
->>          QSIMPLEQ_INSERT_TAIL(&vdev->pending_intp_queue,
->>                               intp, pqnext);
->> -        ret = event_notifier_test_and_clear(intp->interrupt);
->> +        event_notifier_test_and_clear(intp->interrupt);
->>          return;
->>      }
-> 
-> Testing that an event is pending in our notifier is generally a
-> prerequisite to doing anything in the interrupt handler, I don't
-> understand why we're just consuming it and ignoring the return value.
-> The above is in the delayed handling branch of the function, but the
-> normal non-delayed path would only go on to error_report() if the
-> notifier is not pending and then inject an interrupt anyway.  This all
-> seems rather suspicious and it's a unique pattern among the vfio
-> callers of this function.  Is there a more fundamental bug that this
-> function should perform this test once and return without doing
-> anything if it's called spuriously, ie. without a notifier pending?
-> Thanks,
+I'm not sure why helper_cache() is generated for user-only mode.
 
-Hum that's correct that other VFIO call sites do the check. My
-understanding was that this could not fail in this case as, if we
-entered the handler there was something to be cleared. In which
-situation can this fail?
+v1 was:
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg727959.html
+Supersedes: <20200806122612.17167-1-f4bug@amsat.org>
 
-Thanks
+Philippe Mathieu-Daudé (3):
+  target/mips/op_helper: Convert multiple if() to switch case
+  target/mips/op_helper: Document Invalidate/Writeback opcodes as no-op
+  target/mips/op_helper: Log unimplemented cache opcode
 
-Eric
-> 
-> Alex
-> 
-> 
+ target/mips/op_helper.c | 27 +++++++++++++++++++++++----
+ 1 file changed, 23 insertions(+), 4 deletions(-)
+
+-- 
+2.21.3
 
 
