@@ -7,83 +7,83 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A043C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 22:39:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3BEBC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 22:39:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 046D7204EC
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 22:39:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8BE74204EC
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 22:39:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="daHv6cNR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 046D7204EC
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gW4VyGme"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8BE74204EC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36938 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39324 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k6Lsf-0008PJ-6x
-	for qemu-devel@archiver.kernel.org; Thu, 13 Aug 2020 18:39:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36314)
+	id 1k6Lt7-0000vN-P1
+	for qemu-devel@archiver.kernel.org; Thu, 13 Aug 2020 18:39:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36346)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1k6LgS-0005NW-Vf
- for qemu-devel@nongnu.org; Thu, 13 Aug 2020 18:26:53 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:55376
- helo=us-smtp-delivery-1.mimecast.com)
+ id 1k6LgV-0005Sn-Dh
+ for qemu-devel@nongnu.org; Thu, 13 Aug 2020 18:26:55 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:50207
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1k6LgR-0002tB-7W
- for qemu-devel@nongnu.org; Thu, 13 Aug 2020 18:26:52 -0400
+ id 1k6LgT-0002ts-OZ
+ for qemu-devel@nongnu.org; Thu, 13 Aug 2020 18:26:55 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597357610;
+ s=mimecast20190719; t=1597357613;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=NA5YBIhBgCLus4frdJSyA0MQ2ir1g/iduIzPMqjp97s=;
- b=daHv6cNRhNRvYq7kLvau284plauQQt9T7Fwn/jYU5sbiZaRzOxGw+bg1agC4jNYMUypmKo
- yRXhtUpNjbLETyzqwnhCxrfGQox5v4OxEiEajhihB/E1u3+LF7Cvbi/gcerPNkTOZDNao4
- Ubu6bWg7RzZOkab2dbIJJwH0YaXK1UA=
+ bh=vQqSy/MYwwqjJX900gLBZkNMOzZWDr9u74VbkdL4Yf4=;
+ b=gW4VyGmeqxwIlxI7lr9+9fgM0nCNsOgnBlv5AKLBRJIohszfG0+fVkHYxOT2MoqZv8h1Do
+ TMDdJSjSdMHVavg+1W4xpgBoezaIJLxAU6cUwEgwGuCvhk+AW0edqnKizXZm7Sdd05IT59
+ 44sOVYNUGxD+9HdOrWWtOS4YAuk5G44=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-324-oboEsUC1NZ6r2y6b8AEwxg-1; Thu, 13 Aug 2020 18:26:48 -0400
-X-MC-Unique: oboEsUC1NZ6r2y6b8AEwxg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-93-BPqLiSpDOfOQNdp2AYqdxA-1; Thu, 13 Aug 2020 18:26:51 -0400
+X-MC-Unique: BPqLiSpDOfOQNdp2AYqdxA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7EE9E57084
- for <qemu-devel@nongnu.org>; Thu, 13 Aug 2020 22:26:47 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 867D7800683
+ for <qemu-devel@nongnu.org>; Thu, 13 Aug 2020 22:26:50 +0000 (UTC)
 Received: from localhost (ovpn-117-153.rdu2.redhat.com [10.10.117.153])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 447AE1002382;
- Thu, 13 Aug 2020 22:26:47 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4D175708FF;
+ Thu, 13 Aug 2020 22:26:50 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 17/41] pci: Move PCIBusClass typedef to pci.h
-Date: Thu, 13 Aug 2020 18:26:01 -0400
-Message-Id: <20200813222625.243136-18-ehabkost@redhat.com>
+Subject: [PATCH 20/41] mcf_fec: Move mcf_fec_state typedef to header
+Date: Thu, 13 Aug 2020 18:26:04 -0400
+Message-Id: <20200813222625.243136-21-ehabkost@redhat.com>
 In-Reply-To: <20200813222625.243136-1-ehabkost@redhat.com>
 References: <20200813222625.243136-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
 X-Mimecast-Spam-Score: 0.0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=ehabkost@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/13 17:30:51
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=ehabkost@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/13 18:26:36
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,43 +107,44 @@ to convert the code to OBJECT_DEFINE_TYPE() in the future.
 
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- include/hw/pci/pci.h     | 1 +
- include/hw/pci/pci_bus.h | 4 ++--
+ include/hw/m68k/mcf_fec.h | 1 +
+ hw/net/mcf_fec.c          | 4 ++--
  2 files changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
-index c1bf7d5356..4ca7258b5b 100644
---- a/include/hw/pci/pci.h
-+++ b/include/hw/pci/pci.h
-@@ -396,6 +396,7 @@ typedef int (*pci_map_irq_fn)(PCIDevice *pci_dev, int irq_num);
- typedef PCIINTxRoute (*pci_route_irq_fn)(void *opaque, int pin);
+diff --git a/include/hw/m68k/mcf_fec.h b/include/hw/m68k/mcf_fec.h
+index eeb471f9c9..c09e33a57c 100644
+--- a/include/hw/m68k/mcf_fec.h
++++ b/include/hw/m68k/mcf_fec.h
+@@ -11,6 +11,7 @@
+ #define HW_M68K_MCF_FEC_H
  
- #define TYPE_PCI_BUS "PCI"
-+typedef struct PCIBusClass PCIBusClass;
- #define PCI_BUS(obj) OBJECT_CHECK(PCIBus, (obj), TYPE_PCI_BUS)
- #define PCI_BUS_CLASS(klass) OBJECT_CLASS_CHECK(PCIBusClass, (klass), TYPE_PCI_BUS)
- #define PCI_BUS_GET_CLASS(obj) OBJECT_GET_CLASS(PCIBusClass, (obj), TYPE_PCI_BUS)
-diff --git a/include/hw/pci/pci_bus.h b/include/hw/pci/pci_bus.h
-index 0714f578af..347440d42c 100644
---- a/include/hw/pci/pci_bus.h
-+++ b/include/hw/pci/pci_bus.h
-@@ -10,14 +10,14 @@
-  * use accessor functions in pci.h
-  */
+ #define TYPE_MCF_FEC_NET "mcf-fec"
++typedef struct mcf_fec_state mcf_fec_state;
+ #define MCF_FEC_NET(obj) OBJECT_CHECK(mcf_fec_state, (obj), TYPE_MCF_FEC_NET)
  
--typedef struct PCIBusClass {
-+struct PCIBusClass {
-     /*< private >*/
-     BusClass parent_class;
-     /*< public >*/
+ #define FEC_NUM_IRQ 13
+diff --git a/hw/net/mcf_fec.c b/hw/net/mcf_fec.c
+index 281345862c..25e3e453ab 100644
+--- a/hw/net/mcf_fec.c
++++ b/hw/net/mcf_fec.c
+@@ -32,7 +32,7 @@ do { printf("mcf_fec: " fmt , ## __VA_ARGS__); } while (0)
+ #define FEC_MAX_FRAME_SIZE 2032
+ #define FEC_MIB_SIZE 64
  
-     int (*bus_num)(PCIBus *bus);
-     uint16_t (*numa_node)(PCIBus *bus);
--} PCIBusClass;
+-typedef struct {
++struct mcf_fec_state {
+     SysBusDevice parent_obj;
+ 
+     MemoryRegion iomem;
+@@ -56,7 +56,7 @@ typedef struct {
+     uint32_t etdsr;
+     uint32_t emrbr;
+     uint32_t mib[FEC_MIB_SIZE];
+-} mcf_fec_state;
 +};
  
- enum PCIBusFlags {
-     /* This bus is the root of a PCI domain */
+ #define FEC_INT_HB   0x80000000
+ #define FEC_INT_BABR 0x40000000
 -- 
 2.26.2
 
