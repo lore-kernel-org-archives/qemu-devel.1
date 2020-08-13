@@ -2,70 +2,95 @@ Return-Path: <SRS0=egLd=BX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B79FC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 16:52:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F810C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 16:57:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1A44720774
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 16:52:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4612020774
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 16:57:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="oFMe7BMX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A44720774
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=163.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bZliVlTz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4612020774
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34542 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38604 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k6GT6-0000Ib-DS
-	for qemu-devel@archiver.kernel.org; Thu, 13 Aug 2020 12:52:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33776)
+	id 1k6GXP-0002Dx-Fd
+	for qemu-devel@archiver.kernel.org; Thu, 13 Aug 2020 12:57:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34784)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <liq3ea@163.com>) id 1k6GSZ-0008Jr-6x
- for qemu-devel@nongnu.org; Thu, 13 Aug 2020 12:52:11 -0400
-Received: from mail-m971.mail.163.com ([123.126.97.1]:42688)
- by eggs.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <liq3ea@163.com>) id 1k6GSU-000463-9p
- for qemu-devel@nongnu.org; Thu, 13 Aug 2020 12:52:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
- s=s110527; h=From:Subject:Date:Message-Id; bh=qgOBh8DEWIr+1eiPh0
- iebBExJiaGflRdaHFUtmrAabY=; b=oFMe7BMXxW9mkqxWcRDt3Pu1K83ypmgHLr
- sL4Xh6iEQbuaz10CvEVDRuIPJ7FCbmJ7tkSLu1pCW+6pz1l611s/+ISifB8qLAEc
- Ccm1bZX4J0Y2QOyG+d4ShBapuWea8qL66F1wwK32n4Iz1iSakjHKHZyc+hS7oMOB
- MpqK9AFZE=
-Received: from localhost.localdomain (unknown [115.204.177.14])
- by smtp1 (Coremail) with SMTP id GdxpCgA3xNCVbzVffgB5Ag--.40S4;
- Fri, 14 Aug 2020 00:51:56 +0800 (CST)
-From: Li Qiang <liq3ea@163.com>
-To: mst@redhat.com
-Subject: [PATCH] hw: virtio-pmem: detach the element fromt the virtqueue when
- error occurs
-Date: Thu, 13 Aug 2020 09:51:25 -0700
-Message-Id: <20200813165125.59928-1-liq3ea@163.com>
-X-Mailer: git-send-email 2.17.1
-X-CM-TRANSID: GdxpCgA3xNCVbzVffgB5Ag--.40S4
-X-Coremail-Antispam: 1Uf129KBjvdXoWrKr4rZry5Cw1UXw4DKFW7urg_yoW3ArX_GF
- W8CayxWw4jga4akrWjyw4rXF1fGa18W3Z8AF13tF18Ar18Jw45JF9rXFsY9F17WrW8Ka15
- ArZ5Krs8Wwn3ujkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
- 9fnUUvcSsGvfC2KfnxnUUI43ZEXa7xRE7Ks7UUUUU==
-X-Originating-IP: [115.204.177.14]
-X-CM-SenderInfo: 5oltjvrd6rljoofrz/1tbitA5-bVSIiR1jTgAAsN
-Received-SPF: pass client-ip=123.126.97.1; envelope-from=liq3ea@163.com;
- helo=mail-m971.mail.163.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/13 11:36:23
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1k6GWp-0001os-52
+ for qemu-devel@nongnu.org; Thu, 13 Aug 2020 12:56:35 -0400
+Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:37501)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1k6GWn-0004nx-1M
+ for qemu-devel@nongnu.org; Thu, 13 Aug 2020 12:56:34 -0400
+Received: by mail-pj1-x1042.google.com with SMTP id mw10so3035202pjb.2
+ for <qemu-devel@nongnu.org>; Thu, 13 Aug 2020 09:56:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:references:from:message-id:date:user-agent:mime-version
+ :in-reply-to:content-language:content-transfer-encoding;
+ bh=7WXBwvey9BXP65hoVqdPfrNGwtcI7TkVLlNyPPBP9gs=;
+ b=bZliVlTzZXvTAHqAZllcXoHJNXb38OMUqXDXrTRfoweflXDpvcJPHAdaexUT6M8HWo
+ cT8sIfsDzv1Frv2xN7ye4nyZgQ9ZyvcHpG54dT7uzEHWH6G0MnTTGN/5/zJn6pEOz2nX
+ kl+/jpnd9rAnZ8nwXyR1tYexfjUOXj/G4uGmwUgmhs7dOwE4RbxxF1G5W+6TvLu4WBs8
+ mbirw9WTYmdldOcXrSwxbI7ckkoMmynpoh0ivM32/ZEQbLZHqS8ryCzEZuoXNbyVIQSa
+ y2KTTmYmCdptgctE2rpdbflmn7crDbFCZsPwBEQ6ScVBQaW9o3TJ3XuDqx5KveTxU7a7
+ DQsQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=7WXBwvey9BXP65hoVqdPfrNGwtcI7TkVLlNyPPBP9gs=;
+ b=akYms0nOapRdxMXxr/PWHWvbekWIHbceyBgFm7l60m8GqokRHfZICpVrLYizja0viM
+ zIR3KErU+Yv7cNjkDjO7xd466C+UyjUL1t3Sw+RhYkQ+4OVMvH4Qk4fRQvgmnmn8KMGm
+ k7qatIxgjgWaAw0a8dYWEi9z9dBUVoIFJ/+OkDqx0oqdIT5SyVwdsl7HW2A3P2uHS/ZL
+ rEohIuSShd8Jes+PtpatFz2cBoPnEgvpGnCPhDnogewA9VkFLi5w0hrEbYTtQoI/AiGV
+ BbjDNj5dPswnVYf6DMKd7BgVqwOpDycTiQvzQtEb/habb8Q4dx1N+FelYG0bA6LtY+HG
+ xeIg==
+X-Gm-Message-State: AOAM530MjNJCJbnPqSlFJrzsl3gzl/oKZtZzlm7aUik8cXkgG71/H1Rb
+ Gdv//yxLuZv4gjxeKQWTO9YSJfRSZns=
+X-Google-Smtp-Source: ABdhPJxyqU38WA4+zaZu6XusTxmEch8xAgnTepvV/L6nxz7a4xwKb5UQuRO/nyjchyVhF75dhMJOIw==
+X-Received: by 2002:a17:90b:1116:: with SMTP id
+ gi22mr6229781pjb.209.1597337791107; 
+ Thu, 13 Aug 2020 09:56:31 -0700 (PDT)
+Received: from [192.168.1.11] ([71.212.141.89])
+ by smtp.gmail.com with ESMTPSA id u191sm5650916pgu.56.2020.08.13.09.56.30
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 13 Aug 2020 09:56:30 -0700 (PDT)
+Subject: Re: [PATCH v2] tcg: Fix tcg gen for vectorized absolute value
+To: Stephen Long <steplong@quicinc.com>, qemu-devel@nongnu.org
+References: <20200813161818.190-1-steplong@quicinc.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <9a61e17c-bcf5-9e7b-63ed-48be0d5a5dcf@linaro.org>
+Date: Thu, 13 Aug 2020 09:56:28 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+MIME-Version: 1.0
+In-Reply-To: <20200813161818.190-1-steplong@quicinc.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1042;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1042.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -79,33 +104,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Li Qiang <liq3ea@163.com>, liq3ea@gmail.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If error occurs while processing the virtio request we should call
-'virtqueue_detach_element' to detach the element from the virtqueue
-before free the elem.
+On 8/13/20 9:18 AM, Stephen Long wrote:
+> Signed-off-by: Stephen Long <steplong@quicinc.com>
+> ---
+>  tcg/tcg-op-gvec.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+> 
+> Whoops, I forgot to add the signed off line.
 
-Signed-off-by: Li Qiang <liq3ea@163.com>
----
- hw/virtio/virtio-pmem.c | 1 +
- 1 file changed, 1 insertion(+)
+Queued, copying the patch description from v1.
 
-diff --git a/hw/virtio/virtio-pmem.c b/hw/virtio/virtio-pmem.c
-index 1e0c137497..ddb0125901 100644
---- a/hw/virtio/virtio-pmem.c
-+++ b/hw/virtio/virtio-pmem.c
-@@ -77,6 +77,7 @@ static void virtio_pmem_flush(VirtIODevice *vdev, VirtQueue *vq)
- 
-     if (req_data->elem.out_num < 1 || req_data->elem.in_num < 1) {
-         virtio_error(vdev, "virtio-pmem request not proper");
-+        virtqueue_detach_element(vq, (VirtQueueElement *)req_data, 0);
-         g_free(req_data);
-         return;
-     }
--- 
-2.17.1
+Which, by the way, should have been above the "---" line there as well, so that
+it gets included in the commit message.
 
+
+r~
 
