@@ -7,40 +7,40 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE011C433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 10:34:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87624C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 10:34:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 96933206A4
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 10:34:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96933206A4
+	by mail.kernel.org (Postfix) with ESMTPS id 5A641206A4
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 10:34:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A641206A4
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35836 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37248 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k6AYb-0002Md-Qd
-	for qemu-devel@archiver.kernel.org; Thu, 13 Aug 2020 06:34:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49962)
+	id 1k6AYu-0002vg-HE
+	for qemu-devel@archiver.kernel.org; Thu, 13 Aug 2020 06:34:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49992)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <liangpeng10@huawei.com>)
- id 1k6AXC-0008V6-0E; Thu, 13 Aug 2020 06:32:34 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:4184 helo=huawei.com)
+ id 1k6AXE-00008M-3Y; Thu, 13 Aug 2020 06:32:36 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:4181 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <liangpeng10@huawei.com>)
- id 1k6AX8-0006p2-PZ; Thu, 13 Aug 2020 06:32:33 -0400
+ id 1k6AXA-0006oz-Ef; Thu, 13 Aug 2020 06:32:35 -0400
 Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id 24EFB428727448D1A081;
+ by Forcepoint Email with ESMTP id 10802DDD0521AA55BFD7;
  Thu, 13 Aug 2020 18:32:27 +0800 (CST)
 Received: from localhost.localdomain (10.175.104.175) by
  DGGEMS414-HUB.china.huawei.com (10.3.19.214) with Microsoft SMTP Server id
  14.3.487.0; Thu, 13 Aug 2020 18:32:20 +0800
 From: Peng Liang <liangpeng10@huawei.com>
 To: <qemu-arm@nongnu.org>, <qemu-devel@nongnu.org>
-Subject: [RFC 4/9] target/arm: Allow ID registers to synchronize to KVM
-Date: Thu, 13 Aug 2020 18:26:52 +0800
-Message-ID: <20200813102657.2588720-5-liangpeng10@huawei.com>
+Subject: [RFC 5/9] target/arm: introduce CPU feature dependency mechanism
+Date: Thu, 13 Aug 2020 18:26:53 +0800
+Message-ID: <20200813102657.2588720-6-liangpeng10@huawei.com>
 X-Mailer: git-send-email 2.18.4
 In-Reply-To: <20200813102657.2588720-1-liangpeng10@huawei.com>
 References: <20200813102657.2588720-1-liangpeng10@huawei.com>
@@ -78,158 +78,182 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-There are 2 steps to synchronize the values of system registers from
-CPU state to KVM:
-1. write to the values of system registers from CPU state to
-   (index,value) list by write_cpustate_to_list;
-2. write the values in (index,value) list to KVM by
-   write_list_to_kvmstate;
+Some CPU features are dependent on other CPU features.  For example,
+ID_AA64PFR0_EL1.FP field and ID_AA64PFR0_EL1.AdvSIMD must have the same
+value, which means FP and ADVSIMD are dependent on each other, FPHP and
+ADVSIMDHP are dependent on each other.
 
-In step 1, the values of constant system registers are not allowed to
-write to (index,value) list.  However, a constant system register is
-CONSTANT for guest but not for QEMU, which means, QEMU can set/modify
-the value of constant system registers that is different from phsical
-registers when startup.  But if KVM is enabled, guest can not read the
-values of the system registers which QEMU set unless they can be written
-to (index,value) list.  And why not try to write to KVM if kvm_sync is
-true?
+This commit introduces a mechanism for CPU feature dependency in
+AArch64.  We build a directed graph from the CPU feature dependency
+relationship, each edge from->to means the `to` CPU feature is dependent
+on the `from` CPU feature.  And we will automatically enable/disable CPU
+feature according to the directed graph.
 
-At the moment we call write_cpustate_to_list, all ID registers are
-contant, including ID_PFR1_EL1 and ID_AA64PFR0_EL1 because GIC has been
-initialized.  Hence, let's give all ID registers a chance to write to
-KVM.  If the write is successful, then write to (index,value) list.
+For example, a, b, and c CPU features are in relationship a->b->c, which
+means c is dependent on b and b is dependent on a.  If c is enabled by
+user, then a and b is enabled automatically.  And if a is disabled by
+user, then b and c is disabled automatically.
 
 Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
 Signed-off-by: Peng Liang <liangpeng10@huawei.com>
 ---
- target/arm/helper.c  | 31 ++++++++++++++++++++-----------
- target/arm/kvm.c     | 38 ++++++++++++++++++++++++++++++++++++++
- target/arm/kvm_arm.h |  3 +++
- 3 files changed, 61 insertions(+), 11 deletions(-)
+ target/arm/cpu.c | 129 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 129 insertions(+)
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 9208ec046c..1cac269ef1 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -34,6 +34,7 @@
- #include "arm_ldst.h"
- #include "exec/cpu_ldst.h"
- #endif
-+#include "kvm_arm.h"
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index 113cf4a9e7..4e67b8f22c 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -1418,6 +1418,103 @@ static struct CPUFeatureInfo cpu_features[] = {
+     },
+ };
  
- #define ARM_CPU_FREQ 1000000000 /* FIXME: 1 GHz, should be configurable */
- 
-@@ -369,30 +370,38 @@ bool write_cpustate_to_list(ARMCPU *cpu, bool kvm_sync)
-             ok = false;
-             continue;
-         }
--        if (ri->type & ARM_CP_NO_RAW) {
-+        /*
-+         * (Op0, Op1, CRn, CRm, Op2) of ID registers is (3, 0, 0, crm, op2),
-+         * where 1<=crm<8, 0<=op2<8.  Let's give ID registers a chance to
-+         * synchronize to kvm.
-+         */
-+        if ((ri->type & ARM_CP_NO_RAW) && !(kvm_sync &&
-+            ri->opc0 == 3 && ri->opc1 == 0 && ri->crn == 0 && ri->crm > 0)) {
-             continue;
-         }
- 
-         newval = read_raw_cp_reg(&cpu->env, ri);
-         if (kvm_sync) {
--            /*
--             * Only sync if the previous list->cpustate sync succeeded.
--             * Rather than tracking the success/failure state for every
--             * item in the list, we just recheck "does the raw write we must
--             * have made in write_list_to_cpustate() read back OK" here.
--             */
--            uint64_t oldval = cpu->cpreg_values[i];
-+            /* Only sync if we can sync to KVM successfully. */
-+            uint64_t oldval;
-+            uint64_t kvmval;
- 
-+            if (kvm_arm_get_one_reg(cpu, cpu->cpreg_indexes[i], &oldval)) {
-+                continue;
-+            }
-             if (oldval == newval) {
-                 continue;
-             }
- 
--            write_raw_cp_reg(&cpu->env, ri, oldval);
--            if (read_raw_cp_reg(&cpu->env, ri) != oldval) {
-+            if (kvm_arm_set_one_reg(cpu, cpu->cpreg_indexes[i], &newval)) {
-+                continue;
-+            }
-+            if (kvm_arm_get_one_reg(cpu, cpu->cpreg_indexes[i], &kvmval) ||
-+                kvmval != newval) {
-                 continue;
-             }
- 
--            write_raw_cp_reg(&cpu->env, ri, newval);
-+            kvm_arm_set_one_reg(cpu, cpu->cpreg_indexes[i], &oldval);
-         }
-         cpu->cpreg_values[i] = newval;
-     }
-diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-index 8bb7318378..6a40e7da61 100644
---- a/target/arm/kvm.c
-+++ b/target/arm/kvm.c
-@@ -490,6 +490,44 @@ out:
-     return ret;
- }
- 
-+int kvm_arm_get_one_reg(ARMCPU *cpu, uint64_t regidx, uint64_t *target)
-+{
-+    uint32_t v32;
-+    int ret;
++typedef struct CPUFeatureDep {
++    CPUFeatureInfo from, to;
++} CPUFeatureDep;
 +
-+    switch (regidx & KVM_REG_SIZE_MASK) {
-+    case KVM_REG_SIZE_U32:
-+        ret = kvm_get_one_reg(CPU(cpu), regidx, &v32);
-+        if (ret == 0) {
-+            *target = v32;
-+        }
-+        return ret;
-+    case KVM_REG_SIZE_U64:
-+        return kvm_get_one_reg(CPU(cpu), regidx, target);
-+    default:
-+        return -1;
-+    }
-+}
++static const CPUFeatureDep feature_dependencies[] = {
++    {
++        .from = FIELD_INFO(ID_AA64PFR0, FP, true, 0, 0xf, false),
++        .to = FIELD_INFO(ID_AA64PFR0, ADVSIMD, true, 0, 0xf, false),
++    },
++    {
++        .from = FIELD_INFO(ID_AA64PFR0, ADVSIMD, true, 0, 0xf, false),
++        .to = FIELD_INFO(ID_AA64PFR0, FP, true, 0, 0xf, false),
++    },
++    {
++        .from = {
++            .reg = ID_AA64PFR0, .length = R_ID_AA64PFR0_FP_LENGTH,
++            .shift = R_ID_AA64PFR0_FP_SHIFT, .sign = true, .min_value = 1,
++            .ni_value = 0, .name = "FPHP", .is_32bit = false,
++        },
++        .to = {
++            .reg = ID_AA64PFR0, .length = R_ID_AA64PFR0_ADVSIMD_LENGTH,
++            .shift = R_ID_AA64PFR0_ADVSIMD_SHIFT, .sign = true, .min_value = 1,
++            .ni_value = 0, .name = "ADVSIMDHP", .is_32bit = false,
++        },
++    },
++    {
++        .from = {
++            .reg = ID_AA64PFR0, .length = R_ID_AA64PFR0_ADVSIMD_LENGTH,
++            .shift = R_ID_AA64PFR0_ADVSIMD_SHIFT, .sign = true, .min_value = 1,
++            .ni_value = 0, .name = "ADVSIMDHP", .is_32bit = false,
++        },
++        .to = {
++            .reg = ID_AA64PFR0, .length = R_ID_AA64PFR0_FP_LENGTH,
++            .shift = R_ID_AA64PFR0_FP_SHIFT, .sign = true, .min_value = 1,
++            .ni_value = 0, .name = "FPHP", .is_32bit = false,
++        },
++    },
++    {
 +
-+int kvm_arm_set_one_reg(ARMCPU *cpu, uint64_t regidx, uint64_t *source)
-+{
-+    uint32_t v32;
++        .from = FIELD_INFO(ID_AA64ISAR0, AES, false, 1, 0, false),
++        .to = {
++            .reg = ID_AA64ISAR0, .length = R_ID_AA64ISAR0_AES_LENGTH,
++            .shift = R_ID_AA64ISAR0_AES_SHIFT, .sign = false, .min_value = 2,
++            .ni_value = 1, .name = "PMULL", .is_32bit = false,
++        },
++    },
++    {
 +
-+    switch (regidx & KVM_REG_SIZE_MASK) {
-+    case KVM_REG_SIZE_U32:
-+        v32 = *source;
-+        if (v32 != *source) {
-+            error_report("the value of source is too large");
-+            return -1;
-+        }
-+        return kvm_set_one_reg(CPU(cpu), regidx, &v32);
-+    case KVM_REG_SIZE_U64:
-+        return kvm_set_one_reg(CPU(cpu), regidx, source);
-+    default:
-+        return -1;
-+    }
-+}
++        .from = FIELD_INFO(ID_AA64ISAR0, SHA2, false, 1, 0, false),
++        .to = {
++            .reg = ID_AA64ISAR0, .length = R_ID_AA64ISAR0_SHA2_LENGTH,
++            .shift = R_ID_AA64ISAR0_SHA2_SHIFT, .sign = false, .min_value = 2,
++            .ni_value = 1, .name = "SHA512", .is_32bit = false,
++        },
++    },
++    {
++        .from = FIELD_INFO(ID_AA64ISAR1, LRCPC, false, 1, 0, false),
++        .to = {
++            .reg = ID_AA64ISAR1, .length = R_ID_AA64ISAR1_LRCPC_LENGTH,
++            .shift = R_ID_AA64ISAR1_LRCPC_SHIFT, .sign = false, .min_value = 2,
++            .ni_value = 1, .name = "ILRCPC", .is_32bit = false,
++        },
++    },
++    {
++        .from = FIELD_INFO(ID_AA64ISAR0, SM3, false, 1, 0, false),
++        .to = FIELD_INFO(ID_AA64ISAR0, SM4, false, 1, 0, false),
++    },
++    {
++        .from = FIELD_INFO(ID_AA64ISAR0, SM4, false, 1, 0, false),
++        .to = FIELD_INFO(ID_AA64ISAR0, SM3, false, 1, 0, false),
++    },
++    {
++        .from = FIELD_INFO(ID_AA64ISAR0, SHA1, false, 1, 0, false),
++        .to = FIELD_INFO(ID_AA64ISAR0, SHA2, false, 1, 0, false),
++    },
++    {
++        .from = FIELD_INFO(ID_AA64ISAR0, SHA1, false, 1, 0, false),
++        .to = FIELD_INFO(ID_AA64ISAR0, SHA3, false, 1, 0, false),
++    },
++    {
++        .from = FIELD_INFO(ID_AA64ISAR0, SHA3, false, 1, 0, false),
++        .to = {
++            .reg = ID_AA64ISAR0, .length = R_ID_AA64ISAR0_SHA2_LENGTH,
++            .shift = R_ID_AA64ISAR0_SHA2_SHIFT, .sign = false, .min_value = 2,
++            .ni_value = 1, .name = "SHA512", .is_32bit = false,
++        },
++    },
++    {
++        .from = {
++            .reg = ID_AA64ISAR0, .length = R_ID_AA64ISAR0_SHA2_LENGTH,
++            .shift = R_ID_AA64ISAR0_SHA2_SHIFT, .sign = false, .min_value = 2,
++            .ni_value = 1, .name = "SHA512", .is_32bit = false,
++        },
++        .to = FIELD_INFO(ID_AA64ISAR0, SHA3, false, 1, 0, false),
++    },
++};
 +
- bool write_kvmstate_to_list(ARMCPU *cpu)
+ static void arm_cpu_get_bit_prop(Object *obj, Visitor *v, const char *name,
+                                  void *opaque, Error **errp)
  {
-     CPUState *cs = CPU(cpu);
-diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
-index adb38514bf..99035494ae 100644
---- a/target/arm/kvm_arm.h
-+++ b/target/arm/kvm_arm.h
-@@ -478,4 +478,7 @@ static inline const char *its_class_name(void)
+@@ -1454,13 +1551,45 @@ static void arm_cpu_set_bit_prop(Object *obj, Visitor *v, const char *name,
+     }
+ 
+     if (value) {
++        if (object_property_get_bool(obj, feat->name, NULL)) {
++            return;
++        }
+         isar->regs[feat->reg] = deposit64(isar->regs[feat->reg],
+                                           feat->shift, feat->length,
+                                           feat->min_value);
++        /* Auto enable the features which current feature is dependent on. */
++        for (int i = 0; i < ARRAY_SIZE(feature_dependencies); ++i) {
++            const CPUFeatureDep *d = &feature_dependencies[i];
++            if (strcmp(d->to.name, feat->name) != 0) {
++                continue;
++            }
++
++            object_property_set_bool(obj, d->from.name, true, &local_err);
++            if (local_err) {
++                error_propagate(errp, local_err);
++                return;
++            }
++        }
+     } else {
++        if (!object_property_get_bool(obj, feat->name, NULL)) {
++            return;
++        }
+         isar->regs[feat->reg] = deposit64(isar->regs[feat->reg],
+                                           feat->shift, feat->length,
+                                           feat->ni_value);
++        /* Auto disable the features which are dependent on current feature. */
++        for (int i = 0; i < ARRAY_SIZE(feature_dependencies); ++i) {
++            const CPUFeatureDep *d = &feature_dependencies[i];
++            if (strcmp(d->from.name, feat->name) != 0) {
++                continue;
++            }
++
++            object_property_set_bool(obj, d->to.name, false, &local_err);
++            if (local_err) {
++                error_propagate(errp, local_err);
++                return;
++            }
++        }
      }
  }
  
-+int kvm_arm_get_one_reg(ARMCPU *cpu, uint64_t regidx, uint64_t *target);
-+int kvm_arm_set_one_reg(ARMCPU *cpu, uint64_t regidx, uint64_t *source);
-+
- #endif
 -- 
 2.18.4
 
