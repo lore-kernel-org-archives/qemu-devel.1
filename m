@@ -2,89 +2,130 @@ Return-Path: <SRS0=egLd=BX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01490C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 15:13:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AEDAC433E3
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 15:25:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8CC4E20791
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 15:13:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 547012078D
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 15:25:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hTe7y/qi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8CC4E20791
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mymailcheap.com header.i=@mymailcheap.com header.b="biRAhNlt";
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=flygoat.com header.i=@flygoat.com header.b="jgeDUPmS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 547012078D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=flygoat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39120 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44598 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k6EvD-0006bT-Ak
-	for qemu-devel@archiver.kernel.org; Thu, 13 Aug 2020 11:13:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34980)
+	id 1k6F6B-00013L-Jv
+	for qemu-devel@archiver.kernel.org; Thu, 13 Aug 2020 11:24:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38004)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1k6EuZ-0005tv-W2; Thu, 13 Aug 2020 11:13:00 -0400
-Received: from mail-io1-xd44.google.com ([2607:f8b0:4864:20::d44]:35729)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1k6EuY-0008BU-2j; Thu, 13 Aug 2020 11:12:59 -0400
-Received: by mail-io1-xd44.google.com with SMTP id s189so7700777iod.2;
- Thu, 13 Aug 2020 08:12:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=1PdrcMnk2+pLeGKf0LWQajnn+/kzAc69gaI14XWu8gg=;
- b=hTe7y/qirvDWOrlxKSfn/qoQrz0ffqv79Z1REpQaUAi9ya7aZViRkOBxmKwWEDMPPW
- N+c3hczdyhsnAGbmaAH3xhJYVlCcoFO0nJTK22IAXvfL+SuSdEDqYxKOX5FNicCJR1b9
- TcpnekLAucxLBM5GwsY8qZc5JK6csgOXzNBoC0TdxL8cI3AfE74e8y3S34Y3hZyW1e9p
- e8CrQi/gGLiYNaS0+UjYLtIWMKrJ0IZTN4sVbeKTiiAfPlZk3+FXVtNTf7ZoDy7dGLIu
- W4B4xavyouk3NKV+l5kbQdBvIR5Pr9uMLPmGKAOmfolc/TQK/+jYRONiJbL5HLEAUwD8
- SzoQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=1PdrcMnk2+pLeGKf0LWQajnn+/kzAc69gaI14XWu8gg=;
- b=AFDL4NRrrJqdeo6WDIMgyAO2fLLMVb94hgxIj3n9U+nXFVUxzV14nlez4jLbK7aq0i
- tcN/CW3zyKd4zkrli4cgIpI8EGEDop6DJMC73Jy86RDviQPJuWFh2/dD+PMsfjuldUYA
- Z1kIYMfN/7vj2a4tIYmE7057rCVq4OyleaNEX+M8DCPcOuUbsEGTeAk5d2Oc4DfsXi24
- Co4ujLkixNUpdOk6BvV72iYGNW2TaBex9oUW1y5Mcez2YGY5LZSEeGMPPgY3MVobFflV
- GVbuxmWWpiWqzXl2+VwppYEsWcLUBZh7vdE+aXDeiNSAOIlXjyU/9KTz0yuOMvRyCf7E
- IdNw==
-X-Gm-Message-State: AOAM533hKnk7cD98LEI7lUZrR/eXZJL3tXv2jDaMhbCsy1JPuMbrbLng
- pi8oYASnQs456zdNmPZZLnkl238CQacv8yppYyU=
-X-Google-Smtp-Source: ABdhPJyYPam26j1mJJRtHlD6rxFg5LF0JoStb6V46GR8sfYhcWDAeW0whRXyVUHxjQ2+2yPjfHl5XSpUfUl8CVKhZoM=
-X-Received: by 2002:a05:6638:248e:: with SMTP id
- x14mr5416401jat.135.1597331576450; 
- Thu, 13 Aug 2020 08:12:56 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <jiaxun.yang@flygoat.com>)
+ id 1k6F5b-0000eA-6o
+ for qemu-devel@nongnu.org; Thu, 13 Aug 2020 11:24:23 -0400
+Received: from relay1.mymailcheap.com ([144.217.248.100]:50465)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <jiaxun.yang@flygoat.com>)
+ id 1k6F5Y-0001CW-Fm
+ for qemu-devel@nongnu.org; Thu, 13 Aug 2020 11:24:22 -0400
+Received: from filter2.mymailcheap.com (filter2.mymailcheap.com
+ [91.134.140.82])
+ by relay1.mymailcheap.com (Postfix) with ESMTPS id 19E523F202;
+ Thu, 13 Aug 2020 11:24:18 -0400 (EDT)
+Received: from localhost (localhost [127.0.0.1])
+ by filter2.mymailcheap.com (Postfix) with ESMTP id 4EFAD2A51F;
+ Thu, 13 Aug 2020 17:24:17 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=mymailcheap.com;
+ s=default; t=1597332257;
+ bh=LlZQR1dnOXnh4K3vcweMvUR269SQSOlbXf7u+XiU6vc=;
+ h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
+ b=biRAhNltqZbumYr21Ml/geucxmGchTL9inXie6c2/Lpj5F8kL470h4G1bQMssNl8l
+ TshZ+a9TH2Uk1CpDnebqpdNQ55XrI6XyBGahuWZRYwdCc6EaH7ceY1OoALRMGlZsAi
+ ahICiY2V6aWBnGDAIdgay3UFu2tItPbNnPndRfbY=
+X-Virus-Scanned: Debian amavisd-new at filter2.mymailcheap.com
+Received: from filter2.mymailcheap.com ([127.0.0.1])
+ by localhost (filter2.mymailcheap.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id MQl3z4qwlKDq; Thu, 13 Aug 2020 17:24:14 +0200 (CEST)
+Received: from mail20.mymailcheap.com (mail20.mymailcheap.com [51.83.111.147])
+ (using TLSv1.2 with cipher ADH-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by filter2.mymailcheap.com (Postfix) with ESMTPS;
+ Thu, 13 Aug 2020 17:24:14 +0200 (CEST)
+Received: from [213.133.102.83] (ml.mymailcheap.com [213.133.102.83])
+ by mail20.mymailcheap.com (Postfix) with ESMTP id 0AFEF4118C;
+ Thu, 13 Aug 2020 15:24:11 +0000 (UTC)
+Authentication-Results: mail20.mymailcheap.com; dkim=pass (1024-bit key;
+ unprotected) header.d=flygoat.com header.i=@flygoat.com header.b="jgeDUPmS"; 
+ dkim-atps=neutral
+AI-Spam-Status: Not processed
+Received: from [0.0.0.0] (unknown [103.195.6.80])
+ (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+ key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest
+ SHA256) (No client certificate requested)
+ by mail20.mymailcheap.com (Postfix) with ESMTPSA id E393A4118D;
+ Thu, 13 Aug 2020 15:23:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=flygoat.com;
+ s=default; t=1597332224;
+ bh=LlZQR1dnOXnh4K3vcweMvUR269SQSOlbXf7u+XiU6vc=;
+ h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
+ b=jgeDUPmSVCfYe8Y02ebIoB24rODStU4iIhtEesEL/PiNCS8wICiVaJ0uJRfjJgS05
+ ixdwjMM4sowsYinbE9W0uK43Ia8OtUVgcpTPlm4ixCC1o6zIQpmywnpf4p9/8jQl2J
+ W1cOJsGx2wWclZGyHKf2rZ3K9gqcG2U4hACPTr4c=
+Subject: Re: [PATCH-for-5.2] target/mips: Report unimplemented cache()
+ operations
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+References: <20200806122612.17167-1-f4bug@amsat.org>
+ <e55da0ff-e88c-f2f4-0430-32255f7e58fe@flygoat.com>
+ <ec0ff553-a5e7-6c93-5ab3-093721b044a6@amsat.org>
+ <CAFEAcA8iXXW=eD+w-UdPqdjtbfc45Qu+DyfZBmaVe0TgMt_jmg@mail.gmail.com>
+ <a620f323-e42a-e75e-0491-228c480fa55b@amsat.org>
+ <6cecb59e-3a78-907c-cf63-225b4efbca01@amsat.org>
+From: Jiaxun Yang <jiaxun.yang@flygoat.com>
+Message-ID: <39ad849e-c1fb-5031-7a30-f920bcee4cbe@flygoat.com>
+Date: Thu, 13 Aug 2020 23:23:38 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-References: <cover.1595924470.git.zong.li@sifive.com>
- <6b0bf48662ef26ab4c15381a08e78a74ebd7ca79.1595924470.git.zong.li@sifive.com>
- <CAKmqyKNso-cTYuwxo5waxp9n8ifV2GR9v=x6aM-y0NjQTSsw+A@mail.gmail.com>
- <CANXhq0obkQ4MpbyaT6VZ_9SXmNkTixX3+4RrK=5m+gF2nyhZOA@mail.gmail.com>
-In-Reply-To: <CANXhq0obkQ4MpbyaT6VZ_9SXmNkTixX3+4RrK=5m+gF2nyhZOA@mail.gmail.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Thu, 13 Aug 2020 08:02:29 -0700
-Message-ID: <CAKmqyKOSVS-AUHEj8=84o58NoWP4tmNWJ5Gq_UNUEKSXsvtwrQ@mail.gmail.com>
-Subject: Re: [PATCH v6 4/4] target/riscv: Change the TLB page size depends on
- PMP entries.
-To: Zong Li <zong.li@sifive.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::d44;
- envelope-from=alistair23@gmail.com; helo=mail-io1-xd44.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <6cecb59e-3a78-907c-cf63-225b4efbca01@amsat.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Rspamd-Queue-Id: 0AFEF4118C
+X-Spamd-Result: default: False [-0.10 / 10.00]; RCVD_VIA_SMTP_AUTH(0.00)[];
+ ARC_NA(0.00)[]; R_DKIM_ALLOW(0.00)[flygoat.com:s=default];
+ HFILTER_HELO_BAREIP(3.00)[213.133.102.83,1];
+ FROM_HAS_DN(0.00)[]; RCPT_COUNT_THREE(0.00)[3];
+ FREEMAIL_ENVRCPT(0.00)[gmail.com];
+ TO_MATCH_ENVRCPT_ALL(0.00)[]; TAGGED_RCPT(0.00)[];
+ MIME_GOOD(-0.10)[text/plain]; R_SPF_SOFTFAIL(0.00)[~all];
+ ML_SERVERS(-3.10)[213.133.102.83]; TO_DN_ALL(0.00)[];
+ DKIM_TRACE(0.00)[flygoat.com:+];
+ RCVD_IN_DNSWL_NONE(0.00)[213.133.102.83:from];
+ DMARC_POLICY_ALLOW(0.00)[flygoat.com,none];
+ DMARC_POLICY_ALLOW_WITH_FAILURES(0.00)[];
+ RCVD_NO_TLS_LAST(0.10)[]; FROM_EQ_ENVFROM(0.00)[];
+ MIME_TRACE(0.00)[0:+];
+ ASN(0.00)[asn:24940, ipnet:213.133.96.0/19, country:DE];
+ FREEMAIL_CC(0.00)[nongnu.org,gmail.com];
+ MID_RHS_MATCH_FROM(0.00)[]; RCVD_COUNT_TWO(0.00)[2]
+X-Rspamd-Server: mail20.mymailcheap.com
+Received-SPF: pass client-ip=144.217.248.100;
+ envelope-from=jiaxun.yang@flygoat.com; helo=relay1.mymailcheap.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/13 11:24:18
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,165 +138,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, Bin Meng <bmeng.cn@gmail.com>
+Cc: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Aug 12, 2020 at 8:04 PM Zong Li <zong.li@sifive.com> wrote:
->
-> On Wed, Aug 12, 2020 at 11:21 PM Alistair Francis <alistair23@gmail.com> wrote:
-> >
-> > On Tue, Jul 28, 2020 at 1:29 AM Zong Li <zong.li@sifive.com> wrote:
-> > >
-> > > The minimum granularity of PMP is 4 bytes, it is small than 4KB page
-> > > size, therefore, the pmp checking would be ignored if its range doesn't
-> > > start from the alignment of one page. This patch detects the pmp entries
-> > > and sets the small page size to TLB if there is a PMP entry which cover
-> > > the page size.
-> > >
-> > > Signed-off-by: Zong Li <zong.li@sifive.com>
-> > > ---
-> > >  target/riscv/cpu_helper.c | 10 ++++++--
-> > >  target/riscv/pmp.c        | 52 +++++++++++++++++++++++++++++++++++++++
-> > >  target/riscv/pmp.h        |  2 ++
-> > >  3 files changed, 62 insertions(+), 2 deletions(-)
-> > >
-> > > diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-> > > index 2f337e418c..fd1d373b6f 100644
-> > > --- a/target/riscv/cpu_helper.c
-> > > +++ b/target/riscv/cpu_helper.c
-> > > @@ -693,6 +693,7 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-> > >      bool first_stage_error = true;
-> > >      int ret = TRANSLATE_FAIL;
-> > >      int mode = mmu_idx;
-> > > +    target_ulong tlb_size = 0;
-> > >
-> > >      env->guest_phys_fault_addr = 0;
-> > >
-> > > @@ -784,8 +785,13 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-> > >      }
-> > >
-> > >      if (ret == TRANSLATE_SUCCESS) {
-> > > -        tlb_set_page(cs, address & TARGET_PAGE_MASK, pa & TARGET_PAGE_MASK,
-> > > -                     prot, mmu_idx, TARGET_PAGE_SIZE);
-> > > +        if (pmp_is_range_in_tlb(env, pa & TARGET_PAGE_MASK, &tlb_size)) {
-> > > +            tlb_set_page(cs, address & ~(tlb_size - 1), pa & ~(tlb_size - 1),
-> > > +                         prot, mmu_idx, tlb_size);
-> > > +        } else {
-> > > +            tlb_set_page(cs, address & TARGET_PAGE_MASK, pa & TARGET_PAGE_MASK,
-> > > +                         prot, mmu_idx, TARGET_PAGE_SIZE);
-> > > +        }
-> > >          return true;
-> > >      } else if (probe) {
-> > >          return false;
-> > > diff --git a/target/riscv/pmp.c b/target/riscv/pmp.c
-> > > index aeba796484..adadf6e9ba 100644
-> > > --- a/target/riscv/pmp.c
-> > > +++ b/target/riscv/pmp.c
-> > > @@ -393,3 +393,55 @@ target_ulong pmpaddr_csr_read(CPURISCVState *env, uint32_t addr_index)
-> > >
-> > >      return val;
-> > >  }
-> > > +
-> > > +/*
-> > > + * Calculate the TLB size if the start address or the end address of
-> > > + * PMP entry is presented in thie TLB page.
-> > > + */
-> > > +static target_ulong pmp_get_tlb_size(CPURISCVState *env, int pmp_index,
-> > > +    target_ulong tlb_sa, target_ulong tlb_ea)
-> > > +{
-> > > +    target_ulong pmp_sa = env->pmp_state.addr[pmp_index].sa;
-> > > +    target_ulong pmp_ea = env->pmp_state.addr[pmp_index].ea;
-> > > +
-> > > +    if (pmp_sa >= tlb_sa && pmp_ea <= tlb_ea) {
-> > > +        return pmp_ea - pmp_sa + 1;
-> > > +    }
-> > > +
-> > > +    if (pmp_sa >= tlb_sa && pmp_sa <= tlb_ea && pmp_ea >= tlb_ea) {
-> > > +        return tlb_ea - pmp_sa + 1;
-> > > +    }
-> > > +
-> > > +    if (pmp_ea <= tlb_ea && pmp_ea >= tlb_sa && pmp_sa <= tlb_sa) {
-> > > +        return pmp_ea - tlb_sa + 1;
-> > > +    }
-> > > +
-> > > +    return 0;
-> > > +}
-> > > +
-> > > +/*
-> > > + * Check is there a PMP entry whcih range covers this page. If so,
-> >
-> > s/whcih/which/g
-> >
-> > I fixed this when apply it.
-> >
-> > > + * try to find the minimum granularity for the TLB size.
-> > > + */
-> > > +bool pmp_is_range_in_tlb(CPURISCVState *env, hwaddr tlb_sa,
-> > > +    target_ulong *tlb_size)
-> > > +{
-> > > +    int i;
-> > > +    target_ulong val;
-> > > +    target_ulong tlb_ea = (tlb_sa + TARGET_PAGE_SIZE - 1);
-> > > +
-> > > +    for (i = 0; i < MAX_RISCV_PMPS; i++) {
-> > > +        val = pmp_get_tlb_size(env, i, tlb_sa, tlb_ea);
-> > > +        if (val) {
-> > > +            if (*tlb_size == 0 || *tlb_size > val) {
-> > > +                *tlb_size = val;
-> > > +            }
-> > > +        }
-> > > +    }
-> > > +
-> > > +    if (*tlb_size != 0) {
-> > > +        return true;
-> > > +    }
-> > > +
-> > > +    return false;
-> > > +}
-> > > diff --git a/target/riscv/pmp.h b/target/riscv/pmp.h
-> > > index 8e19793132..c70f2ea4c4 100644
-> > > --- a/target/riscv/pmp.h
-> > > +++ b/target/riscv/pmp.h
-> > > @@ -60,5 +60,7 @@ void pmpaddr_csr_write(CPURISCVState *env, uint32_t addr_index,
-> > >  target_ulong pmpaddr_csr_read(CPURISCVState *env, uint32_t addr_index);
-> > >  bool pmp_hart_has_privs(CPURISCVState *env, target_ulong addr,
-> > >      target_ulong size, pmp_priv_t priv, target_ulong mode);
-> > > +bool pmp_is_range_in_tlb(CPURISCVState *env, hwaddr tlb_sa,
-> > > +    target_ulong *tlb_size);
-> >
-> > The indentation is wrong here (as it is in the rest of the file). I
-> > just fixed this up as well as the others when I applied it.
-> >
-> > Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-> >
-> > I have applied patch 3 and 4 of this series. Patch 1 has already been
-> > applied and patch 2 no longer applies due to a different fix, sorry
-> > about that.
-> >
->
-> Thanks for your reviewing and applying. I don't follow with you about
-> patch 2, could you please also forward the information or the fix to
-> me?
 
-This patch fixes the same problem and I find it a little simpler:
-https://patchew.org/QEMU/20200812223045.96803-1-alistair.francis@wdc.com/20200812223045.96803-10-alistair.francis@wdc.com/
 
-Alistair
-
+在 2020/8/11 上午1:21, Philippe Mathieu-Daudé 写道:
+> On 8/6/20 11:37 PM, Philippe Mathieu-Daudé wrote:
+>> On 8/6/20 10:51 PM, Peter Maydell wrote:
+>>> On Thu, 6 Aug 2020 at 21:31, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
+>>>> On 8/6/20 8:01 PM, Jiaxun Yang wrote:
+>>>>> 在 2020/8/6 下午8:26, Philippe Mathieu-Daudé 写道:
+>>>>>> We only implement the Index[Store/Load]Tag from the 'cache' opcode.
+>>>>>> Instead of ignoring the other cache operations, report them as
+>>>>>> unimplemented.
+>>>>> Hmm, I don't think we have anything to do with Invalidate/Writeback etc.
+>>>>> opcodes
+>>>>> in QEMU. Why do we log this?
+>>>> I'm noticed this code is run on Linux 3.3.8 (4KEc):
+>>>>
+>>>>      8880:       3082000f        andi    v0,a0,0xf
+>>>>      8884:       10800008        beqz    a0,88a8
+>>>>      8888:       00a21021        addu    v0,a1,v0
+>>>>      888c:       08002227        j       889c
+>>>>      8890:       00001821        move    v1,zero
+>>>>      8894:       bcf90000        cache   0x19,0(a3)
+>>>>      8898:       24630010        addiu   v1,v1,16
+>>>>      889c:       0062302b        sltu    a2,v1,v0
+>>>>      88a0:       14c0fffc        bnez    a2,8894
+>>>>      88a4:       00833821        addu    a3,a0,v1
+>>>>      88a8:       03e00008        jr      ra
+>>>>      88ac:       00000000        nop
+>>>>
+>>>> Why silently ignore the opcode is not implemented instead of logging it?
+>>> I think the question is whether the opcode is supposed to have
+>>> some behaviour which we're not implementing, or whether "no-op"
+>>> is the correct behaviour for it (which it usually is for
+>>> cache invalidate type operations; compare the way the Arm
+>>> cache ops like IC_IALLU are just ARM_CP_NOP ops).
+>> OK now I understand better, thanks.
+>>
+>> I haven't found useful information about this 0x19=25 opcode value.
+> Just to close this thread, some findings from last WE:
 >
-> > Alistair
-> >
-> > >
-> > >  #endif
-> > > --
-> > > 2.27.0
-> > >
-> > >
+> - I couldn't find where Linux 3.3.8 use that op
+> - I eventually figured out it comes from a kernel module called 'tiatm'.
+> - This kmod is released by OpenWRT in packages named kmod-sangam-atm-annex
+> - Googling for strings from the object, this file has been added in [1]
+> based on the file included in [2]
+> - Someone imported these files in a git repo and published
+> - There is a commented reference [4] as:
+>
+> #define        DataCacheHitInvalidate(a)     {__asm__(" cache  17, (%0)"
+> :   : "r" (a));}
+> #define        DataCacheHitWriteback(a)      {__asm__(" cache  25, (%0)"
+> :   : "r" (a));}
+>
+> - Also referenced (not commented) in [5] "Linux atm module implementation".
+>
+> For my use I'm happy using a trace event:
+>
+> -- >8 --
+
+FYI, I took a look at MIPS M14K (interAptiv) RTL from MIPSOpen project,
+HitInvalidate and HitWriteback cache Ops to L2/L3 Cache will also act
+on L1 Cache. So probably that's kinda... Undocumented trick...
+
+Thanks.
+
+- Jiaxun
 
