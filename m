@@ -2,86 +2,122 @@ Return-Path: <SRS0=egLd=BX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DA48C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 16:43:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F02BC433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 16:44:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AF45820855
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 16:43:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C022020855
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 16:44:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X+1Guwwq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF45820855
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="SPRKYRrc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C022020855
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48136 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50274 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k6GKR-0002As-W6
-	for qemu-devel@archiver.kernel.org; Thu, 13 Aug 2020 12:43:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56240)
+	id 1k6GLP-00035W-11
+	for qemu-devel@archiver.kernel.org; Thu, 13 Aug 2020 12:44:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56938)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1k6G96-00059C-JA
- for qemu-devel@nongnu.org; Thu, 13 Aug 2020 12:32:04 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:47844
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1k6G94-0001dy-Jk
- for qemu-devel@nongnu.org; Thu, 13 Aug 2020 12:32:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597336321;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=BIk7i9h0goB63ZMrR/6zqne/mhsultHKTPd2Tl8s3cw=;
- b=X+1Guwwqn8jc095LIFv8ITAXU/f3pRwsu9Kc5XzK2gUECGbbGXrU1vLIgMUrBJVXOk069y
- GutYQZ9PKaPFDuE9oRTUoqFssjg+dGPP/Z2/WZsSujAwWb9p0aMulOZ+eW/Uni4kn3HPpo
- pTzjOkTVMgg0A37rr41gyX+GSLsgU58=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-477-Y3rqyoP-OiaThj0dLxRW3A-1; Thu, 13 Aug 2020 12:30:27 -0400
-X-MC-Unique: Y3rqyoP-OiaThj0dLxRW3A-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C892A800050;
- Thu, 13 Aug 2020 16:30:26 +0000 (UTC)
-Received: from linux.fritz.box.com (ovpn-113-97.ams2.redhat.com [10.36.113.97])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A65475C1A3;
- Thu, 13 Aug 2020 16:30:25 +0000 (UTC)
-From: Kevin Wolf <kwolf@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [RFC PATCH 21/22] block/export: Move blk to BlockExport
-Date: Thu, 13 Aug 2020 18:29:34 +0200
-Message-Id: <20200813162935.210070-22-kwolf@redhat.com>
-In-Reply-To: <20200813162935.210070-1-kwolf@redhat.com>
-References: <20200813162935.210070-1-kwolf@redhat.com>
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1k6GBa-0002H7-1g; Thu, 13 Aug 2020 12:34:38 -0400
+Received: from mail-vi1eur05on2124.outbound.protection.outlook.com
+ ([40.107.21.124]:11105 helo=EUR05-VI1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1k6GBW-0001qP-DQ; Thu, 13 Aug 2020 12:34:37 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=OObBKBZvyGA8ih67NsOivJ4NNwc1fokDpIUTib1nUIiEdk0hxO8vLRRc1H7ZEvJ+LuCPZrfwRbZYBtif66hA5UTSsMbdIhTPaGN4noT5Y6MPOtZbg6dpGcvQtvylFs8lxPmpjSNgxUAq/YB0WITr08y2zN4QWSUjtJTbwzCBsGr/J3YMkCIH+BFEGfOL0EmvfB4ojLwPi8TZlqqd77N3DTJXXDXz45AEyd7OgF2gE9Iig7T0sHkNrbuWblDpTyaHpXtzgAm2x8jOuVnAVkTdfNUqZVCjuILpeEAqf2XH6xKeSikd96poYjbmUrqEoBcdu6D5f8ZzQoqVF04m1SSszA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ogJXA3CPOlrHFsw6GmfTR8N6E/84NHPrSZAu11reiWg=;
+ b=gGeGFWFVUb99jBMWvauxp/JAeP4GoXJg0YxXUaXnJ5CYS2uHfzztnV6J6dEOZOsg05psluyjCh6wp7o+cGjXIU3SMeHLkhHOWwakRXxahIvMhxq8lOxSapzzqZBr1SPebn7jkD+VbCYe5Nw9YHo8h2Y6YFIfZ8kMppwRnwjEo7EWgazVRPr+lehNTNOGs/jLAGoOsNnl/cKgZ2fngij8OgSaOZi7j/kzWY+0tRjLVvfAVZ6Mlj5BKXSQKr3PIkgsmXIsubWjQXT0FYDwDvpNWqDwe0e/6mxdNFW3+CPICH983Ly1V8BTgBMaB1mOvWALFLSR+pv/H4Snbs19G9QZSw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ogJXA3CPOlrHFsw6GmfTR8N6E/84NHPrSZAu11reiWg=;
+ b=SPRKYRrcvorGlLhIB+RvGO5mMAiiqASmp5czt2DsHc7g8pVrKS515JbaTQumNNnalA21p6V7LLGIStX0Y7vaYHf5TplFQZ9lbDY7e5fRuzLNYz4j89AirSFn0R5byLvEM7VkFMIE4UUIP0mqXBN9zj3SV7+hgVTyEbbhVMxqplE=
+Authentication-Results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM7PR08MB5493.eurprd08.prod.outlook.com (2603:10a6:20b:102::11)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3283.20; Thu, 13 Aug
+ 2020 16:34:30 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::8c0c:c056:97a5:484a]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::8c0c:c056:97a5:484a%3]) with mapi id 15.20.3283.015; Thu, 13 Aug 2020
+ 16:34:30 +0000
+Subject: Re: What is bs->reqs_lock for?
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu block <qemu-block@nongnu.org>
+References: <ebea1375-8bc0-2b0a-051f-28b2afa02a1c@virtuozzo.com>
+ <2c237be3-7e28-f61a-d339-5765089fe65c@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <e6d75774-300d-c38d-3f07-0cbc39aff54e@virtuozzo.com>
+Date: Thu, 13 Aug 2020 19:34:28 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
+In-Reply-To: <2c237be3-7e28-f61a-d339-5765089fe65c@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: AM0PR08CA0026.eurprd08.prod.outlook.com
+ (2603:10a6:208:d2::39) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=kwolf@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/13 12:29:49
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.5] (185.215.60.139) by
+ AM0PR08CA0026.eurprd08.prod.outlook.com (2603:10a6:208:d2::39) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3283.15 via Frontend Transport; Thu, 13 Aug 2020 16:34:29 +0000
+X-Originating-IP: [185.215.60.139]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: a8271732-f532-4507-1272-08d83fa6c06a
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5493:
+X-Microsoft-Antispam-PRVS: <AM7PR08MB54931B7095933F3B816BE187C1430@AM7PR08MB5493.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:1824;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: yThguTOUCudE303OM0E6Ggd2KChC7e5VfNR0i/ODi0xcRqb9bUnu7UpgJCNSo8aA7Y9N3ScEGtpQiXiuzB+IibAawvgswtmDm6rrbK50JXixg4KdViTyPH3SQUQM/bT9RSUxifSfPSIQvDusfMAo0lSttOfxJqKH/MA6ao46xdJffJC5naQFt1E3r5fmeJdbo04dck/P9Z0gq/D3Q6Ss3l1M9tb8D+b0NdOskrsDs4Cjgh+sMu70hBrKaEa5lVNTRV1VzmFesi6eraECA/DP+RtHlYlNVKALMjWaXRzgYmh7e32EuvhZOAAQfcsf0lM3kt8i3lo7VS4j43aRhTybIQZOAEWkt/0YScvip+qLqdlVKMIbLibMxbahctjtcjr3
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(4636009)(366004)(376002)(136003)(396003)(39840400004)(346002)(31686004)(86362001)(31696002)(16576012)(6486002)(4326008)(36756003)(8936002)(83380400001)(110136005)(54906003)(316002)(478600001)(26005)(52116002)(16526019)(186003)(2616005)(956004)(8676002)(66946007)(66476007)(66556008)(5660300002)(53546011)(2906002)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: XA7titxRFrDZXmVw2j+xDlz8gPdjJjofO/sLxpCyUbguH9TQO3XJ8rXdmDcCrlWFZcHh900GEADbSyNTB+FYhKYFzT7ja0AXNauo7K3ZpB/WOb/tK759V9n/WF29O7GAMmA9eFFipKA9bADT4e5/jpW6TCw7WXHZ4ksyCtczR505Ybqz3SgPdQT2MhTM0NBT2DPsC/cAg07gSA53XAL8SYkl13jt/mO0BSv8d5pIHki/H0v7f0QkoL1tWA4BPifi/OfxG6dN00s8qDGNI86fXDRBZcZy2CETx39JrEc79xs6LE+6kJ0nLUhF0Hq8KBUINVaRv2/WKsEV330/oyj3DM5J2wkFqlz6WpCapLCqkxEua3gJ1XJPlkilhPd/1jl3y91T2/lUBZteiWQQmvQLAxgRLU9mH14x7nrFMPou7jak2q8/86URgNKU1YFn0jO/la9jrzj+pSImbHbI3HqjkuOWIcyaG8vUjDqef3/dO/jRwQzGjK3FpooBdFIOWmmSYVQbgV33/cEvOed0urjLBwKLlTZTMmAaNh7R4gjVHpw/JtcfN+mtESOz1UqMwQKNlxbo1+aHpD2yvSWaqKN/vi0Ci9HokxjZDSoPDQl3dPpl9gnctjWJeHeJ0xliGkeu55OFu8KKUAwEFXssRcKX3w==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a8271732-f532-4507-1272-08d83fa6c06a
+X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Aug 2020 16:34:30.0065 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: uSmPOE7cbOvfnBDMbKTnN5ZuAUcqXAX3dS0IW4k2mQBQb9t2N+edardRvz0Hr4sC4tJYp8e2dq/W0bd9pYTo+F6AW0UtVM8vKN3U2H4RIzM=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5493
+Received-SPF: pass client-ip=40.107.21.124;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR05-VI1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/13 12:34:31
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -37
+X-Spam_score: -3.8
+X-Spam_bar: ---
+X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,227 +130,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Every block export has a BlockBackend representing the disk that is
-exported. It should live in BlockExport therefore.
+13.08.2020 18:54, Paolo Bonzini wrote:
+> On 13/08/20 16:57, Vladimir Sementsov-Ogievskiy wrote:
+>> Hi!
+>>
+>> Sorry my stupid question, but which kind of concurrent access
+>> bs->reqs_lock prevents?
+>>
+>> In my understanding the whole logic of request tracking for the bs is
+>> going in the coroutine, so, we don't have parallel access anyway? How
+>> can parallel access to bs->tracked_requests happen?
+> 
+> Different iothreads can access the same BlockDriverState, and block/io.c
+> is not protected by the AioContext lock (in fact almost nothing, or
+> nothing, needs it in the I/O path).
+> 
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- include/block/export.h |  3 +++
- block/export/export.c  |  3 +++
- nbd/server.c           | 44 ++++++++++++++++++++++--------------------
- 3 files changed, 29 insertions(+), 21 deletions(-)
+I thought bs is attached to one aio context and aio context attached to one iothread.
+And all normal request processing of the bs is done in this one iothread.
+And when we need to access bs externally, we do it in
+aio_context_acquire / aio_context_release, which protects from parallel access to
+BlockDriverState fields...
 
-diff --git a/include/block/export.h b/include/block/export.h
-index 83f554b745..53b4163a3b 100644
---- a/include/block/export.h
-+++ b/include/block/export.h
-@@ -54,6 +54,9 @@ struct BlockExport {
-      */
-     AioContext *ctx;
- 
-+    /* The block device to export */
-+    BlockBackend *blk;
-+
-     /* List entry for block_exports */
-     QLIST_ENTRY(BlockExport) next;
- };
-diff --git a/block/export/export.c b/block/export/export.c
-index 1255f3fc80..3cd448ba72 100644
---- a/block/export/export.c
-+++ b/block/export/export.c
-@@ -89,6 +89,8 @@ BlockExport *blk_exp_add(BlockExportOptions *export, Error **errp)
-         return NULL;
-     }
- 
-+    assert(exp->blk != NULL);
-+
-     QLIST_INSERT_HEAD(&block_exports, exp, next);
-     return exp;
- }
-@@ -105,6 +107,7 @@ void blk_exp_unref(BlockExport *exp)
-     if (--exp->refcount == 0) {
-         QLIST_REMOVE(exp, next);
-         exp->drv->delete(exp);
-+        blk_unref(exp->blk);
-         g_free(exp->id);
-         g_free(exp);
-         aio_wait_kick();
-diff --git a/nbd/server.c b/nbd/server.c
-index 899d00782f..6ad78203c9 100644
---- a/nbd/server.c
-+++ b/nbd/server.c
-@@ -84,7 +84,6 @@ struct NBDRequestData {
- struct NBDExport {
-     BlockExport common;
- 
--    BlockBackend *blk;
-     char *name;
-     char *description;
-     uint64_t size;
-@@ -643,7 +642,7 @@ static int nbd_negotiate_handle_info(NBDClient *client, Error **errp)
-      * whether this is OPT_INFO or OPT_GO. */
-     /* minimum - 1 for back-compat, or actual if client will obey it. */
-     if (client->opt == NBD_OPT_INFO || blocksize) {
--        check_align = sizes[0] = blk_get_request_alignment(exp->blk);
-+        check_align = sizes[0] = blk_get_request_alignment(exp->common.blk);
-     } else {
-         sizes[0] = 1;
-     }
-@@ -652,7 +651,7 @@ static int nbd_negotiate_handle_info(NBDClient *client, Error **errp)
-      * TODO: is blk_bs(blk)->bl.opt_transfer appropriate? */
-     sizes[1] = MAX(4096, sizes[0]);
-     /* maximum - At most 32M, but smaller as appropriate. */
--    sizes[2] = MIN(blk_get_max_transfer(exp->blk), NBD_MAX_BUFFER_SIZE);
-+    sizes[2] = MIN(blk_get_max_transfer(exp->common.blk), NBD_MAX_BUFFER_SIZE);
-     trace_nbd_negotiate_handle_info_block_size(sizes[0], sizes[1], sizes[2]);
-     sizes[0] = cpu_to_be32(sizes[0]);
-     sizes[1] = cpu_to_be32(sizes[1]);
-@@ -684,7 +683,7 @@ static int nbd_negotiate_handle_info(NBDClient *client, Error **errp)
-      * tolerate all clients, regardless of alignments.
-      */
-     if (client->opt == NBD_OPT_INFO && !blocksize &&
--        blk_get_request_alignment(exp->blk) > 1) {
-+        blk_get_request_alignment(exp->common.blk) > 1) {
-         return nbd_negotiate_send_rep_err(client,
-                                           NBD_REP_ERR_BLOCK_SIZE_REQD,
-                                           errp,
-@@ -1556,7 +1555,7 @@ int nbd_export_new(BlockExport *blk_exp, BlockDriverState *bs,
-     blk_set_allow_aio_context_change(blk, true);
- 
-     QTAILQ_INIT(&exp->clients);
--    exp->blk = blk;
-+    exp->common.blk = blk;
-     exp->name = g_strdup(name);
-     assert(!desc || strlen(desc) <= NBD_MAX_STRING_SIZE);
-     exp->description = g_strdup(desc);
-@@ -1679,15 +1678,13 @@ static void nbd_export_delete(BlockExport *blk_exp)
-     g_free(exp->description);
-     exp->description = NULL;
- 
--    if (exp->blk) {
-+    if (exp->common.blk) {
-         if (exp->eject_notifier_blk) {
-             notifier_remove(&exp->eject_notifier);
-             blk_unref(exp->eject_notifier_blk);
-         }
--        blk_remove_aio_context_notifier(exp->blk, blk_aio_attached,
-+        blk_remove_aio_context_notifier(exp->common.blk, blk_aio_attached,
-                                         blk_aio_detach, exp);
--        blk_unref(exp->blk);
--        exp->blk = NULL;
-     }
- 
-     if (exp->export_bitmap) {
-@@ -1840,7 +1837,7 @@ static int coroutine_fn nbd_co_send_sparse_read(NBDClient *client,
- 
-     while (progress < size) {
-         int64_t pnum;
--        int status = bdrv_block_status_above(blk_bs(exp->blk), NULL,
-+        int status = bdrv_block_status_above(blk_bs(exp->common.blk), NULL,
-                                              offset + progress,
-                                              size - progress, &pnum, NULL,
-                                              NULL);
-@@ -1872,7 +1869,8 @@ static int coroutine_fn nbd_co_send_sparse_read(NBDClient *client,
-             stl_be_p(&chunk.length, pnum);
-             ret = nbd_co_send_iov(client, iov, 1, errp);
-         } else {
--            ret = blk_pread(exp->blk, offset + progress, data + progress, pnum);
-+            ret = blk_pread(exp->common.blk, offset + progress,
-+                            data + progress, pnum);
-             if (ret < 0) {
-                 error_setg_errno(errp, -ret, "reading from file failed");
-                 break;
-@@ -2136,7 +2134,8 @@ static int nbd_co_receive_request(NBDRequestData *req, NBDRequest *request,
-         }
- 
-         if (request->type != NBD_CMD_CACHE) {
--            req->data = blk_try_blockalign(client->exp->blk, request->len);
-+            req->data = blk_try_blockalign(client->exp->common.blk,
-+                                           request->len);
-             if (req->data == NULL) {
-                 error_setg(errp, "No memory");
-                 return -ENOMEM;
-@@ -2232,7 +2231,7 @@ static coroutine_fn int nbd_do_cmd_read(NBDClient *client, NBDRequest *request,
- 
-     /* XXX: NBD Protocol only documents use of FUA with WRITE */
-     if (request->flags & NBD_CMD_FLAG_FUA) {
--        ret = blk_co_flush(exp->blk);
-+        ret = blk_co_flush(exp->common.blk);
-         if (ret < 0) {
-             return nbd_send_generic_reply(client, request->handle, ret,
-                                           "flush failed", errp);
-@@ -2246,7 +2245,7 @@ static coroutine_fn int nbd_do_cmd_read(NBDClient *client, NBDRequest *request,
-                                        data, request->len, errp);
-     }
- 
--    ret = blk_pread(exp->blk, request->from, data, request->len);
-+    ret = blk_pread(exp->common.blk, request->from, data, request->len);
-     if (ret < 0) {
-         return nbd_send_generic_reply(client, request->handle, ret,
-                                       "reading from file failed", errp);
-@@ -2281,7 +2280,7 @@ static coroutine_fn int nbd_do_cmd_cache(NBDClient *client, NBDRequest *request,
- 
-     assert(request->type == NBD_CMD_CACHE);
- 
--    ret = blk_co_preadv(exp->blk, request->from, request->len,
-+    ret = blk_co_preadv(exp->common.blk, request->from, request->len,
-                         NULL, BDRV_REQ_COPY_ON_READ | BDRV_REQ_PREFETCH);
- 
-     return nbd_send_generic_reply(client, request->handle, ret,
-@@ -2312,7 +2311,8 @@ static coroutine_fn int nbd_handle_request(NBDClient *client,
-         if (request->flags & NBD_CMD_FLAG_FUA) {
-             flags |= BDRV_REQ_FUA;
-         }
--        ret = blk_pwrite(exp->blk, request->from, data, request->len, flags);
-+        ret = blk_pwrite(exp->common.blk, request->from, data, request->len,
-+                         flags);
-         return nbd_send_generic_reply(client, request->handle, ret,
-                                       "writing to file failed", errp);
- 
-@@ -2327,7 +2327,8 @@ static coroutine_fn int nbd_handle_request(NBDClient *client,
-         if (request->flags & NBD_CMD_FLAG_FAST_ZERO) {
-             flags |= BDRV_REQ_NO_FALLBACK;
-         }
--        ret = blk_pwrite_zeroes(exp->blk, request->from, request->len, flags);
-+        ret = blk_pwrite_zeroes(exp->common.blk, request->from, request->len,
-+                                flags);
-         return nbd_send_generic_reply(client, request->handle, ret,
-                                       "writing to file failed", errp);
- 
-@@ -2336,14 +2337,14 @@ static coroutine_fn int nbd_handle_request(NBDClient *client,
-         abort();
- 
-     case NBD_CMD_FLUSH:
--        ret = blk_co_flush(exp->blk);
-+        ret = blk_co_flush(exp->common.blk);
-         return nbd_send_generic_reply(client, request->handle, ret,
-                                       "flush failed", errp);
- 
-     case NBD_CMD_TRIM:
--        ret = blk_co_pdiscard(exp->blk, request->from, request->len);
-+        ret = blk_co_pdiscard(exp->common.blk, request->from, request->len);
-         if (ret == 0 && request->flags & NBD_CMD_FLAG_FUA) {
--            ret = blk_co_flush(exp->blk);
-+            ret = blk_co_flush(exp->common.blk);
-         }
-         return nbd_send_generic_reply(client, request->handle, ret,
-                                       "discard failed", errp);
-@@ -2361,7 +2362,8 @@ static coroutine_fn int nbd_handle_request(NBDClient *client,
- 
-             if (client->export_meta.base_allocation) {
-                 ret = nbd_co_send_block_status(client, request->handle,
--                                               blk_bs(exp->blk), request->from,
-+                                               blk_bs(exp->common.blk),
-+                                               request->from,
-                                                request->len, dont_fragment,
-                                                !client->export_meta.bitmap,
-                                                NBD_META_ID_BASE_ALLOCATION,
+But you say, that block/io.c is not protected by AioContext lock..
+
+Does it mean that everything must be thread-safe in block/io.c and all block drivers?
+
+Are tracked_requests different from other fields? A lot of other BlockDriverState
+fields are not protected by any mutex.. For example: total_sectors, file, backing..
+
+Could you give an example of parallel access to tracked_requests?
+
 -- 
-2.25.4
-
+Best regards,
+Vladimir
 
