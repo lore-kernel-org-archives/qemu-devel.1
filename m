@@ -2,73 +2,69 @@ Return-Path: <SRS0=egLd=BX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E99BBC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 10:49:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5085C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 10:49:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B830420781
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 10:49:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B830420781
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 9B1F720866
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 10:49:33 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="jdric6SD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B1F720866
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58992 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59384 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k6AnX-0006sD-Pg
-	for qemu-devel@archiver.kernel.org; Thu, 13 Aug 2020 06:49:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53398)
+	id 1k6Anc-00071g-Ri
+	for qemu-devel@archiver.kernel.org; Thu, 13 Aug 2020 06:49:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52744)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1k6Ami-0005E7-S9
- for qemu-devel@nongnu.org; Thu, 13 Aug 2020 06:48:36 -0400
-Resent-Date: Thu, 13 Aug 2020 06:48:36 -0400
-Resent-Message-Id: <E1k6Ami-0005E7-S9@lists.gnu.org>
-Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21327)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1k6Amg-0000HG-IZ
- for qemu-devel@nongnu.org; Thu, 13 Aug 2020 06:48:36 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1597315708; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=NIKrrMTJ2JOKZhdZRwVqBn4GZXQr81TMXw4T3/AqovElNvbxTnDUT73LjWPnABpddd5BOGhVQSGAWagMisMEIHagv2mHKVYx00asHm6vy8E2PkbxWw7t4KCGOwmYcuQJhxmS3tMM5afcadk6+2qb/rXeuH+q4L/FOAbrWp91uYE=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1597315708;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=07sfufhI58aE0j2sMc/WJttX/M+erbDFQRB3znXYSsc=; 
- b=D3z4VgkBQq+VnByia5F4xolqSTyeRj8LJrpaB3XLwrDuZ3vYgbyOyWe/Vay6uQSjZ7bOQKe3T6Z2uzyoXIAJ13Jrfaymp5+g557IP9VlBLlUPdbhTJbxgsM8VM1UJEjj6BUHlPsWAFbcZWZfOuq9Y4sHj3dGHa3iRElgrKMUsno=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1597315705951294.3500448539313;
- Thu, 13 Aug 2020 03:48:25 -0700 (PDT)
-Subject: Re: [PATCH 00/17] crypto/cipher: Class hierarchy cleanups
-Message-ID: <159731570548.15736.11623744411793807532@66eaa9a8a123>
-In-Reply-To: <20200813032537.2888593-1-richard.henderson@linaro.org>
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1k6Aja-0008CI-Rh; Thu, 13 Aug 2020 06:45:22 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:48365 helo=ozlabs.org)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1k6AjY-0008MC-NS; Thu, 13 Aug 2020 06:45:22 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 4BS39y6KCyz9sTh; Thu, 13 Aug 2020 20:45:10 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1597315510;
+ bh=vTuhJcwd3n6xHyJID96sVvRGUlCacSW3VOZcuIF6V/k=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=jdric6SD9LVRi6B6G9Mh6WJEQB7D+HwxyztDXNcXFJYLSt307YRg7lmmzSiRxWpCU
+ prIp4X7c9rytIRjLVMaH8fwhLosT3MHjDvvr6jp+HnkuywdT8sfds0i7t7bg+CbAPm
+ VHo/0th33A4VnNB9jlB2SaGU37m5Hc1z+oPSC2QE=
+Date: Thu, 13 Aug 2020 20:25:14 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Greg Kurz <groug@kaod.org>
+Subject: Re: [PATCH 08/14] spapr/xive: Rework error handling of
+ kvmppc_xive_set_source_config()
+Message-ID: <20200813102514.GK181791@yekko.fritz.box>
+References: <159707843034.1489912.1082061742626355958.stgit@bahia.lan>
+ <159707848764.1489912.17078842252160674523.stgit@bahia.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: richard.henderson@linaro.org
-Date: Thu, 13 Aug 2020 03:48:25 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o53.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/13 04:40:08
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="d6d1KVhp94hk3Jrm"
+Content-Disposition: inline
+In-Reply-To: <159707848764.1489912.17078842252160674523.stgit@bahia.lan>
+Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
+ helo=ozlabs.org
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/13 06:45:10
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -9
+X-Spam_score: -1.0
 X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-1.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -81,96 +77,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: berrange@redhat.com, qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDgxMzAzMjUzNy4yODg4
-NTkzLTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJvLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBz
-ZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93
-IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMjAwODEz
-MDMyNTM3LjI4ODg1OTMtMS1yaWNoYXJkLmhlbmRlcnNvbkBsaW5hcm8ub3JnClN1YmplY3Q6IFtQ
-QVRDSCAwMC8xN10gY3J5cHRvL2NpcGhlcjogQ2xhc3MgaGllcmFyY2h5IGNsZWFudXBzCgo9PT0g
-VEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9k
-ZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApn
-aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
-ZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNr
-IGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKRnJvbSBodHRwczovL2dpdGh1Yi5jb20v
-cGF0Y2hldy1wcm9qZWN0L3FlbXUKIC0gW3RhZyB1cGRhdGVdICAgICAgcGF0Y2hldy8yMDIwMDgx
-MzAzMjUzNy4yODg4NTkzLTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJvLm9yZyAtPiBwYXRjaGV3
-LzIwMjAwODEzMDMyNTM3LjI4ODg1OTMtMS1yaWNoYXJkLmhlbmRlcnNvbkBsaW5hcm8ub3JnClN3
-aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKYTM5ZDQ5NCBjcnlwdG8vZ2NyeXB0OiBTcGxp
-dCBRQ3J5cHRvQ2lwaGVyR2NyeXB0IGludG8gc3ViY2xhc3NlcwpjYTc4N2Q5IGNyeXB0by9uZXR0
-bGU6IFNwbGl0IFFDcnlwdG9DaXBoZXJOZXR0bGUgaW50byBzdWJjbGFzc2VzCjgxYmYxOWIgY3J5
-cHRvL2J1aWx0aW46IFNwbGl0IFFDcnlwdG9DaXBoZXJCdWlsdGluIGludG8gc3ViY2xhc3Nlcwox
-MWFlZDc0IGNyeXB0by9idWlsdGluOiBTcGxpdCBhbmQgc2ltcGxpZnkgQUVTX2VuY3J5cHRfY2Jj
-CmM2MjgxNTAgY3J5cHRvL2J1aWx0aW46IE1vdmUgQUVTX2NiY19lbmNyeXB0IGludG8gY2lwaGVy
-LWJ1aWx0aW4uaW5jLmMKMzcwNzM3MCBjcnlwdG8vYnVpbHRpbjogTWVyZ2UgcWNyeXB0b19jaXBo
-ZXJfYWVzX3tlY2IsIHh0c31fe2VuLCBkZX1jcnlwdAplZmUxMDA1IGNyeXB0by9idWlsdGluOiBS
-ZW1vdmUgb2RkLXNpemVkIEFFUyBibG9jayBoYW5kbGluZwo2MjhhYThhIGNyeXB0bzogQ29uc3Rp
-ZnkgY2lwaGVyIGRhdGEgdGFibGVzCjAxZjEyMTUgY3J5cHRvOiBNb3ZlIGNpcGhlci0+ZHJpdmVy
-IGluaXQgdG8gcWNyeXB0b18qX2NpcGhlcl9jdHhfbmV3CjkzZGMzOGEgY3J5cHRvOiBBbGxvY2F0
-ZSBRQ3J5cHRvQ2lwaGVyIHdpdGggdGhlIHN1YmNsYXNzCjgxYWFhNTQgY3J5cHRvOiBVc2UgdGhl
-IGNvcnJlY3QgY29uc3QgdHlwZSBmb3IgZHJpdmVyCjhjNDM3NzUgY3J5cHRvL25ldHRsZTogRml4
-IHh0c19lbmNyeXB0IGFyZ3VtZW50cwpmN2MwZjA0IGNyeXB0bzogUmVtb3ZlIHJlZHVuZGFudCBp
-bmNsdWRlcwo0OTBmZDFiIGNyeXB0bzogUmVuYW1lIGNpcGhlciBpbmNsdWRlIGZpbGVzIHRvIC5p
-bmMuYwo0YmExMzZmIGNyeXB0bzogQXNzdW1lIGJsb2Nrc2l6ZSBpcyBhIHBvd2VyIG9mIDIKYmYz
-MDVlMiBjcnlwdG86IE1vdmUgUUNyeXB0b0NpcGhlckRyaXZlciB0eXBlZGVmIHRvIHFlbXUvdHlw
-ZWRlZnMuaAo2ODA5NTRlIGNyeXB0bzogTW92ZSBRQ3J5cHRvQ2lwaGVyIHR5cGVkZWYgdG8gcWVt
-dS90eXBlZGVmcy5oCgo9PT0gT1VUUFVUIEJFR0lOID09PQoxLzE3IENoZWNraW5nIGNvbW1pdCA2
-ODA5NTRlMTliNDQgKGNyeXB0bzogTW92ZSBRQ3J5cHRvQ2lwaGVyIHR5cGVkZWYgdG8gcWVtdS90
-eXBlZGVmcy5oKQoyLzE3IENoZWNraW5nIGNvbW1pdCBiZjMwNWUyOGZiNjUgKGNyeXB0bzogTW92
-ZSBRQ3J5cHRvQ2lwaGVyRHJpdmVyIHR5cGVkZWYgdG8gcWVtdS90eXBlZGVmcy5oKQozLzE3IENo
-ZWNraW5nIGNvbW1pdCA0YmExMzZmZDUwZjUgKGNyeXB0bzogQXNzdW1lIGJsb2Nrc2l6ZSBpcyBh
-IHBvd2VyIG9mIDIpCjQvMTcgQ2hlY2tpbmcgY29tbWl0IDQ5MGZkMWJmNjM2OCAoY3J5cHRvOiBS
-ZW5hbWUgY2lwaGVyIGluY2x1ZGUgZmlsZXMgdG8gLmluYy5jKQpXQVJOSU5HOiBhZGRlZCwgbW92
-ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMx
-NjogCnJlbmFtZSBmcm9tIGNyeXB0by9jaXBoZXItYnVpbHRpbi5jCgp0b3RhbDogMCBlcnJvcnMs
-IDEgd2FybmluZ3MsIDE0IGxpbmVzIGNoZWNrZWQKClBhdGNoIDQvMTcgaGFzIHN0eWxlIHByb2Js
-ZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9z
-aXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBN
-QUlOVEFJTkVSUy4KNS8xNyBDaGVja2luZyBjb21taXQgZjdjMGYwNDg3N2JkIChjcnlwdG86IFJl
-bW92ZSByZWR1bmRhbnQgaW5jbHVkZXMpCjYvMTcgQ2hlY2tpbmcgY29tbWl0IDhjNDM3NzUyMzUw
-NCAoY3J5cHRvL25ldHRsZTogRml4IHh0c19lbmNyeXB0IGFyZ3VtZW50cykKNy8xNyBDaGVja2lu
-ZyBjb21taXQgODFhYWE1NDg1NWM1IChjcnlwdG86IFVzZSB0aGUgY29ycmVjdCBjb25zdCB0eXBl
-IGZvciBkcml2ZXIpCjgvMTcgQ2hlY2tpbmcgY29tbWl0IDkzZGMzOGEyYTQ2OCAoY3J5cHRvOiBB
-bGxvY2F0ZSBRQ3J5cHRvQ2lwaGVyIHdpdGggdGhlIHN1YmNsYXNzKQo5LzE3IENoZWNraW5nIGNv
-bW1pdCAwMWYxMjE1NzNjOGIgKGNyeXB0bzogTW92ZSBjaXBoZXItPmRyaXZlciBpbml0IHRvIHFj
-cnlwdG9fKl9jaXBoZXJfY3R4X25ldykKMTAvMTcgQ2hlY2tpbmcgY29tbWl0IDYyOGFhOGFjNWZi
-YyAoY3J5cHRvOiBDb25zdGlmeSBjaXBoZXIgZGF0YSB0YWJsZXMpCjExLzE3IENoZWNraW5nIGNv
-bW1pdCBlZmUxMDA1OTViNjEgKGNyeXB0by9idWlsdGluOiBSZW1vdmUgb2RkLXNpemVkIEFFUyBi
-bG9jayBoYW5kbGluZykKMTIvMTcgQ2hlY2tpbmcgY29tbWl0IDM3MDczNzBmNGY1MiAoY3J5cHRv
-L2J1aWx0aW46IE1lcmdlIHFjcnlwdG9fY2lwaGVyX2Flc197ZWNiLCB4dHN9X3tlbiwgZGV9Y3J5
-cHQpCjEzLzE3IENoZWNraW5nIGNvbW1pdCBjNjI4MTUwNGYxZGYgKGNyeXB0by9idWlsdGluOiBN
-b3ZlIEFFU19jYmNfZW5jcnlwdCBpbnRvIGNpcGhlci1idWlsdGluLmluYy5jKQoxNC8xNyBDaGVj
-a2luZyBjb21taXQgMTFhZWQ3NGJmNDUzIChjcnlwdG8vYnVpbHRpbjogU3BsaXQgYW5kIHNpbXBs
-aWZ5IEFFU19lbmNyeXB0X2NiYykKMTUvMTcgQ2hlY2tpbmcgY29tbWl0IDgxYmYxOWJkZTU0YiAo
-Y3J5cHRvL2J1aWx0aW46IFNwbGl0IFFDcnlwdG9DaXBoZXJCdWlsdGluIGludG8gc3ViY2xhc3Nl
-cykKMTYvMTcgQ2hlY2tpbmcgY29tbWl0IGNhNzg3ZDljMzRkNCAoY3J5cHRvL25ldHRsZTogU3Bs
-aXQgUUNyeXB0b0NpcGhlck5ldHRsZSBpbnRvIHN1YmNsYXNzZXMpCkVSUk9SOiBNYWNyb3Mgd2l0
-aCBtdWx0aXBsZSBzdGF0ZW1lbnRzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBhIGRvIC0gd2hpbGUg
-bG9vcAojMjU3OiBGSUxFOiBjcnlwdG8vY2lwaGVyLW5ldHRsZS5pbmMuYzoyNTU6CisjZGVmaW5l
-IERFRklORV9YVFMoTkFNRSwgVFlQRSwgQkxFTiwgRU5DUllQVCwgREVDUllQVCkgICAgICAgICAg
-XAorICAgIFFFTVVfQlVJTERfQlVHX09OKEJMRU4gIT0gWFRTX0JMT0NLX1NJWkUpOyAgICAgICAg
-ICAgICAgICAgIFwKKyAgICBERUZJTkVfX1hUUyhOQU1FLCBUWVBFLCBCTEVOLCBFTkNSWVBULCBE
-RUNSWVBUKSAgICAgICAgICAgICBcCitzdGF0aWMgY29uc3Qgc3RydWN0IFFDcnlwdG9DaXBoZXJE
-cml2ZXIgTkFNRSMjX2RyaXZlcl94dHMgPSB7ICAgXAorICAgIC5jaXBoZXJfZW5jcnlwdCA9IE5B
-TUUjI19lbmNyeXB0X3h0cywgICAgICAgICAgICAgICAgICAgICAgIFwKKyAgICAuY2lwaGVyX2Rl
-Y3J5cHQgPSBOQU1FIyNfZGVjcnlwdF94dHMsICAgICAgICAgICAgICAgICAgICAgICBcCisgICAg
-LmNpcGhlcl9zZXRpdiA9IE5BTUUjI19zZXRpdiwgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgXAorICAgIC5jaXBoZXJfZnJlZSA9IHFjcnlwdG9fY2lwaGVyX2N0eF9mcmVlLCAgICAgICAg
-ICAgICAgICAgICAgIFwKK307Cgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDk3MyBsaW5l
-cyBjaGVja2VkCgpQYXRjaCAxNi8xNyBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcu
-ICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0g
-dG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKMTcvMTcg
-Q2hlY2tpbmcgY29tbWl0IGEzOWQ0OTRhOTNjZSAoY3J5cHRvL2djcnlwdDogU3BsaXQgUUNyeXB0
-b0NpcGhlckdjcnlwdCBpbnRvIHN1YmNsYXNzZXMpCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBj
-b21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0
-Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMjAwODEzMDMyNTM3LjI4ODg1OTMtMS1yaWNoYXJk
-LmhlbmRlcnNvbkBsaW5hcm8ub3JnL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgot
-LS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRj
-aGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVk
-aGF0LmNvbQ==
+
+--d6d1KVhp94hk3Jrm
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Mon, Aug 10, 2020 at 06:54:47PM +0200, Greg Kurz wrote:
+> Since kvm_device_access() returns a negative errno on failure, convert
+> kvmppc_xive_set_source_config() to use it for error checking. This allows
+> to get rid of the local_err boilerplate.
+>=20
+> Propagate the return value so that callers may use it as well to check
+> failures.
+>=20
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+
+Applied to ppc-for-5.2.
+
+> ---
+>  hw/intc/spapr_xive_kvm.c    |   13 ++++---------
+>  include/hw/ppc/spapr_xive.h |    4 ++--
+>  2 files changed, 6 insertions(+), 11 deletions(-)
+>=20
+> diff --git a/hw/intc/spapr_xive_kvm.c b/hw/intc/spapr_xive_kvm.c
+> index 4142aaffff47..f2dda692183b 100644
+> --- a/hw/intc/spapr_xive_kvm.c
+> +++ b/hw/intc/spapr_xive_kvm.c
+> @@ -186,8 +186,8 @@ int kvmppc_xive_cpu_connect(XiveTCTX *tctx, Error **e=
+rrp)
+>   * XIVE Interrupt Source (KVM)
+>   */
+> =20
+> -void kvmppc_xive_set_source_config(SpaprXive *xive, uint32_t lisn, XiveE=
+AS *eas,
+> -                                   Error **errp)
+> +int kvmppc_xive_set_source_config(SpaprXive *xive, uint32_t lisn, XiveEA=
+S *eas,
+> +                                  Error **errp)
+>  {
+>      uint32_t end_idx;
+>      uint32_t end_blk;
+> @@ -196,7 +196,6 @@ void kvmppc_xive_set_source_config(SpaprXive *xive, u=
+int32_t lisn, XiveEAS *eas,
+>      bool masked;
+>      uint32_t eisn;
+>      uint64_t kvm_src;
+> -    Error *local_err =3D NULL;
+> =20
+>      assert(xive_eas_is_valid(eas));
+> =20
+> @@ -216,12 +215,8 @@ void kvmppc_xive_set_source_config(SpaprXive *xive, =
+uint32_t lisn, XiveEAS *eas,
+>      kvm_src |=3D ((uint64_t)eisn << KVM_XIVE_SOURCE_EISN_SHIFT) &
+>          KVM_XIVE_SOURCE_EISN_MASK;
+> =20
+> -    kvm_device_access(xive->fd, KVM_DEV_XIVE_GRP_SOURCE_CONFIG, lisn,
+> -                      &kvm_src, true, &local_err);
+> -    if (local_err) {
+> -        error_propagate(errp, local_err);
+> -        return;
+> -    }
+> +    return kvm_device_access(xive->fd, KVM_DEV_XIVE_GRP_SOURCE_CONFIG, l=
+isn,
+> +                             &kvm_src, true, errp);
+>  }
+> =20
+>  void kvmppc_xive_sync_source(SpaprXive *xive, uint32_t lisn, Error **err=
+p)
+> diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
+> index d0a08b618f79..0ffbe0be0280 100644
+> --- a/include/hw/ppc/spapr_xive.h
+> +++ b/include/hw/ppc/spapr_xive.h
+> @@ -80,8 +80,8 @@ int kvmppc_xive_connect(SpaprInterruptController *intc,=
+ uint32_t nr_servers,
+>                          Error **errp);
+>  void kvmppc_xive_disconnect(SpaprInterruptController *intc);
+>  void kvmppc_xive_reset(SpaprXive *xive, Error **errp);
+> -void kvmppc_xive_set_source_config(SpaprXive *xive, uint32_t lisn, XiveE=
+AS *eas,
+> -                                   Error **errp);
+> +int kvmppc_xive_set_source_config(SpaprXive *xive, uint32_t lisn, XiveEA=
+S *eas,
+> +                                  Error **errp);
+>  void kvmppc_xive_sync_source(SpaprXive *xive, uint32_t lisn, Error **err=
+p);
+>  uint64_t kvmppc_xive_esb_rw(XiveSource *xsrc, int srcno, uint32_t offset,
+>                              uint64_t data, bool write);
+>=20
+>=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--d6d1KVhp94hk3Jrm
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl81FQoACgkQbDjKyiDZ
+s5JLmQ//dp9CQfY93cVr3xa8E9Th8NznAaTdS1EUZou/7Zfa8MMTmSLWkuANPsg7
+TnslPZ6iXXiVLbHPjLZ2YksvqOwtV0DvsV5aNk5Yjq6kp1PZUs3Lzv5xruESucsq
+wUYuKR5+p59gEp43ku0eXZB3Wk42lUdWdQaVOt/LlQWATS0Odt1SWFOfjtlZYuar
+3icQRB+ItuOQqEhnkUme/qr6GwxprfwM9n6gxfA567wtAteeePllR/erMYwwjl9v
+UD5rwDCk93mulePCWdJB+wgBxZ4DVEHEQYlckPfFa0nFAOWYvUJlEjTig8b71c9J
+q72HC27jFk+gyyGHg9R2iYC4qzGe2ci6XPbUku7O4CpvOpJC1SDH2AEsKB9V+lUg
+pMGGIN7SpS/FVkFrsRaFmEJoeFvR++82MXgdZJcURuvPfwNFOXGS0WmGowHBvmb3
+ZGZCuCMH7pk+KcCm0aISxAETHnp2YQ4y3LDAQUVg1eKL2pTdDBZgQk9rqzso6XEP
+kvgSa2Q0w+KZrlgzRjNsfXzEzQ/mTKadXGdcJ5l0i4oA1HpEqrJ0oeKguzwrjq8z
+auNdNcdmDVxBlqFsdkMpO13sNurfNgBafUDFOyJ1GN4cfAJN5vcW2qd+nuniAhlb
+xBqKMAhkkMVlYG2Y7zOtcfgL0W+vvsDcIObxtpPQ1ZMhX+XJdPA=
+=2I2W
+-----END PGP SIGNATURE-----
+
+--d6d1KVhp94hk3Jrm--
 
