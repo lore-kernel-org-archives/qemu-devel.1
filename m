@@ -7,83 +7,65 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C96EC433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 11:02:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A5D6C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 11:11:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 352F320866
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 11:02:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0113020791
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 11:11:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Nf5ySvBH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 352F320866
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="D6wLMLvb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0113020791
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49084 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58532 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k6Azs-0006Pf-DR
-	for qemu-devel@archiver.kernel.org; Thu, 13 Aug 2020 07:02:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55564)
+	id 1k6B8U-0002Hd-6J
+	for qemu-devel@archiver.kernel.org; Thu, 13 Aug 2020 07:11:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58138)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1k6Ayi-0005qU-Mi
- for qemu-devel@nongnu.org; Thu, 13 Aug 2020 07:01:01 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:37061
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1k6Aya-0001da-Qa
- for qemu-devel@nongnu.org; Thu, 13 Aug 2020 07:00:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597316449;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Si5NhwS7GcEPQi8MCfcvnQD3matxk43KbKWlT99iNXI=;
- b=Nf5ySvBHqhpinYHO+Q1qH1FyJA9i6njTeRlOpkWwS2n7DqE2mTdWo2RMDQzM/b6QUJ1o79
- A5afhT1bHjUaYNJfvW9NQ34i7Cmh1hFNnH10XwXmozlU0nOsfY+dPdHJPY8D6y3zLCAmZy
- hThdQOUadU+EeGLE7D/SdCA0ObjP65c=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-405-dwc51L4QPm-Ri5owmeuDbw-1; Thu, 13 Aug 2020 07:00:46 -0400
-X-MC-Unique: dwc51L4QPm-Ri5owmeuDbw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 037C4801AC2;
- Thu, 13 Aug 2020 11:00:45 +0000 (UTC)
-Received: from gondolin (ovpn-112-216.ams2.redhat.com [10.36.112.216])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 73D6F629DD;
- Thu, 13 Aug 2020 11:00:37 +0000 (UTC)
-Date: Thu, 13 Aug 2020 13:00:34 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Peng Liang <liangpeng10@huawei.com>
-Subject: Re: [RFC 6/9] target/arm: introduce KVM_CAP_ARM_CPU_FEATURE
-Message-ID: <20200813130034.421b3368.cohuck@redhat.com>
-In-Reply-To: <20200813102657.2588720-7-liangpeng10@huawei.com>
-References: <20200813102657.2588720-1-liangpeng10@huawei.com>
- <20200813102657.2588720-7-liangpeng10@huawei.com>
-Organization: Red Hat GmbH
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1k6B7W-0000ZK-HG; Thu, 13 Aug 2020 07:10:06 -0400
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:50241 helo=ozlabs.org)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1k6B7T-0002ny-VJ; Thu, 13 Aug 2020 07:10:06 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 4BS3kb56qrz9sTH; Thu, 13 Aug 2020 21:09:59 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1597316999;
+ bh=QJJJZwd1YLPuT8GgXwy/R9jbDIc8rvWxt84eandFw5c=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=D6wLMLvbLuc+QA9nbzGLz+1tPXEcEUhbGwk/zzKP3a165VrHPpRM5HTFLUTXDLD+3
+ IgThVDUEHJWHjDETKbjd3DLSzQAeWHBIl72Pph6tcYb18YLXjA0XXfMR+3euTyKLpm
+ 2rIvvYSTSUAAPu39vYv9xN/316dn+Nm3lXRQm7zM=
+Date: Thu, 13 Aug 2020 20:50:41 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Subject: Re: [PATCH v3 for-5.2 1/3] ppc/xive: Rework setup of
+ XiveSource::esb_mmio
+Message-ID: <20200813105041.GA5509@yekko.fritz.box>
+References: <159679991916.876294.8967140647442842745.stgit@bahia.lan>
+ <159679992680.876294.7520540158586170894.stgit@bahia.lan>
+ <ed5e553d-0cd5-9195-ff0d-681b79d432c1@kaod.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=cohuck@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=cohuck@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/13 03:45:42
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="HlL+5n6rz5pIUxbD"
+Content-Disposition: inline
+In-Reply-To: <ed5e553d-0cd5-9195-ff0d-681b79d432c1@kaod.org>
+Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
+ helo=ozlabs.org
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -9
+X-Spam_score: -1.0
+X-Spam_bar: -
+X-Spam_report: (-1.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,42 +78,174 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, drjones@redhat.com,
- zhang.zhanghailiang@huawei.com, mst@redhat.com, qemu-devel@nongnu.org,
- xiexiangyou@huawei.com, qemu-arm@nongnu.org, pbonzini@redhat.com
+Cc: Daniel Henrique Barboza <danielhb@linux.ibm.com>, qemu-ppc@nongnu.org,
+ Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 13 Aug 2020 18:26:54 +0800
-Peng Liang <liangpeng10@huawei.com> wrote:
 
-> Introduce KVM_CAP_ARM_CPU_FEATURE to check whether KVM supports to set
-> CPU features in ARM.
-> 
-> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
-> Signed-off-by: Peng Liang <liangpeng10@huawei.com>
-> ---
->  linux-headers/linux/kvm.h |  1 +
->  target/arm/cpu.c          |  5 +++++
->  target/arm/kvm64.c        | 14 ++++++++++++++
->  target/arm/kvm_arm.h      |  7 +++++++
->  4 files changed, 27 insertions(+)
-> 
-> diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
-> index a28c366737..0b83d2b4bb 100644
-> --- a/linux-headers/linux/kvm.h
-> +++ b/linux-headers/linux/kvm.h
-> @@ -1031,6 +1031,7 @@ struct kvm_ppc_resize_hpt {
->  #define KVM_CAP_PPC_SECURE_GUEST 181
->  #define KVM_CAP_HALT_POLL 182
->  #define KVM_CAP_ASYNC_PF_INT 183
-> +#define KVM_CAP_ARM_CPU_FEATURE 187
->  
->  #ifdef KVM_CAP_IRQ_ROUTING
+--HlL+5n6rz5pIUxbD
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Please split out this header update into a separate patch so that it
-can be replaced by a proper headers update once the kernel code has been
-included.
+On Fri, Aug 07, 2020 at 02:36:01PM +0200, C=E9dric Le Goater wrote:
+> On 8/7/20 1:32 PM, Greg Kurz wrote:
+> > Depending on whether XIVE is emultated or backed with a KVM XIVE device,
+> > the ESB MMIOs of a XIVE source point to an I/O memory region or a mapped
+> > memory region.
+> >=20
+> > This is currently handled by checking kvm_irqchip_in_kernel() returns
+> > false in xive_source_realize(). This is a bit awkward as we usually
+> > need to do extra things when we're using the in-kernel backend, not
+> > less. But most important, we can do better: turn the existing "xive.esb"
+> > memory region into a plain container, introduce an "xive.esb-emulated"
+> > I/O subregion and rename the existing "xive.esb" subregion in the KVM
+> > code to "xive.esb-kvm". Since "xive.esb-kvm" is added with overlap
+> > and a higher priority, it prevails over "xive.esb-emulated" (ie.
+> > a guest using KVM XIVE will interact with "xive.esb-kvm" instead of
+> > the default "xive.esb-emulated" region.
+> >=20
+> > While here, consolidate the computation of the MMIO region size in
+> > a common helper.
+> >=20
+> > Suggested-by: C=E9dric Le Goater <clg@kaod.org>
+> > Signed-off-by: Greg Kurz <groug@kaod.org>
+>=20
+> This is much better
+>=20
+> Reviewed-by: C=E9dric Le Goater <clg@kaod.org>
 
+Appled to ppc-for-5.2.
+
+>=20
+> Thanks,
+>=20
+> C.
+>=20
+> > ---
+> >  hw/intc/spapr_xive_kvm.c |    4 ++--
+> >  hw/intc/xive.c           |   11 ++++++-----
+> >  include/hw/ppc/xive.h    |    6 ++++++
+> >  3 files changed, 14 insertions(+), 7 deletions(-)
+> >=20
+> > diff --git a/hw/intc/spapr_xive_kvm.c b/hw/intc/spapr_xive_kvm.c
+> > index 893a1ee77e70..6130882be678 100644
+> > --- a/hw/intc/spapr_xive_kvm.c
+> > +++ b/hw/intc/spapr_xive_kvm.c
+> > @@ -742,7 +742,7 @@ int kvmppc_xive_connect(SpaprInterruptController *i=
+ntc, uint32_t nr_servers,
+> >      SpaprXive *xive =3D SPAPR_XIVE(intc);
+> >      XiveSource *xsrc =3D &xive->source;
+> >      Error *local_err =3D NULL;
+> > -    size_t esb_len =3D (1ull << xsrc->esb_shift) * xsrc->nr_irqs;
+> > +    size_t esb_len =3D xive_source_esb_len(xsrc);
+> >      size_t tima_len =3D 4ull << TM_SHIFT;
+> >      CPUState *cs;
+> >      int fd;
+> > @@ -788,7 +788,7 @@ int kvmppc_xive_connect(SpaprInterruptController *i=
+ntc, uint32_t nr_servers,
+> >      }
+> > =20
+> >      memory_region_init_ram_device_ptr(&xsrc->esb_mmio_kvm, OBJECT(xsrc=
+),
+> > -                                      "xive.esb", esb_len, xsrc->esb_m=
+map);
+> > +                                      "xive.esb-kvm", esb_len, xsrc->e=
+sb_mmap);
+> >      memory_region_add_subregion_overlap(&xsrc->esb_mmio, 0,
+> >                                          &xsrc->esb_mmio_kvm, 1);
+> > =20
+> > diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+> > index 9b55e0356c62..561d746cd1da 100644
+> > --- a/hw/intc/xive.c
+> > +++ b/hw/intc/xive.c
+> > @@ -1128,6 +1128,7 @@ static void xive_source_reset(void *dev)
+> >  static void xive_source_realize(DeviceState *dev, Error **errp)
+> >  {
+> >      XiveSource *xsrc =3D XIVE_SOURCE(dev);
+> > +    size_t esb_len =3D xive_source_esb_len(xsrc);
+> > =20
+> >      assert(xsrc->xive);
+> > =20
+> > @@ -1147,11 +1148,11 @@ static void xive_source_realize(DeviceState *de=
+v, Error **errp)
+> >      xsrc->status =3D g_malloc0(xsrc->nr_irqs);
+> >      xsrc->lsi_map =3D bitmap_new(xsrc->nr_irqs);
+> > =20
+> > -    if (!kvm_irqchip_in_kernel()) {
+> > -        memory_region_init_io(&xsrc->esb_mmio, OBJECT(xsrc),
+> > -                              &xive_source_esb_ops, xsrc, "xive.esb",
+> > -                              (1ull << xsrc->esb_shift) * xsrc->nr_irq=
+s);
+> > -    }
+> > +    memory_region_init(&xsrc->esb_mmio, OBJECT(xsrc), "xive.esb", esb_=
+len);
+> > +    memory_region_init_io(&xsrc->esb_mmio_emulated, OBJECT(xsrc),
+> > +                          &xive_source_esb_ops, xsrc, "xive.esb-emulat=
+ed",
+> > +                          esb_len);
+> > +    memory_region_add_subregion(&xsrc->esb_mmio, 0, &xsrc->esb_mmio_em=
+ulated);
+> > =20
+> >      qemu_register_reset(xive_source_reset, dev);
+> >  }
+> > diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
+> > index 705cf48176fc..82a61eaca74f 100644
+> > --- a/include/hw/ppc/xive.h
+> > +++ b/include/hw/ppc/xive.h
+> > @@ -191,6 +191,7 @@ typedef struct XiveSource {
+> >      uint64_t        esb_flags;
+> >      uint32_t        esb_shift;
+> >      MemoryRegion    esb_mmio;
+> > +    MemoryRegion    esb_mmio_emulated;
+> > =20
+> >      /* KVM support */
+> >      void            *esb_mmap;
+> > @@ -215,6 +216,11 @@ static inline bool xive_source_esb_has_2page(XiveS=
+ource *xsrc)
+> >          xsrc->esb_shift =3D=3D XIVE_ESB_4K_2PAGE;
+> >  }
+> > =20
+> > +static inline size_t xive_source_esb_len(XiveSource *xsrc)
+> > +{
+> > +    return (1ull << xsrc->esb_shift) * xsrc->nr_irqs;
+> > +}
+> > +
+> >  /* The trigger page is always the first/even page */
+> >  static inline hwaddr xive_source_esb_page(XiveSource *xsrc, uint32_t s=
+rcno)
+> >  {
+> >=20
+> >=20
+>=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--HlL+5n6rz5pIUxbD
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl81Gv8ACgkQbDjKyiDZ
+s5I1iBAAkoZyPKaZ9zVzfpiTuB81PE36mXEM7odxYiDRSjzjfRccX3KBTdNsxHsb
+MOaqFQ/mZO0LU8Ag0LyIEVlLWX9N6sDWUh6nNY/YqhiniyUtMfW7tKS7pKChcQ4n
+aM8kgxXeQb48K73K5qjScrx9c645Gb7Aosaa4BlZ6Cup9ktpzM0/XL/wg6fttOXj
+ERPpChb6y5+b8lyqBCVf5Ny8lvttRsuUNQM046he1HA6ycUqI05F/vuGuOuoXY4Y
+mw602oc7pIMJzDQsSzdBPhimBdDo0cvOc42Vccp188llP/2T13k8N4fMChmh1jS7
+eWLcgLDNm/TGDZmCk35oGeEvhLHMbWFFeiXLzN1WUBOIVbn/e3uVqSlqD0KxXOfj
+i5gQFgJ5YbSmlC/QRnfzETsFBQ4oGKUQZQDY+tf32sHRJ4+VKeMe+MDM3JNkBKeo
+N3WuWJINh4BozTkMKw1IJ95+s9G11LmNIoilZ3EipH6CQQRZRiU4+fZxtJzCWaxQ
+7FfyDocd0NuXghmIR9tN7f1z8TJJugEIrTL8nDvpw0iF+smoIszwsm+kYVWx/eNA
+MINuBMEDpuVyOBilOCIdPM+2J5y9JXkK0b22yRzkoB2JJ841zWFXdMhyNLPLJfmq
+ESH7jAFui10h7DdcMjNqUDBmu106zOyfnnInHQaIrbcyXzQNrOc=
+=jnJ5
+-----END PGP SIGNATURE-----
+
+--HlL+5n6rz5pIUxbD--
 
