@@ -7,77 +7,78 @@ X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CB97C433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 08:00:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65A1DC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 08:01:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 457E220656
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 08:00:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2A72720781
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 08:01:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g/+2vucw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 457E220656
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ISBx3yFZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A72720781
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59260 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59916 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k68AP-0003Ss-EJ
-	for qemu-devel@archiver.kernel.org; Thu, 13 Aug 2020 04:00:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45272)
+	id 1k68Ab-0003jI-EC
+	for qemu-devel@archiver.kernel.org; Thu, 13 Aug 2020 04:01:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45314)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k689D-0002Z2-B8
- for qemu-devel@nongnu.org; Thu, 13 Aug 2020 03:59:39 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:51131)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k689O-0002kd-Af
+ for qemu-devel@nongnu.org; Thu, 13 Aug 2020 03:59:50 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:27940
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k689B-0004O7-EN
- for qemu-devel@nongnu.org; Thu, 13 Aug 2020 03:59:38 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k689L-0004Pf-W0
+ for qemu-devel@nongnu.org; Thu, 13 Aug 2020 03:59:50 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597305576;
+ s=mimecast20190719; t=1597305587;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=WEGhk3V5mKcePorw1/xuRy6MbmjYUzwJ4yoTjITz3t4=;
- b=g/+2vucwhbgkQ93Hw+4mmoqid6sIHL0F3+EE7iyh3L1jHkbs5TnwFpDEQ1QvbmUzS+wq7O
- MnXvukz3Xa8HLVWVf+vvGb1T2sIEhF/VffaBeNnYycmUznWTKFprWd3JCPZ/ibWHUN8w0P
- 9kVm3iilauE5wYvTVROHB00ersRppS4=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-535-MRWPr_yjMAmLX9EsRoTlfA-1; Thu, 13 Aug 2020 03:59:34 -0400
-X-MC-Unique: MRWPr_yjMAmLX9EsRoTlfA-1
-Received: by mail-wr1-f69.google.com with SMTP id f7so1740348wrs.8
- for <qemu-devel@nongnu.org>; Thu, 13 Aug 2020 00:59:34 -0700 (PDT)
+ bh=9h9S7HHVyUkl/Qnp4fGXBrw+MPQsEQ1fBwGbkp4QGho=;
+ b=ISBx3yFZQoj+BqMtAGLVyJUK4bB4+VKHIrR+E0Ub0p9rnV/BzkpiztdXM2xdjJNw/Zh+6u
+ nivta/H9FZ1tcAKa9SFWK6WwtA/K1BX8m9UreG73H+4QN/GdBoNry7ng/IWEOGcv9cCggK
+ 7rYb0Vu2NL9WFEeou6t+GWNN9VXJ2bs=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-140-CEtlr0kuMaCrZ51LagIORw-1; Thu, 13 Aug 2020 03:59:45 -0400
+X-MC-Unique: CEtlr0kuMaCrZ51LagIORw-1
+Received: by mail-wm1-f70.google.com with SMTP id d22so1911109wmd.2
+ for <qemu-devel@nongnu.org>; Thu, 13 Aug 2020 00:59:45 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=WEGhk3V5mKcePorw1/xuRy6MbmjYUzwJ4yoTjITz3t4=;
- b=k80K44Rj7oNkQHkIPQWpRSPiRbxim6CWavWsuyurKe1FEjnFrRvq34ekU++SgFWKSW
- 6AJ/BlPyP2SC8yelYcVq74vtN97RvFqbgwcP14U2wGUKWgsxvMjee1fJp3cg5lnAa1Z6
- qLtyqtXaSj8rZsUx/CIeWWRCNjptKTDvIcb0Swff54EHRZyN8E8mrzPB7NkNw05hDY0+
- mEVqqcRQxqyewVhEzKeegUR5YdyQaEwNN2hGr05OSJND6GZugMBdO9+6iMWdEiW5W7uR
- Zn5S8V+QnwVuhJGh0EU8BHawXHMFHS/mBFE8mRHBYe+yJwcuDYdbPKW3SslYiiGW8N0c
- nZmA==
-X-Gm-Message-State: AOAM530NBF87mR6k9shq74+ILjeH9wyJCg1wDSnTgObvB/Qjum8EczoN
- KXExOTDDa5KyhqUFQkTNdyN9ir5O9ZXB6SPzCHLeDipKMgtVdPsa5HEp/exqDbP1LM5IAhT9O08
- 1PJ70PidNyMta360=
-X-Received: by 2002:adf:f149:: with SMTP id y9mr2662487wro.93.1597305573466;
- Thu, 13 Aug 2020 00:59:33 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJypJwEIPEzYatiDuV4bp/vcOfJ1jYeLXitIktE0oo13jFpTT686Ft1C/ATwyBWAVrav3ae2mw==
-X-Received: by 2002:adf:f149:: with SMTP id y9mr2662476wro.93.1597305573295;
- Thu, 13 Aug 2020 00:59:33 -0700 (PDT)
+ bh=9h9S7HHVyUkl/Qnp4fGXBrw+MPQsEQ1fBwGbkp4QGho=;
+ b=oijRlVRffzBCbn5cFGYOOJ1EKkHfEpCGTc2ep1f3sDFQKUBONy/8qq7WE1wCnG/vNB
+ PjXioygeZ9ot0lLEplUdX9lxqBZs5MYo8qrbyCb2dGuux2aJH8PUDwCEley+46lMAKK5
+ N0aI8v9vNgNM/Vd86BdrA9htFJB+tH2654+4Pg9XKqD5E4G/3nhnXUWbo3XEDkizbJqT
+ wQZobpiORZEFfH5PJvxL9QfHuC0r3wa9c3PQ9gJVNp6drGLZMI31HnaCYJDH5GeUbkxn
+ wQrAtyRZpw6DwvhDQQEz0TbXDySsSG0VDmjhtY6NhxaPCxnNRRUgqPJJF/9ybLwMx4Z2
+ jO2g==
+X-Gm-Message-State: AOAM532YJhi8KKCPRRtyXZ85RLHaYo5t2tjELazCdAPDLROTGq8PCP0s
+ IHtWNhwqplAbSqbS5PQrLCNeeRjVHlfGTI22ydkD8T9tpQzN0x2WJNM+SsOMaCOF9LlIImQt0PN
+ 48Pvu+diY/ciLevQ=
+X-Received: by 2002:adf:ed48:: with SMTP id u8mr2969508wro.64.1597305583884;
+ Thu, 13 Aug 2020 00:59:43 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz+eARLGpCWNbPRmlPV7KuhTGglMCR/gcr60G2MU1CBENvq/y4ioVFEbaqmGVn9GQPo9ChlvA==
+X-Received: by 2002:adf:ed48:: with SMTP id u8mr2969499wro.64.1597305583738;
+ Thu, 13 Aug 2020 00:59:43 -0700 (PDT)
 Received: from [192.168.1.36] (121.red-81-40-121.staticip.rima-tde.net.
  [81.40.121.121])
- by smtp.gmail.com with ESMTPSA id y203sm8724846wmc.29.2020.08.13.00.59.32
+ by smtp.gmail.com with ESMTPSA id m1sm8092942wmc.28.2020.08.13.00.59.42
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 13 Aug 2020 00:59:32 -0700 (PDT)
-Subject: Re: [PATCH 01/17] crypto: Move QCryptoCipher typedef to
+ Thu, 13 Aug 2020 00:59:43 -0700 (PDT)
+Subject: Re: [PATCH 02/17] crypto: Move QCryptoCipherDriver typedef to
  qemu/typedefs.h
 To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 References: <20200813032537.2888593-1-richard.henderson@linaro.org>
- <20200813032537.2888593-2-richard.henderson@linaro.org>
+ <20200813032537.2888593-3-richard.henderson@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Autocrypt: addr=philmd@redhat.com; keydata=
  mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
@@ -102,30 +103,30 @@ Autocrypt: addr=philmd@redhat.com; keydata=
  9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
  RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
  apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <81ac5ebc-b7b9-bda6-bc1c-48b03e590b7d@redhat.com>
-Date: Thu, 13 Aug 2020 09:59:31 +0200
+Message-ID: <3c7eb078-6a39-60fa-2f08-9ac06815e00d@redhat.com>
+Date: Thu, 13 Aug 2020 09:59:42 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200813032537.2888593-2-richard.henderson@linaro.org>
+In-Reply-To: <20200813032537.2888593-3-richard.henderson@linaro.org>
 Content-Language: en-US
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0
+X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/13 03:59:36
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/13 03:44:21
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -144,12 +145,12 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 8/13/20 5:25 AM, Richard Henderson wrote:
-> This allows header files to declare pointers without pulling
-> in the entire crypto subsystem.
+> This will allow the pointer to be used in crypto/cipher.h,
+> and not just in code using cipherpriv.h.
 > 
 > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
->  include/crypto/cipher.h | 2 --
+>  crypto/cipherpriv.h     | 2 --
 >  include/qemu/typedefs.h | 1 +
 >  2 files changed, 1 insertion(+), 2 deletions(-)
 
