@@ -7,60 +7,60 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 031D2C433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 16:31:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CCE2C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 16:32:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C09A4206A4
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 16:31:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 00FA6206A4
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 16:32:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KVqCqXfR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C09A4206A4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ehk83Rnn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00FA6206A4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47546 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49220 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k6G8q-00046n-U2
-	for qemu-devel@archiver.kernel.org; Thu, 13 Aug 2020 12:31:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55362)
+	id 1k6G9C-0004mC-1E
+	for qemu-devel@archiver.kernel.org; Thu, 13 Aug 2020 12:32:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55422)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1k6G76-0001pD-HN
- for qemu-devel@nongnu.org; Thu, 13 Aug 2020 12:30:00 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:41169
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1k6G7A-0001x0-7G
+ for qemu-devel@nongnu.org; Thu, 13 Aug 2020 12:30:04 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:34131
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1k6G74-0001Dg-W9
- for qemu-devel@nongnu.org; Thu, 13 Aug 2020 12:30:00 -0400
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1k6G77-0001EE-Kz
+ for qemu-devel@nongnu.org; Thu, 13 Aug 2020 12:30:03 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597336198;
+ s=mimecast20190719; t=1597336201;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=zk7z5h8S3NWxmmAkCxBtINH2cvSr9u+MxB0Ck8Ngt4Q=;
- b=KVqCqXfR/NN8ows3twrAL77odTVOIjuKfNUCzEUWwvFNi+rRtWNQNy9nniLXZcoHADRycn
- vjhzEUu7a04o706dl9fGYt6LVKDnOwdkSq1fZaYInxKpyzvL3d5lEaQqkH7eP3gFO6YIPD
- 47widmPDHn/1ujxFjjslOcr2GSUQeTk=
+ bh=AfqQ+rA+QU47hCv+fgERdM5S2is2RvTloiHcD5kJKzc=;
+ b=Ehk83Rnnazl/pViWh6YZijoVamoTMtpW1lT39TQFcQ/DqZZ3XSoDjkGu1lOo5mAooAR+Rr
+ lFPD+mu3GuXJVRycLWxOoW4gbfREgXwpSjl3x6IWRP59N+YvlhrdTa+ZUiRjP4TONf2QBk
+ soCEUyDDFxZ5dj0FuausqLEWdPamH1E=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-566-1hKB9V1aOGONraYORSqLww-1; Thu, 13 Aug 2020 12:29:54 -0400
-X-MC-Unique: 1hKB9V1aOGONraYORSqLww-1
+ us-mta-202-rtV3Yq1sMzmtJCuMQ52w5Q-1; Thu, 13 Aug 2020 12:29:59 -0400
+X-MC-Unique: rtV3Yq1sMzmtJCuMQ52w5Q-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E2F551DDE8;
- Thu, 13 Aug 2020 16:29:53 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3AA991015DC0;
+ Thu, 13 Aug 2020 16:29:58 +0000 (UTC)
 Received: from linux.fritz.box.com (ovpn-113-97.ams2.redhat.com [10.36.113.97])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C37975C1A3;
- Thu, 13 Aug 2020 16:29:52 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1D40F5C1BB;
+ Thu, 13 Aug 2020 16:29:56 +0000 (UTC)
 From: Kevin Wolf <kwolf@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [RFC PATCH 05/22] qemu-storage-daemon: Use qmp_block_export_add()
-Date: Thu, 13 Aug 2020 18:29:18 +0200
-Message-Id: <20200813162935.210070-6-kwolf@redhat.com>
+Subject: [RFC PATCH 08/22] nbd: Add max-connections to nbd-server-start
+Date: Thu, 13 Aug 2020 18:29:21 +0200
+Message-Id: <20200813162935.210070-9-kwolf@redhat.com>
 In-Reply-To: <20200813162935.210070-1-kwolf@redhat.com>
 References: <20200813162935.210070-1-kwolf@redhat.com>
 MIME-Version: 1.0
@@ -71,17 +71,17 @@ X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=kwolf@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/13 12:29:49
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=kwolf@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/13 03:44:21
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,45 +99,201 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-No reason to duplicate the functionality locally, we can now just reuse
-the QMP command block-export-add for --export.
+This is a QMP equivalent of qemu-nbd's --share option, limiting the
+maximum number of clients that can attach at the same time.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- qemu-storage-daemon.c | 13 +------------
- 1 file changed, 1 insertion(+), 12 deletions(-)
+ qapi/block-export.json         | 10 ++++++++--
+ include/block/nbd.h            |  3 ++-
+ block/monitor/block-hmp-cmds.c |  2 +-
+ blockdev-nbd.c                 | 33 ++++++++++++++++++++++++++-------
+ qemu-storage-daemon.c          |  4 ++--
+ 5 files changed, 39 insertions(+), 13 deletions(-)
 
-diff --git a/qemu-storage-daemon.c b/qemu-storage-daemon.c
-index ed26097254..b6f678d3ab 100644
---- a/qemu-storage-daemon.c
-+++ b/qemu-storage-daemon.c
-@@ -150,17 +150,6 @@ static void init_qmp_commands(void)
-                          qmp_marshal_qmp_capabilities, QCO_ALLOW_PRECONFIG);
+diff --git a/qapi/block-export.json b/qapi/block-export.json
+index 40369814b4..1fdc55c53a 100644
+--- a/qapi/block-export.json
++++ b/qapi/block-export.json
+@@ -14,6 +14,8 @@
+ #             is only resolved at time of use, so can be deleted and
+ #             recreated on the fly while the NBD server is active.
+ #             If missing, it will default to denying access (since 4.0).
++# @max-connections: The maximum number of connections to allow at the same
++#                   time, 0 for unlimited. (since 5.2; default: 0)
+ #
+ # Keep this type consistent with the nbd-server-start arguments. The only
+ # intended difference is using SocketAddress instead of SocketAddressLegacy.
+@@ -23,7 +25,8 @@
+ { 'struct': 'NbdServerOptions',
+   'data': { 'addr': 'SocketAddress',
+             '*tls-creds': 'str',
+-            '*tls-authz': 'str'} }
++            '*tls-authz': 'str',
++            '*max-connections': 'uint32' } }
+ 
+ ##
+ # @nbd-server-start:
+@@ -40,6 +43,8 @@
+ #             is only resolved at time of use, so can be deleted and
+ #             recreated on the fly while the NBD server is active.
+ #             If missing, it will default to denying access (since 4.0).
++# @max-connections: The maximum number of connections to allow at the same
++#                   time, 0 for unlimited. (since 5.2; default: 0)
+ #
+ # Returns: error if the server is already running.
+ #
+@@ -51,7 +56,8 @@
+ { 'command': 'nbd-server-start',
+   'data': { 'addr': 'SocketAddressLegacy',
+             '*tls-creds': 'str',
+-            '*tls-authz': 'str'} }
++            '*tls-authz': 'str',
++            '*max-connections': 'uint32' } }
+ 
+ ##
+ # @BlockExportOptionsNbd:
+diff --git a/include/block/nbd.h b/include/block/nbd.h
+index ffca3be78f..6fc1f05ef4 100644
+--- a/include/block/nbd.h
++++ b/include/block/nbd.h
+@@ -352,7 +352,8 @@ void nbd_client_get(NBDClient *client);
+ void nbd_client_put(NBDClient *client);
+ 
+ void nbd_server_start(SocketAddress *addr, const char *tls_creds,
+-                      const char *tls_authz, Error **errp);
++                      const char *tls_authz, uint32_t max_connections,
++                      Error **errp);
+ void nbd_server_start_options(NbdServerOptions *arg, Error **errp);
+ 
+ /* nbd_read
+diff --git a/block/monitor/block-hmp-cmds.c b/block/monitor/block-hmp-cmds.c
+index 56bc83ac97..a651954e16 100644
+--- a/block/monitor/block-hmp-cmds.c
++++ b/block/monitor/block-hmp-cmds.c
+@@ -411,7 +411,7 @@ void hmp_nbd_server_start(Monitor *mon, const QDict *qdict)
+         goto exit;
+     }
+ 
+-    nbd_server_start(addr, NULL, NULL, &local_err);
++    nbd_server_start(addr, NULL, NULL, 0, &local_err);
+     qapi_free_SocketAddress(addr);
+     if (local_err != NULL) {
+         goto exit;
+diff --git a/blockdev-nbd.c b/blockdev-nbd.c
+index 019c37c0bc..28159a92b2 100644
+--- a/blockdev-nbd.c
++++ b/blockdev-nbd.c
+@@ -23,23 +23,41 @@ typedef struct NBDServerData {
+     QIONetListener *listener;
+     QCryptoTLSCreds *tlscreds;
+     char *tlsauthz;
++    uint32_t max_connections;
++    uint32_t connections;
+ } NBDServerData;
+ 
+ static NBDServerData *nbd_server;
+ 
++static void nbd_update_server_watch(NBDServerData *s);
++
+ static void nbd_blockdev_client_closed(NBDClient *client, bool ignored)
+ {
+     nbd_client_put(client);
++    assert(nbd_server->connections > 0);
++    nbd_server->connections--;
++    nbd_update_server_watch(nbd_server);
  }
  
--static void init_export(BlockExportOptions *export, Error **errp)
--{
--    switch (export->type) {
--    case BLOCK_EXPORT_TYPE_NBD:
--        qmp_nbd_server_add(&export->u.nbd, errp);
--        break;
--    default:
--        g_assert_not_reached();
--    }
--}
--
- static void process_options(int argc, char *argv[])
+ static void nbd_accept(QIONetListener *listener, QIOChannelSocket *cioc,
+                        gpointer opaque)
  {
-     int c;
-@@ -241,7 +230,7 @@ static void process_options(int argc, char *argv[])
-                 visit_type_BlockExportOptions(v, NULL, &export, &error_fatal);
-                 visit_free(v);
++    nbd_server->connections++;
++    nbd_update_server_watch(nbd_server);
++
+     qio_channel_set_name(QIO_CHANNEL(cioc), "nbd-server");
+     nbd_client_new(cioc, nbd_server->tlscreds, nbd_server->tlsauthz,
+                    nbd_blockdev_client_closed);
+ }
  
--                init_export(export, &error_fatal);
-+                qmp_block_export_add(export, &error_fatal);
-                 qapi_free_BlockExportOptions(export);
-                 break;
-             }
++static void nbd_update_server_watch(NBDServerData *s)
++{
++    if (!s->max_connections || s->connections < s->max_connections) {
++        qio_net_listener_set_client_func(s->listener, nbd_accept, NULL, NULL);
++    } else {
++        qio_net_listener_set_client_func(s->listener, NULL, NULL, NULL);
++    }
++}
+ 
+ static void nbd_server_free(NBDServerData *server)
+ {
+@@ -88,7 +106,8 @@ static QCryptoTLSCreds *nbd_get_tls_creds(const char *id, Error **errp)
+ 
+ 
+ void nbd_server_start(SocketAddress *addr, const char *tls_creds,
+-                      const char *tls_authz, Error **errp)
++                      const char *tls_authz, uint32_t max_connections,
++                      Error **errp)
+ {
+     if (nbd_server) {
+         error_setg(errp, "NBD server already running");
+@@ -96,6 +115,7 @@ void nbd_server_start(SocketAddress *addr, const char *tls_creds,
+     }
+ 
+     nbd_server = g_new0(NBDServerData, 1);
++    nbd_server->max_connections = max_connections;
+     nbd_server->listener = qio_net_listener_new();
+ 
+     qio_net_listener_set_name(nbd_server->listener,
+@@ -120,10 +140,7 @@ void nbd_server_start(SocketAddress *addr, const char *tls_creds,
+ 
+     nbd_server->tlsauthz = g_strdup(tls_authz);
+ 
+-    qio_net_listener_set_client_func(nbd_server->listener,
+-                                     nbd_accept,
+-                                     NULL,
+-                                     NULL);
++    nbd_update_server_watch(nbd_server);
+ 
+     return;
+ 
+@@ -134,17 +151,19 @@ void nbd_server_start(SocketAddress *addr, const char *tls_creds,
+ 
+ void nbd_server_start_options(NbdServerOptions *arg, Error **errp)
+ {
+-    nbd_server_start(arg->addr, arg->tls_creds, arg->tls_authz, errp);
++    nbd_server_start(arg->addr, arg->tls_creds, arg->tls_authz,
++                     arg->max_connections, errp);
+ }
+ 
+ void qmp_nbd_server_start(SocketAddressLegacy *addr,
+                           bool has_tls_creds, const char *tls_creds,
+                           bool has_tls_authz, const char *tls_authz,
++                          bool has_max_connections, uint32_t max_connections,
+                           Error **errp)
+ {
+     SocketAddress *addr_flat = socket_address_flatten(addr);
+ 
+-    nbd_server_start(addr_flat, tls_creds, tls_authz, errp);
++    nbd_server_start(addr_flat, tls_creds, tls_authz, max_connections, errp);
+     qapi_free_SocketAddress(addr_flat);
+ }
+ 
+diff --git a/qemu-storage-daemon.c b/qemu-storage-daemon.c
+index b6f678d3ab..0fcab6ed2d 100644
+--- a/qemu-storage-daemon.c
++++ b/qemu-storage-daemon.c
+@@ -101,9 +101,9 @@ static void help(void)
+ "                         configure a QMP monitor\n"
+ "\n"
+ "  --nbd-server addr.type=inet,addr.host=<host>,addr.port=<port>\n"
+-"               [,tls-creds=<id>][,tls-authz=<id>]\n"
++"               [,tls-creds=<id>][,tls-authz=<id>][,max-connections=<n>]\n"
+ "  --nbd-server addr.type=unix,addr.path=<path>\n"
+-"               [,tls-creds=<id>][,tls-authz=<id>]\n"
++"               [,tls-creds=<id>][,tls-authz=<id>][,max-connections=<n>]\n"
+ "                         start an NBD server for exporting block nodes\n"
+ "\n"
+ "  --object help          list object types that can be added\n"
 -- 
 2.25.4
 
