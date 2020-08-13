@@ -7,69 +7,69 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E73A5C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 22:49:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0AD1C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 22:51:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9399A207DA
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 22:49:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6A3AA20771
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 22:51:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G9hB000D"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9399A207DA
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DO58P9fS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A3AA20771
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47874 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50926 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k6M2R-0007Yp-Th
-	for qemu-devel@archiver.kernel.org; Thu, 13 Aug 2020 18:49:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36582)
+	id 1k6M3u-0000Uk-Jn
+	for qemu-devel@archiver.kernel.org; Thu, 13 Aug 2020 18:51:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36646)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1k6Lgy-0006HI-GF
- for qemu-devel@nongnu.org; Thu, 13 Aug 2020 18:27:24 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:49442
+ id 1k6Lh2-0006P2-RT
+ for qemu-devel@nongnu.org; Thu, 13 Aug 2020 18:27:28 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:49973
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1k6Lgt-0002wJ-MU
- for qemu-devel@nongnu.org; Thu, 13 Aug 2020 18:27:24 -0400
+ id 1k6Lgw-0002wZ-B9
+ for qemu-devel@nongnu.org; Thu, 13 Aug 2020 18:27:28 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597357639;
+ s=mimecast20190719; t=1597357641;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=UHFfOKFsvubLWkZfcqmVlw75qx4LrHz0fuGLDXYkqNk=;
- b=G9hB000Dd/SrrClSows13FEjSpx5nLxle8Qmcve8iFzfZMH9LUC29HtSrq1pmhTRB0QteM
- ZojtZ+w5hG1M6+sZ0QGVEhJnyxSWK1tH+cJWdfXwU25JPhD9ubmFK9u7mRZ2JGB+f4csG0
- +QMm/yoh6586UGBHyW+KZBKUJM7MjOI=
+ bh=BRSH9EuzQgNAZqC31KEEKYFyp/c8CcaIVHEsWbYpDxQ=;
+ b=DO58P9fSSB+WrRL5vixrM3v7IxZoiKnOV5Nve9sbgwCw8opOjN8pzy3NFnW7G1ZZh/pSh+
+ vuIkz4pNs4MXPjOb1OP3rYy4/nJoIuEsH7sCpoYTYrH72gw7dhGeRto5mS4mGjjd4y6Lra
+ WQUmztCD3HZyMFsXjxzSHB9uyTzRN00=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-411-HNsfB-zgNaWglQzNuhNTUQ-1; Thu, 13 Aug 2020 18:27:09 -0400
-X-MC-Unique: HNsfB-zgNaWglQzNuhNTUQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-81-0EhNa2aPNJaRvXFfY597NQ-1; Thu, 13 Aug 2020 18:27:19 -0400
+X-MC-Unique: 0EhNa2aPNJaRvXFfY597NQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2AA91100CA89
- for <qemu-devel@nongnu.org>; Thu, 13 Aug 2020 22:27:08 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ACCCF1DDE3
+ for <qemu-devel@nongnu.org>; Thu, 13 Aug 2020 22:27:18 +0000 (UTC)
 Received: from localhost (ovpn-117-153.rdu2.redhat.com [10.10.117.153])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1CD1560498;
- Thu, 13 Aug 2020 22:27:06 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0A79D60C04;
+ Thu, 13 Aug 2020 22:27:17 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 32/41] codeconverter: script for automating QOM code cleanups
-Date: Thu, 13 Aug 2020 18:26:16 -0400
-Message-Id: <20200813222625.243136-33-ehabkost@redhat.com>
+Subject: [PATCH 38/41] [automated] Use OBJECT_DECLARE_TYPE where possible
+Date: Thu, 13 Aug 2020 18:26:22 -0400
+Message-Id: <20200813222625.243136-39-ehabkost@redhat.com>
 In-Reply-To: <20200813222625.243136-1-ehabkost@redhat.com>
 References: <20200813222625.243136-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
-X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
@@ -102,2025 +102,1366 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This started as a simple script that scanned for regular
-expressions, but became more and more complex when exceptions to
-the rules were found.
+Replace DECLARE_OBJ_CHECKERS with OBJECT_DECLARE_TYPE where the
+typedefs can be safely removed.
 
-I don't know if this should be maintained in the QEMU source tree
-long term (maybe it can be reused for other code transformations
-that Coccinelle can't handle).  In either case, this is included
-as part of the patch series to document how exactly the automated
-code transformations in the next patches were done.
+Generated running:
+
+$ ./scripts/codeconverter/converter.py -i \
+  --pattern=DeclareObjCheckers $(git grep -l '' -- '*.[ch]')
 
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- .../codeconverter/codeconverter/__init__.py   |   0
- .../codeconverter/codeconverter/patching.py   | 369 +++++++++++
- .../codeconverter/codeconverter/qom_macros.py | 614 ++++++++++++++++++
- .../codeconverter/qom_type_info.py            | 314 +++++++++
- .../codeconverter/codeconverter/regexps.py    |  89 +++
- .../codeconverter/test_patching.py            |  98 +++
- .../codeconverter/test_regexps.py             | 272 ++++++++
- scripts/codeconverter/codeconverter/utils.py  |  65 ++
- scripts/codeconverter/converter.py            | 113 ++++
- 9 files changed, 1934 insertions(+)
- create mode 100644 scripts/codeconverter/codeconverter/__init__.py
- create mode 100644 scripts/codeconverter/codeconverter/patching.py
- create mode 100644 scripts/codeconverter/codeconverter/qom_macros.py
- create mode 100644 scripts/codeconverter/codeconverter/qom_type_info.py
- create mode 100644 scripts/codeconverter/codeconverter/regexps.py
- create mode 100644 scripts/codeconverter/codeconverter/test_patching.py
- create mode 100644 scripts/codeconverter/codeconverter/test_regexps.py
- create mode 100644 scripts/codeconverter/codeconverter/utils.py
- create mode 100755 scripts/codeconverter/converter.py
+ hw/audio/intel-hda.h                | 6 ++----
+ hw/display/virtio-vga.h             | 6 ++----
+ include/authz/base.h                | 6 ++----
+ include/authz/list.h                | 6 ++----
+ include/authz/listfile.h            | 6 ++----
+ include/authz/pamacct.h             | 6 ++----
+ include/authz/simple.h              | 6 ++----
+ include/crypto/secret_common.h      | 6 ++----
+ include/crypto/secret_keyring.h     | 6 ++----
+ include/hw/hyperv/vmbus.h           | 6 ++----
+ include/hw/i2c/i2c.h                | 6 ++----
+ include/hw/i2c/smbus_slave.h        | 6 ++----
+ include/hw/ipack/ipack.h            | 6 ++----
+ include/hw/ipmi/ipmi.h              | 6 ++----
+ include/hw/mem/pc-dimm.h            | 6 ++----
+ include/hw/ppc/pnv.h                | 6 ++----
+ include/hw/ppc/pnv_core.h           | 6 ++----
+ include/hw/ppc/pnv_homer.h          | 6 ++----
+ include/hw/ppc/pnv_occ.h            | 6 ++----
+ include/hw/ppc/pnv_psi.h            | 6 ++----
+ include/hw/ppc/pnv_xive.h           | 6 ++----
+ include/hw/ppc/spapr_cpu_core.h     | 6 ++----
+ include/hw/ppc/spapr_drc.h          | 6 ++----
+ include/hw/ppc/spapr_vio.h          | 6 ++----
+ include/hw/ppc/spapr_xive.h         | 6 ++----
+ include/hw/ppc/xics.h               | 6 ++----
+ include/hw/ppc/xive.h               | 6 ++----
+ include/hw/s390x/event-facility.h   | 6 ++----
+ include/hw/s390x/s390_flic.h        | 6 ++----
+ include/hw/s390x/sclp.h             | 6 ++----
+ include/hw/sd/sd.h                  | 6 ++----
+ include/hw/ssi/ssi.h                | 6 ++----
+ include/hw/sysbus.h                 | 6 ++----
+ include/hw/virtio/virtio-gpu.h      | 6 ++----
+ include/hw/virtio/virtio-input.h    | 6 ++----
+ include/hw/virtio/virtio-mem.h      | 6 ++----
+ include/hw/virtio/virtio-pmem.h     | 6 ++----
+ include/hw/virtio/virtio-serial.h   | 6 ++----
+ include/hw/xen/xen-bus.h            | 6 ++----
+ include/io/channel.h                | 6 ++----
+ include/io/dns-resolver.h           | 6 ++----
+ include/io/net-listener.h           | 6 ++----
+ include/scsi/pr-manager.h           | 6 ++----
+ include/sysemu/cryptodev.h          | 6 ++----
+ include/sysemu/hostmem.h            | 6 ++----
+ include/sysemu/rng.h                | 6 ++----
+ include/sysemu/tpm_backend.h        | 6 ++----
+ include/sysemu/vhost-user-backend.h | 6 ++----
+ target/alpha/cpu-qom.h              | 6 ++----
+ target/arm/cpu-qom.h                | 6 ++----
+ target/avr/cpu-qom.h                | 6 ++----
+ target/cris/cpu-qom.h               | 6 ++----
+ target/hppa/cpu-qom.h               | 6 ++----
+ target/i386/cpu-qom.h               | 6 ++----
+ target/lm32/cpu-qom.h               | 6 ++----
+ target/m68k/cpu-qom.h               | 6 ++----
+ target/microblaze/cpu-qom.h         | 6 ++----
+ target/mips/cpu-qom.h               | 6 ++----
+ target/moxie/cpu.h                  | 6 ++----
+ target/nios2/cpu.h                  | 6 ++----
+ target/openrisc/cpu.h               | 6 ++----
+ target/ppc/cpu-qom.h                | 6 ++----
+ target/riscv/cpu.h                  | 6 ++----
+ target/s390x/cpu-qom.h              | 6 ++----
+ target/sh4/cpu-qom.h                | 6 ++----
+ target/sparc/cpu-qom.h              | 6 ++----
+ target/tilegx/cpu.h                 | 6 ++----
+ target/tricore/cpu-qom.h            | 6 ++----
+ target/unicore32/cpu-qom.h          | 6 ++----
+ target/xtensa/cpu-qom.h             | 6 ++----
+ backends/dbus-vmstate.c             | 6 ++----
+ ui/input-barrier.c                  | 6 ++----
+ ui/input-linux.c                    | 6 ++----
+ 73 files changed, 146 insertions(+), 292 deletions(-)
 
-diff --git a/scripts/codeconverter/codeconverter/__init__.py b/scripts/codeconverter/codeconverter/__init__.py
-new file mode 100644
-index 0000000000..e69de29bb2
-diff --git a/scripts/codeconverter/codeconverter/patching.py b/scripts/codeconverter/codeconverter/patching.py
-new file mode 100644
-index 0000000000..1c722786d2
---- /dev/null
-+++ b/scripts/codeconverter/codeconverter/patching.py
-@@ -0,0 +1,369 @@
-+from typing import IO, Match, NamedTuple, Optional, Literal, Iterable, Type, Dict, List, Any, TypeVar, NewType, Tuple
-+from itertools import chain
-+from tempfile import NamedTemporaryFile
-+import os
-+import re
-+import subprocess
-+from io import StringIO
-+
-+import logging
-+logger = logging.getLogger(__name__)
-+DBG = logger.debug
-+INFO = logger.info
-+WARN = logger.warning
-+ERROR = logger.error
-+
-+from .utils import *
-+
-+T = TypeVar('T')
-+
-+class Patch(NamedTuple):
-+    # start inside file.original_content
-+    start: int
-+    # end position inside file.original_content
-+    end: int
-+    # replacement string for file.original_content[start:end]
-+    replacement: str
-+
-+IdentifierType = Literal['type', 'symbol', 'include', 'constant']
-+class RequiredIdentifier(NamedTuple):
-+    type: IdentifierType
-+    name: str
-+
-+class FileMatch:
-+    """Base class for regex matches
-+
-+    Subclasses just need to set the `regexp` class attribute
-+    """
-+    regexp: Optional[str] = None
-+
-+    def __init__(self, f: 'FileInfo', m: Match) -> None:
-+        self.file: 'FileInfo' = f
-+        self.match: Match = m
-+
-+    @property
-+    def name(self) -> str:
-+        if 'name' not in self.match.groupdict():
-+            return '[no name]'
-+        return self.group('name')
-+
-+    @classmethod
-+    def compiled_re(klass):
-+        return re.compile(klass.regexp, re.MULTILINE)
-+
-+    def start(self) -> int:
-+        return self.match.start()
-+
-+    def end(self) -> int:
-+        return self.match.end()
-+
-+    def line_col(self) -> LineAndColumn:
-+        return self.file.line_col(self.start())
-+
-+    def group(self, *args):
-+        return self.match.group(*args)
-+
-+    def log(self, level, fmt, *args) -> None:
-+        pos = self.line_col()
-+        logger.log(level, '%s:%d:%d: '+fmt, self.file.filename, pos.line, pos.col, *args)
-+
-+    def warn(self, fmt, *args) -> None:
-+        self.log(logging.WARNING, fmt, *args)
-+
-+    def error(self, fmt, *args) -> None:
-+        self.log(logging.ERROR, fmt, *args)
-+
-+    def sub(self, original: str, replacement: str) -> str:
-+        """Replace content
-+
-+        XXX: this won't use the match position, but will just
-+        replace all strings that look like the original match.
-+        This should be enough for all the patterns used in this
-+        script.
-+        """
-+        return original.replace(self.group(0), replacement)
-+
-+    def sanity_check(self) -> None:
-+        """Sanity check match, and print warnings if necessary"""
-+        pass
-+
-+    def replacement(self) -> Optional[str]:
-+        """Return replacement text for pattern, to use new code conventions"""
-+        return None
-+
-+    def make_patch(self, replacement: str) -> 'Patch':
-+        """Make patch replacing the content of this match"""
-+        return Patch(self.start(), self.end(), replacement)
-+
-+    def make_removal_patch(self) -> 'Patch':
-+        """Make patch removing contents of match completely"""
-+        return self.make_patch('')
-+
-+    def append(self, s: str) -> 'Patch':
-+        """Make patch appending string after this match"""
-+        return Patch(self.end(), self.end(), s)
-+
-+    def prepend(self, s: str) -> 'Patch':
-+        """Make patch prepending string before this match"""
-+        return Patch(self.start(), self.start(), s)
-+
-+    def gen_patches(self) -> Iterable['Patch']:
-+        """Patch source code contents to use new code patterns"""
-+        replacement = self.replacement()
-+        if replacement is not None:
-+            yield self.make_patch(replacement)
-+
-+    @classmethod
-+    def has_replacement_rule(klass) -> bool:
-+        return (klass.gen_patches is not FileMatch.gen_patches
-+                or klass.replacement is not FileMatch.replacement)
-+
-+    def contains(self, other: 'FileMatch') -> bool:
-+        return other.start() >= self.start() and other.end() <= self.end()
-+
-+    def __repr__(self) -> str:
-+        start = self.file.line_col(self.start())
-+        end = self.file.line_col(self.end() - 1)
-+        return '<%s %s at %d:%d-%d:%d: %r>' % (self.__class__.__name__,
-+                                                    self.name,
-+                                                    start.line, start.col,
-+                                                    end.line, end.col, self.group(0)[:100])
-+
-+    def required_identifiers(self) -> Iterable[RequiredIdentifier]:
-+        """Can be implemented by subclasses to keep track of identifier references
-+
-+        This method will be used by the code that moves declarations around the file,
-+        to make sure we find the right spot for them.
-+        """
-+        raise NotImplementedError()
-+
-+    def provided_identifiers(self) -> Iterable[RequiredIdentifier]:
-+        """Can be implemented by subclasses to keep track of identifier references
-+
-+        This method will be used by the code that moves declarations around the file,
-+        to make sure we find the right spot for them.
-+        """
-+        raise NotImplementedError()
-+
-+    @classmethod
-+    def find_matches(klass, content: str) -> Iterable[Match]:
-+        """Generate match objects for class
-+
-+        Might be reimplemented by subclasses if they
-+        intend to look for matches using a different method.
-+        """
-+        return klass.compiled_re().finditer(content)
-+
-+    @property
-+    def allfiles(self) -> 'FileList':
-+        return self.file.allfiles
-+
-+def all_subclasses(c: Type[FileMatch]) -> Iterable[Type[FileMatch]]:
-+    for sc in c.__subclasses__():
-+        yield sc
-+        yield from all_subclasses(sc)
-+
-+def match_class_dict() -> Dict[str, Type[FileMatch]]:
-+    d = dict((t.__name__, t) for t in all_subclasses(FileMatch))
-+    return d
-+
-+def names(matches: Iterable[FileMatch]) -> Iterable[str]:
-+    return [m.name for m in matches]
-+
-+class PatchingError(Exception):
-+    pass
-+
-+class OverLappingPatchesError(PatchingError):
-+    pass
-+
-+def apply_patches(s: str, patches: Iterable[Patch]) -> str:
-+    """Apply a sequence of patches to string
-+
-+    >>> apply_patches('abcdefg', [Patch(2,2,'xxx'), Patch(0, 1, 'yy')])
-+    'yybxxxcdefg'
-+    """
-+    r = StringIO()
-+    last = 0
-+    for p in sorted(patches):
-+        DBG("Applying patch at position %d (%s) - %d (%s): %r", p.start, line_col(s, p.start), p.end, line_col(s, p.end), p.replacement)
-+        if last > p.start:
-+            raise OverLappingPatchesError("Overlapping patch at position %d (%s), last patch at %d (%s)" % \
-+                (p.start, line_col(s, p.start), last, line_col(s, last)))
-+        r.write(s[last:p.start])
-+        r.write(p.replacement)
-+        last = p.end
-+    r.write(s[last:])
-+    return r.getvalue()
-+
-+class RegexpScanner:
-+    def __init__(self) -> None:
-+        self.match_index: Dict[Type[Any], List[FileMatch]] = {}
-+        self.match_name_index: Dict[Tuple[Type[Any], str, str], Optional[FileMatch]] = {}
-+
-+    def _find_matches(self, klass: Type[Any]) -> Iterable[FileMatch]:
-+        raise NotImplementedError()
-+
-+    def matches_of_type(self, t: Type[T]) -> Iterable[T]:
-+        if t not in self.match_index:
-+            self.match_index[t] = list(self._find_matches(t))
-+        return  self.match_index[t] # type: ignore
-+
-+    def find_match(self, t: Type[T], name: str, group: str='name') -> Optional[T]:
-+        indexkey = (t, name, group)
-+        if indexkey in self.match_name_index:
-+            return self.match_name_index[indexkey] # type: ignore
-+        r: Optional[T] = None
-+        for m in self.matches_of_type(t):
-+            assert isinstance(m, FileMatch)
-+            if m.group(group) == name:
-+                r = m # type: ignore
-+        self.match_name_index[indexkey] = r # type: ignore
-+        return r
-+
-+    def reset_index(self) -> None:
-+        self.match_index.clear()
-+        self.match_name_index.clear()
-+
-+class FileInfo(RegexpScanner):
-+    filename: str
-+    original_content: Optional[str] = None
-+
-+    def __init__(self, files: 'FileList', filename:str, force:bool=False) -> None:
-+        super().__init__()
-+        self.allfiles = files
-+        self.filename = filename
-+        self.patches: List[Patch] = []
-+        self.force = force
-+
-+    def __repr__(self) -> str:
-+        return f'<FileInfo {repr(self.filename)}>'
-+
-+    def line_col(self, start: int) -> LineAndColumn:
-+        """Return line and column for a match object inside original_content"""
-+        return line_col(self.original_content, start)
-+
-+    def _find_matches(self, klass: Type[Any]) -> List[FileMatch]:
-+        """Build FileMatch objects for each match of regexp"""
-+        if not hasattr(klass, 'regexp') or klass.regexp is None:
-+            return []
-+        assert hasattr(klass, 'regexp')
-+        DBG("scanning for %s", klass.__name__)
-+        DBG("regexp: %s", klass.regexp)
-+        matches = [klass(self, m) for m in klass.find_matches(self.original_content)]
-+        DBG('%s: %d matches found for %s: %s', self.filename, len(matches),
-+            klass.__name__,' '.join(names(matches)))
-+        return matches
-+
-+    def find_match(self, t: Type[T], name: str, group: str='name') -> Optional[T]:
-+        for m in self.matches_of_type(t):
-+            assert isinstance(m, FileMatch)
-+            if m.group(group) == name:
-+                return m # type: ignore
-+        return None
-+
-+    def reset_content(self, s:str):
-+        self.original_content = s
-+        self.patches.clear()
-+        self.reset_index()
-+        self.allfiles.reset_index()
-+
-+    def load(self) -> None:
-+        if self.original_content is not None:
-+            return
-+        with open(self.filename, 'rt') as f:
-+            self.reset_content(f.read())
-+
-+    @property
-+    def all_matches(self) -> Iterable[FileMatch]:
-+        lists = list(self.match_index.values())
-+        return (m for l in lists
-+                  for m in l)
-+
-+    def scan_for_matches(self, class_names: Optional[List[str]]=None) -> None:
-+        DBG("class names: %r", class_names)
-+        class_dict = match_class_dict()
-+        if class_names is None:
-+            DBG("default class names")
-+            class_names = list(name for name,klass in class_dict.items()
-+                               if klass.has_replacement_rule())
-+        DBG("class_names: %r", class_names)
-+        for cn in class_names:
-+            matches = self.matches_of_type(class_dict[cn])
-+            if len(matches) > 0:
-+                INFO('%s: %d matches found for %s: %s', self.filename,
-+                     len(matches), cn, ' '.join(names(matches)))
-+
-+    def gen_patches(self) -> None:
-+        for m in self.all_matches:
-+            for i,p in enumerate(m.gen_patches()):
-+                DBG("patch %d generated by %r:", i, m)
-+                DBG("replace contents at %s-%s with %r",
-+                    self.line_col(p.start), self.line_col(p.end), p.replacement)
-+                self.patches.append(p)
-+
-+    def patch_content(self, max_passes=0, class_names: Optional[List[str]]=None) -> None:
-+        """Multi-pass content patching loop
-+
-+        We run multiple passes because there are rules that will
-+        delete init functions once they become empty.
-+        """
-+        passes = 0
-+        total_patches  = 0
-+        DBG("max_passes: %r", max_passes)
-+        while not max_passes or max_passes <= 0 or passes < max_passes:
-+            passes += 1
-+            self.scan_for_matches(class_names)
-+            self.gen_patches()
-+            DBG("patch content: pass %d: %d patches generated", passes, len(self.patches))
-+            total_patches += len(self.patches)
-+            if not self.patches:
-+                break
-+            try:
-+                self.apply_patches()
-+            except PatchingError:
-+                logger.exception("%s: failed to patch file", self.filename)
-+        INFO("%s: %d patches applied total in %d passes", self.filename, total_patches, passes)
-+
-+    def apply_patches(self) -> None:
-+        """Replace self.original_content after applying patches from self.patches"""
-+        self.reset_content(self.get_patched_content())
-+
-+    def get_patched_content(self) -> str:
-+        assert self.original_content is not None
-+        return apply_patches(self.original_content, self.patches)
-+
-+    def write_to_file(self, f: IO[str]) -> None:
-+        f.write(self.get_patched_content())
-+
-+    def write_to_filename(self, filename: str) -> None:
-+        with open(filename, 'wt') as of:
-+            self.write_to_file(of)
-+
-+    def patch_inplace(self) -> None:
-+        newfile = self.filename+'changed'
-+        self.write_to_filename(newfile)
-+        os.rename(newfile, self.filename)
-+
-+    def show_diff(self) -> None:
-+        with NamedTemporaryFile('wt') as f:
-+            self.write_to_file(f)
-+            f.flush()
-+            subprocess.call(['diff', '-u', self.filename, f.name])
-+
-+    def ref(self):
-+        return TypeInfoReference
-+
-+class FileList(RegexpScanner):
-+    def __init__(self):
-+        super().__init__()
-+        self.files: List[FileInfo] = []
-+
-+    def extend(self, *args, **kwargs):
-+        self.files.extend(*args, **kwargs)
-+
-+    def __iter__(self):
-+        return iter(self.files)
-+
-+    def _find_matches(self, klass: Type[Any]) -> Iterable[FileMatch]:
-+        return chain(*(f._find_matches(klass) for f in self.files))
-+
-diff --git a/scripts/codeconverter/codeconverter/qom_macros.py b/scripts/codeconverter/codeconverter/qom_macros.py
-new file mode 100644
-index 0000000000..67f1a0b2e5
---- /dev/null
-+++ b/scripts/codeconverter/codeconverter/qom_macros.py
-@@ -0,0 +1,614 @@
-+import re
-+from itertools import chain
-+from typing import *
-+
-+from .regexps import *
-+from .patching import *
-+from .utils import *
-+
-+import logging
-+logger = logging.getLogger(__name__)
-+DBG = logger.debug
-+INFO = logger.info
-+WARN = logger.warning
-+
-+# simple expressions:
-+
-+RE_CONSTANT = OR(RE_STRING, RE_NUMBER)
-+
-+class ConstantDefine(FileMatch):
-+    """Simple #define preprocessor directive for a constant"""
-+    # if the macro contents are very simple, it might be included
-+    # in the match group 'value'
-+    regexp = S(r'^[ \t]*#[ \t]*define', CPP_SPACE, NAMED('name', RE_IDENTIFIER),
-+               CPP_SPACE, NAMED('value', RE_CONSTANT), r'[ \t]*\n')
-+
-+    def provided_identifiers(self) -> Iterable[RequiredIdentifier]:
-+        yield RequiredIdentifier('constant', self.group('name'))
-+
-+class TypeIdentifiers(NamedTuple):
-+    """Type names found in type declarations"""
-+    # TYPE_MYDEVICE
-+    typename: Optional[str]
-+    # MYDEVICE
-+    uppercase: Optional[str] = None
-+    # MyDevice
-+    instancetype: Optional[str] = None
-+    # MyDeviceClass
-+    classtype: Optional[str] = None
-+    # my_device
-+    lowercase: Optional[str] = None
-+
-+    def allfields(self):
-+        return tuple(getattr(self, f) for f in self._fields)
-+
-+    def merge(self, other: 'TypeIdentifiers') -> Optional['TypeIdentifiers']:
-+        """Check if identifiers match, return new identifier with complete list"""
-+        if any(not opt_compare(a, b) for a,b in zip(self, other)):
-+            return None
-+        return TypeIdentifiers(*(merge(a, b) for a,b in zip(self, other)))
-+
-+    def __str__(self) -> str:
-+        values = ((f, getattr(self, f)) for f in self._fields)
-+        s = ', '.join('%s=%s' % (f,v) for f,v in values if v is not None)
-+        return f'{s}'
-+
-+    def check_consistency(self) -> List[str]:
-+        """Check if identifiers are consistent with each other,
-+        return list of problems (or empty list if everything seems consistent)
-+        """
-+        r = []
-+        if self.typename is None:
-+            r.append("typename (TYPE_MYDEVICE) is unavailable")
-+
-+        if self.uppercase is None:
-+            r.append("uppercase name is unavailable")
-+
-+        if (self.instancetype is not None
-+            and self.classtype is not None
-+            and self.classtype != f'{self.instancetype}Class'):
-+                r.append("class typedef %s doesn't match instance typedef %s" %
-+                         (self.classtype, self.instancetype))
-+
-+        if (self.uppercase is not None
-+            and self.typename is not None
-+            and f'TYPE_{self.uppercase}' != self.typename):
-+            r.append("uppercase name (%s) doesn't match type name (%s)" %
-+                     (self.uppercase, self.typename))
-+
-+        return r
-+
-+class TypedefMatch(FileMatch):
-+    """typedef declaration"""
-+    def provided_identifiers(self) -> Iterable[RequiredIdentifier]:
-+        yield RequiredIdentifier('type', self.group('name'))
-+
-+class SimpleTypedefMatch(TypedefMatch):
-+    """Simple typedef declaration
-+    (no replacement rules)"""
-+    regexp = S(r'^[ \t]*typedef', SP,
-+               NAMED('typedef_type', RE_TYPE), SP,
-+               NAMED('name', RE_IDENTIFIER), r'\s*;[ \t]*\n')
-+
-+RE_MACRO_DEFINE = S(r'^[ \t]*#\s*define\s+', NAMED('name', RE_IDENTIFIER),
-+                    r'\s*\(\s*', RE_IDENTIFIER, r'\s*\)', CPP_SPACE)
-+
-+RE_STRUCT_ATTRIBUTE = r'QEMU_PACKED'
-+
-+# This doesn't parse the struct definitions completely, it just assumes
-+# the closing brackets are going to be in an unindented line:
-+RE_FULL_STRUCT = S('struct', SP, M(RE_IDENTIFIER, n='?', name='structname'), SP,
-+                   NAMED('body', r'{\n',
-+                         # acceptable inside the struct body:
-+                         # - lines starting with space or tab
-+                         # - empty lines
-+                         # - preprocessor directives
-+                         # - comments
-+                         OR(r'[ \t][^\n]*\n',
-+                            r'#[^\n]*\n',
-+                            r'\n',
-+                            S(r'[ \t]*', RE_COMMENT, r'[ \t]*\n'),
-+                            repeat='*?'),
-+                         r'}', M(RE_STRUCT_ATTRIBUTE, SP, n='*')))
-+RE_STRUCT_TYPEDEF = S(r'^[ \t]*typedef', SP, RE_FULL_STRUCT, SP,
-+                      NAMED('name', RE_IDENTIFIER), r'\s*;[ \t]*\n')
-+
-+class FullStructTypedefMatch(TypedefMatch):
-+    """typedef struct [SomeStruct] { ...} SomeType
-+    Will be replaced by separate struct declaration + typedef
-+    """
-+    regexp = RE_STRUCT_TYPEDEF
-+
-+    def make_structname(self) -> str:
-+        """Make struct name for struct+typedef split"""
-+        name = self.group('structname')
-+        if not name:
-+            name = self.name
-+        return name
-+
-+    def strip_typedef(self) -> Patch:
-+        """generate patch that will strip typedef from the struct declartion
-+
-+        The caller is responsible for readding the typedef somewhere else.
-+        """
-+        name = self.make_structname()
-+        body = self.group('body')
-+        return self.make_patch(f'struct {name} {body};\n')
-+
-+    def make_simple_typedef(self) -> str:
-+        structname = self.make_structname()
-+        name = self.name
-+        return f'typedef struct {structname} {name};\n'
-+
-+    def move_typedef(self, position) -> Iterator[Patch]:
-+        """Generate patches to move typedef elsewhere"""
-+        yield self.strip_typedef()
-+        yield Patch(position, position, self.make_simple_typedef())
-+
-+    def split_typedef(self) -> Iterator[Patch]:
-+        """Split into struct definition + typedef in-place"""
-+        yield self.strip_typedef()
-+        yield self.append(self.make_simple_typedef())
-+
-+class StructTypedefSplit(FullStructTypedefMatch):
-+    """split struct+typedef declaration"""
-+    def gen_patches(self) -> Iterator[Patch]:
-+        if self.group('structname'):
-+            yield from self.split_typedef()
-+
-+class DuplicatedTypedefs(SimpleTypedefMatch):
-+    """Delete ALL duplicate typedefs (unsafe)"""
-+    def gen_patches(self) -> Iterable[Patch]:
-+        other_td = [td for td in chain(self.file.matches_of_type(SimpleTypedefMatch),
-+                                       self.file.matches_of_type(FullStructTypedefMatch))
-+                    if td.name == self.name]
-+        DBG("other_td: %r", other_td)
-+        if any(td.start() < self.start() for td in other_td):
-+            # patch only if handling the first typedef
-+            return
-+        for td in other_td:
-+            if isinstance(td, SimpleTypedefMatch):
-+                DBG("other td: %r", td.match.groupdict())
-+                if td.group('typedef_type') != self.group('typedef_type'):
-+                    yield td.make_removal_patch()
-+            elif isinstance(td, FullStructTypedefMatch):
-+                DBG("other td: %r", td.match.groupdict())
-+                if self.group('typedef_type') == 'struct '+td.group('structname'):
-+                    yield td.strip_typedef()
-+
-+class QOMDuplicatedTypedefs(DuplicatedTypedefs):
-+    """Delete duplicate typedefs if used by QOM type"""
-+    def gen_patches(self) -> Iterable[Patch]:
-+        qom_macros = [TypeCheckMacro, DeclareInstanceChecker, DeclareClassCheckers, DeclareObjCheckers]
-+        qom_matches = chain(*(self.file.matches_of_type(t) for t in qom_macros))
-+        in_use = any(RequiredIdentifier('type', self.name) in m.required_identifiers()
-+                     for m in qom_matches)
-+        if in_use:
-+            yield from DuplicatedTypedefs.gen_patches(self)
-+
-+class QOMStructTypedefSplit(FullStructTypedefMatch):
-+    """split struct+typedef declaration if used by QOM type"""
-+    def gen_patches(self) -> Iterator[Patch]:
-+        qom_macros = [TypeCheckMacro, DeclareInstanceChecker, DeclareClassCheckers, DeclareObjCheckers]
-+        qom_matches = chain(*(self.file.matches_of_type(t) for t in qom_macros))
-+        in_use = any(RequiredIdentifier('type', self.name) in m.required_identifiers()
-+                     for m in qom_matches)
-+        if in_use:
-+            yield from self.split_typedef()
-+
-+def typedefs(file: FileInfo) -> Iterable[TypedefMatch]:
-+    return (cast(TypedefMatch, m)
-+            for m in chain(file.matches_of_type(SimpleTypedefMatch),
-+                           file.matches_of_type(FullStructTypedefMatch)))
-+
-+def find_typedef(f: FileInfo, name: Optional[str]) -> Optional[TypedefMatch]:
-+    if not name:
-+        return None
-+    for td in typedefs(f):
-+        if td.name == name:
-+            return td
-+    return None
-+
-+CHECKER_MACROS = ['OBJECT_CHECK', 'OBJECT_CLASS_CHECK', 'OBJECT_GET_CLASS']
-+CheckerMacroName = Literal['OBJECT_CHECK', 'OBJECT_CLASS_CHECK', 'OBJECT_GET_CLASS']
-+
-+RE_CHECK_MACRO = \
-+    S(RE_MACRO_DEFINE,
-+      OR(*CHECKER_MACROS, name='checker'),
-+      M(r'\s*\(\s*', OR(NAMED('typedefname', RE_IDENTIFIER), RE_TYPE, name='c_type'), r'\s*,', CPP_SPACE,
-+        OPTIONAL_PARS(RE_IDENTIFIER), r',', CPP_SPACE,
-+        NAMED('qom_typename', RE_IDENTIFIER), r'\s*\)\n',
-+        n='?', name='check_args'))
-+
-+EXPECTED_CHECKER_SUFFIXES: List[Tuple[CheckerMacroName, str]] = [
-+    ('OBJECT_GET_CLASS', '_GET_CLASS'),
-+    ('OBJECT_CLASS_CHECK', '_CLASS'),
-+]
-+
-+class TypeCheckMacro(FileMatch):
-+    """OBJECT_CHECK/OBJECT_CLASS_CHECK/OBJECT_GET_CLASS macro definitions
-+    Will be replaced by DECLARE_*_CHECKERS macro
-+    """
-+    #TODO: handle and convert INTERFACE_CHECK macros
-+    regexp = RE_CHECK_MACRO
-+
-+    @property
-+    def checker(self) -> CheckerMacroName:
-+        """Name of checker macro being used"""
-+        return self.group('checker')
-+
-+    @property
-+    def typedefname(self) -> Optional[str]:
-+        return self.group('typedefname')
-+
-+    def find_typedef(self) -> Optional[TypedefMatch]:
-+        return find_typedef(self.file, self.typedefname)
-+
-+    def sanity_check(self) -> None:
-+        DBG("groups: %r", self.match.groups())
-+        if not self.group('check_args'):
-+            self.warn("type check macro not parsed completely: %s", self.name)
-+            return
-+        DBG("type identifiers: %r", self.type_identifiers)
-+        if self.typedefname and self.find_typedef() is None:
-+            self.warn("typedef used by %s not found", self.name)
-+
-+    def find_matching_macros(self) -> List['TypeCheckMacro']:
-+        """Find other check macros that generate the same macro names
-+
-+        The returned list will always be sorted.
-+        """
-+        my_ids = self.type_identifiers
-+        assert my_ids
-+        return [m for m in self.file.matches_of_type(TypeCheckMacro)
-+                if m.type_identifiers is not None
-+                   and my_ids.uppercase is not None
-+                   and (my_ids.uppercase == m.type_identifiers.uppercase
-+                        or my_ids.typename == m.type_identifiers.typename)]
-+
-+    def merge_ids(self, matches: List['TypeCheckMacro']) -> Optional[TypeIdentifiers]:
-+        """Try to merge info about type identifiers from all matches in a list"""
-+        if not matches:
-+            return None
-+        r = matches[0].type_identifiers
-+        if r is None:
-+            return None
-+        for m in matches[1:]:
-+            assert m.type_identifiers
-+            new = r.merge(m.type_identifiers)
-+            if new is None:
-+                self.warn("macro %s identifiers (%s) don't match macro %s (%s)",
-+                          matches[0].name, r, m.name, m.type_identifiers)
-+                return None
-+            r = new
-+        return r
-+
-+    def required_identifiers(self) -> Iterable[RequiredIdentifier]:
-+        yield RequiredIdentifier('include', '"qom/object.h"')
-+        if self.type_identifiers is None:
-+            return
-+        # to make sure typedefs will be moved above all related macros,
-+        # return dependencies from all of them, not just this match
-+        for m in self.find_matching_macros():
-+            yield RequiredIdentifier('type', m.group('c_type'))
-+            yield RequiredIdentifier('constant', m.group('qom_typename'))
-+
-+    @property
-+    def type_identifiers(self) -> Optional[TypeIdentifiers]:
-+        """Extract type identifier information from match"""
-+        typename = self.group('qom_typename')
-+        c_type = self.group('c_type')
-+        if not typename or not c_type:
-+            return None
-+        typedef = self.group('typedefname')
-+        classtype = None
-+        instancetype = None
-+        uppercase = None
-+        expected_suffix = dict(EXPECTED_CHECKER_SUFFIXES).get(self.checker)
-+
-+        # here the available data depends on the checker macro being called:
-+        # - we need to remove the suffix from the macro name
-+        # - depending on the macro type, we know the class type name, or
-+        #   the instance type name
-+        if self.checker in ('OBJECT_GET_CLASS', 'OBJECT_CLASS_CHECK'):
-+            classtype = c_type
-+        elif self.checker == 'OBJECT_CHECK':
-+            instancetype = c_type
-+            uppercase = self.name
-+        else:
-+            assert False
-+        if expected_suffix and self.name.endswith(expected_suffix):
-+            uppercase = self.name[:-len(expected_suffix)]
-+        return TypeIdentifiers(typename=typename, classtype=classtype,
-+                               instancetype=instancetype, uppercase=uppercase)
-+
-+    def gen_patches(self) -> Iterable[Patch]:
-+        if self.type_identifiers is None:
-+            self.warn("couldn't extract type information from macro %s", self.name)
-+            return
-+
-+        if self.name == 'INTERFACE_CLASS':
-+            # INTERFACE_CLASS is special and won't be patched
-+            return
-+
-+        for checker,suffix in EXPECTED_CHECKER_SUFFIXES:
-+            if self.name.endswith(suffix):
-+                if self.checker != checker:
-+                    self.warn("macro %s is using macro %s instead of %s", self.name, self.checker, checker)
-+                    return
-+                break
-+
-+        matches = self.find_matching_macros()
-+        DBG("found %d matching macros: %s", len(matches), ' '.join(m.name for m in matches))
-+        # we will generate patches only when processing the first macro:
-+        if matches[0].start != self.start:
-+            DBG("skipping %s (will patch when handling %s)", self.name, matches[0].name)
-+            return
-+
-+
-+        ids = self.merge_ids(matches)
-+        if ids is None:
-+            DBG("type identifier mismatch, won't patch %s", self.name)
-+            return
-+
-+        if not ids.uppercase:
-+            self.warn("macro %s doesn't follow the expected name pattern", self.name)
-+            return
-+        if not ids.typename:
-+            self.warn("macro %s: couldn't extract type name", self.name)
-+            return
-+
-+        #issues = ids.check_consistency()
-+        #if issues:
-+        #    for i in issues:
-+        #        self.warn("inconsistent identifiers: %s", i)
-+
-+        names = [n for n in (ids.instancetype, ids.classtype, ids.uppercase, ids.typename)
-+                 if n is not None]
-+        if len(set(names)) != len(names):
-+            self.warn("duplicate names used by macro: %r", ids)
-+            return
-+
-+        assert ids.classtype or ids.instancetype
-+        assert ids.typename
-+        assert ids.uppercase
-+        if ids.classtype and ids.instancetype:
-+            new_decl = (f'DECLARE_OBJ_CHECKERS({ids.instancetype}, {ids.classtype},\n'
-+                        f'                     {ids.uppercase}, {ids.typename})\n')
-+        elif ids.classtype:
-+            new_decl = (f'DECLARE_CLASS_CHECKERS({ids.classtype}, {ids.uppercase},\n'
-+                        f'                       {ids.typename})\n')
-+        elif ids.instancetype:
-+            new_decl = (f'DECLARE_INSTANCE_CHECKER({ids.instancetype}, {ids.uppercase},\n'
-+                        f'                         {ids.typename})\n')
-+        else:
-+            assert False
-+
-+        # we need to ensure the typedefs are already available
-+        ok = True
-+        for t in [ids.instancetype, ids.classtype]:
-+            if not t:
-+                continue
-+            td = find_typedef(self.file, t)
-+            if not td:
-+                self.warn("couldn't find typedef %s", t)
-+                ok = False
-+            elif td.start() > self.start():
-+                self.warn("typedef %s need to be moved earlier in the file", td.name)
-+                ok = False
-+
-+        if not ok and not self.file.force:
-+            return
-+
-+        # delete all matching macros and add new declaration:
-+        for m in matches:
-+            yield m.make_patch('')
-+        yield self.append(new_decl)
-+
-+class DeclareInstanceChecker(FileMatch):
-+    """DECLARE_INSTANCE_CHECKER use
-+    Will be replaced with DECLARE_OBJ_CHECKERS if possible
-+    """
-+    #TODO: replace lonely DECLARE_INSTANCE_CHECKER with DECLARE_OBJ_CHECKERS
-+    #      if all types are found.
-+    #      This will require looking up the correct class type in the TypeInfo
-+    #      structs in another file
-+    regexp = S(r'^[ \t]*DECLARE_INSTANCE_CHECKER\s*\(\s*',
-+               NAMED('instancetype', RE_IDENTIFIER), r'\s*,\s*',
-+               NAMED('uppercase', RE_IDENTIFIER), r'\s*,\s*',
-+               NAMED('typename', RE_IDENTIFIER), SP,
-+               r'\)[ \t]*;?[ \t]*\n')
-+
-+    def required_identifiers(self) -> Iterable[RequiredIdentifier]:
-+        yield RequiredIdentifier('include', '"qom/object.h"')
-+        yield RequiredIdentifier('constant', self.group('typename'))
-+        yield RequiredIdentifier('type', self.group('instancetype'))
-+
-+class DeclareClassCheckers(FileMatch):
-+    """DECLARE_INSTANCE_CHECKER use"""
-+    regexp = S(r'^[ \t]*DECLARE_CLASS_CHECKERS\s*\(\s*',
-+               NAMED('classtype', RE_IDENTIFIER), r'\s*,\s*',
-+               NAMED('uppercase', RE_IDENTIFIER), r'\s*,\s*',
-+               NAMED('typename', RE_IDENTIFIER), SP,
-+               r'\)[ \t]*;?[ \t]*\n')
-+
-+    def required_identifiers(self) -> Iterable[RequiredIdentifier]:
-+        yield RequiredIdentifier('include', '"qom/object.h"')
-+        yield RequiredIdentifier('constant', self.group('typename'))
-+        yield RequiredIdentifier('type', self.group('classtype'))
-+
-+class DeclareObjCheckers(FileMatch):
-+    """DECLARE_OBJ_CHECKERS use
-+    Will be replaced with OBJECT_DECLARE_TYPE if possible
-+    """
-+    #TODO: detect when OBJECT_DECLARE_SIMPLE_TYPE can be used
-+    regexp = S(r'^[ \t]*DECLARE_OBJ_CHECKERS\s*\(\s*',
-+               NAMED('instancetype', RE_IDENTIFIER), r'\s*,\s*',
-+               NAMED('classtype', RE_IDENTIFIER), r'\s*,\s*',
-+               NAMED('uppercase', RE_IDENTIFIER), r'\s*,\s*',
-+               NAMED('typename', RE_IDENTIFIER), SP,
-+               r'\)[ \t]*;?[ \t]*\n')
-+
-+    def required_identifiers(self) -> Iterable[RequiredIdentifier]:
-+        yield RequiredIdentifier('include', '"qom/object.h"')
-+        yield RequiredIdentifier('constant', self.group('typename'))
-+        yield RequiredIdentifier('type', self.group('classtype'))
-+        yield RequiredIdentifier('type', self.group('instancetype'))
-+
-+    def gen_patches(self):
-+        ids = TypeIdentifiers(uppercase=self.group('uppercase'),
-+                              typename=self.group('typename'),
-+                              classtype=self.group('classtype'),
-+                              instancetype=self.group('instancetype'))
-+        issues = ids.check_consistency()
-+        if issues:
-+            for i in issues:
-+                self.warn("inconsistent identifiers: %s", i)
-+            return
-+
-+        if self.group('typename') != 'TYPE_'+self.group('uppercase'):
-+            self.warn("type %s mismatch with uppercase name %s", ids.typename, ids.uppercase)
-+            return
-+
-+        typedefs = [(t,self.file.find_match(SimpleTypedefMatch, t))
-+                    for t in (ids.instancetype, ids.classtype)]
-+        for t,td in typedefs:
-+            if td is None:
-+                self.warn("typedef %s not found", t)
-+                break
-+            if td.start() > self.start():
-+                self.warn("typedef %s needs to be move earlier in the file", t)
-+                break
-+            #HACK: check if typedef is used between its definition and the macro
-+            #TODO: check if the only match is inside the "struct { ... }" declaration
-+            if re.search(r'\b'+t+r'\b', self.file.original_content[td.end():self.start()]):
-+                self.warn("typedef %s can't be moved, it is used before the macro", t)
-+                break
-+        else:
-+            for t,td in typedefs:
-+                yield td.make_removal_patch()
-+
-+            lowercase = ids.uppercase.lower()
-+            # all is OK, we can replace the macro!
-+            c = (f'OBJECT_DECLARE_TYPE({ids.instancetype}, {ids.classtype},\n'
-+                 f'                    {lowercase}, {ids.uppercase})\n')
-+            yield self.make_patch(c)
-+
-+class TrivialClassStruct(FileMatch):
-+    """Trivial class struct"""
-+    regexp = S(r'^[ \t]*struct\s*', NAMED('name', RE_IDENTIFIER),
-+               r'\s*{\s*', NAMED('parent_struct', RE_IDENTIFIER), r'\s*parent(_class)?\s*;\s*};\n')
-+
-+class ObjectDeclareType(FileMatch):
-+    """OBJECT_DECLARE_TYPE usage
-+    Will be replaced with OBJECT_DECLARE_SIMPLE_TYPE if possible
-+    """
-+    regexp = S(r'^[ \t]*OBJECT_DECLARE_TYPE\s*\(',
-+               NAMED('instancetype', RE_IDENTIFIER), r'\s*,\s*',
-+               NAMED('classtype', RE_IDENTIFIER), r'\s*,\s*',
-+               NAMED('lowercase', RE_IDENTIFIER), r'\s*,\s*',
-+               NAMED('uppercase', RE_IDENTIFIER), SP,
-+               r'\)[ \t]*;?[ \t]*\n')
-+
-+    def gen_patches(self):
-+        DBG("groups: %r", self.match.groupdict())
-+        trivial_struct = self.file.find_match(TrivialClassStruct, self.group('classtype'))
-+        if trivial_struct:
-+            d = self.match.groupdict().copy()
-+            d['parent_struct'] = trivial_struct.group("parent_struct")
-+            yield trivial_struct.make_removal_patch()
-+            c = ("OBJECT_DECLARE_SIMPLE_TYPE(%(instancetype)s, %(lowercase)s,\n"
-+                 "                           %(uppercase)s, %(parent_struct)s)\n" % d)
-+            yield self.make_patch(c)
-+
-+class Include(FileMatch):
-+    """#include directive"""
-+    regexp = RE_INCLUDE
-+    def provided_identifiers(self) -> Iterable[RequiredIdentifier]:
-+        yield RequiredIdentifier('include', self.group('includepath'))
-+
-+class InitialIncludes(FileMatch):
-+    """Initial #include block"""
-+    regexp = S(RE_FILE_BEGIN,
-+               M(SP, RE_COMMENTS,
-+                 r'^[ \t]*#[ \t]*ifndef[ \t]+', RE_IDENTIFIER, r'[ \t]*\n',
-+                 n='?', name='ifndef_block'),
-+               M(SP, RE_COMMENTS,
-+                 OR(RE_INCLUDE, RE_SIMPLEDEFINE),
-+                 n='*', name='includes'))
-+
-+class SymbolUserList(NamedTuple):
-+    definitions: List[FileMatch]
-+    users: List[FileMatch]
-+
-+class MoveSymbols(FileMatch):
-+    """Handle missing symbols
-+    - Move typedefs and defines when necessary
-+    - Add missing #include lines when necessary
-+    """
-+    regexp = RE_FILE_BEGIN
-+
-+    def gen_patches(self) -> Iterator[Patch]:
-+        index: Dict[RequiredIdentifier, SymbolUserList] = {}
-+        definition_classes = [SimpleTypedefMatch, FullStructTypedefMatch, ConstantDefine, Include]
-+        user_classes = [TypeCheckMacro, DeclareObjCheckers, DeclareInstanceChecker, DeclareClassCheckers]
-+
-+        # first we scan for all symbol definitions and usage:
-+        for dc in definition_classes:
-+            defs = self.file.matches_of_type(dc)
-+            for d in defs:
-+                DBG("scanning %r", d)
-+                for i in d.provided_identifiers():
-+                    index.setdefault(i, SymbolUserList([], [])).definitions.append(d)
-+        DBG("index: %r", list(index.keys()))
-+        for uc in user_classes:
-+            users = self.file.matches_of_type(uc)
-+            for u in users:
-+                for i in u.required_identifiers():
-+                    index.setdefault(i, SymbolUserList([], [])).users.append(u)
-+
-+        # validate all symbols:
-+        for i,ul in index.items():
-+            if not ul.users:
-+                # unused symbol
-+                continue
-+
-+            # symbol not defined
-+            if len(ul.definitions) == 0:
-+                if i.type == 'include':
-+                   includes, = self.file.matches_of_type(InitialIncludes)
-+                   yield includes.append(f'#include {i.name}\n')
-+                else:
-+                    u.warn("definition of %s %s not found in file", i.type, i.name)
-+                continue
-+
-+            # symbol defined twice:
-+            if len(ul.definitions) > 1:
-+                ul.definitions[1].warn("%s defined twice", i.name)
-+                ul.definitions[0].warn("previously defined here")
-+                continue
-+
-+            # symbol defined.  check if all users are after its definition:
-+            assert len(ul.definitions) == 1
-+            definition = ul.definitions[0]
-+            DBG("handling repositioning of %r", definition)
-+            earliest = min(ul.users, key=lambda u: u.start())
-+            if earliest.start() > definition.start():
-+                DBG("%r is OK", definition)
-+                continue
-+
-+            DBG("%r needs to be moved", definition)
-+            if isinstance(definition, SimpleTypedefMatch) \
-+               or isinstance(definition, ConstantDefine):
-+                # simple typedef or define can be moved directly:
-+                yield definition.make_removal_patch()
-+                yield earliest.prepend(definition.group(0))
-+            elif isinstance(definition, FullStructTypedefMatch) \
-+                 and definition.group('structname'):
-+                # full struct typedef is more complex: we need to remove
-+                # the typedef
-+                yield from definition.move_typedef(earliest.start())
-+            else:
-+                definition.warn("definition of %s %s needs to be moved earlier in the file", i.type, i.name)
-+                earliest.warn("definition of %s %s is used here", i.type, i.name)
-+
-diff --git a/scripts/codeconverter/codeconverter/qom_type_info.py b/scripts/codeconverter/codeconverter/qom_type_info.py
-new file mode 100644
-index 0000000000..a2afc0d928
---- /dev/null
-+++ b/scripts/codeconverter/codeconverter/qom_type_info.py
-@@ -0,0 +1,314 @@
-+from .regexps import *
-+from .patching import *
-+from .utils import *
-+from .qom_macros import *
-+
-+RE_SIMPLE_VALUE = OR(RE_IDENTIFIER, RE_STRING, RE_NUMBER)
-+
-+RE_FUN_CALL = S(RE_IDENTIFIER, r'\s*\(\s*', RE_SIMPLE_VALUE, r'\s*\)')
-+RE_SIZEOF = S(r'sizeof\s*\(\s*', NAMED('sizeoftype', RE_TYPE), r'\s*\)')
-+
-+RE_ADDRESS = S(r'&\s*', RE_IDENTIFIER)
-+
-+RE_ARRAY_ITEM = S(r'{\s*', NAMED('arrayitem', M(RE_SIMPLE_VALUE, n='?')), r'\s*}\s*,?')
-+RE_ARRAY_CAST = S(r'\(\s*', RE_IDENTIFIER, r'\s*\[\s*\]\)')
-+RE_ARRAY_ITEMS = M(S(RE_ARRAY_ITEM, SP))
-+RE_ARRAY = S(M(RE_ARRAY_CAST, n='?'), r'\s*{\s*',
-+             NAMED('arrayitems', RE_ARRAY_ITEMS),
-+             r'}')
-+
-+RE_MACRO_CONCAT = M(S(OR(RE_IDENTIFIER, RE_STRING), SP), n='{2,}')
-+
-+# NOTE: this covers a very small subset of valid expressions
-+
-+RE_EXPRESSION = OR(RE_FUN_CALL, RE_SIMPLE_VALUE, RE_ARRAY, RE_SIZEOF,
-+                   RE_ADDRESS, RE_MACRO_CONCAT)
-+
-+TI_FIELDS = [ 'name', 'parent', 'abstract', 'interfaces',
-+    'instance_size', 'instance_init', 'instance_post_init', 'instance_finalize',
-+    'class_size', 'class_init', 'class_base_init', 'class_data']
-+
-+RE_TI_FIELD_NAME = OR(*TI_FIELDS)
-+
-+RE_TI_FIELD_INIT = S(NAMED('comments', RE_COMMENTS),
-+                     r'\.', NAMED('field', RE_TI_FIELD_NAME), r'\s*=\s*',
-+                     NAMED('value', RE_EXPRESSION), r'\s*,?')
-+RE_TI_FIELDS = M(S(RE_TI_FIELD_INIT, SP))
-+
-+RE_TYPEINFO_START = S(r'^[ \t]*', M(r'(static|const)\s+', name='modifiers'), r'TypeInfo\s+',
-+                      NAMED('name', RE_IDENTIFIER), r'\s*=\s*{')
-+RE_TYPEINFO_DEF = S(RE_TYPEINFO_START,
-+                    M(SP, NAMED('fields', RE_TI_FIELDS),
-+                      NAMED('endcomments', RE_COMMENTS),
-+                      r'^};?\n',
-+                      n='?', name='fullspec'))
-+
-+ParsedArray = List[str]
-+ParsedInitializerValue = Union[str, ParsedArray]
-+class InitializerValue(NamedTuple):
-+    raw: str
-+    parsed: Optional[ParsedInitializerValue]
-+TypeInfoInitializers = Dict[str, InitializerValue]
-+
-+def parse_array(m: Match) -> ParsedArray:
-+    #DBG('parse_array: %r', m.group(0))
-+    return [m.group('arrayitem') for m in re.finditer(RE_ARRAY_ITEM, m.group('arrayitems'))]
-+
-+def parse_initializer_value(s) -> InitializerValue:
-+    parsed: Optional[ParsedInitializerValue] = None
-+    if m := re.match(RE_ARRAY, s):
-+        assert m is not None
-+        parsed = parse_array(m)
-+    return InitializerValue(s, parsed)
-+
-+class TypeInfoVar(FileMatch):
-+    """TypeInfo variable declaration with initializer
-+    Will be replaced by OBJECT_DEFINE_TYPE* macro
-+    (not implemented yet)
-+    """
-+    regexp = RE_TYPEINFO_DEF
-+
-+    @property
-+    def initializers(self) -> Optional[TypeInfoInitializers]:
-+        if getattr(self, '_inititalizers', None):
-+            self._initializers: TypeInfoInitializers
-+            return self._initializers
-+        fields = self.group('fields')
-+        if fields is None:
-+            return None
-+        d = dict((fm.group('field'), parse_initializer_value(fm.group('value')))
-+                  for fm in re.finditer(RE_TI_FIELD_INIT, fields))
-+        self._initializers = d
-+        return d
-+
-+    def is_static(self) -> bool:
-+        return 'static' in self.group('modifiers')
-+
-+    def is_full(self) -> bool:
-+        return bool(self.group('fullspec'))
-+
-+    def get_initializers(self) -> TypeInfoInitializers:
-+        """Helper for code that needs to deal with missing initializer info"""
-+        if self.initializers is None:
-+            return {}
-+        return self.initializers
-+
-+    def get_initializer_value(self, field: str) -> InitializerValue:
-+        return self.get_initializers().get(field, InitializerValue('', ''))
-+
-+    def extract_identifiers(self) -> Optional[TypeIdentifiers]:
-+        """Try to extract identifiers from names being used"""
-+        DBG("extracting idenfiers from %s", self.name)
-+        values = self.initializers
-+        if values is None:
-+            return None
-+        if 'name' not in values:
-+            self.warn("name not set in TypeInfo variable %s", self.name)
-+            return None
-+        typename = values['name'].raw
-+        uppercase = None
-+        if typename and re.fullmatch(RE_IDENTIFIER, typename) and typename.startswith("TYPE_"):
-+            uppercase = typename[len('TYPE_'):]
-+        lowercase = None
-+        funcs = set()
-+        prefixes = set()
-+        for field,suffix in [('instance_init', '_init'),
-+                             ('instance_finalize', '_finalize'),
-+                             ('class_init', '_class_init')]:
-+            if field not in values:
-+                continue
-+            func = values[field].raw
-+            funcs.add(func)
-+            if func.endswith(suffix):
-+                prefixes.add(func[:-len(suffix)])
-+            else:
-+                self.warn("function name %s doesn't have expected %s suffix",
-+                          func, suffix)
-+        if len(prefixes) == 1:
-+            lowercase = prefixes.pop()
-+        elif len(prefixes) > 1:
-+            self.warn("inconsistent function names: %s", ' '.join(funcs))
-+
-+        instancetype = None
-+        if 'instance_size' in values:
-+            m = re.fullmatch(RE_SIZEOF, values['instance_size'].raw)
-+            if m:
-+                instancetype = m.group('sizeoftype')
-+        classtype = None
-+        if 'class_size' in values:
-+            m = re.fullmatch(RE_SIZEOF, values['class_size'].raw)
-+            if m:
-+                classtype = m.group('sizeoftype')
-+        #.parent = TYPE_##PARENT_MODULE_OBJ_NAME, \
-+        return TypeIdentifiers(typename=typename,
-+                               uppercase=uppercase, lowercase=lowercase,
-+                               instancetype=instancetype, classtype=classtype)
-+
-+    def append_field(self, field, value) -> Patch:
-+        """Generate patch appending a field initializer"""
-+        content = f'    .{field} = {value},\n'
-+        return Patch(self.match.end('fields'), self.match.end('fields'),
-+                     content)
-+
-+    #def gen_patches(self) -> Iterable[Patch]:
-+    #    basic_fields = { 'parent', 'name',
-+    #                    'instance_size', 'instance_init', 'instance_finalize',
-+    #                    'class_size', 'class_init', }
-+    #    if fields == basic_fields:
-+    #        yield self.make_patch(f'// CAN PATCH: {self.name}\n')
-+
-+class TypeInfoVarInitFuncs(TypeInfoVar):
-+    """TypeInfo variable
-+    Will create missing init functions
-+    """
-+    def gen_patches(self) -> Iterable[Patch]:
-+        values = self.initializers
-+        if values is None:
-+            self.warn("type not parsed completely: %s", self.name)
-+            return
-+
-+        macro = self.file.find_match(TypeInfoVar, self.name)
-+        if macro is None:
-+            self.warn("No TYPE_INFO macro for %s", self.name)
-+            return
-+
-+        ids = self.extract_identifiers()
-+        if ids is None:
-+            return
-+
-+        DBG("identifiers extracted: %r", ids)
-+        fields = set(values.keys())
-+        if ids.lowercase:
-+            if 'instance_init' not in fields:
-+                yield self.prepend(('static void %s_init(Object *obj)\n'
-+                                    '{\n'
-+                                    '}\n\n') % (ids.lowercase))
-+                yield self.append_field('instance_init', ids.lowercase+'_init')
-+
-+            if 'instance_finalize' not in fields:
-+                yield self.prepend(('static void %s_finalize(Object *obj)\n'
-+                                    '{\n'
-+                                    '}\n\n') % (ids.lowercase))
-+                yield self.append_field('instance_finalize', ids.lowercase+'_finalize')
-+
-+
-+            if 'class_init' not in fields:
-+                yield self.prepend(('static void %s_class_init(ObjectClass *oc, void *data)\n'
-+                                    '{\n'
-+                                    '}\n\n') % (ids.lowercase))
-+                yield self.append_field('class_init', ids.lowercase+'_class_init')
-+
-+class TypeInitMacro(FileMatch):
-+    """type_info(...) macro use
-+    Will be deleted if function is empty
-+    """
-+    regexp = S(r'^[ \t]*type_init\(\s*', NAMED('name', RE_IDENTIFIER), r'\s*\);?[ \t]*\n')
-+    def gen_patches(self) -> Iterable[Patch]:
-+        fn = self.file.find_match(StaticVoidFunction, self.name)
-+        DBG("function for %s: %s", self.name, fn)
-+        if fn and fn.body == '':
-+            yield fn.make_patch('')
-+            yield self.make_patch('')
-+
-+class StaticVoidFunction(FileMatch):
-+    """simple static void function
-+    (no replacement rules)
-+    """
-+    #NOTE: just like RE_FULL_STRUCT, this doesn't parse any of the body contents
-+    #      of the function.  Tt will just look for "}" in the beginning of a line
-+    regexp = S(r'static\s+void\s+', NAMED('name', RE_IDENTIFIER), r'\s*\(\s*void\s*\)\n',
-+               r'{\n',
-+               NAMED('body',
-+                     # acceptable inside the function body:
-+                     # - lines starting with space or tab
-+                     # - empty lines
-+                     # - preprocessor directives
-+                     r'([ \t][^\n]*\n|#[^\n]*\n|\n)*?'),
-+               r'}\n')
-+
-+    @property
-+    def body(self) -> str:
-+        return self.group('body')
-+
-+class TypeRegisterCall(FileMatch):
-+    """type_register_static() call
-+    Will be replaced by TYPE_INFO() macro
-+    """
-+    regexp = S(r'^[ \t]*type_register_static\(&\s*', NAMED('name', RE_IDENTIFIER), r'\s*\);[ \t]*\n')
-+
-+    def function(self) -> Optional['StaticVoidFunction']:
-+        """Return function containing this call"""
-+        for m in self.file.matches_of_type(StaticVoidFunction):
-+            if m.contains(self):
-+                return m
-+        return None
-+
-+    def gen_patches(self) -> Iterable[Patch]:
-+        fn = self.function()
-+        if fn is None:
-+            self.warn("can't find function where type_register_static(&%s) is called", self.name)
-+            return
-+
-+        type_init = self.file.find_match(TypeInitMacro, fn.name)
-+        if type_init is None:
-+            self.warn("can't find type_init(%s) line", self.name)
-+            return
-+
-+        var = self.file.find_match(TypeInfoVar, self.name)
-+        if var is None:
-+            self.warn("can't find TypeInfo var declaration for %s", self.name)
-+            return
-+
-+        if not var.is_full():
-+            self.warn("variable declaration %s wasn't parsed fully", var.name)
-+            return
-+
-+        if fn.contains(var):
-+            self.warn("TypeInfo %s variable is inside a function", self.name)
-+            return
-+
-+        # delete type_register_static() call:
-+        yield self.make_patch('')
-+        # append TYPE_REGISTER(...) after variable declaration:
-+        yield var.append(f'TYPE_INFO({self.name})\n')
-+
-+class TypeInfoMacro(FileMatch):
-+    """TYPE_INFO macro usage"""
-+    regexp = S(r'^[ \t]*TYPE_INFO\s*\(\s*', NAMED('name', RE_IDENTIFIER), r'\s*\)[ \t]*;?[ \t]*\n')
-+
-+class CreateClassStruct(DeclareInstanceChecker):
-+    """Replace DECLARE_INSTANCE_CHECKER with OBJECT_DECLARE_SIMPLE_TYPE"""
-+    def gen_patches(self) -> Iterable[Patch]:
-+        typename = self.group('typename')
-+        DBG("looking for TypeInfo variable for %s", typename)
-+        ti = [ti for ti in self.allfiles.matches_of_type(TypeInfoVar)
-+              if ti.get_initializer_value('name').raw == typename]
-+        DBG("type info vars: %r", ti)
-+        if len(ti) > 1:
-+            self.warn("multiple TypeInfo vars found for %s", typename)
-+            return
-+        if len(ti) == 0:
-+            self.warn("no TypeInfo var found for %s", typename)
-+            return
-+        var = ti[0]
-+        assert var.initializers
-+        if 'class_size' in var.initializers:
-+            self.warn("class size already set for TypeInfo %s", var.name)
-+            return
-+        classtype = self.group('instancetype')+'Class'
-+        return
-+        yield
-+        #TODO: need to find out what's the parent class type...
-+        #yield var.append_field('class_size', f'sizeof({classtype})')
-+        #c = (f'OBJECT_DECLARE_SIMPLE_TYPE({instancetype}, {lowercase},\n'
-+        #     f'                           MODULE_OBJ_NAME, ParentClassType)\n')
-+        #yield self.make_patch(c)
-+
-+def type_infos(file: FileInfo) -> Iterable[TypeInfoVar]:
-+    return file.matches_of_type(TypeInfoVar)
-+
-+def full_types(file: FileInfo) -> Iterable[TypeInfoVar]:
-+    return [t for t in type_infos(file) if t.is_full()]
-+
-+def partial_types(file: FileInfo) -> Iterable[TypeInfoVar]:
-+    return [t for t in type_infos(file) if not t.is_full()]
-diff --git a/scripts/codeconverter/codeconverter/regexps.py b/scripts/codeconverter/codeconverter/regexps.py
-new file mode 100644
-index 0000000000..1f7f6d036a
---- /dev/null
-+++ b/scripts/codeconverter/codeconverter/regexps.py
-@@ -0,0 +1,89 @@
-+"""Helpers for creation of regular expressions"""
-+import re
-+
-+import logging
-+logger = logging.getLogger(__name__)
-+DBG = logger.debug
-+INFO = logger.info
-+WARN = logger.warning
-+
-+def S(*regexps) -> str:
-+    """Just a shortcut to concatenate multiple regexps more easily"""
-+    return ''.join(regexps)
-+
-+def P(*regexps, name=None, capture=False, repeat='') -> str:
-+    """Just add parenthesis around regexp(s), with optional name or repeat suffix"""
-+    s = S(*regexps)
-+    if name:
-+        return f'(?P<{name}>{s}){repeat}'
-+    elif capture:
-+        return f'({s}){repeat}'
-+    else:
-+        return f'(?:{s}){repeat}'
-+
-+def NAMED(name, *regexps) -> str:
-+    """Make named group using <P<name>...) syntax
-+
-+    >>> NAMED('mygroup', 'xyz', 'abc')
-+    '(?P<mygroup>xyzabc)'
-+    """
-+    return P(*regexps, name=name)
-+
-+def OR(*regexps, **kwargs) -> str:
-+    """Build (a|b|c) regexp"""
-+    return P('|'.join(regexps), **kwargs)
-+
-+def M(*regexps, n='*', name=None) -> str:
-+    """Add repetition qualifier to regexp(s)
-+
-+    >>> M('a', 'b')
-+    '(?:ab)*'
-+    >>> M('a' , 'b', n='+')
-+    '(?:ab)+'
-+    >>> M('a' , 'b', n='{2,3}', name='name')
-+    '(?P<name>(?:ab){2,3})'
-+    """
-+    r = P(*regexps, repeat=n)
-+    if name:
-+        r = NAMED(name, r)
-+    return r
-+
-+# helper to make parenthesis optional around regexp
-+OPTIONAL_PARS = lambda R: OR(S(r'\(\s*', R, r'\s*\)'), R)
-+def test_optional_pars():
-+    r = OPTIONAL_PARS('abc')+'$'
-+    assert re.match(r, 'abc')
-+    assert re.match(r, '(abc)')
-+    assert not re.match(r, '(abcd)')
-+    assert not re.match(r, '(abc')
-+    assert not re.match(r, 'abc)')
-+
-+
-+# this disables the MULTILINE flag, so it will match at the
-+# beginning of the file:
-+RE_FILE_BEGIN = r'(?-m:^)'
-+
-+# C primitives:
-+
-+SP = r'\s*'
-+
-+RE_COMMENT = r'//[^\n]*$|/\*([^*]|\*[^/])*\*/'
-+RE_COMMENTS = M(RE_COMMENT + SP)
-+
-+RE_IDENTIFIER = r'[a-zA-Z_][a-zA-Z0-9_]*(?![a-zA-Z0-9])'
-+RE_STRING = r'"([^"\\]|\\[a-z"])*"'
-+RE_NUMBER = r'[0-9]+|0x[0-9a-fA-F]+'
-+
-+# space or escaped newlines:
-+CPP_SPACE = OR(r'\s', r'\\\n', repeat='+')
-+
-+RE_PATH = '[a-zA-Z0-9/_.-]+'
-+
-+RE_INCLUDEPATH = OR(S(r'\"', RE_PATH, r'\"'),
-+                    S(r'<', RE_PATH, r'>'))
-+
-+RE_INCLUDE = S(r'^[ \t]*#[ \t]*include[ \t]+', NAMED('includepath', RE_INCLUDEPATH), r'[ \t]*\n')
-+RE_SIMPLEDEFINE = S(r'^[ \t]*#[ \t]*define[ \t]+', RE_IDENTIFIER, r'[ \t]*\n')
-+
-+RE_STRUCT_TYPE = S(r'struct\s+', RE_IDENTIFIER)
-+RE_TYPE = OR(RE_IDENTIFIER, RE_STRUCT_TYPE)
-diff --git a/scripts/codeconverter/codeconverter/test_patching.py b/scripts/codeconverter/codeconverter/test_patching.py
-new file mode 100644
-index 0000000000..3d8f1c5169
---- /dev/null
-+++ b/scripts/codeconverter/codeconverter/test_patching.py
-@@ -0,0 +1,98 @@
-+from tempfile import NamedTemporaryFile
-+from .patching import FileInfo, FileMatch, Patch, FileList
-+from .regexps import *
-+
-+class BasicPattern(FileMatch):
-+    regexp = '[abc]{3}'
-+
-+    @property
-+    def name(self):
-+        return self.group(0)
-+
-+    def replacement(self) -> str:
-+        # replace match with the middle character repeated 5 times
-+        return self.group(0)[1].upper()*5
-+
-+def test_pattern_patching():
-+    of = NamedTemporaryFile('wt')
-+    of.writelines(['one line\n',
-+                  'this pattern will be patched: defbbahij\n',
-+                  'third line\n',
-+                  'another pattern: jihaabfed'])
-+    of.flush()
-+
-+    files = FileList()
-+    f = FileInfo(files, of.name)
-+    f.load()
-+    f.scan_for_matches()
-+    matches = f.matches_of_type(BasicPattern)
-+    assert len(matches) == 2
-+    p2 = matches[1]
-+
-+    # manually add patch, to see if .append() works:
-+    f.patches.append(p2.append('XXX'))
-+
-+    # apply all patches:
-+    f.gen_patches()
-+    patched = f.get_patched_content()
-+    assert patched == ('one line\n'+
-+                       'this pattern will be patched: defBBBBBhij\n'+
-+                       'third line\n'+
-+                       'another pattern: jihAAAAAXXXfed')
-+
-+class Function(FileMatch):
-+    regexp = S(r'BEGIN\s+', NAMED('name', RE_IDENTIFIER), r'\n',
-+               r'(.*\n)*?END\n')
-+
-+class Statement(FileMatch):
-+    regexp = S(r'^\s*', NAMED('name', RE_IDENTIFIER), r'\(\)\n')
-+
-+def test_container_match():
-+    of = NamedTemporaryFile('wt')
-+    of.writelines(['statement1()\n',
-+                   'statement2()\n',
-+                   'BEGIN function1\n',
-+                   '  statement3()\n',
-+                   '  statement4()\n',
-+                   'END\n',
-+                   'BEGIN function2\n',
-+                   '  statement5()\n',
-+                   '  statement6()\n',
-+                   'END\n',
-+                   'statement7()\n'])
-+    of.flush()
-+
-+    files = FileList()
-+    f = FileInfo(files, of.name)
-+    f.load()
-+    assert len(f.matches_of_type(Function)) == 2
-+    print(' '.join(m.name for m in f.matches_of_type(Statement)))
-+    assert len(f.matches_of_type(Statement)) == 7
-+
-+    f1 = f.find_match(Function, 'function1')
-+    f2 = f.find_match(Function, 'function2')
-+    st1 = f.find_match(Statement, 'statement1')
-+    st2 = f.find_match(Statement, 'statement2')
-+    st3 = f.find_match(Statement, 'statement3')
-+    st4 = f.find_match(Statement, 'statement4')
-+    st5 = f.find_match(Statement, 'statement5')
-+    st6 = f.find_match(Statement, 'statement6')
-+    st7 = f.find_match(Statement, 'statement7')
-+
-+    assert not f1.contains(st1)
-+    assert not f1.contains(st2)
-+    assert not f1.contains(st2)
-+    assert f1.contains(st3)
-+    assert f1.contains(st4)
-+    assert not f1.contains(st5)
-+    assert not f1.contains(st6)
-+    assert not f1.contains(st7)
-+
-+    assert not f2.contains(st1)
-+    assert not f2.contains(st2)
-+    assert not f2.contains(st2)
-+    assert not f2.contains(st3)
-+    assert not f2.contains(st4)
-+    assert f2.contains(st5)
-+    assert f2.contains(st6)
-+    assert not f2.contains(st7)
-diff --git a/scripts/codeconverter/codeconverter/test_regexps.py b/scripts/codeconverter/codeconverter/test_regexps.py
-new file mode 100644
-index 0000000000..63466e4bfe
---- /dev/null
-+++ b/scripts/codeconverter/codeconverter/test_regexps.py
-@@ -0,0 +1,272 @@
-+from .regexps import *
-+from .qom_macros import *
-+from .qom_type_info import *
-+
-+def test_res():
-+    def fullmatch(regexp, s):
-+        return re.fullmatch(regexp, s, re.MULTILINE)
-+
-+    assert fullmatch(RE_IDENTIFIER, 'sizeof')
-+    assert fullmatch(RE_IDENTIFIER, 'X86CPU')
-+    assert fullmatch(RE_FUN_CALL, 'sizeof(X86CPU)')
-+    assert fullmatch(RE_IDENTIFIER, 'X86_CPU_TYPE_NAME')
-+    assert fullmatch(RE_SIMPLE_VALUE, '"base"')
-+    print(RE_FUN_CALL)
-+    assert fullmatch(RE_FUN_CALL, 'X86_CPU_TYPE_NAME("base")')
-+    print(RE_TI_FIELD_INIT)
-+    assert fullmatch(RE_TI_FIELD_INIT, '.name = X86_CPU_TYPE_NAME("base"),')
-+
-+
-+    assert fullmatch(RE_MACRO_CONCAT, 'TYPE_ASPEED_GPIO "-ast2600"')
-+    assert fullmatch(RE_EXPRESSION, 'TYPE_ASPEED_GPIO "-ast2600"')
-+
-+    print(RE_MACRO_DEFINE)
-+    assert re.search(RE_MACRO_DEFINE, r'''
-+    #define OFFSET_CHECK(c)                     \
-+    do {                                        \
-+        if (!(c)) {                             \
-+            goto bad_offset;                    \
-+        }                                       \
-+    } while (0)
-+    ''', re.MULTILINE)
-+
-+    print(RE_CHECK_MACRO)
-+    print(CPP_SPACE)
-+    assert not re.match(RE_CHECK_MACRO, r'''
-+    #define OFFSET_CHECK(c)                     \
-+    do {                                        \
-+        if (!(c)) {                             \
-+            goto bad_offset;                    \
-+        }                                       \
-+    } while (0)''', re.MULTILINE)
-+
-+    print(RE_CHECK_MACRO)
-+    assert fullmatch(RE_CHECK_MACRO, r'''#define PCI_DEVICE(obj) \
-+                     OBJECT_CHECK(PCIDevice, (obj), TYPE_PCI_DEVICE)
-+''')
-+    assert fullmatch(RE_CHECK_MACRO, r'''#define COLLIE_MACHINE(obj) \
-+                     OBJECT_CHECK(CollieMachineState, obj, TYPE_COLLIE_MACHINE)
-+''')
-+
-+    print(RE_TYPEINFO_START)
-+    assert re.search(RE_TYPEINFO_START, r'''
-+    cc->open = qmp_chardev_open_file;
-+}
-+
-+static const TypeInfo char_file_type_info = {
-+    .name = TYPE_CHARDEV_FILE,
-+#ifdef _WIN32
-+    .parent = TYPE_CHARDEV_WIN,
-+''', re.MULTILINE)
-+    assert re.search(RE_TYPEINFO_START, r'''
-+        TypeInfo ti = {
-+            .name = armsse_variants[i].name,
-+            .parent = TYPE_ARMSSE,
-+            .class_init = armsse_class_init,
-+            .class_data = (void *)&armsse_variants[i],
-+        };''', re.MULTILINE)
-+
-+    print(RE_ARRAY_ITEM)
-+    assert fullmatch(RE_ARRAY_ITEM, '{ TYPE_HOTPLUG_HANDLER },')
-+    assert fullmatch(RE_ARRAY_ITEM, '{ TYPE_ACPI_DEVICE_IF },')
-+    assert fullmatch(RE_ARRAY_ITEM, '{ }')
-+    assert fullmatch(RE_ARRAY_CAST, '(InterfaceInfo[])')
-+    assert fullmatch(RE_ARRAY, '''(InterfaceInfo[]) {
-+            { TYPE_HOTPLUG_HANDLER },
-+            { TYPE_ACPI_DEVICE_IF },
-+            { }
-+    }''')
-+    print(RE_COMMENT)
-+    assert fullmatch(RE_COMMENT, r'''/* multi-line
-+                                      * comment
-+                                      */''')
-+
-+    print(RE_TI_FIELDS)
-+    assert fullmatch(RE_TI_FIELDS, r'''/* could be TYPE_SYS_BUS_DEVICE (or LPC etc) */
-+        .parent = TYPE_DEVICE,''')
-+    assert fullmatch(RE_TI_FIELDS, r'''.name = TYPE_TPM_CRB,
-+        /* could be TYPE_SYS_BUS_DEVICE (or LPC etc) */
-+        .parent = TYPE_DEVICE,
-+        .instance_size = sizeof(CRBState),
-+        .class_init  = tpm_crb_class_init,
-+        .interfaces = (InterfaceInfo[]) {
-+            { TYPE_TPM_IF },
-+            { }
-+        }''')
-+    assert fullmatch(RE_TI_FIELDS + RE_COMMENTS,
-+        r'''.name = TYPE_PALM_MISC_GPIO,
-+            .parent = TYPE_SYS_BUS_DEVICE,
-+            .instance_size = sizeof(PalmMiscGPIOState),
-+            .instance_init = palm_misc_gpio_init,
-+            /*
-+             * No class init required: device has no internal state so does not
-+             * need to set up reset or vmstate, and has no realize method.
-+             */''')
-+
-+    print(RE_TYPEINFO_DEF)
-+    test_empty = 'static const TypeInfo x86_base_cpu_type_info = {\n'+\
-+                 '};\n';
-+    assert fullmatch(RE_TYPEINFO_DEF, test_empty)
-+
-+    test_simple = r'''
-+    static const TypeInfo x86_base_cpu_type_info = {
-+        .name = X86_CPU_TYPE_NAME("base"),
-+        .parent = TYPE_X86_CPU,
-+        .class_init = x86_cpu_base_class_init,
-+    };
-+    '''
-+    assert re.search(RE_TYPEINFO_DEF, test_simple, re.MULTILINE)
-+
-+    test_interfaces = r'''
-+    static const TypeInfo acpi_ged_info = {
-+        .name          = TYPE_ACPI_GED,
-+        .parent        = TYPE_SYS_BUS_DEVICE,
-+        .instance_size = sizeof(AcpiGedState),
-+        .instance_init  = acpi_ged_initfn,
-+        .class_init    = acpi_ged_class_init,
-+        .interfaces = (InterfaceInfo[]) {
-+            { TYPE_HOTPLUG_HANDLER },
-+            { TYPE_ACPI_DEVICE_IF },
-+            { }
-+        }
-+    };
-+    '''
-+    assert re.search(RE_TYPEINFO_DEF, test_interfaces, re.MULTILINE)
-+
-+    test_comments = r'''
-+    static const TypeInfo palm_misc_gpio_info = {
-+        .name = TYPE_PALM_MISC_GPIO,
-+        .parent = TYPE_SYS_BUS_DEVICE,
-+        .instance_size = sizeof(PalmMiscGPIOState),
-+        .instance_init = palm_misc_gpio_init,
-+        /*
-+         * No class init required: device has no internal state so does not
-+         * need to set up reset or vmstate, and has no realize method.
-+         */
-+    };
-+    '''
-+    assert re.search(RE_TYPEINFO_DEF, test_comments, re.MULTILINE)
-+
-+    test_comments = r'''
-+    static const TypeInfo tpm_crb_info = {
-+        .name = TYPE_TPM_CRB,
-+        /* could be TYPE_SYS_BUS_DEVICE (or LPC etc) */
-+        .parent = TYPE_DEVICE,
-+        .instance_size = sizeof(CRBState),
-+        .class_init  = tpm_crb_class_init,
-+        .interfaces = (InterfaceInfo[]) {
-+            { TYPE_TPM_IF },
-+            { }
-+        }
-+    };
-+    '''
-+    assert re.search(RE_TYPEINFO_DEF, test_comments, re.MULTILINE)
-+
-+def test_struct_re():
-+    print('---')
-+    print(RE_STRUCT_TYPEDEF)
-+    assert re.search(RE_STRUCT_TYPEDEF, r'''
-+typedef struct TCGState {
-+    AccelState parent_obj;
-+
-+    bool mttcg_enabled;
-+    unsigned long tb_size;
-+} TCGState;
-+''', re.MULTILINE)
-+
-+    assert re.search(RE_STRUCT_TYPEDEF, r'''
-+typedef struct {
-+    ISADevice parent_obj;
-+
-+    QEMUSoundCard card;
-+    uint32_t freq;
-+    uint32_t port;
-+    int ticking[2];
-+    int enabled;
-+    int active;
-+    int bufpos;
-+#ifdef DEBUG
-+    int64_t exp[2];
-+#endif
-+    int16_t *mixbuf;
-+    uint64_t dexp[2];
-+    SWVoiceOut *voice;
-+    int left, pos, samples;
-+    QEMUAudioTimeStamp ats;
-+    FM_OPL *opl;
-+    PortioList port_list;
-+} AdlibState;
-+''', re.MULTILINE)
-+
-+    false_positive = r'''
-+typedef struct dma_pagetable_entry {
-+    int32_t frame;
-+    int32_t owner;
-+} A B C D E;
-+struct foo {
-+    int x;
-+} some_variable;
-+'''
-+    assert not re.search(RE_STRUCT_TYPEDEF, false_positive, re.MULTILINE)
-+
-+def test_initial_includes():
-+    print(InitialIncludes.regexp)
-+    c = '''
-+#ifndef HW_FLASH_H
-+#define HW_FLASH_H
-+
-+/* NOR flash devices */
-+
-+#include "qom/object.h"
-+#include "exec/hwaddr.h"
-+
-+/* pflash_cfi01.c */
-+'''
-+    print(repr(list(m.groupdict() for m in re.finditer(InitialIncludes.regexp, c, re.MULTILINE))))
-+    m = re.match(InitialIncludes.regexp, c, re.MULTILINE)
-+    assert m
-+    print(repr(m.group(0)))
-+    assert m.group(0).endswith('#include "exec/hwaddr.h"\n')
-+
-+    c = '''#ifndef QEMU_VIRTIO_9P_H
-+#define QEMU_VIRTIO_9P_H
-+
-+#include "standard-headers/linux/virtio_9p.h"
-+#include "hw/virtio/virtio.h"
-+#include "9p.h"
-+
-+
-+'''
-+    print(repr(list(m.groupdict() for m in re.finditer(InitialIncludes.regexp, c, re.MULTILINE))))
-+    m = re.match(InitialIncludes.regexp, c, re.MULTILINE)
-+    assert m
-+    print(repr(m.group(0)))
-+    assert m.group(0).endswith('#include "9p.h"\n')
-+
-+    c = '''#include "qom/object.h"
-+/*
-+ * QEMU ES1370 emulation
-+...
-+ */
-+
-+/* #define DEBUG_ES1370 */
-+/* #define VERBOSE_ES1370 */
-+#define SILENT_ES1370
-+
-+#include "qemu/osdep.h"
-+#include "hw/audio/soundhw.h"
-+#include "audio/audio.h"
-+#include "hw/pci/pci.h"
-+#include "migration/vmstate.h"
-+#include "qemu/module.h"
-+#include "sysemu/dma.h"
-+
-+/* Missing stuff:
-+   SCTRL_P[12](END|ST)INC
-+'''
-+    print(repr(list(m.groupdict() for m in re.finditer(InitialIncludes.regexp, c, re.MULTILINE))))
-+    m = re.match(InitialIncludes.regexp, c, re.MULTILINE)
-+    assert m
-+    print(repr(m.group(0)))
-+    assert m.group(0).endswith('#include "sysemu/dma.h"\n')
-+
-diff --git a/scripts/codeconverter/codeconverter/utils.py b/scripts/codeconverter/codeconverter/utils.py
-new file mode 100644
-index 0000000000..a9891fd083
---- /dev/null
-+++ b/scripts/codeconverter/codeconverter/utils.py
-@@ -0,0 +1,65 @@
-+from typing import *
-+
-+import logging
-+logger = logging.getLogger(__name__)
-+DBG = logger.debug
-+INFO = logger.info
-+WARN = logger.warning
-+
-+T = TypeVar('T')
-+def opt_compare(a: T, b: T) -> bool:
-+    """Compare two values, ignoring mismatches if one of them is None"""
-+    return (a is None) or (b is None) or (a == b)
-+
-+def merge(a: T, b: T) -> T:
-+    """Merge two values if they matched using opt_compare()"""
-+    assert opt_compare(a, b)
-+    if a is None:
-+        return b
-+    else:
-+        return a
-+
-+def test_comp_merge():
-+    assert opt_compare(None, 1) == True
-+    assert opt_compare(2, None) == True
-+    assert opt_compare(1, 1) == True
-+    assert opt_compare(1, 2) == False
-+
-+    assert merge(None, None) is None
-+    assert merge(None, 10) == 10
-+    assert merge(10, None) == 10
-+    assert merge(10, 10) == 10
-+
-+
-+LineNumber = NewType('LineNumber', int)
-+ColumnNumber = NewType('ColumnNumber', int)
-+class LineAndColumn(NamedTuple):
-+    line: int
-+    col: int
-+
-+    def __str__(self):
-+        return '%d:%d' % (self.line, self.col)
-+
-+def line_col(s, position: int) -> LineAndColumn:
-+    """Return line and column for a char position in string
-+
-+    Character position starts in 0, but lines and columns start in 1.
-+    """
-+    before = s[:position]
-+    lines = before.split('\n')
-+    line = len(lines)
-+    col = len(lines[-1]) + 1
-+    return LineAndColumn(line, col)
-+
-+def test_line_col():
-+    assert line_col('abc\ndefg\nhijkl', 0) == (1, 1)
-+    assert line_col('abc\ndefg\nhijkl', 2) == (1, 3)
-+    assert line_col('abc\ndefg\nhijkl', 3) == (1, 4)
-+    assert line_col('abc\ndefg\nhijkl', 4) == (2, 1)
-+    assert line_col('abc\ndefg\nhijkl', 10) == (3, 2)
-+
-+def not_optional(arg: Optional[T]) -> T:
-+    assert arg is not None
-+    return arg
-+
-+__all__ = ['not_optional', 'opt_compare', 'merge', 'line_col', 'LineAndColumn']
-\ No newline at end of file
-diff --git a/scripts/codeconverter/converter.py b/scripts/codeconverter/converter.py
-new file mode 100755
-index 0000000000..58300b5a21
---- /dev/null
-+++ b/scripts/codeconverter/converter.py
-@@ -0,0 +1,113 @@
-+#!/usr/bin/env python3
-+import sys
-+import argparse
-+import os
-+import os.path
-+import re
-+from typing import *
-+
-+from codeconverter.patching import FileInfo, match_class_dict, FileList
-+import codeconverter.qom_macros
-+from codeconverter.qom_type_info import TI_FIELDS, type_infos, TypeInfoVar
-+
-+import logging
-+logger = logging.getLogger(__name__)
-+DBG = logger.debug
-+INFO = logger.info
-+WARN = logger.warning
-+
-+def process_all_files(parser: argparse.ArgumentParser, args: argparse.Namespace) -> None:
-+    DBG("filenames: %r", args.filenames)
-+
-+    files = FileList()
-+    files.extend(FileInfo(files, fn, args.force) for fn in args.filenames)
-+    for f in files:
-+        DBG('opening %s', f.filename)
-+        f.load()
-+
-+    if args.table:
-+        fields = ['filename', 'variable_name'] + TI_FIELDS
-+        print('\t'.join(fields))
-+        for f in files:
-+            for t in f.matches_of_type(TypeInfoVar):
-+                assert isinstance(t, TypeInfoVar)
-+                values = [f.filename, t.name] + \
-+                         [t.get_initializer_value(f).raw
-+                          for f in TI_FIELDS]
-+                DBG('values: %r', values)
-+                assert all('\t' not in v for v in values)
-+                values = [v.replace('\n', ' ').replace('"', '') for v in values]
-+                print('\t'.join(values))
-+        return
-+
-+    match_classes = match_class_dict()
-+    if not args.patterns:
-+        parser.error("--pattern is required")
-+
-+    classes = [p for arg in args.patterns
-+                for p in re.split(r'[\s,]', arg)]
-+    for c in classes:
-+        if c not in match_classes:
-+            print("Invalid pattern name: %s" % (c), file=sys.stderr)
-+            print("Valid patterns:", file=sys.stderr)
-+            print(PATTERN_HELP, file=sys.stderr)
-+            sys.exit(1)
-+
-+    DBG("classes: %r", classes)
-+    for f in files:
-+        INFO("patching contents of %s", f.filename)
-+        f.patch_content(max_passes=args.passes, class_names=classes)
-+
-+    for f in files:
-+        #alltypes.extend(f.type_infos)
-+        #full_types.extend(f.full_types())
-+
-+        if not args.dry_run:
-+            if args.inplace:
-+                f.patch_inplace()
-+            if args.diff:
-+                f.show_diff()
-+            if not args.diff and not args.inplace:
-+                f.write_to_file(sys.stdout)
-+                sys.stdout.flush()
-+
-+
-+PATTERN_HELP = ('\n'.join("  %s: %s" % (n, str(c.__doc__).strip())
-+                for (n,c) in sorted(match_class_dict().items())
-+                if c.has_replacement_rule()))
-+
-+def main() -> None:
-+    p = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter)
-+    p.add_argument('filenames', nargs='+')
-+    p.add_argument('--passes', type=int, default=1,
-+                   help="Number of passes (0 means unlimited)")
-+    p.add_argument('--pattern', required=True, action='append',
-+                   default=[], dest='patterns',
-+                   help="Pattern to scan for")
-+    p.add_argument('--inplace', '-i', action='store_true',
-+                   help="Patch file in place")
-+    p.add_argument('--dry-run', action='store_true',
-+                   help="Don't patch files or print patching results")
-+    p.add_argument('--force', '-f', action='store_true',
-+                   help="Perform changes even if not completely safe")
-+    p.add_argument('--diff', action='store_true',
-+                   help="Print diff output on stdout")
-+    p.add_argument('--debug', '-d', action='store_true',
-+                   help="Enable debugging")
-+    p.add_argument('--verbose', '-v', action='store_true',
-+                   help="Verbose logging on stderr")
-+    p.add_argument('--table', action='store_true',
-+                   help="Print CSV table of type information")
-+    p.add_argument_group("Valid pattern names",
-+                         PATTERN_HELP)
-+    args = p.parse_args()
-+
-+    loglevel = (logging.DEBUG if args.debug
-+             else logging.INFO if args.verbose
-+             else logging.WARN)
-+    logging.basicConfig(format='%(levelname)s: %(message)s', level=loglevel)
-+    DBG("args: %r", args)
-+    process_all_files(p, args)
-+
-+if __name__ == '__main__':
-+    main()
-\ No newline at end of file
+diff --git a/hw/audio/intel-hda.h b/hw/audio/intel-hda.h
+index 813a7a357d..f5cce18fa3 100644
+--- a/hw/audio/intel-hda.h
++++ b/hw/audio/intel-hda.h
+@@ -8,10 +8,8 @@
+ /* hda bus                                                               */
+ 
+ #define TYPE_HDA_CODEC_DEVICE "hda-codec"
+-typedef struct HDACodecDevice HDACodecDevice;
+-typedef struct HDACodecDeviceClass HDACodecDeviceClass;
+-DECLARE_OBJ_CHECKERS(HDACodecDevice, HDACodecDeviceClass,
+-                     HDA_CODEC_DEVICE, TYPE_HDA_CODEC_DEVICE)
++OBJECT_DECLARE_TYPE(HDACodecDevice, HDACodecDeviceClass,
++                    hda_codec_device, HDA_CODEC_DEVICE)
+ 
+ #define TYPE_HDA_BUS "HDA"
+ typedef struct HDACodecBus HDACodecBus;
+diff --git a/hw/display/virtio-vga.h b/hw/display/virtio-vga.h
+index 19f8af7356..5c5671c9c1 100644
+--- a/hw/display/virtio-vga.h
++++ b/hw/display/virtio-vga.h
+@@ -9,10 +9,8 @@
+  * virtio-vga-base: This extends VirtioPCIProxy.
+  */
+ #define TYPE_VIRTIO_VGA_BASE "virtio-vga-base"
+-typedef struct VirtIOVGABase VirtIOVGABase;
+-typedef struct VirtIOVGABaseClass VirtIOVGABaseClass;
+-DECLARE_OBJ_CHECKERS(VirtIOVGABase, VirtIOVGABaseClass,
+-                     VIRTIO_VGA_BASE, TYPE_VIRTIO_VGA_BASE)
++OBJECT_DECLARE_TYPE(VirtIOVGABase, VirtIOVGABaseClass,
++                    virtio_vga_base, VIRTIO_VGA_BASE)
+ 
+ struct VirtIOVGABase {
+     VirtIOPCIProxy parent_obj;
+diff --git a/include/authz/base.h b/include/authz/base.h
+index 8d8cf9fa5a..06b5e29f6f 100644
+--- a/include/authz/base.h
++++ b/include/authz/base.h
+@@ -27,10 +27,8 @@
+ 
+ #define TYPE_QAUTHZ "authz"
+ 
+-typedef struct QAuthZ QAuthZ;
+-typedef struct QAuthZClass QAuthZClass;
+-DECLARE_OBJ_CHECKERS(QAuthZ, QAuthZClass,
+-                     QAUTHZ, TYPE_QAUTHZ)
++OBJECT_DECLARE_TYPE(QAuthZ, QAuthZClass,
++                    qauthz, QAUTHZ)
+ 
+ 
+ /**
+diff --git a/include/authz/list.h b/include/authz/list.h
+index 93d16876bc..e4e1040472 100644
+--- a/include/authz/list.h
++++ b/include/authz/list.h
+@@ -27,10 +27,8 @@
+ 
+ #define TYPE_QAUTHZ_LIST "authz-list"
+ 
+-typedef struct QAuthZList QAuthZList;
+-typedef struct QAuthZListClass QAuthZListClass;
+-DECLARE_OBJ_CHECKERS(QAuthZList, QAuthZListClass,
+-                     QAUTHZ_LIST, TYPE_QAUTHZ_LIST)
++OBJECT_DECLARE_TYPE(QAuthZList, QAuthZListClass,
++                    qauthz_list, QAUTHZ_LIST)
+ 
+ 
+ 
+diff --git a/include/authz/listfile.h b/include/authz/listfile.h
+index 2e4a629b6d..89c5eafbfa 100644
+--- a/include/authz/listfile.h
++++ b/include/authz/listfile.h
+@@ -27,10 +27,8 @@
+ 
+ #define TYPE_QAUTHZ_LIST_FILE "authz-list-file"
+ 
+-typedef struct QAuthZListFile QAuthZListFile;
+-typedef struct QAuthZListFileClass QAuthZListFileClass;
+-DECLARE_OBJ_CHECKERS(QAuthZListFile, QAuthZListFileClass,
+-                     QAUTHZ_LIST_FILE, TYPE_QAUTHZ_LIST_FILE)
++OBJECT_DECLARE_TYPE(QAuthZListFile, QAuthZListFileClass,
++                    qauthz_list_file, QAUTHZ_LIST_FILE)
+ 
+ 
+ 
+diff --git a/include/authz/pamacct.h b/include/authz/pamacct.h
+index 98454ddc25..44bb5ff28d 100644
+--- a/include/authz/pamacct.h
++++ b/include/authz/pamacct.h
+@@ -27,10 +27,8 @@
+ 
+ #define TYPE_QAUTHZ_PAM "authz-pam"
+ 
+-typedef struct QAuthZPAM QAuthZPAM;
+-typedef struct QAuthZPAMClass QAuthZPAMClass;
+-DECLARE_OBJ_CHECKERS(QAuthZPAM, QAuthZPAMClass,
+-                     QAUTHZ_PAM, TYPE_QAUTHZ_PAM)
++OBJECT_DECLARE_TYPE(QAuthZPAM, QAuthZPAMClass,
++                    qauthz_pam, QAUTHZ_PAM)
+ 
+ 
+ 
+diff --git a/include/authz/simple.h b/include/authz/simple.h
+index 7a896fb94b..ba4a5ec5ea 100644
+--- a/include/authz/simple.h
++++ b/include/authz/simple.h
+@@ -26,10 +26,8 @@
+ 
+ #define TYPE_QAUTHZ_SIMPLE "authz-simple"
+ 
+-typedef struct QAuthZSimple QAuthZSimple;
+-typedef struct QAuthZSimpleClass QAuthZSimpleClass;
+-DECLARE_OBJ_CHECKERS(QAuthZSimple, QAuthZSimpleClass,
+-                     QAUTHZ_SIMPLE, TYPE_QAUTHZ_SIMPLE)
++OBJECT_DECLARE_TYPE(QAuthZSimple, QAuthZSimpleClass,
++                    qauthz_simple, QAUTHZ_SIMPLE)
+ 
+ 
+ 
+diff --git a/include/crypto/secret_common.h b/include/crypto/secret_common.h
+index dd3310ea5f..daf00c3b2a 100644
+--- a/include/crypto/secret_common.h
++++ b/include/crypto/secret_common.h
+@@ -25,10 +25,8 @@
+ #include "qom/object.h"
+ 
+ #define TYPE_QCRYPTO_SECRET_COMMON "secret_common"
+-typedef struct QCryptoSecretCommon QCryptoSecretCommon;
+-typedef struct QCryptoSecretCommonClass QCryptoSecretCommonClass;
+-DECLARE_OBJ_CHECKERS(QCryptoSecretCommon, QCryptoSecretCommonClass,
+-                     QCRYPTO_SECRET_COMMON, TYPE_QCRYPTO_SECRET_COMMON)
++OBJECT_DECLARE_TYPE(QCryptoSecretCommon, QCryptoSecretCommonClass,
++                    qcrypto_secret_common, QCRYPTO_SECRET_COMMON)
+ 
+ 
+ struct QCryptoSecretCommon {
+diff --git a/include/crypto/secret_keyring.h b/include/crypto/secret_keyring.h
+index 9875f4cbf3..cc2c7397db 100644
+--- a/include/crypto/secret_keyring.h
++++ b/include/crypto/secret_keyring.h
+@@ -26,10 +26,8 @@
+ #include "crypto/secret_common.h"
+ 
+ #define TYPE_QCRYPTO_SECRET_KEYRING "secret_keyring"
+-typedef struct QCryptoSecretKeyring QCryptoSecretKeyring;
+-typedef struct QCryptoSecretKeyringClass QCryptoSecretKeyringClass;
+-DECLARE_OBJ_CHECKERS(QCryptoSecretKeyring, QCryptoSecretKeyringClass,
+-                     QCRYPTO_SECRET_KEYRING, TYPE_QCRYPTO_SECRET_KEYRING)
++OBJECT_DECLARE_TYPE(QCryptoSecretKeyring, QCryptoSecretKeyringClass,
++                    qcrypto_secret_keyring, QCRYPTO_SECRET_KEYRING)
+ 
+ 
+ struct QCryptoSecretKeyring {
+diff --git a/include/hw/hyperv/vmbus.h b/include/hw/hyperv/vmbus.h
+index a079baab06..68ad33918f 100644
+--- a/include/hw/hyperv/vmbus.h
++++ b/include/hw/hyperv/vmbus.h
+@@ -20,10 +20,8 @@
+ 
+ #define TYPE_VMBUS_DEVICE "vmbus-dev"
+ 
+-typedef struct VMBusDevice VMBusDevice;
+-typedef struct VMBusDeviceClass VMBusDeviceClass;
+-DECLARE_OBJ_CHECKERS(VMBusDevice, VMBusDeviceClass,
+-                     VMBUS_DEVICE, TYPE_VMBUS_DEVICE)
++OBJECT_DECLARE_TYPE(VMBusDevice, VMBusDeviceClass,
++                    vmbus_device, VMBUS_DEVICE)
+ 
+ /*
+  * Object wrapping a GPADL -- GPA Descriptor List -- an array of guest physical
+diff --git a/include/hw/i2c/i2c.h b/include/hw/i2c/i2c.h
+index 8afa74f42e..770051db54 100644
+--- a/include/hw/i2c/i2c.h
++++ b/include/hw/i2c/i2c.h
+@@ -16,12 +16,10 @@ enum i2c_event {
+     I2C_NACK /* Masker NACKed a receive byte.  */
+ };
+ 
+-typedef struct I2CSlave I2CSlave;
+ 
+ #define TYPE_I2C_SLAVE "i2c-slave"
+-typedef struct I2CSlaveClass I2CSlaveClass;
+-DECLARE_OBJ_CHECKERS(I2CSlave, I2CSlaveClass,
+-                     I2C_SLAVE, TYPE_I2C_SLAVE)
++OBJECT_DECLARE_TYPE(I2CSlave, I2CSlaveClass,
++                    i2c_slave, I2C_SLAVE)
+ 
+ struct I2CSlaveClass {
+     DeviceClass parent_class;
+diff --git a/include/hw/i2c/smbus_slave.h b/include/hw/i2c/smbus_slave.h
+index 8d16e4bcd9..cb9cb372f9 100644
+--- a/include/hw/i2c/smbus_slave.h
++++ b/include/hw/i2c/smbus_slave.h
+@@ -29,10 +29,8 @@
+ #include "qom/object.h"
+ 
+ #define TYPE_SMBUS_DEVICE "smbus-device"
+-typedef struct SMBusDevice SMBusDevice;
+-typedef struct SMBusDeviceClass SMBusDeviceClass;
+-DECLARE_OBJ_CHECKERS(SMBusDevice, SMBusDeviceClass,
+-                     SMBUS_DEVICE, TYPE_SMBUS_DEVICE)
++OBJECT_DECLARE_TYPE(SMBusDevice, SMBusDeviceClass,
++                    smbus_device, SMBUS_DEVICE)
+ 
+ 
+ struct SMBusDeviceClass {
+diff --git a/include/hw/ipack/ipack.h b/include/hw/ipack/ipack.h
+index a2304c1b3e..a59a487853 100644
+--- a/include/hw/ipack/ipack.h
++++ b/include/hw/ipack/ipack.h
+@@ -30,12 +30,10 @@ struct IPackBus {
+     qemu_irq_handler set_irq;
+ };
+ 
+-typedef struct IPackDevice IPackDevice;
+-typedef struct IPackDeviceClass IPackDeviceClass;
+ 
+ #define TYPE_IPACK_DEVICE "ipack-device"
+-DECLARE_OBJ_CHECKERS(IPackDevice, IPackDeviceClass,
+-                     IPACK_DEVICE, TYPE_IPACK_DEVICE)
++OBJECT_DECLARE_TYPE(IPackDevice, IPackDeviceClass,
++                    ipack_device, IPACK_DEVICE)
+ 
+ struct IPackDeviceClass {
+     /*< private >*/
+diff --git a/include/hw/ipmi/ipmi.h b/include/hw/ipmi/ipmi.h
+index d2ed0a9fc4..9915b146f7 100644
+--- a/include/hw/ipmi/ipmi.h
++++ b/include/hw/ipmi/ipmi.h
+@@ -175,10 +175,8 @@ struct IPMIInterfaceClass {
+  * Define a BMC simulator (or perhaps a connection to a real BMC)
+  */
+ #define TYPE_IPMI_BMC "ipmi-bmc"
+-typedef struct IPMIBmc IPMIBmc;
+-typedef struct IPMIBmcClass IPMIBmcClass;
+-DECLARE_OBJ_CHECKERS(IPMIBmc, IPMIBmcClass,
+-                     IPMI_BMC, TYPE_IPMI_BMC)
++OBJECT_DECLARE_TYPE(IPMIBmc, IPMIBmcClass,
++                    ipmi_bmc, IPMI_BMC)
+ 
+ struct IPMIBmc {
+     DeviceState parent;
+diff --git a/include/hw/mem/pc-dimm.h b/include/hw/mem/pc-dimm.h
+index 86e3010243..1d570defc9 100644
+--- a/include/hw/mem/pc-dimm.h
++++ b/include/hw/mem/pc-dimm.h
+@@ -21,10 +21,8 @@
+ #include "qom/object.h"
+ 
+ #define TYPE_PC_DIMM "pc-dimm"
+-typedef struct PCDIMMDevice PCDIMMDevice;
+-typedef struct PCDIMMDeviceClass PCDIMMDeviceClass;
+-DECLARE_OBJ_CHECKERS(PCDIMMDevice, PCDIMMDeviceClass,
+-                     PC_DIMM, TYPE_PC_DIMM)
++OBJECT_DECLARE_TYPE(PCDIMMDevice, PCDIMMDeviceClass,
++                    pc_dimm, PC_DIMM)
+ 
+ #define PC_DIMM_ADDR_PROP "addr"
+ #define PC_DIMM_SLOT_PROP "slot"
+diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
+index f3bacb6a5c..b4b2b24d80 100644
+--- a/include/hw/ppc/pnv.h
++++ b/include/hw/ppc/pnv.h
+@@ -35,10 +35,8 @@
+ #include "qom/object.h"
+ 
+ #define TYPE_PNV_CHIP "pnv-chip"
+-typedef struct PnvChip PnvChip;
+-typedef struct PnvChipClass PnvChipClass;
+-DECLARE_OBJ_CHECKERS(PnvChip, PnvChipClass,
+-                     PNV_CHIP, TYPE_PNV_CHIP)
++OBJECT_DECLARE_TYPE(PnvChip, PnvChipClass,
++                    pnv_chip, PNV_CHIP)
+ 
+ struct PnvChip {
+     /*< private >*/
+diff --git a/include/hw/ppc/pnv_core.h b/include/hw/ppc/pnv_core.h
+index fd17a236e3..5cb22c2fa9 100644
+--- a/include/hw/ppc/pnv_core.h
++++ b/include/hw/ppc/pnv_core.h
+@@ -25,10 +25,8 @@
+ #include "qom/object.h"
+ 
+ #define TYPE_PNV_CORE "powernv-cpu-core"
+-typedef struct PnvCore PnvCore;
+-typedef struct PnvCoreClass PnvCoreClass;
+-DECLARE_OBJ_CHECKERS(PnvCore, PnvCoreClass,
+-                     PNV_CORE, TYPE_PNV_CORE)
++OBJECT_DECLARE_TYPE(PnvCore, PnvCoreClass,
++                    pnv_core, PNV_CORE)
+ 
+ typedef struct PnvChip PnvChip;
+ 
+diff --git a/include/hw/ppc/pnv_homer.h b/include/hw/ppc/pnv_homer.h
+index 7aadcab03c..0978812713 100644
+--- a/include/hw/ppc/pnv_homer.h
++++ b/include/hw/ppc/pnv_homer.h
+@@ -24,10 +24,8 @@
+ #include "qom/object.h"
+ 
+ #define TYPE_PNV_HOMER "pnv-homer"
+-typedef struct PnvHomer PnvHomer;
+-typedef struct PnvHomerClass PnvHomerClass;
+-DECLARE_OBJ_CHECKERS(PnvHomer, PnvHomerClass,
+-                     PNV_HOMER, TYPE_PNV_HOMER)
++OBJECT_DECLARE_TYPE(PnvHomer, PnvHomerClass,
++                    pnv_homer, PNV_HOMER)
+ #define TYPE_PNV8_HOMER TYPE_PNV_HOMER "-POWER8"
+ DECLARE_INSTANCE_CHECKER(PnvHomer, PNV8_HOMER,
+                          TYPE_PNV8_HOMER)
+diff --git a/include/hw/ppc/pnv_occ.h b/include/hw/ppc/pnv_occ.h
+index 4fcfb32417..b79e3440be 100644
+--- a/include/hw/ppc/pnv_occ.h
++++ b/include/hw/ppc/pnv_occ.h
+@@ -24,10 +24,8 @@
+ #include "qom/object.h"
+ 
+ #define TYPE_PNV_OCC "pnv-occ"
+-typedef struct PnvOCC PnvOCC;
+-typedef struct PnvOCCClass PnvOCCClass;
+-DECLARE_OBJ_CHECKERS(PnvOCC, PnvOCCClass,
+-                     PNV_OCC, TYPE_PNV_OCC)
++OBJECT_DECLARE_TYPE(PnvOCC, PnvOCCClass,
++                    pnv_occ, PNV_OCC)
+ #define TYPE_PNV8_OCC TYPE_PNV_OCC "-POWER8"
+ DECLARE_INSTANCE_CHECKER(PnvOCC, PNV8_OCC,
+                          TYPE_PNV8_OCC)
+diff --git a/include/hw/ppc/pnv_psi.h b/include/hw/ppc/pnv_psi.h
+index a33195df17..0034db44c3 100644
+--- a/include/hw/ppc/pnv_psi.h
++++ b/include/hw/ppc/pnv_psi.h
+@@ -26,10 +26,8 @@
+ #include "qom/object.h"
+ 
+ #define TYPE_PNV_PSI "pnv-psi"
+-typedef struct PnvPsi PnvPsi;
+-typedef struct PnvPsiClass PnvPsiClass;
+-DECLARE_OBJ_CHECKERS(PnvPsi, PnvPsiClass,
+-                     PNV_PSI, TYPE_PNV_PSI)
++OBJECT_DECLARE_TYPE(PnvPsi, PnvPsiClass,
++                    pnv_psi, PNV_PSI)
+ 
+ #define PSIHB_XSCOM_MAX         0x20
+ 
+diff --git a/include/hw/ppc/pnv_xive.h b/include/hw/ppc/pnv_xive.h
+index a014e2a726..29d5debd1c 100644
+--- a/include/hw/ppc/pnv_xive.h
++++ b/include/hw/ppc/pnv_xive.h
+@@ -16,10 +16,8 @@
+ struct PnvChip;
+ 
+ #define TYPE_PNV_XIVE "pnv-xive"
+-typedef struct PnvXive PnvXive;
+-typedef struct PnvXiveClass PnvXiveClass;
+-DECLARE_OBJ_CHECKERS(PnvXive, PnvXiveClass,
+-                     PNV_XIVE, TYPE_PNV_XIVE)
++OBJECT_DECLARE_TYPE(PnvXive, PnvXiveClass,
++                    pnv_xive, PNV_XIVE)
+ 
+ #define XIVE_BLOCK_MAX      16
+ 
+diff --git a/include/hw/ppc/spapr_cpu_core.h b/include/hw/ppc/spapr_cpu_core.h
+index fba6a01050..4022917168 100644
+--- a/include/hw/ppc/spapr_cpu_core.h
++++ b/include/hw/ppc/spapr_cpu_core.h
+@@ -16,10 +16,8 @@
+ #include "qom/object.h"
+ 
+ #define TYPE_SPAPR_CPU_CORE "spapr-cpu-core"
+-typedef struct SpaprCpuCore SpaprCpuCore;
+-typedef struct SpaprCpuCoreClass SpaprCpuCoreClass;
+-DECLARE_OBJ_CHECKERS(SpaprCpuCore, SpaprCpuCoreClass,
+-                     SPAPR_CPU_CORE, TYPE_SPAPR_CPU_CORE)
++OBJECT_DECLARE_TYPE(SpaprCpuCore, SpaprCpuCoreClass,
++                    spapr_cpu_core, SPAPR_CPU_CORE)
+ 
+ #define SPAPR_CPU_CORE_TYPE_NAME(model) model "-" TYPE_SPAPR_CPU_CORE
+ 
+diff --git a/include/hw/ppc/spapr_drc.h b/include/hw/ppc/spapr_drc.h
+index 2236aea66a..6daafa8106 100644
+--- a/include/hw/ppc/spapr_drc.h
++++ b/include/hw/ppc/spapr_drc.h
+@@ -20,10 +20,8 @@
+ #include "qapi/error.h"
+ 
+ #define TYPE_SPAPR_DR_CONNECTOR "spapr-dr-connector"
+-typedef struct SpaprDrc SpaprDrc;
+-typedef struct SpaprDrcClass SpaprDrcClass;
+-DECLARE_OBJ_CHECKERS(SpaprDrc, SpaprDrcClass,
+-                     SPAPR_DR_CONNECTOR, TYPE_SPAPR_DR_CONNECTOR)
++OBJECT_DECLARE_TYPE(SpaprDrc, SpaprDrcClass,
++                    spapr_dr_connector, SPAPR_DR_CONNECTOR)
+ 
+ #define TYPE_SPAPR_DRC_PHYSICAL "spapr-drc-physical"
+ typedef struct SpaprDrcPhysical SpaprDrcPhysical;
+diff --git a/include/hw/ppc/spapr_vio.h b/include/hw/ppc/spapr_vio.h
+index e289028634..6c40da72ff 100644
+--- a/include/hw/ppc/spapr_vio.h
++++ b/include/hw/ppc/spapr_vio.h
+@@ -28,10 +28,8 @@
+ #include "qom/object.h"
+ 
+ #define TYPE_VIO_SPAPR_DEVICE "vio-spapr-device"
+-typedef struct SpaprVioDevice SpaprVioDevice;
+-typedef struct SpaprVioDeviceClass SpaprVioDeviceClass;
+-DECLARE_OBJ_CHECKERS(SpaprVioDevice, SpaprVioDeviceClass,
+-                     VIO_SPAPR_DEVICE, TYPE_VIO_SPAPR_DEVICE)
++OBJECT_DECLARE_TYPE(SpaprVioDevice, SpaprVioDeviceClass,
++                    vio_spapr_device, VIO_SPAPR_DEVICE)
+ 
+ #define TYPE_SPAPR_VIO_BUS "spapr-vio-bus"
+ typedef struct SpaprVioBus SpaprVioBus;
+diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
+index 6b0f31969b..33a1d999c3 100644
+--- a/include/hw/ppc/spapr_xive.h
++++ b/include/hw/ppc/spapr_xive.h
+@@ -15,10 +15,8 @@
+ #include "qom/object.h"
+ 
+ #define TYPE_SPAPR_XIVE "spapr-xive"
+-typedef struct SpaprXive SpaprXive;
+-typedef struct SpaprXiveClass SpaprXiveClass;
+-DECLARE_OBJ_CHECKERS(SpaprXive, SpaprXiveClass,
+-                     SPAPR_XIVE, TYPE_SPAPR_XIVE)
++OBJECT_DECLARE_TYPE(SpaprXive, SpaprXiveClass,
++                    spapr_xive, SPAPR_XIVE)
+ 
+ struct SpaprXive {
+     XiveRouter    parent;
+diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
+index bcb584b90d..c5a3cdcadc 100644
+--- a/include/hw/ppc/xics.h
++++ b/include/hw/ppc/xics.h
+@@ -41,8 +41,6 @@
+  * (the kernel implementation supports more but we don't exploit
+  *  that yet)
+  */
+-typedef struct ICPStateClass ICPStateClass;
+-typedef struct ICPState ICPState;
+ typedef struct PnvICPState PnvICPState;
+ typedef struct ICSStateClass ICSStateClass;
+ typedef struct ICSState ICSState;
+@@ -50,8 +48,8 @@ typedef struct ICSIRQState ICSIRQState;
+ typedef struct XICSFabric XICSFabric;
+ 
+ #define TYPE_ICP "icp"
+-DECLARE_OBJ_CHECKERS(ICPState, ICPStateClass,
+-                     ICP, TYPE_ICP)
++OBJECT_DECLARE_TYPE(ICPState, ICPStateClass,
++                    icp, ICP)
+ 
+ #define TYPE_PNV_ICP "pnv-icp"
+ DECLARE_INSTANCE_CHECKER(PnvICPState, PNV_ICP,
+diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
+index fe894fb145..9e67d58bf7 100644
+--- a/include/hw/ppc/xive.h
++++ b/include/hw/ppc/xive.h
+@@ -339,12 +339,10 @@ struct XiveRouter {
+ 
+     XiveFabric *xfb;
+ };
+-typedef struct XiveRouter XiveRouter;
+ 
+ #define TYPE_XIVE_ROUTER "xive-router"
+-typedef struct XiveRouterClass XiveRouterClass;
+-DECLARE_OBJ_CHECKERS(XiveRouter, XiveRouterClass,
+-                     XIVE_ROUTER, TYPE_XIVE_ROUTER)
++OBJECT_DECLARE_TYPE(XiveRouter, XiveRouterClass,
++                    xive_router, XIVE_ROUTER)
+ 
+ struct XiveRouterClass {
+     SysBusDeviceClass parent;
+diff --git a/include/hw/s390x/event-facility.h b/include/hw/s390x/event-facility.h
+index 034cd73d37..52ffd7a97d 100644
+--- a/include/hw/s390x/event-facility.h
++++ b/include/hw/s390x/event-facility.h
+@@ -42,10 +42,8 @@
+ #define SCLP_SELECTIVE_READ                     0x01
+ 
+ #define TYPE_SCLP_EVENT "s390-sclp-event-type"
+-typedef struct SCLPEvent SCLPEvent;
+-typedef struct SCLPEventClass SCLPEventClass;
+-DECLARE_OBJ_CHECKERS(SCLPEvent, SCLPEventClass,
+-                     SCLP_EVENT, TYPE_SCLP_EVENT)
++OBJECT_DECLARE_TYPE(SCLPEvent, SCLPEventClass,
++                    sclp_event, SCLP_EVENT)
+ 
+ #define TYPE_SCLP_CPU_HOTPLUG "sclp-cpu-hotplug"
+ #define TYPE_SCLP_QUIESCE "sclpquiesce"
+diff --git a/include/hw/s390x/s390_flic.h b/include/hw/s390x/s390_flic.h
+index a6a123598d..4b718c8ebf 100644
+--- a/include/hw/s390x/s390_flic.h
++++ b/include/hw/s390x/s390_flic.h
+@@ -39,10 +39,8 @@ extern const VMStateDescription vmstate_adapter_routes;
+     VMSTATE_STRUCT(_f, _s, 1, vmstate_adapter_routes, AdapterRoutes)
+ 
+ #define TYPE_S390_FLIC_COMMON "s390-flic"
+-typedef struct S390FLICState S390FLICState;
+-typedef struct S390FLICStateClass S390FLICStateClass;
+-DECLARE_OBJ_CHECKERS(S390FLICState, S390FLICStateClass,
+-                     S390_FLIC_COMMON, TYPE_S390_FLIC_COMMON)
++OBJECT_DECLARE_TYPE(S390FLICState, S390FLICStateClass,
++                    s390_flic_common, S390_FLIC_COMMON)
+ 
+ struct S390FLICState {
+     SysBusDevice parent_obj;
+diff --git a/include/hw/s390x/sclp.h b/include/hw/s390x/sclp.h
+index f9250fee85..0b6cbd6e3e 100644
+--- a/include/hw/s390x/sclp.h
++++ b/include/hw/s390x/sclp.h
+@@ -182,10 +182,8 @@ typedef struct SCCB {
+  } QEMU_PACKED SCCB;
+ 
+ #define TYPE_SCLP "sclp"
+-typedef struct SCLPDevice SCLPDevice;
+-typedef struct SCLPDeviceClass SCLPDeviceClass;
+-DECLARE_OBJ_CHECKERS(SCLPDevice, SCLPDeviceClass,
+-                     SCLP, TYPE_SCLP)
++OBJECT_DECLARE_TYPE(SCLPDevice, SCLPDeviceClass,
++                    sclp, SCLP)
+ 
+ typedef struct SCLPEventFacility SCLPEventFacility;
+ 
+diff --git a/include/hw/sd/sd.h b/include/hw/sd/sd.h
+index b7e404b665..e9534c50da 100644
+--- a/include/hw/sd/sd.h
++++ b/include/hw/sd/sd.h
+@@ -90,7 +90,6 @@ typedef struct {
+ } SDRequest;
+ 
+ typedef struct SDState SDState;
+-typedef struct SDBus SDBus;
+ 
+ #define TYPE_SD_CARD "sd-card"
+ typedef struct SDCardClass SDCardClass;
+@@ -115,9 +114,8 @@ struct SDCardClass {
+ };
+ 
+ #define TYPE_SD_BUS "sd-bus"
+-typedef struct SDBusClass SDBusClass;
+-DECLARE_OBJ_CHECKERS(SDBus, SDBusClass,
+-                     SD_BUS, TYPE_SD_BUS)
++OBJECT_DECLARE_TYPE(SDBus, SDBusClass,
++                    sd_bus, SD_BUS)
+ 
+ struct SDBus {
+     BusState qbus;
+diff --git a/include/hw/ssi/ssi.h b/include/hw/ssi/ssi.h
+index b9286989fc..4fe1d85136 100644
+--- a/include/hw/ssi/ssi.h
++++ b/include/hw/ssi/ssi.h
+@@ -14,13 +14,11 @@
+ #include "hw/qdev-core.h"
+ #include "qom/object.h"
+ 
+-typedef struct SSISlave SSISlave;
+-typedef struct SSISlaveClass SSISlaveClass;
+ typedef enum SSICSMode SSICSMode;
+ 
+ #define TYPE_SSI_SLAVE "ssi-slave"
+-DECLARE_OBJ_CHECKERS(SSISlave, SSISlaveClass,
+-                     SSI_SLAVE, TYPE_SSI_SLAVE)
++OBJECT_DECLARE_TYPE(SSISlave, SSISlaveClass,
++                    ssi_slave, SSI_SLAVE)
+ 
+ #define SSI_GPIO_CS "ssi-gpio-cs"
+ 
+diff --git a/include/hw/sysbus.h b/include/hw/sysbus.h
+index 77e21bba18..28a9b0f634 100644
+--- a/include/hw/sysbus.h
++++ b/include/hw/sysbus.h
+@@ -14,12 +14,10 @@
+ DECLARE_INSTANCE_CHECKER(BusState, SYSTEM_BUS,
+                          TYPE_SYSTEM_BUS)
+ 
+-typedef struct SysBusDevice SysBusDevice;
+ 
+ #define TYPE_SYS_BUS_DEVICE "sys-bus-device"
+-typedef struct SysBusDeviceClass SysBusDeviceClass;
+-DECLARE_OBJ_CHECKERS(SysBusDevice, SysBusDeviceClass,
+-                     SYS_BUS_DEVICE, TYPE_SYS_BUS_DEVICE)
++OBJECT_DECLARE_TYPE(SysBusDevice, SysBusDeviceClass,
++                    sys_bus_device, SYS_BUS_DEVICE)
+ 
+ /**
+  * SysBusDeviceClass:
+diff --git a/include/hw/virtio/virtio-gpu.h b/include/hw/virtio/virtio-gpu.h
+index 7d4f50a59d..2d3485db21 100644
+--- a/include/hw/virtio/virtio-gpu.h
++++ b/include/hw/virtio/virtio-gpu.h
+@@ -25,10 +25,8 @@
+ #include "qom/object.h"
+ 
+ #define TYPE_VIRTIO_GPU_BASE "virtio-gpu-base"
+-typedef struct VirtIOGPUBase VirtIOGPUBase;
+-typedef struct VirtIOGPUBaseClass VirtIOGPUBaseClass;
+-DECLARE_OBJ_CHECKERS(VirtIOGPUBase, VirtIOGPUBaseClass,
+-                     VIRTIO_GPU_BASE, TYPE_VIRTIO_GPU_BASE)
++OBJECT_DECLARE_TYPE(VirtIOGPUBase, VirtIOGPUBaseClass,
++                    virtio_gpu_base, VIRTIO_GPU_BASE)
+ 
+ #define TYPE_VIRTIO_GPU "virtio-gpu-device"
+ typedef struct VirtIOGPU VirtIOGPU;
+diff --git a/include/hw/virtio/virtio-input.h b/include/hw/virtio/virtio-input.h
+index c54aa6aa72..5eb9e7745e 100644
+--- a/include/hw/virtio/virtio-input.h
++++ b/include/hw/virtio/virtio-input.h
+@@ -19,10 +19,8 @@ typedef struct virtio_input_event virtio_input_event;
+ /* qemu internals                                                    */
+ 
+ #define TYPE_VIRTIO_INPUT "virtio-input-device"
+-typedef struct VirtIOInput VirtIOInput;
+-typedef struct VirtIOInputClass VirtIOInputClass;
+-DECLARE_OBJ_CHECKERS(VirtIOInput, VirtIOInputClass,
+-                     VIRTIO_INPUT, TYPE_VIRTIO_INPUT)
++OBJECT_DECLARE_TYPE(VirtIOInput, VirtIOInputClass,
++                    virtio_input, VIRTIO_INPUT)
+ #define VIRTIO_INPUT_GET_PARENT_CLASS(obj) \
+         OBJECT_GET_PARENT_CLASS(obj, TYPE_VIRTIO_INPUT)
+ 
+diff --git a/include/hw/virtio/virtio-mem.h b/include/hw/virtio/virtio-mem.h
+index 5f0b81a967..dfc72e14b1 100644
+--- a/include/hw/virtio/virtio-mem.h
++++ b/include/hw/virtio/virtio-mem.h
+@@ -21,10 +21,8 @@
+ 
+ #define TYPE_VIRTIO_MEM "virtio-mem"
+ 
+-typedef struct VirtIOMEM VirtIOMEM;
+-typedef struct VirtIOMEMClass VirtIOMEMClass;
+-DECLARE_OBJ_CHECKERS(VirtIOMEM, VirtIOMEMClass,
+-                     VIRTIO_MEM, TYPE_VIRTIO_MEM)
++OBJECT_DECLARE_TYPE(VirtIOMEM, VirtIOMEMClass,
++                    virtio_mem, VIRTIO_MEM)
+ 
+ #define VIRTIO_MEM_MEMDEV_PROP "memdev"
+ #define VIRTIO_MEM_NODE_PROP "node"
+diff --git a/include/hw/virtio/virtio-pmem.h b/include/hw/virtio/virtio-pmem.h
+index 6c15abad70..56df9a03ce 100644
+--- a/include/hw/virtio/virtio-pmem.h
++++ b/include/hw/virtio/virtio-pmem.h
+@@ -20,10 +20,8 @@
+ 
+ #define TYPE_VIRTIO_PMEM "virtio-pmem"
+ 
+-typedef struct VirtIOPMEM VirtIOPMEM;
+-typedef struct VirtIOPMEMClass VirtIOPMEMClass;
+-DECLARE_OBJ_CHECKERS(VirtIOPMEM, VirtIOPMEMClass,
+-                     VIRTIO_PMEM, TYPE_VIRTIO_PMEM)
++OBJECT_DECLARE_TYPE(VirtIOPMEM, VirtIOPMEMClass,
++                    virtio_pmem, VIRTIO_PMEM)
+ 
+ #define VIRTIO_PMEM_ADDR_PROP "memaddr"
+ #define VIRTIO_PMEM_MEMDEV_PROP "memdev"
+diff --git a/include/hw/virtio/virtio-serial.h b/include/hw/virtio/virtio-serial.h
+index f6dd30ea66..9a8db8dd70 100644
+--- a/include/hw/virtio/virtio-serial.h
++++ b/include/hw/virtio/virtio-serial.h
+@@ -26,10 +26,8 @@ struct virtio_serial_conf {
+ };
+ 
+ #define TYPE_VIRTIO_SERIAL_PORT "virtio-serial-port"
+-typedef struct VirtIOSerialPort VirtIOSerialPort;
+-typedef struct VirtIOSerialPortClass VirtIOSerialPortClass;
+-DECLARE_OBJ_CHECKERS(VirtIOSerialPort, VirtIOSerialPortClass,
+-                     VIRTIO_SERIAL_PORT, TYPE_VIRTIO_SERIAL_PORT)
++OBJECT_DECLARE_TYPE(VirtIOSerialPort, VirtIOSerialPortClass,
++                    virtio_serial_port, VIRTIO_SERIAL_PORT)
+ 
+ typedef struct VirtIOSerial VirtIOSerial;
+ typedef struct VirtIOSerialBus VirtIOSerialBus;
+diff --git a/include/hw/xen/xen-bus.h b/include/hw/xen/xen-bus.h
+index 35fec7c905..e0e67505b8 100644
+--- a/include/hw/xen/xen-bus.h
++++ b/include/hw/xen/xen-bus.h
+@@ -71,17 +71,15 @@ struct XenBus {
+     XenWatch *backend_watch;
+     QLIST_HEAD(, XenDevice) inactive_devices;
+ };
+-typedef struct XenBus XenBus;
+ 
+ struct XenBusClass {
+     /*< private >*/
+     BusClass parent_class;
+ };
+-typedef struct XenBusClass XenBusClass;
+ 
+ #define TYPE_XEN_BUS "xen-bus"
+-DECLARE_OBJ_CHECKERS(XenBus, XenBusClass,
+-                     XEN_BUS, TYPE_XEN_BUS)
++OBJECT_DECLARE_TYPE(XenBus, XenBusClass,
++                    xen_bus, XEN_BUS)
+ 
+ void xen_bus_init(void);
+ 
+diff --git a/include/io/channel.h b/include/io/channel.h
+index 3ebdc7954f..245479548a 100644
+--- a/include/io/channel.h
++++ b/include/io/channel.h
+@@ -26,10 +26,8 @@
+ #include "block/aio.h"
+ 
+ #define TYPE_QIO_CHANNEL "qio-channel"
+-typedef struct QIOChannel QIOChannel;
+-typedef struct QIOChannelClass QIOChannelClass;
+-DECLARE_OBJ_CHECKERS(QIOChannel, QIOChannelClass,
+-                     QIO_CHANNEL, TYPE_QIO_CHANNEL)
++OBJECT_DECLARE_TYPE(QIOChannel, QIOChannelClass,
++                    qio_channel, QIO_CHANNEL)
+ 
+ 
+ #define QIO_CHANNEL_ERR_BLOCK -2
+diff --git a/include/io/dns-resolver.h b/include/io/dns-resolver.h
+index 96a3186b6b..8ae4857e05 100644
+--- a/include/io/dns-resolver.h
++++ b/include/io/dns-resolver.h
+@@ -26,10 +26,8 @@
+ #include "io/task.h"
+ 
+ #define TYPE_QIO_DNS_RESOLVER "qio-dns-resolver"
+-typedef struct QIODNSResolver QIODNSResolver;
+-typedef struct QIODNSResolverClass QIODNSResolverClass;
+-DECLARE_OBJ_CHECKERS(QIODNSResolver, QIODNSResolverClass,
+-                     QIO_DNS_RESOLVER, TYPE_QIO_DNS_RESOLVER)
++OBJECT_DECLARE_TYPE(QIODNSResolver, QIODNSResolverClass,
++                    qio_dns_resolver, QIO_DNS_RESOLVER)
+ 
+ 
+ /**
+diff --git a/include/io/net-listener.h b/include/io/net-listener.h
+index 93367db291..4f0847ff19 100644
+--- a/include/io/net-listener.h
++++ b/include/io/net-listener.h
+@@ -25,10 +25,8 @@
+ #include "qom/object.h"
+ 
+ #define TYPE_QIO_NET_LISTENER "qio-net-listener"
+-typedef struct QIONetListener QIONetListener;
+-typedef struct QIONetListenerClass QIONetListenerClass;
+-DECLARE_OBJ_CHECKERS(QIONetListener, QIONetListenerClass,
+-                     QIO_NET_LISTENER, TYPE_QIO_NET_LISTENER)
++OBJECT_DECLARE_TYPE(QIONetListener, QIONetListenerClass,
++                    qio_net_listener, QIO_NET_LISTENER)
+ 
+ 
+ typedef void (*QIONetListenerClientFunc)(QIONetListener *listener,
+diff --git a/include/scsi/pr-manager.h b/include/scsi/pr-manager.h
+index f801fe9533..26bd134531 100644
+--- a/include/scsi/pr-manager.h
++++ b/include/scsi/pr-manager.h
+@@ -9,10 +9,8 @@
+ 
+ #define TYPE_PR_MANAGER "pr-manager"
+ 
+-typedef struct PRManager PRManager;
+-typedef struct PRManagerClass PRManagerClass;
+-DECLARE_OBJ_CHECKERS(PRManager, PRManagerClass,
+-                     PR_MANAGER, TYPE_PR_MANAGER)
++OBJECT_DECLARE_TYPE(PRManager, PRManagerClass,
++                    pr_manager, PR_MANAGER)
+ 
+ struct sg_io_hdr;
+ 
+diff --git a/include/sysemu/cryptodev.h b/include/sysemu/cryptodev.h
+index 65c017cf81..06726f7014 100644
+--- a/include/sysemu/cryptodev.h
++++ b/include/sysemu/cryptodev.h
+@@ -37,10 +37,8 @@
+ 
+ #define TYPE_CRYPTODEV_BACKEND "cryptodev-backend"
+ 
+-typedef struct CryptoDevBackend CryptoDevBackend;
+-typedef struct CryptoDevBackendClass CryptoDevBackendClass;
+-DECLARE_OBJ_CHECKERS(CryptoDevBackend, CryptoDevBackendClass,
+-                     CRYPTODEV_BACKEND, TYPE_CRYPTODEV_BACKEND)
++OBJECT_DECLARE_TYPE(CryptoDevBackend, CryptoDevBackendClass,
++                    cryptodev_backend, CRYPTODEV_BACKEND)
+ 
+ 
+ #define MAX_CRYPTO_QUEUE_NUM  64
+diff --git a/include/sysemu/hostmem.h b/include/sysemu/hostmem.h
+index 1e6078f872..e5b7a152d3 100644
+--- a/include/sysemu/hostmem.h
++++ b/include/sysemu/hostmem.h
+@@ -20,10 +20,8 @@
+ #include "qemu/bitmap.h"
+ 
+ #define TYPE_MEMORY_BACKEND "memory-backend"
+-typedef struct HostMemoryBackend HostMemoryBackend;
+-typedef struct HostMemoryBackendClass HostMemoryBackendClass;
+-DECLARE_OBJ_CHECKERS(HostMemoryBackend, HostMemoryBackendClass,
+-                     MEMORY_BACKEND, TYPE_MEMORY_BACKEND)
++OBJECT_DECLARE_TYPE(HostMemoryBackend, HostMemoryBackendClass,
++                    memory_backend, MEMORY_BACKEND)
+ 
+ /* hostmem-ram.c */
+ /**
+diff --git a/include/sysemu/rng.h b/include/sysemu/rng.h
+index f8fc948109..cee45a4787 100644
+--- a/include/sysemu/rng.h
++++ b/include/sysemu/rng.h
+@@ -17,10 +17,8 @@
+ #include "qom/object.h"
+ 
+ #define TYPE_RNG_BACKEND "rng-backend"
+-typedef struct RngBackend RngBackend;
+-typedef struct RngBackendClass RngBackendClass;
+-DECLARE_OBJ_CHECKERS(RngBackend, RngBackendClass,
+-                     RNG_BACKEND, TYPE_RNG_BACKEND)
++OBJECT_DECLARE_TYPE(RngBackend, RngBackendClass,
++                    rng_backend, RNG_BACKEND)
+ 
+ #define TYPE_RNG_BUILTIN "rng-builtin"
+ 
+diff --git a/include/sysemu/tpm_backend.h b/include/sysemu/tpm_backend.h
+index e038b79d34..7e8a014031 100644
+--- a/include/sysemu/tpm_backend.h
++++ b/include/sysemu/tpm_backend.h
+@@ -19,10 +19,8 @@
+ #include "qapi/error.h"
+ 
+ #define TYPE_TPM_BACKEND "tpm-backend"
+-typedef struct TPMBackend TPMBackend;
+-typedef struct TPMBackendClass TPMBackendClass;
+-DECLARE_OBJ_CHECKERS(TPMBackend, TPMBackendClass,
+-                     TPM_BACKEND, TYPE_TPM_BACKEND)
++OBJECT_DECLARE_TYPE(TPMBackend, TPMBackendClass,
++                    tpm_backend, TPM_BACKEND)
+ 
+ 
+ typedef struct TPMBackendCmd {
+diff --git a/include/sysemu/vhost-user-backend.h b/include/sysemu/vhost-user-backend.h
+index e4c85e33c0..76ca06cf40 100644
+--- a/include/sysemu/vhost-user-backend.h
++++ b/include/sysemu/vhost-user-backend.h
+@@ -22,10 +22,8 @@
+ #include "io/channel.h"
+ 
+ #define TYPE_VHOST_USER_BACKEND "vhost-user-backend"
+-typedef struct VhostUserBackend VhostUserBackend;
+-typedef struct VhostUserBackendClass VhostUserBackendClass;
+-DECLARE_OBJ_CHECKERS(VhostUserBackend, VhostUserBackendClass,
+-                     VHOST_USER_BACKEND, TYPE_VHOST_USER_BACKEND)
++OBJECT_DECLARE_TYPE(VhostUserBackend, VhostUserBackendClass,
++                    vhost_user_backend, VHOST_USER_BACKEND)
+ 
+ 
+ struct VhostUserBackendClass {
+diff --git a/target/alpha/cpu-qom.h b/target/alpha/cpu-qom.h
+index 45350318c9..568fe3fb77 100644
+--- a/target/alpha/cpu-qom.h
++++ b/target/alpha/cpu-qom.h
+@@ -25,10 +25,8 @@
+ 
+ #define TYPE_ALPHA_CPU "alpha-cpu"
+ 
+-typedef struct AlphaCPU AlphaCPU;
+-typedef struct AlphaCPUClass AlphaCPUClass;
+-DECLARE_OBJ_CHECKERS(AlphaCPU, AlphaCPUClass,
+-                     ALPHA_CPU, TYPE_ALPHA_CPU)
++OBJECT_DECLARE_TYPE(AlphaCPU, AlphaCPUClass,
++                    alpha_cpu, ALPHA_CPU)
+ 
+ /**
+  * AlphaCPUClass:
+diff --git a/target/arm/cpu-qom.h b/target/arm/cpu-qom.h
+index eeb1917d07..afaf04f082 100644
+--- a/target/arm/cpu-qom.h
++++ b/target/arm/cpu-qom.h
+@@ -27,10 +27,8 @@ struct arm_boot_info;
+ 
+ #define TYPE_ARM_CPU "arm-cpu"
+ 
+-typedef struct ARMCPU ARMCPU;
+-typedef struct ARMCPUClass ARMCPUClass;
+-DECLARE_OBJ_CHECKERS(ARMCPU, ARMCPUClass,
+-                     ARM_CPU, TYPE_ARM_CPU)
++OBJECT_DECLARE_TYPE(ARMCPU, ARMCPUClass,
++                    arm_cpu, ARM_CPU)
+ 
+ #define TYPE_ARM_MAX_CPU "max-" TYPE_ARM_CPU
+ 
+diff --git a/target/avr/cpu-qom.h b/target/avr/cpu-qom.h
+index 1bbfbb2087..49d63faad2 100644
+--- a/target/avr/cpu-qom.h
++++ b/target/avr/cpu-qom.h
+@@ -26,10 +26,8 @@
+ 
+ #define TYPE_AVR_CPU "avr-cpu"
+ 
+-typedef struct AVRCPU AVRCPU;
+-typedef struct AVRCPUClass AVRCPUClass;
+-DECLARE_OBJ_CHECKERS(AVRCPU, AVRCPUClass,
+-                     AVR_CPU, TYPE_AVR_CPU)
++OBJECT_DECLARE_TYPE(AVRCPU, AVRCPUClass,
++                    avr_cpu, AVR_CPU)
+ 
+ /**
+  *  AVRCPUClass:
+diff --git a/target/cris/cpu-qom.h b/target/cris/cpu-qom.h
+index eced6ef7c9..2b0328113c 100644
+--- a/target/cris/cpu-qom.h
++++ b/target/cris/cpu-qom.h
+@@ -25,10 +25,8 @@
+ 
+ #define TYPE_CRIS_CPU "cris-cpu"
+ 
+-typedef struct CRISCPU CRISCPU;
+-typedef struct CRISCPUClass CRISCPUClass;
+-DECLARE_OBJ_CHECKERS(CRISCPU, CRISCPUClass,
+-                     CRIS_CPU, TYPE_CRIS_CPU)
++OBJECT_DECLARE_TYPE(CRISCPU, CRISCPUClass,
++                    cris_cpu, CRIS_CPU)
+ 
+ /**
+  * CRISCPUClass:
+diff --git a/target/hppa/cpu-qom.h b/target/hppa/cpu-qom.h
+index 5c5aa0c053..58158f374b 100644
+--- a/target/hppa/cpu-qom.h
++++ b/target/hppa/cpu-qom.h
+@@ -25,10 +25,8 @@
+ 
+ #define TYPE_HPPA_CPU "hppa-cpu"
+ 
+-typedef struct HPPACPU HPPACPU;
+-typedef struct HPPACPUClass HPPACPUClass;
+-DECLARE_OBJ_CHECKERS(HPPACPU, HPPACPUClass,
+-                     HPPA_CPU, TYPE_HPPA_CPU)
++OBJECT_DECLARE_TYPE(HPPACPU, HPPACPUClass,
++                    hppa_cpu, HPPA_CPU)
+ 
+ /**
+  * HPPACPUClass:
+diff --git a/target/i386/cpu-qom.h b/target/i386/cpu-qom.h
+index 05b52ba74c..0505472e86 100644
+--- a/target/i386/cpu-qom.h
++++ b/target/i386/cpu-qom.h
+@@ -30,10 +30,8 @@
+ #define TYPE_X86_CPU "i386-cpu"
+ #endif
+ 
+-typedef struct X86CPU X86CPU;
+-typedef struct X86CPUClass X86CPUClass;
+-DECLARE_OBJ_CHECKERS(X86CPU, X86CPUClass,
+-                     X86_CPU, TYPE_X86_CPU)
++OBJECT_DECLARE_TYPE(X86CPU, X86CPUClass,
++                    x86_cpu, X86_CPU)
+ 
+ typedef struct X86CPUModel X86CPUModel;
+ 
+diff --git a/target/lm32/cpu-qom.h b/target/lm32/cpu-qom.h
+index 9bf2f82ffe..e9eb495bf0 100644
+--- a/target/lm32/cpu-qom.h
++++ b/target/lm32/cpu-qom.h
+@@ -25,10 +25,8 @@
+ 
+ #define TYPE_LM32_CPU "lm32-cpu"
+ 
+-typedef struct LM32CPU LM32CPU;
+-typedef struct LM32CPUClass LM32CPUClass;
+-DECLARE_OBJ_CHECKERS(LM32CPU, LM32CPUClass,
+-                     LM32_CPU, TYPE_LM32_CPU)
++OBJECT_DECLARE_TYPE(LM32CPU, LM32CPUClass,
++                    lm32_cpu, LM32_CPU)
+ 
+ /**
+  * LM32CPUClass:
+diff --git a/target/m68k/cpu-qom.h b/target/m68k/cpu-qom.h
+index 241a3b19af..a10429cf67 100644
+--- a/target/m68k/cpu-qom.h
++++ b/target/m68k/cpu-qom.h
+@@ -25,10 +25,8 @@
+ 
+ #define TYPE_M68K_CPU "m68k-cpu"
+ 
+-typedef struct M68kCPU M68kCPU;
+-typedef struct M68kCPUClass M68kCPUClass;
+-DECLARE_OBJ_CHECKERS(M68kCPU, M68kCPUClass,
+-                     M68K_CPU, TYPE_M68K_CPU)
++OBJECT_DECLARE_TYPE(M68kCPU, M68kCPUClass,
++                    m68k_cpu, M68K_CPU)
+ 
+ /*
+  * M68kCPUClass:
+diff --git a/target/microblaze/cpu-qom.h b/target/microblaze/cpu-qom.h
+index 73c2237f98..82734b9b2b 100644
+--- a/target/microblaze/cpu-qom.h
++++ b/target/microblaze/cpu-qom.h
+@@ -25,10 +25,8 @@
+ 
+ #define TYPE_MICROBLAZE_CPU "microblaze-cpu"
+ 
+-typedef struct MicroBlazeCPU MicroBlazeCPU;
+-typedef struct MicroBlazeCPUClass MicroBlazeCPUClass;
+-DECLARE_OBJ_CHECKERS(MicroBlazeCPU, MicroBlazeCPUClass,
+-                     MICROBLAZE_CPU, TYPE_MICROBLAZE_CPU)
++OBJECT_DECLARE_TYPE(MicroBlazeCPU, MicroBlazeCPUClass,
++                    microblaze_cpu, MICROBLAZE_CPU)
+ 
+ /**
+  * MicroBlazeCPUClass:
+diff --git a/target/mips/cpu-qom.h b/target/mips/cpu-qom.h
+index 82f45a828c..93fbbdca1b 100644
+--- a/target/mips/cpu-qom.h
++++ b/target/mips/cpu-qom.h
+@@ -29,10 +29,8 @@
+ #define TYPE_MIPS_CPU "mips-cpu"
+ #endif
+ 
+-typedef struct MIPSCPU MIPSCPU;
+-typedef struct MIPSCPUClass MIPSCPUClass;
+-DECLARE_OBJ_CHECKERS(MIPSCPU, MIPSCPUClass,
+-                     MIPS_CPU, TYPE_MIPS_CPU)
++OBJECT_DECLARE_TYPE(MIPSCPU, MIPSCPUClass,
++                    mips_cpu, MIPS_CPU)
+ 
+ /**
+  * MIPSCPUClass:
+diff --git a/target/moxie/cpu.h b/target/moxie/cpu.h
+index a9832a2d85..d58761ccb1 100644
+--- a/target/moxie/cpu.h
++++ b/target/moxie/cpu.h
+@@ -51,10 +51,8 @@ typedef struct CPUMoxieState {
+ 
+ #define TYPE_MOXIE_CPU "moxie-cpu"
+ 
+-typedef struct MoxieCPU MoxieCPU;
+-typedef struct MoxieCPUClass MoxieCPUClass;
+-DECLARE_OBJ_CHECKERS(MoxieCPU, MoxieCPUClass,
+-                     MOXIE_CPU, TYPE_MOXIE_CPU)
++OBJECT_DECLARE_TYPE(MoxieCPU, MoxieCPUClass,
++                    moxie_cpu, MOXIE_CPU)
+ 
+ /**
+  * MoxieCPUClass:
+diff --git a/target/nios2/cpu.h b/target/nios2/cpu.h
+index 0b91a3634b..1fa0fdaa35 100644
+--- a/target/nios2/cpu.h
++++ b/target/nios2/cpu.h
+@@ -32,10 +32,8 @@ typedef struct CPUNios2State CPUNios2State;
+ 
+ #define TYPE_NIOS2_CPU "nios2-cpu"
+ 
+-typedef struct Nios2CPU Nios2CPU;
+-typedef struct Nios2CPUClass Nios2CPUClass;
+-DECLARE_OBJ_CHECKERS(Nios2CPU, Nios2CPUClass,
+-                     NIOS2_CPU, TYPE_NIOS2_CPU)
++OBJECT_DECLARE_TYPE(Nios2CPU, Nios2CPUClass,
++                    nios2_cpu, NIOS2_CPU)
+ 
+ /**
+  * Nios2CPUClass:
+diff --git a/target/openrisc/cpu.h b/target/openrisc/cpu.h
+index 5e6d8a40d6..d0a8ee657a 100644
+--- a/target/openrisc/cpu.h
++++ b/target/openrisc/cpu.h
+@@ -29,10 +29,8 @@ struct OpenRISCCPU;
+ 
+ #define TYPE_OPENRISC_CPU "or1k-cpu"
+ 
+-typedef struct OpenRISCCPU OpenRISCCPU;
+-typedef struct OpenRISCCPUClass OpenRISCCPUClass;
+-DECLARE_OBJ_CHECKERS(OpenRISCCPU, OpenRISCCPUClass,
+-                     OPENRISC_CPU, TYPE_OPENRISC_CPU)
++OBJECT_DECLARE_TYPE(OpenRISCCPU, OpenRISCCPUClass,
++                    openrisc_cpu, OPENRISC_CPU)
+ 
+ /**
+  * OpenRISCCPUClass:
+diff --git a/target/ppc/cpu-qom.h b/target/ppc/cpu-qom.h
+index f7e600c7b3..5cf806a3a6 100644
+--- a/target/ppc/cpu-qom.h
++++ b/target/ppc/cpu-qom.h
+@@ -29,10 +29,8 @@
+ #define TYPE_POWERPC_CPU "powerpc-cpu"
+ #endif
+ 
+-typedef struct PowerPCCPU PowerPCCPU;
+-typedef struct PowerPCCPUClass PowerPCCPUClass;
+-DECLARE_OBJ_CHECKERS(PowerPCCPU, PowerPCCPUClass,
+-                     POWERPC_CPU, TYPE_POWERPC_CPU)
++OBJECT_DECLARE_TYPE(PowerPCCPU, PowerPCCPUClass,
++                    powerpc_cpu, POWERPC_CPU)
+ 
+ typedef struct CPUPPCState CPUPPCState;
+ typedef struct ppc_tb_t ppc_tb_t;
+diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+index 07807a8f20..48484653c9 100644
+--- a/target/riscv/cpu.h
++++ b/target/riscv/cpu.h
+@@ -232,10 +232,8 @@ struct CPURISCVState {
+     QEMUTimer *timer; /* Internal timer */
+ };
+ 
+-typedef struct RISCVCPU RISCVCPU;
+-typedef struct RISCVCPUClass RISCVCPUClass;
+-DECLARE_OBJ_CHECKERS(RISCVCPU, RISCVCPUClass,
+-                     RISCV_CPU, TYPE_RISCV_CPU)
++OBJECT_DECLARE_TYPE(RISCVCPU, RISCVCPUClass,
++                    riscv_cpu, RISCV_CPU)
+ 
+ /**
+  * RISCVCPUClass:
+diff --git a/target/s390x/cpu-qom.h b/target/s390x/cpu-qom.h
+index 5f0dccdac1..e2b2513711 100644
+--- a/target/s390x/cpu-qom.h
++++ b/target/s390x/cpu-qom.h
+@@ -25,10 +25,8 @@
+ 
+ #define TYPE_S390_CPU "s390x-cpu"
+ 
+-typedef struct S390CPU S390CPU;
+-typedef struct S390CPUClass S390CPUClass;
+-DECLARE_OBJ_CHECKERS(S390CPU, S390CPUClass,
+-                     S390_CPU, TYPE_S390_CPU)
++OBJECT_DECLARE_TYPE(S390CPU, S390CPUClass,
++                    s390_cpu, S390_CPU)
+ 
+ typedef struct S390CPUModel S390CPUModel;
+ typedef struct S390CPUDef S390CPUDef;
+diff --git a/target/sh4/cpu-qom.h b/target/sh4/cpu-qom.h
+index b04b2bb4bf..595814b8cb 100644
+--- a/target/sh4/cpu-qom.h
++++ b/target/sh4/cpu-qom.h
+@@ -29,10 +29,8 @@
+ #define TYPE_SH7751R_CPU SUPERH_CPU_TYPE_NAME("sh7751r")
+ #define TYPE_SH7785_CPU  SUPERH_CPU_TYPE_NAME("sh7785")
+ 
+-typedef struct SuperHCPU SuperHCPU;
+-typedef struct SuperHCPUClass SuperHCPUClass;
+-DECLARE_OBJ_CHECKERS(SuperHCPU, SuperHCPUClass,
+-                     SUPERH_CPU, TYPE_SUPERH_CPU)
++OBJECT_DECLARE_TYPE(SuperHCPU, SuperHCPUClass,
++                    superh_cpu, SUPERH_CPU)
+ 
+ /**
+  * SuperHCPUClass:
+diff --git a/target/sparc/cpu-qom.h b/target/sparc/cpu-qom.h
+index 42cb631d45..5d7fb727bc 100644
+--- a/target/sparc/cpu-qom.h
++++ b/target/sparc/cpu-qom.h
+@@ -29,10 +29,8 @@
+ #define TYPE_SPARC_CPU "sparc-cpu"
+ #endif
+ 
+-typedef struct SPARCCPU SPARCCPU;
+-typedef struct SPARCCPUClass SPARCCPUClass;
+-DECLARE_OBJ_CHECKERS(SPARCCPU, SPARCCPUClass,
+-                     SPARC_CPU, TYPE_SPARC_CPU)
++OBJECT_DECLARE_TYPE(SPARCCPU, SPARCCPUClass,
++                    sparc_cpu, SPARC_CPU)
+ 
+ typedef struct sparc_def_t sparc_def_t;
+ /**
+diff --git a/target/tilegx/cpu.h b/target/tilegx/cpu.h
+index d4cf70dc15..d251ff80b8 100644
+--- a/target/tilegx/cpu.h
++++ b/target/tilegx/cpu.h
+@@ -99,10 +99,8 @@ typedef struct CPUTLGState {
+ 
+ #define TYPE_TILEGX_CPU "tilegx-cpu"
+ 
+-typedef struct TileGXCPU TileGXCPU;
+-typedef struct TileGXCPUClass TileGXCPUClass;
+-DECLARE_OBJ_CHECKERS(TileGXCPU, TileGXCPUClass,
+-                     TILEGX_CPU, TYPE_TILEGX_CPU)
++OBJECT_DECLARE_TYPE(TileGXCPU, TileGXCPUClass,
++                    tilegx_cpu, TILEGX_CPU)
+ 
+ /**
+  * TileGXCPUClass:
+diff --git a/target/tricore/cpu-qom.h b/target/tricore/cpu-qom.h
+index 1988c26093..9e588c4c34 100644
+--- a/target/tricore/cpu-qom.h
++++ b/target/tricore/cpu-qom.h
+@@ -24,10 +24,8 @@
+ 
+ #define TYPE_TRICORE_CPU "tricore-cpu"
+ 
+-typedef struct TriCoreCPU TriCoreCPU;
+-typedef struct TriCoreCPUClass TriCoreCPUClass;
+-DECLARE_OBJ_CHECKERS(TriCoreCPU, TriCoreCPUClass,
+-                     TRICORE_CPU, TYPE_TRICORE_CPU)
++OBJECT_DECLARE_TYPE(TriCoreCPU, TriCoreCPUClass,
++                    tricore_cpu, TRICORE_CPU)
+ 
+ struct TriCoreCPUClass {
+     /*< private >*/
+diff --git a/target/unicore32/cpu-qom.h b/target/unicore32/cpu-qom.h
+index 5b67ac532d..c914273058 100644
+--- a/target/unicore32/cpu-qom.h
++++ b/target/unicore32/cpu-qom.h
+@@ -16,10 +16,8 @@
+ 
+ #define TYPE_UNICORE32_CPU "unicore32-cpu"
+ 
+-typedef struct UniCore32CPU UniCore32CPU;
+-typedef struct UniCore32CPUClass UniCore32CPUClass;
+-DECLARE_OBJ_CHECKERS(UniCore32CPU, UniCore32CPUClass,
+-                     UNICORE32_CPU, TYPE_UNICORE32_CPU)
++OBJECT_DECLARE_TYPE(UniCore32CPU, UniCore32CPUClass,
++                    unicore32_cpu, UNICORE32_CPU)
+ 
+ /**
+  * UniCore32CPUClass:
+diff --git a/target/xtensa/cpu-qom.h b/target/xtensa/cpu-qom.h
+index ef13262b42..299ce3e63c 100644
+--- a/target/xtensa/cpu-qom.h
++++ b/target/xtensa/cpu-qom.h
+@@ -34,10 +34,8 @@
+ 
+ #define TYPE_XTENSA_CPU "xtensa-cpu"
+ 
+-typedef struct XtensaCPU XtensaCPU;
+-typedef struct XtensaCPUClass XtensaCPUClass;
+-DECLARE_OBJ_CHECKERS(XtensaCPU, XtensaCPUClass,
+-                     XTENSA_CPU, TYPE_XTENSA_CPU)
++OBJECT_DECLARE_TYPE(XtensaCPU, XtensaCPUClass,
++                    xtensa_cpu, XTENSA_CPU)
+ 
+ typedef struct XtensaConfig XtensaConfig;
+ 
+diff --git a/backends/dbus-vmstate.c b/backends/dbus-vmstate.c
+index 790bc9d728..55aea64af5 100644
+--- a/backends/dbus-vmstate.c
++++ b/backends/dbus-vmstate.c
+@@ -21,12 +21,10 @@
+ #include "trace.h"
+ #include "qom/object.h"
+ 
+-typedef struct DBusVMState DBusVMState;
+-typedef struct DBusVMStateClass DBusVMStateClass;
+ 
+ #define TYPE_DBUS_VMSTATE "dbus-vmstate"
+-DECLARE_OBJ_CHECKERS(DBusVMState, DBusVMStateClass,
+-                     DBUS_VMSTATE, TYPE_DBUS_VMSTATE)
++OBJECT_DECLARE_TYPE(DBusVMState, DBusVMStateClass,
++                    dbus_vmstate, DBUS_VMSTATE)
+ 
+ struct DBusVMStateClass {
+     ObjectClass parent_class;
+diff --git a/ui/input-barrier.c b/ui/input-barrier.c
+index ece32a56e6..6ff0a23ddb 100644
+--- a/ui/input-barrier.c
++++ b/ui/input-barrier.c
+@@ -20,10 +20,8 @@
+ #include "input-barrier.h"
+ 
+ #define TYPE_INPUT_BARRIER "input-barrier"
+-typedef struct InputBarrier InputBarrier;
+-typedef struct InputBarrierClass InputBarrierClass;
+-DECLARE_OBJ_CHECKERS(InputBarrier, InputBarrierClass,
+-                     INPUT_BARRIER, TYPE_INPUT_BARRIER)
++OBJECT_DECLARE_TYPE(InputBarrier, InputBarrierClass,
++                    input_barrier, INPUT_BARRIER)
+ 
+ 
+ #define MAX_HELLO_LENGTH 1024
+diff --git a/ui/input-linux.c b/ui/input-linux.c
+index 77988e8c71..d916c1eec1 100644
+--- a/ui/input-linux.c
++++ b/ui/input-linux.c
+@@ -31,10 +31,8 @@ static bool linux_is_button(unsigned int lnx)
+ }
+ 
+ #define TYPE_INPUT_LINUX "input-linux"
+-typedef struct InputLinux InputLinux;
+-typedef struct InputLinuxClass InputLinuxClass;
+-DECLARE_OBJ_CHECKERS(InputLinux, InputLinuxClass,
+-                     INPUT_LINUX, TYPE_INPUT_LINUX)
++OBJECT_DECLARE_TYPE(InputLinux, InputLinuxClass,
++                    input_linux, INPUT_LINUX)
+ 
+ 
+ struct InputLinux {
 -- 
 2.26.2
 
