@@ -2,100 +2,80 @@ Return-Path: <SRS0=egLd=BX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 374D6C433E3
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 07:54:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E661C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 07:56:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B005520716
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 07:54:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nGkV6kFy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B005520716
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	by mail.kernel.org (Postfix) with ESMTPS id 742A22078D
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 07:56:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 742A22078D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51678 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55832 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k684P-0008K7-Ka
-	for qemu-devel@archiver.kernel.org; Thu, 13 Aug 2020 03:54:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44050)
+	id 1k685z-0001jZ-PZ
+	for qemu-devel@archiver.kernel.org; Thu, 13 Aug 2020 03:56:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43584)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k683S-0007QV-7Q
- for qemu-devel@nongnu.org; Thu, 13 Aug 2020 03:53:42 -0400
-Received: from mail-wr1-x432.google.com ([2a00:1450:4864:20::432]:42772)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k680n-0004pj-EP
+ for qemu-devel@nongnu.org; Thu, 13 Aug 2020 03:50:57 -0400
+Received: from indium.canonical.com ([91.189.90.7]:38942)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k683Q-0003hH-Eu
- for qemu-devel@nongnu.org; Thu, 13 Aug 2020 03:53:41 -0400
-Received: by mail-wr1-x432.google.com with SMTP id r4so4349387wrx.9
- for <qemu-devel@nongnu.org>; Thu, 13 Aug 2020 00:53:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:references:cc:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=VryNuQpXeWiH5WU29tTxI6GLH1zeaY8QVaIuFAFhGmk=;
- b=nGkV6kFy/gBv4a6A2MQ/53FLPkOXO2Y7HzvnbINNNo3ff6Ph5Jg3fMRozX/2I9WGgs
- XrCaS84dj+9ndXOOxJGivYrr1OT+q6zFrSVJK/SWwDY9pR2Vv8/TIDGiOhuPE8ly2v1v
- cZ6SCRaKWYLRGGZFLxFBFGqgmLZwnobL37JzvUjoTf+VPIPMolxrLqeYQ2mXtP3hmdw1
- 1UA06qd+knbklsQmfm22nWAJqfl0wpS6f6jUftTuTLqUhkfPHzn71UaMGNkJdXYx/3Zz
- 7M3uTXP0NGodv2IH/76si8qgqDkJfPu17qB06emPaj9YENSu7UpV04pSvc3FaSP7rWaT
- 94JQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:references:cc:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=VryNuQpXeWiH5WU29tTxI6GLH1zeaY8QVaIuFAFhGmk=;
- b=sf80zInZAan3YwyVJ4aAsD+q+N0OAGSSkF53AbkrWrHAVYsbB9idJcmAX7wzKPuhaM
- ImLnLQ9LgjCy+pGcBwm1S+XRjJo3+eC1H6XtzElkFKR7aN6C0u+ibfmIh1zzs0OysAuD
- sjZzh5mcrcuBfwE+eCd245XHq5ufYKGND6k3f9AJQrfI/zjkY86fHg4Fjf1XkfNpAHDV
- 0KnjnIY61yge2n9cxvhM4cTcdIjCC8JEXHcMBw+89xQ3Ws0hIoTFdPBYtPIa7ryXl8dU
- fP8qB6ZU/PLzhJBMKd8mTBQLzURYex0UTTW69wML1Y+yqW7qC3ae/S0kVKD6bjFcyEVq
- tIXA==
-X-Gm-Message-State: AOAM530Mv0wqPouDCF8hZxwuu8LScXwTDrFjo1MQhdCLwizkLUMmRDiW
- WBE61pPGdDzDZ962gsdwm40=
-X-Google-Smtp-Source: ABdhPJy5I+Qo+vT1H/1ihKDdpUGAh03oIdp6zTS2jXPNF0gRFJ/H31sIJMx7iPkSlidnle3YnSk/kw==
-X-Received: by 2002:adf:dcc9:: with SMTP id x9mr3002369wrm.153.1597305218640; 
- Thu, 13 Aug 2020 00:53:38 -0700 (PDT)
-Received: from [192.168.1.36] (121.red-81-40-121.staticip.rima-tde.net.
- [81.40.121.121])
- by smtp.gmail.com with ESMTPSA id a3sm7983676wme.34.2020.08.13.00.53.37
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 13 Aug 2020 00:53:38 -0700 (PDT)
-Subject: Re: [PULL 00/20] riscv-to-apply queue
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20200812223045.96803-1-alistair.francis@wdc.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <4b6e707d-405e-dfb2-d804-2252b13df2be@amsat.org>
-Date: Thu, 13 Aug 2020 09:53:37 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k680l-0003QZ-3o
+ for qemu-devel@nongnu.org; Thu, 13 Aug 2020 03:50:57 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1k680i-0004AM-1H
+ for <qemu-devel@nongnu.org>; Thu, 13 Aug 2020 07:50:52 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id DCCC02E809C
+ for <qemu-devel@nongnu.org>; Thu, 13 Aug 2020 07:50:51 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20200812223045.96803-1-alistair.francis@wdc.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::432;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x432.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 13 Aug 2020 07:41:15 -0000
+From: "Tony.LI" <1890545@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: ajbennee bigboy0822 pmaydell
+X-Launchpad-Bug-Reporter: Tony.LI (bigboy0822)
+X-Launchpad-Bug-Modifier: Tony.LI (bigboy0822)
+References: <159670025270.3099.13280483088179052036.malonedeb@gac.canonical.com>
+Message-Id: <159730447546.9711.1588483295452038624.malone@wampee.canonical.com>
+Subject: [Bug 1890545] Re: (ARM64) qemu-x86_64+schroot(Debian bullseye) can't
+ run chrome and can't load HTML
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="6a138c03da9cc3e2e03f6dd3bbb4a615b0be6ec2";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: a8a2452fb977f5f28c2c675fdb9f79bc5886dade
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/13 03:50:52
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -104,108 +84,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- Alistair Francis <alistair.francis@wdc.com>, qemu-devel@nongnu.org,
- LIU Zhiwei <zhiwei_liu@c-sky.com>
+Reply-To: Bug 1890545 <1890545@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/13/20 12:30 AM, Alistair Francis wrote:
-> The following changes since commit d0ed6a69d399ae193959225cdeaa9382746c91cc:
-> 
->   Update version for v5.1.0 release (2020-08-11 17:07:03 +0100)
-> 
-> are available in the Git repository at:
-> 
->   git@github.com:alistair23/qemu.git tags/pull-riscv-to-apply-20200812
-> 
-> for you to fetch changes up to 339332b8aa240e4ea3a56ec1b98cc9b2e1346834:
-> 
->   hw/intc: ibex_plic: Honour source priorities (2020-08-12 12:07:58 -0700)
-> 
-> ----------------------------------------------------------------
-> The first RISC-V PR for the 5.2 window.
-> 
-> This includes:
->  - NaNBox fixes
->  - Vector extension improvements
->  - a L2 cache controller
->  - PMP fixes
->  - Upgrade to OpenSBI v0.8 and the generic platform
->  - Fixes for the Ibex PLIC
-> 
-> ----------------------------------------------------------------
-> Alistair Francis (3):
->       hw/intc: ibex_plic: Update the pending irqs
->       hw/intc: ibex_plic: Don't allow repeat interrupts on claimed lines
->       hw/intc: ibex_plic: Honour source priorities
-> 
-> Bin Meng (7):
->       hw/riscv: sifive_u: Add a dummy L2 cache controller device
->       configure: Create symbolic links for pc-bios/*.elf files
->       roms/opensbi: Upgrade from v0.7 to v0.8
->       roms/Makefile: Build the generic platform for RISC-V OpenSBI firmware
->       hw/riscv: Use pre-built bios image of generic platform for virt & sifive_u
->       hw/riscv: spike: Change the default bios to use generic platform image
->       gitlab-ci/opensbi: Update GitLab CI to build generic platform
-> 
-> Hou Weiying (1):
->       riscv: Fix bug in setting pmpcfg CSR for RISCV64
-> 
-> LIU Zhiwei (2):
->       target/riscv: Clean up fmv.w.x
->       target/riscv: check before allocating TCG temps
-> 
-> Richard Henderson (5):
->       target/riscv: Generate nanboxed results from fp helpers
->       target/riscv: Generalize gen_nanbox_fpr to gen_nanbox_s
->       target/riscv: Generate nanboxed results from trans_rvf.inc.c
->       target/riscv: Check nanboxed inputs to fp helpers
->       target/riscv: Check nanboxed inputs in trans_rvf.inc.c
-> 
-> Zong Li (2):
->       target/riscv: Fix the translation of physical address
->       target/riscv: Change the TLB page size depends on PMP entries.
-> 
->  configure                                      |   1 +
->  Makefile                                       |   4 +-
->  include/hw/intc/ibex_plic.h                    |   1 +
->  include/hw/riscv/sifive_u.h                    |   4 +
->  target/riscv/internals.h                       |  16 ++++
->  target/riscv/pmp.h                             |   2 +
->  hw/intc/ibex_plic.c                            |  36 +++++++--
->  hw/riscv/sifive_u.c                            |  26 ++++++-
->  hw/riscv/spike.c                               |   9 ++-
->  hw/riscv/virt.c                                |   4 +-
->  target/riscv/cpu_helper.c                      |  15 +++-
->  target/riscv/fpu_helper.c                      | 102 ++++++++++++++++---------
->  target/riscv/insn_trans/trans_rvd.inc.c        |   8 +-
->  target/riscv/insn_trans/trans_rvf.inc.c        |  99 +++++++++++++++---------
->  target/riscv/pmp.c                             |  57 +++++++++++++-
->  target/riscv/translate.c                       |  29 +++++++
->  .gitlab-ci.d/opensbi.yml                       |  28 +++----
->  pc-bios/opensbi-riscv32-generic-fw_dynamic.bin | Bin 0 -> 62144 bytes
->  pc-bios/opensbi-riscv32-generic-fw_dynamic.elf | Bin 0 -> 558668 bytes
->  pc-bios/opensbi-riscv32-sifive_u-fw_jump.bin   | Bin 49520 -> 0 bytes
->  pc-bios/opensbi-riscv32-virt-fw_jump.bin       | Bin 49504 -> 0 bytes
->  pc-bios/opensbi-riscv64-generic-fw_dynamic.bin | Bin 0 -> 70792 bytes
->  pc-bios/opensbi-riscv64-generic-fw_dynamic.elf | Bin 0 -> 620424 bytes
->  pc-bios/opensbi-riscv64-sifive_u-fw_jump.bin   | Bin 57936 -> 0 bytes
->  pc-bios/opensbi-riscv64-virt-fw_jump.bin       | Bin 57920 -> 0 bytes
->  roms/Makefile                                  |  32 +++-----
->  roms/opensbi                                   |   2 +-
->  27 files changed, 338 insertions(+), 137 deletions(-)
->  create mode 100644 pc-bios/opensbi-riscv32-generic-fw_dynamic.bin
->  create mode 100644 pc-bios/opensbi-riscv32-generic-fw_dynamic.elf
->  delete mode 100644 pc-bios/opensbi-riscv32-sifive_u-fw_jump.bin
->  delete mode 100644 pc-bios/opensbi-riscv32-virt-fw_jump.bin
->  create mode 100644 pc-bios/opensbi-riscv64-generic-fw_dynamic.bin
->  create mode 100644 pc-bios/opensbi-riscv64-generic-fw_dynamic.elf
->  delete mode 100644 pc-bios/opensbi-riscv64-sifive_u-fw_jump.bin
->  delete mode 100644 pc-bios/opensbi-riscv64-virt-fw_jump.bin
-> 
+Hi,I have already added ioctl(), but there is one individual issue.
 
-Note to Peter, there is a comment to resolve on patch #5 before
-applying this.
+Like this:
+ioctl(54, _IOC(_IOC_READ, 0xf5, 0x0c, 0x04) <unfinished ...>
+
+But,despite the appearance:
+
+15461 open("/home/tony/.config/google-chrome/Default/Web Data",O_RDWR|O_CRE=
+AT|O_NOFOLLOW|O_CLOEXEC,0600) =3D 43
+15461 clock_gettime(1,275070715216,0,16,547700673376,4) =3D 0
+15461 fstat(43,0x0000004025148d50) =3D 0
+15461 fstat(43,0x00000040251489a0) =3D 0
+15461 stat("/home/greatwall/.config/google-chrome/Default/Web Data",0x00000=
+04025148910) =3D 0
+15461 ioctl(43,0x8004f50c,0x25148fc4) =3D -1 errno=3D25 (Inappropriate ioct=
+l for device)
+15461 pread64(43,275500011632,100,0,0,274910104856)15461 gettimeofday(27507=
+0717920,275070717904,1,547702733952,0,275070717328) =3D 0
+ =3D 100
+
+Why is there such an error(Inappropriate ioctl for device)??
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1890545
+
+Title:
+  (ARM64) qemu-x86_64+schroot(Debian bullseye) can't run chrome and
+  can't load HTML
+
+Status in QEMU:
+  New
+
+Bug description:
+  First I creat a file system that is debian(bullseye amd64)on arm64
+  machine=EF=BC=8Cthen I download google-chrome=EF=BC=8Chowever, when I ran=
+ Google
+  browser, some errors occurred.
+
+  $ google-chrome --no-sandbox
+  or =
+
+  $ qemu-x86_64-static google-chrome --no-sandbox
+
+  qemu: uncaught target signal 5 (Trace/breakpoint trap) - core dumped
+  qemu: uncaught target signal 5 (Trace/breakpoint trap) - core dumped
+  [1661:1661:0806/074307.502638:ERROR:nacl_fork_delegate_linux.cc(323)] Bad=
+ NaCl helper startup ack (0 bytes)
+  [1664:1664:0806/074307.504159:ERROR:nacl_fork_delegate_linux.cc(323)] Bad=
+ NaCl helper startup ack (0 bytes)
+  qemu: uncaught target signal 5 (Trace/breakpoint trap) - core dumped
+  qemu: uncaught target signal 5 (Trace/breakpoint trap) - core dumped
+  [1637:1678:0806/074308.337567:ERROR:file_path_watcher_linux.cc(315)] inot=
+ify_init() failed: Function not implemented (38)
+  Fontconfig warning: "/etc/fonts/fonts.conf", line 100: unknown element "b=
+lank"
+  qemu: unknown option 'type=3Dutility'
+  [1637:1680:0806/074313.598432:FATAL:gpu_data_manager_impl_private.cc(439)=
+] GPU process isn't usable. Goodbye.
+  qemu: uncaught target signal 5 (Trace/breakpoint trap) - core dumped
+  Trace/breakpoint trap
+
+  Why?
+  And then I run firefox,it can be opened, but it can't load any web pages =
+and HTML.
+  I really need help=EF=BC=81
+  Thank.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1890545/+subscriptions
 
