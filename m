@@ -2,90 +2,111 @@ Return-Path: <SRS0=egLd=BX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 695E0C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 20:21:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12F8CC433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 20:40:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2C2DA20791
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 20:21:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D067420716
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 20:40:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FnzmlAtz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C2DA20791
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="GiO5yte2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D067420716
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42244 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49384 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k6JjJ-0006LO-DZ
-	for qemu-devel@archiver.kernel.org; Thu, 13 Aug 2020 16:21:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36422)
+	id 1k6K1C-0001kj-Tk
+	for qemu-devel@archiver.kernel.org; Thu, 13 Aug 2020 16:40:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40504)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1k6Jik-0005uN-PW
- for qemu-devel@nongnu.org; Thu, 13 Aug 2020 16:21:06 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:41518
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1k6Jig-0005VB-Kr
- for qemu-devel@nongnu.org; Thu, 13 Aug 2020 16:21:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597350060;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=UdQ4Ia0Wo56ZLfwSBE8QPPvralKE1hTBqrk9VtSWYkM=;
- b=FnzmlAtzMelQWAynSvSCsTZVoKkUgEsJdUonP7m7daP5ZFOpgvLnFS05nKD4Fav85IWfyt
- gWpcXnk4kmYH+oeLwA8TY+6zjv1E4p0smu6FVANJdHO48IFwFLsfW5yKf5Ul8jYGqFIhMy
- h0bpg8QfM1dbJA4NE9j7FRnmCOmD/fM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-385-iimAmIv5MAG7heeORJ-YOA-1; Thu, 13 Aug 2020 16:20:59 -0400
-X-MC-Unique: iimAmIv5MAG7heeORJ-YOA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E04401DDE8;
- Thu, 13 Aug 2020 20:20:57 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-112-166.ams2.redhat.com
- [10.36.112.166])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 836EB5D9D2;
- Thu, 13 Aug 2020 20:20:49 +0000 (UTC)
-Subject: Re: [PATCH] hw: virtio-gpu: remove duplicated 'virtqueue_pop'
-To: Li Qiang <liq3ea@163.com>, mst@redhat.com, kraxel@redhat.com
-References: <20200813153614.39917-1-liq3ea@163.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <47b9f12f-2874-1e1c-2fc1-7ea1a81cc401@redhat.com>
-Date: Thu, 13 Aug 2020 22:20:48 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Firefox/52.0 Thunderbird/52.9.1
+ (Exim 4.90_1) (envelope-from <gromero@linux.vnet.ibm.com>)
+ id 1k6K0P-0001Fk-PP; Thu, 13 Aug 2020 16:39:22 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:24784
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <gromero@linux.vnet.ibm.com>)
+ id 1k6K0N-0007Tz-K5; Thu, 13 Aug 2020 16:39:21 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 07DKUqpm116887; Thu, 13 Aug 2020 16:39:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
+ h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=HIbd55gQYgUr8yUE0rAxv9AV4i95qtwpucMHygg7Q+Y=;
+ b=GiO5yte2W8vpW7yvYLp0SMOGt9S2GbLjKR77ItASyLVf/eVG9RH27FrBfWnY5mTeCJ6/
+ Lf48bkd1nMGxLjF/EjM+ceEO5FBtLZLGlwb5daKXbZCXKOTC6tuzhK/HjNTLE8J6hwGL
+ amp1fT4g5/Dex5VoH5WwGffrYnEpHQm1D7u/X4xTGQv8rFD+0tQHoYGLd+Tv4YmhcXEw
+ 4ILE6o+u7Rh56HaCRTCWG2biOgpGVJm0eLAZfovWsL45KPBy2rHRPhRS971Z8sJMembq
+ 03L0IQTdE+Jt0XFFN7SOMRdm+Sw4AbjoqUyLXdOIPhyL/dN5qh2OWPGLWRvoz3DAEtcc /Q== 
+Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com
+ [169.62.189.11])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 32w0n0ypex-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 13 Aug 2020 16:39:03 -0400
+Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
+ by ppma03dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 07DKZBps016115;
+ Thu, 13 Aug 2020 20:39:02 GMT
+Received: from b01cxnp22033.gho.pok.ibm.com (b01cxnp22033.gho.pok.ibm.com
+ [9.57.198.23]) by ppma03dal.us.ibm.com with ESMTP id 32skp9r627-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 13 Aug 2020 20:39:02 +0000
+Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com
+ [9.57.199.109])
+ by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 07DKd2cB40894876
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 13 Aug 2020 20:39:02 GMT
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id EC911112064;
+ Thu, 13 Aug 2020 20:39:01 +0000 (GMT)
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id DE619112063;
+ Thu, 13 Aug 2020 20:39:00 +0000 (GMT)
+Received: from oc6336877782.ibm.com (unknown [9.85.187.161])
+ by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
+ Thu, 13 Aug 2020 20:39:00 +0000 (GMT)
+Subject: Re: [PATCH] spapr/xive: Use xive_source_esb_len()
+To: Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
+References: <159733969034.320580.6571451425779179477.stgit@bahia.lan>
+From: Gustavo Romero <gromero@linux.vnet.ibm.com>
+Message-ID: <b5cfd02b-abf7-8d03-7ae2-1f483bf7b0bc@linux.vnet.ibm.com>
+Date: Thu, 13 Aug 2020 17:38:59 -0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20200813153614.39917-1-liq3ea@163.com>
+In-Reply-To: <159733969034.320580.6571451425779179477.stgit@bahia.lan>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=lersek@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=lersek@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/13 02:03:30
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
+ definitions=2020-08-13_16:2020-08-13,
+ 2020-08-13 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0
+ priorityscore=1501 clxscore=1011 malwarescore=0 impostorscore=0
+ adultscore=0 suspectscore=0 bulkscore=0 lowpriorityscore=0 spamscore=0
+ mlxscore=0 mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2008130142
+Received-SPF: none client-ip=148.163.158.5;
+ envelope-from=gromero@linux.vnet.ibm.com; helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/13 15:03:14
+X-ACL-Warn: Detected OS   = Linux 3.x [generic]
+X-Spam_score_int: -36
+X-Spam_score: -3.7
+X-Spam_bar: ---
+X-Spam_report: (-3.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001, SPF_NONE=0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,90 +119,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: liq3ea@gmail.com, qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 08/13/20 17:36, Li Qiang wrote:
-> Just use 'while (true)' to avoid duplicated.
-> No function change.
+Hi Greg,
+
+On 8/13/20 2:28 PM, Greg Kurz wrote:
+> static inline size_t xive_source_esb_len(XiveSource *xsrc)
+> {
+>      return (1ull << xsrc->esb_shift) * xsrc->nr_irqs;
+> }
 > 
-> Signed-off-by: Li Qiang <liq3ea@163.com>
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 > ---
->  hw/display/virtio-gpu.c | 8 +++++---
->  1 file changed, 5 insertions(+), 3 deletions(-)
+> Follow-up on "ppc/xive: Rework setup of XiveSource::esb_mmio"
+> http://patchwork.ozlabs.org/project/qemu-devel/patch/159679992680.876294.7520540158586170894.stgit@bahia.lan/
+> ---
+>   hw/intc/spapr_xive.c     |    2 +-
+>   hw/intc/spapr_xive_kvm.c |    2 +-
+>   2 files changed, 2 insertions(+), 2 deletions(-)
 > 
-> diff --git a/hw/display/virtio-gpu.c b/hw/display/virtio-gpu.c
-> index 5f0dd7c150..9cef313f5e 100644
-> --- a/hw/display/virtio-gpu.c
-> +++ b/hw/display/virtio-gpu.c
-> @@ -869,13 +869,15 @@ static void virtio_gpu_handle_ctrl(VirtIODevice *vdev, VirtQueue *vq)
->      }
->  #endif
->  
-> -    cmd = virtqueue_pop(vq, sizeof(struct virtio_gpu_ctrl_command));
-> -    while (cmd) {
-> +    while (true) {
-> +        cmd = virtqueue_pop(vq, sizeof(struct virtio_gpu_ctrl_command));
-> +        if (!cmd) {
-> +            break;
-> +        }
->          cmd->vq = vq;
->          cmd->error = 0;
->          cmd->finished = false;
->          QTAILQ_INSERT_TAIL(&g->cmdq, cmd, next);
-> -        cmd = virtqueue_pop(vq, sizeof(struct virtio_gpu_ctrl_command));
->      }
->  
->      virtio_gpu_process_cmdq(g);
-> 
+> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+> index 3c84f64dc464..4bd0d606ba17 100644
+> --- a/hw/intc/spapr_xive.c
+> +++ b/hw/intc/spapr_xive.c
+> @@ -336,7 +336,7 @@ static void spapr_xive_realize(DeviceState *dev, Error **errp)
+>       sysbus_init_mmio(SYS_BUS_DEVICE(xive), &end_xsrc->esb_mmio);
+>   
+>       /* Set the mapping address of the END ESB pages after the source ESBs */
+> -    xive->end_base = xive->vc_base + (1ull << xsrc->esb_shift) * xsrc->nr_irqs;
+> +    xive->end_base = xive->vc_base + xive_source_esb_len(xsrc);
+>   
+>       /*
+>        * Allocate the routing tables
+> diff --git a/hw/intc/spapr_xive_kvm.c b/hw/intc/spapr_xive_kvm.c
+> index 82a6f99f022d..3263b982239a 100644
+> --- a/hw/intc/spapr_xive_kvm.c
+> +++ b/hw/intc/spapr_xive_kvm.c
+> @@ -831,7 +831,7 @@ void kvmppc_xive_disconnect(SpaprInterruptController *intc)
+>   
+>       /* Clear the KVM mapping */
+>       xsrc = &xive->source;
+> -    esb_len = (1ull << xsrc->esb_shift) * xsrc->nr_irqs;
+> +    esb_len = xive_source_esb_len(xsrc);
 
-There are (at least) three styles:
+hrm I'd like to not add another level of indirection here.
+In this specific case I think it's more clear to read just
 
-(1)
+1ull << xsrc->esb_shift) * xsrc->nr_irqs
 
-    thing = get_next();
-    while (is_valid(thing)) {
-        ...
-        thing = get_next();
-    }
+and get the idea of one IRQ per ESB page (or pair of pages,
+for trigger and management), than one having to look at
+what is inside "a box" called xive_source_esb_len().
 
-(2)
+Wrapping it under another function doesn't help more when
+reading the code, XIVE is already tricky enough :)
 
-    while (true) {
-        thing = get_next();
-        if (!is_valid(thing)) {
-            break;
-        }
-        ...
-     }
 
-(3)
+Cheers,
+Gustavo
 
-    while (is_valid(thing = get_next())) {
-        ...
-    }
-
-My opinion:
-
-- If the get_next() invocation is simple, then style (1) is perfectly fine.
-
-- Style (2) is the worst of all.
-
-- If style (1) is not appropriate for whatever reason, then style (3) is frequently a good replacement. Style (3) is sometimes rejected by coding style documents though. Style (3) is not usable if is_valid() is a function-like macro that does not evaluate its argument exactly once. Frequently, is_valid() is simply open-coded with C operators (using extra parens), for example:
-
-    while ((cmd = virtqueue_pop(vq, sizeof(struct virtio_gpu_ctrl_command)))) {
-
-or more verbosely
-
-    while ((cmd = virtqueue_pop(vq, sizeof(struct virtio_gpu_ctrl_command))) !=
-           NULL) {
-
-If we really dislike style (1), then I'd propose style (3). I think the present patch (style (2)) is a step back.
-
-Just my opinion of course; I don't feel too strongly about this.
-
-Laszlo
-
+PS: It seems something messed up with the commit message. It
+can be that the ML did that tho...
 
