@@ -7,66 +7,66 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80855C433E3
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 22:28:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44965C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 22:29:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4F05920774
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 22:28:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0DD8420774
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 22:29:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K+yVP2tl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F05920774
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XwpZlyr8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0DD8420774
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52040 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56214 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k6LiO-0008F6-Hu
-	for qemu-devel@archiver.kernel.org; Thu, 13 Aug 2020 18:28:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36286)
+	id 1k6LjO-0001WQ-7C
+	for qemu-devel@archiver.kernel.org; Thu, 13 Aug 2020 18:29:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36106)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1k6LgR-0005Kq-QN
- for qemu-devel@nongnu.org; Thu, 13 Aug 2020 18:26:51 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29625
+ id 1k6LgC-0004tQ-JL
+ for qemu-devel@nongnu.org; Thu, 13 Aug 2020 18:26:36 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:58206
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1k6LgN-0002se-Fl
- for qemu-devel@nongnu.org; Thu, 13 Aug 2020 18:26:51 -0400
+ id 1k6LgA-0002ob-Rd
+ for qemu-devel@nongnu.org; Thu, 13 Aug 2020 18:26:36 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597357606;
+ s=mimecast20190719; t=1597357593;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=03X33C2nVksYNqu55ngFeuL1UehMSCG1IZZk458uUcs=;
- b=K+yVP2tlfGugxgO/3/ux2MzO027cDEfHAECKTq4DrOp7OBDTEZbvuZnISxEfcchfZoS48j
- mQhZtB3xlkRoUFwqL2Hx+MuV9aYQ2efTiVlcNsMgYn9ju4RQrFyWTbjPZ8nIlwrsSyjPAG
- 8rZQ5MZ5Q/So2X0WkVfiWtBQK86CdEg=
+ bh=k+VSpcTvYE4m+WDN9scax2UPKJypo/exDIBop33H3x8=;
+ b=XwpZlyr8JcHPSINtbeMBx1PlNDAMynZGTBQzUsLPoImYg15Un3s5bMAxP3PGXvjzgIm+Up
+ E2fum88p/OTFXpzxgn2dA1OShWUOe8EkMk5LkSun7fgO00tXy+q8e19CZ8n/dMxDYVrzPD
+ pGad5gF4DH9kyekT4A/YeSYAavLSZa4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-346-mw5a5klpMgSoyH6GnFU-9w-1; Thu, 13 Aug 2020 18:26:44 -0400
-X-MC-Unique: mw5a5klpMgSoyH6GnFU-9w-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-372-4nWJ5mWIN3mumCyKwlCusw-1; Thu, 13 Aug 2020 18:26:31 -0400
+X-MC-Unique: 4nWJ5mWIN3mumCyKwlCusw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1880B100CA8E
- for <qemu-devel@nongnu.org>; Thu, 13 Aug 2020 22:26:44 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9B12918B9EC1
+ for <qemu-devel@nongnu.org>; Thu, 13 Aug 2020 22:26:30 +0000 (UTC)
 Received: from localhost (ovpn-117-153.rdu2.redhat.com [10.10.117.153])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A4C6D10021AA;
- Thu, 13 Aug 2020 22:26:43 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E7615196F3;
+ Thu, 13 Aug 2020 22:26:29 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 14/41] hcd-dwc2: Rename USB_*CLASS macros for consistency
-Date: Thu, 13 Aug 2020 18:25:58 -0400
-Message-Id: <20200813222625.243136-15-ehabkost@redhat.com>
+Subject: [PATCH 02/41] e1000: Rename QOM class cast macros
+Date: Thu, 13 Aug 2020 18:25:46 -0400
+Message-Id: <20200813222625.243136-3-ehabkost@redhat.com>
 In-Reply-To: <20200813222625.243136-1-ehabkost@redhat.com>
 References: <20200813222625.243136-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
 X-Mimecast-Spam-Score: 0.001
@@ -102,71 +102,51 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Rename the DWC2_CLASS to DWC2_USB_CLASS and DWC2_GET_CLASS to
-DWC2_USB_GET_CLASS, for consistency with the DWC2_USB macro.
+Rename the E1000_DEVICE_CLASS() and E1000_DEVICE_GET_CLASS()
+macros to be consistent with the E1000() instance cast macro.
+
+This will allow us to register the type cast macros using
+OBJECT_DECLARE_TYPE later.
 
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- hw/usb/hcd-dwc2.h | 4 ++--
- hw/usb/hcd-dwc2.c | 8 ++++----
- 2 files changed, 6 insertions(+), 6 deletions(-)
+ hw/net/e1000.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/hw/usb/hcd-dwc2.h b/hw/usb/hcd-dwc2.h
-index 4ba809a07b..54111d835e 100644
---- a/hw/usb/hcd-dwc2.h
-+++ b/hw/usb/hcd-dwc2.h
-@@ -182,9 +182,9 @@ struct DWC2Class {
- #define TYPE_DWC2_USB   "dwc2-usb"
- #define DWC2_USB(obj) \
-     OBJECT_CHECK(DWC2State, (obj), TYPE_DWC2_USB)
--#define DWC2_CLASS(klass) \
-+#define DWC2_USB_CLASS(klass) \
-     OBJECT_CLASS_CHECK(DWC2Class, (klass), TYPE_DWC2_USB)
--#define DWC2_GET_CLASS(obj) \
-+#define DWC2_USB_GET_CLASS(obj) \
-     OBJECT_GET_CLASS(DWC2Class, (obj), TYPE_DWC2_USB)
+diff --git a/hw/net/e1000.c b/hw/net/e1000.c
+index a18f80e369..c4d896a9e6 100644
+--- a/hw/net/e1000.c
++++ b/hw/net/e1000.c
+@@ -151,9 +151,9 @@ typedef struct E1000BaseClass {
+ #define E1000(obj) \
+     OBJECT_CHECK(E1000State, (obj), TYPE_E1000_BASE)
  
- #endif
-diff --git a/hw/usb/hcd-dwc2.c b/hw/usb/hcd-dwc2.c
-index 56f91f6bee..97688d21bf 100644
---- a/hw/usb/hcd-dwc2.c
-+++ b/hw/usb/hcd-dwc2.c
-@@ -1155,7 +1155,7 @@ static void dwc2_work_timer(void *opaque)
+-#define E1000_DEVICE_CLASS(klass) \
++#define E1000_CLASS(klass) \
+      OBJECT_CLASS_CHECK(E1000BaseClass, (klass), TYPE_E1000_BASE)
+-#define E1000_DEVICE_GET_CLASS(obj) \
++#define E1000_GET_CLASS(obj) \
+     OBJECT_GET_CLASS(E1000BaseClass, (obj), TYPE_E1000_BASE)
  
- static void dwc2_reset_enter(Object *obj, ResetType type)
+ static void
+@@ -365,7 +365,7 @@ e1000_autoneg_timer(void *opaque)
+ static void e1000_reset(void *opaque)
  {
--    DWC2Class *c = DWC2_GET_CLASS(obj);
-+    DWC2Class *c = DWC2_USB_GET_CLASS(obj);
-     DWC2State *s = DWC2_USB(obj);
-     int i;
+     E1000State *d = opaque;
+-    E1000BaseClass *edc = E1000_DEVICE_GET_CLASS(d);
++    E1000BaseClass *edc = E1000_GET_CLASS(d);
+     uint8_t *macaddr = d->conf.macaddr.a;
  
-@@ -1239,7 +1239,7 @@ static void dwc2_reset_enter(Object *obj, ResetType type)
- 
- static void dwc2_reset_hold(Object *obj)
- {
--    DWC2Class *c = DWC2_GET_CLASS(obj);
-+    DWC2Class *c = DWC2_USB_GET_CLASS(obj);
-     DWC2State *s = DWC2_USB(obj);
- 
-     trace_usb_dwc2_reset_hold();
-@@ -1253,7 +1253,7 @@ static void dwc2_reset_hold(Object *obj)
- 
- static void dwc2_reset_exit(Object *obj)
- {
--    DWC2Class *c = DWC2_GET_CLASS(obj);
-+    DWC2Class *c = DWC2_USB_GET_CLASS(obj);
-     DWC2State *s = DWC2_USB(obj);
- 
-     trace_usb_dwc2_reset_exit();
-@@ -1382,7 +1382,7 @@ static Property dwc2_usb_properties[] = {
- static void dwc2_class_init(ObjectClass *klass, void *data)
+     timer_del(d->autoneg_timer);
+@@ -1751,7 +1751,7 @@ static void e1000_class_init(ObjectClass *klass, void *data)
  {
      DeviceClass *dc = DEVICE_CLASS(klass);
--    DWC2Class *c = DWC2_CLASS(klass);
-+    DWC2Class *c = DWC2_USB_CLASS(klass);
-     ResettableClass *rc = RESETTABLE_CLASS(klass);
+     PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
+-    E1000BaseClass *e = E1000_DEVICE_CLASS(klass);
++    E1000BaseClass *e = E1000_CLASS(klass);
+     const E1000Info *info = data;
  
-     dc->realize = dwc2_realize;
+     k->realize = pci_e1000_realize;
 -- 
 2.26.2
 
