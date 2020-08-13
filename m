@@ -2,73 +2,98 @@ Return-Path: <SRS0=egLd=BX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4A0FC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 15:37:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7354AC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 15:53:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 86D4320781
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 15:37:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86D4320781
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 3C64B20781
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 15:53:29 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Pl8HTqnU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C64B20781
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52340 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33278 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k6FIL-0004w6-L5
-	for qemu-devel@archiver.kernel.org; Thu, 13 Aug 2020 11:37:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40768)
+	id 1k6FXk-0001KM-Fv
+	for qemu-devel@archiver.kernel.org; Thu, 13 Aug 2020 11:53:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45680)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1k6FHd-00044W-Cf
- for qemu-devel@nongnu.org; Thu, 13 Aug 2020 11:36:50 -0400
-Resent-Date: Thu, 13 Aug 2020 11:36:49 -0400
-Resent-Message-Id: <E1k6FHd-00044W-Cf@lists.gnu.org>
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21716)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1k6FHa-0002mt-2E
- for qemu-devel@nongnu.org; Thu, 13 Aug 2020 11:36:49 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1597332995; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=T7xxE4CxsYobISqIpRlyyoNpPKohbPWaEnaFP6es4uNpsZhQjmOdQnevdfSFSAoKKXK57LobkAB/Bi6RAlNUDWwbWynt7UV+j9aVq1qZKRLHIqKseS15k5kFmV+MWDPLNS8DV4uH1lzwkHsvh0IpxSkig/lY/WmxEc0YFTCCCVg=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1597332995;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=TpD7D4MdyJ/x3eGeQtXDyuZt26888Fc+LOQeEe01eBY=; 
- b=Vnoh6snF2efnamxI9x2CEBB92wkqzvlcowyiF9CEs2gNqz1oXnmM17ynCqq0XVzmek4E8+R2RQSfCdOAzKKeFE9znpAX+F4BcxU4MB2KfyAsfQRr5EeM3pA7+MyO178bTCua+8c1IuLYYinav5fuZWijSKMXwN/2jKynasgLbsY=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1597332989508388.7067014893612;
- Thu, 13 Aug 2020 08:36:29 -0700 (PDT)
-Subject: Re: virtio-vsock requires 'disable-legacy=on' in QEMU 5.1
-Message-ID: <159733298806.15736.14912218494169149336@66eaa9a8a123>
-In-Reply-To: <CAGxU2F7pVNWtJG2BM2bk9qtJ_UHgDw4kjVqRmL-=yme7VX83Vg@mail.gmail.com>
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1k6FXA-0000rC-Rm
+ for qemu-devel@nongnu.org; Thu, 13 Aug 2020 11:52:52 -0400
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:38935)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1k6FX7-00050z-2W
+ for qemu-devel@nongnu.org; Thu, 13 Aug 2020 11:52:52 -0400
+Received: by mail-pg1-x542.google.com with SMTP id v15so3018497pgh.6
+ for <qemu-devel@nongnu.org>; Thu, 13 Aug 2020 08:52:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=WklLjhrK4drp0xRZmPRh6kdz36FUhluTGwFzcvWObQA=;
+ b=Pl8HTqnUsuIzNwZE/W5mtmF19FQB5lN/3+PvfiqhEJXY/tVWx53i4ZYpxgS3x9GlTd
+ Y4ILOfJJpWiFexo5CYlhHcckMaQLzkN/b5s8qSrRxT+hyabEROyNJ21tjWwNsqnazCuq
+ nH77fbjLaOFnVemUcGk/Cnady9EO9Uj/IH2x0+8EGcM+xUDewHKbT3b5y/rtQn8yozqY
+ bTJto898H9zvnydsvJv5XbOF6JEOq5+cIqxwYZf+TIeEaInvQwzHHlFDj3hG8ZiGeOIX
+ LAu6bhZruiLFBKuT7FYG7Ih9GczwT+SbXhtQQT8mv2UF17PAIpbNZkgWZ+4V30TY3E0Q
+ j2sg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=WklLjhrK4drp0xRZmPRh6kdz36FUhluTGwFzcvWObQA=;
+ b=G/30vYjLT3mA38Kj07CTcCy2oRwbPQ7T2yWZbakCvGAHHHY2B+IEAR1DgHGUXjBKdP
+ WiFjEqEz5WUOugFoghZOwXyw2TbFVwET4QyEQb3odj7aHvSwM/0dQNEymP4CJESW3DK8
+ DH8zh4+FzuQqG4g/uu5TsF4ig2wu6TZCMP8NRZHeS+uHOSIf/OBdeE6PrkXMgY03GUTu
+ gs0vjUtMyTy17jSIDJqo0pBSxxLlYZhVTXFj9GdBLTp2AZbOHkWC5L5txWR0hpCNP2vF
+ tvh9A4gKwt48HbW5EJ+Q+OQyp3OA4EnXcuPy8FqIp13hABVW8yQgUBx5kiFjs1pbTNH+
+ ImqA==
+X-Gm-Message-State: AOAM530y89RiOk1kPNCgBn4PsjbROFbw9capHJ7H4a29O06Wg25pVYlj
+ jT67rUUHHg4B4F/ya5wT6VQpjQ==
+X-Google-Smtp-Source: ABdhPJy+1iQZ/e3qLYKw8rFGg3boHO8efYvj355YTE1z4TXekPJoJ6w+nBjaBgv/He3+zvFvNd6wYg==
+X-Received: by 2002:a63:ef46:: with SMTP id c6mr4223122pgk.96.1597333967039;
+ Thu, 13 Aug 2020 08:52:47 -0700 (PDT)
+Received: from [192.168.1.11] ([71.212.141.89])
+ by smtp.gmail.com with ESMTPSA id o192sm6774426pfg.81.2020.08.13.08.52.45
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 13 Aug 2020 08:52:46 -0700 (PDT)
+Subject: Re: [PATCH 3/3] target/riscv: Update MTINST/HTINST CSR in
+ riscv_cpu_do_interrupt()
+To: Alistair Francis <alistair23@gmail.com>, Anup Patel <anup.patel@wdc.com>
+References: <20200729112801.108985-1-anup.patel@wdc.com>
+ <20200729112801.108985-4-anup.patel@wdc.com>
+ <CAKmqyKMCYutR5TNvbJ3nA0rAu4W0xFVsZRm66W7Fi_Nw3joiBw@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <c2624d4f-41f9-8a84-9694-7897cd80c2d0@linaro.org>
+Date: Thu, 13 Aug 2020 08:52:43 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: sgarzare@redhat.com
-Date: Thu, 13 Aug 2020 08:36:29 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o57.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/13 10:17:15
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <CAKmqyKMCYutR5TNvbJ3nA0rAu4W0xFVsZRm66W7Fi_Nw3joiBw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::542;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x542.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -81,36 +106,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: qcheng@redhat.com, mst@redhat.com, cohuck@redhat.com, qemu-devel@nongnu.org,
- pasic@linux.ibm.com, stefanha@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>, Anup Patel <anup@brainfault.org>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Atish Patra <atish.patra@wdc.com>, Alistair Francis <Alistair.Francis@wdc.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS9DQUd4VTJGN3BWTld0SkcyQk0y
-Yms5cXRKX1VIZ0R3NGtqVnFSbUwtPXltZTdWWDgzVmdAbWFpbC5nbWFpbC5jb20vCgoKCkhpLAoK
-VGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2Vl
-IG91dHB1dCBiZWxvdyBmb3IKbW9yZSBpbmZvcm1hdGlvbjoKClR5cGU6IHNlcmllcwpNZXNzYWdl
-LWlkOiBDQUd4VTJGN3BWTld0SkcyQk0yYms5cXRKX1VIZ0R3NGtqVnFSbUwtPXltZTdWWDgzVmdA
-bWFpbC5nbWFpbC5jb20KU3ViamVjdDogdmlydGlvLXZzb2NrIHJlcXVpcmVzICdkaXNhYmxlLWxl
-Z2FjeT1vbicgaW4gUUVNVSA1LjEKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jh
-c2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0t
-bG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMg
-VHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0
-cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09
-CgpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmM2ZWU4YzYgdmlydGlvLXZzb2NrIHJl
-cXVpcmVzICdkaXNhYmxlLWxlZ2FjeT1vbicgaW4gUUVNVSA1LjEKCj09PSBPVVRQVVQgQkVHSU4g
-PT09CkVSUk9SOiBNaXNzaW5nIFNpZ25lZC1vZmYtYnk6IGxpbmUocykKCnRvdGFsOiAxIGVycm9y
-cywgMCB3YXJuaW5ncywgMTQgbGluZXMgY2hlY2tlZAoKQ29tbWl0IGM2ZWU4YzZkMzY0ZCAodmly
-dGlvLXZzb2NrIHJlcXVpcmVzICdkaXNhYmxlLWxlZ2FjeT1vbicgaW4gUUVNVSA1LjEpIGhhcyBz
-dHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJl
-IGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNL
-UEFUQ0ggaW4gTUFJTlRBSU5FUlMuCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4
-aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9w
-YXRjaGV3Lm9yZy9sb2dzL0NBR3hVMkY3cFZOV3RKRzJCTTJiazlxdEpfVUhnRHc0a2pWcVJtTC09
-eW1lN1ZYODNWZ0BtYWlsLmdtYWlsLmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2Fn
-ZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8v
-cGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVs
-QHJlZGhhdC5jb20=
+On 8/12/20 4:16 PM, Alistair Francis wrote:
+> I don't like that we have to manually decode the instructions. As it's
+> only a handful it's not the end of the world, but it seems like
+> duplication that could grow. Could we not use decode_insn16() instead?
+> That way we can share the well tested TCG decoder.
+
+Certainly.  Compare how the decoder can be re-purposed for disassembly -- e.g.
+target/openrisc/disas.c.
+
+Perhaps something like
+
+typedef uint32_t DisasContext;
+
+#include "decode_insn16.inc.c"
+
+/*
+ * This function is supposed to be called for an instruction
+ * that has already executed, and thus is known to be valid.
+ * That said, return 0 for an invalid instruction.
+ */
+uint32_t riscv_expand_rvc_to_rvi(uint16_t insn16)
+{
+    uint32_t insn32 = 0; /* illegal instruction */
+    decode_insn16(&insn32, insn16);
+    return insn32;
+}
+
+static bool expand_i(DisasContext *ctx, arg_immi *a,
+                     uint32_t insn32)
+{
+    insn32 = SET_RD(insn32, a->rd);
+    insn32 = SET_RS1(insn32, a->rs1);
+    insn32 = SET_I_IMM(insn32, a->imm);
+    *ctx = insn32;
+    return true;
+}
+
+static bool trans_addi(DisasContext *ctx, arg_immi *a)
+{
+    return expand_i(ctx, a, OPC_RISC_ADDI);
+}
+
+etc.  All placed in a new file, so that the myriad symbols don't conflict with
+anything else.
+
+
+r~
 
