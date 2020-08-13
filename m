@@ -7,57 +7,57 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 464ABC433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 10:48:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 288B5C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 10:48:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1309620781
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 10:48:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E37F920781
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 10:48:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="aEu+OL3t"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1309620781
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="gMF2bjCH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E37F920781
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52234 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53874 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k6AmJ-000494-Bb
-	for qemu-devel@archiver.kernel.org; Thu, 13 Aug 2020 06:48:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52718)
+	id 1k6Amj-0004pn-2y
+	for qemu-devel@archiver.kernel.org; Thu, 13 Aug 2020 06:48:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52746)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1k6AjW-00082l-Bf; Thu, 13 Aug 2020 06:45:18 -0400
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:43099 helo=ozlabs.org)
+ id 1k6Aja-0008CK-S7; Thu, 13 Aug 2020 06:45:22 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:58949 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1k6AjT-0008Jq-FG; Thu, 13 Aug 2020 06:45:18 -0400
+ id 1k6AjY-0008ME-On; Thu, 13 Aug 2020 06:45:22 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 4BS39y4ktCz9sTY; Thu, 13 Aug 2020 20:45:10 +1000 (AEST)
+ id 4BS39z0KLCz9sTj; Thu, 13 Aug 2020 20:45:10 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1597315510;
- bh=aknzG+GCuZMGFKx/m19Qd6/68FNE29h5IhEnSP0qz3w=;
+ d=gibson.dropbear.id.au; s=201602; t=1597315511;
+ bh=q4gYJWkIdYjm9hJUn0/xiTHgYeLWh7RS1NWQY8LP+6c=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=aEu+OL3tl414bePGXh+jhu66YfKZMWA4LZ+RCiIJZdtw0bqbYNEoyxwkUYwwz/H/Q
- lp+s+Qd/G4yny+dNW78Ypk6r4mjTudp/LbG/1k0TlYXcqarhB5+CEj/GXxitu7W/9g
- Z4G8mu0JwCYClbFd9C41STHiZCmwq/T9wm/x8gCY=
-Date: Thu, 13 Aug 2020 20:23:49 +1000
+ b=gMF2bjCHtkD7xFunJa98527QPOOQev5LZC/UGN474Bnrq3Kpw4+dTb+hCSWlfZyNI
+ 2EV5EIpmDlEDLTL2WsbAtNvxKggHuEnGOsRL7pb8eiXplk20z0msLNOTduOqUJAnu0
+ ezRQ2TazWxndsE3yq4u6mt3nHzlvjaU6Q9dIbwxg=
+Date: Thu, 13 Aug 2020 20:28:42 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
 To: Greg Kurz <groug@kaod.org>
-Subject: Re: [PATCH 06/14] spapr/xive: Rework error handling of
- kvmppc_xive_[gs]et_queue_config()
-Message-ID: <20200813102349.GI181791@yekko.fritz.box>
+Subject: Re: [PATCH 09/14] spapr/kvm: Fix error handling in
+ kvmppc_xive_pre_save()
+Message-ID: <20200813102842.GL181791@yekko.fritz.box>
 References: <159707843034.1489912.1082061742626355958.stgit@bahia.lan>
- <159707847357.1489912.2032291280645236480.stgit@bahia.lan>
+ <159707849455.1489912.6034461176847728064.stgit@bahia.lan>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="TKDEsImF70pdVIl+"
+ protocol="application/pgp-signature"; boundary="p7S+EREVcBHk3zUG"
 Content-Disposition: inline
-In-Reply-To: <159707847357.1489912.2032291280645236480.stgit@bahia.lan>
-Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
+In-Reply-To: <159707849455.1489912.6034461176847728064.stgit@bahia.lan>
+Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
  helo=ozlabs.org
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/13 06:45:10
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -9
 X-Spam_score: -1.0
 X-Spam_bar: -
@@ -84,134 +84,51 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---TKDEsImF70pdVIl+
+--p7S+EREVcBHk3zUG
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Aug 10, 2020 at 06:54:33PM +0200, Greg Kurz wrote:
-> Since kvm_device_access() returns a negative errno on failure, convert
-> kvmppc_xive_get_queue_config() and kvmppc_xive_set_queue_config() to
-> use it for error checking. This allows to get rid of the local_err
-> boilerplate.
->=20
-> Propagate the return value so that callers may use it as well to check
-> failures.
+On Mon, Aug 10, 2020 at 06:54:54PM +0200, Greg Kurz wrote:
+> Now that kvmppc_xive_get_queues() returns a negative errno on failure, ch=
+eck
+> with that because it is preferred to local_err. And most of all, propagate
+> it because vmstate expects negative errnos.
 >=20
 > Signed-off-by: Greg Kurz <groug@kaod.org>
 
-Applied to ppc-for-5.2.
+Fixed a conflict and applied to ppc-for-5.2.
 
 > ---
->  hw/intc/spapr_xive_kvm.c    |   35 ++++++++++++++++-------------------
->  include/hw/ppc/spapr_xive.h |    4 ++--
->  2 files changed, 18 insertions(+), 21 deletions(-)
+>  hw/intc/spapr_xive_kvm.c |    7 ++++---
+>  1 file changed, 4 insertions(+), 3 deletions(-)
 >=20
 > diff --git a/hw/intc/spapr_xive_kvm.c b/hw/intc/spapr_xive_kvm.c
-> index 5e088ccbf885..696623f717b7 100644
+> index f2dda692183b..1686b036eb2d 100644
 > --- a/hw/intc/spapr_xive_kvm.c
 > +++ b/hw/intc/spapr_xive_kvm.c
-> @@ -374,15 +374,15 @@ void kvmppc_xive_source_set_irq(void *opaque, int s=
-rcno, int val)
->  /*
->   * sPAPR XIVE interrupt controller (KVM)
->   */
-> -void kvmppc_xive_get_queue_config(SpaprXive *xive, uint8_t end_blk,
-> -                                  uint32_t end_idx, XiveEND *end,
-> -                                  Error **errp)
-> +int kvmppc_xive_get_queue_config(SpaprXive *xive, uint8_t end_blk,
-> +                                 uint32_t end_idx, XiveEND *end,
-> +                                 Error **errp)
+> @@ -604,16 +604,17 @@ void kvmppc_xive_synchronize_state(SpaprXive *xive,=
+ Error **errp)
+>  int kvmppc_xive_pre_save(SpaprXive *xive)
 >  {
->      struct kvm_ppc_xive_eq kvm_eq =3D { 0 };
->      uint64_t kvm_eq_idx;
->      uint8_t priority;
->      uint32_t server;
-> -    Error *local_err =3D NULL;
+>      Error *local_err =3D NULL;
 > +    int ret;
 > =20
->      assert(xive_end_is_valid(end));
+>      assert(xive->fd !=3D -1);
 > =20
-> @@ -394,11 +394,10 @@ void kvmppc_xive_get_queue_config(SpaprXive *xive, =
-uint8_t end_blk,
->      kvm_eq_idx |=3D server << KVM_XIVE_EQ_SERVER_SHIFT &
->          KVM_XIVE_EQ_SERVER_MASK;
+>      /* EAT: there is no extra state to query from KVM */
 > =20
-> -    kvm_device_access(xive->fd, KVM_DEV_XIVE_GRP_EQ_CONFIG, kvm_eq_idx,
-> -                      &kvm_eq, false, &local_err);
+>      /* ENDT */
+> -    kvmppc_xive_get_queues(xive, &local_err);
 > -    if (local_err) {
-> -        error_propagate(errp, local_err);
-> -        return;
-> +    ret =3D kvm_device_access(xive->fd, KVM_DEV_XIVE_GRP_EQ_CONFIG, kvm_=
-eq_idx,
-> +                            &kvm_eq, false, errp);
+> +    ret =3D kvmppc_xive_get_queues(xive, &local_err);
 > +    if (ret < 0) {
+>          error_report_err(local_err);
+> -        return -1;
 > +        return ret;
 >      }
 > =20
->      /*
-> @@ -408,17 +407,18 @@ void kvmppc_xive_get_queue_config(SpaprXive *xive, =
-uint8_t end_blk,
->       */
->      end->w1 =3D xive_set_field32(END_W1_GENERATION, 0ul, kvm_eq.qtoggle)=
- |
->          xive_set_field32(END_W1_PAGE_OFF, 0ul, kvm_eq.qindex);
-> +
-> +    return 0;
->  }
-> =20
-> -void kvmppc_xive_set_queue_config(SpaprXive *xive, uint8_t end_blk,
-> -                                  uint32_t end_idx, XiveEND *end,
-> -                                  Error **errp)
-> +int kvmppc_xive_set_queue_config(SpaprXive *xive, uint8_t end_blk,
-> +                                 uint32_t end_idx, XiveEND *end,
-> +                                 Error **errp)
->  {
->      struct kvm_ppc_xive_eq kvm_eq =3D { 0 };
->      uint64_t kvm_eq_idx;
->      uint8_t priority;
->      uint32_t server;
-> -    Error *local_err =3D NULL;
-> =20
->      /*
->       * Build the KVM state from the local END structure.
-> @@ -456,12 +456,9 @@ void kvmppc_xive_set_queue_config(SpaprXive *xive, u=
-int8_t end_blk,
->      kvm_eq_idx |=3D server << KVM_XIVE_EQ_SERVER_SHIFT &
->          KVM_XIVE_EQ_SERVER_MASK;
-> =20
-> -    kvm_device_access(xive->fd, KVM_DEV_XIVE_GRP_EQ_CONFIG, kvm_eq_idx,
-> -                      &kvm_eq, true, &local_err);
-> -    if (local_err) {
-> -        error_propagate(errp, local_err);
-> -        return;
-> -    }
-> +    return
-> +        kvm_device_access(xive->fd, KVM_DEV_XIVE_GRP_EQ_CONFIG, kvm_eq_i=
-dx,
-> +                          &kvm_eq, true, errp);
->  }
-> =20
->  void kvmppc_xive_reset(SpaprXive *xive, Error **errp)
-> diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
-> index 93d09d68deb7..d0a08b618f79 100644
-> --- a/include/hw/ppc/spapr_xive.h
-> +++ b/include/hw/ppc/spapr_xive.h
-> @@ -85,10 +85,10 @@ void kvmppc_xive_set_source_config(SpaprXive *xive, u=
-int32_t lisn, XiveEAS *eas,
->  void kvmppc_xive_sync_source(SpaprXive *xive, uint32_t lisn, Error **err=
-p);
->  uint64_t kvmppc_xive_esb_rw(XiveSource *xsrc, int srcno, uint32_t offset,
->                              uint64_t data, bool write);
-> -void kvmppc_xive_set_queue_config(SpaprXive *xive, uint8_t end_blk,
-> +int kvmppc_xive_set_queue_config(SpaprXive *xive, uint8_t end_blk,
->                                   uint32_t end_idx, XiveEND *end,
->                                   Error **errp);
-> -void kvmppc_xive_get_queue_config(SpaprXive *xive, uint8_t end_blk,
-> +int kvmppc_xive_get_queue_config(SpaprXive *xive, uint8_t end_blk,
->                                   uint32_t end_idx, XiveEND *end,
->                                   Error **errp);
->  void kvmppc_xive_synchronize_state(SpaprXive *xive, Error **errp);
+>      return 0;
 >=20
 >=20
 
@@ -221,25 +138,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---TKDEsImF70pdVIl+
+--p7S+EREVcBHk3zUG
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl81FLUACgkQbDjKyiDZ
-s5IL2hAAnyodAsPnhaQ5VVl0zApDpX+qss3HbSW1W5YtHGYC8GyOhOUrA9Ucnu76
-9VqsDm7L822fTs3t7RipLGdsXFknE7x8q2/f/Dfba9ihgzJoSpXe8YO6pgsEsQib
-z6PltbO6aSiGPNAHU6N3mV01l/9puWH5K5/jBwStdjVnYGGrTP4LQBIZHZhsekQO
-nT0CnhXMgYnWCUX54GvLZLxom/dWA+WV8hkG4AP4IvbANj/hP3D+SYpeGZJrnjI3
-8JNYwmYkJuX2571hpg6NHPQtj7PxQCv7JPMMIv+GMBvgm0UVbUpQ9KQSXIi59sTc
-/PTRVylvfhOn3F4IiR/KlSsSglhtVCB1L1ALtHzFWrSlMJZyzv6cKJWAWoajzFUg
-eEay0rtcazw90s20BJCANakMDDsIX4IA8Av1LM2BS32HIXpLE2tkMe7XfzpHq7la
-YJZyuqvGpErPEV5zk6/1QJ14xl0EIWMUi1k10ldOWUatG1VNGeueIVcikhG4Wvjh
-1nYokzzhhmK7z04cDCobYRY1voKTrkVOvQ8HhDza6IUOJ3fe/hIYBK7jqcI5kQkJ
-pGXWGRR9jH/kZEUekyMdGwmkdyUmTwVyZQGt6M9Dy7EpEXv66/+Jk3cT382+uZ+l
-AQXVKCnXJmJb/uTBW0OYgor7X1SNA98dz8DYeHMEszp0sFxhOlo=
-=MYzy
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl81FdoACgkQbDjKyiDZ
+s5LW2g//bVyimU08Lhv86FfCJe1g1KHA+hCGJfjY4VrqFcbux/z+k3RFzEOO5P9V
+ebDFL0+gIocYaxNVh2lE0hu1D6bm4XOzfGCG5/3+CnWQSKcIMRC+5hGggRG6NvTK
+vP5AufCsy7UEMbogcO5iXQzAG9adOsi6sA/cRpg95IBZXMUQWh9VtYf3Be0Ym6gY
+Ubw6i+6VFvu4ZoEKu8yVlWUKxN5QDo17liXbI0nfnZMJo1gZ3nSeQGWzlmiHea+5
+ljInDKWY6nOS0AJm6TKIkkZ1q/p6d9uNdcpFWWN9q7EGQVlfVAr3JLnxMN3K65HU
+szgLC/iqklcLRPIKlmSz330vv0XhnLq2xS+bL16OKHNAd2Pp7qzW0C1HAG5ExqT2
+2sRsTXah/h4z3ywPKKWM1Eijr6lKug0+6jMKo3lB/VtwJbtZnTVsL+As5xkwFxrR
+DP8853YaFoDHD0Q8oEZRNcnG+vlEMVFI2+z3TJhjvI4zuyrjVMW/SsjcHMUf9FPD
+ZvJc7QqiFy2aC7efSmZ9g1M6QjgO3v97fvOtV/58AhXL2TAQMkX1Z+Tm1RMlslpx
+3n/x2KVL01yONQUmN0RfvZdpQUC7EhFIZ98lgTqj6sPZcSukYzzTVrbiEWg4JJMv
+tX/oa/XyauWcYgNBl3lGhhFy+KG7Oc/0riKx0oO6VEtoB0UkUt8=
+=yub7
 -----END PGP SIGNATURE-----
 
---TKDEsImF70pdVIl+--
+--p7S+EREVcBHk3zUG--
 
