@@ -2,68 +2,66 @@ Return-Path: <SRS0=egLd=BX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11EBCC433DF
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BE05C433E1
 	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 06:51:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D688D20771
+	by mail.kernel.org (Postfix) with ESMTPS id 037CB20781
 	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 06:51:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D688D20771
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 037CB20781
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48954 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48948 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k675D-0008H9-4O
+	id 1k675D-0008H2-0g
 	for qemu-devel@archiver.kernel.org; Thu, 13 Aug 2020 02:51:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60278)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60228)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1k673M-0006PB-NK
- for qemu-devel@nongnu.org; Thu, 13 Aug 2020 02:49:34 -0400
-Received: from mout.kundenserver.de ([217.72.192.74]:34523)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1k673K-0006O3-0v
+ for qemu-devel@nongnu.org; Thu, 13 Aug 2020 02:49:30 -0400
+Received: from mout.kundenserver.de ([217.72.192.75]:45961)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1k673J-0004bo-Dz
- for qemu-devel@nongnu.org; Thu, 13 Aug 2020 02:49:32 -0400
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1k673I-0004bh-4C
+ for qemu-devel@nongnu.org; Thu, 13 Aug 2020 02:49:29 -0400
 Received: from localhost.localdomain ([82.252.135.186]) by
  mrelayeu.kundenserver.de (mreue107 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1MOAmt-1kLkDs3L8j-00OUWp; Thu, 13 Aug 2020 08:49:26 +0200
+ id 1MILru-1jrnhB1Miy-00EQqs; Thu, 13 Aug 2020 08:49:25 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 01/14] linux-user: Fix "print_fdset()" in "strace.c" to not
- print ", " after last value
-Date: Thu, 13 Aug 2020 08:49:10 +0200
-Message-Id: <20200813064923.263565-2-laurent@vivier.eu>
+Subject: [PULL 00/14] Linux user for 5.2 patches
+Date: Thu, 13 Aug 2020 08:49:09 +0200
+Message-Id: <20200813064923.263565-1-laurent@vivier.eu>
 X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200813064923.263565-1-laurent@vivier.eu>
-References: <20200813064923.263565-1-laurent@vivier.eu>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:k5WNklHgXJAKgUwHlCIhV2zupA6XopnwoqkM277mTHnXabjZgdG
- wl5JRLifnUxquMFokwBe0u/NEP/tGtdpeAGI6qIL4gKFalTJi2bSrlkOdJZmztHyvJrV1Vz
- w5D0i7XwBtE6zT+/LDzogqHinT9FptiFVTbNc5LylHmsTHL9AKqUKBOkJOVkSs3fmq7K4kS
- yJficVuZiEbdclqj/fjaA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:tx9HswNVwAk=:4qkAh7xZCsL+2Q+FVc08aV
- he/v4o5ENEnL8pfTT/ogi6bGPmc3xJ8p1VYNqNM16hYqgrOXwb+b1XfiKDmgCfrkP0bbV4SKB
- FcDak6mI2kk8RcHtwBxM/2VDEEibQZasUK3IErTGqVY7n+YXygfZoM7pUnxpdYuCqaql+wQgf
- ktvCeb0FaZMs+Fv1n2s2bkqnUGYvEKhj+dW9WOIKtD2g7vuVgZmsyTNARExQL2GzXFKu3WXDG
- i9n3fd/p/9kc15cODcVJX3a6KclF/KFGtaA6lFo9wHtHnLx5UMyUiO7hvps+fzjmsg6CNO6jg
- z0lyK9IOAK1thBtk7A9G77m6MiFhCzIeVTIuXsZW/FaFfJnOSklJ3qbCFp2rckuFHq5xPpcSb
- Ak+yJQodMB4fMus//odXfWCBf2h1vOlHvk89hDpskX3qzrF1PrcBrMioGMCw69OVRRzp8SG2y
- gurNxHSCIkSJg9dL3Qcd/7N7Hc7WSrD2xdkfSm5CQW/IEtgISq8hvLW7+JwvS/Jf5ENeG16Nl
- AjDiq7YEe4f6eGjID3CeyGA7q4zWyU2Fb46NHkPUIIPpx9WrHUTtmtsmrICiH1+yaKzphY9f2
- jg2q1XnmRW4Zy2fdIHl5ddSOdqFk+Q9Sm8v+te5L2NhLDZWHjgsol17A/VdUeB8mU3mYkxMBz
- gy8Fz/7R/TzS4sC5I7QGlnD825p8gs4/BETv8JxplbuhfFGXWnLbRALYisR9Fz5yM2pgi66YX
- Dgqpyho92SwqCGYKwMIqRN5MEAUBN8Yb20ChDTzAbxqWRvJH2jRt+7jC+ZJKe/Zsr4vkFBKnu
- YnlXSWjxlIkoCALHL2XcJoW2sOh6zK78f7GbH19voVDxJkPgN538g5N2wjapRaazsZwxBNm
-Received-SPF: none client-ip=217.72.192.74; envelope-from=laurent@vivier.eu;
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:QCLS3UvoO/Ba87bnCFZKbu1Sso16I52Q28w1pnUM+LFyjsXF/8H
+ W/36EO2M+KVQcgQnrCI34C+2J8L72GAl0dceB9dI3arQK8y29Th+Veb1J2k4Qdu5iE4xIKe
+ RteaQpRJMPZD53nNYR8MKugtiBELTFltkh+A5uaobekDzBq2Y4jEhcHM5TIohvuT3dPzEr1
+ pNV7nN5g36wCMXmDCWxdw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:B0GR8nrNQPY=:7fX5gILxsw1SwDOVE84wu3
+ Z9h/Mem73Q3D2XysTrq3fVUzBr0jEXqIwbovRwPidcc9JpPO/1kF8280mD4zocQenHeehF5OY
+ u0548IYaz0RmaJeln478XtTdspIXA6bo00Hjth1XzJLUTqk/TCXepp1yNg1DIwijsiQWUrlcW
+ Q4w+okngqEMH3W2WF2AgVoWmBLcuSTBS811I5BeD8RvtB+sGAMDxlavOS+8Eg1axj1g/XlJae
+ yWZn4ZQvGbG6BPPjyAicWurMCMpXEO9/y6dc1yNUXH14V8y7H8GwYobyX4U0TdiyD7w1hBmVG
+ Fgxeabe2CQ+2ZlBtl77csQY6EAIIQvCO6u8RjsW4700pMW2zCjbgX5SV3mbJOU3zt1Ba6l6rs
+ aprtQ8gFOaYCsv1wyPA0IcbJVYNEe4ICIsAHkZGS0YrE+pbF3bVCFzwk1NAb/fqCXcTvDHCi4
+ e5KZLK6J2LtT9c+V2lUC4bdDXYvH9unlEuo0awLUZcNoIK4Lo0sX4ytIh/3XpMTTCY42NzU8c
+ Dfu+5PbUrRA5SakMkn//KXOFwKeXS/Tk7QdxBxDwOi4j5tCulW6KQg5wP4NYR5B8jRwWnj3Mr
+ KNlCNMTw9uJDYNOmprOpajPSvTXobhGY640AM34aANrRo0xLZgKqtx9R2m2WIU7AzMSXPIZ45
+ m4PxU7OntkAs5kiVt9co84bD20fyLOff3YXlBswhsv7/sBNn/BgxLUPVc7sUKb5z8KwoA9wYA
+ d64LlNotBAO4kH2mm/xJP7WYmXH1sZz0/rQKc37lWTaza/+/cRNebyDRVJAxmIgUyRPRm6MfS
+ L4xr/C9upySdwq7OD5QNo8NUSd6HJWjoh9fxUnvoU3F9+xGX+6Z8lZQ2A8rwItEUII5Av9M
+Received-SPF: none client-ip=217.72.192.75; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/13 02:49:28
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/13 02:49:26
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -28
 X-Spam_score: -2.9
@@ -83,62 +81,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <laurent@vivier.eu>, Filip Bozuta <Filip.Bozuta@syrmia.com>
+Cc: Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Filip Bozuta <Filip.Bozuta@syrmia.com>
-
-Function "print_fdset()" in "strace.c" is used to print the file descriptor
-values in "print__newselect()" which prints arguments of syscall _newselect().
-Until changes from this patch, this function was printing "," even after the
-last value of the fd_set argument. This was changed in this patch by removing
-this unnecessary "," after the last fd value and thus improving the estetics of
-the _newselect() "-strace" print.
-
-Implementation notes:
-
-   The printing fix was made possible by using an existing function "get_comma()"
-   which returns a "," or an empty string "" based on its argument (0 for "," and
-   other for "").
-
-Signed-off-by: Filip Bozuta <Filip.Bozuta@syrmia.com>
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <20200702160915.9517-1-Filip.Bozuta@syrmia.com>
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
----
- linux-user/strace.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
-
-diff --git a/linux-user/strace.c b/linux-user/strace.c
-index 13981341b327..5e380486433c 100644
---- a/linux-user/strace.c
-+++ b/linux-user/strace.c
-@@ -541,6 +541,7 @@ static void
- print_fdset(int n, abi_ulong target_fds_addr)
- {
-     int i;
-+    int first = 1;
- 
-     qemu_log("[");
-     if( target_fds_addr ) {
-@@ -555,9 +556,12 @@ print_fdset(int n, abi_ulong target_fds_addr)
-             return;
- 
-         for (i=n; i>=0; i--) {
--            if ((tswapal(target_fds[i / TARGET_ABI_BITS]) >> (i & (TARGET_ABI_BITS - 1))) & 1)
--                qemu_log("%d,", i);
-+            if ((tswapal(target_fds[i / TARGET_ABI_BITS]) >>
-+                (i & (TARGET_ABI_BITS - 1))) & 1) {
-+                qemu_log("%s%d", get_comma(first), i);
-+                first = 0;
-             }
-+        }
-         unlock_user(target_fds, target_fds_addr, 0);
-     }
-     qemu_log("]");
--- 
-2.26.2
-
+The following changes since commit d0ed6a69d399ae193959225cdeaa9382746c91cc=
+:=0D
+=0D
+  Update version for v5.1.0 release (2020-08-11 17:07:03 +0100)=0D
+=0D
+are available in the Git repository at:=0D
+=0D
+  git://github.com/vivier/qemu.git tags/linux-user-for-5.2-pull-request=0D
+=0D
+for you to fetch changes up to 04275cad60c8f99e0dd7f56aecda68ceac926da8:=0D
+=0D
+  linux-user: Fix 'utimensat()' implementation (2020-08-12 10:09:58 +0200)=
+=0D
+=0D
+----------------------------------------------------------------=0D
+Add btrfs ioctls=0D
+Add clock_getres_time64, timer_gettime64, timer_settime64,=0D
+    timerfd_gettime64, timerfd_settime64=0D
+Some fixes (page protection, print_fdset, timerspec, itimerspec)=0D
+=0D
+----------------------------------------------------------------=0D
+=0D
+Filip Bozuta (12):=0D
+  linux-user: Fix "print_fdset()" in "strace.c" to not print ", " after=0D
+    last value=0D
+  linux-user: Modify 'target_to_host/host_to_target_itimerspec()'=0D
+  linux-user: Add support for a group of 2038 safe syscalls=0D
+  linux-user: Add support for a group of btrfs ioctls used for=0D
+    subvolumes=0D
+  linux-user: Add support for a group of btrfs ioctls used for snapshots=0D
+  linux-user: Add support for btrfs ioctls used to manipulate with=0D
+    devices=0D
+  linux-user: Add support for btrfs ioctls used to get/set features=0D
+  linux-user: Add support for a group of btrfs inode ioctls=0D
+  linux-user: Add support for two btrfs ioctls used for subvolume=0D
+  linux-user: Add support for btrfs ioctls used to manage quota=0D
+  linux-user: Add support for btrfs ioctls used to scrub a filesystem=0D
+  linux-user: Fix 'utimensat()' implementation=0D
+=0D
+Richard Henderson (2):=0D
+  linux-user: Validate mmap/mprotect prot value=0D
+  linux-user: Adjust guest page protection for the host=0D
+=0D
+ configure                  |   9 ++=0D
+ linux-user/ioctls.h        | 124 ++++++++++++++++++++++++=0D
+ linux-user/mmap.c          | 110 ++++++++++++++-------=0D
+ linux-user/strace.c        |   8 +-=0D
+ linux-user/syscall.c       | 193 +++++++++++++++++++++++++++++++------=0D
+ linux-user/syscall_defs.h  |  42 ++++++++=0D
+ linux-user/syscall_types.h | 140 +++++++++++++++++++++++++++=0D
+ 7 files changed, 563 insertions(+), 63 deletions(-)=0D
+=0D
+-- =0D
+2.26.2=0D
+=0D
 
