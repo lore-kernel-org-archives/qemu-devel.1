@@ -7,40 +7,40 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18A4AC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 10:36:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6ED67C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 10:36:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E3383206A4
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 10:36:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3383206A4
+	by mail.kernel.org (Postfix) with ESMTPS id 431E8206A4
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 10:36:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 431E8206A4
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44782 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45458 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k6Aaq-00066P-5o
-	for qemu-devel@archiver.kernel.org; Thu, 13 Aug 2020 06:36:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49976)
+	id 1k6Aaz-0006Mu-EY
+	for qemu-devel@archiver.kernel.org; Thu, 13 Aug 2020 06:36:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50048)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <liangpeng10@huawei.com>)
- id 1k6AXC-00004y-KZ; Thu, 13 Aug 2020 06:32:34 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:4182 helo=huawei.com)
+ id 1k6AXH-0000Ee-29; Thu, 13 Aug 2020 06:32:39 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:4186 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <liangpeng10@huawei.com>)
- id 1k6AX8-0006p1-PZ; Thu, 13 Aug 2020 06:32:34 -0400
+ id 1k6AXE-0006qF-PT; Thu, 13 Aug 2020 06:32:38 -0400
 Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id 1F1F7F1691C568442C8D;
- Thu, 13 Aug 2020 18:32:27 +0800 (CST)
+ by Forcepoint Email with ESMTP id 2C3A3952A789AAB8465B;
+ Thu, 13 Aug 2020 18:32:32 +0800 (CST)
 Received: from localhost.localdomain (10.175.104.175) by
  DGGEMS414-HUB.china.huawei.com (10.3.19.214) with Microsoft SMTP Server id
- 14.3.487.0; Thu, 13 Aug 2020 18:32:16 +0800
+ 14.3.487.0; Thu, 13 Aug 2020 18:32:22 +0800
 From: Peng Liang <liangpeng10@huawei.com>
 To: <qemu-arm@nongnu.org>, <qemu-devel@nongnu.org>
-Subject: [RFC 2/9] target/arm: parse cpu feature related options
-Date: Thu, 13 Aug 2020 18:26:50 +0800
-Message-ID: <20200813102657.2588720-3-liangpeng10@huawei.com>
+Subject: [RFC 7/9] target/arm: Add CPU features to query-cpu-model-expansion
+Date: Thu, 13 Aug 2020 18:26:55 +0800
+Message-ID: <20200813102657.2588720-8-liangpeng10@huawei.com>
 X-Mailer: git-send-email 2.18.4
 In-Reply-To: <20200813102657.2588720-1-liangpeng10@huawei.com>
 References: <20200813102657.2588720-1-liangpeng10@huawei.com>
@@ -78,149 +78,101 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The implementation of CPUClass::parse_features only supports CPU
-features in "feature=value" format.  However, libvirt maybe send us a
-CPU feature string in "+feature/-feature" format.  Hence, we need to
-override CPUClass::parse_features to support CPU feature string in both
-"feature=value" and "+feature/-feature" format.
-
-The logic of AArch64CPUClass::parse_features is similar to that of
-X86CPUClass::parse_features.  The diference is that feature name is
-transformed to upper before it's added as a property because the name
-of CPU features is upper for convenience.
+Add CPU features to the result of query-cpu-model-expansion so that
+other applications (such as libvirt) can know the supported CPU
+features.
 
 Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
 Signed-off-by: Peng Liang <liangpeng10@huawei.com>
 ---
- target/arm/cpu64.c | 101 +++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 101 insertions(+)
+ target/arm/cpu.c     | 41 +++++++++++++++++++++++++++++++++++++++++
+ target/arm/cpu.h     |  2 ++
+ target/arm/monitor.c |  2 ++
+ 3 files changed, 45 insertions(+)
 
-diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-index 4b52505b6e..981011b3da 100644
---- a/target/arm/cpu64.c
-+++ b/target/arm/cpu64.c
-@@ -28,6 +28,7 @@
- #include "sysemu/kvm.h"
- #include "kvm_arm.h"
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index 3fc54cb3a4..0f620e8afe 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -25,6 +25,8 @@
+ #include "qemu/module.h"
+ #include "qapi/error.h"
  #include "qapi/visitor.h"
-+#include "hw/qdev-properties.h"
++#include "qapi/qmp/qdict.h"
++#include "qom/qom-qobject.h"
+ #include "cpu.h"
+ #include "internals.h"
+ #include "exec/exec-all.h"
+@@ -1515,6 +1517,45 @@ static const CPUFeatureDep feature_dependencies[] = {
+     },
+ };
  
- #ifndef CONFIG_USER_ONLY
- static uint64_t a57_a53_l2ctlr_read(CPUARMState *env, const ARMCPRegInfo *ri)
-@@ -778,6 +779,105 @@ static gchar *aarch64_gdb_arch_name(CPUState *cs)
-     return g_strdup("aarch64");
- }
- 
-+static void
-+cpu_add_feat_as_prop(const char *typename, const char *name, const char *val)
++static char *strtolower(char *src)
 +{
-+    GlobalProperty *prop = g_new0(typeof(*prop), 1);
-+    prop->driver = typename;
-+    prop->property = g_strdup(name);
-+    prop->value = g_strdup(val);
-+    qdev_prop_register_global(prop);
-+}
++    char *start = src;
 +
-+static gint compare_string(gconstpointer a, gconstpointer b)
-+{
-+    return g_strcmp0(a, b);
-+}
-+
-+static GList *plus_features, *minus_features;
-+
-+static char *strtoupr(char *str)
-+{
-+    char *orign = str;
-+
-+    for (; *str != '\0'; str++) {
-+        *str = toupper(*str);
++    for (; *src; ++src) {
++        *src = tolower(*src);
 +    }
 +
-+    return orign;
++    return start;
 +}
 +
-+static void aarch64_cpu_parse_features(const char *typename, char *features,
-+                                     Error **errp)
++void arm_cpu_features_to_dict(ARMCPU *cpu, QDict *features)
 +{
-+    GList *l;
-+    char *featurestr; /* Single 'key=value" string being parsed */
-+    static bool cpu_globals_initialized;
++    Object *obj = OBJECT(cpu);
++    const char *name;
++    ObjectProperty *prop;
++    bool is_32bit = !arm_feature(&cpu->env, ARM_FEATURE_AARCH64);
++    int i;
 +
-+    if (cpu_globals_initialized) {
-+        return;
-+    }
-+    cpu_globals_initialized = true;
-+
-+    if (!features) {
-+        return;
-+    }
-+    for (featurestr = strtok(features, ",");
-+        featurestr;
-+        featurestr = strtok(NULL, ",")) {
-+        const char *name;
-+        char *tmp;
-+        const char *val = NULL;
-+        char *eq = NULL;
-+
-+        /* Compatibility syntax: */
-+        if (featurestr[0] == '+') {
-+            plus_features = g_list_append(plus_features,
-+                                          g_strdup(featurestr + 1));
-+            continue;
-+        } else if (featurestr[0] == '-') {
-+            minus_features = g_list_append(minus_features,
-+                                           g_strdup(featurestr + 1));
++    for (i = 0; i < ARRAY_SIZE(cpu_features); ++i) {
++        if (is_32bit != cpu_features[i].is_32bit) {
 +            continue;
 +        }
 +
-+        eq = strchr(featurestr, '=');
-+        name = featurestr;
-+        if (eq) {
-+            *eq++ = 0;
-+            val = eq;
-+        } else {
-+            error_setg(errp, "Unsupported property format: %s", name);
-+            return;
-+        }
++        name = cpu_features[i].name;
++        prop = object_property_find(obj, name, NULL);
++        if (prop) {
++            QObject *value;
++            g_autofree char *tmp;
 +
-+        if (g_list_find_custom(plus_features, name, compare_string)) {
-+            warn_report("Ambiguous CPU model string. "
-+                        "Don't mix both \"+%s\" and \"%s=%s\"",
-+                        name, name, val);
-+        }
-+        if (g_list_find_custom(minus_features, name, compare_string)) {
-+            warn_report("Ambiguous CPU model string. "
-+                        "Don't mix both \"-%s\" and \"%s=%s\"",
-+                        name, name, val);
-+        }
-+        tmp = g_strdup(name);
-+        tmp = strtoupr(tmp);
-+        cpu_add_feat_as_prop(typename, tmp, val);
-+        g_free(tmp);
-+    }
++            assert(prop->get);
++            value = object_property_get_qobject(obj, name, &error_abort);
++            tmp = strtolower(g_strdup(name));
 +
-+    for (l = plus_features; l; l = l->next) {
-+        const char *name = strtoupr(l->data); /* convert to upper string */
-+        cpu_add_feat_as_prop(typename, name, "on");
-+    }
-+
-+    for (l = minus_features; l; l = l->next) {
-+        const char *name = strtoupr(l->data);
-+        cpu_add_feat_as_prop(typename, name, "off");
++            qdict_put_obj(features, tmp, value);
++        }
 +    }
 +}
 +
- static void aarch64_cpu_class_init(ObjectClass *oc, void *data)
+ static void arm_cpu_get_bit_prop(Object *obj, Visitor *v, const char *name,
+                                  void *opaque, Error **errp)
  {
-     CPUClass *cc = CPU_CLASS(oc);
-@@ -788,6 +888,7 @@ static void aarch64_cpu_class_init(ObjectClass *oc, void *data)
-     cc->gdb_num_core_regs = 34;
-     cc->gdb_core_xml_file = "aarch64-core.xml";
-     cc->gdb_arch_name = aarch64_gdb_arch_name;
-+    cc->parse_features = aarch64_cpu_parse_features;
- }
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 5d8074d03b..da68b7f8f4 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -3933,4 +3933,6 @@ static inline bool isar_feature_any_tts2uxn(const ARMISARegisters *id)
+ #define cpu_isar_feature(name, cpu) \
+     ({ ARMCPU *cpu_ = (cpu); isar_feature_##name(&cpu_->isar); })
  
- static void aarch64_cpu_instance_init(Object *obj)
++void arm_cpu_features_to_dict(ARMCPU *cpu, QDict *features);
++
+ #endif
+diff --git a/target/arm/monitor.c b/target/arm/monitor.c
+index ba6e01abd0..f8eb29efec 100644
+--- a/target/arm/monitor.c
++++ b/target/arm/monitor.c
+@@ -225,6 +225,8 @@ CpuModelExpansionInfo *qmp_query_cpu_model_expansion(CpuModelExpansionType type,
+         }
+     }
+ 
++    arm_cpu_features_to_dict(ARM_CPU(obj), qdict_out);
++
+     if (!qdict_size(qdict_out)) {
+         qobject_unref(qdict_out);
+     } else {
 -- 
 2.18.4
 
