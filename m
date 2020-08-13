@@ -2,88 +2,190 @@ Return-Path: <SRS0=egLd=BX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0A9DC433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 18:28:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD36AC433E3
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 19:04:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 99F61206B2
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 18:28:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8D3BA206B2
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 19:04:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XFs2wYcn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 99F61206B2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="TaqkUdkT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D3BA206B2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59406 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44500 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k6Hy1-0006A9-T4
-	for qemu-devel@archiver.kernel.org; Thu, 13 Aug 2020 14:28:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60200)
+	id 1k6IW9-0005d7-Of
+	for qemu-devel@archiver.kernel.org; Thu, 13 Aug 2020 15:04:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43876)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1k6Hwu-0005LX-Gn
- for qemu-devel@nongnu.org; Thu, 13 Aug 2020 14:27:36 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:40712)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1k6Hwn-0007vs-Lo
- for qemu-devel@nongnu.org; Thu, 13 Aug 2020 14:27:36 -0400
-Received: by mail-wm1-x342.google.com with SMTP id k20so5874617wmi.5
- for <qemu-devel@nongnu.org>; Thu, 13 Aug 2020 11:27:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=NTo5s8/bQNYwOvsdljRPNYiVuCiAITHLTNRNXq2djb4=;
- b=XFs2wYcnilKdgTXBpdnFxGPm3QsLPHoZBPKBiQETSfK293CunIzuRAuJ9uC1Ymd4A3
- orsjifRvI5D87CLnBNFIdOnhxdToz/LAP++/GPSwNl25Z1IEq4XlAMu4pxfjaMfHTOdn
- duiUOq7G90vO6Cj6JLexqQc8BcIxA8GiEoz9UaxXLCELR8ypuK/dNQ0t2kpNLL7ePCWm
- KJyQaAKTQmJxs84gjRREDv73CjHX3bKZ41JILYIH3ybDCHq7aOyk+YO63u28JQkL+XOU
- 9RaX8nNRNsycfM0OP7NJCSPMfg/i5BWAFPYXh0ll1b/mPsclZXO2L8mcebNp1rh8YG+X
- GLdw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:in-reply-to:references:from:date
- :message-id:subject:to:cc;
- bh=NTo5s8/bQNYwOvsdljRPNYiVuCiAITHLTNRNXq2djb4=;
- b=BJxmN4railmW0Bfu+d50V1K3sNHEUbm91dUXGWDAJLQHNkyUR/XxLDVz0Iha0C/b9R
- G4VHHQrFJXFMFYCwSAUN5U4S8f7wSXY32dp/ESoO6rBHi7jf+yMoV6VbvvbUFn4Vrt8Q
- jGVm+lR03Dkz+SF7W23hMLnotUVWv2iQ641MD/Dy5PPofCTww0ixaBvFp9NAE/5k+XPP
- MRcGl6Ke4bYO/yS5Y51HgapyCOi1LJu7WEDI+Fejbfm+YaSPnI2lru0mY6ZHpI3Zxbzp
- XjblmQ8rXzNZF7UqXqZfa9xQ6s96TKHlE36MVyg7K6IvrvV27SvOWSsTdGENBqQBRo5l
- cCcQ==
-X-Gm-Message-State: AOAM533jsweNuam8+B0HTM9cUo2FgtJotmaC/ucDr9ukGU30XPvgRBsW
- VOSLkJq9qmTtSdK25CwRNhmJnotdpquUz//J8IA=
-X-Google-Smtp-Source: ABdhPJxGGYY3KdLwUyDlvUMySAbTRbN6jioc6Cm2DDwux5fTLoVNvU/iNx5gqX4MnH6Kc1PD5fLg/PINPo35hmdpBxk=
-X-Received: by 2002:a1c:b7c2:: with SMTP id h185mr5936842wmf.168.1597343246674; 
- Thu, 13 Aug 2020 11:27:26 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <farman@linux.ibm.com>)
+ id 1k6IVS-0005EK-NX
+ for qemu-devel@nongnu.org; Thu, 13 Aug 2020 15:03:18 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:30806
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <farman@linux.ibm.com>)
+ id 1k6IVQ-0004EO-5R
+ for qemu-devel@nongnu.org; Thu, 13 Aug 2020 15:03:18 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 07DJ1bbr032123; Thu, 13 Aug 2020 15:03:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
+ h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=zankwXPh1JSZGLL5iEapdJBtpkCZ9JrA9lMunhM68I0=;
+ b=TaqkUdkTypixJCNiKX24PKa/4JpJopl1sCntLK7z2+ngrhLw+vlm80qV1jliRbeWEeXO
+ EI9oT6+rGWhsEWhGx7Km7Rwi6SpRy3ntbTc0PHhpCIlcqyTluJAVGOJHD5Mkwlqo+5fW
+ ArPc7xENyfxviXpm3HMYnJJTKHT6ZgSq8ajEqKV19fAyodEusc5YJ+BdxSi+1e9ytEP3
+ tCAoXsb5JL7oJN5Wqh1JagjS+fivd7LQPWQRTPFQ3o+OV0EwBHcyUM+tXsj3GnHvAxhi
+ hCaDT/7pAGmjFiBgQZlUi5nXleRwTnXyy9q/LFSQiMIrd4H8QWg4OiCl4rBjEedOIhNA 4Q== 
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 32w0n0wft1-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 13 Aug 2020 15:03:03 -0400
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 07DJ1kv8032915;
+ Thu, 13 Aug 2020 15:03:02 -0400
+Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com
+ [169.62.189.10])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 32w0n0wfrr-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 13 Aug 2020 15:03:02 -0400
+Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
+ by ppma02dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 07DIxJwt017964;
+ Thu, 13 Aug 2020 19:03:00 GMT
+Received: from b03cxnp08025.gho.boulder.ibm.com
+ (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
+ by ppma02dal.us.ibm.com with ESMTP id 32skp9yf39-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 13 Aug 2020 19:03:00 +0000
+Received: from b03ledav002.gho.boulder.ibm.com
+ (b03ledav002.gho.boulder.ibm.com [9.17.130.233])
+ by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 07DJ2vNp53084462
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 13 Aug 2020 19:02:57 GMT
+Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 975FC136059;
+ Thu, 13 Aug 2020 19:02:59 +0000 (GMT)
+Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 67F14136051;
+ Thu, 13 Aug 2020 19:02:54 +0000 (GMT)
+Received: from [9.65.204.197] (unknown [9.65.204.197])
+ by b03ledav002.gho.boulder.ibm.com (Postfix) with ESMTP;
+ Thu, 13 Aug 2020 19:02:54 +0000 (GMT)
+Subject: Re: device compatibility interface for live migration with assigned
+ devices
+To: Cornelia Huck <cohuck@redhat.com>, Sean Mooney <smooney@redhat.com>
+References: <20200727072440.GA28676@joy-OptiPlex-7040>
+ <20200727162321.7097070e@x1.home> <20200729080503.GB28676@joy-OptiPlex-7040>
+ <20200804183503.39f56516.cohuck@redhat.com>
+ <c178a0d3-269d-1620-22b1-9010f602d8ff@redhat.com>
+ <20200805021654.GB30485@joy-OptiPlex-7040>
+ <2624b12f-3788-7e2b-2cb7-93534960bcb7@redhat.com>
+ <20200805075647.GB2177@nanopsycho>
+ <eb1d01c2-fbad-36b6-10cf-9e03483a736b@redhat.com>
+ <20200805093338.GC30485@joy-OptiPlex-7040> <20200805105319.GF2177@nanopsycho>
+ <4cf2824c803c96496e846c5b06767db305e9fb5a.camel@redhat.com>
+ <20200807135942.5d56a202.cohuck@redhat.com>
+ <20200813173347.239801fa.cohuck@redhat.com>
+From: Eric Farman <farman@linux.ibm.com>
+Autocrypt: addr=farman@linux.ibm.com; keydata=
+ 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
+Message-ID: <315669b0-5c75-d359-a912-62ebab496abf@linux.ibm.com>
+Date: Thu, 13 Aug 2020 15:02:53 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Received: by 2002:a1c:1bca:0:0:0:0:0 with HTTP; Thu, 13 Aug 2020 11:27:26
- -0700 (PDT)
-In-Reply-To: <1597311707-27565-1-git-send-email-likaige@loongson.cn>
-References: <1597311707-27565-1-git-send-email-likaige@loongson.cn>
-From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Date: Thu, 13 Aug 2020 20:27:26 +0200
-Message-ID: <CAHiYmc45WM45Ug2jam0NGuFqGSMV6JpV5ZR5C=oji_RuZQBYiQ@mail.gmail.com>
-Subject: Re: [PATCH 1/2] target/mips: Coding style update to fix checkpatch
- errors
-To: Kaige Li <likaige@loongson.cn>
-Content-Type: multipart/alternative; boundary="000000000000cd70dc05acc67449"
-Received-SPF: pass client-ip=2a00:1450:4864:20::342;
- envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wm1-x342.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+In-Reply-To: <20200813173347.239801fa.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
+ definitions=2020-08-13_15:2020-08-13,
+ 2020-08-13 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0
+ priorityscore=1501 clxscore=1011 malwarescore=0 impostorscore=0
+ adultscore=0 suspectscore=0 bulkscore=0 lowpriorityscore=0 spamscore=0
+ mlxscore=0 mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2008130131
+Received-SPF: pass client-ip=148.163.158.5; envelope-from=farman@linux.ibm.com;
+ helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/13 15:03:14
+X-ACL-Warn: Detected OS   = Linux 3.x [generic]
+X-Spam_score_int: -36
+X-Spam_score: -3.7
+X-Spam_bar: ---
+X-Spam_report: (-3.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -97,388 +199,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Aurelien Jarno <aurelien@aurel32.net>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: kvm@vger.kernel.org, libvir-list@redhat.com,
+ Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, kwankhede@nvidia.com,
+ eauger@redhat.com, xin-ran.wang@intel.com, corbet@lwn.net,
+ openstack-discuss@lists.openstack.org, shaohe.feng@intel.com,
+ kevin.tian@intel.com, Yan Zhao <yan.y.zhao@intel.com>,
+ Parav Pandit <parav@mellanox.com>, jian-feng.ding@intel.com,
+ dgilbert@redhat.com, zhenyuw@linux.intel.com, hejie.xu@intel.com,
+ bao.yumeng@zte.com.cn, Jiri Pirko <jiri@mellanox.com>,
+ intel-gvt-dev@lists.freedesktop.org, berrange@redhat.com, eskultet@redhat.com,
+ Alex Williamson <alex.williamson@redhat.com>, dinechin@redhat.com,
+ devel@ovirt.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000cd70dc05acc67449
-Content-Type: text/plain; charset="UTF-8"
-
-On Thursday, August 13, 2020, Kaige Li <likaige@loongson.cn> wrote:
-
-> This will help ensure that style guidelines are being maintained during
-> subsequent changes.
->
-> Signed-off-by: Kaige Li <likaige@loongson.cn>
-> ---
 
 
-Agreed.
+On 8/13/20 11:33 AM, Cornelia Huck wrote:
+> On Fri, 7 Aug 2020 13:59:42 +0200
+> Cornelia Huck <cohuck@redhat.com> wrote:
+> 
+>> On Wed, 05 Aug 2020 12:35:01 +0100
+>> Sean Mooney <smooney@redhat.com> wrote:
+>>
+>>> On Wed, 2020-08-05 at 12:53 +0200, Jiri Pirko wrote:  
+>>>> Wed, Aug 05, 2020 at 11:33:38AM CEST, yan.y.zhao@intel.com wrote:    
+>>
+>> (...)
+>>
+>>>>>    software_version: device driver's version.
+>>>>>               in <major>.<minor>[.bugfix] scheme, where there is no
+>>>>> 	       compatibility across major versions, minor versions have
+>>>>> 	       forward compatibility (ex. 1-> 2 is ok, 2 -> 1 is not) and
+>>>>> 	       bugfix version number indicates some degree of internal
+>>>>> 	       improvement that is not visible to the user in terms of
+>>>>> 	       features or compatibility,
+>>>>>
+>>>>> vendor specific attributes: each vendor may define different attributes
+>>>>>   device id : device id of a physical devices or mdev's parent pci device.
+>>>>>               it could be equal to pci id for pci devices
+>>>>>   aggregator: used together with mdev_type. e.g. aggregator=2 together
+>>>>>               with i915-GVTg_V5_4 means 2*1/4=1/2 of a gen9 Intel
+>>>>> 	       graphics device.
+>>>>>   remote_url: for a local NVMe VF, it may be configured with a remote
+>>>>>               url of a remote storage and all data is stored in the
+>>>>> 	       remote side specified by the remote url.
+>>>>>   ...    
+>>> just a minor not that i find ^ much more simmple to understand then
+>>> the current proposal with self and compatiable.
+>>> if i have well defiend attibute that i can parse and understand that allow
+>>> me to calulate the what is and is not compatible that is likely going to
+>>> more useful as you wont have to keep maintianing a list of other compatible
+>>> devices every time a new sku is released.
+>>>
+>>> in anycase thank for actully shareing ^ as it make it simpler to reson about what
+>>> you have previously proposed.  
+>>
+>> So, what would be the most helpful format? A 'software_version' field
+>> that follows the conventions outlined above, and other (possibly
+>> optional) fields that have to match?
+> 
+> Just to get a different perspective, I've been trying to come up with
+> what would be useful for a very different kind of device, namely
+> vfio-ccw. (Adding Eric to cc: for that.)
+> 
+> software_version makes sense for everybody, so it should be a standard
+> attribute.
+> 
+> For the vfio-ccw type, we have only one vendor driver (vfio-ccw_IO).
+> 
+> Given a subchannel A, we want to make sure that subchannel B has a
+> reasonable chance of being compatible. I guess that means:
+> 
+> - same subchannel type (I/O)
+> - same chpid type (e.g. all FICON; I assume there are no 'mixed' setups
+>   -- Eric?)
 
-Reviewed-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Correct.
 
+> - same number of chpids? Maybe we can live without that and just inject
+>   some machine checks, I don't know. Same chpid numbers is something we
+>   cannot guarantee, especially if we want to migrate cross-CEC (to
+>   another machine.)
 
->  target/mips/translate_init.inc.c | 61 ++++++++++++++++++++----------
-> ----------
->  1 file changed, 31 insertions(+), 30 deletions(-)
->
-> diff --git a/target/mips/translate_init.inc.c
-> b/target/mips/translate_init.inc.c
-> index 637cacc..0740819 100644
-> --- a/target/mips/translate_init.inc.c
-> +++ b/target/mips/translate_init.inc.c
-> @@ -53,8 +53,7 @@
->
->  /***********************************************************
-> ******************/
->  /* MIPS CPU definitions */
-> -const mips_def_t mips_defs[] =
-> -{
-> +const mips_def_t mips_defs[] = {
->      {
->          .name = "4Kc",
->          .CP0_PRid = 0x00018000,
-> @@ -766,8 +765,8 @@ const mips_def_t mips_defs[] =
->          .name = "Loongson-2E",
->          .CP0_PRid = 0x6302,
->          /* 64KB I-cache and d-cache. 4 way with 32 bit cache line size.
-> */
-> -        .CP0_Config0 = (0x1<<17) | (0x1<<16) | (0x1<<11) | (0x1<<8) |
-> -                       (0x1<<5) | (0x1<<4) | (0x1<<1),
-> +        .CP0_Config0 = (0x1 << 17) | (0x1 << 16) | (0x1 << 11) | (0x1 <<
-> 8) |
-> +                       (0x1 << 5) | (0x1 << 4) | (0x1 << 1),
->          /* Note: Config1 is only used internally,
->             Loongson-2E has only Config0.  */
->          .CP0_Config1 = (1 << CP0C1_FP) | (47 << CP0C1_MMU),
-> @@ -786,8 +785,8 @@ const mips_def_t mips_defs[] =
->          .name = "Loongson-2F",
->          .CP0_PRid = 0x6303,
->          /* 64KB I-cache and d-cache. 4 way with 32 bit cache line size.
-> */
-> -        .CP0_Config0 = (0x1<<17) | (0x1<<16) | (0x1<<11) | (0x1<<8) |
-> -                       (0x1<<5) | (0x1<<4) | (0x1<<1),
-> +        .CP0_Config0 = (0x1 << 17) | (0x1 << 16) | (0x1 << 11) | (0x1 <<
-> 8) |
-> +                       (0x1 << 5) | (0x1 << 4) | (0x1 << 1),
->          /* Note: Config1 is only used internally,
->             Loongson-2F has only Config0.  */
->          .CP0_Config1 = (1 << CP0C1_FP) | (47 << CP0C1_MMU),
-> @@ -932,19 +931,19 @@ void mips_cpu_list(void)
->  }
->
->  #ifndef CONFIG_USER_ONLY
-> -static void no_mmu_init (CPUMIPSState *env, const mips_def_t *def)
-> +static void no_mmu_init(CPUMIPSState *env, const mips_def_t *def)
->  {
->      env->tlb->nb_tlb = 1;
->      env->tlb->map_address = &no_mmu_map_address;
->  }
->
-> -static void fixed_mmu_init (CPUMIPSState *env, const mips_def_t *def)
-> +static void fixed_mmu_init(CPUMIPSState *env, const mips_def_t *def)
->  {
->      env->tlb->nb_tlb = 1;
->      env->tlb->map_address = &fixed_mmu_map_address;
->  }
->
-> -static void r4k_mmu_init (CPUMIPSState *env, const mips_def_t *def)
-> +static void r4k_mmu_init(CPUMIPSState *env, const mips_def_t *def)
->  {
->      env->tlb->nb_tlb = 1 + ((def->CP0_Config1 >> CP0C1_MMU) & 63);
->      env->tlb->map_address = &r4k_map_address;
-> @@ -956,40 +955,41 @@ static void r4k_mmu_init (CPUMIPSState *env, const
-> mips_def_t *def)
->      env->tlb->helper_tlbinvf = r4k_helper_tlbinvf;
->  }
->
-> -static void mmu_init (CPUMIPSState *env, const mips_def_t *def)
-> +static void mmu_init(CPUMIPSState *env, const mips_def_t *def)
->  {
->      env->tlb = g_malloc0(sizeof(CPUMIPSTLBContext));
->
->      switch (def->mmu_type) {
-> -        case MMU_TYPE_NONE:
-> -            no_mmu_init(env, def);
-> -            break;
-> -        case MMU_TYPE_R4000:
-> -            r4k_mmu_init(env, def);
-> -            break;
-> -        case MMU_TYPE_FMT:
-> -            fixed_mmu_init(env, def);
-> -            break;
-> -        case MMU_TYPE_R3000:
-> -        case MMU_TYPE_R6000:
-> -        case MMU_TYPE_R8000:
-> -        default:
-> -            cpu_abort(env_cpu(env), "MMU type not supported\n");
-> +    case MMU_TYPE_NONE:
-> +        no_mmu_init(env, def);
-> +        break;
-> +    case MMU_TYPE_R4000:
-> +        r4k_mmu_init(env, def);
-> +        break;
-> +    case MMU_TYPE_FMT:
-> +        fixed_mmu_init(env, def);
-> +        break;
-> +    case MMU_TYPE_R3000:
-> +    case MMU_TYPE_R6000:
-> +    case MMU_TYPE_R8000:
-> +    default:
-> +        cpu_abort(env_cpu(env), "MMU type not supported\n");
->      }
->  }
->  #endif /* CONFIG_USER_ONLY */
->
-> -static void fpu_init (CPUMIPSState *env, const mips_def_t *def)
-> +static void fpu_init(CPUMIPSState *env, const mips_def_t *def)
->  {
->      int i;
->
-> -    for (i = 0; i < MIPS_FPU_MAX; i++)
-> +    for (i = 0; i < MIPS_FPU_MAX; i++) {
->          env->fpus[i].fcr0 = def->CP1_fcr0;
-> +    }
->
->      memcpy(&env->active_fpu, &env->fpus[0], sizeof(env->active_fpu));
->  }
->
-> -static void mvp_init (CPUMIPSState *env, const mips_def_t *def)
-> +static void mvp_init(CPUMIPSState *env, const mips_def_t *def)
->  {
->      env->mvp = g_malloc0(sizeof(CPUMIPSMVPContext));
->
-> @@ -999,9 +999,10 @@ static void mvp_init (CPUMIPSState *env, const
-> mips_def_t *def)
->         implemented, 5 TCs implemented. */
->      env->mvp->CP0_MVPConf0 = (1U << CP0MVPC0_M) | (1 << CP0MVPC0_TLBS) |
->                               (0 << CP0MVPC0_GS) | (1 << CP0MVPC0_PCP) |
-> -// TODO: actually do 2 VPEs.
-> -//                             (1 << CP0MVPC0_TCA) | (0x1 <<
-> CP0MVPC0_PVPE) |
-> -//                             (0x04 << CP0MVPC0_PTC);
-> +/* TODO: actually do 2 VPEs.
-> + *                            (1 << CP0MVPC0_TCA) | (0x1 <<
-> CP0MVPC0_PVPE) |
-> + *                            (0x04 << CP0MVPC0_PTC);
-> + */
->                               (1 << CP0MVPC0_TCA) | (0x0 << CP0MVPC0_PVPE)
-> |
->                               (0x00 << CP0MVPC0_PTC);
->  #if !defined(CONFIG_USER_ONLY)
-> --
-> 2.1.0
->
->
+I think we'd live without it, because I wouldn't expect it to be
+consistent between systems.
 
---000000000000cd70dc05acc67449
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+> 
+> Other possibly interesting information is not available at the
+> subchannel level (vfio-ccw is a subchannel driver.)
 
-<br><br>On Thursday, August 13, 2020, Kaige Li &lt;<a href=3D"mailto:likaig=
-e@loongson.cn">likaige@loongson.cn</a>&gt; wrote:<br><blockquote class=3D"g=
-mail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-l=
-eft:1ex">This will help ensure that style guidelines are being maintained d=
-uring<br>
-subsequent changes.<br>
-<br>
-Signed-off-by: Kaige Li &lt;<a href=3D"mailto:likaige@loongson.cn">likaige@=
-loongson.cn</a>&gt;<br>
----</blockquote><div><br></div><div>Agreed.</div><div><br></div><div><span =
-style=3D"color:rgb(34,34,34);font-size:14px;line-height:22.1200008392334px"=
->Reviewed-by: Aleksandar Markovic &lt;</span><a href=3D"mailto:aleksandar.q=
-emu.devel@gmail.com" style=3D"font-size:14px;line-height:22.1200008392334px=
-">aleksandar.qemu.devel@gmail.<wbr>com</a><span style=3D"color:rgb(34,34,34=
-);font-size:14px;line-height:22.1200008392334px">&gt;</span><br></div><div>=
-=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;bo=
-rder-left:1px #ccc solid;padding-left:1ex">
-=C2=A0target/mips/translate_init.<wbr>inc.c | 61 ++++++++++++++++++++------=
-----<wbr>----------<br>
-=C2=A01 file changed, 31 insertions(+), 30 deletions(-)<br>
-<br>
-diff --git a/target/mips/translate_init.<wbr>inc.c b/target/mips/translate_=
-init.<wbr>inc.c<br>
-index 637cacc..0740819 100644<br>
---- a/target/mips/translate_init.<wbr>inc.c<br>
-+++ b/target/mips/translate_init.<wbr>inc.c<br>
-@@ -53,8 +53,7 @@<br>
-<br>
-=C2=A0/*****************************<wbr>******************************<wbr=
->******************/<br>
-=C2=A0/* MIPS CPU definitions */<br>
--const mips_def_t mips_defs[] =3D<br>
--{<br>
-+const mips_def_t mips_defs[] =3D {<br>
-=C2=A0 =C2=A0 =C2=A0{<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0.name =3D &quot;4Kc&quot;,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0.CP0_PRid =3D 0x00018000,<br>
-@@ -766,8 +765,8 @@ const mips_def_t mips_defs[] =3D<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0.name =3D &quot;Loongson-2E&quot;,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0.CP0_PRid =3D 0x6302,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0/* 64KB I-cache and d-cache. 4 way with 3=
-2 bit cache line size.=C2=A0 */<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 .CP0_Config0 =3D (0x1&lt;&lt;17) | (0x1&lt;&lt=
-;16) | (0x1&lt;&lt;11) | (0x1&lt;&lt;8) |<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0(0x1&lt;&lt;5) | (0x1&lt;&lt;4) | (0x1&lt;&lt;1),<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 .CP0_Config0 =3D (0x1 &lt;&lt; 17) | (0x1 &lt;=
-&lt; 16) | (0x1 &lt;&lt; 11) | (0x1 &lt;&lt; 8) |<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0(0x1 &lt;&lt; 5) | (0x1 &lt;&lt; 4) | (0x1 &lt;&lt; 1),<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0/* Note: Config1 is only used internally,=
-<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 Loongson-2E has only Config0.=C2=
-=A0 */<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0.CP0_Config1 =3D (1 &lt;&lt; CP0C1_FP) | =
-(47 &lt;&lt; CP0C1_MMU),<br>
-@@ -786,8 +785,8 @@ const mips_def_t mips_defs[] =3D<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0.name =3D &quot;Loongson-2F&quot;,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0.CP0_PRid =3D 0x6303,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0/* 64KB I-cache and d-cache. 4 way with 3=
-2 bit cache line size.=C2=A0 */<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 .CP0_Config0 =3D (0x1&lt;&lt;17) | (0x1&lt;&lt=
-;16) | (0x1&lt;&lt;11) | (0x1&lt;&lt;8) |<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0(0x1&lt;&lt;5) | (0x1&lt;&lt;4) | (0x1&lt;&lt;1),<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 .CP0_Config0 =3D (0x1 &lt;&lt; 17) | (0x1 &lt;=
-&lt; 16) | (0x1 &lt;&lt; 11) | (0x1 &lt;&lt; 8) |<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0(0x1 &lt;&lt; 5) | (0x1 &lt;&lt; 4) | (0x1 &lt;&lt; 1),<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0/* Note: Config1 is only used internally,=
-<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 Loongson-2F has only Config0.=C2=
-=A0 */<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0.CP0_Config1 =3D (1 &lt;&lt; CP0C1_FP) | =
-(47 &lt;&lt; CP0C1_MMU),<br>
-@@ -932,19 +931,19 @@ void mips_cpu_list(void)<br>
-=C2=A0}<br>
-<br>
-=C2=A0#ifndef CONFIG_USER_ONLY<br>
--static void no_mmu_init (CPUMIPSState *env, const mips_def_t *def)<br>
-+static void no_mmu_init(CPUMIPSState *env, const mips_def_t *def)<br>
-=C2=A0{<br>
-=C2=A0 =C2=A0 =C2=A0env-&gt;tlb-&gt;nb_tlb =3D 1;<br>
-=C2=A0 =C2=A0 =C2=A0env-&gt;tlb-&gt;map_address =3D &amp;no_mmu_map_address=
-;<br>
-=C2=A0}<br>
-<br>
--static void fixed_mmu_init (CPUMIPSState *env, const mips_def_t *def)<br>
-+static void fixed_mmu_init(CPUMIPSState *env, const mips_def_t *def)<br>
-=C2=A0{<br>
-=C2=A0 =C2=A0 =C2=A0env-&gt;tlb-&gt;nb_tlb =3D 1;<br>
-=C2=A0 =C2=A0 =C2=A0env-&gt;tlb-&gt;map_address =3D &amp;fixed_mmu_map_addr=
-ess;<br>
-=C2=A0}<br>
-<br>
--static void r4k_mmu_init (CPUMIPSState *env, const mips_def_t *def)<br>
-+static void r4k_mmu_init(CPUMIPSState *env, const mips_def_t *def)<br>
-=C2=A0{<br>
-=C2=A0 =C2=A0 =C2=A0env-&gt;tlb-&gt;nb_tlb =3D 1 + ((def-&gt;CP0_Config1 &g=
-t;&gt; CP0C1_MMU) &amp; 63);<br>
-=C2=A0 =C2=A0 =C2=A0env-&gt;tlb-&gt;map_address =3D &amp;r4k_map_address;<b=
-r>
-@@ -956,40 +955,41 @@ static void r4k_mmu_init (CPUMIPSState *env, const mi=
-ps_def_t *def)<br>
-=C2=A0 =C2=A0 =C2=A0env-&gt;tlb-&gt;helper_tlbinvf =3D r4k_helper_tlbinvf;<=
-br>
-=C2=A0}<br>
-<br>
--static void mmu_init (CPUMIPSState *env, const mips_def_t *def)<br>
-+static void mmu_init(CPUMIPSState *env, const mips_def_t *def)<br>
-=C2=A0{<br>
-=C2=A0 =C2=A0 =C2=A0env-&gt;tlb =3D g_malloc0(sizeof(<wbr>CPUMIPSTLBContext=
-));<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0switch (def-&gt;mmu_type) {<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 case MMU_TYPE_NONE:<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 no_mmu_init(env, def);<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 case MMU_TYPE_R4000:<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 r4k_mmu_init(env, def);<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 case MMU_TYPE_FMT:<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 fixed_mmu_init(env, def);<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 case MMU_TYPE_R3000:<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 case MMU_TYPE_R6000:<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 case MMU_TYPE_R8000:<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 default:<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 cpu_abort(env_cpu(env), &quot;MM=
-U type not supported\n&quot;);<br>
-+=C2=A0 =C2=A0 case MMU_TYPE_NONE:<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 no_mmu_init(env, def);<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
-+=C2=A0 =C2=A0 case MMU_TYPE_R4000:<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 r4k_mmu_init(env, def);<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
-+=C2=A0 =C2=A0 case MMU_TYPE_FMT:<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 fixed_mmu_init(env, def);<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
-+=C2=A0 =C2=A0 case MMU_TYPE_R3000:<br>
-+=C2=A0 =C2=A0 case MMU_TYPE_R6000:<br>
-+=C2=A0 =C2=A0 case MMU_TYPE_R8000:<br>
-+=C2=A0 =C2=A0 default:<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 cpu_abort(env_cpu(env), &quot;MMU type not sup=
-ported\n&quot;);<br>
-=C2=A0 =C2=A0 =C2=A0}<br>
-=C2=A0}<br>
-=C2=A0#endif /* CONFIG_USER_ONLY */<br>
-<br>
--static void fpu_init (CPUMIPSState *env, const mips_def_t *def)<br>
-+static void fpu_init(CPUMIPSState *env, const mips_def_t *def)<br>
-=C2=A0{<br>
-=C2=A0 =C2=A0 =C2=A0int i;<br>
-<br>
--=C2=A0 =C2=A0 for (i =3D 0; i &lt; MIPS_FPU_MAX; i++)<br>
-+=C2=A0 =C2=A0 for (i =3D 0; i &lt; MIPS_FPU_MAX; i++) {<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0env-&gt;fpus[i].fcr0 =3D def-&gt;CP1_fcr0=
-;<br>
-+=C2=A0 =C2=A0 }<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0memcpy(&amp;env-&gt;active_fpu, &amp;env-&gt;fpus[0], s=
-izeof(env-&gt;active_fpu));<br>
-=C2=A0}<br>
-<br>
--static void mvp_init (CPUMIPSState *env, const mips_def_t *def)<br>
-+static void mvp_init(CPUMIPSState *env, const mips_def_t *def)<br>
-=C2=A0{<br>
-=C2=A0 =C2=A0 =C2=A0env-&gt;mvp =3D g_malloc0(sizeof(<wbr>CPUMIPSMVPContext=
-));<br>
-<br>
-@@ -999,9 +999,10 @@ static void mvp_init (CPUMIPSState *env, const mips_de=
-f_t *def)<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 implemented, 5 TCs implemented. */<br>
-=C2=A0 =C2=A0 =C2=A0env-&gt;mvp-&gt;CP0_MVPConf0 =3D (1U &lt;&lt; CP0MVPC0_=
-M) | (1 &lt;&lt; CP0MVPC0_TLBS) |<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 (0 &lt;&lt; CP0MVPC0_GS) | (1 &lt;&lt; CP0M=
-VPC0_PCP) |<br>
--// TODO: actually do 2 VPEs.<br>
--//=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0(1 &lt;&lt; CP0MVPC0_TCA) | (0x1 &lt;&lt;=
- CP0MVPC0_PVPE) |<br>
--//=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0(0x04 &lt;&lt; CP0MVPC0_PTC);<br>
-+/* TODO: actually do 2 VPEs.<br>
-+ *=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 (1 &lt;&lt; CP0MVPC0_TCA) | (0x1 &lt;&lt; CP0MV=
-PC0_PVPE) |<br>
-+ *=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 (0x04 &lt;&lt; CP0MVPC0_PTC);<br>
-+ */<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 (1 &lt;&lt; CP0MVPC0_TCA) | (0x0 &lt;&lt; C=
-P0MVPC0_PVPE) |<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 (0x00 &lt;&lt; CP0MVPC0_PTC);<br>
-=C2=A0#if !defined(CONFIG_USER_ONLY)<br>
--- <br>
-2.1.0<br>
-<br>
-</blockquote>
+I presume you're alluding to the DASD uid (dasdinfo -x) here?
 
---000000000000cd70dc05acc67449--
+> 
+> So, looking at a concrete subchannel on one of my machines, it would
+> look something like the following:
+> 
+> <common>
+> software_version=1.0.0
+> type=vfio-ccw          <-- would be vfio-pci on the example above
+> <vfio-ccw specific>
+> subchannel_type=0
+> <vfio-ccw_IO specific>
+> chpid_type=0x1a
+> chpid_mask=0xf0        <-- not sure if needed/wanted
+> 
+> Does that make sense?
+> 
 
