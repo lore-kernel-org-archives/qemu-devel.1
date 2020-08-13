@@ -2,44 +2,43 @@ Return-Path: <SRS0=egLd=BX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86192C433DF
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AABDC433E1
 	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 00:33:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4E9BE20771
+	by mail.kernel.org (Postfix) with ESMTPS id 68470207DA
 	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 00:33:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="UfotkwUj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E9BE20771
+	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="EBQu/b+O"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 68470207DA
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=xilinx.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46212 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46190 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k61Ax-0003uH-GR
+	id 1k61Ax-0003te-M2
 	for qemu-devel@archiver.kernel.org; Wed, 12 Aug 2020 20:32:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57516)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57512)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <fnuv@xilinx.com>) id 1k619e-0002R1-R0
- for qemu-devel@nongnu.org; Wed, 12 Aug 2020 20:31:39 -0400
-Received: from mail-bn8nam08on2077.outbound.protection.outlook.com
- ([40.107.100.77]:4416 helo=NAM04-BN8-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <fnuv@xilinx.com>) id 1k619b-0000bY-0U
+ (Exim 4.90_1) (envelope-from <fnuv@xilinx.com>) id 1k619d-0002Qv-EG
  for qemu-devel@nongnu.org; Wed, 12 Aug 2020 20:31:38 -0400
+Received: from mail-dm6nam12on2057.outbound.protection.outlook.com
+ ([40.107.243.57]:38983 helo=NAM12-DM6-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <fnuv@xilinx.com>) id 1k619Z-0000bO-7s
+ for qemu-devel@nongnu.org; Wed, 12 Aug 2020 20:31:36 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=CyShPgLLUIEoeiI+dj5RtsaJgfKj0EjGh/xKHHCqV8rzNCDZZaHOnI5VH518Zzzcm68Hczxv484/wiSEEEyv41OP8ZeqRwXBNDt9WbzJHgNw/CAOA1zw5pAuWHTLs0C8fd0RGo1vEvVKbrlMliIBKvHIwtP9C/jahylBXdERXzN4x8EVtO2omyXtzsdrlGWbPT7LbCsxlWRKDw6VgE5JI9OM8HhbVpYILspJ4vEgXC8lVpIxXAiFSRsA9VHXnEE3aR9LZdo33XHNFwGACfNlten9g2Ln7Lv7cUCFXozGtOJNGjhRboFq3OSHOTA4iBY5htZUQMmli7KoUBABW39e7A==
+ b=Yl+mFV+9mlSgfAFutTwR7kHjWeW3h0IJ6Dzoyr40Twwj5BjJ5TsVqmrOb8GkypFG6bTcezFUlWj+bG6d0dNhTpvG/bAV6XB+N3jgRFk36GqAOw+1M+/jr0R9Qkpb7BkAwK57uV+M88QH3RSGT9BrwWR9S8RDjmjsSXnxDbAGBt3wLFPp2SKdfAG13Lwc4HpbiaMfIPaklh5BosCQM7rNH6x7hvI8xu896pdKctT2Oh3glKUQskgqDqkND1h+3JOoRLURLdHceFqFBmA+Q8mMtulYXKCKykkjPYgPgPj2SY50DcMgiqSA7deJ+xbUgqbvBhdvnsVVx3yV1bg8heYspw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Tg+VtIAic2RCbeXl4dagvpFW0us4uFp3G96+zLHZX4E=;
- b=R2fqgfZY9o/mopZUKNhRe5BF/uL2PzRm6gSoD3qR5gLiteqRHDBxuHjh97Gox0Nn11Kq+sLZKwgY8kNYqvL7gwHdTOUNp3pdK9nsEkEB+oPHbCaSrDYiRVyDCXFOgrbEx5bjahXq0ewErCGYEKPFoH9qPMFne5KDHSEvq8JVsfWazBzmea07WjRil/TDS0/nezNyXFFoGJK9Y5MN3fZjWFt+9kLn7Kx5fTcbWLXqZU0i0VDLrnNvF7E67yN70uQC2BTNXEEohNSx+SwV6Xek2j58Cangq3CJvCA+2pLuMZliUPP1urlpmH0SIBuxL3WJlQnTislLuFCaf9qoLr1nww==
+ bh=G4bU/P0757RU2BIV9V6EDPHmvu4qjb2Kg0E+sfeCRfk=;
+ b=DmTexmj6FoHdblHYsGPQTVd8o8sBZdWQDEapluPy/UkecMl+t7ko4BNAVmwhPknxwyMrClCcIBKiiw3im4+Y45y4z1taF+LEDhJD5DkTUHS7esA8j9GdOLkzJxJW+35tdSdCMgqBxzaGzsBFFl3CAO7/6qNuRe7otFW4E1EK7yuWmWaOzu86oUqL2cied4OvSAvVAr2v1htkFtfPbMGenu5n2Mi4xeA9K6zE0sFIsMC6y6zGYso5JVUF1e0k/1fqy20uApAiyZwOyivgTHm7zT55hvAp9u7W2FO60VX9Qmo7Jyxznnnx9avjXC8TXG5afYColMj6JGRg0B1PzEQ47Q==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  149.199.60.83) smtp.rcpttodomain=nongnu.org smtp.mailfrom=xilinx.com;
  dmarc=bestguesspass action=none header.from=xilinx.com; dkim=none (message
@@ -47,18 +46,17 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=xilinx.onmicrosoft.com; s=selector2-xilinx-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Tg+VtIAic2RCbeXl4dagvpFW0us4uFp3G96+zLHZX4E=;
- b=UfotkwUjsb0t1B3gEFKXmZA1lvnq3atfUgUso9Fe/12f2Jjniog7eZHgFYeAdyk6S3deXh0XU+CfCIqXMhQqB6EyQz4SL3brgAQ2UMPJtjp/bZfPFR90Je7R3+pmkvblF2TjvRr4m2uGU4wdO3oxubk0V2ihzLDZg3B+y21kokg=
-Received: from DM5PR12CA0015.namprd12.prod.outlook.com (2603:10b6:4:1::25) by
- SN1PR02MB3693.namprd02.prod.outlook.com (2603:10b6:802:24::10) with
- Microsoft
+ bh=G4bU/P0757RU2BIV9V6EDPHmvu4qjb2Kg0E+sfeCRfk=;
+ b=EBQu/b+O0ymAFf5hWme5Me77vSCK+gukS00ikXHwwgJYMXa8cu1S1OxZNnOV6+e5rY3JfEDjYBBtOLwigzgZ0v52nAgulgrUbG81OhQ3W6ZYbKI+Euh2aYyy6a4be4odqsXVbJo+uiSR4PjEGMQGzmtVvMs7kkJ/+eSJN94SYlE=
+Received: from CY4PR01CA0008.prod.exchangelabs.com (2603:10b6:903:1f::18) by
+ BYAPR02MB4471.namprd02.prod.outlook.com (2603:10b6:a03:56::16) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3283.15; Thu, 13 Aug 2020 00:31:28 +0000
-Received: from CY1NAM02FT040.eop-nam02.prod.protection.outlook.com
- (2603:10b6:4:1:cafe::2d) by DM5PR12CA0015.outlook.office365.com
- (2603:10b6:4:1::25) with Microsoft SMTP Server (version=TLS1_2,
+ 15.20.3261.25; Thu, 13 Aug 2020 00:31:27 +0000
+Received: from CY1NAM02FT012.eop-nam02.prod.protection.outlook.com
+ (2603:10b6:903:1f:cafe::60) by CY4PR01CA0008.outlook.office365.com
+ (2603:10b6:903:1f::18) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3283.16 via Frontend
- Transport; Thu, 13 Aug 2020 00:31:28 +0000
+ Transport; Thu, 13 Aug 2020 00:31:27 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 149.199.60.83)
  smtp.mailfrom=xilinx.com; nongnu.org; dkim=none (message not signed)
  header.d=none;nongnu.org; dmarc=bestguesspass action=none
@@ -67,33 +65,30 @@ Received-SPF: Pass (protection.outlook.com: domain of xilinx.com designates
  149.199.60.83 as permitted sender) receiver=protection.outlook.com;
  client-ip=149.199.60.83; helo=xsj-pvapsmtpgw01;
 Received: from xsj-pvapsmtpgw01 (149.199.60.83) by
- CY1NAM02FT040.mail.protection.outlook.com (10.152.75.135) with Microsoft SMTP
+ CY1NAM02FT012.mail.protection.outlook.com (10.152.75.158) with Microsoft SMTP
  Server id 15.20.3283.16 via Frontend Transport; Thu, 13 Aug 2020 00:31:27
  +0000
-Received: from [149.199.38.66] (port=57224 helo=smtp.xilinx.com)
+Received: from [149.199.38.66] (port=57235 helo=smtp.xilinx.com)
  by xsj-pvapsmtpgw01 with esmtp (Exim 4.90)
- (envelope-from <fnu.vikram@xilinx.com>) id 1k619J-0006yi-Ki
+ (envelope-from <fnu.vikram@xilinx.com>) id 1k619J-0006yr-Sn
  for qemu-devel@nongnu.org; Wed, 12 Aug 2020 17:31:17 -0700
 Received: from [127.0.0.1] (helo=localhost)
  by xsj-pvapsmtp01 with smtp (Exim 4.63)
- (envelope-from <fnu.vikram@xilinx.com>) id 1k619S-00080l-T0
- for qemu-devel@nongnu.org; Wed, 12 Aug 2020 17:31:26 -0700
-Received: from xsj-pvapsmtp01 (mailman.xilinx.com [149.199.38.66])
- by xsj-smtp-dlp2.xlnx.xilinx.com (8.13.8/8.13.1) with ESMTP id 07D0VL6Z029552; 
- Wed, 12 Aug 2020 17:31:21 -0700
+ (envelope-from <fnu.vikram@xilinx.com>) id 1k619T-00080l-4p
+ for qemu-devel@nongnu.org; Wed, 12 Aug 2020 17:31:27 -0700
+Received: from xsj-pvapsmtp01 (mailhost.xilinx.com [149.199.38.66])
+ by xsj-smtp-dlp2.xlnx.xilinx.com (8.13.8/8.13.1) with ESMTP id 07D0VGGZ029492; 
+ Wed, 12 Aug 2020 17:31:16 -0700
 Received: from [172.19.2.115] (helo=xsjfnuv50.xilinx.com)
  by xsj-pvapsmtp01 with esmtp (Exim 4.63)
  (envelope-from <fnu.vikram@xilinx.com>)
- id 1k619N-0007xR-5j; Wed, 12 Aug 2020 17:31:21 -0700
+ id 1k619I-0007xR-GO; Wed, 12 Aug 2020 17:31:16 -0700
 From: Vikram Garhwal <fnu.vikram@xilinx.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v9 4/4] MAINTAINERS: Add maintainer entry for Xilinx ZynqMP
- CAN controller
-Date: Wed, 12 Aug 2020 17:31:08 -0700
-Message-Id: <1597278668-339715-5-git-send-email-fnu.vikram@xilinx.com>
+Subject: [PATCH v9 0/4] Introduce Xilinx ZynqMP CAN controller
+Date: Wed, 12 Aug 2020 17:31:04 -0700
+Message-Id: <1597278668-339715-1-git-send-email-fnu.vikram@xilinx.com>
 X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1597278668-339715-1-git-send-email-fnu.vikram@xilinx.com>
-References: <1597278668-339715-1-git-send-email-fnu.vikram@xilinx.com>
 X-RCIS-Action: ALLOW
 X-TM-AS-Product-Ver: IMSS-7.1.0.1224-8.2.0.1013-23620.005
 X-TM-AS-User-Approved-Sender: Yes;Yes
@@ -102,37 +97,39 @@ X-MS-Office365-Filtering-HT: Tenant
 X-MS-PublicTrafficType: Email
 MIME-Version: 1.0
 Content-Type: text/plain
-X-MS-Office365-Filtering-Correlation-Id: b862c128-c929-4723-b50c-08d83f20373a
-X-MS-TrafficTypeDiagnostic: SN1PR02MB3693:
-X-Microsoft-Antispam-PRVS: <SN1PR02MB36937A2B82BA3B1C4565B9A9BC430@SN1PR02MB3693.namprd02.prod.outlook.com>
+X-MS-Office365-Filtering-Correlation-Id: 32cb5b78-e1b8-42dc-255b-08d83f203761
+X-MS-TrafficTypeDiagnostic: BYAPR02MB4471:
+X-Microsoft-Antispam-PRVS: <BYAPR02MB44710AB7B834AAF6C6F28589BC430@BYAPR02MB4471.namprd02.prod.outlook.com>
 X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
-X-MS-Oob-TLC-OOBClassifiers: OLM:331;
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: b7lSjecV67gqywvLg6XVHCaCQYui1t+DYeLwiWchEkRwHozxMoTrsp8OV3zYPCiCPoTwviM8PLqzsD7/TFT5ZVoriWtDXNAvjS+TXps0/YL+GyTezd+Qe1rJc2LKgEsmVkdqP7lHMGg2jpLjGxW6fml22fvX2UpZV3/5+fzSmyw3ewfrWSx4gfW/f4+8cp58CAmu7BiLT8e0PYQM9xQfu//TNkaZODcvO2etNp6VO0ieM+RF1Mm+Z4Z/vi6lWoArzfuF7MzmkS1azw+YRtnlKyJWAtbix73Ay9ig4kxsSCIgbtG2nhLTTOLx1siHH1up4gYyrDU0JVBOWzjesP6H22/bhpnZ9TnzY54rC9Gmsob4NP2Fny7ML+AbaaOFT7fUlvR1Lpr6ODFDk2hh2GG+eg==
 X-Forefront-Antispam-Report: CIP:149.199.60.83; CTRY:US; LANG:en; SCL:1; SRV:;
  IPV:NLI; SFV:NSPM; H:xsj-pvapsmtpgw01; PTR:unknown-60-83.xilinx.com; CAT:NONE;
- SFS:(136003)(396003)(39860400002)(346002)(376002)(46966005)(7696005)(26005)(316002)(4326008)(70586007)(336012)(107886003)(356005)(8936002)(47076004)(82740400003)(5660300002)(81166007)(186003)(4744005)(70206006)(82310400002)(478600001)(8676002)(2616005)(36756003)(6666004)(2906002)(6916009)(9786002)(426003);
+ SFTY:;
+ SFS:(396003)(346002)(136003)(376002)(39860400002)(46966005)(70206006)(26005)(70586007)(36756003)(2906002)(8676002)(4326008)(2616005)(186003)(5660300002)(83380400001)(7696005)(6666004)(47076004)(426003)(9786002)(356005)(316002)(82740400003)(478600001)(107886003)(81166007)(8936002)(336012)(6916009)(82310400002);
  DIR:OUT; SFP:1101; 
 X-OriginatorOrg: xilinx.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Aug 2020 00:31:27.1002 (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: b862c128-c929-4723-b50c-08d83f20373a
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Aug 2020 00:31:27.3521 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 32cb5b78-e1b8-42dc-255b-08d83f203761
 X-MS-Exchange-CrossTenant-Id: 657af505-d5df-48d0-8300-c31994686c5c
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=657af505-d5df-48d0-8300-c31994686c5c; Ip=[149.199.60.83];
  Helo=[xsj-pvapsmtpgw01]
-X-MS-Exchange-CrossTenant-AuthSource: CY1NAM02FT040.eop-nam02.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: CY1NAM02FT012.eop-nam02.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR02MB3693
-Received-SPF: pass client-ip=40.107.100.77; envelope-from=fnuv@xilinx.com;
- helo=NAM04-BN8-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/12 20:31:33
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR02MB4471
+Received-SPF: pass client-ip=40.107.243.57; envelope-from=fnuv@xilinx.com;
+ helo=NAM12-DM6-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/12 20:31:32
 X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
 X-Spam_score_int: -28
 X-Spam_score: -2.9
 X-Spam_bar: --
 X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -150,33 +147,65 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Reviewed-by: Francisco Iglesias <francisco.iglesias@xilinx.com>
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-Signed-off-by: Vikram Garhwal <fnu.vikram@xilinx.com>
----
- MAINTAINERS | 8 ++++++++
- 1 file changed, 8 insertions(+)
+Changelog:
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 0886eb3..14d9b73 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1536,6 +1536,14 @@ F: hw/net/opencores_eth.c
- 
- Devices
- -------
-+Xilinx CAN
-+M: Vikram Garhwal <fnu.vikram@xilinx.com>
-+M: Francisco Iglesias <francisco.iglesias@xilinx.com>
-+S: Maintained
-+F: hw/net/can/xlnx-*
-+F: include/hw/net/xlnx-*
-+F: tests/qtest/xlnx-can-test*
-+
- EDU
- M: Jiri Slaby <jslaby@suse.cz>
- S: Maintained
--- 
+v8 -> v9:
+    Use g_autofree to do automatic cleanup the object_get_canonical_path() used.
+
+v7 -> v8:
+    Change CAN controller to keep one canbus per controller.
+    Add canbus connections at machine level.
+    Remove ctrl_idx from CAN controller.
+
+v6 -> v7:
+    Remove '-m 4G' option from xlnx-can-test. This option causes the fail of
+    docker-quick@centos7 build test.
+
+v5 -> v6:
+    Add ptimer based counter for time stamping on RX messages.
+    Fix reset issues.
+    Rebase the patches with master latest changes.
+    Added reference clock property for CAN ptimer.
+
+v4 -> v5:
+    Add XlnxZynqMPCAN controller id to debug messages.
+    Drop parameter errp of object_property_add().
+    Add formatting related suggestions.
+
+v3 -> v4:
+    Correct formatting issues.
+
+v2 -> v3:
+    Rectify the build issue.
+    Rearrange the patch order.
+
+v1 -> v2:
+    Rename the CAN device state and address code style issues.
+    Connect the CAN device to Xlnx-ZCU102 board.
+    Add maintainer entry.
+    Add QTEST for the CAN device.
+
+Vikram Garhwal (4):
+  hw/net/can: Introduce Xilinx ZynqMP CAN controller
+  xlnx-zynqmp: Connect Xilinx ZynqMP CAN controllers
+  tests/qtest: Introduce tests for Xilinx ZynqMP CAN controller
+  MAINTAINERS: Add maintainer entry for Xilinx ZynqMP CAN controller
+
+ MAINTAINERS                      |    8 +
+ hw/arm/xlnx-zcu102.c             |   20 +
+ hw/arm/xlnx-zynqmp.c             |   34 ++
+ hw/net/can/Makefile.objs         |    1 +
+ hw/net/can/xlnx-zynqmp-can.c     | 1165 ++++++++++++++++++++++++++++++++++++++
+ include/hw/arm/xlnx-zynqmp.h     |    8 +
+ include/hw/net/xlnx-zynqmp-can.h |   78 +++
+ tests/qtest/Makefile.include     |    2 +
+ tests/qtest/xlnx-can-test.c      |  359 ++++++++++++
+ 9 files changed, 1675 insertions(+)
+ create mode 100644 hw/net/can/xlnx-zynqmp-can.c
+ create mode 100644 include/hw/net/xlnx-zynqmp-can.h
+ create mode 100644 tests/qtest/xlnx-can-test.c
+
+--
 2.7.4
 
 
