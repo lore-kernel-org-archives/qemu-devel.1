@@ -7,69 +7,70 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86F8BC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 06:56:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3A6BC433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 06:57:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4A77120771
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 06:56:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A77120771
+	by mail.kernel.org (Postfix) with ESMTPS id BBAA920838
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 06:57:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BBAA920838
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40754 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44086 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k67AF-00089m-Ge
-	for qemu-devel@archiver.kernel.org; Thu, 13 Aug 2020 02:56:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60350)
+	id 1k67Aq-00015U-27
+	for qemu-devel@archiver.kernel.org; Thu, 13 Aug 2020 02:57:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60414)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1k673T-0006TV-UX
- for qemu-devel@nongnu.org; Thu, 13 Aug 2020 02:49:40 -0400
-Received: from mout.kundenserver.de ([217.72.192.74]:52755)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1k673b-0006aF-GB
+ for qemu-devel@nongnu.org; Thu, 13 Aug 2020 02:49:47 -0400
+Received: from mout.kundenserver.de ([212.227.17.10]:37185)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1k673M-0004cC-Cm
- for qemu-devel@nongnu.org; Thu, 13 Aug 2020 02:49:39 -0400
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1k673O-0004ch-95
+ for qemu-devel@nongnu.org; Thu, 13 Aug 2020 02:49:45 -0400
 Received: from localhost.localdomain ([82.252.135.186]) by
  mrelayeu.kundenserver.de (mreue107 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1Mrggc-1kQrSt3nGe-00nlbS; Thu, 13 Aug 2020 08:49:28 +0200
+ id 1MeTHG-1ke4tT2afM-00aW4U; Thu, 13 Aug 2020 08:49:31 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 05/14] linux-user: Add support for a group of 2038 safe syscalls
-Date: Thu, 13 Aug 2020 08:49:14 +0200
-Message-Id: <20200813064923.263565-6-laurent@vivier.eu>
+Subject: [PULL 11/14] linux-user: Add support for two btrfs ioctls used for
+ subvolume
+Date: Thu, 13 Aug 2020 08:49:20 +0200
+Message-Id: <20200813064923.263565-12-laurent@vivier.eu>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200813064923.263565-1-laurent@vivier.eu>
 References: <20200813064923.263565-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:dCqji8x8mJP+mxBL/CkPObTVzMKVc4hoXe0pSziuwVvevVaOgi2
- cKXXQM0JwJZ+Wva5eZFuwpDTjfSi/VIkTTIUtYyrcjJbLR7OuPgs6fFVYtQ8lsBrWtcV9d2
- PrLc+ZnYenh/IkZLFni5pFVpi5mo+0qGpkygl4hOrkeBgZ5bDr6eQORLVWpwliUoccims/o
- AVlAt6zSjLQ+yv2Wkltew==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:KDuER9gwmHs=:8xKKPkQ8X/toify7RglusK
- stm+cR7tiWn14lfjH/JE/DBMiQh6n9DZpeGaOZdJ1m8VW/3EWfGNp+FtK2PwVSNquh44aQ3VZ
- zixEpj4hfH2yIqRjE/BWN5Ex0TnL6KmLmR2Rv3Mc8Gx1WKEbE9U29iL/hvyXNLFEQXyH3gN9Z
- OrBNNyKANijV9gtL6yK6ibsdbB1Q7HGRLCNRmsJvRNSF+1s0uOndA53/qLLucaA+dnPz6cYTF
- ke/95D2nVbAImR/hk6lJFeXbbpGkcSshOO/WFHI4DoAT4qRnO90y1KEYP2wvAAG9og+VTWOJa
- 4y/cxEroUoUeQVuIgSuFsduvw+iXBoftaO0m+sYPPX5Xhn38edC63LVlsoBmf0uHRpWrZTZsm
- JY52cFneRwFE4ThecO1poLZiY4cDpHNdv2AyqCFh3HRP7GIjy5N96q0bB1HErgY9q5zM9z1iF
- x+C96duw0m2C5Mut6pR22/J0GPoA4IcyibuYwbR8c+B8Slrelo27aL1JwpC8jOycGn2r1bCqP
- HJ4rALbXLQSrW/C0tez1l/+hzf3NAwy1rsG+DheYcx9K0hLvzKZkUttyk7IsltIAAgrTjmj4H
- Ziwf4UB9PkUZxPpnRA1nsjVS+O0ebO7NKXHqjKuB0QlgdNoutcAC1TMzZlfWxICA+C5wyvZCE
- KB3gJyCGmFJNe1XyP4ZlfZC+/8swM//xLZD1drQwJH5jduJA516hkRm5WRdXRo2k7I+vEnB49
- 8mDfBrBouTePWVmeLRHC265FSXw1K1/EOSEv/ATWgPfq31xH8A3gbiZQ8huXcpvZDoQZsw8zK
- 14j2kcn/C6eyC2IwKX4Z2esT2HkxUUElTl4FmZVx+okFiasGifOiyF65IvgG8vWvyYjP6rI
-Received-SPF: none client-ip=217.72.192.74; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:YTHbNury7aNAxG8cTwPbNnm4lFterGWtBVcfpph2bCr/7AVKirq
+ /6gK/bd/v5kWNgvlmlZRyiPMbWmSotK3d3KMZJYudz76XPjwXdF2caGC36MiMn6lrwlAGKd
+ cmsQOfXd6b58XFLaTOZz/Z2eNNZpU8lAB/3ITIFIdtVM5Eb8Zkxr55PbV3XMMlk1Xn/tSLR
+ VkutFLW19YPm46WK6q9Wg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:WeJMt6sJNpc=:DadDqg5aR0UWP/FZBQ9XZ3
+ iyEGFiW4LzXhMOVQrs1zF0S2DQFt/AFTi4RMoYN9f8hNukiT9QXHeT1+ehPsiOawV6HFyEStL
+ eu7dd5FfgCiqvMm3/qXzlQRPgwVjR8CWOWlxQz6sASRTL+36CPjyMIdxEH/VdvTR7Je62G4Nm
+ Q3SHizs28uOUDTdLfp4h9uWkgC5OJh1fUhOin41aA3qDuAdySUh2yrYg0nqjGAxkZU1d1hcgh
+ ZBgBuJjg7d518s3zSqRD9nv3b5go8AKpOu6j7AnegcwW4ze1InnBqTSMXZB9cChlBdOzrUaF/
+ fAXOVuPlAFPmo+2L4DaYijHf1nFgm3D4hsG8JQCwrmm+YxqYxBX6Zv1dXbqKPtKzmk6dEEdVJ
+ iJ58cWtsbEcaWJ5RFInnHHWhyfBaR7Fgu+vwCiBYrR40FCXC7Z0XReIfXgfzKhK+3zTud8TLA
+ wKcBfGkRzIxQbDgTCEMpKaaRJca6gBi05N1ZXGbU7EfLc0k59p57WdWBF6kr6mkFOLhXqRgwO
+ 71sb01DK3hobOoZC0yUADt6Lf0y/7rZ0xpEob992Nih0WjSftBPCPSoa7+xgcmMUORg/Jicjt
+ rN2ajWxHct0GTowN1b/BtV/59qFiLQNv1ge2fa3ii2iGYEVOdCvggkfCENTgWHqeT32MnwNR0
+ OYBCeeLUaV5X6IAX4s6aM3JjYWn0tYEcrnnUwyIbBg0bhUgy+gurVajaj1TAG5SvAeWtcFqZG
+ kKJS/6uMOZq1yz1eEaaqfixMJfBMZtjIirEaBMonz9DUxkYHHvMBkcjc/sO7UzIIzoaYRp6sf
+ N0ymn59M9TXzQiU7VGJ4C1AJ0bI47MAHNJ4cbYxhoXxezrSvlNYbksUBA4jrH6U0NnBF+b6
+Received-SPF: none client-ip=212.227.17.10; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/13 02:49:28
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/13 02:49:30
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -28
 X-Spam_score: -2.9
 X-Spam_bar: --
 X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001, SPF_NONE=0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -89,282 +90,124 @@ Sender: "Qemu-devel"
 
 From: Filip Bozuta <Filip.Bozuta@syrmia.com>
 
-This patch implements functionality for following time64 syscalls:
+This patch implements functionality for following ioctl:
 
-*clock_getres_time64
+BTRFS_IOC_DEFAULT_SUBVOL - Setting a default subvolume
 
-     This a year 2038 safe variant of syscall:
+    Set a default subvolume for a btrfs filesystem. The third
+    ioctl's argument is a '__u64' (unsigned long long) which
+    represents the id of a subvolume that is to be set as
+    the default.
 
-     int clock_getres(clockid_t clockid, struct timespec *res)
-     --finding the resoultion of a specified clock--
-     man page: https://man7.org/linux/man-pages/man2/clock_getres.2.html
+BTRFS_IOC_GET_SUBVOL_ROOTREF - Getting tree and directory id of subvolumes
 
-*timer_gettime64
-*timer_settime64
+    Read tree and directory id of subvolumes from a btrfs
+    filesystem. The tree and directory id's are returned in the
+    ioctl's third argument which represents a pointer to a
+    following type:
 
-     These are year 2038 safe variants of syscalls:
+    struct btrfs_ioctl_get_subvol_rootref_args {
+		/* in/out, minimum id of rootref's treeid to be searched */
+		__u64 min_treeid;
 
-     int timer_settime(timer_t timerid, int flags,
-                       const struct itimerspec *new_value,
-                       struct itimerspec *old_value)
-     int timer_gettime(timer_t timerid, struct itimerspec *curr_value)
-     --arming/dissarming and fetching state of POSIX per-process timer--
-     man page: https://man7.org/linux/man-pages/man2/timer_settime.2.html
+		/* out */
+		struct {
+			__u64 treeid;
+			__u64 dirid;
+		} rootref[BTRFS_MAX_ROOTREF_BUFFER_NUM];
 
-*timerfd_gettime64
-*timerfd_settime64
+		/* out, number of found items */
+		__u8 num_items;
+		__u8 align[7];
+     };
 
-     These are year 2038 safe variants of syscalls:
-
-     int timerfd_settime(int fd, int flags,
-                         const struct itimerspec *new_value,
-                         struct itimerspec *old_value)
-     int timerfd_gettime(int fd, struct itimerspec *curr_value)
-     --timers that notify via file descriptor--
-     man page: https://man7.org/linux/man-pages/man2/timerfd_settime.2.html
+     Before calling this ioctl, 'min_treeid' field should be filled
+     with value that represent the minimum value for the tree id.
 
 Implementation notes:
 
-     Syscall 'clock_getres_time64' was implemented similarly to 'clock_getres()'.
-     The only difference was that for the conversion of 'struct timespec' from
-     host to target, function 'host_to_target_timespec64()' was used instead of
-     'host_to_target_timespec()'.
-
-     For other syscalls, new functions 'host_to_target_itimerspec64()' and
-     'target_to_host_itimerspec64()' were added to convert the value of the
-     'struct itimerspec' from host to target and vice versa. A new type
-     'struct target__kernel_itimerspec' was added in 'syscall_defs.h'. This
-     type was defined with fields which are of the already defined type
-     'struct target_timespec'. This new 'struct target__kernel_itimerspec'
-     type is used in these new converting functions. These new functions were
-     defined similarly to 'host_to_target_itimerspec()' and 'target_to_host_itimerspec()'
-     the only difference being that 'target_to_host_timespec64()' and
-     'host_to_target_timespec64()' were used.
+    Ioctl BTRFS_IOC_GET_SUBVOL_ROOTREF uses the above mentioned structure
+    type as third argument. That is the reason why a aproppriate thunk
+    structure definition is added in file 'syscall_types.h'.
 
 Signed-off-by: Filip Bozuta <Filip.Bozuta@syrmia.com>
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <20200722153421.295411-3-Filip.Bozuta@syrmia.com>
+Message-Id: <20200803094629.21898-7-Filip.Bozuta@syrmia.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- linux-user/syscall.c      | 139 +++++++++++++++++++++++++++++++++++++-
- linux-user/syscall_defs.h |   5 ++
- 2 files changed, 143 insertions(+), 1 deletion(-)
+ linux-user/ioctls.h        |  7 +++++++
+ linux-user/syscall_defs.h  |  3 +++
+ linux-user/syscall_types.h | 11 +++++++++++
+ 3 files changed, 21 insertions(+)
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index aea1160804a2..bbb61a59c72f 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -1247,7 +1247,9 @@ static inline abi_long target_to_host_timespec(struct timespec *host_ts,
- }
+diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
+index 169f98f7a301..728880b9f37b 100644
+--- a/linux-user/ioctls.h
++++ b/linux-user/ioctls.h
+@@ -206,6 +206,9 @@
+      IOCTL(BTRFS_IOC_INO_LOOKUP, IOC_RW,
+            MK_PTR(MK_STRUCT(STRUCT_btrfs_ioctl_ino_lookup_args)))
  #endif
- 
--#if defined(TARGET_NR_clock_settime64) || defined(TARGET_NR_futex_time64)
-+#if defined(TARGET_NR_clock_settime64) || defined(TARGET_NR_futex_time64) || \
-+    defined(TARGET_NR_timer_settime64) || \
-+    (defined(TARGET_NR_timerfd_settime64) && defined(CONFIG_TIMERFD))
- static inline abi_long target_to_host_timespec64(struct timespec *host_ts,
-                                                  abi_ulong target_addr)
- {
-@@ -6801,6 +6803,24 @@ static inline abi_long target_to_host_itimerspec(struct itimerspec *host_its,
- }
- #endif
- 
-+#if defined(TARGET_NR_timer_settime64) || \
-+    (defined(TARGET_NR_timerfd_settime64) && defined(CONFIG_TIMERFD))
-+static inline abi_long target_to_host_itimerspec64(struct itimerspec *host_its,
-+                                                   abi_ulong target_addr)
-+{
-+    if (target_to_host_timespec64(&host_its->it_interval, target_addr +
-+                                  offsetof(struct target__kernel_itimerspec,
-+                                           it_interval)) ||
-+        target_to_host_timespec64(&host_its->it_value, target_addr +
-+                                  offsetof(struct target__kernel_itimerspec,
-+                                           it_value))) {
-+        return -TARGET_EFAULT;
-+    }
-+
-+    return 0;
-+}
++#ifdef BTRFS_IOC_DEFAULT_SUBVOL
++     IOCTL(BTRFS_IOC_DEFAULT_SUBVOL, IOC_W, MK_PTR(TYPE_ULONGLONG))
 +#endif
-+
- #if ((defined(TARGET_NR_timerfd_gettime) || \
-       defined(TARGET_NR_timerfd_settime)) && defined(CONFIG_TIMERFD)) || \
-       defined(TARGET_NR_timer_gettime) || defined(TARGET_NR_timer_settime)
-@@ -6819,6 +6839,26 @@ static inline abi_long host_to_target_itimerspec(abi_ulong target_addr,
- }
+ #ifdef BTRFS_IOC_SUBVOL_GETFLAGS
+      IOCTL(BTRFS_IOC_SUBVOL_GETFLAGS, IOC_R, MK_PTR(TYPE_ULONGLONG))
  #endif
- 
-+#if ((defined(TARGET_NR_timerfd_gettime64) || \
-+      defined(TARGET_NR_timerfd_settime64)) && defined(CONFIG_TIMERFD)) || \
-+      defined(TARGET_NR_timer_gettime64) || defined(TARGET_NR_timer_settime64)
-+static inline abi_long host_to_target_itimerspec64(abi_ulong target_addr,
-+                                                   struct itimerspec *host_its)
-+{
-+    if (host_to_target_timespec64(target_addr +
-+                                  offsetof(struct target__kernel_itimerspec,
-+                                           it_interval),
-+                                  &host_its->it_interval) ||
-+        host_to_target_timespec64(target_addr +
-+                                  offsetof(struct target__kernel_itimerspec,
-+                                           it_value),
-+                                  &host_its->it_value)) {
-+        return -TARGET_EFAULT;
-+    }
-+    return 0;
-+}
-+#endif
-+
- #if defined(TARGET_NR_adjtimex) || \
-     (defined(TARGET_NR_clock_adjtime) && defined(CONFIG_CLOCK_ADJTIME))
- static inline abi_long target_to_host_timex(struct timex *host_tx,
-@@ -11811,6 +11851,17 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-         return ret;
-     }
+@@ -248,6 +251,10 @@
+      IOCTL(BTRFS_IOC_GET_SUBVOL_INFO, IOC_R,
+            MK_PTR(MK_STRUCT(STRUCT_btrfs_ioctl_get_subvol_info_args)))
  #endif
-+#ifdef TARGET_NR_clock_getres_time64
-+    case TARGET_NR_clock_getres_time64:
-+    {
-+        struct timespec ts;
-+        ret = get_errno(clock_getres(arg1, &ts));
-+        if (!is_error(ret)) {
-+            host_to_target_timespec64(arg2, &ts);
-+        }
-+        return ret;
-+    }
++#ifdef BTRFS_IOC_GET_SUBVOL_ROOTREF
++     IOCTL(BTRFS_IOC_GET_SUBVOL_ROOTREF, IOC_RW,
++           MK_PTR(MK_STRUCT(STRUCT_btrfs_ioctl_get_subvol_rootref_args)))
 +#endif
- #ifdef TARGET_NR_clock_nanosleep
-     case TARGET_NR_clock_nanosleep:
-     {
-@@ -12405,6 +12456,32 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-     }
- #endif
- 
-+#ifdef TARGET_NR_timer_settime64
-+    case TARGET_NR_timer_settime64:
-+    {
-+        target_timer_t timerid = get_timer_id(arg1);
-+
-+        if (timerid < 0) {
-+            ret = timerid;
-+        } else if (arg3 == 0) {
-+            ret = -TARGET_EINVAL;
-+        } else {
-+            timer_t htimer = g_posix_timers[timerid];
-+            struct itimerspec hspec_new = {{0},}, hspec_old = {{0},};
-+
-+            if (target_to_host_itimerspec64(&hspec_new, arg3)) {
-+                return -TARGET_EFAULT;
-+            }
-+            ret = get_errno(
-+                          timer_settime(htimer, arg2, &hspec_new, &hspec_old));
-+            if (arg4 && host_to_target_itimerspec64(arg4, &hspec_old)) {
-+                return -TARGET_EFAULT;
-+            }
-+        }
-+        return ret;
-+    }
-+#endif
-+
- #ifdef TARGET_NR_timer_gettime
-     case TARGET_NR_timer_gettime:
-     {
-@@ -12428,6 +12505,29 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-     }
- #endif
- 
-+#ifdef TARGET_NR_timer_gettime64
-+    case TARGET_NR_timer_gettime64:
-+    {
-+        /* args: timer_t timerid, struct itimerspec64 *curr_value */
-+        target_timer_t timerid = get_timer_id(arg1);
-+
-+        if (timerid < 0) {
-+            ret = timerid;
-+        } else if (!arg2) {
-+            ret = -TARGET_EFAULT;
-+        } else {
-+            timer_t htimer = g_posix_timers[timerid];
-+            struct itimerspec hspec;
-+            ret = get_errno(timer_gettime(htimer, &hspec));
-+
-+            if (host_to_target_itimerspec64(arg2, &hspec)) {
-+                ret = -TARGET_EFAULT;
-+            }
-+        }
-+        return ret;
-+    }
-+#endif
-+
- #ifdef TARGET_NR_timer_getoverrun
-     case TARGET_NR_timer_getoverrun:
-     {
-@@ -12481,6 +12581,20 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-         return ret;
- #endif
- 
-+#if defined(TARGET_NR_timerfd_gettime64) && defined(CONFIG_TIMERFD)
-+    case TARGET_NR_timerfd_gettime64:
-+        {
-+            struct itimerspec its_curr;
-+
-+            ret = get_errno(timerfd_gettime(arg1, &its_curr));
-+
-+            if (arg2 && host_to_target_itimerspec64(arg2, &its_curr)) {
-+                return -TARGET_EFAULT;
-+            }
-+        }
-+        return ret;
-+#endif
-+
- #if defined(TARGET_NR_timerfd_settime) && defined(CONFIG_TIMERFD)
-     case TARGET_NR_timerfd_settime:
-         {
-@@ -12504,6 +12618,29 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-         return ret;
- #endif
- 
-+#if defined(TARGET_NR_timerfd_settime64) && defined(CONFIG_TIMERFD)
-+    case TARGET_NR_timerfd_settime64:
-+        {
-+            struct itimerspec its_new, its_old, *p_new;
-+
-+            if (arg3) {
-+                if (target_to_host_itimerspec64(&its_new, arg3)) {
-+                    return -TARGET_EFAULT;
-+                }
-+                p_new = &its_new;
-+            } else {
-+                p_new = NULL;
-+            }
-+
-+            ret = get_errno(timerfd_settime(arg1, arg2, p_new, &its_old));
-+
-+            if (arg4 && host_to_target_itimerspec64(arg4, &its_old)) {
-+                return -TARGET_EFAULT;
-+            }
-+        }
-+        return ret;
-+#endif
-+
- #if defined(TARGET_NR_ioprio_get) && defined(__NR_ioprio_get)
-     case TARGET_NR_ioprio_get:
-         return get_errno(ioprio_get(arg1, arg2));
+ #ifdef BTRFS_IOC_INO_LOOKUP_USER
+      IOCTL(BTRFS_IOC_INO_LOOKUP_USER, IOC_RW,
+            MK_PTR(MK_STRUCT(STRUCT_btrfs_ioctl_ino_lookup_user_args)))
 diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index 3c261cff0e5e..427a25f5bce5 100644
+index 48ebf56d0f36..b025032626a3 100644
 --- a/linux-user/syscall_defs.h
 +++ b/linux-user/syscall_defs.h
-@@ -259,6 +259,11 @@ struct target_itimerspec {
-     struct target_timespec it_value;
- };
+@@ -981,6 +981,8 @@ struct target_rtc_pll_info {
+ #define TARGET_BTRFS_IOC_SUBVOL_CREATE          TARGET_IOWU(BTRFS_IOCTL_MAGIC, 14)
+ #define TARGET_BTRFS_IOC_SNAP_DESTROY           TARGET_IOWU(BTRFS_IOCTL_MAGIC, 15)
+ #define TARGET_BTRFS_IOC_INO_LOOKUP             TARGET_IOWRU(BTRFS_IOCTL_MAGIC, 18)
++#define TARGET_BTRFS_IOC_DEFAULT_SUBVOL         TARGET_IOW(BTRFS_IOCTL_MAGIC, 19,\
++                                                           abi_ullong)
+ #define TARGET_BTRFS_IOC_SUBVOL_GETFLAGS        TARGET_IOR(BTRFS_IOCTL_MAGIC, 25,\
+                                                            abi_ullong)
+ #define TARGET_BTRFS_IOC_SUBVOL_SETFLAGS        TARGET_IOW(BTRFS_IOCTL_MAGIC, 26,\
+@@ -994,6 +996,7 @@ struct target_rtc_pll_info {
+ #define TARGET_BTRFS_IOC_GET_SUPPORTED_FEATURES TARGET_IORU(BTRFS_IOCTL_MAGIC, 57)
+ #define TARGET_BTRFS_IOC_LOGICAL_INO_V2         TARGET_IOWRU(BTRFS_IOCTL_MAGIC, 59)
+ #define TARGET_BTRFS_IOC_GET_SUBVOL_INFO        TARGET_IORU(BTRFS_IOCTL_MAGIC, 60)
++#define TARGET_BTRFS_IOC_GET_SUBVOL_ROOTREF     TARGET_IOWRU(BTRFS_IOCTL_MAGIC, 61)
+ #define TARGET_BTRFS_IOC_INO_LOOKUP_USER        TARGET_IOWRU(BTRFS_IOCTL_MAGIC, 62)
  
-+struct target__kernel_itimerspec {
-+    struct target__kernel_timespec it_interval;
-+    struct target__kernel_timespec it_value;
-+};
+ /* usb ioctls */
+diff --git a/linux-user/syscall_types.h b/linux-user/syscall_types.h
+index 6e64e6c4f57c..851010c78104 100644
+--- a/linux-user/syscall_types.h
++++ b/linux-user/syscall_types.h
+@@ -414,6 +414,17 @@ STRUCT(btrfs_ioctl_dev_info_args,
+        MK_ARRAY(TYPE_ULONGLONG, 379), /* unused */
+        MK_ARRAY(TYPE_CHAR, BTRFS_DEVICE_PATH_NAME_MAX)) /* path */
+ 
++STRUCT(rootref,
++       TYPE_ULONGLONG, /* treeid */
++       TYPE_ULONGLONG) /* dirid */
 +
- struct target_timex {
-     abi_uint modes;              /* Mode selector */
-     abi_long offset;             /* Time offset */
++STRUCT(btrfs_ioctl_get_subvol_rootref_args,
++       TYPE_ULONGLONG, /* min_treeid */
++       MK_ARRAY(MK_STRUCT(STRUCT_rootref),
++                BTRFS_MAX_ROOTREF_BUFFER_NUM), /* rootref */
++       TYPE_CHAR, /* num_items */
++       MK_ARRAY(TYPE_CHAR, 7)) /* align */
++
+ STRUCT(btrfs_ioctl_get_dev_stats,
+        TYPE_ULONGLONG, /* devid */
+        TYPE_ULONGLONG, /* nr_items */
 -- 
 2.26.2
 
