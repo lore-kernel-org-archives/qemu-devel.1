@@ -2,83 +2,84 @@ Return-Path: <SRS0=egLd=BX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 714CAC433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 03:30:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44B82C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 03:30:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3BECA20756
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 03:30:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 10440207DA
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 03:30:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fQZaLeAn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3BECA20756
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Sz5zeG3X"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10440207DA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33530 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33864 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k63wc-0003U5-Dp
-	for qemu-devel@archiver.kernel.org; Wed, 12 Aug 2020 23:30:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58508)
+	id 1k63wh-0003cQ-5R
+	for qemu-devel@archiver.kernel.org; Wed, 12 Aug 2020 23:30:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58636)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1k63sC-0004nu-Lh
- for qemu-devel@nongnu.org; Wed, 12 Aug 2020 23:25:48 -0400
-Received: from mail-pj1-x102a.google.com ([2607:f8b0:4864:20::102a]:55952)
+ id 1k63sN-0005CC-GU
+ for qemu-devel@nongnu.org; Wed, 12 Aug 2020 23:25:59 -0400
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:36780)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1k63sA-0008Vy-Vz
- for qemu-devel@nongnu.org; Wed, 12 Aug 2020 23:25:48 -0400
-Received: by mail-pj1-x102a.google.com with SMTP id 2so2105330pjx.5
- for <qemu-devel@nongnu.org>; Wed, 12 Aug 2020 20:25:46 -0700 (PDT)
+ id 1k63sL-00009u-7C
+ for qemu-devel@nongnu.org; Wed, 12 Aug 2020 23:25:59 -0400
+Received: by mail-pl1-x641.google.com with SMTP id y6so2020536plt.3
+ for <qemu-devel@nongnu.org>; Wed, 12 Aug 2020 20:25:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=P2SPKTHOjMFQdCqB2vtTra0ygHn5FhW2ETtwYwPvoTs=;
- b=fQZaLeAn4s323lW+P0S9LxRYeHFUfLXgtPg3qlHyHBQhbY5uC8TJSb3/cuFzgrMV3X
- BkV2FpdQtfcPW5+5v8SavMtFIbQ4ViQ7OobgNV3xf9LXXG6tvdxf3p+18MS76C87yOxh
- nDA23txSM0XaZJivpkQAk1WJ7+tI0siNJLLJIpXianuDTvFB8JVhVxH39YE+uNJQEuqW
- ukoH+DEG01eZyqN+1PuAzOZLl/WVBEsVfkuaiSRo2RPcxfTDnQCT/jk9jDynD9/KWOwU
- N9mBHSZekRjCChHTcgJ/jQZy8UjpjpEUY9Gk5mDdZc1fya5AtJUnYi1lrL7Xquyzvgna
- 7jMw==
+ bh=jHuSzulEWSxcXS3/HgjqhtO/Ofgto2+WeRaIMAxtwhM=;
+ b=Sz5zeG3XgVdhymmZEIjmfDzibF17JHrLPYGtUpJ94dyXjiVuSE86E/rcxIJx6bklEK
+ e8p3MX2GpUZ5RPNdn9FEkoXW00uaPrIffXcgob1rY7NSul2DOVfBnxynTIkyMe9XoGVF
+ 1UYo8DAnf6C+uPYy0pwChWYRLS3JMyDKzTH1Wz/J4YOz5YRRVkW1P63v+0Nq8OFJi0mQ
+ PUwT/PUboy63xS9y1g2nHE+x6XF94DOIgIgbL1DzpBUWIt9O1FstG9maj9x1hgmVU3KS
+ LJyaeApEFgVdlzNSVOwdEU+osF1yaO4tyid/8uHnpp59CJdWoAvwMxDZxrRVJQCNa8pf
+ MVYg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=P2SPKTHOjMFQdCqB2vtTra0ygHn5FhW2ETtwYwPvoTs=;
- b=aO8sFfDIFuo2pmDpZgFleK4qSusPCPetSkfYh6fNXj34cqTmutnsNquWLA4VS1HSZB
- /aAIDTpcE+P86Ny+n8x64GlgAYFve5+fC7l1B6bN8bXHdcNM5axiy37TjhbDRpjHCZuX
- A4nKWBS6vK7Z1TQNBe7cNScWdEDsO1r4nxPXQGUFBc7IbT6OiEH3s6R4ghZttiObT6ys
- sI9+hQ8vbDBV7xWDn20Wcws+0nD0vqC/YU1SxMtKXwQoDrcupX3Ocim5AYwrz+i32XWu
- gk9IYlLL82xQ8j3SIO128Uf2CWpH6WknwMr3/PiqAIAw8yow3zr1HevvpJ9PsSaNN4ZD
- cYvw==
-X-Gm-Message-State: AOAM532kuKEiBssLhzRwo/MFNSrsYTVPGO0yh3OHBfJVO094ki6QRp5u
- SNow8EcQOfLxi5KPFTj2vNClI7M7tJw=
-X-Google-Smtp-Source: ABdhPJysmZ59JehnO4QDXa+EvZVpCELkWLPapgrKfrzdRO1yI4ufOZ0kLp1jdLKYwgXJe6Bh5uj0Ug==
-X-Received: by 2002:a17:90a:6807:: with SMTP id
- p7mr3090799pjj.42.1597289145330; 
- Wed, 12 Aug 2020 20:25:45 -0700 (PDT)
+ bh=jHuSzulEWSxcXS3/HgjqhtO/Ofgto2+WeRaIMAxtwhM=;
+ b=keNVvEvy+pW7zFwPQo7r9pOzs1gJs0ZiSM3dA/ZkAfp0+hhhnEQznlRGq3XCPESgYV
+ ivW60bpOXTLnAEmkZe+rVQ5UHQ44ZyrhTFODdls9/Je42UkZRb+lNaUOOJgOdo1M0vGD
+ AA+Cp+wTdlii8zf5tBqJVmt6mHEJW/fLNEtRWnWSLunqMuEl23MzlqwB15Tax+g7TP37
+ rvT/tGXlIxXVAcqbXyU86fs5ZFV45T6IWsh062OF8apg80fpAikFpLzSysrlNSO+az2Y
+ K0fqWpNKRjGhytwxtDvg6alLwbhWl0sjlKz5M3AMccYfwMCeKB0/zUHZLymLIMM5J+cf
+ 6k6g==
+X-Gm-Message-State: AOAM5339w6PhROHGE0A8rbJjcfpT6jFAxxgEnE5KCK/mwgDHQ2ZPCChl
+ SE2ZbFUb7lRyj71wKBEcPWmnA3Kd7IM=
+X-Google-Smtp-Source: ABdhPJxUcFJml9PgDgnwE7wHJBbexG7JV81t1eNkeIVzwwE/d2QlZLrPBR+MxN4jpXAzHRV7AbFrQQ==
+X-Received: by 2002:a17:90a:17ab:: with SMTP id
+ q40mr3121848pja.28.1597289155645; 
+ Wed, 12 Aug 2020 20:25:55 -0700 (PDT)
 Received: from localhost.localdomain ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id m19sm3633164pgd.21.2020.08.12.20.25.44
+ by smtp.gmail.com with ESMTPSA id m19sm3633164pgd.21.2020.08.12.20.25.54
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 12 Aug 2020 20:25:44 -0700 (PDT)
+ Wed, 12 Aug 2020 20:25:55 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 04/17] crypto: Rename cipher include files to .inc.c
-Date: Wed, 12 Aug 2020 20:25:24 -0700
-Message-Id: <20200813032537.2888593-5-richard.henderson@linaro.org>
+Subject: [PATCH 12/17] crypto/builtin: Merge qcrypto_cipher_aes_{ecb, xts}_{en,
+ de}crypt
+Date: Wed, 12 Aug 2020 20:25:32 -0700
+Message-Id: <20200813032537.2888593-13-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200813032537.2888593-1-richard.henderson@linaro.org>
 References: <20200813032537.2888593-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::102a;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x102a.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::641;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x641.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -105,51 +106,140 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-QEMU standard procedure for included c files is to use *.inc.c.
-E.g. there are a different set of checks that are applied.
+There's no real reason we need two separate helper functions here.
+Standardize on the function signature required for xts_encrypt.
+Rename to do_aes_{en,de}crypt_ecb, since the helper does not
+itself do anything with respect to xts.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- crypto/{cipher-builtin.c => cipher-builtin.inc.c} | 0
- crypto/{cipher-gcrypt.c => cipher-gcrypt.inc.c}   | 0
- crypto/{cipher-nettle.c => cipher-nettle.inc.c}   | 0
- crypto/cipher.c                                   | 6 +++---
- 4 files changed, 3 insertions(+), 3 deletions(-)
- rename crypto/{cipher-builtin.c => cipher-builtin.inc.c} (100%)
- rename crypto/{cipher-gcrypt.c => cipher-gcrypt.inc.c} (100%)
- rename crypto/{cipher-nettle.c => cipher-nettle.inc.c} (100%)
+ crypto/cipher-builtin.inc.c | 69 ++++++++++---------------------------
+ 1 file changed, 18 insertions(+), 51 deletions(-)
 
-diff --git a/crypto/cipher-builtin.c b/crypto/cipher-builtin.inc.c
-similarity index 100%
-rename from crypto/cipher-builtin.c
-rename to crypto/cipher-builtin.inc.c
-diff --git a/crypto/cipher-gcrypt.c b/crypto/cipher-gcrypt.inc.c
-similarity index 100%
-rename from crypto/cipher-gcrypt.c
-rename to crypto/cipher-gcrypt.inc.c
-diff --git a/crypto/cipher-nettle.c b/crypto/cipher-nettle.inc.c
-similarity index 100%
-rename from crypto/cipher-nettle.c
-rename to crypto/cipher-nettle.inc.c
-diff --git a/crypto/cipher.c b/crypto/cipher.c
-index 2722dc7d87..deae82c264 100644
---- a/crypto/cipher.c
-+++ b/crypto/cipher.c
-@@ -151,11 +151,11 @@ qcrypto_cipher_munge_des_rfb_key(const uint8_t *key,
- #endif /* CONFIG_GCRYPT || CONFIG_NETTLE */
+diff --git a/crypto/cipher-builtin.inc.c b/crypto/cipher-builtin.inc.c
+index e2ae5d090c..4d971a2b82 100644
+--- a/crypto/cipher-builtin.inc.c
++++ b/crypto/cipher-builtin.inc.c
+@@ -72,65 +72,34 @@ static void qcrypto_cipher_free_aes(QCryptoCipher *cipher)
+     g_free(cipher);
+ }
  
- #ifdef CONFIG_GCRYPT
--#include "cipher-gcrypt.c"
-+#include "cipher-gcrypt.inc.c"
- #elif defined CONFIG_NETTLE
--#include "cipher-nettle.c"
-+#include "cipher-nettle.inc.c"
- #else
--#include "cipher-builtin.c"
-+#include "cipher-builtin.inc.c"
- #endif
+-
+-static void qcrypto_cipher_aes_ecb_encrypt(const AES_KEY *key,
+-                                           const void *in,
+-                                           void *out,
+-                                           size_t len)
++static void do_aes_encrypt_ecb(const void *vctx, size_t len,
++                               uint8_t *out, const uint8_t *in)
+ {
+-    const uint8_t *inptr = in;
+-    uint8_t *outptr = out;
++    const QCryptoCipherBuiltinAESContext *ctx = vctx;
  
- QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
+     /* We have already verified that len % AES_BLOCK_SIZE == 0. */
+     while (len) {
+-        AES_encrypt(inptr, outptr, key);
+-        inptr += AES_BLOCK_SIZE;
+-        outptr += AES_BLOCK_SIZE;
++        AES_encrypt(in, out, &ctx->enc);
++        in += AES_BLOCK_SIZE;
++        out += AES_BLOCK_SIZE;
+         len -= AES_BLOCK_SIZE;
+     }
+ }
+ 
+-
+-static void qcrypto_cipher_aes_ecb_decrypt(const AES_KEY *key,
+-                                           const void *in,
+-                                           void *out,
+-                                           size_t len)
++static void do_aes_decrypt_ecb(const void *vctx, size_t len,
++                               uint8_t *out, const uint8_t *in)
+ {
+-    const uint8_t *inptr = in;
+-    uint8_t *outptr = out;
++    const QCryptoCipherBuiltinAESContext *ctx = vctx;
+ 
+     /* We have already verified that len % AES_BLOCK_SIZE == 0. */
+     while (len) {
+-        AES_decrypt(inptr, outptr, key);
+-        inptr += AES_BLOCK_SIZE;
+-        outptr += AES_BLOCK_SIZE;
++        AES_decrypt(in, out, &ctx->dec);
++        in += AES_BLOCK_SIZE;
++        out += AES_BLOCK_SIZE;
+         len -= AES_BLOCK_SIZE;
+     }
+ }
+ 
+-
+-static void qcrypto_cipher_aes_xts_encrypt(const void *ctx,
+-                                           size_t length,
+-                                           uint8_t *dst,
+-                                           const uint8_t *src)
+-{
+-    const QCryptoCipherBuiltinAESContext *aesctx = ctx;
+-
+-    qcrypto_cipher_aes_ecb_encrypt(&aesctx->enc, src, dst, length);
+-}
+-
+-
+-static void qcrypto_cipher_aes_xts_decrypt(const void *ctx,
+-                                           size_t length,
+-                                           uint8_t *dst,
+-                                           const uint8_t *src)
+-{
+-    const QCryptoCipherBuiltinAESContext *aesctx = ctx;
+-
+-    qcrypto_cipher_aes_ecb_decrypt(&aesctx->dec, src, dst, length);
+-}
+-
+-
+ static int qcrypto_cipher_encrypt_aes(QCryptoCipher *cipher,
+                                       const void *in,
+                                       void *out,
+@@ -142,8 +111,7 @@ static int qcrypto_cipher_encrypt_aes(QCryptoCipher *cipher,
+ 
+     switch (cipher->mode) {
+     case QCRYPTO_CIPHER_MODE_ECB:
+-        qcrypto_cipher_aes_ecb_encrypt(&ctxt->state.aes.key.enc,
+-                                       in, out, len);
++        do_aes_encrypt_ecb(&ctxt->state.aes.key, len, out, in);
+         break;
+     case QCRYPTO_CIPHER_MODE_CBC:
+         AES_cbc_encrypt(in, out, len,
+@@ -153,8 +121,8 @@ static int qcrypto_cipher_encrypt_aes(QCryptoCipher *cipher,
+     case QCRYPTO_CIPHER_MODE_XTS:
+         xts_encrypt(&ctxt->state.aes.key,
+                     &ctxt->state.aes.key_tweak,
+-                    qcrypto_cipher_aes_xts_encrypt,
+-                    qcrypto_cipher_aes_xts_decrypt,
++                    do_aes_encrypt_ecb,
++                    do_aes_decrypt_ecb,
+                     ctxt->state.aes.iv,
+                     len, out, in);
+         break;
+@@ -177,8 +145,7 @@ static int qcrypto_cipher_decrypt_aes(QCryptoCipher *cipher,
+ 
+     switch (cipher->mode) {
+     case QCRYPTO_CIPHER_MODE_ECB:
+-        qcrypto_cipher_aes_ecb_decrypt(&ctxt->state.aes.key.dec,
+-                                       in, out, len);
++        do_aes_decrypt_ecb(&ctxt->state.aes.key, len, out, in);
+         break;
+     case QCRYPTO_CIPHER_MODE_CBC:
+         AES_cbc_encrypt(in, out, len,
+@@ -188,8 +155,8 @@ static int qcrypto_cipher_decrypt_aes(QCryptoCipher *cipher,
+     case QCRYPTO_CIPHER_MODE_XTS:
+         xts_decrypt(&ctxt->state.aes.key,
+                     &ctxt->state.aes.key_tweak,
+-                    qcrypto_cipher_aes_xts_encrypt,
+-                    qcrypto_cipher_aes_xts_decrypt,
++                    do_aes_encrypt_ecb,
++                    do_aes_decrypt_ecb,
+                     ctxt->state.aes.iv,
+                     len, out, in);
+         break;
 -- 
 2.25.1
 
