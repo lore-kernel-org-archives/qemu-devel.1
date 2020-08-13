@@ -2,63 +2,64 @@ Return-Path: <SRS0=egLd=BX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BE05C433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 06:51:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0176C433E3
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 06:51:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 037CB20781
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 06:51:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 037CB20781
+	by mail.kernel.org (Postfix) with ESMTPS id 6658620771
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 06:51:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6658620771
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48948 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49060 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k675D-0008H2-0g
-	for qemu-devel@archiver.kernel.org; Thu, 13 Aug 2020 02:51:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60228)
+	id 1k675E-0008Jh-Gn
+	for qemu-devel@archiver.kernel.org; Thu, 13 Aug 2020 02:51:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60288)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1k673K-0006O3-0v
- for qemu-devel@nongnu.org; Thu, 13 Aug 2020 02:49:30 -0400
-Received: from mout.kundenserver.de ([217.72.192.75]:45961)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1k673O-0006Pr-KX
+ for qemu-devel@nongnu.org; Thu, 13 Aug 2020 02:49:34 -0400
+Received: from mout.kundenserver.de ([217.72.192.75]:44567)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1k673I-0004bh-4C
- for qemu-devel@nongnu.org; Thu, 13 Aug 2020 02:49:29 -0400
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1k673J-0004bn-Ca
+ for qemu-devel@nongnu.org; Thu, 13 Aug 2020 02:49:34 -0400
 Received: from localhost.localdomain ([82.252.135.186]) by
  mrelayeu.kundenserver.de (mreue107 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1MILru-1jrnhB1Miy-00EQqs; Thu, 13 Aug 2020 08:49:25 +0200
+ id 1M9nAB-1k0uW31P77-005sHP; Thu, 13 Aug 2020 08:49:26 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 00/14] Linux user for 5.2 patches
-Date: Thu, 13 Aug 2020 08:49:09 +0200
-Message-Id: <20200813064923.263565-1-laurent@vivier.eu>
+Subject: [PULL 02/14] linux-user: Validate mmap/mprotect prot value
+Date: Thu, 13 Aug 2020 08:49:11 +0200
+Message-Id: <20200813064923.263565-3-laurent@vivier.eu>
 X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200813064923.263565-1-laurent@vivier.eu>
+References: <20200813064923.263565-1-laurent@vivier.eu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:QCLS3UvoO/Ba87bnCFZKbu1Sso16I52Q28w1pnUM+LFyjsXF/8H
- W/36EO2M+KVQcgQnrCI34C+2J8L72GAl0dceB9dI3arQK8y29Th+Veb1J2k4Qdu5iE4xIKe
- RteaQpRJMPZD53nNYR8MKugtiBELTFltkh+A5uaobekDzBq2Y4jEhcHM5TIohvuT3dPzEr1
- pNV7nN5g36wCMXmDCWxdw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:B0GR8nrNQPY=:7fX5gILxsw1SwDOVE84wu3
- Z9h/Mem73Q3D2XysTrq3fVUzBr0jEXqIwbovRwPidcc9JpPO/1kF8280mD4zocQenHeehF5OY
- u0548IYaz0RmaJeln478XtTdspIXA6bo00Hjth1XzJLUTqk/TCXepp1yNg1DIwijsiQWUrlcW
- Q4w+okngqEMH3W2WF2AgVoWmBLcuSTBS811I5BeD8RvtB+sGAMDxlavOS+8Eg1axj1g/XlJae
- yWZn4ZQvGbG6BPPjyAicWurMCMpXEO9/y6dc1yNUXH14V8y7H8GwYobyX4U0TdiyD7w1hBmVG
- Fgxeabe2CQ+2ZlBtl77csQY6EAIIQvCO6u8RjsW4700pMW2zCjbgX5SV3mbJOU3zt1Ba6l6rs
- aprtQ8gFOaYCsv1wyPA0IcbJVYNEe4ICIsAHkZGS0YrE+pbF3bVCFzwk1NAb/fqCXcTvDHCi4
- e5KZLK6J2LtT9c+V2lUC4bdDXYvH9unlEuo0awLUZcNoIK4Lo0sX4ytIh/3XpMTTCY42NzU8c
- Dfu+5PbUrRA5SakMkn//KXOFwKeXS/Tk7QdxBxDwOi4j5tCulW6KQg5wP4NYR5B8jRwWnj3Mr
- KNlCNMTw9uJDYNOmprOpajPSvTXobhGY640AM34aANrRo0xLZgKqtx9R2m2WIU7AzMSXPIZ45
- m4PxU7OntkAs5kiVt9co84bD20fyLOff3YXlBswhsv7/sBNn/BgxLUPVc7sUKb5z8KwoA9wYA
- d64LlNotBAO4kH2mm/xJP7WYmXH1sZz0/rQKc37lWTaza/+/cRNebyDRVJAxmIgUyRPRm6MfS
- L4xr/C9upySdwq7OD5QNo8NUSd6HJWjoh9fxUnvoU3F9+xGX+6Z8lZQ2A8rwItEUII5Av9M
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:MRhH9J+P0CRWlAUTnys0givSaKEFDyAyISPI6Zx2JQHH/E8TC7A
+ fpxBjntVvoxiS1cDgGL9+QI0A+Gvf/NfcBKch3cr5WlKAvPCF8TaF/VPkmoA4r3OC+4GRlS
+ UDIFF5CpS2dhREiYDEn+r7T0gF8C4pHoW63LnNU2jlWD5KAGZykPBPZOpJdV6WCuFWUh1ap
+ NYu+DX3Lr/fB/d5BGFWrg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:MnqWGUJFlaI=:V8FUSsWsAEedoemTbEGtrD
+ Fa4Tc6Kh0HdtdfECUniVuedjNaN7nUHuCWkJC3mj/RsGZAMpIlq4NPJ/buAmNnHitGjRkuX9p
+ 36ArzZKNhYc1FiMfmIUD7OBEjDeYMAFp6bTzDvA4mgrgn6ptkjqZbo3xj3Ud+KiLJEGVF8+3X
+ bzli3oHOlAjMeBUPVGLjRw1kfKp07QGiuleAgj9IobYDyL/J6E5sfqwcQyJycuod5wPj6JKKm
+ IfMTOJ7PS3uSZjDxVlvt/BygBeH30FU54tXfxPD+H8fh4Q1eNZA3iBIg1aNfD7f62Eri0yQMg
+ 6XO+ZDxv1PmJoatR50Wg0ZRgIszQwNLsKczAJzm1hQwqsLsEEO5+ZIZ1JMFw8nH/9bGSVS5w+
+ P7gYQeKtA2eIWHepsZZ8eU8/JoVX+3mqM5A2ny/nxFiZGsze347IofQI/YlIyxNkasZ0a97Ic
+ XKeOtEN4C9L9uwA3PGsu/xrym44T2fSzw1zyxuM0SfBHgDieIS/LYAy/MUGidyfUe8p9ww4x6
+ t4YiK76p3Nl5xEMW/l3xJ7O2VkH6HVCCNzYznCvX+PQxj3ZGSmVSUD/QKvHX+iqNOfB6JlSpy
+ AqKg5UA0qlwOpo6+O4jKUY8WX49OrIIEJA3HoUKJhYq/XxwSmA6pdXy8/DJqK2dnxlGjs+3sy
+ h6Opq2R8LldBXzHepzN4sS65j97FPLDckCrHw6l+p0/gCcFCwlGhKoAMCWmBLGG9HE9Nkl4vP
+ 8wNOVac5lfvKuZR2xfAiagXxCjfHDV/bOKHjPSl6hgpm30bRHo8p3J7lb/Xc6N65Wj6EwLigx
+ SVTu9fGH/f7xCBf4kIz11YKtf3oH6nPKj6xAdgFtt45sRccIgIeoNDEL0HQgoXr/ZmaARZX
 Received-SPF: none client-ip=217.72.192.75; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/13 02:49:26
@@ -81,64 +82,266 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <laurent@vivier.eu>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit d0ed6a69d399ae193959225cdeaa9382746c91cc=
-:=0D
-=0D
-  Update version for v5.1.0 release (2020-08-11 17:07:03 +0100)=0D
-=0D
-are available in the Git repository at:=0D
-=0D
-  git://github.com/vivier/qemu.git tags/linux-user-for-5.2-pull-request=0D
-=0D
-for you to fetch changes up to 04275cad60c8f99e0dd7f56aecda68ceac926da8:=0D
-=0D
-  linux-user: Fix 'utimensat()' implementation (2020-08-12 10:09:58 +0200)=
-=0D
-=0D
-----------------------------------------------------------------=0D
-Add btrfs ioctls=0D
-Add clock_getres_time64, timer_gettime64, timer_settime64,=0D
-    timerfd_gettime64, timerfd_settime64=0D
-Some fixes (page protection, print_fdset, timerspec, itimerspec)=0D
-=0D
-----------------------------------------------------------------=0D
-=0D
-Filip Bozuta (12):=0D
-  linux-user: Fix "print_fdset()" in "strace.c" to not print ", " after=0D
-    last value=0D
-  linux-user: Modify 'target_to_host/host_to_target_itimerspec()'=0D
-  linux-user: Add support for a group of 2038 safe syscalls=0D
-  linux-user: Add support for a group of btrfs ioctls used for=0D
-    subvolumes=0D
-  linux-user: Add support for a group of btrfs ioctls used for snapshots=0D
-  linux-user: Add support for btrfs ioctls used to manipulate with=0D
-    devices=0D
-  linux-user: Add support for btrfs ioctls used to get/set features=0D
-  linux-user: Add support for a group of btrfs inode ioctls=0D
-  linux-user: Add support for two btrfs ioctls used for subvolume=0D
-  linux-user: Add support for btrfs ioctls used to manage quota=0D
-  linux-user: Add support for btrfs ioctls used to scrub a filesystem=0D
-  linux-user: Fix 'utimensat()' implementation=0D
-=0D
-Richard Henderson (2):=0D
-  linux-user: Validate mmap/mprotect prot value=0D
-  linux-user: Adjust guest page protection for the host=0D
-=0D
- configure                  |   9 ++=0D
- linux-user/ioctls.h        | 124 ++++++++++++++++++++++++=0D
- linux-user/mmap.c          | 110 ++++++++++++++-------=0D
- linux-user/strace.c        |   8 +-=0D
- linux-user/syscall.c       | 193 +++++++++++++++++++++++++++++++------=0D
- linux-user/syscall_defs.h  |  42 ++++++++=0D
- linux-user/syscall_types.h | 140 +++++++++++++++++++++++++++=0D
- 7 files changed, 563 insertions(+), 63 deletions(-)=0D
-=0D
--- =0D
-2.26.2=0D
-=0D
+From: Richard Henderson <richard.henderson@linaro.org>
+
+The kernel will return -EINVAL for bits set in the prot argument
+that are unknown or invalid.  Previously we were simply cropping
+out the bits that we care about.
+
+Introduce validate_prot_to_pageflags to perform this check in a
+single place between the two syscalls.  Differentiate between
+the target and host versions of prot.  Compute the qemu internal
+page_flags value at the same time.
+
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Message-Id: <20200519185645.3915-2-richard.henderson@linaro.org>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
+ linux-user/mmap.c | 106 +++++++++++++++++++++++++++++++---------------
+ 1 file changed, 73 insertions(+), 33 deletions(-)
+
+diff --git a/linux-user/mmap.c b/linux-user/mmap.c
+index 0019447892e0..46c7eeba9bd2 100644
+--- a/linux-user/mmap.c
++++ b/linux-user/mmap.c
+@@ -59,64 +59,96 @@ void mmap_fork_end(int child)
+         pthread_mutex_unlock(&mmap_mutex);
+ }
+ 
++/*
++ * Validate target prot bitmask.
++ * Return the prot bitmask for the host in *HOST_PROT.
++ * Return 0 if the target prot bitmask is invalid, otherwise
++ * the internal qemu page_flags (which will include PAGE_VALID).
++ */
++static int validate_prot_to_pageflags(int *host_prot, int prot)
++{
++    int valid = PROT_READ | PROT_WRITE | PROT_EXEC | TARGET_PROT_SEM;
++    int page_flags = (prot & PAGE_BITS) | PAGE_VALID;
++
++    /*
++     * For the host, we need not pass anything except read/write/exec.
++     * While PROT_SEM is allowed by all hosts, it is also ignored, so
++     * don't bother transforming guest bit to host bit.  Any other
++     * target-specific prot bits will not be understood by the host
++     * and will need to be encoded into page_flags for qemu emulation.
++     */
++    *host_prot = prot & (PROT_READ | PROT_WRITE | PROT_EXEC);
++
++    return prot & ~valid ? 0 : page_flags;
++}
++
+ /* NOTE: all the constants are the HOST ones, but addresses are target. */
+-int target_mprotect(abi_ulong start, abi_ulong len, int prot)
++int target_mprotect(abi_ulong start, abi_ulong len, int target_prot)
+ {
+     abi_ulong end, host_start, host_end, addr;
+-    int prot1, ret;
++    int prot1, ret, page_flags, host_prot;
+ 
+-    trace_target_mprotect(start, len, prot);
++    trace_target_mprotect(start, len, target_prot);
+ 
+-    if ((start & ~TARGET_PAGE_MASK) != 0)
++    if ((start & ~TARGET_PAGE_MASK) != 0) {
+         return -TARGET_EINVAL;
++    }
++    page_flags = validate_prot_to_pageflags(&host_prot, target_prot);
++    if (!page_flags) {
++        return -TARGET_EINVAL;
++    }
+     len = TARGET_PAGE_ALIGN(len);
+     end = start + len;
+     if (!guest_range_valid(start, len)) {
+         return -TARGET_ENOMEM;
+     }
+-    prot &= PROT_READ | PROT_WRITE | PROT_EXEC;
+-    if (len == 0)
++    if (len == 0) {
+         return 0;
++    }
+ 
+     mmap_lock();
+     host_start = start & qemu_host_page_mask;
+     host_end = HOST_PAGE_ALIGN(end);
+     if (start > host_start) {
+         /* handle host page containing start */
+-        prot1 = prot;
+-        for(addr = host_start; addr < start; addr += TARGET_PAGE_SIZE) {
++        prot1 = host_prot;
++        for (addr = host_start; addr < start; addr += TARGET_PAGE_SIZE) {
+             prot1 |= page_get_flags(addr);
+         }
+         if (host_end == host_start + qemu_host_page_size) {
+-            for(addr = end; addr < host_end; addr += TARGET_PAGE_SIZE) {
++            for (addr = end; addr < host_end; addr += TARGET_PAGE_SIZE) {
+                 prot1 |= page_get_flags(addr);
+             }
+             end = host_end;
+         }
+-        ret = mprotect(g2h(host_start), qemu_host_page_size, prot1 & PAGE_BITS);
+-        if (ret != 0)
++        ret = mprotect(g2h(host_start), qemu_host_page_size,
++                       prot1 & PAGE_BITS);
++        if (ret != 0) {
+             goto error;
++        }
+         host_start += qemu_host_page_size;
+     }
+     if (end < host_end) {
+-        prot1 = prot;
+-        for(addr = end; addr < host_end; addr += TARGET_PAGE_SIZE) {
++        prot1 = host_prot;
++        for (addr = end; addr < host_end; addr += TARGET_PAGE_SIZE) {
+             prot1 |= page_get_flags(addr);
+         }
+-        ret = mprotect(g2h(host_end - qemu_host_page_size), qemu_host_page_size,
+-                       prot1 & PAGE_BITS);
+-        if (ret != 0)
++        ret = mprotect(g2h(host_end - qemu_host_page_size),
++                       qemu_host_page_size, prot1 & PAGE_BITS);
++        if (ret != 0) {
+             goto error;
++        }
+         host_end -= qemu_host_page_size;
+     }
+ 
+     /* handle the pages in the middle */
+     if (host_start < host_end) {
+-        ret = mprotect(g2h(host_start), host_end - host_start, prot);
+-        if (ret != 0)
++        ret = mprotect(g2h(host_start), host_end - host_start, host_prot);
++        if (ret != 0) {
+             goto error;
++        }
+     }
+-    page_set_flags(start, start + len, prot | PAGE_VALID);
++    page_set_flags(start, start + len, page_flags);
+     mmap_unlock();
+     return 0;
+ error:
+@@ -360,19 +392,26 @@ abi_ulong mmap_find_vma(abi_ulong start, abi_ulong size, abi_ulong align)
+ }
+ 
+ /* NOTE: all the constants are the HOST ones */
+-abi_long target_mmap(abi_ulong start, abi_ulong len, int prot,
++abi_long target_mmap(abi_ulong start, abi_ulong len, int target_prot,
+                      int flags, int fd, abi_ulong offset)
+ {
+     abi_ulong ret, end, real_start, real_end, retaddr, host_offset, host_len;
++    int page_flags, host_prot;
+ 
+     mmap_lock();
+-    trace_target_mmap(start, len, prot, flags, fd, offset);
++    trace_target_mmap(start, len, target_prot, flags, fd, offset);
+ 
+     if (!len) {
+         errno = EINVAL;
+         goto fail;
+     }
+ 
++    page_flags = validate_prot_to_pageflags(&host_prot, target_prot);
++    if (!page_flags) {
++        errno = EINVAL;
++        goto fail;
++    }
++
+     /* Also check for overflows... */
+     len = TARGET_PAGE_ALIGN(len);
+     if (!len) {
+@@ -438,14 +477,15 @@ abi_long target_mmap(abi_ulong start, abi_ulong len, int prot,
+         /* Note: we prefer to control the mapping address. It is
+            especially important if qemu_host_page_size >
+            qemu_real_host_page_size */
+-        p = mmap(g2h(start), host_len, prot,
++        p = mmap(g2h(start), host_len, host_prot,
+                  flags | MAP_FIXED | MAP_ANONYMOUS, -1, 0);
+-        if (p == MAP_FAILED)
++        if (p == MAP_FAILED) {
+             goto fail;
++        }
+         /* update start so that it points to the file position at 'offset' */
+         host_start = (unsigned long)p;
+         if (!(flags & MAP_ANONYMOUS)) {
+-            p = mmap(g2h(start), len, prot,
++            p = mmap(g2h(start), len, host_prot,
+                      flags | MAP_FIXED, fd, host_offset);
+             if (p == MAP_FAILED) {
+                 munmap(g2h(start), host_len);
+@@ -479,19 +519,19 @@ abi_long target_mmap(abi_ulong start, abi_ulong len, int prot,
+             /* msync() won't work here, so we return an error if write is
+                possible while it is a shared mapping */
+             if ((flags & MAP_TYPE) == MAP_SHARED &&
+-                (prot & PROT_WRITE)) {
++                (host_prot & PROT_WRITE)) {
+                 errno = EINVAL;
+                 goto fail;
+             }
+-            retaddr = target_mmap(start, len, prot | PROT_WRITE,
++            retaddr = target_mmap(start, len, target_prot | PROT_WRITE,
+                                   MAP_FIXED | MAP_PRIVATE | MAP_ANONYMOUS,
+                                   -1, 0);
+             if (retaddr == -1)
+                 goto fail;
+             if (pread(fd, g2h(start), len, offset) == -1)
+                 goto fail;
+-            if (!(prot & PROT_WRITE)) {
+-                ret = target_mprotect(start, len, prot);
++            if (!(host_prot & PROT_WRITE)) {
++                ret = target_mprotect(start, len, target_prot);
+                 assert(ret == 0);
+             }
+             goto the_end;
+@@ -502,13 +542,13 @@ abi_long target_mmap(abi_ulong start, abi_ulong len, int prot,
+             if (real_end == real_start + qemu_host_page_size) {
+                 /* one single host page */
+                 ret = mmap_frag(real_start, start, end,
+-                                prot, flags, fd, offset);
++                                host_prot, flags, fd, offset);
+                 if (ret == -1)
+                     goto fail;
+                 goto the_end1;
+             }
+             ret = mmap_frag(real_start, start, real_start + qemu_host_page_size,
+-                            prot, flags, fd, offset);
++                            host_prot, flags, fd, offset);
+             if (ret == -1)
+                 goto fail;
+             real_start += qemu_host_page_size;
+@@ -517,7 +557,7 @@ abi_long target_mmap(abi_ulong start, abi_ulong len, int prot,
+         if (end < real_end) {
+             ret = mmap_frag(real_end - qemu_host_page_size,
+                             real_end - qemu_host_page_size, end,
+-                            prot, flags, fd,
++                            host_prot, flags, fd,
+                             offset + real_end - qemu_host_page_size - start);
+             if (ret == -1)
+                 goto fail;
+@@ -533,13 +573,13 @@ abi_long target_mmap(abi_ulong start, abi_ulong len, int prot,
+             else
+                 offset1 = offset + real_start - start;
+             p = mmap(g2h(real_start), real_end - real_start,
+-                     prot, flags, fd, offset1);
++                     host_prot, flags, fd, offset1);
+             if (p == MAP_FAILED)
+                 goto fail;
+         }
+     }
+  the_end1:
+-    page_set_flags(start, start + len, prot | PAGE_VALID);
++    page_set_flags(start, start + len, page_flags);
+  the_end:
+     trace_target_mmap_complete(start);
+     if (qemu_loglevel_mask(CPU_LOG_PAGE)) {
+-- 
+2.26.2
+
 
