@@ -2,130 +2,95 @@ Return-Path: <SRS0=egLd=BX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AEDAC433E3
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 15:25:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EF77C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 15:35:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 547012078D
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 15:25:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3D20120781
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 15:35:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mymailcheap.com header.i=@mymailcheap.com header.b="biRAhNlt";
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=flygoat.com header.i=@flygoat.com header.b="jgeDUPmS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 547012078D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=flygoat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jKVREhTl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D20120781
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44598 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47928 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k6F6B-00013L-Jv
-	for qemu-devel@archiver.kernel.org; Thu, 13 Aug 2020 11:24:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38004)
+	id 1k6FG2-0002zR-Ai
+	for qemu-devel@archiver.kernel.org; Thu, 13 Aug 2020 11:35:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40314)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jiaxun.yang@flygoat.com>)
- id 1k6F5b-0000eA-6o
- for qemu-devel@nongnu.org; Thu, 13 Aug 2020 11:24:23 -0400
-Received: from relay1.mymailcheap.com ([144.217.248.100]:50465)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jiaxun.yang@flygoat.com>)
- id 1k6F5Y-0001CW-Fm
- for qemu-devel@nongnu.org; Thu, 13 Aug 2020 11:24:22 -0400
-Received: from filter2.mymailcheap.com (filter2.mymailcheap.com
- [91.134.140.82])
- by relay1.mymailcheap.com (Postfix) with ESMTPS id 19E523F202;
- Thu, 13 Aug 2020 11:24:18 -0400 (EDT)
-Received: from localhost (localhost [127.0.0.1])
- by filter2.mymailcheap.com (Postfix) with ESMTP id 4EFAD2A51F;
- Thu, 13 Aug 2020 17:24:17 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=mymailcheap.com;
- s=default; t=1597332257;
- bh=LlZQR1dnOXnh4K3vcweMvUR269SQSOlbXf7u+XiU6vc=;
- h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
- b=biRAhNltqZbumYr21Ml/geucxmGchTL9inXie6c2/Lpj5F8kL470h4G1bQMssNl8l
- TshZ+a9TH2Uk1CpDnebqpdNQ55XrI6XyBGahuWZRYwdCc6EaH7ceY1OoALRMGlZsAi
- ahICiY2V6aWBnGDAIdgay3UFu2tItPbNnPndRfbY=
-X-Virus-Scanned: Debian amavisd-new at filter2.mymailcheap.com
-Received: from filter2.mymailcheap.com ([127.0.0.1])
- by localhost (filter2.mymailcheap.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id MQl3z4qwlKDq; Thu, 13 Aug 2020 17:24:14 +0200 (CEST)
-Received: from mail20.mymailcheap.com (mail20.mymailcheap.com [51.83.111.147])
- (using TLSv1.2 with cipher ADH-AES256-GCM-SHA384 (256/256 bits))
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1k6FFJ-0002Zb-6w
+ for qemu-devel@nongnu.org; Thu, 13 Aug 2020 11:34:25 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:50092
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1k6FFH-0002Pf-7k
+ for qemu-devel@nongnu.org; Thu, 13 Aug 2020 11:34:24 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1597332862;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=J23PbI5Z1GJaE4z5vFx4HSX5EA2ITg6BdXAol9Sx6UQ=;
+ b=jKVREhTlFnW5kQTt3Gk6+pErC48igFcexr5ELHRzS1qCcsMPqaoPBaLgHI02g7elpst9ff
+ CsHnTnbNcFtIFY+R+JgejUeUw82XASEZGLDUlxqKQFNbfERAaTF4CdVJlKDsYeGfnRKh8O
+ JfeEX3Zk13s8zH4LKBKzjsk6xY6e0ZA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-471-6m1jfj4qMD6kA-M_xaKmEA-1; Thu, 13 Aug 2020 11:34:18 -0400
+X-MC-Unique: 6m1jfj4qMD6kA-M_xaKmEA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by filter2.mymailcheap.com (Postfix) with ESMTPS;
- Thu, 13 Aug 2020 17:24:14 +0200 (CEST)
-Received: from [213.133.102.83] (ml.mymailcheap.com [213.133.102.83])
- by mail20.mymailcheap.com (Postfix) with ESMTP id 0AFEF4118C;
- Thu, 13 Aug 2020 15:24:11 +0000 (UTC)
-Authentication-Results: mail20.mymailcheap.com; dkim=pass (1024-bit key;
- unprotected) header.d=flygoat.com header.i=@flygoat.com header.b="jgeDUPmS"; 
- dkim-atps=neutral
-AI-Spam-Status: Not processed
-Received: from [0.0.0.0] (unknown [103.195.6.80])
- (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
- key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest
- SHA256) (No client certificate requested)
- by mail20.mymailcheap.com (Postfix) with ESMTPSA id E393A4118D;
- Thu, 13 Aug 2020 15:23:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=flygoat.com;
- s=default; t=1597332224;
- bh=LlZQR1dnOXnh4K3vcweMvUR269SQSOlbXf7u+XiU6vc=;
- h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
- b=jgeDUPmSVCfYe8Y02ebIoB24rODStU4iIhtEesEL/PiNCS8wICiVaJ0uJRfjJgS05
- ixdwjMM4sowsYinbE9W0uK43Ia8OtUVgcpTPlm4ixCC1o6zIQpmywnpf4p9/8jQl2J
- W1cOJsGx2wWclZGyHKf2rZ3K9gqcG2U4hACPTr4c=
-Subject: Re: [PATCH-for-5.2] target/mips: Report unimplemented cache()
- operations
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-References: <20200806122612.17167-1-f4bug@amsat.org>
- <e55da0ff-e88c-f2f4-0430-32255f7e58fe@flygoat.com>
- <ec0ff553-a5e7-6c93-5ab3-093721b044a6@amsat.org>
- <CAFEAcA8iXXW=eD+w-UdPqdjtbfc45Qu+DyfZBmaVe0TgMt_jmg@mail.gmail.com>
- <a620f323-e42a-e75e-0491-228c480fa55b@amsat.org>
- <6cecb59e-3a78-907c-cf63-225b4efbca01@amsat.org>
-From: Jiaxun Yang <jiaxun.yang@flygoat.com>
-Message-ID: <39ad849e-c1fb-5031-7a30-f920bcee4cbe@flygoat.com>
-Date: Thu, 13 Aug 2020 23:23:38 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C46CD807320;
+ Thu, 13 Aug 2020 15:34:15 +0000 (UTC)
+Received: from gondolin (ovpn-112-216.ams2.redhat.com [10.36.112.216])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4127F5C1A3;
+ Thu, 13 Aug 2020 15:33:50 +0000 (UTC)
+Date: Thu, 13 Aug 2020 17:33:47 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: Sean Mooney <smooney@redhat.com>
+Subject: Re: device compatibility interface for live migration with assigned
+ devices
+Message-ID: <20200813173347.239801fa.cohuck@redhat.com>
+In-Reply-To: <20200807135942.5d56a202.cohuck@redhat.com>
+References: <20200727072440.GA28676@joy-OptiPlex-7040>
+ <20200727162321.7097070e@x1.home>
+ <20200729080503.GB28676@joy-OptiPlex-7040>
+ <20200804183503.39f56516.cohuck@redhat.com>
+ <c178a0d3-269d-1620-22b1-9010f602d8ff@redhat.com>
+ <20200805021654.GB30485@joy-OptiPlex-7040>
+ <2624b12f-3788-7e2b-2cb7-93534960bcb7@redhat.com>
+ <20200805075647.GB2177@nanopsycho>
+ <eb1d01c2-fbad-36b6-10cf-9e03483a736b@redhat.com>
+ <20200805093338.GC30485@joy-OptiPlex-7040>
+ <20200805105319.GF2177@nanopsycho>
+ <4cf2824c803c96496e846c5b06767db305e9fb5a.camel@redhat.com>
+ <20200807135942.5d56a202.cohuck@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <6cecb59e-3a78-907c-cf63-225b4efbca01@amsat.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Rspamd-Queue-Id: 0AFEF4118C
-X-Spamd-Result: default: False [-0.10 / 10.00]; RCVD_VIA_SMTP_AUTH(0.00)[];
- ARC_NA(0.00)[]; R_DKIM_ALLOW(0.00)[flygoat.com:s=default];
- HFILTER_HELO_BAREIP(3.00)[213.133.102.83,1];
- FROM_HAS_DN(0.00)[]; RCPT_COUNT_THREE(0.00)[3];
- FREEMAIL_ENVRCPT(0.00)[gmail.com];
- TO_MATCH_ENVRCPT_ALL(0.00)[]; TAGGED_RCPT(0.00)[];
- MIME_GOOD(-0.10)[text/plain]; R_SPF_SOFTFAIL(0.00)[~all];
- ML_SERVERS(-3.10)[213.133.102.83]; TO_DN_ALL(0.00)[];
- DKIM_TRACE(0.00)[flygoat.com:+];
- RCVD_IN_DNSWL_NONE(0.00)[213.133.102.83:from];
- DMARC_POLICY_ALLOW(0.00)[flygoat.com,none];
- DMARC_POLICY_ALLOW_WITH_FAILURES(0.00)[];
- RCVD_NO_TLS_LAST(0.10)[]; FROM_EQ_ENVFROM(0.00)[];
- MIME_TRACE(0.00)[0:+];
- ASN(0.00)[asn:24940, ipnet:213.133.96.0/19, country:DE];
- FREEMAIL_CC(0.00)[nongnu.org,gmail.com];
- MID_RHS_MATCH_FROM(0.00)[]; RCVD_COUNT_TWO(0.00)[2]
-X-Rspamd-Server: mail20.mymailcheap.com
-Received-SPF: pass client-ip=144.217.248.100;
- envelope-from=jiaxun.yang@flygoat.com; helo=relay1.mymailcheap.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/13 11:24:18
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=cohuck@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/13 03:45:42
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -138,76 +103,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: kvm@vger.kernel.org, Eric Farman <farman@linux.ibm.com>,
+ libvir-list@redhat.com, Jason Wang <jasowang@redhat.com>,
+ qemu-devel@nongnu.org, kwankhede@nvidia.com, eauger@redhat.com,
+ xin-ran.wang@intel.com, corbet@lwn.net, openstack-discuss@lists.openstack.org,
+ shaohe.feng@intel.com, kevin.tian@intel.com, Yan Zhao <yan.y.zhao@intel.com>,
+ Parav Pandit <parav@mellanox.com>, jian-feng.ding@intel.com,
+ dgilbert@redhat.com, zhenyuw@linux.intel.com, hejie.xu@intel.com,
+ bao.yumeng@zte.com.cn, Jiri Pirko <jiri@mellanox.com>,
+ intel-gvt-dev@lists.freedesktop.org, berrange@redhat.com, eskultet@redhat.com,
+ Alex Williamson <alex.williamson@redhat.com>, dinechin@redhat.com,
+ devel@ovirt.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Fri, 7 Aug 2020 13:59:42 +0200
+Cornelia Huck <cohuck@redhat.com> wrote:
 
+> On Wed, 05 Aug 2020 12:35:01 +0100
+> Sean Mooney <smooney@redhat.com> wrote:
+> 
+> > On Wed, 2020-08-05 at 12:53 +0200, Jiri Pirko wrote:  
+> > > Wed, Aug 05, 2020 at 11:33:38AM CEST, yan.y.zhao@intel.com wrote:    
+> 
+> (...)
+> 
+> > > >    software_version: device driver's version.
+> > > >               in <major>.<minor>[.bugfix] scheme, where there is no
+> > > > 	       compatibility across major versions, minor versions have
+> > > > 	       forward compatibility (ex. 1-> 2 is ok, 2 -> 1 is not) and
+> > > > 	       bugfix version number indicates some degree of internal
+> > > > 	       improvement that is not visible to the user in terms of
+> > > > 	       features or compatibility,
+> > > > 
+> > > > vendor specific attributes: each vendor may define different attributes
+> > > >   device id : device id of a physical devices or mdev's parent pci device.
+> > > >               it could be equal to pci id for pci devices
+> > > >   aggregator: used together with mdev_type. e.g. aggregator=2 together
+> > > >               with i915-GVTg_V5_4 means 2*1/4=1/2 of a gen9 Intel
+> > > > 	       graphics device.
+> > > >   remote_url: for a local NVMe VF, it may be configured with a remote
+> > > >               url of a remote storage and all data is stored in the
+> > > > 	       remote side specified by the remote url.
+> > > >   ...    
+> > just a minor not that i find ^ much more simmple to understand then
+> > the current proposal with self and compatiable.
+> > if i have well defiend attibute that i can parse and understand that allow
+> > me to calulate the what is and is not compatible that is likely going to
+> > more useful as you wont have to keep maintianing a list of other compatible
+> > devices every time a new sku is released.
+> > 
+> > in anycase thank for actully shareing ^ as it make it simpler to reson about what
+> > you have previously proposed.  
+> 
+> So, what would be the most helpful format? A 'software_version' field
+> that follows the conventions outlined above, and other (possibly
+> optional) fields that have to match?
 
-在 2020/8/11 上午1:21, Philippe Mathieu-Daudé 写道:
-> On 8/6/20 11:37 PM, Philippe Mathieu-Daudé wrote:
->> On 8/6/20 10:51 PM, Peter Maydell wrote:
->>> On Thu, 6 Aug 2020 at 21:31, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
->>>> On 8/6/20 8:01 PM, Jiaxun Yang wrote:
->>>>> 在 2020/8/6 下午8:26, Philippe Mathieu-Daudé 写道:
->>>>>> We only implement the Index[Store/Load]Tag from the 'cache' opcode.
->>>>>> Instead of ignoring the other cache operations, report them as
->>>>>> unimplemented.
->>>>> Hmm, I don't think we have anything to do with Invalidate/Writeback etc.
->>>>> opcodes
->>>>> in QEMU. Why do we log this?
->>>> I'm noticed this code is run on Linux 3.3.8 (4KEc):
->>>>
->>>>      8880:       3082000f        andi    v0,a0,0xf
->>>>      8884:       10800008        beqz    a0,88a8
->>>>      8888:       00a21021        addu    v0,a1,v0
->>>>      888c:       08002227        j       889c
->>>>      8890:       00001821        move    v1,zero
->>>>      8894:       bcf90000        cache   0x19,0(a3)
->>>>      8898:       24630010        addiu   v1,v1,16
->>>>      889c:       0062302b        sltu    a2,v1,v0
->>>>      88a0:       14c0fffc        bnez    a2,8894
->>>>      88a4:       00833821        addu    a3,a0,v1
->>>>      88a8:       03e00008        jr      ra
->>>>      88ac:       00000000        nop
->>>>
->>>> Why silently ignore the opcode is not implemented instead of logging it?
->>> I think the question is whether the opcode is supposed to have
->>> some behaviour which we're not implementing, or whether "no-op"
->>> is the correct behaviour for it (which it usually is for
->>> cache invalidate type operations; compare the way the Arm
->>> cache ops like IC_IALLU are just ARM_CP_NOP ops).
->> OK now I understand better, thanks.
->>
->> I haven't found useful information about this 0x19=25 opcode value.
-> Just to close this thread, some findings from last WE:
->
-> - I couldn't find where Linux 3.3.8 use that op
-> - I eventually figured out it comes from a kernel module called 'tiatm'.
-> - This kmod is released by OpenWRT in packages named kmod-sangam-atm-annex
-> - Googling for strings from the object, this file has been added in [1]
-> based on the file included in [2]
-> - Someone imported these files in a git repo and published
-> - There is a commented reference [4] as:
->
-> #define        DataCacheHitInvalidate(a)     {__asm__(" cache  17, (%0)"
-> :   : "r" (a));}
-> #define        DataCacheHitWriteback(a)      {__asm__(" cache  25, (%0)"
-> :   : "r" (a));}
->
-> - Also referenced (not commented) in [5] "Linux atm module implementation".
->
-> For my use I'm happy using a trace event:
->
-> -- >8 --
+Just to get a different perspective, I've been trying to come up with
+what would be useful for a very different kind of device, namely
+vfio-ccw. (Adding Eric to cc: for that.)
 
-FYI, I took a look at MIPS M14K (interAptiv) RTL from MIPSOpen project,
-HitInvalidate and HitWriteback cache Ops to L2/L3 Cache will also act
-on L1 Cache. So probably that's kinda... Undocumented trick...
+software_version makes sense for everybody, so it should be a standard
+attribute.
 
-Thanks.
+For the vfio-ccw type, we have only one vendor driver (vfio-ccw_IO).
 
-- Jiaxun
+Given a subchannel A, we want to make sure that subchannel B has a
+reasonable chance of being compatible. I guess that means:
+
+- same subchannel type (I/O)
+- same chpid type (e.g. all FICON; I assume there are no 'mixed' setups
+  -- Eric?)
+- same number of chpids? Maybe we can live without that and just inject
+  some machine checks, I don't know. Same chpid numbers is something we
+  cannot guarantee, especially if we want to migrate cross-CEC (to
+  another machine.)
+
+Other possibly interesting information is not available at the
+subchannel level (vfio-ccw is a subchannel driver.)
+
+So, looking at a concrete subchannel on one of my machines, it would
+look something like the following:
+
+<common>
+software_version=1.0.0
+type=vfio-ccw          <-- would be vfio-pci on the example above
+<vfio-ccw specific>
+subchannel_type=0
+<vfio-ccw_IO specific>
+chpid_type=0x1a
+chpid_mask=0xf0        <-- not sure if needed/wanted
+
+Does that make sense?
+
 
