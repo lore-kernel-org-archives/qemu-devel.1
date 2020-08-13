@@ -2,91 +2,68 @@ Return-Path: <SRS0=egLd=BX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF4C4C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 13:38:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB21EC433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 13:41:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 99A412078D
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 13:38:32 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=bytedance-com.20150623.gappssmtp.com header.i=@bytedance-com.20150623.gappssmtp.com header.b="JTeWUZR/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 99A412078D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bytedance.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8FA7E2078D
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 13:41:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FA7E2078D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50160 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52460 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k6DR9-0004TO-SQ
-	for qemu-devel@archiver.kernel.org; Thu, 13 Aug 2020 09:38:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43516)
+	id 1k6DTb-0005Wm-D0
+	for qemu-devel@archiver.kernel.org; Thu, 13 Aug 2020 09:41:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43684)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <wanghonghao@bytedance.com>)
- id 1k6574-00034d-Cn
- for qemu-devel@nongnu.org; Thu, 13 Aug 2020 00:45:14 -0400
-Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:51589)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <wanghonghao@bytedance.com>)
- id 1k6571-0000Z7-UV
- for qemu-devel@nongnu.org; Thu, 13 Aug 2020 00:45:14 -0400
-Received: by mail-pj1-x1042.google.com with SMTP id c6so2191688pje.1
- for <qemu-devel@nongnu.org>; Wed, 12 Aug 2020 21:45:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=bytedance-com.20150623.gappssmtp.com; s=20150623;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=NTJ9ZgzPgFlnOoLLbMVDGOWHarYuAiQjzjWcdYsVGvI=;
- b=JTeWUZR/VSCvHFHQBFfhgKs1Qi0iseE8+VsoqlmK2+/r4Kns2Iu45KYwARGiuUIUuu
- b5cpCyd3S0MasO4dFvVGwbw0oat8TkIKrbewh+elUXZH8TIQHMGfV3wqRGIhnzmi/eiy
- /pnl32OiKq+njid3qXxUK2eN40PSjpBZhT2SRkreX0lZWg3NtNJ7FFsNYTWSo7uTYpos
- ylSNtrdyNBPs+hA9GtgIBfOd2tT7JEyLBP11BOQrrUgXSptbFOpj75HatHHR56Ltr/E+
- U/rDhJaZrH69NreSoz5GfM6bIVS2iibuTwUxYcQX+bS+5oOeVzIKGtIuYOgyFmKQeh15
- MENg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=NTJ9ZgzPgFlnOoLLbMVDGOWHarYuAiQjzjWcdYsVGvI=;
- b=rn1BPWL/eLTVZjbdSvcwmop3/do+Rg1KGEYs+LxdSe2jKL9zxcxj/NyxAvwWYgumOt
- jbshMaPHjU5459OGSwh9K9Uy6bMqQQBg3Woiajc/dUkqv08q5o3VUZuY4DBCArRh5kgY
- p8WWM7GRncwLPvMfCR1rZW6zIeNTNbpdkzj7UsjPqS8qNvlCXjvwalnwIlr9GF/9A+K9
- YcgqTCfzwYdXZKD2XuO+ZJWPl0vlTld9k8coywwk/6gYx6GHLqTZ1ZHdOqU64zC/OYdc
- cZGfAQ/c/z5EPSGTcvcJh30NezhZopSFA9csEAZNKWbxB9YSRFlYHGGyLRapunWvEHip
- tBQw==
-X-Gm-Message-State: AOAM530zdrGGPshoo1HlPVP93SvQy1Hzwo1kAo/iVCPArcKlIuUTXxZk
- BDO4lMlaY/sbuQONmaJuW/SoKzvYVVpEWQ==
-X-Google-Smtp-Source: ABdhPJw85lkYuQ97o6QZk0VQP4PAf55fSv0ayKXM0DUO06ISNuZqznrZCpku9/3B6NuyTrlwD+cDlQ==
-X-Received: by 2002:a17:902:16b:: with SMTP id 98mr2357286plb.23.1597293910331; 
- Wed, 12 Aug 2020 21:45:10 -0700 (PDT)
-Received: from MacBook-Pro.local.net ([61.120.150.74])
- by smtp.gmail.com with ESMTPSA id z29sm4109746pfj.182.2020.08.12.21.45.07
- (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 12 Aug 2020 21:45:09 -0700 (PDT)
-From: wanghonghao <wanghonghao@bytedance.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 2/2] coroutine: take exactly one batch from global pool at a
- time
-Date: Thu, 13 Aug 2020 12:44:45 +0800
-Message-Id: <20200813044445.23233-2-wanghonghao@bytedance.com>
-X-Mailer: git-send-email 2.24.3 (Apple Git-128)
-In-Reply-To: <20200813044445.23233-1-wanghonghao@bytedance.com>
-References: <20200813044445.23233-1-wanghonghao@bytedance.com>
+ (Exim 4.90_1) (envelope-from <kevin.brodsky@arm.com>)
+ id 1k6A3D-0000FR-Tp
+ for qemu-devel@nongnu.org; Thu, 13 Aug 2020 06:01:35 -0400
+Received: from foss.arm.com ([217.140.110.172]:45424)
+ by eggs.gnu.org with esmtp (Exim 4.90_1)
+ (envelope-from <kevin.brodsky@arm.com>) id 1k6A3A-000396-Sr
+ for qemu-devel@nongnu.org; Thu, 13 Aug 2020 06:01:35 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 530B131B;
+ Thu, 13 Aug 2020 03:01:29 -0700 (PDT)
+Received: from [192.168.178.35] (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 911193F70D;
+ Thu, 13 Aug 2020 03:01:27 -0700 (PDT)
+Subject: Re: [PATCH 0/3] target/arm: Complete ISS for MTE tag check fail
+To: Evgenii Stepanov <eugenis@google.com>,
+ Andrey Konovalov <andreyknvl@google.com>
+References: <20200812171946.2044791-1-richard.henderson@linaro.org>
+ <CAAeHK+z=CU5dQepy+SBtVMAp-=k8BODorG768CYwoR3NEKCWFg@mail.gmail.com>
+ <b2d524a2-1523-d03a-72a9-407ab03fa897@linaro.org>
+ <CAAeHK+zD3ZdjpZOBny3QuYtKe-qzhmEfd9w+nr3NrzEuzHHRvw@mail.gmail.com>
+ <CAFKCwrjSU89jiUbzd8Ys8nV6NDCJer=FbUnGWv8m0p0E+9MdVg@mail.gmail.com>
+From: Kevin Brodsky <kevin.brodsky@arm.com>
+Message-ID: <f3e2717b-878c-f6cf-51dc-fe2c372a7b41@arm.com>
+Date: Thu, 13 Aug 2020 11:01:25 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1042;
- envelope-from=wanghonghao@bytedance.com; helo=mail-pj1-x1042.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+In-Reply-To: <CAFKCwrjSU89jiUbzd8Ys8nV6NDCJer=FbUnGWv8m0p0E+9MdVg@mail.gmail.com>
+Content-Type: multipart/alternative;
+ boundary="------------B662C6CCBE1B4141BC04C887"
+Content-Language: en-GB
+Received-SPF: pass client-ip=217.140.110.172;
+ envelope-from=kevin.brodsky@arm.com; helo=foss.arm.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/13 05:05:56
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, HTML_MESSAGE=0.001,
+ RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-Mailman-Approved-At: Thu, 13 Aug 2020 09:37:10 -0400
@@ -101,133 +78,150 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, wanghonghao <wanghonghao@bytedance.com>,
- stefanha@redhat.com
+Cc: peter.maydell@linaro.org, Branislav Rankov <Branislav.Rankov@arm.com>,
+ Elena Petrova <lenaptr@google.com>, Peter Collingbourne <pcc@google.com>,
+ Catalin Marinas <catalin.marinas@arm.com>,
+ Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
+ Kostya Serebryany <kcc@google.com>,
+ Vincenzo Frascino <vincenzo.frascino@arm.com>, alex.bennee@linaro.org,
+ Dmitry Vyukov <dvyukov@google.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch replace the global coroutine queue with a lock-free stack of which
-the elements are coroutine queues. Threads can put coroutine queues into the
-stack or take queues from it and each coroutine queue has exactly
-POOL_BATCH_SIZE coroutines. Note that the stack is not strictly LIFO, but it's
-enough for buffer pool.
+This is a multi-part message in MIME format.
+--------------B662C6CCBE1B4141BC04C887
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Coroutines will be put into thread-local pools first while release. Now the
-fast pathes of both allocation and release are atomic-free, and there won't
-be too many coroutines remain in a single thread since POOL_BATCH_SIZE has been
-reduced to 16.
+On 12/08/2020 20:06, Evgenii Stepanov wrote:
+> On Wed, Aug 12, 2020 at 11:03 AM Andrey Konovalov <andreyknvl@google.com 
+> <mailto:andreyknvl@google.com>> wrote:
+>
+>     On Wed, Aug 12, 2020 at 7:52 PM Richard Henderson
+>     <richard.henderson@linaro.org <mailto:richard.henderson@linaro.org>> wrote:
+>     >
+>     > On 8/12/20 10:38 AM, Andrey Konovalov wrote:
+>     > > On Wed, Aug 12, 2020 at 7:19 PM Richard Henderson
+>     > > <richard.henderson@linaro.org <mailto:richard.henderson@linaro.org>> wrote:
+>     > >>
+>     > >> As reported by Andrey, I was missing the complete ISS info for
+>     > >> the Data Abort raised upon a synchronous tag check fail.
+>     > >>
+>     > >> The following should fix that.  All the twisty little rules for
+>     > >> the ISS.ISV bit are already handled by merge_syn_data_abort.
+>     > >> Probably the most important bit that was missing was ISS.WnR,
+>     > >> as that is independent of ISS.ISV.
+>     > >>
+>     > >> Andrey, will you please test?
+>     > >
+>     > > Looks like WnR is now being set properly, but SAS is still always 0.
+>     >
+>     > Are you looking at ESR_EL1?
+>     >
+>     > On page D13-2992 of revision F.a:
+>     >
+>     > # ISV is 0 for all faults reported in ESR_EL1 or ESR_EL3.
+>     >
+>     > which means that ISS[23:14] are RES0, which includes SAS.
+>
+>     +more Arm and Google people
+>
+>     Is this known? Do we not get access size when MTE fault happens?
+>
+>
+> It sounds like this applies to all data abort exceptions, no matter MTE or not.
 
-In practice, I've run a VM with two block devices binding to two different
-iothreads, and run fio with iodepth 128 on each device. It maintains around
-400 coroutines and has about 1% chance of calling to `qemu_coroutine_new`
-without this patch. And with this patch, it maintains no more than 273
-coroutines and doesn't call `qemu_coroutine_new` after initial allocations.
+Correct. For data aborts in general, the extra syndrome information in ISS[23:14] is 
+only provided at EL2, in order to help hypervisors emulate simple loads/stores (that 
+access device memory) by looking at ESR_EL2 without having to decode the trapped 
+instruction. Did you have any particular use-case in mind for SAS being set even in 
+ESR_EL1?
 
-Signed-off-by: wanghonghao <wanghonghao@bytedance.com>
----
- util/qemu-coroutine.c | 63 ++++++++++++++++++++++++++++---------------
- 1 file changed, 42 insertions(+), 21 deletions(-)
+Kevin
 
-diff --git a/util/qemu-coroutine.c b/util/qemu-coroutine.c
-index c3caa6c770..02cd68bc4a 100644
---- a/util/qemu-coroutine.c
-+++ b/util/qemu-coroutine.c
-@@ -21,13 +21,14 @@
- #include "block/aio.h"
- 
- enum {
--    POOL_BATCH_SIZE = 64,
-+    POOL_BATCH_SIZE = 16,
-+    POOL_MAX_BATCHES = 32,
- };
- 
--/** Free list to speed up creation */
--static QSLIST_HEAD(, Coroutine) release_pool = QSLIST_HEAD_INITIALIZER(pool);
--static unsigned int release_pool_size;
--static __thread QSLIST_HEAD(, Coroutine) alloc_pool = QSLIST_HEAD_INITIALIZER(pool);
-+/** Free stack to speed up creation */
-+static QSLIST_HEAD(, Coroutine) pool[POOL_MAX_BATCHES];
-+static int pool_top;
-+static __thread QSLIST_HEAD(, Coroutine) alloc_pool;
- static __thread unsigned int alloc_pool_size;
- static __thread Notifier coroutine_pool_cleanup_notifier;
- 
-@@ -49,20 +50,26 @@ Coroutine *qemu_coroutine_create(CoroutineEntry *entry, void *opaque)
-     if (CONFIG_COROUTINE_POOL) {
-         co = QSLIST_FIRST(&alloc_pool);
-         if (!co) {
--            if (release_pool_size > POOL_BATCH_SIZE) {
--                /* Slow path; a good place to register the destructor, too.  */
--                if (!coroutine_pool_cleanup_notifier.notify) {
--                    coroutine_pool_cleanup_notifier.notify = coroutine_pool_cleanup;
--                    qemu_thread_atexit_add(&coroutine_pool_cleanup_notifier);
-+            int top;
-+
-+            /* Slow path; a good place to register the destructor, too.  */
-+            if (!coroutine_pool_cleanup_notifier.notify) {
-+                 coroutine_pool_cleanup_notifier.notify = coroutine_pool_cleanup;
-+                 qemu_thread_atexit_add(&coroutine_pool_cleanup_notifier);
-+            }
-+
-+            while ((top = atomic_read(&pool_top)) > 0) {
-+                if (atomic_cmpxchg(&pool_top, top, top - 1) != top) {
-+                    continue;
-                 }
- 
--                /* This is not exact; there could be a little skew between
--                 * release_pool_size and the actual size of release_pool.  But
--                 * it is just a heuristic, it does not need to be perfect.
--                 */
--                alloc_pool_size = atomic_xchg(&release_pool_size, 0);
--                QSLIST_MOVE_ATOMIC(&alloc_pool, &release_pool);
-+                QSLIST_MOVE_ATOMIC(&alloc_pool, &pool[top - 1]);
-                 co = QSLIST_FIRST(&alloc_pool);
-+
-+                if (co) {
-+                    alloc_pool_size = POOL_BATCH_SIZE;
-+                    break;
-+                }
-             }
-         }
-         if (co) {
-@@ -86,16 +93,30 @@ static void coroutine_delete(Coroutine *co)
-     co->caller = NULL;
- 
-     if (CONFIG_COROUTINE_POOL) {
--        if (release_pool_size < POOL_BATCH_SIZE * 2) {
--            QSLIST_INSERT_HEAD_ATOMIC(&release_pool, co, pool_next);
--            atomic_inc(&release_pool_size);
--            return;
--        }
-+        int top, value, old;
-+
-         if (alloc_pool_size < POOL_BATCH_SIZE) {
-             QSLIST_INSERT_HEAD(&alloc_pool, co, pool_next);
-             alloc_pool_size++;
-             return;
-         }
-+
-+        for (top = atomic_read(&pool_top); top < POOL_MAX_BATCHES; top++) {
-+            QSLIST_REPLACE_ATOMIC(&pool[top], &alloc_pool);
-+            if (!QSLIST_EMPTY(&alloc_pool)) {
-+                continue;
-+            }
-+
-+            value = top + 1;
-+
-+            do {
-+                old = atomic_cmpxchg(&pool_top, top, value);
-+            } while (old != top && (top = old) < value);
-+
-+            QSLIST_INSERT_HEAD(&alloc_pool, co, pool_next);
-+            alloc_pool_size = 1;
-+            return;
-+        }
-     }
- 
-     qemu_coroutine_delete(co);
--- 
-2.24.3 (Apple Git-128)
+--------------B662C6CCBE1B4141BC04C887
+Content-Type: text/html; charset=utf-8
+Content-Transfer-Encoding: 8bit
 
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  </head>
+  <body text="#000000" bgcolor="#FFFFFF">
+    On 12/08/2020 20:06, Evgenii Stepanov wrote:<br>
+    <blockquote type="cite"
+cite="mid:CAFKCwrjSU89jiUbzd8Ys8nV6NDCJer=FbUnGWv8m0p0E+9MdVg@mail.gmail.com">
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+      <div dir="ltr">On Wed, Aug 12, 2020 at 11:03 AM Andrey Konovalov
+        &lt;<a href="mailto:andreyknvl@google.com"
+          moz-do-not-send="true">andreyknvl@google.com</a>&gt; wrote:<br>
+        <div class="gmail_quote">
+          <blockquote class="gmail_quote" style="margin:0px 0px 0px
+            0.8ex;border-left:1px solid
+            rgb(204,204,204);padding-left:1ex">On Wed, Aug 12, 2020 at
+            7:52 PM Richard Henderson<br>
+            &lt;<a href="mailto:richard.henderson@linaro.org"
+              target="_blank" moz-do-not-send="true">richard.henderson@linaro.org</a>&gt;
+            wrote:<br>
+            &gt;<br>
+            &gt; On 8/12/20 10:38 AM, Andrey Konovalov wrote:<br>
+            &gt; &gt; On Wed, Aug 12, 2020 at 7:19 PM Richard Henderson<br>
+            &gt; &gt; &lt;<a href="mailto:richard.henderson@linaro.org"
+              target="_blank" moz-do-not-send="true">richard.henderson@linaro.org</a>&gt;
+            wrote:<br>
+            &gt; &gt;&gt;<br>
+            &gt; &gt;&gt; As reported by Andrey, I was missing the
+            complete ISS info for<br>
+            &gt; &gt;&gt; the Data Abort raised upon a synchronous tag
+            check fail.<br>
+            &gt; &gt;&gt;<br>
+            &gt; &gt;&gt; The following should fix that.  All the twisty
+            little rules for<br>
+            &gt; &gt;&gt; the ISS.ISV bit are already handled by
+            merge_syn_data_abort.<br>
+            &gt; &gt;&gt; Probably the most important bit that was
+            missing was ISS.WnR,<br>
+            &gt; &gt;&gt; as that is independent of ISS.ISV.<br>
+            &gt; &gt;&gt;<br>
+            &gt; &gt;&gt; Andrey, will you please test?<br>
+            &gt; &gt;<br>
+            &gt; &gt; Looks like WnR is now being set properly, but SAS
+            is still always 0.<br>
+            &gt;<br>
+            &gt; Are you looking at ESR_EL1?<br>
+            &gt;<br>
+            &gt; On page D13-2992 of revision F.a:<br>
+            &gt;<br>
+            &gt; # ISV is 0 for all faults reported in ESR_EL1 or
+            ESR_EL3.<br>
+            &gt;<br>
+            &gt; which means that ISS[23:14] are RES0, which includes
+            SAS.<br>
+            <br>
+            +more Arm and Google people<br>
+            <br>
+            Is this known? Do we not get access size when MTE fault
+            happens?<br>
+          </blockquote>
+          <div><br>
+          </div>
+          <div>It sounds like this applies to all data abort exceptions,
+            no matter MTE or not.</div>
+        </div>
+      </div>
+    </blockquote>
+    <br>
+    Correct. For data aborts in general, the extra syndrome information
+    in ISS[23:14] is only provided at EL2, in order to help hypervisors
+    emulate simple loads/stores (that access device memory) by looking
+    at ESR_EL2 without having to decode the trapped instruction. Did you
+    have any particular use-case in mind for SAS being set even in
+    ESR_EL1?<br>
+    <br>
+    Kevin<br>
+  </body>
+</html>
+
+--------------B662C6CCBE1B4141BC04C887--
 
