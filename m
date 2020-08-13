@@ -2,101 +2,132 @@ Return-Path: <SRS0=egLd=BX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 796B7C433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 12:27:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3463C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 12:28:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4595E207DA
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 12:27:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B2D7A207DA
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 12:28:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="i51HvJJP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4595E207DA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="L//8R8eH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2D7A207DA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=xilinx.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52440 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53272 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k6CKs-0002hc-Fv
-	for qemu-devel@archiver.kernel.org; Thu, 13 Aug 2020 08:27:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45448)
+	id 1k6CL4-000335-VK
+	for qemu-devel@archiver.kernel.org; Thu, 13 Aug 2020 08:28:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45486)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andreyknvl@google.com>)
- id 1k6CJM-0001QS-Li
- for qemu-devel@nongnu.org; Thu, 13 Aug 2020 08:26:24 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:46821)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <andreyknvl@google.com>)
- id 1k6CJK-0003Eh-T4
- for qemu-devel@nongnu.org; Thu, 13 Aug 2020 08:26:24 -0400
-Received: by mail-pg1-x542.google.com with SMTP id 189so2096195pgg.13
- for <qemu-devel@nongnu.org>; Thu, 13 Aug 2020 05:26:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=fecvo+dx1PLdLDHSkp6XpVInl4ld6x8XcMudkHyqd5w=;
- b=i51HvJJPsqJy9bZSK8a+NCSYDBeUDXH6JGd7M2pyqOBdYbTHAOgDHj9Q/zYSTQ57gH
- LgpeCCaCaUavscIAfOupWtXn9rRUjDSDod/h4YtYcSv73SeoQT3jYe0ETwWr29JJDWIE
- SUacZOHLc/UOpbsY1OSaSKRI3nchkhY2s6qgFPhG6bdtfaXos3eaHwADqMlSgu/oLEWQ
- NWI9dz/kzhYvcdlY2bydwqs98mCKIMHkrosYj9SmY8wGnoVtWaS/dqcYbU/RA2Y/pDzH
- 3Lnzum74F4BKZT8q/u0SHYh6xSlO9W9HuGZsLHtslp2SzrRURLLL9wW0T2JfqFmpFb1k
- Yjng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=fecvo+dx1PLdLDHSkp6XpVInl4ld6x8XcMudkHyqd5w=;
- b=VFU7C8q4aoGmqPF2jvep+ka4ssFrnVcOMaDOCRufSv2Y2V8iN4fC91Ku+uSk81yAyx
- rHYBrticgkIFSe3UHbBlg9rilvP52P5B0wKw0N45eIzSNTEl1almFHCTDGZKYcZiarUs
- UbKOjWF2lH6OZfWUl6I435B+EnIHmCewpvoTjd3vCBvw/HWquCP7dlvV9e40nIEwVY6l
- P0GHs4AJz9YOdV6MhWwRiK++bieTFN/Dfhcang6E2Rir0h9QJa0XEFIjHqhK1qApSIEe
- 0Z41XINKLf7f2JpHq2eGYf7NojQoqYM1wON8H6kJjMRwOM1RSlyopejzuS96r80Bl9F8
- kChg==
-X-Gm-Message-State: AOAM530OQyUBAgFo68OAI6kZuPPHQnNAWyrw6pM/8JXL1ds66vHLyCDd
- OUg0NVXwHbsJt5MOeN8Lo+s4RTz+NjRN1WKqxFXTHg==
-X-Google-Smtp-Source: ABdhPJzOgyD6p6qdx4xY9eHwxyDX6BgaDBG4OvnAGXu7pHRIFQODqwNlODOBw2xtl8MSUEWETPXxFczcQ8tUCCQ+BEs=
-X-Received: by 2002:a62:7dd5:: with SMTP id y204mr4275769pfc.318.1597321580917; 
- Thu, 13 Aug 2020 05:26:20 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <edgar@xilinx.com>)
+ id 1k6CJU-0001Wd-OM; Thu, 13 Aug 2020 08:26:33 -0400
+Received: from mail-co1nam11on2041.outbound.protection.outlook.com
+ ([40.107.220.41]:7744 helo=NAM11-CO1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <edgar@xilinx.com>)
+ id 1k6CJS-0003FK-1W; Thu, 13 Aug 2020 08:26:32 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=koOm8S2/TNiKq0ScS9+3kMSUmDkwPOZWEsRJGWVvtBQ87YBI//rq9O0+HKT34rVVZ/WyAN1xYDJtgJGFHwphzFLdhLZ6hyWZUKzEfmc5sDfRAciQ45aQVxfhRg0TMbfL1R8JUhy3yjpLmpq53ISJYjPdqLIXIdsDxt5M/CYw9KotbzElhe2Y4QZ0ZQcVWScrSc53k5TCivY7SOQXAQUzBZKIwW8A02jtL+bXPlsWdJb7WanX5FFmKMe+yvRa1hb6P9AudBpPo+/WLEIirUDammlD1SOM1uCSMcpl/84xqdeOhY3FHrsuUksl47koJ0Q2KZ8q3yp3uHsyYN18HYdNbg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6KxQmAVENLcL9efUf5d27Gs12muivbwo/rAejyu1Wac=;
+ b=UhC2MKxPFVG2+wM1wv3xasarsJJi9b3J0FVyoCFwrQ4wNr+uOS6PkEv2nMSbx2R5okrku7ZmXYaDoGNbsIeUPzFOpR1WHlbWxOMeqmcviv9+lkaotsrRAbvN8y7IwHWAXfxEHjA+lrqELS9cLieYsg5hYTH585v8QNOpJkyXGFGGgf2nE4XkjYSydh1ubz1F6k1EJ6ylXpRf8BNE3xTGkjiBevTNSruYWQfIJkAeJbkRY13lSiPP/GkIZUwvxUPdSzQ7aOMNmGPikwunf5SBTECQR+iZ6OlCHxXNVQ+VQNz4cpzdh1QhAMCmKYhT+O5nvyRbQM3is59o131FAVzjkw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 149.199.80.198) smtp.rcpttodomain=amsat.org smtp.mailfrom=xilinx.com;
+ dmarc=bestguesspass action=none header.from=xilinx.com; dkim=none (message
+ not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=xilinx.onmicrosoft.com; s=selector2-xilinx-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6KxQmAVENLcL9efUf5d27Gs12muivbwo/rAejyu1Wac=;
+ b=L//8R8eHKlK9QIHW/ua3taGoEsB5u4iQogmu+qzn/lzqlEjMS41G53w5lbmCA98JFLsccDJaXkYcNADpGu4ev85X/Taq6mw2xR/1SbqhCeBs2djAkWjhvof+fjQMxqBu8Sf46teWm4OjOmLB6Fh+Vd+J8E28XNbIx2Wd5GVoHp8=
+Received: from SA0PR11CA0074.namprd11.prod.outlook.com (2603:10b6:806:d2::19)
+ by BN7PR02MB5170.namprd02.prod.outlook.com (2603:10b6:408:23::11)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3283.15; Thu, 13 Aug
+ 2020 12:26:15 +0000
+Received: from SN1NAM02FT0052.eop-nam02.prod.protection.outlook.com
+ (2603:10b6:806:d2:cafe::24) by SA0PR11CA0074.outlook.office365.com
+ (2603:10b6:806:d2::19) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3283.15 via Frontend
+ Transport; Thu, 13 Aug 2020 12:26:15 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 149.199.80.198)
+ smtp.mailfrom=xilinx.com; amsat.org; dkim=none (message not signed)
+ header.d=none;amsat.org; dmarc=bestguesspass action=none
+ header.from=xilinx.com;
+Received-SPF: Pass (protection.outlook.com: domain of xilinx.com designates
+ 149.199.80.198 as permitted sender) receiver=protection.outlook.com;
+ client-ip=149.199.80.198; helo=xir-pvapexch01.xlnx.xilinx.com;
+Received: from xir-pvapexch01.xlnx.xilinx.com (149.199.80.198) by
+ SN1NAM02FT0052.mail.protection.outlook.com (10.97.5.70) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.3283.16 via Frontend Transport; Thu, 13 Aug 2020 12:26:14 +0000
+Received: from xir-pvapexch02.xlnx.xilinx.com (172.21.17.17) by
+ xir-pvapexch01.xlnx.xilinx.com (172.21.17.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1913.5; Thu, 13 Aug 2020 13:26:13 +0100
+Received: from smtp.xilinx.com (172.21.105.197) by
+ xir-pvapexch02.xlnx.xilinx.com (172.21.17.17) with Microsoft SMTP Server id
+ 15.1.1913.5 via Frontend Transport; Thu, 13 Aug 2020 13:26:13 +0100
+Received: from [10.71.119.128] (port=53525 helo=localhost)
+ by smtp.xilinx.com with esmtp (Exim 4.90)
+ (envelope-from <edgar@xilinx.com>)
+ id 1k6CJA-0001wM-Hh; Thu, 13 Aug 2020 13:26:13 +0100
+Date: Thu, 13 Aug 2020 14:26:12 +0200
+From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Subject: Re: [PATCH] target/arm: Clarify HCR_EL2 ARMCPRegInfo type
+Message-ID: <20200813122612.GJ31713@toto>
+References: <20200812111223.7787-1-f4bug@amsat.org>
 MIME-Version: 1.0
-References: <20200812171946.2044791-1-richard.henderson@linaro.org>
- <CAAeHK+z=CU5dQepy+SBtVMAp-=k8BODorG768CYwoR3NEKCWFg@mail.gmail.com>
- <b2d524a2-1523-d03a-72a9-407ab03fa897@linaro.org>
- <CAAeHK+zD3ZdjpZOBny3QuYtKe-qzhmEfd9w+nr3NrzEuzHHRvw@mail.gmail.com>
- <CAFKCwrjSU89jiUbzd8Ys8nV6NDCJer=FbUnGWv8m0p0E+9MdVg@mail.gmail.com>
- <f3e2717b-878c-f6cf-51dc-fe2c372a7b41@arm.com>
-In-Reply-To: <f3e2717b-878c-f6cf-51dc-fe2c372a7b41@arm.com>
-From: Andrey Konovalov <andreyknvl@google.com>
-Date: Thu, 13 Aug 2020 14:26:08 +0200
-Message-ID: <CAAeHK+zKVGPOy9sRmNR9TLSa8Kz98UUrrGUNcqpfRq6H=A3=sw@mail.gmail.com>
-Subject: Re: [PATCH 0/3] target/arm: Complete ISS for MTE tag check fail
-To: Kevin Brodsky <kevin.brodsky@arm.com>,
- Richard Henderson <richard.henderson@linaro.org>
-Cc: Evgenii Stepanov <eugenis@google.com>,
- Vincenzo Frascino <vincenzo.frascino@arm.com>, 
- Catalin Marinas <catalin.marinas@arm.com>,
- Branislav Rankov <Branislav.Rankov@arm.com>, 
- qemu-devel@nongnu.org, alex.bennee@linaro.org, peter.maydell@linaro.org, 
- Elena Petrova <lenaptr@google.com>, Kostya Serebryany <kcc@google.com>,
- Dmitry Vyukov <dvyukov@google.com>, Peter Collingbourne <pcc@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::542;
- envelope-from=andreyknvl@google.com; helo=mail-pg1-x542.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -185
-X-Spam_score: -18.6
-X-Spam_bar: ------------------
-X-Spam_report: (-18.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- ENV_AND_HDR_SPF_MATCH=-0.5, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, USER_IN_DEF_DKIM_WL=-7.5,
- USER_IN_DEF_SPF_WL=-7.5 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200812111223.7787-1-f4bug@amsat.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-EOPAttributedMessage: 0
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 46fef602-7ba5-4644-5d6d-08d83f841271
+X-MS-TrafficTypeDiagnostic: BN7PR02MB5170:
+X-Microsoft-Antispam-PRVS: <BN7PR02MB5170B4B9B3FC878970C898BBC2430@BN7PR02MB5170.namprd02.prod.outlook.com>
+X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
+X-MS-Oob-TLC-OOBClassifiers: OLM:1227;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Forefront-Antispam-Report: CIP:149.199.80.198; CTRY:IE; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:xir-pvapexch01.xlnx.xilinx.com;
+ PTR:unknown-80-198.xilinx.com; CAT:NONE;
+ SFS:(7916004)(136003)(396003)(376002)(39860400002)(346002)(46966005)(316002)(356005)(7636003)(54906003)(26005)(1076003)(4326008)(36906005)(70586007)(336012)(82740400003)(8936002)(33656002)(5660300002)(186003)(70206006)(82310400002)(47076004)(9686003)(2906002)(8676002)(33716001)(478600001)(6916009)(9786002)(83380400001)(426003);
+ DIR:OUT; SFP:1101; 
+X-OriginatorOrg: xilinx.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Aug 2020 12:26:14.7878 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 46fef602-7ba5-4644-5d6d-08d83f841271
+X-MS-Exchange-CrossTenant-Id: 657af505-d5df-48d0-8300-c31994686c5c
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=657af505-d5df-48d0-8300-c31994686c5c; Ip=[149.199.80.198];
+ Helo=[xir-pvapexch01.xlnx.xilinx.com]
+X-MS-Exchange-CrossTenant-AuthSource: SN1NAM02FT0052.eop-nam02.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN7PR02MB5170
+Received-SPF: pass client-ip=40.107.220.41; envelope-from=edgar@xilinx.com;
+ helo=NAM11-CO1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/13 08:26:27
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -26
+X-Spam_score: -2.7
+X-Spam_bar: --
+X-Spam_report: (-2.7 / 5.0 requ) BAYES_00=-1.9, DKIM_INVALID=0.1,
+ DKIM_SIGNED=0.1, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -109,74 +140,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
+ Luc Michel <luc.michel@greensocs.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Aug 13, 2020 at 12:01 PM Kevin Brodsky <kevin.brodsky@arm.com> wrot=
-e:
->
-> On 12/08/2020 20:06, Evgenii Stepanov wrote:
->
-> On Wed, Aug 12, 2020 at 11:03 AM Andrey Konovalov <andreyknvl@google.com>=
- wrote:
->>
->> On Wed, Aug 12, 2020 at 7:52 PM Richard Henderson
->> <richard.henderson@linaro.org> wrote:
->> >
->> > On 8/12/20 10:38 AM, Andrey Konovalov wrote:
->> > > On Wed, Aug 12, 2020 at 7:19 PM Richard Henderson
->> > > <richard.henderson@linaro.org> wrote:
->> > >>
->> > >> As reported by Andrey, I was missing the complete ISS info for
->> > >> the Data Abort raised upon a synchronous tag check fail.
->> > >>
->> > >> The following should fix that.  All the twisty little rules for
->> > >> the ISS.ISV bit are already handled by merge_syn_data_abort.
->> > >> Probably the most important bit that was missing was ISS.WnR,
->> > >> as that is independent of ISS.ISV.
->> > >>
->> > >> Andrey, will you please test?
->> > >
->> > > Looks like WnR is now being set properly, but SAS is still always 0.
->> >
->> > Are you looking at ESR_EL1?
->> >
->> > On page D13-2992 of revision F.a:
->> >
->> > # ISV is 0 for all faults reported in ESR_EL1 or ESR_EL3.
->> >
->> > which means that ISS[23:14] are RES0, which includes SAS.
->>
->> +more Arm and Google people
->>
->> Is this known? Do we not get access size when MTE fault happens?
->
->
-> It sounds like this applies to all data abort exceptions, no matter MTE o=
-r not.
->
->
-> Correct. For data aborts in general, the extra syndrome information in IS=
-S[23:14] is only provided at EL2, in order to help hypervisors emulate simp=
-le loads/stores (that access device memory) by looking at ESR_EL2 without h=
-aving to decode the trapped instruction.
+On Wed, Aug 12, 2020 at 01:12:23PM +0200, Philippe Mathieu-Daudé wrote:
+> In commit ce4afed839 ("target/arm: Implement AArch32 HCR and HCR2")
+> the HCR_EL2 register has been changed from type NO_RAW (no underlying
+> state and does not support raw access for state saving/loading) to
+> type CONST (TCG can assume the value to be constant), removing the
+> read/write accessors.
+> We forgot to remove the previous type ARM_CP_NO_RAW. This is not
+> really a problem since the field is overwritten. However it makes
+> code review confuse, so remove it.
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-OK, got it.
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 
-The WnR bit works properly though, so
 
-Tested-by: Andrey Konovalov <andreyknvl@google.com>
-
-for the series.
-
-> Did you have any particular use-case in mind for SAS being set even in ES=
-R_EL1?
-
-Yes, we could use that to extract the size of the access that caused
-the fault to print more informative KASAN reports. We usually have a
-header like:
-
-BUG: KASAN: slab-out-of-bounds in usb_destroy_configuration+0x636/0x6d0
-Read of size 8 at addr ffff8881c7e3c758 by task kworker/1:7/3434
+> ---
+>  target/arm/helper.c | 1 -
+>  1 file changed, 1 deletion(-)
+> 
+> diff --git a/target/arm/helper.c b/target/arm/helper.c
+> index 455c92b891..9aeb8ebfa9 100644
+> --- a/target/arm/helper.c
+> +++ b/target/arm/helper.c
+> @@ -5105,7 +5105,6 @@ static const ARMCPRegInfo el3_no_el2_cp_reginfo[] = {
+>        .access = PL2_RW,
+>        .readfn = arm_cp_read_zero, .writefn = arm_cp_write_ignore },
+>      { .name = "HCR_EL2", .state = ARM_CP_STATE_BOTH,
+> -      .type = ARM_CP_NO_RAW,
+>        .opc0 = 3, .opc1 = 4, .crn = 1, .crm = 1, .opc2 = 0,
+>        .access = PL2_RW,
+>        .type = ARM_CP_CONST, .resetvalue = 0 },
+> -- 
+> 2.21.3
+> 
 
