@@ -2,132 +2,89 @@ Return-Path: <SRS0=egLd=BX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3463C433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 12:28:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D7A5C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 12:29:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B2D7A207DA
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 12:28:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D942E207DA
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 12:29:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="L//8R8eH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2D7A207DA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=xilinx.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ikFairvc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D942E207DA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53272 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56300 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k6CL4-000335-VK
-	for qemu-devel@archiver.kernel.org; Thu, 13 Aug 2020 08:28:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45486)
+	id 1k6CMH-0004LK-1H
+	for qemu-devel@archiver.kernel.org; Thu, 13 Aug 2020 08:29:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45504)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <edgar@xilinx.com>)
- id 1k6CJU-0001Wd-OM; Thu, 13 Aug 2020 08:26:33 -0400
-Received: from mail-co1nam11on2041.outbound.protection.outlook.com
- ([40.107.220.41]:7744 helo=NAM11-CO1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <edgar@xilinx.com>)
- id 1k6CJS-0003FK-1W; Thu, 13 Aug 2020 08:26:32 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=koOm8S2/TNiKq0ScS9+3kMSUmDkwPOZWEsRJGWVvtBQ87YBI//rq9O0+HKT34rVVZ/WyAN1xYDJtgJGFHwphzFLdhLZ6hyWZUKzEfmc5sDfRAciQ45aQVxfhRg0TMbfL1R8JUhy3yjpLmpq53ISJYjPdqLIXIdsDxt5M/CYw9KotbzElhe2Y4QZ0ZQcVWScrSc53k5TCivY7SOQXAQUzBZKIwW8A02jtL+bXPlsWdJb7WanX5FFmKMe+yvRa1hb6P9AudBpPo+/WLEIirUDammlD1SOM1uCSMcpl/84xqdeOhY3FHrsuUksl47koJ0Q2KZ8q3yp3uHsyYN18HYdNbg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6KxQmAVENLcL9efUf5d27Gs12muivbwo/rAejyu1Wac=;
- b=UhC2MKxPFVG2+wM1wv3xasarsJJi9b3J0FVyoCFwrQ4wNr+uOS6PkEv2nMSbx2R5okrku7ZmXYaDoGNbsIeUPzFOpR1WHlbWxOMeqmcviv9+lkaotsrRAbvN8y7IwHWAXfxEHjA+lrqELS9cLieYsg5hYTH585v8QNOpJkyXGFGGgf2nE4XkjYSydh1ubz1F6k1EJ6ylXpRf8BNE3xTGkjiBevTNSruYWQfIJkAeJbkRY13lSiPP/GkIZUwvxUPdSzQ7aOMNmGPikwunf5SBTECQR+iZ6OlCHxXNVQ+VQNz4cpzdh1QhAMCmKYhT+O5nvyRbQM3is59o131FAVzjkw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 149.199.80.198) smtp.rcpttodomain=amsat.org smtp.mailfrom=xilinx.com;
- dmarc=bestguesspass action=none header.from=xilinx.com; dkim=none (message
- not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=xilinx.onmicrosoft.com; s=selector2-xilinx-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6KxQmAVENLcL9efUf5d27Gs12muivbwo/rAejyu1Wac=;
- b=L//8R8eHKlK9QIHW/ua3taGoEsB5u4iQogmu+qzn/lzqlEjMS41G53w5lbmCA98JFLsccDJaXkYcNADpGu4ev85X/Taq6mw2xR/1SbqhCeBs2djAkWjhvof+fjQMxqBu8Sf46teWm4OjOmLB6Fh+Vd+J8E28XNbIx2Wd5GVoHp8=
-Received: from SA0PR11CA0074.namprd11.prod.outlook.com (2603:10b6:806:d2::19)
- by BN7PR02MB5170.namprd02.prod.outlook.com (2603:10b6:408:23::11)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3283.15; Thu, 13 Aug
- 2020 12:26:15 +0000
-Received: from SN1NAM02FT0052.eop-nam02.prod.protection.outlook.com
- (2603:10b6:806:d2:cafe::24) by SA0PR11CA0074.outlook.office365.com
- (2603:10b6:806:d2::19) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3283.15 via Frontend
- Transport; Thu, 13 Aug 2020 12:26:15 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 149.199.80.198)
- smtp.mailfrom=xilinx.com; amsat.org; dkim=none (message not signed)
- header.d=none;amsat.org; dmarc=bestguesspass action=none
- header.from=xilinx.com;
-Received-SPF: Pass (protection.outlook.com: domain of xilinx.com designates
- 149.199.80.198 as permitted sender) receiver=protection.outlook.com;
- client-ip=149.199.80.198; helo=xir-pvapexch01.xlnx.xilinx.com;
-Received: from xir-pvapexch01.xlnx.xilinx.com (149.199.80.198) by
- SN1NAM02FT0052.mail.protection.outlook.com (10.97.5.70) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.3283.16 via Frontend Transport; Thu, 13 Aug 2020 12:26:14 +0000
-Received: from xir-pvapexch02.xlnx.xilinx.com (172.21.17.17) by
- xir-pvapexch01.xlnx.xilinx.com (172.21.17.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1913.5; Thu, 13 Aug 2020 13:26:13 +0100
-Received: from smtp.xilinx.com (172.21.105.197) by
- xir-pvapexch02.xlnx.xilinx.com (172.21.17.17) with Microsoft SMTP Server id
- 15.1.1913.5 via Frontend Transport; Thu, 13 Aug 2020 13:26:13 +0100
-Received: from [10.71.119.128] (port=53525 helo=localhost)
- by smtp.xilinx.com with esmtp (Exim 4.90)
- (envelope-from <edgar@xilinx.com>)
- id 1k6CJA-0001wM-Hh; Thu, 13 Aug 2020 13:26:13 +0100
-Date: Thu, 13 Aug 2020 14:26:12 +0200
-From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Subject: Re: [PATCH] target/arm: Clarify HCR_EL2 ARMCPRegInfo type
-Message-ID: <20200813122612.GJ31713@toto>
-References: <20200812111223.7787-1-f4bug@amsat.org>
+ (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
+ id 1k6CJX-0001ZE-H7
+ for qemu-devel@nongnu.org; Thu, 13 Aug 2020 08:26:35 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:31623
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
+ id 1k6CJV-0003Fj-K9
+ for qemu-devel@nongnu.org; Thu, 13 Aug 2020 08:26:35 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1597321592;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=zx84IQLxe5Y1wh1pd75dZ8pJgRZTRwWDg2YFX7hom68=;
+ b=ikFairvcsNDKYaOFCrk3KkY7SP6WxiiKUHjJfwBC8Y0Pk9iqcMXESKXVBpiFBR5+buOvjv
+ U2a4WhYmAAoX8uzd0hH7uizXlGDVBViIf9Z7byO6ZdtwJULhDSAQEvwx8PEtg3kVFcTtNI
+ kw+v7p9knMfW7XN2MTpWCKW+DaD4cGA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-188-e3UQlyPKOhiQUL0aeetbiA-1; Thu, 13 Aug 2020 08:26:28 -0400
+X-MC-Unique: e3UQlyPKOhiQUL0aeetbiA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 99528807327;
+ Thu, 13 Aug 2020 12:26:27 +0000 (UTC)
+Received: from starship (unknown [10.35.206.158])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B04D610013D9;
+ Thu, 13 Aug 2020 12:26:22 +0000 (UTC)
+Message-ID: <c1f0d4f02cb67f2b99fbb889df2a69c86a89dec6.camel@redhat.com>
+Subject: Re: [PATCH v3 0/7] Fix scsi devices plug/unplug races w.r.t
+ virtio-scsi iothread
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Thu, 13 Aug 2020 15:26:21 +0300
+In-Reply-To: <20200715150159.95050-1-mlevitsk@redhat.com>
+References: <20200715150159.95050-1-mlevitsk@redhat.com>
+User-Agent: Evolution 3.36.3 (3.36.3-1.fc32)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200812111223.7787-1-f4bug@amsat.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-EOPAttributedMessage: 0
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 46fef602-7ba5-4644-5d6d-08d83f841271
-X-MS-TrafficTypeDiagnostic: BN7PR02MB5170:
-X-Microsoft-Antispam-PRVS: <BN7PR02MB5170B4B9B3FC878970C898BBC2430@BN7PR02MB5170.namprd02.prod.outlook.com>
-X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
-X-MS-Oob-TLC-OOBClassifiers: OLM:1227;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Forefront-Antispam-Report: CIP:149.199.80.198; CTRY:IE; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:xir-pvapexch01.xlnx.xilinx.com;
- PTR:unknown-80-198.xilinx.com; CAT:NONE;
- SFS:(7916004)(136003)(396003)(376002)(39860400002)(346002)(46966005)(316002)(356005)(7636003)(54906003)(26005)(1076003)(4326008)(36906005)(70586007)(336012)(82740400003)(8936002)(33656002)(5660300002)(186003)(70206006)(82310400002)(47076004)(9686003)(2906002)(8676002)(33716001)(478600001)(6916009)(9786002)(83380400001)(426003);
- DIR:OUT; SFP:1101; 
-X-OriginatorOrg: xilinx.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Aug 2020 12:26:14.7878 (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 46fef602-7ba5-4644-5d6d-08d83f841271
-X-MS-Exchange-CrossTenant-Id: 657af505-d5df-48d0-8300-c31994686c5c
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=657af505-d5df-48d0-8300-c31994686c5c; Ip=[149.199.80.198];
- Helo=[xir-pvapexch01.xlnx.xilinx.com]
-X-MS-Exchange-CrossTenant-AuthSource: SN1NAM02FT0052.eop-nam02.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN7PR02MB5170
-Received-SPF: pass client-ip=40.107.220.41; envelope-from=edgar@xilinx.com;
- helo=NAM11-CO1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/13 08:26:27
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -26
-X-Spam_score: -2.7
-X-Spam_bar: --
-X-Spam_report: (-2.7 / 5.0 requ) BAYES_00=-1.9, DKIM_INVALID=0.1,
- DKIM_SIGNED=0.1, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mlevitsk@redhat.com
+X-Mimecast-Spam-Score: 0.003
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=mlevitsk@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/13 08:00:46
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -140,45 +97,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- Luc Michel <luc.michel@greensocs.com>
+Cc: Fam Zheng <fam@euphon.net>, Paolo Bonzini <pbonzini@redhat.com>,
+ "Daniel P. =?ISO-8859-1?Q?Berrang=E9?=" <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Aug 12, 2020 at 01:12:23PM +0200, Philippe Mathieu-Daudé wrote:
-> In commit ce4afed839 ("target/arm: Implement AArch32 HCR and HCR2")
-> the HCR_EL2 register has been changed from type NO_RAW (no underlying
-> state and does not support raw access for state saving/loading) to
-> type CONST (TCG can assume the value to be constant), removing the
-> read/write accessors.
-> We forgot to remove the previous type ARM_CP_NO_RAW. This is not
-> really a problem since the field is overwritten. However it makes
-> code review confuse, so remove it.
+On Wed, 2020-07-15 at 18:01 +0300, Maxim Levitsky wrote:
+> Hi!
 > 
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-
-
-> ---
->  target/arm/helper.c | 1 -
->  1 file changed, 1 deletion(-)
+> This is a patch series that is a result of my discussion with Paulo on
+> how to correctly fix the root cause of the BZ #1812399.
 > 
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index 455c92b891..9aeb8ebfa9 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -5105,7 +5105,6 @@ static const ARMCPRegInfo el3_no_el2_cp_reginfo[] = {
->        .access = PL2_RW,
->        .readfn = arm_cp_read_zero, .writefn = arm_cp_write_ignore },
->      { .name = "HCR_EL2", .state = ARM_CP_STATE_BOTH,
-> -      .type = ARM_CP_NO_RAW,
->        .opc0 = 3, .opc1 = 4, .crn = 1, .crm = 1, .opc2 = 0,
->        .access = PL2_RW,
->        .type = ARM_CP_CONST, .resetvalue = 0 },
+> The root cause of this bug is the fact that IO thread is running mostly
+> unlocked versus main thread on which device hotplug is done.
+> 
+> qdev_device_add first creates the device object, then places it on the bus,
+> and only then realizes it.
+> 
+> However some drivers and currently only virtio-scsi enumerate its child bus
+> devices on each request that is received from the guest and that can happen on the IO
+> thread.
+> 
+> Thus we have a window when new device is on the bus but not realized and can be accessed
+> by the virtio-scsi driver in that state.
+> 
+> Fix that by doing two things:
+> 
+> 1. Add partial RCU protection to the list of a bus's child devices.
+> This allows the scsi IO thread to safely enumerate the child devices
+> while it races with the hotplug placing the device on the bus.
+> 
+> 2. Make the virtio-scsi driver check .realized property of the scsi device
+> and avoid touching the device if it isn't
+> 
+> Note that in the particular bug report the issue wasn't a race but rather due
+> to combination of things, the .realize code in the middle managed to trigger IO on the virtqueue
+> which caused the virtio-scsi driver to access the half realized device. However
+> since this can happen as well with real IO thread, this patch series was done,
+> which fixes this as well.
+> 
+> Changes from V1:
+>   * Patch 2 is new, as suggested by Stefan, added drain_call_rcu() to fix the failing unit test,
+>     make check pass now
+> 
+>   * Patches 6,7 are new as well: I added scsi_device_get as suggested by Stefan as well, although
+>     this is more a refactoring that anything else as it doesn't solve
+>     an existing race.
+> 
+>   * Addressed most of the review feedback from V1
+>     - still need to decide if we need QTAILQ_FOREACH_WITH_RCU_READ_LOCK
+> 
+> Changes from V2:
+> 
+>   * No longer RFC
+>   * Addressed most of the feedback from Stefan
+>   * Fixed reference count leak in patch 7 when device is about to be unrealized
+>   * Better testing
+> 
+> This series was tested by adding a virtio-scsi drive with iothread,
+> then running fio stress job in the guest in a loop, and then adding/removing
+> the scsi drive on the host in the loop.
+> This test was failing usually on 1st iteration withouth this patch series,
+> and now it seems to work smoothly.
+> 
+> Best regards,
+> 	Maxim Levitsky
+> 
+> Maxim Levitsky (7):
+>   scsi/scsi_bus: switch search direction in scsi_device_find
+>   Implement drain_call_rcu and use it in hmp_device_del
+>   device-core: use RCU for list of childs of a bus
+>   device-core: use atomic_set on .realized property
+>   virtio-scsi: don't touch scsi devices that are not yet realized or
+>     about to be un-realized
+>   scsi: Add scsi_device_get
+>   virtio-scsi: use scsi_device_get
+> 
+>  hw/core/bus.c          | 28 +++++++++++++--------
+>  hw/core/qdev.c         | 56 +++++++++++++++++++++++++++++++-----------
+>  hw/scsi/scsi-bus.c     | 48 +++++++++++++++++++++++++++++++-----
+>  hw/scsi/virtio-scsi.c  | 47 ++++++++++++++++++++++++++++-------
+>  include/hw/qdev-core.h | 11 +++++++++
+>  include/hw/scsi/scsi.h |  2 ++
+>  include/qemu/rcu.h     |  1 +
+>  qdev-monitor.c         | 22 +++++++++++++++++
+>  util/rcu.c             | 55 +++++++++++++++++++++++++++++++++++++++++
+>  9 files changed, 230 insertions(+), 40 deletions(-)
+> 
 > -- 
-> 2.21.3
+> 2.26.2
 > 
+
+Seems that this patch series doesn't have any disagreeements, so
+anybody wants to put it on an maintainer's tree, now that the freeze is over?
+
+Best regards,
+	Maxim Levitsky
+
+
 
