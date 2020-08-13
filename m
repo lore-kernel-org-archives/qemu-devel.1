@@ -7,61 +7,58 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CA44C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 09:42:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31DF3C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 09:42:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E3AFD2080C
-	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 09:42:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3AFD2080C
+	by mail.kernel.org (Postfix) with ESMTPS id 0A5EF20838
+	for <qemu-devel@archiver.kernel.org>; Thu, 13 Aug 2020 09:42:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A5EF20838
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59036 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59286 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k69l9-0002MH-60
-	for qemu-devel@archiver.kernel.org; Thu, 13 Aug 2020 05:42:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39634)
+	id 1k69lB-0002SQ-Ab
+	for qemu-devel@archiver.kernel.org; Thu, 13 Aug 2020 05:42:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39638)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <likaige@loongson.cn>)
- id 1k69kI-0000wS-8k
+ id 1k69kI-0000wc-OU
  for qemu-devel@nongnu.org; Thu, 13 Aug 2020 05:42:02 -0400
-Received: from mail.loongson.cn ([114.242.206.163]:52722 helo=loongson.cn)
+Received: from mail.loongson.cn ([114.242.206.163]:52716 helo=loongson.cn)
  by eggs.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <likaige@loongson.cn>) id 1k69kF-0000q5-Vg
+ (envelope-from <likaige@loongson.cn>) id 1k69kG-0000q4-2q
  for qemu-devel@nongnu.org; Thu, 13 Aug 2020 05:42:02 -0400
 Received: from bogon.localdomain (unknown [113.200.148.30])
- by mail.loongson.cn (Coremail) with SMTP id AQAAf9Dx_9_bCjVfyGQIAA--.154S3;
- Thu, 13 Aug 2020 17:41:48 +0800 (CST)
+ by mail.loongson.cn (Coremail) with SMTP id AQAAf9Dx_9_bCjVfyGQIAA--.154S2;
+ Thu, 13 Aug 2020 17:41:47 +0800 (CST)
 From: Kaige Li <likaige@loongson.cn>
 To: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
  Aurelien Jarno <aurelien@aurel32.net>,
  Jiaxun Yang <jiaxun.yang@flygoat.com>,
  Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
-Subject: [PATCH 2/2] target/mips: Add definition of Loongson-3A3000 CPU
-Date: Thu, 13 Aug 2020 17:41:47 +0800
-Message-Id: <1597311707-27565-2-git-send-email-likaige@loongson.cn>
+Subject: [PATCH 1/2] target/mips: Coding style update to fix checkpatch errors
+Date: Thu, 13 Aug 2020 17:41:46 +0800
+Message-Id: <1597311707-27565-1-git-send-email-likaige@loongson.cn>
 X-Mailer: git-send-email 2.1.0
-In-Reply-To: <1597311707-27565-1-git-send-email-likaige@loongson.cn>
-References: <1597311707-27565-1-git-send-email-likaige@loongson.cn>
-X-CM-TRANSID: AQAAf9Dx_9_bCjVfyGQIAA--.154S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7Ww43urWDAr1kXw1kXr1DWrg_yoW8XrWkp3
- WkJrW3Ww15Xry3Z3yfGryDKF45JrZY9Fy8CaySkr1xA3y8u3y5Xr4jyF1ayFnYqr1DJ3Z3
- Ja1vvF4UGw4xC3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
- 9KBjDU0xBIdaVrnRJUUUBYb7Iv0xC_tr1lb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I2
- 0VC2zVCF04k26cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI
- 8067AKxVWUGwA2048vs2IY020Ec7CjxVAFwI0_Jrv_JF4l8cAvFVAK0II2c7xJM28CjxkF
- 64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI8IcV
- CY1x0267AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv67AKxVWxJr0_GcWl84ACjcxK6I8E87Iv
- 6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c
- 02F40Ex7xfMcIj6xIIjxv20xvE14v26r106r15McIj6I8E87Iv67AKxVW8JVWxJwAm72CE
- 4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lc2xSY4AK67AK6r4fMxAIw28IcxkI7V
- AKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCj
- r7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUAVWUtwCIc40Y0x0EwIxGrwCI42IY6x
- IIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAI
- w20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x
- 0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU8Wlk3UUUUU==
+X-CM-TRANSID: AQAAf9Dx_9_bCjVfyGQIAA--.154S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxCw1DCF1UCw4fuF43Wr4Durg_yoWrtFy5pr
+ y7Jw45GF4DJFZIg3y7XrnFvFy5ZFn2gFZ8C3srXF13ta1Uu347ZrsFva4UAFZFqFWkKF15
+ Aan29w1YgFyxWr7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+ 9KBjDU0xBIdaVrnRJUUUkFb7Iv0xC_Kw4lb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I2
+ 0VC2zVCF04k26cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rw
+ A2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xII
+ jxv20xvEc7CjxVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwV
+ C2z280aVCY1x0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC
+ 0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Gr0_Cr
+ 1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JMxkIecxEwVAFwVW8uwCF04k2
+ 0xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI
+ 8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkGc2Ij64vIr41l
+ IxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIx
+ AIcVCF04k26cxKx2IYs7xG6Fyj6rWUJwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E
+ 87Iv6xkF7I0E14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x07bwjjkUUUUU=
 X-CM-SenderInfo: 5olntxtjh6z05rqj20fqof0/
 Received-SPF: pass client-ip=114.242.206.163; envelope-from=likaige@loongson.cn;
  helo=loongson.cn
@@ -89,48 +86,147 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add definition of the Loongson-3A3000 processor in QEMU.
+This will help ensure that style guidelines are being maintained during
+subsequent changes.
 
 Signed-off-by: Kaige Li <likaige@loongson.cn>
 ---
- target/mips/translate_init.inc.c | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
+ target/mips/translate_init.inc.c | 61 ++++++++++++++++++++--------------------
+ 1 file changed, 31 insertions(+), 30 deletions(-)
 
 diff --git a/target/mips/translate_init.inc.c b/target/mips/translate_init.inc.c
-index 0740819..2e98aff 100644
+index 637cacc..0740819 100644
 --- a/target/mips/translate_init.inc.c
 +++ b/target/mips/translate_init.inc.c
-@@ -829,6 +829,30 @@ const mips_def_t mips_defs[] = {
-         .PABITS = 48,
-         .insn_flags = CPU_LOONGSON3A,
-         .mmu_type = MMU_TYPE_R4000,
-+   },
-+   {
-+        .name = "Loongson-3A3000",
-+        .CP0_PRid = 0x14630d,
-+        /* 64KB I-cache and d-cache. 4 way with 32 bit cache line size.  */
-+        .CP0_Config0 = MIPS_CONFIG0 | (0x1 << CP0C0_AR) | (0x2 << CP0C0_AT) |
-+                       (MMU_TYPE_R4000 << CP0C0_MT),
-+        .CP0_Config1 = MIPS_CONFIG1 | (1 << CP0C1_FP) | (63 << CP0C1_MMU) |
-+                       (2 << CP0C1_IS) | (5 << CP0C1_IL) | (3 << CP0C1_IA) |
-+                       (2 << CP0C1_DS) | (5 << CP0C1_DL) | (3 << CP0C1_DA) |
-+                       (1 << CP0C1_PC) | (1 << CP0C1_WR) | (1 << CP0C1_EP),
-+        .CP0_Config2 = MIPS_CONFIG2 | (5 << CP0C2_SS) | (5 << CP0C2_SL) |
-+                       (15 << CP0C2_SA),
-+        .CP0_Config3 = MIPS_CONFIG3 | (1 << CP0C3_LPA),
-+        .SYNCI_Step = 16,
-+        .CCRes = 2,
-+        .CP0_Status_rw_bitmask = 0x7DDBFFFF,
-+        .CP1_fcr0 = (0x5 << FCR0_PRID) | (0x1 << FCR0_REV) | (0x1 << FCR0_F64),
-+        .CP1_fcr31 = 0,
-+        .CP1_fcr31_rw_bitmask = 0xFF83FFFF,
-+        .SEGBITS = 48,
-+        .PABITS = 48,
-+        .insn_flags = CPU_LOONGSON3A,
-+        .mmu_type = MMU_TYPE_R4000,
-     },
+@@ -53,8 +53,7 @@
+ 
+ /*****************************************************************************/
+ /* MIPS CPU definitions */
+-const mips_def_t mips_defs[] =
+-{
++const mips_def_t mips_defs[] = {
      {
-         .name = "Loongson-3A4000",
+         .name = "4Kc",
+         .CP0_PRid = 0x00018000,
+@@ -766,8 +765,8 @@ const mips_def_t mips_defs[] =
+         .name = "Loongson-2E",
+         .CP0_PRid = 0x6302,
+         /* 64KB I-cache and d-cache. 4 way with 32 bit cache line size.  */
+-        .CP0_Config0 = (0x1<<17) | (0x1<<16) | (0x1<<11) | (0x1<<8) |
+-                       (0x1<<5) | (0x1<<4) | (0x1<<1),
++        .CP0_Config0 = (0x1 << 17) | (0x1 << 16) | (0x1 << 11) | (0x1 << 8) |
++                       (0x1 << 5) | (0x1 << 4) | (0x1 << 1),
+         /* Note: Config1 is only used internally,
+            Loongson-2E has only Config0.  */
+         .CP0_Config1 = (1 << CP0C1_FP) | (47 << CP0C1_MMU),
+@@ -786,8 +785,8 @@ const mips_def_t mips_defs[] =
+         .name = "Loongson-2F",
+         .CP0_PRid = 0x6303,
+         /* 64KB I-cache and d-cache. 4 way with 32 bit cache line size.  */
+-        .CP0_Config0 = (0x1<<17) | (0x1<<16) | (0x1<<11) | (0x1<<8) |
+-                       (0x1<<5) | (0x1<<4) | (0x1<<1),
++        .CP0_Config0 = (0x1 << 17) | (0x1 << 16) | (0x1 << 11) | (0x1 << 8) |
++                       (0x1 << 5) | (0x1 << 4) | (0x1 << 1),
+         /* Note: Config1 is only used internally,
+            Loongson-2F has only Config0.  */
+         .CP0_Config1 = (1 << CP0C1_FP) | (47 << CP0C1_MMU),
+@@ -932,19 +931,19 @@ void mips_cpu_list(void)
+ }
+ 
+ #ifndef CONFIG_USER_ONLY
+-static void no_mmu_init (CPUMIPSState *env, const mips_def_t *def)
++static void no_mmu_init(CPUMIPSState *env, const mips_def_t *def)
+ {
+     env->tlb->nb_tlb = 1;
+     env->tlb->map_address = &no_mmu_map_address;
+ }
+ 
+-static void fixed_mmu_init (CPUMIPSState *env, const mips_def_t *def)
++static void fixed_mmu_init(CPUMIPSState *env, const mips_def_t *def)
+ {
+     env->tlb->nb_tlb = 1;
+     env->tlb->map_address = &fixed_mmu_map_address;
+ }
+ 
+-static void r4k_mmu_init (CPUMIPSState *env, const mips_def_t *def)
++static void r4k_mmu_init(CPUMIPSState *env, const mips_def_t *def)
+ {
+     env->tlb->nb_tlb = 1 + ((def->CP0_Config1 >> CP0C1_MMU) & 63);
+     env->tlb->map_address = &r4k_map_address;
+@@ -956,40 +955,41 @@ static void r4k_mmu_init (CPUMIPSState *env, const mips_def_t *def)
+     env->tlb->helper_tlbinvf = r4k_helper_tlbinvf;
+ }
+ 
+-static void mmu_init (CPUMIPSState *env, const mips_def_t *def)
++static void mmu_init(CPUMIPSState *env, const mips_def_t *def)
+ {
+     env->tlb = g_malloc0(sizeof(CPUMIPSTLBContext));
+ 
+     switch (def->mmu_type) {
+-        case MMU_TYPE_NONE:
+-            no_mmu_init(env, def);
+-            break;
+-        case MMU_TYPE_R4000:
+-            r4k_mmu_init(env, def);
+-            break;
+-        case MMU_TYPE_FMT:
+-            fixed_mmu_init(env, def);
+-            break;
+-        case MMU_TYPE_R3000:
+-        case MMU_TYPE_R6000:
+-        case MMU_TYPE_R8000:
+-        default:
+-            cpu_abort(env_cpu(env), "MMU type not supported\n");
++    case MMU_TYPE_NONE:
++        no_mmu_init(env, def);
++        break;
++    case MMU_TYPE_R4000:
++        r4k_mmu_init(env, def);
++        break;
++    case MMU_TYPE_FMT:
++        fixed_mmu_init(env, def);
++        break;
++    case MMU_TYPE_R3000:
++    case MMU_TYPE_R6000:
++    case MMU_TYPE_R8000:
++    default:
++        cpu_abort(env_cpu(env), "MMU type not supported\n");
+     }
+ }
+ #endif /* CONFIG_USER_ONLY */
+ 
+-static void fpu_init (CPUMIPSState *env, const mips_def_t *def)
++static void fpu_init(CPUMIPSState *env, const mips_def_t *def)
+ {
+     int i;
+ 
+-    for (i = 0; i < MIPS_FPU_MAX; i++)
++    for (i = 0; i < MIPS_FPU_MAX; i++) {
+         env->fpus[i].fcr0 = def->CP1_fcr0;
++    }
+ 
+     memcpy(&env->active_fpu, &env->fpus[0], sizeof(env->active_fpu));
+ }
+ 
+-static void mvp_init (CPUMIPSState *env, const mips_def_t *def)
++static void mvp_init(CPUMIPSState *env, const mips_def_t *def)
+ {
+     env->mvp = g_malloc0(sizeof(CPUMIPSMVPContext));
+ 
+@@ -999,9 +999,10 @@ static void mvp_init (CPUMIPSState *env, const mips_def_t *def)
+        implemented, 5 TCs implemented. */
+     env->mvp->CP0_MVPConf0 = (1U << CP0MVPC0_M) | (1 << CP0MVPC0_TLBS) |
+                              (0 << CP0MVPC0_GS) | (1 << CP0MVPC0_PCP) |
+-// TODO: actually do 2 VPEs.
+-//                             (1 << CP0MVPC0_TCA) | (0x1 << CP0MVPC0_PVPE) |
+-//                             (0x04 << CP0MVPC0_PTC);
++/* TODO: actually do 2 VPEs.
++ *                            (1 << CP0MVPC0_TCA) | (0x1 << CP0MVPC0_PVPE) |
++ *                            (0x04 << CP0MVPC0_PTC);
++ */
+                              (1 << CP0MVPC0_TCA) | (0x0 << CP0MVPC0_PVPE) |
+                              (0x00 << CP0MVPC0_PTC);
+ #if !defined(CONFIG_USER_ONLY)
 -- 
 2.1.0
 
