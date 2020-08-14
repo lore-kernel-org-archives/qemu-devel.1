@@ -7,85 +7,84 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AA01C433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 10:07:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76901C433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 10:08:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C77A42074D
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 10:07:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3864D2074D
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 10:08:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VUHd/3Ks"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C77A42074D
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bmcPNVSh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3864D2074D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51868 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55918 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k6WcQ-00063k-1L
-	for qemu-devel@archiver.kernel.org; Fri, 14 Aug 2020 06:07:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43900)
+	id 1k6WdE-0007iW-CK
+	for qemu-devel@archiver.kernel.org; Fri, 14 Aug 2020 06:08:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43742)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k6VnV-0007J1-5z
- for qemu-devel@nongnu.org; Fri, 14 Aug 2020 05:14:49 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44269
- helo=us-smtp-1.mimecast.com)
+ id 1k6VnN-0006vD-6B
+ for qemu-devel@nongnu.org; Fri, 14 Aug 2020 05:14:41 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:36924
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k6VnQ-00035y-4W
- for qemu-devel@nongnu.org; Fri, 14 Aug 2020 05:14:48 -0400
+ id 1k6VnJ-000338-Ht
+ for qemu-devel@nongnu.org; Fri, 14 Aug 2020 05:14:40 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597396483;
+ s=mimecast20190719; t=1597396476;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=H1/obpthDPiI++kV8GyCWd8c/EELxIwncGfunuXqk48=;
- b=VUHd/3KsFYHMbMT2b3PWD7kmwPyjDeNN9zOiaHP6LrsxwLHrLNXVEp1r2W33Ca68bB9Pcq
- 8+748sTZut1JnNq1oG3nnu70N7q4D9tZLdh5T61y9swmsZIuyDFbaWTWr50nuRIpiISYZP
- 9kjIXx7qJFXSwk5TDYo3ogTgbhN58gQ=
+ bh=3C/7hgOHspBfIxBONsfiAWNW93qZIpPhApRZy9KVThY=;
+ b=bmcPNVShu9K71bZrXHOLr8yDFXZ+PE83uWF7cC9WWS8zN1qAV2JcvVfXZNQsItPWEm/h74
+ EBSjG9fSXwm05r4tlp8RsIB3vaYIx+/etnwF6sQE8qbIjkcCd7pjkeXB9tg69+e7J2h+V5
+ AjY3ro1mvFtU/caul+s84I8q9DE+sug=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-177-F4bvrxdyPKWlq_OULshu3g-1; Fri, 14 Aug 2020 05:14:41 -0400
-X-MC-Unique: F4bvrxdyPKWlq_OULshu3g-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-330-wPhmXacmNq2G4oT7333ahA-1; Fri, 14 Aug 2020 05:14:34 -0400
+X-MC-Unique: wPhmXacmNq2G4oT7333ahA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E10FF1005E5B
- for <qemu-devel@nongnu.org>; Fri, 14 Aug 2020 09:14:40 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 29183801AC3
+ for <qemu-devel@nongnu.org>; Fri, 14 Aug 2020 09:14:34 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9F7F460C84;
- Fri, 14 Aug 2020 09:14:40 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DC740600E4;
+ Fri, 14 Aug 2020 09:14:33 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 103/150] meson: convert hw/pci-bridge
-Date: Fri, 14 Aug 2020 05:12:39 -0400
-Message-Id: <20200814091326.16173-104-pbonzini@redhat.com>
+Subject: [PATCH 093/150] meson: convert hw/vfio
+Date: Fri, 14 Aug 2020 05:12:29 -0400
+Message-Id: <20200814091326.16173-94-pbonzini@redhat.com>
 In-Reply-To: <20200814091326.16173-1-pbonzini@redhat.com>
 References: <20200814091326.16173-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/14 05:13:35
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/14 01:57:54
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -108,74 +107,76 @@ From: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/Makefile.objs            |  1 -
- hw/meson.build              |  1 +
- hw/pci-bridge/Makefile.objs | 10 ----------
- hw/pci-bridge/meson.build   | 14 ++++++++++++++
- 4 files changed, 15 insertions(+), 11 deletions(-)
- delete mode 100644 hw/pci-bridge/Makefile.objs
- create mode 100644 hw/pci-bridge/meson.build
+ hw/Makefile.objs      |  1 -
+ hw/meson.build        |  1 +
+ hw/vfio/Makefile.objs |  8 --------
+ hw/vfio/meson.build   | 18 ++++++++++++++++++
+ 4 files changed, 19 insertions(+), 9 deletions(-)
+ delete mode 100644 hw/vfio/Makefile.objs
+ create mode 100644 hw/vfio/meson.build
 
 diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-index 0038cf89d9..3513040d4a 100644
+index a1cfb99334..f6e08f6660 100644
 --- a/hw/Makefile.objs
 +++ b/hw/Makefile.objs
-@@ -22,7 +22,6 @@ devices-dirs-y += net/
- devices-dirs-y += rdma/
- devices-dirs-y += nvram/
- devices-dirs-y += pci/
--devices-dirs-$(CONFIG_PCI) += pci-bridge/
+@@ -31,7 +31,6 @@ devices-dirs-y += ssi/
+ devices-dirs-y += timer/
+ devices-dirs-$(CONFIG_TPM) += tpm/
+ devices-dirs-y += usb/
+-devices-dirs-$(CONFIG_VFIO) += vfio/
  endif
  
  common-obj-y += $(devices-dirs-y)
 diff --git a/hw/meson.build b/hw/meson.build
-index ca36e486e7..a7301f21e8 100644
+index 8338fc4408..4dafc8a08e 100644
 --- a/hw/meson.build
 +++ b/hw/meson.build
-@@ -1,6 +1,7 @@
- subdir('core')
- subdir('mem')
+@@ -3,6 +3,7 @@ subdir('mem')
  subdir('nubus')
-+subdir('pci-bridge')
- subdir('pci-host')
- subdir('pcmcia')
- subdir('rtc')
-diff --git a/hw/pci-bridge/Makefile.objs b/hw/pci-bridge/Makefile.objs
+ subdir('semihosting')
+ subdir('smbios')
++subdir('vfio')
+ subdir('virtio')
+ subdir('watchdog')
+ subdir('xen')
+diff --git a/hw/vfio/Makefile.objs b/hw/vfio/Makefile.objs
 deleted file mode 100644
-index 47065f87d9..0000000000
---- a/hw/pci-bridge/Makefile.objs
+index 9bb1c09e84..0000000000
+--- a/hw/vfio/Makefile.objs
 +++ /dev/null
-@@ -1,10 +0,0 @@
--common-obj-y += pci_bridge_dev.o
--common-obj-$(CONFIG_PCIE_PORT) += pcie_root_port.o gen_pcie_root_port.o pcie_pci_bridge.o
--common-obj-$(CONFIG_PXB) += pci_expander_bridge.o
--common-obj-$(CONFIG_XIO3130) += xio3130_upstream.o xio3130_downstream.o
--common-obj-$(CONFIG_IOH3420) += ioh3420.o
--common-obj-$(CONFIG_I82801B11) += i82801b11.o
--# NewWorld PowerMac
--common-obj-$(CONFIG_DEC_PCI) += dec.o
--# Sun4u
--common-obj-$(CONFIG_SIMBA) += simba.o
-diff --git a/hw/pci-bridge/meson.build b/hw/pci-bridge/meson.build
+@@ -1,8 +0,0 @@
+-obj-y += common.o spapr.o
+-obj-$(CONFIG_VFIO_PCI) += pci.o pci-quirks.o display.o
+-obj-$(CONFIG_VFIO_CCW) += ccw.o
+-obj-$(CONFIG_VFIO_PLATFORM) += platform.o
+-obj-$(CONFIG_VFIO_XGMAC) += calxeda-xgmac.o
+-obj-$(CONFIG_VFIO_AMD_XGBE) += amd-xgbe.o
+-obj-$(CONFIG_VFIO_AP) += ap.o
+-obj-$(CONFIG_VFIO_IGD) += igd.o
+diff --git a/hw/vfio/meson.build b/hw/vfio/meson.build
 new file mode 100644
-index 0000000000..daab8acf2a
+index 0000000000..37efa74018
 --- /dev/null
-+++ b/hw/pci-bridge/meson.build
-@@ -0,0 +1,14 @@
-+pci_ss = ss.source_set()
-+pci_ss.add(files('pci_bridge_dev.c'))
-+pci_ss.add(when: 'CONFIG_I82801B11', if_true: files('i82801b11.c'))
-+pci_ss.add(when: 'CONFIG_IOH3420', if_true: files('ioh3420.c'))
-+pci_ss.add(when: 'CONFIG_PCIE_PORT', if_true: files('pcie_root_port.c', 'gen_pcie_root_port.c', 'pcie_pci_bridge.c'))
-+pci_ss.add(when: 'CONFIG_PXB', if_true: files('pci_expander_bridge.c'))
-+pci_ss.add(when: 'CONFIG_XIO3130', if_true: files('xio3130_upstream.c', 'xio3130_downstream.c'))
++++ b/hw/vfio/meson.build
+@@ -0,0 +1,18 @@
++vfio_ss = ss.source_set()
++vfio_ss.add(files(
++  'common.c',
++  'spapr.c',
++))
++vfio_ss.add(when: 'CONFIG_VFIO_PCI', if_true: files(
++  'display.c',
++  'pci-quirks.c',
++  'pci.c',
++))
++vfio_ss.add(when: 'CONFIG_VFIO_CCW', if_true: files('ccw.c'))
++vfio_ss.add(when: 'CONFIG_VFIO_PLATFORM', if_true: files('platform.c'))
++vfio_ss.add(when: 'CONFIG_VFIO_XGMAC', if_true: files('calxeda-xgmac.c'))
++vfio_ss.add(when: 'CONFIG_VFIO_AMD_XGBE', if_true: files('amd-xgbe.c'))
++vfio_ss.add(when: 'CONFIG_VFIO_AP', if_true: files('ap.c'))
++vfio_ss.add(when: 'CONFIG_VFIO_IGD', if_true: files('igd.c'))
 +
-+# NewWorld PowerMac
-+pci_ss.add(when: 'CONFIG_DEC_PCI', if_true: files('dec.c'))
-+# Sun4u
-+pci_ss.add(when: 'CONFIG_SIMBA', if_true: files('simba.c'))
-+
-+softmmu_ss.add_all(when: 'CONFIG_PCI', if_true: pci_ss)
++specific_ss.add_all(when: 'CONFIG_VFIO', if_true: vfio_ss)
 -- 
 2.26.2
 
