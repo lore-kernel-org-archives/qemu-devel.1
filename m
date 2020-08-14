@@ -2,88 +2,65 @@ Return-Path: <SRS0=5nOY=BY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D8F2C433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 10:21:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8D37C433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 10:21:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DCDA2206DA
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 10:21:33 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UgNeSLr2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCDA2206DA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7C7B7206DA
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 10:21:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C7B7206DA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34530 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35092 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k6Wq5-0000DR-3b
-	for qemu-devel@archiver.kernel.org; Fri, 14 Aug 2020 06:21:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44546)
+	id 1k6WqD-0000Rv-MY
+	for qemu-devel@archiver.kernel.org; Fri, 14 Aug 2020 06:21:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46166)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k6Vo7-00009u-LB
- for qemu-devel@nongnu.org; Fri, 14 Aug 2020 05:15:27 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:39068)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k6Vnx-0003EP-II
- for qemu-devel@nongnu.org; Fri, 14 Aug 2020 05:15:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597396516;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ja1I5Qw/WLCnTYx4aaHPWOGuAKToAKt0NOASimddMSw=;
- b=UgNeSLr2phRyS7WLksuSD2wKOy2bQTi8/E+v6R9FQG4qFAzI2xLx9E9paViG41xHw7n3Zm
- fzb+1pMGFCsPDMqa1XSPHfhlT0TSeTr3CCI1rRCbiBQCbhJ2dR7PorXjip9C0l6587/g61
- XRZwR5POF2RWbyw52UKeaox3xHqPL4I=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-322-LWAwIdVBMOqAf6E-BaStJw-1; Fri, 14 Aug 2020 05:15:14 -0400
-X-MC-Unique: LWAwIdVBMOqAf6E-BaStJw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 78D6F1015DBE
- for <qemu-devel@nongnu.org>; Fri, 14 Aug 2020 09:15:13 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com
- (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 88C595C1BD;
- Fri, 14 Aug 2020 09:15:08 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 140/150] meson: build texi doc
-Date: Fri, 14 Aug 2020 05:13:16 -0400
-Message-Id: <20200814091326.16173-141-pbonzini@redhat.com>
-In-Reply-To: <20200814091326.16173-1-pbonzini@redhat.com>
-References: <20200814091326.16173-1-pbonzini@redhat.com>
+ (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
+ id 1k6VuC-0002Ht-QP
+ for qemu-devel@nongnu.org; Fri, 14 Aug 2020 05:21:44 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:50084 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
+ id 1k6VuA-00045v-2l
+ for qemu-devel@nongnu.org; Fri, 14 Aug 2020 05:21:44 -0400
+Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id 8658E4B0DE9F0F804950;
+ Fri, 14 Aug 2020 17:21:33 +0800 (CST)
+Received: from huawei.com (10.175.101.6) by DGGEMS413-HUB.china.huawei.com
+ (10.3.19.213) with Microsoft SMTP Server id 14.3.487.0; Fri, 14 Aug 2020
+ 17:21:27 +0800
+From: Chuan Zheng <zhengchuan@huawei.com>
+To: <quintela@redhat.com>, <eblake@redhat.com>, <dgilbert@redhat.com>
+Subject: [PATCH v2 05/10] migration/dirtyrate: Record hash results for each
+ sampled page
+Date: Fri, 14 Aug 2020 17:32:08 +0800
+Message-ID: <1597397532-68043-6-git-send-email-zhengchuan@huawei.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1597397532-68043-1-git-send-email-zhengchuan@huawei.com>
+References: <1597397532-68043-1-git-send-email-zhengchuan@huawei.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0.003
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/14 05:13:37
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain
+X-Originating-IP: [10.175.101.6]
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.35; envelope-from=zhengchuan@huawei.com;
+ helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/14 05:21:34
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,367 +73,199 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: zhang.zhanghailiang@huawei.com, linyilu@huawei.com, qemu-devel@nongnu.org,
+ alex.chen@huawei.com, ann.zhuangyanying@huawei.com, fangying1@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+From: Zheng Chuan <zhengchuan@huawei.com>
+
+Record hash results for each sampled page.
+
+Signed-off-by: Zheng Chuan <zhengchuan@huawei.com>
+Signed-off-by: YanYing Zhuang <ann.zhuangyanying@huawei.com>
 ---
- Makefile                       | 106 ++-------------------------------
- docs/interop/qemu-ga-ref.texi  |   2 +-
- docs/interop/qemu-qmp-ref.texi |   2 +-
- meson.build                    |  85 ++++++++++++++++++++++++++
- qga/meson.build                |  12 +++-
- version.texi.in                |   2 +
- 6 files changed, 104 insertions(+), 105 deletions(-)
- create mode 100644 version.texi.in
+ migration/dirtyrate.c | 135 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ migration/dirtyrate.h |   7 +++
+ 2 files changed, 142 insertions(+)
 
-diff --git a/Makefile b/Makefile
-index d8e2a86e69..373dd7286c 100644
---- a/Makefile
-+++ b/Makefile
-@@ -11,7 +11,6 @@ BUILD_DIR=$(CURDIR)
- SRC_PATH=.
+diff --git a/migration/dirtyrate.c b/migration/dirtyrate.c
+index c4304ef..11c0051 100644
+--- a/migration/dirtyrate.c
++++ b/migration/dirtyrate.c
+@@ -25,6 +25,7 @@
+ #include "dirtyrate.h"
  
- UNCHECKED_GOALS := %clean TAGS cscope ctags dist \
--    html info pdf txt \
-     help check-help print-% \
-     docker docker-% vm-help vm-test vm-build-%
+ CalculatingDirtyRateState CalculatingState = CAL_DIRTY_RATE_INIT;
++static unsigned long int qcrypto_hash_len = QCRYPTO_HASH_LEN;
+ static struct DirtyRateStat dirty_stat;
  
-@@ -119,20 +118,13 @@ generated-files-y += .git-submodule-status
- Makefile: ;
- configure: ;
+ static int dirty_rate_set_state(int new_state)
+@@ -71,6 +72,140 @@ static void update_dirtyrate(uint64_t msec)
+     dirty_stat.dirty_rate = dirty_rate;
+ }
  
--.PHONY: all clean cscope distclean html info install install-doc \
--	pdf txt recurse-all dist msi FORCE
-+.PHONY: all clean cscope distclean install \
-+	recurse-all dist msi FORCE
- 
- $(call set-vpath, $(SRC_PATH))
- 
- LIBS+=-lz $(LIBS_TOOLS)
- 
--ifdef BUILD_DOCS
--DOCS+=docs/interop/qemu-qmp-ref.html docs/interop/qemu-qmp-ref.txt docs/interop/qemu-qmp-ref.7
--DOCS+=docs/interop/qemu-ga-ref.html docs/interop/qemu-ga-ref.txt docs/interop/qemu-ga-ref.7
--else
--DOCS=
--endif
--
- SUBDIR_MAKEFLAGS=$(if $(V),,--no-print-directory --quiet) BUILD_DIR=$(BUILD_DIR)
- 
- ifneq ($(wildcard config-host.mak),)
-@@ -141,7 +133,7 @@ endif
- 
- include $(SRC_PATH)/tests/Makefile.include
- 
--all: $(DOCS) $(if $(BUILD_DOCS),sphinxdocs) recurse-all modules
-+all: recurse-all modules
- 
- # LIBFDT_lib="": avoid breaking existing trees with objects requiring -fPIC
- DTC_MAKE_ARGS=-I$(SRC_PATH)/dtc VPATH=$(SRC_PATH)/dtc -C dtc V="$(V)" LIBFDT_lib=""
-@@ -214,7 +206,7 @@ qemu-%.tar.bz2:
- 
- distclean: clean ninja-distclean
- 	-test -f ninjatool && ./ninjatool $(if $(V),-v,) -t clean -g
--	rm -f config-host.mak config-host.h* $(DOCS)
-+	rm -f config-host.mak config-host.h*
- 	rm -f tests/tcg/config-*.mak
- 	rm -f config-all-disas.mak config.status
- 	rm -f po/*.mo tests/qemu-iotests/common.env
-@@ -225,12 +217,6 @@ distclean: clean ninja-distclean
- 	rm -f Makefile.ninja ninjatool ninjatool.stamp Makefile.mtest
- 	rm -f config.log
- 	rm -f linux-headers/asm
--	rm -f docs/version.texi
--	rm -f docs/interop/qemu-ga-qapi.texi docs/interop/qemu-qmp-qapi.texi
--	rm -f docs/interop/qemu-qmp-ref.7 docs/interop/qemu-ga-ref.7
--	rm -f docs/interop/qemu-qmp-ref.txt docs/interop/qemu-ga-ref.txt
--	rm -f docs/interop/qemu-qmp-ref.pdf docs/interop/qemu-ga-ref.pdf
--	rm -f docs/interop/qemu-qmp-ref.html docs/interop/qemu-ga-ref.html
- 	rm -Rf .sdk
- 
- KEYMAPS=da     en-gb  et  fr     fr-ch  is  lt  no  pt-br  sv \
-@@ -264,29 +250,6 @@ else
- BLOBS=
- endif
- 
--install-doc: $(DOCS)
--	$(INSTALL_DIR) "$(DESTDIR)$(qemu_docdir)"
--	$(INSTALL_DATA) docs/interop/qemu-qmp-ref.html "$(DESTDIR)$(qemu_docdir)/interop"
--	$(INSTALL_DATA) docs/interop/qemu-qmp-ref.txt "$(DESTDIR)$(qemu_docdir)/interop"
--ifdef CONFIG_POSIX
--	$(INSTALL_DIR) "$(DESTDIR)$(mandir)/man1"
--	$(INSTALL_DATA) $(MANUAL_BUILDDIR)/system/qemu.1 "$(DESTDIR)$(mandir)/man1"
--	$(INSTALL_DIR) "$(DESTDIR)$(mandir)/man7"
--	$(INSTALL_DATA) docs/interop/qemu-qmp-ref.7 "$(DESTDIR)$(mandir)/man7"
--ifeq ($(CONFIG_GUEST_AGENT),y)
--	$(INSTALL_DATA) docs/interop/qemu-ga-ref.html "$(DESTDIR)$(qemu_docdir)/interop"
--	$(INSTALL_DATA) docs/interop/qemu-ga-ref.txt "$(DESTDIR)$(qemu_docdir)/interop"
--	$(INSTALL_DATA) docs/interop/qemu-ga-ref.7 "$(DESTDIR)$(mandir)/man7"
--endif
--endif
--ifdef CONFIG_VIRTFS
--	$(INSTALL_DIR) "$(DESTDIR)$(mandir)/man1"
--	$(INSTALL_DATA) $(MANUAL_BUILDDIR)/tools/virtfs-proxy-helper.1 "$(DESTDIR)$(mandir)/man1"
--endif
--ifeq ($(CONFIG_LINUX)$(CONFIG_SECCOMP)$(CONFIG_LIBCAP_NG),yyy)
--	$(INSTALL_DATA) $(MANUAL_BUILDDIR)/tools/virtiofsd.1 "$(DESTDIR)$(mandir)/man1"
--endif
--
- install-datadir:
- 	$(INSTALL_DIR) "$(DESTDIR)$(qemu_datadir)"
- 
-@@ -301,8 +264,7 @@ ICON_SIZES=16x16 24x24 32x32 48x48 64x64 128x128 256x256 512x512
- 
- # Needed by "meson install"
- export DESTDIR
--install: all $(if $(BUILD_DOCS),install-doc) \
--	install-datadir install-localstatedir
-+install: all install-datadir install-localstatedir
- ifdef CONFIG_TRACE_SYSTEMTAP
- 	$(INSTALL_PROG) "scripts/qemu-trace-stap" $(DESTDIR)$(bindir)
- endif
-@@ -333,62 +295,6 @@ endif
- 		$(INSTALL_DATA) $(SRC_PATH)/pc-bios/keymaps/$$x "$(DESTDIR)$(qemu_datadir)/keymaps"; \
- 	done
- 
--# documentation
--MAKEINFO=makeinfo
--MAKEINFOINCLUDES= -I docs -I $(<D) -I $(@D)
--MAKEINFOFLAGS=--no-split --number-sections $(MAKEINFOINCLUDES)
--TEXI2PODFLAGS=$(MAKEINFOINCLUDES) -DVERSION="$(VERSION)" -DCONFDIR="$(qemu_confdir)"
--TEXI2PDFFLAGS=$(if $(V),,--quiet) -I $(SRC_PATH) $(MAKEINFOINCLUDES)
--
--docs/version.texi: $(SRC_PATH)/VERSION config-host.mak
--	$(call quiet-command,(\
--		echo "@set VERSION $(VERSION)" && \
--		echo "@set CONFDIR $(qemu_confdir)" \
--	)> $@,"GEN","$@")
--
--%.html: %.texi docs/version.texi
--	$(call quiet-command,LC_ALL=C $(MAKEINFO) $(MAKEINFOFLAGS) --no-headers \
--	--html $< -o $@,"GEN","$@")
--
--%.info: %.texi docs/version.texi
--	$(call quiet-command,$(MAKEINFO) $(MAKEINFOFLAGS) $< -o $@,"GEN","$@")
--
--%.txt: %.texi docs/version.texi
--	$(call quiet-command,LC_ALL=C $(MAKEINFO) $(MAKEINFOFLAGS) --no-headers \
--	--plaintext $< -o $@,"GEN","$@")
--
--%.pdf: %.texi docs/version.texi
--	$(call quiet-command,texi2pdf $(TEXI2PDFFLAGS) $< -o $@,"GEN","$@")
--
--docs/interop/qemu-qmp-qapi.texi: qapi/qapi-doc.texi
--	@cp -p $< $@
--
--docs/interop/qemu-ga-qapi.texi: qga/qga-qapi-doc.texi
--	@cp -p $< $@
--
--html: docs/interop/qemu-qmp-ref.html docs/interop/qemu-ga-ref.html sphinxdocs
--info: docs/interop/qemu-qmp-ref.info docs/interop/qemu-ga-ref.info
--pdf: docs/interop/qemu-qmp-ref.pdf docs/interop/qemu-ga-ref.pdf
--txt: docs/interop/qemu-qmp-ref.txt docs/interop/qemu-ga-ref.txt
--
--docs/interop/qemu-ga-ref.dvi docs/interop/qemu-ga-ref.html \
--    docs/interop/qemu-ga-ref.info docs/interop/qemu-ga-ref.pdf \
--    docs/interop/qemu-ga-ref.txt docs/interop/qemu-ga-ref.7: \
--	docs/interop/qemu-ga-ref.texi docs/interop/qemu-ga-qapi.texi
--
--docs/interop/qemu-qmp-ref.dvi docs/interop/qemu-qmp-ref.html \
--    docs/interop/qemu-qmp-ref.info docs/interop/qemu-qmp-ref.pdf \
--    docs/interop/qemu-qmp-ref.txt docs/interop/qemu-qmp-ref.7: \
--	docs/interop/qemu-qmp-ref.texi docs/interop/qemu-qmp-qapi.texi
--
--$(filter %.1 %.7 %.8,$(DOCS)): scripts/texi2pod.pl
--	$(call quiet-command, \
--	  perl -Ww -- $(SRC_PATH)/scripts/texi2pod.pl $(TEXI2PODFLAGS) $< $@.pod && \
--	  $(POD2MAN) --section=$(subst .,,$(suffix $@)) --center=" " --release=" " $@.pod > $@, \
--	  "GEN","$@")
--
--man: $(filter %.1 %.7 %.8,$(DOCS))
--
- ifdef CONFIG_WIN32
- 
- INSTALLER = qemu-setup-$(VERSION)$(EXESUF)
-@@ -487,7 +393,7 @@ endif
- 	$(call print-help,vm-help,Help about targets running tests inside VM)
- 	@echo  ''
- 	@echo  'Documentation targets:'
--	$(call print-help,html info pdf txt,Build documentation in specified format)
-+	$(call print-help,html info pdf txt man,Build documentation in specified format)
- 	@echo  ''
- ifdef CONFIG_WIN32
- 	@echo  'Windows targets:'
-diff --git a/docs/interop/qemu-ga-ref.texi b/docs/interop/qemu-ga-ref.texi
-index ddb76ce1c2..a23cc2ed7f 100644
---- a/docs/interop/qemu-ga-ref.texi
-+++ b/docs/interop/qemu-ga-ref.texi
-@@ -65,7 +65,7 @@ along with this manual.  If not, see http://www.gnu.org/licenses/.
- @c for texi2pod:
- @c man begin DESCRIPTION
- 
--@include qemu-ga-qapi.texi
-+@include qga/qga-qapi-doc.texi
- 
- @c man end
- 
-diff --git a/docs/interop/qemu-qmp-ref.texi b/docs/interop/qemu-qmp-ref.texi
-index bb25758bd0..ea1d7fe6c2 100644
---- a/docs/interop/qemu-qmp-ref.texi
-+++ b/docs/interop/qemu-qmp-ref.texi
-@@ -65,7 +65,7 @@ along with this manual.  If not, see http://www.gnu.org/licenses/.
- @c for texi2pod:
- @c man begin DESCRIPTION
- 
--@include qemu-qmp-qapi.texi
-+@include qapi/qapi-doc.texi
- 
- @c man end
- 
-diff --git a/meson.build b/meson.build
-index 3847e167a6..8a8c6d0fde 100644
---- a/meson.build
-+++ b/meson.build
-@@ -1050,6 +1050,91 @@ subdir('pc-bios')
- subdir('tests')
- subdir('docs')
- 
-+if build_docs
-+  makeinfo = find_program('makeinfo', required: build_docs)
++/*
++ * get hash result for the sampled memory with length of 4K byte in ramblock,
++ * which starts from ramblock base address.
++ */
++static int get_ramblock_vfn_hash(struct RamblockDirtyInfo *info, unsigned long vfn,
++                                 uint8_t **md)
++{
++    struct iovec iov_array;
++    int ret = 0;
++    int nkey = 1;
 +
-+  docs_inc = [
-+    '-I', meson.current_source_dir(),
-+    '-I', meson.current_build_dir() / 'docs',
-+    '-I', '@OUTDIR@',
-+  ]
++    iov_array.iov_base = info->ramblock_addr +
++                         vfn * DIRTYRATE_SAMPLE_PAGE_SIZE;
++    iov_array.iov_len = DIRTYRATE_SAMPLE_PAGE_SIZE;
 +
-+  version_texi = configure_file(output: 'version.texi',
-+                              input: 'version.texi.in',
-+                              configuration: {'VERSION': meson.project_version(),
-+                                              'qemu_confdir': config_host['qemu_confdir']})
-+
-+  texi = {
-+    'qemu-qmp-ref': ['docs/interop/qemu-qmp-ref.texi', qapi_doc_texi, version_texi],
-+  }
-+  if 'CONFIG_GUEST_AGENT' in config_host
-+    texi += {'qemu-ga-ref': ['docs/interop/qemu-ga-ref.texi', qga_qapi_doc_texi, version_texi]}
-+  endif
-+
-+  if makeinfo.found()
-+    cmd = [
-+      'env', 'LC_ALL=C', makeinfo, '--no-split', '--number-sections', docs_inc,
-+      '@INPUT0@', '-o', '@OUTPUT@',
-+    ]
-+    foreach ext, args: {
-+        'info': [],
-+        'html': ['--no-headers', '--html'],
-+        'txt': ['--no-headers', '--plaintext'],
++    if (qcrypto_hash_bytesv(QCRYPTO_HASH_ALG_MD5,
++                            &iov_array, nkey,
++                            md, &qcrypto_hash_len, NULL) < 0) {
++        ret = -1;
 +    }
-+      t = []
-+      foreach doc, input: texi
-+        output = doc + '.' + ext
-+        t += custom_target(output,
-+                      input: input,
-+                      output: output,
-+                      install: true,
-+                      install_dir: config_host['qemu_docdir'] / 'interop',
-+                      command: cmd + args)
-+      endforeach
-+      alias_target(ext, t)
-+    endforeach
-+  endif
 +
-+  texi2pdf = find_program('texi2pdf', required: false)
++    return ret;
++}
 +
-+  if texi2pdf.found()
-+    pdfs = []
-+    foreach doc, input: texi
-+      output = doc + '.pdf'
-+      pdfs += custom_target(output,
-+                    input: input,
-+                    output: output,
-+                    command: [texi2pdf, '-q', docs_inc, '@INPUT0@', '-o', '@OUTPUT@'],
-+                    build_by_default: false)
-+    endforeach
-+    alias_target('pdf', pdfs)
-+  endif
++static int save_ramblock_hash(struct RamblockDirtyInfo *info)
++{
++    unsigned int sample_pages_count;
++    uint8_t *md = NULL;
++    int i;
++    int ret = -1;
++    GRand* rand = g_rand_new();
 +
-+  texi2pod = find_program('scripts/texi2pod.pl')
-+  pod2man = find_program('pod2man', required: build_docs)
++    sample_pages_count = info->sample_pages_count;
 +
-+  if pod2man.found()
-+    foreach doc, input: texi
-+      man = doc + '.7'
-+      pod = custom_target(man + '.pod',
-+                          input: input,
-+                          output: man + '.pod',
-+                          command: [texi2pod,
-+                                    '-DVERSION="' + meson.project_version() + '"',
-+                                    '-DCONFDIR="' + config_host['qemu_confdir'] + '"',
-+                                    '@INPUT0@', '@OUTPUT@'])
-+      man = custom_target(man,
-+                          input: pod,
-+                          output: man,
-+                          capture: true,
-+                          install: true,
-+                          install_dir: config_host['mandir'] / 'man7',
-+                          command: [pod2man, '--utf8', '--section=7', '--center=" "',
-+                                    '--release=" "', '@INPUT@'])
-+    endforeach
-+  endif
-+endif
++    /* ramblock size less than one page, return success to skip this ramblock */
++    if (unlikely(info->ramblock_pages == 0 || sample_pages_count == 0)) {
++        ret = 0;
++        goto out;
++    }
 +
- summary_info = {}
- summary_info += {'Install prefix':    config_host['prefix']}
- summary_info += {'BIOS directory':    config_host['qemu_datadir']}
-diff --git a/qga/meson.build b/qga/meson.build
-index 7e7174b0a3..6fdddd68e3 100644
---- a/qga/meson.build
-+++ b/qga/meson.build
-@@ -1,7 +1,6 @@
- qga_qapi_outputs = [
-   'qga-qapi-commands.c',
-   'qga-qapi-commands.h',
--  'qga-qapi-doc.texi',
-   'qga-qapi-emit-events.c',
-   'qga-qapi-emit-events.h',
-   'qga-qapi-events.c',
-@@ -17,12 +16,19 @@ qga_qapi_outputs = [
- ]
++    info->hash_result = g_try_malloc0_n(sample_pages_count, sizeof(uint8_t) * qcrypto_hash_len);
++    if (!info->hash_result) {
++        ret = -1;
++        goto out;
++    }
++
++    info->sample_page_vfn = g_try_malloc0_n(sample_pages_count, sizeof(unsigned long));
++    if (!info->sample_page_vfn) {
++        g_free(info->hash_result);
++        ret = -1;
++        goto out;
++    }
++
++    for (i = 0; i < sample_pages_count; i++) {
++        md = info->hash_result + i * qcrypto_hash_len;
++        info->sample_page_vfn[i] = g_rand_int_range(rand, 0, info->ramblock_pages - 1);
++        ret = get_ramblock_vfn_hash(info, info->sample_page_vfn[i], &md);
++        if (ret < 0) {
++            goto out;
++        }
++    }
++    ret = 0;
++
++out:
++    g_rand_free(rand);
++    return ret;
++}
++
++static void get_ramblock_dirty_info(RAMBlock *block, struct RamblockDirtyInfo *info,
++                                    struct DirtyRateConfig *config)
++{
++    uint64_t sample_pages_per_gigabytes = config->sample_pages_per_gigabytes;
++
++    /* Right shift 30 bits to calc block size in GB */
++    info->sample_pages_count = (qemu_ram_get_used_length(block) * sample_pages_per_gigabytes) >> 30;
++
++    /* Right shift 12 bits to calc page count in 4KB */
++    info->ramblock_pages = qemu_ram_get_used_length(block) >> 12;
++    info->ramblock_addr = qemu_ram_get_host_addr(block);
++    strcpy(info->idstr, qemu_ram_get_idstr(block));
++}
++
++static struct RamblockDirtyInfo *
++alloc_ramblock_dirty_info(int *block_index,
++                          struct RamblockDirtyInfo *block_dinfo)
++{
++    struct RamblockDirtyInfo *info = NULL;
++    int index = *block_index;
++
++    if (!block_dinfo) {
++        block_dinfo = g_try_new(struct RamblockDirtyInfo, 1);
++        index = 0;
++    } else {
++        index++;
++        block_dinfo = g_try_realloc(block_dinfo, (index + 1) *
++                                    sizeof(struct RamblockDirtyInfo));
++    }
++    if (!block_dinfo)
++        return NULL;
++
++    info = &block_dinfo[index];
++    memset(info, 0, sizeof(struct RamblockDirtyInfo));
++
++    *block_index = index;
++    return block_dinfo;
++}
++
++static int record_ramblock_hash_info(struct DirtyRateConfig config,
++                                     struct RamblockDirtyInfo **block_dinfo, int *block_index)
++{
++    struct RamblockDirtyInfo *info = NULL;
++    struct RamblockDirtyInfo *dinfo = NULL;
++    RAMBlock *block = NULL;
++    int index = 0;
++
++    RAMBLOCK_FOREACH_MIGRATABLE(block) {
++        dinfo = alloc_ramblock_dirty_info(&index, dinfo);
++        if (dinfo == NULL)
++            return -1;
++        info = &dinfo[index];
++        get_ramblock_dirty_info(block, info, &config);
++        if (save_ramblock_hash(info) < 0) {
++            *block_dinfo = dinfo;
++            *block_index = index;
++            return -1;
++        }
++    }
++
++    *block_dinfo = dinfo;
++    *block_index = index;
++
++    return 0;
++}
++
+ static void calculate_dirtyrate(struct DirtyRateConfig config)
+ {
+     /* todo */
+diff --git a/migration/dirtyrate.h b/migration/dirtyrate.h
+index af57c80..0812b16 100644
+--- a/migration/dirtyrate.h
++++ b/migration/dirtyrate.h
+@@ -20,10 +20,17 @@
+ #define DIRTYRATE_DEFAULT_SAMPLE_PAGES            256
  
- qga_qapi_files = custom_target('QGA QAPI files',
--                               output: qga_qapi_outputs,
-+                               output: qga_qapi_outputs + ['qga-qapi-doc.texi'],
-                                input: 'qapi-schema.json',
-                                command: [ qapi_gen, '-o', 'qga', '-p', 'qga-', '@INPUT0@' ],
-                                depend_files: qapi_gen_depends)
+ /*
++ * Sample page size 4K as default.
++ */
++#define DIRTYRATE_SAMPLE_PAGE_SIZE                4096
 +
- qga_ss = ss.source_set()
--qga_ss.add(qga_qapi_files)
-+i = 0
-+foreach output: qga_qapi_outputs
-+  qga_ss.add(qga_qapi_files[i])
-+  i = i + 1
-+endforeach
-+qga_qapi_doc_texi = qga_qapi_files[i]
++/*
+  * Record ramblock idstr
+  */
+ #define RAMBLOCK_INFO_MAX_LEN                     256
+ 
++#define QCRYPTO_HASH_LEN                          16
 +
- qga_ss.add(files(
-   'commands.c',
-   'guest-agent-command-state.c',
-diff --git a/version.texi.in b/version.texi.in
-new file mode 100644
-index 0000000000..0a723b8be6
---- /dev/null
-+++ b/version.texi.in
-@@ -0,0 +1,2 @@
-+@set VERSION @VERSION@
-+@set CONFDIR @qemu_confdir@
+ /* Take 1s as default for calculation duration */
+ #define DEFAULT_FETCH_DIRTYRATE_TIME_SEC          1
+ 
 -- 
-2.26.2
-
+1.8.3.1
 
 
