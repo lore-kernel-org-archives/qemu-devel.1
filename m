@@ -2,89 +2,65 @@ Return-Path: <SRS0=5nOY=BY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9782BC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 10:22:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7497AC433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 10:22:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6670A206DA
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 10:22:12 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dCXzr03p"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6670A206DA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 46F38206DA
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 10:22:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46F38206DA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38048 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41976 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k6Wqh-0001e5-Lb
-	for qemu-devel@archiver.kernel.org; Fri, 14 Aug 2020 06:22:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44092)
+	id 1k6WrS-0003Da-Hs
+	for qemu-devel@archiver.kernel.org; Fri, 14 Aug 2020 06:22:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46204)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k6Vng-0007o8-Qv
- for qemu-devel@nongnu.org; Fri, 14 Aug 2020 05:15:00 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:29699
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k6Vnf-00039H-2X
- for qemu-devel@nongnu.org; Fri, 14 Aug 2020 05:15:00 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597396498;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=HTuuY+vzPCumqamfPl3OyRF6+4QIU8lduY21tqFA/Tw=;
- b=dCXzr03p+bljJF6gLKi75sULjYltnKdH6fwh/Fd13Hp86EnuyCGUDyTH9XqtSJR0nPEsMk
- JQvL7lIWSrhZiD3yg5c20Gypy0/BCnQoXakQGmptEdjhTta5et8w9OlCYmRKNnWM5dytq1
- +LzNifbY7wbR1lAVY9p7Q/URX1+jzMQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-345-4XZ__YgUOUKLk_xIlEyabw-1; Fri, 14 Aug 2020 05:14:56 -0400
-X-MC-Unique: 4XZ__YgUOUKLk_xIlEyabw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D3E401005E5B
- for <qemu-devel@nongnu.org>; Fri, 14 Aug 2020 09:14:55 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com
- (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 12B715D9D2;
- Fri, 14 Aug 2020 09:14:52 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 120/150] meson: convert hw/cpu
-Date: Fri, 14 Aug 2020 05:12:56 -0400
-Message-Id: <20200814091326.16173-121-pbonzini@redhat.com>
-In-Reply-To: <20200814091326.16173-1-pbonzini@redhat.com>
-References: <20200814091326.16173-1-pbonzini@redhat.com>
+ (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
+ id 1k6VuE-0002LM-Ea
+ for qemu-devel@nongnu.org; Fri, 14 Aug 2020 05:21:46 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:4243 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
+ id 1k6VuA-00047Y-Jx
+ for qemu-devel@nongnu.org; Fri, 14 Aug 2020 05:21:46 -0400
+Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id 9CCF5F0F267A2D4F4D18;
+ Fri, 14 Aug 2020 17:21:38 +0800 (CST)
+Received: from huawei.com (10.175.101.6) by DGGEMS413-HUB.china.huawei.com
+ (10.3.19.213) with Microsoft SMTP Server id 14.3.487.0; Fri, 14 Aug 2020
+ 17:21:28 +0800
+From: Chuan Zheng <zhengchuan@huawei.com>
+To: <quintela@redhat.com>, <eblake@redhat.com>, <dgilbert@redhat.com>
+Subject: [PATCH v2 07/10] migration/dirtyrate: skip sampling ramblock with
+ size below MIN_RAMBLOCK_SIZE
+Date: Fri, 14 Aug 2020 17:32:10 +0800
+Message-ID: <1597397532-68043-8-git-send-email-zhengchuan@huawei.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1597397532-68043-1-git-send-email-zhengchuan@huawei.com>
+References: <1597397532-68043-1-git-send-email-zhengchuan@huawei.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/14 05:13:30
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
+Content-Type: text/plain
+X-Originating-IP: [10.175.101.6]
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.191;
+ envelope-from=zhengchuan@huawei.com; helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/14 05:21:39
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
 X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,71 +73,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: zhang.zhanghailiang@huawei.com, linyilu@huawei.com, qemu-devel@nongnu.org,
+ alex.chen@huawei.com, ann.zhuangyanying@huawei.com, fangying1@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Marc-André Lureau <marcandre.lureau@redhat.com>
+From: Zheng Chuan <zhengchuan@huawei.com>
 
-Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+In order to sample real RAM, skip ramblock with size below
+MIN_RAMBLOCK_SIZE which is 128M as default.
+
+Signed-off-by: Zheng Chuan <zhengchuan@huawei.com>
 ---
- hw/Makefile.objs     | 1 -
- hw/cpu/Makefile.objs | 5 -----
- hw/cpu/meson.build   | 6 ++++++
- hw/meson.build       | 1 +
- 4 files changed, 7 insertions(+), 6 deletions(-)
- delete mode 100644 hw/cpu/Makefile.objs
- create mode 100644 hw/cpu/meson.build
+ migration/dirtyrate.c | 24 ++++++++++++++++++++++++
+ migration/dirtyrate.h |  5 +++++
+ 2 files changed, 29 insertions(+)
 
-diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-index 6fce6a1473..97ad30295e 100644
---- a/hw/Makefile.objs
-+++ b/hw/Makefile.objs
-@@ -5,7 +5,6 @@ devices-dirs-y += adc/
- devices-dirs-y += audio/
- devices-dirs-y += block/
- devices-dirs-y += char/
--devices-dirs-y += cpu/
- endif
+diff --git a/migration/dirtyrate.c b/migration/dirtyrate.c
+index f136067..3dc9feb 100644
+--- a/migration/dirtyrate.c
++++ b/migration/dirtyrate.c
+@@ -179,6 +179,24 @@ alloc_ramblock_dirty_info(int *block_index,
+     return block_dinfo;
+ }
  
- common-obj-y += $(devices-dirs-y)
-diff --git a/hw/cpu/Makefile.objs b/hw/cpu/Makefile.objs
-deleted file mode 100644
-index 8db9e8a7b3..0000000000
---- a/hw/cpu/Makefile.objs
-+++ /dev/null
-@@ -1,5 +0,0 @@
--obj-$(CONFIG_ARM11MPCORE) += arm11mpcore.o
--obj-$(CONFIG_REALVIEW) += realview_mpcore.o
--obj-$(CONFIG_A9MPCORE) += a9mpcore.o
--obj-$(CONFIG_A15MPCORE) += a15mpcore.o
--common-obj-y += core.o cluster.o
-diff --git a/hw/cpu/meson.build b/hw/cpu/meson.build
-new file mode 100644
-index 0000000000..9e52fee9e7
---- /dev/null
-+++ b/hw/cpu/meson.build
-@@ -0,0 +1,6 @@
-+softmmu_ss.add(files('core.c', 'cluster.c'))
++static int skip_sample_ramblock(RAMBlock *block)
++{
++    int64_t ramblock_size;
 +
-+specific_ss.add(when: 'CONFIG_ARM11MPCORE', if_true: files('arm11mpcore.c'))
-+specific_ss.add(when: 'CONFIG_REALVIEW', if_true: files('realview_mpcore.c'))
-+specific_ss.add(when: 'CONFIG_A9MPCORE', if_true: files('a9mpcore.c'))
-+specific_ss.add(when: 'CONFIG_A15MPCORE', if_true: files('a15mpcore.c'))
-diff --git a/hw/meson.build b/hw/meson.build
-index dacd26c561..103da4840b 100644
---- a/hw/meson.build
-+++ b/hw/meson.build
-@@ -1,4 +1,5 @@
- subdir('core')
-+subdir('cpu')
- subdir('display')
- subdir('dma')
- subdir('gpio')
++    /* ramblock size in MB */
++    ramblock_size = qemu_ram_get_used_length(block) >> 20;
++
++    /*
++     * Consider ramblock with size larger than 128M is what we
++     * want to sample.
++     */
++    if (ramblock_size < MIN_RAMBLOCK_SIZE) {
++        return -1;
++    }
++
++    return 0;
++}
++
+ static int record_ramblock_hash_info(struct DirtyRateConfig config,
+                                      struct RamblockDirtyInfo **block_dinfo, int *block_index)
+ {
+@@ -188,6 +206,9 @@ static int record_ramblock_hash_info(struct DirtyRateConfig config,
+     int index = 0;
+ 
+     RAMBLOCK_FOREACH_MIGRATABLE(block) {
++        if (skip_sample_ramblock(block) < 0) {
++            continue;
++        }
+         dinfo = alloc_ramblock_dirty_info(&index, dinfo);
+         if (dinfo == NULL)
+             return -1;
+@@ -263,6 +284,9 @@ static int compare_page_hash_info(struct RamblockDirtyInfo *info, int block_inde
+     RAMBlock *block = NULL;
+ 
+     RAMBLOCK_FOREACH_MIGRATABLE(block) {
++        if (skip_sample_ramblock(block) < 0) {
++            continue;
++        }
+         block_dinfo = NULL;
+         if (!find_page_matched(block, info, block_index + 1, &block_dinfo)) {
+             continue;
+diff --git a/migration/dirtyrate.h b/migration/dirtyrate.h
+index 0812b16..fce2e3b 100644
+--- a/migration/dirtyrate.h
++++ b/migration/dirtyrate.h
+@@ -31,6 +31,11 @@
+ 
+ #define QCRYPTO_HASH_LEN                          16
+ 
++/*
++ * minimum ramblock size to sampled
++ */
++#define MIN_RAMBLOCK_SIZE                        128
++
+ /* Take 1s as default for calculation duration */
+ #define DEFAULT_FETCH_DIRTYRATE_TIME_SEC          1
+ 
 -- 
-2.26.2
-
+1.8.3.1
 
 
