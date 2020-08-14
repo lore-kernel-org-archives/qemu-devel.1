@@ -2,85 +2,81 @@ Return-Path: <SRS0=5nOY=BY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8882AC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 13:24:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0B6CC433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 13:30:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5327320866
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 13:24:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A5423206DA
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 13:30:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SGDmECnX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5327320866
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="u3Pg4IoZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5423206DA
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54800 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60504 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k6Zh5-0008Vk-LX
-	for qemu-devel@archiver.kernel.org; Fri, 14 Aug 2020 09:24:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48426)
+	id 1k6ZnN-0002uI-T4
+	for qemu-devel@archiver.kernel.org; Fri, 14 Aug 2020 09:30:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50072)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k6ZgC-0007tn-2F; Fri, 14 Aug 2020 09:23:32 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:35284)
+ id 1k6Zmg-0002Cv-Ma; Fri, 14 Aug 2020 09:30:14 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:50649)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k6ZgA-0000Vl-IM; Fri, 14 Aug 2020 09:23:31 -0400
-Received: by mail-wr1-x444.google.com with SMTP id f1so8356695wro.2;
- Fri, 14 Aug 2020 06:23:29 -0700 (PDT)
+ id 1k6Zmd-0001DY-UR; Fri, 14 Aug 2020 09:30:14 -0400
+Received: by mail-wm1-x342.google.com with SMTP id c80so7493458wme.0;
+ Fri, 14 Aug 2020 06:30:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=ckF2DqXRF898Cr5olz33UXtEKnXaCp8Tdxdp+D4NReU=;
- b=SGDmECnX8wrYZuZ0Jj2igl2UGhngRT4SbCwQFCAlT4B7+CiWBVDtLNQPV1YCTSGK/W
- zzzPMMBnQ0zRE6P4JM8Q+qnX1IHbM8mLbcshYI5DULwVh4CL0edd16CWYPuNPQSqp7mK
- G9rxUZsLHM7LRDjUFqzTxFEDcZw/eTbFbUz6YM0n5/FJAAXNEx0/ia6CIM4ZMdzDLZr2
- oBxsscVRmFuuyEU5jyz3k8TphIGG7+O0la83LEVR93tMbQG6ZdshMEb28JL2qAuPHiuK
- b/cd2i/ljM3ZaWNi3cUDSxRI/a9AHgd1liv1+SqImnf9/BQtSzNPLk7yfGjW/f5YLokK
- Xpug==
+ h=sender:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=+WN5+x/S52yPuJmxO8+ZTxpwug077ztvG/3BJTOgOtQ=;
+ b=u3Pg4IoZRdTabEyPnFwUFrjkW18lkd9OvNH4S65UX57GRl2JJVQ7/wrjE1ASlJm3LR
+ QHpopIwG8USNPwNLlfDAm/53eTXGSQJD77W/+q8FqsUE+0yVlPrBC8l35PeyYRn/MDWy
+ kwVHcwElnxrZO/PIGtF2bQm27lMCn/NCbZ+YJn33yLVoFzqncjpU/EMNXJgAHkTSQpBJ
+ kGJXh5NjaD0gKX23Bq//UOv9b1BG6LPq5auDNGNRDrUbVxK8x7sVrJmDZUQeeMA7SGyB
+ 7Yx76Qc5jlms5IUUFHjXZfUPtU/Nr0Gs7o4yeqg7NkGUUb91wdw8dwBHZ+HGve11/0te
+ ohxw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=ckF2DqXRF898Cr5olz33UXtEKnXaCp8Tdxdp+D4NReU=;
- b=ZgfDsqffT/nqeWNOZjRw7pg0u4KRto6B9FcptNobLSJf1ce4aTQcIjTssybl/ejPlp
- UrKKDRWduiEwo4kCfnurybgb7hxb2PT1gUjdVdZS2yZDLHjUfsymiU4fKPX17ICqE/Qz
- GKkv15T54SNQBCTfrDkr0a9eUIaERFL9scLGGeW7XJlaxW7JMZclnls73FKp4JLqcGKn
- bAV8sKYat1LIF5+8qcoefTNRquLioNRxdU2aVSfbEUbBtNd/S7dcCyjKy4C6A9Yd6q3A
- wuFogrUlJLdAUA747NILUEmAqDq0w6OxmlhyVrptDF0jrJkDfu35/tScJvhVScNnj732
- TbYA==
-X-Gm-Message-State: AOAM530rNin7VQEByDfqEAinKczOA8MpfU4hE9256Ju3MjO0djr/km+6
- 4YNjCijEK54XCqc7kixf3R7/HwxUe5M=
-X-Google-Smtp-Source: ABdhPJxQLG1J89Jr4qnHXBvJg9ys8GoSzZAo1aFX60q5OcJWs/M8w6k3KQ9j0cfWHjK7u2sWldSedQ==
-X-Received: by 2002:a5d:61c8:: with SMTP id q8mr2650817wrv.160.1597411408027; 
- Fri, 14 Aug 2020 06:23:28 -0700 (PDT)
-Received: from [192.168.1.36] (121.red-81-40-121.staticip.rima-tde.net.
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=+WN5+x/S52yPuJmxO8+ZTxpwug077ztvG/3BJTOgOtQ=;
+ b=plVJj51As/Eqtepn/8OVY247zPObN3BFmFClz7wblbTmH71JZUzjyQ2Dglc/rrKBBE
+ sqVFf9Q6n6IHEBSge5mMdzGIK3BVPr3dP32Hbzp4XwwuvL1NhAzzETo+iI0h70puWkJO
+ l5/HkRXSqIJ/llMZ28GYk4kcQVBTgw5pkaq8cjQjAPuT0gCx61vXEu1mSN01ALZbVwyb
+ 0mpxIELYqwJ3oT8Xo2UxT/XGKW6zViyYiSPNpLBIE/e3hCELU+X8F6P/KjM1WLyQMeOw
+ usJMyMMqp+UTuytuKOcq/KgDj4fwvx/m0NOPypW0snkt4ZG3Zm5HZ62pkAJXfHc88mNO
+ VGMQ==
+X-Gm-Message-State: AOAM532lanCKKo0mFkTn1j+iIlZ61jodOOiSu+S32arFcZmfhZHXCC0o
+ xcngQ9OoAyX3q9tVFCBn9oW4//BhZT4=
+X-Google-Smtp-Source: ABdhPJxkmQ4gixIw9LePIBH+v7mf1/iTJIn5q6ONVI8iOMZILkAc0jcyfl0zWd0PO0AOs9SWsN6Jtw==
+X-Received: by 2002:a1c:4e0d:: with SMTP id g13mr2542782wmh.177.1597411809547; 
+ Fri, 14 Aug 2020 06:30:09 -0700 (PDT)
+Received: from localhost.localdomain (121.red-81-40-121.staticip.rima-tde.net.
  [81.40.121.121])
- by smtp.gmail.com with ESMTPSA id g7sm16284338wrv.82.2020.08.14.06.23.27
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 14 Aug 2020 06:23:27 -0700 (PDT)
-Subject: Re: [PATCH] hw/block/nand: Decommission the NAND museum
+ by smtp.gmail.com with ESMTPSA id j4sm14708003wmi.48.2020.08.14.06.30.08
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 14 Aug 2020 06:30:08 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-References: <20200814132118.12450-1-f4bug@amsat.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <75f7421f-3ea4-ff6c-2c92-0ea9b5b8fdc1@amsat.org>
-Date: Fri, 14 Aug 2020 15:23:26 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+Subject: [PATCH] hw/net/xilinx_axienet: Remove unused code
+Date: Fri, 14 Aug 2020 15:30:07 +0200
+Message-Id: <20200814133007.16850-1-f4bug@amsat.org>
+X-Mailer: git-send-email 2.21.3
 MIME-Version: 1.0
-In-Reply-To: <20200814132118.12450-1-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::342;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x342.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -102,73 +98,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-arm <qemu-arm@nongnu.org>,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-trivial@nongnu.org,
+ Jason Wang <jasowang@redhat.com>, Alistair Francis <alistair@alistair23.me>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ qemu-arm@nongnu.org, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I forgot to Cc qemu-arm@, doing it now since most of the users
-of this are ARM machines.
+Most of the MDIOBus fields are unused.  The ADVERTISE_10HALF
+definition is unused.  Remove unused code.
 
-On 8/14/20 3:21 PM, Philippe Mathieu-Daudé wrote:
-> This is the QEMU equivalent of this Linux commit (but 7 years later):
-> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=f7025a43a9da2
-> 
->     The MTD subsystem has its own small museum of ancient NANDs
->     in a form of the CONFIG_MTD_NAND_MUSEUM_IDS configuration option.
->     The museum contains stone age NANDs with 256 bytes pages, as well
->     as iron age NANDs with 512 bytes per page and up to 8MiB page size.
-> 
->     It is with great sorrow that I inform you that the museum is being
->     decommissioned. The MTD subsystem is out of budget for Kconfig
->     options and already has too many of them, and there is a general
->     kernel trend to simplify the configuration menu.
-> 
->     We remove the stone age exhibits along with closing the museum,
->     but some of the iron age ones are transferred to the regular NAND
->     depot. Namely, only those which have unique device IDs are
->     transferred, and the ones which have conflicting device IDs are
->     removed.
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> ---
->  hw/block/nand.c | 13 ++++++-------
->  1 file changed, 6 insertions(+), 7 deletions(-)
-> 
-> diff --git a/hw/block/nand.c b/hw/block/nand.c
-> index 654e0cb5d1..7d7ccc9aa4 100644
-> --- a/hw/block/nand.c
-> +++ b/hw/block/nand.c
-> @@ -137,7 +137,7 @@ static void mem_and(uint8_t *dest, const uint8_t *src, size_t n)
->  # define ADDR_SHIFT		16
->  # include "nand.c"
->  
-> -/* Information based on Linux drivers/mtd/nand/nand_ids.c */
-> +/* Information based on Linux drivers/mtd/nand/raw/nand_ids.c */
->  static const struct {
->      int size;
->      int width;
-> @@ -153,15 +153,14 @@ static const struct {
->      [0xe8] = { 1,	8,	8, 4, 0 },
->      [0xec] = { 1,	8,	8, 4, 0 },
->      [0xea] = { 2,	8,	8, 4, 0 },
-> -    [0xd5] = { 4,	8,	9, 4, 0 },
->      [0xe3] = { 4,	8,	9, 4, 0 },
->      [0xe5] = { 4,	8,	9, 4, 0 },
-> -    [0xd6] = { 8,	8,	9, 4, 0 },
->  
-> -    [0x39] = { 8,	8,	9, 4, 0 },
-> -    [0xe6] = { 8,	8,	9, 4, 0 },
-> -    [0x49] = { 8,	16,	9, 4, NAND_BUSWIDTH_16 },
-> -    [0x59] = { 8,	16,	9, 4, NAND_BUSWIDTH_16 },
-> +    [0x6b] = { 4,        8,        9, 4, 0 },
-> +    [0xe3] = { 4,        8,        9, 4, 0 },
-> +    [0xe5] = { 4,        8,        9, 4, 0 },
-> +    [0xd6] = { 8,        8,        9, 4, 0 },
-> +    [0xe6] = { 8,        8,        9, 4, 0 },
->  
->      [0x33] = { 16,	8,	9, 5, 0 },
->      [0x73] = { 16,	8,	9, 5, 0 },
-> 
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ hw/net/xilinx_axienet.c | 23 -----------------------
+ 1 file changed, 23 deletions(-)
+
+diff --git a/hw/net/xilinx_axienet.c b/hw/net/xilinx_axienet.c
+index 1e48eb70c9..2e89f236b4 100644
+--- a/hw/net/xilinx_axienet.c
++++ b/hw/net/xilinx_axienet.c
+@@ -54,7 +54,6 @@
+      TYPE_XILINX_AXI_ENET_CONTROL_STREAM)
+ 
+ /* Advertisement control register. */
+-#define ADVERTISE_10HALF        0x0020  /* Try for 10mbps half-duplex  */
+ #define ADVERTISE_10FULL        0x0040  /* Try for 10mbps full-duplex  */
+ #define ADVERTISE_100HALF       0x0080  /* Try for 100mbps half-duplex */
+ #define ADVERTISE_100FULL       0x0100  /* Try for 100mbps full-duplex */
+@@ -169,28 +168,6 @@ tdk_init(struct PHY *phy)
+ }
+ 
+ struct MDIOBus {
+-    /* bus.  */
+-    int mdc;
+-    int mdio;
+-
+-    /* decoder.  */
+-    enum {
+-        PREAMBLE,
+-        SOF,
+-        OPC,
+-        ADDR,
+-        REQ,
+-        TURNAROUND,
+-        DATA
+-    } state;
+-    unsigned int drive;
+-
+-    unsigned int cnt;
+-    unsigned int addr;
+-    unsigned int opc;
+-    unsigned int req;
+-    unsigned int data;
+-
+     struct PHY *devs[32];
+ };
+ 
+-- 
+2.21.3
+
 
