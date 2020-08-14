@@ -4,87 +4,88 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64C97C433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 09:51:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3793CC433E3
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 09:51:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 21408204EA
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 09:51:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E953D204EA
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 09:51:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AKAZC8tM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21408204EA
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="egvj6ZdS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E953D204EA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33934 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35698 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k6WN7-0000gO-C5
-	for qemu-devel@archiver.kernel.org; Fri, 14 Aug 2020 05:51:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43534)
+	id 1k6WNQ-0001OO-5d
+	for qemu-devel@archiver.kernel.org; Fri, 14 Aug 2020 05:51:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43926)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k6VnG-0006cx-4U
- for qemu-devel@nongnu.org; Fri, 14 Aug 2020 05:14:34 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:57209
- helo=us-smtp-delivery-1.mimecast.com)
+ id 1k6VnW-0007Ma-GD
+ for qemu-devel@nongnu.org; Fri, 14 Aug 2020 05:14:50 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29604
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k6Vn9-00030e-Fv
- for qemu-devel@nongnu.org; Fri, 14 Aug 2020 05:14:33 -0400
+ id 1k6VnS-00036i-Sy
+ for qemu-devel@nongnu.org; Fri, 14 Aug 2020 05:14:50 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597396466;
+ s=mimecast20190719; t=1597396486;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=OWxieg1J0Lo/Wcd3zSKFo8OXKwQ3vTNWdGpRN3Orz0w=;
- b=AKAZC8tMp8e8D9cFsAthw6PbLQL5/RyRFXr/DUwwuSdaLDbpHF0PliFocUXqWYBxFC6vAG
- ODkPB3Pzo4HGTCmhwcdmZ2NCYYmNdhB8r3PUreCUI15Cuz/hB4giwgYZpPCEdUNScVM6cb
- ncEh+BsHtu+eqDhKHXQjluXMzn2K2e0=
+ bh=yVsDX30RTD9z+oD9dhmNp34h9p3joMXuW8pOt1DLvWk=;
+ b=egvj6ZdSuzd8RovRjzX30PFS0MtVnmQG4Cf43GrkMVlA3Q33KL3vjr4OTru95z2AjDxyqW
+ yAMyQ9dOE6o2zjOAcn8Dfv0URb3SBXCnkl0elteKbY9G1Wa3Zv/pVd0ZtClEL7cnx1aocl
+ GQsM5ku+xexcdxrLQ32GfurZp/aFwK0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-518-GVERgvL6NjCuFL7pBbhvQg-1; Fri, 14 Aug 2020 05:14:21 -0400
-X-MC-Unique: GVERgvL6NjCuFL7pBbhvQg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-364-wM_v-myxM16c6OUM_w6x3A-1; Fri, 14 Aug 2020 05:14:43 -0400
+X-MC-Unique: wM_v-myxM16c6OUM_w6x3A-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 04BBF1005E5A
- for <qemu-devel@nongnu.org>; Fri, 14 Aug 2020 09:14:21 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C9DDB801AC3
+ for <qemu-devel@nongnu.org>; Fri, 14 Aug 2020 09:14:42 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B6F40747B9;
- Fri, 14 Aug 2020 09:14:20 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 861A160C04;
+ Fri, 14 Aug 2020 09:14:42 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 071/150] meson: convert ui directory to Meson
-Date: Fri, 14 Aug 2020 05:12:07 -0400
-Message-Id: <20200814091326.16173-72-pbonzini@redhat.com>
+Subject: [PATCH 108/150] meson: convert hw/misc
+Date: Fri, 14 Aug 2020 05:12:44 -0400
+Message-Id: <20200814091326.16173-109-pbonzini@redhat.com>
 In-Reply-To: <20200814091326.16173-1-pbonzini@redhat.com>
 References: <20200814091326.16173-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0.003
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/14 01:57:54
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/14 03:37:30
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,351 +108,272 @@ From: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Makefile.objs    |  8 +++--
- Makefile.target  |  8 ++---
- configure        |  6 ++++
- meson.build      | 50 +++++++++++++++++++++++++++++
- ui/Makefile.objs | 73 ------------------------------------------
- ui/meson.build   | 83 +++++++++++++++++++++++++++++++++++++++++++++++-
- ui/shader.c      |  6 ++--
- 7 files changed, 150 insertions(+), 84 deletions(-)
- delete mode 100644 ui/Makefile.objs
+ hw/Makefile.objs            |  1 -
+ hw/meson.build              |  1 +
+ hw/misc/Makefile.objs       | 95 -----------------------------------
+ hw/misc/macio/Makefile.objs |  5 --
+ hw/misc/macio/meson.build   |  8 +++
+ hw/misc/meson.build         | 99 +++++++++++++++++++++++++++++++++++++
+ 6 files changed, 108 insertions(+), 101 deletions(-)
+ delete mode 100644 hw/misc/Makefile.objs
+ delete mode 100644 hw/misc/macio/Makefile.objs
+ create mode 100644 hw/misc/macio/meson.build
+ create mode 100644 hw/misc/meson.build
 
-diff --git a/Makefile.objs b/Makefile.objs
-index ec7627a4c6..72e935023d 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -68,6 +68,11 @@ common-obj-$(CONFIG_AUDIO_OSS) += audio-oss$(DSOSUF)
- common-obj-$(CONFIG_AUDIO_PA) += audio-pa$(DSOSUF)
- common-obj-$(CONFIG_AUDIO_SDL) += audio-sdl$(DSOSUF)
- 
-+common-obj-$(if $(CONFIG_CURSES),m) += ui-curses$(DSOSUF)
-+common-obj-$(if $(CONFIG_GTK),m) += ui-gtk$(DSOSUF)
-+common-obj-$(if $(CONFIG_SDL),m) += ui-sdl$(DSOSUF)
-+common-obj-$(if $(CONFIG_SPICE),m) += ui-spice-app$(DSOSUF)
-+
- common-obj-$(if $(CONFIG_CURL),m) += block-curl$(DSOSUF)
- common-obj-$(if $(CONFIG_GLUSTERFS),m) += block-gluster$(DSOSUF)
- common-obj-$(if $(CONFIG_LIBISCSI),m) += block-iscsi$(DSOSUF)
-@@ -83,9 +88,6 @@ common-obj-m += hw/
- 
- common-obj-y += replay/
- 
--common-obj-y += ui/
--common-obj-m += ui/
--
- common-obj-y += dma-helpers.o
- common-obj-$(CONFIG_TPM) += tpm.o
- 
-diff --git a/Makefile.target b/Makefile.target
-index ff0e1b2d10..16f1e781e9 100644
---- a/Makefile.target
-+++ b/Makefile.target
-@@ -167,8 +167,9 @@ LIBS := $(libs_softmmu) $(LIBS)
- LIBS := $(LIBS) @../block.syms @../qemu.syms
- ifneq ($(CONFIG_MODULES),y)
- LIBS := $(LIBS) $(ALSA_LIBS) $(OSS_LIBS) $(PULSE_LIBS) $(SDL_LIBS)
-+LIBS := $(LIBS) $(GTK_LIBS) $(VTE_LIBS) $(X11_LIBS) $(CURSES_LIBS) $(ICONV_LIBS) $(GIO_LIBS)
+diff --git a/hw/Makefile.objs b/hw/Makefile.objs
+index d0d7816118..ac8278edf7 100644
+--- a/hw/Makefile.objs
++++ b/hw/Makefile.objs
+@@ -17,7 +17,6 @@ devices-dirs-y += intc/
+ devices-dirs-$(CONFIG_IPACK) += ipack/
+ devices-dirs-$(CONFIG_IPMI) += ipmi/
+ devices-dirs-y += isa/
+-devices-dirs-y += misc/
  endif
--LIBS := $(LIBS) $(BRLAPI_LIBS) $(SDL_LIBS) $(SPICE_LIBS)
-+LIBS := $(LIBS) $(BRLAPI_LIBS) $(SDL_LIBS) $(SPICE_LIBS) $(OPENGL_LIBS)
- LIBS := $(LIBS) $(COREAUDIO_LIBS) $(DSOUND_LIBS)
  
- # Hardware support
-@@ -207,9 +208,8 @@ dummy := $(call fix-paths,../,, \
-               crypto-obj-y \
-               io-obj-y \
-               qom-obj-y)
--dummy := $(call unnest-vars,.., \
--               common-obj-y \
--               common-obj-m)
-+dummy := $(call unnest-vars,..,common-obj-y)
-+
- all-obj-y += $(common-obj-y)
- all-obj-y += $(qom-obj-y)
- all-obj-$(CONFIG_SOFTMMU) += $(authz-obj-y)
-diff --git a/configure b/configure
-index 171a1c71d2..26d2479b80 100755
---- a/configure
-+++ b/configure
-@@ -7020,12 +7020,18 @@ fi
- if test "$vnc_sasl" = "yes" ; then
-   echo "CONFIG_VNC_SASL=y" >> $config_host_mak
- fi
-+echo "SASL_CFLAGS=$vnc_sasl_cflags" >> $config_host_mak
-+echo "SASL_LIBS=$vnc_sasl_libs" >> $config_host_mak
- if test "$vnc_jpeg" = "yes" ; then
-   echo "CONFIG_VNC_JPEG=y" >> $config_host_mak
- fi
-+echo "JPEG_CFLAGS=$vnc_jpeg_cflags" >> $config_host_mak
-+echo "JPEG_LIBS=$vnc_jpeg_libs" >> $config_host_mak
- if test "$vnc_png" = "yes" ; then
-   echo "CONFIG_VNC_PNG=y" >> $config_host_mak
- fi
-+echo "PNG_CFLAGS=$vnc_png_cflags" >> $config_host_mak
-+echo "PNG_LIBS=$vnc_png_libs" >> $config_host_mak
- if test "$xkbcommon" = "yes" ; then
-   echo "CONFIG_XKBCOMMON=y" >> $config_host_mak
-   echo "XKBCOMMON_CFLAGS=$xkbcommon_cflags" >> $config_host_mak
-diff --git a/meson.build b/meson.build
-index 98182049d8..db5a000a23 100644
---- a/meson.build
-+++ b/meson.build
-@@ -239,6 +239,56 @@ coreaudio = not_found
- if 'CONFIG_AUDIO_COREAUDIO' in config_host
-   coreaudio = declare_dependency(link_args: config_host['COREAUDIO_LIBS'].split())
- endif
-+opengl = not_found
-+if 'CONFIG_OPENGL' in config_host
-+  opengl = declare_dependency(link_args: config_host['OPENGL_LIBS'].split())
-+else
-+endif
-+gtk = not_found
-+if 'CONFIG_GTK' in config_host
-+  gtk = declare_dependency(compile_args: config_host['GTK_CFLAGS'].split(),
-+                              link_args: config_host['GTK_LIBS'].split())
-+endif
-+vte = not_found
-+if 'CONFIG_VTE' in config_host
-+  vte = declare_dependency(compile_args: config_host['VTE_CFLAGS'].split(),
-+                           link_args: config_host['VTE_LIBS'].split())
-+endif
-+x11 = not_found
-+if 'CONFIG_X11' in config_host
-+  x11 = declare_dependency(compile_args: config_host['X11_CFLAGS'].split(),
-+                           link_args: config_host['X11_LIBS'].split())
-+endif
-+curses = not_found
-+if 'CONFIG_CURSES' in config_host
-+  curses = declare_dependency(compile_args: config_host['CURSES_CFLAGS'].split(),
-+                              link_args: config_host['CURSES_LIBS'].split())
-+endif
-+iconv = not_found
-+if 'CONFIG_ICONV' in config_host
-+  iconv = declare_dependency(compile_args: config_host['ICONV_CFLAGS'].split(),
-+                             link_args: config_host['ICONV_LIBS'].split())
-+endif
-+gio = not_found
-+if 'CONFIG_GIO' in config_host
-+  gio = declare_dependency(compile_args: config_host['GIO_CFLAGS'].split(),
-+                           link_args: config_host['GIO_LIBS'].split())
-+endif
-+png = not_found
-+if 'CONFIG_VNC_PNG' in config_host
-+  png = declare_dependency(compile_args: config_host['PNG_CFLAGS'].split(),
-+                           link_args: config_host['PNG_LIBS'].split())
-+endif
-+jpeg = not_found
-+if 'CONFIG_VNC_JPEG' in config_host
-+  jpeg = declare_dependency(compile_args: config_host['JPEG_CFLAGS'].split(),
-+                            link_args: config_host['JPEG_LIBS'].split())
-+endif
-+sasl = not_found
-+if 'CONFIG_VNC_SASL' in config_host
-+  sasl = declare_dependency(compile_args: config_host['SASL_CFLAGS'].split(),
-+                            link_args: config_host['SASL_LIBS'].split())
-+endif
- 
- create_config = find_program('scripts/create_config')
- minikconf = find_program('scripts/minikconf.py')
-diff --git a/ui/Makefile.objs b/ui/Makefile.objs
+ common-obj-y += $(devices-dirs-y)
+diff --git a/hw/meson.build b/hw/meson.build
+index 1f7b2c4fb9..6ca82b0375 100644
+--- a/hw/meson.build
++++ b/hw/meson.build
+@@ -1,5 +1,6 @@
+ subdir('core')
+ subdir('mem')
++subdir('misc')
+ subdir('net')
+ subdir('nubus')
+ subdir('nvram')
+diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
 deleted file mode 100644
-index 504b196479..0000000000
---- a/ui/Makefile.objs
+index 6be3d255ab..0000000000
+--- a/hw/misc/Makefile.objs
 +++ /dev/null
-@@ -1,73 +0,0 @@
--vnc-obj-y += vnc.o
--vnc-obj-y += vnc-enc-zlib.o vnc-enc-hextile.o
--vnc-obj-y += vnc-enc-tight.o vnc-palette.o
--vnc-obj-y += vnc-enc-zrle.o
--vnc-obj-y += vnc-auth-vencrypt.o
--vnc-obj-$(CONFIG_VNC_SASL) += vnc-auth-sasl.o
--vnc-obj-y += vnc-ws.o
--vnc-obj-y += vnc-jobs.o
+@@ -1,95 +0,0 @@
+-common-obj-$(CONFIG_APPLESMC) += applesmc.o
+-common-obj-$(CONFIG_MAX111X) += max111x.o
+-common-obj-$(CONFIG_TMP105) += tmp105.o
+-common-obj-$(CONFIG_TMP421) += tmp421.o
+-common-obj-$(CONFIG_ISA_DEBUG) += debugexit.o
+-common-obj-$(CONFIG_SGA) += sga.o
+-common-obj-$(CONFIG_ISA_TESTDEV) += pc-testdev.o
+-common-obj-$(CONFIG_PCI_TESTDEV) += pci-testdev.o
+-common-obj-$(CONFIG_EDU) += edu.o
+-common-obj-$(CONFIG_PCA9552) += pca9552.o
 -
--common-obj-y += keymaps.o console.o cursor.o qemu-pixman.o
--common-obj-y += input.o input-keymap.o input-legacy.o kbd-state.o
--common-obj-y += input-barrier.o
--common-obj-$(CONFIG_LINUX) += input-linux.o
--common-obj-$(CONFIG_SPICE) += spice-core.o spice-input.o spice-display.o
--common-obj-$(CONFIG_COCOA) += cocoa.o
--common-obj-$(CONFIG_VNC) += $(vnc-obj-y)
--common-obj-$(call lnot,$(CONFIG_VNC)) += vnc-stubs.o
--ifneq (,$(findstring m,$(CONFIG_SDL)$(CONFIG_GTK)))
--common-obj-$(CONFIG_WIN32) += win32-kbd-hook.o
--endif
+-common-obj-$(CONFIG_UNIMP) += unimp.o
+-common-obj-$(CONFIG_EMPTY_SLOT) += empty_slot.o
+-common-obj-$(CONFIG_FW_CFG_DMA) += vmcoreinfo.o
 -
--# ui-sdl module
--common-obj-$(CONFIG_SDL) += sdl.mo
--sdl.mo-objs := sdl2.o sdl2-input.o sdl2-2d.o
--ifeq ($(CONFIG_OPENGL),y)
--sdl.mo-objs += sdl2-gl.o
--endif
--sdl.mo-cflags := $(SDL_CFLAGS)
--sdl.mo-libs := $(SDL_LIBS)
+-# ARM devices
+-common-obj-$(CONFIG_PL310) += arm_l2x0.o
+-common-obj-$(CONFIG_INTEGRATOR_DEBUG) += arm_integrator_debug.o
+-common-obj-$(CONFIG_A9SCU) += a9scu.o
+-common-obj-$(CONFIG_ARM11SCU) += arm11scu.o
 -
--# ui-gtk module
--common-obj-$(CONFIG_GTK) += gtk.mo
--gtk.mo-objs := gtk.o
--gtk.mo-cflags := $(GTK_CFLAGS) $(VTE_CFLAGS)
--gtk.mo-libs := $(GTK_LIBS) $(VTE_LIBS)
--ifeq ($(CONFIG_OPENGL),y)
--gtk.mo-objs += gtk-egl.o
--gtk.mo-libs += $(OPENGL_LIBS)
--ifeq ($(CONFIG_GTK_GL),y)
--gtk.mo-objs += gtk-gl-area.o
--endif
--endif
+-# Mac devices
+-common-obj-$(CONFIG_MOS6522) += mos6522.o
 -
--ifeq ($(CONFIG_X11),y)
--sdl.mo-objs += x_keymap.o
--gtk.mo-objs += x_keymap.o
--x_keymap.o-cflags := $(X11_CFLAGS)
--x_keymap.o-libs := $(X11_LIBS)
--endif
+-# PKUnity SoC devices
+-common-obj-$(CONFIG_PUV3) += puv3_pm.o
 -
--common-obj-$(CONFIG_CURSES) += curses.mo
--curses.mo-objs := curses.o
--curses.mo-cflags := $(CURSES_CFLAGS) $(ICONV_CFLAGS)
--curses.mo-libs := $(CURSES_LIBS) $(ICONV_LIBS)
+-common-obj-$(CONFIG_MACIO) += macio/
 -
--ifeq ($(CONFIG_GIO)$(CONFIG_SPICE),yy)
--common-obj-$(if $(CONFIG_MODULES),m,y) += spice-app.mo
--endif
--spice-app.mo-objs := spice-app.o
--spice-app.mo-cflags := $(GIO_CFLAGS)
--spice-app.mo-libs := $(GIO_LIBS)
+-common-obj-$(CONFIG_IVSHMEM_DEVICE) += ivshmem.o
 -
--common-obj-$(CONFIG_OPENGL) += shader.o
--common-obj-$(CONFIG_OPENGL) += console-gl.o
--common-obj-$(CONFIG_OPENGL) += egl-helpers.o
--common-obj-$(CONFIG_OPENGL) += egl-context.o
--common-obj-$(CONFIG_OPENGL_DMABUF) += egl-headless.o
+-common-obj-$(CONFIG_ALLWINNER_H3) += allwinner-h3-ccu.o
+-obj-$(CONFIG_ALLWINNER_H3) += allwinner-cpucfg.o
+-common-obj-$(CONFIG_ALLWINNER_H3) += allwinner-h3-dramc.o
+-common-obj-$(CONFIG_ALLWINNER_H3) += allwinner-h3-sysctrl.o
+-common-obj-$(CONFIG_ALLWINNER_H3) += allwinner-sid.o
+-common-obj-$(CONFIG_REALVIEW) += arm_sysctl.o
+-common-obj-$(CONFIG_NSERIES) += cbus.o
+-common-obj-$(CONFIG_ECCMEMCTL) += eccmemctl.o
+-common-obj-$(CONFIG_EXYNOS4) += exynos4210_pmu.o exynos4210_clk.o exynos4210_rng.o
+-common-obj-$(CONFIG_IMX) += imx_ccm.o
+-common-obj-$(CONFIG_IMX) += imx31_ccm.o
+-common-obj-$(CONFIG_IMX) += imx25_ccm.o
+-common-obj-$(CONFIG_IMX) += imx6_ccm.o
+-common-obj-$(CONFIG_IMX) += imx6ul_ccm.o
+-obj-$(CONFIG_IMX) += imx6_src.o
+-common-obj-$(CONFIG_IMX) += imx7_ccm.o
+-common-obj-$(CONFIG_IMX) += imx7_snvs.o
+-common-obj-$(CONFIG_IMX) += imx7_gpr.o
+-common-obj-$(CONFIG_IMX) += imx_rngc.o
+-common-obj-$(CONFIG_MILKYMIST) += milkymist-hpdmc.o
+-common-obj-$(CONFIG_MILKYMIST) += milkymist-pfpu.o
+-common-obj-$(CONFIG_MAINSTONE) += mst_fpga.o
+-common-obj-$(CONFIG_OMAP) += omap_clk.o
+-common-obj-$(CONFIG_OMAP) += omap_gpmc.o
+-common-obj-$(CONFIG_OMAP) += omap_l4.o
+-common-obj-$(CONFIG_OMAP) += omap_sdrc.o
+-common-obj-$(CONFIG_OMAP) += omap_tap.o
+-common-obj-$(CONFIG_RASPI) += bcm2835_mbox.o
+-common-obj-$(CONFIG_RASPI) += bcm2835_mphi.o
+-common-obj-$(CONFIG_RASPI) += bcm2835_property.o
+-common-obj-$(CONFIG_RASPI) += bcm2835_rng.o
+-common-obj-$(CONFIG_RASPI) += bcm2835_thermal.o
+-common-obj-$(CONFIG_SLAVIO) += slavio_misc.o
+-common-obj-$(CONFIG_ZYNQ) += zynq_slcr.o
+-common-obj-$(CONFIG_ZYNQ) += zynq-xadc.o
+-common-obj-$(CONFIG_STM32F2XX_SYSCFG) += stm32f2xx_syscfg.o
+-common-obj-$(CONFIG_STM32F4XX_SYSCFG) += stm32f4xx_syscfg.o
+-common-obj-$(CONFIG_STM32F4XX_EXTI) += stm32f4xx_exti.o
+-obj-$(CONFIG_MIPS_CPS) += mips_cmgcr.o
+-obj-$(CONFIG_MIPS_CPS) += mips_cpc.o
+-obj-$(CONFIG_MIPS_ITU) += mips_itu.o
+-common-obj-$(CONFIG_MPS2_FPGAIO) += mps2-fpgaio.o
+-common-obj-$(CONFIG_MPS2_SCC) += mps2-scc.o
 -
--shader.o-libs += $(OPENGL_LIBS)
--console-gl.o-libs += $(OPENGL_LIBS)
--egl-helpers.o-libs += $(OPENGL_LIBS)
--egl-context.o-libs += $(OPENGL_LIBS)
--egl-headless.o-libs += $(OPENGL_LIBS)
-diff --git a/ui/meson.build b/ui/meson.build
-index 35da0d8d26..d9c70661cd 100644
---- a/ui/meson.build
-+++ b/ui/meson.build
-@@ -1,3 +1,83 @@
-+softmmu_ss.add(files(
-+  'console.c',
-+  'cursor.c',
-+  'input-keymap.c',
-+  'input-legacy.c',
-+  'input-barrier.c',
-+  'input.c',
-+  'kbd-state.c',
-+  'keymaps.c',
-+  'qemu-pixman.c',
+-common-obj-$(CONFIG_TZ_MPC) += tz-mpc.o
+-common-obj-$(CONFIG_TZ_MSC) += tz-msc.o
+-common-obj-$(CONFIG_TZ_PPC) += tz-ppc.o
+-common-obj-$(CONFIG_IOTKIT_SECCTL) += iotkit-secctl.o
+-obj-$(CONFIG_IOTKIT_SYSCTL) += iotkit-sysctl.o
+-common-obj-$(CONFIG_IOTKIT_SYSINFO) += iotkit-sysinfo.o
+-common-obj-$(CONFIG_ARMSSE_CPUID) += armsse-cpuid.o
+-common-obj-$(CONFIG_ARMSSE_MHU) += armsse-mhu.o
+-
+-common-obj-$(CONFIG_PVPANIC) += pvpanic.o
+-common-obj-$(CONFIG_AUX) += auxbus.o
+-common-obj-$(CONFIG_ASPEED_SOC) += aspeed_xdma.o
+-common-obj-$(CONFIG_ASPEED_SOC) += aspeed_scu.o aspeed_sdmc.o
+-common-obj-$(CONFIG_MSF2) += msf2-sysreg.o
+-common-obj-$(CONFIG_NRF51_SOC) += nrf51_rng.o
+-obj-$(CONFIG_MAC_VIA) += mac_via.o
+-
+-common-obj-$(CONFIG_GRLIB) += grlib_ahb_apb_pnp.o
+-
+-obj-$(CONFIG_AVR_POWER) += avr_power.o
+diff --git a/hw/misc/macio/Makefile.objs b/hw/misc/macio/Makefile.objs
+deleted file mode 100644
+index 07fdb320d4..0000000000
+--- a/hw/misc/macio/Makefile.objs
++++ /dev/null
+@@ -1,5 +0,0 @@
+-common-obj-y += macio.o
+-common-obj-$(CONFIG_CUDA) += cuda.o
+-common-obj-$(CONFIG_MAC_PMU) += pmu.o
+-common-obj-$(CONFIG_MAC_DBDMA) += mac_dbdma.o
+-common-obj-$(CONFIG_MACIO_GPIO) += gpio.o
+diff --git a/hw/misc/macio/meson.build b/hw/misc/macio/meson.build
+new file mode 100644
+index 0000000000..17282da20a
+--- /dev/null
++++ b/hw/misc/macio/meson.build
+@@ -0,0 +1,8 @@
++macio_ss = ss.source_set()
++macio_ss.add(files('macio.c'))
++macio_ss.add(when: 'CONFIG_CUDA', if_true: files('cuda.c'))
++macio_ss.add(when: 'CONFIG_MACIO_GPIO', if_true: files('gpio.c'))
++macio_ss.add(when: 'CONFIG_MAC_DBDMA', if_true: files('mac_dbdma.c'))
++macio_ss.add(when: 'CONFIG_MAC_PMU', if_true: files('pmu.c'))
++
++softmmu_ss.add_all(when: 'CONFIG_MACIO', if_true: macio_ss)
+diff --git a/hw/misc/meson.build b/hw/misc/meson.build
+new file mode 100644
+index 0000000000..84fed0494d
+--- /dev/null
++++ b/hw/misc/meson.build
+@@ -0,0 +1,99 @@
++softmmu_ss.add(when: 'CONFIG_APPLESMC', if_true: files('applesmc.c'))
++softmmu_ss.add(when: 'CONFIG_EDU', if_true: files('edu.c'))
++softmmu_ss.add(when: 'CONFIG_FW_CFG_DMA', if_true: files('vmcoreinfo.c'))
++softmmu_ss.add(when: 'CONFIG_ISA_DEBUG', if_true: files('debugexit.c'))
++softmmu_ss.add(when: 'CONFIG_ISA_TESTDEV', if_true: files('pc-testdev.c'))
++softmmu_ss.add(when: 'CONFIG_MAX111X', if_true: files('max111x.c'))
++softmmu_ss.add(when: 'CONFIG_PCA9552', if_true: files('pca9552.c'))
++softmmu_ss.add(when: 'CONFIG_PCI_TESTDEV', if_true: files('pci-testdev.c'))
++softmmu_ss.add(when: 'CONFIG_SGA', if_true: files('sga.c'))
++softmmu_ss.add(when: 'CONFIG_TMP105', if_true: files('tmp105.c'))
++softmmu_ss.add(when: 'CONFIG_TMP421', if_true: files('tmp421.c'))
++softmmu_ss.add(when: 'CONFIG_UNIMP', if_true: files('unimp.c'))
++softmmu_ss.add(when: 'CONFIG_EMPTY_SLOT', if_true: files('empty_slot.c'))
++
++# ARM devices
++softmmu_ss.add(when: 'CONFIG_PL310', if_true: files('arm_l2x0.c'))
++softmmu_ss.add(when: 'CONFIG_INTEGRATOR_DEBUG', if_true: files('arm_integrator_debug.c'))
++softmmu_ss.add(when: 'CONFIG_A9SCU', if_true: files('a9scu.c'))
++softmmu_ss.add(when: 'CONFIG_ARM11SCU', if_true: files('arm11scu.c'))
++
++# Mac devices
++softmmu_ss.add(when: 'CONFIG_MOS6522', if_true: files('mos6522.c'))
++
++# PKUnity SoC devices
++softmmu_ss.add(when: 'CONFIG_PUV3', if_true: files('puv3_pm.c'))
++
++subdir('macio')
++
++softmmu_ss.add(when: 'CONFIG_IVSHMEM_DEVICE', if_true: files('ivshmem.c'))
++
++softmmu_ss.add(when: 'CONFIG_ALLWINNER_H3', if_true: files('allwinner-h3-ccu.c'))
++specific_ss.add(when: 'CONFIG_ALLWINNER_H3', if_true: files('allwinner-cpucfg.c'))
++softmmu_ss.add(when: 'CONFIG_ALLWINNER_H3', if_true: files('allwinner-h3-dramc.c'))
++softmmu_ss.add(when: 'CONFIG_ALLWINNER_H3', if_true: files('allwinner-h3-sysctrl.c'))
++softmmu_ss.add(when: 'CONFIG_ALLWINNER_H3', if_true: files('allwinner-sid.c'))
++softmmu_ss.add(when: 'CONFIG_REALVIEW', if_true: files('arm_sysctl.c'))
++softmmu_ss.add(when: 'CONFIG_NSERIES', if_true: files('cbus.c'))
++softmmu_ss.add(when: 'CONFIG_ECCMEMCTL', if_true: files('eccmemctl.c'))
++softmmu_ss.add(when: 'CONFIG_EXYNOS4', if_true: files('exynos4210_pmu.c', 'exynos4210_clk.c', 'exynos4210_rng.c'))
++softmmu_ss.add(when: 'CONFIG_IMX', if_true: files(
++  'imx25_ccm.c',
++  'imx31_ccm.c',
++  'imx6_ccm.c',
++  'imx6ul_ccm.c',
++  'imx7_ccm.c',
++  'imx7_gpr.c',
++  'imx7_snvs.c',
++  'imx_ccm.c',
++  'imx_rngc.c',
 +))
-+softmmu_ss.add(pixman)
-+
-+softmmu_ss.add(when: 'CONFIG_LINUX', if_true: files('input-linux.c'))
-+softmmu_ss.add(when: 'CONFIG_SPICE', if_true: files('spice-core.c', 'spice-input.c', 'spice-display.c'))
-+softmmu_ss.add(when: [cocoa, 'CONFIG_COCOA'], if_true: files('cocoa.m'))
-+
-+vnc_ss = ss.source_set()
-+vnc_ss.add(files(
-+  'vnc.c',
-+  'vnc-enc-zlib.c',
-+  'vnc-enc-hextile.c',
-+  'vnc-enc-tight.c',
-+  'vnc-palette.c',
-+  'vnc-enc-zrle.c',
-+  'vnc-auth-vencrypt.c',
-+  'vnc-ws.c',
-+  'vnc-jobs.c',
++softmmu_ss.add(when: 'CONFIG_MILKYMIST', if_true: files('milkymist-hpdmc.c', 'milkymist-pfpu.c'))
++softmmu_ss.add(when: 'CONFIG_MAINSTONE', if_true: files('mst_fpga.c'))
++softmmu_ss.add(when: 'CONFIG_OMAP', if_true: files(
++  'omap_clk.c',
++  'omap_gpmc.c',
++  'omap_l4.c',
++  'omap_sdrc.c',
++  'omap_tap.c',
 +))
-+vnc_ss.add(zlib)
-+vnc_ss.add(when: 'CONFIG_VNC_SASL', if_true: [files('vnc-auth-sasl.c'), sasl])
-+softmmu_ss.add_all(when: 'CONFIG_VNC', if_true: vnc_ss)
-+softmmu_ss.add(when: 'CONFIG_VNC', if_false: files('vnc-stubs.c'))
-+softmmu_ss.add(when: [opengl, 'CONFIG_OPENGL'], if_true: files('shader.c', 'console-gl.c', 'egl-helpers.c', 'egl-context.c'))
-+softmmu_ss.add(when: [opengl, 'CONFIG_OPENGL_DMABUF'], if_true: files('egl-headless.c'))
-+softmmu_ss.add(when: 'CONFIG_VNC_PNG', if_true: png)
-+softmmu_ss.add(when: 'CONFIG_VNC_JPEG', if_true: jpeg)
++softmmu_ss.add(when: 'CONFIG_RASPI', if_true: files(
++  'bcm2835_mbox.c',
++  'bcm2835_mphi.c',
++  'bcm2835_property.c',
++  'bcm2835_rng.c',
++  'bcm2835_thermal.c',
++))
++softmmu_ss.add(when: 'CONFIG_SLAVIO', if_true: files('slavio_misc.c'))
++softmmu_ss.add(when: 'CONFIG_ZYNQ', if_true: files('zynq_slcr.c', 'zynq-xadc.c'))
++softmmu_ss.add(when: 'CONFIG_STM32F2XX_SYSCFG', if_true: files('stm32f2xx_syscfg.c'))
++softmmu_ss.add(when: 'CONFIG_STM32F4XX_SYSCFG', if_true: files('stm32f4xx_syscfg.c'))
++softmmu_ss.add(when: 'CONFIG_STM32F4XX_EXTI', if_true: files('stm32f4xx_exti.c'))
++softmmu_ss.add(when: 'CONFIG_MPS2_FPGAIO', if_true: files('mps2-fpgaio.c'))
++softmmu_ss.add(when: 'CONFIG_MPS2_SCC', if_true: files('mps2-scc.c'))
 +
-+ui_modules = []
++softmmu_ss.add(when: 'CONFIG_TZ_MPC', if_true: files('tz-mpc.c'))
++softmmu_ss.add(when: 'CONFIG_TZ_MSC', if_true: files('tz-msc.c'))
++softmmu_ss.add(when: 'CONFIG_TZ_PPC', if_true: files('tz-ppc.c'))
++softmmu_ss.add(when: 'CONFIG_IOTKIT_SECCTL', if_true: files('iotkit-secctl.c'))
++softmmu_ss.add(when: 'CONFIG_IOTKIT_SYSINFO', if_true: files('iotkit-sysinfo.c'))
++softmmu_ss.add(when: 'CONFIG_ARMSSE_CPUID', if_true: files('armsse-cpuid.c'))
++softmmu_ss.add(when: 'CONFIG_ARMSSE_MHU', if_true: files('armsse-mhu.c'))
 +
-+if config_host.has_key('CONFIG_CURSES')
-+  ui_modules += [['curses', files('curses.c'), [curses, iconv]]]
-+endif
++softmmu_ss.add(when: 'CONFIG_PVPANIC', if_true: files('pvpanic.c'))
++softmmu_ss.add(when: 'CONFIG_AUX', if_true: files('auxbus.c'))
++softmmu_ss.add(when: 'CONFIG_ASPEED_SOC', if_true: files('aspeed_scu.c', 'aspeed_sdmc.c', 'aspeed_xdma.c'))
++softmmu_ss.add(when: 'CONFIG_MSF2', if_true: files('msf2-sysreg.c'))
++softmmu_ss.add(when: 'CONFIG_NRF51_SOC', if_true: files('nrf51_rng.c'))
 +
-+if config_host.has_key('CONFIG_GTK') and config_host.has_key('CONFIG_VTE')
-+  softmmu_ss.add(when: 'CONFIG_WIN32', if_true: files('win32-kbd-hook.c'))
++softmmu_ss.add(when: 'CONFIG_GRLIB', if_true: files('grlib_ahb_apb_pnp.c'))
 +
-+  gtk_ss = ss.source_set()
-+  gtk_ss.add(gtk, vte, files('gtk.c'))
-+  gtk_ss.add(when: [x11, 'CONFIG_X11'], if_true: files('x_keymap.c'))
-+  gtk_ss.add(when: [opengl, 'CONFIG_OPENGL'], if_true: files('gtk-egl.c'))
-+  gtk_ss.add(when: [opengl, 'CONFIG_GTK_GL'], if_true: files('gtk-gl-area.c'))
-+  gtk_ss = gtk_ss.apply(config_host, strict: false)
-+  ui_modules += [['gtk', gtk_ss.sources(), gtk_ss.dependencies()]]
-+endif
++specific_ss.add(when: 'CONFIG_AVR_POWER', if_true: files('avr_power.c'))
 +
-+if config_host.has_key('CONFIG_SDL')
-+  softmmu_ss.add(when: 'CONFIG_WIN32', if_true: files('win32-kbd-hook.c'))
++specific_ss.add(when: 'CONFIG_IMX', if_true: files('imx6_src.c'))
++specific_ss.add(when: 'CONFIG_IOTKIT_SYSCTL', if_true: files('iotkit-sysctl.c'))
 +
-+  sdl_ss = ss.source_set()
-+  sdl_ss.add(pixman, glib, files(
-+    'sdl2-2d.c',
-+    'sdl2-input.c',
-+    'sdl2.c',
-+  ))
-+  sdl_ss.add(when: [opengl, 'CONFIG_OPENGL'], if_true: files('sdl2-gl.c'))
-+  sdl_ss.add(when: [x11, 'CONFIG_X11'], if_true: files('x_keymap.c'))
-+  sdl_ss = sdl_ss.apply(config_host, strict: false)
-+  ui_modules += [['sdl', sdl_ss.sources(), sdl_ss.dependencies()]]
-+endif
++specific_ss.add(when: 'CONFIG_MAC_VIA', if_true: files('mac_via.c'))
 +
-+if config_host.has_key('CONFIG_SPICE') and config_host.has_key('CONFIG_GIO')
-+  spice_ss = ss.source_set()
-+  spice_ss.add(spice, gio, files('spice-app.c'))
-+  spice_ss = spice_ss.apply(config_host, strict: false)
-+  ui_modules += [['spice-app', spice_ss.sources(), spice_ss.dependencies()]]
-+endif
-+
-+keymap_gen = find_program('keycodemapdb/tools/keymap-gen')
-+
- keymaps = [
-   ['atset1', 'qcode'],
-   ['linux', 'qcode'],
-@@ -24,7 +104,6 @@ if have_system
-     genh += custom_target(output,
-                   output: output,
-                   capture: true,
--                  build_by_default: true, # to be removed when added to a target
-                   input: files('keycodemapdb/data/keymaps.csv'),
-                   command: [python.full_path(), files('keycodemapdb/tools/keymap-gen'),
-                             '--lang', 'glib2',
-@@ -34,3 +113,5 @@ if have_system
- endif
- 
- subdir('shader')
-+
-+modules += {'ui': ui_modules}
-diff --git a/ui/shader.c b/ui/shader.c
-index d78829f43b..e8b8d321b7 100644
---- a/ui/shader.c
-+++ b/ui/shader.c
-@@ -27,9 +27,9 @@
- #include "qemu/osdep.h"
- #include "ui/shader.h"
- 
--#include "shader/texture-blit-vert.h"
--#include "shader/texture-blit-flip-vert.h"
--#include "shader/texture-blit-frag.h"
-+#include "ui/shader/texture-blit-vert.h"
-+#include "ui/shader/texture-blit-flip-vert.h"
-+#include "ui/shader/texture-blit-frag.h"
- 
- struct QemuGLShader {
-     GLint texture_blit_prog;
++specific_ss.add(when: 'CONFIG_MIPS_CPS', if_true: files('mips_cmgcr.c', 'mips_cpc.c'))
++specific_ss.add(when: 'CONFIG_MIPS_ITU', if_true: files('mips_itu.c'))
 -- 
 2.26.2
 
