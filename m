@@ -2,91 +2,89 @@ Return-Path: <SRS0=5nOY=BY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F4AFC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 09:43:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90663C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 09:43:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 18FA120781
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 09:43:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5422820781
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 09:43:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WbqGrBMp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 18FA120781
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hUt75LuH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5422820781
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45594 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47582 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k6WEx-0007bb-BT
-	for qemu-devel@archiver.kernel.org; Fri, 14 Aug 2020 05:43:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43302)
+	id 1k6WFH-0008PT-FJ
+	for qemu-devel@archiver.kernel.org; Fri, 14 Aug 2020 05:43:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43560)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k6Vn3-00069X-Gl
- for qemu-devel@nongnu.org; Fri, 14 Aug 2020 05:14:21 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:27915
- helo=us-smtp-1.mimecast.com)
+ id 1k6VnH-0006fH-5q
+ for qemu-devel@nongnu.org; Fri, 14 Aug 2020 05:14:35 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:57221
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k6Vmu-0002xH-E3
- for qemu-devel@nongnu.org; Fri, 14 Aug 2020 05:14:21 -0400
+ id 1k6VnD-00031F-PY
+ for qemu-devel@nongnu.org; Fri, 14 Aug 2020 05:14:34 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597396451;
+ s=mimecast20190719; t=1597396471;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ujrPsWDs/IVgad4VBfE5MQdLLqXrF3nkh2Hhr1dHofA=;
- b=WbqGrBMpcuTVikAI689MKZp1jeyImNKfQZxfNPx87NN6AxPYV+pgr1s1DidNbGmdhxyrWd
- R3pUhwLdX9+PZ9IBMxxo8JWbQH5flI3uDjHLB6+oOubEVtnB002+ciq45SbCD7cplsg47H
- +ChDc7Q6vuq4LxlHQyQcpvR1Ommr1OQ=
+ bh=VkUQWk5g868vykQ2y0PljwzQ3kwEQ6vhgr9FhKvcc30=;
+ b=hUt75LuHJ0EQAyYGFtkOmQlaByyNWge+pPwQqutErmZnA9s4bha9iSr3cBg+CyrtzOWq73
+ vgoFE0dd5p3EmTz8N1Gvb0u3ajflAJReli3SS3PolreFlo6jP96B12VR9Lgq0FEFVL/OB4
+ O3QUQYNlSuDcH5hVEempXm+CCzfs6rk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-316-7QNIhIvXOoCAqAKVifJbCQ-1; Fri, 14 Aug 2020 05:14:08 -0400
-X-MC-Unique: 7QNIhIvXOoCAqAKVifJbCQ-1
+ us-mta-257-mlYYhUjbMaOGD1MTU3zJaA-1; Fri, 14 Aug 2020 05:14:29 -0400
+X-MC-Unique: mlYYhUjbMaOGD1MTU3zJaA-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5051285B67D
- for <qemu-devel@nongnu.org>; Fri, 14 Aug 2020 09:14:07 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 59CCD1005E5D
+ for <qemu-devel@nongnu.org>; Fri, 14 Aug 2020 09:14:28 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1DD6069C9D
- for <qemu-devel@nongnu.org>; Fri, 14 Aug 2020 09:14:07 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5141269C9D;
+ Fri, 14 Aug 2020 09:14:24 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 055/150] meson: convert check-qapi-schema
-Date: Fri, 14 Aug 2020 05:11:51 -0400
-Message-Id: <20200814091326.16173-56-pbonzini@redhat.com>
+Subject: [PATCH 080/150] meson: convert net directory to Meson
+Date: Fri, 14 Aug 2020 05:12:16 -0400
+Message-Id: <20200814091326.16173-81-pbonzini@redhat.com>
 In-Reply-To: <20200814091326.16173-1-pbonzini@redhat.com>
 References: <20200814091326.16173-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/14 03:37:30
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/14 05:13:30
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,522 +97,186 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+From: Marc-André Lureau <marcandre.lureau@redhat.com>
+
+Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- tests/Makefile.include        | 218 +-------------------------------
- tests/meson.build             |   2 +
- tests/qapi-schema/meson.build | 225 ++++++++++++++++++++++++++++++++++
- 3 files changed, 229 insertions(+), 216 deletions(-)
- create mode 100644 tests/qapi-schema/meson.build
+ Makefile.objs         |  3 +--
+ Makefile.target       |  1 +
+ meson.build           | 10 ++++++++++
+ net/Makefile.objs     | 32 --------------------------------
+ net/can/Makefile.objs |  2 --
+ net/can/meson.build   |  5 +++++
+ net/meson.build       | 40 ++++++++++++++++++++++++++++++++++++++++
+ 7 files changed, 57 insertions(+), 36 deletions(-)
+ delete mode 100644 net/Makefile.objs
+ delete mode 100644 net/can/Makefile.objs
+ create mode 100644 net/can/meson.build
+ create mode 100644 net/meson.build
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index b3f8fdd321..676d099631 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -161,201 +161,6 @@ check-unit-y += tests/test-qapi-util$(EXESUF)
+diff --git a/Makefile.objs b/Makefile.objs
+index 9d0a82d82a..f2700442a4 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -39,8 +39,7 @@ endif # CONFIG_SOFTMMU or CONFIG_TOOLS
+ # single QEMU executable should support all CPUs and machines.
  
- check-block-$(call land,$(CONFIG_POSIX),$(CONFIG_SOFTMMU)) += tests/check-block.sh
+ ifeq ($(CONFIG_SOFTMMU),y)
+-common-obj-y = net/
+-common-obj-$(CONFIG_LINUX) += fsdev/
++common-obj-$(CONFIG_LINUX) = fsdev/
  
--qapi-schema += alternate-any.json
--qapi-schema += alternate-array.json
--qapi-schema += alternate-base.json
--qapi-schema += alternate-branch-if-invalid.json
--qapi-schema += alternate-clash.json
--qapi-schema += alternate-conflict-dict.json
--qapi-schema += alternate-conflict-enum-bool.json
--qapi-schema += alternate-conflict-enum-int.json
--qapi-schema += alternate-conflict-string.json
--qapi-schema += alternate-conflict-bool-string.json
--qapi-schema += alternate-conflict-num-string.json
--qapi-schema += alternate-empty.json
--qapi-schema += alternate-invalid-dict.json
--qapi-schema += alternate-nested.json
--qapi-schema += alternate-unknown.json
--qapi-schema += args-alternate.json
--qapi-schema += args-any.json
--qapi-schema += args-array-empty.json
--qapi-schema += args-array-unknown.json
--qapi-schema += args-bad-boxed.json
--qapi-schema += args-boxed-anon.json
--qapi-schema += args-boxed-string.json
--qapi-schema += args-int.json
--qapi-schema += args-invalid.json
--qapi-schema += args-member-array-bad.json
--qapi-schema += args-member-case.json
--qapi-schema += args-member-unknown.json
--qapi-schema += args-name-clash.json
--qapi-schema += args-union.json
--qapi-schema += args-unknown.json
--qapi-schema += bad-base.json
--qapi-schema += bad-data.json
--qapi-schema += bad-ident.json
--qapi-schema += bad-if.json
--qapi-schema += bad-if-empty.json
--qapi-schema += bad-if-empty-list.json
--qapi-schema += bad-if-list.json
--qapi-schema += bad-type-bool.json
--qapi-schema += bad-type-dict.json
--qapi-schema += bad-type-int.json
--qapi-schema += base-cycle-direct.json
--qapi-schema += base-cycle-indirect.json
--qapi-schema += command-int.json
--qapi-schema += comments.json
--qapi-schema += doc-bad-alternate-member.json
--qapi-schema += doc-bad-boxed-command-arg.json
--qapi-schema += doc-bad-command-arg.json
--qapi-schema += doc-bad-enum-member.json
--qapi-schema += doc-bad-event-arg.json
--qapi-schema += doc-bad-feature.json
--qapi-schema += doc-bad-section.json
--qapi-schema += doc-bad-symbol.json
--qapi-schema += doc-bad-union-member.json
--qapi-schema += doc-before-include.json
--qapi-schema += doc-before-pragma.json
--qapi-schema += doc-duplicated-arg.json
--qapi-schema += doc-duplicated-return.json
--qapi-schema += doc-duplicated-since.json
--qapi-schema += doc-empty-arg.json
--qapi-schema += doc-empty-section.json
--qapi-schema += doc-empty-symbol.json
--qapi-schema += doc-good.json
--qapi-schema += doc-interleaved-section.json
--qapi-schema += doc-invalid-end.json
--qapi-schema += doc-invalid-end2.json
--qapi-schema += doc-invalid-return.json
--qapi-schema += doc-invalid-section.json
--qapi-schema += doc-invalid-start.json
--qapi-schema += doc-missing-colon.json
--qapi-schema += doc-missing-expr.json
--qapi-schema += doc-missing-space.json
--qapi-schema += doc-missing.json
--qapi-schema += doc-no-symbol.json
--qapi-schema += doc-undoc-feature.json
--qapi-schema += double-type.json
--qapi-schema += duplicate-key.json
--qapi-schema += empty.json
--qapi-schema += enum-bad-member.json
--qapi-schema += enum-bad-name.json
--qapi-schema += enum-bad-prefix.json
--qapi-schema += enum-clash-member.json
--qapi-schema += enum-dict-member-unknown.json
--qapi-schema += enum-if-invalid.json
--qapi-schema += enum-int-member.json
--qapi-schema += enum-member-case.json
--qapi-schema += enum-missing-data.json
--qapi-schema += enum-wrong-data.json
--qapi-schema += event-boxed-empty.json
--qapi-schema += event-case.json
--qapi-schema += event-member-invalid-dict.json
--qapi-schema += event-nest-struct.json
--qapi-schema += features-bad-type.json
--qapi-schema += features-deprecated-type.json
--qapi-schema += features-duplicate-name.json
--qapi-schema += features-if-invalid.json
--qapi-schema += features-missing-name.json
--qapi-schema += features-name-bad-type.json
--qapi-schema += features-no-list.json
--qapi-schema += features-unknown-key.json
--qapi-schema += flat-union-array-branch.json
--qapi-schema += flat-union-bad-base.json
--qapi-schema += flat-union-bad-discriminator.json
--qapi-schema += flat-union-base-any.json
--qapi-schema += flat-union-base-union.json
--qapi-schema += flat-union-clash-member.json
--qapi-schema += flat-union-discriminator-bad-name.json
--qapi-schema += flat-union-empty.json
--qapi-schema += flat-union-inline.json
--qapi-schema += flat-union-inline-invalid-dict.json
--qapi-schema += flat-union-int-branch.json
--qapi-schema += flat-union-invalid-branch-key.json
--qapi-schema += flat-union-invalid-discriminator.json
--qapi-schema += flat-union-invalid-if-discriminator.json
--qapi-schema += flat-union-no-base.json
--qapi-schema += flat-union-optional-discriminator.json
--qapi-schema += flat-union-string-discriminator.json
--qapi-schema += funny-char.json
--qapi-schema += funny-word.json
--qapi-schema += ident-with-escape.json
--qapi-schema += include-before-err.json
--qapi-schema += include-cycle.json
--qapi-schema += include-extra-junk.json
--qapi-schema += include-nested-err.json
--qapi-schema += include-no-file.json
--qapi-schema += include-non-file.json
--qapi-schema += include-repetition.json
--qapi-schema += include-self-cycle.json
--qapi-schema += include-simple.json
--qapi-schema += indented-expr.json
--qapi-schema += leading-comma-list.json
--qapi-schema += leading-comma-object.json
--qapi-schema += missing-colon.json
--qapi-schema += missing-comma-list.json
--qapi-schema += missing-comma-object.json
--qapi-schema += missing-type.json
--qapi-schema += nested-struct-data.json
--qapi-schema += nested-struct-data-invalid-dict.json
--qapi-schema += non-objects.json
--qapi-schema += oob-test.json
--qapi-schema += allow-preconfig-test.json
--qapi-schema += pragma-doc-required-crap.json
--qapi-schema += pragma-extra-junk.json
--qapi-schema += pragma-name-case-whitelist-crap.json
--qapi-schema += pragma-non-dict.json
--qapi-schema += pragma-unknown.json
--qapi-schema += pragma-returns-whitelist-crap.json
--qapi-schema += qapi-schema-test.json
--qapi-schema += quoted-structural-chars.json
--qapi-schema += redefined-builtin.json
--qapi-schema += redefined-command.json
--qapi-schema += redefined-event.json
--qapi-schema += redefined-type.json
--qapi-schema += reserved-command-q.json
--qapi-schema += reserved-enum-q.json
--qapi-schema += reserved-member-has.json
--qapi-schema += reserved-member-q.json
--qapi-schema += reserved-member-u.json
--qapi-schema += reserved-member-underscore.json
--qapi-schema += reserved-type-kind.json
--qapi-schema += reserved-type-list.json
--qapi-schema += returns-alternate.json
--qapi-schema += returns-array-bad.json
--qapi-schema += returns-dict.json
--qapi-schema += returns-unknown.json
--qapi-schema += returns-whitelist.json
--qapi-schema += string-code-point-31.json
--qapi-schema += string-code-point-127.json
--qapi-schema += struct-base-clash-deep.json
--qapi-schema += struct-base-clash.json
--qapi-schema += struct-data-invalid.json
--qapi-schema += struct-member-if-invalid.json
--qapi-schema += struct-member-invalid-dict.json
--qapi-schema += struct-member-invalid.json
--qapi-schema += trailing-comma-list.json
--qapi-schema += trailing-comma-object.json
--qapi-schema += type-bypass-bad-gen.json
--qapi-schema += unclosed-list.json
--qapi-schema += unclosed-object.json
--qapi-schema += unclosed-string.json
--qapi-schema += union-base-empty.json
--qapi-schema += union-base-no-discriminator.json
--qapi-schema += union-branch-case.json
--qapi-schema += union-branch-if-invalid.json
--qapi-schema += union-branch-invalid-dict.json
--qapi-schema += union-clash-branches.json
--qapi-schema += union-empty.json
--qapi-schema += union-invalid-base.json
--qapi-schema += union-optional-branch.json
--qapi-schema += union-unknown.json
--qapi-schema += unknown-escape.json
--qapi-schema += unknown-expr-key.json
--
--
--check-qapi-schema-y := $(addprefix tests/qapi-schema/, $(qapi-schema))
--
- generated-files-y += tests/test-qapi-types.h
- generated-files-y += tests/include/test-qapi-types-sub-module.h
- generated-files-y += tests/test-qapi-types-sub-sub-module.h
-@@ -501,13 +306,6 @@ tests/test-qapi-gen-timestamp: \
- 	@rm -f tests/test-qapi-doc.texi
- 	@>$@
+ common-obj-y += accel/
  
--tests/qapi-schema/doc-good.test.texi: $(SRC_PATH)/tests/qapi-schema/doc-good.json $(qapi-py)
--	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-gen.py \
--		-o tests/qapi-schema -p "doc-good-" $<, \
--		"GEN","$@")
--	@mv tests/qapi-schema/doc-good-qapi-doc.texi $@
--	@rm -f tests/qapi-schema/doc-good-qapi-*.[ch] tests/qapi-schema/doc-good-qmp-*.[ch]
--
- tests/qtest/dbus-vmstate1.h tests/qtest/dbus-vmstate1.c: tests/qtest/dbus-vmstate1-gen-timestamp ;
- tests/qtest/dbus-vmstate1-gen-timestamp: $(SRC_PATH)/tests/qtest/dbus-vmstate1.xml
- 	$(call quiet-command,$(GDBUS_CODEGEN) $< \
-@@ -720,7 +518,6 @@ check-tcg: $(RUN_TCG_TARGET_RULES)
- .PHONY: clean-tcg
- clean-tcg: $(CLEAN_TCG_TARGET_RULES)
- 
--# Other tests
- 
- QEMU_IOTESTS_HELPERS-$(call land,$(CONFIG_SOFTMMU),$(CONFIG_LINUX)) = tests/qemu-iotests/socket_scm_helper$(EXESUF)
- 
-@@ -730,16 +527,6 @@ check-tests/check-block.sh: tests/check-block.sh qemu-img$(EXESUF) \
- 		$(patsubst %,%/all,$(filter %-softmmu,$(TARGET_DIRS)))
- 	@$<
- 
--.PHONY: check-tests/qapi-schema/frontend
--check-tests/qapi-schema/frontend: $(addprefix $(SRC_PATH)/, $(check-qapi-schema-y))
--	$(call quiet-command, PYTHONPATH=$(SRC_PATH)/scripts \
--	  PYTHONIOENCODING=utf-8 $(PYTHON) $(SRC_PATH)/tests/qapi-schema/test-qapi.py $^, \
--	  TEST, check-qapi-schema)
--
--.PHONY: check-tests/qapi-schema/doc-good.texi
--check-tests/qapi-schema/doc-good.texi: tests/qapi-schema/doc-good.test.texi
--	@diff -u $(SRC_PATH)/tests/qapi-schema/doc-good.texi $<
--
- # Python venv for running tests
- 
- .PHONY: check-venv check-acceptance
-@@ -793,15 +580,14 @@ check-acceptance: check-venv $(TESTS_RESULTS_DIR) get-vm-images
- 
- # Consolidated targets
- 
--.PHONY: check-block check-qapi-schema check-qtest check-unit check check-clean get-vm-images
--check-qapi-schema: check-tests/qapi-schema/frontend check-tests/qapi-schema/doc-good.texi
-+.PHONY: check-block check-qtest check-unit check check-clean get-vm-images
- check-qtest: $(patsubst %,check-qtest-%, $(QTEST_TARGETS))
- ifeq ($(CONFIG_TOOLS),y)
- check-block: $(patsubst %,check-%, $(check-block-y))
+diff --git a/Makefile.target b/Makefile.target
+index 4d912df3a3..bf3fda92c1 100644
+--- a/Makefile.target
++++ b/Makefile.target
+@@ -168,6 +168,7 @@ LIBS := $(LIBS) $(GTK_LIBS) $(VTE_LIBS) $(X11_LIBS) $(CURSES_LIBS) $(ICONV_LIBS)
  endif
- check-build: build-unit build-qtest
+ LIBS := $(LIBS) $(BRLAPI_LIBS) $(SDL_LIBS) $(SPICE_LIBS) $(OPENGL_LIBS) $(SECCOMP_LIBS)
+ LIBS := $(LIBS) $(COREAUDIO_LIBS) $(DSOUND_LIBS)
++LIBS := $(LIBS) $(VDE_LIBS) $(SLIRP_LIBS)
  
--check: check-block check-qapi-schema check-unit check-qtest
-+check: check-block check-unit check-qtest
- check-clean:
- 	rm -rf $(check-unit-y) tests/*.o tests/*/*.o $(QEMU_IOTESTS_HELPERS-y)
- 	rm -rf $(sort $(foreach target,$(SYSEMU_TARGET_LIST), $(check-qtest-$(target)-y:%=tests/qtest/%$(EXESUF))) $(check-qtest-generic-y:%=tests/qtest/%$(EXESUF)))
-diff --git a/tests/meson.build b/tests/meson.build
-index ec26f92937..8be9c2233c 100644
---- a/tests/meson.build
-+++ b/tests/meson.build
-@@ -6,3 +6,5 @@ test('decodetree', sh,
- if 'CONFIG_TCG' in config_host
-   subdir('fp')
+ # Hardware support
+ ifeq ($(TARGET_NAME), sparc64)
+diff --git a/meson.build b/meson.build
+index e8e5f6f48a..18d9e97d32 100644
+--- a/meson.build
++++ b/meson.build
+@@ -145,6 +145,15 @@ if 'CONFIG_XKBCOMMON' in config_host
+   xkbcommon = declare_dependency(compile_args: config_host['XKBCOMMON_CFLAGS'].split(),
+                                  link_args: config_host['XKBCOMMON_LIBS'].split())
  endif
-+
-+subdir('qapi-schema')
-diff --git a/tests/qapi-schema/meson.build b/tests/qapi-schema/meson.build
++slirp = not_found
++if config_host.has_key('CONFIG_SLIRP')
++  slirp = declare_dependency(compile_args: config_host['SLIRP_CFLAGS'].split(),
++                             link_args: config_host['SLIRP_LIBS'].split())
++endif
++vde = not_found
++if config_host.has_key('CONFIG_VDE')
++  vde = declare_dependency(link_args: config_host['VDE_LIBS'].split())
++endif
+ pulse = not_found
+ if 'CONFIG_LIBPULSE' in config_host
+   pulse = declare_dependency(compile_args: config_host['PULSE_CFLAGS'].split(),
+@@ -657,6 +666,7 @@ common_ss.add(files('cpus-common.c'))
+ subdir('softmmu')
+ subdir('migration')
+ subdir('monitor')
++subdir('net')
+ subdir('replay')
+ 
+ # needed for fuzzing binaries
+diff --git a/net/Makefile.objs b/net/Makefile.objs
+deleted file mode 100644
+index 5ab45545db..0000000000
+--- a/net/Makefile.objs
++++ /dev/null
+@@ -1,32 +0,0 @@
+-common-obj-y = net.o queue.o checksum.o util.o hub.o
+-common-obj-y += socket.o
+-common-obj-y += dump.o
+-common-obj-y += eth.o
+-common-obj-y += announce.o
+-common-obj-$(CONFIG_L2TPV3) += l2tpv3.o
+-common-obj-$(call land,$(CONFIG_VIRTIO_NET),$(CONFIG_VHOST_NET_USER)) += vhost-user.o
+-common-obj-$(call land,$(call lnot,$(CONFIG_VIRTIO_NET)),$(CONFIG_VHOST_NET_USER)) += vhost-user-stub.o
+-common-obj-$(CONFIG_ALL) += vhost-user-stub.o
+-common-obj-$(CONFIG_SLIRP) += slirp.o
+-slirp.o-cflags := $(SLIRP_CFLAGS)
+-slirp.o-libs := $(SLIRP_LIBS)
+-common-obj-$(CONFIG_VDE) += vde.o
+-common-obj-$(CONFIG_NETMAP) += netmap.o
+-common-obj-y += filter.o
+-common-obj-y += filter-buffer.o
+-common-obj-y += filter-mirror.o
+-common-obj-y += colo-compare.o
+-common-obj-y += colo.o
+-common-obj-y += filter-rewriter.o
+-common-obj-y += filter-replay.o
+-
+-tap-obj-$(CONFIG_LINUX) = tap-linux.o
+-tap-obj-$(CONFIG_BSD) = tap-bsd.o
+-tap-obj-$(CONFIG_SOLARIS) = tap-solaris.o
+-tap-obj-y ?= tap-stub.o
+-common-obj-$(CONFIG_POSIX) += tap.o $(tap-obj-y)
+-common-obj-$(CONFIG_WIN32) += tap-win32.o
+-common-obj-$(CONFIG_VHOST_NET_VDPA) += vhost-vdpa.o
+-vde.o-libs = $(VDE_LIBS)
+-
+-common-obj-$(CONFIG_CAN_BUS) += can/
+diff --git a/net/can/Makefile.objs b/net/can/Makefile.objs
+deleted file mode 100644
+index 9f35dc5c87..0000000000
+--- a/net/can/Makefile.objs
++++ /dev/null
+@@ -1,2 +0,0 @@
+-common-obj-y += can_core.o can_host.o
+-common-obj-$(CONFIG_LINUX) += can_socketcan.o
+diff --git a/net/can/meson.build b/net/can/meson.build
 new file mode 100644
-index 0000000000..c87d141417
+index 0000000000..f53d9ec54f
 --- /dev/null
-+++ b/tests/qapi-schema/meson.build
-@@ -0,0 +1,225 @@
-+test_env = environment()
-+test_env.set('PYTHONPATH', meson.source_root() / 'scripts')
-+test_env.set('PYTHONIOENCODING', 'utf-8')
++++ b/net/can/meson.build
+@@ -0,0 +1,5 @@
++can_ss = ss.source_set()
++can_ss.add(files('can_core.c', 'can_host.c'))
++can_ss.add(when: 'CONFIG_LINUX', if_true: files('can_socketcan.c'))
 +
-+schemas = [
-+  'alternate-any.json',
-+  'alternate-array.json',
-+  'alternate-base.json',
-+  'alternate-branch-if-invalid.json',
-+  'alternate-clash.json',
-+  'alternate-conflict-dict.json',
-+  'alternate-conflict-enum-bool.json',
-+  'alternate-conflict-enum-int.json',
-+  'alternate-conflict-string.json',
-+  'alternate-conflict-bool-string.json',
-+  'alternate-conflict-num-string.json',
-+  'alternate-empty.json',
-+  'alternate-invalid-dict.json',
-+  'alternate-nested.json',
-+  'alternate-unknown.json',
-+  'args-alternate.json',
-+  'args-any.json',
-+  'args-array-empty.json',
-+  'args-array-unknown.json',
-+  'args-bad-boxed.json',
-+  'args-boxed-anon.json',
-+  'args-boxed-string.json',
-+  'args-int.json',
-+  'args-invalid.json',
-+  'args-member-array-bad.json',
-+  'args-member-case.json',
-+  'args-member-unknown.json',
-+  'args-name-clash.json',
-+  'args-union.json',
-+  'args-unknown.json',
-+  'bad-base.json',
-+  'bad-data.json',
-+  'bad-ident.json',
-+  'bad-if.json',
-+  'bad-if-empty.json',
-+  'bad-if-empty-list.json',
-+  'bad-if-list.json',
-+  'bad-type-bool.json',
-+  'bad-type-dict.json',
-+  'bad-type-int.json',
-+  'base-cycle-direct.json',
-+  'base-cycle-indirect.json',
-+  'command-int.json',
-+  'comments.json',
-+  'doc-bad-alternate-member.json',
-+  'doc-bad-boxed-command-arg.json',
-+  'doc-bad-command-arg.json',
-+  'doc-bad-enum-member.json',
-+  'doc-bad-event-arg.json',
-+  'doc-bad-feature.json',
-+  'doc-bad-section.json',
-+  'doc-bad-symbol.json',
-+  'doc-bad-union-member.json',
-+  'doc-before-include.json',
-+  'doc-before-pragma.json',
-+  'doc-duplicated-arg.json',
-+  'doc-duplicated-return.json',
-+  'doc-duplicated-since.json',
-+  'doc-empty-arg.json',
-+  'doc-empty-section.json',
-+  'doc-empty-symbol.json',
-+  'doc-good.json',
-+  'doc-interleaved-section.json',
-+  'doc-invalid-end.json',
-+  'doc-invalid-end2.json',
-+  'doc-invalid-return.json',
-+  'doc-invalid-section.json',
-+  'doc-invalid-start.json',
-+  'doc-missing-colon.json',
-+  'doc-missing-expr.json',
-+  'doc-missing-space.json',
-+  'doc-missing.json',
-+  'doc-no-symbol.json',
-+  'doc-undoc-feature.json',
-+  'double-type.json',
-+  'duplicate-key.json',
-+  'empty.json',
-+  'enum-bad-member.json',
-+  'enum-bad-name.json',
-+  'enum-bad-prefix.json',
-+  'enum-clash-member.json',
-+  'enum-dict-member-unknown.json',
-+  'enum-if-invalid.json',
-+  'enum-int-member.json',
-+  'enum-member-case.json',
-+  'enum-missing-data.json',
-+  'enum-wrong-data.json',
-+  'event-boxed-empty.json',
-+  'event-case.json',
-+  'event-member-invalid-dict.json',
-+  'event-nest-struct.json',
-+  'features-bad-type.json',
-+  'features-deprecated-type.json',
-+  'features-duplicate-name.json',
-+  'features-if-invalid.json',
-+  'features-missing-name.json',
-+  'features-name-bad-type.json',
-+  'features-no-list.json',
-+  'features-unknown-key.json',
-+  'flat-union-array-branch.json',
-+  'flat-union-bad-base.json',
-+  'flat-union-bad-discriminator.json',
-+  'flat-union-base-any.json',
-+  'flat-union-base-union.json',
-+  'flat-union-clash-member.json',
-+  'flat-union-discriminator-bad-name.json',
-+  'flat-union-empty.json',
-+  'flat-union-inline.json',
-+  'flat-union-inline-invalid-dict.json',
-+  'flat-union-int-branch.json',
-+  'flat-union-invalid-branch-key.json',
-+  'flat-union-invalid-discriminator.json',
-+  'flat-union-invalid-if-discriminator.json',
-+  'flat-union-no-base.json',
-+  'flat-union-optional-discriminator.json',
-+  'flat-union-string-discriminator.json',
-+  'funny-char.json',
-+  'funny-word.json',
-+  'ident-with-escape.json',
-+  'include-before-err.json',
-+  'include-cycle.json',
-+  'include-extra-junk.json',
-+  'include-nested-err.json',
-+  'include-no-file.json',
-+  'include-non-file.json',
-+  'include-repetition.json',
-+  'include-self-cycle.json',
-+  'include-simple.json',
-+  'indented-expr.json',
-+  'leading-comma-list.json',
-+  'leading-comma-object.json',
-+  'missing-colon.json',
-+  'missing-comma-list.json',
-+  'missing-comma-object.json',
-+  'missing-type.json',
-+  'nested-struct-data.json',
-+  'nested-struct-data-invalid-dict.json',
-+  'non-objects.json',
-+  'oob-test.json',
-+  'allow-preconfig-test.json',
-+  'pragma-doc-required-crap.json',
-+  'pragma-extra-junk.json',
-+  'pragma-name-case-whitelist-crap.json',
-+  'pragma-non-dict.json',
-+  'pragma-unknown.json',
-+  'pragma-returns-whitelist-crap.json',
-+  'qapi-schema-test.json',
-+  'quoted-structural-chars.json',
-+  'redefined-builtin.json',
-+  'redefined-command.json',
-+  'redefined-event.json',
-+  'redefined-type.json',
-+  'reserved-command-q.json',
-+  'reserved-enum-q.json',
-+  'reserved-member-has.json',
-+  'reserved-member-q.json',
-+  'reserved-member-u.json',
-+  'reserved-member-underscore.json',
-+  'reserved-type-kind.json',
-+  'reserved-type-list.json',
-+  'returns-alternate.json',
-+  'returns-array-bad.json',
-+  'returns-dict.json',
-+  'returns-unknown.json',
-+  'returns-whitelist.json',
-+  'string-code-point-31.json',
-+  'string-code-point-127.json',
-+  'struct-base-clash-deep.json',
-+  'struct-base-clash.json',
-+  'struct-data-invalid.json',
-+  'struct-member-if-invalid.json',
-+  'struct-member-invalid-dict.json',
-+  'struct-member-invalid.json',
-+  'trailing-comma-list.json',
-+  'trailing-comma-object.json',
-+  'type-bypass-bad-gen.json',
-+  'unclosed-list.json',
-+  'unclosed-object.json',
-+  'unclosed-string.json',
-+  'union-base-empty.json',
-+  'union-base-no-discriminator.json',
-+  'union-branch-case.json',
-+  'union-branch-if-invalid.json',
-+  'union-branch-invalid-dict.json',
-+  'union-clash-branches.json',
-+  'union-empty.json',
-+  'union-invalid-base.json',
-+  'union-optional-branch.json',
-+  'union-unknown.json',
-+  'unknown-escape.json',
-+  'unknown-expr-key.json',
-+]
++softmmu_ss.add_all(when: 'CONFIG_CAN_BUS', if_true: can_ss)
+diff --git a/net/meson.build b/net/meson.build
+new file mode 100644
+index 0000000000..6c2ec47dd5
+--- /dev/null
++++ b/net/meson.build
+@@ -0,0 +1,40 @@
++softmmu_ss.add(files(
++  'announce.c',
++  'checksum.c',
++  'colo-compare.c',
++  'colo.c',
++  'dump.c',
++  'eth.c',
++  'filter-buffer.c',
++  'filter-mirror.c',
++  'filter-replay.c',
++  'filter-rewriter.c',
++  'filter.c',
++  'hub.c',
++  'net.c',
++  'queue.c',
++  'socket.c',
++  'util.c',
++))
 +
-+# Because people may want to use test-qapi.py from the command line, we
-+# are not using the "#! /usr/bin/env python3" trick here.  See
-+# docs/devel/build-system.txt
-+test('QAPI schema regression tests', python, args: files('test-qapi.py', schemas),
-+     env: test_env, suite: ['qapi-schema', 'qapi-frontend'])
++softmmu_ss.add(when: 'CONFIG_L2TPV3', if_true: files('l2tpv3.c'))
++softmmu_ss.add(when: ['CONFIG_SLIRP', slirp], if_true: files('slirp.c'))
++softmmu_ss.add(when: ['CONFIG_VDE', vde], if_true: files('vde.c'))
++softmmu_ss.add(when: 'CONFIG_NETMAP', if_true: files('netmap.c'))
++vhost_user_ss = ss.source_set()
++vhost_user_ss.add(when: 'CONFIG_VIRTIO_NET', if_true: files('vhost-user.c'), if_false: files('vhost-user-stub.c'))
++softmmu_ss.add_all(when: 'CONFIG_VHOST_NET_USER', if_true: vhost_user_ss)
++softmmu_ss.add(when: 'CONFIG_ALL', if_true: files('vhost-user-stub.c'))
 +
-+diff = find_program('diff')
++softmmu_ss.add(when: 'CONFIG_LINUX', if_true: files('tap-linux.c'))
++softmmu_ss.add(when: 'CONFIG_BSD', if_true: files('tap-bsd.c'))
++softmmu_ss.add(when: 'CONFIG_SOLARIS', if_true: files('tap-solaris.c'))
++tap_posix = ['tap.c']
++if not config_host.has_key('CONFIG_LINUX') and not config_host.has_key('CONFIG_BSD') and not config_host.has_key('CONFIG_SOLARIS')
++  tap_posix += 'tap-stub.c'
++endif
++softmmu_ss.add(when: 'CONFIG_POSIX', if_true: files(tap_posix))
++softmmu_ss.add(when: 'CONFIG_WIN32', if_true: files('tap-win32.c'))
++softmmu_ss.add(when: 'CONFIG_VHOST_NET_VDPA', if_true: files('vhost-vdpa.c'))
 +
-+qapi_doc = custom_target('QAPI doc',
-+                         output: ['doc-good-qapi-doc.texi',
-+                                  'doc-good-qapi-commands.c', 'doc-good-qapi-commands.h',
-+                                  'doc-good-qapi-emit-events.c', 'doc-good-qapi-emit-events.h',
-+                                  'doc-good-qapi-events.c', 'doc-good-qapi-events.h',
-+                                  'doc-good-qapi-init-commands.c', 'doc-good-qapi-init-commands.h',
-+                                  'doc-good-qapi-introspect.c', 'doc-good-qapi-introspect.h',
-+                                  'doc-good-qapi-types.c', 'doc-good-qapi-types.h',
-+                                  'doc-good-qapi-visit.c', 'doc-good-qapi-visit.h' ],
-+                         input: files('doc-good.json'),
-+                         command: [ qapi_gen, '-o', meson.current_build_dir(),
-+                                    '-p', 'doc-good-', '@INPUT0@' ],
-+                         depend_files: qapi_gen_depends)
-+
-+# "full_path()" needed here to work around
-+# https://github.com/mesonbuild/meson/issues/7585
-+test('QAPI doc', diff, args: ['-u', files('doc-good.texi'), qapi_doc[0].full_path()],
-+     depends: qapi_doc,
-+     suite: ['qapi-schema', 'qapi-doc'])
++subdir('can')
 -- 
 2.26.2
 
