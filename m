@@ -7,72 +7,72 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 010C0C433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 09:38:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C231CC433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 09:39:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C0F16206B2
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 09:38:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8AF52206B2
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 09:39:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HbZHBFPL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0F16206B2
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QdeJU7PB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8AF52206B2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54750 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56824 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k6WAU-0008GD-0d
-	for qemu-devel@archiver.kernel.org; Fri, 14 Aug 2020 05:38:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43048)
+	id 1k6WB0-0000ef-Po
+	for qemu-devel@archiver.kernel.org; Fri, 14 Aug 2020 05:39:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43208)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k6Vmr-0005hO-J7
- for qemu-devel@nongnu.org; Fri, 14 Aug 2020 05:14:09 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:33679
+ id 1k6Vmz-0005zh-H4
+ for qemu-devel@nongnu.org; Fri, 14 Aug 2020 05:14:17 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:52583
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k6Vmm-0002vS-AA
- for qemu-devel@nongnu.org; Fri, 14 Aug 2020 05:14:09 -0400
+ id 1k6Vmt-0002wq-6t
+ for qemu-devel@nongnu.org; Fri, 14 Aug 2020 05:14:17 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597396442;
+ s=mimecast20190719; t=1597396450;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=fTkwEi7CeVUXlW/AI+uj9lJwnOubjAJy/e8tpUThKx4=;
- b=HbZHBFPLg/NecVt1IpImJR9WufbG9gnBQn+jzegOCWJ7HTrQSAcp8qETekI7RAqqxTXRJ1
- ABEy+NXMqkl+arYfS4zCZa0vDu6ZUrIGTfPfRFdR6PEwBh0DD3J+e1ZnyQETzQ8p7eTMsq
- sGpMS6o66iGzJNWJbJqinlZwAkyemjI=
+ bh=xxSrLhzjRzHCrHIHKicXtKR5kR6VR0zB90CYAC8pXLU=;
+ b=QdeJU7PBx91fuCpVn9q0TKWPXkUrMxPUSPqrDkwJyT1sVbgLllRNpcBffTXgLAezI+uJel
+ 3iIp/lYtdt+B31zH1dyU0d6wooQo1c8qg7jfvCTkPskDPsQAtYdoyBFQUYgtfNSp+B3mg0
+ 8Zu0/i2zkbUs3eRk+6ji7WKT93laRgs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-442-3tMXIjqVNq66K3b0WmLLBw-1; Fri, 14 Aug 2020 05:14:00 -0400
-X-MC-Unique: 3tMXIjqVNq66K3b0WmLLBw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-280-fOXdXE2xMCqBJ_3HxoLuww-1; Fri, 14 Aug 2020 05:14:07 -0400
+X-MC-Unique: fOXdXE2xMCqBJ_3HxoLuww-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CB0DC1015DBF
- for <qemu-devel@nongnu.org>; Fri, 14 Aug 2020 09:13:59 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9685B1015DC0
+ for <qemu-devel@nongnu.org>; Fri, 14 Aug 2020 09:14:06 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 85F72100AE5A;
- Fri, 14 Aug 2020 09:13:59 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 642C5600E4
+ for <qemu-devel@nongnu.org>; Fri, 14 Aug 2020 09:14:06 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 048/150] meson: keymap-gen
-Date: Fri, 14 Aug 2020 05:11:44 -0400
-Message-Id: <20200814091326.16173-49-pbonzini@redhat.com>
+Subject: [PATCH 053/150] meson: convert check-decodetree
+Date: Fri, 14 Aug 2020 05:11:49 -0400
+Message-Id: <20200814091326.16173-54-pbonzini@redhat.com>
 In-Reply-To: <20200814091326.16173-1-pbonzini@redhat.com>
 References: <20200814091326.16173-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=205.139.110.61; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
@@ -97,123 +97,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Marc-André Lureau <marcandre.lureau@redhat.com>
-
-Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Makefile       | 38 --------------------------------------
- meson.build    |  1 +
- ui/meson.build | 34 ++++++++++++++++++++++++++++++++++
- 3 files changed, 35 insertions(+), 38 deletions(-)
- create mode 100644 ui/meson.build
+ meson.build            | 2 ++
+ tests/Makefile.include | 8 +-------
+ tests/meson.build      | 4 ++++
+ 3 files changed, 7 insertions(+), 7 deletions(-)
+ create mode 100644 tests/meson.build
 
-diff --git a/Makefile b/Makefile
-index 79abbedd9d..5fbf5e4bbd 100644
---- a/Makefile
-+++ b/Makefile
-@@ -132,44 +132,6 @@ generated-files-y += module_block.h
- 
- generated-files-y += .git-submodule-status
- 
--KEYCODEMAP_GEN = $(SRC_PATH)/ui/keycodemapdb/tools/keymap-gen
--KEYCODEMAP_CSV = $(SRC_PATH)/ui/keycodemapdb/data/keymaps.csv
--
--KEYCODEMAP_FILES = \
--		 ui/input-keymap-atset1-to-qcode.c.inc \
--		 ui/input-keymap-linux-to-qcode.c.inc \
--		 ui/input-keymap-qcode-to-atset1.c.inc \
--		 ui/input-keymap-qcode-to-atset2.c.inc \
--		 ui/input-keymap-qcode-to-atset3.c.inc \
--		 ui/input-keymap-qcode-to-linux.c.inc \
--		 ui/input-keymap-qcode-to-qnum.c.inc \
--		 ui/input-keymap-qcode-to-sun.c.inc \
--		 ui/input-keymap-qnum-to-qcode.c.inc \
--		 ui/input-keymap-usb-to-qcode.c.inc \
--		 ui/input-keymap-win32-to-qcode.c.inc \
--		 ui/input-keymap-x11-to-qcode.c.inc \
--		 ui/input-keymap-xorgevdev-to-qcode.c.inc \
--		 ui/input-keymap-xorgkbd-to-qcode.c.inc \
--		 ui/input-keymap-xorgxquartz-to-qcode.c.inc \
--		 ui/input-keymap-xorgxwin-to-qcode.c.inc \
--		 ui/input-keymap-osx-to-qcode.c.inc \
--		 $(NULL)
--
--generated-files-$(CONFIG_SOFTMMU) += $(KEYCODEMAP_FILES)
--
--ui/input-keymap-%.c.inc: $(KEYCODEMAP_GEN) $(KEYCODEMAP_CSV) $(SRC_PATH)/ui/Makefile.objs
--	$(call quiet-command,\
--	    stem=$* && src=$${stem%-to-*} dst=$${stem#*-to-} && \
--	    test -e $(KEYCODEMAP_GEN) && \
--	    $(PYTHON) $(KEYCODEMAP_GEN) \
--	          --lang glib2 \
--	          --varname qemu_input_map_$${src}_to_$${dst} \
--	          code-map $(KEYCODEMAP_CSV) $${src} $${dst} \
--	        > $@ || rm -f $@, "GEN", "$@")
--
--$(KEYCODEMAP_GEN): .git-submodule-status
--$(KEYCODEMAP_CSV): .git-submodule-status
--
- edk2-decompressed = $(basename $(wildcard pc-bios/edk2-*.fd.bz2))
- pc-bios/edk2-%.fd: pc-bios/edk2-%.fd.bz2
- 	$(call quiet-command,bzip2 -d -c $< > $@,"BUNZIP2",$<)
 diff --git a/meson.build b/meson.build
-index fb2089bc77..01ac61c51f 100644
+index e5617df1b3..b884a4fcb7 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -288,6 +288,7 @@ subdir('trace')
- subdir('util')
- subdir('crypto')
- subdir('storage-daemon')
-+subdir('ui')
+@@ -6,6 +6,7 @@ not_found = dependency('', required: false)
+ keyval = import('unstable-keyval')
+ ss = import('sourceset')
  
- # Build targets from sourcesets
++sh = find_program('sh')
+ cc = meson.get_compiler('c')
+ config_host = keyval.load(meson.current_build_dir() / 'config-host.mak')
  
-diff --git a/ui/meson.build b/ui/meson.build
+@@ -380,6 +381,7 @@ endif
+ 
+ subdir('tools')
+ subdir('pc-bios')
++subdir('tests')
+ 
+ summary_info = {}
+ summary_info += {'Install prefix':    config_host['prefix']}
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index f277d238fb..8e953a24ee 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -894,13 +894,6 @@ check-tests/qapi-schema/frontend: $(addprefix $(SRC_PATH)/, $(check-qapi-schema-
+ check-tests/qapi-schema/doc-good.texi: tests/qapi-schema/doc-good.test.texi
+ 	@diff -u $(SRC_PATH)/tests/qapi-schema/doc-good.texi $<
+ 
+-.PHONY: check-decodetree
+-check-decodetree:
+-	$(call quiet-command, \
+-	  cd $(SRC_PATH)/tests/decode && \
+-          ./check.sh "$(PYTHON)" "$(SRC_PATH)/scripts/decodetree.py", \
+-          TEST, decodetree.py)
+-
+ # Python venv for running tests
+ 
+ .PHONY: check-venv check-acceptance
+@@ -962,6 +955,7 @@ check-block: $(patsubst %,check-%, $(check-block-y))
+ endif
+ check-build: build-unit build-softfloat build-qtest
+ 
++check: check-block check-qapi-schema check-unit check-softfloat check-qtest
+ check-clean:
+ 	rm -rf $(check-unit-y) tests/*.o tests/*/*.o $(QEMU_IOTESTS_HELPERS-y)
+ 	rm -rf $(sort $(foreach target,$(SYSEMU_TARGET_LIST), $(check-qtest-$(target)-y:%=tests/qtest/%$(EXESUF))) $(check-qtest-generic-y:%=tests/qtest/%$(EXESUF)))
+diff --git a/tests/meson.build b/tests/meson.build
 new file mode 100644
-index 0000000000..a6aa7f2b36
+index 0000000000..5c52021dc9
 --- /dev/null
-+++ b/ui/meson.build
-@@ -0,0 +1,34 @@
-+keymaps = [
-+  ['atset1', 'qcode'],
-+  ['linux', 'qcode'],
-+  ['qcode', 'atset1'],
-+  ['qcode', 'atset2'],
-+  ['qcode', 'atset3'],
-+  ['qcode', 'linux'],
-+  ['qcode', 'qnum'],
-+  ['qcode', 'sun'],
-+  ['qnum', 'qcode'],
-+  ['usb', 'qcode'],
-+  ['win32', 'qcode'],
-+  ['x11', 'qcode'],
-+  ['xorgevdev', 'qcode'],
-+  ['xorgkbd', 'qcode'],
-+  ['xorgxquartz', 'qcode'],
-+  ['xorgxwin', 'qcode'],
-+  ['osx', 'qcode'],
-+]
-+
-+if have_system
-+  foreach e : keymaps
-+    output = 'input-keymap-@0@-to-@1@.c.inc'.format(e[0], e[1])
-+    genh += custom_target(output,
-+                  output: output,
-+                  capture: true,
-+                  build_by_default: true, # to be removed when added to a target
-+                  input: files('keycodemapdb/data/keymaps.csv'),
-+                  command: [python.full_path(), files('keycodemapdb/tools/keymap-gen'),
-+                            '--lang', 'glib2',
-+                            '--varname', 'qemu_input_map_@0@_to_@1@'.format(e[0], e[1]),
-+                            'code-map', '@INPUT0@', e[0], e[1]])
-+  endforeach
-+endif
++++ b/tests/meson.build
+@@ -0,0 +1,4 @@
++test('decodetree', sh,
++     args: [ files('decode/check.sh'), config_host['PYTHON'], files('../scripts/decodetree.py') ],
++     workdir: meson.current_source_dir() / 'decode',
++     suite: 'decodetree')
 -- 
 2.26.2
 
