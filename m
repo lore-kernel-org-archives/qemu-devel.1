@@ -2,97 +2,107 @@ Return-Path: <SRS0=5nOY=BY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9ADC2C433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 17:46:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 820C5C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 17:48:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 62A4820774
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 17:46:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3E1FB20774
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 17:48:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m8mVhbEa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62A4820774
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dravQqvW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E1FB20774
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33470 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35738 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k6dmo-0006TZ-Nj
-	for qemu-devel@archiver.kernel.org; Fri, 14 Aug 2020 13:46:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33316)
+	id 1k6do8-0007Tb-FE
+	for qemu-devel@archiver.kernel.org; Fri, 14 Aug 2020 13:48:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33616)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k6dlw-0005c5-RC
- for qemu-devel@nongnu.org; Fri, 14 Aug 2020 13:45:44 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:35494)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k6dlv-00020b-8t
- for qemu-devel@nongnu.org; Fri, 14 Aug 2020 13:45:44 -0400
-Received: by mail-wm1-x344.google.com with SMTP id 184so8603805wmb.0
- for <qemu-devel@nongnu.org>; Fri, 14 Aug 2020 10:45:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=5Vm6ppg0yaHf0DAZOWFj2MrFEiLfmDaCE6JLlMprIsk=;
- b=m8mVhbEaxhS3gJi1vfU7fJCLvWLh456y55B/qxqkYbwUned/IE+fESW8xFYtx+DYrT
- mQr6IodPPDJQBIpprtfeFRA9I0yccgjExTGX/LhWU+DTW5+Gh5hix5jXsEaTcrcy0wl6
- XeRXRpQmapqjCeJBStbJeF34+hMcV2Ag1Aerj8oV2R4wwtEPErmdNWy98TsTu1JL8TiN
- FYRsds8TR3qlofoUx8safMXgKGi4MLnt6bBv8U2CJN0uD20ZoMFyazE8NdfFYKHYMrNq
- HhSSLClVrogljksCTVnqAPKWDFuVLRGmlwsFmdgL86Yh8LCl5imHzVMdmpRY5JKXmHnQ
- ZKuQ==
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k6dnT-00070n-HD
+ for qemu-devel@nongnu.org; Fri, 14 Aug 2020 13:47:19 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57839
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k6dnR-0002B7-8B
+ for qemu-devel@nongnu.org; Fri, 14 Aug 2020 13:47:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1597427235;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=tsMmE8gwr2pejzqNmws1oqjo2oBd50+Pbl4l9fehsd0=;
+ b=dravQqvWwa9iK7gFZwzFSnQMjWGfRV/rRcvW+qiujCN8Xabiih79C7UECfXIcj08qJ2RDN
+ VnKd1n6uQeo+At1YAVMDv64N3Y5mMmbb5JD8BbzEHhDgMRaSaTI5jeq2U8Wc2xXVl3nV5T
+ ClRM5acO3Pq/n4st+9uzntg+Iqbepo8=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-256-hg3v14HUPKyGFXqfvoosSg-1; Fri, 14 Aug 2020 13:47:13 -0400
+X-MC-Unique: hg3v14HUPKyGFXqfvoosSg-1
+Received: by mail-wr1-f71.google.com with SMTP id 89so3607574wrr.15
+ for <qemu-devel@nongnu.org>; Fri, 14 Aug 2020 10:47:13 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=5Vm6ppg0yaHf0DAZOWFj2MrFEiLfmDaCE6JLlMprIsk=;
- b=ZvIQm+/paaiQZl2N6m50YWHsRY6wR8wvq7cXRx0ZCuqLQupIyHBsDYRo2gTtjyadiD
- RYz/32Ax+PPDAGmvTi2Ggsrsz6Oe8W8dOKsUdsAeU4LqlCLvVzd7K3WeURTXoeHyhJR8
- fFvmpXRLPTUNrVZc/NJJ2BjDtYlL0B6BqZZUJEwjIFWgh59iZtM05DRyCgMcZqiUF4KQ
- UHpQ65+jY29LiC9tOgzcsodL9nGztgyIExQ58Cdq8iy5L/LiQdmR+uMf9AB+3+p05gpi
- 9EO2A92aS1P5rcOVkljL/pbRJUq6fETZGaeDRMTbAL5jz7aFXiH3N1ri+qAzg+ncRj7f
- ImCw==
-X-Gm-Message-State: AOAM533ZRt77wo3tJ49lAwHpZDpOGJ+i4Z6l0oX9x7JcQEuzZLiR+0nQ
- KpvriP3lUNmk5U7hXBwowRo=
-X-Google-Smtp-Source: ABdhPJyUCUy6CRjYNwog/mUebRt1Nn3/Fji5xoTgN/Tqw6yXdeRqNrntY6VJGAo9NAf1KQEgoJxU3w==
-X-Received: by 2002:a1c:9c91:: with SMTP id f139mr3667921wme.134.1597427141946; 
- Fri, 14 Aug 2020 10:45:41 -0700 (PDT)
+ bh=tsMmE8gwr2pejzqNmws1oqjo2oBd50+Pbl4l9fehsd0=;
+ b=J151jDRbYM8UW5DcR2zGY8w/fyOvM25IYWkUQt42qoI3AqvhRf1WGGMQTO4xVLzY6f
+ 8n0cKWQ70oWpwCSHncX/LEjIu8zfIJzVZHAkYbdd9k0kIEShr0DOGeDOlQ3AjpGVbia/
+ BI0O8T3W1rIS8YkgPbehUdaRyhltCW9iAyUEZ2/DLvquROk3kpkkUMs67b8R46FdP//G
+ +fDq/y48dqr0B8qmoyD2/LR4FLN2KZqWASxlcQNhUBtZ4AEwbQZaEwH6e19RbE0F5d7M
+ WjOBMP4LON+DpuunN4TOArATMXjPsJkcXMVQtuDa9TK4axr/7oBf1XEVOQ2gxvehpoxD
+ Gtig==
+X-Gm-Message-State: AOAM532oMWdYtN6ks7JESdJVVGCTOVByOoiD4ZNEPRCd54ue5kCUlIuU
+ /NLhsnefdgccnsz6iYofq5MKrb4xAcrDTDI5lQZZssgH/iX3zZNtcKVldIBvIa2blqEG3eE3HLo
+ EzDM8U4xSeKFfxls=
+X-Received: by 2002:a5d:5151:: with SMTP id u17mr3696103wrt.154.1597427232484; 
+ Fri, 14 Aug 2020 10:47:12 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyKuNaeHT6HokzJqDJw+k7TsouToEO21aO7yqahyG6EI+cjm+sG92GW7GHOd5REibc/VgBiuA==
+X-Received: by 2002:a5d:5151:: with SMTP id u17mr3696092wrt.154.1597427232250; 
+ Fri, 14 Aug 2020 10:47:12 -0700 (PDT)
 Received: from [192.168.1.36] (121.red-81-40-121.staticip.rima-tde.net.
  [81.40.121.121])
- by smtp.gmail.com with ESMTPSA id d21sm16748054wmd.41.2020.08.14.10.45.40
+ by smtp.gmail.com with ESMTPSA id o2sm15440222wmh.5.2020.08.14.10.47.11
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 14 Aug 2020 10:45:41 -0700 (PDT)
-Subject: Re: [PATCH 01/41] pl1110: Rename PL1110 enum
+ Fri, 14 Aug 2020 10:47:11 -0700 (PDT)
+Subject: Re: [PATCH 05/41] aspeed_timer: Fix ASPEED_TIMER macro definition
 To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
 References: <20200813222625.243136-1-ehabkost@redhat.com>
- <20200813222625.243136-2-ehabkost@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <3af41d38-3d5f-bdc3-9624-8848151992ae@amsat.org>
-Date: Fri, 14 Aug 2020 19:45:40 +0200
+ <20200813222625.243136-6-ehabkost@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <4c81cf5a-87e5-514d-92f0-7785f142fe58@redhat.com>
+Date: Fri, 14 Aug 2020 19:47:10 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200813222625.243136-2-ehabkost@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200813222625.243136-6-ehabkost@redhat.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::344;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x344.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/14 13:47:15
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -112,87 +122,30 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 8/14/20 12:25 AM, Eduardo Habkost wrote:
-> The PL1110 enum value name will conflict with the PL1110 type
-> cast checker, when we replace the existing macro with an inline
-> function.  Rename it to PL1110_STOCK.
-
-typo s/PL1110/PL110/ in subject and description.
-
+> The macro definition had an extra semicolon.  This was never
+> noticed because the macro was only being used where it didn't
+> make a difference.
 > 
 > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 > ---
->  hw/display/pl110.c | 12 ++++++------
->  1 file changed, 6 insertions(+), 6 deletions(-)
+>  include/hw/timer/aspeed_timer.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/hw/display/pl110.c b/hw/display/pl110.c
-> index c2991a28d2..4664fde3f2 100644
-> --- a/hw/display/pl110.c
-> +++ b/hw/display/pl110.c
-> @@ -42,7 +42,7 @@ enum pl110_bppmode
->  /* The Versatile/PB uses a slightly modified PL110 controller.  */
->  enum pl110_version
->  {
-> -    PL110,
-> +    PL110_STOCK,
->      PL110_VERSATILE,
->      PL111
-
-For completeness I'd also rename PL111.
-
-What about:
-
- enum pl110_version
- {
-    PL110_VERSION,
-    PL110_VERSATILE_VERSION,
-    PL111_VERSION
- }
-
-?
-
->  };
-> @@ -372,12 +372,12 @@ static uint64_t pl110_read(void *opaque, hwaddr offset,
->      case 5: /* LCDLPBASE */
->          return s->lpbase;
->      case 6: /* LCDIMSC */
-> -        if (s->version != PL110) {
-> +        if (s->version != PL110_STOCK) {
->              return s->cr;
->          }
->          return s->int_mask;
->      case 7: /* LCDControl */
-> -        if (s->version != PL110) {
-> +        if (s->version != PL110_STOCK) {
->              return s->int_mask;
->          }
->          return s->cr;
-> @@ -437,7 +437,7 @@ static void pl110_write(void *opaque, hwaddr offset,
->          s->lpbase = val;
->          break;
->      case 6: /* LCDIMSC */
-> -        if (s->version != PL110) {
-> +        if (s->version != PL110_STOCK) {
->              goto control;
->          }
->      imsc:
-> @@ -445,7 +445,7 @@ static void pl110_write(void *opaque, hwaddr offset,
->          pl110_update(s);
->          break;
->      case 7: /* LCDControl */
-> -        if (s->version != PL110) {
-> +        if (s->version != PL110_STOCK) {
->              goto imsc;
->          }
->      control:
-> @@ -513,7 +513,7 @@ static void pl110_init(Object *obj)
->  {
->      PL110State *s = PL110(obj);
+> diff --git a/include/hw/timer/aspeed_timer.h b/include/hw/timer/aspeed_timer.h
+> index 948329893c..d7c7d8ad28 100644
+> --- a/include/hw/timer/aspeed_timer.h
+> +++ b/include/hw/timer/aspeed_timer.h
+> @@ -26,7 +26,7 @@
+>  #include "hw/misc/aspeed_scu.h"
 >  
-> -    s->version = PL110;
-> +    s->version = PL110_STOCK;
->  }
->  
->  static void pl110_versatile_init(Object *obj)
+>  #define ASPEED_TIMER(obj) \
+> -    OBJECT_CHECK(AspeedTimerCtrlState, (obj), TYPE_ASPEED_TIMER);
+> +    OBJECT_CHECK(AspeedTimerCtrlState, (obj), TYPE_ASPEED_TIMER)
+>  #define TYPE_ASPEED_TIMER "aspeed.timer"
+>  #define TYPE_ASPEED_2400_TIMER TYPE_ASPEED_TIMER "-ast2400"
+>  #define TYPE_ASPEED_2500_TIMER TYPE_ASPEED_TIMER "-ast2500"
 > 
+
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
 
