@@ -2,72 +2,83 @@ Return-Path: <SRS0=5nOY=BY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9B5BC433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 04:25:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA446C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 05:34:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8BC6320885
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 04:25:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8BC6320885
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 9C26A20791
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 05:34:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C26A20791
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52964 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41272 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k6RH9-00074B-Po
-	for qemu-devel@archiver.kernel.org; Fri, 14 Aug 2020 00:25:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37558)
+	id 1k6SME-00024f-SR
+	for qemu-devel@archiver.kernel.org; Fri, 14 Aug 2020 01:34:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47866)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1k6RGX-0006cm-Jd; Fri, 14 Aug 2020 00:24:29 -0400
-Resent-Date: Fri, 14 Aug 2020 00:24:29 -0400
-Resent-Message-Id: <E1k6RGX-0006cm-Jd@lists.gnu.org>
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21783)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1k6RGU-0003eE-O2; Fri, 14 Aug 2020 00:24:29 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1597379036; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=S9nVcHZItZesFwjzTTO3g/thW3muA7jCUfx9kA1Xvf8kbIZ0DPJLFtOwbUbOe3epXwuFTTbi+d10wGW6ycweUMMp/zYUxgfMpp+xqCo4+VN0d/NhLLKlvRgqeiaZI6wsiwhvAW+a4VZeTwV4qCIrGXXR5OGWxtIWCNu2mp2QPXg=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1597379036;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=OEvfY9qtAFo+CEpS0u/Qu/lSFAIbwXlFOiLV3WvRCbo=; 
- b=Uv8Nekjx9KmBhH+gOrPm9Z9suHOjtS5/NaPRPZceCVt6Z4r3DYzhxXQN8ffNP9LZ2GWbpl5ZPO2MorSk7CAGcZ3MitELNWJ4qMlxW+kzmIknkq1QQ+EdVZ51wfmLIIA5VypqY9ylyR/zcsyqP9yR6ntRlp75/RNdTNLNczF+ijs=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 159737903177795.25170292746691;
- Thu, 13 Aug 2020 21:23:51 -0700 (PDT)
-Subject: Re: [PATCH] target/riscv: Fix bug in getting trap cause name for
- trace_riscv_trap
-Message-ID: <159737903042.30514.18022346928129143910@66eaa9a8a123>
-In-Reply-To: <20200814035819.1214-1-jiangyifei@huawei.com>
+ (Exim 4.90_1) (envelope-from <yan.y.zhao@intel.com>)
+ id 1k6SLh-0001eZ-0w
+ for qemu-devel@nongnu.org; Fri, 14 Aug 2020 01:33:53 -0400
+Received: from mga03.intel.com ([134.134.136.65]:34462)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <yan.y.zhao@intel.com>)
+ id 1k6SLd-0002fi-W3
+ for qemu-devel@nongnu.org; Fri, 14 Aug 2020 01:33:52 -0400
+IronPort-SDR: CrRiXL5pNT7p+CEdQYeo6CqP2cUBFaIdXMzovgI0ik24CF9kblzHFuB1/jzRJoWcdK7kSIALTA
+ oTjjOYrwEuvg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9712"; a="154323690"
+X-IronPort-AV: E=Sophos;i="5.76,311,1592895600"; d="scan'208";a="154323690"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+ by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 13 Aug 2020 22:33:42 -0700
+IronPort-SDR: 17ObhB5L4p5rZsodtaj4w23ZImAhmDiWJogmKa2wPSRra7i4k7Xor01hjtt9SY9BA0hx1EzUd4
+ hSz/jzm8mpvw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.76,311,1592895600"; d="scan'208";a="325623341"
+Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
+ ([10.239.13.16])
+ by orsmga008.jf.intel.com with ESMTP; 13 Aug 2020 22:33:36 -0700
+Date: Fri, 14 Aug 2020 13:16:01 +0800
+From: Yan Zhao <yan.y.zhao@intel.com>
+To: Jason Wang <jasowang@redhat.com>
+Subject: Re: device compatibility interface for live migration with assigned
+ devices
+Message-ID: <20200814051601.GD15344@joy-OptiPlex-7040>
+References: <20200804183503.39f56516.cohuck@redhat.com>
+ <c178a0d3-269d-1620-22b1-9010f602d8ff@redhat.com>
+ <20200805021654.GB30485@joy-OptiPlex-7040>
+ <2624b12f-3788-7e2b-2cb7-93534960bcb7@redhat.com>
+ <20200805075647.GB2177@nanopsycho>
+ <eb1d01c2-fbad-36b6-10cf-9e03483a736b@redhat.com>
+ <20200805093338.GC30485@joy-OptiPlex-7040>
+ <20200805105319.GF2177@nanopsycho>
+ <20200810074631.GA29059@joy-OptiPlex-7040>
+ <e6e75807-0614-bd75-aeb6-64d643e029d3@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: jiangyifei@huawei.com
-Date: Thu, 13 Aug 2020 21:23:51 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o57.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/14 00:24:23
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <e6e75807-0614-bd75-aeb6-64d643e029d3@redhat.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+Received-SPF: pass client-ip=134.134.136.65; envelope-from=yan.y.zhao@intel.com;
+ helo=mga03.intel.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/14 01:33:42
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -68
+X-Spam_score: -6.9
+X-Spam_bar: ------
+X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_HI=-5,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -80,50 +91,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: qemu-riscv@nongnu.org, zhang.zhanghailiang@huawei.com,
- sagark@eecs.berkeley.edu, kbastian@mail.uni-paderborn.de,
- victor.zhangxiaofeng@huawei.com, qemu-devel@nongnu.org, jiangyifei@huawei.com,
- yinyipeng1@huawei.com, Alistair.Francis@wdc.com, palmer@dabbelt.com,
- wu.wubin@huawei.com, dengkai1@huawei.com
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: kvm@vger.kernel.org, libvir-list@redhat.com, qemu-devel@nongnu.org,
+ kwankhede@nvidia.com, eauger@redhat.com, xin-ran.wang@intel.com,
+ corbet@lwn.net, eskultet@redhat.com, openstack-discuss@lists.openstack.org,
+ shaohe.feng@intel.com, kevin.tian@intel.com, Parav Pandit <parav@mellanox.com>,
+ jian-feng.ding@intel.com, dgilbert@redhat.com, zhenyuw@linux.intel.com,
+ hejie.xu@intel.com, bao.yumeng@zte.com.cn,
+ Alex Williamson <alex.williamson@redhat.com>, smooney@redhat.com,
+ intel-gvt-dev@lists.freedesktop.org, berrange@redhat.com,
+ Cornelia Huck <cohuck@redhat.com>, Jiri Pirko <jiri@mellanox.com>,
+ dinechin@redhat.com, devel@ovirt.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDgxNDAzNTgxOS4xMjE0
-LTEtamlhbmd5aWZlaUBodWF3ZWkuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUg
-ZG9ja2VyLXF1aWNrQGNlbnRvczcgYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3Rpbmcg
-Y29tbWFuZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3Rh
-bGxlZCwgeW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFND
-UklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKbWFrZSBkb2NrZXItaW1hZ2UtY2VudG9zNyBWPTEg
-TkVUV09SSz0xCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1xdWlja0BjZW50b3M3IFNIT1dfRU5WPTEg
-Sj0xNCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCiAgVEVTVCAgICBjaGVjay11
-bml0OiB0ZXN0cy90ZXN0LWNoYXIKVW5leHBlY3RlZCBlcnJvciBpbiBvYmplY3RfcHJvcGVydHlf
-dHJ5X2FkZCgpIGF0IC90bXAvcWVtdS10ZXN0L3NyYy9xb20vb2JqZWN0LmM6MTE4MToKYXR0ZW1w
-dCB0byBhZGQgZHVwbGljYXRlIHByb3BlcnR5ICdzZXJpYWwtaWQnIHRvIG9iamVjdCAodHlwZSAn
-Y29udGFpbmVyJykKRVJST1IgdGVzdC1jaGFyIC0gdG9vIGZldyB0ZXN0cyBydW4gKGV4cGVjdGVk
-IDM4LCBnb3QgOSkKbWFrZTogKioqIFtjaGVjay11bml0XSBFcnJvciAxCm1ha2U6ICoqKiBXYWl0
-aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4uCiAgVEVTVCAgICBpb3Rlc3QtcWNvdzI6IDAyOQog
-IFRFU1QgICAgY2hlY2stcXRlc3QteDg2XzY0OiB0ZXN0cy9xdGVzdC9oZC1nZW8tdGVzdAotLS0K
-ICAgIHJhaXNlIENhbGxlZFByb2Nlc3NFcnJvcihyZXRjb2RlLCBjbWQpCnN1YnByb2Nlc3MuQ2Fs
-bGVkUHJvY2Vzc0Vycm9yOiBDb21tYW5kICdbJ3N1ZG8nLCAnLW4nLCAnZG9ja2VyJywgJ3J1bics
-ICctLWxhYmVsJywgJ2NvbS5xZW11Lmluc3RhbmNlLnV1aWQ9ODNlOGJlOTgyZmU4NGY3MzliMzQy
-NDM1ZjMzYjYyZjYnLCAnLXUnLCAnMTAwMycsICctLXNlY3VyaXR5LW9wdCcsICdzZWNjb21wPXVu
-Y29uZmluZWQnLCAnLS1ybScsICctZScsICdUQVJHRVRfTElTVD0nLCAnLWUnLCAnRVhUUkFfQ09O
-RklHVVJFX09QVFM9JywgJy1lJywgJ1Y9JywgJy1lJywgJ0o9MTQnLCAnLWUnLCAnREVCVUc9Jywg
-Jy1lJywgJ1NIT1dfRU5WPTEnLCAnLWUnLCAnQ0NBQ0hFX0RJUj0vdmFyL3RtcC9jY2FjaGUnLCAn
-LXYnLCAnL2hvbWUvcGF0Y2hldzIvLmNhY2hlL3FlbXUtZG9ja2VyLWNjYWNoZTovdmFyL3RtcC9j
-Y2FjaGU6eicsICctdicsICcvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtYnJ4a29sNTMvc3Jj
-L2RvY2tlci1zcmMuMjAyMC0wOC0xNC0wMC4xMC4zNi42MTUyOi92YXIvdG1wL3FlbXU6eixybycs
-ICdxZW11L2NlbnRvczcnLCAnL3Zhci90bXAvcWVtdS9ydW4nLCAndGVzdC1xdWljayddJyByZXR1
-cm5lZCBub24temVybyBleGl0IHN0YXR1cyAyLgpmaWx0ZXI9LS1maWx0ZXI9bGFiZWw9Y29tLnFl
-bXUuaW5zdGFuY2UudXVpZD04M2U4YmU5ODJmZTg0ZjczOWIzNDI0MzVmMzNiNjJmNgptYWtlWzFd
-OiAqKiogW2RvY2tlci1ydW5dIEVycm9yIDEKbWFrZVsxXTogTGVhdmluZyBkaXJlY3RvcnkgYC92
-YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC1icnhrb2w1My9zcmMnCm1ha2U6ICoqKiBbZG9ja2Vy
-LXJ1bi10ZXN0LXF1aWNrQGNlbnRvczddIEVycm9yIDIKCnJlYWwgICAgMTNtMTUuMDU4cwp1c2Vy
-ICAgIDBtOC40MDlzCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hl
-dy5vcmcvbG9ncy8yMDIwMDgxNDAzNTgxOS4xMjE0LTEtamlhbmd5aWZlaUBodWF3ZWkuY29tL3Rl
-c3RpbmcuZG9ja2VyLXF1aWNrQGNlbnRvczcvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVy
-YXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxl
-YXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On Thu, Aug 13, 2020 at 12:24:50PM +0800, Jason Wang wrote:
+> 
+> On 2020/8/10 下午3:46, Yan Zhao wrote:
+> > > driver is it handled by?
+> > It looks that the devlink is for network device specific, and in
+> > devlink.h, it says
+> > include/uapi/linux/devlink.h - Network physical device Netlink
+> > interface,
+> 
+> 
+> Actually not, I think there used to have some discussion last year and the
+> conclusion is to remove this comment.
+> 
+> It supports IB and probably vDPA in the future.
+>
+hmm... sorry, I didn't find the referred discussion. only below discussion
+regarding to why to add devlink.
+
+https://www.mail-archive.com/netdev@vger.kernel.org/msg95801.html
+	>This doesn't seem to be too much related to networking? Why can't something
+	>like this be in sysfs?
+	
+	It is related to networking quite bit. There has been couple of
+	iteration of this, including sysfs and configfs implementations. There
+	has been a consensus reached that this should be done by netlink. I
+	believe netlink is really the best for this purpose. Sysfs is not a good
+	idea
+
+https://www.mail-archive.com/netdev@vger.kernel.org/msg96102.html
+	>there is already a way to change eth/ib via
+	>echo 'eth' > /sys/bus/pci/drivers/mlx4_core/0000:02:00.0/mlx4_port1
+	>
+	>sounds like this is another way to achieve the same?
+	
+	It is. However the current way is driver-specific, not correct.
+	For mlx5, we need the same, it cannot be done in this way. Do devlink is
+	the correct way to go.
+
+https://lwn.net/Articles/674867/
+	There a is need for some userspace API that would allow to expose things
+	that are not directly related to any device class like net_device of
+	ib_device, but rather chip-wide/switch-ASIC-wide stuff.
+
+	Use cases:
+	1) get/set of port type (Ethernet/InfiniBand)
+	2) monitoring of hardware messages to and from chip
+	3) setting up port splitters - split port into multiple ones and squash again,
+	   enables usage of splitter cable
+	4) setting up shared buffers - shared among multiple ports within one chip
+
+
+
+we actually can also retrieve the same information through sysfs, .e.g
+
+|- [path to device]
+  |--- migration
+  |     |--- self
+  |     |   |---device_api
+  |	|   |---mdev_type
+  |	|   |---software_version
+  |	|   |---device_id
+  |	|   |---aggregator
+  |     |--- compatible
+  |     |   |---device_api
+  |	|   |---mdev_type
+  |	|   |---software_version
+  |	|   |---device_id
+  |	|   |---aggregator
+
+
+
+> 
+> >   I feel like it's not very appropriate for a GPU driver to use
+> > this interface. Is that right?
+> 
+> 
+> I think not though most of the users are switch or ethernet devices. It
+> doesn't prevent you from inventing new abstractions.
+so need to patch devlink core and the userspace devlink tool?
+e.g. devlink migration
+
+> Note that devlink is based on netlink, netlink has been widely used by
+> various subsystems other than networking.
+
+the advantage of netlink I see is that it can monitor device status and
+notify upper layer that migration database needs to get updated.
+But not sure whether openstack would like to use this capability.
+As Sean said, it's heavy for openstack. it's heavy for vendor driver
+as well :)
+
+And devlink monitor now listens the notification and dumps the state
+changes. If we want to use it, need to let it forward the notification
+and dumped info to openstack, right?
+
+Thanks
+Yan
 
