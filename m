@@ -2,68 +2,71 @@ Return-Path: <SRS0=5nOY=BY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7500DC433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 14:59:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53DAEC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 15:05:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 438E220855
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 14:59:30 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="ddMVjsFI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 438E220855
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2B0FD20774
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 15:05:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B0FD20774
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60212 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38792 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k6bB3-0007Kg-GF
-	for qemu-devel@archiver.kernel.org; Fri, 14 Aug 2020 10:59:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44588)
+	id 1k6bGY-00026L-Ez
+	for qemu-devel@archiver.kernel.org; Fri, 14 Aug 2020 11:05:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45974)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berto@igalia.com>)
- id 1k6bA3-0006NZ-Nj; Fri, 14 Aug 2020 10:58:27 -0400
-Received: from fanzine.igalia.com ([178.60.130.6]:42760)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <berto@igalia.com>)
- id 1k6bA0-0003v6-Bi; Fri, 14 Aug 2020 10:58:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
- s=20170329; 
- h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From;
- bh=ovdgE73f1ipNwRiFdggQarMim1KeTu5FasgyhunEZfM=; 
- b=ddMVjsFIPF73AHBoBDf0qFEcfELyXbyO0SNs0lrFxvHmvmMqcVvRFQXEPxtElAkO7zyz5jL9HSIu2bvn5kYl4bTomm1YG9aPgkrO2/nUCTCDBL9BeK7HpX+Jfz+NFp0wn5BcZdWrEOSqImQAXlSkoMOYHcHg/UbR5UmWd4kgnEGUQw0Bs/Py1IBrPKsfAI2T4QYDEvrBr1t7mVQCChOLSV4QvU+SPdwhrI+/4QSdNUuPqtrnqZwAls3Cf8KjIQAz/2EP2K5Tcag+bKh92tKfpaa6gbIW8AEMC40mHFouVh8K/7XUsfSlYR6LNEAXoia5dm8qmxlk9lQea7oU6ZPbVA==;
-Received: from [81.0.33.30] (helo=perseus.local)
- by fanzine.igalia.com with esmtpsa 
- (Cipher TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim)
- id 1k6b9b-00038c-D1; Fri, 14 Aug 2020 16:57:59 +0200
-Received: from berto by perseus.local with local (Exim 4.92)
- (envelope-from <berto@igalia.com>)
- id 1k6b9O-00039c-Ju; Fri, 14 Aug 2020 16:57:46 +0200
-From: Alberto Garcia <berto@igalia.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 1/1] qcow2: Skip copy-on-write when allocating a zero cluster
-Date: Fri, 14 Aug 2020 16:57:41 +0200
-Message-Id: <8d0ca4de285ec56fa24ea43b8763f305816a0acc.1597416317.git.berto@igalia.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <cover.1597416317.git.berto@igalia.com>
-References: <cover.1597416317.git.berto@igalia.com>
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>)
+ id 1k6bFg-00015I-Hp; Fri, 14 Aug 2020 11:04:16 -0400
+Received: from smtpout1.mo804.mail-out.ovh.net ([79.137.123.220]:59065)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>)
+ id 1k6bFe-0004ic-Fh; Fri, 14 Aug 2020 11:04:16 -0400
+Received: from mxplan5.mail.ovh.net (unknown [10.108.20.149])
+ by mo804.mail-out.ovh.net (Postfix) with ESMTPS id 294A1572BC00;
+ Fri, 14 Aug 2020 17:04:01 +0200 (CEST)
+Received: from kaod.org (37.59.142.97) by DAG4EX1.mxp5.local (172.16.2.31)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1979.3; Fri, 14 Aug
+ 2020 17:04:00 +0200
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-97G00115a63b35-ec6f-4d0c-9884-f6fc30d70b31,
+ 373B2072066AFC5654FE77EA66C144DA3E99FD02) smtp.auth=clg@kaod.org
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Subject: [PATCH] spapr/xive: Allocate IPIs from the vCPU contexts
+Date: Fri, 14 Aug 2020 17:03:58 +0200
+Message-ID: <20200814150358.1682513-1-clg@kaod.org>
+X-Mailer: git-send-email 2.25.4
 MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=178.60.130.6; envelope-from=berto@igalia.com;
- helo=fanzine.igalia.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/14 10:57:59
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+X-Originating-IP: [37.59.142.97]
+X-ClientProxiedBy: DAG8EX2.mxp5.local (172.16.2.72) To DAG4EX1.mxp5.local
+ (172.16.2.31)
+X-Ovh-Tracer-GUID: bb78967b-5f56-4fd0-87eb-b0d83842c9a8
+X-Ovh-Tracer-Id: 12096950076797389606
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedrleejgdejkecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhvffufffkofggtgfgihesthekredtredtjeenucfhrhhomhepveorughrihgtucfnvgcuifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeefvdeutddvieekkeeuhfekudejjefggffghfetgfelgfevveefgefhvdegtdelveenucfkpheptddrtddrtddrtddpfeejrdehledrudegvddrleejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepmhigphhlrghnhedrmhgrihhlrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopegtlhhgsehkrghougdrohhrgh
+Received-SPF: pass client-ip=79.137.123.220; envelope-from=clg@kaod.org;
+ helo=smtpout1.mo804.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/14 11:04:02
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -28
+X-Spam_score: -2.9
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -76,220 +79,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
+ qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>,
+ Gustavo Romero <gromero@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Since commit c8bb23cbdbe32f5c326365e0a82e1b0e68cdcd8a when a write
-request results in a new allocation QEMU first tries to see if the
-rest of the cluster outside the written area contains only zeroes.
+When QEMU switches to the XIVE interrupt mode, it performs a
+kvmppc_xive_source_reset() which creates all the guest interrupts at
+the level of the KVM device. These interrupts are backed by real HW
+interrupts from the IPI interrupt pool of the XIVE controller.
 
-In that case, instead of doing a normal copy-on-write operation and
-writing explicit zero buffers to disk, the code zeroes the whole
-cluster efficiently using pwrite_zeroes() with BDRV_REQ_NO_FALLBACK.
+Currently, this is done from the QEMU main thread, which results in
+allocating all interrupts from the chip on which QEMU is running. IPIs
+are not distributed across the system and the load is not well
+balanced across the interrupt controllers.
 
-This improves performance very significantly but it only happens when
-we are writing to an area that was completely unallocated before. Zero
-clusters (QCOW2_CLUSTER_ZERO_*) are treated like normal clusters and
-are therefore slower to allocate.
+Change the vCPU IPI allocation to run from the vCPU context in order
+to allocate the associated XIVE IPI interrupt on the chip on which the
+vCPU is running. This gives a chance to a better distribution of the
+IPIs when the guest has a lot of vCPUs. When the vCPUs are pinned, it
+makes the IPI local to the chip of the vCPU which reduces rerouting
+between interrupt controllers and gives better performance.
 
-This happens because the code uses bdrv_is_allocated_above() rather
-bdrv_block_status_above(). The former is not as accurate for this
-purpose but it is faster. However in the case of qcow2 the underlying
-call does already report zero clusters just fine so there is no reason
-why we cannot use that information.
+This is only possible for running vCPUs. The IPIs of hot plugable
+vCPUs will still be allocated in the context of the QEMU main thread.
 
-After testing 4KB writes on an image that only contains zero clusters
-this patch results in almost five times more IOPS.
+Device interrupts are treated the same. To improve placement, we would
+need some information on the chip owning the virtual source or HW
+source in case of passthrough. This requires changes in PAPR.
 
-Signed-off-by: Alberto Garcia <berto@igalia.com>
+Signed-off-by: Cédric Le Goater <clg@kaod.org>
 ---
- include/block/block.h |  2 +-
- block/commit.c        |  2 +-
- block/io.c            | 20 +++++++++++++++++---
- block/mirror.c        |  3 ++-
- block/qcow2.c         | 26 ++++++++++++++++----------
- block/replication.c   |  2 +-
- block/stream.c        |  2 +-
- qemu-img.c            |  2 +-
- 8 files changed, 40 insertions(+), 19 deletions(-)
+ hw/intc/spapr_xive_kvm.c | 50 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 50 insertions(+)
 
-diff --git a/include/block/block.h b/include/block/block.h
-index 6e36154061..314ce6f425 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -495,7 +495,7 @@ int bdrv_is_allocated(BlockDriverState *bs, int64_t offset, int64_t bytes,
-                       int64_t *pnum);
- int bdrv_is_allocated_above(BlockDriverState *top, BlockDriverState *base,
-                             bool include_base, int64_t offset, int64_t bytes,
--                            int64_t *pnum);
-+                            int64_t *pnum, bool *is_zero);
- 
- bool bdrv_is_read_only(BlockDriverState *bs);
- int bdrv_can_set_read_only(BlockDriverState *bs, bool read_only,
-diff --git a/block/commit.c b/block/commit.c
-index 7732d02dfe..9932a9cf90 100644
---- a/block/commit.c
-+++ b/block/commit.c
-@@ -154,7 +154,7 @@ static int coroutine_fn commit_run(Job *job, Error **errp)
-         }
-         /* Copy if allocated above the base */
-         ret = bdrv_is_allocated_above(blk_bs(s->top), blk_bs(s->base), false,
--                                      offset, COMMIT_BUFFER_SIZE, &n);
-+                                      offset, COMMIT_BUFFER_SIZE, &n, NULL);
-         copy = (ret == 1);
-         trace_commit_one_iteration(s, offset, n, ret);
-         if (copy) {
-diff --git a/block/io.c b/block/io.c
-index ad3a51ed53..4dc92dc933 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -2588,11 +2588,19 @@ int coroutine_fn bdrv_is_allocated(BlockDriverState *bs, int64_t offset,
-  * words, the result is not necessarily the maximum possible range);
-  * but 'pnum' will only be 0 when end of file is reached.
-  *
-+ * If 'is_zero' is not NULL and the range is allocated (i.e. this
-+ * function returns 1) then *is_zero will be updated to indicate if
-+ * the range is known to read back as zeroes (but note however that
-+ * *is_zero == false does not guarantee non-zero data).
-+ * If the range is not allocated then 'is_zero' is ignored and left
-+ * unset.
-+ *
-  */
- int bdrv_is_allocated_above(BlockDriverState *top,
-                             BlockDriverState *base,
-                             bool include_base, int64_t offset,
--                            int64_t bytes, int64_t *pnum)
-+                            int64_t bytes, int64_t *pnum,
-+                            bool *is_zero)
- {
-     BlockDriverState *intermediate;
-     int ret;
-@@ -2606,11 +2614,17 @@ int bdrv_is_allocated_above(BlockDriverState *top,
-         int64_t size_inter;
- 
-         assert(intermediate);
--        ret = bdrv_is_allocated(intermediate, offset, bytes, &pnum_inter);
-+        ret = bdrv_common_block_status_above(intermediate,
-+                                             backing_bs(intermediate),
-+                                             false, offset, bytes,
-+                                             &pnum_inter, NULL, NULL);
-         if (ret < 0) {
-             return ret;
-         }
--        if (ret) {
-+        if (ret & BDRV_BLOCK_ALLOCATED) {
-+            if (is_zero) {
-+                *is_zero = !!(ret & BDRV_BLOCK_ZERO);
-+            }
-             *pnum = pnum_inter;
-             return 1;
-         }
-diff --git a/block/mirror.c b/block/mirror.c
-index e8e8844afc..b42d32ca48 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -837,7 +837,8 @@ static int coroutine_fn mirror_dirty_init(MirrorBlockJob *s)
-             return 0;
-         }
- 
--        ret = bdrv_is_allocated_above(bs, base, false, offset, bytes, &count);
-+        ret = bdrv_is_allocated_above(bs, base, false, offset, bytes, &count,
-+                                      NULL);
-         if (ret < 0) {
-             return ret;
-         }
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 6ad6bdc166..aaf3d5dddf 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -2377,12 +2377,18 @@ static bool merge_cow(uint64_t offset, unsigned bytes,
-     return false;
+diff --git a/hw/intc/spapr_xive_kvm.c b/hw/intc/spapr_xive_kvm.c
+index c6958f2da218..553fd7fd8f56 100644
+--- a/hw/intc/spapr_xive_kvm.c
++++ b/hw/intc/spapr_xive_kvm.c
+@@ -223,6 +223,47 @@ void kvmppc_xive_sync_source(SpaprXive *xive, uint32_t lisn, Error **errp)
+                       NULL, true, errp);
  }
  
--static bool is_unallocated(BlockDriverState *bs, int64_t offset, int64_t bytes)
-+static bool is_unallocated_or_zero(BlockDriverState *bs, int64_t offset,
-+                                   int64_t bytes)
- {
-+    int is_allocated;
-+    bool is_zero;
-     int64_t nr;
--    return !bytes ||
--        (!bdrv_is_allocated_above(bs, NULL, false, offset, bytes, &nr) &&
--         nr == bytes);
-+    if (!bytes) {
-+        return true;
++/*
++ * Allocate the IPIs from the vCPU context. This will allocate the
++ * XIVE IPI interrupt on the chip on which the vCPU is running. This
++ * gives a better distribution of IPIs when the guest has a lot of
++ * vCPUs. When the vCPU are pinned, the IPIs are local which reduces
++ * rerouting between interrupt controllers and gives better
++ * performance.
++ */
++typedef struct {
++    SpaprXive *xive;
++    int ipi;
++    Error *err;
++    int rc;
++} XiveInitIPI;
++
++static void kvmppc_xive_reset_ipi_on_cpu(CPUState *cs, run_on_cpu_data arg)
++{
++    XiveInitIPI *s = arg.host_ptr;
++    uint64_t state = 0;
++
++    s->rc = kvm_device_access(s->xive->fd, KVM_DEV_XIVE_GRP_SOURCE, s->ipi,
++                              &state, true, &s->err);
++}
++
++static int kvmppc_xive_reset_ipi(SpaprXive *xive, int ipi, Error **errp)
++{
++    PowerPCCPU *cpu = spapr_find_cpu(ipi);
++    XiveInitIPI s = {
++        .xive = xive,
++        .ipi  = ipi,
++        .err  = NULL,
++        .rc   = 0,
++    };
++
++    run_on_cpu(CPU(cpu), kvmppc_xive_reset_ipi_on_cpu, RUN_ON_CPU_HOST_PTR(&s));
++    if (s.err) {
++        error_propagate(errp, s.err);
 +    }
-+    is_allocated = bdrv_is_allocated_above(bs, NULL, false, offset, bytes,
-+                                           &nr, &is_zero);
-+    return ((!is_allocated || is_zero) && nr == bytes);
- }
++    return s.rc;
++}
++
+ /*
+  * At reset, the interrupt sources are simply created and MASKED. We
+  * only need to inform the KVM XIVE device about their type: LSI or
+@@ -230,11 +271,20 @@ void kvmppc_xive_sync_source(SpaprXive *xive, uint32_t lisn, Error **errp)
+  */
+ int kvmppc_xive_source_reset_one(XiveSource *xsrc, int srcno, Error **errp)
+ {
++    MachineState *machine = MACHINE(qdev_get_machine());
+     SpaprXive *xive = SPAPR_XIVE(xsrc->xive);
+     uint64_t state = 0;
  
- static bool is_zero_cow(BlockDriverState *bs, QCowL2Meta *m)
-@@ -2390,13 +2396,13 @@ static bool is_zero_cow(BlockDriverState *bs, QCowL2Meta *m)
-     /*
-      * This check is designed for optimization shortcut so it must be
-      * efficient.
--     * Instead of is_zero(), use is_unallocated() as it is faster (but not
--     * as accurate and can result in false negatives).
-+     * Instead of is_zero(), use is_unallocated_or_zero() as it is faster
-+     * (but not as accurate and can result in false negatives).
-      */
--    return is_unallocated(bs, m->offset + m->cow_start.offset,
--                          m->cow_start.nb_bytes) &&
--           is_unallocated(bs, m->offset + m->cow_end.offset,
--                          m->cow_end.nb_bytes);
-+    return is_unallocated_or_zero(bs, m->offset + m->cow_start.offset,
-+                                  m->cow_start.nb_bytes) &&
-+           is_unallocated_or_zero(bs, m->offset + m->cow_end.offset,
-+                                  m->cow_end.nb_bytes);
- }
+     assert(xive->fd != -1);
  
- static int handle_alloc_space(BlockDriverState *bs, QCowL2Meta *l2meta)
-diff --git a/block/replication.c b/block/replication.c
-index 0c70215784..cd3950a13b 100644
---- a/block/replication.c
-+++ b/block/replication.c
-@@ -279,7 +279,7 @@ static coroutine_fn int replication_co_writev(BlockDriverState *bs,
-         ret = bdrv_is_allocated_above(top->bs, base->bs, false,
-                                       sector_num * BDRV_SECTOR_SIZE,
-                                       remaining_sectors * BDRV_SECTOR_SIZE,
--                                      &count);
-+                                      &count, NULL);
-         if (ret < 0) {
-             goto out1;
-         }
-diff --git a/block/stream.c b/block/stream.c
-index 310ccbaa4c..68aa651603 100644
---- a/block/stream.c
-+++ b/block/stream.c
-@@ -157,7 +157,7 @@ static int coroutine_fn stream_run(Job *job, Error **errp)
-             /* Copy if allocated in the intermediate images.  Limit to the
-              * known-unallocated area [offset, offset+n*BDRV_SECTOR_SIZE).  */
-             ret = bdrv_is_allocated_above(backing_bs(bs), s->bottom, true,
--                                          offset, n, &n);
-+                                          offset, n, &n, NULL);
-             /* Finish early if end of backing file has been reached */
-             if (ret == 0 && n == 0) {
-                 n = len - offset;
-diff --git a/qemu-img.c b/qemu-img.c
-index 5308773811..0099e3675d 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -3726,7 +3726,7 @@ static int img_rebase(int argc, char **argv)
-                  * to take action
-                  */
-                 ret = bdrv_is_allocated_above(backing_bs(bs), prefix_chain_bs,
--                                              false, offset, n, &n);
-+                                              false, offset, n, &n, NULL);
-                 if (ret < 0) {
-                     error_report("error while reading image metadata: %s",
-                                  strerror(-ret));
++    /*
++     * IPIs are special. Allocate the IPIs from the vCPU context for
++     * those running. Hotplugged CPUs will the QEMU context.
++     */
++    if (srcno < machine->smp.cpus) {
++        return kvmppc_xive_reset_ipi(xive, srcno, errp);
++    }
++
+     if (xive_source_irq_is_lsi(xsrc, srcno)) {
+         state |= KVM_XIVE_LEVEL_SENSITIVE;
+         if (xsrc->status[srcno] & XIVE_STATUS_ASSERTED) {
 -- 
-2.20.1
+2.25.4
 
 
