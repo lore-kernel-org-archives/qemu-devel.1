@@ -2,88 +2,94 @@ Return-Path: <SRS0=5nOY=BY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B3F5C433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 15:23:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BD6CC433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 15:23:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 94B4D207DA
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 15:23:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2AA01207DA
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 15:23:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sEV/yKY5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 94B4D207DA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="JA71S2Sf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2AA01207DA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35806 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37152 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k6bXx-0000TG-Jl
-	for qemu-devel@archiver.kernel.org; Fri, 14 Aug 2020 11:23:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53030)
+	id 1k6bYA-00012h-Cc
+	for qemu-devel@archiver.kernel.org; Fri, 14 Aug 2020 11:23:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51746)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1k6bRO-0005eY-03; Fri, 14 Aug 2020 11:16:22 -0400
-Received: from mail-il1-x142.google.com ([2607:f8b0:4864:20::142]:46366)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1k6bRM-0008PZ-32; Fri, 14 Aug 2020 11:16:21 -0400
-Received: by mail-il1-x142.google.com with SMTP id c6so8688535ilo.13;
- Fri, 14 Aug 2020 08:16:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=xtt73A/X2cf9b6MoJt/wCCC2aLBtUWrgTkG2A7fVThY=;
- b=sEV/yKY5jwRsO9e8gzS+Lr6CCwqhW5gDQV8UyI4edo10Xvmze2YvC9yFxuq+6IxjMw
- c6kRpBXxaWdE6Gi7arExCOWZpPY5ZUCI5SxJ5hsbVbl4h1TlzfzCChvGK+xWaH+xMdtz
- vW0oBRVuUQOUAiCY0QZPwER4sIOM8p55uc/nrsx6166xHedtDna9Nz71d1SsWCic0uVB
- jnBeqycZWrfSwVZYnPc6R+xIWXUFZII72mSA8STPWT7mRvKw7YxUsdf9pHE7G+tgaR1j
- fzj7co7uAYwoqq7jANztHgubXh5zMbXNCeh0KiNiQgBEJUjiYf46k3Tp/Vh8vG6lMCPu
- hHew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=xtt73A/X2cf9b6MoJt/wCCC2aLBtUWrgTkG2A7fVThY=;
- b=tWmR98Yt6nJIKQmroPfjow2rQJ0dCaiYXiJJlcP9cd8FSS8tvW4/egKx1OazJGCNAj
- T+ZYIsXy8AC+DWMVUp8N9E/zdpAAWBCbFoZkOlqGwLDpe35QVWqrEA5B50kCVmrKBVXT
- vY/W5yyf9ZMYa6k4UOm2WXrtfkePFGeG5RLsMBKcCLwygEEZtvxkd4u9KK4Cjv0/VN83
- jpsvANZsz/LRijCwVE5Bq2Ojla1IhamTXVAYyxRfLLdAwwCZvOd0tCEV2iTqICwJcVSz
- 8J3gOIVGBzth9n3v8mkriZHWd9RNgX72ouWGQ6eHue0/Qz/lxys7mzABSbPvMcRTASwM
- DaAQ==
-X-Gm-Message-State: AOAM531/kgTckAwRbgDoYnrPRuoFpnKJoriix0h+/3f4lOI/E6Pfa1a5
- ujEj9Hyh2LQAIKb6nIRKF2qSVlPUCaadl1vfRYM=
-X-Google-Smtp-Source: ABdhPJwZbYCGfxH5de72bUmxp7hKi84tnBoyvlLeQTOL8qFn2d7gKUaq2i4fMLMBFJVIByyLFUg6jVAD61fbg8eeDD0=
-X-Received: by 2002:a05:6e02:ef3:: with SMTP id
- j19mr3067780ilk.227.1597418177525; 
- Fri, 14 Aug 2020 08:16:17 -0700 (PDT)
+ (Exim 4.90_1)
+ (envelope-from <prvs=4887bfbec=alistair.francis@wdc.com>)
+ id 1k6bQT-0003gx-K5
+ for qemu-devel@nongnu.org; Fri, 14 Aug 2020 11:15:25 -0400
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:55675)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1)
+ (envelope-from <prvs=4887bfbec=alistair.francis@wdc.com>)
+ id 1k6bQR-0007eB-LP
+ for qemu-devel@nongnu.org; Fri, 14 Aug 2020 11:15:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+ t=1597418124; x=1628954124;
+ h=from:to:cc:subject:date:message-id:in-reply-to:
+ references:mime-version:content-transfer-encoding;
+ bh=doNpaViVbQXhUPoI0l7z7b/wPhI0669bus90ugj418U=;
+ b=JA71S2Sfg5XSrMF8Zx36TQHoSe9ewdxGr1D72d4U0NXl6ULiaVTR06PM
+ tHIngkRumKk2g03Coa9AK2GD5EHF0tC9a56CktFTbPka8BDQaP84yVAXo
+ B1yNMuhnoRQyTzjLMYc7MzojY7v77GuAHAd32K+5bkqRHsIcGTF7Uyxa8
+ QSA/7oAJTWmUQ092o1cHacwvXCzXEZ9sUUDK9FlNnP8WQmFi49HNDki9t
+ HCWLHu/3U1Cu/20saB9Wo+r05A0EJwZbRCWUrfUjD8+6HCSMnCWRH18PC
+ L/whG3eBxm+awhTr09nhdy4YEvBIQirkHAgh3HSkSljcy6OhlnvMmWWR/ g==;
+IronPort-SDR: cN3Jn3erD4LUeszbHIRl/RPvhbXpliNEXdCAdW6GES4IewBvi4d/OKjzrjJarnEBnP/cw3P6Iz
+ WlqdtjB2RUt44yU4FqnaT2OpbeR8333/m4A6wOcFVDr/bviIxAz+5r1GNwQizuUumxefSWYYBh
+ pa9ZLSRvSfZ8bLhnELBU3c21rimI5uvpNYaBYes6hp1bvwyRvyuflqfLezadqsOLeI0HPbTtTX
+ KFjZZG/YEduwj5ApXczP7ONDLwS9/BviZPRIS3LGKM+QDLcHcUVXXlIiua16Aw4FX0oRhDmjh/
+ nkY=
+X-IronPort-AV: E=Sophos;i="5.76,312,1592841600"; d="scan'208";a="144994823"
+Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com)
+ ([199.255.45.15])
+ by ob1.hgst.iphmx.com with ESMTP; 14 Aug 2020 23:15:13 +0800
+IronPort-SDR: x0bY89ktMYhivImDWNsdhJwQq6pMlvnnoagng6o/CDRRsKoqz21AEeHVXsatGO9TwMuTNtKVhW
+ gTPUnmI3Cbwg==
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+ by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 14 Aug 2020 08:02:17 -0700
+IronPort-SDR: 1zbXZZS3IsS8qcF72iAlHV1x59O3dNpROH1oEELAPK5GpdFqXBDVFRtpSQBF4GxfJJ5azFKaUa
+ JoSaqcsfufMw==
+WDCIronportException: Internal
+Received: from jbfyk72.ad.shared (HELO risc6-mainframe.hgst.com)
+ ([10.86.59.14])
+ by uls-op-cesaip02.wdc.com with ESMTP; 14 Aug 2020 08:15:12 -0700
+From: Alistair Francis <alistair.francis@wdc.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL v2 06/20] target/riscv: Clean up fmv.w.x
+Date: Fri, 14 Aug 2020 08:04:52 -0700
+Message-Id: <20200814150506.2070566-7-alistair.francis@wdc.com>
+X-Mailer: git-send-email 2.27.0
+In-Reply-To: <20200814150506.2070566-1-alistair.francis@wdc.com>
+References: <20200814150506.2070566-1-alistair.francis@wdc.com>
 MIME-Version: 1.0
-References: <20200814133007.16850-1-f4bug@amsat.org>
-In-Reply-To: <20200814133007.16850-1-f4bug@amsat.org>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Fri, 14 Aug 2020 08:05:48 -0700
-Message-ID: <CAKmqyKPxRQWNSq9N=5d=VhD7Lt=eKds-Fs=3J=-Gz4rRF=0vdw@mail.gmail.com>
-Subject: Re: [PATCH] hw/net/xilinx_axienet: Remove unused code
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::142;
- envelope-from=alistair23@gmail.com; helo=mail-il1-x142.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=216.71.153.144;
+ envelope-from=prvs=4887bfbec=alistair.francis@wdc.com;
+ helo=esa5.hgst.iphmx.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/14 11:15:11
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -43
+X-Spam_score: -4.4
+X-Spam_bar: ----
+X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,78 +102,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- QEMU Trivial <qemu-trivial@nongnu.org>, Jason Wang <jasowang@redhat.com>,
- Alistair Francis <alistair@alistair23.me>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- qemu-arm <qemu-arm@nongnu.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Cc: Alistair Francis <alistair.francis@wdc.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ LIU Zhiwei <zhiwei_liu@c-sky.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Aug 14, 2020 at 6:30 AM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
-g> wrote:
->
-> Most of the MDIOBus fields are unused.  The ADVERTISE_10HALF
-> definition is unused.  Remove unused code.
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Use tcg_gen_extu_tl_i64 to avoid the ifdef.
 
-Alistair
+Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20200626205917.4545-7-zhiwei_liu@c-sky.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20200724002807.441147-7-richard.henderson@linaro.org>
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+---
+ target/riscv/insn_trans/trans_rvf.inc.c | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
 
-> ---
->  hw/net/xilinx_axienet.c | 23 -----------------------
->  1 file changed, 23 deletions(-)
->
-> diff --git a/hw/net/xilinx_axienet.c b/hw/net/xilinx_axienet.c
-> index 1e48eb70c9..2e89f236b4 100644
-> --- a/hw/net/xilinx_axienet.c
-> +++ b/hw/net/xilinx_axienet.c
-> @@ -54,7 +54,6 @@
->       TYPE_XILINX_AXI_ENET_CONTROL_STREAM)
->
->  /* Advertisement control register. */
-> -#define ADVERTISE_10HALF        0x0020  /* Try for 10mbps half-duplex  *=
-/
->  #define ADVERTISE_10FULL        0x0040  /* Try for 10mbps full-duplex  *=
-/
->  #define ADVERTISE_100HALF       0x0080  /* Try for 100mbps half-duplex *=
-/
->  #define ADVERTISE_100FULL       0x0100  /* Try for 100mbps full-duplex *=
-/
-> @@ -169,28 +168,6 @@ tdk_init(struct PHY *phy)
->  }
->
->  struct MDIOBus {
-> -    /* bus.  */
-> -    int mdc;
-> -    int mdio;
-> -
-> -    /* decoder.  */
-> -    enum {
-> -        PREAMBLE,
-> -        SOF,
-> -        OPC,
-> -        ADDR,
-> -        REQ,
-> -        TURNAROUND,
-> -        DATA
-> -    } state;
-> -    unsigned int drive;
-> -
-> -    unsigned int cnt;
-> -    unsigned int addr;
-> -    unsigned int opc;
-> -    unsigned int req;
-> -    unsigned int data;
-> -
->      struct PHY *devs[32];
->  };
->
-> --
-> 2.21.3
->
->
+diff --git a/target/riscv/insn_trans/trans_rvf.inc.c b/target/riscv/insn_trans/trans_rvf.inc.c
+index 832f01db6f..138e317723 100644
+--- a/target/riscv/insn_trans/trans_rvf.inc.c
++++ b/target/riscv/insn_trans/trans_rvf.inc.c
+@@ -406,11 +406,7 @@ static bool trans_fmv_w_x(DisasContext *ctx, arg_fmv_w_x *a)
+     TCGv t0 = tcg_temp_new();
+     gen_get_gpr(t0, a->rs1);
+ 
+-#if defined(TARGET_RISCV64)
+-    tcg_gen_mov_i64(cpu_fpr[a->rd], t0);
+-#else
+-    tcg_gen_extu_i32_i64(cpu_fpr[a->rd], t0);
+-#endif
++    tcg_gen_extu_tl_i64(cpu_fpr[a->rd], t0);
+     gen_nanbox_s(cpu_fpr[a->rd], cpu_fpr[a->rd]);
+ 
+     mark_fs_dirty(ctx);
+-- 
+2.27.0
+
 
