@@ -2,92 +2,88 @@ Return-Path: <SRS0=5nOY=BY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2974AC433E3
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 10:10:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E6C5C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 10:11:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DE48C2074D
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 10:10:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 257392074D
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 10:11:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZKClri5d"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE48C2074D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XI8z6D2J"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 257392074D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40702 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44538 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k6Wfe-0004Zn-2G
-	for qemu-devel@archiver.kernel.org; Fri, 14 Aug 2020 06:10:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46712)
+	id 1k6WgU-0006DB-CE
+	for qemu-devel@archiver.kernel.org; Fri, 14 Aug 2020 06:11:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43790)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k6VwH-0005Nr-4o; Fri, 14 Aug 2020 05:23:53 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:39015)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k6VwF-0004KC-EC; Fri, 14 Aug 2020 05:23:52 -0400
-Received: by mail-wr1-x442.google.com with SMTP id a5so7730745wrm.6;
- Fri, 14 Aug 2020 02:23:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=b3tIdqOLTAFQUjEaio+gozzSgaZAGPhsq/Gr4fWRyyY=;
- b=ZKClri5dHqE26VrbHCuD7MSkbKm7LjSkUBk/svTUZFF69QmoKe2v9c289w1wU5wuEQ
- wfIqdL4V3UJqUU9vI7Ic5UNNNzxUL9Klyx4xqoXvWv42rdjfRqEyWEKdxhTPH+UpqQWt
- X0jbppj3iDy9pnbMwFr8qQPcCH/ngCivOJ/3Egio2PIF8hv9dBQEEz/FmMFIVlt0EnAE
- 6pvu4wVEVcAoco8t/EhPiQhHnsb9Mrs8vewzRO+ekB9YP6AbUZsyDe6CxjCeNT642iux
- aVoUg4rEH5GDsqjedTf/8MeQJfyuRRpCJ6kqTwqnS7ElSwy06xn9YTXTtnqS5SjulpHl
- 0gaA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :mime-version:content-transfer-encoding;
- bh=b3tIdqOLTAFQUjEaio+gozzSgaZAGPhsq/Gr4fWRyyY=;
- b=kNhutieY5YwoFuhULx0wc4r1CsM12DVI8Mk66LhhgS4OV+bGq4iX2BV+x8VCW4BxfE
- 42e30pPrNBvP+SQuvNiS/xiKYM2iq7F2gBjTxOuiSAy3/G50FkgZXYnuSiPRwvA7akhb
- 5n49ILzyCeyyrCR43Ei1yS+alKGgTormFNI9ltuTTrY0SSsTavkyfOCnWpFp3ARmtt+G
- QZ9knxhwX0XGcsc03Y1PL9GL3dPW5WhJCgvNIK2t0EOiUwMRFsD1nyj1oRpWVAuKJb7S
- ++5Wt8ifg0YSeiQ8rbbCcpnSzBRbTW6zGkksNxxzwas7UTOAVEVzHpTlTJ8po4m4Z5CQ
- 9WaA==
-X-Gm-Message-State: AOAM5322ZNJyzj70PShHEDLCIK4YJ0LU2uohFCCPbWNYHsbWSjYpTNhR
- RqZz8n6bWmpTLQOG08trdezB7qNZWAs=
-X-Google-Smtp-Source: ABdhPJzSrk4FUdTFHOYe5gYIiNYcGEHASCMJMBumBfeRuCRfDdu0r5B5tP4wrwHozIsgJL8HLjsHLA==
-X-Received: by 2002:adf:ee06:: with SMTP id y6mr1877950wrn.225.1597397028624; 
- Fri, 14 Aug 2020 02:23:48 -0700 (PDT)
-Received: from localhost.localdomain (121.red-81-40-121.staticip.rima-tde.net.
- [81.40.121.121])
- by smtp.gmail.com with ESMTPSA id b11sm12889395wrq.32.2020.08.14.02.23.47
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 14 Aug 2020 02:23:48 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1k6VnQ-00073f-6X
+ for qemu-devel@nongnu.org; Fri, 14 Aug 2020 05:14:44 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:58115)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1k6VnK-00034E-M2
+ for qemu-devel@nongnu.org; Fri, 14 Aug 2020 05:14:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1597396477;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=zCtt3wfDk2U6pD6XbYja2DKFOXpiv+tulHE30GporkU=;
+ b=XI8z6D2JFndA4i+49KBSj0xC4milP/YVC0IxyuxSCKuPksHDNqie/0zlWUYJfbOLsoySxJ
+ ThggmLdC7L396/ZYmdWyn3zZGP4ymzGMIsvgw3ml2ppHlOGuLR4B/DNP0VKjiK9IrlLo+5
+ mU/kUXYhkB4MNrLOZwQjlPhMRnPyWmU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-490-OIXvaZFGMO20ft75ardDwQ-1; Fri, 14 Aug 2020 05:14:36 -0400
+X-MC-Unique: OIXvaZFGMO20ft75ardDwQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4994A1853DB0
+ for <qemu-devel@nongnu.org>; Fri, 14 Aug 2020 09:14:35 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com
+ (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 085B6600E4;
+ Fri, 14 Aug 2020 09:14:34 +0000 (UTC)
+From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 0/7] hw/sd: Use sdbus_read_data/sdbus_write_data for multiple
- bytes access
-Date: Fri, 14 Aug 2020 11:23:39 +0200
-Message-Id: <20200814092346.21825-1-f4bug@amsat.org>
-X-Mailer: git-send-email 2.21.3
+Subject: [PATCH 096/150] meson: convert hw/timer
+Date: Fri, 14 Aug 2020 05:12:32 -0400
+Message-Id: <20200814091326.16173-97-pbonzini@redhat.com>
+In-Reply-To: <20200814091326.16173-1-pbonzini@redhat.com>
+References: <20200814091326.16173-1-pbonzini@redhat.com>
 MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::442;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x442.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/14 05:13:37
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,57 +96,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-block@nongnu.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Andrew Baumann <Andrew.Baumann@microsoft.com>,
- Beniamino Galvani <b.galvani@gmail.com>, Michael Walle <michael@walle.cc>,
- qemu-arm@nongnu.org
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Introduce sdbus_read_data() and sdbus_write_data() methods to
-access multiple bytes on the data line of a SD bus.
+Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 
-I haven't named then sdbus_access_block() because I expect a
-block to be a power of 2, while there is no such restriction
-on the SD bus (think of SPI).
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ hw/Makefile.objs       |  1 -
+ hw/meson.build         |  1 +
+ hw/timer/Makefile.objs | 41 -----------------------------------------
+ hw/timer/meson.build   | 37 +++++++++++++++++++++++++++++++++++++
+ 4 files changed, 38 insertions(+), 42 deletions(-)
+ delete mode 100644 hw/timer/Makefile.objs
+ create mode 100644 hw/timer/meson.build
 
-We can also simplify the bcm2835_sdhost and pl181 models, but
-it is simpler to first let them use the Fifo32 API.
-
-Based-on: <20200705204630.4133-1-f4bug@amsat.org>
-"hw/sd: convert legacy SDHCI devices to the SDBus API"
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg720136.html
-
-Philippe Mathieu-Daudé (7):
-  hw/sd: Rename read/write_data() as read/write_byte()
-  hw/sd: Rename sdbus_write_data() as sdbus_write_byte()
-  hw/sd: Rename sdbus_read_data() as sdbus_read_byte()
-  hw/sd: Add sdbus_write_data() to write multiples bytes on the data
-    line
-  hw/sd: Use sdbus_write_data() instead of sdbus_write_byte when
-    possible
-  hw/sd: Add sdbus_read_data() to read multiples bytes on the data line
-  hw/sd: Use sdbus_read_data() instead of sdbus_read_byte() when
-    possible
-
- include/hw/sd/sd.h            | 56 ++++++++++++++++++++++++++++++++---
- include/hw/sd/sdcard_legacy.h |  4 +--
- hw/sd/allwinner-sdhost.c      | 24 +++++----------
- hw/sd/bcm2835_sdhost.c        |  4 +--
- hw/sd/core.c                  | 38 +++++++++++++++++++++---
- hw/sd/milkymist-memcard.c     | 14 ++++-----
- hw/sd/omap_mmc.c              |  8 ++---
- hw/sd/pl181.c                 |  4 +--
- hw/sd/pxa2xx_mmci.c           |  4 +--
- hw/sd/sd.c                    | 16 +++++-----
- hw/sd/sdhci.c                 | 46 ++++++++--------------------
- hw/sd/ssi-sd.c                |  2 +-
- 12 files changed, 132 insertions(+), 88 deletions(-)
-
+diff --git a/hw/Makefile.objs b/hw/Makefile.objs
+index f0e5728d13..70ecaa8135 100644
+--- a/hw/Makefile.objs
++++ b/hw/Makefile.objs
+@@ -28,7 +28,6 @@ devices-dirs-y += rtc/
+ devices-dirs-$(CONFIG_SCSI) += scsi/
+ devices-dirs-y += sd/
+ devices-dirs-y += ssi/
+-devices-dirs-y += timer/
+ endif
+ 
+ common-obj-y += $(devices-dirs-y)
+diff --git a/hw/meson.build b/hw/meson.build
+index 2ddf6bad33..50b26db852 100644
+--- a/hw/meson.build
++++ b/hw/meson.build
+@@ -3,6 +3,7 @@ subdir('mem')
+ subdir('nubus')
+ subdir('semihosting')
+ subdir('smbios')
++subdir('timer')
+ subdir('tpm')
+ subdir('usb')
+ subdir('vfio')
+diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
+deleted file mode 100644
+index 1303b13e0d..0000000000
+--- a/hw/timer/Makefile.objs
++++ /dev/null
+@@ -1,41 +0,0 @@
+-common-obj-$(CONFIG_ARM_TIMER) += arm_timer.o
+-common-obj-$(CONFIG_ARM_MPTIMER) += arm_mptimer.o
+-common-obj-$(CONFIG_ARM_V7M) += armv7m_systick.o
+-common-obj-$(CONFIG_A9_GTIMER) += a9gtimer.o
+-common-obj-$(CONFIG_CADENCE) += cadence_ttc.o
+-common-obj-$(CONFIG_HPET) += hpet.o
+-common-obj-$(CONFIG_I8254) += i8254_common.o i8254.o
+-common-obj-$(CONFIG_PUV3) += puv3_ost.o
+-common-obj-$(CONFIG_XILINX) += xilinx_timer.o
+-common-obj-$(CONFIG_SLAVIO) += slavio_timer.o
+-common-obj-$(CONFIG_ETRAXFS) += etraxfs_timer.o
+-common-obj-$(CONFIG_GRLIB) += grlib_gptimer.o
+-common-obj-$(CONFIG_IMX) += imx_epit.o
+-common-obj-$(CONFIG_IMX) += imx_gpt.o
+-common-obj-$(CONFIG_LM32) += lm32_timer.o
+-common-obj-$(CONFIG_MILKYMIST) += milkymist-sysctl.o
+-common-obj-$(CONFIG_NRF51_SOC) += nrf51_timer.o
+-
+-common-obj-$(CONFIG_ALTERA_TIMER) += altera_timer.o
+-common-obj-$(CONFIG_EXYNOS4) += exynos4210_mct.o
+-common-obj-$(CONFIG_EXYNOS4) += exynos4210_pwm.o
+-common-obj-$(CONFIG_OMAP) += omap_gptimer.o
+-common-obj-$(CONFIG_OMAP) += omap_synctimer.o
+-common-obj-$(CONFIG_PXA2XX) += pxa2xx_timer.o
+-common-obj-$(CONFIG_SH4) += sh_timer.o
+-common-obj-$(CONFIG_RENESAS_TMR) += renesas_tmr.o
+-common-obj-$(CONFIG_RENESAS_CMT) += renesas_cmt.o
+-common-obj-$(CONFIG_DIGIC) += digic-timer.o
+-common-obj-$(CONFIG_MIPS_CPS) += mips_gictimer.o
+-
+-common-obj-$(CONFIG_ALLWINNER_A10_PIT) += allwinner-a10-pit.o
+-
+-common-obj-$(CONFIG_STM32F2XX_TIMER) += stm32f2xx_timer.o
+-common-obj-$(CONFIG_ASPEED_SOC) += aspeed_timer.o
+-
+-common-obj-$(CONFIG_CMSDK_APB_TIMER) += cmsdk-apb-timer.o
+-common-obj-$(CONFIG_CMSDK_APB_DUALTIMER) += cmsdk-apb-dualtimer.o
+-common-obj-$(CONFIG_MSF2) += mss-timer.o
+-common-obj-$(CONFIG_RASPI) += bcm2835_systmr.o
+-
+-obj-$(CONFIG_AVR_TIMER16) += avr_timer16.o
+diff --git a/hw/timer/meson.build b/hw/timer/meson.build
+new file mode 100644
+index 0000000000..9f0a267c83
+--- /dev/null
++++ b/hw/timer/meson.build
+@@ -0,0 +1,37 @@
++softmmu_ss.add(when: 'CONFIG_A9_GTIMER', if_true: files('a9gtimer.c'))
++softmmu_ss.add(when: 'CONFIG_ALLWINNER_A10_PIT', if_true: files('allwinner-a10-pit.c'))
++softmmu_ss.add(when: 'CONFIG_ALTERA_TIMER', if_true: files('altera_timer.c'))
++softmmu_ss.add(when: 'CONFIG_ARM_MPTIMER', if_true: files('arm_mptimer.c'))
++softmmu_ss.add(when: 'CONFIG_ARM_TIMER', if_true: files('arm_timer.c'))
++softmmu_ss.add(when: 'CONFIG_ARM_V7M', if_true: files('armv7m_systick.c'))
++softmmu_ss.add(when: 'CONFIG_ASPEED_SOC', if_true: files('aspeed_timer.c'))
++softmmu_ss.add(when: 'CONFIG_CADENCE', if_true: files('cadence_ttc.c'))
++softmmu_ss.add(when: 'CONFIG_CMSDK_APB_DUALTIMER', if_true: files('cmsdk-apb-dualtimer.c'))
++softmmu_ss.add(when: 'CONFIG_CMSDK_APB_TIMER', if_true: files('cmsdk-apb-timer.c'))
++softmmu_ss.add(when: 'CONFIG_RENESAS_TMR', if_true: files('renesas_tmr.c'))
++softmmu_ss.add(when: 'CONFIG_RENESAS_CMT', if_true: files('renesas_cmt.c'))
++softmmu_ss.add(when: 'CONFIG_DIGIC', if_true: files('digic-timer.c'))
++softmmu_ss.add(when: 'CONFIG_ETRAXFS', if_true: files('etraxfs_timer.c'))
++softmmu_ss.add(when: 'CONFIG_EXYNOS4', if_true: files('exynos4210_mct.c'))
++softmmu_ss.add(when: 'CONFIG_EXYNOS4', if_true: files('exynos4210_pwm.c'))
++softmmu_ss.add(when: 'CONFIG_GRLIB', if_true: files('grlib_gptimer.c'))
++softmmu_ss.add(when: 'CONFIG_HPET', if_true: files('hpet.c'))
++softmmu_ss.add(when: 'CONFIG_I8254', if_true: files('i8254_common.c', 'i8254.c'))
++softmmu_ss.add(when: 'CONFIG_IMX', if_true: files('imx_epit.c'))
++softmmu_ss.add(when: 'CONFIG_IMX', if_true: files('imx_gpt.c'))
++softmmu_ss.add(when: 'CONFIG_LM32', if_true: files('lm32_timer.c'))
++softmmu_ss.add(when: 'CONFIG_MILKYMIST', if_true: files('milkymist-sysctl.c'))
++softmmu_ss.add(when: 'CONFIG_MIPS_CPS', if_true: files('mips_gictimer.c'))
++softmmu_ss.add(when: 'CONFIG_MSF2', if_true: files('mss-timer.c'))
++softmmu_ss.add(when: 'CONFIG_NRF51_SOC', if_true: files('nrf51_timer.c'))
++softmmu_ss.add(when: 'CONFIG_OMAP', if_true: files('omap_gptimer.c'))
++softmmu_ss.add(when: 'CONFIG_OMAP', if_true: files('omap_synctimer.c'))
++softmmu_ss.add(when: 'CONFIG_PUV3', if_true: files('puv3_ost.c'))
++softmmu_ss.add(when: 'CONFIG_PXA2XX', if_true: files('pxa2xx_timer.c'))
++softmmu_ss.add(when: 'CONFIG_RASPI', if_true: files('bcm2835_systmr.c'))
++softmmu_ss.add(when: 'CONFIG_SH4', if_true: files('sh_timer.c'))
++softmmu_ss.add(when: 'CONFIG_SLAVIO', if_true: files('slavio_timer.c'))
++softmmu_ss.add(when: 'CONFIG_STM32F2XX_TIMER', if_true: files('stm32f2xx_timer.c'))
++softmmu_ss.add(when: 'CONFIG_XILINX', if_true: files('xilinx_timer.c'))
++
++specific_ss.add(when: 'CONFIG_AVR_TIMER16', if_true: files('avr_timer16.c'))
 -- 
-2.21.3
+2.26.2
+
 
 
