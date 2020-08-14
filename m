@@ -7,84 +7,85 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E0BCC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 09:58:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41527C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 09:58:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 29052206DA
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 09:58:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0E101204EA
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 09:58:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a6gX3fEU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 29052206DA
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f0bMFE12"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E101204EA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41384 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41858 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k6WTz-0006u8-Dv
-	for qemu-devel@archiver.kernel.org; Fri, 14 Aug 2020 05:58:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44166)
+	id 1k6WU8-00076j-AF
+	for qemu-devel@archiver.kernel.org; Fri, 14 Aug 2020 05:58:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43502)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k6Vnk-0007vc-1b
- for qemu-devel@nongnu.org; Fri, 14 Aug 2020 05:15:04 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:44537
- helo=us-smtp-delivery-1.mimecast.com)
+ id 1k6VnD-0006XH-QW
+ for qemu-devel@nongnu.org; Fri, 14 Aug 2020 05:14:31 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:38848
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k6Vnh-00039v-Av
- for qemu-devel@nongnu.org; Fri, 14 Aug 2020 05:15:03 -0400
+ id 1k6Vn9-00030a-C5
+ for qemu-devel@nongnu.org; Fri, 14 Aug 2020 05:14:31 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597396500;
+ s=mimecast20190719; t=1597396466;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=rU4n9sn0xbo37T4jGj6ROAEzLR5VNUSmn/MPgqW3AxU=;
- b=a6gX3fEU379iVmvArVDyeT9YgJaQ1x+sktavwU1ZTHpbcQBuNgMwbDN870Ymh0dvZplc4n
- kpZllGT8WdJpPyS9n/r/2xvZ0wwGtAPw3gBsTVrNs0eE9uP+xdWO3zlKqgGfncqljXeTHa
- 43/oVB9SWjYapn4jYwR8ej0K4PUFvds=
+ bh=+rz8XrRyJ+ACq6JexNWIteKEsW+9PTzomL+Z9Jo0vd4=;
+ b=f0bMFE12SJnPtoKZ16215SaOdjkBPiZQL6c/g7fqvWqa63nF6PVgg6hOD2aAhlzBv0v3il
+ xlb3QAFCMpMiV5dY3GJZ/7Hht4xsFg7NZu/1aQ8x8fWybH57Gz79PaltccIeijgjW5VlX6
+ w975DIxKHDeIUw7weZskndJ9oUljFgU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-171-5XvTvpzlPYqCCwnYGdWWaQ-1; Fri, 14 Aug 2020 05:14:59 -0400
-X-MC-Unique: 5XvTvpzlPYqCCwnYGdWWaQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-57-608supXGOyOZ9NpC48lb0w-1; Fri, 14 Aug 2020 05:14:24 -0400
+X-MC-Unique: 608supXGOyOZ9NpC48lb0w-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2394359
- for <qemu-devel@nongnu.org>; Fri, 14 Aug 2020 09:14:58 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DDDA61853DAD
+ for <qemu-devel@nongnu.org>; Fri, 14 Aug 2020 09:14:23 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C9D765D9D2;
- Fri, 14 Aug 2020 09:14:57 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9CCC6747B9;
+ Fri, 14 Aug 2020 09:14:23 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 125/150] meson: convert hw/acpi
-Date: Fri, 14 Aug 2020 05:13:01 -0400
-Message-Id: <20200814091326.16173-126-pbonzini@redhat.com>
+Subject: [PATCH 079/150] meson: convert migration directory to Meson
+Date: Fri, 14 Aug 2020 05:12:15 -0400
+Message-Id: <20200814091326.16173-80-pbonzini@redhat.com>
 In-Reply-To: <20200814091326.16173-1-pbonzini@redhat.com>
 References: <20200814091326.16173-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/14 05:13:30
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/14 05:13:35
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,97 +108,158 @@ From: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/Makefile.objs      |  1 -
- hw/acpi/Makefile.objs | 26 --------------------------
- hw/acpi/meson.build   | 25 +++++++++++++++++++++++++
- hw/meson.build        |  1 +
- 4 files changed, 26 insertions(+), 27 deletions(-)
- delete mode 100644 hw/acpi/Makefile.objs
- create mode 100644 hw/acpi/meson.build
+ Makefile.objs           |  1 -
+ Makefile.target         |  1 -
+ meson.build             |  5 +++++
+ migration/Makefile.objs | 18 ------------------
+ migration/meson.build   | 40 ++++++++++++++++++++++++++++++++++++++++
+ tests/Makefile.include  |  7 +++----
+ 6 files changed, 48 insertions(+), 24 deletions(-)
+ delete mode 100644 migration/Makefile.objs
+ create mode 100644 migration/meson.build
 
-diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-index 4bdb674ef0..ebae00af6e 100644
---- a/hw/Makefile.objs
-+++ b/hw/Makefile.objs
-@@ -1,6 +1,5 @@
- ifeq ($(CONFIG_SOFTMMU), y)
- devices-dirs-$(call lor,$(CONFIG_VIRTIO_9P),$(call land,$(CONFIG_VIRTFS),$(CONFIG_XEN))) += 9pfs/
--devices-dirs-y += acpi/
- endif
+diff --git a/Makefile.objs b/Makefile.objs
+index cfb2cf2b49..9d0a82d82a 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -43,7 +43,6 @@ common-obj-y = net/
+ common-obj-$(CONFIG_LINUX) += fsdev/
  
- common-obj-y += $(devices-dirs-y)
-diff --git a/hw/acpi/Makefile.objs b/hw/acpi/Makefile.objs
+ common-obj-y += accel/
+-common-obj-y += migration/
+ 
+ common-obj-$(CONFIG_AUDIO_ALSA) += audio-alsa$(DSOSUF)
+ common-obj-$(CONFIG_AUDIO_OSS) += audio-oss$(DSOSUF)
+diff --git a/Makefile.target b/Makefile.target
+index 54a9ef1330..4d912df3a3 100644
+--- a/Makefile.target
++++ b/Makefile.target
+@@ -158,7 +158,6 @@ obj-y += softmmu/
+ obj-y += gdbstub.o
+ obj-y += hw/
+ obj-y += qapi/
+-obj-y += migration/ram.o
+ LIBS := $(libs_softmmu) $(LIBS)
+ 
+ # Temporary until emulators are linked by Meson
+diff --git a/meson.build b/meson.build
+index e294b4790a..e8e5f6f48a 100644
+--- a/meson.build
++++ b/meson.build
+@@ -304,6 +304,10 @@ lzo = not_found
+ if 'CONFIG_LZO' in config_host
+   lzo = declare_dependency(link_args: config_host['LZO_LIBS'].split())
+ endif
++rdma = not_found
++if 'CONFIG_RDMA' in config_host
++  rdma = declare_dependency(link_args: config_host['RDMA_LIBS'].split())
++endif
+ 
+ create_config = find_program('scripts/create_config')
+ minikconf = find_program('scripts/minikconf.py')
+@@ -651,6 +655,7 @@ softmmu_ss.add(when: ['CONFIG_FDT', fdt],  if_true: [files('device_tree.c')])
+ common_ss.add(files('cpus-common.c'))
+ 
+ subdir('softmmu')
++subdir('migration')
+ subdir('monitor')
+ subdir('replay')
+ 
+diff --git a/migration/Makefile.objs b/migration/Makefile.objs
 deleted file mode 100644
-index 72886c7965..0000000000
---- a/hw/acpi/Makefile.objs
+index 0fc619e380..0000000000
+--- a/migration/Makefile.objs
 +++ /dev/null
-@@ -1,26 +0,0 @@
--ifeq ($(CONFIG_ACPI),y)
--common-obj-$(CONFIG_ACPI_X86) += core.o piix4.o pcihp.o
--common-obj-$(CONFIG_ACPI_X86_ICH) += ich9.o tco.o
--common-obj-$(CONFIG_ACPI_CPU_HOTPLUG) += cpu_hotplug.o
--common-obj-$(CONFIG_ACPI_MEMORY_HOTPLUG) += memory_hotplug.o
--common-obj-$(CONFIG_ACPI_CPU_HOTPLUG) += cpu.o
--common-obj-$(CONFIG_ACPI_NVDIMM) += nvdimm.o
--common-obj-$(CONFIG_ACPI_VMGENID) += vmgenid.o
--common-obj-$(CONFIG_ACPI_HW_REDUCED) += generic_event_device.o
--common-obj-$(CONFIG_ACPI_HMAT) += hmat.o
--common-obj-$(CONFIG_ACPI_APEI) += ghes.o
--common-obj-$(call lnot,$(CONFIG_ACPI_X86)) += acpi-stub.o
--common-obj-$(call lnot,$(CONFIG_PC)) += acpi-x86-stub.o
+@@ -1,18 +0,0 @@
+-common-obj-y += migration.o socket.o fd.o exec.o
+-common-obj-y += tls.o channel.o savevm.o
+-common-obj-y += colo.o colo-failover.o
+-common-obj-y += vmstate.o vmstate-types.o page_cache.o
+-common-obj-y += qemu-file.o global_state.o
+-common-obj-y += qemu-file-channel.o
+-common-obj-y += xbzrle.o postcopy-ram.o
+-common-obj-y += qjson.o
+-common-obj-y += block-dirty-bitmap.o
+-common-obj-y += multifd.o
+-common-obj-y += multifd-zlib.o
+-common-obj-$(CONFIG_ZSTD) += multifd-zstd.o
 -
--common-obj-y += acpi_interface.o
--common-obj-y += bios-linker-loader.o
--common-obj-y += aml-build.o utils.o
--common-obj-$(CONFIG_ACPI_PCI) += pci.o
--common-obj-$(CONFIG_TPM) += tpm.o
+-common-obj-$(CONFIG_RDMA) += rdma.o
 -
--common-obj-$(CONFIG_IPMI) += ipmi.o
--common-obj-$(call lnot,$(CONFIG_IPMI)) += ipmi-stub.o
--else
--common-obj-y += acpi-stub.o aml-build-stub.o
--endif
--common-obj-$(CONFIG_ALL) += acpi-stub.o aml-build-stub.o acpi-x86-stub.o ipmi-stub.o
-diff --git a/hw/acpi/meson.build b/hw/acpi/meson.build
+-common-obj-$(CONFIG_LIVE_BLOCK_MIGRATION) += block.o
+-
+-rdma.o-libs := $(RDMA_LIBS)
+diff --git a/migration/meson.build b/migration/meson.build
 new file mode 100644
-index 0000000000..dd69577212
+index 0000000000..ac8ff1419f
 --- /dev/null
-+++ b/hw/acpi/meson.build
-@@ -0,0 +1,25 @@
-+acpi_ss = ss.source_set()
-+acpi_ss.add(files(
-+  'acpi_interface.c',
-+  'aml-build.c',
-+  'bios-linker-loader.c',
-+  'utils.c',
++++ b/migration/meson.build
+@@ -0,0 +1,40 @@
++# Files needed by unit tests
++migration_files = files(
++  'page_cache.c',
++  'xbzrle.c',
++  'vmstate-types.c',
++  'vmstate.c',
++  'qemu-file-channel.c',
++  'qemu-file.c',
++  'qjson.c',
++)
++
++libmigration = static_library('migration', sources: migration_files + genh,
++                              name_suffix: 'fa',
++                              build_by_default: false)
++migration = declare_dependency(link_with: libmigration,
++                               dependencies: [zlib, qom, io])
++softmmu_ss.add(migration)
++
++softmmu_ss.add(files(
++  'block-dirty-bitmap.c',
++  'channel.c',
++  'colo-failover.c',
++  'colo.c',
++  'exec.c',
++  'fd.c',
++  'global_state.c',
++  'migration.c',
++  'multifd.c',
++  'multifd-zlib.c',
++  'postcopy-ram.c',
++  'savevm.c',
++  'socket.c',
++  'tls.c',
 +))
-+acpi_ss.add(when: 'CONFIG_ACPI_CPU_HOTPLUG', if_true: files('cpu.c'))
-+acpi_ss.add(when: 'CONFIG_ACPI_CPU_HOTPLUG', if_true: files('cpu_hotplug.c'))
-+acpi_ss.add(when: 'CONFIG_ACPI_MEMORY_HOTPLUG', if_true: files('memory_hotplug.c'))
-+acpi_ss.add(when: 'CONFIG_ACPI_NVDIMM', if_true: files('nvdimm.c'))
-+acpi_ss.add(when: 'CONFIG_ACPI_PCI', if_true: files('pci.c'))
-+acpi_ss.add(when: 'CONFIG_ACPI_VMGENID', if_true: files('vmgenid.c'))
-+acpi_ss.add(when: 'CONFIG_ACPI_HW_REDUCED', if_true: files('generic_event_device.c'))
-+acpi_ss.add(when: 'CONFIG_ACPI_HMAT', if_true: files('hmat.c'))
-+acpi_ss.add(when: 'CONFIG_ACPI_APEI', if_true: files('ghes.c'))
-+acpi_ss.add(when: 'CONFIG_ACPI_X86', if_true: files('core.c', 'piix4.c', 'pcihp.c'), if_false: files('acpi-stub.c'))
-+acpi_ss.add(when: 'CONFIG_ACPI_X86_ICH', if_true: files('ich9.c', 'tco.c'))
-+acpi_ss.add(when: 'CONFIG_IPMI', if_true: files('ipmi.c'), if_false: files('ipmi-stub.c'))
-+acpi_ss.add(when: 'CONFIG_PC', if_false: files('acpi-x86-stub.c'))
-+acpi_ss.add(when: 'CONFIG_TPM', if_true: files('tpm.c'))
-+softmmu_ss.add(when: 'CONFIG_ACPI', if_false: files('acpi-stub.c', 'aml-build-stub.c'))
-+softmmu_ss.add_all(when: 'CONFIG_ACPI', if_true: acpi_ss)
-+softmmu_ss.add(when: 'CONFIG_ALL', if_true: files('acpi-stub.c', 'aml-build-stub.c',
-+                                                  'acpi-x86-stub.c', 'ipmi-stub.c'))
-diff --git a/hw/meson.build b/hw/meson.build
-index ffa3f06dc0..55ca2b2b61 100644
---- a/hw/meson.build
-+++ b/hw/meson.build
-@@ -1,3 +1,4 @@
-+subdir('acpi')
- subdir('adc')
- subdir('audio')
- subdir('block')
++
++softmmu_ss.add(when: ['CONFIG_RDMA', rdma], if_true: files('rdma.c'))
++softmmu_ss.add(when: 'CONFIG_LIVE_BLOCK_MIGRATION', if_true: files('block.c'))
++softmmu_ss.add(when: 'CONFIG_ZSTD', if_true: [files('multifd-zstd.c'), zstd])
++
++specific_ss.add(when: 'CONFIG_SOFTMMU', if_true: files('ram.c'))
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 66acf9cdb3..425c8ce699 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -227,7 +227,8 @@ tests/test-iov$(EXESUF): tests/test-iov.o $(test-util-obj-y)
+ tests/test-hbitmap$(EXESUF): tests/test-hbitmap.o $(test-util-obj-y) $(test-crypto-obj-y)
+ tests/test-bitmap$(EXESUF): tests/test-bitmap.o $(test-util-obj-y)
+ tests/test-x86-cpuid$(EXESUF): tests/test-x86-cpuid.o
+-tests/test-xbzrle$(EXESUF): tests/test-xbzrle.o migration/xbzrle.o migration/page_cache.o $(test-util-obj-y)
++tests/test-xbzrle$(EXESUF): tests/test-xbzrle.o migration/libmigration.fa $(test-util-obj-y) \
++	$(test-io-obj-y)
+ tests/test-cutils$(EXESUF): tests/test-cutils.o util/cutils.o $(test-util-obj-y)
+ tests/test-int128$(EXESUF): tests/test-int128.o
+ tests/rcutorture$(EXESUF): tests/rcutorture.o $(test-util-obj-y)
+@@ -253,9 +254,7 @@ tests/test-qdev-global-props$(EXESUF): tests/test-qdev-global-props.o \
+ 	hw/core/vmstate-if.o \
+ 	hw/core/clock.o hw/core/qdev-clock.o \
+ 	$(test-qapi-obj-y)
+-tests/test-vmstate$(EXESUF): tests/test-vmstate.o \
+-	migration/vmstate.o migration/vmstate-types.o migration/qemu-file.o \
+-        migration/qemu-file-channel.o migration/qjson.o \
++tests/test-vmstate$(EXESUF): tests/test-vmstate.o migration/libmigration.fa \
+ 	$(test-io-obj-y)
+ tests/test-timed-average$(EXESUF): tests/test-timed-average.o $(test-util-obj-y)
+ tests/test-base64$(EXESUF): tests/test-base64.o $(test-util-obj-y)
 -- 
 2.26.2
 
