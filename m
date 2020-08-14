@@ -7,84 +7,85 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65E8BC433E3
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 09:32:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E786C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 09:32:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 18A9920774
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 09:32:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 396D720781
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 09:32:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AHFgJ+4+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 18A9920774
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eear0lJi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 396D720781
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49500 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51338 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k6W4M-000387-Aj
-	for qemu-devel@archiver.kernel.org; Fri, 14 Aug 2020 05:32:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42886)
+	id 1k6W4i-0003s5-GF
+	for qemu-devel@archiver.kernel.org; Fri, 14 Aug 2020 05:32:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43052)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k6Vmh-0005SM-Vd
- for qemu-devel@nongnu.org; Fri, 14 Aug 2020 05:14:04 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:27379
- helo=us-smtp-delivery-1.mimecast.com)
+ id 1k6Vms-0005ig-22
+ for qemu-devel@nongnu.org; Fri, 14 Aug 2020 05:14:10 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31304
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k6Vmb-0002sv-Tg
- for qemu-devel@nongnu.org; Fri, 14 Aug 2020 05:13:59 -0400
+ id 1k6Vmm-0002vY-C3
+ for qemu-devel@nongnu.org; Fri, 14 Aug 2020 05:14:09 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597396433;
+ s=mimecast20190719; t=1597396443;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=kZZ4a3fRhvDYpBSpO6MSoS8JIop2FqIpkyUpSd7V8UY=;
- b=AHFgJ+4+mr7JM8swY+e/h3Y5VU10uz+d2D+kdYugeqWm5Xg8MG4gbg9/EZMlKYvJvzRWVE
- XutZMlsff2tmA1wPOb8tGb+mUMp0XL0hXhYpEk/mJNHJzjQgi2+J64sV3cvq/dZmrN+esq
- Oep1nlx8Tb6NEaws16wrud5/o9kBzHw=
+ bh=x3msNeX9nlTyv4CL/8WuYtu4E5oEOtKY1xeDfSQEP5U=;
+ b=eear0lJifQ2vQKkTZXXutWYB8lHh5iVT/SKf3bpy2PN3ehdO3G949N9qwlKkOvnIcamErR
+ qaV4UluYBnaZ7djC/olzuyZCxHRB0Gn7K9AR1D5ksUp3xE0jWYC9LxV9xIAugbirE9EyKU
+ 2tfiIV1ADBFmmUW/KXDx+gWsDX3z6hI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-294-Z4msxY2KOQeh9r1Kze9Hfw-1; Fri, 14 Aug 2020 05:13:49 -0400
-X-MC-Unique: Z4msxY2KOQeh9r1Kze9Hfw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-446-iQsE_rq1OMiUpEhOOnoCdA-1; Fri, 14 Aug 2020 05:14:01 -0400
+X-MC-Unique: iQsE_rq1OMiUpEhOOnoCdA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0A4B31015DBC
- for <qemu-devel@nongnu.org>; Fri, 14 Aug 2020 09:13:49 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3827D59
+ for <qemu-devel@nongnu.org>; Fri, 14 Aug 2020 09:14:00 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C3FD3747B9
- for <qemu-devel@nongnu.org>; Fri, 14 Aug 2020 09:13:48 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E6BA51002382;
+ Fri, 14 Aug 2020 09:13:59 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 029/150] tools/virtiofsd: convert to Meson
-Date: Fri, 14 Aug 2020 05:11:25 -0400
-Message-Id: <20200814091326.16173-30-pbonzini@redhat.com>
+Subject: [PATCH 049/150] meson: generate qemu-version.h
+Date: Fri, 14 Aug 2020 05:11:45 -0400
+Message-Id: <20200814091326.16173-50-pbonzini@redhat.com>
 In-Reply-To: <20200814091326.16173-1-pbonzini@redhat.com>
 References: <20200814091326.16173-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/14 01:57:54
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/14 03:37:30
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,210 +98,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+From: Marc-André Lureau <marcandre.lureau@redhat.com>
+
+Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Makefile                                      | 12 ------------
- Makefile.objs                                 |  1 -
- configure                                     |  1 +
- meson.build                                   | 11 +++++++++++
- tools/meson.build                             | 10 ++++++++++
- tools/virtiofsd/Makefile.objs                 | 12 ------------
- tools/virtiofsd/meson.build                   | 19 +++++++++++++++++++
- tools/virtiofsd/passthrough_ll.c              |  2 +-
- .../{seccomp.c => passthrough_seccomp.c}      |  2 +-
- .../{seccomp.h => passthrough_seccomp.h}      |  0
- 10 files changed, 43 insertions(+), 27 deletions(-)
- create mode 100644 tools/meson.build
- delete mode 100644 tools/virtiofsd/Makefile.objs
- create mode 100644 tools/virtiofsd/meson.build
- rename tools/virtiofsd/{seccomp.c => passthrough_seccomp.c} (99%)
- rename tools/virtiofsd/{seccomp.h => passthrough_seccomp.h} (100%)
+ Makefile                | 27 +--------------------------
+ meson.build             | 14 ++++++++++++--
+ scripts/qemu-version.sh | 25 +++++++++++++++++++++++++
+ 3 files changed, 38 insertions(+), 28 deletions(-)
+ create mode 100755 scripts/qemu-version.sh
 
 diff --git a/Makefile b/Makefile
-index b30de2fd5d..310989ce4d 100644
+index 5fbf5e4bbd..9abf7be598 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -196,11 +196,6 @@ HELPERS-y += vhost-user-gpu$(EXESUF)
- vhost-user-json-y += contrib/vhost-user-gpu/50-qemu-gpu.json
- endif
+@@ -112,21 +112,7 @@ include $(SRC_PATH)/rules.mak
+ # lor is defined in rules.mak
+ CONFIG_BLOCK := $(call lor,$(CONFIG_SOFTMMU),$(CONFIG_TOOLS))
  
--ifeq ($(CONFIG_SOFTMMU)$(CONFIG_LINUX)$(CONFIG_SECCOMP)$(CONFIG_LIBCAP_NG),yyyy)
--HELPERS-y += virtiofsd$(EXESUF)
--vhost-user-json-y += tools/virtiofsd/50-qemu-virtiofsd.json
--endif
+-# Create QEMU_PKGVERSION and FULL_VERSION strings
+-# If PKGVERSION is set, use that; otherwise get version and -dirty status from git
+-QEMU_PKGVERSION := $(if $(PKGVERSION),$(PKGVERSION),$(shell \
+-  cd $(SRC_PATH); \
+-  if test -e .git; then \
+-    git describe --match 'v*' 2>/dev/null | tr -d '\n'; \
+-    if ! git diff-index --quiet HEAD &>/dev/null; then \
+-      echo "-dirty"; \
+-    fi; \
+-  fi))
 -
- # Sphinx does not allow building manuals into the same directory as
- # the source files, so if we're doing an in-tree QEMU build we must
- # build the manuals into a subdirectory (and then install them from
-@@ -307,7 +302,6 @@ dummy := $(call unnest-vars,, \
-                 elf2dmp-obj-y \
-                 ivshmem-client-obj-y \
-                 ivshmem-server-obj-y \
--                virtiofsd-obj-y \
-                 rdmacm-mux-obj-y \
-                 vhost-user-scsi-obj-y \
-                 vhost-user-blk-obj-y \
-@@ -540,12 +534,6 @@ rdmacm-mux$(EXESUF): LIBS += "-libumad"
- rdmacm-mux$(EXESUF): $(rdmacm-mux-obj-y) $(COMMON_LDADDS)
- 	$(call LINK, $^)
- 
--# relies on Linux-specific syscalls
--ifeq ($(CONFIG_LINUX)$(CONFIG_SECCOMP)$(CONFIG_LIBCAP_NG),yyy)
--virtiofsd$(EXESUF): $(virtiofsd-obj-y) contrib/libvhost-user/libvhost-user.a $(COMMON_LDADDS)
--	$(call LINK, $^)
--endif
+-# Either "version (pkgversion)", or just "version" if pkgversion not set
+-FULL_VERSION := $(if $(QEMU_PKGVERSION),$(VERSION) ($(QEMU_PKGVERSION)),$(VERSION))
 -
- vhost-user-gpu$(EXESUF): $(vhost-user-gpu-obj-y) contrib/libvhost-user/libvhost-user.a $(COMMON_LDADDS)
- 	$(call LINK, $^)
+-generated-files-y = qemu-version.h config-host.h qemu-options.def
++generated-files-y = config-host.h qemu-options.def
  
-diff --git a/Makefile.objs b/Makefile.objs
-index 9489864967..fee0f71372 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -113,6 +113,5 @@ vhost-user-blk-obj-y = contrib/vhost-user-blk/
- rdmacm-mux-obj-y = contrib/rdmacm-mux/
- vhost-user-input-obj-y = contrib/vhost-user-input/
- vhost-user-gpu-obj-y = contrib/vhost-user-gpu/
--virtiofsd-obj-y = tools/virtiofsd/
+ generated-files-y += module_block.h
  
- ######################################################################
-diff --git a/configure b/configure
-index 5062576d3f..ca397dbfa5 100755
---- a/configure
-+++ b/configure
-@@ -6998,6 +6998,7 @@ if test "$gprof" = "yes" ; then
- fi
- if test "$cap_ng" = "yes" ; then
-   echo "CONFIG_LIBCAP_NG=y" >> $config_host_mak
-+  echo "LIBCAP_NG_LIBS=$cap_libs" >> $config_host_mak
- fi
- echo "CONFIG_AUDIO_DRIVERS=$audio_drv_list" >> $config_host_mak
- for drv in $audio_drv_list; do
+@@ -266,17 +252,6 @@ include $(SRC_PATH)/tests/Makefile.include
+ 
+ all: $(DOCS) $(if $(BUILD_DOCS),sphinxdocs) $(TOOLS) $(HELPERS-y) recurse-all modules
+ 
+-qemu-version.h: FORCE
+-	$(call quiet-command, \
+-                (printf '#define QEMU_PKGVERSION "$(QEMU_PKGVERSION)"\n'; \
+-		printf '#define QEMU_FULL_VERSION "$(FULL_VERSION)"\n'; \
+-		) > $@.tmp)
+-	$(call quiet-command, if ! cmp -s $@ $@.tmp; then \
+-	  mv $@.tmp $@; \
+-	 else \
+-	  rm $@.tmp; \
+-	 fi)
+-
+ config-host.h: config-host.h-timestamp
+ config-host.h-timestamp: config-host.mak
+ qemu-options.def: $(SRC_PATH)/qemu-options.hx $(SRC_PATH)/scripts/hxtool
 diff --git a/meson.build b/meson.build
-index ac70973012..cf7d6de67d 100644
+index 01ac61c51f..56b3dd2979 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -79,6 +79,15 @@ if 'CONFIG_GNUTLS' in config_host
-   gnutls = declare_dependency(compile_args: config_host['GNUTLS_CFLAGS'].split(),
-                               link_args: config_host['GNUTLS_LIBS'].split())
- endif
-+seccomp = not_found
-+if 'CONFIG_SECCOMP' in config_host
-+  seccomp = declare_dependency(compile_args: config_host['SECCOMP_CFLAGS'].split(),
-+                               link_args: config_host['SECCOMP_LIBS'].split())
-+endif
-+libcap_ng = not_found
-+if 'CONFIG_LIBCAP_NG' in config_host
-+  libcap_ng = declare_dependency(link_args: config_host['LIBCAP_NG_LIBS'].split())
-+endif
+@@ -154,6 +154,7 @@ have_block = have_system or have_tools
  
- target_dirs = config_host['TARGET_DIRS'].split()
- have_user = false
-@@ -247,6 +256,8 @@ if have_tools
-   endif
- endif
+ # Generators
  
-+subdir('tools')
++genh = []
+ qapi_gen = find_program('scripts/qapi-gen.py')
+ qapi_gen_depends = [ meson.source_root() / 'scripts/qapi/__init__.py',
+                      meson.source_root() / 'scripts/qapi/commands.py',
+@@ -179,6 +180,17 @@ tracetool = [
+    '--backend=' + config_host['TRACE_BACKENDS']
+ ]
+ 
++qemu_version_cmd = [find_program('scripts/qemu-version.sh'),
++                    meson.current_source_dir(),
++                    config_host['PKGVERSION'], config_host['VERSION']]
++qemu_version = custom_target('qemu-version.h',
++                             output: 'qemu-version.h',
++                             command: qemu_version_cmd,
++                             capture: true,
++                             build_by_default: true,
++                             build_always_stale: true)
++genh += qemu_version
 +
- summary_info = {}
- summary_info += {'Install prefix':    config_host['prefix']}
- summary_info += {'BIOS directory':    config_host['qemu_datadir']}
-diff --git a/tools/meson.build b/tools/meson.build
-new file mode 100644
-index 0000000000..513bd2ff4f
---- /dev/null
-+++ b/tools/meson.build
-@@ -0,0 +1,10 @@
-+have_virtiofsd = (have_system and
-+    have_tools and
-+    'CONFIG_LINUX' in config_host and 
-+    'CONFIG_SECCOMP' in config_host and
-+    'CONFIG_LIBCAP_NG' in config_host and
-+    'CONFIG_VHOST_USER' in config_host)
-+
-+if have_virtiofsd
-+  subdir('virtiofsd')
-+endif
-diff --git a/tools/virtiofsd/Makefile.objs b/tools/virtiofsd/Makefile.objs
-deleted file mode 100644
-index 076f667e46..0000000000
---- a/tools/virtiofsd/Makefile.objs
-+++ /dev/null
-@@ -1,12 +0,0 @@
--virtiofsd-obj-y = buffer.o \
--                  fuse_opt.o \
--                  fuse_log.o \
--                  fuse_lowlevel.o \
--                  fuse_signals.o \
--                  fuse_virtio.o \
--                  helper.o \
--                  passthrough_ll.o \
--                  seccomp.o
+ # Collect sourcesets.
+ 
+ util_ss = ss.source_set()
+@@ -279,8 +291,6 @@ trace_events_subdirs += [
+   'util',
+ ]
+ 
+-genh = []
 -
--seccomp.o-cflags := $(SECCOMP_CFLAGS)
--seccomp.o-libs := $(SECCOMP_LIBS)
-diff --git a/tools/virtiofsd/meson.build b/tools/virtiofsd/meson.build
-new file mode 100644
-index 0000000000..d1e23c5760
+ subdir('qapi')
+ subdir('qobject')
+ subdir('stubs')
+diff --git a/scripts/qemu-version.sh b/scripts/qemu-version.sh
+new file mode 100755
+index 0000000000..4847385e42
 --- /dev/null
-+++ b/tools/virtiofsd/meson.build
-@@ -0,0 +1,19 @@
-+executable('virtiofsd', files(
-+  'buffer.c',
-+  'fuse_opt.c',
-+  'fuse_log.c',
-+  'fuse_lowlevel.c',
-+  'fuse_signals.c',
-+  'fuse_virtio.c',
-+  'helper.c',
-+  'passthrough_ll.c',
-+  'passthrough_seccomp.c'),
-+  link_with: libvhost_user,
-+  dependencies: [seccomp, qemuutil, libcap_ng],
-+  install: true,
-+  install_dir: get_option('libexecdir'))
++++ b/scripts/qemu-version.sh
+@@ -0,0 +1,25 @@
++#!/bin/sh
 +
-+configure_file(input: '50-qemu-virtiofsd.json.in',
-+               output: '50-qemu-virtiofsd.json',
-+               configuration: config_host,
-+               install_dir: config_host['qemu_datadir'] / 'vhost-user')
-diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough_ll.c
-index 94e0de2d2b..63d1d00565 100644
---- a/tools/virtiofsd/passthrough_ll.c
-+++ b/tools/virtiofsd/passthrough_ll.c
-@@ -65,7 +65,7 @@
- #include <unistd.h>
- 
- #include "passthrough_helpers.h"
--#include "seccomp.h"
-+#include "passthrough_seccomp.h"
- 
- /* Keep track of inode posix locks for each owner. */
- struct lo_inode_plock {
-diff --git a/tools/virtiofsd/seccomp.c b/tools/virtiofsd/passthrough_seccomp.c
-similarity index 99%
-rename from tools/virtiofsd/seccomp.c
-rename to tools/virtiofsd/passthrough_seccomp.c
-index 3b1522acdd..19fee60011 100644
---- a/tools/virtiofsd/seccomp.c
-+++ b/tools/virtiofsd/passthrough_seccomp.c
-@@ -7,7 +7,7 @@
-  */
- 
- #include "qemu/osdep.h"
--#include "seccomp.h"
-+#include "passthrough_seccomp.h"
- #include "fuse_i.h"
- #include "fuse_log.h"
- #include <errno.h>
-diff --git a/tools/virtiofsd/seccomp.h b/tools/virtiofsd/passthrough_seccomp.h
-similarity index 100%
-rename from tools/virtiofsd/seccomp.h
-rename to tools/virtiofsd/passthrough_seccomp.h
++set -eu
++
++dir="$1"
++pkgversion="$2"
++version="$3"
++
++if [ -z "$pkgversion"]; then
++    cd "$dir"
++    if [ -e .git ]; then
++        pkgversion=$(git describe --match 'v*' --dirty | echo "")
++    fi
++fi
++
++if [ -n "$pkgversion" ]; then
++    fullversion="$version ($pkgversion)"
++else
++    fullversion="$version"
++fi
++
++cat <<EOF
++#define QEMU_PKGVERSION "$pkgversion"
++#define QEMU_FULL_VERSION "$fullversion"
++EOF
 -- 
 2.26.2
 
