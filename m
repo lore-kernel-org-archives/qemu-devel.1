@@ -2,83 +2,83 @@ Return-Path: <SRS0=5nOY=BY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D084C433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 07:47:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0716DC433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 07:50:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 02E2720708
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 07:47:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C169120829
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 07:50:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MVXQHGan"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02E2720708
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YcMLC8X7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C169120829
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39550 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43614 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k6URF-0004RJ-8N
-	for qemu-devel@archiver.kernel.org; Fri, 14 Aug 2020 03:47:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43152)
+	id 1k6UTe-0006L2-3B
+	for qemu-devel@archiver.kernel.org; Fri, 14 Aug 2020 03:50:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43706)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k6UQP-0003hw-C1
- for qemu-devel@nongnu.org; Fri, 14 Aug 2020 03:46:53 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:49293
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k6USz-0005vU-FF
+ for qemu-devel@nongnu.org; Fri, 14 Aug 2020 03:49:33 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:58651
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k6UQN-0008Bv-3H
- for qemu-devel@nongnu.org; Fri, 14 Aug 2020 03:46:52 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k6USx-0008NB-AW
+ for qemu-devel@nongnu.org; Fri, 14 Aug 2020 03:49:33 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597391209;
+ s=mimecast20190719; t=1597391370;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=5lxcBegXP3ssA5MonkZr90Z1+9G+YoRtlcoqlk0B1xQ=;
- b=MVXQHGanTpFXl502lkGlavlzQBdNOe9DxxnmjvkcTkwFm/guYpvBMxy3Dv/Q+Eb9Ox6k/F
- yjTX7RHdO0pZIThgRH+l4DaAEhrYrEmcoApEPRMJ19ULSYzO5lT+bS2HcGHJm6cpGY9GtD
- ZjaiSY1OpGS/6g1gGbSOE/WLQM/ZtCo=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-224-oq5h17CQOr6f1NngL-4wGg-1; Fri, 14 Aug 2020 03:46:48 -0400
-X-MC-Unique: oq5h17CQOr6f1NngL-4wGg-1
-Received: by mail-wr1-f72.google.com with SMTP id o10so3058438wrs.21
- for <qemu-devel@nongnu.org>; Fri, 14 Aug 2020 00:46:47 -0700 (PDT)
+ bh=E1LvzE/UkXoMZu+EUee66U/Bhb40IX0fe13AsPKM+xk=;
+ b=YcMLC8X7EdLc3qJ2UnhXaf28CwbQVG2RiElXGbjbxbAyMuG13qT9KDKceHpI+R4GcrkXOm
+ WNQefZwpi5991vJKfxgHntgK9+fzvbizVjrSx5rdNCLBmIxkwZZ9BxhJyMZTVyFCqyU4Ps
+ 2G2bddb7jf0oAGzthpEpjSgNQPUak0Y=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-258-1iiqihWpMbutn3CMryhBHg-1; Fri, 14 Aug 2020 03:49:26 -0400
+X-MC-Unique: 1iiqihWpMbutn3CMryhBHg-1
+Received: by mail-wm1-f70.google.com with SMTP id t26so2989715wmn.4
+ for <qemu-devel@nongnu.org>; Fri, 14 Aug 2020 00:49:26 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=5lxcBegXP3ssA5MonkZr90Z1+9G+YoRtlcoqlk0B1xQ=;
- b=JAWuQnqo4FH1kL5+J5maY4HnFY2TBIyaIJS6Y+ZQwOTVLey3VcvG/e4NGK5RTvaFGb
- FsYCCIBcrxYEZq9dhPUDp5bt6U3elUHrQd6XZqSWl8y7UB7HmV4TN45IFwZ7m5HbAKbt
- Trc3m2rYUE25BIEmm2yK0iRoRfTz5WUOyC7q9/CbetGxObGXdV7SM4XlO29R6jbzk/BN
- qg+MOo6Y0n6+12XDrmVsROznT9RVHlKiBR/84JoIp8jq6IOJZzIh7kEBmL6oqG33KyEh
- UulSrWIctKvMSCctRvKofKSS88YiPdSLcAm1bSpyLZu2KdRq4VDImhgWsX0IQP5xKPZb
- t3RQ==
-X-Gm-Message-State: AOAM532pxq6T0hcpnXhPoKLglfsvblg44OUMPWa5JxJx2mBHU3hZZdRu
- fXKDrVqW2jeAw4PYodv+RuPuq+hZMz5eyN3t3YJWEz3LJKcXIzK8ik0e9luTnMqbmSmvszhnLEW
- AsphkhpqaUcIDXtY=
-X-Received: by 2002:a5d:5052:: with SMTP id h18mr1620051wrt.156.1597391206773; 
- Fri, 14 Aug 2020 00:46:46 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzCYUMnzQILAreCUqpA6IlpZtjEsz666s3vjeDUqf5nSlSzwtvTCnHMOSUXFtP0FoT+Y29l8Q==
-X-Received: by 2002:a5d:5052:: with SMTP id h18mr1620025wrt.156.1597391206507; 
- Fri, 14 Aug 2020 00:46:46 -0700 (PDT)
+ bh=E1LvzE/UkXoMZu+EUee66U/Bhb40IX0fe13AsPKM+xk=;
+ b=bzOdTjcPRiy7pbXft4h3hBdlovc4ShR3vsfokazr0XE3F42SnlF34GY33sxB+mjMSI
+ KVFyJgX/Hb6Ea++ejanlPrk/74Zvz3kWnEbKKkqng1huybacCjmrLgzSwpVtNkjdueMc
+ Mcq9PqoNgNlon5v22MwxCqPzhgvC9rEcMD+k26Nc5cEjBxOn521ZJK8hYiFPLsjhe9KR
+ Up6Im4X+NCW31c4qxG/nvx5ETSgM/9SKQ6PY2j+HVgqfw2OQgIco7k+GBHo3UO4PwRWY
+ hxQv1INN/bwVOSCBZrYVctPLlGB8QoqRdc8ojtX6u1W6JBDcXA0kLtZLGbBXfFGgAK5L
+ rOcA==
+X-Gm-Message-State: AOAM531Zn/o/KSHF1tWc+9zW8142XDjRkiqTu7k61FM2dQwYtUfwvzuu
+ oWOy3fYUnAM+lKPftHVm1j7cLkCkDaQelx1SMCECk8b6sYqtTaBixfaEdcl1ASIzslXOE5Gxp0i
+ mm5rkmjOjhpAvW6E=
+X-Received: by 2002:a1c:7e44:: with SMTP id z65mr1470678wmc.13.1597391365428; 
+ Fri, 14 Aug 2020 00:49:25 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyM0yv6LuUznprFWvRQQuTvv6iFIrXSUZTqE7dRxI8OLI0rYXOSlwM+dkIygIwgPZyrAWK2Aw==
+X-Received: by 2002:a1c:7e44:: with SMTP id z65mr1470651wmc.13.1597391365182; 
+ Fri, 14 Aug 2020 00:49:25 -0700 (PDT)
 Received: from [192.168.1.36] (121.red-81-40-121.staticip.rima-tde.net.
  [81.40.121.121])
- by smtp.gmail.com with ESMTPSA id j2sm14939288wrp.46.2020.08.14.00.46.45
+ by smtp.gmail.com with ESMTPSA id j24sm15252993wrb.49.2020.08.14.00.49.23
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 14 Aug 2020 00:46:45 -0700 (PDT)
-Subject: Re: [PATCH] configure: Require pixman for vhost-user-gpu.
-To: Thomas Huth <thuth@redhat.com>, Rafael Kitover <rkitover@gmail.com>,
- qemu-devel@nongnu.org
-References: <20200801224406.315875-1-rkitover@gmail.com>
- <f09f5172-a22c-d51a-7db7-a6fd880d386c@redhat.com>
+ Fri, 14 Aug 2020 00:49:24 -0700 (PDT)
+Subject: Re: [PATCH v5 00/14] QEMU cpus.c refactoring part2
+To: Claudio Fontana <cfontana@suse.de>, qemu-devel@nongnu.org,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+References: <159732818874.15736.6159613223332985218@66eaa9a8a123>
+ <543b7917-1949-9548-6648-c798efaf70ba@suse.de>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Autocrypt: addr=philmd@redhat.com; keydata=
  mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
@@ -103,12 +103,12 @@ Autocrypt: addr=philmd@redhat.com; keydata=
  9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
  RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
  apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <279ec524-0cf3-bacf-b97f-86a876d980c3@redhat.com>
-Date: Fri, 14 Aug 2020 09:46:45 +0200
+Message-ID: <227a3142-36b8-9f61-b4b5-a45eed68acc4@redhat.com>
+Date: Fri, 14 Aug 2020 09:49:22 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <f09f5172-a22c-d51a-7db7-a6fd880d386c@redhat.com>
+In-Reply-To: <543b7917-1949-9548-6648-c798efaf70ba@suse.de>
 Content-Language: en-US
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
@@ -116,17 +116,18 @@ X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/14 01:57:54
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/14 03:37:30
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -139,197 +140,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: lvivier@redhat.com, peter.maydell@linaro.org, thuth@redhat.com,
+ ehabkost@redhat.com, haxm-team@intel.com, mtosatti@redhat.com,
+ armbru@redhat.com, r.bolshakov@yadro.com, dovgaluk@ispras.ru,
+ wenchao.wang@intel.com, pbonzini@redhat.com, sunilmut@microsoft.com,
+ rth@twiddle.net, alex.bennee@linaro.org, colin.xu@intel.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/3/20 8:09 AM, Thomas Huth wrote:
-> On 02/08/2020 00.44, Rafael Kitover wrote:
->> Use the test from Makefile to check if vhost-user-gpu is being built,
->> and if so require pixman.
+On 8/13/20 6:06 PM, Claudio Fontana wrote:
+> Any current infra work that could cause this failure?
 > 
-> Fixes: 9b52b17ba5 ("configure: Allow to build tools without pixman")
+> I do not have problems when testing this set of commands locally,
+> for me it's all green.
+
+Marc-André tried to debug this, but is having hard time reproducing.
+
 > 
-> ... sorry, I missed that there is indeed a tool that requires pixman.
+> Thanks,
 > 
->> Signed-off-by: Rafael Kitover <rkitover@gmail.com>
+> Claudio
+> 
+> On 8/13/20 4:16 PM, no-reply@patchew.org wrote:
+>> Patchew URL: https://patchew.org/QEMU/20200812183250.9221-1-cfontana@suse.de/
+>>
+>>
+>>
+>> Hi,
+>>
+>> This series failed the docker-quick@centos7 build test. Please find the testing commands and
+>> their output below. If you have Docker installed, you can probably reproduce it
+>> locally.
+>>
+>> === TEST SCRIPT BEGIN ===
+>> #!/bin/bash
+>> make docker-image-centos7 V=1 NETWORK=1
+>> time make docker-test-quick@centos7 SHOW_ENV=1 J=14 NETWORK=1
+>> === TEST SCRIPT END ===
+>>
+>>   TEST    check-unit: tests/test-char
+>> Unexpected error in object_property_try_add() at /tmp/qemu-test/src/qom/object.c:1181:
+>> attempt to add duplicate property 'serial-id' to object (type 'container')
+>> ERROR test-char - too few tests run (expected 38, got 9)
+>> make: *** [check-unit] Error 1
+>> make: *** Waiting for unfinished jobs....
+>>   TEST    check-qtest-x86_64: tests/qtest/hd-geo-test
+>> qemu-system-aarch64: -accel kvm: invalid accelerator kvm
 >> ---
->>  configure | 28 ++++++++++++++--------------
->>  1 file changed, 14 insertions(+), 14 deletions(-)
+>>     raise CalledProcessError(retcode, cmd)
+>> subprocess.CalledProcessError: Command '['sudo', '-n', 'docker', 'run', '--label', 'com.qemu.instance.uuid=e2cd2d5f1f1d4eb6bc6bcd79e3d16404', '-u', '1001', '--security-opt', 'seccomp=unconfined', '--rm', '-e', 'TARGET_LIST=', '-e', 'EXTRA_CONFIGURE_OPTS=', '-e', 'V=', '-e', 'J=14', '-e', 'DEBUG=', '-e', 'SHOW_ENV=1', '-e', 'CCACHE_DIR=/var/tmp/ccache', '-v', '/home/patchew/.cache/qemu-docker-ccache:/var/tmp/ccache:z', '-v', '/var/tmp/patchew-tester-tmp-2np4x1wq/src/docker-src.2020-08-13-10.00.40.11908:/var/tmp/qemu:z,ro', 'qemu/centos7', '/var/tmp/qemu/run', 'test-quick']' returned non-zero exit status 2.
+>> filter=--filter=label=com.qemu.instance.uuid=e2cd2d5f1f1d4eb6bc6bcd79e3d16404
+>> make[1]: *** [docker-run] Error 1
+>> make[1]: Leaving directory `/var/tmp/patchew-tester-tmp-2np4x1wq/src'
+>> make: *** [docker-run-test-quick@centos7] Error 2
 >>
->> diff --git a/configure b/configure
->> index 2acc4d1465..181b465861 100755
->> --- a/configure
->> +++ b/configure
->> @@ -4062,20 +4062,6 @@ if test "$modules" = yes; then
->>      fi
->>  fi
->>  
->> -##########################################
->> -# pixman support probe
->> -
->> -if test "$softmmu" = "no"; then
->> -  pixman_cflags=
->> -  pixman_libs=
->> -elif $pkg_config --atleast-version=0.21.8 pixman-1 > /dev/null 2>&1; then
->> -  pixman_cflags=$($pkg_config --cflags pixman-1)
->> -  pixman_libs=$($pkg_config --libs pixman-1)
->> -else
->> -  error_exit "pixman >= 0.21.8 not present." \
->> -      "Please install the pixman devel package."
->> -fi
->> -
->>  ##########################################
->>  # libmpathpersist probe
->>  
->> @@ -4491,6 +4477,20 @@ if test "$opengl" = "yes" && test "$have_x11" = "yes"; then
->>    done
->>  fi
->>  
->> +##########################################
->> +# pixman support probe
->> +
->> +if test "$softmmu" = "no" && ! ( test "${linux} ${virglrenderer} ${gbm} ${want_tools}" = "yes yes yes yes" );  then
-> 
-> Do you need the round brackets here?
-> 
->> +  pixman_cflags=
->> +  pixman_libs=
->> +elif $pkg_config --atleast-version=0.21.8 pixman-1 > /dev/null 2>&1; then
->> +  pixman_cflags=$($pkg_config --cflags pixman-1)
->> +  pixman_libs=$($pkg_config --libs pixman-1)
->> +else
->> +  error_exit "pixman >= 0.21.8 not present." \
->> +      "Please install the pixman devel package."
->> +fi
->> +
->>  ##########################################
->>  # libxml2 probe
->>  if test "$libxml2" != "no" ; then
+>> real    15m49.276s
+>> user    0m8.608s
+>>
+>>
+>> The full log is available at
+>> http://patchew.org/logs/20200812183250.9221-1-cfontana@suse.de/testing.docker-quick@centos7/?type=message.
+>> ---
+>> Email generated automatically by Patchew [https://patchew.org/].
+>> Please send your feedback to patchew-devel@redhat.com
 >>
 > 
-> With the round brackets removed:
-> 
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> 
-> 
-
-Hmm this doesn't work for me:
-
-$ ../configure --disable-system --disable-user --enable-tools
-QEMU_CFLAGS         -Werror  -pthread -I/usr/include/glib-2.0
--I/usr/lib64/glib-2.0/include  -fPIE -DPIE -m64 -mcx16 -D_GNU_SOURCE
--D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -Wstrict-prototypes
--Wredundant-decls -Wall -Wundef -Wwrite-strings -Wmissing-prototypes
--fno-strict-aliasing -fno-common -fwrapv -std=gnu99
--Wold-style-declaration -Wold-style-definition -Wtype-limits
--Wformat-security -Wformat-y2k -Winit-self -Wignored-qualifiers
--Wempty-body -Wnested-externs -Wendif-labels -Wexpansion-to-defined
--Wno-missing-include-dirs -Wno-shift-negative-value -Wno-psabi
--fstack-protector-strong   -I/usr/include/p11-kit-1
--DSTRUCT_IOVEC_DEFINED  -I/usr/include/libpng16  -I/usr/include/libdrm
--I/usr/include/spice-1 -I/usr/include/spice-server -I/usr/include/cacard
--I/usr/include/glib-2.0 -I/usr/lib64/glib-2.0/include
--I/usr/include/nss3 -I/usr/include/nspr4 -pthread
--I/usr/include/libmount -I/usr/include/blkid -I/usr/include/uuid
--I/usr/include/pixman-1  -I/usr/include/capstone
-QEMU_LDFLAGS       -Wl,--warn-common -Wl,-z,relro -Wl,-z,now -pie -m64
--fstack-protector-strong
-target list
-static build      no
-virgl support     yes (0.7.0)
-TCG support       no
-build guest agent yes
-
-$ make vhost-user-gpu
-...
-  LINK    vhost-user-gpu
-/usr/bin/ld: contrib/vhost-user-gpu/vhost-user-gpu.o: in function
-`vg_resource_create_2d':
-contrib/vhost-user-gpu/vhost-user-gpu.c:322: undefined reference to
-`pixman_image_create_bits'
-/usr/bin/ld: contrib/vhost-user-gpu/vhost-user-gpu.o: in function
-`vg_resource_destroy':
-contrib/vhost-user-gpu/vhost-user-gpu.c:381: undefined reference to
-`pixman_image_unref'
-/usr/bin/ld: contrib/vhost-user-gpu/vhost-user-gpu.o: in function
-`vg_transfer_to_host_2d':
-contrib/vhost-user-gpu/vhost-user-gpu.c:538: undefined reference to
-`pixman_image_get_format'
-/usr/bin/ld: contrib/vhost-user-gpu/vhost-user-gpu.c:540: undefined
-reference to `pixman_image_get_stride'
-/usr/bin/ld: contrib/vhost-user-gpu/vhost-user-gpu.c:543: undefined
-reference to `pixman_image_get_width'
-/usr/bin/ld: contrib/vhost-user-gpu/vhost-user-gpu.c:544: undefined
-reference to `pixman_image_get_data'
-/usr/bin/ld: contrib/vhost-user-gpu/vhost-user-gpu.c:556: undefined
-reference to `pixman_image_get_stride'
-/usr/bin/ld: contrib/vhost-user-gpu/vhost-user-gpu.c:557: undefined
-reference to `pixman_image_get_height'
-/usr/bin/ld: contrib/vhost-user-gpu/vhost-user-gpu.c:555: undefined
-reference to `pixman_image_get_data'
-/usr/bin/ld: contrib/vhost-user-gpu/vhost-user-gpu.o: in function
-`vg_resource_flush':
-contrib/vhost-user-gpu/vhost-user-gpu.c:693: undefined reference to
-`pixman_region_init_rect'
-/usr/bin/ld: contrib/vhost-user-gpu/vhost-user-gpu.c:705: undefined
-reference to `pixman_region_init'
-/usr/bin/ld: contrib/vhost-user-gpu/vhost-user-gpu.c:706: undefined
-reference to `pixman_region_init_rect'
-/usr/bin/ld: contrib/vhost-user-gpu/vhost-user-gpu.c:709: undefined
-reference to `pixman_region_intersect'
-/usr/bin/ld: contrib/vhost-user-gpu/vhost-user-gpu.c:711: undefined
-reference to `pixman_region_extents'
-/usr/bin/ld: contrib/vhost-user-gpu/vhost-user-gpu.c:731: undefined
-reference to `pixman_image_get_format'
-/usr/bin/ld: contrib/vhost-user-gpu/vhost-user-gpu.c:731: undefined
-reference to `pixman_image_get_format'
-/usr/bin/ld: contrib/vhost-user-gpu/vhost-user-gpu.c:747: undefined
-reference to `pixman_image_get_format'
-/usr/bin/ld: contrib/vhost-user-gpu/vhost-user-gpu.c:747: undefined
-reference to `pixman_image_create_bits'
-/usr/bin/ld: contrib/vhost-user-gpu/vhost-user-gpu.c:753: undefined
-reference to `pixman_image_composite'
-/usr/bin/ld: contrib/vhost-user-gpu/vhost-user-gpu.c:758: undefined
-reference to `pixman_image_unref'
-/usr/bin/ld: contrib/vhost-user-gpu/vhost-user-gpu.c:762: undefined
-reference to `pixman_region_fini'
-/usr/bin/ld: contrib/vhost-user-gpu/vhost-user-gpu.c:763: undefined
-reference to `pixman_region_fini'
-/usr/bin/ld: contrib/vhost-user-gpu/vhost-user-gpu.c:765: undefined
-reference to `pixman_region_fini'
-/usr/bin/ld: contrib/vhost-user-gpu/vhost-user-gpu.o: in function
-`update_cursor_data_simple':
-contrib/vhost-user-gpu/vhost-user-gpu.c:863: undefined reference to
-`pixman_image_get_width'
-/usr/bin/ld: contrib/vhost-user-gpu/vhost-user-gpu.c:864: undefined
-reference to `pixman_image_get_height'
-/usr/bin/ld: contrib/vhost-user-gpu/vhost-user-gpu.c:865: undefined
-reference to `pixman_image_get_format'
-/usr/bin/ld: contrib/vhost-user-gpu/vhost-user-gpu.c:865: undefined
-reference to `pixman_image_get_format'
-/usr/bin/ld: contrib/vhost-user-gpu/vhost-user-gpu.c:868: undefined
-reference to `pixman_image_get_data'
-collect2: error: ld returned 1 exit status
-make: *** [Makefile:730: vhost-user-gpu] Error 1
-
-$ lsb_release -d
-Description:    Fedora release 30 (Thirty)
-
-$ pkg-config --atleast-version=0.21.8 pixman-1; echo $?
-0
-
-$ pkg-config --cflags pixman-1
--I/usr/include/pixman-1
-# found in QEMU_CFLAGS
-
-$ pkg-config --libs pixman-1
--lpixman-1
-# NOT found in QEMU_LDFLAGS
-
-Thanks,
-
-Phil.
 
 
