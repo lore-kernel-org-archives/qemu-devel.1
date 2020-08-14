@@ -4,79 +4,79 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7727DC433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 09:28:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A69CC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 09:28:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 41E322074D
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 09:28:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 304702074D
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 09:28:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h0afWefW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41E322074D
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PC1RAbfm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 304702074D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60998 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34420 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k6W0Q-0004ig-FB
-	for qemu-devel@archiver.kernel.org; Fri, 14 Aug 2020 05:28:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42850)
+	id 1k6W0q-0005OT-C7
+	for qemu-devel@archiver.kernel.org; Fri, 14 Aug 2020 05:28:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42950)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k6Vmg-0005ON-Aj
- for qemu-devel@nongnu.org; Fri, 14 Aug 2020 05:13:58 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:40422
+ id 1k6Vmn-0005WG-Nz
+ for qemu-devel@nongnu.org; Fri, 14 Aug 2020 05:14:05 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:27678
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k6VmZ-0002s9-Op
- for qemu-devel@nongnu.org; Fri, 14 Aug 2020 05:13:57 -0400
+ id 1k6Vmd-0002tW-Jv
+ for qemu-devel@nongnu.org; Fri, 14 Aug 2020 05:14:05 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597396430;
+ s=mimecast20190719; t=1597396434;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=/tNDX9Zf3yP2ah02rSIYyCo555F18kxxlKj+i4UbyJE=;
- b=h0afWefWTxgVVu/gqtDi+G2JytdBwTPQZVPyPZDfnK4oO97DjtTdXqp4wkDx5zqBtQrBHi
- GXmqKfM7H7xAKH+rT1Kn5TwhgtJv8f6i2fIBK2PXvcd2r4koZAJvtNWdNEc4O9XsRcnjly
- 79lRVXNPMvhOusujuez/WDhg/+joanc=
+ bh=W1tMdH6VbiFoVMAf1NbgiFAuEu/rMJUtHviyNDPoEKY=;
+ b=PC1RAbfm8eBhBMkl8DkSeWtJopKMUGBqBjLp9FF+aMXd2SOXqzYsG6xCVeal11iyQetm6g
+ 0BAhgPFc4bLIZkQGe43FiF/r4jlpHGM6OlCKeP2UCl26UgpWNu/k3J9FgVgwUZ4RK9h2tw
+ eK9AU9BO1erVnbhOOxqPCbaxD0UnXMA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-489-Oxvb9J9dMWy88iZwDs2wbw-1; Fri, 14 Aug 2020 05:13:49 -0400
-X-MC-Unique: Oxvb9J9dMWy88iZwDs2wbw-1
+ us-mta-400-uPC1RYgVPIGcYq5HJRE5wg-1; Fri, 14 Aug 2020 05:13:52 -0400
+X-MC-Unique: uPC1RYgVPIGcYq5HJRE5wg-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 475091853DAD
- for <qemu-devel@nongnu.org>; Fri, 14 Aug 2020 09:13:48 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3E2031015DBE
+ for <qemu-devel@nongnu.org>; Fri, 14 Aug 2020 09:13:51 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id ED26A747B9;
- Fri, 14 Aug 2020 09:13:47 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id EE33D747B9;
+ Fri, 14 Aug 2020 09:13:50 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 027/150] meson: add version.o
-Date: Fri, 14 Aug 2020 05:11:23 -0400
-Message-Id: <20200814091326.16173-28-pbonzini@redhat.com>
+Subject: [PATCH 034/150] contrib/vhost-user-input: convert to meson
+Date: Fri, 14 Aug 2020 05:11:30 -0400
+Message-Id: <20200814091326.16173-35-pbonzini@redhat.com>
 In-Reply-To: <20200814091326.16173-1-pbonzini@redhat.com>
 References: <20200814091326.16173-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=pbonzini@redhat.com;
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/14 05:13:30
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/14 01:57:54
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
@@ -107,37 +107,86 @@ From: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- meson.build | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ Makefile                               | 11 -----------
+ Makefile.objs                          |  1 -
+ contrib/vhost-user-input/Makefile.objs |  1 -
+ contrib/vhost-user-input/meson.build   |  5 +++++
+ meson.build                            |  1 +
+ 5 files changed, 6 insertions(+), 13 deletions(-)
+ delete mode 100644 contrib/vhost-user-input/Makefile.objs
+ create mode 100644 contrib/vhost-user-input/meson.build
 
+diff --git a/Makefile b/Makefile
+index 0a5bc1f424..8da297f149 100644
+--- a/Makefile
++++ b/Makefile
+@@ -302,7 +302,6 @@ dummy := $(call unnest-vars,, \
+                 elf2dmp-obj-y \
+                 ivshmem-client-obj-y \
+                 ivshmem-server-obj-y \
+-                vhost-user-input-obj-y \
+                 vhost-user-gpu-obj-y \
+                 qga-vss-dll-obj-y \
+                 block-obj-y \
+@@ -526,16 +525,6 @@ endif
+ vhost-user-gpu$(EXESUF): $(vhost-user-gpu-obj-y) contrib/libvhost-user/libvhost-user.a $(COMMON_LDADDS)
+ 	$(call LINK, $^)
+ 
+-ifdef CONFIG_VHOST_USER_INPUT
+-ifdef CONFIG_LINUX
+-vhost-user-input$(EXESUF): $(vhost-user-input-obj-y) contrib/libvhost-user/libvhost-user.a $(COMMON_LDADDS)
+-	$(call LINK, $^)
+-
+-# build by default, do not install
+-all: vhost-user-input$(EXESUF)
+-endif
+-endif
+-
+ module_block.h: $(SRC_PATH)/scripts/modules/module_block.py config-host.mak
+ 	$(call quiet-command,$(PYTHON) $< $@ \
+ 	$(addprefix $(SRC_PATH)/,$(patsubst %.mo,%.c,$(block-obj-m))), \
+diff --git a/Makefile.objs b/Makefile.objs
+index 0f80b63554..0922c3ed00 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -106,7 +106,6 @@ qga-vss-dll-obj-y = qga/
+ elf2dmp-obj-y = contrib/elf2dmp/
+ ivshmem-client-obj-$(CONFIG_IVSHMEM) = contrib/ivshmem-client/
+ ivshmem-server-obj-$(CONFIG_IVSHMEM) = contrib/ivshmem-server/
+-vhost-user-input-obj-y = contrib/vhost-user-input/
+ vhost-user-gpu-obj-y = contrib/vhost-user-gpu/
+ 
+ ######################################################################
+diff --git a/contrib/vhost-user-input/Makefile.objs b/contrib/vhost-user-input/Makefile.objs
+deleted file mode 100644
+index b1fad90d51..0000000000
+--- a/contrib/vhost-user-input/Makefile.objs
++++ /dev/null
+@@ -1 +0,0 @@
+-vhost-user-input-obj-y = main.o
+diff --git a/contrib/vhost-user-input/meson.build b/contrib/vhost-user-input/meson.build
+new file mode 100644
+index 0000000000..1eeb1329d9
+--- /dev/null
++++ b/contrib/vhost-user-input/meson.build
+@@ -0,0 +1,5 @@
++executable('vhost-user-input', files('main.c'),
++           link_with: libvhost_user,
++           dependencies: qemuutil,
++           build_by_default: targetos == 'linux',
++           install: false)
 diff --git a/meson.build b/meson.build
-index 6550262b9b..f16add33ca 100644
+index a4b8d66385..4c952c7264 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -45,8 +45,14 @@ targetos = host_machine.system()
- m = cc.find_library('m', required: false)
- util = cc.find_library('util', required: false)
- socket = []
-+version_res = []
- if host_machine.system() == 'windows'
-   socket = cc.find_library('ws2_32')
-+
-+  win = import('windows')
-+  version_res = win.compile_resources('version.rc',
-+                                      depend_files: files('pc-bios/qemu-nsis.ico'),
-+                                      include_directories: include_directories('.'))
+@@ -261,6 +261,7 @@ if have_tools
+   if 'CONFIG_VHOST_USER' in config_host
+     subdir('contrib/libvhost-user')
+     subdir('contrib/vhost-user-blk')
++    subdir('contrib/vhost-user-input')
+     subdir('contrib/vhost-user-scsi')
+   endif
  endif
- glib = declare_dependency(compile_args: config_host['GLIB_CFLAGS'].split(),
-                           link_args: config_host['GLIB_LIBS'].split())
-@@ -231,7 +237,7 @@ libqemuutil = static_library('qemuutil',
-                              sources: util_ss.sources() + stub_ss.sources() + genh,
-                              dependencies: [util_ss.dependencies(), m, glib, socket])
- qemuutil = declare_dependency(link_with: libqemuutil,
--                              sources: genh)
-+                              sources: genh + version_res)
- 
- summary_info = {}
- summary_info += {'Install prefix':    config_host['prefix']}
 -- 
 2.26.2
 
