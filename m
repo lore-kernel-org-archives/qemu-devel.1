@@ -2,89 +2,91 @@ Return-Path: <SRS0=PlQC=BZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84CD1C433E1
-	for <qemu-devel@archiver.kernel.org>; Sat, 15 Aug 2020 16:56:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 349A4C433E1
+	for <qemu-devel@archiver.kernel.org>; Sat, 15 Aug 2020 16:58:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 47BD223B18
-	for <qemu-devel@archiver.kernel.org>; Sat, 15 Aug 2020 16:56:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ED7A123B18
+	for <qemu-devel@archiver.kernel.org>; Sat, 15 Aug 2020 16:58:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SWBW/y7m"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47BD223B18
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W32Mdrbs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED7A123B18
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54988 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58356 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k6zTW-0006Zd-Cy
-	for qemu-devel@archiver.kernel.org; Sat, 15 Aug 2020 12:56:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39872)
+	id 1k6zVk-00083Q-92
+	for qemu-devel@archiver.kernel.org; Sat, 15 Aug 2020 12:58:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40640)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1k6zSg-00062Z-6e
- for qemu-devel@nongnu.org; Sat, 15 Aug 2020 12:55:18 -0400
-Received: from mail-vs1-xe42.google.com ([2607:f8b0:4864:20::e42]:42873)
+ (Exim 4.90_1) (envelope-from <danielhb413@gmail.com>)
+ id 1k6zV6-0007Um-73; Sat, 15 Aug 2020 12:57:48 -0400
+Received: from mail-vs1-xe44.google.com ([2607:f8b0:4864:20::e44]:41246)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1k6zSe-0008PE-GI
- for qemu-devel@nongnu.org; Sat, 15 Aug 2020 12:55:17 -0400
-Received: by mail-vs1-xe42.google.com with SMTP id q13so6199972vsn.9
- for <qemu-devel@nongnu.org>; Sat, 15 Aug 2020 09:55:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ (Exim 4.90_1) (envelope-from <danielhb413@gmail.com>)
+ id 1k6zV4-0000Qv-KZ; Sat, 15 Aug 2020 12:57:47 -0400
+Received: by mail-vs1-xe44.google.com with SMTP id y8so6207844vsq.8;
+ Sat, 15 Aug 2020 09:57:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=Op8+nIvDwpXgHA5KB5m5Q5E20k6FFVqok3W8zuTgmJQ=;
- b=SWBW/y7m3+PdaFt/aEfgwdLYM4xUYOO17egAyx0QX5bMmY7zUS1lWiXgArxER7vnw6
- ab99bz1uQiinq8jZkO3ohdw/cycWCP5Mm00VzBf2UQfBpgAAReD9Yvxxe+up2iKlRRb0
- 9lioC+hyaLBS+YCrr2EeZAhDRcZyIlwHVUSCAgjpTtqsYmo5ABE3kGQdi77me/47hfpp
- kwjg+wTaKG2QlAPNaEELUNzq9mTnG8BX5b5FsNakrnYIBDXqsDhLa4fw3If9ZK3YKBax
- kkHCAptEGkXErDKmK0yTay3HHkGJ+/g9MAzvzk34s1R4CwWZJ3iINy6Sr0ZZnPTGXlAj
- 7BPw==
+ bh=QhUbY4D4iyRK40TzD9Y23365Paz8ar+9JQzeCK3jAbI=;
+ b=W32MdrbsOEQev3So74vDtyL6MuBhOlGqrcpDqSgXcdFOacc2hM3wUh9iQM734pwC7l
+ iQRYObiVZz04q2Sb2vew4IGr7knyLwwtRwIK1jUZ28JuptPM6ifHX97sonv+ZKeDP5MA
+ e5Lm2PVjOncm505Er76Oi5w8ViKfamQHU4UNLfiac+mL+fA9E9pCk27mO1H1WLPfYOXG
+ AVnbdUuSkbhM7alcsyv0zehtLqzHYhKhjB5xv6OcpSwWHXv1FENDWI5uHsn2zPpHam2c
+ M5N+VcqGIS5NkSQNlEJAswpN9Ag9I/EJKLJfNQbdV0Sc1nePFYNhEOxjfMoojpUbGGa3
+ U9mQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=Op8+nIvDwpXgHA5KB5m5Q5E20k6FFVqok3W8zuTgmJQ=;
- b=RuV9xAquiD5yc3xFv1iMObXn7xUwyT5A4xGevZ60JxyoVUd7Cf6hxLB9aEX82uQBkR
- jLecBBqG5WxYXd/gfV23dob2sjaZIyb3RFfZBoOKBYnKMt9N2k2ErmT9Ml26gmt11NE+
- gptcr0OZXhKogeoT7jaEK8mdjE+bdqp0xkV0MTKBWs1++n4898kCfxPLR+Gfy6HzBxtb
- EG/oSxRm3YeePxxzkJPOL+qbvstbBKv/D/Gwgo1rEPMnooHmmAeLayeOyA2eFeS+sqfI
- J6Ok/SgsdUMPlNBpDwzusMXmPgGjVQ17TXJIHo8+yzvMq0cmkUGge4S7wc7GDeoNeg5h
- VF8Q==
-X-Gm-Message-State: AOAM531OA/3XfuKvhy7nn0l9GrWQnyj4nVqvekoMUVdK+uRHLwOAl6eI
- kdbP3PaLCKUuISH70cfUb9MYISY6Ps4+4Q==
-X-Google-Smtp-Source: ABdhPJzl4Jr+b9wWrX87a5QaJFdjYVdanp/z7vDvDgb6nbmZaKTuxtqsxCnAV8VGmBYW9I1CX32rmg==
-X-Received: by 2002:a62:d111:: with SMTP id z17mr3757649pfg.221.1597455128053; 
- Fri, 14 Aug 2020 18:32:08 -0700 (PDT)
-Received: from localhost.localdomain ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id y196sm10625528pfc.202.2020.08.14.18.32.06
+ bh=QhUbY4D4iyRK40TzD9Y23365Paz8ar+9JQzeCK3jAbI=;
+ b=GtCUaS+qOb5LpJvxZhIDM+zdPslN4TzOK1p3qLGN4VaZvOnxyJ+sm5RFiglTAPyhs7
+ BFY/InGnsBTGJy0KYPMnbYwEH8frUSOdCAonMXtokHY5u0D1/mcH6MzMRGkXqyeYqdFk
+ RBZeyo0OppqRLSpl/sJoGJoLv7niMkqcueL+ORd9LbcK0x8a0bNRLeIWyJnvVmvEoXTA
+ Hu//K46uKUq4ZwTmXdJm9UylXGnstAVLIQ1fVUC+x08cTPvLGunwrBd9G3e4mIolfnlr
+ cdfYbF4sJK6LiJzrwY69hCfqP/rLZkFu8wMTERp5qjYLCAtWzg6Y1vpWgmxcF5UtduS6
+ ErpQ==
+X-Gm-Message-State: AOAM532tt3Jpj1LXkoyzjH5VvgCpfu5AVaC9QGlI5InjYGHc1zZHVIKQ
+ ujUCbolEkma5lsgY7uPichmveywEaIGsoA==
+X-Google-Smtp-Source: ABdhPJwQKPZyG6C+NjbJvTmmEOV3QDDLSpN3z5ZBpp4cCh3YkIrGX8qKLgg5wzPURhYCXqXm1jSEkw==
+X-Received: by 2002:a05:6214:12b4:: with SMTP id
+ w20mr4421242qvu.32.1597438486131; 
+ Fri, 14 Aug 2020 13:54:46 -0700 (PDT)
+Received: from rekt.ibmuc.com ([2804:431:c7c6:303f:d1dc:35d8:e9f6:c8b])
+ by smtp.gmail.com with ESMTPSA id p33sm12301018qtp.49.2020.08.14.13.54.44
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 14 Aug 2020 18:32:07 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
+ Fri, 14 Aug 2020 13:54:45 -0700 (PDT)
+From: Daniel Henrique Barboza <danielhb413@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 15/20] target/arm: Fix sve_uzp_p vs odd vector lengths
-Date: Fri, 14 Aug 2020 18:31:40 -0700
-Message-Id: <20200815013145.539409-16-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200815013145.539409-1-richard.henderson@linaro.org>
-References: <20200815013145.539409-1-richard.henderson@linaro.org>
+Subject: [PATCH 05/10] spapr: make ibm,
+ max-associativity-domains scale with user input
+Date: Fri, 14 Aug 2020 17:54:19 -0300
+Message-Id: <20200814205424.543857-6-danielhb413@gmail.com>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200814205424.543857-1-danielhb413@gmail.com>
+References: <20200814205424.543857-1-danielhb413@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::e42;
- envelope-from=richard.henderson@linaro.org; helo=mail-vs1-xe42.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::e44;
+ envelope-from=danielhb413@gmail.com; helo=mail-vs1-xe44.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -99,89 +101,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Desnogues <laurent.desnogues@gmail.com>, peter.maydell@linaro.org
+Cc: Daniel Henrique Barboza <danielhb413@gmail.com>, qemu-ppc@nongnu.org,
+ david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Missed out on compressing the second half of a predicate
-with length vl % 512 > 256.
+The ibm,max-associativity-domains is considering that only a single
+associativity domain can exist in the same NUMA level. This is true
+today because we do not support any type of NUMA distance user
+customization, and all nodes are in the same distance to each other.
 
-Adjust all of the x + (y << s) to x | (y << s) as a
-general style fix.
+To enhance NUMA distance support in the pSeries machine we need to
+make this limit flexible. This patch rewrites the max-associativity
+logic to consider that multiple associativity domains can co-exist
+in the same NUMA level. We're using the legacy_numa() helper to
+avoid leaking unneeded guest changes.
 
-Reported-by: Laurent Desnogues <laurent.desnogues@gmail.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
 ---
- target/arm/sve_helper.c | 30 +++++++++++++++++++++---------
- 1 file changed, 21 insertions(+), 9 deletions(-)
+ hw/ppc/spapr.c | 18 ++++++++++++++++--
+ 1 file changed, 16 insertions(+), 2 deletions(-)
 
-diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
-index 4758d46f34..fcb46f150f 100644
---- a/target/arm/sve_helper.c
-+++ b/target/arm/sve_helper.c
-@@ -1938,7 +1938,7 @@ void HELPER(sve_uzp_p)(void *vd, void *vn, void *vm, uint32_t pred_desc)
-     if (oprsz <= 8) {
-         l = compress_bits(n[0] >> odd, esz);
-         h = compress_bits(m[0] >> odd, esz);
--        d[0] = extract64(l + (h << (4 * oprsz)), 0, 8 * oprsz);
-+        d[0] = l | (h << (4 * oprsz));
-     } else {
-         ARMPredicateReg tmp_m;
-         intptr_t oprsz_16 = oprsz / 16;
-@@ -1952,23 +1952,35 @@ void HELPER(sve_uzp_p)(void *vd, void *vn, void *vm, uint32_t pred_desc)
-             h = n[2 * i + 1];
-             l = compress_bits(l >> odd, esz);
-             h = compress_bits(h >> odd, esz);
--            d[i] = l + (h << 32);
-+            d[i] = l | (h << 32);
-         }
- 
--        /* For VL which is not a power of 2, the results from M do not
--           align nicely with the uint64_t for D.  Put the aligned results
--           from M into TMP_M and then copy it into place afterward.  */
-+        /*
-+         * For VL which is not a multiple of 512, the results from M do not
-+         * align nicely with the uint64_t for D.  Put the aligned results
-+         * from M into TMP_M and then copy it into place afterward.
-+         */
-         if (oprsz & 15) {
--            d[i] = compress_bits(n[2 * i] >> odd, esz);
-+            int final_shift = (oprsz & 15) * 2;
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 073a59c47d..b0c4b80a23 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -919,13 +919,20 @@ static void spapr_dt_rtas(SpaprMachineState *spapr, void *fdt)
+         cpu_to_be32(SPAPR_MEMORY_BLOCK_SIZE & 0xffffffff),
+         cpu_to_be32(ms->smp.max_cpus / ms->smp.threads),
+     };
+-    uint32_t maxdomain = cpu_to_be32(spapr->extra_numa_nodes > 1 ? 1 : 0);
 +
-+            l = n[2 * i + 0];
-+            h = n[2 * i + 1];
-+            l = compress_bits(l >> odd, esz);
-+            h = compress_bits(h >> odd, esz);
-+            d[i] = l | (h << final_shift);
++    /* The maximum domains for a given NUMA level, supposing that every
++     * additional NUMA node belongs to the same domain (aside from the
++     * 4th level, where we must support all available NUMA domains), is
++     * total number of domains - 1. */
++    uint32_t total_nodes_number = ms->numa_state->num_nodes +
++                                  spapr->extra_numa_nodes;
++    uint32_t maxdomain = cpu_to_be32(total_nodes_number - 1);
+     uint32_t maxdomains[] = {
+         cpu_to_be32(4),
+         maxdomain,
+         maxdomain,
+         maxdomain,
+-        cpu_to_be32(ms->numa_state->num_nodes + spapr->extra_numa_nodes),
++        cpu_to_be32(total_nodes_number),
+     };
  
-             for (i = 0; i < oprsz_16; i++) {
-                 l = m[2 * i + 0];
-                 h = m[2 * i + 1];
-                 l = compress_bits(l >> odd, esz);
-                 h = compress_bits(h >> odd, esz);
--                tmp_m.p[i] = l + (h << 32);
-+                tmp_m.p[i] = l | (h << 32);
-             }
--            tmp_m.p[i] = compress_bits(m[2 * i] >> odd, esz);
-+            l = m[2 * i + 0];
-+            h = m[2 * i + 1];
-+            l = compress_bits(l >> odd, esz);
-+            h = compress_bits(h >> odd, esz);
-+            tmp_m.p[i] = l | (h << final_shift);
+     _FDT(rtas = fdt_add_subnode(fdt, 0, "rtas"));
+@@ -962,6 +969,13 @@ static void spapr_dt_rtas(SpaprMachineState *spapr, void *fdt)
+                      qemu_hypertas->str, qemu_hypertas->len));
+     g_string_free(qemu_hypertas, TRUE);
  
-             swap_memmove(vd + oprsz / 2, &tmp_m, oprsz / 2);
-         } else {
-@@ -1977,7 +1989,7 @@ void HELPER(sve_uzp_p)(void *vd, void *vn, void *vm, uint32_t pred_desc)
-                 h = m[2 * i + 1];
-                 l = compress_bits(l >> odd, esz);
-                 h = compress_bits(h >> odd, esz);
--                d[oprsz_16 + i] = l + (h << 32);
-+                d[oprsz_16 + i] = l | (h << 32);
-             }
-         }
++    if (spapr_machine_using_legacy_numa(spapr)) {
++        maxdomain = cpu_to_be32(spapr->extra_numa_nodes > 1 ? 1 : 0);
++        maxdomains[1] = maxdomain;
++        maxdomains[2] = maxdomain;
++        maxdomains[3] = maxdomain;
++    }
++
+     if (smc->pre_5_1_assoc_refpoints) {
+         nr_refpoints = 2;
      }
 -- 
-2.25.1
+2.26.2
 
 
