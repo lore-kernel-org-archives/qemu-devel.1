@@ -2,68 +2,68 @@ Return-Path: <SRS0=5nOY=BY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NORMAL_HTTP_TO_IP,NUMERIC_HTTP_ADDR,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9419C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 09:23:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A4FDC433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 09:24:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 67CA42074D
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 09:23:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3189A2074D
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 09:24:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BLsPp5Co"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67CA42074D
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VebUwqQw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3189A2074D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40156 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42808 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k6Vw9-0004YE-KK
-	for qemu-devel@archiver.kernel.org; Fri, 14 Aug 2020 05:23:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42738)
+	id 1k6Vwc-0005f2-Fh
+	for qemu-devel@archiver.kernel.org; Fri, 14 Aug 2020 05:24:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42754)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k6Vmc-0005Dm-AE
- for qemu-devel@nongnu.org; Fri, 14 Aug 2020 05:13:54 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:35430)
+ id 1k6Vmd-0005Fk-3C
+ for qemu-devel@nongnu.org; Fri, 14 Aug 2020 05:13:55 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32559
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k6VmU-0002qj-4T
- for qemu-devel@nongnu.org; Fri, 14 Aug 2020 05:13:53 -0400
+ id 1k6VmX-0002rZ-Et
+ for qemu-devel@nongnu.org; Fri, 14 Aug 2020 05:13:54 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597396425;
+ s=mimecast20190719; t=1597396428;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=qQBXaEhO1aRkW1Q5mbndoHq11Qw3XibI7UnAe7kgzlc=;
- b=BLsPp5CoTL3D0kDb99mW6zIVrhQ55j6JbpFpuW8vtFWCphGA1hYSKQxUrkhDbI4b6UvcV3
- UcLEizFSJ6f7VL3j3UCCbvX+J1S5P4E/5xu2pwpONv2ZyIQk3Mf6JR+2Ctqv7zzC5fdx1l
- igQkhjyfJ0PFdsLjW5sLbJYnRyxkQcc=
+ bh=MS4GMOrXuyseQj6b9uOcNCZDNOgmCHF+Kqrg/kXyQtY=;
+ b=VebUwqQwzPMad0+zEOcQxLeyS/ShKaSXdz1KhhC2vGt/f6aDZuE0/fUz/g17z7wxEzMv+W
+ ppUDgsskkcFN6VfqiWAN0PIELVagwrXcGfmissroPT/nJPbun9QxJqqeDqi+bMagD10B+I
+ gfw5SUegpYyUlBzjyFgPury1/EWr9BU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-229-L_dRoL0vNHebz7tLj8kyyQ-1; Fri, 14 Aug 2020 05:13:43 -0400
-X-MC-Unique: L_dRoL0vNHebz7tLj8kyyQ-1
+ us-mta-522-Ts_V88Y2MKm9xXKWU92F6g-1; Fri, 14 Aug 2020 05:13:47 -0400
+X-MC-Unique: Ts_V88Y2MKm9xXKWU92F6g-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 51DC11015DBE
- for <qemu-devel@nongnu.org>; Fri, 14 Aug 2020 09:13:42 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 16EDE801AC3
+ for <qemu-devel@nongnu.org>; Fri, 14 Aug 2020 09:13:46 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E7A1C747C3
- for <qemu-devel@nongnu.org>; Fri, 14 Aug 2020 09:13:41 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BBD1E747B9;
+ Fri, 14 Aug 2020 09:13:45 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 020/150] meson: move summary to meson.build
-Date: Fri, 14 Aug 2020 05:11:16 -0400
-Message-Id: <20200814091326.16173-21-pbonzini@redhat.com>
+Subject: [PATCH 022/150] meson: use coverage option
+Date: Fri, 14 Aug 2020 05:11:18 -0400
+Message-Id: <20200814091326.16173-23-pbonzini@redhat.com>
 In-Reply-To: <20200814091326.16173-1-pbonzini@redhat.com>
 References: <20200814091326.16173-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -72,18 +72,19 @@ Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/14 05:13:42
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/14 03:37:30
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -97,606 +98,175 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+From: Marc-André Lureau <marcandre.lureau@redhat.com>
+
+Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- configure   | 237 --------------------------------------------------
- meson.build | 243 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 243 insertions(+), 237 deletions(-)
+ Makefile               | 14 --------------
+ Makefile.target        | 16 ----------------
+ configure              |  9 ++-------
+ docs/devel/testing.rst |  7 +++----
+ meson.build            |  2 +-
+ 5 files changed, 6 insertions(+), 42 deletions(-)
 
+diff --git a/Makefile b/Makefile
+index 5a2f6c96d3..7e9663aeb7 100644
+--- a/Makefile
++++ b/Makefile
+@@ -772,14 +772,6 @@ module_block.h: $(SRC_PATH)/scripts/modules/module_block.py config-host.mak
+ 	$(addprefix $(SRC_PATH)/,$(patsubst %.mo,%.c,$(block-obj-m))), \
+ 	"GEN","$@")
+ 
+-ifdef CONFIG_GCOV
+-.PHONY: clean-coverage
+-clean-coverage:
+-	$(call quiet-command, \
+-		find . \( -name '*.gcda' -o -name '*.gcov' \) -type f -exec rm {} +, \
+-		"CLEAN", "coverage files")
+-endif
+-
+ clean: recurse-clean ninja-clean clean-ctlist
+ 	-test -f ninjatool && ./ninjatool $(if $(V),-v,) -t clean
+ # avoid old build problems by removing potentially incorrect old files
+@@ -1286,9 +1278,6 @@ endif
+ 		echo '')
+ 	@echo  'Cleaning targets:'
+ 	$(call print-help,clean,Remove most generated files but keep the config)
+-ifdef CONFIG_GCOV
+-	$(call print-help,clean-coverage,Remove coverage files)
+-endif
+ 	$(call print-help,distclean,Remove all generated files)
+ 	$(call print-help,dist,Build a distributable tarball)
+ 	@echo  ''
+@@ -1299,9 +1288,6 @@ endif
+ 	@echo  ''
+ 	@echo  'Documentation targets:'
+ 	$(call print-help,html info pdf txt,Build documentation in specified format)
+-ifdef CONFIG_GCOV
+-	$(call print-help,coverage-report,Create code coverage report)
+-endif
+ 	@echo  ''
+ ifdef CONFIG_WIN32
+ 	@echo  'Windows targets:'
+diff --git a/Makefile.target b/Makefile.target
+index ffa2657269..d61a6a978b 100644
+--- a/Makefile.target
++++ b/Makefile.target
+@@ -269,19 +269,3 @@ endif
+ 
+ generated-files-y += config-target.h
+ Makefile: $(generated-files-y)
+-
+-# Reports/Analysis
+-#
+-# The target specific coverage report only cares about target specific
+-# blobs and not the shared code.
+-#
+-
+-%/coverage-report.html:
+-	@mkdir -p $*
+-	$(call quiet-command,\
+-		gcovr -r $(SRC_PATH) --object-directory $(CURDIR) \
+-		-p --html --html-details -o $@, \
+-		"GEN", "coverage-report.html")
+-
+-.PHONY: coverage-report
+-coverage-report: $(CURDIR)/reports/coverage/coverage-report.html
 diff --git a/configure b/configure
-index bbbb213d8d..e8c1ed5aba 100755
+index 50ecafa658..54e8b91843 100755
 --- a/configure
 +++ b/configure
-@@ -527,8 +527,6 @@ secret_keyring=""
- libdaxctl=""
- meson=""
+@@ -424,7 +424,6 @@ tcg_interpreter="no"
+ bigendian="no"
+ mingw32="no"
+ gcov="no"
+-gcov_tool="gcov"
+ EXESUF=""
+ DSOSUF=".so"
+ LDFLAGS_SHARED="-shared"
+@@ -1009,8 +1008,6 @@ for opt do
+   ;;
+   --meson=*) meson="$optarg"
+   ;;
+-  --gcov=*) gcov_tool="$optarg"
+-  ;;
+   --smbd=*) smbd="$optarg"
+   ;;
+   --extra-cflags=*)
+@@ -1817,7 +1814,6 @@ Advanced options (experts only):
+   --with-coroutine=BACKEND coroutine backend. Supported options:
+                            ucontext, sigaltstack, windows
+   --enable-gcov            enable test coverage analysis with gcov
+-  --gcov=GCOV              use specified gcov [$gcov_tool]
+   --disable-blobs          disable installing provided firmware blobs
+   --with-vss-sdk=SDK-path  enable Windows VSS support in QEMU Guest Agent
+   --with-win-sdk=SDK-path  path to Windows Platform SDK (to build VSS .tlb)
+@@ -6551,8 +6547,7 @@ fi
+ write_c_skeleton
  
--supported_cpu="no"
--supported_os="no"
- bogus_os="no"
- malloc_trim=""
+ if test "$gcov" = "yes" ; then
+-  QEMU_CFLAGS="-fprofile-arcs -ftest-coverage -g $QEMU_CFLAGS"
+-  QEMU_LDFLAGS="-fprofile-arcs -ftest-coverage $QEMU_LDFLAGS"
++  :
+ elif test "$fortify_source" = "yes" ; then
+   QEMU_CFLAGS="-U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2 $QEMU_CFLAGS"
+   debug=no
+@@ -7837,7 +7832,6 @@ echo "TASN1_CFLAGS=$tasn1_cflags" >> $config_host_mak
+ echo "POD2MAN=$POD2MAN" >> $config_host_mak
+ if test "$gcov" = "yes" ; then
+   echo "CONFIG_GCOV=y" >> $config_host_mak
+-  echo "GCOV=$gcov_tool" >> $config_host_mak
+ fi
  
-@@ -767,35 +765,27 @@ ARCH=
- # Note that this case should only have supported host CPUs, not guests.
- case "$cpu" in
-   ppc|ppc64|s390x|sparc64|x32|riscv32|riscv64)
--    supported_cpu="yes"
-   ;;
-   ppc64le)
-     ARCH="ppc64"
--    supported_cpu="yes"
-   ;;
-   i386|i486|i586|i686|i86pc|BePC)
-     cpu="i386"
--    supported_cpu="yes"
-   ;;
-   x86_64|amd64)
-     cpu="x86_64"
--    supported_cpu="yes"
-   ;;
-   armv*b|armv*l|arm)
-     cpu="arm"
--    supported_cpu="yes"
-   ;;
-   aarch64)
-     cpu="aarch64"
--    supported_cpu="yes"
-   ;;
-   mips*)
-     cpu="mips"
--    supported_cpu="yes"
-   ;;
-   sparc|sun4[cdmuv])
-     cpu="sparc"
--    supported_cpu="yes"
-   ;;
-   *)
-     # This will result in either an error or falling back to TCI later
-@@ -823,7 +813,6 @@ MINGW32*)
-     audio_drv_list=""
-   fi
-   supported_os="yes"
--  pie="no"
- ;;
- GNU/kFreeBSD)
-   bsd="yes"
-@@ -841,7 +830,6 @@ FreeBSD)
-   libs_qga="-lutil $libs_qga"
-   netmap=""  # enable netmap autodetect
-   HOST_VARIANT_DIR="freebsd"
--  supported_os="yes"
- ;;
- DragonFly)
-   bsd="yes"
-@@ -858,7 +846,6 @@ NetBSD)
-   audio_possible_drivers="oss sdl"
-   oss_lib="-lossaudio"
-   HOST_VARIANT_DIR="netbsd"
--  supported_os="yes"
- ;;
- OpenBSD)
-   bsd="yes"
-@@ -866,7 +853,6 @@ OpenBSD)
-   audio_drv_list="try-sdl"
-   audio_possible_drivers="sdl"
-   HOST_VARIANT_DIR="openbsd"
--  supported_os="yes"
- ;;
- Darwin)
-   bsd="yes"
-@@ -887,7 +873,6 @@ Darwin)
-   # won't work when we're compiling with gcc as a C compiler.
-   QEMU_CFLAGS="-DOS_OBJECT_USE_OBJC=0 $QEMU_CFLAGS"
-   HOST_VARIANT_DIR="darwin"
--  supported_os="yes"
- ;;
- SunOS)
-   solaris="yes"
-@@ -918,7 +903,6 @@ Linux)
-   linux_user="yes"
-   kvm="yes"
-   QEMU_INCLUDES="-isystem ${source_path}/linux-headers -I$PWD/linux-headers $QEMU_INCLUDES"
--  supported_os="yes"
-   libudev="yes"
- ;;
- esac
-@@ -5272,8 +5256,6 @@ EOF
-     spice="yes"
-     libs_softmmu="$libs_softmmu $spice_libs"
-     QEMU_CFLAGS="$QEMU_CFLAGS $spice_cflags"
--    spice_protocol_version=$($pkg_config --modversion spice-protocol)
--    spice_server_version=$($pkg_config --modversion spice-server)
-   else
-     if test "$spice" = "yes" ; then
-       feature_not_found "spice" \
-@@ -6890,225 +6872,6 @@ QEMU_CFLAGS="$pixman_cflags $fdt_cflags $QEMU_CFLAGS"
- QEMU_LDFLAGS="$fdt_ldflags $QEMU_LDFLAGS"
- libs_softmmu="$pixman_libs $libs_softmmu"
+ if test "$libudev" != "no"; then
+@@ -8465,6 +8459,7 @@ NINJA=$PWD/ninjatool $meson setup \
+         -Dwerror=$(if test "$werror" = yes; then echo true; else echo false; fi) \
+         -Dstrip=$(if test "$strip_opt" = yes; then echo true; else echo false; fi) \
+         -Db_pie=$(if test "$pie" = yes; then echo true; else echo false; fi) \
++        -Db_coverage=$(if test "$gcov" = yes; then echo true; else echo false; fi) \
+         $cross_arg \
+         "$PWD" "$source_path"
  
--echo "Install prefix    $prefix"
--echo "BIOS directory    $(eval echo $qemu_datadir)"
--echo "firmware path     $(eval echo $firmwarepath)"
--echo "binary directory  $(eval echo $bindir)"
--echo "library directory $(eval echo $libdir)"
--echo "module directory  $(eval echo $qemu_moddir)"
--echo "libexec directory $(eval echo $libexecdir)"
--echo "include directory $(eval echo $includedir)"
--echo "config directory  $(eval echo $sysconfdir)"
--if test "$mingw32" = "no" ; then
--echo "local state directory   $(eval echo $local_statedir)"
--echo "Manual directory  $(eval echo $mandir)"
--echo "ELF interp prefix $interp_prefix"
--else
--echo "local state directory   queried at runtime"
--echo "Windows SDK       $win_sdk"
--fi
--echo "Build directory   $(pwd)"
--echo "Source path       $source_path"
--echo "GIT binary        $git"
--echo "GIT submodules    $git_submodules"
--echo "C compiler        $cc"
--echo "Host C compiler   $host_cc"
--echo "C++ compiler      $cxx"
--echo "Objective-C compiler $objcc"
--echo "ARFLAGS           $ARFLAGS"
--echo "CFLAGS            $CFLAGS"
--echo "QEMU_CFLAGS       $QEMU_CFLAGS"
--echo "QEMU_LDFLAGS      $QEMU_LDFLAGS"
--echo "make              $make"
--echo "install           $install"
--echo "python            $python ($python_version)"
--if test "$docs" != "no"; then
--    echo "sphinx-build      $sphinx_build"
--fi
--echo "genisoimage       $genisoimage"
--echo "slirp support     $slirp $(echo_version $slirp $slirp_version)"
--if test "$slirp" != "no" ; then
--    echo "smbd              $smbd"
--fi
--echo "module support    $modules"
--echo "alt path mod load $module_upgrades"
--echo "host CPU          $cpu"
--echo "host big endian   $bigendian"
--echo "target list       $target_list"
--echo "gprof enabled     $gprof"
--echo "sparse enabled    $sparse"
--echo "strip binaries    $strip_opt"
--echo "profiler          $profiler"
--echo "static build      $static"
--echo "safe stack        $safe_stack"
--if test "$darwin" = "yes" ; then
--    echo "Cocoa support     $cocoa"
--fi
--echo "SDL support       $sdl $(echo_version $sdl $sdlversion)"
--echo "SDL image support $sdl_image"
--echo "GTK support       $gtk $(echo_version $gtk $gtk_version)"
--echo "GTK GL support    $gtk_gl"
--echo "VTE support       $vte $(echo_version $vte $vteversion)"
--echo "TLS priority      $tls_priority"
--echo "GNUTLS support    $gnutls"
--echo "libgcrypt         $gcrypt"
--if test "$gcrypt" = "yes"
--then
--   echo "  hmac            $gcrypt_hmac"
--   echo "  XTS             $gcrypt_xts"
--fi
--echo "nettle            $nettle $(echo_version $nettle $nettle_version)"
--if test "$nettle" = "yes"
--then
--   echo "  XTS             $nettle_xts"
--fi
--echo "libtasn1          $tasn1"
--echo "PAM               $auth_pam"
--echo "iconv support     $iconv"
--echo "curses support    $curses"
--echo "virgl support     $virglrenderer $(echo_version $virglrenderer $virgl_version)"
--echo "curl support      $curl"
--echo "mingw32 support   $mingw32"
--echo "Audio drivers     $audio_drv_list"
--echo "Block whitelist (rw) $block_drv_rw_whitelist"
--echo "Block whitelist (ro) $block_drv_ro_whitelist"
--echo "VirtFS support    $virtfs"
--echo "Multipath support $mpath"
--echo "VNC support       $vnc"
--if test "$vnc" = "yes" ; then
--    echo "VNC SASL support  $vnc_sasl"
--    echo "VNC JPEG support  $vnc_jpeg"
--    echo "VNC PNG support   $vnc_png"
--fi
--echo "xen support       $xen"
--if test "$xen" = "yes" ; then
--  echo "xen ctrl version  $xen_ctrl_version"
--fi
--echo "brlapi support    $brlapi"
--echo "Documentation     $docs"
--echo "PIE               $pie"
--echo "vde support       $vde"
--echo "netmap support    $netmap"
--echo "Linux AIO support $linux_aio"
--echo "Linux io_uring support $linux_io_uring"
--echo "ATTR/XATTR support $attr"
--echo "Install blobs     $blobs"
--echo "KVM support       $kvm"
--echo "HAX support       $hax"
--echo "HVF support       $hvf"
--echo "WHPX support      $whpx"
--echo "TCG support       $tcg"
--if test "$tcg" = "yes" ; then
--    echo "TCG debug enabled $debug_tcg"
--    echo "TCG interpreter   $tcg_interpreter"
--fi
--echo "malloc trim support $malloc_trim"
--echo "RDMA support      $rdma"
--echo "PVRDMA support    $pvrdma"
--echo "fdt support       $fdt"
--echo "membarrier        $membarrier"
--echo "preadv support    $preadv"
--echo "fdatasync         $fdatasync"
--echo "madvise           $madvise"
--echo "posix_madvise     $posix_madvise"
--echo "posix_memalign    $posix_memalign"
--echo "libcap-ng support $cap_ng"
--echo "vhost-net support $vhost_net"
--echo "vhost-crypto support $vhost_crypto"
--echo "vhost-scsi support $vhost_scsi"
--echo "vhost-vsock support $vhost_vsock"
--echo "vhost-user support $vhost_user"
--echo "vhost-user-fs support $vhost_user_fs"
--echo "vhost-vdpa support $vhost_vdpa"
--echo "Trace backends    $trace_backends"
--if have_backend "simple"; then
--echo "Trace output file $trace_file-<pid>"
--fi
--echo "spice support     $spice $(echo_version $spice $spice_protocol_version/$spice_server_version)"
--echo "rbd support       $rbd"
--echo "xfsctl support    $xfs"
--echo "smartcard support $smartcard"
--echo "libusb            $libusb"
--echo "usb net redir     $usb_redir"
--echo "OpenGL support    $opengl"
--echo "OpenGL dmabufs    $opengl_dmabuf"
--echo "libiscsi support  $libiscsi"
--echo "libnfs support    $libnfs"
--echo "build guest agent $guest_agent"
--echo "QGA VSS support   $guest_agent_with_vss"
--echo "QGA w32 disk info $guest_agent_ntddscsi"
--echo "QGA MSI support   $guest_agent_msi"
--echo "seccomp support   $seccomp"
--echo "coroutine backend $coroutine"
--echo "coroutine pool    $coroutine_pool"
--echo "debug stack usage $debug_stack_usage"
--echo "mutex debugging   $debug_mutex"
--echo "crypto afalg      $crypto_afalg"
--echo "GlusterFS support $glusterfs"
--echo "gcov              $gcov_tool"
--echo "gcov enabled      $gcov"
--echo "TPM support       $tpm"
--echo "libssh support    $libssh"
--echo "QOM debugging     $qom_cast_debug"
--echo "Live block migration $live_block_migration"
--echo "lzo support       $lzo"
--echo "snappy support    $snappy"
--echo "bzip2 support     $bzip2"
--echo "lzfse support     $lzfse"
--echo "zstd support      $zstd"
--echo "NUMA host support $numa"
--echo "libxml2           $libxml2"
--echo "tcmalloc support  $tcmalloc"
--echo "jemalloc support  $jemalloc"
--echo "avx2 optimization $avx2_opt"
--echo "avx512f optimization $avx512f_opt"
--echo "replication support $replication"
--echo "bochs support     $bochs"
--echo "cloop support     $cloop"
--echo "dmg support       $dmg"
--echo "qcow v1 support   $qcow1"
--echo "vdi support       $vdi"
--echo "vvfat support     $vvfat"
--echo "qed support       $qed"
--echo "parallels support $parallels"
--echo "sheepdog support  $sheepdog"
--echo "capstone          $capstone"
--echo "libpmem support   $libpmem"
--echo "libdaxctl support $libdaxctl"
--echo "libudev           $libudev"
--echo "default devices   $default_devices"
--echo "plugin support    $plugins"
--echo "fuzzing support   $fuzzing"
--echo "gdb               $gdb_bin"
--echo "rng-none          $rng_none"
--echo "Linux keyring     $secret_keyring"
--
--if test "$supported_cpu" = "no"; then
--    echo
--    echo "WARNING: SUPPORT FOR THIS HOST CPU WILL GO AWAY IN FUTURE RELEASES!"
--    echo
--    echo "CPU host architecture $cpu support is not currently maintained."
--    echo "The QEMU project intends to remove support for this host CPU in"
--    echo "a future release if nobody volunteers to maintain it and to"
--    echo "provide a build host for our continuous integration setup."
--    echo "configure has succeeded and you can continue to build, but"
--    echo "if you care about QEMU on this platform you should contact"
--    echo "us upstream at qemu-devel@nongnu.org."
--fi
--
--if test "$supported_os" = "no"; then
--    echo
--    echo "WARNING: SUPPORT FOR THIS HOST OS WILL GO AWAY IN FUTURE RELEASES!"
--    echo
--    echo "Host OS $targetos support is not currently maintained."
--    echo "The QEMU project intends to remove support for this host OS in"
--    echo "a future release if nobody volunteers to maintain it and to"
--    echo "provide a build host for our continuous integration setup."
--    echo "configure has succeeded and you can continue to build, but"
--    echo "if you care about QEMU on this platform you should contact"
--    echo "us upstream at qemu-devel@nongnu.org."
--fi
--
- config_host_mak="config-host.mak"
+diff --git a/docs/devel/testing.rst b/docs/devel/testing.rst
+index c1ff24370b..a4264691be 100644
+--- a/docs/devel/testing.rst
++++ b/docs/devel/testing.rst
+@@ -164,13 +164,12 @@ instrumenting the tested code. To use it, configure QEMU with
+ ``--enable-gcov`` option and build. Then run ``make check`` as usual.
  
- echo "# Automatically generated by configure - do not modify" >config-all-disas.mak
+ If you want to gather coverage information on a single test the ``make
+-clean-coverage`` target can be used to delete any existing coverage
++clean-gcda`` target can be used to delete any existing coverage
+ information before running a single test.
+ 
+ You can generate a HTML coverage report by executing ``make
+-coverage-report`` which will create
+-./reports/coverage/coverage-report.html. If you want to create it
+-elsewhere simply execute ``make /foo/bar/baz/coverage-report.html``.
++coverage-html`` which will create
++``meson-logs/coveragereport/index.html``.
+ 
+ Further analysis can be conducted by running the ``gcov`` command
+ directly on the various .gcda output files. Please read the ``gcov``
 diff --git a/meson.build b/meson.build
-index 598b32d18c..d3fb7166b6 100644
+index d3fb7166b6..3070439fe0 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -15,6 +15,8 @@ add_project_link_arguments(config_host['QEMU_LDFLAGS'].split(),
- add_project_arguments(config_host['QEMU_INCLUDES'].split(),
-                       language: ['c', 'cpp', 'objc'])
- 
-+python = import('python').find_installation(config_host['PYTHON'].split()[0])
-+
- if host_machine.system() == 'darwin'
-   add_languages('objc', required: false, native: false)
- endif
-@@ -22,3 +24,244 @@ endif
- configure_file(input: files('scripts/ninjatool.py'),
-                output: 'ninjatool',
-                configuration: config_host)
-+
-+supported_oses = ['windows', 'freebsd', 'netbsd', 'openbsd', 'darwin', 'sunos', 'linux']
-+supported_cpus = ['ppc', 'ppc64', 's390x', 'sparc64', 'riscv32', 'riscv64', 'x86', 'x86_64',
-+  'arm', 'aarch64', 'mips', 'mips64', 'sparc', 'sparc64']
-+
-+cpu = host_machine.cpu_family()
-+targetos = host_machine.system()
-+
-+summary_info = {}
-+summary_info += {'Install prefix':    config_host['prefix']}
-+summary_info += {'BIOS directory':    config_host['qemu_datadir']}
-+summary_info += {'firmware path':     config_host['qemu_firmwarepath']}
-+summary_info += {'binary directory':  config_host['bindir']}
-+summary_info += {'library directory': config_host['libdir']}
-+summary_info += {'module directory':  config_host['qemu_moddir']}
-+summary_info += {'libexec directory': config_host['libexecdir']}
-+summary_info += {'include directory': config_host['includedir']}
-+summary_info += {'config directory':  config_host['sysconfdir']}
-+if targetos != 'windows'
-+  summary_info += {'local state directory': config_host['qemu_localstatedir']}
-+  summary_info += {'Manual directory':      config_host['mandir']}
-+else
-+  summary_info += {'local state directory': 'queried at runtime'}
-+endif
-+summary_info += {'Build directory':   meson.current_build_dir()}
-+summary_info += {'Source path':       meson.current_source_dir()}
-+summary_info += {'GIT binary':        config_host['GIT']}
-+summary_info += {'GIT submodules':    config_host['GIT_SUBMODULES']}
-+summary_info += {'C compiler':        meson.get_compiler('c').cmd_array()[0]}
-+summary_info += {'Host C compiler':   meson.get_compiler('c', native: true).cmd_array()[0]}
-+summary_info += {'C++ compiler':      meson.get_compiler('cpp').cmd_array()[0]}
-+if host_machine.system() == 'darwin'
-+  summary_info += {'Objective-C compiler': meson.get_compiler('objc').cmd_array()[0]}
-+endif
-+summary_info += {'ARFLAGS':           config_host['ARFLAGS']}
-+summary_info += {'CFLAGS':            config_host['CFLAGS']}
-+summary_info += {'QEMU_CFLAGS':       config_host['QEMU_CFLAGS']}
-+summary_info += {'QEMU_LDFLAGS':      config_host['QEMU_LDFLAGS']}
-+summary_info += {'make':              config_host['MAKE']}
-+summary_info += {'install':           config_host['INSTALL']}
-+summary_info += {'python':            '@0@ (version: @1@)'.format(python.full_path(), python.language_version())}
-+summary_info += {'sphinx-build':      config_host['SPHINX_BUILD']}
-+summary_info += {'genisoimage':       config_host['GENISOIMAGE']}
-+# TODO: add back version
-+summary_info += {'slirp support':     config_host.has_key('CONFIG_SLIRP')}
-+if config_host.has_key('CONFIG_SLIRP')
-+  summary_info += {'smbd':            config_host['CONFIG_SMBD_COMMAND']}
-+endif
-+summary_info += {'module support':    config_host.has_key('CONFIG_MODULES')}
-+if config_host.has_key('CONFIG_MODULES')
-+  summary_info += {'alternative module path': config_host.has_key('CONFIG_MODULE_UPGRADES')}
-+endif
-+summary_info += {'host CPU':          cpu}
-+summary_info += {'host endianness':   build_machine.endian()}
-+summary_info += {'target list':       config_host['TARGET_DIRS']}
-+summary_info += {'gprof enabled':     config_host.has_key('CONFIG_GPROF')}
-+summary_info += {'sparse enabled':    meson.get_compiler('c').cmd_array().contains('cgcc')}
-+summary_info += {'strip binaries':    get_option('strip')}
-+summary_info += {'profiler':          config_host.has_key('CONFIG_PROFILER')}
-+summary_info += {'static build':      config_host.has_key('CONFIG_TOOLS')}
-+if targetos == 'darwin'
-+  summary_info += {'Cocoa support': config_host.has_key('CONFIG_COCOA')}
-+endif
-+# TODO: add back version
-+summary_info += {'SDL support':       config_host.has_key('CONFIG_SDL')}
-+summary_info += {'SDL image support': config_host.has_key('CONFIG_SDL_IMAGE')}
-+# TODO: add back version
-+summary_info += {'GTK support':       config_host.has_key('CONFIG_GTK')}
-+summary_info += {'GTK GL support':    config_host.has_key('CONFIG_GTK_GL')}
-+# TODO: add back version
-+summary_info += {'VTE support':       config_host.has_key('CONFIG_VTE')}
-+summary_info += {'TLS priority':      config_host['CONFIG_TLS_PRIORITY']}
-+summary_info += {'GNUTLS support':    config_host.has_key('CONFIG_GNUTLS')}
-+# TODO: add back version
-+summary_info += {'libgcrypt':         config_host.has_key('CONFIG_GCRYPT')}
-+if config_host.has_key('CONFIG_GCRYPT')
-+   summary_info += {'  hmac':            config_host.has_key('CONFIG_GCRYPT_HMAC')}
-+   summary_info += {'  XTS':             not config_host.has_key('CONFIG_QEMU_PRIVATE_XTS')}
-+endif
-+# TODO: add back version
-+summary_info += {'nettle':            config_host.has_key('CONFIG_NETTLE')}
-+if config_host.has_key('CONFIG_NETTLE')
-+   summary_info += {'  XTS':             not config_host.has_key('CONFIG_QEMU_PRIVATE_XTS')}
-+endif
-+summary_info += {'libtasn1':          config_host.has_key('CONFIG_TASN1')}
-+summary_info += {'PAM':               config_host.has_key('CONFIG_AUTH_PAM')}
-+summary_info += {'iconv support':     config_host.has_key('CONFIG_ICONV')}
-+summary_info += {'curses support':    config_host.has_key('CONFIG_CURSES')}
-+# TODO: add back version
-+summary_info += {'virgl support':     config_host.has_key('CONFIG_VIRGL')}
-+summary_info += {'curl support':      config_host.has_key('CONFIG_CURL')}
-+summary_info += {'mingw32 support':   targetos == 'windows'}
-+summary_info += {'Audio drivers':     config_host['CONFIG_AUDIO_DRIVERS']}
-+summary_info += {'Block whitelist (rw)': config_host['CONFIG_BDRV_RW_WHITELIST']}
-+summary_info += {'Block whitelist (ro)': config_host['CONFIG_BDRV_RO_WHITELIST']}
-+summary_info += {'VirtFS support':    config_host.has_key('CONFIG_VIRTFS')}
-+summary_info += {'Multipath support': config_host.has_key('CONFIG_MPATH')}
-+summary_info += {'VNC support':       config_host.has_key('CONFIG_VNC')}
-+if config_host.has_key('CONFIG_VNC')
-+  summary_info += {'VNC SASL support':  config_host.has_key('CONFIG_VNC_SASL')}
-+  summary_info += {'VNC JPEG support':  config_host.has_key('CONFIG_VNC_JPEG')}
-+  summary_info += {'VNC PNG support':   config_host.has_key('CONFIG_VNC_PNG')}
-+endif
-+summary_info += {'xen support':       config_host.has_key('CONFIG_XEN_BACKEND')}
-+if config_host.has_key('CONFIG_XEN_BACKEND')
-+  summary_info += {'xen ctrl version':  config_host['CONFIG_XEN_CTRL_INTERFACE_VERSION']}
-+endif
-+summary_info += {'brlapi support':    config_host.has_key('CONFIG_BRLAPI')}
-+summary_info += {'Documentation':     config_host.has_key('BUILD_DOCS')}
-+summary_info += {'PIE':               get_option('b_pie')}
-+summary_info += {'vde support':       config_host.has_key('CONFIG_VDE')}
-+summary_info += {'netmap support':    config_host.has_key('CONFIG_NETMAP')}
-+summary_info += {'Linux AIO support': config_host.has_key('CONFIG_LINUX_AIO')}
-+summary_info += {'Linux io_uring support': config_host.has_key('CONFIG_LINUX_IO_URING')}
-+summary_info += {'ATTR/XATTR support': config_host.has_key('CONFIG_ATTR')}
-+summary_info += {'Install blobs':     config_host.has_key('INSTALL_BLOBS')}
-+# TODO: add back KVM/HAX/HVF/WHPX/TCG
-+#summary_info += {'KVM support':       have_kvm'}
-+#summary_info += {'HAX support':       have_hax'}
-+#summary_info += {'HVF support':       have_hvf'}
-+#summary_info += {'WHPX support':      have_whpx'}
-+#summary_info += {'TCG support':       have_tcg'}
-+#if get_option('tcg')
-+#  summary_info += {'TCG debug enabled': config_host.has_key('CONFIG_DEBUG_TCG')}
-+#  summary_info += {'TCG interpreter':   config_host.has_key('CONFIG_TCG_INTERPRETER')}
-+#endif
-+summary_info += {'malloc trim support': config_host.has_key('CONFIG_MALLOC_TRIM')}
-+summary_info += {'RDMA support':      config_host.has_key('CONFIG_RDMA')}
-+summary_info += {'PVRDMA support':    config_host.has_key('CONFIG_PVRDMA')}
-+summary_info += {'fdt support':       config_host.has_key('CONFIG_FDT')}
-+summary_info += {'membarrier':        config_host.has_key('CONFIG_MEMBARRIER')}
-+summary_info += {'preadv support':    config_host.has_key('CONFIG_PREADV')}
-+summary_info += {'fdatasync':         config_host.has_key('CONFIG_FDATASYNC')}
-+summary_info += {'madvise':           config_host.has_key('CONFIG_MADVISE')}
-+summary_info += {'posix_madvise':     config_host.has_key('CONFIG_POSIX_MADVISE')}
-+summary_info += {'posix_memalign':    config_host.has_key('CONFIG_POSIX_MEMALIGN')}
-+summary_info += {'libcap-ng support': config_host.has_key('CONFIG_LIBCAP_NG')}
-+summary_info += {'vhost-net support': config_host.has_key('CONFIG_VHOST_NET')}
-+summary_info += {'vhost-crypto support': config_host.has_key('CONFIG_VHOST_CRYPTO')}
-+summary_info += {'vhost-scsi support': config_host.has_key('CONFIG_VHOST_SCSI')}
-+summary_info += {'vhost-vsock support': config_host.has_key('CONFIG_VHOST_VSOCK')}
-+summary_info += {'vhost-user support': config_host.has_key('CONFIG_VHOST_KERNEL')}
-+summary_info += {'vhost-user-fs support': config_host.has_key('CONFIG_VHOST_USER_FS')}
-+summary_info += {'vhost-vdpa support': config_host.has_key('CONFIG_VHOST_VDPA')}
-+summary_info += {'Trace backends':    config_host['TRACE_BACKENDS']}
-+if config_host['TRACE_BACKENDS'].split().contains('simple')
-+  summary_info += {'Trace output file': config_host['CONFIG_TRACE_FILE'] + '-<pid>'}
-+endif
-+# TODO: add back protocol and server version
-+summary_info += {'spice support':     config_host.has_key('CONFIG_SPICE')}
-+summary_info += {'rbd support':       config_host.has_key('CONFIG_RBD')}
-+summary_info += {'xfsctl support':    config_host.has_key('CONFIG_XFS')}
-+summary_info += {'smartcard support': config_host.has_key('CONFIG_SMARTCARD')}
-+summary_info += {'libusb':            config_host.has_key('CONFIG_USB_LIBUSB')}
-+summary_info += {'usb net redir':     config_host.has_key('CONFIG_USB_REDIR')}
-+summary_info += {'OpenGL support':    config_host.has_key('CONFIG_OPENGL')}
-+summary_info += {'OpenGL dmabufs':    config_host.has_key('CONFIG_OPENGL_DMABUF')}
-+summary_info += {'libiscsi support':  config_host.has_key('CONFIG_LIBISCSI')}
-+summary_info += {'libnfs support':    config_host.has_key('CONFIG_LIBNFS')}
-+summary_info += {'build guest agent': config_host.has_key('CONFIG_GUEST_AGENT')}
-+if targetos == 'windows'
-+  if 'WIN_SDK' in config_host
-+    summary_info += {'Windows SDK':       config_host['WIN_SDK']}
-+  endif
-+  summary_info += {'QGA VSS support':   config_host.has_key('CONFIG_QGA_VSS')}
-+  summary_info += {'QGA w32 disk info': config_host.has_key('CONFIG_QGA_NTDDSCSI')}
-+  summary_info += {'QGA MSI support':   config_host.has_key('CONFIG_QGA_MSI_ENABLED')}
-+endif
-+summary_info += {'seccomp support':   config_host.has_key('CONFIG_SECCOMP')}
-+summary_info += {'coroutine backend': config_host['CONFIG_COROUTINE_BACKEND']}
-+summary_info += {'coroutine pool':    config_host['CONFIG_COROUTINE_POOL'] == '1'}
-+summary_info += {'debug stack usage': config_host.has_key('CONFIG_DEBUG_STACK_USAGE')}
-+summary_info += {'mutex debugging':   config_host.has_key('CONFIG_DEBUG_MUTEX')}
-+summary_info += {'crypto afalg':      config_host.has_key('CONFIG_AF_ALG')}
-+summary_info += {'GlusterFS support': config_host.has_key('CONFIG_GLUSTERFS')}
-+summary_info += {'gcov':              config_host.has_key('CONFIG_GCOV')}
-+summary_info += {'TPM support':       config_host.has_key('CONFIG_TPM')}
-+summary_info += {'libssh support':    config_host.has_key('CONFIG_LIBSSH')}
-+summary_info += {'QOM debugging':     config_host.has_key('CONFIG_QOM_CAST_DEBUG')}
-+summary_info += {'Live block migration': config_host.has_key('CONFIG_LIVE_BLOCK_MIGRATION')}
-+summary_info += {'lzo support':       config_host.has_key('CONFIG_LZO')}
-+summary_info += {'snappy support':    config_host.has_key('CONFIG_SNAPPY')}
-+summary_info += {'bzip2 support':     config_host.has_key('CONFIG_BZIP2')}
-+summary_info += {'lzfse support':     config_host.has_key('CONFIG_LZFSE')}
-+summary_info += {'zstd support':      config_host.has_key('CONFIG_ZSTD')}
-+summary_info += {'NUMA host support': config_host.has_key('CONFIG_NUMA')}
-+summary_info += {'libxml2':           config_host.has_key('CONFIG_LIBXML2')}
-+summary_info += {'tcmalloc support':  config_host.has_key('CONFIG_TCMALLOC')}
-+summary_info += {'jemalloc support':  config_host.has_key('CONFIG_JEMALLOC')}
-+summary_info += {'avx2 optimization': config_host.has_key('CONFIG_AVX2_OPT')}
-+summary_info += {'avx512f optimization': config_host.has_key('CONFIG_AVX512F_OPT')}
-+summary_info += {'replication support': config_host.has_key('CONFIG_REPLICATION')}
-+summary_info += {'bochs support':     config_host.has_key('CONFIG_BOCHS')}
-+summary_info += {'cloop support':     config_host.has_key('CONFIG_CLOOP')}
-+summary_info += {'dmg support':       config_host.has_key('CONFIG_DMG')}
-+summary_info += {'qcow v1 support':   config_host.has_key('CONFIG_QCOW1')}
-+summary_info += {'vdi support':       config_host.has_key('CONFIG_VDI')}
-+summary_info += {'vvfat support':     config_host.has_key('CONFIG_VVFAT')}
-+summary_info += {'qed support':       config_host.has_key('CONFIG_QED')}
-+summary_info += {'parallels support': config_host.has_key('CONFIG_PARALLELS')}
-+summary_info += {'sheepdog support':  config_host.has_key('CONFIG_SHEEPDOG')}
-+summary_info += {'capstone':          config_host.has_key('CONFIG_CAPSTONE')}
-+summary_info += {'libpmem support':   config_host.has_key('CONFIG_LIBPMEM')}
-+summary_info += {'libdaxctl support': config_host.has_key('CONFIG_LIBDAXCTL')}
-+summary_info += {'libudev':           config_host.has_key('CONFIG_LIBUDEV')}
-+summary_info += {'default devices':   config_host['CONFIG_MINIKCONF_MODE'] == '--defconfig'}
-+summary_info += {'plugin support':    config_host.has_key('CONFIG_PLUGIN')}
-+summary_info += {'fuzzing support':   config_host.has_key('CONFIG_FUZZ')}
-+if config_host.has_key('HAVE_GDB_BIN')
-+  summary_info += {'gdb':             config_host['HAVE_GDB_BIN']}
-+endif
-+summary_info += {'thread sanitizer':  config_host.has_key('CONFIG_TSAN')}
-+summary_info += {'rng-none':          config_host.has_key('CONFIG_RNG_NONE')}
-+summary_info += {'Linux keyring':     config_host.has_key('CONFIG_SECRET_KEYRING')}
-+summary(summary_info, bool_yn: true)
-+
-+if not supported_cpus.contains(cpu)
-+  message()
-+  warning('SUPPORT FOR THIS HOST CPU WILL GO AWAY IN FUTURE RELEASES!')
-+  message()
-+  message('CPU host architecture ' + cpu + ' support is not currently maintained.')
-+  message('The QEMU project intends to remove support for this host CPU in')
-+  message('a future release if nobody volunteers to maintain it and to')
-+  message('provide a build host for our continuous integration setup.')
-+  message('configure has succeeded and you can continue to build, but')
-+  message('if you care about QEMU on this platform you should contact')
-+  message('us upstream at qemu-devel@nongnu.org.')
-+endif
-+
-+if not supported_oses.contains(targetos)
-+  message()
-+  warning('WARNING: SUPPORT FOR THIS HOST OS WILL GO AWAY IN FUTURE RELEASES!')
-+  message()
-+  message('Host OS ' + targetos + 'support is not currently maintained.')
-+  message('The QEMU project intends to remove support for this host OS in')
-+  message('a future release if nobody volunteers to maintain it and to')
-+  message('provide a build host for our continuous integration setup.')
-+  message('configure has succeeded and you can continue to build, but')
-+  message('if you care about QEMU on this platform you should contact')
-+  message('us upstream at qemu-devel@nongnu.org.')
-+endif
+@@ -199,7 +199,7 @@ summary_info += {'debug stack usage': config_host.has_key('CONFIG_DEBUG_STACK_US
+ summary_info += {'mutex debugging':   config_host.has_key('CONFIG_DEBUG_MUTEX')}
+ summary_info += {'crypto afalg':      config_host.has_key('CONFIG_AF_ALG')}
+ summary_info += {'GlusterFS support': config_host.has_key('CONFIG_GLUSTERFS')}
+-summary_info += {'gcov':              config_host.has_key('CONFIG_GCOV')}
++summary_info += {'gcov':              get_option('b_coverage')}
+ summary_info += {'TPM support':       config_host.has_key('CONFIG_TPM')}
+ summary_info += {'libssh support':    config_host.has_key('CONFIG_LIBSSH')}
+ summary_info += {'QOM debugging':     config_host.has_key('CONFIG_QOM_CAST_DEBUG')}
 -- 
 2.26.2
 
