@@ -2,79 +2,83 @@ Return-Path: <SRS0=PlQC=BZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35A70C433E1
-	for <qemu-devel@archiver.kernel.org>; Sat, 15 Aug 2020 16:39:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6F31C433E1
+	for <qemu-devel@archiver.kernel.org>; Sat, 15 Aug 2020 16:40:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0285723102
-	for <qemu-devel@archiver.kernel.org>; Sat, 15 Aug 2020 16:39:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8217223A6C
+	for <qemu-devel@archiver.kernel.org>; Sat, 15 Aug 2020 16:40:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Um8s5pfh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0285723102
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="q0aae6Y/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8217223A6C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58612 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32824 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k6zDi-0003yQ-9f
-	for qemu-devel@archiver.kernel.org; Sat, 15 Aug 2020 12:39:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35948)
+	id 1k6zEN-0004ya-Ps
+	for qemu-devel@archiver.kernel.org; Sat, 15 Aug 2020 12:40:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35916)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1k6zCx-00036w-0k
- for qemu-devel@nongnu.org; Sat, 15 Aug 2020 12:39:03 -0400
-Received: from mail-pg1-x533.google.com ([2607:f8b0:4864:20::533]:36647)
+ id 1k6zCo-00030o-Fz
+ for qemu-devel@nongnu.org; Sat, 15 Aug 2020 12:38:54 -0400
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:38529)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1k6zCt-0006O7-Le
- for qemu-devel@nongnu.org; Sat, 15 Aug 2020 12:39:02 -0400
-Received: by mail-pg1-x533.google.com with SMTP id p37so5979119pgl.3
- for <qemu-devel@nongnu.org>; Sat, 15 Aug 2020 09:38:59 -0700 (PDT)
+ id 1k6zCm-0006Nm-Rm
+ for qemu-devel@nongnu.org; Sat, 15 Aug 2020 12:38:54 -0400
+Received: by mail-pg1-x542.google.com with SMTP id 128so5978633pgd.5
+ for <qemu-devel@nongnu.org>; Sat, 15 Aug 2020 09:38:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=6ylxTGSowvqS4Sh1nFgWGtctWNG02JS9Mw6SmxLJsAo=;
- b=Um8s5pfhmy2Si6VqG67ZNrDCMnUQgwt2dA1lBHVzX5nmT6wVCJFQtyhaRo0ikfXU2b
- xGBoC6slDc17ehVG7Degk/TJMRrhhZcP3vTkx7p6YDEQOGCnv1qYqaOHARKvmQlX+Rsv
- UNLBjOxJ8IgrfcI1BH3Jx3ZpsUIhYEyT/e+EFZjkM0Box2qIJOEIKCZKe5pLObJknxOQ
- IKJ6ERIe1xmRA7ifDRlKT++5LJzwaUea8iM8X41ingucjgclu3Avi1KU9irGq+fuwh7H
- OdxwX5QD+dCIJEpUhYkIoK0e5FNB1WG47OW+pEZDnDgj4ONSSH/aIySDLOXYDpYH8gY6
- GTnQ==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=prxXYpsbQ4iXO9C0JgcLsKT0yklnyu64rFTxXlR5v4g=;
+ b=q0aae6Y/AQrV72qpxt74vS2aXvJ/85YEHfzMo7gMXqjmBb2wtrvZnQMKXiOQxZbBeQ
+ 7uw/MoAeg18fgcWKiS/V9fjcX+0xZm9mmGwo17UT5/1t1Mw1JMAmhShi2fxYNDN9OGz9
+ sn/9TP/Zcen2rS49iiUpes8ssBskTwbNI4aNn/G31g7SoyURTifVAsJpXIA3Hr1O1DAb
+ Jv781uwNvJ3RdlnIqdeZxLy+Pfhn7IqcSHpfMPaMr2Mbs8h4qb2nYrTc4HpiRVgRVjR9
+ GDqKRt4G82nxJnLM/VSMF6xKEXcMxmOxrT4uTJYXq/HL32iqv0voNi9qwf3aYsK1jpxs
+ 9pyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=6ylxTGSowvqS4Sh1nFgWGtctWNG02JS9Mw6SmxLJsAo=;
- b=s4kBQKBwU0SkK0UVGTEYOak3vDbfEJdWWV/7Z6bkAq63IybcZGAaCtmmyImxOs10fu
- xv6D5YH3DF94xAskVnx/eFX9NyQ/jnbdLBIBt0hZJKcuUMv5BtjuqP0/e1Aw5MObGBMt
- HXysfpkK+YsHFop+QoQTzUrCI998gLnrNVPgIyzt5498B6+eNlfWjNqGGsj4ljo++fBw
- p1AHKo7M69LL/fe5QjxHWvnCz0OnwDOTKCwt0wsYdVfsvR5sINfrrIzW9Hpw5iOZm+N7
- dJE8Nxh8nAXCLt/qhJ4pLEdKUTvF/r8uXipcU+Qr3VNhrTGaRwbqJlQ1MGXYdDtNPNE0
- VV9g==
-X-Gm-Message-State: AOAM5301njE31Bcd38UCoKfNPGK5JYTNfyQUC4KQ+tePn2pwRZALP+mQ
- bwIF0JzZvsmU0LzFQjlRW+tymd7R5+R8Ug==
-X-Google-Smtp-Source: ABdhPJzooIQPqUp4BAMWMSJrlSyEDXoHoqf7zkYUy1ztrkOXxne62hcZz4uUU1WlEbzv6gHTuRdCgw==
-X-Received: by 2002:aa7:8a4d:: with SMTP id n13mr3342048pfa.143.1597441181486; 
- Fri, 14 Aug 2020 14:39:41 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=prxXYpsbQ4iXO9C0JgcLsKT0yklnyu64rFTxXlR5v4g=;
+ b=epIppV8trpoJ+AY5CJhdcG8YQoncIv20+ybt1/jT0mcK4fkbawlWRzCWn0j72w9adp
+ fqh5oJV7cyY3/EIfnZ3QVDHwPtV2akp/tKsXnowJ2xoFThHvl9153J9PVeXtKjdWtTJ4
+ YyDdn+2J/pkSRKpMLbJz+fsGe78OdH5pDFI1Mp7IO4n4h/m+3kpALq7zUlDFYBbwXXxn
+ hO4+BA2R/TteqJDQGVploShy9lum4/pXS/0YX0AhwonXXEAyAvaeylLAqKmRIjWOgvdw
+ GQdWLetba6Z31YW+Tnai7811YkmHO5QRpU4k5sb4vFHURjZn2A5cLjrEhISechMw0bIg
+ gPSw==
+X-Gm-Message-State: AOAM532rYlAlAX4RpW7tr4sT/m7TC+VqIo2KTxHLGznufAM/dNPaeXRc
+ YGzn2t7GgXFk2zmbUg7yfYvaDAdz7QzUhQ==
+X-Google-Smtp-Source: ABdhPJxY+tFn0hIYbjFqJONJQq0hYNVfHozx+s3/Gs0lZ9xCWdVKRSaCVVi3ns4pvn9OS7SkZiirLQ==
+X-Received: by 2002:a63:6744:: with SMTP id b65mr3062787pgc.42.1597441185658; 
+ Fri, 14 Aug 2020 14:39:45 -0700 (PDT)
 Received: from localhost.localdomain ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id q83sm10417249pfc.31.2020.08.14.14.39.39
+ by smtp.gmail.com with ESMTPSA id q83sm10417249pfc.31.2020.08.14.14.39.44
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 14 Aug 2020 14:39:40 -0700 (PDT)
+ Fri, 14 Aug 2020 14:39:44 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 0/3] target/arm: Implement an IMPDEF pauth algorithm
-Date: Fri, 14 Aug 2020 14:39:35 -0700
-Message-Id: <20200814213938.369628-1-richard.henderson@linaro.org>
+Subject: [PATCH v3 3/3] target/arm: Use object_property_add_bool for "sve"
+ property
+Date: Fri, 14 Aug 2020 14:39:38 -0700
+Message-Id: <20200814213938.369628-4-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200814213938.369628-1-richard.henderson@linaro.org>
+References: <20200814213938.369628-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::533;
- envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x533.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::542;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x542.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -102,41 +106,72 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The architected pauth algorithm is quite slow without
-hardware support, and boot times for kernels that enable
-use of the feature have been significantly impacted.
+The interface for object_property_add_bool is simpler,
+making the code easier to understand.
 
-Version 1 blurb at
-  https://lists.nongnu.org/archive/html/qemu-devel/2020-08/msg02172.html
-which contains larger study of the tradeoffs.
+Reviewed-by: Andrew Jones <drjones@redhat.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/arm/cpu64.c | 24 ++++++++++--------------
+ 1 file changed, 10 insertions(+), 14 deletions(-)
 
-Version 2 changes:
-  * Use boolean properties, for qmp_query_cpu_model_expansion (drjones).
-  * Move XXH64 implementation to xxhash.h (ajb).
-  * Include a small cleanup to parsing the "sve" property
-    that I noticed along the way.
-
-Version 3 changes:
-  * Swap order of patches (drjones).
-  * Add properties test case (drjones).
-
-
-r~
-
-Richard Henderson (3):
-  target/arm: Implement an IMPDEF pauth algorithm
-  target/arm: Add cpu properties to control pauth
-  target/arm: Use object_property_add_bool for "sve" property
-
- include/qemu/xxhash.h          | 82 ++++++++++++++++++++++++++++++++++
- target/arm/cpu.h               | 25 +++++++++--
- target/arm/cpu.c               | 13 ++++++
- target/arm/cpu64.c             | 64 ++++++++++++++++++--------
- target/arm/monitor.c           |  1 +
- target/arm/pauth_helper.c      | 41 ++++++++++++++---
- tests/qtest/arm-cpu-features.c | 13 ++++++
- 7 files changed, 212 insertions(+), 27 deletions(-)
-
+diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+index 0227862d39..cce0da0b90 100644
+--- a/target/arm/cpu64.c
++++ b/target/arm/cpu64.c
+@@ -488,6 +488,12 @@ static void cpu_max_set_sve_max_vq(Object *obj, Visitor *v, const char *name,
+     cpu->sve_max_vq = max_vq;
+ }
+ 
++/*
++ * Note that cpu_arm_get/set_sve_vq cannot use the simpler
++ * object_property_add_bool interface because they make use
++ * of the contents of "name" to determine which bit on which
++ * to operate.
++ */
+ static void cpu_arm_get_sve_vq(Object *obj, Visitor *v, const char *name,
+                                void *opaque, Error **errp)
+ {
+@@ -529,26 +535,17 @@ static void cpu_arm_set_sve_vq(Object *obj, Visitor *v, const char *name,
+     set_bit(vq - 1, cpu->sve_vq_init);
+ }
+ 
+-static void cpu_arm_get_sve(Object *obj, Visitor *v, const char *name,
+-                            void *opaque, Error **errp)
++static bool cpu_arm_get_sve(Object *obj, Error **errp)
+ {
+     ARMCPU *cpu = ARM_CPU(obj);
+-    bool value = cpu_isar_feature(aa64_sve, cpu);
+-
+-    visit_type_bool(v, name, &value, errp);
++    return cpu_isar_feature(aa64_sve, cpu);
+ }
+ 
+-static void cpu_arm_set_sve(Object *obj, Visitor *v, const char *name,
+-                            void *opaque, Error **errp)
++static void cpu_arm_set_sve(Object *obj, bool value, Error **errp)
+ {
+     ARMCPU *cpu = ARM_CPU(obj);
+-    bool value;
+     uint64_t t;
+ 
+-    if (!visit_type_bool(v, name, &value, errp)) {
+-        return;
+-    }
+-
+     if (value && kvm_enabled() && !kvm_arm_sve_supported()) {
+         error_setg(errp, "'sve' feature not supported by KVM on this host");
+         return;
+@@ -563,8 +560,7 @@ void aarch64_add_sve_properties(Object *obj)
+ {
+     uint32_t vq;
+ 
+-    object_property_add(obj, "sve", "bool", cpu_arm_get_sve,
+-                        cpu_arm_set_sve, NULL, NULL);
++    object_property_add_bool(obj, "sve", cpu_arm_get_sve, cpu_arm_set_sve);
+ 
+     for (vq = 1; vq <= ARM_MAX_VQ; ++vq) {
+         char name[8];
 -- 
 2.25.1
 
