@@ -7,70 +7,70 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56BEBC433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 08:29:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93D80C433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 08:30:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 22F2C2074D
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 08:29:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 60D3E2087D
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 08:30:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l2G+AhK5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22F2C2074D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="agL5RyD3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60D3E2087D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53832 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56290 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k6V5z-0005Kg-8R
-	for qemu-devel@archiver.kernel.org; Fri, 14 Aug 2020 04:29:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52192)
+	id 1k6V6Q-0006JZ-Hw
+	for qemu-devel@archiver.kernel.org; Fri, 14 Aug 2020 04:30:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52278)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k6V4z-0003Nw-3C; Fri, 14 Aug 2020 04:28:49 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:40317)
+ id 1k6V54-0003Z9-0S; Fri, 14 Aug 2020 04:28:54 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:43152)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k6V4x-0004Lc-JN; Fri, 14 Aug 2020 04:28:48 -0400
-Received: by mail-wm1-x344.google.com with SMTP id k20so7219824wmi.5;
- Fri, 14 Aug 2020 01:28:46 -0700 (PDT)
+ id 1k6V52-0004Mg-DW; Fri, 14 Aug 2020 04:28:53 -0400
+Received: by mail-wr1-x442.google.com with SMTP id a15so7579617wrh.10;
+ Fri, 14 Aug 2020 01:28:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=gPP3i1OySIOEchR+vbmDC0pxKakXyB2ET0Tvdz9ALkE=;
- b=l2G+AhK5j5qZqgRTf3dVx+u67ook/837XCxGnnpnoecz4K/PgEej3QDYpkhAI7ljq+
- +d5MxxFxzi4/WS1I/tkaJnvUH9KHGr6zW+c0efaJ7JROFNnq9BXTb4hQMEeC519o/c6W
- nx4gLMp7hW316JDLdu2hvDmU00bq3SyUDVZl6ZX4R37sI5Kr5yz0luz0leOpToTAmahD
- YgsM5h1VRiCYH1F1EGfJrZVtNGayr/MDg+l7PlbDbP0ScpI1YGcc9fRFLzHypRBv+SV6
- az4QjZHwEaWN/aFxawYFrqgoiwcn2fH+wgkf2H2R/KBjrvg429E3B/KLSwYKIiRiv4wR
- LFGw==
+ bh=h98y0GZ9oBKT9+HT3S78Zkh8zS/hG43uNb/8d1WCmb4=;
+ b=agL5RyD3B5RKHtua7k8mphgl+uyS4aSxW3jFgGqAsF9A3hz8WynkJrwZTmpeKuhLKo
+ LmqbI3a0OZJej2vKM+UB/rHU1mCgBJ+xnUh+yCuq+Mz/N2EgCiu8yTVtBxvnczXQAOSf
+ 2r5QbosILrhBXPNifdei4TqWFY26AiSOdkn8dIgWHMiHffBB5C7tUa89agxdjGHcSwJI
+ MB2eG5hX5A26ZSgwF9UAcwAHw4zXGwE0PBXFaQ1QWBba8AVTvIJz+76t3JtCTG5fZtYW
+ HsjXZZ4m9+jtN5fzEX7ZtLijYQaCgxEuQZqYgim/sGMP8Qydcj/piFqsjFZY0T4EzXnK
+ wFAg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=gPP3i1OySIOEchR+vbmDC0pxKakXyB2ET0Tvdz9ALkE=;
- b=dBDwAscgG7kyOzWZEnucTPDNaysOoeHVZNxQA/9wTlrtnVEOCH+XIg+ybyqBu1FhYW
- PZ9YI3N8QeTUBySSRNIkt3/pgVlnvDbQDitihv0wlR41/senpLj42E3OfMAVuVHW1NaJ
- xvhPuNt9q1HUP6Cqw2CoMOkEtzz4gLGeUqTsQi0Bs81zDbIt0DzYEKXafN/y+Sbs1fdm
- OXblAVc+wYopo+x5DNauZA+F56Ac7M/y23ihZD7C+L852VMjGXPhB2S9baa0+3A4n//1
- UIoF2AHC3IYUvFKTRzE7W8jAzzXJ5MOL0l0khGGBvQvqphzCj1+u/GTDiZfFvBvt1tSb
- ZB0w==
-X-Gm-Message-State: AOAM531YSmOsdV1ULfFSBySgRcDDHqq7bkPsvq7zsTwmrXB87Qa5XPD8
- pE08KwIjXZ/Omx12s8waGrcwc3Kgljc=
-X-Google-Smtp-Source: ABdhPJzpUYuoXoQ17vWZzlmIOYmvHyXDRkOktOqNsXwTPLrhDUOgsZZwft1I+kZRL+KMDly774xx0w==
-X-Received: by 2002:a7b:c0d3:: with SMTP id s19mr1499911wmh.84.1597393725130; 
- Fri, 14 Aug 2020 01:28:45 -0700 (PDT)
+ bh=h98y0GZ9oBKT9+HT3S78Zkh8zS/hG43uNb/8d1WCmb4=;
+ b=ulpdN5DEvtl0D/+tBuUsZdxl8LsAc8KwCUfXHmISxjxsoLigYckrHU4Ru5N7mpFMG7
+ mQR4Fq0OmVS5Dx+J6u0DLAVFg0zXG0yyFE9NEIMxl7X/rp11G3ZKrJbQX9lmG7LVZdKU
+ HdBTElr8jCKlcE/yubWkGVYlyQIoorHXW5iUJAc6ubIZvD4O2hJVxghiNKY+EfCVvSzH
+ cd9UGxICpe0AzSJ3RliUMSD6Gm5ihlEG/qPfVI6Gb08hwAu9nASgu+Pq6dMvLO8BZryk
+ LGFThpxk9iThvimzsw8XJ2Dxv7SLlq2jhQ47axxnaxgcMbrSCLaql6BYhDDw4ztnQlbO
+ YmdA==
+X-Gm-Message-State: AOAM531Riu6xzEGppSl+F54nLRcPLBpix8R3JSi/dy53GwO4D3Y/LXNy
+ q2lTDsvf3ZhAr5ZsmabdA6CXHpevvys=
+X-Google-Smtp-Source: ABdhPJyqUHRXbTjgYIcejArh90LLSHiqaC6dVOeMFts9Tr4fDdG6T46mXoo4vZmRIAv79XbADQ1R0g==
+X-Received: by 2002:adf:ed85:: with SMTP id c5mr1670129wro.307.1597393730132; 
+ Fri, 14 Aug 2020 01:28:50 -0700 (PDT)
 Received: from localhost.localdomain (121.red-81-40-121.staticip.rima-tde.net.
  [81.40.121.121])
- by smtp.gmail.com with ESMTPSA id d14sm14668107wre.44.2020.08.14.01.28.43
+ by smtp.gmail.com with ESMTPSA id d14sm14668107wre.44.2020.08.14.01.28.49
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 14 Aug 2020 01:28:44 -0700 (PDT)
+ Fri, 14 Aug 2020 01:28:49 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 1/7] block/null: Make more explicit the driver default size is
- 1GiB
-Date: Fri, 14 Aug 2020 10:28:35 +0200
-Message-Id: <20200814082841.27000-2-f4bug@amsat.org>
+Subject: [PATCH 5/7] hw/ide/atapi: Replace magic '512' value by
+ BDRV_SECTOR_SIZE
+Date: Fri, 14 Aug 2020 10:28:39 +0200
+Message-Id: <20200814082841.27000-6-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200814082841.27000-1-f4bug@amsat.org>
 References: <20200814082841.27000-1-f4bug@amsat.org>
@@ -78,8 +78,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::344;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x344.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::442;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x442.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -111,44 +111,40 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-As it is not obvious the default size for the null block driver
-is 1 GiB, replace the obfuscated '1 << 30' magic value by a
-definition using IEC binary prefixes.
+Use self-explicit definitions instead of magic '512' value.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- block/null.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ hw/ide/atapi.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/block/null.c b/block/null.c
-index 15e1d56746..8354def367 100644
---- a/block/null.c
-+++ b/block/null.c
-@@ -11,6 +11,7 @@
-  */
+diff --git a/hw/ide/atapi.c b/hw/ide/atapi.c
+index 17a9d635d8..14a2b0bb2f 100644
+--- a/hw/ide/atapi.c
++++ b/hw/ide/atapi.c
+@@ -824,9 +824,9 @@ static void cmd_get_configuration(IDEState *s, uint8_t *buf)
+      *
+      *      Only a problem if the feature/profiles grow.
+      */
+-    if (max_len > 512) {
++    if (max_len > BDRV_SECTOR_SIZE) {
+         /* XXX: assume 1 sector */
+-        max_len = 512;
++        max_len = BDRV_SECTOR_SIZE;
+     }
  
- #include "qemu/osdep.h"
-+#include "qemu/units.h"
- #include "qapi/error.h"
- #include "qapi/qmp/qdict.h"
- #include "qapi/qmp/qstring.h"
-@@ -21,6 +22,7 @@
+     memset(buf, 0, max_len);
+@@ -1186,8 +1186,8 @@ static void cmd_read_dvd_structure(IDEState *s, uint8_t* buf)
+         }
+     }
  
- #define NULL_OPT_LATENCY "latency-ns"
- #define NULL_OPT_ZEROES  "read-zeroes"
-+#define NULL_OPT_SIZE    (1 * GiB)
+-    memset(buf, 0, max_len > IDE_DMA_BUF_SECTORS * 512 + 4 ?
+-           IDE_DMA_BUF_SECTORS * 512 + 4 : max_len);
++    memset(buf, 0, max_len > IDE_DMA_BUF_SECTORS * BDRV_SECTOR_SIZE + 4 ?
++           IDE_DMA_BUF_SECTORS * BDRV_SECTOR_SIZE + 4 : max_len);
  
- typedef struct {
-     int64_t length;
-@@ -86,7 +88,7 @@ static int null_file_open(BlockDriverState *bs, QDict *options, int flags,
-     opts = qemu_opts_create(&runtime_opts, NULL, 0, &error_abort);
-     qemu_opts_absorb_qdict(opts, options, &error_abort);
-     s->length =
--        qemu_opt_get_size(opts, BLOCK_OPT_SIZE, 1 << 30);
-+        qemu_opt_get_size(opts, BLOCK_OPT_SIZE, NULL_OPT_SIZE);
-     s->latency_ns =
-         qemu_opt_get_number(opts, NULL_OPT_LATENCY, 0);
-     if (s->latency_ns < 0) {
+     switch (format) {
+         case 0x00 ... 0x7f:
 -- 
 2.21.3
 
