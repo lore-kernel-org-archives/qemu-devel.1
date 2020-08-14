@@ -2,89 +2,61 @@ Return-Path: <SRS0=5nOY=BY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17D91C433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 10:25:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 498D7C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 10:26:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D0266206DA
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 10:25:46 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IhzQLCuE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0266206DA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1F842206DA
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 10:26:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F842206DA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53502 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56242 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k6Wu9-0007tR-UD
-	for qemu-devel@archiver.kernel.org; Fri, 14 Aug 2020 06:25:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44202)
+	id 1k6Wut-0000ej-Bv
+	for qemu-devel@archiver.kernel.org; Fri, 14 Aug 2020 06:26:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46182)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k6Vnm-000819-Ge
- for qemu-devel@nongnu.org; Fri, 14 Aug 2020 05:15:06 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:49269
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k6Vni-0003AH-71
- for qemu-devel@nongnu.org; Fri, 14 Aug 2020 05:15:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597396501;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=IBXfWk7W7fH0eTVG+0nR5bPqpv6cRgwV8it9E5mV2dA=;
- b=IhzQLCuETYErYF9j/svvx/99RzxXMfewaT5b9E2NbNu6GhdQL2indJdeffd55+A0zzHUt1
- RHTfE7fPhI8+pCFJaIgunL4VQPAu61OlZ2EONII28GYSifBsS4OL0z8UgZj04l/FSGy+ft
- grrBISsA3gC4i7Ncl8QLVK1RL+huHoY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-391-0iUziIdQPtqEjfKRwDJjJQ-1; Fri, 14 Aug 2020 05:14:59 -0400
-X-MC-Unique: 0iUziIdQPtqEjfKRwDJjJQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 932A9801AC8
- for <qemu-devel@nongnu.org>; Fri, 14 Aug 2020 09:14:58 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com
- (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 44C6C5D9D2;
- Fri, 14 Aug 2020 09:14:58 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 126/150] meson: convert hw/9pfs, cleanup
-Date: Fri, 14 Aug 2020 05:13:02 -0400
-Message-Id: <20200814091326.16173-127-pbonzini@redhat.com>
-In-Reply-To: <20200814091326.16173-1-pbonzini@redhat.com>
-References: <20200814091326.16173-1-pbonzini@redhat.com>
+ (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
+ id 1k6VuD-0002Ip-8z
+ for qemu-devel@nongnu.org; Fri, 14 Aug 2020 05:21:45 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:50086 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
+ id 1k6VuA-00045z-0Y
+ for qemu-devel@nongnu.org; Fri, 14 Aug 2020 05:21:44 -0400
+Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id 99E0A1363B2174454624;
+ Fri, 14 Aug 2020 17:21:33 +0800 (CST)
+Received: from huawei.com (10.175.101.6) by DGGEMS413-HUB.china.huawei.com
+ (10.3.19.213) with Microsoft SMTP Server id 14.3.487.0; Fri, 14 Aug 2020
+ 17:21:24 +0800
+From: Chuan Zheng <zhengchuan@huawei.com>
+To: <quintela@redhat.com>, <eblake@redhat.com>, <dgilbert@redhat.com>
+Subject: [PATCH v2 00/10] *** A Method for evaluating dirty page rate ***
+Date: Fri, 14 Aug 2020 17:32:03 +0800
+Message-ID: <1597397532-68043-1-git-send-email-zhengchuan@huawei.com>
+X-Mailer: git-send-email 1.8.3.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/14 05:13:30
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
+Content-Type: text/plain
+X-Originating-IP: [10.175.101.6]
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.35; envelope-from=zhengchuan@huawei.com;
+ helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/14 05:21:34
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
 X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,185 +69,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: zhang.zhanghailiang@huawei.com, linyilu@huawei.com, qemu-devel@nongnu.org,
+ alex.chen@huawei.com, ann.zhuangyanying@huawei.com, fangying1@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Marc-André Lureau <marcandre.lureau@redhat.com>
+v1 -> v2:
+    use g_rand_new() to generate rand_buf
+    move RAMBLOCK_FOREACH_MIGRATABLE into migration/ram.h
+    add skip_sample_ramblock to filter sampled ramblock
+    fix multi-numa vm coredump when query dirtyrate
+    rename qapi interface and rename some structures and functions
+    succeed to compile by appling each patch
+    add test for migrating vm
 
-hw/Makefile.objs is gone so there is more code that can be removed.
+Sometimes it is neccessary to evaluate dirty page rate before migration.
+Users could decide whether to proceed migration based on the evaluation
+in case of vm performance loss due to heavy workload.
+Unlikey simulating dirtylog sync which could do harm on runnning vm,
+we provide a sample-hash method to compare hash results for samping page.
+In this way, it would have hardly no impact on vm performance.
 
-Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- Makefile              |  4 ----
- Makefile.objs         |  8 --------
- Makefile.target       | 15 ---------------
- hw/9pfs/Kconfig       |  4 ++++
- hw/9pfs/Makefile.objs |  9 ---------
- hw/9pfs/meson.build   | 20 ++++++++++++++++++++
- hw/Makefile.objs      |  8 --------
- hw/meson.build        |  1 +
- 8 files changed, 25 insertions(+), 44 deletions(-)
- delete mode 100644 hw/9pfs/Makefile.objs
- create mode 100644 hw/9pfs/meson.build
- delete mode 100644 hw/Makefile.objs
+Evaluate the dirtypage rate both on running and migration vm.
+The VM specifications for migration are as follows:
+- VM use 4-K page;
+- the number of VCPU is 32;
+- the total memory is 32Gigabit;
+- use 'mempress' tool to pressurize VM(mempress 4096 1024);
+- migration bandwidth is 1GB/s
 
-diff --git a/Makefile b/Makefile
-index 98d18c0bfb..79498bcfe4 100644
---- a/Makefile
-+++ b/Makefile
-@@ -169,10 +169,6 @@ ifneq ($(wildcard config-host.mak),)
- include $(SRC_PATH)/Makefile.objs
- endif
- 
--dummy := $(call unnest-vars,, \
--                common-obj-y \
--                common-obj-m)
--
- include $(SRC_PATH)/tests/Makefile.include
- 
- all: $(DOCS) $(if $(BUILD_DOCS),sphinxdocs) recurse-all modules
-diff --git a/Makefile.objs b/Makefile.objs
-index c332323b81..c9720a92df 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -61,18 +61,10 @@ common-obj-$(if $(CONFIG_RBD),m) += block-rbd$(DSOSUF)
- common-obj-$(if $(CONFIG_LZFSE),m) += block-dmg-lzfse$(DSOSUF)
- common-obj-$(if $(and $(CONFIG_BZIP2),$(CONFIG_DMG)),m) += block-dmg-bz2$(DSOSUF)
- 
--common-obj-y += hw/
--common-obj-m += hw/
--
- common-obj-y += libqmp.fa
- 
- endif # CONFIG_SOFTMMU
- 
--#######################################################################
--# Target-independent parts used in system and user emulation
--
--common-obj-y += hw/
--
- ######################################################################
- # Resource file for Windows executables
- version-obj-$(CONFIG_WIN32) += $(BUILD_DIR)/version.o
-diff --git a/Makefile.target b/Makefile.target
-index 3534ece38a..c95e0deb79 100644
---- a/Makefile.target
-+++ b/Makefile.target
-@@ -156,7 +156,6 @@ endif #CONFIG_BSD_USER
- ifdef CONFIG_SOFTMMU
- obj-y += softmmu/
- obj-y += gdbstub.o
--obj-y += hw/
- LIBS := $(libs_softmmu) $(LIBS)
- 
- # Temporary until emulators are linked by Meson
-@@ -185,20 +184,6 @@ endif # CONFIG_SOFTMMU
- dummy := $(call unnest-vars,,obj-y)
- all-obj-y := $(obj-y)
- 
--#
--# common-obj-m has some crap here, probably as side effect from
--# unnest-vars recursing into target directories to fill obj-y and not
--# properly handling the -m case.
--#
--# Clear common-obj-m as workaround.  Fixes suspious dependency errors
--# when building devices as modules.  A bit hackish, but should be ok
--# as long as we do not have any target-specific modules.
--#
--# The meson-based build system currently in development doesn't need
--# unnest-vars and will obsolete this workaround.
--#
--common-obj-m :=
--
- include $(SRC_PATH)/Makefile.objs
- dummy := $(call fix-paths,../,, \
-               authz-obj-y \
-diff --git a/hw/9pfs/Kconfig b/hw/9pfs/Kconfig
-index 3ae5749661..d3ebd73730 100644
---- a/hw/9pfs/Kconfig
-+++ b/hw/9pfs/Kconfig
-@@ -2,8 +2,12 @@ config FSDEV_9P
-     bool
-     depends on VIRTFS
- 
-+config 9PFS
-+    bool
-+
- config VIRTIO_9P
-     bool
-     default y
-     depends on VIRTFS && VIRTIO
-     select FSDEV_9P
-+    select 9PFS
-diff --git a/hw/9pfs/Makefile.objs b/hw/9pfs/Makefile.objs
-deleted file mode 100644
-index 70ded6fd8f..0000000000
---- a/hw/9pfs/Makefile.objs
-+++ /dev/null
-@@ -1,9 +0,0 @@
--common-obj-y  = 9p.o 9p-util.o
--common-obj-y += 9p-local.o 9p-xattr.o
--common-obj-y += 9p-xattr-user.o 9p-posix-acl.o
--common-obj-y += coth.o cofs.o codir.o cofile.o
--common-obj-y += coxattr.o 9p-synth.o
--common-obj-y += 9p-proxy.o
--
--common-obj-$(CONFIG_XEN) += xen-9p-backend.o
--obj-$(CONFIG_VIRTIO_9P) += virtio-9p-device.o
-diff --git a/hw/9pfs/meson.build b/hw/9pfs/meson.build
-new file mode 100644
-index 0000000000..cc09426212
---- /dev/null
-+++ b/hw/9pfs/meson.build
-@@ -0,0 +1,20 @@
-+fs_ss = ss.source_set()
-+fs_ss.add(files(
-+  '9p-local.c',
-+  '9p-posix-acl.c',
-+  '9p-proxy.c',
-+  '9p-synth.c',
-+  '9p-util.c',
-+  '9p-xattr-user.c',
-+  '9p-xattr.c',
-+  '9p.c',
-+  'codir.c',
-+  'cofile.c',
-+  'cofs.c',
-+  'coth.c',
-+  'coxattr.c',
-+))
-+fs_ss.add(when: 'CONFIG_XEN', if_true: files('xen-9p-backend.c'))
-+softmmu_ss.add_all(when: 'CONFIG_9PFS', if_true: fs_ss)
-+
-+specific_ss.add(when: 'CONFIG_VIRTIO_9P', if_true: files('virtio-9p-device.c'))
-diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-deleted file mode 100644
-index ebae00af6e..0000000000
---- a/hw/Makefile.objs
-+++ /dev/null
-@@ -1,8 +0,0 @@
--ifeq ($(CONFIG_SOFTMMU), y)
--devices-dirs-$(call lor,$(CONFIG_VIRTIO_9P),$(call land,$(CONFIG_VIRTFS),$(CONFIG_XEN))) += 9pfs/
--endif
--
--common-obj-y += $(devices-dirs-y)
--common-obj-m += display/
--common-obj-m += usb/
--obj-y += $(devices-dirs-y)
-diff --git a/hw/meson.build b/hw/meson.build
-index 55ca2b2b61..ba8763cad8 100644
---- a/hw/meson.build
-+++ b/hw/meson.build
-@@ -1,3 +1,4 @@
-+subdir('9pfs')
- subdir('acpi')
- subdir('adc')
- subdir('audio')
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+|                      |  running  |                  migrating                    |
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+| no mempress          |   4MB/s   |          8MB/s      (migrated success)        |
+------------------------------------------------------------------------------------
+| mempress 4096 1024   |  1188MB/s |   536MB/s ~ 1044MB/s (cpu throttle triggered) |
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+| mempress 4096 4096   |  4152MB/s |     608MB/s ~ 4125MB/s (migation failed)      |
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Test dirtyrate by qmp command like this:
+1.  virsh qemu-monitor-command [vmname] '{"execute":"calc-dirty-rate", "arguments": {"calc-time": [sleep-time]}}'; 
+2.  sleep specific time which is a bit larger than sleep-time
+3.  virsh qemu-monitor-command [vmname] '{"execute":"query-dirty-rate"}'
+
+Further test dirtyrate by libvirt api like this:
+virsh getdirtyrate [vmname] [sleep-time]
+
+Zheng Chuan (10):
+  migration/dirtyrate: Add get_dirtyrate_thread() function
+  migration/dirtyrate: Add RamlockDirtyInfo to store sampled page info
+  migration/dirtyrate: Add dirtyrate statistics series functions
+  migration/dirtyrate: move RAMBLOCK_FOREACH_MIGRATABLE into ram.h
+  migration/dirtyrate: Record hash results for each sampled page
+  migration/dirtyrate: Compare page hash results for recorded sampled
+    page
+  migration/dirtyrate: skip sampling ramblock with size below
+    MIN_RAMBLOCK_SIZE
+  migration/dirtyrate: Implement get_sample_page_period() and
+    block_sample_page_period()
+  migration/dirtyrate: Implement calculate_dirtyrate() function
+  migration/dirtyrate: Implement
+    qmp_cal_dirty_rate()/qmp_get_dirty_rate() function
+
+ migration/Makefile.objs |   1 +
+ migration/dirtyrate.c   | 448 ++++++++++++++++++++++++++++++++++++++++++++++++
+ migration/dirtyrate.h   |  86 ++++++++++
+ migration/ram.c         |  11 +-
+ migration/ram.h         |  10 ++
+ qapi/migration.json     |  42 +++++
+ 6 files changed, 588 insertions(+), 10 deletions(-)
+ create mode 100644 migration/dirtyrate.c
+ create mode 100644 migration/dirtyrate.h
+
 -- 
-2.26.2
-
+1.8.3.1
 
 
