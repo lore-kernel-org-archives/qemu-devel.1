@@ -2,98 +2,124 @@ Return-Path: <SRS0=5nOY=BY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D9BEC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 18:06:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82BDBC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 18:07:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4108A20771
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 18:06:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 43AF120771
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 18:07:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WayDzb9T"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4108A20771
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="vVZ8dW2Y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43AF120771
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33984 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36664 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k6e64-0003g6-HC
-	for qemu-devel@archiver.kernel.org; Fri, 14 Aug 2020 14:06:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36822)
+	id 1k6e7M-0004pn-Gy
+	for qemu-devel@archiver.kernel.org; Fri, 14 Aug 2020 14:07:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37076)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k6e5T-00034S-LF
- for qemu-devel@nongnu.org; Fri, 14 Aug 2020 14:05:55 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:36157)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k6e5Q-0004Ef-W4
- for qemu-devel@nongnu.org; Fri, 14 Aug 2020 14:05:55 -0400
-Received: by mail-wm1-x341.google.com with SMTP id 3so8651192wmi.1
- for <qemu-devel@nongnu.org>; Fri, 14 Aug 2020 11:05:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=WitJbOpTxk6zlIDA1wT4dVYzgY4J3Pun1+YTvgArosc=;
- b=WayDzb9TnNVD/IDY0VK0/kN+sW6lcKcLIbcCZQ357elxwT0SQAL2wTbEQTqA4iyRJD
- bKM9q+k17bQdJGa4uvkRMmq3lZyBwaAk5BWetJ7pIAQndem72uW+FCTPsz+WebcaY0+C
- nW8wJ//hcWHNMKYtDLG8CLN0g42kxbVbPYyf0CilVUwe1fmj9ZFpGtRx5/NclBPxurxj
- k/syan4Zua7C+YpRc3iU/FHyo90RiHmx1CoCJWTRvKLu69OI01N2F1r0sCI08+XJEntA
- 4u1oN3W6Hs7XMONj8up7rAJp8P2OnvGM4BcUSQvmkdFQrLX/8CqfND2BSgHFSnYGfbgf
- VnJw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=WitJbOpTxk6zlIDA1wT4dVYzgY4J3Pun1+YTvgArosc=;
- b=Mi9zOsTH4Iqp2uVbG7vSLqh/a76WkKSnEpk5QalyHuqJN5hmUEnWb0ws27EsrV1ySf
- uaGGA6HnqAGqW7veHvr+W6QQDtRdDSz4qnI2tVeybB49RfiTfRWzbznqNqTWv4+9tfGx
- GrFORUIWtKzPv8LjeSUXL1FsawM9QF2hAr3C7sHcQxkRtOL3yRfsk24I0ea4TtLHPkhL
- 9pXwMZcJxiE6geeFlvrC5r4AdeTqaSQ0lqRF6HddehX8/CWRv3870+Ty6b2sIgsOmd4J
- 3JPNnUMoovG0JV9x7hHBgvjzHE0AYG4DMNBC4lMqEsFGbf+f4lzmYnNQAwNWGuI/pXQy
- 9cLQ==
-X-Gm-Message-State: AOAM533hhbOb4nmICIPhdL2q8h9eTzdDAA/B9WUI6O/7LAX3oq0Rkpwq
- +KbSNxsPG6tQ+QzZHKVwZII=
-X-Google-Smtp-Source: ABdhPJya5ngD4cpij4XlBVTIto7c1FrwthCSeN85CE5LzUj0Y5eDK2wmjelWFl1oi58mTK2rQ/w9/A==
-X-Received: by 2002:a7b:c95a:: with SMTP id i26mr3740712wml.106.1597428351655; 
- Fri, 14 Aug 2020 11:05:51 -0700 (PDT)
-Received: from [192.168.1.36] (121.red-81-40-121.staticip.rima-tde.net.
- [81.40.121.121])
- by smtp.gmail.com with ESMTPSA id h189sm17051523wme.17.2020.08.14.11.05.50
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 14 Aug 2020 11:05:50 -0700 (PDT)
-Subject: Re: [PATCH 30/41] qom: Make type checker functions accept const
- pointers
-To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
-References: <20200813222625.243136-1-ehabkost@redhat.com>
- <20200813222625.243136-31-ehabkost@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <ea42c253-d249-4da0-2543-558839855b5e@amsat.org>
-Date: Fri, 14 Aug 2020 20:05:50 +0200
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1k6e6V-000485-MV; Fri, 14 Aug 2020 14:06:59 -0400
+Received: from mail-eopbgr80104.outbound.protection.outlook.com
+ ([40.107.8.104]:46371 helo=EUR04-VI1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1k6e6T-0004K2-QV; Fri, 14 Aug 2020 14:06:59 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=jLqCQ53udPSjNKOvq/W7pDwru5l7JQfWYntN4b8OxWINLm/IMN2wGDXXbH+1+yMQGsItrepPw0ZXHarK+SRaVFR4lPcA1+7tSugkjNVJ1L0BNR6WpmqnhrjC3Hn7FIclHjtJ5sUbnlDAVb9Z2E6bLjboYrz6+Asywzt+Re+DySv5+qSYPiwE3HMLfehHSup3AxrDY0FnzP49cLGZE2oq9xrzSWN5cpiOnGkNY2xm0fgqtZlt2k4pHHZbMtQHYbJT9gGz+E+MQJdqO34xPxImDlmsT38CVMqbYyo+Ixjai4zwV2H4HJTM9cuiGjDk5peUquIJqD/mNR2k6FwsX6kYEA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=iglXPdk7YfTzfVwQ1SLUvFoWzlYSbmXl61Ci1JF63NE=;
+ b=URMMXV1eOI4FmOGh7O2Sjuf9jyreXfpke/BbmsGv+w9RXOkZ2L/wI0HRSLF03HvcJOuG7Rtd7zWnBXLxWlIOK/QkAq9W0yQCsI3i4TeENuDW4UKXcUgcuMnc9viEFosYP1XdwFjBw2B3bOqS5w2R1bnj44WBPNEh6RssGxC3gNN6aQcILWdq3IKEtdE2frCojj3YVXWCiL85TWOs3b8Y25j1taJtR7O2yPmI3p2ZodjB0DSA6lTBn2F+zAJ4TupZC+68llr/pVouk7H8fn9N/SSgoS007H7i/Z+aRwwrKIO6ANZlB7ufW4St2j8jWe5fQs9Qg78vBIcYCWlwj7Mm5A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=iglXPdk7YfTzfVwQ1SLUvFoWzlYSbmXl61Ci1JF63NE=;
+ b=vVZ8dW2YGPLgCY6dPGjmczUMQrBLSPS6cfttuY8hh6OVAnb9V+QHbkN/47woQkaQ1CPeJY5dMIjkR/PszkavSUD3IZnzZJJHYcFY4Cu0VYwDVL/3X14KkLgKIghfRGP2VSEv06PM8yK/mDCLeufZqV2OpLIeiJyfwJiMntTVXgs=
+Authentication-Results: virtuozzo.com; dkim=none (message not signed)
+ header.d=none;virtuozzo.com; dmarc=none action=none
+ header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM6PR08MB5077.eurprd08.prod.outlook.com (2603:10a6:20b:e6::15)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3283.22; Fri, 14 Aug
+ 2020 18:06:46 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::8c0c:c056:97a5:484a]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::8c0c:c056:97a5:484a%3]) with mapi id 15.20.3283.022; Fri, 14 Aug 2020
+ 18:06:46 +0000
+Subject: Re: [PATCH 0/1] qcow2: Skip copy-on-write when allocating a zero
+ cluster
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+References: <cover.1597416317.git.berto@igalia.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <138578a5-b2c6-b0df-ff9f-5c95d8ea895f@virtuozzo.com>
+Date: Fri, 14 Aug 2020 21:06:44 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
-MIME-Version: 1.0
-In-Reply-To: <20200813222625.243136-31-ehabkost@redhat.com>
-Content-Type: text/plain; charset=utf-8
+ Thunderbird/68.11.0
+In-Reply-To: <cover.1597416317.git.berto@igalia.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::341;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x341.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: AM3PR05CA0088.eurprd05.prod.outlook.com
+ (2603:10a6:207:1::14) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.5] (185.215.60.177) by
+ AM3PR05CA0088.eurprd05.prod.outlook.com (2603:10a6:207:1::14) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3283.18 via Frontend Transport; Fri, 14 Aug 2020 18:06:45 +0000
+X-Originating-IP: [185.215.60.177]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: cb24cdb5-887f-4c2c-9c6e-08d8407cceb5
+X-MS-TrafficTypeDiagnostic: AM6PR08MB5077:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM6PR08MB50776FCF4969F5F9671B8CB4C1400@AM6PR08MB5077.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: A7B28SPf2MbndQKdhH4WBk2XfEJdx1d3zCa8pT1jAA9+/fzi6KGJH0PwI+F0xf9Zb2f6rGo+wuVKLu5lrEI9p888TrBDVm8Ixi5mbi1sIv+ahDBfldkBNwpNxmDn+I+vxrIg1k+e+04arqtYnX3uToChRhiykkf7WOFAyVXeC/IHBp5/SN4/SSdB39/vGBUt5GYyASl2ZNNAV0SvRMnSPj+sh/yuhsaPdyrGrEfVnkOqs1ujDL0CVx0PohjT5Zt2G6FvIq9BZMVq3m8ir4fmR0l2CuwJ3uR1vrSMeMenuv9SL6VuSBf94vbPg1jAW6qL5E8BhO1lFMIV5zlnXbhwuJfOMLs7z43riu2d9DEUwPnmffR2CekCCav0u98UX6SGpvKw7HEkX4ndKn/o/ixeP5nghaE32kltaLfv8dUcoWJer51796IkLWP64OzKG5nip7Wc6hg+5C8ahtdlIXCHXg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(4636009)(396003)(366004)(346002)(376002)(136003)(39840400004)(31686004)(16576012)(316002)(52116002)(6486002)(54906003)(86362001)(31696002)(107886003)(4326008)(83380400001)(966005)(2906002)(478600001)(66476007)(66556008)(66946007)(36756003)(16526019)(5660300002)(956004)(8676002)(2616005)(8936002)(26005)(186003)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: 6bJJdynvOcz2pU9ERhQPpQNDZ6FqH7zmAiX4NubQ2l2fy4AzvOlUidJ4XyuR1ABldiSwBrheWcmsUkFt+H8F0buRHdvzzC8tDspvZt/UTUap6h0k1fZZk+K/EKl+sLa6I86xkzqC5xm3fKlkgRrgiiHLhaRC4L+qHXEZKNqPpnxp+ma1YKbDMw7Av7knqAejVZl1D6eKCEpuSqhZJOHdLsfrDblFQNuv/k/Vk1FLBoGBs904eUQonzJkP/lf9SfozvEB8KmmPy9caZAKsvMNOn+b6zJDlXn/pWh6WJkF91Hbk4Nj/Rzw2290xXnditXby50UzQ3KO926LDaSRoIvoWEmeUPDJb4bdw8zR780wNzHEx/vM0wu05XhmBl2L4V7PvQbcyh9eW3D2Ie/nuQgS5xqp90jv07nmnNtzP12dTVqDiOQ83EfxlDv4UNF7Y/850Uwcz/0RrqdZGAJD7tINDOf+JZLVSHlKcacNSmrzhK2apl06Klr5quIt3pRnX32uPCb4NW58Vy53utUJAn5iE65bc7uI+bv6Gi6IEJlD0ZGh3wYLUXIHHilq3Q+rAZ6Vi+wINSrbA1trrSNxq1ajhqZ6MNsnWGBbF8Y+qZldujgWUa/FCjcILiywLgs7FPUxxnWg+v3F/SgvvhbSHlcSA==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: cb24cdb5-887f-4c2c-9c6e-08d8407cceb5
+X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Aug 2020 18:06:46.2250 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: rAQC7t7qOMVEIVxohZ+zeudY92XLuFtywJoFYRPmeT7o6oD6x6EKP4TEd3/6f53c6rk271x3FIF24EL5GFvV0LAYRbRea8xfZw0jIYfbHBU=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB5077
+Received-SPF: pass client-ip=40.107.8.104;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR04-VI1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/14 14:06:55
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -106,60 +132,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/14/20 12:26 AM, Eduardo Habkost wrote:
-> The existing type check macros all unconditionally drop const
-> qualifiers from their arguments.  Keep this behavior in the
-> macros generated by DECLARE_*CHECKER* by now.
-> 
-> In the future, we might use _Generic to preserve const-ness of
-> the cast function arguments.
-> 
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+Hi!
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
-> ---
->  include/qom/object.h | 8 +++++---
->  1 file changed, 5 insertions(+), 3 deletions(-)
+14.08.2020 17:57, Alberto Garcia wrote:
+> Hi,
 > 
-> diff --git a/include/qom/object.h b/include/qom/object.h
-> index 4cd84998c2..1d6a520d35 100644
-> --- a/include/qom/object.h
-> +++ b/include/qom/object.h
-> @@ -567,7 +567,7 @@ struct Object
->   */
->  #define DECLARE_INSTANCE_CHECKER(InstanceType, OBJ_NAME, TYPENAME) \
->      static inline G_GNUC_UNUSED InstanceType * \
-> -    OBJ_NAME(void *obj) \
-> +    OBJ_NAME(const void *obj) \
->      { return OBJECT_CHECK(InstanceType, obj, TYPENAME); }
->  
->  /**
-> @@ -581,14 +581,16 @@ struct Object
->   *
->   * This macro will provide the three standard type cast functions for a
->   * QOM type.
-> + *
-> + *FIXME: Use _Generic to make this const-safe
->   */
->  #define DECLARE_CLASS_CHECKERS(ClassType, OBJ_NAME, TYPENAME) \
->      static inline G_GNUC_UNUSED ClassType * \
-> -    OBJ_NAME##_GET_CLASS(void *obj) \
-> +    OBJ_NAME##_GET_CLASS(const void *obj) \
->      { return OBJECT_GET_CLASS(ClassType, obj, TYPENAME); } \
->      \
->      static inline G_GNUC_UNUSED ClassType * \
-> -    OBJ_NAME##_CLASS(void *klass) \
-> +    OBJ_NAME##_CLASS(const void *klass) \
->      { return OBJECT_CLASS_CHECK(ClassType, klass, TYPENAME); }
->  
->  /**
+> the patch is self-explanatory, but I'm using the cover letter to raise
+> a couple of related questions.
+> 
+> Since commit c8bb23cbdbe / QEMU 4.1.0 (and if the storage backend
+> allows it) writing to an image created with preallocation=metadata can
+> be slower (20% in my tests) than writing to an image with no
+> preallocation at all.
+> 
+> So:
+> 
+> a) shall we include a warning in the documentation ("note that this
+>     preallocation mode can result in worse performance")?
+
+I think, the best thing to do is to make it work fast in all cases if possible (I assume, that would be, with your patch + positive answer to [b]? Or not?) :)
+
+Andrey recently added a benchmark, with some cases, where c8bb23cbdbe bring benefits:
+[PATCH v6] scripts/simplebench: compare write request performance
+<1594741846-475697-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+queued in Eduardo's python-next: https://github.com/ehabkost/qemu/commit/9519f87d900b0ef30075c749fa097bd93471553f
+
+So, as a first step, could you post your tests, so we can add it into this benchmark? Or post a patch to simplebench on top of Eduardo's python-next.
+
+> 
+> b) why don't we also initialize preallocated clusters with
+>     QCOW_OFLAG_ZERO? (at least when there's no subclusters involved,
+>     i.e. no backing file). This would make reading from them (and
+>     writing to them, after this patch) faster.
+
+Probably, they are not guaranteed to be zero on all filesystems? But I think at least in some cases (99% :) we can mark them as ZERO.. Honestly, I may be not aware of actual reasons.
+
+> 
+> Berto
+> 
+> Alberto Garcia (1):
+>    qcow2: Skip copy-on-write when allocating a zero cluster
+> 
+>   include/block/block.h |  2 +-
+>   block/commit.c        |  2 +-
+>   block/io.c            | 20 +++++++++++++++++---
+>   block/mirror.c        |  3 ++-
+>   block/qcow2.c         | 26 ++++++++++++++++----------
+>   block/replication.c   |  2 +-
+>   block/stream.c        |  2 +-
+>   qemu-img.c            |  2 +-
+>   8 files changed, 40 insertions(+), 19 deletions(-)
 > 
 
+
+-- 
+Best regards,
+Vladimir
 
