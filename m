@@ -2,87 +2,89 @@ Return-Path: <SRS0=5nOY=BY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8215C433E3
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 09:56:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3F59C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 09:57:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 942DF204EA
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 09:56:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 93B53204EA
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 09:57:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bf18lNwa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 942DF204EA
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L0u28SKZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93B53204EA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60968 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33396 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k6WSG-0003Gf-Qa
-	for qemu-devel@archiver.kernel.org; Fri, 14 Aug 2020 05:56:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44030)
+	id 1k6WSR-0003XV-6O
+	for qemu-devel@archiver.kernel.org; Fri, 14 Aug 2020 05:57:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43490)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k6Vnc-0007d2-NY
- for qemu-devel@nongnu.org; Fri, 14 Aug 2020 05:14:56 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59243)
+ id 1k6VnC-0006UQ-MI
+ for qemu-devel@nongnu.org; Fri, 14 Aug 2020 05:14:30 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:26589
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k6VnZ-00038L-Ij
- for qemu-devel@nongnu.org; Fri, 14 Aug 2020 05:14:56 -0400
+ id 1k6Vn7-0002zu-7A
+ for qemu-devel@nongnu.org; Fri, 14 Aug 2020 05:14:30 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597396492;
+ s=mimecast20190719; t=1597396464;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=2uZT/s+uo12wT2bnnDViCCQzfljp43iiPWFYn7ZUdE0=;
- b=bf18lNwaShxs7uDQ8/K2HX7dFPBlwXIG9qT22uhFqOhD+BDH3GGMOaRGcEJFVGdQ57Lngy
- Fuu8ZXcv2P8hXHuxZoSKQqPWIy9WXEQmv4BPOz8aYDQfOBjhPNi1HCDkEmw0HcelB5bSk4
- eBLQDWOAbn1+ddRnePpG1iiGclZ1gEs=
+ bh=2m9BLaRc2vYcN4AzbMEg1k1RBUEJSYEg5EY4KfBueFg=;
+ b=L0u28SKZWjRQR4XkV18vGjuUIx6EeZOd952A7LisE/1FWh87JEd6uXSIsHR6tuysbqogmz
+ O+ZzO96ZHwWIBPSZV8mjTnMac0FJrNGwMRAO+5UXst+4avBO4dlIfnRgTu03BVvDdXS0zV
+ rUIGnYeb/NHI4ou5iZAKe49vYou4y/s=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-523-fHP1vD7qP5-K_va_FRipHg-1; Fri, 14 Aug 2020 05:14:50 -0400
-X-MC-Unique: fHP1vD7qP5-K_va_FRipHg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-382-HTlPOMZzMICDtq3vi9Dy4Q-1; Fri, 14 Aug 2020 05:14:22 -0400
+X-MC-Unique: HTlPOMZzMICDtq3vi9Dy4Q-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A0C8F1853DAD;
- Fri, 14 Aug 2020 09:14:49 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 14B0D1853DA0
+ for <qemu-devel@nongnu.org>; Fri, 14 Aug 2020 09:14:22 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3E58B600E4;
- Fri, 14 Aug 2020 09:14:49 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C7688747B9;
+ Fri, 14 Aug 2020 09:14:21 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 115/150] meson: convert hw/i2c
-Date: Fri, 14 Aug 2020 05:12:51 -0400
-Message-Id: <20200814091326.16173-116-pbonzini@redhat.com>
+Subject: [PATCH 074/150] meson: convert trace/
+Date: Fri, 14 Aug 2020 05:12:10 -0400
+Message-Id: <20200814091326.16173-75-pbonzini@redhat.com>
 In-Reply-To: <20200814091326.16173-1-pbonzini@redhat.com>
 References: <20200814091326.16173-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/14 05:13:42
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/14 03:37:30
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -96,9 +98,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Corey Minyard <cminyard@mvista.com>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -106,82 +106,52 @@ Sender: "Qemu-devel"
 From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Corey Minyard <cminyard@mvista.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/Makefile.objs     |  1 -
- hw/i2c/Makefile.objs | 14 --------------
- hw/i2c/meson.build   | 16 ++++++++++++++++
- hw/meson.build       |  1 +
- 4 files changed, 17 insertions(+), 15 deletions(-)
- delete mode 100644 hw/i2c/Makefile.objs
- create mode 100644 hw/i2c/meson.build
+ trace/Makefile.objs | 8 --------
+ trace/meson.build   | 5 ++++-
+ 2 files changed, 4 insertions(+), 9 deletions(-)
+ delete mode 100644 trace/Makefile.objs
 
-diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-index 02c5c0d94e..22eb804730 100644
---- a/hw/Makefile.objs
-+++ b/hw/Makefile.objs
-@@ -10,7 +10,6 @@ devices-dirs-y += display/
- devices-dirs-y += dma/
- devices-dirs-y += gpio/
- devices-dirs-$(CONFIG_HYPERV) += hyperv/
--devices-dirs-$(CONFIG_I2C) += i2c/
- endif
- 
- common-obj-y += $(devices-dirs-y)
-diff --git a/hw/i2c/Makefile.objs b/hw/i2c/Makefile.objs
+diff --git a/trace/Makefile.objs b/trace/Makefile.objs
 deleted file mode 100644
-index f2c61eaa8b..0000000000
---- a/hw/i2c/Makefile.objs
+index a429474618..0000000000
+--- a/trace/Makefile.objs
 +++ /dev/null
-@@ -1,14 +0,0 @@
--common-obj-$(CONFIG_I2C) += core.o
--common-obj-$(CONFIG_SMBUS) += smbus_slave.o smbus_master.o
--common-obj-$(CONFIG_SMBUS_EEPROM) += smbus_eeprom.o
--common-obj-$(CONFIG_VERSATILE_I2C) += versatile_i2c.o
--common-obj-$(CONFIG_ACPI_X86_ICH) += smbus_ich9.o
--common-obj-$(CONFIG_ACPI_SMBUS) += pm_smbus.o
--common-obj-$(CONFIG_BITBANG_I2C) += bitbang_i2c.o
--common-obj-$(CONFIG_EXYNOS4) += exynos4210_i2c.o
--common-obj-$(CONFIG_IMX_I2C) += imx_i2c.o
--common-obj-$(CONFIG_ASPEED_SOC) += aspeed_i2c.o
--common-obj-$(CONFIG_NRF51_SOC) += microbit_i2c.o
--common-obj-$(CONFIG_MPC_I2C) += mpc_i2c.o
--common-obj-$(CONFIG_OMAP) += omap_i2c.o
--common-obj-$(CONFIG_PPC4XX) += ppc4xx_i2c.o
-diff --git a/hw/i2c/meson.build b/hw/i2c/meson.build
-new file mode 100644
-index 0000000000..3a511539ad
---- /dev/null
-+++ b/hw/i2c/meson.build
-@@ -0,0 +1,16 @@
-+i2c_ss = ss.source_set()
-+i2c_ss.add(when: 'CONFIG_I2C', if_true: files('core.c'))
-+i2c_ss.add(when: 'CONFIG_SMBUS', if_true: files('smbus_slave.c', 'smbus_master.c'))
-+i2c_ss.add(when: 'CONFIG_ACPI_SMBUS', if_true: files('pm_smbus.c'))
-+i2c_ss.add(when: 'CONFIG_ACPI_X86_ICH', if_true: files('smbus_ich9.c'))
-+i2c_ss.add(when: 'CONFIG_ASPEED_SOC', if_true: files('aspeed_i2c.c'))
-+i2c_ss.add(when: 'CONFIG_BITBANG_I2C', if_true: files('bitbang_i2c.c'))
-+i2c_ss.add(when: 'CONFIG_EXYNOS4', if_true: files('exynos4210_i2c.c'))
-+i2c_ss.add(when: 'CONFIG_IMX_I2C', if_true: files('imx_i2c.c'))
-+i2c_ss.add(when: 'CONFIG_MPC_I2C', if_true: files('mpc_i2c.c'))
-+i2c_ss.add(when: 'CONFIG_NRF51_SOC', if_true: files('microbit_i2c.c'))
-+i2c_ss.add(when: 'CONFIG_SMBUS_EEPROM', if_true: files('smbus_eeprom.c'))
-+i2c_ss.add(when: 'CONFIG_VERSATILE_I2C', if_true: files('versatile_i2c.c'))
-+i2c_ss.add(when: 'CONFIG_OMAP', if_true: files('omap_i2c.c'))
-+i2c_ss.add(when: 'CONFIG_PPC4XX', if_true: files('ppc4xx_i2c.c'))
-+softmmu_ss.add_all(when: 'CONFIG_I2C', if_true: i2c_ss)
-diff --git a/hw/meson.build b/hw/meson.build
-index 4d7c31c652..983edc1d47 100644
---- a/hw/meson.build
-+++ b/hw/meson.build
-@@ -1,4 +1,5 @@
- subdir('core')
-+subdir('i2c')
- subdir('ide')
- subdir('input')
- subdir('intc')
+@@ -1,8 +0,0 @@
+-# -*- mode: makefile -*-
+-
+-
+-##################################################
+-# Translation level
+-
+-obj-y += generated-helpers.o
+-obj-y += control-target.o
+diff --git a/trace/meson.build b/trace/meson.build
+index cab36a248b..9c3c128164 100644
+--- a/trace/meson.build
++++ b/trace/meson.build
+@@ -1,3 +1,5 @@
++specific_ss.add(files('control-target.c'))
++
+ trace_events_files = []
+ foreach dir : [ '.' ] + trace_events_subdirs
+   trace_events_file = meson.source_root() / dir / 'trace-events'
+@@ -61,12 +63,13 @@ foreach d : [
+   ['generated-helpers.h', 'tcg-helper-h'],
+   ['generated-helpers-wrappers.h', 'tcg-helper-wrapper-h'],
+ ]
+-  custom_target(d[0],
++  gen = custom_target(d[0],
+                 output: d[0],
+                 input: meson.source_root() / 'trace-events',
+                 command: [ tracetool, '--group=root', '--format=@0@'.format(d[1]), '@INPUT@' ],
+                 build_by_default: true, # to be removed when added to a target
+                 capture: true)
++  specific_ss.add(gen)
+ endforeach
+ 
+ if 'CONFIG_TRACE_UST' in config_host
 -- 
 2.26.2
 
