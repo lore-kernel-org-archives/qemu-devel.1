@@ -2,83 +2,92 @@ Return-Path: <SRS0=PlQC=BZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D50B2C433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 15 Aug 2020 17:07:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FD16C433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 15 Aug 2020 17:08:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 95DC023B30
-	for <qemu-devel@archiver.kernel.org>; Sat, 15 Aug 2020 17:07:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6D01F23B30
+	for <qemu-devel@archiver.kernel.org>; Sat, 15 Aug 2020 17:08:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="t2I2BFiV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95DC023B30
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WS1aUiEb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D01F23B30
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38098 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42334 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k6zeG-0003rS-Po
-	for qemu-devel@archiver.kernel.org; Sat, 15 Aug 2020 13:07:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42606)
+	id 1k6zfP-0005dZ-O8
+	for qemu-devel@archiver.kernel.org; Sat, 15 Aug 2020 13:08:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42768)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1k6zdT-0002m4-Cb
- for qemu-devel@nongnu.org; Sat, 15 Aug 2020 13:06:27 -0400
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:35375)
+ id 1k6zeP-0004Mr-PS
+ for qemu-devel@nongnu.org; Sat, 15 Aug 2020 13:07:25 -0400
+Received: from mail-il1-x141.google.com ([2607:f8b0:4864:20::141]:35041)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1k6zdR-0001Oe-Ng
- for qemu-devel@nongnu.org; Sat, 15 Aug 2020 13:06:27 -0400
-Received: by mail-oi1-x243.google.com with SMTP id k4so11055205oik.2
- for <qemu-devel@nongnu.org>; Sat, 15 Aug 2020 10:06:25 -0700 (PDT)
+ id 1k6zeO-0001So-8i
+ for qemu-devel@nongnu.org; Sat, 15 Aug 2020 13:07:25 -0400
+Received: by mail-il1-x141.google.com with SMTP id q14so7622011ilm.2
+ for <qemu-devel@nongnu.org>; Sat, 15 Aug 2020 10:07:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=AQeYh8suqz3vP9Br20s8Z+PHQd0HdWmpnfFfXQ0gVk0=;
- b=t2I2BFiVfxZRRTbfGq6Pp8+KC7+vdcTG7s5uPvYm5KTwr7LPY8+qxlUceEO7cRkVii
- gtqwVWEtHqLa3ySJvJi/ZDBT1bvvU75Wqt4BrncS1AMw0TthNkV9lsHDNtHhT+jBh4vu
- glijcRgpMjAQ4oqO1S4Hjh5JOIxsyKLTp4mtLSWJazvHXxWOiBghvAbidl4Pimw2qryi
- ZV9TQPS84gKMtVk6xKoIedIUohdMWyk332yW7YHeOuVgs5cqnXu5KLJW6Vh80HyMTayv
- 7GdN0GGziLd8Gd3nEeoOXZY4ZfJdIhWf5I+4pYe7w3cL6mkjlJ50qAudPY8zrRF7pPTv
- x3Mw==
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=3ArlhIf63DPyzBXDe5j7/Mnm8PQPZAMAlpFUhxnKNcQ=;
+ b=WS1aUiEb3MKDSe7YiCQGT2nIBYfnbFkvz4wc3dW7E9uPqRjBDIjzlaBrf+dSIcIS1s
+ f8DlExRXFeebUx1qcfFqNSdTSRmCmsd35EphraTJuI4EhPtpM89IkZ4xeZpQkBqapYk5
+ mubjhUiZJDjPUrST2wDtuHXqQZrBFvm60C4yHsC9l4OUHpl0xqAMvQ//mza5Z4A+cAI7
+ caPSoHFlYNNYWh5Nbf5tQIIQPLMaTT8khPKKULVx5F6eYWlku8t+0fIT2VB0j0SU38Az
+ voUf5rNgE34E5rDxy3V9j3hHzEQle6hxXtZu78nj6/AaaanA7uW2xzw8e8ZfFZqBVjEv
+ 1BdA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=AQeYh8suqz3vP9Br20s8Z+PHQd0HdWmpnfFfXQ0gVk0=;
- b=a+kxizJjRLXkdaB+UZOQ6yNCGSbuNFJoNPaT2iqcYPsc2PpP6GfmQIyME3D8IpQasN
- oJ/z2zNcQU+tWY7oRuKyZvpdthx9RBC06nywLgFrvTzMTZN5wUxveMR0eqwMjwyfIxlN
- bqT5aC9KdtbtoTPDEs9AoaSKAwu+6mKOjosuWqRpW4+5l11ngxAGadf55dNv37unjZdQ
- RpwJO6v6TSwX/SOxYtYPYSCETENasyjxpNZPr/D0niz4rf8pyZhh+AEg3hWYVEXqBFU7
- Qm6VjwxsFM1FDDb9qePzGWe9az8gJP+lm7K97YyQJFuViwfOPDQNyqI+mhyvm1KYtUhj
- ahHw==
-X-Gm-Message-State: AOAM531yHXShWL3r3bpz+sVLp++yG5tV3L1z16RGEfkutT/vE/Lt7KgW
- NbklA+0w2+MHaRBrQm9LSsZ/qLyrKgnLGA==
-X-Google-Smtp-Source: ABdhPJyXSe+HVnKwHo1cJeOw1w3YJUvvbvNIdA+j0ZhxJOi7dg9pOB+/vtMmktr9rqycYpW1OwFXpg==
-X-Received: by 2002:a17:90a:eb09:: with SMTP id
- j9mr4558758pjz.192.1597455114402; 
- Fri, 14 Aug 2020 18:31:54 -0700 (PDT)
-Received: from localhost.localdomain ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id y196sm10625528pfc.202.2020.08.14.18.31.53
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 14 Aug 2020 18:31:53 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=3ArlhIf63DPyzBXDe5j7/Mnm8PQPZAMAlpFUhxnKNcQ=;
+ b=p92d6LBRaT75MLmppIRwgZ9oJh9GAd9g1D+HKvFbJgeuTkijVxSRn96p5bCUPhUAVd
+ eFzbgQQ6sNtH3SSh1O6gRrvl5bHrclkUS++tSxRaTnCXwwuXWD8mHQnRicb+ifUbqKjC
+ MHrjjiP0JCwBCIB99zj408gAjyTwuZk+2rS7ZHdg7egmXkJn5JeYtmI0IWprbResdoJM
+ DbF/hGntePcZyZv/0HuQ+A7gWKUABEiC6rIf6jQfRz8ZTkuUoOzu1v6VVX4IS6pmjzoe
+ BJHsOBH/M3IP+dKmUOGA7x0WsdQpJh+tyaiCcS/1oHKTYsDuy2XJXLv3uM6VZz0XY5bq
+ RgCw==
+X-Gm-Message-State: AOAM532nezgCHeCOzWyCVY/X3MJCgA7mOBcUXQ3/jXbfKOisDfyACXNf
+ C5gXESY7GiuQUZ93lAmem7D8L1qS3SQLRw==
+X-Google-Smtp-Source: ABdhPJztVVOAB305CXHFnDjv+Eb4UsVjBkwT/oWbY/4+ev0QxOlTGqQaywjP598T4hjXW8C3NNCa3A==
+X-Received: by 2002:a63:9256:: with SMTP id s22mr2836891pgn.75.1597439246514; 
+ Fri, 14 Aug 2020 14:07:26 -0700 (PDT)
+Received: from [192.168.1.11] ([71.212.141.89])
+ by smtp.gmail.com with ESMTPSA id q11sm10298131pfn.170.2020.08.14.14.07.25
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 14 Aug 2020 14:07:25 -0700 (PDT)
+Subject: Re: [PATCH v5 14/14] kvm: remove kvm specific functions from global
+ includes
+To: Claudio Fontana <cfontana@suse.de>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Roman Bolshakov <r.bolshakov@yadro.com>
+References: <20200812183250.9221-1-cfontana@suse.de>
+ <20200812183250.9221-15-cfontana@suse.de>
 From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 05/20] target/arm: Merge do_vector2_p into do_mov_p
-Date: Fri, 14 Aug 2020 18:31:30 -0700
-Message-Id: <20200815013145.539409-6-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200815013145.539409-1-richard.henderson@linaro.org>
-References: <20200815013145.539409-1-richard.henderson@linaro.org>
+Message-ID: <1426bf6f-b587-60bf-cdc6-5659139539eb@linaro.org>
+Date: Fri, 14 Aug 2020 14:07:23 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::243;
- envelope-from=richard.henderson@linaro.org; helo=mail-oi1-x243.google.com
+In-Reply-To: <20200812183250.9221-15-cfontana@suse.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::141;
+ envelope-from=richard.henderson@linaro.org; helo=mail-il1-x141.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -100,56 +109,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
+ qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
+ Pavel Dovgalyuk <dovgaluk@ispras.ru>, Wenchao Wang <wenchao.wang@intel.com>,
+ haxm-team@intel.com, Sunil Muthuswamy <sunilmut@microsoft.com>,
+ Richard Henderson <rth@twiddle.net>, Colin Xu <colin.xu@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is the only user of the function.
+On 8/12/20 11:32 AM, Claudio Fontana wrote:
+> Signed-off-by: Claudio Fontana <cfontana@suse.de>
+> ---
+>  accel/kvm/kvm-cpus.h   |  7 +++++++
+>  accel/stubs/kvm-stub.c | 22 ----------------------
+>  include/sysemu/kvm.h   |  7 -------
+>  3 files changed, 7 insertions(+), 29 deletions(-)
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/arm/translate-sve.c | 19 ++++++-------------
- 1 file changed, 6 insertions(+), 13 deletions(-)
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-index b0fa38db1c..d310709de3 100644
---- a/target/arm/translate-sve.c
-+++ b/target/arm/translate-sve.c
-@@ -178,18 +178,6 @@ static void do_dupi_z(DisasContext *s, int rd, uint64_t word)
-     tcg_gen_gvec_dup_imm(MO_64, vec_full_reg_offset(s, rd), vsz, vsz, word);
- }
- 
--/* Invoke a vector expander on two Pregs.  */
--static bool do_vector2_p(DisasContext *s, GVecGen2Fn *gvec_fn,
--                         int esz, int rd, int rn)
--{
--    if (sve_access_check(s)) {
--        unsigned psz = pred_gvec_reg_size(s);
--        gvec_fn(esz, pred_full_reg_offset(s, rd),
--                pred_full_reg_offset(s, rn), psz, psz);
--    }
--    return true;
--}
--
- /* Invoke a vector expander on three Pregs.  */
- static bool do_vector3_p(DisasContext *s, GVecGen3Fn *gvec_fn,
-                          int esz, int rd, int rn, int rm)
-@@ -221,7 +209,12 @@ static bool do_vecop4_p(DisasContext *s, const GVecGen4 *gvec_op,
- /* Invoke a vector move on two Pregs.  */
- static bool do_mov_p(DisasContext *s, int rd, int rn)
- {
--    return do_vector2_p(s, tcg_gen_gvec_mov, 0, rd, rn);
-+    if (sve_access_check(s)) {
-+        unsigned psz = pred_gvec_reg_size(s);
-+        tcg_gen_gvec_mov(MO_8, pred_full_reg_offset(s, rd),
-+                         pred_full_reg_offset(s, rn), psz, psz);
-+    }
-+    return true;
- }
- 
- /* Set the cpu flags as per a return from an SVE helper.  */
--- 
-2.25.1
 
+r~
 
