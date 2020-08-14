@@ -4,45 +4,46 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
 	DATE_IN_FUTURE_03_06,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B29D6C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 10:52:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2489DC433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 10:53:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 862AD20708
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 10:52:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 862AD20708
+	by mail.kernel.org (Postfix) with ESMTPS id ECDB620708
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 10:53:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECDB620708
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56670 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58892 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k6XJo-00027O-Rv
-	for qemu-devel@archiver.kernel.org; Fri, 14 Aug 2020 06:52:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50132)
+	id 1k6XKv-00036g-8x
+	for qemu-devel@archiver.kernel.org; Fri, 14 Aug 2020 06:53:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50202)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pannengyuan@huawei.com>)
- id 1k6W9Z-0006Xf-B2
- for qemu-devel@nongnu.org; Fri, 14 Aug 2020 05:37:37 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:60252 helo=huawei.com)
+ id 1k6W9d-0006hs-0v
+ for qemu-devel@nongnu.org; Fri, 14 Aug 2020 05:37:41 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:42550 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pannengyuan@huawei.com>)
- id 1k6W9V-00063J-NS
- for qemu-devel@nongnu.org; Fri, 14 Aug 2020 05:37:37 -0400
-Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id 89367E0E8AD5A31AA29D;
- Fri, 14 Aug 2020 17:37:30 +0800 (CST)
+ id 1k6W9a-000641-V6
+ for qemu-devel@nongnu.org; Fri, 14 Aug 2020 05:37:40 -0400
+Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id A07A01ABD2FE3A78F995;
+ Fri, 14 Aug 2020 17:37:35 +0800 (CST)
 Received: from opensource.huawei.com (10.175.100.152) by
  DGGEMS411-HUB.china.huawei.com (10.3.19.211) with Microsoft SMTP Server id
- 14.3.487.0; Fri, 14 Aug 2020 17:37:21 +0800
+ 14.3.487.0; Fri, 14 Aug 2020 17:37:27 +0800
 From: Pan Nengyuan <pannengyuan@huawei.com>
 To: <qemu-devel@nongnu.org>
-Subject: [PATCH 04/12] elf2dmp/pdb: Plug memleak in pdb_init_from_file
-Date: Fri, 14 Aug 2020 12:02:33 -0400
-Message-ID: <20200814160241.7915-5-pannengyuan@huawei.com>
+Subject: [PATCH 08/12] migration/colo: Plug memleaks in
+ colo_process_incoming_thread
+Date: Fri, 14 Aug 2020 12:02:37 -0400
+Message-ID: <20200814160241.7915-9-pannengyuan@huawei.com>
 X-Mailer: git-send-email 2.18.2
 In-Reply-To: <20200814160241.7915-1-pannengyuan@huawei.com>
 References: <20200814160241.7915-1-pannengyuan@huawei.com>
@@ -50,7 +51,7 @@ MIME-Version: 1.0
 Content-Type: text/plain
 X-Originating-IP: [10.175.100.152]
 X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.32;
+Received-SPF: pass client-ip=45.249.212.35;
  envelope-from=pannengyuan@huawei.com; helo=huawei.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/14 05:21:34
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
@@ -72,33 +73,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kuhn.chenqun@huawei.com, Pan Nengyuan <pannengyuan@huawei.com>,
- zhang.zhanghailiang@huawei.com, Viktor
- Prutyanov <viktor.prutyanov@phystech.edu>, euler.robot@huawei.com
+Cc: zhang.zhanghailiang@huawei.com, Juan
+ Quintela <quintela@redhat.com>, Pan Nengyuan <pannengyuan@huawei.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, euler.robot@huawei.com,
+ kuhn.chenqun@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Missing g_error_free in pdb_init_from_file() error path. Fix that.
+'local_err' forgot to free in colo_process_incoming_thread error path.
+Fix that.
 
 Reported-by: Euler Robot <euler.robot@huawei.com>
 Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
 ---
-Cc: Viktor Prutyanov <viktor.prutyanov@phystech.edu>
+Cc: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
+Cc: Juan Quintela <quintela@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 ---
- contrib/elf2dmp/pdb.c | 1 +
- 1 file changed, 1 insertion(+)
+ migration/colo.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/contrib/elf2dmp/pdb.c b/contrib/elf2dmp/pdb.c
-index a5bd40c99d..b3a6547068 100644
---- a/contrib/elf2dmp/pdb.c
-+++ b/contrib/elf2dmp/pdb.c
-@@ -285,6 +285,7 @@ int pdb_init_from_file(const char *name, struct pdb_reader *reader)
-     reader->gmf = g_mapped_file_new(name, TRUE, &gerr);
-     if (gerr) {
-         eprintf("Failed to map PDB file \'%s\'\n", name);
-+        g_error_free(gerr);
-         return 1;
+diff --git a/migration/colo.c b/migration/colo.c
+index ea7d1e9d4e..17b5afc6b5 100644
+--- a/migration/colo.c
++++ b/migration/colo.c
+@@ -870,6 +870,7 @@ void *colo_process_incoming_thread(void *opaque)
+     replication_start_all(REPLICATION_MODE_SECONDARY, &local_err);
+     if (local_err) {
+         qemu_mutex_unlock_iothread();
++        error_report_err(local_err);
+         goto out;
+     }
+ #else
+@@ -882,6 +883,7 @@ void *colo_process_incoming_thread(void *opaque)
+     colo_send_message(mis->to_src_file, COLO_MESSAGE_CHECKPOINT_READY,
+                       &local_err);
+     if (local_err) {
++        error_report_err(local_err);
+         goto out;
      }
  
 -- 
