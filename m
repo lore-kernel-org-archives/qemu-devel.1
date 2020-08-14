@@ -4,76 +4,76 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-0.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F4097C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 02:49:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 351D0C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 03:13:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AB49820768
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 02:49:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F1C4220716
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 03:13:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="YSFuylZ6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB49820768
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="C5q91ulK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1C4220716
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59870 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39524 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k6Pn2-0000wZ-W2
-	for qemu-devel@archiver.kernel.org; Thu, 13 Aug 2020 22:49:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49872)
+	id 1k6Q9z-0005jz-74
+	for qemu-devel@archiver.kernel.org; Thu, 13 Aug 2020 23:13:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54880)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
- id 1k6PmI-0008Uw-Hu
- for qemu-devel@nongnu.org; Thu, 13 Aug 2020 22:49:10 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:45842)
+ id 1k6Q9C-0005HV-Ct
+ for qemu-devel@nongnu.org; Thu, 13 Aug 2020 23:12:50 -0400
+Received: from mail-oi1-x22d.google.com ([2607:f8b0:4864:20::22d]:45383)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
- id 1k6PmF-0006k2-Cv
- for qemu-devel@nongnu.org; Thu, 13 Aug 2020 22:49:10 -0400
-Received: by mail-ot1-x344.google.com with SMTP id c4so6477436otf.12
- for <qemu-devel@nongnu.org>; Thu, 13 Aug 2020 19:49:06 -0700 (PDT)
+ id 1k6Q9A-0004xK-Do
+ for qemu-devel@nongnu.org; Thu, 13 Aug 2020 23:12:49 -0400
+Received: by mail-oi1-x22d.google.com with SMTP id o21so6977205oie.12
+ for <qemu-devel@nongnu.org>; Thu, 13 Aug 2020 20:12:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=uFQKdubY/ms3j4228z9fO7enTa4ep01JZX/g8u5ZeNA=;
- b=YSFuylZ6C7o0d3dLKw8j4H+sqZ5R6j63MZfK9dBerkX0yv/8Ev0lSn4PDjaTkRWaJ4
- shfmOzpJHwy4u8jfhYeRH6KebUSkvLFoouvhsLoqzbj6/J72hOdlYcWXcHEAfYoC6G7F
- 29nghGaUrg6dtQyE33uc+ofbcaeHJYi+SHUc3bEUdjbSqU7UDnQWPZeb2bOn2EXeHCwk
- k4w91v3ak/ojLyp65NBsDPUEcBl9G/ek1hvKQv2Dq2SNlW2qS1GMMg+rDqkfDeUQnFDm
- 8ezZ7YXCylsPQL7H3zWuXGZE1VZd7YxdSgXWyaqF38RfMHDVaKIrfDgS/p6+t0AGSxyE
- Cixg==
+ :cc; bh=LZJ35ck8mjtzDpmYrWqbto/1NTd32akAob1OIsMuVag=;
+ b=C5q91ulKP8th3JxNXQsDl8+tkB3QEfHLa/GCNSjpKI59br9uZhEpHsAQx3nTekva93
+ 2nqBYf8RMslrOWdxZxYuApoe0djayH2Q1A0Gb5ms9s1bzqVyiIU36okIOgYAEk9cAb0u
+ wSTa1N9I/4CFe953dM+VmugUwWcQx7P3gAbPsJl5zKAbgls7zEqQ0ucQQH97sVvdxcSH
+ dBaaWNYLxvB7HZcfQpouKb/TgsM6wZ1cKU5OpWW/7qhc3WP90iyepIxmwx3kF980rV2i
+ d70VaqtVQZE4Rq6V5BxV6PrMQyUhUcaDH4kjaYonV/af3FDBFPbtUU/Ya1lWKJdcazC/
+ FAOQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=uFQKdubY/ms3j4228z9fO7enTa4ep01JZX/g8u5ZeNA=;
- b=bssJf7ozSXPhhnrJK1TR3R8ZaJBMjYlHGeM4kOfjLX/g4lOU8oQlMDEX6Pzg5zRk6v
- OVncZIcZHnGQiTrYzNkZAIGxMAn1t2CySXRCtB6XNJ6Ls9Kwade7uGE8hUswVJ+IhQQp
- CFVdQ5jx6Yy01DiDgtAWkVfH763uYKLv24zXevaWo//LSlrrnpx2emRBl2LFDvVRqNK6
- JEFRcU4/piALa/hxa8TjIl02wKYoc0VfYy81IhHKn1VIQlqctK20hpFj+H72xSsYgR4A
- 9Kfh93TYFYpJZOGZOEV5TpxGPQ0ymmz3Ztp7GbNV/RB020tvRMxg9eFx1OpXNWX6/sNI
- 0PUg==
-X-Gm-Message-State: AOAM531waLna+zIbdJAJk39S45D2sLUN8O74S8UHEjYn4CKA7PWpX39p
- /Q9tpOV7W2CqS+iZ/JbqPzmcA6oiLM1RhNl3USNL1Q==
-X-Google-Smtp-Source: ABdhPJwt5WlWNkpU9HT+sZ0yQsG+RzlDv6BusUoiHzfRn9gXIgvpy6f1hB0UBNtFA0+1XjeDx8an9M6YmD2+nXwFyqw=
-X-Received: by 2002:a9d:630c:: with SMTP id q12mr483005otk.175.1597373345597; 
- Thu, 13 Aug 2020 19:49:05 -0700 (PDT)
+ bh=LZJ35ck8mjtzDpmYrWqbto/1NTd32akAob1OIsMuVag=;
+ b=RziypdvnpNusYZpFHy7qAb91sB2ftyLb8U8iQ3YoNSMcWAh1fX1UkwUMrXQa9UO90y
+ d0F5FohdvKKwWfs08/HXEcT4YLqFvM65WEsOqVDAskRmZsw3A4SbOodzEAJt6pbTw8Z6
+ g/Mhx5oBJbhWdmnK1Rjd59kHrZdptvr/gvq5732C4u8MgisZf59v/3sYM8fko1pyY6PX
+ Fr09g5mq9RTTQz0xojVOPojAtwsCWFEg4UYfisjKEb1V4aekrzp7gIiPqPrmWgPxZgfQ
+ IsLzdEpk57PJuAZ7VNFvmkj0mMTMZGJw7WtVmYbEuUkV6W0JkG+Un80rM26s8sDIMoGq
+ f8rw==
+X-Gm-Message-State: AOAM531cVf3TS9pHDJ4ilyNylXDZXDWjCl5dWYlvQQc1Se9XqPr9g6mf
+ VLZp6805/oa7+vuOiADD+urkcAqwscC46bAprX8ocw==
+X-Google-Smtp-Source: ABdhPJy+rdlrhTtwrFf1/IzeW3YZ2LH2oqKs5y4D4Cb/BAhtEIbN9h1x0WW9xvXnHwbTK/OmQ1aNtQbTAsXJpD8nSi0=
+X-Received: by 2002:aca:bd89:: with SMTP id n131mr369245oif.78.1597374766657; 
+ Thu, 13 Aug 2020 20:12:46 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200806104709.13235-1-frank.chang@sifive.com>
- <20200806104709.13235-27-frank.chang@sifive.com>
- <90f01984-54a4-2a56-c52f-d1f4332b39d4@linaro.org>
-In-Reply-To: <90f01984-54a4-2a56-c52f-d1f4332b39d4@linaro.org>
+ <20200806104709.13235-13-frank.chang@sifive.com>
+ <ab205cfa-80cc-411c-a87e-8c6de7c282e7@linaro.org>
+In-Reply-To: <ab205cfa-80cc-411c-a87e-8c6de7c282e7@linaro.org>
 From: Frank Chang <frank.chang@sifive.com>
-Date: Fri, 14 Aug 2020 10:48:54 +0800
-Message-ID: <CAE_xrPiJRRV3FYtfve6LMOF6LNEYGfhmi9CiabxqUBEew9igLg@mail.gmail.com>
-Subject: Re: [RFC v3 26/71] target/riscv: rvv-1.0: update vext_max_elems() for
- load/store insns
+Date: Fri, 14 Aug 2020 11:12:35 +0800
+Message-ID: <CAE_xrPiyGh28cp7p6Go5vzgD116pPN1HXhSLLkvSu-J2D0fLAQ@mail.gmail.com>
+Subject: Re: [RFC v3 12/71] target/riscv: rvv-1.0: add fractional LMUL
 To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: multipart/alternative; boundary="000000000000d6a1d705accd76b9"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::344;
- envelope-from=frank.chang@sifive.com; helo=mail-ot1-x344.google.com
+Content-Type: multipart/alternative; boundary="0000000000008a4aa805accdcb2a"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::22d;
+ envelope-from=frank.chang@sifive.com; helo=mail-oi1-x22d.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -82,7 +82,7 @@ X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, HTML_MESSAGE=0.001,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=unavailable autolearn_force=no
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,264 +105,156 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000d6a1d705accd76b9
+--0000000000008a4aa805accdcb2a
 Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Aug 7, 2020 at 8:04 AM Richard Henderson <
+On Fri, Aug 7, 2020 at 2:36 AM Richard Henderson <
 richard.henderson@linaro.org> wrote:
 
 > On 8/6/20 3:46 AM, frank.chang@sifive.com wrote:
-> > +static inline uint32_t vext_max_elems(uint32_t desc, uint32_t esz, bool
-> is_ldst)
+> > +    float flmul;
+>
+> int8_t?  It seems weird that the translator wouldn't also use...
+>
+
+It was kept for vector check functions.
+However, I've removed float flmul and changed my
+vector check functions to something like:
+
+> static bool vext_check_sss(DisasContext *s, int vd, int vs1,
+>                            int vs2, int vm, bool is_vs1)
+> {
+>     bool ret = require_vm(vm, vd);
+>     if (s->lmul > 0) {
+>         ret &= require_align(vd, 1 << s->lmul) &&
+>                require_align(vs2, 1 << s->lmul);
+>         if (is_vs1) {
+>             ret &= require_align(vs1, 1 << s->lmul);
+>         }
+>     }
+>     return ret;
+> }
+
+which use shifts to check the alignment/noover of vector registers.
+
+The parameters passed to require_align() and require_noover()
+are also changed to const uint8_t type so that the shifted value can be
+wrapped within 8-bits.
+
+int8_t lmul in DisasContext is also encoded:
+ctx->lmul = sextract32(FIELD_EX32(tb_flags, TB_FLAGS, LMUL), 0, 3);
+
+
+> > +/*
+> > + * Encode LMUL to lmul as following:
+> > + *     LMUL    vlmul    lmul
+> > + *      1       000       0
+> > + *      2       001       1
+> > + *      4       010       2
+> > + *      8       011       3
+> > + *      -       100       -
+> > + *     1/8      101      -3
+> > + *     1/4      110      -2
+> > + *     1/2      111      -1
+> > + */
+> > +static inline int32_t vext_lmul(uint32_t desc)
 > >  {
-> > -    return simd_maxsz(desc) << vext_lmul(desc);
-> > +    /*
-> > +     * As simd_desc support at most 256 bytes, the max vlen is 256 bits.
-> > +     * so vlen in bytes (vlenb) is encoded as maxsz.
-> > +     */
-> > +    uint32_t vlenb = simd_maxsz(desc);
-> > +
-> > +    if (is_ldst) {
-> > +        /*
-> > +         * Vector load/store instructions have the EEW encoded
-> > +         * directly in the instructions. The maximum vector size is
-> > +         * calculated with EMUL rather than LMUL.
-> > +         */
-> > +        uint32_t eew = ctzl(esz);
-> > +        uint32_t sew = vext_sew(desc);
-> > +        uint32_t lmul = vext_lmul(desc);
-> > +        int32_t emul = eew - sew + lmul;
-> > +        uint32_t emul_r = emul < 0 ? 0 : emul;
-> > +        return 1 << (ctzl(vlenb) + emul_r - ctzl(esz));
+> > -    return FIELD_EX32(simd_data(desc), VDATA, LMUL);
+> > +    uint32_t lmul = FIELD_EX32(simd_data(desc), VDATA, LMUL);
+> > +    return (int8_t)(lmul << 5) >> 5;
+> >  }
 >
-> As I said before, the is_ldst instructions should put the EEW and EMUL
-> values
-> into the SEW and LMUL desc fields, so that this does not need to be
-
-special-cased at all.
+> ... this encoding?
+>
+> Oh, and sextract32(lmul, 0, 3) instead of those shifts.
 >
 
-I add a vext_get_emul() helper function in trans_rvv.inc.c:
-
-> static uint8_t vext_get_emul(DisasContext *s, uint8_t eew)
-> {
->     int8_t lmul = sextract32(s->lmul, 0, 3);
->     int8_t emul = ctzl(eew) - (s->sew + 3) + lmul;  // may remove ctzl()
-if eew is already log2(eew)
->     return emul < 0 ? 0 : emul;
-> }
-
-and pass emul as LMUL field in VDATA so that it can be
-reused in vector_helper.c: vext_max_elems():
-
-> uint8_t emul = vext_get_emul(s, eew);
-> data = FIELD_DP32(data, VDATA, LMUL, emul);
-
-I also remove the passing SEW field in VDATA codes as I think SEW
-might not be required in the updated vext_max_elems() (see below).
+OK~
 
 
 >
-> > +        /* Return VLMAX */
-> > +        return 1 << (ctzl(vlenb) + vext_lmul(desc) - ctzl(esz));
->
-> This is overly complicated.
->
-> (1) 1 << ctzl(vlenb) == vlenb.
-> (2) I'm not sure why esz is not already a log2 number.
->
-
-esz is passed from e.g. GEN_VEXT_LD_STRIDE() macro:
-
-> #define GEN_VEXT_LD_STRIDE(NAME, ETYPE, LOAD_FN)        \
-> void HELPER(NAME)(void *vd, void * v0, target_ulong base,           \
->                   target_ulong stride, CPURISCVState *env,
-      \
->                   uint32_t desc)
-                         \
-> {
-                                   \
->     uint32_t vm = vext_vm(desc);
-                \
->     vext_ldst_stride(vd, v0, base, stride, env, desc, vm, LOAD_FN,     \
->                      sizeof(ETYPE), GETPC(), MMU_DATA_LOAD);            \
-> }
->
-> GEN_VEXT_LD_STRIDE(vlse8_v,  int8_t,  lde_b)
-
-which is calculated by sizeof(ETYPE), so the results would be: 1, 2, 4, 8.
-and vext_max_elems() is called by e.g. vext_ldst_stride():
-
-> uint32_t max_elems = vext_max_elems(desc, esz);
-
-I can add another parameter to the macro and pass the hard-coded log2(esz)
-number
-if it's the better way instead of using ctzl().
-Or if there's another approach to get the log2(esz) number more elegantly?
-
-
->
-> This ought to look more like
->
->   int scale = lmul - esz;
->   return (scale < 0
->           ? vlenb >> -scale
->           : vlenb << scale);
->
->
-Thanks for the detailed point outs.
-I manage to change the codes to below as your suggestion.
-
-> static inline uint32_t vext_max_elems(uint32_t desc, uint32_t esz)
-> {
->     /*
->      * As simd_desc support at most 256 bytes, the max vlen is 256 bits.
->      * so vlen in bytes (vlenb) is encoded as maxsz.
->      */
->     uint32_t vlenb = simd_maxsz(desc);
->
->     /* Return VLMAX */
->     int scale = vext_lmul(desc) - ctzl(esz);  // may remove ctzl() if esz
-is already log2(esz)
->     return scale < 0 ? vlenb >> -scale : vlenb << scale;
-> }
-
-
 >
 > r~
 >
 
-Thanks for the review.
+Thanks
 Frank Chang
 
---000000000000d6a1d705accd76b9
+--0000000000008a4aa805accdcb2a
 Content-Type: text/html; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-<div dir=3D"ltr"><div dir=3D"ltr">On Fri, Aug 7, 2020 at 8:04 AM Richard He=
+<div dir=3D"ltr"><div dir=3D"ltr">On Fri, Aug 7, 2020 at 2:36 AM Richard He=
 nderson &lt;<a href=3D"mailto:richard.henderson@linaro.org">richard.henders=
 on@linaro.org</a>&gt; wrote:<br></div><div class=3D"gmail_quote"><blockquot=
 e class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px s=
 olid rgb(204,204,204);padding-left:1ex">On 8/6/20 3:46 AM, <a href=3D"mailt=
 o:frank.chang@sifive.com" target=3D"_blank">frank.chang@sifive.com</a> wrot=
 e:<br>
-&gt; +static inline uint32_t vext_max_elems(uint32_t desc, uint32_t esz, bo=
-ol is_ldst)<br>
+&gt; +=C2=A0 =C2=A0 float flmul;<br>
+<br>
+int8_t?=C2=A0 It seems weird that the translator wouldn&#39;t also use...<b=
+r></blockquote><div><br></div><div>It was kept for vector check functions.<=
+/div><div>However, I&#39;ve removed float flmul and changed my</div><div>ve=
+ctor check functions to something like:</div><div><br></div><div>&gt; stati=
+c bool vext_check_sss(DisasContext *s, int vd, int vs1,<br>&gt; =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0int vs2, int vm, bool is_vs1)<br>&gt; {<br>&gt; =C2=A0 =C2=A0 =
+bool ret =3D require_vm(vm, vd);<br>&gt; =C2=A0 =C2=A0 if (s-&gt;lmul &gt; =
+0) {<br>&gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 ret &amp;=3D require_align(vd, 1 &=
+lt;&lt; s-&gt;lmul) &amp;&amp;<br>&gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0require_align(vs2, 1 &lt;&lt; s-&gt;lmul);<br>&gt; =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 if (is_vs1) {<br>&gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 ret &amp;=3D require_align(vs1, 1 &lt;&lt; s-&gt;lmul);<br>&g=
+t; =C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>&gt; =C2=A0 =C2=A0 }<br>&gt; =C2=A0 =C2=
+=A0 return ret;<br>&gt; }<br></div><div><br></div><div>which use shifts to =
+check the alignment/noover of vector registers.</div><div><br></div><div>Th=
+e parameters passed to=C2=A0require_align() and=C2=A0require_noover()</div>=
+<div>are also changed to=C2=A0const uint8_t type so that the shifted value =
+can be</div><div>wrapped within 8-bits.</div><div><br></div><div>int8_t lmu=
+l in=C2=A0DisasContext is also encoded:</div><div>ctx-&gt;lmul =3D sextract=
+32(FIELD_EX32(tb_flags, TB_FLAGS, LMUL), 0, 3);<br></div><div><br></div><bl=
+ockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-lef=
+t:1px solid rgb(204,204,204);padding-left:1ex">
+<br>
+&gt; +/*<br>
+&gt; + * Encode LMUL to lmul as following:<br>
+&gt; + *=C2=A0 =C2=A0 =C2=A0LMUL=C2=A0 =C2=A0 vlmul=C2=A0 =C2=A0 lmul<br>
+&gt; + *=C2=A0 =C2=A0 =C2=A0 1=C2=A0 =C2=A0 =C2=A0 =C2=A0000=C2=A0 =C2=A0 =
+=C2=A0 =C2=A00<br>
+&gt; + *=C2=A0 =C2=A0 =C2=A0 2=C2=A0 =C2=A0 =C2=A0 =C2=A0001=C2=A0 =C2=A0 =
+=C2=A0 =C2=A01<br>
+&gt; + *=C2=A0 =C2=A0 =C2=A0 4=C2=A0 =C2=A0 =C2=A0 =C2=A0010=C2=A0 =C2=A0 =
+=C2=A0 =C2=A02<br>
+&gt; + *=C2=A0 =C2=A0 =C2=A0 8=C2=A0 =C2=A0 =C2=A0 =C2=A0011=C2=A0 =C2=A0 =
+=C2=A0 =C2=A03<br>
+&gt; + *=C2=A0 =C2=A0 =C2=A0 -=C2=A0 =C2=A0 =C2=A0 =C2=A0100=C2=A0 =C2=A0 =
+=C2=A0 =C2=A0-<br>
+&gt; + *=C2=A0 =C2=A0 =C2=A01/8=C2=A0 =C2=A0 =C2=A0 101=C2=A0 =C2=A0 =C2=A0=
+ -3<br>
+&gt; + *=C2=A0 =C2=A0 =C2=A01/4=C2=A0 =C2=A0 =C2=A0 110=C2=A0 =C2=A0 =C2=A0=
+ -2<br>
+&gt; + *=C2=A0 =C2=A0 =C2=A01/2=C2=A0 =C2=A0 =C2=A0 111=C2=A0 =C2=A0 =C2=A0=
+ -1<br>
+&gt; + */<br>
+&gt; +static inline int32_t vext_lmul(uint32_t desc)<br>
 &gt;=C2=A0 {<br>
-&gt; -=C2=A0 =C2=A0 return simd_maxsz(desc) &lt;&lt; vext_lmul(desc);<br>
-&gt; +=C2=A0 =C2=A0 /*<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0* As simd_desc support at most 256 bytes, the max=
- vlen is 256 bits.<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0* so vlen in bytes (vlenb) is encoded as maxsz.<b=
-r>
-&gt; +=C2=A0 =C2=A0 =C2=A0*/<br>
-&gt; +=C2=A0 =C2=A0 uint32_t vlenb =3D simd_maxsz(desc);<br>
-&gt; +<br>
-&gt; +=C2=A0 =C2=A0 if (is_ldst) {<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 /*<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* Vector load/store instructions ha=
-ve the EEW encoded<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* directly in the instructions. The=
- maximum vector size is<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* calculated with EMUL rather than =
-LMUL.<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0*/<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 uint32_t eew =3D ctzl(esz);<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 uint32_t sew =3D vext_sew(desc);<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 uint32_t lmul =3D vext_lmul(desc);<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 int32_t emul =3D eew - sew + lmul;<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 uint32_t emul_r =3D emul &lt; 0 ? 0 : emu=
-l;<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 return 1 &lt;&lt; (ctzl(vlenb) + emul_r -=
- ctzl(esz));<br>
+&gt; -=C2=A0 =C2=A0 return FIELD_EX32(simd_data(desc), VDATA, LMUL);<br>
+&gt; +=C2=A0 =C2=A0 uint32_t lmul =3D FIELD_EX32(simd_data(desc), VDATA, LM=
+UL);<br>
+&gt; +=C2=A0 =C2=A0 return (int8_t)(lmul &lt;&lt; 5) &gt;&gt; 5;<br>
+&gt;=C2=A0 }<br>
 <br>
-As I said before, the is_ldst instructions should put the EEW and EMUL valu=
-es<br>
-into the SEW and LMUL desc fields, so that this does not need to be=C2=A0</=
-blockquote><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.=
-8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">
-special-cased at all.<br></blockquote><div><br></div><div><div>I add a=C2=
-=A0vext_get_emul() helper function in trans_rvv.inc.c:</div><div><br></div>=
-<div>&gt; static uint8_t vext_get_emul(DisasContext *s, uint8_t eew)<br>&gt=
-; {<br>&gt; =C2=A0 =C2=A0 int8_t lmul =3D sextract32(s-&gt;lmul, 0, 3);<br>=
-&gt; =C2=A0 =C2=A0 int8_t emul =3D ctzl(eew) - (s-&gt;sew + 3) + lmul;=C2=
-=A0 // may remove ctzl() if eew is already log2(eew)<br>&gt; =C2=A0 =C2=A0 =
-return emul &lt; 0 ? 0 : emul;<br>&gt; }<br></div><div><br></div><div>and p=
-ass emul as LMUL field in VDATA  so that it can be</div><div>reused in vect=
-or_helper.c:=C2=A0vext_max_elems():</div></div><div><br></div><div>&gt; uin=
-t8_t emul =3D vext_get_emul(s, eew);</div>&gt; data =3D FIELD_DP32(data, VD=
-ATA, LMUL, emul);</div><div class=3D"gmail_quote"><br></div><div class=3D"g=
-mail_quote">I also remove the passing SEW field in VDATA codes as I think S=
-EW</div><div class=3D"gmail_quote">might not be required in the updated=C2=
-=A0vext_max_elems() (see below).</div><div class=3D"gmail_quote"><div>=C2=
-=A0</div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8e=
-x;border-left:1px solid rgb(204,204,204);padding-left:1ex">
+... this encoding?<br>
 <br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 /* Return VLMAX */<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 return 1 &lt;&lt; (ctzl(vlenb) + vext_lmu=
-l(desc) - ctzl(esz));<br>
+Oh, and sextract32(lmul, 0, 3) instead of those shifts.<br></blockquote><di=
+v><br></div><div>OK~</div><div>=C2=A0</div><blockquote class=3D"gmail_quote=
+" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);=
+padding-left:1ex">
 <br>
-This is overly complicated.<br>
 <br>
-(1) 1 &lt;&lt; ctzl(vlenb) =3D=3D vlenb.<br>
-(2) I&#39;m not sure why esz is not already a log2 number.<br></blockquote>=
-<div><br></div><div>esz is passed from e.g.=C2=A0GEN_VEXT_LD_STRIDE() macro=
-:</div><div><br></div><div>&gt; #define GEN_VEXT_LD_STRIDE(NAME, ETYPE, LOA=
-D_FN)=C2=A0 =C2=A0 =C2=A0 =C2=A0 \<br>&gt; void HELPER(NAME)(void *vd, void=
- * v0, target_ulong base,=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0\<br>&gt;=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 target_ulon=
-g stride, CPURISCVState *env,=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 \<br>&gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 uint32_t desc)=C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0\<br>&gt; {=
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0\<br>&gt; =C2=A0 =C2=A0 uint32_t vm =3D vext_vm(desc);=C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 \<br>&gt; =C2=A0 =C2=A0 vext_=
-ldst_stride(vd, v0, base, stride, env, desc, vm, LOAD_FN,=C2=A0 =C2=A0 =C2=
-=A0\<br>&gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0sizeof(ETYPE), GETPC(), MMU_DATA_LOAD); =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0\<br>&gt; }<br></div><div>&gt;</div><div>&gt;=C2=A0GEN_=
-VEXT_LD_STRIDE(vlse8_v, =C2=A0int8_t, =C2=A0lde_b)</div><div><br></div><div=
->which is calculated by sizeof(ETYPE), so the results would be: 1, 2, 4, 8.=
-</div><div>and vext_max_elems() is called by e.g. vext_ldst_stride():</div>=
-<div><br></div><div>&gt; uint32_t max_elems =3D vext_max_elems(desc, esz);<=
-br></div><div><br></div><div></div><div>I can add another parameter to the =
-macro and pass the hard-coded log2(esz) number</div><div>if it&#39;s the be=
-tter way instead of using=C2=A0ctzl().</div><div>Or if there&#39;s another =
-approach to get the log2(esz) number more elegantly?</div><div>=C2=A0</div>=
-<blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-=
-left:1px solid rgb(204,204,204);padding-left:1ex">
-<br>
-This ought to look more like<br>
-<br>
-=C2=A0 int scale =3D lmul - esz;<br>
-=C2=A0 return (scale &lt; 0<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ? vlenb &gt;&gt; -scale<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 : vlenb &lt;&lt; scale);<br>
-<br></blockquote><div>=C2=A0</div><div><div>Thanks for the detailed point o=
-uts.</div><div>I manage to change the codes to below as your suggestion.</d=
-iv><div><br></div>&gt; static inline uint32_t vext_max_elems(uint32_t desc,=
- uint32_t esz)<br>&gt; {<br>&gt; =C2=A0 =C2=A0 /*<br>&gt; =C2=A0 =C2=A0 =C2=
-=A0* As simd_desc support at most 256 bytes, the max vlen is 256 bits.<br>&=
-gt; =C2=A0 =C2=A0 =C2=A0* so vlen in bytes (vlenb) is encoded as maxsz.<br>=
-&gt; =C2=A0 =C2=A0 =C2=A0*/<br>&gt; =C2=A0 =C2=A0 uint32_t vlenb =3D simd_m=
-axsz(desc);<br>&gt; <br>&gt; =C2=A0 =C2=A0 /* Return VLMAX */<br>&gt; =C2=
-=A0 =C2=A0 int scale =3D vext_lmul(desc) - ctzl(esz);=C2=A0 // may remove c=
-tzl() if esz is already log2(esz)<br>&gt; =C2=A0 =C2=A0 return scale &lt; 0=
- ? vlenb &gt;&gt; -scale : vlenb &lt;&lt; scale;<br>&gt; }<br></div><div>=
-=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0=
-.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">
-<br>
-r~<br></blockquote><div><br></div><div>Thanks for the review.</div>Frank Ch=
-ang</div></div>
+r~<br></blockquote><div><br></div><div>Thanks</div><div>Frank Chang=C2=A0</=
+div></div></div>
 
---000000000000d6a1d705accd76b9--
+--0000000000008a4aa805accdcb2a--
 
