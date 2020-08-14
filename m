@@ -7,83 +7,85 @@ X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4052CC433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 18:02:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6844C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 18:02:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0A98620771
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 18:02:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 650DD20771
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 18:02:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lLuA96Dp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A98620771
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gL1dqEuw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 650DD20771
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49034 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49474 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k6e2Q-0006U3-A8
-	for qemu-devel@archiver.kernel.org; Fri, 14 Aug 2020 14:02:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35928)
+	id 1k6e2V-0006er-Kk
+	for qemu-devel@archiver.kernel.org; Fri, 14 Aug 2020 14:02:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36212)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k6e0b-0004bK-KP
- for qemu-devel@nongnu.org; Fri, 14 Aug 2020 14:00:53 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:56035)
+ id 1k6e1U-0005NP-W5
+ for qemu-devel@nongnu.org; Fri, 14 Aug 2020 14:01:49 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:33171)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k6e0a-0003jW-6M
- for qemu-devel@nongnu.org; Fri, 14 Aug 2020 14:00:53 -0400
-Received: by mail-wm1-x342.google.com with SMTP id 9so8162009wmj.5
- for <qemu-devel@nongnu.org>; Fri, 14 Aug 2020 11:00:51 -0700 (PDT)
+ id 1k6e1T-0003of-HH
+ for qemu-devel@nongnu.org; Fri, 14 Aug 2020 14:01:48 -0400
+Received: by mail-wm1-x341.google.com with SMTP id f18so8855560wmc.0
+ for <qemu-devel@nongnu.org>; Fri, 14 Aug 2020 11:01:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=R5Gdza+ElQrzCj9ShIMK7rozY7qDx/PrHAaTaHDiBfM=;
- b=lLuA96Dpvq7jjO4bVMLYjbyI6sod1Jsc9/FSBJcGQ+MT4kK3o2/e3MMONGr5suhcLg
- whwE3b6/FJ5s/TrsWvTGE5FhRHtMIHcNogxR/IylB7Cpn83NDSJOMJsgxAUpizpdSUOH
- iJo7DZ832T1/twT43z0jCaCX2JM1pVszSevIsJdMzao4Q7IQyHSTFrwvcq8Ae1MfIP5W
- c3fJvFVoArX6nhicBcTh61J3gEVB0MDti8BdBo97ZGJCBnBPRtyqz+8r4RUGv9ob7/gt
- JMGbIdXbhE9Yx8lt3cIV1cliZmEQElv3PAOMDm1SdBuF1q7Lmhe5+QLRb6sZJMEE2/d+
- EfcA==
+ bh=3DLe9RlJeEEZsdwQOKcIWqfNAA0O+DiKJP2WJ4IP2qY=;
+ b=gL1dqEuwYgs1ZE9R6IzYN2tpSUICJBoimXu4MY1TGVHZ88vbc0TQFW7+uf1J9MusS4
+ fHQ25Sk4SZj9C2kkrfdgDU1fO/UFvG2qTw6pHx6rRbnu2+7yFZ4pDAVny8Q8+uFr31sw
+ NPOb+cCi15X/eXGsHZnD76jCI3459R90O7iXCaTNT/Te4HccrNyhmPRmxYnK6BI0PHVI
+ vYeu5/1wFKPZ2mjPnccJz3NxXTmN6by9vwBbbG2i4arxzHQVy2GDfoXpWqIOYO83NfOj
+ H12/tMr4UrR4BlCH3WrF7a70jBBIIZFG4XDSA/31ETwk1gv7T0fyfmgTl8a9QpoHnrVb
+ cDGg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=R5Gdza+ElQrzCj9ShIMK7rozY7qDx/PrHAaTaHDiBfM=;
- b=sczXFz6g7anex+/ROF2LCC/xZYOb5W8gE3Byn+jmz723Ws98Gl4RGPSH4rqfQFFU5p
- X3fAaNjZ0Ix+GS8q39BJ/AHdenZUzo2Z41JG5cmXqdDRTDgsadS3ngXd4LMCHVeaqPFw
- wZVfBo8K5nwISzLv3KYfepOdONiFkzLldxbSqTGtUh8cg8OMRJLNamYnguzgInajAjYy
- kvXGwyKBdO0laVl4g8OfzUiEG5TichS9gVZkE7cWTMZgkQhzpOYsFhCDLdSq1Bxb/JpY
- lcTQcsqEvd5fAbCGY7cXBsEP0rNw/J4qPaub/fZMOcAFJRtCjNGmOZ6QB7z2q8KtpDcu
- YiNw==
-X-Gm-Message-State: AOAM532Xzgrgx60BMoRpjmO3idMGqvaMloCExeu3ySowDcHp2J179bvU
- xJ4gB/1ieiuC7Eit3dnf+rYKAVp2crg=
-X-Google-Smtp-Source: ABdhPJxr/31f7t3kWj6FYZw7gtOAQGRP2/Z6ZfsgMq9RsQ+CerUheN95T/rcYbZ9zzDh9uSAjoSGiw==
-X-Received: by 2002:a1c:4d0d:: with SMTP id o13mr3687406wmh.118.1597428050730; 
- Fri, 14 Aug 2020 11:00:50 -0700 (PDT)
+ bh=3DLe9RlJeEEZsdwQOKcIWqfNAA0O+DiKJP2WJ4IP2qY=;
+ b=UFLNJGBwBhrcVFgHixR1CMOfXM1/osTORH0JoCha2IpWn3Y/qWaKXaAQBAXTfaa2Uh
+ EzVGXaMu496lV2ZNL9SPSQ77jp5tUrdSgf4Q5Yr4YcvYfqPFigTNKrsmWAK0EFbOHJTZ
+ duu+gpL7mKMHX7g6r3pW9oNumYD56VZBaGihBdRYkcu+Vxwx6uME5r1OdHEo5TccOoiD
+ PxMcluVQpfxAvFA/Wq6lE/fhwQER06d+hg4yb/qXNp/yFamLDigdygbBA+8MZdlTZ7Rn
+ IepfpcXxEn05hK4a+omHxd6QRxGLVZrZVylgUh2IzvAH63mi3wFHbnjg0rQIb9UcngB0
+ shbA==
+X-Gm-Message-State: AOAM532KIZLudZL+jCxI/fsT5LHj3tsYJd71llJXr4PRa6IVnFqbLgog
+ 7UY+D+1w2RN3GMsRpjX9cZg=
+X-Google-Smtp-Source: ABdhPJx6brp6Q+wbkkHW7R/Sm01JPg+KSWVEpN4RNCvjSa+vrEDQHdbWLHibCmCtSSSbPr49N7VsKQ==
+X-Received: by 2002:a05:600c:21d3:: with SMTP id
+ x19mr3685163wmj.174.1597428105899; 
+ Fri, 14 Aug 2020 11:01:45 -0700 (PDT)
 Received: from [192.168.1.36] (121.red-81-40-121.staticip.rima-tde.net.
  [81.40.121.121])
- by smtp.gmail.com with ESMTPSA id m14sm16864579wrx.76.2020.08.14.11.00.49
+ by smtp.gmail.com with ESMTPSA id b2sm15106427wmj.47.2020.08.14.11.01.45
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 14 Aug 2020 11:00:50 -0700 (PDT)
-Subject: Re: [PATCH 14/41] hcd-dwc2: Rename USB_*CLASS macros for consistency
+ Fri, 14 Aug 2020 11:01:45 -0700 (PDT)
+Subject: Re: [PATCH 16/41] throttle-groups: Move ThrottleGroup typedef to
+ header
 To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
 References: <20200813222625.243136-1-ehabkost@redhat.com>
- <20200813222625.243136-15-ehabkost@redhat.com>
+ <20200813222625.243136-17-ehabkost@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <5c329e66-e40d-6bb4-b25a-4288e4832ba8@amsat.org>
-Date: Fri, 14 Aug 2020 20:00:49 +0200
+Message-ID: <06f3a14d-413f-6e22-3bf6-546bc1629bbc@amsat.org>
+Date: Fri, 14 Aug 2020 20:01:44 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200813222625.243136-15-ehabkost@redhat.com>
+In-Reply-To: <20200813222625.243136-17-ehabkost@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::342;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x342.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x341.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -111,75 +113,53 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/14/20 12:25 AM, Eduardo Habkost wrote:
-> Rename the DWC2_CLASS to DWC2_USB_CLASS and DWC2_GET_CLASS to
-> DWC2_USB_GET_CLASS, for consistency with the DWC2_USB macro.
+On 8/14/20 12:26 AM, Eduardo Habkost wrote:
+> Move typedef closer to the type check macros, to make it easier
+> to convert the code to OBJECT_DEFINE_TYPE() in the future.
 > 
 > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
 > ---
->  hw/usb/hcd-dwc2.h | 4 ++--
->  hw/usb/hcd-dwc2.c | 8 ++++----
->  2 files changed, 6 insertions(+), 6 deletions(-)
+>  include/block/throttle-groups.h | 1 +
+>  block/throttle-groups.c         | 4 ++--
+>  2 files changed, 3 insertions(+), 2 deletions(-)
 > 
-> diff --git a/hw/usb/hcd-dwc2.h b/hw/usb/hcd-dwc2.h
-> index 4ba809a07b..54111d835e 100644
-> --- a/hw/usb/hcd-dwc2.h
-> +++ b/hw/usb/hcd-dwc2.h
-> @@ -182,9 +182,9 @@ struct DWC2Class {
->  #define TYPE_DWC2_USB   "dwc2-usb"
->  #define DWC2_USB(obj) \
->      OBJECT_CHECK(DWC2State, (obj), TYPE_DWC2_USB)
-> -#define DWC2_CLASS(klass) \
-> +#define DWC2_USB_CLASS(klass) \
->      OBJECT_CLASS_CHECK(DWC2Class, (klass), TYPE_DWC2_USB)
-> -#define DWC2_GET_CLASS(obj) \
-> +#define DWC2_USB_GET_CLASS(obj) \
->      OBJECT_GET_CLASS(DWC2Class, (obj), TYPE_DWC2_USB)
+> diff --git a/include/block/throttle-groups.h b/include/block/throttle-groups.h
+> index 712a8e64b4..5e77db700f 100644
+> --- a/include/block/throttle-groups.h
+> +++ b/include/block/throttle-groups.h
+> @@ -59,6 +59,7 @@ typedef struct ThrottleGroupMember {
+>  } ThrottleGroupMember;
 >  
->  #endif
-> diff --git a/hw/usb/hcd-dwc2.c b/hw/usb/hcd-dwc2.c
-> index 56f91f6bee..97688d21bf 100644
-> --- a/hw/usb/hcd-dwc2.c
-> +++ b/hw/usb/hcd-dwc2.c
-> @@ -1155,7 +1155,7 @@ static void dwc2_work_timer(void *opaque)
+>  #define TYPE_THROTTLE_GROUP "throttle-group"
+> +typedef struct ThrottleGroup ThrottleGroup;
+>  #define THROTTLE_GROUP(obj) OBJECT_CHECK(ThrottleGroup, (obj), TYPE_THROTTLE_GROUP)
 >  
->  static void dwc2_reset_enter(Object *obj, ResetType type)
->  {
-> -    DWC2Class *c = DWC2_GET_CLASS(obj);
-> +    DWC2Class *c = DWC2_USB_GET_CLASS(obj);
->      DWC2State *s = DWC2_USB(obj);
->      int i;
+>  const char *throttle_group_get_name(ThrottleGroupMember *tgm);
+> diff --git a/block/throttle-groups.c b/block/throttle-groups.c
+> index 98fea7fd47..4e28365d8d 100644
+> --- a/block/throttle-groups.c
+> +++ b/block/throttle-groups.c
+> @@ -63,7 +63,7 @@ static void timer_cb(ThrottleGroupMember *tgm, bool is_write);
+>   * access some other ThrottleGroupMember's timers only after verifying that
+>   * that ThrottleGroupMember has throttled requests in the queue.
+>   */
+> -typedef struct ThrottleGroup {
+> +struct ThrottleGroup {
+>      Object parent_obj;
 >  
-> @@ -1239,7 +1239,7 @@ static void dwc2_reset_enter(Object *obj, ResetType type)
+>      /* refuse individual property change if initialization is complete */
+> @@ -79,7 +79,7 @@ typedef struct ThrottleGroup {
 >  
->  static void dwc2_reset_hold(Object *obj)
->  {
-> -    DWC2Class *c = DWC2_GET_CLASS(obj);
-> +    DWC2Class *c = DWC2_USB_GET_CLASS(obj);
->      DWC2State *s = DWC2_USB(obj);
+>      /* This field is protected by the global QEMU mutex */
+>      QTAILQ_ENTRY(ThrottleGroup) list;
+> -} ThrottleGroup;
+> +};
 >  
->      trace_usb_dwc2_reset_hold();
-> @@ -1253,7 +1253,7 @@ static void dwc2_reset_hold(Object *obj)
->  
->  static void dwc2_reset_exit(Object *obj)
->  {
-> -    DWC2Class *c = DWC2_GET_CLASS(obj);
-> +    DWC2Class *c = DWC2_USB_GET_CLASS(obj);
->      DWC2State *s = DWC2_USB(obj);
->  
->      trace_usb_dwc2_reset_exit();
-> @@ -1382,7 +1382,7 @@ static Property dwc2_usb_properties[] = {
->  static void dwc2_class_init(ObjectClass *klass, void *data)
->  {
->      DeviceClass *dc = DEVICE_CLASS(klass);
-> -    DWC2Class *c = DWC2_CLASS(klass);
-> +    DWC2Class *c = DWC2_USB_CLASS(klass);
->      ResettableClass *rc = RESETTABLE_CLASS(klass);
->  
->      dc->realize = dwc2_realize;
+>  /* This is protected by the global QEMU mutex */
+>  static QTAILQ_HEAD(, ThrottleGroup) throttle_groups =
 > 
 
 
