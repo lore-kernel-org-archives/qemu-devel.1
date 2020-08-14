@@ -2,88 +2,65 @@ Return-Path: <SRS0=5nOY=BY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA1F7C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 10:42:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3D9CC433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 10:43:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9880E206A4
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 10:42:24 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y0FSpRDD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9880E206A4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 89FB5206A4
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 10:43:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 89FB5206A4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58686 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35898 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k6XAF-00080X-SE
-	for qemu-devel@archiver.kernel.org; Fri, 14 Aug 2020 06:42:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45140)
+	id 1k6XBW-0001mF-R7
+	for qemu-devel@archiver.kernel.org; Fri, 14 Aug 2020 06:43:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46224)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
- id 1k6VqG-0003wP-1X
- for qemu-devel@nongnu.org; Fri, 14 Aug 2020 05:17:40 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:20543
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
- id 1k6VqC-0003bc-A2
- for qemu-devel@nongnu.org; Fri, 14 Aug 2020 05:17:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597396655;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=loNF9vsUyixHaDiLMmjN5Z8ShRVFHgBbx+2J0vRwvCo=;
- b=Y0FSpRDDngBCorP1DLlGhfOXnAPt/i6DoKVdqGek/hriR34JZ4Tepc/wBdAdlaEuSmJHs5
- i2Uv3675Fwudj9zKBc9ztI4gfH8SOXy1dFVbuAqm/evUlp47SBqkQ5PEYUZnePrpDsEkRn
- 99BcJeqwZ4HuW+eYjGesQSJIdTumGMk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-571-Na56C8ZNMzGX_lGKFFudIg-1; Fri, 14 Aug 2020 05:17:31 -0400
-X-MC-Unique: Na56C8ZNMzGX_lGKFFudIg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4689D801AC2;
- Fri, 14 Aug 2020 09:17:30 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.192.63])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B87D4747B9;
- Fri, 14 Aug 2020 09:17:28 +0000 (UTC)
-Date: Fri, 14 Aug 2020 11:17:26 +0200
-From: Andrew Jones <drjones@redhat.com>
-To: Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH v2 1/3] target/arm: Add cpu properties to control pauth
-Message-ID: <20200814091726.l7g43rz2t6op3vci@kamzik.brq.redhat.com>
-References: <20200813200243.3036772-1-richard.henderson@linaro.org>
- <20200813200243.3036772-2-richard.henderson@linaro.org>
+ (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
+ id 1k6VuF-0002Ne-Cx
+ for qemu-devel@nongnu.org; Fri, 14 Aug 2020 05:21:47 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:4244 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
+ id 1k6VuB-00047a-QQ
+ for qemu-devel@nongnu.org; Fri, 14 Aug 2020 05:21:47 -0400
+Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id 932736D85FF44CD8C710;
+ Fri, 14 Aug 2020 17:21:38 +0800 (CST)
+Received: from huawei.com (10.175.101.6) by DGGEMS413-HUB.china.huawei.com
+ (10.3.19.213) with Microsoft SMTP Server id 14.3.487.0; Fri, 14 Aug 2020
+ 17:21:29 +0800
+From: Chuan Zheng <zhengchuan@huawei.com>
+To: <quintela@redhat.com>, <eblake@redhat.com>, <dgilbert@redhat.com>
+Subject: [PATCH v2 08/10] migration/dirtyrate: Implement
+ get_sample_page_period() and block_sample_page_period()
+Date: Fri, 14 Aug 2020 17:32:11 +0800
+Message-ID: <1597397532-68043-9-git-send-email-zhengchuan@huawei.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1597397532-68043-1-git-send-email-zhengchuan@huawei.com>
+References: <1597397532-68043-1-git-send-email-zhengchuan@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20200813200243.3036772-2-richard.henderson@linaro.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
-X-Mimecast-Spam-Score: 0.003
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=drjones@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/14 05:13:35
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain
+X-Originating-IP: [10.175.101.6]
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.191;
+ envelope-from=zhengchuan@huawei.com; helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/14 05:21:39
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,225 +73,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mark.rutland@arm.com, peter.maydell@linaro.org, alex.bennee@linaro.org,
- qemu-devel@nongnu.org
+Cc: zhang.zhanghailiang@huawei.com, linyilu@huawei.com, qemu-devel@nongnu.org,
+ alex.chen@huawei.com, ann.zhuangyanying@huawei.com, fangying1@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Aug 13, 2020 at 01:02:41PM -0700, Richard Henderson wrote:
-> The crypto overhead of emulating pauth can be significant for
-> some workloads.  Add two boolean properties that allows the
-> feature to be turned off, on with the architected algorithm,
-> or on with an implementation defined algorithm.
-> 
-> We need two intermediate booleans to control the state while
-> parsing properties lest we clobber ID_AA64ISAR1 into an invalid
-> intermediate state.
-> 
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
-> v2: Use boolean properties instead of an enum (drjones).
-> ---
->  target/arm/cpu.h     | 10 ++++++++++
->  target/arm/cpu.c     | 13 +++++++++++++
->  target/arm/cpu64.c   | 40 ++++++++++++++++++++++++++++++++++++----
->  target/arm/monitor.c |  1 +
->  4 files changed, 60 insertions(+), 4 deletions(-)
-> 
-> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-> index 9e8ed423ea..44901923c8 100644
-> --- a/target/arm/cpu.h
-> +++ b/target/arm/cpu.h
-> @@ -196,9 +196,11 @@ typedef struct {
->  #ifdef TARGET_AARCH64
->  # define ARM_MAX_VQ    16
->  void arm_cpu_sve_finalize(ARMCPU *cpu, Error **errp);
-> +void arm_cpu_pauth_finalize(ARMCPU *cpu, Error **errp);
->  #else
->  # define ARM_MAX_VQ    1
->  static inline void arm_cpu_sve_finalize(ARMCPU *cpu, Error **errp) { }
-> +static inline void arm_cpu_pauth_finalize(ARMCPU *cpu, Error **errp) { }
->  #endif
->  
->  typedef struct ARMVectorReg {
-> @@ -938,6 +940,14 @@ struct ARMCPU {
->      uint64_t reset_cbar;
->      uint32_t reset_auxcr;
->      bool reset_hivecs;
-> +
-> +    /*
-> +     * Intermediate values used during property parsing.
-> +     * Once finalized, the values should be read from ID_AA64ISAR1.
-> +     */
-> +    bool prop_pauth;
-> +    bool prop_pauth_impdef;
-> +
->      /* DCZ blocksize, in log_2(words), ie low 4 bits of DCZID_EL0 */
->      uint32_t dcz_blocksize;
->      uint64_t rvbar;
-> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-> index 111579554f..c719562d3d 100644
-> --- a/target/arm/cpu.c
-> +++ b/target/arm/cpu.c
-> @@ -1307,6 +1307,19 @@ void arm_cpu_finalize_features(ARMCPU *cpu, Error **errp)
->              error_propagate(errp, local_err);
->              return;
->          }
-> +
-> +        /*
-> +         * KVM does not support modifications to this feature.
-> +         * We have not registered the cpu properties when KVM
-> +         * is in use, so the user will not be able to set them.
-> +         */
-> +        if (!kvm_enabled()) {
-> +            arm_cpu_pauth_finalize(cpu, &local_err);
-> +            if (local_err != NULL) {
-> +                error_propagate(errp, local_err);
-> +                return;
-> +            }
-> +        }
->      }
->  }
->  
-> diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-> index dd696183df..0227862d39 100644
-> --- a/target/arm/cpu64.c
-> +++ b/target/arm/cpu64.c
-> @@ -28,6 +28,8 @@
->  #include "sysemu/kvm.h"
->  #include "kvm_arm.h"
->  #include "qapi/visitor.h"
-> +#include "hw/qdev-properties.h"
-> +
->  
->  #ifndef CONFIG_USER_ONLY
->  static uint64_t a57_a53_l2ctlr_read(CPUARMState *env, const ARMCPRegInfo *ri)
-> @@ -572,6 +574,36 @@ void aarch64_add_sve_properties(Object *obj)
->      }
->  }
->  
-> +void arm_cpu_pauth_finalize(ARMCPU *cpu, Error **errp)
-> +{
-> +    int arch_val = 0, impdef_val = 0;
-> +    uint64_t t;
-> +
-> +    /* TODO: Handle HaveEnhancedPAC, HaveEnhancedPAC2, HaveFPAC. */
-> +    if (cpu->prop_pauth) {
-> +        if (cpu->prop_pauth_impdef) {
-> +            impdef_val = 1;
-> +        } else {
-> +            arch_val = 1;
-> +        }
-> +    } else if (cpu->prop_pauth_impdef) {
-> +        error_setg(errp, "cannot enable pauth-impdef without pauth");
-> +        error_append_hint(errp, "Add pauth=on to the CPU property list.\n");
-> +    }
-> +
-> +    t = cpu->isar.id_aa64isar1;
-> +    t = FIELD_DP64(t, ID_AA64ISAR1, APA, arch_val);
-> +    t = FIELD_DP64(t, ID_AA64ISAR1, GPA, arch_val);
-> +    t = FIELD_DP64(t, ID_AA64ISAR1, API, impdef_val);
-> +    t = FIELD_DP64(t, ID_AA64ISAR1, GPI, impdef_val);
-> +    cpu->isar.id_aa64isar1 = t;
-> +}
-> +
-> +static Property arm_cpu_pauth_property =
-> +    DEFINE_PROP_BOOL("pauth", ARMCPU, prop_pauth, true);
-> +static Property arm_cpu_pauth_impdef_property =
-> +    DEFINE_PROP_BOOL("pauth-impdef", ARMCPU, prop_pauth_impdef, false);
-> +
->  /* -cpu max: if KVM is enabled, like -cpu host (best possible with this host);
->   * otherwise, a CPU with as many features enabled as our emulation supports.
->   * The version of '-cpu max' for qemu-system-arm is defined in cpu.c;
-> @@ -627,10 +659,6 @@ static void aarch64_max_initfn(Object *obj)
->          t = FIELD_DP64(t, ID_AA64ISAR1, DPB, 2);
->          t = FIELD_DP64(t, ID_AA64ISAR1, JSCVT, 1);
->          t = FIELD_DP64(t, ID_AA64ISAR1, FCMA, 1);
-> -        t = FIELD_DP64(t, ID_AA64ISAR1, APA, 1); /* PAuth, architected only */
-> -        t = FIELD_DP64(t, ID_AA64ISAR1, API, 0);
-> -        t = FIELD_DP64(t, ID_AA64ISAR1, GPA, 1);
-> -        t = FIELD_DP64(t, ID_AA64ISAR1, GPI, 0);
->          t = FIELD_DP64(t, ID_AA64ISAR1, SB, 1);
->          t = FIELD_DP64(t, ID_AA64ISAR1, SPECRES, 1);
->          t = FIELD_DP64(t, ID_AA64ISAR1, FRINTTS, 1);
-> @@ -718,6 +746,10 @@ static void aarch64_max_initfn(Object *obj)
->          cpu->ctr = 0x80038003; /* 32 byte I and D cacheline size, VIPT icache */
->          cpu->dcz_blocksize = 7; /*  512 bytes */
->  #endif
-> +
-> +        /* Default to PAUTH on, with the architected algorithm. */
-> +        qdev_property_add_static(DEVICE(obj), &arm_cpu_pauth_property);
-> +        qdev_property_add_static(DEVICE(obj), &arm_cpu_pauth_impdef_property);
+From: Zheng Chuan <zhengchuan@huawei.com>
 
-Many of our CPU properties have descriptions added with
-object_property_set_description(), maybe we should add
-descriptions for these as well. And, maybe I should look
-into generating descriptions for each of the sve* properties
-too.
+Implement get_sample_page_period() and set_sample_page_period() to
+sleep specific time between sample actions.
 
->      }
->  
->      aarch64_add_sve_properties(obj);
-> diff --git a/target/arm/monitor.c b/target/arm/monitor.c
-> index ba6e01abd0..2c7be32b33 100644
-> --- a/target/arm/monitor.c
-> +++ b/target/arm/monitor.c
-> @@ -104,6 +104,7 @@ static const char *cpu_model_advertised_features[] = {
->      "sve640", "sve768", "sve896", "sve1024", "sve1152", "sve1280",
->      "sve1408", "sve1536", "sve1664", "sve1792", "sve1920", "sve2048",
->      "kvm-no-adjvtime",
-> +    "pauth", "pauth-impdef",
->      NULL
->  };
->  
-> -- 
-> 2.25.1
-> 
-> 
+Signed-off-by: Zheng Chuan <zhengchuan@huawei.com>
+Signed-off-by: YanYing Zhuang <ann.zhuangyanying@huawei.com>
+---
+ migration/dirtyrate.c | 23 +++++++++++++++++++++++
+ migration/dirtyrate.h |  2 ++
+ 2 files changed, 25 insertions(+)
 
-With the qtest change below I tested the property setting. Maybe we should
-add that diff to this patch.
-
-In any case,
-
-Reviewed-by: Andrew Jones <drjones@redhat.com>
-
-Thanks,
-drew
-
-
-diff --git a/tests/qtest/arm-cpu-features.c b/tests/qtest/arm-cpu-features.c
-index f7e062c1891e..bfe08b9b84f0 100644
---- a/tests/qtest/arm-cpu-features.c
-+++ b/tests/qtest/arm-cpu-features.c
-@@ -427,6 +427,18 @@ static void sve_tests_sve_off_kvm(const void *data)
-     qtest_quit(qts);
- }
+diff --git a/migration/dirtyrate.c b/migration/dirtyrate.c
+index 3dc9feb..54b832a 100644
+--- a/migration/dirtyrate.c
++++ b/migration/dirtyrate.c
+@@ -28,6 +28,29 @@ CalculatingDirtyRateState CalculatingState = CAL_DIRTY_RATE_INIT;
+ static unsigned long int qcrypto_hash_len = QCRYPTO_HASH_LEN;
+ static struct DirtyRateStat dirty_stat;
  
-+static void pauth_tests_default(QTestState *qts, const char *cpu_type)
++static int64_t set_sample_page_period(int64_t msec, int64_t initial_time)
 +{
-+    assert_has_feature_enabled(qts, "max", "pauth");
-+    assert_has_feature_disabled(qts, "max", "pauth-impdef");
-+    assert_set_feature(qts, "max", "pauth", false);
-+    assert_set_feature(qts, "max", "pauth", true);
-+    assert_set_feature(qts, "max", "pauth-impdef", true);
-+    assert_set_feature(qts, "max", "pauth-impdef", false);
-+    assert_error(qts, "max", "cannot enable pauth-impdef without pauth",
-+                 "{ 'pauth': false, 'pauth-impdef': true }");
++    int64_t current_time;
++
++    current_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
++    if ((current_time - initial_time) >= msec) {
++        msec = current_time - initial_time;
++    } else {
++        g_usleep((msec + initial_time - current_time) * 1000);
++    }
++
++    return msec;
 +}
 +
- static void test_query_cpu_model_expansion(const void *data)
++static int64_t get_sample_page_period(int64_t sec)
++{
++    if (sec <= MIN_FETCH_DIRTYRATE_TIME_SEC || sec > MAX_FETCH_DIRTYRATE_TIME_SEC) {
++        sec = DEFAULT_FETCH_DIRTYRATE_TIME_SEC;
++    }
++
++    return sec;
++}
++
+ static int dirty_rate_set_state(int new_state)
  {
-     QTestState *qts;
-@@ -461,6 +473,7 @@ static void test_query_cpu_model_expansion(const void *data)
-         assert_has_feature_enabled(qts, "cortex-a57", "aarch64");
+     int old_state = CalculatingState;
+diff --git a/migration/dirtyrate.h b/migration/dirtyrate.h
+index fce2e3b..86d8fa0 100644
+--- a/migration/dirtyrate.h
++++ b/migration/dirtyrate.h
+@@ -38,6 +38,8 @@
  
-         sve_tests_default(qts, "max");
-+        pauth_tests_default(qts, "max");
+ /* Take 1s as default for calculation duration */
+ #define DEFAULT_FETCH_DIRTYRATE_TIME_SEC          1
++#define MIN_FETCH_DIRTYRATE_TIME_SEC              0
++#define MAX_FETCH_DIRTYRATE_TIME_SEC              60
  
-         /* Test that features that depend on KVM generate errors without. */
-         assert_error(qts, "max",
-
+ struct DirtyRateConfig {
+     uint64_t sample_pages_per_gigabytes; /* sample pages per GB */
+-- 
+1.8.3.1
 
 
