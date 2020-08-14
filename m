@@ -2,90 +2,122 @@ Return-Path: <SRS0=5nOY=BY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F979C433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 12:56:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D23C2C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 13:05:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4B5F02087D
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 12:56:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 973DF20B1F
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 13:05:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XOkGzPxv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B5F02087D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="ELcayAKO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 973DF20B1F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44246 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50060 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k6ZFy-0007wM-HE
-	for qemu-devel@archiver.kernel.org; Fri, 14 Aug 2020 08:56:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41808)
+	id 1k6ZP5-0002h0-MH
+	for qemu-devel@archiver.kernel.org; Fri, 14 Aug 2020 09:05:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43770)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k6ZFD-0007Ld-Hx; Fri, 14 Aug 2020 08:55:39 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:53193)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k6ZFB-0005ha-Vm; Fri, 14 Aug 2020 08:55:39 -0400
-Received: by mail-wm1-x343.google.com with SMTP id x5so7391546wmi.2;
- Fri, 14 Aug 2020 05:55:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=drA4MKZeTEkxQZdpt6aMuhasPyyZSu+/CHLdXIl6ncE=;
- b=XOkGzPxvW4BRG4+tsHIoUL6I9GVeaCaB/Fj27M/Vv1Sf5Zt8FArylFDwuVi6NKamXG
- vZ9NAgmNzqRMHiprA9cZfuydXwrey3XqmcYaMUAOQJzbLa2GIYYoyxlh17SyWetE3z3q
- rVwANaoH4CA/dsvqD3Z6BmLBmj6KObzviB/4VG1OSAkApuRAnhFo1X4JZumKa0xp1d91
- 8B3cLqkHFt3FyE/+ERDEDmm+TRSSK1GLlfuRelLMH2kFRkvXcwcmo9pPXHEMbmnRMiyl
- Mnf7S7tXs6wxebd1OqY2kfaxLU8doHFTqch1hywWPocDdaMALWYrX1bGuB1hoWEvrlZi
- aakw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :mime-version:content-transfer-encoding;
- bh=drA4MKZeTEkxQZdpt6aMuhasPyyZSu+/CHLdXIl6ncE=;
- b=QYPVKtd5fDmv+fl3D+aj6KJXFJrxfAMXUNXvtETcrF+67dVej9mFTuysUuLyknDiZd
- ImkNV7NFvSVBfGbfQkfEpbeLuFsrIvVwRjJqI7WChqLusZSel+768et4rjevZdjQhvc+
- 9QFmIItwKPJ0ZjYPwZ1NmK3KHpQ4w2qB1dDYdF295cI56fEjPQIhUCFG/dwS9evG0LnA
- 8369I5deCA01SQM+neCqMwZ/IyWsmu4l10b/i3zIkoC9G7Wb3G8sk9bvp7R9oWCIDRu3
- yk0/C0WP61eV7Yt8mxFSjKY7g+yvR0ODuVa/NXIQWP+twYjeWJ1Ec2l0zCZCVg8vaPcF
- 7W4A==
-X-Gm-Message-State: AOAM5307WehhBti23ENugjoY9zwXgN838Davl2egCU+GpeEs7shj+tF/
- 5EirD/WI5CSy+HLHeRLMIE1VS9VwGqk=
-X-Google-Smtp-Source: ABdhPJxRiVDIJwLURYwd8QJF3f4pRMTh1J+FTFi2etNRxHvulvSr1zdVQ0SRedj3MWdiiN1YORY24w==
-X-Received: by 2002:a1c:96d7:: with SMTP id y206mr2410779wmd.9.1597409735604; 
- Fri, 14 Aug 2020 05:55:35 -0700 (PDT)
-Received: from localhost.localdomain (121.red-81-40-121.staticip.rima-tde.net.
- [81.40.121.121])
- by smtp.gmail.com with ESMTPSA id v16sm14593469wmj.14.2020.08.14.05.55.34
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 14 Aug 2020 05:55:34 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] hw/arm/musicpal: Use AddressSpace for DMA transfers
-Date: Fri, 14 Aug 2020 14:55:33 +0200
-Message-Id: <20200814125533.4047-1-f4bug@amsat.org>
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1k6ZNn-0000vL-Sf; Fri, 14 Aug 2020 09:04:31 -0400
+Received: from mail-eopbgr80129.outbound.protection.outlook.com
+ ([40.107.8.129]:44769 helo=EUR04-VI1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1k6ZNk-0006bp-Jd; Fri, 14 Aug 2020 09:04:30 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=a6wUS4IwQxsrtmJ/4ta3pH+OPLym+Hlj5Y6UutUDv3hTnAQnIwb3LNvSCz/TQBhP6RG9U5/UpRWvWIIH1rctjb2HL8Bckfixv3/g1q8CcjAEQV/g8xx/y4kQenbF49p7iq16fGSlL7OoyRts/g+bOQmndMPGLrosnWSIU7d1rWc4w1TSSuC3eb0aH2DOfHl48ymTLo44tYuOZkVVKpxSbhxSpU0P89ygwB6ze3OEVztXGKV5K9XMeGMJ6Lf+a9QbowCqE2JlTVM6RYjTaTUUPL0QR041X/HS6stNh4mWqB+xFsrkkiUq/X/6n3vuvLknQX+jKb2/v9zITQznIyIaYQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=H80UglqObXKnQlcaClJt4BPJoXYsU9fxtWr1yMUlV5Q=;
+ b=knGNf3fp30uVE1F21b+lmYSuC2I4Fq7+zHztaQk03gEnuggY0GIc3dk2TCHZYxDBibu2lQZ8NqfYAG6hjY6c06n9kJFkZQ3liLHmRZSa4sCCfzeauK9Zp6SyHp26CNT+whdQIqlPLHXOlzhPoUDHjSkDP0SNdXXUcBLENpR7u9xvh3f6daDJcpdRM4DXBbrUMPsyc9lePdWoIKlhwiMGhsp7twhfm9EVNjjTWTN6H+i+bJQlLgUJ4Xju5dU0t44lFchD6qveKC2eBMmgqPiHS624pM0kQPj0X78KB9rfwCoQzO/PHoOWdx3+qck2Qseps70rWUft/WHVF1aOKKGNOA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=H80UglqObXKnQlcaClJt4BPJoXYsU9fxtWr1yMUlV5Q=;
+ b=ELcayAKOfji2hSkzvVa3Utr/hq/GGn2klfLLPFu0ZcY4/gMgZIPj3ni1BhqO/AkpoqLVVeN7lspTubMQ4UTeB+6AVK4IZ4rluapZkV/p1/Vw7EXxPYjZdIVSX/415nlNq/MlD4aL1T008Wkoz4e0b3At/8QQ4robzOJynpe90IA=
+Authentication-Results: nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM6PR08MB2984.eurprd08.prod.outlook.com (2603:10a6:209:4e::28)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3283.22; Fri, 14 Aug
+ 2020 13:04:21 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::8c0c:c056:97a5:484a]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::8c0c:c056:97a5:484a%3]) with mapi id 15.20.3283.022; Fri, 14 Aug 2020
+ 13:04:21 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: qemu-block@nongnu.org
+Subject: [PATCH v2 2/9] block/io.c: drop assertion on double waiting for
+ request serialisation
+Date: Fri, 14 Aug 2020 16:03:41 +0300
+Message-Id: <20200814130348.20625-3-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.3
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20200814130348.20625-1-vsementsov@virtuozzo.com>
+References: <20200814130348.20625-1-vsementsov@virtuozzo.com>
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::343;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x343.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Content-Type: text/plain
+X-ClientProxiedBy: AM0PR10CA0075.EURPRD10.PROD.OUTLOOK.COM
+ (2603:10a6:208:15::28) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from kvm.sw.ru (185.215.60.177) by
+ AM0PR10CA0075.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:208:15::28) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3283.16 via Frontend Transport; Fri, 14 Aug 2020 13:04:20 +0000
+X-Mailer: git-send-email 2.21.3
+X-Originating-IP: [185.215.60.177]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 79cdc639-ddf0-49ba-54a0-08d840528f87
+X-MS-TrafficTypeDiagnostic: AM6PR08MB2984:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM6PR08MB2984C8788222465BA71B7E91C1400@AM6PR08MB2984.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:2958;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 9+xrzZal1kCB5RJY5lqooZ2dP6CQxeyPQC/7Dqg5mMXzwNaKQJHY9FQCRrFsclRrcV+OMoGGFylP/9GTYeEcy19yYfKJp6iWdYCs/i4frIQ9/ozbXT9VrylXISSmIgS6h9xstwuIFEFgyfTrw7EPTWo/6bcZjR2kgYF9cL01jGxCA8yqx+Yww5tBWkhc/TscsbUbmiTrtIbOAPO052NRGMLwFKi8uH2qKykhjj34hKXOHdLGJLmZfZQqX/3Iroq2RhhexYO1jntdDGRBWEbFWzbar4UofFL+nge7ozYHBF5kh4OGYysbjFLg4ug8USsEUXaC/wZObuY8RQxHmrA+2g==
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(4636009)(366004)(396003)(136003)(39840400004)(346002)(376002)(316002)(36756003)(478600001)(66556008)(66476007)(4326008)(8936002)(1076003)(26005)(52116002)(8676002)(6512007)(6506007)(16526019)(186003)(86362001)(6486002)(956004)(2616005)(5660300002)(2906002)(66946007)(6666004)(83380400001)(6916009);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: yuwehSs52CsfCkJI8TqB9e/gs2mCq+7qbISSPejdoBJXcBgnwwKfe/bWaXnP7EIgf2phWRt3knN2cqVcb3CY6CzuHFKeu/4Y9nssPSP+TukiXGHRuJ48ryXznK44HeJXYjeanBLElttKCxCU/n934zOXa9hXvG96shBVWYYcfgDfUnK7i77UtCiidHRiW4tJVH7uUrCQFNtptpuCh8U731HXrgemXfawNCvxTuPcQB3lsDOP3UVnJPO1++aZkJKorDCNKBUbS0+Y9Ev/BV545scjxMGeAe6o5XAzep+HHBwZfFPQf3y35LfAvjrcJF37ShkgvUg28ko6v8L+Cbcqn4CrocN4J7GgqyQ89ZOisbrOTibCS9epe9nLoLwr8k8IcZZWyQZ7jWTZp77qvmWL586w8WQO/jhwL96gLWw7mnerj+i7Ks7dqd0WfUyZhWzsc2W3BgJV0/D+NPt/DbwdLotFPxSH3J9FimDFQ3E0WWrM0jAa7umvhF86ShfvLjqU67wRrmCuCQiH1ARIKtGjKdK5R0XFG/d3CYzPslbi6SUQqcI/ImoNEAneAHGeKsPLcbs1QzFFZfOJcw2Q/yqfoD7tCpu2C3dW05VerSwzCKnOrBekfhaaVKkAEqoxuRZey1e17KcM2cg2nrhSmO700w==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 79cdc639-ddf0-49ba-54a0-08d840528f87
+X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Aug 2020 13:04:21.5219 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: UwtEj6Ig7Qx/2hNyw6vIr1AJsOTQWrJJEcyuVw6MAccLni8O8BkdB+G7paX9SGFgpI6kJjoxKxVO3wnr1bs4bXIhneOlXwDoK4IzL9OvsRI=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB2984
+Received-SPF: pass client-ip=40.107.8.129;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR04-VI1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/14 09:04:26
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -37
+X-Spam_score: -3.8
+X-Spam_bar: ---
+X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,170 +130,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- Jan Kiszka <jan.kiszka@web.de>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: fam@euphon.net, kwolf@redhat.com, vsementsov@virtuozzo.com,
+ armbru@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com,
+ stefanha@redhat.com, pbonzini@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Allow the device to execute the DMA transfers in a different
-AddressSpace.
+The comments states, that on misaligned request we should have already
+been waiting. But for bdrv_padding_rmw_read, we called
+bdrv_mark_request_serialising with align = request_alignment, and now
+we serialise with align = cluster_size. So we may have to wait again
+with larger alignment.
 
-We keep using the system_memory address space, but via the
-proper dma_memory_access() API.
+Note, that the only user of BDRV_REQ_SERIALISING is backup which issues
+cluster-aligned requests, so seems the assertion should not fire for
+now. But it's wrong anyway.
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- hw/arm/musicpal.c | 45 +++++++++++++++++++++++++++++++--------------
- 1 file changed, 31 insertions(+), 14 deletions(-)
+Cc: pbonzini@redhat.com
 
-diff --git a/hw/arm/musicpal.c b/hw/arm/musicpal.c
-index c3b9780f35..f2f4fc0264 100644
---- a/hw/arm/musicpal.c
-+++ b/hw/arm/musicpal.c
-@@ -30,6 +30,7 @@
- #include "hw/audio/wm8750.h"
- #include "sysemu/block-backend.h"
- #include "sysemu/runstate.h"
-+#include "sysemu/dma.h"
- #include "exec/address-spaces.h"
- #include "ui/pixel_ops.h"
- #include "qemu/cutils.h"
-@@ -163,6 +164,8 @@ typedef struct mv88w8618_eth_state {
- 
-     MemoryRegion iomem;
-     qemu_irq irq;
-+    MemoryRegion *dma_mr;
-+    AddressSpace dma_as;
-     uint32_t smir;
-     uint32_t icr;
-     uint32_t imr;
-@@ -176,19 +179,21 @@ typedef struct mv88w8618_eth_state {
-     NICConf conf;
- } mv88w8618_eth_state;
- 
--static void eth_rx_desc_put(uint32_t addr, mv88w8618_rx_desc *desc)
-+static void eth_rx_desc_put(AddressSpace *dma_as, uint32_t addr,
-+                            mv88w8618_rx_desc *desc)
+ block/io.c | 11 +----------
+ 1 file changed, 1 insertion(+), 10 deletions(-)
+
+diff --git a/block/io.c b/block/io.c
+index ad3a51ed53..b18680a842 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -1881,7 +1881,6 @@ bdrv_co_write_req_prepare(BdrvChild *child, int64_t offset, uint64_t bytes,
+                           BdrvTrackedRequest *req, int flags)
  {
-     cpu_to_le32s(&desc->cmdstat);
-     cpu_to_le16s(&desc->bytes);
-     cpu_to_le16s(&desc->buffer_size);
-     cpu_to_le32s(&desc->buffer);
-     cpu_to_le32s(&desc->next);
--    cpu_physical_memory_write(addr, desc, sizeof(*desc));
-+    dma_memory_write(dma_as, addr, desc, sizeof(*desc));
- }
+     BlockDriverState *bs = child->bs;
+-    bool waited;
+     int64_t end_sector = DIV_ROUND_UP(offset + bytes, BDRV_SECTOR_SIZE);
  
--static void eth_rx_desc_get(uint32_t addr, mv88w8618_rx_desc *desc)
-+static void eth_rx_desc_get(AddressSpace *dma_as, uint32_t addr,
-+                            mv88w8618_rx_desc *desc)
- {
--    cpu_physical_memory_read(addr, desc, sizeof(*desc));
-+    dma_memory_read(dma_as, addr, desc, sizeof(*desc));
-     le32_to_cpus(&desc->cmdstat);
-     le16_to_cpus(&desc->bytes);
-     le16_to_cpus(&desc->buffer_size);
-@@ -209,9 +214,9 @@ static ssize_t eth_receive(NetClientState *nc, const uint8_t *buf, size_t size)
-             continue;
-         }
-         do {
--            eth_rx_desc_get(desc_addr, &desc);
-+            eth_rx_desc_get(&s->dma_as, desc_addr, &desc);
-             if ((desc.cmdstat & MP_ETH_RX_OWN) && desc.buffer_size >= size) {
--                cpu_physical_memory_write(desc.buffer + s->vlan_header,
-+                dma_memory_write(&s->dma_as, desc.buffer + s->vlan_header,
-                                           buf, size);
-                 desc.bytes = size + s->vlan_header;
-                 desc.cmdstat &= ~MP_ETH_RX_OWN;
-@@ -221,7 +226,7 @@ static ssize_t eth_receive(NetClientState *nc, const uint8_t *buf, size_t size)
-                 if (s->icr & s->imr) {
-                     qemu_irq_raise(s->irq);
-                 }
--                eth_rx_desc_put(desc_addr, &desc);
-+                eth_rx_desc_put(&s->dma_as, desc_addr, &desc);
-                 return size;
-             }
-             desc_addr = desc.next;
-@@ -230,19 +235,21 @@ static ssize_t eth_receive(NetClientState *nc, const uint8_t *buf, size_t size)
-     return size;
- }
+     if (bs->read_only) {
+@@ -1893,15 +1892,7 @@ bdrv_co_write_req_prepare(BdrvChild *child, int64_t offset, uint64_t bytes,
+     assert(!(flags & ~BDRV_REQ_MASK));
  
--static void eth_tx_desc_put(uint32_t addr, mv88w8618_tx_desc *desc)
-+static void eth_tx_desc_put(AddressSpace *dma_as, uint32_t addr,
-+                            mv88w8618_tx_desc *desc)
- {
-     cpu_to_le32s(&desc->cmdstat);
-     cpu_to_le16s(&desc->res);
-     cpu_to_le16s(&desc->bytes);
-     cpu_to_le32s(&desc->buffer);
-     cpu_to_le32s(&desc->next);
--    cpu_physical_memory_write(addr, desc, sizeof(*desc));
-+    dma_memory_write(dma_as, addr, desc, sizeof(*desc));
- }
- 
--static void eth_tx_desc_get(uint32_t addr, mv88w8618_tx_desc *desc)
-+static void eth_tx_desc_get(AddressSpace *dma_as, uint32_t addr,
-+                            mv88w8618_tx_desc *desc)
- {
--    cpu_physical_memory_read(addr, desc, sizeof(*desc));
-+    dma_memory_read(dma_as, addr, desc, sizeof(*desc));
-     le32_to_cpus(&desc->cmdstat);
-     le16_to_cpus(&desc->res);
-     le16_to_cpus(&desc->bytes);
-@@ -259,17 +266,17 @@ static void eth_send(mv88w8618_eth_state *s, int queue_index)
-     int len;
- 
-     do {
--        eth_tx_desc_get(desc_addr, &desc);
-+        eth_tx_desc_get(&s->dma_as, desc_addr, &desc);
-         next_desc = desc.next;
-         if (desc.cmdstat & MP_ETH_TX_OWN) {
-             len = desc.bytes;
-             if (len < 2048) {
--                cpu_physical_memory_read(desc.buffer, buf, len);
-+                dma_memory_read(&s->dma_as, desc.buffer, buf, len);
-                 qemu_send_packet(qemu_get_queue(s->nic), buf, len);
-             }
-             desc.cmdstat &= ~MP_ETH_TX_OWN;
-             s->icr |= 1 << (MP_ETH_IRQ_TXLO_BIT - queue_index);
--            eth_tx_desc_put(desc_addr, &desc);
-+            eth_tx_desc_put(&s->dma_as, desc_addr, &desc);
-         }
-         desc_addr = next_desc;
-     } while (desc_addr != s->tx_queue[queue_index]);
-@@ -405,6 +412,12 @@ static void mv88w8618_eth_realize(DeviceState *dev, Error **errp)
- {
-     mv88w8618_eth_state *s = MV88W8618_ETH(dev);
- 
-+    if (!s->dma_mr) {
-+        error_setg(errp, TYPE_MV88W8618_ETH " 'dma-memory' link not set");
-+        return;
-+    }
-+
-+    address_space_init(&s->dma_as, s->dma_mr, "emac-dma");
-     s->nic = qemu_new_nic(&net_mv88w8618_info, &s->conf,
-                           object_get_typename(OBJECT(dev)), dev->id, s);
- }
-@@ -428,6 +441,8 @@ static const VMStateDescription mv88w8618_eth_vmsd = {
- 
- static Property mv88w8618_eth_properties[] = {
-     DEFINE_NIC_PROPERTIES(mv88w8618_eth_state, conf),
-+    DEFINE_PROP_LINK("dma-memory", mv88w8618_eth_state, dma_mr,
-+                     TYPE_MEMORY_REGION, MemoryRegion *),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
-@@ -1653,6 +1668,8 @@ static void musicpal_init(MachineState *machine)
-     qemu_check_nic_model(&nd_table[0], "mv88w8618");
-     dev = qdev_new(TYPE_MV88W8618_ETH);
-     qdev_set_nic_properties(dev, &nd_table[0]);
-+    object_property_set_link(OBJECT(dev), "dma-memory",
-+                             OBJECT(get_system_memory()), &error_fatal);
-     sysbus_realize_and_unref(SYS_BUS_DEVICE(dev), &error_fatal);
-     sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, MP_ETH_BASE);
-     sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, pic[MP_ETH_IRQ]);
+     if (flags & BDRV_REQ_SERIALISING) {
+-        waited = bdrv_mark_request_serialising(req, bdrv_get_cluster_size(bs));
+-        /*
+-         * For a misaligned request we should have already waited earlier,
+-         * because we come after bdrv_padding_rmw_read which must be called
+-         * with the request already marked as serialising.
+-         */
+-        assert(!waited ||
+-               (req->offset == req->overlap_offset &&
+-                req->bytes == req->overlap_bytes));
++        bdrv_mark_request_serialising(req, bdrv_get_cluster_size(bs));
+     } else {
+         bdrv_wait_serialising_requests(req);
+     }
 -- 
 2.21.3
 
