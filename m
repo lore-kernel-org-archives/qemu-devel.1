@@ -2,78 +2,77 @@ Return-Path: <SRS0=5nOY=BY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67CA5C433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 15:18:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67087C433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 15:18:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 33243207DA
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 15:18:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3173320866
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 15:18:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="DbfTvGpc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33243207DA
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="GHJ695q9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3173320866
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43640 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44538 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k6bTc-0000S4-Cb
-	for qemu-devel@archiver.kernel.org; Fri, 14 Aug 2020 11:18:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51584)
+	id 1k6bTm-0000p7-DN
+	for qemu-devel@archiver.kernel.org; Fri, 14 Aug 2020 11:18:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51758)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=4887bfbec=alistair.francis@wdc.com>)
- id 1k6bQP-0003UR-C6
- for qemu-devel@nongnu.org; Fri, 14 Aug 2020 11:15:21 -0400
+ id 1k6bQU-0003iV-8w
+ for qemu-devel@nongnu.org; Fri, 14 Aug 2020 11:15:26 -0400
 Received: from esa5.hgst.iphmx.com ([216.71.153.144]:55679)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=4887bfbec=alistair.francis@wdc.com>)
- id 1k6bQL-0007fN-TC
- for qemu-devel@nongnu.org; Fri, 14 Aug 2020 11:15:21 -0400
+ id 1k6bQS-0007fN-66
+ for qemu-devel@nongnu.org; Fri, 14 Aug 2020 11:15:25 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1597418118; x=1628954118;
+ t=1597418125; x=1628954125;
  h=from:to:cc:subject:date:message-id:in-reply-to:
  references:mime-version:content-transfer-encoding;
- bh=jL8la5SaUZPFPaXp7NmU6atCG+J2ay2cXyu6f42UdYk=;
- b=DbfTvGpcSybW/thbdF0wOIXQhvp9hWmzOe9cuMVEqkWGO57Z2MPbFWYq
- SSfTmOHmt170SMFg+y5EOV+jpplB5YAtb2zUWoyIe1ksFq3wrEKUBQHi4
- 4pq1B+JnXeeDInXWgs8yV6oGUGprgefXHDF1NB2kmvUXxTQqPIE5Nzwn6
- CgCexD0Z85ww/vpMVXKsQzato+DECkCXX6da4hThj7UWJxsGJfDdtAG9T
- TQ4p9UrM1dq2Tjiq1CW38SipQIM4tio55kZ4NzkkfYZkjtZxet++RHX6e
- exoh/SmQms5QaBimWvmCooRGSKnbd4lxBJE3FWEjd/o0xgErxMFfPWY3C g==;
-IronPort-SDR: l8tpDX3bYEYcAYCocmtWuyVPnw7CnTRw0o8EYCeghZ8aJAsx8AH2QW0tOAN1pCOUGZOZJr39N8
- MZustU7RisdCtbBCoeNOkMIEEgbajCgCjr97Dec6VUejfM+DiIWV/Dc0oJ7v9ATxQU5qDUDnv1
- 7PuWUYe13F2pX5hXEBHg/ZEGWhSs2bhJGnU7rEwdLlz3h58lxrYiVpX/V/LwA1J0RhPTJdfTG2
- js48yheWcmedJqA9d4js19j3CBcpcxhn6L0e+9jXQY1D9HXl6w0cLqmjluAtJf6/qVNSccK5zR
- AUw=
-X-IronPort-AV: E=Sophos;i="5.76,312,1592841600"; d="scan'208";a="144994807"
+ bh=pyy744F3DcYeTss9mTByW5CPEEq0NerFiagNesu+5ZY=;
+ b=GHJ695q9lE7XcGbIX5ypgj1x93Fr0iW3A4EOvX/lfD7RmEVTFOu5UAjw
+ tIy1B0kn1tj9g0H6aH5VhFzkAZXDaKVpH3cGcRvEN228HFUIIckuvVYLm
+ GESWOjlyAEqjESnoDhkfY8/IzQTjcBGxDLiO6skqLPqOj8t5ZBzlwl5rQ
+ xiVTtRRAmOzfxeSLu6oqeHnB198yyoNGLWuCc0NJT9RnSc4qGSQt5GxC5
+ T9aa1Y+kXHezENuEaJ2Yu1CfSR4IvNrOaXM6GaIpJeblqHYfPEowt0jro
+ cdcSbSzWi5tKOauOoHQlWKdw/dL893He0fLd135xkggdMOoHszP7hFd8y Q==;
+IronPort-SDR: 4faAjNGADO+OuOE3PC0jUBDhRdC+axtPFVLV0e1NY/HFsq0wEfswPIWVcpSqDe9OcU0mFE6NBi
+ 3tNxuAr/AUS8ZHJFZ0zJ3xUQxJSm6oOkSLa73rE209T3rUyBdD6hYYLdtag5EOdeAwtyGyya0A
+ dHZ0QRJTBSRBi71raiml25eYNOBDP0UmrSPiOMkvbbJCsG0XvBdCLInEU84OqCZU9y0XxN5GGi
+ JPX3swO39aC50iCwZ+xrrvULpKqI7ik98dG3wPIQy9pWIBUgKUpPToRzdU5wyOr80AHpwX44TP
+ CPE=
+X-IronPort-AV: E=Sophos;i="5.76,312,1592841600"; d="scan'208";a="144994825"
 Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com)
  ([199.255.45.15])
- by ob1.hgst.iphmx.com with ESMTP; 14 Aug 2020 23:15:12 +0800
-IronPort-SDR: 9yexvthJUafo3pBHSUflyB4xsHJI0/UbwGcrZ196BZaxfVikv/Xy4MP9nIQ1Hgh9bQIulRdcv0
- TS64LdqA+c+Q==
+ by ob1.hgst.iphmx.com with ESMTP; 14 Aug 2020 23:15:13 +0800
+IronPort-SDR: zQxYHQNvIyoEVRyAbu/pS/y4hC+zmFgQrpfXFZj5u0ejoCE1y6TIs5mMz6rhp31eAJysoEpY9k
+ u9AOYvtK20Xg==
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 14 Aug 2020 08:02:16 -0700
-IronPort-SDR: vYgLCfcksVdqUKnvlMt+j0QzFuYCafOXFwlVf0z8LJd9sODwFlYbArM2xo/tJ3UYWZbOoiFYPc
- l6ilg+EL7HsA==
+ 14 Aug 2020 08:02:17 -0700
+IronPort-SDR: eeVj4A8pBahRF/3LPWNFo0dlodAciz4IVnJ9fiR1pOR+vFQdjpG/p7cC1DoRffYX+CShVaEhUx
+ ntgfFbNZngFA==
 WDCIronportException: Internal
 Received: from jbfyk72.ad.shared (HELO risc6-mainframe.hgst.com)
  ([10.86.59.14])
- by uls-op-cesaip02.wdc.com with ESMTP; 14 Aug 2020 08:15:11 -0700
+ by uls-op-cesaip02.wdc.com with ESMTP; 14 Aug 2020 08:15:12 -0700
 From: Alistair Francis <alistair.francis@wdc.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v2 02/20] target/riscv: Generalize gen_nanbox_fpr to
- gen_nanbox_s
-Date: Fri, 14 Aug 2020 08:04:48 -0700
-Message-Id: <20200814150506.2070566-3-alistair.francis@wdc.com>
+Subject: [PULL v2 07/20] target/riscv: check before allocating TCG temps
+Date: Fri, 14 Aug 2020 08:04:53 -0700
+Message-Id: <20200814150506.2070566-8-alistair.francis@wdc.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200814150506.2070566-1-alistair.francis@wdc.com>
 References: <20200814150506.2070566-1-alistair.francis@wdc.com>
@@ -110,77 +109,80 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Richard Henderson <richard.henderson@linaro.org>
+From: LIU Zhiwei <zhiwei_liu@c-sky.com>
 
-Do not depend on the RVD extension, take input and output via
-TCGv_i64 instead of fpu regno.  Move the function to translate.c
-so that it can be used in multiple trans_*.inc.c files.
-
+Signed-off-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
-Message-Id: <20200724002807.441147-3-richard.henderson@linaro.org>
+Message-Id: <20200626205917.4545-5-zhiwei_liu@c-sky.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20200724002807.441147-8-richard.henderson@linaro.org>
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- target/riscv/insn_trans/trans_rvf.inc.c | 16 +---------------
- target/riscv/translate.c                | 11 +++++++++++
- 2 files changed, 12 insertions(+), 15 deletions(-)
+ target/riscv/insn_trans/trans_rvd.inc.c | 8 ++++----
+ target/riscv/insn_trans/trans_rvf.inc.c | 8 ++++----
+ 2 files changed, 8 insertions(+), 8 deletions(-)
 
+diff --git a/target/riscv/insn_trans/trans_rvd.inc.c b/target/riscv/insn_trans/trans_rvd.inc.c
+index ea1044f13b..4f832637fa 100644
+--- a/target/riscv/insn_trans/trans_rvd.inc.c
++++ b/target/riscv/insn_trans/trans_rvd.inc.c
+@@ -20,10 +20,10 @@
+ 
+ static bool trans_fld(DisasContext *ctx, arg_fld *a)
+ {
+-    TCGv t0 = tcg_temp_new();
+-    gen_get_gpr(t0, a->rs1);
+     REQUIRE_FPU;
+     REQUIRE_EXT(ctx, RVD);
++    TCGv t0 = tcg_temp_new();
++    gen_get_gpr(t0, a->rs1);
+     tcg_gen_addi_tl(t0, t0, a->imm);
+ 
+     tcg_gen_qemu_ld_i64(cpu_fpr[a->rd], t0, ctx->mem_idx, MO_TEQ);
+@@ -35,10 +35,10 @@ static bool trans_fld(DisasContext *ctx, arg_fld *a)
+ 
+ static bool trans_fsd(DisasContext *ctx, arg_fsd *a)
+ {
+-    TCGv t0 = tcg_temp_new();
+-    gen_get_gpr(t0, a->rs1);
+     REQUIRE_FPU;
+     REQUIRE_EXT(ctx, RVD);
++    TCGv t0 = tcg_temp_new();
++    gen_get_gpr(t0, a->rs1);
+     tcg_gen_addi_tl(t0, t0, a->imm);
+ 
+     tcg_gen_qemu_st_i64(cpu_fpr[a->rs2], t0, ctx->mem_idx, MO_TEQ);
 diff --git a/target/riscv/insn_trans/trans_rvf.inc.c b/target/riscv/insn_trans/trans_rvf.inc.c
-index 3bfd8881e7..c7057482e8 100644
+index 138e317723..3dfec8211d 100644
 --- a/target/riscv/insn_trans/trans_rvf.inc.c
 +++ b/target/riscv/insn_trans/trans_rvf.inc.c
-@@ -23,20 +23,6 @@
-         return false;                       \
- } while (0)
+@@ -25,10 +25,10 @@
  
--/*
-- * RISC-V requires NaN-boxing of narrower width floating
-- * point values.  This applies when a 32-bit value is
-- * assigned to a 64-bit FP register.  Thus this does not
-- * apply when the RVD extension is not present.
-- */
--static void gen_nanbox_fpr(DisasContext *ctx, int regno)
--{
--    if (has_ext(ctx, RVD)) {
--        tcg_gen_ori_i64(cpu_fpr[regno], cpu_fpr[regno],
--                        MAKE_64BIT_MASK(32, 32));
--    }
--}
--
  static bool trans_flw(DisasContext *ctx, arg_flw *a)
  {
-     TCGv t0 = tcg_temp_new();
-@@ -46,7 +32,7 @@ static bool trans_flw(DisasContext *ctx, arg_flw *a)
+-    TCGv t0 = tcg_temp_new();
+-    gen_get_gpr(t0, a->rs1);
+     REQUIRE_FPU;
+     REQUIRE_EXT(ctx, RVF);
++    TCGv t0 = tcg_temp_new();
++    gen_get_gpr(t0, a->rs1);
      tcg_gen_addi_tl(t0, t0, a->imm);
  
      tcg_gen_qemu_ld_i64(cpu_fpr[a->rd], t0, ctx->mem_idx, MO_TEUL);
--    gen_nanbox_fpr(ctx, a->rd);
-+    gen_nanbox_s(cpu_fpr[a->rd], cpu_fpr[a->rd]);
+@@ -41,11 +41,11 @@ static bool trans_flw(DisasContext *ctx, arg_flw *a)
  
-     tcg_temp_free(t0);
-     mark_fs_dirty(ctx);
-diff --git a/target/riscv/translate.c b/target/riscv/translate.c
-index 9632e79cf3..12a746da97 100644
---- a/target/riscv/translate.c
-+++ b/target/riscv/translate.c
-@@ -90,6 +90,17 @@ static inline bool has_ext(DisasContext *ctx, uint32_t ext)
-     return ctx->misa & ext;
- }
- 
-+/*
-+ * RISC-V requires NaN-boxing of narrower width floating point values.
-+ * This applies when a 32-bit value is assigned to a 64-bit FP register.
-+ * For consistency and simplicity, we nanbox results even when the RVD
-+ * extension is not present.
-+ */
-+static void gen_nanbox_s(TCGv_i64 out, TCGv_i64 in)
-+{
-+    tcg_gen_ori_i64(out, in, MAKE_64BIT_MASK(32, 32));
-+}
-+
- static void generate_exception(DisasContext *ctx, int excp)
+ static bool trans_fsw(DisasContext *ctx, arg_fsw *a)
  {
-     tcg_gen_movi_tl(cpu_pc, ctx->base.pc_next);
++    REQUIRE_FPU;
++    REQUIRE_EXT(ctx, RVF);
+     TCGv t0 = tcg_temp_new();
+     gen_get_gpr(t0, a->rs1);
+ 
+-    REQUIRE_FPU;
+-    REQUIRE_EXT(ctx, RVF);
+     tcg_gen_addi_tl(t0, t0, a->imm);
+ 
+     tcg_gen_qemu_st_i64(cpu_fpr[a->rs2], t0, ctx->mem_idx, MO_TEUL);
 -- 
 2.27.0
 
