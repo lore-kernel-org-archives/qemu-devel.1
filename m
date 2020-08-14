@@ -7,82 +7,82 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A75F2C433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 15:21:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B323FC433E3
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 15:21:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6D77B207DA
-	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 15:21:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 79866207DA
+	for <qemu-devel@archiver.kernel.org>; Fri, 14 Aug 2020 15:21:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="ZAYosU27"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D77B207DA
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="ccNdaZTn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79866207DA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57150 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59260 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k6bWG-000697-IN
-	for qemu-devel@archiver.kernel.org; Fri, 14 Aug 2020 11:21:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51638)
+	id 1k6bWg-0006zl-KD
+	for qemu-devel@archiver.kernel.org; Fri, 14 Aug 2020 11:21:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51778)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=4887bfbec=alistair.francis@wdc.com>)
- id 1k6bQR-0003aX-DD
- for qemu-devel@nongnu.org; Fri, 14 Aug 2020 11:15:23 -0400
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:55675)
+ id 1k6bQU-0003jw-QC
+ for qemu-devel@nongnu.org; Fri, 14 Aug 2020 11:15:26 -0400
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:2522)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=4887bfbec=alistair.francis@wdc.com>)
- id 1k6bQK-0007eB-Vp
- for qemu-devel@nongnu.org; Fri, 14 Aug 2020 11:15:23 -0400
+ id 1k6bQR-0007mz-G8
+ for qemu-devel@nongnu.org; Fri, 14 Aug 2020 11:15:26 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1597418117; x=1628954117;
+ t=1597418123; x=1628954123;
  h=from:to:cc:subject:date:message-id:in-reply-to:
  references:mime-version:content-transfer-encoding;
- bh=/sYwq4jJBFVrhAN6HvnU9aC89Zg8os3gcPnGisptQJw=;
- b=ZAYosU2787TF9WTS2onBTnUqzPMJ8hOh+/IaDXDYn7NkLly+Xv/1YP7t
- MBHHmwwpP4Hiz8xCKxPl693ZeVbN/sp972nwLhuRXVTImSWQls7HQR1Ke
- 3JLipIc/sY8gAVKQWs6wpDzxvIrZCb47CP04wc89JLDmjlCCFDREJpgOK
- QaXIhIu0l9AjB10Kae+h+YCHsnt6YxAE7KRo5sA2mGJhL5xqmk3zgdH6E
- O4mSXcsE76HyWUPa9CGheE4qXE6C7K+Q+ZPtdR2Cf8ZWK2J3m6s4P2+/o
- fmyys6wbREWHx43ITI60v2WEnRGzCyiLJkzNUMkQMUaQx4OpfTBClPyj6 w==;
-IronPort-SDR: 9yLeTZKHIhAm/1O/9AF+EEnLqJHlA7jRCrip3pnTcfJ5zlUoDp0Vi6mthnWzb+fWnfN7EQZXv+
- LztzwEd12d/Bvi5bv+hiJhTl8dI0bVJknKLvCw/axohRsMzYQoex1aFKX4eHvBBPJr2GiM/Zhn
- qSVA9VpGngdhHY4mm/LSAwk6a9MW7OWkJM/TW34si4beWW/SzQcHL8TzsxgRLK6ekdpqOectEs
- WszCVGUZ+6OphZXrrjjJeP2VEiZZwKwBRkdjFL4XMnSQ+aUr69WRt5WFHjPi5Zdwsr4HjsCTbs
- KaQ=
-X-IronPort-AV: E=Sophos;i="5.76,312,1592841600"; d="scan'208";a="144994803"
+ bh=fLfdAGVZEVydfLn7ls9NeU8+lR26vwCk/tcpTzXncLw=;
+ b=ccNdaZTnXPBN5TGdVIOuPN+zKMu7DakEc1nyKk9IUPezZXMUlLJTmCuy
+ RKDnP+YGsjb8OgHGSDs9wDz8Po6z94QQUjpdsyfxevxwbwZtVss8P8p2M
+ 87p1YoBkbiW+RR3hzls/vnJbMuE6UTAAGH80KoStGrYMkX+f0PeiQnRUn
+ 0hqNQRogPnUMBR5ty40hwUCdA3GRwg5qussysmKl90oUfxr++ajTVeFch
+ moZCqy5K5EEyU9TQsTp++3rTO88wgzOEgRy4DQkrmQ8tYVtOiS+ywtoou
+ VEk9oo+wu3Y9sKAsR/enBwvZ7cspZRl/w4b5die4uM2Wn+hHF+t49OCkI A==;
+IronPort-SDR: I6vpcyPzvwZdlbjkm6FvupBGW4i4xxP5CNBaKu3C/L2OvSD8mU+x1bO052f4z/i6lluAXzDuYe
+ 6vaVgTaRn41PbNRlYnoY6nJjS46AGpcObuioqYI2gtoCytFHjsIh9v8dk5akYyDsY6QCWn5a3p
+ E1wZhUdhSfS0mqmGgwhWMLaXqtKf3vl618KUC+8UtDz/0bYsNIWJq7RsYuGeT2r0CKyVY2UCum
+ Ga5IH0RhFAhxXTFnPLr2ULG3D7d/2XrAssYSQN+3v+xs5OEEdy75mTEgB/Rfte+cKyfUe6uYtA
+ HNg=
+X-IronPort-AV: E=Sophos;i="5.76,312,1592841600"; d="scan'208";a="254369416"
 Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com)
  ([199.255.45.15])
- by ob1.hgst.iphmx.com with ESMTP; 14 Aug 2020 23:15:12 +0800
-IronPort-SDR: 2So8M/8TjkRo3it4q6h92CQUNm6IiaLnRCPF0IKT+vw3An2p4kCyls11m4Qrl+z8YxzLIJBEti
- KT27n0EGuKqw==
+ by ob1.hgst.iphmx.com with ESMTP; 14 Aug 2020 23:15:16 +0800
+IronPort-SDR: MT+oIMWf1qpfyhUMteWWl+Ru5HpyAXj/jdo+5hOSYNOKk2EmUvyjQ4Q+A3plKr2VSJU/vp8aJ4
+ tOnKZIkt/O/w==
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 14 Aug 2020 08:02:16 -0700
-IronPort-SDR: H1SZ8i+o4A2qoeYeZnl1PGyH5KrzEIzIXQExwPpVDCss8uCU3W42+wprMOnsB/4NNNuPQ25nWM
- 52nX9V5SCSNA==
+ 14 Aug 2020 08:02:21 -0700
+IronPort-SDR: UUHV+dV6B8z4eqX7zyUcYPvRGOUyZ/SyBUCDYcvXdYy0uEZCKwyi8k3aTh+YUkBJOUXDjK5v2q
+ NjLIid1mSZUA==
 WDCIronportException: Internal
 Received: from jbfyk72.ad.shared (HELO risc6-mainframe.hgst.com)
  ([10.86.59.14])
- by uls-op-cesaip02.wdc.com with ESMTP; 14 Aug 2020 08:15:11 -0700
+ by uls-op-cesaip02.wdc.com with ESMTP; 14 Aug 2020 08:15:16 -0700
 From: Alistair Francis <alistair.francis@wdc.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v2 01/20] target/riscv: Generate nanboxed results from fp
- helpers
-Date: Fri, 14 Aug 2020 08:04:47 -0700
-Message-Id: <20200814150506.2070566-2-alistair.francis@wdc.com>
+Subject: [PULL v2 17/20] target/riscv: Change the TLB page size depends on PMP
+ entries.
+Date: Fri, 14 Aug 2020 08:05:03 -0700
+Message-Id: <20200814150506.2070566-18-alistair.francis@wdc.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20200814150506.2070566-1-alistair.francis@wdc.com>
 References: <20200814150506.2070566-1-alistair.francis@wdc.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.71.153.144;
+Received-SPF: pass client-ip=68.232.141.245;
  envelope-from=prvs=4887bfbec=alistair.francis@wdc.com;
- helo=esa5.hgst.iphmx.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/14 11:15:11
+ helo=esa1.hgst.iphmx.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/14 11:15:16
 X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
 X-Spam_score_int: -43
 X-Spam_score: -4.4
@@ -103,176 +103,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alistair Francis <alistair.francis@wdc.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- LIU Zhiwei <zhiwei_liu@c-sky.com>
+Cc: Alistair Francis <alistair.francis@wdc.com>, Zong Li <zong.li@sifive.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Richard Henderson <richard.henderson@linaro.org>
+From: Zong Li <zong.li@sifive.com>
 
-Make sure that all results from single-precision scalar helpers
-are properly nan-boxed to 64-bits.
+The minimum granularity of PMP is 4 bytes, it is small than 4KB page
+size, therefore, the pmp checking would be ignored if its range doesn't
+start from the alignment of one page. This patch detects the pmp entries
+and sets the small page size to TLB if there is a PMP entry which cover
+the page size.
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
-Message-Id: <20200724002807.441147-2-richard.henderson@linaro.org>
+Signed-off-by: Zong Li <zong.li@sifive.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Message-Id: <6b0bf48662ef26ab4c15381a08e78a74ebd7ca79.1595924470.git.zong.li@sifive.com>
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- target/riscv/internals.h  |  5 +++++
- target/riscv/fpu_helper.c | 42 +++++++++++++++++++++------------------
- 2 files changed, 28 insertions(+), 19 deletions(-)
+ target/riscv/pmp.h        |  2 ++
+ target/riscv/cpu_helper.c | 10 ++++++--
+ target/riscv/pmp.c        | 52 +++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 62 insertions(+), 2 deletions(-)
 
-diff --git a/target/riscv/internals.h b/target/riscv/internals.h
-index 37d33820ad..9f4ba7d617 100644
---- a/target/riscv/internals.h
-+++ b/target/riscv/internals.h
-@@ -38,4 +38,9 @@ target_ulong fclass_d(uint64_t frs1);
- #define SEW32 2
- #define SEW64 3
+diff --git a/target/riscv/pmp.h b/target/riscv/pmp.h
+index 8e19793132..6a8f072871 100644
+--- a/target/riscv/pmp.h
++++ b/target/riscv/pmp.h
+@@ -60,5 +60,7 @@ void pmpaddr_csr_write(CPURISCVState *env, uint32_t addr_index,
+ target_ulong pmpaddr_csr_read(CPURISCVState *env, uint32_t addr_index);
+ bool pmp_hart_has_privs(CPURISCVState *env, target_ulong addr,
+     target_ulong size, pmp_priv_t priv, target_ulong mode);
++bool pmp_is_range_in_tlb(CPURISCVState *env, hwaddr tlb_sa,
++                         target_ulong *tlb_size);
  
-+static inline uint64_t nanbox_s(float32 f)
+ #endif
+diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
+index 2f337e418c..fd1d373b6f 100644
+--- a/target/riscv/cpu_helper.c
++++ b/target/riscv/cpu_helper.c
+@@ -693,6 +693,7 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+     bool first_stage_error = true;
+     int ret = TRANSLATE_FAIL;
+     int mode = mmu_idx;
++    target_ulong tlb_size = 0;
+ 
+     env->guest_phys_fault_addr = 0;
+ 
+@@ -784,8 +785,13 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+     }
+ 
+     if (ret == TRANSLATE_SUCCESS) {
+-        tlb_set_page(cs, address & TARGET_PAGE_MASK, pa & TARGET_PAGE_MASK,
+-                     prot, mmu_idx, TARGET_PAGE_SIZE);
++        if (pmp_is_range_in_tlb(env, pa & TARGET_PAGE_MASK, &tlb_size)) {
++            tlb_set_page(cs, address & ~(tlb_size - 1), pa & ~(tlb_size - 1),
++                         prot, mmu_idx, tlb_size);
++        } else {
++            tlb_set_page(cs, address & TARGET_PAGE_MASK, pa & TARGET_PAGE_MASK,
++                         prot, mmu_idx, TARGET_PAGE_SIZE);
++        }
+         return true;
+     } else if (probe) {
+         return false;
+diff --git a/target/riscv/pmp.c b/target/riscv/pmp.c
+index b14feeb7da..c394e867f8 100644
+--- a/target/riscv/pmp.c
++++ b/target/riscv/pmp.c
+@@ -383,3 +383,55 @@ target_ulong pmpaddr_csr_read(CPURISCVState *env, uint32_t addr_index)
+ 
+     return val;
+ }
++
++/*
++ * Calculate the TLB size if the start address or the end address of
++ * PMP entry is presented in thie TLB page.
++ */
++static target_ulong pmp_get_tlb_size(CPURISCVState *env, int pmp_index,
++                                     target_ulong tlb_sa, target_ulong tlb_ea)
 +{
-+    return f | MAKE_64BIT_MASK(32, 32);
++    target_ulong pmp_sa = env->pmp_state.addr[pmp_index].sa;
++    target_ulong pmp_ea = env->pmp_state.addr[pmp_index].ea;
++
++    if (pmp_sa >= tlb_sa && pmp_ea <= tlb_ea) {
++        return pmp_ea - pmp_sa + 1;
++    }
++
++    if (pmp_sa >= tlb_sa && pmp_sa <= tlb_ea && pmp_ea >= tlb_ea) {
++        return tlb_ea - pmp_sa + 1;
++    }
++
++    if (pmp_ea <= tlb_ea && pmp_ea >= tlb_sa && pmp_sa <= tlb_sa) {
++        return pmp_ea - tlb_sa + 1;
++    }
++
++    return 0;
 +}
 +
- #endif
-diff --git a/target/riscv/fpu_helper.c b/target/riscv/fpu_helper.c
-index 4379756dc4..72541958a7 100644
---- a/target/riscv/fpu_helper.c
-+++ b/target/riscv/fpu_helper.c
-@@ -81,10 +81,16 @@ void helper_set_rounding_mode(CPURISCVState *env, uint32_t rm)
-     set_float_rounding_mode(softrm, &env->fp_status);
- }
- 
-+static uint64_t do_fmadd_s(CPURISCVState *env, uint64_t frs1, uint64_t frs2,
-+                           uint64_t frs3, int flags)
++/*
++ * Check is there a PMP entry which range covers this page. If so,
++ * try to find the minimum granularity for the TLB size.
++ */
++bool pmp_is_range_in_tlb(CPURISCVState *env, hwaddr tlb_sa,
++                         target_ulong *tlb_size)
 +{
-+    return nanbox_s(float32_muladd(frs1, frs2, frs3, flags, &env->fp_status));
-+}
++    int i;
++    target_ulong val;
++    target_ulong tlb_ea = (tlb_sa + TARGET_PAGE_SIZE - 1);
 +
- uint64_t helper_fmadd_s(CPURISCVState *env, uint64_t frs1, uint64_t frs2,
-                         uint64_t frs3)
- {
--    return float32_muladd(frs1, frs2, frs3, 0, &env->fp_status);
-+    return do_fmadd_s(env, frs1, frs2, frs3, 0);
- }
- 
- uint64_t helper_fmadd_d(CPURISCVState *env, uint64_t frs1, uint64_t frs2,
-@@ -96,8 +102,7 @@ uint64_t helper_fmadd_d(CPURISCVState *env, uint64_t frs1, uint64_t frs2,
- uint64_t helper_fmsub_s(CPURISCVState *env, uint64_t frs1, uint64_t frs2,
-                         uint64_t frs3)
- {
--    return float32_muladd(frs1, frs2, frs3, float_muladd_negate_c,
--                          &env->fp_status);
-+    return do_fmadd_s(env, frs1, frs2, frs3, float_muladd_negate_c);
- }
- 
- uint64_t helper_fmsub_d(CPURISCVState *env, uint64_t frs1, uint64_t frs2,
-@@ -110,8 +115,7 @@ uint64_t helper_fmsub_d(CPURISCVState *env, uint64_t frs1, uint64_t frs2,
- uint64_t helper_fnmsub_s(CPURISCVState *env, uint64_t frs1, uint64_t frs2,
-                          uint64_t frs3)
- {
--    return float32_muladd(frs1, frs2, frs3, float_muladd_negate_product,
--                          &env->fp_status);
-+    return do_fmadd_s(env, frs1, frs2, frs3, float_muladd_negate_product);
- }
- 
- uint64_t helper_fnmsub_d(CPURISCVState *env, uint64_t frs1, uint64_t frs2,
-@@ -124,8 +128,8 @@ uint64_t helper_fnmsub_d(CPURISCVState *env, uint64_t frs1, uint64_t frs2,
- uint64_t helper_fnmadd_s(CPURISCVState *env, uint64_t frs1, uint64_t frs2,
-                          uint64_t frs3)
- {
--    return float32_muladd(frs1, frs2, frs3, float_muladd_negate_c |
--                          float_muladd_negate_product, &env->fp_status);
-+    return do_fmadd_s(env, frs1, frs2, frs3,
-+                      float_muladd_negate_c | float_muladd_negate_product);
- }
- 
- uint64_t helper_fnmadd_d(CPURISCVState *env, uint64_t frs1, uint64_t frs2,
-@@ -137,37 +141,37 @@ uint64_t helper_fnmadd_d(CPURISCVState *env, uint64_t frs1, uint64_t frs2,
- 
- uint64_t helper_fadd_s(CPURISCVState *env, uint64_t frs1, uint64_t frs2)
- {
--    return float32_add(frs1, frs2, &env->fp_status);
-+    return nanbox_s(float32_add(frs1, frs2, &env->fp_status));
- }
- 
- uint64_t helper_fsub_s(CPURISCVState *env, uint64_t frs1, uint64_t frs2)
- {
--    return float32_sub(frs1, frs2, &env->fp_status);
-+    return nanbox_s(float32_sub(frs1, frs2, &env->fp_status));
- }
- 
- uint64_t helper_fmul_s(CPURISCVState *env, uint64_t frs1, uint64_t frs2)
- {
--    return float32_mul(frs1, frs2, &env->fp_status);
-+    return nanbox_s(float32_mul(frs1, frs2, &env->fp_status));
- }
- 
- uint64_t helper_fdiv_s(CPURISCVState *env, uint64_t frs1, uint64_t frs2)
- {
--    return float32_div(frs1, frs2, &env->fp_status);
-+    return nanbox_s(float32_div(frs1, frs2, &env->fp_status));
- }
- 
- uint64_t helper_fmin_s(CPURISCVState *env, uint64_t frs1, uint64_t frs2)
- {
--    return float32_minnum(frs1, frs2, &env->fp_status);
-+    return nanbox_s(float32_minnum(frs1, frs2, &env->fp_status));
- }
- 
- uint64_t helper_fmax_s(CPURISCVState *env, uint64_t frs1, uint64_t frs2)
- {
--    return float32_maxnum(frs1, frs2, &env->fp_status);
-+    return nanbox_s(float32_maxnum(frs1, frs2, &env->fp_status));
- }
- 
- uint64_t helper_fsqrt_s(CPURISCVState *env, uint64_t frs1)
- {
--    return float32_sqrt(frs1, &env->fp_status);
-+    return nanbox_s(float32_sqrt(frs1, &env->fp_status));
- }
- 
- target_ulong helper_fle_s(CPURISCVState *env, uint64_t frs1, uint64_t frs2)
-@@ -209,23 +213,23 @@ uint64_t helper_fcvt_lu_s(CPURISCVState *env, uint64_t frs1)
- 
- uint64_t helper_fcvt_s_w(CPURISCVState *env, target_ulong rs1)
- {
--    return int32_to_float32((int32_t)rs1, &env->fp_status);
-+    return nanbox_s(int32_to_float32((int32_t)rs1, &env->fp_status));
- }
- 
- uint64_t helper_fcvt_s_wu(CPURISCVState *env, target_ulong rs1)
- {
--    return uint32_to_float32((uint32_t)rs1, &env->fp_status);
-+    return nanbox_s(uint32_to_float32((uint32_t)rs1, &env->fp_status));
- }
- 
- #if defined(TARGET_RISCV64)
- uint64_t helper_fcvt_s_l(CPURISCVState *env, uint64_t rs1)
- {
--    return int64_to_float32(rs1, &env->fp_status);
-+    return nanbox_s(int64_to_float32(rs1, &env->fp_status));
- }
- 
- uint64_t helper_fcvt_s_lu(CPURISCVState *env, uint64_t rs1)
- {
--    return uint64_to_float32(rs1, &env->fp_status);
-+    return nanbox_s(uint64_to_float32(rs1, &env->fp_status));
- }
- #endif
- 
-@@ -266,7 +270,7 @@ uint64_t helper_fmax_d(CPURISCVState *env, uint64_t frs1, uint64_t frs2)
- 
- uint64_t helper_fcvt_s_d(CPURISCVState *env, uint64_t rs1)
- {
--    return float64_to_float32(rs1, &env->fp_status);
-+    return nanbox_s(float64_to_float32(rs1, &env->fp_status));
- }
- 
- uint64_t helper_fcvt_d_s(CPURISCVState *env, uint64_t rs1)
++    for (i = 0; i < MAX_RISCV_PMPS; i++) {
++        val = pmp_get_tlb_size(env, i, tlb_sa, tlb_ea);
++        if (val) {
++            if (*tlb_size == 0 || *tlb_size > val) {
++                *tlb_size = val;
++            }
++        }
++    }
++
++    if (*tlb_size != 0) {
++        return true;
++    }
++
++    return false;
++}
 -- 
 2.27.0
 
