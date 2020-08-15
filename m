@@ -2,89 +2,91 @@ Return-Path: <SRS0=PlQC=BZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70B03C433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 15 Aug 2020 15:08:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DFBB5C433E1
+	for <qemu-devel@archiver.kernel.org>; Sat, 15 Aug 2020 15:09:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 40AF323101
-	for <qemu-devel@archiver.kernel.org>; Sat, 15 Aug 2020 15:08:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ABE7123101
+	for <qemu-devel@archiver.kernel.org>; Sat, 15 Aug 2020 15:09:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Sj8WlTEp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 40AF323101
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cedsg4qK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ABE7123101
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52946 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56422 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k6xnN-0005da-DW
-	for qemu-devel@archiver.kernel.org; Sat, 15 Aug 2020 11:08:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48814)
+	id 1k6xoK-00075x-U4
+	for qemu-devel@archiver.kernel.org; Sat, 15 Aug 2020 11:09:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49608)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
- id 1k6xjA-0007sb-JB
- for qemu-devel@nongnu.org; Sat, 15 Aug 2020 11:04:12 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:26482
- helo=us-smtp-delivery-1.mimecast.com)
+ id 1k6xk0-0000Rn-KN
+ for qemu-devel@nongnu.org; Sat, 15 Aug 2020 11:05:04 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:59521
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
- id 1k6xj6-0006ob-Sg
- for qemu-devel@nongnu.org; Sat, 15 Aug 2020 11:04:12 -0400
+ id 1k6xjy-00072b-S8
+ for qemu-devel@nongnu.org; Sat, 15 Aug 2020 11:05:04 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597503847;
+ s=mimecast20190719; t=1597503902;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=f1ji2mx+Xn4Am5yZ92CUiZs3kBOCYikIb934jqwUCkg=;
- b=Sj8WlTEpdpz0MBgRVsLRbaQlj5DEYC9fBGEKH/7GBhOb8FKRNeYB1m+vpQka4pb4qiR6qa
- o1Pg+y+DsEg7MJfr6IEJ5jMow0USQjpYPpwigmNhLEWFRX0jj3I0vgnPsUrUv0kLhST4rd
- PvUTA01Ick/U+G61+6WbE7U04OIaWxA=
+ bh=U3jb7gJ3WbiTExY2AZW20/+QPsj/5JIJwp4Qd6tcVJk=;
+ b=cedsg4qKVoqYz6W/xNyA+WV+fzbE0Gnk1WhPi4djGBs87xVfi/aOCLAeFNnYQab+R7ydGf
+ 4i9ZCb2jHTPLN4Z/2ntio8RwrzvotS2a5YpdA22SU1HPI08oSacL03WG5psLb3CaeOzmGm
+ YuEV4xGs6/7xykX3sbaf3ymA7ZFlOEU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-548-fuwg5IwbMICxtOWiCOvkUA-1; Sat, 15 Aug 2020 02:59:31 -0400
-X-MC-Unique: fuwg5IwbMICxtOWiCOvkUA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-130-TSo0FaTVPn-fmJJUc6Q28g-1; Sat, 15 Aug 2020 03:03:07 -0400
+X-MC-Unique: TSo0FaTVPn-fmJJUc6Q28g-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9E8DF801AAE;
- Sat, 15 Aug 2020 06:59:29 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 505711005E5D;
+ Sat, 15 Aug 2020 07:03:06 +0000 (UTC)
 Received: from kamzik.brq.redhat.com (unknown [10.40.192.23])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id F07DD5D9CA;
- Sat, 15 Aug 2020 06:59:23 +0000 (UTC)
-Date: Sat, 15 Aug 2020 08:59:20 +0200
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 15078702FF;
+ Sat, 15 Aug 2020 07:02:57 +0000 (UTC)
+Date: Sat, 15 Aug 2020 09:02:54 +0200
 From: Andrew Jones <drjones@redhat.com>
 To: Peng Liang <liangpeng10@huawei.com>
-Subject: Re: [RFC 5/9] target/arm: introduce CPU feature dependency mechanism
-Message-ID: <20200815065920.de22a6g4jvfawyuc@kamzik.brq.redhat.com>
+Subject: Re: [RFC 7/9] target/arm: Add CPU features to
+ query-cpu-model-expansion
+Message-ID: <20200815070254.ed3cxwcexmyypcgc@kamzik.brq.redhat.com>
 References: <20200813102657.2588720-1-liangpeng10@huawei.com>
- <20200813102657.2588720-6-liangpeng10@huawei.com>
- <20200813124821.psavdkhddg4duar6@kamzik.brq.redhat.com>
- <1e7160d1-96e7-7581-cdc9-cb4ad44aca72@huawei.com>
+ <20200813102657.2588720-8-liangpeng10@huawei.com>
+ <20200813125602.drapo7wyzg57k3jy@kamzik.brq.redhat.com>
+ <c14eb457-5c64-b888-2b94-fcd5e4383c70@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <1e7160d1-96e7-7581-cdc9-cb4ad44aca72@huawei.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <c14eb457-5c64-b888-2b94-fcd5e4383c70@huawei.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
-X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=drjones@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/14 17:09:02
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=drjones@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/15 02:52:02
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,52 +107,58 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, Aug 15, 2020 at 10:19:27AM +0800, Peng Liang wrote:
-> On 8/13/2020 8:48 PM, Andrew Jones wrote:
-> > On Thu, Aug 13, 2020 at 06:26:53PM +0800, Peng Liang wrote:
-> >> Some CPU features are dependent on other CPU features.  For example,
-> >> ID_AA64PFR0_EL1.FP field and ID_AA64PFR0_EL1.AdvSIMD must have the same
-> >> value, which means FP and ADVSIMD are dependent on each other, FPHP and
-> >> ADVSIMDHP are dependent on each other.
+On Sat, Aug 15, 2020 at 10:19:05AM +0800, Peng Liang wrote:
+> On 8/13/2020 8:56 PM, Andrew Jones wrote:
+> > On Thu, Aug 13, 2020 at 06:26:55PM +0800, Peng Liang wrote:
+> >> Add CPU features to the result of query-cpu-model-expansion so that
+> >> other applications (such as libvirt) can know the supported CPU
+> >> features.
 > >>
-> >> This commit introduces a mechanism for CPU feature dependency in
-> >> AArch64.  We build a directed graph from the CPU feature dependency
-> >> relationship, each edge from->to means the `to` CPU feature is dependent
-> >> on the `from` CPU feature.  And we will automatically enable/disable CPU
-> >> feature according to the directed graph.
+> >> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+> >> Signed-off-by: Peng Liang <liangpeng10@huawei.com>
+> >> ---
+> >>  target/arm/cpu.c     | 41 +++++++++++++++++++++++++++++++++++++++++
+> >>  target/arm/cpu.h     |  2 ++
+> >>  target/arm/monitor.c |  2 ++
+> >>  3 files changed, 45 insertions(+)
 > >>
-> >> For example, a, b, and c CPU features are in relationship a->b->c, which
-> >> means c is dependent on b and b is dependent on a.  If c is enabled by
-> >> user, then a and b is enabled automatically.  And if a is disabled by
-> >> user, then b and c is disabled automatically.
+> >> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+> >> index 3fc54cb3a4..0f620e8afe 100644
+> >> --- a/target/arm/cpu.c
+> >> +++ b/target/arm/cpu.c
+> >> @@ -25,6 +25,8 @@
+> >>  #include "qemu/module.h"
+> >>  #include "qapi/error.h"
+> >>  #include "qapi/visitor.h"
+> >> +#include "qapi/qmp/qdict.h"
+> >> +#include "qom/qom-qobject.h"
+> >>  #include "cpu.h"
+> >>  #include "internals.h"
+> >>  #include "exec/exec-all.h"
+> >> @@ -1515,6 +1517,45 @@ static const CPUFeatureDep feature_dependencies[] = {
+> >>      },
+> >>  };
+> >>  
+> >> +static char *strtolower(char *src)
+> >> +{
+> >> +    char *start = src;
+> >> +
+> >> +    for (; *src; ++src) {
+> >> +        *src = tolower(*src);
+> >> +    }
+> >> +
+> >> +    return start;
+> >> +}
 > > 
-> > And what if a is mutually exclusive with b? I.e. a and b can both be
-> > disabled, but only a or b may be enabled.
-> > 
-> > Thanks,
-> > drew
-> > 
-> > .
+> > Shouldn't need this. The CPU property names should already be lowercase.
 > > 
 > 
-> Currently, a and b will be both enabled or disabled.  For example, a and b are
-> in relationship a->b, which means b is dependent on a.  If -cpu host,a=off,b=on,
-> then both a and b are enabled.  If -cpu host,b=on,a=off, then both a and b are
-> disabled.  Maybe we should report an error to user in this scenario?
->
+> For convenience, we use the field part defined in FIELD macro as the name of
+> a CPU feature.  So, the names of CPU features are upper...
 
-Right. There are more relationships between features than "depends on",
-such as "only if not" or "only if value is". The last one points out
-that just setting the minimum feature value may not be sufficient to
-control all the features. Also, there could be relationships involving
-more than two features, such as 'a iff b and c', or 'a iff b and !c'.
-
-We really have to take each feature of each ID register one at a time to
-make sure we handle them appropriately. Exposing them all like this
-without any checks just pushes all the pain onto the user to figure
-everything out, and if there's not even errors generated, then how will
-the user know when they got something wrong until their guest breaks
-in some mysterious way?
+But then the command line requires capital letters for property names,
+which isn't very convenient to the user. The field names could be
+converted to lowercase when generating the property names.
 
 Thanks,
 drew
