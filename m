@@ -2,74 +2,89 @@ Return-Path: <SRS0=PlQC=BZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF95EC433E1
-	for <qemu-devel@archiver.kernel.org>; Sat, 15 Aug 2020 17:13:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DFB40C433E1
+	for <qemu-devel@archiver.kernel.org>; Sat, 15 Aug 2020 17:15:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B894F207FB
-	for <qemu-devel@archiver.kernel.org>; Sat, 15 Aug 2020 17:13:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B894F207FB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id AB46F207FB
+	for <qemu-devel@archiver.kernel.org>; Sat, 15 Aug 2020 17:15:17 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YMWWW4MD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB46F207FB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45304 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47468 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k6zkV-0007Ha-1Q
-	for qemu-devel@archiver.kernel.org; Sat, 15 Aug 2020 13:13:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43578)
+	id 1k6zm0-0008Eg-UU
+	for qemu-devel@archiver.kernel.org; Sat, 15 Aug 2020 13:15:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43920)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1k6zjS-0006oV-B5
- for qemu-devel@nongnu.org; Sat, 15 Aug 2020 13:12:38 -0400
-Resent-Date: Sat, 15 Aug 2020 13:12:38 -0400
-Resent-Message-Id: <E1k6zjS-0006oV-B5@lists.gnu.org>
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21753)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1k6zjO-0001vk-9O
- for qemu-devel@nongnu.org; Sat, 15 Aug 2020 13:12:38 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1597511537; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=OElXYp3sS03Go/JBMXRDuB59YQ2fkeOIZBS3u+XggMyFH0De89UcUDxGJlyGoy63fM2f543TJqGf5cIjR0a+flaZ2/PMEfmNdk/uLh0yHRFMpvBAXZQIcSR3oE3P4HKJ6WyRYGq7TDUrh9EWq/cg7O9Js9om4SvWJLOh5xYLkzk=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1597511537;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=vY9l93WpKtmtJZkLxnHVnSMfzL6w+pG6Kr0WivqG8zE=; 
- b=Z43/zOq87zg3U1ztlFTN1iEiE9GPun4su3G+nKDqb4xvbmT+83g4sznOFe8evrjYo5FZiFCeLz9nVe5C2RFF71svxYyAFxilpooI/LosWCgs6UkYI74eAPq6YrDVPHc91O3OGadJZNSluvt/SIg1guS66UQR5dHw0SDv6SnzD0w=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1597511534125215.6417007084085;
- Sat, 15 Aug 2020 10:12:14 -0700 (PDT)
-Subject: Re: [PATCH v4 0/3] Modify AMD topology to use socket/dies/core/thread
- model
-Message-ID: <159751153278.18222.6555933261886717102@66eaa9a8a123>
-In-Reply-To: <159744083536.39197.13827776633866601278.stgit@naples-babu.amd.com>
+ (Exim 4.90_1) (envelope-from <rohit.shinde12194@gmail.com>)
+ id 1k6zlE-0007mZ-Cn
+ for qemu-devel@nongnu.org; Sat, 15 Aug 2020 13:14:28 -0400
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:40988)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <rohit.shinde12194@gmail.com>)
+ id 1k6zlC-000220-Dt
+ for qemu-devel@nongnu.org; Sat, 15 Aug 2020 13:14:28 -0400
+Received: by mail-pg1-x542.google.com with SMTP id s15so5999457pgc.8
+ for <qemu-devel@nongnu.org>; Sat, 15 Aug 2020 10:14:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=+zjJEW76GFXrK6U2q/vJE64GK4mCTpYjSjiBB706RAk=;
+ b=YMWWW4MDLYzvEBN8lNbCIR+jk+J8Q5TGfRiRH3dNiT8iRhvrrfMzCd1Ykgl+/UkPN/
+ MuMP0vZJ+QbC0e/ykIPRlGeBbmmYkxpXLaRFKoygrOUx3RFROyujBlVLLk23UoCUmMjT
+ /dK8K2Vk0O3YZUcSGkDdHKkE41aplM+n7qqNj/SCi1gBEknqkJVcUClk6P8t8ebYdHvT
+ RFJdDnyDY9RG2H+GdMSnIJWxzdWMNlFghiaxs/LLQWvhrHHUDFFChmhUsm99kWjjzpYV
+ 7sR88QYAjmQarmqAb0wByPTzTwxH94VrO8S+kH3oWwdfIYF1wqGtidt49beRrAxV6HHQ
+ ovEw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=+zjJEW76GFXrK6U2q/vJE64GK4mCTpYjSjiBB706RAk=;
+ b=JvkurbnCE0LCt+VFlmhIK86SdLTNHXpODreo9a/vxkWgScSmoZK9lDkIotEJh6it7Q
+ IXYtbEwyktFH4u+bTJ6Nmb8u9dd4G8Yeg+lew/z7GgcqmWV2+wPjJMswJNKJlHT7qYov
+ c27xesE/InX2/hp2xmHjX2WJB3DIpmjHXkPX9z40vs/JCItWRhNJxbuusMz+ZbXRc/6H
+ 2u/xuz2exI9xvKyuLAGCB2OuISSb+8JeyFtJAKPRDs+C4QGtJp+8GJEl9UBaO8XeQt4P
+ 7JxBjurIo9sG/Dk01/glS3qL8gmd+mYS+6hrIDw5vXy/qWrsTpmGuJfvGFKPhNy3VjTB
+ nVtA==
+X-Gm-Message-State: AOAM533TQIgb1KoVkdWJc0MyFt1cuWYLTGWFm+Ep6vuw6Osaooe33/Qv
+ Atgzcwb/jYOBVvRG2UabyVear515NMbo5bIpkBg=
+X-Google-Smtp-Source: ABdhPJwUePYmmm9uFt6LdDc9rZ7N394efinTzr6AKys80Cs/zCWNmMKAtXHc+z+7rwYQ09OrP3Gtq9jz466tHRW9QUw=
+X-Received: by 2002:a62:17c1:: with SMTP id 184mr5671263pfx.136.1597511664554; 
+ Sat, 15 Aug 2020 10:14:24 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: babu.moger@amd.com
-Date: Sat, 15 Aug 2020 10:12:14 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o57.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/15 13:12:31
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
+References: <20200815130046.5344-1-rohit.shinde12194@gmail.com>
+ <d915c2a8-deba-1d88-d7d8-d16b8dcaf6d4@amsat.org>
+In-Reply-To: <d915c2a8-deba-1d88-d7d8-d16b8dcaf6d4@amsat.org>
+From: Rohit Shinde <rohit.shinde12194@gmail.com>
+Date: Sat, 15 Aug 2020 13:14:13 -0400
+Message-ID: <CA+Ai=tBw1bKJjHMLS=wbh2_WEU04TWPJohRxTggUV2k3gnb6gw@mail.gmail.com>
+Subject: Re: [PATCH] Fixes: Fallthrough warning on line 270 of
+ qemu/qapi/opts-visitor.c
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Content-Type: multipart/alternative; boundary="0000000000004a575d05acedabef"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::542;
+ envelope-from=rohit.shinde12194@gmail.com; helo=mail-pg1-x542.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
 X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001, HTML_MESSAGE=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -82,140 +97,220 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: ehabkost@redhat.com, mst@redhat.com, qemu-devel@nongnu.org,
- imammedo@redhat.com, pbonzini@redhat.com, rth@twiddle.net
+Cc: mdroth@linux.vnet.ibm.com, qemu-devel@nongnu.org, armbru@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTk3NDQwODM1MzYuMzkxOTcu
-MTM4Mjc3NzY2MzM4NjY2MDEyNzguc3RnaXRAbmFwbGVzLWJhYnUuYW1kLmNvbS8KCgoKSGksCgpU
-aGlzIHNlcmllcyBmYWlsZWQgdGhlIGRvY2tlci1xdWlja0BjZW50b3M3IGJ1aWxkIHRlc3QuIFBs
-ZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElm
-IHlvdSBoYXZlIERvY2tlciBpbnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0
-CmxvY2FsbHkuCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCm1ha2UgZG9j
-a2VyLWltYWdlLWNlbnRvczcgVj0xIE5FVFdPUks9MQp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtcXVp
-Y2tAY2VudG9zNyBTSE9XX0VOVj0xIEo9MTQgTkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQg
-PT09CgogIENDICAgICAgdGVzdHMvdGVzdC10aW1lZC1hdmVyYWdlLm8KICBDQyAgICAgIHRlc3Rz
-L3Rlc3QtdXRpbC1maWxlbW9uaXRvci5vCi90bXAvcWVtdS10ZXN0L3NyYy90ZXN0cy90ZXN0LXg4
-Ni1jcHVpZC5jOiBJbiBmdW5jdGlvbiAndGVzdF90b3BvX2JpdHMnOgovdG1wL3FlbXUtdGVzdC9z
-cmMvdGVzdHMvdGVzdC14ODYtY3B1aWQuYzozNDo1OiBlcnJvcjogZXhjZXNzIGVsZW1lbnRzIGlu
-IHN0cnVjdCBpbml0aWFsaXplciBbLVdlcnJvcl0KICAgICB0b3BvX2luZm8gPSAoWDg2Q1BVVG9w
-b0luZm8pIHswLCAxLCAxLCAxfTsKICAgICBeCi90bXAvcWVtdS10ZXN0L3NyYy90ZXN0cy90ZXN0
-LXg4Ni1jcHVpZC5jOjM0OjU6IGVycm9yOiAobmVhciBpbml0aWFsaXphdGlvbiBmb3IgJyhhbm9u
-eW1vdXMpJykgWy1XZXJyb3JdCi90bXAvcWVtdS10ZXN0L3NyYy90ZXN0cy90ZXN0LXg4Ni1jcHVp
-ZC5jOjM5OjU6IGVycm9yOiBleGNlc3MgZWxlbWVudHMgaW4gc3RydWN0IGluaXRpYWxpemVyIFst
-V2Vycm9yXQogICAgIHRvcG9faW5mbyA9IChYODZDUFVUb3BvSW5mbykgezAsIDEsIDEsIDF9Owog
-ICAgIF4KL3RtcC9xZW11LXRlc3Qvc3JjL3Rlc3RzL3Rlc3QteDg2LWNwdWlkLmM6Mzk6NTogZXJy
-b3I6IChuZWFyIGluaXRpYWxpemF0aW9uIGZvciAnKGFub255bW91cyknKSBbLVdlcnJvcl0KL3Rt
-cC9xZW11LXRlc3Qvc3JjL3Rlc3RzL3Rlc3QteDg2LWNwdWlkLmM6NDg6NTogZXJyb3I6IGV4Y2Vz
-cyBlbGVtZW50cyBpbiBzdHJ1Y3QgaW5pdGlhbGl6ZXIgWy1XZXJyb3JdCiAgICAgdG9wb19pbmZv
-ID0gKFg4NkNQVVRvcG9JbmZvKSB7MCwgMSwgMSwgMn07CiAgICAgXgovdG1wL3FlbXUtdGVzdC9z
-cmMvdGVzdHMvdGVzdC14ODYtY3B1aWQuYzo0ODo1OiBlcnJvcjogKG5lYXIgaW5pdGlhbGl6YXRp
-b24gZm9yICcoYW5vbnltb3VzKScpIFstV2Vycm9yXQovdG1wL3FlbXUtdGVzdC9zcmMvdGVzdHMv
-dGVzdC14ODYtY3B1aWQuYzo1MDo1OiBlcnJvcjogZXhjZXNzIGVsZW1lbnRzIGluIHN0cnVjdCBp
-bml0aWFsaXplciBbLVdlcnJvcl0KICAgICB0b3BvX2luZm8gPSAoWDg2Q1BVVG9wb0luZm8pIHsw
-LCAxLCAxLCAzfTsKICAgICBeCi90bXAvcWVtdS10ZXN0L3NyYy90ZXN0cy90ZXN0LXg4Ni1jcHVp
-ZC5jOjUwOjU6IGVycm9yOiAobmVhciBpbml0aWFsaXphdGlvbiBmb3IgJyhhbm9ueW1vdXMpJykg
-Wy1XZXJyb3JdCi90bXAvcWVtdS10ZXN0L3NyYy90ZXN0cy90ZXN0LXg4Ni1jcHVpZC5jOjUyOjU6
-IGVycm9yOiBleGNlc3MgZWxlbWVudHMgaW4gc3RydWN0IGluaXRpYWxpemVyIFstV2Vycm9yXQog
-ICAgIHRvcG9faW5mbyA9IChYODZDUFVUb3BvSW5mbykgezAsIDEsIDEsIDR9OwogICAgIF4KL3Rt
-cC9xZW11LXRlc3Qvc3JjL3Rlc3RzL3Rlc3QteDg2LWNwdWlkLmM6NTI6NTogZXJyb3I6IChuZWFy
-IGluaXRpYWxpemF0aW9uIGZvciAnKGFub255bW91cyknKSBbLVdlcnJvcl0KL3RtcC9xZW11LXRl
-c3Qvc3JjL3Rlc3RzL3Rlc3QteDg2LWNwdWlkLmM6NTU6NTogZXJyb3I6IGV4Y2VzcyBlbGVtZW50
-cyBpbiBzdHJ1Y3QgaW5pdGlhbGl6ZXIgWy1XZXJyb3JdCiAgICAgdG9wb19pbmZvID0gKFg4NkNQ
-VVRvcG9JbmZvKSB7MCwgMSwgMSwgMTR9OwogICAgIF4KL3RtcC9xZW11LXRlc3Qvc3JjL3Rlc3Rz
-L3Rlc3QteDg2LWNwdWlkLmM6NTU6NTogZXJyb3I6IChuZWFyIGluaXRpYWxpemF0aW9uIGZvciAn
-KGFub255bW91cyknKSBbLVdlcnJvcl0KL3RtcC9xZW11LXRlc3Qvc3JjL3Rlc3RzL3Rlc3QteDg2
-LWNwdWlkLmM6NTc6NTogZXJyb3I6IGV4Y2VzcyBlbGVtZW50cyBpbiBzdHJ1Y3QgaW5pdGlhbGl6
-ZXIgWy1XZXJyb3JdCiAgICAgdG9wb19pbmZvID0gKFg4NkNQVVRvcG9JbmZvKSB7MCwgMSwgMSwg
-MTV9OwogICAgIF4KL3RtcC9xZW11LXRlc3Qvc3JjL3Rlc3RzL3Rlc3QteDg2LWNwdWlkLmM6NTc6
-NTogZXJyb3I6IChuZWFyIGluaXRpYWxpemF0aW9uIGZvciAnKGFub255bW91cyknKSBbLVdlcnJv
-cl0KL3RtcC9xZW11LXRlc3Qvc3JjL3Rlc3RzL3Rlc3QteDg2LWNwdWlkLmM6NTk6NTogZXJyb3I6
-IGV4Y2VzcyBlbGVtZW50cyBpbiBzdHJ1Y3QgaW5pdGlhbGl6ZXIgWy1XZXJyb3JdCiAgICAgdG9w
-b19pbmZvID0gKFg4NkNQVVRvcG9JbmZvKSB7MCwgMSwgMSwgMTZ9OwogICAgIF4KL3RtcC9xZW11
-LXRlc3Qvc3JjL3Rlc3RzL3Rlc3QteDg2LWNwdWlkLmM6NTk6NTogZXJyb3I6IChuZWFyIGluaXRp
-YWxpemF0aW9uIGZvciAnKGFub255bW91cyknKSBbLVdlcnJvcl0KL3RtcC9xZW11LXRlc3Qvc3Jj
-L3Rlc3RzL3Rlc3QteDg2LWNwdWlkLmM6NjE6NTogZXJyb3I6IGV4Y2VzcyBlbGVtZW50cyBpbiBz
-dHJ1Y3QgaW5pdGlhbGl6ZXIgWy1XZXJyb3JdCiAgICAgdG9wb19pbmZvID0gKFg4NkNQVVRvcG9J
-bmZvKSB7MCwgMSwgMSwgMTd9OwogICAgIF4KL3RtcC9xZW11LXRlc3Qvc3JjL3Rlc3RzL3Rlc3Qt
-eDg2LWNwdWlkLmM6NjE6NTogZXJyb3I6IChuZWFyIGluaXRpYWxpemF0aW9uIGZvciAnKGFub255
-bW91cyknKSBbLVdlcnJvcl0KL3RtcC9xZW11LXRlc3Qvc3JjL3Rlc3RzL3Rlc3QteDg2LWNwdWlk
-LmM6NjU6NTogZXJyb3I6IGV4Y2VzcyBlbGVtZW50cyBpbiBzdHJ1Y3QgaW5pdGlhbGl6ZXIgWy1X
-ZXJyb3JdCiAgICAgdG9wb19pbmZvID0gKFg4NkNQVVRvcG9JbmZvKSB7MCwgMSwgMzAsIDJ9Owog
-ICAgIF4KL3RtcC9xZW11LXRlc3Qvc3JjL3Rlc3RzL3Rlc3QteDg2LWNwdWlkLmM6NjU6NTogZXJy
-b3I6IChuZWFyIGluaXRpYWxpemF0aW9uIGZvciAnKGFub255bW91cyknKSBbLVdlcnJvcl0KL3Rt
-cC9xZW11LXRlc3Qvc3JjL3Rlc3RzL3Rlc3QteDg2LWNwdWlkLmM6Njc6NTogZXJyb3I6IGV4Y2Vz
-cyBlbGVtZW50cyBpbiBzdHJ1Y3QgaW5pdGlhbGl6ZXIgWy1XZXJyb3JdCiAgICAgdG9wb19pbmZv
-ID0gKFg4NkNQVVRvcG9JbmZvKSB7MCwgMSwgMzEsIDJ9OwogICAgIF4KL3RtcC9xZW11LXRlc3Qv
-c3JjL3Rlc3RzL3Rlc3QteDg2LWNwdWlkLmM6Njc6NTogZXJyb3I6IChuZWFyIGluaXRpYWxpemF0
-aW9uIGZvciAnKGFub255bW91cyknKSBbLVdlcnJvcl0KL3RtcC9xZW11LXRlc3Qvc3JjL3Rlc3Rz
-L3Rlc3QteDg2LWNwdWlkLmM6Njk6NTogZXJyb3I6IGV4Y2VzcyBlbGVtZW50cyBpbiBzdHJ1Y3Qg
-aW5pdGlhbGl6ZXIgWy1XZXJyb3JdCiAgICAgdG9wb19pbmZvID0gKFg4NkNQVVRvcG9JbmZvKSB7
-MCwgMSwgMzIsIDJ9OwogICAgIF4KL3RtcC9xZW11LXRlc3Qvc3JjL3Rlc3RzL3Rlc3QteDg2LWNw
-dWlkLmM6Njk6NTogZXJyb3I6IChuZWFyIGluaXRpYWxpemF0aW9uIGZvciAnKGFub255bW91cykn
-KSBbLVdlcnJvcl0KL3RtcC9xZW11LXRlc3Qvc3JjL3Rlc3RzL3Rlc3QteDg2LWNwdWlkLmM6NzE6
-NTogZXJyb3I6IGV4Y2VzcyBlbGVtZW50cyBpbiBzdHJ1Y3QgaW5pdGlhbGl6ZXIgWy1XZXJyb3Jd
-CiAgICAgdG9wb19pbmZvID0gKFg4NkNQVVRvcG9JbmZvKSB7MCwgMSwgMzMsIDJ9OwogICAgIF4K
-L3RtcC9xZW11LXRlc3Qvc3JjL3Rlc3RzL3Rlc3QteDg2LWNwdWlkLmM6NzE6NTogZXJyb3I6IChu
-ZWFyIGluaXRpYWxpemF0aW9uIGZvciAnKGFub255bW91cyknKSBbLVdlcnJvcl0KL3RtcC9xZW11
-LXRlc3Qvc3JjL3Rlc3RzL3Rlc3QteDg2LWNwdWlkLmM6NzQ6NTogZXJyb3I6IGV4Y2VzcyBlbGVt
-ZW50cyBpbiBzdHJ1Y3QgaW5pdGlhbGl6ZXIgWy1XZXJyb3JdCiAgICAgdG9wb19pbmZvID0gKFg4
-NkNQVVRvcG9JbmZvKSB7MCwgMSwgMzAsIDJ9OwogICAgIF4KL3RtcC9xZW11LXRlc3Qvc3JjL3Rl
-c3RzL3Rlc3QteDg2LWNwdWlkLmM6NzQ6NTogZXJyb3I6IChuZWFyIGluaXRpYWxpemF0aW9uIGZv
-ciAnKGFub255bW91cyknKSBbLVdlcnJvcl0KL3RtcC9xZW11LXRlc3Qvc3JjL3Rlc3RzL3Rlc3Qt
-eDg2LWNwdWlkLmM6NzY6NTogZXJyb3I6IGV4Y2VzcyBlbGVtZW50cyBpbiBzdHJ1Y3QgaW5pdGlh
-bGl6ZXIgWy1XZXJyb3JdCiAgICAgdG9wb19pbmZvID0gKFg4NkNQVVRvcG9JbmZvKSB7MCwgMiwg
-MzAsIDJ9OwogICAgIF4KL3RtcC9xZW11LXRlc3Qvc3JjL3Rlc3RzL3Rlc3QteDg2LWNwdWlkLmM6
-NzY6NTogZXJyb3I6IChuZWFyIGluaXRpYWxpemF0aW9uIGZvciAnKGFub255bW91cyknKSBbLVdl
-cnJvcl0KL3RtcC9xZW11LXRlc3Qvc3JjL3Rlc3RzL3Rlc3QteDg2LWNwdWlkLmM6Nzg6NTogZXJy
-b3I6IGV4Y2VzcyBlbGVtZW50cyBpbiBzdHJ1Y3QgaW5pdGlhbGl6ZXIgWy1XZXJyb3JdCiAgICAg
-dG9wb19pbmZvID0gKFg4NkNQVVRvcG9JbmZvKSB7MCwgMywgMzAsIDJ9OwogICAgIF4KL3RtcC9x
-ZW11LXRlc3Qvc3JjL3Rlc3RzL3Rlc3QteDg2LWNwdWlkLmM6Nzg6NTogZXJyb3I6IChuZWFyIGlu
-aXRpYWxpemF0aW9uIGZvciAnKGFub255bW91cyknKSBbLVdlcnJvcl0KL3RtcC9xZW11LXRlc3Qv
-c3JjL3Rlc3RzL3Rlc3QteDg2LWNwdWlkLmM6ODA6NTogZXJyb3I6IGV4Y2VzcyBlbGVtZW50cyBp
-biBzdHJ1Y3QgaW5pdGlhbGl6ZXIgWy1XZXJyb3JdCiAgICAgdG9wb19pbmZvID0gKFg4NkNQVVRv
-cG9JbmZvKSB7MCwgNCwgMzAsIDJ9OwogICAgIF4KL3RtcC9xZW11LXRlc3Qvc3JjL3Rlc3RzL3Rl
-c3QteDg2LWNwdWlkLmM6ODA6NTogZXJyb3I6IChuZWFyIGluaXRpYWxpemF0aW9uIGZvciAnKGFu
-b255bW91cyknKSBbLVdlcnJvcl0KL3RtcC9xZW11LXRlc3Qvc3JjL3Rlc3RzL3Rlc3QteDg2LWNw
-dWlkLmM6ODg6NTogZXJyb3I6IGV4Y2VzcyBlbGVtZW50cyBpbiBzdHJ1Y3QgaW5pdGlhbGl6ZXIg
-Wy1XZXJyb3JdCiAgICAgdG9wb19pbmZvID0gKFg4NkNQVVRvcG9JbmZvKSB7MCwgMSwgNiwgM307
-CiAgICAgXgovdG1wL3FlbXUtdGVzdC9zcmMvdGVzdHMvdGVzdC14ODYtY3B1aWQuYzo4ODo1OiBl
-cnJvcjogKG5lYXIgaW5pdGlhbGl6YXRpb24gZm9yICcoYW5vbnltb3VzKScpIFstV2Vycm9yXQov
-dG1wL3FlbXUtdGVzdC9zcmMvdGVzdHMvdGVzdC14ODYtY3B1aWQuYzo5NDo1OiBlcnJvcjogZXhj
-ZXNzIGVsZW1lbnRzIGluIHN0cnVjdCBpbml0aWFsaXplciBbLVdlcnJvcl0KICAgICB0b3BvX2lu
-Zm8gPSAoWDg2Q1BVVG9wb0luZm8pIHswLCAxLCA2LCAzfTsKICAgICBeCi90bXAvcWVtdS10ZXN0
-L3NyYy90ZXN0cy90ZXN0LXg4Ni1jcHVpZC5jOjk0OjU6IGVycm9yOiAobmVhciBpbml0aWFsaXph
-dGlvbiBmb3IgJyhhbm9ueW1vdXMpJykgWy1XZXJyb3JdCi90bXAvcWVtdS10ZXN0L3NyYy90ZXN0
-cy90ZXN0LXg4Ni1jcHVpZC5jOjk5OjU6IGVycm9yOiBleGNlc3MgZWxlbWVudHMgaW4gc3RydWN0
-IGluaXRpYWxpemVyIFstV2Vycm9yXQogICAgIHRvcG9faW5mbyA9IChYODZDUFVUb3BvSW5mbykg
-ezAsIDEsIDYsIDN9OwogICAgIF4KL3RtcC9xZW11LXRlc3Qvc3JjL3Rlc3RzL3Rlc3QteDg2LWNw
-dWlkLmM6OTk6NTogZXJyb3I6IChuZWFyIGluaXRpYWxpemF0aW9uIGZvciAnKGFub255bW91cykn
-KSBbLVdlcnJvcl0KY2MxOiBhbGwgd2FybmluZ3MgYmVpbmcgdHJlYXRlZCBhcyBlcnJvcnMKICBD
-QyAgICAgIHRlc3RzL3Rlc3QtdXRpbC1zb2NrZXRzLm8KbWFrZTogKioqIFt0ZXN0cy90ZXN0LXg4
-Ni1jcHVpZC5vXSBFcnJvciAxCm1ha2U6ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMu
-Li4uCiAgQ0MgICAgICB0ZXN0cy90ZXN0LWF1dGh6LXNpbXBsZS5vClRyYWNlYmFjayAobW9zdCBy
-ZWNlbnQgY2FsbCBsYXN0KToKLS0tCiAgICByYWlzZSBDYWxsZWRQcm9jZXNzRXJyb3IocmV0Y29k
-ZSwgY21kKQpzdWJwcm9jZXNzLkNhbGxlZFByb2Nlc3NFcnJvcjogQ29tbWFuZCAnWydzdWRvJywg
-Jy1uJywgJ2RvY2tlcicsICdydW4nLCAnLS1sYWJlbCcsICdjb20ucWVtdS5pbnN0YW5jZS51dWlk
-PWYxZDgxYWE5MDY2MjQzMGRiZmJiYWZlZGI2YmU3OTJkJywgJy11JywgJzEwMDMnLCAnLS1zZWN1
-cml0eS1vcHQnLCAnc2VjY29tcD11bmNvbmZpbmVkJywgJy0tcm0nLCAnLWUnLCAnVEFSR0VUX0xJ
-U1Q9JywgJy1lJywgJ0VYVFJBX0NPTkZJR1VSRV9PUFRTPScsICctZScsICdWPScsICctZScsICdK
-PTE0JywgJy1lJywgJ0RFQlVHPScsICctZScsICdTSE9XX0VOVj0xJywgJy1lJywgJ0NDQUNIRV9E
-SVI9L3Zhci90bXAvY2NhY2hlJywgJy12JywgJy9ob21lL3BhdGNoZXcyLy5jYWNoZS9xZW11LWRv
-Y2tlci1jY2FjaGU6L3Zhci90bXAvY2NhY2hlOnonLCAnLXYnLCAnL3Zhci90bXAvcGF0Y2hldy10
-ZXN0ZXItdG1wLWNjY3J4ZzNjL3NyYy9kb2NrZXItc3JjLjIwMjAtMDgtMTUtMTMuMDkuMDMuMTI1
-NTE6L3Zhci90bXAvcWVtdTp6LHJvJywgJ3FlbXUvY2VudG9zNycsICcvdmFyL3RtcC9xZW11L3J1
-bicsICd0ZXN0LXF1aWNrJ10nIHJldHVybmVkIG5vbi16ZXJvIGV4aXQgc3RhdHVzIDIuCmZpbHRl
-cj0tLWZpbHRlcj1sYWJlbD1jb20ucWVtdS5pbnN0YW5jZS51dWlkPWYxZDgxYWE5MDY2MjQzMGRi
-ZmJiYWZlZGI2YmU3OTJkCm1ha2VbMV06ICoqKiBbZG9ja2VyLXJ1bl0gRXJyb3IgMQptYWtlWzFd
-OiBMZWF2aW5nIGRpcmVjdG9yeSBgL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLWNjY3J4ZzNj
-L3NyYycKbWFrZTogKioqIFtkb2NrZXItcnVuLXRlc3QtcXVpY2tAY2VudG9zN10gRXJyb3IgMgoK
-cmVhbCAgICAzbTkuNjYxcwp1c2VyICAgIDBtOC4yNzJzCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWls
-YWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8xNTk3NDQwODM1MzYuMzkxOTcuMTM4Mjc3
-NzY2MzM4NjY2MDEyNzguc3RnaXRAbmFwbGVzLWJhYnUuYW1kLmNvbS90ZXN0aW5nLmRvY2tlci1x
-dWlja0BjZW50b3M3Lz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGlj
-YWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIg
-ZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+--0000000000004a575d05acedabef
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hey Philippe,
+
+Thanks for the detailed comments! I have a couple of questions.
+
+
+   1. I'll modify the patch to just include a fallthrough comment instead
+   of an attribute. How do I include the v4 version number in the patch? Do=
+ I
+   erase the last commit on my branch or fork from the master and start the
+   work again and label it as v4?
+   2. I am trying to find some issues of interest, starting through which I
+   can go to bigger contributions. Do you have any suggestions on how I mig=
+ht
+   do that? For now, I am trying to tackle the bite sized issues to find my
+   way around the code base. I would like to move to substantial contributi=
+ons.
+   3. I have a background in CS theory, but its been 2 years since I
+   graduated from my Master's so I am a bit rusty on some stuff. How much C=
+S
+   theory (like compilers and OS) do I need to know if I want to contribute=
+?
+
+
+Thanks,
+Rohit.
+
+On Sat, Aug 15, 2020 at 11:24 AM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
+rg>
+wrote:
+
+> Hi Rohit,
+>
+> Congratulation for your first patch! It is in very
+> good shape already :)
+>
+> It is easier for the reviewers if you start the patch subject with
+> the name of the subsystem concerned, or the file modified:
+>
+> "qapi/opts-visitor: Add missing fallthrough annotations"
+>
+> On 8/15/20 3:00 PM, Rohit Shinde wrote:
+> > Added the fallthrough comment so that the compiler doesn't emit an erro=
+r
+> on compiling with the -Wimplicit-fallthrough flag.
+>
+> If possible align the description to 72 chars.
+>
+> >
+> > Signed off by: Rohit Shinde
+>
+> The tag is written "Signed-off-by" with '-', then your "name <email>":
+>
+> Signed-off-by: Rohit Shinde <rohit.shinde12194@gmail.com>
+>
+> If you configure your git client, using 'git-commit -s' will
+> automatically add the S-o-b tag:
+>
+> $ git config user.name "Rohit Shinde"
+> $ git config user.email "rohit.shinde12194@gmail.com"
+> $ git commit -s
+>
+> > ---
+> >  qapi/opts-visitor.c | 1 +
+> >  1 file changed, 1 insertion(+)
+> >
+> > diff --git a/qapi/opts-visitor.c b/qapi/opts-visitor.c
+> > index 7781c23a42..43cf60d3a0 100644
+> > --- a/qapi/opts-visitor.c
+> > +++ b/qapi/opts-visitor.c
+> > @@ -266,6 +266,7 @@ opts_next_list(Visitor *v, GenericList *tail, size_=
+t
+> size)
+> >          }
+> >          ov->list_mode =3D LM_IN_PROGRESS;
+> >          /* range has been completed, fall through in order to pop
+> option */
+> > +        __attribute__((fallthrough));
+>
+> C uses attributes when declaring a type/variable/function.
+> Here this is inside a function body, not a declaration.
+> A simple "/* fallthrough */" comment will make the compiler happy.
+> You can see a similar patch for example:
+>
+> https://git.qemu.org/?p=3Dqemu.git;a=3Dblobdiff;f=3Ddisas/sh4.c;h=3Ddcdbd=
+f26d8;hp=3D55ef865a3;hb=3Dccb237090f;hpb=3D7aa12aa215
+>
+> When you find an issue that might have already been fixed elsewhere
+> in the repository, 'git-log -p' is your friend. Since the commits are
+> patches already accepted/merged, they might be a good source to learn
+> (how the issue was fixed, how the bug was described, ...).
+
+
+> Regards,
+>
+> Phil.
+>
+> >
+> >      case LM_IN_PROGRESS: {
+> >          const QemuOpt *opt;
+> >
+>
+>
+
+--0000000000004a575d05acedabef
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div dir=3D"ltr">Hey Philippe,<div><br></div><div>Thanks f=
+or the detailed comments! I have a couple of questions.</div><div><br></div=
+><div><ol><li>I&#39;ll modify the patch to just include a fallthrough comme=
+nt instead of an attribute. How do I include the v4 version number in the p=
+atch? Do I erase the last commit on my branch or fork from the master and s=
+tart the work again and label it as v4?</li><li>I am trying to find some is=
+sues of interest, starting through which I can go to bigger contributions. =
+Do you have any suggestions on how I might do that? For now, I am trying to=
+ tackle the bite sized issues to find my way around the code base. I would =
+like to move to substantial contributions.</li><li>I have a background in C=
+S theory, but its been 2 years since I graduated from my Master&#39;s so I =
+am a bit rusty on some stuff. How much CS theory (like compilers and OS) do=
+ I need to know if I want to contribute?</li></ol><div><br></div><div>Thank=
+s,</div><div>Rohit.</div></div></div><br><div class=3D"gmail_quote"><div di=
+r=3D"ltr" class=3D"gmail_attr">On Sat, Aug 15, 2020 at 11:24 AM Philippe Ma=
+thieu-Daud=C3=A9 &lt;<a href=3D"mailto:f4bug@amsat.org">f4bug@amsat.org</a>=
+&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px =
+0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">Hi R=
+ohit,<br>
+<br>
+Congratulation for your first patch! It is in very<br>
+good shape already :)<br>
+<br>
+It is easier for the reviewers if you start the patch subject with<br>
+the name of the subsystem concerned, or the file modified:<br>
+<br>
+&quot;qapi/opts-visitor: Add missing fallthrough annotations&quot;<br>
+<br>
+On 8/15/20 3:00 PM, Rohit Shinde wrote:<br>
+&gt; Added the fallthrough comment so that the compiler doesn&#39;t emit an=
+ error on compiling with the -Wimplicit-fallthrough flag.<br>
+<br>
+If possible align the description to 72 chars.<br>
+<br>
+&gt; <br>
+&gt; Signed off by: Rohit Shinde<br>
+<br>
+The tag is written &quot;Signed-off-by&quot; with &#39;-&#39;, then your &q=
+uot;name &lt;email&gt;&quot;:<br>
+<br>
+Signed-off-by: Rohit Shinde &lt;<a href=3D"mailto:rohit.shinde12194@gmail.c=
+om" target=3D"_blank">rohit.shinde12194@gmail.com</a>&gt;<br>
+<br>
+If you configure your git client, using &#39;git-commit -s&#39; will<br>
+automatically add the S-o-b tag:<br>
+<br>
+$ git config <a href=3D"http://user.name" rel=3D"noreferrer" target=3D"_bla=
+nk">user.name</a> &quot;Rohit Shinde&quot;<br>
+$ git config user.email &quot;<a href=3D"mailto:rohit.shinde12194@gmail.com=
+" target=3D"_blank">rohit.shinde12194@gmail.com</a>&quot;<br>
+$ git commit -s<br>
+<br>
+&gt; ---<br>
+&gt;=C2=A0 qapi/opts-visitor.c | 1 +<br>
+&gt;=C2=A0 1 file changed, 1 insertion(+)<br>
+&gt; <br>
+&gt; diff --git a/qapi/opts-visitor.c b/qapi/opts-visitor.c<br>
+&gt; index 7781c23a42..43cf60d3a0 100644<br>
+&gt; --- a/qapi/opts-visitor.c<br>
+&gt; +++ b/qapi/opts-visitor.c<br>
+&gt; @@ -266,6 +266,7 @@ opts_next_list(Visitor *v, GenericList *tail, size=
+_t size)<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ov-&gt;list_mode =3D LM_IN_PROGRESS;=
+<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 /* range has been completed, fall th=
+rough in order to pop option */<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 __attribute__((fallthrough));<br>
+<br>
+C uses attributes when declaring a type/variable/function.<br>
+Here this is inside a function body, not a declaration.<br>
+A simple &quot;/* fallthrough */&quot; comment will make the compiler happy=
+.<br>
+You can see a similar patch for example:<br>
+<a href=3D"https://git.qemu.org/?p=3Dqemu.git;a=3Dblobdiff;f=3Ddisas/sh4.c;=
+h=3Ddcdbdf26d8;hp=3D55ef865a3;hb=3Dccb237090f;hpb=3D7aa12aa215" rel=3D"nore=
+ferrer" target=3D"_blank">https://git.qemu.org/?p=3Dqemu.git;a=3Dblobdiff;f=
+=3Ddisas/sh4.c;h=3Ddcdbdf26d8;hp=3D55ef865a3;hb=3Dccb237090f;hpb=3D7aa12aa2=
+15</a><br>
+<br>
+When you find an issue that might have already been fixed elsewhere<br>
+in the repository, &#39;git-log -p&#39; is your friend. Since the commits a=
+re<br>
+patches already accepted/merged, they might be a good source to learn<br>
+(how the issue was fixed, how the bug was described, ...).=C2=A0</blockquot=
+e><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;borde=
+r-left:1px solid rgb(204,204,204);padding-left:1ex">
+<br>
+Regards,<br>
+<br>
+Phil.<br>
+<br>
+&gt;=C2=A0 <br>
+&gt;=C2=A0 =C2=A0 =C2=A0 case LM_IN_PROGRESS: {<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 const QemuOpt *opt;<br>
+&gt; <br>
+<br>
+</blockquote></div></div>
+
+--0000000000004a575d05acedabef--
 
