@@ -2,91 +2,89 @@ Return-Path: <SRS0=PlQC=BZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 349A4C433E1
-	for <qemu-devel@archiver.kernel.org>; Sat, 15 Aug 2020 16:58:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29AB2C433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 15 Aug 2020 17:06:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ED7A123B18
-	for <qemu-devel@archiver.kernel.org>; Sat, 15 Aug 2020 16:58:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E07CE23AA0
+	for <qemu-devel@archiver.kernel.org>; Sat, 15 Aug 2020 17:06:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W32Mdrbs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED7A123B18
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZXaSMdBA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E07CE23AA0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58356 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34350 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k6zVk-00083Q-92
-	for qemu-devel@archiver.kernel.org; Sat, 15 Aug 2020 12:58:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40640)
+	id 1k6zdQ-0002L9-5W
+	for qemu-devel@archiver.kernel.org; Sat, 15 Aug 2020 13:06:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42400)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <danielhb413@gmail.com>)
- id 1k6zV6-0007Um-73; Sat, 15 Aug 2020 12:57:48 -0400
-Received: from mail-vs1-xe44.google.com ([2607:f8b0:4864:20::e44]:41246)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1k6zck-0001uK-OF
+ for qemu-devel@nongnu.org; Sat, 15 Aug 2020 13:05:42 -0400
+Received: from mail-vs1-xe42.google.com ([2607:f8b0:4864:20::e42]:41300)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <danielhb413@gmail.com>)
- id 1k6zV4-0000Qv-KZ; Sat, 15 Aug 2020 12:57:47 -0400
-Received: by mail-vs1-xe44.google.com with SMTP id y8so6207844vsq.8;
- Sat, 15 Aug 2020 09:57:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1k6zci-0001Fn-RZ
+ for qemu-devel@nongnu.org; Sat, 15 Aug 2020 13:05:42 -0400
+Received: by mail-vs1-xe42.google.com with SMTP id y8so6214799vsq.8
+ for <qemu-devel@nongnu.org>; Sat, 15 Aug 2020 10:05:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=QhUbY4D4iyRK40TzD9Y23365Paz8ar+9JQzeCK3jAbI=;
- b=W32MdrbsOEQev3So74vDtyL6MuBhOlGqrcpDqSgXcdFOacc2hM3wUh9iQM734pwC7l
- iQRYObiVZz04q2Sb2vew4IGr7knyLwwtRwIK1jUZ28JuptPM6ifHX97sonv+ZKeDP5MA
- e5Lm2PVjOncm505Er76Oi5w8ViKfamQHU4UNLfiac+mL+fA9E9pCk27mO1H1WLPfYOXG
- AVnbdUuSkbhM7alcsyv0zehtLqzHYhKhjB5xv6OcpSwWHXv1FENDWI5uHsn2zPpHam2c
- M5N+VcqGIS5NkSQNlEJAswpN9Ag9I/EJKLJfNQbdV0Sc1nePFYNhEOxjfMoojpUbGGa3
- U9mQ==
+ bh=13iDMrHB1KJoXoePiZR2R7O74YXAoVM8bGBrZHlUo/Q=;
+ b=ZXaSMdBA1dKdayya5wF/mC1h5ohEFE3DXamlItJIzh+iz1gwu1zhmY971tu5h1CEIV
+ K+oB5ZrXfK82etO8HzqMYnhzZUEbEQ/scApzwXX8F6knQ++jQxkoPUBOihfuJrCWItQ6
+ Smzlpy3xqMivwQtyJKv6beiwhpAH4ACg5r/v6hSzWekjl+tHKG6vd6cPy5gdJ6vNgfFO
+ ULaMBMNZyd2cKsewyfS5O/ig759hktDgOusQTIxezlOpGw7PHEPAB+86pmziRNmZnuj7
+ Wdh9PkM/hx3hxZteCNwy4j6Df1qwRnP/DHWMlg/4kkwQdJjS9mTUvPdeF7hMO7d61Xu0
+ je1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=QhUbY4D4iyRK40TzD9Y23365Paz8ar+9JQzeCK3jAbI=;
- b=GtCUaS+qOb5LpJvxZhIDM+zdPslN4TzOK1p3qLGN4VaZvOnxyJ+sm5RFiglTAPyhs7
- BFY/InGnsBTGJy0KYPMnbYwEH8frUSOdCAonMXtokHY5u0D1/mcH6MzMRGkXqyeYqdFk
- RBZeyo0OppqRLSpl/sJoGJoLv7niMkqcueL+ORd9LbcK0x8a0bNRLeIWyJnvVmvEoXTA
- Hu//K46uKUq4ZwTmXdJm9UylXGnstAVLIQ1fVUC+x08cTPvLGunwrBd9G3e4mIolfnlr
- cdfYbF4sJK6LiJzrwY69hCfqP/rLZkFu8wMTERp5qjYLCAtWzg6Y1vpWgmxcF5UtduS6
- ErpQ==
-X-Gm-Message-State: AOAM532tt3Jpj1LXkoyzjH5VvgCpfu5AVaC9QGlI5InjYGHc1zZHVIKQ
- ujUCbolEkma5lsgY7uPichmveywEaIGsoA==
-X-Google-Smtp-Source: ABdhPJwQKPZyG6C+NjbJvTmmEOV3QDDLSpN3z5ZBpp4cCh3YkIrGX8qKLgg5wzPURhYCXqXm1jSEkw==
-X-Received: by 2002:a05:6214:12b4:: with SMTP id
- w20mr4421242qvu.32.1597438486131; 
- Fri, 14 Aug 2020 13:54:46 -0700 (PDT)
-Received: from rekt.ibmuc.com ([2804:431:c7c6:303f:d1dc:35d8:e9f6:c8b])
- by smtp.gmail.com with ESMTPSA id p33sm12301018qtp.49.2020.08.14.13.54.44
+ bh=13iDMrHB1KJoXoePiZR2R7O74YXAoVM8bGBrZHlUo/Q=;
+ b=Nl4PTEIcVP+dFfD44fLqNH7jMDZ3eBVnxtcWgzmFP97e5vVvr2itmd7MHgQ5f+ZQmJ
+ sLuO/ci0RS63R6SXj/rapWfj7MGEVwgfMvQOfF2kyuDNXR68SFAe1Y/N7+h1M5S4TZjz
+ ix6Zp91U4f485Mphq8CKbB5KD8dng99C8bCBC3DvC9XqJvAK2TypWIL2nqn2SiScZSNV
+ xe0FnbITrg+3KZWYCmn3qV1sxO7t6nTSbGdhDg4+1wTtaCkp8g6QfvJIFaX2/cWvrl2X
+ VT3dQ8HeTVZ+L7Uxp41YF/cRS710AMznyXhScIc5xlvfisOmhMc12pnv2Fj/le4+ZXmZ
+ 4Rgg==
+X-Gm-Message-State: AOAM530+CFBqo2tKHHUulRSZ6HOGf6Q13aPHrH2/mZKRW1SDmL+ROOzv
+ WD8R17oz6l/nrGruVEXwmQ4ltc6w2TlFNg==
+X-Google-Smtp-Source: ABdhPJwaagQ+DJMkz++nuby27VgKrRCmUKLdrTR1B7mTLuv2eJuJyWbm0xiqfTipvP7gLuuDwDgOBw==
+X-Received: by 2002:a62:17c1:: with SMTP id 184mr3619805pfx.136.1597455121146; 
+ Fri, 14 Aug 2020 18:32:01 -0700 (PDT)
+Received: from localhost.localdomain ([71.212.141.89])
+ by smtp.gmail.com with ESMTPSA id y196sm10625528pfc.202.2020.08.14.18.31.59
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 14 Aug 2020 13:54:45 -0700 (PDT)
-From: Daniel Henrique Barboza <danielhb413@gmail.com>
+ Fri, 14 Aug 2020 18:32:00 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 05/10] spapr: make ibm,
- max-associativity-domains scale with user input
-Date: Fri, 14 Aug 2020 17:54:19 -0300
-Message-Id: <20200814205424.543857-6-danielhb413@gmail.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200814205424.543857-1-danielhb413@gmail.com>
-References: <20200814205424.543857-1-danielhb413@gmail.com>
+Subject: [PATCH 10/20] target/arm: Split out gen_gvec_ool_zzp
+Date: Fri, 14 Aug 2020 18:31:35 -0700
+Message-Id: <20200815013145.539409-11-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200815013145.539409-1-richard.henderson@linaro.org>
+References: <20200815013145.539409-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::e44;
- envelope-from=danielhb413@gmail.com; helo=mail-vs1-xe44.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::e42;
+ envelope-from=richard.henderson@linaro.org; helo=mail-vs1-xe42.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -101,70 +99,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Daniel Henrique Barboza <danielhb413@gmail.com>, qemu-ppc@nongnu.org,
- david@gibson.dropbear.id.au
+Cc: peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The ibm,max-associativity-domains is considering that only a single
-associativity domain can exist in the same NUMA level. This is true
-today because we do not support any type of NUMA distance user
-customization, and all nodes are in the same distance to each other.
+Model after gen_gvec_fn_zzz et al.
 
-To enhance NUMA distance support in the pSeries machine we need to
-make this limit flexible. This patch rewrites the max-associativity
-logic to consider that multiple associativity domains can co-exist
-in the same NUMA level. We're using the legacy_numa() helper to
-avoid leaking unneeded guest changes.
-
-Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- hw/ppc/spapr.c | 18 ++++++++++++++++--
- 1 file changed, 16 insertions(+), 2 deletions(-)
+ target/arm/translate-sve.c | 29 ++++++++++++++---------------
+ 1 file changed, 14 insertions(+), 15 deletions(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 073a59c47d..b0c4b80a23 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -919,13 +919,20 @@ static void spapr_dt_rtas(SpaprMachineState *spapr, void *fdt)
-         cpu_to_be32(SPAPR_MEMORY_BLOCK_SIZE & 0xffffffff),
-         cpu_to_be32(ms->smp.max_cpus / ms->smp.threads),
-     };
--    uint32_t maxdomain = cpu_to_be32(spapr->extra_numa_nodes > 1 ? 1 : 0);
-+
-+    /* The maximum domains for a given NUMA level, supposing that every
-+     * additional NUMA node belongs to the same domain (aside from the
-+     * 4th level, where we must support all available NUMA domains), is
-+     * total number of domains - 1. */
-+    uint32_t total_nodes_number = ms->numa_state->num_nodes +
-+                                  spapr->extra_numa_nodes;
-+    uint32_t maxdomain = cpu_to_be32(total_nodes_number - 1);
-     uint32_t maxdomains[] = {
-         cpu_to_be32(4),
-         maxdomain,
-         maxdomain,
-         maxdomain,
--        cpu_to_be32(ms->numa_state->num_nodes + spapr->extra_numa_nodes),
-+        cpu_to_be32(total_nodes_number),
-     };
+diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
+index ea6058f7ef..3361e1c01f 100644
+--- a/target/arm/translate-sve.c
++++ b/target/arm/translate-sve.c
+@@ -142,6 +142,17 @@ static int pred_gvec_reg_size(DisasContext *s)
+     return size_for_gvec(pred_full_reg_size(s));
+ }
  
-     _FDT(rtas = fdt_add_subnode(fdt, 0, "rtas"));
-@@ -962,6 +969,13 @@ static void spapr_dt_rtas(SpaprMachineState *spapr, void *fdt)
-                      qemu_hypertas->str, qemu_hypertas->len));
-     g_string_free(qemu_hypertas, TRUE);
- 
-+    if (spapr_machine_using_legacy_numa(spapr)) {
-+        maxdomain = cpu_to_be32(spapr->extra_numa_nodes > 1 ? 1 : 0);
-+        maxdomains[1] = maxdomain;
-+        maxdomains[2] = maxdomain;
-+        maxdomains[3] = maxdomain;
-+    }
++/* Invoke an out-of-line helper on 2 Zregs and a predicate. */
++static void gen_gvec_ool_zzp(DisasContext *s, gen_helper_gvec_3 *fn,
++                             int rd, int rn, int pg, int data)
++{
++    unsigned vsz = vec_full_reg_size(s);
++    tcg_gen_gvec_3_ool(vec_full_reg_offset(s, rd),
++                       vec_full_reg_offset(s, rn),
++                       pred_full_reg_offset(s, pg),
++                       vsz, vsz, data, fn);
++}
 +
-     if (smc->pre_5_1_assoc_refpoints) {
-         nr_refpoints = 2;
+ /* Invoke an out-of-line helper on 3 Zregs and a predicate. */
+ static void gen_gvec_ool_zzzp(DisasContext *s, gen_helper_gvec_4 *fn,
+                               int rd, int rn, int rm, int pg, int data)
+@@ -415,11 +426,7 @@ static bool do_zpz_ool(DisasContext *s, arg_rpr_esz *a, gen_helper_gvec_3 *fn)
+         return false;
      }
+     if (sve_access_check(s)) {
+-        unsigned vsz = vec_full_reg_size(s);
+-        tcg_gen_gvec_3_ool(vec_full_reg_offset(s, a->rd),
+-                           vec_full_reg_offset(s, a->rn),
+-                           pred_full_reg_offset(s, a->pg),
+-                           vsz, vsz, 0, fn);
++        gen_gvec_ool_zzp(s, fn, a->rd, a->rn, a->pg, 0);
+     }
+     return true;
+ }
+@@ -603,11 +610,7 @@ static bool do_movz_zpz(DisasContext *s, int rd, int rn, int pg,
+     };
+ 
+     if (sve_access_check(s)) {
+-        unsigned vsz = vec_full_reg_size(s);
+-        tcg_gen_gvec_3_ool(vec_full_reg_offset(s, rd),
+-                           vec_full_reg_offset(s, rn),
+-                           pred_full_reg_offset(s, pg),
+-                           vsz, vsz, invert, fns[esz]);
++        gen_gvec_ool_zzp(s, fns[esz], rd, rn, pg, invert);
+     }
+     return true;
+ }
+@@ -616,11 +619,7 @@ static bool do_zpzi_ool(DisasContext *s, arg_rpri_esz *a,
+                         gen_helper_gvec_3 *fn)
+ {
+     if (sve_access_check(s)) {
+-        unsigned vsz = vec_full_reg_size(s);
+-        tcg_gen_gvec_3_ool(vec_full_reg_offset(s, a->rd),
+-                           vec_full_reg_offset(s, a->rn),
+-                           pred_full_reg_offset(s, a->pg),
+-                           vsz, vsz, a->imm, fn);
++        gen_gvec_ool_zzp(s, fn, a->rd, a->rn, a->pg, a->imm);
+     }
+     return true;
+ }
 -- 
-2.26.2
+2.25.1
 
 
