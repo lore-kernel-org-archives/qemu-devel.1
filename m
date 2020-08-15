@@ -2,76 +2,91 @@ Return-Path: <SRS0=PlQC=BZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11273C433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 15 Aug 2020 17:33:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32EC7C433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 15 Aug 2020 17:41:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D712023B30
-	for <qemu-devel@archiver.kernel.org>; Sat, 15 Aug 2020 17:33:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D712023B30
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id F02D423B30
+	for <qemu-devel@archiver.kernel.org>; Sat, 15 Aug 2020 17:41:19 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="N2LWH/Or"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F02D423B30
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57484 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35216 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k703e-0005Mv-4k
-	for qemu-devel@archiver.kernel.org; Sat, 15 Aug 2020 13:33:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47188)
+	id 1k70BD-00085q-5B
+	for qemu-devel@archiver.kernel.org; Sat, 15 Aug 2020 13:41:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48438)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhang.zhanghailiang@huawei.com>)
- id 1k702z-0004o4-E6
- for qemu-devel@nongnu.org; Sat, 15 Aug 2020 13:32:49 -0400
-Received: from szxga08-in.huawei.com ([45.249.212.255]:38434 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhang.zhanghailiang@huawei.com>)
- id 1k702v-0003yV-6u
- for qemu-devel@nongnu.org; Sat, 15 Aug 2020 13:32:49 -0400
-Received: from dggeme755-chm.china.huawei.com (unknown [172.30.72.54])
- by Forcepoint Email with ESMTP id 45715AF9DFA837BB4E25;
- Sat, 15 Aug 2020 09:41:54 +0800 (CST)
-Received: from dggeme756-chm.china.huawei.com (10.3.19.102) by
- dggeme755-chm.china.huawei.com (10.3.19.101) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1913.5; Sat, 15 Aug 2020 09:41:54 +0800
-Received: from dggeme756-chm.china.huawei.com ([10.6.80.68]) by
- dggeme756-chm.china.huawei.com ([10.6.80.68]) with mapi id 15.01.1913.007;
- Sat, 15 Aug 2020 09:41:53 +0800
-From: Zhanghailiang <zhang.zhanghailiang@huawei.com>
-To: Derek Su <jwsu1986@gmail.com>, Lukas Straub <lukasstraub2@web.de>
-Subject: RE: [PATCH v1 0/1] COLO: migrate dirty ram pages before colo
- checkpoint
-Thread-Topic: [PATCH v1 0/1] COLO: migrate dirty ram pages before colo
- checkpoint
-Thread-Index: AQHWR3EcmDhsnQsjxEWJOGaLUtyUkKkhCgeAgBSZrwCAAxEEsA==
-Date: Sat, 15 Aug 2020 01:41:53 +0000
-Message-ID: <d42f662dc48c4e42b6bf687563bfc3c9@huawei.com>
-References: <20200621021004.5559-1-dereksu@qnap.com>
- <20200731094940.7a26e583@luklap>
- <CAFKS8hWT1ieRkZcV4Q1ReC4X2wAXKteWB1VkEB7NesT2T-s_Kg@mail.gmail.com>
-In-Reply-To: <CAFKS8hWT1ieRkZcV4Q1ReC4X2wAXKteWB1VkEB7NesT2T-s_Kg@mail.gmail.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.174.185.139]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1k70AM-0007gJ-St
+ for qemu-devel@nongnu.org; Sat, 15 Aug 2020 13:40:26 -0400
+Received: from mail-qv1-xf34.google.com ([2607:f8b0:4864:20::f34]:34745)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1k70AL-0004r6-40
+ for qemu-devel@nongnu.org; Sat, 15 Aug 2020 13:40:26 -0400
+Received: by mail-qv1-xf34.google.com with SMTP id t6so5849298qvw.1
+ for <qemu-devel@nongnu.org>; Sat, 15 Aug 2020 10:40:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=Dt3CKviEUaIARP3VoTRcas5wkm8EDq7dhBzT1P07KmY=;
+ b=N2LWH/OrQhwtQi1q9rkIfT8KvyE3KjDBucs5l/nbT4+PFvvgbbLDqtNJOsJIZcVGCB
+ lwlFBZcTP9XATBbneSUqQxJxTB802wyRzLD1+UtQJ67KmGTnECXBcSpMypVsjYhHQbvz
+ yeu/jcg13ekCu6EE4D88I1pQeEtAWkR8eR4eIsvn1J1TpZscgju5SKOtlNo8CdyISrXT
+ P1YTbanhKrVNiQN+D+o0/jtJpyl9h2m9GNssr3UeGC0aStG501WSrGC4H4rUsEF9P5n6
+ eqwJvlbjtYVmMZFE+McVouXgIXqsBidoTXjICjIzr2+UZN4ZCf8tR+KdK6+m4OhuYJb5
+ Ea+Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=Dt3CKviEUaIARP3VoTRcas5wkm8EDq7dhBzT1P07KmY=;
+ b=rXU+kWYHYbXm7pcTtQClYEllUcR9uxoUdwZUDBfpB1BEJ54RNgYBuLScLZKyY8+4Sa
+ /exejGJzGZik2Rs4fomcMmPmbkfp/fXJ4zKYF+/XHmuZtqx9CIMWs1aP1FudyFrrxLrL
+ 36yEKAxGCPRM+SL9QUwkH4k/llJ6f0MiIgiPmCI7kxPuT3HgOJUgmIWds+zDEnonSBGU
+ ci5qzmxLxsEzO2RaP1TDwX2/vyFUUiBFphAmzi5iisWGVyGw6OYp1OlCE5Vo2vVCLxsL
+ aml9Ji7JhnwzM/QIJ7DMmPOaPhlXvQ1KHkwaN3ItemLirXlTPKwJr5uIlw/etEiUB5tI
+ 3lnA==
+X-Gm-Message-State: AOAM533VYTjlK4boySeDwyjcmPGLIFyxN4rskiCSrutFUg5lNtrE5SAM
+ suVr/E2nM1mhyorhbjpiE9nnXW3q/4sceQ==
+X-Google-Smtp-Source: ABdhPJw8CO5SjYGiL3HJZfXvuZOqXjbdRb9J3jsbQExHhtNtvvMRivdCo8pV1cShZP5ZGk8Ya+tUFQ==
+X-Received: by 2002:a62:7f15:: with SMTP id a21mr3690539pfd.191.1597455126728; 
+ Fri, 14 Aug 2020 18:32:06 -0700 (PDT)
+Received: from localhost.localdomain ([71.212.141.89])
+ by smtp.gmail.com with ESMTPSA id y196sm10625528pfc.202.2020.08.14.18.32.05
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 14 Aug 2020 18:32:06 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 14/20] target/arm: Generalize inl_qrdmlah_* helper functions
+Date: Fri, 14 Aug 2020 18:31:39 -0700
+Message-Id: <20200815013145.539409-15-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200815013145.539409-1-richard.henderson@linaro.org>
+References: <20200815013145.539409-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.255;
- envelope-from=zhang.zhanghailiang@huawei.com; helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/15 13:32:32
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::f34;
+ envelope-from=richard.henderson@linaro.org; helo=mail-qv1-xf34.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -84,120 +99,186 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "chyang@qnap.com" <chyang@qnap.com>,
- "quintela@redhat.com" <quintela@redhat.com>, Derek Su <dereksu@qnap.com>,
- "dgilbert@redhat.com" <dgilbert@redhat.com>,
- "ctcheng@qnap.com" <ctcheng@qnap.com>
+Cc: peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBEZXJlayBTdSBbbWFpbHRvOmp3
-c3UxOTg2QGdtYWlsLmNvbV0NCj4gU2VudDogVGh1cnNkYXksIEF1Z3VzdCAxMywgMjAyMCA2OjI4
-IFBNDQo+IFRvOiBMdWthcyBTdHJhdWIgPGx1a2Fzc3RyYXViMkB3ZWIuZGU+DQo+IENjOiBEZXJl
-ayBTdSA8ZGVyZWtzdUBxbmFwLmNvbT47IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZzsgWmhhbmdoYWls
-aWFuZw0KPiA8emhhbmcuemhhbmdoYWlsaWFuZ0BodWF3ZWkuY29tPjsgY2h5YW5nQHFuYXAuY29t
-OyBxdWludGVsYUByZWRoYXQuY29tOw0KPiBkZ2lsYmVydEByZWRoYXQuY29tOyBjdGNoZW5nQHFu
-YXAuY29tDQo+IFN1YmplY3Q6IFJlOiBbUEFUQ0ggdjEgMC8xXSBDT0xPOiBtaWdyYXRlIGRpcnR5
-IHJhbSBwYWdlcyBiZWZvcmUgY29sbw0KPiBjaGVja3BvaW50DQo+IA0KPiBPbiBGcmksIEp1bCAz
-MSwgMjAyMCBhdCAzOjUyIFBNIEx1a2FzIFN0cmF1YiA8bHVrYXNzdHJhdWIyQHdlYi5kZT4gd3Jv
-dGU6DQo+ID4NCj4gPiBPbiBTdW4sIDIxIEp1biAyMDIwIDEwOjEwOjAzICswODAwDQo+ID4gRGVy
-ZWsgU3UgPGRlcmVrc3VAcW5hcC5jb20+IHdyb3RlOg0KPiA+DQo+ID4gPiBUaGlzIHNlcmllcyBp
-cyB0byByZWR1Y2UgdGhlIGd1ZXN0J3MgZG93bnRpbWUgZHVyaW5nIGNvbG8gY2hlY2twb2ludA0K
-PiA+ID4gYnkgbWlncmF0aW5nIGRpcnR5IHJhbSBwYWdlcyBhcyBtYW55IGFzIHBvc3NpYmxlIGJl
-Zm9yZSBjb2xvIGNoZWNrcG9pbnQuDQo+ID4gPg0KPiA+ID4gSWYgdGhlIGl0ZXJhdGlvbiBjb3Vu
-dCByZWFjaGVzIENPTE9fUkFNX01JR1JBVEVfSVRFUkFUSU9OX01BWCBvciByYW0NCj4gPiA+IHBl
-bmRpbmcgc2l6ZSBpcyBsb3dlciB0aGFuICd4LWNvbG8tbWlncmF0ZS1yYW0tdGhyZXNob2xkJywg
-c3RvcCB0aGUNCj4gPiA+IHJhbSBtaWdyYXRpb24gYW5kIGRvIGNvbG8gY2hlY2twb2ludC4NCj4g
-PiA+DQo+ID4gPiBUZXN0IGVudmlyb25tZW50Og0KPiA+ID4gVGhlIGJvdGggcHJpbWFyeSBWTSBh
-bmQgc2Vjb25kYXJ5IFZNIGhhcyAxR2lCIHJhbSBhbmQgMTBHYkUgTklDIGZvcg0KPiA+ID4gRlQg
-dHJhZmZpYy4NCj4gPiA+IE9uZSBmaW8gYnVmZmVyIHdyaXRlIGpvYiBydW5zIG9uIHRoZSBndWVz
-dC4NCj4gPiA+IFRoZSByZXN1bHQgc2hvd3MgdGhlIHRvdGFsIHByaW1hcnkgVk0gZG93bnRpbWUg
-aXMgZGVjcmVhc2VkIGJ5IH40MCUuDQo+ID4gPg0KPiA+ID4gUGxlYXNlIGhlbHAgdG8gcmV2aWV3
-IGl0IGFuZCBzdWdnZXN0aW9ucyBhcmUgd2VsY29tZWQuDQo+ID4gPiBUaGFua3MuDQo+ID4NCj4g
-PiBIZWxsbyBEZXJlaywNCj4gPiBTb3JyeSBmb3IgdGhlIGxhdGUgcmVwbHkuDQo+ID4gSSB0aGlu
-ayB0aGlzIGlzIG5vdCBhIGdvb2QgaWRlYSwgYmVjYXVzZSBpdCB1bm5lY2Vzc2FyaWx5IGludHJv
-ZHVjZXMgYSBkZWxheQ0KPiBiZXR3ZWVuIGNoZWNrcG9pbnQgcmVxdWVzdCBhbmQgdGhlIGNoZWNr
-cG9pbnQgaXRzZWxmIGFuZCB0aHVzIGltcGFpcnMgbmV0d29yaw0KPiBib3VuZCB3b3JrbG9hZHMg
-ZHVlIHRvIGluY3JlYXNlZCBuZXR3b3JrIGxhdGVuY3kuIFdvcmtsb2FkcyB0aGF0IGFyZQ0KPiBp
-bmRlcGVuZGVudCBmcm9tIG5ldHdvcmsgZG9uJ3QgY2F1c2UgbWFueSBjaGVja3BvaW50cyBhbnl3
-YXksIHNvIGl0IGRvZXNuJ3QNCj4gaGVscCB0aGVyZSBlaXRoZXIuDQo+ID4NCj4gDQoNCkhpIERl
-cmVrLA0KDQpBY3R1YWxseSwgVGhlcmUgaXMgYSBxdWl0IGludGVyZXN0aW5nIHF1ZXN0aW9uIHdl
-IHNob3VsZCB0aGluazogDQpXaGF0IHdpbGwgaGFwcGVuIGlmIFZNIGNvbnRpbnVlcyB0byBydW4g
-YWZ0ZXIgZGV0ZWN0ZWQgYSBtaXNtYXRjaGVkIHN0YXRlIGJldHdlZW4gUFZNIGFuZCBTVk0sDQpB
-Y2NvcmRpbmcgdG8gdGhlIHJ1bGVzIG9mIENPTE8sIHdlIHNob3VsZCBzdG9wIFZNcyBpbW1lZGlh
-dGVseSB0byBzeW5jIHRoZSBzdGF0ZSBiZXR3ZWVuIFBWTSBhbmQgU1ZNLA0KQnV0IGhlcmUsIHlv
-dSBjaG9vc2UgdGhlbSB0byBjb250aW51ZSB0byBydW4gZm9yIGEgd2hpbGUsIHRoZW4gdGhlcmUg
-bWF5IGJlIG1vcmUgY2xpZW50J3MgbmV0d29yayBwYWNrYWdlcw0KQ29taW5nLCBhbmQgbWF5IGNh
-dXNlIG1vcmUgbWVtb3J5IHBhZ2VzIGRpcnR5LCBhbm90aGVyIHNpZGUgZWZmZWN0IGlzIHRoZSBu
-ZXcgbmV0d29yayBwYWNrYWdlcyB3aWxsIG5vdA0KQmUgc2VudCBvdXQgd2l0aCBoaWdoIHByb2Jh
-YmlsaXR5LCBiZWNhdXNlIHRoZWlyIHJlcGxpZXMgc2hvdWxkIGJlIGRpZmZlcmVudCBzaW5jZSB0
-aGUgc3RhdGUgYmV0d2VlbiBQVk0gYW5kIFNWTSBpcyBkaWZmZXJlbnQuDQoNClNvLCBJTUhPLCBp
-dCBtYWtlcyBub24tc2Vuc2UgdG8gbGV0IFZNcyB0byBjb250aW51ZSB0byBydW4gYWZ0ZXIgZGV0
-ZWN0ZWQgdGhlbSBpbiBkaWZmZXJlbnQgc3RhdGUuDQpCZXNpZGVzLCBJIGRvbid0IHRoaW5rIGl0
-IGlzIGVhc3kgdG8gY29uc3RydWN0IHRoaXMgY2FzZSBpbiB0ZXN0cy4NCg0KDQpUaGFua3MsDQpI
-YWlsaWFuZw0KDQpzPiBIZWxsbywgTHVrYXMgJiBaaGFuZ2hhaWxpYW5nDQo+IA0KPiBUaGFua3Mg
-Zm9yIHlvdXIgb3BpbmlvbnMuDQo+IEkgd2VudCB0aHJvdWdoIG15IHBhdGNoLCBhbmQgSSBmZWVs
-IGEgbGl0dGxlIGNvbmZ1c2VkIGFuZCB3b3VsZCBsaWtlIHRvIGRpZyBpbnRvIGl0DQo+IG1vcmUu
-DQo+IA0KPiBJbiB0aGlzIHBhdGNoLCBjb2xvX21pZ3JhdGVfcmFtX2JlZm9yZV9jaGVja3BvaW50
-KCkgaXMgYmVmb3JlDQo+IENPTE9fTUVTU0FHRV9DSEVDS1BPSU5UX1JFUVVFU1QsIHNvIHRoZSBT
-Vk0gYW5kIFBWTSBzaG91bGQgbm90IGVudGVyDQo+IHRoZSBwYXVzZSBzdGF0ZS4NCj4gDQo+IElu
-IHRoZSBtZWFud2hpbGUsIHRoZSBwYWNrZXRzIHRvIFBWTS9TVk0gY2FuIHN0aWxsIGJlIGNvbXBh
-cmVkIGFuZCBub3RpZnkNCj4gaW5jb25zaXN0ZW5jeSBpZiBtaXNtYXRjaGVkLCByaWdodD8NCj4g
-SXMgaXQgcG9zc2libGUgdG8gaW50cm9kdWNlIGV4dHJhIG5ldHdvcmsgbGF0ZW5jeT8NCj4gDQo+
-IEluIG15IHRlc3QgKHJhbmR3cml0ZSB0byBkaXNrIGJ5IGZpbyB3aXRoIGRpcmVjdD0wKSwgdGhl
-IHBpbmcgZnJvbSBhbm90aGVyIGNsaWVudCB0bw0KPiB0aGUgUFZNICB1c2luZyBnZW5lcmljIGNv
-bG8gYW5kIGNvbG8gdXNlZCB0aGlzIHBhdGNoIGFyZSBiZWxvdy4NCj4gVGhlIG5ldHdvcmsgbGF0
-ZW5jeSBkb2VzIG5vdCBpbmNyZWFzZSBhcyBteSBleHBlY3RhdGlvbi4NCj4gDQo+IGdlbmVyaWMg
-Y29sbw0KPiBgYGANCj4gNjQgYnl0ZXMgZnJvbSAxOTIuMTY4LjgwLjE4OiBpY21wX3NlcT04NyB0
-dGw9NjQgdGltZT0yOC4xMDkgbXMNCj4gNjQgYnl0ZXMgZnJvbSAxOTIuMTY4LjgwLjE4OiBpY21w
-X3NlcT04OCB0dGw9NjQgdGltZT0xNi43NDcgbXMNCj4gNjQgYnl0ZXMgZnJvbSAxOTIuMTY4Ljgw
-LjE4OiBpY21wX3NlcT04OSB0dGw9NjQgdGltZT0yMzg4Ljc3OSBtcw0KPiA8LS0tLWNoZWNrcG9p
-bnQgc3RhcnQNCj4gNjQgYnl0ZXMgZnJvbSAxOTIuMTY4LjgwLjE4OiBpY21wX3NlcT05MCB0dGw9
-NjQgdGltZT0xMzg1Ljc5MiBtcw0KPiA2NCBieXRlcyBmcm9tIDE5Mi4xNjguODAuMTg6IGljbXBf
-c2VxPTkxIHR0bD02NCB0aW1lPTM4NC44OTYgbXMNCj4gPC0tLS1jaGVja3BvaW50IGVuZA0KPiA2
-NCBieXRlcyBmcm9tIDE5Mi4xNjguODAuMTg6IGljbXBfc2VxPTkyIHR0bD02NCB0aW1lPTMuODk1
-IG1zDQo+IDY0IGJ5dGVzIGZyb20gMTkyLjE2OC44MC4xODogaWNtcF9zZXE9OTMgdHRsPTY0IHRp
-bWU9MS4wMjAgbXMNCj4gNjQgYnl0ZXMgZnJvbSAxOTIuMTY4LjgwLjE4OiBpY21wX3NlcT05NCB0
-dGw9NjQgdGltZT0wLjg2NSBtcw0KPiA2NCBieXRlcyBmcm9tIDE5Mi4xNjguODAuMTg6IGljbXBf
-c2VxPTk1IHR0bD02NCB0aW1lPTAuODU0IG1zDQo+IDY0IGJ5dGVzIGZyb20gMTkyLjE2OC44MC4x
-ODogaWNtcF9zZXE9OTYgdHRsPTY0IHRpbWU9MjguMzU5IG1zDQo+IDY0IGJ5dGVzIGZyb20gMTky
-LjE2OC44MC4xODogaWNtcF9zZXE9OTcgdHRsPTY0IHRpbWU9MTIuMzA5IG1zDQo+IDY0IGJ5dGVz
-IGZyb20gMTkyLjE2OC44MC4xODogaWNtcF9zZXE9OTggdHRsPTY0IHRpbWU9MC44NzAgbXMNCj4g
-NjQgYnl0ZXMgZnJvbSAxOTIuMTY4LjgwLjE4OiBpY21wX3NlcT05OSB0dGw9NjQgdGltZT0yMzcx
-LjczMyBtcw0KPiA2NCBieXRlcyBmcm9tIDE5Mi4xNjguODAuMTg6IGljbXBfc2VxPTEwMCB0dGw9
-NjQgdGltZT0xMzcxLjQ0MCBtcw0KPiA2NCBieXRlcyBmcm9tIDE5Mi4xNjguODAuMTg6IGljbXBf
-c2VxPTEwMSB0dGw9NjQgdGltZT0zNjYuNDE0IG1zDQo+IDY0IGJ5dGVzIGZyb20gMTkyLjE2OC44
-MC4xODogaWNtcF9zZXE9MTAyIHR0bD02NCB0aW1lPTAuODE4IG1zDQo+IDY0IGJ5dGVzIGZyb20g
-MTkyLjE2OC44MC4xODogaWNtcF9zZXE9MTAzIHR0bD02NCB0aW1lPTAuOTk3IG1zIGBgYA0KPiAN
-Cj4gY29sbyB1c2VkIHRoaXMgcGF0Y2gNCj4gYGBgDQo+IDY0IGJ5dGVzIGZyb20gMTkyLjE2OC44
-MC4xODogaWNtcF9zZXE9NzIgdHRsPTY0IHRpbWU9MS40MTcgbXMNCj4gNjQgYnl0ZXMgZnJvbSAx
-OTIuMTY4LjgwLjE4OiBpY21wX3NlcT03MyB0dGw9NjQgdGltZT0wLjkzMSBtcw0KPiA2NCBieXRl
-cyBmcm9tIDE5Mi4xNjguODAuMTg6IGljbXBfc2VxPTc0IHR0bD02NCB0aW1lPTAuODc2IG1zDQo+
-IDY0IGJ5dGVzIGZyb20gMTkyLjE2OC44MC4xODogaWNtcF9zZXE9NzUgdHRsPTY0IHRpbWU9MTE4
-NC4wMzQgbXMNCj4gPC0tLS1jaGVja3BvaW50IHN0YXJ0DQo+IDY0IGJ5dGVzIGZyb20gMTkyLjE2
-OC44MC4xODogaWNtcF9zZXE9NzYgdHRsPTY0IHRpbWU9MTgxLjI5NyBtcw0KPiA8LS0tLWNoZWNr
-cG9pbnQgZW5kDQo+IDY0IGJ5dGVzIGZyb20gMTkyLjE2OC44MC4xODogaWNtcF9zZXE9NzcgdHRs
-PTY0IHRpbWU9MC44NjUgbXMNCj4gNjQgYnl0ZXMgZnJvbSAxOTIuMTY4LjgwLjE4OiBpY21wX3Nl
-cT03OCB0dGw9NjQgdGltZT0wLjg1OCBtcw0KPiA2NCBieXRlcyBmcm9tIDE5Mi4xNjguODAuMTg6
-IGljbXBfc2VxPTc5IHR0bD02NCB0aW1lPTEuMjQ3IG1zDQo+IDY0IGJ5dGVzIGZyb20gMTkyLjE2
-OC44MC4xODogaWNtcF9zZXE9ODAgdHRsPTY0IHRpbWU9MC45NDYgbXMNCj4gNjQgYnl0ZXMgZnJv
-bSAxOTIuMTY4LjgwLjE4OiBpY21wX3NlcT04MSB0dGw9NjQgdGltZT0wLjg1NSBtcw0KPiA2NCBi
-eXRlcyBmcm9tIDE5Mi4xNjguODAuMTg6IGljbXBfc2VxPTgyIHR0bD02NCB0aW1lPTAuODY4IG1z
-DQo+IDY0IGJ5dGVzIGZyb20gMTkyLjE2OC44MC4xODogaWNtcF9zZXE9ODMgdHRsPTY0IHRpbWU9
-MC43NDkgbXMNCj4gNjQgYnl0ZXMgZnJvbSAxOTIuMTY4LjgwLjE4OiBpY21wX3NlcT04NCB0dGw9
-NjQgdGltZT0yLjE1NCBtcw0KPiA2NCBieXRlcyBmcm9tIDE5Mi4xNjguODAuMTg6IGljbXBfc2Vx
-PTg1IHR0bD02NCB0aW1lPTE0OTkuMTg2IG1zDQo+IDY0IGJ5dGVzIGZyb20gMTkyLjE2OC44MC4x
-ODogaWNtcF9zZXE9ODYgdHRsPTY0IHRpbWU9NDk2LjE3MyBtcw0KPiA2NCBieXRlcyBmcm9tIDE5
-Mi4xNjguODAuMTg6IGljbXBfc2VxPTg3IHR0bD02NCB0aW1lPTAuODU0IG1zDQo+IDY0IGJ5dGVz
-IGZyb20gMTkyLjE2OC44MC4xODogaWNtcF9zZXE9ODggdHRsPTY0IHRpbWU9MC43NzQgbXMgYGBg
-DQo+IA0KPiBUaGFuayB5b3UuDQo+IA0KPiBSZWdhcmRzLA0KPiBEZXJlaw0KPiANCj4gPiBIYWls
-YW5nIGRpZCBoYXZlIGEgcGF0Y2ggdG8gbWlncmF0ZSByYW0gYmV0d2VlbiBjaGVja3BvaW50cywg
-d2hpY2ggc2hvdWxkDQo+IGhlbHAgYWxsIHdvcmtsb2FkcywgYnV0IGl0IHdhc24ndCBtZXJnZWQg
-YmFjayB0aGVuLiBJIHRoaW5rIHlvdSBjYW4gcGljayBpdCB1cCBhZ2FpbiwNCj4gcmViYXNlIGFu
-ZCBhZGRyZXNzIERhdmlkJ3MgYW5kIEVyaWMncyBjb21tZW50czoNCj4gPiBodHRwczovL2xvcmUu
-a2VybmVsLm9yZy9xZW11LWRldmVsLzIwMjAwMjE3MDEyMDQ5LjIyOTg4LTMtemhhbmcuemhhbmdo
-DQo+ID4gYWlsaWFuZ0BodWF3ZWkuY29tL1QvI3UNCj4gPg0KPiA+IEhhaWxhbmcsIGFyZSB5b3Ug
-b2sgd2l0aCB0aGF0Pw0KPiA+DQo+ID4gUmVnYXJkcywNCj4gPiBMdWthcyBTdHJhdWINCg==
+Unify add/sub helpers and add a parameter for rounding.
+This will allow saturating non-rounding to reuse this code.
+
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/arm/vec_helper.c | 80 +++++++++++++++--------------------------
+ 1 file changed, 29 insertions(+), 51 deletions(-)
+
+diff --git a/target/arm/vec_helper.c b/target/arm/vec_helper.c
+index 7d76412ee0..bbd1141dfc 100644
+--- a/target/arm/vec_helper.c
++++ b/target/arm/vec_helper.c
+@@ -37,19 +37,24 @@
+ #endif
+ 
+ /* Signed saturating rounding doubling multiply-accumulate high half, 16-bit */
+-static int16_t inl_qrdmlah_s16(int16_t src1, int16_t src2,
+-                               int16_t src3, uint32_t *sat)
++static int16_t do_sqrdmlah_h(int16_t src1, int16_t src2, int16_t src3,
++                             bool neg, bool round, uint32_t *sat)
+ {
+-    /* Simplify:
++    /*
++     * Simplify:
+      * = ((a3 << 16) + ((e1 * e2) << 1) + (1 << 15)) >> 16
+      * = ((a3 << 15) + (e1 * e2) + (1 << 14)) >> 15
+      */
+     int32_t ret = (int32_t)src1 * src2;
+-    ret = ((int32_t)src3 << 15) + ret + (1 << 14);
++    if (neg) {
++        ret = -ret;
++    }
++    ret += ((int32_t)src3 << 15) + (round << 14);
+     ret >>= 15;
++
+     if (ret != (int16_t)ret) {
+         *sat = 1;
+-        ret = (ret < 0 ? -0x8000 : 0x7fff);
++        ret = (ret < 0 ? INT16_MIN : INT16_MAX);
+     }
+     return ret;
+ }
+@@ -58,8 +63,9 @@ uint32_t HELPER(neon_qrdmlah_s16)(CPUARMState *env, uint32_t src1,
+                                   uint32_t src2, uint32_t src3)
+ {
+     uint32_t *sat = &env->vfp.qc[0];
+-    uint16_t e1 = inl_qrdmlah_s16(src1, src2, src3, sat);
+-    uint16_t e2 = inl_qrdmlah_s16(src1 >> 16, src2 >> 16, src3 >> 16, sat);
++    uint16_t e1 = do_sqrdmlah_h(src1, src2, src3, false, true, sat);
++    uint16_t e2 = do_sqrdmlah_h(src1 >> 16, src2 >> 16, src3 >> 16,
++                                false, true, sat);
+     return deposit32(e1, 16, 16, e2);
+ }
+ 
+@@ -73,35 +79,18 @@ void HELPER(gvec_qrdmlah_s16)(void *vd, void *vn, void *vm,
+     uintptr_t i;
+ 
+     for (i = 0; i < opr_sz / 2; ++i) {
+-        d[i] = inl_qrdmlah_s16(n[i], m[i], d[i], vq);
++        d[i] = do_sqrdmlah_h(n[i], m[i], d[i], false, true, vq);
+     }
+     clear_tail(d, opr_sz, simd_maxsz(desc));
+ }
+ 
+-/* Signed saturating rounding doubling multiply-subtract high half, 16-bit */
+-static int16_t inl_qrdmlsh_s16(int16_t src1, int16_t src2,
+-                               int16_t src3, uint32_t *sat)
+-{
+-    /* Similarly, using subtraction:
+-     * = ((a3 << 16) - ((e1 * e2) << 1) + (1 << 15)) >> 16
+-     * = ((a3 << 15) - (e1 * e2) + (1 << 14)) >> 15
+-     */
+-    int32_t ret = (int32_t)src1 * src2;
+-    ret = ((int32_t)src3 << 15) - ret + (1 << 14);
+-    ret >>= 15;
+-    if (ret != (int16_t)ret) {
+-        *sat = 1;
+-        ret = (ret < 0 ? -0x8000 : 0x7fff);
+-    }
+-    return ret;
+-}
+-
+ uint32_t HELPER(neon_qrdmlsh_s16)(CPUARMState *env, uint32_t src1,
+                                   uint32_t src2, uint32_t src3)
+ {
+     uint32_t *sat = &env->vfp.qc[0];
+-    uint16_t e1 = inl_qrdmlsh_s16(src1, src2, src3, sat);
+-    uint16_t e2 = inl_qrdmlsh_s16(src1 >> 16, src2 >> 16, src3 >> 16, sat);
++    uint16_t e1 = do_sqrdmlah_h(src1, src2, src3, true, true, sat);
++    uint16_t e2 = do_sqrdmlah_h(src1 >> 16, src2 >> 16, src3 >> 16,
++                                true, true, sat);
+     return deposit32(e1, 16, 16, e2);
+ }
+ 
+@@ -115,19 +104,23 @@ void HELPER(gvec_qrdmlsh_s16)(void *vd, void *vn, void *vm,
+     uintptr_t i;
+ 
+     for (i = 0; i < opr_sz / 2; ++i) {
+-        d[i] = inl_qrdmlsh_s16(n[i], m[i], d[i], vq);
++        d[i] = do_sqrdmlah_h(n[i], m[i], d[i], true, true, vq);
+     }
+     clear_tail(d, opr_sz, simd_maxsz(desc));
+ }
+ 
+ /* Signed saturating rounding doubling multiply-accumulate high half, 32-bit */
+-static int32_t inl_qrdmlah_s32(int32_t src1, int32_t src2,
+-                               int32_t src3, uint32_t *sat)
++static int32_t do_sqrdmlah_s(int32_t src1, int32_t src2, int32_t src3,
++                             bool neg, bool round, uint32_t *sat)
+ {
+     /* Simplify similarly to int_qrdmlah_s16 above.  */
+     int64_t ret = (int64_t)src1 * src2;
+-    ret = ((int64_t)src3 << 31) + ret + (1 << 30);
++    if (neg) {
++        ret = -ret;
++    }
++    ret = ((int64_t)src3 << 31) + (round << 30);
+     ret >>= 31;
++
+     if (ret != (int32_t)ret) {
+         *sat = 1;
+         ret = (ret < 0 ? INT32_MIN : INT32_MAX);
+@@ -139,7 +132,7 @@ uint32_t HELPER(neon_qrdmlah_s32)(CPUARMState *env, int32_t src1,
+                                   int32_t src2, int32_t src3)
+ {
+     uint32_t *sat = &env->vfp.qc[0];
+-    return inl_qrdmlah_s32(src1, src2, src3, sat);
++    return do_sqrdmlah_s(src1, src2, src3, false, true, sat);
+ }
+ 
+ void HELPER(gvec_qrdmlah_s32)(void *vd, void *vn, void *vm,
+@@ -152,31 +145,16 @@ void HELPER(gvec_qrdmlah_s32)(void *vd, void *vn, void *vm,
+     uintptr_t i;
+ 
+     for (i = 0; i < opr_sz / 4; ++i) {
+-        d[i] = inl_qrdmlah_s32(n[i], m[i], d[i], vq);
++        d[i] = do_sqrdmlah_s(n[i], m[i], d[i], false, true, vq);
+     }
+     clear_tail(d, opr_sz, simd_maxsz(desc));
+ }
+ 
+-/* Signed saturating rounding doubling multiply-subtract high half, 32-bit */
+-static int32_t inl_qrdmlsh_s32(int32_t src1, int32_t src2,
+-                               int32_t src3, uint32_t *sat)
+-{
+-    /* Simplify similarly to int_qrdmlsh_s16 above.  */
+-    int64_t ret = (int64_t)src1 * src2;
+-    ret = ((int64_t)src3 << 31) - ret + (1 << 30);
+-    ret >>= 31;
+-    if (ret != (int32_t)ret) {
+-        *sat = 1;
+-        ret = (ret < 0 ? INT32_MIN : INT32_MAX);
+-    }
+-    return ret;
+-}
+-
+ uint32_t HELPER(neon_qrdmlsh_s32)(CPUARMState *env, int32_t src1,
+                                   int32_t src2, int32_t src3)
+ {
+     uint32_t *sat = &env->vfp.qc[0];
+-    return inl_qrdmlsh_s32(src1, src2, src3, sat);
++    return do_sqrdmlah_s(src1, src2, src3, true, true, sat);
+ }
+ 
+ void HELPER(gvec_qrdmlsh_s32)(void *vd, void *vn, void *vm,
+@@ -189,7 +167,7 @@ void HELPER(gvec_qrdmlsh_s32)(void *vd, void *vn, void *vm,
+     uintptr_t i;
+ 
+     for (i = 0; i < opr_sz / 4; ++i) {
+-        d[i] = inl_qrdmlsh_s32(n[i], m[i], d[i], vq);
++        d[i] = do_sqrdmlah_s(n[i], m[i], d[i], true, true, vq);
+     }
+     clear_tail(d, opr_sz, simd_maxsz(desc));
+ }
+-- 
+2.25.1
+
 
