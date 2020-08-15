@@ -2,67 +2,66 @@ Return-Path: <SRS0=PlQC=BZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 869C9C433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 15 Aug 2020 16:08:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEDCEC433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 15 Aug 2020 16:08:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5B8B223B18
-	for <qemu-devel@archiver.kernel.org>; Sat, 15 Aug 2020 16:08:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B8B223B18
+	by mail.kernel.org (Postfix) with ESMTPS id 8334F23B18
+	for <qemu-devel@archiver.kernel.org>; Sat, 15 Aug 2020 16:08:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8334F23B18
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45846 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48752 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k6yj1-0007OT-HY
-	for qemu-devel@archiver.kernel.org; Sat, 15 Aug 2020 12:08:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55902)
+	id 1k6yjb-00009F-PE
+	for qemu-devel@archiver.kernel.org; Sat, 15 Aug 2020 12:08:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55940)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k6yiB-0006B9-G2
- for qemu-devel@nongnu.org; Sat, 15 Aug 2020 12:07:15 -0400
-Received: from indium.canonical.com ([91.189.90.7]:43410)
+ id 1k6yiD-0006FV-ST
+ for qemu-devel@nongnu.org; Sat, 15 Aug 2020 12:07:17 -0400
+Received: from indium.canonical.com ([91.189.90.7]:43416)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k6yi9-0002Hn-LW
- for qemu-devel@nongnu.org; Sat, 15 Aug 2020 12:07:15 -0400
+ id 1k6yiC-0002Hy-8Q
+ for qemu-devel@nongnu.org; Sat, 15 Aug 2020 12:07:17 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1k6ud0-0006vU-GC
- for <qemu-devel@nongnu.org>; Sat, 15 Aug 2020 11:45:38 +0000
+ id 1k6urr-0007bl-0H
+ for <qemu-devel@nongnu.org>; Sat, 15 Aug 2020 12:00:59 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 697872E80E7
- for <qemu-devel@nongnu.org>; Sat, 15 Aug 2020 11:45:38 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id F09722E80D2
+ for <qemu-devel@nongnu.org>; Sat, 15 Aug 2020 12:00:58 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 15 Aug 2020 11:38:55 -0000
-From: - <1891749@bugs.launchpad.net>
+Date: Sat, 15 Aug 2020 11:51:57 -0000
+From: Ech <1891748@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: i386 linux-user
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: xyz378537
-X-Launchpad-Bug-Reporter: - (xyz378537)
-X-Launchpad-Bug-Modifier: - (xyz378537)
-Message-Id: <159749153602.26349.12174585441877803100.malonedeb@soybean.canonical.com>
-Subject: [Bug 1891749] [NEW] CGA Mode 6 is only 100 pixels tall,
- when it's supposed to be 200
+X-Launchpad-Bug-Commenters: ech1965
+X-Launchpad-Bug-Reporter: Ech (ech1965)
+X-Launchpad-Bug-Modifier: Ech (ech1965)
+References: <159749143652.14755.7473614939867617680.malonedeb@gac.canonical.com>
+Message-Id: <159749231757.21888.3817240973030618249.malone@chaenomeles.canonical.com>
+Subject: [Bug 1891748] Re: qemu-arm-static 5.1 can't run gcc
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="d6d0b96812d8def2ca0ffcc25cb4d200f2f30aeb";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 6197ef693ab10c6d5940ec7d1c722bdc6f187c09
+X-Launchpad-Hash: fe8167c22eb31e843475a5a4d0ceb42e12bb0b9a
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/15 12:06:21
@@ -72,7 +71,8 @@ X-Spam_score: -5.9
 X-Spam_bar: -----
 X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
  RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -84,47 +84,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1891749 <1891749@bugs.launchpad.net>
+Reply-To: Bug 1891748 <1891748@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+Additional info,
 
-I have written a program that used CGA Mode 6 (640x200 black and white).
-However qemu-system-i386 only displays the first 100 pixels, effectively
-limiting the resolution of mode 6 to 640x100. When running the same
-program on a real computer it uses the whole 640x200 pixels.
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+error message text ( "Allocating guest commpage" ) found in this commit:
 
 
-** Tags: i386 linux-user
-
-** Tags added: linux-user
-
-** Tags removed: li
+https://fossies.org/diffs/qemu/5.0.0_vs_5.1.0-rc0/linux-user/elfload.c-diff=
+.html
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1891749
+https://bugs.launchpad.net/bugs/1891748
 
 Title:
-  CGA Mode 6 is only 100 pixels tall, when it's supposed to be 200
+  qemu-arm-static 5.1 can't run gcc
 
 Status in QEMU:
   New
 
 Bug description:
-  I have written a program that used CGA Mode 6 (640x200 black and
-  white). However qemu-system-i386 only displays the first 100 pixels,
-  effectively limiting the resolution of mode 6 to 640x100. When running
-  the same program on a real computer it uses the whole 640x200 pixels.
+  Issue discovered while trying to build pikvm (1)
+
+  Long story short: when using qemu-arm-static 5.1, gcc exits whith
+  message:
+
+  Allocating guest commpage: Operation not permitted
+
+  =
+
+  when using qemu-arm-static v5.0, gcc "works"
+
+  Steps to reproduce will follow
+
+  (1)  https://github.com/pikvm/pikvm/blob/master/pages/building_os.md
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1891749/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1891748/+subscriptions
 
