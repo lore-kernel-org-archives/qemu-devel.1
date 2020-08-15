@@ -2,90 +2,92 @@ Return-Path: <SRS0=PlQC=BZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=0.2 required=3.0 tests=BAYES_00,DATE_IN_PAST_12_24,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DE77C433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 15 Aug 2020 16:45:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73CF9C433E1
+	for <qemu-devel@archiver.kernel.org>; Sat, 15 Aug 2020 16:46:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 23B4D23A6C
-	for <qemu-devel@archiver.kernel.org>; Sat, 15 Aug 2020 16:45:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3B21423B18
+	for <qemu-devel@archiver.kernel.org>; Sat, 15 Aug 2020 16:46:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="WS1wj6+L"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 23B4D23A6C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FQSzufEJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B21423B18
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39608 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42894 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k6zIt-00081q-Cg
-	for qemu-devel@archiver.kernel.org; Sat, 15 Aug 2020 12:45:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37304)
+	id 1k6zK1-00013c-Ea
+	for qemu-devel@archiver.kernel.org; Sat, 15 Aug 2020 12:46:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37510)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
- id 1k6zID-0007bY-Bp
- for qemu-devel@nongnu.org; Sat, 15 Aug 2020 12:44:29 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:33181)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1k6zJ2-0008Kz-1Y
+ for qemu-devel@nongnu.org; Sat, 15 Aug 2020 12:45:20 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:34213)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
- id 1k6zIB-00073r-Nz
- for qemu-devel@nongnu.org; Sat, 15 Aug 2020 12:44:28 -0400
-Received: by mail-oi1-x244.google.com with SMTP id n128so7168228oif.0
- for <qemu-devel@nongnu.org>; Sat, 15 Aug 2020 09:44:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=nNxcyvydBKW7um7acp/fp1BhM/4SQTbKf0bBRIbObWA=;
- b=WS1wj6+Luh3GU2QmWNRtvgIkTaGEaoC8uIU+t0s2qurInNUA6hZHkgBnShAy0vJYPp
- Fbpi9wQXm/eDVNcbPBl93Uyg5nhuqZrICobe41YTiipWlzCGwNZ4K69eKRgl0rLuSbcM
- dLYFpjmwPoNFrANxpQv0XxtXrjXALKinaF25h1BW7D5HqWa4qoR73Zf4Wl+48Av3Prhp
- bQvA71tsVmuyC2SsIAHSp15H7ct0pyS40A1rWICu2ztqDBjhTNQzNjSJbN4unaYqA1nr
- QzOIXb+PudAi0cjtSPIVS7KBO7N76fkWGUmWR951T4QZ+ljbMZ0Ijm4cVXl8JYDrs2rP
- Y3xg==
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1k6zJ0-0007Ag-2j
+ for qemu-devel@nongnu.org; Sat, 15 Aug 2020 12:45:19 -0400
+Received: by mail-oi1-x243.google.com with SMTP id z22so11029220oid.1
+ for <qemu-devel@nongnu.org>; Sat, 15 Aug 2020 09:45:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=yiKdEsXrfNBH7/8vYLZc3MqLfFg4s03EnbAK1DMKZss=;
+ b=FQSzufEJpHgEXdXVj7RJ7hNTKcgoV79nx+d0e7Am/nx1wtlmpnEm0lEwmqvYPpf7Rx
+ wiU3dTxhItSJFWg+aMzhwylk7/8x/O6ZYHRKFQ/d4zRkBb8eEtJrkKK2p2eLW+CwoLaB
+ cOSf+HdNoWbe1VApVrQTY578+Rqwxf5uHEXau22dC3u1y+1s6XagZzsqfXsIZHkw+uBe
+ H1XgQ7XzX7GAvyv+bpnL8emy6jSckYdXc+Ah7XPy0FFEG9shQTx8Hjl7I3QogUiynPR3
+ wAE+6np2CPBt6Grj7sOsTV9xnRdyWZsrugH0fT2W4BehbhadwxrkhtZqxwQQydwxsjgR
+ QYzQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=nNxcyvydBKW7um7acp/fp1BhM/4SQTbKf0bBRIbObWA=;
- b=T6+LZNgQlqH5ovsIQFtBQXkt0FLzbPxMbYXFLPQpgdJkzPnwU7pW8VrYBuxaHNivsK
- ObWGsoVyECuH09PmFIl3qay76OB1x3CW90vLDiTvRQmoLtSKzK0SVkCKeAERNoxkUnWz
- f8ruJY9mAd5AkThJfMShaxy2nMJTsZ0eNysks2wJ1TfsuPCgP4cIYcXJ9qFS2Wq4BXAb
- ONUJbvYikloe3RxGBweLop9PbnTUycrXlBWl7hD8VXy7ZgoQqw6fZzYauo7bY8kqjrO6
- kB65YBdDKz76qWp0NPUb5L2yzCPAla4CB2t4mJT7db0fi+EqfmZCvwegacULySR6OkFF
- JBxw==
-X-Gm-Message-State: AOAM533nm8rz0xFN3fFmSNfDPzZcEPTrdmSADt+3Kq9vzizKBEVodir3
- gYzciYKdCIo8JLkpVF7gYBquf3ebMUha8oN3aTDskmFqFas=
-X-Google-Smtp-Source: ABdhPJwks7FCHLO+icCm1f/bxIWRNnwBbQGIm4b/hUFuy5n0R20aqcOqtkDL+DEury7bEBOne5qQYFbmVUy+gtIrJf0=
-X-Received: by 2002:aca:bd89:: with SMTP id n131mr3125624oif.78.1597458353242; 
- Fri, 14 Aug 2020 19:25:53 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=yiKdEsXrfNBH7/8vYLZc3MqLfFg4s03EnbAK1DMKZss=;
+ b=sFbmI3B4q+sheJm3V+00g0ADVIRuaGKVUK0nL+JFZGsYxSQJLwEDVJsnO7hFnJnLnC
+ kTQmCArGoIf/mym1Nn8a4GLELR0kdtzAjYcuDsInEdiXjokIHydHdzyAxTdBZAoZBhgw
+ /9eqW6q5MNTF1TUaXbW3XhRZnJ1htrrGRBsKOCQDnf7BFtAwGVjm6IGmT2HpaoP8mSvy
+ F3MuI/XMr9cT6S1l/YSXrEBkuxDSPkvvx1sh5EuREsfxm/SV4+ZI/DQTG1KMQEhSZNzW
+ GU5l5JY4o44r7SBUR1UvqhyjRGKQYA7FUgIyG+QgUHWYTd1I77TGkuTKO1bAHxP/joli
+ oRLw==
+X-Gm-Message-State: AOAM531b2q8HVd1n4UAiGro3FqDQuFLgVqUYa3Q7a71A72gHVT2YrBwX
+ uYoRlZpyMRQx+W/CB+P2BqylqSdS1FtjFA==
+X-Google-Smtp-Source: ABdhPJysIL824KIrlrx0ofsgHQEmTPDH+0vwgUV2dcjPhNsTZw4Ogb0HeUVr2ttW2p6vpY6X7RUo9Q==
+X-Received: by 2002:a17:90a:a590:: with SMTP id
+ b16mr4368232pjq.131.1597455113171; 
+ Fri, 14 Aug 2020 18:31:53 -0700 (PDT)
+Received: from localhost.localdomain ([71.212.141.89])
+ by smtp.gmail.com with ESMTPSA id y196sm10625528pfc.202.2020.08.14.18.31.52
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 14 Aug 2020 18:31:52 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 04/20] target/arm: Rearrange {sve,fp}_check_access assert
+Date: Fri, 14 Aug 2020 18:31:29 -0700
+Message-Id: <20200815013145.539409-5-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200815013145.539409-1-richard.henderson@linaro.org>
+References: <20200815013145.539409-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-References: <20200806104709.13235-1-frank.chang@sifive.com>
- <20200806104709.13235-27-frank.chang@sifive.com>
- <90f01984-54a4-2a56-c52f-d1f4332b39d4@linaro.org>
- <CAE_xrPiJRRV3FYtfve6LMOF6LNEYGfhmi9CiabxqUBEew9igLg@mail.gmail.com>
- <5706a1ca-1dd9-22cd-08ce-c70780111bfc@linaro.org>
-In-Reply-To: <5706a1ca-1dd9-22cd-08ce-c70780111bfc@linaro.org>
-From: Frank Chang <frank.chang@sifive.com>
-Date: Sat, 15 Aug 2020 10:25:42 +0800
-Message-ID: <CAE_xrPi93pRQccEncy00SO6cax0_GGRw-HUFF0uFzQ0f2P67kA@mail.gmail.com>
-Subject: Re: [RFC v3 26/71] target/riscv: rvv-1.0: update vext_max_elems() for
- load/store insns
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: multipart/alternative; boundary="000000000000b0614605ace14148"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::244;
- envelope-from=frank.chang@sifive.com; helo=mail-oi1-x244.google.com
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::243;
+ envelope-from=richard.henderson@linaro.org; helo=mail-oi1-x243.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -9
-X-Spam_score: -1.0
-X-Spam_bar: -
-X-Spam_report: (-1.0 / 5.0 requ) BAYES_00=-1.9, DATE_IN_PAST_12_24=1.049,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,124 +100,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- Palmer Dabbelt <palmer@dabbelt.com>
+Cc: peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000b0614605ace14148
-Content-Type: text/plain; charset="UTF-8"
+We want to ensure that access is checked by the time we ask
+for a specific fp/vector register.  We want to ensure that
+we do not emit two lots of code to raise an exception.
 
-On Sat, Aug 15, 2020 at 2:36 AM Richard Henderson <
-richard.henderson@linaro.org> wrote:
+But sometimes it's difficult to cleanly organize the code
+such that we never pass through sve_check_access exactly once.
+Allow multiple calls so long as the result is true, that is,
+no exception to be raised.
 
-> On 8/13/20 7:48 PM, Frank Chang wrote:
-> > esz is passed from e.g. GEN_VEXT_LD_STRIDE() macro:
-> >
-> >> #define GEN_VEXT_LD_STRIDE(NAME, ETYPE, LOAD_FN)        \
-> >> void HELPER(NAME)(void *vd, void * v0, target_ulong base,  \
-> >>                   target_ulong stride, CPURISCVState *env, \
-> >>                   uint32_t desc)                           \
-> >> {                                                          \
-> >>     uint32_t vm = vext_vm(desc);                           \
-> >>     vext_ldst_stride(vd, v0, base, stride, env, desc, vm, LOAD_FN, \
-> >>                      sizeof(ETYPE), GETPC(), MMU_DATA_LOAD);       \
-> >> }
-> >>
-> >> GEN_VEXT_LD_STRIDE(vlse8_v,  int8_t,  lde_b)
-> >
-> > which is calculated by sizeof(ETYPE), so the results would be: 1, 2, 4,
-> 8.
-> > and vext_max_elems() is called by e.g. vext_ldst_stride():
->
-> Ah, yes.
->
-> >> uint32_t max_elems = vext_max_elems(desc, esz);
-> >
-> > I can add another parameter to the macro and pass the hard-coded
-> log2(esz) number
-> > if it's the better way instead of using ctzl().
-> > Or if there's another approach to get the log2(esz) number more
-> elegantly?
->
-> Using ctzl(sizeof(type)) in the GEN_VEXT_LD_STRIDE macro will work well.
-> This
-> will be constant folded by the compiler.
->
->
-> r~
->
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/arm/translate.h     |  1 +
+ target/arm/translate-a64.c | 27 ++++++++++++++++-----------
+ 2 files changed, 17 insertions(+), 11 deletions(-)
 
-Nice, didn't come up with the compiler optimization.
-Will fix the codes and send out a new version of patchset.
-Thanks for the tips.
+diff --git a/target/arm/translate.h b/target/arm/translate.h
+index 16f2699ad7..ad7972eb22 100644
+--- a/target/arm/translate.h
++++ b/target/arm/translate.h
+@@ -64,6 +64,7 @@ typedef struct DisasContext {
+      * that it is set at the point where we actually touch the FP regs.
+      */
+     bool fp_access_checked;
++    bool sve_access_checked;
+     /* ARMv8 single-step state (this is distinct from the QEMU gdbstub
+      * single-step support).
+      */
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index 534c3ff5f3..42aa695dff 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -1175,18 +1175,18 @@ static void do_vec_ld(DisasContext *s, int destidx, int element,
+  * unallocated-encoding checks (otherwise the syndrome information
+  * for the resulting exception will be incorrect).
+  */
+-static inline bool fp_access_check(DisasContext *s)
++static bool fp_access_check(DisasContext *s)
+ {
+-    assert(!s->fp_access_checked);
+-    s->fp_access_checked = true;
++    if (s->fp_excp_el) {
++        assert(!s->fp_access_checked);
++        s->fp_access_checked = true;
+ 
+-    if (!s->fp_excp_el) {
+-        return true;
++        gen_exception_insn(s, s->pc_curr, EXCP_UDEF,
++                           syn_fp_access_trap(1, 0xe, false), s->fp_excp_el);
++        return false;
+     }
+-
+-    gen_exception_insn(s, s->pc_curr, EXCP_UDEF,
+-                       syn_fp_access_trap(1, 0xe, false), s->fp_excp_el);
+-    return false;
++    s->fp_access_checked = true;
++    return true;
+ }
+ 
+ /* Check that SVE access is enabled.  If it is, return true.
+@@ -1195,10 +1195,14 @@ static inline bool fp_access_check(DisasContext *s)
+ bool sve_access_check(DisasContext *s)
+ {
+     if (s->sve_excp_el) {
+-        gen_exception_insn(s, s->pc_curr, EXCP_UDEF, syn_sve_access_trap(),
+-                           s->sve_excp_el);
++        assert(!s->sve_access_checked);
++        s->sve_access_checked = true;
++
++        gen_exception_insn(s, s->pc_curr, EXCP_UDEF,
++                           syn_sve_access_trap(), s->sve_excp_el);
+         return false;
+     }
++    s->sve_access_checked = true;
+     return fp_access_check(s);
+ }
+ 
+@@ -14548,6 +14552,7 @@ static void disas_a64_insn(CPUARMState *env, DisasContext *s)
+     s->base.pc_next += 4;
+ 
+     s->fp_access_checked = false;
++    s->sve_access_checked = false;
+ 
+     if (dc_isar_feature(aa64_bti, s)) {
+         if (s->base.num_insns == 1) {
+-- 
+2.25.1
 
-Frank Chang
-
---000000000000b0614605ace14148
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div dir=3D"ltr">On Sat, Aug 15, 2020 at 2:36 AM Richard H=
-enderson &lt;<a href=3D"mailto:richard.henderson@linaro.org">richard.hender=
-son@linaro.org</a>&gt; wrote:<br></div><div class=3D"gmail_quote"><blockquo=
-te class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px =
-solid rgb(204,204,204);padding-left:1ex">On 8/13/20 7:48 PM, Frank Chang wr=
-ote:<br>
-&gt; esz is passed from e.g.=C2=A0GEN_VEXT_LD_STRIDE() macro:<br>
-&gt; <br>
-&gt;&gt; #define GEN_VEXT_LD_STRIDE(NAME, ETYPE, LOAD_FN)=C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 \<br>
-&gt;&gt; void HELPER(NAME)(void *vd, void * v0, target_ulong base,=C2=A0 \<=
-br>
-&gt;&gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 tar=
-get_ulong stride, CPURISCVState *env, \<br>
-&gt;&gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 uin=
-t32_t desc)=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0\<br>
-&gt;&gt; {=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 \<br>
-&gt;&gt; =C2=A0 =C2=A0 uint32_t vm =3D vext_vm(desc);=C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0\<br>
-&gt;&gt; =C2=A0 =C2=A0 vext_ldst_stride(vd, v0, base, stride, env, desc, vm=
-, LOAD_FN, \<br>
-&gt;&gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0sizeof(ETYPE), GETPC(), MMU_DATA_LOAD); =C2=A0 =C2=A0 =C2=A0 \<br=
->
-&gt;&gt; }<br>
-&gt;&gt;<br>
-&gt;&gt;=C2=A0GEN_VEXT_LD_STRIDE(vlse8_v, =C2=A0int8_t, =C2=A0lde_b)<br>
-&gt; <br>
-&gt; which is calculated by sizeof(ETYPE), so the results would be: 1, 2, 4=
-, 8.<br>
-&gt; and vext_max_elems() is called by e.g. vext_ldst_stride():<br>
-<br>
-Ah, yes.<br>
-<br>
-&gt;&gt; uint32_t max_elems =3D vext_max_elems(desc, esz);<br>
-&gt; <br>
-&gt; I can add another parameter to the macro and pass the hard-coded log2(=
-esz) number<br>
-&gt; if it&#39;s the better way instead of using=C2=A0ctzl().<br>
-&gt; Or if there&#39;s another approach to get the log2(esz) number more el=
-egantly?<br>
-<br>
-Using ctzl(sizeof(type)) in the GEN_VEXT_LD_STRIDE macro will work well.=C2=
-=A0 This<br>
-will be constant folded by the compiler.<br>
-<br>
-<br>
-r~<br></blockquote><div><br></div><div>Nice, didn&#39;t come up with the co=
-mpiler optimization.</div><div>Will fix the codes and send out a new versio=
-n of patchset.</div><div>Thanks for the tips.</div><div><br></div><div>Fran=
-k Chang=C2=A0<br></div></div></div>
-
---000000000000b0614605ace14148--
 
