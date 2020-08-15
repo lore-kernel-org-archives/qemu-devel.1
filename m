@@ -8,54 +8,57 @@ X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C92C0C433E1
-	for <qemu-devel@archiver.kernel.org>; Sat, 15 Aug 2020 15:07:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94D1EC433E1
+	for <qemu-devel@archiver.kernel.org>; Sat, 15 Aug 2020 15:07:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 91E6723101
-	for <qemu-devel@archiver.kernel.org>; Sat, 15 Aug 2020 15:07:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5FE9D23101
+	for <qemu-devel@archiver.kernel.org>; Sat, 15 Aug 2020 15:07:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="azujKpAG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91E6723101
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="fT+8YfYn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FE9D23101
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=163.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47744 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48542 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k6xmU-0003WU-R9
-	for qemu-devel@archiver.kernel.org; Sat, 15 Aug 2020 11:07:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48316)
+	id 1k6xme-0003rB-Hr
+	for qemu-devel@archiver.kernel.org; Sat, 15 Aug 2020 11:07:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50688)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <liq3ea@163.com>) id 1k6xif-00070V-L2
- for qemu-devel@nongnu.org; Sat, 15 Aug 2020 11:03:41 -0400
-Received: from mail-m9763.mail.163.com ([123.126.97.63]:46538)
- by eggs.gnu.org with esmtps (TLS1.2:DHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <liq3ea@163.com>) id 1k6xiZ-0006bQ-Jm
- for qemu-devel@nongnu.org; Sat, 15 Aug 2020 11:03:39 -0400
+ (Exim 4.90_1) (envelope-from <liq3ea@163.com>) id 1k6xlM-0002AJ-UM
+ for qemu-devel@nongnu.org; Sat, 15 Aug 2020 11:06:28 -0400
+Received: from mail-m9763.mail.163.com ([123.126.97.63]:41318)
+ by eggs.gnu.org with esmtp (Exim 4.90_1)
+ (envelope-from <liq3ea@163.com>) id 1k6xlJ-0007SE-G0
+ for qemu-devel@nongnu.org; Sat, 15 Aug 2020 11:06:28 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
- s=s110527; h=From:Subject:Date:Message-Id; bh=GRipXL1wXwapZA2mgs
- copNepRvF0IcwJJiMPyjZeykA=; b=azujKpAGdyW1XusGyBUlmjlsJOX41GpsTh
- CC75MfhSPyS9asHJGeQy7lduiMoUzP/ga8CGmVJl97jlifd1OGuOakfa77y7uY97
- /4gj4iSYi3dBHg2CO2r6Kuc9wsT3nMkcfuarJ9Wt0ZFsPcVtliDQ93qCZWcpx9L1
- c1R/km92g=
+ s=s110527; h=From:Subject:Date:Message-Id; bh=W4LN/xZpHEZmo9POvK
+ UpY0DPWTuEFUi8n4lDp6jU9qE=; b=fT+8YfYnQtTwQsd4DquO1va4bVxxURMoGu
+ /MPWtaRamd3ubLj2Wkh0H8A3s96HvUUa1ua0DyX+bgsUlMu43t+0kct9w9cffvTy
+ umbN4rILS3URTKlD3FXXXKl4RPxwGxL1JjzyehlBPh+RRJRVuaemumuG/XD5pfXU
+ xUrICPwjs=
 Received: from localhost.localdomain (unknown [115.204.244.155])
- by smtp5 (Coremail) with SMTP id HdxpCgBn0O7WjDdfslvODQ--.349S4;
- Sat, 15 Aug 2020 15:20:56 +0800 (CST)
+ by smtp1 (Coremail) with SMTP id GdxpCgA3w4MF7zdfSkGDAA--.134S5;
+ Sat, 15 Aug 2020 22:20:00 +0800 (CST)
 From: Li Qiang <liq3ea@163.com>
-To: jsnow@redhat.com,
-	alxndr@bu.edu
-Subject: [PATCH] hw: ide: check the pointer before do dma memory unmap
-Date: Sat, 15 Aug 2020 00:20:52 -0700
-Message-Id: <20200815072052.73228-1-liq3ea@163.com>
+To: hare@suse.com,
+	pbonzini@redhat.com,
+	fam@euphon.net
+Subject: [PATCH 1/2] hw: megasas: return -1 when 'megasas_map_sgl' fails
+Date: Sat, 15 Aug 2020 07:19:39 -0700
+Message-Id: <20200815141940.44025-2-liq3ea@163.com>
 X-Mailer: git-send-email 2.17.1
-X-CM-TRANSID: HdxpCgBn0O7WjDdfslvODQ--.349S4
-X-Coremail-Antispam: 1Uf129KBjvdXoW7XF4UGr4fuF17Zr1kZFy7Jrb_yoWfCrb_X3
- yfX348Wa95Jayj9w13tw4rJ347t395Jr1kurySgry3uF17Jay3JFW8t3ZrWrW3tFZrtrW3
- GF1F9FWrurWDKjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
- 9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IU1fWFUUUUUU==
+In-Reply-To: <20200815141940.44025-1-liq3ea@163.com>
+References: <20200815141940.44025-1-liq3ea@163.com>
+X-CM-TRANSID: GdxpCgA3w4MF7zdfSkGDAA--.134S5
+X-Coremail-Antispam: 1Uf129KBjvdXoW7JF4DZrWrWrW8XrW3uryxuFg_yoWDuFc_Aw
+ 1093WkJr47Zr47J3sYqw1jyr12qwnrXFyDAr4aqasxAw13GasrGw4DX39rZFWkCw48urs8
+ twnayrZxAws5WjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+ 9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IU1b18JUUUUU==
 X-Originating-IP: [115.204.244.155]
-X-CM-SenderInfo: 5oltjvrd6rljoofrz/1tbiFBmBbVaD6+TB1AAAsu
+X-CM-SenderInfo: 5oltjvrd6rljoofrz/xtbBoRGBbVQHLOqJ+AAAs4
 Received-SPF: pass client-ip=123.126.97.63; envelope-from=liq3ea@163.com;
  helo=mail-m9763.mail.163.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/15 03:37:13
@@ -85,36 +88,38 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In 'map_page' we need to check the return value of
-'dma_memory_map' to ensure the we actully maped something.
-Otherwise, we will hit an assert in 'address_space_unmap'.
-This is because we can't find the MR with the NULL buffer.
-This is the LP#1884693:
+The caller of 'megasas_map_sgl' will only check if the return
+is zero or not. If it return 0 it means success, as in the next
+patch we will consider 'iov_count=0' is an error, so let's
+return -1 to indicate a failure.
 
--->https://bugs.launchpad.net/qemu/+bug/1884693
-
-Reported-by: Alexander Bulekov <alxndr@bu.edu>
 Signed-off-by: Li Qiang <liq3ea@163.com>
 ---
- hw/ide/ahci.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ hw/scsi/megasas.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
-index 009120f88b..63e9fccdbe 100644
---- a/hw/ide/ahci.c
-+++ b/hw/ide/ahci.c
-@@ -250,6 +250,11 @@ static void map_page(AddressSpace *as, uint8_t **ptr, uint64_t addr,
+diff --git a/hw/scsi/megasas.c b/hw/scsi/megasas.c
+index 5cfd1bf22e..d6c9680c36 100644
+--- a/hw/scsi/megasas.c
++++ b/hw/scsi/megasas.c
+@@ -281,7 +281,7 @@ static int megasas_map_sgl(MegasasState *s, MegasasCmd *cmd, union mfi_sgl *sgl)
+     if (iov_count > MEGASAS_MAX_SGE) {
+         trace_megasas_iovec_sgl_overflow(cmd->index, iov_count,
+                                          MEGASAS_MAX_SGE);
+-        return iov_count;
++        return -1;
      }
+     pci_dma_sglist_init(&cmd->qsg, PCI_DEVICE(s), iov_count);
+     for (i = 0; i < iov_count; i++) {
+@@ -311,7 +311,7 @@ static int megasas_map_sgl(MegasasState *s, MegasasCmd *cmd, union mfi_sgl *sgl)
+     return 0;
+ unmap:
+     qemu_sglist_destroy(&cmd->qsg);
+-    return iov_count - i;
++    return -1;
+ }
  
-     *ptr = dma_memory_map(as, addr, &len, DMA_DIRECTION_FROM_DEVICE);
-+
-+    if (!*ptr) {
-+        return;
-+    }
-+
-     if (len < wanted) {
-         dma_memory_unmap(as, *ptr, len, DMA_DIRECTION_FROM_DEVICE, len);
-         *ptr = NULL;
+ /*
 -- 
 2.17.1
 
