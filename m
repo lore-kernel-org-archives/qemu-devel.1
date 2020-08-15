@@ -2,88 +2,100 @@ Return-Path: <SRS0=PlQC=BZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,DATE_IN_PAST_12_24,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95DA1C433E1
-	for <qemu-devel@archiver.kernel.org>; Sat, 15 Aug 2020 16:15:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 807C8C433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 15 Aug 2020 16:16:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5FEA623AA0
-	for <qemu-devel@archiver.kernel.org>; Sat, 15 Aug 2020 16:15:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0AC5C23AA0
+	for <qemu-devel@archiver.kernel.org>; Sat, 15 Aug 2020 16:16:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pcUN0Sg6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FEA623AA0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AKcdzNq5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0AC5C23AA0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40700 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43978 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k6yq1-0008Qv-KW
-	for qemu-devel@archiver.kernel.org; Sat, 15 Aug 2020 12:15:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57982)
+	id 1k6yrA-0001Tw-U8
+	for qemu-devel@archiver.kernel.org; Sat, 15 Aug 2020 12:16:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58298)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>)
- id 1k6yom-0007LG-2y; Sat, 15 Aug 2020 12:14:04 -0400
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:39441)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1k6ypn-0008RU-D3; Sat, 15 Aug 2020 12:15:07 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:34424)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>)
- id 1k6yok-00035A-E5; Sat, 15 Aug 2020 12:14:03 -0400
-Received: by mail-oi1-x243.google.com with SMTP id a24so10951019oia.6;
- Sat, 15 Aug 2020 09:14:01 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1k6ypl-0003Ba-WD; Sat, 15 Aug 2020 12:15:07 -0400
+Received: by mail-wr1-x444.google.com with SMTP id f7so10929295wrw.1;
+ Sat, 15 Aug 2020 09:15:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=Rz1Bn0O+S+J/XTgmJoZptTZ3JFxX1OXOQheVdd25VFs=;
- b=pcUN0Sg6NBjaTaKCgFvA9WG5Z8FEGQX1O6t8VvlA/NL3tkse9IQ58KU8QtU2VkeRSP
- n5yzzoct7THb6hi95SJPdA0WTehr/my7TQRaa29Xg19rIcnWSKR8qDr0YGKBMSju5xgC
- QjIBACZJhzsgQGD7/j+8Mj1QGVORQUR83PW3BFbwcfgRy3FW6raDAvFm2/rsDnesq/Gd
- LoTVGAhk4b7p4nfkBp0TkMCPTGZaen1NNKaKCkOVX1QPIIJNlGFr8+FQ38vP40fa+0bj
- T5KKWwPyfilwoy6CvatB4AZ3y9hxP7iJq+YgLb3tWsvIXKIzc588JTGgka3e7yvuKSC5
- a6xw==
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=nSrc/lb9fkx3CNfm+ox5hrRtqhW1/GlYoh+C1KHuZYA=;
+ b=AKcdzNq5HaZXLkcZYpCBtPQrKMtWcq7VMs35+4fu+28ojUJtOnkSSpWEc1SfMtjIXh
+ x8NF553TYXqJ6hyEscbcBeJdQDNyvOanYh5UJhwGt8pwOdf/WqTUdZRT8WbhJVawkRTH
+ wwj1fh03NdJ3wbcZKtomOsXW38ZmUsylgMRcbbwaULUX4t2b4yjUUI7wUjvjHRgwSpSE
+ U+Lbe83bI1VlY7VoxEOmKrlEq/EvO3T/n1nHuTVYxnDZb7bDqVUsxWMXY0fNK6PIg6sW
+ kPT1F9xnlj19qRULbpU4nAHAUra2ANkhSCEkHxDTWTSli4si/eF34a41SxIrUthWeHBv
+ w3kg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=Rz1Bn0O+S+J/XTgmJoZptTZ3JFxX1OXOQheVdd25VFs=;
- b=Ma/M8FoUN+EScc0xwnhk3Px7Ee/zrlH12uZSkre3kUghtfHVqLE+mn0lkDfQ29T1Y+
- RefCfiM8p4vjg/In/tNMi1Os+xANbRU3rm9qwmwhBEwQV2RbdusPY3Io2GRqxo+2VO+7
- koudrJk5/J5E+PJ20SQJg0oyjAeG8/8d2ElrRZNgwsNS1i9kO1bOiC3IGM3eJiwOiiE+
- UAvSLLCMSZjuw6hAp/yOq/GkBrPCJ5dbmbCGwRFFYVbxfICkSQgF41fee0JQ553jLq3Z
- V0cf5sja3Nw8E2cndo4NMd96wbmzlF2gORNbdaH2VnNMF3T6gwQtJWBJNGQRBnxo19VG
- 8VhA==
-X-Gm-Message-State: AOAM530Odpm/cYYJsnHFFzfrPFz9lyIVKyPX6R4a8EV1F7ScR4zIgvKK
- VQswLL5X94attQCeej6OzTCC8pOYMlMDQDt/QHyo6OrGajA=
-X-Google-Smtp-Source: ABdhPJwmL9ilK3QZaYsWyYrWqFp5AGOB3zk4LrA+Cp4YB6D9betCEHIByOJ5fafzbCLSNdoYoVsJDClKk05FnrYXCIQ=
-X-Received: by 2002:aca:fd46:: with SMTP id b67mr3333039oii.150.1597461623940; 
- Fri, 14 Aug 2020 20:20:23 -0700 (PDT)
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=nSrc/lb9fkx3CNfm+ox5hrRtqhW1/GlYoh+C1KHuZYA=;
+ b=TrEicz/8KuIPpR+fGYmGb4296YT7mswCSQU14pQwR1W0titAGctW41ENztkzElxEIf
+ DdTQBUPs0CBasjqCnXqT+/wmB2Sy6VijcRgsMupGtPkLWQRFdCNsCpcHsNrrxR1QKgEc
+ VR8dv9ZUb/aqT+DpgRTkqvUYprdv8Aybyq9ATt4vZO4ch1//Pn4F6bpF/dwlbiz+2ToQ
+ JgJMgggBl2OADqQRVOqJrZauv+PsusvzJEGOUe64IJ/Av1ZsMoLGVH0CwfOLwS6Sg/a4
+ XDBBkiMX2TtfTBdBdSkIIzldHbVaSz+g7MFOuKGk8Wqu6BCFWg0kZGKGbqcVUzLEq/Il
+ titw==
+X-Gm-Message-State: AOAM533RJxhZjHEzX8eYQsXCTvAw0RS5b5+PHnk1JlefRIsj2B4uAtup
+ FKdk1OgUxS72Scq/TjYrUXJZaCTkWE0=
+X-Google-Smtp-Source: ABdhPJwF/U0O3qXjFbyal5jme90ZU0vTSSux9BYEgGksdFa3QUEmLTbb+wFj3JmG6ilxi+59FKRX5Q==
+X-Received: by 2002:a5d:610a:: with SMTP id v10mr5870342wrt.8.1597478332238;
+ Sat, 15 Aug 2020 00:58:52 -0700 (PDT)
+Received: from [192.168.1.36] (121.red-81-40-121.staticip.rima-tde.net.
+ [81.40.121.121])
+ by smtp.gmail.com with ESMTPSA id n11sm14558612wmi.15.2020.08.15.00.58.51
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Sat, 15 Aug 2020 00:58:51 -0700 (PDT)
+Subject: Re: [PATCH 07/18] hw/sd: sd: Fix incorrect populated function switch
+ status data structure
+To: Bin Meng <bmeng.cn@gmail.com>, Alistair Francis <Alistair.Francis@wdc.com>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Palmer Dabbelt <palmerdabbelt@google.com>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>, qemu-devel@nongnu.org,
+ qemu-riscv@nongnu.org, Sai Pavan Boddu <saipava@xilinx.com>
+References: <1597423256-14847-1-git-send-email-bmeng.cn@gmail.com>
+ <1597423256-14847-8-git-send-email-bmeng.cn@gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <565d9936-3eda-db2f-b390-05f675cf6644@amsat.org>
+Date: Sat, 15 Aug 2020 09:58:50 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-References: <20200814082841.27000-1-f4bug@amsat.org>
- <20200814082841.27000-4-f4bug@amsat.org>
-In-Reply-To: <20200814082841.27000-4-f4bug@amsat.org>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Sat, 15 Aug 2020 11:19:48 +0800
-Message-ID: <CAKXe6SJ-OvymYFD5d3R_Nq-tP5PQ0ScnU66UgVVfypgyNZx1uw@mail.gmail.com>
-Subject: Re: [PATCH 3/7] hw/ide/core: Replace magic '512' value by
- BDRV_SECTOR_SIZE
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::243;
- envelope-from=liq3ea@gmail.com; helo=mail-oi1-x243.google.com
+In-Reply-To: <1597423256-14847-8-git-send-email-bmeng.cn@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -10
-X-Spam_score: -1.1
-X-Spam_bar: -
-X-Spam_report: (-1.1 / 5.0 requ) BAYES_00=-1.9, DATE_IN_PAST_12_24=1.049,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_FROM=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,140 +108,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- qemu-block@nongnu.org, qemu-trivial@nongnu.org,
- Michael Tokarev <mjt@tls.msk.ru>, Qemu Developers <qemu-devel@nongnu.org>,
- Laurent Vivier <laurent@vivier.eu>, Paolo Bonzini <pbonzini@redhat.com>,
- Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>
+Cc: Bin Meng <bin.meng@windriver.com>, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> =E4=BA=8E2020=E5=B9=B48=E6=9C=
-=8814=E6=97=A5=E5=91=A8=E4=BA=94 =E4=B8=8B=E5=8D=884:31=E5=86=99=E9=81=93=
-=EF=BC=9A
->
-> Use self-explicit definitions instead of magic '512' value.
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
++Sai Pavan
 
-Reviewed-by: Li Qiang <liq3ea@gmail.com>
+On 8/14/20 6:40 PM, Bin Meng wrote:
+> From: Bin Meng <bin.meng@windriver.com>
+> 
+> At present the function switch status data structure bit [399:376]
+> are wrongly pupulated. These 3 bytes encode function switch status
+> for the 6 function groups, with 4 bits per group, starting from
+> function group 6 at bit 399, then followed by function group 5 at
+> bit 395, and so on.
+> 
+> However the codes mistakenly fills in the function group 1 status
+> at bit 399. This fixes the code logic.
+> 
 
+Fixes: a1bb27b1e9 ("SD card emulation (initial implementation)")
+
+> Signed-off-by: Bin Meng <bin.meng@windriver.com>
 > ---
->  hw/ide/core.c | 23 ++++++++++++-----------
->  1 file changed, 12 insertions(+), 11 deletions(-)
->
-> diff --git a/hw/ide/core.c b/hw/ide/core.c
-> index f76f7e5234..bcb2aa85fc 100644
-> --- a/hw/ide/core.c
-> +++ b/hw/ide/core.c
-> @@ -121,7 +121,7 @@ static void ide_identify(IDEState *s)
->      put_le16(p + 0, 0x0040);
->      put_le16(p + 1, s->cylinders);
->      put_le16(p + 3, s->heads);
-> -    put_le16(p + 4, 512 * s->sectors); /* XXX: retired, remove ? */
-> +    put_le16(p + 4, BDRV_SECTOR_SIZE * s->sectors); /* XXX: retired, rem=
-ove ? */
->      put_le16(p + 5, 512); /* XXX: retired, remove ? */
->      put_le16(p + 6, s->sectors);
->      padstr((char *)(p + 10), s->drive_serial_str, 20); /* serial number =
-*/
-> @@ -864,7 +864,7 @@ static void ide_dma_cb(void *opaque, int ret)
->          }
+> 
+>  hw/sd/sd.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/sd/sd.c b/hw/sd/sd.c
+> index fad9cf1..51f5900 100644
+> --- a/hw/sd/sd.c
+> +++ b/hw/sd/sd.c
+> @@ -806,11 +806,15 @@ static void sd_function_switch(SDState *sd, uint32_t arg)
+>      sd->data[11] = 0x43;
+>      sd->data[12] = 0x80;	/* Supported group 1 functions */
+>      sd->data[13] = 0x03;
+> +
+> +    sd->data[14] = 0;
+> +    sd->data[15] = 0;
+> +    sd->data[16] = 0;
+
+Pointless zero initialization.
+
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+I'll wait until next week in case Sai Pavan wants to test this
+patch (I don't have access to the Xilinx images anymore) then
+I'll queue this via my sd-next tree.
+
+Regards,
+
+Phil.
+
+>      for (i = 0; i < 6; i ++) {
+>          new_func = (arg >> (i * 4)) & 0x0f;
+>          if (mode && new_func != 0x0f)
+>              sd->function_group[i] = new_func;
+> -        sd->data[14 + (i >> 1)] = new_func << ((i * 4) & 4);
+> +        sd->data[16 - (i >> 1)] |= new_func << ((i % 2) * 4);
 >      }
->
-> -    if (s->io_buffer_size > s->nsector * 512) {
-> +    if (s->io_buffer_size > s->nsector * BDRV_SECTOR_SIZE) {
->          /*
->           * The PRDs were longer than needed for this request.
->           * The Active bit must remain set after the request completes.
-> @@ -877,7 +877,7 @@ static void ide_dma_cb(void *opaque, int ret)
->
->      sector_num =3D ide_get_sector(s);
->      if (n > 0) {
-> -        assert(n * 512 =3D=3D s->sg.size);
-> +        assert(n * BDRV_SECTOR_SIZE =3D=3D s->sg.size);
->          dma_buf_commit(s, s->sg.size);
->          sector_num +=3D n;
->          ide_set_sector(s, sector_num);
-> @@ -894,17 +894,17 @@ static void ide_dma_cb(void *opaque, int ret)
->      /* launch next transfer */
->      n =3D s->nsector;
->      s->io_buffer_index =3D 0;
-> -    s->io_buffer_size =3D n * 512;
-> +    s->io_buffer_size =3D n * BDRV_SECTOR_SIZE;
->      prep_size =3D s->bus->dma->ops->prepare_buf(s->bus->dma, s->io_buffe=
-r_size);
->      /* prepare_buf() must succeed and respect the limit */
-> -    assert(prep_size >=3D 0 && prep_size <=3D n * 512);
-> +    assert(prep_size >=3D 0 && prep_size <=3D n * BDRV_SECTOR_SIZE);
->
->      /*
->       * Now prep_size stores the number of bytes in the sglist, and
->       * s->io_buffer_size stores the number of bytes described by the PRD=
-s.
->       */
->
-> -    if (prep_size < n * 512) {
-> +    if (prep_size < n * BDRV_SECTOR_SIZE) {
->          /*
->           * The PRDs are too short for this request. Error condition!
->           * Reset the Active bit and don't raise the interrupt.
-> @@ -1412,7 +1412,8 @@ static bool cmd_identify(IDEState *s, uint8_t cmd)
->              ide_cfata_identify(s);
->          }
->          s->status =3D READY_STAT | SEEK_STAT;
-> -        ide_transfer_start(s, s->io_buffer, 512, ide_transfer_stop);
-> +        ide_transfer_start(s, s->io_buffer, BDRV_SECTOR_SIZE,
-> +                           ide_transfer_stop);
->          ide_set_irq(s->bus);
->          return false;
->      } else {
-> @@ -1482,7 +1483,7 @@ static bool cmd_write_multiple(IDEState *s, uint8_t=
- cmd)
->      n =3D MIN(s->nsector, s->req_nb_sectors);
->
->      s->status =3D SEEK_STAT | READY_STAT;
-> -    ide_transfer_start(s, s->io_buffer, 512 * n, ide_sector_write);
-> +    ide_transfer_start(s, s->io_buffer, BDRV_SECTOR_SIZE * n, ide_sector=
-_write);
->
->      s->media_changed =3D 1;
->
-> @@ -1524,7 +1525,7 @@ static bool cmd_write_pio(IDEState *s, uint8_t cmd)
->
->      s->req_nb_sectors =3D 1;
->      s->status =3D SEEK_STAT | READY_STAT;
-> -    ide_transfer_start(s, s->io_buffer, 512, ide_sector_write);
-> +    ide_transfer_start(s, s->io_buffer, BDRV_SECTOR_SIZE, ide_sector_wri=
-te);
->
->      s->media_changed =3D 1;
->
-> @@ -1678,7 +1679,7 @@ static bool cmd_identify_packet(IDEState *s, uint8_=
-t cmd)
->  {
->      ide_atapi_identify(s);
->      s->status =3D READY_STAT | SEEK_STAT;
-> -    ide_transfer_start(s, s->io_buffer, 512, ide_transfer_stop);
-> +    ide_transfer_start(s, s->io_buffer, BDRV_SECTOR_SIZE, ide_transfer_s=
-top);
->      ide_set_irq(s->bus);
->      return false;
->  }
-> @@ -2559,7 +2560,7 @@ static void ide_init1(IDEBus *bus, int unit)
->      s->unit =3D unit;
->      s->drive_serial =3D drive_serial++;
->      /* we need at least 2k alignment for accessing CDROMs using O_DIRECT=
- */
-> -    s->io_buffer_total_len =3D IDE_DMA_BUF_SECTORS*512 + 4;
-> +    s->io_buffer_total_len =3D IDE_DMA_BUF_SECTORS * BDRV_SECTOR_SIZE + =
-4;
->      s->io_buffer =3D qemu_memalign(2048, s->io_buffer_total_len);
->      memset(s->io_buffer, 0, s->io_buffer_total_len);
->
-> --
-> 2.21.3
->
->
+>      memset(&sd->data[17], 0, 47);
+>      stw_be_p(sd->data + 64, sd_crc16(sd->data, 64));
+> 
+
 
