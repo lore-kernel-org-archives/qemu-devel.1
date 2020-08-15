@@ -7,86 +7,86 @@ X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 807C8C433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 15 Aug 2020 16:16:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F22CC433E1
+	for <qemu-devel@archiver.kernel.org>; Sat, 15 Aug 2020 16:17:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0AC5C23AA0
-	for <qemu-devel@archiver.kernel.org>; Sat, 15 Aug 2020 16:16:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0A1A323AA0
+	for <qemu-devel@archiver.kernel.org>; Sat, 15 Aug 2020 16:16:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AKcdzNq5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0AC5C23AA0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J+iRFUyf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A1A323AA0
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43978 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46186 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k6yrA-0001Tw-U8
-	for qemu-devel@archiver.kernel.org; Sat, 15 Aug 2020 12:16:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58298)
+	id 1k6yrb-0002M5-5y
+	for qemu-devel@archiver.kernel.org; Sat, 15 Aug 2020 12:16:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58352)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k6ypn-0008RU-D3; Sat, 15 Aug 2020 12:15:07 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:34424)
+ id 1k6ypx-0000Ig-MZ; Sat, 15 Aug 2020 12:15:17 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:51890)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k6ypl-0003Ba-WD; Sat, 15 Aug 2020 12:15:07 -0400
-Received: by mail-wr1-x444.google.com with SMTP id f7so10929295wrw.1;
- Sat, 15 Aug 2020 09:15:04 -0700 (PDT)
+ id 1k6ypw-0003DC-68; Sat, 15 Aug 2020 12:15:17 -0400
+Received: by mail-wm1-x343.google.com with SMTP id p14so9847279wmg.1;
+ Sat, 15 Aug 2020 09:15:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=nSrc/lb9fkx3CNfm+ox5hrRtqhW1/GlYoh+C1KHuZYA=;
- b=AKcdzNq5HaZXLkcZYpCBtPQrKMtWcq7VMs35+4fu+28ojUJtOnkSSpWEc1SfMtjIXh
- x8NF553TYXqJ6hyEscbcBeJdQDNyvOanYh5UJhwGt8pwOdf/WqTUdZRT8WbhJVawkRTH
- wwj1fh03NdJ3wbcZKtomOsXW38ZmUsylgMRcbbwaULUX4t2b4yjUUI7wUjvjHRgwSpSE
- U+Lbe83bI1VlY7VoxEOmKrlEq/EvO3T/n1nHuTVYxnDZb7bDqVUsxWMXY0fNK6PIg6sW
- kPT1F9xnlj19qRULbpU4nAHAUra2ANkhSCEkHxDTWTSli4si/eF34a41SxIrUthWeHBv
- w3kg==
+ bh=i7QpRGtek9kVvNw7rdh6kZdsur5t/BbscrRJyKtiOlQ=;
+ b=J+iRFUyfyxBs9psl70itcL9zm3xr8vtozBc5Qz0C4DcGrXC547cHMZFDl+3FJJhUgg
+ BAVqVH2MPyMOAZf4rUfeLeBHbwZ3WVN/ZS0yH5+ABp2llzqPuoVq47AGuZeyKZhNXvj9
+ 8MjP1d4zDP7tJq7hCVMZX9SiAUE/LkKkOEdmrLuYoH9d/ZTN00EhFGpbkqrCvZ/STpZ7
+ la4EVjqa1JY+288cMnu/vP53qg5t/a0dc5Vr25Zz4+4joEeoFybx/CaiJ/vSbMhvwi0j
+ 1wseaXSfGZhSJv/kf4d2SKDiBAG9opWPJBhf9oadIwf0gqkt9tv1QRzwPnsHSKtqHsu2
+ r0FQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=nSrc/lb9fkx3CNfm+ox5hrRtqhW1/GlYoh+C1KHuZYA=;
- b=TrEicz/8KuIPpR+fGYmGb4296YT7mswCSQU14pQwR1W0titAGctW41ENztkzElxEIf
- DdTQBUPs0CBasjqCnXqT+/wmB2Sy6VijcRgsMupGtPkLWQRFdCNsCpcHsNrrxR1QKgEc
- VR8dv9ZUb/aqT+DpgRTkqvUYprdv8Aybyq9ATt4vZO4ch1//Pn4F6bpF/dwlbiz+2ToQ
- JgJMgggBl2OADqQRVOqJrZauv+PsusvzJEGOUe64IJ/Av1ZsMoLGVH0CwfOLwS6Sg/a4
- XDBBkiMX2TtfTBdBdSkIIzldHbVaSz+g7MFOuKGk8Wqu6BCFWg0kZGKGbqcVUzLEq/Il
- titw==
-X-Gm-Message-State: AOAM533RJxhZjHEzX8eYQsXCTvAw0RS5b5+PHnk1JlefRIsj2B4uAtup
- FKdk1OgUxS72Scq/TjYrUXJZaCTkWE0=
-X-Google-Smtp-Source: ABdhPJwF/U0O3qXjFbyal5jme90ZU0vTSSux9BYEgGksdFa3QUEmLTbb+wFj3JmG6ilxi+59FKRX5Q==
-X-Received: by 2002:a5d:610a:: with SMTP id v10mr5870342wrt.8.1597478332238;
- Sat, 15 Aug 2020 00:58:52 -0700 (PDT)
+ bh=i7QpRGtek9kVvNw7rdh6kZdsur5t/BbscrRJyKtiOlQ=;
+ b=mb4d7a9opcwUlLiTNMfPDfRfYXXMs2ymBga/nftDNFUi0zCL6Wv8EpT92v8o/wyADp
+ 3qn8cYfvXgsf6EGmit7DNOMYD64AziA1onq8rGcoqPluUilO2AQlXPGbbD3CrFxPC2E/
+ +TwFE8NItb5k8hMyv0N6m8jD/+CIwdJlwKxxMz6qKsgRzFFkFBB8GFV5We1bcq3DzCPk
+ vCD5jAI4uPeNzzYgvPMQUPG252mqRZEqLebOO9ONdjJF/TBXiBD8msjcogoxxsyhGYld
+ 8akknhr1GTPWmgdyYSHJC4jjEtjs5JMMLHsB/a4L4o7JSyMPbPaSFEyUVPjV66sb3uD5
+ Uugw==
+X-Gm-Message-State: AOAM5311b5NS6yTSHLKIP75bN9W55nAaTJ3K9i07odr2I2PBy+AeEDDV
+ seDh5bHi8PhzNEGTnb8Q6VLIYcfwtjA=
+X-Google-Smtp-Source: ABdhPJyZNNYPUreDoz6nuSDJBha5n5gjRqGCDcKmNzdeDA6+Q9envGNpo4xR/oKL49sIP3WLqUNQFw==
+X-Received: by 2002:a1c:448a:: with SMTP id r132mr5633981wma.158.1597477912864; 
+ Sat, 15 Aug 2020 00:51:52 -0700 (PDT)
 Received: from [192.168.1.36] (121.red-81-40-121.staticip.rima-tde.net.
  [81.40.121.121])
- by smtp.gmail.com with ESMTPSA id n11sm14558612wmi.15.2020.08.15.00.58.51
+ by smtp.gmail.com with ESMTPSA id g145sm27175944wmg.23.2020.08.15.00.51.46
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 15 Aug 2020 00:58:51 -0700 (PDT)
-Subject: Re: [PATCH 07/18] hw/sd: sd: Fix incorrect populated function switch
- status data structure
+ Sat, 15 Aug 2020 00:51:52 -0700 (PDT)
+Subject: Re: [PATCH 09/18] hw/sd: sdhci: Make sdhci_poweron_reset() internal
+ visible
 To: Bin Meng <bmeng.cn@gmail.com>, Alistair Francis <Alistair.Francis@wdc.com>,
  Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
  Palmer Dabbelt <palmerdabbelt@google.com>,
  Sagar Karandikar <sagark@eecs.berkeley.edu>, qemu-devel@nongnu.org,
- qemu-riscv@nongnu.org, Sai Pavan Boddu <saipava@xilinx.com>
+ qemu-riscv@nongnu.org
 References: <1597423256-14847-1-git-send-email-bmeng.cn@gmail.com>
- <1597423256-14847-8-git-send-email-bmeng.cn@gmail.com>
+ <1597423256-14847-10-git-send-email-bmeng.cn@gmail.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <565d9936-3eda-db2f-b390-05f675cf6644@amsat.org>
-Date: Sat, 15 Aug 2020 09:58:50 +0200
+Message-ID: <e68381fd-e4cd-a56a-ab44-ff603242e1cc@amsat.org>
+Date: Sat, 15 Aug 2020 09:51:40 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <1597423256-14847-8-git-send-email-bmeng.cn@gmail.com>
+In-Reply-To: <1597423256-14847-10-git-send-email-bmeng.cn@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::343;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x343.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -113,63 +113,54 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-+Sai Pavan
-
 On 8/14/20 6:40 PM, Bin Meng wrote:
 > From: Bin Meng <bin.meng@windriver.com>
 > 
-> At present the function switch status data structure bit [399:376]
-> are wrongly pupulated. These 3 bytes encode function switch status
-> for the 6 function groups, with 4 bits per group, starting from
-> function group 6 at bit 399, then followed by function group 5 at
-> bit 395, and so on.
-> 
-> However the codes mistakenly fills in the function group 1 status
-> at bit 399. This fixes the code logic.
-> 
+> sdhci_poweron_reset() might be needed for any SDHCI compatible
+> device that is built on top of the generic SDHCI device.
 
-Fixes: a1bb27b1e9 ("SD card emulation (initial implementation)")
+NAck. Please use device_legacy_reset() instead.
 
-> Signed-off-by: Bin Meng <bin.meng@windriver.com>
-> ---
-> 
->  hw/sd/sd.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/sd/sd.c b/hw/sd/sd.c
-> index fad9cf1..51f5900 100644
-> --- a/hw/sd/sd.c
-> +++ b/hw/sd/sd.c
-> @@ -806,11 +806,15 @@ static void sd_function_switch(SDState *sd, uint32_t arg)
->      sd->data[11] = 0x43;
->      sd->data[12] = 0x80;	/* Supported group 1 functions */
->      sd->data[13] = 0x03;
-> +
-> +    sd->data[14] = 0;
-> +    sd->data[15] = 0;
-> +    sd->data[16] = 0;
+In next patch:
 
-Pointless zero initialization.
+  device_legacy_reset(DEVICE(&sdhci->slot));
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
-I'll wait until next week in case Sai Pavan wants to test this
-patch (I don't have access to the Xilinx images anymore) then
-I'll queue this via my sd-next tree.
-
-Regards,
+Thanks,
 
 Phil.
 
->      for (i = 0; i < 6; i ++) {
->          new_func = (arg >> (i * 4)) & 0x0f;
->          if (mode && new_func != 0x0f)
->              sd->function_group[i] = new_func;
-> -        sd->data[14 + (i >> 1)] = new_func << ((i * 4) & 4);
-> +        sd->data[16 - (i >> 1)] |= new_func << ((i % 2) * 4);
->      }
->      memset(&sd->data[17], 0, 47);
->      stw_be_p(sd->data + 64, sd_crc16(sd->data, 64));
+> 
+> Signed-off-by: Bin Meng <bin.meng@windriver.com>
+> ---
+> 
+>  hw/sd/sdhci-internal.h | 1 +
+>  hw/sd/sdhci.c          | 2 +-
+>  2 files changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/sd/sdhci-internal.h b/hw/sd/sdhci-internal.h
+> index e8c753d..b587e8e 100644
+> --- a/hw/sd/sdhci-internal.h
+> +++ b/hw/sd/sdhci-internal.h
+> @@ -342,5 +342,6 @@ void sdhci_uninitfn(SDHCIState *s);
+>  void sdhci_common_realize(SDHCIState *s, Error **errp);
+>  void sdhci_common_unrealize(SDHCIState *s);
+>  void sdhci_common_class_init(ObjectClass *klass, void *data);
+> +void sdhci_poweron_reset(DeviceState *dev);
+>  
+>  #endif
+> diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
+> index deac181..20f2fe0 100644
+> --- a/hw/sd/sdhci.c
+> +++ b/hw/sd/sdhci.c
+> @@ -294,7 +294,7 @@ static void sdhci_reset(SDHCIState *s)
+>      s->pending_insert_state = false;
+>  }
+>  
+> -static void sdhci_poweron_reset(DeviceState *dev)
+> +void sdhci_poweron_reset(DeviceState *dev)
+>  {
+>      /* QOM (ie power-on) reset. This is identical to reset
+>       * commanded via device register apart from handling of the
 > 
 
 
