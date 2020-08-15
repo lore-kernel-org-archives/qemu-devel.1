@@ -2,83 +2,82 @@ Return-Path: <SRS0=PlQC=BZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA5DFC433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 15 Aug 2020 15:31:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58B06C433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 15 Aug 2020 15:32:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 74B3223A75
-	for <qemu-devel@archiver.kernel.org>; Sat, 15 Aug 2020 15:31:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1B94E23A75
+	for <qemu-devel@archiver.kernel.org>; Sat, 15 Aug 2020 15:32:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WmVif8Ar"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74B3223A75
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XEsdAbto"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B94E23A75
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50234 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54960 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k6y9A-0006CN-OJ
-	for qemu-devel@archiver.kernel.org; Sat, 15 Aug 2020 11:31:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37664)
+	id 1k6yAr-0008D3-Uh
+	for qemu-devel@archiver.kernel.org; Sat, 15 Aug 2020 11:32:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39110)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1k6y6U-0002oW-Ko
- for qemu-devel@nongnu.org; Sat, 15 Aug 2020 11:28:18 -0400
-Received: from mail-pj1-x1041.google.com ([2607:f8b0:4864:20::1041]:39770)
+ id 1k6y9U-0006no-BO
+ for qemu-devel@nongnu.org; Sat, 15 Aug 2020 11:31:24 -0400
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:46872)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1k6y6S-00040C-Qi
- for qemu-devel@nongnu.org; Sat, 15 Aug 2020 11:28:18 -0400
-Received: by mail-pj1-x1041.google.com with SMTP id f9so5653082pju.4
- for <qemu-devel@nongnu.org>; Sat, 15 Aug 2020 08:28:15 -0700 (PDT)
+ id 1k6y9S-0004ZJ-MG
+ for qemu-devel@nongnu.org; Sat, 15 Aug 2020 11:31:24 -0400
+Received: by mail-pf1-x443.google.com with SMTP id 74so5961550pfx.13
+ for <qemu-devel@nongnu.org>; Sat, 15 Aug 2020 08:31:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=D1VJrUQknShqmnmzu8X8w1cJRuHx820LA67l/SpR/wI=;
- b=WmVif8ArPf0sdlGrhV/s/zKZGtvIaxy/aOyK09OYvPdy1oSxGR/pblFFX7sTBnZxVj
- rgYuuolNwN0G3RqTYUnL9AOR0TKKNCCov/uFEKu2KcE62MXZjMeJwFHqb13XcnQbP9NH
- F/MyD8YVDCB7K+frcYVEx4gl2O3q09F/b+ZPNFofurzUZS2iDQ88/1+K3dgf/VI/PLz7
- iHzmUInH0x0GdkdHNm91F6rCqXtH7nVokTtTvekG8BmC6MzVNX1ui/Okle3vOYJnWrH+
- /1RFKCugh3a3MQcsgPN+Q90nh1JWdS68qVQICNGq4jZ6iP/s/taoRX6D4uqvE3S+XFPv
- DWIQ==
+ bh=Xaxzc+r6r88xLIgQLZ64izxJ1KoUU6V1OBDgcD8ihqc=;
+ b=XEsdAbto4EBxr+22K8//q6bDOn7/suDGUrZHLQavsIhHq4G3hWDuk7d7i6aVTdj//B
+ D/RKGQPoWruq5suvFHVDCQAmvF54ajyNaGMieNJBnTjvDJsz2DOztGLzm8d+7NviYD12
+ ZPcjumymMdhxrUmwdFo44S1ainKU4836d9g2UVFSgdtwEGZFLzFlOJTkPtw/NbMvqSmq
+ YbecZdLm/QJe7ESrbaaO+Ox0U/5hEkxMY4ZIEJ7D1KmyPJYTYYB4suHPuozPlA/p0Gun
+ otgDNTYpmvWRJv5cw5COmFqdLCboyNibCTlNIGDfmJXAS1Buj7eEeZTsFpbKv2jyiuFg
+ SB8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=D1VJrUQknShqmnmzu8X8w1cJRuHx820LA67l/SpR/wI=;
- b=ZUMp3PvBcy//An/314dcFzERoJbUGlEHAR384E2lfKjrt2QJ8M3BtAXroz4s/FWVb5
- Du9xYPK7AzyP7Mmc0sDlOjmBCS4NB8HeTeUjNycwmHRaJ1W64DgZgAvDLh8e2WNRrkkT
- yStC+kmIlBfIbDyqjxBS3d7EqGkxWsv3q8eNd7/+h+j+AXZQNScO+kjGGJoJUuvKfIYs
- KqKDrO3x9eCEMryu5b2A630LZx/dg42G+BxvPWp8LFOH0fWOwCL7F8E0cezDsShBEnf5
- KpSwjNf144YNt0xmqRmhLc+PeD0iqyFPSGCuGpvag15vp+aD4k2uZzMs/PyNKhn1DmI/
- jaBA==
-X-Gm-Message-State: AOAM5321PLyC18018pF5UVvecltQaOAe0Iu2cTmpBnZVRY/eoucM9SGG
- movwJlseLoIuM7anxNHG3ll76+SRGpdpPg==
-X-Google-Smtp-Source: ABdhPJwX8ilxBh5q0IfY1WH99QRcdmPu68ss52Ytcvq14V4uPRQsEUr14yJFQPLO0Qh9FImTcz9V/A==
-X-Received: by 2002:aa7:9552:: with SMTP id w18mr695754pfq.150.1597455134318; 
- Fri, 14 Aug 2020 18:32:14 -0700 (PDT)
+ bh=Xaxzc+r6r88xLIgQLZ64izxJ1KoUU6V1OBDgcD8ihqc=;
+ b=QmNPogqGqARlP8m54AIVQbhXorGFgAejtUjupNtxDwkVq0tdkvQiAbxOSph717uCEZ
+ nKU10xEFY6PJq9bhaPWCR9BGBdYr8SBGAiLfdBoRgUQuM21k40e2kw6CUqRDBkqI9k2v
+ G7CRzt2cx5GrjkP+kG7/R0JCwJTs2Y1q5MPRQQ74H4C60bGw5PKR/Sx4LxDcTE/VUAJ2
+ eF8uALZOn/vU2uf3xhSpK3zYoEpg2i7vh4bSJmIqbxc3g+3Qvgewdy9fIAVjf5fs2Db1
+ OVmRv82pcRcY+vkyRa7trfUqLcdEY6eBQ0Y077tl7pqyaAmHUOeidchK/rCYQ9B7IwPZ
+ iFlw==
+X-Gm-Message-State: AOAM5324+/3mSKYM6/DzqQ24QtnQV5JfLg/XlzcecHuORRVYCwn8PG9Y
+ l2/M/jHRW/DMZDZDRsNyb3nbB5qDNtAaXA==
+X-Google-Smtp-Source: ABdhPJzwy9zWZ9Wp/nNapuoYwq/d0IcrPRxYRmuKEipi7b5tVoBgzxmr9NRIlAEHpKUCC7npTgzeLg==
+X-Received: by 2002:a63:4e56:: with SMTP id o22mr3256361pgl.381.1597455125698; 
+ Fri, 14 Aug 2020 18:32:05 -0700 (PDT)
 Received: from localhost.localdomain ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id y196sm10625528pfc.202.2020.08.14.18.32.13
+ by smtp.gmail.com with ESMTPSA id y196sm10625528pfc.202.2020.08.14.18.32.04
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 14 Aug 2020 18:32:13 -0700 (PDT)
+ Fri, 14 Aug 2020 18:32:05 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 20/20] target/arm: Convert sq{,
- r}dmulh to gvec for aa64 advsimd
-Date: Fri, 14 Aug 2020 18:31:45 -0700
-Message-Id: <20200815013145.539409-21-richard.henderson@linaro.org>
+Subject: [PATCH 13/20] target/arm: Tidy SVE tszimm shift formats
+Date: Fri, 14 Aug 2020 18:31:38 -0700
+Message-Id: <20200815013145.539409-14-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200815013145.539409-1-richard.henderson@linaro.org>
 References: <20200815013145.539409-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1041;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1041.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::443;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x443.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -105,158 +104,76 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Rather than require the user to fill in the immediate (shl or shr),
+create full formats that include the immediate.
+
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/helper.h        | 10 ++++++++
- target/arm/translate-a64.c | 33 ++++++++++++++++++--------
- target/arm/vec_helper.c    | 48 ++++++++++++++++++++++++++++++++++++++
- 3 files changed, 81 insertions(+), 10 deletions(-)
+ target/arm/sve.decode | 35 ++++++++++++++++-------------------
+ 1 file changed, 16 insertions(+), 19 deletions(-)
 
-diff --git a/target/arm/helper.h b/target/arm/helper.h
-index 378bb1898b..3ca73a1764 100644
---- a/target/arm/helper.h
-+++ b/target/arm/helper.h
-@@ -776,6 +776,16 @@ DEF_HELPER_FLAGS_5(gvec_mls_idx_s, TCG_CALL_NO_RWG,
- DEF_HELPER_FLAGS_5(gvec_mls_idx_d, TCG_CALL_NO_RWG,
-                    void, ptr, ptr, ptr, ptr, i32)
+diff --git a/target/arm/sve.decode b/target/arm/sve.decode
+index 4f580a25e7..6425396ac1 100644
+--- a/target/arm/sve.decode
++++ b/target/arm/sve.decode
+@@ -150,13 +150,17 @@
+ @rd_rn_i6       ........ ... rn:5 ..... imm:s6 rd:5             &rri
  
-+DEF_HELPER_FLAGS_5(neon_sqdmulh_h, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(neon_sqdmulh_s, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+
-+DEF_HELPER_FLAGS_5(neon_sqrdmulh_h, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(neon_sqrdmulh_s, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+
- #ifdef TARGET_AARCH64
- #include "helper-a64.h"
- #include "helper-sve.h"
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index c74c6e854c..d4da12268c 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -697,6 +697,20 @@ static void gen_gvec_op3_fpst(DisasContext *s, bool is_q, int rd, int rn,
-     tcg_temp_free_ptr(fpst);
- }
+ # Two register operand, one immediate operand, with predicate,
+-# element size encoded as TSZHL.  User must fill in imm.
+-@rdn_pg_tszimm  ........ .. ... ... ... pg:3 ..... rd:5 \
+-                &rpri_esz rn=%reg_movprfx esz=%tszimm_esz
++# element size encoded as TSZHL.
++@rdn_pg_tszimm_shl  ........ .. ... ... ... pg:3 ..... rd:5 \
++                    &rpri_esz rn=%reg_movprfx esz=%tszimm_esz imm=%tszimm_shl
++@rdn_pg_tszimm_shr  ........ .. ... ... ... pg:3 ..... rd:5 \
++                    &rpri_esz rn=%reg_movprfx esz=%tszimm_esz imm=%tszimm_shr
  
-+/* Expand a 3-operand + qc + operation using an out-of-line helper.  */
-+static void gen_gvec_op3_qc(DisasContext *s, bool is_q, int rd, int rn,
-+                            int rm, gen_helper_gvec_3_ptr *fn)
-+{
-+    TCGv_ptr qc_ptr = tcg_temp_new_ptr();
-+
-+    tcg_gen_addi_ptr(qc_ptr, cpu_env, offsetof(CPUARMState, vfp.qc));
-+    tcg_gen_gvec_3_ptr(vec_full_reg_offset(s, rd),
-+                       vec_full_reg_offset(s, rn),
-+                       vec_full_reg_offset(s, rm), qc_ptr,
-+                       is_q ? 16 : 8, vec_full_reg_size(s), 0, fn);
-+    tcg_temp_free_ptr(qc_ptr);
-+}
-+
- /* Set ZF and NF based on a 64 bit result. This is alas fiddlier
-  * than the 32 bit equivalent.
-  */
-@@ -11753,6 +11767,15 @@ static void disas_simd_3same_int(DisasContext *s, uint32_t insn)
-             gen_gvec_fn3(s, is_q, rd, rn, rm, gen_gvec_mla, size);
-         }
-         return;
-+    case 0x16: /* SQDMULH, SQRDMULH */
-+        {
-+            static gen_helper_gvec_3_ptr * const fns[2][2] = {
-+                { gen_helper_neon_sqdmulh_h, gen_helper_neon_sqrdmulh_h },
-+                { gen_helper_neon_sqdmulh_s, gen_helper_neon_sqrdmulh_s },
-+            };
-+            gen_gvec_op3_qc(s, is_q, rd, rn, rm, fns[size - 1][u]);
-+        }
-+        return;
-     case 0x11:
-         if (!u) { /* CMTST */
-             gen_gvec_fn3(s, is_q, rd, rn, rm, gen_gvec_cmtst, size);
-@@ -11864,16 +11887,6 @@ static void disas_simd_3same_int(DisasContext *s, uint32_t insn)
-                 genenvfn = fns[size][u];
-                 break;
-             }
--            case 0x16: /* SQDMULH, SQRDMULH */
--            {
--                static NeonGenTwoOpEnvFn * const fns[2][2] = {
--                    { gen_helper_neon_qdmulh_s16, gen_helper_neon_qrdmulh_s16 },
--                    { gen_helper_neon_qdmulh_s32, gen_helper_neon_qrdmulh_s32 },
--                };
--                assert(size == 1 || size == 2);
--                genenvfn = fns[size - 1][u];
--                break;
--            }
-             default:
-                 g_assert_not_reached();
-             }
-diff --git a/target/arm/vec_helper.c b/target/arm/vec_helper.c
-index fb53684ce3..73d62c4e4f 100644
---- a/target/arm/vec_helper.c
-+++ b/target/arm/vec_helper.c
-@@ -109,6 +109,30 @@ void HELPER(gvec_qrdmlsh_s16)(void *vd, void *vn, void *vm,
-     clear_tail(d, opr_sz, simd_maxsz(desc));
- }
+ # Similarly without predicate.
+-@rd_rn_tszimm   ........ .. ... ... ...... rn:5 rd:5 \
+-                &rri_esz esz=%tszimm16_esz
++@rd_rn_tszimm_shl   ........ .. ... ... ...... rn:5 rd:5 \
++                    &rri_esz esz=%tszimm16_esz imm=%tszimm16_shl
++@rd_rn_tszimm_shr   ........ .. ... ... ...... rn:5 rd:5 \
++                    &rri_esz esz=%tszimm16_esz imm=%tszimm16_shr
  
-+void HELPER(neon_sqdmulh_h)(void *vd, void *vn, void *vm,
-+                            void *vq, uint32_t desc)
-+{
-+    intptr_t i, opr_sz = simd_oprsz(desc);
-+    int16_t *d = vd, *n = vn, *m = vm;
-+
-+    for (i = 0; i < opr_sz / 2; ++i) {
-+        d[i] = do_sqrdmlah_h(n[i], m[i], 0, false, false, vq);
-+    }
-+    clear_tail(d, opr_sz, simd_maxsz(desc));
-+}
-+
-+void HELPER(neon_sqrdmulh_h)(void *vd, void *vn, void *vm,
-+                             void *vq, uint32_t desc)
-+{
-+    intptr_t i, opr_sz = simd_oprsz(desc);
-+    int16_t *d = vd, *n = vn, *m = vm;
-+
-+    for (i = 0; i < opr_sz / 2; ++i) {
-+        d[i] = do_sqrdmlah_h(n[i], m[i], 0, false, true, vq);
-+    }
-+    clear_tail(d, opr_sz, simd_maxsz(desc));
-+}
-+
- /* Signed saturating rounding doubling multiply-accumulate high half, 32-bit */
- static int32_t do_sqrdmlah_s(int32_t src1, int32_t src2, int32_t src3,
-                              bool neg, bool round, uint32_t *sat)
-@@ -172,6 +196,30 @@ void HELPER(gvec_qrdmlsh_s32)(void *vd, void *vn, void *vm,
-     clear_tail(d, opr_sz, simd_maxsz(desc));
- }
+ # Two register operand, one immediate operand, with 4-bit predicate.
+ # User must fill in imm.
+@@ -289,14 +293,10 @@ UMINV           00000100 .. 001 011 001 ... ..... .....         @rd_pg_rn
+ ### SVE Shift by Immediate - Predicated Group
  
-+void HELPER(neon_sqdmulh_s)(void *vd, void *vn, void *vm,
-+                            void *vq, uint32_t desc)
-+{
-+    intptr_t i, opr_sz = simd_oprsz(desc);
-+    int32_t *d = vd, *n = vn, *m = vm;
-+
-+    for (i = 0; i < opr_sz / 4; ++i) {
-+        d[i] = do_sqrdmlah_s(n[i], m[i], 0, false, false, vq);
-+    }
-+    clear_tail(d, opr_sz, simd_maxsz(desc));
-+}
-+
-+void HELPER(neon_sqrdmulh_s)(void *vd, void *vn, void *vm,
-+                             void *vq, uint32_t desc)
-+{
-+    intptr_t i, opr_sz = simd_oprsz(desc);
-+    int32_t *d = vd, *n = vn, *m = vm;
-+
-+    for (i = 0; i < opr_sz / 4; ++i) {
-+        d[i] = do_sqrdmlah_s(n[i], m[i], 0, false, true, vq);
-+    }
-+    clear_tail(d, opr_sz, simd_maxsz(desc));
-+}
-+
- /* Integer 8 and 16-bit dot-product.
-  *
-  * Note that for the loops herein, host endianness does not matter
+ # SVE bitwise shift by immediate (predicated)
+-ASR_zpzi        00000100 .. 000 000 100 ... .. ... ..... \
+-                @rdn_pg_tszimm imm=%tszimm_shr
+-LSR_zpzi        00000100 .. 000 001 100 ... .. ... ..... \
+-                @rdn_pg_tszimm imm=%tszimm_shr
+-LSL_zpzi        00000100 .. 000 011 100 ... .. ... ..... \
+-                @rdn_pg_tszimm imm=%tszimm_shl
+-ASRD            00000100 .. 000 100 100 ... .. ... ..... \
+-                @rdn_pg_tszimm imm=%tszimm_shr
++ASR_zpzi        00000100 .. 000 000 100 ... .. ... .....  @rdn_pg_tszimm_shr
++LSR_zpzi        00000100 .. 000 001 100 ... .. ... .....  @rdn_pg_tszimm_shr
++LSL_zpzi        00000100 .. 000 011 100 ... .. ... .....  @rdn_pg_tszimm_shl
++ASRD            00000100 .. 000 100 100 ... .. ... .....  @rdn_pg_tszimm_shr
+ 
+ # SVE bitwise shift by vector (predicated)
+ ASR_zpzz        00000100 .. 010 000 100 ... ..... .....   @rdn_pg_rm
+@@ -400,12 +400,9 @@ RDVL            00000100 101 11111 01010 imm:s6 rd:5
+ ### SVE Bitwise Shift - Unpredicated Group
+ 
+ # SVE bitwise shift by immediate (unpredicated)
+-ASR_zzi         00000100 .. 1 ..... 1001 00 ..... ..... \
+-                @rd_rn_tszimm imm=%tszimm16_shr
+-LSR_zzi         00000100 .. 1 ..... 1001 01 ..... ..... \
+-                @rd_rn_tszimm imm=%tszimm16_shr
+-LSL_zzi         00000100 .. 1 ..... 1001 11 ..... ..... \
+-                @rd_rn_tszimm imm=%tszimm16_shl
++ASR_zzi         00000100 .. 1 ..... 1001 00 ..... .....  @rd_rn_tszimm_shr
++LSR_zzi         00000100 .. 1 ..... 1001 01 ..... .....  @rd_rn_tszimm_shr
++LSL_zzi         00000100 .. 1 ..... 1001 11 ..... .....  @rd_rn_tszimm_shl
+ 
+ # SVE bitwise shift by wide elements (unpredicated)
+ # Note esz != 3
 -- 
 2.25.1
 
