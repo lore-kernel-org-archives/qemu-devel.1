@@ -2,86 +2,91 @@ Return-Path: <SRS0=PlQC=BZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=0.4 required=3.0 tests=BAYES_00,DATE_IN_PAST_06_12,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61466C433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 15 Aug 2020 16:51:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84CD1C433E1
+	for <qemu-devel@archiver.kernel.org>; Sat, 15 Aug 2020 16:56:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 25FC323B18
-	for <qemu-devel@archiver.kernel.org>; Sat, 15 Aug 2020 16:51:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 47BD223B18
+	for <qemu-devel@archiver.kernel.org>; Sat, 15 Aug 2020 16:56:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oNu/VjoX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25FC323B18
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SWBW/y7m"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47BD223B18
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52186 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54988 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k6zOq-0005AK-FH
-	for qemu-devel@archiver.kernel.org; Sat, 15 Aug 2020 12:51:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38862)
+	id 1k6zTW-0006Zd-Cy
+	for qemu-devel@archiver.kernel.org; Sat, 15 Aug 2020 12:56:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39872)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <hsp.cat7@gmail.com>)
- id 1k6zOG-0004jY-Uf
- for qemu-devel@nongnu.org; Sat, 15 Aug 2020 12:50:44 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:44072)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1k6zSg-00062Z-6e
+ for qemu-devel@nongnu.org; Sat, 15 Aug 2020 12:55:18 -0400
+Received: from mail-vs1-xe42.google.com ([2607:f8b0:4864:20::e42]:42873)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <hsp.cat7@gmail.com>)
- id 1k6zOF-0007rx-3O
- for qemu-devel@nongnu.org; Sat, 15 Aug 2020 12:50:44 -0400
-Received: by mail-oi1-x244.google.com with SMTP id h3so10983156oie.11
- for <qemu-devel@nongnu.org>; Sat, 15 Aug 2020 09:50:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
- bh=fJkvxgfiGyz33+Y8tWTTw9I5nhgSyYEXW6hXm6UBN2k=;
- b=oNu/VjoXQ5Vg85TwhL+IjbrRanVgN2s8YIETU82NcqLrOwpq1yDDU0yzNaC5nzNj4V
- IEYATBVXhDjIEhvCzw2OpyfNY56K+LIJ0ujRkMNwCZ1iTtbGpvKcIhfhhGk1VHi+sjp1
- cI4wT6PMNL9Iuke9RzXuUc6+EspJHpDgI8jMaFjg9Lq9LSJ/jj/jU0UbZ6rf+FWx7j/p
- mlpKShdCYyY2PewUNHlfx3Fha10VCWCjSw8/k6RyPHSS0sXbVQAF4m8M1LcGKL5Bk3hH
- 46D3r8M70AnkGWfYvAWuZRvLaUy5mP8mHLaQ1+PcIzCLNCyoxeLSp5jBBTbm+KarRLBO
- T2xQ==
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1k6zSe-0008PE-GI
+ for qemu-devel@nongnu.org; Sat, 15 Aug 2020 12:55:17 -0400
+Received: by mail-vs1-xe42.google.com with SMTP id q13so6199972vsn.9
+ for <qemu-devel@nongnu.org>; Sat, 15 Aug 2020 09:55:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=Op8+nIvDwpXgHA5KB5m5Q5E20k6FFVqok3W8zuTgmJQ=;
+ b=SWBW/y7m3+PdaFt/aEfgwdLYM4xUYOO17egAyx0QX5bMmY7zUS1lWiXgArxER7vnw6
+ ab99bz1uQiinq8jZkO3ohdw/cycWCP5Mm00VzBf2UQfBpgAAReD9Yvxxe+up2iKlRRb0
+ 9lioC+hyaLBS+YCrr2EeZAhDRcZyIlwHVUSCAgjpTtqsYmo5ABE3kGQdi77me/47hfpp
+ kwjg+wTaKG2QlAPNaEELUNzq9mTnG8BX5b5FsNakrnYIBDXqsDhLa4fw3If9ZK3YKBax
+ kkHCAptEGkXErDKmK0yTay3HHkGJ+/g9MAzvzk34s1R4CwWZJ3iINy6Sr0ZZnPTGXlAj
+ 7BPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to;
- bh=fJkvxgfiGyz33+Y8tWTTw9I5nhgSyYEXW6hXm6UBN2k=;
- b=IxuYfGvOXC1/4o7iaGqmfFZERm24n+3RTUJxNy2D749eDJKvRSJbQpCLE2j2guHeLa
- y1efEUJIpTzDWe1pNcBL2Fjr3RdCG28Z7Xg8lIwSzHzcnzqfKKf2DE0ygLoURFadDLy3
- pOK33hXNfgi/SbpR2GMmxtsXG302WZK+m2/ZH9FsZzK3Mz+GuSezBIkrv8AAOLcmJHd2
- 29y8rSllTtgIKrXypmUH/tjIdXYjVaM2zZiLdnGoH6r/vig5aY5C/lnezqkLEw5ubMY8
- MjxsMqdSVQQHP2Istjbo3zD/l8Juo5snXbKSzH2V0LMvDsegpyIFgSWC5rqRHCkY1i3K
- 0xkg==
-X-Gm-Message-State: AOAM531I4QU57cD1BSbselcLGEtVl6goGMWSaJtYmLak/6G5ku+h6mbd
- q5x+p2NGQgp1wPLG2FN24+xgUGlvdMEDPYXdXCMX+nRX
-X-Google-Smtp-Source: ABdhPJywXFQpIPVVqG5NySOwE0KT5HtmAshlnk8qRcg30WbcmTLenXYhsejLY4fKtGYTVFbaObIyTBE2i1pg+wZ+VKA=
-X-Received: by 2002:aca:4c0f:: with SMTP id z15mr3694784oia.131.1597482123875; 
- Sat, 15 Aug 2020 02:02:03 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=Op8+nIvDwpXgHA5KB5m5Q5E20k6FFVqok3W8zuTgmJQ=;
+ b=RuV9xAquiD5yc3xFv1iMObXn7xUwyT5A4xGevZ60JxyoVUd7Cf6hxLB9aEX82uQBkR
+ jLecBBqG5WxYXd/gfV23dob2sjaZIyb3RFfZBoOKBYnKMt9N2k2ErmT9Ml26gmt11NE+
+ gptcr0OZXhKogeoT7jaEK8mdjE+bdqp0xkV0MTKBWs1++n4898kCfxPLR+Gfy6HzBxtb
+ EG/oSxRm3YeePxxzkJPOL+qbvstbBKv/D/Gwgo1rEPMnooHmmAeLayeOyA2eFeS+sqfI
+ J6Ok/SgsdUMPlNBpDwzusMXmPgGjVQ17TXJIHo8+yzvMq0cmkUGge4S7wc7GDeoNeg5h
+ VF8Q==
+X-Gm-Message-State: AOAM531OA/3XfuKvhy7nn0l9GrWQnyj4nVqvekoMUVdK+uRHLwOAl6eI
+ kdbP3PaLCKUuISH70cfUb9MYISY6Ps4+4Q==
+X-Google-Smtp-Source: ABdhPJzl4Jr+b9wWrX87a5QaJFdjYVdanp/z7vDvDgb6nbmZaKTuxtqsxCnAV8VGmBYW9I1CX32rmg==
+X-Received: by 2002:a62:d111:: with SMTP id z17mr3757649pfg.221.1597455128053; 
+ Fri, 14 Aug 2020 18:32:08 -0700 (PDT)
+Received: from localhost.localdomain ([71.212.141.89])
+ by smtp.gmail.com with ESMTPSA id y196sm10625528pfc.202.2020.08.14.18.32.06
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 14 Aug 2020 18:32:07 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 15/20] target/arm: Fix sve_uzp_p vs odd vector lengths
+Date: Fri, 14 Aug 2020 18:31:40 -0700
+Message-Id: <20200815013145.539409-16-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200815013145.539409-1-richard.henderson@linaro.org>
+References: <20200815013145.539409-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-References: <20200814091326.16173-1-pbonzini@redhat.com>
-In-Reply-To: <20200814091326.16173-1-pbonzini@redhat.com>
-From: Howard Spoelstra <hsp.cat7@gmail.com>
-Date: Sat, 15 Aug 2020 11:01:52 +0200
-Message-ID: <CABLmASEvuBOaJ9PeyXZmruyDQhiERnPxSXEsHg+VNe83XeD6=g@mail.gmail.com>
-Subject: Re: [PATCH v2 000/150] Meson integration for 5.2
-To: qemu-devel qemu-devel <qemu-devel@nongnu.org>
-Content-Type: multipart/alternative; boundary="0000000000008758e805ace6ca0d"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::244;
- envelope-from=hsp.cat7@gmail.com; helo=mail-oi1-x244.google.com
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::e42;
+ envelope-from=richard.henderson@linaro.org; helo=mail-vs1-xe42.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -2
-X-Spam_score: -0.3
-X-Spam_bar: /
-X-Spam_report: (-0.3 / 5.0 requ) BAYES_00=-1.9, DATE_IN_PAST_06_12=1.543,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001, HTML_MESSAGE=0.001,
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,144 +99,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Laurent Desnogues <laurent.desnogues@gmail.com>, peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000008758e805ace6ca0d
-Content-Type: text/plain; charset="UTF-8"
+Missed out on compressing the second half of a predicate
+with length vl % 512 > 256.
 
-On Fri, Aug 14, 2020 at 11:15 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+Adjust all of the x + (y << s) to x | (y << s) as a
+general style fix.
 
->
-> Hi Paolo,
+Reported-by: Laurent Desnogues <laurent.desnogues@gmail.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/arm/sve_helper.c | 30 +++++++++++++++++++++---------
+ 1 file changed, 21 insertions(+), 9 deletions(-)
 
-I don't know how much of this is already meant to work, but I run into
-several issues when compiling the latest code from the meson-poc-next
-branch.
+diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
+index 4758d46f34..fcb46f150f 100644
+--- a/target/arm/sve_helper.c
++++ b/target/arm/sve_helper.c
+@@ -1938,7 +1938,7 @@ void HELPER(sve_uzp_p)(void *vd, void *vn, void *vm, uint32_t pred_desc)
+     if (oprsz <= 8) {
+         l = compress_bits(n[0] >> odd, esz);
+         h = compress_bits(m[0] >> odd, esz);
+-        d[0] = extract64(l + (h << (4 * oprsz)), 0, 8 * oprsz);
++        d[0] = l | (h << (4 * oprsz));
+     } else {
+         ARMPredicateReg tmp_m;
+         intptr_t oprsz_16 = oprsz / 16;
+@@ -1952,23 +1952,35 @@ void HELPER(sve_uzp_p)(void *vd, void *vn, void *vm, uint32_t pred_desc)
+             h = n[2 * i + 1];
+             l = compress_bits(l >> odd, esz);
+             h = compress_bits(h >> odd, esz);
+-            d[i] = l + (h << 32);
++            d[i] = l | (h << 32);
+         }
+ 
+-        /* For VL which is not a power of 2, the results from M do not
+-           align nicely with the uint64_t for D.  Put the aligned results
+-           from M into TMP_M and then copy it into place afterward.  */
++        /*
++         * For VL which is not a multiple of 512, the results from M do not
++         * align nicely with the uint64_t for D.  Put the aligned results
++         * from M into TMP_M and then copy it into place afterward.
++         */
+         if (oprsz & 15) {
+-            d[i] = compress_bits(n[2 * i] >> odd, esz);
++            int final_shift = (oprsz & 15) * 2;
++
++            l = n[2 * i + 0];
++            h = n[2 * i + 1];
++            l = compress_bits(l >> odd, esz);
++            h = compress_bits(h >> odd, esz);
++            d[i] = l | (h << final_shift);
+ 
+             for (i = 0; i < oprsz_16; i++) {
+                 l = m[2 * i + 0];
+                 h = m[2 * i + 1];
+                 l = compress_bits(l >> odd, esz);
+                 h = compress_bits(h >> odd, esz);
+-                tmp_m.p[i] = l + (h << 32);
++                tmp_m.p[i] = l | (h << 32);
+             }
+-            tmp_m.p[i] = compress_bits(m[2 * i] >> odd, esz);
++            l = m[2 * i + 0];
++            h = m[2 * i + 1];
++            l = compress_bits(l >> odd, esz);
++            h = compress_bits(h >> odd, esz);
++            tmp_m.p[i] = l | (h << final_shift);
+ 
+             swap_memmove(vd + oprsz / 2, &tmp_m, oprsz / 2);
+         } else {
+@@ -1977,7 +1989,7 @@ void HELPER(sve_uzp_p)(void *vd, void *vn, void *vm, uint32_t pred_desc)
+                 h = m[2 * i + 1];
+                 l = compress_bits(l >> odd, esz);
+                 h = compress_bits(h >> odd, esz);
+-                d[oprsz_16 + i] = l + (h << 32);
++                d[oprsz_16 + i] = l | (h << 32);
+             }
+         }
+     }
+-- 
+2.25.1
 
-1. MSYS2-based Windows build: The guide to compile e.g., qemu-system-ppc on
-Windows with Msys2 works OK to compile Qemu:
-https://wiki.qemu.org/Hosts/W32#Native_builds_with_MSYS2
-However, when I compile the meson-poc-next branch I run into the following
-error:
-
-hsp@HSP-W10-X64-I7 MINGW64 ~/src/qemu-meson-gitlab/build
-$ ../configure --cross-prefix=x86_64-w64-mingw32- --target-list=ppc-softmmu
---enable-gtk --enable-sdl
-...
-Program python3 found: NO
-../meson.build:32:0: ERROR: /mingw64/bin/python3 not found
-A full log can be found at
-C:/msys64/home/hsp/src/qemu-meson-gitlab/build/meson-logs/meson-log.txt
-ERROR: meson setup failed
-
-2. When cross compiling from Fedora 32 for Windows with
-../configure --cross-prefix=x86_64-w64-mingw32- --enable-gtk --enable-sdl
---target-list=ppc-softmmu
-
-I get the error below even though the v2 commit message says there is a fix
-for the absolute path error included:
-
-The Meson build system
-Version: 0.55.0
-Source dir: /home/hsp/src/qemu-meson-gitlab
-Build dir: /home/hsp/src/qemu-meson-gitlab/build
-Build type: cross build
-
-../meson.build:1:0: ERROR: prefix value 'c:/Program Files/QEMU' must be an
-absolute path
-
-A full log can be found at
-/home/hsp/src/qemu-meson-gitlab/build/meson-logs/meson-log.txt
-
-ERROR: meson setup failed
-
-3. As mentioned earlier here concerning a build on fedora 32 host:
-https://lists.nongnu.org/archive/html/qemu-devel/2020-08/msg02307.html
-Both SDL and GTK Guis do not seem to work, only the vnc server is started.
-
-4. The v2 patch set seems to not apply cleanly to current qemu-master, I
-get this error:
-patching file docs/devel/build-system.rst (renamed from
-docs/devel/build-system.txt)
-Hunk #2 succeeded at 179 with fuzz 2 (offset 152 lines).
-Hunk #3 succeeded at 187 (offset 152 lines).
-Hunk #4 FAILED at 53.
-Hunk #5 FAILED at 90.
-Hunk #6 FAILED at 115.
-Hunk #7 FAILED at 183.
-Hunk #8 FAILED at 201.
-Hunk #9 FAILED at 211.
-Hunk #10 FAILED at 222.
-Hunk #11 FAILED at 247.
-Hunk #12 FAILED at 308.
-Hunk #13 FAILED at 356.
-Hunk #14 FAILED at 398.
-Hunk #15 FAILED at 451.
-12 out of 15 hunks FAILED -- saving rejects to file
-docs/devel/build-system.rst.rej
-
-5: And one question: Should the compiled binary etc be placed in the build
-directory, or should they go into (in my case) the ppc-softmmu folder as
-with a default build?
-
-Best,
-Howard
-
---0000000000008758e805ace6ca0d
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
-<div dir=3D"ltr" class=3D"gmail_attr">On Fri, Aug 14, 2020 at 11:15 AM Paol=
-o Bonzini &lt;<a href=3D"mailto:pbonzini@redhat.com" target=3D"_blank">pbon=
-zini@redhat.com</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" s=
-tyle=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);pad=
-ding-left:1ex"><br></blockquote><div><div>Hi Paolo,</div><div><br></div><di=
-v>I don&#39;t know how much of this is
- already meant to work, but I run into several issues when compiling the
- latest code from the meson-poc-next branch. <br></div><div><br></div><div>=
-1. MSYS2-based Windows build: The guide to compile e.g., qemu-system-ppc on=
- Windows with Msys2 works OK to compile Qemu: <a href=3D"https://wiki.qemu.=
-org/Hosts/W32#Native_builds_with_MSYS2" target=3D"_blank">https://wiki.qemu=
-.org/Hosts/W32#Native_builds_with_MSYS2</a> <br></div><div>However, when I =
-compile the meson-poc-next branch I run into the following error:</div><div=
-><br></div><div>hsp@HSP-W10-X64-I7 MINGW64 ~/src/qemu-meson-gitlab/build<br=
->$ ../configure --cross-prefix=3Dx86_64-w64-mingw32- --target-list=3Dppc-so=
-ftmmu --enable-gtk --enable-sdl <br></div><div>...<br>Program python3 found=
-: NO<br>../meson.build:32:0: ERROR: /mingw64/bin/python3 not found<br>A ful=
-l log can be found at C:/msys64/home/hsp/src/qemu-meson-gitlab/build/meson-=
-logs/meson-log.txt<br>ERROR: meson setup failed</div><div><br></div><div>2.=
- When cross compiling from Fedora 32 for Windows with</div><div>../configur=
-e --cross-prefix=3Dx86_64-w64-mingw32- --enable-gtk --enable-sdl --target-l=
-ist=3Dppc-softmmu</div><div><br></div><div>I get the error below even thoug=
-h the v2 commit message says there is a fix for the absolute path error inc=
-luded:</div><div><br></div><div>The Meson build system<br>Version: 0.55.0<b=
-r>Source dir: /home/hsp/src/qemu-meson-gitlab<br>Build dir: /home/hsp/src/q=
-emu-meson-gitlab/build<br>Build type: cross build<br><br>../meson.build:1:0=
-: ERROR: prefix value &#39;c:/Program Files/QEMU&#39; must be an absolute p=
-ath<br><br>A full log can be found at /home/hsp/src/qemu-meson-gitlab/build=
-/meson-logs/meson-log.txt<br><br>ERROR: meson setup failed</div><div><br></=
-div><div>3. As mentioned earlier here concerning a build on fedora 32 host:=
-<br></div><div><a href=3D"https://lists.nongnu.org/archive/html/qemu-devel/=
-2020-08/msg02307.html" target=3D"_blank">https://lists.nongnu.org/archive/h=
-tml/qemu-devel/2020-08/msg02307.html</a></div><div>Both SDL and GTK Guis do=
- not seem to work, only the vnc server is started.<br></div><div><br></div>=
-<div>4. The v2 patch set seems to not apply cleanly to current qemu-master,=
- I get this error: <br></div><div>patching file docs/devel/build-system.rst=
- (renamed from docs/devel/build-system.txt)<br>Hunk #2 succeeded at 179 wit=
-h fuzz 2 (offset 152 lines).<br>Hunk #3 succeeded at 187 (offset 152 lines)=
-.<br>Hunk #4 FAILED at 53.<br>Hunk #5 FAILED at 90.<br>Hunk #6 FAILED at 11=
-5.<br>Hunk #7 FAILED at 183.<br>Hunk #8 FAILED at 201.<br>Hunk #9 FAILED at=
- 211.<br>Hunk #10 FAILED at 222.<br>Hunk #11 FAILED at 247.<br>Hunk #12 FAI=
-LED at 308.<br>Hunk #13 FAILED at 356.<br>Hunk #14 FAILED at 398.<br>Hunk #=
-15 FAILED at 451.<br>12 out of 15 hunks FAILED -- saving rejects to file do=
-cs/devel/build-system.rst.rej<br></div><div><br></div><div>5:
- And one question: Should the compiled binary etc be placed in the build
- directory, or should they go into (in my case) the ppc-softmmu folder=20
-as with a default build? <br></div><div><br></div><div>Best,</div><div>Howa=
-rd</div></div><div>=C2=A0</div></div></div>
-
---0000000000008758e805ace6ca0d--
 
