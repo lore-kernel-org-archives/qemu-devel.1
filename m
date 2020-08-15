@@ -7,43 +7,43 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BC3EC433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 15 Aug 2020 18:03:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C68CC433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 15 Aug 2020 18:03:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 01AEC23B6F
-	for <qemu-devel@archiver.kernel.org>; Sat, 15 Aug 2020 18:03:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01AEC23B6F
+	by mail.kernel.org (Postfix) with ESMTPS id D500723B6F
+	for <qemu-devel@archiver.kernel.org>; Sat, 15 Aug 2020 18:03:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D500723B6F
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58740 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59100 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k70Wy-0002Sm-7y
-	for qemu-devel@archiver.kernel.org; Sat, 15 Aug 2020 14:03:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51784)
+	id 1k70X4-0002bc-5K
+	for qemu-devel@archiver.kernel.org; Sat, 15 Aug 2020 14:03:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51788)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
- id 1k70VG-0000pu-J8
- for qemu-devel@nongnu.org; Sat, 15 Aug 2020 14:02:02 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:57320 helo=huawei.com)
+ id 1k70VI-0000rz-2l
+ for qemu-devel@nongnu.org; Sat, 15 Aug 2020 14:02:04 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:57324 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
- id 1k70VE-0007DT-Ii
- for qemu-devel@nongnu.org; Sat, 15 Aug 2020 14:02:02 -0400
+ id 1k70VD-0007DS-8m
+ for qemu-devel@nongnu.org; Sat, 15 Aug 2020 14:02:03 -0400
 Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 07955CC715B2438D88AC;
+ by Forcepoint Email with ESMTP id 15330EF42AC93647B124;
  Sat, 15 Aug 2020 10:11:17 +0800 (CST)
 Received: from huawei.com (10.175.101.6) by DGGEMS401-HUB.china.huawei.com
  (10.3.19.201) with Microsoft SMTP Server id 14.3.487.0; Sat, 15 Aug 2020
- 10:11:09 +0800
+ 10:11:07 +0800
 From: Chuan Zheng <zhengchuan@huawei.com>
 To: <quintela@redhat.com>, <eblake@redhat.com>, <dgilbert@redhat.com>
-Subject: [PATCH v2 09/10] migration/dirtyrate: Implement calculate_dirtyrate()
- function
-Date: Sat, 15 Aug 2020 10:22:59 +0800
-Message-ID: <1597458180-16945-10-git-send-email-zhengchuan@huawei.com>
+Subject: [PATCH v2 05/10] migration/dirtyrate: Record hash results for each
+ sampled page
+Date: Sat, 15 Aug 2020 10:22:55 +0800
+Message-ID: <1597458180-16945-6-git-send-email-zhengchuan@huawei.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1597458180-16945-1-git-send-email-zhengchuan@huawei.com>
 References: <1597458180-16945-1-git-send-email-zhengchuan@huawei.com>
@@ -81,78 +81,190 @@ Sender: "Qemu-devel"
 
 From: Zheng Chuan <zhengchuan@huawei.com>
 
-Implement calculate_dirtyrate() function.
+Record hash results for each sampled page.
 
 Signed-off-by: Zheng Chuan <zhengchuan@huawei.com>
 Signed-off-by: YanYing Zhuang <ann.zhuangyanying@huawei.com>
 ---
- migration/dirtyrate.c | 46 ++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 44 insertions(+), 2 deletions(-)
+ migration/dirtyrate.c | 135 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ migration/dirtyrate.h |   7 +++
+ 2 files changed, 142 insertions(+)
 
 diff --git a/migration/dirtyrate.c b/migration/dirtyrate.c
-index 54b832a..d487030 100644
+index c4304ef..11c0051 100644
 --- a/migration/dirtyrate.c
 +++ b/migration/dirtyrate.c
-@@ -177,6 +177,21 @@ static void get_ramblock_dirty_info(RAMBlock *block, struct RamblockDirtyInfo *i
-     strcpy(info->idstr, qemu_ram_get_idstr(block));
+@@ -25,6 +25,7 @@
+ #include "dirtyrate.h"
+ 
+ CalculatingDirtyRateState CalculatingState = CAL_DIRTY_RATE_INIT;
++static unsigned long int qcrypto_hash_len = QCRYPTO_HASH_LEN;
+ static struct DirtyRateStat dirty_stat;
+ 
+ static int dirty_rate_set_state(int new_state)
+@@ -71,6 +72,140 @@ static void update_dirtyrate(uint64_t msec)
+     dirty_stat.dirty_rate = dirty_rate;
  }
  
-+static void free_ramblock_dirty_info(struct RamblockDirtyInfo *infos, int count)
++/*
++ * get hash result for the sampled memory with length of 4K byte in ramblock,
++ * which starts from ramblock base address.
++ */
++static int get_ramblock_vfn_hash(struct RamblockDirtyInfo *info, unsigned long vfn,
++                                 uint8_t **md)
 +{
-+    int i;
++    struct iovec iov_array;
++    int ret = 0;
++    int nkey = 1;
 +
-+    if (!infos) {
-+        return;
++    iov_array.iov_base = info->ramblock_addr +
++                         vfn * DIRTYRATE_SAMPLE_PAGE_SIZE;
++    iov_array.iov_len = DIRTYRATE_SAMPLE_PAGE_SIZE;
++
++    if (qcrypto_hash_bytesv(QCRYPTO_HASH_ALG_MD5,
++                            &iov_array, nkey,
++                            md, &qcrypto_hash_len, NULL) < 0) {
++        ret = -1;
 +    }
 +
-+    for (i = 0; i < count; i++) {
-+        g_free(infos[i].sample_page_vfn);
-+        g_free(infos[i].hash_result);
-+    }
-+    g_free(infos);
++    return ret;
 +}
 +
- static struct RamblockDirtyInfo *
- alloc_ramblock_dirty_info(int *block_index,
-                           struct RamblockDirtyInfo *block_dinfo)
-@@ -328,8 +343,35 @@ static int compare_page_hash_info(struct RamblockDirtyInfo *info, int block_inde
- 
- static void calculate_dirtyrate(struct DirtyRateConfig config)
- {
--    /* todo */
--    return;
-+    struct RamblockDirtyInfo *block_dinfo = NULL;
-+    int block_index = 0;
-+    int64_t msec = 0;
-+    int64_t initial_time;
++static int save_ramblock_hash(struct RamblockDirtyInfo *info)
++{
++    unsigned int sample_pages_count;
++    uint8_t *md = NULL;
++    int i;
++    int ret = -1;
++    GRand* rand = g_rand_new();
 +
-+    rcu_register_thread();
-+    reset_dirtyrate_stat();
-+    initial_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
-+    rcu_read_lock();
-+    if (record_ramblock_hash_info(config, &block_dinfo, &block_index) < 0) {
-+        goto out;
-+    }
-+    rcu_read_unlock();
++    sample_pages_count = info->sample_pages_count;
 +
-+    msec = config.sample_period_seconds * 1000;
-+    msec = set_sample_page_period(msec, initial_time);
-+
-+    rcu_read_lock();
-+    if (compare_page_hash_info(block_dinfo, block_index) < 0) {
++    /* ramblock size less than one page, return success to skip this ramblock */
++    if (unlikely(info->ramblock_pages == 0 || sample_pages_count == 0)) {
++        ret = 0;
 +        goto out;
 +    }
 +
-+    update_dirtyrate(msec);
++    info->hash_result = g_try_malloc0_n(sample_pages_count, sizeof(uint8_t) * qcrypto_hash_len);
++    if (!info->hash_result) {
++        ret = -1;
++        goto out;
++    }
++
++    info->sample_page_vfn = g_try_malloc0_n(sample_pages_count, sizeof(unsigned long));
++    if (!info->sample_page_vfn) {
++        g_free(info->hash_result);
++        ret = -1;
++        goto out;
++    }
++
++    for (i = 0; i < sample_pages_count; i++) {
++        md = info->hash_result + i * qcrypto_hash_len;
++        info->sample_page_vfn[i] = g_rand_int_range(rand, 0, info->ramblock_pages - 1);
++        ret = get_ramblock_vfn_hash(info, info->sample_page_vfn[i], &md);
++        if (ret < 0) {
++            goto out;
++        }
++    }
++    ret = 0;
 +
 +out:
-+    rcu_read_unlock();
-+    free_ramblock_dirty_info(block_dinfo, block_index + 1);
-+    rcu_unregister_thread();
++    g_rand_free(rand);
++    return ret;
++}
 +
- }
++static void get_ramblock_dirty_info(RAMBlock *block, struct RamblockDirtyInfo *info,
++                                    struct DirtyRateConfig *config)
++{
++    uint64_t sample_pages_per_gigabytes = config->sample_pages_per_gigabytes;
++
++    /* Right shift 30 bits to calc block size in GB */
++    info->sample_pages_count = (qemu_ram_get_used_length(block) * sample_pages_per_gigabytes) >> 30;
++
++    /* Right shift 12 bits to calc page count in 4KB */
++    info->ramblock_pages = qemu_ram_get_used_length(block) >> 12;
++    info->ramblock_addr = qemu_ram_get_host_addr(block);
++    strcpy(info->idstr, qemu_ram_get_idstr(block));
++}
++
++static struct RamblockDirtyInfo *
++alloc_ramblock_dirty_info(int *block_index,
++                          struct RamblockDirtyInfo *block_dinfo)
++{
++    struct RamblockDirtyInfo *info = NULL;
++    int index = *block_index;
++
++    if (!block_dinfo) {
++        block_dinfo = g_try_new(struct RamblockDirtyInfo, 1);
++        index = 0;
++    } else {
++        index++;
++        block_dinfo = g_try_realloc(block_dinfo, (index + 1) *
++                                    sizeof(struct RamblockDirtyInfo));
++    }
++    if (!block_dinfo)
++        return NULL;
++
++    info = &block_dinfo[index];
++    memset(info, 0, sizeof(struct RamblockDirtyInfo));
++
++    *block_index = index;
++    return block_dinfo;
++}
++
++static int record_ramblock_hash_info(struct DirtyRateConfig config,
++                                     struct RamblockDirtyInfo **block_dinfo, int *block_index)
++{
++    struct RamblockDirtyInfo *info = NULL;
++    struct RamblockDirtyInfo *dinfo = NULL;
++    RAMBlock *block = NULL;
++    int index = 0;
++
++    RAMBLOCK_FOREACH_MIGRATABLE(block) {
++        dinfo = alloc_ramblock_dirty_info(&index, dinfo);
++        if (dinfo == NULL)
++            return -1;
++        info = &dinfo[index];
++        get_ramblock_dirty_info(block, info, &config);
++        if (save_ramblock_hash(info) < 0) {
++            *block_dinfo = dinfo;
++            *block_index = index;
++            return -1;
++        }
++    }
++
++    *block_dinfo = dinfo;
++    *block_index = index;
++
++    return 0;
++}
++
+ static void calculate_dirtyrate(struct DirtyRateConfig config)
+ {
+     /* todo */
+diff --git a/migration/dirtyrate.h b/migration/dirtyrate.h
+index af57c80..0812b16 100644
+--- a/migration/dirtyrate.h
++++ b/migration/dirtyrate.h
+@@ -20,10 +20,17 @@
+ #define DIRTYRATE_DEFAULT_SAMPLE_PAGES            256
  
- void *get_dirtyrate_thread(void *arg)
+ /*
++ * Sample page size 4K as default.
++ */
++#define DIRTYRATE_SAMPLE_PAGE_SIZE                4096
++
++/*
+  * Record ramblock idstr
+  */
+ #define RAMBLOCK_INFO_MAX_LEN                     256
+ 
++#define QCRYPTO_HASH_LEN                          16
++
+ /* Take 1s as default for calculation duration */
+ #define DEFAULT_FETCH_DIRTYRATE_TIME_SEC          1
+ 
 -- 
 1.8.3.1
 
