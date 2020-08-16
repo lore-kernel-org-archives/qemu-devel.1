@@ -2,68 +2,85 @@ Return-Path: <SRS0=YAkC=B2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 256BCC433DF
-	for <qemu-devel@archiver.kernel.org>; Sun, 16 Aug 2020 06:28:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0064AC433DF
+	for <qemu-devel@archiver.kernel.org>; Sun, 16 Aug 2020 08:28:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DFD0C2065D
-	for <qemu-devel@archiver.kernel.org>; Sun, 16 Aug 2020 06:28:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A399620674
+	for <qemu-devel@archiver.kernel.org>; Sun, 16 Aug 2020 08:28:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="CbUFgqNO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFD0C2065D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DX69zvTE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A399620674
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45226 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47574 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7C9X-0006y9-2g
-	for qemu-devel@archiver.kernel.org; Sun, 16 Aug 2020 02:28:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39452)
+	id 1k7E1K-0002m2-Qi
+	for qemu-devel@archiver.kernel.org; Sun, 16 Aug 2020 04:28:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54320)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1k7C8g-0006Ns-5v; Sun, 16 Aug 2020 02:27:30 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:46389 helo=ozlabs.org)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1k7C8d-0007Q5-Bv; Sun, 16 Aug 2020 02:27:29 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 4BTnK021nxz9sTT; Sun, 16 Aug 2020 16:27:16 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1597559236;
- bh=GnCTrJDIDXx4Ri4O8qEMoUbXNLOwVz7GZ54H3POHSJI=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=CbUFgqNOUVdwIkGZQ+DqqX+XRrrtPppb5gjckApknzP/VbN9FEGjnzKmclwy5dc94
- CPOND4xM5ypmXlC8l5NLkinDYfBB2grXp9c1yfRw/lKksGXKIyEj4xmLtrmwlaCHTD
- y6GYCkirzEFinqUQPCBnf/9L8+Zh08sZSNQsNyB4=
-Date: Sun, 16 Aug 2020 14:30:00 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Subject: Re: [PATCH] spapr/xive: Allocate IPIs from the vCPU contexts
-Message-ID: <20200816043000.GH12805@yekko.fritz.box>
-References: <20200814150358.1682513-1-clg@kaod.org>
- <42e8bb9f-c052-5abb-9ffe-0700bfe3904d@kaod.org>
+ (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>)
+ id 1k7E0j-0002I9-18; Sun, 16 Aug 2020 04:27:25 -0400
+Received: from mail-oi1-x231.google.com ([2607:f8b0:4864:20::231]:42751)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>)
+ id 1k7E0g-00029B-GW; Sun, 16 Aug 2020 04:27:24 -0400
+Received: by mail-oi1-x231.google.com with SMTP id j7so12144244oij.9;
+ Sun, 16 Aug 2020 01:27:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=yNKVsnrfUrUERwIie4oLeayjoiN+EQXXS/LThrnMAJg=;
+ b=DX69zvTEcupe1/5sPizB4xd7E3s30jmYbd8D4f+Hb5A5gYYAlGkptlYPH+nPbJDXH6
+ TwlfpRG3j+4y6APNOcxPBDGxQGLEFbPvOfjxie4IhC81CofR2h5cLpIO4UCmkH6/NpxW
+ bVwjFb7sjB0a/wfggyJSIe8VJCU2i65F65pSSe0WI6uV9wdmLmavkg+kY5bL1NSjriGl
+ OxkumLnRVx1XjtbkXuvHwvFTNGKQDKdcX9WxA4khU39dNVbUQy7vZ7SdsC9Xrq8jq5jc
+ cBQ2vQS6XzAu8xvIyFztvsbbl/hgVAHmrub3jJGxQ/TYCt/ubdnHzAXgFodS5o+SF9fz
+ Oy1Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=yNKVsnrfUrUERwIie4oLeayjoiN+EQXXS/LThrnMAJg=;
+ b=UP4gpZaPQhb80vAUBZFvgYYd+2wyvEpNDOBxjROUsOTIMLhvcZUuWUsxQy/o4GodZ/
+ 7tjAb/aoOSCwp3t5yXhhWaM0+I0pkNfjU1WGlPrHHPBkQzWC/pmjq4nr2kBVeZfXre+u
+ 513g4i/stLbzqHyyUWcXWWQ06NUribGXE5jKX1WNRhFfzZl+aEa3XXyyZnucLXxZ65zZ
+ 57K0B+G0xk9JIQRKjJpkUzD1D/bmw7QxsNlaYworOn0cQpFgVtrJ5M018EZ1gM7CA4zN
+ HRaIFLY0BvVd1aM5Lx6F6pQ4HRcMu1hGWEp1no/T+lDR0JkeEssEq/QIVg0PBl3Vd/VE
+ t7XQ==
+X-Gm-Message-State: AOAM530sYXtRyBh65lQ9+R94w8HVDWzMdutjXqy8Zwcq0eMInon7ab2d
+ 9lCgeyukOMpo+jo8hd5sPIIDKQq2BEmQTCI4tB4=
+X-Google-Smtp-Source: ABdhPJySNmZox4Y2K6voZELKqTNOUh7YCFx2/8ISjvzOdjwGMIlMUTGbNZpI3Wy7wI4bzZSHP6Bdi6ytjaAUbCn83lk=
+X-Received: by 2002:aca:c0c1:: with SMTP id q184mr6612318oif.56.1597566441022; 
+ Sun, 16 Aug 2020 01:27:21 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="gTtJ75FAzB1T2CN6"
-Content-Disposition: inline
-In-Reply-To: <42e8bb9f-c052-5abb-9ffe-0700bfe3904d@kaod.org>
-Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
- helo=ozlabs.org
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/16 02:27:17
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -9
-X-Spam_score: -1.0
-X-Spam_bar: -
-X-Spam_report: (-1.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
+References: <20200812104918.107116-1-stefanha@redhat.com>
+ <20200812104918.107116-2-stefanha@redhat.com>
+In-Reply-To: <20200812104918.107116-2-stefanha@redhat.com>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Sun, 16 Aug 2020 16:26:45 +0800
+Message-ID: <CAKXe6S+nUWQGFDKRu8mBBOTKc1kWc7YfO=p+F7+ObnmW017atg@mail.gmail.com>
+Subject: Re: [PATCH 1/3] util/iov: add iov_discard_undo()
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Content-Type: multipart/alternative; boundary="00000000000038eb6405acfa6c7c"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::231;
+ envelope-from=liq3ea@gmail.com; helo=mail-oi1-x231.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -76,175 +93,844 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>,
- Gustavo Romero <gromero@linux.ibm.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ "Michael S. Tsirkin" <mst@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>, Alexander Bulekov <alxndr@bu.edu>,
+ "Gonglei \(Arei\)" <arei.gonglei@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
---gTtJ75FAzB1T2CN6
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+--00000000000038eb6405acfa6c7c
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Aug 14, 2020 at 05:08:13PM +0200, C=E9dric Le Goater wrote:
->=20
-> This works as expected with a 128 vCPUs guest with pinned vcpus. The
-> first 64 IPIs are allocated on the first chip and the remaining 64
-> on the second chip.
->=20
-> Still, this is more an RFC. We have time before the end of the merge
-> window.
+Stefan Hajnoczi <stefanha@redhat.com> =E4=BA=8E2020=E5=B9=B48=E6=9C=8812=E6=
+=97=A5=E5=91=A8=E4=B8=89 =E4=B8=8B=E5=8D=886:52=E5=86=99=E9=81=93=EF=BC=9A
 
-It looks reasonable to me.  AFAICT it makes things better than they
-were, and even if we can improve it further, that won't break
-migration or other interfaces we need to preserve.
+> The iov_discard_front/back() operations are useful for parsing iovecs
+> but they modify the array elements. If the original array is needed
+> after parsing finishes there is currently no way to restore it.
+>
+> Although g_memdup() can be used before performing destructive
+> iov_discard_front/back() operations, this is inefficient.
+>
+> Introduce iov_discard_undo() to restore the array to the state prior to
+> an iov_discard_front/back() operation.
+>
+>
 
->=20
-> Thanks,
->=20
-> C. =20
->=20
->=20
-> On 8/14/20 5:03 PM, C=E9dric Le Goater wrote:
-> > When QEMU switches to the XIVE interrupt mode, it performs a
-> > kvmppc_xive_source_reset() which creates all the guest interrupts at
-> > the level of the KVM device. These interrupts are backed by real HW
-> > interrupts from the IPI interrupt pool of the XIVE controller.
-> >=20
-> > Currently, this is done from the QEMU main thread, which results in
-> > allocating all interrupts from the chip on which QEMU is running. IPIs
-> > are not distributed across the system and the load is not well
-> > balanced across the interrupt controllers.
-> >=20
-> > Change the vCPU IPI allocation to run from the vCPU context in order
-> > to allocate the associated XIVE IPI interrupt on the chip on which the
-> > vCPU is running. This gives a chance to a better distribution of the
-> > IPIs when the guest has a lot of vCPUs. When the vCPUs are pinned, it
-> > makes the IPI local to the chip of the vCPU which reduces rerouting
-> > between interrupt controllers and gives better performance.
-> >=20
-> > This is only possible for running vCPUs. The IPIs of hot plugable
-> > vCPUs will still be allocated in the context of the QEMU main thread.
-> >=20
-> > Device interrupts are treated the same. To improve placement, we would
-> > need some information on the chip owning the virtual source or HW
-> > source in case of passthrough. This requires changes in PAPR.
-> >=20
-> > Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-> > ---
-> >  hw/intc/spapr_xive_kvm.c | 50 ++++++++++++++++++++++++++++++++++++++++
-> >  1 file changed, 50 insertions(+)
-> >=20
-> > diff --git a/hw/intc/spapr_xive_kvm.c b/hw/intc/spapr_xive_kvm.c
-> > index c6958f2da218..553fd7fd8f56 100644
-> > --- a/hw/intc/spapr_xive_kvm.c
-> > +++ b/hw/intc/spapr_xive_kvm.c
-> > @@ -223,6 +223,47 @@ void kvmppc_xive_sync_source(SpaprXive *xive, uint=
-32_t lisn, Error **errp)
-> >                        NULL, true, errp);
-> >  }
-> > =20
-> > +/*
-> > + * Allocate the IPIs from the vCPU context. This will allocate the
-> > + * XIVE IPI interrupt on the chip on which the vCPU is running. This
-> > + * gives a better distribution of IPIs when the guest has a lot of
-> > + * vCPUs. When the vCPU are pinned, the IPIs are local which reduces
-> > + * rerouting between interrupt controllers and gives better
-> > + * performance.
-> > + */
-> > +typedef struct {
-> > +    SpaprXive *xive;
-> > +    int ipi;
-> > +    Error *err;
-> > +    int rc;
-> > +} XiveInitIPI;
-> > +
-> > +static void kvmppc_xive_reset_ipi_on_cpu(CPUState *cs, run_on_cpu_data=
- arg)
-> > +{
-> > +    XiveInitIPI *s =3D arg.host_ptr;
-> > +    uint64_t state =3D 0;
-> > +
-> > +    s->rc =3D kvm_device_access(s->xive->fd, KVM_DEV_XIVE_GRP_SOURCE, =
-s->ipi,
-> > +                              &state, true, &s->err);
-> > +}
-> > +
-> > +static int kvmppc_xive_reset_ipi(SpaprXive *xive, int ipi, Error **err=
-p)
-> > +{
-> > +    PowerPCCPU *cpu =3D spapr_find_cpu(ipi);
-> > +    XiveInitIPI s =3D {
-> > +        .xive =3D xive,
-> > +        .ipi  =3D ipi,
-> > +        .err  =3D NULL,
-> > +        .rc   =3D 0,
-> > +    };
-> > +
-> > +    run_on_cpu(CPU(cpu), kvmppc_xive_reset_ipi_on_cpu, RUN_ON_CPU_HOST=
-_PTR(&s));
-> > +    if (s.err) {
-> > +        error_propagate(errp, s.err);
-> > +    }
-> > +    return s.rc;
-> > +}
-> > +
-> >  /*
-> >   * At reset, the interrupt sources are simply created and MASKED. We
-> >   * only need to inform the KVM XIVE device about their type: LSI or
-> > @@ -230,11 +271,20 @@ void kvmppc_xive_sync_source(SpaprXive *xive, uin=
-t32_t lisn, Error **errp)
-> >   */
-> >  int kvmppc_xive_source_reset_one(XiveSource *xsrc, int srcno, Error **=
-errp)
-> >  {
-> > +    MachineState *machine =3D MACHINE(qdev_get_machine());
-> >      SpaprXive *xive =3D SPAPR_XIVE(xsrc->xive);
-> >      uint64_t state =3D 0;
-> > =20
-> >      assert(xive->fd !=3D -1);
-> > =20
-> > +    /*
-> > +     * IPIs are special. Allocate the IPIs from the vCPU context for
-> > +     * those running. Hotplugged CPUs will the QEMU context.
-> > +     */
-> > +    if (srcno < machine->smp.cpus) {
-> > +        return kvmppc_xive_reset_ipi(xive, srcno, errp);
-> > +    }
-> > +
-> >      if (xive_source_irq_is_lsi(xsrc, srcno)) {
-> >          state |=3D KVM_XIVE_LEVEL_SENSITIVE;
-> >          if (xsrc->status[srcno] & XIVE_STATUS_ASSERTED) {
-> >=20
->=20
+Seems there are some errors. See below
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
 
---gTtJ75FAzB1T2CN6
-Content-Type: application/pgp-signature; name="signature.asc"
 
------BEGIN PGP SIGNATURE-----
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+>  include/qemu/iov.h |  23 +++++++
+>  tests/test-iov.c   | 165 +++++++++++++++++++++++++++++++++++++++++++++
+>  util/iov.c         |  50 ++++++++++++--
+>  3 files changed, 234 insertions(+), 4 deletions(-)
+>
+> diff --git a/include/qemu/iov.h b/include/qemu/iov.h
+> index bffc151282..b6b283a5e5 100644
+> --- a/include/qemu/iov.h
+> +++ b/include/qemu/iov.h
+> @@ -130,6 +130,29 @@ size_t iov_discard_front(struct iovec **iov, unsigne=
+d
+> int *iov_cnt,
+>  size_t iov_discard_back(struct iovec *iov, unsigned int *iov_cnt,
+>                          size_t bytes);
+>
+> +/* Information needed to undo an iov_discard_*() operation */
+> +typedef struct {
+> +    struct iovec *modified_iov;
+> +    struct iovec orig;
+> +} IOVDiscardUndo;
+> +
+> +/*
+> + * Undo an iov_discard_front_undoable() or iov_discard_back_undoable()
+> + * operation. If multiple operations are made then each one needs a
+> separate
+> + * IOVDiscardUndo and iov_discard_undo() must be called in the reverse
+> order
+> + * that the operations were made.
+> + */
+> +void iov_discard_undo(IOVDiscardUndo *undo);
+> +
+> +/*
+> + * Undoable versions of iov_discard_front() and iov_discard_back(). Use
+> + * iov_discard_undo() to reset to the state before the discard operation=
+s.
+> + */
+> +size_t iov_discard_front_undoable(struct iovec **iov, unsigned int
+> *iov_cnt,
+> +                                  size_t bytes, IOVDiscardUndo *undo);
+> +size_t iov_discard_back_undoable(struct iovec *iov, unsigned int *iov_cn=
+t,
+> +                                 size_t bytes, IOVDiscardUndo *undo);
+> +
+>  typedef struct QEMUIOVector {
+>      struct iovec *iov;
+>      int niov;
+> diff --git a/tests/test-iov.c b/tests/test-iov.c
+> index 458ca25099..9c415e2f1f 100644
+> --- a/tests/test-iov.c
+> +++ b/tests/test-iov.c
+> @@ -26,6 +26,12 @@ static void iov_free(struct iovec *iov, unsigned niov)
+>      g_free(iov);
+>  }
+>
+> +static bool iov_equals(const struct iovec *a, const struct iovec *b,
+> +                       unsigned niov)
+> +{
+> +    return memcmp(a, b, sizeof(a[0]) * niov) =3D=3D 0;
+> +}
+> +
+>  static void test_iov_bytes(struct iovec *iov, unsigned niov,
+>                             size_t offset, size_t bytes)
+>  {
+> @@ -335,6 +341,87 @@ static void test_discard_front(void)
+>      iov_free(iov, iov_cnt);
+>  }
+>
+> +static void test_discard_front_undo(void)
+> +{
+> +    IOVDiscardUndo undo;
+> +    struct iovec *iov;
+> +    struct iovec *iov_tmp;
+> +    struct iovec *iov_orig;
+> +    unsigned int iov_cnt;
+> +    unsigned int iov_cnt_tmp;
+> +    size_t size;
+> +
+> +    /* Discard zero bytes */
+> +    iov_random(&iov, &iov_cnt);
+> +    iov_orig =3D g_memdup(iov, sizeof(iov[0]) * iov_cnt);
+> +    iov_tmp =3D iov;
+> +    iov_cnt_tmp =3D iov_cnt;
+> +    iov_discard_front_undoable(&iov_tmp, &iov_cnt_tmp, 0, &undo);
+> +    iov_discard_undo(&undo);
+> +    assert(iov_equals(iov, iov_orig, iov_cnt));
+> +    g_free(iov_orig);
+> +    iov_free(iov, iov_cnt);
+> +
+> +    /* Discard more bytes than vector size */
+> +    iov_random(&iov, &iov_cnt);
+> +    iov_orig =3D g_memdup(iov, sizeof(iov[0]) * iov_cnt);
+> +    iov_tmp =3D iov;
+> +    iov_cnt_tmp =3D iov_cnt;
+> +    size =3D iov_size(iov, iov_cnt);
+> +    iov_discard_front_undoable(&iov_tmp, &iov_cnt_tmp, size + 1, &undo);
+> +    iov_discard_undo(&undo);
+> +    assert(iov_equals(iov, iov_orig, iov_cnt));
+>
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl84tkgACgkQbDjKyiDZ
-s5JPPxAAyEEqNtAIiwni87CTMuycjyMAuYOcvpxMXKk3SLYLXQEmJDL1eq8nXGlU
-q5MQEEycU8nO134Xupe3VYtW76nUk89jUXF08Cvvk4fqvIZAVXnlevR0Ek7p5iJ9
-zki7DShbBrjNtJBVGpIJYSjGfAcfGpOEuxZLsXO6rGxtjJMjEgucQzSjsr1DDODy
-0sjH30dwwInM8x16TeNnY++NiBaPxFkHCXNwytjV3DFXPqCLRYLPboi47xfUn8l8
-eyhlb8t73pVggV6Xvati0c6EgTHwFIAsJ3zsJYeD3eBHo301x7ZTUHtsOgQtfY2F
-dKuJPiZjWvYcwAbt17S1ldBjvCy4pUjSpJZ2UEzFJrAM7cjE4cSVlJt6L048kKtD
-EPZLz6B+LmkjuzEvXEA3v3Qh7oywbEATvwIYXy+j3nxqYBZcM9Jwa759oO3TVyhU
-nj1EF000K26hH6HnQS9VcguC7Gg/Y6htLLkebxUQ1yWcSq5IM52sYb5Lty/biXWI
-ek2rxP+WxqQuOlajrYXAtfz9yP6yVpVsfrV7uoax1dT9Tg5xqLLK1rkzCcS6EUeL
-U+2ImI0NSBtZgZTUJeNKDp3ut8G0FsfbYVpASvXSrvQzxt2zZ8pZ+WGLkVyORC6d
-Z3nih0Urg6maXi8sAz4Jy1A2ZcbJiyLPrI8ghIlKLnu5IXJYj+g=
-=d504
------END PGP SIGNATURE-----
+The 'iov_discard_front_undoable' will change the 'iov_tmp' it will not
+touch 'iov_orig'.
+So the test will be always passed. The actually function will not be tested=
+.
 
---gTtJ75FAzB1T2CN6--
+Also, maybe we could abstract a function to do these discard test?
+
+
+> +    g_free(iov_orig);
+> +    iov_free(iov, iov_cnt);
+> +
+> +    /* Discard entire vector */
+> +    iov_random(&iov, &iov_cnt);
+> +    iov_orig =3D g_memdup(iov, sizeof(iov[0]) * iov_cnt);
+> +    iov_tmp =3D iov;
+> +    iov_cnt_tmp =3D iov_cnt;
+> +    size =3D iov_size(iov, iov_cnt);
+> +    iov_discard_front_undoable(&iov_tmp, &iov_cnt_tmp, size, &undo);
+> +    iov_discard_undo(&undo);
+> +    assert(iov_equals(iov, iov_orig, iov_cnt));
+> +    g_free(iov_orig);
+> +    iov_free(iov, iov_cnt);
+> +
+> +    /* Discard within first element */
+> +    iov_random(&iov, &iov_cnt);
+> +    iov_orig =3D g_memdup(iov, sizeof(iov[0]) * iov_cnt);
+> +    iov_tmp =3D iov;
+> +    iov_cnt_tmp =3D iov_cnt;
+> +    size =3D g_test_rand_int_range(1, iov->iov_len);
+> +    iov_discard_front_undoable(&iov_tmp, &iov_cnt_tmp, size, &undo);
+> +    iov_discard_undo(&undo);
+> +    assert(iov_equals(iov, iov_orig, iov_cnt));
+> +    g_free(iov_orig);
+> +    iov_free(iov, iov_cnt);
+> +
+> +    /* Discard entire first element */
+> +    iov_random(&iov, &iov_cnt);
+> +    iov_orig =3D g_memdup(iov, sizeof(iov[0]) * iov_cnt);
+> +    iov_tmp =3D iov;
+> +    iov_cnt_tmp =3D iov_cnt;
+> +    iov_discard_front_undoable(&iov_tmp, &iov_cnt_tmp, iov->iov_len,
+> &undo);
+> +    iov_discard_undo(&undo);
+> +    assert(iov_equals(iov, iov_orig, iov_cnt));
+> +    g_free(iov_orig);
+> +    iov_free(iov, iov_cnt);
+> +
+> +    /* Discard within second element */
+> +    iov_random(&iov, &iov_cnt);
+> +    iov_orig =3D g_memdup(iov, sizeof(iov[0]) * iov_cnt);
+> +    iov_tmp =3D iov;
+> +    iov_cnt_tmp =3D iov_cnt;
+> +    size =3D iov->iov_len + g_test_rand_int_range(1, iov[1].iov_len);
+> +    iov_discard_front_undoable(&iov_tmp, &iov_cnt_tmp, size, &undo);
+> +    iov_discard_undo(&undo);
+> +    assert(iov_equals(iov, iov_orig, iov_cnt));
+> +    g_free(iov_orig);
+> +    iov_free(iov, iov_cnt);
+> +}
+> +
+>  static void test_discard_back(void)
+>  {
+>      struct iovec *iov;
+> @@ -404,6 +491,82 @@ static void test_discard_back(void)
+>      iov_free(iov, iov_cnt);
+>  }
+>
+> +static void test_discard_back_undo(void)
+> +{
+> +    IOVDiscardUndo undo;
+> +    struct iovec *iov;
+> +    struct iovec *iov_orig;
+> +    unsigned int iov_cnt;
+> +    unsigned int iov_cnt_tmp;
+> +    size_t size;
+> +
+> +    /* Discard zero bytes */
+> +    iov_random(&iov, &iov_cnt);
+> +    iov_orig =3D g_memdup(iov, sizeof(iov[0]) * iov_cnt);
+> +    iov_cnt_tmp =3D iov_cnt;
+> +    iov_discard_back_undoable(iov, &iov_cnt_tmp, 0, &undo);
+> +    iov_discard_undo(&undo);
+> +    assert(iov_equals(iov, iov_orig, iov_cnt));
+> +    g_free(iov_orig);
+> +    iov_free(iov, iov_cnt);
+> +
+> +    /* Discard more bytes than vector size */
+> +    iov_random(&iov, &iov_cnt);
+> +    iov_orig =3D g_memdup(iov, sizeof(iov[0]) * iov_cnt);
+> +    iov_cnt_tmp =3D iov_cnt;
+> +    size =3D iov_size(iov, iov_cnt);
+> +    iov_discard_back_undoable(iov, &iov_cnt_tmp, size + 1, &undo);
+> +    iov_discard_undo(&undo);
+> +    assert(iov_equals(iov, iov_orig, iov_cnt));
+> +    g_free(iov_orig);
+> +    iov_free(iov, iov_cnt);
+> +
+> +    /* Discard entire vector */
+> +    iov_random(&iov, &iov_cnt);
+> +    iov_orig =3D g_memdup(iov, sizeof(iov[0]) * iov_cnt);
+> +    iov_cnt_tmp =3D iov_cnt;
+> +    size =3D iov_size(iov, iov_cnt);
+> +    iov_discard_back_undoable(iov, &iov_cnt_tmp, size, &undo);
+> +    iov_discard_undo(&undo);
+> +    assert(iov_equals(iov, iov_orig, iov_cnt));
+> +    g_free(iov_orig);
+> +    iov_free(iov, iov_cnt);
+> +
+> +    /* Discard within last element */
+> +    iov_random(&iov, &iov_cnt);
+> +    iov_orig =3D g_memdup(iov, sizeof(iov[0]) * iov_cnt);
+> +    iov_cnt_tmp =3D iov_cnt;
+> +    size =3D g_test_rand_int_range(1, iov[iov_cnt - 1].iov_len);
+> +    iov_discard_back_undoable(iov, &iov_cnt_tmp, size, &undo);
+> +    iov_discard_undo(&undo);
+> +    assert(iov_equals(iov, iov_orig, iov_cnt));
+> +    g_free(iov_orig);
+> +    iov_free(iov, iov_cnt);
+> +
+> +    /* Discard entire last element */
+> +    iov_random(&iov, &iov_cnt);
+> +    iov_orig =3D g_memdup(iov, sizeof(iov[0]) * iov_cnt);
+> +    iov_cnt_tmp =3D iov_cnt;
+> +    size =3D iov[iov_cnt - 1].iov_len;
+> +    iov_discard_back_undoable(iov, &iov_cnt_tmp, size, &undo);
+> +    iov_discard_undo(&undo);
+> +    assert(iov_equals(iov, iov_orig, iov_cnt));
+> +    g_free(iov_orig);
+> +    iov_free(iov, iov_cnt);
+> +
+> +    /* Discard within second-to-last element */
+> +    iov_random(&iov, &iov_cnt);
+> +    iov_orig =3D g_memdup(iov, sizeof(iov[0]) * iov_cnt);
+> +    iov_cnt_tmp =3D iov_cnt;
+> +    size =3D iov[iov_cnt - 1].iov_len +
+> +           g_test_rand_int_range(1, iov[iov_cnt - 2].iov_len);
+> +    iov_discard_back_undoable(iov, &iov_cnt_tmp, size, &undo);
+> +    iov_discard_undo(&undo);
+> +    assert(iov_equals(iov, iov_orig, iov_cnt));
+> +    g_free(iov_orig);
+> +    iov_free(iov, iov_cnt);
+> +}
+> +
+>  int main(int argc, char **argv)
+>  {
+>      g_test_init(&argc, &argv, NULL);
+> @@ -412,5 +575,7 @@ int main(int argc, char **argv)
+>      g_test_add_func("/basic/iov/io", test_io);
+>      g_test_add_func("/basic/iov/discard-front", test_discard_front);
+>      g_test_add_func("/basic/iov/discard-back", test_discard_back);
+> +    g_test_add_func("/basic/iov/discard-front-undo",
+> test_discard_front_undo);
+> +    g_test_add_func("/basic/iov/discard-back-undo",
+> test_discard_back_undo);
+>      return g_test_run();
+>  }
+> diff --git a/util/iov.c b/util/iov.c
+> index 45ef3043ee..efcf04b445 100644
+> --- a/util/iov.c
+> +++ b/util/iov.c
+> @@ -636,14 +636,33 @@ void qemu_iovec_clone(QEMUIOVector *dest, const
+> QEMUIOVector *src, void *buf)
+>      }
+>  }
+>
+> -size_t iov_discard_front(struct iovec **iov, unsigned int *iov_cnt,
+> -                         size_t bytes)
+> +void iov_discard_undo(IOVDiscardUndo *undo)
+> +{
+> +    /* Restore original iovec if it was modified */
+> +    if (undo->modified_iov) {
+> +        *undo->modified_iov =3D undo->orig;
+> +    }
+> +}
+> +
+> +size_t iov_discard_front_undoable(struct iovec **iov,
+> +                                  unsigned int *iov_cnt,
+> +                                  size_t bytes,
+> +                                  IOVDiscardUndo *undo)
+>  {
+>      size_t total =3D 0;
+>      struct iovec *cur;
+>
+> +    if (undo) {
+> +        undo->modified_iov =3D NULL;
+> +    }
+> +
+>      for (cur =3D *iov; *iov_cnt > 0; cur++) {
+>          if (cur->iov_len > bytes) {
+> +            if (undo) {
+> +                undo->modified_iov =3D cur;
+> +                undo->orig =3D *cur;
+> +            }
+> +
+>
+
+Why here we remember the 'cur'? 'cur' is the some of the 'iov'.
+Maybe we remember the 'iov'. I think we need the undo structure like this:
+
+struct IOVUndo {
+    iov **modified_iov;
+    iov *orig;
+};
+
+Then we can remeber the origin 'iov'.
+
+Thanks,
+Li Qiang
+
+
+
+>              cur->iov_base +=3D bytes;
+>              cur->iov_len -=3D bytes;
+>              total +=3D bytes;
+> @@ -659,12 +678,24 @@ size_t iov_discard_front(struct iovec **iov,
+> unsigned int *iov_cnt,
+>      return total;
+>  }
+>
+> -size_t iov_discard_back(struct iovec *iov, unsigned int *iov_cnt,
+> -                        size_t bytes)
+> +size_t iov_discard_front(struct iovec **iov, unsigned int *iov_cnt,
+> +                         size_t bytes)
+> +{
+> +    return iov_discard_front_undoable(iov, iov_cnt, bytes, NULL);
+> +}
+> +
+> +size_t iov_discard_back_undoable(struct iovec *iov,
+> +                                 unsigned int *iov_cnt,
+> +                                 size_t bytes,
+> +                                 IOVDiscardUndo *undo)
+>  {
+>      size_t total =3D 0;
+>      struct iovec *cur;
+>
+> +    if (undo) {
+> +        undo->modified_iov =3D NULL;
+> +    }
+> +
+>      if (*iov_cnt =3D=3D 0) {
+>          return 0;
+>      }
+> @@ -673,6 +704,11 @@ size_t iov_discard_back(struct iovec *iov, unsigned
+> int *iov_cnt,
+>
+>      while (*iov_cnt > 0) {
+>          if (cur->iov_len > bytes) {
+> +            if (undo) {
+> +                undo->modified_iov =3D cur;
+> +                undo->orig =3D *cur;
+> +            }
+> +
+>              cur->iov_len -=3D bytes;
+>              total +=3D bytes;
+>              break;
+> @@ -687,6 +723,12 @@ size_t iov_discard_back(struct iovec *iov, unsigned
+> int *iov_cnt,
+>      return total;
+>  }
+>
+> +size_t iov_discard_back(struct iovec *iov, unsigned int *iov_cnt,
+> +                        size_t bytes)
+> +{
+> +    return iov_discard_back_undoable(iov, iov_cnt, bytes, NULL);
+> +}
+> +
+>  void qemu_iovec_discard_back(QEMUIOVector *qiov, size_t bytes)
+>  {
+>      size_t total;
+> --
+> 2.26.2
+>
+>
+
+--00000000000038eb6405acfa6c7c
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
+<div dir=3D"ltr" class=3D"gmail_attr">Stefan Hajnoczi &lt;<a href=3D"mailto=
+:stefanha@redhat.com">stefanha@redhat.com</a>&gt; =E4=BA=8E2020=E5=B9=B48=
+=E6=9C=8812=E6=97=A5=E5=91=A8=E4=B8=89 =E4=B8=8B=E5=8D=886:52=E5=86=99=E9=
+=81=93=EF=BC=9A<br></div><blockquote class=3D"gmail_quote" style=3D"margin:=
+0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">=
+The iov_discard_front/back() operations are useful for parsing iovecs<br>
+but they modify the array elements. If the original array is needed<br>
+after parsing finishes there is currently no way to restore it.<br>
+<br>
+Although g_memdup() can be used before performing destructive<br>
+iov_discard_front/back() operations, this is inefficient.<br>
+<br>
+Introduce iov_discard_undo() to restore the array to the state prior to<br>
+an iov_discard_front/back() operation.<br>
+<br></blockquote><div><br></div><div><br></div><div>Seems there are some er=
+rors. See below</div><div><br></div><div>=C2=A0</div><blockquote class=3D"g=
+mail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204=
+,204,204);padding-left:1ex">
+Signed-off-by: Stefan Hajnoczi &lt;<a href=3D"mailto:stefanha@redhat.com" t=
+arget=3D"_blank">stefanha@redhat.com</a>&gt;<br>
+---<br>
+=C2=A0include/qemu/iov.h |=C2=A0 23 +++++++<br>
+=C2=A0tests/test-iov.c=C2=A0 =C2=A0| 165 ++++++++++++++++++++++++++++++++++=
++++++++++++<br>
+=C2=A0util/iov.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 50 ++++++++++++--=
+<br>
+=C2=A03 files changed, 234 insertions(+), 4 deletions(-)<br>
+<br>
+diff --git a/include/qemu/iov.h b/include/qemu/iov.h<br>
+index bffc151282..b6b283a5e5 100644<br>
+--- a/include/qemu/iov.h<br>
++++ b/include/qemu/iov.h<br>
+@@ -130,6 +130,29 @@ size_t iov_discard_front(struct iovec **iov, unsigned =
+int *iov_cnt,<br>
+=C2=A0size_t iov_discard_back(struct iovec *iov, unsigned int *iov_cnt,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0size_t bytes);<br>
+<br>
++/* Information needed to undo an iov_discard_*() operation */<br>
++typedef struct {<br>
++=C2=A0 =C2=A0 struct iovec *modified_iov;<br>
++=C2=A0 =C2=A0 struct iovec orig;<br>
++} IOVDiscardUndo;<br>
++<br>
++/*<br>
++ * Undo an iov_discard_front_undoable() or iov_discard_back_undoable()<br>
++ * operation. If multiple operations are made then each one needs a separa=
+te<br>
++ * IOVDiscardUndo and iov_discard_undo() must be called in the reverse ord=
+er<br>
++ * that the operations were made.<br>
++ */<br>
++void iov_discard_undo(IOVDiscardUndo *undo);<br>
++<br>
++/*<br>
++ * Undoable versions of iov_discard_front() and iov_discard_back(). Use<br=
+>
++ * iov_discard_undo() to reset to the state before the discard operations.=
+<br>
++ */<br>
++size_t iov_discard_front_undoable(struct iovec **iov, unsigned int *iov_cn=
+t,<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 size_t bytes, IOVDiscardUndo =
+*undo);<br>
++size_t iov_discard_back_undoable(struct iovec *iov, unsigned int *iov_cnt,=
+<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0size_t bytes, IOVDiscardUndo *=
+undo);<br>
++<br>
+=C2=A0typedef struct QEMUIOVector {<br>
+=C2=A0 =C2=A0 =C2=A0struct iovec *iov;<br>
+=C2=A0 =C2=A0 =C2=A0int niov;<br>
+diff --git a/tests/test-iov.c b/tests/test-iov.c<br>
+index 458ca25099..9c415e2f1f 100644<br>
+--- a/tests/test-iov.c<br>
++++ b/tests/test-iov.c<br>
+@@ -26,6 +26,12 @@ static void iov_free(struct iovec *iov, unsigned niov)<b=
+r>
+=C2=A0 =C2=A0 =C2=A0g_free(iov);<br>
+=C2=A0}<br>
+<br>
++static bool iov_equals(const struct iovec *a, const struct iovec *b,<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0unsigned niov)<br>
++{<br>
++=C2=A0 =C2=A0 return memcmp(a, b, sizeof(a[0]) * niov) =3D=3D 0;<br>
++}<br>
++<br>
+=C2=A0static void test_iov_bytes(struct iovec *iov, unsigned niov,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 size_t offset, size_t bytes)<br>
+=C2=A0{<br>
+@@ -335,6 +341,87 @@ static void test_discard_front(void)<br>
+=C2=A0 =C2=A0 =C2=A0iov_free(iov, iov_cnt);<br>
+=C2=A0}<br>
+<br>
++static void test_discard_front_undo(void)<br>
++{<br>
++=C2=A0 =C2=A0 IOVDiscardUndo undo;<br>
++=C2=A0 =C2=A0 struct iovec *iov;<br>
++=C2=A0 =C2=A0 struct iovec *iov_tmp;<br>
++=C2=A0 =C2=A0 struct iovec *iov_orig;<br>
++=C2=A0 =C2=A0 unsigned int iov_cnt;<br>
++=C2=A0 =C2=A0 unsigned int iov_cnt_tmp;<br>
++=C2=A0 =C2=A0 size_t size;<br>
++<br>
++=C2=A0 =C2=A0 /* Discard zero bytes */<br>
++=C2=A0 =C2=A0 iov_random(&amp;iov, &amp;iov_cnt);<br>
++=C2=A0 =C2=A0 iov_orig =3D g_memdup(iov, sizeof(iov[0]) * iov_cnt);<br>
++=C2=A0 =C2=A0 iov_tmp =3D iov;<br>
++=C2=A0 =C2=A0 iov_cnt_tmp =3D iov_cnt;<br>
++=C2=A0 =C2=A0 iov_discard_front_undoable(&amp;iov_tmp, &amp;iov_cnt_tmp, 0=
+, &amp;undo);<br>
++=C2=A0 =C2=A0 iov_discard_undo(&amp;undo);<br>
++=C2=A0 =C2=A0 assert(iov_equals(iov, iov_orig, iov_cnt));<br>
++=C2=A0 =C2=A0 g_free(iov_orig);<br>
++=C2=A0 =C2=A0 iov_free(iov, iov_cnt);<br>
++<br>
++=C2=A0 =C2=A0 /* Discard more bytes than vector size */<br>
++=C2=A0 =C2=A0 iov_random(&amp;iov, &amp;iov_cnt);<br>
++=C2=A0 =C2=A0 iov_orig =3D g_memdup(iov, sizeof(iov[0]) * iov_cnt);<br>
++=C2=A0 =C2=A0 iov_tmp =3D iov;<br>
++=C2=A0 =C2=A0 iov_cnt_tmp =3D iov_cnt;<br>
++=C2=A0 =C2=A0 size =3D iov_size(iov, iov_cnt);<br>
++=C2=A0 =C2=A0 iov_discard_front_undoable(&amp;iov_tmp, &amp;iov_cnt_tmp, s=
+ize + 1, &amp;undo);<br>
++=C2=A0 =C2=A0 iov_discard_undo(&amp;undo);<br>
++=C2=A0 =C2=A0 assert(iov_equals(iov, iov_orig, iov_cnt));<br></blockquote>=
+<div><br></div><div>The &#39;iov_discard_front_undoable&#39; will change th=
+e &#39;iov_tmp&#39; it will not touch &#39;iov_orig&#39;.</div><div>So the =
+test will be always passed. The actually function will not be tested.</div>=
+<div><br></div><div>Also, maybe we could abstract a function to do these di=
+scard test?</div><div>=C2=A0</div><blockquote class=3D"gmail_quote" style=
+=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding=
+-left:1ex">
++=C2=A0 =C2=A0 g_free(iov_orig);<br>
++=C2=A0 =C2=A0 iov_free(iov, iov_cnt);<br>
++<br>
++=C2=A0 =C2=A0 /* Discard entire vector */<br>
++=C2=A0 =C2=A0 iov_random(&amp;iov, &amp;iov_cnt);<br>
++=C2=A0 =C2=A0 iov_orig =3D g_memdup(iov, sizeof(iov[0]) * iov_cnt);<br>
++=C2=A0 =C2=A0 iov_tmp =3D iov;<br>
++=C2=A0 =C2=A0 iov_cnt_tmp =3D iov_cnt;<br>
++=C2=A0 =C2=A0 size =3D iov_size(iov, iov_cnt);<br>
++=C2=A0 =C2=A0 iov_discard_front_undoable(&amp;iov_tmp, &amp;iov_cnt_tmp, s=
+ize, &amp;undo);<br>
++=C2=A0 =C2=A0 iov_discard_undo(&amp;undo);<br>
++=C2=A0 =C2=A0 assert(iov_equals(iov, iov_orig, iov_cnt));<br>
++=C2=A0 =C2=A0 g_free(iov_orig);<br>
++=C2=A0 =C2=A0 iov_free(iov, iov_cnt);<br>
++<br>
++=C2=A0 =C2=A0 /* Discard within first element */<br>
++=C2=A0 =C2=A0 iov_random(&amp;iov, &amp;iov_cnt);<br>
++=C2=A0 =C2=A0 iov_orig =3D g_memdup(iov, sizeof(iov[0]) * iov_cnt);<br>
++=C2=A0 =C2=A0 iov_tmp =3D iov;<br>
++=C2=A0 =C2=A0 iov_cnt_tmp =3D iov_cnt;<br>
++=C2=A0 =C2=A0 size =3D g_test_rand_int_range(1, iov-&gt;iov_len);<br>
++=C2=A0 =C2=A0 iov_discard_front_undoable(&amp;iov_tmp, &amp;iov_cnt_tmp, s=
+ize, &amp;undo);<br>
++=C2=A0 =C2=A0 iov_discard_undo(&amp;undo);<br>
++=C2=A0 =C2=A0 assert(iov_equals(iov, iov_orig, iov_cnt));<br>
++=C2=A0 =C2=A0 g_free(iov_orig);<br>
++=C2=A0 =C2=A0 iov_free(iov, iov_cnt);<br>
++<br>
++=C2=A0 =C2=A0 /* Discard entire first element */<br>
++=C2=A0 =C2=A0 iov_random(&amp;iov, &amp;iov_cnt);<br>
++=C2=A0 =C2=A0 iov_orig =3D g_memdup(iov, sizeof(iov[0]) * iov_cnt);<br>
++=C2=A0 =C2=A0 iov_tmp =3D iov;<br>
++=C2=A0 =C2=A0 iov_cnt_tmp =3D iov_cnt;<br>
++=C2=A0 =C2=A0 iov_discard_front_undoable(&amp;iov_tmp, &amp;iov_cnt_tmp, i=
+ov-&gt;iov_len, &amp;undo);<br>
++=C2=A0 =C2=A0 iov_discard_undo(&amp;undo);<br>
++=C2=A0 =C2=A0 assert(iov_equals(iov, iov_orig, iov_cnt));<br>
++=C2=A0 =C2=A0 g_free(iov_orig);<br>
++=C2=A0 =C2=A0 iov_free(iov, iov_cnt);<br>
++<br>
++=C2=A0 =C2=A0 /* Discard within second element */<br>
++=C2=A0 =C2=A0 iov_random(&amp;iov, &amp;iov_cnt);<br>
++=C2=A0 =C2=A0 iov_orig =3D g_memdup(iov, sizeof(iov[0]) * iov_cnt);<br>
++=C2=A0 =C2=A0 iov_tmp =3D iov;<br>
++=C2=A0 =C2=A0 iov_cnt_tmp =3D iov_cnt;<br>
++=C2=A0 =C2=A0 size =3D iov-&gt;iov_len + g_test_rand_int_range(1, iov[1].i=
+ov_len);<br>
++=C2=A0 =C2=A0 iov_discard_front_undoable(&amp;iov_tmp, &amp;iov_cnt_tmp, s=
+ize, &amp;undo);<br>
++=C2=A0 =C2=A0 iov_discard_undo(&amp;undo);<br>
++=C2=A0 =C2=A0 assert(iov_equals(iov, iov_orig, iov_cnt));<br>
++=C2=A0 =C2=A0 g_free(iov_orig);<br>
++=C2=A0 =C2=A0 iov_free(iov, iov_cnt);<br>
++}<br>
++<br>
+=C2=A0static void test_discard_back(void)<br>
+=C2=A0{<br>
+=C2=A0 =C2=A0 =C2=A0struct iovec *iov;<br>
+@@ -404,6 +491,82 @@ static void test_discard_back(void)<br>
+=C2=A0 =C2=A0 =C2=A0iov_free(iov, iov_cnt);<br>
+=C2=A0}<br>
+<br>
++static void test_discard_back_undo(void)<br>
++{<br>
++=C2=A0 =C2=A0 IOVDiscardUndo undo;<br>
++=C2=A0 =C2=A0 struct iovec *iov;<br>
++=C2=A0 =C2=A0 struct iovec *iov_orig;<br>
++=C2=A0 =C2=A0 unsigned int iov_cnt;<br>
++=C2=A0 =C2=A0 unsigned int iov_cnt_tmp;<br>
++=C2=A0 =C2=A0 size_t size;<br>
++<br>
++=C2=A0 =C2=A0 /* Discard zero bytes */<br>
++=C2=A0 =C2=A0 iov_random(&amp;iov, &amp;iov_cnt);<br>
++=C2=A0 =C2=A0 iov_orig =3D g_memdup(iov, sizeof(iov[0]) * iov_cnt);<br>
++=C2=A0 =C2=A0 iov_cnt_tmp =3D iov_cnt;<br>
++=C2=A0 =C2=A0 iov_discard_back_undoable(iov, &amp;iov_cnt_tmp, 0, &amp;und=
+o);<br>
++=C2=A0 =C2=A0 iov_discard_undo(&amp;undo);<br>
++=C2=A0 =C2=A0 assert(iov_equals(iov, iov_orig, iov_cnt));<br>
++=C2=A0 =C2=A0 g_free(iov_orig);<br>
++=C2=A0 =C2=A0 iov_free(iov, iov_cnt);<br>
++<br>
++=C2=A0 =C2=A0 /* Discard more bytes than vector size */<br>
++=C2=A0 =C2=A0 iov_random(&amp;iov, &amp;iov_cnt);<br>
++=C2=A0 =C2=A0 iov_orig =3D g_memdup(iov, sizeof(iov[0]) * iov_cnt);<br>
++=C2=A0 =C2=A0 iov_cnt_tmp =3D iov_cnt;<br>
++=C2=A0 =C2=A0 size =3D iov_size(iov, iov_cnt);<br>
++=C2=A0 =C2=A0 iov_discard_back_undoable(iov, &amp;iov_cnt_tmp, size + 1, &=
+amp;undo);<br>
++=C2=A0 =C2=A0 iov_discard_undo(&amp;undo);<br>
++=C2=A0 =C2=A0 assert(iov_equals(iov, iov_orig, iov_cnt));<br>
++=C2=A0 =C2=A0 g_free(iov_orig);<br>
++=C2=A0 =C2=A0 iov_free(iov, iov_cnt);<br>
++<br>
++=C2=A0 =C2=A0 /* Discard entire vector */<br>
++=C2=A0 =C2=A0 iov_random(&amp;iov, &amp;iov_cnt);<br>
++=C2=A0 =C2=A0 iov_orig =3D g_memdup(iov, sizeof(iov[0]) * iov_cnt);<br>
++=C2=A0 =C2=A0 iov_cnt_tmp =3D iov_cnt;<br>
++=C2=A0 =C2=A0 size =3D iov_size(iov, iov_cnt);<br>
++=C2=A0 =C2=A0 iov_discard_back_undoable(iov, &amp;iov_cnt_tmp, size, &amp;=
+undo);<br>
++=C2=A0 =C2=A0 iov_discard_undo(&amp;undo);<br>
++=C2=A0 =C2=A0 assert(iov_equals(iov, iov_orig, iov_cnt));<br>
++=C2=A0 =C2=A0 g_free(iov_orig);<br>
++=C2=A0 =C2=A0 iov_free(iov, iov_cnt);<br>
++<br>
++=C2=A0 =C2=A0 /* Discard within last element */<br>
++=C2=A0 =C2=A0 iov_random(&amp;iov, &amp;iov_cnt);<br>
++=C2=A0 =C2=A0 iov_orig =3D g_memdup(iov, sizeof(iov[0]) * iov_cnt);<br>
++=C2=A0 =C2=A0 iov_cnt_tmp =3D iov_cnt;<br>
++=C2=A0 =C2=A0 size =3D g_test_rand_int_range(1, iov[iov_cnt - 1].iov_len);=
+<br>
++=C2=A0 =C2=A0 iov_discard_back_undoable(iov, &amp;iov_cnt_tmp, size, &amp;=
+undo);<br>
++=C2=A0 =C2=A0 iov_discard_undo(&amp;undo);<br>
++=C2=A0 =C2=A0 assert(iov_equals(iov, iov_orig, iov_cnt));<br>
++=C2=A0 =C2=A0 g_free(iov_orig);<br>
++=C2=A0 =C2=A0 iov_free(iov, iov_cnt);<br>
++<br>
++=C2=A0 =C2=A0 /* Discard entire last element */<br>
++=C2=A0 =C2=A0 iov_random(&amp;iov, &amp;iov_cnt);<br>
++=C2=A0 =C2=A0 iov_orig =3D g_memdup(iov, sizeof(iov[0]) * iov_cnt);<br>
++=C2=A0 =C2=A0 iov_cnt_tmp =3D iov_cnt;<br>
++=C2=A0 =C2=A0 size =3D iov[iov_cnt - 1].iov_len;<br>
++=C2=A0 =C2=A0 iov_discard_back_undoable(iov, &amp;iov_cnt_tmp, size, &amp;=
+undo);<br>
++=C2=A0 =C2=A0 iov_discard_undo(&amp;undo);<br>
++=C2=A0 =C2=A0 assert(iov_equals(iov, iov_orig, iov_cnt));<br>
++=C2=A0 =C2=A0 g_free(iov_orig);<br>
++=C2=A0 =C2=A0 iov_free(iov, iov_cnt);<br>
++<br>
++=C2=A0 =C2=A0 /* Discard within second-to-last element */<br>
++=C2=A0 =C2=A0 iov_random(&amp;iov, &amp;iov_cnt);<br>
++=C2=A0 =C2=A0 iov_orig =3D g_memdup(iov, sizeof(iov[0]) * iov_cnt);<br>
++=C2=A0 =C2=A0 iov_cnt_tmp =3D iov_cnt;<br>
++=C2=A0 =C2=A0 size =3D iov[iov_cnt - 1].iov_len +<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0g_test_rand_int_range(1, iov[iov_=
+cnt - 2].iov_len);<br>
++=C2=A0 =C2=A0 iov_discard_back_undoable(iov, &amp;iov_cnt_tmp, size, &amp;=
+undo);<br>
++=C2=A0 =C2=A0 iov_discard_undo(&amp;undo);<br>
++=C2=A0 =C2=A0 assert(iov_equals(iov, iov_orig, iov_cnt));<br>
++=C2=A0 =C2=A0 g_free(iov_orig);<br>
++=C2=A0 =C2=A0 iov_free(iov, iov_cnt);<br>
++}<br>
++<br>
+=C2=A0int main(int argc, char **argv)<br>
+=C2=A0{<br>
+=C2=A0 =C2=A0 =C2=A0g_test_init(&amp;argc, &amp;argv, NULL);<br>
+@@ -412,5 +575,7 @@ int main(int argc, char **argv)<br>
+=C2=A0 =C2=A0 =C2=A0g_test_add_func(&quot;/basic/iov/io&quot;, test_io);<br=
+>
+=C2=A0 =C2=A0 =C2=A0g_test_add_func(&quot;/basic/iov/discard-front&quot;, t=
+est_discard_front);<br>
+=C2=A0 =C2=A0 =C2=A0g_test_add_func(&quot;/basic/iov/discard-back&quot;, te=
+st_discard_back);<br>
++=C2=A0 =C2=A0 g_test_add_func(&quot;/basic/iov/discard-front-undo&quot;, t=
+est_discard_front_undo);<br>
++=C2=A0 =C2=A0 g_test_add_func(&quot;/basic/iov/discard-back-undo&quot;, te=
+st_discard_back_undo);<br>
+=C2=A0 =C2=A0 =C2=A0return g_test_run();<br>
+=C2=A0}<br>
+diff --git a/util/iov.c b/util/iov.c<br>
+index 45ef3043ee..efcf04b445 100644<br>
+--- a/util/iov.c<br>
++++ b/util/iov.c<br>
+@@ -636,14 +636,33 @@ void qemu_iovec_clone(QEMUIOVector *dest, const QEMUI=
+OVector *src, void *buf)<br>
+=C2=A0 =C2=A0 =C2=A0}<br>
+=C2=A0}<br>
+<br>
+-size_t iov_discard_front(struct iovec **iov, unsigned int *iov_cnt,<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0size_t bytes)<br>
++void iov_discard_undo(IOVDiscardUndo *undo)<br>
++{<br>
++=C2=A0 =C2=A0 /* Restore original iovec if it was modified */<br>
++=C2=A0 =C2=A0 if (undo-&gt;modified_iov) {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 *undo-&gt;modified_iov =3D undo-&gt;orig;<br>
++=C2=A0 =C2=A0 }<br>
++}<br>
++<br>
++size_t iov_discard_front_undoable(struct iovec **iov,<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 unsigned int *iov_cnt,<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 size_t bytes,<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 IOVDiscardUndo *undo)<br>
+=C2=A0{<br>
+=C2=A0 =C2=A0 =C2=A0size_t total =3D 0;<br>
+=C2=A0 =C2=A0 =C2=A0struct iovec *cur;<br>
+<br>
++=C2=A0 =C2=A0 if (undo) {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 undo-&gt;modified_iov =3D NULL;<br>
++=C2=A0 =C2=A0 }<br>
++<br>
+=C2=A0 =C2=A0 =C2=A0for (cur =3D *iov; *iov_cnt &gt; 0; cur++) {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0if (cur-&gt;iov_len &gt; bytes) {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (undo) {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 undo-&gt;modified_=
+iov =3D cur;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 undo-&gt;orig =3D =
+*cur;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
++<br></blockquote><div><br></div><div>Why here we remember the &#39;cur&#39=
+;? &#39;cur&#39; is the some of the &#39;iov&#39;.</div><div>Maybe we remem=
+ber=C2=A0the &#39;iov&#39;. I think we need the undo structure like this:</=
+div><div><br></div><div>struct IOVUndo {</div><div>=C2=A0 =C2=A0 iov **modi=
+fied_iov;=C2=A0</div><div>=C2=A0 =C2=A0 iov *orig;</div><div>};</div><div><=
+br></div><div>Then we can remeber the origin &#39;iov&#39;.</div><div><br><=
+/div><div>Thanks,</div><div>Li Qiang</div><div><br></div><div>=C2=A0</div><=
+blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-l=
+eft:1px solid rgb(204,204,204);padding-left:1ex">
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0cur-&gt;iov_base +=3D bytes=
+;<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0cur-&gt;iov_len -=3D bytes;=
+<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0total +=3D bytes;<br>
+@@ -659,12 +678,24 @@ size_t iov_discard_front(struct iovec **iov, unsigned=
+ int *iov_cnt,<br>
+=C2=A0 =C2=A0 =C2=A0return total;<br>
+=C2=A0}<br>
+<br>
+-size_t iov_discard_back(struct iovec *iov, unsigned int *iov_cnt,<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 size_t bytes)<br>
++size_t iov_discard_front(struct iovec **iov, unsigned int *iov_cnt,<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0size_t bytes)<br>
++{<br>
++=C2=A0 =C2=A0 return iov_discard_front_undoable(iov, iov_cnt, bytes, NULL)=
+;<br>
++}<br>
++<br>
++size_t iov_discard_back_undoable(struct iovec *iov,<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0unsigned int *iov_cnt,<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0size_t bytes,<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0IOVDiscardUndo *undo)<br>
+=C2=A0{<br>
+=C2=A0 =C2=A0 =C2=A0size_t total =3D 0;<br>
+=C2=A0 =C2=A0 =C2=A0struct iovec *cur;<br>
+<br>
++=C2=A0 =C2=A0 if (undo) {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 undo-&gt;modified_iov =3D NULL;<br>
++=C2=A0 =C2=A0 }<br>
++<br>
+=C2=A0 =C2=A0 =C2=A0if (*iov_cnt =3D=3D 0) {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return 0;<br>
+=C2=A0 =C2=A0 =C2=A0}<br>
+@@ -673,6 +704,11 @@ size_t iov_discard_back(struct iovec *iov, unsigned in=
+t *iov_cnt,<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0while (*iov_cnt &gt; 0) {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0if (cur-&gt;iov_len &gt; bytes) {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (undo) {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 undo-&gt;modified_=
+iov =3D cur;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 undo-&gt;orig =3D =
+*cur;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
++<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0cur-&gt;iov_len -=3D bytes;=
+<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0total +=3D bytes;<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0break;<br>
+@@ -687,6 +723,12 @@ size_t iov_discard_back(struct iovec *iov, unsigned in=
+t *iov_cnt,<br>
+=C2=A0 =C2=A0 =C2=A0return total;<br>
+=C2=A0}<br>
+<br>
++size_t iov_discard_back(struct iovec *iov, unsigned int *iov_cnt,<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 size_t bytes)<br>
++{<br>
++=C2=A0 =C2=A0 return iov_discard_back_undoable(iov, iov_cnt, bytes, NULL);=
+<br>
++}<br>
++<br>
+=C2=A0void qemu_iovec_discard_back(QEMUIOVector *qiov, size_t bytes)<br>
+=C2=A0{<br>
+=C2=A0 =C2=A0 =C2=A0size_t total;<br>
+-- <br>
+2.26.2<br>
+<br>
+</blockquote></div></div>
+
+--00000000000038eb6405acfa6c7c--
 
