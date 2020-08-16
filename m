@@ -2,93 +2,93 @@ Return-Path: <SRS0=YAkC=B2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13F84C433DF
-	for <qemu-devel@archiver.kernel.org>; Sun, 16 Aug 2020 17:47:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E73E1C433E1
+	for <qemu-devel@archiver.kernel.org>; Sun, 16 Aug 2020 18:26:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C930920708
-	for <qemu-devel@archiver.kernel.org>; Sun, 16 Aug 2020 17:47:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A8D2E20829
+	for <qemu-devel@archiver.kernel.org>; Sun, 16 Aug 2020 18:26:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VOTfaRUf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C930920708
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XcJp083N"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8D2E20829
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37872 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45352 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7Mko-0001dw-4U
-	for qemu-devel@archiver.kernel.org; Sun, 16 Aug 2020 13:47:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48098)
+	id 1k7NMm-0007KT-Uh
+	for qemu-devel@archiver.kernel.org; Sun, 16 Aug 2020 14:26:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53610)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <duboisj@gmail.com>)
- id 1k7Mjs-00010a-Rq; Sun, 16 Aug 2020 13:46:36 -0400
-Received: from mail-io1-xd41.google.com ([2607:f8b0:4864:20::d41]:41479)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1k7NMA-0006s5-TA
+ for qemu-devel@nongnu.org; Sun, 16 Aug 2020 14:26:10 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:42830)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <duboisj@gmail.com>)
- id 1k7Mjq-0001pq-1R; Sun, 16 Aug 2020 13:46:36 -0400
-Received: by mail-io1-xd41.google.com with SMTP id g19so15399199ioh.8;
- Sun, 16 Aug 2020 10:46:32 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1k7NM6-0005gZ-OQ
+ for qemu-devel@nongnu.org; Sun, 16 Aug 2020 14:26:10 -0400
+Received: by mail-wr1-x444.google.com with SMTP id r4so12726332wrx.9
+ for <qemu-devel@nongnu.org>; Sun, 16 Aug 2020 11:26:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:mime-version
+ h=sender:from:to:cc:subject:date:message-id:mime-version
  :content-transfer-encoding;
- bh=kgFG4OuRUVY8jfu20p/rmn2M6K7fE9N8kFx4N9NUlKc=;
- b=VOTfaRUf+I9dDf7rSckjRdqAuGWVR4g2ay/vngO6AjJsJtjqamFVVKHL6AATv0r9CV
- q+fEmzGW1Bn8x2khWm6zxfy1CsrCzo9OxFDsjR9xbvAWXmKpCM3lVGh6uvTQWjRpt6sW
- 5UrjIAQKey/Zn+4ljjgPGtMyMfDSKnDOSDqQT6CGVqGI1YJqWbGcfNW/CLFiognKPiqO
- zQ+5ofUo5g2LdBLdGy0gBdBHSJEJQ+BwomiKSaEH/CrIqBjHbx/oxIf+j9dsZ9OZU4Dg
- H7qAY+r8V4do2XdEpd+w5heIG43BDuuQW41TqZKoelUTC17ljW5GsxTxhWyscKQx0fwE
- zYkA==
+ bh=foLrN1/bHDkeocz+h/WD6CFykMSU5DGbqxqlC9JoDZ0=;
+ b=XcJp083NiZJQep0L3SjYSS7TBnnmKvVBIa6+1iQiEnz5CEzuq1S8C3XHCwpUHdSzFC
+ UMvi9JDk2AXEjjn5b1hlXOIoU/ze4a5g2b+3ZAuoPVu5gwQ4f2aBeMmMQ0tl8hiDFgHY
+ GP25+B94IRyaU9YxX3ZHD6Dnk2evE97gI/6Qy3F1wMiv6J+V4wAk0dagsAMUGh81IUIw
+ VbTYWAmQ+2CWQ1G/3+KdzS5K2gPsHf5ygUfwaceIe89HWTA9NSa7Vmr06rD22adgxAsk
+ z72ffD9l8TixzEkq+RfU2FFRESfqAiSoRvpeL0mu5S7O/ayWWc/y+SxjzbDd0458okL3
+ BAyQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=kgFG4OuRUVY8jfu20p/rmn2M6K7fE9N8kFx4N9NUlKc=;
- b=pvrVE/lT7EbjboRhIP4yQO7UnengaEq/koONuOdbFMJE9GR+XP/UQQELndAI+2gb2A
- fNIGFEqnZKvQ7L/RanHF5JTUQk0jBPDQhM0BmuEsIMzFLxKS7JJ3rcB10RrwJyMJ7uEC
- fegcawG+y8ohBm6FgmYHbz0rCabloC9TLNgW5GIgdoj9XNRZRDWyXMchY8SEXwXqeUJM
- BGf0rETHSI689W/hhTqWPTuEPYOHqymHKiL/9SRQ1jzTsEe9i+XOC8FLDxs/IRCHVFHf
- LkZiRCp+2AYZ7bZaC/sAzZjxzhLkD8vCAHiZc4u9kTPHvmG2VWKuMRGUKH/MVg70G7N5
- E43A==
-X-Gm-Message-State: AOAM530fQtNB+lw3KGcteHcmEssmSajB4iRcPTqPJvX/+rJiKP9gaC+s
- /VyQxxXQXkIB02ooGPi7o2n1fiiGUe7qtAyp
-X-Google-Smtp-Source: ABdhPJzjkY56BxygBYrUd9Clz4N0iXaK4knYhz0ZVuTDiNOf94/g52DAuQc7QaQooGjDwsCtfvhaXw==
-X-Received: by 2002:a05:6638:12c4:: with SMTP id
- v4mr10713227jas.11.1597599991677; 
- Sun, 16 Aug 2020 10:46:31 -0700 (PDT)
-Received: from localhost.localdomain (50-93-248-134.fttp.usinternet.com.
- [50.93.248.134])
- by smtp.gmail.com with ESMTPSA id x2sm7654667iom.14.2020.08.16.10.46.30
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=foLrN1/bHDkeocz+h/WD6CFykMSU5DGbqxqlC9JoDZ0=;
+ b=FkuJ9TFlJ4OxnnNYfeIzLuJ3F7IoQMiu54DRI/gnkKoggQSZgIPPmU4/ZjYDf7YRU6
+ Ad/SuhnttddG98cZ+/5ngYnCPmd0IxaEbjNJdkOd8ua+T1SgZ9l4TRc4E+795AopbGwM
+ BAdaKJL4/8tFVPpnObzad2LIiCYH3P6VoYtQJwBZqOfpfCuQfKw1jY95nh8n/GrN/W/V
+ 0O5JiglQrqSaR57YXiqKEaWNz0LimHRly321O0m4+sxRr/5FV20SjiL38EVtVTj2K0Bt
+ STYaCGp67f3EveuOyYTMR2FI6t2TzBFUm942vHY2hOUxlI3TxgAeI7fMsP9jAdz+GA6Z
+ OaKw==
+X-Gm-Message-State: AOAM533oAGdEkzDJsCQBNgvi82Y5Qq57x87XXzhPsJt7c09zy1GQMUQe
+ NrKR1S65LWA2+SSzXEGBkqySypt4PXo=
+X-Google-Smtp-Source: ABdhPJzRFJf/+Mejp5ebiQENr6A7tJIaOeJ6kM7/MwJJ2WKMQ8akKQpG1DaOA0mi9r4SbDHrzYR42A==
+X-Received: by 2002:a05:6000:118c:: with SMTP id
+ g12mr11541210wrx.212.1597602364656; 
+ Sun, 16 Aug 2020 11:26:04 -0700 (PDT)
+Received: from localhost.localdomain (121.red-81-40-121.staticip.rima-tde.net.
+ [81.40.121.121])
+ by smtp.gmail.com with ESMTPSA id p22sm24809489wmc.38.2020.08.16.11.26.03
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 16 Aug 2020 10:46:30 -0700 (PDT)
-From: duboisj@gmail.com
-X-Google-Original-From: josh@joshdubois.com
-To: qemu-trivial@nongnu.org,
-	qemu-devel@nongnu.org
-Subject: [PATCH] trace/simple: Enable tracing on startup only if the user
- specifies a trace option
-Date: Sun, 16 Aug 2020 12:46:10 -0500
-Message-Id: <20200816174610.20253-1-josh@joshdubois.com>
-X-Mailer: git-send-email 2.25.1
+ Sun, 16 Aug 2020 11:26:03 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] memory: Initialize MemoryRegionOps for RAM memory regions
+Date: Sun, 16 Aug 2020 20:26:02 +0200
+Message-Id: <20200816182602.352-1-f4bug@amsat.org>
+X-Mailer: git-send-email 2.21.3
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::d41;
- envelope-from=duboisj@gmail.com; helo=mail-io1-xd41.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,65 +101,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: armbru@redhat.com, Josh DuBois <josh@joshdubois.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Richard Henderson <rth@twiddle.net>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Peter Maydell <peter.maydell@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Josh DuBois <josh@joshdubois.com>
+There is an issue when using memory_region_dispatch_read() or
+memory_region_dispatch_write() on RAM memory regions.
 
-Tracing can be enabled at the command line or via the
-monitor. Command-line trace options are recorded during
-trace_opt_parse(), but tracing is not enabled until the various
-front-ends later call trace_init_file(). If the user passes a trace
-option on the command-line, remember that and enable tracing during
-trace_init_file().  Otherwise, trace_init_file() should record the
-trace file specified by the frontend and avoid enabling traces
-until the user requests them via the monitor.
+RAM memory regions are initialized as:
 
-This fixes 1b7157be3a8c4300fc8044d40f4b2e64a152a1b4 and also
-db25d56c014aa1a96319c663e0a60346a223b31e, by allowing the user
-to enable traces on the command line and also avoiding
-unwanted trace-<pid> files when the user has not asked for them.
+  memory_region_init_ram()
+  -> memory_region_init_ram_nomigrate()
+     -> memory_region_init_ram_shared_nomigrate()
+        -> memory_region_init()
+           -> object_initialize(TYPE_MEMORY_REGION)
+              -> memory_region_initfn()
+                 -> mr->ops = &unassigned_mem_ops;
 
-Fixes: 1b7157be3a8c4300fc8044d40f4b2e64a152a1b4
-Signed-off-by: Josh DuBois <josh@joshdubois.com>
+Later when accessing the alias, the memory_region_dispatch_read()
+flow is:
+
+  memory_region_dispatch_read()
+  -> memory_region_dispatch_read1()
+     -> if (mr->ops->read) { ... }
+                   ^^^^^^
+                   NULL deref as unassigned_mem_ops.read is NULL.
+
+  memory_region_dispatch_write()
+  -> if (mr->ops->write) { ... }
+                ^^^^^^^
+                NULL deref as unassigned_mem_ops.read is NULL.
+
+Fix by initializing the MemoryRegionOps to ram_device_mem_ops,
+this way the memory accesses are properly dispatched using
+memory_region_ram_device_read() / memory_region_ram_device_write().
+
+Fixes: 4a2e242bbb ("memory: Don't use memcpy for ram_device regions")
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- trace/control.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ softmmu/memory.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/trace/control.c b/trace/control.c
-index 6558b5c906..8f94f09444 100644
---- a/trace/control.c
-+++ b/trace/control.c
-@@ -39,6 +39,7 @@ static TraceEventGroup *event_groups;
- static size_t nevent_groups;
- static uint32_t next_id;
- static uint32_t next_vcpu_id;
-+static bool init_trace_on_startup;
- 
- QemuOptsList qemu_trace_opts = {
-     .name = "trace",
-@@ -225,7 +226,9 @@ void trace_init_file(const char *file)
+diff --git a/softmmu/memory.c b/softmmu/memory.c
+index af25987518..2fce3fef2d 100644
+--- a/softmmu/memory.c
++++ b/softmmu/memory.c
+@@ -1509,6 +1509,8 @@ void memory_region_init_ram_shared_nomigrate(MemoryRegion *mr,
+     Error *err = NULL;
+     memory_region_init(mr, owner, name, size);
+     mr->ram = true;
++    mr->ops = &ram_device_mem_ops;
++    mr->opaque = mr;
+     mr->terminates = true;
+     mr->destructor = memory_region_destructor_ram;
+     mr->ram_block = qemu_ram_alloc(size, share, mr, &err);
+@@ -1533,6 +1535,8 @@ void memory_region_init_resizeable_ram(MemoryRegion *mr,
+     Error *err = NULL;
+     memory_region_init(mr, owner, name, size);
+     mr->ram = true;
++    mr->ops = &ram_device_mem_ops;
++    mr->opaque = mr;
+     mr->terminates = true;
+     mr->destructor = memory_region_destructor_ram;
+     mr->ram_block = qemu_ram_alloc_resizeable(size, max_size, resized,
+@@ -1558,6 +1562,8 @@ void memory_region_init_ram_from_file(MemoryRegion *mr,
+     Error *err = NULL;
+     memory_region_init(mr, owner, name, size);
+     mr->ram = true;
++    mr->ops = &ram_device_mem_ops;
++    mr->opaque = mr;
+     mr->terminates = true;
+     mr->destructor = memory_region_destructor_ram;
+     mr->align = align;
+@@ -1581,6 +1587,8 @@ void memory_region_init_ram_from_fd(MemoryRegion *mr,
+     Error *err = NULL;
+     memory_region_init(mr, owner, name, size);
+     mr->ram = true;
++    mr->ops = &ram_device_mem_ops;
++    mr->opaque = mr;
+     mr->terminates = true;
+     mr->destructor = memory_region_destructor_ram;
+     mr->ram_block = qemu_ram_alloc_from_fd(size, mr,
+@@ -1603,6 +1611,8 @@ void memory_region_init_ram_ptr(MemoryRegion *mr,
  {
- #ifdef CONFIG_TRACE_SIMPLE
-     st_set_trace_file(file);
--    st_set_trace_file_enabled(true);
-+    if (init_trace_on_startup) {
-+        st_set_trace_file_enabled(true);
-+    }
- #elif defined CONFIG_TRACE_LOG
-     /*
-      * If both the simple and the log backends are enabled, "--trace file"
-@@ -299,6 +302,7 @@ char *trace_opt_parse(const char *optarg)
-     }
-     trace_init_events(qemu_opt_get(opts, "events"));
-     trace_file = g_strdup(qemu_opt_get(opts, "file"));
-+    init_trace_on_startup = true;
-     qemu_opts_del(opts);
- 
-     return trace_file;
+     memory_region_init(mr, owner, name, size);
+     mr->ram = true;
++    mr->ops = &ram_device_mem_ops;
++    mr->opaque = mr;
+     mr->terminates = true;
+     mr->destructor = memory_region_destructor_ram;
+     mr->dirty_log_mask = tcg_enabled() ? (1 << DIRTY_MEMORY_CODE) : 0;
 -- 
-2.25.1
+2.21.3
 
 
