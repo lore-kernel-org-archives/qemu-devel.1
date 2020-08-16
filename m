@@ -1,92 +1,93 @@
-Return-Path: <SRS0=PlQC=BZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=YAkC=B2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36B69C433E1
-	for <qemu-devel@archiver.kernel.org>; Sat, 15 Aug 2020 22:00:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38D19C433E1
+	for <qemu-devel@archiver.kernel.org>; Sun, 16 Aug 2020 02:32:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 01C29206B6
-	for <qemu-devel@archiver.kernel.org>; Sat, 15 Aug 2020 22:00:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EF87F2068E
+	for <qemu-devel@archiver.kernel.org>; Sun, 16 Aug 2020 02:32:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="eJecjkNW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01C29206B6
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OZFjpJRd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF87F2068E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45568 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40840 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k74DZ-0003x5-3K
-	for qemu-devel@archiver.kernel.org; Sat, 15 Aug 2020 18:00:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38290)
+	id 1k78T5-0002AY-50
+	for qemu-devel@archiver.kernel.org; Sat, 15 Aug 2020 22:32:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41858)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
- id 1k74Cz-0003VZ-0Z
- for qemu-devel@nongnu.org; Sat, 15 Aug 2020 17:59:25 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:41332)
+ (Exim 4.90_1) (envelope-from <rohit.shinde12194@gmail.com>)
+ id 1k78SO-0001Jo-Ej
+ for qemu-devel@nongnu.org; Sat, 15 Aug 2020 22:31:36 -0400
+Received: from mail-qt1-x835.google.com ([2607:f8b0:4864:20::835]:40252)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
- id 1k74Cx-0001B0-0O
- for qemu-devel@nongnu.org; Sat, 15 Aug 2020 17:59:24 -0400
-Received: by mail-ot1-x342.google.com with SMTP id a65so10493289otc.8
- for <qemu-devel@nongnu.org>; Sat, 15 Aug 2020 14:59:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=bCin6TmgTSZWrgtfO6/BybfYU3ZQRUite8vCDBRZoh0=;
- b=eJecjkNW4Wcw/UhB9GuLXR4D3b7PrzJHOLR7tuXHWmnpq/yMJQ86cFq4eZG1lOEcpa
- yz7wjE6DkXg0FWB2lKdPsvjfw5OLnvKdZXEjLsurIiszZAExWw0ycSIdB4Nh5BOzwQrG
- HFBMlFwfikjJ2g1ngZWi4N6FNMoZ3uZr0f+SFknHUSbFrt+tAYCT8Vv8O10A09pG4Jbi
- +BgVPZgLYr2Fwczx80tLk8omfH7jRG0jeDlxzuUlp64gVejo1VWo/HGhdW12r5H5KujF
- 4lIFBWywg4p/cJ3bfAZBSt61S9iB/qoGobhsFCZE+u7Fd+vZhImZfIuAxt1NHfyr5dmK
- SD5A==
+ (Exim 4.90_1) (envelope-from <rohit.shinde12194@gmail.com>)
+ id 1k78SM-0002BM-RA
+ for qemu-devel@nongnu.org; Sat, 15 Aug 2020 22:31:36 -0400
+Received: by mail-qt1-x835.google.com with SMTP id s16so9936087qtn.7
+ for <qemu-devel@nongnu.org>; Sat, 15 Aug 2020 19:31:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=F3RWIqKqOWl438yGKydFmhV1PP/93HHyWCr6vW6Op9o=;
+ b=OZFjpJRdYd17mxtpqBxOREB47E75Jqjn8tpN/WDwpXepuw9RGAHExYX/Pol9mxaEQt
+ EznAF5pzP2ozpIhkaHYN3sGI2kf/vNACRVXGqOTV9As3AGaKH/J8Vkfh3gnSOmZodgKW
+ g8LbdlcKXpQyWJaZoVAarEhXKXfwLzmEnLeh5TCC5lvuTtBZ2BhKD0/XXFyjAvfu8jN0
+ YOtX4ZEEyOFBzG0KpW7CFkG4N9VC4lfUtx6PHNr/AzOg2ZZoQ4HZH8JgXDSG2vOM6N4x
+ 8lhfLY4EqzbnPD/YXne92DiVzSfZdv4LxsozpHP9h56/Yho4uW2eI5rko4OoblSSh40X
+ F3ig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=bCin6TmgTSZWrgtfO6/BybfYU3ZQRUite8vCDBRZoh0=;
- b=mC1tIzRhAQW1xW4/UG3DMMXArYcbP+Sie0RFCqwlsgfG/8P5gKzjd3UAZa3ceCOo3r
- /Do3KQtJ8mczrFayi3iSxTOrF7EL6+kHLPR3CumhZ68AyG9yhIDPZhjTYXV98dqvGpHw
- 6b7dT4IgB4CRIoRuj82MKae+2Za8zaBSEVXS3zcchHagNM/BiSU+Zva72ANUB6Gz2wh4
- qP6JDQPVK0QckuSLHXGBXSWUf2aEAg/jnKCzt13B6oipzLycgcChYmS5E5+50wzC8UZx
- EjVQ4EYZNi0VKaOsY8gdaHaSYfxGKaW21fRqp7BrfqpSY40J1YLRcIfcp2aefTkIEp3d
- oXcA==
-X-Gm-Message-State: AOAM533li4AqdNU1nEvkhx6HXtpFFJc6W70mWw7mATabWfVFqkI3N70N
- hZj26dR/Frtbl4kpg52N+8gaR98+3O3klVftPCVfDg==
-X-Google-Smtp-Source: ABdhPJwPblhMNoruxqo35v5uX6B3U+67Y5PP4TdGgzqC+ww6k1Wmg3iRQ4SmixoygJCeKis4Dana91XL9Ngohyc8IX4=
-X-Received: by 2002:a9d:3443:: with SMTP id v61mr6693131otb.139.1597528761661; 
- Sat, 15 Aug 2020 14:59:21 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=F3RWIqKqOWl438yGKydFmhV1PP/93HHyWCr6vW6Op9o=;
+ b=B+02hpV5PZwLM2ZD7+mfFjysJkbARPduSH9WSF+DoevAbOJm+vjHue/wajzPO9JPc+
+ TLmTWkFDZb5jSRZ1ewZZ3smghqa2yjUU1cYLOgpdjErTEGvacOeXe4kHVRLr0EwK9OSj
+ wkX3SADbwrYb6jltOsb824hTS2+jU0yqoGYOWZORMSZqEdJ1aJ1YahaOzuR1S9pRT5Vb
+ 0ye6CdebB4JDzGBeMEUrgQijBijIVXy04ySv5KexPfYQBEMYUZLc2SquYUkWYmuP7iVo
+ FaHWK5ylJdRdkolkfKBRDoj55SRkd4JAqP7AUF5jQOew/Em9XBVbPoTM28yamFY0oPpV
+ 9uGg==
+X-Gm-Message-State: AOAM530mz7mYenDF3zdtAHyndYvHdKvUD4F6iDXYFJ/4fAT6NFhPAy40
+ 1cKnYExBBHhLGPn5sL0k9LYhEN4GohPfaw==
+X-Google-Smtp-Source: ABdhPJywHDAxg52SADrsndD0vQcigDcXPHQBmh2cjrhufZcuI1VPuDzWYey4S3eRHya/eYNIRRyQoA==
+X-Received: by 2002:ac8:5241:: with SMTP id y1mr8197690qtn.102.1597545093236; 
+ Sat, 15 Aug 2020 19:31:33 -0700 (PDT)
+Received: from ubuntu.localdomain (pool-108-35-56-31.nwrknj.fios.verizon.net.
+ [108.35.56.31])
+ by smtp.gmail.com with ESMTPSA id b131sm12960089qkc.121.2020.08.15.19.31.32
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sat, 15 Aug 2020 19:31:32 -0700 (PDT)
+From: Rohit Shinde <rohit.shinde12194@gmail.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v4] qapi/opts-visitor: Fixed fallthrough compiler warning
+Date: Sat, 15 Aug 2020 22:31:27 -0400
+Message-Id: <20200816023127.22268-1-rohit.shinde12194@gmail.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-References: <20200806104709.13235-1-frank.chang@sifive.com>
- <20200806104709.13235-27-frank.chang@sifive.com>
- <90f01984-54a4-2a56-c52f-d1f4332b39d4@linaro.org>
- <CAE_xrPiJRRV3FYtfve6LMOF6LNEYGfhmi9CiabxqUBEew9igLg@mail.gmail.com>
- <5706a1ca-1dd9-22cd-08ce-c70780111bfc@linaro.org>
- <CAE_xrPgSbzzJqHYTeSND4wQDJUMoMYPmmcH97VE6hRcxh2S54A@mail.gmail.com>
- <de85d715-924a-8156-7424-5c35fd585fb3@linaro.org>
-In-Reply-To: <de85d715-924a-8156-7424-5c35fd585fb3@linaro.org>
-From: Frank Chang <frank.chang@sifive.com>
-Date: Sun, 16 Aug 2020 05:59:12 +0800
-Message-ID: <CAE_xrPiwcFCNaj0cBhWRo_uqPA7DgTOoxB5V6BgYQOXrMR6VTg@mail.gmail.com>
-Subject: Re: [RFC v3 26/71] target/riscv: rvv-1.0: update vext_max_elems() for
- load/store insns
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: multipart/alternative; boundary="0000000000005b929805acf1a63e"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::342;
- envelope-from=frank.chang@sifive.com; helo=mail-ot1-x342.google.com
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::835;
+ envelope-from=rohit.shinde12194@gmail.com; helo=mail-qt1-x835.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, HTML_MESSAGE=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=unavailable autolearn_force=no
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,86 +100,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- Palmer Dabbelt <palmer@dabbelt.com>
+Cc: Rohit Shinde <rohit.shinde12194@gmail.com>, armbru@redhat.com,
+ mdroth@linux.vnet.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000005b929805acf1a63e
-Content-Type: text/plain; charset="UTF-8"
+Added fallthrough comment on line 270 to fix compiler warning
 
-On Sat, Aug 15, 2020 at 1:29 PM Richard Henderson <
-richard.henderson@linaro.org> wrote:
+Signed-off-by: Rohit Shinde <rohit.shinde12194@gmail.com>
+---
+ qapi/opts-visitor.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> On 8/14/20 7:52 PM, Frank Chang wrote:
-> >     probe_pages(env, base + stride * i, nf * esz, ra, access_type);
-> > and
-> >     target_ulong addr = base + stride * i + k * esz;
-> >
-> > If we pass ctzl(sizeof(type)) in GEN_VEXT_LD_STRIDE(),
-> > I would still have to do: (1 << esz) to get the correct element size in
-> the
-> > above calculations.
-> > Would it eliminate the performance gain we have in vext_max_elems()
-> instead?
->
-> Well, no, it will improve performance, because you'll write
->
->   addr = base + stride * i + (k << esz)
->
-> I.e. strength-reduce the multiply to a shift.
->
->
-This works like a charm.
-Thanks for the advice.
+diff --git a/qapi/opts-visitor.c b/qapi/opts-visitor.c
+index 43cf60d3a0..3422ff265e 100644
+--- a/qapi/opts-visitor.c
++++ b/qapi/opts-visitor.c
+@@ -266,7 +266,7 @@ opts_next_list(Visitor *v, GenericList *tail, size_t size)
+         }
+         ov->list_mode = LM_IN_PROGRESS;
+         /* range has been completed, fall through in order to pop option */
+-        __attribute__((fallthrough));
++        /* fallthrough */
+ 
+     case LM_IN_PROGRESS: {
+         const QemuOpt *opt;
+-- 
+2.25.1
 
-Frank Chang
-
-
-
-> r~
->
->
-
---0000000000005b929805acf1a63e
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div dir=3D"ltr">On Sat, Aug 15, 2020 at 1:29 PM Richard H=
-enderson &lt;<a href=3D"mailto:richard.henderson@linaro.org">richard.hender=
-son@linaro.org</a>&gt; wrote:<br></div><div class=3D"gmail_quote"><blockquo=
-te class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px =
-solid rgb(204,204,204);padding-left:1ex">On 8/14/20 7:52 PM, Frank Chang wr=
-ote:<br>
-&gt; =C2=A0 =C2=A0 probe_pages(env, base + stride * i, nf * esz, ra, access=
-_type);<br>
-&gt; and<br>
-&gt; =C2=A0 =C2=A0 target_ulong addr =3D base + stride * i + k * esz;<br>
-&gt; <br>
-&gt; If we pass ctzl(sizeof(type)) in=C2=A0GEN_VEXT_LD_STRIDE(),<br>
-&gt; I would still have to do: (1 &lt;&lt; esz) to get the correct element =
-size in the<br>
-&gt; above calculations.<br>
-&gt; Would it eliminate the performance gain we have in=C2=A0vext_max_elems=
-() instead?<br>
-<br>
-Well, no, it will improve performance, because you&#39;ll write<br>
-<br>
-=C2=A0 addr =3D base + stride * i + (k &lt;&lt; esz)<br>
-<br>
-I.e. strength-reduce the multiply to a shift.<br><br></blockquote><div><br>=
-</div><div>This works like a charm.</div><div>Thanks for the advice.</div><=
-div><br></div><div>Frank Chang=C2=A0</div><div><br></div><div>=C2=A0</div><=
-blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-l=
-eft:1px solid rgb(204,204,204);padding-left:1ex">
-r~<br>
-<br>
-</blockquote></div></div>
-
---0000000000005b929805acf1a63e--
 
