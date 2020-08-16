@@ -2,87 +2,93 @@ Return-Path: <SRS0=YAkC=B2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DDEDC433DF
-	for <qemu-devel@archiver.kernel.org>; Sun, 16 Aug 2020 16:56:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1675C433DF
+	for <qemu-devel@archiver.kernel.org>; Sun, 16 Aug 2020 17:31:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 185D920866
-	for <qemu-devel@archiver.kernel.org>; Sun, 16 Aug 2020 16:56:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8A75820829
+	for <qemu-devel@archiver.kernel.org>; Sun, 16 Aug 2020 17:31:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HynKIk0R"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 185D920866
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MJvHZHNp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A75820829
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42062 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55732 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7LxY-0004OR-As
-	for qemu-devel@archiver.kernel.org; Sun, 16 Aug 2020 12:56:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40694)
+	id 1k7MVb-0004Hx-Pj
+	for qemu-devel@archiver.kernel.org; Sun, 16 Aug 2020 13:31:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45870)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <rohit.shinde12194@gmail.com>)
- id 1k7Lx0-0003vn-9X
- for qemu-devel@nongnu.org; Sun, 16 Aug 2020 12:56:06 -0400
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:37464)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1k7MUl-0003dT-8b
+ for qemu-devel@nongnu.org; Sun, 16 Aug 2020 13:30:59 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:42391)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <rohit.shinde12194@gmail.com>)
- id 1k7Lwy-000550-O8
- for qemu-devel@nongnu.org; Sun, 16 Aug 2020 12:56:06 -0400
-Received: by mail-pg1-x544.google.com with SMTP id g33so6929689pgb.4
- for <qemu-devel@nongnu.org>; Sun, 16 Aug 2020 09:56:03 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1k7MUj-0000MT-Qp
+ for qemu-devel@nongnu.org; Sun, 16 Aug 2020 13:30:59 -0400
+Received: by mail-wr1-x443.google.com with SMTP id r4so12642778wrx.9
+ for <qemu-devel@nongnu.org>; Sun, 16 Aug 2020 10:30:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=kzSZiL+IXq4xlSgO5SkAoFZ6dLa3rxaTPoYQ+oModUk=;
- b=HynKIk0R0zFdE5V/R0D9DheJ20UFn70OUyG420vxxNh3AhFRImxJiZnbbU++OpplYz
- WZQgGMbRlPZiF2XeJCMkxa+Vbn0ikjy040DSQU0eysv2XITlRvWImWOwV0UWM/WkL06X
- /jvRcn1zdNRAzi4m4d6R/I9Wqy63a/7Mpw+23R6xnpZbNSseVDmWi/0d7nwwHjhGltpL
- Pf6Vbrb5gdXqpjjv7J7XTaogN0djbme6KNke0niNV6HsDSpAc3ncshFDLpDFG3aMeBTc
- Lgh5yO0W8dtfRiXJjgMvZO0eOT4wefVzxcjuWRsnh3IE2DH63IuWN+SdIyJPl/pnMxVr
- Bz2Q==
+ h=sender:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=Raus7Isiyid3WEc/Ocz9YyElsHP3uG3r5vaxVcFMgjw=;
+ b=MJvHZHNp0mFzOou/WehPtWeE8pcFff/7JlkEbNhLZSQ9mVgnvhBgRMP7uQZBpgZu8h
+ hseVqcZMg0LjPtCWERHdogYt7IgEwPyN2iyT3S3UhalTL/NsPR9GQFyxnWyU13ikbGZK
+ mS3fECPnxFG2vARLmONw0w2rVxjjCpdvVOGhwtRKUaDSITcRXstxt76d/9MHOI/s87fd
+ DRLxYjaCIPqZoPYeUO9rhbHA7qc51VeWIno5o6RuOwWUdbn5UT4YVPF5Z1USrChJFYCt
+ HBaSxBheccjj2rTlfbPxux5edbTzUHtZ4NQbqhVDzWfw3DrzVGyKzn+uYmrlnu1xPi8b
+ zGaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=kzSZiL+IXq4xlSgO5SkAoFZ6dLa3rxaTPoYQ+oModUk=;
- b=mrRUReqQcmqoJWrVoTvFnXsZ5HZhUlHNW+t4zaTIQ/8PUBiJiUAuRAL925Uk7FVl1H
- WWDdh+qAHt0WcOgFaYN/N6eeFlI76UmyB/aGepbaCcJVmgfJ6YJu+SXUpcJtKv893QXd
- PTWj4wpt4S7r3pDYL/CueDrx6xdQeaZHFLu2CLD30oAdxQnkwN03Mg3B10oaL7TnNAy1
- OPh5nQkhN3CgN8oJAvHNUuoxywQAENj4I8EFRhivIOPBpOlQnsa/FTMaZTBvQFLG6XAD
- ILoms2m3u69kGBdXC+ciQSqQJYvQgbqixpFiF6WTTVCSoAsOmGk6A+yx1X/WbOYoDLOw
- TJrg==
-X-Gm-Message-State: AOAM533lD7SrAqIReVoiKd7nCKc+43vpitxQNoUcGNGpO5lbl3ot6DUg
- njmO3pDlFZK10Kxlm8DW9EZk6/LBhwAV47C+MS4=
-X-Google-Smtp-Source: ABdhPJxLSWUV7vCMVCpvj/8qRSAqC5DjxNnil7y04RZajs+qcv5ZRAWhvrhymgRT0RnoGhDXVyb+YG80NSJP1x1dSns=
-X-Received: by 2002:aa7:972f:: with SMTP id k15mr8800571pfg.209.1597596962625; 
- Sun, 16 Aug 2020 09:56:02 -0700 (PDT)
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=Raus7Isiyid3WEc/Ocz9YyElsHP3uG3r5vaxVcFMgjw=;
+ b=nqvbZHaUjr5Th8W17qPfGaaLApnRirmfczsQaFK5bCcnwPrMaNT86C1PO4Hp9jxZLa
+ XuFjU0WIvG5ztkRSstqhH/S65i6HcHbtCQqCxgTtSWQoOqGmbT23eSZv0Xju30Pufr7Z
+ UskviDNEJhxnrxl4q3thCabNAyNR5Nz9nDN+2ZMW8khtMtrRPi9bSAtabj87c1DLCV92
+ vKH4nzoE031jHZF0OiDXSoj9NxYBb7JdZAzbXFfOYEzW7+bkrlDXug0VcuR6RqQDyU5Y
+ 9R7AHV8uN2l/t8lkfI3icc8RRvgEDHGQvk+kVp4XMr544ee/j8nqMv5IWHlCWgbvtEXs
+ vsvA==
+X-Gm-Message-State: AOAM532vcMJxfu3u2QC1EG5D3kqNqDpuvv/gbYTr8mDdLvycdhbZJkoD
+ LVhEA6UrK8TYF5CDuyNlpXznLjAAi9U=
+X-Google-Smtp-Source: ABdhPJx4n9xU7QjOTuklrNSYtKcnZqjqR0slA+msMwCxUIpf1uGlZVaFpWmjQUgH0jRduDPlYUkLUw==
+X-Received: by 2002:adf:edc3:: with SMTP id v3mr11432451wro.193.1597599054054; 
+ Sun, 16 Aug 2020 10:30:54 -0700 (PDT)
+Received: from localhost.localdomain (121.red-81-40-121.staticip.rima-tde.net.
+ [81.40.121.121])
+ by smtp.gmail.com with ESMTPSA id 32sm29797919wrh.18.2020.08.16.10.30.52
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sun, 16 Aug 2020 10:30:53 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] memory: Directly dispatch alias accesses on origin memory
+ region
+Date: Sun, 16 Aug 2020 19:30:51 +0200
+Message-Id: <20200816173051.16274-1-f4bug@amsat.org>
+X-Mailer: git-send-email 2.21.3
 MIME-Version: 1.0
-References: <20200816023127.22268-1-rohit.shinde12194@gmail.com>
- <9abbbc9d-b5d5-fdd1-e6ff-c89071189f7f@linaro.org>
-In-Reply-To: <9abbbc9d-b5d5-fdd1-e6ff-c89071189f7f@linaro.org>
-From: Rohit Shinde <rohit.shinde12194@gmail.com>
-Date: Sun, 16 Aug 2020 12:55:51 -0400
-Message-ID: <CA+Ai=tB3QW7+vt4qSrfSBornPmPJ+1rVajvvXf=p4kg3FG2+ZA@mail.gmail.com>
-Subject: Re: [PATCH v4] qapi/opts-visitor: Fixed fallthrough compiler warning
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: multipart/alternative; boundary="000000000000739ad205ad01877c"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::544;
- envelope-from=rohit.shinde12194@gmail.com; helo=mail-pg1-x544.google.com
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001, HTML_MESSAGE=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,75 +101,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mdroth@linux.vnet.ibm.com, qemu-devel@nongnu.org, armbru@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Richard Henderson <rth@twiddle.net>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000739ad205ad01877c
-Content-Type: text/plain; charset="UTF-8"
+There is an issue when accessing an alias memory region via the
+memory_region_dispatch_read() / memory_region_dispatch_write()
+calls:
 
-Hey Richard,
+The memory_region_init_alias() flow is:
 
+  memory_region_init_alias()
+  -> memory_region_init()
+     -> object_initialize(TYPE_MEMORY_REGION)
+        -> memory_region_initfn()
+           -> mr->ops = &unassigned_mem_ops;
 
-   1. So I should fork off the master again? I am a bit unclear on the
-   workflow, since this is my first doing patches via format-patch and
-   send-email so I am making mistakes.
-   2. I just checked and my version of the code doesn't contain that line,
-   so I am unsure on how that line got there. I was trying to fix the compiler
-   warnings. Could you please guide me on how I create the next version of a
-   patch?
+Later when accessing the alias, the memory_region_dispatch_read()
+flow is:
 
-Thanks,
-Rohit.
+  memory_region_dispatch_read()
+  -> memory_region_access_valid(mr)
+     -> mr->ops->valid.accepts()
+        -> unassigned_mem_accepts()
+        <- false
+     <- false
+   <- MEMTX_DECODE_ERROR
 
-On Sun, Aug 16, 2020 at 12:03 PM Richard Henderson <
-richard.henderson@linaro.org> wrote:
+The caller gets a MEMTX_DECODE_ERROR while the access is OK.
 
-> On 8/15/20 7:31 PM, Rohit Shinde wrote:
-> >          /* range has been completed, fall through in order to pop
-> option */
-> > -        __attribute__((fallthrough));
-> > +        /* fallthrough */
->
-> (1) Any patch should not be relative to your own v3.
-> (2) The previous line already contains the words "fall through",
->     so what is it that you are trying to fix?
->
->
-> r~
->
+Fix by directly dispatching aliases accesses to its origin region.
 
---000000000000739ad205ad01877c
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Fixes: 2cdfcf272d ("memory: assign MemoryRegionOps to all regions")
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ softmmu/memory.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-<div dir=3D"ltr">Hey Richard,<div><br></div><div><ol><li>So I should=C2=A0f=
-ork off the master again? I am a bit unclear on the workflow, since this is=
- my first doing patches via format-patch and send-email so I am making mist=
-akes.</li><li>I just checked and my version of the code doesn&#39;t contain=
- that line, so I am unsure on how that line got there. I was trying to fix =
-the compiler warnings. Could you please guide me on how I create the next v=
-ersion of a patch?</li></ol><div>Thanks,</div></div><div>Rohit.</div></div>=
-<br><div class=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">On Sun=
-, Aug 16, 2020 at 12:03 PM Richard Henderson &lt;<a href=3D"mailto:richard.=
-henderson@linaro.org">richard.henderson@linaro.org</a>&gt; wrote:<br></div>=
-<blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-=
-left:1px solid rgb(204,204,204);padding-left:1ex">On 8/15/20 7:31 PM, Rohit=
- Shinde wrote:<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 /* range has been completed, fall th=
-rough in order to pop option */<br>
-&gt; -=C2=A0 =C2=A0 =C2=A0 =C2=A0 __attribute__((fallthrough));<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 /* fallthrough */<br>
-<br>
-(1) Any patch should not be relative to your own v3.<br>
-(2) The previous line already contains the words &quot;fall through&quot;,<=
-br>
-=C2=A0 =C2=A0 so what is it that you are trying to fix?<br>
-<br>
-<br>
-r~<br>
-</blockquote></div>
+diff --git a/softmmu/memory.c b/softmmu/memory.c
+index af25987518..651705b7d1 100644
+--- a/softmmu/memory.c
++++ b/softmmu/memory.c
+@@ -1405,6 +1405,10 @@ MemTxResult memory_region_dispatch_read(MemoryRegion *mr,
+     unsigned size = memop_size(op);
+     MemTxResult r;
+ 
++    if (mr->alias) {
++        addr += mr->alias_offset;
++        mr = mr->alias;
++    }
+     if (!memory_region_access_valid(mr, addr, size, false, attrs)) {
+         *pval = unassigned_mem_read(mr, addr, size);
+         return MEMTX_DECODE_ERROR;
+@@ -1449,6 +1453,10 @@ MemTxResult memory_region_dispatch_write(MemoryRegion *mr,
+ {
+     unsigned size = memop_size(op);
+ 
++    if (mr->alias) {
++        addr += mr->alias_offset;
++        mr = mr->alias;
++    }
+     if (!memory_region_access_valid(mr, addr, size, true, attrs)) {
+         unassigned_mem_write(mr, addr, data, size);
+         return MEMTX_DECODE_ERROR;
+-- 
+2.21.3
 
---000000000000739ad205ad01877c--
 
