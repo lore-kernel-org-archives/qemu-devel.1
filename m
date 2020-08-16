@@ -2,79 +2,79 @@ Return-Path: <SRS0=YAkC=B2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3011DC433E1
-	for <qemu-devel@archiver.kernel.org>; Sun, 16 Aug 2020 08:51:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DEB0C433DF
+	for <qemu-devel@archiver.kernel.org>; Sun, 16 Aug 2020 08:54:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EEAD82065C
-	for <qemu-devel@archiver.kernel.org>; Sun, 16 Aug 2020 08:51:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ECD062065C
+	for <qemu-devel@archiver.kernel.org>; Sun, 16 Aug 2020 08:54:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hs/Jn8mo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EEAD82065C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IYfFojZ8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECD062065C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55982 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58998 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7EO3-0007kl-6z
-	for qemu-devel@archiver.kernel.org; Sun, 16 Aug 2020 04:51:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57098)
+	id 1k7ERG-0000nM-2V
+	for qemu-devel@archiver.kernel.org; Sun, 16 Aug 2020 04:54:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57476)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1k7ENS-00073A-5O; Sun, 16 Aug 2020 04:50:54 -0400
-Received: from mail-yb1-xb44.google.com ([2607:f8b0:4864:20::b44]:37929)
+ id 1k7EQi-0000Kl-0B; Sun, 16 Aug 2020 04:54:16 -0400
+Received: from mail-yb1-xb41.google.com ([2607:f8b0:4864:20::b41]:35746)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1k7ENQ-0004VA-Iu; Sun, 16 Aug 2020 04:50:53 -0400
-Received: by mail-yb1-xb44.google.com with SMTP id e187so7707684ybc.5;
- Sun, 16 Aug 2020 01:50:51 -0700 (PDT)
+ id 1k7EQg-0004g4-8P; Sun, 16 Aug 2020 04:54:15 -0400
+Received: by mail-yb1-xb41.google.com with SMTP id y134so7717532yby.2;
+ Sun, 16 Aug 2020 01:54:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=WM81FUooLa0WVXS+UjOCZ/wG1bbk9t8qGS+VYBWibBo=;
- b=hs/Jn8mosBdbxqzJ5ztNKElGWO52K8rnov+ofIIHBIKo62kFD1BCyP1ibij1ElhfLK
- P/deJB5gSwuNVzYx/P4thPlL4t0vHWdtY4Aruh3BjeFr8qnhwWWNs1yecCf2i5xedGLr
- RB8BzsFrgbPT1F3Uuh1bwMDj1gaqsdVFYyohcOq6WnujT9GZPMvBf5PPLyfc9EdHi3SW
- /xom1hhax2a4+6ejY1qyJer/5IsRF1TIjUXasat69GxoSTi+wcAD89a9OCrDo/7Vvodb
- X1tGOtQQzeF51gky8ncY4SaFX0V6K0EYb8rjeRVMs7QmWqFs5RFTjgYjxxCDkwEmY+my
- 3AKg==
+ bh=lc9/9ec4NBry6nJd16jLQjYYfqhlQUGXwRhYp0pFGso=;
+ b=IYfFojZ8W2sIr+mqV8hx8ku3ShSbs5X4QoSEU8BZT9UXJ/r/9z+GYqpGVCrs4QcCy9
+ GdAadGeXjIUxODDU3ZTh4yF3yizrDu4EF0Iwn7Wdom/SICTrOogw6PKv0QsDhwsc8tQz
+ dCYjWCdYoB4jhomhSNgxsWvZ4N2wAnn46dlzBJz97pF/bdYMdqomJutzsmSE2w2ktw13
+ /EgMWl+fygaPwWL+QpYlagO10UnHY5G6rueLsXX/WmsX1T+UZpSHAC2i2Z8Uk6LXf5C/
+ +Jdyd351xY28ms+fDQIVTmcCS2bECtcFku2In6+bGzDQUH0hUVsfrUo9898D3hjGxwz9
+ rwvQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=WM81FUooLa0WVXS+UjOCZ/wG1bbk9t8qGS+VYBWibBo=;
- b=qYB00EF6VjZBpGRW/gyk1/c+THEwLkDzzbvH0f41wNa4cjpxstZjGRwH37BDi0tXpG
- ZpVgHqLTgILRMalQPxJNEu9XJMBOCFSQJFXApvj7WSVhc+SgQdgSP8o3FkQKOYYYO0Ml
- 48YMr0zEIgp5+k+K2eLLSOSZDDuUUVwTvNwmUDAuYXXfnIfnSumX2SL9eIjkJ3OdIwWf
- e9zwntOYW7IZz4DAxpHxBNyAhV7O6ZLmR89dbxgdVFzqDod/wLXdP1lrTqfZ0De5pODF
- c+5DooTrqVmIdzDGcDPTNAuTMUA3T0PlJjIna8oC83QPuwj9LPxdODCccVDx+Bj2Bf9V
- ABAg==
-X-Gm-Message-State: AOAM533+Y7DibLR3USWDSXuH+uwfsI8IEqsVRN2D85qrAcB94BI01amR
- YYSOTT7jLQjSPz4RHvpRvCUMnVwc0mfUZRJ5rVk=
-X-Google-Smtp-Source: ABdhPJwQoFoJ+Z5CFmoinXAGKMnfkIhh4A4P7ZqMLUiWgJJZtzFCizbcg0j/0ILMT0tDoQtTZIWmbh5cl1dkAL1MpkI=
-X-Received: by 2002:a25:8290:: with SMTP id r16mr13534343ybk.122.1597567850460; 
- Sun, 16 Aug 2020 01:50:50 -0700 (PDT)
+ bh=lc9/9ec4NBry6nJd16jLQjYYfqhlQUGXwRhYp0pFGso=;
+ b=PYymeh3X/I72DZyQE2a2Qbq2efmfovILO08mPNrBOC4CCfhCbFgLpWSq4V75SDKMAj
+ 9hwlNadOiL2OR0gr6QBFYM0dzI6DI5BYVQdtssfkAe5peB7j2rwBVq2xOVrRDxqmeTPL
+ NoUkNbjMaREvEli8NJdtMbQuhJHiO98K8Px2Z9pruKx3KZBK2UbhJpXyvIJZRU2FWcHt
+ hO3yku42Ioe32I30SIq1ov2LaD+WMMkhvWS6bN+eKuDTkZMU4W4CYk1I/HkqBdtn0Ynt
+ yVe3hQ6Meq5O0Z6xWloEgxxgCX7BrrDcuBi6q2NYNFNYFsEsLSfU+wpHwHsCA7PXCgOD
+ 0x5Q==
+X-Gm-Message-State: AOAM531ITrsAw7zTrsQ7T3moB07UdPKqNQooF8WbhViX4xW+bi7/3wYn
+ hqQ8uYr8R6B/kE22hH++xiozb0Tfnh8DvkwKV3k=
+X-Google-Smtp-Source: ABdhPJzdoxQk3q3GoSCfvCk2WOu3JDOCoNeBEmFcC1ffg3vR1UGPqitDlY2z4aUcn+1wB8CrBBNVlZ+GYBbaKFqS7Xo=
+X-Received: by 2002:a25:4251:: with SMTP id p78mr13639848yba.306.1597568052704; 
+ Sun, 16 Aug 2020 01:54:12 -0700 (PDT)
 MIME-Version: 1.0
 References: <1597423256-14847-1-git-send-email-bmeng.cn@gmail.com>
- <1597423256-14847-10-git-send-email-bmeng.cn@gmail.com>
- <e68381fd-e4cd-a56a-ab44-ff603242e1cc@amsat.org>
-In-Reply-To: <e68381fd-e4cd-a56a-ab44-ff603242e1cc@amsat.org>
+ <1597423256-14847-9-git-send-email-bmeng.cn@gmail.com>
+ <3b8ef426-77ce-d3b2-594b-045cae5ec94f@amsat.org>
+In-Reply-To: <3b8ef426-77ce-d3b2-594b-045cae5ec94f@amsat.org>
 From: Bin Meng <bmeng.cn@gmail.com>
-Date: Sun, 16 Aug 2020 16:50:39 +0800
-Message-ID: <CAEUhbmUtD2miWZk8uYvB6VkM8bu9rqr32J29WJADoNy9JethRg@mail.gmail.com>
-Subject: Re: [PATCH 09/18] hw/sd: sdhci: Make sdhci_poweron_reset() internal
- visible
+Date: Sun, 16 Aug 2020 16:54:01 +0800
+Message-ID: <CAEUhbmXoz2YcnTNs0M3bYWPCsMRcn=96Sa_PQQnyCN9DfZeVYg@mail.gmail.com>
+Subject: Re: [PATCH 08/18] hw/sd: sd: Correctly set the high capacity bit
 To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::b44;
- envelope-from=bmeng.cn@gmail.com; helo=mail-yb1-xb44.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::b41;
+ envelope-from=bmeng.cn@gmail.com; helo=mail-yb1-xb41.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -109,34 +109,39 @@ Sender: "Qemu-devel"
 
 Hi Philippe,
 
-On Sat, Aug 15, 2020 at 3:51 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
+On Sat, Aug 15, 2020 at 4:38 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
 g> wrote:
 >
 > On 8/14/20 6:40 PM, Bin Meng wrote:
 > > From: Bin Meng <bin.meng@windriver.com>
 > >
-> > sdhci_poweron_reset() might be needed for any SDHCI compatible
-> > device that is built on top of the generic SDHCI device.
+> > Per the SD spec, Standard Capacity SD Memory Card (SDSC) supports
+> > capacity up to and including 2 GiB.
+> >
 >
-> NAck. Please use device_legacy_reset() instead.
+> Fixes: 2d7adea4fe ("hw/sd: Support SDHC size cards")
 >
-> In next patch:
+> > Signed-off-by: Bin Meng <bin.meng@windriver.com>
+> > ---
+> >
+> >  hw/sd/sd.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/hw/sd/sd.c b/hw/sd/sd.c
+> > index 51f5900..5e7fc3f 100644
+> > --- a/hw/sd/sd.c
+> > +++ b/hw/sd/sd.c
+> > @@ -313,7 +313,7 @@ static void sd_ocr_powerup(void *opaque)
+> >      /* card power-up OK */
+> >      sd->ocr =3D FIELD_DP32(sd->ocr, OCR, CARD_POWER_UP, 1);
+> >
+> > -    if (sd->size > 1 * GiB) {
+> > +    if (sd->size > 2 * GiB) {
 >
->   device_legacy_reset(DEVICE(&sdhci->slot));
+> But you need to fix sd_set_csd() too, else this is incomplete.
 >
 
-The function comments say this API is deprecated.
-
-/**
- * device_legacy_reset:
- *
- * Reset a single device (by calling the reset method).
- * Note: This function is deprecated and will be removed when it becomes un=
-used.
- * Please use device_cold_reset() now.
- */
-
-Should we use device_cold_reset() here?
+Ah yes, I missed that. Will fix in v2. Thanks for the review.
 
 Regards,
 Bin
