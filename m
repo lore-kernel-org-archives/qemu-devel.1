@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CB07C433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 15:40:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B108C433E5
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 15:40:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0242522BEB
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 15:40:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 21BBF22CE3
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 15:40:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K5WQ4A9M"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0242522BEB
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SorUBNUa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21BBF22CE3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38478 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38738 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7hFo-00041v-16
-	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 11:40:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42958)
+	id 1k7hFq-00049L-8H
+	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 11:40:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42866)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k7gLC-0003dn-Sy
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:42:26 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23069
- helo=us-smtp-1.mimecast.com)
+ id 1k7gL3-0003Q2-D9
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:42:18 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:55765
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k7gL8-0006vr-SC
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:42:26 -0400
+ id 1k7gKw-0006uT-FX
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:42:16 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597675342;
+ s=mimecast20190719; t=1597675329;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=LvymUVZshpWhdrmlfGlQijeyhUn+w1f5RXfbWUnQhVw=;
- b=K5WQ4A9MByrbhaGhLvXaQpzamUt5YaB+AatX1Q7atXF+CoL3xqHlKNMEErRyCGHEOJK8R7
- yHEcn00e19uK33o6xOft2FNh4mrr49ELS98tAI9V4yaySQhLkacSeCmuZuScBLuIwfvJm6
- iLvPtP6nKW/JvJH8JtWnEwXmMxWFH9I=
+ bh=2SK54a16DA68q6T/I9wzGpsv/gBJyipwwF1tkZV2snU=;
+ b=SorUBNUajqD9yYDqUqFC8qNk9ExO6uvKWaOYi4zU8NrK+F4DJzbcuQwiWCfZhoWs95/Rru
+ QONNY2HvHQZXd1XSSyoxJSSh5t3UJWmWg3nBxnAPH1vBj8BOwRUCnWp/EAr+zSDFsuk56R
+ Cp4qZoHD59LqVIWLD09pN48meBuevqc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-497-86g-t1gQM_WVX2NtTdpOaQ-1; Mon, 17 Aug 2020 10:42:20 -0400
-X-MC-Unique: 86g-t1gQM_WVX2NtTdpOaQ-1
+ us-mta-427-3DyXFQoiMNKOXLeLCSV17Q-1; Mon, 17 Aug 2020 10:42:07 -0400
+X-MC-Unique: 3DyXFQoiMNKOXLeLCSV17Q-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 64082185E524
- for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 14:42:19 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C23FE1DDEF
+ for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 14:42:06 +0000 (UTC)
 Received: from donizetti.redhat.com (ovpn-113-20.ams2.redhat.com
  [10.36.113.20])
- by smtp.corp.redhat.com (Postfix) with ESMTP id AC86670C3D;
- Mon, 17 Aug 2020 14:42:18 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0666570C3D;
+ Mon, 17 Aug 2020 14:42:05 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 136/150] remove Makefile.target
-Date: Mon, 17 Aug 2020 16:40:39 +0200
-Message-Id: <20200817144053.345107-41-pbonzini@redhat.com>
+Subject: [PATCH 128/150] meson: accel
+Date: Mon, 17 Aug 2020 16:40:31 +0200
+Message-Id: <20200817144053.345107-33-pbonzini@redhat.com>
 In-Reply-To: <20200817143723.343284-1-pbonzini@redhat.com>
 References: <20200817143723.343284-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -74,18 +74,17 @@ X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/17 00:24:04
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/17 03:34:42
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,273 +102,191 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
+Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Makefile        | 53 ++++---------------------------------------------
- Makefile.target | 12 -----------
- configure       | 17 ----------------
- 3 files changed, 4 insertions(+), 78 deletions(-)
- delete mode 100644 Makefile.target
+ Makefile.objs             |  2 +-
+ Makefile.target           |  1 -
+ accel/Makefile.objs       |  6 ------
+ accel/kvm/Makefile.objs   |  2 --
+ accel/kvm/meson.build     |  5 +++++
+ accel/meson.build         |  7 +++++++
+ accel/stubs/Makefile.objs |  6 ------
+ accel/stubs/meson.build   |  6 ++++++
+ accel/tcg/Makefile.objs   |  9 ---------
+ accel/tcg/meson.build     | 15 +++++++++++++++
+ accel/xen/Makefile.objs   |  1 -
+ accel/xen/meson.build     |  1 +
+ meson.build               |  1 +
+ 13 files changed, 36 insertions(+), 26 deletions(-)
+ delete mode 100644 accel/Makefile.objs
+ delete mode 100644 accel/kvm/Makefile.objs
+ create mode 100644 accel/kvm/meson.build
+ create mode 100644 accel/meson.build
+ delete mode 100644 accel/stubs/Makefile.objs
+ create mode 100644 accel/stubs/meson.build
+ delete mode 100644 accel/tcg/Makefile.objs
+ create mode 100644 accel/tcg/meson.build
+ delete mode 100644 accel/xen/Makefile.objs
+ create mode 100644 accel/xen/meson.build
 
-diff --git a/Makefile b/Makefile
-index e6ede40f51..175776d912 100644
---- a/Makefile
-+++ b/Makefile
-@@ -168,17 +168,6 @@ include $(SRC_PATH)/tests/Makefile.include
+diff --git a/Makefile.objs b/Makefile.objs
+index c9720a92df..83622c58a5 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -39,7 +39,7 @@ endif # CONFIG_SOFTMMU or CONFIG_TOOLS
+ # single QEMU executable should support all CPUs and machines.
  
- all: $(DOCS) $(if $(BUILD_DOCS),sphinxdocs) recurse-all modules
+ ifeq ($(CONFIG_SOFTMMU),y)
+-common-obj-y = accel/
++common-obj-y =
  
--config-host.h: config-host.h-timestamp
--config-host.h-timestamp: config-host.mak
--
--TARGET_DIRS_RULES := $(foreach t, all fuzz clean install, $(addsuffix /$(t), $(TARGET_DIRS)))
--
--.PHONY: $(TARGET_DIRS_RULES)
--# The $(TARGET_DIRS_RULES) are of the form SUBDIR/GOAL, so that
--# $(dir $@) yields the sub-directory, and $(notdir $@) yields the sub-goal
--$(TARGET_DIRS_RULES): $(TARGET_DEPS)
--	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) -C $(dir $@) V="$(V)" TARGET_DIR="$(dir $@)" $(notdir $@),)
--
- # LIBFDT_lib="": avoid breaking existing trees with objects requiring -fPIC
- DTC_MAKE_ARGS=-I$(SRC_PATH)/dtc VPATH=$(SRC_PATH)/dtc -C dtc V="$(V)" LIBFDT_lib=""
- DTC_CFLAGS=$(CFLAGS) $(QEMU_CFLAGS)
-@@ -215,8 +204,6 @@ slirp/all: .git-submodule-status
- 		CC="$(CC)" AR="$(AR)" 	LD="$(LD)" RANLIB="$(RANLIB)"	\
- 		CFLAGS="$(QEMU_CFLAGS) $(CFLAGS)" LDFLAGS="$(QEMU_LDFLAGS)")
- 
--$(filter %/all, $(TARGET_DIRS_RULES)):
--
- ROM_DIRS = $(addprefix pc-bios/, $(ROMS))
- ROM_DIRS_RULES=$(foreach t, all clean, $(addsuffix /$(t), $(ROM_DIRS)))
- # Only keep -O and -g cflags
-@@ -224,11 +211,9 @@ ROM_DIRS_RULES=$(foreach t, all clean, $(addsuffix /$(t), $(ROM_DIRS)))
- $(ROM_DIRS_RULES):
- 	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) -C $(dir $@) V="$(V)" TARGET_DIR="$(dir $@)" CFLAGS="$(filter -O% -g%,$(CFLAGS))" $(notdir $@),)
- 
--.PHONY: recurse-all recurse-clean recurse-install
--recurse-all: $(addsuffix /all, $(TARGET_DIRS) $(ROM_DIRS))
--recurse-clean: $(addsuffix /clean, $(TARGET_DIRS) $(ROM_DIRS))
--recurse-install: $(addsuffix /install, $(TARGET_DIRS))
--$(addsuffix /install, $(TARGET_DIRS)): all
-+.PHONY: recurse-all recurse-clean
-+recurse-all: $(ROM_DIRS)
-+recurse-clean: $(addsuffix /clean, $(ROM_DIRS))
- 
- ######################################################################
- 
-@@ -283,9 +268,6 @@ distclean: clean ninja-distclean
- 	$(call clean-manual,system)
- 	$(call clean-manual,tools)
- 	$(call clean-manual,user)
--	for d in $(TARGET_DIRS); do \
--	rm -rf $$d || exit 1 ; \
--        done
- 	rm -Rf .sdk
- 
- KEYMAPS=da     en-gb  et  fr     fr-ch  is  lt  no  pt-br  sv \
-@@ -389,8 +371,7 @@ ICON_SIZES=16x16 24x24 32x32 48x48 64x64 128x128 256x256 512x512
- # Needed by "meson install"
- export DESTDIR
- install: all $(if $(BUILD_DOCS),install-doc) \
--	install-datadir install-localstatedir \
--	recurse-install
-+	install-datadir install-localstatedir
- ifdef CONFIG_TRACE_SYSTEMTAP
- 	$(INSTALL_PROG) "scripts/qemu-trace-stap" $(DESTDIR)$(bindir)
- endif
-@@ -420,9 +401,6 @@ endif
- 	set -e; for x in $(KEYMAPS); do \
- 		$(INSTALL_DATA) $(SRC_PATH)/pc-bios/keymaps/$$x "$(DESTDIR)$(qemu_datadir)/keymaps"; \
- 	done
--	for d in $(TARGET_DIRS); do \
--	$(MAKE) $(SUBDIR_MAKEFLAGS) TARGET_DIR=$$d/ -C $$d $@ || exit 1 ; \
--        done
- 
- # documentation
- MAKEINFO=makeinfo
-@@ -537,20 +515,6 @@ docs/interop/qemu-qmp-ref.dvi docs/interop/qemu-qmp-ref.html \
- 
- $(filter %.1 %.7 %.8,$(DOCS)): scripts/texi2pod.pl
- 
--# Reports/Analysis
--
--%/coverage-report.html:
--	@mkdir -p $*
--	$(call quiet-command,\
--		gcovr -r $(SRC_PATH) \
--		$(foreach t, $(TARGET_DIRS), --object-directory $(BUILD_DIR)/$(t)) \
--		 --object-directory $(BUILD_DIR) \
--		-p --html --html-details -o $@, \
--		"GEN", "coverage-report.html")
--
--.PHONY: coverage-report
--coverage-report: $(CURDIR)/reports/coverage/coverage-report.html
--
- ifdef CONFIG_WIN32
- 
- INSTALLER = qemu-setup-$(VERSION)$(EXESUF)
-@@ -638,15 +602,6 @@ endif
- 	$(call print-help,cscope,Generate cscope index)
- 	$(call print-help,sparse,Run sparse on the QEMU source)
- 	@echo  ''
--	@$(if $(TARGET_DIRS), \
--		echo 'Architecture specific targets:'; \
--		$(foreach t, $(TARGET_DIRS), \
--		$(call print-help-run,$(t)/all,Build for $(t)); \
--		$(if $(CONFIG_FUZZ), \
--			$(if $(findstring softmmu,$(t)), \
--				$(call print-help-run,$(t)/fuzz,Build fuzzer for $(t)); \
--		))) \
--		echo '')
- 	@echo  'Cleaning targets:'
- 	$(call print-help,clean,Remove most generated files but keep the config)
- 	$(call print-help,distclean,Remove all generated files)
+ common-obj-$(CONFIG_AUDIO_ALSA) += audio-alsa$(DSOSUF)
+ common-obj-$(CONFIG_AUDIO_OSS) += audio-oss$(DSOSUF)
 diff --git a/Makefile.target b/Makefile.target
-deleted file mode 100644
-index a07149c0a6..0000000000
+index 1ab8773402..8633e2b9fe 100644
 --- a/Makefile.target
++++ b/Makefile.target
+@@ -110,7 +110,6 @@ obj-y += trace/
+ #########################################################
+ # cpu emulator library
+ obj-y += exec.o exec-vary.o
+-obj-y += accel/
+ obj-$(CONFIG_TCG) += tcg/tcg.o tcg/tcg-op.o tcg/tcg-op-vec.o tcg/tcg-op-gvec.o
+ obj-$(CONFIG_TCG) += tcg/tcg-common.o tcg/optimize.o
+ obj-$(CONFIG_TCG_INTERPRETER) += tcg/tci.o
+diff --git a/accel/Makefile.objs b/accel/Makefile.objs
+deleted file mode 100644
+index ff72f0d030..0000000000
+--- a/accel/Makefile.objs
 +++ /dev/null
-@@ -1,12 +0,0 @@
--# -*- Mode: makefile -*-
+@@ -1,6 +0,0 @@
+-common-obj-$(CONFIG_SOFTMMU) += accel.o
+-obj-$(call land,$(CONFIG_SOFTMMU),$(CONFIG_POSIX)) += qtest.o
+-obj-$(CONFIG_KVM) += kvm/
+-obj-$(CONFIG_TCG) += tcg/
+-obj-$(CONFIG_XEN) += xen/
+-obj-y += stubs/
+diff --git a/accel/kvm/Makefile.objs b/accel/kvm/Makefile.objs
+deleted file mode 100644
+index fdfa481578..0000000000
+--- a/accel/kvm/Makefile.objs
++++ /dev/null
+@@ -1,2 +0,0 @@
+-obj-y += kvm-all.o
+-obj-$(call lnot,$(CONFIG_SEV)) += sev-stub.o
+diff --git a/accel/kvm/meson.build b/accel/kvm/meson.build
+new file mode 100644
+index 0000000000..4db2388e2f
+--- /dev/null
++++ b/accel/kvm/meson.build
+@@ -0,0 +1,5 @@
++kvm_ss = ss.source_set()
++kvm_ss.add(files('kvm-all.c'))
++kvm_ss.add(when: 'CONFIG_SEV', if_false: files('sev-stub.c'))
++
++specific_ss.add_all(when: 'CONFIG_KVM', if_true: kvm_ss)
+diff --git a/accel/meson.build b/accel/meson.build
+new file mode 100644
+index 0000000000..26c503e480
+--- /dev/null
++++ b/accel/meson.build
+@@ -0,0 +1,7 @@
++softmmu_ss.add(files('accel.c'))
++specific_ss.add(when: ['CONFIG_SOFTMMU', 'CONFIG_POSIX'], if_true: files('qtest.c'))
++
++subdir('kvm')
++subdir('tcg')
++subdir('xen')
++subdir('stubs')
+diff --git a/accel/stubs/Makefile.objs b/accel/stubs/Makefile.objs
+deleted file mode 100644
+index bbd14e71fb..0000000000
+--- a/accel/stubs/Makefile.objs
++++ /dev/null
+@@ -1,6 +0,0 @@
+-obj-$(call lnot,$(CONFIG_HAX))  += hax-stub.o
+-obj-$(call lnot,$(CONFIG_HVF))  += hvf-stub.o
+-obj-$(call lnot,$(CONFIG_WHPX)) += whpx-stub.o
+-obj-$(call lnot,$(CONFIG_KVM))  += kvm-stub.o
+-obj-$(call lnot,$(CONFIG_TCG))  += tcg-stub.o
+-obj-$(call lnot,$(CONFIG_XEN))  += xen-stub.o
+diff --git a/accel/stubs/meson.build b/accel/stubs/meson.build
+new file mode 100644
+index 0000000000..314e3cfff4
+--- /dev/null
++++ b/accel/stubs/meson.build
+@@ -0,0 +1,6 @@
++specific_ss.add(when: 'CONFIG_HAX', if_false: files('hax-stub.c'))
++specific_ss.add(when: 'CONFIG_XEN', if_false: files('xen-stub.c'))
++specific_ss.add(when: 'CONFIG_HVF', if_false: files('hvf-stub.c'))
++specific_ss.add(when: 'CONFIG_KVM', if_false: files('kvm-stub.c'))
++specific_ss.add(when: 'CONFIG_TCG', if_false: files('tcg-stub.c'))
++specific_ss.add(when: 'CONFIG_WHPX', if_false: files('whpx-stub.c'))
+diff --git a/accel/tcg/Makefile.objs b/accel/tcg/Makefile.objs
+deleted file mode 100644
+index a92f2c454b..0000000000
+--- a/accel/tcg/Makefile.objs
++++ /dev/null
+@@ -1,9 +0,0 @@
+-obj-$(CONFIG_SOFTMMU) += tcg-all.o
+-obj-$(CONFIG_SOFTMMU) += cputlb.o
+-obj-y += tcg-runtime.o tcg-runtime-gvec.o
+-obj-y += cpu-exec.o cpu-exec-common.o translate-all.o
+-obj-y += translator.o
 -
--BUILD_DIR?=$(CURDIR)/..
--
--include ../config-host.mak
--include config-target.mak
--include $(SRC_PATH)/rules.mak
--
--all:
--install: all
--	
--.PHONY: all clean install
-diff --git a/configure b/configure
-index 94e458f4be..840a90d987 100755
---- a/configure
-+++ b/configure
-@@ -316,7 +316,6 @@ audio_drv_list=""
- block_drv_rw_whitelist=""
- block_drv_ro_whitelist=""
- host_cc="cc"
--libs_softmmu=""
- libs_tools=""
- audio_win_int=""
- libs_qga=""
-@@ -864,7 +863,6 @@ Darwin)
-   audio_drv_list="coreaudio try-sdl"
-   audio_possible_drivers="coreaudio sdl"
-   QEMU_LDFLAGS="-framework CoreFoundation -framework IOKit $QEMU_LDFLAGS"
--  libs_softmmu="-F/System/Library/Frameworks -framework Cocoa -framework IOKit $libs_softmmu"
-   # Disable attempts to use ObjectiveC features in os/object.h since they
-   # won't work when we're compiling with gcc as a C compiler.
-   QEMU_CFLAGS="-DOS_OBJECT_USE_OBJC=0 $QEMU_CFLAGS"
-@@ -2555,7 +2553,6 @@ if test "$lzo" != "no" ; then
- int main(void) { lzo_version(); return 0; }
- EOF
-     if compile_prog "" "-llzo2" ; then
--        libs_softmmu="$libs_softmmu -llzo2"
-         lzo_libs="-llzo2"
-         lzo="yes"
-     else
-@@ -2575,7 +2572,6 @@ if test "$snappy" != "no" ; then
- int main(void) { snappy_max_compressed_length(4096); return 0; }
- EOF
-     if compile_prog "" "-lsnappy" ; then
--        libs_softmmu="$libs_softmmu -lsnappy"
-         snappy_libs='-lsnappy'
-         snappy="yes"
-     else
-@@ -2675,7 +2671,6 @@ if test "$xen" != "no" ; then
-       xen_pc="$xen_pc xentoolcore"
-     fi
-     QEMU_CFLAGS="$QEMU_CFLAGS $($pkg_config --cflags $xen_pc)"
--    libs_softmmu="$($pkg_config --libs $xen_pc) $libs_softmmu"
-     xen_cflags="$($pkg_config --cflags $xen_pc)"
-     xen_libs="$($pkg_config --libs $xen_pc)"
-   else
-@@ -3420,7 +3415,6 @@ EOF
-   rdma_libs="-lrdmacm -libverbs -libumad"
-   if compile_prog "" "$rdma_libs" ; then
-     rdma="yes"
--    libs_softmmu="$libs_softmmu $rdma_libs"
-   else
-     if test "$rdma" = "yes" ; then
-         error_exit \
-@@ -4451,8 +4445,6 @@ EOF
-   fi
- fi
+-obj-$(CONFIG_USER_ONLY) += user-exec.o
+-obj-$(call lnot,$(CONFIG_SOFTMMU)) += user-exec-stub.o
+-obj-$(CONFIG_PLUGIN) += plugin-gen.o
+diff --git a/accel/tcg/meson.build b/accel/tcg/meson.build
+new file mode 100644
+index 0000000000..2a335b50f2
+--- /dev/null
++++ b/accel/tcg/meson.build
+@@ -0,0 +1,15 @@
++tcg_ss = ss.source_set()
++tcg_ss.add(files(
++  'cpu-exec-common.c',
++  'cpu-exec.c',
++  'tcg-runtime-gvec.c',
++  'tcg-runtime.c',
++  'translate-all.c',
++  'translator.c',
++))
++tcg_ss.add(when: 'CONFIG_USER_ONLY', if_true: files('user-exec.c'))
++tcg_ss.add(when: 'CONFIG_SOFTMMU', if_false: files('user-exec-stub.c'))
++tcg_ss.add(when: 'CONFIG_PLUGIN', if_true: files('plugin-gen.c'))
++specific_ss.add_all(when: 'CONFIG_TCG', if_true: tcg_ss)
++
++specific_ss.add(when: ['CONFIG_SOFTMMU', 'CONFIG_TCG'], if_true: files('tcg-all.c', 'cputlb.c'))
+diff --git a/accel/xen/Makefile.objs b/accel/xen/Makefile.objs
+deleted file mode 100644
+index 7482cfb436..0000000000
+--- a/accel/xen/Makefile.objs
++++ /dev/null
+@@ -1 +0,0 @@
+-obj-y += xen-all.o
+diff --git a/accel/xen/meson.build b/accel/xen/meson.build
+new file mode 100644
+index 0000000000..002bdb03c6
+--- /dev/null
++++ b/accel/xen/meson.build
+@@ -0,0 +1 @@
++specific_ss.add(when: 'CONFIG_XEN', if_true: files('xen-all.c'))
+diff --git a/meson.build b/meson.build
+index b14b1c9efb..6bb9841c54 100644
+--- a/meson.build
++++ b/meson.build
+@@ -700,6 +700,7 @@ subdir('monitor')
+ subdir('net')
+ subdir('replay')
+ subdir('hw')
++subdir('accel')
  
--libs_softmmu="$libs_softmmu $fdt_libs"
--
- ##########################################
- # opengl probe (for sdl2, gtk, milkymist-tmu2)
- 
-@@ -4676,7 +4668,6 @@ EOF
- 
-   if compile_prog "" "-lnuma" ; then
-     numa=yes
--    libs_softmmu="-lnuma $libs_softmmu"
-     numa_libs="-lnuma"
-   else
-     if test "$numa" = "yes" ; then
-@@ -5218,7 +5209,6 @@ if compile_prog "" "" ; then
-   have_openpty="yes"
- else
-   if compile_prog "" "-lutil" ; then
--    libs_softmmu="-lutil $libs_softmmu"
-     libs_tools="-lutil $libs_tools"
-     have_openpty="yes"
-   fi
-@@ -5237,7 +5227,6 @@ EOF
-      $pkg_config --atleast-version=0.12.3 spice-protocol && \
-      compile_prog "$spice_cflags" "$spice_libs" ; then
-     spice="yes"
--    libs_softmmu="$libs_softmmu $spice_libs"
-     QEMU_CFLAGS="$QEMU_CFLAGS $spice_cflags"
-   else
-     if test "$spice" = "yes" ; then
-@@ -6390,7 +6379,6 @@ if test "$libpmem" != "no"; then
- 		libpmem="yes"
- 		libpmem_libs=$($pkg_config --libs libpmem)
- 		libpmem_cflags=$($pkg_config --cflags libpmem)
--		libs_softmmu="$libs_softmmu $libpmem_libs"
- 		QEMU_CFLAGS="$QEMU_CFLAGS $libpmem_cflags"
- 	else
- 		if test "$libpmem" = "yes" ; then
-@@ -6408,7 +6396,6 @@ if test "$libdaxctl" != "no"; then
- 		libdaxctl="yes"
- 		libdaxctl_libs=$($pkg_config --libs libdaxctl)
- 		libdaxctl_cflags=$($pkg_config --cflags libdaxctl)
--		libs_softmmu="$libs_softmmu $libdaxctl_libs"
- 		QEMU_CFLAGS="$QEMU_CFLAGS $libdaxctl_cflags"
- 	else
- 		if test "$libdaxctl" = "yes" ; then
-@@ -6837,7 +6824,6 @@ echo_version() {
- # prepend pixman and ftd flags after all config tests are done
- QEMU_CFLAGS="$pixman_cflags $fdt_cflags $QEMU_CFLAGS"
- QEMU_LDFLAGS="$fdt_ldflags $QEMU_LDFLAGS"
--libs_softmmu="$pixman_libs $libs_softmmu"
- 
- config_host_mak="config-host.mak"
- 
-@@ -6866,7 +6852,6 @@ echo "qemu_helperdir=$libexecdir" >> $config_host_mak
- echo "qemu_localedir=$qemu_localedir" >> $config_host_mak
- echo "qemu_icondir=$qemu_icondir" >> $config_host_mak
- echo "qemu_desktopdir=$qemu_desktopdir" >> $config_host_mak
--echo "libs_softmmu=$libs_softmmu" >> $config_host_mak
- echo "GIT=$git" >> $config_host_mak
- echo "GIT_SUBMODULES=$git_submodules" >> $config_host_mak
- echo "GIT_UPDATE=$git_update" >> $config_host_mak
-@@ -8117,8 +8102,6 @@ if [ "$TARGET_SYSTBL_ABI" != "" ] && [ "$TARGET_SYSTBL" = "" ]; then
-   TARGET_SYSTBL=syscall.tbl
- fi
- 
--symlink "$source_path/Makefile.target" "$target_dir/Makefile"
--
- upper() {
-     echo "$@"| LC_ALL=C tr '[a-z]' '[A-Z]'
- }
+ # needed for fuzzing binaries
+ subdir('tests/qtest/libqos')
 -- 
 2.26.2
 
