@@ -2,102 +2,113 @@ Return-Path: <SRS0=yhYb=B3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11867C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 08:05:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95DD1C433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 08:15:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D9BFF207DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 08:05:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9BFF207DF
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=netbsd.org
+	by mail.kernel.org (Postfix) with ESMTPS id 5B36A207DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 08:15:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fqJTP+Vz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B36A207DF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44708 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48364 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7a9E-0001um-Oa
-	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 04:05:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33982)
+	id 1k7aIl-0004GQ-Ew
+	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 04:15:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36668)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kamil@netbsd.org>) id 1k7a6B-0001Np-7h
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 04:02:31 -0400
-Received: from mail.netbsd.org ([2001:470:a085:999::25]:57390)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kamil@netbsd.org>) id 1k7a67-0007jH-Q1
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 04:02:30 -0400
-Received: from [IPv6:::1] (localhost [127.0.0.1])
- by mail.netbsd.org (Postfix) with ESMTP id D63FB84CDF;
- Mon, 17 Aug 2020 08:02:21 +0000 (UTC)
-Subject: Re: [PATCH v5 1/4] Add the NVMM vcpu API
-To: rth@twiddle.net, ehabkost@redhat.com, slp@redhat.com,
- pbonzini@redhat.com, peter.maydell@linaro.org, philmd@redhat.com,
- max@m00nbsd.net, jmcneill@invisible.ca
-References: <20200811141049.15824-1-n54@gmx.com>
-From: Kamil Rytarowski <kamil@netbsd.org>
-Autocrypt: addr=kamil@netbsd.org; keydata=
- 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
-Message-ID: <215c2dff-56dc-0e2c-6648-6055b7ab2146@netbsd.org>
-Date: Mon, 17 Aug 2020 09:59:49 +0200
-User-Agent: Mozilla/5.0 (X11; NetBSD amd64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1k7aIA-0003hK-A0
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 04:14:54 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:59336
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1k7aI7-0000eq-SI
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 04:14:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1597652090;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=P2m45etb+tSDrkQuj2V6HfLZ34MsUl3BtBPPfzRP07M=;
+ b=fqJTP+Vzax4s6B9CIEUzpFiTE5FH6aSsDU2CRnE+rPdSIg5DLIADjbJdPLW0iQihJhdMA+
+ NseS2tqTKfYYqCpfSn0UMsfhRF3UIyS5GMDeKVWJCAaQKVy8fyMtdXT2w5gZV0FgoTWZ8a
+ Py3dM9ed34y6wkEG+oTD3wwo4hDh+Ew=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-243-mlk0JkKtM06tQ5JKZAaEeA-1; Mon, 17 Aug 2020 04:14:47 -0400
+X-MC-Unique: mlk0JkKtM06tQ5JKZAaEeA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DD59B100CF64;
+ Mon, 17 Aug 2020 08:14:46 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-113-146.ams2.redhat.com
+ [10.36.113.146])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id CD6B95C221;
+ Mon, 17 Aug 2020 08:14:45 +0000 (UTC)
+Subject: Re: [RFC PATCH 01/22] nbd: Remove unused nbd_export_get_blockdev()
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+References: <20200813162935.210070-1-kwolf@redhat.com>
+ <20200813162935.210070-2-kwolf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <59bd4644-baab-4662-2ab8-6194b5419ada@redhat.com>
+Date: Mon, 17 Aug 2020 10:14:43 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200811141049.15824-1-n54@gmx.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2001:470:a085:999::25;
- envelope-from=kamil@netbsd.org; helo=mail.netbsd.org
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+In-Reply-To: <20200813162935.210070-2-kwolf@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="g2OLwVLxmj4NBpu3BWu4DhShSijLs6w3S"
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/17 00:24:04
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -116,132 +127,44 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Ping?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--g2OLwVLxmj4NBpu3BWu4DhShSijLs6w3S
+Content-Type: multipart/mixed; boundary="GC0B7RbESIHwkC94pg7QxK4JYrbWJ4ANt"
 
-On 11.08.2020 16:10, Kamil Rytarowski wrote:
-> From: Maxime Villard <max@m00nbsd.net>
-> 
-> Adds support for the NetBSD Virtual Machine Monitor (NVMM) stubs and
-> introduces the nvmm.h sysemu API for managing the vcpu scheduling and
-> management.
-> 
-> Signed-off-by: Maxime Villard <max@m00nbsd.net>
-> Signed-off-by: Kamil Rytarowski <n54@gmx.com>
-> Reviewed-by: Sergio Lopez <slp@redhat.com>
-> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> Tested-by: Jared McNeill <jmcneill@invisible.ca>
+--GC0B7RbESIHwkC94pg7QxK4JYrbWJ4ANt
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 13.08.20 18:29, Kevin Wolf wrote:
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
->  accel/stubs/Makefile.objs |  1 +
->  accel/stubs/nvmm-stub.c   | 43 +++++++++++++++++++++++++++++++++++++++
->  include/sysemu/nvmm.h     | 35 +++++++++++++++++++++++++++++++
->  3 files changed, 79 insertions(+)
->  create mode 100644 accel/stubs/nvmm-stub.c
->  create mode 100644 include/sysemu/nvmm.h
-> 
-> diff --git a/accel/stubs/Makefile.objs b/accel/stubs/Makefile.objs
-> index bbd14e71fb..38660a0b9b 100644
-> --- a/accel/stubs/Makefile.objs
-> +++ b/accel/stubs/Makefile.objs
-> @@ -1,6 +1,7 @@
->  obj-$(call lnot,$(CONFIG_HAX))  += hax-stub.o
->  obj-$(call lnot,$(CONFIG_HVF))  += hvf-stub.o
->  obj-$(call lnot,$(CONFIG_WHPX)) += whpx-stub.o
-> +obj-$(call lnot,$(CONFIG_NVMM)) += nvmm-stub.o
->  obj-$(call lnot,$(CONFIG_KVM))  += kvm-stub.o
->  obj-$(call lnot,$(CONFIG_TCG))  += tcg-stub.o
->  obj-$(call lnot,$(CONFIG_XEN))  += xen-stub.o
-> diff --git a/accel/stubs/nvmm-stub.c b/accel/stubs/nvmm-stub.c
-> new file mode 100644
-> index 0000000000..c2208b84a3
-> --- /dev/null
-> +++ b/accel/stubs/nvmm-stub.c
-> @@ -0,0 +1,43 @@
-> +/*
-> + * Copyright (c) 2018-2019 Maxime Villard, All rights reserved.
-> + *
-> + * NetBSD Virtual Machine Monitor (NVMM) accelerator stub.
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
-> + * See the COPYING file in the top-level directory.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "qemu-common.h"
-> +#include "cpu.h"
-> +#include "sysemu/nvmm.h"
-> +
-> +int nvmm_init_vcpu(CPUState *cpu)
-> +{
-> +    return -1;
-> +}
-> +
-> +int nvmm_vcpu_exec(CPUState *cpu)
-> +{
-> +    return -1;
-> +}
-> +
-> +void nvmm_destroy_vcpu(CPUState *cpu)
-> +{
-> +}
-> +
-> +void nvmm_cpu_synchronize_state(CPUState *cpu)
-> +{
-> +}
-> +
-> +void nvmm_cpu_synchronize_post_reset(CPUState *cpu)
-> +{
-> +}
-> +
-> +void nvmm_cpu_synchronize_post_init(CPUState *cpu)
-> +{
-> +}
-> +
-> +void nvmm_cpu_synchronize_pre_loadvm(CPUState *cpu)
-> +{
-> +}
-> diff --git a/include/sysemu/nvmm.h b/include/sysemu/nvmm.h
-> new file mode 100644
-> index 0000000000..10496f3980
-> --- /dev/null
-> +++ b/include/sysemu/nvmm.h
-> @@ -0,0 +1,35 @@
-> +/*
-> + * Copyright (c) 2018-2019 Maxime Villard, All rights reserved.
-> + *
-> + * NetBSD Virtual Machine Monitor (NVMM) accelerator support.
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
-> + * See the COPYING file in the top-level directory.
-> + */
-> +
-> +#ifndef QEMU_NVMM_H
-> +#define QEMU_NVMM_H
-> +
-> +#include "config-host.h"
-> +#include "qemu-common.h"
-> +
-> +int nvmm_init_vcpu(CPUState *);
-> +int nvmm_vcpu_exec(CPUState *);
-> +void nvmm_destroy_vcpu(CPUState *);
-> +
-> +void nvmm_cpu_synchronize_state(CPUState *);
-> +void nvmm_cpu_synchronize_post_reset(CPUState *);
-> +void nvmm_cpu_synchronize_post_init(CPUState *);
-> +void nvmm_cpu_synchronize_pre_loadvm(CPUState *);
-> +
-> +#ifdef CONFIG_NVMM
-> +
-> +int nvmm_enabled(void);
-> +
-> +#else /* CONFIG_NVMM */
-> +
-> +#define nvmm_enabled() (0)
-> +
-> +#endif /* CONFIG_NVMM */
-> +
-> +#endif /* CONFIG_NVMM */
-> --
-> 2.28.0
-> 
+>  include/block/nbd.h | 2 --
+>  nbd/server.c        | 5 -----
+>  2 files changed, 7 deletions(-)
+
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+
+--GC0B7RbESIHwkC94pg7QxK4JYrbWJ4ANt--
+
+--g2OLwVLxmj4NBpu3BWu4DhShSijLs6w3S
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl86PHMACgkQ9AfbAGHV
+z0DSogf/d/wPxZ/H+cZwRxK604jQrENE2OIpPrbuekegR/wKv3yTP5JJvxB9o6b9
+O4K4kpIxyrLn4U1ubZ6lqPCnmqbCterig2poR8nGpLCR/I71X2PsUd10TjK0cYex
+3KqGMUVXzcWkyDjNTatU0IgR9NKTJsh4hwA/M5QC8cOBi+y93f7LvFoxu9E1TX71
+6n98A2/qR3G18a8/F264wPyuI/VABDJOD8oL1mVgCLysb0CC5qpJQetAsAagqUy3
+O+dVOBLbSbzRMJ/DyVXZ25ucGQv6AOAyDTGvCvsW8bzYEee9DLeDxmo4LxG4sBay
+bbjPaKk26JU5nzVMdS8XrjtUJTni9g==
+=S1hj
+-----END PGP SIGNATURE-----
+
+--g2OLwVLxmj4NBpu3BWu4DhShSijLs6w3S--
 
 
