@@ -2,76 +2,80 @@ Return-Path: <SRS0=yhYb=B3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CE00C433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 12:02:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1236FC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 12:02:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CB2502067C
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 12:02:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D57792067C
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 12:02:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jGKIIMLv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB2502067C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Txt5NJVc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D57792067C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33016 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33214 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7dq9-0006O3-2A
-	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 08:02:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60642)
+	id 1k7dqG-0006Sr-3H
+	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 08:02:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60666)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <marcandre.lureau@redhat.com>)
- id 1k7dpF-00059U-Rv
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 08:01:17 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:23497)
+ id 1k7dpH-0005C2-LN
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 08:01:19 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:54165)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <marcandre.lureau@redhat.com>)
- id 1k7dpE-0003fY-0J
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 08:01:17 -0400
+ id 1k7dpF-0003fg-RK
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 08:01:19 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597665675;
+ s=mimecast20190719; t=1597665677;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=pnJdpW+Vz+R/b7LxH4DU9OkPy3KD/Xqc3C7CNMbuDMY=;
- b=jGKIIMLvSPRYVtFxey0kRdSscmZzjYBAU0t8sbIZG/ppEUrS8UR+2tFxXca/Oln+ziw8T4
- Ql3cWpOBvjaX66D1Apx4t7kAVRH/ajRHAYHtlNpXkEhcX4gj/DIsvDesGWXxdU6WYbjkTI
- YMGVoVEky3uUQoVPwmh+qFHHj7jDDXI=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=TSC2eOKE0NQbqwjE3v+4TyCChUK9VcdeLXUZxTLG/Js=;
+ b=Txt5NJVcHoSc+RXN6JUrEEXkwWIWcluUdD4rP6DUc0EcNwlD77hr97Iz6jKty1EQ4rTxB9
+ dTRGaFTW+kQ+ldb3cQ2MmUjpsB5tDM4b0Ot9s8OOL7C+8NZZQSP3oHd1KU53Lbu2jX1qKO
+ SaQYRelxpiK216yegVpKSjPm33Um3oQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-96-AON5aFx4OROH_cxq9rWqzg-1; Mon, 17 Aug 2020 08:01:03 -0400
-X-MC-Unique: AON5aFx4OROH_cxq9rWqzg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-263-z-S0Ko5GNMiKc5SfnJScbA-1; Mon, 17 Aug 2020 08:01:13 -0400
+X-MC-Unique: z-S0Ko5GNMiKc5SfnJScbA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9B36581F012
- for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 12:01:00 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 94D0051AF
+ for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 12:01:12 +0000 (UTC)
 Received: from localhost (unknown [10.36.110.38])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 41E32BABA;
- Mon, 17 Aug 2020 12:00:58 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 580A35D9D2;
+ Mon, 17 Aug 2020 12:01:10 +0000 (UTC)
 From: marcandre.lureau@redhat.com
 To: qemu-devel@nongnu.org
-Subject: [PATCH 0/4] WIP: add physical display dimensions to spice/virtio-gpu
-Date: Mon, 17 Aug 2020 16:00:52 +0400
-Message-Id: <20200817120056.56751-1-marcandre.lureau@redhat.com>
+Subject: [PATCH 2/4] ui: add getter for UIInfo
+Date: Mon, 17 Aug 2020 16:00:54 +0400
+Message-Id: <20200817120056.56751-3-marcandre.lureau@redhat.com>
+In-Reply-To: <20200817120056.56751-1-marcandre.lureau@redhat.com>
+References: <20200817120056.56751-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=marcandre.lureau@redhat.com
 X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=63.128.21.124;
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=216.205.24.124;
  envelope-from=marcandre.lureau@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/17 01:24:49
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/17 02:47:08
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -98,37 +102,49 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>=0D
+From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
-Hi,=0D
-=0D
-In order to improve support for HiDPI, I proposed some new Spice messages t=
-o=0D
-inform the guest of the display physical dimensions.=0D
-=0D
-See spice-protocol proposal and related server & spice-gtk changes:=0D
-https://gitlab.freedesktop.org/spice/spice-protocol/-/merge_requests/24=0D
-https://gitlab.freedesktop.org/spice/spice/-/merge_requests/139=0D
-https://gitlab.freedesktop.org/spice/spice-gtk/-/merge_requests/64=0D
-=0D
-Marc-Andr=C3=A9 Lureau (4):=0D
-  edid: use physical dimensions if available=0D
-  ui: add getter for UIInfo=0D
-  spice: get monitors physical dimension=0D
-  virtio-gpu: set physical dimensions for EDID=0D
-=0D
- hw/display/edid-generate.c     | 21 ++++++++-----=0D
- hw/display/virtio-gpu-base.c   |  2 ++=0D
- hw/display/virtio-gpu.c        |  2 ++=0D
- include/hw/display/edid.h      |  2 ++=0D
- include/hw/virtio/virtio-gpu.h |  1 +=0D
- include/ui/console.h           |  4 +++=0D
- ui/console.c                   |  7 +++++=0D
- ui/spice-display.c             | 54 +++++++++++++++++++++++++++++++++-=0D
- 8 files changed, 84 insertions(+), 9 deletions(-)=0D
-=0D
---=20=0D
-2.26.2=0D
-=0D
+The following patch is going to introduce extra fields / details to
+UIInfo. Add a getter and keep the current values, instead of memset(0)
+
+Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+---
+ ui/console.c       | 7 +++++++
+ ui/spice-display.c | 2 +-
+ 2 files changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/ui/console.c b/ui/console.c
+index 0579be792f..2a0d191d4e 100644
+--- a/ui/console.c
++++ b/ui/console.c
+@@ -1513,6 +1513,13 @@ bool dpy_ui_info_supported(QemuConsole *con)
+     return con->hw_ops->ui_info != NULL;
+ }
+ 
++const QemuUIInfo *dpy_get_ui_info(const QemuConsole *con)
++{
++    assert(con != NULL);
++
++    return &con->ui_info;
++}
++
+ int dpy_set_ui_info(QemuConsole *con, QemuUIInfo *info)
+ {
+     assert(con != NULL);
+diff --git a/ui/spice-display.c b/ui/spice-display.c
+index 19632fdf6c..625d9232b9 100644
+--- a/ui/spice-display.c
++++ b/ui/spice-display.c
+@@ -672,7 +672,7 @@ static int interface_client_monitors_config(QXLInstance *sin,
+         return 1;
+     }
+ 
+-    memset(&info, 0, sizeof(info));
++    info = *dpy_get_ui_info(ssd->dcl.con);
+ 
+     if (mc->num_of_monitors == 1) {
+         /*
+-- 
+2.26.2
 
 
