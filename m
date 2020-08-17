@@ -2,76 +2,86 @@ Return-Path: <SRS0=yhYb=B3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4E45C433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 11:02:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6ED2FC433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 11:03:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9B08D20885
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 11:02:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B08D20885
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=winhong.com
+	by mail.kernel.org (Postfix) with ESMTPS id 38E582067C
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 11:03:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=yadro.com header.i=@yadro.com header.b="bWtMFX29"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38E582067C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yadro.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48676 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51302 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7cud-0003Os-UA
-	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 07:02:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46724)
+	id 1k7cvh-0004TU-GC
+	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 07:03:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47080)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <yili@winhong.com>)
- id 1k7ctp-0002qi-IG; Mon, 17 Aug 2020 07:01:57 -0400
-Received: from regular1.263xmail.com ([211.150.70.200]:37122)
+ (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
+ id 1k7cus-0003mD-3w
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 07:03:02 -0400
+Received: from mta-02.yadro.com ([89.207.88.252]:37656 helo=mta-01.yadro.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <yili@winhong.com>)
- id 1k7ctj-0004Sc-2w; Mon, 17 Aug 2020 07:01:56 -0400
-Received: from localhost (unknown [192.168.167.69])
- by regular1.263xmail.com (Postfix) with ESMTP id CCFFD1193;
- Mon, 17 Aug 2020 19:01:37 +0800 (CST)
-X-MAIL-GRAY: 0
-X-MAIL-DELIVERY: 1
-X-ADDR-CHECKED4: 1
-X-ANTISPAM-LEVEL: 2
-X-SKE-CHECKED: 1
-X-ABS-CHECKED: 1
-Received: from localhost.localdomain (unknown [14.18.236.70])
- by smtp.263.net (postfix) whith ESMTP id
- P32155T139859895248640S1597662090441127_; 
- Mon, 17 Aug 2020 19:01:36 +0800 (CST)
-X-IP-DOMAINF: 1
-X-UNIQUE-TAG: <65a94dbb6bc6e37e6e31b68c4b36d351>
-X-RL-SENDER: yili@winhong.com
-X-SENDER: yili@winhong.com
-X-LOGIN-NAME: yili@winhong.com
-X-FST-TO: qemu-block@nongnu.org
-X-SENDER-IP: 14.18.236.70
-X-ATTACHMENT-NUM: 0
-X-DNS-TYPE: 0
-X-System-Flag: 0
-From: Yi Li <yili@winhong.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH] qemu-img: Explicit number replaced by a constant
-Date: Mon, 17 Aug 2020 19:01:13 +0800
-Message-Id: <20200817110113.1552683-1-yili@winhong.com>
-X-Mailer: git-send-email 2.25.3
+ (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
+ id 1k7cuq-0004ab-8o
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 07:03:01 -0400
+Received: from localhost (unknown [127.0.0.1])
+ by mta-01.yadro.com (Postfix) with ESMTP id B9BB9527DC;
+ Mon, 17 Aug 2020 11:02:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=yadro.com; h=
+ in-reply-to:content-disposition:content-type:content-type
+ :mime-version:references:message-id:subject:subject:from:from
+ :date:date:received:received:received; s=mta-01; t=1597662175;
+ x=1599476576; bh=9GhqVW//jqLHrzdpYtyxfxgY17FkckeNtzu7iJ8DaiU=; b=
+ bWtMFX29CLIwAAD50LUdWIn8XhqiaHWHmgsxy0Vh9jh0jigBgQ50zJ75Ro5qkIpT
+ yjCnkGcLTFcIiOD7aNAzw9ut0sKVP1rERvYiSeD6uhyGSO4DzkisRTavldhqbtcF
+ V7CGBrjjMvH9eVT2tkqHcW5iNPQsPCAfTuUYusz+vtI=
+X-Virus-Scanned: amavisd-new at yadro.com
+Received: from mta-01.yadro.com ([127.0.0.1])
+ by localhost (mta-01.yadro.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id RfPeG6Xt2eZY; Mon, 17 Aug 2020 14:02:55 +0300 (MSK)
+Received: from T-EXCH-02.corp.yadro.com (t-exch-02.corp.yadro.com
+ [172.17.10.102])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mta-01.yadro.com (Postfix) with ESMTPS id 35AD1527D2;
+ Mon, 17 Aug 2020 14:02:54 +0300 (MSK)
+Received: from localhost (172.17.204.212) by T-EXCH-02.corp.yadro.com
+ (172.17.10.102) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P384) id 15.1.669.32; Mon, 17
+ Aug 2020 14:02:54 +0300
+Date: Mon, 17 Aug 2020 14:02:54 +0300
+From: Roman Bolshakov <r.bolshakov@yadro.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v2 000/150] Meson integration for 5.2
+Message-ID: <20200817110254.GA98227@SPB-NB-133.local>
+References: <20200814091326.16173-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=211.150.70.200; envelope-from=yili@winhong.com;
- helo=regular1.263xmail.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/17 07:01:39
-X-ACL-Warn: Detected OS   = ???
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20200814091326.16173-1-pbonzini@redhat.com>
+X-Originating-IP: [172.17.204.212]
+X-ClientProxiedBy: T-EXCH-01.corp.yadro.com (172.17.10.101) To
+ T-EXCH-02.corp.yadro.com (172.17.10.102)
+Received-SPF: pass client-ip=89.207.88.252; envelope-from=r.bolshakov@yadro.com;
+ helo=mta-01.yadro.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/17 07:02:56
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -84,58 +94,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, yilikernel@gmail.com, qemu-devel@nongnu.org,
- yili@winhong.com, mreitz@redhat.com
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Yi Li <yili@winhong.com>
----
- qemu-img.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+On Fri, Aug 14, 2020 at 05:10:56AM -0400, Paolo Bonzini wrote:
+> News since v1:
+> * automatically generate dependencies for sphinx manuals [Peter]
+> * fixes for ARM KVM build [Peter]
+> * work around old libiscsi in vhost-user-scsi.c [Peter]
+> * hack to support default c:/Program Files/QEMU prefix on mingw cross compilation [Peter]
+> * added --enable-gettext/--disable-gettext [Peter]
+> * test for setuptools presence [Peter]
+> * fixes for Darwin [Peter, Roman]
+> * do not invoke system Meson through Python, always use embedded Meson with --python [Roman]
+> * improvements and fixes to clean and distclean targets [Stefano]
+> * avoid (incorrect?) ubsan failure from CONFIG_BDRV_*_WHITELIST [Alexander]
+> * move --s390-pgste to Meson, removed QEMU_CFLAGS/QEMU_LDFLAGS for config-target.mak
+> * remove some dead configure assignments
+> * update build system docs on how to add configure options, convert to rST
+> * moved installation of edk2 blobs and descriptors to Meson
+> * build and install elf2dmp on Windows too
+> * included headers renamed to .c.inc instead of .inc
+> 
+> Available from https://gitlab.com/bonzini/qemu branch meson-poc-next.
+> 
+> Paolo
+> 
 
-diff --git a/qemu-img.c b/qemu-img.c
-index 5308773811..a0fbc2757c 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -1181,7 +1181,7 @@ static int64_t find_nonzero(const uint8_t *buf, int64_t n)
- }
- 
- /*
-- * Returns true iff the first sector pointed to by 'buf' contains at least
-+ * Returns true if the first sector pointed to by 'buf' contains at least
-  * a non-NUL byte.
-  *
-  * 'pnum' is set to the number of sectors (including and immediately following
-@@ -1200,10 +1200,10 @@ static int is_allocated_sectors(const uint8_t *buf, int n, int *pnum,
-         *pnum = 0;
-         return 0;
-     }
--    is_zero = buffer_is_zero(buf, 512);
-+    is_zero = buffer_is_zero(buf, BDRV_SECTOR_SIZE);
-     for(i = 1; i < n; i++) {
--        buf += 512;
--        if (is_zero != buffer_is_zero(buf, 512)) {
-+        buf += BDRV_SECTOR_SIZE;
-+        if (is_zero != buffer_is_zero(buf, BDRV_SECTOR_SIZE)) {
-             break;
-         }
-     }
-@@ -2489,8 +2489,8 @@ static int img_convert(int argc, char **argv)
-             }
-         }
- 
--        qemu_opt_set_number(opts, BLOCK_OPT_SIZE, s.total_sectors * 512,
--                            &error_abort);
-+        qemu_opt_set_number(opts, BLOCK_OPT_SIZE,
-+                            s.total_sectors * BDRV_SECTOR_SIZE, &error_abort);
-         ret = add_old_style_options(out_fmt, opts, out_baseimg, NULL);
-         if (ret < 0) {
-             goto out;
--- 
-2.25.3
+Hi Paolo,
 
+for macOS/darwin,
 
+Tested-by: Roman Bolshakov <r.bolshakov@yadro.com>
 
+On the next step, it might be good to drop configure in favor of meson
+configuration, so configure, build and test commands would be similar to
+libvirt:
+
+meson build
+ninja -C build
+meson test -C build
+
+Thanks,
+Roman
 
