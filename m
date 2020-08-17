@@ -2,88 +2,89 @@ Return-Path: <SRS0=yhYb=B3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+X-Spam-Status: No, score=-0.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F4FFC433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 10:28:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A65CC433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 10:30:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3E22D20738
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 10:28:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 66DEC206FA
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 10:30:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dhsaLhpm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E22D20738
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X77MsG92"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 66DEC206FA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53306 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55486 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7cNh-0008QH-Gy
-	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 06:28:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39050)
+	id 1k7cPk-000125-LH
+	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 06:30:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39398)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1k7cN1-0007yF-EG
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 06:28:03 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:22959)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1k7cMy-0000AF-Jq
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 06:28:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597660078;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=5t4AMbi3BwtliqZ1VzYEVSDte52IZZWnAjRAQoK0j1g=;
- b=dhsaLhpmVIjo8MZWmB4J2HjjbP8WxxDfnoYdERsDDOcKcmzBWDYdbGCkQ1Z8Hs6GA11Nq4
- HnWAUZtaojteqw+m7YcOa1lZmlIOwusG2vXIkfsOfPHKUl/l3j0s1GTdd0D3W73K2TN6vA
- MJi+siFZjtHUkT54Von0U9EOPouAL2A=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-558-shrARw0MObajYwjTRrt5eA-1; Mon, 17 Aug 2020 06:27:57 -0400
-X-MC-Unique: shrARw0MObajYwjTRrt5eA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 456C0807338;
- Mon, 17 Aug 2020 10:27:56 +0000 (UTC)
-Received: from gondolin (ovpn-112-230.ams2.redhat.com [10.36.112.230])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E630410027AB;
- Mon, 17 Aug 2020 10:27:48 +0000 (UTC)
-Date: Mon, 17 Aug 2020 12:27:46 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Subject: Re: virtio-vsock requires 'disable-legacy=on' in QEMU 5.1
-Message-ID: <20200817122746.0b786372.cohuck@redhat.com>
-In-Reply-To: <20200813120415.s5we6mihe6fywm4a@steredhat.lan>
-References: <CAGxU2F7pVNWtJG2BM2bk9qtJ_UHgDw4kjVqRmL-=yme7VX83Vg@mail.gmail.com>
- <20200813112820.62ffd63e.cohuck@redhat.com>
- <20200813102430.vjnc56anqjaxn4tw@steredhat.lan>
- <20200813123737.25ba11d2.cohuck@redhat.com>
- <20200813120415.s5we6mihe6fywm4a@steredhat.lan>
-Organization: Red Hat GmbH
+ (Exim 4.90_1) (envelope-from <ahmedkhaledkaraman@gmail.com>)
+ id 1k7cP3-0000Yz-RG
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 06:30:09 -0400
+Received: from mail-lj1-x22d.google.com ([2a00:1450:4864:20::22d]:41178)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <ahmedkhaledkaraman@gmail.com>)
+ id 1k7cP1-0000LI-T9
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 06:30:09 -0400
+Received: by mail-lj1-x22d.google.com with SMTP id f26so16855826ljc.8
+ for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 03:30:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:from:date:message-id:subject:to;
+ bh=bIWKDS93H3R/6z5/h/E/DNbwzUNbGNv/dIbC01dC6Qg=;
+ b=X77MsG92Vn1b1+J5ztk239lOicSQERYwj019cr2xa4OdpnaUyRM1q9WMXsCpsOA0mq
+ NKHLOdpOryEixmU1lp4qOCuKvEajw2SsuOcDg6zmvX4yTNElm0+v7FU6KDBzYVKDfG8d
+ l9BEfWpWYdNWhSjFv5eYjEMRl8pErvM6WxuQ9M/CMlwoHPGbG5KPn4vkmiHo48fM1DFM
+ IYyCAzinJz08O4ce2E2fp794B6YRSI5XOhHb7pRlz+RTfC/Q0U0Ro9bzvIF+YgLKZaLr
+ eGWbgp9hVvIPcpJsD8QECpYrSQAsvCLPcLWHhS09US/CLlzZ7A8rvo6MifXMiu5VToxt
+ no7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+ bh=bIWKDS93H3R/6z5/h/E/DNbwzUNbGNv/dIbC01dC6Qg=;
+ b=HNaoRumcXx1EZwIPlkY7fSqKYkOZaN1EX+IsLZBLYUODcX53mmbACKx5Zxd7K96fEz
+ JZt3Hm/k/zYuhI3/Uqi7zBb2tR/Qj9D078lxKKtekh0ATmbdqWgAuiaub4JdjqXZiCyk
+ BWIHnLNyQHSErn4yFqDLQbfcYzntI2+rszy4+pvVKvXRgx69EjA/vGTQwYpxAnQWDJSW
+ rdfNMcrkUyeAcFv2zGkbTHnKeFAwtppv2ylw7ytKzgNc02CHLAh3fCjw8HRH56bRgr18
+ RzJSoB7gptuDpwVViV3tPhYSTbvBCFRLb1eUr7ry/zyCd7vwVI41EOZEgTAmRnhMT7aN
+ Q5kQ==
+X-Gm-Message-State: AOAM532msGgW5+arB3M2tTC4sMXUK21qp2vvIqDD6yAH6OplhDW8xeji
+ RKjaPy4y8k1HXSD91CFUM/9y3x000CbysmNNzNhOMZl1
+X-Google-Smtp-Source: ABdhPJzQNtnRtYFUooHmcqwtgZntzQq0pDa5cEJDiALDZBmZ+55CiDVE+0IePBpcIGjTgD6Ud0Gg6+vB0t3yxxdXSJQ=
+X-Received: by 2002:a2e:908a:: with SMTP id l10mr6744918ljg.409.1597660204429; 
+ Mon, 17 Aug 2020 03:30:04 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=cohuck@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=cohuck@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/17 01:24:49
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+From: Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
+Date: Mon, 17 Aug 2020 12:30:00 +0200
+Message-ID: <CALTWKrV=oppHwqQaybT0uxhQhXGRn=RkfZGE+DyUAi5_w6ZRvw@mail.gmail.com>
+Subject: [REPORT] [GSoC - TCG Continuous Benchmarking] [#8] QEMU Nightly
+ Performance Tests
+To: QEMU Developers <qemu-devel@nongnu.org>, 
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, 
+ Eric Blake <eblake@redhat.com>,
+ =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>, 
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>, 
+ Richard Henderson <rth@twiddle.net>, luoyonggang@gmail.com,
+ John Snow <jsnow@redhat.com>
+Content-Type: multipart/alternative; boundary="000000000000f4f4bb05ad1040d5"
+Received-SPF: pass client-ip=2a00:1450:4864:20::22d;
+ envelope-from=ahmedkhaledkaraman@gmail.com; helo=mail-lj1-x22d.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -97,99 +98,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Halil Pasic <pasic@linux.ibm.com>, Qinghua Cheng <qcheng@redhat.com>,
- qemu devel list <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 13 Aug 2020 14:04:15 +0200
-Stefano Garzarella <sgarzare@redhat.com> wrote:
+--000000000000f4f4bb05ad1040d5
+Content-Type: text/plain; charset="UTF-8"
 
-> On Thu, Aug 13, 2020 at 12:37:37PM +0200, Cornelia Huck wrote:
-> > On Thu, 13 Aug 2020 12:24:30 +0200
-> > Stefano Garzarella <sgarzare@redhat.com> wrote:
-> >   
-> > > On Thu, Aug 13, 2020 at 11:28:20AM +0200, Cornelia Huck wrote:  
-> > > > We basically have three possible ways to deal with this:
-> > > > 
-> > > > - Force it to modern (i.e., what you have been doing; would need the
-> > > >   equivalent changes in ccw as well.)    
-> > > 
-> > > Oo, thanks for pointing out ccw!
-> > > I don't know ccw well, in this case should we set dev->max_rev to 1 or 2
-> > > to force to modern?  
-> > 
-> > No, ->max_rev is the wrong side of the limit :) You want  
-> 
-> Well :-) Thanks!
-> 
-> > 
-> >     ccw_dev->force_revision_1 = true;
-> > 
-> > in _instance_init() (see e.g. virtio-ccw-gpu.c).
-> >   
-> > >   
-> > > >   Pro: looks like the cleanest approach.
-> > > >   Con: not sure if we would need backwards compatibility support,
-> > > >   which looks hairy.    
-> > > 
-> > > Not sure too.  
-> > 
-> > Yes, I'm not sure at all how to handle user-specified values for
-> > legacy/modern.
+Hi everyone,
 
-Thinking a bit more about it, I'm not sure whether we even *can*
-provide backwards compatibility: we have different autoconfigurations
-for PCI based upon where it is plugged, and ccw does not have a way to
-turn legacy on/off, except from within the code.
+QEMU currently lacks a system for measuring the performance of targets
+automatically. The previous reports introduced different tools and
+methods for locating performance regressions, but all of them had to
+be manually executed by the user when needed.
 
-> >   
-> > >   
-> > > > - Add vsock to the list of devices with legacy support.
-> > > >   Pro: Existing setups continue to work.
-> > > >   Con: If vsock is really virtio-1-only, we still carry around
-> > > >   possibly broken legacy support.    
-> > > 
-> > > I'm not sure it is virtio-1-only, but virtio-vsock was introduced in
-> > > 2016, so I supposed it is modern-only.  
-> > 
-> > Yes, I would guess so as well.
-> >   
-> > > 
-> > > How can I verify that? Maybe forcing legacy mode and run some tests.  
-> > 
-> > Probably yes. The likeliest area with issues is probably endianness, so
-> > maybe with something big endian in the mix?
-> >   
-> 
-> Yeah, I'll try this setup!
-> 
-> > >   
-> > > > - Do nothing, have users force legacy off. Bad idea, as ccw has no way
-> > > >   to do that on the command line.
-> > > > 
-> > > > The first option is probably best.
+This report devises a new nightly tests system that runs automatically
+each night. After the execution is completed, it sends a report to the
+QEMU mailing list with the performance measurements of seventeen
+different QEMU targets, and how these measurements compare to
+previously obtained ones.
 
-The first option is now "force modern, but with no backwards
-compatibility", which is not that great; but "allow legacy, even though
-it should not exist" is not particularly appealing, either... what a
-mess :(
+Report link:
+https://ahmedkrmn.github.io/TCG-Continuous-Benchmarking/QEMU-Nightly-Performance-Tests/
 
-> > > >    
-> > > 
-> > > Yeah, I agree with you!  
-> > 
-> > Yes, it's really a pity we only noticed this after the release; this
-> > was supposed to stop new devices with legacy support creeping in, not
-> > to break existing command lines :(
-> >   
-> 
-> Yes, I forgot to test vsock stuff before the release :-(
-> Maybe we should add some tests...
+The system is now scheduled to execute daily, and starting from
+tonight, the results will be sent to the mailing list.
 
-Speaking of tests: do you have a quick way to test vhost-vsock at hand?
-Maybe I should add it to my manual repertoire...
+Previous reports:
+Report 1 - Measuring Basic Performance Metrics of QEMU:
+https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg06692.html
+Report 2 - Dissecting QEMU Into Three Main Parts:
+https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg09441.html
+Report 3 - QEMU 5.0 and 5.1-pre-soft-freeze Dissect Comparison:
+https://lists.gnu.org/archive/html/qemu-devel/2020-07/msg01978.html
+Report 4 - Listing QEMU Helpers and Function Callees:
+https://lists.gnu.org/archive/html/qemu-devel/2020-07/msg04227.html
+Report 5 - Finding Commits Affecting QEMU Performance:
+https://lists.gnu.org/archive/html/qemu-devel/2020-07/msg05769.html
+Report 6 - Performance Comparison of Two QEMU Builds:
+https://lists.gnu.org/archive/html/qemu-devel/2020-07/msg07389.html
+Report 7 - Measuring QEMU Emulation Efficiency:
+https://lists.gnu.org/archive/html/qemu-devel/2020-08/msg00098.html
 
+Best regards,
+Ahmed Karaman
+
+--000000000000f4f4bb05ad1040d5
+Content-Type: text/html; charset="UTF-8"
+
+<div dir="auto">Hi everyone,<br>
+<br>
+QEMU currently lacks a system for measuring the performance of targets<br>
+automatically. The previous reports introduced different tools and<br>
+methods for locating performance regressions, but all of them had to<br>
+be manually executed by the user when needed.<br>
+<br>
+This report devises a new nightly tests system that runs automatically<br>
+each night. After the execution is completed, it sends a report to the<br>
+QEMU mailing list with the performance measurements of seventeen<br>
+different QEMU targets, and how these measurements compare to<br>
+previously obtained ones.<br>
+<br>
+Report link:<br>
+<a href="https://ahmedkrmn.github.io/TCG-Continuous-Benchmarking/QEMU-Nightly-Performance-Tests/" rel="noreferrer noreferrer" target="_blank">https://ahmedkrmn.github.io/TCG-Continuous-Benchmarking/QEMU-Nightly-Performance-Tests/</a><br>
+<br>
+The system is now scheduled to execute daily, and starting from<br>
+tonight, the results will be sent to the mailing list.<br>
+<br>
+Previous reports:<br>
+Report 1 - Measuring Basic Performance Metrics of QEMU:<br>
+<a href="https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg06692.html" rel="noreferrer noreferrer" target="_blank">https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg06692.html</a><br>
+Report 2 - Dissecting QEMU Into Three Main Parts:<br>
+<a href="https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg09441.html" rel="noreferrer noreferrer" target="_blank">https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg09441.html</a><br>
+Report 3 - QEMU 5.0 and 5.1-pre-soft-freeze Dissect Comparison:<br>
+<a href="https://lists.gnu.org/archive/html/qemu-devel/2020-07/msg01978.html" rel="noreferrer noreferrer" target="_blank">https://lists.gnu.org/archive/html/qemu-devel/2020-07/msg01978.html</a><br>
+Report 4 - Listing QEMU Helpers and Function Callees:<br>
+<a href="https://lists.gnu.org/archive/html/qemu-devel/2020-07/msg04227.html" rel="noreferrer noreferrer" target="_blank">https://lists.gnu.org/archive/html/qemu-devel/2020-07/msg04227.html</a><br>
+Report 5 - Finding Commits Affecting QEMU Performance:<br>
+<a href="https://lists.gnu.org/archive/html/qemu-devel/2020-07/msg05769.html" rel="noreferrer noreferrer" target="_blank">https://lists.gnu.org/archive/html/qemu-devel/2020-07/msg05769.html</a><br>
+Report 6 - Performance Comparison of Two QEMU Builds:<br>
+<a href="https://lists.gnu.org/archive/html/qemu-devel/2020-07/msg07389.html" rel="noreferrer noreferrer" target="_blank">https://lists.gnu.org/archive/html/qemu-devel/2020-07/msg07389.html</a><br>
+Report 7 - Measuring QEMU Emulation Efficiency:<br>
+<a href="https://lists.gnu.org/archive/html/qemu-devel/2020-08/msg00098.html" rel="noreferrer noreferrer" target="_blank">https://lists.gnu.org/archive/html/qemu-devel/2020-08/msg00098.html</a><br>
+<br>
+Best regards,<br>
+Ahmed Karaman<br></div>
+
+--000000000000f4f4bb05ad1040d5--
 
