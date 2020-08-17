@@ -6,93 +6,67 @@ X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 293EDC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 06:39:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0FE0C433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 06:46:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E9B3020716
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 06:39:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9390820758
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 06:46:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zp86t1G+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9B3020716
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=irrelevant.dk header.i=@irrelevant.dk header.b="pZBLSgwV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9390820758
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33898 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36402 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7Ynv-0006V9-5r
-	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 02:39:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45394)
+	id 1k7Yuf-0007zk-Sy
+	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 02:46:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46522)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1k7YnK-00064W-9j
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 02:38:58 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:52503
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1k7YnF-0006is-G8
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 02:38:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597646330;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=p27bQOF4p6q5oYpRrHd1HKqo5O+sKCNmptEH4q2zCDY=;
- b=Zp86t1G+zPTmpEmcbhg5WMeLjaFqh0+GQ6BOI1A/cPUVHK0sL0j+rLFeKiBurukm6JfPqU
- xrcBGaOHNO+PXJ3nuHF+aP3tyJVvEeZ9nRLLuXhrUMKbb/aeNcIQrXbZbsKSsXwT48NTyV
- sNHsEZa/cizjs/DBRqVfJWZQ5tacOH8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-148-LJkz_mXvMI2EhpfIOLxf7g-1; Mon, 17 Aug 2020 02:38:48 -0400
-X-MC-Unique: LJkz_mXvMI2EhpfIOLxf7g-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E053D801AAC;
- Mon, 17 Aug 2020 06:38:45 +0000 (UTC)
-Received: from gondolin (ovpn-112-230.ams2.redhat.com [10.36.112.230])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 896B65C1DC;
- Mon, 17 Aug 2020 06:38:30 +0000 (UTC)
-Date: Mon, 17 Aug 2020 08:38:28 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Eric Farman <farman@linux.ibm.com>
-Subject: Re: device compatibility interface for live migration with assigned
- devices
-Message-ID: <20200817083828.187315ef.cohuck@redhat.com>
-In-Reply-To: <315669b0-5c75-d359-a912-62ebab496abf@linux.ibm.com>
-References: <20200727072440.GA28676@joy-OptiPlex-7040>
- <20200727162321.7097070e@x1.home>
- <20200729080503.GB28676@joy-OptiPlex-7040>
- <20200804183503.39f56516.cohuck@redhat.com>
- <c178a0d3-269d-1620-22b1-9010f602d8ff@redhat.com>
- <20200805021654.GB30485@joy-OptiPlex-7040>
- <2624b12f-3788-7e2b-2cb7-93534960bcb7@redhat.com>
- <20200805075647.GB2177@nanopsycho>
- <eb1d01c2-fbad-36b6-10cf-9e03483a736b@redhat.com>
- <20200805093338.GC30485@joy-OptiPlex-7040>
- <20200805105319.GF2177@nanopsycho>
- <4cf2824c803c96496e846c5b06767db305e9fb5a.camel@redhat.com>
- <20200807135942.5d56a202.cohuck@redhat.com>
- <20200813173347.239801fa.cohuck@redhat.com>
- <315669b0-5c75-d359-a912-62ebab496abf@linux.ibm.com>
-Organization: Red Hat GmbH
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
+ id 1k7Ytp-0007To-TE; Mon, 17 Aug 2020 02:45:42 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:39150)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
+ id 1k7Ytn-0007OA-9w; Mon, 17 Aug 2020 02:45:41 -0400
+Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net
+ [80.167.98.190])
+ by charlie.dont.surf (Postfix) with ESMTPSA id A5DD6BF425;
+ Mon, 17 Aug 2020 06:45:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=irrelevant.dk;
+ s=default; t=1597646735;
+ bh=7u0m9Qaxa/EOPBR33+kp6ojtS9vHzbd7a/mGn7/0L5I=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=pZBLSgwVJRTeiAlqHYDAFwLy4s2Pz7zVgCjUKkfNY4l1fnarGljbabe6Jfe37llDz
+ mpD39TbMSa0kdJ//06xt6sVeO5f9ARl4iJSJ5Uk80bEKwPLf/eJvL+YDjG8AJ0XGV+
+ 4SE3F7UKqbndHKzXvHHdgxS/L09D4bJBPnCr7XHnp0eCpLitf2etAfrHkD+k2KApYF
+ iPQA3TkVywXiHS1oUAe0znfviwaKlfNOWRw3qxBz+E7hXx67GnZ9siOPHEIuf+AVrq
+ ZCIhThr+rjRIzuC6Odrnm1/NFF2By7A59leUs6L6okB1gk7VYORC0OKoH95FCDQoQC
+ jkiU72g7aUCIA==
+Date: Mon, 17 Aug 2020 08:45:29 +0200
+From: Klaus Jensen <its@irrelevant.dk>
+To: qemu-devel@nongnu.org
+Subject: Re: [PATCH v2 00/16] hw/block/nvme: dma handling and address mapping
+ cleanup
+Message-ID: <20200817064520.GA11110@apples.localdomain>
+References: <20200729220638.344477-1-its@irrelevant.dk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=cohuck@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/17 00:54:24
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20200729220638.344477-1-its@irrelevant.dk>
+Received-SPF: pass client-ip=128.199.63.193; envelope-from=its@irrelevant.dk;
+ helo=charlie.dont.surf
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/17 02:29:16
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,127 +79,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kvm@vger.kernel.org, libvir-list@redhat.com,
- Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, kwankhede@nvidia.com,
- eauger@redhat.com, xin-ran.wang@intel.com, corbet@lwn.net,
- openstack-discuss@lists.openstack.org, shaohe.feng@intel.com,
- kevin.tian@intel.com, Yan Zhao <yan.y.zhao@intel.com>,
- Parav Pandit <parav@mellanox.com>, jian-feng.ding@intel.com,
- dgilbert@redhat.com, zhenyuw@linux.intel.com, hejie.xu@intel.com,
- bao.yumeng@zte.com.cn, Jiri Pirko <jiri@mellanox.com>,
- Sean Mooney <smooney@redhat.com>, intel-gvt-dev@lists.freedesktop.org,
- berrange@redhat.com, eskultet@redhat.com,
- Alex Williamson <alex.williamson@redhat.com>, dinechin@redhat.com,
- devel@ovirt.org
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ qemu-block@nongnu.org, Klaus Jensen <k.jensen@samsung.com>,
+ Max Reitz <mreitz@redhat.com>, Keith Busch <kbusch@kernel.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 13 Aug 2020 15:02:53 -0400
-Eric Farman <farman@linux.ibm.com> wrote:
+On Jul 30 00:06, Klaus Jensen wrote:
+> From: Klaus Jensen <k.jensen@samsung.com>
+>=20
+> This series consists of patches that refactors dma read/write and adds a
+> number of address mapping helper functions.
+>=20
+> v2:
+>   * hw/block/nvme: add mapping helpers
+>     - Add an assert in case of out of bounds array access. (Maxim)
+>=20
+>   * hw/block/nvme: remove redundant has_sg member
+>     - Split the fix for the missing qemu_iov_destroy into a fresh patch
+>       ("hw/block/nvme: destroy request iov before reuse"). (Minwoo)
+>=20
+>   * hw/block/nvme: pass request along for tracing [DROPPED]
+>     - Dropped the patch and replaced it with a simple patch that just adds
+>       tracing to the nvme_map_prp function ("hw/block/nvme: add tracing to
+>       nvme_map_prp"). (Minwoo)
+>=20
+>   * hw/block/nvme: add request mapping helper
+>     - Changed the name from nvme_map to nvme_map_dptr. (Minwoo, Maxim)
+>=20
+>   * hw/block/nvme: add check for mdts
+>     - Don't touch the documentaiton for the cmb_size_mb and max_ioqpairs
+>       parameters in this patch. (Minwoo)
+>=20
+>   * hw/block/nvme: refactor NvmeRequest clearing [DROPPED]
+>     - Keep NvmeRequest structure clearing as "before use". (Maxim)
+>=20
+>   * hw/block/nvme: add a namespace reference in NvmeRequest
+>   * hw/block/nvme: remove NvmeCmd parameter
+>     - Squash these two patches together into "hw/block/nvme: add ns/cmd
+>       references in NvmeRequest".
+>=20
+>   * hw/block/nvme: consolidate qsg/iov clearing
+>     - Move the qsg/iov destroys to a new nvme_req_exit function that is c=
+alled
+>       after the cqe has been posted.
+>=20
+>   * hw/block/nvme: remove explicit qsg/iov parameters
+>     - New patch. THe nvme_map_prp() function doesn't require the qsg and =
+iov
+>       parameters since it can just get them from the passed NvmeRequest.
+>=20
+> Based-on: <20200706061303.246057-1-its@irrelevant.dk>
+>=20
+> Klaus Jensen (16):
+>   hw/block/nvme: memset preallocated requests structures
+>   hw/block/nvme: add mapping helpers
+>   hw/block/nvme: replace dma_acct with blk_acct equivalent
+>   hw/block/nvme: remove redundant has_sg member
+>   hw/block/nvme: destroy request iov before reuse
+>   hw/block/nvme: refactor dma read/write
+>   hw/block/nvme: add tracing to nvme_map_prp
+>   hw/block/nvme: add request mapping helper
+>   hw/block/nvme: verify validity of prp lists in the cmb
+>   hw/block/nvme: refactor request bounds checking
+>   hw/block/nvme: add check for mdts
+>   hw/block/nvme: be consistent about zeros vs zeroes
+>   hw/block/nvme: add ns/cmd references in NvmeRequest
+>   hw/block/nvme: consolidate qsg/iov clearing
+>   hw/block/nvme: use preallocated qsg/iov in nvme_dma_prp
+>   hw/block/nvme: remove explicit qsg/iov parameters
+>=20
+>  block/nvme.c          |   4 +-
+>  hw/block/nvme.c       | 506 +++++++++++++++++++++++++++---------------
+>  hw/block/nvme.h       |   4 +-
+>  hw/block/trace-events |   4 +
+>  include/block/nvme.h  |   4 +-
+>  5 files changed, 340 insertions(+), 182 deletions(-)
+>=20
+> --=20
+> 2.27.0
+>=20
+>=20
 
-> On 8/13/20 11:33 AM, Cornelia Huck wrote:
-> > On Fri, 7 Aug 2020 13:59:42 +0200
-> > Cornelia Huck <cohuck@redhat.com> wrote:
-> >   
-> >> On Wed, 05 Aug 2020 12:35:01 +0100
-> >> Sean Mooney <smooney@redhat.com> wrote:
-> >>  
-> >>> On Wed, 2020-08-05 at 12:53 +0200, Jiri Pirko wrote:    
-> >>>> Wed, Aug 05, 2020 at 11:33:38AM CEST, yan.y.zhao@intel.com wrote:      
-> >>
-> >> (...)
-> >>  
-> >>>>>    software_version: device driver's version.
-> >>>>>               in <major>.<minor>[.bugfix] scheme, where there is no
-> >>>>> 	       compatibility across major versions, minor versions have
-> >>>>> 	       forward compatibility (ex. 1-> 2 is ok, 2 -> 1 is not) and
-> >>>>> 	       bugfix version number indicates some degree of internal
-> >>>>> 	       improvement that is not visible to the user in terms of
-> >>>>> 	       features or compatibility,
-> >>>>>
-> >>>>> vendor specific attributes: each vendor may define different attributes
-> >>>>>   device id : device id of a physical devices or mdev's parent pci device.
-> >>>>>               it could be equal to pci id for pci devices
-> >>>>>   aggregator: used together with mdev_type. e.g. aggregator=2 together
-> >>>>>               with i915-GVTg_V5_4 means 2*1/4=1/2 of a gen9 Intel
-> >>>>> 	       graphics device.
-> >>>>>   remote_url: for a local NVMe VF, it may be configured with a remote
-> >>>>>               url of a remote storage and all data is stored in the
-> >>>>> 	       remote side specified by the remote url.
-> >>>>>   ...      
-> >>> just a minor not that i find ^ much more simmple to understand then
-> >>> the current proposal with self and compatiable.
-> >>> if i have well defiend attibute that i can parse and understand that allow
-> >>> me to calulate the what is and is not compatible that is likely going to
-> >>> more useful as you wont have to keep maintianing a list of other compatible
-> >>> devices every time a new sku is released.
-> >>>
-> >>> in anycase thank for actully shareing ^ as it make it simpler to reson about what
-> >>> you have previously proposed.    
-> >>
-> >> So, what would be the most helpful format? A 'software_version' field
-> >> that follows the conventions outlined above, and other (possibly
-> >> optional) fields that have to match?  
-> > 
-> > Just to get a different perspective, I've been trying to come up with
-> > what would be useful for a very different kind of device, namely
-> > vfio-ccw. (Adding Eric to cc: for that.)
-> > 
-> > software_version makes sense for everybody, so it should be a standard
-> > attribute.
-> > 
-> > For the vfio-ccw type, we have only one vendor driver (vfio-ccw_IO).
-> > 
-> > Given a subchannel A, we want to make sure that subchannel B has a
-> > reasonable chance of being compatible. I guess that means:
-> > 
-> > - same subchannel type (I/O)
-> > - same chpid type (e.g. all FICON; I assume there are no 'mixed' setups
-> >   -- Eric?)  
-> 
-> Correct.
-> 
-> > - same number of chpids? Maybe we can live without that and just inject
-> >   some machine checks, I don't know. Same chpid numbers is something we
-> >   cannot guarantee, especially if we want to migrate cross-CEC (to
-> >   another machine.)  
-> 
-> I think we'd live without it, because I wouldn't expect it to be
-> consistent between systems.
+Thanks for the reviews everyone.
 
-Yes, and the guest needs to be able to deal with changing path
-configurations anyway.
-
-> 
-> > 
-> > Other possibly interesting information is not available at the
-> > subchannel level (vfio-ccw is a subchannel driver.)  
-> 
-> I presume you're alluding to the DASD uid (dasdinfo -x) here?
-
-Yes, or the even more basic Sense ID information.
-
-> 
-> > 
-> > So, looking at a concrete subchannel on one of my machines, it would
-> > look something like the following:
-> > 
-> > <common>
-> > software_version=1.0.0
-> > type=vfio-ccw          <-- would be vfio-pci on the example above
-> > <vfio-ccw specific>
-> > subchannel_type=0
-> > <vfio-ccw_IO specific>
-> > chpid_type=0x1a
-> > chpid_mask=0xf0        <-- not sure if needed/wanted
-
-Let's just drop the chpid_mask here.
-
-> > 
-> > Does that make sense?
-
-Would be interesting if someone could come up with some possible
-information for a third type of device.
-
+Pushed to nvme-next.
 
