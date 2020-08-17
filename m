@@ -7,82 +7,79 @@ X-Spam-Status: No, score=-5.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93DBDC433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 13:36:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFC7EC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 13:39:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5DEA7204FD
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 13:36:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7282A204FD
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 13:39:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BVjchvEj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5DEA7204FD
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iYyR9Dag"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7282A204FD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52490 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54682 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7fJZ-0001bV-Jt
-	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 09:36:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54054)
+	id 1k7fM7-0002Yg-NW
+	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 09:39:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54464)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k7fJ3-0001A7-S0
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 09:36:09 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:51060
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k7fLa-00029s-KG
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 09:38:46 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:40889
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k7fJ0-00076d-Re
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 09:36:09 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k7fLY-0007Gz-OA
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 09:38:46 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597671365;
+ s=mimecast20190719; t=1597671523;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=SdGeddxCsUjs/rLzHwPEQuzcDIDzSYlSxaaSCwwnASE=;
- b=BVjchvEjFMzA/QiVcQCHY83fviSko6WfoU6SUXGO4jWLf80fLnLo/KTqY2qHSNBE5oWDPs
- +gekSQWLbCE1JpHFrxKX9nL4+OkjEMWKSiahyNN0sySW9EM6Y0L2hIxJNh+aCM3q7rJ4hT
- DeE6nxRKXBGixD/v04ArkfbDSlpVSXs=
+ bh=XpFtVKXpCKmBKB1xDWPJ5+hUZ4f3H2BiGVbdJfQdydc=;
+ b=iYyR9DagU0b22HJzPmuBwjhTV44MkWy8KJjyodQxJ3IGjvqcUi2Ix91h0blWVM+BjDt5rQ
+ BH2JieO0ni41hB6fXltUKtd7ISIewbltMyTcymSzz1hKUSBHII1iDNmGPV5OiZemx30WR/
+ nvRg5yUqmf0wfgF/d1OTRvKUYZmg2es=
 Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
  [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-5-AWsIlwffNU2aYa5xIxU6jw-1; Mon, 17 Aug 2020 09:36:04 -0400
-X-MC-Unique: AWsIlwffNU2aYa5xIxU6jw-1
-Received: by mail-wr1-f69.google.com with SMTP id t3so7075296wrr.5
- for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 06:36:02 -0700 (PDT)
+ us-mta-75-qkaTvGiPNh2BEv8umX_SbA-1; Mon, 17 Aug 2020 09:38:31 -0400
+X-MC-Unique: qkaTvGiPNh2BEv8umX_SbA-1
+Received: by mail-wr1-f69.google.com with SMTP id k11so7076672wrv.1
+ for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 06:38:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=SdGeddxCsUjs/rLzHwPEQuzcDIDzSYlSxaaSCwwnASE=;
- b=nGtd+QKR6DrnE50NXmEK56Fimp9GGPI1Zm6EO4Y+mBMj7Xn278boF/DXUGyzwQ7Z8T
- rtEA2zH7OsSZu4L5ts3fRYIxyOrgIw66Lwe4/fB+RW9SEwGq8YldK5fXjhbW1qKQUxeX
- gCueBvyfKm6vZQzzQ2dB08eAZysdoXMbkkoYLWGgjnUxohuWZkTKTJWrvM7T6rI8E/Hr
- 9GBvnDUC+p9difMezMRJbOktkb61yzQUf8czdexQsc2D1pxgdb/GEKSt4xoy7wbE7FpP
- 1GLwvZl3NwFME0UbkYbBMqCW3uV+56xn5QreT4OMfLLlsHlrC6w52HW86ajB/x0l8zWM
- YHAQ==
-X-Gm-Message-State: AOAM532TXuPumFuynVqO5bi9ZosR56/EzY5ATIm+FbjVhzNnwwKYV1rN
- NN37Vwu0JV/5O9KGEVL1xkxa8vqiyMN1+TNG3gshJb/kLOJOWSZqKzyPhgMRh7tmWYSXiEveK9m
- rIdO2oqxsJxNeGqY=
-X-Received: by 2002:a05:6000:120c:: with SMTP id
- e12mr15301732wrx.354.1597671361672; 
- Mon, 17 Aug 2020 06:36:01 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxJCVfImP9MHjShgFwjjGpHuK9DgU2aPLRjiTWGKHpCL/p6lMs0UJxe+aAuq3Adi6mATPkYQg==
-X-Received: by 2002:a05:6000:120c:: with SMTP id
- e12mr15301716wrx.354.1597671361465; 
- Mon, 17 Aug 2020 06:36:01 -0700 (PDT)
+ bh=XpFtVKXpCKmBKB1xDWPJ5+hUZ4f3H2BiGVbdJfQdydc=;
+ b=UvWz9xHYrLcnwbFLPQFwir4skmfJJxzq2bYxuoxoXN32H5EvzBsQHsdLJzdttVQQgJ
+ I5z2UyJklqiTWvgA7IzbxKBEdeWO1BR0QY8xqBwGCp0GsijWQHe+BiFKoMOfSJv/zQW1
+ OIj66hs5vnVm6r8dNFlH+ToC/nCkRl6z+Q3kN7Op6UaQajjj6igXdeyOIJoBO433/pO4
+ zfrRUvMpBETNgfl88CIZ49hC1T/D9O4N/ox5v3XxAIbjUyUypn8V9u/QNzIIAmM29DsL
+ m96FJflvcB0oqDb9ky+7KQypsvhrotBp89kSyDi+mXlfXnvnUCE8rW2CS6fv61uYEz1+
+ wxdQ==
+X-Gm-Message-State: AOAM532P0fhoBMt0wrvNAcKFnJD6EeYwcuqHCbTWSG2+MO4+0xcmsEf1
+ r+ng8mX7nkgIpZA1B00bqWd21njJ4bpFet5mSx5DtgGndY6TSqkMMmoMtzSyFeAUx3G/VGHQzOf
+ DUHmqlzldXDwblg8=
+X-Received: by 2002:a5d:6a8b:: with SMTP id s11mr15386842wru.222.1597671510383; 
+ Mon, 17 Aug 2020 06:38:30 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxKnbw+Z2jGis3wxNEdJpk8sWHIVPvcsSsbgRQrelv43HehW4NA8XXhCWFS3EmT4rSPGepcsA==
+X-Received: by 2002:a5d:6a8b:: with SMTP id s11mr15386821wru.222.1597671510184; 
+ Mon, 17 Aug 2020 06:38:30 -0700 (PDT)
 Received: from [192.168.1.36] (121.red-81-40-121.staticip.rima-tde.net.
  [81.40.121.121])
- by smtp.gmail.com with ESMTPSA id v8sm30288583wmb.24.2020.08.17.06.36.00
+ by smtp.gmail.com with ESMTPSA id t189sm30984760wmf.47.2020.08.17.06.38.29
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 17 Aug 2020 06:36:00 -0700 (PDT)
-Subject: Re: [PATCH v2 000/150] Meson integration for 5.2
-To: Paolo Bonzini <pbonzini@redhat.com>,
- Roman Bolshakov <r.bolshakov@yadro.com>,
- "Daniel P . Berrange" <berrange@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>
+ Mon, 17 Aug 2020 06:38:29 -0700 (PDT)
+Subject: Re: [PATCH 025/150] libqemuutil, qapi, trace: convert to meson
+To: Roman Bolshakov <r.bolshakov@yadro.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 References: <20200814091326.16173-1-pbonzini@redhat.com>
- <20200817110254.GA98227@SPB-NB-133.local>
- <f8a9f236-7017-01a7-0a6d-06a2e18f95f1@redhat.com>
+ <20200814091326.16173-26-pbonzini@redhat.com>
+ <20200817111000.GB98227@SPB-NB-133.local>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Autocrypt: addr=philmd@redhat.com; keydata=
  mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
@@ -107,30 +104,30 @@ Autocrypt: addr=philmd@redhat.com; keydata=
  9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
  RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
  apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <44308a0f-8f09-84c9-fb59-bbb0bb580e1b@redhat.com>
-Date: Mon, 17 Aug 2020 15:36:00 +0200
+Message-ID: <3b8912cb-510e-fe84-39d4-276d12687538@redhat.com>
+Date: Mon, 17 Aug 2020 15:38:28 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <f8a9f236-7017-01a7-0a6d-06a2e18f95f1@redhat.com>
+In-Reply-To: <20200817111000.GB98227@SPB-NB-133.local>
 Content-Language: en-US
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
 X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/17 00:24:04
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/17 03:34:42
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -143,41 +140,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/17/20 1:24 PM, Paolo Bonzini wrote:
-> On 17/08/20 13:02, Roman Bolshakov wrote:
+On 8/17/20 1:10 PM, Roman Bolshakov wrote:
+> On Fri, Aug 14, 2020 at 05:11:21AM -0400, Paolo Bonzini wrote:
+>> This shows how to do some "computations" in meson.build using its array
+>> and dictionary data structures, and also a basic usage of the sourceset
+>> module for conditional compilation.
 >>
->> Tested-by: Roman Bolshakov <r.bolshakov@yadro.com>
->>
->> On the next step, it might be good to drop configure in favor of meson
->> configuration, so configure, build and test commands would be similar to
->> libvirt:
->>
->> meson build
->> ninja -C build
->> meson test -C build
+>> [...]
+>> +  trace_ss.add(trace_h, trace_c)
+>> +  if 'CONFIG_TRACE_DTRACE' in config_host
+>> +    trace_dtrace = custom_target(fmt.format('trace-dtrace', 'dtrace'),
+>> +                                 output: fmt.format('trace-dtrace', 'dtrace'),
+>> +                                 input: trace_events_file,
+>> +                                 command: [ tracetool, group, '--format=d', '@INPUT@' ],
+>> +                                 capture: true)
+>> +    trace_dtrace_h = custom_target(fmt.format('trace-dtrace', 'h'),
+>> +                                   output: fmt.format('trace-dtrace', 'h'),
+>> +                                   input: trace_dtrace,
+>> +                                   command: [ 'dtrace', '-o', '@OUTPUT@', '-h', '-s', '@INPUT@' ])
+>> +    trace_dtrace_o = custom_target(fmt.format('trace-dtrace', 'o'),
+>> +                                   output: fmt.format('trace-dtrace', 'o'),
+>> +                                   input: trace_dtrace,
+>> +                                   command: [ 'dtrace', '-o', '@OUTPUT@', '-G', '-s', '@INPUT@' ])
+>> +
+>> +    trace_ss.add(trace_dtrace_h, trace_dtrace_o)
 > 
-> Well, there are quite a few steps needed to get there:
+> The patch conflicts with the latest tracing PULL request,
+
+Which isn't merged ;)
+
+It is simpler for the reviewer to test using a series that
+apply on current master.
+
+> object files shouldn't be generated on darwin:
 > 
-[...]
+> https://lists.gnu.org/archive/html/qemu-devel/2020-08/msg02493.html
 > 
-> 2) moving the rest of "make install" to Meson is even more of a
-> no-brainer.  Marc-André has patches there.  They also include a
-> conversion of the ROM build.
-
-There was a discussion last year, IIRC QEMU isn't supposed to build
-ROMs, the repositories are provided for the source code and licenses.
-
-QEMU might provide a compiled ROM and describe in the commit how it
-was built, but isn't responsible of providing buildsys to build all
-the roms jungle.
-
-Maybe its time to say "we kept that up to now, let's make a change".
-
-Thoughts?
+> Thanks,
+> Roman
 
 
