@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3322C433E4
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 15:33:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C81FCC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 15:33:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9F9022332F
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 15:33:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 88B4323331
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 15:33:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Fp4kjd6I"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F9022332F
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dhJqVg2r"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88B4323331
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57890 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59886 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7h8V-0005ho-Sq
-	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 11:33:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42584)
+	id 1k7h8q-0006WH-9j
+	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 11:33:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42728)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k7gKT-0002t2-Er
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:41:41 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:41673)
+ id 1k7gKs-0003Ip-0Q
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:42:06 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:53764)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k7gKO-0006qf-Jf
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:41:41 -0400
+ id 1k7gKq-0006td-5J
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:42:05 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597675295;
+ s=mimecast20190719; t=1597675323;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=yaNJ6IuIrRUXWAqx7sgSBGNyDiIOBarS60pmB3FgTrg=;
- b=Fp4kjd6I3fk/3g+hqZ2eDOAcQXUtvxUr5bYalokSLNA9tCcOoqcnunVdNLDVGkRzXc/MuD
- aKywb271EQWnS6CjHq53AMK0cVLwGzdm5T2zBo/d6n7o+L5wSJo4Fkvv+RMFM+m7zxfQ4P
- ivY3ldROmDk5x98nMVscvnxoMfnOLiQ=
+ bh=rU4n9sn0xbo37T4jGj6ROAEzLR5VNUSmn/MPgqW3AxU=;
+ b=dhJqVg2rbXXahs0QDtmzVmmMyTmK4LL2ua0Mbyj3QpSyE+9e29O9pG/K6YDFIkMwYQpXYY
+ lSLI5UZg+uKpb5kUp2nB+AHvQtl6+NWNrMwhNrma9ZA3l+lVtvWiVUJ1lnUDfUUVcc6GCd
+ R7uZu+1Rv30Nzfz1AfZl6W1YWnQ11/Q=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-241-W7Wo5Z5wNJeBUr6n2ANvUw-1; Mon, 17 Aug 2020 10:41:33 -0400
-X-MC-Unique: W7Wo5Z5wNJeBUr6n2ANvUw-1
+ us-mta-265-2WNNz0Q4PAWm6lWcZDTH0A-1; Mon, 17 Aug 2020 10:42:00 -0400
+X-MC-Unique: 2WNNz0Q4PAWm6lWcZDTH0A-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 005D6100CEC4
- for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 14:41:33 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7FCED81F000
+ for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 14:41:59 +0000 (UTC)
 Received: from donizetti.redhat.com (ovpn-113-20.ams2.redhat.com
  [10.36.113.20])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 27074756AC;
- Mon, 17 Aug 2020 14:41:31 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C7421756AB;
+ Mon, 17 Aug 2020 14:41:55 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 115/150] meson: convert hw/hyperv
-Date: Mon, 17 Aug 2020 16:40:18 +0200
-Message-Id: <20200817144053.345107-20-pbonzini@redhat.com>
+Subject: [PATCH 124/150] meson: convert hw/acpi
+Date: Mon, 17 Aug 2020 16:40:27 +0200
+Message-Id: <20200817144053.345107-29-pbonzini@redhat.com>
 In-Reply-To: <20200817143723.343284-1-pbonzini@redhat.com>
 References: <20200817143723.343284-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -107,54 +107,97 @@ From: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/Makefile.objs        | 1 -
- hw/hyperv/Makefile.objs | 3 ---
- hw/hyperv/meson.build   | 3 +++
- hw/meson.build          | 1 +
- 4 files changed, 4 insertions(+), 4 deletions(-)
- delete mode 100644 hw/hyperv/Makefile.objs
- create mode 100644 hw/hyperv/meson.build
+ hw/Makefile.objs      |  1 -
+ hw/acpi/Makefile.objs | 26 --------------------------
+ hw/acpi/meson.build   | 25 +++++++++++++++++++++++++
+ hw/meson.build        |  1 +
+ 4 files changed, 26 insertions(+), 27 deletions(-)
+ delete mode 100644 hw/acpi/Makefile.objs
+ create mode 100644 hw/acpi/meson.build
 
 diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-index 22eb804730..a2c2f6d1de 100644
+index 4bdb674ef0..ebae00af6e 100644
 --- a/hw/Makefile.objs
 +++ b/hw/Makefile.objs
-@@ -9,7 +9,6 @@ devices-dirs-y += cpu/
- devices-dirs-y += display/
- devices-dirs-y += dma/
- devices-dirs-y += gpio/
--devices-dirs-$(CONFIG_HYPERV) += hyperv/
+@@ -1,6 +1,5 @@
+ ifeq ($(CONFIG_SOFTMMU), y)
+ devices-dirs-$(call lor,$(CONFIG_VIRTIO_9P),$(call land,$(CONFIG_VIRTFS),$(CONFIG_XEN))) += 9pfs/
+-devices-dirs-y += acpi/
  endif
  
  common-obj-y += $(devices-dirs-y)
-diff --git a/hw/hyperv/Makefile.objs b/hw/hyperv/Makefile.objs
+diff --git a/hw/acpi/Makefile.objs b/hw/acpi/Makefile.objs
 deleted file mode 100644
-index 5b614e040c..0000000000
---- a/hw/hyperv/Makefile.objs
+index 72886c7965..0000000000
+--- a/hw/acpi/Makefile.objs
 +++ /dev/null
-@@ -1,3 +0,0 @@
--obj-y += hyperv.o
--obj-$(CONFIG_HYPERV_TESTDEV) += hyperv_testdev.o
--obj-$(CONFIG_VMBUS) += vmbus.o
-diff --git a/hw/hyperv/meson.build b/hw/hyperv/meson.build
+@@ -1,26 +0,0 @@
+-ifeq ($(CONFIG_ACPI),y)
+-common-obj-$(CONFIG_ACPI_X86) += core.o piix4.o pcihp.o
+-common-obj-$(CONFIG_ACPI_X86_ICH) += ich9.o tco.o
+-common-obj-$(CONFIG_ACPI_CPU_HOTPLUG) += cpu_hotplug.o
+-common-obj-$(CONFIG_ACPI_MEMORY_HOTPLUG) += memory_hotplug.o
+-common-obj-$(CONFIG_ACPI_CPU_HOTPLUG) += cpu.o
+-common-obj-$(CONFIG_ACPI_NVDIMM) += nvdimm.o
+-common-obj-$(CONFIG_ACPI_VMGENID) += vmgenid.o
+-common-obj-$(CONFIG_ACPI_HW_REDUCED) += generic_event_device.o
+-common-obj-$(CONFIG_ACPI_HMAT) += hmat.o
+-common-obj-$(CONFIG_ACPI_APEI) += ghes.o
+-common-obj-$(call lnot,$(CONFIG_ACPI_X86)) += acpi-stub.o
+-common-obj-$(call lnot,$(CONFIG_PC)) += acpi-x86-stub.o
+-
+-common-obj-y += acpi_interface.o
+-common-obj-y += bios-linker-loader.o
+-common-obj-y += aml-build.o utils.o
+-common-obj-$(CONFIG_ACPI_PCI) += pci.o
+-common-obj-$(CONFIG_TPM) += tpm.o
+-
+-common-obj-$(CONFIG_IPMI) += ipmi.o
+-common-obj-$(call lnot,$(CONFIG_IPMI)) += ipmi-stub.o
+-else
+-common-obj-y += acpi-stub.o aml-build-stub.o
+-endif
+-common-obj-$(CONFIG_ALL) += acpi-stub.o aml-build-stub.o acpi-x86-stub.o ipmi-stub.o
+diff --git a/hw/acpi/meson.build b/hw/acpi/meson.build
 new file mode 100644
-index 0000000000..1367e2994f
+index 0000000000..dd69577212
 --- /dev/null
-+++ b/hw/hyperv/meson.build
-@@ -0,0 +1,3 @@
-+specific_ss.add(when: 'CONFIG_HYPERV', if_true: files('hyperv.c'))
-+specific_ss.add(when: 'CONFIG_HYPERV_TESTDEV', if_true: files('hyperv_testdev.c'))
-+specific_ss.add(when: 'CONFIG_VMBUS', if_true: files('vmbus.c'))
++++ b/hw/acpi/meson.build
+@@ -0,0 +1,25 @@
++acpi_ss = ss.source_set()
++acpi_ss.add(files(
++  'acpi_interface.c',
++  'aml-build.c',
++  'bios-linker-loader.c',
++  'utils.c',
++))
++acpi_ss.add(when: 'CONFIG_ACPI_CPU_HOTPLUG', if_true: files('cpu.c'))
++acpi_ss.add(when: 'CONFIG_ACPI_CPU_HOTPLUG', if_true: files('cpu_hotplug.c'))
++acpi_ss.add(when: 'CONFIG_ACPI_MEMORY_HOTPLUG', if_true: files('memory_hotplug.c'))
++acpi_ss.add(when: 'CONFIG_ACPI_NVDIMM', if_true: files('nvdimm.c'))
++acpi_ss.add(when: 'CONFIG_ACPI_PCI', if_true: files('pci.c'))
++acpi_ss.add(when: 'CONFIG_ACPI_VMGENID', if_true: files('vmgenid.c'))
++acpi_ss.add(when: 'CONFIG_ACPI_HW_REDUCED', if_true: files('generic_event_device.c'))
++acpi_ss.add(when: 'CONFIG_ACPI_HMAT', if_true: files('hmat.c'))
++acpi_ss.add(when: 'CONFIG_ACPI_APEI', if_true: files('ghes.c'))
++acpi_ss.add(when: 'CONFIG_ACPI_X86', if_true: files('core.c', 'piix4.c', 'pcihp.c'), if_false: files('acpi-stub.c'))
++acpi_ss.add(when: 'CONFIG_ACPI_X86_ICH', if_true: files('ich9.c', 'tco.c'))
++acpi_ss.add(when: 'CONFIG_IPMI', if_true: files('ipmi.c'), if_false: files('ipmi-stub.c'))
++acpi_ss.add(when: 'CONFIG_PC', if_false: files('acpi-x86-stub.c'))
++acpi_ss.add(when: 'CONFIG_TPM', if_true: files('tpm.c'))
++softmmu_ss.add(when: 'CONFIG_ACPI', if_false: files('acpi-stub.c', 'aml-build-stub.c'))
++softmmu_ss.add_all(when: 'CONFIG_ACPI', if_true: acpi_ss)
++softmmu_ss.add(when: 'CONFIG_ALL', if_true: files('acpi-stub.c', 'aml-build-stub.c',
++                                                  'acpi-x86-stub.c', 'ipmi-stub.c'))
 diff --git a/hw/meson.build b/hw/meson.build
-index 983edc1d47..f9e5adfb48 100644
+index ffa3f06dc0..55ca2b2b61 100644
 --- a/hw/meson.build
 +++ b/hw/meson.build
-@@ -1,4 +1,5 @@
- subdir('core')
-+subdir('hyperv')
- subdir('i2c')
- subdir('ide')
- subdir('input')
+@@ -1,3 +1,4 @@
++subdir('acpi')
+ subdir('adc')
+ subdir('audio')
+ subdir('block')
 -- 
 2.26.2
 
