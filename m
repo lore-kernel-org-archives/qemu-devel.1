@@ -7,63 +7,64 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A857CC433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 09:32:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40EACC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 09:34:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 743A92072D
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 09:32:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0A9DC2072D
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 09:34:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="fi6f16LB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 743A92072D
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="f0ytYKyg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A9DC2072D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49774 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54314 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7bVR-000645-Oj
-	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 05:32:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51248)
+	id 1k7bWt-0007uR-Bu
+	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 05:34:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51302)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1k7bFr-0007sQ-F2; Mon, 17 Aug 2020 05:16:35 -0400
+ id 1k7bFv-00082s-DR; Mon, 17 Aug 2020 05:16:39 -0400
 Received: from mail-eopbgr140127.outbound.protection.outlook.com
  ([40.107.14.127]:35534 helo=EUR01-VE1-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1k7bFo-000882-7V; Mon, 17 Aug 2020 05:16:35 -0400
+ id 1k7bFs-000882-4b; Mon, 17 Aug 2020 05:16:39 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ZnetS6IqkNKjMQxZuR5gfmOh2P6/ovQmDonqf7KgNlzr8wdVvVQ/a89ZPgkJ9GXlXpxbDN8TB5uo2BgbZ50RcTMg/dCNACqtl5yOSCVQRg2sc6nMqCcIA8iAvqXELtuy2potId3ki3emJAzjiymwf6kPbviRE6WtCxLnsr2jwz+Cj+Z9xzE2oFIrXNbvuoTIMsZltbKwZXZrbCtgbQe3ZpY+fqd8G6U5gewYCaEuJs9vktsMmC416s3/bVe6Toa2pTdfprinGUpEp/gaByEbaeXTpTUIQnvd4bSw8ERCWTLOeY4kjplO3WSF5JaMrP9d61cWjOn9C9jH3XR6NBSlYA==
+ b=YMCFrolTsS+Wnd2YrBd0ndDGShJm4YBVFCWbAN2CpRpOa/pRGLrr07ZNQJ16bl359LygTtoOwt2cGKTjvB35ntscBvppJVIs40hHlL9gzZt6pcAwrmUWs5LIldz/QbTuMtBpiDe4c+aLeXF+3YJ2/UlKbLdB6MufF+Gxvl8JPFQc3mOQ7KQqco+t+sB8rnQLV3ZD2/2JNQobTnazOQtXl+eOlbytKy0JbiNpftbCgM3iLNSFPA++aQpIfYPv9Z6oHylOmxdnJE7fGooPALf/2rv2IXitZQUAel2jX0HZVpw78cErXBuUUMSRToZ77xboScy7B12Wi0r6F++ZJV5BRA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6bSewKwR/qJKi8k6AuIIWLyv+oN8eJ5a/HOfOESNKN8=;
- b=T7qGzh0MT1EvzMQG+Jr3MW52T7niMxsRVpQYtPhRvYA2SAFxfDj7cPQzeh1gDQJqPgPKJaFkzLII8wDPMgAsbOXT+mbasQZgEMY0O2l6pYIPGLXvSpzS7Fkp3/DyDirLZj1YkNAQGEjK9JrqepHbEGcdF0caB4uoPH7wPs2yFbMVM3V4l24D9sngPTd5o+PClWDBTEYebdPO/6djDgEUQkUN9u0p+FJ4KIj6ZjXwwv/j3KMZrzDLG3AwW3IKieDi4p4thEzTEAGTC1n4/yso8jETKp0xroSrZwxkULmpEYij8wVLqXHKouI9aNdK2W2O90ych2aOWNRsU9d7khGyEQ==
+ bh=9umXax7o65jnZOIGs4fX9mg1dWtR2FDxxk8CWQKo7B8=;
+ b=hYBGlxB4kWjMZt7bwBjsPggIP1lTz0FNZy3PAzSL+8TNsdJrHXdxpDXye+5LzvFFPDZlwP8BNbjNYBF09KPjeTG/zGTsPq1iSqLQuq3xyUsuQ4YyfwJOgyiAQHXiW9WIm3RsoRO3azTnwirFjWLXWD7xyJbdd2QB77w05Y/P7grjo0xIgIIiPiMlih/A9eV8bfpP1wgvqNua9FgnUrXTBru27x2FwfnQ7YmhHckWxqljuWQj6UmGdLMWsy+IA9JTJBXOtCa/6zxS39GupAM9s1o2HRL/lMpXVjNQPJkzFV+d5FqYUa4fKWuNH+1djRk93jCXYEIGt8B/tUmbY98HdQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
  header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6bSewKwR/qJKi8k6AuIIWLyv+oN8eJ5a/HOfOESNKN8=;
- b=fi6f16LBAqwNBmCmhOhZkW+52qIJn9ArzTSBndv505kNIeepsBZqNAGoNAzksGhfx+ss2H5ZCpDh3/YH9n6hGpQBaqdNLaR2aETPEl/iDxhDSdOWLtb+d6/BG5OjIp+AlNj5471o2tosXdrTiM5DUU45pPfTcIUyl2ncBZI0RVk=
+ bh=9umXax7o65jnZOIGs4fX9mg1dWtR2FDxxk8CWQKo7B8=;
+ b=f0ytYKygTZ4i+3lSIk5OlxMBV3/LTlnlJTSmsBktEXfbLwx9RohMMJwarQELIFZuMjihDXSe/XarBJEjTJEbLPXDtOig9fnQqsGKYsNLMfNkkabCusoKSRV9PYX4Qdv3rGhCJ/vYJi0cR5bNEENUBtt992xOFmJTGFdXiTyFvXA=
 Authentication-Results: nongnu.org; dkim=none (message not signed)
  header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
 Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
  by AM6PR08MB4852.eurprd08.prod.outlook.com (2603:10a6:20b:cc::19)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3283.23; Mon, 17 Aug
- 2020 09:16:11 +0000
+ 2020 09:16:13 +0000
 Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
  ([fe80::8c0c:c056:97a5:484a]) by AM7PR08MB5494.eurprd08.prod.outlook.com
  ([fe80::8c0c:c056:97a5:484a%3]) with mapi id 15.20.3283.027; Mon, 17 Aug 2020
- 09:16:11 +0000
+ 09:16:13 +0000
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH v3 09/12] iotests.py: add filter_img_check
-Date: Mon, 17 Aug 2020 12:15:50 +0300
-Message-Id: <20200817091553.283155-10-vsementsov@virtuozzo.com>
+Subject: [PATCH v3 12/12] block/qcow2: automatically insert preallocate filter
+ when on FUSE
+Date: Mon, 17 Aug 2020 12:15:53 +0300
+Message-Id: <20200817091553.283155-13-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.18.0
 In-Reply-To: <20200817091553.283155-1-vsementsov@virtuozzo.com>
 References: <20200817091553.283155-1-vsementsov@virtuozzo.com>
@@ -77,32 +78,32 @@ Received: from kvm.sw.ru (185.215.60.174) by
  AM0PR10CA0015.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:208:17c::25) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3283.16 via Frontend
- Transport; Mon, 17 Aug 2020 09:16:10 +0000
+ Transport; Mon, 17 Aug 2020 09:16:13 +0000
 X-Mailer: git-send-email 2.18.0
 X-Originating-IP: [185.215.60.174]
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: c0424e49-6224-4b7c-a507-08d8428e2ea8
+X-MS-Office365-Filtering-Correlation-Id: a351dfca-edaf-43d8-bafb-08d8428e304a
 X-MS-TrafficTypeDiagnostic: AM6PR08MB4852:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM6PR08MB4852D6675A1F124C5FC498E4C15F0@AM6PR08MB4852.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:393;
+X-Microsoft-Antispam-PRVS: <AM6PR08MB48523E4042C33D3AA03CA42AC15F0@AM6PR08MB4852.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:147;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: DwYGtTR9VKtxMPKm3jD+cspMRt7wHfG7tVoGvQebNGnsE/nqH0Z+v00rIV+TI0Wq82OTBWrLQ+XjqbZoG5q+KkGdLp6yFH9LO/LTvqgwFm+mT2EZrHfsJXHTzSaHEjOUcZ389w6mL+s7Akc1fTuM4vOYQ7Wm2lW/EpP+MHll9vOlE2i6UzCH65J25fWMEwfvFCNi+E2TFFUcE/pc9pkILYiA5zIrSWnS6bZ4kSYjFDFOhSNQx/vVH1ADyRe8UCa4o3hEgYmWtTPNL38wOhLiOFgEbzF2sVZRiEXi+i0jyGdnQ1/GlFfYFnzkuK8lDlfKrMlbXpMlxq6pk4TFKDdGng==
+X-Microsoft-Antispam-Message-Info: 9+fTdxWIfkf/FKu21duaEEOoO5fs5hDNrmHMz1t/yD404NncxgUzzdYJYsNnk9fNgkluE7562gEJXneQEX3aM0x2TNyA2Mh4sPlNsR+5ZB5xhD88uwyrkr3AXUVKMaoJ8IdXCQvrC5ltxf0C0zYz2FK5jODQ1o0p0HuXyGCR2e0C4YsiX+WU37Lj0R3sWm9Vj94E7bIH/p6/kUFy4/8mlkQFIQ7u0rGotuI+wdDdjyGzC+HhGwILBo6q9ldH4ln0zZD9hySaujOz4KumD6A6YUWzpbTIf5VYdw5LqZgNdGvANwQ4qaZktjfUfjIcn4Lb4skpGag0wy8/nCjPfaJmUQ==
 X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
  IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(366004)(136003)(346002)(376002)(39840400004)(396003)(52116002)(26005)(86362001)(16526019)(6506007)(186003)(6486002)(107886003)(8676002)(8936002)(478600001)(36756003)(4326008)(6916009)(316002)(2906002)(1076003)(6512007)(5660300002)(4744005)(2616005)(66556008)(66476007)(6666004)(66946007)(956004);
+ SFS:(4636009)(366004)(136003)(346002)(376002)(39840400004)(396003)(52116002)(26005)(86362001)(16526019)(6506007)(186003)(6486002)(107886003)(8676002)(8936002)(478600001)(36756003)(4326008)(6916009)(316002)(2906002)(1076003)(6512007)(5660300002)(2616005)(66556008)(66476007)(6666004)(66946007)(956004)(83380400001);
  DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: 8K6nbw4dnJEjJe+6mtB93uwl84TNzdxzp0ouNnwYaAtnAoL1MPxqkqzMFqil8v2ZUT9bUY641EXSAsmW3VOy05DIxqoSYgqiQ9xpTjd2QdJWT9cOXEaLBf+0U/Op9Bry8u+Ida0s4W4x8q+mKrqdcAbJHnNbbw34r76THpOWKTAdIe5itWjPiy03VpcNhtVODkC/QJA4n+tXDYvHmSRRVsUTHFA7bYFn4iqiWSi0jRWt0tp3LjUJkYY/n0Fo9P4nIAI6fu5HXqzjP94Oy533+W9J3D4gJIyVpPkGT2+B3gLFTP2aocdMIiuEnjcx8ZeJzJM5oQhtaWqMiSXS1g94H2ZN3cUii4+ARonun/0mEIzhOzCpWVez3YUr5cATkBw98GIUoVWwe/LRRrNy8SJqyyXBNdfOKwrJpQTsA6ZAZdaRuYrYJy1FPXMOXFqSRjawcmyDRWDgEbHQYrOylRpWe6vk2AuiAB847nvEIRoFFZC3dLHWODzsmXPZvmkW4Mp0yBt02WTkTisFafyeXFj30yVoxCHQG0+yrssiSGqW6y+BdphQVZ9Wec0lovwfjin9vNrT79TpY98fagZlIWn14MQjvZ3wPRg7fquTCL77icOa5+rT4jB/O/hVcADan/ycB7L0J4iNVvyZUmZoOP9X+Q==
+X-MS-Exchange-AntiSpam-MessageData: nPc2WCf96fFFr6tRi9bqKiJ2GGClIveXqenZKcWzfac10p+cCBQY0+pRkdaSj0pyRpWXiMvf2oNHzBoHXncDZDX18f3NNBxLD3yRnFPnLhiO6bi0R4d/+peZbqE0e0ES+UMexyNDA6oRfyisziEZoT+wetPH6gP63B7sY2Ul8DHdgBGUB+HvezC6nKt1o2wRzEb4b7MfVn+laOj4a0GgEopZRU2G/afl9so+j+2J9Oh8/FLidpTQdnQ+PiCux5haHu14etyMIF4sLGQTKxTMPQ/jmRrJyVh98SvctdfnIDP/kiW3W40xAfBspFbbsg+ICOBIfhiRAN4ER/yvqIZzTztvxn1woqCdGJaRxjR0ziA8UuawdzGhk6fcEhRieHAERu1RiNW2BIqrijiI8g+Ymd6k5FNnTvfDVHUSDjJCLpLPvGUCEWoXrrRuBa5NRs72M4ZMIE9NWpNLrinQ/pdf3LLZ7r+Wel9W6Rg/X2vLL1Qyo7VzeRzvP8BKnO5fmFtrHTMf+k99m4WsY1nlEjZM81Sm3VNKxzHCeOKT4rxRXcZrnluNp2gtwUxjS3Xp9cD8H3yBgZab3zBfBu6PD1OpxB2gaXTTMEkFGeWVzLDnkLhSpClmg/tY7tzTfu+ygYn9YwdlwlRxVs+OnF7SPIxq/Q==
 X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c0424e49-6224-4b7c-a507-08d8428e2ea8
+X-MS-Exchange-CrossTenant-Network-Message-Id: a351dfca-edaf-43d8-bafb-08d8428e304a
 X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Aug 2020 09:16:10.9723 (UTC)
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Aug 2020 09:16:13.7790 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: GRqDnYh9LzmmbA2ODagbyBBMFLF0XzxIMa28vlTHONC0npGw3rgad77zrEZtytbJr4DvMHWAo8VeDVxZ4Yc7EWR8Q5ALK0VXCYS8AilUdCU=
+X-MS-Exchange-CrossTenant-UserPrincipalName: Ni+EczDfT0UQ/RFcrUgP3m3KsLqkHLDhjpAoTAOLMGBOssi8X5cuX/55rQ7vh2wi2Dhldkdu+DX8Wpoc0qCUS0aPH3ChIaFNPuC9TwumJXM=
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4852
 Received-SPF: pass client-ip=40.107.14.127;
  envelope-from=vsementsov@virtuozzo.com;
@@ -136,27 +137,83 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add analog of bash _filter_qemu_img_check to python framework.
+vstorage has slow allocation, so this patch detect vstorage
+(I hope, we don't use other FUSE filesystems) and inserts preallocate
+filter between qcow2 node and its file child.
+
+The following test executes more than 10 times faster
+(43.2s -> 3.9s for me) with this patch. (/newssd3 is mount point of
+vstorage, both cs and mds are on same ssd local ssd disk)
+
+    IMG=/newssd3/z
+    FILE_OPTS=file.filename=$IMG
+    COUNT=15000
+    CHUNK=64K
+    CLUSTER=1M
+    rm -f $IMG
+    ./qemu-img create -f qcow2 -o cluster_size=$CLUSTER $IMG 1G
+    ./qemu-img bench -c $COUNT -d 1 -s $CHUNK -w -t none -f qcow2 $IMG
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- tests/qemu-iotests/iotests.py | 4 ++++
- 1 file changed, 4 insertions(+)
+ block/qcow2.c | 38 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 38 insertions(+)
 
-diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-index 369e9918b4..ef3da4ee61 100644
---- a/tests/qemu-iotests/iotests.py
-+++ b/tests/qemu-iotests/iotests.py
-@@ -402,6 +402,10 @@ def filter_img_info(output, filename):
-         lines.append(line)
-     return '\n'.join(lines)
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 6ad6bdc166..f56507158e 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -1868,6 +1868,40 @@ static void coroutine_fn qcow2_open_entry(void *opaque)
+     qemu_co_mutex_unlock(&s->lock);
+ }
  
-+def filter_img_check(msg):
-+    msg = re.sub(r'.*allocated.*fragmented.*compressed clusters', '', msg)
-+    return re.sub(r'Image end offset: [0-9]+', '', msg).strip()
++static int qcow2_vz_insert_prealloc_filter(BlockDriverState *bs, Error **errp)
++{
++    QDict *options;
++    BlockDriverState *filter_bs;
++    Error *local_err = NULL;
++    int flags;
 +
- def filter_imgfmt(msg):
-     return msg.replace(imgfmt, 'IMGFMT')
++    if (!bdrv_is_file_on_fuse(bs->file->bs)) {
++        /* Nothing to do */
++        return 0;
++    }
++
++    /* Assume it's a vstorage */
++    options = qdict_new();
++    qdict_put_str(options, "driver", "preallocate");
++    qdict_put_str(options, "file", bs->file->bs->node_name);
++    flags = bdrv_is_read_only(bs->file->bs) ? 0 : BDRV_O_RDWR;
++    filter_bs = bdrv_open(NULL, NULL, options, flags, errp);
++    if (!filter_bs) {
++        return -EINVAL;
++    }
++
++    bdrv_replace_node(bs->file->bs, filter_bs, &local_err);
++
++    /*
++     * On failure we want to remove filter_bs, on success it's referenced now by
++     * qcow2 node.
++     */
++    bdrv_unref(filter_bs);
++
++    error_propagate(errp, local_err);
++    return local_err ? -EINVAL : 0;
++}
++
+ static int qcow2_open(BlockDriverState *bs, QDict *options, int flags,
+                       Error **errp)
+ {
+@@ -1886,6 +1920,10 @@ static int qcow2_open(BlockDriverState *bs, QDict *options, int flags,
+         return -EINVAL;
+     }
+ 
++    if (qcow2_vz_insert_prealloc_filter(bs, errp) < 0) {
++        return -EINVAL;
++    }
++
+     /* Initialise locks */
+     qemu_co_mutex_init(&s->lock);
  
 -- 
 2.18.0
