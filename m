@@ -2,119 +2,110 @@ Return-Path: <SRS0=yhYb=B3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33F73C433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 13:55:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC176C433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 13:58:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E3A8C206FA
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 13:55:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 92EBD2075B
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 13:58:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i3fACJ20"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3A8C206FA
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="czJpgMQC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 92EBD2075B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41408 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43582 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7fbI-0000we-4F
-	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 09:55:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57288)
+	id 1k7feM-00022U-N2
+	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 09:58:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57942)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1k7faV-000071-Er
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 09:54:11 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:30054
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1k7fdd-0001bd-6M
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 09:57:25 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:45510)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1k7faS-0000T9-9m
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 09:54:11 -0400
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1k7fdb-0000uf-1e
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 09:57:24 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597672444;
+ s=mimecast20190719; t=1597672641;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=Xi9vRc3vsGyoV3+aR9gdLf1/jTDG+1MXz6S0aIIGL6o=;
- b=i3fACJ20NpagBpTojNJWifcwy69jaJSwLsdKC3so3OLUthXOJYF3k4tWfc7h6Q7UuWq2kK
- H3Bax1ZSL0VRKJikcMxRKcAqBe2WZPLuiXx4UDTAVyT298yUihm/B8AdsgtA9eRslXw7wH
- dxCjjfeGT5km/0ZUhcP+YK2Gxbmuocs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-436-EO42-vhFNFiIUQoXyRMzKQ-1; Mon, 17 Aug 2020 09:54:01 -0400
-X-MC-Unique: EO42-vhFNFiIUQoXyRMzKQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ECEB718686C0;
- Mon, 17 Aug 2020 13:54:00 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-113-146.ams2.redhat.com
- [10.36.113.146])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8DE9170C3D;
- Mon, 17 Aug 2020 13:53:59 +0000 (UTC)
-Subject: Re: [RFC PATCH 04/22] block/export: Add BlockExport infrastructure
- and block-export-add
-To: Kevin Wolf <kwolf@redhat.com>
-References: <20200813162935.210070-1-kwolf@redhat.com>
- <20200813162935.210070-5-kwolf@redhat.com>
- <7ed669db-7a75-fb25-4ce6-52369ea01b4b@redhat.com>
- <20200817124544.GI11402@linux.fritz.box>
- <0a8939b5-4441-e76e-44c5-b27e69eba3b8@redhat.com>
- <20200817132938.GM11402@linux.fritz.box>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <4fef913a-986b-7f64-c8e5-0bb45c5fc05f@redhat.com>
-Date: Mon, 17 Aug 2020 15:53:58 +0200
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=HzvgKtnZwE0jSyG7+ObBR6XdWBnX2EOQuwSfHX6V5jI=;
+ b=czJpgMQC+aLmtU+I6hYqNJf53sFHJp/3kpKB/3Kx/ZUS+CY161M4AofUyYqSDBJhM70cRb
+ OnpwZAF0pn4GdyYCgonmff5yhsWVHNFyXEBgjvAkWtJbxFE/v4P+pJe0HLrJdaAN/cxcBl
+ tlFRsadvXt5n45D9RvD2/CqjyeJRcGQ=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-159-mMSJxlvQMmuo14fDa-Y4TA-1; Mon, 17 Aug 2020 09:57:19 -0400
+X-MC-Unique: mMSJxlvQMmuo14fDa-Y4TA-1
+Received: by mail-wm1-f72.google.com with SMTP id z10so6047418wmi.8
+ for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 06:57:19 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=HzvgKtnZwE0jSyG7+ObBR6XdWBnX2EOQuwSfHX6V5jI=;
+ b=XpufYcsteh6ouZ0P65yRLGomOePXG5W8lIwsB2escbU4n1T9EFnaF686xYLDGkOexR
+ KmAvKtQR+VrI3MoMKfH2FZliHV99uQzGf+hE6+YIVoqVd3zfyr2EeuRc4q3iN43fkqlF
+ SrcBP/1zHurSpSAYLDkYqqQV7wqckbpYdjvrrO9CVRB8mUv1/4hD/ngI3wWahFqv5aJd
+ gRVx6QDXGOEz/cns+cE+MIJYFuEkuqLDgmkhvjeYhCMQf07TETrSifBQqxzymF1sFlRM
+ dMqSR1B789Mf1pF8QCQ45B7hdES0LZZqyXk/utVtqoO28H5uO+0pN8FmOkkDorfgO75y
+ nefA==
+X-Gm-Message-State: AOAM53295kQPy2C4dh1Qo0ZQspJW5K8AVveUAgyqRP57asBbCP/AzAxC
+ O2qvbJMnAh1TC89YZVrhi62TtOlc5c9+kQuZslAUkgOwrdh1lb9dazM63bPCu1QlbtFwU9gAzP0
+ ZmlLmNETPdgXFbsA=
+X-Received: by 2002:a05:6000:12c1:: with SMTP id
+ l1mr14839064wrx.270.1597672638196; 
+ Mon, 17 Aug 2020 06:57:18 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzRX8itsX18njR8k8oL0o24RH4YpBZ2WyfLFKh8oC/LN3CwLlXFT5S/f84utVzSF0XDNOP6EQ==
+X-Received: by 2002:a05:6000:12c1:: with SMTP id
+ l1mr14839050wrx.270.1597672637946; 
+ Mon, 17 Aug 2020 06:57:17 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:a0d1:fc42:c610:f977?
+ ([2001:b07:6468:f312:a0d1:fc42:c610:f977])
+ by smtp.gmail.com with ESMTPSA id k15sm30813922wrp.43.2020.08.17.06.57.17
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 17 Aug 2020 06:57:17 -0700 (PDT)
+Subject: Re: [PATCH v2 000/150] Meson integration for 5.2
+To: Cornelia Huck <cohuck@redhat.com>
+References: <20200814091326.16173-1-pbonzini@redhat.com>
+ <20200817142617.0ab2b9f3.cohuck@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <1b77c48c-108f-c603-33cf-f8d0f6b1b2b5@redhat.com>
+Date: Mon, 17 Aug 2020 15:57:19 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <20200817132938.GM11402@linux.fritz.box>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <20200817142617.0ab2b9f3.cohuck@redhat.com>
+Content-Language: en-US
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="qFhrdmAYYnAJ1CQmxvP3bNcXBMXnNvukg"
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=mreitz@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/17 05:03:47
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/17 02:47:08
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
 X-Spam_bar: ----
 X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -127,211 +118,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---qFhrdmAYYnAJ1CQmxvP3bNcXBMXnNvukg
-Content-Type: multipart/mixed; boundary="nimiRosnp6IN9KcGhjE29ELg71tneumRk"
+On 17/08/20 14:26, Cornelia Huck wrote:
+> 
+> The bad news: The build on the s390x system with Fedora 30 (yes, I
+> know) seems to be lacking various devices. The output of
+> 'qemu-system-s390x -device ?' misses all of the
+> -transitional/-non-transitional varieties for virtio-pci devices, as
+> well as some of the vhost-user devices, and, rather bizarrely, the
+> gen15* and some of the z14 cpu models (this is on a z12, so it's not
+> that all 'newer' models are missing, and I don't think the system we
+> build on should influence the generation of models, even with an older
+> compiler). I checked the output from 'qemu-system-x86_64 -device ?',
+> and it is missing the -transitional/-non-transitional virtio-pci
+> devices as well (did not check if anything else is missing as well).
 
---nimiRosnp6IN9KcGhjE29ELg71tneumRk
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Whoa, that's weird.  I'll take a look, thanks.
 
-On 17.08.20 15:29, Kevin Wolf wrote:
-> Am 17.08.2020 um 15:19 hat Max Reitz geschrieben:
->> On 17.08.20 14:45, Kevin Wolf wrote:
->>> Am 17.08.2020 um 12:03 hat Max Reitz geschrieben:
->>>> On 13.08.20 18:29, Kevin Wolf wrote:
->>>>> We want to have a common set of commands for all types of block expor=
-ts.
->>>>> Currently, this is only NBD, but we're going to add more types.
->>>>>
->>>>> This patch adds the basic BlockExport and BlockExportDriver structs a=
-nd
->>>>> a QMP command block-export-add that creates a new export based on the
->>>>> given BlockExportOptions.
->>>>>
->>>>> qmp_nbd_server_add() becomes a wrapper around qmp_block_export_add().
->>>>>
->>>>> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
->>>>> ---
->>>>>  qapi/block-export.json     |  9 ++++++
->>>>>  include/block/export.h     | 32 +++++++++++++++++++++
->>>>>  include/block/nbd.h        |  3 +-
->>>>>  block/export/export.c      | 57 ++++++++++++++++++++++++++++++++++++=
-++
->>>>>  blockdev-nbd.c             | 19 ++++++++-----
->>>>>  nbd/server.c               | 15 +++++++++-
->>>>>  Makefile.objs              |  6 ++--
->>>>>  block/Makefile.objs        |  2 ++
->>>>>  block/export/Makefile.objs |  1 +
->>>>>  9 files changed, 132 insertions(+), 12 deletions(-)
->>>>>  create mode 100644 include/block/export.h
->>>>>  create mode 100644 block/export/export.c
->>>>>  create mode 100644 block/export/Makefile.objs
->>>>
->>>> Nothing of too great importance below.  But it=E2=80=99s an RFC, so co=
-mments I
->>>> will give.
->>>>
->>>>> diff --git a/block/export/export.c b/block/export/export.c
->>>>> new file mode 100644
->>>>> index 0000000000..3d0dacb3f2
->>>>> --- /dev/null
->>>>> +++ b/block/export/export.c
->>>>> @@ -0,0 +1,57 @@
->>>>> +/*
->>>>> + * Common block export infrastructure
->>>>> + *
->>>>> + * Copyright (c) 2012, 2020 Red Hat, Inc.
->>>>> + *
->>>>> + * Authors:
->>>>> + * Paolo Bonzini <pbonzini@redhat.com>
->>>>> + * Kevin Wolf <kwolf@redhat.com>
->>>>> + *
->>>>> + * This work is licensed under the terms of the GNU GPL, version 2 o=
-r
->>>>> + * later.  See the COPYING file in the top-level directory.
->>>>> + */
->>>>> +
->>>>> +#include "qemu/osdep.h"
->>>>> +
->>>>> +#include "block/export.h"
->>>>> +#include "block/nbd.h"
->>>>> +#include "qapi/error.h"
->>>>> +#include "qapi/qapi-commands-block-export.h"
->>>>> +
->>>>> +static const BlockExportDriver* blk_exp_drivers[] =3D {
->>>>                                  ^^
->>>> Sternenplatzierung *hust*
->>>>
->>>>> +    &blk_exp_nbd,
->>>>> +};
->>>>
->>>> Not sure whether I like this better than the block driver way of
->>>> registering block drivers with a constructor.  It requires writing les=
-s
->>>> code, at the expense of making the variable global.  So I think there=
-=E2=80=99s
->>>> no good reason to prefer the block driver approach.
->>>
->>> I guess I can see one reason why we may want to switch to the
->>> registration style eventually: If we we want to make export drivers
->>> optional modules which may or may not be present.
->>
->> Good point.
->>
->>>> Maybe my hesitance comes from the variable being declared (as extern) =
-in
->>>> a header file (block/export.h).  I think I would prefer it if we put
->>>> that external reference only here in this file.  Would that work, or d=
-o
->>>> you have other plans that require blk_exp_nbd to be visible outside of
->>>> nbd/server.c and this file here?
->>>
->>> Hm, do we have precedence for "public, but not really" variables?
->>> Normally I expect public symbols to be declared in a header file.
->>
->> Hm, yes.
->>
->> tl;dr: I was wrong about a local external reference being nicer.  But I
->> believe there is a difference between externally-facing header files
->> (e.g. block.h) and internal header files (e.g. block_int.h).  I don=E2=
-=80=99t
->> know which of those block/export.h is supposed to be.
->>
->> (And of course it doesn=E2=80=99t even matter at all, really.)
->>
->>
->> non-tl;dr:
->>
->> We have a similar case for bdrv_{file,raw,qcow2}, but those are at least
->> in a *_int.h.  I can=E2=80=99t say I like that style.
->>
->> OK, let me try to figure out what my problem with this is.
->>
->> I think if a module (in this case the NBD export code) exports
->> something, it should be available in the respective header (i.e., some
->> NBD header), not in some other header.  A module=E2=80=99s header should=
- present
->> what it exports to the rest of the code.  The export code probably
->> doesn=E2=80=99t want to export the NBD driver object, it wants to import=
- it,
->> actually.  So if it should be in a header file, it should be in an NBD
->> header.
->>
->> Now none of our block drivers has a header file for exporting symbols to
->> the rest of the block code, which is why their symbols have been put
->> into block_int.h.  I think that=E2=80=99s cutting corners, but can be de=
-fended
->> by saying that block_int.h is not for exporting anything, but just
->> collects stuff internal to the block layer, so it kind of fits there.
->>
->> (Still, technically, I believe bdrv_{file,raw,qcow2} should be exported
->> by each respective block driver in a driver-specific header file.  If
->> that isn=E2=80=99t the case, it doesn=E2=80=99t really matter to me whet=
-her it=E2=80=99s put
->> into a dedicated header file to collect internal stuff (block_int.h) or
->> just imported locally (with an external declaration) where it=E2=80=99s =
-used.
->> Probably the dedicated header file is cleaner after all, right.)
->>
->> Maybe block/export.h is the same in that it=E2=80=99s just supposed to c=
-ollect
->> symbols used internally by the export code, then it isn=E2=80=99t wrong =
-to put
->> it there.  But if it=E2=80=99s a header file that may be used by non-exp=
-ort code
->> to use export functionality, then it would be wrong.
->>
->> But whatever.
->>
->> Now I have sorted out my feelings, and they don=E2=80=99t give any resul=
-t at
->> all, but it was kind of therapeutic for me.
->=20
-> Actually, there could be a conclusion: The declaration shouldn't be in
-> include/block/export.h, but in include/block/nbd.h. We already include
-> both headers in block/export/export.c because of qmp_nbd_*().
+Paolo
 
-Sounds good.
-
-> Of course, you already requests that I leave the other NBD-related stuff
-> in blockdev-nbd.c rather than moving it there, so the use of blk_exp_nbd
-> would be the only reason that remains for export.c to include nbd.h.
-
-Aww.  That=E2=80=99s too bad.
-
-> But it might still be better than having it in export.h.
-
-I=E2=80=99ll take the easy way out and leave it to you.
-
-Max
-
-
---nimiRosnp6IN9KcGhjE29ELg71tneumRk--
-
---qFhrdmAYYnAJ1CQmxvP3bNcXBMXnNvukg
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl86i/YACgkQ9AfbAGHV
-z0DoMwf+PtAZLPlnC/+F/EKbmCsceEwTjMB6tY7IwgklIJRnNmCKDlGkvDEo0ypZ
-6HBYHMv7TW+2IAdTRNfAeMEZgyxec7pUtXunaDwZDvPNoHcGry/ElEJXlBvfMnhw
-Ip3VFcsIXArR81743VTPdJ6gCDDNfeYbpTPiyRx7bHh0Dl0apSjSbAhJgdcodKjY
-aq+PXcA1277SZTtcngYnPGPuMp+wc7i97nR22LIlffnnbg5rHNGvrBRhDRc4oYyo
-CnOM/USljQWzV/yCrbQK3TzRXka2Am5EgySsvPCD8v+yW5NUmQRVlFwpmZSS6sU1
-6dtxltEGxndt7oyzM0pkspPWs7rw4Q==
-=/4ev
------END PGP SIGNATURE-----
-
---qFhrdmAYYnAJ1CQmxvP3bNcXBMXnNvukg--
+> The builds on the F31 (x86) and F32 (s390x, with -Werror disabled)
+> systems are fine.
 
 
