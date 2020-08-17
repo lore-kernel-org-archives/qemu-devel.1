@@ -7,75 +7,76 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A84C9C433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 15:17:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A307BC433E3
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 15:17:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 74242205CB
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 15:17:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7222B205CB
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 15:17:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VyZ/Nyjt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74242205CB
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HaW8+Rqv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7222B205CB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42142 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42188 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7gtU-00010D-Mv
-	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 11:17:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41434)
+	id 1k7gtV-00011D-Ks
+	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 11:17:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41648)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1k7gHc-0005M0-DS
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:38:44 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:41621)
+ id 1k7gHp-0005sO-4q
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:38:57 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:32997)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1k7gHa-0006Fn-Lm
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:38:44 -0400
-Received: by mail-wr1-x443.google.com with SMTP id r2so15269262wrs.8
- for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 07:38:42 -0700 (PDT)
+ id 1k7gHn-0006Iu-Gr
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:38:56 -0400
+Received: by mail-wr1-x443.google.com with SMTP id p20so15286319wrf.0
+ for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 07:38:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:subject:date:message-id:in-reply-to:references
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=fLQDRD2mwQArCUub7+cO8guKcXQpbRORxQdypC9xSvQ=;
- b=VyZ/NyjtdT2xpMVT3eoqy3Bmg3wmdFW3tmQhxFbPlj1oWYSWZGcTFUGcrtBGw5AY5M
- rwg2fLA6u8ACLXlJ+Xjdul0w4FfE9Kd6m8GvB7mTFgBMN8R0oORhKE0xZOGXipgKDQoQ
- cZ9b88uUXSwxhOAfOJOBMWktlRV3KMOkW45iExtMoAxzNeXvUKCJnO3Rfzzi34YyCqX2
- QIMN7rS+hHBUsue4rewT/loz+vDDQcrHYXdNcmfDuMH9jw6UX9TXnm0Yl47hx/Rix2VV
- yHqXkcVrEVVwVx8c2CHJ3aVrAGnh4SEiYdH99+42CPjnsJdWn4oG+wifN8n3VeirhX31
- c5pg==
+ bh=EqxqYSBV7uEMenTXBSHXyP24ul4XVhFr0o+0x9l/sqA=;
+ b=HaW8+Rqv9UgL2E1Lii0pa2zb99aua6U8bbg/VXRiVqa1rvYWT/yBq7C6ouXzFBXSSY
+ 2aCXyNNNEB9dwPMcfjEeg6YpUme7/OGE1rvGuyoIUW1wwCgWYmkRcEhQQkLonbABp1KC
+ JYdDfryY9JRFgYraseicwX/2128AOubNEgoBGcbvVwzU/YYx3JTDnJk86+wMXZPSQRMd
+ 4RaLAfiDxg6jjwFDzk/Mx3c7ZMHtejJdF3uJyH7u7pYCj7CUDUetyF2Or9VQfn6eR5CK
+ SjQYEbiHf8+BwPE9vCUM6rinL38mNrT4tXvicFJyQfRVgyoEtGtGndBMJ/i8c688LZ8S
+ a2rA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:subject:date:message-id
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=fLQDRD2mwQArCUub7+cO8guKcXQpbRORxQdypC9xSvQ=;
- b=S/gEhDX6OiKjFE99WdDcWJWrfLklCOJG29IT2KmR6nvGUGXYL5Z6ME6BCsy/2ObTaJ
- LluWjMBti6gv5D1Y9US85Wg52iivt3c1GqoGBVfc931Hu+uE+pvqG4aleapOslIsNvf/
- 1F9zdlLsIzNc6yOV2htg/eSZpMiO3874uOj/UwnhSPzAtUbRFLAZB8LJKYsLHoN/Lqjs
- p8wBRiqafsZCbZW4nmUE1zs00ZeLS5paQjZAchJObM8Un8iIU89Oi2Cqqt29EAbxKE3Z
- yTY/Uz78CgshwYVAu6E7KcorHxo8gca0kbn0MaaTf/UXRGMOLi6gUlCZd1pO+jieNAuY
- OnGA==
-X-Gm-Message-State: AOAM533XJ/L2iJBYN+X+iVbvQckkM3g6kOy3Y8pQbP1ZYbapanMgqvSA
- yA6gby/9sGIIwOIxCyv7TRbkAhFy06A=
-X-Google-Smtp-Source: ABdhPJwQ/CmzJ3BPg7tkhrDp9tHJV50I5i9u/u/j1YZLZ6211kP7HxTKB/9mHvFiua93rQXYahqH3g==
-X-Received: by 2002:adf:c401:: with SMTP id v1mr15102930wrf.379.1597675121024; 
- Mon, 17 Aug 2020 07:38:41 -0700 (PDT)
+ bh=EqxqYSBV7uEMenTXBSHXyP24ul4XVhFr0o+0x9l/sqA=;
+ b=GN09eXYUCIvuInVGRD2dj5P3ngy28odWRTVn9x442px+xZTdIH4j5RGRakP/EIhmzf
+ K0OZYEkmAdwha3BkzRcHREk6SKQFGbRWU/uZTUaSB8pzUhYDYtXNjvkv2lsg4QfVNZGn
+ ML4w+l2b4K+0HVNCaKCn0aqiRsdI0hlxAYYoheYTn6lBMJtrw/1GpJh5mYCcop/Sfkxr
+ KIDaPy+Dk23uQdIvQt5qqZUwSqjt6H7Xau8x4Jw/TEjXiuQx8vTJXk60d/i5YXbuRJG2
+ DEPOHqe7jv+BEAWS0fTSFXawNim7XSTwTDQ8kGg9fid1ioeyW/jwUBliaxsbSxwrgaw7
+ kkKw==
+X-Gm-Message-State: AOAM531IyWMav5rXhMpCfKaB17XhfD3qx+pbFMqFXOXw4p+7evoSCj1B
+ ElUtIp7jPsdVC9tI/PoHTBO7wE4FPSI=
+X-Google-Smtp-Source: ABdhPJy49dAjWZK2xEe6eA+Ocs7xYaXGe3LuBlPI/QwbXOGvE26seMyuGxfsH1yIWmIYsJFFVG0sKQ==
+X-Received: by 2002:adf:fd41:: with SMTP id h1mr16845136wrs.124.1597675133941; 
+ Mon, 17 Aug 2020 07:38:53 -0700 (PDT)
 Received: from donizetti.redhat.com ([2001:b07:6468:f312:a0d1:fc42:c610:f977])
  by smtp.gmail.com with ESMTPSA id
- i22sm34966603wrb.45.2020.08.17.07.38.40 for <qemu-devel@nongnu.org>
+ i22sm34966603wrb.45.2020.08.17.07.38.53
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 17 Aug 2020 07:38:40 -0700 (PDT)
+ Mon, 17 Aug 2020 07:38:53 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 076/150] meson: convert qemu-storage-daemon
-Date: Mon, 17 Aug 2020 16:36:09 +0200
-Message-Id: <20200817143723.343284-77-pbonzini@redhat.com>
+Subject: [PATCH 089/150] meson: convert hw/mem
+Date: Mon, 17 Aug 2020 16:36:22 +0200
+Message-Id: <20200817143723.343284-90-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200817143723.343284-1-pbonzini@redhat.com>
 References: <20200817143723.343284-1-pbonzini@redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=2a00:1450:4864:20::443;
  envelope-from=paolo.bonzini@gmail.com; helo=mail-wr1-x443.google.com
@@ -101,139 +102,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+From: Marc-André Lureau <marcandre.lureau@redhat.com>
+
+Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Makefile                                            |  5 -----
- Makefile.objs                                       | 10 ----------
- meson.build                                         |  2 +-
- storage-daemon/Makefile.objs                        |  3 ---
- storage-daemon/meson.build                          | 13 +++++++++++++
- storage-daemon/qapi/meson.build                     |  5 +----
- .../qemu-storage-daemon.c                           |  0
- 7 files changed, 15 insertions(+), 23 deletions(-)
- delete mode 100644 storage-daemon/Makefile.objs
- rename qemu-storage-daemon.c => storage-daemon/qemu-storage-daemon.c (100%)
+ hw/Makefile.objs     | 1 -
+ hw/mem/Kconfig       | 1 +
+ hw/mem/Makefile.objs | 3 ---
+ hw/mem/meson.build   | 6 ++++++
+ hw/meson.build       | 1 +
+ 5 files changed, 8 insertions(+), 4 deletions(-)
+ delete mode 100644 hw/mem/Makefile.objs
+ create mode 100644 hw/mem/meson.build
 
-diff --git a/Makefile b/Makefile
-index 135175c5ef..a523898da0 100644
---- a/Makefile
-+++ b/Makefile
-@@ -168,8 +168,6 @@ include $(SRC_PATH)/Makefile.objs
+diff --git a/hw/Makefile.objs b/hw/Makefile.objs
+index 73c49ddd3b..df72b25a64 100644
+--- a/hw/Makefile.objs
++++ b/hw/Makefile.objs
+@@ -34,7 +34,6 @@ devices-dirs-y += usb/
+ devices-dirs-$(CONFIG_VFIO) += vfio/
+ devices-dirs-y += virtio/
+ devices-dirs-y += watchdog/
+-devices-dirs-$(CONFIG_MEM_DEVICE) += mem/
  endif
  
- dummy := $(call unnest-vars,, \
--                storage-daemon-obj-y \
--                storage-daemon-obj-m \
-                 common-obj-y \
-                 common-obj-m)
- 
-@@ -185,7 +183,6 @@ TARGET_DIRS_RULES := $(foreach t, all fuzz clean install, $(addsuffix /$(t), $(T
- SOFTMMU_ALL_RULES=$(filter %-softmmu/all, $(TARGET_DIRS_RULES))
- $(SOFTMMU_ALL_RULES): $(authz-obj-y)
- $(SOFTMMU_ALL_RULES): $(block-obj-y)
--$(SOFTMMU_ALL_RULES): $(storage-daemon-obj-y)
- $(SOFTMMU_ALL_RULES): $(chardev-obj-y)
- $(SOFTMMU_ALL_RULES): $(crypto-obj-y)
- $(SOFTMMU_ALL_RULES): $(io-obj-y)
-@@ -276,8 +273,6 @@ Makefile: $(version-obj-y)
- 
- COMMON_LDADDS = libqemuutil.a
- 
--qemu-storage-daemon$(EXESUF): qemu-storage-daemon.o $(authz-obj-y) $(block-obj-y) $(crypto-obj-y) $(chardev-obj-y) $(io-obj-y) $(qom-obj-y) $(storage-daemon-obj-y) $(COMMON_LDADDS)
--
- clean: recurse-clean ninja-clean clean-ctlist
- 	-test -f ninjatool && ./ninjatool $(if $(V),-v,) -t clean
- # avoid old build problems by removing potentially incorrect old files
-diff --git a/Makefile.objs b/Makefile.objs
-index d7826c1e5c..e304d92954 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -33,16 +33,6 @@ io-obj-y = io/libio.fa
- 
- endif # CONFIG_SOFTMMU or CONFIG_TOOLS
- 
--#######################################################################
--# storage-daemon-obj-y is code used by qemu-storage-daemon (these objects are
--# used for system emulation, too, but specified separately there)
--
--storage-daemon-obj-y = block/ qapi/ qom/ storage-daemon/
--storage-daemon-obj-y += blockdev.o blockdev-nbd.o iothread.o job-qmp.o
--storage-daemon-obj-$(CONFIG_WIN32) += os-win32.o
--storage-daemon-obj-$(CONFIG_POSIX) += os-posix.o
--storage-daemon-obj-y += libqmp.fa
--
- ######################################################################
- # Target independent part of system emulation. The long term path is to
- # suppress *all* target specific code in case of system emulation, i.e. a
-diff --git a/meson.build b/meson.build
-index d7d10cbbaf..cae4b2dce2 100644
---- a/meson.build
-+++ b/meson.build
-@@ -586,7 +586,6 @@ subdir('util')
- subdir('qom')
- subdir('authz')
- subdir('crypto')
--subdir('storage-daemon')
- subdir('ui')
- 
- 
-@@ -796,6 +795,7 @@ if have_tools
-                dependencies: [block, qemuutil], install: true)
-   endif
- 
-+  subdir('storage-daemon')
-   subdir('contrib/rdmacm-mux')
-   subdir('contrib/elf2dmp')
- 
-diff --git a/storage-daemon/Makefile.objs b/storage-daemon/Makefile.objs
+ common-obj-y += $(devices-dirs-y)
+diff --git a/hw/mem/Kconfig b/hw/mem/Kconfig
+index c27844900d..a0ef2cf648 100644
+--- a/hw/mem/Kconfig
++++ b/hw/mem/Kconfig
+@@ -9,3 +9,4 @@ config NVDIMM
+     bool
+     default y
+     depends on (PC || PSERIES || ARM_VIRT)
++    select MEM_DEVICE
+diff --git a/hw/mem/Makefile.objs b/hw/mem/Makefile.objs
 deleted file mode 100644
-index 41c0d02178..0000000000
---- a/storage-daemon/Makefile.objs
+index 56345befd0..0000000000
+--- a/hw/mem/Makefile.objs
 +++ /dev/null
 @@ -1,3 +0,0 @@
--storage-daemon-obj-y = qapi/libqsd-qapi.fa
--
--qemu-storage-daemon.o: storage-daemon/qapi/qapi-commands.h storage-daemon/qapi/qapi-init-commands.h
-diff --git a/storage-daemon/meson.build b/storage-daemon/meson.build
-index 35f8949924..0409acc3f5 100644
---- a/storage-daemon/meson.build
-+++ b/storage-daemon/meson.build
-@@ -1 +1,14 @@
-+qsd_ss = ss.source_set()
-+qsd_ss.add(files('qemu-storage-daemon.c'))
-+qsd_ss.add(block, chardev, qmp, qom, qemuutil)
-+qsd_ss.add_all(blockdev_ss)
+-common-obj-$(CONFIG_DIMM) += pc-dimm.o
+-common-obj-y += memory-device.o
+-common-obj-$(CONFIG_NVDIMM) += nvdimm.o
+diff --git a/hw/mem/meson.build b/hw/mem/meson.build
+new file mode 100644
+index 0000000000..ba424622bb
+--- /dev/null
++++ b/hw/mem/meson.build
+@@ -0,0 +1,6 @@
++mem_ss = ss.source_set()
++mem_ss.add(files('memory-device.c'))
++mem_ss.add(when: 'CONFIG_DIMM', if_true: files('pc-dimm.c'))
++mem_ss.add(when: 'CONFIG_NVDIMM', if_true: files('nvdimm.c'))
 +
- subdir('qapi')
-+
-+if have_tools
-+  qsd_ss = qsd_ss.apply(config_host, strict: false)
-+  executable('qemu-storage-daemon',
-+             qsd_ss.sources(),
-+             dependencies: qsd_ss.dependencies(),
-+             install: true)
-+endif
-diff --git a/storage-daemon/qapi/meson.build b/storage-daemon/qapi/meson.build
-index 7a2b041247..cea618bec0 100644
---- a/storage-daemon/qapi/meson.build
-+++ b/storage-daemon/qapi/meson.build
-@@ -4,7 +4,4 @@ qsd_qapi_files = custom_target('QAPI files for qemu-storage-daemon',
-                                command: [ qapi_gen, '-o', 'storage-daemon/qapi', '@INPUT@' ],
-                                depend_files: [ qapi_inputs, qapi_gen_depends ])
- 
--static_library('qsd-qapi',
--               qsd_qapi_files.to_list(),
--               name_suffix: 'fa',
--               build_by_default: false)
-+qsd_ss.add(qsd_qapi_files.to_list())
-diff --git a/qemu-storage-daemon.c b/storage-daemon/qemu-storage-daemon.c
-similarity index 100%
-rename from qemu-storage-daemon.c
-rename to storage-daemon/qemu-storage-daemon.c
++softmmu_ss.add_all(when: 'CONFIG_MEM_DEVICE', if_true: mem_ss)
+diff --git a/hw/meson.build b/hw/meson.build
+index dccc2d19a6..542d675618 100644
+--- a/hw/meson.build
++++ b/hw/meson.build
+@@ -1,4 +1,5 @@
+ subdir('core')
++subdir('mem')
+ subdir('nubus')
+ subdir('semihosting')
+ subdir('smbios')
 -- 
 2.26.2
 
