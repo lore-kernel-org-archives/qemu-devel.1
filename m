@@ -8,76 +8,77 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8904C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 23:58:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08242C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 23:58:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B127C2072E
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 23:58:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C870C2072E
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 23:58:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GfJJH3Ik"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B127C2072E
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jUM9m7e2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C870C2072E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47116 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48086 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7p14-0005LU-1I
-	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 19:58:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57322)
+	id 1k7p1I-0005jl-3s
+	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 19:58:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57386)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <aladjev.andrew@gmail.com>)
- id 1k7p0D-0004gs-1V
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 19:57:21 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:43679)
+ id 1k7p0V-0004sZ-1U
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 19:57:39 -0400
+Received: from mail-wr1-x432.google.com ([2a00:1450:4864:20::432]:37476)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <aladjev.andrew@gmail.com>)
- id 1k7p0B-0007wv-AX
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 19:57:20 -0400
-Received: by mail-wr1-x441.google.com with SMTP id a15so16539475wrh.10
- for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 16:57:18 -0700 (PDT)
+ id 1k7p0T-0007xc-Ck
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 19:57:38 -0400
+Received: by mail-wr1-x432.google.com with SMTP id y3so16581954wrl.4
+ for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 16:57:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=sBrmmEmnH2nlvNfW79Q00MjuPYlDGFgLKe/nn6RzzQ0=;
- b=GfJJH3IkbC2OVl1buWEM0RHEZ7qlCDtUrg9vxZ0iJndyGz/DYNsvpkIq+r1AG6pzA6
- IMC9c9G27cW6y0Hxz1PT5EUJREGpJ6NvNYNh3NZRhUxobc4Uuo3fHKGCa9fVlzrlisok
- DCdMGk9GkT9krnEkOWsbFh0RBKHNJBTyl43WXWc3MFj8R6SaFLmFF1EGSlFdPuHeln95
- 01fMu1/LOkIIOv144svtT2ySeQWV3cxYGnekGjKW3okbNHJQKYza1bfCvrsRGzEd3p3b
- SlgGL57aSTeY4g3ntL2qWJCwvKAbdv3gj5iVnyRu8kOWc/ebQBzzk0X9FE6Es0SyyEmJ
- 1vWA==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=/gzpVNDN7rw08Y30zaVHDDVEjQK+MKmzOs7NKEAjHFY=;
+ b=jUM9m7e2ujjnas6KKGVNpZKJnNu6sIoLUTljzEnbaYZsVWbBzZ1N6p8PXJcqFHP70A
+ M1sIpgkv8rWNi8lSiAOjUfUkblg6scl1omjqOkmMon/qUKLUjsmRJqNgr+QgnKlHR3ra
+ ekfCHsi/wnZW1VdKoK+YpV3QYGCwk5bDlOtnH9agT5Nu01AYM7tCW1BzJliUw1gbkbPg
+ QjL71KJmORjA9Z9SI4VOnGth/BngdRVrtlFVwGC1d7zyKuwCDBGoJbk0elhDYXH72E/q
+ 5n0FbhUR/zDtO4C3HcsSr4l9XKsuD2NyNvPdE2qpVCGgmQL0g5SLOoh3nn7X85ZscHKV
+ v+yw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=sBrmmEmnH2nlvNfW79Q00MjuPYlDGFgLKe/nn6RzzQ0=;
- b=DHKLGRZQ0Hm7JvhakUpCisWigp7YYIFlrKFLnhYO5qFKbDF1eF4dGezZraceXtzWlX
- ZpAyZbhjoAuyMgmojTQZHD3DCFpZHUnfzQd2aO5tByJbYkjwLaTOsZ7z+npNot4Z3+Tu
- O9U2zrROgGb7X9hTyYOzx0JX/FhAbH9V33+bA00/tib8AO4iljVdJKX1PvXANVXtvp1J
- 7dVFtdxQfp/xkNdO5U3pObUcd+QmZdXUijoniq/NaWlkxVBS6m273672B5W/Ap8+1RCe
- bxuPB3SYRnlD509Dkx1KaI6xFEwWOH4Iey+uHleoPxpe+2WOCVt31tCjH/r0l3jvWdKD
- 9TyA==
-X-Gm-Message-State: AOAM533SSDU1MQIt/1fLU16kaQmd0Xnk+J7dXrW4y4kgguYVJ6T+fvV0
- NrR8YMYusfetry9LnNLygt6XCf/azwEbQg==
-X-Google-Smtp-Source: ABdhPJytQq6MhrG9tmckiht6HQ1cNlcmdgHvKjAJa0cQhRsQKjqtc8MIRAl+p5X7SPtREdPVOgt85A==
-X-Received: by 2002:adf:b30c:: with SMTP id j12mr17395751wrd.420.1597708637034; 
- Mon, 17 Aug 2020 16:57:17 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=/gzpVNDN7rw08Y30zaVHDDVEjQK+MKmzOs7NKEAjHFY=;
+ b=ExyyhoIAyXHKNazz2TvGNWYegd9j0JcDHzZYc10F9LS8SxoS7tI6Qf78JAMrz51jwO
+ q9Y8StiGBYdut/8f8Ug7FhRAq58TISifATOAPsZXG9Fo3uVT2EfM+sM6s3IrlL27zH2c
+ KuaVSJZ7wtZ9PndAwhhPicKE5LIYdENun6EU4fk4hfP8Qq1oUKbT19FiG2i1UfHdV1Y3
+ 0ys+Q5asdYJ1zdTogV3BGzFDxyZPACj2fVjhjzaQw5y0SfskdDnOtGQrlv7ghvqLd+Jq
+ twJp9MZ658F75EQm8q0z7KgIBF8WHP56QKIWn120bz7BQzUkjS9RbTOwGo3hQMp57agD
+ itSg==
+X-Gm-Message-State: AOAM530RzI9uAPrke62bIoqVMgOVPCHgJFRNYy5+MkopwqEfg+3xNuPH
+ LDLSPqLWuurfHqurxrgDIXIdcmIX2pP0Og==
+X-Google-Smtp-Source: ABdhPJyd2gq4/nKz3dGrARdCKleewC8j8LXjEGVZYd1tyakPSo9AacrQRWM0/h3mrmNzrDC+Ly0C/A==
+X-Received: by 2002:a5d:4d87:: with SMTP id b7mr18685666wru.170.1597708655490; 
+ Mon, 17 Aug 2020 16:57:35 -0700 (PDT)
 Received: from mini.lan (ns331963.ip-37-187-122.eu. [37.187.122.190])
- by smtp.gmail.com with ESMTPSA id z12sm32715495wrp.20.2020.08.17.16.57.15
+ by smtp.gmail.com with ESMTPSA id z12sm32715495wrp.20.2020.08.17.16.57.34
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 17 Aug 2020 16:57:16 -0700 (PDT)
+ Mon, 17 Aug 2020 16:57:34 -0700 (PDT)
 From: Andrew Aladjev <aladjev.andrew@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 1/3] linux user: make execfd global (like exec path) and keep
- it open
-Date: Tue, 18 Aug 2020 02:57:10 +0300
-Message-Id: <20200817235712.10957-1-aladjev.andrew@gmail.com>
+Subject: [PATCH 2/3] linux user: moving is proc functions to separate file
+Date: Tue, 18 Aug 2020 02:57:11 +0300
+Message-Id: <20200817235712.10957-2-aladjev.andrew@gmail.com>
 X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200817235712.10957-1-aladjev.andrew@gmail.com>
+References: <20200817235712.10957-1-aladjev.andrew@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::441;
- envelope-from=aladjev.andrew@gmail.com; helo=mail-wr1-x441.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::432;
+ envelope-from=aladjev.andrew@gmail.com; helo=mail-wr1-x432.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -104,135 +105,133 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-User opens /proc/self/exe symlink, than kernel should create /proc/self/fd/<execfd> symlink. We should be able to detect both exe and fd/<execfd> symlinks to provide common behaviour. The easiest solution is to make execfd global and keep it open. This solution looks acceptable because exec_path is already global.
-
 Signed-off-by: Andrew Aladjev <aladjev.andrew@gmail.com>
 ---
- linux-user/elfload.c |  3 ++-
- linux-user/exit.c    |  7 +++++--
- linux-user/main.c    |  2 +-
- linux-user/qemu.h    |  1 +
- linux-user/syscall.c | 18 ++++++++++++++----
- 5 files changed, 23 insertions(+), 8 deletions(-)
+ linux-user/Makefile.objs  |  5 +++--
+ linux-user/syscall.c      | 33 +--------------------------------
+ linux-user/syscall_proc.c | 32 ++++++++++++++++++++++++++++++++
+ linux-user/syscall_proc.h |  7 +++++++
+ 4 files changed, 43 insertions(+), 34 deletions(-)
+ create mode 100644 linux-user/syscall_proc.c
+ create mode 100644 linux-user/syscall_proc.h
 
-diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-index fe9dfe795d..dfaf937ab9 100644
---- a/linux-user/elfload.c
-+++ b/linux-user/elfload.c
-@@ -2363,6 +2363,7 @@ void probe_guest_base(const char *image_name, abi_ulong guest_loaddr,
+diff --git a/linux-user/Makefile.objs b/linux-user/Makefile.objs
+index 1940910a73..20f8828b86 100644
+--- a/linux-user/Makefile.objs
++++ b/linux-user/Makefile.objs
+@@ -1,7 +1,8 @@
+ obj-y = main.o syscall.o strace.o mmap.o signal.o \
+ 	elfload.o linuxload.o uaccess.o uname.o \
+-	safe-syscall.o $(TARGET_ABI_DIR)/signal.o \
+-        $(TARGET_ABI_DIR)/cpu_loop.o exit.o fd-trans.o
++	safe-syscall.o syscall_proc.o \
++	$(TARGET_ABI_DIR)/cpu_loop.o $(TARGET_ABI_DIR)/signal.o \
++        exit.o fd-trans.o
  
-    IMAGE_NAME is the filename of the image, to use in error messages.
-    IMAGE_FD is the open file descriptor for the image.
-+   WARNING: IMAGE_FD won't be closed.
- 
-    BPRM_BUF is a copy of the beginning of the file; this of course
-    contains the elf file header at offset 0.  It is assumed that this
-@@ -2632,7 +2633,6 @@ static void load_elf_image(const char *image_name, int image_fd,
- 
-     mmap_unlock();
- 
--    close(image_fd);
-     return;
- 
-  exit_read:
-@@ -2666,6 +2666,7 @@ static void load_elf_interp(const char *filename, struct image_info *info,
-     }
- 
-     load_elf_image(filename, fd, info, NULL, bprm_buf);
-+    close(fd);
-     return;
- 
-  exit_perror:
-diff --git a/linux-user/exit.c b/linux-user/exit.c
-index 1594015444..f0626fc432 100644
---- a/linux-user/exit.c
-+++ b/linux-user/exit.c
-@@ -28,12 +28,15 @@ extern void __gcov_dump(void);
- 
- void preexit_cleanup(CPUArchState *env, int code)
- {
-+    close(execfd);
-+
- #ifdef CONFIG_GPROF
-         _mcleanup();
- #endif
- #ifdef CONFIG_GCOV
-         __gcov_dump();
- #endif
--        gdb_exit(env, code);
--        qemu_plugin_atexit_cb();
-+
-+    gdb_exit(env, code);
-+    qemu_plugin_atexit_cb();
- }
-diff --git a/linux-user/main.c b/linux-user/main.c
-index 75c9785157..27644a831a 100644
---- a/linux-user/main.c
-+++ b/linux-user/main.c
-@@ -49,6 +49,7 @@
- #include "crypto/init.h"
- 
- char *exec_path;
-+int execfd;
- 
- int singlestep;
- static const char *argv0;
-@@ -629,7 +630,6 @@ int main(int argc, char **argv, char **envp)
-     int target_argc;
-     int i;
-     int ret;
--    int execfd;
-     int log_mask;
-     unsigned long max_reserved_va;
- 
-diff --git a/linux-user/qemu.h b/linux-user/qemu.h
-index 5c964389c1..f99be78d42 100644
---- a/linux-user/qemu.h
-+++ b/linux-user/qemu.h
-@@ -156,6 +156,7 @@ typedef struct TaskState {
- } __attribute__((aligned(16))) TaskState;
- 
- extern char *exec_path;
-+extern int execfd;
- void init_task_state(TaskState *ts);
- void task_settid(TaskState *);
- void stop_all_tasks(void);
+ obj-$(TARGET_HAS_BFLT) += flatload.o
+ obj-$(TARGET_I386) += vm86.o
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 945fc25279..5741c72733 100644
+index 5741c72733..01edc9b68d 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -7613,8 +7613,7 @@ static int do_openat(void *cpu_env, int dirfd, const char *pathname, int flags,
-     };
+@@ -125,6 +125,7 @@
+ #include "qapi/error.h"
+ #include "fd-trans.h"
+ #include "tcg/tcg.h"
++#include "syscall_proc.h"
  
-     if (is_proc_myself(pathname, "exe")) {
--        int execfd = qemu_getauxval(AT_EXECFD);
--        return execfd ? execfd : safe_openat(dirfd, exec_path, flags, mode);
-+        return execfd;
-     }
+ #ifndef CLONE_IO
+ #define CLONE_IO                0x80000000      /* Clone io context */
+@@ -7482,38 +7483,6 @@ static int open_self_auxv(void *cpu_env, int fd)
+     return 0;
+ }
  
-     for (fake_open = fakes; fake_open->filename; fake_open++) {
-@@ -7872,8 +7871,19 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-         return ret;
- #endif
-     case TARGET_NR_close:
--        fd_trans_unregister(arg1);
--        return get_errno(close(arg1));
-+        {
-+            int fd = arg1;
-+            if (fd == execfd) {
-+                /*
-+                 * We don't need to close execfd.
-+                 * It will be closed on QEMU exit.
-+                 */
+-static int is_proc_myself(const char *filename, const char *entry)
+-{
+-    if (!strncmp(filename, "/proc/", strlen("/proc/"))) {
+-        filename += strlen("/proc/");
+-        if (!strncmp(filename, "self/", strlen("self/"))) {
+-            filename += strlen("self/");
+-        } else if (*filename >= '1' && *filename <= '9') {
+-            char myself[80];
+-            snprintf(myself, sizeof(myself), "%d/", getpid());
+-            if (!strncmp(filename, myself, strlen(myself))) {
+-                filename += strlen(myself);
+-            } else {
+-                return 0;
+-            }
+-        } else {
+-            return 0;
+-        }
+-        if (!strcmp(filename, entry)) {
+-            return 1;
+-        }
+-    }
+-    return 0;
+-}
+-
+-#if defined(HOST_WORDS_BIGENDIAN) != defined(TARGET_WORDS_BIGENDIAN) || \
+-    defined(TARGET_SPARC) || defined(TARGET_M68K) || defined(TARGET_HPPA)
+-static int is_proc(const char *filename, const char *entry)
+-{
+-    return strcmp(filename, entry) == 0;
+-}
+-#endif
+-
+ #if defined(HOST_WORDS_BIGENDIAN) != defined(TARGET_WORDS_BIGENDIAN)
+ static int open_net_route(void *cpu_env, int fd)
+ {
+diff --git a/linux-user/syscall_proc.c b/linux-user/syscall_proc.c
+new file mode 100644
+index 0000000000..34051a8e6b
+--- /dev/null
++++ b/linux-user/syscall_proc.c
+@@ -0,0 +1,32 @@
++#include "qemu/osdep.h"
++
++#include "syscall_proc.h"
++
++int is_proc_myself(const char *filename, const char *entry)
++{
++    if (!strncmp(filename, "/proc/", strlen("/proc/"))) {
++        filename += strlen("/proc/");
++        if (!strncmp(filename, "self/", strlen("self/"))) {
++            filename += strlen("self/");
++        } else if (*filename >= '1' && *filename <= '9') {
++            char myself[80];
++            snprintf(myself, sizeof(myself), "%d/", getpid());
++            if (!strncmp(filename, myself, strlen(myself))) {
++                filename += strlen(myself);
++            } else {
 +                return 0;
 +            }
-+
-+            fd_trans_unregister(fd);
-+            return get_errno(close(fd));
++        } else {
++            return 0;
 +        }
- 
-     case TARGET_NR_brk:
-         return do_brk(arg1);
++        if (!strcmp(filename, entry)) {
++            return 1;
++        }
++    }
++    return 0;
++}
++
++int is_proc(const char *filename, const char *entry)
++{
++    return strcmp(filename, entry) == 0;
++}
+diff --git a/linux-user/syscall_proc.h b/linux-user/syscall_proc.h
+new file mode 100644
+index 0000000000..3098af931f
+--- /dev/null
++++ b/linux-user/syscall_proc.h
+@@ -0,0 +1,7 @@
++#ifndef SYSCALL_PROC_H
++#define SYSCALL_PROC_H
++
++int is_proc(const char *filename, const char *entry);
++int is_proc_myself(const char *filename, const char *entry);
++
++#endif
 -- 
 2.26.2
 
