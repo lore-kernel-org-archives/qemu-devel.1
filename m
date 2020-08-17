@@ -7,69 +7,69 @@ X-Spam-Status: No, score=-8.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34AD5C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 16:53:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EB91C433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 16:54:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0378A206FA
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 16:53:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ED24320729
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 16:54:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A93TDSpm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0378A206FA
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aEJXgnPl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED24320729
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41694 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43814 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7iO2-0000JQ-Ah
-	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 12:53:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50796)
+	id 1k7iOb-0001Et-3p
+	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 12:54:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50980)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1k7iMu-0007m6-Ir
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 12:52:20 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:42919)
+ id 1k7iNy-0000Q1-Re
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 12:53:26 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:37836
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1k7iMr-0000xS-Dy
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 12:52:20 -0400
+ id 1k7iNx-00011Z-2H
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 12:53:26 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597683136;
+ s=mimecast20190719; t=1597683204;
  h=from:from:reply-to:reply-to:subject:subject:date:date:
  message-id:message-id:to:to:cc:cc:mime-version:mime-version:
  content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=8zFUfe+pir1MJOO9qerkME2lwmB1MgfuH27wUEyju/U=;
- b=A93TDSpmDgrIqBewb0rXW56QnLpmbSI++4yBZG+ZNSA1bSfhkhXmLI8pqFGhNiNDtMzAe0
- kSdexxyBQd70WAB/v65Lu6BhSI07W8bPtCXGA6e82NLkBmq1VoCS6EZ5GV7/70E8RMpykR
- Q2Vm1TzEXfJFPNxWK5/uuCTy9UPz4uE=
+ bh=UOesBd2C41UBK3XHqnrP4ZdkKUxR8ffVTEafz2I/3LU=;
+ b=aEJXgnPl6NZ7SqHhP1gOK0T4RThcTmAspfCkSRpRp5pqggAuzesbb3joT2qaVec0zPzPW7
+ PFBkPi04yee+fny6XL1Dop1l9TzGM/MZtxS19ngYFNuwEU1roCMTfE4rZjcW2e9RpOeq++
+ 8ArQwbHNjzu9jZPkbX16cv0QK2rdYVA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-580-UPsbjWsHNnKMEgYykmAqLQ-1; Mon, 17 Aug 2020 12:52:12 -0400
-X-MC-Unique: UPsbjWsHNnKMEgYykmAqLQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-507-NMJ8hSHmMQKbD7NYUl4_YQ-1; Mon, 17 Aug 2020 12:53:22 -0400
+X-MC-Unique: NMJ8hSHmMQKbD7NYUl4_YQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5078181F014;
- Mon, 17 Aug 2020 16:52:11 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4131081F007;
+ Mon, 17 Aug 2020 16:53:21 +0000 (UTC)
 Received: from redhat.com (unknown [10.36.110.49])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1AC775D9D2;
- Mon, 17 Aug 2020 16:52:09 +0000 (UTC)
-Date: Mon, 17 Aug 2020 17:52:07 +0100
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 854525B6B6;
+ Mon, 17 Aug 2020 16:53:20 +0000 (UTC)
+Date: Mon, 17 Aug 2020 17:53:17 +0100
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: Re: [PATCH 04/17] crypto: Rename cipher include files to .inc.c
-Message-ID: <20200817165207.GN4775@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Subject: Re: [PATCH 06/17] crypto/nettle: Fix xts_encrypt arguments
+Message-ID: <20200817165317.GO4775@redhat.com>
 References: <20200813032537.2888593-1-richard.henderson@linaro.org>
- <20200813032537.2888593-5-richard.henderson@linaro.org>
- <5f63fcf7-2170-6671-f086-36716147ae3a@redhat.com>
+ <20200813032537.2888593-7-richard.henderson@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <5f63fcf7-2170-6671-f086-36716147ae3a@redhat.com>
+In-Reply-To: <20200813032537.2888593-7-richard.henderson@linaro.org>
 User-Agent: Mutt/1.14.5 (2020-06-23)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
 X-Mimecast-Spam-Score: 0.001
@@ -77,17 +77,17 @@ X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
 Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=berrange@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/17 01:24:49
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=berrange@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/17 03:34:42
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,32 +101,22 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Aug 13, 2020 at 10:00:29AM +0200, Philippe Mathieu-Daudé wrote:
-> On 8/13/20 5:25 AM, Richard Henderson wrote:
-> > QEMU standard procedure for included c files is to use *.inc.c.
-> > E.g. there are a different set of checks that are applied.
-> > 
-> > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> > ---
-> >  crypto/{cipher-builtin.c => cipher-builtin.inc.c} | 0
-> >  crypto/{cipher-gcrypt.c => cipher-gcrypt.inc.c}   | 0
-> >  crypto/{cipher-nettle.c => cipher-nettle.inc.c}   | 0
-> >  crypto/cipher.c                                   | 6 +++---
-> >  4 files changed, 3 insertions(+), 3 deletions(-)
-> >  rename crypto/{cipher-builtin.c => cipher-builtin.inc.c} (100%)
-> >  rename crypto/{cipher-gcrypt.c => cipher-gcrypt.inc.c} (100%)
-> >  rename crypto/{cipher-nettle.c => cipher-nettle.inc.c} (100%)
+On Wed, Aug 12, 2020 at 08:25:26PM -0700, Richard Henderson wrote:
+> The fourth argument to xts_encrypt should be the decrypt
+> callback; we were accidentally passing encrypt twice.
 > 
-> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> (This clashes with Paolo's Meson series renaming them to .c.inc).
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  crypto/cipher-nettle.inc.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-IIRC, we need to use  c.inc, because Meson has specific semantics
-around a file ending in ".c" that we don't want.
+Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
+
 
 Regards,
 Daniel
