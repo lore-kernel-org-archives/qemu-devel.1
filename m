@@ -7,76 +7,75 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F7DAC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 14:42:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96B03C433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 14:43:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3E17B20729
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 14:42:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3BC5320729
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 14:43:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kkv/Q3zO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E17B20729
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kXkBkhcP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3BC5320729
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38332 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41544 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7gLY-0003wh-Fb
-	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 10:42:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40388)
+	id 1k7gMK-0005IB-8i
+	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 10:43:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40446)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1k7gGV-00031c-FK
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:37:35 -0400
-Received: from mail-wr1-x430.google.com ([2a00:1450:4864:20::430]:39220)
+ id 1k7gGY-0003A8-Pc
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:37:38 -0400
+Received: from mail-wr1-x430.google.com ([2a00:1450:4864:20::430]:43835)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1k7gGU-000614-0j
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:37:35 -0400
-Received: by mail-wr1-x430.google.com with SMTP id a5so15256162wrm.6
- for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 07:37:33 -0700 (PDT)
+ id 1k7gGU-00061B-MG
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:37:38 -0400
+Received: by mail-wr1-x430.google.com with SMTP id a15so15232034wrh.10
+ for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 07:37:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ h=sender:from:to:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=9Mp8BiBSVdEYc0+9oVuuotBn7iphkJ1Zxzn3sgGCr1c=;
- b=kkv/Q3zOKVQQbtNrfctFlEG4IwDtKtJWjOAW6vL1uwwyvYw0TPOEiw/QP3ULzOtiQk
- DAWE/WiXLRft8TyKdhjlzbMNTMr2CYtRqWQyw/uicSwGLr0qBnOu2RJ585adAFM7nrqj
- fRfLTJb/B16dNAOo7WTqLxwDlur5g84IGgyTAsYyjME4j47jmeNOCM38oG1Z0SyZI4bn
- hv4qQ0sY4sTxfaMeYPdjkU2D2oPu1LoqLBfNq1hEJjhrKu8rBGLE8+SO4Bzt6ZzBEUr+
- y5LpLmc1t8QGgHh76OOMHR/xZiQgPQTzvqOuaWZj0Nw3VD7f8C0fuKL/wP5gQz2dxs+8
- 7a1g==
+ bh=qoRCGKzSh4d2/smpmVDlZsZITxNoE/1z6MyY3lVTkb4=;
+ b=kXkBkhcPIniqdAscYr8GLaTdPQOAIAHyN09GY0+vLy/afOXRLWyIoYZO06GOoqGzt7
+ rIuXWbqzcVVR9JahhDKQ0cj3W1PKs3cyo8c4FANnypjPWI+BgHfE5FeUHtiFFzszQ779
+ 2PuDwNHvj3B6h3J8RJIgyh1hOr1pkLPxU+aFmEM7JZbsLizIzDIW6B67jB4WBDXOmK3Z
+ eedEczM8JpzXrzkX7dSRx5wtQgf3gppr7i+nwYx4xEKh0d0CzozEZKxPcwB92vxX4eVb
+ 9ilyevwqchpp7iCnKn2uGNo6qmwKKVgbXXNuk3e+rvRsSis3Mfvz4m2Ew+f7iEbUxaIk
+ uQ0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ h=x-gm-message-state:sender:from:to:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=9Mp8BiBSVdEYc0+9oVuuotBn7iphkJ1Zxzn3sgGCr1c=;
- b=YX5WtPibfUc/ymY7KOdKiIk2mG18ayF08sbI3G0tqKE2M8EZ5eOcIIT7a7qsaXy1Cr
- x2A8s4V967HJxtK+tA31JR2gfNstUqL3LT7thnPlOxj8RoMOep32T1ME2gIBCyp5GI5y
- sHGEpmuUnCPOv7tta9F6fyKc9tQv/mM1/7fGo4gviMfVh3+q2/lXYULjAin5LlyrYLNU
- g9lroPp7Efwi58iXgOINlBrChjJlYyFlvx4MX5kbKAxrt9b472yUt13mjehHasj3DXEq
- S76BlwDzxVR60ksYbwqutS+AklYFizZEZHZo43zPQfGrUIEBwKPTywQCGEr45EJ3DgAj
- rAaw==
-X-Gm-Message-State: AOAM531V1AVkAbF7FmzurriWa66V8YQ24B/U2z3259nH0uK2Y8hm+Xab
- ENEfWYIgiWNTwDPJsTSaeQHCp6nhxlo=
-X-Google-Smtp-Source: ABdhPJwKaWus3GCD2XWrO4nKe0g1GXcfpqH1voAtRQnLUz6mL7G8YH7JQxSWC/PPyMq1IZ24Z0haXA==
-X-Received: by 2002:adf:bc54:: with SMTP id a20mr15634006wrh.227.1597675052444; 
- Mon, 17 Aug 2020 07:37:32 -0700 (PDT)
+ bh=qoRCGKzSh4d2/smpmVDlZsZITxNoE/1z6MyY3lVTkb4=;
+ b=ZzbqvdhXODdH1keV7LPHZX4ZTP3kcccHPSCWHrAJ6YWMXEYriFJwe52p8aQbm0uxkH
+ ZvskDVnoimCNRlrflfoQq9vHRIPX2LxLWNaUp1+KDAvSFdv3NqlP1BPf36PGULkWzjEN
+ +E8J+WGHKy7rKzG6JCNUzyx6QAsO5e/o/usp8ni+wVctMijKtJjMdqpcS0rHDp0m+EHy
+ g4nLb6XPs9P3ptKAlG9bnBVFVp/4v/a9hwFI4/2p4yh5SPJ/AAi+KrWyWszHWsiVEVGR
+ Qks4OPyCc5wPnvMBRxWnZKp096nEtaMHY5fboy05GxaUcIoHNvUzGfldUKfkWQGq/InQ
+ BWVQ==
+X-Gm-Message-State: AOAM5327f78As8urqf6QCUJRcFq9hh0MJrP/wIoX+IWciqdDM6URvCjK
+ ztgGL85//Wez5A6/tJhTehC46Gdbn6E=
+X-Google-Smtp-Source: ABdhPJxz5Co+gNh96Gkujb2kSBcUiXYPb1bmHvYDDKAkXJb2mpcdI5QUwgfPXSV8icdpHFP670ENSQ==
+X-Received: by 2002:a5d:5272:: with SMTP id l18mr14148142wrc.89.1597675051401; 
+ Mon, 17 Aug 2020 07:37:31 -0700 (PDT)
 Received: from donizetti.redhat.com ([2001:b07:6468:f312:a0d1:fc42:c610:f977])
  by smtp.gmail.com with ESMTPSA id
- i22sm34966603wrb.45.2020.08.17.07.37.31
+ i22sm34966603wrb.45.2020.08.17.07.37.30 for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 17 Aug 2020 07:37:31 -0700 (PDT)
+ Mon, 17 Aug 2020 07:37:30 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 006/150] build-sys hack: ensure target directory is there
-Date: Mon, 17 Aug 2020 16:34:59 +0200
-Message-Id: <20200817143723.343284-7-pbonzini@redhat.com>
+Subject: [PATCH 005/150] meson: rename .inc.c files to .inc
+Date: Mon, 17 Aug 2020 16:34:58 +0200
+Message-Id: <20200817143723.343284-6-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200817143723.343284-1-pbonzini@redhat.com>
 References: <20200817143723.343284-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=2a00:1450:4864:20::430;
  envelope-from=paolo.bonzini@gmail.com; helo=mail-wr1-x430.google.com
@@ -88,7 +87,8 @@ X-Spam_bar: /
 X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
  DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
  HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,36 +101,1573 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Marc-André Lureau <marcandre.lureau@redhat.com>
-
-By removing some unnest-vars calls, we miss some directory creation
-that may be required by some/dir/object.d.
-
-This will go away once everything is converted to Meson.
-
-Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- rules.mak | 1 +
- 1 file changed, 1 insertion(+)
+ .gitignore                                    |  4 +-
+ Makefile                                      | 36 ++++++++---------
+ ...{atomic_common.inc.c => atomic_common.inc} |  0
+ accel/tcg/cputlb.c                            |  2 +-
+ accel/tcg/user-exec.c                         |  2 +-
+ contrib/gitdm/filetypes.txt                   |  2 +-
+ exec.c                                        |  4 +-
+ ...cialize.inc.c => softfloat-specialize.inc} |  0
+ fpu/softfloat.c                               |  2 +-
+ include/tcg/tcg.h                             |  2 +-
+ memory_ldst.inc.c => memory_ldst.inc          |  0
+ scripts/clean-includes                        |  2 +-
+ target/arm/Makefile.objs                      | 40 +++++++++----------
+ ...ranslate-neon.inc.c => translate-neon.inc} |  6 +--
+ target/arm/translate-sve.c                    |  2 +-
+ ...{translate-vfp.inc.c => translate-vfp.inc} |  4 +-
+ target/arm/translate.c                        | 12 +++---
+ target/avr/Makefile.objs                      |  4 +-
+ target/avr/disas.c                            |  2 +-
+ target/avr/translate.c                        |  2 +-
+ target/cris/translate.c                       |  2 +-
+ ...{translate_v10.inc.c => translate_v10.inc} |  0
+ target/hppa/Makefile.objs                     |  4 +-
+ target/hppa/translate.c                       |  2 +-
+ target/mips/translate.c                       |  2 +-
+ ...ranslate_init.inc.c => translate_init.inc} |  0
+ target/openrisc/Makefile.objs                 |  6 +--
+ target/openrisc/disas.c                       |  2 +-
+ target/openrisc/translate.c                   |  2 +-
+ target/ppc/int_helper.c                       |  2 +-
+ .../{mfrom_table.inc.c => mfrom_table.inc}    |  0
+ target/ppc/translate.c                        | 22 +++++-----
+ .../{dfp-impl.inc.c => dfp-impl.inc}          |  0
+ .../translate/{dfp-ops.inc.c => dfp-ops.inc}  |  0
+ .../translate/{fp-impl.inc.c => fp-impl.inc}  |  0
+ .../translate/{fp-ops.inc.c => fp-ops.inc}    |  0
+ .../{spe-impl.inc.c => spe-impl.inc}          |  0
+ .../translate/{spe-ops.inc.c => spe-ops.inc}  |  0
+ .../{vmx-impl.inc.c => vmx-impl.inc}          |  0
+ .../translate/{vmx-ops.inc.c => vmx-ops.inc}  |  0
+ .../{vsx-impl.inc.c => vsx-impl.inc}          |  0
+ .../translate/{vsx-ops.inc.c => vsx-ops.inc}  |  0
+ ...ranslate_init.inc.c => translate_init.inc} |  0
+ target/riscv/Makefile.objs                    |  8 ++--
+ ..._privileged.inc.c => trans_privileged.inc} |  0
+ .../{trans_rva.inc.c => trans_rva.inc}        |  0
+ .../{trans_rvd.inc.c => trans_rvd.inc}        |  0
+ .../{trans_rvf.inc.c => trans_rvf.inc}        |  0
+ .../{trans_rvh.inc.c => trans_rvh.inc}        |  0
+ .../{trans_rvi.inc.c => trans_rvi.inc}        |  0
+ .../{trans_rvm.inc.c => trans_rvm.inc}        |  0
+ .../{trans_rvv.inc.c => trans_rvv.inc}        |  0
+ target/riscv/translate.c                      | 20 +++++-----
+ target/rx/Makefile.objs                       |  6 +--
+ target/rx/disas.c                             |  2 +-
+ target/rx/translate.c                         |  2 +-
+ target/s390x/translate.c                      |  2 +-
+ .../{translate_vx.inc.c => translate_vx.inc}  |  0
+ target/xtensa/core-dc232b.c                   |  4 +-
+ .../{gdb-config.inc.c => gdb-config.inc}      |  0
+ ...tensa-modules.inc.c => xtensa-modules.inc} |  0
+ target/xtensa/core-dc233c.c                   |  4 +-
+ .../{gdb-config.inc.c => gdb-config.inc}      |  0
+ ...tensa-modules.inc.c => xtensa-modules.inc} |  0
+ target/xtensa/core-de212.c                    |  4 +-
+ .../{gdb-config.inc.c => gdb-config.inc}      |  0
+ ...tensa-modules.inc.c => xtensa-modules.inc} |  0
+ target/xtensa/core-fsf.c                      |  2 +-
+ ...tensa-modules.inc.c => xtensa-modules.inc} |  0
+ target/xtensa/core-sample_controller.c        |  4 +-
+ .../{gdb-config.inc.c => gdb-config.inc}      |  0
+ ...tensa-modules.inc.c => xtensa-modules.inc} |  0
+ target/xtensa/core-test_kc705_be.c            |  4 +-
+ .../{gdb-config.inc.c => gdb-config.inc}      |  0
+ ...tensa-modules.inc.c => xtensa-modules.inc} |  0
+ target/xtensa/core-test_mmuhifi_c3.c          |  4 +-
+ .../{gdb-config.inc.c => gdb-config.inc}      |  0
+ ...tensa-modules.inc.c => xtensa-modules.inc} |  0
+ target/xtensa/import_core.sh                  |  8 ++--
+ tcg/README                                    |  2 +-
+ .../{tcg-target.inc.c => tcg-target.inc}      |  4 +-
+ tcg/arm/{tcg-target.inc.c => tcg-target.inc}  |  4 +-
+ tcg/i386/{tcg-target.inc.c => tcg-target.inc} |  4 +-
+ tcg/mips/{tcg-target.inc.c => tcg-target.inc} |  2 +-
+ tcg/ppc/{tcg-target.inc.c => tcg-target.inc}  |  4 +-
+ .../{tcg-target.inc.c => tcg-target.inc}      |  4 +-
+ tcg/s390/{tcg-target.inc.c => tcg-target.inc} |  4 +-
+ .../{tcg-target.inc.c => tcg-target.inc}      |  2 +-
+ tcg/{tcg-ldst.inc.c => tcg-ldst.inc}          |  0
+ tcg/{tcg-pool.inc.c => tcg-pool.inc}          |  2 +-
+ tcg/tcg.c                                     |  6 +--
+ tcg/tci/README                                |  4 +-
+ tcg/tci/{tcg-target.inc.c => tcg-target.inc}  |  0
+ tests/fp/fp-test.c                            |  2 +-
+ tests/fp/{wrap.inc.c => wrap.inc}             |  0
+ ui/input-keymap.c                             | 34 ++++++++--------
+ ui/vnc-enc-zrle.c                             | 22 +++++-----
+ ui/{vnc-enc-zrle.inc.c => vnc-enc-zrle.inc}   |  0
+ 98 files changed, 173 insertions(+), 173 deletions(-)
+ rename accel/tcg/{atomic_common.inc.c => atomic_common.inc} (100%)
+ rename fpu/{softfloat-specialize.inc.c => softfloat-specialize.inc} (100%)
+ rename memory_ldst.inc.c => memory_ldst.inc (100%)
+ rename target/arm/{translate-neon.inc.c => translate-neon.inc} (99%)
+ rename target/arm/{translate-vfp.inc.c => translate-vfp.inc} (99%)
+ rename target/cris/{translate_v10.inc.c => translate_v10.inc} (100%)
+ rename target/mips/{translate_init.inc.c => translate_init.inc} (100%)
+ rename target/ppc/{mfrom_table.inc.c => mfrom_table.inc} (100%)
+ rename target/ppc/translate/{dfp-impl.inc.c => dfp-impl.inc} (100%)
+ rename target/ppc/translate/{dfp-ops.inc.c => dfp-ops.inc} (100%)
+ rename target/ppc/translate/{fp-impl.inc.c => fp-impl.inc} (100%)
+ rename target/ppc/translate/{fp-ops.inc.c => fp-ops.inc} (100%)
+ rename target/ppc/translate/{spe-impl.inc.c => spe-impl.inc} (100%)
+ rename target/ppc/translate/{spe-ops.inc.c => spe-ops.inc} (100%)
+ rename target/ppc/translate/{vmx-impl.inc.c => vmx-impl.inc} (100%)
+ rename target/ppc/translate/{vmx-ops.inc.c => vmx-ops.inc} (100%)
+ rename target/ppc/translate/{vsx-impl.inc.c => vsx-impl.inc} (100%)
+ rename target/ppc/translate/{vsx-ops.inc.c => vsx-ops.inc} (100%)
+ rename target/ppc/{translate_init.inc.c => translate_init.inc} (100%)
+ rename target/riscv/insn_trans/{trans_privileged.inc.c => trans_privileged.inc} (100%)
+ rename target/riscv/insn_trans/{trans_rva.inc.c => trans_rva.inc} (100%)
+ rename target/riscv/insn_trans/{trans_rvd.inc.c => trans_rvd.inc} (100%)
+ rename target/riscv/insn_trans/{trans_rvf.inc.c => trans_rvf.inc} (100%)
+ rename target/riscv/insn_trans/{trans_rvh.inc.c => trans_rvh.inc} (100%)
+ rename target/riscv/insn_trans/{trans_rvi.inc.c => trans_rvi.inc} (100%)
+ rename target/riscv/insn_trans/{trans_rvm.inc.c => trans_rvm.inc} (100%)
+ rename target/riscv/insn_trans/{trans_rvv.inc.c => trans_rvv.inc} (100%)
+ rename target/s390x/{translate_vx.inc.c => translate_vx.inc} (100%)
+ rename target/xtensa/core-dc232b/{gdb-config.inc.c => gdb-config.inc} (100%)
+ rename target/xtensa/core-dc232b/{xtensa-modules.inc.c => xtensa-modules.inc} (100%)
+ rename target/xtensa/core-dc233c/{gdb-config.inc.c => gdb-config.inc} (100%)
+ rename target/xtensa/core-dc233c/{xtensa-modules.inc.c => xtensa-modules.inc} (100%)
+ rename target/xtensa/core-de212/{gdb-config.inc.c => gdb-config.inc} (100%)
+ rename target/xtensa/core-de212/{xtensa-modules.inc.c => xtensa-modules.inc} (100%)
+ rename target/xtensa/core-fsf/{xtensa-modules.inc.c => xtensa-modules.inc} (100%)
+ rename target/xtensa/core-sample_controller/{gdb-config.inc.c => gdb-config.inc} (100%)
+ rename target/xtensa/core-sample_controller/{xtensa-modules.inc.c => xtensa-modules.inc} (100%)
+ rename target/xtensa/core-test_kc705_be/{gdb-config.inc.c => gdb-config.inc} (100%)
+ rename target/xtensa/core-test_kc705_be/{xtensa-modules.inc.c => xtensa-modules.inc} (100%)
+ rename target/xtensa/core-test_mmuhifi_c3/{gdb-config.inc.c => gdb-config.inc} (100%)
+ rename target/xtensa/core-test_mmuhifi_c3/{xtensa-modules.inc.c => xtensa-modules.inc} (100%)
+ rename tcg/aarch64/{tcg-target.inc.c => tcg-target.inc} (99%)
+ rename tcg/arm/{tcg-target.inc.c => tcg-target.inc} (99%)
+ rename tcg/i386/{tcg-target.inc.c => tcg-target.inc} (99%)
+ rename tcg/mips/{tcg-target.inc.c => tcg-target.inc} (99%)
+ rename tcg/ppc/{tcg-target.inc.c => tcg-target.inc} (99%)
+ rename tcg/riscv/{tcg-target.inc.c => tcg-target.inc} (99%)
+ rename tcg/s390/{tcg-target.inc.c => tcg-target.inc} (99%)
+ rename tcg/sparc/{tcg-target.inc.c => tcg-target.inc} (99%)
+ rename tcg/{tcg-ldst.inc.c => tcg-ldst.inc} (100%)
+ rename tcg/{tcg-pool.inc.c => tcg-pool.inc} (99%)
+ rename tcg/tci/{tcg-target.inc.c => tcg-target.inc} (100%)
+ rename tests/fp/{wrap.inc.c => wrap.inc} (100%)
+ rename ui/{vnc-enc-zrle.inc.c => vnc-enc-zrle.inc} (100%)
 
-diff --git a/rules.mak b/rules.mak
-index 694865b63e..56ba540a32 100644
---- a/rules.mak
-+++ b/rules.mak
-@@ -66,6 +66,7 @@ expand-objs = $(strip $(sort $(filter %.o,$1)) \
-                   $(filter-out %.o %.mo,$1))
+diff --git a/.gitignore b/.gitignore
+index 656e39050b..2424131c65 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -18,7 +18,7 @@
+ /ui/shader/texture-blit-frag.h
+ /ui/shader/texture-blit-vert.h
+ /ui/shader/texture-blit-flip-vert.h
+-/ui/input-keymap-*.c
++/ui/input-keymap-*.inc
+ *-timestamp
+ /*-softmmu
+ /*-darwin-user
+@@ -161,4 +161,4 @@ trace-dtrace-root.h
+ trace-dtrace-root.dtrace
+ trace-ust-all.h
+ trace-ust-all.c
+-/target/arm/decode-sve.inc.c
++/target/arm/decode-sve.inc
+diff --git a/Makefile b/Makefile
+index 00cadebf99..f237ff899d 100644
+--- a/Makefile
++++ b/Makefile
+@@ -289,28 +289,28 @@ KEYCODEMAP_GEN = $(SRC_PATH)/ui/keycodemapdb/tools/keymap-gen
+ KEYCODEMAP_CSV = $(SRC_PATH)/ui/keycodemapdb/data/keymaps.csv
  
- %.o: %.c
-+	@mkdir -p $(dir $@)
- 	$(call quiet-command,$(CC) $(QEMU_LOCAL_INCLUDES) $(QEMU_INCLUDES) \
- 	       $(QEMU_CFLAGS) $(QEMU_DGFLAGS) $(CFLAGS) $($@-cflags) \
- 	       -c -o $@ $<,"CC","$(TARGET_DIR)$@")
+ KEYCODEMAP_FILES = \
+-		 ui/input-keymap-atset1-to-qcode.c \
+-		 ui/input-keymap-linux-to-qcode.c \
+-		 ui/input-keymap-qcode-to-atset1.c \
+-		 ui/input-keymap-qcode-to-atset2.c \
+-		 ui/input-keymap-qcode-to-atset3.c \
+-		 ui/input-keymap-qcode-to-linux.c \
+-		 ui/input-keymap-qcode-to-qnum.c \
+-		 ui/input-keymap-qcode-to-sun.c \
+-		 ui/input-keymap-qnum-to-qcode.c \
+-		 ui/input-keymap-usb-to-qcode.c \
+-		 ui/input-keymap-win32-to-qcode.c \
+-		 ui/input-keymap-x11-to-qcode.c \
+-		 ui/input-keymap-xorgevdev-to-qcode.c \
+-		 ui/input-keymap-xorgkbd-to-qcode.c \
+-		 ui/input-keymap-xorgxquartz-to-qcode.c \
+-		 ui/input-keymap-xorgxwin-to-qcode.c \
+-		 ui/input-keymap-osx-to-qcode.c \
++		 ui/input-keymap-atset1-to-qcode.inc \
++		 ui/input-keymap-linux-to-qcode.inc \
++		 ui/input-keymap-qcode-to-atset1.inc \
++		 ui/input-keymap-qcode-to-atset2.inc \
++		 ui/input-keymap-qcode-to-atset3.inc \
++		 ui/input-keymap-qcode-to-linux.inc \
++		 ui/input-keymap-qcode-to-qnum.inc \
++		 ui/input-keymap-qcode-to-sun.inc \
++		 ui/input-keymap-qnum-to-qcode.inc \
++		 ui/input-keymap-usb-to-qcode.inc \
++		 ui/input-keymap-win32-to-qcode.inc \
++		 ui/input-keymap-x11-to-qcode.inc \
++		 ui/input-keymap-xorgevdev-to-qcode.inc \
++		 ui/input-keymap-xorgkbd-to-qcode.inc \
++		 ui/input-keymap-xorgxquartz-to-qcode.inc \
++		 ui/input-keymap-xorgxwin-to-qcode.inc \
++		 ui/input-keymap-osx-to-qcode.inc \
+ 		 $(NULL)
+ 
+ generated-files-$(CONFIG_SOFTMMU) += $(KEYCODEMAP_FILES)
+ 
+-ui/input-keymap-%.c: $(KEYCODEMAP_GEN) $(KEYCODEMAP_CSV) $(SRC_PATH)/ui/Makefile.objs
++ui/input-keymap-%.inc: $(KEYCODEMAP_GEN) $(KEYCODEMAP_CSV) $(SRC_PATH)/ui/Makefile.objs
+ 	$(call quiet-command,\
+ 	    stem=$* && src=$${stem%-to-*} dst=$${stem#*-to-} && \
+ 	    test -e $(KEYCODEMAP_GEN) && \
+diff --git a/accel/tcg/atomic_common.inc.c b/accel/tcg/atomic_common.inc
+similarity index 100%
+rename from accel/tcg/atomic_common.inc.c
+rename to accel/tcg/atomic_common.inc
+diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
+index 5349ee6b0e..ca4c98224d 100644
+--- a/accel/tcg/cputlb.c
++++ b/accel/tcg/cputlb.c
+@@ -2354,7 +2354,7 @@ void cpu_stq_le_data(CPUArchState *env, target_ulong ptr, uint64_t val)
+ #define ATOMIC_MMU_CLEANUP
+ #define ATOMIC_MMU_IDX   get_mmuidx(oi)
+ 
+-#include "atomic_common.inc.c"
++#include "atomic_common.inc"
+ 
+ #define DATA_SIZE 1
+ #include "atomic_template.h"
+diff --git a/accel/tcg/user-exec.c b/accel/tcg/user-exec.c
+index 1d34c57ff5..e219ecc916 100644
+--- a/accel/tcg/user-exec.c
++++ b/accel/tcg/user-exec.c
+@@ -1189,7 +1189,7 @@ static void *atomic_mmu_lookup(CPUArchState *env, target_ulong addr,
+ #define ATOMIC_NAME(X)   HELPER(glue(glue(atomic_ ## X, SUFFIX), END))
+ #define EXTRA_ARGS
+ 
+-#include "atomic_common.inc.c"
++#include "atomic_common.inc"
+ 
+ #define DATA_SIZE 1
+ #include "atomic_template.h"
+diff --git a/contrib/gitdm/filetypes.txt b/contrib/gitdm/filetypes.txt
+index 2d5002fea0..e8e2628a36 100644
+--- a/contrib/gitdm/filetypes.txt
++++ b/contrib/gitdm/filetypes.txt
+@@ -42,7 +42,7 @@ order build,interface,tests,code,documentation,devel-doc,blobs
+ # (most common languages first
+ #
+ filetype code \.c$	# C
+-filetype code \.inc.c$	# C
++filetype code \.inc$	# C
+ filetype code \.C$	# C++
+ filetype code \.cpp$	# C++
+ filetype code \.c\+\+$	# C++
+diff --git a/exec.c b/exec.c
+index 8047bf2ff9..f5915ce24c 100644
+--- a/exec.c
++++ b/exec.c
+@@ -3659,7 +3659,7 @@ void cpu_physical_memory_unmap(void *buffer, hwaddr len,
+ #define TRANSLATE(...)           address_space_translate(as, __VA_ARGS__)
+ #define RCU_READ_LOCK(...)       rcu_read_lock()
+ #define RCU_READ_UNLOCK(...)     rcu_read_unlock()
+-#include "memory_ldst.inc.c"
++#include "memory_ldst.inc"
+ 
+ int64_t address_space_cache_init(MemoryRegionCache *cache,
+                                  AddressSpace *as,
+@@ -3795,7 +3795,7 @@ address_space_write_cached_slow(MemoryRegionCache *cache, hwaddr addr,
+ #define TRANSLATE(...)           address_space_translate_cached(cache, __VA_ARGS__)
+ #define RCU_READ_LOCK()          ((void)0)
+ #define RCU_READ_UNLOCK()        ((void)0)
+-#include "memory_ldst.inc.c"
++#include "memory_ldst.inc"
+ 
+ /* virtual memory access for debug (includes writing to ROM) */
+ int cpu_memory_rw_debug(CPUState *cpu, target_ulong addr,
+diff --git a/fpu/softfloat-specialize.inc.c b/fpu/softfloat-specialize.inc
+similarity index 100%
+rename from fpu/softfloat-specialize.inc.c
+rename to fpu/softfloat-specialize.inc
+diff --git a/fpu/softfloat.c b/fpu/softfloat.c
+index 79be4f5840..7fb1f3b9bf 100644
+--- a/fpu/softfloat.c
++++ b/fpu/softfloat.c
+@@ -621,7 +621,7 @@ static inline float64 float64_pack_raw(FloatParts p)
+ | are propagated from function inputs to output.  These details are target-
+ | specific.
+ *----------------------------------------------------------------------------*/
+-#include "softfloat-specialize.inc.c"
++#include "softfloat-specialize.inc"
+ 
+ /* Canonicalize EXP and FRAC, setting CLS.  */
+ static FloatParts sf_canonicalize(FloatParts part, const FloatFmt *parm,
+diff --git a/include/tcg/tcg.h b/include/tcg/tcg.h
+index e63450a893..89fa9cffe9 100644
+--- a/include/tcg/tcg.h
++++ b/include/tcg/tcg.h
+@@ -636,7 +636,7 @@ struct TCGContext {
+     /* Track which vCPU triggers events */
+     CPUState *cpu;                      /* *_trans */
+ 
+-    /* These structures are private to tcg-target.inc.c.  */
++    /* These structures are private to tcg-target.inc.  */
+ #ifdef TCG_TARGET_NEED_LDST_LABELS
+     QSIMPLEQ_HEAD(, TCGLabelQemuLdst) ldst_labels;
+ #endif
+diff --git a/memory_ldst.inc.c b/memory_ldst.inc
+similarity index 100%
+rename from memory_ldst.inc.c
+rename to memory_ldst.inc
+diff --git a/scripts/clean-includes b/scripts/clean-includes
+index 795b3bea31..ff2dbe8525 100755
+--- a/scripts/clean-includes
++++ b/scripts/clean-includes
+@@ -113,7 +113,7 @@ EOT
+ 
+ for f in "$@"; do
+   case "$f" in
+-    *.inc.c)
++    *.inc)
+       # These aren't standalone C source files
+       echo "SKIPPING $f (not a standalone source file)"
+       continue
+diff --git a/target/arm/Makefile.objs b/target/arm/Makefile.objs
+index fa39fd7c83..4a177ad914 100644
+--- a/target/arm/Makefile.objs
++++ b/target/arm/Makefile.objs
+@@ -13,66 +13,66 @@ obj-$(call lnot,$(CONFIG_KVM)) += kvm-stub.o
+ 
+ DECODETREE = $(SRC_PATH)/scripts/decodetree.py
+ 
+-target/arm/decode-sve.inc.c: $(SRC_PATH)/target/arm/sve.decode $(DECODETREE)
++target/arm/decode-sve.inc: $(SRC_PATH)/target/arm/sve.decode $(DECODETREE)
+ 	$(call quiet-command,\
+ 	  $(PYTHON) $(DECODETREE) --decode disas_sve -o $@ $<,\
+ 	  "GEN", $(TARGET_DIR)$@)
+ 
+-target/arm/decode-neon-shared.inc.c: $(SRC_PATH)/target/arm/neon-shared.decode $(DECODETREE)
++target/arm/decode-neon-shared.inc: $(SRC_PATH)/target/arm/neon-shared.decode $(DECODETREE)
+ 	$(call quiet-command,\
+ 	  $(PYTHON) $(DECODETREE) --static-decode disas_neon_shared -o $@ $<,\
+ 	  "GEN", $(TARGET_DIR)$@)
+ 
+-target/arm/decode-neon-dp.inc.c: $(SRC_PATH)/target/arm/neon-dp.decode $(DECODETREE)
++target/arm/decode-neon-dp.inc: $(SRC_PATH)/target/arm/neon-dp.decode $(DECODETREE)
+ 	$(call quiet-command,\
+ 	  $(PYTHON) $(DECODETREE) --static-decode disas_neon_dp -o $@ $<,\
+ 	  "GEN", $(TARGET_DIR)$@)
+ 
+-target/arm/decode-neon-ls.inc.c: $(SRC_PATH)/target/arm/neon-ls.decode $(DECODETREE)
++target/arm/decode-neon-ls.inc: $(SRC_PATH)/target/arm/neon-ls.decode $(DECODETREE)
+ 	$(call quiet-command,\
+ 	  $(PYTHON) $(DECODETREE) --static-decode disas_neon_ls -o $@ $<,\
+ 	  "GEN", $(TARGET_DIR)$@)
+ 
+-target/arm/decode-vfp.inc.c: $(SRC_PATH)/target/arm/vfp.decode $(DECODETREE)
++target/arm/decode-vfp.inc: $(SRC_PATH)/target/arm/vfp.decode $(DECODETREE)
+ 	$(call quiet-command,\
+ 	  $(PYTHON) $(DECODETREE) --static-decode disas_vfp -o $@ $<,\
+ 	  "GEN", $(TARGET_DIR)$@)
+ 
+-target/arm/decode-vfp-uncond.inc.c: $(SRC_PATH)/target/arm/vfp-uncond.decode $(DECODETREE)
++target/arm/decode-vfp-uncond.inc: $(SRC_PATH)/target/arm/vfp-uncond.decode $(DECODETREE)
+ 	$(call quiet-command,\
+ 	  $(PYTHON) $(DECODETREE) --static-decode disas_vfp_uncond -o $@ $<,\
+ 	  "GEN", $(TARGET_DIR)$@)
+ 
+-target/arm/decode-a32.inc.c: $(SRC_PATH)/target/arm/a32.decode $(DECODETREE)
++target/arm/decode-a32.inc: $(SRC_PATH)/target/arm/a32.decode $(DECODETREE)
+ 	$(call quiet-command,\
+ 	  $(PYTHON) $(DECODETREE) --static-decode disas_a32 -o $@ $<,\
+ 	  "GEN", $(TARGET_DIR)$@)
+ 
+-target/arm/decode-a32-uncond.inc.c: $(SRC_PATH)/target/arm/a32-uncond.decode $(DECODETREE)
++target/arm/decode-a32-uncond.inc: $(SRC_PATH)/target/arm/a32-uncond.decode $(DECODETREE)
+ 	$(call quiet-command,\
+ 	  $(PYTHON) $(DECODETREE) --static-decode disas_a32_uncond -o $@ $<,\
+ 	  "GEN", $(TARGET_DIR)$@)
+ 
+-target/arm/decode-t32.inc.c: $(SRC_PATH)/target/arm/t32.decode $(DECODETREE)
++target/arm/decode-t32.inc: $(SRC_PATH)/target/arm/t32.decode $(DECODETREE)
+ 	$(call quiet-command,\
+ 	  $(PYTHON) $(DECODETREE) --static-decode disas_t32 -o $@ $<,\
+ 	  "GEN", $(TARGET_DIR)$@)
+ 
+-target/arm/decode-t16.inc.c: $(SRC_PATH)/target/arm/t16.decode $(DECODETREE)
++target/arm/decode-t16.inc: $(SRC_PATH)/target/arm/t16.decode $(DECODETREE)
+ 	$(call quiet-command,\
+ 	  $(PYTHON) $(DECODETREE) -w 16 --static-decode disas_t16 -o $@ $<,\
+ 	  "GEN", $(TARGET_DIR)$@)
+ 
+-target/arm/translate-sve.o: target/arm/decode-sve.inc.c
+-target/arm/translate.o: target/arm/decode-neon-shared.inc.c
+-target/arm/translate.o: target/arm/decode-neon-dp.inc.c
+-target/arm/translate.o: target/arm/decode-neon-ls.inc.c
+-target/arm/translate.o: target/arm/decode-vfp.inc.c
+-target/arm/translate.o: target/arm/decode-vfp-uncond.inc.c
+-target/arm/translate.o: target/arm/decode-a32.inc.c
+-target/arm/translate.o: target/arm/decode-a32-uncond.inc.c
+-target/arm/translate.o: target/arm/decode-t32.inc.c
+-target/arm/translate.o: target/arm/decode-t16.inc.c
++target/arm/translate-sve.o: target/arm/decode-sve.inc
++target/arm/translate.o: target/arm/decode-neon-shared.inc
++target/arm/translate.o: target/arm/decode-neon-dp.inc
++target/arm/translate.o: target/arm/decode-neon-ls.inc
++target/arm/translate.o: target/arm/decode-vfp.inc
++target/arm/translate.o: target/arm/decode-vfp-uncond.inc
++target/arm/translate.o: target/arm/decode-a32.inc
++target/arm/translate.o: target/arm/decode-a32-uncond.inc
++target/arm/translate.o: target/arm/decode-t32.inc
++target/arm/translate.o: target/arm/decode-t16.inc
+ 
+ obj-y += tlb_helper.o debug_helper.o
+ obj-y += translate.o op_helper.o
+diff --git a/target/arm/translate-neon.inc.c b/target/arm/translate-neon.inc
+similarity index 99%
+rename from target/arm/translate-neon.inc.c
+rename to target/arm/translate-neon.inc
+index f6cb921573..ac0ddcc2d0 100644
+--- a/target/arm/translate-neon.inc.c
++++ b/target/arm/translate-neon.inc
+@@ -50,9 +50,9 @@ static inline int rsub_8(DisasContext *s, int x)
+ }
+ 
+ /* Include the generated Neon decoder */
+-#include "decode-neon-dp.inc.c"
+-#include "decode-neon-ls.inc.c"
+-#include "decode-neon-shared.inc.c"
++#include "decode-neon-dp.inc"
++#include "decode-neon-ls.inc"
++#include "decode-neon-shared.inc"
+ 
+ /* Return the offset of a 2**SIZE piece of a NEON register, at index ELE,
+  * where 0 is the least significant end of the register.
+diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
+index 88a2fb271d..60c0716389 100644
+--- a/target/arm/translate-sve.c
++++ b/target/arm/translate-sve.c
+@@ -100,7 +100,7 @@ static inline int msz_dtype(DisasContext *s, int msz)
+  * Include the generated decoder.
+  */
+ 
+-#include "decode-sve.inc.c"
++#include "decode-sve.inc"
+ 
+ /*
+  * Implement all of the translator functions referenced by the decoder.
+diff --git a/target/arm/translate-vfp.inc.c b/target/arm/translate-vfp.inc
+similarity index 99%
+rename from target/arm/translate-vfp.inc.c
+rename to target/arm/translate-vfp.inc
+index afa8a5f888..1f518b45e3 100644
+--- a/target/arm/translate-vfp.inc.c
++++ b/target/arm/translate-vfp.inc
+@@ -27,8 +27,8 @@
+  */
+ 
+ /* Include the generated VFP decoder */
+-#include "decode-vfp.inc.c"
+-#include "decode-vfp-uncond.inc.c"
++#include "decode-vfp.inc"
++#include "decode-vfp-uncond.inc"
+ 
+ /*
+  * The imm8 encodes the sign bit, enough bits to represent an exponent in
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index c39a929b93..3128fa6fcf 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -1176,8 +1176,8 @@ static TCGv_ptr vfp_reg_ptr(bool dp, int reg)
+ #define ARM_CP_RW_BIT   (1 << 20)
+ 
+ /* Include the VFP and Neon decoders */
+-#include "translate-vfp.inc.c"
+-#include "translate-neon.inc.c"
++#include "translate-vfp.inc"
++#include "translate-neon.inc"
+ 
+ static inline void iwmmxt_load_reg(TCGv_i64 var, int reg)
+ {
+@@ -5217,10 +5217,10 @@ static int t16_pop_list(DisasContext *s, int x)
+  * Include the generated decoders.
+  */
+ 
+-#include "decode-a32.inc.c"
+-#include "decode-a32-uncond.inc.c"
+-#include "decode-t32.inc.c"
+-#include "decode-t16.inc.c"
++#include "decode-a32.inc"
++#include "decode-a32-uncond.inc"
++#include "decode-t32.inc"
++#include "decode-t16.inc"
+ 
+ /* Helpers to swap operands for reverse-subtract.  */
+ static void gen_rsb(TCGv_i32 dst, TCGv_i32 a, TCGv_i32 b)
+diff --git a/target/avr/Makefile.objs b/target/avr/Makefile.objs
+index 6e35ba2c5c..81d9bcd1ba 100644
+--- a/target/avr/Makefile.objs
++++ b/target/avr/Makefile.objs
+@@ -21,12 +21,12 @@
+ DECODETREE = $(SRC_PATH)/scripts/decodetree.py
+ decode-y = $(SRC_PATH)/target/avr/insn.decode
+ 
+-target/avr/decode_insn.inc.c: $(decode-y) $(DECODETREE)
++target/avr/decode_insn.inc: $(decode-y) $(DECODETREE)
+ 	$(call quiet-command, \
+ 	  $(PYTHON) $(DECODETREE) -o $@ --decode decode_insn --insnwidth 16 $<, \
+ 	  "GEN", $(TARGET_DIR)$@)
+ 
+-target/avr/translate.o: target/avr/decode_insn.inc.c
++target/avr/translate.o: target/avr/decode_insn.inc
+ 
+ obj-y += translate.o cpu.o helper.o
+ obj-y += gdbstub.o
+diff --git a/target/avr/disas.c b/target/avr/disas.c
+index 8e1bac4d76..c45ab2cb14 100644
+--- a/target/avr/disas.c
++++ b/target/avr/disas.c
+@@ -60,7 +60,7 @@ static int append_16(DisasContext *ctx, int x)
+ 
+ /* Include the auto-generated decoder.  */
+ static bool decode_insn(DisasContext *ctx, uint16_t insn);
+-#include "decode_insn.inc.c"
++#include "decode_insn.inc"
+ 
+ #define output(mnemonic, format, ...) \
+     (pctx->info->fprintf_func(pctx->info->stream, "%-9s " format, \
+diff --git a/target/avr/translate.c b/target/avr/translate.c
+index 648dcd5c3e..8deb126be5 100644
+--- a/target/avr/translate.c
++++ b/target/avr/translate.c
+@@ -198,7 +198,7 @@ static bool avr_have_feature(DisasContext *ctx, int feature)
+ }
+ 
+ static bool decode_insn(DisasContext *ctx, uint16_t insn);
+-#include "decode_insn.inc.c"
++#include "decode_insn.inc"
+ 
+ /*
+  * Arithmetic Instructions
+diff --git a/target/cris/translate.c b/target/cris/translate.c
+index aaa46b5bca..a0d4b1ccdf 100644
+--- a/target/cris/translate.c
++++ b/target/cris/translate.c
+@@ -3037,7 +3037,7 @@ static unsigned int crisv32_decoder(CPUCRISState *env, DisasContext *dc)
+     return insn_len;
+ }
+ 
+-#include "translate_v10.inc.c"
++#include "translate_v10.inc"
+ 
+ /*
+  * Delay slots on QEMU/CRIS.
+diff --git a/target/cris/translate_v10.inc.c b/target/cris/translate_v10.inc
+similarity index 100%
+rename from target/cris/translate_v10.inc.c
+rename to target/cris/translate_v10.inc
+diff --git a/target/hppa/Makefile.objs b/target/hppa/Makefile.objs
+index 174f50a96c..40dcb86ad0 100644
+--- a/target/hppa/Makefile.objs
++++ b/target/hppa/Makefile.objs
+@@ -4,8 +4,8 @@ obj-$(CONFIG_SOFTMMU) += machine.o
+ 
+ DECODETREE = $(SRC_PATH)/scripts/decodetree.py
+ 
+-target/hppa/decode.inc.c: $(SRC_PATH)/target/hppa/insns.decode $(DECODETREE)
++target/hppa/decode.inc: $(SRC_PATH)/target/hppa/insns.decode $(DECODETREE)
+ 	$(call quiet-command,\
+ 	  $(PYTHON) $(DECODETREE) -o $@ $<, "GEN", $(TARGET_DIR)$@)
+ 
+-target/hppa/translate.o: target/hppa/decode.inc.c
++target/hppa/translate.o: target/hppa/decode.inc
+diff --git a/target/hppa/translate.c b/target/hppa/translate.c
+index 4bd22d4820..31e292630c 100644
+--- a/target/hppa/translate.c
++++ b/target/hppa/translate.c
+@@ -334,7 +334,7 @@ static int expand_shl11(DisasContext *ctx, int val)
+ 
+ 
+ /* Include the auto-generated decoder.  */
+-#include "decode.inc.c"
++#include "decode.inc"
+ 
+ /* We are not using a goto_tb (for whatever reason), but have updated
+    the iaq (for whatever reason), so don't do it again on exit.  */
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index 9fad58ea2c..221a42e828 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -31322,7 +31322,7 @@ void mips_tcg_init(void)
+ #endif
+ }
+ 
+-#include "translate_init.inc.c"
++#include "translate_init.inc"
+ 
+ void cpu_mips_realize_env(CPUMIPSState *env)
+ {
+diff --git a/target/mips/translate_init.inc.c b/target/mips/translate_init.inc
+similarity index 100%
+rename from target/mips/translate_init.inc.c
+rename to target/mips/translate_init.inc
+diff --git a/target/openrisc/Makefile.objs b/target/openrisc/Makefile.objs
+index b5432f4684..0f2fcff6af 100644
+--- a/target/openrisc/Makefile.objs
++++ b/target/openrisc/Makefile.objs
+@@ -6,10 +6,10 @@ obj-y += gdbstub.o
+ 
+ DECODETREE = $(SRC_PATH)/scripts/decodetree.py
+ 
+-target/openrisc/decode.inc.c: \
++target/openrisc/decode.inc: \
+   $(SRC_PATH)/target/openrisc/insns.decode $(DECODETREE)
+ 	$(call quiet-command,\
+ 	  $(PYTHON) $(DECODETREE) -o $@ $<, "GEN", $(TARGET_DIR)$@)
+ 
+-target/openrisc/translate.o: target/openrisc/decode.inc.c
+-target/openrisc/disas.o: target/openrisc/decode.inc.c
++target/openrisc/translate.o: target/openrisc/decode.inc
++target/openrisc/disas.o: target/openrisc/decode.inc
+diff --git a/target/openrisc/disas.c b/target/openrisc/disas.c
+index ce112640b9..3f753164ed 100644
+--- a/target/openrisc/disas.c
++++ b/target/openrisc/disas.c
+@@ -25,7 +25,7 @@
+ typedef disassemble_info DisasContext;
+ 
+ /* Include the auto-generated decoder.  */
+-#include "decode.inc.c"
++#include "decode.inc"
+ 
+ #define output(mnemonic, format, ...) \
+     (info->fprintf_func(info->stream, "%-9s " format, \
+diff --git a/target/openrisc/translate.c b/target/openrisc/translate.c
+index 52323a16df..a119be2fc7 100644
+--- a/target/openrisc/translate.c
++++ b/target/openrisc/translate.c
+@@ -65,7 +65,7 @@ static inline bool is_user(DisasContext *dc)
+ }
+ 
+ /* Include the auto-generated decoder.  */
+-#include "decode.inc.c"
++#include "decode.inc"
+ 
+ static TCGv cpu_sr;
+ static TCGv cpu_regs[32];
+diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
+index d8bd3c234a..eff3c0d33a 100644
+--- a/target/ppc/int_helper.c
++++ b/target/ppc/int_helper.c
+@@ -398,7 +398,7 @@ target_ulong helper_divso(CPUPPCState *env, target_ulong arg1,
+ target_ulong helper_602_mfrom(target_ulong arg)
+ {
+     if (likely(arg < 602)) {
+-#include "mfrom_table.inc.c"
++#include "mfrom_table.inc"
+         return mfrom_ROM_table[arg];
+     } else {
+         return 0;
+diff --git a/target/ppc/mfrom_table.inc.c b/target/ppc/mfrom_table.inc
+similarity index 100%
+rename from target/ppc/mfrom_table.inc.c
+rename to target/ppc/mfrom_table.inc
+diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+index 4ce3d664b5..95d90808c0 100644
+--- a/target/ppc/translate.c
++++ b/target/ppc/translate.c
+@@ -6900,15 +6900,15 @@ static inline void set_avr64(int regno, TCGv_i64 src, bool high)
+     tcg_gen_st_i64(src, cpu_env, avr64_offset(regno, high));
+ }
+ 
+-#include "translate/fp-impl.inc.c"
++#include "translate/fp-impl.inc"
+ 
+-#include "translate/vmx-impl.inc.c"
++#include "translate/vmx-impl.inc"
+ 
+-#include "translate/vsx-impl.inc.c"
++#include "translate/vsx-impl.inc"
+ 
+-#include "translate/dfp-impl.inc.c"
++#include "translate/dfp-impl.inc"
+ 
+-#include "translate/spe-impl.inc.c"
++#include "translate/spe-impl.inc"
+ 
+ /* Handles lfdp, lxsd, lxssp */
+ static void gen_dform39(DisasContext *ctx)
+@@ -7587,19 +7587,19 @@ GEN_HANDLER2_E(treclaim, "treclaim", 0x1F, 0x0E, 0x1D, 0x03E0F800, \
+ GEN_HANDLER2_E(trechkpt, "trechkpt", 0x1F, 0x0E, 0x1F, 0x03FFF800, \
+                PPC_NONE, PPC2_TM),
+ 
+-#include "translate/fp-ops.inc.c"
++#include "translate/fp-ops.inc"
+ 
+-#include "translate/vmx-ops.inc.c"
++#include "translate/vmx-ops.inc"
+ 
+-#include "translate/vsx-ops.inc.c"
++#include "translate/vsx-ops.inc"
+ 
+-#include "translate/dfp-ops.inc.c"
++#include "translate/dfp-ops.inc"
+ 
+-#include "translate/spe-ops.inc.c"
++#include "translate/spe-ops.inc"
+ };
+ 
+ #include "helper_regs.h"
+-#include "translate_init.inc.c"
++#include "translate_init.inc"
+ 
+ /*****************************************************************************/
+ /* Misc PowerPC helpers */
+diff --git a/target/ppc/translate/dfp-impl.inc.c b/target/ppc/translate/dfp-impl.inc
+similarity index 100%
+rename from target/ppc/translate/dfp-impl.inc.c
+rename to target/ppc/translate/dfp-impl.inc
+diff --git a/target/ppc/translate/dfp-ops.inc.c b/target/ppc/translate/dfp-ops.inc
+similarity index 100%
+rename from target/ppc/translate/dfp-ops.inc.c
+rename to target/ppc/translate/dfp-ops.inc
+diff --git a/target/ppc/translate/fp-impl.inc.c b/target/ppc/translate/fp-impl.inc
+similarity index 100%
+rename from target/ppc/translate/fp-impl.inc.c
+rename to target/ppc/translate/fp-impl.inc
+diff --git a/target/ppc/translate/fp-ops.inc.c b/target/ppc/translate/fp-ops.inc
+similarity index 100%
+rename from target/ppc/translate/fp-ops.inc.c
+rename to target/ppc/translate/fp-ops.inc
+diff --git a/target/ppc/translate/spe-impl.inc.c b/target/ppc/translate/spe-impl.inc
+similarity index 100%
+rename from target/ppc/translate/spe-impl.inc.c
+rename to target/ppc/translate/spe-impl.inc
+diff --git a/target/ppc/translate/spe-ops.inc.c b/target/ppc/translate/spe-ops.inc
+similarity index 100%
+rename from target/ppc/translate/spe-ops.inc.c
+rename to target/ppc/translate/spe-ops.inc
+diff --git a/target/ppc/translate/vmx-impl.inc.c b/target/ppc/translate/vmx-impl.inc
+similarity index 100%
+rename from target/ppc/translate/vmx-impl.inc.c
+rename to target/ppc/translate/vmx-impl.inc
+diff --git a/target/ppc/translate/vmx-ops.inc.c b/target/ppc/translate/vmx-ops.inc
+similarity index 100%
+rename from target/ppc/translate/vmx-ops.inc.c
+rename to target/ppc/translate/vmx-ops.inc
+diff --git a/target/ppc/translate/vsx-impl.inc.c b/target/ppc/translate/vsx-impl.inc
+similarity index 100%
+rename from target/ppc/translate/vsx-impl.inc.c
+rename to target/ppc/translate/vsx-impl.inc
+diff --git a/target/ppc/translate/vsx-ops.inc.c b/target/ppc/translate/vsx-ops.inc
+similarity index 100%
+rename from target/ppc/translate/vsx-ops.inc.c
+rename to target/ppc/translate/vsx-ops.inc
+diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.inc
+similarity index 100%
+rename from target/ppc/translate_init.inc.c
+rename to target/ppc/translate_init.inc
+diff --git a/target/riscv/Makefile.objs b/target/riscv/Makefile.objs
+index ff38df6219..1a66d8a859 100644
+--- a/target/riscv/Makefile.objs
++++ b/target/riscv/Makefile.objs
+@@ -14,15 +14,15 @@ decode16-y = $(SRC_PATH)/target/riscv/insn16.decode
+ decode16-$(TARGET_RISCV32) += $(SRC_PATH)/target/riscv/insn16-32.decode
+ decode16-$(TARGET_RISCV64) += $(SRC_PATH)/target/riscv/insn16-64.decode
+ 
+-target/riscv/decode_insn32.inc.c: $(decode32-y) $(DECODETREE)
++target/riscv/decode_insn32.inc: $(decode32-y) $(DECODETREE)
+ 	$(call quiet-command, \
+ 	  $(PYTHON) $(DECODETREE) -o $@ --static-decode decode_insn32 \
+           $(decode32-y), "GEN", $(TARGET_DIR)$@)
+ 
+-target/riscv/decode_insn16.inc.c: $(decode16-y) $(DECODETREE)
++target/riscv/decode_insn16.inc: $(decode16-y) $(DECODETREE)
+ 	$(call quiet-command, \
+ 	  $(PYTHON) $(DECODETREE) -o $@ --static-decode decode_insn16 \
+           --insnwidth 16 $(decode16-y), "GEN", $(TARGET_DIR)$@)
+ 
+-target/riscv/translate.o: target/riscv/decode_insn32.inc.c \
+-	target/riscv/decode_insn16.inc.c
++target/riscv/translate.o: target/riscv/decode_insn32.inc \
++	target/riscv/decode_insn16.inc
+diff --git a/target/riscv/insn_trans/trans_privileged.inc.c b/target/riscv/insn_trans/trans_privileged.inc
+similarity index 100%
+rename from target/riscv/insn_trans/trans_privileged.inc.c
+rename to target/riscv/insn_trans/trans_privileged.inc
+diff --git a/target/riscv/insn_trans/trans_rva.inc.c b/target/riscv/insn_trans/trans_rva.inc
+similarity index 100%
+rename from target/riscv/insn_trans/trans_rva.inc.c
+rename to target/riscv/insn_trans/trans_rva.inc
+diff --git a/target/riscv/insn_trans/trans_rvd.inc.c b/target/riscv/insn_trans/trans_rvd.inc
+similarity index 100%
+rename from target/riscv/insn_trans/trans_rvd.inc.c
+rename to target/riscv/insn_trans/trans_rvd.inc
+diff --git a/target/riscv/insn_trans/trans_rvf.inc.c b/target/riscv/insn_trans/trans_rvf.inc
+similarity index 100%
+rename from target/riscv/insn_trans/trans_rvf.inc.c
+rename to target/riscv/insn_trans/trans_rvf.inc
+diff --git a/target/riscv/insn_trans/trans_rvh.inc.c b/target/riscv/insn_trans/trans_rvh.inc
+similarity index 100%
+rename from target/riscv/insn_trans/trans_rvh.inc.c
+rename to target/riscv/insn_trans/trans_rvh.inc
+diff --git a/target/riscv/insn_trans/trans_rvi.inc.c b/target/riscv/insn_trans/trans_rvi.inc
+similarity index 100%
+rename from target/riscv/insn_trans/trans_rvi.inc.c
+rename to target/riscv/insn_trans/trans_rvi.inc
+diff --git a/target/riscv/insn_trans/trans_rvm.inc.c b/target/riscv/insn_trans/trans_rvm.inc
+similarity index 100%
+rename from target/riscv/insn_trans/trans_rvm.inc.c
+rename to target/riscv/insn_trans/trans_rvm.inc
+diff --git a/target/riscv/insn_trans/trans_rvv.inc.c b/target/riscv/insn_trans/trans_rvv.inc
+similarity index 100%
+rename from target/riscv/insn_trans/trans_rvv.inc.c
+rename to target/riscv/insn_trans/trans_rvv.inc
+diff --git a/target/riscv/translate.c b/target/riscv/translate.c
+index 9632e79cf3..aa7f56d77b 100644
+--- a/target/riscv/translate.c
++++ b/target/riscv/translate.c
+@@ -583,7 +583,7 @@ static int ex_rvc_shifti(DisasContext *ctx, int imm)
+ }
+ 
+ /* Include the auto-generated decoder for 32 bit insn */
+-#include "decode_insn32.inc.c"
++#include "decode_insn32.inc"
+ 
+ static bool gen_arith_imm_fn(DisasContext *ctx, arg_i *a,
+                              void (*func)(TCGv, TCGv, target_long))
+@@ -718,17 +718,17 @@ static bool gen_shift(DisasContext *ctx, arg_r *a,
+ }
+ 
+ /* Include insn module translation function */
+-#include "insn_trans/trans_rvi.inc.c"
+-#include "insn_trans/trans_rvm.inc.c"
+-#include "insn_trans/trans_rva.inc.c"
+-#include "insn_trans/trans_rvf.inc.c"
+-#include "insn_trans/trans_rvd.inc.c"
+-#include "insn_trans/trans_rvh.inc.c"
+-#include "insn_trans/trans_rvv.inc.c"
+-#include "insn_trans/trans_privileged.inc.c"
++#include "insn_trans/trans_rvi.inc"
++#include "insn_trans/trans_rvm.inc"
++#include "insn_trans/trans_rva.inc"
++#include "insn_trans/trans_rvf.inc"
++#include "insn_trans/trans_rvd.inc"
++#include "insn_trans/trans_rvh.inc"
++#include "insn_trans/trans_rvv.inc"
++#include "insn_trans/trans_privileged.inc"
+ 
+ /* Include the auto-generated decoder for 16 bit insn */
+-#include "decode_insn16.inc.c"
++#include "decode_insn16.inc"
+ 
+ static void decode_opc(CPURISCVState *env, DisasContext *ctx, uint16_t opcode)
+ {
+diff --git a/target/rx/Makefile.objs b/target/rx/Makefile.objs
+index a0018d5bc5..eddc62a61b 100644
+--- a/target/rx/Makefile.objs
++++ b/target/rx/Makefile.objs
+@@ -2,10 +2,10 @@ obj-y += translate.o op_helper.o helper.o cpu.o gdbstub.o disas.o
+ 
+ DECODETREE = $(SRC_PATH)/scripts/decodetree.py
+ 
+-target/rx/decode.inc.c: \
++target/rx/decode.inc: \
+   $(SRC_PATH)/target/rx/insns.decode $(DECODETREE)
+ 	$(call quiet-command,\
+ 	  $(PYTHON) $(DECODETREE) --varinsnwidth 32 -o $@ $<, "GEN", $(TARGET_DIR)$@)
+ 
+-target/rx/translate.o: target/rx/decode.inc.c
+-target/rx/disas.o: target/rx/decode.inc.c
++target/rx/translate.o: target/rx/decode.inc
++target/rx/disas.o: target/rx/decode.inc
+diff --git a/target/rx/disas.c b/target/rx/disas.c
+index 6dee7a0342..6450892051 100644
+--- a/target/rx/disas.c
++++ b/target/rx/disas.c
+@@ -100,7 +100,7 @@ static int bdsp_s(DisasContext *ctx, int d)
+ }
+ 
+ /* Include the auto-generated decoder.  */
+-#include "decode.inc.c"
++#include "decode.inc"
+ 
+ static void dump_bytes(DisasContext *ctx)
+ {
+diff --git a/target/rx/translate.c b/target/rx/translate.c
+index 61e86653a4..272619cced 100644
+--- a/target/rx/translate.c
++++ b/target/rx/translate.c
+@@ -124,7 +124,7 @@ static int bdsp_s(DisasContext *ctx, int d)
+ }
+ 
+ /* Include the auto-generated decoder. */
+-#include "decode.inc.c"
++#include "decode.inc"
+ 
+ void rx_cpu_dump_state(CPUState *cs, FILE *f, int flags)
+ {
+diff --git a/target/s390x/translate.c b/target/s390x/translate.c
+index 4f6f1e31cd..4c6452f363 100644
+--- a/target/s390x/translate.c
++++ b/target/s390x/translate.c
+@@ -5120,7 +5120,7 @@ static DisasJumpType op_mpcifc(DisasContext *s, DisasOps *o)
+ }
+ #endif
+ 
+-#include "translate_vx.inc.c"
++#include "translate_vx.inc"
+ 
+ /* ====================================================================== */
+ /* The "Cc OUTput" generators.  Given the generated output (and in some cases
+diff --git a/target/s390x/translate_vx.inc.c b/target/s390x/translate_vx.inc
+similarity index 100%
+rename from target/s390x/translate_vx.inc.c
+rename to target/s390x/translate_vx.inc
+diff --git a/target/xtensa/core-dc232b.c b/target/xtensa/core-dc232b.c
+index 7851bcb636..bc4c866ff0 100644
+--- a/target/xtensa/core-dc232b.c
++++ b/target/xtensa/core-dc232b.c
+@@ -35,13 +35,13 @@
+ #include "overlay_tool.h"
+ 
+ #define xtensa_modules xtensa_modules_dc232b
+-#include "core-dc232b/xtensa-modules.inc.c"
++#include "core-dc232b/xtensa-modules.inc"
+ 
+ static XtensaConfig dc232b __attribute__((unused)) = {
+     .name = "dc232b",
+     .gdb_regmap = {
+         .reg = {
+-#include "core-dc232b/gdb-config.inc.c"
++#include "core-dc232b/gdb-config.inc"
+         }
+     },
+     .isa_internal = &xtensa_modules,
+diff --git a/target/xtensa/core-dc232b/gdb-config.inc.c b/target/xtensa/core-dc232b/gdb-config.inc
+similarity index 100%
+rename from target/xtensa/core-dc232b/gdb-config.inc.c
+rename to target/xtensa/core-dc232b/gdb-config.inc
+diff --git a/target/xtensa/core-dc232b/xtensa-modules.inc.c b/target/xtensa/core-dc232b/xtensa-modules.inc
+similarity index 100%
+rename from target/xtensa/core-dc232b/xtensa-modules.inc.c
+rename to target/xtensa/core-dc232b/xtensa-modules.inc
+diff --git a/target/xtensa/core-dc233c.c b/target/xtensa/core-dc233c.c
+index f8204f7045..83419258a0 100644
+--- a/target/xtensa/core-dc233c.c
++++ b/target/xtensa/core-dc233c.c
+@@ -34,13 +34,13 @@
+ #include "overlay_tool.h"
+ 
+ #define xtensa_modules xtensa_modules_dc233c
+-#include "core-dc233c/xtensa-modules.inc.c"
++#include "core-dc233c/xtensa-modules.inc"
+ 
+ static XtensaConfig dc233c __attribute__((unused)) = {
+     .name = "dc233c",
+     .gdb_regmap = {
+         .reg = {
+-#include "core-dc233c/gdb-config.inc.c"
++#include "core-dc233c/gdb-config.inc"
+         }
+     },
+     .isa_internal = &xtensa_modules,
+diff --git a/target/xtensa/core-dc233c/gdb-config.inc.c b/target/xtensa/core-dc233c/gdb-config.inc
+similarity index 100%
+rename from target/xtensa/core-dc233c/gdb-config.inc.c
+rename to target/xtensa/core-dc233c/gdb-config.inc
+diff --git a/target/xtensa/core-dc233c/xtensa-modules.inc.c b/target/xtensa/core-dc233c/xtensa-modules.inc
+similarity index 100%
+rename from target/xtensa/core-dc233c/xtensa-modules.inc.c
+rename to target/xtensa/core-dc233c/xtensa-modules.inc
+diff --git a/target/xtensa/core-de212.c b/target/xtensa/core-de212.c
+index a061158f6e..eda095d14e 100644
+--- a/target/xtensa/core-de212.c
++++ b/target/xtensa/core-de212.c
+@@ -34,13 +34,13 @@
+ #include "overlay_tool.h"
+ 
+ #define xtensa_modules xtensa_modules_de212
+-#include "core-de212/xtensa-modules.inc.c"
++#include "core-de212/xtensa-modules.inc"
+ 
+ static XtensaConfig de212 __attribute__((unused)) = {
+     .name = "de212",
+     .gdb_regmap = {
+         .reg = {
+-#include "core-de212/gdb-config.inc.c"
++#include "core-de212/gdb-config.inc"
+         }
+     },
+     .isa_internal = &xtensa_modules,
+diff --git a/target/xtensa/core-de212/gdb-config.inc.c b/target/xtensa/core-de212/gdb-config.inc
+similarity index 100%
+rename from target/xtensa/core-de212/gdb-config.inc.c
+rename to target/xtensa/core-de212/gdb-config.inc
+diff --git a/target/xtensa/core-de212/xtensa-modules.inc.c b/target/xtensa/core-de212/xtensa-modules.inc
+similarity index 100%
+rename from target/xtensa/core-de212/xtensa-modules.inc.c
+rename to target/xtensa/core-de212/xtensa-modules.inc
+diff --git a/target/xtensa/core-fsf.c b/target/xtensa/core-fsf.c
+index 1221a296fa..3398f3b480 100644
+--- a/target/xtensa/core-fsf.c
++++ b/target/xtensa/core-fsf.c
+@@ -34,7 +34,7 @@
+ #include "overlay_tool.h"
+ 
+ #define xtensa_modules xtensa_modules_fsf
+-#include "core-fsf/xtensa-modules.inc.c"
++#include "core-fsf/xtensa-modules.inc"
+ 
+ static XtensaConfig fsf __attribute__((unused)) = {
+     .name = "fsf",
+diff --git a/target/xtensa/core-fsf/xtensa-modules.inc.c b/target/xtensa/core-fsf/xtensa-modules.inc
+similarity index 100%
+rename from target/xtensa/core-fsf/xtensa-modules.inc.c
+rename to target/xtensa/core-fsf/xtensa-modules.inc
+diff --git a/target/xtensa/core-sample_controller.c b/target/xtensa/core-sample_controller.c
+index a1d220bb9a..1523ef5dba 100644
+--- a/target/xtensa/core-sample_controller.c
++++ b/target/xtensa/core-sample_controller.c
+@@ -34,13 +34,13 @@
+ #include "overlay_tool.h"
+ 
+ #define xtensa_modules xtensa_modules_sample_controller
+-#include "core-sample_controller/xtensa-modules.inc.c"
++#include "core-sample_controller/xtensa-modules.inc"
+ 
+ static XtensaConfig sample_controller __attribute__((unused)) = {
+     .name = "sample_controller",
+     .gdb_regmap = {
+         .reg = {
+-#include "core-sample_controller/gdb-config.inc.c"
++#include "core-sample_controller/gdb-config.inc"
+         }
+     },
+     .isa_internal = &xtensa_modules,
+diff --git a/target/xtensa/core-sample_controller/gdb-config.inc.c b/target/xtensa/core-sample_controller/gdb-config.inc
+similarity index 100%
+rename from target/xtensa/core-sample_controller/gdb-config.inc.c
+rename to target/xtensa/core-sample_controller/gdb-config.inc
+diff --git a/target/xtensa/core-sample_controller/xtensa-modules.inc.c b/target/xtensa/core-sample_controller/xtensa-modules.inc
+similarity index 100%
+rename from target/xtensa/core-sample_controller/xtensa-modules.inc.c
+rename to target/xtensa/core-sample_controller/xtensa-modules.inc
+diff --git a/target/xtensa/core-test_kc705_be.c b/target/xtensa/core-test_kc705_be.c
+index ab73c3885f..60e9a7d7fc 100644
+--- a/target/xtensa/core-test_kc705_be.c
++++ b/target/xtensa/core-test_kc705_be.c
+@@ -34,13 +34,13 @@
+ #include "overlay_tool.h"
+ 
+ #define xtensa_modules xtensa_modules_test_kc705_be
+-#include "core-test_kc705_be/xtensa-modules.inc.c"
++#include "core-test_kc705_be/xtensa-modules.inc"
+ 
+ static XtensaConfig test_kc705_be __attribute__((unused)) = {
+     .name = "test_kc705_be",
+     .gdb_regmap = {
+         .reg = {
+-#include "core-test_kc705_be/gdb-config.inc.c"
++#include "core-test_kc705_be/gdb-config.inc"
+         }
+     },
+     .isa_internal = &xtensa_modules,
+diff --git a/target/xtensa/core-test_kc705_be/gdb-config.inc.c b/target/xtensa/core-test_kc705_be/gdb-config.inc
+similarity index 100%
+rename from target/xtensa/core-test_kc705_be/gdb-config.inc.c
+rename to target/xtensa/core-test_kc705_be/gdb-config.inc
+diff --git a/target/xtensa/core-test_kc705_be/xtensa-modules.inc.c b/target/xtensa/core-test_kc705_be/xtensa-modules.inc
+similarity index 100%
+rename from target/xtensa/core-test_kc705_be/xtensa-modules.inc.c
+rename to target/xtensa/core-test_kc705_be/xtensa-modules.inc
+diff --git a/target/xtensa/core-test_mmuhifi_c3.c b/target/xtensa/core-test_mmuhifi_c3.c
+index 089ed7da5d..0a297f5071 100644
+--- a/target/xtensa/core-test_mmuhifi_c3.c
++++ b/target/xtensa/core-test_mmuhifi_c3.c
+@@ -35,13 +35,13 @@
+ #include "overlay_tool.h"
+ 
+ #define xtensa_modules xtensa_modules_test_mmuhifi_c3
+-#include "core-test_mmuhifi_c3/xtensa-modules.inc.c"
++#include "core-test_mmuhifi_c3/xtensa-modules.inc"
+ 
+ static XtensaConfig test_mmuhifi_c3 __attribute__((unused)) = {
+     .name = "test_mmuhifi_c3",
+     .gdb_regmap = {
+         .reg = {
+-#include "core-test_mmuhifi_c3/gdb-config.inc.c"
++#include "core-test_mmuhifi_c3/gdb-config.inc"
+         }
+     },
+     .isa_internal = &xtensa_modules,
+diff --git a/target/xtensa/core-test_mmuhifi_c3/gdb-config.inc.c b/target/xtensa/core-test_mmuhifi_c3/gdb-config.inc
+similarity index 100%
+rename from target/xtensa/core-test_mmuhifi_c3/gdb-config.inc.c
+rename to target/xtensa/core-test_mmuhifi_c3/gdb-config.inc
+diff --git a/target/xtensa/core-test_mmuhifi_c3/xtensa-modules.inc.c b/target/xtensa/core-test_mmuhifi_c3/xtensa-modules.inc
+similarity index 100%
+rename from target/xtensa/core-test_mmuhifi_c3/xtensa-modules.inc.c
+rename to target/xtensa/core-test_mmuhifi_c3/xtensa-modules.inc
+diff --git a/target/xtensa/import_core.sh b/target/xtensa/import_core.sh
+index 8f844cf9e2..a2e422b147 100755
+--- a/target/xtensa/import_core.sh
++++ b/target/xtensa/import_core.sh
+@@ -23,7 +23,7 @@ tar -xf "$OVERLAY" -C "$TARGET" --strip-components=2 \
+     xtensa/config/core-isa.h \
+     xtensa/config/core-matmap.h
+ tar -xf "$OVERLAY" -O gdb/xtensa-config.c | \
+-    sed -n '1,/*\//p;/XTREG/,/XTREG_END/p' > "$TARGET"/gdb-config.inc.c
++    sed -n '1,/*\//p;/XTREG/,/XTREG_END/p' > "$TARGET"/gdb-config.inc
+ #
+ # Fix up known issues in the xtensa-modules.c
+ #
+@@ -35,7 +35,7 @@ tar -xf "$OVERLAY" -O binutils/xtensa-modules.c | \
+         -e '/^#include "ansidecl.h"/d' \
+         -e '/^Slot_[a-zA-Z0-9_]\+_decode (const xtensa_insnbuf insn)/,/^}/s/^  return 0;$/  return XTENSA_UNDEFINED;/' \
+         -e 's/#include <xtensa-isa.h>/#include "xtensa-isa.h"/' \
+-    > "$TARGET"/xtensa-modules.inc.c
++    > "$TARGET"/xtensa-modules.inc
+ 
+ cat <<EOF > "${TARGET}.c"
+ #include "qemu/osdep.h"
+@@ -49,13 +49,13 @@ cat <<EOF > "${TARGET}.c"
+ #include "overlay_tool.h"
+ 
+ #define xtensa_modules xtensa_modules_$NAME
+-#include "core-$NAME/xtensa-modules.inc.c"
++#include "core-$NAME/xtensa-modules.inc"
+ 
+ static XtensaConfig $NAME __attribute__((unused)) = {
+     .name = "$NAME",
+     .gdb_regmap = {
+         .reg = {
+-#include "core-$NAME/gdb-config.inc.c"
++#include "core-$NAME/gdb-config.inc"
+         }
+     },
+     .isa_internal = &xtensa_modules,
+diff --git a/tcg/README b/tcg/README
+index a64f67809b..fdf6ee551e 100644
+--- a/tcg/README
++++ b/tcg/README
+@@ -652,7 +652,7 @@ function tcg_gen_xxx(args).
+ 
+ 4) Backend
+ 
+-tcg-target.h contains the target specific definitions. tcg-target.inc.c
++tcg-target.h contains the target specific definitions. tcg-target.inc
+ contains the target specific code; it is #included by tcg/tcg.c, rather
+ than being a standalone C file.
+ 
+diff --git a/tcg/aarch64/tcg-target.inc.c b/tcg/aarch64/tcg-target.inc
+similarity index 99%
+rename from tcg/aarch64/tcg-target.inc.c
+rename to tcg/aarch64/tcg-target.inc
+index 760b0e742d..000f7e6b08 100644
+--- a/tcg/aarch64/tcg-target.inc.c
++++ b/tcg/aarch64/tcg-target.inc
+@@ -10,7 +10,7 @@
+  * See the COPYING file in the top-level directory for details.
+  */
+ 
+-#include "../tcg-pool.inc.c"
++#include "../tcg-pool.inc"
+ #include "qemu/bitops.h"
+ 
+ /* We're going to re-use TCGType in setting of the SF bit, which controls
+@@ -1542,7 +1542,7 @@ static void tcg_out_cltz(TCGContext *s, TCGType ext, TCGReg d,
+ }
+ 
+ #ifdef CONFIG_SOFTMMU
+-#include "../tcg-ldst.inc.c"
++#include "../tcg-ldst.inc"
+ 
+ /* helper signature: helper_ret_ld_mmu(CPUState *env, target_ulong addr,
+  *                                     TCGMemOpIdx oi, uintptr_t ra)
+diff --git a/tcg/arm/tcg-target.inc.c b/tcg/arm/tcg-target.inc
+similarity index 99%
+rename from tcg/arm/tcg-target.inc.c
+rename to tcg/arm/tcg-target.inc
+index 6aa7757aac..42c2601280 100644
+--- a/tcg/arm/tcg-target.inc.c
++++ b/tcg/arm/tcg-target.inc
+@@ -23,7 +23,7 @@
+  */
+ 
+ #include "elf.h"
+-#include "../tcg-pool.inc.c"
++#include "../tcg-pool.inc"
+ 
+ int arm_arch = __ARM_ARCH;
+ 
+@@ -1131,7 +1131,7 @@ static TCGCond tcg_out_cmp2(TCGContext *s, const TCGArg *args,
+ }
+ 
+ #ifdef CONFIG_SOFTMMU
+-#include "../tcg-ldst.inc.c"
++#include "../tcg-ldst.inc"
+ 
+ /* helper signature: helper_ret_ld_mmu(CPUState *env, target_ulong addr,
+  *                                     int mmu_idx, uintptr_t ra)
+diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc
+similarity index 99%
+rename from tcg/i386/tcg-target.inc.c
+rename to tcg/i386/tcg-target.inc
+index ae0228238b..c8d5ff7945 100644
+--- a/tcg/i386/tcg-target.inc.c
++++ b/tcg/i386/tcg-target.inc
+@@ -22,7 +22,7 @@
+  * THE SOFTWARE.
+  */
+ 
+-#include "../tcg-pool.inc.c"
++#include "../tcg-pool.inc"
+ 
+ #ifdef CONFIG_DEBUG_TCG
+ static const char * const tcg_target_reg_names[TCG_TARGET_NB_REGS] = {
+@@ -1647,7 +1647,7 @@ static void tcg_out_nopn(TCGContext *s, int n)
+ }
+ 
+ #if defined(CONFIG_SOFTMMU)
+-#include "../tcg-ldst.inc.c"
++#include "../tcg-ldst.inc"
+ 
+ /* helper signature: helper_ret_ld_mmu(CPUState *env, target_ulong addr,
+  *                                     int mmu_idx, uintptr_t ra)
+diff --git a/tcg/mips/tcg-target.inc.c b/tcg/mips/tcg-target.inc
+similarity index 99%
+rename from tcg/mips/tcg-target.inc.c
+rename to tcg/mips/tcg-target.inc
+index 4d32ebc1df..5459818a92 100644
+--- a/tcg/mips/tcg-target.inc.c
++++ b/tcg/mips/tcg-target.inc
+@@ -1107,7 +1107,7 @@ static void tcg_out_call(TCGContext *s, tcg_insn_unit *arg)
+ }
+ 
+ #if defined(CONFIG_SOFTMMU)
+-#include "../tcg-ldst.inc.c"
++#include "../tcg-ldst.inc"
+ 
+ static void * const qemu_ld_helpers[16] = {
+     [MO_UB]   = helper_ret_ldub_mmu,
+diff --git a/tcg/ppc/tcg-target.inc.c b/tcg/ppc/tcg-target.inc
+similarity index 99%
+rename from tcg/ppc/tcg-target.inc.c
+rename to tcg/ppc/tcg-target.inc
+index c8d1e765d9..7f13849bb3 100644
+--- a/tcg/ppc/tcg-target.inc.c
++++ b/tcg/ppc/tcg-target.inc
+@@ -23,7 +23,7 @@
+  */
+ 
+ #include "elf.h"
+-#include "../tcg-pool.inc.c"
++#include "../tcg-pool.inc"
+ 
+ #if defined _CALL_DARWIN || defined __APPLE__
+ #define TCG_TARGET_CALL_DARWIN
+@@ -1845,7 +1845,7 @@ static const uint32_t qemu_exts_opc[4] = {
+ };
+ 
+ #if defined (CONFIG_SOFTMMU)
+-#include "../tcg-ldst.inc.c"
++#include "../tcg-ldst.inc"
+ 
+ /* helper signature: helper_ld_mmu(CPUState *env, target_ulong addr,
+  *                                 int mmu_idx, uintptr_t ra)
+diff --git a/tcg/riscv/tcg-target.inc.c b/tcg/riscv/tcg-target.inc
+similarity index 99%
+rename from tcg/riscv/tcg-target.inc.c
+rename to tcg/riscv/tcg-target.inc
+index 3c11ab8b7a..d666c792e7 100644
+--- a/tcg/riscv/tcg-target.inc.c
++++ b/tcg/riscv/tcg-target.inc
+@@ -27,7 +27,7 @@
+  * THE SOFTWARE.
+  */
+ 
+-#include "../tcg-pool.inc.c"
++#include "../tcg-pool.inc"
+ 
+ #ifdef CONFIG_DEBUG_TCG
+ static const char * const tcg_target_reg_names[TCG_TARGET_NB_REGS] = {
+@@ -919,7 +919,7 @@ static void tcg_out_mb(TCGContext *s, TCGArg a0)
+  */
+ 
+ #if defined(CONFIG_SOFTMMU)
+-#include "../tcg-ldst.inc.c"
++#include "../tcg-ldst.inc"
+ 
+ /* helper signature: helper_ret_ld_mmu(CPUState *env, target_ulong addr,
+  *                                     TCGMemOpIdx oi, uintptr_t ra)
+diff --git a/tcg/s390/tcg-target.inc.c b/tcg/s390/tcg-target.inc
+similarity index 99%
+rename from tcg/s390/tcg-target.inc.c
+rename to tcg/s390/tcg-target.inc
+index b07e9ff7d6..c313a088ff 100644
+--- a/tcg/s390/tcg-target.inc.c
++++ b/tcg/s390/tcg-target.inc
+@@ -29,7 +29,7 @@
+ #error "unsupported code generation mode"
+ #endif
+ 
+-#include "../tcg-pool.inc.c"
++#include "../tcg-pool.inc"
+ #include "elf.h"
+ 
+ /* ??? The translation blocks produced by TCG are generally small enough to
+@@ -1536,7 +1536,7 @@ static void tcg_out_qemu_st_direct(TCGContext *s, MemOp opc, TCGReg data,
+ }
+ 
+ #if defined(CONFIG_SOFTMMU)
+-#include "../tcg-ldst.inc.c"
++#include "../tcg-ldst.inc"
+ 
+ /* We're expecting to use a 20-bit negative offset on the tlb memory ops.  */
+ QEMU_BUILD_BUG_ON(TLB_MASK_TABLE_OFS(0) > 0);
+diff --git a/tcg/sparc/tcg-target.inc.c b/tcg/sparc/tcg-target.inc
+similarity index 99%
+rename from tcg/sparc/tcg-target.inc.c
+rename to tcg/sparc/tcg-target.inc
+index 65fddb310d..e6aecd9ab4 100644
+--- a/tcg/sparc/tcg-target.inc.c
++++ b/tcg/sparc/tcg-target.inc
+@@ -22,7 +22,7 @@
+  * THE SOFTWARE.
+  */
+ 
+-#include "../tcg-pool.inc.c"
++#include "../tcg-pool.inc"
+ 
+ #ifdef CONFIG_DEBUG_TCG
+ static const char * const tcg_target_reg_names[TCG_TARGET_NB_REGS] = {
+diff --git a/tcg/tcg-ldst.inc.c b/tcg/tcg-ldst.inc
+similarity index 100%
+rename from tcg/tcg-ldst.inc.c
+rename to tcg/tcg-ldst.inc
+diff --git a/tcg/tcg-pool.inc.c b/tcg/tcg-pool.inc
+similarity index 99%
+rename from tcg/tcg-pool.inc.c
+rename to tcg/tcg-pool.inc
+index 4eaa84b631..7390173f10 100644
+--- a/tcg/tcg-pool.inc.c
++++ b/tcg/tcg-pool.inc
+@@ -118,7 +118,7 @@ static inline void new_pool_l8(TCGContext *s, int rtype, tcg_insn_unit *label,
+     new_pool_insert(s, n);
+ }
+ 
+-/* To be provided by cpu/tcg-target.inc.c.  */
++/* To be provided by cpu/tcg-target.inc.  */
+ static void tcg_out_nop_fill(tcg_insn_unit *p, int count);
+ 
+ static int tcg_out_pool_finalize(TCGContext *s)
+diff --git a/tcg/tcg.c b/tcg/tcg.c
+index 1362bc6101..5af2ce475c 100644
+--- a/tcg/tcg.c
++++ b/tcg/tcg.c
+@@ -65,7 +65,7 @@
+ #include "exec/log.h"
+ #include "sysemu/sysemu.h"
+ 
+-/* Forward declarations for functions declared in tcg-target.inc.c and
++/* Forward declarations for functions declared in tcg-target.inc and
+    used here. */
+ static void tcg_target_init(TCGContext *s);
+ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode);
+@@ -101,7 +101,7 @@ static void tcg_register_jit_int(void *buf, size_t size,
+                                  size_t debug_frame_size)
+     __attribute__((unused));
+ 
+-/* Forward declarations for functions declared and used in tcg-target.inc.c. */
++/* Forward declarations for functions declared and used in tcg-target.inc. */
+ static const char *target_parse_constraint(TCGArgConstraint *ct,
+                                            const char *ct_str, TCGType type);
+ static void tcg_out_ld(TCGContext *s, TCGType type, TCGReg ret, TCGReg arg1,
+@@ -341,7 +341,7 @@ static void set_jmp_reset_offset(TCGContext *s, int which)
+     assert(s->tb_jmp_reset_offset[which] == off);
+ }
+ 
+-#include "tcg-target.inc.c"
++#include "tcg-target.inc"
+ 
+ /* compare a pointer @ptr and a tb_tc @s */
+ static int ptr_cmp_tb_tc(const void *ptr, const struct tb_tc *s)
+diff --git a/tcg/tci/README b/tcg/tci/README
+index 386c3c7507..63ce297738 100644
+--- a/tcg/tci/README
++++ b/tcg/tci/README
+@@ -21,7 +21,7 @@ This is what TCI (Tiny Code Interpreter) does.
+ 2) Implementation
+ 
+ Like each TCG host frontend, TCI implements the code generator in
+-tcg-target.inc.c, tcg-target.h. Both files are in directory tcg/tci.
++tcg-target.inc, tcg-target.h. Both files are in directory tcg/tci.
+ 
+ The additional file tcg/tci.c adds the interpreter.
+ 
+@@ -123,7 +123,7 @@ u1 = linux-user-test works
+   would also improve speed for hosts which support byte alignment).
+ 
+ * A better disassembler for the pseudo code would be nice (a very primitive
+-  disassembler is included in tcg-target.inc.c).
++  disassembler is included in tcg-target.inc).
+ 
+ * It might be useful to have a runtime option which selects the native TCG
+   or TCI, so QEMU would have to include two TCGs. Today, selecting TCI
+diff --git a/tcg/tci/tcg-target.inc.c b/tcg/tci/tcg-target.inc
+similarity index 100%
+rename from tcg/tci/tcg-target.inc.c
+rename to tcg/tci/tcg-target.inc
+diff --git a/tests/fp/fp-test.c b/tests/fp/fp-test.c
+index 43ef9628c4..6fe2402e9c 100644
+--- a/tests/fp/fp-test.c
++++ b/tests/fp/fp-test.c
+@@ -116,7 +116,7 @@ static void usage_complete(int argc, char *argv[])
+ }
+ 
+ /* keep wrappers separate but do not bother defining headers for all of them */
+-#include "wrap.inc.c"
++#include "wrap.inc"
+ 
+ static void not_implemented(void)
+ {
+diff --git a/tests/fp/wrap.inc.c b/tests/fp/wrap.inc
+similarity index 100%
+rename from tests/fp/wrap.inc.c
+rename to tests/fp/wrap.inc
+diff --git a/ui/input-keymap.c b/ui/input-keymap.c
+index c4301851bd..cfe2c44d28 100644
+--- a/ui/input-keymap.c
++++ b/ui/input-keymap.c
+@@ -4,23 +4,23 @@
+ 
+ #include "standard-headers/linux/input.h"
+ 
+-#include "ui/input-keymap-atset1-to-qcode.c"
+-#include "ui/input-keymap-linux-to-qcode.c"
+-#include "ui/input-keymap-qcode-to-atset1.c"
+-#include "ui/input-keymap-qcode-to-atset2.c"
+-#include "ui/input-keymap-qcode-to-atset3.c"
+-#include "ui/input-keymap-qcode-to-linux.c"
+-#include "ui/input-keymap-qcode-to-qnum.c"
+-#include "ui/input-keymap-qcode-to-sun.c"
+-#include "ui/input-keymap-qnum-to-qcode.c"
+-#include "ui/input-keymap-usb-to-qcode.c"
+-#include "ui/input-keymap-win32-to-qcode.c"
+-#include "ui/input-keymap-x11-to-qcode.c"
+-#include "ui/input-keymap-xorgevdev-to-qcode.c"
+-#include "ui/input-keymap-xorgkbd-to-qcode.c"
+-#include "ui/input-keymap-xorgxquartz-to-qcode.c"
+-#include "ui/input-keymap-xorgxwin-to-qcode.c"
+-#include "ui/input-keymap-osx-to-qcode.c"
++#include "ui/input-keymap-atset1-to-qcode.inc"
++#include "ui/input-keymap-linux-to-qcode.inc"
++#include "ui/input-keymap-qcode-to-atset1.inc"
++#include "ui/input-keymap-qcode-to-atset2.inc"
++#include "ui/input-keymap-qcode-to-atset3.inc"
++#include "ui/input-keymap-qcode-to-linux.inc"
++#include "ui/input-keymap-qcode-to-qnum.inc"
++#include "ui/input-keymap-qcode-to-sun.inc"
++#include "ui/input-keymap-qnum-to-qcode.inc"
++#include "ui/input-keymap-usb-to-qcode.inc"
++#include "ui/input-keymap-win32-to-qcode.inc"
++#include "ui/input-keymap-x11-to-qcode.inc"
++#include "ui/input-keymap-xorgevdev-to-qcode.inc"
++#include "ui/input-keymap-xorgkbd-to-qcode.inc"
++#include "ui/input-keymap-xorgxquartz-to-qcode.inc"
++#include "ui/input-keymap-xorgxwin-to-qcode.inc"
++#include "ui/input-keymap-osx-to-qcode.inc"
+ 
+ int qemu_input_linux_to_qcode(unsigned int lnx)
+ {
+diff --git a/ui/vnc-enc-zrle.c b/ui/vnc-enc-zrle.c
+index b4f71e32cf..98d500278a 100644
+--- a/ui/vnc-enc-zrle.c
++++ b/ui/vnc-enc-zrle.c
+@@ -199,56 +199,56 @@ static void zrle_write_u8(VncState *vs, uint8_t value)
+ 
+ #define ZRLE_BPP 8
+ #define ZYWRLE_ENDIAN ENDIAN_NO
+-#include "vnc-enc-zrle.inc.c"
++#include "vnc-enc-zrle.inc"
+ #undef ZRLE_BPP
+ 
+ #define ZRLE_BPP 15
+ #undef ZYWRLE_ENDIAN
+ #define ZYWRLE_ENDIAN ENDIAN_LITTLE
+-#include "vnc-enc-zrle.inc.c"
++#include "vnc-enc-zrle.inc"
+ 
+ #undef ZYWRLE_ENDIAN
+ #define ZYWRLE_ENDIAN ENDIAN_BIG
+-#include "vnc-enc-zrle.inc.c"
++#include "vnc-enc-zrle.inc"
+ 
+ #undef ZRLE_BPP
+ #define ZRLE_BPP 16
+ #undef ZYWRLE_ENDIAN
+ #define ZYWRLE_ENDIAN ENDIAN_LITTLE
+-#include "vnc-enc-zrle.inc.c"
++#include "vnc-enc-zrle.inc"
+ 
+ #undef ZYWRLE_ENDIAN
+ #define ZYWRLE_ENDIAN ENDIAN_BIG
+-#include "vnc-enc-zrle.inc.c"
++#include "vnc-enc-zrle.inc"
+ 
+ #undef ZRLE_BPP
+ #define ZRLE_BPP 32
+ #undef ZYWRLE_ENDIAN
+ #define ZYWRLE_ENDIAN ENDIAN_LITTLE
+-#include "vnc-enc-zrle.inc.c"
++#include "vnc-enc-zrle.inc"
+ 
+ #undef ZYWRLE_ENDIAN
+ #define ZYWRLE_ENDIAN ENDIAN_BIG
+-#include "vnc-enc-zrle.inc.c"
++#include "vnc-enc-zrle.inc"
+ 
+ #define ZRLE_COMPACT_PIXEL 24a
+ #undef ZYWRLE_ENDIAN
+ #define ZYWRLE_ENDIAN ENDIAN_LITTLE
+-#include "vnc-enc-zrle.inc.c"
++#include "vnc-enc-zrle.inc"
+ 
+ #undef ZYWRLE_ENDIAN
+ #define ZYWRLE_ENDIAN ENDIAN_BIG
+-#include "vnc-enc-zrle.inc.c"
++#include "vnc-enc-zrle.inc"
+ 
+ #undef ZRLE_COMPACT_PIXEL
+ #define ZRLE_COMPACT_PIXEL 24b
+ #undef ZYWRLE_ENDIAN
+ #define ZYWRLE_ENDIAN ENDIAN_LITTLE
+-#include "vnc-enc-zrle.inc.c"
++#include "vnc-enc-zrle.inc"
+ 
+ #undef ZYWRLE_ENDIAN
+ #define ZYWRLE_ENDIAN ENDIAN_BIG
+-#include "vnc-enc-zrle.inc.c"
++#include "vnc-enc-zrle.inc"
+ #undef ZRLE_COMPACT_PIXEL
+ #undef ZRLE_BPP
+ 
+diff --git a/ui/vnc-enc-zrle.inc.c b/ui/vnc-enc-zrle.inc
+similarity index 100%
+rename from ui/vnc-enc-zrle.inc.c
+rename to ui/vnc-enc-zrle.inc
 -- 
 2.26.2
 
