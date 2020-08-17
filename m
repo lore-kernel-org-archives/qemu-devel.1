@@ -2,94 +2,90 @@ Return-Path: <SRS0=yhYb=B3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A307BC433E3
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 15:17:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A7C3C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 15:18:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7222B205CB
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 15:17:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 55B56205CB
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 15:18:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HaW8+Rqv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7222B205CB
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OhTsvKBI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55B56205CB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42188 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45944 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7gtV-00011D-Ks
-	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 11:17:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41648)
+	id 1k7guG-0002Z9-Eo
+	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 11:18:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42232)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1k7gHp-0005sO-4q
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:38:57 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:32997)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1k7gHn-0006Iu-Gr
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:38:56 -0400
-Received: by mail-wr1-x443.google.com with SMTP id p20so15286319wrf.0
- for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 07:38:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=EqxqYSBV7uEMenTXBSHXyP24ul4XVhFr0o+0x9l/sqA=;
- b=HaW8+Rqv9UgL2E1Lii0pa2zb99aua6U8bbg/VXRiVqa1rvYWT/yBq7C6ouXzFBXSSY
- 2aCXyNNNEB9dwPMcfjEeg6YpUme7/OGE1rvGuyoIUW1wwCgWYmkRcEhQQkLonbABp1KC
- JYdDfryY9JRFgYraseicwX/2128AOubNEgoBGcbvVwzU/YYx3JTDnJk86+wMXZPSQRMd
- 4RaLAfiDxg6jjwFDzk/Mx3c7ZMHtejJdF3uJyH7u7pYCj7CUDUetyF2Or9VQfn6eR5CK
- SjQYEbiHf8+BwPE9vCUM6rinL38mNrT4tXvicFJyQfRVgyoEtGtGndBMJ/i8c688LZ8S
- a2rA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=EqxqYSBV7uEMenTXBSHXyP24ul4XVhFr0o+0x9l/sqA=;
- b=GN09eXYUCIvuInVGRD2dj5P3ngy28odWRTVn9x442px+xZTdIH4j5RGRakP/EIhmzf
- K0OZYEkmAdwha3BkzRcHREk6SKQFGbRWU/uZTUaSB8pzUhYDYtXNjvkv2lsg4QfVNZGn
- ML4w+l2b4K+0HVNCaKCn0aqiRsdI0hlxAYYoheYTn6lBMJtrw/1GpJh5mYCcop/Sfkxr
- KIDaPy+Dk23uQdIvQt5qqZUwSqjt6H7Xau8x4Jw/TEjXiuQx8vTJXk60d/i5YXbuRJG2
- DEPOHqe7jv+BEAWS0fTSFXawNim7XSTwTDQ8kGg9fid1ioeyW/jwUBliaxsbSxwrgaw7
- kkKw==
-X-Gm-Message-State: AOAM531IyWMav5rXhMpCfKaB17XhfD3qx+pbFMqFXOXw4p+7evoSCj1B
- ElUtIp7jPsdVC9tI/PoHTBO7wE4FPSI=
-X-Google-Smtp-Source: ABdhPJy49dAjWZK2xEe6eA+Ocs7xYaXGe3LuBlPI/QwbXOGvE26seMyuGxfsH1yIWmIYsJFFVG0sKQ==
-X-Received: by 2002:adf:fd41:: with SMTP id h1mr16845136wrs.124.1597675133941; 
- Mon, 17 Aug 2020 07:38:53 -0700 (PDT)
-Received: from donizetti.redhat.com ([2001:b07:6468:f312:a0d1:fc42:c610:f977])
- by smtp.gmail.com with ESMTPSA id
- i22sm34966603wrb.45.2020.08.17.07.38.53
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 17 Aug 2020 07:38:53 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1k7gJo-0001hz-Pd
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:41:01 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:22162
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1k7gJm-0006mF-4z
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:41:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1597675257;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=6T+Fp5nse2UFE2qjL4ASZPlrj+hnm8DBvwFbw6WgtmQ=;
+ b=OhTsvKBIjbhfYvYBVsrhkcphWS/m9ALJ+ZL52Dn3cTMdKAPuAks4nA1DkRyYhWaFHa8kur
+ +rWPIApjbEkdEG1IZp0wasqZ5BIr7z2ceC1bA0Y1E5at0Eu6eZPXETG7CopbnghfPGwx67
+ VnNavAg9APnGQKqu/83YNQ/A0WU9v9o=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-276-Fan9CjyiOj2KDzD-8GfrEg-1; Mon, 17 Aug 2020 10:40:55 -0400
+X-MC-Unique: Fan9CjyiOj2KDzD-8GfrEg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 01F4E185E521
+ for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 14:40:55 +0000 (UTC)
+Received: from donizetti.redhat.com (ovpn-113-20.ams2.redhat.com
+ [10.36.113.20])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5B29470C3D
+ for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 14:40:54 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 089/150] meson: convert hw/mem
-Date: Mon, 17 Aug 2020 16:36:22 +0200
-Message-Id: <20200817143723.343284-90-pbonzini@redhat.com>
-X-Mailer: git-send-email 2.26.2
+Subject: [PATCH 096/150] meson: convert hw/rtc
+Date: Mon, 17 Aug 2020 16:39:59 +0200
+Message-Id: <20200817144053.345107-1-pbonzini@redhat.com>
 In-Reply-To: <20200817143723.343284-1-pbonzini@redhat.com>
 References: <20200817143723.343284-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0.0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::443;
- envelope-from=paolo.bonzini@gmail.com; helo=mail-wr1-x443.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/17 05:13:21
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,77 +98,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Marc-André Lureau <marcandre.lureau@redhat.com>
-
-Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/Makefile.objs     | 1 -
- hw/mem/Kconfig       | 1 +
- hw/mem/Makefile.objs | 3 ---
- hw/mem/meson.build   | 6 ++++++
- hw/meson.build       | 1 +
- 5 files changed, 8 insertions(+), 4 deletions(-)
- delete mode 100644 hw/mem/Makefile.objs
- create mode 100644 hw/mem/meson.build
+ hw/Makefile.objs     |  1 -
+ hw/meson.build       |  1 +
+ hw/rtc/Makefile.objs | 15 ---------------
+ hw/rtc/meson.build   | 16 ++++++++++++++++
+ 4 files changed, 17 insertions(+), 16 deletions(-)
+ delete mode 100644 hw/rtc/Makefile.objs
+ create mode 100644 hw/rtc/meson.build
 
 diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-index 73c49ddd3b..df72b25a64 100644
+index 70ecaa8135..f60fd019ac 100644
 --- a/hw/Makefile.objs
 +++ b/hw/Makefile.objs
-@@ -34,7 +34,6 @@ devices-dirs-y += usb/
- devices-dirs-$(CONFIG_VFIO) += vfio/
- devices-dirs-y += virtio/
- devices-dirs-y += watchdog/
--devices-dirs-$(CONFIG_MEM_DEVICE) += mem/
- endif
- 
- common-obj-y += $(devices-dirs-y)
-diff --git a/hw/mem/Kconfig b/hw/mem/Kconfig
-index c27844900d..a0ef2cf648 100644
---- a/hw/mem/Kconfig
-+++ b/hw/mem/Kconfig
-@@ -9,3 +9,4 @@ config NVDIMM
-     bool
-     default y
-     depends on (PC || PSERIES || ARM_VIRT)
-+    select MEM_DEVICE
-diff --git a/hw/mem/Makefile.objs b/hw/mem/Makefile.objs
-deleted file mode 100644
-index 56345befd0..0000000000
---- a/hw/mem/Makefile.objs
-+++ /dev/null
-@@ -1,3 +0,0 @@
--common-obj-$(CONFIG_DIMM) += pc-dimm.o
--common-obj-y += memory-device.o
--common-obj-$(CONFIG_NVDIMM) += nvdimm.o
-diff --git a/hw/mem/meson.build b/hw/mem/meson.build
-new file mode 100644
-index 0000000000..ba424622bb
---- /dev/null
-+++ b/hw/mem/meson.build
-@@ -0,0 +1,6 @@
-+mem_ss = ss.source_set()
-+mem_ss.add(files('memory-device.c'))
-+mem_ss.add(when: 'CONFIG_DIMM', if_true: files('pc-dimm.c'))
-+mem_ss.add(when: 'CONFIG_NVDIMM', if_true: files('nvdimm.c'))
-+
-+softmmu_ss.add_all(when: 'CONFIG_MEM_DEVICE', if_true: mem_ss)
+@@ -24,7 +24,6 @@ devices-dirs-y += nvram/
+ devices-dirs-y += pci/
+ devices-dirs-$(CONFIG_PCI) += pci-bridge/ pci-host/
+ devices-dirs-y += pcmcia/
+-devices-dirs-y += rtc/
+ devices-dirs-$(CONFIG_SCSI) += scsi/
+ devices-dirs-y += sd/
+ devices-dirs-y += ssi/
 diff --git a/hw/meson.build b/hw/meson.build
-index dccc2d19a6..542d675618 100644
+index 50b26db852..1fb1687e1e 100644
 --- a/hw/meson.build
 +++ b/hw/meson.build
-@@ -1,4 +1,5 @@
+@@ -1,6 +1,7 @@
  subdir('core')
-+subdir('mem')
+ subdir('mem')
  subdir('nubus')
++subdir('rtc')
  subdir('semihosting')
  subdir('smbios')
+ subdir('timer')
+diff --git a/hw/rtc/Makefile.objs b/hw/rtc/Makefile.objs
+deleted file mode 100644
+index e4c1b8617c..0000000000
+--- a/hw/rtc/Makefile.objs
++++ /dev/null
+@@ -1,15 +0,0 @@
+-common-obj-$(CONFIG_DS1338) += ds1338.o
+-common-obj-$(CONFIG_M41T80) += m41t80.o
+-common-obj-$(CONFIG_M48T59) += m48t59.o
+-ifeq ($(CONFIG_ISA_BUS),y)
+-common-obj-$(CONFIG_M48T59) += m48t59-isa.o
+-endif
+-common-obj-$(CONFIG_PL031) += pl031.o
+-common-obj-$(CONFIG_TWL92230) += twl92230.o
+-common-obj-$(CONFIG_XLNX_ZYNQMP) += xlnx-zynqmp-rtc.o
+-common-obj-$(CONFIG_EXYNOS4) += exynos4210_rtc.o
+-obj-$(CONFIG_MC146818RTC) += mc146818rtc.o
+-common-obj-$(CONFIG_SUN4V_RTC) += sun4v-rtc.o
+-common-obj-$(CONFIG_ASPEED_SOC) += aspeed_rtc.o
+-common-obj-$(CONFIG_GOLDFISH_RTC) += goldfish_rtc.o
+-common-obj-$(CONFIG_ALLWINNER_H3) += allwinner-rtc.o
+diff --git a/hw/rtc/meson.build b/hw/rtc/meson.build
+new file mode 100644
+index 0000000000..7cecdee5dd
+--- /dev/null
++++ b/hw/rtc/meson.build
+@@ -0,0 +1,16 @@
++
++softmmu_ss.add(when: 'CONFIG_DS1338', if_true: files('ds1338.c'))
++softmmu_ss.add(when: 'CONFIG_M41T80', if_true: files('m41t80.c'))
++softmmu_ss.add(when: 'CONFIG_M48T59', if_true: files('m48t59.c'))
++softmmu_ss.add(when: 'CONFIG_PL031', if_true: files('pl031.c'))
++softmmu_ss.add(when: 'CONFIG_TWL92230', if_true: files('twl92230.c'))
++softmmu_ss.add(when: ['CONFIG_ISA_BUS', 'CONFIG_M48T59'], if_true: files('m48t59-isa.c'))
++softmmu_ss.add(when: 'CONFIG_XLNX_ZYNQMP', if_true: files('xlnx-zynqmp-rtc.c'))
++
++softmmu_ss.add(when: 'CONFIG_EXYNOS4', if_true: files('exynos4210_rtc.c'))
++softmmu_ss.add(when: 'CONFIG_SUN4V_RTC', if_true: files('sun4v-rtc.c'))
++softmmu_ss.add(when: 'CONFIG_ASPEED_SOC', if_true: files('aspeed_rtc.c'))
++softmmu_ss.add(when: 'CONFIG_GOLDFISH_RTC', if_true: files('goldfish_rtc.c'))
++softmmu_ss.add(when: 'CONFIG_ALLWINNER_H3', if_true: files('allwinner-rtc.c'))
++
++specific_ss.add(when: 'CONFIG_MC146818RTC', if_true: files('mc146818rtc.c'))
 -- 
 2.26.2
 
