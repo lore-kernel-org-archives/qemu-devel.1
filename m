@@ -2,86 +2,109 @@ Return-Path: <SRS0=yhYb=B3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25210C433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 16:28:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69F50C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 16:30:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D9555205CB
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 16:28:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 325E220657
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 16:30:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BdGfA4kf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9555205CB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EKQXcdnB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 325E220657
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49988 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55726 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7hzz-0003HQ-2x
-	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 12:28:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43366)
+	id 1k7i1O-0005cB-BI
+	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 12:30:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44304)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1k7huP-0001jx-8G; Mon, 17 Aug 2020 12:22:53 -0400
-Received: from mail-io1-xd43.google.com ([2607:f8b0:4864:20::d43]:38317)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1k7huN-0005WY-KB; Mon, 17 Aug 2020 12:22:52 -0400
-Received: by mail-io1-xd43.google.com with SMTP id h4so18202436ioe.5;
- Mon, 17 Aug 2020 09:22:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=aCUv7VPVG8oN5Xmva7GVoFqSpuADxNTCe1KaU8Lql9s=;
- b=BdGfA4kfssBHbtNJVfS8oMg9TgYMwk5sKabh0jEkxc72w2A56F5UpE/8kjmQldg4gO
- XJQ3foK94V8/6Ebqb5CV0mRH+bx0OadJuof3uhNuC6J145+8J1q1+gsiV2F5zwxxPPIO
- cX2GV0vKy9L5a+gjK4AvaZbcvas8TSLgHLLychA7FugNj9njYF589HgmbaPNL10uyO0h
- CwzPP9jecNSYeUShKRI0U9F65FIbRy8hUt82scYdsDZT+4pSq7dO4Y9UPPMWgjvNA82c
- LCMIj8QcROiO7shD1awmZqM1wd60f0WOG1Kj3YrS3BKSPgOOGahq8eT4lys5tDh6Beur
- FYFA==
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1k7hyq-0001aO-Hi
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 12:27:28 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:32186
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1k7hym-00066u-Ug
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 12:27:27 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1597681643;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=YacAenn7YhyTH03RT22cutTCboN2Fxlku+b8lV8DbRY=;
+ b=EKQXcdnBl11Q9RD2NvIQtvSxvK2Ni4ipXlPpTouFA3An0bOfYAxWZFJMBNyk9oZPuifBPv
+ VB134siN/q+TfFpuxJT6M/3IV/olnP27X3eDAvYVB/jmw2Cdv61mm9ygP3uIg8eMfHUTGn
+ y+aO4gdC1QOIVXjQYMH5DB7w2ieG7Xc=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-297-J_KRTgaAMLWvFyLtDlrFpQ-1; Mon, 17 Aug 2020 12:27:21 -0400
+X-MC-Unique: J_KRTgaAMLWvFyLtDlrFpQ-1
+Received: by mail-wm1-f72.google.com with SMTP id a5so6201983wmj.5
+ for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 09:27:21 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=aCUv7VPVG8oN5Xmva7GVoFqSpuADxNTCe1KaU8Lql9s=;
- b=EtftYscGp8IBL1vIfsyTrCr0f9Cx7sGb6TYJgsGABmsZbVITU/GdNQb4gCO3v+nx25
- 7AJUv9BYW1kY5hfBy75C4bs311tuz8SNCHUoiSENZkgV8e9XsWc59t3S6gsJh5AHQ/2S
- DUkMoq/qN/4K7VCmaxUPaYegzaW27Um5f6d8dJyfDALdNUR5tAHgQebRSjjXtd5VnGja
- rWNzA/kK445oQmuYmBLXX3XX+ifX1LW/wCwNakvawBkXwLehC90VP+EvjpL5tIxkyRHC
- 4AtMavPXQjdnDIZd/GJb8v2DYf9zkZEUnVUjbRAQXiJ/RAYlckLWdpHFzjy3MB/Uhkyq
- HISA==
-X-Gm-Message-State: AOAM530vZhpkwBXONiyf5RjamvcimJpGhPOlmx7IFRUyUHOz7qVe1lxv
- 1BGikQlz5xjEHWkfODP8Pg/fnBN2JpeM1AfeWHU=
-X-Google-Smtp-Source: ABdhPJyl2S/7BVGUZIrF41pK3vL/ZudEvBLDbvvp7jHBh1K0D23+3G18+yiyUFlLNTy0Ngta74v+fK6n2AznIBKF6/0=
-X-Received: by 2002:a05:6638:e90:: with SMTP id
- p16mr15542850jas.26.1597681370325; 
- Mon, 17 Aug 2020 09:22:50 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=YacAenn7YhyTH03RT22cutTCboN2Fxlku+b8lV8DbRY=;
+ b=Ux1iHHkEOqkofXgOmRsJj0E/fQMFtdlvR7rU/neRXqldc/hv5mlEk22OoZRHPtWAY4
+ mGmI58IwNjWkiWwODRJ7z/hN2tx9VVnaWFjnwlYtyTFVnezMhX4Ad7Weq/qSkskyGBN8
+ UsHmnGy8ROjU48dOsfUeNOGkWRjBBIlw/UsPmeo1jVCbWKYEoe7/UnBjCPDsLjCLZoQs
+ 3PWDpsU1579mU8/dgs2RG4ihJEs7Z+WPh+D3NjmLk6o4N5fhBSq1pxNvaBigsFCDqnu2
+ v8ZO5RchRcMEa6NuaOU4eIeS/7zsJvJIltItQWuRNNwP9U+x7wCsS+DPlrdTv3ClzuNU
+ BwFg==
+X-Gm-Message-State: AOAM531nJ4PAKy+3CaqBTnOYBLPQJTc78iYHR84D6+WY4CzbW//xAZub
+ dMnVcxIFyZnRnvFOmtwNPGh0QGwD1rY9TUTEYiWLLdEoi82AhBxNGoCfB29HQOv/+MnJpOxPpXz
+ QiSUu3JqArLGgXxA=
+X-Received: by 2002:a1c:4409:: with SMTP id r9mr14580238wma.114.1597681640738; 
+ Mon, 17 Aug 2020 09:27:20 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyAsaaebknlWbBQpGlUBsAlOvShputYr718cH8Xph1I3A55V1vVwSCiMJtXw52/fJbMt0CSuA==
+X-Received: by 2002:a1c:4409:: with SMTP id r9mr14580219wma.114.1597681640495; 
+ Mon, 17 Aug 2020 09:27:20 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:a0d1:fc42:c610:f977?
+ ([2001:b07:6468:f312:a0d1:fc42:c610:f977])
+ by smtp.gmail.com with ESMTPSA id f131sm29355950wme.40.2020.08.17.09.27.19
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 17 Aug 2020 09:27:19 -0700 (PDT)
+Subject: Re: [PATCH] memory: Directly dispatch alias accesses on origin memory
+ region
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org
+References: <20200816173051.16274-1-f4bug@amsat.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <706c1969-3e73-7a8e-d4fe-9a2516f44054@redhat.com>
+Date: Mon, 17 Aug 2020 18:27:19 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-References: <20200817140144.373403-1-edgar.iglesias@gmail.com>
- <20200817140144.373403-4-edgar.iglesias@gmail.com>
-In-Reply-To: <20200817140144.373403-4-edgar.iglesias@gmail.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 17 Aug 2020 09:12:18 -0700
-Message-ID: <CAKmqyKOnVYAUCREoK6kejyk3mTZn8+xrRXFR9XVFwBBmvx5Bcg@mail.gmail.com>
-Subject: Re: [PATCH v1 3/5] target/microblaze: mbar: Add support for
- data-access barriers
-To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::d43;
- envelope-from=alistair23@gmail.com; helo=mail-io1-xd43.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+In-Reply-To: <20200816173051.16274-1-f4bug@amsat.org>
+Content-Language: en-US
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/17 03:34:42
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -95,56 +118,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: figlesia@xilinx.com, Peter Maydell <peter.maydell@linaro.org>,
- Edgar Iglesias <edgar.iglesias@xilinx.com>,
- Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>,
- Francisco Iglesias <frasse.iglesias@gmail.com>,
- Alistair Francis <alistair@alistair23.me>,
- Richard Henderson <richard.henderson@linaro.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- KONRAD Frederic <frederic.konrad@adacore.com>,
- Stefano Stabellini <sstabellini@kernel.org>, qemu-arm <qemu-arm@nongnu.org>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- Luc Michel <luc.michel@greensocs.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Aug 17, 2020 at 7:02 AM Edgar E. Iglesias
-<edgar.iglesias@gmail.com> wrote:
->
-> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
->
-> Add support for data-access barriers.
->
-> Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+On 16/08/20 19:30, Philippe Mathieu-Daudé wrote:
+> There is an issue when accessing an alias memory region via the
+> memory_region_dispatch_read() / memory_region_dispatch_write()
+> calls:
+> 
+> The memory_region_init_alias() flow is:
+> 
+>   memory_region_init_alias()
+>   -> memory_region_init()
+>      -> object_initialize(TYPE_MEMORY_REGION)
+>         -> memory_region_initfn()
+>            -> mr->ops = &unassigned_mem_ops;
+> 
+> Later when accessing the alias, the memory_region_dispatch_read()
+> flow is:
+> 
+>   memory_region_dispatch_read()
+>   -> memory_region_access_valid(mr)
+>      -> mr->ops->valid.accepts()
+>         -> unassigned_mem_accepts()
+>         <- false
+>      <- false
+>    <- MEMTX_DECODE_ERROR
+> 
+> The caller gets a MEMTX_DECODE_ERROR while the access is OK.
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+What is the path that leads to this call?
 
-Alistair
+> Fix by directly dispatching aliases accesses to its origin region.
+> 
+> Fixes: 2cdfcf272d ("memory: assign MemoryRegionOps to all regions")
 
-> ---
->  target/microblaze/translate.c | 5 +++++
->  1 file changed, 5 insertions(+)
->
-> diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
-> index c1be76d4c8..c58f334a0f 100644
-> --- a/target/microblaze/translate.c
-> +++ b/target/microblaze/translate.c
-> @@ -1233,6 +1233,11 @@ static void dec_br(DisasContext *dc)
->
->          LOG_DIS("mbar %d\n", mbar_imm);
->
-> +        /* Data access memory barrier.  */
-> +        if ((mbar_imm & 2) == 0) {
-> +            tcg_gen_mb(TCG_BAR_SC | TCG_MO_ALL);
-> +        }
-> +
->          /* mbar IMM & 16 decodes to sleep.  */
->          if (mbar_imm & 16) {
->              TCGv_i32 tmp_hlt = tcg_const_i32(EXCP_HLT);
-> --
-> 2.25.1
->
->
+I don't think the "Fixes" is okay because you'd have gotten a different
+bug before.
+
+> +    if (mr->alias) {
+> +        addr += mr->alias_offset;
+> +        mr = mr->alias;
+> +    }
+
+Also, I think this would have to be a while loop.
+
+Paolo
+
 
