@@ -2,109 +2,86 @@ Return-Path: <SRS0=yhYb=B3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FCF8C433E3
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 16:38:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7853C433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 16:43:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2A46C205CB
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 16:38:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 702BF20657
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 16:43:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eCOp/erG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A46C205CB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=amarulasolutions.com header.i=@amarulasolutions.com header.b="NhHqLVRZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 702BF20657
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amarulasolutions.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47234 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51382 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7i9o-00069O-7t
-	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 12:38:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47922)
+	id 1k7iE0-0008Ts-Is
+	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 12:43:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48704)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k7i9B-0005Np-Se
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 12:38:09 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:27431)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k7i99-0007gL-Ia
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 12:38:09 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597682286;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=kzTceLykt/J0pmt8gKcDNliXiiAqyQwhZk3z9UUkoQw=;
- b=eCOp/erGhM+KFK7ytSsckojk2qC1AmNA5WWtWrlXtNNDXpLt3EuJYCcI84FnF0lTny/DYT
- e5/AIkrqT41YDlY+etqIZkLzqgNyPCfx7mh/gBiugCqXaFHXViZYrATsydmI7hdf8cseOB
- lPbTFaa6zRwgE6HmTXlCmzuQ6+2p5hs=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-21-gMYzk7eMOh6fqZhFHl7npw-1; Mon, 17 Aug 2020 12:38:05 -0400
-X-MC-Unique: gMYzk7eMOh6fqZhFHl7npw-1
-Received: by mail-wm1-f70.google.com with SMTP id c184so4229080wme.1
- for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 09:38:04 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <michael@amarulasolutions.com>)
+ id 1k7iDC-0007fW-G2
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 12:42:18 -0400
+Received: from mail-wm1-x32a.google.com ([2a00:1450:4864:20::32a]:34256)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <michael@amarulasolutions.com>)
+ id 1k7iDA-0008D1-6C
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 12:42:18 -0400
+Received: by mail-wm1-x32a.google.com with SMTP id c19so13556866wmd.1
+ for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 09:42:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amarulasolutions.com; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=/L3DyWciEUFzV08baN7hV3ol+9DDNuY5kWd/RT1eIGg=;
+ b=NhHqLVRZQSB9y2bp4RXek2KsJg65GaKK6ZT2JFPChXV3jCgXjs0o9d/OmWfwCEqZmc
+ tsS4FXlITNZZMF0ptVsIdUtYfdn/CE02sgCBInT9zkWtffjfU/1ozeCEvkJGf0RTNDNp
+ M7XRDEXPrmZ5RKyBMUkHFYz+ZwEaAY4GhODtw=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=kzTceLykt/J0pmt8gKcDNliXiiAqyQwhZk3z9UUkoQw=;
- b=JvFmqt4Rr+8I8lIlCEgnGCobs9kMB8pLRDwDK/MKR2fJHSEJJE4S+kTAiE1UXtZkg7
- M3TcYDncBjryw/Sr90vaFRdUpMSxSgjPJcVR676yKwLnz2eJBA9WhhqyYNONk5WFqKej
- CUuq5bSC/fxLvgQFrsWbzsaKzhm8F7rS76C7mLVYt+fi7neqB6J+JpKY2L+2vBqJtphx
- HjcCfPFT4EYeToVRA1Mupt5HZnm/709sEywNoDBxngCaAgAPX1ZsiN9Mf13DkAorRFKS
- 8+aHXsvwcYMDIcuL6ETzFaMAYWe6gXLwzhmgF57CE83FFami96LC5CtnH4LmSgRE3yJH
- DXeg==
-X-Gm-Message-State: AOAM531v+eMdjaqN50TCIbws1/1kma7h5tV/phrV9BBqXI478cg6Muyq
- chfRbtaOYgoFRNJwuMBrHVJNpP1Su/fdXTDnZ/giNCD34ommvOEJVUrap+qkcdSlBkB14/0lyQ0
- AOGzYlia/1LkCbtM=
-X-Received: by 2002:a5d:6348:: with SMTP id b8mr16009472wrw.362.1597682283685; 
- Mon, 17 Aug 2020 09:38:03 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzKQehD//OgZctf/YxaukLgD0a5AryeWch5yDWM9X1ZxmTTf+iFApWPaKJTj3Q+0JkPzw8/cw==
-X-Received: by 2002:a5d:6348:: with SMTP id b8mr16009446wrw.362.1597682283464; 
- Mon, 17 Aug 2020 09:38:03 -0700 (PDT)
-Received: from [192.168.10.150] ([93.56.170.5])
- by smtp.gmail.com with ESMTPSA id p25sm29384601wma.39.2020.08.17.09.38.02
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 17 Aug 2020 09:38:02 -0700 (PDT)
-Subject: Re: [PATCH 0/2] block; scsi-generic: Fix max transfer size calculation
-To: Dmitry Fomichev <dmitry.fomichev@wdc.com>, Kevin Wolf <kwolf@redhat.com>, 
- Max Reitz <mreitz@redhat.com>, Fam Zheng <famz@redhat.com>,
- Maxim Levitsky <mlevitsky@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-References: <20200811225122.17342-1-dmitry.fomichev@wdc.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d01fb82b-7f09-ddcc-4161-36cfd6e65f22@redhat.com>
-Date: Mon, 17 Aug 2020 18:38:02 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=/L3DyWciEUFzV08baN7hV3ol+9DDNuY5kWd/RT1eIGg=;
+ b=X0uapfaJ6+KSYtfAx+BC7M65zDhXOFhDQTi90xBOZ5Ewk8evYJzDsxvNLcdEReWIPt
+ 9GmZqjQQqalxiAtDcCNZ87QyjaYcq0GdpbloCNx6OR0G83kq5++yJIN9bdqC8H/Ij8O1
+ aacHiD24bkXFqU7OuN9Lj1VtTLUYpk49Swrtv/d+3wY8YTPU45a5j3PH/NblLVKDar32
+ n62GIA+4A0O1ucLbGhybR/nGurZ+UFXtjf1LGqVr2A128Lhim8abXPtxgBBHeYqJgbV7
+ ah38xoOOpL6+r1rHGOKDM66rZ5LPZZ0FS7lrk6CX0k4FSUx2raqUFGoUXEhbwlwcTyWP
+ x+mg==
+X-Gm-Message-State: AOAM531dD21xRW6pxo0/ygM0hmnrjW8VFM9KIe1FYxNpsO4AW1tVc9+U
+ UcoJ3vbLOBFBtrlnol1d+3ChJT43ltcYmqC3jAhWwcRP4To=
+X-Google-Smtp-Source: ABdhPJz11z11W8Z2YbfaaO0pdUg1rt0OE16RcbU/KoivUKWPdwtMfB7avVdoNwUpAr+jbhN5njiXsINZMXAkHih0kZc=
+X-Received: by 2002:a1c:5f54:: with SMTP id t81mr14879460wmb.2.1597682534038; 
+ Mon, 17 Aug 2020 09:42:14 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200811225122.17342-1-dmitry.fomichev@wdc.com>
-Content-Language: en-US
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/17 03:34:42
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+References: <20200812152149.260163-1-michael@amarulasolutions.com>
+ <20200817064701.o3q3plnjhzyz3s42@sirius.home.kraxel.org>
+ <CAOf5uwn94gZPZXChFDXWZ-1w0jOY_SxRqzF4Mk8hrtLq-r3yCg@mail.gmail.com>
+ <20200817072841.lvbco4k7hzzimxsb@sirius.home.kraxel.org>
+In-Reply-To: <20200817072841.lvbco4k7hzzimxsb@sirius.home.kraxel.org>
+From: Michael Nazzareno Trimarchi <michael@amarulasolutions.com>
+Date: Mon, 17 Aug 2020 18:42:02 +0200
+Message-ID: <CAOf5uwn2KAajFo7oXYkZg5q3jbJyRC50hJafcoWCVzrdvkqXMw@mail.gmail.com>
+Subject: Re: [PATCH] hw: dev-wacom: Support wacom tablet emulation in linux
+ qemu
+To: Gerd Hoffmann <kraxel@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::32a;
+ envelope-from=michael@amarulasolutions.com; helo=mail-wm1-x32a.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -117,43 +94,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Damien Le Moal <damien.lemoal@wdc.com>,
- Alistair Francis <alistair.francis@wdc.com>, qemu-devel@nongnu.org,
- qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 12/08/20 00:51, Dmitry Fomichev wrote:
-> When a host-managed zoned device is passed through to the
-> guest system using scsi-generic driver, the maximum i/o size for the
-> drive at the guest may end up being larger than at the host, causing
-> i/o errors while accessing the backing zoned drive at the host system.
-> 
-> Two problems prevent correct setting of the maximum i/o transfer size
-> at the guest in this configuration. One issue is specific to
-> host-managed zone devices - scsi-generic driver doesn't recognize the
-> SCSI type of HM-zoned devices. The other problem is that file-posix
-> code for finding max_segments system value doesn't correctly handle
-> SG nodes.
-> 
-> The following two patches fix these problems.
-> 
-> Based-on: <20200424084338.26803-16-armbru@redhat.com>
-> 
-> Dmitry Fomichev (2):
->   file-posix: Correctly read max_segments of SG nodes
->   scsi-generic: Fix HM-zoned device scan
-> 
->  block/file-posix.c       | 55 +++++++++++++++++++++++-----------------
->  hw/scsi/scsi-generic.c   | 10 +++++---
->  include/scsi/constants.h |  1 +
->  3 files changed, 39 insertions(+), 27 deletions(-)
-> 
+Hi Gerd
 
-The patches are more or less unrelated; I have queued the second, while
-the first is outside my maintenance area.
+Have another small question. Do you know how force show cursor working
+in this case?
 
-Paolo
+Michael
 
+On Mon, Aug 17, 2020 at 9:28 AM Gerd Hoffmann <kraxel@redhat.com> wrote:
+>
+>   Hi,
+>
+> > > > +static const uint8_t qemu_wacom_hid_report_descriptor[] = {
+> > > > +     0x05, 0x01,
+> > > > +     0x09, 0x02,
+> > >
+> > > Where does this come from?  Created from scratch?  Copied from real
+> >
+> > No, there are dump of several descriptor on github. I will put in the
+> > commit message
+>
+> A comment with a link would be good too.
+>
+> > > wacom tablet?  Any chance this can get descriptive comments like the
+> > > other report descriptors (see dev-hid.c)?
+> >
+> > Yes, no problem. I will study a bit more. How was working before?
+>
+> I suspect in the past the linux driver simply checked the device id and
+> went with that without fetching the report descriptor.
+>
+> Also note qemu has a generic tablet (-device usb-tablet), so there are
+> probably very few users using the wacom emulation.  Possibly it is
+> broken for quite a while already but nobody noticed ...
+>
+> take care,
+>   Gerd
+>
+
+
+-- 
+Michael Nazzareno Trimarchi
+Amarula Solutions BV
+COO Co-Founder
+Cruquiuskade 47 Amsterdam 1018 AM NL
+T. +31(0)851119172
+M. +39(0)3479132170
+[`as] https://www.amarulasolutions.com
 
