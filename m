@@ -7,73 +7,72 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28504C433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 16:23:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84C73C433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 16:23:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EA6CD2054F
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 16:23:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4FB732054F
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 16:23:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D8zLcOP8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA6CD2054F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NZz8f4n2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4FB732054F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57876 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59676 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7hvC-0003DH-79
-	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 12:23:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42544)
+	id 1k7hvS-0003w4-IR
+	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 12:23:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42546)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k7hqs-0002BI-AM
+ id 1k7hqs-0002BN-Bi
  for qemu-devel@nongnu.org; Mon, 17 Aug 2020 12:19:14 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:40824)
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:46808)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k7hqo-00053z-RF
+ id 1k7hqo-00054M-RT
  for qemu-devel@nongnu.org; Mon, 17 Aug 2020 12:19:12 -0400
-Received: by mail-wm1-x342.google.com with SMTP id k20so14379679wmi.5
- for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 09:19:06 -0700 (PDT)
+Received: by mail-wr1-x441.google.com with SMTP id r15so5658937wrp.13
+ for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 09:19:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=QI5AKzPXefPD6C1P2HIGbpvr66qRwSQ3EEuHj7Lej/I=;
- b=D8zLcOP8SgEDDsfeLWeOgI0+kBHIkY0pD/vY8p1onfYQBK/ecqKCIDdsDE7uYEoe/h
- NkuFtR6KirTap4cebT00wPZqu6YphiuxouMRxrx08lAree28CzlWqBlidQN/CqZrHV4q
- f9mqDZqi0xNjKaKTuiBHxwLTQyi0a0UhevXhLPuR1VnjnEyVdoz/DzNN0W1GnlY9zf/v
- ot90y6AYIK4R3pmx7tKJbPd27D0E1v9N3XUILbuKbhkTkOVY/NpfkZUp86xcoIJ/OsvX
- OhCsdNsTY7KXs8+d77B7/hKOOAiEgPlx/OFS0FYuDulrhH5mbXLhBo9LSWyZLsiwQIDq
- zysg==
+ bh=ObJNJE/1Ce4anWxkpsO1TM66WWuyMS9eIMcj33K+RL0=;
+ b=NZz8f4n2WNcCIEUeLAFpFJ2qj5veUi76cE+hvQl3c1EQkiuEfdwM2EQDY3UAenbTzs
+ DJY90Bhktu66WxdQ0Nwlmg+EaZUqT5Qdnqmz3WJ1ovVsgs222d4RCNGU7u3jiX6qNuKq
+ T91LAjskDMo1/3ysP7Tad8NR1fiHOL0OAYbgF7WU6Zee6xH1hUgOXkcR9agsq+yRuvrh
+ pwQ7j0ricqAPs/2BV2oBaDeS2i17LqYl8ybnwo764jjhRVXnvH5NOzoRbGhLmQ/FzWMD
+ 0KxAj3diF/U1maOCYZ09i2nTMB7vupXOYWu4ZrowuNPfgjfwk1dTvsoKzCw4LwQsbd/l
+ ThuA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=QI5AKzPXefPD6C1P2HIGbpvr66qRwSQ3EEuHj7Lej/I=;
- b=AF18qFbNdb6mnP9jc+uDlZDr5Gdpht/IawxMxssu+/jtE+AsaYH/IlImY3XZ/iRNc9
- YeCk2jVFQZZfoS3nhwEaA54YyGil0i3SRwhjCM5+qba30XYCHla5AFoey8HWyUZrPwCK
- EeHbR10//dqkqQ8zE0gfeHydgjMLn4+NrmVUznICKisnZwNYyihGMs4w0QQy4HehvWlw
- GNa7GB/6fuLnTEvQCXP54kUDLJu6SR4znAC4QOJLd0mE5nXn6HzLPYGGtE+69rbko+up
- HsRPn8o8j6jKYQuyruanxjQca+2HBHGofulZXvuG8DKuyEoilTKDROxdQMI+EyeGMqcJ
- VkWA==
-X-Gm-Message-State: AOAM532hyjxafQkiV2ybpq48nOJNTP9ckvrj7z0KblmTGDNm9R6i4/+x
- ze4x5o+HsFS/WhD0z3sm5eCYR+R/7/w=
-X-Google-Smtp-Source: ABdhPJyznKOlxofdVg2m2sx9zQ/89hMh6/9LHRoTQzrE/frRBIItaLGD4zoMegJhes1fXUKYmc43gw==
-X-Received: by 2002:a1c:4d16:: with SMTP id o22mr263754wmh.131.1597681145612; 
- Mon, 17 Aug 2020 09:19:05 -0700 (PDT)
+ bh=ObJNJE/1Ce4anWxkpsO1TM66WWuyMS9eIMcj33K+RL0=;
+ b=Q3LdzknU2Hie5xb3rHbkfoDeP4VvTIsH2ZcKJv2VYeoTTo5Xug6mGkgyBKFitfqde5
+ pJjIKErQ5CH+FoiQocEYO0L51A/E1Xxytus/CcJ/5JaZiOtZn/rXNdhc9QzjeLnJzTcs
+ Dj/x63BXUYCqLy0tTuU1gqXHZZgDdSVcP/LXRpSLRomHJm7cRCJLJFwKWv3vzB9e7yXb
+ VXSdsMpGJnlB+dNomG6r67F8iRVbWehL5GwtxHZ09WQV9GcB3XjJ4zOjkd7Mq7VWch1N
+ yPpLFbkVlWfhjl1Xg1jhZ6Zd43qmL9I9sUmSW37DGaysh3frhpEDeLiT9TJSEVX/YD+8
+ PpBA==
+X-Gm-Message-State: AOAM530nKe9sLl/Oip24o68dvimS51/AezWkq/+J4Lff0F0qzzuUiu+y
+ KnLe5qIcOjehd6M45ClpqCl9N+46A6g=
+X-Google-Smtp-Source: ABdhPJzNyhSHNxrR9lz1MYElSPqQzbnxH71HC1fzxDgPou8xJCzbjOF24ed4HJh46hOvK7xdr7m+kw==
+X-Received: by 2002:adf:e9cd:: with SMTP id l13mr17692877wrn.340.1597681147041; 
+ Mon, 17 Aug 2020 09:19:07 -0700 (PDT)
 Received: from localhost.localdomain (121.red-81-40-121.staticip.rima-tde.net.
  [81.40.121.121])
- by smtp.gmail.com with ESMTPSA id r3sm29535472wro.1.2020.08.17.09.19.04
+ by smtp.gmail.com with ESMTPSA id r3sm29535472wro.1.2020.08.17.09.19.05
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 17 Aug 2020 09:19:05 -0700 (PDT)
+ Mon, 17 Aug 2020 09:19:06 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org, Stephen Checkoway <stephen.checkoway@oberlin.edu>,
  Peter Maydell <peter.maydell@linaro.org>
-Subject: [RFC PATCH 6/9] hw/core/null-machine: Allow to use the MMIO 'test'
- device
-Date: Mon, 17 Aug 2020 18:18:50 +0200
-Message-Id: <20200817161853.593247-7-f4bug@amsat.org>
+Subject: [RFC PATCH 7/9] tests/qtest: Add generic MMIO tests
+Date: Mon, 17 Aug 2020 18:18:51 +0200
+Message-Id: <20200817161853.593247-8-f4bug@amsat.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200817161853.593247-1-f4bug@amsat.org>
 References: <20200817161853.593247-1-f4bug@amsat.org>
@@ -81,8 +80,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::342;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x342.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::441;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x441.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -118,66 +117,199 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The MMIO 'test' device (TYPE_MMIO_TESTDEV) can be mapped almost
-anywhere on the sysbus memory. Allow the 'none' machine to
-instantiate it from the command line, such:
+Add generic MMIO tests (which don't need any particular knowledge
+about the architecture) and can be run without any CPU (using the
+'none' machine).
 
-  $ qemu-system-sh4 -M none -monitor stdio \
-    -device mmio-testdev,address=0x00000000 -monitor stdio
-  (qemu) info mtree
-  address-space: memory
-    0000000000000000-ffffffffffffffff (prio 0, i/o): system
-      0000000000000000-000000001fffffff (prio 0, i/o): testdev
-        0000000000000000-00000000000007ff (prio 0, ram): testdev-sram
-        0000000010000000-0000000017ffffff (prio 0, i/o): interleaver-container
-          0000000011608000-00000000116081ff (prio 0, i/o): interleaver-16x8
-          0000000013208000-00000000132083ff (prio 0, i/o): interleaver-32x8
-          0000000013216000-00000000132161ff (prio 0, i/o): interleaver-32x16
-          0000000016408000-00000000164087ff (prio 0, i/o): interleaver-64x8
-          0000000016416000-00000000164163ff (prio 0, i/o): interleaver-64x16
-          0000000016432000-00000000164321ff (prio 0, i/o): interleaver-64x32
+Start testing the interleaved memory accesses.
+
+Cross-endianess is not tested (host and target must have the same
+endianess).
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/core/null-machine.c | 2 ++
- hw/misc/mmio-testdev.c | 4 ++++
- 2 files changed, 6 insertions(+)
+ tests/qtest/mmio-test.c      | 146 +++++++++++++++++++++++++++++++++++
+ MAINTAINERS                  |   1 +
+ tests/qtest/Makefile.include |   1 +
+ 3 files changed, 148 insertions(+)
+ create mode 100644 tests/qtest/mmio-test.c
 
-diff --git a/hw/core/null-machine.c b/hw/core/null-machine.c
-index 7e693523d7..d8be17092f 100644
---- a/hw/core/null-machine.c
-+++ b/hw/core/null-machine.c
-@@ -17,6 +17,7 @@
- #include "sysemu/sysemu.h"
- #include "exec/address-spaces.h"
- #include "hw/core/cpu.h"
-+#include "hw/misc/testdev.h"
- 
- static void machine_none_init(MachineState *mch)
- {
-@@ -55,6 +56,7 @@ static void machine_none_machine_init(MachineClass *mc)
-     mc->no_floppy = 1;
-     mc->no_cdrom = 1;
-     mc->no_sdcard = 1;
-+    machine_class_allow_dynamic_sysbus_dev(mc, TYPE_MMIO_TESTDEV);
- }
- 
- DEFINE_MACHINE("none", machine_none_machine_init)
-diff --git a/hw/misc/mmio-testdev.c b/hw/misc/mmio-testdev.c
-index 3b7a8057b2..42eed16f2d 100644
---- a/hw/misc/mmio-testdev.c
-+++ b/hw/misc/mmio-testdev.c
-@@ -9,6 +9,10 @@
- /*
-  * This device is mostly used to test QEMU internal MMIO devices.
-  * Accesses using CPU core are not allowed.
+diff --git a/tests/qtest/mmio-test.c b/tests/qtest/mmio-test.c
+new file mode 100644
+index 0000000000..7a31eb8e9d
+--- /dev/null
++++ b/tests/qtest/mmio-test.c
+@@ -0,0 +1,146 @@
++/*
++ * QTest testcases for generic MMIO accesses
 + *
-+ * This device is meant to be used for testing, like:
++ * Copyright (C) 2020 Philippe Mathieu-Daudé <f4bug@amsat.org>
 + *
-+ *   qemu-system-sh4 -M none -device mmio-testdev,address=0x10000000
-  */
++ * SPDX-License-Identifier: GPL-2.0-or-later
++ */
++
++#include "qemu/osdep.h"
++
++#include "libqtest.h"
++#include "qemu/bswap.h"
++
++/* Must fit in arch address space */
++static const uint64_t base = 0x20000000ul;
++
++static bool is_cross_endian(QTestState *qts)
++{
++    bool te = qtest_big_endian(qts);
++#ifdef HOST_WORDS_BIGENDIAN
++    te = !te;
++#endif
++    return te;
++}
++
++static QTestState *create_interleaver_qtest(void)
++{
++    QTestState *qts;
++
++    qts = qtest_initf("-M none -device mmio-testdev,address=0x%" PRIx64, base);
++    if (is_cross_endian(qts)) {
++        g_test_skip("Skipping on cross-endian targets");
++        qtest_quit(qts);
++        return NULL;
++    }
++    return qts;
++}
++
++static void test_interleaver_rd32x8a(void)
++{
++    QTestState *qts = create_interleaver_qtest();
++
++    if (!qts) {
++        return;
++    }
++
++    /* write sram directly */
++    qtest_writeb(qts, base + 0x000, 0x10);
++    qtest_writeb(qts, base + 0x100, 0x32);
++    qtest_writeb(qts, base + 0x200, 0x54);
++    qtest_writeb(qts, base + 0x300, 0x76);
++    /* read via interleaver */
++    g_assert_cmphex(qtest_readl(qts, base + 0x13208000 + 0x00), ==, 0x76543210);
++    qtest_quit(qts);
++}
++
++static void test_interleaver_rd32x8b(void)
++{
++    QTestState *qts = create_interleaver_qtest();
++
++    if (!qts) {
++        return;
++    }
++
++    /* write sram directly */
++    qtest_writeb(qts, base + 0x003, 0x10);
++    qtest_writeb(qts, base + 0x103, 0x32);
++    qtest_writeb(qts, base + 0x203, 0x54);
++    qtest_writeb(qts, base + 0x303, 0x76);
++    /* read via interleaver */
++    g_assert_cmphex(qtest_readl(qts, base + 0x13208000 + 0x0c), ==, 0x76543210);
++    qtest_quit(qts);
++}
++
++static void test_interleaver_rd32x16(void)
++{
++    QTestState *qts = create_interleaver_qtest();
++
++    if (!qts) {
++        return;
++    }
++
++    /* write sram directly */
++    qtest_writew(qts, base + 0x002, 0x3210);
++    qtest_writew(qts, base + 0x102, 0x7654);
++    /* read via interleaver */
++    g_assert_cmphex(qtest_readl(qts, base + 0x13216000 + 0x04), ==, 0x76543210);
++    qtest_quit(qts);
++}
++
++static void test_interleaver_wr32x16(void)
++{
++    QTestState *qts = create_interleaver_qtest();
++
++    if (!qts) {
++        return;
++    }
++
++    /* write via interleaver */
++    qtest_writel(qts, base + 0x13216000 + 0x04, 0x76543210);
++    /* read sram directly */
++    g_assert_cmphex(qtest_readw(qts, base + 0x002), ==, 0x3210);
++    g_assert_cmphex(qtest_readw(qts, base + 0x102), ==, 0x7654);
++    qtest_quit(qts);
++}
++
++static void test_interleaver_wr64x8(void)
++{
++    QTestState *qts = create_interleaver_qtest();
++
++    if (!qts) {
++        return;
++    }
++
++    /* write via interleaver */
++    qtest_writeq(qts, base + 0x16408000 + 0x08, 0x9876543210);
++    /* read sram directly */
++    g_assert_cmphex(qtest_readb(qts, base + 0x001), ==, 0x10);
++    g_assert_cmphex(qtest_readb(qts, base + 0x101), ==, 0x32);
++    g_assert_cmphex(qtest_readb(qts, base + 0x401), ==, 0x98);
++    qtest_quit(qts);
++}
++
++static struct {
++    const char *name;
++    void (*test)(void);
++} tests[] = {
++    {"interleaver/rd32x8a", test_interleaver_rd32x8a},
++    {"interleaver/rd32x8b", test_interleaver_rd32x8b},
++    {"interleaver/rd32x16", test_interleaver_rd32x16},
++    {"interleaver/wr32x16", test_interleaver_wr32x16},
++    {"interleaver/wr64x8",  test_interleaver_wr64x8},
++};
++
++int main(int argc, char **argv)
++{
++    g_test_init(&argc, &argv, NULL);
++
++    for (size_t i = 0; i < ARRAY_SIZE(tests); i++) {
++        g_autofree gchar *path = g_strdup_printf("mmio/%s",
++                                                 tests[i].name);
++        qtest_add_func(path, tests[i].test);
++    }
++
++    return g_test_run();
++}
+diff --git a/MAINTAINERS b/MAINTAINERS
+index f75b8c984a..93efef1b87 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1968,6 +1968,7 @@ F: include/hw/misc/interleaver.h
+ F: hw/misc/interleaver.c
+ F: hw/misc/mmio-testdev.c
+ F: include/hw/misc/testdev.h
++F: tests/qtest/mmio-test.c
  
- #include "qemu/osdep.h"
+ Standard VGA
+ M: Gerd Hoffmann <kraxel@redhat.com>
+diff --git a/tests/qtest/Makefile.include b/tests/qtest/Makefile.include
+index b0204e44f2..29dbeb5d05 100644
+--- a/tests/qtest/Makefile.include
++++ b/tests/qtest/Makefile.include
+@@ -9,6 +9,7 @@ check-qtest-generic-y += qmp-cmd-test
+ check-qtest-generic-y += qom-test
+ check-qtest-generic-$(CONFIG_MODULES) += modules-test
+ check-qtest-generic-y += test-hmp
++check-qtest-generic-$(CONFIG_MMIO_TESTDEV) += mmio-test
+ 
+ check-qtest-pci-$(CONFIG_RTL8139_PCI) += rtl8139-test
+ check-qtest-pci-$(CONFIG_VGA) += display-vga-test
 -- 
 2.26.2
 
