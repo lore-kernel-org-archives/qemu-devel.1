@@ -2,91 +2,120 @@ Return-Path: <SRS0=yhYb=B3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D24DBC433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 17:40:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6F7AC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 17:52:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9F32D20716
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 17:40:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 94A5C2063A
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 17:52:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eesrp0Vs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F32D20716
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="s9sY4lG9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 94A5C2063A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48834 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53582 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7j7C-00053O-Rm
-	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 13:40:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33406)
+	id 1k7jIe-0007uE-MM
+	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 13:52:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35812)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
- id 1k7j6I-0004ZT-Cp
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 13:39:14 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:21624
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
- id 1k7j6F-0006fT-Ow
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 13:39:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597685947;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=2odN6IEiamiWMKclWwZO2gVz2L4Px7ApPcvK3oklb54=;
- b=eesrp0VsHtbC5C5QCosc2+rRonAKy8UiC+qURCKtQQSjZl9SzZPhe/nMPGj13BkmqhcDyu
- s3bc6TQ5TqxywZr60JVsbpt1tZ2r8UWNUdfelCzbomSjcZgXx7Gk3VH0pBnJtrCPDse75O
- VUqXrW3I8NB/+nuOldQ0i91SYUFDpE4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-67-gJTbOLU4Ona0KrNygzam3w-1; Mon, 17 Aug 2020 13:39:03 -0400
-X-MC-Unique: gJTbOLU4Ona0KrNygzam3w-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 515405200;
- Mon, 17 Aug 2020 17:39:02 +0000 (UTC)
-Received: from kaapi (unknown [10.74.8.115])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7F1995D9D2;
- Mon, 17 Aug 2020 17:38:54 +0000 (UTC)
-Date: Mon, 17 Aug 2020 23:08:51 +0530 (IST)
-From: P J P <ppandit@redhat.com>
-X-X-Sender: pjp@kaapi
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH v4 0/9] memory: assert and define MemoryRegionOps callbacks
-In-Reply-To: <1bfaf72e-35ee-fce6-9894-c5346af78742@amsat.org>
-Message-ID: <nycvar.YSQ.7.78.906.2008172304280.306228@xnncv>
-References: <20200811114133.672647-1-ppandit@redhat.com>
- <c43dbd57-f22f-27f0-d6b3-77734be76631@amsat.org>
- <nycvar.YSQ.7.78.906.2008170954360.306228@xnncv>
- <1bfaf72e-35ee-fce6-9894-c5346af78742@amsat.org>
+ (Exim 4.90_1) (envelope-from <jjherne@linux.ibm.com>)
+ id 1k7jHz-0007SE-QS; Mon, 17 Aug 2020 13:51:20 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:46510)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <jjherne@linux.ibm.com>)
+ id 1k7jHx-00087H-R8; Mon, 17 Aug 2020 13:51:19 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 07HHY7Nd102511; Mon, 17 Aug 2020 13:51:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
+ h=reply-to : subject : to
+ : cc : references : from : message-id : date : mime-version : in-reply-to
+ : content-type : content-transfer-encoding; s=pp1;
+ bh=bC7EjNMuEc6YnGhgMMKwHqvCZQd81H8FwubaRz/wGe0=;
+ b=s9sY4lG9TefTUg0GrLPZIxJE3l0lL1Y5vjx4m3ofwTJy26GO1M+/bzoUggTZtlQ3WmaV
+ V4DxUArGuGZjgjQ1J7KTFMz4FSXmdUTot8tpPQJgFUWRg581C6d7MG/hM9Xd+jdcn/uB
+ Ln1zGN57+g3CR442ZX96T+XGBDyOrnDJ19ajIhFijyVAsBLwEKp//rWggWb1BrEily2C
+ wPoMqJrmHWFJvUrQ4nComSDD/IIl3njN8NHbLVaedbzrN5ttR3B8L1mKJ21JmZ29gRCd
+ Qpq4HjHo8AoKVXiFeeAFx4JdjVvRKN/tnQ1/HCFyMyW5phSF74kX9sva1wz9tWacnpy+ Cw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 32ywg1j5c5-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 17 Aug 2020 13:51:15 -0400
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 07HHZFFl106851;
+ Mon, 17 Aug 2020 13:51:15 -0400
+Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com
+ [169.53.41.122])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 32ywg1j5bs-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 17 Aug 2020 13:51:15 -0400
+Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
+ by ppma04dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 07HHnDRC032461;
+ Mon, 17 Aug 2020 17:51:14 GMT
+Received: from b01cxnp22035.gho.pok.ibm.com (b01cxnp22035.gho.pok.ibm.com
+ [9.57.198.25]) by ppma04dal.us.ibm.com with ESMTP id 32x7b9yfca-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 17 Aug 2020 17:51:14 +0000
+Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com
+ [9.57.199.106])
+ by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 07HHpDwx54329602
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 17 Aug 2020 17:51:13 GMT
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 9781A28058;
+ Mon, 17 Aug 2020 17:51:13 +0000 (GMT)
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 709D32805E;
+ Mon, 17 Aug 2020 17:51:13 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.85.160.29])
+ by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
+ Mon, 17 Aug 2020 17:51:13 +0000 (GMT)
+Subject: Re: [PATCH] pc-bios: s390x: Only set lowcore iplb address on
+ list-directed IPL
+To: Cornelia Huck <cohuck@redhat.com>
+References: <20200817141734.5109-1-jjherne@linux.ibm.com>
+ <20200817183048.30cb6f9e.cohuck@redhat.com>
+From: "Jason J. Herne" <jjherne@linux.ibm.com>
+Organization: IBM
+Message-ID: <f232a187-c989-cf77-52e5-2e31678e5bed@linux.ibm.com>
+Date: Mon, 17 Aug 2020 13:51:13 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ppandit@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/mixed;
- boundary="-1463810047-10410216-1597685941=:306228"
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=ppandit@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/17 00:24:04
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
+In-Reply-To: <20200817183048.30cb6f9e.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
+ definitions=2020-08-17_13:2020-08-17,
+ 2020-08-17 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ impostorscore=0 clxscore=1015
+ priorityscore=1501 suspectscore=0 lowpriorityscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 adultscore=0 spamscore=0 mlxscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2008170127
+Received-SPF: pass client-ip=148.163.156.1; envelope-from=jjherne@linux.ibm.com;
+ helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/17 13:51:16
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -36
+X-Spam_score: -3.7
 X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-3.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,64 +128,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Li Qiang <liq3ea@gmail.com>,
- =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Lei Sun <slei.casper@gmail.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?ISO-8859-15?Q?Alex_Benn=E9e?= <alex.bennee@linaro.org>,
- David Gibson <david@gibson.dropbear.id.au>
+Reply-To: jjherne@linux.ibm.com
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
----1463810047-10410216-1597685941=:306228
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
+On 8/17/20 12:30 PM, Cornelia Huck wrote:
+> On Mon, 17 Aug 2020 10:17:34 -0400
+> "Jason J. Herne" <jjherne@linux.ibm.com> wrote:
+> 
+>> The POP states that the IPLB location is only written to 0x14 for
+>> list-directed IPL. Some operating systems expect 0x14 to not change on
+>> boot and will fail IPL if it does change.
+>>
+>> Fixes: 9bfc04f9ef6802fff0
+> 
+> Should be
+> 
+> Fixes: 9bfc04f9ef68 ("pc-bios: s390x: Save iplb location in lowcore")
+> 
+>> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
+>> Reviewed-by: Janosch Frank <frankja@de.ibm.com>
+>> ---
+>>   pc-bios/s390-ccw/jump2ipl.c | 5 ++++-
+>>   1 file changed, 4 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/pc-bios/s390-ccw/jump2ipl.c b/pc-bios/s390-ccw/jump2ipl.c
+>> index 767012bf0c..5e3e13f4b0 100644
+>> --- a/pc-bios/s390-ccw/jump2ipl.c
+>> +++ b/pc-bios/s390-ccw/jump2ipl.c
+>> @@ -33,7 +33,10 @@ void jump_to_IPL_code(uint64_t address)
+>>   {
+>>       /* store the subsystem information _after_ the bootmap was loaded */
+>>       write_subsystem_identification();
+>> -    write_iplb_location();
+>> +
+>> +    if (iplb.pbt != S390_IPL_TYPE_CCW) {
+>> +            write_iplb_location();
+>> +    }
+> 
+> What happens for ipl types other than CCW and FCP? IOW, should that
+> rather be a positive check for S390_IPL_TYPE_FCP?
+> 
+>>   
+>>       /* prevent unknown IPL types in the guest */
+>>       if (iplb.pbt == S390_IPL_TYPE_QEMU_SCSI) {
+> 
 
-+-- On Mon, 17 Aug 2020, Philippe Mathieu-Daudé wrote --+
-| On 8/17/20 7:02 AM, P J P wrote:
-| > +-- On Sun, 16 Aug 2020, Philippe Mathieu-Daudé wrote --+
-| > | What about read_with_attrs()/write_with_attrs()? It seems they are part 
-| > | of the same problem.
-| > 
-| > * read/write_with_attrs function is called if read/write callback is not 
-| >   defined
-| > 
-| >   ../softmmu/memory.c
-| >     if (mr->ops->write) {
-| >                     ... memory_region_write_accessor, mr,
-| >     } else {
-| >                     ... memory_region_write_with_attrs_accessor,
-| > 
-| >   So, defining read/write methods may also address read/write_with_attrs 
-| >   issue?
-| > 
-| > * $ grep -Eri -A 5 -B 5 '(\.read_with_attrs|\.write_with_attrs)' . | fpaste
-| > 
-| >    -> https://paste.centos.org/view/386c9597
-| > 
-| >   It doesn't show an occurrence where one of the read/write_with_attrs is 
-| >   missing.
-| > 
-| > * Nevertheless, if we need to define read/write_with_attrs routines, because 
-| >   memory_region_init_io() would assert(3) for them
-| > 
-| >   could that be a subsequent patch series please?
-| 
-| Yes no problem, I was just wondering and wasn't sure.
+Based on my (admittedly limited) understanding of the architecture and
+code, I believe write_iplb_location() should be called at least for
+S390_IPL_TYPE_FCP but I'm not 100% sure on S390_IPL_TYPE_QEMU_SCSI.
+Perhaps Janosch has an idea?
+
+It was originally unconditional, and my new conditional excludes vfio
+CCW which is definitely a step in the right direction, in any case :).
 
 
-@Peter, @Paolo: (To confirm)
-   Do we ping/reach out to respective maintainers for merging this series?
-
-
-Thank you.
---
-Prasad J Pandit / Red Hat Product Security Team
-8685 545E B54C 486B C6EB 271E E285 8B5A F050 DE8D
----1463810047-10410216-1597685941=:306228--
-
+-- 
+-- Jason J. Herne (jjherne@linux.ibm.com)
 
