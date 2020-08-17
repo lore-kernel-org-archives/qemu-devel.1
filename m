@@ -7,71 +7,71 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54579C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 14:57:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15C28C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 14:58:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1E3FF205CB
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 14:57:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D594C205CB
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 14:58:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NhNeSvzK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E3FF205CB
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tZ4p5EGb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D594C205CB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56938 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59952 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7ga1-0001I9-Dt
-	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 10:57:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41108)
+	id 1k7gaU-0002Vk-3d
+	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 10:58:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40940)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1k7gHI-0004uM-7i
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:38:24 -0400
-Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:39222)
+ id 1k7gH6-0004MT-7w
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:38:12 -0400
+Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:45585)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1k7gHE-0006BZ-Mr
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:38:23 -0400
-Received: by mail-wr1-x42b.google.com with SMTP id a5so15258866wrm.6
- for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 07:38:20 -0700 (PDT)
+ id 1k7gH4-00069p-Mq
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:38:11 -0400
+Received: by mail-wr1-x42b.google.com with SMTP id z18so15241906wrm.12
+ for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 07:38:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=MxRrNlWMa4peGdDiN+aPCZQxNRXBWH2i6GnS6XF+Ofc=;
- b=NhNeSvzKgniEF68kToAuUqCjWOWYcddHp31ToGUk8NUkr4ir1X0Kl+Jdehabsswm/7
- qvftkomKG63pArHGNcMlWFwHeEcxnbvD+9g9LLm8xmmnxEo3l15rqW0tFWaa25A+Kami
- Twf0R24j45vgZeIVqf7BlhyxGbz943I7I0wyOEdXd1wHvz6ZT0St/jEgZa5K/0SkQiVS
- CMGXAkIE0z3NnMgLnjbsvUm3jDhtw9JX90/cTlbYXFA5Xlm+GMbKUlrr+Rg7P+rjYVIr
- 8fGwrxADjJbVsuzofJ9JKci54jQiMdptL1dpFfaGcGxN3ZoBlgoPxcSAnYllMMO8Cyzb
- ZMjw==
+ bh=WQv+f2f0fRtkp8SsmttK9Yb+gdx5W6ZpefDYJCwcG00=;
+ b=tZ4p5EGbheOTF5TCOVqXXl/jID1l1hqzMQJ133aRDc+n4TOC9DKp4aE8FQX8wFYJy4
+ g9mRuuNbdMEKqRtke2Rbv1pGMQyPt1vPmUqYLX2jSVvyr/EMBm+7ojd5nS7JFQu771Ys
+ prYyBfzW9wLpKzQq8zKcMUx5XPHpKJaOGKIJAWHrPqRnj7HCv5Rzsx5FosKbgSS9ql4n
+ egTUqbJK5nn1FJjFLqJBPUZxj8K2tcccZiOzu67KeTvFl5KkYREuR3+LaN8rP3GvZZex
+ F7cqJTo24vNSDjxz6m10mhSrJId/lYUS0BiTPae+vjJ9C2eqCynm090311pZfX1oSaCg
+ /Cdg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=MxRrNlWMa4peGdDiN+aPCZQxNRXBWH2i6GnS6XF+Ofc=;
- b=AiZRlgXH2ayv96WzX6sUG3WDj6FTpFvgVAs/32b5otzrHlGuGv5+7n9JyZeOX2mh8o
- BgsNHdSbGrsJ5JEXPAbLLbK/qTbir5aWgCUMwETO79mt6WpKXkaMIM+gsMoqAzvSg9ef
- /fvsGINfupUVkAi5CNA2N80Tc7xgaUzl++Zm9U7wxKA08Tnlt6gahGSjqiJpYWc3WSex
- qBm7rmJ/ujSI6/bIImEMcX+AcPCLghJecJmoTMQRWCn8vbhuY8eLw7l7obtD0ggOO2S4
- 2XacKTWAaJ/c/w5jU9gEtWBHBECgdGsxHiSy+6Be93tsICIop1qKA0P10TCw0xwizD0U
- BN5w==
-X-Gm-Message-State: AOAM5310I2k4aVK/nZfMonSE/LrDA8wE52NFZBwzGf/M3qkqBNbuWAqX
- l5BNwy/W73OMl+/PRDVfJz6oWQ7eg2o=
-X-Google-Smtp-Source: ABdhPJx5Cb4RWKXzHql7txQgtEeny1rIKPkiilm9tzR7nJ+G0P0XhISv3pmgSjzWJzP6+Z4Rh6nAZg==
-X-Received: by 2002:adf:e704:: with SMTP id c4mr16993074wrm.81.1597675099215; 
- Mon, 17 Aug 2020 07:38:19 -0700 (PDT)
+ bh=WQv+f2f0fRtkp8SsmttK9Yb+gdx5W6ZpefDYJCwcG00=;
+ b=uDacXGaDBQrSH40cOzlNcP1ZOxWxFdplVcC+oRFzosY1S0prBRU8uja+mfu/UuTBSL
+ P4cir50WWzbcJWNWmuA/quRnFxLClIn1hxN82t55vixm9QiM24u0kOW/m5YrSg8Hs5Yt
+ UXxvZLqJKsVX7dQvifG41PMghmpYOGrnPkJlVYdN5GWIq57Z596fda8HaIiI2+vPBjdf
+ NF3mgJ2uIcFcz59qrvebFkSYSFl9OQMvyJFXjx/4ECh1DGKYAzyoSFccaU4F9qRhUhxA
+ Dr12MfYkgBh/b0mGZulbBNmJ36MUq58Gs2bgZCdQfLToyEI4fx4knZsldnNtt5asmK0v
+ SxzA==
+X-Gm-Message-State: AOAM5322LZTLQI6BdyGuKWF6yAD37Xxb8ayq7xrRsjei2qQnm1YiijvV
+ 05yPc89bL/CfW3AXMfOkO/etZoEXhVg=
+X-Google-Smtp-Source: ABdhPJzblm9nqdOH4C7NxgrIySNpesrVAFZm5LvfKipaX5gp750rKJi/3W4gi7dIYhjpsuQSDA/wcg==
+X-Received: by 2002:adf:e647:: with SMTP id b7mr16943865wrn.220.1597675089228; 
+ Mon, 17 Aug 2020 07:38:09 -0700 (PDT)
 Received: from donizetti.redhat.com ([2001:b07:6468:f312:a0d1:fc42:c610:f977])
  by smtp.gmail.com with ESMTPSA id
- i22sm34966603wrb.45.2020.08.17.07.38.18
+ i22sm34966603wrb.45.2020.08.17.07.38.08
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 17 Aug 2020 07:38:18 -0700 (PDT)
+ Mon, 17 Aug 2020 07:38:08 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 055/150] meson: convert qom directory to Meson (tools part)
-Date: Mon, 17 Aug 2020 16:35:48 +0200
-Message-Id: <20200817143723.343284-56-pbonzini@redhat.com>
+Subject: [PATCH 044/150] meson: add qemu-keymap
+Date: Mon, 17 Aug 2020 16:35:37 +0200
+Message-Id: <20200817143723.343284-45-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200817143723.343284-1-pbonzini@redhat.com>
 References: <20200817143723.343284-1-pbonzini@redhat.com>
@@ -112,110 +112,84 @@ From: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Makefile          |  2 +-
- Makefile.objs     |  2 +-
- Makefile.target   |  3 ++-
- meson.build       |  1 +
- qom/Makefile.objs |  3 ---
- qom/meson.build   | 15 +++++++++++++++
- 6 files changed, 20 insertions(+), 6 deletions(-)
- create mode 100644 qom/meson.build
+ Makefile    |  5 -----
+ configure   |  4 +---
+ meson.build | 10 ++++++++++
+ 3 files changed, 11 insertions(+), 8 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index 68ad75d210..1f95ba81f4 100644
+index cbd5bd1a87..60dec5d0ff 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -237,7 +237,6 @@ dummy := $(call unnest-vars,, \
-                 storage-daemon-obj-y \
-                 storage-daemon-obj-m \
-                 crypto-obj-y \
--                qom-obj-y \
-                 io-obj-y \
-                 common-obj-y \
-                 common-obj-m)
-@@ -258,6 +257,7 @@ $(SOFTMMU_ALL_RULES): $(storage-daemon-obj-y)
- $(SOFTMMU_ALL_RULES): $(chardev-obj-y)
- $(SOFTMMU_ALL_RULES): $(crypto-obj-y)
- $(SOFTMMU_ALL_RULES): $(io-obj-y)
-+$(SOFTMMU_ALL_RULES): $(qom-obj-y)
- $(SOFTMMU_ALL_RULES): config-all-devices.mak
+@@ -418,8 +418,6 @@ qemu-nbd$(EXESUF): qemu-nbd.o $(authz-obj-y) $(block-obj-y) $(crypto-obj-y) $(io
+ qemu-io$(EXESUF): qemu-io.o $(authz-obj-y) $(block-obj-y) $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
+ qemu-storage-daemon$(EXESUF): qemu-storage-daemon.o $(authz-obj-y) $(block-obj-y) $(crypto-obj-y) $(chardev-obj-y) $(io-obj-y) $(qom-obj-y) $(storage-daemon-obj-y) $(COMMON_LDADDS)
  
- SOFTMMU_FUZZ_RULES=$(filter %-softmmu/fuzz, $(TARGET_DIRS_RULES))
-diff --git a/Makefile.objs b/Makefile.objs
-index baf15656e8..84bfa2a61a 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -1,6 +1,6 @@
- #######################################################################
- # Common libraries for tools and emulators
--qom-obj-y = qom/
-+qom-obj-y = qom/libqom.fa
+-qemu-keymap$(EXESUF): qemu-keymap.o ui/input-keymap.o $(COMMON_LDADDS)
+-
+ qemu-edid$(EXESUF): qemu-edid.o hw/display/edid-generate.o $(COMMON_LDADDS)
  
- #######################################################################
- # code used by both qemu system emulation and qemu-img
-diff --git a/Makefile.target b/Makefile.target
-index 257afc2723..1e04551a8e 100644
---- a/Makefile.target
-+++ b/Makefile.target
-@@ -191,13 +191,14 @@ all-obj-y := $(obj-y)
- common-obj-m :=
+ fsdev/virtfs-proxy-helper$(EXESUF): fsdev/virtfs-proxy-helper.o fsdev/9p-marshal.o fsdev/9p-iov-marshal.o $(COMMON_LDADDS)
+@@ -432,9 +430,6 @@ endif
+ qemu-img-cmds.h: $(SRC_PATH)/qemu-img-cmds.hx $(SRC_PATH)/scripts/hxtool
+ 	$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -h < $< > $@,"GEN","$@")
  
- include $(SRC_PATH)/Makefile.objs
-+dummy := $(call fix-paths,../,, \
-+              qom-obj-y)
- dummy := $(call unnest-vars,.., \
-                authz-obj-y \
-                block-obj-y \
-                block-obj-m \
-                chardev-obj-y \
-                crypto-obj-y \
--               qom-obj-y \
-                io-obj-y \
-                common-obj-y \
-                common-obj-m)
+-qemu-keymap$(EXESUF): LIBS += $(XKBCOMMON_LIBS)
+-qemu-keymap$(EXESUF): QEMU_CFLAGS += $(XKBCOMMON_CFLAGS)
+-
+ module_block.h: $(SRC_PATH)/scripts/modules/module_block.py config-host.mak
+ 	$(call quiet-command,$(PYTHON) $< $@ \
+ 	$(addprefix $(SRC_PATH)/,$(patsubst %.mo,%.c,$(block-obj-m))), \
+diff --git a/configure b/configure
+index a58d049d13..919f0413fa 100755
+--- a/configure
++++ b/configure
+@@ -6703,9 +6703,6 @@ if test "$softmmu" = yes ; then
+     fi
+     mpath=no
+   fi
+-  if test "$xkbcommon" = "yes"; then
+-    tools="qemu-keymap\$(EXESUF) $tools"
+-  fi
+ fi
+ 
+ # Probe for guest agent support/options
+@@ -7022,6 +7019,7 @@ if test "$vnc_png" = "yes" ; then
+   echo "CONFIG_VNC_PNG=y" >> $config_host_mak
+ fi
+ if test "$xkbcommon" = "yes" ; then
++  echo "CONFIG_XKBCOMMON=y" >> $config_host_mak
+   echo "XKBCOMMON_CFLAGS=$xkbcommon_cflags" >> $config_host_mak
+   echo "XKBCOMMON_LIBS=$xkbcommon_libs" >> $config_host_mak
+ fi
 diff --git a/meson.build b/meson.build
-index 00b3220fc8..30e7a0e35b 100644
+index 8c05db2cb6..fc65f01b6f 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -336,6 +336,7 @@ libqemuutil = static_library('qemuutil',
- qemuutil = declare_dependency(link_with: libqemuutil,
-                               sources: genh + version_res)
+@@ -107,6 +107,11 @@ libcap_ng = not_found
+ if 'CONFIG_LIBCAP_NG' in config_host
+   libcap_ng = declare_dependency(link_args: config_host['LIBCAP_NG_LIBS'].split())
+ endif
++xkbcommon = not_found
++if 'CONFIG_XKBCOMMON' in config_host
++  xkbcommon = declare_dependency(compile_args: config_host['XKBCOMMON_CFLAGS'].split(),
++                                 link_args: config_host['XKBCOMMON_LIBS'].split())
++endif
+ rt = cc.find_library('rt', required: false)
+ libiscsi = not_found
+ if 'CONFIG_LIBISCSI' in config_host
+@@ -301,6 +306,11 @@ if have_tools
+   subdir('contrib/rdmacm-mux')
+   subdir('contrib/elf2dmp')
  
-+subdir('qom')
- subdir('fsdev')
- 
- # Other build targets
-diff --git a/qom/Makefile.objs b/qom/Makefile.objs
-index 1b45d104ba..b9629045e6 100644
---- a/qom/Makefile.objs
-+++ b/qom/Makefile.objs
-@@ -1,5 +1,2 @@
--qom-obj-y = object.o container.o qom-qobject.o
--qom-obj-y += object_interfaces.o
--
- common-obj-$(CONFIG_SOFTMMU) += qom-hmp-cmds.o qom-qmp-cmds.o
- storage-daemon-obj-y += qom-qmp-cmds.o
-diff --git a/qom/meson.build b/qom/meson.build
-new file mode 100644
-index 0000000000..3c41ed37e4
---- /dev/null
-+++ b/qom/meson.build
-@@ -0,0 +1,15 @@
-+qom_ss = ss.source_set()
-+qom_ss.add(files(
-+  'container.c',
-+  'object.c',
-+  'object_interfaces.c',
-+  'qom-qobject.c',
-+))
++  if 'CONFIG_XKBCOMMON' in config_host
++    executable('qemu-keymap', files('qemu-keymap.c', 'ui/input-keymap.c'),
++               dependencies: [qemuutil, xkbcommon], install: true)
++  endif
 +
-+qom_ss = qom_ss.apply(config_host, strict: false)
-+libqom = static_library('qom', qom_ss.sources(),
-+                        dependencies: [qom_ss.dependencies()],
-+                        link_with: [libqemuutil],
-+                        name_suffix: 'fa')
-+
-+qom = declare_dependency(link_whole: libqom)
+   if 'CONFIG_VHOST_USER' in config_host
+     subdir('contrib/libvhost-user')
+     subdir('contrib/vhost-user-blk')
 -- 
 2.26.2
 
