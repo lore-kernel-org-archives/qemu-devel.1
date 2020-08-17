@@ -7,72 +7,73 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84C73C433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 16:23:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0885DC433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 16:24:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4FB732054F
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 16:23:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CC50F2054F
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 16:24:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NZz8f4n2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4FB732054F
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dlTVE+NT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC50F2054F
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59676 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60586 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7hvS-0003w4-IR
-	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 12:23:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42546)
+	id 1k7hvj-0004I8-OZ
+	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 12:24:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42542)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k7hqs-0002BN-Bi
+ id 1k7hqs-0002BG-Bs
  for qemu-devel@nongnu.org; Mon, 17 Aug 2020 12:19:14 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:46808)
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:33946)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k7hqo-00054M-RT
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 12:19:12 -0400
-Received: by mail-wr1-x441.google.com with SMTP id r15so5658937wrp.13
- for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 09:19:08 -0700 (PDT)
+ id 1k7hqp-00054W-LU
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 12:19:13 -0400
+Received: by mail-wr1-x441.google.com with SMTP id f7so15593441wrw.1
+ for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 09:19:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=ObJNJE/1Ce4anWxkpsO1TM66WWuyMS9eIMcj33K+RL0=;
- b=NZz8f4n2WNcCIEUeLAFpFJ2qj5veUi76cE+hvQl3c1EQkiuEfdwM2EQDY3UAenbTzs
- DJY90Bhktu66WxdQ0Nwlmg+EaZUqT5Qdnqmz3WJ1ovVsgs222d4RCNGU7u3jiX6qNuKq
- T91LAjskDMo1/3ysP7Tad8NR1fiHOL0OAYbgF7WU6Zee6xH1hUgOXkcR9agsq+yRuvrh
- pwQ7j0ricqAPs/2BV2oBaDeS2i17LqYl8ybnwo764jjhRVXnvH5NOzoRbGhLmQ/FzWMD
- 0KxAj3diF/U1maOCYZ09i2nTMB7vupXOYWu4ZrowuNPfgjfwk1dTvsoKzCw4LwQsbd/l
- ThuA==
+ bh=+1f1xYxQv9iAMf0ZcH5rNUu+lZAXATbXmvjHTkMEv7U=;
+ b=dlTVE+NTmghw64Lm+wnYk7TGn1R4Vp8z1aApw6/X43aXHgpmkZ1oVzYc5QaXBBpjDr
+ ihLmeb87Qr7vOU92Fp7c5YGzgEe5VqZ5ZatXJo62BadiymvmOFJ5q1Xvx9yPuqWa5cFd
+ MEi2EMV7lg6nrWX/VrW+4gEqFTBRQuMHmsyh3BmqVWdtKxOORfXL3/WlWNfB6MGqItQr
+ YCagRSzKNoH0WAm86s2VLDEfpOitB7DVs0H1108shX4nl5mVcCKTGi3sEKbAAT3+j+3f
+ dk1J7nKCPMhO+ot7+Ti1nvNXKeWy+BmPKNs3fkoHcJF+YAVgVxhj1ZWP+tKgoTZSBHxE
+ u5iw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=ObJNJE/1Ce4anWxkpsO1TM66WWuyMS9eIMcj33K+RL0=;
- b=Q3LdzknU2Hie5xb3rHbkfoDeP4VvTIsH2ZcKJv2VYeoTTo5Xug6mGkgyBKFitfqde5
- pJjIKErQ5CH+FoiQocEYO0L51A/E1Xxytus/CcJ/5JaZiOtZn/rXNdhc9QzjeLnJzTcs
- Dj/x63BXUYCqLy0tTuU1gqXHZZgDdSVcP/LXRpSLRomHJm7cRCJLJFwKWv3vzB9e7yXb
- VXSdsMpGJnlB+dNomG6r67F8iRVbWehL5GwtxHZ09WQV9GcB3XjJ4zOjkd7Mq7VWch1N
- yPpLFbkVlWfhjl1Xg1jhZ6Zd43qmL9I9sUmSW37DGaysh3frhpEDeLiT9TJSEVX/YD+8
- PpBA==
-X-Gm-Message-State: AOAM530nKe9sLl/Oip24o68dvimS51/AezWkq/+J4Lff0F0qzzuUiu+y
- KnLe5qIcOjehd6M45ClpqCl9N+46A6g=
-X-Google-Smtp-Source: ABdhPJzNyhSHNxrR9lz1MYElSPqQzbnxH71HC1fzxDgPou8xJCzbjOF24ed4HJh46hOvK7xdr7m+kw==
-X-Received: by 2002:adf:e9cd:: with SMTP id l13mr17692877wrn.340.1597681147041; 
- Mon, 17 Aug 2020 09:19:07 -0700 (PDT)
+ bh=+1f1xYxQv9iAMf0ZcH5rNUu+lZAXATbXmvjHTkMEv7U=;
+ b=rk4/W7V8NOBaHVVpF5C7HWiSLVVX5KlqU7LiO+q3xKlQ3vtnjJcvNQhf5kHenDuFHN
+ W1LtxpUsdKI4Gy745CMKdUIqgkBNRTiEb5mQfP+zqGWKhNrI3/iR/FT7TeHGKi7bb4f6
+ z+0dj+CfC2dXQ3GjiTw+XFRYgVIwgYkdxPJaPz+8dNt8SqvUUhIcEsVWvq+quGSIQtI3
+ L99GTPkw8dVeKOPfmOAjVUgGtIlFf+VWo4Ns9lAOCCW/E+p9s2+mY1UZTcIoH8V7ebOY
+ RhigbEPAI9p7TXFE7tvEsTzJ+lH/eEgYKwnMHB/kUqw5wLOy53Ruc4gEJdqm3NhRT6RF
+ qnJg==
+X-Gm-Message-State: AOAM530gupWXJYFdctpVpn3Fs3LuRZiGKuz1TdbKIXcJrOcT6WBjSkSl
+ rYav1a8sRXiRo1pmBZ6tQg1CW0hElTk=
+X-Google-Smtp-Source: ABdhPJzxt76j2R+ep+UDuNQLpMDcMPvtFOCnNPo19YCT/sZBR2a2iWQGumzWTC2vE49T7iAghUcYmw==
+X-Received: by 2002:adf:e90f:: with SMTP id f15mr16467437wrm.18.1597681150116; 
+ Mon, 17 Aug 2020 09:19:10 -0700 (PDT)
 Received: from localhost.localdomain (121.red-81-40-121.staticip.rima-tde.net.
  [81.40.121.121])
- by smtp.gmail.com with ESMTPSA id r3sm29535472wro.1.2020.08.17.09.19.05
+ by smtp.gmail.com with ESMTPSA id r3sm29535472wro.1.2020.08.17.09.19.08
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 17 Aug 2020 09:19:06 -0700 (PDT)
+ Mon, 17 Aug 2020 09:19:09 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org, Stephen Checkoway <stephen.checkoway@oberlin.edu>,
  Peter Maydell <peter.maydell@linaro.org>
-Subject: [RFC PATCH 7/9] tests/qtest: Add generic MMIO tests
-Date: Mon, 17 Aug 2020 18:18:51 +0200
-Message-Id: <20200817161853.593247-8-f4bug@amsat.org>
+Subject: [RFC PATCH 9/9] hw/misc/interleaver: Display subregions in 'info
+ mtree'
+Date: Mon, 17 Aug 2020 18:18:53 +0200
+Message-Id: <20200817161853.593247-10-f4bug@amsat.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200817161853.593247-1-f4bug@amsat.org>
 References: <20200817161853.593247-1-f4bug@amsat.org>
@@ -117,199 +118,97 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add generic MMIO tests (which don't need any particular knowledge
-about the architecture) and can be run without any CPU (using the
-'none' machine).
+Implement the MemoryRegion::subregions_description() handler to
+be able to display the inverleaved memory regions:
 
-Start testing the interleaved memory accesses.
-
-Cross-endianess is not tested (host and target must have the same
-endianess).
+  $ qemu-system-sh4 -M none -monitor stdio \
+    -device mmio-testdev,address=0x00000000 -monitor stdio
+  address-space: memory
+    0000000000000000-ffffffffffffffff (prio 0, i/o): system
+      0000000000000000-000000001fffffff (prio 0, i/o): testdev
+        0000000000000000-00000000000007ff (prio 0, ram): testdev-sram
+        0000000010000000-0000000017ffffff (prio 0, i/o): interleaver-container
+          0000000011608000-00000000116081ff (prio 0, i/o): interleaver-16x8
+          0000000011608000-00000000116081ff (prio 0, i/o):   8-bit access on 'sram-p0'
+          0000000011608000-00000000116081ff (prio 0, i/o):   8-bit access on 'sram-p1' (8-bit shifted)
+          0000000013208000-00000000132083ff (prio 0, i/o): interleaver-32x8
+          0000000013208000-00000000132083ff (prio 0, i/o):   8-bit access on 'sram-p0'
+          0000000013208000-00000000132083ff (prio 0, i/o):   8-bit access on 'sram-p1' (8-bit shifted)
+          0000000013208000-00000000132083ff (prio 0, i/o):   8-bit access on 'sram-p2' (16-bit shifted)
+          0000000013208000-00000000132083ff (prio 0, i/o):   8-bit access on 'sram-p3' (24-bit shifted)
+          0000000013216000-00000000132161ff (prio 0, i/o): interleaver-32x16
+          0000000013216000-00000000132161ff (prio 0, i/o):   16-bit access on 'sram-p0'
+          0000000013216000-00000000132161ff (prio 0, i/o):   16-bit access on 'sram-p1' (16-bit shifted)
+          0000000016408000-00000000164087ff (prio 0, i/o): interleaver-64x8
+          0000000016408000-00000000164087ff (prio 0, i/o):   8-bit access on 'sram-p0'
+          0000000016408000-00000000164087ff (prio 0, i/o):   8-bit access on 'sram-p1' (8-bit shifted)
+          0000000016408000-00000000164087ff (prio 0, i/o):   8-bit access on 'sram-p2' (16-bit shifted)
+          0000000016408000-00000000164087ff (prio 0, i/o):   8-bit access on 'sram-p3' (24-bit shifted)
+          0000000016408000-00000000164087ff (prio 0, i/o):   8-bit access on 'sram-p4' (32-bit shifted)
+          0000000016408000-00000000164087ff (prio 0, i/o):   8-bit access on 'sram-p5' (40-bit shifted)
+          0000000016408000-00000000164087ff (prio 0, i/o):   8-bit access on 'sram-p6' (48-bit shifted)
+          0000000016408000-00000000164087ff (prio 0, i/o):   8-bit access on 'sram-p7' (56-bit shifted)
+          0000000016416000-00000000164163ff (prio 0, i/o): interleaver-64x16
+          0000000016416000-00000000164163ff (prio 0, i/o):   16-bit access on 'sram-p0'
+          0000000016416000-00000000164163ff (prio 0, i/o):   16-bit access on 'sram-p1' (16-bit shifted)
+          0000000016416000-00000000164163ff (prio 0, i/o):   16-bit access on 'sram-p2' (32-bit shifted)
+          0000000016416000-00000000164163ff (prio 0, i/o):   16-bit access on 'sram-p3' (48-bit shifted)
+          0000000016432000-00000000164321ff (prio 0, i/o): interleaver-64x32
+          0000000016432000-00000000164321ff (prio 0, i/o):   32-bit access on 'sram-p0'
+          0000000016432000-00000000164321ff (prio 0, i/o):   32-bit access on 'sram-p1' (32-bit shifted)
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- tests/qtest/mmio-test.c      | 146 +++++++++++++++++++++++++++++++++++
- MAINTAINERS                  |   1 +
- tests/qtest/Makefile.include |   1 +
- 3 files changed, 148 insertions(+)
- create mode 100644 tests/qtest/mmio-test.c
+ hw/misc/interleaver.c | 29 +++++++++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
 
-diff --git a/tests/qtest/mmio-test.c b/tests/qtest/mmio-test.c
-new file mode 100644
-index 0000000000..7a31eb8e9d
---- /dev/null
-+++ b/tests/qtest/mmio-test.c
-@@ -0,0 +1,146 @@
-+/*
-+ * QTest testcases for generic MMIO accesses
-+ *
-+ * Copyright (C) 2020 Philippe Mathieu-Daudé <f4bug@amsat.org>
-+ *
-+ * SPDX-License-Identifier: GPL-2.0-or-later
-+ */
-+
-+#include "qemu/osdep.h"
-+
-+#include "libqtest.h"
-+#include "qemu/bswap.h"
-+
-+/* Must fit in arch address space */
-+static const uint64_t base = 0x20000000ul;
-+
-+static bool is_cross_endian(QTestState *qts)
-+{
-+    bool te = qtest_big_endian(qts);
-+#ifdef HOST_WORDS_BIGENDIAN
-+    te = !te;
-+#endif
-+    return te;
-+}
-+
-+static QTestState *create_interleaver_qtest(void)
-+{
-+    QTestState *qts;
-+
-+    qts = qtest_initf("-M none -device mmio-testdev,address=0x%" PRIx64, base);
-+    if (is_cross_endian(qts)) {
-+        g_test_skip("Skipping on cross-endian targets");
-+        qtest_quit(qts);
-+        return NULL;
-+    }
-+    return qts;
-+}
-+
-+static void test_interleaver_rd32x8a(void)
-+{
-+    QTestState *qts = create_interleaver_qtest();
-+
-+    if (!qts) {
-+        return;
-+    }
-+
-+    /* write sram directly */
-+    qtest_writeb(qts, base + 0x000, 0x10);
-+    qtest_writeb(qts, base + 0x100, 0x32);
-+    qtest_writeb(qts, base + 0x200, 0x54);
-+    qtest_writeb(qts, base + 0x300, 0x76);
-+    /* read via interleaver */
-+    g_assert_cmphex(qtest_readl(qts, base + 0x13208000 + 0x00), ==, 0x76543210);
-+    qtest_quit(qts);
-+}
-+
-+static void test_interleaver_rd32x8b(void)
-+{
-+    QTestState *qts = create_interleaver_qtest();
-+
-+    if (!qts) {
-+        return;
-+    }
-+
-+    /* write sram directly */
-+    qtest_writeb(qts, base + 0x003, 0x10);
-+    qtest_writeb(qts, base + 0x103, 0x32);
-+    qtest_writeb(qts, base + 0x203, 0x54);
-+    qtest_writeb(qts, base + 0x303, 0x76);
-+    /* read via interleaver */
-+    g_assert_cmphex(qtest_readl(qts, base + 0x13208000 + 0x0c), ==, 0x76543210);
-+    qtest_quit(qts);
-+}
-+
-+static void test_interleaver_rd32x16(void)
-+{
-+    QTestState *qts = create_interleaver_qtest();
-+
-+    if (!qts) {
-+        return;
-+    }
-+
-+    /* write sram directly */
-+    qtest_writew(qts, base + 0x002, 0x3210);
-+    qtest_writew(qts, base + 0x102, 0x7654);
-+    /* read via interleaver */
-+    g_assert_cmphex(qtest_readl(qts, base + 0x13216000 + 0x04), ==, 0x76543210);
-+    qtest_quit(qts);
-+}
-+
-+static void test_interleaver_wr32x16(void)
-+{
-+    QTestState *qts = create_interleaver_qtest();
-+
-+    if (!qts) {
-+        return;
-+    }
-+
-+    /* write via interleaver */
-+    qtest_writel(qts, base + 0x13216000 + 0x04, 0x76543210);
-+    /* read sram directly */
-+    g_assert_cmphex(qtest_readw(qts, base + 0x002), ==, 0x3210);
-+    g_assert_cmphex(qtest_readw(qts, base + 0x102), ==, 0x7654);
-+    qtest_quit(qts);
-+}
-+
-+static void test_interleaver_wr64x8(void)
-+{
-+    QTestState *qts = create_interleaver_qtest();
-+
-+    if (!qts) {
-+        return;
-+    }
-+
-+    /* write via interleaver */
-+    qtest_writeq(qts, base + 0x16408000 + 0x08, 0x9876543210);
-+    /* read sram directly */
-+    g_assert_cmphex(qtest_readb(qts, base + 0x001), ==, 0x10);
-+    g_assert_cmphex(qtest_readb(qts, base + 0x101), ==, 0x32);
-+    g_assert_cmphex(qtest_readb(qts, base + 0x401), ==, 0x98);
-+    qtest_quit(qts);
-+}
-+
-+static struct {
-+    const char *name;
-+    void (*test)(void);
-+} tests[] = {
-+    {"interleaver/rd32x8a", test_interleaver_rd32x8a},
-+    {"interleaver/rd32x8b", test_interleaver_rd32x8b},
-+    {"interleaver/rd32x16", test_interleaver_rd32x16},
-+    {"interleaver/wr32x16", test_interleaver_wr32x16},
-+    {"interleaver/wr64x8",  test_interleaver_wr64x8},
-+};
-+
-+int main(int argc, char **argv)
-+{
-+    g_test_init(&argc, &argv, NULL);
-+
-+    for (size_t i = 0; i < ARRAY_SIZE(tests); i++) {
-+        g_autofree gchar *path = g_strdup_printf("mmio/%s",
-+                                                 tests[i].name);
-+        qtest_add_func(path, tests[i].test);
-+    }
-+
-+    return g_test_run();
-+}
-diff --git a/MAINTAINERS b/MAINTAINERS
-index f75b8c984a..93efef1b87 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1968,6 +1968,7 @@ F: include/hw/misc/interleaver.h
- F: hw/misc/interleaver.c
- F: hw/misc/mmio-testdev.c
- F: include/hw/misc/testdev.h
-+F: tests/qtest/mmio-test.c
+diff --git a/hw/misc/interleaver.c b/hw/misc/interleaver.c
+index 46099e9e11..5cedcb3541 100644
+--- a/hw/misc/interleaver.c
++++ b/hw/misc/interleaver.c
+@@ -112,6 +112,34 @@ static MemTxResult interleaver_write(void *opaque,
+     return r;
+ }
  
- Standard VGA
- M: Gerd Hoffmann <kraxel@redhat.com>
-diff --git a/tests/qtest/Makefile.include b/tests/qtest/Makefile.include
-index b0204e44f2..29dbeb5d05 100644
---- a/tests/qtest/Makefile.include
-+++ b/tests/qtest/Makefile.include
-@@ -9,6 +9,7 @@ check-qtest-generic-y += qmp-cmd-test
- check-qtest-generic-y += qom-test
- check-qtest-generic-$(CONFIG_MODULES) += modules-test
- check-qtest-generic-y += test-hmp
-+check-qtest-generic-$(CONFIG_MMIO_TESTDEV) += mmio-test
++static GStrv interleaver_subregions_description(const MemoryRegion *mr)
++{
++    InterleaverDeviceState *s = container_of(mr, InterleaverDeviceState, iomem);
++    InterleaverDeviceClass *idc = INTERLEAVER_DEVICE_GET_CLASS(s);
++    gchar **descs = g_new(gchar *, idc->mr_count + 1);
++    unsigned output_access_bits = idc->output_access_size << 3;
++    size_t i;
++
++    for (i = 0; i < idc->mr_count; i++) {
++        if (i) {
++            descs[i] = g_strdup_printf("  %u-bit access on '%s'"
++                                       " (%zu-bit shifted)",
++                                       output_access_bits,
++                                       s->mr[i] ? memory_region_name(s->mr[i])
++                                                : emtpy_mr_name,
++                                       i * output_access_bits);
++       } else {
++            descs[i] = g_strdup_printf("  %u-bit access on '%s'",
++                                       output_access_bits,
++                                       s->mr[i] ? memory_region_name(s->mr[i])
++                                                : emtpy_mr_name);
++        }
++    }
++    descs[i] = NULL;
++
++    return descs;
++}
++
+ static void interleaver_realize(DeviceState *dev, Error **errp)
+ {
+     InterleaverDeviceState *s = INTERLEAVER_DEVICE(dev);
+@@ -139,6 +167,7 @@ static void interleaver_realize(DeviceState *dev, Error **errp)
+     }
+     memory_region_init_io(&s->iomem, OBJECT(s), &idc->ops, s,
+                           idc->name, s->size);
++    s->iomem.subregions_description = interleaver_subregions_description;
+     sysbus_init_mmio(SYS_BUS_DEVICE(s), &s->iomem);
+ }
  
- check-qtest-pci-$(CONFIG_RTL8139_PCI) += rtl8139-test
- check-qtest-pci-$(CONFIG_VGA) += display-vga-test
 -- 
 2.26.2
 
