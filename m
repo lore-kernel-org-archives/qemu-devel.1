@@ -2,87 +2,159 @@ Return-Path: <SRS0=yhYb=B3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.3 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88672C433E3
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 19:51:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFE13C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 19:54:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2DE9320658
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 19:51:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 56A9C20658
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 19:54:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ApKvBvz9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2DE9320658
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="l1o6eHSR";
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=microchiptechnology.onmicrosoft.com header.i=@microchiptechnology.onmicrosoft.com header.b="NWw7bssk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56A9C20658
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45878 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49058 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7lAL-0007DN-7w
-	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 15:51:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34616)
+	id 1k7lDI-0000O2-GE
+	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 15:54:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35292)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1k7l94-0005we-Vc; Mon, 17 Aug 2020 15:50:14 -0400
-Received: from mail-il1-x143.google.com ([2607:f8b0:4864:20::143]:45650)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1k7l91-0004uG-2w; Mon, 17 Aug 2020 15:50:14 -0400
-Received: by mail-il1-x143.google.com with SMTP id k4so15595906ilr.12;
- Mon, 17 Aug 2020 12:50:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=H/s7k8ignUQyK57x7x+i93UxNODR+Gb2wkrwM/MszE4=;
- b=ApKvBvz9NHLkwsI+sWo9MMyUx6C9JQVlQbXyJyojEWyRbr8AFBfGDO4zF/A3Gpe6YL
- koFti5eXJRDuFcpWRRTvp2KgTMwoRGu48rjS9Oj70NMppyz2yD29QDIPWO5ZCUQZ9z0k
- IkXFaGcjSt+6e3TPX1Uc/EE8jrI75fizX16ww99bqt1beE6hzdCtN+j4D5uFK7mhtKFP
- ldKC5sDHopXW9NLqddka1mSMUVgVYrCwUBLXs4QhPF2JH0V11vw0fFdcgeEu1E1SZoS0
- vJP8dLF1Q1I3LfCtLRQ025MAJTgs03puLsxkgy8Pwsl/OFCO4WWDmYaRz/SmLZN+ev4n
- SfHQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=H/s7k8ignUQyK57x7x+i93UxNODR+Gb2wkrwM/MszE4=;
- b=ZFV8epOm0LDQ5llQlwc7CnTPzz53Hgh2g2ckLHqE3gl5FV893zE5P0t1y5Uy1gwtQk
- 2GtM1Pue2F+gTBAMsX10GZp/4YBT2T9pzv+wVqH2S7vtJ/c755O5yg3QEuEgUlRxvAR4
- rKj439oMw3GHtBlH1VonqasQoxQd9XRY+XaYyMzKA70Ojv+G4BAER1fhwVDcZhQN40/F
- 28/+1YEV66awkyITDCF8asRWyaOHMwOsh2jvMs0UMMNDR6TglF/jrkiO5dd7KuEz724I
- MDlLcluzArcYDGTM0wryyt0PDUFQOOEqhugyugwkZTpggNs4Rf8r3dmkXfQBjhwhs83Q
- GOkg==
-X-Gm-Message-State: AOAM533svy8RkkHNpAtII8SSELFwfzs6iVHbqDhkuh0i15Z70xq4u4pi
- ZH6sAB9ARSQIYVPMEJPgGO2uU7sxJMt8LQoa4H4=
-X-Google-Smtp-Source: ABdhPJy8IINFfQEmInMOj7mdQix1kqpKTWD8G0CPP6N1rCVQxGGhDHrVmHrJotTuMUPUN+mz10gk+ZWWjegXHqpTNE0=
-X-Received: by 2002:a05:6e02:13f1:: with SMTP id
- w17mr15611548ilj.131.1597693809491; 
- Mon, 17 Aug 2020 12:50:09 -0700 (PDT)
-MIME-Version: 1.0
+ (Exim 4.90_1) (envelope-from <Cyril.Jean@microchip.com>)
+ id 1k7lCf-0008Ds-I2; Mon, 17 Aug 2020 15:53:57 -0400
+Received: from esa5.microchip.iphmx.com ([216.71.150.166]:53420)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <Cyril.Jean@microchip.com>)
+ id 1k7lCb-0005MJ-Od; Mon, 17 Aug 2020 15:53:56 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+ t=1597694035; x=1629230035;
+ h=from:to:cc:subject:date:message-id:references:
+ in-reply-to:content-id:content-transfer-encoding: mime-version;
+ bh=1cvPr/VPakVgquhfCH70EKkCqUYBFONRRhpQgq7voTY=;
+ b=l1o6eHSRxCk2AkiboLdlRAsCFZtzSkCKRw1L/c8IhIzKO+6tyTVIyUYM
+ VS9Vpu6DFtDVfXTsUJB5qnvHWvI831bdQDH9YI7+Rm0bdjKVJH1YY4vzb
+ 8kmlOCBojWXZqhYBIdDdUTwPhXIkYvo69SK5Bktk6KrJFilJ53xKFWMql
+ 5nC0Bkk1vof2SrXSRBwuSXt/n9LrvLdn1UYtNbTd5Iv4x4tjAsmeuPGxW
+ dHMXT+tPfzkER4bd3nNdX6iOFSMbA3Fnel4ckIPW/wGsysFJzjritT+n9
+ D8eDOzhe+KvhscCQIFuSAvJd7dRRDMjH9bmk3T011+j2pA3V2bG98VTOb Q==;
+IronPort-SDR: O0hMvaluxUUn0BpRcofJfVT97V6bLTHLO72eCEbds4Lh4o8a1nLzurS94jDhoUUcxe0L551T3f
+ zC7ia4n7AthUbU9D4ach/ugVzaslFwUGxN0U9Z4VHbNUegTtaMlaei7PtbZrmxbxRjIpkOdeYx
+ ohynk+3uiWuQkZ2g+wiQKwFFpuy9G8K43y7+UPJmpmOG+q4iq+WrzWdJH3PPzWZVubAJizelT2
+ gNsyhGWVlt2DMOInaroC/FVka4q1vREf4JkTsiTvRcep6+cLvynbnJ84D5NrIVaE5+vI7gBy6X
+ bA8=
+X-IronPort-AV: E=Sophos;i="5.76,324,1592895600"; d="scan'208";a="87456517"
+Received: from smtpout.microchip.com (HELO email.microchip.com)
+ ([198.175.253.82])
+ by esa5.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256;
+ 17 Aug 2020 12:53:50 -0700
+Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1979.3; Mon, 17 Aug 2020 12:53:43 -0700
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (10.10.215.89) by
+ email.microchip.com (10.10.87.151) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1979.3
+ via Frontend Transport; Mon, 17 Aug 2020 12:53:43 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=NB+7M2z+DbCqAVX2csNBdNwc3T8OGPB1NbHZEpVqU/6WQJTodNIOIyrOVQsDv0mTKiPleBY/jE8hITC/cX3hrKEcSqNviHWJJM8F4M0p3jXEMEd+AduRlhaxfhZlAG7oY/SVyJZ1M2hZX5/BxpAdQJlUFwURyL9SXacaFEICvpbe6krijdW7iRK2we/wm4NmdNtlNi5NdC3P9JW93sY/+iiniQazlGaeuu3hcD7RWwNVuipJQCVgSvjkBqV3tQggWMj2PshE4hzmcNy1B9w7FdQCQsmlIXyB6427vQ5/jsU13V/6ZKQKKOBBb5BTl15iZro8If1u/Wf8+9VzQYRZHw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=1cvPr/VPakVgquhfCH70EKkCqUYBFONRRhpQgq7voTY=;
+ b=QyFnysAiEVl6peh+zAsScsKPf90Yt7wkDl6OlK2FRVxnuIBdpOC0xIGp5iuP8/gj2LnzzJ96ExgMENR4rkaOvmC9qw24Z6wY8UOkyh5ctrGs4y0iWAhKKiIA5n3yEmR1LBfGGaRmFIeRoGzU1d9PfvZbtPPWA1/2TXYyqqnX12McklJOAw0UW2t3A6wQXMT2FeTu64UG//zSzD/YuFHZ8hiaAFUoXl4I2KCQtMYsoVnS3Sw8DSgVurfL1/XfU5kdHAKAj6HXHmyg1hW1rcv5tz0JLDkDcNPWlfzWCIZsVaokaXBrSqWejxA3ctiB2QEdh8fh6+UxfjoDWvpBOC2SKw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microchip.com; dmarc=pass action=none
+ header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=microchiptechnology.onmicrosoft.com;
+ s=selector2-microchiptechnology-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=1cvPr/VPakVgquhfCH70EKkCqUYBFONRRhpQgq7voTY=;
+ b=NWw7bsskl4SfVn0Wy1KZ1njWMQt9QitTm2mZIjSVJdzUBMs+xSW0aBwhSJ4t2ug1nCggCVVmGY0OIKZi3CbY7vDp/8fqnPnJSVf0cR8xHa9OxkoDkazBj4ErdhEzrQH9Bf0McMEeGqSO4m77Rw2jVyVNNtK79nByzUXjq8XKPt4=
+Received: from DM6PR11MB3690.namprd11.prod.outlook.com (2603:10b6:5:13d::32)
+ by DM5PR1101MB2169.namprd11.prod.outlook.com (2603:10b6:4:51::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3283.24; Mon, 17 Aug
+ 2020 19:53:46 +0000
+Received: from DM6PR11MB3690.namprd11.prod.outlook.com
+ ([fe80::e0ca:f0fd:7675:46d7]) by DM6PR11MB3690.namprd11.prod.outlook.com
+ ([fe80::e0ca:f0fd:7675:46d7%4]) with mapi id 15.20.3283.027; Mon, 17 Aug 2020
+ 19:53:46 +0000
+To: <alistair23@gmail.com>
+CC: <bmeng.cn@gmail.com>, <anup@brainfault.org>, <Alistair.Francis@wdc.com>,
+ <kbastian@mail.uni-paderborn.de>, <palmerdabbelt@google.com>,
+ <sagark@eecs.berkeley.edu>, <qemu-devel@nongnu.org>, <qemu-riscv@nongnu.org>, 
+ <peter.maydell@linaro.org>, <alistair@alistair23.me>,
+ <qemu-block@nongnu.org>, <jasowang@redhat.com>, <bin.meng@windriver.com>,
+ <pbonzini@redhat.com>, <palmer@dabbelt.com>, <qemu-arm@nongnu.org>,
+ <marcandre.lureau@redhat.com>, <edgar.iglesias@gmail.com>,
+ <philmd@redhat.com>
+Subject: Re: [PATCH 00/18] hw/riscv: Add Microchip PolarFire SoC Icicle Kit
+ board support
+Thread-Topic: [PATCH 00/18] hw/riscv: Add Microchip PolarFire SoC Icicle Kit
+ board support
+Thread-Index: AQHWdIGDfQ2ADX3iMkmaUQkzVWiMJKk8cXaAgAA+ugCAAAcHgA==
+Date: Mon, 17 Aug 2020 19:53:46 +0000
+Message-ID: <d3f61c2c-a489-887e-0143-4d9a1e66e6f2@microchip.com>
 References: <1597423256-14847-1-git-send-email-bmeng.cn@gmail.com>
- <1597423256-14847-5-git-send-email-bmeng.cn@gmail.com>
-In-Reply-To: <1597423256-14847-5-git-send-email-bmeng.cn@gmail.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 17 Aug 2020 12:39:37 -0700
-Message-ID: <CAKmqyKM_qPNQaFmqW+PwXaRCf8DvLvQ2goKak6M00QT13NiUmA@mail.gmail.com>
-Subject: Re: [PATCH 04/18] hw/riscv: Initial support for Microchip PolarFire
- SoC Icicle Kit board
-To: Bin Meng <bmeng.cn@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::143;
- envelope-from=alistair23@gmail.com; helo=mail-il1-x143.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ <CAAhSdy2D=TcENAJDja4r6pnhz0LRi-T+A9k3Btrs_EuB4x0e4w@mail.gmail.com>
+ <CAEUhbmV5=B5xKhYqMj1MQb61nt5cNUJG1MXT++C1w1YMYTfLCQ@mail.gmail.com>
+ <202949f7-c9d5-4d4d-3ebe-53727f4fa169@microchip.com>
+ <CAKmqyKM3nm0rhxgDvWKWfO+4b23ZLSkHW2TzmcVZ_ZFy4L7MRg@mail.gmail.com>
+In-Reply-To: <CAKmqyKM3nm0rhxgDvWKWfO+4b23ZLSkHW2TzmcVZ_ZFy4L7MRg@mail.gmail.com>
+Accept-Language: en-IE, en-US
+Content-Language: en-IE
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: gmail.com; dkim=none (message not signed)
+ header.d=none;gmail.com; dmarc=none action=none header.from=microchip.com;
+x-originating-ip: [86.40.244.225]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: ed454b7c-5877-4b75-2034-08d842e740a0
+x-ms-traffictypediagnostic: DM5PR1101MB2169:
+x-microsoft-antispam-prvs: <DM5PR1101MB2169BB4F4A67CF8D425923C19E5F0@DM5PR1101MB2169.namprd11.prod.outlook.com>
+x-bypassexternaltag: True
+x-ms-oob-tlc-oobclassifiers: OLM:8882;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: dny3CeeP0EOUwqWuFlvz3Z1J76bL7wAiGTJ0asHClfF/PAXS8qVhuXBteyJnHz6iugPoqDMAdv6/SNbt4kQFMA8+GsK2LJ4jSafN3HVq/qZb4d/n2Ez+4U55ec2N3yWMbP7guc9m03Lv+bxdDkOS/wswt2SXEn7O1JD3XrFyt2p6/6PQeOKgkohXz7v453Mr2W+IsoiDqF9fqfuLn0+IzUI8sfRkVxiMH+NEjaK6Ou+ihdwrnrA5xNJ5v62k5dS4Aht5HGNdi0a17ZkiucdUnurjI7wcUj+CDRPd+4LpfrYWYq7JvM+1wy6m6G/bFBGci7D23dnQF0PhfuvSVmuKXA==
+x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:DM6PR11MB3690.namprd11.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(366004)(186003)(54906003)(5660300002)(53546011)(26005)(6486002)(8936002)(66476007)(66556008)(66946007)(66446008)(64756008)(6506007)(4326008)(6512007)(498600001)(8676002)(6916009)(83380400001)(2906002)(2616005)(86362001)(76116006)(91956017)(36756003)(31686004)(31696002)(7416002)(71200400001);
+ DIR:OUT; SFP:1101; 
+x-ms-exchange-antispam-messagedata: TfYQrkl+XCurxedsbl1xyLMw+qN8Jy0LOokDCygHpAWk/KKZA7ASmxzZRGBLPCAXPHEIHYT8a4OfkXPX3rfq086fhJact567BmKC9824/Vp9KSnpJ/uXN0oTiKAJkXZkj/ryuFsAWTg7S0l8ojVdR19pGbBiPWYw9cBOg4dL+QiBIcK5TOQUS2tMqfI5uvD+l/clZPcOvpYWyw04HRvcaMwjE5CY6ZU2jhD2FI9q0dxCJqfG1AtsR0VW12kJ+yo09ubTf/7+yN2WKBBpo76v/3aiuyRRRKeWfGE2ELcmf9ctBirV+9TQc+hiq0Qr9/WwKHJf1jxcY+dCP057cqCyfJxEV8NX0JSVah/orvxpcfqemuuLnJDCX6TfYHL9LbK7VwWM+ds6dKgI0H1hYoStLhsyLVuK3RWdGlqlgHaQiuNUHJPMrH215Wht0HBFwFUwR+6tNtWSaVdvwUl4WfCrQkwL1FJ+lCF4m8jR0hwRK2SNh5sJLAzOXjF+iQzj+mvDb1sCSPaIogMpIQJmk12A/d897bgF4TJrxjyXOQe8aEDlymYUypT0z0NLnn9juMZ0Ef4bsOB4GzHuQT7rfHVstF4x629C6B+MybBhXEA1U9PiE+8gE+E3a476IUc6TV+3WfGu0ohJQxSRJ1PHlfG77Q==
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <94AE9F10AC5C344493150A2FB7763272@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB3690.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ed454b7c-5877-4b75-2034-08d842e740a0
+X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Aug 2020 19:53:46.0520 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 39jTLBwFOu5XGJt9J19SYZDD3hrKSI5Xh16XH7X63UtUuehc8oiwvO+sO1E7NXGZSsOnEK8dyFdAt99BfH69VBApBgFDm0nBjUNFLAN2oGE=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR1101MB2169
+Received-SPF: pass client-ip=216.71.150.166;
+ envelope-from=Cyril.Jean@microchip.com; helo=esa5.microchip.iphmx.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/17 15:53:49
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -43
+X-Spam_score: -4.4
+X-Spam_bar: ----
+X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -96,537 +168,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Bin Meng <bin.meng@windriver.com>,
- "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Palmer Dabbelt <palmerdabbelt@google.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- Palmer Dabbelt <palmer@dabbelt.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Reply-to: <Cyril.Jean@microchip.com>
+From:  via <qemu-devel@nongnu.org>
 
-On Fri, Aug 14, 2020 at 9:43 AM Bin Meng <bmeng.cn@gmail.com> wrote:
->
-> From: Bin Meng <bin.meng@windriver.com>
->
-> This is an initial support for Microchip PolarFire SoC Icicle Kit.
-> The Icicle Kit board integrates a PolarFire SoC, with one SiFive's
-> E51 plus four U54 cores and many on-chip peripherals and an FPGA.
->
-> For more details about Microchip PolarFire Soc, please see:
-> https://www.microsemi.com/product-directory/soc-fpgas/5498-polarfire-soc-fpga
->
-> Unlike SiFive FU540, the RISC-V core resect vector is at 0x20220000.
-> The following perepherals are created as an unimplemented device:
->
-> - Bus Error Uint 0/1/2/3/4
-> - L2 cache controller
-> - SYSREG
-> - MPUCFG
-> - IOSCBCFG
->
-> More devices will be added later.
->
-> The BIOS image used by this machine is hss.bin, aka Hart Software
-> Services, which can be built from:
-> https://github.com/polarfire-soc/hart-software-services
->
-> To launch this machine:
-> $ qemu-system-riscv64 -nographic -M microchip-icicle-kit
->
-> The memory is set to 1 GiB by default to match the hardware.
-> A sanity check on ram size is performed in the machine init routine
-> to prompt user to increase the RAM size to > 1 GiB when less than
-> 1 GiB ram is detected.
->
-> Signed-off-by: Bin Meng <bin.meng@windriver.com>
-
-Looks good. I didn't check the addresses and PLIC config data with the
-datasheet, but I'm assuming it's correct.
-
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-
-Alistair
-
-> ---
->
->  MAINTAINERS                         |   7 +
->  default-configs/riscv64-softmmu.mak |   1 +
->  hw/riscv/Kconfig                    |   6 +
->  hw/riscv/Makefile.objs              |   1 +
->  hw/riscv/microchip_pfsoc.c          | 312 ++++++++++++++++++++++++++++++++++++
->  include/hw/riscv/microchip_pfsoc.h  |  88 ++++++++++
->  6 files changed, 415 insertions(+)
->  create mode 100644 hw/riscv/microchip_pfsoc.c
->  create mode 100644 include/hw/riscv/microchip_pfsoc.h
->
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 0886eb3..8716cb6 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -1314,6 +1314,13 @@ F: include/hw/riscv/opentitan.h
->  F: include/hw/char/ibex_uart.h
->  F: include/hw/intc/ibex_plic.h
->
-> +Microchip PolarFire SoC Icicle Kit
-> +M: Bin Meng <bin.meng@windriver.com>
-> +L: qemu-riscv@nongnu.org
-> +S: Supported
-> +F: hw/riscv/microchip_pfsoc.c
-> +F: include/hw/riscv/microchip_pfsoc.h
-> +
->  RX Machines
->  -----------
->  rx-gdbsim
-> diff --git a/default-configs/riscv64-softmmu.mak b/default-configs/riscv64-softmmu.mak
-> index aaf6d73..76b6195 100644
-> --- a/default-configs/riscv64-softmmu.mak
-> +++ b/default-configs/riscv64-softmmu.mak
-> @@ -10,3 +10,4 @@ CONFIG_SPIKE=y
->  CONFIG_SIFIVE_E=y
->  CONFIG_SIFIVE_U=y
->  CONFIG_RISCV_VIRT=y
-> +CONFIG_MICROCHIP_PFSOC=y
-> diff --git a/hw/riscv/Kconfig b/hw/riscv/Kconfig
-> index 28947ef..3292fae 100644
-> --- a/hw/riscv/Kconfig
-> +++ b/hw/riscv/Kconfig
-> @@ -48,3 +48,9 @@ config RISCV_VIRT
->      select PCI_EXPRESS_GENERIC_BRIDGE
->      select PFLASH_CFI01
->      select SIFIVE
-> +
-> +config MICROCHIP_PFSOC
-> +    bool
-> +    select HART
-> +    select SIFIVE
-> +    select UNIMP
-> diff --git a/hw/riscv/Makefile.objs b/hw/riscv/Makefile.objs
-> index 57cc708..419a5a0 100644
-> --- a/hw/riscv/Makefile.objs
-> +++ b/hw/riscv/Makefile.objs
-> @@ -14,3 +14,4 @@ obj-$(CONFIG_SIFIVE_U) += sifive_u_prci.o
->  obj-$(CONFIG_SIFIVE) += sifive_uart.o
->  obj-$(CONFIG_SPIKE) += spike.o
->  obj-$(CONFIG_RISCV_VIRT) += virt.o
-> +obj-$(CONFIG_MICROCHIP_PFSOC) += microchip_pfsoc.o
-> diff --git a/hw/riscv/microchip_pfsoc.c b/hw/riscv/microchip_pfsoc.c
-> new file mode 100644
-> index 0000000..20a642c
-> --- /dev/null
-> +++ b/hw/riscv/microchip_pfsoc.c
-> @@ -0,0 +1,312 @@
-> +/*
-> + * QEMU RISC-V Board Compatible with Microchip PolarFire SoC Icicle Kit
-> + *
-> + * Copyright (c) 2020 Wind River Systems, Inc.
-> + *
-> + * Author:
-> + *   Bin Meng <bin.meng@windriver.com>
-> + *
-> + * Provides a board compatible with the Microchip PolarFire SoC Icicle Kit
-> + *
-> + * 0) CLINT (Core Level Interruptor)
-> + * 1) PLIC (Platform Level Interrupt Controller)
-> + * 2) eNVM (Embedded Non-Volatile Memory)
-> + *
-> + * This board currently generates devicetree dynamically that indicates at least
-> + * two harts and up to five harts.
-> + *
-> + * This program is free software; you can redistribute it and/or modify it
-> + * under the terms and conditions of the GNU General Public License,
-> + * version 2 or later, as published by the Free Software Foundation.
-> + *
-> + * This program is distributed in the hope it will be useful, but WITHOUT
-> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-> + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-> + * more details.
-> + *
-> + * You should have received a copy of the GNU General Public License along with
-> + * this program.  If not, see <http://www.gnu.org/licenses/>.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "qemu/error-report.h"
-> +#include "qemu/log.h"
-> +#include "qemu/units.h"
-> +#include "qemu/cutils.h"
-> +#include "qapi/error.h"
-> +#include "hw/boards.h"
-> +#include "hw/irq.h"
-> +#include "hw/loader.h"
-> +#include "hw/sysbus.h"
-> +#include "hw/cpu/cluster.h"
-> +#include "target/riscv/cpu.h"
-> +#include "hw/misc/unimp.h"
-> +#include "hw/riscv/boot.h"
-> +#include "hw/riscv/riscv_hart.h"
-> +#include "hw/riscv/sifive_clint.h"
-> +#include "hw/riscv/sifive_plic.h"
-> +#include "hw/riscv/microchip_pfsoc.h"
-> +
-> +/*
-> + * The BIOS image used by this machine is called Hart Software Services (HSS).
-> + * See https://github.com/polarfire-soc/hart-software-services
-> + */
-> +#define BIOS_FILENAME   "hss.bin"
-> +#define RESET_VECTOR    0x20220000
-> +
-> +static const struct MemmapEntry {
-> +    hwaddr base;
-> +    hwaddr size;
-> +} microchip_pfsoc_memmap[] = {
-> +    [MICROCHIP_PFSOC_DEBUG] =           {        0x0,     0x1000 },
-> +    [MICROCHIP_PFSOC_E51_DTIM] =        {  0x1000000,     0x2000 },
-> +    [MICROCHIP_PFSOC_BUSERR_UNIT0] =    {  0x1700000,     0x1000 },
-> +    [MICROCHIP_PFSOC_BUSERR_UNIT1] =    {  0x1701000,     0x1000 },
-> +    [MICROCHIP_PFSOC_BUSERR_UNIT2] =    {  0x1702000,     0x1000 },
-> +    [MICROCHIP_PFSOC_BUSERR_UNIT3] =    {  0x1703000,     0x1000 },
-> +    [MICROCHIP_PFSOC_BUSERR_UNIT4] =    {  0x1704000,     0x1000 },
-> +    [MICROCHIP_PFSOC_CLINT] =           {  0x2000000,    0x10000 },
-> +    [MICROCHIP_PFSOC_L2CC] =            {  0x2010000,     0x1000 },
-> +    [MICROCHIP_PFSOC_L2LIM] =           {  0x8000000,  0x2000000 },
-> +    [MICROCHIP_PFSOC_PLIC] =            {  0xc000000,  0x4000000 },
-> +    [MICROCHIP_PFSOC_SYSREG] =          { 0x20002000,     0x2000 },
-> +    [MICROCHIP_PFSOC_MPUCFG] =          { 0x20005000,     0x1000 },
-> +    [MICROCHIP_PFSOC_ENVM_CFG] =        { 0x20200000,     0x1000 },
-> +    [MICROCHIP_PFSOC_ENVM_DATA] =       { 0x20220000,    0x20000 },
-> +    [MICROCHIP_PFSOC_IOSCB_CFG] =       { 0x37080000,     0x1000 },
-> +    [MICROCHIP_PFSOC_DRAM] =            { 0x80000000,        0x0 },
-> +};
-> +
-> +static void microchip_pfsoc_soc_instance_init(Object *obj)
-> +{
-> +    MachineState *ms = MACHINE(qdev_get_machine());
-> +    MicrochipPFSoCState *s = MICROCHIP_PFSOC(obj);
-> +
-> +    object_initialize_child(obj, "e-cluster", &s->e_cluster, TYPE_CPU_CLUSTER);
-> +    qdev_prop_set_uint32(DEVICE(&s->e_cluster), "cluster-id", 0);
-> +
-> +    object_initialize_child(OBJECT(&s->e_cluster), "e-cpus", &s->e_cpus,
-> +                            TYPE_RISCV_HART_ARRAY);
-> +    qdev_prop_set_uint32(DEVICE(&s->e_cpus), "num-harts", 1);
-> +    qdev_prop_set_uint32(DEVICE(&s->e_cpus), "hartid-base", 0);
-> +    qdev_prop_set_string(DEVICE(&s->e_cpus), "cpu-type",
-> +                         TYPE_RISCV_CPU_SIFIVE_E51);
-> +    qdev_prop_set_uint64(DEVICE(&s->e_cpus), "resetvec", RESET_VECTOR);
-> +
-> +    object_initialize_child(obj, "u-cluster", &s->u_cluster, TYPE_CPU_CLUSTER);
-> +    qdev_prop_set_uint32(DEVICE(&s->u_cluster), "cluster-id", 1);
-> +
-> +    object_initialize_child(OBJECT(&s->u_cluster), "u-cpus", &s->u_cpus,
-> +                            TYPE_RISCV_HART_ARRAY);
-> +    qdev_prop_set_uint32(DEVICE(&s->u_cpus), "num-harts", ms->smp.cpus - 1);
-> +    qdev_prop_set_uint32(DEVICE(&s->u_cpus), "hartid-base", 1);
-> +    qdev_prop_set_string(DEVICE(&s->u_cpus), "cpu-type",
-> +                         TYPE_RISCV_CPU_SIFIVE_U54);
-> +    qdev_prop_set_uint64(DEVICE(&s->u_cpus), "resetvec", RESET_VECTOR);
-> +}
-> +
-> +static void microchip_pfsoc_soc_realize(DeviceState *dev, Error **errp)
-> +{
-> +    MachineState *ms = MACHINE(qdev_get_machine());
-> +    MicrochipPFSoCState *s = MICROCHIP_PFSOC(dev);
-> +    const struct MemmapEntry *memmap = microchip_pfsoc_memmap;
-> +    MemoryRegion *system_memory = get_system_memory();
-> +    MemoryRegion *e51_dtim_mem = g_new(MemoryRegion, 1);
-> +    MemoryRegion *l2lim_mem = g_new(MemoryRegion, 1);
-> +    MemoryRegion *envm_data = g_new(MemoryRegion, 1);
-> +    char *plic_hart_config;
-> +    size_t plic_hart_config_len;
-> +    int i;
-> +
-> +    sysbus_realize(SYS_BUS_DEVICE(&s->e_cpus), &error_abort);
-> +    sysbus_realize(SYS_BUS_DEVICE(&s->u_cpus), &error_abort);
-> +    /*
-> +     * The cluster must be realized after the RISC-V hart array container,
-> +     * as the container's CPU object is only created on realize, and the
-> +     * CPU must exist and have been parented into the cluster before the
-> +     * cluster is realized.
-> +     */
-> +    qdev_realize(DEVICE(&s->e_cluster), NULL, &error_abort);
-> +    qdev_realize(DEVICE(&s->u_cluster), NULL, &error_abort);
-> +
-> +    /* E51 DTIM */
-> +    memory_region_init_ram(e51_dtim_mem, NULL, "microchip.pfsoc.e51_dtim_mem",
-> +                           memmap[MICROCHIP_PFSOC_E51_DTIM].size, &error_fatal);
-> +    memory_region_add_subregion(system_memory,
-> +                                memmap[MICROCHIP_PFSOC_E51_DTIM].base,
-> +                                e51_dtim_mem);
-> +
-> +    /* Bus Error Units */
-> +    create_unimplemented_device("microchip.pfsoc.buserr_unit0_mem",
-> +        memmap[MICROCHIP_PFSOC_BUSERR_UNIT0].base,
-> +        memmap[MICROCHIP_PFSOC_BUSERR_UNIT0].size);
-> +    create_unimplemented_device("microchip.pfsoc.buserr_unit1_mem",
-> +        memmap[MICROCHIP_PFSOC_BUSERR_UNIT1].base,
-> +        memmap[MICROCHIP_PFSOC_BUSERR_UNIT1].size);
-> +    create_unimplemented_device("microchip.pfsoc.buserr_unit2_mem",
-> +        memmap[MICROCHIP_PFSOC_BUSERR_UNIT2].base,
-> +        memmap[MICROCHIP_PFSOC_BUSERR_UNIT2].size);
-> +    create_unimplemented_device("microchip.pfsoc.buserr_unit3_mem",
-> +        memmap[MICROCHIP_PFSOC_BUSERR_UNIT3].base,
-> +        memmap[MICROCHIP_PFSOC_BUSERR_UNIT3].size);
-> +    create_unimplemented_device("microchip.pfsoc.buserr_unit4_mem",
-> +        memmap[MICROCHIP_PFSOC_BUSERR_UNIT4].base,
-> +        memmap[MICROCHIP_PFSOC_BUSERR_UNIT4].size);
-> +
-> +    /* CLINT */
-> +    sifive_clint_create(memmap[MICROCHIP_PFSOC_CLINT].base,
-> +        memmap[MICROCHIP_PFSOC_CLINT].size, ms->smp.cpus,
-> +        SIFIVE_SIP_BASE, SIFIVE_TIMECMP_BASE, SIFIVE_TIME_BASE, false);
-> +
-> +    /* L2 cache controller */
-> +    create_unimplemented_device("microchip.pfsoc.l2cc",
-> +        memmap[MICROCHIP_PFSOC_L2CC].base, memmap[MICROCHIP_PFSOC_L2CC].size);
-> +
-> +    /*
-> +     * Add L2-LIM at reset size.
-> +     * This should be reduced in size as the L2 Cache Controller WayEnable
-> +     * register is incremented. Unfortunately I don't see a nice (or any) way
-> +     * to handle reducing or blocking out the L2 LIM while still allowing it
-> +     * be re returned to all enabled after a reset. For the time being, just
-> +     * leave it enabled all the time. This won't break anything, but will be
-> +     * too generous to misbehaving guests.
-> +     */
-> +    memory_region_init_ram(l2lim_mem, NULL, "microchip.pfsoc.l2lim",
-> +                           memmap[MICROCHIP_PFSOC_L2LIM].size, &error_fatal);
-> +    memory_region_add_subregion(system_memory,
-> +                                memmap[MICROCHIP_PFSOC_L2LIM].base,
-> +                                l2lim_mem);
-> +
-> +    /* create PLIC hart topology configuration string */
-> +    plic_hart_config_len = (strlen(MICROCHIP_PFSOC_PLIC_HART_CONFIG) + 1) *
-> +                           ms->smp.cpus;
-> +    plic_hart_config = g_malloc0(plic_hart_config_len);
-> +    for (i = 0; i < ms->smp.cpus; i++) {
-> +        if (i != 0) {
-> +            strncat(plic_hart_config, "," MICROCHIP_PFSOC_PLIC_HART_CONFIG,
-> +                    plic_hart_config_len);
-> +        } else {
-> +            strncat(plic_hart_config, "M", plic_hart_config_len);
-> +        }
-> +        plic_hart_config_len -= (strlen(MICROCHIP_PFSOC_PLIC_HART_CONFIG) + 1);
-> +    }
-> +
-> +    /* PLIC */
-> +    s->plic = sifive_plic_create(memmap[MICROCHIP_PFSOC_PLIC].base,
-> +        plic_hart_config,
-> +        MICROCHIP_PFSOC_PLIC_NUM_SOURCES,
-> +        MICROCHIP_PFSOC_PLIC_NUM_PRIORITIES,
-> +        MICROCHIP_PFSOC_PLIC_PRIORITY_BASE,
-> +        MICROCHIP_PFSOC_PLIC_PENDING_BASE,
-> +        MICROCHIP_PFSOC_PLIC_ENABLE_BASE,
-> +        MICROCHIP_PFSOC_PLIC_ENABLE_STRIDE,
-> +        MICROCHIP_PFSOC_PLIC_CONTEXT_BASE,
-> +        MICROCHIP_PFSOC_PLIC_CONTEXT_STRIDE,
-> +        memmap[MICROCHIP_PFSOC_PLIC].size);
-> +    g_free(plic_hart_config);
-> +
-> +    /* SYSREG */
-> +    create_unimplemented_device("microchip.pfsoc.sysreg",
-> +        memmap[MICROCHIP_PFSOC_SYSREG].base,
-> +        memmap[MICROCHIP_PFSOC_SYSREG].size);
-> +
-> +    /* MPUCFG */
-> +    create_unimplemented_device("microchip.pfsoc.mpucfg",
-> +        memmap[MICROCHIP_PFSOC_MPUCFG].base,
-> +        memmap[MICROCHIP_PFSOC_MPUCFG].size);
-> +
-> +    /* eNVM */
-> +    memory_region_init_rom(envm_data, OBJECT(dev), "microchip.pfsoc.envm.data",
-> +                           memmap[MICROCHIP_PFSOC_ENVM_DATA].size,
-> +                           &error_fatal);
-> +    memory_region_add_subregion(system_memory,
-> +                                memmap[MICROCHIP_PFSOC_ENVM_DATA].base,
-> +                                envm_data);
-> +
-> +    /* IOSCBCFG */
-> +    create_unimplemented_device("microchip.pfsoc.ioscb.cfg",
-> +        memmap[MICROCHIP_PFSOC_IOSCB_CFG].base,
-> +        memmap[MICROCHIP_PFSOC_IOSCB_CFG].size);
-> +}
-> +
-> +static void microchip_pfsoc_soc_class_init(ObjectClass *oc, void *data)
-> +{
-> +    DeviceClass *dc = DEVICE_CLASS(oc);
-> +
-> +    dc->realize = microchip_pfsoc_soc_realize;
-> +    /* Reason: Uses serial_hds in realize function, thus can't be used twice */
-> +    dc->user_creatable = false;
-> +}
-> +
-> +static const TypeInfo microchip_pfsoc_soc_type_info = {
-> +    .name = TYPE_MICROCHIP_PFSOC,
-> +    .parent = TYPE_DEVICE,
-> +    .instance_size = sizeof(MicrochipPFSoCState),
-> +    .instance_init = microchip_pfsoc_soc_instance_init,
-> +    .class_init = microchip_pfsoc_soc_class_init,
-> +};
-> +
-> +static void microchip_pfsoc_soc_register_types(void)
-> +{
-> +    type_register_static(&microchip_pfsoc_soc_type_info);
-> +}
-> +
-> +type_init(microchip_pfsoc_soc_register_types)
-> +
-> +static void microchip_icicle_kit_machine_init(MachineState *machine)
-> +{
-> +    MachineClass *mc = MACHINE_GET_CLASS(machine);
-> +    const struct MemmapEntry *memmap = microchip_pfsoc_memmap;
-> +    MicrochipIcicleKitState *s = MICROCHIP_ICICLE_KIT_MACHINE(machine);
-> +    MemoryRegion *system_memory = get_system_memory();
-> +    MemoryRegion *main_mem = g_new(MemoryRegion, 1);
-> +
-> +    /* Sanity check on RAM size */
-> +    if (machine->ram_size < mc->default_ram_size) {
-> +        char *sz = size_to_str(mc->default_ram_size);
-> +        error_report("Invalid RAM size, should be bigger than %s", sz);
-> +        g_free(sz);
-> +        exit(EXIT_FAILURE);
-> +    }
-> +
-> +    /* Initialize SoC */
-> +    object_initialize_child(OBJECT(machine), "soc", &s->soc,
-> +                            TYPE_MICROCHIP_PFSOC);
-> +    qdev_realize(DEVICE(&s->soc), NULL, &error_abort);
-> +
-> +    /* Register RAM */
-> +    memory_region_init_ram(main_mem, NULL, "microchip.icicle.kit.ram",
-> +                           machine->ram_size, &error_fatal);
-> +    memory_region_add_subregion(system_memory,
-> +                                memmap[MICROCHIP_PFSOC_DRAM].base, main_mem);
-> +
-> +    /* Load the firmware */
-> +    riscv_find_and_load_firmware(machine, BIOS_FILENAME, RESET_VECTOR, NULL);
-> +}
-> +
-> +static void microchip_icicle_kit_machine_class_init(ObjectClass *oc, void *data)
-> +{
-> +    MachineClass *mc = MACHINE_CLASS(oc);
-> +
-> +    mc->desc = "Microchip PolarFire SoC Icicle Kit";
-> +    mc->init = microchip_icicle_kit_machine_init;
-> +    mc->max_cpus = MICROCHIP_PFSOC_MANAGEMENT_CPU_COUNT +
-> +                   MICROCHIP_PFSOC_COMPUTE_CPU_COUNT;
-> +    mc->min_cpus = MICROCHIP_PFSOC_MANAGEMENT_CPU_COUNT + 1;
-> +    mc->default_cpus = mc->min_cpus;
-> +    mc->default_ram_size = 1 * GiB;
-> +}
-> +
-> +static const TypeInfo microchip_icicle_kit_machine_typeinfo = {
-> +    .name       = MACHINE_TYPE_NAME("microchip-icicle-kit"),
-> +    .parent     = TYPE_MACHINE,
-> +    .class_init = microchip_icicle_kit_machine_class_init,
-> +    .instance_size = sizeof(MicrochipIcicleKitState),
-> +};
-> +
-> +static void microchip_icicle_kit_machine_init_register_types(void)
-> +{
-> +    type_register_static(&microchip_icicle_kit_machine_typeinfo);
-> +}
-> +
-> +type_init(microchip_icicle_kit_machine_init_register_types)
-> diff --git a/include/hw/riscv/microchip_pfsoc.h b/include/hw/riscv/microchip_pfsoc.h
-> new file mode 100644
-> index 0000000..1953ef1
-> --- /dev/null
-> +++ b/include/hw/riscv/microchip_pfsoc.h
-> @@ -0,0 +1,88 @@
-> +/*
-> + * Microchip PolarFire SoC machine interface
-> + *
-> + * Copyright (c) 2020 Wind River Systems, Inc.
-> + *
-> + * Author:
-> + *   Bin Meng <bin.meng@windriver.com>
-> + *
-> + * This program is free software; you can redistribute it and/or modify it
-> + * under the terms and conditions of the GNU General Public License,
-> + * version 2 or later, as published by the Free Software Foundation.
-> + *
-> + * This program is distributed in the hope it will be useful, but WITHOUT
-> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-> + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-> + * more details.
-> + *
-> + * You should have received a copy of the GNU General Public License along with
-> + * this program.  If not, see <http://www.gnu.org/licenses/>.
-> + */
-> +
-> +#ifndef HW_MICROCHIP_PFSOC_H
-> +#define HW_MICROCHIP_PFSOC_H
-> +
-> +typedef struct MicrochipPFSoCState {
-> +    /*< private >*/
-> +    DeviceState parent_obj;
-> +
-> +    /*< public >*/
-> +    CPUClusterState e_cluster;
-> +    CPUClusterState u_cluster;
-> +    RISCVHartArrayState e_cpus;
-> +    RISCVHartArrayState u_cpus;
-> +    DeviceState *plic;
-> +} MicrochipPFSoCState;
-> +
-> +#define TYPE_MICROCHIP_PFSOC    "microchip.pfsoc"
-> +#define MICROCHIP_PFSOC(obj) \
-> +    OBJECT_CHECK(MicrochipPFSoCState, (obj), TYPE_MICROCHIP_PFSOC)
-> +
-> +typedef struct MicrochipIcicleKitState {
-> +    /*< private >*/
-> +    MachineState parent_obj;
-> +
-> +    /*< public >*/
-> +    MicrochipPFSoCState soc;
-> +} MicrochipIcicleKitState;
-> +
-> +#define TYPE_MICROCHIP_ICICLE_KIT_MACHINE \
-> +    MACHINE_TYPE_NAME("microchip-icicle-kit")
-> +#define MICROCHIP_ICICLE_KIT_MACHINE(obj) \
-> +    OBJECT_CHECK(MicrochipIcicleKitState, (obj), \
-> +                 TYPE_MICROCHIP_ICICLE_KIT_MACHINE)
-> +
-> +enum {
-> +    MICROCHIP_PFSOC_DEBUG,
-> +    MICROCHIP_PFSOC_E51_DTIM,
-> +    MICROCHIP_PFSOC_BUSERR_UNIT0,
-> +    MICROCHIP_PFSOC_BUSERR_UNIT1,
-> +    MICROCHIP_PFSOC_BUSERR_UNIT2,
-> +    MICROCHIP_PFSOC_BUSERR_UNIT3,
-> +    MICROCHIP_PFSOC_BUSERR_UNIT4,
-> +    MICROCHIP_PFSOC_CLINT,
-> +    MICROCHIP_PFSOC_L2CC,
-> +    MICROCHIP_PFSOC_L2LIM,
-> +    MICROCHIP_PFSOC_PLIC,
-> +    MICROCHIP_PFSOC_SYSREG,
-> +    MICROCHIP_PFSOC_MPUCFG,
-> +    MICROCHIP_PFSOC_ENVM_CFG,
-> +    MICROCHIP_PFSOC_ENVM_DATA,
-> +    MICROCHIP_PFSOC_IOSCB_CFG,
-> +    MICROCHIP_PFSOC_DRAM,
-> +};
-> +
-> +#define MICROCHIP_PFSOC_MANAGEMENT_CPU_COUNT    1
-> +#define MICROCHIP_PFSOC_COMPUTE_CPU_COUNT       4
-> +
-> +#define MICROCHIP_PFSOC_PLIC_HART_CONFIG        "MS"
-> +#define MICROCHIP_PFSOC_PLIC_NUM_SOURCES        185
-> +#define MICROCHIP_PFSOC_PLIC_NUM_PRIORITIES     7
-> +#define MICROCHIP_PFSOC_PLIC_PRIORITY_BASE      0x04
-> +#define MICROCHIP_PFSOC_PLIC_PENDING_BASE       0x1000
-> +#define MICROCHIP_PFSOC_PLIC_ENABLE_BASE        0x2000
-> +#define MICROCHIP_PFSOC_PLIC_ENABLE_STRIDE      0x80
-> +#define MICROCHIP_PFSOC_PLIC_CONTEXT_BASE       0x200000
-> +#define MICROCHIP_PFSOC_PLIC_CONTEXT_STRIDE     0x1000
-> +
-> +#endif /* HW_MICROCHIP_PFSOC_H */
-> --
-> 2.7.4
->
->
+T24gOC8xNy8yMCA4OjI4IFBNLCBBbGlzdGFpciBGcmFuY2lzIHdyb3RlOg0KPiBFWFRFUk5BTCBF
+TUFJTDogRG8gbm90IGNsaWNrIGxpbmtzIG9yIG9wZW4gYXR0YWNobWVudHMgdW5sZXNzIHlvdSBr
+bm93IHRoZSBjb250ZW50IGlzIHNhZmUNCj4NCj4gT24gTW9uLCBBdWcgMTcsIDIwMjAgYXQgMTE6
+MTIgQU0gdmlhIDxxZW11LWRldmVsQG5vbmdudS5vcmc+IHdyb3RlOg0KPj4gSGkgQW51cCwNCj4+
+DQo+PiBPbiA4LzE3LzIwIDExOjMwIEFNLCBCaW4gTWVuZyB3cm90ZToNCj4+PiBFWFRFUk5BTCBF
+TUFJTDogRG8gbm90IGNsaWNrIGxpbmtzIG9yIG9wZW4gYXR0YWNobWVudHMgdW5sZXNzIHlvdSBr
+bm93IHRoZSBjb250ZW50IGlzIHNhZmUNCj4+Pg0KPj4+IEhpIEFudXAsDQo+Pj4NCj4+PiBPbiBT
+YXQsIEF1ZyAxNSwgMjAyMCBhdCAxOjQ0IEFNIEFudXAgUGF0ZWwgPGFudXBAYnJhaW5mYXVsdC5v
+cmc+IHdyb3RlOg0KPj4+PiBPbiBGcmksIEF1ZyAxNCwgMjAyMCBhdCAxMDoxMiBQTSBCaW4gTWVu
+ZyA8Ym1lbmcuY25AZ21haWwuY29tPiB3cm90ZToNCj4+Pj4+IEZyb206IEJpbiBNZW5nIDxiaW4u
+bWVuZ0B3aW5kcml2ZXIuY29tPg0KPj4+Pj4NCj4+Pj4+IFRoaXMgYWRkcyBzdXBwb3J0IGZvciBN
+aWNyb2NoaXAgUG9sYXJGaXJlIFNvQyBJY2ljbGUgS2l0IGJvYXJkLg0KPj4+Pj4gVGhlIEljaWNs
+ZSBLaXQgYm9hcmQgaW50ZWdyYXRlcyBhIFBvbGFyRmlyZSBTb0MsIHdpdGggb25lIFNpRml2ZSdz
+DQo+Pj4+PiBFNTEgcGx1cyBmb3VyIFU1NCBjb3JlcyBhbmQgbWFueSBvbi1jaGlwIHBlcmlwaGVy
+YWxzIGFuZCBhbiBGUEdBLg0KPj4+PiBOaWNlIFdvcmsgISEhIFRoaXMgaXMgdmVyeSBoZWxwZnVs
+Lg0KPj4+IFRoYW5rcyENCj4+Pg0KPj4+PiBUaGUgTWljcm9jaGlwIEhTUyBpcyBxdWl0ZSBjb252
+b2x1dGVkLiBJdCBoYXM6DQo+Pj4+IDEuIEREUiBJbml0DQo+Pj4+IDIuIEJvb3QgZGV2aWNlIHN1
+cHBvcnQNCj4+Pj4gMy4gU0JJIHN1cHBvcnQgdXNpbmcgT3BlblNCSSBhcyBsaWJyYXJ5DQo+Pj4+
+IDQuIFNpbXBsZSBURUUgc3VwcG9ydA0KPj4+Pg0KPj4+PiBJIHRoaW5rIHBvaW50IDEpIGFuZCAy
+KSBhYm92ZSBzaG91bGQgYmUgcGFydCBvZiBVLUJvb3QgU1BMLg0KPj4+PiBUaGUgcG9pbnQgMykg
+Y2FuIGJlIE9wZW5TQkkgRldfRFlOQU1JQy4NCj4+Pj4NCj4+Pj4gTGFzdGx5LGZvciBwb2ludCA0
+KSwgd2UgYXJlIHdvcmtpbmcgb24gYSBuZXcgT3BlblNCSSBmZWF0dXJlIHVzaW5nDQo+Pj4+IHdo
+aWNoIHdlIGNhbiBydW4gaW5kZXBlbmRlbnQgU2VjdXJlIE9TIGFuZCBOb24tU2VjdXJlIE9TIHVz
+aW5nDQo+Pj4+IFUtQm9vdF9TUEwrT3BlblNCSSAoZm9yIGJvdGggU2lGaXZlIFVubGVhc2hlZCBh
+bmQgTWljcm9jaGlwDQo+Pj4+IFBvbGFyRmlyZSkuDQo+Pj4+DQo+Pj4+IERvIHlvdSBoYXZlIHBs
+YW5zIGZvciBhZGRpbmcgVS1Cb290IFNQTCBzdXBwb3J0IGZvciB0aGlzIGJvYXJkID8/DQo+Pj4g
+KyBDeXJpbCBKZWFuIGZyb20gTWljcm9jaGlwDQo+Pj4NCj4+PiBJIHdpbGwgaGF2ZSB0byBsZWF2
+ZSB0aGlzIHF1ZXN0aW9uIHRvIEN5cmlsIHRvIGNvbW1lbnQuDQo+Pj4NCj4+IEkgY3VycmVudGx5
+IGRvIG5vdCBoYXZlIGEgcGxhbiB0byBzdXBwb3J0IFUtQm9vdCBTUEwuIFRoZSBpZGVhIG9mIHRo
+ZQ0KPj4gSFNTIGlzIHRvIGNvbnRhaW4gYWxsIHRoZSBzaWxpY29uIHNwZWNpZmljIGluaXRpYWxp
+emF0aW9uIGFuZA0KPj4gY29uZmlndXJhdGlvbiBjb2RlIHdpdGhpbiB0aGUgSFNTIGJlZm9yZSBq
+dW1waW5nIHRvIFUtQm9vdCBTLW1vZGUuIEkNCj4+IHdvdWxkIHJhdGhlciBrZWVwIGFsbCB0aGlz
+IHdpdGhpbiB0aGUgSFNTIGZvciB0aGUgdGltZSBiZWluZy4gSSB3b3VsZA0KPj4gd2FpdCB1bnRp
+bCB3ZSByZWFjaCBwcm9kdWN0aW9uIHNpbGljb24gYmVmb3JlIGF0dGVtcHRpbmcgdG8gbW92ZSB0
+aGlzIHRvDQo+PiBVLUJvb3QgU1BMIGFzIHRoZSBIU1MgaXMgbGlrZWx5IHRvIGNvbnRhaW4gc29t
+ZSBvcGFxdWUgc2lsaWNvbiByZWxhdGVkDQo+PiBjaGFuZ2VzIGZvciBhbm90aGVyIHdoaWxlLg0K
+PiBUaGF0IGlzIHVuZm9ydHVuYXRlLCBhIGxvdCBvZiB3b3JrIGhhcyBnb25lIGludG8gbWFraW5n
+IHRoZSBib290IGZsb3cNCj4gc2ltcGxlIGFuZCBlYXN5IHRvIHVzZS4NCj4NCj4gUUVNVSBub3cg
+aW5jbHVkZXMgT3BlblNCSSBieSBkZWZhdWx0IHRvIG1ha2UgaXQgZWFzeSBmb3IgdXNlcnMgdG8g
+Ym9vdA0KPiBMaW51eC4gVGhlIEljaWNsZSBLaXQgYm9hcmQgaXMgbm93IHRoZSBtb3N0IGRpZmZp
+Y3VsdCBRRU1VIGJvYXJkIHRvDQo+IGJvb3QgTGludXggb24uIE5vdCB0byBtZW50aW9uIGl0IG1h
+a2VzIGl0IGhhcmQgdG8gaW1wb3NzaWJsZSB0bw0KPiBzdXBwb3J0IGl0IGluIHN0YW5kYXJkIHRv
+b2wgZmxvd3Mgc3VjaCBhcyBtZXRhLXJpc2N2Lg0KPg0KPiBBbGlzdGFpcg0KDQpJZiBpdCBpcyBz
+dWNoIGEgcHJvYmxlbSB3ZSBjYW4gYWRkIGEgVS1Cb290IFNQTCBzdGFnZSBhbmQgdGhlIEhTUyBj
+YW4gYmUgDQp0cmVhdGVkIGFzIHN0YW5kYXJkIFNvQyBST00gY29kZS4NCg0KQ3lyaWwuDQoNCg0K
 
