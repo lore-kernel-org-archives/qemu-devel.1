@@ -2,89 +2,87 @@ Return-Path: <SRS0=yhYb=B3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-14.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EEA6C433E3
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 15:45:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EBAFC433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 15:45:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2FF5922CF8
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 15:45:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CA9952065D
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 15:45:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bXb92SqZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FF5922CF8
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N5CUdI9P"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA9952065D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59134 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60634 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7hJj-0004FT-D2
-	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 11:44:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43054)
+	id 1k7hKA-0004tF-U9
+	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 11:45:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42992)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k7gLK-0003ww-Ni
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:42:34 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:46634
- helo=us-smtp-1.mimecast.com)
+ id 1k7gLF-0003jC-6E
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:42:29 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:60096)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k7gLI-0006x3-B4
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:42:34 -0400
+ id 1k7gLC-0006w6-3H
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:42:28 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597675351;
+ s=mimecast20190719; t=1597675345;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=0Qqlus7n1b/LCKuGfQDu5fJLszwM3oQDDtyxx2p4i/g=;
- b=bXb92SqZ5Fb8FaIoVU6yOZlQsaV0cBDTqTyCfjf4VIBJfEieMaWCJBn8B6xysekVYSiDtL
- eBWfeQTkrzhCAodNY2LP20Be+6uSwKKGPdD/A6V2ml2TlOVs3RJTJWeSf4oWtJ+OY37jCl
- 16UauIgZqKdKp2ykJa/cdHa8PBQTCNw=
+ bh=LedXecCt40e9TDykDffC5QUZbSE0DrmbXRzfa5v82bk=;
+ b=N5CUdI9PZZbiJS7X1YdZ7mvTI624bYvUL2hST4AlNP4eN3FCYMMDPwwd/HtAjKZ4GU83LC
+ 0y3mxCsJ8AEXAH8qPcpaxetYeZbHSYVozjriY86fIrfc43z5fDCoc9/F48sZ5RfG6aYzzT
+ M/q8Ws4Z13tTs3zdIeoE+dQoFYlmypw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-396-OfEj5LypMA-aFL489S_FOQ-1; Mon, 17 Aug 2020 10:42:29 -0400
-X-MC-Unique: OfEj5LypMA-aFL489S_FOQ-1
+ us-mta-38-8zeuQgKRNXqthvgw15hY5w-1; Mon, 17 Aug 2020 10:42:21 -0400
+X-MC-Unique: 8zeuQgKRNXqthvgw15hY5w-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D507281F000
- for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 14:42:28 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 97C0F1DDE8
+ for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 14:42:20 +0000 (UTC)
 Received: from donizetti.redhat.com (ovpn-113-20.ams2.redhat.com
  [10.36.113.20])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 549B670C3D
- for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 14:42:28 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B738070C3D;
+ Mon, 17 Aug 2020 14:42:19 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 145/150] meson: convert VNC and dependent libraries to meson
-Date: Mon, 17 Aug 2020 16:40:48 +0200
-Message-Id: <20200817144053.345107-50-pbonzini@redhat.com>
+Subject: [PATCH 137/150] meson: sphinx-build
+Date: Mon, 17 Aug 2020 16:40:40 +0200
+Message-Id: <20200817144053.345107-42-pbonzini@redhat.com>
 In-Reply-To: <20200817143723.343284-1-pbonzini@redhat.com>
 References: <20200817143723.343284-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/17 05:13:21
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/17 01:24:49
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -98,296 +96,409 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+For now, sphinx is run on every invocation of make.  The previous mechanism
+using $(wildcard) is not reproducible in Meson and was also brittle; for
+example some .rst.inc files were left out.  The next patch will introduce
+a Sphinx extension to emit a depfile.
+
+Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- configure         | 122 +++++-----------------------------------------
- meson.build       |  40 +++++++++------
- meson_options.txt |   4 ++
- ui/meson.build    |  10 ++--
- 4 files changed, 45 insertions(+), 131 deletions(-)
+ Makefile           | 142 +++------------------------------------------
+ configure          |   1 -
+ docs/index.html.in |   4 +-
+ docs/meson.build   |  68 ++++++++++++++++++++++
+ meson.build        |   2 +
+ rules.mak          |  48 ---------------
+ 6 files changed, 79 insertions(+), 186 deletions(-)
+ create mode 100644 docs/meson.build
 
+diff --git a/Makefile b/Makefile
+index 175776d912..fe7e719075 100644
+--- a/Makefile
++++ b/Makefile
+@@ -124,36 +124,9 @@ $(call set-vpath, $(SRC_PATH))
+ 
+ LIBS+=-lz $(LIBS_TOOLS)
+ 
+-# Sphinx does not allow building manuals into the same directory as
+-# the source files, so if we're doing an in-tree QEMU build we must
+-# build the manuals into a subdirectory (and then install them from
+-# there for 'make install'). For an out-of-tree build we can just
+-# use the docs/ subdirectory in the build tree as normal.
+-ifeq ($(realpath $(SRC_PATH)),$(realpath .))
+-MANUAL_BUILDDIR := docs/built
+-else
+-MANUAL_BUILDDIR := docs
+-endif
+-
+ ifdef BUILD_DOCS
+-DOCS+=$(MANUAL_BUILDDIR)/system/qemu.1
+-DOCS+=$(MANUAL_BUILDDIR)/tools/qemu-img.1
+-DOCS+=$(MANUAL_BUILDDIR)/tools/qemu-nbd.8
+-DOCS+=$(MANUAL_BUILDDIR)/interop/qemu-ga.8
+-ifeq ($(CONFIG_LINUX)$(CONFIG_SECCOMP)$(CONFIG_LIBCAP_NG),yyy)
+-DOCS+=$(MANUAL_BUILDDIR)/tools/virtiofsd.1
+-endif
+-DOCS+=$(MANUAL_BUILDDIR)/system/qemu-block-drivers.7
+ DOCS+=docs/interop/qemu-qmp-ref.html docs/interop/qemu-qmp-ref.txt docs/interop/qemu-qmp-ref.7
+ DOCS+=docs/interop/qemu-ga-ref.html docs/interop/qemu-ga-ref.txt docs/interop/qemu-ga-ref.7
+-DOCS+=$(MANUAL_BUILDDIR)/system/qemu-cpu-models.7
+-DOCS+=$(MANUAL_BUILDDIR)/index.html
+-ifdef CONFIG_VIRTFS
+-DOCS+=$(MANUAL_BUILDDIR)/tools/virtfs-proxy-helper.1
+-endif
+-ifdef CONFIG_TRACE_SYSTEMTAP
+-DOCS+=$(MANUAL_BUILDDIR)/tools/qemu-trace-stap.1
+-endif
+ else
+ DOCS=
+ endif
+@@ -237,11 +210,6 @@ dist: qemu-$(VERSION).tar.bz2
+ qemu-%.tar.bz2:
+ 	$(SRC_PATH)/scripts/make-release "$(SRC_PATH)" "$(patsubst qemu-%.tar.bz2,%,$@)"
+ 
+-define clean-manual =
+-rm -rf $(MANUAL_BUILDDIR)/$1/_static
+-rm -f $(MANUAL_BUILDDIR)/$1/objects.inv $(MANUAL_BUILDDIR)/$1/searchindex.js $(MANUAL_BUILDDIR)/$1/*.html
+-endef
+-
+ distclean: clean ninja-distclean
+ 	-test -f ninjatool && ./ninjatool $(if $(V),-v,) -t clean -g
+ 	rm -f config-host.mak config-host.h* $(DOCS)
+@@ -261,13 +229,6 @@ distclean: clean ninja-distclean
+ 	rm -f docs/interop/qemu-qmp-ref.txt docs/interop/qemu-ga-ref.txt
+ 	rm -f docs/interop/qemu-qmp-ref.pdf docs/interop/qemu-ga-ref.pdf
+ 	rm -f docs/interop/qemu-qmp-ref.html docs/interop/qemu-ga-ref.html
+-	rm -rf .doctrees
+-	$(call clean-manual,devel)
+-	$(call clean-manual,interop)
+-	$(call clean-manual,specs)
+-	$(call clean-manual,system)
+-	$(call clean-manual,tools)
+-	$(call clean-manual,user)
+ 	rm -Rf .sdk
+ 
+ KEYMAPS=da     en-gb  et  fr     fr-ch  is  lt  no  pt-br  sv \
+@@ -301,28 +262,8 @@ else
+ BLOBS=
+ endif
+ 
+-# Note that we manually filter-out the non-Sphinx documentation which
+-# is currently built into the docs/interop directory in the build tree,
+-# and also any sphinx-built manpages.
+-define install-manual =
+-for d in $$(cd $(MANUAL_BUILDDIR) && find $1 -type d); do $(INSTALL_DIR) "$(DESTDIR)$(qemu_docdir)/$$d"; done
+-for f in $$(cd $(MANUAL_BUILDDIR) && find $1 -type f -a '!' '(' -name '*.[0-9]' -o -name 'qemu-*-qapi.*' -o -name 'qemu-*-ref.*' ')' ); do $(INSTALL_DATA) "$(MANUAL_BUILDDIR)/$$f" "$(DESTDIR)$(qemu_docdir)/$$f"; done
+-endef
+-
+-# Note that we deliberately do not install the "devel" manual: it is
+-# for QEMU developers, and not interesting to our users.
+-.PHONY: install-sphinxdocs
+-install-sphinxdocs: sphinxdocs
+-	$(call install-manual,interop)
+-	$(call install-manual,specs)
+-	$(call install-manual,system)
+-	$(call install-manual,tools)
+-	$(call install-manual,user)
+-
+-install-doc: $(DOCS) install-sphinxdocs
++install-doc: $(DOCS)
+ 	$(INSTALL_DIR) "$(DESTDIR)$(qemu_docdir)"
+-	$(INSTALL_DATA) $(MANUAL_BUILDDIR)/index.html "$(DESTDIR)$(qemu_docdir)"
+-	$(INSTALL_DIR) "$(DESTDIR)$(qemu_docdir)/interop"
+ 	$(INSTALL_DATA) docs/interop/qemu-qmp-ref.html "$(DESTDIR)$(qemu_docdir)/interop"
+ 	$(INSTALL_DATA) docs/interop/qemu-qmp-ref.txt "$(DESTDIR)$(qemu_docdir)/interop"
+ ifdef CONFIG_POSIX
+@@ -330,19 +271,7 @@ ifdef CONFIG_POSIX
+ 	$(INSTALL_DATA) $(MANUAL_BUILDDIR)/system/qemu.1 "$(DESTDIR)$(mandir)/man1"
+ 	$(INSTALL_DIR) "$(DESTDIR)$(mandir)/man7"
+ 	$(INSTALL_DATA) docs/interop/qemu-qmp-ref.7 "$(DESTDIR)$(mandir)/man7"
+-	$(INSTALL_DATA) $(MANUAL_BUILDDIR)/system/qemu-block-drivers.7 "$(DESTDIR)$(mandir)/man7"
+-	$(INSTALL_DATA) $(MANUAL_BUILDDIR)/system/qemu-cpu-models.7 "$(DESTDIR)$(mandir)/man7"
+-ifeq ($(CONFIG_TOOLS),y)
+-	$(INSTALL_DATA) $(MANUAL_BUILDDIR)/tools/qemu-img.1 "$(DESTDIR)$(mandir)/man1"
+-	$(INSTALL_DIR) "$(DESTDIR)$(mandir)/man8"
+-	$(INSTALL_DATA) $(MANUAL_BUILDDIR)/tools/qemu-nbd.8 "$(DESTDIR)$(mandir)/man8"
+-endif
+-ifdef CONFIG_TRACE_SYSTEMTAP
+-	$(INSTALL_DATA) $(MANUAL_BUILDDIR)/tools/qemu-trace-stap.1 "$(DESTDIR)$(mandir)/man1"
+-endif
+ ifeq ($(CONFIG_GUEST_AGENT),y)
+-	$(INSTALL_DATA) $(MANUAL_BUILDDIR)/interop/qemu-ga.8 "$(DESTDIR)$(mandir)/man8"
+-	$(INSTALL_DIR) "$(DESTDIR)$(qemu_docdir)/interop"
+ 	$(INSTALL_DATA) docs/interop/qemu-ga-ref.html "$(DESTDIR)$(qemu_docdir)/interop"
+ 	$(INSTALL_DATA) docs/interop/qemu-ga-ref.txt "$(DESTDIR)$(qemu_docdir)/interop"
+ 	$(INSTALL_DATA) docs/interop/qemu-ga-ref.7 "$(DESTDIR)$(mandir)/man7"
+@@ -429,69 +358,6 @@ docs/version.texi: $(SRC_PATH)/VERSION config-host.mak
+ %.pdf: %.texi docs/version.texi
+ 	$(call quiet-command,texi2pdf $(TEXI2PDFFLAGS) $< -o $@,"GEN","$@")
+ 
+-# Sphinx builds all its documentation at once in one invocation
+-# and handles "don't rebuild things unless necessary" itself.
+-# The '.doctrees' files are cached information to speed this up.
+-.PHONY: sphinxdocs
+-sphinxdocs: $(MANUAL_BUILDDIR)/devel/index.html \
+-            $(MANUAL_BUILDDIR)/interop/index.html \
+-            $(MANUAL_BUILDDIR)/specs/index.html \
+-            $(MANUAL_BUILDDIR)/system/index.html \
+-            $(MANUAL_BUILDDIR)/tools/index.html \
+-            $(MANUAL_BUILDDIR)/user/index.html
+-
+-# Canned command to build a single manual
+-# Arguments: $1 = manual name, $2 = Sphinx builder ('html' or 'man')
+-# Note the use of different doctree for each (manual, builder) tuple;
+-# this works around Sphinx not handling parallel invocation on
+-# a single doctree: https://github.com/sphinx-doc/sphinx/issues/2946
+-build-manual = $(call quiet-command,CONFDIR="$(qemu_confdir)" $(SPHINX_BUILD) $(if $(V),,-q) $(SPHINX_WERROR) -b $2 -D version=$(VERSION) -D release="$(FULL_VERSION)" -d .doctrees/$1-$2 $(SRC_PATH)/docs/$1 $(MANUAL_BUILDDIR)/$1 ,"SPHINX","$(MANUAL_BUILDDIR)/$1")
+-# We assume all RST files in the manual's directory are used in it
+-manual-deps = $(wildcard $(SRC_PATH)/docs/$1/*.rst $(SRC_PATH)/docs/$1/*/*.rst) \
+-              $(SRC_PATH)/docs/defs.rst.inc \
+-              $(SRC_PATH)/docs/$1/conf.py $(SRC_PATH)/docs/conf.py \
+-              $(SRC_PATH)/docs/sphinx/*.py
+-# Macro to write out the rule and dependencies for building manpages
+-# Usage: $(call define-manpage-rule,manualname,manpage1 manpage2...[,extradeps])
+-# 'extradeps' is optional, and specifies extra files (eg .hx files) that
+-# the manual page depends on.
+-define define-manpage-rule
+-$(call atomic,$(foreach manpage,$2,$(MANUAL_BUILDDIR)/$1/$(manpage)),$(call manual-deps,$1) $3)
+-	$(call build-manual,$1,man)
+-endef
+-
+-$(MANUAL_BUILDDIR)/devel/index.html: $(call manual-deps,devel)
+-	$(call build-manual,devel,html)
+-
+-$(MANUAL_BUILDDIR)/interop/index.html: $(call manual-deps,interop)
+-	$(call build-manual,interop,html)
+-
+-$(MANUAL_BUILDDIR)/specs/index.html: $(call manual-deps,specs)
+-	$(call build-manual,specs,html)
+-
+-$(MANUAL_BUILDDIR)/system/index.html: $(call manual-deps,system) $(SRC_PATH)/hmp-commands.hx $(SRC_PATH)/hmp-commands-info.hx $(SRC_PATH)/qemu-options.hx
+-	$(call build-manual,system,html)
+-
+-$(MANUAL_BUILDDIR)/tools/index.html: $(call manual-deps,tools) $(SRC_PATH)/qemu-img-cmds.hx $(SRC_PATH)/docs/qemu-option-trace.rst.inc
+-	$(call build-manual,tools,html)
+-
+-$(MANUAL_BUILDDIR)/user/index.html: $(call manual-deps,user)
+-	$(call build-manual,user,html)
+-
+-$(call define-manpage-rule,interop,qemu-ga.8)
+-
+-$(call define-manpage-rule,system,qemu.1 qemu-block-drivers.7 qemu-cpu-models.7)
+-
+-$(call define-manpage-rule,tools,\
+-       qemu-img.1 qemu-nbd.8 qemu-trace-stap.1\
+-       virtiofsd.1 virtfs-proxy-helper.1,\
+-       $(SRC_PATH)/qemu-img-cmds.hx $(SRC_PATH)/docs/qemu-option-trace.rst.inc)
+-
+-$(MANUAL_BUILDDIR)/index.html: $(SRC_PATH)/docs/index.html.in qemu-version.h
+-	@mkdir -p "$(MANUAL_BUILDDIR)"
+-	$(call quiet-command, sed "s|@@VERSION@@|${VERSION}|g" $< >$@, \
+-             "GEN","$@")
+-
+ docs/interop/qemu-qmp-qapi.texi: qapi/qapi-doc.texi
+ 	@cp -p $< $@
+ 
+@@ -514,6 +380,12 @@ docs/interop/qemu-qmp-ref.dvi docs/interop/qemu-qmp-ref.html \
+ 	docs/interop/qemu-qmp-ref.texi docs/interop/qemu-qmp-qapi.texi
+ 
+ $(filter %.1 %.7 %.8,$(DOCS)): scripts/texi2pod.pl
++	$(call quiet-command, \
++	  perl -Ww -- $(SRC_PATH)/scripts/texi2pod.pl $(TEXI2PODFLAGS) $< $@.pod && \
++	  $(POD2MAN) --section=$(subst .,,$(suffix $@)) --center=" " --release=" " $@.pod > $@, \
++	  "GEN","$@")
++
++man: $(filter %.1 %.7 %.8,$(DOCS))
+ 
+ ifdef CONFIG_WIN32
+ 
 diff --git a/configure b/configure
-index dd8f9923b0..48aafd2e55 100755
+index 840a90d987..d1cdd9155f 100755
 --- a/configure
 +++ b/configure
-@@ -380,12 +380,12 @@ sdl="auto"
- sdl_image="auto"
- virtfs=""
- mpath=""
--vnc="yes"
-+vnc="enabled"
- sparse="no"
- vde=""
--vnc_sasl=""
--vnc_jpeg=""
--vnc_png=""
-+vnc_sasl="auto"
-+vnc_jpeg="auto"
-+vnc_png="auto"
- xkbcommon=""
- xen=""
- xen_ctrl_version=""
-@@ -1108,9 +1108,9 @@ for opt do
-   ;;
-   --enable-mpath) mpath="yes"
-   ;;
--  --disable-vnc) vnc="no"
-+  --disable-vnc) vnc="disabled"
-   ;;
--  --enable-vnc) vnc="yes"
-+  --enable-vnc) vnc="enabled"
-   ;;
-   --oss-lib=*) oss_lib="$optarg"
-   ;;
-@@ -1146,17 +1146,17 @@ for opt do
-   ;;
-   --disable-strip) strip_opt="no"
-   ;;
--  --disable-vnc-sasl) vnc_sasl="no"
-+  --disable-vnc-sasl) vnc_sasl="disabled"
-   ;;
--  --enable-vnc-sasl) vnc_sasl="yes"
-+  --enable-vnc-sasl) vnc_sasl="enabled"
-   ;;
--  --disable-vnc-jpeg) vnc_jpeg="no"
-+  --disable-vnc-jpeg) vnc_jpeg="disabled"
-   ;;
--  --enable-vnc-jpeg) vnc_jpeg="yes"
-+  --enable-vnc-jpeg) vnc_jpeg="enabled"
-   ;;
--  --disable-vnc-png) vnc_png="no"
-+  --disable-vnc-png) vnc_png="disabled"
-   ;;
--  --enable-vnc-png) vnc_png="yes"
-+  --enable-vnc-png) vnc_png="enabled"
-   ;;
-   --disable-slirp) slirp="no"
-   ;;
-@@ -3379,85 +3379,6 @@ EOF
-     fi
- fi
- 
--##########################################
--# VNC SASL detection
--if test "$vnc" = "yes" && test "$vnc_sasl" != "no" ; then
--  cat > $TMPC <<EOF
--#include <sasl/sasl.h>
--#include <stdio.h>
--int main(void) { sasl_server_init(NULL, "qemu"); return 0; }
--EOF
--  # Assuming Cyrus-SASL installed in /usr prefix
--  # QEMU defines struct iovec in "qemu/osdep.h",
--  # we don't want libsasl to redefine it in <sasl/sasl.h>.
--  vnc_sasl_cflags="-DSTRUCT_IOVEC_DEFINED"
--  vnc_sasl_libs="-lsasl2"
--  if compile_prog "$vnc_sasl_cflags" "$vnc_sasl_libs" ; then
--    vnc_sasl=yes
--    libs_softmmu="$vnc_sasl_libs $libs_softmmu"
--    QEMU_CFLAGS="$QEMU_CFLAGS $vnc_sasl_cflags"
--  else
--    if test "$vnc_sasl" = "yes" ; then
--      feature_not_found "vnc-sasl" "Install Cyrus SASL devel"
--    fi
--    vnc_sasl=no
--  fi
--fi
--
--##########################################
--# VNC JPEG detection
--if test "$vnc" = "yes" && test "$vnc_jpeg" != "no" ; then
--cat > $TMPC <<EOF
--#include <stdio.h>
--#include <jpeglib.h>
--int main(void) { struct jpeg_compress_struct s; jpeg_create_compress(&s); return 0; }
--EOF
--    vnc_jpeg_cflags=""
--    vnc_jpeg_libs="-ljpeg"
--  if compile_prog "$vnc_jpeg_cflags" "$vnc_jpeg_libs" ; then
--    vnc_jpeg=yes
--    libs_softmmu="$vnc_jpeg_libs $libs_softmmu"
--    QEMU_CFLAGS="$QEMU_CFLAGS $vnc_jpeg_cflags"
--  else
--    if test "$vnc_jpeg" = "yes" ; then
--      feature_not_found "vnc-jpeg" "Install libjpeg-turbo devel"
--    fi
--    vnc_jpeg=no
--  fi
--fi
--
--##########################################
--# VNC PNG detection
--if test "$vnc" = "yes" && test "$vnc_png" != "no" ; then
--cat > $TMPC <<EOF
--//#include <stdio.h>
--#include <png.h>
--#include <stddef.h>
--int main(void) {
--    png_structp png_ptr;
--    png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
--    return png_ptr != 0;
--}
--EOF
--  if $pkg_config libpng --exists; then
--    vnc_png_cflags=$($pkg_config libpng --cflags)
--    vnc_png_libs=$($pkg_config libpng --libs)
--  else
--    vnc_png_cflags=""
--    vnc_png_libs="-lpng"
--  fi
--  if compile_prog "$vnc_png_cflags" "$vnc_png_libs" ; then
--    vnc_png=yes
--    libs_softmmu="$vnc_png_libs $libs_softmmu"
--    QEMU_CFLAGS="$QEMU_CFLAGS $vnc_png_cflags"
--  else
--    if test "$vnc_png" = "yes" ; then
--      feature_not_found "vnc-png" "Install libpng devel"
--    fi
--    vnc_png=no
--  fi
--fi
--
- ##########################################
- # xkbcommon probe
- if test "$xkbcommon" != "no" ; then
-@@ -6838,24 +6759,6 @@ if test "$audio_win_int" = "yes" ; then
- fi
- echo "CONFIG_BDRV_RW_WHITELIST=$block_drv_rw_whitelist" >> $config_host_mak
- echo "CONFIG_BDRV_RO_WHITELIST=$block_drv_ro_whitelist" >> $config_host_mak
--if test "$vnc" = "yes" ; then
--  echo "CONFIG_VNC=y" >> $config_host_mak
--fi
--if test "$vnc_sasl" = "yes" ; then
--  echo "CONFIG_VNC_SASL=y" >> $config_host_mak
--fi
--echo "SASL_CFLAGS=$vnc_sasl_cflags" >> $config_host_mak
--echo "SASL_LIBS=$vnc_sasl_libs" >> $config_host_mak
--if test "$vnc_jpeg" = "yes" ; then
--  echo "CONFIG_VNC_JPEG=y" >> $config_host_mak
--fi
--echo "JPEG_CFLAGS=$vnc_jpeg_cflags" >> $config_host_mak
--echo "JPEG_LIBS=$vnc_jpeg_libs" >> $config_host_mak
--if test "$vnc_png" = "yes" ; then
--  echo "CONFIG_VNC_PNG=y" >> $config_host_mak
--fi
--echo "PNG_CFLAGS=$vnc_png_cflags" >> $config_host_mak
--echo "PNG_LIBS=$vnc_png_libs" >> $config_host_mak
- if test "$xkbcommon" = "yes" ; then
-   echo "CONFIG_XKBCOMMON=y" >> $config_host_mak
-   echo "XKBCOMMON_CFLAGS=$xkbcommon_cflags" >> $config_host_mak
-@@ -8268,6 +8171,7 @@ NINJA=$PWD/ninjatool $meson setup \
-         -Db_pie=$(if test "$pie" = yes; then echo true; else echo false; fi) \
-         -Db_coverage=$(if test "$gcov" = yes; then echo true; else echo false; fi) \
- 	-Dsdl=$sdl -Dsdl_image=$sdl_image \
-+	-Dvnc=$vnc -Dvnc_sasl=$vnc_sasl -Dvnc_jpeg=$vnc_jpeg -Dvnc_png=$vnc_png \
-         $cross_arg \
-         "$PWD" "$source_path"
- 
+@@ -7775,7 +7775,6 @@ echo "INSTALL_PROG=$install -c -m 0755" >> $config_host_mak
+ echo "INSTALL_LIB=$install -c -m 0644" >> $config_host_mak
+ echo "PYTHON=$python" >> $config_host_mak
+ echo "SPHINX_BUILD=$sphinx_build" >> $config_host_mak
+-echo "SPHINX_WERROR=$sphinx_werror" >> $config_host_mak
+ echo "GENISOIMAGE=$genisoimage" >> $config_host_mak
+ echo "MESON=$meson" >> $config_host_mak
+ echo "CC=$cc" >> $config_host_mak
+diff --git a/docs/index.html.in b/docs/index.html.in
+index 6736fa4360..ca28047881 100644
+--- a/docs/index.html.in
++++ b/docs/index.html.in
+@@ -2,10 +2,10 @@
+ <html lang="en">
+     <head>
+         <meta charset="UTF-8">
+-        <title>QEMU @@VERSION@@ Documentation</title>
++        <title>QEMU @VERSION@ Documentation</title>
+     </head>
+     <body>
+-        <h1>QEMU @@VERSION@@ Documentation</h1>
++        <h1>QEMU @VERSION@ Documentation</h1>
+         <ul>
+             <li><a href="system/index.html">System Emulation User's Guide</a></li>
+             <li><a href="user/index.html">User Mode Emulation User's Guide</a></li>
+diff --git a/docs/meson.build b/docs/meson.build
+new file mode 100644
+index 0000000000..20fc92e2fe
+--- /dev/null
++++ b/docs/meson.build
+@@ -0,0 +1,68 @@
++SPHINX_ARGS = [config_host['SPHINX_BUILD'],
++               '-Dversion=' + meson.project_version(),
++               '-Drelease=' + config_host['PKGVERSION']]
++
++if get_option('werror')
++  SPHINX_ARGS += [ '-W' ]
++endif
++
++if build_docs
++  configure_file(output: 'index.html',
++                 input: files('index.html.in'),
++                 configuration: {'VERSION': meson.project_version()},
++                 install_dir: config_host['qemu_docdir'])
++  manuals = [ 'devel', 'interop', 'tools', 'specs', 'system', 'user' ]
++  man_pages = {
++    'interop' : {
++        'qemu-ga.8': (have_tools ? 'man8' : ''),
++    },
++    'tools': {
++        'qemu-img.1': (have_tools ? 'man1' : ''),
++        'qemu-nbd.8': (have_tools ? 'man8' : ''),
++        'qemu-trace-stap.1': (config_host.has_key('CONFIG_TRACE_SYSTEMTAP') ? 'man1' : ''),
++        'virtfs-proxy-helper.1': (have_virtfs_proxy_helper ? 'man1' : ''),
++        'virtiofsd.1': (have_virtiofsd ? 'man1' : ''),
++    },
++    'system': {
++        'qemu.1': 'man1',
++        'qemu-block-drivers.7': 'man7',
++        'qemu-cpu-models.7': 'man7'
++    },
++  }
++
++  sphinxdocs = []
++  sphinxmans = []
++  foreach manual : manuals
++    private_dir = meson.current_build_dir() / (manual + '.p')
++    input_dir = meson.current_source_dir() / manual
++    sphinxdocs += custom_target(manual + ' manual',
++                build_always_stale: true,
++                build_by_default: build_docs,
++                output: manual,
++                command: [SPHINX_ARGS, '-b', 'html', '-d', private_dir,
++                          input_dir, meson.current_build_dir() / manual])
++    if build_docs and manual != 'devel'
++      install_subdir(meson.current_build_dir() / manual,
++                     install_dir: config_host['qemu_docdir'])
++    endif
++
++    these_man_pages = []
++    install_dirs = []
++    foreach page, section : man_pages.get(manual, {})
++      these_man_pages += page
++      install_dirs += section == '' ? false : get_option('mandir') / section
++    endforeach
++    if these_man_pages.length() > 0
++      sphinxmans += custom_target(manual + ' man pages',
++                         build_always_stale: true,
++                         build_by_default: build_docs,
++                         output: these_man_pages,
++                         install: build_docs,
++                         install_dir: install_dirs,
++                         command: [SPHINX_ARGS, '-b', 'man', '-d', private_dir,
++                                   input_dir, meson.current_build_dir()])
++    endif
++  endforeach
++  alias_target('sphinxdocs', sphinxdocs)
++  alias_target('man', sphinxmans)
++endif
 diff --git a/meson.build b/meson.build
-index f67440c6e1..d7d359a196 100644
+index 8ff7aada2c..bce7580726 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -300,20 +300,24 @@ if 'CONFIG_GIO' in config_host
-   gio = declare_dependency(compile_args: config_host['GIO_CFLAGS'].split(),
-                            link_args: config_host['GIO_LIBS'].split())
- endif
-+vnc = not_found
- png = not_found
--if 'CONFIG_VNC_PNG' in config_host
--  png = declare_dependency(compile_args: config_host['PNG_CFLAGS'].split(),
--                           link_args: config_host['PNG_LIBS'].split())
--endif
- jpeg = not_found
--if 'CONFIG_VNC_JPEG' in config_host
--  jpeg = declare_dependency(compile_args: config_host['JPEG_CFLAGS'].split(),
--                            link_args: config_host['JPEG_LIBS'].split())
--endif
- sasl = not_found
--if 'CONFIG_VNC_SASL' in config_host
--  sasl = declare_dependency(compile_args: config_host['SASL_CFLAGS'].split(),
--                            link_args: config_host['SASL_LIBS'].split())
-+if get_option('vnc').enabled()
-+  vnc = declare_dependency() # dummy dependency
-+  png = dependency('libpng', required: get_option('vnc_png'),
-+                   static: enable_static)
-+  jpeg = cc.find_library('jpeg', has_headers: ['jpeglib.h'],
-+                         required: get_option('vnc_jpeg'),
-+                         static: enable_static)
-+  sasl = cc.find_library('sasl2', has_headers: ['sasl/sasl.h'],
-+                         required: get_option('vnc_sasl'),
-+                         static: enable_static)
-+  if sasl.found()
-+    sasl = declare_dependency(dependencies: sasl,
-+                              compile_args: '-DSTRUCT_IOVEC_DEFINED')
-+  endif
- endif
- fdt = not_found
- if 'CONFIG_FDT' in config_host
-@@ -371,6 +375,10 @@ endif
+@@ -11,6 +11,7 @@ cc = meson.get_compiler('c')
+ config_host = keyval.load(meson.current_build_dir() / 'config-host.mak')
+ config_all_disas = keyval.load(meson.current_build_dir() / 'config-all-disas.mak')
+ enable_modules = 'CONFIG_MODULES' in config_host
++build_docs = 'BUILD_DOCS' in config_host
  
- config_host_data.set('CONFIG_SDL', sdl.found())
- config_host_data.set('CONFIG_SDL_IMAGE', sdl_image.found())
-+config_host_data.set('CONFIG_VNC', vnc.found())
-+config_host_data.set('CONFIG_VNC_JPEG', jpeg.found())
-+config_host_data.set('CONFIG_VNC_PNG', png.found())
-+config_host_data.set('CONFIG_VNC_SASL', sasl.found())
- config_host_data.set('QEMU_VERSION', '"@0@"'.format(meson.project_version()))
- config_host_data.set('QEMU_VERSION_MAJOR', meson.project_version().split('.')[0])
- config_host_data.set('QEMU_VERSION_MINOR', meson.project_version().split('.')[1])
-@@ -1275,11 +1283,11 @@ summary_info += {'Block whitelist (rw)': config_host['CONFIG_BDRV_RW_WHITELIST']
- summary_info += {'Block whitelist (ro)': config_host['CONFIG_BDRV_RO_WHITELIST']}
- summary_info += {'VirtFS support':    config_host.has_key('CONFIG_VIRTFS')}
- summary_info += {'Multipath support': config_host.has_key('CONFIG_MPATH')}
--summary_info += {'VNC support':       config_host.has_key('CONFIG_VNC')}
--if config_host.has_key('CONFIG_VNC')
--  summary_info += {'VNC SASL support':  config_host.has_key('CONFIG_VNC_SASL')}
--  summary_info += {'VNC JPEG support':  config_host.has_key('CONFIG_VNC_JPEG')}
--  summary_info += {'VNC PNG support':   config_host.has_key('CONFIG_VNC_PNG')}
-+summary_info += {'VNC support':       vnc.found()}
-+if vnc.found()
-+  summary_info += {'VNC SASL support':  sasl.found()}
-+  summary_info += {'VNC JPEG support':  jpeg.found()}
-+  summary_info += {'VNC PNG support':   png.found()}
- endif
- summary_info += {'xen support':       config_host.has_key('CONFIG_XEN_BACKEND')}
- if config_host.has_key('CONFIG_XEN_BACKEND')
-diff --git a/meson_options.txt b/meson_options.txt
-index e548211f34..67455c57bc 100644
---- a/meson_options.txt
-+++ b/meson_options.txt
-@@ -1,2 +1,6 @@
- option('sdl', type : 'feature', value : 'auto')
- option('sdl_image', type : 'feature', value : 'auto')
-+option('vnc', type : 'feature', value : 'enabled')
-+option('vnc_jpeg', type : 'feature', value : 'auto')
-+option('vnc_png', type : 'feature', value : 'auto')
-+option('vnc_sasl', type : 'feature', value : 'auto')
-diff --git a/ui/meson.build b/ui/meson.build
-index 7289cd3bd0..ab9773dfa0 100644
---- a/ui/meson.build
-+++ b/ui/meson.build
-@@ -27,14 +27,12 @@ vnc_ss.add(files(
-   'vnc-ws.c',
-   'vnc-jobs.c',
- ))
--vnc_ss.add(zlib)
--vnc_ss.add(when: 'CONFIG_VNC_SASL', if_true: [files('vnc-auth-sasl.c'), sasl])
--softmmu_ss.add_all(when: 'CONFIG_VNC', if_true: vnc_ss)
--softmmu_ss.add(when: 'CONFIG_VNC', if_false: files('vnc-stubs.c'))
-+vnc_ss.add(zlib, png, jpeg)
-+vnc_ss.add(when: sasl, if_true: files('vnc-auth-sasl.c'))
-+softmmu_ss.add_all(when: vnc, if_true: vnc_ss)
-+softmmu_ss.add(when: vnc, if_false: files('vnc-stubs.c'))
- softmmu_ss.add(when: [opengl, 'CONFIG_OPENGL'], if_true: files('shader.c', 'console-gl.c', 'egl-helpers.c', 'egl-context.c'))
- softmmu_ss.add(when: [opengl, 'CONFIG_OPENGL_DMABUF'], if_true: files('egl-headless.c'))
--softmmu_ss.add(when: 'CONFIG_VNC_PNG', if_true: png)
--softmmu_ss.add(when: 'CONFIG_VNC_JPEG', if_true: jpeg)
+ add_project_arguments(config_host['QEMU_CFLAGS'].split(),
+                       language: ['c', 'objc'])
+@@ -1047,6 +1048,7 @@ endif
+ subdir('tools')
+ subdir('pc-bios')
+ subdir('tests')
++subdir('docs')
  
- ui_modules = {}
+ summary_info = {}
+ summary_info += {'Install prefix':    config_host['prefix']}
+diff --git a/rules.mak b/rules.mak
+index 6d89001f0a..6cab0b9cbd 100644
+--- a/rules.mak
++++ b/rules.mak
+@@ -375,53 +375,5 @@ define unnest-vars
+         $(eval $v := $(filter-out %/,$($v))))
+ endef
  
+-TEXI2MAN = $(call quiet-command, \
+-	perl -Ww -- $(SRC_PATH)/scripts/texi2pod.pl $(TEXI2PODFLAGS) $< $@.pod && \
+-	$(POD2MAN) --section=$(subst .,,$(suffix $@)) --center=" " --release=" " $@.pod > $@, \
+-	"GEN","$@")
+-
+-%.1:
+-	$(call TEXI2MAN)
+-%.7:
+-	$(call TEXI2MAN)
+-%.8:
+-	$(call TEXI2MAN)
+-
+-# Support for building multiple output files by atomically executing
+-# a single rule which depends on several input files (so the rule
+-# will be executed exactly once, not once per output file, and
+-# not multiple times in parallel.) For more explanation see:
+-# https://www.cmcrossroads.com/article/atomic-rules-gnu-make
+-
+-# Given a space-separated list of filenames, create the name of
+-# a 'sentinel' file to use to indicate that they have been built.
+-# We use fixed text on the end to avoid accidentally triggering
+-# automatic pattern rules, and . on the start to make the file
+-# not show up in ls output.
+-sentinel = .$(subst $(SPACE),_,$(subst /,_,$1)).sentinel.
+-
+-# Define an atomic rule that builds multiple outputs from multiple inputs.
+-# To use:
+-#    $(call atomic,out1 out2 ...,in1 in2 ...)
+-#    <TAB>rule to do the operation
+-#
+-# Make 4.3 will have native support for this, and you would be able
+-# to instead write:
+-#    out1 out2 ... &: in1 in2 ...
+-#    <TAB>rule to do the operation
+-#
+-# The way this works is that it creates a make rule
+-# "out1 out2 ... : sentinel-file ; @:" which says that the sentinel
+-# depends on the dependencies, and the rule to do that is "do nothing".
+-# Then we have a rule
+-# "sentinel-file : in1 in2 ..."
+-# whose commands start with "touch sentinel-file" and then continue
+-# with the rule text provided by the user of this 'atomic' function.
+-# The foreach... is there to delete the sentinel file if any of the
+-# output files don't exist, so that we correctly rebuild in that situation.
+-atomic = $(eval $1: $(call sentinel,$1) ; @:) \
+-         $(call sentinel,$1) : $2 ; @touch $$@ \
+-         $(foreach t,$1,$(if $(wildcard $t),,$(shell rm -f $(call sentinel,$1))))
+-
+ print-%:
+ 	@echo '$*=$($*)'
 -- 
 2.26.2
 
