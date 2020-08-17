@@ -7,71 +7,71 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7912C433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 14:59:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DB2DC433E3
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 14:59:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B6026205CB
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 14:59:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 486D320760
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 14:59:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bv68M623"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B6026205CB
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lT+wSmKG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 486D320760
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41520 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41586 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7gc4-0006VA-0D
+	id 1k7gc4-0006Wu-GO
 	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 10:59:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40974)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40912)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1k7gH9-0004Vs-Ex
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:38:15 -0400
-Received: from mail-wr1-x432.google.com ([2a00:1450:4864:20::432]:43842)
+ id 1k7gH4-0004JJ-QF
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:38:10 -0400
+Received: from mail-wr1-x432.google.com ([2a00:1450:4864:20::432]:45591)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1k7gH7-0006AS-Jh
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:38:15 -0400
-Received: by mail-wr1-x432.google.com with SMTP id a15so15234388wrh.10
- for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 07:38:13 -0700 (PDT)
+ id 1k7gH2-00069R-Ur
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:38:10 -0400
+Received: by mail-wr1-x432.google.com with SMTP id z18so15241761wrm.12
+ for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 07:38:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=TTpH/Amkk5QWW5qv7DGlz5zG9WnvhyPmO7FqAWwRULk=;
- b=bv68M6230nt5T4jVtif3PvbuH7t0inWvCD/bbyQ84N0UEluHgRJdFF6QS/gpGBHfpD
- zNIKczWu5T1HdEGdYu7Yzh6YFIQUnCvL5haAB3+TYY0ihEq73RjG0RBZ40suqMAX7iEm
- 6BM6XAgkL4LUsQmCX3/JnaZhOq/MWBBgx/j1jYnVpZbcO1cJW86lXr8kNc+lKUFDbFCv
- 8wrJn+X7sTy4f+S4HCGUmFgd+IxK0TkrXSF/ha+5LxQfUHqCESPSb4yRsHSr5r2ZVddw
- 9eGtdUefSRSJRY2cyhmW564NhtNHTJNM6/KyiYywYDy8wMCHZnavXx4M7P6vozlhYjTV
- 0bwQ==
+ bh=qOKJ+Ver4XgMvPbsJwwjCcehhxtmfHeXcEultQ+LU6o=;
+ b=lT+wSmKGQtylt7hUnexQEIWXYMHF7+hW5f0UPSYXJCnLtEVtr307t4xjhXpRUQ3yoj
+ 3oYpZKGG2Wp9TyPz7FCDdBTZA7LVF14rQ6pYqDeqVa8JtPMKGamDKT1Ul7aishUQZsTQ
+ /ER6814dovQsDNGRTeDEsuxfr6XuSptZ0xWfnSarK+b4vJOlzuZ5DpFx3NCeSsqwxjgy
+ gN//3oEzGU6IaKClu/ZrBUPSLDD4kdKA6NhL+8GTkym+fQcL5pKFavwa1k6HLkjxCTrx
+ +cnqpmCplW4Qp2uApMxuFEaRVFiVMbVY29GjT7ObBx3DdX4jWumpZLuJX0I8aLBNv31/
+ 5RJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=TTpH/Amkk5QWW5qv7DGlz5zG9WnvhyPmO7FqAWwRULk=;
- b=rboRpVl3r/G66MmGGscQJy+NLOcxtn+2AIDlMCMri/nKgG/4I3r8XrYl70WeZTXlcq
- qQEIs2KR1DPuzA8s3rk+u0usi/s34cggH9DIw2lYcJvxXbDT/cagFXNMAkcTklOMJLQW
- 6DAyMyVFeVt/dJsobU2nLW/qavhh9v4zMG7Xnxif+KHeQ6oE3i3kexPI+3+FCQ7R0poP
- WybBvZOCC/wJFvLrweETS3kfEqRovNRUnQYsFOdsKgAYfcdL9j2nFLoUdS3pkc/95CcU
- eAAwEHvzIUvJZBC7n+9piHqwUC/gFsy2orB/lCAPwPswEmu5w1bEKEwc7grohjJDXoPu
- mtXw==
-X-Gm-Message-State: AOAM530007yY6pr2g3tsdIjyAr/b1XJe5vPqx44YBI2+EyUyy+8/Gk2E
- UrzipyjsOUviWu0eloqLVw1+jROk2B4=
-X-Google-Smtp-Source: ABdhPJxRvSqf18AdhTBWBnMoDqoQxcv4brFC2A+7biRuawhiJ3sseXThjgJtgxvGfTl4dTXu5fPVPw==
-X-Received: by 2002:adf:b34a:: with SMTP id k10mr15517788wrd.402.1597675091940; 
- Mon, 17 Aug 2020 07:38:11 -0700 (PDT)
+ bh=qOKJ+Ver4XgMvPbsJwwjCcehhxtmfHeXcEultQ+LU6o=;
+ b=KGSpjZYnrSdPn4TlssUgYYzLPLpsZTXPONTadbMl46Z8CscwnOOjz7rAkdeJHu1QPH
+ RNFiaYVLFM+66YOy2VUef3iZ30U4Ecpa9JkmjBjt/pr47PKHSS/Dzk4oK+Cb8FskRg/H
+ Kd9Z7bQcZez90UWR0mO5/Bpk6xKqn6fq58x+zouIGX0EgzDno2whYbf1WW8aq6FKS7HF
+ czIH/GpqA2BpzJ+YbavQ0XceM7Gu0Se+nStSmOHDmTZvCDfS46tTTQS0DN6EnsmcCnr4
+ N47t6hCIOYGSw3paAKXwXulFz9ENSwBlBsOLCy0kSEvPJMnNt++0WE24cW4BLifMm4E8
+ BSOQ==
+X-Gm-Message-State: AOAM531TW2ek/C+VSBREE/IgpBb18gF/PMo+tT127PwsI6B6Hy7LQX5r
+ 8byQRqusEkOu56V3brYwmWeolh0SNd4=
+X-Google-Smtp-Source: ABdhPJxTGc1xCE/WybpERzW3frl0AAD0SeMQ4930w57KKhJ3Dn8FzvX35gSFSzaW2CsLfKHN5n0bJQ==
+X-Received: by 2002:a5d:544a:: with SMTP id w10mr16077523wrv.317.1597675086539; 
+ Mon, 17 Aug 2020 07:38:06 -0700 (PDT)
 Received: from donizetti.redhat.com ([2001:b07:6468:f312:a0d1:fc42:c610:f977])
  by smtp.gmail.com with ESMTPSA id
- i22sm34966603wrb.45.2020.08.17.07.38.11
+ i22sm34966603wrb.45.2020.08.17.07.38.05
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 17 Aug 2020 07:38:11 -0700 (PDT)
+ Mon, 17 Aug 2020 07:38:06 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 047/150] meson: keymap-gen
-Date: Mon, 17 Aug 2020 16:35:40 +0200
-Message-Id: <20200817143723.343284-48-pbonzini@redhat.com>
+Subject: [PATCH 041/150] meson: add msi generation
+Date: Mon, 17 Aug 2020 16:35:34 +0200
+Message-Id: <20200817143723.343284-42-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200817143723.343284-1-pbonzini@redhat.com>
 References: <20200817143723.343284-1-pbonzini@redhat.com>
@@ -112,113 +112,96 @@ From: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Makefile       | 38 --------------------------------------
- meson.build    |  1 +
- ui/meson.build | 34 ++++++++++++++++++++++++++++++++++
- 3 files changed, 35 insertions(+), 38 deletions(-)
- create mode 100644 ui/meson.build
+ Makefile                  | 18 ------------------
+ qga/meson.build           | 25 +++++++++++++++++++++++++
+ qga/vss-win32/meson.build |  3 ++-
+ 3 files changed, 27 insertions(+), 19 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index 2cd3f5862d..f36ff09fd3 100644
+index 9b35c0d00a..a46b31b907 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -130,44 +130,6 @@ generated-files-y += module_block.h
+@@ -439,23 +439,6 @@ qemu-img-cmds.h: $(SRC_PATH)/qemu-img-cmds.hx $(SRC_PATH)/scripts/hxtool
+ qemu-keymap$(EXESUF): LIBS += $(XKBCOMMON_LIBS)
+ qemu-keymap$(EXESUF): QEMU_CFLAGS += $(XKBCOMMON_CFLAGS)
  
- generated-files-y += .git-submodule-status
- 
--KEYCODEMAP_GEN = $(SRC_PATH)/ui/keycodemapdb/tools/keymap-gen
--KEYCODEMAP_CSV = $(SRC_PATH)/ui/keycodemapdb/data/keymaps.csv
+-ifdef QEMU_GA_MSI_ENABLED
+-QEMU_GA_MSI=qemu-ga-$(ARCH).msi
 -
--KEYCODEMAP_FILES = \
--		 ui/input-keymap-atset1-to-qcode.inc \
--		 ui/input-keymap-linux-to-qcode.inc \
--		 ui/input-keymap-qcode-to-atset1.inc \
--		 ui/input-keymap-qcode-to-atset2.inc \
--		 ui/input-keymap-qcode-to-atset3.inc \
--		 ui/input-keymap-qcode-to-linux.inc \
--		 ui/input-keymap-qcode-to-qnum.inc \
--		 ui/input-keymap-qcode-to-sun.inc \
--		 ui/input-keymap-qnum-to-qcode.inc \
--		 ui/input-keymap-usb-to-qcode.inc \
--		 ui/input-keymap-win32-to-qcode.inc \
--		 ui/input-keymap-x11-to-qcode.inc \
--		 ui/input-keymap-xorgevdev-to-qcode.inc \
--		 ui/input-keymap-xorgkbd-to-qcode.inc \
--		 ui/input-keymap-xorgxquartz-to-qcode.inc \
--		 ui/input-keymap-xorgxwin-to-qcode.inc \
--		 ui/input-keymap-osx-to-qcode.inc \
--		 $(NULL)
+-msi: $(QEMU_GA_MSI)
 -
--generated-files-$(CONFIG_SOFTMMU) += $(KEYCODEMAP_FILES)
+-$(QEMU_GA_MSI): qga/qemu-ga.exe $(QGA_VSS_PROVIDER)
 -
--ui/input-keymap-%.inc: $(KEYCODEMAP_GEN) $(KEYCODEMAP_CSV) $(SRC_PATH)/ui/Makefile.objs
--	$(call quiet-command,\
--	    stem=$* && src=$${stem%-to-*} dst=$${stem#*-to-} && \
--	    test -e $(KEYCODEMAP_GEN) && \
--	    $(PYTHON) $(KEYCODEMAP_GEN) \
--	          --lang glib2 \
--	          --varname qemu_input_map_$${src}_to_$${dst} \
--	          code-map $(KEYCODEMAP_CSV) $${src} $${dst} \
--	        > $@ || rm -f $@, "GEN", "$@")
+-$(QEMU_GA_MSI): config-host.mak
 -
--$(KEYCODEMAP_GEN): .git-submodule-status
--$(KEYCODEMAP_CSV): .git-submodule-status
+-$(QEMU_GA_MSI):  $(SRC_PATH)/qga/installer/qemu-ga.wxs
+-	$(call quiet-command,QEMU_GA_VERSION="$(QEMU_GA_VERSION)" QEMU_GA_MANUFACTURER="$(QEMU_GA_MANUFACTURER)" QEMU_GA_DISTRO="$(QEMU_GA_DISTRO)" BUILD_DIR="$(BUILD_DIR)" \
+-	wixl -o $@ $(QEMU_GA_MSI_ARCH) $(QEMU_GA_MSI_WITH_VSS) $(QEMU_GA_MSI_MINGW_DLL_PATH) $<,"WIXL","$@")
+-else
+-msi:
+-	@echo "MSI build not configured or dependency resolution failed (reconfigure with --enable-guest-agent-msi option)"
+-endif
 -
- edk2-decompressed = $(basename $(wildcard pc-bios/edk2-*.fd.bz2))
- pc-bios/edk2-%.fd: pc-bios/edk2-%.fd.bz2
- 	$(call quiet-command,bzip2 -d -c $< > $@,"BUNZIP2",$<)
-diff --git a/meson.build b/meson.build
-index 8319d03730..ded5dba360 100644
---- a/meson.build
-+++ b/meson.build
-@@ -288,6 +288,7 @@ subdir('trace')
- subdir('util')
- subdir('crypto')
- subdir('storage-daemon')
-+subdir('ui')
- 
- # Build targets from sourcesets
- 
-diff --git a/ui/meson.build b/ui/meson.build
-new file mode 100644
-index 0000000000..daacd2ffbc
---- /dev/null
-+++ b/ui/meson.build
-@@ -0,0 +1,34 @@
-+keymaps = [
-+  ['atset1', 'qcode'],
-+  ['linux', 'qcode'],
-+  ['qcode', 'atset1'],
-+  ['qcode', 'atset2'],
-+  ['qcode', 'atset3'],
-+  ['qcode', 'linux'],
-+  ['qcode', 'qnum'],
-+  ['qcode', 'sun'],
-+  ['qnum', 'qcode'],
-+  ['usb', 'qcode'],
-+  ['win32', 'qcode'],
-+  ['x11', 'qcode'],
-+  ['xorgevdev', 'qcode'],
-+  ['xorgkbd', 'qcode'],
-+  ['xorgxquartz', 'qcode'],
-+  ['xorgxwin', 'qcode'],
-+  ['osx', 'qcode'],
-+]
+ ifneq ($(EXESUF),)
+ .PHONY: qga/qemu-ga
+ qga/qemu-ga: qga/qemu-ga$(EXESUF) $(QGA_VSS_PROVIDER) $(QEMU_GA_MSI)
+@@ -471,7 +454,6 @@ clean: recurse-clean ninja-clean clean-ctlist
+ # avoid old build problems by removing potentially incorrect old files
+ 	rm -f config.mak op-i386.h opc-i386.h gen-op-i386.h op-arm.h opc-arm.h gen-op-arm.h
+ 	rm -f qemu-options.def
+-	rm -f *.msi
+ 	find . \( -name '*.so' -o -name '*.dll' -o -name '*.mo' -o -name '*.[oda]' \) -type f \
+ 		! -path ./roms/edk2/ArmPkg/Library/GccLto/liblto-aarch64.a \
+ 		! -path ./roms/edk2/ArmPkg/Library/GccLto/liblto-arm.a \
+diff --git a/qga/meson.build b/qga/meson.build
+index 948302e06d..2d33c09fe6 100644
+--- a/qga/meson.build
++++ b/qga/meson.build
+@@ -48,5 +48,30 @@ qga = executable('qemu-ga', qga_ss.sources(),
+ if host_machine.system() == 'windows'
+   if 'CONFIG_QGA_VSS' in config_host
+     subdir('vss-win32')
++  else
++    gen_tlb = []
++  endif
 +
-+if have_system
-+  foreach e : keymaps
-+    output = 'input-keymap-@0@-to-@1@.inc'.format(e[0], e[1])
-+    genh += custom_target(output,
-+                  output: output,
-+                  capture: true,
-+                  build_by_default: true, # to be removed when added to a target
-+                  input: files('keycodemapdb/data/keymaps.csv'),
-+                  command: [python.full_path(), files('keycodemapdb/tools/keymap-gen'),
-+                            '--lang', 'glib2',
-+                            '--varname', 'qemu_input_map_@0@_to_@1@'.format(e[0], e[1]),
-+                            'code-map', '@INPUT0@', e[0], e[1]])
-+  endforeach
-+endif
++  wixl = find_program('wixl', required: false)
++  if wixl.found()
++    deps = [gen_tlb, qga]
++    if 'QEMU_GA_MSI_WITH_VSS' in config_host
++      deps += qga_vss
++    endif
++    qga_msi = custom_target('QGA MSI',
++                            input: files('installer/qemu-ga.wxs'),
++                            output: 'qemu-ga-@0@.msi'.format(config_host['ARCH']),
++                            depends: deps,
++                            command: [
++                              'QEMU_GA_VERSION=' + config_host['QEMU_GA_VERSION'],
++                              'QEMU_GA_MANUFACTURER=' + config_host['QEMU_GA_MANUFACTURER'],
++                              'QEMU_GA_DISTRO=' + config_host['QEMU_GA_DISTRO'],
++                              'BUILD_DIR=' + meson.build_root(),
++                              wixl, '-o', '@OUTPUT0@', '@INPUT0@',
++                              config_host['QEMU_GA_MSI_ARCH'].split(),
++                              config_host['QEMU_GA_MSI_WITH_VSS'].split(),
++                              config_host['QEMU_GA_MSI_MINGW_DLL_PATH'].split(),
++                            ])
++    alias_target('msi', qga_msi)
+   endif
+ endif
+diff --git a/qga/vss-win32/meson.build b/qga/vss-win32/meson.build
+index 42c8d31a3d..1f39e05335 100644
+--- a/qga/vss-win32/meson.build
++++ b/qga/vss-win32/meson.build
+@@ -2,7 +2,8 @@ if add_languages('cpp', required: false)
+   glib_static = dependency('glib-2.0', static: true)
+   link_args = cc.get_supported_link_arguments(['-fstack-protector-all', '-fstack-protector-strong',
+                                                '-Wl,--add-stdcall-alias', '-Wl,--enable-stdcall-fixup'])
+-  shared_module('qga-vss', ['requester.cpp', 'provider.cpp', 'install.cpp'],
++
++  qga_vss = shared_module('qga-vss', ['requester.cpp', 'provider.cpp', 'install.cpp'],
+                 name_prefix: '',
+                 cpp_args: ['-Wno-unknown-pragmas', '-Wno-delete-non-virtual-dtor', '-Wno-non-virtual-dtor'],
+                 link_args: link_args,
 -- 
 2.26.2
 
