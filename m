@@ -7,79 +7,79 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F56CC433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 15:14:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F342C433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 15:14:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0C8672054F
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 15:14:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4A3B72067C
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 15:14:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N0d2tAZg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C8672054F
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="izzkcj8+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A3B72067C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50922 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54238 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7gpx-0001Aj-9W
-	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 11:14:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41230)
+	id 1k7gqR-0002ZY-HE
+	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 11:14:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41594)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1k7gHR-000576-Bp
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:38:33 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:43016)
+ id 1k7gHm-0005lj-Fp
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:38:54 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:51617)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1k7gHP-0006DF-HG
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:38:33 -0400
-Received: by mail-wr1-x444.google.com with SMTP id a15so15235365wrh.10
- for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 07:38:31 -0700 (PDT)
+ id 1k7gHk-0006I0-Ix
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:38:54 -0400
+Received: by mail-wm1-x341.google.com with SMTP id p14so13426164wmg.1
+ for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 07:38:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=UvepImufTOkKXGEhsXevW6x6eLEJ38fEauCGd02DUaM=;
- b=N0d2tAZgdgTuXVjGWr2e5VxcpoF1FcNHehzxODm5kgsk8YZhFiEuFXF3d7ur3MCVZ8
- SRCMN+xkAGCEhyMOZ95vbkor0YY4vHfx2FmjzYSjoq6zT9c7Hgw6DOiXpvchs2GzutNS
- 08DdUPqGxoT5UNkN9SlEKJJtRBUTqoULYyA4LRPDnWmAFAuHFVxfpGWTeNhf6MAzlSvs
- CDTGjm3oIj4yeQJ8nHU6bvBNVpayaKwOAt+FpmWtcLT5kDoSfotD0cJzFusJXNg5G+gv
- t1ujrzvGMsUMk9Pu9xDYSuKuZxZQQSiHHU45VnNjNnxkn5kV60BtV+HpfRtC2+kEQ9x1
- JwKQ==
+ bh=iCxXfpTM81EsDq1JksQIVS4Yaq4rtllmbbY1pIXiot0=;
+ b=izzkcj8+k/ebG7ZeSzqk7VRm4zccQEGl1FLJeM4bGqk/PK/6H/GOCTGVcn4IWlsWus
+ H5tHpJRcGWiCgGbJurFoXMkxQ2GsnH0TIX2uHHbfbgqQUYx46lDoG6tqOXJQnxIxGrUI
+ fjitOnX4H8aJK56KSvYi0YpAPPKKqO0ak8a+gfKc57PWZoQHsJRuEY2Wz5oUdxDcGUAS
+ 3jBiBolbpkgrRvCfRFiQTH+yci1MosIqph3zQd1xHjnIjmGp06po5x4vHhyL2EcAWrr+
+ bQZoalFEFd5WjBRR59PwkKhOwmqlpzI+AM1iqFW+bZdeMxvphWy2ahCR0eViB6H7fcwz
+ Dk7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=UvepImufTOkKXGEhsXevW6x6eLEJ38fEauCGd02DUaM=;
- b=FbgvjlOFpw5exKz7r3fxvxSznbdiw9KN6+bretBI/yEqm/6jeEA95rLIcqsm7AmSo+
- cahBtq2V+ip0gngdSTn5CPNsABZjsnNstXITEcexbIk3C/CVUTzW4otj/jLY43d6zPwL
- ldKQtSdns5QOUZi7XLY8V9eFOPBVE8rOkJ1XpLg1VEce1B0zcsxjbwMAdzozTBIKVxDl
- ih1dqFsHhodSRh3gDxZYQuKaErZz73+461VcUlH0tVbx199MM4p8BrbjV56CeZHjzpmE
- G7QZU5lcKeQp+gj1xoh18kUv6Hh9ZRaiRgEPgXNFY6/UlhVPOR365rRVlonxtdkb3xCG
- IQXg==
-X-Gm-Message-State: AOAM533ZQhDs+UJAK2xaXYcyUryIHX1bdboTfa3fOgL6Fk7mg4dm060o
- tsFBqNgygual10vNJTP+3Lpg+1WWWeo=
-X-Google-Smtp-Source: ABdhPJzoKuuL5gTQW5kdxgGwjTTHcwXfKAUUi7uUpTMwDoz3imlikanXtS5JOfRSYwiGpSxSj3iUOw==
-X-Received: by 2002:adf:9125:: with SMTP id j34mr17456203wrj.157.1597675109941; 
- Mon, 17 Aug 2020 07:38:29 -0700 (PDT)
+ bh=iCxXfpTM81EsDq1JksQIVS4Yaq4rtllmbbY1pIXiot0=;
+ b=kL+PytMuN5cw26jPI74rNPeSc8c17cSSbKoB7QdmzYPDPsI3I3aYJghEjENQYb0pra
+ CMWXbaLEk5VURmZbdcJS3KNrUPhF0BbJ+Wyi8OeCe/KZDpzyNj6cKpSh8YYxkv8RH/mA
+ XlEVw0CZKoRZV9J0uOVZosbYZWBTWzp77gYMarll/kAgErejKXL9du3JFfUUzNsUhddw
+ 3UQI3ZU9ikaIo3F10StzpyGPwFfSV8Yx03d1slJkbRUKFNYSUulJZ95FfBg/BhUkYEgZ
+ NIUk+AAhreKMxj/Uf43r3MnWwyXwecWRzG7OPGC4NDtrSnrttFJlCWqkEp819d/wGeRq
+ rRgA==
+X-Gm-Message-State: AOAM530RWLGBok9leIp55mGaoyK+qIpgRnL+tgckreTxyQbNz4W07XRz
+ Rfq4EWlc+rMrd+p0SJbkVYxNjSAHL58=
+X-Google-Smtp-Source: ABdhPJxFfGZyEy29vCz9YWuhOks/CF+JviQKlMKiIRNsWctGG3B/MmtrM2pRF7cuqXndIBDWcq1ufQ==
+X-Received: by 2002:a1c:a1c7:: with SMTP id k190mr14171897wme.1.1597675131015; 
+ Mon, 17 Aug 2020 07:38:51 -0700 (PDT)
 Received: from donizetti.redhat.com ([2001:b07:6468:f312:a0d1:fc42:c610:f977])
  by smtp.gmail.com with ESMTPSA id
- i22sm34966603wrb.45.2020.08.17.07.38.29
+ i22sm34966603wrb.45.2020.08.17.07.38.50
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 17 Aug 2020 07:38:29 -0700 (PDT)
+ Mon, 17 Aug 2020 07:38:50 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 065/150] meson: qemu-pr-helper
-Date: Mon, 17 Aug 2020 16:35:58 +0200
-Message-Id: <20200817143723.343284-66-pbonzini@redhat.com>
+Subject: [PATCH 086/150] meson: convert hw/semihosting
+Date: Mon, 17 Aug 2020 16:36:19 +0200
+Message-Id: <20200817143723.343284-87-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200817143723.343284-1-pbonzini@redhat.com>
 References: <20200817143723.343284-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=paolo.bonzini@gmail.com; helo=mail-wr1-x444.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=paolo.bonzini@gmail.com; helo=mail-wm1-x341.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -107,104 +107,56 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Marc-André Lureau <marcandre.lureau@redhat.com>
-
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Makefile    |  7 +------
- configure   |  3 ---
- meson.build | 10 ++++++++++
- 3 files changed, 11 insertions(+), 9 deletions(-)
+ hw/Makefile.objs             | 1 -
+ hw/meson.build               | 1 +
+ hw/semihosting/Makefile.objs | 2 --
+ hw/semihosting/meson.build   | 4 ++++
+ 4 files changed, 5 insertions(+), 3 deletions(-)
+ delete mode 100644 hw/semihosting/Makefile.objs
+ create mode 100644 hw/semihosting/meson.build
 
-diff --git a/Makefile b/Makefile
-index e2f64b9c8b..cd8d9a0b02 100644
---- a/Makefile
-+++ b/Makefile
-@@ -127,7 +127,7 @@ $(call set-vpath, $(SRC_PATH))
- 
- LIBS+=-lz $(LIBS_TOOLS)
- 
--HELPERS-y = $(HELPERS)
-+HELPERS-y =
- 
- # Sphinx does not allow building manuals into the same directory as
- # the source files, so if we're doing an in-tree QEMU build we must
-@@ -280,11 +280,6 @@ COMMON_LDADDS = libqemuutil.a
- 
- qemu-storage-daemon$(EXESUF): qemu-storage-daemon.o $(authz-obj-y) $(block-obj-y) $(crypto-obj-y) $(chardev-obj-y) $(io-obj-y) $(qom-obj-y) $(storage-daemon-obj-y) $(COMMON_LDADDS)
- 
--scsi/qemu-pr-helper$(EXESUF): scsi/qemu-pr-helper.o scsi/utils.o $(authz-obj-y) $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
--ifdef CONFIG_MPATH
--scsi/qemu-pr-helper$(EXESUF): LIBS += -ludev -lmultipath -lmpathpersist
--endif
--
- clean: recurse-clean ninja-clean clean-ctlist
- 	-test -f ninjatool && ./ninjatool $(if $(V),-v,) -t clean
- # avoid old build problems by removing potentially incorrect old files
-diff --git a/configure b/configure
-index 961436ea41..0262b7b661 100755
---- a/configure
-+++ b/configure
-@@ -6668,7 +6668,6 @@ if [ "$eventfd" = "yes" ]; then
- fi
- 
- tools=""
--helpers=""
- if test "$want_tools" = "yes" ; then
-   if [ "$linux" = "yes" -o "$bsd" = "yes" -o "$solaris" = "yes" ] ; then
-     tools="qemu-storage-daemon\$(EXESUF) $tools"
-@@ -6692,7 +6691,6 @@ if test "$softmmu" = yes ; then
-       fi
-       mpath=no
-     fi
--    helpers="$helpers scsi/qemu-pr-helper\$(EXESUF)"
-   else
-     if test "$virtfs" = yes; then
-       error_exit "VirtFS is supported only on Linux"
-@@ -7770,7 +7768,6 @@ else
-   QEMU_INCLUDES="-iquote ${source_path}/tcg/${ARCH} $QEMU_INCLUDES"
- fi
- 
--echo "HELPERS=$helpers" >> $config_host_mak
- echo "TOOLS=$tools" >> $config_host_mak
- echo "ROMS=$roms" >> $config_host_mak
- echo "MAKE=$make" >> $config_host_mak
-diff --git a/meson.build b/meson.build
-index b8f6cc49fb..92f2da51e5 100644
---- a/meson.build
-+++ b/meson.build
-@@ -144,6 +144,10 @@ if 'CONFIG_XKBCOMMON' in config_host
-                                  link_args: config_host['XKBCOMMON_LIBS'].split())
+diff --git a/hw/Makefile.objs b/hw/Makefile.objs
+index bdf8bdf256..6a7ca0fcfe 100644
+--- a/hw/Makefile.objs
++++ b/hw/Makefile.objs
+@@ -36,7 +36,6 @@ devices-dirs-y += virtio/
+ devices-dirs-y += watchdog/
+ devices-dirs-$(CONFIG_MEM_DEVICE) += mem/
+ devices-dirs-$(CONFIG_NUBUS) += nubus/
+-devices-dirs-y += semihosting/
+ devices-dirs-y += smbios/
  endif
- rt = cc.find_library('rt', required: false)
-+libmpathpersist = not_found
-+if config_host.has_key('CONFIG_MPATH')
-+  libmpathpersist = cc.find_library('mpathpersist')
-+endif
- libiscsi = not_found
- if 'CONFIG_LIBISCSI' in config_host
-   libiscsi = declare_dependency(compile_args: config_host['LIBISCSI_CFLAGS'].split(),
-@@ -629,6 +633,7 @@ foreach target : target_dirs
- endforeach
  
- # Other build targets
-+
- if 'CONFIG_GUEST_AGENT' in config_host
-   subdir('qga')
- endif
-@@ -670,6 +675,11 @@ if have_tools
-                dependencies: [qemuutil, libcap_ng],
-                install: true,
-                install_dir: get_option('libexecdir'))
-+
-+    executable('qemu-pr-helper', files('scsi/qemu-pr-helper.c', 'scsi/utils.c'),
-+               dependencies: [authz, crypto, io, qom, qemuutil,
-+                              libcap_ng, libudev, libmpathpersist],
-+               install: true)
-   endif
- 
-   if 'CONFIG_IVSHMEM' in config_host
+diff --git a/hw/meson.build b/hw/meson.build
+index fe7c466460..66a2f6cddd 100644
+--- a/hw/meson.build
++++ b/hw/meson.build
+@@ -1,2 +1,3 @@
+ subdir('core')
++subdir('semihosting')
+ subdir('xen')
+diff --git a/hw/semihosting/Makefile.objs b/hw/semihosting/Makefile.objs
+deleted file mode 100644
+index 4ad47c05c0..0000000000
+--- a/hw/semihosting/Makefile.objs
++++ /dev/null
+@@ -1,2 +0,0 @@
+-obj-$(CONFIG_SEMIHOSTING) += config.o
+-obj-$(CONFIG_SEMIHOSTING) += console.o
+diff --git a/hw/semihosting/meson.build b/hw/semihosting/meson.build
+new file mode 100644
+index 0000000000..f40ac574c4
+--- /dev/null
++++ b/hw/semihosting/meson.build
+@@ -0,0 +1,4 @@
++specific_ss.add(when: 'CONFIG_SEMIHOSTING', if_true: files(
++  'config.c',
++  'console.c',
++))
 -- 
 2.26.2
 
