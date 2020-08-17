@@ -2,110 +2,87 @@ Return-Path: <SRS0=yhYb=B3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC176C433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 13:58:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B80FC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 14:03:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 92EBD2075B
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 13:58:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 085E12065D
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 14:03:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="czJpgMQC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 92EBD2075B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l6raCCzO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 085E12065D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43582 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49922 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7feM-00022U-N2
-	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 09:58:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57942)
+	id 1k7fjE-0004vb-2U
+	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 10:03:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59336)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k7fdd-0001bd-6M
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 09:57:25 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:45510)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k7fdb-0000uf-1e
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 09:57:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597672641;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=HzvgKtnZwE0jSyG7+ObBR6XdWBnX2EOQuwSfHX6V5jI=;
- b=czJpgMQC+aLmtU+I6hYqNJf53sFHJp/3kpKB/3Kx/ZUS+CY161M4AofUyYqSDBJhM70cRb
- OnpwZAF0pn4GdyYCgonmff5yhsWVHNFyXEBgjvAkWtJbxFE/v4P+pJe0HLrJdaAN/cxcBl
- tlFRsadvXt5n45D9RvD2/CqjyeJRcGQ=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-159-mMSJxlvQMmuo14fDa-Y4TA-1; Mon, 17 Aug 2020 09:57:19 -0400
-X-MC-Unique: mMSJxlvQMmuo14fDa-Y4TA-1
-Received: by mail-wm1-f72.google.com with SMTP id z10so6047418wmi.8
- for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 06:57:19 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
+ id 1k7fhu-0003GE-Ps; Mon, 17 Aug 2020 10:01:50 -0400
+Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:46995)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
+ id 1k7fht-0001Vw-14; Mon, 17 Aug 2020 10:01:50 -0400
+Received: by mail-lj1-x241.google.com with SMTP id h19so17581186ljg.13;
+ Mon, 17 Aug 2020 07:01:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=rFDNys71dgTDc8zx+0/nANNqkjvau89gJkLMGwhQhgs=;
+ b=l6raCCzOvUFPuI5nl8ARg3TRYRmzPZjNEJvFegsOVEg3ELpbb9SJXARRw9ak8WDRfQ
+ eKIkdiDGdjcm+uTtOpslF8Foteu/wpN9byG4Bt0DRFGQhFKLMfHzJzs9VuZAvZ3Ol/cN
+ iQTLQXnS1ONSGO4DGXceorVwkeSkFo3H5tXT6081b09zYAC0lHx3Llb8fKWDJlyRRIKz
+ Bv2CF8FiSJYb941Jd2fhk15IJG9qpnfe0k0kEMB4KMCV2g9jWlBLRrYAufMl7CID1ONp
+ jxPxA9pPlHZmCOUEYWkilX8ltjeKq9kW+57egt/14mOmvCS36aOAZ25CJRMkx1sJ9RRz
+ H68g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
  :content-transfer-encoding;
- bh=HzvgKtnZwE0jSyG7+ObBR6XdWBnX2EOQuwSfHX6V5jI=;
- b=XpufYcsteh6ouZ0P65yRLGomOePXG5W8lIwsB2escbU4n1T9EFnaF686xYLDGkOexR
- KmAvKtQR+VrI3MoMKfH2FZliHV99uQzGf+hE6+YIVoqVd3zfyr2EeuRc4q3iN43fkqlF
- SrcBP/1zHurSpSAYLDkYqqQV7wqckbpYdjvrrO9CVRB8mUv1/4hD/ngI3wWahFqv5aJd
- gRVx6QDXGOEz/cns+cE+MIJYFuEkuqLDgmkhvjeYhCMQf07TETrSifBQqxzymF1sFlRM
- dMqSR1B789Mf1pF8QCQ45B7hdES0LZZqyXk/utVtqoO28H5uO+0pN8FmOkkDorfgO75y
- nefA==
-X-Gm-Message-State: AOAM53295kQPy2C4dh1Qo0ZQspJW5K8AVveUAgyqRP57asBbCP/AzAxC
- O2qvbJMnAh1TC89YZVrhi62TtOlc5c9+kQuZslAUkgOwrdh1lb9dazM63bPCu1QlbtFwU9gAzP0
- ZmlLmNETPdgXFbsA=
-X-Received: by 2002:a05:6000:12c1:: with SMTP id
- l1mr14839064wrx.270.1597672638196; 
- Mon, 17 Aug 2020 06:57:18 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzRX8itsX18njR8k8oL0o24RH4YpBZ2WyfLFKh8oC/LN3CwLlXFT5S/f84utVzSF0XDNOP6EQ==
-X-Received: by 2002:a05:6000:12c1:: with SMTP id
- l1mr14839050wrx.270.1597672637946; 
- Mon, 17 Aug 2020 06:57:17 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:a0d1:fc42:c610:f977?
- ([2001:b07:6468:f312:a0d1:fc42:c610:f977])
- by smtp.gmail.com with ESMTPSA id k15sm30813922wrp.43.2020.08.17.06.57.17
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 17 Aug 2020 06:57:17 -0700 (PDT)
-Subject: Re: [PATCH v2 000/150] Meson integration for 5.2
-To: Cornelia Huck <cohuck@redhat.com>
-References: <20200814091326.16173-1-pbonzini@redhat.com>
- <20200817142617.0ab2b9f3.cohuck@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <1b77c48c-108f-c603-33cf-f8d0f6b1b2b5@redhat.com>
-Date: Mon, 17 Aug 2020 15:57:19 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ bh=rFDNys71dgTDc8zx+0/nANNqkjvau89gJkLMGwhQhgs=;
+ b=QBykhoU0f/DKeCS8KwIVAKLKqW39mIUpob/smmQFoaTYSuVCsdhhxlo1u7Xr24lZ97
+ 6BeVDZpGRBLLDxtt+0q7Jqc1jiKkBOrLhPFkINJviNT+0CFs+e3dOF7AW/pdzZVm+1Vj
+ cQ5RVC/Vje5nCXyPca2l4nO3Klf1yN4weu3HWgG8Ff8FsZC3OtFtYCT2UtDPv00p39//
+ bPn+YvYYzbB7eFuSQcTY2Bc6ULF0tWJ/yrQc4EAq2ffqYGuAyyvsrUJRcbj+X+3ySVEg
+ cfNBip3173XglvJYLDLH36o8nmDQIZBg0lSGltJ9zcTVQhwCy/Jf60xMsCwNdL7OVL7f
+ AzMw==
+X-Gm-Message-State: AOAM530YX4FOdm9PtQBeLL7l9q0LDSDGv8G8vK5vswNDnl+vq/rKq0E3
+ yXu8yul5ytoHxvb/Lc5y5ONykt/PBCNrrv7I
+X-Google-Smtp-Source: ABdhPJyRvMFPwqGwMsku+NXxPUcZ7YVoOVoP+yId0wFsRDxrOUSkmoI/KNUx/VSALoHBhgKFYXIVjg==
+X-Received: by 2002:a2e:b5a5:: with SMTP id f5mr7800879ljn.114.1597672905999; 
+ Mon, 17 Aug 2020 07:01:45 -0700 (PDT)
+Received: from gmail.com (81-231-232-130-no39.tbcn.telia.com. [81.231.232.130])
+ by smtp.gmail.com with ESMTPSA id r8sm5522419lfm.42.2020.08.17.07.01.44
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 17 Aug 2020 07:01:45 -0700 (PDT)
+From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v1 0/5] target/microblaze: Enable MTTCG
+Date: Mon, 17 Aug 2020 16:01:39 +0200
+Message-Id: <20200817140144.373403-1-edgar.iglesias@gmail.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-In-Reply-To: <20200817142617.0ab2b9f3.cohuck@redhat.com>
-Content-Language: en-US
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/17 02:47:08
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::241;
+ envelope-from=edgar.iglesias@gmail.com; helo=mail-lj1-x241.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -10
+X-Spam_score: -1.1
+X-Spam_bar: -
+X-Spam_report: (-1.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ FSL_HELO_FAKE=1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -118,30 +95,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: figlesia@xilinx.com, peter.maydell@linaro.org, sstabellini@kernel.org,
+ edgar.iglesias@xilinx.com, sai.pavan.boddu@xilinx.com,
+ frasse.iglesias@gmail.com, alistair@alistair23.me,
+ richard.henderson@linaro.org, frederic.konrad@adacore.com, qemu-arm@nongnu.org,
+ philmd@redhat.com, luc.michel@greensocs.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 17/08/20 14:26, Cornelia Huck wrote:
-> 
-> The bad news: The build on the s390x system with Fedora 30 (yes, I
-> know) seems to be lacking various devices. The output of
-> 'qemu-system-s390x -device ?' misses all of the
-> -transitional/-non-transitional varieties for virtio-pci devices, as
-> well as some of the vhost-user devices, and, rather bizarrely, the
-> gen15* and some of the z14 cpu models (this is on a z12, so it's not
-> that all 'newer' models are missing, and I don't think the system we
-> build on should influence the generation of models, even with an older
-> compiler). I checked the output from 'qemu-system-x86_64 -device ?',
-> and it is missing the -transitional/-non-transitional virtio-pci
-> devices as well (did not check if anything else is missing as well).
+From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-Whoa, that's weird.  I'll take a look, thanks.
+This series adds translation for memory barrier instructions and
+changes the store-exclusive implementation to use cmpxhg rather
+than relying on single-threaded TCG.
 
-Paolo
+This is primarily in preparation for future AMP machines.
 
-> The builds on the F31 (x86) and F32 (s390x, with -Werror disabled)
-> systems are fine.
+Cheers,
+Edgar
+
+Edgar E. Iglesias (5):
+  target/microblaze: mbar: Transfer dc->rd to mbar_imm
+  target/microblaze: mbar: Move LOG_DIS to before sleep
+  target/microblaze: mbar: Add support for data-access barriers
+  target/microblaze: swx: Use atomic_cmpxchg
+  configure: microblaze: Enable mttcg
+
+ configure                     |  1 +
+ target/microblaze/translate.c | 33 +++++++++++++++++++++++----------
+ 2 files changed, 24 insertions(+), 10 deletions(-)
+
+-- 
+2.25.1
 
 
