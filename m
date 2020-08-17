@@ -7,77 +7,77 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF92CC433E3
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9C92C433E1
 	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 09:09:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8B730206C0
+	by mail.kernel.org (Postfix) with ESMTPS id 75F972063A
 	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 09:09:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="Yhya67zu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B730206C0
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="IWs5liFY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 75F972063A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49288 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49300 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7b95-0002Kn-Ne
+	id 1k7b95-0002Kw-Ka
 	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 05:09:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45252)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45774)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
- id 1k7arf-0000Sp-UI
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 04:51:35 -0400
-Received: from mail-pj1-x1033.google.com ([2607:f8b0:4864:20::1033]:50615)
+ id 1k7asJ-0001ey-Nx
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 04:52:15 -0400
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:41838)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
- id 1k7are-00055w-Dx
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 04:51:35 -0400
-Received: by mail-pj1-x1033.google.com with SMTP id e4so7495503pjd.0
- for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 01:51:33 -0700 (PDT)
+ id 1k7asG-0005DF-Tt
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 04:52:15 -0400
+Received: by mail-pl1-x642.google.com with SMTP id f10so7159960plj.8
+ for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 01:52:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=99inUY6TcXre93Q9sK2twtbOOBRR6deMTZ0PhPm0qww=;
- b=Yhya67zuJcqLW0c30YPV5JtD5Xal2KXSJhCgLAMOna3p4u8rJRbMsLg9zRkql8F4hh
- A6OZoGeOrS9YbMhY9gieLeCDmiWTMoq+J465ZKQMHfjwv/9QRMNd6akRgc79sg+VMPBY
- BHiLjY5wNeQbrlOIKsKXjLpqiS7mAr3en0mSkMY4ZN9UtZ/9KRUeS3K6nxEvc5cyv1MJ
- sy4DF+rke5uvo6mgjBSv5KRUEWxayUBmd9xs1xSdFhsKXNNAFdfj5bcgDKB+3YEfkdBF
- bf0GpnOcOZMzyaHHNnVZDCmgIPaeNPgXs5gfW3G9Bn2O6j7llFpohZQxVL8trOG2yiw6
- 4JDg==
+ bh=8AHmQ9os1R8vl3YkHmoCbLc+gv13dnARAhx869gfPzg=;
+ b=IWs5liFYvzjxU4HMiUKZIneCpgs8hPUaSePflrwJwNg2HOUUHbYMqiSX6RFRNe+XPW
+ gS1wxt0l5Qmjk+r/2Bo/nGddO5/EG5/AgXafZ2gaI5VmSQE+qv8bM1ViffS4Lu+XGVAD
+ BEl/+CX2CHh39Z2zJ622bozMi0o/BgoCu5hlaVj3kdKFLvsJcn1ARn8YohCqKdLqis3p
+ 6qD3hmorTOH/BERHO+4FMOza5LZ5MtNrnSzulWwzmjQc/KMZ8v8Eq7KhluiPtiGDSa/f
+ WGoP4YildEke7+0d7CnV8rysi9CaSk1BOJyPVpxdSKCNTSo8NsWXd5/Lto3Vyi91pT0D
+ 6C3w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=99inUY6TcXre93Q9sK2twtbOOBRR6deMTZ0PhPm0qww=;
- b=HjPr0h3xHfyNpxtb48Omzm/OwVawWs/TF+m6YNzkIM20q0lWri4UqjDaFPi2u1aIO3
- +S8+VzMOe5JE94TMq6aKdi7E57g/dZK1Psa3Q6mFhFr2Z0eirQ2mntHVxWTqCR7Fngdr
- i/kuE2aXM3KOxY/WPue4ihK/XF0glO0ATW3zHbxzOML9WHFN9gaqBlSQrNkLMuRUbsTw
- Gxm7BNrlNlhPnsTHBRXKHFh8B//fJzt3YynlpQJAthw/pjjYleBEjl4tYW/5mIrzw65X
- kQ7h8VkKH1UI2kF+VWTrZW6uOpwFsVfpXfeYJYxGB1Nq0p4X7imHy9I6O3l0uf6YfoS4
- 3SUw==
-X-Gm-Message-State: AOAM532rQjFEUEPF4loW9lr+6RbPpiVfQ5qdS5m5nEb5LAHiXIf3anGZ
- PN+7L5LpI6WzhNKi+GheYlKdvA3tfjaSag==
-X-Google-Smtp-Source: ABdhPJxI1PYzX5xFnla/0OrsT91ngDuzICc8vvTvjk1MwlEEGiGdM4gym8iVcv7QuwdBvc3ChDcwVw==
-X-Received: by 2002:a17:90a:d3c2:: with SMTP id
- d2mr11684414pjw.112.1597654292980; 
- Mon, 17 Aug 2020 01:51:32 -0700 (PDT)
+ bh=8AHmQ9os1R8vl3YkHmoCbLc+gv13dnARAhx869gfPzg=;
+ b=s9+OyYYy3rKTN5JtbjESua667eNObsm9Gpp+YW8QPn5Wt4mDzrL2kmw4GhlbaiAKID
+ rLuHVA52Hnk13+rByMx2yDL72gd1qkxusOYRFrgTEOL7A8jBbvZNfZV7rSjSbComezAx
+ SBjug0CW5ckKB4oAwJ7uQ2m14HpUtFq0AoYpAi6qesYSYeA90GbWHwpCj6/e5FGUhv8z
+ 53XEwWjjw3lLPXWw5zP7lhzfnu2Wjp9+V48DfeY7Bd1BBWuY7A7h+wWUQPPNZVknZV0a
+ q8NRdTpT06aJIpZceTgTH37rJnLkUZxRp0jdgAZOmK4uv/DFqq21hF5Lv3ZYoOqmik2I
+ PIGw==
+X-Gm-Message-State: AOAM533bmnEnNxalFslF3u8bc6jF8RK2+AcJ8ZBUGKqHWQyYLiLVPufT
+ /qWQks5VA9eI9VoDpBwbItQNoHBmwsVU5w==
+X-Google-Smtp-Source: ABdhPJwzP/2C/IfXvbLIi4e+VlI+Fwjhw2THeEZJEXohEGkhv594nIKpKgjXgWEzkaW79Etf1mHYJA==
+X-Received: by 2002:a17:902:9345:: with SMTP id
+ g5mr10674558plp.192.1597654331516; 
+ Mon, 17 Aug 2020 01:52:11 -0700 (PDT)
 Received: from frankchang-ThinkPad-T490.internal.sifive.com
  (114-34-229-221.HINET-IP.hinet.net. [114.34.229.221])
- by smtp.gmail.com with ESMTPSA id d9sm16478588pgv.45.2020.08.17.01.51.31
+ by smtp.gmail.com with ESMTPSA id d9sm16478588pgv.45.2020.08.17.01.52.09
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 17 Aug 2020 01:51:32 -0700 (PDT)
+ Mon, 17 Aug 2020 01:52:11 -0700 (PDT)
 From: frank.chang@sifive.com
 To: qemu-devel@nongnu.org,
 	qemu-riscv@nongnu.org
-Subject: [RFC v4 31/70] target/riscv: rvv-1.0: iota instruction
-Date: Mon, 17 Aug 2020 16:49:16 +0800
-Message-Id: <20200817084955.28793-32-frank.chang@sifive.com>
+Subject: [RFC v4 45/70] target/riscv: rvv-1.0: add Zvqmac extension
+Date: Mon, 17 Aug 2020 16:49:30 +0800
+Message-Id: <20200817084955.28793-46-frank.chang@sifive.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200817084955.28793-1-frank.chang@sifive.com>
 References: <20200817084955.28793-1-frank.chang@sifive.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1033;
- envelope-from=frank.chang@sifive.com; helo=mail-pj1-x1033.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::642;
+ envelope-from=frank.chang@sifive.com; helo=mail-pl1-x642.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -111,24 +111,56 @@ Sender: "Qemu-devel"
 From: Frank Chang <frank.chang@sifive.com>
 
 Signed-off-by: Frank Chang <frank.chang@sifive.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/riscv/insn32.decode | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ target/riscv/cpu.c       | 1 +
+ target/riscv/cpu.h       | 1 +
+ target/riscv/translate.c | 2 ++
+ 3 files changed, 4 insertions(+)
 
-diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index 0992d6ac86d..7a10fc27c5f 100644
---- a/target/riscv/insn32.decode
-+++ b/target/riscv/insn32.decode
-@@ -596,7 +596,7 @@ vfirst_m        010000 . ..... 10001 010 ..... 1010111 @r2_vm
- vmsbf_m         010100 . ..... 00001 010 ..... 1010111 @r2_vm
- vmsif_m         010100 . ..... 00011 010 ..... 1010111 @r2_vm
- vmsof_m         010100 . ..... 00010 010 ..... 1010111 @r2_vm
--viota_m         010110 . ..... 10000 010 ..... 1010111 @r2_vm
-+viota_m         010100 . ..... 10000 010 ..... 1010111 @r2_vm
- vid_v           010110 . 00000 10001 010 ..... 1010111 @r1_vm
- vext_x_v        001100 1 ..... ..... 010 ..... 1010111 @r
- vmv_s_x         001101 1 00000 ..... 110 ..... 1010111 @r2
+diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+index 085381fee00..8844975bf94 100644
+--- a/target/riscv/cpu.c
++++ b/target/riscv/cpu.c
+@@ -512,6 +512,7 @@ static Property riscv_cpu_properties[] = {
+     DEFINE_PROP_BOOL("Counters", RISCVCPU, cfg.ext_counters, true),
+     DEFINE_PROP_BOOL("Zifencei", RISCVCPU, cfg.ext_ifencei, true),
+     DEFINE_PROP_BOOL("Zicsr", RISCVCPU, cfg.ext_icsr, true),
++    DEFINE_PROP_BOOL("Zvqmac", RISCVCPU, cfg.ext_vqmac, true),
+     DEFINE_PROP_STRING("priv_spec", RISCVCPU, cfg.priv_spec),
+     DEFINE_PROP_STRING("vext_spec", RISCVCPU, cfg.vext_spec),
+     DEFINE_PROP_UINT16("vlen", RISCVCPU, cfg.vlen, 128),
+diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+index 715faed8824..6e9b17c4e38 100644
+--- a/target/riscv/cpu.h
++++ b/target/riscv/cpu.h
+@@ -285,6 +285,7 @@ typedef struct RISCVCPU {
+         bool ext_counters;
+         bool ext_ifencei;
+         bool ext_icsr;
++        bool ext_vqmac;
+ 
+         char *priv_spec;
+         char *user_spec;
+diff --git a/target/riscv/translate.c b/target/riscv/translate.c
+index 0b3f5f1b4ba..5817e9344e9 100644
+--- a/target/riscv/translate.c
++++ b/target/riscv/translate.c
+@@ -75,6 +75,7 @@ typedef struct DisasContext {
+     uint8_t sew;
+     uint16_t vlen;
+     bool vl_eq_vlmax;
++    bool ext_vqmac;
+ } DisasContext;
+ 
+ #ifdef TARGET_RISCV64
+@@ -870,6 +871,7 @@ static void riscv_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
+     ctx->misa = env->misa;
+     ctx->frm = -1;  /* unknown rounding mode */
+     ctx->ext_ifencei = cpu->cfg.ext_ifencei;
++    ctx->ext_vqmac = cpu->cfg.ext_vqmac;
+     ctx->vlen = cpu->cfg.vlen;
+     ctx->vill = FIELD_EX32(tb_flags, TB_FLAGS, VILL);
+     ctx->sew = FIELD_EX32(tb_flags, TB_FLAGS, SEW);
 -- 
 2.17.1
 
