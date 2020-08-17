@@ -2,121 +2,116 @@ Return-Path: <SRS0=yhYb=B3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10C53C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 16:01:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0346BC433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 16:01:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BFA4D20829
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 16:01:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AF00320825
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 16:01:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=syrmia.com header.i=@syrmia.com header.b="K7yYkUic"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BFA4D20829
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=syrmia.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gaHnxnKo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF00320825
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33038 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34834 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7hZN-0006oy-RX
-	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 12:01:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56846)
+	id 1k7hZg-0007Zu-Rh
+	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 12:01:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60026)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <Filip.Bozuta@syrmia.com>)
- id 1k7hE5-00025C-U0
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 11:39:09 -0400
-Received: from mail-eopbgr30138.outbound.protection.outlook.com
- ([40.107.3.138]:59478 helo=EUR03-AM5-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <Filip.Bozuta@syrmia.com>)
- id 1k7hE3-0006uE-In
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 11:39:09 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=HxfFsX1BOSQSp6bAScX9xcCMldyKOXzZbZkH2FBx99klH0SYdBtHB21Si5gY+JhcojFB9GCf5gKRTuZwiBZ0XVa57ps7XQ6dHHgqt7fqy0E8rbTlm2ThwMvjYajtjnIoyWxUYKYzNHIDEEfs/SbPJxDvQ4EnFpvnsg2lvGjcRR0e8U7b2JwNRg8SGuGttnlBeWYTOMqcj1HEQxQwVruG0hTZqoFencOuHhfjQAmrwoNWJFCOd/L57SN2w0iHsHHAhDJ0yHU+CumG0y0al3Vu48l71Zlrls7AULtseESC98D9r4li5x/PYqivpcYDNTVSHVOKDFmMtQM+xUr+idIH6A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=GVpQaxT6ae9tOiOJH1O4FKrN83E/SD6xuYBM19lp1Pg=;
- b=RDMW/5HBS/CQQHWIyDK5qX3KfLNi/v5KvLdywQcYZ5PGtp/+P7fAobBj5yI4XgLOw/NdqqnN2NEru44ogKssr4jZnA434kle+lazBreausBMcEuLzMys9Eg7dxmcJrOuzQXC6JM6r0feSvtalSio45YyVs0wPg9eDyjZqZpgBdmGhqAXj0GQnQtGoxWsG0zqBTGZwamXx1GiqFWfNIYIpvuTiI+tS30Po2zS2PHRJdeYUkCiOq+RgzfOQalz2QZLNGGUabE0bvvBzbdQVniIvKQYkI4frIKNJkf5uobrYJiEi4MZGXqUrdni8ULYlfmuRdKagMTJiZhBNAYpvihH7g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=syrmia.com; dmarc=pass action=none header.from=syrmia.com;
- dkim=pass header.d=syrmia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=syrmia.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=GVpQaxT6ae9tOiOJH1O4FKrN83E/SD6xuYBM19lp1Pg=;
- b=K7yYkUicDl+NgSZvrxwUR0HRSJUqIOoeMvKmt5HSaXFnxQ4j6poHiPYHZ/eEz9nYBeylu8BxrHixW3hZwJD/xXwvDjfGUnu0vbrBzjVqA3XFnPONGvYmkoGPZ8LbrNq1Tox5ssIhsEV3B80UoDwoCwqsk3suYclIlSIuP+4jmKo=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=syrmia.com;
-Received: from VE1PR03MB5246.eurprd03.prod.outlook.com (2603:10a6:802:a1::22)
- by VI1PR03MB4797.eurprd03.prod.outlook.com (2603:10a6:803:bf::26)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3283.20; Mon, 17 Aug
- 2020 15:24:00 +0000
-Received: from VE1PR03MB5246.eurprd03.prod.outlook.com
- ([fe80::3568:5b4f:ab6b:e362]) by VE1PR03MB5246.eurprd03.prod.outlook.com
- ([fe80::3568:5b4f:ab6b:e362%6]) with mapi id 15.20.3261.026; Mon, 17 Aug 2020
- 15:24:00 +0000
-From: Filip Bozuta <Filip.Bozuta@syrmia.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2] linux-user: Fix 'semop()' and 'semtimedop()' implementation
-Date: Mon, 17 Aug 2020 17:23:46 +0200
-Message-Id: <20200817152346.32092-1-Filip.Bozuta@syrmia.com>
-X-Mailer: git-send-email 2.25.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: ZR0P278CA0030.CHEP278.PROD.OUTLOOK.COM
- (2603:10a6:910:1c::17) To VE1PR03MB5246.eurprd03.prod.outlook.com
- (2603:10a6:802:a1::22)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1k7hOF-0006AC-78
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 11:49:39 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36402
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1k7hOC-0000D0-LG
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 11:49:38 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1597679376;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=AD7XX2dWA3kInjb3AnPDqrsH6LkT3sqqGE4nQ1AOxxk=;
+ b=gaHnxnKoCSz0j6/sF6izcc4UAgPd2GwhnMnSGzeA1f4DqrsFC1gAIZgn33Aegb4jbWOzyO
+ mxIVO2qoVcFzdHrSJbNxXCRA6VgoutK8StG5XqDYCLw73fl+nkPOVF3mVhNy10X+qVCv4r
+ 7JmQmYvCgEs5QFy8/9BpKoApo4Lj01w=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-405-V0Haojm0Mj-Ht_5Fzd6b-A-1; Mon, 17 Aug 2020 11:49:33 -0400
+X-MC-Unique: V0Haojm0Mj-Ht_5Fzd6b-A-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C4D0F10066FA;
+ Mon, 17 Aug 2020 15:49:32 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-113-146.ams2.redhat.com
+ [10.36.113.146])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8224510021AA;
+ Mon, 17 Aug 2020 15:49:31 +0000 (UTC)
+Subject: Re: [RFC PATCH 15/22] block/export: Move device to BlockExportOptions
+To: Kevin Wolf <kwolf@redhat.com>
+References: <20200813162935.210070-1-kwolf@redhat.com>
+ <20200813162935.210070-16-kwolf@redhat.com>
+ <a163c834-bfc8-897a-c91f-8458b50dfdb6@redhat.com>
+ <20200817152733.GQ11402@linux.fritz.box>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <005af944-6061-deee-d1e1-20f299d780cb@redhat.com>
+Date: Mon, 17 Aug 2020 17:49:29 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from localhost.localdomain (147.91.217.236) by
- ZR0P278CA0030.CHEP278.PROD.OUTLOOK.COM (2603:10a6:910:1c::17) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3283.16 via Frontend Transport; Mon, 17 Aug 2020 15:23:59 +0000
-X-Mailer: git-send-email 2.25.1
-X-Originating-IP: [147.91.217.236]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: bbbc5986-3bbc-41b6-ce08-08d842c19112
-X-MS-TrafficTypeDiagnostic: VI1PR03MB4797:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <VI1PR03MB4797CFC222A4462A98D73A76EB5F0@VI1PR03MB4797.eurprd03.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: NrNidV5k52fZhePqpWTrCN2U0lca5SRZj0WFKldw+mz0z+PrjLbd0WX04ryKCG3TU1K0zSLj9d2iB8aR/Lm58XzE5VnUgrC0GC/3PppTSf1BdFL/bB4rqLX+ft7NGFGUHXdHUhIq2dk0MdpQnfeKgDL6Pq2U1fj/thM3ZthHHJFcbBdCee2zFmd/ISeePDfgzRgg23b9+Dd0HGjvtYin5Iy0Agkl/zSzcOHUVlie2303sIPvuO9LX4t+6Udckt/wkEXqeTMYgiHo1oyc3ywNsIrCAjU/Ikv/luvhnjkvOGebRIvSv4sdveM23/3FbBw1Awwd2zSiB1nDcMcxr1XKneI/3o+g1CuI5UP6tSoRO9IKY++I5XJJGB1w5y72HNKp
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:VE1PR03MB5246.eurprd03.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(136003)(39830400003)(366004)(376002)(396003)(346002)(66476007)(66556008)(8936002)(107886003)(6486002)(8676002)(26005)(316002)(478600001)(5660300002)(54906003)(4326008)(86362001)(66946007)(83380400001)(52116002)(1076003)(36756003)(16526019)(186003)(6506007)(6666004)(69590400007)(2616005)(956004)(6916009)(2906002)(6512007);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: D4xhxMUYrrSId1TaAW1OjnCP4t+KrsDCmBt0SA3QTfTBF2n3ikXGtOLkPT4mgUaHVpVJEgds5N2cv34qvEFOnk23y1hP+zRVVtC9nX0kQ5WXloKcmC52fkl5Z4nifGQEpZWrLGUZ0Cw+2YvtHtw0DoA5MH+AashDNFm+4HUC7wa+MiScHwgeEDpJtD032b06XYrqSVlyvsW/y+MCKJqT3d/0nlPVFEys/yXcMVYhVoiLI1Mzfim5HJqu7Ma8TO37D/uaAU9yNQ9ACuVhlgIOrFqgA1o6hjkLhtlkrTl8yTkq1ImKzNhuwiMwt2t3fo3WQTUeUFeDm0NzFb/UyQtNMoOakLqBwrTCXLIlMWQWJX4rQorI2kxe9sG8EbJ9qk+hALVI6Wo5W/ui3Jos96MdGU7LXx6QwQEM0YBRc7n4UXHLxSKfRNqGrUTm5oJ296KGFD5heN/RYkk5NdQhMAso5SLo9DehJ0s79gXwb16FleUbz6+O575UTldclWsnlTCJ/G8tFDW3uFkmZK/pxykpSjxOgbPEVJxezYvbZYSzqsqk/ck4SklvClCTXa17bkS0T/aeR3ebV5cXD7V+mT/Q3h8c4+Ak+mz4X7EeCdJ5Cgx3MjIbK2Lwzo3G/naK+TzFZMPDV6Yx3DdNKBKMVgDWug==
-X-OriginatorOrg: syrmia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bbbc5986-3bbc-41b6-ce08-08d842c19112
-X-MS-Exchange-CrossTenant-AuthSource: VE1PR03MB5246.eurprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Aug 2020 15:24:00.4664 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 19214a73-c1ab-4e19-8f59-14bdcb09a66e
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: EdGJfLk5IXFfg6Q0sVQzo7aBiu+0+nWF2JFgp/FRLWjZW0C3u1yFKdvPGb6DBOShZIwGvPmCBVnN9gjrZc+HMw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR03MB4797
-Received-SPF: pass client-ip=40.107.3.138;
- envelope-from=Filip.Bozuta@syrmia.com;
- helo=EUR03-AM5-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/17 11:39:05
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -37
-X-Spam_score: -3.8
+In-Reply-To: <20200817152733.GQ11402@linux.fritz.box>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="J5VHFuzTxML3EejJ7MibVJTVY7UQy8icF"
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/17 00:24:04
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
 X-Spam_bar: ---
-X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -129,95 +124,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <laurent@vivier.eu>, Filip Bozuta <Filip.Bozuta@syrmia.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The implementations of syscalls 'semop()' and 'semtimedop()' in
-file 'syscall.c' use function 'target_to_host_sembuf()' to convert
-values of 'struct sembuf' from host to target. However, before this
-conversion it should be check whether the number of semaphore operations
-'nsops' is not bigger than maximum allowed semaphor operations per
-syscall: 'SEMOPM'. In these cases, errno 'E2BIG' ("Arg list too long")
-should be set. But the implementation will set errno 'EFAULT' ("Bad address")
-in this case since the conversion from target to host in this case fails.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--J5VHFuzTxML3EejJ7MibVJTVY7UQy8icF
+Content-Type: multipart/mixed; boundary="RF2jMYiJY5qxqPjzGIQSrNRQm3kug1hxC"
 
-This was confirmed with the LTP test for 'semop()' ('ipc/semop/semop02') in
-test case where 'nsops' is greater than SEMOPM with unaproppriate errno EFAULT:
+--RF2jMYiJY5qxqPjzGIQSrNRQm3kug1hxC
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-semop02.c:130: FAIL: semop failed unexpectedly; expected: E2BIG: EFAULT (14)
+On 17.08.20 17:27, Kevin Wolf wrote:
+> Am 17.08.2020 um 17:13 hat Max Reitz geschrieben:
+>> On 13.08.20 18:29, Kevin Wolf wrote:
+>>> Every block export needs a block node to export, so move the 'device'
+>>> option from BlockExportOptionsNbd to BlockExportOptions.
+>>>
+>>> To maintain compatibility in nbd-server-add, BlockExportOptionsNbd need=
+s
+>>> to be wrapped by a new type NbdServerAddOptions that adds 'device' back
+>>> because nbd-server-add doesn't use the BlockExportOptions base type.
+>>>
+>>> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+>>> ---
+>>>  qapi/block-export.json         | 27 +++++++++++++++++++++------
+>>>  block/export/export.c          | 26 ++++++++++++++++++++------
+>>>  block/monitor/block-hmp-cmds.c |  6 +++---
+>>>  blockdev-nbd.c                 |  4 ++--
+>>>  qemu-nbd.c                     |  2 +-
+>>>  5 files changed, 47 insertions(+), 18 deletions(-)
+>>
+>> (Code diff looks good, just a question on the interface:)
+>>
+>>> diff --git a/qapi/block-export.json b/qapi/block-export.json
+>>> index 4ce163411f..d68f3bf87e 100644
+>>> --- a/qapi/block-export.json
+>>> +++ b/qapi/block-export.json
+>>
+>> [...]
+>>
+>>> @@ -167,6 +179,8 @@
+>>>  # Describes a block export, i.e. how single node should be exported on=
+ an
+>>>  # external interface.
+>>>  #
+>>> +# @device: The device name or node name of the node to be exported
+>>> +#
+>>
+>> Wouldn=E2=80=99t it be better to restrict ourselves to a node name here?
+>> (Bluntly ignoring the fact that doing so would make this patch an
+>> incompatible change, which would require some reordering in this series,
+>> unless we decide to just ignore that intra-series incompatibility.)
+>=20
+> We already have intra-series incompatibility, so I wouldn't mind that.
+>=20
+>> OTOH...  What does =E2=80=9Cbetter=E2=80=9D mean.  It won=E2=80=99t hurt=
+ anyone to keep this as
+>> @device.  It=E2=80=99s just that I feel like if we had no legacy burden =
+and did
+>> this all from scratch, we would just make it @node-name.
+>>
+>> Did you deliberately decide against @node-name?
+>=20
+> At first I thought I could still share code between nbd-server-add and
+> block-export-add, but that's not the case. Then I guess the only other
+> reason I have is consistency with other QMP commands. I won't pretend
+> it's a strong one.
 
-This patch changes this by adding a check whether 'nsops' is bigger than
-'SEMOPM' before the conversion function 'target_to_host_sembuf()' is called.
-After the changes from this patch, the test works fine along with the other
-LTP testcases for 'semop()'):
+If =E2=80=9Cusing @node-name would be more natural=E2=80=9D doesn=E2=80=99t=
+ resonate with you,
+then I suppose we should just leave it as @device.  It isn=E2=80=99t harder=
+ to
+handle for qemu, and maybe it makes transitioning easier for some users
+(although I can=E2=80=99t quite imagine how).
 
-semop02.c:126: PASS: semop failed as expected: E2BIG (7)
+Max
 
-Implementation notes:
 
-    A target value ('TARGET_SEMOPM') was added for 'SEMOPM' as to be sure
-    in case the value is not available for some targets.
+--RF2jMYiJY5qxqPjzGIQSrNRQm3kug1hxC--
 
-Signed-off-by: Filip Bozuta <Filip.Bozuta@syrmia.com>
----
- linux-user/syscall.c      | 12 ++++++++++--
- linux-user/syscall_defs.h |  2 ++
- 2 files changed, 12 insertions(+), 2 deletions(-)
+--J5VHFuzTxML3EejJ7MibVJTVY7UQy8icF
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 1211e759c2..70b172740c 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -3904,7 +3904,7 @@ static inline abi_long do_semtimedop(int semid,
-                                      unsigned nsops,
-                                      abi_long timeout)
- {
--    struct sembuf sops[nsops];
-+    struct sembuf *sops = NULL;
-     struct timespec ts, *pts = NULL;
-     abi_long ret;
- 
-@@ -3915,8 +3915,15 @@ static inline abi_long do_semtimedop(int semid,
-         }
-     }
- 
--    if (target_to_host_sembuf(sops, ptr, nsops))
-+    if (nsops > TARGET_SEMOPM) {
-+        return -TARGET_E2BIG;
-+    }
-+
-+    sops = g_new(struct sembuf, nsops);
-+
-+    if (target_to_host_sembuf(sops, ptr, nsops)) {
-         return -TARGET_EFAULT;
-+    }
- 
-     ret = -TARGET_ENOSYS;
- #ifdef __NR_semtimedop
-@@ -3928,6 +3935,7 @@ static inline abi_long do_semtimedop(int semid,
-                                  SEMTIMEDOP_IPC_ARGS(nsops, sops, (long)pts)));
-     }
- #endif
-+    g_free(sops);
-     return ret;
- }
- #endif
-diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index 3c261cff0e..f7f77346be 100644
---- a/linux-user/syscall_defs.h
-+++ b/linux-user/syscall_defs.h
-@@ -46,6 +46,8 @@
- #define IPCOP_shmget		23
- #define IPCOP_shmctl		24
- 
-+#define TARGET_SEMOPM     500
-+
- /*
-  * The following is for compatibility across the various Linux
-  * platforms.  The i386 ioctl numbering scheme doesn't really enforce
--- 
-2.25.1
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl86pwkACgkQ9AfbAGHV
+z0DvCgf+NWL5o0x3pTwK5BOLDbo3bDDRX6+4gYYQszYp5Vdws25Yj586ZLT64DQC
+zoKszhEllBLs2d63d7BwAulvIEAY5lZ0RvP3/EZx+gwdhgzBK7fDmqNVubH/TghZ
+m3jDabupDvT25lbyWFIbRq9FilGW3iAgG05BD5EY+83Ej35Gwa/sA7ihDfXC1QrO
+j5UBeaxwM2atZx5ht370mfP4UV1G5XhLaIm7ewIYkKP/YIBQpzCSe32GI2d89jk6
+HRGL6gT+omxRcSep6IreoEKKT+hvs8Yk+59wTHkAWPuh4sOIGm0kotcdzpLH4U57
+KArmg+VJcAVX28SPll3mCYyvnX77zw==
+=irSF
+-----END PGP SIGNATURE-----
+
+--J5VHFuzTxML3EejJ7MibVJTVY7UQy8icF--
 
 
