@@ -2,79 +2,106 @@ Return-Path: <SRS0=yhYb=B3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E46D9C433E3
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 09:21:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DD16C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 09:22:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BEF8D2072E
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 09:21:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BEF8D2072E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id DD47C2072D
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 09:22:14 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bEiK6h7j"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD47C2072D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55960 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58852 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7bKt-0002Z2-0C
-	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 05:21:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50172)
+	id 1k7bLK-0003hf-3N
+	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 05:22:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47684)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k7bAQ-0005Wh-VS
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 05:10:58 -0400
-Received: from indium.canonical.com ([91.189.90.7]:55684)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k7bAO-0007VU-TE
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 05:10:58 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1k7bAN-0006i5-IB
- for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 09:10:55 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 84D9E2E80DB
- for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 09:10:55 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <sgarzare@redhat.com>)
+ id 1k7ay2-0004Tx-2z
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 04:58:10 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:29937)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <sgarzare@redhat.com>)
+ id 1k7axz-00062x-Uj
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 04:58:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1597654686;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=Dgmctd3manNBQBiaD9YImAfOH4rP+7lahcnG09PTuBU=;
+ b=bEiK6h7jeLx8t6oxJvIJ0SlYHs3+LY0NRKrHy+slLEtEbUrOl9MX1teE6IGI0VhpS9bXgH
+ X+oZu1jCggMFq/OTVV5VQjAf/lmuBCnxpb8TXol6evPmasV1RUD8ulG7DgU6LFFsabSm/O
+ 70kYxH5oIYVfGvPHtq7mLYsbZt1MIi4=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-500-gZHaR9HwORe0FfdO6Baj-A-1; Mon, 17 Aug 2020 04:58:04 -0400
+X-MC-Unique: gZHaR9HwORe0FfdO6Baj-A-1
+Received: by mail-wr1-f71.google.com with SMTP id 89so6727821wrr.15
+ for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 01:58:04 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=Dgmctd3manNBQBiaD9YImAfOH4rP+7lahcnG09PTuBU=;
+ b=X6unXmJ4hvqzcqG10TwF0Rx8c5sNypXJdU+bgHlVO4dJxa0D+Cs9xP595KQOiyzS7a
+ yl0lWe5EbtEvLgrZLVFqOnjLmXWcZc0IoEZ05thtO+Jl8q3u/hduUmDQLJ26LIkprmUa
+ +NHGJeFMM5mzyf24VHxuflIlp5tTnup8G8GHwkU/Z5Ywprxb7XzCeTg3C9jl+sJW+afJ
+ ELyiXN61eOB/01fUrY215EClU1QBWUiC6sPB7Xj+9is606JWsV+dljUYhzeY15S79241
+ DlxGNb0mv4yNY1MyChDCeLGPDnXolLBMxas0dCv68cfoKQ64DYp60Af6hXA90b5Fk1/G
+ njEw==
+X-Gm-Message-State: AOAM5306pcTvHuLrJXn7BfmeLADwMoPSOn9I1dXdg79BKEJgE0UCoGH6
+ ncJM5hUjpCwXr/awX9auHObCDMgpjfPwAEWwadTBcWYKBTpV4QauxS2ajKWE8LAIQdO3KYJjlNC
+ 2baSPPYJ6MozkDdA=
+X-Received: by 2002:a1c:9c96:: with SMTP id f144mr13782838wme.18.1597654682975; 
+ Mon, 17 Aug 2020 01:58:02 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxCd6m7Ky9fwp4Ds+T8KkpCtgW6QjU38AQqTmqv+At6v3NMu7IS6SnvthglT55N3Q+mPHS4IQ==
+X-Received: by 2002:a1c:9c96:: with SMTP id f144mr13782810wme.18.1597654682719; 
+ Mon, 17 Aug 2020 01:58:02 -0700 (PDT)
+Received: from steredhat ([5.180.207.22])
+ by smtp.gmail.com with ESMTPSA id i14sm36532069wrc.19.2020.08.17.01.58.01
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 17 Aug 2020 01:58:02 -0700 (PDT)
+Date: Mon, 17 Aug 2020 10:57:58 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Pan Nengyuan <pannengyuan@huawei.com>
+Subject: Re: [PATCH 10/12] block/file-posix: fix a possible undefined behavior
+Message-ID: <20200817085658.tvxnqvw6gjyxozie@steredhat>
+References: <20200814160241.7915-1-pannengyuan@huawei.com>
+ <20200814160241.7915-11-pannengyuan@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 17 Aug 2020 09:03:42 -0000
-From: Gerd Hoffmann <1882851@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: diego-viola kraxel-redhat
-X-Launchpad-Bug-Reporter: Diego Viola (diego-viola)
-X-Launchpad-Bug-Modifier: Gerd Hoffmann (kraxel-redhat)
-References: <159174217343.32241.17743917589333297614.malonedeb@gac.canonical.com>
-Message-Id: <20200817090342.bemmtkvz4seayp2i@sirius.home.kraxel.org>
-Subject: [Bug 1882851] Re: [PATCH] drm/virtio: fix unblank
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="d6d0b96812d8def2ca0ffcc25cb4d200f2f30aeb";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: d284a2190538dffe335a4818d3847d2c764d10e9
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/17 04:50:35
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200814160241.7915-11-pannengyuan@huawei.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=sgarzare@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=sgarzare@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/17 01:24:49
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -83,89 +110,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1882851 <1882851@bugs.launchpad.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, zhang.zhanghailiang@huawei.com,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ euler.robot@huawei.com, kuhn.chenqun@huawei.com,
+ Aarushi Mehta <mehta.aaru20@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+On Fri, Aug 14, 2020 at 12:02:39PM -0400, Pan Nengyuan wrote:
+> local_err is not initialized to NULL, it will cause a assert error as below:
+> qemu/util/error.c:59: error_setv: Assertion `*errp == NULL' failed.
+> 
+> Fixes: c6447510690
+> Reported-by: Euler Robot <euler.robot@huawei.com>
+> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
+> ---
+> Cc: Kevin Wolf <kwolf@redhat.com>
+> Cc: Max Reitz <mreitz@redhat.com>
+> Cc: Aarushi Mehta <mehta.aaru20@gmail.com>
+> Cc: qemu-block@nongnu.org
+> ---
+>  block/file-posix.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-> > --- a/drivers/gpu/drm/virtio/virtgpu_display.c
-> > +++ b/drivers/gpu/drm/virtio/virtgpu_display.c
-> > @@ -100,6 +100,7 @@ static void virtio_gpu_crtc_atomic_enable(struct dr=
-m_crtc *crtc,
-> >  	struct virtio_gpu_output *output =3D drm_crtc_to_virtio_gpu_output(cr=
-tc);
-> >  =
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
-> >  	output->enabled =3D true;
-> > +	output->need_update =3D true;
+Thanks,
+Stefano
 
-> > --- a/drivers/gpu/drm/virtio/virtgpu_plane.c
-> > +++ b/drivers/gpu/drm/virtio/virtgpu_plane.c
-> > @@ -163,7 +163,8 @@ static void virtio_gpu_primary_plane_update(struct =
-drm_plane *plane,
-> >  	    plane->state->src_w !=3D old_state->src_w ||
-> >  	    plane->state->src_h !=3D old_state->src_h ||
-> >  	    plane->state->src_x !=3D old_state->src_x ||
-> > -	    plane->state->src_y !=3D old_state->src_y) {
-> > +	    plane->state->src_y !=3D old_state->src_y ||
-> > +	    output->need_update) {
-> =
+> 
+> diff --git a/block/file-posix.c b/block/file-posix.c
+> index 9a00d4190a..697a7d9eea 100644
+> --- a/block/file-posix.c
+> +++ b/block/file-posix.c
+> @@ -2113,7 +2113,7 @@ static void raw_aio_attach_aio_context(BlockDriverState *bs,
+>  #endif
+>  #ifdef CONFIG_LINUX_IO_URING
+>      if (s->use_linux_io_uring) {
+> -        Error *local_err;
+> +        Error *local_err = NULL;
+>          if (!aio_setup_linux_io_uring(new_context, &local_err)) {
+>              error_reportf_err(local_err, "Unable to use linux io_uring, "
+>                                           "falling back to thread pool: ");
+> -- 
+> 2.18.2
+> 
+> 
 
-> Uh instead of hand-rolling what's essentially a drm_crtc_needs_modeset
-> check, why not use that one? atomic helpers try to keep the usual suspects
-> for state transitions already handy, to avoid every driver rolling their
-> own. Or do I miss something here?
-
-Well, the virtio-gpu virtual hardware can't do plane updates and crtc
-updates independant from each other.  So the crtc callbacks handle
-disable only (we don't need a fb for that) and leave the enable to the
-plane update.
-
-I suspect calling drm_atomic_crtc_needs_modeset() in plane update isn't
-going to fly ...
-
-take care,
-  Gerd
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1882851
-
-Title:
-  QEMU video freezes with "Guest disabled display" (virtio driver)
-
-Status in QEMU:
-  New
-
-Bug description:
-  I am using Arch Linux as my Guest and Host OS, after starting qemu
-  with the following command:
-
-    $ qemu-system-x86_64 -enable-kvm -hda arch-zoom.qcow2 -m 4G -vga
-  virtio
-
-  and waiting for a screen blank, I get this message:
-
-    Guest disabled display
-
-  And nothing happens after that, I can move the mouse or hit any key,
-  and the message is still there.
-
-  I can still reboot the VM but that's not optimal.
-
-  I can reproduce this with the latest QEMU release (5.0.0) or git master, =
-
-  I also tried this with older releases (4.0.0, 3.0.0) and the issue is sti=
-ll there.
-
-  I can't reproduce this with other video drivers (std, qxl).
-
-  With std/qxl the screen will blank a bit and then continue as normal.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1882851/+subscriptions
 
