@@ -2,86 +2,111 @@ Return-Path: <SRS0=yhYb=B3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY autolearn=ham
+X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FCE5C433E3
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 21:17:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5992CC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 21:23:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 383BC2072E
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 21:17:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1FD9520674
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 21:23:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hVfhrlQ3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 383BC2072E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="NNVZeIW/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1FD9520674
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59322 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34286 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7mVq-0006XZ-FJ
-	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 17:17:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51250)
+	id 1k7mbD-0008KV-9z
+	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 17:23:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51950)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1k7mV6-00063Y-FW; Mon, 17 Aug 2020 17:17:04 -0400
-Received: from mail-io1-xd44.google.com ([2607:f8b0:4864:20::d44]:34998)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1k7mV4-0006YF-HU; Mon, 17 Aug 2020 17:17:04 -0400
-Received: by mail-io1-xd44.google.com with SMTP id s189so19140316iod.2;
- Mon, 17 Aug 2020 14:17:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=mQSWZ4OL8kptnsLiqBLKFUgG5/0K0ZeOyTGLKyi74kw=;
- b=hVfhrlQ3CArPhbOGKmQIfLO/uM3CBNHgBcevrD4f6vm28JYtuhLt7VZm94pGmu5/Tu
- vhqR3nueWdz60NFoEjNySuwDbQvvzEGXeiM6eR/se9dDKvAKlOslCPImAWDmddQVRUaf
- Fg1Mc96AH35MJnbhyf8gDxDeAQxdtDsuAm2zR4B4Gylnkt1rDhIowcnyACaSmFhf4i8I
- rjwMltDF2zg6gUpTfb6WXF+5ri6VoycrFwXTjuUrVVFUrE26kipKn+ekvdYzm722Vvr+
- Vtn2o1U3FRX5bb5bE8L/1wBakXiDV2JTFDqZOYQfh84pCA4cyfx016obMA9JR2SOpf8r
- Q5VA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=mQSWZ4OL8kptnsLiqBLKFUgG5/0K0ZeOyTGLKyi74kw=;
- b=HOmAvcQXkAjj0Ax7aG0iJpbe/u9mun9g98czEzLvjTmY6ukCVH6kcCEiT1dp8d/BNs
- ecm60aN8Yhi+mBol07oY+2VHLAGHnpaTacnvEzXqvxqkzgFIYpRtylCYKh0BsE7nmzAZ
- gXy1oHZcxeP6V+boC1i3Q97/N8IAa2TOub1/yHe93dtRPhsWIE2tuqMoXqj8w80bp3PM
- 1HGogNh7P75p0P6OmNp1HDi9sYtTbUuS9XVmCYEJe1953dQdaqA3HS2aaMYAF+CzoVWF
- MMd+FOj+vCaCBPkEj3tZ3xmz5SgT3E64S9amTo2IYnHRJ7XI3ceFVSGaKwvg/iv84Y5y
- UEzg==
-X-Gm-Message-State: AOAM533aRPj50qk84ek4A45fc3tuHTf2012UGRGQnXPXGURaTYrI6ZGS
- eLvWqgf32YeJilgbx1/s1I61ucycE6Tu+LHVwaw=
-X-Google-Smtp-Source: ABdhPJy0NKIK5UsIVizWEoJiljf6UNa0mOLEihfYvd3K/0Tj8Yt6RoRpP+hXPkxBiWS5TwdcdouISpDBz0E9AevftB0=
-X-Received: by 2002:a5d:995a:: with SMTP id v26mr13585090ios.176.1597699021032; 
- Mon, 17 Aug 2020 14:17:01 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <steven.sistare@oracle.com>)
+ id 1k7mZe-0007aK-21
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 17:21:46 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:44000)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <steven.sistare@oracle.com>)
+ id 1k7mZ2-0006x4-L4
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 17:21:45 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+ by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 07HLHRBS186685;
+ Mon, 17 Aug 2020 21:21:03 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=uBM546asiZlUssVJFwrvsGq0Vg2j2VA9Os6AYc6Fcnw=;
+ b=NNVZeIW/HW37/Gt53gt+cYt1VUo4nJOZDXMTEHem8o0NUj7rCBQbdX5Bj/DxELKhMS/3
+ NdoZIQHSVRC2U7MhHYC5yiazHUqFuj/ASA5ef2nEnnUIjoyYxsKzhbAmmXzTcNru1PwQ
+ tGb1YAnvpN1tMHI7OoblE1zJ/07pu6W/0i+m7ami+gRmorvzoRvTDeb8LY+rfFH+2x3Z
+ cjKMJqZ/aEBnw3SLe10qb4KQR5eyHxtZybwW6scnN9bg1/kQWr4xreHcNw0JtG6/hOfl
+ fV+39Lrqw7ZWoecAo2X8MMFl0+TaN+Evkb2idj1Ow8za6/U+0RCABnBhs/x8eazlqjaX 8w== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+ by userp2120.oracle.com with ESMTP id 32x8bn16e2-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+ Mon, 17 Aug 2020 21:21:02 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+ by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 07HLHhuB171380;
+ Mon, 17 Aug 2020 21:21:02 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+ by aserp3020.oracle.com with ESMTP id 32xsm136k0-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 17 Aug 2020 21:21:02 +0000
+Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
+ by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 07HLL0EO005135;
+ Mon, 17 Aug 2020 21:21:00 GMT
+Received: from [10.39.206.110] (/10.39.206.110)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Mon, 17 Aug 2020 14:20:59 -0700
+Subject: Re: [PATCH V1 18/32] osdep: import MADV_DOEXEC
+To: Alex Williamson <alex.williamson@redhat.com>
+References: <1596122076-341293-1-git-send-email-steven.sistare@oracle.com>
+ <1596122076-341293-19-git-send-email-steven.sistare@oracle.com>
+ <51c859fb-3340-e361-1945-0ec2a393a34d@oracle.com>
+ <20200817144856.16c703da@x1.home>
+From: Steven Sistare <steven.sistare@oracle.com>
+Organization: Oracle Corporation
+Message-ID: <1750879d-70f8-72db-0eb3-86caa75ad3a0@oracle.com>
+Date: Mon, 17 Aug 2020 17:20:57 -0400
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-References: <1597423256-14847-1-git-send-email-bmeng.cn@gmail.com>
- <1597423256-14847-7-git-send-email-bmeng.cn@gmail.com>
-In-Reply-To: <1597423256-14847-7-git-send-email-bmeng.cn@gmail.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 17 Aug 2020 14:06:29 -0700
-Message-ID: <CAKmqyKOj89059O5jBsLCu=eQsPoQJ-suvzP1y1kKR0VJDg1tTw@mail.gmail.com>
-Subject: Re: [PATCH 06/18] hw/riscv: microchip_pfsoc: Connect 5 MMUARTs
-To: Bin Meng <bmeng.cn@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::d44;
- envelope-from=alistair23@gmail.com; helo=mail-io1-xd44.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200817144856.16c703da@x1.home>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9716
+ signatures=668679
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0
+ suspectscore=0
+ malwarescore=0 mlxscore=0 phishscore=0 spamscore=0 mlxlogscore=999
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2008170145
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9716
+ signatures=668679
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0
+ lowpriorityscore=0
+ impostorscore=0 suspectscore=0 adultscore=0 spamscore=0 malwarescore=0
+ mlxlogscore=999 priorityscore=1501 bulkscore=0 clxscore=1015 phishscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2008170145
+Received-SPF: pass client-ip=156.151.31.85;
+ envelope-from=steven.sistare@oracle.com; helo=userp2120.oracle.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/17 17:21:05
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
+X-Spam_score_int: -53
+X-Spam_score: -5.4
+X-Spam_bar: -----
+X-Spam_report: (-5.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,173 +119,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Bin Meng <bin.meng@windriver.com>,
- "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Palmer Dabbelt <palmerdabbelt@google.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- Palmer Dabbelt <palmer@dabbelt.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Aug 14, 2020 at 9:49 AM Bin Meng <bmeng.cn@gmail.com> wrote:
->
-> From: Bin Meng <bin.meng@windriver.com>
->
-> Microchip PolarFire SoC has 5 MMUARTs, and the Icicle Kit board
-> wires 4 of them out. Let's connect all 5 MMUARTs.
->
-> Signed-off-by: Bin Meng <bin.meng@windriver.com>
+On 8/17/2020 4:48 PM, Alex Williamson wrote:
+> On Mon, 17 Aug 2020 14:30:51 -0400
+> Steven Sistare <steven.sistare@oracle.com> wrote:
+> 
+>> On 7/30/2020 11:14 AM, Steve Sistare wrote:
+>>> Anonymous memory segments used by the guest are preserved across a re-exec
+>>> of qemu, mapped at the same VA, via a proposed madvise(MADV_DOEXEC) option
+>>> in the Linux kernel. For the madvise patches, see:
+>>>
+>>> https://lore.kernel.org/lkml/1595869887-23307-1-git-send-email-anthony.yznaga@oracle.com/
+>>>
+>>> Signed-off-by: Steve Sistare <steven.sistare@oracle.com>
+>>> ---
+>>>  include/qemu/osdep.h | 7 +++++++
+>>>  1 file changed, 7 insertions(+)  
+>>
+>> Hi Alex,
+>>   The MADV_DOEXEC functionality, which is a pre-requisite for the entire qemu 
+>> live update series, is getting a chilly reception on lkml.  We could instead 
+>> create guest memory using memfd_create and preserve the fd across exec.  However, 
+>> the subsequent mmap(fd) will return a different VA than was used previously, 
+>> which  is a problem for memory that was registered with vfio, as the original VA 
+>> is remembered in the kernel struct vfio_dma and used in various kernel functions, 
+>> such as vfio_iommu_replay.
+>>
+>> To fix, we could provide a VFIO_IOMMU_REMAP_DMA ioctl taking iova, size, and
+>> new_vaddr.  The implementation finds an exact match for (iova, size) and replaces 
+>> vaddr with new_vaddr.  Flags cannot be changed.
+>>
+>> memfd_create plus VFIO_IOMMU_REMAP_DMA would replace MADV_DOEXEC.
+>> vfio on any form of shared memory (shm, dax, etc) could also be preserved across
+>> exec with shmat/mmap plus VFIO_IOMMU_REMAP_DMA.
+>>
+>> What do you think
+> 
+> Your new REMAP ioctl would have parameters identical to the MAP_DMA
+> ioctl, so I think we should just use one of the flag bits on the
+> existing MAP_DMA ioctl for this variant.
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Sounds good.
 
-Alistair
+> Reading through the discussion on the kernel side there seems to be
+> some confusion around why vfio needs the vaddr beyond the user call to
+> MAP_DMA though.  Originally this was used to test for virtually
+> contiguous mappings for merging and splitting purposes.  This is
+> defunct in the v2 interface, however the vaddr is now used largely for
+> mdev devices.  If an mdev device is not backed by an IOMMU device and
+> does not share a container with an IOMMU device, then a user MAP_DMA
+> ioctl essentially just registers the translation within the vfio
+> container.  The mdev vendor driver can then later either request pages
+> to be pinned for device DMA or can perform copy_to/from_user() to
+> simulate DMA via the CPU.
+> 
+> Therefore I don't see that there's a simple re-architecture of the vfio
+> IOMMU backend that could drop vaddr use.  
 
-> ---
->
->  hw/riscv/Kconfig                   |  1 +
->  hw/riscv/microchip_pfsoc.c         | 30 ++++++++++++++++++++++++++++++
->  include/hw/riscv/microchip_pfsoc.h | 20 ++++++++++++++++++++
->  3 files changed, 51 insertions(+)
->
-> diff --git a/hw/riscv/Kconfig b/hw/riscv/Kconfig
-> index 3292fae..ceb7c16 100644
-> --- a/hw/riscv/Kconfig
-> +++ b/hw/riscv/Kconfig
-> @@ -54,3 +54,4 @@ config MICROCHIP_PFSOC
->      select HART
->      select SIFIVE
->      select UNIMP
-> +    select MCHP_PFSOC_MMUART
-> diff --git a/hw/riscv/microchip_pfsoc.c b/hw/riscv/microchip_pfsoc.c
-> index 20a642c..f6b375c 100644
-> --- a/hw/riscv/microchip_pfsoc.c
-> +++ b/hw/riscv/microchip_pfsoc.c
-> @@ -11,6 +11,7 @@
->   * 0) CLINT (Core Level Interruptor)
->   * 1) PLIC (Platform Level Interrupt Controller)
->   * 2) eNVM (Embedded Non-Volatile Memory)
-> + * 3) MMUARTs (Multi-Mode UART)
->   *
->   * This board currently generates devicetree dynamically that indicates at least
->   * two harts and up to five harts.
-> @@ -38,6 +39,7 @@
->  #include "hw/irq.h"
->  #include "hw/loader.h"
->  #include "hw/sysbus.h"
-> +#include "chardev/char.h"
->  #include "hw/cpu/cluster.h"
->  #include "target/riscv/cpu.h"
->  #include "hw/misc/unimp.h"
-> @@ -46,6 +48,7 @@
->  #include "hw/riscv/sifive_clint.h"
->  #include "hw/riscv/sifive_plic.h"
->  #include "hw/riscv/microchip_pfsoc.h"
-> +#include "sysemu/sysemu.h"
->
->  /*
->   * The BIOS image used by this machine is called Hart Software Services (HSS).
-> @@ -69,8 +72,13 @@ static const struct MemmapEntry {
->      [MICROCHIP_PFSOC_L2CC] =            {  0x2010000,     0x1000 },
->      [MICROCHIP_PFSOC_L2LIM] =           {  0x8000000,  0x2000000 },
->      [MICROCHIP_PFSOC_PLIC] =            {  0xc000000,  0x4000000 },
-> +    [MICROCHIP_PFSOC_MMUART0] =         { 0x20000000,     0x1000 },
->      [MICROCHIP_PFSOC_SYSREG] =          { 0x20002000,     0x2000 },
->      [MICROCHIP_PFSOC_MPUCFG] =          { 0x20005000,     0x1000 },
-> +    [MICROCHIP_PFSOC_MMUART1] =         { 0x20100000,     0x1000 },
-> +    [MICROCHIP_PFSOC_MMUART2] =         { 0x20102000,     0x1000 },
-> +    [MICROCHIP_PFSOC_MMUART3] =         { 0x20104000,     0x1000 },
-> +    [MICROCHIP_PFSOC_MMUART4] =         { 0x20106000,     0x1000 },
->      [MICROCHIP_PFSOC_ENVM_CFG] =        { 0x20200000,     0x1000 },
->      [MICROCHIP_PFSOC_ENVM_DATA] =       { 0x20220000,    0x20000 },
->      [MICROCHIP_PFSOC_IOSCB_CFG] =       { 0x37080000,     0x1000 },
-> @@ -215,6 +223,28 @@ static void microchip_pfsoc_soc_realize(DeviceState *dev, Error **errp)
->          memmap[MICROCHIP_PFSOC_MPUCFG].base,
->          memmap[MICROCHIP_PFSOC_MPUCFG].size);
->
-> +    /* MMUARTs */
-> +    s->serial0 = mchp_pfsoc_mmuart_create(system_memory,
-> +        memmap[MICROCHIP_PFSOC_MMUART0].base,
-> +        qdev_get_gpio_in(DEVICE(s->plic), MICROCHIP_PFSOC_MMUART0_IRQ),
-> +        serial_hd(0));
-> +    s->serial1 = mchp_pfsoc_mmuart_create(system_memory,
-> +        memmap[MICROCHIP_PFSOC_MMUART1].base,
-> +        qdev_get_gpio_in(DEVICE(s->plic), MICROCHIP_PFSOC_MMUART1_IRQ),
-> +        serial_hd(1));
-> +    s->serial2 = mchp_pfsoc_mmuart_create(system_memory,
-> +        memmap[MICROCHIP_PFSOC_MMUART2].base,
-> +        qdev_get_gpio_in(DEVICE(s->plic), MICROCHIP_PFSOC_MMUART2_IRQ),
-> +        serial_hd(2));
-> +    s->serial3 = mchp_pfsoc_mmuart_create(system_memory,
-> +        memmap[MICROCHIP_PFSOC_MMUART3].base,
-> +        qdev_get_gpio_in(DEVICE(s->plic), MICROCHIP_PFSOC_MMUART3_IRQ),
-> +        serial_hd(3));
-> +    s->serial4 = mchp_pfsoc_mmuart_create(system_memory,
-> +        memmap[MICROCHIP_PFSOC_MMUART4].base,
-> +        qdev_get_gpio_in(DEVICE(s->plic), MICROCHIP_PFSOC_MMUART4_IRQ),
-> +        serial_hd(4));
-> +
->      /* eNVM */
->      memory_region_init_rom(envm_data, OBJECT(dev), "microchip.pfsoc.envm.data",
->                             memmap[MICROCHIP_PFSOC_ENVM_DATA].size,
-> diff --git a/include/hw/riscv/microchip_pfsoc.h b/include/hw/riscv/microchip_pfsoc.h
-> index 1953ef1..a5efa1d 100644
-> --- a/include/hw/riscv/microchip_pfsoc.h
-> +++ b/include/hw/riscv/microchip_pfsoc.h
-> @@ -22,6 +22,8 @@
->  #ifndef HW_MICROCHIP_PFSOC_H
->  #define HW_MICROCHIP_PFSOC_H
->
-> +#include "hw/char/mchp_pfsoc_mmuart.h"
-> +
->  typedef struct MicrochipPFSoCState {
->      /*< private >*/
->      DeviceState parent_obj;
-> @@ -32,6 +34,11 @@ typedef struct MicrochipPFSoCState {
->      RISCVHartArrayState e_cpus;
->      RISCVHartArrayState u_cpus;
->      DeviceState *plic;
-> +    MchpPfSoCMMUartState *serial0;
-> +    MchpPfSoCMMUartState *serial1;
-> +    MchpPfSoCMMUartState *serial2;
-> +    MchpPfSoCMMUartState *serial3;
-> +    MchpPfSoCMMUartState *serial4;
->  } MicrochipPFSoCState;
->
->  #define TYPE_MICROCHIP_PFSOC    "microchip.pfsoc"
-> @@ -64,14 +71,27 @@ enum {
->      MICROCHIP_PFSOC_L2CC,
->      MICROCHIP_PFSOC_L2LIM,
->      MICROCHIP_PFSOC_PLIC,
-> +    MICROCHIP_PFSOC_MMUART0,
->      MICROCHIP_PFSOC_SYSREG,
->      MICROCHIP_PFSOC_MPUCFG,
-> +    MICROCHIP_PFSOC_MMUART1,
-> +    MICROCHIP_PFSOC_MMUART2,
-> +    MICROCHIP_PFSOC_MMUART3,
-> +    MICROCHIP_PFSOC_MMUART4,
->      MICROCHIP_PFSOC_ENVM_CFG,
->      MICROCHIP_PFSOC_ENVM_DATA,
->      MICROCHIP_PFSOC_IOSCB_CFG,
->      MICROCHIP_PFSOC_DRAM,
->  };
->
-> +enum {
-> +    MICROCHIP_PFSOC_MMUART0_IRQ = 90,
-> +    MICROCHIP_PFSOC_MMUART1_IRQ = 91,
-> +    MICROCHIP_PFSOC_MMUART2_IRQ = 92,
-> +    MICROCHIP_PFSOC_MMUART3_IRQ = 93,
-> +    MICROCHIP_PFSOC_MMUART4_IRQ = 94,
-> +};
-> +
->  #define MICROCHIP_PFSOC_MANAGEMENT_CPU_COUNT    1
->  #define MICROCHIP_PFSOC_COMPUTE_CPU_COUNT       4
->
-> --
-> 2.7.4
->
->
+Yes.  I did not explain on lkml as you do here (thanks), but I reached the 
+same conclusion.
+
+> I'm a bit concerned this new
+> remap proposal also raises the question of how do we prevent userspace
+> remapping vaddrs racing with asynchronous kernel use of the previous
+> vaddrs.  
+
+Agreed.  After a quick glance at the code, holding iommu->lock during 
+remap might be sufficient, but it needs more study.
+
+> Are we expecting guest drivers/agents to quiesce the device,
+> or maybe relying on clearing bus-master, for PCI devices, to halt DMA?
+
+No.  We want to support any guest, and the guest is not aware that qemu
+live update is occurring.
+
+> The vfio migration interface we've developed does have a mechanism to
+> stop a device, would we need to use this here?  If we do have a
+> mechanism to quiesce the device, is the only reason we're not unmapping
+> everything and remapping it into the new address space the latency in
+> performing that operation?  Thanks,
+
+Same answer - we don't require that the guest has vfio migration support.
+
+- Steve
 
