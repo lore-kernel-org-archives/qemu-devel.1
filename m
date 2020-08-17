@@ -7,77 +7,79 @@ X-Spam-Status: No, score=-8.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9658CC433F7
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 16:48:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17F55C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 16:51:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5BD1520674
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 16:48:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DBBEF206FA
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 16:51:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EQUiIK4L"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BD1520674
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZF16Fh9g"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBBEF206FA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34174 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37426 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7iJY-00058j-LJ
-	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 12:48:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49990)
+	id 1k7iMT-0006o4-4u
+	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 12:51:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50548)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1k7iIv-0004f1-S3
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 12:48:13 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:41848
+ id 1k7iLg-0006M5-Te
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 12:51:04 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:39181
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1k7iIt-0000R3-Qh
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 12:48:13 -0400
+ id 1k7iLe-0000sE-DQ
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 12:51:04 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597682890;
+ s=mimecast20190719; t=1597683061;
  h=from:from:reply-to:reply-to:subject:subject:date:date:
  message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:in-reply-to:in-reply-to:  references:references;
- bh=i1lYrEFSSLZcyKDUl6oLEJkwSZVkH77N/8qjBJfkpic=;
- b=EQUiIK4LrLLJpSl4BhcPLnKzelc1qg1HhhVAcwFT0onYMoMANvs88cdmxDukWmF95/1UcF
- aUo4W2USGjYyZGPzWNpX4gJTNmriDEQcxyL/XYfy1wjWUG8DbqZmEEWTCos/wWAvN8bsl+
- h0vqXLBMoMRZ0SEvXjZFBRr+nzmMuU0=
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=hcngs80YIzwNj+JgKPnHEBcjGCg0bkjROLyOgrjQSC8=;
+ b=ZF16Fh9gTG3cCvPOUHhDxw+ZoLHSlXM3i39m9tNTPBGdDfi/eaXeaBoY45WJIWyOhIK6hv
+ jCcd5rd8aHQo7ypztBq+AqLW7BCRyNwj/cM02gbh2ie74CSbfhyHNvQ7fPQqdqGsrE7sSv
+ ZHO0tWBs1TLpLsxeDMK6pRPPAg/Mo10=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-521-XYzi3rKrMb6FuE1lwP0BFQ-1; Mon, 17 Aug 2020 12:48:06 -0400
-X-MC-Unique: XYzi3rKrMb6FuE1lwP0BFQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-264-yRlEcHMRPKuXwb2o1Rm1TA-1; Mon, 17 Aug 2020 12:50:58 -0400
+X-MC-Unique: yRlEcHMRPKuXwb2o1Rm1TA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 059501005E5F;
- Mon, 17 Aug 2020 16:48:05 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 62361185E531;
+ Mon, 17 Aug 2020 16:50:57 +0000 (UTC)
 Received: from redhat.com (unknown [10.36.110.49])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 23658756B6;
- Mon, 17 Aug 2020 16:48:03 +0000 (UTC)
-Date: Mon, 17 Aug 2020 17:48:01 +0100
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 75C595D9D2;
+ Mon, 17 Aug 2020 16:50:56 +0000 (UTC)
+Date: Mon, 17 Aug 2020 17:50:53 +0100
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 To: Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH 01/17] crypto: Move QCryptoCipher typedef to
- qemu/typedefs.h
-Message-ID: <20200817164801.GK4775@redhat.com>
+Subject: Re: [PATCH 05/17] crypto: Remove redundant includes
+Message-ID: <20200817165053.GL4775@redhat.com>
 References: <20200813032537.2888593-1-richard.henderson@linaro.org>
- <20200813032537.2888593-2-richard.henderson@linaro.org>
+ <20200813032537.2888593-6-richard.henderson@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20200813032537.2888593-2-richard.henderson@linaro.org>
+In-Reply-To: <20200813032537.2888593-6-richard.henderson@linaro.org>
 User-Agent: Mutt/1.14.5 (2020-06-23)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
 X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
 Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=berrange@redhat.com;
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=berrange@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/17 00:24:04
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/17 05:13:21
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -105,19 +107,19 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Aug 12, 2020 at 08:25:21PM -0700, Richard Henderson wrote:
-> This allows header files to declare pointers without pulling
-> in the entire crypto subsystem.
+On Wed, Aug 12, 2020 at 08:25:25PM -0700, Richard Henderson wrote:
+> Both qemu/osdep.h and cipherpriv.h have already been
+> included by the parent cipher.c.
 > 
 > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
->  include/crypto/cipher.h | 2 --
->  include/qemu/typedefs.h | 1 +
->  2 files changed, 1 insertion(+), 2 deletions(-)
+>  crypto/cipher-builtin.inc.c | 2 --
+>  crypto/cipher-gcrypt.inc.c  | 2 --
+>  crypto/cipher-nettle.inc.c  | 2 --
+>  3 files changed, 6 deletions(-)
 
-I'm not in favour of this change or the next. Using #include "cipher.h"
-is not a burden on the users of the crypto code. Moving typedefs away
-from the associated struct is a step backwards IMHO.
+Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
+
 
 Regards,
 Daniel
