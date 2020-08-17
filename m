@@ -2,97 +2,87 @@ Return-Path: <SRS0=yhYb=B3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8364C433E3
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 15:50:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 008BCC433E4
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 15:51:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 652822063A
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 15:50:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BEF0E2063A
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 15:51:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ECGsQTkS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 652822063A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UlpB28nF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BEF0E2063A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34080 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36474 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7hPS-0000XG-HN
-	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 11:50:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57864)
+	id 1k7hPq-0001aI-Nn
+	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 11:51:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47340)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1k7hH2-0007QZ-38
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 11:42:12 -0400
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:39216)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1k7hGz-0007ip-4I
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 11:42:11 -0400
-Received: by mail-pl1-x643.google.com with SMTP id g15so3815134plj.6
- for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 08:42:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=3Wvq81j0f9R19GcAdXH/3hOrbeHJRoRKMKC/d+bI4Ys=;
- b=ECGsQTkSkC/OzShAEK0gLwA6gz61YgB1MZNfDEtIMoWkHQ+Fx0n2pnx/fQsYP3rV9/
- FIZW1ZFYx684LFWjJBL/d2ozDN7F7f5Ytxqn5JYV1W77AYhakB4yXroEpw46kWOuFF/8
- Zu5KJmOvDb50uVx8tcsa0PKl7b/xevsZ2TsnnSE6oKCqNS+Gg9F/3OVPhJ0VvUcbNjrz
- sNY2JPy3/k9G3YArZSYjms+BEWj9UyX1DB1NW/ZheYVayUmKVKQ5iZQMKPFK8VIeFibG
- mtdif35+floJZvYRrT4XCkBtZPfbp1ez/rsNdMzTF3cWk/gojxdBhJURmLQcMkCMZpFy
- Dswg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=3Wvq81j0f9R19GcAdXH/3hOrbeHJRoRKMKC/d+bI4Ys=;
- b=PcZCCFLY8Pke0wrEJodFDnVfkzn1VYhNRO0R8z2Q5lyXk3C7/aWpo+bGxrLlpFAGpy
- /vdqXCG12FdWZX/ZK4IcfvyFL4ob1HsrlmrZfawLK+Udy2rHjR5IaC5OxMkBr7VbFpe3
- R61NnTUh1c/mvSATbUXGzHr+PRRiFrr4dEKSTzXzZlg1XstIY16zlurDN4NcPJn3mq+7
- XGE7SgnYKrhgy8LggpQj3x9/x9hGaZe0XLU+boTZUYRSwfr6NOXZf4vPSFrfVun9YpXN
- kXL9+fkwH1fvSFozpxcYAg5InMdv2w8Y6vXByk11heaOBBzSCNRhvvc4+uuy9OF7PkyX
- cLIA==
-X-Gm-Message-State: AOAM533Pv81SCpt7OASnF2hkY0ZGZCaSk0dzusoYy80HvJqTa+M3YPSw
- 2EPY9tGFuVFpoRSTY6N3kD7oyw==
-X-Google-Smtp-Source: ABdhPJzRlgygh4kiT3ZtN/+SV75PnPF31+llYoqomnrWUZJrL5St3b3aSyWTfp64KyryLcb0UK4R0Q==
-X-Received: by 2002:a17:90a:cc6:: with SMTP id 6mr13616213pjt.2.1597678927240; 
- Mon, 17 Aug 2020 08:42:07 -0700 (PDT)
-Received: from [192.168.1.11] ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id g129sm19909805pfb.33.2020.08.17.08.42.05
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 17 Aug 2020 08:42:06 -0700 (PDT)
-Subject: Re: [PATCH v1 3/5] target/microblaze: mbar: Add support for
- data-access barriers
-To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-devel@nongnu.org
-References: <20200817140144.373403-1-edgar.iglesias@gmail.com>
- <20200817140144.373403-4-edgar.iglesias@gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <d4c0d54b-2575-147e-36aa-268628def55a@linaro.org>
-Date: Mon, 17 Aug 2020 08:42:04 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1k7gdc-0001RE-Fy
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 11:01:28 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:43013)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1k7gda-0000sH-Cz
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 11:01:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1597676485;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=LjOuXSAskq9pjifl295fJdMk9wAR+MVeB3QfDm5pT2E=;
+ b=UlpB28nFOunsz671yB0CoB0yrfomuKtWl/HEat0Ng0BGC8DC3nArA9gFgXzMB3zdrpEIQJ
+ FCwb/ytlKMz9pCtGdNhppYP00/bR1cz/q972etaUuYkqg+naDJSQnV9JF9CNu9Yh+Lo5tM
+ SCiAnmOc+2GezlfujLa8wON8ETiZci8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-547-t8JRBUjPMge0MsRyK5dO4g-1; Mon, 17 Aug 2020 11:01:20 -0400
+X-MC-Unique: t8JRBUjPMge0MsRyK5dO4g-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B0DDE807354;
+ Mon, 17 Aug 2020 15:01:19 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-112-160.ams2.redhat.com [10.36.112.160])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9B5737DFC0;
+ Mon, 17 Aug 2020 15:01:18 +0000 (UTC)
+Date: Mon, 17 Aug 2020 17:01:17 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Max Reitz <mreitz@redhat.com>
+Subject: Re: [RFC PATCH 11/22] qemu-nbd: Use blk_exp_add() to create the export
+Message-ID: <20200817150117.GO11402@linux.fritz.box>
+References: <20200813162935.210070-1-kwolf@redhat.com>
+ <20200813162935.210070-12-kwolf@redhat.com>
+ <d9d9ce92-291b-7e25-bc32-c0d899e73842@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200817140144.373403-4-edgar.iglesias@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::643;
- envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x643.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+In-Reply-To: <d9d9ce92-291b-7e25-bc32-c0d899e73842@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="qxfKREH7IwbezJ+T"
+Content-Disposition: inline
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=kwolf@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/17 02:47:08
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,59 +95,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: figlesia@xilinx.com, peter.maydell@linaro.org, sstabellini@kernel.org,
- edgar.iglesias@xilinx.com, sai.pavan.boddu@xilinx.com,
- frasse.iglesias@gmail.com, alistair@alistair23.me, frederic.konrad@adacore.com,
- qemu-arm@nongnu.org, philmd@redhat.com, luc.michel@greensocs.com
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/17/20 7:01 AM, Edgar E. Iglesias wrote:
-> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
-> 
-> Add support for data-access barriers.
-> 
-> Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-> ---
->  target/microblaze/translate.c | 5 +++++
->  1 file changed, 5 insertions(+)
-> 
-> diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
-> index c1be76d4c8..c58f334a0f 100644
-> --- a/target/microblaze/translate.c
-> +++ b/target/microblaze/translate.c
-> @@ -1233,6 +1233,11 @@ static void dec_br(DisasContext *dc)
->  
->          LOG_DIS("mbar %d\n", mbar_imm);
->  
-> +        /* Data access memory barrier.  */
-> +        if ((mbar_imm & 2) == 0) {
-> +            tcg_gen_mb(TCG_BAR_SC | TCG_MO_ALL);
-> +        }
-> +
->          /* mbar IMM & 16 decodes to sleep.  */
->          if (mbar_imm & 16) {
->              TCGv_i32 tmp_hlt = tcg_const_i32(EXCP_HLT);
-> 
+--qxfKREH7IwbezJ+T
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-The patch as written is fine, so
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Am 17.08.2020 um 16:27 hat Max Reitz geschrieben:
+> On 13.08.20 18:29, Kevin Wolf wrote:
+> > With this change, NBD exports are only created through the BlockExport
+> > interface any more. This allows us finally to move things from the NBD
+> > layer to the BlockExport layer if they make sense for other export
+> > types, too.
+>=20
+> I see.
+>=20
+> > blk_exp_add() returns only a weak reference, so the explicit
+> > nbd_export_put() goes away.
+> >=20
+> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> > ---
+> >  include/block/export.h |  2 ++
+> >  include/block/nbd.h    |  1 +
+> >  block/export/export.c  |  2 +-
+> >  blockdev-nbd.c         |  8 +++++++-
+> >  qemu-nbd.c             | 28 ++++++++++++++++++++++------
+> >  5 files changed, 33 insertions(+), 8 deletions(-)
+>=20
+> [...]
+>=20
+> > diff --git a/blockdev-nbd.c b/blockdev-nbd.c
+> > index d5b084acc2..8dd127af52 100644
+> > --- a/blockdev-nbd.c
+> > +++ b/blockdev-nbd.c
+>=20
+> [...]
+>=20
+> > @@ -176,7 +182,7 @@ BlockExport *nbd_export_create(BlockExportOptions *=
+exp_args, Error **errp)
+> > =20
+> >      assert(exp_args->type =3D=3D BLOCK_EXPORT_TYPE_NBD);
+> > =20
+> > -    if (!nbd_server) {
+> > +    if (!nbd_server && !is_qemu_nbd) {
+>=20
+> (This begs the question of how difficult it would be to let qemu-nbd use
+> QMP=E2=80=99s nbd-server-start, but I will not ask it, for I fear the ans=
+wer.)
 
-However, a couple of other notes for mbar:
+(It would probably include something along the lines of "patches
+welcome". (I initially wanted to do this, but came to the conclusion
+that it wasn't for this series when I noticed the socket activation
+code and discussed with danpb on IRC how to integrate it in
+SocketAddress.))
 
-(1) mbar_imm & 1 is insn memory barrier.  For ARM, we do:
+> >          error_setg(errp, "NBD server not running");
+> >          return NULL;
+> >      }
+> > diff --git a/qemu-nbd.c b/qemu-nbd.c
+> > index 48aa8a9d46..d967b8fcb9 100644
+> > --- a/qemu-nbd.c
+> > +++ b/qemu-nbd.c
+>=20
+> [...]
+>=20
+> > @@ -1050,9 +1050,27 @@ int main(int argc, char **argv)
+> > =20
+> >      bs->detect_zeroes =3D detect_zeroes;
+> > =20
+> > -    export =3D nbd_export_new(bs, export_name,
+> > -                            export_description, bitmap, readonly, shar=
+ed > 1,
+> > -                            writethrough, &error_fatal);
+> > +    nbd_server_is_qemu_nbd(true);
+> > +
+> > +    export_opts =3D g_new(BlockExportOptions, 1);
+> > +    *export_opts =3D (BlockExportOptions) {
+> > +        .type               =3D BLOCK_EXPORT_TYPE_NBD,
+> > +        .has_writethrough   =3D true,
+> > +        .writethrough       =3D writethrough,
+> > +        .u.nbd =3D {
+> > +            .device             =3D g_strdup(bdrv_get_node_name(bs)),
+> > +            .has_name           =3D true,
+> > +            .name               =3D g_strdup(export_name),
+> > +            .has_description    =3D !!export_description,
+> > +            .description        =3D g_strdup(export_description),
+> > +            .has_writable       =3D true,
+> > +            .writable           =3D !readonly,
+> > +            .has_bitmap         =3D !!bitmap,
+> > +            .bitmap             =3D g_strdup(bitmap),
+> > +        },
+> > +    };
+> > +    blk_exp_add(export_opts, &error_fatal);
+>=20
+> Why not use the already-global qmp_block_export_add(), if we don=E2=80=99=
+t need
+> the return value here?  (Will we require it at some point?)
 
-    /*
-     * We need to break the TB after this insn to execute
-     * self-modifying code correctly and also to take
-     * any pending interrupts immediately.
-     */
-    gen_goto_tb(s, 0, s->base.pc_next);
+I can do that. I needed the return value originally, but after some
+reshuffling of the series it magically disappeared.
 
-(2) mbar_imm & 16 (sleep) should check for user-mode and generate
-    an illegal instruction.
+Kevin
 
+--qxfKREH7IwbezJ+T
+Content-Type: application/pgp-signature; name="signature.asc"
 
-r~
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEE3D3rFZqa+V09dFb+fwmycsiPL9YFAl86m70ACgkQfwmycsiP
+L9YxLBAAvZ7QZS1UuClNIIxFQHuOr7edVUpClwo5aYJ6/RF+/6u2n79IPapKfKMn
+TymAMOXBED9raHF3lfdGyOkL0gvV/PsxqotZwui5X+1OolK2MUe7if7TjvgIREe+
+bLc+n+EKC2LzBZa751rPwIlvtpNT53apBgSVjQK82AuhN8K+kfgIYrqZ8WnCPOLJ
+Hfh1Hv5xLat9LQW35e9xnPvbAd2rAkzaWT05qvGg/+agXJVFGqfB+30xEUoEOIF7
+TyR58pik187V9lnC6sTqJx+Cq+6lKJhPhMnL3DfT054SrE4n2/9lymZiw5CDEZrW
+Q4lmn6uMoe/KbsDLL1UoQF0aL6MvDdcLA4DxD9leavpWe2/yy1enytQ+s6//lbqo
+pKPtspH0h/LV9bE0JODI/Xp9p5YnwsLAx3ikSg6WPbPA3dU/38imqYigG7WKbZSb
+hmgIbFulRCob1koH3DQTIsOyn4DHbNtk9HCdKeQcvgZf57EGgZHgNdxAC8UGKm5w
+B4BqKjOyBtPR8oQdfVXmoJBpb0xvA6Je2LdSGHfn0qBHxycR7MMRcZnApJnZXRST
+5VuGSGPaYK+B9V8n7yS6a2RlfkkZan2C/6Wd70Nos+69dfA3ZzbhAa9NXr9qZWmw
+4xdaNXrx4m1Ly1kBWaP6aH2vIHPstx/lSCehNkJlSV22NSxF6ys=
+=07py
+-----END PGP SIGNATURE-----
+
+--qxfKREH7IwbezJ+T--
+
 
