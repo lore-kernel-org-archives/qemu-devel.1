@@ -2,114 +2,89 @@ Return-Path: <SRS0=yhYb=B3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A23BFC433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 11:43:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0197CC433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 11:50:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6A6932063A
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 11:43:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BA8E220674
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 11:50:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G2dO7Var"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A6932063A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=yadro.com header.i=@yadro.com header.b="U2UtxOd8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA8E220674
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yadro.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53128 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55478 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7dYH-0001sg-Mq
-	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 07:43:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56640)
+	id 1k7deh-00035A-VC
+	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 07:50:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58262)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1k7dWY-0008WP-Jd
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 07:41:58 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:37235
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1k7dWT-0001Gr-Rr
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 07:41:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597664513;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=4qtEVeZiL+Pl+12v4RXY2HIN7rdqwCjhDpVNmsXVm8Y=;
- b=G2dO7VarP05R09dnpKL3v4dJsNGCNYZ4zBblFKmN+eLugOrjWxWAw+2GtDZC1akptzbUih
- MB8II4OOWJ4jPfxeYu7fPOvCID3oSdYDuB488xA8v697d/NY1NfXaY+1PGnjMNJkO5lv+j
- 0yx3Grxs2LJ2pDrF/Yo7u2jrUHvYYAM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-152-L69REwY0NUSJyoWGbdezEg-1; Mon, 17 Aug 2020 07:41:51 -0400
-X-MC-Unique: L69REwY0NUSJyoWGbdezEg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
+ id 1k7de3-0002fx-Rl
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 07:49:43 -0400
+Received: from mta-02.yadro.com ([89.207.88.252]:40506 helo=mta-01.yadro.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
+ id 1k7de1-00027A-VU
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 07:49:43 -0400
+Received: from localhost (unknown [127.0.0.1])
+ by mta-01.yadro.com (Postfix) with ESMTP id D291E52894;
+ Mon, 17 Aug 2020 11:49:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=yadro.com; h=
+ in-reply-to:content-transfer-encoding:content-disposition
+ :content-type:content-type:mime-version:references:message-id
+ :subject:subject:from:from:date:date:received:received:received;
+ s=mta-01; t=1597664978; x=1599479379; bh=kFUNgJMf6lpUZ1DfgyGuDB
+ tc8+syh71p2UHl3ZtN4L8=; b=U2UtxOd805a0bAIQttlIW3mtC04o/zVUw6sYBd
+ Xxbvm4l6dbmPLWJcBZ38SGkVxX3BHp2GenpSlpaM4RSK1sMZdkbu5avfJHXixWN8
+ e3+bshjQiOjZPLfWrqNoaSc9ldE4GUN5pQoo47OLRmDcy+P1P1iHfce3JGKgSvIr
+ I8VH8=
+X-Virus-Scanned: amavisd-new at yadro.com
+Received: from mta-01.yadro.com ([127.0.0.1])
+ by localhost (mta-01.yadro.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id lTyFwkQ9tD47; Mon, 17 Aug 2020 14:49:38 +0300 (MSK)
+Received: from T-EXCH-02.corp.yadro.com (t-exch-02.corp.yadro.com
+ [172.17.10.102])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4357B100CF64;
- Mon, 17 Aug 2020 11:41:50 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-113-146.ams2.redhat.com
- [10.36.113.146])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5A8A9BABA;
- Mon, 17 Aug 2020 11:41:49 +0000 (UTC)
-Subject: Re: [RFC PATCH 06/22] qemu-nbd: Use raw block driver for --offset
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-References: <20200813162935.210070-1-kwolf@redhat.com>
- <20200813162935.210070-7-kwolf@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <ec10fcc4-6dba-b511-2d37-6e82ea5ce896@redhat.com>
-Date: Mon, 17 Aug 2020 13:41:47 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ by mta-01.yadro.com (Postfix) with ESMTPS id 2E219527DA;
+ Mon, 17 Aug 2020 14:49:37 +0300 (MSK)
+Received: from localhost (172.17.204.212) by T-EXCH-02.corp.yadro.com
+ (172.17.10.102) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P384) id 15.1.669.32; Mon, 17
+ Aug 2020 14:49:37 +0300
+Date: Mon, 17 Aug 2020 14:49:37 +0300
+From: Roman Bolshakov <r.bolshakov@yadro.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v2 000/150] Meson integration for 5.2
+Message-ID: <20200817114937.GC98227@SPB-NB-133.local>
+References: <20200814091326.16173-1-pbonzini@redhat.com>
+ <20200817110254.GA98227@SPB-NB-133.local>
+ <f8a9f236-7017-01a7-0a6d-06a2e18f95f1@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200813162935.210070-7-kwolf@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="HUoxxybENbsB03YEGoOkeLaU1j1tSMaSc"
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=mreitz@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/17 05:03:47
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <f8a9f236-7017-01a7-0a6d-06a2e18f95f1@redhat.com>
+X-Originating-IP: [172.17.204.212]
+X-ClientProxiedBy: T-EXCH-01.corp.yadro.com (172.17.10.101) To
+ T-EXCH-02.corp.yadro.com (172.17.10.102)
+Received-SPF: pass client-ip=89.207.88.252; envelope-from=r.bolshakov@yadro.com;
+ helo=mta-01.yadro.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/17 07:02:56
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -127,76 +102,60 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---HUoxxybENbsB03YEGoOkeLaU1j1tSMaSc
-Content-Type: multipart/mixed; boundary="Qc4tuuvjgLnzEZgbbUsGvYpNkH31Q0Fq3"
+On Mon, Aug 17, 2020 at 01:24:50PM +0200, Paolo Bonzini wrote:
+> On 17/08/20 13:02, Roman Bolshakov wrote:
+> > 
+> > Tested-by: Roman Bolshakov <r.bolshakov@yadro.com>
+> > 
+> > On the next step, it might be good to drop configure in favor of meson
+> > configuration, so configure, build and test commands would be similar to
+> > libvirt:
+> > 
+> > meson build
+> > ninja -C build
+> > meson test -C build
+> 
+> Well, there are quite a few steps needed to get there:
+> 
+> 1) moving feature tests from configure to Meson is a no-brainer.
+> However it's better to first convert the unit tests to Meson and get rid
+> of the rest of rules.mak.  This is because it's simpler to do this if
+> there are no uses left of CONFIG_* symbols in the Makefiles.
+> 
 
---Qc4tuuvjgLnzEZgbbUsGvYpNkH31Q0Fq3
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Agreed
 
-On 13.08.20 18:29, Kevin Wolf wrote:
-> Instead of implementing qemu-nbd --offset in the NBD code, just put a
-> raw block node with the requested offset on top of the user image and
-> rely on that doing the job.
->=20
-> This does not only simplify the nbd_export_new() interface and bring it
-> closer to the set of options that the nbd-server-add QMP command offers,
-> but in fact it also eliminates a potential source for bugs in the NBD
-> code which previously had to add the offset manually in all relevant
-> places.
->=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  include/block/nbd.h |  4 ++--
->  blockdev-nbd.c      |  9 +--------
->  nbd/server.c        | 34 +++++++++++++++++-----------------
->  qemu-nbd.c          | 27 ++++++++++++---------------
->  4 files changed, 32 insertions(+), 42 deletions(-)
+> 2) moving the rest of "make install" to Meson is even more of a
+> no-brainer.  Marc-André has patches there.  They also include a
+> conversion of the ROM build.
+> 
+> 3) moving the bulk of the build from meson to ninja is possible and I
+> already have patches for it.  It requires adding ninja as a build
+> dependency however.  The main advantage here is getting rid of
+> Ninjatool.  I'm not sure how moving the handling of submodules to Meson
+> would work, and that's needed in order to be able to build with "ninja
+> -C build".
+> 
 
-[...]
+I'm more familiar with CMake rather than meson but they seem to be
+similar. CMake has a way to wrap build of submodules:
+https://cmake.org/cmake/help/latest/module/ExternalProject.html
 
-> diff --git a/nbd/server.c b/nbd/server.c
-> index 774325dbe5..92360d1f08 100644
-> --- a/nbd/server.c
-> +++ b/nbd/server.c
+I haven't found if meson has the feature. Perhaps, like 4) it's
+something to be enhanced in meson.
 
-[...]
+An alternative is to change the submodules to Meson (if their
+maintainers don't mind the change) and use meson subproject:
 
-> @@ -1569,7 +1574,7 @@ NBDExport *nbd_export_new(BlockDriverState *bs, uin=
-t64_t dev_offset,
->          exp->nbdflags |=3D (NBD_FLAG_SEND_TRIM | NBD_FLAG_SEND_WRITE_ZER=
-OES |
->                            NBD_FLAG_SEND_FAST_ZERO);
->      }
-> -    assert(size <=3D INT64_MAX - dev_offset);
-> +    assert(size <=3D INT64_MAX);
+https://mesonbuild.com/Subprojects.html
 
-Forgot to note: I think we can drop this assertion altogether now.
+Regards,
+Roman
 
-Max
-
-
---Qc4tuuvjgLnzEZgbbUsGvYpNkH31Q0Fq3--
-
---HUoxxybENbsB03YEGoOkeLaU1j1tSMaSc
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl86bPsACgkQ9AfbAGHV
-z0B4sAgAsczjthrD8qYckf9+SJPPexHPcLdmeo+CGt8YGParO75rLaFx+InqF/Mu
-i3sczP995FnWNehxiRtQ2YEH5gZiUWfaVqosW8q2vqEJw1tpiKMxyiLeCUQ0Zq92
-mqqe/8ZUYuWwc/ssmoGbjVHjquLRLPewll6VvOygLBpd4snN3LzovGSq50xW/XXm
-fJLE1lTAovhhjCsn9cg3br1JUOiq1WAGGtAUTdSl8Mt9GllNVWb1KbthgS2GjO1M
-ZRGASlP+8jJR7jmVemV3Jh0nwcvhaeJPk89YMO+puq2j+kYehRsGU1E2Uo8SxTD3
-LVjCLpGUmFztdSrQ8ZspsEn6wxiGPg==
-=XtJM
------END PGP SIGNATURE-----
-
---HUoxxybENbsB03YEGoOkeLaU1j1tSMaSc--
-
+> 4) I find "meson test" to be inferior in some respects to the QEMU's TAP
+> test harness.  In particular, one feature of QEMU's Makefiles is that
+> you can cut-and-paste from "make V=1 output" into the shell.  So that
+> part may take some time.  I'd rather extend Meson so that it's possible
+> to write arbitrary test runners.
+> 
 
