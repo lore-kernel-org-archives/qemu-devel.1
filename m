@@ -2,90 +2,131 @@ Return-Path: <SRS0=yhYb=B3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 131B0C433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 05:03:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 116CAC433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 05:25:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C90482072D
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 05:03:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D2250206C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 05:25:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SZTy3J6X"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C90482072D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iB/yIqGk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2250206C0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35932 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38592 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7XIr-0006d9-VO
-	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 01:03:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56516)
+	id 1k7XeG-0000RZ-0Q
+	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 01:25:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59724)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
- id 1k7XI2-0006CJ-SL
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 01:02:36 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35032
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k7Xde-0008Pm-VG
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 01:24:54 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:37770
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
- id 1k7XI0-00053Z-DP
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 01:02:34 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k7Xdb-00079o-UQ
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 01:24:54 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597640551;
+ s=mimecast20190719; t=1597641890;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=0gW1W5c1hde4dHO4Y8trzDwdZfZf7EZrVYeIj7NBfmY=;
- b=SZTy3J6XIGxKSaH2Y0Vb0t305fllzvuwnqVM7fHAxNawdyht8Jxb91wM2d3G6Tq6J8QbKS
- x1e5y8Ryat33O1HqOuzH7Np3/tG4NorOslO7dci6U4ZO26kB83BbG8REnDnWhGMrDCjYlm
- WqG0CX8roSQWwNMVqIYyPrnoFsdza8o=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-110-H2kPP0fUPe2NQNMjlzOE5w-1; Mon, 17 Aug 2020 01:02:26 -0400
-X-MC-Unique: H2kPP0fUPe2NQNMjlzOE5w-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4BC8318B9EC3;
- Mon, 17 Aug 2020 05:02:24 +0000 (UTC)
-Received: from kaapi (unknown [10.74.8.115])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 690FC7A1F6;
- Mon, 17 Aug 2020 05:02:16 +0000 (UTC)
-Date: Mon, 17 Aug 2020 10:32:13 +0530 (IST)
-From: P J P <ppandit@redhat.com>
-X-X-Sender: pjp@kaapi
-To: =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>
-Subject: Re: [PATCH v4 0/9] memory: assert and define MemoryRegionOps callbacks
-In-Reply-To: <c43dbd57-f22f-27f0-d6b3-77734be76631@amsat.org>
-Message-ID: <nycvar.YSQ.7.78.906.2008170954360.306228@xnncv>
-References: <20200811114133.672647-1-ppandit@redhat.com>
- <c43dbd57-f22f-27f0-d6b3-77734be76631@amsat.org>
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=t8sSNWEgbGqHQQao5jWuxMb/IzyK23atDvjGWJkZhe4=;
+ b=iB/yIqGkfKPrjhPcd3V8iWZNDFsY6aTqEViwdD71nbyw1ZxhYR8AqVW6QFcUJg2ssMWGQM
+ kzHFBjhPICUpjV77bGg/cllsbW4PO4765MVFjS0LAt3g5p6akFikkxsIK1sqS69yUOOQUg
+ 4Sfi1tVssVJzYbg76gcLKUTxPJ1q4Xs=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-34-U-jRxnc9MCSxsOG1abpNxQ-1; Mon, 17 Aug 2020 01:24:48 -0400
+X-MC-Unique: U-jRxnc9MCSxsOG1abpNxQ-1
+Received: by mail-wr1-f72.google.com with SMTP id j2so6504708wrr.14
+ for <qemu-devel@nongnu.org>; Sun, 16 Aug 2020 22:24:48 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=ZYpalzqwUoNBePZOpV7je+sSd/fyQW+gkbORBclRMMY=;
+ b=eun1Vqe+i1nW/bVXTY8e7QFpptmEsPndYI4vFSVy1A7boNm8/YQNtEQ0R8kiFXR0kU
+ 5mtCsThaTz8DvkXHrO9+OcI8yNAcGa+ZYeWQbj9DQC4X0p3VJ2Oo4R2nwdqAOfOTPUxk
+ CYVdwh82BDS0vkBeETzmOnQb4SKP2W8r7oCFaJJbXBe9WCDGF/BMFa/ptHD7jIfaPHC2
+ A5/EeDtxaWCnIDGE78PkoxkaboAwwa11VH0Z/GoOiE/iwiETz6t2OiwC5Flu4yd4QbD6
+ uqeI3En4ZkwfNVRONy/2zG+jbT+26nCnV0AKYzfsKG3kdh9SRE0QaqNvkM3Ny4WU4IKp
+ +1qA==
+X-Gm-Message-State: AOAM530nhyB1lFbyIJC4CeHy9elqwxUSjIT4UNZVMmxzOU8FMHLXWixL
+ 8hSNB2R1Te1ohYksz2QF0fUMafM6smN8/mWtKHODEeqrbA5ggd7pl52c7goq9t9FgqOZw526kg2
+ aJXMABO1wvzKsMx8=
+X-Received: by 2002:adf:f812:: with SMTP id s18mr13848474wrp.96.1597641887111; 
+ Sun, 16 Aug 2020 22:24:47 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwqbZaD+LNv1uT7Vd2Q07YL8RuhuP+GBLo1VgQNMnZg0Fs29yk4osUdxfT1lfi76rBMugdpWw==
+X-Received: by 2002:adf:f812:: with SMTP id s18mr13848440wrp.96.1597641886788; 
+ Sun, 16 Aug 2020 22:24:46 -0700 (PDT)
+Received: from [192.168.1.36] (121.red-81-40-121.staticip.rima-tde.net.
+ [81.40.121.121])
+ by smtp.gmail.com with ESMTPSA id c10sm27697729wro.84.2020.08.16.22.24.44
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Sun, 16 Aug 2020 22:24:45 -0700 (PDT)
+Subject: Re: [PATCH v3 0/8] Generalize start-powered-off property from ARM
+To: David Gibson <david@gibson.dropbear.id.au>,
+ Thiago Jung Bauermann <bauerman@linux.ibm.com>
+References: <20200723025657.644724-1-bauerman@linux.ibm.com>
+ <20200817044730.GK12805@yekko.fritz.box>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <83ebefab-8bdf-2584-53e6-e4fa0f540109@redhat.com>
+Date: Mon, 17 Aug 2020 07:24:43 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <20200817044730.GK12805@yekko.fritz.box>
+Content-Language: en-US
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ppandit@redhat.com
-X-Mimecast-Spam-Score: 0.001
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0.003
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/mixed;
- boundary="-1463810047-420044280-1597640543=:306228"
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=ppandit@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/16 22:37:43
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/17 00:54:24
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,64 +139,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Li Qiang <liq3ea@gmail.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Lei Sun <slei.casper@gmail.com>,
- Alex Williamson <alex.williamson@redhat.com>,
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>,
+ qemu-s390x@nongnu.org, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org,
+ Greg Kurz <groug@kaod.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, qemu-arm@nongnu.org,
+ qemu-ppc@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>,
  Paolo Bonzini <pbonzini@redhat.com>,
- =?ISO-8859-15?Q?Alex_Benn=E9e?= <alex.bennee@linaro.org>,
- David Gibson <david@gibson.dropbear.id.au>
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
----1463810047-420044280-1597640543=:306228
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
+On 8/17/20 6:47 AM, David Gibson wrote:
+> On Wed, Jul 22, 2020 at 11:56:49PM -0300, Thiago Jung Bauermann wrote:
+>> The ARM code has a start-powered-off property in ARMCPU, which is a
+>> subclass of CPUState. This property causes arm_cpu_reset() to set
+>> CPUState::halted to 1, signalling that the CPU should start in a halted
+>> state. Other architectures also have code which aim to achieve the same
+>> effect, but without using a property.
+>>
+>> The ppc/spapr version has a bug where QEMU does a KVM_RUN on the vcpu
+>> before cs->halted is set to 1, causing the vcpu to run while it's still in
+>> an unitialized state (more details in patch 3).
+>>
+>> Peter Maydell mentioned the ARM start-powered-off property and
+>> Eduardo Habkost suggested making it generic, so this patch series does
+>> that, for all cases which I was able to find via grep in the code.
+>>
+>> The only problem is that I was only able to test these changes on a ppc64le
+>> pseries KVM guest, so except for patches 2 and 3, all others are only
+>> build-tested. Also, my grasp of QOM lifecycle is basically non-existant so
+>> please be aware of that when reviewing this series.
+>>
+>> The last patch may be wrong, as pointed out by Eduardo, so I marked it as
+>> RFC. It may make sense to drop it.
+>>
+>> Applies cleanly on yesterday's master.
+> 
+> This series appears to break the Travis build for a MIPS target:
+> 
+> Unexpected error in qdev_prop_set_after_realize() at /home/travis/build/dgibson/qemu/hw/core/qdev-properties.c:30:
+> qemu-system-mips64el: Attempt to set property 'start-powered-off' on anonymous device (type 'I6400-mips64-cpu') after it was realized
+> Broken pipe
+> /home/travis/build/dgibson/qemu/tests/qtest/libqtest.c:175: kill_qemu() detected QEMU death from signal 6 (Aborted) (core dumped)
+> Aborted (core dumped)
+> ERROR qom-test - too few tests run (expected 8, got 0)
+> /home/travis/build/dgibson/qemu/tests/Makefile.include:650: recipe for target 'check-qtest-mips64el' failed
 
-+-- On Sun, 16 Aug 2020, Philippe Mathieu-Daudé wrote --+
-| On 8/11/20 1:41 PM, P J P wrote:
-| > From: Prasad J Pandit <pjp@fedoraproject.org>
-| > * This series asserts that MemoryRegionOps objects define read/write
-| >   callback methods. Thus avoids potential NULL pointer dereference.
-| >   ex. -> https://git.qemu.org/?p=qemu.git;a=commit;h=bb15013ef34617eb1344f5276292cadd326c21b2
-| > 
-| > * Also adds various undefined MemoryRegionOps read/write functions
-| >   to avoid potential assert failure.
-| 
-| What about read_with_attrs()/write_with_attrs()? It seems they are part of 
-| the same problem.
-
-* read/write_with_attrs function is called if read/write callback is not 
-  defined
-
-  ../softmmu/memory.c
-    if (mr->ops->write) {
-                    ... memory_region_write_accessor, mr,
-    } else {
-                    ... memory_region_write_with_attrs_accessor,
-
-  So, defining read/write methods may also address read/write_with_attrs 
-  issue?
-
-* $ grep -Eri -A 5 -B 5 '(\.read_with_attrs|\.write_with_attrs)' . | fpaste
-
-   -> https://paste.centos.org/view/386c9597
-
-  It doesn't show an occurrence where one of the read/write_with_attrs is 
-  missing.
-
-* Nevertheless, if we need to define read/write_with_attrs routines, because 
-  memory_region_init_io() would assert(3) for them
-
-  could that be a subsequent patch series please?
-
-
-Thank you.
---
-Prasad J Pandit / Red Hat Product Security Team
-8685 545E B54C 486B C6EB 271E E285 8B5A F050 DE8D
----1463810047-420044280-1597640543=:306228--
+Good catch. hw/mips/cps.c, hw/ppc/e500.c and hw/sparc/sun4m.c are
+incorrectly setting the property after the cpu is realized because
+the cpu is created with cpu_create(). We need to create them with
+object_initialize_child() and realize them manually with qdev_realize().
 
 
