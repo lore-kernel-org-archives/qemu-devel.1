@@ -2,99 +2,88 @@ Return-Path: <SRS0=yhYb=B3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9946FC433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 08:31:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57F80C433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 08:50:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 64C6E2072D
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 08:31:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 238CC2067C
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 08:50:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ye4A1F9o"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64C6E2072D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="Pn+FzaA/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 238CC2067C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60146 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40682 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7aYd-0001ww-Kh
-	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 04:31:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40168)
+	id 1k7ar3-0006eI-9X
+	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 04:50:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43996)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k7aY2-0001Wq-MT
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 04:31:18 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:38669)
+ (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
+ id 1k7aqE-0005Bh-0x
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 04:50:06 -0400
+Received: from mail-pl1-x630.google.com ([2607:f8b0:4864:20::630]:39877)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k7aY1-0002gm-0c
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 04:31:18 -0400
-Received: by mail-wr1-x444.google.com with SMTP id a14so14076428wra.5
- for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 01:31:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=pzM5zy39YS37eRHE7FnipY8K5CRyPtgNWAO1/R0K9DE=;
- b=Ye4A1F9ouTpWLMU9NBlqS9ezMoC543vWFdGOnuRLwStIUD9zONR8XWaGRaaluBbvI4
- 8X86wbelz5I6o1B7i6qwMFX/mOOywyzLvwipJhAH2eX8kwhDJuu9WtB/O2OgvFRpzUg8
- EplsdDAWL9YR7CDPwAW89tehiQ2zXHvrUJSi1l3Gb+2VQS5DIL72PwlcVbvPuf2dlEcJ
- WmHqiGAWEci4mGyJfu1qHbjuR0fct5AqihrBSO/C1eF9xcKFlpstADx5FWN06ZY54Jto
- X9mlstYE3s4+R/YZSVaYPz+aYn36vtvzYSFZm/cgAP2f2pTdHwZ+Z3+aUHBA4it3kc5V
- /b0A==
+ (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
+ id 1k7aqC-0004gI-27
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 04:50:05 -0400
+Received: by mail-pl1-x630.google.com with SMTP id g15so3265156plj.6
+ for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 01:50:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
+ h=from:to:cc:subject:date:message-id;
+ bh=YaRz00F3DdxFE8gRMGnGvA7xLPyskscbRKXD8PrH9lw=;
+ b=Pn+FzaA/3eoynZQFDr6+pbZwzDAW0kJsw1VEI6PRa+di30+MW45dKXVMXkmEHj0n71
+ e108Ghuo6NhjlDc5jkrSbpNUk4qmlzSq+sUAaD2EHcA8OPtxQGqBjcri9P5qZJnHuDeB
+ 2+qh5mD4wKsQKx3aUaXCvM9ntrMzcryB3X/Gk6coTmYP8DHhA/TEX9FlMWq+N1jAVQMU
+ Flaif8GvtKoX6ZgRN3JttO4UA0A12x1VXzJGTtq3wLq8V+jL8z5wDtzeZELaJDKSqi0F
+ EjXbYCiwMrkaED2XMBq5xgNIykNJMWqRr4RfwlExQOvzHD0rVoCfJDQr35bH+nEkTYJh
+ pmOQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=pzM5zy39YS37eRHE7FnipY8K5CRyPtgNWAO1/R0K9DE=;
- b=OJ3N9LpFxfZxZI2EjYbGeQ3dr2UVQVWr3a0XDBTfs9DHBQxeNkBRGZGQ0dPDqd6Wf3
- WxjoIRTwEbZYx5pm844VnxWQINK9Y0vm63p4rKTUAzKCiPrYxtKoqeui2lLGtV/gCiQ5
- Av25/pvHApxxZr5md+K8MVuTYli6W8omDsUXWXVFxh2kTqHwX5PpNbe0rBX+tjnLbsT8
- DLhHYKkFlDSyU2KYczkz0rZNSreJRAlAGTKFOhuMoImsGjCiKheEkZSBCUcG9neRZ7m1
- DKyV68L1x3DgJFb2PFAp/6bW/woS4zpP4C/y+NmfWRouOGiCmZKsCFotuw+diwQvgSmD
- ct0g==
-X-Gm-Message-State: AOAM533jF7/GN2eUFlAKreHQssa+S+VaQD/CPlUIZFpOhtIbhnMp5HIj
- VPrNqxYpDRIZXxhbqpuRsKJBHtQzkmc=
-X-Google-Smtp-Source: ABdhPJzmuWRnCI2PqKVqHAoG7hFiiyLhEIfeeQjAxT+8svwygLByKOYIUqtUYnp+Qf6/oH3JjCJ38Q==
-X-Received: by 2002:adf:bc4b:: with SMTP id a11mr13370517wrh.381.1597653075132; 
- Mon, 17 Aug 2020 01:31:15 -0700 (PDT)
-Received: from [192.168.1.36] (121.red-81-40-121.staticip.rima-tde.net.
- [81.40.121.121])
- by smtp.gmail.com with ESMTPSA id k10sm31192366wrm.74.2020.08.17.01.31.13
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 17 Aug 2020 01:31:14 -0700 (PDT)
-Subject: Re: [PATCH v5 1/4] Add the NVMM vcpu API
-To: Kamil Rytarowski <kamil@netbsd.org>, rth@twiddle.net,
- ehabkost@redhat.com, slp@redhat.com, pbonzini@redhat.com,
- peter.maydell@linaro.org, max@m00nbsd.net, jmcneill@invisible.ca
-References: <20200811141049.15824-1-n54@gmx.com>
- <215c2dff-56dc-0e2c-6648-6055b7ab2146@netbsd.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <b235a6e6-6d8c-4c9b-1e00-51461252fb5a@amsat.org>
-Date: Mon, 17 Aug 2020 10:31:13 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
-MIME-Version: 1.0
-In-Reply-To: <215c2dff-56dc-0e2c-6648-6055b7ab2146@netbsd.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
+ h=x-gm-message-state:from:to:cc:subject:date:message-id;
+ bh=YaRz00F3DdxFE8gRMGnGvA7xLPyskscbRKXD8PrH9lw=;
+ b=dIh+SOlpQcBAcwG1KMOSJXIGtP5n4X0WyvrWTsJN+yZz5Pt9AojM5nMzTHr2k65k03
+ Myp+lwA7FpjN/RkIQOticHeVUKRE2gTV+W/IYQMunpDiPs+DaveNeGmTx3FtDTYgQMHj
+ dXGQNI3aJHFBWLSw2HRuCT2z6OWTVW59XFLbtFInjyXGoi2JnB0/YqplXWgL+SCCEtQP
+ EinyvQUvsVUTTlO+0sIKb9CZQT9FgSQtFir6bI+p/yvBiY6btskBtbhmgShVkFAm051P
+ 2mkToY6hUBkthpZo1N0/G9oA8GjLEeVtZfJ5dYk8QK/r6fT/k8D7uJis9c7tELvyah/9
+ FnEw==
+X-Gm-Message-State: AOAM5302oWH8+HnpC/0l1cQQ074YFuEHFyYSkHVge7kX5gbVrMLd4D/p
+ QkLCq8fWVz6fR811hq889ehMH3B8okYWuQ==
+X-Google-Smtp-Source: ABdhPJwZuZLJvCZAw6JPc2stebg7Q5A+e8lP5RmaD8cKl50aZONipRM6UYuGuXA2lwfgw1XbJ1NcAw==
+X-Received: by 2002:a17:90b:2092:: with SMTP id
+ hb18mr12129512pjb.118.1597654201849; 
+ Mon, 17 Aug 2020 01:50:01 -0700 (PDT)
+Received: from frankchang-ThinkPad-T490.internal.sifive.com
+ (114-34-229-221.HINET-IP.hinet.net. [114.34.229.221])
+ by smtp.gmail.com with ESMTPSA id d9sm16478588pgv.45.2020.08.17.01.49.59
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 17 Aug 2020 01:50:00 -0700 (PDT)
+From: frank.chang@sifive.com
+To: qemu-devel@nongnu.org,
+	qemu-riscv@nongnu.org
+Subject: [RFC v4 00/70] support vector extension v1.0
+Date: Mon, 17 Aug 2020 16:48:45 +0800
+Message-Id: <20200817084955.28793-1-frank.chang@sifive.com>
+X-Mailer: git-send-email 2.17.1
+Received-SPF: pass client-ip=2607:f8b0:4864:20::630;
+ envelope-from=frank.chang@sifive.com; helo=mail-pl1-x630.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,50 +96,172 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Frank Chang <frank.chang@sifive.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Kamil,
+From: Frank Chang <frank.chang@sifive.com>
 
-On 8/17/20 9:59 AM, Kamil Rytarowski wrote:
-> Ping?
+This patchset implements the vector extension v1.0 for RISC-V on QEMU.
 
-1/ Your series misses a cover letter, see:
-https://wiki.qemu.org/Contribute/SubmitAPatch#Include_a_meaningful_cover_letter
-(no need to repost though).
+This patchset is sent as RFC because RVV v1.0 is still in draft state.
+v2 patchset was sent for RVV v0.9 and bumped to RVV v1.0 since v3 patchset.
 
-2/ Please wait at least 1 week between pings
-(except for critical bug fixes in pre-release),
-the maintainer taking this is probably busy.
+The port is available here:
+https://github.com/sifive/qemu/tree/rvv-1.0-upstream-v4
 
-3/ The 5.2 development window is still not open,
-see i.e. the opening commit of the 5.1 tree:
-https://git.qemu.org/?p=qemu.git;a=commit;h=a7922a3c8
+You can change the cpu argument: vext_spec to v1.0 (i.e. vext_spec=v1.0)
+to run with RVV v1.0 instructions.
 
-Regards,
+Note: This patchset depends on two other patchsets listed in Based-on
+      section below so it might not able to be built unless those two
+      patchsets are applied.
 
-Phil.
+Changelog:
 
-> 
-> On 11.08.2020 16:10, Kamil Rytarowski wrote:
->> From: Maxime Villard <max@m00nbsd.net>
->>
->> Adds support for the NetBSD Virtual Machine Monitor (NVMM) stubs and
->> introduces the nvmm.h sysemu API for managing the vcpu scheduling and
->> management.
->>
->> Signed-off-by: Maxime Villard <max@m00nbsd.net>
->> Signed-off-by: Kamil Rytarowski <n54@gmx.com>
->> Reviewed-by: Sergio Lopez <slp@redhat.com>
->> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->> Tested-by: Jared McNeill <jmcneill@invisible.ca>
->> ---
->>  accel/stubs/Makefile.objs |  1 +
->>  accel/stubs/nvmm-stub.c   | 43 +++++++++++++++++++++++++++++++++++++++
->>  include/sysemu/nvmm.h     | 35 +++++++++++++++++++++++++++++++
->>  3 files changed, 79 insertions(+)
->>  create mode 100644 accel/stubs/nvmm-stub.c
->>  create mode 100644 include/sysemu/nvmm.h
+v4
+  * remove explicit float flmul variable in DisasContext.
+  * replace floating-point calculations with shift operations to
+    improve performance.
+  * relax RV_VLEN_MAX to 512-bits.
+
+v3
+  * apply nan-box helpers from Richard Henderson.
+  * remove fp16 api changes as they are sent independently in another
+    pathcset by Chih-Min Chao.
+  * remove all tail elements clear functions as tail elements can
+    retain unchanged for either VTA set to undisturbed or agnostic.
+  * add fp16 nan-box check generator function.
+  * add floating-point rounding mode enum.
+  * replace flmul arithmetic with shifts to avoid floating-point
+    conversions.
+  * add Zvqmac extension.
+  * replace gdbstub vector register xml files with dynamic generator.
+  * bumped to RVV v1.0.
+  * RVV v1.0 related changes:
+    * add vl<nf>re<eew>.v and vs<nf>r.v vector whole register
+      load/store instructions
+    * add vrgatherei16 instruction.
+    * rearranged bits in vtype to make vlmul bits into a contiguous
+      field.
+
+v2
+  * drop v0.7.1 support.
+  * replace invisible return check macros with functions.
+  * move mark_vs_dirty() to translators.
+  * add SSTATUS_VS flag for s-mode.
+  * nan-box scalar fp register for floating-point operations.
+  * add gdbstub files for vector registers to allow system-mode
+    debugging with GDB.
+
+Based-on: <20200724002807.441147-1-richard.henderson@linaro.org/>
+Based-on: <1596102747-20226-1-git-send-email-chihmin.chao@sifive.com/>
+
+Frank Chang (62):
+  target/riscv: drop vector 0.7.1 and add 1.0 support
+  target/riscv: Use FIELD_EX32() to extract wd field
+  target/riscv: rvv-1.0: introduce writable misa.v field
+  target/riscv: rvv-1.0: remove rvv related codes from fcsr registers
+  target/riscv: rvv-1.0: check MSTATUS_VS when accessing vector csr
+    registers
+  target/riscv: rvv-1.0: remove MLEN calculations
+  target/riscv: rvv-1.0: add fractional LMUL
+  target/riscv: rvv-1.0: add VMA and VTA
+  target/riscv: rvv-1.0: update check functions
+  target/riscv: introduce more imm value modes in translator functions
+  target/riscv: rvv:1.0: add translation-time nan-box helper function
+  target/riscv: rvv-1.0: configure instructions
+  target/riscv: rvv-1.0: stride load and store instructions
+  target/riscv: rvv-1.0: index load and store instructions
+  target/riscv: rvv-1.0: fix address index overflow bug of indexed
+    load/store insns
+  target/riscv: rvv-1.0: fault-only-first unit stride load
+  target/riscv: rvv-1.0: amo operations
+  target/riscv: rvv-1.0: load/store whole register instructions
+  target/riscv: rvv-1.0: update vext_max_elems() for load/store insns
+  target/riscv: rvv-1.0: take fractional LMUL into vector max elements
+    calculation
+  target/riscv: rvv-1.0: floating-point square-root instruction
+  target/riscv: rvv-1.0: floating-point classify instructions
+  target/riscv: rvv-1.0: mask population count instruction
+  target/riscv: rvv-1.0: find-first-set mask bit instruction
+  target/riscv: rvv-1.0: set-X-first mask bit instructions
+  target/riscv: rvv-1.0: iota instruction
+  target/riscv: rvv-1.0: element index instruction
+  target/riscv: rvv-1.0: allow load element with sign-extended
+  target/riscv: rvv-1.0: register gather instructions
+  target/riscv: rvv-1.0: integer scalar move instructions
+  target/riscv: rvv-1.0: floating-point move instruction
+  target/riscv: rvv-1.0: floating-point scalar move instructions
+  target/riscv: rvv-1.0: whole register move instructions
+  target/riscv: rvv-1.0: integer extension instructions
+  target/riscv: rvv-1.0: single-width averaging add and subtract
+    instructions
+  target/riscv: rvv-1.0: single-width bit shift instructions
+  target/riscv: rvv-1.0: integer add-with-carry/subtract-with-borrow
+  target/riscv: rvv-1.0: narrowing integer right shift instructions
+  target/riscv: rvv-1.0: widening integer multiply-add instructions
+  target/riscv: rvv-1.0: add Zvqmac extension
+  target/riscv: rvv-1.0: quad-widening integer multiply-add instructions
+  target/riscv: rvv-1.0: single-width saturating add and subtract
+    instructions
+  target/riscv: rvv-1.0: integer comparison instructions
+  target/riscv: use softfloat lib float16 comparison functions
+  target/riscv: rvv-1.0: floating-point compare instructions
+  target/riscv: rvv-1.0: mask-register logical instructions
+  target/riscv: rvv-1.0: slide instructions
+  target/riscv: rvv-1.0: floating-point slide instructions
+  target/riscv: rvv-1.0: narrowing fixed-point clip instructions
+  target/riscv: rvv-1.0: single-width floating-point reduction
+  target/riscv: rvv-1.0: widening floating-point reduction instructions
+  target/riscv: rvv-1.0: single-width scaling shift instructions
+  target/riscv: rvv-1.0: remove widening saturating scaled multiply-add
+  target/riscv: rvv-1.0: remove vmford.vv and vmford.vf
+  target/riscv: rvv-1.0: remove integer extract instruction
+  target/riscv: rvv-1.0: floating-point min/max instructions
+  target/riscv: introduce floating-point rounding mode enum
+  target/riscv: rvv-1.0: floating-point/integer type-convert
+    instructions
+  target/riscv: rvv-1.0: widening floating-point/integer type-convert
+  target/riscv: add "set round to odd" rounding mode helper function
+  target/riscv: rvv-1.0: narrowing floating-point/integer type-convert
+  target/riscv: rvv-1.0: relax RV_VLEN_MAX to 512-bits
+
+Greentime Hu (2):
+  target/riscv: rvv-1.0: add vlenb register
+  target/riscv: gdb: support vector registers for rv32
+
+Hsiangkai Wang (2):
+  target/riscv: gdb: modify gdb csr xml file to align with csr register
+    map
+  target/riscv: gdb: support vector registers for rv64
+
+LIU Zhiwei (4):
+  target/riscv: rvv-1.0: add mstatus VS field
+  target/riscv: rvv-1.0: add sstatus VS field
+  target/riscv: rvv-1.0: add translation-time vector context status
+  target/riscv: rvv-1.0: add vcsr register
+
+ gdb-xml/riscv-32bit-csr.xml             |   18 +-
+ gdb-xml/riscv-64bit-csr.xml             |   18 +-
+ target/riscv/cpu.c                      |   12 +-
+ target/riscv/cpu.h                      |   97 +-
+ target/riscv/cpu_bits.h                 |   10 +
+ target/riscv/cpu_helper.c               |   16 +-
+ target/riscv/csr.c                      |   73 +-
+ target/riscv/fpu_helper.c               |   17 +-
+ target/riscv/gdbstub.c                  |  126 +-
+ target/riscv/helper.h                   |  523 ++--
+ target/riscv/insn32-64.decode           |   18 +-
+ target/riscv/insn32.decode              |  295 +-
+ target/riscv/insn_trans/trans_rvv.inc.c | 2366 ++++++++++------
+ target/riscv/internals.h                |   19 +-
+ target/riscv/translate.c                |   68 +-
+ target/riscv/vector_helper.c            | 3269 +++++++++++------------
+ 16 files changed, 4051 insertions(+), 2894 deletions(-)
+
+--
+2.17.1
+
 
