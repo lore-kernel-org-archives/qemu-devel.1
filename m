@@ -7,79 +7,78 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E2E1C433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 14:46:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35041C433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 14:46:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2E81820789
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 14:46:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E83E320789
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 14:46:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bVS4MP7O"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E81820789
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WDdu53j1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E83E320789
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54588 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54962 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7gPV-0002LR-Ak
-	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 10:46:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40560)
+	id 1k7gPY-0002V0-T9
+	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 10:46:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40516)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1k7gGh-0003Zq-PV
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:37:47 -0400
-Received: from mail-wr1-x42a.google.com ([2a00:1450:4864:20::42a]:45580)
+ id 1k7gGe-0003QE-7d
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:37:44 -0400
+Received: from mail-wr1-x42c.google.com ([2a00:1450:4864:20::42c]:41860)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1k7gGf-00063U-PU
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:37:47 -0400
-Received: by mail-wr1-x42a.google.com with SMTP id z18so15240511wrm.12
- for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 07:37:45 -0700 (PDT)
+ id 1k7gGc-000632-NY
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:37:43 -0400
+Received: by mail-wr1-x42c.google.com with SMTP id r2so15265803wrs.8
+ for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 07:37:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ h=sender:from:to:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=dspYanX3zf7a9yxolnnruaw1M3atSamdkc1hvEVqzGE=;
- b=bVS4MP7OD0Kk3M6bl9iuuY6LTLaC1GxovV8fQcQrNNUOcjQrWdf/TW9FLIG8uMCRIz
- vwBHSGcdXRuvK0VKMKf7+C6iryNR5ysVY9Vx3X3hKfyBr3VZDovLq8oL/YVRM4V+BhOd
- nQNYTVYnq67KAedV3eH1+mGvtZ1TxOY8aG/bRob2OblUmonunBeJK2azHkhbL/PSuFBt
- qpqkajgNXzRF2oDVjbOcqY7LeCwec9a7qobxQPhRKF9uXdqD4nwXl8MzEyO1NmDR5N1k
- CVkQmGEQ9pBYyejfoFKGLNqeIsfHCC3SXq+pLLfgcHfaojLN6tUB59WEoVcNae0kXGkk
- 7YNA==
+ bh=rgLa8OOgysOf7Sl9OK2QDbGQukQVDXrVrkDaQKpgc84=;
+ b=WDdu53j1/HqGCSmA24j6T2i6BO10XlWivf8LT0NGawMq1hj2RDeAUQXEdHuzJVLzTc
+ Fe+Hp7UAQ9J1dymtnH1V7ALC3RbZ2QIF6ogMPYcQhKWhhBBEz/m+rfwkZa1eNKyK34A1
+ nAApt+HUCQY83FttnmFwWaK6xm3ZeeS0Ij9ZaMEMsgfpUxZskC3X/4PaWtt2D8UQdWlZ
+ v8919NHp/+DyjXEIm8u1Hj36Q/Zb75MNBebmxj2b4aD2NvmuQYBLMuhoIEggrktXNv9l
+ E1fDqpoG0AOYwl2R9xuyPWKryb1ZsKJLrneQ1JHc6ZWL8Ays/4bP2IdTJBGXio+fxlkM
+ YEwQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ h=x-gm-message-state:sender:from:to:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=dspYanX3zf7a9yxolnnruaw1M3atSamdkc1hvEVqzGE=;
- b=oJtzsiK2IyW2Gt09LO8l9hGimvZk+cr6NB2VXCso0zHQCT5+tXNJNWpofT8+dMks0G
- FtNkTyAjBIRVdBmRAMfgy4T+FoM+u/812WNxJMFoe2Y3KZIPNMw/7Q6ZLqh2fOtBQJo2
- XYp9x2AtCVpFfYyiGMlYT8208eZ6sYyhqBgZRr23lIbkqtRzVU+IMB0SOvQ7aY0z6Ax0
- 9wIngiNuQrLBKD4pxDZ8O5HEjG2FuT0vodLhg6nD18yFYFGU+jVvuV+TRrPrImZMqiPl
- 6jTwgz67ripdQ/VIeT2ZBiTTVh3CGyfC1pZIDs6yPk9y5OMWnqych08Q/3b5MEZM1P1S
- EluQ==
-X-Gm-Message-State: AOAM531d78I+rzIuxW6nuxwqgBzSCexspN+GsnTn+9pt0CQzvN8quJq5
- 9vBm6PWSVpV8ZvhKairx+9PUzk5wlzc=
-X-Google-Smtp-Source: ABdhPJxm18IhDgtyUK3NJHGPa/63dgzgkJSxxgTCMOQB849PF+zBOfwO3bGZmrUBuHOLo4l7hHh3CA==
-X-Received: by 2002:adf:fb87:: with SMTP id a7mr16896296wrr.390.1597675064179; 
- Mon, 17 Aug 2020 07:37:44 -0700 (PDT)
+ bh=rgLa8OOgysOf7Sl9OK2QDbGQukQVDXrVrkDaQKpgc84=;
+ b=UURCEV7bs34h5/d0d11p2XWJJ/p8V7wy7AI4ohTZzwFtpF75LSBuhKFJDT+82Y+7QD
+ a/FKslpHuzsviFPJOUiPVgofppH+2XUT5j2UWOps3X+K4xT9Qqbufeb+DOVwUfvOe+oM
+ JTH2ZZhka9HNZq6vtGVHWAxTQa0eOlZOTz9xX+kEzz0cbfgGZsYkIctNcr92XiWeXVIK
+ C989y8LZ4y9F6WpIgtRPhghQi4QXENtzGqTgETYsuOUjyqF9vXjdh1ib4mq1xcxiJA9H
+ QBpPMqsEAuRZytJ3H67AP3p7cAOZiPxwN5q3ydRFd2T5xO9iyk4cJYNNvg4nSB7cEWr/
+ MITA==
+X-Gm-Message-State: AOAM5328yFW7+fwlufqdPyOaVqbin0HJ1k+mM8H6ZdGupbtYgHKZXZb2
+ eb+QHuHiwURnhJv8mv3cn+ZRLoJqZrE=
+X-Google-Smtp-Source: ABdhPJxqQdGi6zhP66UvnblEr48QUQKDlhgpmIrAp+PAdmdp9Te3pWF/kqh4zXtJ5fWhpFVG2xJXpQ==
+X-Received: by 2002:adf:e704:: with SMTP id c4mr16990308wrm.81.1597675061038; 
+ Mon, 17 Aug 2020 07:37:41 -0700 (PDT)
 Received: from donizetti.redhat.com ([2001:b07:6468:f312:a0d1:fc42:c610:f977])
  by smtp.gmail.com with ESMTPSA id
- i22sm34966603wrb.45.2020.08.17.07.37.43
+ i22sm34966603wrb.45.2020.08.17.07.37.40 for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 17 Aug 2020 07:37:43 -0700 (PDT)
+ Mon, 17 Aug 2020 07:37:40 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 017/150] build-sys hack: link with whole .fa archives
-Date: Mon, 17 Aug 2020 16:35:10 +0200
-Message-Id: <20200817143723.343284-18-pbonzini@redhat.com>
+Subject: [PATCH 014/150] tests/vm: include setuptools
+Date: Mon, 17 Aug 2020 16:35:07 +0200
+Message-Id: <20200817143723.343284-15-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200817143723.343284-1-pbonzini@redhat.com>
 References: <20200817143723.343284-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::42a;
- envelope-from=paolo.bonzini@gmail.com; helo=mail-wr1-x42a.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::42c;
+ envelope-from=paolo.bonzini@gmail.com; helo=mail-wr1-x42c.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -101,76 +100,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Marc-André Lureau <marcandre.lureau@redhat.com>
+They are a dependency of Meson, so install them.
 
-In order to link the *-obj-y files into tests, we will make static
-libraries of them in Meson, and then link them as whole archives
-into the tests.  To separate regular static libraries from link-whole
-libraries, give them a different file extension.
-
-Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- rules.mak | 18 +++++++++++++-----
- 1 file changed, 13 insertions(+), 5 deletions(-)
+ tests/vm/freebsd | 1 +
+ tests/vm/netbsd  | 1 +
+ tests/vm/openbsd | 1 +
+ 3 files changed, 3 insertions(+)
 
-diff --git a/rules.mak b/rules.mak
-index e79a4005a7..5ab42def82 100644
---- a/rules.mak
-+++ b/rules.mak
-@@ -39,6 +39,13 @@ find-symbols = $(if $1, $(sort $(shell $(NM) -P -g $1 | $2)))
- defined-symbols = $(call find-symbols,$1,awk '$$2!="U"{print $$1}')
- undefined-symbols = $(call find-symbols,$1,awk '$$2=="U"{print $$1}')
+diff --git a/tests/vm/freebsd b/tests/vm/freebsd
+index 29252fa4a6..b34b14fc53 100755
+--- a/tests/vm/freebsd
++++ b/tests/vm/freebsd
+@@ -33,6 +33,7 @@ class FreeBSDVM(basevm.BaseVM):
+         "pkgconf",
+         "bzip2",
+         "python37",
++        "py37-setuptools",
  
-+WL := -Wl,
-+ifdef CONFIG_DARWIN
-+whole-archive = $(WL)-force_load,$1
-+else
-+whole-archive = $(WL)--whole-archive $1 $(WL)--no-whole-archive
-+endif
-+
- # All the .mo objects in -m variables are also added into corresponding -y
- # variable in unnest-vars, but filtered out here, when LINK is called.
- #
-@@ -54,11 +61,12 @@ undefined-symbols = $(call find-symbols,$1,awk '$$2=="U"{print $$1}')
- # This is necessary because the exectuable itself may not use the function, in
- # which case the function would not be linked in. Then the DSO loading will
- # fail because of the missing symbol.
--process-archive-undefs = $(filter-out %.a %.mo,$1) \
-+process-archive-undefs = $(filter-out %.a %.fa %.mo,$1) \
-                 $(addprefix $(WL_U), \
--                     $(filter $(call defined-symbols,$(filter %.a, $1)), \
-+                     $(filter $(call defined-symbols,$(filter %.a %.fa, $1)), \
-                               $(call undefined-symbols,$(filter %.mo,$1)))) \
--                $(filter %.a,$1)
-+		$(foreach l,$(filter %.fa,$1),$(call whole-archive,$l)) \
-+		$(filter %.a,$1)
+         # gnu tools
+         "bash",
+diff --git a/tests/vm/netbsd b/tests/vm/netbsd
+index 2e87199211..93d48b6fdd 100755
+--- a/tests/vm/netbsd
++++ b/tests/vm/netbsd
+@@ -31,6 +31,7 @@ class NetBSDVM(basevm.BaseVM):
+         "pkgconf",
+         "xz",
+         "python37",
++        "py37-setuptools",
  
- extract-libs = $(strip $(foreach o,$(filter-out %.mo,$1),$($o-libs)))
- expand-objs = $(strip $(sort $(filter %.o,$1)) \
-@@ -122,7 +130,7 @@ LD_REL := $(CC) -nostdlib $(LD_REL_FLAGS)
- modules:
+         # gnu tools
+         "bash",
+diff --git a/tests/vm/openbsd b/tests/vm/openbsd
+index dfe633e453..7e27fda642 100755
+--- a/tests/vm/openbsd
++++ b/tests/vm/openbsd
+@@ -30,6 +30,7 @@ class OpenBSDVM(basevm.BaseVM):
+         "git",
+         "pkgconf",
+         "bzip2", "xz",
++        "py3-setuptools",
  
- %$(EXESUF): %.o
--	$(call LINK,$(filter %.o %.a %.mo, $^))
-+	$(call LINK,$(filter %.o %.a %.mo %.fa, $^))
- 
- %.a:
- 	$(call quiet-command,rm -f $@ && $(AR) rcs $@ $^,"AR","$(TARGET_DIR)$@")
-@@ -378,7 +386,7 @@ define unnest-vars
-                 $(error $o added in $v but $o-objs is not set)))
-         $(shell mkdir -p ./ $(sort $(dir $($v))))
-         # Include all the .d files
--        $(eval -include $(patsubst %.o,%.d,$(patsubst %.mo,%.d,$($v))))
-+        $(eval -include $(patsubst %.o,%.d,$(patsubst %.mo,%.d,$(filter %.o,$($v)))))
-         $(eval $v := $(filter-out %/,$($v))))
- endef
- 
+         # gnu tools
+         "bash",
 -- 
 2.26.2
 
