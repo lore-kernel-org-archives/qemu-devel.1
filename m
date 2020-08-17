@@ -2,135 +2,103 @@ Return-Path: <SRS0=yhYb=B3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51C8EC433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 07:35:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11867C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 08:05:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1CAA520758
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 07:35:20 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SUyGi92q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CAA520758
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id D9BFF207DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 08:05:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9BFF207DF
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=netbsd.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34106 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44708 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7Zfr-0004DM-D1
-	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 03:35:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55868)
+	id 1k7a9E-0001um-Oa
+	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 04:05:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33982)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1k7ZfJ-0003na-Lj
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 03:34:45 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:55012
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1k7ZfH-0004DW-V8
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 03:34:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597649682;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=padWhJrfx5V2Tv9nzNQ5FXaQjTEJs6duuzEE2+VrZ6o=;
- b=SUyGi92quv1GVX+CccAVgL5l//A4MPPyxV1rT5W69Afj/JlHlke9bXo8BbqkCPUdvLZQ5g
- kUYtY9Ptl5J6TFkD/g7fuj/Rl6/RUrD03ejoXS9rMH9hxStBBmW4pfFAFXQ+0/+pCjIgXA
- HjO/oPMRvh2vuLaBTfqKTWpfhMgGaZs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-309-_pMkviHTOCusZvBXpLQVbA-1; Mon, 17 Aug 2020 03:34:41 -0400
-X-MC-Unique: _pMkviHTOCusZvBXpLQVbA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E495E801ADA;
- Mon, 17 Aug 2020 07:34:39 +0000 (UTC)
-Received: from [10.97.116.15] (ovpn-116-15.gru2.redhat.com [10.97.116.15])
- by smtp.corp.redhat.com (Postfix) with ESMTP id CC9BB7A4D0;
- Mon, 17 Aug 2020 07:34:33 +0000 (UTC)
-Subject: Re: [PATCH v2] virtio-mem: detach the element from the virtqueue when
- error occurs
-To: Li Qiang <liq3ea@163.com>, mst@redhat.com
-References: <20200816142245.17556-1-liq3ea@163.com>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat GmbH
-Message-ID: <254210bc-9e7e-407d-3151-104944930103@redhat.com>
-Date: Mon, 17 Aug 2020 09:34:30 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <kamil@netbsd.org>) id 1k7a6B-0001Np-7h
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 04:02:31 -0400
+Received: from mail.netbsd.org ([2001:470:a085:999::25]:57390)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <kamil@netbsd.org>) id 1k7a67-0007jH-Q1
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 04:02:30 -0400
+Received: from [IPv6:::1] (localhost [127.0.0.1])
+ by mail.netbsd.org (Postfix) with ESMTP id D63FB84CDF;
+ Mon, 17 Aug 2020 08:02:21 +0000 (UTC)
+Subject: Re: [PATCH v5 1/4] Add the NVMM vcpu API
+To: rth@twiddle.net, ehabkost@redhat.com, slp@redhat.com,
+ pbonzini@redhat.com, peter.maydell@linaro.org, philmd@redhat.com,
+ max@m00nbsd.net, jmcneill@invisible.ca
+References: <20200811141049.15824-1-n54@gmx.com>
+From: Kamil Rytarowski <kamil@netbsd.org>
+Autocrypt: addr=kamil@netbsd.org; keydata=
+ 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
+Message-ID: <215c2dff-56dc-0e2c-6648-6055b7ab2146@netbsd.org>
+Date: Mon, 17 Aug 2020 09:59:49 +0200
+User-Agent: Mozilla/5.0 (X11; NetBSD amd64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200816142245.17556-1-liq3ea@163.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=david@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <20200811141049.15824-1-n54@gmx.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=david@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/17 03:34:42
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2001:470:a085:999::25;
+ envelope-from=kamil@netbsd.org; helo=mail.netbsd.org
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -41
+X-Spam_score: -4.2
 X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -143,66 +111,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: liq3ea@gmail.com, qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 16.08.20 16:22, Li Qiang wrote:
-> If error occurs while processing the virtio request we should call
-> 'virtqueue_detach_element' to detach the element from the virtqueue
-> before free the elem.
+Ping?
+
+On 11.08.2020 16:10, Kamil Rytarowski wrote:
+> From: Maxime Villard <max@m00nbsd.net>
 > 
-> Signed-off-by: Li Qiang <liq3ea@163.com>
-
-
-Fixes: 910b25766b ("virtio-mem: Paravirtualized memory hot(un)plug")
-Acked-by: David Hildenbrand <david@redhat.com>
-
-@MST, can you please pick this up? Thanks!
-
+> Adds support for the NetBSD Virtual Machine Monitor (NVMM) stubs and
+> introduces the nvmm.h sysemu API for managing the vcpu scheduling and
+> management.
+> 
+> Signed-off-by: Maxime Villard <max@m00nbsd.net>
+> Signed-off-by: Kamil Rytarowski <n54@gmx.com>
+> Reviewed-by: Sergio Lopez <slp@redhat.com>
+> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> Tested-by: Jared McNeill <jmcneill@invisible.ca>
 > ---
-> Change since v1:
-> Change the subject
-> Avoid using the goto label
+>  accel/stubs/Makefile.objs |  1 +
+>  accel/stubs/nvmm-stub.c   | 43 +++++++++++++++++++++++++++++++++++++++
+>  include/sysemu/nvmm.h     | 35 +++++++++++++++++++++++++++++++
+>  3 files changed, 79 insertions(+)
+>  create mode 100644 accel/stubs/nvmm-stub.c
+>  create mode 100644 include/sysemu/nvmm.h
 > 
->  hw/virtio/virtio-mem.c | 3 +++
->  1 file changed, 3 insertions(+)
+> diff --git a/accel/stubs/Makefile.objs b/accel/stubs/Makefile.objs
+> index bbd14e71fb..38660a0b9b 100644
+> --- a/accel/stubs/Makefile.objs
+> +++ b/accel/stubs/Makefile.objs
+> @@ -1,6 +1,7 @@
+>  obj-$(call lnot,$(CONFIG_HAX))  += hax-stub.o
+>  obj-$(call lnot,$(CONFIG_HVF))  += hvf-stub.o
+>  obj-$(call lnot,$(CONFIG_WHPX)) += whpx-stub.o
+> +obj-$(call lnot,$(CONFIG_NVMM)) += nvmm-stub.o
+>  obj-$(call lnot,$(CONFIG_KVM))  += kvm-stub.o
+>  obj-$(call lnot,$(CONFIG_TCG))  += tcg-stub.o
+>  obj-$(call lnot,$(CONFIG_XEN))  += xen-stub.o
+> diff --git a/accel/stubs/nvmm-stub.c b/accel/stubs/nvmm-stub.c
+> new file mode 100644
+> index 0000000000..c2208b84a3
+> --- /dev/null
+> +++ b/accel/stubs/nvmm-stub.c
+> @@ -0,0 +1,43 @@
+> +/*
+> + * Copyright (c) 2018-2019 Maxime Villard, All rights reserved.
+> + *
+> + * NetBSD Virtual Machine Monitor (NVMM) accelerator stub.
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "qemu-common.h"
+> +#include "cpu.h"
+> +#include "sysemu/nvmm.h"
+> +
+> +int nvmm_init_vcpu(CPUState *cpu)
+> +{
+> +    return -1;
+> +}
+> +
+> +int nvmm_vcpu_exec(CPUState *cpu)
+> +{
+> +    return -1;
+> +}
+> +
+> +void nvmm_destroy_vcpu(CPUState *cpu)
+> +{
+> +}
+> +
+> +void nvmm_cpu_synchronize_state(CPUState *cpu)
+> +{
+> +}
+> +
+> +void nvmm_cpu_synchronize_post_reset(CPUState *cpu)
+> +{
+> +}
+> +
+> +void nvmm_cpu_synchronize_post_init(CPUState *cpu)
+> +{
+> +}
+> +
+> +void nvmm_cpu_synchronize_pre_loadvm(CPUState *cpu)
+> +{
+> +}
+> diff --git a/include/sysemu/nvmm.h b/include/sysemu/nvmm.h
+> new file mode 100644
+> index 0000000000..10496f3980
+> --- /dev/null
+> +++ b/include/sysemu/nvmm.h
+> @@ -0,0 +1,35 @@
+> +/*
+> + * Copyright (c) 2018-2019 Maxime Villard, All rights reserved.
+> + *
+> + * NetBSD Virtual Machine Monitor (NVMM) accelerator support.
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +
+> +#ifndef QEMU_NVMM_H
+> +#define QEMU_NVMM_H
+> +
+> +#include "config-host.h"
+> +#include "qemu-common.h"
+> +
+> +int nvmm_init_vcpu(CPUState *);
+> +int nvmm_vcpu_exec(CPUState *);
+> +void nvmm_destroy_vcpu(CPUState *);
+> +
+> +void nvmm_cpu_synchronize_state(CPUState *);
+> +void nvmm_cpu_synchronize_post_reset(CPUState *);
+> +void nvmm_cpu_synchronize_post_init(CPUState *);
+> +void nvmm_cpu_synchronize_pre_loadvm(CPUState *);
+> +
+> +#ifdef CONFIG_NVMM
+> +
+> +int nvmm_enabled(void);
+> +
+> +#else /* CONFIG_NVMM */
+> +
+> +#define nvmm_enabled() (0)
+> +
+> +#endif /* CONFIG_NVMM */
+> +
+> +#endif /* CONFIG_NVMM */
+> --
+> 2.28.0
 > 
-> diff --git a/hw/virtio/virtio-mem.c b/hw/virtio/virtio-mem.c
-> index 7740fc613f..e6ffc781b3 100644
-> --- a/hw/virtio/virtio-mem.c
-> +++ b/hw/virtio/virtio-mem.c
-> @@ -318,6 +318,7 @@ static void virtio_mem_handle_request(VirtIODevice *vdev, VirtQueue *vq)
->          if (iov_to_buf(elem->out_sg, elem->out_num, 0, &req, len) < len) {
->              virtio_error(vdev, "virtio-mem protocol violation: invalid request"
->                           " size: %d", len);
-> +            virtqueue_detach_element(vq, elem, 0);
->              g_free(elem);
->              return;
->          }
-> @@ -327,6 +328,7 @@ static void virtio_mem_handle_request(VirtIODevice *vdev, VirtQueue *vq)
->              virtio_error(vdev, "virtio-mem protocol violation: not enough space"
->                           " for response: %zu",
->                           iov_size(elem->in_sg, elem->in_num));
-> +            virtqueue_detach_element(vq, elem, 0);
->              g_free(elem);
->              return;
->          }
-> @@ -348,6 +350,7 @@ static void virtio_mem_handle_request(VirtIODevice *vdev, VirtQueue *vq)
->          default:
->              virtio_error(vdev, "virtio-mem protocol violation: unknown request"
->                           " type: %d", type);
-> +            virtqueue_detach_element(vq, elem, 0);
->              g_free(elem);
->              return;
->          }
-> 
-
-
--- 
-Thanks,
-
-David / dhildenb
 
 
