@@ -7,77 +7,77 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA105C433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 09:09:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF92CC433E3
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 09:09:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7C4622063A
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 09:09:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8B730206C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 09:09:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="bluGCR8I"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C4622063A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="Yhya67zu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B730206C0
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48940 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49288 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7b92-0002CL-LK
-	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 05:09:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45086)
+	id 1k7b95-0002Kn-Ne
+	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 05:09:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45252)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
- id 1k7arS-0008K5-R2
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 04:51:22 -0400
-Received: from mail-pf1-x42b.google.com ([2607:f8b0:4864:20::42b]:35581)
+ id 1k7arf-0000Sp-UI
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 04:51:35 -0400
+Received: from mail-pj1-x1033.google.com ([2607:f8b0:4864:20::1033]:50615)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
- id 1k7arQ-00053n-Rz
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 04:51:22 -0400
-Received: by mail-pf1-x42b.google.com with SMTP id d188so7898481pfd.2
- for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 01:51:20 -0700 (PDT)
+ id 1k7are-00055w-Dx
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 04:51:35 -0400
+Received: by mail-pj1-x1033.google.com with SMTP id e4so7495503pjd.0
+ for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 01:51:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=fR4JpsXJUuT5lJNobC6iQBq0EFUGSIwBclP3cnYK+Jo=;
- b=bluGCR8I7oJDlVxHvXBbJF5x6SX0H/gpKKmSNeVIuak9l/cZUkOKEWbv2th3i7iIgq
- /FaBwaMHT29rXdSA6eKoSuRni0uwaMWnOmR0npo5hqwOgRLFyLuGqPsyeqbOKbsRtGOK
- MNea7CJxX3xy6KroFz9N+VGFXE/EgFql0M7xonZvrTeMDLYmnn+E9DOLfwHrKqOuIhsx
- 4CPfcaf6P481t6Zxj1tdunRMOWEd5Mh4kY4vAFlEG19eUwyxNY/Lkvq2u/aoHn21CuJ2
- BKG1MvckCyY9wrvkKdx+3VTSpYS8+W/49UCaLiA5tofhfx8+xMxLtv8OX7DPYZvsPDL5
- C+Ag==
+ bh=99inUY6TcXre93Q9sK2twtbOOBRR6deMTZ0PhPm0qww=;
+ b=Yhya67zuJcqLW0c30YPV5JtD5Xal2KXSJhCgLAMOna3p4u8rJRbMsLg9zRkql8F4hh
+ A6OZoGeOrS9YbMhY9gieLeCDmiWTMoq+J465ZKQMHfjwv/9QRMNd6akRgc79sg+VMPBY
+ BHiLjY5wNeQbrlOIKsKXjLpqiS7mAr3en0mSkMY4ZN9UtZ/9KRUeS3K6nxEvc5cyv1MJ
+ sy4DF+rke5uvo6mgjBSv5KRUEWxayUBmd9xs1xSdFhsKXNNAFdfj5bcgDKB+3YEfkdBF
+ bf0GpnOcOZMzyaHHNnVZDCmgIPaeNPgXs5gfW3G9Bn2O6j7llFpohZQxVL8trOG2yiw6
+ 4JDg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=fR4JpsXJUuT5lJNobC6iQBq0EFUGSIwBclP3cnYK+Jo=;
- b=H+GN1zshIqAq9qTDLJ9Vbc1/cyQ61lGt0XeE6jugKWCX9XmwigJ3PkmgfJEFAeR8Fk
- xdQ0rvi6VzCKd017js7/pn5Hq5O7owhrPqSdSmIAKhKjKtbAaFQuokwzYLENNLI3MOO3
- pxowpvgZtPRdHHnhMFO0y6JdR96Ti5LIx8dZ4xfvFrX5V+GhKYi+fYHP+vqufzj43mbA
- PO4DtUS7nGoCjabOEC+Vli+MaZ/elBqk2PgKGx5TP7Vwj12AjI0ZpITUqKnFYA6Ff1xJ
- jG8jpCxPigglnVWzPL75/YmfNnnCGE2190dzkiX5gj39nUTskp3L9yVrJ8zdhkw1kq4D
- wPAw==
-X-Gm-Message-State: AOAM533VyOAiMpIF1ZjphwlXBYePSPZhhnFSsFBKw0WDL43zMngGlx9m
- l2y5AMrkHFNA404ksu0IgpDRGlDYOoRBmg==
-X-Google-Smtp-Source: ABdhPJzNQRVvCrMOGALQIBFmKfL1aAddZ+1fV3WdLUEhhSzKDSEkor0hrgk3iXMWsTYvfCwfjd2zGQ==
-X-Received: by 2002:a63:3157:: with SMTP id x84mr9121757pgx.256.1597654279485; 
- Mon, 17 Aug 2020 01:51:19 -0700 (PDT)
+ bh=99inUY6TcXre93Q9sK2twtbOOBRR6deMTZ0PhPm0qww=;
+ b=HjPr0h3xHfyNpxtb48Omzm/OwVawWs/TF+m6YNzkIM20q0lWri4UqjDaFPi2u1aIO3
+ +S8+VzMOe5JE94TMq6aKdi7E57g/dZK1Psa3Q6mFhFr2Z0eirQ2mntHVxWTqCR7Fngdr
+ i/kuE2aXM3KOxY/WPue4ihK/XF0glO0ATW3zHbxzOML9WHFN9gaqBlSQrNkLMuRUbsTw
+ Gxm7BNrlNlhPnsTHBRXKHFh8B//fJzt3YynlpQJAthw/pjjYleBEjl4tYW/5mIrzw65X
+ kQ7h8VkKH1UI2kF+VWTrZW6uOpwFsVfpXfeYJYxGB1Nq0p4X7imHy9I6O3l0uf6YfoS4
+ 3SUw==
+X-Gm-Message-State: AOAM532rQjFEUEPF4loW9lr+6RbPpiVfQ5qdS5m5nEb5LAHiXIf3anGZ
+ PN+7L5LpI6WzhNKi+GheYlKdvA3tfjaSag==
+X-Google-Smtp-Source: ABdhPJxI1PYzX5xFnla/0OrsT91ngDuzICc8vvTvjk1MwlEEGiGdM4gym8iVcv7QuwdBvc3ChDcwVw==
+X-Received: by 2002:a17:90a:d3c2:: with SMTP id
+ d2mr11684414pjw.112.1597654292980; 
+ Mon, 17 Aug 2020 01:51:32 -0700 (PDT)
 Received: from frankchang-ThinkPad-T490.internal.sifive.com
  (114-34-229-221.HINET-IP.hinet.net. [114.34.229.221])
- by smtp.gmail.com with ESMTPSA id d9sm16478588pgv.45.2020.08.17.01.51.17
+ by smtp.gmail.com with ESMTPSA id d9sm16478588pgv.45.2020.08.17.01.51.31
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 17 Aug 2020 01:51:19 -0700 (PDT)
+ Mon, 17 Aug 2020 01:51:32 -0700 (PDT)
 From: frank.chang@sifive.com
 To: qemu-devel@nongnu.org,
 	qemu-riscv@nongnu.org
-Subject: [RFC v4 26/70] target/riscv: rvv-1.0: floating-point square-root
- instruction
-Date: Mon, 17 Aug 2020 16:49:11 +0800
-Message-Id: <20200817084955.28793-27-frank.chang@sifive.com>
+Subject: [RFC v4 31/70] target/riscv: rvv-1.0: iota instruction
+Date: Mon, 17 Aug 2020 16:49:16 +0800
+Message-Id: <20200817084955.28793-32-frank.chang@sifive.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200817084955.28793-1-frank.chang@sifive.com>
 References: <20200817084955.28793-1-frank.chang@sifive.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::42b;
- envelope-from=frank.chang@sifive.com; helo=mail-pf1-x42b.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1033;
+ envelope-from=frank.chang@sifive.com; helo=mail-pj1-x1033.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -117,18 +117,18 @@ Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index c99575d1360..f142aa5d073 100644
+index 0992d6ac86d..7a10fc27c5f 100644
 --- a/target/riscv/insn32.decode
 +++ b/target/riscv/insn32.decode
-@@ -527,7 +527,7 @@ vfwmsac_vv      111110 . ..... ..... 001 ..... 1010111 @r_vm
- vfwmsac_vf      111110 . ..... ..... 101 ..... 1010111 @r_vm
- vfwnmsac_vv     111111 . ..... ..... 001 ..... 1010111 @r_vm
- vfwnmsac_vf     111111 . ..... ..... 101 ..... 1010111 @r_vm
--vfsqrt_v        100011 . ..... 00000 001 ..... 1010111 @r2_vm
-+vfsqrt_v        010011 . ..... 00000 001 ..... 1010111 @r2_vm
- vfmin_vv        000100 . ..... ..... 001 ..... 1010111 @r_vm
- vfmin_vf        000100 . ..... ..... 101 ..... 1010111 @r_vm
- vfmax_vv        000110 . ..... ..... 001 ..... 1010111 @r_vm
+@@ -596,7 +596,7 @@ vfirst_m        010000 . ..... 10001 010 ..... 1010111 @r2_vm
+ vmsbf_m         010100 . ..... 00001 010 ..... 1010111 @r2_vm
+ vmsif_m         010100 . ..... 00011 010 ..... 1010111 @r2_vm
+ vmsof_m         010100 . ..... 00010 010 ..... 1010111 @r2_vm
+-viota_m         010110 . ..... 10000 010 ..... 1010111 @r2_vm
++viota_m         010100 . ..... 10000 010 ..... 1010111 @r2_vm
+ vid_v           010110 . 00000 10001 010 ..... 1010111 @r1_vm
+ vext_x_v        001100 1 ..... ..... 010 ..... 1010111 @r
+ vmv_s_x         001101 1 00000 ..... 110 ..... 1010111 @r2
 -- 
 2.17.1
 
