@@ -7,79 +7,78 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24F3CC433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 15:16:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A84C9C433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 15:17:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DC389205CB
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 15:16:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 74242205CB
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 15:17:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rp0/kuAo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC389205CB
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VyZ/Nyjt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74242205CB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37602 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42142 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7gsV-0007Ue-Cr
-	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 11:16:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41678)
+	id 1k7gtU-00010D-Mv
+	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 11:17:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41434)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1k7gHr-0005xW-2l
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:38:59 -0400
-Received: from mail-wr1-x435.google.com ([2a00:1450:4864:20::435]:39236)
+ id 1k7gHc-0005M0-DS
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:38:44 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:41621)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1k7gHp-0006JP-6S
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:38:58 -0400
-Received: by mail-wr1-x435.google.com with SMTP id a5so15261137wrm.6
- for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 07:38:56 -0700 (PDT)
+ id 1k7gHa-0006Fn-Lm
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:38:44 -0400
+Received: by mail-wr1-x443.google.com with SMTP id r2so15269262wrs.8
+ for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 07:38:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ h=sender:from:to:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=I5sTwjY55tIx6VkpEdnjtkbMh7zB2PQKI/MqcK86Yew=;
- b=rp0/kuAo4+PvF6pRHbTQIfXagA74XGXDvowwYWDvzJCwVB6Ou9nozPzZymnHYdi/Tp
- B/f/57IScHxW2oPOBN56yUlWgV1xXwA8DVJsC45cIbJxGBI45ntIeshktmLoOkBsNxVN
- uoz9v7CRMPd8S0qTt2qi0cPxXGqVmlfRp8DqaK8dET9jNLrY80xv1bH23iEHieO7Jiwd
- MuHs69FOSvTs3Qmt4PmVrkadXwYp9dnYytSVFMvdWgdZbqQUhmur74iAF+NL21/p6/nO
- EEKx2LThZpgfRBNWeLJu4Jmi2i9hrZ3GO4QF5HrM2DYZPWsFH6zeREPB3HsfTgzwJOIv
- 3zbQ==
+ bh=fLQDRD2mwQArCUub7+cO8guKcXQpbRORxQdypC9xSvQ=;
+ b=VyZ/NyjtdT2xpMVT3eoqy3Bmg3wmdFW3tmQhxFbPlj1oWYSWZGcTFUGcrtBGw5AY5M
+ rwg2fLA6u8ACLXlJ+Xjdul0w4FfE9Kd6m8GvB7mTFgBMN8R0oORhKE0xZOGXipgKDQoQ
+ cZ9b88uUXSwxhOAfOJOBMWktlRV3KMOkW45iExtMoAxzNeXvUKCJnO3Rfzzi34YyCqX2
+ QIMN7rS+hHBUsue4rewT/loz+vDDQcrHYXdNcmfDuMH9jw6UX9TXnm0Yl47hx/Rix2VV
+ yHqXkcVrEVVwVx8c2CHJ3aVrAGnh4SEiYdH99+42CPjnsJdWn4oG+wifN8n3VeirhX31
+ c5pg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ h=x-gm-message-state:sender:from:to:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=I5sTwjY55tIx6VkpEdnjtkbMh7zB2PQKI/MqcK86Yew=;
- b=IFhY1QNYIaaebrl9f8b5nHoHWh4vEVFuYvqgxrOQXm1XmVqe8Xgi3EpQqA0TbI7xx5
- oABFChK6orq9YBdoGO7Fz80q34HpUVFc/OaqGQuwDN7dfaadT1Q3jSvZerJEc/G8gfy6
- jBim4JPWsBogy2StngP1LU+33WIk6COyeFl/zshyFs6kST7oUrob+MYy0G2lgMLK9NEi
- G/ahJ0+kCj2js6snGJ0Jdgnf3FidsUZZjhNtk1SR+5XDQTU9CvFjfGU7HJNxy63gGEmQ
- Df/0i/IS4AIhCOrZ+JB5ZERdVbHupkT3G48U3D8jq8Ws3hPITGWpLiEISvamql1iR7qa
- 4w7g==
-X-Gm-Message-State: AOAM5318gRaSS0dH5lw5GZ0Epn4TI3lIH7BXJ+bj4QdvJ3muCBwkBLsr
- mX59l0tDybp9N4pNl/FIsqXfehzyQfk=
-X-Google-Smtp-Source: ABdhPJyPNCXPGCbgmbMQHM/812CyyE1hU+gKY0dha3E9Czt7j+7Y1/FtN2E0s/xxP/AKWHAyCNOx0g==
-X-Received: by 2002:adf:812a:: with SMTP id 39mr15323136wrm.137.1597675135551; 
- Mon, 17 Aug 2020 07:38:55 -0700 (PDT)
+ bh=fLQDRD2mwQArCUub7+cO8guKcXQpbRORxQdypC9xSvQ=;
+ b=S/gEhDX6OiKjFE99WdDcWJWrfLklCOJG29IT2KmR6nvGUGXYL5Z6ME6BCsy/2ObTaJ
+ LluWjMBti6gv5D1Y9US85Wg52iivt3c1GqoGBVfc931Hu+uE+pvqG4aleapOslIsNvf/
+ 1F9zdlLsIzNc6yOV2htg/eSZpMiO3874uOj/UwnhSPzAtUbRFLAZB8LJKYsLHoN/Lqjs
+ p8wBRiqafsZCbZW4nmUE1zs00ZeLS5paQjZAchJObM8Un8iIU89Oi2Cqqt29EAbxKE3Z
+ yTY/Uz78CgshwYVAu6E7KcorHxo8gca0kbn0MaaTf/UXRGMOLi6gUlCZd1pO+jieNAuY
+ OnGA==
+X-Gm-Message-State: AOAM533XJ/L2iJBYN+X+iVbvQckkM3g6kOy3Y8pQbP1ZYbapanMgqvSA
+ yA6gby/9sGIIwOIxCyv7TRbkAhFy06A=
+X-Google-Smtp-Source: ABdhPJwQ/CmzJ3BPg7tkhrDp9tHJV50I5i9u/u/j1YZLZ6211kP7HxTKB/9mHvFiua93rQXYahqH3g==
+X-Received: by 2002:adf:c401:: with SMTP id v1mr15102930wrf.379.1597675121024; 
+ Mon, 17 Aug 2020 07:38:41 -0700 (PDT)
 Received: from donizetti.redhat.com ([2001:b07:6468:f312:a0d1:fc42:c610:f977])
  by smtp.gmail.com with ESMTPSA id
- i22sm34966603wrb.45.2020.08.17.07.38.54
+ i22sm34966603wrb.45.2020.08.17.07.38.40 for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 17 Aug 2020 07:38:55 -0700 (PDT)
+ Mon, 17 Aug 2020 07:38:40 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 091/150] meson: convert hw/virtio
-Date: Mon, 17 Aug 2020 16:36:24 +0200
-Message-Id: <20200817143723.343284-92-pbonzini@redhat.com>
+Subject: [PATCH 076/150] meson: convert qemu-storage-daemon
+Date: Mon, 17 Aug 2020 16:36:09 +0200
+Message-Id: <20200817143723.343284-77-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200817143723.343284-1-pbonzini@redhat.com>
 References: <20200817143723.343284-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::435;
- envelope-from=paolo.bonzini@gmail.com; helo=mail-wr1-x435.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=paolo.bonzini@gmail.com; helo=mail-wr1-x443.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -102,158 +101,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Marc-André Lureau <marcandre.lureau@redhat.com>
-
-Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/Makefile.objs        |  1 -
- hw/meson.build          |  1 +
- hw/virtio/Makefile.objs | 48 --------------------------------------
- hw/virtio/meson.build   | 51 +++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 52 insertions(+), 49 deletions(-)
- delete mode 100644 hw/virtio/Makefile.objs
- create mode 100644 hw/virtio/meson.build
+ Makefile                                            |  5 -----
+ Makefile.objs                                       | 10 ----------
+ meson.build                                         |  2 +-
+ storage-daemon/Makefile.objs                        |  3 ---
+ storage-daemon/meson.build                          | 13 +++++++++++++
+ storage-daemon/qapi/meson.build                     |  5 +----
+ .../qemu-storage-daemon.c                           |  0
+ 7 files changed, 15 insertions(+), 23 deletions(-)
+ delete mode 100644 storage-daemon/Makefile.objs
+ rename qemu-storage-daemon.c => storage-daemon/qemu-storage-daemon.c (100%)
 
-diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-index 9ebd13d7cd..a1cfb99334 100644
---- a/hw/Makefile.objs
-+++ b/hw/Makefile.objs
-@@ -32,7 +32,6 @@ devices-dirs-y += timer/
- devices-dirs-$(CONFIG_TPM) += tpm/
- devices-dirs-y += usb/
- devices-dirs-$(CONFIG_VFIO) += vfio/
--devices-dirs-y += virtio/
+diff --git a/Makefile b/Makefile
+index 135175c5ef..a523898da0 100644
+--- a/Makefile
++++ b/Makefile
+@@ -168,8 +168,6 @@ include $(SRC_PATH)/Makefile.objs
  endif
  
- common-obj-y += $(devices-dirs-y)
-diff --git a/hw/meson.build b/hw/meson.build
-index f2209d900c..8338fc4408 100644
---- a/hw/meson.build
-+++ b/hw/meson.build
-@@ -3,5 +3,6 @@ subdir('mem')
- subdir('nubus')
- subdir('semihosting')
- subdir('smbios')
-+subdir('virtio')
- subdir('watchdog')
- subdir('xen')
-diff --git a/hw/virtio/Makefile.objs b/hw/virtio/Makefile.objs
+ dummy := $(call unnest-vars,, \
+-                storage-daemon-obj-y \
+-                storage-daemon-obj-m \
+                 common-obj-y \
+                 common-obj-m)
+ 
+@@ -185,7 +183,6 @@ TARGET_DIRS_RULES := $(foreach t, all fuzz clean install, $(addsuffix /$(t), $(T
+ SOFTMMU_ALL_RULES=$(filter %-softmmu/all, $(TARGET_DIRS_RULES))
+ $(SOFTMMU_ALL_RULES): $(authz-obj-y)
+ $(SOFTMMU_ALL_RULES): $(block-obj-y)
+-$(SOFTMMU_ALL_RULES): $(storage-daemon-obj-y)
+ $(SOFTMMU_ALL_RULES): $(chardev-obj-y)
+ $(SOFTMMU_ALL_RULES): $(crypto-obj-y)
+ $(SOFTMMU_ALL_RULES): $(io-obj-y)
+@@ -276,8 +273,6 @@ Makefile: $(version-obj-y)
+ 
+ COMMON_LDADDS = libqemuutil.a
+ 
+-qemu-storage-daemon$(EXESUF): qemu-storage-daemon.o $(authz-obj-y) $(block-obj-y) $(crypto-obj-y) $(chardev-obj-y) $(io-obj-y) $(qom-obj-y) $(storage-daemon-obj-y) $(COMMON_LDADDS)
+-
+ clean: recurse-clean ninja-clean clean-ctlist
+ 	-test -f ninjatool && ./ninjatool $(if $(V),-v,) -t clean
+ # avoid old build problems by removing potentially incorrect old files
+diff --git a/Makefile.objs b/Makefile.objs
+index d7826c1e5c..e304d92954 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -33,16 +33,6 @@ io-obj-y = io/libio.fa
+ 
+ endif # CONFIG_SOFTMMU or CONFIG_TOOLS
+ 
+-#######################################################################
+-# storage-daemon-obj-y is code used by qemu-storage-daemon (these objects are
+-# used for system emulation, too, but specified separately there)
+-
+-storage-daemon-obj-y = block/ qapi/ qom/ storage-daemon/
+-storage-daemon-obj-y += blockdev.o blockdev-nbd.o iothread.o job-qmp.o
+-storage-daemon-obj-$(CONFIG_WIN32) += os-win32.o
+-storage-daemon-obj-$(CONFIG_POSIX) += os-posix.o
+-storage-daemon-obj-y += libqmp.fa
+-
+ ######################################################################
+ # Target independent part of system emulation. The long term path is to
+ # suppress *all* target specific code in case of system emulation, i.e. a
+diff --git a/meson.build b/meson.build
+index d7d10cbbaf..cae4b2dce2 100644
+--- a/meson.build
++++ b/meson.build
+@@ -586,7 +586,6 @@ subdir('util')
+ subdir('qom')
+ subdir('authz')
+ subdir('crypto')
+-subdir('storage-daemon')
+ subdir('ui')
+ 
+ 
+@@ -796,6 +795,7 @@ if have_tools
+                dependencies: [block, qemuutil], install: true)
+   endif
+ 
++  subdir('storage-daemon')
+   subdir('contrib/rdmacm-mux')
+   subdir('contrib/elf2dmp')
+ 
+diff --git a/storage-daemon/Makefile.objs b/storage-daemon/Makefile.objs
 deleted file mode 100644
-index fc91719b4a..0000000000
---- a/hw/virtio/Makefile.objs
+index 41c0d02178..0000000000
+--- a/storage-daemon/Makefile.objs
 +++ /dev/null
-@@ -1,48 +0,0 @@
--ifeq ($(CONFIG_VIRTIO),y)
--common-obj-y += virtio-bus.o
--obj-y += virtio.o
+@@ -1,3 +0,0 @@
+-storage-daemon-obj-y = qapi/libqsd-qapi.fa
 -
--obj-$(CONFIG_VHOST) += vhost.o vhost-backend.o
--common-obj-$(call lnot,$(CONFIG_VHOST)) += vhost-stub.o
--obj-$(CONFIG_VHOST_USER) += vhost-user.o
--obj-$(CONFIG_VHOST_VDPA) += vhost-vdpa.o
--
--common-obj-$(CONFIG_VIRTIO_RNG) += virtio-rng.o
--common-obj-$(CONFIG_VIRTIO_PCI) += virtio-pci.o
--common-obj-$(CONFIG_VIRTIO_MMIO) += virtio-mmio.o
--obj-$(CONFIG_VIRTIO_BALLOON) += virtio-balloon.o
--obj-$(CONFIG_VIRTIO_CRYPTO) += virtio-crypto.o
--obj-$(CONFIG_VHOST_USER_FS) += vhost-user-fs.o
--obj-$(call land,$(CONFIG_VIRTIO_CRYPTO),$(CONFIG_VIRTIO_PCI)) += virtio-crypto-pci.o
--obj-$(CONFIG_VIRTIO_PMEM) += virtio-pmem.o
--common-obj-$(call land,$(CONFIG_VIRTIO_PMEM),$(CONFIG_VIRTIO_PCI)) += virtio-pmem-pci.o
--obj-$(call land,$(CONFIG_VHOST_USER_FS),$(CONFIG_VIRTIO_PCI)) += vhost-user-fs-pci.o
--obj-$(CONFIG_VIRTIO_IOMMU) += virtio-iommu.o
--obj-$(CONFIG_VHOST_VSOCK) += vhost-vsock-common.o vhost-vsock.o
--obj-$(CONFIG_VHOST_USER_VSOCK) += vhost-vsock-common.o vhost-user-vsock.o
--obj-$(CONFIG_VIRTIO_MEM) += virtio-mem.o
--common-obj-$(call land,$(CONFIG_VIRTIO_MEM),$(CONFIG_VIRTIO_PCI)) += virtio-mem-pci.o
--
--ifeq ($(CONFIG_VIRTIO_PCI),y)
--obj-$(CONFIG_VHOST_VSOCK) += vhost-vsock-pci.o
--obj-$(CONFIG_VHOST_USER_VSOCK) += vhost-user-vsock-pci.o
--obj-$(CONFIG_VHOST_USER_BLK) += vhost-user-blk-pci.o
--obj-$(CONFIG_VHOST_USER_INPUT) += vhost-user-input-pci.o
--obj-$(CONFIG_VHOST_USER_SCSI) += vhost-user-scsi-pci.o
--obj-$(CONFIG_VHOST_SCSI) += vhost-scsi-pci.o
--obj-$(CONFIG_VIRTIO_INPUT_HOST) += virtio-input-host-pci.o
--obj-$(CONFIG_VIRTIO_INPUT) += virtio-input-pci.o
--obj-$(CONFIG_VIRTIO_RNG) += virtio-rng-pci.o
--obj-$(CONFIG_VIRTIO_BALLOON) += virtio-balloon-pci.o
--obj-$(CONFIG_VIRTIO_IOMMU) += virtio-iommu-pci.o
--obj-$(CONFIG_VIRTIO_9P) += virtio-9p-pci.o
--obj-$(CONFIG_VIRTIO_SCSI) += virtio-scsi-pci.o
--obj-$(CONFIG_VIRTIO_BLK) += virtio-blk-pci.o
--obj-$(CONFIG_VIRTIO_NET) += virtio-net-pci.o
--obj-$(CONFIG_VIRTIO_SERIAL) += virtio-serial-pci.o
--endif
--else
--common-obj-y += vhost-stub.o
--endif
--
--common-obj-$(CONFIG_ALL) += vhost-stub.o
-diff --git a/hw/virtio/meson.build b/hw/virtio/meson.build
-new file mode 100644
-index 0000000000..fbff9bc9d4
---- /dev/null
-+++ b/hw/virtio/meson.build
-@@ -0,0 +1,51 @@
-+softmmu_virtio_ss = ss.source_set()
-+softmmu_virtio_ss.add(files('virtio-bus.c'))
-+softmmu_virtio_ss.add(when: 'CONFIG_VIRTIO_PCI', if_true: files('virtio-pci.c'))
-+softmmu_virtio_ss.add(when: 'CONFIG_VIRTIO_MMIO', if_true: files('virtio-mmio.c'))
-+softmmu_virtio_ss.add(when: 'CONFIG_VHOST', if_false: files('vhost-stub.c'))
+-qemu-storage-daemon.o: storage-daemon/qapi/qapi-commands.h storage-daemon/qapi/qapi-init-commands.h
+diff --git a/storage-daemon/meson.build b/storage-daemon/meson.build
+index 35f8949924..0409acc3f5 100644
+--- a/storage-daemon/meson.build
++++ b/storage-daemon/meson.build
+@@ -1 +1,14 @@
++qsd_ss = ss.source_set()
++qsd_ss.add(files('qemu-storage-daemon.c'))
++qsd_ss.add(block, chardev, qmp, qom, qemuutil)
++qsd_ss.add_all(blockdev_ss)
 +
-+softmmu_ss.add_all(when: 'CONFIG_VIRTIO', if_true: softmmu_virtio_ss)
-+softmmu_ss.add(when: 'CONFIG_VIRTIO', if_false: files('vhost-stub.c'))
+ subdir('qapi')
 +
-+softmmu_ss.add(when: 'CONFIG_ALL', if_true: files('vhost-stub.c'))
-+
-+virtio_ss = ss.source_set()
-+virtio_ss.add(files('virtio.c'))
-+virtio_ss.add(when: 'CONFIG_VHOST', if_true: files('vhost.c', 'vhost-backend.c'))
-+virtio_ss.add(when: 'CONFIG_VHOST_USER', if_true: files('vhost-user.c'))
-+virtio_ss.add(when: 'CONFIG_VHOST_VDPA', if_true: files('vhost-vdpa.c'))
-+virtio_ss.add(when: 'CONFIG_VIRTIO_BALLOON', if_true: files('virtio-balloon.c'))
-+virtio_ss.add(when: 'CONFIG_VIRTIO_CRYPTO', if_true: files('virtio-crypto.c'))
-+virtio_ss.add(when: ['CONFIG_VIRTIO_CRYPTO', 'CONFIG_VIRTIO_PCI'], if_true: files('virtio-crypto-pci.c'))
-+virtio_ss.add(when: 'CONFIG_VHOST_USER_FS', if_true: files('vhost-user-fs.c'))
-+virtio_ss.add(when: ['CONFIG_VHOST_USER_FS', 'CONFIG_VIRTIO_PCI'], if_true: files('vhost-user-fs-pci.c'))
-+virtio_ss.add(when: 'CONFIG_VIRTIO_PMEM', if_true: files('virtio-pmem.c'))
-+virtio_ss.add(when: 'CONFIG_VHOST_VSOCK', if_true: files('vhost-vsock.c', 'vhost-vsock-common.c'))
-+virtio_ss.add(when: 'CONFIG_VHOST_USER_VSOCK', if_true: files('vhost-user-vsock.c', 'vhost-vsock-common.c'))
-+virtio_ss.add(when: 'CONFIG_VIRTIO_RNG', if_true: files('virtio-rng.c'))
-+virtio_ss.add(when: 'CONFIG_VIRTIO_IOMMU', if_true: files('virtio-iommu.c'))
-+virtio_ss.add(when: 'CONFIG_VIRTIO_MEM', if_true: files('virtio-mem.c'))
-+
-+virtio_pci_ss = ss.source_set()
-+virtio_pci_ss.add(when: 'CONFIG_VHOST_VSOCK', if_true: files('vhost-vsock-pci.c'))
-+virtio_pci_ss.add(when: 'CONFIG_VHOST_USER_VSOCK', if_true: files('vhost-user-vsock-pci.c'))
-+virtio_pci_ss.add(when: 'CONFIG_VHOST_USER_BLK', if_true: files('vhost-user-blk-pci.c'))
-+virtio_pci_ss.add(when: 'CONFIG_VHOST_USER_INPUT', if_true: files('vhost-user-input-pci.c'))
-+virtio_pci_ss.add(when: 'CONFIG_VHOST_USER_SCSI', if_true: files('vhost-user-scsi-pci.c'))
-+virtio_pci_ss.add(when: 'CONFIG_VHOST_SCSI', if_true: files('vhost-scsi-pci.c'))
-+virtio_pci_ss.add(when: 'CONFIG_VIRTIO_INPUT_HOST', if_true: files('virtio-input-host-pci.c'))
-+virtio_pci_ss.add(when: 'CONFIG_VIRTIO_INPUT', if_true: files('virtio-input-pci.c'))
-+virtio_pci_ss.add(when: 'CONFIG_VIRTIO_RNG', if_true: files('virtio-rng-pci.c'))
-+virtio_pci_ss.add(when: 'CONFIG_VIRTIO_BALLOON', if_true: files('virtio-balloon-pci.c'))
-+virtio_pci_ss.add(when: 'CONFIG_VIRTIO_9P', if_true: files('virtio-9p-pci.c'))
-+virtio_pci_ss.add(when: 'CONFIG_VIRTIO_SCSI', if_true: files('virtio-scsi-pci.c'))
-+virtio_pci_ss.add(when: 'CONFIG_VIRTIO_BLK', if_true: files('virtio-blk-pci.c'))
-+virtio_pci_ss.add(when: 'CONFIG_VIRTIO_NET', if_true: files('virtio-net-pci.c'))
-+virtio_pci_ss.add(when: 'CONFIG_VIRTIO_SERIAL', if_true: files('virtio-serial-pci.c'))
-+virtio_pci_ss.add(when: 'CONFIG_VIRTIO_PMEM', if_true: files('virtio-pmem-pci.c'))
-+virtio_pci_ss.add(when: 'CONFIG_VIRTIO_IOMMU', if_true: files('virtio-iommu-pci.c'))
-+virtio_pci_ss.add(when: 'CONFIG_VIRTIO_MEM', if_true: files('virtio-mem-pci.c'))
-+
-+virtio_ss.add_all(when: 'CONFIG_VIRTIO_PCI', if_true: virtio_pci_ss)
-+
-+specific_ss.add_all(when: 'CONFIG_VIRTIO', if_true: virtio_ss)
++if have_tools
++  qsd_ss = qsd_ss.apply(config_host, strict: false)
++  executable('qemu-storage-daemon',
++             qsd_ss.sources(),
++             dependencies: qsd_ss.dependencies(),
++             install: true)
++endif
+diff --git a/storage-daemon/qapi/meson.build b/storage-daemon/qapi/meson.build
+index 7a2b041247..cea618bec0 100644
+--- a/storage-daemon/qapi/meson.build
++++ b/storage-daemon/qapi/meson.build
+@@ -4,7 +4,4 @@ qsd_qapi_files = custom_target('QAPI files for qemu-storage-daemon',
+                                command: [ qapi_gen, '-o', 'storage-daemon/qapi', '@INPUT@' ],
+                                depend_files: [ qapi_inputs, qapi_gen_depends ])
+ 
+-static_library('qsd-qapi',
+-               qsd_qapi_files.to_list(),
+-               name_suffix: 'fa',
+-               build_by_default: false)
++qsd_ss.add(qsd_qapi_files.to_list())
+diff --git a/qemu-storage-daemon.c b/storage-daemon/qemu-storage-daemon.c
+similarity index 100%
+rename from qemu-storage-daemon.c
+rename to storage-daemon/qemu-storage-daemon.c
 -- 
 2.26.2
 
