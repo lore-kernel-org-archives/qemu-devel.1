@@ -7,79 +7,78 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99183C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 14:52:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EEDAC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 14:52:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 60BAD204FD
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 14:52:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 295B1204FD
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 14:52:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Lid5JGJC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60BAD204FD
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L167BocW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 295B1204FD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54944 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55694 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7gUX-0005fz-GX
-	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 10:52:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40812)
+	id 1k7gUj-0005ya-9k
+	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 10:52:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40644)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1k7gGy-0004Fb-8Q
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:38:05 -0400
-Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:39412)
+ id 1k7gGm-0003ns-Nx
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:37:52 -0400
+Received: from mail-wr1-x435.google.com ([2a00:1450:4864:20::435]:41870)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1k7gGw-000680-E5
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:38:03 -0400
-Received: by mail-wm1-x335.google.com with SMTP id g75so14082096wme.4
- for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 07:38:01 -0700 (PDT)
+ id 1k7gGl-00064K-0Q
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:37:52 -0400
+Received: by mail-wr1-x435.google.com with SMTP id r2so15266270wrs.8
+ for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 07:37:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ h=sender:from:to:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=dZwHbdO9HxehKFQePTOuC1KMP4DvkmrbQ/M7cw7Pcco=;
- b=Lid5JGJCu1pzO9Wxc4Vks3zGW6bw0qa+DikxWx8d4RoCRLrX3lZM3f1FRdxR6D5uKG
- Nk2Dn6ascuvSj/e6R7+f2cGOoPDAGPFpQIblXmO13X1xfFmaxBlSuqmfeVQ/Wa8H69Pw
- Y0uNqLULSEM+qIjQlF0dgYk88P4rG69oplEpg2875oeLsI+Joy2ApfmPXb2C09nku9kH
- CfTmzAVoqdqH3jJm/U0Y6QLj611DkO2qMqHj5lvBDhq3K3w6ELb8U/peN+d0lPFYKqI/
- Z50CZeSK4mIje5th6ZTirkE0dDhZEVY298nYUG4zBs5N09bZgBT3jQzp7/Ar687h4S98
- 7oxg==
+ bh=pjHPdTSEtllDij+zXCCOkgSX4mQ0mNOLN2bMHomzYEY=;
+ b=L167BocW5B37/ru9Q8OW8GKUCYY6FBFTccRI8lyDI2+teCrIuLo37TqSNTi1OD0mzV
+ ZwMWZkhM/89pa9yTPlzpUnP6UhpHK7XhNNSl4j9jxKQsYlTWuSW1fhQ54T/3t4ZrwbyA
+ HKha10FNROB6m2mee/xwrc7+e71JuoG/6V7fjGoKI07z07phv4Ek2KEa5OCyWSTrcxd3
+ wJuz8blNbOqAzQGBhoTlGg7Qjtzw8BxMB3wcR8DXxS07Nx35EUX0+JZUJMlF2ufLDP44
+ FHYpxi3hrArlTLi65c+9N9S1Bm6SwJVX5NAwL4rJpDV2Qcx/3yu40S23WWiMl1um17W5
+ bgzA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ h=x-gm-message-state:sender:from:to:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=dZwHbdO9HxehKFQePTOuC1KMP4DvkmrbQ/M7cw7Pcco=;
- b=ZVmXx7HKZDIw2DDQpnB3qBovjUd1Ex3ak0cJL4g9zds2Lv1Z9a43PRr2DgrMRN3e4T
- /jj6CepnvfnzkEmVsDOJkuFef3Pyl2SUay98QgWRyi0j+DVpdQxYSFJ0S34cqpu9Pqm3
- RFC5YGClmQen5AlsRqMjTi0Q3s2MtqgFifdrQkGPqCocQHobS57VYqLRD32K86iz8SK5
- cs0m47UyRHlMPB0y0sOklaEvQTHsOYrFTCqIr4nPYIhiXd9Nwu7A6paDd5DpcKa7g9zz
- FJ+D8+LoNtGiTWNiRPgeOuX/6ZZVuiiYG3XOy2PqSqFFvScw08GUGb5b6qJA0nihfzE0
- XKcQ==
-X-Gm-Message-State: AOAM533YdM5+CM66RjFDe6gmqk12cPvazDe2pUz0HPfNcQIihYln8kUr
- mwYqVIH5zq4y+Kwx7l5llGKcNT3GWBg=
-X-Google-Smtp-Source: ABdhPJxp1iJhjqOPd9x39Ntcfz+R/dOKnh0qwQfZoLhl0ncqByOUC7NU2KTVMViuJknI7DXQN/sHJw==
-X-Received: by 2002:a1c:f30f:: with SMTP id q15mr14686124wmq.60.1597675080295; 
- Mon, 17 Aug 2020 07:38:00 -0700 (PDT)
+ bh=pjHPdTSEtllDij+zXCCOkgSX4mQ0mNOLN2bMHomzYEY=;
+ b=GGZToI88abptZPe1gdFGmFxVVVu7affexYNNecHyXOKZiQeNMbnwge89sg9XT2zJW2
+ 25RKNEa8zSgN8u5Sc/2CicYgz3JjIsufSx6HDNBtrzTz1/8koUo7h63sBslWhNxM7vTZ
+ JQZvF6W/Bx4mK2eUG1wvUlktDEWUXDYnURvUxFPSdbxNgXBcGK1d05o50mKfF9pw7Hyd
+ F7u7EsjNG0GcAf/HUqxg+Z3Ck02asFXF8Me3noWWw7R/0Vie2YritLrUEsSxl2x31CDZ
+ FrkIX06gIgI3SKEchQ/tOG9wUen8cVquoAIuQpNA/0PWGHH+ku2bkpFAghHwOT2IyGSA
+ a6jA==
+X-Gm-Message-State: AOAM5339xEjhmQcCIuCRTu4w4QY/UX4CgjMYa8xaX4F3FuhAvhlzjPUC
+ N48kwWBcMICUj0BI6+/GIu2FjI60Tlg=
+X-Google-Smtp-Source: ABdhPJzMXPtmypvOd2d543sVK0swn9DW1dxRBx2vTDWNPDbcdzStk7t7zGlgzncRP65UuyqSawww6A==
+X-Received: by 2002:a5d:5272:: with SMTP id l18mr14149269wrc.89.1597675069360; 
+ Mon, 17 Aug 2020 07:37:49 -0700 (PDT)
 Received: from donizetti.redhat.com ([2001:b07:6468:f312:a0d1:fc42:c610:f977])
  by smtp.gmail.com with ESMTPSA id
- i22sm34966603wrb.45.2020.08.17.07.37.59
+ i22sm34966603wrb.45.2020.08.17.07.37.48 for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 17 Aug 2020 07:37:59 -0700 (PDT)
+ Mon, 17 Aug 2020 07:37:49 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 034/150] contrib/vhost-user-gpu: convert to meson
-Date: Mon, 17 Aug 2020 16:35:27 +0200
-Message-Id: <20200817143723.343284-35-pbonzini@redhat.com>
+Subject: [PATCH 022/150] meson: add sparse support
+Date: Mon, 17 Aug 2020 16:35:15 +0200
+Message-Id: <20200817143723.343284-23-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200817143723.343284-1-pbonzini@redhat.com>
 References: <20200817143723.343284-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::335;
- envelope-from=paolo.bonzini@gmail.com; helo=mail-wm1-x335.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::435;
+ envelope-from=paolo.bonzini@gmail.com; helo=mail-wr1-x435.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -102,191 +101,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Marc-André Lureau <marcandre.lureau@redhat.com>
+Do not use cgcc; instead, extract compilation commands from compile_commands.json
+and invoke sparse directly.
 
-Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Makefile                             | 18 +-----------------
- Makefile.objs                        |  1 -
- contrib/vhost-user-gpu/Makefile.objs | 10 ----------
- contrib/vhost-user-gpu/meson.build   | 13 +++++++++++++
- meson.build                          | 15 +++++++++++++++
- rules.mak                            |  7 -------
- 6 files changed, 29 insertions(+), 35 deletions(-)
- delete mode 100644 contrib/vhost-user-gpu/Makefile.objs
- create mode 100644 contrib/vhost-user-gpu/meson.build
+ Makefile                |  1 +
+ configure               |  8 ++------
+ meson.build             |  7 +++++++
+ scripts/check_sparse.py | 25 +++++++++++++++++++++++++
+ 4 files changed, 35 insertions(+), 6 deletions(-)
+ create mode 100644 scripts/check_sparse.py
 
 diff --git a/Makefile b/Makefile
-index d02910b073..44626d6a80 100644
+index 578aa99942..8288e2fbd2 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -184,16 +184,10 @@ $(call set-vpath, $(SRC_PATH))
- 
- LIBS+=-lz $(LIBS_TOOLS)
- 
--vhost-user-json-y =
- HELPERS-y = $(HELPERS)
- 
- HELPERS-$(call land,$(CONFIG_SOFTMMU),$(CONFIG_LINUX)) += qemu-bridge-helper$(EXESUF)
- 
--ifeq ($(CONFIG_LINUX)$(CONFIG_VIRGL)$(CONFIG_GBM)$(CONFIG_TOOLS),yyyy)
--HELPERS-y += vhost-user-gpu$(EXESUF)
--vhost-user-json-y += contrib/vhost-user-gpu/50-qemu-gpu.json
--endif
--
- # Sphinx does not allow building manuals into the same directory as
- # the source files, so if we're doing an in-tree QEMU build we must
- # build the manuals into a subdirectory (and then install them from
-@@ -300,7 +294,6 @@ dummy := $(call unnest-vars,, \
-                 elf2dmp-obj-y \
-                 ivshmem-client-obj-y \
-                 ivshmem-server-obj-y \
--                vhost-user-gpu-obj-y \
-                 qga-vss-dll-obj-y \
-                 block-obj-y \
-                 block-obj-m \
-@@ -314,7 +307,7 @@ dummy := $(call unnest-vars,, \
- 
- include $(SRC_PATH)/tests/Makefile.include
- 
--all: $(DOCS) $(if $(BUILD_DOCS),sphinxdocs) $(TOOLS) $(HELPERS-y) recurse-all modules $(vhost-user-json-y)
-+all: $(DOCS) $(if $(BUILD_DOCS),sphinxdocs) $(TOOLS) $(HELPERS-y) recurse-all modules
- 
- qemu-version.h: FORCE
- 	$(call quiet-command, \
-@@ -520,9 +513,6 @@ ivshmem-server$(EXESUF): $(ivshmem-server-obj-y) $(COMMON_LDADDS)
- 	$(call LINK, $^)
- endif
- 
--vhost-user-gpu$(EXESUF): $(vhost-user-gpu-obj-y) contrib/libvhost-user/libvhost-user.a $(COMMON_LDADDS)
--	$(call LINK, $^)
--
- module_block.h: $(SRC_PATH)/scripts/modules/module_block.py config-host.mak
- 	$(call quiet-command,$(PYTHON) $< $@ \
- 	$(addprefix $(SRC_PATH)/,$(patsubst %.mo,%.c,$(block-obj-m))), \
-@@ -720,12 +710,6 @@ endif
- ifneq ($(HELPERS-y),)
- 	$(call install-prog,$(HELPERS-y),$(DESTDIR)$(libexecdir))
- endif
--ifneq ($(vhost-user-json-y),)
--	$(INSTALL_DIR) "$(DESTDIR)$(qemu_datadir)/vhost-user/"
--	for x in $(vhost-user-json-y); do \
--		$(INSTALL_DATA) $$x "$(DESTDIR)$(qemu_datadir)/vhost-user/"; \
--	done
--endif
- ifdef CONFIG_TRACE_SYSTEMTAP
- 	$(INSTALL_PROG) "scripts/qemu-trace-stap" $(DESTDIR)$(bindir)
- endif
-diff --git a/Makefile.objs b/Makefile.objs
-index 0922c3ed00..2f2d4b2066 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -106,6 +106,5 @@ qga-vss-dll-obj-y = qga/
- elf2dmp-obj-y = contrib/elf2dmp/
- ivshmem-client-obj-$(CONFIG_IVSHMEM) = contrib/ivshmem-client/
- ivshmem-server-obj-$(CONFIG_IVSHMEM) = contrib/ivshmem-server/
--vhost-user-gpu-obj-y = contrib/vhost-user-gpu/
- 
- ######################################################################
-diff --git a/contrib/vhost-user-gpu/Makefile.objs b/contrib/vhost-user-gpu/Makefile.objs
-deleted file mode 100644
-index 09296091be..0000000000
---- a/contrib/vhost-user-gpu/Makefile.objs
-+++ /dev/null
-@@ -1,10 +0,0 @@
--vhost-user-gpu-obj-y = vhost-user-gpu.o virgl.o vugbm.o
--
--vhost-user-gpu.o-cflags := $(PIXMAN_CFLAGS) $(GBM_CFLAGS)
--vhost-user-gpu.o-libs := $(PIXMAN_LIBS)
--
--virgl.o-cflags := $(VIRGL_CFLAGS) $(GBM_CFLAGS)
--virgl.o-libs := $(VIRGL_LIBS)
--
--vugbm.o-cflags := $(GBM_CFLAGS)
--vugbm.o-libs := $(GBM_LIBS)
-diff --git a/contrib/vhost-user-gpu/meson.build b/contrib/vhost-user-gpu/meson.build
-new file mode 100644
-index 0000000000..6c1459f54a
---- /dev/null
-+++ b/contrib/vhost-user-gpu/meson.build
-@@ -0,0 +1,13 @@
-+if 'CONFIG_TOOLS' in config_host and 'CONFIG_VIRGL' in config_host \
-+    and 'CONFIG_GBM' in config_host and 'CONFIG_LINUX' in config_host
-+  executable('vhost-user-gpu', files('vhost-user-gpu.c', 'virgl.c', 'vugbm.c'),
-+             link_with: libvhost_user,
-+             dependencies: [qemuutil, pixman, gbm, virgl],
-+             install: true,
-+             install_dir: get_option('libexecdir'))
-+
-+  configure_file(input: '50-qemu-gpu.json.in',
-+                 output: '50-qemu-gpu.json',
-+                 configuration: config_host,
-+                 install_dir: config_host['qemu_datadir'] / 'vhost-user')
-+endif
+@@ -1254,6 +1254,7 @@ endif
+ 	$(call print-help,install,Install QEMU, documentation and tools)
+ 	$(call print-help,ctags/TAGS,Generate tags file for editors)
+ 	$(call print-help,cscope,Generate cscope index)
++	$(call print-help,sparse,Run sparse on the QEMU source)
+ 	@echo  ''
+ 	@$(if $(TARGET_DIRS), \
+ 		echo 'Architecture specific targets:'; \
+diff --git a/configure b/configure
+index 9f20bf1d36..d4172b06a7 100755
+--- a/configure
++++ b/configure
+@@ -3009,7 +3009,7 @@ fi
+ ##########################################
+ # Sparse probe
+ if test "$sparse" != "no" ; then
+-  if has cgcc; then
++  if has sparse; then
+     sparse=yes
+   else
+     if test "$sparse" = "yes" ; then
+@@ -7810,11 +7810,7 @@ echo "QEMU_CFLAGS=$QEMU_CFLAGS" >> $config_host_mak
+ echo "QEMU_CXXFLAGS=$QEMU_CXXFLAGS" >> $config_host_mak
+ echo "QEMU_INCLUDES=$QEMU_INCLUDES" >> $config_host_mak
+ if test "$sparse" = "yes" ; then
+-  echo "CC           := REAL_CC=\"\$(CC)\" cgcc"       >> $config_host_mak
+-  echo "CPP          := REAL_CC=\"\$(CPP)\" cgcc"      >> $config_host_mak
+-  echo "CXX          := REAL_CC=\"\$(CXX)\" cgcc"      >> $config_host_mak
+-  echo "HOST_CC      := REAL_CC=\"\$(HOST_CC)\" cgcc"  >> $config_host_mak
+-  echo "QEMU_CFLAGS  += -Wbitwise -Wno-transparent-union -Wno-old-initializer -Wno-non-pointer-null" >> $config_host_mak
++  echo "SPARSE_CFLAGS = -Wbitwise -Wno-transparent-union -Wno-old-initializer -Wno-non-pointer-null" >> $config_host_mak
+ fi
+ echo "QEMU_LDFLAGS=$QEMU_LDFLAGS" >> $config_host_mak
+ echo "LDFLAGS_NOPIE=$LDFLAGS_NOPIE" >> $config_host_mak
 diff --git a/meson.build b/meson.build
-index a8c22b20e5..6f17032e95 100644
+index e6f9dfb070..e15e072a8c 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -79,6 +79,8 @@ if 'CONFIG_GNUTLS' in config_host
-   gnutls = declare_dependency(compile_args: config_host['GNUTLS_CFLAGS'].split(),
-                               link_args: config_host['GNUTLS_LIBS'].split())
- endif
-+pixman = declare_dependency(compile_args: config_host['PIXMAN_CFLAGS'].split(),
-+                            link_args: config_host['PIXMAN_LIBS'].split())
- seccomp = not_found
- if 'CONFIG_SECCOMP' in config_host
-   seccomp = declare_dependency(compile_args: config_host['SECCOMP_CFLAGS'].split(),
-@@ -93,6 +95,16 @@ if 'CONFIG_LIBISCSI' in config_host
-   libiscsi = declare_dependency(compile_args: config_host['LIBISCSI_CFLAGS'].split(),
-                                 link_args: config_host['LIBISCSI_LIBS'].split())
- endif
-+gbm = not_found
-+if 'CONFIG_GBM' in config_host
-+  gbm = declare_dependency(compile_args: config_host['GBM_CFLAGS'].split(),
-+                           link_args: config_host['GBM_LIBS'].split())
-+endif
-+virgl = not_found
-+if 'CONFIG_VIRGL' in config_host
-+  virgl = declare_dependency(compile_args: config_host['VIRGL_CFLAGS'].split(),
-+                             link_args: config_host['VIRGL_LIBS'].split())
-+endif
+@@ -17,6 +17,13 @@ add_project_arguments(config_host['QEMU_INCLUDES'].split(),
  
- target_dirs = config_host['TARGET_DIRS'].split()
- have_user = false
-@@ -261,6 +273,9 @@ if have_tools
-   if 'CONFIG_VHOST_USER' in config_host
-     subdir('contrib/libvhost-user')
-     subdir('contrib/vhost-user-blk')
-+    if 'CONFIG_LINUX' in config_host
-+      subdir('contrib/vhost-user-gpu')
-+    endif
-     subdir('contrib/vhost-user-input')
-     subdir('contrib/vhost-user-scsi')
-   endif
-diff --git a/rules.mak b/rules.mak
-index 7aefd37b5d..1aa6394079 100644
---- a/rules.mak
-+++ b/rules.mak
-@@ -402,13 +402,6 @@ TEXI2MAN = $(call quiet-command, \
- %.8:
- 	$(call TEXI2MAN)
+ python = import('python').find_installation()
  
--GEN_SUBST = $(call quiet-command, \
--	sed -e "s!@libexecdir@!$(libexecdir)!g" < $< > $@, \
--	"GEN","$@")
--
--%.json: %.json.in
--	$(call GEN_SUBST)
--
- # Support for building multiple output files by atomically executing
- # a single rule which depends on several input files (so the rule
- # will be executed exactly once, not once per output file, and
++if 'SPARSE_CFLAGS' in config_host
++  run_target('sparse',
++             command: [find_program('scripts/check_sparse.py'),
++                       config_host['SPARSE_CFLAGS'].split(),
++                       'compile_commands.json'])
++endif
++
+ if host_machine.system() == 'darwin'
+   add_languages('objc', required: false, native: false)
+ endif
+diff --git a/scripts/check_sparse.py b/scripts/check_sparse.py
+new file mode 100644
+index 0000000000..0de7aa55d9
+--- /dev/null
++++ b/scripts/check_sparse.py
+@@ -0,0 +1,25 @@
++#! /usr/bin/env python3
++
++# Invoke sparse based on the contents of compile_commands.json
++
++import json
++import subprocess
++import sys
++import shlex
++
++def extract_cflags(shcmd):
++    cflags = shlex.split(shcmd)
++    return [x for x in cflags
++            if x.startswith('-D') or x.startswith('-I') or x.startswith('-W')
++               or x.startswith('-std=')]
++
++cflags = sys.argv[1:-1]
++with open(sys.argv[-1], 'r') as fd:
++    compile_commands = json.load(fd)
++
++for cmd in compile_commands:
++    cmd = ['sparse'] + cflags + extract_cflags(cmd['command']) + [cmd['file']]
++    print(' '.join((shlex.quote(x) for x in cmd)))
++    r = subprocess.run(cmd)
++    if r.returncode != 0:
++        sys.exit(r.returncode)
 -- 
 2.26.2
 
