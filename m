@@ -8,76 +8,76 @@ X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AE41C433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 14:03:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE743C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 14:03:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 397842065D
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 14:03:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 79AE82065D
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 14:03:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YF/rUwhG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 397842065D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RhTy0gqh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79AE82065D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50138 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51006 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7fjG-00051M-EO
-	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 10:03:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59396)
+	id 1k7fjO-0005MV-ML
+	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 10:03:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59442)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
- id 1k7fhx-0003Hv-J8; Mon, 17 Aug 2020 10:01:53 -0400
-Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:35510)
+ id 1k7fhz-0003K3-Nk; Mon, 17 Aug 2020 10:01:56 -0400
+Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:38216)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
- id 1k7fhv-0001We-0L; Mon, 17 Aug 2020 10:01:53 -0400
-Received: by mail-lj1-x242.google.com with SMTP id i10so17606858ljn.2;
- Mon, 17 Aug 2020 07:01:50 -0700 (PDT)
+ id 1k7fhw-0001XC-LX; Mon, 17 Aug 2020 10:01:55 -0400
+Received: by mail-lj1-x244.google.com with SMTP id m22so17575665ljj.5;
+ Mon, 17 Aug 2020 07:01:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=YijezSjj37b3KI8DzXtGc07DWsdbUe75Toiwcts1NQA=;
- b=YF/rUwhGmFUPujnQ7vq2K4GiXayIL+d1C3l7mjkgDdTVho3yD9xIOoiz5U8AM8aqPF
- 8iWs1m2cK79vVFH+b9yDbmxCRxGBNtcQM8bjztfAKnfnAARhK/3Dzt+vF1d81V2+1gBu
- P00+ciwOq2zFSFEFVtLccCBpq4eB62qgLDd1BuRVLwLDXjqS4t4OXZvlKAzaOqG3grNO
- P5mTWOkKvenav7Dkr5p7waOvbjd6CKzY9ocK0NQ5Z1vJRWhI0nZSlmDNPUmZ4znDF+iR
- UOJaoFql9QYDiwgXznV0bU7QW+iVHUA9x5mIP6sv/FLKcxBCuIlwos6QVUwn9TTvRul4
- xIkQ==
+ bh=BfvYle3AyXZXtRgGPAz105k3QnmpEvKZtYecnlYInTY=;
+ b=RhTy0gqh9Yly0157weuxmBvUxq8VjOW1EFeb1iJeIftEi/dL1SVY4JGprwb8u10vSK
+ AwupqxcTryarWb8I3k1FoDrODibDX42iZknZe0SbL1mk+9eotvQIwQzAIGkViPlQ2y9y
+ Qv4DLyKz4FoJB84Qt3xCgibLN07k3KiOhF37VQCOoXb/7HAb6P2Ge3DzrvDs48yzk/WL
+ lIdqHsusRR3RgUNed5L4MuoAcZoxM8BpqUvwKCXnZecV6obu3u+DTU6cQxReYbVKfqx5
+ KYJYFTn3agn1coFOTEzy3Kc9lemr/OPwv45tT6JTJA8jHz+MgKz/f7GTDrV+mQ1TgXN1
+ NKNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=YijezSjj37b3KI8DzXtGc07DWsdbUe75Toiwcts1NQA=;
- b=E4G4YHseFqpSG/XoGxzrE7FM+H6RxN8exKWlrXhRKGfGY60GAyEWxztE0dEy7ev0Ds
- rGmvWwDA07TdR/SMCSlSavyrPWETu4rmkCaSHuG9uz5WU49ptJTXdpdhaz3OMoI4Ptff
- CLwad5XCrX+gjkHoTvoEYyRHufZcMsL3XdeVt5bvrTv3nyPl0VDp+y+GbZFDgWCuyg43
- z+uZX8cao8MhtcT0ETWIJ0JrCmnmdMn3qdkWXPWaMIBLRcIvCYzRuJIiqV2zf+mQVj0/
- q7vzfhl31X/w+xosE7W4n7QkJcTp52g+SiAeTx8ulhk+2oClIzN7y0UhtTm0+p+mZwu6
- sN9g==
-X-Gm-Message-State: AOAM5338rwBDlZkwNz93lgHkEZ4nf1rZM1eUWhK71HDgNGdZLYAyxv2q
- REEoV5F6L3e4ejWnHOKWYv54V3rXidb8cWi6
-X-Google-Smtp-Source: ABdhPJzdYWfSc11z4Ar/F9bT0efMtFUq66I4lQZbOv2CKizNS/WvgzZNAb5IpbihimdKGSiVtTKMug==
-X-Received: by 2002:a05:651c:110:: with SMTP id
- a16mr7987230ljb.152.1597672908652; 
- Mon, 17 Aug 2020 07:01:48 -0700 (PDT)
+ bh=BfvYle3AyXZXtRgGPAz105k3QnmpEvKZtYecnlYInTY=;
+ b=KCHz2As0ABMph1aPgz1zj8EuJG9dF7zjxzfvflmLbvQeaur3dn3GcwNwp8AoLlh/Vw
+ z6CXR27R8/YQ+PnGOiQ/kYjhoNFB87QMfY8SfgPuRCP0Vh2++zO/Gyag1uQJSTfI/JTH
+ oRVcMKRXrKClQ8wydqzY552xzNk2LjzyA7pzD5q8cwxPxlaZpP8b4fcUc2EwBaFZET7x
+ I0EMgf+slSJlKpdfw+4dOs3cjFfqZHDDmE1wTqLEMB+oHZxc9GNPF5BpMEQ6zVgYWi5X
+ lB/T/TcoMlXHrNL3xXhyJ84b/biawxKN7nVm5rGDrLySGcDAOBZrMqzDMevom++WwdUi
+ KssQ==
+X-Gm-Message-State: AOAM532KzaRTa5qelxjIpzr7GxG9yfdwdwxdE+ocKbWPnVRboYvR6eYZ
+ KXFiz1SWg0Gb/idoXFC7zVcsaFjAfmWopkwx
+X-Google-Smtp-Source: ABdhPJzMvQzyBO7QqU37PJDf0WR3Xmr8FnD78Al4zAgaPcQx/SWS/a66sBBPHq8CxWEeImqvdMgJMg==
+X-Received: by 2002:a2e:8e70:: with SMTP id t16mr7975048ljk.81.1597672910407; 
+ Mon, 17 Aug 2020 07:01:50 -0700 (PDT)
 Received: from gmail.com (81-231-232-130-no39.tbcn.telia.com. [81.231.232.130])
- by smtp.gmail.com with ESMTPSA id b16sm5063513ljk.24.2020.08.17.07.01.47
+ by smtp.gmail.com with ESMTPSA id 29sm5111941ljv.72.2020.08.17.07.01.49
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 17 Aug 2020 07:01:48 -0700 (PDT)
+ Mon, 17 Aug 2020 07:01:49 -0700 (PDT)
 From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v1 2/5] target/microblaze: mbar: Move LOG_DIS to before sleep
-Date: Mon, 17 Aug 2020 16:01:41 +0200
-Message-Id: <20200817140144.373403-3-edgar.iglesias@gmail.com>
+Subject: [PATCH v1 3/5] target/microblaze: mbar: Add support for data-access
+ barriers
+Date: Mon, 17 Aug 2020 16:01:42 +0200
+Message-Id: <20200817140144.373403-4-edgar.iglesias@gmail.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200817140144.373403-1-edgar.iglesias@gmail.com>
 References: <20200817140144.373403-1-edgar.iglesias@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::242;
- envelope-from=edgar.iglesias@gmail.com; helo=mail-lj1-x242.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::244;
+ envelope-from=edgar.iglesias@gmail.com; helo=mail-lj1-x244.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -10
@@ -110,35 +110,29 @@ Sender: "Qemu-devel"
 
 From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-Move LOG_DIS log to before sleeping handling so that it logs
-for sleep instructions aswell.
+Add support for data-access barriers.
 
 Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 ---
- target/microblaze/translate.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ target/microblaze/translate.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
 diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
-index 47637f152b..c1be76d4c8 100644
+index c1be76d4c8..c58f334a0f 100644
 --- a/target/microblaze/translate.c
 +++ b/target/microblaze/translate.c
-@@ -1231,6 +1231,8 @@ static void dec_br(DisasContext *dc)
-     if (mbar == 2 && dc->imm == 4) {
-         uint16_t mbar_imm = dc->rd;
+@@ -1233,6 +1233,11 @@ static void dec_br(DisasContext *dc)
  
-+        LOG_DIS("mbar %d\n", mbar_imm);
+         LOG_DIS("mbar %d\n", mbar_imm);
+ 
++        /* Data access memory barrier.  */
++        if ((mbar_imm & 2) == 0) {
++            tcg_gen_mb(TCG_BAR_SC | TCG_MO_ALL);
++        }
 +
          /* mbar IMM & 16 decodes to sleep.  */
          if (mbar_imm & 16) {
              TCGv_i32 tmp_hlt = tcg_const_i32(EXCP_HLT);
-@@ -1248,7 +1250,6 @@ static void dec_br(DisasContext *dc)
-             tcg_temp_free_i32(tmp_1);
-             return;
-         }
--        LOG_DIS("mbar %d\n", mbar_imm);
-         /* Break the TB.  */
-         dc->cpustate_changed = 1;
-         return;
 -- 
 2.25.1
 
