@@ -7,78 +7,77 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1150C433E4
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 09:08:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CED62C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 09:08:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6B01920829
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 09:08:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 870D02063A
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 09:08:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="AUasqCyM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B01920829
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="a1Q0fS0A"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 870D02063A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40824 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41628 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7b7j-0007NL-H7
-	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 05:08:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45728)
+	id 1k7b7r-0007gj-NT
+	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 05:08:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45940)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
- id 1k7asG-0001UZ-7d
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 04:52:12 -0400
-Received: from mail-pl1-x62d.google.com ([2607:f8b0:4864:20::62d]:43178)
+ id 1k7asX-00020X-Kj
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 04:52:29 -0400
+Received: from mail-pf1-x42d.google.com ([2607:f8b0:4864:20::42d]:46722)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
- id 1k7asE-0005Ca-7w
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 04:52:11 -0400
-Received: by mail-pl1-x62d.google.com with SMTP id t10so7157155plz.10
- for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 01:52:09 -0700 (PDT)
+ id 1k7asV-0005Ez-UE
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 04:52:29 -0400
+Received: by mail-pf1-x42d.google.com with SMTP id 74so7878793pfx.13
+ for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 01:52:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=/QB6MM6my3+zghgo3JxQFAhPc1E5NUjOg7eIVy9GGiM=;
- b=AUasqCyMHH/quxy2GkiAZpoXVLxNbf0Ciw+/mSYgHnuqB9+vzI8vR0c0KEwl0MjKE6
- +6EDc8xhEoACAsKhiZQjnuaDLyaS3fQ/8fdAwt3XkUoPOGvRslkkDj6frjdshBF7NXTJ
- IskfGsVTtM+QFUQHmECrn/YfiDU/NIRhahUz9+BqIACgZb9uGOIBjWx2q6eFU6Pue0/W
- rIQuA1mwaAwkrBLtBHdGUxR1cKtpSfC7J90Z7mgkig6pdIE4DH7Yp1SK8OP02b9NAb+z
- 4iaJxwbIga/HRoTP+WD1XMiXVBWwppRISy+V6xGAxpEbqdqhS48cfvUZDSRm9d2TzXuL
- 49Mw==
+ bh=/GnwhWW2LoppIMQ4Co1GACx8GcXTAa6/KQWK39IohYo=;
+ b=a1Q0fS0AN7AVYCFOGJmjrMMUGb4ODu5QZRUHj66JRG3xuR5XVqI8182gFVxsDanWp3
+ Q0rnqhaqgCnCuSVx5JgIwn4ojCUDH8leeeAr6hMAPg36fxUQyiuxv3R9Pjb5CiBdLBtm
+ q13tvNaoxXpiY6tLaVS6R89DK7HwbT1xHgWVwuBGazZBfeqXyvoQlWVcHCp1iPV2NfwM
+ D3HIu7+NcKxOLufDUC4LY3Wgu9KXzqbv1zNw9IQp75AGPJlntpjyWwwzgqgq9x8u+MXy
+ sE+2eregGeQmqWasZONnjRQqt+GaQJupStVxFzN9nM6a7W9UuxPcQ5KBZ35Q3aBVg1we
+ ZW8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=/QB6MM6my3+zghgo3JxQFAhPc1E5NUjOg7eIVy9GGiM=;
- b=l/PDcbhboWBDw9D8GeiR8LTlwK3RhSVkC91gKqZhH6gJXj0AZAbvd5OCiYGoKeLoco
- JYH0fGQWuhGzmxzKkyfeZypvw3k+M7n1u4+NiFKHKE2t0MTy8iBM5xLB1Fv8fzLBlDms
- tlrE/kcuYoBMZD1CxW7wGGFU3cikGhaWR0BjqojZsOktGKu6YdckVZIPGWi9IEWxiVAR
- 1BOwyqHeRK2RkGvNG9vXACw8b3MmPeZOrA/20VQW/8HSe2TjeskPdzf2HKCrUDDKezCm
- kpLTxO1otN95AjDpjpDVx7yCJ4jhc3dwKtTMjVRs6k9vv73YNIBhdNFFv4eP9qRyfU3I
- 7arA==
-X-Gm-Message-State: AOAM530vvJMHR5s9sjjLBOkLVGY8WPo8szykoyrcFSw02Fo+Q80LS192
- roRHiSfYNaWXJi4097Xm/PCDhRp50SG54A==
-X-Google-Smtp-Source: ABdhPJyl4SSmCNGtZQ14VRWLhDGfJ3EW2FiZTQKQPA9K5cvLhs0oCYth8CjuCtpUQw+MOkDI8b4Y2w==
-X-Received: by 2002:a17:902:ac87:: with SMTP id
- h7mr10721972plr.238.1597654328847; 
- Mon, 17 Aug 2020 01:52:08 -0700 (PDT)
+ bh=/GnwhWW2LoppIMQ4Co1GACx8GcXTAa6/KQWK39IohYo=;
+ b=g8u6TGZCI82q6SAVUuaz8DlhinBJpRNiidVxWmTmejwajT2OIIVZW19dbQqJhCx4WR
+ 4qFoM/98512Y/9yaxja7n6GAPgpec6lyHf1gFDMMPl5SoVVN3/+hdm63ZAfPyKF2V6y8
+ rcyyxCToUTsI16UCV8zVbfhlTOEMj9mIePrYkqzXgUKcxrQtJlnoscedP4i09fUfSFJd
+ rgQ58wsxp/8zk652MdqbDdsshud/n1TlJo/IVEP90U+oilhax34tFjUA5t0flT0L9wA7
+ QYq4LA9Oy/RaoL176at+nAR+OJsR/tr6wwAAUf8Y44SIsJYXkYaC57xA+138A0kdnRwj
+ AQxw==
+X-Gm-Message-State: AOAM532JvePD2tlZKPf7eYAYMa49X5HikLEDIe6h5q2LJk2FUyS9H4KV
+ kuqlvfvv48ROepvy8cc7F9hSLVWMjr+NvQ==
+X-Google-Smtp-Source: ABdhPJze1rqFYLc+wyuZkFSglCKksHv2jZ7dL5YrBN30uRMxrK8LUm7b9t+8G9T2Z54jxDnzhTHFrg==
+X-Received: by 2002:a63:f44b:: with SMTP id p11mr5010240pgk.324.1597654345057; 
+ Mon, 17 Aug 2020 01:52:25 -0700 (PDT)
 Received: from frankchang-ThinkPad-T490.internal.sifive.com
  (114-34-229-221.HINET-IP.hinet.net. [114.34.229.221])
- by smtp.gmail.com with ESMTPSA id d9sm16478588pgv.45.2020.08.17.01.52.06
+ by smtp.gmail.com with ESMTPSA id d9sm16478588pgv.45.2020.08.17.01.52.23
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 17 Aug 2020 01:52:08 -0700 (PDT)
+ Mon, 17 Aug 2020 01:52:24 -0700 (PDT)
 From: frank.chang@sifive.com
 To: qemu-devel@nongnu.org,
 	qemu-riscv@nongnu.org
-Subject: [RFC v4 44/70] target/riscv: rvv-1.0: widening integer multiply-add
+Subject: [RFC v4 50/70] target/riscv: rvv-1.0: floating-point compare
  instructions
-Date: Mon, 17 Aug 2020 16:49:29 +0800
-Message-Id: <20200817084955.28793-45-frank.chang@sifive.com>
+Date: Mon, 17 Aug 2020 16:49:35 +0800
+Message-Id: <20200817084955.28793-51-frank.chang@sifive.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200817084955.28793-1-frank.chang@sifive.com>
 References: <20200817084955.28793-1-frank.chang@sifive.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::62d;
- envelope-from=frank.chang@sifive.com; helo=mail-pl1-x62d.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::42d;
+ envelope-from=frank.chang@sifive.com; helo=mail-pf1-x42d.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -112,28 +111,50 @@ Sender: "Qemu-devel"
 From: Frank Chang <frank.chang@sifive.com>
 
 Signed-off-by: Frank Chang <frank.chang@sifive.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/riscv/insn32.decode | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ target/riscv/vector_helper.c | 8 --------
+ 1 file changed, 8 deletions(-)
 
-diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index c4fe9767585..2e305d492d8 100644
---- a/target/riscv/insn32.decode
-+++ b/target/riscv/insn32.decode
-@@ -438,9 +438,9 @@ vwmaccu_vv      111100 . ..... ..... 010 ..... 1010111 @r_vm
- vwmaccu_vx      111100 . ..... ..... 110 ..... 1010111 @r_vm
- vwmacc_vv       111101 . ..... ..... 010 ..... 1010111 @r_vm
- vwmacc_vx       111101 . ..... ..... 110 ..... 1010111 @r_vm
--vwmaccsu_vv     111110 . ..... ..... 010 ..... 1010111 @r_vm
--vwmaccsu_vx     111110 . ..... ..... 110 ..... 1010111 @r_vm
--vwmaccus_vx     111111 . ..... ..... 110 ..... 1010111 @r_vm
-+vwmaccsu_vv     111111 . ..... ..... 010 ..... 1010111 @r_vm
-+vwmaccsu_vx     111111 . ..... ..... 110 ..... 1010111 @r_vm
-+vwmaccus_vx     111110 . ..... ..... 110 ..... 1010111 @r_vm
- vmv_v_v         010111 1 00000 ..... 000 ..... 1010111 @r2
- vmv_v_x         010111 1 00000 ..... 100 ..... 1010111 @r2
- vmv_v_i         010111 1 00000 ..... 011 ..... 1010111 @r2
+diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
+index e6441f18465..766622d3878 100644
+--- a/target/riscv/vector_helper.c
++++ b/target/riscv/vector_helper.c
+@@ -3963,7 +3963,6 @@ void HELPER(NAME)(void *vd, void *v0, void *vs1, void *vs2,   \
+ {                                                             \
+     uint32_t vm = vext_vm(desc);                              \
+     uint32_t vl = env->vl;                                    \
+-    uint32_t vlmax = vext_maxsz(desc) / sizeof(ETYPE);        \
+     uint32_t i;                                               \
+                                                               \
+     for (i = 0; i < vl; i++) {                                \
+@@ -3975,9 +3974,6 @@ void HELPER(NAME)(void *vd, void *v0, void *vs1, void *vs2,   \
+         vext_set_elem_mask(vd, i,                             \
+                            DO_OP(s2, s1, &env->fp_status));   \
+     }                                                         \
+-    for (; i < vlmax; i++) {                                  \
+-        vext_set_elem_mask(vd, i, 0);                         \
+-    }                                                         \
+ }
+ 
+ GEN_VEXT_CMP_VV_ENV(vmfeq_vv_h, uint16_t, H2, float16_eq_quiet)
+@@ -3990,7 +3986,6 @@ void HELPER(NAME)(void *vd, void *v0, uint64_t s1, void *vs2,       \
+ {                                                                   \
+     uint32_t vm = vext_vm(desc);                                    \
+     uint32_t vl = env->vl;                                          \
+-    uint32_t vlmax = vext_max_elems(desc, ctzl(sizeof(ETYPE)));     \
+     uint32_t i;                                                     \
+                                                                     \
+     for (i = 0; i < vl; i++) {                                      \
+@@ -4001,9 +3996,6 @@ void HELPER(NAME)(void *vd, void *v0, uint64_t s1, void *vs2,       \
+         vext_set_elem_mask(vd, i,                                   \
+                            DO_OP(s2, (ETYPE)s1, &env->fp_status));  \
+     }                                                               \
+-    for (; i < vlmax; i++) {                                        \
+-        vext_set_elem_mask(vd, i, 0);                               \
+-    }                                                               \
+ }
+ 
+ GEN_VEXT_CMP_VF(vmfeq_vf_h, uint16_t, H2, float16_eq_quiet)
 -- 
 2.17.1
 
