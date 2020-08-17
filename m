@@ -7,79 +7,79 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 231B1C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 15:13:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0208AC433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 15:13:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E4D8F205CB
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 15:13:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C0185205CB
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 15:13:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TwFCZUfb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E4D8F205CB
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ns15tRZI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0185205CB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46222 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49110 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7gor-0007bi-4G
-	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 11:13:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41586)
+	id 1k7gpW-0000PS-05
+	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 11:13:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41526)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1k7gHm-0005l2-4r
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:38:54 -0400
-Received: from mail-wm1-x32b.google.com ([2a00:1450:4864:20::32b]:32796)
+ id 1k7gHi-0005cH-MU
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:38:50 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:53387)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1k7gHj-0006Hh-RJ
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:38:53 -0400
-Received: by mail-wm1-x32b.google.com with SMTP id f18so13347781wmc.0
- for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 07:38:51 -0700 (PDT)
+ id 1k7gHg-0006HE-Ua
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:38:50 -0400
+Received: by mail-wm1-x343.google.com with SMTP id g8so13425487wmk.3
+ for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 07:38:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=m1vdLqyZHYPVpKZYlNKe7l8hkA0P1BlGDeAlf+ZccV8=;
- b=TwFCZUfbcAbSQqFLDAquMRXayRE9J9oLiZniVjSp/9IiVBP1cfTJm2iakYPr1rIYH/
- HcpL1YNDMZ4l9/YTpf5kjnk1kxn+rYqh3I69ElbIh33PG+0aW27pY3HJGrJ2P4js+a4I
- pIA//j3SlKgunmlPqEQaifH8gG4TgDRSNybZJ0yUhW+2hm6/GJ0S5HJ+4hBnnUoNHWNb
- Y3/3JMDCMqOTe36ScTAZHLz5hbYPQF3UGFS7g2xTbWOPM/8+ZbBCPxeEbmXq54WDy1TA
- 2pLlMNvEApq0KkF+nw/4MxrPm9apLVmfY2aBVWTI9BquBtPSeEIZmV8VghZ3jRyofOm+
- MgEw==
+ bh=QkSUKaQSRTqap5DCYMIG/XBpbSZg51wHSxqCC8/Qs+8=;
+ b=Ns15tRZIMJSFvN6JSndeX0TVvYj8oJnRod3bzN73pq98jYYMLRMLzrm7inKVju7Q4e
+ ejGZzmSR64a+XK1X0mVY2gJlioCdIqSFXI1yoBPwCnG7TVJdhTEQAdag0pVcGfIH37bQ
+ tie4ktR/x30QSJjAH8sf8WGqjEyBEruZEKpl7Rn7qs2zqcG0CPyDF0hXZBM5NGMj2O8N
+ WwZ+/gniNnJFM0d+EtO+EWt04YNfuaqiKHKA2LHT8fcq/fNizdFHL18xQD9QaAa22TnP
+ PucWO3i0BC2BTNvUUBrncVN5yd2CWzwhRlb4kveuwFTuJB/MHrrNHPwwoZdV65UvqxEy
+ ENFQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=m1vdLqyZHYPVpKZYlNKe7l8hkA0P1BlGDeAlf+ZccV8=;
- b=JLCFaePO4CKq9ppM3WXGzcYsjvXMyAtMcmwpuYW5PRkGg/WxbKac/O/IGJFyBmf2Y2
- aZ/N9t8Zp6T+ge6X1nYf7YNXOFVUajjMiAU8xHm6lYt2r/epoch9EvowT//enZmmZVd/
- iJ7guE1WH16cP/kxQu1dOqs9tP8VvEbvmXKzYlTsTHrv4aEOZmIoSFAWJ2bOG6p6X09Q
- vD/gevyuyZDeJIQRzKEOy250Gc054P49HAbR7zPted/mkT1eVk/rgMkdcqwmHtDXWvbC
- vBIFnisxCWGN4HjW7mdFy+avFzDz0iMnBiCr6fZRnSY0+jjQ9kCp638qk+ZMhXjnQClU
- 6IYw==
-X-Gm-Message-State: AOAM533f/0IkG/OtHpcrRUdIk7LXWl5AjmFn6ZHAgEPUg6bqGIvOzORk
- U3IDupIpVKuOzOkSUwtZsovz2R6Z31w=
-X-Google-Smtp-Source: ABdhPJzuaETWV/G0wtOayZ3IH4/EG5FASw+qiFW1nCEd6TJP5RiA8l8zGJ+6dnsYCZtZQPmJJJjpGQ==
-X-Received: by 2002:a1c:de41:: with SMTP id v62mr15679638wmg.163.1597675130084; 
- Mon, 17 Aug 2020 07:38:50 -0700 (PDT)
+ bh=QkSUKaQSRTqap5DCYMIG/XBpbSZg51wHSxqCC8/Qs+8=;
+ b=OjmdM4ZhFVok45dvwYW65FvVkLuH/N/mGP2fiqlQh6U3hLBMsWUedQJQRGrt5KmbpQ
+ /5b+FaJCCSty+/ZqKU++iLVbOh7MDx+DidTGb80+Lo+3YD+EETJPy+WkO7ZDapQbGv+j
+ M8vga8cso2jqjVdN2crV8G/5H/dxsh9DVGK8AAkXSmSZZqOQAOQ+Z5Cm0noKTdzfMS3v
+ JPEmwxg47W/Vz9/KsQfrFfd2AXzDyqbvTGplofkfblQptpbtiqNZZh2Cz+QxhW12Gz0b
+ l2NP1Qer680zZLtm+xxWb8sCauoWsxHvxIVpYjda05QYWG8c1T1n4tANuPs3ZWxYW7P4
+ wHSw==
+X-Gm-Message-State: AOAM530mO9+8Og60p5g0z1vJifBNS2kJ7Hj4M7GpfxT0crvERZVitKoV
+ jSALHEKkDpG+hw6QovEKHJCpZKR1NPY=
+X-Google-Smtp-Source: ABdhPJxmjQt8Mtz+OdrAdvGIQ+GcVLWDkmtSgWLhkax5qpc11lj08H5E5cTp4dX4NpvT4M0xR63prA==
+X-Received: by 2002:a1c:f30f:: with SMTP id q15mr14689214wmq.60.1597675127281; 
+ Mon, 17 Aug 2020 07:38:47 -0700 (PDT)
 Received: from donizetti.redhat.com ([2001:b07:6468:f312:a0d1:fc42:c610:f977])
  by smtp.gmail.com with ESMTPSA id
- i22sm34966603wrb.45.2020.08.17.07.38.49
+ i22sm34966603wrb.45.2020.08.17.07.38.46
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 17 Aug 2020 07:38:49 -0700 (PDT)
+ Mon, 17 Aug 2020 07:38:46 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 085/150] meson: convert hw/core
-Date: Mon, 17 Aug 2020 16:36:18 +0200
-Message-Id: <20200817143723.343284-86-pbonzini@redhat.com>
+Subject: [PATCH 082/150] meson: convert disas directory to Meson
+Date: Mon, 17 Aug 2020 16:36:15 +0200
+Message-Id: <20200817143723.343284-83-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200817143723.343284-1-pbonzini@redhat.com>
 References: <20200817143723.343284-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::32b;
- envelope-from=paolo.bonzini@gmail.com; helo=mail-wm1-x32b.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::343;
+ envelope-from=paolo.bonzini@gmail.com; helo=mail-wm1-x343.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -112,147 +112,136 @@ From: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/Makefile.objs       |  1 -
- hw/core/Makefile.objs  | 34 -----------------------------
- hw/core/meson.build    | 49 ++++++++++++++++++++++++++++++++++++++++++
- hw/meson.build         |  1 +
- tests/Makefile.include | 10 +--------
- 5 files changed, 51 insertions(+), 44 deletions(-)
- delete mode 100644 hw/core/Makefile.objs
- create mode 100644 hw/core/meson.build
+ Makefile.objs               |  2 --
+ disas/Makefile.objs         | 30 ------------------------------
+ disas/libvixl/Makefile.objs |  5 -----
+ disas/libvixl/meson.build   |  7 +++++++
+ disas/meson.build           | 27 +++++++++++++++++++++++++++
+ meson.build                 |  1 +
+ 6 files changed, 35 insertions(+), 37 deletions(-)
+ delete mode 100644 disas/Makefile.objs
+ delete mode 100644 disas/libvixl/Makefile.objs
+ create mode 100644 disas/libvixl/meson.build
+ create mode 100644 disas/meson.build
 
-diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-index d204a906af..bdf8bdf256 100644
---- a/hw/Makefile.objs
-+++ b/hw/Makefile.objs
-@@ -1,4 +1,3 @@
--devices-dirs-y = core/
- ifeq ($(CONFIG_SOFTMMU), y)
- devices-dirs-$(call lor,$(CONFIG_VIRTIO_9P),$(call land,$(CONFIG_VIRTFS),$(CONFIG_XEN))) += 9pfs/
- devices-dirs-y += acpi/
-diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
-deleted file mode 100644
-index d8fee8effe..0000000000
---- a/hw/core/Makefile.objs
-+++ /dev/null
-@@ -1,34 +0,0 @@
--# core qdev-related obj files, also used by *-user:
--common-obj-y += qdev.o qdev-properties.o
--common-obj-y += bus.o
--common-obj-y += cpu.o
--common-obj-y += resettable.o
--common-obj-y += hotplug.o
--common-obj-y += vmstate-if.o
--# irq.o needed for qdev GPIO handling:
--common-obj-y += irq.o
--common-obj-y += clock.o qdev-clock.o
--
--common-obj-$(CONFIG_SOFTMMU) += reset.o
--common-obj-$(CONFIG_SOFTMMU) += qdev-fw.o
--common-obj-$(CONFIG_SOFTMMU) += fw-path-provider.o
--common-obj-$(CONFIG_SOFTMMU) += nmi.o
--common-obj-$(CONFIG_SOFTMMU) += vm-change-state-handler.o
--common-obj-$(CONFIG_SOFTMMU) += qdev-properties-system.o
--common-obj-$(CONFIG_SOFTMMU) += sysbus.o
--common-obj-$(CONFIG_SOFTMMU) += machine.o
--common-obj-$(CONFIG_SOFTMMU) += null-machine.o
--common-obj-$(CONFIG_SOFTMMU) += loader.o
--common-obj-$(CONFIG_SOFTMMU) += machine-hmp-cmds.o
--common-obj-$(CONFIG_SOFTMMU) += numa.o
--common-obj-$(CONFIG_SOFTMMU) += clock-vmstate.o
--obj-$(CONFIG_SOFTMMU) += machine-qmp-cmds.o
--
--common-obj-$(CONFIG_XILINX_AXI) += stream.o
--common-obj-$(CONFIG_PTIMER) += ptimer.o
--common-obj-$(CONFIG_FITLOADER) += loader-fit.o
--common-obj-$(CONFIG_REGISTER) += register.o
--common-obj-$(CONFIG_OR_IRQ) += or-irq.o
--common-obj-$(CONFIG_SPLIT_IRQ) += split-irq.o
--common-obj-$(CONFIG_PLATFORM_BUS) += platform-bus.o
--common-obj-$(CONFIG_GENERIC_LOADER) += generic-loader.o
-diff --git a/hw/core/meson.build b/hw/core/meson.build
-new file mode 100644
-index 0000000000..fc91f98075
---- /dev/null
-+++ b/hw/core/meson.build
-@@ -0,0 +1,49 @@
-+# core qdev-related obj files, also used by *-user and unit tests
-+hwcore_files = files(
-+  'bus.c',
-+  'fw-path-provider.c',
-+  'hotplug.c',
-+  'qdev-properties.c',
-+  'qdev.c',
-+  'reset.c',
-+  'resettable.c',
-+  'vmstate-if.c',
-+  # irq.c needed for qdev GPIO handling:
-+  'irq.c',
-+  'clock.c',
-+  'qdev-clock.c',
-+)
-+
-+libhwcore = static_library('hwcore', sources: hwcore_files + genh,
-+                           name_suffix: 'fa',
-+                           build_by_default: false)
-+hwcore = declare_dependency(link_whole: libhwcore)
-+common_ss.add(hwcore)
-+
-+common_ss.add(files('cpu.c'))
-+common_ss.add(when: 'CONFIG_FITLOADER', if_true: files('loader-fit.c'))
-+common_ss.add(when: 'CONFIG_GENERIC_LOADER', if_true: files('generic-loader.c'))
-+common_ss.add(when: 'CONFIG_OR_IRQ', if_true: files('or-irq.c'))
-+common_ss.add(when: 'CONFIG_PLATFORM_BUS', if_true: files('platform-bus.c'))
-+common_ss.add(when: 'CONFIG_PTIMER', if_true: files('ptimer.c'))
-+common_ss.add(when: 'CONFIG_REGISTER', if_true: files('register.c'))
-+common_ss.add(when: 'CONFIG_SPLIT_IRQ', if_true: files('split-irq.c'))
-+common_ss.add(when: 'CONFIG_XILINX_AXI', if_true: files('stream.c'))
-+
-+softmmu_ss.add(files(
-+  'loader.c',
-+  'machine-hmp-cmds.c',
-+  'machine.c',
-+  'nmi.c',
-+  'null-machine.c',
-+  'qdev-fw.c',
-+  'qdev-properties-system.c',
-+  'sysbus.c',
-+  'vm-change-state-handler.c',
-+  'clock-vmstate.c',
-+))
-+
-+specific_ss.add(when: 'CONFIG_SOFTMMU', if_true: files(
-+  'machine-qmp-cmds.c',
-+  'numa.c',
-+))
-diff --git a/hw/meson.build b/hw/meson.build
-index 08112a5e4b..fe7c466460 100644
---- a/hw/meson.build
-+++ b/hw/meson.build
-@@ -1 +1,2 @@
-+subdir('core')
- subdir('xen')
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 425c8ce699..b6d96614cb 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -244,15 +244,7 @@ tests/test-bufferiszero$(EXESUF): tests/test-bufferiszero.o $(test-util-obj-y)
- tests/atomic_add-bench$(EXESUF): tests/atomic_add-bench.o $(test-util-obj-y)
- tests/atomic64-bench$(EXESUF): tests/atomic64-bench.o $(test-util-obj-y)
+diff --git a/Makefile.objs b/Makefile.objs
+index 7158031c0c..3b32a4c9bb 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -74,8 +74,6 @@ endif # CONFIG_SOFTMMU
+ # Target-independent parts used in system and user emulation
  
--tests/test-qdev-global-props$(EXESUF): tests/test-qdev-global-props.o \
--	hw/core/qdev.o hw/core/qdev-properties.o hw/core/hotplug.o\
--	hw/core/bus.o \
--	hw/core/resettable.o \
--	hw/core/irq.o \
--	hw/core/fw-path-provider.o \
--	hw/core/reset.o \
--	hw/core/vmstate-if.o \
--	hw/core/clock.o hw/core/qdev-clock.o \
-+tests/test-qdev-global-props$(EXESUF): tests/test-qdev-global-props.o hw/core/libhwcore.fa \
- 	$(test-qapi-obj-y)
- tests/test-vmstate$(EXESUF): tests/test-vmstate.o migration/libmigration.fa \
- 	$(test-io-obj-y)
+ common-obj-y += hw/
+-common-obj-y += qom/
+-common-obj-y += disas/
+ 
+ ######################################################################
+ # Resource file for Windows executables
+diff --git a/disas/Makefile.objs b/disas/Makefile.objs
+deleted file mode 100644
+index 3c1cdce026..0000000000
+--- a/disas/Makefile.objs
++++ /dev/null
+@@ -1,30 +0,0 @@
+-
+-common-obj-$(CONFIG_ALPHA_DIS) += alpha.o
+-common-obj-$(CONFIG_ARM_DIS) += arm.o
+-common-obj-$(CONFIG_ARM_A64_DIS) += arm-a64.o
+-common-obj-$(CONFIG_ARM_A64_DIS) += libvixl/
+-libvixldir = $(SRC_PATH)/disas/libvixl
+-# The -Wno-sign-compare is needed only for gcc 4.6, which complains about
+-# some signed-unsigned equality comparisons in libvixl which later gcc
+-# versions do not.
+-arm-a64.o-cflags := -I$(libvixldir) -Wno-sign-compare
+-common-obj-$(CONFIG_CRIS_DIS) += cris.o
+-common-obj-$(CONFIG_HPPA_DIS) += hppa.o
+-common-obj-$(CONFIG_I386_DIS) += i386.o
+-common-obj-$(CONFIG_M68K_DIS) += m68k.o
+-common-obj-$(CONFIG_MICROBLAZE_DIS) += microblaze.o
+-common-obj-$(CONFIG_MIPS_DIS) += mips.o
+-common-obj-$(CONFIG_NANOMIPS_DIS) += nanomips.o
+-common-obj-$(CONFIG_NIOS2_DIS) += nios2.o
+-common-obj-$(CONFIG_MOXIE_DIS) += moxie.o
+-common-obj-$(CONFIG_PPC_DIS) += ppc.o
+-common-obj-$(CONFIG_RISCV_DIS) += riscv.o
+-common-obj-$(CONFIG_S390_DIS) += s390.o
+-common-obj-$(CONFIG_SH4_DIS) += sh4.o
+-common-obj-$(CONFIG_SPARC_DIS) += sparc.o
+-common-obj-$(CONFIG_LM32_DIS) += lm32.o
+-common-obj-$(CONFIG_XTENSA_DIS) += xtensa.o
+-
+-# TODO: As long as the TCG interpreter and its generated code depend
+-# on the QEMU target, we cannot compile the disassembler here.
+-#common-obj-$(CONFIG_TCI_DIS) += tci.o
+diff --git a/disas/libvixl/Makefile.objs b/disas/libvixl/Makefile.objs
+deleted file mode 100644
+index 99a637f6a0..0000000000
+--- a/disas/libvixl/Makefile.objs
++++ /dev/null
+@@ -1,5 +0,0 @@
+-common-obj-$(CONFIG_ARM_A64_DIS) = vixl/utils.o \
+-               vixl/compiler-intrinsics.o \
+-               vixl/a64/instructions-a64.o \
+-               vixl/a64/decoder-a64.o \
+-               vixl/a64/disasm-a64.o
+diff --git a/disas/libvixl/meson.build b/disas/libvixl/meson.build
+new file mode 100644
+index 0000000000..5e2eb33e8e
+--- /dev/null
++++ b/disas/libvixl/meson.build
+@@ -0,0 +1,7 @@
++libvixl_ss.add(files(
++  'vixl/a64/decoder-a64.cc',
++  'vixl/a64/disasm-a64.cc',
++  'vixl/a64/instructions-a64.cc',
++  'vixl/compiler-intrinsics.cc',
++  'vixl/utils.cc',
++))
+diff --git a/disas/meson.build b/disas/meson.build
+new file mode 100644
+index 0000000000..0527d69128
+--- /dev/null
++++ b/disas/meson.build
+@@ -0,0 +1,27 @@
++libvixl_ss = ss.source_set()
++subdir('libvixl')
++
++common_ss.add(when: 'CONFIG_ALPHA_DIS', if_true: files('alpha.c'))
++common_ss.add(when: 'CONFIG_ARM_A64_DIS', if_true: files('arm-a64.cc'))
++common_ss.add_all(when: 'CONFIG_ARM_A64_DIS', if_true: libvixl_ss)
++common_ss.add(when: 'CONFIG_ARM_DIS', if_true: files('arm.c'))
++common_ss.add(when: 'CONFIG_CRIS_DIS', if_true: files('cris.c'))
++common_ss.add(when: 'CONFIG_HPPA_DIS', if_true: files('hppa.c'))
++common_ss.add(when: 'CONFIG_I386_DIS', if_true: files('i386.c'))
++common_ss.add(when: 'CONFIG_LM32_DIS', if_true: files('lm32.c'))
++common_ss.add(when: 'CONFIG_M68K_DIS', if_true: files('m68k.c'))
++common_ss.add(when: 'CONFIG_MICROBLAZE_DIS', if_true: files('microblaze.c'))
++common_ss.add(when: 'CONFIG_MIPS_DIS', if_true: files('mips.c'))
++common_ss.add(when: 'CONFIG_MOXIE_DIS', if_true: files('moxie.c'))
++common_ss.add(when: 'CONFIG_NANOMIPS_DIS', if_true: files('nanomips.cpp'))
++common_ss.add(when: 'CONFIG_NIOS2_DIS', if_true: files('nios2.c'))
++common_ss.add(when: 'CONFIG_PPC_DIS', if_true: files('ppc.c'))
++common_ss.add(when: 'CONFIG_RISCV_DIS', if_true: files('riscv.c'))
++common_ss.add(when: 'CONFIG_S390_DIS', if_true: files('s390.c'))
++common_ss.add(when: 'CONFIG_SH4_DIS', if_true: files('sh4.c'))
++common_ss.add(when: 'CONFIG_SPARC_DIS', if_true: files('sparc.c'))
++common_ss.add(when: 'CONFIG_XTENSA_DIS', if_true: files('xtensa.c'))
++
++# TODO: As long as the TCG interpreter and its generated code depend
++# on the QEMU target, we cannot compile the disassembler here.
++#common_ss.add(when: 'CONFIG_TCI_DIS', if_true: files('tci.c'))
+diff --git a/meson.build b/meson.build
+index dd80401d11..acd730ba92 100644
+--- a/meson.build
++++ b/meson.build
+@@ -669,6 +669,7 @@ common_ss.add(files('cpus-common.c'))
+ 
+ subdir('softmmu')
+ subdir('backends')
++subdir('disas')
+ subdir('migration')
+ subdir('monitor')
+ subdir('net')
 -- 
 2.26.2
 
