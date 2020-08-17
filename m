@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F030C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 15:44:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EEA6C433E3
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 15:45:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DCF5C22D01
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 15:44:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2FF5922CF8
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 15:45:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Bdpfgdes"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCF5C22D01
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bXb92SqZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FF5922CF8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58632 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59134 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7hJf-000426-1T
-	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 11:44:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43050)
+	id 1k7hJj-0004FT-D2
+	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 11:44:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43054)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k7gLJ-0003uz-Th
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:42:33 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:34311
- helo=us-smtp-delivery-1.mimecast.com)
+ id 1k7gLK-0003ww-Ni
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:42:34 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:46634
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k7gLH-0006wq-Et
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:42:33 -0400
+ id 1k7gLI-0006x3-B4
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:42:34 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597675350;
+ s=mimecast20190719; t=1597675351;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=mg+j2SJ3/MSJ1rV+xP0Unf5Jl+JGy4lzP4mrgp3eBaA=;
- b=BdpfgdesRWDAYOjVH5M30M0ZI8oP6QHUZwX2rpLjYRyZWAOBEvrMYOeTpZIY9dn2nn2Qcc
- hJOa624rCf7eJDVH3numYfARwyPbVY6C9EOBwYa0cTbLodCfk6Pwqla0s5qLlcnEqpuSTb
- F7yVfE7BEismXpeDToM5MZ0wUg6htzk=
+ bh=0Qqlus7n1b/LCKuGfQDu5fJLszwM3oQDDtyxx2p4i/g=;
+ b=bXb92SqZ5Fb8FaIoVU6yOZlQsaV0cBDTqTyCfjf4VIBJfEieMaWCJBn8B6xysekVYSiDtL
+ eBWfeQTkrzhCAodNY2LP20Be+6uSwKKGPdD/A6V2ml2TlOVs3RJTJWeSf4oWtJ+OY37jCl
+ 16UauIgZqKdKp2ykJa/cdHa8PBQTCNw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-148-qU8a9XQmPqm9-xPNU9lqrg-1; Mon, 17 Aug 2020 10:42:28 -0400
-X-MC-Unique: qU8a9XQmPqm9-xPNU9lqrg-1
+ us-mta-396-OfEj5LypMA-aFL489S_FOQ-1; Mon, 17 Aug 2020 10:42:29 -0400
+X-MC-Unique: OfEj5LypMA-aFL489S_FOQ-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F27271005E75
- for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 14:42:27 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D507281F000
+ for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 14:42:28 +0000 (UTC)
 Received: from donizetti.redhat.com (ovpn-113-20.ams2.redhat.com
  [10.36.113.20])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 56E90756AB
- for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 14:42:27 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 549B670C3D
+ for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 14:42:28 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 144/150] meson: move SDL and SDL-image detection to meson
-Date: Mon, 17 Aug 2020 16:40:47 +0200
-Message-Id: <20200817144053.345107-49-pbonzini@redhat.com>
+Subject: [PATCH 145/150] meson: convert VNC and dependent libraries to meson
+Date: Mon, 17 Aug 2020 16:40:48 +0200
+Message-Id: <20200817144053.345107-50-pbonzini@redhat.com>
 In-Reply-To: <20200817143723.343284-1-pbonzini@redhat.com>
 References: <20200817143723.343284-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -74,17 +74,18 @@ X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/17 05:03:47
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/17 05:13:21
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,304 +104,290 @@ Sender: "Qemu-devel"
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- chardev/meson.build |   2 +-
- configure           | 142 +++-----------------------------------------
- meson.build         |  26 +++++---
- meson_options.txt   |   2 +
- ui/meson.build      |   4 +-
- 5 files changed, 32 insertions(+), 144 deletions(-)
- create mode 100644 meson_options.txt
+ configure         | 122 +++++-----------------------------------------
+ meson.build       |  40 +++++++++------
+ meson_options.txt |   4 ++
+ ui/meson.build    |  10 ++--
+ 4 files changed, 45 insertions(+), 131 deletions(-)
 
-diff --git a/chardev/meson.build b/chardev/meson.build
-index f79efaaf09..993cfaf235 100644
---- a/chardev/meson.build
-+++ b/chardev/meson.build
-@@ -36,7 +36,7 @@ softmmu_ss.add(when: ['CONFIG_SPICE', spice], if_true: files('spice.c'))
- 
- chardev_modules = {}
- 
--if config_host.has_key('CONFIG_BRLAPI') and config_host.has_key('CONFIG_SDL')
-+if config_host.has_key('CONFIG_BRLAPI') and sdl.found()
-   module_ss = ss.source_set()
-   module_ss.add(when: [sdl, brlapi], if_true: files('baum.c'))
-   chardev_modules += { 'brlapi': module_ss }
 diff --git a/configure b/configure
-index d76cae818d..dd8f9923b0 100755
+index dd8f9923b0..48aafd2e55 100755
 --- a/configure
 +++ b/configure
-@@ -376,8 +376,8 @@ curses=""
- docs=""
- fdt=""
- netmap="no"
--sdl=""
--sdl_image=""
-+sdl="auto"
-+sdl_image="auto"
+@@ -380,12 +380,12 @@ sdl="auto"
+ sdl_image="auto"
  virtfs=""
  mpath=""
- vnc="yes"
-@@ -1088,13 +1088,13 @@ for opt do
-     # configure to be used by RPM and similar macros that set
-     # lots of directory switches by default.
+-vnc="yes"
++vnc="enabled"
+ sparse="no"
+ vde=""
+-vnc_sasl=""
+-vnc_jpeg=""
+-vnc_png=""
++vnc_sasl="auto"
++vnc_jpeg="auto"
++vnc_png="auto"
+ xkbcommon=""
+ xen=""
+ xen_ctrl_version=""
+@@ -1108,9 +1108,9 @@ for opt do
    ;;
--  --disable-sdl) sdl="no"
-+  --disable-sdl) sdl="disabled"
+   --enable-mpath) mpath="yes"
    ;;
--  --enable-sdl) sdl="yes"
-+  --enable-sdl) sdl="enabled"
+-  --disable-vnc) vnc="no"
++  --disable-vnc) vnc="disabled"
    ;;
--  --disable-sdl-image) sdl_image="no"
-+  --disable-sdl-image) sdl_image="disabled"
+-  --enable-vnc) vnc="yes"
++  --enable-vnc) vnc="enabled"
    ;;
--  --enable-sdl-image) sdl_image="yes"
-+  --enable-sdl-image) sdl_image="enabled"
+   --oss-lib=*) oss_lib="$optarg"
    ;;
-   --disable-qom-cast-debug) qom_cast_debug="no"
+@@ -1146,17 +1146,17 @@ for opt do
    ;;
-@@ -2386,7 +2386,7 @@ if test "$cocoa" = "yes"; then
-         error_exit "Cocoa and GTK UIs cannot both be enabled at once"
-     fi
-     gtk=no
--    sdl=no
-+    sdl=disabled
- fi
- 
- # Some versions of Mac OS X incorrectly define SIZE_MAX
-@@ -3285,125 +3285,6 @@ if test "$vte" != "no"; then
+   --disable-strip) strip_opt="no"
+   ;;
+-  --disable-vnc-sasl) vnc_sasl="no"
++  --disable-vnc-sasl) vnc_sasl="disabled"
+   ;;
+-  --enable-vnc-sasl) vnc_sasl="yes"
++  --enable-vnc-sasl) vnc_sasl="enabled"
+   ;;
+-  --disable-vnc-jpeg) vnc_jpeg="no"
++  --disable-vnc-jpeg) vnc_jpeg="disabled"
+   ;;
+-  --enable-vnc-jpeg) vnc_jpeg="yes"
++  --enable-vnc-jpeg) vnc_jpeg="enabled"
+   ;;
+-  --disable-vnc-png) vnc_png="no"
++  --disable-vnc-png) vnc_png="disabled"
+   ;;
+-  --enable-vnc-png) vnc_png="yes"
++  --enable-vnc-png) vnc_png="enabled"
+   ;;
+   --disable-slirp) slirp="no"
+   ;;
+@@ -3379,85 +3379,6 @@ EOF
      fi
  fi
  
 -##########################################
--# SDL probe
--
--# Look for sdl configuration program (pkg-config or sdl2-config).  Try
--# sdl2-config even without cross prefix, and favour pkg-config over sdl2-config.
--
--sdl_probe ()
--{
--  if $pkg_config sdl2 --exists; then
--    sdlconfig="$pkg_config sdl2"
--    sdlversion=$($sdlconfig --modversion 2>/dev/null)
--  elif has "$sdl2_config"; then
--    sdlconfig="$sdl2_config"
--    sdlversion=$($sdlconfig --version)
--  else
--    if test "$sdl" = "yes" ; then
--      feature_not_found "sdl" "Install SDL2-devel"
--    fi
--    sdl=no
--    # no need to do the rest
--    return
--  fi
--  if test -n "$cross_prefix" && test "$(basename "$sdlconfig")" = sdl2-config; then
--    echo warning: using "\"$sdlconfig\"" to detect cross-compiled sdl >&2
--  fi
--
--  cat > $TMPC << EOF
--#include <SDL.h>
--#undef main /* We don't want SDL to override our main() */
--int main( void ) { return SDL_Init (SDL_INIT_VIDEO); }
--EOF
--  sdl_cflags=$($sdlconfig --cflags 2>/dev/null)
--  sdl_cflags="$sdl_cflags -Wno-undef"  # workaround 2.0.8 bug
--  if test "$static" = "yes" ; then
--    if $pkg_config sdl2 --exists; then
--      sdl_libs=$($pkg_config sdl2 --static --libs 2>/dev/null)
--    else
--      sdl_libs=$($sdlconfig --static-libs 2>/dev/null)
--    fi
--  else
--    sdl_libs=$($sdlconfig --libs 2>/dev/null)
--  fi
--  if compile_prog "$sdl_cflags" "$sdl_libs" ; then
--    sdl=yes
--
--    # static link with sdl ? (note: sdl.pc's --static --libs is broken)
--    if test "$sdl" = "yes" && test "$static" = "yes" ; then
--      if test $? = 0 && echo $sdl_libs | grep -- -laa > /dev/null; then
--         sdl_libs="$sdl_libs $(aalib-config --static-libs 2>/dev/null)"
--         sdl_cflags="$sdl_cflags $(aalib-config --cflags 2>/dev/null)"
--      fi
--      if compile_prog "$sdl_cflags" "$sdl_libs" ; then
--	:
--      else
--        sdl=no
--      fi
--    fi # static link
--  else # sdl not found
--    if test "$sdl" = "yes" ; then
--      feature_not_found "sdl" "Install SDL2 devel"
--    fi
--    sdl=no
--  fi # sdl compile test
--}
--
--sdl_image_probe ()
--{
--    if test "$sdl_image" != "no" ; then
--        if $pkg_config SDL2_image --exists; then
--            if test "$static" = "yes"; then
--                sdl_image_libs=$($pkg_config SDL2_image --libs --static 2>/dev/null)
--            else
--                sdl_image_libs=$($pkg_config SDL2_image --libs 2>/dev/null)
--            fi
--            sdl_image_cflags=$($pkg_config SDL2_image --cflags 2>/dev/null)
--            sdl_image=yes
--
--            sdl_cflags="$sdl_cflags $sdl_image_cflags"
--            sdl_libs="$sdl_libs $sdl_image_libs"
--        else
--            if test "$sdl_image" = "yes" ; then
--                feature_not_found "sdl_image" "Install SDL Image devel"
--            else
--                sdl_image=no
--            fi
--        fi
--    fi
--}
--
--if test "$sdl" != "no" ; then
--  sdl_probe
--fi
--
--if test "$sdl" = "yes" ; then
--  sdl_image_probe
--else
--  if test "$sdl_image" = "yes"; then
--    echo "warning: SDL Image requested, but SDL is not available, disabling"
--  fi
--  sdl_image=no
--fi
--
--if test "$sdl" = "yes" ; then
+-# VNC SASL detection
+-if test "$vnc" = "yes" && test "$vnc_sasl" != "no" ; then
 -  cat > $TMPC <<EOF
--#include <SDL.h>
--#if defined(SDL_VIDEO_DRIVER_X11)
--#include <X11/XKBlib.h>
--#else
--#error No x11 support
--#endif
--int main(void) { return 0; }
+-#include <sasl/sasl.h>
+-#include <stdio.h>
+-int main(void) { sasl_server_init(NULL, "qemu"); return 0; }
 -EOF
--  if compile_prog "$sdl_cflags $x11_cflags" "$sdl_libs $x11_libs" ; then
--    need_x11=yes
--    sdl_cflags="$sdl_cflags $x11_cflags"
--    sdl_libs="$sdl_libs $x11_libs"
+-  # Assuming Cyrus-SASL installed in /usr prefix
+-  # QEMU defines struct iovec in "qemu/osdep.h",
+-  # we don't want libsasl to redefine it in <sasl/sasl.h>.
+-  vnc_sasl_cflags="-DSTRUCT_IOVEC_DEFINED"
+-  vnc_sasl_libs="-lsasl2"
+-  if compile_prog "$vnc_sasl_cflags" "$vnc_sasl_libs" ; then
+-    vnc_sasl=yes
+-    libs_softmmu="$vnc_sasl_libs $libs_softmmu"
+-    QEMU_CFLAGS="$QEMU_CFLAGS $vnc_sasl_cflags"
+-  else
+-    if test "$vnc_sasl" = "yes" ; then
+-      feature_not_found "vnc-sasl" "Install Cyrus SASL devel"
+-    fi
+-    vnc_sasl=no
+-  fi
+-fi
+-
+-##########################################
+-# VNC JPEG detection
+-if test "$vnc" = "yes" && test "$vnc_jpeg" != "no" ; then
+-cat > $TMPC <<EOF
+-#include <stdio.h>
+-#include <jpeglib.h>
+-int main(void) { struct jpeg_compress_struct s; jpeg_create_compress(&s); return 0; }
+-EOF
+-    vnc_jpeg_cflags=""
+-    vnc_jpeg_libs="-ljpeg"
+-  if compile_prog "$vnc_jpeg_cflags" "$vnc_jpeg_libs" ; then
+-    vnc_jpeg=yes
+-    libs_softmmu="$vnc_jpeg_libs $libs_softmmu"
+-    QEMU_CFLAGS="$QEMU_CFLAGS $vnc_jpeg_cflags"
+-  else
+-    if test "$vnc_jpeg" = "yes" ; then
+-      feature_not_found "vnc-jpeg" "Install libjpeg-turbo devel"
+-    fi
+-    vnc_jpeg=no
+-  fi
+-fi
+-
+-##########################################
+-# VNC PNG detection
+-if test "$vnc" = "yes" && test "$vnc_png" != "no" ; then
+-cat > $TMPC <<EOF
+-//#include <stdio.h>
+-#include <png.h>
+-#include <stddef.h>
+-int main(void) {
+-    png_structp png_ptr;
+-    png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+-    return png_ptr != 0;
+-}
+-EOF
+-  if $pkg_config libpng --exists; then
+-    vnc_png_cflags=$($pkg_config libpng --cflags)
+-    vnc_png_libs=$($pkg_config libpng --libs)
+-  else
+-    vnc_png_cflags=""
+-    vnc_png_libs="-lpng"
+-  fi
+-  if compile_prog "$vnc_png_cflags" "$vnc_png_libs" ; then
+-    vnc_png=yes
+-    libs_softmmu="$vnc_png_libs $libs_softmmu"
+-    QEMU_CFLAGS="$QEMU_CFLAGS $vnc_png_cflags"
+-  else
+-    if test "$vnc_png" = "yes" ; then
+-      feature_not_found "vnc-png" "Install libpng devel"
+-    fi
+-    vnc_png=no
 -  fi
 -fi
 -
  ##########################################
- # RDMA needs OpenFabrics libraries
- if test "$rdma" != "no" ; then
-@@ -7004,14 +6885,6 @@ if test "$have_x11" = "yes" && test "$need_x11" = "yes"; then
-   echo "X11_CFLAGS=$x11_cflags" >> $config_host_mak
-   echo "X11_LIBS=$x11_libs" >> $config_host_mak
+ # xkbcommon probe
+ if test "$xkbcommon" != "no" ; then
+@@ -6838,24 +6759,6 @@ if test "$audio_win_int" = "yes" ; then
  fi
--if test "$sdl" = "yes" ; then
--  echo "CONFIG_SDL=m" >> $config_host_mak
--  echo "SDL_CFLAGS=$sdl_cflags" >> $config_host_mak
--  echo "SDL_LIBS=$sdl_libs" >> $config_host_mak
--  if test "$sdl_image" = "yes" ; then
--      echo "CONFIG_SDL_IMAGE=y" >> $config_host_mak
--  fi
+ echo "CONFIG_BDRV_RW_WHITELIST=$block_drv_rw_whitelist" >> $config_host_mak
+ echo "CONFIG_BDRV_RO_WHITELIST=$block_drv_ro_whitelist" >> $config_host_mak
+-if test "$vnc" = "yes" ; then
+-  echo "CONFIG_VNC=y" >> $config_host_mak
 -fi
- if test "$cocoa" = "yes" ; then
-   echo "CONFIG_COCOA=y" >> $config_host_mak
- fi
-@@ -8394,6 +8267,7 @@ NINJA=$PWD/ninjatool $meson setup \
-         -Dstrip=$(if test "$strip_opt" = yes; then echo true; else echo false; fi) \
+-if test "$vnc_sasl" = "yes" ; then
+-  echo "CONFIG_VNC_SASL=y" >> $config_host_mak
+-fi
+-echo "SASL_CFLAGS=$vnc_sasl_cflags" >> $config_host_mak
+-echo "SASL_LIBS=$vnc_sasl_libs" >> $config_host_mak
+-if test "$vnc_jpeg" = "yes" ; then
+-  echo "CONFIG_VNC_JPEG=y" >> $config_host_mak
+-fi
+-echo "JPEG_CFLAGS=$vnc_jpeg_cflags" >> $config_host_mak
+-echo "JPEG_LIBS=$vnc_jpeg_libs" >> $config_host_mak
+-if test "$vnc_png" = "yes" ; then
+-  echo "CONFIG_VNC_PNG=y" >> $config_host_mak
+-fi
+-echo "PNG_CFLAGS=$vnc_png_cflags" >> $config_host_mak
+-echo "PNG_LIBS=$vnc_png_libs" >> $config_host_mak
+ if test "$xkbcommon" = "yes" ; then
+   echo "CONFIG_XKBCOMMON=y" >> $config_host_mak
+   echo "XKBCOMMON_CFLAGS=$xkbcommon_cflags" >> $config_host_mak
+@@ -8268,6 +8171,7 @@ NINJA=$PWD/ninjatool $meson setup \
          -Db_pie=$(if test "$pie" = yes; then echo true; else echo false; fi) \
          -Db_coverage=$(if test "$gcov" = yes; then echo true; else echo false; fi) \
-+	-Dsdl=$sdl -Dsdl_image=$sdl_image \
+ 	-Dsdl=$sdl -Dsdl_image=$sdl_image \
++	-Dvnc=$vnc -Dvnc_sasl=$vnc_sasl -Dvnc_jpeg=$vnc_jpeg -Dvnc_png=$vnc_png \
          $cross_arg \
          "$PWD" "$source_path"
  
 diff --git a/meson.build b/meson.build
-index 3c402e7c7a..f67440c6e1 100644
+index f67440c6e1..d7d359a196 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -11,6 +11,7 @@ cc = meson.get_compiler('c')
- config_host = keyval.load(meson.current_build_dir() / 'config-host.mak')
- config_all_disas = keyval.load(meson.current_build_dir() / 'config-all-disas.mak')
- enable_modules = 'CONFIG_MODULES' in config_host
-+enable_static = 'CONFIG_STATIC' in config_host
- build_docs = 'BUILD_DOCS' in config_host
- config_host_data = configuration_data()
- genh = []
-@@ -214,13 +215,22 @@ brlapi = not_found
- if 'CONFIG_BRLAPI' in config_host
-   brlapi = declare_dependency(link_args: config_host['BRLAPI_LIBS'].split())
+@@ -300,20 +300,24 @@ if 'CONFIG_GIO' in config_host
+   gio = declare_dependency(compile_args: config_host['GIO_CFLAGS'].split(),
+                            link_args: config_host['GIO_LIBS'].split())
  endif
-+
-+sdl = dependency('sdl2', required: get_option('sdl'), static: enable_static)
-+sdl_image = not_found
- sdlwindows = false
--sdl = not_found
--if 'CONFIG_SDL' in config_host
--  sdl = declare_dependency(compile_args: config_host['SDL_CFLAGS'].split(),
--                           link_args: config_host['SDL_LIBS'].split())
--  sdlwindows = config_host['SDL_LIBS'].contains('-mwindows')
-+if sdl.found()
-+  sdlwindows = sdl.get_configtool_variable('libs').split().contains('-mwindows')
-+  sdl_image = dependency('sdl-image', required: get_option('sdl_image'),
++vnc = not_found
+ png = not_found
+-if 'CONFIG_VNC_PNG' in config_host
+-  png = declare_dependency(compile_args: config_host['PNG_CFLAGS'].split(),
+-                           link_args: config_host['PNG_LIBS'].split())
+-endif
+ jpeg = not_found
+-if 'CONFIG_VNC_JPEG' in config_host
+-  jpeg = declare_dependency(compile_args: config_host['JPEG_CFLAGS'].split(),
+-                            link_args: config_host['JPEG_LIBS'].split())
+-endif
+ sasl = not_found
+-if 'CONFIG_VNC_SASL' in config_host
+-  sasl = declare_dependency(compile_args: config_host['SASL_CFLAGS'].split(),
+-                            link_args: config_host['SASL_LIBS'].split())
++if get_option('vnc').enabled()
++  vnc = declare_dependency() # dummy dependency
++  png = dependency('libpng', required: get_option('vnc_png'),
++                   static: enable_static)
++  jpeg = cc.find_library('jpeg', has_headers: ['jpeglib.h'],
++                         required: get_option('vnc_jpeg'),
 +                         static: enable_static)
-+else
-+  if get_option('sdl_image').enabled()
-+    error('sdl-image required, but SDL was @0@',
-+          get_option('sdl').disabled() ? 'disabled' : 'not found')
++  sasl = cc.find_library('sasl2', has_headers: ['sasl/sasl.h'],
++                         required: get_option('vnc_sasl'),
++                         static: enable_static)
++  if sasl.found()
++    sasl = declare_dependency(dependencies: sasl,
++                              compile_args: '-DSTRUCT_IOVEC_DEFINED')
 +  endif
-+  sdl_image = not_found
  endif
-+
- rbd = not_found
- if 'CONFIG_RBD' in config_host
-   rbd = declare_dependency(link_args: config_host['RBD_LIBS'].split())
-@@ -359,6 +369,8 @@ endif
+ fdt = not_found
+ if 'CONFIG_FDT' in config_host
+@@ -371,6 +375,10 @@ endif
  
- # Create config-host.h
- 
-+config_host_data.set('CONFIG_SDL', sdl.found())
-+config_host_data.set('CONFIG_SDL_IMAGE', sdl_image.found())
+ config_host_data.set('CONFIG_SDL', sdl.found())
+ config_host_data.set('CONFIG_SDL_IMAGE', sdl_image.found())
++config_host_data.set('CONFIG_VNC', vnc.found())
++config_host_data.set('CONFIG_VNC_JPEG', jpeg.found())
++config_host_data.set('CONFIG_VNC_PNG', png.found())
++config_host_data.set('CONFIG_VNC_SASL', sasl.found())
  config_host_data.set('QEMU_VERSION', '"@0@"'.format(meson.project_version()))
  config_host_data.set('QEMU_VERSION_MAJOR', meson.project_version().split('.')[0])
  config_host_data.set('QEMU_VERSION_MINOR', meson.project_version().split('.')[1])
-@@ -1230,8 +1242,8 @@ if targetos == 'darwin'
-   summary_info += {'Cocoa support': config_host.has_key('CONFIG_COCOA')}
+@@ -1275,11 +1283,11 @@ summary_info += {'Block whitelist (rw)': config_host['CONFIG_BDRV_RW_WHITELIST']
+ summary_info += {'Block whitelist (ro)': config_host['CONFIG_BDRV_RO_WHITELIST']}
+ summary_info += {'VirtFS support':    config_host.has_key('CONFIG_VIRTFS')}
+ summary_info += {'Multipath support': config_host.has_key('CONFIG_MPATH')}
+-summary_info += {'VNC support':       config_host.has_key('CONFIG_VNC')}
+-if config_host.has_key('CONFIG_VNC')
+-  summary_info += {'VNC SASL support':  config_host.has_key('CONFIG_VNC_SASL')}
+-  summary_info += {'VNC JPEG support':  config_host.has_key('CONFIG_VNC_JPEG')}
+-  summary_info += {'VNC PNG support':   config_host.has_key('CONFIG_VNC_PNG')}
++summary_info += {'VNC support':       vnc.found()}
++if vnc.found()
++  summary_info += {'VNC SASL support':  sasl.found()}
++  summary_info += {'VNC JPEG support':  jpeg.found()}
++  summary_info += {'VNC PNG support':   png.found()}
  endif
- # TODO: add back version
--summary_info += {'SDL support':       config_host.has_key('CONFIG_SDL')}
--summary_info += {'SDL image support': config_host.has_key('CONFIG_SDL_IMAGE')}
-+summary_info += {'SDL support':       sdl.found()}
-+summary_info += {'SDL image support': sdl_image.found()}
- # TODO: add back version
- summary_info += {'GTK support':       config_host.has_key('CONFIG_GTK')}
- summary_info += {'GTK GL support':    config_host.has_key('CONFIG_GTK_GL')}
+ summary_info += {'xen support':       config_host.has_key('CONFIG_XEN_BACKEND')}
+ if config_host.has_key('CONFIG_XEN_BACKEND')
 diff --git a/meson_options.txt b/meson_options.txt
-new file mode 100644
-index 0000000000..e548211f34
---- /dev/null
+index e548211f34..67455c57bc 100644
+--- a/meson_options.txt
 +++ b/meson_options.txt
-@@ -0,0 +1,2 @@
-+option('sdl', type : 'feature', value : 'auto')
-+option('sdl_image', type : 'feature', value : 'auto')
+@@ -1,2 +1,6 @@
+ option('sdl', type : 'feature', value : 'auto')
+ option('sdl_image', type : 'feature', value : 'auto')
++option('vnc', type : 'feature', value : 'enabled')
++option('vnc_jpeg', type : 'feature', value : 'auto')
++option('vnc_png', type : 'feature', value : 'auto')
++option('vnc_sasl', type : 'feature', value : 'auto')
 diff --git a/ui/meson.build b/ui/meson.build
-index 060639a326..7289cd3bd0 100644
+index 7289cd3bd0..ab9773dfa0 100644
 --- a/ui/meson.build
 +++ b/ui/meson.build
-@@ -55,11 +55,11 @@ if config_host.has_key('CONFIG_GTK') and config_host.has_key('CONFIG_VTE')
-   ui_modules += {'gtk' : gtk_ss}
- endif
+@@ -27,14 +27,12 @@ vnc_ss.add(files(
+   'vnc-ws.c',
+   'vnc-jobs.c',
+ ))
+-vnc_ss.add(zlib)
+-vnc_ss.add(when: 'CONFIG_VNC_SASL', if_true: [files('vnc-auth-sasl.c'), sasl])
+-softmmu_ss.add_all(when: 'CONFIG_VNC', if_true: vnc_ss)
+-softmmu_ss.add(when: 'CONFIG_VNC', if_false: files('vnc-stubs.c'))
++vnc_ss.add(zlib, png, jpeg)
++vnc_ss.add(when: sasl, if_true: files('vnc-auth-sasl.c'))
++softmmu_ss.add_all(when: vnc, if_true: vnc_ss)
++softmmu_ss.add(when: vnc, if_false: files('vnc-stubs.c'))
+ softmmu_ss.add(when: [opengl, 'CONFIG_OPENGL'], if_true: files('shader.c', 'console-gl.c', 'egl-helpers.c', 'egl-context.c'))
+ softmmu_ss.add(when: [opengl, 'CONFIG_OPENGL_DMABUF'], if_true: files('egl-headless.c'))
+-softmmu_ss.add(when: 'CONFIG_VNC_PNG', if_true: png)
+-softmmu_ss.add(when: 'CONFIG_VNC_JPEG', if_true: jpeg)
  
--if config_host.has_key('CONFIG_SDL')
-+if sdl.found()
-   softmmu_ss.add(when: 'CONFIG_WIN32', if_true: files('win32-kbd-hook.c'))
+ ui_modules = {}
  
-   sdl_ss = ss.source_set()
--  sdl_ss.add(pixman, glib, files(
-+  sdl_ss.add(sdl, sdl_image, pixman, glib, files(
-     'sdl2-2d.c',
-     'sdl2-input.c',
-     'sdl2.c',
 -- 
 2.26.2
 
