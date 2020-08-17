@@ -2,88 +2,114 @@ Return-Path: <SRS0=yhYb=B3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7813C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 12:50:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18C98C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 12:57:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 830CC20825
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 12:50:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D72992072E
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 12:57:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Bil0Qtbn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 830CC20825
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FYsav9Fb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D72992072E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39064 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45758 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7ebF-0006zE-R3
-	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 08:50:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42658)
+	id 1k7ehF-0001e2-5h
+	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 08:57:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44764)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1k7eaO-00062z-1b
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 08:50:00 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:52339
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1k7egb-0001A8-3x
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 08:56:25 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44929
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1k7eaM-00019w-Da
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 08:49:59 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1k7egW-0002Cn-JL
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 08:56:24 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597668596;
+ s=mimecast20190719; t=1597668979;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=tgpbTXMCtMz0hKncr7yXSkAO0qiKqNnjnsQBhIOjc+c=;
- b=Bil0QtbnXZ3NxYMbpeH1WjHOUX2ZE9utgLA6qxj8BtvJNRhj1m/5PiAUlm8Ki8wuoGclES
- 7M2uXvfBNiPkun8QhmhQcoJ5QNaJeN6skiq6K6+5n8pz893BPWsJjofxFMnUnj4tYM15UZ
- vZlgq3+7fD1UBVy9s18y7DbCuGcTHBg=
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=KLLx8mLuMswWF7p0milJxQBvjqp5X1NB5gWALyWcmu8=;
+ b=FYsav9Fbu92gtBUDWAlqQ/oKTiS5DZYD2lciLRXNtfTOhjCGhlaLQq2VuscuXfs1w60PeA
+ Azz4mCfwCIfyLQn85zTlnVvTqsrS5Fl0eE06Ih1Bcwd3LnwFSpxBpKUgArlqTyvvmALF/g
+ Vj1MUCjsD2/xaT3TcJFq4WvMpIBM3cg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-260-io5oDuYMOKi-sfVKs0xVbw-1; Mon, 17 Aug 2020 08:49:54 -0400
-X-MC-Unique: io5oDuYMOKi-sfVKs0xVbw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-320-RzZUNxxwO8uMMH34oGvStw-1; Mon, 17 Aug 2020 08:56:14 -0400
+X-MC-Unique: RzZUNxxwO8uMMH34oGvStw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 721A0800463;
- Mon, 17 Aug 2020 12:49:53 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-112-160.ams2.redhat.com [10.36.112.160])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 78B945C5FD;
- Mon, 17 Aug 2020 12:49:52 +0000 (UTC)
-Date: Mon, 17 Aug 2020 14:49:51 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Max Reitz <mreitz@redhat.com>
-Subject: Re: [RFC PATCH 07/22] block/export: Remove magic from block-export-add
-Message-ID: <20200817124951.GJ11402@linux.fritz.box>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 80879185E52B;
+ Mon, 17 Aug 2020 12:56:13 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-113-146.ams2.redhat.com
+ [10.36.113.146])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5C70F7A3B5;
+ Mon, 17 Aug 2020 12:56:12 +0000 (UTC)
+Subject: Re: [RFC PATCH 09/22] nbd: Add writethrough to block-export-add
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 References: <20200813162935.210070-1-kwolf@redhat.com>
- <20200813162935.210070-8-kwolf@redhat.com>
- <2a6528d8-1792-ec1e-287b-a9b9e2f20eef@redhat.com>
+ <20200813162935.210070-10-kwolf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <faa916e7-3c39-84f4-183f-808153abe12d@redhat.com>
+Date: Mon, 17 Aug 2020 14:56:10 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <2a6528d8-1792-ec1e-287b-a9b9e2f20eef@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <20200813162935.210070-10-kwolf@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
 X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="ADZbWkCsHQ7r3kzd"
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=kwolf@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/17 05:03:47
+ protocol="application/pgp-signature";
+ boundary="Do6uDWcxBknsNfvClftG0uZ3b0ZF2yDmr"
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/17 05:13:21
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,187 +122,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---ADZbWkCsHQ7r3kzd
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Do6uDWcxBknsNfvClftG0uZ3b0ZF2yDmr
+Content-Type: multipart/mixed; boundary="FNIdvyaFu8hPKaWUVp7XmORIIhMeiN8HR"
+
+--FNIdvyaFu8hPKaWUVp7XmORIIhMeiN8HR
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-Am 17.08.2020 um 13:41 hat Max Reitz geschrieben:
-> On 13.08.20 18:29, Kevin Wolf wrote:
-> > nbd-server-add tries to be convenient and adds two questionable
-> > features that we don't want to share in block-export-add, even for NBD
-> > exports:
-> >=20
-> > 1. When requesting a writable export of a read-only device, the export
-> >    is silently downgraded to read-only. This should be an error in the
-> >    context of block-export-add.
-> >=20
-> > 2. When using a BlockBackend name, unplugging the device from the guest
-> >    will automatically stop the NBD server, too. This may sometimes be
-> >    what you want, but it could also be very surprising. Let's keep
-> >    things explicit with block-export-add. If the user wants to stop the
-> >    export, they should tell us so.
-> >=20
-> > Move these things into the nbd-server-add QMP command handler so that
-> > they apply only there.
-> >=20
-> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> > ---
-> >  include/block/nbd.h   |  3 ++-
-> >  block/export/export.c | 44 ++++++++++++++++++++++++++++++++++++++-----
-> >  blockdev-nbd.c        | 10 ++++------
-> >  nbd/server.c          | 19 ++++++++++++-------
-> >  qemu-nbd.c            |  3 +--
-> >  5 files changed, 58 insertions(+), 21 deletions(-)
+On 13.08.20 18:29, Kevin Wolf wrote:
+> qemu-nbd allows use of writethrough cache modes, which mean that write
+> requests made through NBD will cause a flush before they complete.
+> Expose the same functionality in block-export-add.
 >=20
-> [...]
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  qapi/block-export.json | 7 ++++++-
+>  blockdev-nbd.c         | 2 +-
+>  2 files changed, 7 insertions(+), 2 deletions(-)
 >=20
-> > diff --git a/block/export/export.c b/block/export/export.c
-> > index 3d0dacb3f2..2d5f92861c 100644
-> > --- a/block/export/export.c
-> > +++ b/block/export/export.c
->=20
-> [...]
->=20
-> > @@ -34,24 +36,56 @@ static const BlockExportDriver *blk_exp_find_driver=
-(BlockExportType type)
-> >      return NULL;
-> >  }
-> > =20
-> > -void qmp_block_export_add(BlockExportOptions *export, Error **errp)
-> > +static BlockExport *blk_exp_add(BlockExportOptions *export, Error **er=
-rp)
-> >  {
-> >      const BlockExportDriver *drv;
-> > =20
-> >      drv =3D blk_exp_find_driver(export->type);
-> >      if (!drv) {
-> >          error_setg(errp, "No driver found for the requested export typ=
-e");
-> > -        return;
-> > +        return NULL;
-> >      }
-> > =20
-> > -    drv->create(export, errp);
-> > +    return drv->create(export, errp);
-> > +}
-> > +
-> > +void qmp_block_export_add(BlockExportOptions *export, Error **errp)
-> > +{
-> > +    blk_exp_add(export, errp);
-> >  }
->=20
-> Interesting.  I would have added it this way from the start then (with a
-> note that we=E2=80=99ll need it later).
->=20
-> >  void qmp_nbd_server_add(BlockExportOptionsNbd *arg, Error **errp)
-> >  {
-> > -    BlockExportOptions export =3D {
-> > +    BlockExport *export;
-> > +    BlockDriverState *bs;
-> > +    BlockBackend *on_eject_blk;
-> > +
-> > +    BlockExportOptions export_opts =3D {
-> >          .type =3D BLOCK_EXPORT_TYPE_NBD,
-> >          .u.nbd =3D *arg,
->=20
-> This copies *arg=E2=80=99s contents...
->=20
-> >      };
-> > -    qmp_block_export_add(&export, errp);
-> > +
-> > +    /*
-> > +     * nbd-server-add doesn't complain when a read-only device should =
-be
-> > +     * exported as writable, but simply downgrades it. This is an erro=
-r with
-> > +     * block-export-add.
-> > +     */
-> > +    bs =3D bdrv_lookup_bs(arg->device, arg->device, NULL);
-> > +    if (bs && bdrv_is_read_only(bs)) {
-> > +        arg->writable =3D false;
->=20
-> ...and here you only modify the original *arg, but not
-> export_opts.u.nbd.  So I don=E2=80=99t think this will have any effect.
+> diff --git a/qapi/block-export.json b/qapi/block-export.json
+> index 1fdc55c53a..4ce163411f 100644
+> --- a/qapi/block-export.json
+> +++ b/qapi/block-export.json
+> @@ -167,10 +167,15 @@
+>  # Describes a block export, i.e. how single node should be exported on a=
+n
+>  # external interface.
+>  #
+> +# @writethrough: If true, caches are flushed after every write request t=
+o the
+> +#                export before completion is signalled. (since: 5.2;
+> +#                default: false)
+> +#
+>  # Since: 4.2
+>  ##
+>  { 'union': 'BlockExportOptions',
+> -  'base': { 'type': 'BlockExportType' },
+> +  'base': { 'type': 'BlockExportType',
+> +            '*writethrough': 'bool' },
+>    'discriminator': 'type',
+>    'data': {
+>        'nbd': 'BlockExportOptionsNbd'
 
-I thought I had tested this... Well, good catch, thanks.
+Hm.  I find it weird to have @writethrough in the base but @device in
+the specialized class.
 
-> > +    }
-> > +
-> > +    export =3D blk_exp_add(&export_opts, errp);
-> > +    if (!export) {
-> > +        return;
-> > +    }
-> > +
-> > +    /*
-> > +     * nbd-server-add removes the export when the named BlockBackend u=
-sed for
-> > +     * @device goes away.
-> > +     */
-> > +    on_eject_blk =3D blk_by_name(arg->device);
-> > +    if (on_eject_blk) {
-> > +        nbd_export_set_on_eject_blk(export, on_eject_blk);
-> > +    }
-> >  }
->=20
-> The longer it gets, the more I think maybe it should be in some NBD file
-> like blockdev-nbd.c after all.
+I think everything that will be common to all block exports should be in
+the base, and that probably includes a node-name.  I=E2=80=99m aware that w=
+ill
+make things more tedious in the code, but perhaps it would be a nicer
+interface in the end.  Or is the real problem that that would create
+problems in the storage daemon=E2=80=99s command line interface, because th=
+en
+the specialized (legacy) NBD interface would no longer be compatible
+with the new generalized block export interface?
 
-Fair enough. Though I think blockdev-nbd.c in the root directory is
-something that shouldn't even exist.
+Anyway, @writable might be a similar story.  A @read-only may make sense
+in general, I think.
 
-But I guess I can just leave the functions where they are and we can
-move the file another day.
+Basically, I think that the export code should be separate from the code
+setting up the BlockBackend that should be exported, so all options
+regarding that BB should be common; and those options are @node-name,
+@writethrough, and @read-only.  (And perhaps other things like
+@resizable, too, even though that isn=E2=80=99t something to consider for N=
+BD.)
 
-> [...]
->=20
-> > diff --git a/nbd/server.c b/nbd/server.c
-> > index 92360d1f08..0b84fd30e2 100644
-> > --- a/nbd/server.c
-> > +++ b/nbd/server.c
-> > @@ -1506,11 +1506,22 @@ static void nbd_eject_notifier(Notifier *n, voi=
-d *data)
-> >      aio_context_release(aio_context);
-> >  }
-> > =20
-> > +void nbd_export_set_on_eject_blk(BlockExport *exp, BlockBackend *blk)
-> > +{
-> > +    NBDExport *nbd_exp =3D container_of(exp, NBDExport, common);
-> > +    assert(exp->drv =3D=3D &blk_exp_nbd);
-> > +
->=20
-> I think asserting that the nbd_exp->eject_notifier is unused so far
-> would make sense (e.g. just checking that eject_notifier_blk is NULL).
+Max
 
-Makes sense.
 
-Kevin
+--FNIdvyaFu8hPKaWUVp7XmORIIhMeiN8HR--
 
---ADZbWkCsHQ7r3kzd
+--Do6uDWcxBknsNfvClftG0uZ3b0ZF2yDmr
 Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEE3D3rFZqa+V09dFb+fwmycsiPL9YFAl86fO4ACgkQfwmycsiP
-L9ZzgRAAs8PH71I1ta5+Uvtnp4XBGHwDnotDfATGIhPOFBLQcFVfZs96wHh3oFaH
-ah4/KSzeqMj4pbwMxG/brcULsJTJp5DIHvYYcKYMlSUj4WovaQB2c84Sv5PZIJ5I
-xnUMTcQ9UabgSa8gGfnIIXzLPj8Byfa25jdJQdvGsgRBciXGWf++Muz1B1HMqRk5
-aJKXDc1SsWouRIvX3Aa2V0v9bbbq58Qbryezj4tOZdWENjYT/QsECXHBF4TGiMRv
-H0EFkln4TH1ulagXb4mhU+tIf1na336tJUpQ7MBbfFwVNt1vjpOJkFBawgqkWDFp
-tqZQTpeh3DTCNGQGSCGox0QqflH66QpP/LEKpAuh1ilC9qFsbPJruEvJ1lpKYvm/
-DH08M/UzrLIPzgEKVieyezY9wYGQKjQRVts6L9lO12M2fxnmJgXB9ZUCL0SDAMok
-HG/4pHdioNVTt4BhTGQu5ZMPrALVNwOwl9iAfFvFbyT7SORnxpuTIs2QIa5/wM6O
-blU1z/9agdRwNKz8l1fmfW0aa7oP9ZWfG4h60TMadPA9/0mRt3CWB1pmsPoiEfSe
-cajyasfqgB038JAc3cYs93jnZdoIPnnrA6u+nw3tA1SMndJLtnQRKEhaMHz8DRyx
-lP/wWh98pIeomaFK/FB749Yj7uQvsUlkcNzjFVd7HMg6gZsUlzc=
-=NXF5
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl86fmoACgkQ9AfbAGHV
+z0ChSwgAiB1Wl4kaSH/MH0KE20qv3AlXImFdzrNcP4MCfosQdE+GgaePkUgfYsNz
+LaFx+Eggbb6GBxCZcG+3lRDDVio1jDa9B5VFGEt3mRUDXuVb1UlP9nmQP1V5tPtT
+f617947yfqnXcbH3fsVNiuWYWy9Zqn780KiSaMxa+JA/rdsiiEux5DzsWE94SH1a
+Scxn8jcSig0yIDo+SakHDMXh4j70GBJvu3ZccQT7sSw567169DsWbpMypFwmyCc6
+gVwtihur+PF9nX0KHYabfwJfQyUrkbP0kRUKIzd8mobu6rwuglhpuGE1MwDw+pRQ
+t4d7F8VP4HEaojO+Pz1iwPOB44c/yA==
+=GE/J
 -----END PGP SIGNATURE-----
 
---ADZbWkCsHQ7r3kzd--
+--Do6uDWcxBknsNfvClftG0uZ3b0ZF2yDmr--
 
 
