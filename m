@@ -7,79 +7,79 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DB2DC433E3
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 14:59:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0EC5C433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 15:00:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 486D320760
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 14:59:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AA534204FD
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 15:00:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lT+wSmKG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 486D320760
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Sga27fK8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA534204FD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41586 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45596 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7gc4-0006Wu-GO
-	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 10:59:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40912)
+	id 1k7gcv-0008HG-Mp
+	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 11:00:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41218)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1k7gH4-0004JJ-QF
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:38:10 -0400
-Received: from mail-wr1-x432.google.com ([2a00:1450:4864:20::432]:45591)
+ id 1k7gHR-000574-5v
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:38:33 -0400
+Received: from mail-wr1-x42d.google.com ([2a00:1450:4864:20::42d]:39225)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1k7gH2-00069R-Ur
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:38:10 -0400
-Received: by mail-wr1-x432.google.com with SMTP id z18so15241761wrm.12
- for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 07:38:07 -0700 (PDT)
+ id 1k7gHP-0006D1-Di
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:38:32 -0400
+Received: by mail-wr1-x42d.google.com with SMTP id a5so15259423wrm.6
+ for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 07:38:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=qOKJ+Ver4XgMvPbsJwwjCcehhxtmfHeXcEultQ+LU6o=;
- b=lT+wSmKGQtylt7hUnexQEIWXYMHF7+hW5f0UPSYXJCnLtEVtr307t4xjhXpRUQ3yoj
- 3oYpZKGG2Wp9TyPz7FCDdBTZA7LVF14rQ6pYqDeqVa8JtPMKGamDKT1Ul7aishUQZsTQ
- /ER6814dovQsDNGRTeDEsuxfr6XuSptZ0xWfnSarK+b4vJOlzuZ5DpFx3NCeSsqwxjgy
- gN//3oEzGU6IaKClu/ZrBUPSLDD4kdKA6NhL+8GTkym+fQcL5pKFavwa1k6HLkjxCTrx
- +cnqpmCplW4Qp2uApMxuFEaRVFiVMbVY29GjT7ObBx3DdX4jWumpZLuJX0I8aLBNv31/
- 5RJA==
+ bh=GCZEu26+ZlByYj6flD+0i+PBWz9jBredaJ3O6s3/97U=;
+ b=Sga27fK8he4uy+8BEMxPBiTsSLHid1Dsc92aSCdQTPoDSf4Zvimt0KcWKZO3WdCtzf
+ lr12Nq1Q8xMbScersuUJx3svt/srTkV8mQa7FCulvlVmG5sohQINUiedqO9/qheRGmPa
+ Rkk1ggSxBpY6b8dgAda+pwFC9nLpoyOOLc95ThC3UKSMYgax3DMBc00mH7ZN8FDez/uR
+ 2NExttJEbLahMCW1oW80Uzi/M2nTaBZw3vNnmdPu5071JHU7+L9aWRBqTa/skrRe+nlh
+ OvNG+jWleZI3tI36I1ZGjzuZAG7TASw2gUcrgDSsbNOsVTG/4GG2OSzNRfrz1J99sWi0
+ bO7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=qOKJ+Ver4XgMvPbsJwwjCcehhxtmfHeXcEultQ+LU6o=;
- b=KGSpjZYnrSdPn4TlssUgYYzLPLpsZTXPONTadbMl46Z8CscwnOOjz7rAkdeJHu1QPH
- RNFiaYVLFM+66YOy2VUef3iZ30U4Ecpa9JkmjBjt/pr47PKHSS/Dzk4oK+Cb8FskRg/H
- Kd9Z7bQcZez90UWR0mO5/Bpk6xKqn6fq58x+zouIGX0EgzDno2whYbf1WW8aq6FKS7HF
- czIH/GpqA2BpzJ+YbavQ0XceM7Gu0Se+nStSmOHDmTZvCDfS46tTTQS0DN6EnsmcCnr4
- N47t6hCIOYGSw3paAKXwXulFz9ENSwBlBsOLCy0kSEvPJMnNt++0WE24cW4BLifMm4E8
- BSOQ==
-X-Gm-Message-State: AOAM531TW2ek/C+VSBREE/IgpBb18gF/PMo+tT127PwsI6B6Hy7LQX5r
- 8byQRqusEkOu56V3brYwmWeolh0SNd4=
-X-Google-Smtp-Source: ABdhPJxTGc1xCE/WybpERzW3frl0AAD0SeMQ4930w57KKhJ3Dn8FzvX35gSFSzaW2CsLfKHN5n0bJQ==
-X-Received: by 2002:a5d:544a:: with SMTP id w10mr16077523wrv.317.1597675086539; 
- Mon, 17 Aug 2020 07:38:06 -0700 (PDT)
+ bh=GCZEu26+ZlByYj6flD+0i+PBWz9jBredaJ3O6s3/97U=;
+ b=MA1bcY+r1hRYacNMKZURs+DgLFT46V8Q3hHBFlr0TSsTfPl3XpmnZdum/1P94iEitN
+ j3DvM8P2HC1foDur8ArKq6yIxn7eI99VW8iZmdidUknsmSIhftx2/cM3UdSdZJ9S7D6/
+ sS0IXjqq7XGagvnobyIAssidNO4E9WjlSWFyNz9YrqiLzlJyOC+jmcYulSPYREmV5XoP
+ DWvVLyOe/8xzebX/q4SKZUWY3u2GsKbl2gXHVIr1KFcskQu84yCWIKOVUzr5Y3AkGTZl
+ ojHrbuaL1MzLXqW41QZOm0R8ORLFKNgS/VR9OcUByatkKfHh5I3nXWNCAqBSg4lsoqs0
+ 5IIQ==
+X-Gm-Message-State: AOAM532IfJjEv8K35lyFZD+IQTAxug2avg3jXnzFzS0LpljqMbE4nLNO
+ kEnzOHGRcu74ZMoPvnYz33STDH80P84=
+X-Google-Smtp-Source: ABdhPJxWEL2xpFl0gmkAu8JK8EfGWXvNx8iKjp/TKOQjaOFCL2oQLv+CSnvuyuOVzc4tBuyuP63Yrw==
+X-Received: by 2002:adf:92a1:: with SMTP id 30mr17130507wrn.56.1597675108943; 
+ Mon, 17 Aug 2020 07:38:28 -0700 (PDT)
 Received: from donizetti.redhat.com ([2001:b07:6468:f312:a0d1:fc42:c610:f977])
  by smtp.gmail.com with ESMTPSA id
- i22sm34966603wrb.45.2020.08.17.07.38.05
+ i22sm34966603wrb.45.2020.08.17.07.38.28
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 17 Aug 2020 07:38:06 -0700 (PDT)
+ Mon, 17 Aug 2020 07:38:28 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 041/150] meson: add msi generation
-Date: Mon, 17 Aug 2020 16:35:34 +0200
-Message-Id: <20200817143723.343284-42-pbonzini@redhat.com>
+Subject: [PATCH 064/150] meson: qemu-{img,io,nbd}
+Date: Mon, 17 Aug 2020 16:35:57 +0200
+Message-Id: <20200817143723.343284-65-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200817143723.343284-1-pbonzini@redhat.com>
 References: <20200817143723.343284-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::432;
- envelope-from=paolo.bonzini@gmail.com; helo=mail-wr1-x432.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::42d;
+ envelope-from=paolo.bonzini@gmail.com; helo=mail-wr1-x42d.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -112,96 +112,81 @@ From: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Makefile                  | 18 ------------------
- qga/meson.build           | 25 +++++++++++++++++++++++++
- qga/vss-win32/meson.build |  3 ++-
- 3 files changed, 27 insertions(+), 19 deletions(-)
+ Makefile    |  5 -----
+ configure   |  3 +--
+ meson.build | 14 ++++++++++++--
+ 3 files changed, 13 insertions(+), 9 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index 9b35c0d00a..a46b31b907 100644
+index 22247cb376..e2f64b9c8b 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -439,23 +439,6 @@ qemu-img-cmds.h: $(SRC_PATH)/qemu-img-cmds.hx $(SRC_PATH)/scripts/hxtool
- qemu-keymap$(EXESUF): LIBS += $(XKBCOMMON_LIBS)
- qemu-keymap$(EXESUF): QEMU_CFLAGS += $(XKBCOMMON_CFLAGS)
+@@ -278,11 +278,6 @@ Makefile: $(version-obj-y)
  
--ifdef QEMU_GA_MSI_ENABLED
--QEMU_GA_MSI=qemu-ga-$(ARCH).msi
+ COMMON_LDADDS = libqemuutil.a
+ 
+-qemu-img.o: qemu-img-cmds.h
 -
--msi: $(QEMU_GA_MSI)
--
--$(QEMU_GA_MSI): qga/qemu-ga.exe $(QGA_VSS_PROVIDER)
--
--$(QEMU_GA_MSI): config-host.mak
--
--$(QEMU_GA_MSI):  $(SRC_PATH)/qga/installer/qemu-ga.wxs
--	$(call quiet-command,QEMU_GA_VERSION="$(QEMU_GA_VERSION)" QEMU_GA_MANUFACTURER="$(QEMU_GA_MANUFACTURER)" QEMU_GA_DISTRO="$(QEMU_GA_DISTRO)" BUILD_DIR="$(BUILD_DIR)" \
--	wixl -o $@ $(QEMU_GA_MSI_ARCH) $(QEMU_GA_MSI_WITH_VSS) $(QEMU_GA_MSI_MINGW_DLL_PATH) $<,"WIXL","$@")
--else
--msi:
--	@echo "MSI build not configured or dependency resolution failed (reconfigure with --enable-guest-agent-msi option)"
--endif
--
- ifneq ($(EXESUF),)
- .PHONY: qga/qemu-ga
- qga/qemu-ga: qga/qemu-ga$(EXESUF) $(QGA_VSS_PROVIDER) $(QEMU_GA_MSI)
-@@ -471,7 +454,6 @@ clean: recurse-clean ninja-clean clean-ctlist
- # avoid old build problems by removing potentially incorrect old files
- 	rm -f config.mak op-i386.h opc-i386.h gen-op-i386.h op-arm.h opc-arm.h gen-op-arm.h
- 	rm -f qemu-options.def
--	rm -f *.msi
- 	find . \( -name '*.so' -o -name '*.dll' -o -name '*.mo' -o -name '*.[oda]' \) -type f \
- 		! -path ./roms/edk2/ArmPkg/Library/GccLto/liblto-aarch64.a \
- 		! -path ./roms/edk2/ArmPkg/Library/GccLto/liblto-arm.a \
-diff --git a/qga/meson.build b/qga/meson.build
-index 948302e06d..2d33c09fe6 100644
---- a/qga/meson.build
-+++ b/qga/meson.build
-@@ -48,5 +48,30 @@ qga = executable('qemu-ga', qga_ss.sources(),
- if host_machine.system() == 'windows'
-   if 'CONFIG_QGA_VSS' in config_host
-     subdir('vss-win32')
-+  else
-+    gen_tlb = []
+-qemu-img$(EXESUF): qemu-img.o $(authz-obj-y) $(block-obj-y) $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
+-qemu-nbd$(EXESUF): qemu-nbd.o $(authz-obj-y) $(block-obj-y) $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
+-qemu-io$(EXESUF): qemu-io.o $(authz-obj-y) $(block-obj-y) $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
+ qemu-storage-daemon$(EXESUF): qemu-storage-daemon.o $(authz-obj-y) $(block-obj-y) $(crypto-obj-y) $(chardev-obj-y) $(io-obj-y) $(qom-obj-y) $(storage-daemon-obj-y) $(COMMON_LDADDS)
+ 
+ scsi/qemu-pr-helper$(EXESUF): scsi/qemu-pr-helper.o scsi/utils.o $(authz-obj-y) $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
+diff --git a/configure b/configure
+index bc17695581..961436ea41 100755
+--- a/configure
++++ b/configure
+@@ -6670,9 +6670,8 @@ fi
+ tools=""
+ helpers=""
+ if test "$want_tools" = "yes" ; then
+-  tools="qemu-img\$(EXESUF) qemu-io\$(EXESUF) $tools"
+   if [ "$linux" = "yes" -o "$bsd" = "yes" -o "$solaris" = "yes" ] ; then
+-    tools="qemu-nbd\$(EXESUF) qemu-storage-daemon\$(EXESUF) $tools"
++    tools="qemu-storage-daemon\$(EXESUF) $tools"
+   fi
+ fi
+ if test "$softmmu" = yes ; then
+diff --git a/meson.build b/meson.build
+index e01ff4b119..b8f6cc49fb 100644
+--- a/meson.build
++++ b/meson.build
+@@ -346,7 +346,7 @@ if have_system
+   ]
+ endif
+ foreach d : hx_headers
+-  custom_target(d[1],
++  hxdep += custom_target(d[1],
+                 input: files(d[0]),
+                 output: d[1],
+                 capture: true,
+@@ -555,7 +555,8 @@ libblock = static_library('block', block_ss.sources(),
+                           build_by_default: false)
+ 
+ block = declare_dependency(link_whole: [libblock],
+-                           link_args: '@block.syms')
++                           link_args: '@block.syms',
++                           dependencies: [crypto, io])
+ 
+ foreach m : block_mods + softmmu_mods
+   shared_module(m.name(),
+@@ -633,6 +634,15 @@ if 'CONFIG_GUEST_AGENT' in config_host
+ endif
+ 
+ if have_tools
++  qemu_img = executable('qemu-img', [files('qemu-img.c'), hxdep],
++             dependencies: [authz, block, crypto, io, qom, qemuutil], install: true)
++  qemu_io = executable('qemu-io', files('qemu-io.c'),
++             dependencies: [block, qemuutil], install: true)
++  if host_machine.system() == 'linux' or host_machine.system() == 'sunos' or host_machine.system().endswith('bsd')
++    qemu_nbd = executable('qemu-nbd', files('qemu-nbd.c'),
++               dependencies: [block, qemuutil], install: true)
 +  endif
 +
-+  wixl = find_program('wixl', required: false)
-+  if wixl.found()
-+    deps = [gen_tlb, qga]
-+    if 'QEMU_GA_MSI_WITH_VSS' in config_host
-+      deps += qga_vss
-+    endif
-+    qga_msi = custom_target('QGA MSI',
-+                            input: files('installer/qemu-ga.wxs'),
-+                            output: 'qemu-ga-@0@.msi'.format(config_host['ARCH']),
-+                            depends: deps,
-+                            command: [
-+                              'QEMU_GA_VERSION=' + config_host['QEMU_GA_VERSION'],
-+                              'QEMU_GA_MANUFACTURER=' + config_host['QEMU_GA_MANUFACTURER'],
-+                              'QEMU_GA_DISTRO=' + config_host['QEMU_GA_DISTRO'],
-+                              'BUILD_DIR=' + meson.build_root(),
-+                              wixl, '-o', '@OUTPUT0@', '@INPUT0@',
-+                              config_host['QEMU_GA_MSI_ARCH'].split(),
-+                              config_host['QEMU_GA_MSI_WITH_VSS'].split(),
-+                              config_host['QEMU_GA_MSI_MINGW_DLL_PATH'].split(),
-+                            ])
-+    alias_target('msi', qga_msi)
-   endif
- endif
-diff --git a/qga/vss-win32/meson.build b/qga/vss-win32/meson.build
-index 42c8d31a3d..1f39e05335 100644
---- a/qga/vss-win32/meson.build
-+++ b/qga/vss-win32/meson.build
-@@ -2,7 +2,8 @@ if add_languages('cpp', required: false)
-   glib_static = dependency('glib-2.0', static: true)
-   link_args = cc.get_supported_link_arguments(['-fstack-protector-all', '-fstack-protector-strong',
-                                                '-Wl,--add-stdcall-alias', '-Wl,--enable-stdcall-fixup'])
--  shared_module('qga-vss', ['requester.cpp', 'provider.cpp', 'install.cpp'],
-+
-+  qga_vss = shared_module('qga-vss', ['requester.cpp', 'provider.cpp', 'install.cpp'],
-                 name_prefix: '',
-                 cpp_args: ['-Wno-unknown-pragmas', '-Wno-delete-non-virtual-dtor', '-Wno-non-virtual-dtor'],
-                 link_args: link_args,
+   subdir('contrib/rdmacm-mux')
+   subdir('contrib/elf2dmp')
+ 
 -- 
 2.26.2
 
