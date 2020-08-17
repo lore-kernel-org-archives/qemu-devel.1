@@ -2,81 +2,82 @@ Return-Path: <SRS0=yhYb=B3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6978FC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 14:04:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CFBEC433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 14:06:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3458B2065D
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 14:04:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2938C20748
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 14:06:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="snY6vt1C"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3458B2065D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A7t0BmXn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2938C20748
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57920 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34266 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7fkc-00089W-Dc
-	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 10:04:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59448)
+	id 1k7fmA-0001i2-Ce
+	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 10:06:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60352)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
- id 1k7fi1-0003LT-5s; Mon, 17 Aug 2020 10:01:57 -0400
-Received: from mail-lf1-x143.google.com ([2a00:1450:4864:20::143]:44241)
+ id 1k7fkp-000091-US; Mon, 17 Aug 2020 10:04:51 -0400
+Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:40705)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
- id 1k7fhy-0001Xe-Vx; Mon, 17 Aug 2020 10:01:56 -0400
-Received: by mail-lf1-x143.google.com with SMTP id x24so8402389lfe.11;
- Mon, 17 Aug 2020 07:01:54 -0700 (PDT)
+ id 1k7fko-0001o7-Ki; Mon, 17 Aug 2020 10:04:51 -0400
+Received: by mail-lf1-x141.google.com with SMTP id m15so8424262lfp.7;
+ Mon, 17 Aug 2020 07:04:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=gRwNidHb/xzDXEvtr3z3PMKv/URa1A0x7rFiibmqh6s=;
- b=snY6vt1CXWl9LUwqROGVCqaHldkYLhrO/SVpV3q/z4WM0N2XlnhMRL/SzOG9DSPrRc
- FDoe2FwWKc8XpOmnxFcXytqiQJga++uIwM83vpwTTTBFwEaFcxzkO3M0JXuQxzXasX7V
- z/z1+M5o87cjnkHmXK3ClPxprKJRxTn3ODdXW4Z6myOd8anyX7wyGARXnPCffLYvKDOe
- W2rFyG5Hfklphw63swW1CXstQNuGF0qjnH1rA4CFfn8BZyh8fFqConQC27VvBUPhzq5H
- b4NpfGQNLSWsyJvKmxBOmTyldw17qYRa5y9XBJ4Xugfb9uZkUIzYTcRzVlZxHFTCdGUT
- bfWQ==
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:content-transfer-encoding:in-reply-to;
+ bh=N+rLV/pWq3xQfAoGrL1v7pEpSGtwzgoBoIc3nou5BHY=;
+ b=A7t0BmXnX8T9MseHJmWpvczP/H3qP19J/giAhcg3xWzXblelPftzEoh7nwJLPM7oi1
+ ezkuzT6QD6/lBSP3Hnv4z6L0CoiomkHX3PjT1XJsQb6+pLU6OwT0FqTy0+SC9EN8AREB
+ xO3vGQELKI/PUkNn+QEPnWtRQ0eDR6u8f3wEs/h0TVbKFlMPoIc+1ULJqANVxqNSdOQj
+ D2zEBXQtgK+DXZTuXLg0K2NpC/IYj7RuMmnu31yn4Z+GKh/APtG/3cBSZPTegVpEFGu0
+ ysf5Yf8p4Z/qYaVBNnFYcLF+Au+38RdcBeQVlTewE1t4CqAgewSM1MCxywMdpPOnZI2m
+ TS3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=gRwNidHb/xzDXEvtr3z3PMKv/URa1A0x7rFiibmqh6s=;
- b=XLUqk/BgijLTKv70Pv72hXZriobZPAhFwBtAovU9gYj8np53x9GYIbR8b40LjfvztY
- 7Hf0KvPzWDr8HPD+uT7N4fMYxU74XuMisMG4kc9oRpYyH6tp4OEuInL/bSw4lY9yEVt5
- hElaPAxoeG9NBJjFw/zVcTioPjwQFccA6jBIslBI7VvDqQxL4a1Q0UprBFFwtdgfmpNa
- IAEdj0/uFEIFpcC2RC2xyYoOsCIzkDSqfkEsWmuiH7WEkhDY7NdjxI9QFcksR81eSVH6
- +gYlmJHou959RQF47c3RSNKEbCy0+CS4UKkPkQGgK863BiGdGWAGjQEZlCt8+mtqP04W
- sU3g==
-X-Gm-Message-State: AOAM531DJzqoSNZh+V48pdkdWKMDExifHoEuWauuk8LHdS0NQLuRiSDR
- utm7tPwUSEQblJYi8rOhd+fkFF+6zTtxweQf
-X-Google-Smtp-Source: ABdhPJzJkRodM4UO4geVDmC1nu9978k3vs7vvm1TKrYnC02NfGsRg/jpRFt0W3g8M97xR4h5hAd9Zg==
-X-Received: by 2002:a19:cb51:: with SMTP id b78mr7459536lfg.130.1597672912623; 
- Mon, 17 Aug 2020 07:01:52 -0700 (PDT)
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=N+rLV/pWq3xQfAoGrL1v7pEpSGtwzgoBoIc3nou5BHY=;
+ b=RTL9hah1thHQXNUYaGKFfvUZY4PWCBTMCxo8Cgh6PAKW8JsxJmDcu7v/sAtr3/ab4H
+ yMFolCfYFeeg6ZJZfUG5PuIC3Lol1WueDAr6/uUuhq4sO3T5X8YEs3mOIPx8XIQLDmxw
+ HgAUiWvNARvrVwEFDzZz1zxfdOHwfWiIgFQ9hq8LB/mlpl5spZIms9PO3QFbVTl/SCz6
+ UR7Vye6MzIBpd8PQ2OomuvYtXaMkc+RERTWFDlXatMHmmVQLTWdrHpHNtqf7Limil4M3
+ iYfzlwQgXrTWBZOUOasToDpfAjF/dM4HIQe77BZ1uMSnzVW7dYI+wXr/cBPDKDhfZGy6
+ tLVg==
+X-Gm-Message-State: AOAM530+MbzctdkFWjP/g727AWUx3+SGBdAkcnMmE7ysHRw9TDcxa1B9
+ 6kOF6efkdrYtuDmrDP4Qp5s=
+X-Google-Smtp-Source: ABdhPJzGPRyR4Y6sJpSC9ECCkHUz/eNuZOFZxxad7brrgvkFxV7Y/6v3mHp+dryA7auirFYsJhPo7w==
+X-Received: by 2002:a19:6b0e:: with SMTP id d14mr7452029lfa.103.1597673088134; 
+ Mon, 17 Aug 2020 07:04:48 -0700 (PDT)
 Received: from gmail.com (81-231-232-130-no39.tbcn.telia.com. [81.231.232.130])
- by smtp.gmail.com with ESMTPSA id c4sm5040593ljk.70.2020.08.17.07.01.51
+ by smtp.gmail.com with ESMTPSA id h7sm5055641ljc.75.2020.08.17.07.04.47
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 17 Aug 2020 07:01:52 -0700 (PDT)
+ Mon, 17 Aug 2020 07:04:47 -0700 (PDT)
+Date: Mon, 17 Aug 2020 16:04:46 +0200
 From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v1 4/5] target/microblaze: swx: Use atomic_cmpxchg
-Date: Mon, 17 Aug 2020 16:01:43 +0200
-Message-Id: <20200817140144.373403-5-edgar.iglesias@gmail.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200817140144.373403-1-edgar.iglesias@gmail.com>
-References: <20200817140144.373403-1-edgar.iglesias@gmail.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Subject: Re: [PATCH] hw/net/xilinx_axienet: Remove unused code
+Message-ID: <20200817140446.GC2954729@toto>
+References: <20200814133007.16850-1-f4bug@amsat.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::143;
- envelope-from=edgar.iglesias@gmail.com; helo=mail-lf1-x143.google.com
+In-Reply-To: <20200814133007.16850-1-f4bug@amsat.org>
+Received-SPF: pass client-ip=2a00:1450:4864:20::141;
+ envelope-from=edgar.iglesias@gmail.com; helo=mail-lf1-x141.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -10
@@ -98,65 +99,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: figlesia@xilinx.com, peter.maydell@linaro.org, sstabellini@kernel.org,
- edgar.iglesias@xilinx.com, sai.pavan.boddu@xilinx.com,
- frasse.iglesias@gmail.com, alistair@alistair23.me,
- richard.henderson@linaro.org, frederic.konrad@adacore.com, qemu-arm@nongnu.org,
- philmd@redhat.com, luc.michel@greensocs.com
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-trivial@nongnu.org,
+ Jason Wang <jasowang@redhat.com>, Alistair Francis <alistair@alistair23.me>,
+ qemu-devel@nongnu.org, qemu-arm@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+On Fri, Aug 14, 2020 at 03:30:07PM +0200, Philippe Mathieu-Daudé wrote:
+> Most of the MDIOBus fields are unused.  The ADVERTISE_10HALF
+> definition is unused.  Remove unused code.
 
-Use atomic_cmpxchg to implement the atomic cmpxchg sequence.
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 
-Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
----
- target/microblaze/translate.c | 21 +++++++++++++--------
- 1 file changed, 13 insertions(+), 8 deletions(-)
 
-diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
-index c58f334a0f..530c15e5ad 100644
---- a/target/microblaze/translate.c
-+++ b/target/microblaze/translate.c
-@@ -1075,14 +1075,16 @@ static void dec_store(DisasContext *dc)
-         swx_skip = gen_new_label();
-         tcg_gen_brcond_tl(TCG_COND_NE, env_res_addr, addr, swx_skip);
- 
--        /* Compare the value loaded at lwx with current contents of
--           the reserved location.
--           FIXME: This only works for system emulation where we can expect
--           this compare and the following write to be atomic. For user
--           emulation we need to add atomicity between threads.  */
-+        /*
-+         * Compare the value loaded at lwx with current contents of
-+         * the reserved location.
-+         */
-         tval = tcg_temp_new_i32();
--        tcg_gen_qemu_ld_i32(tval, addr, cpu_mmu_index(&dc->cpu->env, false),
--                            MO_TEUL);
-+
-+        tcg_gen_atomic_cmpxchg_i32(tval, addr, env_res_val,
-+                                   cpu_R[dc->rd], mem_index,
-+                                   mop);
-+
-         tcg_gen_brcond_i32(TCG_COND_NE, env_res_val, tval, swx_skip);
-         write_carryi(dc, 0);
-         tcg_temp_free_i32(tval);
-@@ -1108,7 +1110,10 @@ static void dec_store(DisasContext *dc)
-                 break;
-         }
-     }
--    tcg_gen_qemu_st_i32(cpu_R[dc->rd], addr, mem_index, mop);
-+
-+    if (!ex) {
-+        tcg_gen_qemu_st_i32(cpu_R[dc->rd], addr, mem_index, mop);
-+    }
- 
-     /* Verify alignment if needed.  */
-     if (dc->cpu->cfg.unaligned_exceptions && size > 1) {
--- 
-2.25.1
-
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> ---
+>  hw/net/xilinx_axienet.c | 23 -----------------------
+>  1 file changed, 23 deletions(-)
+> 
+> diff --git a/hw/net/xilinx_axienet.c b/hw/net/xilinx_axienet.c
+> index 1e48eb70c9..2e89f236b4 100644
+> --- a/hw/net/xilinx_axienet.c
+> +++ b/hw/net/xilinx_axienet.c
+> @@ -54,7 +54,6 @@
+>       TYPE_XILINX_AXI_ENET_CONTROL_STREAM)
+>  
+>  /* Advertisement control register. */
+> -#define ADVERTISE_10HALF        0x0020  /* Try for 10mbps half-duplex  */
+>  #define ADVERTISE_10FULL        0x0040  /* Try for 10mbps full-duplex  */
+>  #define ADVERTISE_100HALF       0x0080  /* Try for 100mbps half-duplex */
+>  #define ADVERTISE_100FULL       0x0100  /* Try for 100mbps full-duplex */
+> @@ -169,28 +168,6 @@ tdk_init(struct PHY *phy)
+>  }
+>  
+>  struct MDIOBus {
+> -    /* bus.  */
+> -    int mdc;
+> -    int mdio;
+> -
+> -    /* decoder.  */
+> -    enum {
+> -        PREAMBLE,
+> -        SOF,
+> -        OPC,
+> -        ADDR,
+> -        REQ,
+> -        TURNAROUND,
+> -        DATA
+> -    } state;
+> -    unsigned int drive;
+> -
+> -    unsigned int cnt;
+> -    unsigned int addr;
+> -    unsigned int opc;
+> -    unsigned int req;
+> -    unsigned int data;
+> -
+>      struct PHY *devs[32];
+>  };
+>  
+> -- 
+> 2.21.3
+> 
 
