@@ -7,79 +7,79 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D313C433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 15:10:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A5E2C433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 15:11:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DBB1F2054F
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 15:10:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 61B342054F
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 15:11:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kVX7s4Zz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBB1F2054F
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FhqNMLbq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61B342054F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34356 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38296 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7gmT-0002U9-2O
-	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 11:10:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41134)
+	id 1k7gnO-0004J6-LR
+	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 11:11:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41536)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1k7gHM-00051l-6g
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:38:28 -0400
-Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:56087)
+ id 1k7gHj-0005e9-Hx
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:38:51 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:32994)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1k7gHF-0006Bh-SY
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:38:27 -0400
-Received: by mail-wm1-x335.google.com with SMTP id 9so13414679wmj.5
- for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 07:38:21 -0700 (PDT)
+ id 1k7gHh-0006HQ-Qu
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:38:51 -0400
+Received: by mail-wr1-x441.google.com with SMTP id p20so15285942wrf.0
+ for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 07:38:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=4PQbF8bhzVMCICmYbql34FE7vRnqpkhqgrq1jHhjLTw=;
- b=kVX7s4ZzBfEr6T135AHAFc6Zc/vw9fJfQ4yG/5I6DC/g9UNFB7NL/fs92ZqKnwFGOW
- MgWNRwCBXffDuoc3eMMLifk+XprZw1hTtPWsp7AVD9SHdcHRbJPcT9xZPrxCuSihdxEK
- PZB2FNMhFrH9LQT7Yl09bOmoHfr1iDTi87wC97OVIjTcPv3btWPrBukGCiMgEHUomJPT
- +ZBSqMjrDyx66vShlSq1dBMwXliA9GKzbRBrjK5AboFqtJZUxcOg4+hzIss9J55Z2UjB
- 4IGhv3jVtiZz6aaGm0yS7sqvHATo8W3+Emkli4+MD2Ukx8Ky9j6ZTAEYHDBj3SEcNqlP
- feuQ==
+ bh=vJYRzFczP3G71nLXPxT7FoelYpxmkicx4WZGHD1y9RM=;
+ b=FhqNMLbqwag88fzLuyfmypOKCewKXIQ6RU3bszYK19rS+fnGuC4TYIOmB6h0DdNb96
+ u5JrUyOrwjt7ll8cM83j8hYa7Pn/cWVMG6YZa5x5vP2HwPez+3ChNpMvkG6u6qJvbkU5
+ hsJ6I/UjEAGM6rGpIQLjqEOTLI9ySo8gd1F/M8nuFQDObSFdYcvJYe6lu7ZeL/ow11Ib
+ ESgOSulwiwkRYgPe/HS9UdwzIBGSIg4hjRNzpDtm2z01ycCL2IP/HiQgTsMYyrG/GHYt
+ Is3y4BMIYjrxgrE0E9VnXKcBPNxhYBtkFSoYrlnPoI4o5zO2rSW449f5GMXwlPDv3Ot+
+ 8dHg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=4PQbF8bhzVMCICmYbql34FE7vRnqpkhqgrq1jHhjLTw=;
- b=uBn2Cy+cSofA1clCJdULA2EsKE3rPyJF+wvjiLVqg/m1HwcQyFebQ+ZmIIrTt5Ri5Q
- m/HAfHLYD7FprD+RKbiS+EAZw/y9FTj8hR+1RLCTLGJlNQnmr6T2KUdSmmoP6B9k235Y
- CMUAsj5IlkjVWU725RkjeRnr1xKNCHVkLIgB6MXzHqqUVLySb7y/Gj/x0qFzha5uS8Tb
- LInTwyrqOwNAeFGeEtX91kWpS4YSLRdUvNDuLDp+aV90mERH9OIaZMkrp8fOaVkj9RH8
- YHNHHfks8IBp3KIjNFxkgBStGS+PLBPTTcWRI6shZJXXypqB2zwWPHJ/f/1aVGPMpsjA
- E7ow==
-X-Gm-Message-State: AOAM532l3m67Rm8T4DR7lsVIAb7jG2OV+5uSLsyiY+L1jXAFM7j19Ow2
- Yo9aS1g6GDKvFikOj9kWRuBo/PMXWOw=
-X-Google-Smtp-Source: ABdhPJwtO4grclavmAk0gklVjKxhWBXj3EScdBPHchcRF9HEGus4xzz4R/ekpzd93Y/yEXy3Hwyi7g==
-X-Received: by 2002:a1c:f30f:: with SMTP id q15mr14687404wmq.60.1597675100327; 
- Mon, 17 Aug 2020 07:38:20 -0700 (PDT)
+ bh=vJYRzFczP3G71nLXPxT7FoelYpxmkicx4WZGHD1y9RM=;
+ b=Ja/9TeIlY0iJcHKApA+1RH2MSVRx7CFGaqwrBd2jM4hehtzQ6t/6DDesQk1G9yL5SZ
+ VZ0htq0tBl8Lv6yOBZuwEsJz+ZKOBVlFNC8V1LS9Mdis/b62IlT2+h7pE3LrmODJ//wW
+ fF0+bv3vOOee6IckpMdZdwYa6OrvoIWZp2Si8eCc+4zGy8gVDsNlwNQwtPKYv56lvop7
+ 5jeMIGCO86y+GSEGYaL3n82EobKPa7tnjzSgrctNYUs/jxUBNyBXJ5QwiPXvy5SAWPmb
+ mUpNynEaczzd69coUmbCN+kD6uAd9Pfz7ZPbnchCFFtiq3HmteH377bD6scJ3OGa9Ubd
+ jm/Q==
+X-Gm-Message-State: AOAM5307baMUopA9OqGogeFJDuO238LqHh5Dc7hlCus1LG9YPqqAjikH
+ DaNO5r2crZTvf0eetstKadfZ5vJz5ak=
+X-Google-Smtp-Source: ABdhPJxCtmKl+Lp+LZKS7iTo5ONQcVduXqP3f0GRGijbsf6bOh5mU6XFxlcczeQSj9AZDkn+XcX/nA==
+X-Received: by 2002:a5d:440e:: with SMTP id z14mr15505487wrq.422.1597675128181; 
+ Mon, 17 Aug 2020 07:38:48 -0700 (PDT)
 Received: from donizetti.redhat.com ([2001:b07:6468:f312:a0d1:fc42:c610:f977])
  by smtp.gmail.com with ESMTPSA id
- i22sm34966603wrb.45.2020.08.17.07.38.19
+ i22sm34966603wrb.45.2020.08.17.07.38.47
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 17 Aug 2020 07:38:19 -0700 (PDT)
+ Mon, 17 Aug 2020 07:38:47 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 056/150] meson: convert authz directory to Meson
-Date: Mon, 17 Aug 2020 16:35:49 +0200
-Message-Id: <20200817143723.343284-57-pbonzini@redhat.com>
+Subject: [PATCH 083/150] meson: convert qapi-specific to meson
+Date: Mon, 17 Aug 2020 16:36:16 +0200
+Message-Id: <20200817143723.343284-84-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200817143723.343284-1-pbonzini@redhat.com>
 References: <20200817143723.343284-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::335;
- envelope-from=paolo.bonzini@gmail.com; helo=mail-wm1-x335.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::441;
+ envelope-from=paolo.bonzini@gmail.com; helo=mail-wr1-x441.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -112,118 +112,79 @@ From: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Makefile            |  1 -
- Makefile.objs       |  3 ++-
- Makefile.target     |  2 +-
- authz/Makefile.objs |  7 -------
- authz/meson.build   | 19 +++++++++++++++++++
- meson.build         |  5 +++++
- 6 files changed, 27 insertions(+), 10 deletions(-)
- delete mode 100644 authz/Makefile.objs
- create mode 100644 authz/meson.build
+ Makefile.objs      |  2 --
+ Makefile.target    |  1 -
+ qapi/Makefile.objs | 15 ---------------
+ qapi/meson.build   | 10 +++++++---
+ 4 files changed, 7 insertions(+), 21 deletions(-)
+ delete mode 100644 qapi/Makefile.objs
 
-diff --git a/Makefile b/Makefile
-index 1f95ba81f4..6051efe766 100644
---- a/Makefile
-+++ b/Makefile
-@@ -230,7 +230,6 @@ include $(SRC_PATH)/Makefile.objs
- endif
- 
- dummy := $(call unnest-vars,, \
--                authz-obj-y \
-                 chardev-obj-y \
-                 block-obj-y \
-                 block-obj-m \
 diff --git a/Makefile.objs b/Makefile.objs
-index 84bfa2a61a..0bc361d338 100644
+index 3b32a4c9bb..c332323b81 100644
 --- a/Makefile.objs
 +++ b/Makefile.objs
-@@ -9,7 +9,8 @@ ifeq ($(call lor,$(CONFIG_SOFTMMU),$(CONFIG_TOOLS)),y)
+@@ -64,8 +64,6 @@ common-obj-$(if $(and $(CONFIG_BZIP2),$(CONFIG_DMG)),m) += block-dmg-bz2$(DSOSUF
+ common-obj-y += hw/
+ common-obj-m += hw/
  
- chardev-obj-y = chardev/
+-common-obj-y += qapi/
+-
+ common-obj-y += libqmp.fa
  
--authz-obj-y = authz/
-+authz-obj-y = authz/libauthz.fa
-+authz/libauthz.fa-libs = $(if $(CONFIG_AUTH_PAM),-lpam)
- 
- block-obj-y = block/ nbd/ scsi/
- block-obj-y += block.o blockjob.o job.o
+ endif # CONFIG_SOFTMMU
 diff --git a/Makefile.target b/Makefile.target
-index 1e04551a8e..79b6e02bed 100644
+index bf3fda92c1..386378b9c8 100644
 --- a/Makefile.target
 +++ b/Makefile.target
-@@ -192,9 +192,9 @@ common-obj-m :=
+@@ -157,7 +157,6 @@ ifdef CONFIG_SOFTMMU
+ obj-y += softmmu/
+ obj-y += gdbstub.o
+ obj-y += hw/
+-obj-y += qapi/
+ LIBS := $(libs_softmmu) $(LIBS)
  
- include $(SRC_PATH)/Makefile.objs
- dummy := $(call fix-paths,../,, \
-+              authz-obj-y \
-               qom-obj-y)
- dummy := $(call unnest-vars,.., \
--               authz-obj-y \
-                block-obj-y \
-                block-obj-m \
-                chardev-obj-y \
-diff --git a/authz/Makefile.objs b/authz/Makefile.objs
+ # Temporary until emulators are linked by Meson
+diff --git a/qapi/Makefile.objs b/qapi/Makefile.objs
 deleted file mode 100644
-index ed7b273596..0000000000
---- a/authz/Makefile.objs
+index c0a31be1a1..0000000000
+--- a/qapi/Makefile.objs
 +++ /dev/null
-@@ -1,7 +0,0 @@
--authz-obj-y += base.o
--authz-obj-y += simple.o
--authz-obj-y += list.o
--authz-obj-y += listfile.o
--authz-obj-$(CONFIG_AUTH_PAM) += pamacct.o
+@@ -1,15 +0,0 @@
+-QAPI_TARGET_MODULES = machine-target misc-target
 -
--pamacct.o-libs = -lpam
-diff --git a/authz/meson.build b/authz/meson.build
-new file mode 100644
-index 0000000000..c1f63627c1
---- /dev/null
-+++ b/authz/meson.build
-@@ -0,0 +1,19 @@
-+authz_ss = ss.source_set()
-+authz_ss.add(genh)
-+authz_ss.add(files(
-+  'base.c',
-+  'list.c',
-+  'listfile.c',
-+  'simple.c',
-+))
-+
-+authz_ss.add(when: ['CONFIG_AUTH_PAM', pam], if_true: files('pamacct.c'))
-+
-+authz_ss = authz_ss.apply(config_host, strict: false)
-+libauthz = static_library('authz', authz_ss.sources(),
-+                          dependencies: [authz_ss.dependencies()],
-+                          name_suffix: 'fa',
-+                          build_by_default: false)
-+
-+authz = declare_dependency(link_whole: libauthz,
-+                           dependencies: qom)
-diff --git a/meson.build b/meson.build
-index 30e7a0e35b..e1fc4c2169 100644
---- a/meson.build
-+++ b/meson.build
-@@ -99,6 +99,10 @@ if 'CONFIG_GNUTLS' in config_host
- endif
- pixman = declare_dependency(compile_args: config_host['PIXMAN_CFLAGS'].split(),
-                             link_args: config_host['PIXMAN_LIBS'].split())
-+pam = not_found
-+if 'CONFIG_AUTH_PAM' in config_host
-+  pam = cc.find_library('pam')
-+endif
- libattr = not_found
- if 'CONFIG_ATTR' in config_host
-   libattr = declare_dependency(link_args: config_host['LIBATTR_LIBS'].split())
-@@ -337,6 +341,7 @@ qemuutil = declare_dependency(link_with: libqemuutil,
-                               sources: genh + version_res)
+-obj-y = qapi-introspect.o
+-obj-y += $(QAPI_TARGET_MODULES:%=qapi-types-%.o)
+-obj-y += qapi-types.o
+-obj-y += $(QAPI_TARGET_MODULES:%=qapi-visit-%.o)
+-obj-y += qapi-visit.o
+-obj-y += $(QAPI_TARGET_MODULES:%=qapi-events-%.o)
+-obj-y += qapi-events.o
+-obj-y += $(QAPI_TARGET_MODULES:%=qapi-commands-%.o)
+-obj-y += qapi-commands.o
+-obj-y += qapi-init-commands.o
+-
+-QAPI_MODULES_STORAGE_DAEMON = block-core char common control crypto
+-QAPI_MODULES_STORAGE_DAEMON += introspect job qom sockets pragma transaction
+diff --git a/qapi/meson.build b/qapi/meson.build
+index f45b80bbfa..2b2872a41d 100644
+--- a/qapi/meson.build
++++ b/qapi/meson.build
+@@ -114,8 +114,12 @@ foreach output : qapi_util_outputs
+   i = i + 1
+ endforeach
  
- subdir('qom')
-+subdir('authz')
- subdir('fsdev')
+-# These are still handled by the Makefile
+-i += qapi_nonmodule_outputs.length()
+-i += qapi_specific_outputs.length()
++foreach output : qapi_specific_outputs + qapi_nonmodule_outputs
++  if output.endswith('.h')
++    genh += qapi_files[i]
++  endif
++  specific_ss.add(when: 'CONFIG_SOFTMMU', if_true: qapi_files[i])
++  i = i + 1
++endforeach
  
- # Other build targets
+ qapi_doc_texi = qapi_files[i]
 -- 
 2.26.2
 
