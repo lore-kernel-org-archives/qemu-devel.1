@@ -7,79 +7,78 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9E8FC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 15:07:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C90C8C433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 15:08:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 754D8204EC
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 15:07:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 69A04204EC
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 15:08:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FTSljtP6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 754D8204EC
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A24/tdAa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69A04204EC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46872 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50570 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7gjH-0004OU-Lj
-	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 11:07:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41332)
+	id 1k7gk0-0005uB-J0
+	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 11:08:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41098)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1k7gHY-0005CO-LM
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:38:40 -0400
-Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:39222)
+ id 1k7gHI-0004tW-0D
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:38:24 -0400
+Received: from mail-wr1-x42d.google.com ([2a00:1450:4864:20::42d]:43838)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1k7gHU-0006EG-Ha
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:38:39 -0400
-Received: by mail-wr1-x429.google.com with SMTP id a5so15259763wrm.6
- for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 07:38:35 -0700 (PDT)
+ id 1k7gHE-0006BQ-04
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:38:23 -0400
+Received: by mail-wr1-x42d.google.com with SMTP id a15so15234738wrh.10
+ for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 07:38:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ h=sender:from:to:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=aXdjHqDn7Dx5PCb35bX2WOyvYxDDE/R6Ug79m5dFQdc=;
- b=FTSljtP6QQzBCvBVePRrLHxknzFAhwVLzYODcQv97uFXYoaVNXpU/lCril8f9enlL/
- Kn2DikM+Q9ugDlZIpaUBDLdDCudDKbZeRERDssHhowhshuw60f34OgpVOxMgCrGwhEHu
- eWWafHGYFHgpIhMYWipqyeW/tnb2+Yli1n2z5dSs5fMydnrGxuASgRCeWhdJtihlGn7B
- qngo8AI7+DWWLSwIheKhxqO6lWbFIB4aBliMNXdwmFKCdKODv1RvjkSga6jsKvASYb7R
- xCAHjRcezGdw7nqzFpSTzc1SxdgqyyehWnvN5z6DIVugW4Suv/ElfzZOzGctdZu/r7bK
- 3qaA==
+ bh=VcvZFJOfgRhfmScg8I4ZyG0nqR7sIH9JWaPeIlnfKRw=;
+ b=A24/tdAabD6+LCaQzG0YOkoM0VRkxW5srw8r2vUGd+QQDFqLhNcmovhkBbRQMLM9ba
+ khC9dSAcZy+eREu4REqzlGbfM/ySBnUgpfl5VDRYnpLtGrAxdRC+ihzoN9j5yoOdCmAi
+ 3xtSuNT/CSrke8iv0IqhKkVLIbRhSZS8V4/JzR/rZLvL3g0DIM/2PRQ/deiCrS0rINPZ
+ MLbYBJAdeX2SDHcyi3dVZAtVbbwNWx4d+zGjdyfoFYsKNj8IbnF9OMtrz/jXsc4XbDci
+ GVD71CiDLK1J+CNKL+7qJ4/WDQemUk7YFJEk+sVZ7dQmUcZNvjVEce/M+6YWVHCmYSZv
+ gBsg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ h=x-gm-message-state:sender:from:to:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=aXdjHqDn7Dx5PCb35bX2WOyvYxDDE/R6Ug79m5dFQdc=;
- b=S5vi7JlkQiwVEop5NvcpsPuzwFhZAchuySHEtwGQnFLGK4a9njZ5nyuXaDdNnMXe/I
- AudYdrhWi7tMk36z+syUDYZ2pVgFLdwXuyFTOjFquKHkwh+KlOQR6RFHVE/mNr30Otjt
- POlAvivVAjvtpwPR9fU44OQg4vgxwulk0oVyhPzpcbNNwp9pDNOO/XWDRgTYX6UV2sgi
- g9EZs5q//D1/egcN7bvWotJwCMnIWGOKajD1P3a3wjfytLlSvYlD0lV4bTe7FnXr1NYh
- n8RlwOTR1YAdmUCw6WFU2MLcczgWW1OrSsP0SvyYcDQQb6RX5jSN1VDODk2Jbndf1Ywf
- Q+2Q==
-X-Gm-Message-State: AOAM531nBDWPmapB2fsIzji1dh5n3KUse7gkXtNenERDYt8E2bsi7GQ3
- gKB+D2nyw3Og44NToYiTFTKG6tx8XFU=
-X-Google-Smtp-Source: ABdhPJzEbwTQyUGGizfh3vPeEC1ISgEDQ9JQdH+64zZw/fr1L6Md7MAEjWKHGPQ8rvuUT7eIXwablg==
-X-Received: by 2002:a5d:440e:: with SMTP id z14mr15504446wrq.422.1597675114348; 
- Mon, 17 Aug 2020 07:38:34 -0700 (PDT)
+ bh=VcvZFJOfgRhfmScg8I4ZyG0nqR7sIH9JWaPeIlnfKRw=;
+ b=nlun7za22wsEn24KVI5O65HenXzG0fEEXbdiMCzC+zNV0Fre7wc4RVBczARcHOOjVR
+ NWwVT/s5GR4gs8YnY6qpmC71Q+TsyYP3CM6ee6lv6C13XVmu6IQlJkLtPIllJAO1BFzX
+ 4r5YgdVpQaskB/Jt71nBCzn3J9JN13nAEWci1IyhsHX8mRd+9u865y9nq1Tuib0+cJpf
+ WYiSqgW40e1pWmX4xDKVYJjw8t7SiMd2H1iLuZ2dpuoLOLd6TMQEgt0eaS9IDHNYMXxN
+ sx/eWvRANYgknguQGNsUk82G01fe9ROfCmTCqiDTe4dpXui7inbSEaxDrPb65Zd3CSd7
+ aGaQ==
+X-Gm-Message-State: AOAM533kR0ReFUdQvnWkG7/d9DGvunT0LZSb1C1oKVF8s6dBZEWC/Au0
+ XC9dNfRd3+AImrp6jBOjMOQ13UxRnmc=
+X-Google-Smtp-Source: ABdhPJy3FGRw54F26353RDCf9vF90uHgECwTH3WReYGiPyaO5wDhepwCzsr20nzACVitWG/GKO52lA==
+X-Received: by 2002:adf:dfd0:: with SMTP id q16mr17185969wrn.60.1597675097448; 
+ Mon, 17 Aug 2020 07:38:17 -0700 (PDT)
 Received: from donizetti.redhat.com ([2001:b07:6468:f312:a0d1:fc42:c610:f977])
  by smtp.gmail.com with ESMTPSA id
- i22sm34966603wrb.45.2020.08.17.07.38.33
+ i22sm34966603wrb.45.2020.08.17.07.38.16 for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 17 Aug 2020 07:38:33 -0700 (PDT)
+ Mon, 17 Aug 2020 07:38:17 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 069/150] meson: convert audio directory to Meson
-Date: Mon, 17 Aug 2020 16:36:02 +0200
-Message-Id: <20200817143723.343284-70-pbonzini@redhat.com>
+Subject: [PATCH 053/150] meson: convert tests/fp and check-softfloat
+Date: Mon, 17 Aug 2020 16:35:46 +0200
+Message-Id: <20200817143723.343284-54-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200817143723.343284-1-pbonzini@redhat.com>
 References: <20200817143723.343284-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::429;
- envelope-from=paolo.bonzini@gmail.com; helo=mail-wr1-x429.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::42d;
+ envelope-from=paolo.bonzini@gmail.com; helo=mail-wr1-x42d.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -102,248 +101,1487 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Makefile.objs       |  7 +++++--
- Makefile.target     |  3 ++-
- audio/Makefile.objs | 35 -----------------------------------
- audio/meson.build   | 30 ++++++++++++++++++++++++++++++
- configure           | 16 ++++++++++++++++
- meson.build         | 27 +++++++++++++++++++++++++++
- 6 files changed, 80 insertions(+), 38 deletions(-)
- delete mode 100644 audio/Makefile.objs
- create mode 100644 audio/meson.build
+ configure              |   2 +-
+ tests/Makefile.include | 160 +----------
+ tests/fp/Makefile      | 600 --------------------------------------
+ tests/fp/meson.build   | 636 +++++++++++++++++++++++++++++++++++++++++
+ tests/meson.build      |   4 +
+ 5 files changed, 644 insertions(+), 758 deletions(-)
+ delete mode 100644 tests/fp/Makefile
+ create mode 100644 tests/fp/meson.build
 
-diff --git a/Makefile.objs b/Makefile.objs
-index e43526fe5f..ec7627a4c6 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -63,6 +63,11 @@ common-obj-$(CONFIG_LINUX) += fsdev/
- common-obj-y += accel/
- common-obj-y += migration/
- 
-+common-obj-$(CONFIG_AUDIO_ALSA) += audio-alsa$(DSOSUF)
-+common-obj-$(CONFIG_AUDIO_OSS) += audio-oss$(DSOSUF)
-+common-obj-$(CONFIG_AUDIO_PA) += audio-pa$(DSOSUF)
-+common-obj-$(CONFIG_AUDIO_SDL) += audio-sdl$(DSOSUF)
-+
- common-obj-$(if $(CONFIG_CURL),m) += block-curl$(DSOSUF)
- common-obj-$(if $(CONFIG_GLUSTERFS),m) += block-gluster$(DSOSUF)
- common-obj-$(if $(CONFIG_LIBISCSI),m) += block-iscsi$(DSOSUF)
-@@ -73,8 +78,6 @@ common-obj-$(if $(CONFIG_RBD),m) += block-rbd$(DSOSUF)
- common-obj-$(if $(CONFIG_LZFSE),m) += block-dmg-lzfse$(DSOSUF)
- common-obj-$(if $(and $(CONFIG_BZIP2),$(CONFIG_DMG)),m) += block-dmg-bz2$(DSOSUF)
- 
--common-obj-y += audio/
--common-obj-m += audio/
- common-obj-y += hw/
- common-obj-m += hw/
- 
-diff --git a/Makefile.target b/Makefile.target
-index c8c4b70162..ff0e1b2d10 100644
---- a/Makefile.target
-+++ b/Makefile.target
-@@ -166,9 +166,10 @@ LIBS := $(libs_softmmu) $(LIBS)
- # Temporary until emulators are linked by Meson
- LIBS := $(LIBS) @../block.syms @../qemu.syms
- ifneq ($(CONFIG_MODULES),y)
--LIBS := $(LIBS)
-+LIBS := $(LIBS) $(ALSA_LIBS) $(OSS_LIBS) $(PULSE_LIBS) $(SDL_LIBS)
- endif
- LIBS := $(LIBS) $(BRLAPI_LIBS) $(SDL_LIBS) $(SPICE_LIBS)
-+LIBS := $(LIBS) $(COREAUDIO_LIBS) $(DSOUND_LIBS)
- 
- # Hardware support
- ifeq ($(TARGET_NAME), sparc64)
-diff --git a/audio/Makefile.objs b/audio/Makefile.objs
-deleted file mode 100644
-index b4a4c11f31..0000000000
---- a/audio/Makefile.objs
-+++ /dev/null
-@@ -1,35 +0,0 @@
--common-obj-y = audio.o audio_legacy.o noaudio.o wavaudio.o mixeng.o
--common-obj-$(CONFIG_SPICE) += spiceaudio.o
--common-obj-$(CONFIG_AUDIO_COREAUDIO) += coreaudio.o
--common-obj-$(CONFIG_AUDIO_DSOUND) += dsoundaudio.o
--common-obj-$(CONFIG_AUDIO_WIN_INT) += audio_win_int.o
--common-obj-y += wavcapture.o
--
--coreaudio.o-libs := $(COREAUDIO_LIBS)
--dsoundaudio.o-libs := $(DSOUND_LIBS)
--
--# alsa module
--common-obj-$(CONFIG_AUDIO_ALSA) += alsa.mo
--alsa.mo-objs = alsaaudio.o
--alsa.mo-libs := $(ALSA_LIBS)
--
--# oss module
--common-obj-$(CONFIG_AUDIO_OSS) += oss.mo
--oss.mo-objs = ossaudio.o
--oss.mo-libs := $(OSS_LIBS)
--
--# pulseaudio module
--common-obj-$(CONFIG_AUDIO_PA) += pa.mo
--pa.mo-objs = paaudio.o
--pa.mo-libs := $(PULSE_LIBS)
--
--# sdl module
--common-obj-$(CONFIG_AUDIO_SDL) += sdl.mo
--sdl.mo-objs = sdlaudio.o
--sdl.mo-cflags := $(SDL_CFLAGS)
--sdl.mo-libs := $(SDL_LIBS)
--
--# jack module
--common-obj-$(CONFIG_AUDIO_JACK) += jack.mo
--jack.mo-objs = jackaudio.o
--jack.mo-libs := $(JACK_LIBS)
-diff --git a/audio/meson.build b/audio/meson.build
-new file mode 100644
-index 0000000000..15c06ba045
---- /dev/null
-+++ b/audio/meson.build
-@@ -0,0 +1,30 @@
-+softmmu_ss.add(files(
-+  'audio.c',
-+  'audio_legacy.c',
-+  'mixeng.c',
-+  'noaudio.c',
-+  'wavaudio.c',
-+  'wavcapture.c',
-+))
-+
-+softmmu_ss.add(when: [spice, 'CONFIG_SPICE'], if_true: files('spiceaudio.c'))
-+softmmu_ss.add(when: [coreaudio, 'CONFIG_AUDIO_COREAUDIO'], if_true: files('coreaudio.c'))
-+softmmu_ss.add(when: [dsound, 'CONFIG_AUDIO_DSOUND'], if_true: files('dsoundaudio.c'))
-+softmmu_ss.add(when: ['CONFIG_AUDIO_WIN_INT'], if_true: files('audio_win_int.c'))
-+
-+audio_modules = {}
-+foreach m : [
-+  ['CONFIG_AUDIO_ALSA', 'alsa', alsa, 'alsaaudio.c'],
-+  ['CONFIG_AUDIO_OSS', 'oss', oss, 'ossaudio.c'],
-+  ['CONFIG_AUDIO_PA', 'pa', pulse, 'paaudio.c'],
-+  ['CONFIG_AUDIO_SDL', 'sdl', sdl, 'sdlaudio.c'],
-+  ['CONFIG_AUDIO_JACK', 'jack', jack, 'jackaudio.c']
-+]
-+  if config_host.has_key(m[0])
-+    module_ss = ss.source_set()
-+    module_ss.add(when: m[2], if_true: files(m[3]))
-+    audio_modules += {m[1] : module_ss}
-+  endif
-+endforeach
-+
-+modules += {'audio': audio_modules}
 diff --git a/configure b/configure
-index 50e74b1e79..f52556fef4 100755
+index 642f2a8f88..2123a79039 100755
 --- a/configure
 +++ b/configure
-@@ -3718,6 +3718,8 @@ for drv in $audio_drv_list; do
-     alsa | try-alsa)
-     if $pkg_config alsa --exists; then
-         alsa_libs=$($pkg_config alsa --libs)
-+        alsa_cflags=$($pkg_config alsa --cflags)
-+        alsa=yes
-         if test "$drv" = "try-alsa"; then
-             audio_drv_list=$(echo "$audio_drv_list" | sed -e 's/try-alsa/alsa/')
-         fi
-@@ -3733,7 +3735,9 @@ for drv in $audio_drv_list; do
+@@ -8329,7 +8329,7 @@ DIRS="$DIRS pc-bios/optionrom pc-bios/s390-ccw"
+ DIRS="$DIRS roms/seabios"
+ LINKS="Makefile"
+ LINKS="$LINKS tests/tcg/lm32/Makefile po/Makefile"
+-LINKS="$LINKS tests/tcg/Makefile.target tests/fp/Makefile"
++LINKS="$LINKS tests/tcg/Makefile.target"
+ LINKS="$LINKS tests/plugin/Makefile"
+ LINKS="$LINKS pc-bios/optionrom/Makefile pc-bios/keymaps"
+ LINKS="$LINKS pc-bios/s390-ccw/Makefile"
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 8e953a24ee..b3f8fdd321 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -437,9 +437,6 @@ tests/test-bufferiszero$(EXESUF): tests/test-bufferiszero.o $(test-util-obj-y)
+ tests/atomic_add-bench$(EXESUF): tests/atomic_add-bench.o $(test-util-obj-y)
+ tests/atomic64-bench$(EXESUF): tests/atomic64-bench.o $(test-util-obj-y)
  
-     pa | try-pa)
-     if $pkg_config libpulse --exists; then
-+        libpulse=yes
-         pulse_libs=$($pkg_config libpulse --libs)
-+        pulse_cflags=$($pkg_config libpulse --cflags)
-         if test "$drv" = "try-pa"; then
-             audio_drv_list=$(echo "$audio_drv_list" | sed -e 's/try-pa/pa/')
-         fi
-@@ -3776,6 +3780,7 @@ for drv in $audio_drv_list; do
+-tests/fp/%:
+-	$(MAKE) -C $(dir $@) $(notdir $@)
+-
+ tests/test-qdev-global-props$(EXESUF): tests/test-qdev-global-props.o \
+ 	hw/core/qdev.o hw/core/qdev-properties.o hw/core/hotplug.o\
+ 	hw/core/bus.o \
+@@ -675,157 +672,6 @@ check-report-unit.tap: $(check-unit-y)
  
-     jack | try-jack)
-     if $pkg_config jack --exists; then
-+        libjack=yes
-         jack_libs=$($pkg_config jack --libs)
-         if test "$drv" = "try-jack"; then
-             audio_drv_list=$(echo "$audio_drv_list" | sed -e 's/try-jack/jack/')
-@@ -6987,11 +6992,22 @@ for drv in $audio_drv_list; do
- 	    echo "$def=y" >> $config_host_mak ;;
-     esac
- done
-+if test "$alsa" = "yes" ; then
-+    echo "CONFIG_ALSA=y" >> $config_host_mak
-+fi
- echo "ALSA_LIBS=$alsa_libs" >> $config_host_mak
-+echo "ALSA_CFLAGS=$alsa_cflags" >> $config_host_mak
-+if test "$libpulse" = "yes" ; then
-+    echo "CONFIG_LIBPULSE=y" >> $config_host_mak
-+fi
- echo "PULSE_LIBS=$pulse_libs" >> $config_host_mak
-+echo "PULSE_CFLAGS=$pulse_cflags" >> $config_host_mak
- echo "COREAUDIO_LIBS=$coreaudio_libs" >> $config_host_mak
- echo "DSOUND_LIBS=$dsound_libs" >> $config_host_mak
- echo "OSS_LIBS=$oss_libs" >> $config_host_mak
-+if test "$libjack" = "yes" ; then
-+    echo "CONFIG_LIBJACK=y" >> $config_host_mak
-+fi
- echo "JACK_LIBS=$jack_libs" >> $config_host_mak
- if test "$audio_win_int" = "yes" ; then
-   echo "CONFIG_AUDIO_WIN_INT=y" >> $config_host_mak
-diff --git a/meson.build b/meson.build
-index 06d9287005..9dda687575 100644
---- a/meson.build
-+++ b/meson.build
-@@ -143,6 +143,20 @@ if 'CONFIG_XKBCOMMON' in config_host
-   xkbcommon = declare_dependency(compile_args: config_host['XKBCOMMON_CFLAGS'].split(),
-                                  link_args: config_host['XKBCOMMON_LIBS'].split())
+ check-report.tap: $(patsubst %,check-report-qtest-%.tap, $(QTEST_TARGETS)) check-report-unit.tap
+ 
+-# FPU Emulation tests (aka softfloat)
+-#
+-# As we still have some places that need fixing the rules are a little
+-# more complex than they need to be and have to override some of the
+-# generic Makefile expansions. Once we are cleanly passing all
+-# the tests we can simplify the make syntax.
+-
+-FP_TEST_BIN=$(BUILD_DIR)/tests/fp/fp-test
+-
+-# the build dir is created by configure
+-$(FP_TEST_BIN): config-host.h $(test-util-obj-y)
+-	$(call quiet-command, \
+-	 	$(MAKE) $(SUBDIR_MAKEFLAGS) -C $(dir $@) V="$(V)" $(notdir $@), \
+-	         "BUILD", "$(notdir $@)")
+-
+-# The full test suite can take a bit of time, default to a quick run
+-# "-l 2 -r all" can take more than a day for some operations and is best
+-# run manually
+-FP_TL=-l 1 -r all
+-
+-# $1 = tests, $2 = description, $3 = test flags
+-test-softfloat = $(call quiet-command, \
+-			cd $(BUILD_DIR)/tests/fp && \
+-			./fp-test -s $(if $3,$3,$(FP_TL)) $1 > $2.out 2>&1 || \
+-			(cat $2.out && exit 1;), \
+-			"FLOAT TEST", $2)
+-
+-# Conversion Routines: Float to Float
+-# FIXME: f32_to_f128 (broken), f64_to_f128 (broken)
+-# FIXME: f128_to_f32(broken), f128_to_f64 (broken)
+-# FIXME: f128_to_extF80 (broken)
+-check-softfloat-conv-f2f: $(FP_TEST_BIN)
+-	$(call test-softfloat, \
+-		f16_to_f32 f16_to_f64 \
+-		f16_to_extF80 f16_to_f128 \
+-		f32_to_f16 f32_to_f64 \
+-		f32_to_extF80 \
+-		f64_to_f16 f64_to_f32 \
+-		extF80_to_f16 extF80_to_f32 \
+-		extF80_to_f64 extF80_to_f128 \
+-		f128_to_f16, \
+-		float-to-float)
+-
+-# Conversion Routines: Int and Uint to Float
+-# FIXME: i32_to_extF80 (broken), i64_to_extF80 (broken)
+-#        ui32_to_f128 (not implemented)
+-check-softfloat-conv-to-float: $(FP_TEST_BIN)
+-	$(call test-softfloat, \
+-		i32_to_f16 i64_to_f16 \
+-		i32_to_f32 i64_to_f32 \
+-		i32_to_f64 i64_to_f64 \
+-		i32_to_f128 i64_to_f128, int-to-float)
+-	$(call test-softfloat, \
+-		ui32_to_f16 ui64_to_f16 \
+-		ui32_to_f32 ui64_to_f32 \
+-		ui32_to_f64 ui64_to_f64 \
+-		ui32_to_extF80 ui64_to_extF80 \
+-		ui64_to_f128, uint-to-float)
+-
+-# Conversion Routines: Float to integers
+-# FIXME: extF80_roundToInt (broken)
+-check-softfloat-conv-to-int: $(FP_TEST_BIN)
+-	$(call test-softfloat, \
+-		f16_to_i32 f16_to_i32_r_minMag \
+-		f32_to_i32 f32_to_i32_r_minMag \
+-		f64_to_i32 f64_to_i32_r_minMag \
+-		extF80_to_i32 extF80_to_i32_r_minMag \
+-		f128_to_i32 f128_to_i32_r_minMag \
+-		f16_to_i64 f16_to_i64_r_minMag \
+-		f32_to_i64 f32_to_i64_r_minMag \
+-		f64_to_i64 f64_to_i64_r_minMag \
+-		extF80_to_i64 extF80_to_i64_r_minMag \
+-		f128_to_i64 f128_to_i64_r_minMag, \
+-		float-to-int)
+-	$(call test-softfloat, \
+-		f16_to_ui32 f16_to_ui32_r_minMag \
+-		f32_to_ui32 f32_to_ui32_r_minMag \
+-		f64_to_ui32 f64_to_ui32_r_minMag \
+-		extF80_to_ui32 extF80_to_ui32_r_minMag \
+-		f128_to_ui32 f128_to_ui32_r_minMag \
+-		f16_to_ui64 f16_to_ui64_r_minMag \
+-		f32_to_ui64 f32_to_ui64_r_minMag \
+-		f64_to_ui64 f64_to_ui64_r_minMag \
+-		extF80_to_ui64 extF80_to_ui64_r_minMag \
+-		f128_to_ui64 f128_to_ui64_r_minMag, \
+-		float-to-uint)
+-	$(call test-softfloat, \
+-		f16_roundToInt f32_roundToInt \
+-		f64_roundToInt f128_roundToInt, \
+-		round-to-integer)
+-
+-.PHONY: check-softfloat-conv
+-check-softfloat-conv: check-softfloat-conv-f2f
+-check-softfloat-conv: check-softfloat-conv-to-float
+-check-softfloat-conv: check-softfloat-conv-to-int
+-
+-# Generic rule for all float operations
+-#
+-# Some patterns are overridden due to broken or missing tests.
+-# Hopefully these can be removed over time.
+-
+-check-softfloat-%: $(FP_TEST_BIN)
+-	$(call test-softfloat, f16_$* f32_$* f64_$* extF80_$* f128_$*, $*)
+-
+-# Float Compare routines
+-SF_COMPARE_OPS=eq eq_signaling le le_quiet lt_quiet
+-SF_COMPARE_RULES=$(patsubst %,check-softfloat-%, $(SF_COMPARE_OPS))
+-
+-# FIXME: extF80_lt_quiet (broken)
+-check-softfloat-lt_quiet: $(FP_TEST_BIN)
+-	$(call test-softfloat, 				\
+-		f16_lt_quiet f32_lt_quiet f64_lt_quiet  \
+-		f128_lt_quiet, 				\
+-		lt_quiet)
+-
+-.PHONY: check-softfloat-compare
+-check-softfloat-compare: $(SF_COMPARE_RULES)
+-
+-# Math Operations
+-
+-# FIXME: extF80_mulAdd (missing)
+-check-softfloat-mulAdd: $(FP_TEST_BIN)
+-	$(call test-softfloat, \
+-		f16_mulAdd f32_mulAdd f64_mulAdd f128_mulAdd, \
+-		mulAdd,-l 1)
+-
+-# FIXME: extF80_rem (broken)
+-check-softfloat-rem: $(FP_TEST_BIN)
+-	$(call test-softfloat, \
+-		f16_rem f32_rem f64_rem f128_rem, \
+-		rem)
+-
+-SF_MATH_OPS=add sub mul mulAdd div rem sqrt
+-SF_MATH_RULES=$(patsubst %,check-softfloat-%, $(SF_MATH_OPS))
+-
+-.PHONY: check-softfloat-ops
+-check-softfloat-ops: $(SF_MATH_RULES)
+-
+-# Finally a generic rule to test all of softfoat. If TCG isnt't
+-# enabled we define a null operation which skips the tests.
+-
+-.PHONY: check-softfloat
+-ifeq ($(CONFIG_TCG),y)
+-build-softfloat: $(FP_TEST_BIN)
+-check-softfloat: build-softfloat check-softfloat-conv check-softfloat-compare check-softfloat-ops
+-else
+-build-softfloat check-softfloat:
+-	$(call quiet-command, /bin/true, "FLOAT TEST", \
+-		"SKIPPED for non-TCG builds")
+-endif
+-
+ # Plugins
+ ifeq ($(CONFIG_PLUGIN),y)
+ .PHONY: plugins
+@@ -953,9 +799,9 @@ check-qtest: $(patsubst %,check-qtest-%, $(QTEST_TARGETS))
+ ifeq ($(CONFIG_TOOLS),y)
+ check-block: $(patsubst %,check-%, $(check-block-y))
  endif
-+pulse = not_found
-+if 'CONFIG_LIBPULSE' in config_host
-+  pulse = declare_dependency(compile_args: config_host['PULSE_CFLAGS'].split(),
-+                             link_args: config_host['PULSE_LIBS'].split())
-+endif
-+alsa = not_found
-+if 'CONFIG_ALSA' in config_host
-+  alsa = declare_dependency(compile_args: config_host['ALSA_CFLAGS'].split(),
-+                            link_args: config_host['ALSA_LIBS'].split())
-+endif
-+jack = not_found
-+if 'CONFIG_LIBJACK' in config_host
-+  jack = declare_dependency(link_args: config_host['JACK_LIBS'].split())
-+endif
- spice = not_found
- if 'CONFIG_SPICE' in config_host
-   spice = declare_dependency(compile_args: config_host['SPICE_CFLAGS'].split(),
-@@ -213,6 +227,18 @@ liblzfse = not_found
- if 'CONFIG_LZFSE' in config_host
-   liblzfse = declare_dependency(link_args: config_host['LZFSE_LIBS'].split())
- endif
-+oss = not_found
-+if 'CONFIG_AUDIO_OSS' in config_host
-+  oss = declare_dependency(link_args: config_host['OSS_LIBS'].split())
-+endif
-+dsound = not_found
-+if 'CONFIG_AUDIO_DSOUND' in config_host
-+  dsound = declare_dependency(link_args: config_host['DSOUND_LIBS'].split())
-+endif
-+coreaudio = not_found
-+if 'CONFIG_AUDIO_COREAUDIO' in config_host
-+  coreaudio = declare_dependency(link_args: config_host['COREAUDIO_LIBS'].split())
-+endif
+-check-build: build-unit build-softfloat build-qtest
++check-build: build-unit build-qtest
  
- create_config = find_program('scripts/create_config')
- minikconf = find_program('scripts/minikconf.py')
-@@ -514,6 +540,7 @@ libqemuutil = static_library('qemuutil',
- qemuutil = declare_dependency(link_with: libqemuutil,
-                               sources: genh + version_res)
+-check: check-block check-qapi-schema check-unit check-softfloat check-qtest
++check: check-block check-qapi-schema check-unit check-qtest
+ check-clean:
+ 	rm -rf $(check-unit-y) tests/*.o tests/*/*.o $(QEMU_IOTESTS_HELPERS-y)
+ 	rm -rf $(sort $(foreach target,$(SYSEMU_TARGET_LIST), $(check-qtest-$(target)-y:%=tests/qtest/%$(EXESUF))) $(check-qtest-generic-y:%=tests/qtest/%$(EXESUF)))
+@@ -963,7 +809,7 @@ check-clean:
+ 	rm -f tests/qtest/dbus-vmstate1-gen-timestamp
+ 	rm -rf $(TESTS_VENV_DIR) $(TESTS_RESULTS_DIR)
  
-+subdir('audio')
- subdir('io')
- subdir('chardev')
- subdir('fsdev')
+-check: check-block check-qapi-schema check-unit check-softfloat check-qtest check-decodetree
++check: check-block check-qapi-schema check-unit check-qtest check-decodetree
+ 
+ clean: check-clean
+ 
+diff --git a/tests/fp/Makefile b/tests/fp/Makefile
+deleted file mode 100644
+index 56768ecfd2..0000000000
+--- a/tests/fp/Makefile
++++ /dev/null
+@@ -1,600 +0,0 @@
+-BUILD_DIR := $(CURDIR)/../..
+-
+-include $(BUILD_DIR)/config-host.mak
+-include $(SRC_PATH)/rules.mak
+-
+-SOFTFLOAT_DIR := $(SRC_PATH)/tests/fp/berkeley-softfloat-3
+-TESTFLOAT_DIR := $(SRC_PATH)/tests/fp/berkeley-testfloat-3
+-
+-SF_SOURCE_DIR  := $(SOFTFLOAT_DIR)/source
+-SF_INCLUDE_DIR := $(SOFTFLOAT_DIR)/source/include
+-# we could use any specialize here, it doesn't matter
+-SF_SPECIALIZE := 8086-SSE
+-SF_SPECIALIZE_DIR := $(SF_SOURCE_DIR)/$(SF_SPECIALIZE)
+-
+-TF_SOURCE_DIR := $(TESTFLOAT_DIR)/source
+-
+-$(call set-vpath, $(SRC_PATH)/fpu $(SRC_PATH)/tests/fp)
+-
+-LIBQEMUUTIL := $(BUILD_DIR)/libqemuutil.a
+-
+-# Use this variable to be clear when we pull in our own implementation
+-# We build the object with a default rule thanks to the vpath above
+-QEMU_SOFTFLOAT_OBJ := softfloat.o
+-
+-QEMU_INCLUDES += -I$(SRC_PATH)/tests/fp
+-QEMU_INCLUDES += -I$(SF_INCLUDE_DIR)
+-QEMU_INCLUDES += -I$(SF_SPECIALIZE_DIR)
+-QEMU_INCLUDES += -I$(TF_SOURCE_DIR)
+-
+-# work around TARGET_* poisoning
+-QEMU_CFLAGS += -DHW_POISON_H
+-# define a target to match testfloat's implementation-defined choices, such as
+-# whether to raise the invalid flag when dealing with NaNs in muladd.
+-QEMU_CFLAGS += -DTARGET_ARM
+-
+-# capstone has a platform.h file that clashes with softfloat's
+-QEMU_CFLAGS := $(filter-out %capstone, $(QEMU_CFLAGS))
+-
+-# softfloat defines
+-SF_OPTS :=
+-SF_OPTS += -DSOFTFLOAT_ROUND_ODD
+-SF_OPTS += -DINLINE_LEVEL=5
+-SF_OPTS += -DSOFTFLOAT_FAST_DIV32TO16
+-SF_OPTS += -DSOFTFLOAT_FAST_DIV64TO32
+-SF_OPTS += -DSOFTFLOAT_FAST_INT64
+-QEMU_CFLAGS += $(SF_OPTS)
+-
+-# silence the build of softfloat objects
+-SF_CFLAGS += -Wno-missing-prototypes
+-SF_CFLAGS += -Wno-redundant-decls
+-SF_CFLAGS += -Wno-return-type
+-SF_CFLAGS += -Wno-error
+-
+-# testfloat defines
+-TF_OPTS :=
+-TF_OPTS += -DFLOAT16
+-TF_OPTS += -DFLOAT64
+-TF_OPTS += -DEXTFLOAT80
+-TF_OPTS += -DFLOAT128
+-TF_OPTS += -DFLOAT_ROUND_ODD
+-TF_OPTS += -DLONG_DOUBLE_IS_EXTFLOAT80
+-QEMU_CFLAGS += $(TF_OPTS)
+-
+-# silence the build of testfloat objects
+-TF_CFLAGS :=
+-TF_CFLAGS += -Wno-strict-prototypes
+-TF_CFLAGS += -Wno-unknown-pragmas
+-TF_CFLAGS += -Wno-uninitialized
+-TF_CFLAGS += -Wno-missing-prototypes
+-TF_CFLAGS += -Wno-return-type
+-TF_CFLAGS += -Wno-unused-function
+-TF_CFLAGS += -Wno-error
+-
+-# softfloat objects
+-SF_OBJS_PRIMITIVES :=
+-SF_OBJS_PRIMITIVES += s_eq128.o
+-SF_OBJS_PRIMITIVES += s_le128.o
+-SF_OBJS_PRIMITIVES += s_lt128.o
+-SF_OBJS_PRIMITIVES += s_shortShiftLeft128.o
+-SF_OBJS_PRIMITIVES += s_shortShiftRight128.o
+-SF_OBJS_PRIMITIVES += s_shortShiftRightJam64.o
+-SF_OBJS_PRIMITIVES += s_shortShiftRightJam64Extra.o
+-SF_OBJS_PRIMITIVES += s_shortShiftRightJam128.o
+-SF_OBJS_PRIMITIVES += s_shortShiftRightJam128Extra.o
+-SF_OBJS_PRIMITIVES += s_shiftRightJam32.o
+-SF_OBJS_PRIMITIVES += s_shiftRightJam64.o
+-SF_OBJS_PRIMITIVES += s_shiftRightJam64Extra.o
+-SF_OBJS_PRIMITIVES += s_shiftRightJam128.o
+-SF_OBJS_PRIMITIVES += s_shiftRightJam128Extra.o
+-SF_OBJS_PRIMITIVES += s_shiftRightJam256M.o
+-SF_OBJS_PRIMITIVES += s_countLeadingZeros8.o
+-SF_OBJS_PRIMITIVES += s_countLeadingZeros16.o
+-SF_OBJS_PRIMITIVES += s_countLeadingZeros32.o
+-SF_OBJS_PRIMITIVES += s_countLeadingZeros64.o
+-SF_OBJS_PRIMITIVES += s_add128.o
+-SF_OBJS_PRIMITIVES += s_add256M.o
+-SF_OBJS_PRIMITIVES += s_sub128.o
+-SF_OBJS_PRIMITIVES += s_sub256M.o
+-SF_OBJS_PRIMITIVES += s_mul64ByShifted32To128.o
+-SF_OBJS_PRIMITIVES += s_mul64To128.o
+-SF_OBJS_PRIMITIVES += s_mul128By32.o
+-SF_OBJS_PRIMITIVES += s_mul128To256M.o
+-SF_OBJS_PRIMITIVES += s_approxRecip_1Ks.o
+-SF_OBJS_PRIMITIVES += s_approxRecip32_1.o
+-SF_OBJS_PRIMITIVES += s_approxRecipSqrt_1Ks.o
+-SF_OBJS_PRIMITIVES += s_approxRecipSqrt32_1.o
+-
+-SF_OBJS_SPECIALIZE :=
+-SF_OBJS_SPECIALIZE += softfloat_raiseFlags.o
+-SF_OBJS_SPECIALIZE += s_f16UIToCommonNaN.o
+-SF_OBJS_SPECIALIZE += s_commonNaNToF16UI.o
+-SF_OBJS_SPECIALIZE += s_propagateNaNF16UI.o
+-SF_OBJS_SPECIALIZE += s_f32UIToCommonNaN.o
+-SF_OBJS_SPECIALIZE += s_commonNaNToF32UI.o
+-SF_OBJS_SPECIALIZE += s_propagateNaNF32UI.o
+-SF_OBJS_SPECIALIZE += s_f64UIToCommonNaN.o
+-SF_OBJS_SPECIALIZE += s_commonNaNToF64UI.o
+-SF_OBJS_SPECIALIZE += s_propagateNaNF64UI.o
+-SF_OBJS_SPECIALIZE += extF80M_isSignalingNaN.o
+-SF_OBJS_SPECIALIZE += s_extF80UIToCommonNaN.o
+-SF_OBJS_SPECIALIZE += s_commonNaNToExtF80UI.o
+-SF_OBJS_SPECIALIZE += s_propagateNaNExtF80UI.o
+-SF_OBJS_SPECIALIZE += f128M_isSignalingNaN.o
+-SF_OBJS_SPECIALIZE += s_f128UIToCommonNaN.o
+-SF_OBJS_SPECIALIZE += s_commonNaNToF128UI.o
+-SF_OBJS_SPECIALIZE += s_propagateNaNF128UI.o
+-
+-SF_OBJS_OTHERS :=
+-SF_OBJS_OTHERS += s_roundToUI32.o
+-SF_OBJS_OTHERS += s_roundToUI64.o
+-SF_OBJS_OTHERS += s_roundToI32.o
+-SF_OBJS_OTHERS += s_roundToI64.o
+-SF_OBJS_OTHERS += s_normSubnormalF16Sig.o
+-SF_OBJS_OTHERS += s_roundPackToF16.o
+-SF_OBJS_OTHERS += s_normRoundPackToF16.o
+-SF_OBJS_OTHERS += s_addMagsF16.o
+-SF_OBJS_OTHERS += s_subMagsF16.o
+-SF_OBJS_OTHERS += s_mulAddF16.o
+-SF_OBJS_OTHERS += s_normSubnormalF32Sig.o
+-SF_OBJS_OTHERS += s_roundPackToF32.o
+-SF_OBJS_OTHERS += s_normRoundPackToF32.o
+-SF_OBJS_OTHERS += s_addMagsF32.o
+-SF_OBJS_OTHERS += s_subMagsF32.o
+-SF_OBJS_OTHERS += s_mulAddF32.o
+-SF_OBJS_OTHERS += s_normSubnormalF64Sig.o
+-SF_OBJS_OTHERS += s_roundPackToF64.o
+-SF_OBJS_OTHERS += s_normRoundPackToF64.o
+-SF_OBJS_OTHERS += s_addMagsF64.o
+-SF_OBJS_OTHERS += s_subMagsF64.o
+-SF_OBJS_OTHERS += s_mulAddF64.o
+-SF_OBJS_OTHERS += s_normSubnormalExtF80Sig.o
+-SF_OBJS_OTHERS += s_roundPackToExtF80.o
+-SF_OBJS_OTHERS += s_normRoundPackToExtF80.o
+-SF_OBJS_OTHERS += s_addMagsExtF80.o
+-SF_OBJS_OTHERS += s_subMagsExtF80.o
+-SF_OBJS_OTHERS += s_normSubnormalF128Sig.o
+-SF_OBJS_OTHERS += s_roundPackToF128.o
+-SF_OBJS_OTHERS += s_normRoundPackToF128.o
+-SF_OBJS_OTHERS += s_addMagsF128.o
+-SF_OBJS_OTHERS += s_subMagsF128.o
+-SF_OBJS_OTHERS += s_mulAddF128.o
+-SF_OBJS_OTHERS += softfloat_state.o
+-SF_OBJS_OTHERS += ui32_to_f16.o
+-SF_OBJS_OTHERS += ui32_to_f32.o
+-SF_OBJS_OTHERS += ui32_to_f64.o
+-SF_OBJS_OTHERS += ui32_to_extF80.o
+-SF_OBJS_OTHERS += ui32_to_extF80M.o
+-SF_OBJS_OTHERS += ui32_to_f128.o
+-SF_OBJS_OTHERS += ui32_to_f128M.o
+-SF_OBJS_OTHERS += ui64_to_f16.o
+-SF_OBJS_OTHERS += ui64_to_f32.o
+-SF_OBJS_OTHERS += ui64_to_f64.o
+-SF_OBJS_OTHERS += ui64_to_extF80.o
+-SF_OBJS_OTHERS += ui64_to_extF80M.o
+-SF_OBJS_OTHERS += ui64_to_f128.o
+-SF_OBJS_OTHERS += ui64_to_f128M.o
+-SF_OBJS_OTHERS += i32_to_f16.o
+-SF_OBJS_OTHERS += i32_to_f32.o
+-SF_OBJS_OTHERS += i32_to_f64.o
+-SF_OBJS_OTHERS += i32_to_extF80.o
+-SF_OBJS_OTHERS += i32_to_extF80M.o
+-SF_OBJS_OTHERS += i32_to_f128.o
+-SF_OBJS_OTHERS += i32_to_f128M.o
+-SF_OBJS_OTHERS += i64_to_f16.o
+-SF_OBJS_OTHERS += i64_to_f32.o
+-SF_OBJS_OTHERS += i64_to_f64.o
+-SF_OBJS_OTHERS += i64_to_extF80.o
+-SF_OBJS_OTHERS += i64_to_extF80M.o
+-SF_OBJS_OTHERS += i64_to_f128.o
+-SF_OBJS_OTHERS += i64_to_f128M.o
+-SF_OBJS_OTHERS += f16_to_ui32.o
+-SF_OBJS_OTHERS += f16_to_ui64.o
+-SF_OBJS_OTHERS += f16_to_i32.o
+-SF_OBJS_OTHERS += f16_to_i64.o
+-SF_OBJS_OTHERS += f16_to_ui32_r_minMag.o
+-SF_OBJS_OTHERS += f16_to_ui64_r_minMag.o
+-SF_OBJS_OTHERS += f16_to_i32_r_minMag.o
+-SF_OBJS_OTHERS += f16_to_i64_r_minMag.o
+-SF_OBJS_OTHERS += f16_to_f32.o
+-SF_OBJS_OTHERS += f16_to_f64.o
+-SF_OBJS_OTHERS += f16_to_extF80.o
+-SF_OBJS_OTHERS += f16_to_extF80M.o
+-SF_OBJS_OTHERS += f16_to_f128.o
+-SF_OBJS_OTHERS += f16_to_f128M.o
+-SF_OBJS_OTHERS += f16_roundToInt.o
+-SF_OBJS_OTHERS += f16_add.o
+-SF_OBJS_OTHERS += f16_sub.o
+-SF_OBJS_OTHERS += f16_mul.o
+-SF_OBJS_OTHERS += f16_mulAdd.o
+-SF_OBJS_OTHERS += f16_div.o
+-SF_OBJS_OTHERS += f16_rem.o
+-SF_OBJS_OTHERS += f16_sqrt.o
+-SF_OBJS_OTHERS += f16_eq.o
+-SF_OBJS_OTHERS += f16_le.o
+-SF_OBJS_OTHERS += f16_lt.o
+-SF_OBJS_OTHERS += f16_eq_signaling.o
+-SF_OBJS_OTHERS += f16_le_quiet.o
+-SF_OBJS_OTHERS += f16_lt_quiet.o
+-SF_OBJS_OTHERS += f16_isSignalingNaN.o
+-SF_OBJS_OTHERS += f32_to_ui32.o
+-SF_OBJS_OTHERS += f32_to_ui64.o
+-SF_OBJS_OTHERS += f32_to_i32.o
+-SF_OBJS_OTHERS += f32_to_i64.o
+-SF_OBJS_OTHERS += f32_to_ui32_r_minMag.o
+-SF_OBJS_OTHERS += f32_to_ui64_r_minMag.o
+-SF_OBJS_OTHERS += f32_to_i32_r_minMag.o
+-SF_OBJS_OTHERS += f32_to_i64_r_minMag.o
+-SF_OBJS_OTHERS += f32_to_f16.o
+-SF_OBJS_OTHERS += f32_to_f64.o
+-SF_OBJS_OTHERS += f32_to_extF80.o
+-SF_OBJS_OTHERS += f32_to_extF80M.o
+-SF_OBJS_OTHERS += f32_to_f128.o
+-SF_OBJS_OTHERS += f32_to_f128M.o
+-SF_OBJS_OTHERS += f32_roundToInt.o
+-SF_OBJS_OTHERS += f32_add.o
+-SF_OBJS_OTHERS += f32_sub.o
+-SF_OBJS_OTHERS += f32_mul.o
+-SF_OBJS_OTHERS += f32_mulAdd.o
+-SF_OBJS_OTHERS += f32_div.o
+-SF_OBJS_OTHERS += f32_rem.o
+-SF_OBJS_OTHERS += f32_sqrt.o
+-SF_OBJS_OTHERS += f32_eq.o
+-SF_OBJS_OTHERS += f32_le.o
+-SF_OBJS_OTHERS += f32_lt.o
+-SF_OBJS_OTHERS += f32_eq_signaling.o
+-SF_OBJS_OTHERS += f32_le_quiet.o
+-SF_OBJS_OTHERS += f32_lt_quiet.o
+-SF_OBJS_OTHERS += f32_isSignalingNaN.o
+-SF_OBJS_OTHERS += f64_to_ui32.o
+-SF_OBJS_OTHERS += f64_to_ui64.o
+-SF_OBJS_OTHERS += f64_to_i32.o
+-SF_OBJS_OTHERS += f64_to_i64.o
+-SF_OBJS_OTHERS += f64_to_ui32_r_minMag.o
+-SF_OBJS_OTHERS += f64_to_ui64_r_minMag.o
+-SF_OBJS_OTHERS += f64_to_i32_r_minMag.o
+-SF_OBJS_OTHERS += f64_to_i64_r_minMag.o
+-SF_OBJS_OTHERS += f64_to_f16.o
+-SF_OBJS_OTHERS += f64_to_f32.o
+-SF_OBJS_OTHERS += f64_to_extF80.o
+-SF_OBJS_OTHERS += f64_to_extF80M.o
+-SF_OBJS_OTHERS += f64_to_f128.o
+-SF_OBJS_OTHERS += f64_to_f128M.o
+-SF_OBJS_OTHERS += f64_roundToInt.o
+-SF_OBJS_OTHERS += f64_add.o
+-SF_OBJS_OTHERS += f64_sub.o
+-SF_OBJS_OTHERS += f64_mul.o
+-SF_OBJS_OTHERS += f64_mulAdd.o
+-SF_OBJS_OTHERS += f64_div.o
+-SF_OBJS_OTHERS += f64_rem.o
+-SF_OBJS_OTHERS += f64_sqrt.o
+-SF_OBJS_OTHERS += f64_eq.o
+-SF_OBJS_OTHERS += f64_le.o
+-SF_OBJS_OTHERS += f64_lt.o
+-SF_OBJS_OTHERS += f64_eq_signaling.o
+-SF_OBJS_OTHERS += f64_le_quiet.o
+-SF_OBJS_OTHERS += f64_lt_quiet.o
+-SF_OBJS_OTHERS += f64_isSignalingNaN.o
+-SF_OBJS_OTHERS += extF80_to_ui32.o
+-SF_OBJS_OTHERS += extF80_to_ui64.o
+-SF_OBJS_OTHERS += extF80_to_i32.o
+-SF_OBJS_OTHERS += extF80_to_i64.o
+-SF_OBJS_OTHERS += extF80_to_ui32_r_minMag.o
+-SF_OBJS_OTHERS += extF80_to_ui64_r_minMag.o
+-SF_OBJS_OTHERS += extF80_to_i32_r_minMag.o
+-SF_OBJS_OTHERS += extF80_to_i64_r_minMag.o
+-SF_OBJS_OTHERS += extF80_to_f16.o
+-SF_OBJS_OTHERS += extF80_to_f32.o
+-SF_OBJS_OTHERS += extF80_to_f64.o
+-SF_OBJS_OTHERS += extF80_to_f128.o
+-SF_OBJS_OTHERS += extF80_roundToInt.o
+-SF_OBJS_OTHERS += extF80_add.o
+-SF_OBJS_OTHERS += extF80_sub.o
+-SF_OBJS_OTHERS += extF80_mul.o
+-SF_OBJS_OTHERS += extF80_div.o
+-SF_OBJS_OTHERS += extF80_rem.o
+-SF_OBJS_OTHERS += extF80_sqrt.o
+-SF_OBJS_OTHERS += extF80_eq.o
+-SF_OBJS_OTHERS += extF80_le.o
+-SF_OBJS_OTHERS += extF80_lt.o
+-SF_OBJS_OTHERS += extF80_eq_signaling.o
+-SF_OBJS_OTHERS += extF80_le_quiet.o
+-SF_OBJS_OTHERS += extF80_lt_quiet.o
+-SF_OBJS_OTHERS += extF80_isSignalingNaN.o
+-SF_OBJS_OTHERS += extF80M_to_ui32.o
+-SF_OBJS_OTHERS += extF80M_to_ui64.o
+-SF_OBJS_OTHERS += extF80M_to_i32.o
+-SF_OBJS_OTHERS += extF80M_to_i64.o
+-SF_OBJS_OTHERS += extF80M_to_ui32_r_minMag.o
+-SF_OBJS_OTHERS += extF80M_to_ui64_r_minMag.o
+-SF_OBJS_OTHERS += extF80M_to_i32_r_minMag.o
+-SF_OBJS_OTHERS += extF80M_to_i64_r_minMag.o
+-SF_OBJS_OTHERS += extF80M_to_f16.o
+-SF_OBJS_OTHERS += extF80M_to_f32.o
+-SF_OBJS_OTHERS += extF80M_to_f64.o
+-SF_OBJS_OTHERS += extF80M_to_f128M.o
+-SF_OBJS_OTHERS += extF80M_roundToInt.o
+-SF_OBJS_OTHERS += extF80M_add.o
+-SF_OBJS_OTHERS += extF80M_sub.o
+-SF_OBJS_OTHERS += extF80M_mul.o
+-SF_OBJS_OTHERS += extF80M_div.o
+-SF_OBJS_OTHERS += extF80M_rem.o
+-SF_OBJS_OTHERS += extF80M_sqrt.o
+-SF_OBJS_OTHERS += extF80M_eq.o
+-SF_OBJS_OTHERS += extF80M_le.o
+-SF_OBJS_OTHERS += extF80M_lt.o
+-SF_OBJS_OTHERS += extF80M_eq_signaling.o
+-SF_OBJS_OTHERS += extF80M_le_quiet.o
+-SF_OBJS_OTHERS += extF80M_lt_quiet.o
+-SF_OBJS_OTHERS += f128_to_ui32.o
+-SF_OBJS_OTHERS += f128_to_ui64.o
+-SF_OBJS_OTHERS += f128_to_i32.o
+-SF_OBJS_OTHERS += f128_to_i64.o
+-SF_OBJS_OTHERS += f128_to_ui32_r_minMag.o
+-SF_OBJS_OTHERS += f128_to_ui64_r_minMag.o
+-SF_OBJS_OTHERS += f128_to_i32_r_minMag.o
+-SF_OBJS_OTHERS += f128_to_i64_r_minMag.o
+-SF_OBJS_OTHERS += f128_to_f16.o
+-SF_OBJS_OTHERS += f128_to_f32.o
+-SF_OBJS_OTHERS += f128_to_extF80.o
+-SF_OBJS_OTHERS += f128_to_f64.o
+-SF_OBJS_OTHERS += f128_roundToInt.o
+-SF_OBJS_OTHERS += f128_add.o
+-SF_OBJS_OTHERS += f128_sub.o
+-SF_OBJS_OTHERS += f128_mul.o
+-SF_OBJS_OTHERS += f128_mulAdd.o
+-SF_OBJS_OTHERS += f128_div.o
+-SF_OBJS_OTHERS += f128_rem.o
+-SF_OBJS_OTHERS += f128_sqrt.o
+-SF_OBJS_OTHERS += f128_eq.o
+-SF_OBJS_OTHERS += f128_le.o
+-SF_OBJS_OTHERS += f128_lt.o
+-SF_OBJS_OTHERS += f128_eq_signaling.o
+-SF_OBJS_OTHERS += f128_le_quiet.o
+-SF_OBJS_OTHERS += f128_lt_quiet.o
+-SF_OBJS_OTHERS += f128_isSignalingNaN.o
+-SF_OBJS_OTHERS += f128M_to_ui32.o
+-SF_OBJS_OTHERS += f128M_to_ui64.o
+-SF_OBJS_OTHERS += f128M_to_i32.o
+-SF_OBJS_OTHERS += f128M_to_i64.o
+-SF_OBJS_OTHERS += f128M_to_ui32_r_minMag.o
+-SF_OBJS_OTHERS += f128M_to_ui64_r_minMag.o
+-SF_OBJS_OTHERS += f128M_to_i32_r_minMag.o
+-SF_OBJS_OTHERS += f128M_to_i64_r_minMag.o
+-SF_OBJS_OTHERS += f128M_to_f16.o
+-SF_OBJS_OTHERS += f128M_to_f32.o
+-SF_OBJS_OTHERS += f128M_to_extF80M.o
+-SF_OBJS_OTHERS += f128M_to_f64.o
+-SF_OBJS_OTHERS += f128M_roundToInt.o
+-SF_OBJS_OTHERS += f128M_add.o
+-SF_OBJS_OTHERS += f128M_sub.o
+-SF_OBJS_OTHERS += f128M_mul.o
+-SF_OBJS_OTHERS += f128M_mulAdd.o
+-SF_OBJS_OTHERS += f128M_div.o
+-SF_OBJS_OTHERS += f128M_rem.o
+-SF_OBJS_OTHERS += f128M_sqrt.o
+-SF_OBJS_OTHERS += f128M_eq.o
+-SF_OBJS_OTHERS += f128M_le.o
+-SF_OBJS_OTHERS += f128M_lt.o
+-SF_OBJS_OTHERS += f128M_eq_signaling.o
+-SF_OBJS_OTHERS += f128M_le_quiet.o
+-SF_OBJS_OTHERS += f128M_lt_quiet.o
+-
+-SF_OBJS_ALL_NOSPEC :=
+-SF_OBJS_ALL_NOSPEC += $(SF_OBJS_PRIMITIVES)
+-SF_OBJS_ALL_NOSPEC += $(SF_OBJS_OTHERS)
+-
+-SF_OBJS_ALL :=
+-SF_OBJS_ALL += $(SF_OBJS_ALL_NOSPEC)
+-SF_OBJS_ALL += $(SF_OBJS_SPECIALIZE)
+-
+-# testfloat objects
+-TF_OBJS_GENCASES :=
+-TF_OBJS_GENCASES += genCases_ui32.o
+-TF_OBJS_GENCASES += genCases_ui64.o
+-TF_OBJS_GENCASES += genCases_i32.o
+-TF_OBJS_GENCASES += genCases_i64.o
+-TF_OBJS_GENCASES += genCases_f16.o
+-TF_OBJS_GENCASES += genCases_f32.o
+-TF_OBJS_GENCASES += genCases_f64.o
+-TF_OBJS_GENCASES += genCases_extF80.o
+-TF_OBJS_GENCASES += genCases_f128.o
+-
+-TF_OBJS_WRITECASE :=
+-TF_OBJS_WRITECASE += writeCase_a_ui32.o
+-TF_OBJS_WRITECASE += writeCase_a_ui64.o
+-TF_OBJS_WRITECASE += writeCase_a_f16.o
+-TF_OBJS_WRITECASE += writeCase_ab_f16.o
+-TF_OBJS_WRITECASE += writeCase_abc_f16.o
+-TF_OBJS_WRITECASE += writeCase_a_f32.o
+-TF_OBJS_WRITECASE += writeCase_ab_f32.o
+-TF_OBJS_WRITECASE += writeCase_abc_f32.o
+-TF_OBJS_WRITECASE += writeCase_a_f64.o
+-TF_OBJS_WRITECASE += writeCase_ab_f64.o
+-TF_OBJS_WRITECASE += writeCase_abc_f64.o
+-TF_OBJS_WRITECASE += writeCase_a_extF80M.o
+-TF_OBJS_WRITECASE += writeCase_ab_extF80M.o
+-TF_OBJS_WRITECASE += writeCase_a_f128M.o
+-TF_OBJS_WRITECASE += writeCase_ab_f128M.o
+-TF_OBJS_WRITECASE += writeCase_abc_f128M.o
+-TF_OBJS_WRITECASE += writeCase_z_bool.o
+-TF_OBJS_WRITECASE += writeCase_z_ui32.o
+-TF_OBJS_WRITECASE += writeCase_z_ui64.o
+-TF_OBJS_WRITECASE += writeCase_z_f16.o
+-TF_OBJS_WRITECASE += writeCase_z_f32.o
+-TF_OBJS_WRITECASE += writeCase_z_f64.o
+-TF_OBJS_WRITECASE += writeCase_z_extF80M.o
+-TF_OBJS_WRITECASE += writeCase_z_f128M.o
+-
+-TF_OBJS_TEST :=
+-TF_OBJS_TEST += test_a_ui32_z_f16.o
+-TF_OBJS_TEST += test_a_ui32_z_f32.o
+-TF_OBJS_TEST += test_a_ui32_z_f64.o
+-TF_OBJS_TEST += test_a_ui32_z_extF80.o
+-TF_OBJS_TEST += test_a_ui32_z_f128.o
+-TF_OBJS_TEST += test_a_ui64_z_f16.o
+-TF_OBJS_TEST += test_a_ui64_z_f32.o
+-TF_OBJS_TEST += test_a_ui64_z_f64.o
+-TF_OBJS_TEST += test_a_ui64_z_extF80.o
+-TF_OBJS_TEST += test_a_ui64_z_f128.o
+-TF_OBJS_TEST += test_a_i32_z_f16.o
+-TF_OBJS_TEST += test_a_i32_z_f32.o
+-TF_OBJS_TEST += test_a_i32_z_f64.o
+-TF_OBJS_TEST += test_a_i32_z_extF80.o
+-TF_OBJS_TEST += test_a_i32_z_f128.o
+-TF_OBJS_TEST += test_a_i64_z_f16.o
+-TF_OBJS_TEST += test_a_i64_z_f32.o
+-TF_OBJS_TEST += test_a_i64_z_f64.o
+-TF_OBJS_TEST += test_a_i64_z_extF80.o
+-TF_OBJS_TEST += test_a_i64_z_f128.o
+-TF_OBJS_TEST += test_a_f16_z_ui32_rx.o
+-TF_OBJS_TEST += test_a_f16_z_ui64_rx.o
+-TF_OBJS_TEST += test_a_f16_z_i32_rx.o
+-TF_OBJS_TEST += test_a_f16_z_i64_rx.o
+-TF_OBJS_TEST += test_a_f16_z_ui32_x.o
+-TF_OBJS_TEST += test_a_f16_z_ui64_x.o
+-TF_OBJS_TEST += test_a_f16_z_i32_x.o
+-TF_OBJS_TEST += test_a_f16_z_i64_x.o
+-TF_OBJS_TEST += test_a_f16_z_f32.o
+-TF_OBJS_TEST += test_a_f16_z_f64.o
+-TF_OBJS_TEST += test_a_f16_z_extF80.o
+-TF_OBJS_TEST += test_a_f16_z_f128.o
+-TF_OBJS_TEST += test_az_f16.o
+-TF_OBJS_TEST += test_az_f16_rx.o
+-TF_OBJS_TEST += test_abz_f16.o
+-TF_OBJS_TEST += test_abcz_f16.o
+-TF_OBJS_TEST += test_ab_f16_z_bool.o
+-TF_OBJS_TEST += test_a_f32_z_ui32_rx.o
+-TF_OBJS_TEST += test_a_f32_z_ui64_rx.o
+-TF_OBJS_TEST += test_a_f32_z_i32_rx.o
+-TF_OBJS_TEST += test_a_f32_z_i64_rx.o
+-TF_OBJS_TEST += test_a_f32_z_ui32_x.o
+-TF_OBJS_TEST += test_a_f32_z_ui64_x.o
+-TF_OBJS_TEST += test_a_f32_z_i32_x.o
+-TF_OBJS_TEST += test_a_f32_z_i64_x.o
+-TF_OBJS_TEST += test_a_f32_z_f16.o
+-TF_OBJS_TEST += test_a_f32_z_f64.o
+-TF_OBJS_TEST += test_a_f32_z_extF80.o
+-TF_OBJS_TEST += test_a_f32_z_f128.o
+-TF_OBJS_TEST += test_az_f32.o
+-TF_OBJS_TEST += test_az_f32_rx.o
+-TF_OBJS_TEST += test_abz_f32.o
+-TF_OBJS_TEST += test_abcz_f32.o
+-TF_OBJS_TEST += test_ab_f32_z_bool.o
+-TF_OBJS_TEST += test_a_f64_z_ui32_rx.o
+-TF_OBJS_TEST += test_a_f64_z_ui64_rx.o
+-TF_OBJS_TEST += test_a_f64_z_i32_rx.o
+-TF_OBJS_TEST += test_a_f64_z_i64_rx.o
+-TF_OBJS_TEST += test_a_f64_z_ui32_x.o
+-TF_OBJS_TEST += test_a_f64_z_ui64_x.o
+-TF_OBJS_TEST += test_a_f64_z_i32_x.o
+-TF_OBJS_TEST += test_a_f64_z_i64_x.o
+-TF_OBJS_TEST += test_a_f64_z_f16.o
+-TF_OBJS_TEST += test_a_f64_z_f32.o
+-TF_OBJS_TEST += test_a_f64_z_extF80.o
+-TF_OBJS_TEST += test_a_f64_z_f128.o
+-TF_OBJS_TEST += test_az_f64.o
+-TF_OBJS_TEST += test_az_f64_rx.o
+-TF_OBJS_TEST += test_abz_f64.o
+-TF_OBJS_TEST += test_abcz_f64.o
+-TF_OBJS_TEST += test_ab_f64_z_bool.o
+-TF_OBJS_TEST += test_a_extF80_z_ui32_rx.o
+-TF_OBJS_TEST += test_a_extF80_z_ui64_rx.o
+-TF_OBJS_TEST += test_a_extF80_z_i32_rx.o
+-TF_OBJS_TEST += test_a_extF80_z_i64_rx.o
+-TF_OBJS_TEST += test_a_extF80_z_ui32_x.o
+-TF_OBJS_TEST += test_a_extF80_z_ui64_x.o
+-TF_OBJS_TEST += test_a_extF80_z_i32_x.o
+-TF_OBJS_TEST += test_a_extF80_z_i64_x.o
+-TF_OBJS_TEST += test_a_extF80_z_f16.o
+-TF_OBJS_TEST += test_a_extF80_z_f32.o
+-TF_OBJS_TEST += test_a_extF80_z_f64.o
+-TF_OBJS_TEST += test_a_extF80_z_f128.o
+-TF_OBJS_TEST += test_az_extF80.o
+-TF_OBJS_TEST += test_az_extF80_rx.o
+-TF_OBJS_TEST += test_abz_extF80.o
+-TF_OBJS_TEST += test_ab_extF80_z_bool.o
+-TF_OBJS_TEST += test_a_f128_z_ui32_rx.o
+-TF_OBJS_TEST += test_a_f128_z_ui64_rx.o
+-TF_OBJS_TEST += test_a_f128_z_i32_rx.o
+-TF_OBJS_TEST += test_a_f128_z_i64_rx.o
+-TF_OBJS_TEST += test_a_f128_z_ui32_x.o
+-TF_OBJS_TEST += test_a_f128_z_ui64_x.o
+-TF_OBJS_TEST += test_a_f128_z_i32_x.o
+-TF_OBJS_TEST += test_a_f128_z_i64_x.o
+-TF_OBJS_TEST += test_a_f128_z_f16.o
+-TF_OBJS_TEST += test_a_f128_z_f32.o
+-TF_OBJS_TEST += test_a_f128_z_f64.o
+-TF_OBJS_TEST += test_a_f128_z_extF80.o
+-TF_OBJS_TEST += test_az_f128.o
+-TF_OBJS_TEST += test_az_f128_rx.o
+-TF_OBJS_TEST += test_abz_f128.o
+-TF_OBJS_TEST += test_abcz_f128.o
+-TF_OBJS_TEST += test_ab_f128_z_bool.o
+-
+-TF_OBJS_LIB :=
+-TF_OBJS_LIB += uint128_inline.o
+-TF_OBJS_LIB += uint128.o
+-TF_OBJS_LIB += fail.o
+-TF_OBJS_LIB += functions_common.o
+-TF_OBJS_LIB += functionInfos.o
+-TF_OBJS_LIB += standardFunctionInfos.o
+-TF_OBJS_LIB += random.o
+-TF_OBJS_LIB += genCases_common.o
+-TF_OBJS_LIB += $(TF_OBJS_GENCASES)
+-TF_OBJS_LIB += genCases_writeTestsTotal.o
+-TF_OBJS_LIB += verCases_inline.o
+-TF_OBJS_LIB += verCases_common.o
+-TF_OBJS_LIB += verCases_writeFunctionName.o
+-TF_OBJS_LIB += readHex.o
+-TF_OBJS_LIB += writeHex.o
+-TF_OBJS_LIB += $(TF_OBJS_WRITECASE)
+-TF_OBJS_LIB += testLoops_common.o
+-TF_OBJS_LIB += $(TF_OBJS_TEST)
+-
+-BINARIES := fp-test$(EXESUF) fp-bench$(EXESUF)
+-
+-# We require artefacts from the main build including config-host.h
+-# because platform.h includes it. Rather than re-invoking the main
+-# build we just error out if things aren't there.
+-$(LIBQEMUUTIL) $(BUILD_DIR)/config-host.h:
+-	$(error $@ missing, re-run parent build)
+-
+-all: $(BUILD_DIR)/config-host.h $(BINARIES)
+-
+-# libtestfloat.a depends on libsoftfloat.a, so specify it first
+-FP_TEST_LIBS := libtestfloat.a libsoftfloat.a $(LIBQEMUUTIL)
+-
+-fp-test$(EXESUF): fp-test.o slowfloat.o $(QEMU_SOFTFLOAT_OBJ) $(FP_TEST_LIBS)
+-
+-# Custom rule to build with SF_CFLAGS
+-SF_BUILD = $(call quiet-command,$(CC) $(QEMU_LOCAL_INCLUDES) $(QEMU_INCLUDES) \
+-		$(QEMU_CFLAGS) $(SF_CFLAGS) $(QEMU_DGFLAGS) $(CFLAGS) \
+-		$($@-cflags) -c -o $@ $<,"CC","$(TARGET_DIR)$@")
+-
+-$(SF_OBJS_ALL_NOSPEC): %.o: $(SF_SOURCE_DIR)/%.c
+-	$(SF_BUILD)
+-$(SF_OBJS_SPECIALIZE): %.o: $(SF_SPECIALIZE_DIR)/%.c
+-	$(SF_BUILD)
+-
+-libsoftfloat.a: $(SF_OBJS_ALL)
+-
+-# Custom rule to build with TF_CFLAGS
+-$(TF_OBJS_LIB) slowfloat.o: %.o: $(TF_SOURCE_DIR)/%.c
+-	$(call quiet-command,$(CC) $(QEMU_LOCAL_INCLUDES) $(QEMU_INCLUDES) \
+-		$(QEMU_CFLAGS) $(TF_CFLAGS) $(QEMU_DGFLAGS) $(CFLAGS) \
+-		$($@-cflags) -c -o $@ $<,"CC","$(TARGET_DIR)$@")
+-
+-libtestfloat.a: $(TF_OBJS_LIB)
+-
+-fp-bench$(EXESUF): fp-bench.o $(QEMU_SOFTFLOAT_OBJ) $(LIBQEMUUTIL)
+-
+-clean:
+-	rm -f *.o *.d $(BINARIES)
+-	rm -f *.gcno *.gcda *.gcov
+-	rm -f fp-test$(EXESUF)
+-	rm -f fp-bench$(EXESUF)
+-	rm -f libsoftfloat.a
+-	rm -f libtestfloat.a
+-
+--include $(wildcard *.d)
+diff --git a/tests/fp/meson.build b/tests/fp/meson.build
+new file mode 100644
+index 0000000000..8779a17aab
+--- /dev/null
++++ b/tests/fp/meson.build
+@@ -0,0 +1,636 @@
++# There are namespace pollution issues on Windows, due to osdep.h
++# bringing in Windows headers that define a FLOAT128 type.
++if targetos == 'windows'
++  subdir_done()
++endif
++
++fpcflags = [
++  # softfloat defines
++  '-DSOFTFLOAT_ROUND_ODD',
++  '-DINLINE_LEVEL=5',
++  '-DSOFTFLOAT_FAST_DIV32TO16',
++  '-DSOFTFLOAT_FAST_DIV64TO32',
++  '-DSOFTFLOAT_FAST_INT64',
++  # testfloat defines
++  '-DFLOAT16',
++  '-DFLOAT64',
++  '-DEXTFLOAT80',
++  '-DFLOAT128',
++  '-DFLOAT_ROUND_ODD',
++  '-DLONG_DOUBLE_IS_EXTFLOAT80',
++]
++
++sfdir = 'berkeley-softfloat-3/source'
++sfspedir = sfdir / '8086-SSE'
++tfdir = 'berkeley-testfloat-3/source'
++
++sfinc = include_directories(sfdir / 'include', sfspedir)
++
++tfcflags = [
++  '-Wno-strict-prototypes',
++  '-Wno-unknown-pragmas',
++  '-Wno-uninitialized',
++  '-Wno-missing-prototypes',
++  '-Wno-return-type',
++  '-Wno-unused-function',
++  '-Wno-error',
++]
++
++tfgencases = [
++  tfdir / 'genCases_ui32.c',
++  tfdir / 'genCases_ui64.c',
++  tfdir / 'genCases_i32.c',
++  tfdir / 'genCases_i64.c',
++  tfdir / 'genCases_f16.c',
++  tfdir / 'genCases_f32.c',
++  tfdir / 'genCases_f64.c',
++  tfdir / 'genCases_extF80.c',
++  tfdir / 'genCases_f128.c',
++]
++
++tfwritecase = [
++  tfdir / 'writeCase_a_ui32.c',
++  tfdir / 'writeCase_a_ui64.c',
++  tfdir / 'writeCase_a_f16.c',
++  tfdir / 'writeCase_ab_f16.c',
++  tfdir / 'writeCase_abc_f16.c',
++  tfdir / 'writeCase_a_f32.c',
++  tfdir / 'writeCase_ab_f32.c',
++  tfdir / 'writeCase_abc_f32.c',
++  tfdir / 'writeCase_a_f64.c',
++  tfdir / 'writeCase_ab_f64.c',
++  tfdir / 'writeCase_abc_f64.c',
++  tfdir / 'writeCase_a_extF80M.c',
++  tfdir / 'writeCase_ab_extF80M.c',
++  tfdir / 'writeCase_a_f128M.c',
++  tfdir / 'writeCase_ab_f128M.c',
++  tfdir / 'writeCase_abc_f128M.c',
++  tfdir / 'writeCase_z_bool.c',
++  tfdir / 'writeCase_z_ui32.c',
++  tfdir / 'writeCase_z_ui64.c',
++  tfdir / 'writeCase_z_f16.c',
++  tfdir / 'writeCase_z_f32.c',
++  tfdir / 'writeCase_z_f64.c',
++  tfdir / 'writeCase_z_extF80M.c',
++  tfdir / 'writeCase_z_f128M.c',
++]
++
++tftest = [
++  tfdir / 'test_a_ui32_z_f16.c',
++  tfdir / 'test_a_ui32_z_f32.c',
++  tfdir / 'test_a_ui32_z_f64.c',
++  tfdir / 'test_a_ui32_z_extF80.c',
++  tfdir / 'test_a_ui32_z_f128.c',
++  tfdir / 'test_a_ui64_z_f16.c',
++  tfdir / 'test_a_ui64_z_f32.c',
++  tfdir / 'test_a_ui64_z_f64.c',
++  tfdir / 'test_a_ui64_z_extF80.c',
++  tfdir / 'test_a_ui64_z_f128.c',
++  tfdir / 'test_a_i32_z_f16.c',
++  tfdir / 'test_a_i32_z_f32.c',
++  tfdir / 'test_a_i32_z_f64.c',
++  tfdir / 'test_a_i32_z_extF80.c',
++  tfdir / 'test_a_i32_z_f128.c',
++  tfdir / 'test_a_i64_z_f16.c',
++  tfdir / 'test_a_i64_z_f32.c',
++  tfdir / 'test_a_i64_z_f64.c',
++  tfdir / 'test_a_i64_z_extF80.c',
++  tfdir / 'test_a_i64_z_f128.c',
++  tfdir / 'test_a_f16_z_ui32_rx.c',
++  tfdir / 'test_a_f16_z_ui64_rx.c',
++  tfdir / 'test_a_f16_z_i32_rx.c',
++  tfdir / 'test_a_f16_z_i64_rx.c',
++  tfdir / 'test_a_f16_z_ui32_x.c',
++  tfdir / 'test_a_f16_z_ui64_x.c',
++  tfdir / 'test_a_f16_z_i32_x.c',
++  tfdir / 'test_a_f16_z_i64_x.c',
++  tfdir / 'test_a_f16_z_f32.c',
++  tfdir / 'test_a_f16_z_f64.c',
++  tfdir / 'test_a_f16_z_extF80.c',
++  tfdir / 'test_a_f16_z_f128.c',
++  tfdir / 'test_az_f16.c',
++  tfdir / 'test_az_f16_rx.c',
++  tfdir / 'test_abz_f16.c',
++  tfdir / 'test_abcz_f16.c',
++  tfdir / 'test_ab_f16_z_bool.c',
++  tfdir / 'test_a_f32_z_ui32_rx.c',
++  tfdir / 'test_a_f32_z_ui64_rx.c',
++  tfdir / 'test_a_f32_z_i32_rx.c',
++  tfdir / 'test_a_f32_z_i64_rx.c',
++  tfdir / 'test_a_f32_z_ui32_x.c',
++  tfdir / 'test_a_f32_z_ui64_x.c',
++  tfdir / 'test_a_f32_z_i32_x.c',
++  tfdir / 'test_a_f32_z_i64_x.c',
++  tfdir / 'test_a_f32_z_f16.c',
++  tfdir / 'test_a_f32_z_f64.c',
++  tfdir / 'test_a_f32_z_extF80.c',
++  tfdir / 'test_a_f32_z_f128.c',
++  tfdir / 'test_az_f32.c',
++  tfdir / 'test_az_f32_rx.c',
++  tfdir / 'test_abz_f32.c',
++  tfdir / 'test_abcz_f32.c',
++  tfdir / 'test_ab_f32_z_bool.c',
++  tfdir / 'test_a_f64_z_ui32_rx.c',
++  tfdir / 'test_a_f64_z_ui64_rx.c',
++  tfdir / 'test_a_f64_z_i32_rx.c',
++  tfdir / 'test_a_f64_z_i64_rx.c',
++  tfdir / 'test_a_f64_z_ui32_x.c',
++  tfdir / 'test_a_f64_z_ui64_x.c',
++  tfdir / 'test_a_f64_z_i32_x.c',
++  tfdir / 'test_a_f64_z_i64_x.c',
++  tfdir / 'test_a_f64_z_f16.c',
++  tfdir / 'test_a_f64_z_f32.c',
++  tfdir / 'test_a_f64_z_extF80.c',
++  tfdir / 'test_a_f64_z_f128.c',
++  tfdir / 'test_az_f64.c',
++  tfdir / 'test_az_f64_rx.c',
++  tfdir / 'test_abz_f64.c',
++  tfdir / 'test_abcz_f64.c',
++  tfdir / 'test_ab_f64_z_bool.c',
++  tfdir / 'test_a_extF80_z_ui32_rx.c',
++  tfdir / 'test_a_extF80_z_ui64_rx.c',
++  tfdir / 'test_a_extF80_z_i32_rx.c',
++  tfdir / 'test_a_extF80_z_i64_rx.c',
++  tfdir / 'test_a_extF80_z_ui32_x.c',
++  tfdir / 'test_a_extF80_z_ui64_x.c',
++  tfdir / 'test_a_extF80_z_i32_x.c',
++  tfdir / 'test_a_extF80_z_i64_x.c',
++  tfdir / 'test_a_extF80_z_f16.c',
++  tfdir / 'test_a_extF80_z_f32.c',
++  tfdir / 'test_a_extF80_z_f64.c',
++  tfdir / 'test_a_extF80_z_f128.c',
++  tfdir / 'test_az_extF80.c',
++  tfdir / 'test_az_extF80_rx.c',
++  tfdir / 'test_abz_extF80.c',
++  tfdir / 'test_ab_extF80_z_bool.c',
++  tfdir / 'test_a_f128_z_ui32_rx.c',
++  tfdir / 'test_a_f128_z_ui64_rx.c',
++  tfdir / 'test_a_f128_z_i32_rx.c',
++  tfdir / 'test_a_f128_z_i64_rx.c',
++  tfdir / 'test_a_f128_z_ui32_x.c',
++  tfdir / 'test_a_f128_z_ui64_x.c',
++  tfdir / 'test_a_f128_z_i32_x.c',
++  tfdir / 'test_a_f128_z_i64_x.c',
++  tfdir / 'test_a_f128_z_f16.c',
++  tfdir / 'test_a_f128_z_f32.c',
++  tfdir / 'test_a_f128_z_f64.c',
++  tfdir / 'test_a_f128_z_extF80.c',
++  tfdir / 'test_az_f128.c',
++  tfdir / 'test_az_f128_rx.c',
++  tfdir / 'test_abz_f128.c',
++  tfdir / 'test_abcz_f128.c',
++  tfdir / 'test_ab_f128_z_bool.c',
++]
++
++libtestfloat = static_library(
++  'testfloat',
++  files(
++    tfdir / 'uint128_inline.c',
++    tfdir / 'uint128.c',
++    tfdir / 'fail.c',
++    tfdir / 'functions_common.c',
++    tfdir / 'functionInfos.c',
++    tfdir / 'standardFunctionInfos.c',
++    tfdir / 'random.c',
++    tfdir / 'genCases_common.c',
++    tfgencases,
++    tfdir / 'genCases_writeTestsTotal.c',
++    tfdir / 'verCases_inline.c',
++    tfdir / 'verCases_common.c',
++    tfdir / 'verCases_writeFunctionName.c',
++    tfdir / 'readHex.c',
++    tfdir / 'writeHex.c',
++    tfwritecase,
++    tfdir / 'testLoops_common.c',
++    tftest,
++  ),
++  include_directories: sfinc,
++  c_args: tfcflags + fpcflags,
++)
++
++sfcflags = [
++  '-Wno-missing-prototypes',
++  '-Wno-redundant-decls',
++  '-Wno-return-type',
++  '-Wno-error',
++]
++
++libsoftfloat = static_library(
++  'softfloat',
++  files(
++    # primitives
++    sfdir / 's_eq128.c',
++    sfdir / 's_le128.c',
++    sfdir / 's_lt128.c',
++    sfdir / 's_shortShiftLeft128.c',
++    sfdir / 's_shortShiftRight128.c',
++    sfdir / 's_shortShiftRightJam64.c',
++    sfdir / 's_shortShiftRightJam64Extra.c',
++    sfdir / 's_shortShiftRightJam128.c',
++    sfdir / 's_shortShiftRightJam128Extra.c',
++    sfdir / 's_shiftRightJam32.c',
++    sfdir / 's_shiftRightJam64.c',
++    sfdir / 's_shiftRightJam64Extra.c',
++    sfdir / 's_shiftRightJam128.c',
++    sfdir / 's_shiftRightJam128Extra.c',
++    sfdir / 's_shiftRightJam256M.c',
++    sfdir / 's_countLeadingZeros8.c',
++    sfdir / 's_countLeadingZeros16.c',
++    sfdir / 's_countLeadingZeros32.c',
++    sfdir / 's_countLeadingZeros64.c',
++    sfdir / 's_add128.c',
++    sfdir / 's_add256M.c',
++    sfdir / 's_sub128.c',
++    sfdir / 's_sub256M.c',
++    sfdir / 's_mul64ByShifted32To128.c',
++    sfdir / 's_mul64To128.c',
++    sfdir / 's_mul128By32.c',
++    sfdir / 's_mul128To256M.c',
++    sfdir / 's_approxRecip_1Ks.c',
++    sfdir / 's_approxRecip32_1.c',
++    sfdir / 's_approxRecipSqrt_1Ks.c',
++    sfdir / 's_approxRecipSqrt32_1.c',
++    # others
++    sfdir / 's_roundToUI32.c',
++    sfdir / 's_roundToUI64.c',
++    sfdir / 's_roundToI32.c',
++    sfdir / 's_roundToI64.c',
++    sfdir / 's_normSubnormalF16Sig.c',
++    sfdir / 's_roundPackToF16.c',
++    sfdir / 's_normRoundPackToF16.c',
++    sfdir / 's_addMagsF16.c',
++    sfdir / 's_subMagsF16.c',
++    sfdir / 's_mulAddF16.c',
++    sfdir / 's_normSubnormalF32Sig.c',
++    sfdir / 's_roundPackToF32.c',
++    sfdir / 's_normRoundPackToF32.c',
++    sfdir / 's_addMagsF32.c',
++    sfdir / 's_subMagsF32.c',
++    sfdir / 's_mulAddF32.c',
++    sfdir / 's_normSubnormalF64Sig.c',
++    sfdir / 's_roundPackToF64.c',
++    sfdir / 's_normRoundPackToF64.c',
++    sfdir / 's_addMagsF64.c',
++    sfdir / 's_subMagsF64.c',
++    sfdir / 's_mulAddF64.c',
++    sfdir / 's_normSubnormalExtF80Sig.c',
++    sfdir / 's_roundPackToExtF80.c',
++    sfdir / 's_normRoundPackToExtF80.c',
++    sfdir / 's_addMagsExtF80.c',
++    sfdir / 's_subMagsExtF80.c',
++    sfdir / 's_normSubnormalF128Sig.c',
++    sfdir / 's_roundPackToF128.c',
++    sfdir / 's_normRoundPackToF128.c',
++    sfdir / 's_addMagsF128.c',
++    sfdir / 's_subMagsF128.c',
++    sfdir / 's_mulAddF128.c',
++    sfdir / 'softfloat_state.c',
++    sfdir / 'ui32_to_f16.c',
++    sfdir / 'ui32_to_f32.c',
++    sfdir / 'ui32_to_f64.c',
++    sfdir / 'ui32_to_extF80.c',
++    sfdir / 'ui32_to_extF80M.c',
++    sfdir / 'ui32_to_f128.c',
++    sfdir / 'ui32_to_f128M.c',
++    sfdir / 'ui64_to_f16.c',
++    sfdir / 'ui64_to_f32.c',
++    sfdir / 'ui64_to_f64.c',
++    sfdir / 'ui64_to_extF80.c',
++    sfdir / 'ui64_to_extF80M.c',
++    sfdir / 'ui64_to_f128.c',
++    sfdir / 'ui64_to_f128M.c',
++    sfdir / 'i32_to_f16.c',
++    sfdir / 'i32_to_f32.c',
++    sfdir / 'i32_to_f64.c',
++    sfdir / 'i32_to_extF80.c',
++    sfdir / 'i32_to_extF80M.c',
++    sfdir / 'i32_to_f128.c',
++    sfdir / 'i32_to_f128M.c',
++    sfdir / 'i64_to_f16.c',
++    sfdir / 'i64_to_f32.c',
++    sfdir / 'i64_to_f64.c',
++    sfdir / 'i64_to_extF80.c',
++    sfdir / 'i64_to_extF80M.c',
++    sfdir / 'i64_to_f128.c',
++    sfdir / 'i64_to_f128M.c',
++    sfdir / 'f16_to_ui32.c',
++    sfdir / 'f16_to_ui64.c',
++    sfdir / 'f16_to_i32.c',
++    sfdir / 'f16_to_i64.c',
++    sfdir / 'f16_to_ui32_r_minMag.c',
++    sfdir / 'f16_to_ui64_r_minMag.c',
++    sfdir / 'f16_to_i32_r_minMag.c',
++    sfdir / 'f16_to_i64_r_minMag.c',
++    sfdir / 'f16_to_f32.c',
++    sfdir / 'f16_to_f64.c',
++    sfdir / 'f16_to_extF80.c',
++    sfdir / 'f16_to_extF80M.c',
++    sfdir / 'f16_to_f128.c',
++    sfdir / 'f16_to_f128M.c',
++    sfdir / 'f16_roundToInt.c',
++    sfdir / 'f16_add.c',
++    sfdir / 'f16_sub.c',
++    sfdir / 'f16_mul.c',
++    sfdir / 'f16_mulAdd.c',
++    sfdir / 'f16_div.c',
++    sfdir / 'f16_rem.c',
++    sfdir / 'f16_sqrt.c',
++    sfdir / 'f16_eq.c',
++    sfdir / 'f16_le.c',
++    sfdir / 'f16_lt.c',
++    sfdir / 'f16_eq_signaling.c',
++    sfdir / 'f16_le_quiet.c',
++    sfdir / 'f16_lt_quiet.c',
++    sfdir / 'f16_isSignalingNaN.c',
++    sfdir / 'f32_to_ui32.c',
++    sfdir / 'f32_to_ui64.c',
++    sfdir / 'f32_to_i32.c',
++    sfdir / 'f32_to_i64.c',
++    sfdir / 'f32_to_ui32_r_minMag.c',
++    sfdir / 'f32_to_ui64_r_minMag.c',
++    sfdir / 'f32_to_i32_r_minMag.c',
++    sfdir / 'f32_to_i64_r_minMag.c',
++    sfdir / 'f32_to_f16.c',
++    sfdir / 'f32_to_f64.c',
++    sfdir / 'f32_to_extF80.c',
++    sfdir / 'f32_to_extF80M.c',
++    sfdir / 'f32_to_f128.c',
++    sfdir / 'f32_to_f128M.c',
++    sfdir / 'f32_roundToInt.c',
++    sfdir / 'f32_add.c',
++    sfdir / 'f32_sub.c',
++    sfdir / 'f32_mul.c',
++    sfdir / 'f32_mulAdd.c',
++    sfdir / 'f32_div.c',
++    sfdir / 'f32_rem.c',
++    sfdir / 'f32_sqrt.c',
++    sfdir / 'f32_eq.c',
++    sfdir / 'f32_le.c',
++    sfdir / 'f32_lt.c',
++    sfdir / 'f32_eq_signaling.c',
++    sfdir / 'f32_le_quiet.c',
++    sfdir / 'f32_lt_quiet.c',
++    sfdir / 'f32_isSignalingNaN.c',
++    sfdir / 'f64_to_ui32.c',
++    sfdir / 'f64_to_ui64.c',
++    sfdir / 'f64_to_i32.c',
++    sfdir / 'f64_to_i64.c',
++    sfdir / 'f64_to_ui32_r_minMag.c',
++    sfdir / 'f64_to_ui64_r_minMag.c',
++    sfdir / 'f64_to_i32_r_minMag.c',
++    sfdir / 'f64_to_i64_r_minMag.c',
++    sfdir / 'f64_to_f16.c',
++    sfdir / 'f64_to_f32.c',
++    sfdir / 'f64_to_extF80.c',
++    sfdir / 'f64_to_extF80M.c',
++    sfdir / 'f64_to_f128.c',
++    sfdir / 'f64_to_f128M.c',
++    sfdir / 'f64_roundToInt.c',
++    sfdir / 'f64_add.c',
++    sfdir / 'f64_sub.c',
++    sfdir / 'f64_mul.c',
++    sfdir / 'f64_mulAdd.c',
++    sfdir / 'f64_div.c',
++    sfdir / 'f64_rem.c',
++    sfdir / 'f64_sqrt.c',
++    sfdir / 'f64_eq.c',
++    sfdir / 'f64_le.c',
++    sfdir / 'f64_lt.c',
++    sfdir / 'f64_eq_signaling.c',
++    sfdir / 'f64_le_quiet.c',
++    sfdir / 'f64_lt_quiet.c',
++    sfdir / 'f64_isSignalingNaN.c',
++    sfdir / 'extF80_to_ui32.c',
++    sfdir / 'extF80_to_ui64.c',
++    sfdir / 'extF80_to_i32.c',
++    sfdir / 'extF80_to_i64.c',
++    sfdir / 'extF80_to_ui32_r_minMag.c',
++    sfdir / 'extF80_to_ui64_r_minMag.c',
++    sfdir / 'extF80_to_i32_r_minMag.c',
++    sfdir / 'extF80_to_i64_r_minMag.c',
++    sfdir / 'extF80_to_f16.c',
++    sfdir / 'extF80_to_f32.c',
++    sfdir / 'extF80_to_f64.c',
++    sfdir / 'extF80_to_f128.c',
++    sfdir / 'extF80_roundToInt.c',
++    sfdir / 'extF80_add.c',
++    sfdir / 'extF80_sub.c',
++    sfdir / 'extF80_mul.c',
++    sfdir / 'extF80_div.c',
++    sfdir / 'extF80_rem.c',
++    sfdir / 'extF80_sqrt.c',
++    sfdir / 'extF80_eq.c',
++    sfdir / 'extF80_le.c',
++    sfdir / 'extF80_lt.c',
++    sfdir / 'extF80_eq_signaling.c',
++    sfdir / 'extF80_le_quiet.c',
++    sfdir / 'extF80_lt_quiet.c',
++    sfdir / 'extF80_isSignalingNaN.c',
++    sfdir / 'extF80M_to_ui32.c',
++    sfdir / 'extF80M_to_ui64.c',
++    sfdir / 'extF80M_to_i32.c',
++    sfdir / 'extF80M_to_i64.c',
++    sfdir / 'extF80M_to_ui32_r_minMag.c',
++    sfdir / 'extF80M_to_ui64_r_minMag.c',
++    sfdir / 'extF80M_to_i32_r_minMag.c',
++    sfdir / 'extF80M_to_i64_r_minMag.c',
++    sfdir / 'extF80M_to_f16.c',
++    sfdir / 'extF80M_to_f32.c',
++    sfdir / 'extF80M_to_f64.c',
++    sfdir / 'extF80M_to_f128M.c',
++    sfdir / 'extF80M_roundToInt.c',
++    sfdir / 'extF80M_add.c',
++    sfdir / 'extF80M_sub.c',
++    sfdir / 'extF80M_mul.c',
++    sfdir / 'extF80M_div.c',
++    sfdir / 'extF80M_rem.c',
++    sfdir / 'extF80M_sqrt.c',
++    sfdir / 'extF80M_eq.c',
++    sfdir / 'extF80M_le.c',
++    sfdir / 'extF80M_lt.c',
++    sfdir / 'extF80M_eq_signaling.c',
++    sfdir / 'extF80M_le_quiet.c',
++    sfdir / 'extF80M_lt_quiet.c',
++    sfdir / 'f128_to_ui32.c',
++    sfdir / 'f128_to_ui64.c',
++    sfdir / 'f128_to_i32.c',
++    sfdir / 'f128_to_i64.c',
++    sfdir / 'f128_to_ui32_r_minMag.c',
++    sfdir / 'f128_to_ui64_r_minMag.c',
++    sfdir / 'f128_to_i32_r_minMag.c',
++    sfdir / 'f128_to_i64_r_minMag.c',
++    sfdir / 'f128_to_f16.c',
++    sfdir / 'f128_to_f32.c',
++    sfdir / 'f128_to_extF80.c',
++    sfdir / 'f128_to_f64.c',
++    sfdir / 'f128_roundToInt.c',
++    sfdir / 'f128_add.c',
++    sfdir / 'f128_sub.c',
++    sfdir / 'f128_mul.c',
++    sfdir / 'f128_mulAdd.c',
++    sfdir / 'f128_div.c',
++    sfdir / 'f128_rem.c',
++    sfdir / 'f128_sqrt.c',
++    sfdir / 'f128_eq.c',
++    sfdir / 'f128_le.c',
++    sfdir / 'f128_lt.c',
++    sfdir / 'f128_eq_signaling.c',
++    sfdir / 'f128_le_quiet.c',
++    sfdir / 'f128_lt_quiet.c',
++    sfdir / 'f128_isSignalingNaN.c',
++    sfdir / 'f128M_to_ui32.c',
++    sfdir / 'f128M_to_ui64.c',
++    sfdir / 'f128M_to_i32.c',
++    sfdir / 'f128M_to_i64.c',
++    sfdir / 'f128M_to_ui32_r_minMag.c',
++    sfdir / 'f128M_to_ui64_r_minMag.c',
++    sfdir / 'f128M_to_i32_r_minMag.c',
++    sfdir / 'f128M_to_i64_r_minMag.c',
++    sfdir / 'f128M_to_f16.c',
++    sfdir / 'f128M_to_f32.c',
++    sfdir / 'f128M_to_extF80M.c',
++    sfdir / 'f128M_to_f64.c',
++    sfdir / 'f128M_roundToInt.c',
++    sfdir / 'f128M_add.c',
++    sfdir / 'f128M_sub.c',
++    sfdir / 'f128M_mul.c',
++    sfdir / 'f128M_mulAdd.c',
++    sfdir / 'f128M_div.c',
++    sfdir / 'f128M_rem.c',
++    sfdir / 'f128M_sqrt.c',
++    sfdir / 'f128M_eq.c',
++    sfdir / 'f128M_le.c',
++    sfdir / 'f128M_lt.c',
++    sfdir / 'f128M_eq_signaling.c',
++    sfdir / 'f128M_le_quiet.c',
++    sfdir / 'f128M_lt_quiet.c',
++    # spe
++    sfspedir / 'softfloat_raiseFlags.c',
++    sfspedir / 's_f16UIToCommonNaN.c',
++    sfspedir / 's_commonNaNToF16UI.c',
++    sfspedir / 's_propagateNaNF16UI.c',
++    sfspedir / 's_f32UIToCommonNaN.c',
++    sfspedir / 's_commonNaNToF32UI.c',
++    sfspedir / 's_propagateNaNF32UI.c',
++    sfspedir / 's_f64UIToCommonNaN.c',
++    sfspedir / 's_commonNaNToF64UI.c',
++    sfspedir / 's_propagateNaNF64UI.c',
++    sfspedir / 'extF80M_isSignalingNaN.c',
++    sfspedir / 's_extF80UIToCommonNaN.c',
++    sfspedir / 's_commonNaNToExtF80UI.c',
++    sfspedir / 's_propagateNaNExtF80UI.c',
++    sfspedir / 'f128M_isSignalingNaN.c',
++    sfspedir / 's_f128UIToCommonNaN.c',
++    sfspedir / 's_commonNaNToF128UI.c',
++    sfspedir / 's_propagateNaNF128UI.c',
++  ),
++  include_directories: sfinc,
++  c_args: sfcflags + fpcflags,
++)
++
++fpcflags += [
++  # work around TARGET_* poisoning
++  '-DHW_POISON_H',
++  # define a target to match testfloat's implementation-defined choices, such as
++  # whether to raise the invalid flag when dealing with NaNs in muladd.
++  '-DTARGET_ARM',
++  # FIXME: uiZ may be used uninitialized in this function
++  '-Wno-uninitialized',
++]
++
++fptest = executable(
++  'fp-test',
++  ['fp-test.c', tfdir / 'slowfloat.c', '../../fpu/softfloat.c'],
++  build_by_default: false,
++  link_with: [libtestfloat, libsoftfloat],
++  dependencies: [qemuutil],
++  include_directories: [sfinc, include_directories(tfdir)],
++  c_args: fpcflags,
++)
++softfloat_conv_tests = {
++    'float-to-float': 'f16_to_f32 f16_to_f64 f16_to_extF80 f16_to_f128 ' +
++                      'f32_to_f16 f32_to_f64 f32_to_extF80 ' +
++                      'f64_to_f16 f64_to_f32 ' +
++                      'extF80_to_f16 extF80_to_f32 ' +
++                      'extF80_to_f64 extF80_to_f128 ' +
++                      'f128_to_f16',
++    'int-to-float': 'i32_to_f16 i64_to_f16 i32_to_f32 i64_to_f32 ' +
++                    'i32_to_f64 i64_to_f64 i32_to_f128 i64_to_f128',
++    'uint-to-float': 'ui32_to_f16 ui64_to_f16 ui32_to_f32 ui64_to_f32 ' +
++                     'ui32_to_f64 ui64_to_f64 ui64_to_f128 ' +
++                     'ui32_to_extF80 ui64_to_extF80',
++    'float-to-int': 'f16_to_i32 f16_to_i32_r_minMag ' +
++                    'f32_to_i32 f32_to_i32_r_minMag ' +
++                    'f64_to_i32 f64_to_i32_r_minMag ' +
++                    'extF80_to_i32 extF80_to_i32_r_minMag ' +
++                    'f128_to_i32 f128_to_i32_r_minMag ' +
++                    'f16_to_i64 f16_to_i64_r_minMag ' +
++                    'f32_to_i64 f32_to_i64_r_minMag ' +
++                    'f64_to_i64 f64_to_i64_r_minMag ' +
++                    'extF80_to_i64 extF80_to_i64_r_minMag ' +
++                    'f128_to_i64 f128_to_i64_r_minMag',
++    'float-to-uint': 'f16_to_ui32 f16_to_ui32_r_minMag ' +
++                     'f32_to_ui32 f32_to_ui32_r_minMag ' +
++                     'f64_to_ui32 f64_to_ui32_r_minMag ' +
++                     'extF80_to_ui32 extF80_to_ui32_r_minMag ' +
++                     'f128_to_ui32 f128_to_ui32_r_minMag ' +
++                     'f16_to_ui64 f16_to_ui64_r_minMag ' +
++                     'f32_to_ui64 f32_to_ui64_r_minMag ' +
++                     'f64_to_ui64 f64_to_ui64_r_minMag ' +
++                     'extF80_to_ui64 extF80_to_ui64_r_minMag ' +
++                     'f128_to_ui64 f128_to_ui64_r_minMag',
++    'round-to-integer': 'f16_roundToInt f32_roundToInt ' +
++                        'f64_roundToInt f128_roundToInt'
++}
++softfloat_tests = {
++    'eq_signaling' : 'compare',
++    'le' : 'compare',
++    'le_quiet' : 'compare',
++    'lt_quiet' : 'compare',
++    'add': 'ops',
++    'sub': 'ops',
++    'mul': 'ops',
++    'div': 'ops',
++    'rem': 'ops',
++    'sqrt': 'ops'
++}
++# The full test suite can take a bit of time, default to a quick run
++# "-l 2 -r all" can take more than a day for some operations and is best
++# run manually
++fptest_args = ['-s', '-l', '1']
++fptest_rounding_args = ['-r', 'all']
++
++# Conversion Routines:
++# FIXME: i32_to_extF80 (broken), i64_to_extF80 (broken)
++#        extF80_roundToInt (broken)
++foreach k, v : softfloat_conv_tests
++  test('fp-test:' + k, fptest,
++       args: fptest_args + fptest_rounding_args + v.split(),
++       suite: ['softfloat', 'softfloat-conv'])
++endforeach
++
++# FIXME: extF80_{lt_quiet, rem} (broken),
++#        extF80_{mulAdd} (missing)
++foreach k, v : softfloat_tests
++  extF80_broken = ['lt_quiet', 'rem'].contains(k)
++  test('fp-test:' + k, fptest,
++       args: fptest_args + fptest_rounding_args +
++             ['f16_' + k, 'f32_' + k, 'f64_' + k, 'f128_' + k] +
++             (extF80_broken ? [] : ['extF80_' + k]),
++       suite: ['softfloat', 'softfloat-' + v])
++endforeach
++test('fp-test:mulAdd', fptest,
++     # no fptest_rounding_args
++     args: fptest_args +
++           ['f16_mulAdd', 'f32_mulAdd', 'f64_mulAdd', 'f128_mulAdd'],
++     suite: ['softfloat-slow', 'softfloat-ops-slow'], timeout: 60)
++
++fpbench = executable(
++  'fp-bench',
++  ['fp-bench.c', '../../fpu/softfloat.c'],
++  build_by_default: false,
++  link_with: [libtestfloat, libsoftfloat],
++  dependencies: [qemuutil],
++  include_directories: [sfinc, include_directories(tfdir)],
++  c_args: fpcflags,
++)
+diff --git a/tests/meson.build b/tests/meson.build
+index 5c52021dc9..ec26f92937 100644
+--- a/tests/meson.build
++++ b/tests/meson.build
+@@ -2,3 +2,7 @@ test('decodetree', sh,
+      args: [ files('decode/check.sh'), config_host['PYTHON'], files('../scripts/decodetree.py') ],
+      workdir: meson.current_source_dir() / 'decode',
+      suite: 'decodetree')
++
++if 'CONFIG_TCG' in config_host
++  subdir('fp')
++endif
 -- 
 2.26.2
 
