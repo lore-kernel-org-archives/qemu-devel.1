@@ -7,79 +7,79 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F05BC433E1
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B760C433DF
 	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 15:02:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C3D25204FD
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 15:02:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2BFDC204FD
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 15:02:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OIVL0f18"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3D25204FD
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OUWTEKq8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2BFDC204FD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49970 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50072 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7geX-0001v5-Ua
-	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 11:02:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41046)
+	id 1k7geZ-0001yB-Ah
+	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 11:02:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40938)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1k7gHD-0004gv-0s
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:38:19 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:36938)
+ id 1k7gH6-0004Lz-3I
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:38:12 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:37275)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1k7gHB-0006Ax-2o
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:38:18 -0400
-Received: by mail-wm1-x342.google.com with SMTP id k8so14101540wma.2
- for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 07:38:16 -0700 (PDT)
+ id 1k7gH4-00069g-H2
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:38:11 -0400
+Received: by mail-wr1-x443.google.com with SMTP id y3so15280611wrl.4
+ for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 07:38:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=u9LHgiiPmGa38g/Fb0syP3eiMwtEunpU2hIQUxxiPH0=;
- b=OIVL0f18QpUOgr0A6If5b2CfwkNvJoG9OnnILoaukT59HaivT27sqN7bypVB7+iZev
- atOEnSF/UtjBsswWOg789UnVkvVEw93Wce+FeMRU+jTIcc0b8nBsL52oO6gOWepCQUX+
- 1WMTwxHqxXBH7U7o5IJQ7g4M3B3IGbYextKBbByxPab1wtwCRBB9zB9YRKRM2CKCkNFS
- UDbGLpV4bX1kx1G+g+eZQtbCBFsgN6Dnfge8lyscjgD8iLUHwibJdHfkgBpwe5or0P4k
- HriHAfqq8Lw2fE7uPZHFvJHi85yuVf+vUw6ON95NdnLwLBi4saC0rHnFJBU5oXaAPTqO
- u/ZQ==
+ bh=kf7BeJ8yweifSglyftbXaX9ZKpT7856D3iotyv/TdHg=;
+ b=OUWTEKq8JGP84pCVQBEGzXPXGedcUT/8VL2T6a1vV/meg2tR5boh0LLbt3NX2Y6uq1
+ NUlJ51cdnHyjSSXkZcqFErLprYO8MidpC8GWQOK1ReNOXQ0IgD+GftigENm8UVRsxFWT
+ zjeO/7IlM27yOY0zUqGNXVJ/U3Fz/bUKjoKqJNgcTcO9Ik7GB+dn/eYBD/aI5zs77/z7
+ 3wHQW9IFBmXkcI4wQ+4xkAOv42W0g+JxYt/6a7TM1yDN+xYkHSfBOYwFhXMWBlgwWcL8
+ NgQ7vGhj34eC6e6xJ4yS6HruyfIVmTPfptPTVlx3u4B85FWv6VRVLf97rxvUf+sC7La/
+ I0Lw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=u9LHgiiPmGa38g/Fb0syP3eiMwtEunpU2hIQUxxiPH0=;
- b=h4+pA/0ssMCbY40nqskGcqPqFmNq01xd53W1CeMKXJxAoIv/1rUNZ3BKiAsxcJ/Wld
- 8JJu0fQo9jLRgEO/llxTwZcTnNtW51IUPfjz+XzjjXRyIi8I59NM6i34afwPXEoN8mRK
- VaptHkBdeXYuTAyxSSDvo0IA1N/6/XCdC7n7wu3OGfB9SZHZW/uKs11GZa0jITd9yiFq
- PsYBSV3LbjZxbwldTdEEqoy79BEXO6E4iWc1rHgWGb4pY/K7v3acUDm2EaojsjhLZdSZ
- uJgE0fLHFhL/BnPvV6KO+kXGEO/lEFM8LcaUIwbqBhoh4FcfVYFcyTp56fKn9JgtmzAa
- VWlQ==
-X-Gm-Message-State: AOAM531PapXAf0jO3ggCaJ/gi2OYiTEwJIgPWLny0awGFgfsL9d5TESE
- PW2NIFkGJsqxevH7h5eOfgR5cRGmH5c=
-X-Google-Smtp-Source: ABdhPJy85zju38mu4V6ZHHXGDKyPUSDpHQGD0UhEOd07aTgTiTuZSIFRSjhmm4wTWaMP0K76v4T74w==
-X-Received: by 2002:a7b:cf22:: with SMTP id m2mr15386543wmg.46.1597675095520; 
- Mon, 17 Aug 2020 07:38:15 -0700 (PDT)
+ bh=kf7BeJ8yweifSglyftbXaX9ZKpT7856D3iotyv/TdHg=;
+ b=FKiGAQ3VnT6EU1UCO3I5OGGpqJwDMJD29G8apmA0YDEqC7ZVQcDkjr/te/d1Ksf1gz
+ YNhxivu/k99k/Jmc/oVbmNpLSuUdtx6CGba5G/oXj+oFph22OUW48d82bVfZvoofODNn
+ s77psUzEO9m3FWs4P/GWMF/ctLi80RwU6PZosOzHm8w6Cdr+hGWVV8+azKFVKNWI9fSv
+ Z706tlsqk9ZWAt8hK6ujw7TQXUR6+dXjf/BO+s0a8zcWJotrf1O1x6vHqWaFYvoPffqR
+ zwA1cxPEByezM8mW6Sd1S0P+OjD96X/I5dPd2IOjM8qWPDvB0FzUPksJPinkMxShfMEy
+ HmUQ==
+X-Gm-Message-State: AOAM531aJRtQI2FflKDj7y/oyff2sYi+cJLkHChXFnwPyXu2kH9E+WnV
+ 3BLbUCTEdw6gcDZDhUpqDKACioUiEo4=
+X-Google-Smtp-Source: ABdhPJzoe12wELTCpjV6BXOr9KUVWGugQx8pGOtCxqgnTfBWx0TmKeu13nHTDUCpK+JKhlrQdZcHUw==
+X-Received: by 2002:adf:92a1:: with SMTP id 30mr17128981wrn.56.1597675088323; 
+ Mon, 17 Aug 2020 07:38:08 -0700 (PDT)
 Received: from donizetti.redhat.com ([2001:b07:6468:f312:a0d1:fc42:c610:f977])
  by smtp.gmail.com with ESMTPSA id
- i22sm34966603wrb.45.2020.08.17.07.38.14
+ i22sm34966603wrb.45.2020.08.17.07.38.07
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 17 Aug 2020 07:38:15 -0700 (PDT)
+ Mon, 17 Aug 2020 07:38:07 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 051/150] meson: handle edk2 bios and descriptors
-Date: Mon, 17 Aug 2020 16:35:44 +0200
-Message-Id: <20200817143723.343284-52-pbonzini@redhat.com>
+Subject: [PATCH 043/150] meson: add qemu-bridge-helper
+Date: Mon, 17 Aug 2020 16:35:36 +0200
+Message-Id: <20200817143723.343284-44-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200817143723.343284-1-pbonzini@redhat.com>
 References: <20200817143723.343284-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::342;
- envelope-from=paolo.bonzini@gmail.com; helo=mail-wm1-x342.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=paolo.bonzini@gmail.com; helo=mail-wr1-x443.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -114,156 +114,59 @@ Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Makefile                        | 29 -----------------------------
- meson.build                     |  1 +
- pc-bios/descriptors/meson.build | 14 ++++++++++++++
- pc-bios/meson.build             | 27 +++++++++++++++++++++++++++
- 4 files changed, 42 insertions(+), 29 deletions(-)
- create mode 100644 pc-bios/descriptors/meson.build
- create mode 100644 pc-bios/meson.build
+ Makefile    | 4 ----
+ meson.build | 9 ++++++++-
+ 2 files changed, 8 insertions(+), 5 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index ca331b13dc..68ad75d210 100644
+index 06c73b8d09..cbd5bd1a87 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -116,10 +116,6 @@ generated-files-y += module_block.h
+@@ -186,8 +186,6 @@ LIBS+=-lz $(LIBS_TOOLS)
  
- generated-files-y += .git-submodule-status
+ HELPERS-y = $(HELPERS)
  
--edk2-decompressed = $(basename $(wildcard pc-bios/edk2-*.fd.bz2))
--pc-bios/edk2-%.fd: pc-bios/edk2-%.fd.bz2
--	$(call quiet-command,bzip2 -d -c $< > $@,"BUNZIP2",$<)
+-HELPERS-$(call land,$(CONFIG_SOFTMMU),$(CONFIG_LINUX)) += qemu-bridge-helper$(EXESUF)
 -
- # Don't try to regenerate Makefile or configure
- # We don't generate any of them
- Makefile: ;
-@@ -263,9 +259,6 @@ $(SOFTMMU_ALL_RULES): $(chardev-obj-y)
- $(SOFTMMU_ALL_RULES): $(crypto-obj-y)
- $(SOFTMMU_ALL_RULES): $(io-obj-y)
- $(SOFTMMU_ALL_RULES): config-all-devices.mak
--ifdef DECOMPRESS_EDK2_BLOBS
--$(SOFTMMU_ALL_RULES): $(edk2-decompressed)
--endif
+ # Sphinx does not allow building manuals into the same directory as
+ # the source files, so if we're doing an in-tree QEMU build we must
+ # build the manuals into a subdirectory (and then install them from
+@@ -420,8 +418,6 @@ qemu-nbd$(EXESUF): qemu-nbd.o $(authz-obj-y) $(block-obj-y) $(crypto-obj-y) $(io
+ qemu-io$(EXESUF): qemu-io.o $(authz-obj-y) $(block-obj-y) $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
+ qemu-storage-daemon$(EXESUF): qemu-storage-daemon.o $(authz-obj-y) $(block-obj-y) $(crypto-obj-y) $(chardev-obj-y) $(io-obj-y) $(qom-obj-y) $(storage-daemon-obj-y) $(COMMON_LDADDS)
  
- SOFTMMU_FUZZ_RULES=$(filter %-softmmu/fuzz, $(TARGET_DIRS_RULES))
- $(SOFTMMU_FUZZ_RULES): $(authz-obj-y)
-@@ -373,7 +366,6 @@ clean: recurse-clean ninja-clean clean-ctlist
- 		! -path ./roms/edk2/ArmPkg/Library/GccLto/liblto-arm.a \
- 		! -path ./roms/edk2/BaseTools/Source/Python/UPT/Dll/sqlite3.dll \
- 		-exec rm {} +
--	rm -f $(edk2-decompressed)
- 	rm -f $(filter-out %.tlb,$(TOOLS)) $(HELPERS-y) TAGS cscope.* *.pod *~ */*~
- 	rm -f fsdev/*.pod scsi/*.pod
- 	rm -f $(foreach f,$(generated-files-y),$(f) $(f)-timestamp)
-@@ -450,13 +442,8 @@ edk2-licenses.txt \
- hppa-firmware.img \
- opensbi-riscv32-sifive_u-fw_jump.bin opensbi-riscv32-virt-fw_jump.bin \
- opensbi-riscv64-sifive_u-fw_jump.bin opensbi-riscv64-virt-fw_jump.bin
+-qemu-bridge-helper$(EXESUF): qemu-bridge-helper.o $(COMMON_LDADDS)
 -
--
--DESCS=50-edk2-i386-secure.json 50-edk2-x86_64-secure.json \
--60-edk2-aarch64.json 60-edk2-arm.json 60-edk2-i386.json 60-edk2-x86_64.json
- else
- BLOBS=
--DESCS=
- endif
+ qemu-keymap$(EXESUF): qemu-keymap.o ui/input-keymap.o $(COMMON_LDADDS)
  
- # Note that we manually filter-out the non-Sphinx documentation which
-@@ -533,7 +520,6 @@ install-includedir:
- export DESTDIR
- install: all $(if $(BUILD_DOCS),install-doc) \
- 	install-datadir install-localstatedir install-includedir \
--	$(if $(INSTALL_BLOBS),$(edk2-decompressed)) \
- 	recurse-install
- ifneq ($(TOOLS),)
- 	$(call install-prog,$(TOOLS),$(DESTDIR)$(bindir))
-@@ -556,21 +542,6 @@ ifneq ($(BLOBS),)
- 	set -e; for x in $(BLOBS); do \
- 		$(INSTALL_DATA) $(SRC_PATH)/pc-bios/$$x "$(DESTDIR)$(qemu_datadir)"; \
- 	done
--endif
--ifdef INSTALL_BLOBS
--	set -e; for x in $(edk2-decompressed); do \
--		$(INSTALL_DATA) $$x "$(DESTDIR)$(qemu_datadir)"; \
--	done
--endif
--ifneq ($(DESCS),)
--	$(INSTALL_DIR) "$(DESTDIR)$(qemu_datadir)/firmware"
--	set -e; tmpf=$$(mktemp); trap 'rm -f -- "$$tmpf"' EXIT; \
--	for x in $(DESCS); do \
--		sed -e 's,@DATADIR@,$(qemu_datadir),' \
--			"$(SRC_PATH)/pc-bios/descriptors/$$x" > "$$tmpf"; \
--		$(INSTALL_DATA) "$$tmpf" \
--			"$(DESTDIR)$(qemu_datadir)/firmware/$$x"; \
--	done
- endif
- 	for s in $(ICON_SIZES); do \
- 		mkdir -p "$(DESTDIR)$(qemu_icondir)/hicolor/$${s}/apps"; \
+ qemu-edid$(EXESUF): qemu-edid.o hw/display/edid-generate.o $(COMMON_LDADDS)
 diff --git a/meson.build b/meson.build
-index 131ba26c1d..bb9e918e4c 100644
+index 67a26314fa..8c05db2cb6 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -379,6 +379,7 @@ if have_tools
+@@ -293,7 +293,6 @@ qemuutil = declare_dependency(link_with: libqemuutil,
+                               sources: genh + version_res)
+ 
+ # Other build targets
+-
+ if 'CONFIG_GUEST_AGENT' in config_host
+   subdir('qga')
  endif
- 
- subdir('tools')
-+subdir('pc-bios')
- 
- summary_info = {}
- summary_info += {'Install prefix':    config_host['prefix']}
-diff --git a/pc-bios/descriptors/meson.build b/pc-bios/descriptors/meson.build
-new file mode 100644
-index 0000000000..7c715bace8
---- /dev/null
-+++ b/pc-bios/descriptors/meson.build
-@@ -0,0 +1,14 @@
-+foreach f: [
-+  '50-edk2-i386-secure.json',
-+  '50-edk2-x86_64-secure.json',
-+  '60-edk2-aarch64.json',
-+  '60-edk2-arm.json',
-+  '60-edk2-i386.json',
-+  '60-edk2-x86_64.json'
-+]
-+  configure_file(input: files(f),
-+                 output: f,
-+                 configuration: {'DATADIR': config_host['qemu_datadir']},
-+                 install: install_blobs,
-+                 install_dir: config_host['qemu_datadir'] / 'firmware')
-+endforeach
-diff --git a/pc-bios/meson.build b/pc-bios/meson.build
-new file mode 100644
-index 0000000000..6e3bfe3ca4
---- /dev/null
-+++ b/pc-bios/meson.build
-@@ -0,0 +1,27 @@
-+bzip2 = find_program('bzip2')
+@@ -311,6 +310,14 @@ if have_tools
+     subdir('contrib/vhost-user-input')
+     subdir('contrib/vhost-user-scsi')
+   endif
 +
-+install_blobs = 'INSTALL_BLOBS' in config_host
-+if 'DECOMPRESS_EDK2_BLOBS' in config_host
-+  fds = [
-+    'edk2-aarch64-code.fd',
-+    'edk2-arm-code.fd',
-+    'edk2-arm-vars.fd',
-+    'edk2-i386-code.fd',
-+    'edk2-i386-secure-code.fd',
-+    'edk2-i386-vars.fd',
-+    'edk2-x86_64-code.fd',
-+    'edk2-x86_64-secure-code.fd',
-+  ]
++  if host_machine.system() == 'linux'
++    executable('qemu-bridge-helper', files('qemu-bridge-helper.c'),
++               dependencies: [qemuutil, libcap_ng],
++               install: true,
++               install_dir: get_option('libexecdir'))
++  endif
 +
-+  foreach f : fds
-+    custom_target(f,
-+                  output: f,
-+                  input: '@0@.bz2'.format(f),
-+                  capture: true,
-+                  install: install_blobs,
-+                  install_dir: config_host['qemu_datadir'],
-+                  command: [ bzip2, '-dc', '@INPUT0@' ])
-+  endforeach
-+endif
-+
-+subdir('descriptors')
+   if 'CONFIG_IVSHMEM' in config_host
+     subdir('contrib/ivshmem-client')
+     subdir('contrib/ivshmem-server')
 -- 
 2.26.2
 
