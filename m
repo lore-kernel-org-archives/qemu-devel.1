@@ -2,85 +2,89 @@ Return-Path: <SRS0=yhYb=B3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D82F9C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 06:49:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66AFAC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 06:50:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9B49220758
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 06:49:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3277F20758
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 06:50:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amarulasolutions.com header.i=@amarulasolutions.com header.b="VaMYB0aa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B49220758
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amarulasolutions.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="heeOEYsL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3277F20758
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40766 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42882 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7Yxq-0001T6-Qk
-	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 02:49:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46982)
+	id 1k7Yyj-0002KM-Gj
+	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 02:50:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47174)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <michael@amarulasolutions.com>)
- id 1k7Yx7-0000yL-I3
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 02:49:05 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:34877)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <michael@amarulasolutions.com>)
- id 1k7Yx5-0007h7-DO
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 02:49:05 -0400
-Received: by mail-wm1-x344.google.com with SMTP id 184so12975793wmb.0
- for <qemu-devel@nongnu.org>; Sun, 16 Aug 2020 23:49:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amarulasolutions.com; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=f1dXXEx+zcgacnXjK5zJ/p3PlgB59prxUayqJL0AVL4=;
- b=VaMYB0aa/LjglP7jy0/D3DgGezt+GU8ne8TT1zVTzCo9btbUZ2zXpx9L+JkSoeXOrz
- pOV4cgGCPDTL4Be5LbEpWKRX7qZkSfMieFL1utPedUzJXiWjKuOvjWti2lahU24cttgx
- uq+WouGaaj1lVP0sm0Ns5L3NK0ZBzqXV6G4+w=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=f1dXXEx+zcgacnXjK5zJ/p3PlgB59prxUayqJL0AVL4=;
- b=XlQxxrbO4VLra6mSBlXnpQd9hvLIdwmnvVi3b7maLli9Xl0f7dalqN+ZysOVxwQ/MM
- 4kxyperaTQzsPNWwmXIqUjhzhsFYS7JQE6QHbwauIsMg/IcsjKHYcibRd9RguxFau+xo
- GVI4p5CVLsLql8lGSRuK3vbmr/kqCklOsu9Vd/7jMS2O3986mh8ui3aCAt9YQaXoASQZ
- u0daXMnq0DsLpP+ujFFYL0hHRoy3dTf5g8poT/6/u3OuYj91XCPY3K416ydgb0bNvzxy
- YzGRpFmqYM5YTZnUmK7CeYYO037Tv5EP4/5Zoyl2XHSQXk8p/ZLQtJAuHc0qNj/LVthH
- oTkg==
-X-Gm-Message-State: AOAM532tOiEoMOGioJNmJQr/GSjcHnq9xv9DeAyLSyOJgVsVfe1KpSUI
- ocStM7PyyFvLduZZagMfnC6K8AX3RO8NFnZ9D6ixdQ==
-X-Google-Smtp-Source: ABdhPJxWH//JS4tAkdC5W/BimvNdkRP9P8NAmO1P+jQ5moUQiaQDb+yTfhGD44SZPGSb2+7G0/eGyZ7i/eAeu94QLz0=
-X-Received: by 2002:a1c:2d95:: with SMTP id t143mr12771797wmt.44.1597646940722; 
- Sun, 16 Aug 2020 23:49:00 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1k7Yxe-0001OD-AF
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 02:49:38 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:37402
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1k7Yxc-0007kS-N2
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 02:49:38 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1597646975;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=qSNqbd8xdlm+KvS2CRU8j/CZdv8Su5c3Xq64Mqa9GRc=;
+ b=heeOEYsL2XZ9jG3XXSalwMc+s35Gx4pUFrqYGtAmETOqPF4FsJ8iBCZlimwgX4yajqlahA
+ dO2lsLxKrGRHB+t/cLqoxJXCX+eCYiBvcq4CLrT7Heg9yy9z2rIS3Q+5x8NjfXXh4gzhvV
+ dcj6srR4K6E6QzF5QmauhQr7AFdoOH4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-167-ey04bhYBMfek47yz1D7QWg-1; Mon, 17 Aug 2020 02:49:31 -0400
+X-MC-Unique: ey04bhYBMfek47yz1D7QWg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9CE0E81F007;
+ Mon, 17 Aug 2020 06:49:30 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-112-195.ams2.redhat.com
+ [10.36.112.195])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 380E3100EBA5;
+ Mon, 17 Aug 2020 06:49:29 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 121FC1753B; Mon, 17 Aug 2020 08:49:29 +0200 (CEST)
+Date: Mon, 17 Aug 2020 08:49:29 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: Chen Qun <kuhn.chenqun@huawei.com>
+Subject: Re: [PATCH 11/11] hw/display/vga:Remove redundant statement in
+ vga_draw_graphic()
+Message-ID: <20200817064929.4ankvfxxiqa4adgo@sirius.home.kraxel.org>
+References: <20200813073712.4001404-1-kuhn.chenqun@huawei.com>
+ <20200813073712.4001404-12-kuhn.chenqun@huawei.com>
 MIME-Version: 1.0
-References: <20200812152149.260163-1-michael@amarulasolutions.com>
- <20200817064701.o3q3plnjhzyz3s42@sirius.home.kraxel.org>
-In-Reply-To: <20200817064701.o3q3plnjhzyz3s42@sirius.home.kraxel.org>
-From: Michael Nazzareno Trimarchi <michael@amarulasolutions.com>
-Date: Mon, 17 Aug 2020 08:48:49 +0200
-Message-ID: <CAOf5uwn94gZPZXChFDXWZ-1w0jOY_SxRqzF4Mk8hrtLq-r3yCg@mail.gmail.com>
-Subject: Re: [PATCH] hw: dev-wacom: Support wacom tablet emulation in linux
- qemu
-To: Gerd Hoffmann <kraxel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::344;
- envelope-from=michael@amarulasolutions.com; helo=mail-wm1-x344.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200813073712.4001404-12-kuhn.chenqun@huawei.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/17 00:24:04
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,64 +97,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, Euler Robot <euler.robot@huawei.com>,
+ pannengyuan@huawei.com, qemu-devel@nongnu.org, zhang.zhanghailiang@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Gerd
+On Thu, Aug 13, 2020 at 03:37:12PM +0800, Chen Qun wrote:
+> Clang static code analyzer show warning:
+> hw/display/vga.c:1677:9: warning: Value stored to 'update' is never read
+>         update = full_update;
+>         ^        ~~~~~~~~~~~
+> 
+> Reported-by: Euler Robot <euler.robot@huawei.com>
+> Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
 
-On Mon, Aug 17, 2020 at 8:47 AM Gerd Hoffmann <kraxel@redhat.com> wrote:
->
-> On Wed, Aug 12, 2020 at 05:21:49PM +0200, Michael Trimarchi wrote:
-> > Linux need to fill up the hid descriptor in order to let
-> > the driver be emulated. This patch was tested on top of
-> > qemu 4.2.0 and recent linux kernel.
-> >
-> > modprobe wacom.ko
-> > evtest tool
-> >
-> > Signed-off-by: Michael Trimarchi <michael@amarulasolutions.com>
-> > ---
-> >  hw/usb/dev-wacom.c | 70 ++++++++++++++++++++++++++++++++++++++++++++++
-> >  1 file changed, 70 insertions(+)
-> >
-> > diff --git a/hw/usb/dev-wacom.c b/hw/usb/dev-wacom.c
-> > index 8aba44b8bc..fe95699672 100644
-> > --- a/hw/usb/dev-wacom.c
-> > +++ b/hw/usb/dev-wacom.c
-> > @@ -259,6 +259,64 @@ static void usb_wacom_handle_reset(USBDevice *dev)
-> >      s->mode = WACOM_MODE_HID;
-> >  }
-> >
-> > +static const uint8_t qemu_wacom_hid_report_descriptor[] = {
-> > +     0x05, 0x01,
-> > +     0x09, 0x02,
->
-> Where does this come from?  Created from scratch?  Copied from real
+Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
 
-No, there are dump of several descriptor on github. I will put in the
-commit message
-
-> wacom tablet?  Any chance this can get descriptive comments like the
-> other report descriptors (see dev-hid.c)?
-
-Yes, no problem. I will study a bit more. How was working before?
-
-Michael
-
->
-> thanks,
->   Gerd
->
-
-
--- 
-Michael Nazzareno Trimarchi
-Amarula Solutions BV
-COO Co-Founder
-Cruquiuskade 47 Amsterdam 1018 AM NL
-T. +31(0)851119172
-M. +39(0)3479132170
-[`as] https://www.amarulasolutions.com
 
