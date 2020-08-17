@@ -7,63 +7,62 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D91AC433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 15:36:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62856C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 15:36:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D269223105
-	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 15:36:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 26B5622C9F
+	for <qemu-devel@archiver.kernel.org>; Mon, 17 Aug 2020 15:36:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y1B6Wyr/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D269223105
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PbsM2vVF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 26B5622C9F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46866 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49278 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7hBZ-0004Mq-1r
-	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 11:36:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43034)
+	id 1k7hBw-0005L3-CU
+	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 11:36:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42748)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k7gLI-0003sm-Ul
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:42:32 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31374
- helo=us-smtp-1.mimecast.com)
+ id 1k7gKt-0003Jv-87
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:42:08 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39799)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k7gLG-0006wh-9A
- for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:42:32 -0400
+ id 1k7gKq-0006tg-6Q
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 10:42:06 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597675349;
+ s=mimecast20190719; t=1597675323;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=afI0bjWFAI8/sQwiWTeLYcsqB3BFM0DVvTZAz0LOc3M=;
- b=Y1B6Wyr/8KI3c8EJSXiFozYJKMtZ9YfMV3BAyDKwHnN+6hakjI1pDhb+uleT6prmvuteAR
- EZmI4QJJNJoCDscupsXBppXCiWpemUrjyFkBvFPyAbBqhlg4nhmglu7myAvvj394pnvhbG
- s2xnxCVpKQUJp//q2kI+Uy6WqbASQWQ=
+ bh=XxNDI70b3/0e7kXgirS50nvDaO0T9WjLPkIdXZfyNbk=;
+ b=PbsM2vVFQKuGOFqdQoMg4ZWYZLEUkQ/y1bnh3P4TJYY7eTgrmuTy2o1l8Cl+GcTDmlJ/Yn
+ dqOz/LRr9Myv8yezVbeN1zHBxRqIldi90dr1NiBCR5oQWGkdZ1sQO+dugDlMEJx6gomNnx
+ L0Rr8SCIkicwgWLGmW0kgzqClBiuO0k=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-80-hb4L1ckhOneD3rXINajXGQ-1; Mon, 17 Aug 2020 10:42:27 -0400
-X-MC-Unique: hb4L1ckhOneD3rXINajXGQ-1
+ us-mta-329-ph1LIC1aOwyRb_phrFMyGw-1; Mon, 17 Aug 2020 10:42:01 -0400
+X-MC-Unique: ph1LIC1aOwyRb_phrFMyGw-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ED241100CECD
- for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 14:42:26 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B93001DDE9
+ for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 14:42:00 +0000 (UTC)
 Received: from donizetti.redhat.com (ovpn-113-20.ams2.redhat.com
  [10.36.113.20])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5123270C3D
- for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 14:42:26 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D6EFC70C3D;
+ Mon, 17 Aug 2020 14:41:59 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 143/150] meson: convert sample plugins
-Date: Mon, 17 Aug 2020 16:40:46 +0200
-Message-Id: <20200817144053.345107-48-pbonzini@redhat.com>
+Subject: [PATCH 125/150] meson: convert hw/9pfs, cleanup
+Date: Mon, 17 Aug 2020 16:40:28 +0200
+Message-Id: <20200817144053.345107-30-pbonzini@redhat.com>
 In-Reply-To: <20200817143723.343284-1-pbonzini@redhat.com>
 References: <20200817143723.343284-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -72,18 +71,18 @@ Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/17 05:13:21
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/17 02:47:08
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -98,142 +97,183 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+From: Marc-André Lureau <marcandre.lureau@redhat.com>
+
+hw/Makefile.objs is gone so there is more code that can be removed.
+
+Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- configure                |  4 ----
- tests/Makefile.include   |  9 --------
- tests/meson.build        |  3 +++
- tests/plugin/Makefile    | 46 ----------------------------------------
- tests/plugin/meson.build |  7 ++++++
- 5 files changed, 10 insertions(+), 59 deletions(-)
- delete mode 100644 tests/plugin/Makefile
- create mode 100644 tests/plugin/meson.build
+ Makefile              |  4 ----
+ Makefile.objs         |  8 --------
+ Makefile.target       | 15 ---------------
+ hw/9pfs/Kconfig       |  4 ++++
+ hw/9pfs/Makefile.objs |  9 ---------
+ hw/9pfs/meson.build   | 20 ++++++++++++++++++++
+ hw/Makefile.objs      |  8 --------
+ hw/meson.build        |  1 +
+ 8 files changed, 25 insertions(+), 44 deletions(-)
+ delete mode 100644 hw/9pfs/Makefile.objs
+ create mode 100644 hw/9pfs/meson.build
+ delete mode 100644 hw/Makefile.objs
 
-diff --git a/configure b/configure
-index a00d0cf2de..d76cae818d 100755
---- a/configure
-+++ b/configure
-@@ -6832,9 +6832,6 @@ echo "GIT_UPDATE=$git_update" >> $config_host_mak
- 
- echo "ARCH=$ARCH" >> $config_host_mak
- 
--echo "GLIB_CFLAGS=$glib_cflags" >> $config_host_mak
--echo "GLIB_LDFLAGS=$glib_ldflags" >> $config_host_mak
--
- if test "$default_devices" = "yes" ; then
-   echo "CONFIG_MINIKCONF_MODE=--defconfig" >> $config_host_mak
- else
-@@ -8274,7 +8271,6 @@ DIRS="$DIRS roms/seabios"
- LINKS="Makefile"
- LINKS="$LINKS tests/tcg/lm32/Makefile po/Makefile"
- LINKS="$LINKS tests/tcg/Makefile.target"
--LINKS="$LINKS tests/plugin/Makefile"
- LINKS="$LINKS pc-bios/optionrom/Makefile pc-bios/keymaps"
- LINKS="$LINKS pc-bios/s390-ccw/Makefile"
- LINKS="$LINKS roms/seabios/Makefile"
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index e023df817d..aec293bdd0 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -429,15 +429,6 @@ check-speed: $(check-speed-y)
- check-report-unit.tap: $(check-unit-y)
- 	$(call do_test_tap,$^)
- 
--# Plugins
--ifeq ($(CONFIG_PLUGIN),y)
--.PHONY: plugins
--plugins:
--	$(call quiet-command,\
--		$(MAKE) $(SUBDIR_MAKEFLAGS) -C tests/plugin V="$(V)", \
--		"BUILD", "plugins")
--endif
--
- # Per guest TCG tests
- 
- BUILD_TCG_TARGET_RULES=$(patsubst %,build-tcg-tests-%, $(TARGET_DIRS))
-diff --git a/tests/meson.build b/tests/meson.build
-index f834c272e8..fe2c6d8e6b 100644
---- a/tests/meson.build
-+++ b/tests/meson.build
-@@ -9,6 +9,9 @@ test('decodetree', sh,
- 
- if 'CONFIG_TCG' in config_host
-   subdir('fp')
-+  if 'CONFIG_PLUGIN' in config_host
-+    subdir('plugin')
-+  endif
+diff --git a/Makefile b/Makefile
+index a523898da0..99f8033cd2 100644
+--- a/Makefile
++++ b/Makefile
+@@ -167,10 +167,6 @@ ifneq ($(wildcard config-host.mak),)
+ include $(SRC_PATH)/Makefile.objs
  endif
  
- subdir('qapi-schema')
-diff --git a/tests/plugin/Makefile b/tests/plugin/Makefile
+-dummy := $(call unnest-vars,, \
+-                common-obj-y \
+-                common-obj-m)
+-
+ include $(SRC_PATH)/tests/Makefile.include
+ 
+ all: $(DOCS) $(if $(BUILD_DOCS),sphinxdocs) recurse-all modules
+diff --git a/Makefile.objs b/Makefile.objs
+index c332323b81..c9720a92df 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -61,18 +61,10 @@ common-obj-$(if $(CONFIG_RBD),m) += block-rbd$(DSOSUF)
+ common-obj-$(if $(CONFIG_LZFSE),m) += block-dmg-lzfse$(DSOSUF)
+ common-obj-$(if $(and $(CONFIG_BZIP2),$(CONFIG_DMG)),m) += block-dmg-bz2$(DSOSUF)
+ 
+-common-obj-y += hw/
+-common-obj-m += hw/
+-
+ common-obj-y += libqmp.fa
+ 
+ endif # CONFIG_SOFTMMU
+ 
+-#######################################################################
+-# Target-independent parts used in system and user emulation
+-
+-common-obj-y += hw/
+-
+ ######################################################################
+ # Resource file for Windows executables
+ version-obj-$(CONFIG_WIN32) += $(BUILD_DIR)/version.o
+diff --git a/Makefile.target b/Makefile.target
+index 3534ece38a..c95e0deb79 100644
+--- a/Makefile.target
++++ b/Makefile.target
+@@ -156,7 +156,6 @@ endif #CONFIG_BSD_USER
+ ifdef CONFIG_SOFTMMU
+ obj-y += softmmu/
+ obj-y += gdbstub.o
+-obj-y += hw/
+ LIBS := $(libs_softmmu) $(LIBS)
+ 
+ # Temporary until emulators are linked by Meson
+@@ -185,20 +184,6 @@ endif # CONFIG_SOFTMMU
+ dummy := $(call unnest-vars,,obj-y)
+ all-obj-y := $(obj-y)
+ 
+-#
+-# common-obj-m has some crap here, probably as side effect from
+-# unnest-vars recursing into target directories to fill obj-y and not
+-# properly handling the -m case.
+-#
+-# Clear common-obj-m as workaround.  Fixes suspious dependency errors
+-# when building devices as modules.  A bit hackish, but should be ok
+-# as long as we do not have any target-specific modules.
+-#
+-# The meson-based build system currently in development doesn't need
+-# unnest-vars and will obsolete this workaround.
+-#
+-common-obj-m :=
+-
+ include $(SRC_PATH)/Makefile.objs
+ dummy := $(call fix-paths,../,, \
+               authz-obj-y \
+diff --git a/hw/9pfs/Kconfig b/hw/9pfs/Kconfig
+index 3ae5749661..d3ebd73730 100644
+--- a/hw/9pfs/Kconfig
++++ b/hw/9pfs/Kconfig
+@@ -2,8 +2,12 @@ config FSDEV_9P
+     bool
+     depends on VIRTFS
+ 
++config 9PFS
++    bool
++
+ config VIRTIO_9P
+     bool
+     default y
+     depends on VIRTFS && VIRTIO
+     select FSDEV_9P
++    select 9PFS
+diff --git a/hw/9pfs/Makefile.objs b/hw/9pfs/Makefile.objs
 deleted file mode 100644
-index e9348fde4a..0000000000
---- a/tests/plugin/Makefile
+index 70ded6fd8f..0000000000
+--- a/hw/9pfs/Makefile.objs
 +++ /dev/null
-@@ -1,46 +0,0 @@
--# -*- Mode: makefile -*-
--#
--# This Makefile example is fairly independent from the main makefile
--# so users can take and adapt it for their build. We only really
--# include config-host.mak so we don't have to repeat probing for
--# cflags that the main configure has already done for us.
--#
+@@ -1,9 +0,0 @@
+-common-obj-y  = 9p.o 9p-util.o
+-common-obj-y += 9p-local.o 9p-xattr.o
+-common-obj-y += 9p-xattr-user.o 9p-posix-acl.o
+-common-obj-y += coth.o cofs.o codir.o cofile.o
+-common-obj-y += coxattr.o 9p-synth.o
+-common-obj-y += 9p-proxy.o
 -
--BUILD_DIR := $(CURDIR)/../..
--
--include $(BUILD_DIR)/config-host.mak
--
--VPATH += $(SRC_PATH)/tests/plugin
--
--NAMES :=
--NAMES += bb
--NAMES += empty
--NAMES += insn
--NAMES += mem
--NAMES += hotblocks
--NAMES += howvec
--NAMES += hotpages
--NAMES += lockstep
--
--SONAMES := $(addsuffix .so,$(addprefix lib,$(NAMES)))
--
--# The main QEMU uses Glib extensively so it's perfectly fine to use it
--# in plugins (which many example do).
--CFLAGS = $(GLIB_CFLAGS)
--CFLAGS += -fPIC
--CFLAGS += $(if $(findstring no-psabi,$(QEMU_CFLAGS)),-Wpsabi)
--CFLAGS += -I$(SRC_PATH)/include/qemu
--
--all: $(SONAMES)
--
--%.o: %.c
--	$(CC) $(CFLAGS) -c -o $@ $<
--
--lib%.so: %.o
--	$(CC) -shared -Wl,-soname,$@ -o $@ $^ $(LDLIBS)
--
--clean:
--	rm -f *.o *.so *.d
--	rm -Rf .libs
--
--.PHONY: all clean
-diff --git a/tests/plugin/meson.build b/tests/plugin/meson.build
+-common-obj-$(CONFIG_XEN) += xen-9p-backend.o
+-obj-$(CONFIG_VIRTIO_9P) += virtio-9p-device.o
+diff --git a/hw/9pfs/meson.build b/hw/9pfs/meson.build
 new file mode 100644
-index 0000000000..dbbdcbaa67
+index 0000000000..cc09426212
 --- /dev/null
-+++ b/tests/plugin/meson.build
-@@ -0,0 +1,7 @@
-+t = []
-+foreach i : ['bb', 'empty', 'insn', 'mem', 'hotblocks', 'howvec', 'hotpages', 'lockstep']
-+  t += shared_module(i, files(i + '.c'),
-+                     include_directories: '../../include/qemu',
-+                     dependencies: glib)
-+endforeach
-+alias_target('plugins', t)
++++ b/hw/9pfs/meson.build
+@@ -0,0 +1,20 @@
++fs_ss = ss.source_set()
++fs_ss.add(files(
++  '9p-local.c',
++  '9p-posix-acl.c',
++  '9p-proxy.c',
++  '9p-synth.c',
++  '9p-util.c',
++  '9p-xattr-user.c',
++  '9p-xattr.c',
++  '9p.c',
++  'codir.c',
++  'cofile.c',
++  'cofs.c',
++  'coth.c',
++  'coxattr.c',
++))
++fs_ss.add(when: 'CONFIG_XEN', if_true: files('xen-9p-backend.c'))
++softmmu_ss.add_all(when: 'CONFIG_9PFS', if_true: fs_ss)
++
++specific_ss.add(when: 'CONFIG_VIRTIO_9P', if_true: files('virtio-9p-device.c'))
+diff --git a/hw/Makefile.objs b/hw/Makefile.objs
+deleted file mode 100644
+index ebae00af6e..0000000000
+--- a/hw/Makefile.objs
++++ /dev/null
+@@ -1,8 +0,0 @@
+-ifeq ($(CONFIG_SOFTMMU), y)
+-devices-dirs-$(call lor,$(CONFIG_VIRTIO_9P),$(call land,$(CONFIG_VIRTFS),$(CONFIG_XEN))) += 9pfs/
+-endif
+-
+-common-obj-y += $(devices-dirs-y)
+-common-obj-m += display/
+-common-obj-m += usb/
+-obj-y += $(devices-dirs-y)
+diff --git a/hw/meson.build b/hw/meson.build
+index 55ca2b2b61..ba8763cad8 100644
+--- a/hw/meson.build
++++ b/hw/meson.build
+@@ -1,3 +1,4 @@
++subdir('9pfs')
+ subdir('acpi')
+ subdir('adc')
+ subdir('audio')
 -- 
 2.26.2
 
