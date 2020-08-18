@@ -2,73 +2,79 @@ Return-Path: <SRS0=kYy5=B4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7BEEC433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 18:35:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D6DEC433E1
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 18:46:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 938732075E
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 18:35:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="QDCrLb1T"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 938732075E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
+	by mail.kernel.org (Postfix) with ESMTPS id DA57E206B5
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 18:46:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA57E206B5
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49464 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56068 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k86Sf-00059Z-RT
-	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 14:35:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47728)
+	id 1k86dE-00007I-2Q
+	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 14:46:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49478)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
- id 1k86Ry-0004fv-Be
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 14:35:12 -0400
-Received: from lizzy.crudebyte.com ([91.194.90.13]:38095)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
- id 1k86Rv-0007SP-Hm
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 14:35:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=crudebyte.com; s=lizzy; h=Content-Type:Content-Transfer-Encoding:
- MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
- Content-ID:Content-Description;
- bh=jHswqOFl1IQcLDf8WMR19s5FKomkcxXrdfdxRjBNoyc=; b=QDCrLb1Ty4oPvu8yaD49ErZU74
- +hfYe7XiuQegt+yyrOHYnaGwJOf2uFjpXB7KLgwM8BYg8tuWIc5d3BYTNqZYUwBKGDeqKmMlGJiP7
- wa9LEkb7sg9fFf85lBK5DBk/3N41XUapHIDPWKEcOz5L2stkT7QxpHcBG2VV2hv+5T71YE/+O9RmC
- kccJO/bNPwk2/96WBBKKozRB2PWxgti4fjMJAj0laM4e4r7Bqg+nTYpemLEmFMTv8DYdFmdWhs4wL
- ZzpE+kfnJbpVxEEfZNPbB5onnsmT8FiyTRK8AqEy0DTjT0johprUbr4JPt9MwQWHWdlFrMRK6ixPq
- s/6rGoGw==;
-From: Christian Schoenebeck <qemu_oss@crudebyte.com>
-To: qemu-devel@nongnu.org
-Cc: David Vossel <dvossel@redhat.com>, Michal Privoznik <mprivozn@redhat.com>,
- Fabian Deutsch <fdeutsch@redhat.com>
-Subject: Re: guest agent public ssh key add/remove support?
-Date: Tue, 18 Aug 2020 20:35:02 +0200
-Message-ID: <2310267.m5nKHIMqSz@silver>
-In-Reply-To: <CAPjOJFsjqFg6jO==Y5ExhL2+mZXA0Z1vce2pmUCODLtyS6Z7Yw@mail.gmail.com>
-References: <CAPjOJFsjqFg6jO==Y5ExhL2+mZXA0Z1vce2pmUCODLtyS6Z7Yw@mail.gmail.com>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k86c9-0007LO-Eo
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 14:45:41 -0400
+Received: from indium.canonical.com ([91.189.90.7]:36980)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k86c7-0000MZ-HS
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 14:45:41 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1k86c6-0002rB-Dg
+ for <qemu-devel@nongnu.org>; Tue, 18 Aug 2020 18:45:38 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 60D982E80DC
+ for <qemu-devel@nongnu.org>; Tue, 18 Aug 2020 18:45:38 +0000 (UTC)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
-Received-SPF: pass client-ip=91.194.90.13; envelope-from=qemu_oss@crudebyte.com;
- helo=lizzy.crudebyte.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 14:11:17
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 18 Aug 2020 18:37:13 -0000
+From: Ahmed Karaman <1892081@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: ahmedkrmn
+X-Launchpad-Bug-Reporter: Ahmed Karaman (ahmedkrmn)
+X-Launchpad-Bug-Modifier: Ahmed Karaman (ahmedkrmn)
+References: <159777580973.2034.8843080316751302000.malonedeb@chaenomeles.canonical.com>
+Message-Id: <159777583339.15880.666813501795760984.malone@soybean.canonical.com>
+Subject: [Bug 1892081] Re: Performance improvement when using "QEMU_FLATTEN"
+ with softfloat type conversions
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="99c2d833c8d727fd05148486920aca032e908071"; Instance="production"
+X-Launchpad-Hash: abc096b965f10341936b37f31eaa196ed1d3e956
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 14:45:37
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -77,31 +83,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: Bug 1892081 <1892081@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Dienstag, 18. August 2020 15:25:56 CEST David Vossel wrote:
-> - Guest Agent SSH add/remove Support?
-> 
-> As a PoC, I cobbled together some guest agent exec and file write client
-> commands which can technically achieve the desired result of
-> adding/removing entries in a /home/<user>/.ssh/authorized_keys file. It's a
-> little unwieldy, but it works.
-> 
-> This got me thinking, an officially supported guest agent api for this ssh
-> key management would be really nice. There's already a somewhat related
-> precedent with the "guest-set-user-password" guest agent command.
-> 
-> So here's the question. What would you all think about the guest agent API
-> being expanded with new commands for adding/removing ssh public keys from
-> authorized_keys files?
+** Attachment added: "before.png"
+   https://bugs.launchpad.net/qemu/+bug/1892081/+attachment/5402578/+files/=
+before.png
 
-There are two pass-through file systems in QEMU: 9pfs and virtiofs. Don't you 
-think they would be sufficient for the use case?
+-- =
 
-Best regards,
-Christian Schoenebeck
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1892081
 
+Title:
+  Performance improvement when using "QEMU_FLATTEN" with softfloat type
+  conversions
 
+Status in QEMU:
+  New
+
+Bug description:
+  Attached below is a matrix multiplication program for double data
+  types. The program performs the casting operation "(double)rand()"
+  when generating random numbers.
+
+  This operation calls the integer to float softfloat conversion
+  function "int32_to_float_64".
+
+  Adding the "QEMU_FLATTEN" attribute to the function definition
+  decreases the instructions per call of the function by about 63%.
+
+  Attached are before and after performance screenshots from
+  KCachegrind.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1892081/+subscriptions
 
