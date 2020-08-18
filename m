@@ -2,94 +2,73 @@ Return-Path: <SRS0=kYy5=B4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B298EC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 12:56:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D599BC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 12:57:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6AFDA20706
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 12:56:06 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CENlk2ts"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6AFDA20706
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9FB5F20706
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 12:57:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9FB5F20706
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52416 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55064 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k819p-00024F-EQ
-	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 08:56:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40220)
+	id 1k81Ak-0003Bx-Ty
+	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 08:57:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40438)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1k818o-0001F8-HC
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 08:55:02 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:57303
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1k81AE-0002gF-Ui
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 08:56:30 -0400
+Resent-Date: Tue, 18 Aug 2020 08:56:30 -0400
+Resent-Message-Id: <E1k81AE-0002gF-Ui@lists.gnu.org>
+Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21396)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1k818m-00064S-Kf
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 08:55:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597755299;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=hysYxjFPrgvbcb+fe7+xeegNUFsaGkXkr4U+kSxgveo=;
- b=CENlk2tsKaqHVCxVdOBgpGCt4bFhu+PxHgp6SdxCrpl1QmmgLBn7DtAVPDZGihBEtzS+zp
- KDvXXrkRHLy/uKuXwGWG3D/LFaiFBska89Mq2co9gqndVrSVJs7rC6P5OAb8Uq+xrenZFy
- tEB4ZoozvILckmJW0AEUQVBsqIEuWb8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-244-xmqFy55PM3ms9EwdFfszlQ-1; Tue, 18 Aug 2020 08:54:55 -0400
-X-MC-Unique: xmqFy55PM3ms9EwdFfszlQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5555118686C9;
- Tue, 18 Aug 2020 12:54:54 +0000 (UTC)
-Received: from localhost (ovpn-114-160.ams2.redhat.com [10.36.114.160])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C98B85D757;
- Tue, 18 Aug 2020 12:54:47 +0000 (UTC)
-Date: Tue, 18 Aug 2020 13:54:46 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Auger Eric <eric.auger@redhat.com>
-Subject: Re: [PATCH 07/11] vfio/platform: Remove dead assignment in
- vfio_intp_interrupt()
-Message-ID: <20200818125446.GC36102@stefanha-x1.localdomain>
-References: <20200813073712.4001404-1-kuhn.chenqun@huawei.com>
- <20200813073712.4001404-8-kuhn.chenqun@huawei.com>
- <20200813105911.2312adb5@x1.home>
- <681519bf-92ca-6247-490a-e9193b0bd385@redhat.com>
- <20200813131530.09ad0a4c@x1.home>
- <8e096d15-1700-f399-045d-1ba73eb6c1c1@redhat.com>
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1k81AB-0006LB-Gk
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 08:56:30 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1597755376; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=TVR9g0oN3rnHPChZ9ktbbWsVmT2515uN3smXEwSl+/o4n5btN3BbtwbHqwRTD70v8halL8xFyujScawydU7NOHjbueRo7o3+6LgVO2K3JpXYFFx63v/Rt73DGPecqcFrNT4skQBDrl4BLReTd6U8aegt3EfmXTIM4/iTho7y4RM=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1597755376;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=FAdamSNR/dieGtsjnB8XTDTGpvDZrpXtT+9ERdgp8DU=; 
+ b=KMvIJHHs1N+E2hjL78ORYe0ZQ+86mXvUz5w1tyXGdUR2RPWRudWOkiQj+Rx3e23r6WVoIFauXvN+1DKMkjjPx+JfOQUMXIcZ+j9i3wrZvdEldhHDsKvcgIB9n14ZtbyKiSbU8o8HxLXwNzu6bEnDinRwdWqM0oQNO7Nf+KQw3PQ=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1597755372494383.6387224569395;
+ Tue, 18 Aug 2020 05:56:12 -0700 (PDT)
+Subject: Re: [PATCH v2 0/7] x86: fix cpu hotplug with secure boot
+Message-ID: <159775537107.17412.11110752129834412055@66eaa9a8a123>
+In-Reply-To: <20200818122208.1243901-1-imammedo@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <8e096d15-1700-f399-045d-1ba73eb6c1c1@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="7qSK/uQB79J36Y4o"
-Content-Disposition: inline
-Received-SPF: none client-ip=205.139.110.61; envelope-from=stefanha@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 02:16:14
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: imammedo@redhat.com
+Date: Tue, 18 Aug 2020 05:56:12 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o53.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 08:56:24
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,131 +81,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: zhang.zhanghailiang@huawei.com, qemu-trivial@nongnu.org,
- pannengyuan@huawei.com, qemu-devel@nongnu.org,
- Alex Williamson <alex.williamson@redhat.com>,
- Euler Robot <euler.robot@huawei.com>, Chen Qun <kuhn.chenqun@huawei.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: boris.ostrovsky@oracle.com, lersek@redhat.com, qemu-devel@nongnu.org,
+ aaron.young@oracle.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---7qSK/uQB79J36Y4o
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Thu, Aug 13, 2020 at 09:18:59PM +0200, Auger Eric wrote:
-> Hi Alex,
->=20
-> On 8/13/20 9:15 PM, Alex Williamson wrote:
-> > On Thu, 13 Aug 2020 20:02:45 +0200
-> > Auger Eric <eric.auger@redhat.com> wrote:
-> >=20
-> >> Hi Alex,
-> >>
-> >> On 8/13/20 6:59 PM, Alex Williamson wrote:
-> >>> On Thu, 13 Aug 2020 15:37:08 +0800
-> >>> Chen Qun <kuhn.chenqun@huawei.com> wrote:
-> >>>  =20
-> >>>> Clang static code analyzer show warning:
-> >>>> hw/vfio/platform.c:239:9: warning: Value stored to 'ret' is never re=
-ad
-> >>>>         ret =3D event_notifier_test_and_clear(intp->interrupt);
-> >>>>         ^     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> >>>>
-> >>>> Reported-by: Euler Robot <euler.robot@huawei.com>
-> >>>> Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
-> >>>> ---
-> >>>> Cc: Alex Williamson <alex.williamson@redhat.com>
-> >>>> Cc: Eric Auger <eric.auger@redhat.com>
-> >>>> ---
-> >>>>  hw/vfio/platform.c | 2 +-
-> >>>>  1 file changed, 1 insertion(+), 1 deletion(-)
-> >>>>
-> >>>> diff --git a/hw/vfio/platform.c b/hw/vfio/platform.c
-> >>>> index ac2cefc9b1..869ed2c39d 100644
-> >>>> --- a/hw/vfio/platform.c
-> >>>> +++ b/hw/vfio/platform.c
-> >>>> @@ -236,7 +236,7 @@ static void vfio_intp_interrupt(VFIOINTp *intp)
-> >>>>          trace_vfio_intp_interrupt_set_pending(intp->pin);
-> >>>>          QSIMPLEQ_INSERT_TAIL(&vdev->pending_intp_queue,
-> >>>>                               intp, pqnext);
-> >>>> -        ret =3D event_notifier_test_and_clear(intp->interrupt);
-> >>>> +        event_notifier_test_and_clear(intp->interrupt);
-> >>>>          return;
-> >>>>      } =20
-> >>>
-> >>> Testing that an event is pending in our notifier is generally a
-> >>> prerequisite to doing anything in the interrupt handler, I don't
-> >>> understand why we're just consuming it and ignoring the return value.
-> >>> The above is in the delayed handling branch of the function, but the
-> >>> normal non-delayed path would only go on to error_report() if the
-> >>> notifier is not pending and then inject an interrupt anyway.  This al=
-l
-> >>> seems rather suspicious and it's a unique pattern among the vfio
-> >>> callers of this function.  Is there a more fundamental bug that this
-> >>> function should perform this test once and return without doing
-> >>> anything if it's called spuriously, ie. without a notifier pending?
-> >>> Thanks, =20
-> >>
-> >> Hum that's correct that other VFIO call sites do the check. My
-> >> understanding was that this could not fail in this case as, if we
-> >> entered the handler there was something to be cleared. In which
-> >> situation can this fail?
-> >=20
-> > I'm not sure what the right answer is, I see examples either way
-> > looking outside of vfio code.  On one hand, maybe we never get called
-> > spuriously, on the other if it's the callee's responsibility to drain
-> > events from the fd and we have it readily accessible whether there were
-> > any events pending, why would we inject an interrupt if the result that
-> > we have in hand shows no pending events?  The overhead of returning
-> > based on that result is minuscule.
->=20
-> I agree
-> >=20
-> > qemu_set_fd_handler() is a wrapper for aio_set_fd_handler().  Stefan is
-> > a possible defacto maintainer of some of the aio code.  Stefan, do you
-> > have thoughts on whether callbacks from event notifier fds should
-> > consider spurious events?  Thanks,
->=20
-> Indeed I saw that for instance block/nvme.c nvme_handle_event is not
-> checking the result.
->=20
-> Let's wait for Stefan's answer ...
-
-vfio_intp_interrupt() will always read a non-zero eventfd value, based
-on these assumptions:
-
-intp->interrupt is "readable" since vfio_intp_interrupt() is called by
-the AioContext (event loop). "readable" does not guarantee that data can
-actually be read because it also includes error events:
-
-  new_node->pfd.events =3D (io_read ? G_IO_IN | G_IO_HUP | G_IO_ERR : 0);
-
-However, I think we can exclude the error case for the VFIO interrupt
-eventfds because there are no error cases for eventfds (unlike socket
-disconnection, for example).
-
-The other important assumption is that only one thread on the host is
-monitoring the eventfd for activity.
-
-Stefan
-
---7qSK/uQB79J36Y4o
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl87z5YACgkQnKSrs4Gr
-c8jU3wgAnBv6cYtdSQgtUw0hOiA0ZRFpVp10FUPwkZTlQY5tNTq33eOkCjmySOV9
-iVmoDYDWzi+VHXeWhYGKL2nU8YuVkcd++URup4Op4cn30iMnR0x07Xyp/dAPmq5D
-tDHS+nRMf9OoszqSy/vbR+0dN9Go/DD5wXvLsXjArRFB9W4HOTDn9VtNyI0nyMbL
-MU3fQJdsffSl5pCkOfDe7Ozm1BbZSy56B1qRVaU6qtfkP1rM71Tn6AR2aTzqN5+k
-XistUBmyxPCSxxi+K0UVWbEvFYZBUX5y5tOQwkGPdLTZZjPD3wgz3+1Xrvcz2a0I
-Gl5SyKNj2tAzkMZQEUJtxUNDeutaNw==
-=778W
------END PGP SIGNATURE-----
-
---7qSK/uQB79J36Y4o--
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDgxODEyMjIwOC4xMjQz
+OTAxLTEtaW1hbW1lZG9AcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQgdGhl
+IGRvY2tlci1xdWlja0BjZW50b3M3IGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5n
+IGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0
+YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBT
+Q1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCm1ha2UgZG9ja2VyLWltYWdlLWNlbnRvczcgVj0x
+IE5FVFdPUks9MQp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtcXVpY2tAY2VudG9zNyBTSE9XX0VOVj0x
+IEo9MTQgTkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgogIFRFU1QgICAgY2hlY2st
+dW5pdDogdGVzdHMvdGVzdC1jaGFyClVuZXhwZWN0ZWQgZXJyb3IgaW4gb2JqZWN0X3Byb3BlcnR5
+X3RyeV9hZGQoKSBhdCAvdG1wL3FlbXUtdGVzdC9zcmMvcW9tL29iamVjdC5jOjExODE6CmF0dGVt
+cHQgdG8gYWRkIGR1cGxpY2F0ZSBwcm9wZXJ0eSAnc2VyaWFsLWlkJyB0byBvYmplY3QgKHR5cGUg
+J2NvbnRhaW5lcicpCkVSUk9SIHRlc3QtY2hhciAtIHRvbyBmZXcgdGVzdHMgcnVuIChleHBlY3Rl
+ZCAzOCwgZ290IDkpCm1ha2U6ICoqKiBbY2hlY2stdW5pdF0gRXJyb3IgMQptYWtlOiAqKiogV2Fp
+dGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4uLgogIFRFU1QgICAgaW90ZXN0LXFjb3cyOiAwMjQK
+ICBURVNUICAgIGlvdGVzdC1xY293MjogMDI1Ci0tLQogICAgcmFpc2UgQ2FsbGVkUHJvY2Vzc0Vy
+cm9yKHJldGNvZGUsIGNtZCkKc3VicHJvY2Vzcy5DYWxsZWRQcm9jZXNzRXJyb3I6IENvbW1hbmQg
+J1snc3VkbycsICctbicsICdkb2NrZXInLCAncnVuJywgJy0tbGFiZWwnLCAnY29tLnFlbXUuaW5z
+dGFuY2UudXVpZD1mMmI1MmU3NzllYTA0NGE2YWY4MzQ3YWU0OWQ0Nzg1ZScsICctdScsICcxMDAx
+JywgJy0tc2VjdXJpdHktb3B0JywgJ3NlY2NvbXA9dW5jb25maW5lZCcsICctLXJtJywgJy1lJywg
+J1RBUkdFVF9MSVNUPScsICctZScsICdFWFRSQV9DT05GSUdVUkVfT1BUUz0nLCAnLWUnLCAnVj0n
+LCAnLWUnLCAnSj0xNCcsICctZScsICdERUJVRz0nLCAnLWUnLCAnU0hPV19FTlY9MScsICctZScs
+ICdDQ0FDSEVfRElSPS92YXIvdG1wL2NjYWNoZScsICctdicsICcvaG9tZS9wYXRjaGV3Ly5jYWNo
+ZS9xZW11LWRvY2tlci1jY2FjaGU6L3Zhci90bXAvY2NhY2hlOnonLCAnLXYnLCAnL3Zhci90bXAv
+cGF0Y2hldy10ZXN0ZXItdG1wLWU2NTF4NGE4L3NyYy9kb2NrZXItc3JjLjIwMjAtMDgtMTgtMDgu
+NDMuMDQuMjMzMjE6L3Zhci90bXAvcWVtdTp6LHJvJywgJ3FlbXUvY2VudG9zNycsICcvdmFyL3Rt
+cC9xZW11L3J1bicsICd0ZXN0LXF1aWNrJ10nIHJldHVybmVkIG5vbi16ZXJvIGV4aXQgc3RhdHVz
+IDIuCmZpbHRlcj0tLWZpbHRlcj1sYWJlbD1jb20ucWVtdS5pbnN0YW5jZS51dWlkPWYyYjUyZTc3
+OWVhMDQ0YTZhZjgzNDdhZTQ5ZDQ3ODVlCm1ha2VbMV06ICoqKiBbZG9ja2VyLXJ1bl0gRXJyb3Ig
+MQptYWtlWzFdOiBMZWF2aW5nIGRpcmVjdG9yeSBgL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1w
+LWU2NTF4NGE4L3NyYycKbWFrZTogKioqIFtkb2NrZXItcnVuLXRlc3QtcXVpY2tAY2VudG9zN10g
+RXJyb3IgMgoKcmVhbCAgICAxM203LjE0MHMKdXNlciAgICAwbTkuMzI4cwoKClRoZSBmdWxsIGxv
+ZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAyMDA4MTgxMjIyMDgu
+MTI0MzkwMS0xLWltYW1tZWRvQHJlZGhhdC5jb20vdGVzdGluZy5kb2NrZXItcXVpY2tAY2VudG9z
+Ny8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0
+Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRv
+IHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
 
