@@ -7,47 +7,47 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9095CC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 04:36:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A6A7C433E1
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 04:36:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5C239206DA
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 04:36:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4406A206DA
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 04:36:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="MtSPeq0R"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C239206DA
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="ChM439LE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4406A206DA
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38876 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43712 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7tLu-00030O-It
-	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 00:36:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50286)
+	id 1k7tMb-0004wS-GS
+	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 00:36:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50348)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1k7t6g-00009K-CJ; Tue, 18 Aug 2020 00:20:19 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:51551 helo=ozlabs.org)
+ id 1k7t7K-0000Z0-CL; Tue, 18 Aug 2020 00:20:58 -0400
+Received: from ozlabs.org ([203.11.71.1]:45861)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1k7t6e-0006PG-Dw; Tue, 18 Aug 2020 00:20:18 -0400
+ id 1k7t6u-0006Qj-U0; Tue, 18 Aug 2020 00:20:58 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 4BVyNg3NFKz9sVt; Tue, 18 Aug 2020 14:19:31 +1000 (AEST)
+ id 4BVyNg5LF8z9sVy; Tue, 18 Aug 2020 14:19:31 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1597724371;
- bh=84GQnKrJ/KKX2ARDOv43YFIXRVyBvCRDdcNlh8ieclo=;
+ bh=R4hwxEmQn586lRXLI0JdQqAdlRHDs2bpPhNkBigRBAU=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=MtSPeq0RX/VviDGUIHidGFb8LQk/k5EoWN0MqrvCD0OrBUb3f8+L75QsHllEsGOCK
- 2FjvefUw+msCth5N4866CWMo6uy+tI+5C64PQYpY1NBJZXuSqc+r18+u4DMAUJjRuG
- AHdfnGogSFCzI7wgv7UiqPW1XDn/CHBRRv/lHPws=
+ b=ChM439LEqqM20BS47aIOpspIH5J2lW5V9tJlsJqiyM5HZ5+P+vioCXST7Q7LoNyqk
+ U7WBwlftcZNRiREZA5ddCShrhYv6jIZPU1s5UhGkxxHvwZDP0JBqSJcUq4gYLbpyXd
+ QErVuEEB8dtlRYLpbGxH1+0zhV6EA2RMPTlE+kJM=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org,
 	groug@kaod.org
-Subject: [PULL 29/40] spapr/xive: Rework error handling of
- kvmppc_xive_cpu_[gs]et_state()
-Date: Tue, 18 Aug 2020 14:19:11 +1000
-Message-Id: <20200818041922.251708-30-david@gibson.dropbear.id.au>
+Subject: [PULL 30/40] spapr/xive: Rework error handling of
+ kvmppc_xive_[gs]et_queue_config()
+Date: Tue, 18 Aug 2020 14:19:12 +1000
+Message-Id: <20200818041922.251708-31-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200818041922.251708-1-david@gibson.dropbear.id.au>
 References: <20200818041922.251708-1-david@gibson.dropbear.id.au>
@@ -84,83 +84,118 @@ Sender: "Qemu-devel"
 
 From: Greg Kurz <groug@kaod.org>
 
-kvm_set_one_reg() returns a negative errno on failure, use that instead
-of errno. Also propagate it to callers so they can use it to check
-for failures and hopefully get rid of their local_err boilerplate.
+Since kvm_device_access() returns a negative errno on failure, convert
+kvmppc_xive_get_queue_config() and kvmppc_xive_set_queue_config() to
+use it for error checking. This allows to get rid of the local_err
+boilerplate.
+
+Propagate the return value so that callers may use it as well to check
+failures.
 
 Signed-off-by: Greg Kurz <groug@kaod.org>
-Message-Id: <159707846665.1489912.14267225652103441921.stgit@bahia.lan>
+Message-Id: <159707847357.1489912.2032291280645236480.stgit@bahia.lan>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/intc/spapr_xive_kvm.c | 15 ++++++++++-----
- include/hw/ppc/xive.h    |  4 ++--
- 2 files changed, 12 insertions(+), 7 deletions(-)
+ hw/intc/spapr_xive_kvm.c    | 35 ++++++++++++++++-------------------
+ include/hw/ppc/spapr_xive.h |  4 ++--
+ 2 files changed, 18 insertions(+), 21 deletions(-)
 
 diff --git a/hw/intc/spapr_xive_kvm.c b/hw/intc/spapr_xive_kvm.c
-index b2a36fd59d..5e088ccbf8 100644
+index 5e088ccbf8..696623f717 100644
 --- a/hw/intc/spapr_xive_kvm.c
 +++ b/hw/intc/spapr_xive_kvm.c
-@@ -73,7 +73,7 @@ static void kvm_cpu_disable_all(void)
-  * XIVE Thread Interrupt Management context (KVM)
+@@ -374,15 +374,15 @@ void kvmppc_xive_source_set_irq(void *opaque, int srcno, int val)
+ /*
+  * sPAPR XIVE interrupt controller (KVM)
   */
- 
--void kvmppc_xive_cpu_set_state(XiveTCTX *tctx, Error **errp)
-+int kvmppc_xive_cpu_set_state(XiveTCTX *tctx, Error **errp)
+-void kvmppc_xive_get_queue_config(SpaprXive *xive, uint8_t end_blk,
+-                                  uint32_t end_idx, XiveEND *end,
+-                                  Error **errp)
++int kvmppc_xive_get_queue_config(SpaprXive *xive, uint8_t end_blk,
++                                 uint32_t end_idx, XiveEND *end,
++                                 Error **errp)
  {
-     SpaprXive *xive = SPAPR_XIVE(tctx->xptr);
-     uint64_t state[2];
-@@ -86,13 +86,16 @@ void kvmppc_xive_cpu_set_state(XiveTCTX *tctx, Error **errp)
+     struct kvm_ppc_xive_eq kvm_eq = { 0 };
+     uint64_t kvm_eq_idx;
+     uint8_t priority;
+     uint32_t server;
+-    Error *local_err = NULL;
++    int ret;
  
-     ret = kvm_set_one_reg(tctx->cs, KVM_REG_PPC_VP_STATE, state);
-     if (ret != 0) {
--        error_setg_errno(errp, errno,
-+        error_setg_errno(errp, -ret,
-                          "XIVE: could not restore KVM state of CPU %ld",
-                          kvm_arch_vcpu_id(tctx->cs));
-+        return ret;
-     }
-+
-+    return 0;
- }
+     assert(xive_end_is_valid(end));
  
--void kvmppc_xive_cpu_get_state(XiveTCTX *tctx, Error **errp)
-+int kvmppc_xive_cpu_get_state(XiveTCTX *tctx, Error **errp)
- {
-     SpaprXive *xive = SPAPR_XIVE(tctx->xptr);
-     uint64_t state[2] = { 0 };
-@@ -102,14 +105,16 @@ void kvmppc_xive_cpu_get_state(XiveTCTX *tctx, Error **errp)
+@@ -394,11 +394,10 @@ void kvmppc_xive_get_queue_config(SpaprXive *xive, uint8_t end_blk,
+     kvm_eq_idx |= server << KVM_XIVE_EQ_SERVER_SHIFT &
+         KVM_XIVE_EQ_SERVER_MASK;
  
-     ret = kvm_get_one_reg(tctx->cs, KVM_REG_PPC_VP_STATE, state);
-     if (ret != 0) {
--        error_setg_errno(errp, errno,
-+        error_setg_errno(errp, -ret,
-                          "XIVE: could not capture KVM state of CPU %ld",
-                          kvm_arch_vcpu_id(tctx->cs));
+-    kvm_device_access(xive->fd, KVM_DEV_XIVE_GRP_EQ_CONFIG, kvm_eq_idx,
+-                      &kvm_eq, false, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
 -        return;
++    ret = kvm_device_access(xive->fd, KVM_DEV_XIVE_GRP_EQ_CONFIG, kvm_eq_idx,
++                            &kvm_eq, false, errp);
++    if (ret < 0) {
 +        return ret;
      }
  
-     /* word0 and word1 of the OS ring. */
-     *((uint64_t *) &tctx->regs[TM_QW1_OS]) = state[0];
+     /*
+@@ -408,17 +407,18 @@ void kvmppc_xive_get_queue_config(SpaprXive *xive, uint8_t end_blk,
+      */
+     end->w1 = xive_set_field32(END_W1_GENERATION, 0ul, kvm_eq.qtoggle) |
+         xive_set_field32(END_W1_PAGE_OFF, 0ul, kvm_eq.qindex);
 +
 +    return 0;
  }
  
- typedef struct {
-diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
-index 2d87ed4372..785c905357 100644
---- a/include/hw/ppc/xive.h
-+++ b/include/hw/ppc/xive.h
-@@ -489,7 +489,7 @@ int kvmppc_xive_source_reset_one(XiveSource *xsrc, int srcno, Error **errp);
- void kvmppc_xive_source_set_irq(void *opaque, int srcno, int val);
- int kvmppc_xive_cpu_connect(XiveTCTX *tctx, Error **errp);
- void kvmppc_xive_cpu_synchronize_state(XiveTCTX *tctx, Error **errp);
--void kvmppc_xive_cpu_get_state(XiveTCTX *tctx, Error **errp);
--void kvmppc_xive_cpu_set_state(XiveTCTX *tctx, Error **errp);
-+int kvmppc_xive_cpu_get_state(XiveTCTX *tctx, Error **errp);
-+int kvmppc_xive_cpu_set_state(XiveTCTX *tctx, Error **errp);
+-void kvmppc_xive_set_queue_config(SpaprXive *xive, uint8_t end_blk,
+-                                  uint32_t end_idx, XiveEND *end,
+-                                  Error **errp)
++int kvmppc_xive_set_queue_config(SpaprXive *xive, uint8_t end_blk,
++                                 uint32_t end_idx, XiveEND *end,
++                                 Error **errp)
+ {
+     struct kvm_ppc_xive_eq kvm_eq = { 0 };
+     uint64_t kvm_eq_idx;
+     uint8_t priority;
+     uint32_t server;
+-    Error *local_err = NULL;
  
- #endif /* PPC_XIVE_H */
+     /*
+      * Build the KVM state from the local END structure.
+@@ -456,12 +456,9 @@ void kvmppc_xive_set_queue_config(SpaprXive *xive, uint8_t end_blk,
+     kvm_eq_idx |= server << KVM_XIVE_EQ_SERVER_SHIFT &
+         KVM_XIVE_EQ_SERVER_MASK;
+ 
+-    kvm_device_access(xive->fd, KVM_DEV_XIVE_GRP_EQ_CONFIG, kvm_eq_idx,
+-                      &kvm_eq, true, &local_err);
+-    if (local_err) {
+-        error_propagate(errp, local_err);
+-        return;
+-    }
++    return
++        kvm_device_access(xive->fd, KVM_DEV_XIVE_GRP_EQ_CONFIG, kvm_eq_idx,
++                          &kvm_eq, true, errp);
+ }
+ 
+ void kvmppc_xive_reset(SpaprXive *xive, Error **errp)
+diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
+index 93d09d68de..d0a08b618f 100644
+--- a/include/hw/ppc/spapr_xive.h
++++ b/include/hw/ppc/spapr_xive.h
+@@ -85,10 +85,10 @@ void kvmppc_xive_set_source_config(SpaprXive *xive, uint32_t lisn, XiveEAS *eas,
+ void kvmppc_xive_sync_source(SpaprXive *xive, uint32_t lisn, Error **errp);
+ uint64_t kvmppc_xive_esb_rw(XiveSource *xsrc, int srcno, uint32_t offset,
+                             uint64_t data, bool write);
+-void kvmppc_xive_set_queue_config(SpaprXive *xive, uint8_t end_blk,
++int kvmppc_xive_set_queue_config(SpaprXive *xive, uint8_t end_blk,
+                                  uint32_t end_idx, XiveEND *end,
+                                  Error **errp);
+-void kvmppc_xive_get_queue_config(SpaprXive *xive, uint8_t end_blk,
++int kvmppc_xive_get_queue_config(SpaprXive *xive, uint8_t end_blk,
+                                  uint32_t end_idx, XiveEND *end,
+                                  Error **errp);
+ void kvmppc_xive_synchronize_state(SpaprXive *xive, Error **errp);
 -- 
 2.26.2
 
