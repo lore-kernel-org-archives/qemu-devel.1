@@ -2,100 +2,92 @@ Return-Path: <SRS0=kYy5=B4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 824DAC433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 13:43:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B11E5C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 13:56:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 471E92087D
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 13:43:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8014F206B5
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 13:56:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RNq0Dl48"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 471E92087D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=brainfault-org.20150623.gappssmtp.com header.i=@brainfault-org.20150623.gappssmtp.com header.b="odhoYXQY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8014F206B5
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36870 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44352 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k81tY-0008F0-Jj
-	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 09:43:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53242)
+	id 1k8267-0003zq-Q5
+	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 09:56:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56202)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1k81t0-0007h7-63
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 09:42:46 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57824
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1k81sy-0003ne-G6
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 09:42:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597758163;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=vzm1P267oX2OIl4KdxZaWEn9KMb88kWlhbExy+mYOz8=;
- b=RNq0Dl48/O4CLgd9cXHJm+wypsWNE6jPcdcbWj4y3pGXRKHkoFFLZiQOKlz5XVa9i/Eabf
- HIehsLK16LEUdyIDgW/dp7AbrK2THGHNhlV3gpWERfT9p5yaXxNMhl0rpybH9tyQr/wT5p
- am1g+rWjKLKxmuyQ4U9Uj58SX1+cs5o=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-484-RJTf6a7HMla8DuRxjcrtvQ-1; Tue, 18 Aug 2020 09:42:39 -0400
-X-MC-Unique: RJTf6a7HMla8DuRxjcrtvQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 793461009443;
- Tue, 18 Aug 2020 13:42:38 +0000 (UTC)
-Received: from [10.36.113.93] (ovpn-113-93.ams2.redhat.com [10.36.113.93])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A782726192;
- Tue, 18 Aug 2020 13:42:30 +0000 (UTC)
-Subject: Re: [PATCH 07/11] vfio/platform: Remove dead assignment in
- vfio_intp_interrupt()
-To: Stefan Hajnoczi <stefanha@redhat.com>
-References: <20200813073712.4001404-1-kuhn.chenqun@huawei.com>
- <20200813073712.4001404-8-kuhn.chenqun@huawei.com>
- <20200813105911.2312adb5@x1.home>
- <681519bf-92ca-6247-490a-e9193b0bd385@redhat.com>
- <20200813131530.09ad0a4c@x1.home>
- <8e096d15-1700-f399-045d-1ba73eb6c1c1@redhat.com>
- <20200818125446.GC36102@stefanha-x1.localdomain>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <20ee54db-e36c-fc45-aa5c-14bf6433602b@redhat.com>
-Date: Tue, 18 Aug 2020 15:42:29 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.90_1) (envelope-from <anup@brainfault.org>)
+ id 1k825V-0003HY-9u
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 09:55:41 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:50819)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <anup@brainfault.org>)
+ id 1k825R-0005Mo-Sm
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 09:55:41 -0400
+Received: by mail-wm1-x342.google.com with SMTP id c80so16305760wme.0
+ for <qemu-devel@nongnu.org>; Tue, 18 Aug 2020 06:55:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=brainfault-org.20150623.gappssmtp.com; s=20150623;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=0Jx9fgh4HAjmM8oiGC/Kx2mJQVPexJyHPpm+nMaUXSU=;
+ b=odhoYXQYG9Jrem+qNFG9QZPLTXdlifnah+AiUOzB3YTkVqUEsWTMpUPvJBUI0qn0Hd
+ xQU3OsqAUk0EomZlPPAoWGrGsRNarnjljYuHE7mZi2orv+FLvA+4eey6TfyqNXsVbDEI
+ te7jdUAFG4eVIqyOR4hDmFtHqGJPpCFG1H1F3RG/v2TWefImYrBgeTFP3H2lXPdTSaIl
+ 3XZxsTgq8W+dSBIYicxgNxcADBZqMAQQAglN85Uoko/JkNbsHE6GzXfqpkhTPruZqaU6
+ 89/DEKxHBbUfOTQYGgKnbvWTNlAvk2TB0ZqCrXLvPbqdV432t6DzphgKTG+H2ewfwOYe
+ n7KA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=0Jx9fgh4HAjmM8oiGC/Kx2mJQVPexJyHPpm+nMaUXSU=;
+ b=tkJ17BtpFl2FbrN2URg4nQyQQ2Xnsk++e7qedb8gJOO9NegURlvOYgd4iFoYoNhXeW
+ 9VhzorCx4k9AUbNAQ7zuBC1ZceX4iFB0MS4+fZi4OSPr9toQ2jXrLU25njFxRpHHFQIN
+ WPhhTcz2QEH0V0r+Iw+PGzXMbmShqXiLC1T6xcPvc/KqxtqvIURXKLtOGeBFD064tBOO
+ rz1rm8d+WSLlq3RmNmrArR1Fbp5lV9qAcqJJ/l8nh6BlFeYV5bSct8JFsjhC+CzdOx59
+ wEbVEXX00/Pn2XqFYd6NoA/HipBBok9YpUW40nsKIbYi2FU8y1JpB0S+eyZNH4XQ4T+2
+ HHiw==
+X-Gm-Message-State: AOAM533iSIxPS0tSzcWQHZKwhYF8OxULg86pghUBlVIEAhRuCjig3W7p
+ LkvyrzFjxPWjT/eOJmIEkZ7ccgE7Wj1FEG9LqTsKtw==
+X-Google-Smtp-Source: ABdhPJzaFOAveoYbEKpl25MD/FsYU/ZG0vEt4bTjc47r5ym/l3ic0jG4uLsysuKfzMF0yUsVAPG5UbWMLXfGkl+EmZ4=
+X-Received: by 2002:a7b:c4d5:: with SMTP id g21mr25496wmk.185.1597758935937;
+ Tue, 18 Aug 2020 06:55:35 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200818125446.GC36102@stefanha-x1.localdomain>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eric.auger@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.120;
- envelope-from=eric.auger@redhat.com; helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 03:19:25
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+References: <1597423256-14847-1-git-send-email-bmeng.cn@gmail.com>
+ <CAAhSdy2D=TcENAJDja4r6pnhz0LRi-T+A9k3Btrs_EuB4x0e4w@mail.gmail.com>
+ <CAEUhbmV5=B5xKhYqMj1MQb61nt5cNUJG1MXT++C1w1YMYTfLCQ@mail.gmail.com>
+ <202949f7-c9d5-4d4d-3ebe-53727f4fa169@microchip.com>
+ <CAKmqyKM3nm0rhxgDvWKWfO+4b23ZLSkHW2TzmcVZ_ZFy4L7MRg@mail.gmail.com>
+ <d3f61c2c-a489-887e-0143-4d9a1e66e6f2@microchip.com>
+ <CAAhSdy32owLO0KytyYsg-zH6JyyfNfGofa4vanqTFJLntPq0=g@mail.gmail.com>
+ <1f17cc4c-83f8-a024-ebef-79e28fab9a32@microchip.com>
+In-Reply-To: <1f17cc4c-83f8-a024-ebef-79e28fab9a32@microchip.com>
+From: Anup Patel <anup@brainfault.org>
+Date: Tue, 18 Aug 2020 19:25:24 +0530
+Message-ID: <CAAhSdy1MTvjfpHZEAs2YVHXdPBaEMQxUNdP_yc7br0C2p9kfng@mail.gmail.com>
+Subject: Re: [PATCH 00/18] hw/riscv: Add Microchip PolarFire SoC Icicle Kit
+ board support
+To: Cyril.Jean@microchip.com
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: none client-ip=2a00:1450:4864:20::342;
+ envelope-from=anup@brainfault.org; helo=mail-wm1-x342.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -108,117 +100,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: zhang.zhanghailiang@huawei.com, qemu-trivial@nongnu.org,
- pannengyuan@huawei.com, qemu-devel@nongnu.org,
- Alex Williamson <alex.williamson@redhat.com>,
- Euler Robot <euler.robot@huawei.com>, Chen Qun <kuhn.chenqun@huawei.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Alistair Francis <alistair@alistair23.me>,
+ "open list:RISC-V" <qemu-riscv@nongnu.org>, qemu-block@nongnu.org,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>, Bin Meng <bin.meng@windriver.com>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Jason Wang <jasowang@redhat.com>, Palmer Dabbelt <palmerdabbelt@google.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
+ qemu-arm@nongnu.org, Alistair Francis <Alistair.Francis@wdc.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Alistair Francis <alistair23@gmail.com>,
+ Bin Meng <bmeng.cn@gmail.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Stefan,
+On Tue, Aug 18, 2020 at 6:39 PM <Cyril.Jean@microchip.com> wrote:
+>
+> On 8/18/20 7:17 AM, Anup Patel wrote:
+> > EXTERNAL EMAIL: Do not click links or open attachments unless you know the content is safe
+> >
+> > On Tue, Aug 18, 2020 at 1:23 AM <Cyril.Jean@microchip.com> wrote:
+> >> On 8/17/20 8:28 PM, Alistair Francis wrote:
+> >>> EXTERNAL EMAIL: Do not click links or open attachments unless you know the content is safe
+> >>>
+> >>> On Mon, Aug 17, 2020 at 11:12 AM via <qemu-devel@nongnu.org> wrote:
+> >>>> Hi Anup,
+> >>>>
+> >>>> On 8/17/20 11:30 AM, Bin Meng wrote:
+> >>>>> EXTERNAL EMAIL: Do not click links or open attachments unless you know the content is safe
+> >>>>>
+> >>>>> Hi Anup,
+> >>>>>
+> >>>>> On Sat, Aug 15, 2020 at 1:44 AM Anup Patel <anup@brainfault.org> wrote:
+> >>>>>> On Fri, Aug 14, 2020 at 10:12 PM Bin Meng <bmeng.cn@gmail.com> wrote:
+> >>>>>>> From: Bin Meng <bin.meng@windriver.com>
+> >>>>>>>
+> >>>>>>> This adds support for Microchip PolarFire SoC Icicle Kit board.
+> >>>>>>> The Icicle Kit board integrates a PolarFire SoC, with one SiFive's
+> >>>>>>> E51 plus four U54 cores and many on-chip peripherals and an FPGA.
+> >>>>>> Nice Work !!! This is very helpful.
+> >>>>> Thanks!
+> >>>>>
+> >>>>>> The Microchip HSS is quite convoluted. It has:
+> >>>>>> 1. DDR Init
+> >>>>>> 2. Boot device support
+> >>>>>> 3. SBI support using OpenSBI as library
+> >>>>>> 4. Simple TEE support
+> >>>>>>
+> >>>>>> I think point 1) and 2) above should be part of U-Boot SPL.
+> >>>>>> The point 3) can be OpenSBI FW_DYNAMIC.
+> >>>>>>
+> >>>>>> Lastly,for point 4), we are working on a new OpenSBI feature using
+> >>>>>> which we can run independent Secure OS and Non-Secure OS using
+> >>>>>> U-Boot_SPL+OpenSBI (for both SiFive Unleashed and Microchip
+> >>>>>> PolarFire).
+> >>>>>>
+> >>>>>> Do you have plans for adding U-Boot SPL support for this board ??
+> >>>>> + Cyril Jean from Microchip
+> >>>>>
+> >>>>> I will have to leave this question to Cyril to comment.
+> >>>>>
+> >>>> I currently do not have a plan to support U-Boot SPL. The idea of the
+> >>>> HSS is to contain all the silicon specific initialization and
+> >>>> configuration code within the HSS before jumping to U-Boot S-mode. I
+> >>>> would rather keep all this within the HSS for the time being. I would
+> >>>> wait until we reach production silicon before attempting to move this to
+> >>>> U-Boot SPL as the HSS is likely to contain some opaque silicon related
+> >>>> changes for another while.
+> >>> That is unfortunate, a lot of work has gone into making the boot flow
+> >>> simple and easy to use.
+> >>>
+> >>> QEMU now includes OpenSBI by default to make it easy for users to boot
+> >>> Linux. The Icicle Kit board is now the most difficult QEMU board to
+> >>> boot Linux on. Not to mention it makes it hard to impossible to
+> >>> support it in standard tool flows such as meta-riscv.
+> >>>
+> >>> Alistair
+> >> If it is such a problem we can add a U-Boot SPL stage and the HSS can be
+> >> treated as standard SoC ROM code.
+> > It's not mandatory for U-Boot SPL to have stable DRAM calibration settings
+> > from the start itself. The initial U-Boot SPL support for most
+> > platforms (accross
+> > architectures) usually include basic working DRAM calibration settings which
+> > is later on updated with separate patches. Also, we don't need all U-Boot
+> > drivers to be upstreamed in one-go as this can be done in phases.
+> >
+> > The advantage we have with PolarFire SoC Icicle board is that we already
+> > have a U-Boot S-mode. and we believe the OpenSBI generic platform will
+> > work fine for PolarFire SoC Icicle board so the only thing missing right now
+> > is the U-Boot SPL support for OpenSource boot-flow.
+> >
+> > It will certainly accelerate open-source development if we have boot-flow
+> > U-Boot_SPL => OpenSBI (FW_DYNAMIC) => U-Boot_S-mode working
+> > on PolarFire SoC Icicle board. Initially, we just need DRAM, SD/eMMC,
+> > and Serial port support for U-Boot SPL and U-Boot S-mode. Later on,
+> > more patches can add ethernet and other booting device drivers to U-Boot.
+> >
+> > Regarding security services of HSS, we are working on a OpenSBI
+> > feature which will allow HSS security services to run as independent
+> > binary in M-mode (not linked to OpenSBI) and OpenSBI FW_DYNAMIC
+> > will be a separate binary acting as a secure monitor.
+> >
+> > Regards,
+> > Anup
+>
+> What I have in mind is that the external memory will be up and running
+> by the time we get to U-Boot SPL. In the case of PolarFire SoC the ROM
+> code equivalent brings up the DDR memory interface so we do not need to
+> worry about this as part of U-Boot.
 
-On 8/18/20 2:54 PM, Stefan Hajnoczi wrote:
-> On Thu, Aug 13, 2020 at 09:18:59PM +0200, Auger Eric wrote:
->> Hi Alex,
->>
->> On 8/13/20 9:15 PM, Alex Williamson wrote:
->>> On Thu, 13 Aug 2020 20:02:45 +0200
->>> Auger Eric <eric.auger@redhat.com> wrote:
->>>
->>>> Hi Alex,
->>>>
->>>> On 8/13/20 6:59 PM, Alex Williamson wrote:
->>>>> On Thu, 13 Aug 2020 15:37:08 +0800
->>>>> Chen Qun <kuhn.chenqun@huawei.com> wrote:
->>>>>   
->>>>>> Clang static code analyzer show warning:
->>>>>> hw/vfio/platform.c:239:9: warning: Value stored to 'ret' is never read
->>>>>>         ret = event_notifier_test_and_clear(intp->interrupt);
->>>>>>         ^     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->>>>>>
->>>>>> Reported-by: Euler Robot <euler.robot@huawei.com>
->>>>>> Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
->>>>>> ---
->>>>>> Cc: Alex Williamson <alex.williamson@redhat.com>
->>>>>> Cc: Eric Auger <eric.auger@redhat.com>
->>>>>> ---
->>>>>>  hw/vfio/platform.c | 2 +-
->>>>>>  1 file changed, 1 insertion(+), 1 deletion(-)
->>>>>>
->>>>>> diff --git a/hw/vfio/platform.c b/hw/vfio/platform.c
->>>>>> index ac2cefc9b1..869ed2c39d 100644
->>>>>> --- a/hw/vfio/platform.c
->>>>>> +++ b/hw/vfio/platform.c
->>>>>> @@ -236,7 +236,7 @@ static void vfio_intp_interrupt(VFIOINTp *intp)
->>>>>>          trace_vfio_intp_interrupt_set_pending(intp->pin);
->>>>>>          QSIMPLEQ_INSERT_TAIL(&vdev->pending_intp_queue,
->>>>>>                               intp, pqnext);
->>>>>> -        ret = event_notifier_test_and_clear(intp->interrupt);
->>>>>> +        event_notifier_test_and_clear(intp->interrupt);
->>>>>>          return;
->>>>>>      }  
->>>>>
->>>>> Testing that an event is pending in our notifier is generally a
->>>>> prerequisite to doing anything in the interrupt handler, I don't
->>>>> understand why we're just consuming it and ignoring the return value.
->>>>> The above is in the delayed handling branch of the function, but the
->>>>> normal non-delayed path would only go on to error_report() if the
->>>>> notifier is not pending and then inject an interrupt anyway.  This all
->>>>> seems rather suspicious and it's a unique pattern among the vfio
->>>>> callers of this function.  Is there a more fundamental bug that this
->>>>> function should perform this test once and return without doing
->>>>> anything if it's called spuriously, ie. without a notifier pending?
->>>>> Thanks,  
->>>>
->>>> Hum that's correct that other VFIO call sites do the check. My
->>>> understanding was that this could not fail in this case as, if we
->>>> entered the handler there was something to be cleared. In which
->>>> situation can this fail?
->>>
->>> I'm not sure what the right answer is, I see examples either way
->>> looking outside of vfio code.  On one hand, maybe we never get called
->>> spuriously, on the other if it's the callee's responsibility to drain
->>> events from the fd and we have it readily accessible whether there were
->>> any events pending, why would we inject an interrupt if the result that
->>> we have in hand shows no pending events?  The overhead of returning
->>> based on that result is minuscule.
->>
->> I agree
->>>
->>> qemu_set_fd_handler() is a wrapper for aio_set_fd_handler().  Stefan is
->>> a possible defacto maintainer of some of the aio code.  Stefan, do you
->>> have thoughts on whether callbacks from event notifier fds should
->>> consider spurious events?  Thanks,
->>
->> Indeed I saw that for instance block/nvme.c nvme_handle_event is not
->> checking the result.
->>
->> Let's wait for Stefan's answer ...
-> 
-> vfio_intp_interrupt() will always read a non-zero eventfd value, based
-> on these assumptions:
-> 
-> intp->interrupt is "readable" since vfio_intp_interrupt() is called by
-> the AioContext (event loop). "readable" does not guarantee that data can
-> actually be read because it also includes error events:
-> 
->   new_node->pfd.events = (io_read ? G_IO_IN | G_IO_HUP | G_IO_ERR : 0);
-> 
-> However, I think we can exclude the error case for the VFIO interrupt
-> eventfds because there are no error cases for eventfds (unlike socket
-> disconnection, for example).
-> 
-> The other important assumption is that only one thread on the host is
-> monitoring the eventfd for activity.
+Keeping DRAM configuration as part of a separate ROM booting stage prior
+to the U-Boot SPL sounds good to me. This will lead to following boot-flow:
 
-Thank for your the confirmation. So this patch should be safe.
+ROM/HSS (M-mode) => U-Boot SPL (M-mode) => OpenSBI (M-mode) => U-Boot S-mode
 
-Best Regards
+>
+> Sounds to me the component that needs to be upstreamed next is the eMMC
+> support so that it can be used as part of U-Boot SPL. Correct?
 
-Eric
-> 
-> Stefan
-> 
+Maybe as a PHASE1 patch series for PolarFire U-Boot support can
+target the following:
+1. Minimal U-Boot board support for PolarFire IcIcle Board with
+single defconfig to build both U-Boot SPL and U-Boot S-mode
+2. Serial port driver (probably re-use existing driver)
+3. SD and eMMC driver
 
+Supporting SD booting is highly desirable for PHASE1. At least,
+U-Boot SPL, OpenSBI, U-Boot S-mode, and Linux should come
+as separate images from SD card. The ROM/HSS can reside and
+boot from on-board flash/eMMC.
+
+Above is my suggestion based on experience with SiFive Unleashed.
+
+The general idea behind OpenSource boot-flow is to have each
+booting stage as a separate binary so that users can selectively
+upgrade a particular booting stage without re-compiling/re-flashing
+other booting stages.
+
+Various distros and yocto already support building most of the above
+booting stages (U-Boot, OpenSBI, Linux, etc) so we can reuse a lot
+of existing work. Eventually, I am confident we will endup moving
+more stuff from ROM/HSS to U-Boot SPL for ease in maintenance.
+
+Regards,
+Anup
 
