@@ -4,89 +4,82 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C140BC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 09:53:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DE3BC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 09:55:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8BE01206B5
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 09:53:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2998D206DA
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 09:55:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DT+r1cjR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8BE01206B5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=anisinha-ca.20150623.gappssmtp.com header.i=@anisinha-ca.20150623.gappssmtp.com header.b="jfbs2wUj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2998D206DA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=anisinha.ca
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43680 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46588 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7yIr-0007A4-SL
-	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 05:53:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38214)
+	id 1k7yLS-00008s-Ac
+	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 05:55:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38780)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
- id 1k7yIF-0006j2-VR
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 05:52:36 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33579
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
- id 1k7yIE-0004a4-9H
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 05:52:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597744352;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=5ojOJc8TNwb88o3l/kIvXxklyu5s+s7WHnPpORq61s0=;
- b=DT+r1cjRT0hSIqaFfCpfZqndwX3rDdJocqxtdiMCRS1o6tZyzHoIFhnBy5V3EId1+2ZjPA
- rncTzHWw2aSm6bYyKrttXHaTMnod+DjZwjCZP6yBf8hlbJZRL0uA/x5haHqIoYfc1eZ63z
- rg/vOsPMBs8rkFmbmZRGDTBfdj86CYo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-520-CSPzLjDQMW2pQ4q1D2Hjdg-1; Tue, 18 Aug 2020 05:52:31 -0400
-X-MC-Unique: CSPzLjDQMW2pQ4q1D2Hjdg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 59CD01005E63;
- Tue, 18 Aug 2020 09:52:28 +0000 (UTC)
-Received: from kaapi (unknown [10.40.192.118])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C41B15C1DC;
- Tue, 18 Aug 2020 09:52:04 +0000 (UTC)
-Date: Tue, 18 Aug 2020 15:22:01 +0530 (IST)
-From: P J P <ppandit@redhat.com>
-X-X-Sender: pjp@kaapi
-To: =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>
-Subject: Re: [RFC PATCH 1/9] memory: Initialize MemoryRegionOps for RAM memory
- regions
-In-Reply-To: <20200817161853.593247-2-f4bug@amsat.org>
-Message-ID: <nycvar.YSQ.7.78.906.2008181445190.306228@xnncv>
-References: <20200817161853.593247-1-f4bug@amsat.org>
- <20200817161853.593247-2-f4bug@amsat.org>
+ (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1k7yKc-0007n8-6X
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 05:55:02 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:46787)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1k7yKY-0004kc-Td
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 05:55:01 -0400
+Received: by mail-wr1-x441.google.com with SMTP id r15so7731730wrp.13
+ for <qemu-devel@nongnu.org>; Tue, 18 Aug 2020 02:54:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=anisinha-ca.20150623.gappssmtp.com; s=20150623;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=gYc/YmymThvhpwrEF8B+hv0E8UEl5BzJVj8pR47OHgY=;
+ b=jfbs2wUjwzszwRNY0yqRCnUKNVtu+Sxh+4bDPvIBKnrzdrgSnEuFT5TE1i3U+QZPpC
+ HP96+ef96jzrUnJ+hWrj65dfKzybVCfz5cBpJO0lahwzoDInhT2apGOOsJdRPCjIpxwO
+ KdWLVosRaYC8+4FiJy8p5XdDGCR8cWomloIYD/65jg5cCCrcLwB+N7VEZXhJFg4Grq4l
+ CDyy3SOteB+vIQ2GUwz9kWZ9yUCR+IAl8RCvmAzvC3BCotBYOkH1JMVzTlBjSpp+IgEQ
+ Z9/maHGCZvhBjq0DUnl5qIDsifjYZ76QpPhtkxHCezaZgW6P/3PbbiIWB84iDPQzrqBZ
+ WNEg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=gYc/YmymThvhpwrEF8B+hv0E8UEl5BzJVj8pR47OHgY=;
+ b=pb4qw60fVChe4EmIhAny33mOiyC0S9NSvAPtydQT7R+9O+BigMi5Iqxt/ZOCLL0KzB
+ empwXdOElgzJ/E8W++o1YOZBLOaPAow14YJReB8KPLtyswoKUqK7P8gyH12jX/kPM/A5
+ 6U5QSP+CG6bhYV2O7warSSg5fJmd933NT+UH80UEigNrb/l+Swwp8L0rJbg6ziUCy/U7
+ bgQ4G4ICP+9PpwYd0PQPHUjaQjlM6ptpXeRBiw8ZjyjFur3mBzzRTs30bFacJcIcgiDI
+ 61JKCib2Tj0Sv9Xqt/wjSD4tNKh6TV0GkryjfMbLOx/OkvE1fEyBb5BiM4mIlnzGxqrp
+ irDg==
+X-Gm-Message-State: AOAM532RfIpX8HDcsw5XQ5e5eArLuwEnhDUAYAMhzylt6W28IzIr2qBY
+ Ybf3vcFd6tm9PlCPugftCVLX//Nh9N0/nQ0B/Na1ijyo0Jk=
+X-Google-Smtp-Source: ABdhPJwUiLxoaORR+3qK210EP6Uo9qCXyADznxc+NYbwmQ8CFNfW3qB4GaT64RD1lcK5PbJv5LTVifsAPU4902EY9hs=
+X-Received: by 2002:a5d:5485:: with SMTP id h5mr18545090wrv.427.1597744495322; 
+ Tue, 18 Aug 2020 02:54:55 -0700 (PDT)
 MIME-Version: 1.0
-Content-ID: <nycvar.YSQ.7.78.906.2008181520000.306228@xnncv>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ppandit@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/mixed;
- BOUNDARY="-1463810047-709961173-1597743935=:306228"
-Received-SPF: none client-ip=205.139.110.120; envelope-from=ppandit@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 03:19:25
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
+References: <1597151528-75766-1-git-send-email-ani@anisinha.ca>
+In-Reply-To: <1597151528-75766-1-git-send-email-ani@anisinha.ca>
+From: Ani Sinha <ani@anisinha.ca>
+Date: Tue, 18 Aug 2020 15:24:44 +0530
+Message-ID: <CAARzgwxZNpiTLn8aome=tVxHe-ut=Pkbte=McUbr=B2xx6kRfQ@mail.gmail.com>
+Subject: Re: [PATCH V2] Introduce a new flag for piix to disable root bus PCI
+ hotplug
+To: qemu-devel@nongnu.org
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: none client-ip=2a00:1450:4864:20::441;
+ envelope-from=ani@anisinha.ca; helo=mail-wr1-x441.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,63 +92,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Stephen Checkoway <stephen.checkoway@oberlin.edu>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
- Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- =?ISO-8859-15?Q?Herv=E9_Poussineau?= <hpoussin@reactos.org>,
- "Edgar E . Iglesias" <edgar.iglesias@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>,
- Artyom Tarasenko <atar4qemu@gmail.com>, Richard Henderson <rth@twiddle.net>
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
----1463810047-709961173-1597743935=:306228
-Content-Type: text/plain; CHARSET=ISO-8859-15
-Content-Transfer-Encoding: 8BIT
-Content-ID: <nycvar.YSQ.7.78.906.2008181520001.306228@xnncv>
+Igor etc, I just tested this patch using a Windows 2012 R2 image and
+it seems to be working. Any feedbacks on this patch?
 
-+-- On Mon, 17 Aug 2020, Philippe Mathieu-Daudé wrote --+
-| Fix by initializing the MemoryRegionOps to ram_device_mem_ops, this way the 
-| memory accesses are properly dispatched using 
-| memory_region_ram_device_read() / memory_region_ram_device_write().
-| 
-| Fixes: 4a2e242bbb ("memory: Don't use memcpy for ram_device regions")
-| Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-| ---
-| Since v1: Corrected description (PJP)
-| Cc: P J P <ppandit@redhat.com>
-| ---
-|  softmmu/memory.c | 10 ++++++++++
-|  1 file changed, 10 insertions(+)
-| 
-| diff --git a/softmmu/memory.c b/softmmu/memory.c
-| index 651705b7d1..8139da1a58 100644
-| --- a/softmmu/memory.c
-| +++ b/softmmu/memory.c
-| @@ -1517,6 +1517,8 @@ void memory_region_init_ram_shared_nomigrate(MemoryRegion *mr,
-|      Error *err = NULL;
-|      memory_region_init(mr, owner, name, size);
-|      mr->ram = true;
-| +    mr->ops = &ram_device_mem_ops;
-| +    mr->opaque = mr;
-|      mr->terminates = true;
-
-
-I wonder if 'mr->ops = &ram_device_mem_ops' could be done in 
-memory_region_init() instead?
-
-Otherwise looks okay.
-
-Thank you.
---
-Prasad J Pandit / Red Hat Product Security Team
-8685 545E B54C 486B C6EB 271E E285 8B5A F050 DE8D
----1463810047-709961173-1597743935=:306228--
-
+On Tue, Aug 11, 2020 at 6:42 PM Ani Sinha <ani@anisinha.ca> wrote:
+>
+> We introduce a new global flag for PIIX with which we can turn on or off PCI
+> device hotplug on the root bus. This flag can be used to prevent all PCI
+> devices from getting hotplugged or unplugged from the root PCI bus.
+>
+> Signed-off-by: Ani Sinha <ani@anisinha.ca>
+> ---
+>  hw/acpi/piix4.c      |  3 +++
+>  hw/i386/acpi-build.c | 20 ++++++++++++++++----
+>  2 files changed, 19 insertions(+), 4 deletions(-)
+>
+> diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
+> index 26bac4f..94ec35a 100644
+> --- a/hw/acpi/piix4.c
+> +++ b/hw/acpi/piix4.c
+> @@ -78,6 +78,7 @@ typedef struct PIIX4PMState {
+>
+>      AcpiPciHpState acpi_pci_hotplug;
+>      bool use_acpi_hotplug_bridge;
+> +    bool use_acpi_root_pci_hotplug;
+>
+>      uint8_t disable_s3;
+>      uint8_t disable_s4;
+> @@ -635,6 +636,8 @@ static Property piix4_pm_properties[] = {
+>      DEFINE_PROP_UINT8(ACPI_PM_PROP_S4_VAL, PIIX4PMState, s4_val, 2),
+>      DEFINE_PROP_BOOL("acpi-pci-hotplug-with-bridge-support", PIIX4PMState,
+>                       use_acpi_hotplug_bridge, true),
+> +    DEFINE_PROP_BOOL("acpi-root-pci-hotplug", PIIX4PMState,
+> +                     use_acpi_root_pci_hotplug, true),
+>      DEFINE_PROP_BOOL("memory-hotplug-support", PIIX4PMState,
+>                       acpi_memory_hotplug.is_enabled, true),
+>      DEFINE_PROP_END_OF_LIST(),
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index b7bcbbb..a82e5c1 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -95,6 +95,7 @@ typedef struct AcpiPmInfo {
+>      bool s3_disabled;
+>      bool s4_disabled;
+>      bool pcihp_bridge_en;
+> +    bool pcihp_root_en;
+>      uint8_t s4_val;
+>      AcpiFadtData fadt;
+>      uint16_t cpu_hp_io_base;
+> @@ -245,6 +246,9 @@ static void acpi_get_pm_info(MachineState *machine, AcpiPmInfo *pm)
+>      pm->pcihp_bridge_en =
+>          object_property_get_bool(obj, "acpi-pci-hotplug-with-bridge-support",
+>                                   NULL);
+> +    pm->pcihp_root_en =
+> +        object_property_get_bool(obj, "acpi-root-pci-hotplug", NULL);
+> +
+>  }
+>
+>  static void acpi_get_misc_info(AcpiMiscInfo *info)
+> @@ -337,12 +341,15 @@ static void build_append_pcihp_notify_entry(Aml *method, int slot)
+>  }
+>
+>  static void build_append_pci_bus_devices(Aml *parent_scope, PCIBus *bus,
+> -                                         bool pcihp_bridge_en)
+> +                                         bool pcihp_bridge_en,
+> +                                         bool pcihp_root_en)
+>  {
+>      Aml *dev, *notify_method = NULL, *method;
+>      QObject *bsel;
+>      PCIBus *sec;
+>      int i;
+> +    bool root_bus = pci_bus_is_root(bus);
+> +    bool root_pcihp_disabled = (root_bus && !pcihp_root_en);
+>
+>      bsel = object_property_get_qobject(OBJECT(bus), ACPI_PCIHP_PROP_BSEL, NULL);
+>      if (bsel) {
+> @@ -361,6 +368,9 @@ static void build_append_pci_bus_devices(Aml *parent_scope, PCIBus *bus,
+>          bool bridge_in_acpi;
+>
+>          if (!pdev) {
+> +            /* skip if pci hotplug for the root bus is disabled */
+> +            if (root_pcihp_disabled)
+> +                continue;
+>              if (bsel) { /* add hotplug slots for non present devices */
+>                  dev = aml_device("S%.02X", PCI_DEVFN(slot, 0));
+>                  aml_append(dev, aml_name_decl("_SUN", aml_int(slot)));
+> @@ -419,7 +429,7 @@ static void build_append_pci_bus_devices(Aml *parent_scope, PCIBus *bus,
+>              method = aml_method("_S3D", 0, AML_NOTSERIALIZED);
+>              aml_append(method, aml_return(aml_int(s3d)));
+>              aml_append(dev, method);
+> -        } else if (hotplug_enabled_dev) {
+> +        } else if (hotplug_enabled_dev && !root_pcihp_disabled) {
+>              /* add _SUN/_EJ0 to make slot hotpluggable  */
+>              aml_append(dev, aml_name_decl("_SUN", aml_int(slot)));
+>
+> @@ -439,7 +449,8 @@ static void build_append_pci_bus_devices(Aml *parent_scope, PCIBus *bus,
+>               */
+>              PCIBus *sec_bus = pci_bridge_get_sec_bus(PCI_BRIDGE(pdev));
+>
+> -            build_append_pci_bus_devices(dev, sec_bus, pcihp_bridge_en);
+> +            build_append_pci_bus_devices(dev, sec_bus, pcihp_bridge_en,
+> +                                         pcihp_root_en);
+>          }
+>          /* slot descriptor has been composed, add it into parent context */
+>          aml_append(parent_scope, dev);
+> @@ -1818,7 +1829,8 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+>          if (bus) {
+>              Aml *scope = aml_scope("PCI0");
+>              /* Scan all PCI buses. Generate tables to support hotplug. */
+> -            build_append_pci_bus_devices(scope, bus, pm->pcihp_bridge_en);
+> +            build_append_pci_bus_devices(scope, bus, pm->pcihp_bridge_en,
+> +                                         pm->pcihp_root_en);
+>
+>              if (TPM_IS_TIS_ISA(tpm)) {
+>                  if (misc->tpm_version == TPM_VERSION_2_0) {
+> --
+> 2.7.4
+>
 
