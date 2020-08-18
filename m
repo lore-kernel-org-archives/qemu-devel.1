@@ -7,46 +7,46 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 875F5C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 04:23:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AA23C433E3
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 04:23:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 50AD5207BB
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 04:23:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 23CF020706
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 04:23:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Px5AKkQX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 50AD5207BB
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="DNWHZS+Y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 23CF020706
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36738 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37720 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7t9M-0004JR-IN
-	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 00:23:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49840)
+	id 1k7t9W-0004iO-6t
+	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 00:23:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49902)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1k7t63-00078k-M8; Tue, 18 Aug 2020 00:19:39 -0400
-Received: from ozlabs.org ([203.11.71.1]:42489)
+ id 1k7t67-0007IZ-8x; Tue, 18 Aug 2020 00:19:43 -0400
+Received: from ozlabs.org ([203.11.71.1]:51169)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1k7t5z-0006JZ-Vn; Tue, 18 Aug 2020 00:19:39 -0400
+ id 1k7t65-0006L0-9p; Tue, 18 Aug 2020 00:19:42 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 4BVyNZ03HTz9sTn; Tue, 18 Aug 2020 14:19:25 +1000 (AEST)
+ id 4BVyNZ1bJqz9sTt; Tue, 18 Aug 2020 14:19:26 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1597724366;
- bh=l4MkVwUco+rCkcYPoEa1iA0fgIjbUKLLoqRdGoYQlHU=;
+ bh=62brQkG4nIHthJ12gqOXwUyRW/t7bCiEYH2IKJRyf+U=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=Px5AKkQXxvxcquQxwRQPEDoSvxXaG59XzVZoFEgKMkWuqWEf1PdfOlaI9E/VAtPHQ
- FWvO6To4iGuHQqCAzjd4jOFdPZkw/yGqfs/DSeoyezF0J++DerqOO3qQ+NMpcUBYmm
- Bnxc8PIpaGj7O8CC/DWcQxIg4MX75vZyuqsC4GY8=
+ b=DNWHZS+YxP3rfhILq4FgIuvw7jOb+TSzOjyffbzn7tpUlEBSG3TFdFMS8dJFIYKFQ
+ Tj9zNns/uhcMpxSZwT4TgNQKq4mz3KVM0zLCJZGVht7vHrXG0XOp8zIZ4+4v9vXnTz
+ IEP6WSYu20DpWVlwq3bQ5HVUS9QbWWS6kuSFPGR4=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org,
 	groug@kaod.org
-Subject: [PULL 04/40] target/ppc: add byte-reverse br[dwh] instructions
-Date: Tue, 18 Aug 2020 14:18:46 +1000
-Message-Id: <20200818041922.251708-5-david@gibson.dropbear.id.au>
+Subject: [PULL 06/40] target/ppc: add vmulld instruction
+Date: Tue, 18 Aug 2020 14:18:48 +1000
+Message-Id: <20200818041922.251708-7-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200818041922.251708-1-david@gibson.dropbear.id.au>
 References: <20200818041922.251708-1-david@gibson.dropbear.id.au>
@@ -83,70 +83,50 @@ Sender: "Qemu-devel"
 
 From: Lijun Pan <ljp@linux.ibm.com>
 
-POWER ISA 3.1 introduces following byte-reverse instructions:
-brd: Byte-Reverse Doubleword X-form
-brw: Byte-Reverse Word X-form
-brh: Byte-Reverse Halfword X-form
+vmulld: Vector Multiply Low Doubleword.
 
 Signed-off-by: Lijun Pan <ljp@linux.ibm.com>
-Message-Id: <20200701234344.91843-4-ljp@linux.ibm.com>
+Message-Id: <20200701234344.91843-6-ljp@linux.ibm.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/translate.c | 40 ++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 40 insertions(+)
+ target/ppc/translate/vmx-impl.inc.c | 1 +
+ target/ppc/translate/vmx-ops.inc.c  | 4 ++++
+ 2 files changed, 5 insertions(+)
 
-diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-index 4ce3d664b5..590c3e3bc7 100644
---- a/target/ppc/translate.c
-+++ b/target/ppc/translate.c
-@@ -6971,7 +6971,47 @@ static void gen_dform3D(DisasContext *ctx)
-     return gen_invalid(ctx);
- }
+diff --git a/target/ppc/translate/vmx-impl.inc.c b/target/ppc/translate/vmx-impl.inc.c
+index b6c9290707..f8e8b978ec 100644
+--- a/target/ppc/translate/vmx-impl.inc.c
++++ b/target/ppc/translate/vmx-impl.inc.c
+@@ -807,6 +807,7 @@ GEN_VXFORM_DUAL(vmulouw, PPC_ALTIVEC, PPC_NONE,
+ GEN_VXFORM(vmulosb, 4, 4);
+ GEN_VXFORM(vmulosh, 4, 5);
+ GEN_VXFORM(vmulosw, 4, 6);
++GEN_VXFORM_V(vmulld, MO_64, tcg_gen_gvec_mul, 4, 7);
+ GEN_VXFORM(vmuleub, 4, 8);
+ GEN_VXFORM(vmuleuh, 4, 9);
+ GEN_VXFORM(vmuleuw, 4, 10);
+diff --git a/target/ppc/translate/vmx-ops.inc.c b/target/ppc/translate/vmx-ops.inc.c
+index 84e05fb827..b49787ac97 100644
+--- a/target/ppc/translate/vmx-ops.inc.c
++++ b/target/ppc/translate/vmx-ops.inc.c
+@@ -48,6 +48,9 @@ GEN_HANDLER_E(name, 0x04, opc2, opc3, inval, PPC_NONE, PPC2_ISA300)
+ GEN_HANDLER_E_2(name, 0x04, opc2, opc3, opc4, 0x00000000, PPC_NONE,     \
+                                                        PPC2_ISA300)
  
-+#if defined(TARGET_PPC64)
-+/* brd */
-+static void gen_brd(DisasContext *ctx)
-+{
-+    tcg_gen_bswap64_i64(cpu_gpr[rA(ctx->opcode)], cpu_gpr[rS(ctx->opcode)]);
-+}
++#define GEN_VXFORM_310(name, opc2, opc3)                                \
++GEN_HANDLER_E(name, 0x04, opc2, opc3, 0x00000000, PPC_NONE, PPC2_ISA310)
 +
-+/* brw */
-+static void gen_brw(DisasContext *ctx)
-+{
-+    tcg_gen_bswap64_i64(cpu_gpr[rA(ctx->opcode)], cpu_gpr[rS(ctx->opcode)]);
-+    tcg_gen_rotli_i64(cpu_gpr[rA(ctx->opcode)], cpu_gpr[rA(ctx->opcode)], 32);
-+
-+}
-+
-+/* brh */
-+static void gen_brh(DisasContext *ctx)
-+{
-+    TCGv_i64 t0 = tcg_temp_new_i64();
-+    TCGv_i64 t1 = tcg_temp_new_i64();
-+    TCGv_i64 t2 = tcg_temp_new_i64();
-+
-+    tcg_gen_movi_i64(t0, 0x00ff00ff00ff00ffull);
-+    tcg_gen_shri_i64(t1, cpu_gpr[rS(ctx->opcode)], 8);
-+    tcg_gen_and_i64(t2, t1, t0);
-+    tcg_gen_and_i64(t1, cpu_gpr[rS(ctx->opcode)], t0);
-+    tcg_gen_shli_i64(t1, t1, 8);
-+    tcg_gen_or_i64(cpu_gpr[rA(ctx->opcode)], t1, t2);
-+
-+    tcg_temp_free_i64(t0);
-+    tcg_temp_free_i64(t1);
-+    tcg_temp_free_i64(t2);
-+}
-+#endif
-+
- static opcode_t opcodes[] = {
-+#if defined(TARGET_PPC64)
-+GEN_HANDLER_E(brd, 0x1F, 0x1B, 0x05, 0x0000F801, PPC_NONE, PPC2_ISA310),
-+GEN_HANDLER_E(brw, 0x1F, 0x1B, 0x04, 0x0000F801, PPC_NONE, PPC2_ISA310),
-+GEN_HANDLER_E(brh, 0x1F, 0x1B, 0x06, 0x0000F801, PPC_NONE, PPC2_ISA310),
-+#endif
- GEN_HANDLER(invalid, 0x00, 0x00, 0x00, 0xFFFFFFFF, PPC_NONE),
- GEN_HANDLER(cmp, 0x1F, 0x00, 0x00, 0x00400000, PPC_INTEGER),
- GEN_HANDLER(cmpi, 0x0B, 0xFF, 0xFF, 0x00400000, PPC_INTEGER),
+ #define GEN_VXFORM_DUAL(name0, name1, opc2, opc3, type0, type1) \
+ GEN_HANDLER_E(name0##_##name1, 0x4, opc2, opc3, 0x00000000, type0, type1)
+ 
+@@ -104,6 +107,7 @@ GEN_VXFORM_DUAL(vmulouw, vmuluwm, 4, 2, PPC_ALTIVEC, PPC_NONE),
+ GEN_VXFORM(vmulosb, 4, 4),
+ GEN_VXFORM(vmulosh, 4, 5),
+ GEN_VXFORM_207(vmulosw, 4, 6),
++GEN_VXFORM_310(vmulld, 4, 7),
+ GEN_VXFORM(vmuleub, 4, 8),
+ GEN_VXFORM(vmuleuh, 4, 9),
+ GEN_VXFORM_207(vmuleuw, 4, 10),
 -- 
 2.26.2
 
