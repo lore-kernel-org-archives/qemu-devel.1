@@ -7,67 +7,67 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3525C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 15:07:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9D5FC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 15:07:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 725DA207D3
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 15:07:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8F82D206B5
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 15:07:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K3gWPpOu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 725DA207D3
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Eqs2/eB8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F82D206B5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47302 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51100 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k83Cb-0006UG-JT
-	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 11:07:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33836)
+	id 1k83DC-000863-NZ
+	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 11:07:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33572)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k82Lr-0006Tw-7I
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:12:35 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:32233
+ id 1k82Lf-0005yE-2K
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:12:23 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:31233
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k82Ld-0007ef-VV
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:12:34 -0400
+ id 1k82LT-0007bd-Mm
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:12:22 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597759941;
+ s=mimecast20190719; t=1597759929;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=xSry71oLmjjbBRrT1zTrAxscXbSiE08Hxa43WW0EWuk=;
- b=K3gWPpOuNxgUqsHB7ZYjySmbapfQP9eBA7if6xKSuBDCSvcU/14GTFC1FM2YmC7PV/KR4I
- ZePmjqNCk9/adEu1CzsdsQFYnQL30fHP6qJvSh5FTtuMY2nHbDPuB+wyYkxi1QLQo2uOaZ
- +pZlyD7NBPHo8A/kaxxtdJtGyGhB3jU=
+ bh=Pl0jAkenLkFo4zL19mkOAUPmJs0SzL6RKuibTucn6yE=;
+ b=Eqs2/eB8dMxR6xOVkAd1RjBA0lMVUCAhXlNpc583JRmqm05VD1xOEiC4OwbeeFujAO0hqy
+ RfIMAlzSmP1EqJ+jpKEgGPoh2syKXWUJ18vrsetoT7btTxMVVB9mNmK4G6CizOhYOK1ra3
+ z4CIU8Qz7OuVcOwozKqa5NhaAZhEDeU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-160-nuUmT4qjN32q3raAHHzKeg-1; Tue, 18 Aug 2020 10:12:19 -0400
-X-MC-Unique: nuUmT4qjN32q3raAHHzKeg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-446-WnZOzAUfMPSkFrD1TN_0vw-1; Tue, 18 Aug 2020 10:12:07 -0400
+X-MC-Unique: WnZOzAUfMPSkFrD1TN_0vw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3DF74100A949
- for <qemu-devel@nongnu.org>; Tue, 18 Aug 2020 14:12:16 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6351481F01B
+ for <qemu-devel@nongnu.org>; Tue, 18 Aug 2020 14:12:06 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id EE7795882D;
- Tue, 18 Aug 2020 14:12:15 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 136167BE68;
+ Tue, 18 Aug 2020 14:12:06 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 137/150] remove Makefile.target
-Date: Tue, 18 Aug 2020 10:10:12 -0400
-Message-Id: <20200818141025.21608-138-pbonzini@redhat.com>
+Subject: [PULL 124/150] meson: convert hw/adc
+Date: Tue, 18 Aug 2020 10:09:59 -0400
+Message-Id: <20200818141025.21608-125-pbonzini@redhat.com>
 In-Reply-To: <20200818141025.21608-1-pbonzini@redhat.com>
 References: <20200818141025.21608-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0.002
@@ -97,278 +97,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
+Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Makefile        | 53 ++++---------------------------------------------
- Makefile.target | 12 -----------
- configure       | 17 ----------------
- 3 files changed, 4 insertions(+), 78 deletions(-)
- delete mode 100644 Makefile.target
+ hw/Makefile.objs     | 1 -
+ hw/adc/Makefile.objs | 1 -
+ hw/adc/meson.build   | 1 +
+ hw/meson.build       | 1 +
+ 4 files changed, 2 insertions(+), 2 deletions(-)
+ delete mode 100644 hw/adc/Makefile.objs
+ create mode 100644 hw/adc/meson.build
 
-diff --git a/Makefile b/Makefile
-index d91352d8ef..4d71304b5a 100644
---- a/Makefile
-+++ b/Makefile
-@@ -170,17 +170,6 @@ include $(SRC_PATH)/tests/Makefile.include
- 
- all: $(DOCS) $(if $(BUILD_DOCS),sphinxdocs) recurse-all modules
- 
--config-host.h: config-host.h-timestamp
--config-host.h-timestamp: config-host.mak
--
--TARGET_DIRS_RULES := $(foreach t, all fuzz clean install, $(addsuffix /$(t), $(TARGET_DIRS)))
--
--.PHONY: $(TARGET_DIRS_RULES)
--# The $(TARGET_DIRS_RULES) are of the form SUBDIR/GOAL, so that
--# $(dir $@) yields the sub-directory, and $(notdir $@) yields the sub-goal
--$(TARGET_DIRS_RULES): $(TARGET_DEPS)
--	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) -C $(dir $@) V="$(V)" TARGET_DIR="$(dir $@)" $(notdir $@),)
--
- # LIBFDT_lib="": avoid breaking existing trees with objects requiring -fPIC
- DTC_MAKE_ARGS=-I$(SRC_PATH)/dtc VPATH=$(SRC_PATH)/dtc -C dtc V="$(V)" LIBFDT_lib=""
- DTC_CFLAGS=$(CFLAGS) $(QEMU_CFLAGS)
-@@ -217,8 +206,6 @@ slirp/all: .git-submodule-status
- 		CC="$(CC)" AR="$(AR)" 	LD="$(LD)" RANLIB="$(RANLIB)"	\
- 		CFLAGS="$(QEMU_CFLAGS) $(CFLAGS)" LDFLAGS="$(QEMU_LDFLAGS)")
- 
--$(filter %/all, $(TARGET_DIRS_RULES)):
--
- ROM_DIRS = $(addprefix pc-bios/, $(ROMS))
- ROM_DIRS_RULES=$(foreach t, all clean, $(addsuffix /$(t), $(ROM_DIRS)))
- # Only keep -O and -g cflags
-@@ -226,11 +213,9 @@ ROM_DIRS_RULES=$(foreach t, all clean, $(addsuffix /$(t), $(ROM_DIRS)))
- $(ROM_DIRS_RULES):
- 	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) -C $(dir $@) V="$(V)" TARGET_DIR="$(dir $@)" CFLAGS="$(filter -O% -g%,$(CFLAGS))" $(notdir $@),)
- 
--.PHONY: recurse-all recurse-clean recurse-install
--recurse-all: $(addsuffix /all, $(TARGET_DIRS) $(ROM_DIRS))
--recurse-clean: $(addsuffix /clean, $(TARGET_DIRS) $(ROM_DIRS))
--recurse-install: $(addsuffix /install, $(TARGET_DIRS))
--$(addsuffix /install, $(TARGET_DIRS)): all
-+.PHONY: recurse-all recurse-clean
-+recurse-all: $(ROM_DIRS)
-+recurse-clean: $(addsuffix /clean, $(ROM_DIRS))
- 
- ######################################################################
- 
-@@ -285,9 +270,6 @@ distclean: clean ninja-distclean
- 	$(call clean-manual,system)
- 	$(call clean-manual,tools)
- 	$(call clean-manual,user)
--	for d in $(TARGET_DIRS); do \
--	rm -rf $$d || exit 1 ; \
--        done
- 	rm -Rf .sdk
- 
- KEYMAPS=da     en-gb  et  fr     fr-ch  is  lt  no  pt-br  sv \
-@@ -391,8 +373,7 @@ ICON_SIZES=16x16 24x24 32x32 48x48 64x64 128x128 256x256 512x512
- # Needed by "meson install"
- export DESTDIR
- install: all $(if $(BUILD_DOCS),install-doc) \
--	install-datadir install-localstatedir \
--	recurse-install
-+	install-datadir install-localstatedir
- ifdef CONFIG_TRACE_SYSTEMTAP
- 	$(INSTALL_PROG) "scripts/qemu-trace-stap" $(DESTDIR)$(bindir)
+diff --git a/hw/Makefile.objs b/hw/Makefile.objs
+index c0cbc0f132..4bdb674ef0 100644
+--- a/hw/Makefile.objs
++++ b/hw/Makefile.objs
+@@ -1,7 +1,6 @@
+ ifeq ($(CONFIG_SOFTMMU), y)
+ devices-dirs-$(call lor,$(CONFIG_VIRTIO_9P),$(call land,$(CONFIG_VIRTFS),$(CONFIG_XEN))) += 9pfs/
+ devices-dirs-y += acpi/
+-devices-dirs-y += adc/
  endif
-@@ -422,9 +403,6 @@ endif
- 	set -e; for x in $(KEYMAPS); do \
- 		$(INSTALL_DATA) $(SRC_PATH)/pc-bios/keymaps/$$x "$(DESTDIR)$(qemu_datadir)/keymaps"; \
- 	done
--	for d in $(TARGET_DIRS); do \
--	$(MAKE) $(SUBDIR_MAKEFLAGS) TARGET_DIR=$$d/ -C $$d $@ || exit 1 ; \
--        done
  
- # documentation
- MAKEINFO=makeinfo
-@@ -539,20 +517,6 @@ docs/interop/qemu-qmp-ref.dvi docs/interop/qemu-qmp-ref.html \
- 
- $(filter %.1 %.7 %.8,$(DOCS)): scripts/texi2pod.pl
- 
--# Reports/Analysis
--
--%/coverage-report.html:
--	@mkdir -p $*
--	$(call quiet-command,\
--		gcovr -r $(SRC_PATH) \
--		$(foreach t, $(TARGET_DIRS), --object-directory $(BUILD_DIR)/$(t)) \
--		 --object-directory $(BUILD_DIR) \
--		-p --html --html-details -o $@, \
--		"GEN", "coverage-report.html")
--
--.PHONY: coverage-report
--coverage-report: $(CURDIR)/reports/coverage/coverage-report.html
--
- ifdef CONFIG_WIN32
- 
- INSTALLER = qemu-setup-$(VERSION)$(EXESUF)
-@@ -640,15 +604,6 @@ endif
- 	$(call print-help,cscope,Generate cscope index)
- 	$(call print-help,sparse,Run sparse on the QEMU source)
- 	@echo  ''
--	@$(if $(TARGET_DIRS), \
--		echo 'Architecture specific targets:'; \
--		$(foreach t, $(TARGET_DIRS), \
--		$(call print-help-run,$(t)/all,Build for $(t)); \
--		$(if $(CONFIG_FUZZ), \
--			$(if $(findstring softmmu,$(t)), \
--				$(call print-help-run,$(t)/fuzz,Build fuzzer for $(t)); \
--		))) \
--		echo '')
- 	@echo  'Cleaning targets:'
- 	$(call print-help,clean,Remove most generated files but keep the config)
- 	$(call print-help,distclean,Remove all generated files)
-diff --git a/Makefile.target b/Makefile.target
+ common-obj-y += $(devices-dirs-y)
+diff --git a/hw/adc/Makefile.objs b/hw/adc/Makefile.objs
 deleted file mode 100644
-index a07149c0a6..0000000000
---- a/Makefile.target
+index 2b9dc36c7f..0000000000
+--- a/hw/adc/Makefile.objs
 +++ /dev/null
-@@ -1,12 +0,0 @@
--# -*- Mode: makefile -*-
--
--BUILD_DIR?=$(CURDIR)/..
--
--include ../config-host.mak
--include config-target.mak
--include $(SRC_PATH)/rules.mak
--
--all:
--install: all
--	
--.PHONY: all clean install
-diff --git a/configure b/configure
-index 74340d2b28..e4306878a7 100755
---- a/configure
-+++ b/configure
-@@ -316,7 +316,6 @@ audio_drv_list=""
- block_drv_rw_whitelist=""
- block_drv_ro_whitelist=""
- host_cc="cc"
--libs_softmmu=""
- libs_tools=""
- audio_win_int=""
- libs_qga=""
-@@ -864,7 +863,6 @@ Darwin)
-   audio_drv_list="coreaudio try-sdl"
-   audio_possible_drivers="coreaudio sdl"
-   QEMU_LDFLAGS="-framework CoreFoundation -framework IOKit $QEMU_LDFLAGS"
--  libs_softmmu="-F/System/Library/Frameworks -framework Cocoa -framework IOKit $libs_softmmu"
-   # Disable attempts to use ObjectiveC features in os/object.h since they
-   # won't work when we're compiling with gcc as a C compiler.
-   QEMU_CFLAGS="-DOS_OBJECT_USE_OBJC=0 $QEMU_CFLAGS"
-@@ -2555,7 +2553,6 @@ if test "$lzo" != "no" ; then
- int main(void) { lzo_version(); return 0; }
- EOF
-     if compile_prog "" "-llzo2" ; then
--        libs_softmmu="$libs_softmmu -llzo2"
-         lzo_libs="-llzo2"
-         lzo="yes"
-     else
-@@ -2575,7 +2572,6 @@ if test "$snappy" != "no" ; then
- int main(void) { snappy_max_compressed_length(4096); return 0; }
- EOF
-     if compile_prog "" "-lsnappy" ; then
--        libs_softmmu="$libs_softmmu -lsnappy"
-         snappy_libs='-lsnappy'
-         snappy="yes"
-     else
-@@ -2675,7 +2671,6 @@ if test "$xen" != "no" ; then
-       xen_pc="$xen_pc xentoolcore"
-     fi
-     QEMU_CFLAGS="$QEMU_CFLAGS $($pkg_config --cflags $xen_pc)"
--    libs_softmmu="$($pkg_config --libs $xen_pc) $libs_softmmu"
-     xen_cflags="$($pkg_config --cflags $xen_pc)"
-     xen_libs="$($pkg_config --libs $xen_pc)"
-   else
-@@ -3420,7 +3415,6 @@ EOF
-   rdma_libs="-lrdmacm -libverbs -libumad"
-   if compile_prog "" "$rdma_libs" ; then
-     rdma="yes"
--    libs_softmmu="$libs_softmmu $rdma_libs"
-   else
-     if test "$rdma" = "yes" ; then
-         error_exit \
-@@ -4451,8 +4445,6 @@ EOF
-   fi
- fi
- 
--libs_softmmu="$libs_softmmu $fdt_libs"
--
- ##########################################
- # opengl probe (for sdl2, gtk, milkymist-tmu2)
- 
-@@ -4676,7 +4668,6 @@ EOF
- 
-   if compile_prog "" "-lnuma" ; then
-     numa=yes
--    libs_softmmu="-lnuma $libs_softmmu"
-     numa_libs="-lnuma"
-   else
-     if test "$numa" = "yes" ; then
-@@ -5218,7 +5209,6 @@ if compile_prog "" "" ; then
-   have_openpty="yes"
- else
-   if compile_prog "" "-lutil" ; then
--    libs_softmmu="-lutil $libs_softmmu"
-     libs_tools="-lutil $libs_tools"
-     have_openpty="yes"
-   fi
-@@ -5237,7 +5227,6 @@ EOF
-      $pkg_config --atleast-version=0.12.3 spice-protocol && \
-      compile_prog "$spice_cflags" "$spice_libs" ; then
-     spice="yes"
--    libs_softmmu="$libs_softmmu $spice_libs"
-     QEMU_CFLAGS="$QEMU_CFLAGS $spice_cflags"
-   else
-     if test "$spice" = "yes" ; then
-@@ -6390,7 +6379,6 @@ if test "$libpmem" != "no"; then
- 		libpmem="yes"
- 		libpmem_libs=$($pkg_config --libs libpmem)
- 		libpmem_cflags=$($pkg_config --cflags libpmem)
--		libs_softmmu="$libs_softmmu $libpmem_libs"
- 		QEMU_CFLAGS="$QEMU_CFLAGS $libpmem_cflags"
- 	else
- 		if test "$libpmem" = "yes" ; then
-@@ -6408,7 +6396,6 @@ if test "$libdaxctl" != "no"; then
- 		libdaxctl="yes"
- 		libdaxctl_libs=$($pkg_config --libs libdaxctl)
- 		libdaxctl_cflags=$($pkg_config --cflags libdaxctl)
--		libs_softmmu="$libs_softmmu $libdaxctl_libs"
- 		QEMU_CFLAGS="$QEMU_CFLAGS $libdaxctl_cflags"
- 	else
- 		if test "$libdaxctl" = "yes" ; then
-@@ -6837,7 +6824,6 @@ echo_version() {
- # prepend pixman and ftd flags after all config tests are done
- QEMU_CFLAGS="$pixman_cflags $fdt_cflags $QEMU_CFLAGS"
- QEMU_LDFLAGS="$fdt_ldflags $QEMU_LDFLAGS"
--libs_softmmu="$pixman_libs $libs_softmmu"
- 
- config_host_mak="config-host.mak"
- 
-@@ -6866,7 +6852,6 @@ echo "qemu_helperdir=$libexecdir" >> $config_host_mak
- echo "qemu_localedir=$qemu_localedir" >> $config_host_mak
- echo "qemu_icondir=$qemu_icondir" >> $config_host_mak
- echo "qemu_desktopdir=$qemu_desktopdir" >> $config_host_mak
--echo "libs_softmmu=$libs_softmmu" >> $config_host_mak
- echo "GIT=$git" >> $config_host_mak
- echo "GIT_SUBMODULES=$git_submodules" >> $config_host_mak
- echo "GIT_UPDATE=$git_update" >> $config_host_mak
-@@ -8117,8 +8102,6 @@ if [ "$TARGET_SYSTBL_ABI" != "" ] && [ "$TARGET_SYSTBL" = "" ]; then
-   TARGET_SYSTBL=syscall.tbl
- fi
- 
--symlink "$source_path/Makefile.target" "$target_dir/Makefile"
--
- upper() {
-     echo "$@"| LC_ALL=C tr '[a-z]' '[A-Z]'
- }
+@@ -1 +0,0 @@
+-common-obj-$(CONFIG_STM32F2XX_ADC) += stm32f2xx_adc.o
+diff --git a/hw/adc/meson.build b/hw/adc/meson.build
+new file mode 100644
+index 0000000000..0d62ae96ae
+--- /dev/null
++++ b/hw/adc/meson.build
+@@ -0,0 +1 @@
++softmmu_ss.add(when: 'CONFIG_STM32F2XX_ADC', if_true: files('stm32f2xx_adc.c'))
+diff --git a/hw/meson.build b/hw/meson.build
+index 624335be90..ffa3f06dc0 100644
+--- a/hw/meson.build
++++ b/hw/meson.build
+@@ -1,3 +1,4 @@
++subdir('adc')
+ subdir('audio')
+ subdir('block')
+ subdir('char')
 -- 
 2.26.2
 
