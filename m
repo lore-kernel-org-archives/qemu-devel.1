@@ -2,87 +2,93 @@ Return-Path: <SRS0=kYy5=B4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3177EC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 15:46:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4313FC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 15:47:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F11552245C
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 15:46:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0A9B620897
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 15:47:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YtxWPFMl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F11552245C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DAG1SOSg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A9B620897
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39850 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43714 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k83oa-0007oO-80
-	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 11:46:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49682)
+	id 1k83ps-000145-6a
+	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 11:47:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40652)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1k83ME-0000W4-Ni
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 11:17:06 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:49281
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1k83MA-0008MI-Ew
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 11:17:00 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597763817;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=wFNRE5ym6NszrXjW7noTZdGM/WMaZvCcZu9Hy/byeKg=;
- b=YtxWPFMlggD+adMUdQRYYj2TFwCo0mxx1yeDntwgQMtyag8JjjAQdXggdSRZKm4Zlx28qs
- SUzhrBPLzTlG0atIr+wqWboOB7qAZE8Y9gW206G3JkcP/OteKNNR2pajNH+7icutHVrbWA
- zirWZoNEfeyLknSIaoamRYIbFcs7wrU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-93-dqao98qQMhOEx19ZK6XKhQ-1; Tue, 18 Aug 2020 11:16:55 -0400
-X-MC-Unique: dqao98qQMhOEx19ZK6XKhQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 36DBA1DDFD;
- Tue, 18 Aug 2020 15:16:53 +0000 (UTC)
-Received: from gondolin (ovpn-112-221.ams2.redhat.com [10.36.112.221])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 41EC939A75;
- Tue, 18 Aug 2020 15:16:40 +0000 (UTC)
-Date: Tue, 18 Aug 2020 17:16:37 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Subject: Re: [PATCH v6 5/7] virtio-scsi-pci: default num_queues to -smp N
-Message-ID: <20200818171637.08d6efee.cohuck@redhat.com>
-In-Reply-To: <20200818143348.310613-6-stefanha@redhat.com>
-References: <20200818143348.310613-1-stefanha@redhat.com>
- <20200818143348.310613-6-stefanha@redhat.com>
-Organization: Red Hat GmbH
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1k82l0-0006hR-Ra; Tue, 18 Aug 2020 10:38:34 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:35158)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1k82kz-0002z7-4W; Tue, 18 Aug 2020 10:38:34 -0400
+Received: by mail-wm1-x344.google.com with SMTP id 184so17254393wmb.0;
+ Tue, 18 Aug 2020 07:38:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=HBZVH8DbVP87G8OaAytsCzNyqaW3XTQSsMrdJGsu7lU=;
+ b=DAG1SOSgzbawLFIyLqQg+HKeKRdOSXKBIsnafrvB5VE82XeY1NItAkJ07Db8Wd72xX
+ 8KHbBHMYAepStJUVH1AeAgu20ULsvWl8Jg4pj2vmlzIDsH/QqxlqHm/xqj1unu2Yz6sS
+ c9cT+HHq2DdOXNe3vhrGgY727CsPe2qXgZgiigibSDPHS0LxiwSlMiOaNqNKr/IeOY57
+ Q8rbvNGWTub4diRI3oKJ2HAx39FA5LFGqifAQjvGG1Xqy6bMSr57OB7O4zEE6A4Oi29a
+ CGkikf8OxYLhKWm6puKoiiGTp9Ch1VNPQCAKVJtRN8swgTOkzM8q+30uMNjf8nyNzuOp
+ aUJw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=HBZVH8DbVP87G8OaAytsCzNyqaW3XTQSsMrdJGsu7lU=;
+ b=gxcdXkpW2DVQbV30fEachprr/eaDWG00cxG3ualsZ78Hjdw28qpmCB2lpDqOgAnk5+
+ +jgNtT494CnLQ/wFKtyrfpXGn7F73W6hIwY/BiSxw3fqW1ahUZOIJF+6uHROdMGPPAjV
+ XzaQ4a8QihTQTmgIbGsPEOZ3dAFWuqRGCoem0Kb6Brho/YEf3ZwqNS+0Tz71B6tGXLA3
+ UfHRtvEvaTMkQPTZcpYAR9sERRKVAXMuAs422IBSXF+nzLJFBRnE5pKfYMFw5fgPp05F
+ XHXOFMThupis66PlFwqH4EVslK6EnX2KFraJZ/hdPmL2SUnw3bDl4qBWkwsbWlHbqhTQ
+ E9jQ==
+X-Gm-Message-State: AOAM533ivht/dUYmK6pVrAS/Zxv75rdqpdIV5aXe0OAj7bXrDd3g6y5N
+ 9jIPPWzzTPCiOR0kuA3l20B9smVlNBU=
+X-Google-Smtp-Source: ABdhPJzeATk3WZykFmKe/Kx+k1ecCKzD6QnmiAlprd2fKDp2brjhbVf69J6rHzTFJzQVDBO3GwP9kA==
+X-Received: by 2002:a1c:b787:: with SMTP id h129mr220955wmf.93.1597761510886; 
+ Tue, 18 Aug 2020 07:38:30 -0700 (PDT)
+Received: from localhost.localdomain (121.red-81-40-121.staticip.rima-tde.net.
+ [81.40.121.121])
+ by smtp.gmail.com with ESMTPSA id z8sm139177wmf.42.2020.08.18.07.38.29
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 18 Aug 2020 07:38:30 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 2/2] hw/core/sysbus: Make sysbus_pass_irq() arguments
+ self-describing
+Date: Tue, 18 Aug 2020 16:38:25 +0200
+Message-Id: <20200818143825.691110-3-f4bug@amsat.org>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200818143825.691110-1-f4bug@amsat.org>
+References: <20200818143825.691110-1-f4bug@amsat.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=cohuck@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=cohuck@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 06:40:33
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::344;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x344.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,45 +101,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
- Thomas Huth <thuth@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- qemu-block@nongnu.org, Peter Maydell <peter.maydell@linaro.org>,
- David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org,
- Eduardo Habkost <ehabkost@redhat.com>,
- Raphael Norwitz <raphael.norwitz@nutanix.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- Fam Zheng <fam@euphon.net>, David Gibson <david@gibson.dropbear.id.au>,
- Max Reitz <mreitz@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-trivial@nongnu.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 18 Aug 2020 15:33:46 +0100
-Stefan Hajnoczi <stefanha@redhat.com> wrote:
+Make the direction sysbus_pass_irq() pass the GPIOs more obvious
+by renaming its arguments as 'from_dev' and 'to_dev'.
 
-> Automatically size the number of virtio-scsi-pci, vhost-scsi-pci, and
-> vhost-user-scsi-pci request virtqueues to match the number of vCPUs.
-> Other transports continue to default to 1 request virtqueue.
-> 
-> A 1:1 virtqueue:vCPU mapping ensures that completion interrupts are
-> handled on the same vCPU that submitted the request.  No IPI is
-> necessary to complete an I/O request and performance is improved.  The
-> maximum number of MSI-X vectors and virtqueues limit are respected.
-> 
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
->  include/hw/virtio/virtio-scsi.h |  2 ++
->  hw/core/machine.c               |  3 +++
->  hw/scsi/vhost-scsi.c            |  3 ++-
->  hw/scsi/vhost-user-scsi.c       |  3 ++-
->  hw/scsi/virtio-scsi.c           |  6 +++++-
->  hw/virtio/vhost-scsi-pci.c      | 10 +++++++---
->  hw/virtio/vhost-user-scsi-pci.c | 10 +++++++---
->  hw/virtio/virtio-scsi-pci.c     | 10 +++++++---
->  8 files changed, 35 insertions(+), 12 deletions(-)
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ include/hw/sysbus.h | 7 ++++++-
+ hw/core/sysbus.c    | 5 ++---
+ 2 files changed, 8 insertions(+), 4 deletions(-)
 
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+diff --git a/include/hw/sysbus.h b/include/hw/sysbus.h
+index da9f85c58ce..65de6f6b062 100644
+--- a/include/hw/sysbus.h
++++ b/include/hw/sysbus.h
+@@ -73,7 +73,12 @@ typedef void FindSysbusDeviceFunc(SysBusDevice *sbdev, void *opaque);
+ void sysbus_init_mmio(SysBusDevice *dev, MemoryRegion *memory);
+ MemoryRegion *sysbus_mmio_get_region(SysBusDevice *dev, int n);
+ void sysbus_init_irq(SysBusDevice *dev, qemu_irq *p);
+-void sysbus_pass_irq(SysBusDevice *dev, SysBusDevice *target);
++/**
++ * sysbus_pass_irq: Pass through IRQ/GPIO lines from one to another device
++ * @to_dev: Device which needs to expose IRQ/GPIO lines
++ * @from_dev: Device which has the IRQ/GPIO lines
++ */
++void sysbus_pass_irq(SysBusDevice *to_dev, SysBusDevice *from_dev);
+ void sysbus_init_ioports(SysBusDevice *dev, uint32_t ioport, uint32_t size);
+ 
+ 
+diff --git a/hw/core/sysbus.c b/hw/core/sysbus.c
+index 70239b7e7d0..bc23a66b5c5 100644
+--- a/hw/core/sysbus.c
++++ b/hw/core/sysbus.c
+@@ -181,10 +181,9 @@ void sysbus_init_irq(SysBusDevice *dev, qemu_irq *p)
+     qdev_init_gpio_out_named(DEVICE(dev), p, SYSBUS_DEVICE_GPIO_IRQ, 1);
+ }
+ 
+-/* Pass IRQs from a target device.  */
+-void sysbus_pass_irq(SysBusDevice *dev, SysBusDevice *target)
++void sysbus_pass_irq(SysBusDevice *to_dev, SysBusDevice *from_dev)
+ {
+-    qdev_pass_gpios(DEVICE(target), DEVICE(dev), SYSBUS_DEVICE_GPIO_IRQ);
++    qdev_pass_gpios(DEVICE(from_dev), DEVICE(to_dev), SYSBUS_DEVICE_GPIO_IRQ);
+ }
+ 
+ void sysbus_init_mmio(SysBusDevice *dev, MemoryRegion *memory)
+-- 
+2.26.2
 
 
