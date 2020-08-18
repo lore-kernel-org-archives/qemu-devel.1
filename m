@@ -7,76 +7,76 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2F74C433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 14:59:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E12AFC433E1
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 14:59:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8DEC22224D
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 14:59:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 67916207DE
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 14:59:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JvJI3e2e"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DEC22224D
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C5aTYyGF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67916207DE
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42250 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46358 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k834q-00006Z-Oe
-	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 10:59:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33584)
+	id 1k835e-0001qd-AH
+	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 10:59:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33062)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k82Lf-0005zh-PI
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:12:23 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:54794
+ id 1k82LD-00051r-A2
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:11:55 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32287
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k82LS-0007bD-2D
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:12:23 -0400
+ id 1k82L2-0007VF-90
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:11:54 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597759927;
+ s=mimecast20190719; t=1597759903;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=RNT/jS4WliFELB3Y4N1skk3//tCoNoB/v6xjsu+GKJM=;
- b=JvJI3e2eHz6Tf/33CNxA68x2el+Z9cPTxGB5BFX8xjdHeFBJydyLhhNccoQhLzIS7J8CmM
- lmtRt0OvYP5qxxm+3AEMdz7ET+zUCa/oPpQx8i5hko5Jk4r3LTqqSMd2WYB/zaiPvg282x
- m/cI62d2FfJFigZVg9syvV0MDMqQ0Ic=
+ bh=m1vdLqyZHYPVpKZYlNKe7l8hkA0P1BlGDeAlf+ZccV8=;
+ b=C5aTYyGFX/20HjjVdVhRzxs+pFW+LMOQ3O+oLqHM3rul4GiOC/maPLfIQ/kt6oldKIZPQA
+ fSKvIMEntwMWHhwlvGfpcklymiAJ7gWCPPdd7uwjfsuHN00O6+6vlbMjwEeHQkibpIJbbn
+ mOIkKMSDwLxI4C4bV3enx7HMSPGGDVA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-441-pE7WhdvsOBeiyOYaOeaIFw-1; Tue, 18 Aug 2020 10:12:06 -0400
-X-MC-Unique: pE7WhdvsOBeiyOYaOeaIFw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-558-mZETlaGpOZauwOBk4iQAjw-1; Tue, 18 Aug 2020 10:11:41 -0400
+X-MC-Unique: mZETlaGpOZauwOBk4iQAjw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3651B1800D41
- for <qemu-devel@nongnu.org>; Tue, 18 Aug 2020 14:12:05 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B29E51007463
+ for <qemu-devel@nongnu.org>; Tue, 18 Aug 2020 14:11:40 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E7ED6600DD;
- Tue, 18 Aug 2020 14:12:04 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6BD45165D8;
+ Tue, 18 Aug 2020 14:11:40 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 121/150] meson: convert hw/char
-Date: Tue, 18 Aug 2020 10:09:56 -0400
-Message-Id: <20200818141025.21608-122-pbonzini@redhat.com>
+Subject: [PULL 086/150] meson: convert hw/core
+Date: Tue, 18 Aug 2020 10:09:21 -0400
+Message-Id: <20200818141025.21608-87-pbonzini@redhat.com>
 In-Reply-To: <20200818141025.21608-1-pbonzini@redhat.com>
 References: <20200818141025.21608-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Spam-Score: 0.003
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 06:40:33
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 03:19:25
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -108,124 +108,147 @@ From: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/Makefile.objs      |  1 -
- hw/char/Makefile.objs | 39 ---------------------------------------
- hw/char/meson.build   | 38 ++++++++++++++++++++++++++++++++++++++
- hw/meson.build        |  1 +
- 4 files changed, 39 insertions(+), 40 deletions(-)
- delete mode 100644 hw/char/Makefile.objs
- create mode 100644 hw/char/meson.build
+ hw/Makefile.objs       |  1 -
+ hw/core/Makefile.objs  | 34 -----------------------------
+ hw/core/meson.build    | 49 ++++++++++++++++++++++++++++++++++++++++++
+ hw/meson.build         |  1 +
+ tests/Makefile.include | 10 +--------
+ 5 files changed, 51 insertions(+), 44 deletions(-)
+ delete mode 100644 hw/core/Makefile.objs
+ create mode 100644 hw/core/meson.build
 
 diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-index 97ad30295e..04cfb6ca6d 100644
+index d204a906af..bdf8bdf256 100644
 --- a/hw/Makefile.objs
 +++ b/hw/Makefile.objs
-@@ -4,7 +4,6 @@ devices-dirs-y += acpi/
- devices-dirs-y += adc/
- devices-dirs-y += audio/
- devices-dirs-y += block/
--devices-dirs-y += char/
- endif
- 
- common-obj-y += $(devices-dirs-y)
-diff --git a/hw/char/Makefile.objs b/hw/char/Makefile.objs
+@@ -1,4 +1,3 @@
+-devices-dirs-y = core/
+ ifeq ($(CONFIG_SOFTMMU), y)
+ devices-dirs-$(call lor,$(CONFIG_VIRTIO_9P),$(call land,$(CONFIG_VIRTFS),$(CONFIG_XEN))) += 9pfs/
+ devices-dirs-y += acpi/
+diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
 deleted file mode 100644
-index bf177ac41d..0000000000
---- a/hw/char/Makefile.objs
+index d8fee8effe..0000000000
+--- a/hw/core/Makefile.objs
 +++ /dev/null
-@@ -1,39 +0,0 @@
--common-obj-$(CONFIG_IPACK) += ipoctal232.o
--common-obj-$(CONFIG_ESCC) += escc.o
--common-obj-$(CONFIG_NRF51_SOC) += nrf51_uart.o
--common-obj-$(CONFIG_PARALLEL) += parallel.o
--common-obj-$(CONFIG_ISA_BUS) += parallel-isa.o
--common-obj-$(CONFIG_PL011) += pl011.o
--common-obj-$(CONFIG_SERIAL) += serial.o
--common-obj-$(CONFIG_SERIAL_ISA) += serial-isa.o
--common-obj-$(CONFIG_SERIAL_PCI) += serial-pci.o
--common-obj-$(CONFIG_SERIAL_PCI_MULTI) += serial-pci-multi.o
--common-obj-$(CONFIG_VIRTIO_SERIAL) += virtio-console.o
--common-obj-$(CONFIG_XILINX) += xilinx_uartlite.o
--common-obj-$(CONFIG_XEN) += xen_console.o
--common-obj-$(CONFIG_CADENCE) += cadence_uart.o
--common-obj-$(CONFIG_IBEX) += ibex_uart.o
+@@ -1,34 +0,0 @@
+-# core qdev-related obj files, also used by *-user:
+-common-obj-y += qdev.o qdev-properties.o
+-common-obj-y += bus.o
+-common-obj-y += cpu.o
+-common-obj-y += resettable.o
+-common-obj-y += hotplug.o
+-common-obj-y += vmstate-if.o
+-# irq.o needed for qdev GPIO handling:
+-common-obj-y += irq.o
+-common-obj-y += clock.o qdev-clock.o
 -
--common-obj-$(CONFIG_EXYNOS4) += exynos4210_uart.o
--common-obj-$(CONFIG_COLDFIRE) += mcf_uart.o
--common-obj-$(CONFIG_OMAP) += omap_uart.o
--common-obj-$(CONFIG_SH4) += sh_serial.o
--common-obj-$(CONFIG_DIGIC) += digic-uart.o
--common-obj-$(CONFIG_STM32F2XX_USART) += stm32f2xx_usart.o
--common-obj-$(CONFIG_RASPI) += bcm2835_aux.o
--common-obj-$(CONFIG_RENESAS_SCI) += renesas_sci.o
--common-obj-$(CONFIG_AVR_USART) += avr_usart.o
+-common-obj-$(CONFIG_SOFTMMU) += reset.o
+-common-obj-$(CONFIG_SOFTMMU) += qdev-fw.o
+-common-obj-$(CONFIG_SOFTMMU) += fw-path-provider.o
+-common-obj-$(CONFIG_SOFTMMU) += nmi.o
+-common-obj-$(CONFIG_SOFTMMU) += vm-change-state-handler.o
+-common-obj-$(CONFIG_SOFTMMU) += qdev-properties-system.o
+-common-obj-$(CONFIG_SOFTMMU) += sysbus.o
+-common-obj-$(CONFIG_SOFTMMU) += machine.o
+-common-obj-$(CONFIG_SOFTMMU) += null-machine.o
+-common-obj-$(CONFIG_SOFTMMU) += loader.o
+-common-obj-$(CONFIG_SOFTMMU) += machine-hmp-cmds.o
+-common-obj-$(CONFIG_SOFTMMU) += numa.o
+-common-obj-$(CONFIG_SOFTMMU) += clock-vmstate.o
+-obj-$(CONFIG_SOFTMMU) += machine-qmp-cmds.o
 -
--common-obj-$(CONFIG_CMSDK_APB_UART) += cmsdk-apb-uart.o
--common-obj-$(CONFIG_ETRAXFS) += etraxfs_ser.o
--common-obj-$(CONFIG_ISA_DEBUG) += debugcon.o
--common-obj-$(CONFIG_GRLIB) += grlib_apbuart.o
--common-obj-$(CONFIG_IMX) += imx_serial.o
--common-obj-$(CONFIG_LM32) += lm32_juart.o
--common-obj-$(CONFIG_LM32) += lm32_uart.o
--common-obj-$(CONFIG_MILKYMIST) += milkymist-uart.o
--common-obj-$(CONFIG_SCLPCONSOLE) += sclpconsole.o sclpconsole-lm.o
--
--obj-$(CONFIG_VIRTIO) += virtio-serial-bus.o
--obj-$(CONFIG_PSERIES) += spapr_vty.o
--obj-$(CONFIG_TERMINAL3270) += terminal3270.o
-diff --git a/hw/char/meson.build b/hw/char/meson.build
+-common-obj-$(CONFIG_XILINX_AXI) += stream.o
+-common-obj-$(CONFIG_PTIMER) += ptimer.o
+-common-obj-$(CONFIG_FITLOADER) += loader-fit.o
+-common-obj-$(CONFIG_REGISTER) += register.o
+-common-obj-$(CONFIG_OR_IRQ) += or-irq.o
+-common-obj-$(CONFIG_SPLIT_IRQ) += split-irq.o
+-common-obj-$(CONFIG_PLATFORM_BUS) += platform-bus.o
+-common-obj-$(CONFIG_GENERIC_LOADER) += generic-loader.o
+diff --git a/hw/core/meson.build b/hw/core/meson.build
 new file mode 100644
-index 0000000000..e888215145
+index 0000000000..fc91f98075
 --- /dev/null
-+++ b/hw/char/meson.build
-@@ -0,0 +1,38 @@
-+softmmu_ss.add(when: 'CONFIG_CADENCE', if_true: files('cadence_uart.c'))
-+softmmu_ss.add(when: 'CONFIG_CMSDK_APB_UART', if_true: files('cmsdk-apb-uart.c'))
-+softmmu_ss.add(when: 'CONFIG_ESCC', if_true: files('escc.c'))
-+softmmu_ss.add(when: 'CONFIG_ETRAXFS', if_true: files('etraxfs_ser.c'))
-+softmmu_ss.add(when: 'CONFIG_GRLIB', if_true: files('grlib_apbuart.c'))
-+softmmu_ss.add(when: 'CONFIG_IBEX', if_true: files('ibex_uart.c'))
-+softmmu_ss.add(when: 'CONFIG_IMX', if_true: files('imx_serial.c'))
-+softmmu_ss.add(when: 'CONFIG_IPACK', if_true: files('ipoctal232.c'))
-+softmmu_ss.add(when: 'CONFIG_ISA_BUS', if_true: files('parallel-isa.c'))
-+softmmu_ss.add(when: 'CONFIG_ISA_DEBUG', if_true: files('debugcon.c'))
-+softmmu_ss.add(when: 'CONFIG_LM32', if_true: files('lm32_juart.c'))
-+softmmu_ss.add(when: 'CONFIG_LM32', if_true: files('lm32_uart.c'))
-+softmmu_ss.add(when: 'CONFIG_MILKYMIST', if_true: files('milkymist-uart.c'))
-+softmmu_ss.add(when: 'CONFIG_NRF51_SOC', if_true: files('nrf51_uart.c'))
-+softmmu_ss.add(when: 'CONFIG_PARALLEL', if_true: files('parallel.c'))
-+softmmu_ss.add(when: 'CONFIG_PL011', if_true: files('pl011.c'))
-+softmmu_ss.add(when: 'CONFIG_SCLPCONSOLE', if_true: files('sclpconsole.c', 'sclpconsole-lm.c'))
-+softmmu_ss.add(when: 'CONFIG_SERIAL', if_true: files('serial.c'))
-+softmmu_ss.add(when: 'CONFIG_SERIAL_ISA', if_true: files('serial-isa.c'))
-+softmmu_ss.add(when: 'CONFIG_SERIAL_PCI', if_true: files('serial-pci.c'))
-+softmmu_ss.add(when: 'CONFIG_SERIAL_PCI_MULTI', if_true: files('serial-pci-multi.c'))
-+softmmu_ss.add(when: 'CONFIG_VIRTIO_SERIAL', if_true: files('virtio-console.c'))
-+softmmu_ss.add(when: 'CONFIG_XEN', if_true: files('xen_console.c'))
-+softmmu_ss.add(when: 'CONFIG_XILINX', if_true: files('xilinx_uartlite.c'))
++++ b/hw/core/meson.build
+@@ -0,0 +1,49 @@
++# core qdev-related obj files, also used by *-user and unit tests
++hwcore_files = files(
++  'bus.c',
++  'fw-path-provider.c',
++  'hotplug.c',
++  'qdev-properties.c',
++  'qdev.c',
++  'reset.c',
++  'resettable.c',
++  'vmstate-if.c',
++  # irq.c needed for qdev GPIO handling:
++  'irq.c',
++  'clock.c',
++  'qdev-clock.c',
++)
 +
-+softmmu_ss.add(when: 'CONFIG_AVR_USART', if_true: files('avr_usart.c'))
-+softmmu_ss.add(when: 'CONFIG_COLDFIRE', if_true: files('mcf_uart.c'))
-+softmmu_ss.add(when: 'CONFIG_DIGIC', if_true: files('digic-uart.c'))
-+softmmu_ss.add(when: 'CONFIG_EXYNOS4', if_true: files('exynos4210_uart.c'))
-+softmmu_ss.add(when: 'CONFIG_OMAP', if_true: files('omap_uart.c'))
-+softmmu_ss.add(when: 'CONFIG_RASPI', if_true: files('bcm2835_aux.c'))
-+softmmu_ss.add(when: 'CONFIG_RENESAS_SCI', if_true: files('renesas_sci.c'))
-+softmmu_ss.add(when: 'CONFIG_SH4', if_true: files('sh_serial.c'))
-+softmmu_ss.add(when: 'CONFIG_STM32F2XX_USART', if_true: files('stm32f2xx_usart.c'))
++libhwcore = static_library('hwcore', sources: hwcore_files + genh,
++                           name_suffix: 'fa',
++                           build_by_default: false)
++hwcore = declare_dependency(link_whole: libhwcore)
++common_ss.add(hwcore)
 +
-+specific_ss.add(when: 'CONFIG_TERMINAL3270', if_true: files('terminal3270.c'))
-+specific_ss.add(when: 'CONFIG_VIRTIO', if_true: files('virtio-serial-bus.c'))
-+specific_ss.add(when: 'CONFIG_PSERIES', if_true: files('spapr_vty.c'))
++common_ss.add(files('cpu.c'))
++common_ss.add(when: 'CONFIG_FITLOADER', if_true: files('loader-fit.c'))
++common_ss.add(when: 'CONFIG_GENERIC_LOADER', if_true: files('generic-loader.c'))
++common_ss.add(when: 'CONFIG_OR_IRQ', if_true: files('or-irq.c'))
++common_ss.add(when: 'CONFIG_PLATFORM_BUS', if_true: files('platform-bus.c'))
++common_ss.add(when: 'CONFIG_PTIMER', if_true: files('ptimer.c'))
++common_ss.add(when: 'CONFIG_REGISTER', if_true: files('register.c'))
++common_ss.add(when: 'CONFIG_SPLIT_IRQ', if_true: files('split-irq.c'))
++common_ss.add(when: 'CONFIG_XILINX_AXI', if_true: files('stream.c'))
++
++softmmu_ss.add(files(
++  'loader.c',
++  'machine-hmp-cmds.c',
++  'machine.c',
++  'nmi.c',
++  'null-machine.c',
++  'qdev-fw.c',
++  'qdev-properties-system.c',
++  'sysbus.c',
++  'vm-change-state-handler.c',
++  'clock-vmstate.c',
++))
++
++specific_ss.add(when: 'CONFIG_SOFTMMU', if_true: files(
++  'machine-qmp-cmds.c',
++  'numa.c',
++))
 diff --git a/hw/meson.build b/hw/meson.build
-index 103da4840b..dd0c77ec2b 100644
+index 08112a5e4b..fe7c466460 100644
 --- a/hw/meson.build
 +++ b/hw/meson.build
-@@ -1,3 +1,4 @@
-+subdir('char')
- subdir('core')
- subdir('cpu')
- subdir('display')
+@@ -1 +1,2 @@
++subdir('core')
+ subdir('xen')
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 425c8ce699..b6d96614cb 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -244,15 +244,7 @@ tests/test-bufferiszero$(EXESUF): tests/test-bufferiszero.o $(test-util-obj-y)
+ tests/atomic_add-bench$(EXESUF): tests/atomic_add-bench.o $(test-util-obj-y)
+ tests/atomic64-bench$(EXESUF): tests/atomic64-bench.o $(test-util-obj-y)
+ 
+-tests/test-qdev-global-props$(EXESUF): tests/test-qdev-global-props.o \
+-	hw/core/qdev.o hw/core/qdev-properties.o hw/core/hotplug.o\
+-	hw/core/bus.o \
+-	hw/core/resettable.o \
+-	hw/core/irq.o \
+-	hw/core/fw-path-provider.o \
+-	hw/core/reset.o \
+-	hw/core/vmstate-if.o \
+-	hw/core/clock.o hw/core/qdev-clock.o \
++tests/test-qdev-global-props$(EXESUF): tests/test-qdev-global-props.o hw/core/libhwcore.fa \
+ 	$(test-qapi-obj-y)
+ tests/test-vmstate$(EXESUF): tests/test-vmstate.o migration/libmigration.fa \
+ 	$(test-io-obj-y)
 -- 
 2.26.2
 
