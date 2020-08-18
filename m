@@ -7,77 +7,76 @@ X-Spam-Status: No, score=-14.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25334C433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 10:26:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5619C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 10:27:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E73A420786
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 10:26:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AFBFD20674
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 10:27:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZKKhDXFO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E73A420786
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IQfwSBYD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AFBFD20674
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38012 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40866 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7ypL-0002UW-5c
-	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 06:26:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48116)
+	id 1k7yqD-0003dY-HV
+	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 06:27:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48346)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k7yoB-000126-Js
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 06:25:35 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:48766
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k7yor-000271-0M
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 06:26:17 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:41782)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k7yo9-0000sz-M9
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 06:25:35 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k7yop-00011Y-69
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 06:26:16 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597746333;
+ s=mimecast20190719; t=1597746374;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=oai5LciPeFAN3lsjCqzp3GGdpPybxXekYnT95jgJG8k=;
- b=ZKKhDXFO35GULVTF66PRumB7nSZr0titJ/kjCytAYZ/ElzmnYTsthbMW217/3GLawC/jwH
- HzscGk/pralFNytlYiolvN/vrjhwRMZNys+WBEwjKBzkFM1DHLCxpeeNqS3WJz6ItDvy0e
- mMtnqrvCqTL0PDT9tefyzKXMMqzO0HA=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-464-3rPTmFA2MOCy3fL2dH8VYw-1; Tue, 18 Aug 2020 06:25:31 -0400
-X-MC-Unique: 3rPTmFA2MOCy3fL2dH8VYw-1
-Received: by mail-wr1-f72.google.com with SMTP id t12so8104512wrp.0
- for <qemu-devel@nongnu.org>; Tue, 18 Aug 2020 03:25:31 -0700 (PDT)
+ bh=BMJKTM6pUo8Mz9tUOtDtFydWnxlyaAxxtwZAfbnkqZY=;
+ b=IQfwSBYDdyYaNCdcdbNWUpxZATSvKRPzo4nZmifWwIu6RIhYPgWlg5RFYffIfR9T2+WhEX
+ rgD5udHZrz2oMKd0ZYEmOwPXjCyYBoiPL/DdU7Ls7B4EAiVsORZX5eWQ7pKTP6Msj9kbVd
+ yQGIw5KC6FonSj1xE86aYT8Kuai6wXw=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-381-dPkBPXULPOa-Ctf57nus0w-1; Tue, 18 Aug 2020 06:26:12 -0400
+X-MC-Unique: dPkBPXULPOa-Ctf57nus0w-1
+Received: by mail-wm1-f70.google.com with SMTP id z1so7222848wmf.9
+ for <qemu-devel@nongnu.org>; Tue, 18 Aug 2020 03:26:12 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=oai5LciPeFAN3lsjCqzp3GGdpPybxXekYnT95jgJG8k=;
- b=uK3ePhwvh90SW+g6kOPWnOTscxcTlUbxoZ+SADSR+I71JLimIFxmcwXkJ4nB3g5gA9
- BaxmSQqyBcMUzwT//qSTLbVNc0tF48ax5hW83lsNjwS7jBX1g7xCiRLMC+U3tuWvA6YA
- BAaRXg4CMwjdPRqXa0r0yZKj1WbFI6Bn3s/d90Iqu+Rp9zuXyQDnd/r8l7g6saGh7a7b
- DSATECdWE2//xRIo5RvI5eE6C/I/BBC1it5aT/wKyh6B3hhaO9RJ0AH3hsZ4GBpqhqSX
- ++kh6rldzgRstIwyru3l8HfD3Tv8kVhF8jeXYlMCgnSdBKQ8n182vRZ/S9Nicb2z0RlN
- RaKg==
-X-Gm-Message-State: AOAM530XIC98QZDHnQ056MhgWLV6fFsnhsBnpin0fPTo8+YEW5d9PCOZ
- ywuMQ3r8OicI82pJjyy8RycbeQnJDsbhtM0JELFKUsmHRvRRj1WhjtSu0NLjQsO8ezZzwB4ke96
- 0R1VSLFzZ+2tNJac=
-X-Received: by 2002:adf:dfd0:: with SMTP id q16mr21335754wrn.60.1597746330116; 
- Tue, 18 Aug 2020 03:25:30 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx1Ybd6wef6sTcxihOBPmGhoc3/2PdRE1dBm6lsKlC3o/xK+4FzVIpK9o5Mt3oDdbi5Z5lw1Q==
-X-Received: by 2002:adf:dfd0:: with SMTP id q16mr21335737wrn.60.1597746329916; 
- Tue, 18 Aug 2020 03:25:29 -0700 (PDT)
+ bh=BMJKTM6pUo8Mz9tUOtDtFydWnxlyaAxxtwZAfbnkqZY=;
+ b=uUDx/iDNZHWMuC17gY2ny3yDn+K925OjK+ieERZWX4qDFMogECctHJXFwmeMsjtFhR
+ 7xfsb9ah22KftsFRuTzbtABjzmBh5RG44P5e/d3WmPIMWq3GoPJGt/DHUxIbkN4R/txt
+ EsgMfsmnBqV2U5URp2H4z+hWxF8hHsvySr3VfRxZvXq9xP6+tzxJ6bvNDAip+fs5v1MM
+ KaCRJ3osRcfmOqPrBPu6ZVE44reRyzr5RF62Eoz3ify2h5/F+ZHEELHknYue4jBUfKQ+
+ SDG+ZsRoXTTSZrKYUB78GdY9NkNbYLkk/twL0FtufdWn9QnmNiNK3fEGHxdrA589Icn4
+ TyeA==
+X-Gm-Message-State: AOAM533mg5FtFwzbg5/LYcAAxsqflsESP3rwlE0BZcisWz8uxLaopRtK
+ xkAdsO/HCww5jZ1xcBobU2B+0nx4lZn82ZzjFdyc5MOUX4f8fAYQXQk2ACIKq7NKvN/lEKJenBu
+ LQOKj1YDPgErNKdk=
+X-Received: by 2002:a1c:b145:: with SMTP id a66mr19728472wmf.133.1597746371406; 
+ Tue, 18 Aug 2020 03:26:11 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyM+mjKi15NUXsAD4I5hSusKs4t0qJRzpCafyspIhAw/P9taMsat5uFN3hLBMJ/zaVDqqcwNg==
+X-Received: by 2002:a1c:b145:: with SMTP id a66mr19728461wmf.133.1597746371160; 
+ Tue, 18 Aug 2020 03:26:11 -0700 (PDT)
 Received: from [192.168.1.36] (121.red-81-40-121.staticip.rima-tde.net.
  [81.40.121.121])
- by smtp.gmail.com with ESMTPSA id 32sm35183703wrn.86.2020.08.18.03.25.28
+ by smtp.gmail.com with ESMTPSA id m126sm33396283wmf.3.2020.08.18.03.26.10
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 18 Aug 2020 03:25:29 -0700 (PDT)
-Subject: Re: [PATCH 119/150] meson: convert hw/cpu
+ Tue, 18 Aug 2020 03:26:10 -0700 (PDT)
+Subject: Re: [PATCH 123/150] meson: convert hw/adc
 To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 References: <20200817143723.343284-1-pbonzini@redhat.com>
- <20200817144053.345107-24-pbonzini@redhat.com>
+ <20200817144053.345107-28-pbonzini@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Autocrypt: addr=philmd@redhat.com; keydata=
  mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
@@ -102,30 +101,31 @@ Autocrypt: addr=philmd@redhat.com; keydata=
  9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
  RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
  apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <96cd8467-6dd6-2282-9d30-1569c9467dbb@redhat.com>
-Date: Tue, 18 Aug 2020 12:25:28 +0200
+Message-ID: <b8f5195e-a755-8550-d49c-3261b33ae9e3@redhat.com>
+Date: Tue, 18 Aug 2020 12:26:09 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200817144053.345107-24-pbonzini@redhat.com>
+In-Reply-To: <20200817144053.345107-28-pbonzini@redhat.com>
 Content-Language: en-US
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: none client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 02:16:14
+Received-SPF: none client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 03:22:11
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
 X-Spam_bar: ----
 X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -150,58 +150,48 @@ On 8/17/20 4:40 PM, Paolo Bonzini wrote:
 > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
 >  hw/Makefile.objs     | 1 -
->  hw/cpu/Makefile.objs | 5 -----
->  hw/cpu/meson.build   | 6 ++++++
+>  hw/adc/Makefile.objs | 1 -
+>  hw/adc/meson.build   | 1 +
 >  hw/meson.build       | 1 +
->  4 files changed, 7 insertions(+), 6 deletions(-)
->  delete mode 100644 hw/cpu/Makefile.objs
->  create mode 100644 hw/cpu/meson.build
+>  4 files changed, 2 insertions(+), 2 deletions(-)
+>  delete mode 100644 hw/adc/Makefile.objs
+>  create mode 100644 hw/adc/meson.build
 > 
 > diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-> index 6fce6a1473..97ad30295e 100644
+> index c0cbc0f132..4bdb674ef0 100644
 > --- a/hw/Makefile.objs
 > +++ b/hw/Makefile.objs
-> @@ -5,7 +5,6 @@ devices-dirs-y += adc/
->  devices-dirs-y += audio/
->  devices-dirs-y += block/
->  devices-dirs-y += char/
-> -devices-dirs-y += cpu/
+> @@ -1,7 +1,6 @@
+>  ifeq ($(CONFIG_SOFTMMU), y)
+>  devices-dirs-$(call lor,$(CONFIG_VIRTIO_9P),$(call land,$(CONFIG_VIRTFS),$(CONFIG_XEN))) += 9pfs/
+>  devices-dirs-y += acpi/
+> -devices-dirs-y += adc/
 >  endif
 >  
 >  common-obj-y += $(devices-dirs-y)
-> diff --git a/hw/cpu/Makefile.objs b/hw/cpu/Makefile.objs
+> diff --git a/hw/adc/Makefile.objs b/hw/adc/Makefile.objs
 > deleted file mode 100644
-> index 8db9e8a7b3..0000000000
-> --- a/hw/cpu/Makefile.objs
+> index 2b9dc36c7f..0000000000
+> --- a/hw/adc/Makefile.objs
 > +++ /dev/null
-> @@ -1,5 +0,0 @@
-> -obj-$(CONFIG_ARM11MPCORE) += arm11mpcore.o
-> -obj-$(CONFIG_REALVIEW) += realview_mpcore.o
-> -obj-$(CONFIG_A9MPCORE) += a9mpcore.o
-> -obj-$(CONFIG_A15MPCORE) += a15mpcore.o
-> -common-obj-y += core.o cluster.o
-> diff --git a/hw/cpu/meson.build b/hw/cpu/meson.build
+> @@ -1 +0,0 @@
+> -common-obj-$(CONFIG_STM32F2XX_ADC) += stm32f2xx_adc.o
+> diff --git a/hw/adc/meson.build b/hw/adc/meson.build
 > new file mode 100644
-> index 0000000000..9e52fee9e7
+> index 0000000000..0d62ae96ae
 > --- /dev/null
-> +++ b/hw/cpu/meson.build
-> @@ -0,0 +1,6 @@
-> +softmmu_ss.add(files('core.c', 'cluster.c'))
-> +
-> +specific_ss.add(when: 'CONFIG_ARM11MPCORE', if_true: files('arm11mpcore.c'))
-> +specific_ss.add(when: 'CONFIG_REALVIEW', if_true: files('realview_mpcore.c'))
-> +specific_ss.add(when: 'CONFIG_A9MPCORE', if_true: files('a9mpcore.c'))
-> +specific_ss.add(when: 'CONFIG_A15MPCORE', if_true: files('a15mpcore.c'))
+> +++ b/hw/adc/meson.build
+> @@ -0,0 +1 @@
+> +softmmu_ss.add(when: 'CONFIG_STM32F2XX_ADC', if_true: files('stm32f2xx_adc.c'))
 > diff --git a/hw/meson.build b/hw/meson.build
-> index dacd26c561..103da4840b 100644
+> index 624335be90..ffa3f06dc0 100644
 > --- a/hw/meson.build
 > +++ b/hw/meson.build
-> @@ -1,4 +1,5 @@
->  subdir('core')
-> +subdir('cpu')
->  subdir('display')
->  subdir('dma')
->  subdir('gpio')
+> @@ -1,3 +1,4 @@
+> +subdir('adc')
+>  subdir('audio')
+>  subdir('block')
+>  subdir('char')
 > 
 
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
