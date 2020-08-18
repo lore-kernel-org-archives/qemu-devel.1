@@ -2,105 +2,79 @@ Return-Path: <SRS0=kYy5=B4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.9 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED956C433E4
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 15:19:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA930C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 15:20:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ACADA207DA
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 15:19:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 800C22054F
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 15:20:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JVxbIyMV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACADA207DA
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BfS5dGOT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 800C22054F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45092 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51280 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k83Of-0004Fm-Qo
-	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 11:19:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37220)
+	id 1k83Pk-0006mt-Jn
+	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 11:20:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33500)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1k82YS-0004c6-VR
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:25:36 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:27612
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1k82Lb-0005pF-EA
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:12:19 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:54978
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1k82YR-0000tf-Bw
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:25:36 -0400
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1k82LL-0007Zl-4y
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:12:19 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597760733;
+ s=mimecast20190719; t=1597759922;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=90uu1gc8u2zW9HTtObOvz1uXaozhja6ySEf9NUG3ipI=;
- b=JVxbIyMVbp35lsyoQJid+chK2BEc+g18BimoPcyLU+cJ3oGYHMfsEye+1/Y1AaM25WseEo
- ZfTrMR6N+fFT/b1/ohbz+PVfzxEI6C3lPs1Zb8b4hnQBKWpDp6cQpIrdp+GtV53MYah2go
- kRD6F2/PPh4SUzsPwGxxpR1HrZeQ+24=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=H9FavuJqmxsGLhsOxpQUaI0es2WjXRSahOLPo6Hf8MQ=;
+ b=BfS5dGOTZNi9sMs2J+1DpIahHZwtCzCFvYS3XhKihrFprmqQusRRhWjX3F/93C1AQIY14X
+ hKRZ6XW5bRJB9D9ClNLwJuH+oDOy41Sstj1TnoW1e+x2BUtZSBcApbYkbPgxgBYeaDuOpk
+ irgtbnOeD0ijjevq6ZmxD0+hIdTYTOU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-177-avYxWoUvPg6_fcH_jg-oLw-1; Tue, 18 Aug 2020 10:25:31 -0400
-X-MC-Unique: avYxWoUvPg6_fcH_jg-oLw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-253-tEWOPgfPN8S-qGBBJ0_Udw-1; Tue, 18 Aug 2020 10:11:58 -0400
+X-MC-Unique: tEWOPgfPN8S-qGBBJ0_Udw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 865E880BCA1;
- Tue, 18 Aug 2020 14:25:30 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-112-119.ams2.redhat.com
- [10.36.112.119])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 620D05D757;
- Tue, 18 Aug 2020 14:25:29 +0000 (UTC)
-Subject: Re: [RFC PATCH 16/22] block/export: Allocate BlockExport in
- blk_exp_add()
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-References: <20200813162935.210070-1-kwolf@redhat.com>
- <20200813162935.210070-17-kwolf@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <4b937863-ee77-26e5-7ad6-867002e6e2fb@redhat.com>
-Date: Tue, 18 Aug 2020 16:25:27 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F264581F017
+ for <qemu-devel@nongnu.org>; Tue, 18 Aug 2020 14:11:57 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com
+ (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B1210196B6;
+ Tue, 18 Aug 2020 14:11:57 +0000 (UTC)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL 113/150] meson: convert hw/input
+Date: Tue, 18 Aug 2020 10:09:48 -0400
+Message-Id: <20200818141025.21608-114-pbonzini@redhat.com>
+In-Reply-To: <20200818141025.21608-1-pbonzini@redhat.com>
+References: <20200818141025.21608-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200813162935.210070-17-kwolf@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
-X-Mimecast-Spam-Score: 0.0
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="ZujjayNp4T5ES1qga4vf84EQ4HPtMJIMj"
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=mreitz@redhat.com;
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 08:01:06
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -110,7 +84,7 @@ X-Spam_bar: ----
 X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -123,87 +97,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ZujjayNp4T5ES1qga4vf84EQ4HPtMJIMj
-Content-Type: multipart/mixed; boundary="xEPYPRySBe2Md370nGpSF9Y1o70efxzRJ"
+From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
---xEPYPRySBe2Md370nGpSF9Y1o70efxzRJ
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ hw/Makefile.objs       |  1 -
+ hw/input/Makefile.objs | 18 ------------------
+ hw/input/meson.build   | 18 ++++++++++++++++++
+ hw/meson.build         |  1 +
+ 4 files changed, 19 insertions(+), 19 deletions(-)
+ delete mode 100644 hw/input/Makefile.objs
+ create mode 100644 hw/input/meson.build
 
-On 13.08.20 18:29, Kevin Wolf wrote:
-> Instead of letting the driver allocate and return the BlockExport
-> object, allocate it already in blk_exp_add() and pass it. This allows us
-> to initialise the generic part before calling into the driver so that
-> the driver can just use these values instead of having to parse the
-> options a second time.
->=20
-> For symmetry, move freeing the BlockExport to blk_exp_unref().
->=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  include/block/export.h |  3 ++-
->  include/block/nbd.h    | 11 ++++++-----
->  block/export/export.c  | 17 ++++++++++++++++-
->  blockdev-nbd.c         | 24 +++++++++++++-----------
->  nbd/server.c           | 30 +++++++++++++-----------------
->  5 files changed, 50 insertions(+), 35 deletions(-)
+diff --git a/hw/Makefile.objs b/hw/Makefile.objs
+index 80b104168a..3feccd83d7 100644
+--- a/hw/Makefile.objs
++++ b/hw/Makefile.objs
+@@ -12,7 +12,6 @@ devices-dirs-y += gpio/
+ devices-dirs-$(CONFIG_HYPERV) += hyperv/
+ devices-dirs-$(CONFIG_I2C) += i2c/
+ devices-dirs-y += ide/
+-devices-dirs-y += input/
+ endif
+ 
+ common-obj-y += $(devices-dirs-y)
+diff --git a/hw/input/Makefile.objs b/hw/input/Makefile.objs
+deleted file mode 100644
+index abc1ff03c0..0000000000
+--- a/hw/input/Makefile.objs
++++ /dev/null
+@@ -1,18 +0,0 @@
+-common-obj-$(CONFIG_ADB) += adb.o adb-mouse.o adb-kbd.o
+-common-obj-y += hid.o
+-common-obj-$(CONFIG_LM832X) += lm832x.o
+-common-obj-$(CONFIG_PCKBD) += pckbd.o
+-common-obj-$(CONFIG_PL050) += pl050.o
+-common-obj-$(CONFIG_PS2) += ps2.o
+-common-obj-$(CONFIG_STELLARIS_INPUT) += stellaris_input.o
+-common-obj-$(CONFIG_TSC2005) += tsc2005.o
+-
+-common-obj-$(CONFIG_VIRTIO_INPUT) += virtio-input.o
+-common-obj-$(CONFIG_VIRTIO_INPUT) += virtio-input-hid.o
+-common-obj-$(CONFIG_VIRTIO_INPUT_HOST) += virtio-input-host.o
+-common-obj-$(CONFIG_VHOST_USER_INPUT) += vhost-user-input.o
+-
+-common-obj-$(CONFIG_MILKYMIST) += milkymist-softusb.o
+-common-obj-$(CONFIG_PXA2XX) += pxa2xx_keypad.o
+-common-obj-$(CONFIG_TSC210X) += tsc210x.o
+-common-obj-$(CONFIG_LASIPS2) += lasips2.o
+diff --git a/hw/input/meson.build b/hw/input/meson.build
+new file mode 100644
+index 0000000000..e7285b15ae
+--- /dev/null
++++ b/hw/input/meson.build
+@@ -0,0 +1,18 @@
++softmmu_ss.add(files('hid.c'))
++softmmu_ss.add(when: 'CONFIG_ADB', if_true: files('adb.c', 'adb-mouse.c', 'adb-kbd.c'))
++softmmu_ss.add(when: 'CONFIG_LM832X', if_true: files('lm832x.c'))
++softmmu_ss.add(when: 'CONFIG_PCKBD', if_true: files('pckbd.c'))
++softmmu_ss.add(when: 'CONFIG_PL050', if_true: files('pl050.c'))
++softmmu_ss.add(when: 'CONFIG_PS2', if_true: files('ps2.c'))
++softmmu_ss.add(when: 'CONFIG_STELLARIS_INPUT', if_true: files('stellaris_input.c'))
++softmmu_ss.add(when: 'CONFIG_TSC2005', if_true: files('tsc2005.c'))
++
++softmmu_ss.add(when: 'CONFIG_VIRTIO_INPUT', if_true: files('virtio-input.c'))
++softmmu_ss.add(when: 'CONFIG_VIRTIO_INPUT', if_true: files('virtio-input-hid.c'))
++softmmu_ss.add(when: 'CONFIG_VIRTIO_INPUT_HOST', if_true: files('virtio-input-host.c'))
++softmmu_ss.add(when: 'CONFIG_VHOST_USER_INPUT', if_true: files('vhost-user-input.c'))
++
++softmmu_ss.add(when: 'CONFIG_MILKYMIST', if_true: files('milkymist-softusb.c'))
++softmmu_ss.add(when: 'CONFIG_PXA2XX', if_true: files('pxa2xx_keypad.c'))
++softmmu_ss.add(when: 'CONFIG_TSC210X', if_true: files('tsc210x.c'))
++softmmu_ss.add(when: 'CONFIG_LASIPS2', if_true: files('lasips2.c'))
+diff --git a/hw/meson.build b/hw/meson.build
+index 986e710287..b15c8d0970 100644
+--- a/hw/meson.build
++++ b/hw/meson.build
+@@ -1,4 +1,5 @@
+ subdir('core')
++subdir('input')
+ subdir('intc')
+ subdir('ipack')
+ subdir('ipmi')
+-- 
+2.26.2
 
-[...]
-
-> diff --git a/block/export/export.c b/block/export/export.c
-> index ef86bf892b..9de108cbc1 100644
-> --- a/block/export/export.c
-> +++ b/block/export/export.c
-
-[...]
-
-> @@ -46,7 +48,19 @@ BlockExport *blk_exp_add(BlockExportOptions *export, E=
-rror **errp)
->          return NULL;
->      }
-> =20
-> -    return drv->create(export, errp);
-
-assert(drv->instance_size >=3D sizeof(BlockExport)) might be nice before
-dereferencing *exp.
-
-With that:
-
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-
-> +    exp =3D g_malloc0(drv->instance_size);
-> +    *exp =3D (BlockExport) {
-> +        .drv        =3D &blk_exp_nbd,
-> +        .refcount   =3D 1,
-> +    };
-
-
---xEPYPRySBe2Md370nGpSF9Y1o70efxzRJ--
-
---ZujjayNp4T5ES1qga4vf84EQ4HPtMJIMj
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl875NcACgkQ9AfbAGHV
-z0CV7QgAoJeg3yseNLyYrcYHZ3e4unaS+bG8/fSM1iNFQtkfW3UpbjRSvOKYfEDn
-04CLTKjg8etbnA7Pe3q4oss/jefL3ahih0foWD2inzflLIqIyuluBsAsjoFHla38
-ofAGLTEVEDghcpn2fdwqDBziTjZ2Gvt9CXF574kNyQlE+8yA33676MZJCWlNalq3
-Gz9ruix2GS6qSvjq4bQf+R8th4o1NwZpIf4F/bPp6DzXlnbwiTDFgPLOzGndjWDa
-TMrQwuS+1rR5+nIOsDhGgaQc07GvkrolLqqa+u6RZj97h/oEA4SDLrd/0ryQTzXG
-2v8K0qs46MpFxc/D7Eu0FHMXNMFjWA==
-=ow3D
------END PGP SIGNATURE-----
-
---ZujjayNp4T5ES1qga4vf84EQ4HPtMJIMj--
 
 
