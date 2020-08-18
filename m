@@ -7,85 +7,84 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60070C433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 14:32:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44631C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 14:32:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 29B092076E
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 14:32:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 11699207DA
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 14:32:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FnelcDxU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 29B092076E
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NkvZZk+O"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11699207DA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38724 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40542 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k82es-0007qI-7h
-	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 10:32:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60662)
+	id 1k82fC-00009S-7Z
+	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 10:32:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60470)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k82Ke-0003tu-Gx
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:11:20 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:50721
+ id 1k82KU-0003ct-7F
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:11:10 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:42174
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k82KV-0007O6-Tr
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:11:20 -0400
+ id 1k82KJ-0007MJ-Oc
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:11:08 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597759869;
+ s=mimecast20190719; t=1597759858;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=efn93JT+sD0D3wyRay4HVSFzwAjTKI69jhk/1i4+Kes=;
- b=FnelcDxUgAKhogdw1SDj7MtQU3O0g9SLvkQ10s3dhO+eKWjTS9fLojvfbOtW/tGflsB+qZ
- o4+7gAUGUvSscCLSE2GD2zec608lmg0T4lPqGsRn8k/WbF6MxKZsw41Mi/q2bGah031c+n
- SCZtRpOjoyNGxmpUh0LeM5+Oko5mFuE=
+ bh=8qmeOPZVy3Ojwwllvg28lnFvp59kGLmyQpnHaYZNo+o=;
+ b=NkvZZk+OX5+Ji4J0NuGSiwW3heJ7V4UMVHbRNyvXR3WOacil9Oah0xEKp+zjijDjuSZkSw
+ ryLxOUBhnUKLUfHxcC1N8RMhAikQRTWoz2vrJEGy1+nHJVTOf7bbfhOb+76AcU7+C17zZ0
+ dMM+4UXlMCsIgzv8bV1n17kJnZKdDWk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-85--99LKWICPXS1Qjp47n4TXA-1; Tue, 18 Aug 2020 10:11:07 -0400
-X-MC-Unique: -99LKWICPXS1Qjp47n4TXA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-10-q-wjsbuXNbioI3BaLp-NyQ-1; Tue, 18 Aug 2020 10:10:56 -0400
+X-MC-Unique: q-wjsbuXNbioI3BaLp-NyQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 86E9980732F
- for <qemu-devel@nongnu.org>; Tue, 18 Aug 2020 14:11:06 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0BE6781F01C
+ for <qemu-devel@nongnu.org>; Tue, 18 Aug 2020 14:10:56 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3677A5C64D;
- Tue, 18 Aug 2020 14:11:06 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CC82E6CE4E
+ for <qemu-devel@nongnu.org>; Tue, 18 Aug 2020 14:10:55 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 041/150] meson: convert vss-win32
-Date: Tue, 18 Aug 2020 10:08:36 -0400
-Message-Id: <20200818141025.21608-42-pbonzini@redhat.com>
+Subject: [PULL 030/150] contrib/vhost-user-blk: convert to Meson
+Date: Tue, 18 Aug 2020 10:08:25 -0400
+Message-Id: <20200818141025.21608-31-pbonzini@redhat.com>
 In-Reply-To: <20200818141025.21608-1-pbonzini@redhat.com>
 References: <20200818141025.21608-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Spam-Score: 0.0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 06:40:33
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 02:16:14
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,144 +97,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Marc-André Lureau <marcandre.lureau@redhat.com>
+The GLib pkg-config information is extracted from config-host.mak and
+used to link vhost-user-blk.
 
-Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Makefile                    |  1 -
- Makefile.objs               |  8 --------
- qga/Makefile.objs           |  1 -
- qga/meson.build             |  6 ++++++
- qga/vss-win32/Makefile.objs | 23 -----------------------
- qga/vss-win32/meson.build   | 33 +++++++++++++++++++++++++++++++++
- 6 files changed, 39 insertions(+), 33 deletions(-)
- delete mode 100644 qga/Makefile.objs
- delete mode 100644 qga/vss-win32/Makefile.objs
- create mode 100644 qga/vss-win32/meson.build
+ Makefile                             | 3 ---
+ Makefile.objs                        | 1 -
+ contrib/vhost-user-blk/Makefile.objs | 1 -
+ contrib/vhost-user-blk/meson.build   | 5 +++++
+ meson.build                          | 1 +
+ 5 files changed, 6 insertions(+), 5 deletions(-)
+ delete mode 100644 contrib/vhost-user-blk/Makefile.objs
+ create mode 100644 contrib/vhost-user-blk/meson.build
 
 diff --git a/Makefile b/Makefile
-index db535c7fc8..c71269ff22 100644
+index 310989ce4d..3d269fad61 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -292,7 +292,6 @@ endif
- dummy := $(call unnest-vars,, \
-                 authz-obj-y \
-                 chardev-obj-y \
--                qga-vss-dll-obj-y \
-                 block-obj-y \
-                 block-obj-m \
-                 storage-daemon-obj-y \
+@@ -304,7 +304,6 @@ dummy := $(call unnest-vars,, \
+                 ivshmem-server-obj-y \
+                 rdmacm-mux-obj-y \
+                 vhost-user-scsi-obj-y \
+-                vhost-user-blk-obj-y \
+                 vhost-user-input-obj-y \
+                 vhost-user-gpu-obj-y \
+                 qga-vss-dll-obj-y \
+@@ -527,8 +526,6 @@ ivshmem-server$(EXESUF): $(ivshmem-server-obj-y) $(COMMON_LDADDS)
+ endif
+ vhost-user-scsi$(EXESUF): $(vhost-user-scsi-obj-y) contrib/libvhost-user/libvhost-user.a $(COMMON_LDADDS)
+ 	$(call LINK, $^)
+-vhost-user-blk$(EXESUF): $(vhost-user-blk-obj-y) contrib/libvhost-user/libvhost-user.a $(COMMON_LDADDS)
+-	$(call LINK, $^)
+ 
+ rdmacm-mux$(EXESUF): LIBS += "-libumad"
+ rdmacm-mux$(EXESUF): $(rdmacm-mux-obj-y) $(COMMON_LDADDS)
 diff --git a/Makefile.objs b/Makefile.objs
-index 259f9936ac..baf15656e8 100644
+index fee0f71372..f69736c10c 100644
 --- a/Makefile.objs
 +++ b/Makefile.objs
-@@ -91,11 +91,3 @@ common-obj-y += disas/
- ######################################################################
- # Resource file for Windows executables
- version-obj-$(CONFIG_WIN32) += $(BUILD_DIR)/version.o
--
--######################################################################
--# guest agent
--
--# FIXME: a few definitions from qapi/qapi-types.o and
--# qapi/qapi-visit.o are needed by libqemuutil.a.  These should be
--# extracted into a QAPI schema module, or perhaps a separate schema.
--qga-vss-dll-obj-y = qga/
-diff --git a/qga/Makefile.objs b/qga/Makefile.objs
+@@ -109,7 +109,6 @@ ivshmem-server-obj-$(CONFIG_IVSHMEM) = contrib/ivshmem-server/
+ vhost-user-scsi.o-cflags := $(LIBISCSI_CFLAGS)
+ vhost-user-scsi.o-libs := $(LIBISCSI_LIBS)
+ vhost-user-scsi-obj-y = contrib/vhost-user-scsi/
+-vhost-user-blk-obj-y = contrib/vhost-user-blk/
+ rdmacm-mux-obj-y = contrib/rdmacm-mux/
+ vhost-user-input-obj-y = contrib/vhost-user-input/
+ vhost-user-gpu-obj-y = contrib/vhost-user-gpu/
+diff --git a/contrib/vhost-user-blk/Makefile.objs b/contrib/vhost-user-blk/Makefile.objs
 deleted file mode 100644
-index 9ecf2496da..0000000000
---- a/qga/Makefile.objs
+index 72e2cdc3ad..0000000000
+--- a/contrib/vhost-user-blk/Makefile.objs
 +++ /dev/null
 @@ -1 +0,0 @@
--qga-vss-dll-obj-$(CONFIG_QGA_VSS) += vss-win32/
-diff --git a/qga/meson.build b/qga/meson.build
-index 3513a90f5d..9ddb260cff 100644
---- a/qga/meson.build
-+++ b/qga/meson.build
-@@ -44,3 +44,9 @@ qga = executable('qemu-ga', qga_ss.sources(),
-                  link_args: config_host['LIBS_QGA'].split(),
-                  dependencies: [qemuutil, libudev],
-                  install: true)
-+
-+if targetos == 'windows'
-+  if 'CONFIG_QGA_VSS' in config_host
-+    subdir('vss-win32')
-+  endif
-+endif
-diff --git a/qga/vss-win32/Makefile.objs b/qga/vss-win32/Makefile.objs
-deleted file mode 100644
-index c82676aeb8..0000000000
---- a/qga/vss-win32/Makefile.objs
-+++ /dev/null
-@@ -1,23 +0,0 @@
--# rules to build qga-vss.dll
--
--qga-vss-dll-obj-y += requester.o provider.o install.o
--
--obj-qga-vss-dll-obj-y = $(addprefix $(obj)/, $(qga-vss-dll-obj-y))
--$(obj-qga-vss-dll-obj-y): QEMU_CXXFLAGS := $(filter-out -fstack-protector-all -fstack-protector-strong, $(QEMU_CXXFLAGS)) -Wno-unknown-pragmas -Wno-delete-non-virtual-dtor
--
--QGA_VSS_LDFLAGS = -shared -Wl,--add-stdcall-alias,--enable-stdcall-fixup -lglib-2.0 -lole32 -loleaut32 -lshlwapi -luuid -lintl -lws2_32 -static
--$(obj)/qga-vss.dll: $(obj-qga-vss-dll-obj-y) $(SRC_PATH)/$(obj)/qga-vss.def
--	$(call quiet-command,$(CXX) -o $@ $(qga-vss-dll-obj-y) $(SRC_PATH)/qga/vss-win32/qga-vss.def $(CXXFLAGS) $(QGA_VSS_LDFLAGS),"LINK","$(TARGET_DIR)$@")
--
--
--# rules to build qga-provider.tlb
--# Currently, only native build is supported because building .tlb
--# (TypeLibrary) from .idl requires WindowsSDK and MIDL (and cl.exe in VC++).
--MIDL=$(WIN_SDK)/Bin/midl
--
--$(obj)/qga-vss.tlb: $(SRC_PATH)/$(obj)/qga-vss.idl
--ifeq ($(WIN_SDK),"")
--	$(call quiet-command,cp $(dir $<)qga-vss.tlb $@,"COPY","$(TARGET_DIR)$@")
--else
--	$(call quiet-command,$(MIDL) -tlb $@ -I $(WIN_SDK)/Include $<,"MIDL","$(TARGET_DIR)$@")
--endif
-diff --git a/qga/vss-win32/meson.build b/qga/vss-win32/meson.build
+-vhost-user-blk-obj-y = vhost-user-blk.o
+diff --git a/contrib/vhost-user-blk/meson.build b/contrib/vhost-user-blk/meson.build
 new file mode 100644
-index 0000000000..42c8d31a3d
+index 0000000000..05cbf816d2
 --- /dev/null
-+++ b/qga/vss-win32/meson.build
-@@ -0,0 +1,33 @@
-+if add_languages('cpp', required: false)
-+  glib_static = dependency('glib-2.0', static: true)
-+  link_args = cc.get_supported_link_arguments(['-fstack-protector-all', '-fstack-protector-strong',
-+                                               '-Wl,--add-stdcall-alias', '-Wl,--enable-stdcall-fixup'])
-+  shared_module('qga-vss', ['requester.cpp', 'provider.cpp', 'install.cpp'],
-+                name_prefix: '',
-+                cpp_args: ['-Wno-unknown-pragmas', '-Wno-delete-non-virtual-dtor', '-Wno-non-virtual-dtor'],
-+                link_args: link_args,
-+                vs_module_defs: 'qga-vss.def',
-+                dependencies: [glib_static, socket,
-+                               cc.find_library('ole32'),
-+                               cc.find_library('oleaut32'),
-+                               cc.find_library('shlwapi'),
-+                               cc.find_library('uuid'),
-+                               cc.find_library('intl')])
-+endif
-+
-+# rules to build qga-vss.tlb
-+# Currently, only native build is supported because building .tlb
-+# (TypeLibrary) from .idl requires WindowsSDK and MIDL (and cl.exe in VC++).
-+midl = find_program('midl', required: false)
-+if midl.found()
-+  gen_tlb = custom_target('gen-tlb',
-+                          input: 'qga-vss.idl',
-+                          output: 'qga-vss.tlb',
-+                          command: [midl, '-tlb', '-I' + config_host['WIN_SDK'],
-+                                     '@INPUT@', '@OUTPUT@'])
-+else
-+  gen_tlb = custom_target('gen-tlb',
-+                          input: 'qga-vss.tlb',
-+                          output: 'qga-vss.tlb',
-+                          command: ['cp', '@INPUT@', '@OUTPUT@'])
-+endif
++++ b/contrib/vhost-user-blk/meson.build
+@@ -0,0 +1,5 @@
++executable('vhost-user-blk', files('vhost-user-blk.c'),
++           link_with: libvhost_user,
++           dependencies: qemuutil,
++           build_by_default: targetos == 'linux',
++           install: false)
+diff --git a/meson.build b/meson.build
+index cd4f3f2029..fa8a7901d2 100644
+--- a/meson.build
++++ b/meson.build
+@@ -254,6 +254,7 @@ qemuutil = declare_dependency(link_with: libqemuutil,
+ if have_tools
+   if 'CONFIG_VHOST_USER' in config_host
+     subdir('contrib/libvhost-user')
++    subdir('contrib/vhost-user-blk')
+   endif
+ endif
+ 
 -- 
 2.26.2
 
