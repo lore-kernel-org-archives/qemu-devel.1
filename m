@@ -2,89 +2,87 @@ Return-Path: <SRS0=kYy5=B4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3ADEC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 08:24:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36406C433E1
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 08:47:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8E910206B5
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 08:24:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E08FC2067C
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 08:47:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amarulasolutions.com header.i=@amarulasolutions.com header.b="SBIH624Y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E910206B5
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amarulasolutions.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KePLka+u"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E08FC2067C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50732 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54590 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7wua-0005pE-MY
-	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 04:24:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46262)
+	id 1k7xHd-00016C-54
+	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 04:47:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51366)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <michael@amarulasolutions.com>)
- id 1k7wu1-0005Fv-SK
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 04:23:30 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:34077)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <michael@amarulasolutions.com>)
- id 1k7wtz-000229-8C
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 04:23:29 -0400
-Received: by mail-wr1-x444.google.com with SMTP id f7so17414194wrw.1
- for <qemu-devel@nongnu.org>; Tue, 18 Aug 2020 01:23:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amarulasolutions.com; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=QI58JgN3jn/WkuIJshc9tL1XFTcqRMcJuei4GSMSxKs=;
- b=SBIH624Y7/M7JGCQmhdE3njRJSSRmvVAdFVfU8wmyE2sT4NdX5hVWGktBu7Q/4D4jD
- FVD2s08olNpqipdogcIDoFk/oDJfPWZZK8xGACyRY4s9hHyOtZjgJIhBxVXe38FQwfHz
- omWn7vDQ6z/vz9dtgzEmQOOZfkQmnZAa6H/sw=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=QI58JgN3jn/WkuIJshc9tL1XFTcqRMcJuei4GSMSxKs=;
- b=ZhoIniNdvk8FAKzXuSPBWFB7ERNd3JC/+ZRyv+7EyUfujJ7egy1PtCblhHL8kE8C3W
- wXTM2Nvh17xDcWdyi1/1NcA0iOpDfZa2EnUHrjrhMl3E4QwK7hxuj+UckHyJ2CP1bIkH
- ShyAjztz8nADetNx0RpmK0MdhLqlkK3AdEueBOulI8D5J5+9Goxy8MTIhQBEuWd3XsvM
- Wtp3FnKzqeyHyxXmCE+d358Ri94ksJ2jfniVgmvrf4Cb1e67MaeZELYwtQRhYlqhH2II
- tMsmhklEH0gxrFR5TBcXONQFmEQj4CpYQJNNvh7y5lY37YJW+z+UGwViYI/rb8jgIwA5
- lVpA==
-X-Gm-Message-State: AOAM533dcCX3c58/m8/dryQOeMeAOd3RzMj3E52AwF96C4T0rnSTPHHu
- bjXMWYNxpkSSQn96wnLJWmIA0xesB5UZZB4BkjXlVQ==
-X-Google-Smtp-Source: ABdhPJxByyVd5HNxUjFrl4ON0PymPgcNu6wVI4+0SqVgVfxXsgN7oVUSMINjWLrN2bGrAJUK4uxE3qGa8joDPeGYreY=
-X-Received: by 2002:a5d:6589:: with SMTP id q9mr5742669wru.383.1597739004473; 
- Tue, 18 Aug 2020 01:23:24 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1k7xH8-0000gf-8B
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 04:47:22 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:25764
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1k7xH6-0004ro-C0
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 04:47:21 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1597740438;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=o4ZtICq6FUiSTy0SOYYyA7VbN0Q10E5YbHeTYNFkECs=;
+ b=KePLka+u35WMo4EWWXIi5LniXKrwrwGv99HqZCTzQQN6fgvdoUq1qVXkmBy6kTSb1xuIWS
+ nz7NOfMLJelOlqvVaaEpKQB0BFntq66ZsrNFSBo6fJIlYImnrfH0e8bye0ehNlo4juiUQa
+ Xmhnjlb4oRpF8vGg2jgnuW5FfWkroyY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-558-0sD0XwlaNjOqVMkdqajEJw-1; Tue, 18 Aug 2020 04:47:16 -0400
+X-MC-Unique: 0sD0XwlaNjOqVMkdqajEJw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 263E981F019;
+ Tue, 18 Aug 2020 08:47:15 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-112-105.ams2.redhat.com [10.36.112.105])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E927519C4F;
+ Tue, 18 Aug 2020 08:47:13 +0000 (UTC)
+Date: Tue, 18 Aug 2020 10:47:12 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Nir Soffer <nsoffer@redhat.com>
+Subject: Re: [RFC PATCH 06/22] qemu-nbd: Use raw block driver for --offset
+Message-ID: <20200818084712.GB6865@linux.fritz.box>
+References: <20200813162935.210070-1-kwolf@redhat.com>
+ <20200813162935.210070-7-kwolf@redhat.com>
+ <CAMRbyyu8=uFJkqCuC5BBamzHOwfXaw-rWVa+KT4gQc3bE=WKfQ@mail.gmail.com>
 MIME-Version: 1.0
-References: <20200812152149.260163-1-michael@amarulasolutions.com>
- <20200817064701.o3q3plnjhzyz3s42@sirius.home.kraxel.org>
- <CAOf5uwn94gZPZXChFDXWZ-1w0jOY_SxRqzF4Mk8hrtLq-r3yCg@mail.gmail.com>
- <20200817072841.lvbco4k7hzzimxsb@sirius.home.kraxel.org>
- <CAOf5uwn2KAajFo7oXYkZg5q3jbJyRC50hJafcoWCVzrdvkqXMw@mail.gmail.com>
- <20200818060214.z2irps623upmbe2w@sirius.home.kraxel.org>
-In-Reply-To: <20200818060214.z2irps623upmbe2w@sirius.home.kraxel.org>
-From: Michael Nazzareno Trimarchi <michael@amarulasolutions.com>
-Date: Tue, 18 Aug 2020 10:23:13 +0200
-Message-ID: <CAOf5uwmKuRGf1F6SouBXcGTmErgCL=CL2RwL=CBbK0SkvOSH2Q@mail.gmail.com>
-Subject: Re: [PATCH] hw: dev-wacom: Support wacom tablet emulation in linux
- qemu
-To: Gerd Hoffmann <kraxel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=michael@amarulasolutions.com; helo=mail-wr1-x444.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <CAMRbyyu8=uFJkqCuC5BBamzHOwfXaw-rWVa+KT4gQc3bE=WKfQ@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
+X-Mimecast-Spam-Score: 0.003
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: none client-ip=205.139.110.61; envelope-from=kwolf@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 02:16:14
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,53 +95,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-block <qemu-block@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi
-
-On Tue, Aug 18, 2020 at 8:02 AM Gerd Hoffmann <kraxel@redhat.com> wrote:
->
-> On Mon, Aug 17, 2020 at 06:42:02PM +0200, Michael Nazzareno Trimarchi wrote:
-> > Hi Gerd
+Am 17.08.2020 um 19:19 hat Nir Soffer geschrieben:
+> On Thu, Aug 13, 2020 at 7:36 PM Kevin Wolf <kwolf@redhat.com> wrote:
+> 
+> > Instead of implementing qemu-nbd --offset in the NBD code, just put a
+> > raw block node with the requested offset on top of the user image and
+> > rely on that doing the job.
 > >
-> > Have another small question. Do you know how force show cursor working
-> > in this case?
->
-> Which display and which vga do you use?
+> > This does not only simplify the nbd_export_new() interface and bring it
+> > closer to the set of options that the nbd-server-add QMP command offers,
+> > but in fact it also eliminates a potential source for bugs in the NBD
+> > code which previously had to add the offset manually in all relevant
+> > places.
+> >
+> 
+> Just to make sure I understand this correctly -
+> 
+> qemu-nbd can work with:
+> 
+>     $ qemu-nbd 'json:{"driver": "file", "filename": "test.raw"}'
+> 
+> And:
+> 
+>     $ qemu-nbd 'json:{"driver": "raw", "file": {"driver": "file",
+> "filename": "test.raw"}}'
+> 
+> I assumed that we always create the raw node?
 
-/usr/bin/qemu-system-i386 -M pc \
--enable-kvm -cpu host \
--m 1024 \
--vga std \
--global VGA.vgamem_mb=4 \
--kernel out/w_and_h_emulator/images/bzImage \
--drive file=out/w_and_h_emulator/images/rootfs.ext2,if=virtio,format=raw \
--append "root=/dev/vda console=" \
--net nic,model=virtio \
--net user,hostfwd=tcp::22222-:22,hostfwd=tcp::10000-:10000,hostfwd=tcp::10001-:10001
-\
--usb -device usb-wacom-tablet \
--usb -device usb-host,vendorid=0x04d8,productid=0x000a -show-cursor
+No, the first form creates only the 'file' node without a 'raw' node on
+top. For all practical matters, this should be the same in qemu-img or
+qemu-nbd. For actually running VMs, omitting the 'raw' node where it's
+not needed can improve performance a little.
 
-But I need to use the framebuffer. So what happens for instance in
-software like ts_calibrate you can not see the cursor
+What is true is that if you use a filename without specifying the driver
+(i.e.  you rely on format probing), you'll get a 'raw' node on top of
+the 'file' node.
 
-Michael
->
-> take care,
->   Gerd
->
+> oVirt always uses the second form to make it easier to support offset,
+> size, and backing.
+> https://github.com/oVirt/ovirt-imageio/blob/2021164d064227d7c5e03c8da087adc66e3a577e/daemon/ovirt_imageio/_internal/qemu_nbd.py#L104
+> 
+> This also seems to be the way libvirt builds the nodes using -blockdev.
 
+libvirt actually has a BZ to avoid the 'raw' node for performance when
+it's not needed.
 
--- 
-Michael Nazzareno Trimarchi
-Amarula Solutions BV
-COO Co-Founder
-Cruquiuskade 47 Amsterdam 1018 AM NL
-T. +31(0)851119172
-M. +39(0)3479132170
-[`as] https://www.amarulasolutions.com
+> Do we have a way to visualize the internal node graph used by
+> qemu-nbd/qemu-img?
+
+No, but as long as you explicitly specify the driver, you get exactly
+what you specified.
+
+For exploring what happens, you can pass the same json: filename to QEMU
+(maybe with -hda) and then use the monitor to inspect the state.
+
+Kevin
+
 
