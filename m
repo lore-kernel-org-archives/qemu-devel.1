@@ -2,73 +2,131 @@ Return-Path: <SRS0=kYy5=B4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.9 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D599BC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 12:57:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18787C433E1
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 13:02:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9FB5F20706
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 12:57:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9FB5F20706
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id C5EA52245C
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 13:02:34 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PpF9tKOq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C5EA52245C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55064 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57812 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k81Ak-0003Bx-Ty
-	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 08:57:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40438)
+	id 1k81G5-0004ss-Ts
+	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 09:02:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41584)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1k81AE-0002gF-Ui
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 08:56:30 -0400
-Resent-Date: Tue, 18 Aug 2020 08:56:30 -0400
-Resent-Message-Id: <E1k81AE-0002gF-Ui@lists.gnu.org>
-Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21396)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k81FS-0004OL-LG
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 09:01:54 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58776)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1k81AB-0006LB-Gk
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 08:56:30 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1597755376; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=TVR9g0oN3rnHPChZ9ktbbWsVmT2515uN3smXEwSl+/o4n5btN3BbtwbHqwRTD70v8halL8xFyujScawydU7NOHjbueRo7o3+6LgVO2K3JpXYFFx63v/Rt73DGPecqcFrNT4skQBDrl4BLReTd6U8aegt3EfmXTIM4/iTho7y4RM=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1597755376;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=FAdamSNR/dieGtsjnB8XTDTGpvDZrpXtT+9ERdgp8DU=; 
- b=KMvIJHHs1N+E2hjL78ORYe0ZQ+86mXvUz5w1tyXGdUR2RPWRudWOkiQj+Rx3e23r6WVoIFauXvN+1DKMkjjPx+JfOQUMXIcZ+j9i3wrZvdEldhHDsKvcgIB9n14ZtbyKiSbU8o8HxLXwNzu6bEnDinRwdWqM0oQNO7Nf+KQw3PQ=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1597755372494383.6387224569395;
- Tue, 18 Aug 2020 05:56:12 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k81FQ-0006xK-Je
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 09:01:54 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1597755711;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=GhZkqpPE0FJjHSIPRbDoYdHdY/j9x5dvay5i7aBth5o=;
+ b=PpF9tKOqd3cKVNns5gX0bgaRLvmuTcHGa55v65kXEGtL7PmYWpDEGqOCOuKSSda64S9Fjz
+ NCdWELqNRFNbngeQX+fR531+pdp6ENwwaK+rpZbHSHNAwCse5J13bwtdCgwwiM3g355S6Y
+ 9fJujuTIqa55rAWIDUtzG2h4hFTFX5A=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-393-oHPCEXmPNTOIFZKpWywCUQ-1; Tue, 18 Aug 2020 09:01:34 -0400
+X-MC-Unique: oHPCEXmPNTOIFZKpWywCUQ-1
+Received: by mail-wr1-f69.google.com with SMTP id b8so8257247wrr.2
+ for <qemu-devel@nongnu.org>; Tue, 18 Aug 2020 06:01:34 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=GhZkqpPE0FJjHSIPRbDoYdHdY/j9x5dvay5i7aBth5o=;
+ b=HL359CkbJCkm9nkiOi1P9rbJ5wF4/3jVtYO6ZJ145O7CyAK7FPzga6qi9ydcOBAopQ
+ WZ54tMaczB7820Yd+wBqzEPH/EuYTgxH/eKyFkxKRP5hmGQOS5IamyhujhIQ09ZnC/kc
+ 9oDQ2r4W9iI5FNoEkPf6KjwvRETQgXhvlr47hB0f0uFmRz/BLdoKfdW+DLSNik89cLbV
+ WcM9rbDOM7b1qer9zG6yeK17AE5sG9xJF1XXM6g2z9IUKaPbsJWNCCnImVGA8CFAvV/C
+ hHuzISqgXGpsn+odXD43idqgNTJu5erTIISnbZJ4MmDz7HklNWSSt6Lyd6n1fBOCzVc+
+ zcHw==
+X-Gm-Message-State: AOAM530A8Jr1j+5RBWsEJ+YvhMO7BEJFc07Zh5E2vuEYHo7LI8rz2a0J
+ gSMTDTlC90X1aHdUJuP25cIetEhDmJXFrjBYzvTwIJ+QgMHB0dRcyWnCs/qS4xzYvl2xUxkLIN6
+ D7sNlan/Xuz8Gmb4=
+X-Received: by 2002:a1c:3dc3:: with SMTP id
+ k186mr18917526wma.122.1597755692934; 
+ Tue, 18 Aug 2020 06:01:32 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxZ8ofnA4Fe2rrHJGIpTRo/HVGqQzehc9c2271Kv621/gePn1KmZ54IBiKx0eq+5DRDWzWKRw==
+X-Received: by 2002:a1c:3dc3:: with SMTP id
+ k186mr18917500wma.122.1597755692662; 
+ Tue, 18 Aug 2020 06:01:32 -0700 (PDT)
+Received: from [192.168.1.36] (121.red-81-40-121.staticip.rima-tde.net.
+ [81.40.121.121])
+ by smtp.gmail.com with ESMTPSA id j11sm34084101wrw.79.2020.08.18.06.01.31
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 18 Aug 2020 06:01:31 -0700 (PDT)
 Subject: Re: [PATCH v2 0/7] x86: fix cpu hotplug with secure boot
-Message-ID: <159775537107.17412.11110752129834412055@66eaa9a8a123>
-In-Reply-To: <20200818122208.1243901-1-imammedo@redhat.com>
+To: qemu-devel@nongnu.org, no-reply@patchew.org, imammedo@redhat.com
+References: <159775537107.17412.11110752129834412055@66eaa9a8a123>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <8da6ed70-4de0-fb37-a67f-465e5dd88012@redhat.com>
+Date: Tue, 18 Aug 2020 15:01:30 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: imammedo@redhat.com
-Date: Tue, 18 Aug 2020 05:56:12 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o53.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 08:56:24
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <159775537107.17412.11110752129834412055@66eaa9a8a123>
+Content-Language: en-US
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: none client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 03:22:11
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -81,47 +139,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: boris.ostrovsky@oracle.com, lersek@redhat.com, qemu-devel@nongnu.org,
- aaron.young@oracle.com
+Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ boris.ostrovsky@oracle.com, lersek@redhat.com, aaron.young@oracle.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDgxODEyMjIwOC4xMjQz
-OTAxLTEtaW1hbW1lZG9AcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQgdGhl
-IGRvY2tlci1xdWlja0BjZW50b3M3IGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5n
-IGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0
-YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBT
-Q1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCm1ha2UgZG9ja2VyLWltYWdlLWNlbnRvczcgVj0x
-IE5FVFdPUks9MQp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtcXVpY2tAY2VudG9zNyBTSE9XX0VOVj0x
-IEo9MTQgTkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgogIFRFU1QgICAgY2hlY2st
-dW5pdDogdGVzdHMvdGVzdC1jaGFyClVuZXhwZWN0ZWQgZXJyb3IgaW4gb2JqZWN0X3Byb3BlcnR5
-X3RyeV9hZGQoKSBhdCAvdG1wL3FlbXUtdGVzdC9zcmMvcW9tL29iamVjdC5jOjExODE6CmF0dGVt
-cHQgdG8gYWRkIGR1cGxpY2F0ZSBwcm9wZXJ0eSAnc2VyaWFsLWlkJyB0byBvYmplY3QgKHR5cGUg
-J2NvbnRhaW5lcicpCkVSUk9SIHRlc3QtY2hhciAtIHRvbyBmZXcgdGVzdHMgcnVuIChleHBlY3Rl
-ZCAzOCwgZ290IDkpCm1ha2U6ICoqKiBbY2hlY2stdW5pdF0gRXJyb3IgMQptYWtlOiAqKiogV2Fp
-dGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4uLgogIFRFU1QgICAgaW90ZXN0LXFjb3cyOiAwMjQK
-ICBURVNUICAgIGlvdGVzdC1xY293MjogMDI1Ci0tLQogICAgcmFpc2UgQ2FsbGVkUHJvY2Vzc0Vy
-cm9yKHJldGNvZGUsIGNtZCkKc3VicHJvY2Vzcy5DYWxsZWRQcm9jZXNzRXJyb3I6IENvbW1hbmQg
-J1snc3VkbycsICctbicsICdkb2NrZXInLCAncnVuJywgJy0tbGFiZWwnLCAnY29tLnFlbXUuaW5z
-dGFuY2UudXVpZD1mMmI1MmU3NzllYTA0NGE2YWY4MzQ3YWU0OWQ0Nzg1ZScsICctdScsICcxMDAx
-JywgJy0tc2VjdXJpdHktb3B0JywgJ3NlY2NvbXA9dW5jb25maW5lZCcsICctLXJtJywgJy1lJywg
-J1RBUkdFVF9MSVNUPScsICctZScsICdFWFRSQV9DT05GSUdVUkVfT1BUUz0nLCAnLWUnLCAnVj0n
-LCAnLWUnLCAnSj0xNCcsICctZScsICdERUJVRz0nLCAnLWUnLCAnU0hPV19FTlY9MScsICctZScs
-ICdDQ0FDSEVfRElSPS92YXIvdG1wL2NjYWNoZScsICctdicsICcvaG9tZS9wYXRjaGV3Ly5jYWNo
-ZS9xZW11LWRvY2tlci1jY2FjaGU6L3Zhci90bXAvY2NhY2hlOnonLCAnLXYnLCAnL3Zhci90bXAv
-cGF0Y2hldy10ZXN0ZXItdG1wLWU2NTF4NGE4L3NyYy9kb2NrZXItc3JjLjIwMjAtMDgtMTgtMDgu
-NDMuMDQuMjMzMjE6L3Zhci90bXAvcWVtdTp6LHJvJywgJ3FlbXUvY2VudG9zNycsICcvdmFyL3Rt
-cC9xZW11L3J1bicsICd0ZXN0LXF1aWNrJ10nIHJldHVybmVkIG5vbi16ZXJvIGV4aXQgc3RhdHVz
-IDIuCmZpbHRlcj0tLWZpbHRlcj1sYWJlbD1jb20ucWVtdS5pbnN0YW5jZS51dWlkPWYyYjUyZTc3
-OWVhMDQ0YTZhZjgzNDdhZTQ5ZDQ3ODVlCm1ha2VbMV06ICoqKiBbZG9ja2VyLXJ1bl0gRXJyb3Ig
-MQptYWtlWzFdOiBMZWF2aW5nIGRpcmVjdG9yeSBgL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1w
-LWU2NTF4NGE4L3NyYycKbWFrZTogKioqIFtkb2NrZXItcnVuLXRlc3QtcXVpY2tAY2VudG9zN10g
-RXJyb3IgMgoKcmVhbCAgICAxM203LjE0MHMKdXNlciAgICAwbTkuMzI4cwoKClRoZSBmdWxsIGxv
-ZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAyMDA4MTgxMjIyMDgu
-MTI0MzkwMS0xLWltYW1tZWRvQHJlZGhhdC5jb20vdGVzdGluZy5kb2NrZXItcXVpY2tAY2VudG9z
-Ny8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0
-Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRv
-IHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+On 8/18/20 2:56 PM, no-reply@patchew.org wrote:
+> Patchew URL: https://patchew.org/QEMU/20200818122208.1243901-1-imammedo@redhat.com/
+> 
+> 
+> 
+> Hi,
+> 
+> This series failed the docker-quick@centos7 build test. Please find the testing commands and
+> their output below. If you have Docker installed, you can probably reproduce it
+> locally.
+> 
+> === TEST SCRIPT BEGIN ===
+> #!/bin/bash
+> make docker-image-centos7 V=1 NETWORK=1
+> time make docker-test-quick@centos7 SHOW_ENV=1 J=14 NETWORK=1
+> === TEST SCRIPT END ===
+> 
+>   TEST    check-unit: tests/test-char
+> Unexpected error in object_property_try_add() at /tmp/qemu-test/src/qom/object.c:1181:
+> attempt to add duplicate property 'serial-id' to object (type 'container')
+
+Unrelated error.
+
+> ERROR test-char - too few tests run (expected 38, got 9)
+> make: *** [check-unit] Error 1
+> make: *** Waiting for unfinished jobs....
+>   TEST    iotest-qcow2: 024
+>   TEST    iotest-qcow2: 025
+> ---
+>     raise CalledProcessError(retcode, cmd)
+> subprocess.CalledProcessError: Command '['sudo', '-n', 'docker', 'run', '--label', 'com.qemu.instance.uuid=f2b52e779ea044a6af8347ae49d4785e', '-u', '1001', '--security-opt', 'seccomp=unconfined', '--rm', '-e', 'TARGET_LIST=', '-e', 'EXTRA_CONFIGURE_OPTS=', '-e', 'V=', '-e', 'J=14', '-e', 'DEBUG=', '-e', 'SHOW_ENV=1', '-e', 'CCACHE_DIR=/var/tmp/ccache', '-v', '/home/patchew/.cache/qemu-docker-ccache:/var/tmp/ccache:z', '-v', '/var/tmp/patchew-tester-tmp-e651x4a8/src/docker-src.2020-08-18-08.43.04.23321:/var/tmp/qemu:z,ro', 'qemu/centos7', '/var/tmp/qemu/run', 'test-quick']' returned non-zero exit status 2.
+> filter=--filter=label=com.qemu.instance.uuid=f2b52e779ea044a6af8347ae49d4785e
+> make[1]: *** [docker-run] Error 1
+> make[1]: Leaving directory `/var/tmp/patchew-tester-tmp-e651x4a8/src'
+> make: *** [docker-run-test-quick@centos7] Error 2
+> 
+> real    13m7.140s
+> user    0m9.328s
+> 
+> 
+> The full log is available at
+> http://patchew.org/logs/20200818122208.1243901-1-imammedo@redhat.com/testing.docker-quick@centos7/?type=message.
+> ---
+> Email generated automatically by Patchew [https://patchew.org/].
+> Please send your feedback to patchew-devel@redhat.com
+> 
+
 
