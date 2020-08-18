@@ -2,88 +2,81 @@ Return-Path: <SRS0=kYy5=B4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26D24C433E3
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 00:48:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D508DC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 01:26:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DA0BA20789
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 00:48:07 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iSo3+ifl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA0BA20789
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9A411207D3
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 01:26:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A411207D3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60466 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37684 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7pnL-0007fg-1q
-	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 20:48:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40272)
+	id 1k7qOr-0005Nj-RA
+	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 21:26:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46880)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>)
- id 1k7pmk-0007AW-Rt; Mon, 17 Aug 2020 20:47:30 -0400
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:34922)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k7qNj-0004of-98
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 21:25:43 -0400
+Received: from indium.canonical.com ([91.189.90.7]:33644)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>)
- id 1k7pmj-0004hv-7f; Mon, 17 Aug 2020 20:47:30 -0400
-Received: by mail-oi1-x243.google.com with SMTP id k4so16479138oik.2;
- Mon, 17 Aug 2020 17:47:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=G+zOtyx97TfAAJrlw+eOoM0dymIgIO4CgcDFJgl+9XA=;
- b=iSo3+iflY2P8on98wRFboJ9ySQFcXs46Rw+Azj/4fpxyfxTs1S09TyliVUWBEMp/6Z
- BpSFcOrRnfIoaQPgOnKGTivITtA7vECnnsrHnrmT+zUfGywc+bVPryWrxS2g1Jn5Z09r
- kzrYEtm2aUdl5yaKhN/kWkG+LCDGAoC5xJ6JtujlZ16wVBEAiIHfqPQdomZJotfsjjAg
- kLfaUQNF7nJtMEZRU7gUUMp3bBizoogSityQq0ztzlGeAQORrl6uEUkCUtpGYJYpfm8V
- QxvIQgT7rPNqGbp14On4+wp2l7O+CbOW/pH1/WZAcakoEqAozJRsQhCsMKRfovaPnSn5
- /F2w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=G+zOtyx97TfAAJrlw+eOoM0dymIgIO4CgcDFJgl+9XA=;
- b=Ilam89Kg1QiMQQsAMaxvjjqKXG/sd94fg0EdUzFcUwYqFNf/VUfs8pAQBJmxO2mpvv
- BLRVVxrqVSg+RfCkhwEg9vzR+wopUnItSMpEfsXOISITxc/L6uMNPqG8W8Syi0XSEdpK
- p3rrcfi4dSSEwQSO4W4+C179aPfNh/WIwu5anbrbBCbJVYiwotpV0Rrg+mv7xqz63Uw2
- T/xlc1/gn/qp69dvge0aRn5YOEIif6Y+Pr0fdsDiqF4UmN+c40k9fYvb/9JexbWFQo7f
- zzGnqFjq/pSd/r2Y+ZYOsBmrGpfJ+qT7gNXkGjB8IoBO27Fz/as9yrLPcjEekoDhpcNt
- CU2Q==
-X-Gm-Message-State: AOAM5308JYf+Wrhe7PX1q25pl9TPza2oJfJA+pk8tMlieSfAPlJZyV2O
- xLrRD05iPUN+Iy6bvUwm3lTEv8wv3lHWbgr6Njc=
-X-Google-Smtp-Source: ABdhPJx36LFbWxe97IW1zrlRmSnjlaiwqDvsNE5moLNcRWHM2tD3mEMAbr504oqc/yAB17HatFErE4+C5Q4lE5ucsvA=
-X-Received: by 2002:aca:1117:: with SMTP id 23mr11595380oir.97.1597711647331; 
- Mon, 17 Aug 2020 17:47:27 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k7qNh-00008t-7t
+ for qemu-devel@nongnu.org; Mon, 17 Aug 2020 21:25:42 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1k7qNe-00041U-8J
+ for <qemu-devel@nongnu.org>; Tue, 18 Aug 2020 01:25:38 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 3D2DB2E802A
+ for <qemu-devel@nongnu.org>; Tue, 18 Aug 2020 01:25:38 +0000 (UTC)
 MIME-Version: 1.0
-References: <20200815141940.44025-1-liq3ea@163.com>
- <83092d06-25e3-abf8-67b2-8b9bcfb00732@redhat.com>
-In-Reply-To: <83092d06-25e3-abf8-67b2-8b9bcfb00732@redhat.com>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Tue, 18 Aug 2020 08:46:50 +0800
-Message-ID: <CAKXe6SLuz1jyGG9k0+yi288DUibUT_w5cPhFpA+s4ZBENLmo+g@mail.gmail.com>
-Subject: Re: [PATCH 0/2] Fix the assert failure in scsi_dma_complete
-To: Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: multipart/alternative; boundary="000000000000315bc705ad1c3bb7"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::243;
- envelope-from=liq3ea@gmail.com; helo=mail-oi1-x243.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 18 Aug 2020 01:19:39 -0000
+From: Michael Slade <1891829@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: serial
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: mslade
+X-Launchpad-Bug-Reporter: Michael Slade (mslade)
+X-Launchpad-Bug-Modifier: Michael Slade (mslade)
+References: <159762208982.14812.18418944831865683616.malonedeb@gac.canonical.com>
+Message-Id: <159771357975.22068.13435463970092949911.malone@chaenomeles.canonical.com>
+Subject: [Bug 1891829] Re: High bit(s) sometimes set high on rcvd serial bytes
+ when char size < 8 bits
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="d6d0b96812d8def2ca0ffcc25cb4d200f2f30aeb";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 729225540daffdce2bc28509184322053605e2c9
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/17 21:25:38
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -92,109 +85,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, hare@suse.com, Li Qiang <liq3ea@163.com>,
- Qemu Developers <qemu-devel@nongnu.org>, qemu-block@nongnu.org
+Reply-To: Bug 1891829 <1891829@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000315bc705ad1c3bb7
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+If I connect a serial mouse to the built-in serial port on an old
+(kernel 2.4) box and go
 
-Paolo Bonzini <pbonzini@redhat.com> =E4=BA=8E2020=E5=B9=B48=E6=9C=8818=E6=
-=97=A5=E5=91=A8=E4=BA=8C =E4=B8=8A=E5=8D=881:05=E5=86=99=E9=81=93=EF=BC=9A
+stty -F /dev/ttyS0 1200 cs7
+dd if=3D/dev/ttyS0 bs=3D1|hexdump -C
 
-> On 15/08/20 16:19, Li Qiang wrote:
-> > Currently in 'megasas_map_sgl' when 'iov_count=3D0' will just return
-> > success however the 'cmd' doens't contain any iov. This will cause
-> > the assert in 'scsi_dma_complete' failed. This is because in
-> > 'dma_blk_cb' the 'dbs->sg_cur_index =3D=3D dbs->sg->nsg' will be true
-> > and just call 'dma_complete'. However now there is no aiocb returned.
-> >
-> > This is the LP#1878263:
-> >
-> > -->https://bugs.launchpad.net/qemu/+bug/1878263
-> >
-> > To solve this we will consider the 'iov_count=3D0' is an error.
-> > In the first patch, I uses -1 to indicate an error and in the second
-> > patch I consider 'iov_count=3D0' is an error.
-> >
-> > Li Qiang (2):
-> >   hw: megasas: return -1 when 'megasas_map_sgl' fails
-> >   hw: megasas: consider 'iov_count=3D0' is an error in megasas_map_sgl
-> >
-> >  hw/scsi/megasas.c | 6 +++---
-> >  1 file changed, 3 insertions(+), 3 deletions(-)
-> >
->
-> Queued, thanks.  But do you have a qtest for this?
->
+The bytes received/printed when the mouse is moved all have bit7=3D0.
 
-Okay, I will cook a qtest for this recently.
+-- =
 
-Thanks,
-Li Qiang
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1891829
 
+Title:
+  High bit(s) sometimes set high on rcvd serial bytes when char size < 8
+  bits
 
->
-> Paolo
->
->
+Status in QEMU:
+  New
 
---000000000000315bc705ad1c3bb7
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Bug description:
+  I *believe* (not confirmed) that the old standard PC serial ports,
+  when configured with a character size of 7 bits or less, should set
+  non-data bits to 0 when the CPU reads received chars from the read
+  register.  qemu doesn't do this.
 
-<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
-<div dir=3D"ltr" class=3D"gmail_attr">Paolo Bonzini &lt;<a href=3D"mailto:p=
-bonzini@redhat.com">pbonzini@redhat.com</a>&gt; =E4=BA=8E2020=E5=B9=B48=E6=
-=9C=8818=E6=97=A5=E5=91=A8=E4=BA=8C =E4=B8=8A=E5=8D=881:05=E5=86=99=E9=81=
-=93=EF=BC=9A<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px=
- 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">On =
-15/08/20 16:19, Li Qiang wrote:<br>
-&gt; Currently in &#39;megasas_map_sgl&#39; when &#39;iov_count=3D0&#39; wi=
-ll just return<br>
-&gt; success however the &#39;cmd&#39; doens&#39;t contain any iov. This wi=
-ll cause<br>
-&gt; the assert in &#39;scsi_dma_complete&#39; failed. This is because in<b=
-r>
-&gt; &#39;dma_blk_cb&#39; the &#39;dbs-&gt;sg_cur_index =3D=3D dbs-&gt;sg-&=
-gt;nsg&#39; will be true<br>
-&gt; and just call &#39;dma_complete&#39;. However now there is no aiocb re=
-turned.<br>
-&gt; <br>
-&gt; This is the LP#1878263:<br>
-&gt; <br>
-&gt; --&gt;<a href=3D"https://bugs.launchpad.net/qemu/+bug/1878263" rel=3D"=
-noreferrer" target=3D"_blank">https://bugs.launchpad.net/qemu/+bug/1878263<=
-/a><br>
-&gt; <br>
-&gt; To solve this we will consider the &#39;iov_count=3D0&#39; is an error=
-.<br>
-&gt; In the first patch, I uses -1 to indicate an error and in the second<b=
-r>
-&gt; patch I consider &#39;iov_count=3D0&#39; is an error.<br>
-&gt; <br>
-&gt; Li Qiang (2):<br>
-&gt;=C2=A0 =C2=A0hw: megasas: return -1 when &#39;megasas_map_sgl&#39; fail=
-s<br>
-&gt;=C2=A0 =C2=A0hw: megasas: consider &#39;iov_count=3D0&#39; is an error =
-in megasas_map_sgl<br>
-&gt; <br>
-&gt;=C2=A0 hw/scsi/megasas.c | 6 +++---<br>
-&gt;=C2=A0 1 file changed, 3 insertions(+), 3 deletions(-)<br>
-&gt; <br>
-<br>
-Queued, thanks.=C2=A0 But do you have a qtest for this?<br></blockquote><di=
-v><br></div><div>Okay, I will cook a qtest for this recently.</div><div><br=
-></div><div>Thanks,</div><div>Li Qiang</div><div>=C2=A0</div><blockquote cl=
-ass=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid=
- rgb(204,204,204);padding-left:1ex">
-<br>
-Paolo<br>
-<br>
-</blockquote></div></div>
+  Windows 1.01 will not make use of a serial mouse when bit 7 is 1.  The
+  ID byte that the mouse sends on reset is ignored.  I added a temporary
+  hack to set bit 7 to 0 on all incoming bytes, and this convinced
+  windows 1.01 to use the mouse.
 
---000000000000315bc705ad1c3bb7--
+  note 1:  This was using a real serial mouse through a passed-through
+  serial port.  The emulated msmouse doesn't work for other reasons.
+
+  note 2:  The USB serial port I am passing through to the guest sets
+  non-data bits to 1.  Not sure if this is the USB hardware or linux.
+
+  note 3:  I also needed to add an -icount line to slow down the guest
+  CPU, so that certain cpu-sensitive timing code in the guest didn't
+  give up too quickly.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1891829/+subscriptions
 
