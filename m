@@ -7,70 +7,70 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE97FC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 14:45:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF391C433E3
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 14:46:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 98B73207D3
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 14:45:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BDDA9207D3
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 14:46:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="icaovQ6o"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 98B73207D3
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cTos/XhF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDDA9207D3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56298 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59046 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k82rp-0004cx-OF
-	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 10:45:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32782)
+	id 1k82sL-0005oQ-WB
+	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 10:46:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32818)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k82Ky-0004V8-RJ
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:11:40 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:58202
+ id 1k82L1-0004Xn-Hb
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:11:43 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23423
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k82Ks-0007T7-7C
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:11:40 -0400
+ id 1k82Ks-0007TA-72
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:11:42 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597759892;
+ s=mimecast20190719; t=1597759893;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=LaC80DgIjZKD2CD7roIgijLIbzLRPLB5JGUqnTCZlJo=;
- b=icaovQ6opZu3PbNwYuNFShgOyX1EL+J1QDHNieA5UcgjlHkl6rX7ABCWosqA/MGQIP3tiL
- NhTAE5qLsECD8w/2su9gsO13l08A6IvvTl+WGOe/RNZE3iBAf6IOqdTRpqJQeUzofDN2JF
- SpsVuOMLfJApid6RwhPnidF/QiS/DgQ=
+ bh=hn05m8P7ew0Ut5NVYOInCwmcApeNBhYYeXPBkA0FRZY=;
+ b=cTos/XhFhSnnyoEQnNk5+0O+Tg2TbhusmUDMniYIMtXbCr+UO2XLKOf+xMcfpX0RrtBNKM
+ 2/C7u0FqdioTwbs6GK4qtJ8K19ZXNtbX7LNyL3vsGE2u31AxBG1uSPW1ZQQJJf/ElDK5B8
+ DKNtYMSC3o0yB8RhkefQEQLc0JhDQlU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-518-B6YrDblVPjKLDdNDBVZKcw-1; Tue, 18 Aug 2020 10:11:30 -0400
-X-MC-Unique: B6YrDblVPjKLDdNDBVZKcw-1
+ us-mta-572-Vsd6YmOIPWqGcq0DgMIpWg-1; Tue, 18 Aug 2020 10:11:30 -0400
+X-MC-Unique: Vsd6YmOIPWqGcq0DgMIpWg-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 77863100A95D
- for <qemu-devel@nongnu.org>; Tue, 18 Aug 2020 14:11:29 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7F32D1800D41
+ for <qemu-devel@nongnu.org>; Tue, 18 Aug 2020 14:11:26 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 275C35D757;
- Tue, 18 Aug 2020 14:11:29 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5ED087DFC7;
+ Tue, 18 Aug 2020 14:11:21 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 066/150] meson: qemu-pr-helper
-Date: Tue, 18 Aug 2020 10:09:01 -0400
-Message-Id: <20200818141025.21608-67-pbonzini@redhat.com>
+Subject: [PULL 060/150] meson: convert target/s390x/gen-features.h
+Date: Tue, 18 Aug 2020 10:08:55 -0400
+Message-Id: <20200818141025.21608-61-pbonzini@redhat.com>
 In-Reply-To: <20200818141025.21608-1-pbonzini@redhat.com>
 References: <20200818141025.21608-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -105,105 +105,136 @@ Sender: "Qemu-devel"
 
 From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
-The executable moves back from libexecdir to bindir, when it was
-in 5.0 and earlier.
+Needed by linux-user/s390x/cpu_loop.c; this removes the only use of HOST_CC.
 
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Makefile    |  7 +------
- configure   |  3 ---
- meson.build | 10 ++++++++++
- 3 files changed, 11 insertions(+), 9 deletions(-)
+ Makefile                    |  2 ++
+ configure                   |  1 -
+ meson.build                 |  1 +
+ target/meson.build          |  1 +
+ target/s390x/Makefile.objs  | 20 --------------------
+ target/s390x/cpu_features.h |  2 +-
+ target/s390x/cpu_models.h   |  2 +-
+ target/s390x/meson.build    |  9 +++++++++
+ 8 files changed, 15 insertions(+), 23 deletions(-)
+ create mode 100644 target/meson.build
+ create mode 100644 target/s390x/meson.build
 
 diff --git a/Makefile b/Makefile
-index e67fe52ed3..414c631aee 100644
+index b0cae10ce0..420f2661eb 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -129,7 +129,7 @@ $(call set-vpath, $(SRC_PATH))
+@@ -115,6 +115,8 @@ CONFIG_BLOCK := $(call lor,$(CONFIG_SOFTMMU),$(CONFIG_TOOLS))
+ generated-files-y = config-host.h
  
- LIBS+=-lz $(LIBS_TOOLS)
+ generated-files-y += module_block.h
++generated-files-y += target/s390x/gen-features.h
++target/s390x/gen-features.h: Makefile.ninja
  
--HELPERS-y = $(HELPERS)
-+HELPERS-y =
+ generated-files-y += .git-submodule-status
  
- # Sphinx does not allow building manuals into the same directory as
- # the source files, so if we're doing an in-tree QEMU build we must
-@@ -282,11 +282,6 @@ COMMON_LDADDS = libqemuutil.a
- 
- qemu-storage-daemon$(EXESUF): qemu-storage-daemon.o $(authz-obj-y) $(block-obj-y) $(crypto-obj-y) $(chardev-obj-y) $(io-obj-y) $(qom-obj-y) $(storage-daemon-obj-y) $(COMMON_LDADDS)
- 
--scsi/qemu-pr-helper$(EXESUF): scsi/qemu-pr-helper.o scsi/utils.o $(authz-obj-y) $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
--ifdef CONFIG_MPATH
--scsi/qemu-pr-helper$(EXESUF): LIBS += -ludev -lmultipath -lmpathpersist
--endif
--
- clean: recurse-clean ninja-clean clean-ctlist
- 	-test -f ninjatool && ./ninjatool $(if $(V),-v,) -t clean
- # avoid old build problems by removing potentially incorrect old files
 diff --git a/configure b/configure
-index 013ee3bda4..cca4ed382e 100755
+index a73a8d6576..d59cee6cc1 100755
 --- a/configure
 +++ b/configure
-@@ -6668,7 +6668,6 @@ if [ "$eventfd" = "yes" ]; then
+@@ -7785,7 +7785,6 @@ echo "CC=$cc" >> $config_host_mak
+ if $iasl -h > /dev/null 2>&1; then
+   echo "IASL=$iasl" >> $config_host_mak
  fi
- 
- tools=""
--helpers=""
- if test "$want_tools" = "yes" ; then
-   if [ "$linux" = "yes" -o "$bsd" = "yes" -o "$solaris" = "yes" ] ; then
-     tools="qemu-storage-daemon\$(EXESUF) $tools"
-@@ -6692,7 +6691,6 @@ if test "$softmmu" = yes ; then
-       fi
-       mpath=no
-     fi
--    helpers="$helpers scsi/qemu-pr-helper\$(EXESUF)"
-   else
-     if test "$virtfs" = yes; then
-       error_exit "VirtFS is supported only on Linux"
-@@ -7770,7 +7768,6 @@ else
-   QEMU_INCLUDES="-iquote ${source_path}/tcg/${ARCH} $QEMU_INCLUDES"
- fi
- 
--echo "HELPERS=$helpers" >> $config_host_mak
- echo "TOOLS=$tools" >> $config_host_mak
- echo "ROMS=$roms" >> $config_host_mak
- echo "MAKE=$make" >> $config_host_mak
+-echo "HOST_CC=$host_cc" >> $config_host_mak
+ echo "CXX=$cxx" >> $config_host_mak
+ echo "OBJCC=$objcc" >> $config_host_mak
+ echo "AR=$ar" >> $config_host_mak
 diff --git a/meson.build b/meson.build
-index a6d4057e0d..54d2a65fa4 100644
+index eece79c8a9..eabca9025a 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -145,6 +145,10 @@ if 'CONFIG_XKBCOMMON' in config_host
-                                  link_args: config_host['XKBCOMMON_LIBS'].split())
- endif
- rt = cc.find_library('rt', required: false)
-+libmpathpersist = not_found
-+if config_host.has_key('CONFIG_MPATH')
-+  libmpathpersist = cc.find_library('mpathpersist')
-+endif
- libiscsi = not_found
- if 'CONFIG_LIBISCSI' in config_host
-   libiscsi = declare_dependency(compile_args: config_host['LIBISCSI_CFLAGS'].split(),
-@@ -630,6 +634,7 @@ foreach target : target_dirs
- endforeach
+@@ -345,6 +345,7 @@ qemuutil = declare_dependency(link_with: libqemuutil,
+ 
+ subdir('io')
+ subdir('fsdev')
++subdir('target')
  
  # Other build targets
-+
  if 'CONFIG_GUEST_AGENT' in config_host
-   subdir('qga')
- endif
-@@ -671,6 +676,11 @@ if have_tools
-                dependencies: [qemuutil, libcap_ng],
-                install: true,
-                install_dir: get_option('libexecdir'))
-+
-+    executable('qemu-pr-helper', files('scsi/qemu-pr-helper.c', 'scsi/utils.c'),
-+               dependencies: [authz, crypto, io, qom, qemuutil,
-+                              libcap_ng, libudev, libmpathpersist],
-+               install: true)
-   endif
+diff --git a/target/meson.build b/target/meson.build
+new file mode 100644
+index 0000000000..e29dd3e01f
+--- /dev/null
++++ b/target/meson.build
+@@ -0,0 +1 @@
++subdir('s390x')
+diff --git a/target/s390x/Makefile.objs b/target/s390x/Makefile.objs
+index 3e2745594a..9b9accc5fd 100644
+--- a/target/s390x/Makefile.objs
++++ b/target/s390x/Makefile.objs
+@@ -8,23 +8,3 @@ obj-$(CONFIG_SOFTMMU) += sigp.o
+ obj-$(CONFIG_KVM) += kvm.o
+ obj-$(call lnot,$(CONFIG_KVM)) += kvm-stub.o
+ obj-$(call lnot,$(CONFIG_TCG)) += tcg-stub.o
+-
+-# build and run feature list generator
+-feat-src = $(SRC_PATH)/target/$(TARGET_BASE_ARCH)/
+-feat-dst = $(BUILD_DIR)/$(TARGET_DIR)
+-ifneq ($(MAKECMDGOALS),clean)
+-generated-files-y += $(feat-dst)gen-features.h
+-endif
+-
+-$(feat-dst)gen-features.h: $(feat-dst)gen-features.h-timestamp
+-	@cmp $< $@ >/dev/null 2>&1 || cp $< $@
+-$(feat-dst)gen-features.h-timestamp: $(feat-dst)gen-features
+-	$(call quiet-command,$< >$@,"GEN","$(TARGET_DIR)gen-features.h")
+-
+-$(feat-dst)gen-features: $(feat-src)gen-features.c
+-	$(call quiet-command,$(HOST_CC) $(QEMU_INCLUDES) -o $@ $<,"CC","$(TARGET_DIR)gen-features")
+-
+-clean-target:
+-	rm -f gen-features.h-timestamp
+-	rm -f gen-features.h
+-	rm -f gen-features
+diff --git a/target/s390x/cpu_features.h b/target/s390x/cpu_features.h
+index da695a8346..2a29475493 100644
+--- a/target/s390x/cpu_features.h
++++ b/target/s390x/cpu_features.h
+@@ -16,7 +16,7 @@
  
-   if 'CONFIG_IVSHMEM' in config_host
+ #include "qemu/bitmap.h"
+ #include "cpu_features_def.h"
+-#include "gen-features.h"
++#include "target/s390x/gen-features.h"
+ 
+ /* CPU features are announced via different ways */
+ typedef enum {
+diff --git a/target/s390x/cpu_models.h b/target/s390x/cpu_models.h
+index 88bd01a616..74d1f87e4f 100644
+--- a/target/s390x/cpu_models.h
++++ b/target/s390x/cpu_models.h
+@@ -14,7 +14,7 @@
+ #define TARGET_S390X_CPU_MODELS_H
+ 
+ #include "cpu_features.h"
+-#include "gen-features.h"
++#include "target/s390x/gen-features.h"
+ #include "hw/core/cpu.h"
+ 
+ /* static CPU definition */
+diff --git a/target/s390x/meson.build b/target/s390x/meson.build
+new file mode 100644
+index 0000000000..ddf8d20a36
+--- /dev/null
++++ b/target/s390x/meson.build
+@@ -0,0 +1,9 @@
++gen_features = executable('gen-features', 'gen-features.c', native: true,
++                          build_by_default: false)
++
++gen_features_h = custom_target('gen-features.h',
++                               output: 'gen-features.h',
++                               capture: true,
++                               command: gen_features)
++
++specific_ss.add(gen_features_h)
 -- 
 2.26.2
 
