@@ -7,76 +7,76 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63134C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 14:38:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E6D2C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 14:39:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2FB87207DE
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 14:38:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 083482076E
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 14:39:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G8bUvF6I"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FB87207DE
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ie52xNuN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 083482076E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46410 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50958 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k82kv-0005ul-CQ
-	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 10:38:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33090)
+	id 1k82lp-0007mb-8D
+	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 10:39:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60704)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k82LE-00054U-B1
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:11:56 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:42357
+ id 1k82Kg-00040K-Se
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:11:22 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41807
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k82L4-0007Vh-Ga
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:11:56 -0400
+ id 1k82KX-0007Om-48
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:11:22 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597759905;
+ s=mimecast20190719; t=1597759872;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=EqxqYSBV7uEMenTXBSHXyP24ul4XVhFr0o+0x9l/sqA=;
- b=G8bUvF6IOJN9DC7hO1g9hcalgLMQ53KkBRkFSBO9A0gs7KeyiAlnMtV/b62L/4DegCw1G+
- 3TdqCR1Y24+PfDOE74Rerw79NidiZh4N+LIVgiQeNlvMn2s93AHeaNQzKwkB+WSWcUjqNW
- mCtKSWuqUYL2FuKGXUVYAtkiHgKQlfs=
+ bh=jJPDAgGBJ5+W7NXyAPlK9tqt+xTyVeSLeGlG9TPepww=;
+ b=ie52xNuNnr95vuS4PJOFBRYVoPsuPxVtTioMM89dxGRvj4GRvJqT6Tu11Rn8BNK2JKmuK1
+ A3BOB15/hpXRVf5jkW9W7ZUdOoJKpzhHwmntOhfcpNqtuSz0ztMLtqb6R0K1zdGK92mIvt
+ +x6rnkhivoIvzrl3XJYn0n4G6X2aHUU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-223-CgQrApJhN26Tm-YXTl8wlQ-1; Tue, 18 Aug 2020 10:11:43 -0400
-X-MC-Unique: CgQrApJhN26Tm-YXTl8wlQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-474-pkdUwBhoM1KklJfKYrJzrQ-1; Tue, 18 Aug 2020 10:11:10 -0400
+X-MC-Unique: pkdUwBhoM1KklJfKYrJzrQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0EB7A1007463
- for <qemu-devel@nongnu.org>; Tue, 18 Aug 2020 14:11:43 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5B48AD6385
+ for <qemu-devel@nongnu.org>; Tue, 18 Aug 2020 14:11:09 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B2AF6165D8;
- Tue, 18 Aug 2020 14:11:42 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0CDE85882D;
+ Tue, 18 Aug 2020 14:11:08 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 090/150] meson: convert hw/mem
-Date: Tue, 18 Aug 2020 10:09:25 -0400
-Message-Id: <20200818141025.21608-91-pbonzini@redhat.com>
+Subject: [PULL 047/150] meson: add virtfs-proxy-helper
+Date: Tue, 18 Aug 2020 10:08:42 -0400
+Message-Id: <20200818141025.21608-48-pbonzini@redhat.com>
 In-Reply-To: <20200818141025.21608-1-pbonzini@redhat.com>
 References: <20200818141025.21608-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 06:40:33
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 03:19:25
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -108,67 +108,110 @@ From: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/Makefile.objs     | 1 -
- hw/mem/Kconfig       | 1 +
- hw/mem/Makefile.objs | 3 ---
- hw/mem/meson.build   | 6 ++++++
- hw/meson.build       | 1 +
- 5 files changed, 8 insertions(+), 4 deletions(-)
- delete mode 100644 hw/mem/Makefile.objs
- create mode 100644 hw/mem/meson.build
+ Makefile          | 2 --
+ configure         | 7 +++++--
+ fsdev/meson.build | 8 ++++++++
+ meson.build       | 6 ++++++
+ 4 files changed, 19 insertions(+), 4 deletions(-)
+ create mode 100644 fsdev/meson.build
 
-diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-index 73c49ddd3b..df72b25a64 100644
---- a/hw/Makefile.objs
-+++ b/hw/Makefile.objs
-@@ -34,7 +34,6 @@ devices-dirs-y += usb/
- devices-dirs-$(CONFIG_VFIO) += vfio/
- devices-dirs-y += virtio/
- devices-dirs-y += watchdog/
--devices-dirs-$(CONFIG_MEM_DEVICE) += mem/
- endif
+diff --git a/Makefile b/Makefile
+index a768af38eb..79abbedd9d 100644
+--- a/Makefile
++++ b/Makefile
+@@ -420,8 +420,6 @@ qemu-nbd$(EXESUF): qemu-nbd.o $(authz-obj-y) $(block-obj-y) $(crypto-obj-y) $(io
+ qemu-io$(EXESUF): qemu-io.o $(authz-obj-y) $(block-obj-y) $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
+ qemu-storage-daemon$(EXESUF): qemu-storage-daemon.o $(authz-obj-y) $(block-obj-y) $(crypto-obj-y) $(chardev-obj-y) $(io-obj-y) $(qom-obj-y) $(storage-daemon-obj-y) $(COMMON_LDADDS)
  
- common-obj-y += $(devices-dirs-y)
-diff --git a/hw/mem/Kconfig b/hw/mem/Kconfig
-index c27844900d..a0ef2cf648 100644
---- a/hw/mem/Kconfig
-+++ b/hw/mem/Kconfig
-@@ -9,3 +9,4 @@ config NVDIMM
-     bool
-     default y
-     depends on (PC || PSERIES || ARM_VIRT)
-+    select MEM_DEVICE
-diff --git a/hw/mem/Makefile.objs b/hw/mem/Makefile.objs
-deleted file mode 100644
-index 56345befd0..0000000000
---- a/hw/mem/Makefile.objs
-+++ /dev/null
-@@ -1,3 +0,0 @@
--common-obj-$(CONFIG_DIMM) += pc-dimm.o
--common-obj-y += memory-device.o
--common-obj-$(CONFIG_NVDIMM) += nvdimm.o
-diff --git a/hw/mem/meson.build b/hw/mem/meson.build
+-fsdev/virtfs-proxy-helper$(EXESUF): fsdev/virtfs-proxy-helper.o fsdev/9p-marshal.o fsdev/9p-iov-marshal.o $(COMMON_LDADDS)
+-
+ scsi/qemu-pr-helper$(EXESUF): scsi/qemu-pr-helper.o scsi/utils.o $(authz-obj-y) $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
+ ifdef CONFIG_MPATH
+ scsi/qemu-pr-helper$(EXESUF): LIBS += -ludev -lmultipath -lmpathpersist
+diff --git a/configure b/configure
+index f1ce9d7f0c..1421883577 100755
+--- a/configure
++++ b/configure
+@@ -4339,6 +4339,7 @@ fi
+ ##########################################
+ # attr probe
+ 
++libattr_libs=
+ if test "$attr" != "no" ; then
+   cat > $TMPC <<EOF
+ #include <stdio.h>
+@@ -4355,7 +4356,8 @@ EOF
+   # Older distros have <attr/xattr.h>, and need -lattr:
+   elif compile_prog "-DCONFIG_LIBATTR" "-lattr" ; then
+     attr=yes
+-    LIBS="-lattr $LIBS"
++    libattr_libs="-lattr"
++    LIBS="$libattr_libs $LIBS"
+     libattr=yes
+   else
+     if test "$attr" = "yes" ; then
+@@ -6667,6 +6669,7 @@ if [ "$eventfd" = "yes" ]; then
+ fi
+ 
+ tools=""
++helpers=""
+ if test "$want_tools" = "yes" ; then
+   tools="qemu-img\$(EXESUF) qemu-io\$(EXESUF) $tools"
+   if [ "$linux" = "yes" -o "$bsd" = "yes" -o "$solaris" = "yes" ] ; then
+@@ -6677,7 +6680,6 @@ if test "$softmmu" = yes ; then
+   if test "$linux" = yes; then
+     if test "$virtfs" != no && test "$cap_ng" = yes && test "$attr" = yes ; then
+       virtfs=yes
+-      helpers="$helpers fsdev/virtfs-proxy-helper\$(EXESUF)"
+     else
+       if test "$virtfs" = yes; then
+         error_exit "VirtFS requires libcap-ng devel and libattr devel"
+@@ -7259,6 +7261,7 @@ if test "$linux_io_uring" = "yes" ; then
+ fi
+ if test "$attr" = "yes" ; then
+   echo "CONFIG_ATTR=y" >> $config_host_mak
++  echo "LIBATTR_LIBS=$libattr_libs" >> $config_host_mak
+ fi
+ if test "$libattr" = "yes" ; then
+   echo "CONFIG_LIBATTR=y" >> $config_host_mak
+diff --git a/fsdev/meson.build b/fsdev/meson.build
 new file mode 100644
-index 0000000000..ba424622bb
+index 0000000000..30e2319960
 --- /dev/null
-+++ b/hw/mem/meson.build
-@@ -0,0 +1,6 @@
-+mem_ss = ss.source_set()
-+mem_ss.add(files('memory-device.c'))
-+mem_ss.add(when: 'CONFIG_DIMM', if_true: files('pc-dimm.c'))
-+mem_ss.add(when: 'CONFIG_NVDIMM', if_true: files('nvdimm.c'))
++++ b/fsdev/meson.build
+@@ -0,0 +1,8 @@
++have_virtfs_proxy_helper = have_tools and libattr.found() and libcap_ng.found() and 'CONFIG_VIRTFS' in config_host
++if have_virtfs_proxy_helper
++  executable('virtfs-proxy-helper',
++             files('virtfs-proxy-helper.c', '9p-marshal.c', '9p-iov-marshal.c'),
++             dependencies: [qemuutil, libattr, libcap_ng],
++             install: true,
++             install_dir: get_option('libexecdir'))
++endif
+diff --git a/meson.build b/meson.build
+index 0b465043d7..69e099fb8f 100644
+--- a/meson.build
++++ b/meson.build
+@@ -99,6 +99,10 @@ if 'CONFIG_GNUTLS' in config_host
+ endif
+ pixman = declare_dependency(compile_args: config_host['PIXMAN_CFLAGS'].split(),
+                             link_args: config_host['PIXMAN_LIBS'].split())
++libattr = not_found
++if 'CONFIG_ATTR' in config_host
++  libattr = declare_dependency(link_args: config_host['LIBATTR_LIBS'].split())
++endif
+ seccomp = not_found
+ if 'CONFIG_SECCOMP' in config_host
+   seccomp = declare_dependency(compile_args: config_host['SECCOMP_CFLAGS'].split(),
+@@ -298,6 +302,8 @@ libqemuutil = static_library('qemuutil',
+ qemuutil = declare_dependency(link_with: libqemuutil,
+                               sources: genh + version_res)
+ 
++subdir('fsdev')
 +
-+softmmu_ss.add_all(when: 'CONFIG_MEM_DEVICE', if_true: mem_ss)
-diff --git a/hw/meson.build b/hw/meson.build
-index dccc2d19a6..542d675618 100644
---- a/hw/meson.build
-+++ b/hw/meson.build
-@@ -1,4 +1,5 @@
- subdir('core')
-+subdir('mem')
- subdir('nubus')
- subdir('semihosting')
- subdir('smbios')
+ # Other build targets
+ if 'CONFIG_GUEST_AGENT' in config_host
+   subdir('qga')
 -- 
 2.26.2
 
