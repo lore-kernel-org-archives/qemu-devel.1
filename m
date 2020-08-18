@@ -7,72 +7,72 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61AEBC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 14:59:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CCC0C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 15:00:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 188C3207DE
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 14:59:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 33B8B20786
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 15:00:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fwi38DtA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 188C3207DE
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XCbFEesk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33B8B20786
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46472 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48088 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k835f-0001tO-8H
-	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 10:59:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33280)
+	id 1k8368-0002Wq-D4
+	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 11:00:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33728)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k82LN-0005TG-6B
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:12:05 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36029
+ id 1k82Ll-0006G2-Vi
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:12:30 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23706
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k82L8-0007We-1O
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:12:04 -0400
+ id 1k82Lb-0007cq-26
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:12:29 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597759909;
+ s=mimecast20190719; t=1597759937;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Sg9YVJRv6wW6cfJ0v4OQv28WxAZBM0uAS+h3Qkeg40s=;
- b=fwi38DtAalYTFE89orFBpYReu/yOP53HWZ515YpBtox57reit7rV9COjk9MCJ+tBz+t1Bk
- iOD9JGENgx62Y29sWUcEzESjdj5si7ljA8QU9iEle3ie5LWbsrTgALAoeFiIOEihiK1Qhj
- 1MEdbuWLr1D3qQz7yO16DW5hnPPw13k=
+ bh=i0BODsRsYqt5/ZhHJHUcTN3NvTrrPCU6cEV8rc4i/s0=;
+ b=XCbFEeskrcAkaQsD44KzimHN8+hiiVCntGjZ4KRMDlu9d8curdIBQz/pNnwwqMNn3FgFgG
+ rxFcaThzNedsg2zXICZ17NnCNxLSTwwfD/ZpO0C6ILGNErsblpSjHLsXXHrtmiTyW0fBBt
+ ESd6EJcRagQWrwGLlvUh9pX7xCE93gQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-427-umC6ObuvOyO7q0vG_pir0w-1; Tue, 18 Aug 2020 10:11:47 -0400
-X-MC-Unique: umC6ObuvOyO7q0vG_pir0w-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-419-izwvvo12PPqoxkZg-gSklA-1; Tue, 18 Aug 2020 10:12:15 -0400
+X-MC-Unique: izwvvo12PPqoxkZg-gSklA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BD15180F040
- for <qemu-devel@nongnu.org>; Tue, 18 Aug 2020 14:11:46 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9771981F017
+ for <qemu-devel@nongnu.org>; Tue, 18 Aug 2020 14:12:14 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6D557261B8;
- Tue, 18 Aug 2020 14:11:46 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 642635882D
+ for <qemu-devel@nongnu.org>; Tue, 18 Aug 2020 14:12:14 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 098/150] meson: convert hw/ssi
-Date: Tue, 18 Aug 2020 10:09:33 -0400
-Message-Id: <20200818141025.21608-99-pbonzini@redhat.com>
+Subject: [PULL 133/150] meson: plugins
+Date: Tue, 18 Aug 2020 10:10:08 -0400
+Message-Id: <20200818141025.21608-134-pbonzini@redhat.com>
 In-Reply-To: <20200818141025.21608-1-pbonzini@redhat.com>
 References: <20200818141025.21608-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-1.mimecast.com
@@ -98,79 +98,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Marc-André Lureau <marcandre.lureau@redhat.com>
+For now link arguments end up in Makefile.target, they will move to the
+right place soon.
 
-Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/Makefile.objs     |  1 -
- hw/meson.build       |  1 +
- hw/ssi/Makefile.objs | 10 ----------
- hw/ssi/meson.build   |  9 +++++++++
- 4 files changed, 10 insertions(+), 11 deletions(-)
- delete mode 100644 hw/ssi/Makefile.objs
- create mode 100644 hw/ssi/meson.build
+ Makefile              |  8 +-------
+ Makefile.target       | 12 ++++++++++--
+ meson.build           |  5 +++++
+ plugins/Makefile.objs | 21 ---------------------
+ plugins/meson.build   |  5 +++++
+ 5 files changed, 21 insertions(+), 30 deletions(-)
+ delete mode 100644 plugins/Makefile.objs
+ create mode 100644 plugins/meson.build
 
-diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-index f60fd019ac..e50eb04635 100644
---- a/hw/Makefile.objs
-+++ b/hw/Makefile.objs
-@@ -26,7 +26,6 @@ devices-dirs-$(CONFIG_PCI) += pci-bridge/ pci-host/
- devices-dirs-y += pcmcia/
- devices-dirs-$(CONFIG_SCSI) += scsi/
- devices-dirs-y += sd/
--devices-dirs-y += ssi/
- endif
+diff --git a/Makefile b/Makefile
+index 79498bcfe4..4d1e42d0f1 100644
+--- a/Makefile
++++ b/Makefile
+@@ -424,13 +424,10 @@ endif
  
- common-obj-y += $(devices-dirs-y)
-diff --git a/hw/meson.build b/hw/meson.build
-index 1fb1687e1e..75644266f2 100644
---- a/hw/meson.build
-+++ b/hw/meson.build
-@@ -4,6 +4,7 @@ subdir('nubus')
- subdir('rtc')
- subdir('semihosting')
- subdir('smbios')
-+subdir('ssi')
- subdir('timer')
- subdir('tpm')
- subdir('usb')
-diff --git a/hw/ssi/Makefile.objs b/hw/ssi/Makefile.objs
-deleted file mode 100644
-index 07a85f1967..0000000000
---- a/hw/ssi/Makefile.objs
-+++ /dev/null
-@@ -1,10 +0,0 @@
--common-obj-$(CONFIG_PL022) += pl022.o
--common-obj-$(CONFIG_SSI) += ssi.o
--common-obj-$(CONFIG_XILINX_SPI) += xilinx_spi.o
--common-obj-$(CONFIG_XILINX_SPIPS) += xilinx_spips.o
--common-obj-$(CONFIG_ASPEED_SOC) += aspeed_smc.o
--common-obj-$(CONFIG_STM32F2XX_SPI) += stm32f2xx_spi.o
--common-obj-$(CONFIG_MSF2) += mss-spi.o
+ ICON_SIZES=16x16 24x24 32x32 48x48 64x64 128x128 256x256 512x512
+ 
+-install-includedir:
+-	$(INSTALL_DIR) "$(DESTDIR)$(includedir)"
 -
--common-obj-$(CONFIG_OMAP) += omap_spi.o
--common-obj-$(CONFIG_IMX) += imx_spi.o
-diff --git a/hw/ssi/meson.build b/hw/ssi/meson.build
+ # Needed by "meson install"
+ export DESTDIR
+ install: all $(if $(BUILD_DOCS),install-doc) \
+-	install-datadir install-localstatedir install-includedir \
++	install-datadir install-localstatedir \
+ 	recurse-install
+ ifdef CONFIG_TRACE_SYSTEMTAP
+ 	$(INSTALL_PROG) "scripts/qemu-trace-stap" $(DESTDIR)$(bindir)
+@@ -456,9 +453,6 @@ endif
+ 		"$(DESTDIR)$(qemu_desktopdir)/qemu.desktop"
+ ifdef CONFIG_GTK
+ 	$(MAKE) -C po $@
+-endif
+-ifeq ($(CONFIG_PLUGIN),y)
+-	$(INSTALL_DATA) $(SRC_PATH)/include/qemu/qemu-plugin.h "$(DESTDIR)$(includedir)/qemu-plugin.h"
+ endif
+ 	$(INSTALL_DIR) "$(DESTDIR)$(qemu_datadir)/keymaps"
+ 	set -e; for x in $(KEYMAPS); do \
+diff --git a/Makefile.target b/Makefile.target
+index c180b4cb38..2b7280b272 100644
+--- a/Makefile.target
++++ b/Makefile.target
+@@ -110,8 +110,6 @@ obj-y += trace/
+ #########################################################
+ LIBS := $(libs_cpu) $(LIBS)
+ 
+-obj-$(CONFIG_PLUGIN) += plugins/
+-
+ #########################################################
+ # Linux user emulator target
+ 
+@@ -153,6 +151,16 @@ LIBS := $(LIBS) $(VDE_LIBS) $(SLIRP_LIBS)
+ LIBS := $(LIBS) $(LIBUSB_LIBS) $(SMARTCARD_LIBS) $(USB_REDIR_LIBS)
+ LIBS := $(LIBS) $(VIRGL_LIBS) $(CURSES_LIBS)
+ 
++ifeq ($(CONFIG_PLUGIN),y)
++ifdef CONFIG_HAS_LD_DYNAMIC_LIST
++LIBS += -Wl,--dynamic-list=$(BUILD_DIR)/qemu-plugins-ld.symbols
++else
++ifdef CONFIG_HAS_LD_EXPORTED_SYMBOLS_LIST
++LIBS += -Wl,-exported_symbols_list,$(BUILD_DIR)/qemu-plugins-ld64.symbols
++endif
++endif
++endif
++
+ generated-files-y += hmp-commands.h hmp-commands-info.h
+ 
+ endif # CONFIG_SOFTMMU
+diff --git a/meson.build b/meson.build
+index e6422ef8a3..613ba92297 100644
+--- a/meson.build
++++ b/meson.build
+@@ -728,6 +728,7 @@ subdir('net')
+ subdir('replay')
+ subdir('hw')
+ subdir('accel')
++subdir('plugins')
+ subdir('bsd-user')
+ subdir('linux-user')
+ 
+@@ -896,6 +897,10 @@ endforeach
+ 
+ # Other build targets
+ 
++if 'CONFIG_PLUGIN' in config_host
++  install_headers('include/qemu/qemu-plugin.h')
++endif
++
+ if 'CONFIG_GUEST_AGENT' in config_host
+   subdir('qga')
+ endif
+diff --git a/plugins/Makefile.objs b/plugins/Makefile.objs
+deleted file mode 100644
+index 6f14d91ccb..0000000000
+--- a/plugins/Makefile.objs
++++ /dev/null
+@@ -1,21 +0,0 @@
+-#
+-# Plugin Support
+-#
+-
+-obj-y += loader.o
+-obj-y += core.o
+-obj-y += api.o
+-
+-# Abuse -libs suffix to only link with --dynamic-list/-exported_symbols_list
+-# when the final binary includes the plugin object.
+-#
+-# Note that simply setting LDFLAGS is not enough: we build binaries that
+-# never link plugin.o, and the linker might fail (at least ld64 does)
+-# if the symbols in the list are not in the output binary.
+-ifdef CONFIG_HAS_LD_DYNAMIC_LIST
+-api.o-libs := -Wl,--dynamic-list=$(BUILD_DIR)/qemu-plugins-ld.symbols
+-else
+-ifdef CONFIG_HAS_LD_EXPORTED_SYMBOLS_LIST
+-api.o-libs := -Wl,-exported_symbols_list,$(BUILD_DIR)/qemu-plugins-ld64.symbols
+-endif
+-endif
+diff --git a/plugins/meson.build b/plugins/meson.build
 new file mode 100644
-index 0000000000..f1f5c287d0
+index 0000000000..9608e5293f
 --- /dev/null
-+++ b/hw/ssi/meson.build
-@@ -0,0 +1,9 @@
-+softmmu_ss.add(when: 'CONFIG_ASPEED_SOC', if_true: files('aspeed_smc.c'))
-+softmmu_ss.add(when: 'CONFIG_MSF2', if_true: files('mss-spi.c'))
-+softmmu_ss.add(when: 'CONFIG_PL022', if_true: files('pl022.c'))
-+softmmu_ss.add(when: 'CONFIG_SSI', if_true: files('ssi.c'))
-+softmmu_ss.add(when: 'CONFIG_STM32F2XX_SPI', if_true: files('stm32f2xx_spi.c'))
-+softmmu_ss.add(when: 'CONFIG_XILINX_SPI', if_true: files('xilinx_spi.c'))
-+softmmu_ss.add(when: 'CONFIG_XILINX_SPIPS', if_true: files('xilinx_spips.c'))
-+softmmu_ss.add(when: 'CONFIG_IMX', if_true: files('imx_spi.c'))
-+softmmu_ss.add(when: 'CONFIG_OMAP', if_true: files('omap_spi.c'))
++++ b/plugins/meson.build
+@@ -0,0 +1,5 @@
++specific_ss.add(when: 'CONFIG_PLUGIN', if_true: [files(
++  'loader.c',
++  'core.c',
++  'api.c',
++)])
 -- 
 2.26.2
 
