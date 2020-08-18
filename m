@@ -7,82 +7,84 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDBFCC433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 14:55:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B79A3C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 14:56:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BDF0C207D3
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 14:55:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 815F9207D3
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 14:56:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NFbwtwXy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDF0C207D3
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cU7DQLB/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 815F9207D3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54422 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58896 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k831r-0001qK-0M
-	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 10:55:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32966)
+	id 1k832a-0003j1-Ov
+	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 10:56:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33658)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k82L9-0004qK-21
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:11:51 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:22147)
+ id 1k82Li-00066c-Gf
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:12:26 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:35091
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k82L1-0007Us-5r
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:11:50 -0400
+ id 1k82LV-0007c3-GA
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:12:26 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597759901;
+ s=mimecast20190719; t=1597759932;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=h9cCHqwe107M70j80uu/a8jeV+D9N1MF11fMb6+Tnaw=;
- b=NFbwtwXySf6+NH21rjvWaUKmnp+N/Jt8V9ZNgKE3A4fVXLRaxMX7rnZQjJVoKHxasRenyH
- 7nP9qhz6FBWTPQl5ISpvhfCnIRE/Tal9m+SGba3KKnR8R0uPGj1qahrk0SQkOTVUEIfPcm
- hJ7R4DXhyrFCjQkk00pt8jSKjddI5SQ=
+ bh=IBXfWk7W7fH0eTVG+0nR5bPqpv6cRgwV8it9E5mV2dA=;
+ b=cU7DQLB/NQdD3rlbP3chF+u0wOlFf329yzVjHX1O5LJ6Twqys63R9YfXI6FRU2doFvItti
+ jtghsIOMHG4Y5VUU8q8Ar83ZPK+wt5k7rzFvk42bnVwWqkdhQYwL+oC27bs5f8fo4BvHmv
+ IOTvHhzIrxFSJpBUR+RmYtd/B2vaouE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-276--kAqUAVPOaeO21SjxTKG_w-1; Tue, 18 Aug 2020 10:11:40 -0400
-X-MC-Unique: -kAqUAVPOaeO21SjxTKG_w-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-273-nzxzIQM_MVKXVNERS30ebA-1; Tue, 18 Aug 2020 10:12:10 -0400
+X-MC-Unique: nzxzIQM_MVKXVNERS30ebA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1D8661800D41
- for <qemu-devel@nongnu.org>; Tue, 18 Aug 2020 14:11:39 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 26E6880F043
+ for <qemu-devel@nongnu.org>; Tue, 18 Aug 2020 14:12:07 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id CC1E2165D8;
- Tue, 18 Aug 2020 14:11:38 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D9E64600DD;
+ Tue, 18 Aug 2020 14:12:06 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 082/150] meson: convert fsdev/
-Date: Tue, 18 Aug 2020 10:09:17 -0400
-Message-Id: <20200818141025.21608-83-pbonzini@redhat.com>
+Subject: [PULL 126/150] meson: convert hw/9pfs, cleanup
+Date: Tue, 18 Aug 2020 10:10:01 -0400
+Message-Id: <20200818141025.21608-127-pbonzini@redhat.com>
 In-Reply-To: <20200818141025.21608-1-pbonzini@redhat.com>
 References: <20200818141025.21608-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 02:02:19
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 06:40:33
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -103,79 +105,176 @@ Sender: "Qemu-devel"
 
 From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
+hw/Makefile.objs is gone so there is more code that can be removed.
+
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Makefile.objs       |  4 +---
- configure           |  1 -
- fsdev/Makefile.objs | 12 ------------
- fsdev/meson.build   | 10 ++++++++++
- 4 files changed, 11 insertions(+), 16 deletions(-)
- delete mode 100644 fsdev/Makefile.objs
+ Makefile              |  4 ----
+ Makefile.objs         |  8 --------
+ Makefile.target       | 15 ---------------
+ hw/9pfs/Kconfig       |  4 ++++
+ hw/9pfs/Makefile.objs |  9 ---------
+ hw/9pfs/meson.build   | 20 ++++++++++++++++++++
+ hw/Makefile.objs      |  8 --------
+ hw/meson.build        |  1 +
+ 8 files changed, 25 insertions(+), 44 deletions(-)
+ delete mode 100644 hw/9pfs/Makefile.objs
+ create mode 100644 hw/9pfs/meson.build
+ delete mode 100644 hw/Makefile.objs
 
+diff --git a/Makefile b/Makefile
+index 98d18c0bfb..79498bcfe4 100644
+--- a/Makefile
++++ b/Makefile
+@@ -169,10 +169,6 @@ ifneq ($(wildcard config-host.mak),)
+ include $(SRC_PATH)/Makefile.objs
+ endif
+ 
+-dummy := $(call unnest-vars,, \
+-                common-obj-y \
+-                common-obj-m)
+-
+ include $(SRC_PATH)/tests/Makefile.include
+ 
+ all: $(DOCS) $(if $(BUILD_DOCS),sphinxdocs) recurse-all modules
 diff --git a/Makefile.objs b/Makefile.objs
-index c00851a0cd..7158031c0c 100644
+index c332323b81..c9720a92df 100644
 --- a/Makefile.objs
 +++ b/Makefile.objs
-@@ -39,9 +39,7 @@ endif # CONFIG_SOFTMMU or CONFIG_TOOLS
- # single QEMU executable should support all CPUs and machines.
+@@ -61,18 +61,10 @@ common-obj-$(if $(CONFIG_RBD),m) += block-rbd$(DSOSUF)
+ common-obj-$(if $(CONFIG_LZFSE),m) += block-dmg-lzfse$(DSOSUF)
+ common-obj-$(if $(and $(CONFIG_BZIP2),$(CONFIG_DMG)),m) += block-dmg-bz2$(DSOSUF)
  
- ifeq ($(CONFIG_SOFTMMU),y)
--common-obj-$(CONFIG_LINUX) = fsdev/
+-common-obj-y += hw/
+-common-obj-m += hw/
 -
--common-obj-y += accel/
-+common-obj-y = accel/
+ common-obj-y += libqmp.fa
  
- common-obj-$(CONFIG_AUDIO_ALSA) += audio-alsa$(DSOSUF)
- common-obj-$(CONFIG_AUDIO_OSS) += audio-oss$(DSOSUF)
-diff --git a/configure b/configure
-index 78bea5ff67..fb4c3ff071 100755
---- a/configure
-+++ b/configure
-@@ -3702,7 +3702,6 @@ int main(void)
- EOF
-   if compile_prog "" "$cap_libs" ; then
-     cap_ng=yes
--    libs_tools="$cap_libs $libs_tools"
-   else
-     if test "$cap_ng" = "yes" ; then
-       feature_not_found "cap_ng" "Install libcap-ng devel"
-diff --git a/fsdev/Makefile.objs b/fsdev/Makefile.objs
-deleted file mode 100644
-index 42cd70c367..0000000000
---- a/fsdev/Makefile.objs
-+++ /dev/null
-@@ -1,12 +0,0 @@
--# Lots of the fsdev/9pcode is pulled in by vl.c via qemu_fsdev_add.
--# only pull in the actual 9p backend if we also enabled virtio or xen.
--ifeq ($(CONFIG_FSDEV_9P),y)
--common-obj-y = qemu-fsdev.o 9p-marshal.o 9p-iov-marshal.o
--else
--common-obj-y = qemu-fsdev-dummy.o
--endif
--common-obj-y += qemu-fsdev-opts.o qemu-fsdev-throttle.o
+ endif # CONFIG_SOFTMMU
+ 
+-#######################################################################
+-# Target-independent parts used in system and user emulation
 -
--# Toplevel always builds this; targets without virtio will put it in
--# common-obj-y
--common-obj-$(CONFIG_ALL) += qemu-fsdev-dummy.o
-diff --git a/fsdev/meson.build b/fsdev/meson.build
-index 30e2319960..7dd1cc9bfb 100644
---- a/fsdev/meson.build
-+++ b/fsdev/meson.build
-@@ -1,3 +1,13 @@
-+fsdev_ss = ss.source_set()
-+fsdev_ss.add(files('qemu-fsdev-opts.c', 'qemu-fsdev-throttle.c'))
-+fsdev_ss.add(when: 'CONFIG_ALL', if_true: files('qemu-fsdev-dummy.c'))
-+fsdev_ss.add(when: ['CONFIG_FSDEV_9P'], if_true: files(
-+  '9p-iov-marshal.c',
-+  '9p-marshal.c',
-+  'qemu-fsdev.c',
-+), if_false: files('qemu-fsdev-dummy.c'))
-+softmmu_ss.add_all(when: 'CONFIG_LINUX', if_true: fsdev_ss)
+-common-obj-y += hw/
+-
+ ######################################################################
+ # Resource file for Windows executables
+ version-obj-$(CONFIG_WIN32) += $(BUILD_DIR)/version.o
+diff --git a/Makefile.target b/Makefile.target
+index 3534ece38a..c95e0deb79 100644
+--- a/Makefile.target
++++ b/Makefile.target
+@@ -156,7 +156,6 @@ endif #CONFIG_BSD_USER
+ ifdef CONFIG_SOFTMMU
+ obj-y += softmmu/
+ obj-y += gdbstub.o
+-obj-y += hw/
+ LIBS := $(libs_softmmu) $(LIBS)
+ 
+ # Temporary until emulators are linked by Meson
+@@ -185,20 +184,6 @@ endif # CONFIG_SOFTMMU
+ dummy := $(call unnest-vars,,obj-y)
+ all-obj-y := $(obj-y)
+ 
+-#
+-# common-obj-m has some crap here, probably as side effect from
+-# unnest-vars recursing into target directories to fill obj-y and not
+-# properly handling the -m case.
+-#
+-# Clear common-obj-m as workaround.  Fixes suspious dependency errors
+-# when building devices as modules.  A bit hackish, but should be ok
+-# as long as we do not have any target-specific modules.
+-#
+-# The meson-based build system currently in development doesn't need
+-# unnest-vars and will obsolete this workaround.
+-#
+-common-obj-m :=
+-
+ include $(SRC_PATH)/Makefile.objs
+ dummy := $(call fix-paths,../,, \
+               authz-obj-y \
+diff --git a/hw/9pfs/Kconfig b/hw/9pfs/Kconfig
+index 3ae5749661..d3ebd73730 100644
+--- a/hw/9pfs/Kconfig
++++ b/hw/9pfs/Kconfig
+@@ -2,8 +2,12 @@ config FSDEV_9P
+     bool
+     depends on VIRTFS
+ 
++config 9PFS
++    bool
 +
- have_virtfs_proxy_helper = have_tools and libattr.found() and libcap_ng.found() and 'CONFIG_VIRTFS' in config_host
- if have_virtfs_proxy_helper
-   executable('virtfs-proxy-helper',
+ config VIRTIO_9P
+     bool
+     default y
+     depends on VIRTFS && VIRTIO
+     select FSDEV_9P
++    select 9PFS
+diff --git a/hw/9pfs/Makefile.objs b/hw/9pfs/Makefile.objs
+deleted file mode 100644
+index 70ded6fd8f..0000000000
+--- a/hw/9pfs/Makefile.objs
++++ /dev/null
+@@ -1,9 +0,0 @@
+-common-obj-y  = 9p.o 9p-util.o
+-common-obj-y += 9p-local.o 9p-xattr.o
+-common-obj-y += 9p-xattr-user.o 9p-posix-acl.o
+-common-obj-y += coth.o cofs.o codir.o cofile.o
+-common-obj-y += coxattr.o 9p-synth.o
+-common-obj-y += 9p-proxy.o
+-
+-common-obj-$(CONFIG_XEN) += xen-9p-backend.o
+-obj-$(CONFIG_VIRTIO_9P) += virtio-9p-device.o
+diff --git a/hw/9pfs/meson.build b/hw/9pfs/meson.build
+new file mode 100644
+index 0000000000..cc09426212
+--- /dev/null
++++ b/hw/9pfs/meson.build
+@@ -0,0 +1,20 @@
++fs_ss = ss.source_set()
++fs_ss.add(files(
++  '9p-local.c',
++  '9p-posix-acl.c',
++  '9p-proxy.c',
++  '9p-synth.c',
++  '9p-util.c',
++  '9p-xattr-user.c',
++  '9p-xattr.c',
++  '9p.c',
++  'codir.c',
++  'cofile.c',
++  'cofs.c',
++  'coth.c',
++  'coxattr.c',
++))
++fs_ss.add(when: 'CONFIG_XEN', if_true: files('xen-9p-backend.c'))
++softmmu_ss.add_all(when: 'CONFIG_9PFS', if_true: fs_ss)
++
++specific_ss.add(when: 'CONFIG_VIRTIO_9P', if_true: files('virtio-9p-device.c'))
+diff --git a/hw/Makefile.objs b/hw/Makefile.objs
+deleted file mode 100644
+index ebae00af6e..0000000000
+--- a/hw/Makefile.objs
++++ /dev/null
+@@ -1,8 +0,0 @@
+-ifeq ($(CONFIG_SOFTMMU), y)
+-devices-dirs-$(call lor,$(CONFIG_VIRTIO_9P),$(call land,$(CONFIG_VIRTFS),$(CONFIG_XEN))) += 9pfs/
+-endif
+-
+-common-obj-y += $(devices-dirs-y)
+-common-obj-m += display/
+-common-obj-m += usb/
+-obj-y += $(devices-dirs-y)
+diff --git a/hw/meson.build b/hw/meson.build
+index 55ca2b2b61..ba8763cad8 100644
+--- a/hw/meson.build
++++ b/hw/meson.build
+@@ -1,3 +1,4 @@
++subdir('9pfs')
+ subdir('acpi')
+ subdir('adc')
+ subdir('audio')
 -- 
 2.26.2
 
