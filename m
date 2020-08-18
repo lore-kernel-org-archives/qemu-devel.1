@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47F4FC433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 14:35:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 234CCC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 14:35:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0A3702076E
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 14:35:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E2A9D2076E
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 14:35:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CP0LMxc9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A3702076E
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gvDx/QUo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2A9D2076E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53904 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55636 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k82ha-0005mf-5P
-	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 10:35:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60542)
+	id 1k82hs-0006V4-5I
+	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 10:35:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60710)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k82KX-0003ev-3W
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:11:13 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:46246
+ id 1k82Kh-00040y-6H
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:11:23 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41387
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k82KT-0007NX-UT
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:11:11 -0400
+ id 1k82KZ-0007PF-4T
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:11:22 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597759865;
+ s=mimecast20190719; t=1597759874;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=I01kMBp63EOgupnkKBjWSy2Amff3pdqr9v9AU6HZRz4=;
- b=CP0LMxc9no2vIAjNyGVbRY38cXFdlRdLduuXvLpViynTUDjXfaEyw8pHj9Nrrlbt5wUcXl
- hE0/klT4/DxbI85m1u4+ssjK7OJbLVjcDNoWopXSFtGEXIU/jkAf7miqG/BL2Ku5Yv9v4h
- 0iCmGPMek772DFArjK2aTbjCQKpOuAI=
+ bh=Gk0WYaKP+qzL75B7tm557kxSj+SjpicpV/yNk/Xgxro=;
+ b=gvDx/QUodsogj66GAe67cc2J5de+h1ISaamcIKLRKL4HnP4vRldacRmH+d77YExh2mEKK2
+ 0q4Jp456Zto4oPLjU4D3Uauws6JNPafIZM9yh3qrp/SxfZKvaSAFGU3dsAMFDnYviBFYzV
+ 6Tr9L7431+9939XeDCKD3sQzZAb25uo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-496-R2vt8aTBPXOR73PnOCKEIw-1; Tue, 18 Aug 2020 10:11:02 -0400
-X-MC-Unique: R2vt8aTBPXOR73PnOCKEIw-1
+ us-mta-200-QFiZ4LwoPmmHxma2XnAx7Q-1; Tue, 18 Aug 2020 10:11:12 -0400
+X-MC-Unique: QFiZ4LwoPmmHxma2XnAx7Q-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BB857101962B
- for <qemu-devel@nongnu.org>; Tue, 18 Aug 2020 14:11:01 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6243E100CA9A
+ for <qemu-devel@nongnu.org>; Tue, 18 Aug 2020 14:11:11 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 75E5659;
- Tue, 18 Aug 2020 14:11:01 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1FAD4196B6;
+ Tue, 18 Aug 2020 14:11:11 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 037/150] contrib/elf2dmp: convert to meson
-Date: Tue, 18 Aug 2020 10:08:32 -0400
-Message-Id: <20200818141025.21608-38-pbonzini@redhat.com>
+Subject: [PULL 050/150] meson: generate shader headers
+Date: Tue, 18 Aug 2020 10:08:45 -0400
+Message-Id: <20200818141025.21608-51-pbonzini@redhat.com>
 In-Reply-To: <20200818141025.21608-1-pbonzini@redhat.com>
 References: <20200818141025.21608-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -108,111 +108,93 @@ From: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Makefile                      | 4 ----
- Makefile.objs                 | 6 ------
- configure                     | 3 ---
- contrib/elf2dmp/Makefile.objs | 4 ----
- contrib/elf2dmp/meson.build   | 5 +++++
- meson.build                   | 6 ++++++
- 6 files changed, 11 insertions(+), 17 deletions(-)
- delete mode 100644 contrib/elf2dmp/Makefile.objs
- create mode 100644 contrib/elf2dmp/meson.build
+ Makefile              | 19 -------------------
+ meson.build           |  1 +
+ ui/meson.build        |  2 ++
+ ui/shader/meson.build | 15 +++++++++++++++
+ 4 files changed, 18 insertions(+), 19 deletions(-)
+ create mode 100644 ui/shader/meson.build
 
 diff --git a/Makefile b/Makefile
-index 208e98dd4d..653c16bb0d 100644
+index 9abf7be598..0732886563 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -293,7 +293,6 @@ dummy := $(call unnest-vars,, \
-                 authz-obj-y \
-                 chardev-obj-y \
-                 qga-obj-y \
--                elf2dmp-obj-y \
-                 qga-vss-dll-obj-y \
-                 block-obj-y \
-                 block-obj-m \
-@@ -503,9 +502,6 @@ ifneq ($(EXESUF),)
- qemu-ga: qemu-ga$(EXESUF) $(QGA_VSS_PROVIDER) $(QEMU_GA_MSI)
- endif
+@@ -384,7 +384,6 @@ clean: recurse-clean ninja-clean clean-ctlist
+ 	rm -f $(filter-out %.tlb,$(TOOLS)) $(HELPERS-y) TAGS cscope.* *.pod *~ */*~
+ 	rm -f fsdev/*.pod scsi/*.pod
+ 	rm -f qemu-img-cmds.h
+-	rm -f ui/shader/*-vert.h ui/shader/*-frag.h
+ 	rm -f $(foreach f,$(generated-files-y),$(f) $(f)-timestamp)
+ 	rm -f config-all-devices.mak
+ 	rm -f $(SUBDIR_DEVICES_MAK)
+@@ -609,24 +608,6 @@ endif
+ 	$(MAKE) $(SUBDIR_MAKEFLAGS) TARGET_DIR=$$d/ -C $$d $@ || exit 1 ; \
+         done
  
--elf2dmp$(EXESUF): $(elf2dmp-obj-y)
--	$(call LINK, $^)
+-# opengl shader programs
+-ui/shader/%-vert.h: $(SRC_PATH)/ui/shader/%.vert $(SRC_PATH)/scripts/shaderinclude.pl
+-	@mkdir -p $(dir $@)
+-	$(call quiet-command,\
+-		perl $(SRC_PATH)/scripts/shaderinclude.pl $< > $@,\
+-		"VERT","$@")
 -
- module_block.h: $(SRC_PATH)/scripts/modules/module_block.py config-host.mak
- 	$(call quiet-command,$(PYTHON) $< $@ \
- 	$(addprefix $(SRC_PATH)/,$(patsubst %.mo,%.c,$(block-obj-m))), \
-diff --git a/Makefile.objs b/Makefile.objs
-index 336a684ff3..1486254a2c 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -100,9 +100,3 @@ version-obj-$(CONFIG_WIN32) += $(BUILD_DIR)/version.o
- # extracted into a QAPI schema module, or perhaps a separate schema.
- qga-obj-y = qga/
- qga-vss-dll-obj-y = qga/
+-ui/shader/%-frag.h: $(SRC_PATH)/ui/shader/%.frag $(SRC_PATH)/scripts/shaderinclude.pl
+-	@mkdir -p $(dir $@)
+-	$(call quiet-command,\
+-		perl $(SRC_PATH)/scripts/shaderinclude.pl $< > $@,\
+-		"FRAG","$@")
 -
--######################################################################
--# contrib
--elf2dmp-obj-y = contrib/elf2dmp/
+-ui/shader.o: $(SRC_PATH)/ui/shader.c \
+-	ui/shader/texture-blit-vert.h \
+-	ui/shader/texture-blit-flip-vert.h \
+-	ui/shader/texture-blit-frag.h
 -
--######################################################################
-diff --git a/configure b/configure
-index 932c0743e4..02b3336a32 100755
---- a/configure
-+++ b/configure
-@@ -6680,9 +6680,6 @@ if test "$want_tools" = "yes" ; then
-   if [ "$linux" = "yes" -o "$bsd" = "yes" -o "$solaris" = "yes" ] ; then
-     tools="qemu-nbd\$(EXESUF) qemu-storage-daemon\$(EXESUF) $tools"
-   fi
--  if [ "$curl" = "yes" ]; then
--      tools="elf2dmp\$(EXESUF) $tools"
--  fi
- fi
- if test "$softmmu" = yes ; then
-   if test "$linux" = yes; then
-diff --git a/contrib/elf2dmp/Makefile.objs b/contrib/elf2dmp/Makefile.objs
-deleted file mode 100644
-index 1505716916..0000000000
---- a/contrib/elf2dmp/Makefile.objs
-+++ /dev/null
-@@ -1,4 +0,0 @@
--elf2dmp-obj-y = main.o addrspace.o download.o pdb.o qemu_elf.o
--
--download.o-cflags := $(CURL_CFLAGS)
--download.o-libs   := $(CURL_LIBS)
-diff --git a/contrib/elf2dmp/meson.build b/contrib/elf2dmp/meson.build
-new file mode 100644
-index 0000000000..b3de173316
---- /dev/null
-+++ b/contrib/elf2dmp/meson.build
-@@ -0,0 +1,5 @@
-+if 'CONFIG_CURL' in config_host
-+  executable('elf2dmp', files('main.c', 'addrspace.c', 'download.c', 'pdb.c', 'qemu_elf.c'),
-+             dependencies: [glib, curl],
-+             install: true)
-+endif
+ # documentation
+ MAKEINFO=makeinfo
+ MAKEINFOINCLUDES= -I docs -I $(<D) -I $(@D)
 diff --git a/meson.build b/meson.build
-index 7bb5984652..1fd903c32a 100644
+index 73660bafc1..648c7456d9 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -107,6 +107,11 @@ if 'CONFIG_VIRGL' in config_host
-   virgl = declare_dependency(compile_args: config_host['VIRGL_CFLAGS'].split(),
-                              link_args: config_host['VIRGL_LIBS'].split())
+@@ -156,6 +156,7 @@ have_block = have_system or have_tools
+ # Generators
+ 
+ genh = []
++shaderinclude = find_program('scripts/shaderinclude.pl')
+ qapi_gen = find_program('scripts/qapi-gen.py')
+ qapi_gen_depends = [ meson.source_root() / 'scripts/qapi/__init__.py',
+                      meson.source_root() / 'scripts/qapi/commands.py',
+diff --git a/ui/meson.build b/ui/meson.build
+index a6aa7f2b36..35da0d8d26 100644
+--- a/ui/meson.build
++++ b/ui/meson.build
+@@ -32,3 +32,5 @@ if have_system
+                             'code-map', '@INPUT0@', e[0], e[1]])
+   endforeach
  endif
-+curl = not_found
-+if 'CONFIG_CURL' in config_host
-+  curl = declare_dependency(compile_args: config_host['CURL_CFLAGS'].split(),
-+                            link_args: config_host['CURL_LIBS'].split())
-+endif
- 
- target_dirs = config_host['TARGET_DIRS'].split()
- have_user = false
-@@ -271,6 +276,7 @@ qemuutil = declare_dependency(link_with: libqemuutil,
- 
- if have_tools
-   subdir('contrib/rdmacm-mux')
-+  subdir('contrib/elf2dmp')
- 
-   if 'CONFIG_VHOST_USER' in config_host
-     subdir('contrib/libvhost-user')
++
++subdir('shader')
+diff --git a/ui/shader/meson.build b/ui/shader/meson.build
+new file mode 100644
+index 0000000000..f69e44ed89
+--- /dev/null
++++ b/ui/shader/meson.build
+@@ -0,0 +1,15 @@
++shaders = [
++  ['texture-blit', 'frag'],
++  ['texture-blit', 'vert'],
++  ['texture-blit-flip', 'vert'],
++]
++
++foreach e : shaders
++  output = '@0@-@1@.h'.format(e[0], e[1])
++  genh += custom_target(output,
++                output: output,
++                capture: true,
++                build_by_default: true, # to be removed when added to a target
++                input: files('@0@.@1@'.format(e[0], e[1])),
++                command: [shaderinclude, '@INPUT0@'])
++endforeach
 -- 
 2.26.2
 
