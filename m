@@ -7,88 +7,89 @@ X-Spam-Status: No, score=-3.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD13BC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 12:31:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91C38C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 12:32:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7B6CA206B5
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 12:31:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 595D92065D
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 12:32:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="WYiTa5ba"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B6CA206B5
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="DvKYeVYe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 595D92065D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55436 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56234 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k80mE-0006Rq-HG
-	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 08:31:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33190)
+	id 1k80nE-0006zo-Bh
+	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 08:32:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33306)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
- id 1k80hd-0003ZR-1a; Tue, 18 Aug 2020 08:26:57 -0400
-Received: from mout.web.de ([212.227.15.4]:33621)
+ id 1k80iF-00047R-IZ
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 08:27:35 -0400
+Received: from mout.web.de ([217.72.192.78]:50687)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
- id 1k80ha-0002cF-CT; Tue, 18 Aug 2020 08:26:56 -0400
+ id 1k80iD-0002eb-Lh
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 08:27:35 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
- s=dbaedf251592; t=1597753606;
- bh=Zgk2YWIiOH1Htm1ShKzM/kUPW/y3JY6T6OqiPDDGPAw=;
+ s=dbaedf251592; t=1597753625;
+ bh=xAYAMNZznihGhXB6b0Zne0872D9TrpTHXauiELJAN+8=;
  h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References;
- b=WYiTa5badKNcWOZWnStncmgPcBgULl9+NbEhuUem18MJ6QOGRnmRoq/vDqFMNGbaZ
- tiS9RWHeencjIMnsQxFXDyIGGQTopefF5YPKlkU+UfGxFDtclOEjJdju9J5sOsUdMV
- 8p8yv9EKiBJ7nky7+j1OXiEOW5zXHn+nyVf7KaaE=
+ b=DvKYeVYeTYO7RQ/VT+sGqP42ToONbT7vn4l+O0ax2n4WKbWRpPk/U5j+sz9XF/+Kf
+ BNfVh1qa3ml4WdnIFnSqpKg4Ap5+JuIk5tp4aMkio746GiBjYn1q3uu3vF/EL3kLuH
+ SLKP5seNwpSDVVHk8dIIhQwIH3IA/sZXAPPZzjzc=
 X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
-Received: from luklap ([89.247.255.107]) by smtp.web.de (mrweb001
- [213.165.67.108]) with ESMTPSA (Nemesis) id 0MD8RQ-1jtl6I2RK8-00GYWE; Tue, 18
- Aug 2020 14:26:46 +0200
-Date: Tue, 18 Aug 2020 14:26:31 +0200
+Received: from luklap ([89.247.255.107]) by smtp.web.de (mrweb101
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 0Lkh7Q-1kiAw916A8-00aUpm; Tue, 18
+ Aug 2020 14:27:05 +0200
+Date: Tue, 18 Aug 2020 14:27:01 +0200
 From: Lukas Straub <lukasstraub2@web.de>
 To: qemu-devel <qemu-devel@nongnu.org>
-Subject: Re: [PATCH v7 0/8] Introduce 'yank' oob qmp command to recover from
- hanging qemu
-Message-ID: <20200818142631.3e1c1481@luklap>
-In-Reply-To: <cover.1596528468.git.lukasstraub2@web.de>
-References: <cover.1596528468.git.lukasstraub2@web.de>
+Subject: Re: [PATCH v3 0/7] colo: Introduce resource agent and test suite/CI
+Message-ID: <20200818142701.6d1d82bd@luklap>
+In-Reply-To: <cover.1596536719.git.lukasstraub2@web.de>
+References: <cover.1596536719.git.lukasstraub2@web.de>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/tOCVbpn=6/.JuG8VrsS0WRD";
+Content-Type: multipart/signed; boundary="Sig_/6h//x_4uwRTisCjHo8L05kG";
  protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Provags-ID: V03:K1:dcvDlUAfAUifmKrFBhaI30rODK9Il9RRPk7QCWjoGUZ5gSCx+jG
- 0QsYJp3UGOW1vcjwvqc5HuegAJcfDxubZVkEFxRl8xHp1C+UY7iAQWHvycu3UJ42uQf6W6d
- Phx4ztSsJAaI2H36gKiTOCTlAxyh0IJ0DUiMevPqh3c0OshxYSXEnst4k8U9dJjvUwkCg4y
- DOx1SZ0ovOSEcbhQ0zlIg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:BN71A9kadec=:qLSncwTm6duZJZ+G2fZ6fg
- FikWIArpbme1Os8cLQneL9/6K0C4KpKXU9X5Op3cRmrAntROVyLznydGh0CCxjb0EpVJpfDNg
- NrWnwFYwKaRE+WRXrxOJSnlRJUe9CI27FRtzuui5UYW3jHexWOjPIQQLDzGl0Qnv8RBrlXujq
- AfP641g9nmT9BtB56DFUZTirLSsVfcl0baXw2T8WJK1NgGtksTf/Hpr8buT5jFXZX84iyzd0r
- +FQK3ijlsHf39wW8sbH54UUAy6UPxcWIpCtE7rAlw5aBK/APdrP86VcBz/5pPUMYV/wc0Fq32
- gRpCYFd8Wq7l64iGEvsJMx/emlVD4FIM9n6RSeywCxyNIKpb24pBXbkKRqHRSlBdicIUJA2/W
- K4opGWnSUQriOKPtdUrydfGhBfsK+ze3DmffsaIsmPBlVUX3A2EhRBAFPVS/1tTr1bN6dqZ6j
- ktuCjmwAj1zw8diEnVbb/Bhj5VYJdCu5JvFc7zBaswWjLbouxoqWg59Sj1ElDpGyVm7aqSDU3
- RB7bdIvax9FvXl1vkoaOpCSK+Ti6FCjmcyn8xCczlA895X3D1FhPLBHmRjfkGz9gyo8vq8w81
- jYRkYKzW7fnbwVh2JWT78Lg+DiwA6PaDEhbQuafCE5zXkRqcpS+p77zekT7cv7YedGSlL5vjq
- dHEYtH6qwb4ahXulYk0rCkggZBKnKUxBPZLnkY17Dcx4sqBiJAn181F2dUU5p9tFG9RR5ASYo
- dCsX7pboO9R2pSetAdCXhQLtenyEGnzUJSVrD5RFQANFrbf0UVnD7QyJqH0mCMUm/qpmTFLSN
- ri6sCga85CP1KWq7dkdQYZ/d0vf6avKDZmgpKpA7SpUsy5+9C1AwyACtcNQ+fWqdqcKsOKU5J
- MHqWoo3bS+oEMg+atOq32qU9o7MKhdOcrc488w0uu1HZ8vKprN1O3C0mfMGBmU2dHbU8vkpe0
- IVAkRCIQ1kt+J7ghGbNbTc0hOG3L8r2tyMTb+8kQW7a/sdC0AX83TgWvd8oRl54GaEk2dOg12
- Tjz3urjqMDM9qtQcMgGw07Xdnfot8cyEc99HuiofNI5cLuZ5Sg7utNvaa9gC49vXU1y1T9lUS
- qEhPKFNZeawvlyY2Xl05dfmQez/RisR7HSwPU0lX+5fVcHAIQgXsXGJX02xDIkO1IsK1iKsEk
- oyz2yxiD71z9eePuEg/ciaOjjE/VC6azSr+vZQk+D00s72c2pAe4PrqCfJHYwEBBumcIjKdDG
- p6yjaeUqKCV9paawRXaYYPOm/bXY7KgJiuGIOsg==
-Received-SPF: pass client-ip=212.227.15.4; envelope-from=lukasstraub2@web.de;
+X-Provags-ID: V03:K1:iovb8qppwy+EacJGq5VgMUtf004izfUtikG2yW0NYVfqYjCJKau
+ TU/K7bwbumOiRwdTXsge2mPFzf4pGSyk0FauFXOrjIBpIinvuyDx4zS5gKv0BhuYd/6d+fQ
+ gSWzP4CU4cOV2bOPtnPiGE6oqNoKD01YBHHLJoYoSA7DEM+2soIjOv9S7rX4ZvfUhiEKElh
+ hXoSNo+9C54TlF3CJejHQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:4mNrPqlApuU=:LeUJWqasNozQmb2P7M5h49
+ AoDogSF1LfOvHGcre9Cf9AbS7lMLhzFzJVaGVqPp+gDEq/HdpaAeBjA/gwFPhk6zfs9JDIes3
+ u/qRdohxxSZNJ8lItG2r4iD56GJBdLU+pE5eZgz5vgq3zSjQuWZoIa3sPR3Yn7QL0ye4bsykA
+ H6YZjfQDYeS05E9Vl5TWa5ReaJ8eSQ+b/ZAK+Ja2C4PySM1BKQhUWcWQTD+OTF6i99IzHtePD
+ LL+Osd/exF6TPW1TXDVef3H7aN3Ji3R49/sM+wH3b+aWFYShzygn4CeKseQo1Rtc3ENp00nab
+ B058FsZvdjvSi8l0HQTcrP+p+QKBjP0J5GW4RkMmXiWBbUbavIHYTjEm9pSpZ1TyyDuf3rpS0
+ rk2Yzw/bE8zDxuS92jjK/a5njKFuLLSWdPoFPJ6+XsBSLBdcKRdNchFW9KLeDnMpJ2Zu+FayD
+ cmu970RyUiF586+qA6DtKJF3wnwrTmJ/W2Ihd16j12re+HeNBwNLu7c7HOnr9b2g0YdFHVkO6
+ NTc334oW7DYNYEthm2qsvUivuzO7aTsHGMU34M25xBULmsvmAoB1S/d1qNWE3BiNkXv4GqOYS
+ jtyo79xS62eurw6KAOu0WbpN1Zk8kkiIdIDk+40yDauYf9nvMlVBPN5/Uc3Qakrqt7pP0s1FO
+ mU7KkLhP8CzGXPy/v2qzb7Ym7fx8N0jkA+DFKl/sXR8xdY+mWLNIDS3ulGXvEGK3q1b7c7nBg
+ iPtDP4vl27DXD3Sq9TovD/DCa+ogH8rWG+JpERp0eC4hVvQq0HBpkKq7kBWbv/wH9h3KpArL0
+ YZogP3mS0DlqPAzidn8JVado9y1Gr9VjOZTH7fztqAwo0Ppr20/xllqpe22szHr+4sXKIsT5h
+ u4UjHNhGWicUIl1jJbMJm4BinEGXE8pAqwI8d8KcI6XBZq/6qHkvY6zdsrhc+p5Y0CsMOrnnl
+ xsD25wHvAUcQdvJa4kK6DAbO7myXJ+oa+b45ltqhr8VTgwu/231zbSE0XUoD/PN4f3oFguSFF
+ aYh7JFsouoQOWeOdqrKWLH7Y9Qn7qL+a6T+4mDot/CVHKMVtmLlYXIpTxneOcKjvn5dJJ+kAc
+ o6AwB1i1Us4l6tQRK3nw/UG41JN5ZrQyUmFSKUBXyhMq+GRUwqsJ8cZMNUgdaSBKv1aS8o+nV
+ r/UcO9eWbw3IaH6TBknSku6g+XZEHPZha9KJd0riIjWMNfgBAJ0k9RzKNn935IrJKo/m659CQ
+ XQk5sqCJveHVFRp2PHbfex0cX9K1F/CNDqu1YUw==
+Received-SPF: pass client-ip=217.72.192.78; envelope-from=lukasstraub2@web.de;
  helo=mout.web.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 08:26:50
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 08:27:32
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -25
-X-Spam_score: -2.6
-X-Spam_bar: --
-X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+X-Spam_score_int: -34
+X-Spam_score: -3.5
+X-Spam_bar: ---
+X-Spam_report: (-3.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,135 +102,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>,
- qemu-block <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>,
- "Dr. David Alan
- Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?B?TWFyYy1BbmRy?= =?UTF-8?B?w6k=?= Lureau <marcandre.lureau@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, Zhang Chen <chen.zhang@intel.com>,
+ Cleber Rosa <crosa@redhat.com>,
+ Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---Sig_/tOCVbpn=6/.JuG8VrsS0WRD
-Content-Type: text/plain; charset=UTF-8
+--Sig_/6h//x_4uwRTisCjHo8L05kG
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, 4 Aug 2020 10:11:22 +0200
+On Tue, 4 Aug 2020 12:46:29 +0200
 Lukas Straub <lukasstraub2@web.de> wrote:
 
 > Hello Everyone,
-> In many cases, if qemu has a network connection (qmp, migration, chardev,=
- etc.)
-> to some other server and that server dies or hangs, qemu hangs too.
-> These patches introduce the new 'yank' out-of-band qmp command to recover=
- from
-> these kinds of hangs. The different subsystems register callbacks which g=
-et
-> executed with the yank command. For example the callback can shutdown() a
-> socket. This is intended for the colo use-case, but it can be used for ot=
-her
-> things too of course.
+> So here is v3. Patch 1 can already be merged independently of the others.
+> Please review.
 >=20
 > Regards,
 > Lukas Straub
 >=20
-> v7:
->  -yank_register_instance now returns error via Error **errp instead of ab=
-orting
->  -dropped "chardev/char.c: Check for duplicate id before  creating charde=
-v"
+> Based-on: <cover.1596528468.git.lukasstraub2@web.de>
+> "Introduce 'yank' oob qmp command to recover from hanging qemu"
 >=20
-> v6:
->  -add Reviewed-by and Acked-by tags
->  -rebase on master
->  -lots of changes in nbd due to rebase
->  -only take maintainership of util/yank.c and include/qemu/yank.h (Daniel=
- P. Berrang=C3=A9)
->  -fix a crash discovered by the newly added chardev test
->  -fix the test itself
->=20
-> v5:
->  -move yank.c to util/
->  -move yank.h to include/qemu/
->  -add license to yank.h
->  -use const char*
->  -nbd: use atomic_store_release and atomic_load_aqcuire
->  -io-channel: ensure thread-safety and document it
->  -add myself as maintainer for yank
->=20
-> v4:
->  -fix build errors...
+> Changes:
 >=20
 > v3:
->  -don't touch softmmu/vl.c, use __contructor__ attribute instead (Paolo B=
-onzini)
->  -fix build errors
->  -rewrite migration patch so it actually passes all tests
+>  -resource-agent: Don't determine local qemu state by remote master-score=
+, query
+>   directly via qmp instead
+>  -resource-agent: Add max_queue_size parameter for colo-compare
+>  -resource-agent: Fix monitor action on secondary returning error during
+>   clean shutdown
+>  -resource-agent: Fix stop action setting master-score to 0 on primary on
+>   clean shutdown
 >=20
 > v2:
->  -don't touch io/ code anymore
->  -always register yank functions
->  -'yank' now takes a list of instances to yank
->  -'query-yank' returns a list of yankable instances
+>  -use new yank api
+>  -drop disk_size parameter
+>  -introduce pick_qemu_util function and use it
 >=20
-> Lukas Straub (8):
->   Introduce yank feature
->   block/nbd.c: Add yank feature
->   chardev/char-socket.c: Add yank feature
->   migration: Add yank feature
->   io/channel-tls.c: make qio_channel_tls_shutdown thread-safe
->   io: Document thread-safety of qio_channel_shutdown
->   MAINTAINERS: Add myself as maintainer for yank feature
->   tests/test-char.c: Wait for the chardev to connect in
->     char_socket_client_dupid_test
+> Overview:
 >=20
->  MAINTAINERS                   |   6 ++
->  block/nbd.c                   | 129 +++++++++++++++---------
->  chardev/char-socket.c         |  31 ++++++
->  include/io/channel.h          |   2 +
->  include/qemu/yank.h           |  80 +++++++++++++++
->  io/channel-tls.c              |   6 +-
->  migration/channel.c           |  12 +++
->  migration/migration.c         |  25 ++++-
->  migration/multifd.c           |  10 ++
->  migration/qemu-file-channel.c |   6 ++
->  migration/savevm.c            |   6 ++
->  qapi/misc.json                |  45 +++++++++
->  tests/Makefile.include        |   2 +-
->  tests/test-char.c             |   1 +
->  util/Makefile.objs            |   1 +
->  util/yank.c                   | 184 ++++++++++++++++++++++++++++++++++
->  16 files changed, 493 insertions(+), 53 deletions(-)
->  create mode 100644 include/qemu/yank.h
->  create mode 100644 util/yank.c
+> Hello Everyone,
+> These patches introduce a resource agent for fully automatic management o=
+f colo
+> and a test suite building upon the resource agent to extensively test col=
+o.
+>=20
+> Test suite features:
+> -Tests failover with peer crashing and hanging and failover during checkp=
+oint
+> -Tests network using ssh and iperf3
+> -Quick test requires no special configuration
+> -Network test for testing colo-compare
+> -Stress test: failover all the time with network load
+>=20
+> Resource agent features:
+> -Fully automatic management of colo
+> -Handles many failures: hanging/crashing qemu, replication error, disk er=
+ror, ...
+> -Recovers from hanging qemu by using the "yank" oob command
+> -Tracks which node has up-to-date data
+> -Works well in clusters with more than 2 nodes
+>=20
+> Run times on my laptop:
+> Quick test: 200s
+> Network test: 800s (tagged as slow)
+> Stress test: 1300s (tagged as slow)
+>=20
+> For the last two tests, the test suite needs access to a network bridge to
+> properly test the network, so some parameters need to be given to the test
+> run. See tests/acceptance/colo.py for more information.
+>=20
+> Regards,
+> Lukas Straub
+>=20
+> Lukas Straub (7):
+>   block/quorum.c: stable children names
+>   avocado_qemu: Introduce pick_qemu_util to pick qemu utility binaries
+>   boot_linux.py: Use pick_qemu_util
+>   colo: Introduce resource agent
+>   colo: Introduce high-level test suite
+>   configure,Makefile: Install colo resource-agent
+>   MAINTAINERS: Add myself as maintainer for COLO resource agent
+>=20
+>  MAINTAINERS                               |    6 +
+>  Makefile                                  |    5 +
+>  block/quorum.c                            |   20 +-
+>  configure                                 |   10 +
+>  scripts/colo-resource-agent/colo          | 1501 +++++++++++++++++++++
+>  scripts/colo-resource-agent/crm_master    |   44 +
+>  scripts/colo-resource-agent/crm_resource  |   12 +
+>  tests/acceptance/avocado_qemu/__init__.py |   15 +
+>  tests/acceptance/boot_linux.py            |   11 +-
+>  tests/acceptance/colo.py                  |  677 ++++++++++
+>  10 files changed, 2286 insertions(+), 15 deletions(-)
+>  create mode 100755 scripts/colo-resource-agent/colo
+>  create mode 100755 scripts/colo-resource-agent/crm_master
+>  create mode 100755 scripts/colo-resource-agent/crm_resource
+>  create mode 100644 tests/acceptance/colo.py
 >=20
 > --
 > 2.20.1
 
 Ping...
 
---Sig_/tOCVbpn=6/.JuG8VrsS0WRD
+--Sig_/6h//x_4uwRTisCjHo8L05kG
 Content-Type: application/pgp-signature
 Content-Description: OpenPGP digital signature
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCgAdFiEEg/qxWKDZuPtyYo+kNasLKJxdslgFAl87yPcACgkQNasLKJxd
-sliB+g//Y8O2uZdLWQVRS/knkAKB62Oh9jzyc3rymUH8mZMfdiRQEwLyxtiXU8rt
-/n7nTcQckVmW9SoAD9/vzO6oWhwR7U/ZqLrrhG1pO8isCYrFhJTKWUPxakSZ+xNQ
-ky66w1Rm+p19HecH7FrxY6JplKVmsFesAWG9nOHYDZh1bA+Ks8f2XGpo1HRxe+jI
-SAI/3UQ6vRAeFG4auAm+i7MuSPRA1xvsJfzCDHG5MW79cl52XvJg1tUi5cA45QrC
-4WX7AIUsSXiOc3J+D2nYwnloP0Dwhwz7HXx+12u22ZMYACJ1Tdn+V6lZYKijJLpW
-kToRDiVy+z681/sd3L0s0ncmyANZlHoM6EmVHLNtxpk2tHWGBFV552JdT4wN68jE
-PHP9JfB3c+xdaPSugtpLafooqLwwty65Lu/nBUDd7xkWPSgwR3pveCSWHUkD4lS8
-m3jDq5VZ8Yh8oqOTNijAIEPBoCbrDkW0ncXL/BARkfbyNrT5R5m1zt+PKefTN8Oh
-Lkr0MUKBZFF4nBljM4PV6EeHDc6J+XQgIyrPzG6NomMhbUBENASXqiDyfemDeevM
-hBMnSA7XU55hfIELz3m5oPDUtAxfJSuG99nm2ablqnRJa/NQwKglIr7cJ+FSc0eK
-+7YHKlcIKHL/mmuN9+LgL28piKbvzUZRnVyCOzKcHMBMCmh5Hq4=
-=PKNE
+iQIzBAEBCgAdFiEEg/qxWKDZuPtyYo+kNasLKJxdslgFAl87yRUACgkQNasLKJxd
+sljr4hAAgBf0+dbcWmLTQHPaN6cMZ5mLIJGQlrCC3ua3iwc2HYlcEUdJU2uC2TWq
+TPGVvuHVaq3HiWltPlZzAZn7GHXHKmfqwzUD8v8IVPFz5TclEC/cTNL38cfDj0f+
+NOV9PcqRw0nalIbsgONqpBAlo2D8HpGIQQhJt0lM3W52bcMhONHc3sMfflicgGIn
+/WbMCDQvJ0PuBOrTCFK46m8JRIkcPmvpNu7MVE6Xpd3/s1xE4qe8rNnYWNLK3ux5
+SjeOkIEoM/QXzFHE7yR0E8hYPJWWiUJGglMMHgjEJpLgv2gsf9QgElp5cftoBPCP
+PLMJYifKJedaF8lXP+ejtI9vOXL4yqvk+J93+2JMetz0cxO93Tp5MwMQYu/S7ybB
+J1JYNMLNwFQv3duNeySCkcSLyC6IGhI3ORPdlWfHvuRHRQDI25gZXTE3WdaQi1XM
+F/5tqMShmC+blwQQAWkcuylvJdTu9F1ZpQGc+wUXZ3BQgGPvofAlpLChlmplx8yC
+bARr2B0EeHn9jItxA/Psfa0pIGHnPdxmB7CFGFwGM25k1YByIPbmyfZQfl7LgRvL
+iKck277cg7wJ58MbJTON/0+EYJ8Fd3gKfd+x/iK1ow7K4cV1QhiGNSHynPKfbti2
+/nePAGrvIBDVrriSCkPFvErhQqFOYNvex/Hi2nnBtGsdGkAwzaM=
+=gMjj
 -----END PGP SIGNATURE-----
 
---Sig_/tOCVbpn=6/.JuG8VrsS0WRD--
+--Sig_/6h//x_4uwRTisCjHo8L05kG--
 
