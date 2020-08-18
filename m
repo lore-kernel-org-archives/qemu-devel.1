@@ -2,114 +2,89 @@ Return-Path: <SRS0=kYy5=B4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.9 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D38CAC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 15:35:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7004CC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 15:36:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 942DD20786
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 15:35:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3C9D020786
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 15:36:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UcNnHGtw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 942DD20786
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jKtq+lEW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C9D020786
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54228 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60444 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k83db-0006V8-Or
-	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 11:34:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45238)
+	id 1k83fM-0000le-HD
+	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 11:36:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40628)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1k835z-0002sz-46
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 11:00:15 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:43882
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1k835v-0005OK-7O
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 11:00:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597762809;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=l2Bc+l4F7DXJeUeALKfLL+jqNnv6Ip7cUvzBDx5+Mlo=;
- b=UcNnHGtwfHhJyIkpNrY30syf8iNij7CrrFgvbd4vcZzjMfB0cq0Qj0a/WAbt2uODjzoK0v
- n36r0mxaEVi67UjR86IUFhXRqZiaQ1Ln6XOJjEuWjchWAi7s33Uw77142CH4Q6+YN11a2i
- A6Fiz/HiSeUnu0awHiOqbdi+98+XdGU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-247-xQVHpjceNECXVPDKZ7cKGw-1; Tue, 18 Aug 2020 11:00:07 -0400
-X-MC-Unique: xQVHpjceNECXVPDKZ7cKGw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5712E807335;
- Tue, 18 Aug 2020 15:00:06 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-112-119.ams2.redhat.com
- [10.36.112.119])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4039026323;
- Tue, 18 Aug 2020 15:00:02 +0000 (UTC)
-Subject: Re: [RFC PATCH 17/22] block/export: Add blk_exp_close_all(_type)
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-References: <20200813162935.210070-1-kwolf@redhat.com>
- <20200813162935.210070-18-kwolf@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <706438d2-2c7d-4f5f-0149-d5e881205bf0@redhat.com>
-Date: Tue, 18 Aug 2020 17:00:00 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1k82ky-0006ac-A2; Tue, 18 Aug 2020 10:38:32 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:42142)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1k82kw-0002yt-MT; Tue, 18 Aug 2020 10:38:31 -0400
+Received: by mail-wr1-x443.google.com with SMTP id r4so18476509wrx.9;
+ Tue, 18 Aug 2020 07:38:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=y9Bd2jpxuNuhoVUEDpWdgjoBSmiOW5VBx9T24Qn6sLM=;
+ b=jKtq+lEWGxa6CIR/mPKPYdLGwbZidu0flZWPy7qLJk9n7SjrqM1bI6WZxqLKyQPDF0
+ g55DA8zhSYDjgzeZa5bpjGj5ga66Bl24MfhkKd3yPzruL0EgeyE2QJiRN0S/CBKikuv6
+ 8NQF3DLbntnsjOhMGVS4ibpo2kuWgYwrBBixJXp3f6z3fiI9e6AdUMod4Apw31Usly42
+ PeXsminY8X8kns9qjBWU0G3jJ6i6rvaO91+D10qA4UebeOvFfOIOsQoJ9vKcmJfo0r8P
+ pHFRkuDUVgB4ipOiRj/aTrdL+FN6FOBPJpu6Zp7AvSu7i552W3/nex0iOZLfA+5rXJdL
+ JJag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=y9Bd2jpxuNuhoVUEDpWdgjoBSmiOW5VBx9T24Qn6sLM=;
+ b=emN4GLDoqAeSL/0J6HYotnfViISW+/JXJBdUe4/zd5G0rVvcwdrbP5C8r5QxFQDhbM
+ KlrMpesyeM6355bMyz4iAZZJIY10QMkree+P7nWXgpTxqbOttfYmcjm760ukx8jTjQwv
+ CzDDKlkLGBDxytAQ1IE+yBer4iesNWwbIK38OQFVwfdFuWHYZn9gAtq9R23jY4nQvhJB
+ XYKKJ24atq+HOrdF7IdGH4mK4fn5N4AUGxg7QyuxGT3bFuQD//e97nzQorgGCHe3zlFk
+ p85tFTOpWzoKW2VTDL7OCNTT7VM8pBqXtrjvwZGKBo1v30zoB4Uvth251PkXxlnprFoi
+ ABTg==
+X-Gm-Message-State: AOAM531m8jxbfxESB9lwQwux2YhkZPSIFBPL4TEskwg3umLMXo/dsjsB
+ vgP7JyerHcUkqRbGR9lS1dQAymlBZuM=
+X-Google-Smtp-Source: ABdhPJzUgHxXWUZv2OmnIyqs8mG3Z96ND21xUYkcBkhXK83eryol/GvcJtISmFNav/c1hFPU1okrIg==
+X-Received: by 2002:adf:e504:: with SMTP id j4mr21050257wrm.205.1597761507948; 
+ Tue, 18 Aug 2020 07:38:27 -0700 (PDT)
+Received: from localhost.localdomain (121.red-81-40-121.staticip.rima-tde.net.
+ [81.40.121.121])
+ by smtp.gmail.com with ESMTPSA id z8sm139177wmf.42.2020.08.18.07.38.26
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 18 Aug 2020 07:38:27 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 0/2] hw/core: Make qdev_pass_gpios/sysbus_pass_irq arguments
+ self-describing
+Date: Tue, 18 Aug 2020 16:38:23 +0200
+Message-Id: <20200818143825.691110-1-f4bug@amsat.org>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-In-Reply-To: <20200813162935.210070-18-kwolf@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="OTJ3Ll3D4SRd5YQr4aW5e54Ip9bVlx2zZ"
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=mreitz@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 06:40:33
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -122,100 +97,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-trivial@nongnu.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---OTJ3Ll3D4SRd5YQr4aW5e54Ip9bVlx2zZ
-Content-Type: multipart/mixed; boundary="tJInkF5xKkWZTHt7h1BLrU1vqyNngVJCa"
+Simply rename qdev_pass_gpios() and sysbus_pass_irq() arguments using
+self-describing names, to make the direction the GPIO/IRQ lines are
+passed obvious.
 
---tJInkF5xKkWZTHt7h1BLrU1vqyNngVJCa
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Note, currently each function arguments are inverted :)
 
-On 13.08.20 18:29, Kevin Wolf wrote:
-> This adds a function to shut down all block exports, and another one to
-> shut down the block exports of a single type. The latter is used for now
-> when stopping the NBD server. As soon as we implement support for
-> multiple NBD servers, we'll need a per-server list of exports and it
-> will be replaced by a function using that.
->=20
-> As a side effect, the BlockExport layer has a list tracking all existing
-> exports now. closed_exports loses its only user and can go away.
->=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  include/block/export.h |  8 +++++++
->  include/block/nbd.h    |  2 --
->  block.c                |  2 +-
->  block/export/export.c  | 52 ++++++++++++++++++++++++++++++++++++++++++
->  blockdev-nbd.c         |  2 +-
->  nbd/server.c           | 34 ++++-----------------------
->  qemu-nbd.c             |  2 +-
->  7 files changed, 68 insertions(+), 34 deletions(-)
+- qdev_pass_gpios: (from -> to)
+- sysbus_pass_irq: (to -> from)
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+Philippe Mathieu-Daudé (2):
+  hw/core/qdev: Make qdev_pass_gpios() arguments self-describing
+  hw/core/sysbus: Make sysbus_pass_irq() arguments self-describing
 
-> diff --git a/block/export/export.c b/block/export/export.c
-> index 9de108cbc1..675db9a8b9 100644
-> --- a/block/export/export.c
-> +++ b/block/export/export.c
+ include/hw/qdev-core.h | 10 +++++-----
+ include/hw/sysbus.h    |  7 ++++++-
+ hw/core/qdev.c         | 14 +++++++-------
+ hw/core/sysbus.c       |  5 ++---
+ 4 files changed, 20 insertions(+), 16 deletions(-)
 
-[...]
-
-> +/* type =3D=3D BLOCK_EXPORT_TYPE__MAX for all types */
-> +void blk_exp_close_all_type(BlockExportType type)
-> +{
-> +    BlockExport *exp, *next;
-> +
-> +    QLIST_FOREACH_SAFE(exp, &block_exports, next, next) {
-> +        if (type !=3D BLOCK_EXPORT_TYPE__MAX && exp->drv->type !=3D type=
-) {
-> +            continue;
-> +        }
-> +        blk_exp_request_shutdown(exp);
-> +    }
-> +
-> +    AIO_WAIT_WHILE(NULL, blk_exp_has_type(type));
-> +}
-> +
-> +void blk_exp_close_all(void)
-> +{
-> +    blk_exp_close_all_type(BLOCK_EXPORT_TYPE__MAX);
-
-What=E2=80=99s interesting about this is that I saw from the header file th=
-at
-you added both this and the type-specific function and wondered =E2=80=9CWh=
-y not
-just pass __MAX to close_all_type() to close all?=E2=80=9D  And then I thou=
-ght
-=E2=80=9CBecause that would be stupid as an external interface=E2=80=9D.
-
-So I see you had the same thinking.
-
-
---tJInkF5xKkWZTHt7h1BLrU1vqyNngVJCa--
-
---OTJ3Ll3D4SRd5YQr4aW5e54Ip9bVlx2zZ
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl877PAACgkQ9AfbAGHV
-z0CxIQgAnHqFtvZXg3CrZ5d1uORmza+mcWnijvNPEuqFUU+zMCJ75atC9phC92f8
-jP/wzIKjjn/qx4DI9yhM0a5kwI8Igevoqngf3gzQIH7vPNU3tW6ZJvsMHc8qXGu+
-Z9hrChnIVnkF4H22wxiIKqvYfj1QGfEyThtLgsNDULJopTohGIrZFLKnMtiuZIBn
-PJHjz3YezrTej50YvD4bF/2pXrAJDUyISgJLUiBe5WE4WKZ+wjjBhIWyYtPpgq2b
-wLR6CC+/pb++AgyzwzlpcyGFUr1fEl1EawUx7KuSYX7TpqtD04VhCuqncrUF3Pd0
-YnXYRy0CowmJRNBr4reHXPq1ix4qrQ==
-=lDdS
------END PGP SIGNATURE-----
-
---OTJ3Ll3D4SRd5YQr4aW5e54Ip9bVlx2zZ--
+-- 
+2.26.2
 
 
