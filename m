@@ -7,55 +7,55 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3807C433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 04:25:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76570C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 04:25:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8ADD920706
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 04:25:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3DB48207BB
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 04:25:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Pi1OH+lo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8ADD920706
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="OlPL+R6v"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3DB48207BB
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46226 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49498 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7tBN-00088y-Qi
-	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 00:25:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49950)
+	id 1k7tBv-00013s-7u
+	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 00:25:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50004)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1k7t68-0007MW-Cg; Tue, 18 Aug 2020 00:19:44 -0400
-Received: from ozlabs.org ([203.11.71.1]:35485)
+ id 1k7t6B-0007VC-D2; Tue, 18 Aug 2020 00:19:47 -0400
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:56647 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1k7t65-0006L1-Bi; Tue, 18 Aug 2020 00:19:44 -0400
+ id 1k7t69-0006MS-GZ; Tue, 18 Aug 2020 00:19:47 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 4BVyNZ0lRFz9sTs; Tue, 18 Aug 2020 14:19:26 +1000 (AEST)
+ id 4BVyNb0msVz9sVF; Tue, 18 Aug 2020 14:19:27 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1597724366;
- bh=ZcLWJRCfe42jLOzZWBdTOkvTNEMdWVGD+cDNWo3TWFg=;
+ d=gibson.dropbear.id.au; s=201602; t=1597724367;
+ bh=Vecwsc8w/Gi+tSL1ZQRvRrUML/0AnOdY4NFin78A5MY=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=Pi1OH+lo9LxEZvoVkZnjHK75V+AscdcrLs7BK3woiCKIhJnvlEe2g+tXqmMqOfDEQ
- WEHykNhlUjkQkTVCef/8hXuGyGzYj8erfOZ39aza3qCH62zJ17CbkLS7Q89Psv25Pk
- UN4c9mh+FB8zwobalNdxcUSwsXVwbgy3TqBdJOQ8=
+ b=OlPL+R6v2rWCzi6N3wqwpMSPEsV3mr1CjDl3obHR7G6WN1bEln0yUUmOxFKOGrS/q
+ 1nFfX7dIPE93uNWsdxX96752XVg+ymd9hDcm9bijb3O7kPIJEEfnw+VXKSzVuscnat
+ u4RCoozCgBAkztqxGGIZ0Tc4rzWAOFdNU+bQ8HIE=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org,
 	groug@kaod.org
-Subject: [PULL 05/40] target/ppc: convert vmuluwm to tcg_gen_gvec_mul
-Date: Tue, 18 Aug 2020 14:18:47 +1000
-Message-Id: <20200818041922.251708-6-david@gibson.dropbear.id.au>
+Subject: [PULL 13/40] target/ppc: add vmulh{su}w instructions
+Date: Tue, 18 Aug 2020 14:18:55 +1000
+Message-Id: <20200818041922.251708-14-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200818041922.251708-1-david@gibson.dropbear.id.au>
 References: <20200818041922.251708-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
+Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
  helo=ozlabs.org
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 00:19:26
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -9
 X-Spam_score: -1.0
 X-Spam_bar: -
@@ -84,68 +84,100 @@ Sender: "Qemu-devel"
 
 From: Lijun Pan <ljp@linux.ibm.com>
 
-Convert the original implementation of vmuluwm to the more generic
-tcg_gen_gvec_mul.
+vmulhsw: Vector Multiply High Signed Word
+vmulhuw: Vector Multiply High Unsigned Word
 
 Signed-off-by: Lijun Pan <ljp@linux.ibm.com>
-Message-Id: <20200701234344.91843-5-ljp@linux.ibm.com>
+Message-Id: <20200724045845.89976-4-ljp@linux.ibm.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/helper.h                 |  1 -
- target/ppc/int_helper.c             | 13 -------------
- target/ppc/translate/vmx-impl.inc.c |  2 +-
- 3 files changed, 1 insertion(+), 15 deletions(-)
+ target/ppc/helper.h                 |  2 ++
+ target/ppc/int_helper.c             | 19 +++++++++++++++++++
+ target/ppc/translate/vmx-impl.inc.c |  6 ++++++
+ target/ppc/translate/vmx-ops.inc.c  |  4 ++--
+ 4 files changed, 29 insertions(+), 2 deletions(-)
 
 diff --git a/target/ppc/helper.h b/target/ppc/helper.h
-index 90166cbabd..032da717f7 100644
+index 032da717f7..c218bb13ec 100644
 --- a/target/ppc/helper.h
 +++ b/target/ppc/helper.h
-@@ -184,7 +184,6 @@ DEF_HELPER_3(vmulosw, void, avr, avr, avr)
+@@ -184,6 +184,8 @@ DEF_HELPER_3(vmulosw, void, avr, avr, avr)
  DEF_HELPER_3(vmuloub, void, avr, avr, avr)
  DEF_HELPER_3(vmulouh, void, avr, avr, avr)
  DEF_HELPER_3(vmulouw, void, avr, avr, avr)
--DEF_HELPER_3(vmuluwm, void, avr, avr, avr)
++DEF_HELPER_3(vmulhsw, void, avr, avr, avr)
++DEF_HELPER_3(vmulhuw, void, avr, avr, avr)
  DEF_HELPER_3(vslo, void, avr, avr, avr)
  DEF_HELPER_3(vsro, void, avr, avr, avr)
  DEF_HELPER_3(vsrv, void, avr, avr, avr)
 diff --git a/target/ppc/int_helper.c b/target/ppc/int_helper.c
-index d8bd3c234a..263e899fe0 100644
+index 263e899fe0..1e866b7d3b 100644
 --- a/target/ppc/int_helper.c
 +++ b/target/ppc/int_helper.c
-@@ -523,19 +523,6 @@ void helper_vprtybq(ppc_avr_t *r, ppc_avr_t *b)
-     r->VsrD(0) = 0;
- }
+@@ -1086,6 +1086,25 @@ VMUL(uw, u32, VsrW, VsrD, uint64_t)
+ #undef VMUL_DO_ODD
+ #undef VMUL
  
--#define VARITH_DO(name, op, element)                                    \
--    void helper_v##name(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)       \
--    {                                                                   \
--        int i;                                                          \
--                                                                        \
--        for (i = 0; i < ARRAY_SIZE(r->element); i++) {                  \
--            r->element[i] = a->element[i] op b->element[i];             \
--        }                                                               \
--    }
--VARITH_DO(muluwm, *, u32)
--#undef VARITH_DO
--#undef VARITH
--
- #define VARITHFP(suffix, func)                                          \
-     void helper_v##suffix(CPUPPCState *env, ppc_avr_t *r, ppc_avr_t *a, \
-                           ppc_avr_t *b)                                 \
++void helper_vmulhsw(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)
++{
++    int i;
++
++    for (i = 0; i < 4; i++) {
++        r->s32[i] = (int32_t)(((int64_t)a->s32[i] * (int64_t)b->s32[i]) >> 32);
++    }
++}
++
++void helper_vmulhuw(ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b)
++{
++    int i;
++
++    for (i = 0; i < 4; i++) {
++        r->u32[i] = (uint32_t)(((uint64_t)a->u32[i] *
++                               (uint64_t)b->u32[i]) >> 32);
++    }
++}
++
+ void helper_vperm(CPUPPCState *env, ppc_avr_t *r, ppc_avr_t *a, ppc_avr_t *b,
+                   ppc_avr_t *c)
+ {
 diff --git a/target/ppc/translate/vmx-impl.inc.c b/target/ppc/translate/vmx-impl.inc.c
-index de2fd136ff..b6c9290707 100644
+index f8e8b978ec..79631e56b4 100644
 --- a/target/ppc/translate/vmx-impl.inc.c
 +++ b/target/ppc/translate/vmx-impl.inc.c
-@@ -801,7 +801,7 @@ static void trans_vclzd(DisasContext *ctx)
- GEN_VXFORM(vmuloub, 4, 0);
- GEN_VXFORM(vmulouh, 4, 1);
- GEN_VXFORM(vmulouw, 4, 2);
--GEN_VXFORM(vmuluwm, 4, 2);
-+GEN_VXFORM_V(vmuluwm, MO_32, tcg_gen_gvec_mul, 4, 2);
- GEN_VXFORM_DUAL(vmulouw, PPC_ALTIVEC, PPC_NONE,
-                 vmuluwm, PPC_NONE, PPC2_ALTIVEC_207)
- GEN_VXFORM(vmulosb, 4, 4);
+@@ -811,9 +811,15 @@ GEN_VXFORM_V(vmulld, MO_64, tcg_gen_gvec_mul, 4, 7);
+ GEN_VXFORM(vmuleub, 4, 8);
+ GEN_VXFORM(vmuleuh, 4, 9);
+ GEN_VXFORM(vmuleuw, 4, 10);
++GEN_VXFORM(vmulhuw, 4, 10);
++GEN_VXFORM_DUAL(vmuleuw, PPC_ALTIVEC, PPC_NONE,
++                vmulhuw, PPC_NONE, PPC2_ISA310);
+ GEN_VXFORM(vmulesb, 4, 12);
+ GEN_VXFORM(vmulesh, 4, 13);
+ GEN_VXFORM(vmulesw, 4, 14);
++GEN_VXFORM(vmulhsw, 4, 14);
++GEN_VXFORM_DUAL(vmulesw, PPC_ALTIVEC, PPC_NONE,
++                vmulhsw, PPC_NONE, PPC2_ISA310);
+ GEN_VXFORM_V(vslb, MO_8, tcg_gen_gvec_shlv, 2, 4);
+ GEN_VXFORM_V(vslh, MO_16, tcg_gen_gvec_shlv, 2, 5);
+ GEN_VXFORM_V(vslw, MO_32, tcg_gen_gvec_shlv, 2, 6);
+diff --git a/target/ppc/translate/vmx-ops.inc.c b/target/ppc/translate/vmx-ops.inc.c
+index b49787ac97..29701ad778 100644
+--- a/target/ppc/translate/vmx-ops.inc.c
++++ b/target/ppc/translate/vmx-ops.inc.c
+@@ -110,10 +110,10 @@ GEN_VXFORM_207(vmulosw, 4, 6),
+ GEN_VXFORM_310(vmulld, 4, 7),
+ GEN_VXFORM(vmuleub, 4, 8),
+ GEN_VXFORM(vmuleuh, 4, 9),
+-GEN_VXFORM_207(vmuleuw, 4, 10),
++GEN_VXFORM_DUAL(vmuleuw, vmulhuw, 4, 10, PPC_ALTIVEC, PPC_NONE),
+ GEN_VXFORM(vmulesb, 4, 12),
+ GEN_VXFORM(vmulesh, 4, 13),
+-GEN_VXFORM_207(vmulesw, 4, 14),
++GEN_VXFORM_DUAL(vmulesw, vmulhsw, 4, 14, PPC_ALTIVEC, PPC_NONE),
+ GEN_VXFORM(vslb, 2, 4),
+ GEN_VXFORM(vslh, 2, 5),
+ GEN_VXFORM_DUAL(vslw, vrlwnm, 2, 6, PPC_ALTIVEC, PPC_NONE),
 -- 
 2.26.2
 
