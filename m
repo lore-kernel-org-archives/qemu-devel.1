@@ -7,55 +7,55 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13827C433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 04:31:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13D81C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 04:31:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C4925206DA
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 04:31:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C3900206DA
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 04:31:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="nzNM4wn+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4925206DA
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="VqbgvlW2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3900206DA
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46660 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47542 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7tHb-00036F-1C
-	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 00:31:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50050)
+	id 1k7tHm-0003TG-0j
+	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 00:31:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50076)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1k7t6C-0007Xb-Nb; Tue, 18 Aug 2020 00:19:48 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:41557)
+ id 1k7t6D-0007aR-Mt; Tue, 18 Aug 2020 00:19:49 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:43185 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1k7t6A-0006Mz-Uh; Tue, 18 Aug 2020 00:19:48 -0400
+ id 1k7t6B-0006Mr-2U; Tue, 18 Aug 2020 00:19:49 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 4BVyNc40Cxz9sVT; Tue, 18 Aug 2020 14:19:28 +1000 (AEST)
+ id 4BVyNb3pwKz9sVM; Tue, 18 Aug 2020 14:19:27 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1597724368;
- bh=be243u2yZPlEiN07XeWKF1dOQ1lSXdIuEaA2RcjcqXQ=;
+ d=gibson.dropbear.id.au; s=201602; t=1597724367;
+ bh=p5k/N3bAXkiI8BCnZaFK1edTmmELskToQBlH18YDB1g=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=nzNM4wn+ikHuFPlSNGn7vQxk78JkSg/h5SCiMGV4016SwZiRNDi7imvx2aa20+I6d
- MC+yExuQRvgtACp7zv3BbyP1Jo7aQeeYk295cyZh7JkyCX3vTZznfI5vLAhUcLhloP
- RFg9fnb0l3+tURuOH4vBxXtbdzLxwak/t8GSofI8=
+ b=VqbgvlW2nz0yJEP34SYIca1YEfoONGnei9+Wj+IJoCB+TYx11gcGxViuNki3X86v0
+ Ol40UBei0lHNnoK9dGdnRAMbyQ1CnLl6E/RfubTONaQGEZlQGghhjW4gfvTRUFdfuV
+ w41lf8VsyJR6On2G3RaSm3N6LDsNs8y07D3iD4t8=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org,
 	groug@kaod.org
-Subject: [PULL 19/40] spapr/xive: Fix xive->fd if kvm_create_device() fails
-Date: Tue, 18 Aug 2020 14:19:01 +1000
-Message-Id: <20200818041922.251708-20-david@gibson.dropbear.id.au>
+Subject: [PULL 15/40] target/ppc: Fix SPE unavailable exception triggering
+Date: Tue, 18 Aug 2020 14:18:57 +1000
+Message-Id: <20200818041922.251708-16-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200818041922.251708-1-david@gibson.dropbear.id.au>
 References: <20200818041922.251708-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
+Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
  helo=ozlabs.org
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 00:19:26
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -9
 X-Spam_score: -1.0
 X-Spam_bar: -
@@ -76,58 +76,242 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
+ Matthieu Bucchianeri <matthieu.bucchianeri@leostella.com>,
  David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Greg Kurz <groug@kaod.org>
+From: Matthieu Bucchianeri <matthieu.bucchianeri@leostella.com>
 
-If the creation of the KVM XIVE device fails for some reasons, the
-negative errno ends up in xive->fd, but the rest of the code assumes
-that xive->fd either contains an open fd, ie. positive value, or -1.
+When emulating certain floating point instructions or vector instructions on
+PowerPC machines, QEMU did not properly generate the SPE/Embedded Floating-
+Point Unavailable interrupt. See the buglink further below for references to
+the relevant NXP documentation.
 
-This doesn't cause any misbehavior except kvmppc_xive_disconnect()
-that will try to close(xive->fd) during rollback and likely be
-rewarded with an EBADF.
+This patch fixes the behavior of some evfs* instructions that were
+incorrectly emitting the interrupt.
 
-Only set xive->fd with a open fd.
+More importantly, this patch fixes the behavior of several efd* and ev*
+instructions that were not generating the interrupt. Triggering the
+interrupt for these instructions fixes lazy FPU/vector context switching on
+some operating systems like Linux.
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
-Message-Id: <159673296585.766512.15404407281299745442.stgit@bahia.lan>
+Without this patch, the result of some double-precision arithmetic could be
+corrupted due to the lack of proper saving and restoring of the upper
+32-bit part of the general-purpose registers.
+
+Buglink: https://bugs.launchpad.net/qemu/+bug/1888918
+Buglink: https://bugs.launchpad.net/qemu/+bug/1611394
+Signed-off-by: Matthieu Bucchianeri <matthieu.bucchianeri@leostella.com>
+Message-Id: <20200727175553.32276-1-matthieu.bucchianeri@leostella.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/intc/spapr_xive_kvm.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+ target/ppc/translate/spe-impl.inc.c | 97 +++++++++++++++++++----------
+ 1 file changed, 64 insertions(+), 33 deletions(-)
 
-diff --git a/hw/intc/spapr_xive_kvm.c b/hw/intc/spapr_xive_kvm.c
-index edb7ee0e74..d55ea4670e 100644
---- a/hw/intc/spapr_xive_kvm.c
-+++ b/hw/intc/spapr_xive_kvm.c
-@@ -745,6 +745,7 @@ int kvmppc_xive_connect(SpaprInterruptController *intc, uint32_t nr_servers,
-     size_t esb_len = (1ull << xsrc->esb_shift) * xsrc->nr_irqs;
-     size_t tima_len = 4ull << TM_SHIFT;
-     CPUState *cs;
-+    int fd;
+diff --git a/target/ppc/translate/spe-impl.inc.c b/target/ppc/translate/spe-impl.inc.c
+index 42a0d1cffb..2e6e799a25 100644
+--- a/target/ppc/translate/spe-impl.inc.c
++++ b/target/ppc/translate/spe-impl.inc.c
+@@ -349,14 +349,24 @@ static inline void gen_evmergelohi(DisasContext *ctx)
+ }
+ static inline void gen_evsplati(DisasContext *ctx)
+ {
+-    uint64_t imm = ((int32_t)(rA(ctx->opcode) << 27)) >> 27;
++    uint64_t imm;
++    if (unlikely(!ctx->spe_enabled)) {
++        gen_exception(ctx, POWERPC_EXCP_SPEU);
++        return;
++    }
++    imm = ((int32_t)(rA(ctx->opcode) << 27)) >> 27;
  
-     /*
-      * The KVM XIVE device already in use. This is the case when
-@@ -760,11 +761,12 @@ int kvmppc_xive_connect(SpaprInterruptController *intc, uint32_t nr_servers,
-     }
+     tcg_gen_movi_tl(cpu_gpr[rD(ctx->opcode)], imm);
+     tcg_gen_movi_tl(cpu_gprh[rD(ctx->opcode)], imm);
+ }
+ static inline void gen_evsplatfi(DisasContext *ctx)
+ {
+-    uint64_t imm = rA(ctx->opcode) << 27;
++    uint64_t imm;
++    if (unlikely(!ctx->spe_enabled)) {
++        gen_exception(ctx, POWERPC_EXCP_SPEU);
++        return;
++    }
++    imm = rA(ctx->opcode) << 27;
  
-     /* First, create the KVM XIVE device */
--    xive->fd = kvm_create_device(kvm_state, KVM_DEV_TYPE_XIVE, false);
--    if (xive->fd < 0) {
--        error_setg_errno(errp, -xive->fd, "XIVE: error creating KVM device");
-+    fd = kvm_create_device(kvm_state, KVM_DEV_TYPE_XIVE, false);
-+    if (fd < 0) {
-+        error_setg_errno(errp, -fd, "XIVE: error creating KVM device");
-         return -1;
-     }
-+    xive->fd = fd;
+     tcg_gen_movi_tl(cpu_gpr[rD(ctx->opcode)], imm);
+     tcg_gen_movi_tl(cpu_gprh[rD(ctx->opcode)], imm);
+@@ -389,21 +399,37 @@ static inline void gen_evsel(DisasContext *ctx)
  
-     /* Tell KVM about the # of VCPUs we may have */
-     if (kvm_device_check_attr(xive->fd, KVM_DEV_XIVE_GRP_CTRL,
+ static void gen_evsel0(DisasContext *ctx)
+ {
++    if (unlikely(!ctx->spe_enabled)) {
++        gen_exception(ctx, POWERPC_EXCP_SPEU);
++        return;
++    }
+     gen_evsel(ctx);
+ }
+ 
+ static void gen_evsel1(DisasContext *ctx)
+ {
++    if (unlikely(!ctx->spe_enabled)) {
++        gen_exception(ctx, POWERPC_EXCP_SPEU);
++        return;
++    }
+     gen_evsel(ctx);
+ }
+ 
+ static void gen_evsel2(DisasContext *ctx)
+ {
++    if (unlikely(!ctx->spe_enabled)) {
++        gen_exception(ctx, POWERPC_EXCP_SPEU);
++        return;
++    }
+     gen_evsel(ctx);
+ }
+ 
+ static void gen_evsel3(DisasContext *ctx)
+ {
++    if (unlikely(!ctx->spe_enabled)) {
++        gen_exception(ctx, POWERPC_EXCP_SPEU);
++        return;
++    }
+     gen_evsel(ctx);
+ }
+ 
+@@ -518,6 +544,11 @@ static inline void gen_evmwsmia(DisasContext *ctx)
+ {
+     TCGv_i64 tmp;
+ 
++    if (unlikely(!ctx->spe_enabled)) {
++        gen_exception(ctx, POWERPC_EXCP_SPEU);
++        return;
++    }
++
+     gen_evmwsmi(ctx);            /* rD := rA * rB */
+ 
+     tmp = tcg_temp_new_i64();
+@@ -534,6 +565,11 @@ static inline void gen_evmwsmiaa(DisasContext *ctx)
+     TCGv_i64 acc;
+     TCGv_i64 tmp;
+ 
++    if (unlikely(!ctx->spe_enabled)) {
++        gen_exception(ctx, POWERPC_EXCP_SPEU);
++        return;
++    }
++
+     gen_evmwsmi(ctx);           /* rD := rA * rB */
+ 
+     acc = tcg_temp_new_i64();
+@@ -892,8 +928,14 @@ static inline void gen_##name(DisasContext *ctx)                              \
+ #define GEN_SPEFPUOP_CONV_32_64(name)                                         \
+ static inline void gen_##name(DisasContext *ctx)                              \
+ {                                                                             \
+-    TCGv_i64 t0 = tcg_temp_new_i64();                                         \
+-    TCGv_i32 t1 = tcg_temp_new_i32();                                         \
++    TCGv_i64 t0;                                                              \
++    TCGv_i32 t1;                                                              \
++    if (unlikely(!ctx->spe_enabled)) {                                        \
++        gen_exception(ctx, POWERPC_EXCP_SPEU);                                \
++        return;                                                               \
++    }                                                                         \
++    t0 = tcg_temp_new_i64();                                                  \
++    t1 = tcg_temp_new_i32();                                                  \
+     gen_load_gpr64(t0, rB(ctx->opcode));                                      \
+     gen_helper_##name(t1, cpu_env, t0);                                       \
+     tcg_gen_extu_i32_tl(cpu_gpr[rD(ctx->opcode)], t1);                        \
+@@ -903,8 +945,14 @@ static inline void gen_##name(DisasContext *ctx)                              \
+ #define GEN_SPEFPUOP_CONV_64_32(name)                                         \
+ static inline void gen_##name(DisasContext *ctx)                              \
+ {                                                                             \
+-    TCGv_i64 t0 = tcg_temp_new_i64();                                         \
+-    TCGv_i32 t1 = tcg_temp_new_i32();                                         \
++    TCGv_i64 t0;                                                              \
++    TCGv_i32 t1;                                                              \
++    if (unlikely(!ctx->spe_enabled)) {                                        \
++        gen_exception(ctx, POWERPC_EXCP_SPEU);                                \
++        return;                                                               \
++    }                                                                         \
++    t0 = tcg_temp_new_i64();                                                  \
++    t1 = tcg_temp_new_i32();                                                  \
+     tcg_gen_trunc_tl_i32(t1, cpu_gpr[rB(ctx->opcode)]);                       \
+     gen_helper_##name(t0, cpu_env, t1);                                       \
+     gen_store_gpr64(rD(ctx->opcode), t0);                                     \
+@@ -914,7 +962,12 @@ static inline void gen_##name(DisasContext *ctx)                              \
+ #define GEN_SPEFPUOP_CONV_64_64(name)                                         \
+ static inline void gen_##name(DisasContext *ctx)                              \
+ {                                                                             \
+-    TCGv_i64 t0 = tcg_temp_new_i64();                                         \
++    TCGv_i64 t0;                                                              \
++    if (unlikely(!ctx->spe_enabled)) {                                        \
++        gen_exception(ctx, POWERPC_EXCP_SPEU);                                \
++        return;                                                               \
++    }                                                                         \
++    t0 = tcg_temp_new_i64();                                                  \
+     gen_load_gpr64(t0, rB(ctx->opcode));                                      \
+     gen_helper_##name(t0, cpu_env, t0);                                       \
+     gen_store_gpr64(rD(ctx->opcode), t0);                                     \
+@@ -923,13 +976,8 @@ static inline void gen_##name(DisasContext *ctx)                              \
+ #define GEN_SPEFPUOP_ARITH2_32_32(name)                                       \
+ static inline void gen_##name(DisasContext *ctx)                              \
+ {                                                                             \
+-    TCGv_i32 t0, t1;                                                          \
+-    if (unlikely(!ctx->spe_enabled)) {                                        \
+-        gen_exception(ctx, POWERPC_EXCP_SPEU);                                \
+-        return;                                                               \
+-    }                                                                         \
+-    t0 = tcg_temp_new_i32();                                                  \
+-    t1 = tcg_temp_new_i32();                                                  \
++    TCGv_i32 t0 = tcg_temp_new_i32();                                         \
++    TCGv_i32 t1 = tcg_temp_new_i32();                                         \
+     tcg_gen_trunc_tl_i32(t0, cpu_gpr[rA(ctx->opcode)]);                       \
+     tcg_gen_trunc_tl_i32(t1, cpu_gpr[rB(ctx->opcode)]);                       \
+     gen_helper_##name(t0, cpu_env, t0, t1);                                   \
+@@ -958,13 +1006,8 @@ static inline void gen_##name(DisasContext *ctx)                              \
+ #define GEN_SPEFPUOP_COMP_32(name)                                            \
+ static inline void gen_##name(DisasContext *ctx)                              \
+ {                                                                             \
+-    TCGv_i32 t0, t1;                                                          \
+-    if (unlikely(!ctx->spe_enabled)) {                                        \
+-        gen_exception(ctx, POWERPC_EXCP_SPEU);                                \
+-        return;                                                               \
+-    }                                                                         \
+-    t0 = tcg_temp_new_i32();                                                  \
+-    t1 = tcg_temp_new_i32();                                                  \
++    TCGv_i32 t0 = tcg_temp_new_i32();                                         \
++    TCGv_i32 t1 = tcg_temp_new_i32();                                         \
+                                                                               \
+     tcg_gen_trunc_tl_i32(t0, cpu_gpr[rA(ctx->opcode)]);                       \
+     tcg_gen_trunc_tl_i32(t1, cpu_gpr[rB(ctx->opcode)]);                       \
+@@ -1074,28 +1117,16 @@ GEN_SPEFPUOP_ARITH2_32_32(efsmul);
+ GEN_SPEFPUOP_ARITH2_32_32(efsdiv);
+ static inline void gen_efsabs(DisasContext *ctx)
+ {
+-    if (unlikely(!ctx->spe_enabled)) {
+-        gen_exception(ctx, POWERPC_EXCP_SPEU);
+-        return;
+-    }
+     tcg_gen_andi_tl(cpu_gpr[rD(ctx->opcode)], cpu_gpr[rA(ctx->opcode)],
+                     (target_long)~0x80000000LL);
+ }
+ static inline void gen_efsnabs(DisasContext *ctx)
+ {
+-    if (unlikely(!ctx->spe_enabled)) {
+-        gen_exception(ctx, POWERPC_EXCP_SPEU);
+-        return;
+-    }
+     tcg_gen_ori_tl(cpu_gpr[rD(ctx->opcode)], cpu_gpr[rA(ctx->opcode)],
+                    0x80000000);
+ }
+ static inline void gen_efsneg(DisasContext *ctx)
+ {
+-    if (unlikely(!ctx->spe_enabled)) {
+-        gen_exception(ctx, POWERPC_EXCP_SPEU);
+-        return;
+-    }
+     tcg_gen_xori_tl(cpu_gpr[rD(ctx->opcode)], cpu_gpr[rA(ctx->opcode)],
+                     0x80000000);
+ }
 -- 
 2.26.2
 
