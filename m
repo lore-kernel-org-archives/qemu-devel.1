@@ -7,55 +7,55 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12FB4C433E3
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 04:34:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46FE2C433E1
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 04:34:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D6741206DA
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 04:34:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0DCF1206DA
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 04:34:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="CUNbAnyU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6741206DA
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="e3iFbors"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0DCF1206DA
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56196 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33522 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7tJw-0006wl-2c
-	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 00:34:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50162)
+	id 1k7tKp-0000lj-7H
+	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 00:34:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50308)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1k7t6Y-0008Q5-4X; Tue, 18 Aug 2020 00:20:10 -0400
-Received: from ozlabs.org ([203.11.71.1]:39803)
+ id 1k7t6k-0000Mh-Lm; Tue, 18 Aug 2020 00:20:22 -0400
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:53753 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1k7t6W-0006NF-AO; Tue, 18 Aug 2020 00:20:09 -0400
+ id 1k7t6i-0006TM-SP; Tue, 18 Aug 2020 00:20:22 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 4BVyNc659Wz9sVZ; Tue, 18 Aug 2020 14:19:28 +1000 (AEST)
+ id 4BVyNj4SVjz9sW7; Tue, 18 Aug 2020 14:19:33 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1597724368;
- bh=br1dq6DE2bypNpRudqQL9GprFBfraC/xQtt+MK7jboA=;
+ d=gibson.dropbear.id.au; s=201602; t=1597724373;
+ bh=62YQZOe8wkxWTVe1lI9MQqNSqkHNZnzB9/AdI04ywnM=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=CUNbAnyU2AQz7T2r5szy9Du4Z4iPBFGt7nvElZBNmWA0hKPUnmqC627vtv0gO8Ngc
- uC/4dqkYwp9n3DXr753rRdpoQO0LtBdtw/RVdL+uxh778eWUafroVkUfFz2I4NQ59/
- bYXEboJIGPaNk/7jYr2mElpZVn/uZ/bD+kvqgRTM=
+ b=e3iFborshtksfAqaB0iJcAjKx1QfbCx6bAjAsO8YMw2ASYr9ZOEUlKqleSbAcA8DE
+ 1jiQthsil5S8IIp/Qz1Mmw9kY8eAdzdtpyX+Dc4zQ3w/UUfSQR4zQDhQIQdv5ZP+/4
+ 3LKewZyszSrjccH7rspoab9gRQro9yuqhsCF7XyQ=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org,
 	groug@kaod.org
-Subject: [PULL 20/40] spapr/xive: Simplify kvmppc_xive_disconnect()
-Date: Tue, 18 Aug 2020 14:19:02 +1000
-Message-Id: <20200818041922.251708-21-david@gibson.dropbear.id.au>
+Subject: [PULL 37/40] ppc/xive: Simplify error handling in xive_tctx_realize()
+Date: Tue, 18 Aug 2020 14:19:19 +1000
+Message-Id: <20200818041922.251708-38-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200818041922.251708-1-david@gibson.dropbear.id.au>
 References: <20200818041922.251708-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
+Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
  helo=ozlabs.org
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 00:19:26
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -9
 X-Spam_score: -1.0
 X-Spam_bar: -
@@ -83,39 +83,39 @@ Sender: "Qemu-devel"
 
 From: Greg Kurz <groug@kaod.org>
 
-Since this function begins with:
-
-    /* The KVM XIVE device is not in use */
-    if (!xive || xive->fd == -1) {
-        return;
-    }
-
-we obviously don't need to check xive->fd again.
+Now that kvmppc_xive_cpu_connect() returns a negative errno on failure,
+use that and get rid of the local_err boilerplate.
 
 Signed-off-by: Greg Kurz <groug@kaod.org>
-Message-Id: <159673297296.766512.14780055521619233656.stgit@bahia.lan>
+Message-Id: <159707852234.1489912.16410314514265848075.stgit@bahia.lan>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/intc/spapr_xive_kvm.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ hw/intc/xive.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
-diff --git a/hw/intc/spapr_xive_kvm.c b/hw/intc/spapr_xive_kvm.c
-index d55ea4670e..893a1ee77e 100644
---- a/hw/intc/spapr_xive_kvm.c
-+++ b/hw/intc/spapr_xive_kvm.c
-@@ -873,10 +873,8 @@ void kvmppc_xive_disconnect(SpaprInterruptController *intc)
-      * and removed from the list of devices of the VM. The VCPU
-      * presenters are also detached from the device.
-      */
--    if (xive->fd != -1) {
--        close(xive->fd);
--        xive->fd = -1;
--    }
-+    close(xive->fd);
-+    xive->fd = -1;
+diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+index 17ca5a1916..489e6256ef 100644
+--- a/hw/intc/xive.c
++++ b/hw/intc/xive.c
+@@ -662,7 +662,6 @@ static void xive_tctx_realize(DeviceState *dev, Error **errp)
+     XiveTCTX *tctx = XIVE_TCTX(dev);
+     PowerPCCPU *cpu;
+     CPUPPCState *env;
+-    Error *local_err = NULL;
  
-     kvm_kernel_irqchip = false;
-     kvm_msi_via_irqfd_allowed = false;
+     assert(tctx->cs);
+     assert(tctx->xptr);
+@@ -683,9 +682,7 @@ static void xive_tctx_realize(DeviceState *dev, Error **errp)
+ 
+     /* Connect the presenter to the VCPU (required for CPU hotplug) */
+     if (xive_in_kernel(tctx->xptr)) {
+-        kvmppc_xive_cpu_connect(tctx, &local_err);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++        if (kvmppc_xive_cpu_connect(tctx, errp) < 0) {
+             return;
+         }
+     }
 -- 
 2.26.2
 
