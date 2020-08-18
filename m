@@ -2,88 +2,87 @@ Return-Path: <SRS0=kYy5=B4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18AFCC433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 14:50:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 183F4C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 14:51:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D835820738
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 14:50:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D68152080C
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 14:51:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fPYg/5VX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D835820738
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cvJe7cPO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D68152080C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56690 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33838 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k82wp-0007qj-1y
-	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 10:50:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33418)
+	id 1k82xq-0001fr-0f
+	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 10:51:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33464)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k82LV-0005gZ-QT
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:12:13 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:53950
- helo=us-smtp-1.mimecast.com)
+ id 1k82LZ-0005kz-9X
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:12:17 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21396)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k82LI-0007Yz-Hh
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:12:13 -0400
+ id 1k82LL-0007Zz-QG
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:12:16 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597759919;
+ s=mimecast20190719; t=1597759922;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=NfyB9OFP3NC+XP2rys2fAFHGh1rpKodm28QmEjGLxY8=;
- b=fPYg/5VXO+haPjGeOlg0UDXZCm2wyUdlHM7aXU1OI1LtIfdfRC8kfMC68/SM+JfOf8LGMV
- be+iodLeRaILVznnVExOflk5xNLKzi72XSfCIle4NKo1rL8glj7A7KK0Z0Vt7KJcLbVajx
- MVp0gZSJ/yWJcyFeMnDJedsSiNJ/iwg=
+ bh=2uZT/s+uo12wT2bnnDViCCQzfljp43iiPWFYn7ZUdE0=;
+ b=cvJe7cPO6mkZkyL5zrld+x/R6B5fLKFoFz8vVQd2MX+tiTo9jyTjmg9Lm63d5ebEvesfwR
+ P/B1L6KcU2XdXbEm7o87nTfDgVe1h++nNXUuUxTqT2ovVfvxX24gp+5s6SdDFgYIlaw83O
+ YvAwpTdMwoCPg6W5/FEailG8nBGZipg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-263-PwGVP1SPM_ifiGiUsjv9ew-1; Tue, 18 Aug 2020 10:11:58 -0400
-X-MC-Unique: PwGVP1SPM_ifiGiUsjv9ew-1
+ us-mta-227-1SkW2N2BP7y4HhDORR2Lag-1; Tue, 18 Aug 2020 10:12:00 -0400
+X-MC-Unique: 1SkW2N2BP7y4HhDORR2Lag-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 390C72FD00
- for <qemu-devel@nongnu.org>; Tue, 18 Aug 2020 14:11:57 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AD9D52FD00;
+ Tue, 18 Aug 2020 14:11:59 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id EBD3459;
- Tue, 18 Aug 2020 14:11:56 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7554959;
+ Tue, 18 Aug 2020 14:11:58 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 111/150] meson: convert hw/ipack
-Date: Tue, 18 Aug 2020 10:09:46 -0400
-Message-Id: <20200818141025.21608-112-pbonzini@redhat.com>
+Subject: [PULL 115/150] meson: convert hw/i2c
+Date: Tue, 18 Aug 2020 10:09:50 -0400
+Message-Id: <20200818141025.21608-116-pbonzini@redhat.com>
 In-Reply-To: <20200818141025.21608-1-pbonzini@redhat.com>
 References: <20200818141025.21608-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 06:40:33
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 03:22:11
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
  URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -98,7 +97,9 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Corey Minyard <cminyard@mvista.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -106,53 +107,82 @@ Sender: "Qemu-devel"
 From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Corey Minyard <cminyard@mvista.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/Makefile.objs       | 1 -
- hw/ipack/Makefile.objs | 2 --
- hw/ipack/meson.build   | 1 +
- hw/meson.build         | 1 +
- 4 files changed, 2 insertions(+), 3 deletions(-)
- delete mode 100644 hw/ipack/Makefile.objs
- create mode 100644 hw/ipack/meson.build
+ hw/Makefile.objs     |  1 -
+ hw/i2c/Makefile.objs | 14 --------------
+ hw/i2c/meson.build   | 16 ++++++++++++++++
+ hw/meson.build       |  1 +
+ 4 files changed, 17 insertions(+), 15 deletions(-)
+ delete mode 100644 hw/i2c/Makefile.objs
+ create mode 100644 hw/i2c/meson.build
 
 diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-index f136377866..76d9305959 100644
+index 02c5c0d94e..22eb804730 100644
 --- a/hw/Makefile.objs
 +++ b/hw/Makefile.objs
-@@ -14,7 +14,6 @@ devices-dirs-$(CONFIG_I2C) += i2c/
- devices-dirs-y += ide/
- devices-dirs-y += input/
- devices-dirs-y += intc/
--devices-dirs-$(CONFIG_IPACK) += ipack/
+@@ -10,7 +10,6 @@ devices-dirs-y += display/
+ devices-dirs-y += dma/
+ devices-dirs-y += gpio/
+ devices-dirs-$(CONFIG_HYPERV) += hyperv/
+-devices-dirs-$(CONFIG_I2C) += i2c/
  endif
  
  common-obj-y += $(devices-dirs-y)
-diff --git a/hw/ipack/Makefile.objs b/hw/ipack/Makefile.objs
+diff --git a/hw/i2c/Makefile.objs b/hw/i2c/Makefile.objs
 deleted file mode 100644
-index 8b9bdcb549..0000000000
---- a/hw/ipack/Makefile.objs
+index f2c61eaa8b..0000000000
+--- a/hw/i2c/Makefile.objs
 +++ /dev/null
-@@ -1,2 +0,0 @@
--common-obj-$(CONFIG_IPACK) += ipack.o
--common-obj-$(CONFIG_IPACK) += tpci200.o
-diff --git a/hw/ipack/meson.build b/hw/ipack/meson.build
+@@ -1,14 +0,0 @@
+-common-obj-$(CONFIG_I2C) += core.o
+-common-obj-$(CONFIG_SMBUS) += smbus_slave.o smbus_master.o
+-common-obj-$(CONFIG_SMBUS_EEPROM) += smbus_eeprom.o
+-common-obj-$(CONFIG_VERSATILE_I2C) += versatile_i2c.o
+-common-obj-$(CONFIG_ACPI_X86_ICH) += smbus_ich9.o
+-common-obj-$(CONFIG_ACPI_SMBUS) += pm_smbus.o
+-common-obj-$(CONFIG_BITBANG_I2C) += bitbang_i2c.o
+-common-obj-$(CONFIG_EXYNOS4) += exynos4210_i2c.o
+-common-obj-$(CONFIG_IMX_I2C) += imx_i2c.o
+-common-obj-$(CONFIG_ASPEED_SOC) += aspeed_i2c.o
+-common-obj-$(CONFIG_NRF51_SOC) += microbit_i2c.o
+-common-obj-$(CONFIG_MPC_I2C) += mpc_i2c.o
+-common-obj-$(CONFIG_OMAP) += omap_i2c.o
+-common-obj-$(CONFIG_PPC4XX) += ppc4xx_i2c.o
+diff --git a/hw/i2c/meson.build b/hw/i2c/meson.build
 new file mode 100644
-index 0000000000..3f8138b6f2
+index 0000000000..3a511539ad
 --- /dev/null
-+++ b/hw/ipack/meson.build
-@@ -0,0 +1 @@
-+softmmu_ss.add(when: 'CONFIG_IPACK', if_true: files('ipack.c', 'tpci200.c'))
++++ b/hw/i2c/meson.build
+@@ -0,0 +1,16 @@
++i2c_ss = ss.source_set()
++i2c_ss.add(when: 'CONFIG_I2C', if_true: files('core.c'))
++i2c_ss.add(when: 'CONFIG_SMBUS', if_true: files('smbus_slave.c', 'smbus_master.c'))
++i2c_ss.add(when: 'CONFIG_ACPI_SMBUS', if_true: files('pm_smbus.c'))
++i2c_ss.add(when: 'CONFIG_ACPI_X86_ICH', if_true: files('smbus_ich9.c'))
++i2c_ss.add(when: 'CONFIG_ASPEED_SOC', if_true: files('aspeed_i2c.c'))
++i2c_ss.add(when: 'CONFIG_BITBANG_I2C', if_true: files('bitbang_i2c.c'))
++i2c_ss.add(when: 'CONFIG_EXYNOS4', if_true: files('exynos4210_i2c.c'))
++i2c_ss.add(when: 'CONFIG_IMX_I2C', if_true: files('imx_i2c.c'))
++i2c_ss.add(when: 'CONFIG_MPC_I2C', if_true: files('mpc_i2c.c'))
++i2c_ss.add(when: 'CONFIG_NRF51_SOC', if_true: files('microbit_i2c.c'))
++i2c_ss.add(when: 'CONFIG_SMBUS_EEPROM', if_true: files('smbus_eeprom.c'))
++i2c_ss.add(when: 'CONFIG_VERSATILE_I2C', if_true: files('versatile_i2c.c'))
++i2c_ss.add(when: 'CONFIG_OMAP', if_true: files('omap_i2c.c'))
++i2c_ss.add(when: 'CONFIG_PPC4XX', if_true: files('ppc4xx_i2c.c'))
++softmmu_ss.add_all(when: 'CONFIG_I2C', if_true: i2c_ss)
 diff --git a/hw/meson.build b/hw/meson.build
-index 9796f95e5c..ec4bb48a0f 100644
+index 4d7c31c652..983edc1d47 100644
 --- a/hw/meson.build
 +++ b/hw/meson.build
 @@ -1,4 +1,5 @@
  subdir('core')
-+subdir('ipack')
- subdir('ipmi')
- subdir('isa')
- subdir('mem')
++subdir('i2c')
+ subdir('ide')
+ subdir('input')
+ subdir('intc')
 -- 
 2.26.2
 
