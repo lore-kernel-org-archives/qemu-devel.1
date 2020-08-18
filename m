@@ -2,105 +2,103 @@ Return-Path: <SRS0=kYy5=B4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 473C9C433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 03:37:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31CE4C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 03:37:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 11A4F2053B
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 03:37:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F1F822053B
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 03:37:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="bZ/yPHEM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11A4F2053B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="fPfvXdPZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1F822053B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51618 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53174 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7sQp-0000SH-Cu
-	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 23:37:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41198)
+	id 1k7sR9-00016z-7n
+	for qemu-devel@archiver.kernel.org; Mon, 17 Aug 2020 23:37:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41326)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bauerman@linux.ibm.com>)
- id 1k7sOQ-00045V-Mc; Mon, 17 Aug 2020 23:34:34 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57408)
+ id 1k7sOk-0004ld-30; Mon, 17 Aug 2020 23:34:54 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:21022)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bauerman@linux.ibm.com>)
- id 1k7sOO-0000mE-Kt; Mon, 17 Aug 2020 23:34:34 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+ id 1k7sOh-0000nu-IC; Mon, 17 Aug 2020 23:34:53 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
  by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 07I3Vmg1040227; Mon, 17 Aug 2020 23:34:01 -0400
+ 07I33Xgb073959; Mon, 17 Aug 2020 23:34:25 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
  h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=MvO/3TaXIaWi0NFqkMYr5QRYsMxBjotQRfyRCmT/j60=;
- b=bZ/yPHEMhpxVIuf4tn/xLNMuinBJ1YDuCD8h6inPgHQrBcZWm3CAFEMWZp4T8mXb6s5O
- JFjdGpB3wQ02fMixkM91SkOaqX8YTHhRJl4XHohh4aXFaWz6sBuOCODnooJ2DJRNoZkq
- K3r1syiVyMoxp7pocB0ANCGf9dN6uGc/nBxrgyJM9dUisPmjVWTX9GA9ahAxk20PPd/9
- BSJfnghzdr9TEnnMmK1Q+bpfSYDdIOkXupHM2e1FRzy1Mq8Q0vbQzXNdZLMl6yAxeCiT
- P6RVuII+p2hQSGvbNOuXgda6TRDH2to4Aw8ozxAmYZbc6EDRp6AaaBohhPZyc/0ugoLA kg== 
+ content-transfer-encoding; s=pp1;
+ bh=Vc2zx12UOMaphWtyABPPHXpZMOTQHMRCgSz79WbZ/Wk=;
+ b=fPfvXdPZ52Imk4Rsfhg/G4nPTOojNiRP+YihT1V3aTs8PCEqgZX0hiVNEOopbcdfoOY5
+ ++C9ihSkRHygFiGn3RQ8ppkOfbygWgRjSLv1JLMhT/HbcC4jk3nWRdpu6XNkD00IzbwP
+ 5Vbui92eXlWoraPHQ2fWxxsjtvuL6VosEh8FTrcDrWC5bcUdnm33ZL3x/9Wv18EQG2QA
+ XkVSFS+5hSoZFhUOOjGKn5O5DuzR/ES3qOXGsr2H7biUU+l5s3rKXp2d0zfM3NgHg+4S
+ SfrH0/axnYo2HLO0gdeKeaszHT3mSGeN/Jlro2M+jz1DbOInZ80puY9QItcem3KwQo8j Xg== 
 Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 3304tdk7b0-1
+ by mx0a-001b2d01.pphosted.com with ESMTP id 3304r2u4ra-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 17 Aug 2020 23:34:01 -0400
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 07I3WH5t041299;
- Mon, 17 Aug 2020 23:34:01 -0400
-Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com
- [169.55.91.170])
- by mx0a-001b2d01.pphosted.com with ESMTP id 3304tdk7ag-1
+ Mon, 17 Aug 2020 23:34:25 -0400
+Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 07I358Br081098;
+ Mon, 17 Aug 2020 23:34:24 -0400
+Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com
+ [169.53.41.122])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 3304r2u4r2-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 17 Aug 2020 23:34:01 -0400
-Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
- by ppma02wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 07I3UBaI027184;
- Tue, 18 Aug 2020 03:33:59 GMT
-Received: from b01cxnp23033.gho.pok.ibm.com (b01cxnp23033.gho.pok.ibm.com
- [9.57.198.28]) by ppma02wdc.us.ibm.com with ESMTP id 3304scgsmt-1
+ Mon, 17 Aug 2020 23:34:24 -0400
+Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
+ by ppma04dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 07I3VGpF012918;
+ Tue, 18 Aug 2020 03:34:23 GMT
+Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com
+ [9.57.198.24]) by ppma04dal.us.ibm.com with ESMTP id 3304uq8y5x-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 18 Aug 2020 03:33:59 +0000
+ Tue, 18 Aug 2020 03:34:23 +0000
 Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com
  [9.57.199.111])
- by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 07I3Xx8N48824662
+ by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 07I3YMwH50004342
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 18 Aug 2020 03:33:59 GMT
+ Tue, 18 Aug 2020 03:34:22 GMT
 Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 4564BAC05F;
- Tue, 18 Aug 2020 03:33:59 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id CCB72AC05B;
+ Tue, 18 Aug 2020 03:34:22 +0000 (GMT)
 Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 1FDFAAC05E;
- Tue, 18 Aug 2020 03:33:52 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 71130AC059;
+ Tue, 18 Aug 2020 03:34:15 +0000 (GMT)
 Received: from morokweng.localdomain.com (unknown [9.211.138.167])
  by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
- Tue, 18 Aug 2020 03:33:51 +0000 (GMT)
+ Tue, 18 Aug 2020 03:34:15 +0000 (GMT)
 From: Thiago Jung Bauermann <bauerman@linux.ibm.com>
 To: qemu-ppc@nongnu.org
-Subject: [PATCH v4 1/8] target/arm: Move start-powered-off property to generic
- CPUState
-Date: Tue, 18 Aug 2020 00:33:16 -0300
-Message-Id: <20200818033323.336912-2-bauerman@linux.ibm.com>
+Subject: [PATCH v4 4/8] ppc/e500: Use start-powered-off CPUState property
+Date: Tue, 18 Aug 2020 00:33:19 -0300
+Message-Id: <20200818033323.336912-5-bauerman@linux.ibm.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200818033323.336912-1-bauerman@linux.ibm.com>
 References: <20200818033323.336912-1-bauerman@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
  definitions=2020-08-18_01:2020-08-17,
  2020-08-18 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 adultscore=0
- priorityscore=1501 phishscore=0 spamscore=0 impostorscore=0 suspectscore=1
- mlxscore=0 clxscore=1015 malwarescore=0 lowpriorityscore=0 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2008180022
+ lowpriorityscore=0
+ spamscore=0 mlxlogscore=999 bulkscore=0 suspectscore=1 priorityscore=1501
+ malwarescore=0 impostorscore=0 adultscore=0 clxscore=1015 phishscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2008180022
 Received-SPF: pass client-ip=148.163.156.1;
  envelope-from=bauerman@linux.ibm.com; helo=mx0a-001b2d01.pphosted.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/17 21:44:44
@@ -142,117 +140,62 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-There are other platforms which also have CPUs that start powered off, so
-generalize the start-powered-off property so that it can be used by them.
+Instead of setting CPUState::halted to 1 in ppce500_cpu_reset_sec(), use
+the start-powered-off property which makes cpu_common_reset() initialize it
+to 1 in common code.
 
-Note that ARMv7MState also has a property of the same name but this patch
-doesn't change it because that class isn't a subclass of CPUState so it
-wouldn't be a trivial change.
+Also change creation of CPU object from cpu_create() to object_new() and
+qdev_realize() because cpu_create() realizes the CPU and it's not possible
+to set a property after the object is realized.
 
-This change should not cause any change in behavior.
-
-Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Thiago Jung Bauermann <bauerman@linux.ibm.com>
 ---
- exec.c                | 1 +
- include/hw/core/cpu.h | 4 ++++
- target/arm/cpu.c      | 5 ++---
- target/arm/cpu.h      | 3 ---
- target/arm/kvm32.c    | 2 +-
- target/arm/kvm64.c    | 2 +-
- 6 files changed, 9 insertions(+), 8 deletions(-)
+ hw/ppc/e500.c | 19 +++++++++++++++----
+ 1 file changed, 15 insertions(+), 4 deletions(-)
 
-diff --git a/exec.c b/exec.c
-index 6f381f98e2..82e82fab09 100644
---- a/exec.c
-+++ b/exec.c
-@@ -899,6 +899,7 @@ Property cpu_common_props[] = {
-     DEFINE_PROP_LINK("memory", CPUState, memory, TYPE_MEMORY_REGION,
-                      MemoryRegion *),
- #endif
-+    DEFINE_PROP_BOOL("start-powered-off", CPUState, start_powered_off, false),
-     DEFINE_PROP_END_OF_LIST(),
- };
+diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
+index ab9884e315..0077aca74d 100644
+--- a/hw/ppc/e500.c
++++ b/hw/ppc/e500.c
+@@ -704,9 +704,6 @@ static void ppce500_cpu_reset_sec(void *opaque)
  
-diff --git a/include/hw/core/cpu.h b/include/hw/core/cpu.h
-index 8f145733ce..9fc2696db5 100644
---- a/include/hw/core/cpu.h
-+++ b/include/hw/core/cpu.h
-@@ -374,6 +374,10 @@ struct CPUState {
-     bool created;
-     bool stop;
-     bool stopped;
+     cpu_reset(cs);
+ 
+-    /* Secondary CPU starts in halted state for now. Needs to change when
+-       implementing non-kernel boot. */
+-    cs->halted = 1;
+     cs->exception_index = EXCP_HLT;
+ }
+ 
+@@ -864,8 +861,9 @@ void ppce500_init(MachineState *machine)
+         PowerPCCPU *cpu;
+         CPUState *cs;
+         qemu_irq *input;
++        Error *err = NULL;
+ 
+-        cpu = POWERPC_CPU(cpu_create(machine->cpu_type));
++        cpu = POWERPC_CPU(object_new(machine->cpu_type));
+         env = &cpu->env;
+         cs = CPU(cpu);
+ 
+@@ -897,6 +895,19 @@ void ppce500_init(MachineState *machine)
+         } else {
+             /* Secondary CPUs */
+             qemu_register_reset(ppce500_cpu_reset_sec, cpu);
 +
-+    /* Should CPU start in powered-off state? */
-+    bool start_powered_off;
++            /*
++             * Secondary CPU starts in halted state for now. Needs to change
++             * when implementing non-kernel boot.
++             */
++            object_property_set_bool(OBJECT(cs), "start-powered-off", true,
++                                     &error_abort);
++        }
 +
-     bool unplug;
-     bool crash_occurred;
-     bool exit_request;
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index 111579554f..ec65c7653f 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -174,8 +174,8 @@ static void arm_cpu_reset(DeviceState *dev)
-     env->vfp.xregs[ARM_VFP_MVFR1] = cpu->isar.mvfr1;
-     env->vfp.xregs[ARM_VFP_MVFR2] = cpu->isar.mvfr2;
- 
--    cpu->power_state = cpu->start_powered_off ? PSCI_OFF : PSCI_ON;
--    s->halted = cpu->start_powered_off;
-+    cpu->power_state = s->start_powered_off ? PSCI_OFF : PSCI_ON;
-+    s->halted = s->start_powered_off;
- 
-     if (arm_feature(env, ARM_FEATURE_IWMMXT)) {
-         env->iwmmxt.cregs[ARM_IWMMXT_wCID] = 0x69051000 | 'Q';
-@@ -2182,7 +2182,6 @@ static const ARMCPUInfo arm_cpus[] = {
- };
- 
- static Property arm_cpu_properties[] = {
--    DEFINE_PROP_BOOL("start-powered-off", ARMCPU, start_powered_off, false),
-     DEFINE_PROP_UINT32("psci-conduit", ARMCPU, psci_conduit, 0),
-     DEFINE_PROP_UINT64("midr", ARMCPU, midr, 0),
-     DEFINE_PROP_UINT64("mp-affinity", ARMCPU,
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 9e8ed423ea..a925d26996 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -810,9 +810,6 @@ struct ARMCPU {
-      */
-     uint32_t psci_version;
- 
--    /* Should CPU start in PSCI powered-off state? */
--    bool start_powered_off;
--
-     /* Current power state, access guarded by BQL */
-     ARMPSCIState power_state;
- 
-diff --git a/target/arm/kvm32.c b/target/arm/kvm32.c
-index 0af46b41c8..1f2b8f8b7a 100644
---- a/target/arm/kvm32.c
-+++ b/target/arm/kvm32.c
-@@ -218,7 +218,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
- 
-     /* Determine init features for this CPU */
-     memset(cpu->kvm_init_features, 0, sizeof(cpu->kvm_init_features));
--    if (cpu->start_powered_off) {
-+    if (cs->start_powered_off) {
-         cpu->kvm_init_features[0] |= 1 << KVM_ARM_VCPU_POWER_OFF;
++        if (!qdev_realize(DEVICE(cs), NULL, &err)) {
++            error_report_err(err);
++            object_unref(OBJECT(cs));
++            exit(EXIT_FAILURE);
+         }
      }
-     if (kvm_check_extension(cs->kvm_state, KVM_CAP_ARM_PSCI_0_2)) {
-diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-index 1169237905..f8a6d905fb 100644
---- a/target/arm/kvm64.c
-+++ b/target/arm/kvm64.c
-@@ -775,7 +775,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
  
-     /* Determine init features for this CPU */
-     memset(cpu->kvm_init_features, 0, sizeof(cpu->kvm_init_features));
--    if (cpu->start_powered_off) {
-+    if (cs->start_powered_off) {
-         cpu->kvm_init_features[0] |= 1 << KVM_ARM_VCPU_POWER_OFF;
-     }
-     if (kvm_check_extension(cs->kvm_state, KVM_CAP_ARM_PSCI_0_2)) {
 
