@@ -7,76 +7,77 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89C34C433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 15:08:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AB2AC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 15:08:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 44FB6207DA
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 15:08:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4654A206B5
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 15:08:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KwsEYpof"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 44FB6207DA
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XxBHty0D"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4654A206B5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52862 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55444 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k83DT-0000OY-El
-	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 11:07:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33946)
+	id 1k83Du-0001Uf-Ec
+	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 11:08:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33888)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k82Ly-0006dk-3q
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:12:42 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:55427
+ id 1k82Lu-0006bC-4U
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:12:38 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:48944
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k82Lo-0007gx-38
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:12:41 -0400
+ id 1k82Lm-0007gJ-3g
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:12:37 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597759951;
+ s=mimecast20190719; t=1597759949;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=pQJeg8MZZWFA+26AoBZGRexdaepfiPY1AFS/gUOoBrE=;
- b=KwsEYpof5Oi1d4103SprQfXT41W95jTPm/1bVtxse4GymsrzMlYrj37zHZe+KkzFDQkFpA
- bHwRUncV/NdlQufX1O2FfD9unUtJP4GQoEisPIv2FHpbaX695qxUtcNAVKa/4wHwN13qHV
- u/jwxSqszP5p4gs7C8dgWQM982BOsdg=
+ bh=CNpg2+JxxivGlle9ggNErZ6ShlQW6g8IjN/0GSu0Dhw=;
+ b=XxBHty0DAbDXu1uDGkZq+4CZUlEjKVx0hOBwZ3O0zTDOfwtlX9+vHZ8voKjorRMRfMrGWO
+ sONGMMRfIFeFX/w9mog82+2LXvAXkOP+fdvRl6n589uM3JT+5FfauvBnpoPgcXOqG9Wh+/
+ xa2vZYHX2KrnxjuMioNy+IqbYOQBieU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-44-PhE6885FMyGE5KW3dKjKOQ-1; Tue, 18 Aug 2020 10:12:23 -0400
-X-MC-Unique: PhE6885FMyGE5KW3dKjKOQ-1
+ us-mta-401-iA5ECZiGNROzU8bklU_giw-1; Tue, 18 Aug 2020 10:12:24 -0400
+X-MC-Unique: iA5ECZiGNROzU8bklU_giw-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F144880F040
- for <qemu-devel@nongnu.org>; Tue, 18 Aug 2020 14:12:22 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C929580F043
+ for <qemu-devel@nongnu.org>; Tue, 18 Aug 2020 14:12:23 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B58427A1FA
- for <qemu-devel@nongnu.org>; Tue, 18 Aug 2020 14:12:22 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8DDBF7A1FA
+ for <qemu-devel@nongnu.org>; Tue, 18 Aug 2020 14:12:23 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 146/150] meson: convert VNC and dependent libraries to meson
-Date: Tue, 18 Aug 2020 10:10:21 -0400
-Message-Id: <20200818141025.21608-147-pbonzini@redhat.com>
+Subject: [PULL 148/150] meson: avoid unstable module warning with Meson 0.56.0
+ or newer
+Date: Tue, 18 Aug 2020 10:10:23 -0400
+Message-Id: <20200818141025.21608-149-pbonzini@redhat.com>
 In-Reply-To: <20200818141025.21608-1-pbonzini@redhat.com>
 References: <20200818141025.21608-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Spam-Score: 0.0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=pbonzini@redhat.com;
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 02:16:14
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 08:01:06
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
@@ -103,290 +104,26 @@ Sender: "Qemu-devel"
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- configure         | 122 +++++-----------------------------------------
- meson.build       |  40 +++++++++------
- meson_options.txt |   4 ++
- ui/meson.build    |  10 ++--
- 4 files changed, 45 insertions(+), 131 deletions(-)
+ meson.build | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/configure b/configure
-index 26fefa6cbc..86f384be29 100755
---- a/configure
-+++ b/configure
-@@ -380,12 +380,12 @@ sdl="auto"
- sdl_image="auto"
- virtfs=""
- mpath=""
--vnc="yes"
-+vnc="enabled"
- sparse="no"
- vde=""
--vnc_sasl=""
--vnc_jpeg=""
--vnc_png=""
-+vnc_sasl="auto"
-+vnc_jpeg="auto"
-+vnc_png="auto"
- xkbcommon=""
- xen=""
- xen_ctrl_version=""
-@@ -1108,9 +1108,9 @@ for opt do
-   ;;
-   --enable-mpath) mpath="yes"
-   ;;
--  --disable-vnc) vnc="no"
-+  --disable-vnc) vnc="disabled"
-   ;;
--  --enable-vnc) vnc="yes"
-+  --enable-vnc) vnc="enabled"
-   ;;
-   --oss-lib=*) oss_lib="$optarg"
-   ;;
-@@ -1146,17 +1146,17 @@ for opt do
-   ;;
-   --disable-strip) strip_opt="no"
-   ;;
--  --disable-vnc-sasl) vnc_sasl="no"
-+  --disable-vnc-sasl) vnc_sasl="disabled"
-   ;;
--  --enable-vnc-sasl) vnc_sasl="yes"
-+  --enable-vnc-sasl) vnc_sasl="enabled"
-   ;;
--  --disable-vnc-jpeg) vnc_jpeg="no"
-+  --disable-vnc-jpeg) vnc_jpeg="disabled"
-   ;;
--  --enable-vnc-jpeg) vnc_jpeg="yes"
-+  --enable-vnc-jpeg) vnc_jpeg="enabled"
-   ;;
--  --disable-vnc-png) vnc_png="no"
-+  --disable-vnc-png) vnc_png="disabled"
-   ;;
--  --enable-vnc-png) vnc_png="yes"
-+  --enable-vnc-png) vnc_png="enabled"
-   ;;
-   --disable-slirp) slirp="no"
-   ;;
-@@ -3379,85 +3379,6 @@ EOF
-     fi
- fi
- 
--##########################################
--# VNC SASL detection
--if test "$vnc" = "yes" && test "$vnc_sasl" != "no" ; then
--  cat > $TMPC <<EOF
--#include <sasl/sasl.h>
--#include <stdio.h>
--int main(void) { sasl_server_init(NULL, "qemu"); return 0; }
--EOF
--  # Assuming Cyrus-SASL installed in /usr prefix
--  # QEMU defines struct iovec in "qemu/osdep.h",
--  # we don't want libsasl to redefine it in <sasl/sasl.h>.
--  vnc_sasl_cflags="-DSTRUCT_IOVEC_DEFINED"
--  vnc_sasl_libs="-lsasl2"
--  if compile_prog "$vnc_sasl_cflags" "$vnc_sasl_libs" ; then
--    vnc_sasl=yes
--    libs_softmmu="$vnc_sasl_libs $libs_softmmu"
--    QEMU_CFLAGS="$QEMU_CFLAGS $vnc_sasl_cflags"
--  else
--    if test "$vnc_sasl" = "yes" ; then
--      feature_not_found "vnc-sasl" "Install Cyrus SASL devel"
--    fi
--    vnc_sasl=no
--  fi
--fi
--
--##########################################
--# VNC JPEG detection
--if test "$vnc" = "yes" && test "$vnc_jpeg" != "no" ; then
--cat > $TMPC <<EOF
--#include <stdio.h>
--#include <jpeglib.h>
--int main(void) { struct jpeg_compress_struct s; jpeg_create_compress(&s); return 0; }
--EOF
--    vnc_jpeg_cflags=""
--    vnc_jpeg_libs="-ljpeg"
--  if compile_prog "$vnc_jpeg_cflags" "$vnc_jpeg_libs" ; then
--    vnc_jpeg=yes
--    libs_softmmu="$vnc_jpeg_libs $libs_softmmu"
--    QEMU_CFLAGS="$QEMU_CFLAGS $vnc_jpeg_cflags"
--  else
--    if test "$vnc_jpeg" = "yes" ; then
--      feature_not_found "vnc-jpeg" "Install libjpeg-turbo devel"
--    fi
--    vnc_jpeg=no
--  fi
--fi
--
--##########################################
--# VNC PNG detection
--if test "$vnc" = "yes" && test "$vnc_png" != "no" ; then
--cat > $TMPC <<EOF
--//#include <stdio.h>
--#include <png.h>
--#include <stddef.h>
--int main(void) {
--    png_structp png_ptr;
--    png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
--    return png_ptr != 0;
--}
--EOF
--  if $pkg_config libpng --exists; then
--    vnc_png_cflags=$($pkg_config libpng --cflags)
--    vnc_png_libs=$($pkg_config libpng --libs)
--  else
--    vnc_png_cflags=""
--    vnc_png_libs="-lpng"
--  fi
--  if compile_prog "$vnc_png_cflags" "$vnc_png_libs" ; then
--    vnc_png=yes
--    libs_softmmu="$vnc_png_libs $libs_softmmu"
--    QEMU_CFLAGS="$QEMU_CFLAGS $vnc_png_cflags"
--  else
--    if test "$vnc_png" = "yes" ; then
--      feature_not_found "vnc-png" "Install libpng devel"
--    fi
--    vnc_png=no
--  fi
--fi
--
- ##########################################
- # xkbcommon probe
- if test "$xkbcommon" != "no" ; then
-@@ -6839,24 +6760,6 @@ if test "$audio_win_int" = "yes" ; then
- fi
- echo "CONFIG_BDRV_RW_WHITELIST=$block_drv_rw_whitelist" >> $config_host_mak
- echo "CONFIG_BDRV_RO_WHITELIST=$block_drv_ro_whitelist" >> $config_host_mak
--if test "$vnc" = "yes" ; then
--  echo "CONFIG_VNC=y" >> $config_host_mak
--fi
--if test "$vnc_sasl" = "yes" ; then
--  echo "CONFIG_VNC_SASL=y" >> $config_host_mak
--fi
--echo "SASL_CFLAGS=$vnc_sasl_cflags" >> $config_host_mak
--echo "SASL_LIBS=$vnc_sasl_libs" >> $config_host_mak
--if test "$vnc_jpeg" = "yes" ; then
--  echo "CONFIG_VNC_JPEG=y" >> $config_host_mak
--fi
--echo "JPEG_CFLAGS=$vnc_jpeg_cflags" >> $config_host_mak
--echo "JPEG_LIBS=$vnc_jpeg_libs" >> $config_host_mak
--if test "$vnc_png" = "yes" ; then
--  echo "CONFIG_VNC_PNG=y" >> $config_host_mak
--fi
--echo "PNG_CFLAGS=$vnc_png_cflags" >> $config_host_mak
--echo "PNG_LIBS=$vnc_png_libs" >> $config_host_mak
- if test "$xkbcommon" = "yes" ; then
-   echo "CONFIG_XKBCOMMON=y" >> $config_host_mak
-   echo "XKBCOMMON_CFLAGS=$xkbcommon_cflags" >> $config_host_mak
-@@ -8275,6 +8178,7 @@ NINJA=$PWD/ninjatool $meson setup \
-         -Db_pie=$(if test "$pie" = yes; then echo true; else echo false; fi) \
-         -Db_coverage=$(if test "$gcov" = yes; then echo true; else echo false; fi) \
- 	-Dsdl=$sdl -Dsdl_image=$sdl_image \
-+	-Dvnc=$vnc -Dvnc_sasl=$vnc_sasl -Dvnc_jpeg=$vnc_jpeg -Dvnc_png=$vnc_png \
-         $cross_arg \
-         "$PWD" "$source_path"
- 
 diff --git a/meson.build b/meson.build
-index 53638335d9..afe684cbad 100644
+index 57cfa8723d..94bfaa6290 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -299,20 +299,24 @@ if 'CONFIG_GIO' in config_host
-   gio = declare_dependency(compile_args: config_host['GIO_CFLAGS'].split(),
-                            link_args: config_host['GIO_LIBS'].split())
- endif
-+vnc = not_found
- png = not_found
--if 'CONFIG_VNC_PNG' in config_host
--  png = declare_dependency(compile_args: config_host['PNG_CFLAGS'].split(),
--                           link_args: config_host['PNG_LIBS'].split())
--endif
- jpeg = not_found
--if 'CONFIG_VNC_JPEG' in config_host
--  jpeg = declare_dependency(compile_args: config_host['JPEG_CFLAGS'].split(),
--                            link_args: config_host['JPEG_LIBS'].split())
--endif
- sasl = not_found
--if 'CONFIG_VNC_SASL' in config_host
--  sasl = declare_dependency(compile_args: config_host['SASL_CFLAGS'].split(),
--                            link_args: config_host['SASL_LIBS'].split())
-+if get_option('vnc').enabled()
-+  vnc = declare_dependency() # dummy dependency
-+  png = dependency('libpng', required: get_option('vnc_png'),
-+                   static: enable_static)
-+  jpeg = cc.find_library('jpeg', has_headers: ['jpeglib.h'],
-+                         required: get_option('vnc_jpeg'),
-+                         static: enable_static)
-+  sasl = cc.find_library('sasl2', has_headers: ['sasl/sasl.h'],
-+                         required: get_option('vnc_sasl'),
-+                         static: enable_static)
-+  if sasl.found()
-+    sasl = declare_dependency(dependencies: sasl,
-+                              compile_args: '-DSTRUCT_IOVEC_DEFINED')
-+  endif
- endif
- fdt = not_found
- if 'CONFIG_FDT' in config_host
-@@ -370,6 +374,10 @@ endif
+@@ -3,7 +3,11 @@ project('qemu', ['c'], meson_version: '>=0.55.0',
+         version: run_command('head', meson.source_root() / 'VERSION').stdout().strip())
  
- config_host_data.set('CONFIG_SDL', sdl.found())
- config_host_data.set('CONFIG_SDL_IMAGE', sdl_image.found())
-+config_host_data.set('CONFIG_VNC', vnc.found())
-+config_host_data.set('CONFIG_VNC_JPEG', jpeg.found())
-+config_host_data.set('CONFIG_VNC_PNG', png.found())
-+config_host_data.set('CONFIG_VNC_SASL', sasl.found())
- config_host_data.set('QEMU_VERSION', '"@0@"'.format(meson.project_version()))
- config_host_data.set('QEMU_VERSION_MAJOR', meson.project_version().split('.')[0])
- config_host_data.set('QEMU_VERSION_MINOR', meson.project_version().split('.')[1])
-@@ -1275,11 +1283,11 @@ summary_info += {'Block whitelist (rw)': config_host['CONFIG_BDRV_RW_WHITELIST']
- summary_info += {'Block whitelist (ro)': config_host['CONFIG_BDRV_RO_WHITELIST']}
- summary_info += {'VirtFS support':    config_host.has_key('CONFIG_VIRTFS')}
- summary_info += {'Multipath support': config_host.has_key('CONFIG_MPATH')}
--summary_info += {'VNC support':       config_host.has_key('CONFIG_VNC')}
--if config_host.has_key('CONFIG_VNC')
--  summary_info += {'VNC SASL support':  config_host.has_key('CONFIG_VNC_SASL')}
--  summary_info += {'VNC JPEG support':  config_host.has_key('CONFIG_VNC_JPEG')}
--  summary_info += {'VNC PNG support':   config_host.has_key('CONFIG_VNC_PNG')}
-+summary_info += {'VNC support':       vnc.found()}
-+if vnc.found()
-+  summary_info += {'VNC SASL support':  sasl.found()}
-+  summary_info += {'VNC JPEG support':  jpeg.found()}
-+  summary_info += {'VNC PNG support':   png.found()}
- endif
- summary_info += {'xen support':       config_host.has_key('CONFIG_XEN_BACKEND')}
- if config_host.has_key('CONFIG_XEN_BACKEND')
-diff --git a/meson_options.txt b/meson_options.txt
-index e548211f34..67455c57bc 100644
---- a/meson_options.txt
-+++ b/meson_options.txt
-@@ -1,2 +1,6 @@
- option('sdl', type : 'feature', value : 'auto')
- option('sdl_image', type : 'feature', value : 'auto')
-+option('vnc', type : 'feature', value : 'enabled')
-+option('vnc_jpeg', type : 'feature', value : 'auto')
-+option('vnc_png', type : 'feature', value : 'auto')
-+option('vnc_sasl', type : 'feature', value : 'auto')
-diff --git a/ui/meson.build b/ui/meson.build
-index daec6c405e..6f74d30ea0 100644
---- a/ui/meson.build
-+++ b/ui/meson.build
-@@ -27,14 +27,12 @@ vnc_ss.add(files(
-   'vnc-ws.c',
-   'vnc-jobs.c',
- ))
--vnc_ss.add(zlib)
--vnc_ss.add(when: 'CONFIG_VNC_SASL', if_true: [files('vnc-auth-sasl.c'), sasl])
--softmmu_ss.add_all(when: 'CONFIG_VNC', if_true: vnc_ss)
--softmmu_ss.add(when: 'CONFIG_VNC', if_false: files('vnc-stubs.c'))
-+vnc_ss.add(zlib, png, jpeg)
-+vnc_ss.add(when: sasl, if_true: files('vnc-auth-sasl.c'))
-+softmmu_ss.add_all(when: vnc, if_true: vnc_ss)
-+softmmu_ss.add(when: vnc, if_false: files('vnc-stubs.c'))
- softmmu_ss.add(when: [opengl, 'CONFIG_OPENGL'], if_true: files('shader.c', 'console-gl.c', 'egl-helpers.c', 'egl-context.c'))
- softmmu_ss.add(when: [opengl, 'CONFIG_OPENGL_DMABUF'], if_true: files('egl-headless.c'))
--softmmu_ss.add(when: 'CONFIG_VNC_PNG', if_true: png)
--softmmu_ss.add(when: 'CONFIG_VNC_JPEG', if_true: jpeg)
+ not_found = dependency('', required: false)
+-keyval = import('unstable-keyval')
++if meson.version().version_compare('>=0.56.0')
++  keyval = import('keyval')
++else
++  keyval = import('unstable-keyval')
++endif
+ ss = import('sourceset')
  
- ui_modules = {}
- 
+ sh = find_program('sh')
 -- 
 2.26.2
 
