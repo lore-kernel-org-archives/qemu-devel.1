@@ -7,46 +7,46 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7DD8C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 04:37:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CBF2C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 04:38:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 81935206DA
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 04:37:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 67F4A206DA
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 04:38:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="ik4SSBtI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 81935206DA
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="XWe1UumW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67F4A206DA
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48122 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51010 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7tNG-0006h4-QI
-	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 00:37:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50662)
+	id 1k7tNw-0007rj-Av
+	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 00:38:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50526)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1k7t7i-0001dy-O5; Tue, 18 Aug 2020 00:21:22 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:34593 helo=ozlabs.org)
+ id 1k7t7U-00010C-Qt; Tue, 18 Aug 2020 00:21:08 -0400
+Received: from ozlabs.org ([203.11.71.1]:48747)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1k7t7h-0006dT-0d; Tue, 18 Aug 2020 00:21:22 -0400
+ id 1k7t7T-0006Rf-0r; Tue, 18 Aug 2020 00:21:08 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 4BVyNk2k1Mz9sWB; Tue, 18 Aug 2020 14:19:34 +1000 (AEST)
+ id 4BVyNh1bhwz9sW3; Tue, 18 Aug 2020 14:19:32 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1597724374;
- bh=nhGwyAeymaASkHK5D/WcPZyVl5hEMzVQYliqIctBXOA=;
+ d=gibson.dropbear.id.au; s=201602; t=1597724372;
+ bh=/tKjcLtS76XXLQ/pn0TEycoIQ/uHeOAgdmkWU4oTH6k=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=ik4SSBtIPMC+/JBYA6SO1Xs0ymadVtjRHrDofR5+TLXCQczF4Hkw4/as0p/hy0l3T
- ML0kAe5Xt5MojrMmldvtdX6ZnoN0ujJf4Fd8qTC1kWoMrGaPSbQ7gJOzPRhh2aEdmC
- wtE6x3Cnml2E6MMUeKmcBOCNpUqRUf0GB2n9XswY=
+ b=XWe1UumWCfLxtN6cKNqDez3m20Q5wVSR0eihIJhXod2sGvR0anQJzrnILsOxaHG2Z
+ Jsd8YuqWuGJdm+c/xW0l/JAXVzHmxWrB4CA8YKgqUbfyZbYQmswXpyTqMZA6YI2lQk
+ q30qRVDbcfC82s/ncoaHfcn1xq2xZTTOWhUPjtrA=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org,
 	groug@kaod.org
-Subject: [PULL 40/40] spapr/xive: Use xive_source_esb_len()
-Date: Tue, 18 Aug 2020 14:19:22 +1000
-Message-Id: <20200818041922.251708-41-david@gibson.dropbear.id.au>
+Subject: [PULL 33/40] spapr/kvm: Fix error handling in kvmppc_xive_pre_save()
+Date: Tue, 18 Aug 2020 14:19:15 +1000
+Message-Id: <20200818041922.251708-34-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200818041922.251708-1-david@gibson.dropbear.id.au>
 References: <20200818041922.251708-1-david@gibson.dropbear.id.au>
@@ -83,45 +83,42 @@ Sender: "Qemu-devel"
 
 From: Greg Kurz <groug@kaod.org>
 
-static inline size_t xive_source_esb_len(XiveSource *xsrc)
-{
-    return (1ull << xsrc->esb_shift) * xsrc->nr_irqs;
-}
+Now that kvmppc_xive_get_queues() returns a negative errno on failure, check
+with that because it is preferred to local_err. And most of all, propagate
+it because vmstate expects negative errnos.
 
 Signed-off-by: Greg Kurz <groug@kaod.org>
-Message-Id: <159733969034.320580.6571451425779179477.stgit@bahia.lan>
+Message-Id: <159707849455.1489912.6034461176847728064.stgit@bahia.lan>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/intc/spapr_xive.c     | 2 +-
- hw/intc/spapr_xive_kvm.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ hw/intc/spapr_xive_kvm.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-index 3c84f64dc4..4bd0d606ba 100644
---- a/hw/intc/spapr_xive.c
-+++ b/hw/intc/spapr_xive.c
-@@ -336,7 +336,7 @@ static void spapr_xive_realize(DeviceState *dev, Error **errp)
-     sysbus_init_mmio(SYS_BUS_DEVICE(xive), &end_xsrc->esb_mmio);
- 
-     /* Set the mapping address of the END ESB pages after the source ESBs */
--    xive->end_base = xive->vc_base + (1ull << xsrc->esb_shift) * xsrc->nr_irqs;
-+    xive->end_base = xive->vc_base + xive_source_esb_len(xsrc);
- 
-     /*
-      * Allocate the routing tables
 diff --git a/hw/intc/spapr_xive_kvm.c b/hw/intc/spapr_xive_kvm.c
-index d871bb1a00..e8667ce5f6 100644
+index f2dda69218..1686b036eb 100644
 --- a/hw/intc/spapr_xive_kvm.c
 +++ b/hw/intc/spapr_xive_kvm.c
-@@ -831,7 +831,7 @@ void kvmppc_xive_disconnect(SpaprInterruptController *intc)
+@@ -604,16 +604,17 @@ void kvmppc_xive_synchronize_state(SpaprXive *xive, Error **errp)
+ int kvmppc_xive_pre_save(SpaprXive *xive)
+ {
+     Error *local_err = NULL;
++    int ret;
  
-     /* Clear the KVM mapping */
-     xsrc = &xive->source;
--    esb_len = (1ull << xsrc->esb_shift) * xsrc->nr_irqs;
-+    esb_len = xive_source_esb_len(xsrc);
+     assert(xive->fd != -1);
  
-     if (xsrc->esb_mmap) {
-         memory_region_del_subregion(&xsrc->esb_mmio, &xsrc->esb_mmio_kvm);
+     /* EAT: there is no extra state to query from KVM */
+ 
+     /* ENDT */
+-    kvmppc_xive_get_queues(xive, &local_err);
+-    if (local_err) {
++    ret = kvmppc_xive_get_queues(xive, &local_err);
++    if (ret < 0) {
+         error_report_err(local_err);
+-        return -1;
++        return ret;
+     }
+ 
+     return 0;
 -- 
 2.26.2
 
