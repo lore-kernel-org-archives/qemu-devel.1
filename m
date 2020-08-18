@@ -4,91 +4,74 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4313FC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 15:47:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 487C0C433E1
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 15:51:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0A9B620897
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 15:47:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 134C42080C
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 15:51:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DAG1SOSg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A9B620897
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="QW6q9LyU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 134C42080C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=quicinc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43714 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56894 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k83ps-000145-6a
-	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 11:47:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40652)
+	id 1k83ta-0006kg-4X
+	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 11:51:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59670)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k82l0-0006hR-Ra; Tue, 18 Aug 2020 10:38:34 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:35158)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k82kz-0002z7-4W; Tue, 18 Aug 2020 10:38:34 -0400
-Received: by mail-wm1-x344.google.com with SMTP id 184so17254393wmb.0;
- Tue, 18 Aug 2020 07:38:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=HBZVH8DbVP87G8OaAytsCzNyqaW3XTQSsMrdJGsu7lU=;
- b=DAG1SOSgzbawLFIyLqQg+HKeKRdOSXKBIsnafrvB5VE82XeY1NItAkJ07Db8Wd72xX
- 8KHbBHMYAepStJUVH1AeAgu20ULsvWl8Jg4pj2vmlzIDsH/QqxlqHm/xqj1unu2Yz6sS
- c9cT+HHq2DdOXNe3vhrGgY727CsPe2qXgZgiigibSDPHS0LxiwSlMiOaNqNKr/IeOY57
- Q8rbvNGWTub4diRI3oKJ2HAx39FA5LFGqifAQjvGG1Xqy6bMSr57OB7O4zEE6A4Oi29a
- CGkikf8OxYLhKWm6puKoiiGTp9Ch1VNPQCAKVJtRN8swgTOkzM8q+30uMNjf8nyNzuOp
- aUJw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=HBZVH8DbVP87G8OaAytsCzNyqaW3XTQSsMrdJGsu7lU=;
- b=gxcdXkpW2DVQbV30fEachprr/eaDWG00cxG3ualsZ78Hjdw28qpmCB2lpDqOgAnk5+
- +jgNtT494CnLQ/wFKtyrfpXGn7F73W6hIwY/BiSxw3fqW1ahUZOIJF+6uHROdMGPPAjV
- XzaQ4a8QihTQTmgIbGsPEOZ3dAFWuqRGCoem0Kb6Brho/YEf3ZwqNS+0Tz71B6tGXLA3
- UfHRtvEvaTMkQPTZcpYAR9sERRKVAXMuAs422IBSXF+nzLJFBRnE5pKfYMFw5fgPp05F
- XHXOFMThupis66PlFwqH4EVslK6EnX2KFraJZ/hdPmL2SUnw3bDl4qBWkwsbWlHbqhTQ
- E9jQ==
-X-Gm-Message-State: AOAM533ivht/dUYmK6pVrAS/Zxv75rdqpdIV5aXe0OAj7bXrDd3g6y5N
- 9jIPPWzzTPCiOR0kuA3l20B9smVlNBU=
-X-Google-Smtp-Source: ABdhPJzeATk3WZykFmKe/Kx+k1ecCKzD6QnmiAlprd2fKDp2brjhbVf69J6rHzTFJzQVDBO3GwP9kA==
-X-Received: by 2002:a1c:b787:: with SMTP id h129mr220955wmf.93.1597761510886; 
- Tue, 18 Aug 2020 07:38:30 -0700 (PDT)
-Received: from localhost.localdomain (121.red-81-40-121.staticip.rima-tde.net.
- [81.40.121.121])
- by smtp.gmail.com with ESMTPSA id z8sm139177wmf.42.2020.08.18.07.38.29
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 18 Aug 2020 07:38:30 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 2/2] hw/core/sysbus: Make sysbus_pass_irq() arguments
- self-describing
-Date: Tue, 18 Aug 2020 16:38:25 +0200
-Message-Id: <20200818143825.691110-3-f4bug@amsat.org>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200818143825.691110-1-f4bug@amsat.org>
-References: <20200818143825.691110-1-f4bug@amsat.org>
+ (Exim 4.90_1) (envelope-from <tsimpson@qualcomm.com>)
+ id 1k83qq-0002RU-RC
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 11:48:41 -0400
+Received: from alexa-out-sd-01.qualcomm.com ([199.106.114.38]:42784)
+ by eggs.gnu.org with esmtps (TLS1.2:RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <tsimpson@qualcomm.com>)
+ id 1k83qn-0005Hw-Cw
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 11:48:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
+ t=1597765717; x=1629301717;
+ h=from:to:cc:subject:date:message-id:in-reply-to:
+ references:mime-version:content-transfer-encoding;
+ bh=eQ9pZDLJT0++hD4thsX7Gk5+50J0E0NHqpLQv8mcroM=;
+ b=QW6q9LyUGnrKWrzBS1c2HxRQymJz9jClZ8Gmdq8om2xYvcmEoa9WxL8n
+ 4tXnwY7huq+4KbSz8n3xUENJ/vgs7K2HHBICKWo/Q9MmmlSmCEDKrNHh5
+ 5vV1Vo+mtzTUboEEr16+drjlESoll2GGaOofZCogKr0v0DuUsmGbKxayC A=;
+Received: from unknown (HELO ironmsg01-sd.qualcomm.com) ([10.53.140.141])
+ by alexa-out-sd-01.qualcomm.com with ESMTP; 18 Aug 2020 08:48:34 -0700
+Received: from vu-tsimpson-aus.qualcomm.com (HELO
+ vu-tsimpson1-aus.qualcomm.com) ([10.222.150.1])
+ by ironmsg01-sd.qualcomm.com with ESMTP; 18 Aug 2020 08:48:33 -0700
+Received: by vu-tsimpson1-aus.qualcomm.com (Postfix, from userid 47164)
+ id 902487BD; Tue, 18 Aug 2020 10:48:33 -0500 (CDT)
+From: Taylor Simpson <tsimpson@quicinc.com>
+To: tsimpson@quicinc.com
+Subject: [RFC PATCH v3 01/34] Hexagon Update MAINTAINERS file
+Date: Tue, 18 Aug 2020 10:47:21 -0500
+Message-Id: <1597765675-16393-2-git-send-email-tsimpson@quicinc.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1597765675-16393-1-git-send-email-tsimpson@quicinc.com>
+References: <1597765675-16393-1-git-send-email-tsimpson@quicinc.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::344;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x344.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Content-Transfer-Encoding: base64
+Received-SPF: pass client-ip=199.106.114.38;
+ envelope-from=tsimpson@qualcomm.com; helo=alexa-out-sd-01.qualcomm.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 11:48:34
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -32
+X-Spam_score: -3.3
+X-Spam_bar: ---
+X-Spam_report: (-3.3 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,60 +84,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-trivial@nongnu.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: "open list:All patches CC here" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Make the direction sysbus_pass_irq() pass the GPIOs more obvious
-by renaming its arguments as 'from_dev' and 'to_dev'.
-
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- include/hw/sysbus.h | 7 ++++++-
- hw/core/sysbus.c    | 5 ++---
- 2 files changed, 8 insertions(+), 4 deletions(-)
-
-diff --git a/include/hw/sysbus.h b/include/hw/sysbus.h
-index da9f85c58ce..65de6f6b062 100644
---- a/include/hw/sysbus.h
-+++ b/include/hw/sysbus.h
-@@ -73,7 +73,12 @@ typedef void FindSysbusDeviceFunc(SysBusDevice *sbdev, void *opaque);
- void sysbus_init_mmio(SysBusDevice *dev, MemoryRegion *memory);
- MemoryRegion *sysbus_mmio_get_region(SysBusDevice *dev, int n);
- void sysbus_init_irq(SysBusDevice *dev, qemu_irq *p);
--void sysbus_pass_irq(SysBusDevice *dev, SysBusDevice *target);
-+/**
-+ * sysbus_pass_irq: Pass through IRQ/GPIO lines from one to another device
-+ * @to_dev: Device which needs to expose IRQ/GPIO lines
-+ * @from_dev: Device which has the IRQ/GPIO lines
-+ */
-+void sysbus_pass_irq(SysBusDevice *to_dev, SysBusDevice *from_dev);
- void sysbus_init_ioports(SysBusDevice *dev, uint32_t ioport, uint32_t size);
- 
- 
-diff --git a/hw/core/sysbus.c b/hw/core/sysbus.c
-index 70239b7e7d0..bc23a66b5c5 100644
---- a/hw/core/sysbus.c
-+++ b/hw/core/sysbus.c
-@@ -181,10 +181,9 @@ void sysbus_init_irq(SysBusDevice *dev, qemu_irq *p)
-     qdev_init_gpio_out_named(DEVICE(dev), p, SYSBUS_DEVICE_GPIO_IRQ, 1);
- }
- 
--/* Pass IRQs from a target device.  */
--void sysbus_pass_irq(SysBusDevice *dev, SysBusDevice *target)
-+void sysbus_pass_irq(SysBusDevice *to_dev, SysBusDevice *from_dev)
- {
--    qdev_pass_gpios(DEVICE(target), DEVICE(dev), SYSBUS_DEVICE_GPIO_IRQ);
-+    qdev_pass_gpios(DEVICE(from_dev), DEVICE(to_dev), SYSBUS_DEVICE_GPIO_IRQ);
- }
- 
- void sysbus_init_mmio(SysBusDevice *dev, MemoryRegion *memory)
--- 
-2.26.2
-
+QWRkIFRheWxvciBTaW1wc29uIGFzIHRoZSBIZXhhZ29uIHRhcmdldCBtYWludGFpbmVyCgpTaWdu
+ZWQtb2ZmLWJ5OiBUYXlsb3IgU2ltcHNvbiA8dHNpbXBzb25AcXVpY2luYy5jb20+Ci0tLQogTUFJ
+TlRBSU5FUlMgfCA4ICsrKysrKysrCiAxIGZpbGUgY2hhbmdlZCwgOCBpbnNlcnRpb25zKCspCgpk
+aWZmIC0tZ2l0IGEvTUFJTlRBSU5FUlMgYi9NQUlOVEFJTkVSUwppbmRleCAwODg2ZWIzLi5kODVk
+YTU1IDEwMDY0NAotLS0gYS9NQUlOVEFJTkVSUworKysgYi9NQUlOVEFJTkVSUwpAQCAtMTg0LDYg
+KzE4NCwxNCBAQCBGOiBpbmNsdWRlL2h3L2NyaXMvCiBGOiB0ZXN0cy90Y2cvY3Jpcy8KIEY6IGRp
+c2FzL2NyaXMuYwogCitIZXhhZ29uIFRDRyBDUFVzCitNOiBUYXlsb3IgU2ltcHNvbiA8dHNpbXBz
+b25AcXVpY2luYy5jb20+CitTOiBTdXBwb3J0ZWQKK0Y6IHRhcmdldC9oZXhhZ29uLworRjogbGlu
+dXgtdXNlci9oZXhhZ29uLworRjogZGlzYXMvaGV4YWdvbi5jCitGOiBkZWZhdWx0LWNvbmZpZ3Mv
+aGV4YWdvbi1saW51eC11c2VyLm1haworCiBIUFBBIChQQS1SSVNDKSBUQ0cgQ1BVcwogTTogUmlj
+aGFyZCBIZW5kZXJzb24gPHJ0aEB0d2lkZGxlLm5ldD4KIFM6IE1haW50YWluZWQKLS0gCjIuNy40
+Cgo=
 
