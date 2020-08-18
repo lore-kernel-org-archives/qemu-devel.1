@@ -2,131 +2,105 @@ Return-Path: <SRS0=kYy5=B4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9752C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 11:11:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07C7CC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 11:11:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8487F206B5
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 11:11:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B8D7C206B5
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 11:11:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XYWL/+Oo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8487F206B5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="q+VaK9IE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8D7C206B5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38852 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40326 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7zWS-0003c1-Oq
-	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 07:11:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34764)
+	id 1k7zWj-0004F4-Rl
+	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 07:11:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34948)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k7zUH-0002CI-Oe
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 07:09:05 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:33359
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k7zUF-00075z-CM
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 07:09:05 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597748942;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=ArG9a3FHYt3qOmjj8GJ+d3J1T8RHFzC1XLJxjQx/c2w=;
- b=XYWL/+OoPtBuKKJJ6ubTyg/nVgcQ2YSv4xeU0nKhjoNgrphdhz+X7wnAsBWnsLpH4L6l5a
- MHWWQotcA1NlKUVZkupnt3wTsp7bH0le0nfUkcoDXkAcKyRIxpBzL6jEW9u7ESXb9s9XBE
- 0wMZvDPhfJ6yF1prLiG5BaPhofiGI4I=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-196-3j-TdM3rPOqAVfKTI8W_hg-1; Tue, 18 Aug 2020 07:08:54 -0400
-X-MC-Unique: 3j-TdM3rPOqAVfKTI8W_hg-1
-Received: by mail-wm1-f72.google.com with SMTP id z10so7265093wmi.8
- for <qemu-devel@nongnu.org>; Tue, 18 Aug 2020 04:08:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=ArG9a3FHYt3qOmjj8GJ+d3J1T8RHFzC1XLJxjQx/c2w=;
- b=ZbvSrsuV3UtIIutC7Rg/2E0ghlnA+a/TywfE5e+ktCjTjscb/Dono5ifAVPwFsudYQ
- i1ZxOFvD0+xgygMciIU3PLjDlEjjjXS1HFooHSr7ScdZHv7BMzZ0vC2+Q/vX+T7gU5dK
- Nsy4+OkfpCK1tdD4Fe+ZkpNQECOw9BzmssTAchKw75ljRWfxzCj9DOG1vpj5D1QN83Hr
- +sT53KSiL+cYh1x6ACpOkjQLyWtl5DPMHdhsauw0MmgHPyBUgCyCD2aM/5uAHR5qKnoS
- 34HqGDxKv6OHsrtsgUl3um8bGORVx0aGjAHVNvQmwwFWUcwaK6FJ/CrwNov/GW0RMx3y
- AwEw==
-X-Gm-Message-State: AOAM5324sGBw4bQPiGpsT/YDsqJQkhhrTBGhxBzcpbLvmbu2vtvyunPJ
- vaBzLN5XDWGB+AW2blFfGOU96qdWiZGrmRbt/qg3PqFlGNkrtFNb38klqTdkpmezqqiNpBiBxMb
- UXZgVsT3wYzRvq0E=
-X-Received: by 2002:adf:ec4f:: with SMTP id w15mr18870774wrn.385.1597748933288; 
- Tue, 18 Aug 2020 04:08:53 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwLEn0pmmYxwgUSwubpiD/XfqiIIAznuy+n618brtQScHZIWDu5I+FANAuJcGlWqmXkjL3XAA==
-X-Received: by 2002:adf:ec4f:: with SMTP id w15mr18870754wrn.385.1597748933006; 
- Tue, 18 Aug 2020 04:08:53 -0700 (PDT)
-Received: from [192.168.1.36] (121.red-81-40-121.staticip.rima-tde.net.
- [81.40.121.121])
- by smtp.gmail.com with ESMTPSA id r206sm33712692wma.6.2020.08.18.04.08.52
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 18 Aug 2020 04:08:52 -0700 (PDT)
-Subject: Re: [PATCH v3 000/150] Meson integration for 5.2
-To: Paolo Bonzini <pbonzini@redhat.com>, Cornelia Huck <cohuck@redhat.com>
-References: <20200817143723.343284-1-pbonzini@redhat.com>
- <20200818115907.74f353e0.cohuck@redhat.com>
- <79afeb13-85cc-32f2-7e56-7a98a58bed8f@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <bcf9e13a-0244-6125-aa05-80fc67289eca@redhat.com>
-Date: Tue, 18 Aug 2020 13:08:51 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <david.edmondson@oracle.com>)
+ id 1k7zUY-0002JY-34; Tue, 18 Aug 2020 07:09:22 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:40538)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <david.edmondson@oracle.com>)
+ id 1k7zUQ-00076R-D2; Tue, 18 Aug 2020 07:09:21 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+ by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 07IB1uI7013682;
+ Tue, 18 Aug 2020 11:08:57 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=from : to : cc :
+ subject : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=corp-2020-01-29;
+ bh=DGibSnPPRTybN8Lroxn51SZUqADTznvzBnyQuSQV4EE=;
+ b=q+VaK9IEBxUi+r4/5dnr9UFVgUQJUxR0w5Z3rHv3fuV/Mogf1uu8vnYOlxdZ8A2Ad+V1
+ 0nv7QryVuOUJNtdardTbxO/RmflS7+KhDaCE0dBnfZEgio6HN4RckzdewQN4v7eYm9NB
+ go47uqgMJ7gUv9hDasxmoZd9fjV5mtVX8r7ht9avY7nFyz/u2+7hsrofvdIysI3rpAnH
+ cxOCVaxCxkKTv6I5WNswhaITiuHUbHPNw3vlmI0agsk9iKY7XxszXGigU+p31hZmgHCt
+ 64JFyHAVjr/m340z6CuXCdyWNQmmC7pvJT5HxZv9ROYtCdnkry/7Se1qhuGnPW32VE/0 OQ== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+ by aserp2120.oracle.com with ESMTP id 32x7nmc1tc-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+ Tue, 18 Aug 2020 11:08:57 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+ by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 07IB8BEM171757;
+ Tue, 18 Aug 2020 11:08:57 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+ by aserp3030.oracle.com with ESMTP id 32xs9mtyq7-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 18 Aug 2020 11:08:56 +0000
+Received: from abhmp0003.oracle.com (abhmp0003.oracle.com [141.146.116.9])
+ by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 07IB8tTU026571;
+ Tue, 18 Aug 2020 11:08:55 GMT
+Received: from disaster-area.hh.sledj.net (/81.187.26.238)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Tue, 18 Aug 2020 04:08:55 -0700
+Received: from localhost (disaster-area.hh.sledj.net [local])
+ by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id 9d62ac22;
+ Tue, 18 Aug 2020 11:08:45 +0000 (UTC)
+From: David Edmondson <david.edmondson@oracle.com>
+To: qemu-devel@nongnu.org
+Subject: [RFC PATCH 4/9] block/curl: Perform IO in fixed size chunks
+Date: Tue, 18 Aug 2020 12:08:40 +0100
+Message-Id: <20200818110845.3825105-5-david.edmondson@oracle.com>
+X-Mailer: git-send-email 2.27.0
+In-Reply-To: <20200818110845.3825105-1-david.edmondson@oracle.com>
+References: <20200818110845.3825105-1-david.edmondson@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <79afeb13-85cc-32f2-7e56-7a98a58bed8f@redhat.com>
-Content-Language: en-US
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: none client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 02:16:14
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9716
+ signatures=668679
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0
+ adultscore=0 spamscore=0
+ mlxscore=0 mlxlogscore=999 suspectscore=3 malwarescore=0 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2008180080
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9716
+ signatures=668679
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=3
+ spamscore=0
+ impostorscore=0 priorityscore=1501 adultscore=0 mlxscore=0 mlxlogscore=999
+ lowpriorityscore=0 bulkscore=0 phishscore=0 malwarescore=0 clxscore=1015
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2008180079
+Received-SPF: pass client-ip=141.146.126.78;
+ envelope-from=david.edmondson@oracle.com; helo=aserp2120.oracle.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 07:09:07
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
+X-Spam_score_int: -63
+X-Spam_score: -6.4
+X-Spam_bar: ------
+X-Spam_report: (-6.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001, UNPARSEABLE_RELAY=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -139,41 +113,330 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, David Edmondson <david.edmondson@oracle.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/18/20 12:25 PM, Paolo Bonzini wrote:
-> On 18/08/20 11:59, Cornelia Huck wrote:
->> On Mon, 17 Aug 2020 16:34:53 +0200
->> Paolo Bonzini <pbonzini@redhat.com> wrote:
->>
->>> - Simplified/rewrote handling of the modules variable [Howard]
->>> - Fixed access to gdb-xml files [Howard]
->>> - Fixed cross-compilation failure due to mingw prefix [Howard]
->>> - Fixed SDL2 detection on cross compiles [Howard]
->>> - Fixed sub-makefiles that include config-host.mak
->>>
->>> You can find it at the usual place, https://gitlab.com/bonzini/qemu.git
->>> branch meson-poc-next.
->>
->> Builds (on x86 & s390x), runs (this time with the right binary ;), and
->> passes make check, make check-tcg, and kvm unit tests (s390x) for me.
->>
-> 
-> Great, I'll do the last tests here and send a pull request.
+Do all IO requests to the remote server in 256kB chunks.
 
-What about the 2 patchew errors?
+Signed-off-by: David Edmondson <david.edmondson@oracle.com>
+---
+ block/curl.c       | 151 ++++++++++++++++++++++++++++++++-------------
+ block/trace-events |   2 +
+ 2 files changed, 109 insertions(+), 44 deletions(-)
 
-../src/meson.build:227:2: ERROR: 'sdl2' is not a config-tool dependency
-
-ERROR: meson setup failed
-
-
-
-../src/meson.build:547:0: ERROR: Program 'scripts/tracetool.py' not found
-
-ERROR: meson setup failed
+diff --git a/block/curl.c b/block/curl.c
+index d2f4de46c9..cfc518efda 100644
+--- a/block/curl.c
++++ b/block/curl.c
+@@ -78,6 +78,14 @@ static CURLMcode __curl_multi_socket_action(CURLM *multi_handle,
+ #define CURL_BLOCK_OPT_SSLVERIFY_DEFAULT true
+ #define CURL_BLOCK_OPT_TIMEOUT_DEFAULT 5
+ 
++/* Must be a non-zero power of 2. */
++#define CURL_BLOCK_SIZE (256 * 1024)
++
++/* Align "n" to the start of the containing block. */
++#define CURL_BLOCK_ALIGN(n) ((n) & ~(CURL_BLOCK_SIZE - 1))
++/* The offset of "n" within its' block. */
++#define CURL_BLOCK_OFFSET(n) ((n) & (CURL_BLOCK_SIZE - 1))
++
+ struct BDRVCURLState;
+ struct CURLState;
+ 
+@@ -86,11 +94,18 @@ static bool libcurl_initialized;
+ typedef struct CURLAIOCB {
+     Coroutine *co;
+     QEMUIOVector *qiov;
++    uint64_t qiov_offset; /* Offset in qiov to place data. */
+ 
+     uint64_t offset;
+     uint64_t bytes;
+     int ret;
+ 
++    /*
++     * start and end indicate the subset of the surrounding
++     * CURL_BLOCK_SIZE sized block that is the subject of this
++     * IOCB. They are offsets from the beginning of the underlying
++     * buffer.
++     */
+     size_t start;
+     size_t end;
+ } CURLAIOCB;
+@@ -110,7 +125,6 @@ typedef struct CURLState
+     char *orig_buf;
+     uint64_t buf_start;
+     size_t buf_off;
+-    size_t buf_len;
+     char range[128];
+     char errmsg[CURL_ERROR_SIZE];
+     char in_use;
+@@ -259,11 +273,11 @@ static size_t curl_read_cb(void *ptr, size_t size, size_t nmemb, void *opaque)
+         goto read_end;
+     }
+ 
+-    if (s->buf_off >= s->buf_len) {
++    if (s->buf_off >= CURL_BLOCK_SIZE) {
+         /* buffer full, read nothing */
+         goto read_end;
+     }
+-    realsize = MIN(realsize, s->buf_len - s->buf_off);
++    realsize = MIN(realsize, CURL_BLOCK_SIZE - s->buf_off);
+     memcpy(s->orig_buf + s->buf_off, ptr, realsize);
+     s->buf_off += realsize;
+ 
+@@ -281,35 +295,44 @@ static bool curl_find_buf(BDRVCURLState *s, uint64_t start, uint64_t len,
+     uint64_t clamped_end = MIN(end, s->len);
+     uint64_t clamped_len = clamped_end - start;
+ 
+-    for (i=0; i<CURL_NUM_STATES; i++) {
++    for (i = 0; i < CURL_NUM_STATES; i++) {
+         CURLState *state = &s->states[i];
+-        uint64_t buf_end = (state->buf_start + state->buf_off);
+-        uint64_t buf_fend = (state->buf_start + state->buf_len);
++        /* The end of the currently valid data. */
++        uint64_t buf_end = state->buf_start + state->buf_off;
++        /* The end of the valid data when the IO completes. */
++        uint64_t buf_fend = state->buf_start + CURL_BLOCK_SIZE;
+ 
+         if (!state->orig_buf)
+             continue;
+         if (!state->buf_off)
+             continue;
+ 
+-        // Does the existing buffer cover our section?
++        /*
++         * Does the existing buffer cover our section?
++         */
+         if ((start >= state->buf_start) &&
+             (start <= buf_end) &&
+             (clamped_end >= state->buf_start) &&
+             (clamped_end <= buf_end))
+         {
+-            char *buf = state->orig_buf + (start - state->buf_start);
++            char *buf = state->orig_buf + CURL_BLOCK_OFFSET(start);
+ 
+             trace_curl_pending_hit(qemu_coroutine_self(),
+                                    start, len);
+-            qemu_iovec_from_buf(acb->qiov, 0, buf, clamped_len);
++            qemu_iovec_from_buf(acb->qiov, acb->qiov_offset, buf, clamped_len);
+             if (clamped_len < len) {
+-                qemu_iovec_memset(acb->qiov, clamped_len, 0, len - clamped_len);
++                qemu_iovec_memset(acb->qiov, acb->qiov_offset + clamped_len,
++                                  0, len - clamped_len);
+             }
+             acb->ret = 0;
+             return true;
+         }
+ 
+-        // Wait for unfinished chunks
++        /*
++         * If an in-progress IO will provide the required data, wait
++         * for it to complete - the initiator will complete this
++         * aiocb.
++         */
+         if (state->in_use &&
+             (start >= state->buf_start) &&
+             (start <= buf_fend) &&
+@@ -320,10 +343,10 @@ static bool curl_find_buf(BDRVCURLState *s, uint64_t start, uint64_t len,
+ 
+             trace_curl_pending_piggyback(qemu_coroutine_self(),
+                                          start, len);
+-            acb->start = start - state->buf_start;
++            acb->start = CURL_BLOCK_OFFSET(start);
+             acb->end = acb->start + clamped_len;
+ 
+-            for (j=0; j<CURL_NUM_ACB; j++) {
++            for (j = 0; j < CURL_NUM_ACB; j++) {
+                 if (!state->acb[j]) {
+                     state->acb[j] = acb;
+                     return true;
+@@ -377,7 +400,7 @@ static void curl_multi_check_completion(BDRVCURLState *s)
+             for (i = 0; i < CURL_NUM_ACB; i++) {
+                 CURLAIOCB *acb = state->acb[i];
+ 
+-                if (acb == NULL) {
++                if (!acb) {
+                     continue;
+                 }
+ 
+@@ -385,14 +408,15 @@ static void curl_multi_check_completion(BDRVCURLState *s)
+                     /* Assert that we have read all data */
+                     assert(state->buf_off >= acb->end);
+ 
+-                    qemu_iovec_from_buf(acb->qiov, 0,
++                    qemu_iovec_from_buf(acb->qiov, acb->qiov_offset,
+                                         state->orig_buf + acb->start,
+                                         acb->end - acb->start);
+ 
+                     if (acb->end - acb->start < acb->bytes) {
+                         size_t offset = acb->end - acb->start;
+-                        qemu_iovec_memset(acb->qiov, offset, 0,
+-                                          acb->bytes - offset);
++
++                        qemu_iovec_memset(acb->qiov, acb->qiov_offset + offset,
++                                          0, acb->bytes - offset);
+                     }
+                 }
+ 
+@@ -539,6 +563,7 @@ static int curl_init_state(BDRVCURLState *s, CURLState *state)
+ static void curl_clean_state(CURLState *s)
+ {
+     int j;
++
+     for (j = 0; j < CURL_NUM_ACB; j++) {
+         assert(!s->acb[j]);
+     }
+@@ -856,18 +881,26 @@ static void curl_setup_preadv(BlockDriverState *bs, CURLAIOCB *acb)
+ 
+     BDRVCURLState *s = bs->opaque;
+ 
+-    uint64_t start = acb->offset;
+-    uint64_t end;
++    /*
++     * Our caller must ensure that this request does not span two
++     * blocks.
++     */
++    assert(CURL_BLOCK_ALIGN(acb->offset) ==
++           CURL_BLOCK_ALIGN(acb->offset + acb->bytes - 1));
+ 
+     qemu_mutex_lock(&s->mutex);
+ 
+-    // In case we have the requested data already (e.g. read-ahead),
+-    // we can just call the callback and be done.
+-    if (curl_find_buf(s, start, acb->bytes, acb)) {
++    /*
++     * Check whether the requested data can be found in an existing or
++     * pending IO request.
++     */
++    if (curl_find_buf(s, acb->offset, acb->bytes, acb)) {
+         goto out;
+     }
+ 
+-    // No cache found, so let's start a new request
++    /*
++     * No cache found, so let's start a new request.
++     */
+     for (;;) {
+         state = curl_find_state(s);
+         if (state) {
+@@ -882,16 +915,15 @@ static void curl_setup_preadv(BlockDriverState *bs, CURLAIOCB *acb)
+         goto out;
+     }
+ 
+-    acb->start = 0;
+-    acb->end = MIN(acb->bytes, s->len - start);
++    acb->start = CURL_BLOCK_OFFSET(acb->offset);
++    acb->end = acb->start + MIN(acb->bytes, s->len - acb->offset);
+ 
+     state->buf_off = 0;
+-    g_free(state->orig_buf);
+-    state->buf_start = start;
+-    state->buf_len = MIN(acb->end, s->len - start);
+-    end = start + state->buf_len - 1;
+-    state->orig_buf = g_try_malloc(state->buf_len);
+-    if (state->buf_len && state->orig_buf == NULL) {
++    state->buf_start = CURL_BLOCK_ALIGN(acb->offset);
++    if (!state->orig_buf) {
++        state->orig_buf = g_try_malloc(CURL_BLOCK_SIZE);
++    }
++    if (!state->orig_buf) {
+         curl_clean_state(state);
+         acb->ret = -ENOMEM;
+         goto out;
+@@ -899,8 +931,10 @@ static void curl_setup_preadv(BlockDriverState *bs, CURLAIOCB *acb)
+     state->acb[0] = acb;
+ 
+     snprintf(state->range, 127, "%" PRIu64 "-%" PRIu64,
+-             s->offset + start, s->offset + end);
+-    trace_curl_setup_preadv(qemu_coroutine_self(), start, acb->bytes);
++             s->offset + state->buf_start,
++             s->offset + state->buf_start + CURL_BLOCK_SIZE);
++    trace_curl_setup_preadv(qemu_coroutine_self(), state->buf_start,
++                            CURL_BLOCK_SIZE);
+     curl_easy_setopt(state->curl, CURLOPT_RANGE, state->range);
+ 
+     if (curl_multi_add_handle(s->multi, state->curl) != CURLM_OK) {
+@@ -921,21 +955,50 @@ out:
+ static int coroutine_fn curl_co_preadv(BlockDriverState *bs,
+         uint64_t offset, uint64_t bytes, QEMUIOVector *qiov, int flags)
+ {
+-    CURLAIOCB acb = {
+-        .co = qemu_coroutine_self(),
+-        .ret = -EINPROGRESS,
+-        .qiov = qiov,
+-        .offset = offset,
+-        .bytes = bytes
+-    };
++    /*
++     * The lower layer does all IO in single CURL_BLOCK_SIZE sized and
++     * aligned chunks and cannot handle an IO that spans two blocks,
++     * so split the request here.
++     */
++    int ret = 0;
++    uint64_t qiov_offset = 0;
++    uint64_t off = offset;
+ 
+     trace_curl_co_preadv(qemu_coroutine_self(), offset, bytes);
+-    curl_setup_preadv(bs, &acb);
+-    while (acb.ret == -EINPROGRESS) {
+-        qemu_coroutine_yield();
++
++    while (bytes > 0) {
++        uint64_t len = MIN(bytes, CURL_BLOCK_SIZE - CURL_BLOCK_OFFSET(off));
++        CURLAIOCB acb = {
++            .co = qemu_coroutine_self(),
++            .ret = -EINPROGRESS,
++            .qiov = qiov,
++            .qiov_offset = qiov_offset,
++            .offset = off,
++            .bytes = len,
++        };
++
++        trace_curl_co_preadv_segment(qemu_coroutine_self(), off, len);
++
++        curl_setup_preadv(bs, &acb);
++        while (acb.ret == -EINPROGRESS) {
++            qemu_coroutine_yield();
++        }
++
++        ret = acb.ret;
++        if (ret != 0) {
++            return ret;
++        }
++
++        trace_curl_co_preadv_segment_done(qemu_coroutine_self());
++
++        qiov_offset += len;
++        off += len;
++        bytes -= len;
+     }
++
+     trace_curl_co_preadv_done(qemu_coroutine_self());
+-    return acb.ret;
++
++    return ret;
+ }
+ 
+ static void curl_close(BlockDriverState *bs)
+diff --git a/block/trace-events b/block/trace-events
+index 0b52d2ca1d..72b1e927bf 100644
+--- a/block/trace-events
++++ b/block/trace-events
+@@ -200,6 +200,8 @@ curl_open(const char *file) "opening %s"
+ curl_open_size(uint64_t size) "size = %" PRIu64
+ curl_co_preadv(void *co, uint64_t offset, uint64_t bytes) "co %p requests 0x%" PRIx64 " + 0x%" PRIx64
+ curl_co_preadv_done(void *co) "co %p done"
++curl_co_preadv_segment(void *co, uint64_t offset, uint64_t bytes) "co %p requests 0x%" PRIx64 " + 0x%" PRIx64
++curl_co_preadv_segment_done(void *co) "co %p done"
+ curl_setup_preadv(void *co, uint64_t offset, uint64_t bytes) "co %p requests 0x%" PRIx64 " + 0x%" PRIx64
+ curl_pending_hit(void *co, uint64_t start, uint64_t len) "co %p finds 0x%" PRIx64 " + 0x%" PRIx64
+ curl_pending_piggyback(void *co, uint64_t start, uint64_t len) "co %p pending 0x%" PRIx64 " + 0x%" PRIx64
+-- 
+2.27.0
 
 
