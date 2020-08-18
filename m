@@ -2,79 +2,96 @@ Return-Path: <SRS0=kYy5=B4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B15E1C433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 15:17:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D66D5C433E4
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 15:17:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 69A97207DE
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 15:17:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9CCC3207DA
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 15:17:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h2nmLztE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69A97207DE
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AuPduhLp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9CCC3207DA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35140 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38146 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k83MQ-00008o-HW
-	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 11:17:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33844)
+	id 1k83N4-0001Pf-PK
+	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 11:17:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37020)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k82Lr-0006VJ-PK
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:12:35 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:30291
+ (Exim 4.90_1) (envelope-from <eperezma@redhat.com>)
+ id 1k82Xq-0003QS-Q8
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:24:58 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:21695
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k82Lj-0007fp-8T
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:12:35 -0400
+ (Exim 4.90_1) (envelope-from <eperezma@redhat.com>)
+ id 1k82Xo-0000fn-3V
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:24:57 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597759946;
+ s=mimecast20190719; t=1597760695;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=WpTMTpF6yoBNhO9XraEmlF3IF/8hBPvrG5Q+yVsZWHU=;
- b=h2nmLztE8KewzJYpPD9clDy3u2+tkdjOdue+uBP7AdD+72WsTeQCGvHSu/Rw5fEdslEp40
- tUItLvOLzJW6EWiJLYnlvSyl5v+eHO/5gH+DkLSRzwFMvDk9CsHZ91kpLkGcugu6JZCo5w
- HGPrqurK6jy27em4BLfhmycnFmeJcCk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-23-xVtqAVJwOJ-QmpP7INZYxQ-1; Tue, 18 Aug 2020 10:12:24 -0400
-X-MC-Unique: xVtqAVJwOJ-QmpP7INZYxQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6C85A81F01B
- for <qemu-devel@nongnu.org>; Tue, 18 Aug 2020 14:12:23 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com
- (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1E52F7A401;
- Tue, 18 Aug 2020 14:12:23 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 147/150] meson: convert po/
-Date: Tue, 18 Aug 2020 10:10:22 -0400
-Message-Id: <20200818141025.21608-148-pbonzini@redhat.com>
-In-Reply-To: <20200818141025.21608-1-pbonzini@redhat.com>
-References: <20200818141025.21608-1-pbonzini@redhat.com>
+ bh=bnVjv2E9MXPIek9BeP6uPAv77BN+S21x4krPCFjqD6w=;
+ b=AuPduhLpj/g1XA9raU6wM6DpKl7VI/z6tJgi/BWS6O0q2DWwBwtqsw1//UBNYu3R9GACym
+ EEHG+0BkqCJIMEEYzBrBoCSbIwyj1p+YIZUCk6NbjBH+fBToZNobCcdPdpvPhoI+SmCfnb
+ Dyu7oD4OGnAFiEy6OmqMIy/1/VzoKHs=
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
+ [209.85.160.199]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-243-hoEIjvb-PBGrrh8zIiXEhQ-1; Tue, 18 Aug 2020 10:24:51 -0400
+X-MC-Unique: hoEIjvb-PBGrrh8zIiXEhQ-1
+Received: by mail-qt1-f199.google.com with SMTP id e14so14529451qtm.5
+ for <qemu-devel@nongnu.org>; Tue, 18 Aug 2020 07:24:51 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=bnVjv2E9MXPIek9BeP6uPAv77BN+S21x4krPCFjqD6w=;
+ b=i6hTCh2I50F8PLDhmrYdtYQDbH3apUiUAKLRy0/PKFEJjwV7ip2AcK6bP/5un4M5S2
+ hOh/IreE6gkdFJSBvOnpgtt9po4DzvD0+vpHIO9SFObzHLP1/JDSA/tde5vz6LWiA8lw
+ gAE6jyKtJ5MPRvtBn2F7puAZ6mxlpDTeq5ZdwA5L0Y1wnCdhWy0EVOIKq54FhYT+8fd6
+ 2+3mTwAfEmUsxX9dJOVMLeYH7j5PzpgfXLDgzVbOzOs8za/QHanllLG4jNqrm5ZXjW5u
+ 1jGBE4p5QCgt5F0I6gIhmLV4fRIqmI/Ucuonv014iyoXVmIniShf44AwCjEnAN1yl98j
+ J0gg==
+X-Gm-Message-State: AOAM5329ph2aGxNQ1xWqQMpvpb1t2YMJ8KCFTIfZBEci2K1KEc/C7iHP
+ Ad72GXT0FMJCgRRdW/4Jdvp0LIxbYJTUkVIaeTfb3Ulc145B5IkKoO468jJ9V8xUZz9hZV34Cit
+ +ao3zC5pYhPX5QsO1DEqBohA0/8DNiOY=
+X-Received: by 2002:a05:620a:1595:: with SMTP id
+ d21mr17439778qkk.203.1597760691040; 
+ Tue, 18 Aug 2020 07:24:51 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwRFwzvWpICHYl9Pb7Pt332bo70VHU7hKuV9Z1SfAmKAOsh056cPo7CEJLKpLI+3ysuPXSpPbsVUibtzJriZX8=
+X-Received: by 2002:a05:620a:1595:: with SMTP id
+ d21mr17439752qkk.203.1597760690754; 
+ Tue, 18 Aug 2020 07:24:50 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+References: <20200626064122.9252-1-eperezma@redhat.com>
+ <20200811175533.7359-1-eperezma@redhat.com>
+ <20200811175533.7359-2-eperezma@redhat.com>
+ <2443886f-2109-e048-b47f-886c896613ab@redhat.com>
+ <CAJaqyWe0_wcXHgbAVAVNCTpG7O4YKF6FMkgKsf6SfW4dEZ4A5g@mail.gmail.com>
+In-Reply-To: <CAJaqyWe0_wcXHgbAVAVNCTpG7O4YKF6FMkgKsf6SfW4dEZ4A5g@mail.gmail.com>
+From: Eugenio Perez Martin <eperezma@redhat.com>
+Date: Tue, 18 Aug 2020 16:24:12 +0200
+Message-ID: <CAJaqyWe+KgnVegtprpRmVvXo7kFVFDL_erK_5Nyp4K=gTUcN=Q@mail.gmail.com>
+Subject: Re: [RFC v3 1/1] memory: Skip bad range assertion if notifier
+ supports arbitrary masks
+To: Jason Wang <jasowang@redhat.com>
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0.002
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eperezma@redhat.com
+X-Mimecast-Spam-Score: 0.003
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=pbonzini@redhat.com;
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=eperezma@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 08:01:06
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -84,7 +101,7 @@ X-Spam_bar: ----
 X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,358 +114,164 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Yan Zhao <yan.y.zhao@intel.com>,
+ Juan Quintela <quintela@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>,
+ Eric Auger <eric.auger@redhat.com>, Avi Kivity <avi@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Marc-André Lureau <marcandre.lureau@redhat.com>
+On Wed, Aug 12, 2020 at 10:49 AM Eugenio Perez Martin
+<eperezma@redhat.com> wrote:
+>
+> On Wed, Aug 12, 2020 at 4:24 AM Jason Wang <jasowang@redhat.com> wrote:
+> >
+> >
+> > On 2020/8/12 =E4=B8=8A=E5=8D=881:55, Eugenio P=C3=A9rez wrote:
+> > > Signed-off-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
+> > > ---
+> > >   hw/virtio/vhost.c     |  2 +-
+> > >   include/exec/memory.h |  2 ++
+> > >   softmmu/memory.c      | 10 ++++++++--
+> > >   3 files changed, 11 insertions(+), 3 deletions(-)
+> > >
+> > > diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+> > > index 1a1384e7a6..e74ad9e09b 100644
+> > > --- a/hw/virtio/vhost.c
+> > > +++ b/hw/virtio/vhost.c
+> > > @@ -729,7 +729,7 @@ static void vhost_iommu_region_add(MemoryListener=
+ *listener,
+> > >       iommu_idx =3D memory_region_iommu_attrs_to_index(iommu_mr,
+> > >                                                      MEMTXATTRS_UNSPE=
+CIFIED);
+> > >       iommu_notifier_init(&iommu->n, vhost_iommu_unmap_notify,
+> > > -                        IOMMU_NOTIFIER_UNMAP,
+> > > +                        IOMMU_NOTIFIER_UNMAP | IOMMU_NOTIFIER_IOTLB,
+> >
+> >
+> > I think we can safely drop IOMMU_NOTIFIER_UNMAP here since device IOTLB
+> > is sufficient.
+> >
+> > Btw, IOMMU_NOTIFIER_IOTLB is kind of confusing, maybe something like
+> > IOMMU_NOTIFIER_DEVIOTLB.
+> >
+>
+> Got it, will change.
+>
+> >
+> > >                           section->offset_within_region,
+> > >                           int128_get64(end),
+> > >                           iommu_idx);
+> > > diff --git a/include/exec/memory.h b/include/exec/memory.h
+> > > index 307e527835..4d94c1e984 100644
+> > > --- a/include/exec/memory.h
+> > > +++ b/include/exec/memory.h
+> > > @@ -87,6 +87,8 @@ typedef enum {
+> > >       IOMMU_NOTIFIER_UNMAP =3D 0x1,
+> > >       /* Notify entry changes (newly created entries) */
+> > >       IOMMU_NOTIFIER_MAP =3D 0x2,
+> > > +    /* Notify changes on IOTLB entries */
+> > > +    IOMMU_NOTIFIER_IOTLB =3D 0x04,
+> > >   } IOMMUNotifierFlag;
+> > >
+> > >   #define IOMMU_NOTIFIER_ALL (IOMMU_NOTIFIER_MAP | IOMMU_NOTIFIER_UNM=
+AP)
+> > > diff --git a/softmmu/memory.c b/softmmu/memory.c
+> > > index af25987518..e2c5f6d0e7 100644
+> > > --- a/softmmu/memory.c
+> > > +++ b/softmmu/memory.c
+> > > @@ -1895,6 +1895,7 @@ void memory_region_notify_one(IOMMUNotifier *no=
+tifier,
+> >
+> >
+> > (we probably need a better name of this function, at least something
+> > like "memory_region_iommu_notify_one").
+> >
+>
+> Ok will change.
+>
+> >
+> > >   {
+> > >       IOMMUNotifierFlag request_flags;
+> > >       hwaddr entry_end =3D entry->iova + entry->addr_mask;
+> > > +    IOMMUTLBEntry tmp =3D *entry;
+> > >
+> > >       /*
+> > >        * Skip the notification if the notification does not overlap
+> > > @@ -1904,7 +1905,12 @@ void memory_region_notify_one(IOMMUNotifier *n=
+otifier,
+> > >           return;
+> > >       }
+> > >
+> > > -    assert(entry->iova >=3D notifier->start && entry_end <=3D notifi=
+er->end);
+> > > +    if (notifier->notifier_flags & IOMMU_NOTIFIER_IOTLB) {
+> > > +        tmp.iova =3D MAX(tmp.iova, notifier->start);
+> > > +        tmp.addr_mask =3D MIN(entry_end, notifier->end) - tmp.iova;
+> >
+> >
+> > Any reason for doing such re-calculation here, a comment would be helpf=
+ul.
+> >
+>
+> It was proposed by Peter, but I understand as limiting the
+> address+range we pass to the notifier. Although vhost seems to support
+> it as long as it contains (notifier->start, notifier->end) in range, a
+> future notifier might not.
+>
+> It could be done as iommu_entry_crop(IOMMUTLBEntry *entry, const
+> IOMMUNotifier *notifier) though.
+>
+> >
+> > > +    } else {
+> > > +        assert(entry->iova >=3D notifier->start && entry_end <=3D no=
+tifier->end);
+> >
+> >
+> > I wonder if it's better to convert the assert so some kind of log or
+> > warn here.
+> >
+>
+> I think that if we transform that assert to a log, we should also tell
+> the guest that something went wrong. Or would it be enough notifying
+> the bad range?
+>
+> If a malicious guest cannot reach that point, I think that leaving it
+> as an assertion allows us to detect earlier the fail in my opinion
+> (Assert early and assert often).
+>
+> Thanks!
+>
 
-Meson warns if xgettext is not found.  In the future we may want to add
-a required argument to i18n.gettext(); in the meanwhile, I am adding a
---enable-gettext/--disable-gettext option and feature detection in
-configure.  This preserves QEMU's default behavior of detecting system
-features, without any warning, if neither --enable-* nor --disable-*
-is requested.
+Hi Jason.
 
-Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- Makefile          |  5 +---
- configure         | 21 +++++++++++++-
- meson.build       |  3 ++
- meson_options.txt |  1 +
- po/LINGUAS        |  8 +++++
- po/Makefile       | 52 ---------------------------------
- po/POTFILES       |  1 +
- po/meson.build    |  7 +++++
- po/messages.po    | 74 -----------------------------------------------
- tests/vm/freebsd  |  1 +
- tests/vm/netbsd   |  1 +
- tests/vm/openbsd  |  1 +
- 12 files changed, 44 insertions(+), 131 deletions(-)
- create mode 100644 po/LINGUAS
- delete mode 100644 po/Makefile
- create mode 100644 po/POTFILES
- create mode 100644 po/meson.build
- delete mode 100644 po/messages.po
+I just sent v4, please let me know if the changes are ok for you or
+you think it should be done otherwise.
 
-diff --git a/Makefile b/Makefile
-index bbb27f7981..8ba5990504 100644
---- a/Makefile
-+++ b/Makefile
-@@ -210,7 +210,7 @@ distclean: clean ninja-distclean
- 	rm -f config-host.mak config-host.h*
- 	rm -f tests/tcg/config-*.mak
- 	rm -f config-all-disas.mak config.status
--	rm -f po/*.mo tests/qemu-iotests/common.env
-+	rm -f tests/qemu-iotests/common.env
- 	rm -f roms/seabios/config.mak roms/vgabios/config.mak
- 	rm -f qemu-plugins-ld.symbols qemu-plugins-ld64.symbols
- 	rm -f *-config-target.h *-config-devices.mak *-config-devices.h
-@@ -288,9 +288,6 @@ endif
- 	mkdir -p "$(DESTDIR)$(qemu_desktopdir)"
- 	$(INSTALL_DATA) $(SRC_PATH)/ui/qemu.desktop \
- 		"$(DESTDIR)$(qemu_desktopdir)/qemu.desktop"
--ifdef CONFIG_GTK
--	$(MAKE) -C po $@
--endif
- 	$(INSTALL_DIR) "$(DESTDIR)$(qemu_datadir)/keymaps"
- 	set -e; for x in $(KEYMAPS); do \
- 		$(INSTALL_DATA) $(SRC_PATH)/pc-bios/keymaps/$$x "$(DESTDIR)$(qemu_datadir)/keymaps"; \
-diff --git a/configure b/configure
-index 86f384be29..0167822204 100755
---- a/configure
-+++ b/configure
-@@ -522,6 +522,7 @@ rng_none="no"
- secret_keyring=""
- libdaxctl=""
- meson=""
-+gettext=""
- 
- bogus_os="no"
- malloc_trim=""
-@@ -1112,6 +1113,10 @@ for opt do
-   ;;
-   --enable-vnc) vnc="enabled"
-   ;;
-+  --disable-gettext) gettext="false"
-+  ;;
-+  --enable-gettext) gettext="true"
-+  ;;
-   --oss-lib=*) oss_lib="$optarg"
-   ;;
-   --audio-drv-list=*) audio_drv_list="$optarg"
-@@ -2983,6 +2988,19 @@ if test "$whpx" != "no" ; then
-     fi
- fi
- 
-+##########################################
-+# gettext probe
-+if test "$gettext" != "false" ; then
-+  if has xgettext; then
-+    gettext=true
-+  else
-+    if test "$gettext" = "true" ; then
-+      feature_not_found "gettext" "Install xgettext binary"
-+    fi
-+    gettext=false
-+  fi
-+fi
-+
- ##########################################
- # Sparse probe
- if test "$sparse" != "no" ; then
-@@ -8047,7 +8065,7 @@ DIRS="$DIRS docs docs/interop fsdev scsi"
- DIRS="$DIRS pc-bios/optionrom pc-bios/s390-ccw"
- DIRS="$DIRS roms/seabios"
- LINKS="Makefile"
--LINKS="$LINKS tests/tcg/lm32/Makefile po/Makefile"
-+LINKS="$LINKS tests/tcg/lm32/Makefile"
- LINKS="$LINKS tests/tcg/Makefile.target"
- LINKS="$LINKS pc-bios/optionrom/Makefile pc-bios/keymaps"
- LINKS="$LINKS pc-bios/s390-ccw/Makefile"
-@@ -8179,6 +8197,7 @@ NINJA=$PWD/ninjatool $meson setup \
-         -Db_coverage=$(if test "$gcov" = yes; then echo true; else echo false; fi) \
- 	-Dsdl=$sdl -Dsdl_image=$sdl_image \
- 	-Dvnc=$vnc -Dvnc_sasl=$vnc_sasl -Dvnc_jpeg=$vnc_jpeg -Dvnc_png=$vnc_png \
-+	-Dgettext=$gettext \
-         $cross_arg \
-         "$PWD" "$source_path"
- 
-diff --git a/meson.build b/meson.build
-index afe684cbad..57cfa8723d 100644
---- a/meson.build
-+++ b/meson.build
-@@ -1108,6 +1108,9 @@ subdir('tools')
- subdir('pc-bios')
- subdir('tests')
- subdir('docs')
-+if 'CONFIG_GTK' in config_host
-+  subdir('po')
-+endif
- 
- if build_docs
-   makeinfo = find_program('makeinfo', required: build_docs)
-diff --git a/meson_options.txt b/meson_options.txt
-index 67455c57bc..e5f45243ce 100644
---- a/meson_options.txt
-+++ b/meson_options.txt
-@@ -1,3 +1,4 @@
-+option('gettext', type : 'boolean', value : true)
- option('sdl', type : 'feature', value : 'auto')
- option('sdl_image', type : 'feature', value : 'auto')
- option('vnc', type : 'feature', value : 'enabled')
-diff --git a/po/LINGUAS b/po/LINGUAS
-new file mode 100644
-index 0000000000..cc4b5c3b36
---- /dev/null
-+++ b/po/LINGUAS
-@@ -0,0 +1,8 @@
-+bg
-+de_DE
-+fr_FR
-+hu
-+it
-+sv
-+tr
-+zh_CN
-diff --git a/po/Makefile b/po/Makefile
-deleted file mode 100644
-index c041f4c858..0000000000
---- a/po/Makefile
-+++ /dev/null
-@@ -1,52 +0,0 @@
--# This makefile is very special as it's meant to build as part of the build
--# process and also within the source tree to update the translation files.
--
--# Set SRC_PATH for in-tree builds without configuration.
--SRC_PATH=..
--
--# The default target must come before any include statements.
--all:
--
--.PHONY:	all build clean install update
--
--%.mo: %.po
--	$(call quiet-command, msgfmt -o $@ $<,"GEN","$@")
--
---include ../config-host.mak
--include $(SRC_PATH)/rules.mak
--
--PO_PATH=$(SRC_PATH)/po
--
--VERSION=$(shell cat $(SRC_PATH)/VERSION)
--SRCS=$(filter-out $(PO_PATH)/messages.po,$(wildcard $(PO_PATH)/*.po))
--OBJS=$(patsubst $(PO_PATH)/%.po,%.mo,$(SRCS))
--
--vpath %.po $(PO_PATH)
--
--all:
--	@echo "Use 'make update' to update translation files or use 'make build'"
--	@echo "or 'make install' to build and install the translation files."
--
--update: $(SRCS)
--
--build: $(OBJS)
--
--clean:
--	rm -f $(OBJS)
--
--install: $(OBJS)
--	for obj in $(OBJS); do \
--	    base=$$(basename $$obj .mo); \
--	    $(INSTALL) -d $(DESTDIR)$(prefix)/share/locale/$$base/LC_MESSAGES; \
--	    $(INSTALL) -m644 $$obj $(DESTDIR)$(prefix)/share/locale/$$base/LC_MESSAGES/qemu.mo; \
--	done
--
--$(PO_PATH)/messages.po: $(SRC_PATH)/ui/gtk.c
--	$(call quiet-command, ( cd $(SRC_PATH) && \
--          xgettext -o - --from-code=UTF-8 --foreign-user --no-location \
--	    --package-name=QEMU --package-version=$(VERSION) \
--	    --msgid-bugs-address=qemu-devel@nongnu.org -k_ -C ui/gtk.c | \
--	  sed -e s/CHARSET/UTF-8/) >$@,"GEN","$@")
--
--$(PO_PATH)/%.po: $(PO_PATH)/messages.po
--	$(call quiet-command, msgmerge -q $@ $< > $@.bak && mv $@.bak $@,"GEN","$@")
-diff --git a/po/POTFILES b/po/POTFILES
-new file mode 100644
-index 0000000000..d34d5ed9aa
---- /dev/null
-+++ b/po/POTFILES
-@@ -0,0 +1 @@
-+ui/gtk.c
-diff --git a/po/meson.build b/po/meson.build
-new file mode 100644
-index 0000000000..1387fd979a
---- /dev/null
-+++ b/po/meson.build
-@@ -0,0 +1,7 @@
-+i18n = import('i18n')
-+
-+if get_option('gettext')
-+  i18n.gettext(meson.project_name(),
-+               args: '--msgid-bugs-address=qemu-devel@nongnu.org',
-+               preset: 'glib')
-+endif
-diff --git a/po/messages.po b/po/messages.po
-deleted file mode 100644
-index 065bd459a0..0000000000
---- a/po/messages.po
-+++ /dev/null
-@@ -1,74 +0,0 @@
--# SOME DESCRIPTIVE TITLE.
--# This file is put in the public domain.
--# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
--#
--#, fuzzy
--msgid ""
--msgstr ""
--"Project-Id-Version: QEMU 2.12.91\n"
--"Report-Msgid-Bugs-To: qemu-devel@nongnu.org\n"
--"POT-Creation-Date: 2018-07-18 07:56+0200\n"
--"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
--"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
--"Language-Team: LANGUAGE <LL@li.org>\n"
--"Language: \n"
--"MIME-Version: 1.0\n"
--"Content-Type: text/plain; charset=UTF-8\n"
--"Content-Transfer-Encoding: 8bit\n"
--
--msgid " - Press Ctrl+Alt+G to release grab"
--msgstr ""
--
--msgid " [Paused]"
--msgstr ""
--
--msgid "_Pause"
--msgstr ""
--
--msgid "_Reset"
--msgstr ""
--
--msgid "Power _Down"
--msgstr ""
--
--msgid "_Quit"
--msgstr ""
--
--msgid "_Fullscreen"
--msgstr ""
--
--msgid "_Copy"
--msgstr ""
--
--msgid "Zoom _In"
--msgstr ""
--
--msgid "Zoom _Out"
--msgstr ""
--
--msgid "Best _Fit"
--msgstr ""
--
--msgid "Zoom To _Fit"
--msgstr ""
--
--msgid "Grab On _Hover"
--msgstr ""
--
--msgid "_Grab Input"
--msgstr ""
--
--msgid "Show _Tabs"
--msgstr ""
--
--msgid "Detach Tab"
--msgstr ""
--
--msgid "Show Menubar"
--msgstr ""
--
--msgid "_Machine"
--msgstr ""
--
--msgid "_View"
--msgstr ""
-diff --git a/tests/vm/freebsd b/tests/vm/freebsd
-index b34b14fc53..5f866e09c4 100755
---- a/tests/vm/freebsd
-+++ b/tests/vm/freebsd
-@@ -39,6 +39,7 @@ class FreeBSDVM(basevm.BaseVM):
-         "bash",
-         "gmake",
-         "gsed",
-+        "gettext",
- 
-         # libs: crypto
-         "gnutls",
-diff --git a/tests/vm/netbsd b/tests/vm/netbsd
-index 93d48b6fdd..ffb65a89be 100755
---- a/tests/vm/netbsd
-+++ b/tests/vm/netbsd
-@@ -37,6 +37,7 @@ class NetBSDVM(basevm.BaseVM):
-         "bash",
-         "gmake",
-         "gsed",
-+        "gettext",
- 
-         # libs: crypto
-         "gnutls",
-diff --git a/tests/vm/openbsd b/tests/vm/openbsd
-index 7e27fda642..8356646f21 100755
---- a/tests/vm/openbsd
-+++ b/tests/vm/openbsd
-@@ -36,6 +36,7 @@ class OpenBSDVM(basevm.BaseVM):
-         "bash",
-         "gmake",
-         "gsed",
-+        "gettext",
- 
-         # libs: usb
-         "libusb1",
--- 
-2.26.2
+Is it ok for you to just let the assert, or you think we should still
+change to a conditional?
 
+Thanks!
+
+> > Thanks
+> >
+> >
+> > > +    }
+> > >
+> > >       if (entry->perm & IOMMU_RW) {
+> > >           request_flags =3D IOMMU_NOTIFIER_MAP;
+> > > @@ -1913,7 +1919,7 @@ void memory_region_notify_one(IOMMUNotifier *no=
+tifier,
+> > >       }
+> > >
+> > >       if (notifier->notifier_flags & request_flags) {
+> > > -        notifier->notify(notifier, entry);
+> > > +        notifier->notify(notifier, &tmp);
+> > >       }
+> > >   }
+> > >
+> >
 
 
