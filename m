@@ -2,90 +2,93 @@ Return-Path: <SRS0=kYy5=B4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82A9AC433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 06:18:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BFFFCC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 06:25:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4F9752065D
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 06:18:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8D02720825
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 06:25:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=brainfault-org.20150623.gappssmtp.com header.i=@brainfault-org.20150623.gappssmtp.com header.b="gN5EDQ1y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F9752065D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TBT2SE+N"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D02720825
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34826 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38172 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7uwg-0007jG-Kn
-	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 02:18:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43990)
+	id 1k7v47-0001Id-PO
+	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 02:25:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45778)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <anup@brainfault.org>)
- id 1k7uw8-0007BK-30
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 02:17:32 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:44277)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <anup@brainfault.org>)
- id 1k7uw5-0003dV-Ri
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 02:17:31 -0400
-Received: by mail-wr1-x441.google.com with SMTP id c15so17061609wrs.11
- for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 23:17:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=brainfault-org.20150623.gappssmtp.com; s=20150623;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=MIdWO3COCqNdq9aMAydiJRPmw8ayq0kdGOqoDuJJjbk=;
- b=gN5EDQ1y2F3iKrhn8Mzh/7lqjhxrwUIINxNyR7KvPMMKhWe77LozxTnwKM1qzKJKgG
- UcNdokP++rJbAlLNcm7VikdLZwidRMKX06VWFdiHXJkuNKMmQpglHWxTPs50zTE6Dchs
- WLgtivoofLTi1V2Db2i/lXFOR/XPKrzlbohTZDjGwi0bvUFRG5tC5yyMmdHbXK2itaw3
- sbdxRUdpeiGNA7xhXcldaBUe5jgR2aC5qvqx0icemPzSQDjb++VVQl0Tt9+lW8uE+7gO
- TKjym0rKD3BRJNDUDBcIz/KaC9PgxXwsafbkLHO/9GE+6pO9Zo74CQQiYOhu3BbGD1UO
- ohTA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=MIdWO3COCqNdq9aMAydiJRPmw8ayq0kdGOqoDuJJjbk=;
- b=Wz0YlMoD5BQAa/VKXgON/F/Ao7HcFa1DSZjoUl+btqJqOGepZ51Q3uxP5ThQlkkvON
- ROChU43ZaGX3c8rCqSA6fIaKXrmV+fv47lngLRyzoApiBtSjmav+Zz46MYRtG1dDPiwG
- 65FLwn7dec1q4lQIbrx+o9nFm3SSGsYRggp0T1NONkto4DxWrqnu2oqgJ3o3lBZYWIEj
- YdMpXsYa8eDI5eaF2Dype+eEggRaokVXtOAKtpxc+dP3X4ylIUW7Db4fuyfeWvm+JZGk
- 9aKJ5UTP3VEj9C6FnhaX0FyQnVJLPe7BakgHNh4H/3Qk0xN3hpyailHDm+NyJN+EfLfg
- lQng==
-X-Gm-Message-State: AOAM531WfnSVQswpkSoHyTmy9HaElhoTj2JUVvTLu7BBL+0amzUoohSe
- kZW06Zxt0wNileQ9Ghum7RbAITrHxV/R8TS8LGGRjA==
-X-Google-Smtp-Source: ABdhPJyymyoSdwLNSZAXB/cVgy+M4WNK6BiXsZOPS1Y6uWbR3YKi9cmxZbTh9kvnDZIZsUAt65hP4QaOA8uOi8dF6OU=
-X-Received: by 2002:adf:f247:: with SMTP id b7mr19606082wrp.128.1597731447614; 
- Mon, 17 Aug 2020 23:17:27 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1k7v3b-0000mu-4B
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 02:25:15 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:31016
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1k7v3Z-0004RX-EZ
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 02:25:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1597731912;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=/eJHnS7lGkZRNdC672zcBxD0G6w2MNLVzRaRLOSFWfM=;
+ b=TBT2SE+NE+1/JClGk4iyBBikTjwBrDb6OgZ0C27P+x+dMJIi8TQR3c3vcPAU2VrcQTFS5c
+ BdcoRWzUJ1W73+8QU19bvd4pWWpMX6Def6uKV1Wh4L94eNy08cowJUF2YmMp+tEwNtqw2U
+ XHUkV0mEYCsAHUAb51MeRDrWGgBc3A4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-409-CABUfqDaOfOsuWHdybF72g-1; Tue, 18 Aug 2020 02:25:10 -0400
+X-MC-Unique: CABUfqDaOfOsuWHdybF72g-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A9D251005E65
+ for <qemu-devel@nongnu.org>; Tue, 18 Aug 2020 06:25:09 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-112-195.ams2.redhat.com
+ [10.36.112.195])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4CEC326164;
+ Tue, 18 Aug 2020 06:25:03 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 0BFBA9D59; Tue, 18 Aug 2020 08:25:02 +0200 (CEST)
+Date: Tue, 18 Aug 2020 08:25:02 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Subject: Re: [PATCH 1/4] edid: use physical dimensions if available
+Message-ID: <20200818062502.k6iliffbuo6mod5g@sirius.home.kraxel.org>
+References: <20200817120056.56751-1-marcandre.lureau@redhat.com>
+ <20200817120056.56751-2-marcandre.lureau@redhat.com>
+ <20200817122135.cmi2lfhoggsfpx3d@sirius.home.kraxel.org>
+ <CAMxuvawcpPEE0e4gEpe1ihFtibuJf0-wFAWuWtuURPAjwOVqXg@mail.gmail.com>
 MIME-Version: 1.0
-References: <1597423256-14847-1-git-send-email-bmeng.cn@gmail.com>
- <CAAhSdy2D=TcENAJDja4r6pnhz0LRi-T+A9k3Btrs_EuB4x0e4w@mail.gmail.com>
- <CAEUhbmV5=B5xKhYqMj1MQb61nt5cNUJG1MXT++C1w1YMYTfLCQ@mail.gmail.com>
- <202949f7-c9d5-4d4d-3ebe-53727f4fa169@microchip.com>
- <CAKmqyKM3nm0rhxgDvWKWfO+4b23ZLSkHW2TzmcVZ_ZFy4L7MRg@mail.gmail.com>
- <d3f61c2c-a489-887e-0143-4d9a1e66e6f2@microchip.com>
-In-Reply-To: <d3f61c2c-a489-887e-0143-4d9a1e66e6f2@microchip.com>
-From: Anup Patel <anup@brainfault.org>
-Date: Tue, 18 Aug 2020 11:47:15 +0530
-Message-ID: <CAAhSdy32owLO0KytyYsg-zH6JyyfNfGofa4vanqTFJLntPq0=g@mail.gmail.com>
-Subject: Re: [PATCH 00/18] hw/riscv: Add Microchip PolarFire SoC Icicle Kit
- board support
-To: Cyril.Jean@microchip.com
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: none client-ip=2a00:1450:4864:20::441;
- envelope-from=anup@brainfault.org; helo=mail-wr1-x441.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=unavailable autolearn_force=no
+In-Reply-To: <CAMxuvawcpPEE0e4gEpe1ihFtibuJf0-wFAWuWtuURPAjwOVqXg@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+Received-SPF: none client-ip=207.211.31.120; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 02:25:12
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,109 +101,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Alistair Francis <alistair@alistair23.me>,
- "open list:RISC-V" <qemu-riscv@nongnu.org>, qemu-block@nongnu.org,
- Sagar Karandikar <sagark@eecs.berkeley.edu>, Bin Meng <bin.meng@windriver.com>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Jason Wang <jasowang@redhat.com>, Palmer Dabbelt <palmerdabbelt@google.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
- qemu-arm@nongnu.org, Alistair Francis <Alistair.Francis@wdc.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Alistair Francis <alistair23@gmail.com>,
- Bin Meng <bmeng.cn@gmail.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- Palmer Dabbelt <palmer@dabbelt.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Aug 18, 2020 at 1:23 AM <Cyril.Jean@microchip.com> wrote:
->
-> On 8/17/20 8:28 PM, Alistair Francis wrote:
-> > EXTERNAL EMAIL: Do not click links or open attachments unless you know the content is safe
+On Mon, Aug 17, 2020 at 04:57:55PM +0400, Marc-André Lureau wrote:
+> Hi
+> 
+> On Mon, Aug 17, 2020 at 4:21 PM Gerd Hoffmann <kraxel@redhat.com> wrote:
 > >
-> > On Mon, Aug 17, 2020 at 11:12 AM via <qemu-devel@nongnu.org> wrote:
-> >> Hi Anup,
-> >>
-> >> On 8/17/20 11:30 AM, Bin Meng wrote:
-> >>> EXTERNAL EMAIL: Do not click links or open attachments unless you know the content is safe
-> >>>
-> >>> Hi Anup,
-> >>>
-> >>> On Sat, Aug 15, 2020 at 1:44 AM Anup Patel <anup@brainfault.org> wrote:
-> >>>> On Fri, Aug 14, 2020 at 10:12 PM Bin Meng <bmeng.cn@gmail.com> wrote:
-> >>>>> From: Bin Meng <bin.meng@windriver.com>
-> >>>>>
-> >>>>> This adds support for Microchip PolarFire SoC Icicle Kit board.
-> >>>>> The Icicle Kit board integrates a PolarFire SoC, with one SiFive's
-> >>>>> E51 plus four U54 cores and many on-chip peripherals and an FPGA.
-> >>>> Nice Work !!! This is very helpful.
-> >>> Thanks!
-> >>>
-> >>>> The Microchip HSS is quite convoluted. It has:
-> >>>> 1. DDR Init
-> >>>> 2. Boot device support
-> >>>> 3. SBI support using OpenSBI as library
-> >>>> 4. Simple TEE support
-> >>>>
-> >>>> I think point 1) and 2) above should be part of U-Boot SPL.
-> >>>> The point 3) can be OpenSBI FW_DYNAMIC.
-> >>>>
-> >>>> Lastly,for point 4), we are working on a new OpenSBI feature using
-> >>>> which we can run independent Secure OS and Non-Secure OS using
-> >>>> U-Boot_SPL+OpenSBI (for both SiFive Unleashed and Microchip
-> >>>> PolarFire).
-> >>>>
-> >>>> Do you have plans for adding U-Boot SPL support for this board ??
-> >>> + Cyril Jean from Microchip
-> >>>
-> >>> I will have to leave this question to Cyril to comment.
-> >>>
-> >> I currently do not have a plan to support U-Boot SPL. The idea of the
-> >> HSS is to contain all the silicon specific initialization and
-> >> configuration code within the HSS before jumping to U-Boot S-mode. I
-> >> would rather keep all this within the HSS for the time being. I would
-> >> wait until we reach production silicon before attempting to move this to
-> >> U-Boot SPL as the HSS is likely to contain some opaque silicon related
-> >> changes for another while.
-> > That is unfortunate, a lot of work has gone into making the boot flow
-> > simple and easy to use.
+> > On Mon, Aug 17, 2020 at 04:00:53PM +0400, marcandre.lureau@redhat.com wrote:
+> > > From: Marc-André Lureau <marcandre.lureau@redhat.com>
+> > >
+> > > Add width_mm/height_mm to qemu_edid_info, and use it if it is
+> > > set (non-zero) to generate the EDID.
 > >
-> > QEMU now includes OpenSBI by default to make it easy for users to boot
-> > Linux. The Icicle Kit board is now the most difficult QEMU board to
-> > boot Linux on. Not to mention it makes it hard to impossible to
-> > support it in standard tool flows such as meta-riscv.
-> >
-> > Alistair
->
-> If it is such a problem we can add a U-Boot SPL stage and the HSS can be
-> treated as standard SoC ROM code.
+> > Any specific reason why you switch from dpi to xmm/ymm?
+> 
+> Not really, but there is no DPI information from Gtk. I also find it
+> difficult to reason with DPI, dimensions are simpler to check about
+> correctness imho (I take the ruler from my desk for example ;). And
+> also DPI is a space density, without horizontal and vertical
+> distinction.
 
-It's not mandatory for U-Boot SPL to have stable DRAM calibration settings
-from the start itself. The initial U-Boot SPL support for most
-platforms (accross
-architectures) usually include basic working DRAM calibration settings which
-is later on updated with separate patches. Also, we don't need all U-Boot
-drivers to be upstreamed in one-go as this can be done in phases.
+Typically computer displays have square pixels, so that shouldn't be a
+problem.  For manually configuration it is easier if you have to deal
+with one value only not two.
 
-The advantage we have with PolarFire SoC Icicle board is that we already
-have a U-Boot S-mode. and we believe the OpenSBI generic platform will
-work fine for PolarFire SoC Icicle board so the only thing missing right now
-is the U-Boot SPL support for OpenSource boot-flow.
+> So by giving width/height in mm we actually have something more
+> correct and easier to debug imho. No?
 
-It will certainly accelerate open-source development if we have boot-flow
-U-Boot_SPL => OpenSBI (FW_DYNAMIC) => U-Boot_S-mode working
-on PolarFire SoC Icicle board. Initially, we just need DRAM, SD/eMMC,
-and Serial port support for U-Boot SPL and U-Boot S-mode. Later on,
-more patches can add ethernet and other booting device drivers to U-Boot.
+I dislike having both with/height and dpi in struct qemu_edid_info.
 
-Regarding security services of HSS, we are working on a OpenSBI
-feature which will allow HSS security services to run as independent
-binary in M-mode (not linked to OpenSBI) and OpenSBI FW_DYNAMIC
-will be a separate binary acting as a secure monitor.
+Suggestion:  Drop dpi struct member (should be easy, I think it isn't
+wired anywhere yet).  Add two little qemu_edid_* helpers to convert
+from/to dpi.  If only one of xmm/ymm is given go calculate the other
+automatically (assuming square pixels).  If none is given use 100 dpi
+(like the current code does).
 
-Regards,
-Anup
+take care,
+  Gerd
+
 
