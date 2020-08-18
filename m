@@ -7,84 +7,84 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43194C433DF
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA6FEC433E1
 	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 14:50:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0C6A820738
+	by mail.kernel.org (Postfix) with ESMTPS id 83CBB20738
 	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 14:50:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eeThStIp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C6A820738
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DHMzkcfc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83CBB20738
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55998 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56030 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k82wh-0007Zo-7K
+	id 1k82wh-0007aO-ND
 	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 10:50:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32860)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32920)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k82L3-0004ct-Jo
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:11:45 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:50658
- helo=us-smtp-delivery-1.mimecast.com)
+ id 1k82L6-0004k8-HY
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:11:48 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:51527)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k82Ku-0007TZ-LV
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:11:45 -0400
+ id 1k82Kw-0007Tt-Kq
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:11:48 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597759895;
+ s=mimecast20190719; t=1597759896;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=EKJbxr7jSHOgjm0bKqWvEcbG5RMgeZe2xCuGSh7UvNM=;
- b=eeThStIpwAp6FB6PX4HlrNzIWAYjlE0TJCdvTPddCW499yQ4WzctgHEmLY37cOGDrrGiCe
- dXhYcoM6QmwTs66RWZpb7sFA6i1FcZOLPAPU5jl4inD9GRwtqKXQuhOKVnUClLyIz0Zcot
- PbUhMndH4xj93WL38Lr8KUI8WiI5zto=
+ bh=zY/6YoKGie5W5TZFUVxbxcU1xo4P/ysemCrfZ0E23bk=;
+ b=DHMzkcfcSkwW/zoXBXUXQrI/qnG63ANc4zCEJrnsOxqL7xknBOyUbF3oYumsp0O0eJzVi8
+ I19zUa66o3s6N1f6zX2+3BbJO0TJH/FhrkL6e2KzyGw8cuXVhmk5b8oYhFXnBIc5y2sNKJ
+ tcVLTnO2yNGKpZ0/iBUaOF70FKgtk50=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-137-UM7PwfV8ONanE5IyMhrh7A-1; Tue, 18 Aug 2020 10:11:33 -0400
-X-MC-Unique: UM7PwfV8ONanE5IyMhrh7A-1
+ us-mta-189-9f686CeKPleF1-lnFR8Emw-1; Tue, 18 Aug 2020 10:11:34 -0400
+X-MC-Unique: 9f686CeKPleF1-lnFR8Emw-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 94EAB186A56D
- for <qemu-devel@nongnu.org>; Tue, 18 Aug 2020 14:11:32 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 61DB42FD00
+ for <qemu-devel@nongnu.org>; Tue, 18 Aug 2020 14:11:33 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 619F55D757
- for <qemu-devel@nongnu.org>; Tue, 18 Aug 2020 14:11:32 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1DDA55D757;
+ Tue, 18 Aug 2020 14:11:33 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 073/150] meson: convert most of softmmu/
-Date: Tue, 18 Aug 2020 10:09:08 -0400
-Message-Id: <20200818141025.21608-74-pbonzini@redhat.com>
+Subject: [PULL 075/150] meson: convert dump/
+Date: Tue, 18 Aug 2020 10:09:10 -0400
+Message-Id: <20200818141025.21608-76-pbonzini@redhat.com>
 In-Reply-To: <20200818141025.21608-1-pbonzini@redhat.com>
 References: <20200818141025.21608-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0.0
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 08:01:06
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 03:22:11
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
 X-Spam_bar: ----
 X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,69 +97,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Leave out main.c, it's special due to fuzzing.
+From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
+Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- meson.build           |  2 ++
- softmmu/Makefile.objs | 14 +-------------
- softmmu/meson.build   | 10 ++++++++++
- 3 files changed, 13 insertions(+), 13 deletions(-)
- create mode 100644 softmmu/meson.build
+ Makefile.objs      | 3 +--
+ Makefile.target    | 1 -
+ configure          | 4 ++++
+ dump/Makefile.objs | 3 ---
+ dump/meson.build   | 4 ++++
+ meson.build        | 9 +++++++++
+ 6 files changed, 18 insertions(+), 6 deletions(-)
+ delete mode 100644 dump/Makefile.objs
+ create mode 100644 dump/meson.build
 
+diff --git a/Makefile.objs b/Makefile.objs
+index ec15ebc4b4..6657a6cce3 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -48,8 +48,7 @@ storage-daemon-obj-$(CONFIG_POSIX) += os-posix.o
+ # single QEMU executable should support all CPUs and machines.
+ 
+ ifeq ($(CONFIG_SOFTMMU),y)
+-common-obj-y = dump/
+-common-obj-y += monitor/
++common-obj-y = monitor/
+ common-obj-y += net/
+ common-obj-$(CONFIG_LINUX) += fsdev/
+ 
+diff --git a/Makefile.target b/Makefile.target
+index 5f926e5bfa..c8f7a6c04b 100644
+--- a/Makefile.target
++++ b/Makefile.target
+@@ -156,7 +156,6 @@ endif #CONFIG_BSD_USER
+ ifdef CONFIG_SOFTMMU
+ obj-y += softmmu/
+ obj-y += gdbstub.o
+-obj-y += dump/
+ obj-y += hw/
+ obj-y += monitor/
+ obj-y += qapi/
+diff --git a/configure b/configure
+index a4396d7027..45250f77f3 100755
+--- a/configure
++++ b/configure
+@@ -2571,6 +2571,7 @@ int main(void) { lzo_version(); return 0; }
+ EOF
+     if compile_prog "" "-llzo2" ; then
+         libs_softmmu="$libs_softmmu -llzo2"
++        lzo_libs="-llzo2"
+         lzo="yes"
+     else
+         if test "$lzo" = "yes"; then
+@@ -2590,6 +2591,7 @@ int main(void) { snappy_max_compressed_length(4096); return 0; }
+ EOF
+     if compile_prog "" "-lsnappy" ; then
+         libs_softmmu="$libs_softmmu -lsnappy"
++        snappy_libs='-lsnappy'
+         snappy="yes"
+     else
+         if test "$snappy" = "yes"; then
+@@ -7419,10 +7421,12 @@ fi
+ 
+ if test "$lzo" = "yes" ; then
+   echo "CONFIG_LZO=y" >> $config_host_mak
++  echo "LZO_LIBS=$lzo_libs" >> $config_host_mak
+ fi
+ 
+ if test "$snappy" = "yes" ; then
+   echo "CONFIG_SNAPPY=y" >> $config_host_mak
++  echo "SNAPPY_LIBS=$snappy_libs" >> $config_host_mak
+ fi
+ 
+ if test "$bzip2" = "yes" ; then
+diff --git a/dump/Makefile.objs b/dump/Makefile.objs
+deleted file mode 100644
+index d2a5db3b81..0000000000
+--- a/dump/Makefile.objs
++++ /dev/null
+@@ -1,3 +0,0 @@
+-obj-y += dump.o
+-common-obj-y += dump-hmp-cmds.o
+-obj-$(TARGET_X86_64) += win_dump.o
+diff --git a/dump/meson.build b/dump/meson.build
+new file mode 100644
+index 0000000000..2eff29c3ea
+--- /dev/null
++++ b/dump/meson.build
+@@ -0,0 +1,4 @@
++softmmu_ss.add(files('dump-hmp-cmds.c'))
++
++specific_ss.add(when: 'CONFIG_SOFTMMU', if_true: [files('dump.c'), snappy, lzo])
++specific_ss.add(when: ['CONFIG_SOFTMMU', 'TARGET_X86_64'], if_true: files('win_dump.c'))
 diff --git a/meson.build b/meson.build
-index 4e2f7759e4..fe72282b51 100644
+index fe72282b51..76bff6acd8 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -642,6 +642,8 @@ softmmu_ss.add(when: ['CONFIG_FDT', fdt],  if_true: [files('device_tree.c')])
+@@ -297,6 +297,14 @@ if 'CONFIG_FDT' in config_host
+   fdt = declare_dependency(compile_args: config_host['FDT_CFLAGS'].split(),
+                            link_args: config_host['FDT_LIBS'].split())
+ endif
++snappy = not_found
++if 'CONFIG_SNAPPY' in config_host
++  snappy = declare_dependency(link_args: config_host['SNAPPY_LIBS'].split())
++endif
++lzo = not_found
++if 'CONFIG_LZO' in config_host
++  lzo = declare_dependency(link_args: config_host['LZO_LIBS'].split())
++endif
  
- common_ss.add(files('cpus-common.c'))
+ create_config = find_program('scripts/create_config')
+ minikconf = find_program('scripts/minikconf.py')
+@@ -604,6 +612,7 @@ subdir('io')
+ subdir('chardev')
+ subdir('fsdev')
+ subdir('target')
++subdir('dump')
  
-+subdir('softmmu')
-+
- # needed for fuzzing binaries
- subdir('tests/qtest/libqos')
- 
-diff --git a/softmmu/Makefile.objs b/softmmu/Makefile.objs
-index c036887500..ec74d8a9fa 100644
---- a/softmmu/Makefile.objs
-+++ b/softmmu/Makefile.objs
-@@ -1,14 +1,2 @@
- softmmu-main-y = softmmu/main.o
--
--obj-y += arch_init.o
--obj-y += cpus.o
--obj-y += cpu-throttle.o
--obj-y += balloon.o
--obj-y += ioport.o
--obj-y += memory.o
--obj-y += memory_mapping.o
--
--obj-y += qtest.o
--
--obj-y += vl.o
--vl.o-cflags := $(SDL_CFLAGS)
-+main.o-cflags := $(SDL_CFLAGS)
-diff --git a/softmmu/meson.build b/softmmu/meson.build
-new file mode 100644
-index 0000000000..95d38df259
---- /dev/null
-+++ b/softmmu/meson.build
-@@ -0,0 +1,10 @@
-+specific_ss.add(when: 'CONFIG_SOFTMMU', if_true: files(
-+  'arch_init.c',
-+  'balloon.c',
-+  'cpus.c',
-+  'cpu-throttle.c',
-+  'ioport.c',
-+  'memory.c',
-+  'memory_mapping.c',
-+  'qtest.c',
-+  'vl.c'))
+ block_ss.add(files(
+   'block.c',
 -- 
 2.26.2
 
