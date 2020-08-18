@@ -2,83 +2,165 @@ Return-Path: <SRS0=kYy5=B4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92462C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 13:36:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21C00C433E3
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 13:40:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5E26B207D3
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 13:36:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D5233206B5
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 13:40:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EO6CnR8e"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E26B207D3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="BF3HCKKx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5233206B5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41652 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53580 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k81mU-0006mo-MR
-	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 09:36:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50466)
+	id 1k81qy-0003RY-VN
+	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 09:40:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33934)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1k81jl-0002kx-On
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 09:33:13 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:21623)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1k81jj-0002V9-S8
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 09:33:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597757591;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=rVxI2XJOfHe0Y3eeEFhLEP6oB8/Fzt8K3Xb8sLFJw5o=;
- b=EO6CnR8e79WtPo+jPMfnWRSi9iICI3VU6VdYdysgvblUR3HUwa+QaZAvlj2idyHjoAUoiw
- KHAXUxEiYr5b3YNACiJ+73mkIc889jAleiABL8fsOey5ZWLRM/ANgpnbofS3IHi7FL5AGk
- 7DdX4usbSxvAe5cHJnXl0Oui90Gx35o=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-214-GM5D4bcQOBa9RDm11QcTpw-1; Tue, 18 Aug 2020 09:32:43 -0400
-X-MC-Unique: GM5D4bcQOBa9RDm11QcTpw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7003C1DDED;
- Tue, 18 Aug 2020 13:32:42 +0000 (UTC)
-Received: from localhost (ovpn-112-119.ams2.redhat.com [10.36.112.119])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D68DB10098A7;
- Tue, 18 Aug 2020 13:32:41 +0000 (UTC)
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH v4 0/4] migration: Add block-bitmap-mapping parameter
-Date: Tue, 18 Aug 2020 15:32:36 +0200
-Message-Id: <20200818133240.195840-1-mreitz@redhat.com>
+ (Exim 4.90_1) (envelope-from <parav@nvidia.com>) id 1k7y4H-0000rX-H0
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 05:38:09 -0400
+Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:17891)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <parav@nvidia.com>) id 1k7y4F-0002Yc-1b
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 05:38:08 -0400
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by
+ hqnvemgate25.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+ id <B5f3ba0130000>; Tue, 18 Aug 2020 02:32:03 -0700
+Received: from hqmail.nvidia.com ([172.20.161.6])
+ by hqpgpgate101.nvidia.com (PGP Universal service);
+ Tue, 18 Aug 2020 02:33:01 -0700
+X-PGP-Universal: processed;
+ by hqpgpgate101.nvidia.com on Tue, 18 Aug 2020 02:33:01 -0700
+Received: from HQMAIL111.nvidia.com (172.20.187.18) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 18 Aug
+ 2020 09:32:57 +0000
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.109)
+ by HQMAIL111.nvidia.com (172.20.187.18) with Microsoft SMTP Server (TLS) id
+ 15.0.1473.3 via Frontend Transport; Tue, 18 Aug 2020 09:32:57 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=cDQmAtmb6l4QM+yqfDuCkIMR6TthSkqoP1zMQr2eRJONW0X6ly+2ZzN25Bn3aUktgl9CskkXQWRUzu9o0jLJhZOlGFlOFvXnP8/6UWq3Lx8WzS8kovywb3a/I0MnP+S17VGaa+xafr7FkfhYcOkT5ZgBW6n9Sd0hZvWXVuIjT9Xd0y3aLjqhLRZtfebJSIInzsI3mfqEpjYz7qSNilwHiocu+cRqtqbgZM3UFt6XuVAMkCEHmWqNBv7Pfczb2DUqKtQt1TaEG7UC9/2h8uLdLoqrtQZLtOjaFgGLAfgisNTtk2mS2u+SBfIsanQ50qgFLKYeuf+E5rs1AN/3Wo+Q+g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=nCwN+MP5vwTY0MX1XataMpmjF4QWCoBUKEQ7o+E7qSo=;
+ b=BOHX2X2TCg6aADnr5YWIUfKciRyd0pFjJHZXgR13yuowkpSEQ+0pbjs6xZFSBYJn0mNjLYchzP7H2j6lxQNg2vuu9TeLKU6uvBRxJy9R6gvAMuX/qrplBqqJCDWdaSjGnWeE46jsDIY6JHnc1qrDrVpYJvGDWkxOiC2jHYh0PCkpxb/HyqJAEIMIzQakpCNLixIkVDVv3E/pl6HZiobAhF5txVu7EUZzBcsn4OenOB81THSOJR9OkHbnLkAgsLNm7+4g6a2PmcFNR0MRgDdnxyC2nNOHoQSc6L4vyIWbl3fN8CuBUc7wqmTh2PBgvdjwTpOokMwGSYcsDnSdu7cWxg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+Received: from BY5PR12MB4322.namprd12.prod.outlook.com (2603:10b6:a03:20a::20)
+ by BY5PR12MB4084.namprd12.prod.outlook.com (2603:10b6:a03:205::14)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3283.16; Tue, 18 Aug
+ 2020 09:32:56 +0000
+Received: from BY5PR12MB4322.namprd12.prod.outlook.com
+ ([fe80::b5f0:8a21:df98:7707]) by BY5PR12MB4322.namprd12.prod.outlook.com
+ ([fe80::b5f0:8a21:df98:7707%8]) with mapi id 15.20.3283.028; Tue, 18 Aug 2020
+ 09:32:55 +0000
+From: Parav Pandit <parav@nvidia.com>
+To: Jason Wang <jasowang@redhat.com>, =?utf-8?B?RGFuaWVsIFAuIEJlcnJhbmfDqQ==?=
+ <berrange@redhat.com>
+Subject: RE: device compatibility interface for live migration with assigned
+ devices
+Thread-Topic: device compatibility interface for live migration with assigned
+ devices
+Thread-Index: AQHWaxahY2KLNHS+kEetIX0F/1UfDqkw/oyAgAR+pQCAAaChgIAGKisAgABceICAAAHJgIAAAlhQ
+Date: Tue, 18 Aug 2020 09:32:55 +0000
+Message-ID: <BY5PR12MB43222059335C96F7B050CFDCDC5C0@BY5PR12MB4322.namprd12.prod.outlook.com>
+References: <20200805021654.GB30485@joy-OptiPlex-7040>
+ <2624b12f-3788-7e2b-2cb7-93534960bcb7@redhat.com>
+ <20200805075647.GB2177@nanopsycho>
+ <eb1d01c2-fbad-36b6-10cf-9e03483a736b@redhat.com>
+ <20200805093338.GC30485@joy-OptiPlex-7040> <20200805105319.GF2177@nanopsycho>
+ <20200810074631.GA29059@joy-OptiPlex-7040>
+ <e6e75807-0614-bd75-aeb6-64d643e029d3@redhat.com>
+ <20200814051601.GD15344@joy-OptiPlex-7040>
+ <a51209fe-a8c6-941f-ff54-7be06d73bc44@redhat.com>
+ <20200818085527.GB20215@redhat.com>
+ <3a073222-dcfe-c02d-198b-29f6a507b2e1@redhat.com>
+In-Reply-To: <3a073222-dcfe-c02d-198b-29f6a507b2e1@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=nvidia.com;
+x-originating-ip: [49.207.209.10]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 69929b2d-a67e-4d92-23cb-08d84359b01d
+x-ms-traffictypediagnostic: BY5PR12MB4084:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <BY5PR12MB40840A10D6787B3BEBEBE574DC5C0@BY5PR12MB4084.namprd12.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:9508;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: djg17ZqqtvjmJQWQeOU2ak+n9sn5l5NIsQIHF+O0qtCgDgfwtkfi6GO1UTSzsaX2VvWyTjMpmYlucTbWq+sRfPDIYy2E41nEJODPN8FXCkc/tJtNMQyfeob+ad3CYKFD9Bm7zJTUlBY25tDIOYhN5Nku3W+mFgCfarX0jGvOi9lgkJ8G2v3YFlVaPzajGHObAoXwLqUHtDxz+UV0oQXwGadIPytZHf8G6HisVzgZGCb0oxuXrPLTTNoXuA4XbprqWzcciobd6Uxqpb9Xl8v9cvfIS8NBJWDLKSnkzjo28i0hfpNMAP48PxPMm4zhUGcBy24mbSF2eqTxLKSHIscFsA==
+x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:BY5PR12MB4322.namprd12.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(4636009)(366004)(396003)(346002)(376002)(39860400002)(136003)(64756008)(66446008)(66556008)(7416002)(26005)(66476007)(8676002)(9686003)(66946007)(55016002)(2906002)(186003)(76116006)(5660300002)(316002)(55236004)(86362001)(8936002)(478600001)(6506007)(52536014)(71200400001)(83380400001)(110136005)(4326008)(54906003)(7696005)(33656002);
+ DIR:OUT; SFP:1101; 
+x-ms-exchange-antispam-messagedata: rgN5a2hev42CJBdjiY+3IirIdvirkSuGsTJROzEFyI4r30YPUyhKMzBIIIiSO35x5zQwxVSIoURvAouSJerIkqloF/KCrf3E8+/aUxNiVPGmEAh8enE0ZtKt2mkLgbz8w1+xa4er1qLLZDdWKih5GY/AgJr2NR+/42u4WzUfh3B9kg8coadaxjNSR+5DtD16KOEO1Ou3/KHaaQ3p0WgU6dtSxw3uw4IJ/6rn6PdSrnb6+1cABGO62QtdWGhFsr9XdqdnGCT6MHZeyE76i+EG1+3Anx1jn6i11Xdgiyno6C+/tecaAC8U0L+j812gTicrDbGPFT4uJdZOkhyRAc+Q4jIiTw8p5Yt76ak4jPguhkxTX8w/3mHdzs92JObx0Hv7xdOpJo0Y6yG4pObOHgSP7A/lVxNHYtnLP881tEeYEhW4mCP+IaxqponMJIOUrpJwDgDTztatCAcK9qQWXqZs9sf8MOhU6tqv92bBB0955R4T42xsUpiNwVsMoCdK4Raa/ROmESK943Z8VNkJs2e9GnzuV6h3dg2FrWUcjInj65KoO8PBhobNbMj4Fv/1ql1FzM9LGp+TchX1YavbKznL2HFL82Rl5F9VFUtJTt9bVLfVgtOhASZ/QLI5Oo+o0lgTZ6RlIubCWZ7qW07Vmf3ZoQ==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: none client-ip=63.128.21.124; envelope-from=mreitz@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 02:02:19
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BY5PR12MB4322.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 69929b2d-a67e-4d92-23cb-08d84359b01d
+X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Aug 2020 09:32:55.6455 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: k1t5x/fAcSVdWegJDNAn5D2o9oRAihlJqE42/dbeWDv3X6W3HiKDrK6wV/SiSLR8Peb1F9JaZYhiqOfkSfj+8A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4084
+X-OriginatorOrg: Nvidia.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+ t=1597743123; bh=nCwN+MP5vwTY0MX1XataMpmjF4QWCoBUKEQ7o+E7qSo=;
+ h=X-PGP-Universal:ARC-Seal:ARC-Message-Signature:
+ ARC-Authentication-Results:From:To:CC:Subject:Thread-Topic:
+ Thread-Index:Date:Message-ID:References:In-Reply-To:
+ Accept-Language:Content-Language:X-MS-Has-Attach:
+ X-MS-TNEF-Correlator:authentication-results:x-originating-ip:
+ x-ms-publictraffictype:x-ms-office365-filtering-correlation-id:
+ x-ms-traffictypediagnostic:x-ms-exchange-transport-forked:
+ x-microsoft-antispam-prvs:x-ms-oob-tlc-oobclassifiers:
+ x-ms-exchange-senderadcheck:x-microsoft-antispam:
+ x-microsoft-antispam-message-info:x-forefront-antispam-report:
+ x-ms-exchange-antispam-messagedata:Content-Type:
+ Content-Transfer-Encoding:MIME-Version:
+ X-MS-Exchange-CrossTenant-AuthAs:
+ X-MS-Exchange-CrossTenant-AuthSource:
+ X-MS-Exchange-CrossTenant-Network-Message-Id:
+ X-MS-Exchange-CrossTenant-originalarrivaltime:
+ X-MS-Exchange-CrossTenant-fromentityheader:
+ X-MS-Exchange-CrossTenant-id:X-MS-Exchange-CrossTenant-mailboxtype:
+ X-MS-Exchange-CrossTenant-userprincipalname:
+ X-MS-Exchange-Transport-CrossTenantHeadersStamped:X-OriginatorOrg;
+ b=BF3HCKKxowZEap8LTaUXcK5qf1YFEonxkR3RsBjk0mzdO3s2kYg3kVOpITzR+4oRL
+ +HlIRy0Mex4+6OMGBAipvjf1GaICCWPLCA3iHN2FqkuQQGug+V2ac14jqSapgIJ3Wh
+ 4bR+gHtBnnRBkA8gJapI1WqaOcAK/PmYWEsT/EPDg4Qnn6JlJPkdJY1dvIiR1bzOP7
+ 1sNNiHH3J24q70/broFtAy/n2qSIYgvRsikgf/9tJwzVvYdDjwfO2rHc1xYIkSLnRR
+ M6A1S9VWHrVn5royN4sLPuEOBiT1AKdYKaaevQ8A7E7oQvM4hbO4fLXWt9Yhk354aB
+ FC17ROcDrALaw==
+Received-SPF: pass client-ip=216.228.121.64; envelope-from=parav@nvidia.com;
+ helo=hqnvemgate25.nvidia.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 05:33:01
+X-ACL-Warn: Detected OS   = Windows 7 or 8 [fuzzy]
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_NONE=0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_SORBS_WEB=1.5, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
+X-Mailman-Approved-At: Tue, 18 Aug 2020 09:39:32 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,98 +172,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Juan Quintela <quintela@redhat.com>, John Snow <jsnow@redhat.com>,
- qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- Peter Krempa <pkrempa@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "libvir-list@redhat.com" <libvir-list@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Kirti Wankhede <kwankhede@nvidia.com>, "eauger@redhat.com" <eauger@redhat.com>,
+ "xin-ran.wang@intel.com" <xin-ran.wang@intel.com>,
+ "corbet@lwn.net" <corbet@lwn.net>, "openstack-discuss@lists.openstack.org"
+ <openstack-discuss@lists.openstack.org>,
+ "shaohe.feng@intel.com" <shaohe.feng@intel.com>,
+ "kevin.tian@intel.com" <kevin.tian@intel.com>, Yan Zhao <yan.y.zhao@intel.com>,
+ Parav Pandit <parav@mellanox.com>,
+ "jian-feng.ding@intel.com" <jian-feng.ding@intel.com>,
+ "dgilbert@redhat.com" <dgilbert@redhat.com>,
+ "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
+ "hejie.xu@intel.com" <hejie.xu@intel.com>,
+ "bao.yumeng@zte.com.cn" <bao.yumeng@zte.com.cn>, Alex
+ Williamson <alex.williamson@redhat.com>,
+ "eskultet@redhat.com" <eskultet@redhat.com>,
+ "smooney@redhat.com" <smooney@redhat.com>,
+ "intel-gvt-dev@lists.freedesktop.org" <intel-gvt-dev@lists.freedesktop.org>,
+ Cornelia Huck <cohuck@redhat.com>, Jiri Pirko <jiri@mellanox.com>,
+ "dinechin@redhat.com" <dinechin@redhat.com>,
+ "devel@ovirt.org" <devel@ovirt.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-RFC v1: https://lists.nongnu.org/archive/html/qemu-block/2020-05/msg00912.html
-RFC v2: https://lists.nongnu.org/archive/html/qemu-block/2020-05/msg00915.html
-v1: https://lists.nongnu.org/archive/html/qemu-devel/2020-06/msg09792.html
-v2: https://lists.nongnu.org/archive/html/qemu-block/2020-07/msg01179.html
-v3: https://lists.nongnu.org/archive/html/qemu-block/2020-07/msg01385.html
-
-Branch: https://github.com/XanClic/qemu.git migration-bitmap-mapping-v4
-Branch: https://git.xanclic.moe/XanClic/qemu.git migration-bitmap-mapping-v4
-
-Hi,
-
-This new migration parameter allows mapping block node names and bitmap
-names to aliases for the purpose of block dirty bitmap migration.
-
-This way, management tools can use different node names on the source
-and destination and pass the mapping of how bitmaps are to be
-transferred to qemu (on the source, the destination, or even both with
-arbitrary aliases in the migration stream).
-
-
-v4:
-- Patch 1:
-  - Rebased
-  - %s/5.1/5.2/
-  - The destination side will now ignore unmapped aliases, too (though
-    they are reported to stderr)
-  - Check that the aliases given will fit in the migration stream (i.e.
-    are shorter than 256 bytes)
-    - On that note, fix a pre-existing bug where a bitmap with a name
-      longer than 255 bytes would make qemu_put_counted_string() fail an
-      assertion
-
-- Patch 2:
-  - import time (apparently, I forgot that in v3...?)
-
-- Patch 3:
-  - Added; I need this now
-
-- Patch 4:
-  - Migration rarely ever really fails now (just one case, where a
-    non-aliased bitmap name is too long, which can only be detected when
-    beginning migration)
-
-  - Thus, we have to read most error messages from the VM log now, for
-    which I’ve added a new function (verify_dest_error)
-
-  - Added tests for overly long bitmap names and node/bitmap aliases
-
-
-git-backport-diff against v3:
-
-Key:
-[----] : patches are identical
-[####] : number of functional differences between upstream/downstream patch
-[down] : patch is downstream-only
-The flags [FC] indicate (F)unctional and (C)ontextual differences, respectively
-
-001/4:[0167] [FC] 'migration: Add block-bitmap-mapping parameter'
-002/4:[0001] [FC] 'iotests.py: Add wait_for_runstate()'
-003/4:[down] 'iotests.py: Let wait_migration() return on failure'
-004/4:[0232] [FC] 'iotests: Test node/bitmap aliases during migration'
-
-
-Max Reitz (4):
-  migration: Add block-bitmap-mapping parameter
-  iotests.py: Add wait_for_runstate()
-  iotests.py: Let wait_migration() return on failure
-  iotests: Test node/bitmap aliases during migration
-
- qapi/migration.json            | 101 +++++-
- migration/migration.h          |   3 +
- migration/block-dirty-bitmap.c | 409 +++++++++++++++++++---
- migration/migration.c          |  30 ++
- monitor/hmp-cmds.c             |  30 ++
- tests/qemu-iotests/300         | 595 +++++++++++++++++++++++++++++++++
- tests/qemu-iotests/300.out     |   5 +
- tests/qemu-iotests/group       |   1 +
- tests/qemu-iotests/iotests.py  |  22 +-
- 9 files changed, 1134 insertions(+), 62 deletions(-)
- create mode 100755 tests/qemu-iotests/300
- create mode 100644 tests/qemu-iotests/300.out
-
--- 
-2.26.2
-
+SGkgSmFzb24sDQoNCkZyb206IEphc29uIFdhbmcgPGphc293YW5nQHJlZGhhdC5jb20+IA0KU2Vu
+dDogVHVlc2RheSwgQXVndXN0IDE4LCAyMDIwIDI6MzIgUE0NCg0KDQpPbiAyMDIwLzgvMTgg5LiL
+5Y2INDo1NSwgRGFuaWVsIFAuIEJlcnJhbmfDqSB3cm90ZToNCk9uIFR1ZSwgQXVnIDE4LCAyMDIw
+IGF0IDExOjI0OjMwQU0gKzA4MDAsIEphc29uIFdhbmcgd3JvdGU6DQpPbiAyMDIwLzgvMTQg5LiL
+5Y2IMToxNiwgWWFuIFpoYW8gd3JvdGU6DQpPbiBUaHUsIEF1ZyAxMywgMjAyMCBhdCAxMjoyNDo1
+MFBNICswODAwLCBKYXNvbiBXYW5nIHdyb3RlOg0KT24gMjAyMC84LzEwIOS4i+WNiDM6NDYsIFlh
+biBaaGFvIHdyb3RlOg0KZHJpdmVyIGlzIGl0IGhhbmRsZWQgYnk/DQpJdCBsb29rcyB0aGF0IHRo
+ZSBkZXZsaW5rIGlzIGZvciBuZXR3b3JrIGRldmljZSBzcGVjaWZpYywgYW5kIGluDQpkZXZsaW5r
+LmgsIGl0IHNheXMNCmluY2x1ZGUvdWFwaS9saW51eC9kZXZsaW5rLmggLSBOZXR3b3JrIHBoeXNp
+Y2FsIGRldmljZSBOZXRsaW5rDQppbnRlcmZhY2UsDQpBY3R1YWxseSBub3QsIEkgdGhpbmsgdGhl
+cmUgdXNlZCB0byBoYXZlIHNvbWUgZGlzY3Vzc2lvbiBsYXN0IHllYXIgYW5kIHRoZQ0KY29uY2x1
+c2lvbiBpcyB0byByZW1vdmUgdGhpcyBjb21tZW50Lg0KDQpbLi4uXQ0KDQo+IFllcywgYnV0IGl0
+IGNvdWxkIGJlIGhhcmQuIEUuZyB2RFBBIHdpbGwgY2hvc2UgdG8gdXNlIGRldmxpbmsgKHRoZXJl
+J3MgYSBsb25nIGRlYmF0ZSBvbiBzeXNmcyB2cyBkZXZsaW5rKS4gU28gaWYgd2UgZ28gd2l0aCBz
+eXNmcywgYXQgbGVhc3QgdHdvIEFQSXMgbmVlZHMgdG8gYmUgc3VwcG9ydGVkIC4uLg0KDQpXZSBo
+YWQgaW50ZXJuYWwgZGlzY3Vzc2lvbiBhbmQgcHJvcG9zYWwgb24gdGhpcyB0b3BpYy4NCkkgd2Fu
+dGVkIEVsaSBDb2hlbiB0byBiZSBiYWNrIGZyb20gdmFjYXRpb24gb24gV2VkIDgvMTksIGJ1dCBz
+aW5jZSB0aGlzIGlzIGFjdGl2ZSBkaXNjdXNzaW9uIHJpZ2h0IG5vdywgSSB3aWxsIHNoYXJlIHRo
+ZSB0aG91Z2h0cyBhbnl3YXkuDQoNCkhlcmUgYXJlIHRoZSBpbml0aWFsIHJvdW5kIG9mIHRob3Vn
+aHRzIGFuZCBwcm9wb3NhbC4NCg0KVXNlciByZXF1aXJlbWVudHM6DQotLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0NCjEuIFVzZXIgbWlnaHQgd2FudCB0byBjcmVhdGUgb25lIG9yIG1vcmUgdmRw
+YSBkZXZpY2VzIHBlciBQQ0kgUEYvVkYvU0YuDQoyLiBVc2VyIG1pZ2h0IHdhbnQgdG8gY3JlYXRl
+IG9uZSBvciBtb3JlIHZkcGEgZGV2aWNlcyBvZiB0eXBlIG5ldC9ibGsgb3Igb3RoZXIgdHlwZS4N
+CjMuIFVzZXIgbmVlZHMgdG8gbG9vayBhbmQgZHVtcCBhdCB0aGUgaGVhbHRoIG9mIHRoZSBxdWV1
+ZXMgZm9yIGRlYnVnIHB1cnBvc2UuDQo0LiBEdXJpbmcgdmRwYSBuZXQgZGV2aWNlIGNyZWF0aW9u
+IHRpbWUsIHVzZXIgbWF5IGhhdmUgdG8gcHJvdmlkZSBhIE1BQyBhZGRyZXNzIGFuZC9vciBWTEFO
+Lg0KNS4gVXNlciBzaG91bGQgYmUgYWJsZSB0byBzZXQvcXVlcnkgc29tZSBvZiB0aGUgYXR0cmli
+dXRlcyBmb3IgZGVidWcvY29tcGF0aWJpbGl0eSBjaGVjaw0KNi4gV2hlbiB1c2VyIHdhbnRzIHRv
+IGNyZWF0ZSB2ZHBhIGRldmljZSwgaXQgbmVlZHMgdG8ga25vdyB3aGljaCBkZXZpY2Ugc3VwcG9y
+dHMgY3JlYXRpb24uDQo3LiBVc2VyIHNob3VsZCBiZSBhYmxlIHRvIHNlZSB0aGUgcXVldWUgc3Rh
+dGlzdGljcyBvZiBkb29yYmVsbHMsIHdxZXMgZXRjIHJlZ2FyZGxlc3Mgb2YgY2xhc3MgdHlwZQ0K
+DQpUbyBhZGRyZXNzIGFib3ZlIHJlcXVpcmVtZW50cywgdGhlcmUgaXMgYSBuZWVkIG9mIHZlbmRv
+ciBhZ25vc3RpYyB0b29sLCBzbyB0aGF0IHVzZXIgY2FuIGNyZWF0ZS9jb25maWcvZGVsZXRlIHZk
+cGEgZGV2aWNlKHMpIHJlZ2FyZGxlc3Mgb2YgdGhlIHZlbmRvci4NCg0KSGVuY2UsDQpXZSBzaG91
+bGQgaGF2ZSBhIHRvb2wgdGhhdCBsZXRzIHVzZXIgZG8gaXQuDQoNCkV4YW1wbGVzOg0KLS0tLS0t
+LS0tLS0tLQ0KKGEpIExpc3QgcGFyZW50IGRldmljZXMgd2hpY2ggc3VwcG9ydHMgY3JlYXRpbmcg
+dmRwYSBkZXZpY2VzLg0KSXQgYWxzbyBzaG93cyB3aGljaCBjbGFzcyB0eXBlcyBzdXBwb3J0ZWQg
+YnkgdGhpcyBwYXJlbnQgZGV2aWNlLg0KSW4gYmVsb3cgY29tbWFuZCB0d28gcGFyZW50IGRldmlj
+ZXMgc3VwcG9ydCB2ZHBhIGRldmljZSBjcmVhdGlvbi4NCkZpcnN0IGlzIFBDSSBWRiB3aG9zZSBi
+ZGYgaXMgMDMuMDA6NS4NClNlY29uZCBpcyBQQ0kgU0Ygd2hvc2UgbmFtZSBpcyBtbHg1X3NmLjEN
+Cg0KJCB2ZHBhIGxpc3QgcGQNCnBjaS8wMDAwOjAzLjAwOjUNCiAgY2xhc3Nfc3VwcG9ydHMNCiAg
+ICBuZXQgdmRwYQ0KdmlydGJ1cy9tbHg1X3NmLjENCiAgY2xhc3Nfc3VwcG9ydHMNCiAgICBuZXQN
+Cg0KKGIpIE5vdyBhZGQgYSB2ZHBhIGRldmljZSBhbmQgc2hvdyB0aGUgZGV2aWNlLg0KJCB2ZHBh
+IGRldiBhZGQgcGNpLzAwMDA6MDMuMDA6NSB0eXBlIG5ldA0KJCB2ZHBhIGRldiBzaG93DQp2ZHBh
+MEBwY2kvMDAwMDowMy4wMDo1IHR5cGUgbmV0IHN0YXRlIGluYWN0aXZlIG1heHF1ZXVlcyA4IGN1
+cnF1ZXVlcyA0DQoNCihjKSB2ZHBhIGRldiBzaG93IGZlYXR1cmVzIHZkcGEwDQppb21tdSBwbGF0
+Zm9ybQ0KdmVyc2lvbiAxDQoNCihkKSBkdW1wIHZkcGEgc3RhdGlzdGljcw0KJCB2ZHBhIGRldiBz
+dGF0cyBzaG93IHZkcGEwDQpraWNrZG9vcmJlbGxzIDEwDQp3cWVzIDEwMA0KDQooZSkgTm93IGRl
+bGV0ZSBhIHZkcGEgZGV2aWNlIHByZXZpb3VzbHkgY3JlYXRlZC4NCiQgdmRwYSBkZXYgZGVsIHZk
+cGEwDQoNCkRlc2lnbiBvdmVydmlldzoNCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQoxLiBBYm92
+ZSBleGFtcGxlIHRvb2wgcnVucyBvdmVyIG5ldGxpbmsgc29ja2V0IGludGVyZmFjZS4NCjIuIFRo
+aXMgZW5hYmxlcyB1c2VycyB0byByZXR1cm4gbWVhbmluZ2Z1bCBlcnJvciBzdHJpbmdzIGluIGFk
+ZGl0aW9uIHRvIGNvZGUgc28gdGhhdCB1c2VyIGNhbiBiZSBtb3JlIGluZm9ybWVkLg0KT2Z0ZW4g
+dGhpcyBpcyBtaXNzaW5nIGluIGlvY3RsKCkvY29uZmlnZnMvc3lzZnMgaW50ZXJmYWNlcy4NCjMu
+IFRoaXMgdG9vbCBvdmVyIG5ldGxpbmsgZW5hYmxlcyBzeXNjYWxsZXIgdGVzdHMgdG8gYmUgbW9y
+ZSB1c2FibGUgbGlrZSBvdGhlciBzdWJzeXN0ZW1zIHRvIGtlZXAga2VybmVsIHJvYnVzdA0KNC4g
+VGhpcyBwcm92aWRlcyB2ZW5kb3IgYWdub3N0aWMgdmlldyBvZiBhbGwgdmRwYSBjYXBhYmxlIHBh
+cmVudCBhbmQgdmRwYSBkZXZpY2VzLg0KDQo1LiBFYWNoIGRyaXZlciB3aGljaCBzdXBwb3J0cyB2
+ZHBhIGRldmljZSBjcmVhdGlvbiwgcmVnaXN0ZXJzIHRoZSBwYXJlbnQgZGV2aWNlIGFsb25nIHdp
+dGggc3VwcG9ydGVkIGNsYXNzZXMuDQoNCkZBUXM6DQotLS0tLS0tLQ0KMS4gV2h5IG5vdCB1c2lu
+ZyBkZXZsaW5rPw0KQW5zOiBCZWNhdXNlIGFzIHZkcGEgZWNobyBzeXN0ZW0gZ3Jvd3MsIGRldmxp
+bmsgd2lsbCBmYWxsIHNob3J0IG9mIGV4dGVuZGluZyB2ZHBhIHNwZWNpZmljIHBhcmFtcywgYXR0
+cmlidXRlcywgc3RhdHMuDQoNCjIuIFdoeSBub3QgdXNlIHN5c2ZzPw0KQW5zOiANCihhKSBCZWNh
+dXNlIHJ1bm5pbmcgc3lzY2FsbGVyIGluZnJhc3RydWN0dXJlIGNhbiBydW4gd2VsbCBvdmVyIG5l
+dGxpbmsgc29ja2V0cyBsaWtlIGl0IHJ1bnMgZm9yIHNldmVyYWwgc3Vic3lzdGVtLg0KKGIpIGl0
+IGxhY2tzIHRoZSBhYmlsaXR5IHRvIHJldHVybiBlcnJvciBtZXNzYWdlcy4gRG9pbmcgdmlhIGtl
+cm5lbCBsb2cgaXMganVzdCBkb2Vzbid0IHdvcmsuDQooYykgV2h5IG5vdCB1c2luZyBzb21lIGlv
+Y3RsKCk/IEl0IHdpbGwgcmVpbnZlbnQgdGhlIHdoZWVsIG9mIG5ldGxpbmsgdGhhdCBoYXMgVExW
+IGZvcm1hdHMgZm9yIHNldmVyYWwgYXR0cmlidXRlcy4NCg0KMy4gV2h5IG5vdCBjb25maWdzPw0K
+SXQgZm9sbG93cyBzYW1lIGxpbWl0YXRpb24gYXMgdGhhdCBvZiBzeXNmcy4NCg0KTG93IGxldmVs
+IGRlc2lnbiBhbmQgZHJpdmVyIEFQSVM6DQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLQ0KV2lsbCBwb3N0IG9uY2Ugd2UgZGlzY3VzcyB0aGlzIGZ1cnRoZXIuDQo=
 
