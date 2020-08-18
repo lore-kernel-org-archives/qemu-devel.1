@@ -2,63 +2,68 @@ Return-Path: <SRS0=kYy5=B4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97440C433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 21:56:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68676C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 21:58:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6628920709
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 21:56:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 20B5F20709
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 21:58:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eMxOakTq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6628920709
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bc2kdDXV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20B5F20709
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50536 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56828 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k89ak-0002n3-Iw
-	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 17:56:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48626)
+	id 1k89cH-0005LU-BH
+	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 17:58:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48660)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jusual@redhat.com>) id 1k89ZU-00018U-2h
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 17:55:08 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:25959
+ (Exim 4.90_1) (envelope-from <jusual@redhat.com>) id 1k89ZY-0001D4-NB
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 17:55:12 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:34770
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jusual@redhat.com>) id 1k89ZR-0007fV-UW
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 17:55:07 -0400
+ (Exim 4.90_1) (envelope-from <jusual@redhat.com>) id 1k89ZW-0007ft-V0
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 17:55:12 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597787703;
+ s=mimecast20190719; t=1597787710;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=qLLQXtaXRbT1qps1CfEUDptEEVRC30jtIOlMpqJninM=;
- b=eMxOakTq/dtrw2ADKfSZG7g1Glf280zPeYqPuJ46itFYWDmENnKi9y3Fqa+IAuVo38fZFy
- Dkw+DzBj3gCuLIg/uAz24QEaiqmFxVDbG0eKQAc0F579GSMlRupteT2IEnkNKoSQHbEbbl
- hoHO9iq0QEr+FXRCO+AWanrENivyTIU=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=zz2tH4BT/ZCHpEwxA/sq/JDVNa6IRW375UQRDz8+Dvo=;
+ b=bc2kdDXVBCpZB/VLr9CAlpnoF8Hj5P20EKWBaa+xa08SpcxrCZTa7DyGAPW+8Yb8OLkpa9
+ ILPDDyJbm5HIxN0IfBRu/Vk5Jg+v2YUe89Gk5m3hZjOHRjQxd2BW3DcxdoAyp589rQzEWA
+ 4l7G5jwH9HSdVIEPa2ymW2+0fkniiYc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-79-Kj4yYr5jM52vSxQUmQNJeQ-1; Tue, 18 Aug 2020 17:54:59 -0400
-X-MC-Unique: Kj4yYr5jM52vSxQUmQNJeQ-1
+ us-mta-516-wxT4Rjt0M-2F0NtlekFJlw-1; Tue, 18 Aug 2020 17:55:08 -0400
+X-MC-Unique: wxT4Rjt0M-2F0NtlekFJlw-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F4229425CC;
- Tue, 18 Aug 2020 21:54:58 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 99815100746F;
+ Tue, 18 Aug 2020 21:55:07 +0000 (UTC)
 Received: from localhost.localdomain.com (unknown [10.43.2.201])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3B73A10027AB;
- Tue, 18 Aug 2020 21:54:48 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 417751014171;
+ Tue, 18 Aug 2020 21:55:06 +0000 (UTC)
 From: Julia Suvorova <jusual@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC PATCH v2 0/4] Use ACPI PCI hot-plug for q35
-Date: Tue, 18 Aug 2020 23:52:23 +0200
-Message-Id: <20200818215227.181654-1-jusual@redhat.com>
+Subject: [RFC PATCH v2 3/4] hw/i386/acpi-build: Turn off support of PCIe
+ native hot-plug and SHPC in _OSC
+Date: Tue, 18 Aug 2020 23:52:26 +0200
+Message-Id: <20200818215227.181654-4-jusual@redhat.com>
+In-Reply-To: <20200818215227.181654-1-jusual@redhat.com>
+References: <20200818215227.181654-1-jusual@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
@@ -67,9 +72,9 @@ X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=jusual@redhat.com;
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=jusual@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 17:55:03
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 16:56:52
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -96,36 +101,100 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-PCIe native hot-plug has numerous problems with racing events and unpredictable
-guest behaviour (Windows). Switching to ACPI hot-plug for now.
+Other methods may be used if the system is capable of this and the _OSC bit
+is set. Disable them explicitly to force ACPI PCI hot-plug use. The older
+versions will still use PCIe native.
 
-Tested on RHEL 8 and Windows 2019.
-pxb-pcie is not yet supported.
+Signed-off-by: Julia Suvorova <jusual@redhat.com>
+---
+ hw/i386/acpi-build.h | 11 +++++++++++
+ hw/i386/acpi-build.c | 21 +++++++++++++++------
+ 2 files changed, 26 insertions(+), 6 deletions(-)
 
-v2:
-    * new ioport range for acpiphp [Gerd]
-    * drop find_pci_host() [Igor]
-    * explain magic numbers in _OSC [Igor]
-    * drop build_q35_pci_hotplug() wrapper [Igor]
-
-Julia Suvorova (4):
-  hw/acpi/ich9: Trace ich9_gpe_readb()/writeb()
-  hw/i386/acpi-build: Add ACPI PCI hot-plug methods to q35
-  hw/i386/acpi-build: Turn off support of PCIe native hot-plug and SHPC
-    in _OSC
-  hw/acpi/ich9: Enable ACPI PCI hot-plug
-
- hw/i386/acpi-build.h    | 12 ++++++++++
- include/hw/acpi/ich9.h  |  3 +++
- include/hw/acpi/pcihp.h |  3 ++-
- hw/acpi/ich9.c          | 52 ++++++++++++++++++++++++++++++++++++++++-
- hw/acpi/pcihp.c         | 15 ++++++++----
- hw/acpi/piix4.c         |  2 +-
- hw/i386/acpi-build.c    | 48 +++++++++++++++++++++++--------------
- hw/i386/pc.c            |  1 +
- hw/acpi/trace-events    |  4 ++++
- 9 files changed, 114 insertions(+), 26 deletions(-)
-
+diff --git a/hw/i386/acpi-build.h b/hw/i386/acpi-build.h
+index 74df5fc612..6f94312c39 100644
+--- a/hw/i386/acpi-build.h
++++ b/hw/i386/acpi-build.h
+@@ -5,6 +5,17 @@
+ 
+ extern const struct AcpiGenericAddress x86_nvdimm_acpi_dsmio;
+ 
++/* PCI Firmware Specification 3.2, Table 4-5 */
++typedef enum {
++    ACPI_OSC_NATIVE_HP_EN = 0,
++    ACPI_OSC_SHPC_EN = 1,
++    ACPI_OSC_PME_EN = 2,
++    ACPI_OSC_AER_EN = 3,
++    ACPI_OSC_PCIE_CAP_EN = 4,
++    ACPI_OSC_LTR_EN = 5,
++    ACPI_OSC_ALLONES_INVALID = 6,
++} AcpiOSCField;
++
+ void acpi_setup(void);
+ 
+ #endif
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index f3cd52bd06..c5f4802b8c 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -1411,7 +1411,7 @@ static void build_i386_pci_hotplug(Aml *table, uint64_t pcihp_addr)
+     aml_append(table, scope);
+ }
+ 
+-static Aml *build_q35_osc_method(void)
++static Aml *build_q35_osc_method(AcpiPmInfo *pm)
+ {
+     Aml *if_ctx;
+     Aml *if_ctx2;
+@@ -1419,6 +1419,7 @@ static Aml *build_q35_osc_method(void)
+     Aml *method;
+     Aml *a_cwd1 = aml_name("CDW1");
+     Aml *a_ctrl = aml_local(0);
++    unsigned osc_ctrl;
+ 
+     method = aml_method("_OSC", 4, AML_NOTSERIALIZED);
+     aml_append(method, aml_create_dword_field(aml_arg(3), aml_int(0), "CDW1"));
+@@ -1430,11 +1431,19 @@ static Aml *build_q35_osc_method(void)
+ 
+     aml_append(if_ctx, aml_store(aml_name("CDW3"), a_ctrl));
+ 
++    /* Always allow native PME, AER (depend on PCIE Capability Control) */
++    osc_ctrl = BIT(ACPI_OSC_PME_EN) | BIT(ACPI_OSC_AER_EN) |
++               BIT(ACPI_OSC_PCIE_CAP_EN);
++
+     /*
+-     * Always allow native PME, AER (no dependencies)
+-     * Allow SHPC (PCI bridges can have SHPC controller)
++     * Guests seem to generally prefer native hot-plug control.
++     * Enable it only when we do not use ACPI hot-plug.
+      */
+-    aml_append(if_ctx, aml_and(a_ctrl, aml_int(0x1F), a_ctrl));
++    if (!pm->pcihp_bridge_en) {
++        osc_ctrl |= BIT(ACPI_OSC_NATIVE_HP_EN) | BIT(ACPI_OSC_SHPC_EN);
++    }
++
++    aml_append(if_ctx, aml_and(a_ctrl, aml_int(osc_ctrl), a_ctrl));
+ 
+     if_ctx2 = aml_if(aml_lnot(aml_equal(aml_arg(1), aml_int(1))));
+     /* Unknown revision */
+@@ -1514,7 +1523,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+         aml_append(dev, aml_name_decl("_CID", aml_eisaid("PNP0A03")));
+         aml_append(dev, aml_name_decl("_ADR", aml_int(0)));
+         aml_append(dev, aml_name_decl("_UID", aml_int(1)));
+-        aml_append(dev, build_q35_osc_method());
++        aml_append(dev, build_q35_osc_method(pm));
+         aml_append(sb_scope, dev);
+         aml_append(dsdt, sb_scope);
+ 
+@@ -1590,7 +1599,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+             if (pci_bus_is_express(bus)) {
+                 aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0A08")));
+                 aml_append(dev, aml_name_decl("_CID", aml_eisaid("PNP0A03")));
+-                aml_append(dev, build_q35_osc_method());
++                aml_append(dev, build_q35_osc_method(pm));
+             } else {
+                 aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0A03")));
+             }
 -- 
 2.25.4
 
