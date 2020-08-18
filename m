@@ -2,81 +2,80 @@ Return-Path: <SRS0=kYy5=B4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6069DC433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 14:06:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 588E3C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 14:08:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2BBC020786
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 14:06:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1CE0820786
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 14:08:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PXzLm2Y6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2BBC020786
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Cb2g20q0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CE0820786
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54358 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57632 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k82G6-0000RN-CL
-	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 10:06:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58640)
+	id 1k82Hj-0001oP-5a
+	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 10:08:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59180)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k82F5-0008QV-UJ
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:05:35 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52204
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k82H2-0001NK-3d
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:07:36 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:46904)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k82F3-0006YC-76
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:05:35 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k82Gz-0006mu-Lk
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:07:35 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597759532;
+ s=mimecast20190719; t=1597759652;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=E9epHG6VgAJzm/Kz3YR5fUBllA+Sj8z0e7+B2hhHrXA=;
- b=PXzLm2Y64L0Af5/YSXzUbZY7pumDckJS/Zu7sC57YeRo6Wc7FO9gloKt2LSEPn59p9uAw5
- 1Xzh2rwbByFFMVSBLcVP2XuqFr3DZ6IXR/Ns3ZZ5dX1rbG22T3UrCUkRnmantWtm17700Y
- Ae4Ma1OUmR+sdU/Jd5pEvu2qxA59K/Q=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-133-bMZxoJwKMbWoEPg7MwypHQ-1; Tue, 18 Aug 2020 10:05:30 -0400
-X-MC-Unique: bMZxoJwKMbWoEPg7MwypHQ-1
-Received: by mail-wm1-f70.google.com with SMTP id c184so5218961wme.1
- for <qemu-devel@nongnu.org>; Tue, 18 Aug 2020 07:05:30 -0700 (PDT)
+ bh=ac2XO/Ww/EXFhXifWlkl7Ec0U4mhq4EaxAmD79ih3d8=;
+ b=Cb2g20q00POvON/CP2MyMZY6Ebwr5HRj17Wo3Swx20InjTcUOMtN/Tf80UMSYzs4Oda1gn
+ CkphvgBiMmwhab2eJ9OT1fVQRrF5aDtrC18wlLdFF/6l9QfYAV82vOsKySe5UZC7+QnFiF
+ otCVnCgQk8Uocd3CX8bszW2dFSWZURs=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-565-PWBugFu5NESWG-LFreJp0w-1; Tue, 18 Aug 2020 10:07:29 -0400
+X-MC-Unique: PWBugFu5NESWG-LFreJp0w-1
+Received: by mail-wr1-f69.google.com with SMTP id s23so8282465wrb.12
+ for <qemu-devel@nongnu.org>; Tue, 18 Aug 2020 07:07:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:autocrypt:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=E9epHG6VgAJzm/Kz3YR5fUBllA+Sj8z0e7+B2hhHrXA=;
- b=hSdMlJQ5R1t1jSesqD32ojp7tmoGilikcnhaCMR38vtTKXqiPfEaWVUM+xKjMD5jOO
- l21qkREK3D9qwugCHNZTT4EVfHKElX8L2iqC7HtRa/ta5/vZ8mNWjsRsQaMSYvHT7/yc
- t5/DeUGyvxAERDYfm4cUPvkglcLskSRlMFrfWzk2fHiYPbYSpq/rEhZ6DC9q9j9OJLQC
- fGMjmmPKn3p1Bv79NfSxeA99hOqDXRhBp4o4EJ0tkNQzPlIR2xEU95QN4v6l+ODgBlKW
- Am6OCbChUB3RWCYQGBoA2JEcHnEzz1NCDzAacZxdUWsqd04rHmJbBC34P3NdeI0KeGP0
- qvxw==
-X-Gm-Message-State: AOAM532yHhyn1L/uKK4u6ENz4GEQ5Ctw2nxpkWbco3o0s1rHmX0LSL9z
- a1Q8LvozDHMeEfjWgMRVJTV3ax98Ids4QyCJieH3Sv2q0TzgmKsRWpPBo4t1tZIUtMuJzMZcP0q
- IKcVapDTNhS7/meQ=
-X-Received: by 2002:adf:91a1:: with SMTP id 30mr22031736wri.29.1597759529206; 
- Tue, 18 Aug 2020 07:05:29 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzdbKjsUUt5MSUSPNmlyXns1TQlSKWdMDEPD558B8k/8a3ftuwnAGkTLUOOqN5CJ2/Kz3MPfg==
-X-Received: by 2002:adf:91a1:: with SMTP id 30mr22031705wri.29.1597759528867; 
- Tue, 18 Aug 2020 07:05:28 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=ac2XO/Ww/EXFhXifWlkl7Ec0U4mhq4EaxAmD79ih3d8=;
+ b=hxOHy5OW1OFjBg9Jc4+GleIcJAP21qts60WPsNfsEIElZyy2tDO3xu2cii6UavQ/dy
+ m6T7pciHAAS0ij7Y8RxxQ2lBhy4H7V8jsOfI6nNRrkzQuy99mY6la0qofNhDSRBB5mn4
+ 8A/x5MC0RObGmwSWoksNOkjX9in/wR4JOKswqRAUFP9DBc6aysqaf2nZYVsurJd317VO
+ epYBjtafCdF6ngKd033aWGLHxcdi9CtN12/PEEiedLlSlbjcaE9O7hGwR87LpNlkMm79
+ NlVW9KHp4Z19lkH2ne1YDWeaKm0O39bOL5z5Z/jKPUua4LVsJMAlBrMX78OcyisICw6+
+ ViAA==
+X-Gm-Message-State: AOAM532tVsclhsiwzDC/8OQrDHXx1ehXy3cyNYl/S68/wn8iQZwqOpvw
+ 0VWoNov2NtKx/0MlzfhFoYwPzZR16z7t3qg9x79yj2FBI1XMAhfKWwWAx7V1LS4rugyGctg8rnp
+ 9EiNrWgz3Ggp0BeE=
+X-Received: by 2002:adf:e411:: with SMTP id g17mr21629531wrm.77.1597759648594; 
+ Tue, 18 Aug 2020 07:07:28 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwsmUyqrmwmDwW38RUv+lR2R1XWzHjnIHreoBGFQEdqBk0SYSZ3BA3FZdMpv6swLAxix88upA==
+X-Received: by 2002:adf:e411:: with SMTP id g17mr21629502wrm.77.1597759648298; 
+ Tue, 18 Aug 2020 07:07:28 -0700 (PDT)
 Received: from [192.168.1.36] (121.red-81-40-121.staticip.rima-tde.net.
  [81.40.121.121])
- by smtp.gmail.com with ESMTPSA id m126sm116339wmf.3.2020.08.18.07.05.27
+ by smtp.gmail.com with ESMTPSA id r21sm35904752wrc.2.2020.08.18.07.07.26
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 18 Aug 2020 07:05:27 -0700 (PDT)
-Subject: Re: [PATCH v3 000/150] Meson integration for 5.2
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-References: <20200817143723.343284-1-pbonzini@redhat.com>
+ Tue, 18 Aug 2020 07:07:27 -0700 (PDT)
+Subject: Re: [PATCH v2 0/7] x86: fix cpu hotplug with secure boot
+To: qemu-devel@nongnu.org, no-reply@patchew.org, imammedo@redhat.com
+References: <159775799513.19075.6719910596790450677@66eaa9a8a123>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Autocrypt: addr=philmd@redhat.com; keydata=
  mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
@@ -101,30 +100,31 @@ Autocrypt: addr=philmd@redhat.com; keydata=
  9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
  RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
  apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <bbecf5e0-33a2-4dc9-3098-618b6813d3f0@redhat.com>
-Date: Tue, 18 Aug 2020 16:05:27 +0200
+Message-ID: <9663458b-162f-9c04-9f21-c88439bbfd66@redhat.com>
+Date: Tue, 18 Aug 2020 16:07:26 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200817143723.343284-1-pbonzini@redhat.com>
+In-Reply-To: <159775799513.19075.6719910596790450677@66eaa9a8a123>
 Content-Language: en-US
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 06:40:33
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 03:22:11
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -137,137 +137,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ boris.ostrovsky@oracle.com, lersek@redhat.com, aaron.young@oracle.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/17/20 4:34 PM, Paolo Bonzini wrote:
-> - Simplified/rewrote handling of the modules variable [Howard]
-> - Fixed access to gdb-xml files [Howard]
-> - Fixed cross-compilation failure due to mingw prefix [Howard]
-> - Fixed SDL2 detection on cross compiles [Howard]
-> - Fixed sub-makefiles that include config-host.mak
+On 8/18/20 3:39 PM, no-reply@patchew.org wrote:
+> Patchew URL: https://patchew.org/QEMU/20200818122208.1243901-1-imammedo@redhat.com/
 > 
-> You can find it at the usual place, https://gitlab.com/bonzini/qemu.git
-> branch meson-poc-next.
+> 
+> 
+> Hi,
+> 
+> This series failed the docker-quick@centos7 build test. Please find the testing commands and
+> their output below. If you have Docker installed, you can probably reproduce it
+> locally.
+> 
+> === TEST SCRIPT BEGIN ===
+> #!/bin/bash
+> make docker-image-centos7 V=1 NETWORK=1
+> time make docker-test-quick@centos7 SHOW_ENV=1 J=14 NETWORK=1
+> === TEST SCRIPT END ===
+> 
+>   TEST    check-unit: tests/test-char
+> Unexpected error in object_property_try_add() at /tmp/qemu-test/src/qom/object.c:1181:
+> attempt to add duplicate property 'serial-id' to object (type 'container')
 
-Also for later, 'make help' doesn't list various targets:
+Unrelated issue.
 
----
- Generic targets:
-   all                            - Build all
-   dir/file.o                     - Build specified target only
-   install                        - Install QEMU
-   ctags/TAGS                     - Generate tags file for editors
-   cscope                         - Generate cscope index
--
--Architecture specific targets:
--  aarch64-softmmu/all            - Build for aarch64-softmmu
--  alpha-softmmu/all              - Build for alpha-softmmu
--  arm-softmmu/all                - Build for arm-softmmu
--  avr-softmmu/all                - Build for avr-softmmu
--  cris-softmmu/all               - Build for cris-softmmu
--  hppa-softmmu/all               - Build for hppa-softmmu
--  i386-softmmu/all               - Build for i386-softmmu
--  lm32-softmmu/all               - Build for lm32-softmmu
--  m68k-softmmu/all               - Build for m68k-softmmu
--  microblazeel-softmmu/all       - Build for microblazeel-softmmu
--  microblaze-softmmu/all         - Build for microblaze-softmmu
--  mips64el-softmmu/all           - Build for mips64el-softmmu
--  mips64-softmmu/all             - Build for mips64-softmmu
--  mipsel-softmmu/all             - Build for mipsel-softmmu
--  mips-softmmu/all               - Build for mips-softmmu
--  moxie-softmmu/all              - Build for moxie-softmmu
--  nios2-softmmu/all              - Build for nios2-softmmu
--  or1k-softmmu/all               - Build for or1k-softmmu
--  ppc64-softmmu/all              - Build for ppc64-softmmu
--  ppc-softmmu/all                - Build for ppc-softmmu
--  riscv32-softmmu/all            - Build for riscv32-softmmu
--  riscv64-softmmu/all            - Build for riscv64-softmmu
--  rx-softmmu/all                 - Build for rx-softmmu
--  s390x-softmmu/all              - Build for s390x-softmmu
--  sh4eb-softmmu/all              - Build for sh4eb-softmmu
--  sh4-softmmu/all                - Build for sh4-softmmu
--  sparc64-softmmu/all            - Build for sparc64-softmmu
--  sparc-softmmu/all              - Build for sparc-softmmu
--  tricore-softmmu/all            - Build for tricore-softmmu
--  unicore32-softmmu/all          - Build for unicore32-softmmu
--  x86_64-softmmu/all             - Build for x86_64-softmmu
--  xtensaeb-softmmu/all           - Build for xtensaeb-softmmu
--  xtensa-softmmu/all             - Build for xtensa-softmmu
--  aarch64_be-linux-user/all      - Build for aarch64_be-linux-user
--  aarch64-linux-user/all         - Build for aarch64-linux-user
--  alpha-linux-user/all           - Build for alpha-linux-user
--  armeb-linux-user/all           - Build for armeb-linux-user
--  arm-linux-user/all             - Build for arm-linux-user
--  cris-linux-user/all            - Build for cris-linux-user
--  hppa-linux-user/all            - Build for hppa-linux-user
--  i386-linux-user/all            - Build for i386-linux-user
--  m68k-linux-user/all            - Build for m68k-linux-user
--  microblazeel-linux-user/all    - Build for microblazeel-linux-user
--  microblaze-linux-user/all      - Build for microblaze-linux-user
--  mips64el-linux-user/all        - Build for mips64el-linux-user
--  mips64-linux-user/all          - Build for mips64-linux-user
--  mipsel-linux-user/all          - Build for mipsel-linux-user
--  mips-linux-user/all            - Build for mips-linux-user
--  mipsn32el-linux-user/all       - Build for mipsn32el-linux-user
--  mipsn32-linux-user/all         - Build for mipsn32-linux-user
--  nios2-linux-user/all           - Build for nios2-linux-user
--  or1k-linux-user/all            - Build for or1k-linux-user
--  ppc64abi32-linux-user/all      - Build for ppc64abi32-linux-user
--  ppc64le-linux-user/all         - Build for ppc64le-linux-user
--  ppc64-linux-user/all           - Build for ppc64-linux-user
--  ppc-linux-user/all             - Build for ppc-linux-user
--  riscv32-linux-user/all         - Build for riscv32-linux-user
--  riscv64-linux-user/all         - Build for riscv64-linux-user
--  s390x-linux-user/all           - Build for s390x-linux-user
--  sh4eb-linux-user/all           - Build for sh4eb-linux-user
--  sh4-linux-user/all             - Build for sh4-linux-user
--  sparc32plus-linux-user/all     - Build for sparc32plus-linux-user
--  sparc64-linux-user/all         - Build for sparc64-linux-user
--  sparc-linux-user/all           - Build for sparc-linux-user
--  tilegx-linux-user/all          - Build for tilegx-linux-user
--  x86_64-linux-user/all          - Build for x86_64-linux-user
--  xtensaeb-linux-user/all        - Build for xtensaeb-linux-user
--  xtensa-linux-user/all          - Build for xtensa-linux-user
--
--Helper targets:
--  fsdev/virtfs-proxy-helper      - Build virtfs-proxy-helper
--  scsi/qemu-pr-helper            - Build qemu-pr-helper
--  qemu-bridge-helper             - Build qemu-bridge-helper
--  vhost-user-gpu                 - Build vhost-user-gpu
--  virtiofsd                      - Build virtiofsd
--
--Tools targets:
--  qemu-ga                        - Build qemu-ga tool
--  qemu-keymap                    - Build qemu-keymap tool
--  elf2dmp                        - Build elf2dmp tool
--  ivshmem-client                 - Build ivshmem-client tool
--  ivshmem-server                 - Build ivshmem-server tool
--  qemu-nbd                       - Build qemu-nbd tool
--  qemu-storage-daemon            - Build qemu-storage-daemon tool
--  qemu-img                       - Build qemu-img tool
--  qemu-io                        - Build qemu-io tool
--  qemu-edid                      - Build qemu-edid tool
-+  sparse                         - Run sparse on the QEMU source
-
- Cleaning targets:
-   clean                          - Remove most generated files but keep
-the config
-@@ -105,7 +20,7 @@
-   vm-help                        - Help about targets running tests
-inside VM
-
- Documentation targets:
--  html info pdf txt              - Build documentation in specified format
-+  html info pdf txt man          - Build documentation in specified format
-
-   make [targets]                 - (quiet build, default)
-   make V=1 [targets]             - (verbose build)
----
-
-Regards,
-
-Phil.
+> ERROR test-char - too few tests run (expected 38, got 9)
+> make: *** [check-unit] Error 1
+> make: *** Waiting for unfinished jobs....
+>   TEST    check-qtest-x86_64: tests/qtest/hd-geo-test
+> qemu-system-aarch64: -accel kvm: invalid accelerator kvm
+> ---
+>     raise CalledProcessError(retcode, cmd)
+> subprocess.CalledProcessError: Command '['sudo', '-n', 'docker', 'run', '--label', 'com.qemu.instance.uuid=0c3122d22095423b9f3e2db213296b3e', '-u', '1001', '--security-opt', 'seccomp=unconfined', '--rm', '-e', 'TARGET_LIST=', '-e', 'EXTRA_CONFIGURE_OPTS=', '-e', 'V=', '-e', 'J=14', '-e', 'DEBUG=', '-e', 'SHOW_ENV=1', '-e', 'CCACHE_DIR=/var/tmp/ccache', '-v', '/home/patchew/.cache/qemu-docker-ccache:/var/tmp/ccache:z', '-v', '/var/tmp/patchew-tester-tmp-4deda8a6/src/docker-src.2020-08-18-09.26.35.1749:/var/tmp/qemu:z,ro', 'qemu/centos7', '/var/tmp/qemu/run', 'test-quick']' returned non-zero exit status 2.
+> filter=--filter=label=com.qemu.instance.uuid=0c3122d22095423b9f3e2db213296b3e
+> make[1]: *** [docker-run] Error 1
+> make[1]: Leaving directory `/var/tmp/patchew-tester-tmp-4deda8a6/src'
+> make: *** [docker-run-test-quick@centos7] Error 2
+> 
+> real    13m18.695s
+> user    0m8.887s
+> 
+> 
+> The full log is available at
+> http://patchew.org/logs/20200818122208.1243901-1-imammedo@redhat.com/testing.docker-quick@centos7/?type=message.
+> ---
+> Email generated automatically by Patchew [https://patchew.org/].
+> Please send your feedback to patchew-devel@redhat.com
+> 
 
 
