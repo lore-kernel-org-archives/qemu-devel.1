@@ -7,50 +7,52 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F368FC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 04:28:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99DECC433E1
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 04:29:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B016C207D3
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 04:28:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5A758207BB
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 04:29:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="hIwVS9Nx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B016C207D3
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="BRWsQzFP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A758207BB
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34842 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39048 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7tEY-0006cT-TN
-	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 00:28:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49954)
+	id 1k7tFO-0008LX-IG
+	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 00:29:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50074)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1k7t68-0007Mz-HX; Tue, 18 Aug 2020 00:19:44 -0400
-Received: from ozlabs.org ([203.11.71.1]:52515)
+ id 1k7t6D-0007aO-Me; Tue, 18 Aug 2020 00:19:49 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:35941 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1k7t66-0006LS-Ia; Tue, 18 Aug 2020 00:19:44 -0400
+ id 1k7t6B-0006Mx-7i; Tue, 18 Aug 2020 00:19:49 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 4BVyNZ64LBz9sV9; Tue, 18 Aug 2020 14:19:26 +1000 (AEST)
+ id 4BVyNc1ZwYz9sRK; Tue, 18 Aug 2020 14:19:28 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1597724366;
- bh=hzgAt1O6dYjmUZB5vBufIOGpmcBVYQk4j7ZI3PZ6rtI=;
+ d=gibson.dropbear.id.au; s=201602; t=1597724368;
+ bh=6HX359pDH9E5Ws1o3UwRlX/kLzA+QilZAfwnA0x4H1k=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=hIwVS9NxWrKhyVpL7uy1fPTexpeeR++bXm1ig3xjjYq8nb+QpY46KrM6LZWT6DlaE
- RtmzfIkH2pis9rBtulJgShDXg7XqfxyeLHtldbB//k+nMo6uem/aqQbI7I6z1pAH2E
- tVrjnO5CTkXeLVcDByH6dcsVxcY4I7oq7IbTEYdY=
+ b=BRWsQzFPIysHs6RDu4ED3pIJE7gDO6CPDKS79i8CeUbOHIV3CeLZ/2tOKP8PEFOuJ
+ cb7EMNlg1r0Q93I0dnmKAIQoPN2EJjhRqV3cAu8+LLRHy4WK2AcFWan82pF+5ruqbc
+ AplqYaJ63sw1VqZiHMyoW+XP5xaFo+UYG+tfs5Z8=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org,
 	groug@kaod.org
-Subject: [PULL 11/40] Update PowerPC AT_HWCAP2 definition
-Date: Tue, 18 Aug 2020 14:18:53 +1000
-Message-Id: <20200818041922.251708-12-david@gibson.dropbear.id.au>
+Subject: [PULL 18/40] spapr: Clarify error and documentation for broken KVM
+ XICS
+Date: Tue, 18 Aug 2020 14:19:00 +1000
+Message-Id: <20200818041922.251708-19-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200818041922.251708-1-david@gibson.dropbear.id.au>
 References: <20200818041922.251708-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
  helo=ozlabs.org
@@ -75,36 +77,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Lijun Pan <ljp@linux.ibm.com>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-ppc@nongnu.org,
- qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>,
+ David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org,
+ qemu-devel@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Lijun Pan <ljp@linux.ibm.com>
+From: Greg Kurz <groug@kaod.org>
 
-Add PPC2_FEATURE2_ARCH_3_10 to the PowerPC AT_HWCAP2 definitions.
+When starting an L2 KVM guest with `ic-mode=dual,kernel-irqchip=on`,
+QEMU fails with:
 
-Signed-off-by: Lijun Pan <ljp@linux.ibm.com>
-Message-Id: <20200724045845.89976-2-ljp@linux.ibm.com>
+KVM is too old to support ic-mode=dual,kernel-irqchip=on
+
+This error message was introduced to detect older KVM versions that
+didn't allow destruction and re-creation of the XICS KVM device that
+we do at reboot. But it is actually the same issue that we get with
+nested guests : when running under pseries, KVM currently provides
+a genuine XICS device (not the XICS-on-XIVE device that we get
+under powernv) which doesn't support destruction/re-creation.
+
+This will eventually be fixed in KVM but in the meantime, update
+the error message and documentation to mention the nested case.
+While here, mention that in "No XIVE support in KVM" section that
+this can also happen with "guest OSes supporting XIVE" since
+we check this at init time before starting the guest.
+
+Reported-by: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
+Buglink: https://bugs.launchpad.net/qemu/+bug/1890290
+Signed-off-by: Greg Kurz <groug@kaod.org>
+Message-Id: <159664243614.622889.18307368735989783528.stgit@bahia.lan>
+Reviewed-by: Cédric Le Goater <clg@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- include/elf.h | 1 +
- 1 file changed, 1 insertion(+)
+ docs/specs/ppc-spapr-xive.rst |  5 ++++-
+ hw/ppc/spapr_irq.c            | 12 +++++++++---
+ 2 files changed, 13 insertions(+), 4 deletions(-)
 
-diff --git a/include/elf.h b/include/elf.h
-index 5b06b55f28..c117a4d1ab 100644
---- a/include/elf.h
-+++ b/include/elf.h
-@@ -558,6 +558,7 @@ typedef struct {
- #define PPC_FEATURE2_HTM_NOSC           0x01000000
- #define PPC_FEATURE2_ARCH_3_00          0x00800000
- #define PPC_FEATURE2_HAS_IEEE128        0x00400000
-+#define PPC_FEATURE2_ARCH_3_10          0x00040000
+diff --git a/docs/specs/ppc-spapr-xive.rst b/docs/specs/ppc-spapr-xive.rst
+index 7199db730b..7144347560 100644
+--- a/docs/specs/ppc-spapr-xive.rst
++++ b/docs/specs/ppc-spapr-xive.rst
+@@ -126,6 +126,9 @@ xics            XICS KVM       XICS emul.     XICS KVM
  
- /* Bits present in AT_HWCAP for Sparc.  */
+ (1) QEMU warns with ``warning: kernel_irqchip requested but unavailable:
+     IRQ_XIVE capability must be present for KVM``
++    In some cases (old host kernels or KVM nested guests), one may hit a
++    QEMU/KVM incompatibility due to device destruction in reset. QEMU fails
++    with ``KVM is incompatible with ic-mode=dual,kernel-irqchip=on``
+ (2) QEMU fails with ``kernel_irqchip requested but unavailable:
+     IRQ_XIVE capability must be present for KVM``
+ 
+@@ -148,7 +151,7 @@ xics            XICS KVM       XICS emul.     XICS KVM
+     mode (XICS), either don't set the ic-mode machine property or try
+     ic-mode=xics or ic-mode=dual``
+ (4) QEMU/KVM incompatibility due to device destruction in reset. QEMU fails
+-    with ``KVM is too old to support ic-mode=dual,kernel-irqchip=on``
++    with ``KVM is incompatible with ic-mode=dual,kernel-irqchip=on``
+ 
+ 
+ XIVE Device tree properties
+diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+index 2f8f7d62f8..72bb938375 100644
+--- a/hw/ppc/spapr_irq.c
++++ b/hw/ppc/spapr_irq.c
+@@ -139,6 +139,7 @@ SpaprIrq spapr_irq_dual = {
+ 
+ static int spapr_irq_check(SpaprMachineState *spapr, Error **errp)
+ {
++    ERRP_GUARD();
+     MachineState *machine = MACHINE(spapr);
+ 
+     /*
+@@ -179,14 +180,19 @@ static int spapr_irq_check(SpaprMachineState *spapr, Error **errp)
+ 
+     /*
+      * On a POWER9 host, some older KVM XICS devices cannot be destroyed and
+-     * re-created. Detect that early to avoid QEMU to exit later when the
+-     * guest reboots.
++     * re-created. Same happens with KVM nested guests. Detect that early to
++     * avoid QEMU to exit later when the guest reboots.
+      */
+     if (kvm_enabled() &&
+         spapr->irq == &spapr_irq_dual &&
+         kvm_kernel_irqchip_required() &&
+         xics_kvm_has_broken_disconnect(spapr)) {
+-        error_setg(errp, "KVM is too old to support ic-mode=dual,kernel-irqchip=on");
++        error_setg(errp,
++            "KVM is incompatible with ic-mode=dual,kernel-irqchip=on");
++        error_append_hint(errp,
++            "This can happen with an old KVM or in a KVM nested guest.\n");
++        error_append_hint(errp,
++            "Try without kernel-irqchip or with kernel-irqchip=off.\n");
+         return -1;
+     }
  
 -- 
 2.26.2
