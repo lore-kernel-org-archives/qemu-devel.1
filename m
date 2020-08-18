@@ -2,91 +2,94 @@ Return-Path: <SRS0=kYy5=B4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B436C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 12:46:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B298EC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 12:56:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6179620706
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 12:46:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6AFDA20706
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 12:56:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JqW/36Tn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6179620706
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CENlk2ts"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6AFDA20706
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46746 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52416 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k810T-0007Gs-Hz
-	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 08:46:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37976)
+	id 1k819p-00024F-EQ
+	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 08:56:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40220)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1k80zC-0006iC-W2
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 08:45:07 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:38146)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1k818o-0001F8-HC
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 08:55:02 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:57303
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1k80zA-0004v5-Fe
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 08:45:06 -0400
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1k818m-00064S-Kf
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 08:55:02 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597754703;
+ s=mimecast20190719; t=1597755299;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=5Zxi5LAjZwZIM/0IOEDo8PTzKES7kw0u6tOKfPwvDwE=;
- b=JqW/36Tn2DbwLNS9nQlYBuGCquZaiEL+GxweGW+shbIELdHthgnz3+9tOFUizIPsCdwI3+
- ZzkN/+RFTeWSRGYh4VXNQX80RzuhPicznwnzTESFs9GCzl09sQKALLL4jGGsJ8Avm47w+j
- JpEb+Z3ywcB6EF2LdzZIgro5CXDocoM=
+ bh=hysYxjFPrgvbcb+fe7+xeegNUFsaGkXkr4U+kSxgveo=;
+ b=CENlk2tsKaqHVCxVdOBgpGCt4bFhu+PxHgp6SdxCrpl1QmmgLBn7DtAVPDZGihBEtzS+zp
+ KDvXXrkRHLy/uKuXwGWG3D/LFaiFBska89Mq2co9gqndVrSVJs7rC6P5OAb8Uq+xrenZFy
+ tEB4ZoozvILckmJW0AEUQVBsqIEuWb8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-264-R8OMmg14MouMgO6BfQkt_g-1; Tue, 18 Aug 2020 08:45:01 -0400
-X-MC-Unique: R8OMmg14MouMgO6BfQkt_g-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-244-xmqFy55PM3ms9EwdFfszlQ-1; Tue, 18 Aug 2020 08:54:55 -0400
+X-MC-Unique: xmqFy55PM3ms9EwdFfszlQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 62006D6380;
- Tue, 18 Aug 2020 12:45:00 +0000 (UTC)
-Received: from gondolin (ovpn-112-221.ams2.redhat.com [10.36.112.221])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 22D06BA63;
- Tue, 18 Aug 2020 12:44:52 +0000 (UTC)
-Date: Tue, 18 Aug 2020 14:44:50 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Subject: Re: virtio-vsock requires 'disable-legacy=on' in QEMU 5.1
-Message-ID: <20200818144450.0701d68c.cohuck@redhat.com>
-In-Reply-To: <20200817131128.lgxn3pyzuzly4edp@steredhat>
-References: <CAGxU2F7pVNWtJG2BM2bk9qtJ_UHgDw4kjVqRmL-=yme7VX83Vg@mail.gmail.com>
- <20200813112820.62ffd63e.cohuck@redhat.com>
- <20200813102430.vjnc56anqjaxn4tw@steredhat.lan>
- <20200813123737.25ba11d2.cohuck@redhat.com>
- <20200813120415.s5we6mihe6fywm4a@steredhat.lan>
- <20200817122746.0b786372.cohuck@redhat.com>
- <20200817131128.lgxn3pyzuzly4edp@steredhat>
-Organization: Red Hat GmbH
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5555118686C9;
+ Tue, 18 Aug 2020 12:54:54 +0000 (UTC)
+Received: from localhost (ovpn-114-160.ams2.redhat.com [10.36.114.160])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C98B85D757;
+ Tue, 18 Aug 2020 12:54:47 +0000 (UTC)
+Date: Tue, 18 Aug 2020 13:54:46 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [PATCH 07/11] vfio/platform: Remove dead assignment in
+ vfio_intp_interrupt()
+Message-ID: <20200818125446.GC36102@stefanha-x1.localdomain>
+References: <20200813073712.4001404-1-kuhn.chenqun@huawei.com>
+ <20200813073712.4001404-8-kuhn.chenqun@huawei.com>
+ <20200813105911.2312adb5@x1.home>
+ <681519bf-92ca-6247-490a-e9193b0bd385@redhat.com>
+ <20200813131530.09ad0a4c@x1.home>
+ <8e096d15-1700-f399-045d-1ba73eb6c1c1@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <8e096d15-1700-f399-045d-1ba73eb6c1c1@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=cohuck@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
 X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: none client-ip=63.128.21.124; envelope-from=cohuck@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 02:02:19
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="7qSK/uQB79J36Y4o"
+Content-Disposition: inline
+Received-SPF: none client-ip=205.139.110.61; envelope-from=stefanha@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 02:16:14
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,129 +102,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Halil Pasic <pasic@linux.ibm.com>, Qinghua Cheng <qcheng@redhat.com>,
- qemu devel list <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>
+Cc: zhang.zhanghailiang@huawei.com, qemu-trivial@nongnu.org,
+ pannengyuan@huawei.com, qemu-devel@nongnu.org,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Euler Robot <euler.robot@huawei.com>, Chen Qun <kuhn.chenqun@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 17 Aug 2020 15:11:28 +0200
-Stefano Garzarella <sgarzare@redhat.com> wrote:
+--7qSK/uQB79J36Y4o
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> On Mon, Aug 17, 2020 at 12:27:46PM +0200, Cornelia Huck wrote:
-> > On Thu, 13 Aug 2020 14:04:15 +0200
-> > Stefano Garzarella <sgarzare@redhat.com> wrote:
-> >   
-> > > On Thu, Aug 13, 2020 at 12:37:37PM +0200, Cornelia Huck wrote:  
-> > > > On Thu, 13 Aug 2020 12:24:30 +0200
-> > > > Stefano Garzarella <sgarzare@redhat.com> wrote:
-> > > >     
-> > > > > On Thu, Aug 13, 2020 at 11:28:20AM +0200, Cornelia Huck wrote:    
-> > > > > > We basically have three possible ways to deal with this:
-> > > > > > 
-> > > > > > - Force it to modern (i.e., what you have been doing; would need the
-> > > > > >   equivalent changes in ccw as well.)      
-> > > > > 
-> > > > > Oo, thanks for pointing out ccw!
-> > > > > I don't know ccw well, in this case should we set dev->max_rev to 1 or 2
-> > > > > to force to modern?    
-> > > > 
-> > > > No, ->max_rev is the wrong side of the limit :) You want    
-> > > 
-> > > Well :-) Thanks!
-> > >   
-> > > > 
-> > > >     ccw_dev->force_revision_1 = true;
-> > > > 
-> > > > in _instance_init() (see e.g. virtio-ccw-gpu.c).
-> > > >     
-> > > > >     
-> > > > > >   Pro: looks like the cleanest approach.
-> > > > > >   Con: not sure if we would need backwards compatibility support,
-> > > > > >   which looks hairy.      
-> > > > > 
-> > > > > Not sure too.    
-> > > > 
-> > > > Yes, I'm not sure at all how to handle user-specified values for
-> > > > legacy/modern.  
-> > 
-> > Thinking a bit more about it, I'm not sure whether we even *can*
-> > provide backwards compatibility: we have different autoconfigurations
-> > for PCI based upon where it is plugged, and ccw does not have a way to
-> > turn legacy on/off, except from within the code.  
-> 
-> Yes, I discovered today for example that the PCIe bus set auto-legacy
-> mode to off.
+On Thu, Aug 13, 2020 at 09:18:59PM +0200, Auger Eric wrote:
+> Hi Alex,
+>=20
+> On 8/13/20 9:15 PM, Alex Williamson wrote:
+> > On Thu, 13 Aug 2020 20:02:45 +0200
+> > Auger Eric <eric.auger@redhat.com> wrote:
+> >=20
+> >> Hi Alex,
+> >>
+> >> On 8/13/20 6:59 PM, Alex Williamson wrote:
+> >>> On Thu, 13 Aug 2020 15:37:08 +0800
+> >>> Chen Qun <kuhn.chenqun@huawei.com> wrote:
+> >>>  =20
+> >>>> Clang static code analyzer show warning:
+> >>>> hw/vfio/platform.c:239:9: warning: Value stored to 'ret' is never re=
+ad
+> >>>>         ret =3D event_notifier_test_and_clear(intp->interrupt);
+> >>>>         ^     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> >>>>
+> >>>> Reported-by: Euler Robot <euler.robot@huawei.com>
+> >>>> Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
+> >>>> ---
+> >>>> Cc: Alex Williamson <alex.williamson@redhat.com>
+> >>>> Cc: Eric Auger <eric.auger@redhat.com>
+> >>>> ---
+> >>>>  hw/vfio/platform.c | 2 +-
+> >>>>  1 file changed, 1 insertion(+), 1 deletion(-)
+> >>>>
+> >>>> diff --git a/hw/vfio/platform.c b/hw/vfio/platform.c
+> >>>> index ac2cefc9b1..869ed2c39d 100644
+> >>>> --- a/hw/vfio/platform.c
+> >>>> +++ b/hw/vfio/platform.c
+> >>>> @@ -236,7 +236,7 @@ static void vfio_intp_interrupt(VFIOINTp *intp)
+> >>>>          trace_vfio_intp_interrupt_set_pending(intp->pin);
+> >>>>          QSIMPLEQ_INSERT_TAIL(&vdev->pending_intp_queue,
+> >>>>                               intp, pqnext);
+> >>>> -        ret =3D event_notifier_test_and_clear(intp->interrupt);
+> >>>> +        event_notifier_test_and_clear(intp->interrupt);
+> >>>>          return;
+> >>>>      } =20
+> >>>
+> >>> Testing that an event is pending in our notifier is generally a
+> >>> prerequisite to doing anything in the interrupt handler, I don't
+> >>> understand why we're just consuming it and ignoring the return value.
+> >>> The above is in the delayed handling branch of the function, but the
+> >>> normal non-delayed path would only go on to error_report() if the
+> >>> notifier is not pending and then inject an interrupt anyway.  This al=
+l
+> >>> seems rather suspicious and it's a unique pattern among the vfio
+> >>> callers of this function.  Is there a more fundamental bug that this
+> >>> function should perform this test once and return without doing
+> >>> anything if it's called spuriously, ie. without a notifier pending?
+> >>> Thanks, =20
+> >>
+> >> Hum that's correct that other VFIO call sites do the check. My
+> >> understanding was that this could not fail in this case as, if we
+> >> entered the handler there was something to be cleared. In which
+> >> situation can this fail?
+> >=20
+> > I'm not sure what the right answer is, I see examples either way
+> > looking outside of vfio code.  On one hand, maybe we never get called
+> > spuriously, on the other if it's the callee's responsibility to drain
+> > events from the fd and we have it readily accessible whether there were
+> > any events pending, why would we inject an interrupt if the result that
+> > we have in hand shows no pending events?  The overhead of returning
+> > based on that result is minuscule.
+>=20
+> I agree
+> >=20
+> > qemu_set_fd_handler() is a wrapper for aio_set_fd_handler().  Stefan is
+> > a possible defacto maintainer of some of the aio code.  Stefan, do you
+> > have thoughts on whether callbacks from event notifier fds should
+> > consider spurious events?  Thanks,
+>=20
+> Indeed I saw that for instance block/nvme.c nvme_handle_event is not
+> checking the result.
+>=20
+> Let's wait for Stefan's answer ...
 
-And vhost-vsock actually really seems to be modern-only, see below.
+vfio_intp_interrupt() will always read a non-zero eventfd value, based
+on these assumptions:
 
-> 
-> >   
-> > > >     
-> > > > >     
-> > > > > > - Add vsock to the list of devices with legacy support.
-> > > > > >   Pro: Existing setups continue to work.
-> > > > > >   Con: If vsock is really virtio-1-only, we still carry around
-> > > > > >   possibly broken legacy support.      
-> > > > > 
-> > > > > I'm not sure it is virtio-1-only, but virtio-vsock was introduced in
-> > > > > 2016, so I supposed it is modern-only.    
-> > > > 
-> > > > Yes, I would guess so as well.
-> > > >     
-> > > > > 
-> > > > > How can I verify that? Maybe forcing legacy mode and run some tests.    
-> > > > 
-> > > > Probably yes. The likeliest area with issues is probably endianness, so
-> > > > maybe with something big endian in the mix?
-> > > >     
-> > > 
-> > > Yeah, I'll try this setup!
+intp->interrupt is "readable" since vfio_intp_interrupt() is called by
+the AioContext (event loop). "readable" does not guarantee that data can
+actually be read because it also includes error events:
 
-Ok, I tried this now with an x86 host and an s390x guest. Reverted the
-checking commit, tried both with a -ccw and a -pci device and your ncat
-example.
-- When using virtio-1, both devices work fine.
-- When using the -pci device with disable-modern=yes, I get "reset by
-  peer".
-- When using the -ccw device with max_revision=0, I get an instant
-  timeout.
+  new_node->pfd.events =3D (io_read ? G_IO_IN | G_IO_HUP | G_IO_ERR : 0);
 
-Smells like endianness problems (aka weird things are happening).
+However, I think we can exclude the error case for the VFIO interrupt
+eventfds because there are no error cases for eventfds (unlike socket
+disconnection, for example).
 
-Also noticed that vhost-vsock-ccw does not have an immediate problem,
-even with the commit: The code only checks whether the device has been
-forced to legacy, not whether legacy is allowed (which cannot be
-controlled by the user anyway). Probably best to address after we've
-dealt with the vhost-vsock issue and made sure that there are no other
-problems.
+The other important assumption is that only one thread on the host is
+monitoring the eventfd for activity.
 
-> > >   
-> > > > >     
-> > > > > > - Do nothing, have users force legacy off. Bad idea, as ccw has no way
-> > > > > >   to do that on the command line.
-> > > > > > 
-> > > > > > The first option is probably best.  
-> > 
-> > The first option is now "force modern, but with no backwards
-> > compatibility", which is not that great; but "allow legacy, even though
-> > it should not exist" is not particularly appealing, either... what a
-> > mess :(  
-> 
-> Yeah, it's a mess :-( anyway I still prefer option 1, it seems a little
-> bit more correct to me.
+Stefan
 
-It seems to me that the status before this was "works by accident, but
-only if we're not negotiating to legacy, or the guest/host are both
-little endian". IOW, no visible breakage for most people (or we'd
-probably have heard of it already). Now we have a setup that's correct,
-but forces users to adapt their QEMU command lines. Option 1 would
-eliminate the need to do that, but would cause possibly
-not-really-fixable migration issues (you can probably deal with that
-manually, detaching and re-attaching the device as a last resort.)
+--7qSK/uQB79J36Y4o
+Content-Type: application/pgp-signature; name="signature.asc"
 
-So, force modern, probably also remove the -transitional device type,
-and put a prominent explanation into the change log?
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl87z5YACgkQnKSrs4Gr
+c8jU3wgAnBv6cYtdSQgtUw0hOiA0ZRFpVp10FUPwkZTlQY5tNTq33eOkCjmySOV9
+iVmoDYDWzi+VHXeWhYGKL2nU8YuVkcd++URup4Op4cn30iMnR0x07Xyp/dAPmq5D
+tDHS+nRMf9OoszqSy/vbR+0dN9Go/DD5wXvLsXjArRFB9W4HOTDn9VtNyI0nyMbL
+MU3fQJdsffSl5pCkOfDe7Ozm1BbZSy56B1qRVaU6qtfkP1rM71Tn6AR2aTzqN5+k
+XistUBmyxPCSxxi+K0UVWbEvFYZBUX5y5tOQwkGPdLTZZjPD3wgz3+1Xrvcz2a0I
+Gl5SyKNj2tAzkMZQEUJtxUNDeutaNw==
+=778W
+-----END PGP SIGNATURE-----
+
+--7qSK/uQB79J36Y4o--
 
 
