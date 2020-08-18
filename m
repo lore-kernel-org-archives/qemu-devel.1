@@ -7,46 +7,47 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0362BC433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 04:28:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 078CFC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 04:28:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C1E50207BB
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 04:28:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CA87E207BB
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 04:28:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="g+djrO36"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1E50207BB
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="dirAgSMe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA87E207BB
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33744 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34082 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7tE7-0006Bh-Tk
-	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 00:27:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50186)
+	id 1k7tEB-0006Ju-4g
+	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 00:28:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49952)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1k7t6Z-0008RW-TX; Tue, 18 Aug 2020 00:20:12 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:38105 helo=ozlabs.org)
+ id 1k7t68-0007Mw-HV; Tue, 18 Aug 2020 00:19:44 -0400
+Received: from ozlabs.org ([203.11.71.1]:55169)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1k7t6Y-0006Ns-2n; Tue, 18 Aug 2020 00:20:11 -0400
+ id 1k7t65-0006L7-Di; Tue, 18 Aug 2020 00:19:44 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 4BVyNd0klNz9sVd; Tue, 18 Aug 2020 14:19:29 +1000 (AEST)
+ id 4BVyNZ2Yp6z9sTv; Tue, 18 Aug 2020 14:19:26 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1597724369;
- bh=nH0H3yYyxaySTaqQiGqcwMUcDcqOkORK6NquiIdDaCM=;
+ d=gibson.dropbear.id.au; s=201602; t=1597724366;
+ bh=xULFcd8XyrPU5zk1hOCR/43qJSisf+K/JFQrUQ84++E=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=g+djrO36YSuLMLelS7uwOuc2RKettH+rxDMS5zhHRM3oh76TV9V3SE8Z9ZGWvt3mR
- /07/vguUSb+HAmPGWYMwYwLgRmoLCpTrG3Bdc9jM9c92oR2WZV+ZfihxOkdJJjraVf
- l1CnYzFjvl6v+d6YsXPZZBNMqEUd05Pj/vHqWlIs=
+ b=dirAgSMewWjsvIS6sJw1NAOT8N1OrAPcNHAIJQz0SHdDICqrxCKpd7eKoYntadS+4
+ ppAmmmxWmEht/+P/5HREOtaRAPvVAWx7DnZ+1KfDSwiPT7zvkk3PJas6F53NsVPYq3
+ Xq+jyX4Eppk6niU0Ydh8l/Op6W1vlKFfDc0Hnc2E=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org,
 	groug@kaod.org
-Subject: [PULL 21/40] target/ppc: Integrate icount to purr, vtb, and tbu40
-Date: Tue, 18 Aug 2020 14:19:03 +1000
-Message-Id: <20200818041922.251708-22-david@gibson.dropbear.id.au>
+Subject: [PULL 07/40] ppc/spapr: Fix 32 bit logical memory block size
+ assumptions
+Date: Tue, 18 Aug 2020 14:18:49 +1000
+Message-Id: <20200818041922.251708-8-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200818041922.251708-1-david@gibson.dropbear.id.au>
 References: <20200818041922.251708-1-david@gibson.dropbear.id.au>
@@ -75,103 +76,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org,
- qemu-devel@nongnu.org, Gustavo Romero <gromero@linux.ibm.com>
+Cc: Anton Blanchard <anton@ozlabs.org>, qemu-ppc@nongnu.org,
+ qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Gustavo Romero <gromero@linux.ibm.com>
+From: Anton Blanchard <anton@ozlabs.org>
 
-Currently if option '-icount auto' is passed to the QEMU TCG to enable
-counting instructions the VM crashes with the following error report when
-Linux runs on it:
+When testing large LMB sizes (eg 4GB), I found a couple of places
+that assume they are 32bit in size.
 
-qemu-system-ppc64: Bad icount read
-
-This happens because read/write access to the SPRs PURR, VTB, and TBU40
-is not integrated to the icount framework.
-
-This commit fixes that issue by making the read/write access of these
-SPRs aware of icount framework, adding the proper gen_io_start() calls
-before calling the helpers to load/store these SPRs in TCG and ensuring
-that the associated TBs end immediately after, accordingly to what's in
-docs/devel/tcg-icount.rst.
-
-Signed-off-by: Gustavo Romero <gromero@linux.ibm.com>
-Message-Id: <20200811153235.4527-1-gromero@linux.ibm.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Anton Blanchard <anton@ozlabs.org>
+Message-Id: <20200715004228.1262681-1-anton@ozlabs.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/translate_init.inc.c | 30 ++++++++++++++++++++++++++++++
- 1 file changed, 30 insertions(+)
+ hw/ppc/spapr.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.inc.c
-index 5134123dd6..230a062d29 100644
---- a/target/ppc/translate_init.inc.c
-+++ b/target/ppc/translate_init.inc.c
-@@ -284,12 +284,24 @@ static void spr_write_atbu(DisasContext *ctx, int sprn, int gprn)
- ATTRIBUTE_UNUSED
- static void spr_read_purr(DisasContext *ctx, int gprn, int sprn)
- {
-+    if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
-+        gen_io_start();
-+    }
-     gen_helper_load_purr(cpu_gpr[gprn], cpu_env);
-+    if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
-+        gen_stop_exception(ctx);
-+    }
- }
- 
- static void spr_write_purr(DisasContext *ctx, int sprn, int gprn)
- {
-+    if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
-+        gen_io_start();
-+    }
-     gen_helper_store_purr(cpu_env, cpu_gpr[gprn]);
-+    if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
-+        gen_stop_exception(ctx);
-+    }
- }
- 
- /* HDECR */
-@@ -319,17 +331,35 @@ static void spr_write_hdecr(DisasContext *ctx, int sprn, int gprn)
- 
- static void spr_read_vtb(DisasContext *ctx, int gprn, int sprn)
- {
-+    if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
-+        gen_io_start();
-+    }
-     gen_helper_load_vtb(cpu_gpr[gprn], cpu_env);
-+    if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
-+        gen_stop_exception(ctx);
-+    }
- }
- 
- static void spr_write_vtb(DisasContext *ctx, int sprn, int gprn)
- {
-+    if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
-+        gen_io_start();
-+    }
-     gen_helper_store_vtb(cpu_env, cpu_gpr[gprn]);
-+    if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
-+        gen_stop_exception(ctx);
-+    }
- }
- 
- static void spr_write_tbu40(DisasContext *ctx, int sprn, int gprn)
- {
-+    if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
-+        gen_io_start();
-+    }
-     gen_helper_store_tbu40(cpu_env, cpu_gpr[gprn]);
-+    if (tb_cflags(ctx->base.tb) & CF_USE_ICOUNT) {
-+        gen_stop_exception(ctx);
-+    }
- }
- 
- #endif
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 0ae293ec94..a5bb0736e2 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -558,7 +558,8 @@ static int spapr_dt_dynamic_reconfiguration_memory(SpaprMachineState *spapr,
+     int nb_numa_nodes = machine->numa_state->num_nodes;
+     int ret, i, offset;
+     uint64_t lmb_size = SPAPR_MEMORY_BLOCK_SIZE;
+-    uint32_t prop_lmb_size[] = {0, cpu_to_be32(lmb_size)};
++    uint32_t prop_lmb_size[] = {cpu_to_be32(lmb_size >> 32),
++                                cpu_to_be32(lmb_size & 0xffffffff)};
+     uint32_t *int_buf, *cur_index, buf_len;
+     int nr_nodes = nb_numa_nodes ? nb_numa_nodes : 1;
+     MemoryDeviceInfoList *dimms = NULL;
+@@ -905,7 +906,8 @@ static void spapr_dt_rtas(SpaprMachineState *spapr, void *fdt)
+     uint32_t lrdr_capacity[] = {
+         cpu_to_be32(max_device_addr >> 32),
+         cpu_to_be32(max_device_addr & 0xffffffff),
+-        0, cpu_to_be32(SPAPR_MEMORY_BLOCK_SIZE),
++        cpu_to_be32(SPAPR_MEMORY_BLOCK_SIZE >> 32),
++        cpu_to_be32(SPAPR_MEMORY_BLOCK_SIZE & 0xffffffff),
+         cpu_to_be32(ms->smp.max_cpus / ms->smp.threads),
+     };
+     uint32_t maxdomain = cpu_to_be32(spapr->gpu_numa_id > 1 ? 1 : 0);
 -- 
 2.26.2
 
