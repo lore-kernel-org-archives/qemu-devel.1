@@ -7,85 +7,84 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 379EAC433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 14:42:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16C98C433E1
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 14:42:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 033ED2076E
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 14:42:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C8F672076E
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 14:42:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Mrk4VS7K"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 033ED2076E
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C36BtASM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8F672076E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34392 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34712 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k82oL-0004BG-4z
-	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 10:42:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60876)
+	id 1k82oO-0004J1-1A
+	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 10:42:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33152)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k82Kp-0004LD-H4
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:11:32 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:25480
- helo=us-smtp-1.mimecast.com)
+ id 1k82LG-0005B2-RU
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:11:58 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:37317
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k82Ki-0007Rp-Ck
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:11:30 -0400
+ id 1k82L5-0007Vy-ND
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:11:58 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597759883;
+ s=mimecast20190719; t=1597759906;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=I8gsrQ8Rfi6MMYXFbMa6/STIcol0xJfRoXuXKrwP9cQ=;
- b=Mrk4VS7K7sHZ5POOvdnV+QcmnN2vB/i8fgsSnvB7mcbpGkZaTJKZN/SOH8dRV6qCVaAEes
- P47WE3cR1OFk77e6LzR9Sm+TsEQ/nx4+mUEmBCD6MIpCvvWuXZJcOFvojkNarCcWrkifRA
- f87XvkUTiYIxXjqv9hrcQiLHY7AmSks=
+ bh=I5sTwjY55tIx6VkpEdnjtkbMh7zB2PQKI/MqcK86Yew=;
+ b=C36BtASMoShTcFNUbLUv/40UqFmleOlld3Kr2jP+xuP2pbIyZAa/PHzyEyWX+M1JPK27rO
+ r8YhOdUW3aUqtL9lTXAth5hojuRngaUpatRNl9/zUxgCi5agkV4XPcpumUXD6pkaoPf8Tm
+ vQdwkKnYMonwbo/1I+9qPiFK89HR+j8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-175-fLOjIj7DO3G-A_spveVTLw-1; Tue, 18 Aug 2020 10:11:20 -0400
-X-MC-Unique: fLOjIj7DO3G-A_spveVTLw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-176-xGK6WFwyPeageXZUUMRfrw-1; Tue, 18 Aug 2020 10:11:44 -0400
+X-MC-Unique: xGK6WFwyPeageXZUUMRfrw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DCDF481F017
- for <qemu-devel@nongnu.org>; Tue, 18 Aug 2020 14:11:19 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 107991007465
+ for <qemu-devel@nongnu.org>; Tue, 18 Aug 2020 14:11:44 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9885459;
- Tue, 18 Aug 2020 14:11:19 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B37DE261BB;
+ Tue, 18 Aug 2020 14:11:43 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 057/150] meson: convert authz directory to Meson
-Date: Tue, 18 Aug 2020 10:08:52 -0400
-Message-Id: <20200818141025.21608-58-pbonzini@redhat.com>
+Subject: [PULL 092/150] meson: convert hw/virtio
+Date: Tue, 18 Aug 2020 10:09:27 -0400
+Message-Id: <20200818141025.21608-93-pbonzini@redhat.com>
 In-Reply-To: <20200818141025.21608-1-pbonzini@redhat.com>
 References: <20200818141025.21608-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 06:40:33
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 02:16:14
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -108,118 +107,148 @@ From: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Makefile            |  1 -
- Makefile.objs       |  3 ++-
- Makefile.target     |  2 +-
- authz/Makefile.objs |  7 -------
- authz/meson.build   | 19 +++++++++++++++++++
- meson.build         |  5 +++++
- 6 files changed, 27 insertions(+), 10 deletions(-)
- delete mode 100644 authz/Makefile.objs
- create mode 100644 authz/meson.build
+ hw/Makefile.objs        |  1 -
+ hw/meson.build          |  1 +
+ hw/virtio/Makefile.objs | 48 --------------------------------------
+ hw/virtio/meson.build   | 51 +++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 52 insertions(+), 49 deletions(-)
+ delete mode 100644 hw/virtio/Makefile.objs
+ create mode 100644 hw/virtio/meson.build
 
-diff --git a/Makefile b/Makefile
-index bd0f208dd6..2742f92706 100644
---- a/Makefile
-+++ b/Makefile
-@@ -232,7 +232,6 @@ include $(SRC_PATH)/Makefile.objs
+diff --git a/hw/Makefile.objs b/hw/Makefile.objs
+index 9ebd13d7cd..a1cfb99334 100644
+--- a/hw/Makefile.objs
++++ b/hw/Makefile.objs
+@@ -32,7 +32,6 @@ devices-dirs-y += timer/
+ devices-dirs-$(CONFIG_TPM) += tpm/
+ devices-dirs-y += usb/
+ devices-dirs-$(CONFIG_VFIO) += vfio/
+-devices-dirs-y += virtio/
  endif
  
- dummy := $(call unnest-vars,, \
--                authz-obj-y \
-                 chardev-obj-y \
-                 block-obj-y \
-                 block-obj-m \
-diff --git a/Makefile.objs b/Makefile.objs
-index 84bfa2a61a..0bc361d338 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -9,7 +9,8 @@ ifeq ($(call lor,$(CONFIG_SOFTMMU),$(CONFIG_TOOLS)),y)
- 
- chardev-obj-y = chardev/
- 
--authz-obj-y = authz/
-+authz-obj-y = authz/libauthz.fa
-+authz/libauthz.fa-libs = $(if $(CONFIG_AUTH_PAM),-lpam)
- 
- block-obj-y = block/ nbd/ scsi/
- block-obj-y += block.o blockjob.o job.o
-diff --git a/Makefile.target b/Makefile.target
-index 1e04551a8e..79b6e02bed 100644
---- a/Makefile.target
-+++ b/Makefile.target
-@@ -192,9 +192,9 @@ common-obj-m :=
- 
- include $(SRC_PATH)/Makefile.objs
- dummy := $(call fix-paths,../,, \
-+              authz-obj-y \
-               qom-obj-y)
- dummy := $(call unnest-vars,.., \
--               authz-obj-y \
-                block-obj-y \
-                block-obj-m \
-                chardev-obj-y \
-diff --git a/authz/Makefile.objs b/authz/Makefile.objs
+ common-obj-y += $(devices-dirs-y)
+diff --git a/hw/meson.build b/hw/meson.build
+index f2209d900c..8338fc4408 100644
+--- a/hw/meson.build
++++ b/hw/meson.build
+@@ -3,5 +3,6 @@ subdir('mem')
+ subdir('nubus')
+ subdir('semihosting')
+ subdir('smbios')
++subdir('virtio')
+ subdir('watchdog')
+ subdir('xen')
+diff --git a/hw/virtio/Makefile.objs b/hw/virtio/Makefile.objs
 deleted file mode 100644
-index ed7b273596..0000000000
---- a/authz/Makefile.objs
+index fc91719b4a..0000000000
+--- a/hw/virtio/Makefile.objs
 +++ /dev/null
-@@ -1,7 +0,0 @@
--authz-obj-y += base.o
--authz-obj-y += simple.o
--authz-obj-y += list.o
--authz-obj-y += listfile.o
--authz-obj-$(CONFIG_AUTH_PAM) += pamacct.o
+@@ -1,48 +0,0 @@
+-ifeq ($(CONFIG_VIRTIO),y)
+-common-obj-y += virtio-bus.o
+-obj-y += virtio.o
 -
--pamacct.o-libs = -lpam
-diff --git a/authz/meson.build b/authz/meson.build
+-obj-$(CONFIG_VHOST) += vhost.o vhost-backend.o
+-common-obj-$(call lnot,$(CONFIG_VHOST)) += vhost-stub.o
+-obj-$(CONFIG_VHOST_USER) += vhost-user.o
+-obj-$(CONFIG_VHOST_VDPA) += vhost-vdpa.o
+-
+-common-obj-$(CONFIG_VIRTIO_RNG) += virtio-rng.o
+-common-obj-$(CONFIG_VIRTIO_PCI) += virtio-pci.o
+-common-obj-$(CONFIG_VIRTIO_MMIO) += virtio-mmio.o
+-obj-$(CONFIG_VIRTIO_BALLOON) += virtio-balloon.o
+-obj-$(CONFIG_VIRTIO_CRYPTO) += virtio-crypto.o
+-obj-$(CONFIG_VHOST_USER_FS) += vhost-user-fs.o
+-obj-$(call land,$(CONFIG_VIRTIO_CRYPTO),$(CONFIG_VIRTIO_PCI)) += virtio-crypto-pci.o
+-obj-$(CONFIG_VIRTIO_PMEM) += virtio-pmem.o
+-common-obj-$(call land,$(CONFIG_VIRTIO_PMEM),$(CONFIG_VIRTIO_PCI)) += virtio-pmem-pci.o
+-obj-$(call land,$(CONFIG_VHOST_USER_FS),$(CONFIG_VIRTIO_PCI)) += vhost-user-fs-pci.o
+-obj-$(CONFIG_VIRTIO_IOMMU) += virtio-iommu.o
+-obj-$(CONFIG_VHOST_VSOCK) += vhost-vsock-common.o vhost-vsock.o
+-obj-$(CONFIG_VHOST_USER_VSOCK) += vhost-vsock-common.o vhost-user-vsock.o
+-obj-$(CONFIG_VIRTIO_MEM) += virtio-mem.o
+-common-obj-$(call land,$(CONFIG_VIRTIO_MEM),$(CONFIG_VIRTIO_PCI)) += virtio-mem-pci.o
+-
+-ifeq ($(CONFIG_VIRTIO_PCI),y)
+-obj-$(CONFIG_VHOST_VSOCK) += vhost-vsock-pci.o
+-obj-$(CONFIG_VHOST_USER_VSOCK) += vhost-user-vsock-pci.o
+-obj-$(CONFIG_VHOST_USER_BLK) += vhost-user-blk-pci.o
+-obj-$(CONFIG_VHOST_USER_INPUT) += vhost-user-input-pci.o
+-obj-$(CONFIG_VHOST_USER_SCSI) += vhost-user-scsi-pci.o
+-obj-$(CONFIG_VHOST_SCSI) += vhost-scsi-pci.o
+-obj-$(CONFIG_VIRTIO_INPUT_HOST) += virtio-input-host-pci.o
+-obj-$(CONFIG_VIRTIO_INPUT) += virtio-input-pci.o
+-obj-$(CONFIG_VIRTIO_RNG) += virtio-rng-pci.o
+-obj-$(CONFIG_VIRTIO_BALLOON) += virtio-balloon-pci.o
+-obj-$(CONFIG_VIRTIO_IOMMU) += virtio-iommu-pci.o
+-obj-$(CONFIG_VIRTIO_9P) += virtio-9p-pci.o
+-obj-$(CONFIG_VIRTIO_SCSI) += virtio-scsi-pci.o
+-obj-$(CONFIG_VIRTIO_BLK) += virtio-blk-pci.o
+-obj-$(CONFIG_VIRTIO_NET) += virtio-net-pci.o
+-obj-$(CONFIG_VIRTIO_SERIAL) += virtio-serial-pci.o
+-endif
+-else
+-common-obj-y += vhost-stub.o
+-endif
+-
+-common-obj-$(CONFIG_ALL) += vhost-stub.o
+diff --git a/hw/virtio/meson.build b/hw/virtio/meson.build
 new file mode 100644
-index 0000000000..c1f63627c1
+index 0000000000..fbff9bc9d4
 --- /dev/null
-+++ b/authz/meson.build
-@@ -0,0 +1,19 @@
-+authz_ss = ss.source_set()
-+authz_ss.add(genh)
-+authz_ss.add(files(
-+  'base.c',
-+  'list.c',
-+  'listfile.c',
-+  'simple.c',
-+))
++++ b/hw/virtio/meson.build
+@@ -0,0 +1,51 @@
++softmmu_virtio_ss = ss.source_set()
++softmmu_virtio_ss.add(files('virtio-bus.c'))
++softmmu_virtio_ss.add(when: 'CONFIG_VIRTIO_PCI', if_true: files('virtio-pci.c'))
++softmmu_virtio_ss.add(when: 'CONFIG_VIRTIO_MMIO', if_true: files('virtio-mmio.c'))
++softmmu_virtio_ss.add(when: 'CONFIG_VHOST', if_false: files('vhost-stub.c'))
 +
-+authz_ss.add(when: ['CONFIG_AUTH_PAM', pam], if_true: files('pamacct.c'))
++softmmu_ss.add_all(when: 'CONFIG_VIRTIO', if_true: softmmu_virtio_ss)
++softmmu_ss.add(when: 'CONFIG_VIRTIO', if_false: files('vhost-stub.c'))
 +
-+authz_ss = authz_ss.apply(config_host, strict: false)
-+libauthz = static_library('authz', authz_ss.sources(),
-+                          dependencies: [authz_ss.dependencies()],
-+                          name_suffix: 'fa',
-+                          build_by_default: false)
++softmmu_ss.add(when: 'CONFIG_ALL', if_true: files('vhost-stub.c'))
 +
-+authz = declare_dependency(link_whole: libauthz,
-+                           dependencies: qom)
-diff --git a/meson.build b/meson.build
-index 0eb3cfcf78..b2b74f1695 100644
---- a/meson.build
-+++ b/meson.build
-@@ -100,6 +100,10 @@ if 'CONFIG_GNUTLS' in config_host
- endif
- pixman = declare_dependency(compile_args: config_host['PIXMAN_CFLAGS'].split(),
-                             link_args: config_host['PIXMAN_LIBS'].split())
-+pam = not_found
-+if 'CONFIG_AUTH_PAM' in config_host
-+  pam = cc.find_library('pam')
-+endif
- libattr = not_found
- if 'CONFIG_ATTR' in config_host
-   libattr = declare_dependency(link_args: config_host['LIBATTR_LIBS'].split())
-@@ -338,6 +342,7 @@ qemuutil = declare_dependency(link_with: libqemuutil,
-                               sources: genh + version_res)
- 
- subdir('qom')
-+subdir('authz')
- subdir('fsdev')
- 
- # Other build targets
++virtio_ss = ss.source_set()
++virtio_ss.add(files('virtio.c'))
++virtio_ss.add(when: 'CONFIG_VHOST', if_true: files('vhost.c', 'vhost-backend.c'))
++virtio_ss.add(when: 'CONFIG_VHOST_USER', if_true: files('vhost-user.c'))
++virtio_ss.add(when: 'CONFIG_VHOST_VDPA', if_true: files('vhost-vdpa.c'))
++virtio_ss.add(when: 'CONFIG_VIRTIO_BALLOON', if_true: files('virtio-balloon.c'))
++virtio_ss.add(when: 'CONFIG_VIRTIO_CRYPTO', if_true: files('virtio-crypto.c'))
++virtio_ss.add(when: ['CONFIG_VIRTIO_CRYPTO', 'CONFIG_VIRTIO_PCI'], if_true: files('virtio-crypto-pci.c'))
++virtio_ss.add(when: 'CONFIG_VHOST_USER_FS', if_true: files('vhost-user-fs.c'))
++virtio_ss.add(when: ['CONFIG_VHOST_USER_FS', 'CONFIG_VIRTIO_PCI'], if_true: files('vhost-user-fs-pci.c'))
++virtio_ss.add(when: 'CONFIG_VIRTIO_PMEM', if_true: files('virtio-pmem.c'))
++virtio_ss.add(when: 'CONFIG_VHOST_VSOCK', if_true: files('vhost-vsock.c', 'vhost-vsock-common.c'))
++virtio_ss.add(when: 'CONFIG_VHOST_USER_VSOCK', if_true: files('vhost-user-vsock.c', 'vhost-vsock-common.c'))
++virtio_ss.add(when: 'CONFIG_VIRTIO_RNG', if_true: files('virtio-rng.c'))
++virtio_ss.add(when: 'CONFIG_VIRTIO_IOMMU', if_true: files('virtio-iommu.c'))
++virtio_ss.add(when: 'CONFIG_VIRTIO_MEM', if_true: files('virtio-mem.c'))
++
++virtio_pci_ss = ss.source_set()
++virtio_pci_ss.add(when: 'CONFIG_VHOST_VSOCK', if_true: files('vhost-vsock-pci.c'))
++virtio_pci_ss.add(when: 'CONFIG_VHOST_USER_VSOCK', if_true: files('vhost-user-vsock-pci.c'))
++virtio_pci_ss.add(when: 'CONFIG_VHOST_USER_BLK', if_true: files('vhost-user-blk-pci.c'))
++virtio_pci_ss.add(when: 'CONFIG_VHOST_USER_INPUT', if_true: files('vhost-user-input-pci.c'))
++virtio_pci_ss.add(when: 'CONFIG_VHOST_USER_SCSI', if_true: files('vhost-user-scsi-pci.c'))
++virtio_pci_ss.add(when: 'CONFIG_VHOST_SCSI', if_true: files('vhost-scsi-pci.c'))
++virtio_pci_ss.add(when: 'CONFIG_VIRTIO_INPUT_HOST', if_true: files('virtio-input-host-pci.c'))
++virtio_pci_ss.add(when: 'CONFIG_VIRTIO_INPUT', if_true: files('virtio-input-pci.c'))
++virtio_pci_ss.add(when: 'CONFIG_VIRTIO_RNG', if_true: files('virtio-rng-pci.c'))
++virtio_pci_ss.add(when: 'CONFIG_VIRTIO_BALLOON', if_true: files('virtio-balloon-pci.c'))
++virtio_pci_ss.add(when: 'CONFIG_VIRTIO_9P', if_true: files('virtio-9p-pci.c'))
++virtio_pci_ss.add(when: 'CONFIG_VIRTIO_SCSI', if_true: files('virtio-scsi-pci.c'))
++virtio_pci_ss.add(when: 'CONFIG_VIRTIO_BLK', if_true: files('virtio-blk-pci.c'))
++virtio_pci_ss.add(when: 'CONFIG_VIRTIO_NET', if_true: files('virtio-net-pci.c'))
++virtio_pci_ss.add(when: 'CONFIG_VIRTIO_SERIAL', if_true: files('virtio-serial-pci.c'))
++virtio_pci_ss.add(when: 'CONFIG_VIRTIO_PMEM', if_true: files('virtio-pmem-pci.c'))
++virtio_pci_ss.add(when: 'CONFIG_VIRTIO_IOMMU', if_true: files('virtio-iommu-pci.c'))
++virtio_pci_ss.add(when: 'CONFIG_VIRTIO_MEM', if_true: files('virtio-mem-pci.c'))
++
++virtio_ss.add_all(when: 'CONFIG_VIRTIO_PCI', if_true: virtio_pci_ss)
++
++specific_ss.add_all(when: 'CONFIG_VIRTIO', if_true: virtio_ss)
 -- 
 2.26.2
 
