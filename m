@@ -2,77 +2,111 @@ Return-Path: <SRS0=kYy5=B4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.1 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1650C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 06:08:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42E95C433E1
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 06:17:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9264120709
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 06:08:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9264120709
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 0D2252065D
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 06:17:06 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B1y/EWXP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D2252065D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57474 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60638 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k7uno-0004oW-RJ
-	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 02:08:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41890)
+	id 1k7uvi-0006g9-8h
+	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 02:17:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43670)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <clg@kaod.org>)
- id 1k7unD-0004Jf-G3; Tue, 18 Aug 2020 02:08:19 -0400
-Received: from smtpout1.mo804.mail-out.ovh.net ([79.137.123.220]:40231)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <clg@kaod.org>)
- id 1k7unA-0002SC-T7; Tue, 18 Aug 2020 02:08:19 -0400
-Received: from mxplan5.mail.ovh.net (unknown [10.108.4.47])
- by mo804.mail-out.ovh.net (Postfix) with ESMTPS id C73375821804;
- Tue, 18 Aug 2020 08:08:05 +0200 (CEST)
-Received: from kaod.org (37.59.142.97) by DAG4EX1.mxp5.local (172.16.2.31)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1979.3; Tue, 18 Aug
- 2020 08:08:05 +0200
-Authentication-Results: garm.ovh; auth=pass
- (GARM-97G001c87858a7-b678-4a6b-90d0-2387fafac297,
- 5D4690BFF1A8204198846400511E4593F3B91EAC) smtp.auth=clg@kaod.org
-Subject: Re: [PATCH] hw: add a number of SPI-flash's of m25p80 family
-To: i.kononenko <i.kononenko@yadro.com>
-References: <20200811203724.20699-1-i.kononenko@yadro.com>
- <528a1a29-8092-6d7b-8177-68d8a1c6b7b1@kaod.org>
- <7e669f8b-e4e2-884e-ae90-14546d6b3a73@yadro.com>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <c6c73b3a-ea40-cec4-34bd-bfd0d8859cc6@kaod.org>
-Date: Tue, 18 Aug 2020 08:08:04 +0200
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1k7uuz-0006CI-21
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 02:16:21 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:57314
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1k7uut-0003VN-Hs
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 02:16:20 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1597731374;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=zNAWR8Db7iky2PfhhKyqyzQvo8/JAP8HRK4XLQpqp7Q=;
+ b=B1y/EWXPRuvK8W04VK9N1Rn0VmOK7jTeOF6iC8DsHA6OCay7w6kFfHxuqDyiijdXhWWTa0
+ 1PZ1cg2oPTZokElYDujQpdZ5xF0CcbqqMtjhoh/JrlrjrPaRdHM3/QI/M+Bfnzqr5SS/Ji
+ 3mwg/t2AerhHMG5uDDVwoRyWOIwj840=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-241-m-Kd8du9PRmMEOSUCEazcQ-1; Tue, 18 Aug 2020 02:16:12 -0400
+X-MC-Unique: m-Kd8du9PRmMEOSUCEazcQ-1
+Received: by mail-wr1-f72.google.com with SMTP id l14so7833156wrp.9
+ for <qemu-devel@nongnu.org>; Mon, 17 Aug 2020 23:16:11 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=zNAWR8Db7iky2PfhhKyqyzQvo8/JAP8HRK4XLQpqp7Q=;
+ b=KqV+ErNMeH4aOnpLPDqv3uAYRqZIBLF1+S4mwpvWcFw52fe4Mvopq6snNk6247K49H
+ atHvsqp/t+LfXI6uM2UYch7Hu17gPhcGQus4h0moLFlOZFuy3w55ahVgbnuaVcWTp12Z
+ 9d5WvISutCeLNbpp7nvxY7+EiSbkvAgkuKgR4YGgJEz/wTLtV7xqeUk8BxinmZm2ZpHN
+ 0BNcSd4QMJfzhLLAwu5LyKvpw0hVHY3YvLOdwRfryCeI+QVTcUM8ZqtxpyQgOGt82RG1
+ Rh7mSm3BGHnDSgK0uVTPLs0X66UX/xszUCG8QzPhwU/1Qb97MKmvcHwVIckppmqPCG8A
+ LN4Q==
+X-Gm-Message-State: AOAM532uqI7Wla99fV2MbcexvVkswyJiNsGL9KAtpW+XomZmLJL2rZ54
+ AYEhcuEkYLuXv95C+Zn1EMIO1J8mKyoMoyWXh/1hWSUfDLmmaTDcrESv5boDFAUyIPV2yKGAaqr
+ 1X6fBOa/1+0wEUdE=
+X-Received: by 2002:a5d:6284:: with SMTP id k4mr19629976wru.372.1597731371098; 
+ Mon, 17 Aug 2020 23:16:11 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxj/bImW0Yb5Ijxp6LB/yDbbZIY88X54R+KgF198iJjIMemSR7pN2UP2s/j5xobdW/eVeICoQ==
+X-Received: by 2002:a5d:6284:: with SMTP id k4mr19629957wru.372.1597731370791; 
+ Mon, 17 Aug 2020 23:16:10 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:a0d1:fc42:c610:f977?
+ ([2001:b07:6468:f312:a0d1:fc42:c610:f977])
+ by smtp.gmail.com with ESMTPSA id w132sm35052813wma.32.2020.08.17.23.16.09
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 17 Aug 2020 23:16:10 -0700 (PDT)
+Subject: Re: What is bs->reqs_lock for?
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu block <qemu-block@nongnu.org>
+References: <ebea1375-8bc0-2b0a-051f-28b2afa02a1c@virtuozzo.com>
+ <2c237be3-7e28-f61a-d339-5765089fe65c@redhat.com>
+ <e6d75774-300d-c38d-3f07-0cbc39aff54e@virtuozzo.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <8d337bc3-e3a7-d941-aa70-642f9ce0fcbe@redhat.com>
+Date: Tue, 18 Aug 2020 08:16:09 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <7e669f8b-e4e2-884e-ae90-14546d6b3a73@yadro.com>
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <e6d75774-300d-c38d-3f07-0cbc39aff54e@virtuozzo.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [37.59.142.97]
-X-ClientProxiedBy: DAG7EX2.mxp5.local (172.16.2.62) To DAG4EX1.mxp5.local
- (172.16.2.31)
-X-Ovh-Tracer-GUID: ab3c29ee-1c46-44cd-a13a-0e3b32d48381
-X-Ovh-Tracer-Id: 8089872308167805734
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedruddthedguddttdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefuvfhfhffkffgfgggjtgfgihesthekredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeehuedtheeghfdvhedtueelteegvdefueektdefiefhffffieduuddtudfhgfevtdenucffohhmrghinhepghhithhhuhgsrdgtohhmnecukfhppedtrddtrddtrddtpdefjedrheelrddugedvrdeljeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehmgihplhgrnhehrdhmrghilhdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepihdrkhhonhhonhgvnhhkoheshigrughrohdrtghomh
-Received-SPF: pass client-ip=79.137.123.220; envelope-from=clg@kaod.org;
- helo=smtpout1.mo804.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 02:08:06
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -5
-X-Spam_score: -0.6
-X-Spam_bar: /
-X-Spam_report: (-0.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_BL_SPAMCOP_NET=1.347,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: none client-ip=207.211.31.81; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 02:16:14
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -85,71 +119,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Alistair Francis <alistair@alistair23.me>,
- "open list:All patches CC here" <qemu-devel@nongnu.org>,
- "open list:Block layer core" <qemu-block@nongnu.org>,
- Max Reitz <mreitz@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/17/20 7:16 PM, i.kononenko wrote:
-> No, the ext ID wasn't be checked at a real HW.
-> Just copied it from the U-boot official repository
-> https://github.com/u-boot/u-boot/blob/789bfb52668ee609b2043de645e2f94bbd24fd1f/drivers/mtd/spi/spi-nor-ids.c#L183
+On 13/08/20 18:34, Vladimir Sementsov-Ogievskiy wrote:
+> I thought bs is attached to one aio context and aio context attached to
+> one iothread.
 
+For now yes, but with multiqueue there would be many iothreads sending
+requests to the AioContext.  The BDS would still have a "home"
+aiocontext to request socket readiness events, but
+io_uring/linux_aio/threadpool requests could be issued from any iothread.
 
-OK.
+> And all normal request processing of the bs is done in this one iothread.
+> And when we need to access bs externally, we do it in
+> aio_context_acquire / aio_context_release, which protects from parallel
+> access to BlockDriverState fields...
+> 
+> But you say, that block/io.c is not protected by AioContext lock..
+> Does it mean that everything must be thread-safe in block/io.c and all
+> block drivers?
 
-Reviewed-by: Cédric Le Goater <clg@kaod.org>
-
-> Do i need to take it from a real HW and compare?
-No. That's fine :)
-
-Thanks,
-
-C. 
-
+Yes.
 
 > 
-> On 12.08.2020 10:27, Cédric Le Goater wrote:
->> On 8/11/20 10:37 PM, Igor Kononenko wrote:
->>> Support a following SPI flashes:
->>> * mx66l51235f
->>> * mt25ql512ab
->>>
->>> Signed-off-by: Igor Kononenko <i.kononenko@yadro.com>
->>> ---
->>>  hw/block/m25p80.c | 2 ++
->>>  1 file changed, 2 insertions(+)
->>>
->>> diff --git a/hw/block/m25p80.c b/hw/block/m25p80.c
->>> index 8227088441..bf1f833784 100644
->>> --- a/hw/block/m25p80.c
->>> +++ b/hw/block/m25p80.c
->>> @@ -219,6 +219,7 @@ static const FlashPartInfo known_devices[] = {
->>>      { INFO("mx25l12855e", 0xc22618,      0,  64 << 10, 256, 0) },
->>>      { INFO("mx25l25635e", 0xc22019,      0,  64 << 10, 512, 0) },
->>>      { INFO("mx25l25655e", 0xc22619,      0,  64 << 10, 512, 0) },
->>> +    { INFO("mx66l51235f", 0xc2201a,      0,  64 << 10, 1024, ER_4K | ER_32K) },
->>>      { INFO("mx66u51235f", 0xc2253a,      0,  64 << 10, 1024, ER_4K | ER_32K) },
->>>      { INFO("mx66u1g45g",  0xc2253b,      0,  64 << 10, 2048, ER_4K | ER_32K) },
->>>      { INFO("mx66l1g45g",  0xc2201b,      0,  64 << 10, 2048, ER_4K | ER_32K) },
->>> @@ -237,6 +238,7 @@ static const FlashPartInfo known_devices[] = {
->>>      { INFO("n25q128",     0x20ba18,      0,  64 << 10, 256, 0) },
->>>      { INFO("n25q256a",    0x20ba19,      0,  64 << 10, 512, ER_4K) },
->>>      { INFO("n25q512a",    0x20ba20,      0,  64 << 10, 1024, ER_4K) },
->>> +    { INFO("mt25ql512ab", 0x20ba20, 0x1044, 64 << 10, 1024, ER_4K | ER_32K) },
->>
->> Have checked the extended ID on real HW ? 
->>
->> C. 
->>
->>>      { INFO_STACKED("n25q00",    0x20ba21, 0x1000, 64 << 10, 2048, ER_4K, 4) },
->>>      { INFO_STACKED("n25q00a",   0x20bb21, 0x1000, 64 << 10, 2048, ER_4K, 4) },
->>>      { INFO_STACKED("mt25ql01g", 0x20ba21, 0x1040, 64 << 10, 2048, ER_4K, 2) },
->>>
->>
+> Are tracked_requests different from other fields? A lot of other
+> BlockDriverState
+> fields are not protected by any mutex.. For example: total_sectors,
+> file, backing..
+
+Rules are documented in include/block/block_int.h.  It seems however
+that never_freeze was blindly added at the end.
+
+Paolo
+
+> Could you give an example of parallel access to tracked_requests?
 > 
 
 
