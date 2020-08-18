@@ -7,84 +7,84 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E74C7C433DF
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3C8DC433E1
 	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 15:04:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A2E2E20786
+	by mail.kernel.org (Postfix) with ESMTPS id 95150206B5
 	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 15:04:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iHti6t2a"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2E2E20786
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CPxoFgSL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95150206B5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34944 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34962 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k83AH-0001Ce-QX
+	id 1k83AH-0001D9-Nm
 	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 11:04:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33172)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33392)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k82LI-0005EW-1a
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:12:00 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:43274
- helo=us-smtp-delivery-1.mimecast.com)
+ id 1k82LU-0005eO-1L
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:12:12 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48540)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k82L4-0007Vo-Rl
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:11:59 -0400
+ id 1k82LF-0007YZ-Sz
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:12:10 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597759906;
+ s=mimecast20190719; t=1597759917;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Zph8b3o0acW1hqgMdUrd8CqQt9M1Q9Sg6LBnXV8UIfQ=;
- b=iHti6t2aW5d6zy+L30dhDzqtyAIQTo9/n9NJrHNNTMXG586xBq3SkYc16GsxTuK4OgytlC
- y5PkVJv7o/Ek1Ed9O7kTgFTjICPj9ZEt++wGKVARU9MSMJTS2j8lWaRY0//CfAm2hhzEZp
- nltFfsaw8mI54rgOEdFcL9l+V0x7Cto=
+ bh=YaGCnkLq1J3mjmOFXpJRr8e/B9IOOrs8jkBkMapreho=;
+ b=CPxoFgSLs4mmhB5sxuRseXDz+2Ks1FRiM/QGFtjmxmxSj/dJZIBe/RR7/+tJdvQ888kLLu
+ R3rpZhxgslCB+ttcSwzNm3gf7/slnM+5l68qbGASfcoAT+jDOnRHMc90n7DWGzaYIvD60Q
+ ue0SZsjFoHKbK3MWjPQTrEexxQfrM9c=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-572-kvjlld3kOouUue_oD2Bg6g-1; Tue, 18 Aug 2020 10:11:44 -0400
-X-MC-Unique: kvjlld3kOouUue_oD2Bg6g-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-145-uBKWJbGpNN2uDGoSXf4KrQ-1; Tue, 18 Aug 2020 10:11:55 -0400
+X-MC-Unique: uBKWJbGpNN2uDGoSXf4KrQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 93E90186A56F
- for <qemu-devel@nongnu.org>; Tue, 18 Aug 2020 14:11:43 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D079180F040
+ for <qemu-devel@nongnu.org>; Tue, 18 Aug 2020 14:11:54 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2FC60261B8;
- Tue, 18 Aug 2020 14:11:43 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7FB3F196B6;
+ Tue, 18 Aug 2020 14:11:54 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 091/150] meson: convert hw/watchdog
-Date: Tue, 18 Aug 2020 10:09:26 -0400
-Message-Id: <20200818141025.21608-92-pbonzini@redhat.com>
+Subject: [PULL 109/150] meson: convert hw/isa
+Date: Tue, 18 Aug 2020 10:09:44 -0400
+Message-Id: <20200818141025.21608-110-pbonzini@redhat.com>
 In-Reply-To: <20200818141025.21608-1-pbonzini@redhat.com>
 References: <20200818141025.21608-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 02:16:14
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 03:22:11
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
 X-Spam_bar: ----
 X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -109,62 +109,70 @@ Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/Makefile.objs          | 1 -
- hw/meson.build            | 1 +
- hw/watchdog/Makefile.objs | 7 -------
- hw/watchdog/meson.build   | 7 +++++++
- 4 files changed, 8 insertions(+), 8 deletions(-)
- delete mode 100644 hw/watchdog/Makefile.objs
- create mode 100644 hw/watchdog/meson.build
+ hw/Makefile.objs     |  1 -
+ hw/isa/Makefile.objs | 11 -----------
+ hw/isa/meson.build   | 11 +++++++++++
+ hw/meson.build       |  1 +
+ 4 files changed, 12 insertions(+), 12 deletions(-)
+ delete mode 100644 hw/isa/Makefile.objs
+ create mode 100644 hw/isa/meson.build
 
 diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-index df72b25a64..9ebd13d7cd 100644
+index ac8278edf7..a28e211e78 100644
 --- a/hw/Makefile.objs
 +++ b/hw/Makefile.objs
-@@ -33,7 +33,6 @@ devices-dirs-$(CONFIG_TPM) += tpm/
- devices-dirs-y += usb/
- devices-dirs-$(CONFIG_VFIO) += vfio/
- devices-dirs-y += virtio/
--devices-dirs-y += watchdog/
+@@ -16,7 +16,6 @@ devices-dirs-y += input/
+ devices-dirs-y += intc/
+ devices-dirs-$(CONFIG_IPACK) += ipack/
+ devices-dirs-$(CONFIG_IPMI) += ipmi/
+-devices-dirs-y += isa/
  endif
  
  common-obj-y += $(devices-dirs-y)
+diff --git a/hw/isa/Makefile.objs b/hw/isa/Makefile.objs
+deleted file mode 100644
+index 8e73960a75..0000000000
+--- a/hw/isa/Makefile.objs
++++ /dev/null
+@@ -1,11 +0,0 @@
+-common-obj-$(CONFIG_ISA_BUS) += isa-bus.o
+-common-obj-$(CONFIG_ISA_SUPERIO) += isa-superio.o
+-common-obj-$(CONFIG_APM) += apm.o
+-common-obj-$(CONFIG_I82378) += i82378.o
+-common-obj-$(CONFIG_PC87312) += pc87312.o
+-common-obj-$(CONFIG_PIIX3) += piix3.o
+-common-obj-$(CONFIG_PIIX4) += piix4.o
+-common-obj-$(CONFIG_VT82C686) += vt82c686.o
+-common-obj-$(CONFIG_SMC37C669) += smc37c669-superio.o
+-
+-obj-$(CONFIG_LPC_ICH9) += lpc_ich9.o
+diff --git a/hw/isa/meson.build b/hw/isa/meson.build
+new file mode 100644
+index 0000000000..8bf678ca0a
+--- /dev/null
++++ b/hw/isa/meson.build
+@@ -0,0 +1,11 @@
++softmmu_ss.add(when: 'CONFIG_APM', if_true: files('apm.c'))
++softmmu_ss.add(when: 'CONFIG_I82378', if_true: files('i82378.c'))
++softmmu_ss.add(when: 'CONFIG_ISA_BUS', if_true: files('isa-bus.c'))
++softmmu_ss.add(when: 'CONFIG_ISA_SUPERIO', if_true: files('isa-superio.c'))
++softmmu_ss.add(when: 'CONFIG_PC87312', if_true: files('pc87312.c'))
++softmmu_ss.add(when: 'CONFIG_PIIX3', if_true: files('piix3.c'))
++softmmu_ss.add(when: 'CONFIG_PIIX4', if_true: files('piix4.c'))
++softmmu_ss.add(when: 'CONFIG_SMC37C669', if_true: files('smc37c669-superio.c'))
++softmmu_ss.add(when: 'CONFIG_VT82C686', if_true: files('vt82c686.c'))
++
++specific_ss.add(when: 'CONFIG_LPC_ICH9', if_true: files('lpc_ich9.c'))
 diff --git a/hw/meson.build b/hw/meson.build
-index 542d675618..f2209d900c 100644
+index 6ca82b0375..86598544e6 100644
 --- a/hw/meson.build
 +++ b/hw/meson.build
-@@ -3,4 +3,5 @@ subdir('mem')
- subdir('nubus')
- subdir('semihosting')
- subdir('smbios')
-+subdir('watchdog')
- subdir('xen')
-diff --git a/hw/watchdog/Makefile.objs b/hw/watchdog/Makefile.objs
-deleted file mode 100644
-index 631b711d86..0000000000
---- a/hw/watchdog/Makefile.objs
-+++ /dev/null
-@@ -1,7 +0,0 @@
--common-obj-y += watchdog.o
--common-obj-$(CONFIG_CMSDK_APB_WATCHDOG) += cmsdk-apb-watchdog.o
--common-obj-$(CONFIG_WDT_IB6300ESB) += wdt_i6300esb.o
--common-obj-$(CONFIG_WDT_IB700) += wdt_ib700.o
--common-obj-$(CONFIG_WDT_DIAG288) += wdt_diag288.o
--common-obj-$(CONFIG_ASPEED_SOC) += wdt_aspeed.o
--common-obj-$(CONFIG_WDT_IMX2) += wdt_imx2.o
-diff --git a/hw/watchdog/meson.build b/hw/watchdog/meson.build
-new file mode 100644
-index 0000000000..9b8725e642
---- /dev/null
-+++ b/hw/watchdog/meson.build
-@@ -0,0 +1,7 @@
-+softmmu_ss.add(files('watchdog.c'))
-+softmmu_ss.add(when: 'CONFIG_CMSDK_APB_WATCHDOG', if_true: files('cmsdk-apb-watchdog.c'))
-+softmmu_ss.add(when: 'CONFIG_WDT_IB6300ESB', if_true: files('wdt_i6300esb.c'))
-+softmmu_ss.add(when: 'CONFIG_WDT_IB700', if_true: files('wdt_ib700.c'))
-+softmmu_ss.add(when: 'CONFIG_WDT_DIAG288', if_true: files('wdt_diag288.c'))
-+softmmu_ss.add(when: 'CONFIG_ASPEED_SOC', if_true: files('wdt_aspeed.c'))
-+softmmu_ss.add(when: 'CONFIG_WDT_IMX2', if_true: files('wdt_imx2.c'))
+@@ -1,4 +1,5 @@
+ subdir('core')
++subdir('isa')
+ subdir('mem')
+ subdir('misc')
+ subdir('net')
 -- 
 2.26.2
 
