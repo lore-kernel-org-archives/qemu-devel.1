@@ -4,79 +4,79 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AED5C433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 14:34:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47F4FC433E1
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 14:35:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 26E92207DA
-	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 14:34:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0A3702076E
+	for <qemu-devel@archiver.kernel.org>; Tue, 18 Aug 2020 14:35:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GhoQ5GpL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 26E92207DA
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CP0LMxc9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A3702076E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49220 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53904 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k82ge-0003hl-Af
-	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 10:34:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32904)
+	id 1k82ha-0005mf-5P
+	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 10:35:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60542)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k82L5-0004iV-OC
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:11:47 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47329
+ id 1k82KX-0003ev-3W
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:11:13 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:46246
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k82Kw-0007UI-Ix
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:11:47 -0400
+ id 1k82KT-0007NX-UT
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 10:11:11 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597759897;
+ s=mimecast20190719; t=1597759865;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=/3/QFTaHMZY8X0WnvRIp0OgSFRNSCDVphPIw9WOe9DU=;
- b=GhoQ5GpL2GoViZ2IfkXiN9b5FFcjUyCle4w6p6rgoKPSa3e5aRgIN/O/WPcjZ55pA1nuTm
- EtOr5+soOG0AnWtw2jKGIGsfB3s//dptuheMxEEq01C/odg2LVZ/hSIcsSJxmr1HzX0jUi
- G+A3H4Rs6FjTpouwj93zfEWy1+pAS0w=
+ bh=I01kMBp63EOgupnkKBjWSy2Amff3pdqr9v9AU6HZRz4=;
+ b=CP0LMxc9no2vIAjNyGVbRY38cXFdlRdLduuXvLpViynTUDjXfaEyw8pHj9Nrrlbt5wUcXl
+ hE0/klT4/DxbI85m1u4+ssjK7OJbLVjcDNoWopXSFtGEXIU/jkAf7miqG/BL2Ku5Yv9v4h
+ 0iCmGPMek772DFArjK2aTbjCQKpOuAI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-331-vJtnx1omM0ePW8Zix7E3rQ-1; Tue, 18 Aug 2020 10:11:35 -0400
-X-MC-Unique: vJtnx1omM0ePW8Zix7E3rQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-496-R2vt8aTBPXOR73PnOCKEIw-1; Tue, 18 Aug 2020 10:11:02 -0400
+X-MC-Unique: R2vt8aTBPXOR73PnOCKEIw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7C5CF1007465
- for <qemu-devel@nongnu.org>; Tue, 18 Aug 2020 14:11:34 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BB857101962B
+ for <qemu-devel@nongnu.org>; Tue, 18 Aug 2020 14:11:01 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 379107DFC9;
- Tue, 18 Aug 2020 14:11:34 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 75E5659;
+ Tue, 18 Aug 2020 14:11:01 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 078/150] meson: convert replay directory to Meson
-Date: Tue, 18 Aug 2020 10:09:13 -0400
-Message-Id: <20200818141025.21608-79-pbonzini@redhat.com>
+Subject: [PULL 037/150] contrib/elf2dmp: convert to meson
+Date: Tue, 18 Aug 2020 10:08:32 -0400
+Message-Id: <20200818141025.21608-38-pbonzini@redhat.com>
 In-Reply-To: <20200818141025.21608-1-pbonzini@redhat.com>
 References: <20200818141025.21608-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 06:40:33
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 03:19:25
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -108,72 +108,111 @@ From: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Makefile.objs        |  1 -
- meson.build          |  1 +
- replay/Makefile.objs | 10 ----------
- replay/meson.build   | 12 ++++++++++++
- 4 files changed, 13 insertions(+), 11 deletions(-)
- delete mode 100644 replay/Makefile.objs
- create mode 100644 replay/meson.build
+ Makefile                      | 4 ----
+ Makefile.objs                 | 6 ------
+ configure                     | 3 ---
+ contrib/elf2dmp/Makefile.objs | 4 ----
+ contrib/elf2dmp/meson.build   | 5 +++++
+ meson.build                   | 6 ++++++
+ 6 files changed, 11 insertions(+), 17 deletions(-)
+ delete mode 100644 contrib/elf2dmp/Makefile.objs
+ create mode 100644 contrib/elf2dmp/meson.build
 
+diff --git a/Makefile b/Makefile
+index 208e98dd4d..653c16bb0d 100644
+--- a/Makefile
++++ b/Makefile
+@@ -293,7 +293,6 @@ dummy := $(call unnest-vars,, \
+                 authz-obj-y \
+                 chardev-obj-y \
+                 qga-obj-y \
+-                elf2dmp-obj-y \
+                 qga-vss-dll-obj-y \
+                 block-obj-y \
+                 block-obj-m \
+@@ -503,9 +502,6 @@ ifneq ($(EXESUF),)
+ qemu-ga: qemu-ga$(EXESUF) $(QGA_VSS_PROVIDER) $(QEMU_GA_MSI)
+ endif
+ 
+-elf2dmp$(EXESUF): $(elf2dmp-obj-y)
+-	$(call LINK, $^)
+-
+ module_block.h: $(SRC_PATH)/scripts/modules/module_block.py config-host.mak
+ 	$(call quiet-command,$(PYTHON) $< $@ \
+ 	$(addprefix $(SRC_PATH)/,$(patsubst %.mo,%.c,$(block-obj-m))), \
 diff --git a/Makefile.objs b/Makefile.objs
-index e304d92954..cfb2cf2b49 100644
+index 336a684ff3..1486254a2c 100644
 --- a/Makefile.objs
 +++ b/Makefile.objs
-@@ -68,7 +68,6 @@ common-obj-$(if $(and $(CONFIG_BZIP2),$(CONFIG_DMG)),m) += block-dmg-bz2$(DSOSUF
- common-obj-y += hw/
- common-obj-m += hw/
- 
--common-obj-y += replay/
- common-obj-y += backends/
- 
- common-obj-y += qapi/
+@@ -100,9 +100,3 @@ version-obj-$(CONFIG_WIN32) += $(BUILD_DIR)/version.o
+ # extracted into a QAPI schema module, or perhaps a separate schema.
+ qga-obj-y = qga/
+ qga-vss-dll-obj-y = qga/
+-
+-######################################################################
+-# contrib
+-elf2dmp-obj-y = contrib/elf2dmp/
+-
+-######################################################################
+diff --git a/configure b/configure
+index 932c0743e4..02b3336a32 100755
+--- a/configure
++++ b/configure
+@@ -6680,9 +6680,6 @@ if test "$want_tools" = "yes" ; then
+   if [ "$linux" = "yes" -o "$bsd" = "yes" -o "$solaris" = "yes" ] ; then
+     tools="qemu-nbd\$(EXESUF) qemu-storage-daemon\$(EXESUF) $tools"
+   fi
+-  if [ "$curl" = "yes" ]; then
+-      tools="elf2dmp\$(EXESUF) $tools"
+-  fi
+ fi
+ if test "$softmmu" = yes ; then
+   if test "$linux" = yes; then
+diff --git a/contrib/elf2dmp/Makefile.objs b/contrib/elf2dmp/Makefile.objs
+deleted file mode 100644
+index 1505716916..0000000000
+--- a/contrib/elf2dmp/Makefile.objs
++++ /dev/null
+@@ -1,4 +0,0 @@
+-elf2dmp-obj-y = main.o addrspace.o download.o pdb.o qemu_elf.o
+-
+-download.o-cflags := $(CURL_CFLAGS)
+-download.o-libs   := $(CURL_LIBS)
+diff --git a/contrib/elf2dmp/meson.build b/contrib/elf2dmp/meson.build
+new file mode 100644
+index 0000000000..b3de173316
+--- /dev/null
++++ b/contrib/elf2dmp/meson.build
+@@ -0,0 +1,5 @@
++if 'CONFIG_CURL' in config_host
++  executable('elf2dmp', files('main.c', 'addrspace.c', 'download.c', 'pdb.c', 'qemu_elf.c'),
++             dependencies: [glib, curl],
++             install: true)
++endif
 diff --git a/meson.build b/meson.build
-index cc714786a5..3d45a300e5 100644
+index 7bb5984652..1fd903c32a 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -653,6 +653,7 @@ common_ss.add(files('cpus-common.c'))
+@@ -107,6 +107,11 @@ if 'CONFIG_VIRGL' in config_host
+   virgl = declare_dependency(compile_args: config_host['VIRGL_CFLAGS'].split(),
+                              link_args: config_host['VIRGL_LIBS'].split())
+ endif
++curl = not_found
++if 'CONFIG_CURL' in config_host
++  curl = declare_dependency(compile_args: config_host['CURL_CFLAGS'].split(),
++                            link_args: config_host['CURL_LIBS'].split())
++endif
  
- subdir('softmmu')
- subdir('monitor')
-+subdir('replay')
+ target_dirs = config_host['TARGET_DIRS'].split()
+ have_user = false
+@@ -271,6 +276,7 @@ qemuutil = declare_dependency(link_with: libqemuutil,
  
- # needed for fuzzing binaries
- subdir('tests/qtest/libqos')
-diff --git a/replay/Makefile.objs b/replay/Makefile.objs
-deleted file mode 100644
-index 939be964a9..0000000000
---- a/replay/Makefile.objs
-+++ /dev/null
-@@ -1,10 +0,0 @@
--common-obj-y += replay.o
--common-obj-y += replay-internal.o
--common-obj-y += replay-events.o
--common-obj-y += replay-time.o
--common-obj-y += replay-input.o
--common-obj-y += replay-char.o
--common-obj-y += replay-snapshot.o
--common-obj-y += replay-net.o
--common-obj-y += replay-audio.o
--common-obj-y += replay-random.o
-diff --git a/replay/meson.build b/replay/meson.build
-new file mode 100644
-index 0000000000..8783aea7c8
---- /dev/null
-+++ b/replay/meson.build
-@@ -0,0 +1,12 @@
-+softmmu_ss.add(files(
-+  'replay.c',
-+  'replay-internal.c',
-+  'replay-events.c',
-+  'replay-time.c',
-+  'replay-input.c',
-+  'replay-char.c',
-+  'replay-snapshot.c',
-+  'replay-net.c',
-+  'replay-audio.c',
-+  'replay-random.c',
-+))
+ if have_tools
+   subdir('contrib/rdmacm-mux')
++  subdir('contrib/elf2dmp')
+ 
+   if 'CONFIG_VHOST_USER' in config_host
+     subdir('contrib/libvhost-user')
 -- 
 2.26.2
 
