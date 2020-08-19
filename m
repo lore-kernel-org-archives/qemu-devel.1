@@ -2,101 +2,76 @@ Return-Path: <SRS0=bVMU=B5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5318AC433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 06:49:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CFD33C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 06:52:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1B7E62063A
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 06:49:48 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jJoLkqYR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B7E62063A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9F52E2063A
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 06:52:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F52E2063A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=tuxfamily.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33214 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35406 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8Huu-0003a8-9c
-	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 02:49:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35712)
+	id 1k8Hxl-0004hF-VZ
+	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 02:52:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36256)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1k8HuE-00039O-Ib
- for qemu-devel@nongnu.org; Wed, 19 Aug 2020 02:49:06 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:34961)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1k8HuC-0006G6-1B
- for qemu-devel@nongnu.org; Wed, 19 Aug 2020 02:49:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597819739;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=P3uu5IFaLaLBaEne77p85Rm9zS0AYx6pt3UV8kDIKr8=;
- b=jJoLkqYRRfxPG4yqc5eoObneJiecH/1fU4J5csN2FlZZn4uwN2Oj0Y8DKbppTzmA+M0K1A
- qREJhwSTddabXIUgii9c2QTNJOWciWNWFagnG/1RmkpFCDq7O3p4O30ywfe+byabUSmOuM
- dZGQojptATr8d8azIH2mC409udjvDSY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-138-r2Pg7qBzPU6wKlhoBXCaRA-1; Wed, 19 Aug 2020 02:48:57 -0400
-X-MC-Unique: r2Pg7qBzPU6wKlhoBXCaRA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 17994186A560;
- Wed, 19 Aug 2020 06:48:54 +0000 (UTC)
-Received: from [10.72.13.88] (ovpn-13-88.pek2.redhat.com [10.72.13.88])
- by smtp.corp.redhat.com (Postfix) with ESMTP id EA8445C1DC;
- Wed, 19 Aug 2020 06:48:35 +0000 (UTC)
-Subject: Re: device compatibility interface for live migration with assigned
- devices
-To: Parav Pandit <parav@nvidia.com>, =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?=
- <berrange@redhat.com>
-References: <20200805021654.GB30485@joy-OptiPlex-7040>
- <2624b12f-3788-7e2b-2cb7-93534960bcb7@redhat.com>
- <20200805075647.GB2177@nanopsycho>
- <eb1d01c2-fbad-36b6-10cf-9e03483a736b@redhat.com>
- <20200805093338.GC30485@joy-OptiPlex-7040> <20200805105319.GF2177@nanopsycho>
- <20200810074631.GA29059@joy-OptiPlex-7040>
- <e6e75807-0614-bd75-aeb6-64d643e029d3@redhat.com>
- <20200814051601.GD15344@joy-OptiPlex-7040>
- <a51209fe-a8c6-941f-ff54-7be06d73bc44@redhat.com>
- <20200818085527.GB20215@redhat.com>
- <3a073222-dcfe-c02d-198b-29f6a507b2e1@redhat.com>
- <BY5PR12MB43222059335C96F7B050CFDCDC5C0@BY5PR12MB4322.namprd12.prod.outlook.com>
- <934c8d2a-a34e-6c68-0e53-5de2a8f49d19@redhat.com>
- <BY5PR12MB4322CD6B3C697B6F1807ECBFDC5D0@BY5PR12MB4322.namprd12.prod.outlook.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <115147a9-3d8c-aa95-c43d-251a321ac152@redhat.com>
-Date: Wed, 19 Aug 2020 14:48:34 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <th.huth@gmail.com>) id 1k8HxE-0004Gd-7k
+ for qemu-devel@nongnu.org; Wed, 19 Aug 2020 02:52:12 -0400
+Received: from mail-ed1-f66.google.com ([209.85.208.66]:33507)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <th.huth@gmail.com>) id 1k8HxC-0006c6-4M
+ for qemu-devel@nongnu.org; Wed, 19 Aug 2020 02:52:11 -0400
+Received: by mail-ed1-f66.google.com with SMTP id v22so17209266edy.0
+ for <qemu-devel@nongnu.org>; Tue, 18 Aug 2020 23:52:09 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=+Ry/DktSl5XfwDZgy3PJpnKHT/LG80fCdmSr74IK76o=;
+ b=WzX7dhnHsejM0x7AjjHJanJn4kruc/ZoEVgSAVp69m3Ya5lAjBttepEkguR28BJw5g
+ Vwf8ZGMQize9jI0gs4jfEOVdRCD14VMSgn+Ku9uYwPZtezVp7xCvB6tYibcIqs06tZTc
+ /Lc88WYj7iJj7pefCFboboj8zPFP4IgIavHtUOn1i4kBzQp2SU2bLNEuEwLOLa4LgfHP
+ omEmkeBuxlD2lb/EAnAb+vZo9ezZaIkceRpnIWBRvqknfLL1+nhiIWCE3n2MOgtcgc1s
+ pNgGACEQ4Koz+EQP9MeDFBq9Wxh0s1ifPSZiKT7hmSxLhqxCjPWOR9qHFMEAbtwFE1Mi
+ cQvA==
+X-Gm-Message-State: AOAM5331My/2Wi7gbztvmJskx0NMHiQ2ou6mnPRkXoVLhnGE23eTHhV+
+ R5opr5KKn/1Cc7itj+Qyx5ogJZBq8lM=
+X-Google-Smtp-Source: ABdhPJz485dU4e9hLlVyL+9e3qyNuunT+k5zscqzivvph3Y8xZmwipyZnHKha5EiEuALKp2RHyjSlw==
+X-Received: by 2002:aa7:dc44:: with SMTP id g4mr23609077edu.273.1597819927148; 
+ Tue, 18 Aug 2020 23:52:07 -0700 (PDT)
+Received: from thl530.multi.box (pd9e839dc.dip0.t-ipconnect.de.
+ [217.232.57.220])
+ by smtp.gmail.com with ESMTPSA id l3sm16948063edv.3.2020.08.18.23.52.06
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 18 Aug 2020 23:52:06 -0700 (PDT)
+From: Thomas Huth <huth@tuxfamily.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] hw/m68k: QOMify the mcf5206 system integration module
+Date: Wed, 19 Aug 2020 08:52:01 +0200
+Message-Id: <20200819065201.4045-1-huth@tuxfamily.org>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-In-Reply-To: <BY5PR12MB4322CD6B3C697B6F1807ECBFDC5D0@BY5PR12MB4322.namprd12.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=jasowang@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/19 01:28:55
+Received-SPF: pass client-ip=209.85.208.66; envelope-from=th.huth@gmail.com;
+ helo=mail-ed1-f66.google.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/19 02:52:08
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: -8
+X-Spam_score: -0.9
+X-Spam_bar: /
+X-Spam_report: (-0.9 / 5.0 requ) BAYES_00=-1.9, FREEMAIL_FORGED_FROMDOMAIN=1,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -109,186 +84,162 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "libvir-list@redhat.com" <libvir-list@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Kirti Wankhede <kwankhede@nvidia.com>, "eauger@redhat.com" <eauger@redhat.com>,
- "xin-ran.wang@intel.com" <xin-ran.wang@intel.com>,
- "corbet@lwn.net" <corbet@lwn.net>, "openstack-discuss@lists.openstack.org"
- <openstack-discuss@lists.openstack.org>,
- "shaohe.feng@intel.com" <shaohe.feng@intel.com>,
- "kevin.tian@intel.com" <kevin.tian@intel.com>, Yan Zhao <yan.y.zhao@intel.com>,
- Parav Pandit <parav@mellanox.com>,
- "jian-feng.ding@intel.com" <jian-feng.ding@intel.com>,
- "dgilbert@redhat.com" <dgilbert@redhat.com>,
- "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
- "hejie.xu@intel.com" <hejie.xu@intel.com>,
- "bao.yumeng@zte.com.cn" <bao.yumeng@zte.com.cn>,
- Alex Williamson <alex.williamson@redhat.com>,
- "eskultet@redhat.com" <eskultet@redhat.com>,
- "smooney@redhat.com" <smooney@redhat.com>,
- "intel-gvt-dev@lists.freedesktop.org" <intel-gvt-dev@lists.freedesktop.org>,
- Cornelia Huck <cohuck@redhat.com>, Jiri Pirko <jiri@mellanox.com>,
- "dinechin@redhat.com" <dinechin@redhat.com>,
- "devel@ovirt.org" <devel@ovirt.org>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+The mcf5206 system integration module should be a proper device.
+Let's finally QOMify it.
 
-On 2020/8/19 下午1:26, Parav Pandit wrote:
->
->> From: Jason Wang <jasowang@redhat.com>
->> Sent: Wednesday, August 19, 2020 8:16 AM
->
->> On 2020/8/18 下午5:32, Parav Pandit wrote:
->>> Hi Jason,
->>>
->>> From: Jason Wang <jasowang@redhat.com>
->>> Sent: Tuesday, August 18, 2020 2:32 PM
->>>
->>>
->>> On 2020/8/18 下午4:55, Daniel P. Berrangé wrote:
->>> On Tue, Aug 18, 2020 at 11:24:30AM +0800, Jason Wang wrote:
->>> On 2020/8/14 下午1:16, Yan Zhao wrote:
->>> On Thu, Aug 13, 2020 at 12:24:50PM +0800, Jason Wang wrote:
->>> On 2020/8/10 下午3:46, Yan Zhao wrote:
->>> driver is it handled by?
->>> It looks that the devlink is for network device specific, and in
->>> devlink.h, it says include/uapi/linux/devlink.h - Network physical
->>> device Netlink interface, Actually not, I think there used to have
->>> some discussion last year and the conclusion is to remove this
->>> comment.
->>>
->>> [...]
->>>
->>>> Yes, but it could be hard. E.g vDPA will chose to use devlink (there's a long
->> debate on sysfs vs devlink). So if we go with sysfs, at least two APIs needs to be
->> supported ...
->>> We had internal discussion and proposal on this topic.
->>> I wanted Eli Cohen to be back from vacation on Wed 8/19, but since this is
->> active discussion right now, I will share the thoughts anyway.
->>> Here are the initial round of thoughts and proposal.
->>>
->>> User requirements:
->>> ---------------------------
->>> 1. User might want to create one or more vdpa devices per PCI PF/VF/SF.
->>> 2. User might want to create one or more vdpa devices of type net/blk or
->> other type.
->>> 3. User needs to look and dump at the health of the queues for debug purpose.
->>> 4. During vdpa net device creation time, user may have to provide a MAC
->> address and/or VLAN.
->>> 5. User should be able to set/query some of the attributes for
->>> debug/compatibility check 6. When user wants to create vdpa device, it needs
->> to know which device supports creation.
->>> 7. User should be able to see the queue statistics of doorbells, wqes
->>> etc regardless of class type
->>
->> Note that wqes is probably not something common in all of the vendors.
-> Yes. I virtq descriptors stats is better to monitor the virtqueues.
->
->>
->>> To address above requirements, there is a need of vendor agnostic tool, so
->> that user can create/config/delete vdpa device(s) regardless of the vendor.
->>> Hence,
->>> We should have a tool that lets user do it.
->>>
->>> Examples:
->>> -------------
->>> (a) List parent devices which supports creating vdpa devices.
->>> It also shows which class types supported by this parent device.
->>> In below command two parent devices support vdpa device creation.
->>> First is PCI VF whose bdf is 03.00:5.
->>> Second is PCI SF whose name is mlx5_sf.1
->>>
->>> $ vdpa list pd
->>
->> What did "pd" mean?
->>
-> Parent device which support creation of one or more vdpa devices.
-> In a system there can be multiple parent devices which may be support vdpa creation.
-> User should be able to know which devices support it, and when user creates a vdpa device, it tells which parent device to use for creation as done in below vdpa dev add example.
->>> pci/0000:03.00:5
->>>     class_supports
->>>       net vdpa
->>> virtbus/mlx5_sf.1
->>
->> So creating mlx5_sf.1 is the charge of devlink?
->>
-> Yes.
-> But here vdpa tool is working at the parent device identifier {bus+name} instead of devlink identifier.
->
->
->>>     class_supports
->>>       net
->>>
->>> (b) Now add a vdpa device and show the device.
->>> $ vdpa dev add pci/0000:03.00:5 type net
->>
->> So if you want to create devices types other than vdpa on
->> pci/0000:03.00:5 it needs some synchronization with devlink?
-> Please refer to FAQ-1,  a new tool is not linked to devlink because vdpa will evolve with time and devlink will fall short.
-> So no, it doesn't need any synchronization with devlink.
-> As long as parent device exist, user can create it.
-> All synchronization will be within drivers/vdpa/vdpa.c
-> This user interface is exposed via new netlink family by doing genl_register_family() with new name "vdpa" in drivers/vdpa/vdpa.c.
+Signed-off-by: Thomas Huth <huth@tuxfamily.org>
+---
+ hw/m68k/an5206.c      | 14 ++++++++++++--
+ hw/m68k/mcf5206.c     | 44 ++++++++++++++++++++++++++++++++++---------
+ include/hw/m68k/mcf.h |  3 +--
+ 3 files changed, 48 insertions(+), 13 deletions(-)
 
-
-Just to make sure I understand here.
-
-Consider we had virtbus/mlx5_sf.1. Process A want to create a vDPA 
-instance on top of it but Process B want to create a IB instance. Then I 
-think some synchronization is needed at at least parent device level?
-
-
->
->>
->>> $ vdpa dev show
->>> vdpa0@pci/0000:03.00:5 type net state inactive maxqueues 8 curqueues 4
->>>
->>> (c) vdpa dev show features vdpa0
->>> iommu platform
->>> version 1
->>>
->>> (d) dump vdpa statistics
->>> $ vdpa dev stats show vdpa0
->>> kickdoorbells 10
->>> wqes 100
->>>
->>> (e) Now delete a vdpa device previously created.
->>> $ vdpa dev del vdpa0
->>>
->>> Design overview:
->>> -----------------------
->>> 1. Above example tool runs over netlink socket interface.
->>> 2. This enables users to return meaningful error strings in addition to code so
->> that user can be more informed.
->>> Often this is missing in ioctl()/configfs/sysfs interfaces.
->>> 3. This tool over netlink enables syscaller tests to be more usable like other
->> subsystems to keep kernel robust
->>> 4. This provides vendor agnostic view of all vdpa capable parent and vdpa
->> devices.
->>> 5. Each driver which supports vdpa device creation, registers the parent device
->> along with supported classes.
->>> FAQs:
->>> --------
->>> 1. Why not using devlink?
->>> Ans: Because as vdpa echo system grows, devlink will fall short of extending
->> vdpa specific params, attributes, stats.
->>
->>
->> This should be fine but it's still not clear to me the difference
->> between a vdpa netlink and a vdpa object in devlink.
->>
-> The difference is a vdpa specific tool work at the parent device level.
-> It is likely more appropriate to because it can self-contain everything needed to create/delete devices, view/set features, stats.
-> Trying to put that in devlink will fall short as devlink doesn’t have vdpa definitions.
-> Typically when a class/device subsystem grows, its own tool is wiser like iproute2/ip, iproute2/tc, iproute2/rdma.
-
-
-Ok, I see.
-
-Thanks
-
+diff --git a/hw/m68k/an5206.c b/hw/m68k/an5206.c
+index 846f4e40c6..673898b0ea 100644
+--- a/hw/m68k/an5206.c
++++ b/hw/m68k/an5206.c
+@@ -21,7 +21,17 @@
+ #define AN5206_MBAR_ADDR 0x10000000
+ #define AN5206_RAMBAR_ADDR 0x20000000
+ 
+-/* Board init.  */
++static void mcf5206_init(MemoryRegion *sysmem, uint32_t base)
++{
++    DeviceState *dev;
++    SysBusDevice *s;
++
++    dev = qdev_new(TYPE_MCF5206_MBAR);
++    s = SYS_BUS_DEVICE(dev);
++    sysbus_realize_and_unref(s, &error_fatal);
++
++    memory_region_add_subregion(sysmem, base, sysbus_mmio_get_region(s, 0));
++}
+ 
+ static void an5206_init(MachineState *machine)
+ {
+@@ -51,7 +61,7 @@ static void an5206_init(MachineState *machine)
+     memory_region_init_ram(sram, NULL, "an5206.sram", 512, &error_fatal);
+     memory_region_add_subregion(address_space_mem, AN5206_RAMBAR_ADDR, sram);
+ 
+-    mcf5206_init(address_space_mem, AN5206_MBAR_ADDR, cpu);
++    mcf5206_init(address_space_mem, AN5206_MBAR_ADDR);
+ 
+     /* Load kernel.  */
+     if (!kernel_filename) {
+diff --git a/hw/m68k/mcf5206.c b/hw/m68k/mcf5206.c
+index 94a37a1a46..51d2e0da1c 100644
+--- a/hw/m68k/mcf5206.c
++++ b/hw/m68k/mcf5206.c
+@@ -15,6 +15,7 @@
+ #include "qemu/timer.h"
+ #include "hw/ptimer.h"
+ #include "sysemu/sysemu.h"
++#include "hw/sysbus.h"
+ 
+ /* General purpose timer module.  */
+ typedef struct {
+@@ -159,6 +160,8 @@ static m5206_timer_state *m5206_timer_init(qemu_irq irq)
+ /* System Integration Module.  */
+ 
+ typedef struct {
++    SysBusDevice parent_obj;
++
+     M68kCPU *cpu;
+     MemoryRegion iomem;
+     m5206_timer_state *timer[2];
+@@ -174,6 +177,8 @@ typedef struct {
+     uint8_t uivr[2];
+ } m5206_mbar_state;
+ 
++#define MCF5206_MBAR(obj) OBJECT_CHECK(m5206_mbar_state, (obj), TYPE_MCF5206_MBAR)
++
+ /* Interrupt controller.  */
+ 
+ static int m5206_find_pending_irq(m5206_mbar_state *s)
+@@ -257,8 +262,10 @@ static void m5206_mbar_set_irq(void *opaque, int irq, int level)
+ 
+ /* System Integration Module.  */
+ 
+-static void m5206_mbar_reset(m5206_mbar_state *s)
++static void m5206_mbar_reset(DeviceState *dev)
+ {
++    m5206_mbar_state *s = MCF5206_MBAR(dev);
++
+     s->scr = 0xc0;
+     s->icr[1] = 0x04;
+     s->icr[2] = 0x08;
+@@ -578,24 +585,43 @@ static const MemoryRegionOps m5206_mbar_ops = {
+     .endianness = DEVICE_NATIVE_ENDIAN,
+ };
+ 
+-qemu_irq *mcf5206_init(MemoryRegion *sysmem, uint32_t base, M68kCPU *cpu)
++static void mcf5206_mbar_realize(DeviceState *dev, Error **errp)
+ {
+-    m5206_mbar_state *s;
++    m5206_mbar_state *s = MCF5206_MBAR(dev);
+     qemu_irq *pic;
+ 
+-    s = g_new0(m5206_mbar_state, 1);
+-
+     memory_region_init_io(&s->iomem, NULL, &m5206_mbar_ops, s,
+                           "mbar", 0x00001000);
+-    memory_region_add_subregion(sysmem, base, &s->iomem);
++    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->iomem);
+ 
+     pic = qemu_allocate_irqs(m5206_mbar_set_irq, s, 14);
+     s->timer[0] = m5206_timer_init(pic[9]);
+     s->timer[1] = m5206_timer_init(pic[10]);
+     s->uart[0] = mcf_uart_init(pic[12], serial_hd(0));
+     s->uart[1] = mcf_uart_init(pic[13], serial_hd(1));
+-    s->cpu = cpu;
++    s->cpu = M68K_CPU(qemu_get_cpu(0));
++}
++
++static void mcf5206_mbar_class_init(ObjectClass *oc, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(oc);
+ 
+-    m5206_mbar_reset(s);
+-    return pic;
++    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
++    dc->desc = "MCF5206 system integration module";
++    dc->realize = mcf5206_mbar_realize;
++    dc->reset = m5206_mbar_reset;
+ }
++
++static const TypeInfo mcf5206_mbar_info = {
++    .name          = TYPE_MCF5206_MBAR,
++    .parent        = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(m5206_mbar_state),
++    .class_init    = mcf5206_mbar_class_init,
++};
++
++static void mcf5206_mbar_register_types(void)
++{
++    type_register_static(&mcf5206_mbar_info);
++}
++
++type_init(mcf5206_mbar_register_types)
+diff --git a/include/hw/m68k/mcf.h b/include/hw/m68k/mcf.h
+index 0db49c5e60..decf17ce42 100644
+--- a/include/hw/m68k/mcf.h
++++ b/include/hw/m68k/mcf.h
+@@ -18,7 +18,6 @@ qemu_irq *mcf_intc_init(struct MemoryRegion *sysmem,
+                         M68kCPU *cpu);
+ 
+ /* mcf5206.c */
+-qemu_irq *mcf5206_init(struct MemoryRegion *sysmem,
+-                       uint32_t base, M68kCPU *cpu);
++#define TYPE_MCF5206_MBAR "mcf5206-mbar"
+ 
+ #endif
+-- 
+2.26.2
 
 
