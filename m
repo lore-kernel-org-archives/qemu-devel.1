@@ -2,105 +2,63 @@ Return-Path: <SRS0=bVMU=B5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,HK_RANDOM_FROM,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11B55C433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 16:11:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7844EC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 16:24:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D292120888
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 16:11:20 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N65h0nKg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D292120888
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4D5FA2083B
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 16:24:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D5FA2083B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55934 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38478 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8QgK-0003ey-5y
-	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 12:11:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46048)
+	id 1k8Qsr-0000bz-Gx
+	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 12:24:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51702)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k8QZ6-0003jI-5k
- for qemu-devel@nongnu.org; Wed, 19 Aug 2020 12:03:52 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:39579
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k8QZ4-0005sU-As
- for qemu-devel@nongnu.org; Wed, 19 Aug 2020 12:03:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597853026;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=iAIS2oTaw8KHQnBQMzKd61Xt0Ca1CzJQZMv3ZWJBLc0=;
- b=N65h0nKgVPNpgayFmfGCTR5fzVmfl1+L0cg/lTtx42R+j6jnzxtk0h1yA5LQ2WwwVOOF4Z
- /bnEuyAT4yem9PXKpsb6LM2ZLNXqSslUnEQOwWSqAh2K0DDyRgUaEOCE5pTclifsRgbMTZ
- F5axHTZMxBbB6XHGOd+4iR0EMPrYnh8=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-297-9wIy-FxiP1qi5cpWxJYUEQ-1; Wed, 19 Aug 2020 12:03:43 -0400
-X-MC-Unique: 9wIy-FxiP1qi5cpWxJYUEQ-1
-Received: by mail-wm1-f70.google.com with SMTP id k204so1197646wmb.3
- for <qemu-devel@nongnu.org>; Wed, 19 Aug 2020 09:03:43 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=iAIS2oTaw8KHQnBQMzKd61Xt0Ca1CzJQZMv3ZWJBLc0=;
- b=JT+3v8kwoprIHPtp3oEd1CsdULYTLCwJQhMxaa6gt43ysG1e0PrdDbOy2cRvwrgDfY
- HsJoR0zJO6lrBkgEXUl07ltJbTvp/Tbq+4L//+UkjZWpQwMW8c6tMk9lnqY1Vl0UO3W7
- /DyGbCOcjoZfP5C1w1Drf03Kt1wPuTHGUzj0xVO/mkXUt9a0BIOoloUPTUJ1smZBCc+Y
- t5c4pTGmT/C2cDAcv7q1t3InMwl02KRHsxEqMrWbS7EcRksOR6xHS3a7/w4b8eLdwMqU
- ouxkSgPQWa4VcKCmKDVhBXYxNE7e5ZcdBoj4fnS1TAEARRtIjMH/+SXcxUgvRDAKrBfY
- LDuw==
-X-Gm-Message-State: AOAM531qZiAW2Yq7YOUlMzMh404JZeqNV8ejEvYUfwKtGgCC+Gqu7dh3
- 5+5gzk90Kumc5UZyK1oTAAOF1+qolcxhNbNgpGXBQH/UbgfLIlX3f1A0uis8BxCAykOuQorHmgk
- w0KylRtpsc8W/wzY=
-X-Received: by 2002:adf:dfc7:: with SMTP id q7mr25569728wrn.80.1597853022146; 
- Wed, 19 Aug 2020 09:03:42 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyhy9t8bEtMPSS1J76XXdWjgSuWKev5bmIvy7wNcRq4eJjDML5X945784FWXO+Sa9JT1jWhQg==
-X-Received: by 2002:adf:dfc7:: with SMTP id q7mr25569713wrn.80.1597853021965; 
- Wed, 19 Aug 2020 09:03:41 -0700 (PDT)
-Received: from x1w.redhat.com (121.red-81-40-121.staticip.rima-tde.net.
- [81.40.121.121])
- by smtp.gmail.com with ESMTPSA id 126sm6646552wme.42.2020.08.19.09.03.40
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 19 Aug 2020 09:03:41 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [RFC PATCH v4 4/5] util/vfio-helpers: Introduce
- qemu_vfio_pci_init_msix_irqs()
-Date: Wed, 19 Aug 2020 18:03:17 +0200
-Message-Id: <20200819160318.835292-5-philmd@redhat.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200819160318.835292-1-philmd@redhat.com>
-References: <20200819160318.835292-1-philmd@redhat.com>
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1k8Qrj-0008KZ-Kj
+ for qemu-devel@nongnu.org; Wed, 19 Aug 2020 12:23:07 -0400
+Received: from relay64.bu.edu ([128.197.228.104]:57831)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1k8Qrh-0008OW-AR
+ for qemu-devel@nongnu.org; Wed, 19 Aug 2020 12:23:07 -0400
+X-Envelope-From: alxndr@bu.edu
+X-BU-AUTH: mozz.bu.edu [128.197.127.33]
+Received: from BU-AUTH (localhost.localdomain [127.0.0.1]) (authenticated
+ bits=0)
+ by relay64.bu.edu (8.14.3/8.14.3) with ESMTP id 07JGMB1D027134
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+ Wed, 19 Aug 2020 12:22:15 -0400
+Date: Wed, 19 Aug 2020 12:22:11 -0400
+From: Alexander Bulekov <alxndr@bu.edu>
+To: Li Qiang <liq3ea@gmail.com>
+Subject: Re: [PATCH] qtest: add fuzz test case
+Message-ID: <20200819162211.5z6blwmgy35mw6dk@mozz.bu.edu>
+References: <20200819141533.66354-1-liq3ea@163.com>
+ <baabaa94-e4bf-3578-2f78-624704eb29c4@redhat.com>
+ <CAKXe6S+Vpe5NH4j22deQLxZaX7NRFtwvGR0FhEoBPPNdK33ibQ@mail.gmail.com>
 MIME-Version: 1.0
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0.003
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8;
-	text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/19 01:46:53
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+In-Reply-To: <CAKXe6S+Vpe5NH4j22deQLxZaX7NRFtwvGR0FhEoBPPNdK33ibQ@mail.gmail.com>
+Received-SPF: pass client-ip=128.197.228.104; envelope-from=alxndr@bu.edu;
+ helo=relay64.bu.edu
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/19 12:23:04
+X-ACL-Warn: Detected OS   = Linux 2.6.x
+X-Spam_score_int: -31
+X-Spam_score: -3.2
+X-Spam_bar: ---
+X-Spam_report: (-3.2 / 5.0 requ) BAYES_00=-1.9, HK_RANDOM_ENVFROM=0.001,
+ HK_RANDOM_FROM=1, RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -113,107 +71,286 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Li Qiang <liq3ea@163.com>, Qemu Developers <qemu-devel@nongnu.org>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-qemu_vfio_pci_init_irq() allows us to initialize any type of IRQ,
-but only one. Introduce qemu_vfio_pci_init_msix_irqs() which is
-specific to MSIX IRQ type, and allow us to use multiple IRQs
-(thus passing multiple eventfd notifiers).
+On 200819 2250, Li Qiang wrote:
+> Philippe Mathieu-Daudé <philmd@redhat.com> 于2020年8月19日周三 下午10:38写道：
+> 
+> > On 8/19/20 4:15 PM, Li Qiang wrote:
+> > > Currently the device fuzzer find a more and more issues.
+> > > For every fuzz case, we need not only the fixes but also
+> > > the coressponding test case. We can analysis the reproducer
+> >
+> > Typo "corresponding"
+> >
+> 
+> Will correct in next revision.
+> 
+> 
+> >
+> > > for every case and find what happened in where and write
+> > > a beautiful test case. However the raw data of reproducer is not
+> > > friendly to analysis. It will take a very long time, even far more
+> > > than the fixes itself. So let's create a new file to hold all of
+> > > the fuzz test cases and just use the raw data to act as the test
+> > > case. This way nobody will be afraid of writing a test case for
+> > > the fuzz reproducer.
+> >
+> > Ahaha nice :)
+> >
 
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
----
- include/qemu/vfio-helpers.h |  2 ++
- util/vfio-helpers.c         | 57 +++++++++++++++++++++++++++++++++++++
- 2 files changed, 59 insertions(+)
+So the problem is that QOS isn't built out-enough for all of the devices
+that we want to test, and it would take a lot of time to translate the
+fuzzer-generated reproducer each time we want to add a test?
 
-diff --git a/include/qemu/vfio-helpers.h b/include/qemu/vfio-helpers.h
-index 1f057c2b9e4..8e6bd83ea41 100644
---- a/include/qemu/vfio-helpers.h
-+++ b/include/qemu/vfio-helpers.h
-@@ -28,5 +28,7 @@ void qemu_vfio_pci_unmap_bar(QEMUVFIOState *s, int index, void *bar,
-                              uint64_t offset, uint64_t size);
- int qemu_vfio_pci_init_irq(QEMUVFIOState *s, EventNotifier *e,
-                            int irq_type, Error **errp);
-+int qemu_vfio_pci_init_msix_irqs(QEMUVFIOState *s, EventNotifier *e,
-+                                 unsigned *irq_count, Error **errp);
- 
- #endif
-diff --git a/util/vfio-helpers.c b/util/vfio-helpers.c
-index 8f4a3d452ed..6f833972587 100644
---- a/util/vfio-helpers.c
-+++ b/util/vfio-helpers.c
-@@ -216,6 +216,63 @@ int qemu_vfio_pci_init_irq(QEMUVFIOState *s, EventNotifier *e,
-     return 0;
- }
- 
-+/**
-+ * Initialize device MSIX IRQs and register event notifiers.
-+ * @irq_count: pointer to number of MSIX IRQs to initialize
-+ * @notifier: Array of @irq_count notifiers (each corresponding to a MSIX IRQ)
-+
-+ * If the number of IRQs requested exceeds the available on the device,
-+ * store the number of available IRQs in @irq_count and return -EOVERFLOW.
-+ */
-+int qemu_vfio_pci_init_msix_irqs(QEMUVFIOState *s, EventNotifier *notifier,
-+                                 unsigned *irq_count, Error **errp)
-+{
-+    int r;
-+    size_t irq_set_size;
-+    struct vfio_irq_set *irq_set;
-+    struct vfio_irq_info irq_info = {
-+        .argsz = sizeof(irq_info),
-+        .index = VFIO_PCI_MSIX_IRQ_INDEX
-+    };
-+
-+    if (ioctl(s->device, VFIO_DEVICE_GET_IRQ_INFO, &irq_info)) {
-+        error_setg_errno(errp, errno, "Failed to get device interrupt info");
-+        return -errno;
-+    }
-+    if (irq_info.count < *irq_count) {
-+        error_setg(errp, "Not enough device interrupts available");
-+        *irq_count = irq_info.count;
-+        return -EOVERFLOW;
-+    }
-+    if (!(irq_info.flags & VFIO_IRQ_INFO_EVENTFD)) {
-+        error_setg(errp, "Device interrupt doesn't support eventfd");
-+        return -EINVAL;
-+    }
-+
-+    irq_set_size = sizeof(*irq_set) + *irq_count * sizeof(int32_t);
-+    irq_set = g_malloc0(irq_set_size);
-+
-+    /* Get to a known IRQ state */
-+    *irq_set = (struct vfio_irq_set) {
-+        .argsz = irq_set_size,
-+        .flags = VFIO_IRQ_SET_DATA_EVENTFD | VFIO_IRQ_SET_ACTION_TRIGGER,
-+        .index = irq_info.index,
-+        .start = 0,
-+        .count = *irq_count,
-+    };
-+
-+    for (unsigned i = 0; i < *irq_count; i++) {
-+        ((int32_t *)&irq_set->data)[i] = event_notifier_get_fd(&notifier[i]);
-+    }
-+    r = ioctl(s->device, VFIO_DEVICE_SET_IRQS, irq_set);
-+    g_free(irq_set);
-+    if (r) {
-+        error_setg_errno(errp, errno, "Failed to setup device interrupts");
-+        return -errno;
-+    }
-+    return 0;
-+}
-+
- static int qemu_vfio_pci_read_config(QEMUVFIOState *s, void *buf,
-                                      int size, int ofs)
- {
--- 
-2.26.2
+If we want some context for the crashing trace, but cannot build out a
+full test, we could add trace events to the actual device code. This
+should be a small amount of work compared to building a full-fledged
+tests, but maybe I'm wrong.
 
+For the issue in question, there are already some trace points.
+If I run the repro with -trace 'pci*' -trace 'megasas*' -trace 'scsi*' :
+Reformat the trace somewhat and add some annotations for the data that
+comes from DMA:
+
+# megasas_init Using 80 sges, 1000 cmds, raid mode
+# scsi_device_set_ua target 0 lun 0 key 0x06 asc 0x29 ascq 0x00
+# megasas_reset firmware state 0xb0000000
+outl 0xcf8 0x80001818
+outl 0xcfc 0xc101
+# pci_cfg_write megasas 03:0 @0x18 <- 0xc101
+outl 0xcf8 0x8000181c
+outl 0xcf8 0x80001804
+outw 0xcfc 0x7
+# pci_cfg_write megasas 03:0 @0x4 <- 0x7
+# pci_update_mappings_add d=0x7fd3b8fbd800 00:03.0 2,0xc100+0x100
+outl 0xcf8 0x8000186a
+write 0x14 0x1 0xfe     # DMA Buffer
+write 0x0 0x1 0x02      # DMA Buffer
+outb 0xc1c0 0x17
+# megasas_mmio_writel reg MFI_IQPL: 0x17
+# megasas_qf_new frame 0x0 addr 0x0
+# megasas_qf_enqueue frame 0x0 count 11 context 0x0 head 0x0 tail 0x0 busy 1
+#  LD Write dev 0/0 lba 0x0 count 254
+#  len 0 limit 520192
+# scsi_req_parsed target 0 lun 0 tag 0 command 138 dir 2 length 520192
+# scsi_req_parsed_lba target 0 lun 0 tag 0 command 138 lba 0
+# scsi_req_alloc target 0 lun 0 tag 0
+# scsi_disk_new_request Command: lun=0 tag=0x0 data= 0x8a 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0xfe 0x00 0x00
+# scsi_disk_dma_command_WRITE Write (sector 0, count 254)
+# scsi_req_continue target 0 lun 0 tag 0
+
+I don't know how useful this trace is, but maybe we can provide it
+alongside the reproducer that we commit to the repo. Maybe it could be
+improved with better trace events. Just a suggestion if we want more
+context around the raw qtest trace..
+
+> > >
+> > > This patch adds the issue LP#1878263 test case.
+> > >
+> > > Signed-off-by: Li Qiang <liq3ea@163.com>
+> > > ---
+> > >  tests/qtest/Makefile.include |  2 ++
+> > >  tests/qtest/fuzz-test.c      | 45 ++++++++++++++++++++++++++++++++++++
+> > >  2 files changed, 47 insertions(+)
+> > >  create mode 100644 tests/qtest/fuzz-test.c
+> > >
+> > > diff --git a/tests/qtest/Makefile.include b/tests/qtest/Makefile.include
+> > > index b0204e44f2..ff460179c5 100644
+> > > --- a/tests/qtest/Makefile.include
+> > > +++ b/tests/qtest/Makefile.include
+> > > @@ -7,6 +7,7 @@ check-qtest-generic-y += machine-none-test
+> > >  check-qtest-generic-y += qmp-test
+> > >  check-qtest-generic-y += qmp-cmd-test
+> > >  check-qtest-generic-y += qom-test
+> > > +check-qtest-generic-y += fuzz-test
+> >
+> > Maybe name that fuzzed-reproducers-test?
+> >
+> 
+> This maybe be more understandable.
+> 
+> 
+> >
+> > >  check-qtest-generic-$(CONFIG_MODULES) += modules-test
+> > >  check-qtest-generic-y += test-hmp
+> > >
+> > > @@ -272,6 +273,7 @@ tests/qtest/m25p80-test$(EXESUF):
+> > tests/qtest/m25p80-test.o
+> > >  tests/qtest/i440fx-test$(EXESUF): tests/qtest/i440fx-test.o
+> > $(libqos-pc-obj-y)
+> > >  tests/qtest/q35-test$(EXESUF): tests/qtest/q35-test.o $(libqos-pc-obj-y)
+> > >  tests/qtest/fw_cfg-test$(EXESUF): tests/qtest/fw_cfg-test.o
+> > $(libqos-pc-obj-y)
+> > > +tests/qtest/fuzz-test$(EXESUF): tests/qtest/fuzz-test.o
+> > $(libqos-pc-obj-y)
+> > >  tests/qtest/rtl8139-test$(EXESUF): tests/qtest/rtl8139-test.o
+> > $(libqos-pc-obj-y)
+> > >  tests/qtest/pnv-xscom-test$(EXESUF): tests/qtest/pnv-xscom-test.o
+> > >  tests/qtest/wdt_ib700-test$(EXESUF): tests/qtest/wdt_ib700-test.o
+> > > diff --git a/tests/qtest/fuzz-test.c b/tests/qtest/fuzz-test.c
+> > > new file mode 100644
+> > > index 0000000000..695c6dffb9
+> > > --- /dev/null
+> > > +++ b/tests/qtest/fuzz-test.c
+> > > @@ -0,0 +1,45 @@
+> > > +/*
+> > > + * QTest testcase for fuzz case
+> > > + *
+> > > + * Copyright (c) 2020 Li Qiang <liq3ea@gmail.com>
+> > > + *
+> > > + * This work is licensed under the terms of the GNU GPL, version 2 or
+> > later.
+> > > + * See the COPYING file in the top-level directory.
+> > > + */
+> > > +
+> > > +
+> > > +#include "qemu/osdep.h"
+> > > +
+> > > +#include "libqtest.h"
+> > > +
+> > > +/*
+> > > + * This used to trigger the assert in scsi_dma_complete
+> > > + * https://bugs.launchpad.net/qemu/+bug/1878263
+> > > + */
+> > > +static void test_megasas_zero_iov_cnt(void)
+> >
+> > I'd name it test_lp1878263_megasas_zero_iov_cnt()
+> >
+> 
+> This seems better.
+> 
+> 
+> > or lp1878263_megasas_zero_iov_cnt().
+> 
+> 
+> 
+> >
+> > > +{
+> > > +    QTestState *s;
+> > > +
+> > > +    s = qtest_init("-nographic -monitor none -serial none "
+> > > +                   "-M q35 -device megasas -device scsi-cd,drive=null0 "
+> > > +                   "-blockdev
+> > driver=null-co,read-zeroes=on,node-name=null0");
+> > > +    qtest_outl(s, 0xcf8, 0x80001818);
+> > > +    qtest_outl(s, 0xcfc, 0xc101);
+> > > +    qtest_outl(s, 0xcf8, 0x8000181c);
+> > > +    qtest_outl(s, 0xcf8, 0x80001804);
+> > > +    qtest_outw(s, 0xcfc, 0x7);
+> > > +    qtest_outl(s, 0xcf8, 0x8000186a);
+> > > +    qtest_writeb(s, 0x14, 0xfe);
+> > > +    qtest_writeb(s, 0x0, 0x02);
+> > > +    qtest_outb(s, 0xc1c0, 0x17);
+> > > +    qtest_quit(s);
+> >
+> > Actually all the test body could be generated...
+> 
+> Alex, can you have a look at that?
+> >
+
+I think there are couple ways to approach this:
+1. Parse the reproducer and generate C code from a reproducer trace. The
+   result would be similar to Li's code.
+
+Pros:
+ * We get something that looks more-or-less like a normal qtest test.
+Cons:
+ * Need to automatically generate the C code.
+
+2. Write a single C function that reads the command line args and raw
+   qtest commands from a repro file and sends them to the qtest server.
+   Roughly:
+
++++ /path/to/repros/i386/megasas-lp1878263.repro
+
+cmd: -nographic -monitor none -serial none -M q35 -device megasas -device scsi-cd,drive=null0 -blockdev driver=null-co,read-zeroes=on,node-name=null0
+# megasas_init Using 80 sges, 1000 cmds, raid mode
+# scsi_device_set_ua target 0 lun 0 key 0x06 asc 0x29 ascq 0x00
+# megasas_reset firmware state 0xb0000000
+outl 0xcf8 0x80001818
+outl 0xcfc 0xc101
+....
+
+The code would then roughly be
+s = qtest_init(get_cmd_from_first_line())
+while get_next_line() {
+    if line doesnt start with "#":
+        qtest_sendf(line)
+}
+
+..
+qtest_add_data_func("fuzz/repro", "/path/to/megasas-lp1878263", run_reproducer);
+qtest_add_data_func("fuzz/repro", "/path/to/another-repro", run_reproducer);
+...
+
+Pros:
+ * Little post-processing required to go from a qtest repro trace to a
+   test case
+ * Simple to add a new test. Just create a repro file and add a new
+   qtest_add_data_func
+Cons:
+ * I think this would require us to expose qtest_sendf
+ * We might need a separate reproduce.c file for each arch/target for
+   which we want to reproduce bugs
+
+3. Same as 2. but do not use the libqtest client or modify qtest_sendf.
+Use a python script to do the same thing.
+Pros:
+ * We don't need to expose qtest_sendf, if that is a problem
+Cons:
+ * We would need to integrate it into the build/test system
+
+4. Use the original binary crashes and feed them into a softmmu/fuzz,
+rather than a softmmu/all build.  As a result, we would have unreadable
+binary files in the repo instead of slightly-more readable qtest traces.
+Pros:
+ * We would be able to test/reproduce issues such as double-fetches
+   or other timing-sensitive problems that we cannot with a simple qtest
+   trace.
+Cons:
+ * Now we have to build the fuzzer to run the tests and integrate that
+   into the build system.
+ * If we tweak the fuzzer, the binary inputs might break.
+
+Thoughts about these approaches?
+
+-Alex
+
+> > > +}
+> > > +
+> > > +int main(int argc, char **argv)
+> > > +{
+> > > +    g_test_init(&argc, &argv, NULL);
+> > > +
+> > > +    qtest_add_func("fuzz/megasas_zero_iov_cnt",
+> > test_megasas_zero_iov_cnt);
+> > > +
+> > > +    return g_test_run();
+> >
+> > The problem is now the test suite will fail because this test is not
+> > fixed.
+> >
+> >
+> Yes, as Paolo queued my patch to solve this:
+> -->https://lists.gnu.org/archive/html/qemu-devel/2020-08/msg03712.html
+> 
+> I think this patch should go Paolo's tree.
+> 
+> Thanks,
+> Li Qiang
+> 
+> 
+> > Good idea btw :)
+> >
+> > > +}
+> > >
+> >
+> >
 
