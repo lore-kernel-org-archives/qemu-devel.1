@@ -2,82 +2,83 @@ Return-Path: <SRS0=bVMU=B5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-19.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F486C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 03:22:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AB5FC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 03:33:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1BAFE207BB
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 03:22:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 55E782063A
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 03:33:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JVbDfaGp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BAFE207BB
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gUTWjj3U"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55E782063A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48574 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50864 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8Eg5-0006eI-Dv
-	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 23:22:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53738)
+	id 1k8Eqz-000881-Iw
+	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 23:33:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55388)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k8EfX-0006E0-Eq
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 23:21:43 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:45501)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k8EqN-0007hX-N9
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 23:32:55 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:51349
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k8EfV-0005Vn-DL
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 23:21:43 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k8EqI-0006s6-9X
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 23:32:55 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597807300;
+ s=mimecast20190719; t=1597807969;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=WCqdB9Qnkr42hKUfWl+4Tmh5xtv9ATMtBSs4WdMM8uk=;
- b=JVbDfaGpUHyfllPDH0Vt3ngGZMP3yJWJj+zs9tKPsBTjm07fQFZ71kuMFy0XLmdEdcap5O
- EKQH5YeVoDl4ApUfEURFfLUsmQM1ohNxVKDt/WyIeJPdZPJF3QbG5hapTMGqmOPJz4yIg5
- wBkrIQnzx3rI5oGXVNj2qcYcaRMlXDw=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-409-BwBP_tAWMgSGZ4F7GSb4lw-1; Tue, 18 Aug 2020 23:21:38 -0400
-X-MC-Unique: BwBP_tAWMgSGZ4F7GSb4lw-1
-Received: by mail-wm1-f69.google.com with SMTP id h7so401930wmm.7
- for <qemu-devel@nongnu.org>; Tue, 18 Aug 2020 20:21:38 -0700 (PDT)
+ bh=ZiGisiywky/pJZpb7hS6jtmM7XEZMFHD3P6d3blZWIU=;
+ b=gUTWjj3U18E0PU4RzUrNc3ZRLhimZYACqWLdyOE/dcHWoponh5KqnSVq6s2AXkWuZAyy9q
+ 553/HhI+ctqo3IyIfZG0eCd71oo06HCzFPSz0o0SLRORUbQd6OVEFGqVCwruenoW/IzpZo
+ svbPwWZi02ki+x8pZkYh2WUNNtEaPNE=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-359-rs4J6AeDN8eIEBUSZhXPoA-1; Tue, 18 Aug 2020 23:32:46 -0400
+X-MC-Unique: rs4J6AeDN8eIEBUSZhXPoA-1
+Received: by mail-wr1-f70.google.com with SMTP id o10so8880368wrs.21
+ for <qemu-devel@nongnu.org>; Tue, 18 Aug 2020 20:32:45 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=WCqdB9Qnkr42hKUfWl+4Tmh5xtv9ATMtBSs4WdMM8uk=;
- b=o2yOjMaZcNl5IYNkOrwOjJeN9N6+YFd/Eoow2Yax/fvrhDL+VNWth61xfZn4Qh+GWk
- ftPZx50ZcvCL/aynWZxPwPNf80iJUi+tuwINOlLXv9wiPwNoP7qcEkWzKGWoH4DOEhmc
- aUW0ek4k5lRCRlGbkIi+id5730cEi3WyXqnE2hRtPPYBeph+FATmnuEBAVfs7iJM30AP
- u+qNe9iVYgfLiZ9AJ+p0am5fFnQd9SwkMsSJn6Q8mTrb89mbhdubXotMJF8VqAOJmLNN
- Wa137uwsvP+K6EdA5JCaw06J1zVJPW4QuUDTA8T7VKB6rBDgCRg0dR4r1oy6SB1ZS5hg
- E76Q==
-X-Gm-Message-State: AOAM531fOHYVKWz1jAy45sEeBx/QhlJcWUYoPU7gI8YuZKd4YEfCrrEi
- mKxGUkg0tfbuZRCGkY7t6MvkSoNWYc8t6YsJuDtLaE3OLVAdSpTQGVqRkaTbB8c1Z9nHNjQVXIS
- WGaYYQ0NUkcQ80sc=
-X-Received: by 2002:a7b:c941:: with SMTP id i1mr2662706wml.73.1597807297191;
- Tue, 18 Aug 2020 20:21:37 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwdEK9b1J9GAilb7xbFKCVZhBEO83hVaLSwyg84DzW15pcLMA3dxSFxExyScI5dSZlP26QbsQ==
-X-Received: by 2002:a7b:c941:: with SMTP id i1mr2662692wml.73.1597807296909;
- Tue, 18 Aug 2020 20:21:36 -0700 (PDT)
+ bh=ZiGisiywky/pJZpb7hS6jtmM7XEZMFHD3P6d3blZWIU=;
+ b=bFD32pWooyXCz9fXxD86VQYSNEXbvroSXjRAya8h6ntS0Hf0LOAvpaRCdE1R7cdmOu
+ So1GvSBDhirM8ZhrQWi/6T4w91kUaILiYGDcblwZF5URAsISkJuXhOAJc7qiU4iB1t2x
+ eQOrPmbEZFwl5aiEONdtmJvKUiTHQY2qHePDE9JMe/N65O88b/5Q+zcJQadd8zeUX44e
+ LdpM3S4mHGhUDKmNL52W/GVY+tK280NAEv8DqK3u6qiCz7qgXN9j6Sy9GfPPl7WTf4K+
+ HCUTZfaFgu7uKZ5AU5GXqLFmzBIwXjN6RXNEhHzMtGFSVk3j/CKrT3dsdpO+R4k7Vcuk
+ dDDQ==
+X-Gm-Message-State: AOAM5318aDwXp4eUWFXiVPWvGf4NIhH8krR5a/DamWYm1PXaPlzm2oFX
+ pIGdlLdjbGJV70++q1kkNVuD4B47f+RohfX3jB4VA3UON3viXZaw4hgbhQXEqWpwmjCMtGEWY7V
+ X/9IYA6qJXr6Mu/k=
+X-Received: by 2002:adf:ea85:: with SMTP id s5mr2129485wrm.55.1597807964941;
+ Tue, 18 Aug 2020 20:32:44 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwV+SsKhe/mthUwsLnf5rD7lmiiPUxOQ4ACrUQ38UsFCk26s6u7SDoRSh8A73zmdXsNhX3E9A==
+X-Received: by 2002:adf:ea85:: with SMTP id s5mr2129468wrm.55.1597807964635;
+ Tue, 18 Aug 2020 20:32:44 -0700 (PDT)
 Received: from [192.168.1.36] (121.red-81-40-121.staticip.rima-tde.net.
  [81.40.121.121])
- by smtp.gmail.com with ESMTPSA id g70sm3182291wmg.24.2020.08.18.20.21.35
+ by smtp.gmail.com with ESMTPSA id q19sm38925085wrf.48.2020.08.18.20.32.43
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 18 Aug 2020 20:21:36 -0700 (PDT)
-Subject: Re: [RFC PATCH v2 2/4] hw/i386/acpi-build: Add ACPI PCI hot-plug
- methods to q35
-To: Julia Suvorova <jusual@redhat.com>, qemu-devel@nongnu.org
-References: <20200818215227.181654-1-jusual@redhat.com>
- <20200818215227.181654-3-jusual@redhat.com>
+ Tue, 18 Aug 2020 20:32:43 -0700 (PDT)
+Subject: Re: [PATCH v3 1/1] audio/jack: fix use after free segfault
+To: Geoffrey McRae <geoff@hostfission.com>, qemu-devel@nongnu.org
+References: <20200819011835.92737-1-geoff@hostfission.com>
+ <20200819011835.92737-2-geoff@hostfission.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Autocrypt: addr=philmd@redhat.com; keydata=
  mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
@@ -102,30 +103,31 @@ Autocrypt: addr=philmd@redhat.com; keydata=
  9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
  RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
  apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <7f29d89e-8cdc-8067-acff-2817183f20f0@redhat.com>
-Date: Wed, 19 Aug 2020 05:21:35 +0200
+Message-ID: <34c4c83a-c870-0d21-1a15-3da76b4e5488@redhat.com>
+Date: Wed, 19 Aug 2020 05:32:42 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200818215227.181654-3-jusual@redhat.com>
+In-Reply-To: <20200819011835.92737-2-geoff@hostfission.com>
 Content-Language: en-US
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
 X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 23:05:17
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 22:38:38
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -138,196 +140,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Igor Mammedov <imammedo@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>
+Cc: kraxel@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Julia,
+Hi Geoffrey,
 
-On 8/18/20 11:52 PM, Julia Suvorova wrote:
-> Implement notifications and gpe to support q35 ACPI PCI hot-plug.
-> Use 0xcc4 - 0xcd7 range for 'acpi-pci-hotplug' io ports.
+On 8/19/20 3:18 AM, Geoffrey McRae wrote:
+> The client may have been freed already by a secondary audio device
+> recovering its session as JACK2 has some cleanup code to work around
+> broken clients, which doesn't account for well behaved clients.
 > 
-> Signed-off-by: Julia Suvorova <jusual@redhat.com>
+> https://github.com/jackaudio/jack2/issues/627
+> 
+> As JACK1 and JACK2 are interchangeable and JACK2 has "cleanup" routine
+> that JACK1 does not have, we need to determine which version is in use
+> at runtime. Unfortunatly there is no way to determine which is in use
+> other then to look for symbols that are missing in JACK1, which in this
+> case is `jack_get_version`.
+> 
+> An issue has been raised over this, but to be compatible with older
+> versions we must use this method to determine which library is in use.
+> If at some time the jack developers implement `jack_get_version` in
+> JACK1, this code will need to be revisited.
+> 
+> At worst the workaround will be enabled and this will introduce a small
+> memory leak if the jack server is restarted. This however is better then
+> the alternative which would be a use after free segfault.
+> 
+> Signed-off-by: Geoffrey McRae <geoff@hostfission.com>
 > ---
->  include/hw/acpi/pcihp.h |  3 ++-
->  hw/acpi/pcihp.c         | 10 ++++++----
->  hw/acpi/piix4.c         |  2 +-
->  hw/i386/acpi-build.c    | 25 ++++++++++++++-----------
->  4 files changed, 23 insertions(+), 17 deletions(-)
+>  audio/jackaudio.c | 37 ++++++++++++++++++++++++++++++++++++-
+>  configure         |  4 +++-
+>  2 files changed, 39 insertions(+), 2 deletions(-)
 > 
-> diff --git a/include/hw/acpi/pcihp.h b/include/hw/acpi/pcihp.h
-> index 8bc4a4c01d..1e9d246f57 100644
-> --- a/include/hw/acpi/pcihp.h
-> +++ b/include/hw/acpi/pcihp.h
-> @@ -54,7 +54,8 @@ typedef struct AcpiPciHpState {
->  } AcpiPciHpState;
+> diff --git a/audio/jackaudio.c b/audio/jackaudio.c
+> index 72ed7c4929..d1685999c3 100644
+> --- a/audio/jackaudio.c
+> +++ b/audio/jackaudio.c
+> @@ -31,6 +31,7 @@
+>  #define AUDIO_CAP "jack"
+>  #include "audio_int.h"
 >  
->  void acpi_pcihp_init(Object *owner, AcpiPciHpState *, PCIBus *root,
-> -                     MemoryRegion *address_space_io, bool bridges_enabled);
-> +                     MemoryRegion *address_space_io, bool bridges_enabled,
-> +                     bool is_piix4);
+> +#include <dlfcn.h>
+>  #include <jack/jack.h>
+>  #include <jack/thread.h>
 >  
->  void acpi_pcihp_device_pre_plug_cb(HotplugHandler *hotplug_dev,
->                                     DeviceState *dev, Error **errp);
-> diff --git a/hw/acpi/pcihp.c b/hw/acpi/pcihp.c
-> index 9e31ab2da4..9a35ed6c83 100644
-> --- a/hw/acpi/pcihp.c
-> +++ b/hw/acpi/pcihp.c
-> @@ -38,7 +38,8 @@
->  #include "qom/qom-qobject.h"
->  #include "trace.h"
->  
-> -#define ACPI_PCIHP_ADDR 0xae00
-> +#define ACPI_PCIHP_ADDR_PIIX4 0xae00
-> +#define ACPI_PCIHP_ADDR_Q35 0x0cc4
->  #define ACPI_PCIHP_SIZE 0x0014
->  #define PCI_UP_BASE 0x0000
->  #define PCI_DOWN_BASE 0x0004
-> @@ -359,12 +360,13 @@ static const MemoryRegionOps acpi_pcihp_io_ops = {
->  };
->  
->  void acpi_pcihp_init(Object *owner, AcpiPciHpState *s, PCIBus *root_bus,
-> -                     MemoryRegion *address_space_io, bool bridges_enabled)
-> +                     MemoryRegion *address_space_io, bool bridges_enabled,
-> +                     bool is_piix4)
-
-Instead of adding implementation knowledge to this generic function, can
-you instead pass it a 'io_base' argument (or 'pcihp_addr')?
-
->  {
->      s->io_len = ACPI_PCIHP_SIZE;
-> -    s->io_base = ACPI_PCIHP_ADDR;
-> +    s->io_base = is_piix4 ? ACPI_PCIHP_ADDR_PIIX4 : ACPI_PCIHP_ADDR_Q35;
->  
-> -    s->root= root_bus;
-> +    s->root = root_bus;
->      s->legacy_piix = !bridges_enabled;
->  
->      memory_region_init_io(&s->io, owner, &acpi_pcihp_io_ops, s,
-> diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
-> index cdfa0e2998..1f27bfbd06 100644
-> --- a/hw/acpi/piix4.c
-> +++ b/hw/acpi/piix4.c
-> @@ -596,7 +596,7 @@ static void piix4_acpi_system_hot_add_init(MemoryRegion *parent,
->      memory_region_add_subregion(parent, GPE_BASE, &s->io_gpe);
->  
->      acpi_pcihp_init(OBJECT(s), &s->acpi_pci_hotplug, bus, parent,
-> -                    s->use_acpi_hotplug_bridge);
-> +                    s->use_acpi_hotplug_bridge, true);
->  
->      s->cpu_hotplug_legacy = true;
->      object_property_add_bool(OBJECT(s), "cpu-hotplug-legacy",
-> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> index b7bcbbbb2a..f3cd52bd06 100644
-> --- a/hw/i386/acpi-build.c
-> +++ b/hw/i386/acpi-build.c
-> @@ -201,10 +201,6 @@ static void acpi_get_pm_info(MachineState *machine, AcpiPmInfo *pm)
->          /* w2k requires FADT(rev1) or it won't boot, keep PC compatible */
->          pm->fadt.rev = 1;
->          pm->cpu_hp_io_base = PIIX4_CPU_HOTPLUG_IO_BASE;
-> -        pm->pcihp_io_base =
-> -            object_property_get_uint(obj, ACPI_PCIHP_IO_BASE_PROP, NULL);
-> -        pm->pcihp_io_len =
-> -            object_property_get_uint(obj, ACPI_PCIHP_IO_LEN_PROP, NULL);
->      }
->      if (lpc) {
->          struct AcpiGenericAddress r = { .space_id = AML_AS_SYSTEM_IO,
-> @@ -214,6 +210,10 @@ static void acpi_get_pm_info(MachineState *machine, AcpiPmInfo *pm)
->          pm->fadt.flags |= 1 << ACPI_FADT_F_RESET_REG_SUP;
->          pm->cpu_hp_io_base = ICH9_CPU_HOTPLUG_IO_BASE;
->      }
-> +    pm->pcihp_io_base =
-> +        object_property_get_uint(obj, ACPI_PCIHP_IO_BASE_PROP, NULL);
-> +    pm->pcihp_io_len =
-> +        object_property_get_uint(obj, ACPI_PCIHP_IO_LEN_PROP, NULL);
->  
->      /* The above need not be conditional on machine type because the reset port
->       * happens to be the same on PIIX (pc) and ICH9 (q35). */
-> @@ -472,7 +472,7 @@ static void build_append_pci_bus_devices(Aml *parent_scope, PCIBus *bus,
->          QLIST_FOREACH(sec, &bus->child, sibling) {
->              int32_t devfn = sec->parent_dev->devfn;
->  
-> -            if (pci_bus_is_root(sec) || pci_bus_is_express(sec)) {
-> +            if (pci_bus_is_root(sec)) {
-
-Different patch?
-
->                  continue;
->              }
->  
-> @@ -1368,7 +1368,7 @@ static void build_piix4_isa_bridge(Aml *table)
->      aml_append(table, scope);
+> @@ -84,6 +85,7 @@ typedef struct QJackIn {
 >  }
+>  QJackIn;
 >  
-> -static void build_piix4_pci_hotplug(Aml *table)
-> +static void build_i386_pci_hotplug(Aml *table, uint64_t pcihp_addr)
-
-Being common to 32/64-bit, I'd name that build_x86_pci_hotplug().
-
+> +static int QJackWorkaroundCloseBug;
+>  static int qjack_client_init(QJackClient *c);
+>  static void qjack_client_connect_ports(QJackClient *c);
+>  static void qjack_client_fini(QJackClient *c);
+> @@ -563,7 +565,10 @@ static void qjack_client_fini(QJackClient *c)
+>          /* fallthrough */
+>  
+>      case QJACK_STATE_SHUTDOWN:
+> -        jack_client_close(c->client);
+> +        if (!QJackWorkaroundCloseBug) {
+> +            jack_client_close(c->client);
+> +        }
+> +        c->client = NULL;
+>          /* fallthrough */
+>  
+>      case QJACK_STATE_DISCONNECTED:
+> @@ -662,6 +667,36 @@ static void qjack_info(const char *msg)
+>  
+>  static void register_audio_jack(void)
 >  {
->      Aml *scope;
->      Aml *field;
-> @@ -1377,20 +1377,22 @@ static void build_piix4_pci_hotplug(Aml *table)
->      scope =  aml_scope("_SB.PCI0");
->  
->      aml_append(scope,
-> -        aml_operation_region("PCST", AML_SYSTEM_IO, aml_int(0xae00), 0x08));
-> +        aml_operation_region("PCST", AML_SYSTEM_IO, aml_int(pcihp_addr), 0x08));
->      field = aml_field("PCST", AML_DWORD_ACC, AML_NOLOCK, AML_WRITE_AS_ZEROS);
->      aml_append(field, aml_named_field("PCIU", 32));
->      aml_append(field, aml_named_field("PCID", 32));
->      aml_append(scope, field);
->  
->      aml_append(scope,
-> -        aml_operation_region("SEJ", AML_SYSTEM_IO, aml_int(0xae08), 0x04));
-> +    aml_operation_region("SEJ", AML_SYSTEM_IO,
-> +                         aml_int(pcihp_addr + 0x08), 0x04));
->      field = aml_field("SEJ", AML_DWORD_ACC, AML_NOLOCK, AML_WRITE_AS_ZEROS);
->      aml_append(field, aml_named_field("B0EJ", 32));
->      aml_append(scope, field);
->  
->      aml_append(scope,
-> -        aml_operation_region("BNMR", AML_SYSTEM_IO, aml_int(0xae10), 0x04));
-> +        aml_operation_region("BNMR", AML_SYSTEM_IO,
-> +                             aml_int(pcihp_addr + 0x10), 0x04));
->      field = aml_field("BNMR", AML_DWORD_ACC, AML_NOLOCK, AML_WRITE_AS_ZEROS);
->      aml_append(field, aml_named_field("BNUM", 32));
->      aml_append(scope, field);
-> @@ -1504,7 +1506,6 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
->          build_hpet_aml(dsdt);
->          build_piix4_isa_bridge(dsdt);
->          build_isa_devices_aml(dsdt);
-> -        build_piix4_pci_hotplug(dsdt);
->          build_piix4_pci0_int(dsdt);
->      } else {
->          sb_scope = aml_scope("_SB");
-> @@ -1526,6 +1527,8 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
->          }
->      }
->  
-> +    build_i386_pci_hotplug(dsdt, pm->pcihp_io_base);
+> +    void *handle;
 > +
->      if (pcmc->legacy_cpu_hotplug) {
->          build_legacy_cpu_hotplug_aml(dsdt, machine, pm->cpu_hp_io_base);
->      } else {
-> @@ -1546,7 +1549,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
->      {
->          aml_append(scope, aml_name_decl("_HID", aml_string("ACPI0006")));
+> +    /*
+> +     * As JACK1 and JACK2 are interchangeable and JACK2 has "cleanup" routine
+> +     * that JACK1 does not have, we need to determine which version is in use at
+> +     * runtime. Unfortunatly there is no way to determine which is in use other
+> +     * then to look for symbols that are missing in JACK1, which in this case is
+> +     * `jack_get_version`. An issue has been raised over this, but to be
+> +     * compatible with older versions we must use this method to determine which
+> +     * library is in use. If at some time the jack developers implement
+> +     * `jack_get_version` in JACK1, this code will need to be revisited.
+> +     *
+> +     * At worst the workaround will be enabled and we will introduce a small
+> +     * memory leak if the jack server is restarted. This is better then the
+> +     * alternative which would be a use after free segfault.
+> +     */
+> +
+> +    handle = dlopen("libjack.so", RTLD_LAZY | RTLD_NOLOAD);
+> +    if (!handle) {
+> +        dolog("unable to open libjack.so to determine version\n");
+> +        dolog("assuming JACK2 and enabling the close bug workaround\n");
+> +        QJackWorkaroundCloseBug = 1;
+> +    } else {
+> +        if (dlsym(handle, "jack_get_version")) {
+> +            dolog("JACK2 detected, enabling close bug workaround\n");
+> +            QJackWorkaroundCloseBug = 1;
+> +        }
+> +        dlclose(handle);
+> +    }
+> +
+>      audio_driver_register(&jack_driver);
+>      jack_set_thread_creator(qjack_thread_creator);
+>      jack_set_error_function(qjack_error);
+> diff --git a/configure b/configure
+> index 2acc4d1465..43d2893fbb 100755
+> --- a/configure
+> +++ b/configure
+> @@ -3754,7 +3754,8 @@ for drv in $audio_drv_list; do
 >  
-> -        if (misc->is_piix4) {
-> +        if (misc->is_piix4 || pm->pcihp_bridge_en) {
+>      jack | try-jack)
+>      if $pkg_config jack --exists; then
+> -        jack_libs=$($pkg_config jack --libs)
+> +        # dl is needed to check at runtime if jack1 or jack2 is in use
+> +        jack_libs="$($pkg_config jack --libs) -ldl"
+>          if test "$drv" = "try-jack"; then
+>              audio_drv_list=$(echo "$audio_drv_list" | sed -e 's/try-jack/jack/')
+>          fi
 
-Why not directly check 'if (pm->pcihp_bridge_en) {'?
+Why not checking jack_get_version() using compile_prog here?
 
->              method = aml_method("_E01", 0, AML_NOTSERIALIZED);
->              aml_append(method,
->                  aml_acquire(aml_name("\\_SB.PCI0.BLCK"), 0xFFFF));
-> 
-
-Regards,
+Thanks,
 
 Phil.
 
