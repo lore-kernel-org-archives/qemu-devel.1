@@ -2,89 +2,79 @@ Return-Path: <SRS0=bVMU=B5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05028C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 10:50:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5D34C433E1
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 10:52:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C7D61207FB
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 10:49:59 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RF69nTNv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7D61207FB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9F514206B5
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 10:52:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F514206B5
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56980 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33726 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8LfL-0006by-4w
-	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 06:49:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38806)
+	id 1k8LhM-0000MX-Tz
+	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 06:52:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40374)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1k8LcL-0003OL-7T
- for qemu-devel@nongnu.org; Wed, 19 Aug 2020 06:46:53 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:49028
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1k8LcJ-0003Uj-Df
- for qemu-devel@nongnu.org; Wed, 19 Aug 2020 06:46:52 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597834010;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=IvJSjtW/GNm2NtGb3G/59MWpRbjf2SQjK24/Bw7AqWQ=;
- b=RF69nTNvIE1D1HYDDD7RZG9BO4xMd/5KKDSTHBnwQ44UdzLYNUY3Z8c5ll4QFPyzvaskhC
- xxQ4TArDUdXRHOOaSM684weIiVjHnlMie2AsyXH02Iu6BU80K3S3N0BBvDfDRN3y6H5jBy
- M+Y5T7Vnhf51dYnQIQ8XNcevOvCTPBc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-216-E6-TyKAIPz60v_F5KoGuUw-1; Wed, 19 Aug 2020 06:46:48 -0400
-X-MC-Unique: E6-TyKAIPz60v_F5KoGuUw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4A7EA1014DF9;
- Wed, 19 Aug 2020 10:46:47 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-114-19.ams2.redhat.com [10.36.114.19])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 403565C1A3;
- Wed, 19 Aug 2020 10:46:46 +0000 (UTC)
-Date: Wed, 19 Aug 2020 12:46:44 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Max Reitz <mreitz@redhat.com>
-Subject: Re: [PATCH v7 27/47] blkverify: Use bdrv_sum_allocated_file_size()
-Message-ID: <20200819104644.GA10272@linux.fritz.box>
-References: <20200625152215.941773-1-mreitz@redhat.com>
- <20200625152215.941773-28-mreitz@redhat.com>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k8LgN-0007iW-3Z
+ for qemu-devel@nongnu.org; Wed, 19 Aug 2020 06:51:03 -0400
+Received: from indium.canonical.com ([91.189.90.7]:44552)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k8LgK-0004Dw-Uh
+ for qemu-devel@nongnu.org; Wed, 19 Aug 2020 06:51:02 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1k8LgI-0004h7-Ni
+ for <qemu-devel@nongnu.org>; Wed, 19 Aug 2020 10:50:58 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id AD6152E8023
+ for <qemu-devel@nongnu.org>; Wed, 19 Aug 2020 10:50:58 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20200625152215.941773-28-mreitz@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=kwolf@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 23:05:17
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 19 Aug 2020 10:36:53 -0000
+From: Jonathan Wakely <1886155@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: jwakely mliska
+X-Launchpad-Bug-Reporter: Martin Liska (mliska)
+X-Launchpad-Bug-Modifier: Jonathan Wakely (jwakely)
+References: <159376359338.16005.10195773015354828175.malonedeb@soybean.canonical.com>
+Message-Id: <159783341366.32636.16429140323070349472.malone@wampee.canonical.com>
+Subject: =?utf-8?q?=5BBug_1886155=5D_Re=3A_error=3A_argument_2_of_=E2=80=98?=
+ =?utf-8?b?X19hdG9taWNfbG9hZOKAmSBkaXNjYXJkcyDigJhjb25zdOKAmSBxdWFsaWZpZXI=?=
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="99c2d833c8d727fd05148486920aca032e908071"; Instance="production"
+X-Launchpad-Hash: b9a61b3f4528808d5056b512348df1f8e2c8341c
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/19 06:50:59
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -93,26 +83,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
+Reply-To: Bug 1886155 <1886155@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 25.06.2020 um 17:21 hat Max Reitz geschrieben:
-> blkverify is a filter, so bdrv_get_allocated_file_size()'s default
-> implementation will return only the size of its filtered child.
-> However, because both of its children are disk images, it makes more
-> sense to sum both of their allocated sizes.
+It looks like `typeof_strip_qual` doesn't work for pointer types.
 
-Hm, but so are the children of, say, backup-top. I don't think you're
-suggesting that backup-top should add the sizes of both images, even
-though the backup job is actively increasing the allocated size of the
-non-primary node, much like blkverify.
+-- =
 
-So I believe returning only the allocated size of the primary child in
-blkverify would be more consistent with what we do elsewhere.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1886155
 
-Kevin
+Title:
+  error: argument 2 of =E2=80=98__atomic_load=E2=80=99 discards =E2=80=98co=
+nst=E2=80=99 qualifier
 
+Status in QEMU:
+  New
+
+Bug description:
+  GCC 11 reports the following errors:
+
+  [  125s] In file included from /home/abuild/rpmbuild/BUILD/qemu-5.0.0/inc=
+lude/qemu/seqlock.h:17,
+  [  125s]                  from /home/abuild/rpmbuild/BUILD/qemu-5.0.0/inc=
+lude/qemu/qht.h:10,
+  [  125s]                  from /home/abuild/rpmbuild/BUILD/qemu-5.0.0/uti=
+l/qht.c:69:
+  [  125s] /home/abuild/rpmbuild/BUILD/qemu-5.0.0/util/qht.c: In function '=
+qht_do_lookup':
+  [  125s] /home/abuild/rpmbuild/BUILD/qemu-5.0.0/include/qemu/atomic.h:153=
+:5: error: argument 2 of '__atomic_load' discards 'const' qualifier [-Werro=
+r=3Dincompatible-pointer-types]
+  [  125s]   153 |     __atomic_load(ptr, valptr, __ATOMIC_RELAXED);       \
+  [  125s]       |     ^~~~~~~~~~~~~
+  [  125s] /home/abuild/rpmbuild/BUILD/qemu-5.0.0/include/qemu/atomic.h:161=
+:5: note: in expansion of macro 'atomic_rcu_read__nocheck'
+  [  125s]   161 |     atomic_rcu_read__nocheck(ptr, &_val);             \
+  [  125s]       |     ^~~~~~~~~~~~~~~~~~~~~~~~
+  [  125s] /home/abuild/rpmbuild/BUILD/qemu-5.0.0/util/qht.c:499:27: note: =
+in expansion of macro 'atomic_rcu_read'
+  [  125s]   499 |                 void *p =3D atomic_rcu_read(&b->pointers=
+[i]);
+  [  125s]       |                           ^~~~~~~~~~~~~~~
+  [  125s] /home/abuild/rpmbuild/BUILD/qemu-5.0.0/include/qemu/atomic.h:153=
+:5: error: argument 2 of '__atomic_load' discards 'const' qualifier [-Werro=
+r=3Dincompatible-pointer-types]
+  [  125s]   153 |     __atomic_load(ptr, valptr, __ATOMIC_RELAXED);       \
+  [  125s]       |     ^~~~~~~~~~~~~
+  [  125s] /home/abuild/rpmbuild/BUILD/qemu-5.0.0/include/qemu/atomic.h:161=
+:5: note: in expansion of macro 'atomic_rcu_read__nocheck'
+  [  125s]   161 |     atomic_rcu_read__nocheck(ptr, &_val);             \
+  [  125s]       |     ^~~~~~~~~~~~~~~~~~~~~~~~
+  [  125s] /home/abuild/rpmbuild/BUILD/qemu-5.0.0/util/qht.c:506:13: note: =
+in expansion of macro 'atomic_rcu_read'
+  [  125s]   506 |         b =3D atomic_rcu_read(&b->next);
+  [  125s]       |             ^~~~~~~~~~~~~~~
+  [  125s] /home/abuild/rpmbuild/BUILD/qemu-5.0.0/util/qht.c: In function '=
+qht_lookup_custom':
+  [  125s] /home/abuild/rpmbuild/BUILD/qemu-5.0.0/include/qemu/atomic.h:153=
+:5: error: argument 2 of '__atomic_load' discards 'const' qualifier [-Werro=
+r=3Dincompatible-pointer-types]
+  [  125s]   153 |     __atomic_load(ptr, valptr, __ATOMIC_RELAXED);       \
+  [  125s]       |     ^~~~~~~~~~~~~
+  [  125s] /home/abuild/rpmbuild/BUILD/qemu-5.0.0/include/qemu/atomic.h:161=
+:5: note: in expansion of macro 'atomic_rcu_read__nocheck'
+  [  125s]   161 |     atomic_rcu_read__nocheck(ptr, &_val);             \
+  [  125s]       |     ^~~~~~~~~~~~~~~~~~~~~~~~
+  [  125s] /home/abuild/rpmbuild/BUILD/qemu-5.0.0/util/qht.c:534:11: note: =
+in expansion of macro 'atomic_rcu_read'
+  [  125s]   534 |     map =3D atomic_rcu_read(&ht->map);
+  [  125s]       |           ^~~~~~~~~~~~~~~
+  [  125s] /home/abuild/rpmbuild/BUILD/qemu-5.0.0/util/qht.c: In function '=
+qht_statistics_init':
+  [  125s] /home/abuild/rpmbuild/BUILD/qemu-5.0.0/include/qemu/atomic.h:153=
+:5: error: argument 2 of '__atomic_load' discards 'const' qualifier [-Werro=
+r=3Dincompatible-pointer-types]
+  [  125s]   153 |     __atomic_load(ptr, valptr, __ATOMIC_RELAXED);       \
+  [  125s]       |     ^~~~~~~~~~~~~
+  [  125s] /home/abuild/rpmbuild/BUILD/qemu-5.0.0/include/qemu/atomic.h:161=
+:5: note: in expansion of macro 'atomic_rcu_read__nocheck'
+  [  125s]   161 |     atomic_rcu_read__nocheck(ptr, &_val);             \
+  [  125s]       |     ^~~~~~~~~~~~~~~~~~~~~~~~
+  [  125s] /home/abuild/rpmbuild/BUILD/qemu-5.0.0/util/qht.c:907:11: note: =
+in expansion of macro 'atomic_rcu_read'
+  [  125s]   907 |     map =3D atomic_rcu_read(&ht->map);
+  [  125s]       |           ^~~~~~~~~~~~~~~
+  [  125s] /home/abuild/rpmbuild/BUILD/qemu-5.0.0/include/qemu/atomic.h:153=
+:5: error: argument 2 of '__atomic_load' discards 'const' qualifier [-Werro=
+r=3Dincompatible-pointer-types]
+  [  125s]   153 |     __atomic_load(ptr, valptr, __ATOMIC_RELAXED);       \
+  [  125s]       |     ^~~~~~~~~~~~~
+  [  125s] /home/abuild/rpmbuild/BUILD/qemu-5.0.0/include/qemu/atomic.h:161=
+:5: note: in expansion of macro 'atomic_rcu_read__nocheck'
+  [  125s]   161 |     atomic_rcu_read__nocheck(ptr, &_val);             \
+  [  125s]       |     ^~~~~~~~~~~~~~~~~~~~~~~~
+  [  125s] /home/abuild/rpmbuild/BUILD/qemu-5.0.0/util/qht.c:941:21: note: =
+in expansion of macro 'atomic_rcu_read'
+  [  125s]   941 |                 b =3D atomic_rcu_read(&b->next);
+  [  125s]       |                     ^~~~~~~~~~~~~~~
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1886155/+subscriptions
 
