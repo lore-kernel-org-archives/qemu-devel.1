@@ -6,58 +6,59 @@ X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
 	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE5F9C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 05:29:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4E7DC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 05:30:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8913B206DA
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 05:29:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B1AAB206DA
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 05:30:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=hostfission.com header.i=@hostfission.com header.b="rtqCIUoD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8913B206DA
+	dkim=pass (1024-bit key) header.d=hostfission.com header.i=@hostfission.com header.b="jQaMD3wq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1AAB206DA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=hostfission.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60044 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33960 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8Gen-00048y-Sg
-	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 01:29:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47232)
+	id 1k8Gfy-000547-1F
+	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 01:30:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47738)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <geoff@hostfission.com>)
- id 1k8Ge0-0003ia-C5
- for qemu-devel@nongnu.org; Wed, 19 Aug 2020 01:28:16 -0400
-Received: from mail1.hostfission.com ([139.99.139.48]:60394)
+ id 1k8GfL-0004em-Au
+ for qemu-devel@nongnu.org; Wed, 19 Aug 2020 01:29:39 -0400
+Received: from mail1.hostfission.com ([139.99.139.48]:60428)
  by eggs.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <geoff@hostfission.com>) id 1k8Gdy-0004gj-R6
- for qemu-devel@nongnu.org; Wed, 19 Aug 2020 01:28:16 -0400
+ (envelope-from <geoff@hostfission.com>) id 1k8GfJ-0004pK-Lx
+ for qemu-devel@nongnu.org; Wed, 19 Aug 2020 01:29:39 -0400
 Received: from www1.hostfission.com (www1.hostfission.com [139.99.139.52])
- by mail1.hostfission.com (Postfix) with ESMTP id 0BE5C42720;
- Wed, 19 Aug 2020 15:28:13 +1000 (AEST)
+ by mail1.hostfission.com (Postfix) with ESMTP id 49F5F42539;
+ Wed, 19 Aug 2020 15:29:36 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=hostfission.com;
- s=mail; t=1597814893;
- bh=Giyat406/6o7kwy//RzKyVr9V43QHS48NfV1AnKByq4=;
+ s=mail; t=1597814976;
+ bh=cdXJ2hiizMyhjSFBPBzTnhEKkSO3kIKQnswtu3+14bE=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=rtqCIUoDDjNLDWSYXXefguaxZhNXXhPnfV4isph3D60lHWdkzVSIknQhhk4HiNZ/T
- dYJLc0xW0924mnj7ZfjxGaRCY0vsjTt50OJA15sKXGFiHsWT8DHAdIkVhsy+CeC41S
- 3zCbsr6AaAOLaXFXv7L8lfbWfJ9Uk5sIEt7hEsf0=
+ b=jQaMD3wqB2K7THg+yPbzPMFLW14DT56/Ac9WBILVemiMPYQj9jecSIVzR8RuieAuj
+ hDLSajfVsDDebFzDHT9rNyZIVN8aRdRSmGuh6m0uik7VSU0QmKcfi2vuZhthJxjcV5
+ bNrOq6Ll6jevKsszzAtw5l39M7Dpzz3hsVlz7aso=
 Received: from mail.hostfission.com (www1.hostfission.com [127.0.0.1])
- by www1.hostfission.com (Postfix) with ESMTP id EE8869D947;
- Wed, 19 Aug 2020 15:28:12 +1000 (AEST)
+ by www1.hostfission.com (Postfix) with ESMTP id 3DB9F9D947;
+ Wed, 19 Aug 2020 15:29:36 +1000 (AEST)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII;
  format=flowed
 Content-Transfer-Encoding: 7bit
-Date: Wed, 19 Aug 2020 15:28:12 +1000
+Date: Wed, 19 Aug 2020 15:29:36 +1000
 From: Geoffrey McRae <geoff@hostfission.com>
 To: Gerd Hoffmann <kraxel@redhat.com>
 Cc: qemu-devel@nongnu.org
 Subject: Re: [PATCH v2] audio/jack: fix use after free segfault
-In-Reply-To: <20200819050445.qlhafh2kwh5rt2jh@sirius.home.kraxel.org>
+In-Reply-To: <9a87a1208b126b2fe882c34a41ebbb18@hostfission.com>
 References: <20200819010741.91DAE3A0788@moya.office.hostfission.com>
  <20200819050445.qlhafh2kwh5rt2jh@sirius.home.kraxel.org>
-Message-ID: <9a87a1208b126b2fe882c34a41ebbb18@hostfission.com>
+ <9a87a1208b126b2fe882c34a41ebbb18@hostfission.com>
+Message-ID: <5f01ceace88ae5ba515debf57f99e87a@hostfission.com>
 X-Sender: geoff@hostfission.com
 User-Agent: Roundcube Webmail/1.3.8
 Received-SPF: pass client-ip=139.99.139.48; envelope-from=geoff@hostfission.com;
@@ -88,30 +89,38 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2020-08-19 15:04, Gerd Hoffmann wrote:
-> Hi,
+On 2020-08-19 15:28, Geoffrey McRae wrote:
+> On 2020-08-19 15:04, Gerd Hoffmann wrote:
+>> Hi,
+>> 
+>>> As JACK1 and JACK2 are interchangeable and JACK2 has "cleanup" 
+>>> routine
+>>> that JACK1 does not have, we need to determine which version is in 
+>>> use
+>>> at runtime. Unfortunatly there is no way to determine which is in use
+>>> other then to look for symbols that are missing in JACK1, which in 
+>>> this
+>>> case is `jack_get_version`.
+>> 
+>> No.  That'll quickly becomes a maintainance nightmare.
+>> 
+>> How about moving the qjack_client_fini() call to qjack_shutdown()?  
+>> Or,
+>> if that isn't an option due to qjack_shutdown being called from a 
+>> signal
+>> handler, schedule a bottom half calling qjack_client_fini()?
 > 
->> As JACK1 and JACK2 are interchangeable and JACK2 has "cleanup" routine
->> that JACK1 does not have, we need to determine which version is in use
->> at runtime. Unfortunatly there is no way to determine which is in use
->> other then to look for symbols that are missing in JACK1, which in 
->> this
->> case is `jack_get_version`.
+> You are correct, you can not perform such actions in the callback.
 > 
-> No.  That'll quickly becomes a maintainance nightmare.
+>> schedule a bottom half calling qjack_client_fini()
 > 
-> How about moving the qjack_client_fini() call to qjack_shutdown()?  Or,
-> if that isn't an option due to qjack_shutdown being called from a 
-> signal
-> handler, schedule a bottom half calling qjack_client_fini()?
+> Does QEMU have such a mechanism for doing this?
 
-You are correct, you can not perform such actions in the callback.
-
-> schedule a bottom half calling qjack_client_fini()
-
-Does QEMU have such a mechanism for doing this?
+There could also be a possible race here if `jack_client_connect` is 
+called before the scheduled shutdown takes place.
 
 > 
-> take care,
->   Gerd
+>> 
+>> take care,
+>>   Gerd
 
