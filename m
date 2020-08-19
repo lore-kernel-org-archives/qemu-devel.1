@@ -2,127 +2,112 @@ Return-Path: <SRS0=bVMU=B5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,RCVD_ILLEGAL_IP,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2ED2BC433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 22:26:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28C48C433E1
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 22:28:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E925220758
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 22:26:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DCE2A20758
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 22:28:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="aNy/+4o9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E925220758
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I/9+bLz3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCE2A20758
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40436 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42666 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8WXB-0004Zp-7W
-	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 18:26:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56054)
+	id 1k8WZP-0005ac-5M
+	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 18:28:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56546)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <Babu.Moger@amd.com>)
- id 1k8WWc-00049T-BK
- for qemu-devel@nongnu.org; Wed, 19 Aug 2020 18:25:42 -0400
-Received: from mail-bn7nam10on2072.outbound.protection.outlook.com
- ([40.107.92.72]:59873 helo=NAM10-BN7-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <Babu.Moger@amd.com>)
- id 1k8WWZ-0006aL-Nu
- for qemu-devel@nongnu.org; Wed, 19 Aug 2020 18:25:42 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=HgD9DFzTNvNDcmpBZnFP6TcL9Pc0f7aVrcld9u9YfxUQ76833ic6dFlyFUQD2X5Uwrl9N2uxquy04dHa5aZ2nXQLUmR3zTEO/wyNKB3WLI6w7m8H1ji67M+DxGHHGk06XVEMIassHyG6rbtNPGXsy8uQ870Z9UPuB5gQKRb9/fkdlioivdBJjYNXJdgg/8xr3nLKcUTLyZN/26BzU6qnJ6zs3aLp3gayZCh7Bg4UqDvdl7tbnh6psuyNTRhq3wHLbmqxTBoB1jPIII6eINojtPu4Ebs58/2ekwwNRgdCKI7yQqVk5WtroZTjYLARdx0rbURfHVu9xU5yqZe3W/QqWQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=1WjojCY0nEVJzD+LQl0J5LJ78s5wZPamxs9W6UOXHPU=;
- b=cyvx0fQU8eyHtcO64xTGHSwsANxGYQc3oYEqwJTMpiFII5QeJEQuWik3y/MGxc5fWYJo6kMIajl7mdAgkW1pGhWUb5YeyItBMrmno2NSy3fXF+a8pX0lcFbAIBnKK1hHzASIwKiQ1+i9XuuaWkM7d5JZ/Q7jNBpOoap3CCXDju/6nr+hGDPKfivmVWxToGtcliAVNYyqcgOMuB2UV5q5I54aA2xqEAXU6+/scsF0cUhRl8pi8nkiqbFVf8nHxq6dLmnu6gC28DEA7McqrODjjuv9X7o1uzZnHOAeWYzDEB6jy3WPoHnda+87oPz7lDROKk2CIeks5IAGaS4CUu1W1Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=1WjojCY0nEVJzD+LQl0J5LJ78s5wZPamxs9W6UOXHPU=;
- b=aNy/+4o9W4ze9OCCdVBZDTb3as15ZxQbE3xwUEZpKPolT6SOSLGlgyMGx6ojheUHs7T+ILmXmqfoBxzTquUDGDMNuG5seTL2FcE+iOc6q2zKNalxLb84uWqQb92qzEVmnfxoyONPJ1GF6GUun8AqpqUNrbFCfDD5/VmRkXuikJ8=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=amd.com;
-Received: from SN1PR12MB2560.namprd12.prod.outlook.com (2603:10b6:802:26::19)
- by SN6PR12MB2623.namprd12.prod.outlook.com (2603:10b6:805:6f::12)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3305.25; Wed, 19 Aug
- 2020 22:10:34 +0000
-Received: from SN1PR12MB2560.namprd12.prod.outlook.com
- ([fe80::ccd9:728:9577:200d]) by SN1PR12MB2560.namprd12.prod.outlook.com
- ([fe80::ccd9:728:9577:200d%4]) with mapi id 15.20.3305.024; Wed, 19 Aug 2020
- 22:10:34 +0000
-Subject: RE: [PATCH v4 2/3] hw/i386: Update the EPYC topology to use
- socket/dies/core/thread model
-To: Igor Mammedov <imammedo@redhat.com>
-References: <159744083536.39197.13827776633866601278.stgit@naples-babu.amd.com>
- <159744117377.39197.9319853595178174798.stgit@naples-babu.amd.com>
- <20200819132538.1173e444@redhat.com>
-From: Babu Moger <babu.moger@amd.com>
-Message-ID: <82b39dd9-3e70-c3cb-6ee7-163d57097d4f@amd.com>
-Date: Wed, 19 Aug 2020 17:10:32 -0500
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1k8WYe-00058j-A7
+ for qemu-devel@nongnu.org; Wed, 19 Aug 2020 18:27:48 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:50704
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1k8WYb-0006vC-9v
+ for qemu-devel@nongnu.org; Wed, 19 Aug 2020 18:27:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1597876063;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=eHOxQx0vydXF4YD60fhMLHkPLvxDrtwujHDE6RwiERk=;
+ b=I/9+bLz3HZnsuUFeuhXyzChDqQcEbxcpTLH+JzrvUpJF0e09OffPs0FB6YNynAQufd7HX9
+ D2ULhJVbBfhO0gN9n3KoHPppxlPHqb3M4Aw6czgjtyOhRy6QAclDiC/CLwB4geNFdTZGh8
+ n32Ip/uv5n1pI82eF85OgKlfmI23PCw=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-34-xvXKRJ1xPQydSeNCm-cXdw-1; Wed, 19 Aug 2020 18:27:35 -0400
+X-MC-Unique: xvXKRJ1xPQydSeNCm-cXdw-1
+Received: by mail-wr1-f70.google.com with SMTP id 89so9741814wrr.15
+ for <qemu-devel@nongnu.org>; Wed, 19 Aug 2020 15:27:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=eHOxQx0vydXF4YD60fhMLHkPLvxDrtwujHDE6RwiERk=;
+ b=fgx+0wIjFrMPWXa+c5LI2Bc+T7vaMeB8ulpwUxQfpr2WyuMhRb1W9DpVDGfWefXEhp
+ DVnn46TuVsyGhVeh2hYI3JoGJPHSyV+SVru1im//sH6uos5Hg5V3inA60ophGKUTDtNO
+ 5LmoqqfO0/VqMw03g9+493SGsOenX4vsQYRiYX5xyGsvVb+mnwy2G7wezRBjjzrMGVm2
+ ZKoGV72CzsjtJCFdgaTEZtIC+IGQ7ZQy7Un77dkhhHRcw8QeH5PR4oSORLOhUIdVBpGR
+ zXF5p7x8wEUFk8vDf6IZB1eFiZcYbLt4HV3drpIlkxXKxh8qc+/coEZrY9zg9/Axyvh1
+ kkBw==
+X-Gm-Message-State: AOAM530f+jsAUUMVRDee/9jNNcb++7nyYX4gm8xyB98J5KXFcA3RX5rm
+ ddJnYFib8q9hudpQsgl7xOdg/izLSZuXk1/wbUZIcksP61dRCx7CPo9VEsSJldbO11B1CJoYPE3
+ 04TxjpYy2n+0+cP8=
+X-Received: by 2002:a5d:6748:: with SMTP id l8mr186009wrw.358.1597876054380;
+ Wed, 19 Aug 2020 15:27:34 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzpuyeECH505wboPi9lkjPb18F3wzVSW8K2WEC28oILPpFcpKNXX4mLrkQ+lDIcfevlMp2dcA==
+X-Received: by 2002:a5d:6748:: with SMTP id l8mr185994wrw.358.1597876054103;
+ Wed, 19 Aug 2020 15:27:34 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:1cc0:4e4e:f1a9:1745?
+ ([2001:b07:6468:f312:1cc0:4e4e:f1a9:1745])
+ by smtp.gmail.com with ESMTPSA id j2sm388974wrp.46.2020.08.19.15.27.33
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 19 Aug 2020 15:27:33 -0700 (PDT)
+Subject: Re: [PULL v6 000/150] Meson-based build system
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>
+References: <20200819143525.2175-1-pbonzini@redhat.com>
+ <CAFEAcA_8VJecDyK8FR0ty=pknmo+Hc5s0OFj+-Y1Ah-OJ01FDQ@mail.gmail.com>
+ <CAFEAcA9jt21RHiu1eqAzK_PJAj9i6Ej27jT2=gfjSRZVjJsDKw@mail.gmail.com>
+ <2073e70d-f0c7-1831-b6c7-7ceaf8bd5599@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <dcf36021-3a68-f361-8bed-9606d9413afd@redhat.com>
+Date: Thu, 20 Aug 2020 00:27:33 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-In-Reply-To: <20200819132538.1173e444@redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SN4PR0601CA0019.namprd06.prod.outlook.com
- (2603:10b6:803:2f::29) To SN1PR12MB2560.namprd12.prod.outlook.com
- (2603:10b6:802:26::19)
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from 255.255.255.255 (255.255.255.255) by
- SN4PR0601CA0019.namprd06.prod.outlook.com (2603:10b6:803:2f::29) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3305.25 via Frontend
- Transport; Wed, 19 Aug 2020 22:10:33 +0000
-X-Originating-IP: [165.204.77.1]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 15705e40-2931-408a-6176-08d8448cb1ba
-X-MS-TrafficTypeDiagnostic: SN6PR12MB2623:
-X-Microsoft-Antispam-PRVS: <SN6PR12MB262396D7099997C234F60D6E955D0@SN6PR12MB2623.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: CfKbF/ZyPOf4Jh6b2E8B5p+kWnq8IqKN27B7PPL8CdZpGFbZU8hBb2BRX3ypW+0RktgIEhYdHavguZMI74uFFzGDy+imMN4Ds2AMXXnHNvhaf4zEo3wOKzlSEmoMn8A23qI2ixaefzRPGqhK8wEmeS941u/JZDrrUzdj6BNQsNnnbLzt+Dv4nFTPSoPoNEHDbxR4GDnJJZ3sh9T2lCsnKad6UvYMN46RfXp2ClBDjrle305DzQRfFRZ4FFcqDRH9Tss9sNaUXl0rTT8mM2q8fTmeWdPeyPdjTjxr/TVVyB6ILnhdDYa13smhL7xiNScmfBLD0yHTes0ebSao1IgjqCQB07D35N1V5LxWrkWdib2kFSJHhNbS5cEopUBb8fPamGWVSYXTJKTlr87poPxQys2ZWY+2TDogKbtFcVsZI38=
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:SN1PR12MB2560.namprd12.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(346002)(376002)(39860400002)(396003)(366004)(136003)(186003)(31696002)(4326008)(26005)(86362001)(8936002)(31686004)(44832011)(478600001)(956004)(110011004)(66946007)(2616005)(8676002)(5660300002)(54906003)(316002)(15650500001)(52116002)(16576012)(66476007)(83380400001)(2906002)(53546011)(6486002)(36756003)(66556008)(6916009)(43740500002);
- DIR:OUT; SFP:1101; 
-X-MS-Exchange-AntiSpam-MessageData: MQl98glzXsyHP2tD6GhJIETpN0DHbgjQY3wHqgHXu6raT6R+ZFkETchf+DcwiXrJBICaQV8MF94YvvoZfgwLP/DlWixaAxDj6fEsUamL3S66+tlJIRFLEem6YKUpf+6IplTbyC6oljzUjf5ldn6ROLtasCtMisekPUm6NE0Z9qO5f8MhOPXn8XgNyzITnF915Y8TpTUoHwSTQAUIZE1+hfjcuyTLJObZ4UcjGYARDVYMTcHIQ9V7aujqqXBOsiJ5X0r3SzMZXzTCaPIYGYCBEkO1K7YGF+sN9jjibKybrTm1oxcUG6i7hsX/dAOO32ohRubZSI5GC4/URNZmiRqpQ63KmrFjPbAxpanAHdZge79d05/rmcK01hXxyY9FCl50vfpgMAdWCH8TxpNbPuV8Dmr07XhMwBhrppAqtDj/32LY6pVJzP6BKTVCu3QxplXIeHZ3IixGmkwwDIfh+ZIya70eVbTxD6IJnw1MBFocntnLpG3l/AY9XgUgaUNM6EhKjaxPr5VQmDzwypj/ELSbQlvxDc6dt49rNnnItEmwtYYWfh69Wq+SfDRBfMGLeAZi6AMy49fc7OwA5Iwk5DATvsnGzkr1K++M0LqbL6usAxiLb0th9bWN+PEz8Y4+4fBw42jrSbco1/XDfUTs944oug==
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 15705e40-2931-408a-6176-08d8448cb1ba
-X-MS-Exchange-CrossTenant-AuthSource: SN1PR12MB2560.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Aug 2020 22:10:34.3135 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: pioKa+Qdftp35VfppKfJN/bF8J0d3xeg2HZE5CRPFexPEiDXmVFqjOvITadD5aYY
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR12MB2623
-Received-SPF: none client-ip=40.107.92.72; envelope-from=Babu.Moger@amd.com;
- helo=NAM10-BN7-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/19 18:25:37
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -5
-X-Spam_score: -0.6
-X-Spam_bar: /
-X-Spam_report: (-0.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, FORGED_SPF_HELO=1, MSGID_FROM_MTA_HEADER=0.001,
- RCVD_ILLEGAL_IP=1.3, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1,
- SPF_HELO_PASS=-0.001, SPF_NONE=0.001 autolearn=no autolearn_force=no
+In-Reply-To: <2073e70d-f0c7-1831-b6c7-7ceaf8bd5599@redhat.com>
+Content-Language: en-US
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/19 18:27:43
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -135,87 +120,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "ehabkost@redhat.com" <ehabkost@redhat.com>,
- "mst@redhat.com" <mst@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "rth@twiddle.net" <rth@twiddle.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 19/08/20 22:07, Philippe Mathieu-Daudé wrote:
+> Probably not the cause, but I'm seeing now docker images are built in
+> parallel (before it was sequential, I run make with -j8).
 
+I think it's always been parallel, and in fact nothing at all is changed
+by this series in that area.
 
-> -----Original Message-----
-> From: Igor Mammedov <imammedo@redhat.com>
-> Sent: Wednesday, August 19, 2020 6:26 AM
-> To: Moger, Babu <Babu.Moger@amd.com>
-> Cc: pbonzini@redhat.com; rth@twiddle.net; ehabkost@redhat.com;
-> mst@redhat.com; marcel.apfelbaum@gmail.com; qemu-devel@nongnu.org
-> Subject: Re: [PATCH v4 2/3] hw/i386: Update the EPYC topology to use
-> socket/dies/core/thread model
-> 
-> On Fri, 14 Aug 2020 16:39:33 -0500
-> Babu Moger <babu.moger@amd.com> wrote:
-> 
-> > Update the EPYC topology to use socket/dies/core/thread model. The
-> > EPYC model does not use the smp dies to build the topology. Instead,
-> > it uses numa nodes to build the topology. Internally both are similar
-> > concept which divides the cores on L3 boundary. Combining both into
-> > one terminology makes it simple to program.
-> >
-> > Add a new check to error out when smp dies are not provided when EPYC
-> > model is numa configured. Next task is to remove node_id, nr_nodes and
-> > nodes_per_pkg from EPYC topology which will be done in next patch.
-> >
-> > Signed-off-by: Babu Moger <babu.moger@amd.com>
-> > ---
-> >  hw/i386/x86.c |    8 ++++++++
-> >  1 file changed, 8 insertions(+)
-> >
-> > diff --git a/hw/i386/x86.c b/hw/i386/x86.c index
-> > 67bee1bcb8..e90c42d2fc 100644
-> > --- a/hw/i386/x86.c
-> > +++ b/hw/i386/x86.c
-> > @@ -138,6 +138,14 @@ void x86_cpus_init(X86MachineState *x86ms, int
-> > default_cpu_version)
-> >
-> >      /* Check for apicid encoding */
-> >      if (cpu_x86_use_epyc_apic_id_encoding(ms->cpu_type)) {
-> > +        if ((ms->numa_state->num_nodes > 0) &&
-> 
-> > +            ms->numa_state->num_nodes != (ms->smp.sockets *
-> > + x86ms->smp_dies)) {
-> this case is gated by (ms->numa_state->num_nodes > 0) so it won't work in case
-> -smp dies=>1 but there is no -numa options at all
+In any case it's fixed by v7, it was a cut-and-paste error (the MIPS
+invocations of syscallhdr.sh are different from the others).
 
-Looking back again, this check does not appear to be a good idea. The numa
-information is coming from ACPI and die information is coming from CPU
-internal hardware config. It may not match. I don't think this check will
-be good option. Sorry. I did not think about that earlier.
+Paolo
 
+> This seems to flood the DNS which blacklist me then I get failures:
 > 
-> we need to error out and ask to provide numa nodes corresponding to
->    (ms->numa_state->num_nodes == 0) && (ms->smp.sockets * x86ms-
-> >smp_dies)
+> #5 47.62 Error: Failed to download metadata for repo 'fedora-modular':
+> Cannot prepare internal mirrorlist: Curl error (6): Couldn't resolve
+> host name for
+> https://mirrors.fedoraproject.org/metalink?repo=fedora-modular-30&arch=x86_64
+> [Could not resolve host: mirrors.fedoraproject.org]
 > 
-> or better alternative would be to enable autonuma when EPYC cpu is enabled,
-> that will insure that this patch will work even if user hasn't specified -numa
-> option, since it will create a single numa node automatically.
 > 
-> The later will take care of (-smp 1,dies=1) case, which is broken due to lack of
-> explicit -numa we end up with CPU_UNSET_NUMA_NODE_ID in
-> CPUID_Fn8000001E_ECX.
-> 
-> > +            error_setg(&error_fatal, "Numa configuration here requires smp "
-> > +                       "'dies' parameter. Configure the cpu topology properly "
-> > +                       "with max_cpus = sockets * dies * cores * threads. Dies"
-> > +                       " is equivalent to number of numa nodes in a socket.");
-> > +            return;
-> > +        }
-> >          x86_set_epyc_topo_handlers(ms);
-> >      }
-> >
-> >
 
 
