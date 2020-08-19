@@ -2,71 +2,80 @@ Return-Path: <SRS0=bVMU=B5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+X-Spam-Status: No, score=-0.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FROM_LOCAL_DIGITS,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87613C433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 14:26:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D674C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 14:29:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4E7A92076E
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 14:26:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 43DE32076E
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 14:29:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="TAzHyBAp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E7A92076E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
+	dkim=pass (1024-bit key) header.d=fudan.edu.cn header.i=@fudan.edu.cn header.b="hXa/RxTL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43DE32076E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=fudan.edu.cn
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33614 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37358 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8P2S-0002Nl-Hm
-	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 10:26:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43990)
+	id 1k8P5j-0003yC-I0
+	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 10:29:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44770)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berto@igalia.com>)
- id 1k8P1n-0001tc-WB; Wed, 19 Aug 2020 10:25:24 -0400
-Received: from fanzine.igalia.com ([178.60.130.6]:41649)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <berto@igalia.com>)
- id 1k8P1l-0008Mn-0w; Wed, 19 Aug 2020 10:25:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
- s=20170329; 
- h=Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
- bh=bmTOdycsi+/DSc9HRJbtzGFxOWXqK4qfIg1yiai7eFw=; 
- b=TAzHyBApXMaAiqJCSVKqjhtYh2yaNASmYkIjCneslwsuwj4EuoDqPad6SMenr31cftINdfhNwvaBe3jnKPUwUPSiatCTt1pEQwSoK5EpkpSWG9RTL9/+S8qQJ8uNSpDJAJM6uGuBpqWDFKKSoUpTuPJPruqNxFGVpF2RZDhNBxhCDlh0sm/k3uDHIw3iC8Qda5WixlaRfbbtgD6thDG4k3eAEgic/uC2eJlLS7P7u4k5FvrwRbe9Szw8zJy3CDriuo56edyMHuKSz936LSsSxedYMFDavxFCfdqFirlclS2FrY4KuentKojuwqiR+hoPeSjUXhZDvM4yWN4QLZwk6A==;
-Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
- by fanzine.igalia.com with esmtps 
- (Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
- id 1k8P1h-0007G9-59; Wed, 19 Aug 2020 16:25:17 +0200
-Received: from berto by mail.igalia.com with local (Exim)
- id 1k8P1g-0006eN-Rm; Wed, 19 Aug 2020 16:25:16 +0200
-From: Alberto Garcia <berto@igalia.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Subject: Re: [PATCH 0/1] qcow2: Skip copy-on-write when allocating a zero
- cluster
-In-Reply-To: <20200817155307.GS11402@linux.fritz.box>
-References: <cover.1597416317.git.berto@igalia.com>
- <20200817101019.GD11402@linux.fritz.box>
- <w518sedz3td.fsf@maestria.local.igalia.com>
- <20200817155307.GS11402@linux.fritz.box>
-User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
- (i586-pc-linux-gnu)
-Date: Wed, 19 Aug 2020 16:25:16 +0200
-Message-ID: <w51pn7memr7.fsf@maestria.local.igalia.com>
+ (Exim 4.90_1) (envelope-from <19210240159@fudan.edu.cn>)
+ id 1k8P5C-0003Xx-PV
+ for qemu-devel@nongnu.org; Wed, 19 Aug 2020 10:28:55 -0400
+Received: from mail.fudan.edu.cn ([202.120.224.10]:41894 helo=fudan.edu.cn)
+ by eggs.gnu.org with esmtp (Exim 4.90_1)
+ (envelope-from <19210240159@fudan.edu.cn>) id 1k8P56-0000NV-Cw
+ for qemu-devel@nongnu.org; Wed, 19 Aug 2020 10:28:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=fudan.edu.cn; s=dkim; h=Received:Date:From:To:Subject:
+ Content-Type:MIME-Version:Message-ID; bh=FquTfrl/UHw65/Duf0AFGst
+ 388NTc0U39sBEFDEeh04=; b=hXa/RxTLVTjZwt+0leUAIt2zVXrqd0rwNvKrT8m
+ ZfHdB7YPjjYqYipo110uvEmEdo5puO3uzRbj/vswBbtjxCCKRWJGQNSzSclO8Itq
+ imY6sE1/BUAWLA2tUT5mP1vTaS0MHKE8Tc5aiZmHxss0AmWrvdDp3TanDakJl1EF
+ emR0=
+Received: by ajax-webmail-app1 (Coremail) ; Wed, 19 Aug 2020 22:28:35 +0800
+ (GMT+08:00)
+X-Originating-IP: [39.191.9.152]
+Date: Wed, 19 Aug 2020 22:28:35 +0800 (GMT+08:00)
+X-CM-HeaderCharset: UTF-8
+From: =?UTF-8?B?5p6X5aWV5biG?= <19210240159@fudan.edu.cn>
+To: qemu-devel@nongnu.org
+Subject: qemu
+X-Priority: 3
+X-Mailer: Coremail Webmail Server Version XT3.0.8 dev build
+ 20190909(dad6f454) Copyright (c) 2002-2020 www.mailtech.cn fudan.edu.cn
+X-SendMailWithSms: false
+X-CM-CTRLDATA: arX6p2Zvb3Rlcl9odG09MzMzOjE0JmZvb3Rlcl90eHQ9MjM0OjEw
+Content-Type: multipart/alternative; 
+ boundary="----=_Part_71008_892918934.1597847315664"
 MIME-Version: 1.0
-Content-Type: text/plain
-Received-SPF: pass client-ip=178.60.130.6; envelope-from=berto@igalia.com;
- helo=fanzine.igalia.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/19 10:25:17
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+Message-ID: <48e5d45b.51f9.174071f24d0.Coremail.19210240159@fudan.edu.cn>
+X-Coremail-Locale: zh_CN
+X-CM-TRANSID: XAUFCgA3eUITNz1fvF9hAw--.933W
+X-CM-SenderInfo: irzsiiysuqikmz6i3vldqovvfxof0/1tbiAQ8NB1Kp4fbKlAAFsz
+X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWUJw
+ CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
+ daVFxhVjvjDU=
+Received-SPF: pass client-ip=202.120.224.10;
+ envelope-from=19210240159@fudan.edu.cn; helo=fudan.edu.cn
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/19 10:28:37
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
+X-Spam_score_int: -24
+X-Spam_score: -2.5
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.5 / 5.0 requ) BAYES_20=-0.001, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FROM_LOCAL_DIGITS=0.001, FROM_LOCAL_HEX=0.006, HTML_MESSAGE=0.001,
+ RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -79,49 +88,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon 17 Aug 2020 05:53:07 PM CEST, Kevin Wolf wrote:
->> > Or are you saying that ZERO_RANGE + pwrite on a sparse file (=
->> > cluster allocation) is faster for you than just the pwrite alone (=
->> > writing to already allocated cluster)?
->> 
->> Yes, 20% faster in my tests (4KB random writes), but in the latter
->> case the cluster is already allocated only at the qcow2 level, not on
->> the filesystem. preallocation=falloc is faster than
->> preallocation=metadata (preallocation=off sits in the middle).
->
-> Hm, this feels wrong. Doing more operations should never be faster
-> than doing less operations.
->
-> Maybe the difference is in allocating 64k at once instead of doing a
-> separate allocation for every 4k block? But with the extent size hint
-> patches to file-posix, we should allocate 1 MB at once by default now
-> (if your test image was newly created). Can you check whether this is
-> in effect for your image file?
+------=_Part_71008_892918934.1597847315664
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
 
-I checked with xfs on my computer. I'm not very familiar with that
-filesystem so I was using the default options and I didn't tune
-anything.
+SGVsbG/vvIwKICAgcmVjZW50bHkgd2hlbiBJIHdhcyBjaGVja2luZyB0aGUgY3ZlcyBmb3IgdGhp
+cyBzb2Z0d2FyZSwgSSBjYW4gbm90IGZpbmQgdGhlIHBhdGNoIGNvbW1pdCBpZCBmb3IgdGhlc2Ug
+Y3ZlczoKICAgQ1ZFLTIwMTktMTIyNDcgQ1ZFLTIwMTgtNTc0OCBDVkUtMjAyMC0xMzc5MQpjb3Vs
+ZCB5b3UgcGxlYXNlIHRlbGwgd2hpdGNoIGNvbW1pdCBmaXggdGhlc2UgY3ZlPyBUaGFua3MuCgoK
+CgoKCgoKCgoNCg0KDQoNCg0K
+------=_Part_71008_892918934.1597847315664
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: base64
 
-What I got with my tests (using fio):
+SGVsbG/vvIw8ZGl2PiZuYnNwOyAmbmJzcDtyZWNlbnRseSB3aGVuIEkgd2FzIGNoZWNraW5nIHRo
+ZSBjdmVzIGZvciB0aGlzIHNvZnR3YXJlLCBJIGNhbiBub3QgZmluZCB0aGUgcGF0Y2ggY29tbWl0
+IGlkIGZvciB0aGVzZSBjdmVzOjwvZGl2PjxkaXY+Jm5ic3A7ICZuYnNwO0NWRS0yMDE5LTEyMjQ3
+IENWRS0yMDE4LTU3NDgmbmJzcDtDVkUtMjAyMC0xMzc5MTwvZGl2PjxkaXY+Y291bGQgeW91IHBs
+ZWFzZSB0ZWxsIHdoaXRjaCBjb21taXQgZml4IHRoZXNlIGN2ZT8gVGhhbmtzLjwvZGl2Pjxicj48
+YnI+CgoKPGJyPjxicj4KCgo8YnI+PGJyPgoKCjxicj48YnI+CgoKPGJyPjxicj4KCgo8YnI+PGJy
+Pg0KDQoNCg==
+------=_Part_71008_892918934.1597847315664--
 
-- Using extent_size_hint didn't make any difference in my test case (I
-  do see a clear difference however with the test case described in
-  commit ffa244c84a).
-
-- preallocation=off is still faster than preallocation=metadata. If I
-  disable handle_alloc_space() (so there is no ZERO_RANGE used) then it
-  is much slower.
-
-- With preallocation=falloc I get the same results as with
-  preallocation=metadata.
-
-- preallocation=full is the fastest by far.
-
-Berto
 
