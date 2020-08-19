@@ -2,101 +2,81 @@ Return-Path: <SRS0=bVMU=B5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.4 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A226C433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 19:45:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E7FDC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 19:51:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B4C51207DA
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 19:45:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AD9CE207BB
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 19:51:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NsIWD0nw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4C51207DA
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gUA/cRIe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD9CE207BB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51676 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54046 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8U1P-0006AG-S1
-	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 15:45:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50626)
+	id 1k8U7L-0007UL-UY
+	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 15:51:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51552)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k8U0r-0005jT-1K
- for qemu-devel@nongnu.org; Wed, 19 Aug 2020 15:44:45 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:56116
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1k8U6Z-0006ua-UA
+ for qemu-devel@nongnu.org; Wed, 19 Aug 2020 15:50:39 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:51919
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k8U0o-0002jq-12
- for qemu-devel@nongnu.org; Wed, 19 Aug 2020 15:44:44 -0400
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1k8U6X-0003Wk-Op
+ for qemu-devel@nongnu.org; Wed, 19 Aug 2020 15:50:39 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597866280;
+ s=mimecast20190719; t=1597866636;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ODRa/K1hafftc+Zlxl/3ZDVWfsdzKrx0gDG4S2lrm/c=;
- b=NsIWD0nwimtAim0N1vIeCUsNaXXhba1Lpj98l4P9ijgIFykoZWNLAFXSDvubSVQN7L78q1
- vJTzpTEmQEHYtyWM06bJr8L1tNm/HlfjEgG0waIpiawdJotQXboT6uJS6TT0J9Gsf0RXzT
- oJ0vveX4Z/urIlb0msig88nWY2Sc7fA=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-528-4Fo-kKfiO66-pHqVw5zU6A-1; Wed, 19 Aug 2020 15:44:38 -0400
-X-MC-Unique: 4Fo-kKfiO66-pHqVw5zU6A-1
-Received: by mail-wm1-f69.google.com with SMTP id h7so1296811wmm.7
- for <qemu-devel@nongnu.org>; Wed, 19 Aug 2020 12:44:38 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=ODRa/K1hafftc+Zlxl/3ZDVWfsdzKrx0gDG4S2lrm/c=;
- b=CqbhUcbnQBdOhvMKsCpjWWNgHAcv1xCSMbFrmZ1qudVAmaKdTchOoPkI2gY7r4pdbE
- H+sb1DFMzyhIq686nIDRVNphcz6uUvZCotkjzmotVF9SP3wV3Jb/PwMiSYUaCtLRr/QS
- 4fjOrKTVilYEvxhx8zzOmUfR57eetNo1z9wPbG99RJEw3j256k4q1T71Ro2T5sSn+rL8
- T2Xdpwc43+WeNgvcdjPNRW1Ab6iatBZzVcG+OISlnT1cvHxN/b/1Z0zoaLxnH2OS5Uf6
- pgJc+sjpnbtxne6trPsJ1kX+Lv6AIu79h2pRmyjg+qUe3AR3MkuXNESXXfZBHoCrZZ+o
- snBA==
-X-Gm-Message-State: AOAM532kh6IQjVCMEZ9eKKxGxsXvjHRYqKPttwYgYuwqhm6yY09lTaqa
- gRSoz3byYp0g2KzqEjy9R8+TCb7iX5Xl9HuyeWRxS3lbDo0p7sm1Zd0UDmDTkyj/QLbjT1lrTab
- LqozRR3N/JIQMGI0=
-X-Received: by 2002:a1c:4d0d:: with SMTP id o13mr6668309wmh.118.1597866277151; 
- Wed, 19 Aug 2020 12:44:37 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzFL88Pkp8aaRk5VlLLSXiWPokPFXpJsprBvybgggHfvLpgTdpJ/IdDI79gFzYLl/9Ma2osQA==
-X-Received: by 2002:a1c:4d0d:: with SMTP id o13mr6668286wmh.118.1597866276941; 
- Wed, 19 Aug 2020 12:44:36 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:1cc0:4e4e:f1a9:1745?
- ([2001:b07:6468:f312:1cc0:4e4e:f1a9:1745])
- by smtp.gmail.com with ESMTPSA id o124sm7177638wmb.2.2020.08.19.12.44.35
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 19 Aug 2020 12:44:36 -0700 (PDT)
-Subject: Re: [PULL v6 000/150] Meson-based build system
-To: Peter Maydell <peter.maydell@linaro.org>, Michael Tokarev <mjt@tls.msk.ru>
-References: <20200819143525.2175-1-pbonzini@redhat.com>
- <CAFEAcA_8VJecDyK8FR0ty=pknmo+Hc5s0OFj+-Y1Ah-OJ01FDQ@mail.gmail.com>
- <5d247082-4928-b47c-76c4-c366a9421e1a@msgid.tls.msk.ru>
- <CAFEAcA_YU8QY_VRNdXmBV=YKuBFaX=scT0Pnk1F8JBWrrbsbJA@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <72597e7a-6ee2-9875-536d-c5cd2d81950d@redhat.com>
-Date: Wed, 19 Aug 2020 21:44:35 +0200
+ bh=IjIaVgy0CerJ+noFPw3SnZh84TBydK3nBoCQvXR5L4o=;
+ b=gUA/cRIeaJ9GL/kcuAkwZ1z2ZzoKLQ+hp8//HFhT22JkoKrnbZt+FaPd4ijBQZ9OnaDuIl
+ kCKTtiJ3xft5cDGDGzNpo5vEdh/z0W1f6TDQDHugmIa9DkS+IuujkRmcxeFdEoVfVT/59e
+ 87j8CptTWlHAGDzYEbrJ5BFSongb5Vs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-48-EJvi6G1VO3O90vGd5UCJzA-1; Wed, 19 Aug 2020 15:50:21 -0400
+X-MC-Unique: EJvi6G1VO3O90vGd5UCJzA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7577A807330;
+ Wed, 19 Aug 2020 19:50:20 +0000 (UTC)
+Received: from [10.3.112.136] (ovpn-112-136.phx2.redhat.com [10.3.112.136])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1164E7DFFF;
+ Wed, 19 Aug 2020 19:50:20 +0000 (UTC)
+Subject: Re: [RFC PATCH 07/22] block/export: Remove magic from block-export-add
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+References: <20200813162935.210070-1-kwolf@redhat.com>
+ <20200813162935.210070-8-kwolf@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <b2958a79-f7c6-7bc2-8895-50924f15afd9@redhat.com>
+Date: Wed, 19 Aug 2020 14:50:19 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_YU8QY_VRNdXmBV=YKuBFaX=scT0Pnk1F8JBWrrbsbJA@mail.gmail.com>
+In-Reply-To: <20200813162935.210070-8-kwolf@redhat.com>
 Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0.001
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eblake@redhat.com
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=pbonzini@redhat.com;
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=eblake@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/19 04:57:22
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -119,28 +99,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Peter Krempa <pkrempa@redhat.com>, qemu-devel@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 19/08/20 21:04, Peter Maydell wrote:
->> is it really that important? We've changed single target build
->> rules already (from subdir-x86_64-softmmu to x86_64-softmmu/all
->> for one), which broke quite some mostly automatic build
->> systems which needed some fixing. Moving executables isn't a
->> big deal after that, methinks..
-> It breaks my setups and also my muscle memory for where
-> executables live. So this is the limit of how much I'm
-> willing to allow Meson to mess us around, I think.
+cc: Peter Krempa
 
-It's totally possible to accomodate this and I appreciate the help and
-effort you're putting into something that you (understandably) are not
-too confident in.
+On 8/13/20 11:29 AM, Kevin Wolf wrote:
+> nbd-server-add tries to be convenient and adds two questionable
+> features that we don't want to share in block-export-add, even for NBD
+> exports:
+> 
+> 1. When requesting a writable export of a read-only device, the export
+>     is silently downgraded to read-only. This should be an error in the
+>     context of block-export-add.
 
-However, this change was already in the first series that was posted
-like a year ago...
+I'd be happy for this to be an error even with nbd-export-add; I don't 
+think it would harm any of libvirt's existing usage (either for storage 
+migration, or for incremental backups).
 
-Paolo
+Side note: In the past, I had a proposal to enhance the NBD Protocol to 
+allow a client to advertise to the server its intent on being a 
+read-only or read-write client.  Not relevant to this patch, but this 
+part of the commit message reminds me that I should revisit that topic 
+(Rich and I recently hit another case in nbdkit where such an extension 
+would be nice, when it comes to using NBD's multi-conn for better 
+performance on a read-only connection, but only if the server knows the 
+client intends to be read-only)
+
+> 
+> 2. When using a BlockBackend name, unplugging the device from the guest
+>     will automatically stop the NBD server, too. This may sometimes be
+>     what you want, but it could also be very surprising. Let's keep
+>     things explicit with block-export-add. If the user wants to stop the
+>     export, they should tell us so.
+
+Here, keeping the nbd command different from the block-export command 
+seems tolerable.  On the other hand, I wonder if Peter needs to change 
+anything in libvirt's incremental backup code to handle this sudden 
+disappearance of an NBD device during a disk hot-unplug (that is, either 
+the presence of an ongoing pull-mode backup should block disk unplug, or 
+libvirt needs a way to guarantee that an ongoing backup NBD device 
+remains in spite of subsequent disk actions on the guest).  Depending on 
+libvirt's needs, we may want to revisit the nbd command to have the same 
+policy as block-export-add, plus an introspectible feature notation.
+
+> 
+> Move these things into the nbd-server-add QMP command handler so that
+> they apply only there.
+> 
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>   include/block/nbd.h   |  3 ++-
+
+> +void qmp_block_export_add(BlockExportOptions *export, Error **errp)
+> +{
+> +    blk_exp_add(export, errp);
+>   }
+>   
+>   void qmp_nbd_server_add(BlockExportOptionsNbd *arg, Error **errp)
+>   {
+> -    BlockExportOptions export = {
+> +    BlockExport *export;
+> +    BlockDriverState *bs;
+> +    BlockBackend *on_eject_blk;
+> +
+> +    BlockExportOptions export_opts = {
+>           .type = BLOCK_EXPORT_TYPE_NBD,
+>           .u.nbd = *arg,
+>       };
+> -    qmp_block_export_add(&export, errp);
+> +
+> +    /*
+> +     * nbd-server-add doesn't complain when a read-only device should be
+> +     * exported as writable, but simply downgrades it. This is an error with
+> +     * block-export-add.
+
+I'd be happy with either marking this deprecated now (and fixing it in 
+two releases), or declaring it a bug in nbd-server-add now (and fixing 
+it outright).
+
+> +     */
+> +    bs = bdrv_lookup_bs(arg->device, arg->device, NULL);
+> +    if (bs && bdrv_is_read_only(bs)) {
+> +        arg->writable = false;
+> +    }
+> +
+> +    export = blk_exp_add(&export_opts, errp);
+> +    if (!export) {
+> +        return;
+> +    }
+> +
+> +    /*
+> +     * nbd-server-add removes the export when the named BlockBackend used for
+> +     * @device goes away.
+> +     */
+> +    on_eject_blk = blk_by_name(arg->device);
+> +    if (on_eject_blk) {
+> +        nbd_export_set_on_eject_blk(export, on_eject_blk);
+> +    }
+
+Wait - is the magic export removal tied only to exporting a drive name, 
+and not a node name?  So as long as libvirt is using only node names 
+whwen adding exports, a drive being unplugged won't interfere?
+
+Overall, the change makes sense to me, although I'd love to see if we 
+could go further on the writable vs. read-only issue.
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
