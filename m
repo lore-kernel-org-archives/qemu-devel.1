@@ -2,97 +2,158 @@ Return-Path: <SRS0=bVMU=B5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.4 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.4 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81367C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 09:29:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B29DC433E1
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 09:34:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3544320639
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 09:29:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 230CA206FA
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 09:34:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Bb1z5cvx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3544320639
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="FwP6FrSd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 230CA206FA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43574 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45814 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8KPl-0001dZ-DC
-	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 05:29:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46318)
+	id 1k8KU6-0002pO-Dd
+	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 05:34:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47098)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1k8KPD-0001DK-EV
- for qemu-devel@nongnu.org; Wed, 19 Aug 2020 05:29:15 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:24181
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1k8KPA-0001LW-EY
- for qemu-devel@nongnu.org; Wed, 19 Aug 2020 05:29:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597829351;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=k/MD/P1poUrssHbNV3l2HJ+sTJ0zcG/biGuEzEA7714=;
- b=Bb1z5cvxbXSYyKKD6lD5J7JejIz/KsV4Op2eAIJ0dhqhyTeLeFKk/umf9sv5Ptjz5g94pU
- m53uLKD8h7i5ecUSenP6SEXHHr/iQDSQZjDqn6RyIZmY2eocV6AI+TFBcCgwYKxJD4cKqa
- Q+be23dYuI5FqdvRvkd1lX/0LytLw4Q=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-197-GVKzHXlSMuG_lmSgcWY1Qw-1; Wed, 19 Aug 2020 05:29:07 -0400
-X-MC-Unique: GVKzHXlSMuG_lmSgcWY1Qw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6565381F034;
- Wed, 19 Aug 2020 09:29:04 +0000 (UTC)
-Received: from [10.72.13.88] (ovpn-13-88.pek2.redhat.com [10.72.13.88])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 805F7756C6;
- Wed, 19 Aug 2020 09:28:40 +0000 (UTC)
-Subject: Re: [ovirt-devel] Re: device compatibility interface for live
- migration with assigned devices
-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <a51209fe-a8c6-941f-ff54-7be06d73bc44@redhat.com>
- <20200818085527.GB20215@redhat.com>
- <3a073222-dcfe-c02d-198b-29f6a507b2e1@redhat.com>
- <20200818091628.GC20215@redhat.com>
- <20200818113652.5d81a392.cohuck@redhat.com>
- <BY5PR12MB4322C9D1A66C4657776A1383DC5C0@BY5PR12MB4322.namprd12.prod.outlook.com>
- <20200819033035.GA21172@joy-OptiPlex-7040>
- <e20812b7-994b-b7f9-2df4-a78c4d116c7f@redhat.com>
- <20200819065951.GB21172@joy-OptiPlex-7040>
- <d6f9a51e-80b3-44c5-2656-614b327dc080@redhat.com>
- <20200819081338.GC21172@joy-OptiPlex-7040>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <c1d580dd-5c0c-21bc-19a6-f776617d4ec2@redhat.com>
-Date: Wed, 19 Aug 2020 17:28:38 +0800
+ (Exim 4.90_1) (envelope-from <frankja@linux.ibm.com>)
+ id 1k8KTD-0002OS-6u; Wed, 19 Aug 2020 05:33:23 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:55366)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <frankja@linux.ibm.com>)
+ id 1k8KTA-0001mM-VH; Wed, 19 Aug 2020 05:33:22 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 07J9WqGi141649; Wed, 19 Aug 2020 05:32:56 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
+ h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type; s=pp1; bh=mD1WkqYecHEih6zyE5BPfrb+hDqDQZuHG8M10DmVqQ4=;
+ b=FwP6FrSdIH2ozJQ9qmWF+CMuEhg0VJY75BqdCg8hsj7u3D7dZmDDOX+lgPSGjZlDwOOF
+ 7SD9U9QOnRouty/fdUvw2+yn7yviG/Nu2Eg7yMX7cNE+XgvUO08vfFqpqYJrYOAIRZWL
+ AYXRzShSlZV/RONhgTwLhoTmEK6bOLQgE4C7hyX3MUUbDNBHn2YnvBdSBvnHkNZHqaPs
+ hTNHu87SiBXFj49ILSdbs5pU4RYCTAONdwiPLjfad/iZ91lk4SKkHxIG24tkM+1d4ddy
+ KVueCwKBjlSep4GEuAhLDZRB3nrdufbyJTarl2InNNY5o2w/aRbGFZoqw6aQPWh+4g64 0g== 
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 3304u7x1tt-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 19 Aug 2020 05:32:56 -0400
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 07J9WtFe141953;
+ Wed, 19 Aug 2020 05:32:55 -0400
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com
+ [169.51.49.99])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 3304u7x1q9-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 19 Aug 2020 05:32:55 -0400
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+ by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 07J9PNFg025649;
+ Wed, 19 Aug 2020 09:32:38 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com
+ (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+ by ppma04ams.nl.ibm.com with ESMTP id 3304cc1pnq-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 19 Aug 2020 09:32:38 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com
+ [9.149.105.232])
+ by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
+ id 07J9WZlQ65274182
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 19 Aug 2020 09:32:35 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 6C06152050;
+ Wed, 19 Aug 2020 09:32:35 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.70.234])
+ by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 2761B5204E;
+ Wed, 19 Aug 2020 09:32:35 +0000 (GMT)
+Subject: Re: [PATCH] pc-bios: s390x: Only set lowcore iplb address on
+ list-directed IPL
+To: jjherne@linux.ibm.com, Cornelia Huck <cohuck@redhat.com>
+References: <20200817141734.5109-1-jjherne@linux.ibm.com>
+ <20200817183048.30cb6f9e.cohuck@redhat.com>
+ <f232a187-c989-cf77-52e5-2e31678e5bed@linux.ibm.com>
+From: Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <173257e9-a6cb-48a5-62ed-794c060e3900@linux.ibm.com>
+Date: Wed, 19 Aug 2020 11:32:34 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ Thunderbird/68.8.0
 MIME-Version: 1.0
-In-Reply-To: <20200819081338.GC21172@joy-OptiPlex-7040>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=jasowang@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/19 01:46:53
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+In-Reply-To: <f232a187-c989-cf77-52e5-2e31678e5bed@linux.ibm.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="raZfnjy0XgcsCubwLzLmpohqUPzSNxZIY"
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
+ definitions=2020-08-19_04:2020-08-19,
+ 2020-08-19 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ mlxscore=0 impostorscore=0
+ phishscore=0 mlxlogscore=999 lowpriorityscore=0 bulkscore=0 spamscore=0
+ suspectscore=0 adultscore=0 priorityscore=1501 malwarescore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2008190082
+Received-SPF: pass client-ip=148.163.156.1; envelope-from=frankja@linux.ibm.com;
+ helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/19 05:32:56
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -36
+X-Spam_score: -3.7
+X-Spam_bar: ---
+X-Spam_report: (-3.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -106,268 +167,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "libvir-list@redhat.com" <libvir-list@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Kirti Wankhede <kwankhede@nvidia.com>, "eauger@redhat.com" <eauger@redhat.com>,
- "xin-ran.wang@intel.com" <xin-ran.wang@intel.com>,
- "corbet@lwn.net" <corbet@lwn.net>, "openstack-discuss@lists.openstack.org"
- <openstack-discuss@lists.openstack.org>,
- "shaohe.feng@intel.com" <shaohe.feng@intel.com>,
- "kevin.tian@intel.com" <kevin.tian@intel.com>,
- Parav Pandit <parav@mellanox.com>,
- "jian-feng.ding@intel.com" <jian-feng.ding@intel.com>,
- "dgilbert@redhat.com" <dgilbert@redhat.com>,
- "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
- "hejie.xu@intel.com" <hejie.xu@intel.com>,
- "bao.yumeng@zte.com.cn" <bao.yumeng@zte.com.cn>,
- Alex Williamson <alex.williamson@redhat.com>,
- "eskultet@redhat.com" <eskultet@redhat.com>, Parav Pandit <parav@nvidia.com>,
- "sm ooney@redhat.com" <smooney@redhat.com>,
- "intel-gvt-dev@lists.freedesktop.org" <intel-gvt-dev@lists.freedesktop.org>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>, Jiri Pirko <jiri@mellanox.com>,
- "dinechin@redhat.com" <dinechin@redhat.com>,
- "devel@ovirt.org" <devel@ovirt.org>
+Cc: qemu-s390x@nongnu.org, Viktor Mihajlovski <mihajlov@linux.ibm.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--raZfnjy0XgcsCubwLzLmpohqUPzSNxZIY
+Content-Type: multipart/mixed; boundary="jJh3cBdymXYgjmgqjq4XW4jCtbiOTk5A4"
 
-On 2020/8/19 下午4:13, Yan Zhao wrote:
-> On Wed, Aug 19, 2020 at 03:39:50PM +0800, Jason Wang wrote:
->> On 2020/8/19 下午2:59, Yan Zhao wrote:
->>> On Wed, Aug 19, 2020 at 02:57:34PM +0800, Jason Wang wrote:
->>>> On 2020/8/19 上午11:30, Yan Zhao wrote:
->>>>> hi All,
->>>>> could we decide that sysfs is the interface that every VFIO vendor driver
->>>>> needs to provide in order to support vfio live migration, otherwise the
->>>>> userspace management tool would not list the device into the compatible
->>>>> list?
->>>>>
->>>>> if that's true, let's move to the standardizing of the sysfs interface.
->>>>> (1) content
->>>>> common part: (must)
->>>>>       - software_version: (in major.minor.bugfix scheme)
->>>> This can not work for devices whose features can be negotiated/advertised
->>>> independently. (E.g virtio devices)
->>>>
->>> sorry, I don't understand here, why virtio devices need to use vfio interface?
+--jJh3cBdymXYgjmgqjq4XW4jCtbiOTk5A4
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 8/17/20 7:51 PM, Jason J. Herne wrote:
+> On 8/17/20 12:30 PM, Cornelia Huck wrote:
+>> On Mon, 17 Aug 2020 10:17:34 -0400
+>> "Jason J. Herne" <jjherne@linux.ibm.com> wrote:
 >>
->> I don't see any reason that virtio devices can't be used by VFIO. Do you?
->>
->> Actually, virtio devices have been used by VFIO for many years:
->>
->> - passthrough a hardware virtio devices to userspace(VM) drivers
->> - using virtio PMD inside guest
->>
-> So, what's different for it vs passing through a physical hardware via VFIO?
-
-
-The difference is in the guest, the device could be either real hardware 
-or emulated ones.
-
-
-> even though the features are negotiated dynamically, could you explain
-> why it would cause software_version not work?
-
-
-Virtio device 1 supports feature A, B, C
-Virtio device 2 supports feature B, C, D
-
-So you can't migrate a guest from device 1 to device 2. And it's 
-impossible to model the features with versions.
-
-
->
->
->>> I think this thread is discussing about vfio related devices.
+>>> The POP states that the IPLB location is only written to 0x14 for
+>>> list-directed IPL. Some operating systems expect 0x14 to not change o=
+n
+>>> boot and will fail IPL if it does change.
 >>>
->>>>>       - device_api: vfio-pci or vfio-ccw ...
->>>>>       - type: mdev type for mdev device or
->>>>>               a signature for physical device which is a counterpart for
->>>>> 	   mdev type.
->>>>>
->>>>> device api specific part: (must)
->>>>>      - pci id: pci id of mdev parent device or pci id of physical pci
->>>>>        device (device_api is vfio-pci)API here.
->>>> So this assumes a PCI device which is probably not true.
->>>>
->>> for device_api of vfio-pci, why it's not true?
+>>> Fixes: 9bfc04f9ef6802fff0
+>>
+>> Should be
+>>
+>> Fixes: 9bfc04f9ef68 ("pc-bios: s390x: Save iplb location in lowcore")
+>>
+>>> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
+>>> Reviewed-by: Janosch Frank <frankja@de.ibm.com>
+>>> ---
+>>>   pc-bios/s390-ccw/jump2ipl.c | 5 ++++-
+>>>   1 file changed, 4 insertions(+), 1 deletion(-)
 >>>
->>> for vfio-ccw, it's subchannel_type.
+>>> diff --git a/pc-bios/s390-ccw/jump2ipl.c b/pc-bios/s390-ccw/jump2ipl.=
+c
+>>> index 767012bf0c..5e3e13f4b0 100644
+>>> --- a/pc-bios/s390-ccw/jump2ipl.c
+>>> +++ b/pc-bios/s390-ccw/jump2ipl.c
+>>> @@ -33,7 +33,10 @@ void jump_to_IPL_code(uint64_t address)
+>>>   {
+>>>       /* store the subsystem information _after_ the bootmap was load=
+ed */
+>>>       write_subsystem_identification();
+>>> -    write_iplb_location();
+>>> +
+>>> +    if (iplb.pbt !=3D S390_IPL_TYPE_CCW) {
+>>> +            write_iplb_location();
+>>> +    }
 >>
->> Ok but having two different attributes for the same file is not good idea.
->> How mgmt know there will be a 3rd type?
-> that's why some attributes need to be common. e.g.
-> device_api: it's common because mgmt need to know it's a pci device or a
->              ccw device. and the api type is already defined vfio.h.
-> 	    (The field is agreed by and actually suggested by Alex in previous mail)
-> type: mdev_type for mdev. if mgmt does not understand it, it would not
->        be able to create one compatible mdev device.
-> software_version: mgmt can compare the major and minor if it understands
->        this fields.
-
-
-I think it would be helpful if you can describe how mgmt is expected to 
-work step by step with the proposed sysfs API. This can help people to 
-understand.
-
-Thanks for the patience. Since sysfs is uABI, when accepted, we need 
-support it forever. That's why we need to be careful.
-
-
+>> What happens for ipl types other than CCW and FCP? IOW, should that
+>> rather be a positive check for S390_IPL_TYPE_FCP?
 >>
->>>>>      - subchannel_type (device_api is vfio-ccw)
->>>>> vendor driver specific part: (optional)
->>>>>      - aggregator
->>>>>      - chpid_type
->>>>>      - remote_url
->>>> For "remote_url", just wonder if it's better to integrate or reuse the
->>>> existing NVME management interface instead of duplicating it here. Otherwise
->>>> it could be a burden for mgmt to learn. E.g vendor A may use "remote_url"
->>>> but vendor B may use a different attribute.
->>>>
->>> it's vendor driver specific.
->>> vendor specific attributes are inevitable, and that's why we are
->>> discussing here of a way to standardizing of it.
+>>>  =20
+>>>       /* prevent unknown IPL types in the guest */
+>>>       if (iplb.pbt =3D=3D S390_IPL_TYPE_QEMU_SCSI) {
 >>
->> Well, then you will end up with a very long list to discuss. E.g for
->> networking devices, you will have "mac", "v(x)lan" and a lot of other.
->>
->> Note that "remote_url" is not vendor specific but NVME (class/subsystem)
->> specific.
->>
-> yes, it's just NVMe specific. I added it as an example to show what is
-> vendor specific.
-> if one attribute is vendor specific across all vendors, then it's not vendor specific,
-> it's already common attribute, right?
+>=20
+> Based on my (admittedly limited) understanding of the architecture and
+> code, I believe write_iplb_location() should be called at least for
+> S390_IPL_TYPE_FCP but I'm not 100% sure on S390_IPL_TYPE_QEMU_SCSI.
+> Perhaps Janosch has an idea?
+>=20
+> It was originally unconditional, and my new conditional excludes vfio
+> CCW which is definitely a step in the right direction, in any case :).
+
+If I remember correctly the problem was that ZIPL used the IPLB lowcore
+ptr without checking how it was booted (CCW or FCP). That was fixed in
+mid of July by testing if diag308 gives back a config or not.
+
+So we might have a deadlock situation here which I need to think about
+for a bit. I'm setting Viktor CC to get a bit more information about the
+state of the zipl backports into the distros.
 
 
-It's common but the issue is about naming and mgmt overhead. Unless you 
-have a unified API per class (NVME, ethernet, etc), you can't prevent 
-vendor from using another name instead of "remote_url".
 
 
->
->> The point is that if vendor/class specific part is unavoidable, why not
->> making all of the attributes vendor specific?
->>
-> some parts need to be common, as I listed above.
+--jJh3cBdymXYgjmgqjq4XW4jCtbiOTk5A4--
 
+--raZfnjy0XgcsCubwLzLmpohqUPzSNxZIY
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-This is hard, unless VFIO knows the type of device (e.g it's a NVME or 
-networking device).
+-----BEGIN PGP SIGNATURE-----
 
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl888bIACgkQ41TmuOI4
+ufhIXBAAnqiUl5Xpr9M1FV9NP6V1JDrQqrIBMu6yjbQEZKpv6UmzdnnNS2DSsZeN
++LIKRFoT/NrfRwoTz0AsPOYiJ8sXnkZTJt+BN2H64+GifHZblUnXlQuHNyRRzKul
+lFC1xxfrFWXoyM0JDbUTH0CiImcoJ2kCBcKiPaf06kqhg9houAdvsIPDYzPCfXcN
+BNTAG/xuGYOJ2nzEwk9HwOzNf7Ku/ywi+RV1cewzhdSWCFCoIv5LdTxHfppWPylK
+h+OhuRpmORsuMqDsfThgVUeR4b6khKbHpu3Bvudo5WFn2TSe3unkQ4K5U4wFwZ5u
+ydBBO9r89YBuKBdUaIxsWk3WZ6foXaL6+gq1DpLIi7XSvuIDRjT0148VgxIHJ0eF
+mTrPbohnpJLbKSpAir9M1dmopmyIM4aRxjN9i6qvJEx99f7qmnCjE1FDTwD7ig5u
+uNSdlc7y+aU6t9ZFoO/ybzjKelkFBTGgL10R4w7SxwDRYus8BURI76/5BSB8+qaT
+mo91G+QAEEaIt2hDr0XKccOik5gJkYdgRQmPAGoa0u6x7fxvwMVtSechKOh8JORX
+g6vE1bUVKB70/ihL5KZJoVkn8wrRu/lrCOAxSz3KBwpfAdhyG7ciO6HEw8W5YokD
+vgYuqAyEcb317KXwqKJjHp2rdi2XXLGLjk616DyoZ7irnfWuH44=
+=nN/9
+-----END PGP SIGNATURE-----
 
->
->>> our goal is that mgmt can use it without understanding the meaning of vendor
->>> specific attributes.
->>
->> I'm not sure this is the correct design of uAPI. Is there something similar
->> in the existing uAPIs?
->>
->> And it might be hard to work for virtio devices.
->>
->>
->>>>> NOTE: vendors are free to add attributes in this part with a
->>>>> restriction that this attribute is able to be configured with the same
->>>>> name in sysfs too. e.g.
->>>> Sysfs works well for common attributes belongs to a class, but I'm not sure
->>>> it can work well for device/vendor specific attributes. Does this mean mgmt
->>>> need to iterate all the attributes in both src and dst?
->>>>
->>> no. just attributes under migration directory.
->>>
->>>>> for aggregator, there must be a sysfs attribute in device node
->>>>> /sys/devices/pci0000:00/0000:00:02.0/882cc4da-dede-11e7-9180-078a62063ab1/intel_vgpu/aggregator,
->>>>> so that the userspace tool is able to configure the target device
->>>>> according to source device's aggregator attribute.
->>>>>
->>>>>
->>>>> (2) where and structure
->>>>> proposal 1:
->>>>> |- [path to device]
->>>>>      |--- migration
->>>>>      |     |--- self
->>>>>      |     |    |-software_version
->>>>>      |     |    |-device_api
->>>>>      |     |    |-type
->>>>>      |     |    |-[pci_id or subchannel_type]
->>>>>      |     |    |-<aggregator or chpid_type>
->>>>>      |     |--- compatible
->>>>>      |     |    |-software_version
->>>>>      |     |    |-device_api
->>>>>      |     |    |-type
->>>>>      |     |    |-[pci_id or subchannel_type]
->>>>>      |     |    |-<aggregator or chpid_type>
->>>>> multiple compatible is allowed.
->>>>> attributes should be ASCII text files, preferably with only one value
->>>>> per file.
->>>>>
->>>>>
->>>>> proposal 2: use bin_attribute.
->>>>> |- [path to device]
->>>>>      |--- migration
->>>>>      |     |--- self
->>>>>      |     |--- compatible
->>>>>
->>>>> so we can continue use multiline format. e.g.
->>>>> cat compatible
->>>>>      software_version=0.1.0
->>>>>      device_api=vfio_pci
->>>>>      type=i915-GVTg_V5_{val1:int:1,2,4,8}
->>>>>      pci_id=80865963
->>>>>      aggregator={val1}/2
->>>> So basically two questions:
->>>>
->>>> - how hard to standardize sysfs API for dealing with compatibility check (to
->>>> make it work for most types of devices)
->>> sorry, I just know we are in the process of standardizing of it :)
->>
->> It's not easy. As I said, the current design can't work for virtio devices
->> and it's not hard to find other examples. I remember some Intel devices have
->> bitmask based capability registers.
->>
-> some Intel devices have bitmask based capability registers.
-> so what?
-
-
-You should at least make the proposed API working for your(Intel) own 
-devices.
-
-
-> we have defined pci_id to identify the devices.
-> even two different devices have equal PCI IDs, we still allow them to
-> add vendor specific fields. e.g.
-> for QAT, they can add alg_set to identify hardware supported algorithms.
-
-
-Well, the point is to make sure the API not work only for some specific 
-devices. If we agree with this, we need try to seek what is missed instead.
-
-
->
->>>> - how hard for the mgmt to learn with a vendor specific attributes (vs
->>>> existing management API)
->>> what is existing management API?
->>
->> It depends on the type of devices. E.g for NVME, we've already had one
->> (/sys/kernel/config/nvme)?
->>
-> if the device is binding to vfio or vfio-mdev, I believe this interface
-> is not there.
-
-
-So you want to duplicate some APIs with existing NVME ones?
-
-Thanks
-
-
->
->
-> Thanks
-> Yan
->
+--raZfnjy0XgcsCubwLzLmpohqUPzSNxZIY--
 
 
