@@ -7,44 +7,44 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86C36C433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 13:11:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 342A9C433E1
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 13:12:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5B3172065F
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 13:11:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B3172065F
+	by mail.kernel.org (Postfix) with ESMTPS id 04BCA206FA
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 13:12:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04BCA206FA
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47864 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51638 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8NsB-00019f-Ko
-	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 09:11:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52034)
+	id 1k8NtU-0002lY-8b
+	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 09:12:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52092)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <clg@kaod.org>)
- id 1k8Npm-0004sp-QR; Wed, 19 Aug 2020 09:08:54 -0400
-Received: from smtpout1.mo529.mail-out.ovh.net ([178.32.125.2]:58771)
+ id 1k8Npp-0004yF-6c; Wed, 19 Aug 2020 09:08:57 -0400
+Received: from smtpout1.mo804.mail-out.ovh.net ([79.137.123.220]:36813)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <clg@kaod.org>)
- id 1k8Npj-0006LI-U1; Wed, 19 Aug 2020 09:08:54 -0400
-Received: from mxplan5.mail.ovh.net (unknown [10.108.16.8])
- by mo529.mail-out.ovh.net (Postfix) with ESMTPS id A7B4A51EFC7D;
- Wed, 19 Aug 2020 15:08:49 +0200 (CEST)
+ id 1k8Npl-0006Lq-LV; Wed, 19 Aug 2020 09:08:56 -0400
+Received: from mxplan5.mail.ovh.net (unknown [10.109.138.109])
+ by mo804.mail-out.ovh.net (Postfix) with ESMTPS id 6958258A0B8A;
+ Wed, 19 Aug 2020 15:08:51 +0200 (CEST)
 Received: from kaod.org (37.59.142.98) by DAG4EX1.mxp5.local (172.16.2.31)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1979.3; Wed, 19 Aug
- 2020 15:08:48 +0200
+ 2020 15:08:50 +0200
 Authentication-Results: garm.ovh; auth=pass
- (GARM-98R002b316f480-e9ea-4a06-92ab-092c6af114d4,
+ (GARM-98R00222ed0cb7-28ec-4adb-bcfa-41a54b3a8a55,
  56ABA3BD09B5898CED80C8E013D4E39E9C6048D1) smtp.auth=clg@kaod.org
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 To: David Gibson <david@gibson.dropbear.id.au>
-Subject: [PATCH 2/8] linux-headers: Update for KVM_DEV_XIVE_GRP_SOURCE_INFO
-Date: Wed, 19 Aug 2020 15:08:37 +0200
-Message-ID: <20200819130843.2230799-3-clg@kaod.org>
+Subject: [PATCH 4/8] spapr/xive: Activate StoreEOI for POWER10 only
+Date: Wed, 19 Aug 2020 15:08:39 +0200
+Message-ID: <20200819130843.2230799-5-clg@kaod.org>
 X-Mailer: git-send-email 2.25.4
 In-Reply-To: <20200819130843.2230799-1-clg@kaod.org>
 References: <20200819130843.2230799-1-clg@kaod.org>
@@ -54,14 +54,14 @@ Content-Transfer-Encoding: 8bit
 X-Originating-IP: [37.59.142.98]
 X-ClientProxiedBy: DAG2EX1.mxp5.local (172.16.2.11) To DAG4EX1.mxp5.local
  (172.16.2.31)
-X-Ovh-Tracer-GUID: 03e09e63-567b-4646-a48b-58487daac0e8
-X-Ovh-Tracer-Id: 2621376458588523302
+X-Ovh-Tracer-GUID: a88e599d-486e-4347-8993-cb6e5e2a3057
+X-Ovh-Tracer-Id: 2621939408889350950
 X-VR-SPAMSTATE: OK
 X-VR-SPAMSCORE: -100
 X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedruddtkedggeegucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvufffkffojghfgggtgfhisehtkeertdertdejnecuhfhrohhmpeevrogurhhitgcunfgvucfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepheehfeegjeeitdfffeetjeduveejueefuefgtdefueelueetveeliefhhffgtdelnecukfhppedtrddtrddtrddtpdefjedrheelrddugedvrdelkeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehmgihplhgrnhehrdhmrghilhdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtoheptghlgheskhgrohgurdhorhhg
-Received-SPF: pass client-ip=178.32.125.2; envelope-from=clg@kaod.org;
- helo=smtpout1.mo529.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/19 09:08:48
+Received-SPF: pass client-ip=79.137.123.220; envelope-from=clg@kaod.org;
+ helo=smtpout1.mo804.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/19 09:08:51
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer
 X-Spam_score_int: -18
 X-Spam_score: -1.9
@@ -87,39 +87,98 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-To be sent with the linux-headers update when support is merged.
+The StoreEOI features is safe to use with a P10 compat machine but not
+with P9 compat, as it can not be migrated to a P9 host.
+
+Introdude a "hw-storeeoi" property in the SpaprXive model to check for
+the availability of StoreEOI at the HW level when a kernel IRQ chip is
+in use. XIVE emulated is not impacted.
 
 Signed-off-by: Cédric Le Goater <clg@kaod.org>
 ---
- linux-headers/asm-powerpc/kvm.h | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ include/hw/ppc/spapr_xive.h |  1 +
+ hw/intc/spapr_xive.c        |  3 ++-
+ hw/ppc/spapr_irq.c          | 20 ++++++++++++++++++++
+ 3 files changed, 23 insertions(+), 1 deletion(-)
 
-diff --git a/linux-headers/asm-powerpc/kvm.h b/linux-headers/asm-powerpc/kvm.h
-index 264e266a85bf..aeb8e8c4633b 100644
---- a/linux-headers/asm-powerpc/kvm.h
-+++ b/linux-headers/asm-powerpc/kvm.h
-@@ -690,6 +690,7 @@ struct kvm_ppc_cpu_char {
- #define KVM_DEV_XIVE_GRP_SOURCE_CONFIG	3	/* 64-bit source identifier */
- #define KVM_DEV_XIVE_GRP_EQ_CONFIG	4	/* 64-bit EQ identifier */
- #define KVM_DEV_XIVE_GRP_SOURCE_SYNC	5       /* 64-bit source identifier */
-+#define KVM_DEV_XIVE_GRP_SOURCE_INFO	6       /* 64-bit source identifier */
+diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
+index 3f325723ea74..402e38a7cf5e 100644
+--- a/include/hw/ppc/spapr_xive.h
++++ b/include/hw/ppc/spapr_xive.h
+@@ -51,6 +51,7 @@ typedef struct SpaprXive {
+     VMChangeStateEntry *change;
  
- /* Layout of 64-bit XIVE source attribute values */
- #define KVM_XIVE_LEVEL_SENSITIVE	(1ULL << 0)
-@@ -721,6 +722,13 @@ struct kvm_ppc_xive_eq {
- 	__u8  pad[40];
+     uint8_t       hv_prio;
++    bool          hw_storeeoi;
+ } SpaprXive;
+ 
+ typedef struct SpaprXiveClass {
+diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+index 943b9958a68b..d184d17e30e7 100644
+--- a/hw/intc/spapr_xive.c
++++ b/hw/intc/spapr_xive.c
+@@ -596,6 +596,7 @@ static Property spapr_xive_properties[] = {
+     DEFINE_PROP_UINT64("vc-base", SpaprXive, vc_base, SPAPR_XIVE_VC_BASE),
+     DEFINE_PROP_UINT64("tm-base", SpaprXive, tm_base, SPAPR_XIVE_TM_BASE),
+     DEFINE_PROP_UINT8("hv-prio", SpaprXive, hv_prio, 7),
++    DEFINE_PROP_BOOL("hw-storeeoi", SpaprXive, hw_storeeoi, false),
+     DEFINE_PROP_END_OF_LIST(),
  };
  
-+#define KVM_XIVE_SOURCE_FLAG_STORE_EOI	0x00000001
-+
-+/* Layout of source characteristics (8 bytes) */
-+struct kvm_ppc_xive_src {
-+	__u64 flags;
-+};
-+
- #define KVM_XIVE_EQ_ALWAYS_NOTIFY	0x00000001
+@@ -945,7 +946,7 @@ static target_ulong h_int_get_source_info(PowerPCCPU *cpu,
+         /*
+          * Override QEMU settings with KVM values
+          */
+-        if (flags & XIVE_SRC_STORE_EOI) {
++        if (xive->hw_storeeoi && flags & XIVE_SRC_STORE_EOI) {
+             args[0] |= SPAPR_XIVE_SRC_STORE_EOI;
+         } else {
+             args[0] &= ~SPAPR_XIVE_SRC_STORE_EOI;
+diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+index 72bb938375ef..80cf1c3d6bb2 100644
+--- a/hw/ppc/spapr_irq.c
++++ b/hw/ppc/spapr_irq.c
+@@ -199,6 +199,23 @@ static int spapr_irq_check(SpaprMachineState *spapr, Error **errp)
+     return 0;
+ }
  
- #define KVM_XIVE_TIMA_PAGE_OFFSET	0
++static bool spapr_irq_xive_hw_storeeoi(SpaprMachineState *spapr)
++{
++    MachineState *machine = MACHINE(spapr);
++
++    /*
++     * All P10 compat kernels should enforce load-after-store ordering
++     * for StoreEOI.
++     */
++    if (ppc_type_check_compat(machine->cpu_type, CPU_POWERPC_LOGICAL_3_10,
++                              0, spapr->max_compat_pvr)) {
++        return true;
++    }
++
++    /* StoreEOI on P9 compat is unsafe */
++    return false;
++}
++
+ /*
+  * sPAPR IRQ frontend routines for devices
+  */
+@@ -325,6 +342,7 @@ void spapr_irq_init(SpaprMachineState *spapr, Error **errp)
+ 
+     if (spapr->irq->xive) {
+         uint32_t nr_servers = spapr_max_server_number(spapr);
++        bool storeeoi = spapr_irq_xive_hw_storeeoi(spapr);
+         DeviceState *dev;
+         int i;
+ 
+@@ -337,6 +355,8 @@ void spapr_irq_init(SpaprMachineState *spapr, Error **errp)
+         qdev_prop_set_uint32(dev, "nr-ends", nr_servers << 3);
+         object_property_set_link(OBJECT(dev), "xive-fabric", OBJECT(spapr),
+                                  &error_abort);
++        object_property_set_bool(OBJECT(dev), "hw-storeeoi", storeeoi,
++                                 &error_abort);
+         sysbus_realize_and_unref(SYS_BUS_DEVICE(dev), &error_fatal);
+ 
+         spapr->xive = SPAPR_XIVE(dev);
 -- 
 2.25.4
 
