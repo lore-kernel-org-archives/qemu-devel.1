@@ -2,61 +2,105 @@ Return-Path: <SRS0=bVMU=B5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.0 required=3.0 tests=BAYES_00,HK_RANDOM_FROM,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6389C433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 16:24:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49B05C433E1
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 16:39:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5A43F20882
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 16:24:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A43F20882
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
+	by mail.kernel.org (Postfix) with ESMTPS id 0EEB120888
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 16:39:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RwwQRdgY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0EEB120888
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40810 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46952 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8QtR-0001ZS-KO
-	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 12:24:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52064)
+	id 1k8R7m-0005ED-7o
+	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 12:39:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56332)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1k8Qsm-0000l4-P3
- for qemu-devel@nongnu.org; Wed, 19 Aug 2020 12:24:12 -0400
-Received: from relay68.bu.edu ([128.197.228.73]:60054)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1k8Qsj-00004r-MY
- for qemu-devel@nongnu.org; Wed, 19 Aug 2020 12:24:12 -0400
-X-Envelope-From: alxndr@bu.edu
-X-BU-AUTH: mozz.bu.edu [128.197.127.33]
-Received: from BU-AUTH (localhost.localdomain [127.0.0.1]) (authenticated
- bits=0)
- by relay68.bu.edu (8.14.3/8.14.3) with ESMTP id 07JGNHiq001908
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
- Wed, 19 Aug 2020 12:23:20 -0400
-Date: Wed, 19 Aug 2020 12:23:17 -0400
-From: Alexander Bulekov <alxndr@bu.edu>
-To: qemu-devel@nongnu.org
-Subject: Re: [PATCH v2 00/15] Add a General Virtual Device Fuzzer
-Message-ID: <20200819162313.5x5elxeypitklf2k@mozz.bu.edu>
-References: <20200819061110.1320568-1-alxndr@bu.edu>
- <159781875904.25250.2549056217558413980@66eaa9a8a123>
+ (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1k8R71-0004fQ-8u
+ for qemu-devel@nongnu.org; Wed, 19 Aug 2020 12:38:55 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:23557
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1k8R6y-0001xa-Kc
+ for qemu-devel@nongnu.org; Wed, 19 Aug 2020 12:38:54 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1597855131;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=7/CfPbqVwkBQNKsZsmfMjrcuU/QPk8UD5NZ/+SlLU2A=;
+ b=RwwQRdgYJOsxY43RYdYv23MoXfzoeQ+bC8QX2iEPQINRdk7DAlSHWt7HqEt9+k0JQElBhK
+ JwCuKRM1g76T7YsFM8/x01a31nz9226CZJR565UoyoBmw/VJ/WpuWQcY4uC0zZoDa9EVNN
+ gy6LteGOjTXvtvqFkqjMhOLXt/NAz18=
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-404-CLEfq4FfPdye5MGZaYyyrA-1; Wed, 19 Aug 2020 12:38:49 -0400
+X-MC-Unique: CLEfq4FfPdye5MGZaYyyrA-1
+Received: by mail-qt1-f200.google.com with SMTP id h10so17143232qtc.4
+ for <qemu-devel@nongnu.org>; Wed, 19 Aug 2020 09:38:49 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=7/CfPbqVwkBQNKsZsmfMjrcuU/QPk8UD5NZ/+SlLU2A=;
+ b=Uq6qcBVy8RANsYUj9R9jGVhbwsuIQ/xi5yE+Xh2nX5q9g9fdZAcHE35w3d6R/xI+cz
+ G1G3ra2GqxOsHVyWSeVwywJXnhD6HMfAfEdTlxnxnv/rSIaMx0IFeu5XYmlfjS1BZtqS
+ L6EhCJq8FzFOK/f7l1cfktEUYn7F6JE44dWZj5V9b/pc5mX+bHcllWBEABJiuNdFiQ9s
+ cMt4mV2BDKyQap+4P6C8/dTylSFkVilYCwe8/+HfZcbkRMvkAzlIpYfM0QChxvsKtkCJ
+ a2EkVtx/K4yB7jDEy2Gr6Zez6GjEdq3ZvNi+9sWho8StxiZzG5x4KiBDNauqnf8Y297N
+ BOJg==
+X-Gm-Message-State: AOAM533fAIgXMdEpavxs7ytm9FgYiazH1RW5srVEbymDi7HqGEYmob9K
+ b2BMtmMOPU+D5452S5n8tvfGzZRc00llP+oVuEUGphQvpjhpYZNyPL0Ng2qc6Re4IHcZUjNevaV
+ nunf7ZkAIQG2WiEs=
+X-Received: by 2002:ae9:ef43:: with SMTP id d64mr23269638qkg.326.1597855129220; 
+ Wed, 19 Aug 2020 09:38:49 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzEco0mYHmo84nrtEEBT/fAa5nVZvACiG61Su8RdChtE+k1s4R8NE3USWcHlp2XAxlsIMV5RA==
+X-Received: by 2002:ae9:ef43:: with SMTP id d64mr23269614qkg.326.1597855128969; 
+ Wed, 19 Aug 2020 09:38:48 -0700 (PDT)
+Received: from xz-x1 (bras-vprn-toroon474qw-lp130-11-70-53-122-15.dsl.bell.ca.
+ [70.53.122.15])
+ by smtp.gmail.com with ESMTPSA id 2sm24545280qki.46.2020.08.19.09.38.47
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 19 Aug 2020 09:38:48 -0700 (PDT)
+Date: Wed, 19 Aug 2020 12:38:46 -0400
+From: Peter Xu <peterx@redhat.com>
+To: Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>
+Subject: Re: [RFC v4 1/2] memory: Rename memory_region_notify_one to
+ memory_region_notify_one_iommu
+Message-ID: <20200819163846.GA305409@xz-x1>
+References: <20200818130151.31678-1-eperezma@redhat.com>
+ <20200818130151.31678-2-eperezma@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20200818130151.31678-2-eperezma@redhat.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=peterx@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
 Content-Disposition: inline
-In-Reply-To: <159781875904.25250.2549056217558413980@66eaa9a8a123>
-Received-SPF: pass client-ip=128.197.228.73; envelope-from=alxndr@bu.edu;
- helo=relay68.bu.edu
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/19 12:24:08
-X-ACL-Warn: Detected OS   = Linux 2.6.x
-X-Spam_score_int: -31
-X-Spam_score: -3.2
-X-Spam_bar: ---
-X-Spam_report: (-3.2 / 5.0 requ) BAYES_00=-1.9, HK_RANDOM_ENVFROM=0.001,
- HK_RANDOM_FROM=1, RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=peterx@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/19 04:57:22
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -69,335 +113,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: darren.kenny@oracle.com, bsd@redhat.com, f4bug@amsat.org,
- stefanha@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>, Yan Zhao <yan.y.zhao@intel.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Jason Wang <jasowang@redhat.com>, Juan Quintela <quintela@redhat.com>,
+ qemu-devel@nongnu.org, Eric Auger <eric.auger@redhat.com>, qemu-arm@nongnu.org,
+ Avi Kivity <avi@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Oops I forgot to do my checkpatch pass. I'll resend this, shortly.
--Alex
+On Tue, Aug 18, 2020 at 03:01:50PM +0200, Eugenio Pérez wrote:
+> Signed-off-by: Eugenio Pérez <eperezma@redhat.com>
 
-On 200818 2332, no-reply@patchew.org wrote:
-> Patchew URL: https://patchew.org/QEMU/20200819061110.1320568-1-alxndr@bu.edu/
-> 
-> 
-> 
-> Hi,
-> 
-> This series seems to have some coding style problems. See output below for
-> more information:
-> 
-> Type: series
-> Message-id: 20200819061110.1320568-1-alxndr@bu.edu
-> Subject: [PATCH v2 00/15] Add a General Virtual Device Fuzzer
-> 
-> === TEST SCRIPT BEGIN ===
-> #!/bin/bash
-> git rev-parse base > /dev/null || exit 0
-> git config --local diff.renamelimit 0
-> git config --local diff.renames True
-> git config --local diff.algorithm histogram
-> ./scripts/checkpatch.pl --mailback base..
-> === TEST SCRIPT END ===
-> 
-> Switched to a new branch 'test'
-> a8e119d scripts/oss-fuzz: Add crash trace minimization script
-> ae04d9e scripts/oss-fuzz: Add script to reorder a general-fuzzer trace
-> 565c5c5 scripts/oss-fuzz: build the general-fuzzer configs
-> 559cd36 scripts/oss-fuzz: Add general-fuzzer configs for oss-fuzz
-> 54db062 scripts/oss-fuzz: Add general-fuzzer build script
-> 8973b6e scripts/oss-fuzz: Add wrapper program for generic fuzzer
-> 3452c68 fuzz: add a crossover function to generic-fuzzer
-> 5c579c9 fuzz: add a DISABLE_PCI op to general-fuzzer
-> 4f50ecd fuzz: Add support for custom crossover functions
-> 95bd76d fuzz: Add fuzzer callbacks to DMA-read functions
-> 89e6484 fuzz: Declare DMA Read callback function
-> a5441b1 fuzz: Add DMA support to the generic-fuzzer
-> 9bd3375 fuzz: Add PCI features to the general fuzzer
-> a2759f3 fuzz: Add general virtual-device fuzzer
-> f9c6ddd fuzz: Change the way we write qtest log to stderr
-> 
-> === OUTPUT BEGIN ===
-> 1/15 Checking commit f9c6ddda8115 (fuzz: Change the way we write qtest log to stderr)
-> 2/15 Checking commit a2759f329ffa (fuzz: Add general virtual-device fuzzer)
-> WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
-> #31: 
-> new file mode 100644
-> 
-> ERROR: missing space after enum definition
-> #68: FILE: tests/qtest/fuzz/general_fuzz.c:33:
-> +enum cmds{
-> 
-> ERROR: line over 90 characters
-> #108: FILE: tests/qtest/fuzz/general_fuzz.c:73:
-> +    AddressSpace *as = (io_space == get_system_memory()) ? &address_space_memory : &address_space_io;
-> 
-> ERROR: line over 90 characters
-> #124: FILE: tests/qtest/fuzz/general_fuzz.c:89:
-> +                if(address_space_translate(as, abs_addr, &xlat, &len, true, MEMTXATTRS_UNSPECIFIED) == mr){
-> 
-> ERROR: space required before the open brace '{'
-> #124: FILE: tests/qtest/fuzz/general_fuzz.c:89:
-> +                if(address_space_translate(as, abs_addr, &xlat, &len, true, MEMTXATTRS_UNSPECIFIED) == mr){
-> 
-> ERROR: space required before the open parenthesis '('
-> #124: FILE: tests/qtest/fuzz/general_fuzz.c:89:
-> +                if(address_space_translate(as, abs_addr, &xlat, &len, true, MEMTXATTRS_UNSPECIFIED) == mr){
-> 
-> ERROR: space required before the open brace '{'
-> #128: FILE: tests/qtest/fuzz/general_fuzz.c:93:
-> +                    if(mr->size){
-> 
-> ERROR: space required before the open parenthesis '('
-> #128: FILE: tests/qtest/fuzz/general_fuzz.c:93:
-> +                    if(mr->size){
-> 
-> ERROR: spaces required around that '-' (ctx:VxV)
-> #131: FILE: tests/qtest/fuzz/general_fuzz.c:96:
-> +                    result->len = mr->size-(result->addr-abs_addr);
->                                            ^
-> 
-> ERROR: spaces required around that '-' (ctx:VxV)
-> #131: FILE: tests/qtest/fuzz/general_fuzz.c:96:
-> +                    result->len = mr->size-(result->addr-abs_addr);
->                                                          ^
-> 
-> ERROR: space prohibited between function name and open parenthesis '('
-> #483: FILE: tests/qtest/fuzz/general_fuzz.c:448:
-> +    char **result = g_strsplit (getenv("QEMU_FUZZ_OBJECTS"), " ", -1);
-> 
-> ERROR: space required before the open brace '{'
-> #500: FILE: tests/qtest/fuzz/general_fuzz.c:465:
-> +    if(!fuzzable_memoryregions->len){
-> 
-> ERROR: space required before the open parenthesis '('
-> #500: FILE: tests/qtest/fuzz/general_fuzz.c:465:
-> +    if(!fuzzable_memoryregions->len){
-> 
-> total: 12 errors, 1 warnings, 501 lines checked
-> 
-> Patch 2/15 has style problems, please review.  If any of these errors
-> are false positives report them to the maintainer, see
-> CHECKPATCH in MAINTAINERS.
-> 
-> 3/15 Checking commit 9bd3375b88bc (fuzz: Add PCI features to the general fuzzer)
-> 4/15 Checking commit a5441b1099c7 (fuzz: Add DMA support to the generic-fuzzer)
-> ERROR: externs should be avoided in .c files
-> #84: FILE: tests/qtest/fuzz/general_fuzz.c:97:
-> +void fuzz_dma_read_cb(size_t addr, size_t len, MemoryRegion *mr, bool is_write);
-> 
-> WARNING: line over 80 characters
-> #129: FILE: tests/qtest/fuzz/general_fuzz.c:142:
-> +        || (mr != MACHINE(qdev_get_machine())->ram && !(mr->ops == &unassigned_mem_ops))
-> 
-> total: 1 errors, 1 warnings, 247 lines checked
-> 
-> Patch 4/15 has style problems, please review.  If any of these errors
-> are false positives report them to the maintainer, see
-> CHECKPATCH in MAINTAINERS.
-> 
-> 5/15 Checking commit 89e64845b1dd (fuzz: Declare DMA Read callback function)
-> 6/15 Checking commit 95bd76d180c1 (fuzz: Add fuzzer callbacks to DMA-read functions)
-> 7/15 Checking commit 4f50ecd4705c (fuzz: Add support for custom crossover functions)
-> ERROR: space required before the open parenthesis '('
-> #30: FILE: tests/qtest/fuzz/fuzz.c:127:
-> +    if(fuzz_target->crossover) {
-> 
-> WARNING: line over 80 characters
-> #59: FILE: tests/qtest/fuzz/fuzz.h:91:
-> +     * seed: the seed that should be used to make mutations deterministic, when needed
-> 
-> total: 1 errors, 1 warnings, 57 lines checked
-> 
-> Patch 7/15 has style problems, please review.  If any of these errors
-> are false positives report them to the maintainer, see
-> CHECKPATCH in MAINTAINERS.
-> 
-> 8/15 Checking commit 5c579c959fec (fuzz: add a DISABLE_PCI op to general-fuzzer)
-> ERROR: do not initialise statics to 0 or NULL
-> #30: FILE: tests/qtest/fuzz/general_fuzz.c:97:
-> +static bool pci_disabled = false;
-> 
-> total: 1 errors, 0 warnings, 55 lines checked
-> 
-> Patch 8/15 has style problems, please review.  If any of these errors
-> are false positives report them to the maintainer, see
-> CHECKPATCH in MAINTAINERS.
-> 
-> 9/15 Checking commit 3452c68ac630 (fuzz: add a crossover function to generic-fuzzer)
-> ERROR: do not use C99 // comments
-> #49: FILE: tests/qtest/fuzz/general_fuzz.c:773:
-> +    // Copy in the first input
-> 
-> ERROR: spaces required around that '+' (ctx:VxV)
-> #51: FILE: tests/qtest/fuzz/general_fuzz.c:775:
-> +    memcpy(out+size, data1, copy);
->                ^
-> 
-> ERROR: spaces required around that '+=' (ctx:VxW)
-> #52: FILE: tests/qtest/fuzz/general_fuzz.c:776:
-> +    size+= copy;
->          ^
-> 
-> ERROR: spaces required around that '-=' (ctx:VxW)
-> #53: FILE: tests/qtest/fuzz/general_fuzz.c:777:
-> +    max_out_size-= copy;
->                  ^
-> 
-> ERROR: do not use C99 // comments
-> #55: FILE: tests/qtest/fuzz/general_fuzz.c:779:
-> +    // Append a separator
-> 
-> ERROR: spaces required around that '+' (ctx:VxV)
-> #57: FILE: tests/qtest/fuzz/general_fuzz.c:781:
-> +    memcpy(out+size, SEPARATOR, copy);
->                ^
-> 
-> ERROR: spaces required around that '+=' (ctx:VxW)
-> #58: FILE: tests/qtest/fuzz/general_fuzz.c:782:
-> +    size+= copy;
->          ^
-> 
-> ERROR: spaces required around that '-=' (ctx:VxW)
-> #59: FILE: tests/qtest/fuzz/general_fuzz.c:783:
-> +    max_out_size-= copy;
->                  ^
-> 
-> ERROR: do not use C99 // comments
-> #61: FILE: tests/qtest/fuzz/general_fuzz.c:785:
-> +    // Clear out the
-> 
-> ERROR: spaces required around that '+=' (ctx:VxW)
-> #66: FILE: tests/qtest/fuzz/general_fuzz.c:790:
-> +    size+= copy;
->          ^
-> 
-> ERROR: spaces required around that '-=' (ctx:VxW)
-> #67: FILE: tests/qtest/fuzz/general_fuzz.c:791:
-> +    max_out_size-= copy;
->                  ^
-> 
-> ERROR: spaces required around that '+' (ctx:VxV)
-> #70: FILE: tests/qtest/fuzz/general_fuzz.c:794:
-> +    memcpy(out+size, SEPARATOR, copy);
->                ^
-> 
-> ERROR: spaces required around that '+=' (ctx:VxW)
-> #71: FILE: tests/qtest/fuzz/general_fuzz.c:795:
-> +    size+= copy;
->          ^
-> 
-> ERROR: spaces required around that '-=' (ctx:VxW)
-> #72: FILE: tests/qtest/fuzz/general_fuzz.c:796:
-> +    max_out_size-= copy;
->                  ^
-> 
-> ERROR: spaces required around that '+=' (ctx:VxW)
-> #78: FILE: tests/qtest/fuzz/general_fuzz.c:802:
-> +    size+= copy;
->          ^
-> 
-> ERROR: spaces required around that '-=' (ctx:VxW)
-> #79: FILE: tests/qtest/fuzz/general_fuzz.c:803:
-> +    max_out_size-= copy;
->                  ^
-> 
-> ERROR: spaces required around that '+' (ctx:VxV)
-> #82: FILE: tests/qtest/fuzz/general_fuzz.c:806:
-> +    memcpy(out+size, SEPARATOR, copy);
->                ^
-> 
-> ERROR: spaces required around that '+=' (ctx:VxW)
-> #83: FILE: tests/qtest/fuzz/general_fuzz.c:807:
-> +    size+= copy;
->          ^
-> 
-> ERROR: spaces required around that '-=' (ctx:VxW)
-> #84: FILE: tests/qtest/fuzz/general_fuzz.c:808:
-> +    max_out_size-= copy;
->                  ^
-> 
-> ERROR: spaces required around that '+' (ctx:VxV)
-> #87: FILE: tests/qtest/fuzz/general_fuzz.c:811:
-> +    memcpy(out+size, data2, copy);
->                ^
-> 
-> ERROR: spaces required around that '+=' (ctx:VxW)
-> #88: FILE: tests/qtest/fuzz/general_fuzz.c:812:
-> +    size+= copy;
->          ^
-> 
-> ERROR: spaces required around that '-=' (ctx:VxW)
-> #89: FILE: tests/qtest/fuzz/general_fuzz.c:813:
-> +    max_out_size-= copy;
->                  ^
-> 
-> total: 22 errors, 0 warnings, 93 lines checked
-> 
-> Patch 9/15 has style problems, please review.  If any of these errors
-> are false positives report them to the maintainer, see
-> CHECKPATCH in MAINTAINERS.
-> 
-> 10/15 Checking commit 8973b6e31476 (scripts/oss-fuzz: Add wrapper program for generic fuzzer)
-> WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
-> #19: 
-> new file mode 100644
-> 
-> total: 0 errors, 1 warnings, 40 lines checked
-> 
-> Patch 10/15 has style problems, please review.  If any of these errors
-> are false positives report them to the maintainer, see
-> CHECKPATCH in MAINTAINERS.
-> 11/15 Checking commit 54db062fafe0 (scripts/oss-fuzz: Add general-fuzzer build script)
-> WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
-> #17: 
-> new file mode 100755
-> 
-> total: 0 errors, 1 warnings, 62 lines checked
-> 
-> Patch 11/15 has style problems, please review.  If any of these errors
-> are false positives report them to the maintainer, see
-> CHECKPATCH in MAINTAINERS.
-> 12/15 Checking commit 559cd365394c (scripts/oss-fuzz: Add general-fuzzer configs for oss-fuzz)
-> WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
-> #16: 
-> new file mode 100644
-> 
-> total: 0 errors, 1 warnings, 103 lines checked
-> 
-> Patch 12/15 has style problems, please review.  If any of these errors
-> are false positives report them to the maintainer, see
-> CHECKPATCH in MAINTAINERS.
-> 13/15 Checking commit 565c5c5cec66 (scripts/oss-fuzz: build the general-fuzzer configs)
-> 14/15 Checking commit ae04d9edfe56 (scripts/oss-fuzz: Add script to reorder a general-fuzzer trace)
-> WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
-> #21: 
-> new file mode 100755
-> 
-> total: 0 errors, 1 warnings, 94 lines checked
-> 
-> Patch 14/15 has style problems, please review.  If any of these errors
-> are false positives report them to the maintainer, see
-> CHECKPATCH in MAINTAINERS.
-> 15/15 Checking commit a8e119d529aa (scripts/oss-fuzz: Add crash trace minimization script)
-> WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
-> #16: 
-> new file mode 100755
-> 
-> total: 0 errors, 1 warnings, 118 lines checked
-> 
-> Patch 15/15 has style problems, please review.  If any of these errors
-> are false positives report them to the maintainer, see
-> CHECKPATCH in MAINTAINERS.
-> === OUTPUT END ===
-> 
-> Test command exited with code: 1
-> 
-> 
-> The full log is available at
-> http://patchew.org/logs/20200819061110.1320568-1-alxndr@bu.edu/testing.checkpatch/?type=message.
-> ---
-> Email generated automatically by Patchew [https://patchew.org/].
-> Please send your feedback to patchew-devel@redhat.com
+Reviewed-by: Peter Xu <peterx@redhat.com>
+
+It would be good if there's some commit message, though..
+
+Also, I'd slightly prefer memory_region_notify_iommu_one rather than one_iommu,
+but I'm fine with either.
+
+-- 
+Peter Xu
+
 
