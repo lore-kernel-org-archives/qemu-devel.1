@@ -2,116 +2,85 @@ Return-Path: <SRS0=bVMU=B5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.4 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89389C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 14:49:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE8D5C433E1
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 14:52:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 367862083B
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 14:49:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7E21820866
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 14:52:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bGchlP9g"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 367862083B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZrhdHIoO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E21820866
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54348 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60212 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8PPM-0006T4-C4
-	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 10:49:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52598)
+	id 1k8PSE-0000Zf-IJ
+	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 10:52:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53306)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1k8POj-0005jh-Dp
- for qemu-devel@nongnu.org; Wed, 19 Aug 2020 10:49:05 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:30078)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1k8POh-0003kn-DK
- for qemu-devel@nongnu.org; Wed, 19 Aug 2020 10:49:05 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597848542;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=QD4+MwQRKRFDE1kdCzASjArjtxdwisiXqmByKhI3HZE=;
- b=bGchlP9gd+J9QOL8FLf3exwphWSJYPgVufwCTcF0R8UKblYZVjVcmyr4+mXVZjun3DVttg
- Zhr9qmwuxY0vqzQ95Xt/+dZa6WORuO3kvEj1WKqhJWoY/vltoMY3NHiAN5kXdtTzpjqBHp
- UI1LBrEU9x3sNz7RbXchmsxhToPJuD8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-196-UlP2V-djPDGExWFCLNe9KA-1; Wed, 19 Aug 2020 10:48:59 -0400
-X-MC-Unique: UlP2V-djPDGExWFCLNe9KA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DAB6D1015DCB;
- Wed, 19 Aug 2020 14:48:58 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-113-120.ams2.redhat.com
- [10.36.113.120])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id CF13959;
- Wed, 19 Aug 2020 14:48:57 +0000 (UTC)
-Subject: Re: [RFC PATCH 19/22] block/export: Move strong user reference to
- block_exports
-To: Kevin Wolf <kwolf@redhat.com>
-References: <20200813162935.210070-1-kwolf@redhat.com>
- <20200813162935.210070-20-kwolf@redhat.com>
- <5bdf307f-0d1e-b64c-978f-c9075a3e2eb0@redhat.com>
- <20200819142300.GD10272@linux.fritz.box>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <31aaea72-8352-145f-7f17-995b6cfe0e23@redhat.com>
-Date: Wed, 19 Aug 2020 16:48:56 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1k8PR9-00089A-3Q
+ for qemu-devel@nongnu.org; Wed, 19 Aug 2020 10:51:35 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:35975)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1k8PR6-00049A-Ui
+ for qemu-devel@nongnu.org; Wed, 19 Aug 2020 10:51:34 -0400
+Received: by mail-oi1-x241.google.com with SMTP id l204so21220651oib.3
+ for <qemu-devel@nongnu.org>; Wed, 19 Aug 2020 07:51:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=V5ql+c4aPit03IhaGdZ07yHY0PmRvZHMWMUTbPdXgVc=;
+ b=ZrhdHIoOQ4TqgtyNhwjh5JzNvTFqCU+9gJI0I5gv+JFELwTKUyahiYU3x5op1Pgp+i
+ IiOw4lRH4No3fjJbGtLGLkUq+iv+zaa7tAyJCOavDTaipl+2Zn+u56yRikMZPjwhcrsV
+ fP95lC22O7vFYDTj/MxtpCg0+bNTQs7DylfzgG7vRIdR00eIhhcppsG2X09zSOePmq+m
+ 2jDEz0B51BGddIodlPJfnye3tkBVon74uMpaLAIYebJlDveKaUiuRGx4SnwDtoInM77+
+ yqCqEy2LdvYo6bJp8kxVwIwIlnS1Cy+LabJloIgbknyoZ8oj9Cg93iepdpJb9kkxuo/u
+ IGlQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=V5ql+c4aPit03IhaGdZ07yHY0PmRvZHMWMUTbPdXgVc=;
+ b=UL3y6HH2MW2RlXFyg9hot6BYenfc523JRBzflXaGRQA68KFmAoj5HzMG8xM4CHZ9UC
+ SddatAdAQdAAoKRp0QyLyu8jNzRO+7Ulbv+9KQvCen7ADvi4ji/9S/KMunS/UmlTklIK
+ ICTRTv4St/lMb51qZUl6GOHz+HdavMGkypMFEGgS/sfQcYTqIp/H50cZ+flEzh93vWFK
+ FHNo7S+w6xEc0jJEo5ugB8q7S0TbGbEquKuQvhzH+Z2AC/bHqIF7A4Hsxx9fv5Ru7d5f
+ oRLRYvRCgDcKtRkGKAVVKOJjnfoL+VYIhPlPArlo6b/X3SJY7YvuAL4CJ6rEIP/2iR4p
+ ZnFQ==
+X-Gm-Message-State: AOAM53184tSP4ZZS/0wOEVB0FEODT2kAiyTy79E46kVO0d2QJgxEx81k
+ piyXKS+UD5wmjNLPd8b/kGOspkz/QW8/wVX3ZS4=
+X-Google-Smtp-Source: ABdhPJynLW6S2FcCBig/ZKqQ1LlTtmqyz0vGWhqY6WzDi1m/t5svypfBjn5NmEmDjLw0EM34KMS7oqbWx0IEhh4orKg=
+X-Received: by 2002:aca:fd46:: with SMTP id b67mr3362889oii.150.1597848691394; 
+ Wed, 19 Aug 2020 07:51:31 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200819142300.GD10272@linux.fritz.box>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="v113ZkLpjYGrrHDyhieuA1PEbjOEmzQlq"
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=mreitz@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/19 06:57:45
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+References: <20200819141533.66354-1-liq3ea@163.com>
+ <baabaa94-e4bf-3578-2f78-624704eb29c4@redhat.com>
+In-Reply-To: <baabaa94-e4bf-3578-2f78-624704eb29c4@redhat.com>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Wed, 19 Aug 2020 22:50:54 +0800
+Message-ID: <CAKXe6S+Vpe5NH4j22deQLxZaX7NRFtwvGR0FhEoBPPNdK33ibQ@mail.gmail.com>
+Subject: Re: [PATCH] qtest: add fuzz test case
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: multipart/alternative; boundary="000000000000a7ce3705ad3c23e3"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::241;
+ envelope-from=liq3ea@gmail.com; helo=mail-oi1-x241.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -124,101 +93,348 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Li Qiang <liq3ea@163.com>, Qemu Developers <qemu-devel@nongnu.org>,
+ Alexander Bulekov <alxndr@bu.edu>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---v113ZkLpjYGrrHDyhieuA1PEbjOEmzQlq
-Content-Type: multipart/mixed; boundary="FlxPdpppbH9uAHXo3ESAoB9Wl5XH5w4N9"
-
---FlxPdpppbH9uAHXo3ESAoB9Wl5XH5w4N9
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+--000000000000a7ce3705ad3c23e3
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On 19.08.20 16:23, Kevin Wolf wrote:
-> Am 19.08.2020 um 13:56 hat Max Reitz geschrieben:
->> On 13.08.20 18:29, Kevin Wolf wrote:
->>> The reference owned by the user/monitor that is created when adding the
->>> export and dropped when removing it was tied to the 'exports' list in
->>> nbd/server.c. Every block export will have a user reference, so move it
->>> to the block export level and tie it to the 'block_exports' list in
->>> block/export/export.c instead. This is necessary for introducing a QMP
->>> command for removing exports.
->>>
->>> Note that exports are present in block_exports even after the user has
->>> requested shutdown. This is different from NBD's exports where exports
->>> are immediately removed on a shutdown request, even if they are still i=
-n
->>> the process of shutting down. In order to avoid that the user still
->>> interacts with an export that is shutting down (and possibly removes it
->>> a second time), we need to remember if the user actually still owns it.
->>>
->>> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
->>> ---
->>>  include/block/export.h | 8 ++++++++
->>>  block/export/export.c  | 4 ++++
->>>  blockdev-nbd.c         | 5 -----
->>>  nbd/server.c           | 2 --
->>>  4 files changed, 12 insertions(+), 7 deletions(-)
->>
->> With this patch, there=E2=80=99s an abort in iotest 281.  Perhaps becaus=
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> =E4=BA=8E2020=E5=B9=B48=E6=
+=9C=8819=E6=97=A5=E5=91=A8=E4=B8=89 =E4=B8=8B=E5=8D=8810:38=E5=86=99=E9=81=
+=93=EF=BC=9A
+
+> On 8/19/20 4:15 PM, Li Qiang wrote:
+> > Currently the device fuzzer find a more and more issues.
+> > For every fuzz case, we need not only the fixes but also
+> > the coressponding test case. We can analysis the reproducer
+>
+> Typo "corresponding"
+>
+
+Will correct in next revision.
+
+
+>
+> > for every case and find what happened in where and write
+> > a beautiful test case. However the raw data of reproducer is not
+> > friendly to analysis. It will take a very long time, even far more
+> > than the fixes itself. So let's create a new file to hold all of
+> > the fuzz test cases and just use the raw data to act as the test
+> > case. This way nobody will be afraid of writing a test case for
+> > the fuzz reproducer.
+>
+> Ahaha nice :)
+>
+> >
+> > This patch adds the issue LP#1878263 test case.
+> >
+> > Signed-off-by: Li Qiang <liq3ea@163.com>
+> > ---
+> >  tests/qtest/Makefile.include |  2 ++
+> >  tests/qtest/fuzz-test.c      | 45 ++++++++++++++++++++++++++++++++++++
+> >  2 files changed, 47 insertions(+)
+> >  create mode 100644 tests/qtest/fuzz-test.c
+> >
+> > diff --git a/tests/qtest/Makefile.include b/tests/qtest/Makefile.includ=
 e
->> blk_exp_unref() is now done by blk_exp_request_shutdown() outside of
->> where the AIO context is locked?
->=20
-> I have two fixes locally that were related to failing qemu-iotests. I
-> guess the first one might be for what you're seeing?
->=20
-> Kevin
->=20
-> diff --git a/block/export/export.c b/block/export/export.c
-> index 71d17bd440..d021b98b74 100644
-> --- a/block/export/export.c
-> +++ b/block/export/export.c
-> @@ -105,9 +105,14 @@ void blk_exp_unref(BlockExport *exp)
->  {
->      assert(exp->refcount > 0);
->      if (--exp->refcount =3D=3D 0) {
+> > index b0204e44f2..ff460179c5 100644
+> > --- a/tests/qtest/Makefile.include
+> > +++ b/tests/qtest/Makefile.include
+> > @@ -7,6 +7,7 @@ check-qtest-generic-y +=3D machine-none-test
+> >  check-qtest-generic-y +=3D qmp-test
+> >  check-qtest-generic-y +=3D qmp-cmd-test
+> >  check-qtest-generic-y +=3D qom-test
+> > +check-qtest-generic-y +=3D fuzz-test
+>
+> Maybe name that fuzzed-reproducers-test?
+>
 
-If this is done without locking the context, should this be an atomic
-operation?
-
-> +        AioContext *aio_context =3D exp->ctx;
-> +
-> +        aio_context_acquire(aio_context);
->          QLIST_REMOVE(exp, next);
->          exp->drv->delete(exp);
->          blk_unref(exp->blk);
-> +        aio_context_release(aio_context);
-> +
-
-But for the crash I was seeing, this should be sufficient, yes.
-
-Max
+This maybe be more understandable.
 
 
---FlxPdpppbH9uAHXo3ESAoB9Wl5XH5w4N9--
+>
+> >  check-qtest-generic-$(CONFIG_MODULES) +=3D modules-test
+> >  check-qtest-generic-y +=3D test-hmp
+> >
+> > @@ -272,6 +273,7 @@ tests/qtest/m25p80-test$(EXESUF):
+> tests/qtest/m25p80-test.o
+> >  tests/qtest/i440fx-test$(EXESUF): tests/qtest/i440fx-test.o
+> $(libqos-pc-obj-y)
+> >  tests/qtest/q35-test$(EXESUF): tests/qtest/q35-test.o $(libqos-pc-obj-=
+y)
+> >  tests/qtest/fw_cfg-test$(EXESUF): tests/qtest/fw_cfg-test.o
+> $(libqos-pc-obj-y)
+> > +tests/qtest/fuzz-test$(EXESUF): tests/qtest/fuzz-test.o
+> $(libqos-pc-obj-y)
+> >  tests/qtest/rtl8139-test$(EXESUF): tests/qtest/rtl8139-test.o
+> $(libqos-pc-obj-y)
+> >  tests/qtest/pnv-xscom-test$(EXESUF): tests/qtest/pnv-xscom-test.o
+> >  tests/qtest/wdt_ib700-test$(EXESUF): tests/qtest/wdt_ib700-test.o
+> > diff --git a/tests/qtest/fuzz-test.c b/tests/qtest/fuzz-test.c
+> > new file mode 100644
+> > index 0000000000..695c6dffb9
+> > --- /dev/null
+> > +++ b/tests/qtest/fuzz-test.c
+> > @@ -0,0 +1,45 @@
+> > +/*
+> > + * QTest testcase for fuzz case
+> > + *
+> > + * Copyright (c) 2020 Li Qiang <liq3ea@gmail.com>
+> > + *
+> > + * This work is licensed under the terms of the GNU GPL, version 2 or
+> later.
+> > + * See the COPYING file in the top-level directory.
+> > + */
+> > +
+> > +
+> > +#include "qemu/osdep.h"
+> > +
+> > +#include "libqtest.h"
+> > +
+> > +/*
+> > + * This used to trigger the assert in scsi_dma_complete
+> > + * https://bugs.launchpad.net/qemu/+bug/1878263
+> > + */
+> > +static void test_megasas_zero_iov_cnt(void)
+>
+> I'd name it test_lp1878263_megasas_zero_iov_cnt()
+>
 
---v113ZkLpjYGrrHDyhieuA1PEbjOEmzQlq
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+This seems better.
 
------BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl89O9gACgkQ9AfbAGHV
-z0CdXwf/Xeyvevz9X5PAt7jt+bOsHGbJZ5PwGxxJJw4BJedVgI50d0ADfTLM7l9H
-hF4d3J7eDLcJeiS3r0/2kvJ1jRe1HFiSikD2DQx/iwmq+Y8uPkAdNANnOZOLRRrz
-ME+7tybLsFdckGEuKnheOgqYv4+2RQJDhCBWlY3k+M2t8rNzT5dtng4v31t0HgjZ
-v2a2zSIBf+fxT83erXKqbYXe0ozIJ+i5m8onlmTYA9wKQ9+BWGyXK9vBAOFqljIO
-qOiJ2gDGRc/4i+kokn+ldirhUQBm4TCWEPuNeIyXij3u6/MjEfas4wBfRG7ou9cu
-DF0ZuuBPEpw2f6ByUp9tIkkoVRRSfw==
-=oyIA
------END PGP SIGNATURE-----
+> or lp1878263_megasas_zero_iov_cnt().
 
---v113ZkLpjYGrrHDyhieuA1PEbjOEmzQlq--
 
+
+>
+> > +{
+> > +    QTestState *s;
+> > +
+> > +    s =3D qtest_init("-nographic -monitor none -serial none "
+> > +                   "-M q35 -device megasas -device scsi-cd,drive=3Dnul=
+l0 "
+> > +                   "-blockdev
+> driver=3Dnull-co,read-zeroes=3Don,node-name=3Dnull0");
+> > +    qtest_outl(s, 0xcf8, 0x80001818);
+> > +    qtest_outl(s, 0xcfc, 0xc101);
+> > +    qtest_outl(s, 0xcf8, 0x8000181c);
+> > +    qtest_outl(s, 0xcf8, 0x80001804);
+> > +    qtest_outw(s, 0xcfc, 0x7);
+> > +    qtest_outl(s, 0xcf8, 0x8000186a);
+> > +    qtest_writeb(s, 0x14, 0xfe);
+> > +    qtest_writeb(s, 0x0, 0x02);
+> > +    qtest_outb(s, 0xc1c0, 0x17);
+> > +    qtest_quit(s);
+>
+> Actually all the test body could be generated...
+
+Alex, can you have a look at that?
+>
+> > +}
+> > +
+> > +int main(int argc, char **argv)
+> > +{
+> > +    g_test_init(&argc, &argv, NULL);
+> > +
+> > +    qtest_add_func("fuzz/megasas_zero_iov_cnt",
+> test_megasas_zero_iov_cnt);
+> > +
+> > +    return g_test_run();
+>
+> The problem is now the test suite will fail because this test is not
+> fixed.
+>
+>
+Yes, as Paolo queued my patch to solve this:
+-->https://lists.gnu.org/archive/html/qemu-devel/2020-08/msg03712.html
+
+I think this patch should go Paolo's tree.
+
+Thanks,
+Li Qiang
+
+
+> Good idea btw :)
+>
+> > +}
+> >
+>
+>
+
+--000000000000a7ce3705ad3c23e3
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
+<div dir=3D"ltr" class=3D"gmail_attr">Philippe Mathieu-Daud=C3=A9 &lt;<a hr=
+ef=3D"mailto:philmd@redhat.com">philmd@redhat.com</a>&gt; =E4=BA=8E2020=E5=
+=B9=B48=E6=9C=8819=E6=97=A5=E5=91=A8=E4=B8=89 =E4=B8=8B=E5=8D=8810:38=E5=86=
+=99=E9=81=93=EF=BC=9A<br></div><blockquote class=3D"gmail_quote" style=3D"m=
+argin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left=
+:1ex">On 8/19/20 4:15 PM, Li Qiang wrote:<br>
+&gt; Currently the device fuzzer find a more and more issues.<br>
+&gt; For every fuzz case, we need not only the fixes but also<br>
+&gt; the coressponding test case. We can analysis the reproducer<br>
+<br>
+Typo &quot;corresponding&quot;<br></blockquote><div><br></div><div>Will cor=
+rect in next revision.</div><div>=C2=A0</div><blockquote class=3D"gmail_quo=
+te" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204=
+);padding-left:1ex">
+<br>
+&gt; for every case and find what happened in where and write<br>
+&gt; a beautiful test case. However the raw data of reproducer is not<br>
+&gt; friendly to analysis. It will take a very long time, even far more<br>
+&gt; than the fixes itself. So let&#39;s create a new file to hold all of<b=
+r>
+&gt; the fuzz test cases and just use the raw data to act as the test<br>
+&gt; case. This way nobody will be afraid of writing a test case for<br>
+&gt; the fuzz reproducer.<br>
+<br>
+Ahaha nice :)<br>
+<br>
+&gt; <br>
+&gt; This patch adds the issue LP#1878263 test case.<br>
+&gt; <br>
+&gt; Signed-off-by: Li Qiang &lt;<a href=3D"mailto:liq3ea@163.com" target=
+=3D"_blank">liq3ea@163.com</a>&gt;<br>
+&gt; ---<br>
+&gt;=C2=A0 tests/qtest/Makefile.include |=C2=A0 2 ++<br>
+&gt;=C2=A0 tests/qtest/fuzz-test.c=C2=A0 =C2=A0 =C2=A0 | 45 +++++++++++++++=
++++++++++++++++++++++<br>
+&gt;=C2=A0 2 files changed, 47 insertions(+)<br>
+&gt;=C2=A0 create mode 100644 tests/qtest/fuzz-test.c<br>
+&gt; <br>
+&gt; diff --git a/tests/qtest/Makefile.include b/tests/qtest/Makefile.inclu=
+de<br>
+&gt; index b0204e44f2..ff460179c5 100644<br>
+&gt; --- a/tests/qtest/Makefile.include<br>
+&gt; +++ b/tests/qtest/Makefile.include<br>
+&gt; @@ -7,6 +7,7 @@ check-qtest-generic-y +=3D machine-none-test<br>
+&gt;=C2=A0 check-qtest-generic-y +=3D qmp-test<br>
+&gt;=C2=A0 check-qtest-generic-y +=3D qmp-cmd-test<br>
+&gt;=C2=A0 check-qtest-generic-y +=3D qom-test<br>
+&gt; +check-qtest-generic-y +=3D fuzz-test<br>
+<br>
+Maybe name that fuzzed-reproducers-test?<br></blockquote><div><br></div><di=
+v>This maybe be more understandable.</div><div>=C2=A0</div><blockquote clas=
+s=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid r=
+gb(204,204,204);padding-left:1ex">
+<br>
+&gt;=C2=A0 check-qtest-generic-$(CONFIG_MODULES) +=3D modules-test<br>
+&gt;=C2=A0 check-qtest-generic-y +=3D test-hmp<br>
+&gt;=C2=A0 <br>
+&gt; @@ -272,6 +273,7 @@ tests/qtest/m25p80-test$(EXESUF): tests/qtest/m25p=
+80-test.o<br>
+&gt;=C2=A0 tests/qtest/i440fx-test$(EXESUF): tests/qtest/i440fx-test.o $(li=
+bqos-pc-obj-y)<br>
+&gt;=C2=A0 tests/qtest/q35-test$(EXESUF): tests/qtest/q35-test.o $(libqos-p=
+c-obj-y)<br>
+&gt;=C2=A0 tests/qtest/fw_cfg-test$(EXESUF): tests/qtest/fw_cfg-test.o $(li=
+bqos-pc-obj-y)<br>
+&gt; +tests/qtest/fuzz-test$(EXESUF): tests/qtest/fuzz-test.o $(libqos-pc-o=
+bj-y)<br>
+&gt;=C2=A0 tests/qtest/rtl8139-test$(EXESUF): tests/qtest/rtl8139-test.o $(=
+libqos-pc-obj-y)<br>
+&gt;=C2=A0 tests/qtest/pnv-xscom-test$(EXESUF): tests/qtest/pnv-xscom-test.=
+o<br>
+&gt;=C2=A0 tests/qtest/wdt_ib700-test$(EXESUF): tests/qtest/wdt_ib700-test.=
+o<br>
+&gt; diff --git a/tests/qtest/fuzz-test.c b/tests/qtest/fuzz-test.c<br>
+&gt; new file mode 100644<br>
+&gt; index 0000000000..695c6dffb9<br>
+&gt; --- /dev/null<br>
+&gt; +++ b/tests/qtest/fuzz-test.c<br>
+&gt; @@ -0,0 +1,45 @@<br>
+&gt; +/*<br>
+&gt; + * QTest testcase for fuzz case<br>
+&gt; + *<br>
+&gt; + * Copyright (c) 2020 Li Qiang &lt;<a href=3D"mailto:liq3ea@gmail.com=
+" target=3D"_blank">liq3ea@gmail.com</a>&gt;<br>
+&gt; + *<br>
+&gt; + * This work is licensed under the terms of the GNU GPL, version 2 or=
+ later.<br>
+&gt; + * See the COPYING file in the top-level directory.<br>
+&gt; + */<br>
+&gt; +<br>
+&gt; +<br>
+&gt; +#include &quot;qemu/osdep.h&quot;<br>
+&gt; +<br>
+&gt; +#include &quot;libqtest.h&quot;<br>
+&gt; +<br>
+&gt; +/*<br>
+&gt; + * This used to trigger the assert in scsi_dma_complete<br>
+&gt; + * <a href=3D"https://bugs.launchpad.net/qemu/+bug/1878263" rel=3D"no=
+referrer" target=3D"_blank">https://bugs.launchpad.net/qemu/+bug/1878263</a=
+><br>
+&gt; + */<br>
+&gt; +static void test_megasas_zero_iov_cnt(void)<br>
+<br>
+I&#39;d name it test_lp1878263_megasas_zero_iov_cnt()<br></blockquote><div>=
+<br></div><div>This seems better.</div><div>=C2=A0</div><blockquote class=
+=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rg=
+b(204,204,204);padding-left:1ex">
+or lp1878263_megasas_zero_iov_cnt().</blockquote><div>=C2=A0</div><blockquo=
+te class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px =
+solid rgb(204,204,204);padding-left:1ex">
+<br>
+&gt; +{<br>
+&gt; +=C2=A0 =C2=A0 QTestState *s;<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 s =3D qtest_init(&quot;-nographic -monitor none -serial=
+ none &quot;<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+&quot;-M q35 -device megasas -device scsi-cd,drive=3Dnull0 &quot;<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+&quot;-blockdev driver=3Dnull-co,read-zeroes=3Don,node-name=3Dnull0&quot;);=
+<br>
+&gt; +=C2=A0 =C2=A0 qtest_outl(s, 0xcf8, 0x80001818);<br>
+&gt; +=C2=A0 =C2=A0 qtest_outl(s, 0xcfc, 0xc101);<br>
+&gt; +=C2=A0 =C2=A0 qtest_outl(s, 0xcf8, 0x8000181c);<br>
+&gt; +=C2=A0 =C2=A0 qtest_outl(s, 0xcf8, 0x80001804);<br>
+&gt; +=C2=A0 =C2=A0 qtest_outw(s, 0xcfc, 0x7);<br>
+&gt; +=C2=A0 =C2=A0 qtest_outl(s, 0xcf8, 0x8000186a);<br>
+&gt; +=C2=A0 =C2=A0 qtest_writeb(s, 0x14, 0xfe);<br>
+&gt; +=C2=A0 =C2=A0 qtest_writeb(s, 0x0, 0x02);<br>
+&gt; +=C2=A0 =C2=A0 qtest_outb(s, 0xc1c0, 0x17);<br>
+&gt; +=C2=A0 =C2=A0 qtest_quit(s);<br>
+<br>
+Actually all the test body could be generated...</blockquote><blockquote cl=
+ass=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid=
+ rgb(204,204,204);padding-left:1ex">
+Alex, can you have a look at that?<br>
+<br>
+&gt; +}<br>
+&gt; +<br>
+&gt; +int main(int argc, char **argv)<br>
+&gt; +{<br>
+&gt; +=C2=A0 =C2=A0 g_test_init(&amp;argc, &amp;argv, NULL);<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 qtest_add_func(&quot;fuzz/megasas_zero_iov_cnt&quot;, t=
+est_megasas_zero_iov_cnt);<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 return g_test_run();<br>
+<br>
+The problem is now the test suite will fail because this test is not<br>
+fixed.<br>
+<br></blockquote><div><br></div><div>Yes, as Paolo queued my patch to solve=
+ this:</div><div>--&gt;<a href=3D"https://lists.gnu.org/archive/html/qemu-d=
+evel/2020-08/msg03712.html">https://lists.gnu.org/archive/html/qemu-devel/2=
+020-08/msg03712.html</a></div><div><br></div><div>I think this patch should=
+ go Paolo&#39;s tree.</div><div><br></div><div>Thanks,</div><div>Li Qiang</=
+div><div>=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"margin:0px =
+0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">
+Good idea btw :)<br>
+<br>
+&gt; +}<br>
+&gt; <br>
+<br>
+</blockquote></div></div>
+
+--000000000000a7ce3705ad3c23e3--
 
