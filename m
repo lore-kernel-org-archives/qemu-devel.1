@@ -2,80 +2,100 @@ Return-Path: <SRS0=bVMU=B5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB134C433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 08:21:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E60F6C433E1
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 08:23:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 89A3F20738
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 08:21:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B3D6B20738
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 08:23:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BuoWWlby"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 89A3F20738
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bvQpDvow"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3D6B20738
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52226 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55472 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8JLs-0003HT-SO
-	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 04:21:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58012)
+	id 1k8JNm-0004hb-1d
+	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 04:23:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58520)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1k8JKt-0002fg-JR
- for qemu-devel@nongnu.org; Wed, 19 Aug 2020 04:20:43 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:53669
+ (Exim 4.90_1) (envelope-from <eperezma@redhat.com>)
+ id 1k8JN7-00040y-1p
+ for qemu-devel@nongnu.org; Wed, 19 Aug 2020 04:23:01 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:50337
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1k8JKq-0000sD-SQ
- for qemu-devel@nongnu.org; Wed, 19 Aug 2020 04:20:42 -0400
+ (Exim 4.90_1) (envelope-from <eperezma@redhat.com>)
+ id 1k8JN3-0001DG-CI
+ for qemu-devel@nongnu.org; Wed, 19 Aug 2020 04:23:00 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597825239;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:in-reply-to:in-reply-to:  references:references;
- bh=GOwYWB4fmX4oh0+K2uW+k0ttXGmG+9xOGII/7ihbv4k=;
- b=BuoWWlby30iFtoybniD/7JeIgxW1ThgMPO29ec4ZF977FarywEtJ3p4R72Jcg87A6FjWEQ
- yD7gNdHssKGWnnFzpcLhq+5pov5+GcUvS3jjZ47Dsz1a4q/KBPbaihvuPI3Y6Dgi506at3
- SCvlXhcdbE8pP9s28GFGrXUxMPfpyYE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-88-xuFUdEI7MvWkR1dOv_Ck8g-1; Wed, 19 Aug 2020 04:20:20 -0400
-X-MC-Unique: xuFUdEI7MvWkR1dOv_Ck8g-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 90FFF81F021;
- Wed, 19 Aug 2020 08:20:19 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.110.45])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 33C175DEB5;
- Wed, 19 Aug 2020 08:20:16 +0000 (UTC)
-Date: Wed, 19 Aug 2020 09:20:13 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH] tests: docker: support mxe-based mingw builds
-Message-ID: <20200819082013.GB69261@redhat.com>
-References: <20200819080206.27423-1-pbonzini@redhat.com>
+ s=mimecast20190719; t=1597825376;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=VXMAvdVjnwEq/4SvoxiTBch4Ojyt+xI36R9uuQaxBI4=;
+ b=bvQpDvow3KEI3FOL3HAnbmqy4ssLFyfHzidiXPtj/EiWJMZdRkbIY3nT+k5LQ847W4ix7A
+ O3WLUEeDkjuN9gzo61uVG6u5JITg8lmlEKYtm027/3aqo2Sif/koyDD9Lnaoy/yeZFiFxy
+ cytXwS3S/C5CJEEf9QNejKz2IJWRIt0=
+Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
+ [209.85.160.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-417-g8zoQF0xOuGIZOwhQQGWyw-1; Wed, 19 Aug 2020 04:22:55 -0400
+X-MC-Unique: g8zoQF0xOuGIZOwhQQGWyw-1
+Received: by mail-qt1-f198.google.com with SMTP id m13so16162035qth.16
+ for <qemu-devel@nongnu.org>; Wed, 19 Aug 2020 01:22:54 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=VXMAvdVjnwEq/4SvoxiTBch4Ojyt+xI36R9uuQaxBI4=;
+ b=nBtxtIVPs7yKYcj30B2HQtcwWTuEdxKq/RB+/oUvPg2uHwvCNvlKpxQlRizrfTdK0W
+ PQnBpbo01BE3QuWtbIf4eWPDiJDVRRcRrBVheCLigl1UP3wzKfRTHNLVUnL69HuFMxTV
+ oO9UACu15wJ+qK/9DyOd1BUmGrlMTeKZhWfPt1juC5kWRInpH7SoNyWH8l6xOm0zxn/f
+ brD0z3CzeUkK6xlxTvRvtLiD4aI2Kqk7+xIe0mud71tJvFNtMIHa4r57yuLqsvLl7YaP
+ du3+LgV+2HPtAy+s6o0p75F9Vxm8bPw3gjN15Enkf474sku25ygcSYuP4v8+8iM0sXGF
+ TbUQ==
+X-Gm-Message-State: AOAM533TmS4MTHmCSBDO06Gp5NH3ahlth5gKvoOrbj2ZMllvIPtTi6bh
+ OXKAx/AEkgr4DqD3gmXk9rpe03DLPZwKWJByjB6Y6ZE7dX16R7IOX6L6mPYjCIT5qfGgXNEHggn
+ JvjeGpx2bVqX/MUHAavjj8t5UjocBwDg=
+X-Received: by 2002:a05:620a:1595:: with SMTP id
+ d21mr20722030qkk.203.1597825374473; 
+ Wed, 19 Aug 2020 01:22:54 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxPm1C92KjIUObN8NYLDlLrk5bMxE+aJa4+Uel9h1T9gwiI6eE1eqNCHwi8ko5R5hu6ksHKQi9ZZ6ZZR+Z38NE=
+X-Received: by 2002:a05:620a:1595:: with SMTP id
+ d21mr20722017qkk.203.1597825374213; 
+ Wed, 19 Aug 2020 01:22:54 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200819080206.27423-1-pbonzini@redhat.com>
-User-Agent: Mutt/1.14.5 (2020-06-23)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+References: <20200626064122.9252-1-eperezma@redhat.com>
+ <20200811175533.7359-1-eperezma@redhat.com>
+ <20200811175533.7359-2-eperezma@redhat.com>
+ <2443886f-2109-e048-b47f-886c896613ab@redhat.com>
+ <CAJaqyWe0_wcXHgbAVAVNCTpG7O4YKF6FMkgKsf6SfW4dEZ4A5g@mail.gmail.com>
+ <CAJaqyWe+KgnVegtprpRmVvXo7kFVFDL_erK_5Nyp4K=gTUcN=Q@mail.gmail.com>
+ <eb26c5d7-465a-34ed-3f8f-bad11eda5bee@redhat.com>
+In-Reply-To: <eb26c5d7-465a-34ed-3f8f-bad11eda5bee@redhat.com>
+From: Eugenio Perez Martin <eperezma@redhat.com>
+Date: Wed, 19 Aug 2020 10:22:17 +0200
+Message-ID: <CAJaqyWfGx5T=DvGPq-ydvvYbNg_pRR35rXAT=Lz5nTaztQAV8g@mail.gmail.com>
+Subject: Re: [RFC v3 1/1] memory: Skip bad range assertion if notifier
+ supports arbitrary masks
+To: Jason Wang <jasowang@redhat.com>
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
-X-Mimecast-Spam-Score: 0.001
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eperezma@redhat.com
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=berrange@redhat.com;
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=eperezma@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 23:05:17
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/19 04:00:34
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -83,8 +103,7 @@ X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,163 +116,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: peter.maydell@linaro.org, alex.bennee@linaro.org, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Yan Zhao <yan.y.zhao@intel.com>,
+ Juan Quintela <quintela@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>,
+ Eric Auger <eric.auger@redhat.com>, Avi Kivity <avi@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Aug 19, 2020 at 04:02:06AM -0400, Paolo Bonzini wrote:
-> This can be run with docker-test-mingw@ubuntu1804-mxe, and is the setup
-> that Peter uses to test cross-compilation.
+On Wed, Aug 19, 2020 at 9:15 AM Jason Wang <jasowang@redhat.com> wrote:
+>
+>
+> On 2020/8/18 =E4=B8=8B=E5=8D=8810:24, Eugenio Perez Martin wrote:
+> > On Wed, Aug 12, 2020 at 10:49 AM Eugenio Perez Martin
+> > <eperezma@redhat.com>  wrote:
+> >> On Wed, Aug 12, 2020 at 4:24 AM Jason Wang<jasowang@redhat.com>  wrote=
+:
+> >>> On 2020/8/12 =E4=B8=8A=E5=8D=881:55, Eugenio P=C3=A9rez wrote:
+> >>>> Signed-off-by: Eugenio P=C3=A9rez<eperezma@redhat.com>
+> >>>> ---
+> >>>>    hw/virtio/vhost.c     |  2 +-
+> >>>>    include/exec/memory.h |  2 ++
+> >>>>    softmmu/memory.c      | 10 ++++++++--
+> >>>>    3 files changed, 11 insertions(+), 3 deletions(-)
+> >>>>
+> >>>> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+> >>>> index 1a1384e7a6..e74ad9e09b 100644
+> >>>> --- a/hw/virtio/vhost.c
+> >>>> +++ b/hw/virtio/vhost.c
+> >>>> @@ -729,7 +729,7 @@ static void vhost_iommu_region_add(MemoryListene=
+r *listener,
+> >>>>        iommu_idx =3D memory_region_iommu_attrs_to_index(iommu_mr,
+> >>>>                                                       MEMTXATTRS_UNS=
+PECIFIED);
+> >>>>        iommu_notifier_init(&iommu->n, vhost_iommu_unmap_notify,
+> >>>> -                        IOMMU_NOTIFIER_UNMAP,
+> >>>> +                        IOMMU_NOTIFIER_UNMAP | IOMMU_NOTIFIER_IOTLB=
+,
+> >>> I think we can safely drop IOMMU_NOTIFIER_UNMAP here since device IOT=
+LB
+> >>> is sufficient.
+> >>>
+> >>> Btw, IOMMU_NOTIFIER_IOTLB is kind of confusing, maybe something like
+> >>> IOMMU_NOTIFIER_DEVIOTLB.
+> >>>
+> >> Got it, will change.
+> >>
+> >>>>                            section->offset_within_region,
+> >>>>                            int128_get64(end),
+> >>>>                            iommu_idx);
+> >>>> diff --git a/include/exec/memory.h b/include/exec/memory.h
+> >>>> index 307e527835..4d94c1e984 100644
+> >>>> --- a/include/exec/memory.h
+> >>>> +++ b/include/exec/memory.h
+> >>>> @@ -87,6 +87,8 @@ typedef enum {
+> >>>>        IOMMU_NOTIFIER_UNMAP =3D 0x1,
+> >>>>        /* Notify entry changes (newly created entries) */
+> >>>>        IOMMU_NOTIFIER_MAP =3D 0x2,
+> >>>> +    /* Notify changes on IOTLB entries */
+> >>>> +    IOMMU_NOTIFIER_IOTLB =3D 0x04,
+> >>>>    } IOMMUNotifierFlag;
+> >>>>
+> >>>>    #define IOMMU_NOTIFIER_ALL (IOMMU_NOTIFIER_MAP | IOMMU_NOTIFIER_U=
+NMAP)
+> >>>> diff --git a/softmmu/memory.c b/softmmu/memory.c
+> >>>> index af25987518..e2c5f6d0e7 100644
+> >>>> --- a/softmmu/memory.c
+> >>>> +++ b/softmmu/memory.c
+> >>>> @@ -1895,6 +1895,7 @@ void memory_region_notify_one(IOMMUNotifier *n=
+otifier,
+> >>> (we probably need a better name of this function, at least something
+> >>> like "memory_region_iommu_notify_one").
+> >>>
+> >> Ok will change.
+> >>
+> >>>>    {
+> >>>>        IOMMUNotifierFlag request_flags;
+> >>>>        hwaddr entry_end =3D entry->iova + entry->addr_mask;
+> >>>> +    IOMMUTLBEntry tmp =3D *entry;
+> >>>>
+> >>>>        /*
+> >>>>         * Skip the notification if the notification does not overlap
+> >>>> @@ -1904,7 +1905,12 @@ void memory_region_notify_one(IOMMUNotifier *=
+notifier,
+> >>>>            return;
+> >>>>        }
+> >>>>
+> >>>> -    assert(entry->iova >=3D notifier->start && entry_end <=3D notif=
+ier->end);
+> >>>> +    if (notifier->notifier_flags & IOMMU_NOTIFIER_IOTLB) {
+> >>>> +        tmp.iova =3D MAX(tmp.iova, notifier->start);
+> >>>> +        tmp.addr_mask =3D MIN(entry_end, notifier->end) - tmp.iova;
+> >>> Any reason for doing such re-calculation here, a comment would be hel=
+pful.
+> >>>
+> >> It was proposed by Peter, but I understand as limiting the
+> >> address+range we pass to the notifier. Although vhost seems to support
+> >> it as long as it contains (notifier->start, notifier->end) in range, a
+> >> future notifier might not.
+>
+>
+> Yes, actually, I feel confused after reading the codes. Is
+> notifier->start IOVA or GPA?
+>
+> In vfio.c, we did:
+>
+>          iommu_notifier_init(&giommu->n, vfio_iommu_map_notify,
+>                              IOMMU_NOTIFIER_ALL,
+>                              section->offset_within_region,
+>                              int128_get64(llend),
+>                              iommu_idx);
+>
+> So it looks to me the start and end are GPA, but the assertion above
+> check it against IOVA which seems to be wrong ....
+>
+> Thanks
+>
 
-We already have docker containers with MXE based on Debian:
+I see.
 
-  debian-win32-cross.docker
-  debian-win64-cross.docker
+I didn't go so deep, I just assumed that:
+* all the addresses were GPA in the vhost-net+virtio-net case,
+although the name iova in IOMMUTLBEntry.
+* memory region was initialized with IOVA addresses in case of VFIO.
 
-your image uses a different naming convention, and puts both
-32 and 64 bit in the same image.
+Maybe the comment should warn about the bad "iova" name, if I'm right?
 
-I feel like we should have the Ubuntu variant follow the same
-structure and naming as the Debian variant for consistency.
+I assumed that nothing changed in the VFIO case since its notifier has
+no IOMMU_NOTIFIER_DEVIOTLB flag and the new conditional in
+memory_region_notify_one_iommu, but I will test with a device
+passthrough and DPDK again. Do you think another test would be needed?
 
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  tests/docker/common.rc                        | 18 ++++++-
->  .../docker/dockerfiles/ubuntu1804-mxe.docker  | 54 +++++++++++++++++++
->  tests/docker/test-mingw                       | 11 +++-
->  3 files changed, 80 insertions(+), 3 deletions(-)
->  create mode 100644 tests/docker/dockerfiles/ubuntu1804-mxe.docker
-> 
-> diff --git a/tests/docker/common.rc b/tests/docker/common.rc
-> index ebc5b97ecf..402f6603b6 100755
-> --- a/tests/docker/common.rc
-> +++ b/tests/docker/common.rc
-> @@ -15,10 +15,26 @@
->  # overriden by TARGET_LIST if the user sets it.
->  DEF_TARGET_LIST=${DEF_TARGET_LIST:-"x86_64-softmmu,aarch64-softmmu"}
->  
-> +has()
-> +{
-> +    echo "$FEATURES" | grep -wq -e "$1"
-> +}
-> +
-> +requires_any()
-> +{
-> +    for c in $@; do
-> +        if has "$c"; then
-> +            return
-> +        fi
-> +    done
-> +    echo "None of prerequisites '$*' is present, skip"
-> +    exit 0
-> +}
-> +
->  requires()
->  {
->      for c in $@; do
-> -        if ! echo "$FEATURES" | grep -wq -e "$c"; then
-> +        if ! has "$c"; then
->              echo "Prerequisite '$c' not present, skip"
->              exit 0
->          fi
-> diff --git a/tests/docker/dockerfiles/ubuntu1804-mxe.docker b/tests/docker/dockerfiles/ubuntu1804-mxe.docker
-> new file mode 100644
-> index 0000000000..91895db80d
-> --- /dev/null
-> +++ b/tests/docker/dockerfiles/ubuntu1804-mxe.docker
-> @@ -0,0 +1,54 @@
-> +FROM ubuntu:18.04
-> +ENV PACKAGES \
-> +    ccache \
-> +    gcc \
-> +    gettext \
-> +    git \
-> +    gnupg \
-> +    gnupg2 \
-> +    make \
-> +    nsis \
-> +    python3-yaml \
-> +    python3-sphinx \
-> +    python3-setuptools \
-> +    texinfo
-> +RUN apt-get update && \
-> +    DEBIAN_FRONTEND=noninteractive apt-get -y install $PACKAGES
-> +
-> +ENV MXE_PACKAGES \
-> +    mxe-i686-w64-mingw32.shared-bzip2 \
-> +    mxe-i686-w64-mingw32.shared-curl \
-> +    mxe-i686-w64-mingw32.shared-glib \
-> +    mxe-i686-w64-mingw32.shared-gcc \
-> +    mxe-i686-w64-mingw32.shared-glib \
-> +    mxe-i686-w64-mingw32.shared-gmp \
-> +    mxe-i686-w64-mingw32.shared-gnutls \
-> +    mxe-i686-w64-mingw32.shared-gtk3 \
-> +    mxe-i686-w64-mingw32.shared-libjpeg-turbo \
-> +    mxe-i686-w64-mingw32.shared-libpng \
-> +    mxe-i686-w64-mingw32.shared-nettle \
-> +    mxe-i686-w64-mingw32.shared-nsis \
-> +    mxe-i686-w64-mingw32.shared-pixman \
-> +    mxe-i686-w64-mingw32.shared-pkgconf \
-> +    mxe-i686-w64-mingw32.shared-sdl2 \
-> +    mxe-x86-64-w64-mingw32.shared-bzip2 \
-> +    mxe-x86-64-w64-mingw32.shared-curl \
-> +    mxe-x86-64-w64-mingw32.shared-gcc \
-> +    mxe-x86-64-w64-mingw32.shared-glib \
-> +    mxe-x86-64-w64-mingw32.shared-gmp \
-> +    mxe-x86-64-w64-mingw32.shared-gnutls \
-> +    mxe-x86-64-w64-mingw32.shared-gtk3 \
-> +    mxe-x86-64-w64-mingw32.shared-libjpeg-turbo \
-> +    mxe-x86-64-w64-mingw32.shared-libpng \
-> +    mxe-x86-64-w64-mingw32.shared-nettle \
-> +    mxe-x86-64-w64-mingw32.shared-nsis \
-> +    mxe-x86-64-w64-mingw32.shared-pixman \
-> +    mxe-x86-64-w64-mingw32.shared-pkgconf \
-> +    mxe-x86-64-w64-mingw32.shared-sdl2
-> +
-> +RUN echo "deb http://pkg.mxe.cc/repos/apt bionic main" > \
-> +   /etc/apt/sources.list.d/mxeapt.list && \
-> +   apt-key adv --keyserver keyserver.ubuntu.com --recv-keys C6BF758A33A3A276 && \
-> +   apt-get update && \
-> +   DEBIAN_FRONTEND=noninteractive apt-get install -y $MXE_PACKAGES
-> +ENV FEATURES mxe
-> diff --git a/tests/docker/test-mingw b/tests/docker/test-mingw
-> index c30eb654eb..9e2fadb11a 100755
-> --- a/tests/docker/test-mingw
-> +++ b/tests/docker/test-mingw
-> @@ -13,11 +13,18 @@
->  
->  . common.rc
->  
-> -requires mingw dtc
-> +requires dtc
-> +requires_any mingw mxe
->  
->  cd "$BUILD_DIR"
->  
-> -for prefix in x86_64-w64-mingw32- i686-w64-mingw32-; do
-> +if has mingw; then
-> +  prefixes='x86_64-w64-mingw32- i686-w64-mingw32-'
-> +else
-> +  prefixes='x86_64-w64-mingw32.shared- i686-w64-mingw32.shared-'
-> +  export PATH=/usr/lib/mxe/usr/bin:$PATH
-> +fi
-> +for prefix in $prefixes; do
->      TARGET_LIST=${TARGET_LIST:-$DEF_TARGET_LIST} \
->          build_qemu --cross-prefix=$prefix \
->          --enable-trace-backends=simple \
-> -- 
-> 2.26.2
-> 
-> 
+Maybe Peter can go deeper on this.
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Thanks!
+
+>
+> >>
+> >> It could be done as iommu_entry_crop(IOMMUTLBEntry *entry, const
+> >> IOMMUNotifier *notifier) though.
+>
 
 
