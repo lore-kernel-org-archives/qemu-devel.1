@@ -7,77 +7,77 @@ X-Spam-Status: No, score=-14.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B7D1C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 03:14:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F486C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 03:22:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 06DBE2065F
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 03:14:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1BAFE207BB
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 03:22:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AvNYCFDn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06DBE2065F
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JVbDfaGp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BAFE207BB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45272 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48574 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8EYk-0004pI-Ar
-	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 23:14:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52326)
+	id 1k8Eg5-0006eI-Dv
+	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 23:22:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53738)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k8EYC-0004On-UT
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 23:14:08 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:48934
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k8EfX-0006E0-Eq
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 23:21:43 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:45501)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k8EYB-0004UJ-5j
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 23:14:08 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k8EfV-0005Vn-DL
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 23:21:43 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597806846;
+ s=mimecast20190719; t=1597807300;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=KAUSjRGA2Q9BGD8XNLP2H6DG9SM8DERncEv9awtQVOk=;
- b=AvNYCFDnAC3zKNxq2jjWHQYZtB5T47QVn/+alcYU6IrJSdoONmLwDQLkwfVmzqxnZAPt7j
- vXd1d0pQt39CUbO2nPCmOFsgmqHMjXepkfjsUmQgxgQ8btE24bvHjm6pAy2UFCEVAWkINk
- +kctGHrt8W9VoRKDYXc3FJyK2eE6rxw=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-191-zaYeASAUNjaDKtStBbD4-w-1; Tue, 18 Aug 2020 23:14:04 -0400
-X-MC-Unique: zaYeASAUNjaDKtStBbD4-w-1
-Received: by mail-wr1-f71.google.com with SMTP id o10so8866284wrs.21
- for <qemu-devel@nongnu.org>; Tue, 18 Aug 2020 20:14:04 -0700 (PDT)
+ bh=WCqdB9Qnkr42hKUfWl+4Tmh5xtv9ATMtBSs4WdMM8uk=;
+ b=JVbDfaGpUHyfllPDH0Vt3ngGZMP3yJWJj+zs9tKPsBTjm07fQFZ71kuMFy0XLmdEdcap5O
+ EKQH5YeVoDl4ApUfEURFfLUsmQM1ohNxVKDt/WyIeJPdZPJF3QbG5hapTMGqmOPJz4yIg5
+ wBkrIQnzx3rI5oGXVNj2qcYcaRMlXDw=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-409-BwBP_tAWMgSGZ4F7GSb4lw-1; Tue, 18 Aug 2020 23:21:38 -0400
+X-MC-Unique: BwBP_tAWMgSGZ4F7GSb4lw-1
+Received: by mail-wm1-f69.google.com with SMTP id h7so401930wmm.7
+ for <qemu-devel@nongnu.org>; Tue, 18 Aug 2020 20:21:38 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=KAUSjRGA2Q9BGD8XNLP2H6DG9SM8DERncEv9awtQVOk=;
- b=ZCtwppVCPuraguc/EmpTW5ZlSCkcyAxwFUPtU4z4+Grrs6uBLU8g2SzfPHNSFPo7rM
- D/i1Zj8PCoDH8MJ6EpYcGD4qHxyKy28KSbiN1yqCn093XJkPAtvZv8LZYma19MPu1y6b
- 7qVQ7PYruWcCSLF53OWmHlQ1JWoe/gleQRyouWNS2s/fOFGY9SyuWRtwTFQoOUtWuPYd
- q1jkdtjGGBetqbxYW9aZucdLTczpw5QQWp/hwB/2zHPRajumM33FgOVBN7GI/SpQGzIt
- n86sQyewCLE7oTp4SgwdSSEFUlHVjCDFW90+WqgJIH+q3PBuXUKpxxdeZlOdBQQiMMQA
- 1wyQ==
-X-Gm-Message-State: AOAM532yFqJMdyyv7/+fcmTlM61yg181Njjnz0WJRizEI/SDj1bUW9Wl
- Oukwr32czWC+6D4niyi2ZFpVKAG3x+Y5JNuFEXxxKigBo0fG+BSOo2WsXTrd9AIS1ockRvqOxCf
- 3P1Maw4TA0ICBDPM=
-X-Received: by 2002:a1c:4c17:: with SMTP id z23mr2816369wmf.49.1597806843888; 
- Tue, 18 Aug 2020 20:14:03 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzRV1Ok1O30UmKHf+1C6JgbjJhH3f47kDD7FZOTmHibZirz1WJqGrQ1RRj/aSNYt6G/S4WXcw==
-X-Received: by 2002:a1c:4c17:: with SMTP id z23mr2816351wmf.49.1597806843625; 
- Tue, 18 Aug 2020 20:14:03 -0700 (PDT)
+ bh=WCqdB9Qnkr42hKUfWl+4Tmh5xtv9ATMtBSs4WdMM8uk=;
+ b=o2yOjMaZcNl5IYNkOrwOjJeN9N6+YFd/Eoow2Yax/fvrhDL+VNWth61xfZn4Qh+GWk
+ ftPZx50ZcvCL/aynWZxPwPNf80iJUi+tuwINOlLXv9wiPwNoP7qcEkWzKGWoH4DOEhmc
+ aUW0ek4k5lRCRlGbkIi+id5730cEi3WyXqnE2hRtPPYBeph+FATmnuEBAVfs7iJM30AP
+ u+qNe9iVYgfLiZ9AJ+p0am5fFnQd9SwkMsSJn6Q8mTrb89mbhdubXotMJF8VqAOJmLNN
+ Wa137uwsvP+K6EdA5JCaw06J1zVJPW4QuUDTA8T7VKB6rBDgCRg0dR4r1oy6SB1ZS5hg
+ E76Q==
+X-Gm-Message-State: AOAM531fOHYVKWz1jAy45sEeBx/QhlJcWUYoPU7gI8YuZKd4YEfCrrEi
+ mKxGUkg0tfbuZRCGkY7t6MvkSoNWYc8t6YsJuDtLaE3OLVAdSpTQGVqRkaTbB8c1Z9nHNjQVXIS
+ WGaYYQ0NUkcQ80sc=
+X-Received: by 2002:a7b:c941:: with SMTP id i1mr2662706wml.73.1597807297191;
+ Tue, 18 Aug 2020 20:21:37 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwdEK9b1J9GAilb7xbFKCVZhBEO83hVaLSwyg84DzW15pcLMA3dxSFxExyScI5dSZlP26QbsQ==
+X-Received: by 2002:a7b:c941:: with SMTP id i1mr2662692wml.73.1597807296909;
+ Tue, 18 Aug 2020 20:21:36 -0700 (PDT)
 Received: from [192.168.1.36] (121.red-81-40-121.staticip.rima-tde.net.
  [81.40.121.121])
- by smtp.gmail.com with ESMTPSA id o124sm2834872wmb.2.2020.08.18.20.14.02
+ by smtp.gmail.com with ESMTPSA id g70sm3182291wmg.24.2020.08.18.20.21.35
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 18 Aug 2020 20:14:03 -0700 (PDT)
-Subject: Re: [RFC PATCH v2 1/4] hw/acpi/ich9: Trace ich9_gpe_readb()/writeb()
+ Tue, 18 Aug 2020 20:21:36 -0700 (PDT)
+Subject: Re: [RFC PATCH v2 2/4] hw/i386/acpi-build: Add ACPI PCI hot-plug
+ methods to q35
 To: Julia Suvorova <jusual@redhat.com>, qemu-devel@nongnu.org
 References: <20200818215227.181654-1-jusual@redhat.com>
- <20200818215227.181654-2-jusual@redhat.com>
+ <20200818215227.181654-3-jusual@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Autocrypt: addr=philmd@redhat.com; keydata=
  mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
@@ -102,12 +102,12 @@ Autocrypt: addr=philmd@redhat.com; keydata=
  9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
  RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
  apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <7220698b-3a7c-cd36-9ca5-5bb9a06a8fd6@redhat.com>
-Date: Wed, 19 Aug 2020 05:14:01 +0200
+Message-ID: <7f29d89e-8cdc-8067-acff-2817183f20f0@redhat.com>
+Date: Wed, 19 Aug 2020 05:21:35 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200818215227.181654-2-jusual@redhat.com>
+In-Reply-To: <20200818215227.181654-3-jusual@redhat.com>
 Content-Language: en-US
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
@@ -115,16 +115,16 @@ X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 22:38:38
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 23:05:17
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -144,68 +144,191 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Hi Julia,
+
 On 8/18/20 11:52 PM, Julia Suvorova wrote:
-> Add trace events similar to piix4_gpe_readb() to check gpe status.
+> Implement notifications and gpe to support q35 ACPI PCI hot-plug.
+> Use 0xcc4 - 0xcd7 range for 'acpi-pci-hotplug' io ports.
 > 
 > Signed-off-by: Julia Suvorova <jusual@redhat.com>
-> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 > ---
->  hw/acpi/ich9.c       | 7 ++++++-
->  hw/acpi/trace-events | 4 ++++
->  2 files changed, 10 insertions(+), 1 deletion(-)
+>  include/hw/acpi/pcihp.h |  3 ++-
+>  hw/acpi/pcihp.c         | 10 ++++++----
+>  hw/acpi/piix4.c         |  2 +-
+>  hw/i386/acpi-build.c    | 25 ++++++++++++++-----------
+>  4 files changed, 23 insertions(+), 17 deletions(-)
 > 
-> diff --git a/hw/acpi/ich9.c b/hw/acpi/ich9.c
-> index 6a19070cec..a2a1742aa6 100644
-> --- a/hw/acpi/ich9.c
-> +++ b/hw/acpi/ich9.c
-> @@ -36,6 +36,7 @@
->  #include "hw/acpi/acpi.h"
->  #include "hw/acpi/tco.h"
->  #include "exec/address-spaces.h"
-> +#include "trace.h"
+> diff --git a/include/hw/acpi/pcihp.h b/include/hw/acpi/pcihp.h
+> index 8bc4a4c01d..1e9d246f57 100644
+> --- a/include/hw/acpi/pcihp.h
+> +++ b/include/hw/acpi/pcihp.h
+> @@ -54,7 +54,8 @@ typedef struct AcpiPciHpState {
+>  } AcpiPciHpState;
 >  
->  #include "hw/i386/ich9.h"
->  #include "hw/mem/pc-dimm.h"
-> @@ -59,13 +60,17 @@ static void ich9_pm_update_sci_fn(ACPIREGS *regs)
->  static uint64_t ich9_gpe_readb(void *opaque, hwaddr addr, unsigned width)
+>  void acpi_pcihp_init(Object *owner, AcpiPciHpState *, PCIBus *root,
+> -                     MemoryRegion *address_space_io, bool bridges_enabled);
+> +                     MemoryRegion *address_space_io, bool bridges_enabled,
+> +                     bool is_piix4);
+>  
+>  void acpi_pcihp_device_pre_plug_cb(HotplugHandler *hotplug_dev,
+>                                     DeviceState *dev, Error **errp);
+> diff --git a/hw/acpi/pcihp.c b/hw/acpi/pcihp.c
+> index 9e31ab2da4..9a35ed6c83 100644
+> --- a/hw/acpi/pcihp.c
+> +++ b/hw/acpi/pcihp.c
+> @@ -38,7 +38,8 @@
+>  #include "qom/qom-qobject.h"
+>  #include "trace.h"
+>  
+> -#define ACPI_PCIHP_ADDR 0xae00
+> +#define ACPI_PCIHP_ADDR_PIIX4 0xae00
+> +#define ACPI_PCIHP_ADDR_Q35 0x0cc4
+>  #define ACPI_PCIHP_SIZE 0x0014
+>  #define PCI_UP_BASE 0x0000
+>  #define PCI_DOWN_BASE 0x0004
+> @@ -359,12 +360,13 @@ static const MemoryRegionOps acpi_pcihp_io_ops = {
+>  };
+>  
+>  void acpi_pcihp_init(Object *owner, AcpiPciHpState *s, PCIBus *root_bus,
+> -                     MemoryRegion *address_space_io, bool bridges_enabled)
+> +                     MemoryRegion *address_space_io, bool bridges_enabled,
+> +                     bool is_piix4)
+
+Instead of adding implementation knowledge to this generic function, can
+you instead pass it a 'io_base' argument (or 'pcihp_addr')?
+
 >  {
->      ICH9LPCPMRegs *pm = opaque;
-> -    return acpi_gpe_ioport_readb(&pm->acpi_regs, addr);
-> +    uint64_t val = acpi_gpe_ioport_readb(&pm->acpi_regs, addr);
-> +
-> +    trace_ich9_gpe_readb(addr, width, val);
-> +    return val;
+>      s->io_len = ACPI_PCIHP_SIZE;
+> -    s->io_base = ACPI_PCIHP_ADDR;
+> +    s->io_base = is_piix4 ? ACPI_PCIHP_ADDR_PIIX4 : ACPI_PCIHP_ADDR_Q35;
+>  
+> -    s->root= root_bus;
+> +    s->root = root_bus;
+>      s->legacy_piix = !bridges_enabled;
+>  
+>      memory_region_init_io(&s->io, owner, &acpi_pcihp_io_ops, s,
+> diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
+> index cdfa0e2998..1f27bfbd06 100644
+> --- a/hw/acpi/piix4.c
+> +++ b/hw/acpi/piix4.c
+> @@ -596,7 +596,7 @@ static void piix4_acpi_system_hot_add_init(MemoryRegion *parent,
+>      memory_region_add_subregion(parent, GPE_BASE, &s->io_gpe);
+>  
+>      acpi_pcihp_init(OBJECT(s), &s->acpi_pci_hotplug, bus, parent,
+> -                    s->use_acpi_hotplug_bridge);
+> +                    s->use_acpi_hotplug_bridge, true);
+>  
+>      s->cpu_hotplug_legacy = true;
+>      object_property_add_bool(OBJECT(s), "cpu-hotplug-legacy",
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index b7bcbbbb2a..f3cd52bd06 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -201,10 +201,6 @@ static void acpi_get_pm_info(MachineState *machine, AcpiPmInfo *pm)
+>          /* w2k requires FADT(rev1) or it won't boot, keep PC compatible */
+>          pm->fadt.rev = 1;
+>          pm->cpu_hp_io_base = PIIX4_CPU_HOTPLUG_IO_BASE;
+> -        pm->pcihp_io_base =
+> -            object_property_get_uint(obj, ACPI_PCIHP_IO_BASE_PROP, NULL);
+> -        pm->pcihp_io_len =
+> -            object_property_get_uint(obj, ACPI_PCIHP_IO_LEN_PROP, NULL);
+>      }
+>      if (lpc) {
+>          struct AcpiGenericAddress r = { .space_id = AML_AS_SYSTEM_IO,
+> @@ -214,6 +210,10 @@ static void acpi_get_pm_info(MachineState *machine, AcpiPmInfo *pm)
+>          pm->fadt.flags |= 1 << ACPI_FADT_F_RESET_REG_SUP;
+>          pm->cpu_hp_io_base = ICH9_CPU_HOTPLUG_IO_BASE;
+>      }
+> +    pm->pcihp_io_base =
+> +        object_property_get_uint(obj, ACPI_PCIHP_IO_BASE_PROP, NULL);
+> +    pm->pcihp_io_len =
+> +        object_property_get_uint(obj, ACPI_PCIHP_IO_LEN_PROP, NULL);
+>  
+>      /* The above need not be conditional on machine type because the reset port
+>       * happens to be the same on PIIX (pc) and ICH9 (q35). */
+> @@ -472,7 +472,7 @@ static void build_append_pci_bus_devices(Aml *parent_scope, PCIBus *bus,
+>          QLIST_FOREACH(sec, &bus->child, sibling) {
+>              int32_t devfn = sec->parent_dev->devfn;
+>  
+> -            if (pci_bus_is_root(sec) || pci_bus_is_express(sec)) {
+> +            if (pci_bus_is_root(sec)) {
+
+Different patch?
+
+>                  continue;
+>              }
+>  
+> @@ -1368,7 +1368,7 @@ static void build_piix4_isa_bridge(Aml *table)
+>      aml_append(table, scope);
 >  }
 >  
->  static void ich9_gpe_writeb(void *opaque, hwaddr addr, uint64_t val,
->                              unsigned width)
+> -static void build_piix4_pci_hotplug(Aml *table)
+> +static void build_i386_pci_hotplug(Aml *table, uint64_t pcihp_addr)
+
+Being common to 32/64-bit, I'd name that build_x86_pci_hotplug().
+
 >  {
->      ICH9LPCPMRegs *pm = opaque;
-> +    trace_ich9_gpe_writeb(addr, width, val);
->      acpi_gpe_ioport_writeb(&pm->acpi_regs, addr, val);
->      acpi_update_sci(&pm->acpi_regs, pm->irq);
->  }
-> diff --git a/hw/acpi/trace-events b/hw/acpi/trace-events
-> index afbc77de1c..b9f4827afc 100644
-> --- a/hw/acpi/trace-events
-> +++ b/hw/acpi/trace-events
-> @@ -32,6 +32,10 @@ cpuhp_acpi_ejecting_cpu(uint32_t idx) "0x%"PRIx32
->  cpuhp_acpi_write_ost_ev(uint32_t slot, uint32_t ev) "idx[0x%"PRIx32"] OST EVENT: 0x%"PRIx32
->  cpuhp_acpi_write_ost_status(uint32_t slot, uint32_t st) "idx[0x%"PRIx32"] OST STATUS: 0x%"PRIx32
+>      Aml *scope;
+>      Aml *field;
+> @@ -1377,20 +1377,22 @@ static void build_piix4_pci_hotplug(Aml *table)
+>      scope =  aml_scope("_SB.PCI0");
 >  
-> +# ich9.c
-> +ich9_gpe_readb(uint64_t addr, unsigned width, uint64_t val) "addr: 0x%" PRIx64 " width: %d ==> 0x%" PRIx64
-> +ich9_gpe_writeb(uint64_t addr, unsigned width, uint64_t val) "addr: 0x%" PRIx64 " width: %d <== 0x%" PRIx64
-
-Nitpick, val could be uint8_t.
-
-Otherwise:
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
+>      aml_append(scope,
+> -        aml_operation_region("PCST", AML_SYSTEM_IO, aml_int(0xae00), 0x08));
+> +        aml_operation_region("PCST", AML_SYSTEM_IO, aml_int(pcihp_addr), 0x08));
+>      field = aml_field("PCST", AML_DWORD_ACC, AML_NOLOCK, AML_WRITE_AS_ZEROS);
+>      aml_append(field, aml_named_field("PCIU", 32));
+>      aml_append(field, aml_named_field("PCID", 32));
+>      aml_append(scope, field);
+>  
+>      aml_append(scope,
+> -        aml_operation_region("SEJ", AML_SYSTEM_IO, aml_int(0xae08), 0x04));
+> +    aml_operation_region("SEJ", AML_SYSTEM_IO,
+> +                         aml_int(pcihp_addr + 0x08), 0x04));
+>      field = aml_field("SEJ", AML_DWORD_ACC, AML_NOLOCK, AML_WRITE_AS_ZEROS);
+>      aml_append(field, aml_named_field("B0EJ", 32));
+>      aml_append(scope, field);
+>  
+>      aml_append(scope,
+> -        aml_operation_region("BNMR", AML_SYSTEM_IO, aml_int(0xae10), 0x04));
+> +        aml_operation_region("BNMR", AML_SYSTEM_IO,
+> +                             aml_int(pcihp_addr + 0x10), 0x04));
+>      field = aml_field("BNMR", AML_DWORD_ACC, AML_NOLOCK, AML_WRITE_AS_ZEROS);
+>      aml_append(field, aml_named_field("BNUM", 32));
+>      aml_append(scope, field);
+> @@ -1504,7 +1506,6 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+>          build_hpet_aml(dsdt);
+>          build_piix4_isa_bridge(dsdt);
+>          build_isa_devices_aml(dsdt);
+> -        build_piix4_pci_hotplug(dsdt);
+>          build_piix4_pci0_int(dsdt);
+>      } else {
+>          sb_scope = aml_scope("_SB");
+> @@ -1526,6 +1527,8 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+>          }
+>      }
+>  
+> +    build_i386_pci_hotplug(dsdt, pm->pcihp_io_base);
 > +
->  # pcihp.c
->  acpi_pci_eject_slot(unsigned bsel, unsigned slot) "bsel: %u slot: %u"
->  acpi_pci_unplug(int bsel, int slot) "bsel: %d slot: %d"
+>      if (pcmc->legacy_cpu_hotplug) {
+>          build_legacy_cpu_hotplug_aml(dsdt, machine, pm->cpu_hp_io_base);
+>      } else {
+> @@ -1546,7 +1549,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+>      {
+>          aml_append(scope, aml_name_decl("_HID", aml_string("ACPI0006")));
+>  
+> -        if (misc->is_piix4) {
+> +        if (misc->is_piix4 || pm->pcihp_bridge_en) {
+
+Why not directly check 'if (pm->pcihp_bridge_en) {'?
+
+>              method = aml_method("_E01", 0, AML_NOTSERIALIZED);
+>              aml_append(method,
+>                  aml_acquire(aml_name("\\_SB.PCI0.BLCK"), 0xFFFF));
 > 
+
+Regards,
+
+Phil.
 
 
