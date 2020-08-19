@@ -2,83 +2,134 @@ Return-Path: <SRS0=bVMU=B5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+X-Spam-Status: No, score=-19.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87459C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 03:48:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36727C433E1
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 04:47:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5DA2820709
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 03:48:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5DA2820709
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0224320738
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 04:47:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NbExphXW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0224320738
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60198 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46102 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8F5u-0004KU-LO
-	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 23:48:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57472)
+	id 1k8G0a-0004qf-6M
+	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 00:47:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40432)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <yan.y.zhao@intel.com>)
- id 1k8F5M-0003vF-K4
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 23:48:24 -0400
-Received: from mga14.intel.com ([192.55.52.115]:48984)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <yan.y.zhao@intel.com>)
- id 1k8F5J-0008UO-Ch
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 23:48:24 -0400
-IronPort-SDR: m8SmOuARPCrmG2O8ds901B05m239SxOWWJmP99yW0KWO5HeNLUzyBTFhAWclte9VWkK8rvTxqT
- 2It0ccfJ9yRQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9717"; a="154306670"
-X-IronPort-AV: E=Sophos;i="5.76,329,1592895600"; d="scan'208";a="154306670"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
- by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 18 Aug 2020 20:48:18 -0700
-IronPort-SDR: gW+H1ML9Tmx47WL96J93dFo0ciNYOhkpFuZAl4nqL2XtlJ8DRNolmJwbwuEc4rcpbF72lKn+om
- M9Zzu2iLeBFA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.76,329,1592895600"; d="scan'208";a="326943564"
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
- ([10.239.13.16])
- by orsmga008.jf.intel.com with ESMTP; 18 Aug 2020 20:48:12 -0700
-Date: Wed, 19 Aug 2020 11:30:35 +0800
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: Parav Pandit <parav@nvidia.com>
-Subject: Re: device compatibility interface for live migration with assigned
- devices
-Message-ID: <20200819033035.GA21172@joy-OptiPlex-7040>
-References: <20200805105319.GF2177@nanopsycho>
- <20200810074631.GA29059@joy-OptiPlex-7040>
- <e6e75807-0614-bd75-aeb6-64d643e029d3@redhat.com>
- <20200814051601.GD15344@joy-OptiPlex-7040>
- <a51209fe-a8c6-941f-ff54-7be06d73bc44@redhat.com>
- <20200818085527.GB20215@redhat.com>
- <3a073222-dcfe-c02d-198b-29f6a507b2e1@redhat.com>
- <20200818091628.GC20215@redhat.com>
- <20200818113652.5d81a392.cohuck@redhat.com>
- <BY5PR12MB4322C9D1A66C4657776A1383DC5C0@BY5PR12MB4322.namprd12.prod.outlook.com>
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k8G03-0004P4-55
+ for qemu-devel@nongnu.org; Wed, 19 Aug 2020 00:46:59 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:46114
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k8Fzz-0000G0-Qc
+ for qemu-devel@nongnu.org; Wed, 19 Aug 2020 00:46:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1597812414;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=bRoM0PHzquaAVLl3aIe/J0Sv5Y5r80AviJxRC4AW/Ks=;
+ b=NbExphXWAuq/ToMVLCBRfg6wUu4PUyUiXxxvUSSVTOkF+Ivqzjtq+2HVcay1+iMfvhTUJG
+ w0jpcxmi7s0kDzK9H0+kvXQKARuqVZ96JH/e51ddUa8+ogyWLRJJtLfTaM7kHhvZfuiY7v
+ 5J0UfE76sMfCcTxb5gC+ju+t7jkUc2g=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-37-9rTyesrFOO27rLoCiR9MuA-1; Wed, 19 Aug 2020 00:46:51 -0400
+X-MC-Unique: 9rTyesrFOO27rLoCiR9MuA-1
+Received: by mail-wr1-f69.google.com with SMTP id r29so8933212wrr.10
+ for <qemu-devel@nongnu.org>; Tue, 18 Aug 2020 21:46:51 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=bRoM0PHzquaAVLl3aIe/J0Sv5Y5r80AviJxRC4AW/Ks=;
+ b=t2LG8aFUra45/SibYDXfW+GUQ6up0uDXgb1QkpexCEECSOHupbvr3irB8tMgqG/pCQ
+ D7O628iOHnyPsyFiILPvQPae2+r1Ybq6jxrqLBIQJAuPqGwX1HUGACgQMGsD5ezize1O
+ brbsKHXaj3+LdoYB2I9ibwAuCGUwB8NcPUN53P2KsDuCoRp7bxyHgSu1s1QNmYIpWP/t
+ gOCNo9EYxa/0bcWxHqUTKYqzplPCLWaRODWKNnTCkRXwPGFbTCgtvxv7ViAxr7EyZa/8
+ 0eT7PjVonDnciuzW1JfLZz4c8x2x+HfpBGHNhEG3pMTmWu732bQML1v2j8oCnLCrCvce
+ E0Kg==
+X-Gm-Message-State: AOAM531t7D25AaQ2VDbnms2HllYQEIB2rM0ekg+xY9I89l2USenWwYk9
+ viur3ZCXUSiZLaJ3sPH8XJ6WFT3Yi4d4e0kjSgf2glbCIku8cUXGoYayY2LuBOXituy4lfD4NoB
+ 5stdo78yhZqgtDEw=
+X-Received: by 2002:adf:e411:: with SMTP id g17mr24483706wrm.77.1597812410128; 
+ Tue, 18 Aug 2020 21:46:50 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzoyCJssBCOty8dwbZAQOZtkLWGUYXdDOeIzonMAKQaO120E5OjwqeYmrg1cPWQ7vH2utnNiA==
+X-Received: by 2002:adf:e411:: with SMTP id g17mr24483690wrm.77.1597812409855; 
+ Tue, 18 Aug 2020 21:46:49 -0700 (PDT)
+Received: from [192.168.1.36] (121.red-81-40-121.staticip.rima-tde.net.
+ [81.40.121.121])
+ by smtp.gmail.com with ESMTPSA id 188sm8738483wmz.2.2020.08.18.21.46.48
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 18 Aug 2020 21:46:49 -0700 (PDT)
+Subject: Re: [PATCH v3 1/1] audio/jack: fix use after free segfault
+To: Geoffrey McRae <geoff@hostfission.com>
+References: <20200819011835.92737-1-geoff@hostfission.com>
+ <20200819011835.92737-2-geoff@hostfission.com>
+ <34c4c83a-c870-0d21-1a15-3da76b4e5488@redhat.com>
+ <5c2a509c0807efbc1fab24f54fad150c@hostfission.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <36f399e3-028e-9187-fc90-288a6ad7f64c@redhat.com>
+Date: Wed, 19 Aug 2020 06:46:48 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
+In-Reply-To: <5c2a509c0807efbc1fab24f54fad150c@hostfission.com>
+Content-Language: en-US
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <BY5PR12MB4322C9D1A66C4657776A1383DC5C0@BY5PR12MB4322.namprd12.prod.outlook.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-Received-SPF: pass client-ip=192.55.52.115; envelope-from=yan.y.zhao@intel.com;
- helo=mga14.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 23:48:18
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -68
-X-Spam_score: -6.9
-X-Spam_bar: ------
-X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_HI=-5,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 22:38:38
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -91,227 +142,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "libvir-list@redhat.com" <libvir-list@redhat.com>,
- Jason Wang <jasowang@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Kirti Wankhede <kwankhede@nvidia.com>, "eauger@redhat.com" <eauger@redhat.com>,
- "xin-ran.wang@intel.com" <xin-ran.wang@intel.com>,
- "corbet@lwn.net" <corbet@lwn.net>, "openstack-discuss@lists.openstack.org"
- <openstack-discuss@lists.openstack.org>,
- "shaohe.feng@intel.com" <shaohe.feng@intel.com>,
- "kevin.tian@intel.com" <kevin.tian@intel.com>,
- Parav Pandit <parav@mellanox.com>,
- "jian-feng.ding@intel.com" <jian-feng.ding@intel.com>,
- "dgilbert@redhat.com" <dgilbert@redhat.com>,
- "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
- "hejie.xu@intel.com" <hejie.xu@intel.com>,
- "bao.yumeng@zte.com.cn" <bao.yumeng@zte.com.cn>,
- Alex Williamson <alex.williamson@redhat.com>,
- "eskultet@redhat.com" <eskultet@redhat.com>,
- "smooney@redhat.com" <smooney@redhat.com>,
- "intel-gvt-dev@lists.freedesktop.org" <intel-gvt-dev@lists.freedesktop.org>,
- Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>, Jiri Pirko <jiri@mellanox.com>,
- "dinechin@redhat.com" <dinechin@redhat.com>,
- "devel@ovirt.org" <devel@ovirt.org>
+Cc: qemu-devel@nongnu.org, kraxel@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Aug 18, 2020 at 09:39:24AM +0000, Parav Pandit wrote:
-> Hi Cornelia,
+On 8/19/20 5:36 AM, Geoffrey McRae wrote:
 > 
-> > From: Cornelia Huck <cohuck@redhat.com>
-> > Sent: Tuesday, August 18, 2020 3:07 PM
-> > To: Daniel P. Berrangé <berrange@redhat.com>
-> > Cc: Jason Wang <jasowang@redhat.com>; Yan Zhao
-> > <yan.y.zhao@intel.com>; kvm@vger.kernel.org; libvir-list@redhat.com;
-> > qemu-devel@nongnu.org; Kirti Wankhede <kwankhede@nvidia.com>;
-> > eauger@redhat.com; xin-ran.wang@intel.com; corbet@lwn.net; openstack-
-> > discuss@lists.openstack.org; shaohe.feng@intel.com; kevin.tian@intel.com;
-> > Parav Pandit <parav@mellanox.com>; jian-feng.ding@intel.com;
-> > dgilbert@redhat.com; zhenyuw@linux.intel.com; hejie.xu@intel.com;
-> > bao.yumeng@zte.com.cn; Alex Williamson <alex.williamson@redhat.com>;
-> > eskultet@redhat.com; smooney@redhat.com; intel-gvt-
-> > dev@lists.freedesktop.org; Jiri Pirko <jiri@mellanox.com>;
-> > dinechin@redhat.com; devel@ovirt.org
-> > Subject: Re: device compatibility interface for live migration with assigned
-> > devices
-> > 
-> > On Tue, 18 Aug 2020 10:16:28 +0100
-> > Daniel P. Berrangé <berrange@redhat.com> wrote:
-> > 
-> > > On Tue, Aug 18, 2020 at 05:01:51PM +0800, Jason Wang wrote:
-> > > >    On 2020/8/18 下午4:55, Daniel P. Berrangé wrote:
-> > > >
-> > > >  On Tue, Aug 18, 2020 at 11:24:30AM +0800, Jason Wang wrote:
-> > > >
-> > > >  On 2020/8/14 下午1:16, Yan Zhao wrote:
-> > > >
-> > > >  On Thu, Aug 13, 2020 at 12:24:50PM +0800, Jason Wang wrote:
-> > > >
-> > > >  On 2020/8/10 下午3:46, Yan Zhao wrote:
-> > >
-> > > >  we actually can also retrieve the same information through sysfs,
-> > > > .e.g
-> > > >
-> > > >  |- [path to device]
-> > > >     |--- migration
-> > > >     |     |--- self
-> > > >     |     |   |---device_api
-> > > >     |    |   |---mdev_type
-> > > >     |    |   |---software_version
-> > > >     |    |   |---device_id
-> > > >     |    |   |---aggregator
-> > > >     |     |--- compatible
-> > > >     |     |   |---device_api
-> > > >     |    |   |---mdev_type
-> > > >     |    |   |---software_version
-> > > >     |    |   |---device_id
-> > > >     |    |   |---aggregator
-> > > >
-> > > >
-> > > >  Yes but:
-> > > >
-> > > >  - You need one file per attribute (one syscall for one attribute)
-> > > >  - Attribute is coupled with kobject
-> > 
-> > Is that really that bad? You have the device with an embedded kobject
-> > anyway, and you can just put things into an attribute group?
-> > 
-> > [Also, I think that self/compatible split in the example makes things
-> > needlessly complex. Shouldn't semantic versioning and matching already
-> > cover nearly everything? I would expect very few cases that are more
-> > complex than that. Maybe the aggregation stuff, but I don't think we need
-> > that self/compatible split for that, either.]
-> > 
-> > > >
-> > > >  All of above seems unnecessary.
-> > > >
-> > > >  Another point, as we discussed in another thread, it's really hard
-> > > > to make  sure the above API work for all types of devices and
-> > > > frameworks. So having a  vendor specific API looks much better.
-> > > >
-> > > >  From the POV of userspace mgmt apps doing device compat checking /
-> > > > migration,  we certainly do NOT want to use different vendor
-> > > > specific APIs. We want to  have an API that can be used / controlled in a
-> > standard manner across vendors.
-> > > >
-> > > >    Yes, but it could be hard. E.g vDPA will chose to use devlink (there's a
-> > > >    long debate on sysfs vs devlink). So if we go with sysfs, at least two
-> > > >    APIs needs to be supported ...
-> > >
-> > > NB, I was not questioning devlink vs sysfs directly. If devlink is
-> > > related to netlink, I can't say I'm enthusiastic as IMKE sysfs is
-> > > easier to deal with. I don't know enough about devlink to have much of an
-> > opinion though.
-> > > The key point was that I don't want the userspace APIs we need to deal
-> > > with to be vendor specific.
-> > 
-> > From what I've seen of devlink, it seems quite nice; but I understand why
-> > sysfs might be easier to deal with (especially as there's likely already a lot of
-> > code using it.)
-> > 
-> > I understand that some users would like devlink because it is already widely
-> > used for network drivers (and some others), but I don't think the majority of
-> > devices used with vfio are network (although certainly a lot of them are.)
-> > 
-> > >
-> > > What I care about is that we have a *standard* userspace API for
-> > > performing device compatibility checking / state migration, for use by
-> > > QEMU/libvirt/ OpenStack, such that we can write code without countless
-> > > vendor specific code paths.
-> > >
-> > > If there is vendor specific stuff on the side, that's fine as we can
-> > > ignore that, but the core functionality for device compat / migration
-> > > needs to be standardized.
-> > 
-> > To summarize:
-> > - choose one of sysfs or devlink
-> > - have a common interface, with a standardized way to add
-> >   vendor-specific attributes
-> > ?
 > 
-> Please refer to my previous email which has more example and details.
-hi Parav,
-the example is based on a new vdpa tool running over netlink, not based
-on devlink, right?
-For vfio migration compatibility, we have to deal with both mdev and physical
-pci devices, I don't think it's a good idea to write a new tool for it, given
-we are able to retrieve the same info from sysfs and there's already an
-mdevctl from Alex (https://github.com/mdevctl/mdevctl).
+> On 2020-08-19 13:32, Philippe Mathieu-Daudé wrote:
+>> Hi Geoffrey,
+>>
+>> On 8/19/20 3:18 AM, Geoffrey McRae wrote:
+>>> The client may have been freed already by a secondary audio device
+>>> recovering its session as JACK2 has some cleanup code to work around
+>>> broken clients, which doesn't account for well behaved clients.
+>>>
+>>> https://github.com/jackaudio/jack2/issues/627
+>>>
+>>> As JACK1 and JACK2 are interchangeable and JACK2 has "cleanup" routine
+>>> that JACK1 does not have, we need to determine which version is in use
+>>> at runtime. Unfortunatly there is no way to determine which is in use
+>>> other then to look for symbols that are missing in JACK1, which in this
+>>> case is `jack_get_version`.
+>>>
+>>> An issue has been raised over this, but to be compatible with older
+>>> versions we must use this method to determine which library is in use.
+>>> If at some time the jack developers implement `jack_get_version` in
+>>> JACK1, this code will need to be revisited.
+>>>
+>>> At worst the workaround will be enabled and this will introduce a small
+>>> memory leak if the jack server is restarted. This however is better then
+>>> the alternative which would be a use after free segfault.
+>>>
+>>> Signed-off-by: Geoffrey McRae <geoff@hostfission.com>
+>>> ---
+>>>  audio/jackaudio.c | 37 ++++++++++++++++++++++++++++++++++++-
+>>>  configure         |  4 +++-
+>>>  2 files changed, 39 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/audio/jackaudio.c b/audio/jackaudio.c
+>>> index 72ed7c4929..d1685999c3 100644
+>>> --- a/audio/jackaudio.c
+>>> +++ b/audio/jackaudio.c
+>>> @@ -31,6 +31,7 @@
+>>>  #define AUDIO_CAP "jack"
+>>>  #include "audio_int.h"
+>>>
+>>> +#include <dlfcn.h>
+>>>  #include <jack/jack.h>
+>>>  #include <jack/thread.h>
+>>>
+>>> @@ -84,6 +85,7 @@ typedef struct QJackIn {
+>>>  }
+>>>  QJackIn;
+>>>
+>>> +static int QJackWorkaroundCloseBug;
+>>>  static int qjack_client_init(QJackClient *c);
+>>>  static void qjack_client_connect_ports(QJackClient *c);
+>>>  static void qjack_client_fini(QJackClient *c);
+>>> @@ -563,7 +565,10 @@ static void qjack_client_fini(QJackClient *c)
+>>>          /* fallthrough */
+>>>
+>>>      case QJACK_STATE_SHUTDOWN:
+>>> -        jack_client_close(c->client);
+>>> +        if (!QJackWorkaroundCloseBug) {
+>>> +            jack_client_close(c->client);
+>>> +        }
+>>> +        c->client = NULL;
+>>>          /* fallthrough */
+>>>
+>>>      case QJACK_STATE_DISCONNECTED:
+>>> @@ -662,6 +667,36 @@ static void qjack_info(const char *msg)
+>>>
+>>>  static void register_audio_jack(void)
+>>>  {
+>>> +    void *handle;
+>>> +
+>>> +    /*
+>>> +     * As JACK1 and JACK2 are interchangeable and JACK2 has
+>>> "cleanup" routine
+>>> +     * that JACK1 does not have, we need to determine which version
+>>> is in use at
+>>> +     * runtime. Unfortunatly there is no way to determine which is
+>>> in use other
+>>> +     * then to look for symbols that are missing in JACK1, which in
+>>> this case is
+>>> +     * `jack_get_version`. An issue has been raised over this, but
+>>> to be
+>>> +     * compatible with older versions we must use this method to
+>>> determine which
+>>> +     * library is in use. If at some time the jack developers implement
+>>> +     * `jack_get_version` in JACK1, this code will need to be
+>>> revisited.
+>>> +     *
+>>> +     * At worst the workaround will be enabled and we will introduce
+>>> a small
+>>> +     * memory leak if the jack server is restarted. This is better
+>>> then the
+>>> +     * alternative which would be a use after free segfault.
+>>> +     */
+>>> +
+>>> +    handle = dlopen("libjack.so", RTLD_LAZY | RTLD_NOLOAD);
+>>> +    if (!handle) {
+>>> +        dolog("unable to open libjack.so to determine version\n");
+>>> +        dolog("assuming JACK2 and enabling the close bug
+>>> workaround\n");
+>>> +        QJackWorkaroundCloseBug = 1;
+>>> +    } else {
+>>> +        if (dlsym(handle, "jack_get_version")) {
+>>> +            dolog("JACK2 detected, enabling close bug workaround\n");
+>>> +            QJackWorkaroundCloseBug = 1;
+>>> +        }
+>>> +        dlclose(handle);
+>>> +    }
+>>> +
+>>>      audio_driver_register(&jack_driver);
+>>>      jack_set_thread_creator(qjack_thread_creator);
+>>>      jack_set_error_function(qjack_error);
+>>> diff --git a/configure b/configure
+>>> index 2acc4d1465..43d2893fbb 100755
+>>> --- a/configure
+>>> +++ b/configure
+>>> @@ -3754,7 +3754,8 @@ for drv in $audio_drv_list; do
+>>>
+>>>      jack | try-jack)
+>>>      if $pkg_config jack --exists; then
+>>> -        jack_libs=$($pkg_config jack --libs)
+>>> +        # dl is needed to check at runtime if jack1 or jack2 is in use
+>>> +        jack_libs="$($pkg_config jack --libs) -ldl"
+>>>          if test "$drv" = "try-jack"; then
+>>>              audio_drv_list=$(echo "$audio_drv_list" | sed -e
+>>> 's/try-jack/jack/')
+>>>          fi
+>>
+>> Why not checking jack_get_version() using compile_prog here?
+>>
+>> Thanks,
+>>
+>> Phil.
+> 
+> Hi Phil,
+> 
+> Because the library can be swapped out after compile time as the
+> versions are ABI compatible by design.
 
-hi All,
-could we decide that sysfs is the interface that every VFIO vendor driver
-needs to provide in order to support vfio live migration, otherwise the
-userspace management tool would not list the device into the compatible
-list?
+IIUC in the GH issue you linked you describe a problem from v1.9.1
+to v1.9.14. I see jack_get_version() is already available in v1.9.1:
+https://github.com/jackaudio/jack2/blob/1.9.1/common/jack/jack.h#L55
 
-if that's true, let's move to the standardizing of the sysfs interface.
-(1) content
-common part: (must)
-   - software_version: (in major.minor.bugfix scheme)
-   - device_api: vfio-pci or vfio-ccw ...
-   - type: mdev type for mdev device or
-           a signature for physical device which is a counterpart for
-	   mdev type.
+Why would someone link with jack2 then replace it with jack1 without
+rebuilding? That sounds silly...
 
-device api specific part: (must)
-  - pci id: pci id of mdev parent device or pci id of physical pci
-    device (device_api is vfio-pci)
-  - subchannel_type (device_api is vfio-ccw) 
- 
-vendor driver specific part: (optional)
-  - aggregator
-  - chpid_type
-  - remote_url
+> 
+> -Geoff
+> 
 
-NOTE: vendors are free to add attributes in this part with a
-restriction that this attribute is able to be configured with the same
-name in sysfs too. e.g.
-for aggregator, there must be a sysfs attribute in device node
-/sys/devices/pci0000:00/0000:00:02.0/882cc4da-dede-11e7-9180-078a62063ab1/intel_vgpu/aggregator,
-so that the userspace tool is able to configure the target device
-according to source device's aggregator attribute.
-
-
-(2) where and structure
-proposal 1:
-|- [path to device]
-  |--- migration
-  |     |--- self
-  |     |    |-software_version
-  |     |    |-device_api
-  |     |    |-type
-  |     |    |-[pci_id or subchannel_type]
-  |     |    |-<aggregator or chpid_type>
-  |     |--- compatible
-  |     |    |-software_version
-  |     |    |-device_api
-  |     |    |-type
-  |     |    |-[pci_id or subchannel_type]
-  |     |    |-<aggregator or chpid_type>
-multiple compatible is allowed.
-attributes should be ASCII text files, preferably with only one value
-per file.
-
-
-proposal 2: use bin_attribute.
-|- [path to device]
-  |--- migration
-  |     |--- self
-  |     |--- compatible
-
-so we can continue use multiline format. e.g.
-cat compatible
-  software_version=0.1.0
-  device_api=vfio_pci
-  type=i915-GVTg_V5_{val1:int:1,2,4,8}
-  pci_id=80865963
-  aggregator={val1}/2
-
-Thanks
-Yan
 
