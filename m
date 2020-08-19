@@ -2,105 +2,118 @@ Return-Path: <SRS0=bVMU=B5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E38A9C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 16:41:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0259C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 16:45:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B08DA20888
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 16:41:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B9F9720882
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 16:45:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ezWiRTfx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B08DA20888
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="cgL4P2Oz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9F9720882
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50748 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56314 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8R9V-0006yn-08
-	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 12:41:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56816)
+	id 1k8RDW-0001EA-Qb
+	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 12:45:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57690)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1k8R8I-0005pR-7c
- for qemu-devel@nongnu.org; Wed, 19 Aug 2020 12:40:14 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:56371
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1k8R8F-0002Jm-DD
- for qemu-devel@nongnu.org; Wed, 19 Aug 2020 12:40:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597855210;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=qvx1PubyBKAzg8T/9vG5A1Kawx1VD1yyunwPD//mz5s=;
- b=ezWiRTfxmNoTodtiNC18ZcPqBmmZUSWfunAEOT0vUp4xHQmUCSAEBz7DwPVR+H7Kf+GCTP
- 7uLB6ecXCT1DDlstJ5Le4bTqtMWuYPNMg0gNWmtoBX4iSBTOmpV7oxBWs9V2B1ohqNu1Sf
- tQdXyuRvs2gn9v23FrgT8T7zhelrFnA=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-421-OR6EE1FAP76kep3PMn8oxA-1; Wed, 19 Aug 2020 12:40:06 -0400
-X-MC-Unique: OR6EE1FAP76kep3PMn8oxA-1
-Received: by mail-qv1-f70.google.com with SMTP id d1so15948127qvs.21
- for <qemu-devel@nongnu.org>; Wed, 19 Aug 2020 09:40:06 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=qvx1PubyBKAzg8T/9vG5A1Kawx1VD1yyunwPD//mz5s=;
- b=WaNgA0Le/Q9dkTlE3Mlvk2Ri3dg0WDkMF/s5cQf0anufYSuswel+SrfZ7Bdicmj+5K
- oeMQbF6zcRc0EBBlvLJbN29Y+emwdJ5rcv+cwBPphtH+ANKDTu+oGRxYImCTXHZhxrWJ
- DCjjgvmJo/DnjcbIaFNJtvinLhwUjLBFaXurGMdqvb7cTvCcz1kRfmQGRf52W2BfD8n5
- Lsp9W2rPwNjwdsHorloPhffi3RClTdpw5KU8HeyF/eZuyo64pmN7tvBgB98Ds1DW12yn
- pmR30gxSIKYpyVLkJwyNh1MQIwcRV01VF2FbH/UumNBHEqvtPNsULOvo1ELhOM0+cGuc
- Dh2A==
-X-Gm-Message-State: AOAM531F3fYmZJ5FReZfvycreDsfAwr2ymysaLT9zkbU0kJzGFe/rEgK
- Ji+g4PuTmUbMWQDY1KNAfHelc2RmDVT79Rj2nl1GfqRUSQ+5gZDyh3Ur8yilCNHxv/Ld0DOsYJO
- LuY9aN7k8cZcTasU=
-X-Received: by 2002:ac8:428f:: with SMTP id o15mr21812988qtl.213.1597855205712; 
- Wed, 19 Aug 2020 09:40:05 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyObD2dwi7z18wK+MwCqWiF/0OFg+gqVeuRmHvNpF35g+0FnDdP29y4n3kSpK6SrU4MhMgyyw==
-X-Received: by 2002:ac8:428f:: with SMTP id o15mr21812969qtl.213.1597855205490; 
- Wed, 19 Aug 2020 09:40:05 -0700 (PDT)
-Received: from xz-x1 (bras-vprn-toroon474qw-lp130-11-70-53-122-15.dsl.bell.ca.
- [70.53.122.15])
- by smtp.gmail.com with ESMTPSA id f31sm29091534qte.35.2020.08.19.09.40.03
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 19 Aug 2020 09:40:04 -0700 (PDT)
-Date: Wed, 19 Aug 2020 12:40:02 -0400
-From: Peter Xu <peterx@redhat.com>
-To: Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>
-Subject: Re: [RFC v4 2/2] memory: Skip bad range assertion if notifier is
- DEVIOTLB type
-Message-ID: <20200819164002.GB305409@xz-x1>
-References: <20200818130151.31678-1-eperezma@redhat.com>
- <20200818130151.31678-3-eperezma@redhat.com>
+ (Exim 4.90_1) (envelope-from <bauerman@linux.ibm.com>)
+ id 1k8RC0-0007we-SG; Wed, 19 Aug 2020 12:44:04 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:37134
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <bauerman@linux.ibm.com>)
+ id 1k8RBy-0002mX-Rw; Wed, 19 Aug 2020 12:44:04 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 07JGUjSI169613; Wed, 19 Aug 2020 12:43:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
+ h=from : to : cc : subject
+ : date : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=MJVxnsr+PE9RmmiXUlrGdTqgD3hIqKlsXA4ckkbFYx8=;
+ b=cgL4P2OziKGZ9Lz17czqcSoTKwUdy/lU+Bxn0E6w9oMH8aTZFFVjNqx8+i+EFyulf9aw
+ 0tnmW9GLM4iMPp55pFGY9VHHw+RhhpIsV3RmvIqxwqTTKwh2d7QFtfrsLo/DOFvvwom/
+ GSumV1jUzx1nvHvcOTPbPJrBTIzuzLhlNsph0c8O5ozCgFWSDEx9Cdx5+sCaEjgV0+aQ
+ Y4JgtEFNeTji2bHvhH9SRDgFBlsXSPdtOSrTfm+q+BnG6bxf2F/G/PrZ9Ju3GvL9hBmd
+ yCOGJZ+Xf+ZPW8ZpcFbzpGIRtbpIrnYzYFjvsvfxDnQQCjCFUjrPWT4ILGA9t812zrBi Dg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 3313qr17kg-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 19 Aug 2020 12:43:42 -0400
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 07JGUkp6169680;
+ Wed, 19 Aug 2020 12:43:41 -0400
+Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com
+ [169.62.189.10])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 3313qr17k1-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 19 Aug 2020 12:43:41 -0400
+Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
+ by ppma02dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 07JGPZjR012145;
+ Wed, 19 Aug 2020 16:43:41 GMT
+Received: from b03cxnp07029.gho.boulder.ibm.com
+ (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
+ by ppma02dal.us.ibm.com with ESMTP id 3304ccrucw-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 19 Aug 2020 16:43:40 +0000
+Received: from b03ledav006.gho.boulder.ibm.com
+ (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
+ by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 07JGhdZb16581024
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 19 Aug 2020 16:43:39 GMT
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id A8FF6C605B;
+ Wed, 19 Aug 2020 16:43:39 +0000 (GMT)
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 664A6C6059;
+ Wed, 19 Aug 2020 16:43:34 +0000 (GMT)
+Received: from morokweng.localdomain.com (unknown [9.211.41.171])
+ by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
+ Wed, 19 Aug 2020 16:43:34 +0000 (GMT)
+From: Thiago Jung Bauermann <bauerman@linux.ibm.com>
+To: qemu-ppc@nongnu.org
+Subject: [PATCH v6 2/8] target/arm: Move setting of CPU halted state to
+ generic code
+Date: Wed, 19 Aug 2020 13:43:00 -0300
+Message-Id: <20200819164306.625357-3-bauerman@linux.ibm.com>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200819164306.625357-1-bauerman@linux.ibm.com>
+References: <20200819164306.625357-1-bauerman@linux.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20200818130151.31678-3-eperezma@redhat.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=peterx@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=peterx@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/19 01:46:53
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
+ definitions=2020-08-19_09:2020-08-19,
+ 2020-08-19 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ lowpriorityscore=0
+ phishscore=0 malwarescore=0 mlxlogscore=999 mlxscore=0 suspectscore=1
+ adultscore=0 clxscore=1015 priorityscore=1501 bulkscore=0 spamscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2008190135
+Received-SPF: pass client-ip=148.163.158.5;
+ envelope-from=bauerman@linux.ibm.com; helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/19 11:27:43
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -36
+X-Spam_score: -3.7
+X-Spam_bar: ---
+X-Spam_report: (-3.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -113,23 +126,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Yan Zhao <yan.y.zhao@intel.com>,
- Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Jason Wang <jasowang@redhat.com>, Juan Quintela <quintela@redhat.com>,
- qemu-devel@nongnu.org, Eric Auger <eric.auger@redhat.com>, qemu-arm@nongnu.org,
- Avi Kivity <avi@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ David Hildenbrand <david@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
+ Jiaxun Yang <jiaxun.yang@flygoat.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Thomas Huth <thuth@redhat.com>, David Gibson <david@gibson.dropbear.id.au>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Artyom Tarasenko <atar4qemu@gmail.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Greg Kurz <groug@kaod.org>,
+ qemu-s390x@nongnu.org, qemu-arm@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <rth@twiddle.net>, Cornelia Huck <cohuck@redhat.com>,
+ Thiago Jung Bauermann <bauerman@linux.ibm.com>,
+ Igor Mammedov <imammedo@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Aug 18, 2020 at 03:01:51PM +0200, Eugenio Pérez wrote:
-> Signed-off-by: Eugenio Pérez <eperezma@redhat.com>
+This change is in a separate patch because it's not so obvious that it
+won't cause a regression.
 
-The changes on the callers of memory_region_notify_one_iommu() seems to be
-still missing (and, to embed the type into the notification process)..
+Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: Thiago Jung Bauermann <bauerman@linux.ibm.com>
+---
+ hw/core/cpu.c    | 2 +-
+ target/arm/cpu.c | 1 -
+ 2 files changed, 1 insertion(+), 2 deletions(-)
 
--- 
-Peter Xu
-
+diff --git a/hw/core/cpu.c b/hw/core/cpu.c
+index 594441a150..71bb7859f1 100644
+--- a/hw/core/cpu.c
++++ b/hw/core/cpu.c
+@@ -258,7 +258,7 @@ static void cpu_common_reset(DeviceState *dev)
+     }
+ 
+     cpu->interrupt_request = 0;
+-    cpu->halted = 0;
++    cpu->halted = cpu->start_powered_off;
+     cpu->mem_io_pc = 0;
+     cpu->icount_extra = 0;
+     atomic_set(&cpu->icount_decr_ptr->u32, 0);
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index ec65c7653f..b6c65e4df6 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -175,7 +175,6 @@ static void arm_cpu_reset(DeviceState *dev)
+     env->vfp.xregs[ARM_VFP_MVFR2] = cpu->isar.mvfr2;
+ 
+     cpu->power_state = s->start_powered_off ? PSCI_OFF : PSCI_ON;
+-    s->halted = s->start_powered_off;
+ 
+     if (arm_feature(env, ARM_FEATURE_IWMMXT)) {
+         env->iwmmxt.cregs[ARM_IWMMXT_wCID] = 0x69051000 | 'Q';
 
