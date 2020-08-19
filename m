@@ -2,91 +2,73 @@ Return-Path: <SRS0=bVMU=B5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E52BC433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 08:59:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B7EAC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 09:01:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5AAD4206FA
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 08:59:12 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YZZ8n8N5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5AAD4206FA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id F2C602072D
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 09:01:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F2C602072D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53270 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57402 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8Jw7-0000U6-LV
-	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 04:59:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37164)
+	id 1k8JyG-0002Kf-2w
+	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 05:01:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37798)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1k8JvJ-0007zC-WE
- for qemu-devel@nongnu.org; Wed, 19 Aug 2020 04:58:22 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:50769
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1k8Jx9-0001Nk-9P
+ for qemu-devel@nongnu.org; Wed, 19 Aug 2020 05:00:15 -0400
+Resent-Date: Wed, 19 Aug 2020 05:00:15 -0400
+Resent-Message-Id: <E1k8Jx9-0001Nk-9P@lists.gnu.org>
+Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21321)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1k8JvH-0005YB-NX
- for qemu-devel@nongnu.org; Wed, 19 Aug 2020 04:58:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597827498;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=MdtWP1tX4RGcQNsHoAIxfRzL4lXau94Rknf5DnAVgY4=;
- b=YZZ8n8N5Gt/h+PgsuqbwxJDqVoISY0rCQM8l3gQuDa5f+4Oo48ttsuDvNVdBacqJRFVH8D
- ZEsMJkCxJtdxlSgM2AASpWmNBjwviAdPTeJS4zfJL4gTukg2NuKrxrTzIWJSoRcH7JN5rY
- gqyrq+1+Os5XtxEjbVzDE4QF0mC/uYw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-355-IojwvNqgO9yk2qCZTtXLEw-1; Wed, 19 Aug 2020 04:58:17 -0400
-X-MC-Unique: IojwvNqgO9yk2qCZTtXLEw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CB4E2801AE5;
- Wed, 19 Aug 2020 08:58:15 +0000 (UTC)
-Received: from gondolin (ovpn-112-216.ams2.redhat.com [10.36.112.216])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 00AE35DA66;
- Wed, 19 Aug 2020 08:58:13 +0000 (UTC)
-Date: Wed, 19 Aug 2020 10:58:11 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Laszlo Ersek <lersek@redhat.com>
-Subject: Re: [PATCH v2 1/7] x86: lpc9: let firmware negotiate 'CPU hotplug
- with SMI' features
-Message-ID: <20200819105811.4e649725.cohuck@redhat.com>
-In-Reply-To: <f5a7a4a6-f80e-9836-1524-d4ffe896be92@redhat.com>
-References: <20200818122208.1243901-1-imammedo@redhat.com>
- <20200818122208.1243901-2-imammedo@redhat.com>
- <f5a7a4a6-f80e-9836-1524-d4ffe896be92@redhat.com>
-Organization: Red Hat GmbH
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1k8Jx1-0005np-Ij
+ for qemu-devel@nongnu.org; Wed, 19 Aug 2020 05:00:14 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1597827597; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=KbljSBdcEBB3WO9wS4tlFr6YvtVesfwEe5R23QzWTGZZHDk/ndiSSabdb8eZTzMcYwYC/cGyT6XZ0VzmfRQBUzTiXvpYJhGTq1VXZyJVDIC1/j8KUSn6msNFYcRlmJehv3nNqI9vDdF0C8PUDu5o6lRa2S1S5gNNEQOMmIYqOAE=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1597827597;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=dz/Ycheq6vnB+ovG8JhtNU5azC89Vo47WLD3IkZgF44=; 
+ b=S4EhdpFSIIbVFdrn0bVm86GzfPvD9JqAtk2f+Ob7W70Zrh47okQUNsdf1Qtr1h1VEjnjR92PzJtA5dMqPUsVcMR4B+WQXHZr/ODe0foYBJTWjXHRnt6fAPj5nBjh2xW1X8zc/s1Aw3elCNfW2Ln5vF1OftjAupJsanxcXy27hPI=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1597827592368300.7551340199516;
+ Wed, 19 Aug 2020 01:59:52 -0700 (PDT)
+Subject: Re: [PATCH] tests: docker: support mxe-based mingw builds
+Message-ID: <159782759116.26721.12383991426856444400@66eaa9a8a123>
+In-Reply-To: <20200819080206.27423-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=cohuck@redhat.com
-X-Mimecast-Spam-Score: 0.003
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=cohuck@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/19 04:00:34
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: pbonzini@redhat.com
+Date: Wed, 19 Aug 2020 01:59:52 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o53.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/19 03:50:52
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,203 +81,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Daniel Henrique Barboza <danielhb413@gmail.com>, qemu-devel@nongnu.org,
- aaron.young@oracle.com, David Gibson <dgibson@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>, boris.ostrovsky@oracle.com
+Reply-To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, alex.bennee@linaro.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 19 Aug 2020 10:39:04 +0200
-Laszlo Ersek <lersek@redhat.com> wrote:
-
-> Hi Igor,
-> 
-> (CC'ing Daniel, Cornelia, David, Peter)
-> 
-> On 08/18/20 14:22, Igor Mammedov wrote:
-> > It will allow firmware to notify QEMU that firmware requires SMI
-> > being triggered on CPU hot[un]plug, so that it would be able to account
-> > for hotplugged CPU and relocate it to new SMM base and/or safely remove
-> > CPU on unplug.
-> >
-> > Using negotiated features, follow up patches will insert SMI upcall
-> > into AML code, to make sure that firmware processes hotplug before
-> > guest OS would attempt to use new CPU.
-> >
-> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-> > ---
-> > v2:
-> >   - rebase on top of 5.1 (move compat values to 5.1 machine)
-> >   - make "x-smi-cpu-hotunplug" false by default (Laszlo Ersek <lersek@redhat.com>)
-> > ---
-> >  include/hw/i386/ich9.h |  2 ++
-> >  include/hw/i386/pc.h   |  3 +++
-> >  hw/i386/pc.c           |  6 +++++-
-> >  hw/i386/pc_piix.c      |  1 +
-> >  hw/i386/pc_q35.c       |  1 +
-> >  hw/isa/lpc_ich9.c      | 13 +++++++++++++
-> >  6 files changed, 25 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/include/hw/i386/ich9.h b/include/hw/i386/ich9.h
-> > index a98d10b252..d1bb3f7bf0 100644
-> > --- a/include/hw/i386/ich9.h
-> > +++ b/include/hw/i386/ich9.h
-> > @@ -247,5 +247,7 @@ typedef struct ICH9LPCState {
-> >
-> >  /* bit positions used in fw_cfg SMI feature negotiation */
-> >  #define ICH9_LPC_SMI_F_BROADCAST_BIT            0
-> > +#define ICH9_LPC_SMI_F_CPU_HOTPLUG_BIT          1
-> > +#define ICH9_LPC_SMI_F_CPU_HOT_UNPLUG_BIT       2
-> >
-> >  #endif /* HW_ICH9_H */
-> > diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-> > index 3d7ed3a55e..fe52e165b2 100644
-> > --- a/include/hw/i386/pc.h
-> > +++ b/include/hw/i386/pc.h
-> > @@ -193,6 +193,9 @@ void pc_system_firmware_init(PCMachineState *pcms, MemoryRegion *rom_memory);
-> >  void pc_madt_cpu_entry(AcpiDeviceIf *adev, int uid,
-> >                         const CPUArchIdList *apic_ids, GArray *entry);
-> >
-> > +extern GlobalProperty pc_compat_5_1[];
-> > +extern const size_t pc_compat_5_1_len;
-> > +
-> >  extern GlobalProperty pc_compat_5_0[];
-> >  extern const size_t pc_compat_5_0_len;
-> >
-> > diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> > index 47c5ca3e34..99c6bdbab4 100644
-> > --- a/hw/i386/pc.c
-> > +++ b/hw/i386/pc.c
-> > @@ -97,8 +97,12 @@
-> >  #include "fw_cfg.h"
-> >  #include "trace.h"
-> >
-> > -GlobalProperty pc_compat_5_0[] = {
-> > +GlobalProperty pc_compat_5_1[] = {
-> > +    { "ICH9-LPC", "x-smi-cpu-hotplug", "off" },
-> >  };
-> > +const size_t pc_compat_5_1_len = G_N_ELEMENTS(pc_compat_5_1);
-> > +
-> > +GlobalProperty pc_compat_5_0[] = { };
-> >  const size_t pc_compat_5_0_len = G_N_ELEMENTS(pc_compat_5_0);
-> >
-> >  GlobalProperty pc_compat_4_2[] = {
-> > diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-> > index b789e83f9a..d56f2e1b96 100644
-> > --- a/hw/i386/pc_piix.c
-> > +++ b/hw/i386/pc_piix.c
-> > @@ -433,6 +433,7 @@ static void pc_i440fx_5_1_machine_options(MachineClass *m)
-> >      m->alias = "pc";
-> >      m->is_default = true;
-> >      pcmc->default_cpu_version = 1;
-> > +    compat_props_add(m->compat_props, pc_compat_5_1, pc_compat_5_1_len);
-> >  }
-> >
-> >  DEFINE_I440FX_MACHINE(v5_1, "pc-i440fx-5.1", NULL,
-> > diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-> > index a3e607a544..0ca1146a59 100644
-> > --- a/hw/i386/pc_q35.c
-> > +++ b/hw/i386/pc_q35.c
-> > @@ -359,6 +359,7 @@ static void pc_q35_5_1_machine_options(MachineClass *m)
-> >      pc_q35_machine_options(m);
-> >      m->alias = "q35";
-> >      pcmc->default_cpu_version = 1;
-> > +    compat_props_add(m->compat_props, pc_compat_5_1, pc_compat_5_1_len);
-> >  }
-> >
-> >  DEFINE_Q35_MACHINE(v5_1, "pc-q35-5.1", NULL,
-> > diff --git a/hw/isa/lpc_ich9.c b/hw/isa/lpc_ich9.c
-> > index cd6e169d47..19f32bed3e 100644
-> > --- a/hw/isa/lpc_ich9.c
-> > +++ b/hw/isa/lpc_ich9.c
-> > @@ -373,6 +373,15 @@ static void smi_features_ok_callback(void *opaque)
-> >          /* guest requests invalid features, leave @features_ok at zero */
-> >          return;
-> >      }
-> > +    if (!(guest_features & BIT_ULL(ICH9_LPC_SMI_F_BROADCAST_BIT)) &&
-> > +        guest_features & (BIT_ULL(ICH9_LPC_SMI_F_CPU_HOTPLUG_BIT) |
-> > +                          BIT_ULL(ICH9_LPC_SMI_F_CPU_HOT_UNPLUG_BIT))) {
-> > +        /*
-> > +         * cpu hot-[un]plug with SMI requires SMI broadcast,
-> > +         * leave @features_ok at zero
-> > +         */
-> > +        return;
-> > +    }
-> >
-> >      /* valid feature subset requested, lock it down, report success */
-> >      lpc->smi_negotiated_features = guest_features;
-> > @@ -747,6 +756,10 @@ static Property ich9_lpc_properties[] = {
-> >      DEFINE_PROP_BOOL("noreboot", ICH9LPCState, pin_strap.spkr_hi, true),
-> >      DEFINE_PROP_BIT64("x-smi-broadcast", ICH9LPCState, smi_host_features,
-> >                        ICH9_LPC_SMI_F_BROADCAST_BIT, true),
-> > +    DEFINE_PROP_BIT64("x-smi-cpu-hotplug", ICH9LPCState, smi_host_features,
-> > +                      ICH9_LPC_SMI_F_CPU_HOTPLUG_BIT, true),
-> > +    DEFINE_PROP_BIT64("x-smi-cpu-hotunplug", ICH9LPCState, smi_host_features,
-> > +                      ICH9_LPC_SMI_F_CPU_HOT_UNPLUG_BIT, false),
-> >      DEFINE_PROP_END_OF_LIST(),
-> >  };
-> >
-> >  
-> 
-> this patch does the right thing for the 5.1 PC machine types, but it
-> does not introduce any 5.2 machine types, so I can't enable the hotplug
-> feature bit without messing with the x-smi-cpu-hotplug property
-> manually.
-> 
-> Now... looking at the mailing list, I can see the following patch
-> pending review (posted by Daniel ~5 days ago):
-> 
->   [PATCH 01/10] hw: add compat machines for 5.2
->   http://mid.mail-archive.com/20200814205424.543857-2-danielhb413@gmail.com
-> 
-> That patch introduces the 5.2 PC machine types.
-> 
-> However, I can't just apply your series on top of that one patch,
-> because they conflict at least on the "pc_compat_5_1" array.
-
-I consider any patch that adds compat options without adding all compat
-machines first to be buggy. We had that in the past, and it had been
-painful to sort it out again later. That's why I usually post a compat
-machines patch during hardfreeze, to be picked up by anyone who needs
-it.
-
-(See
-https://lore.kernel.org/qemu-devel/20200728094645.272149-1-cohuck@redhat.com/
--- this is the patch that Daniel re-posted.)
-
-> 
-> Given that Daniel's patch was posted before yours, and also that
-> Daniel's patch introduces 5.2 machine types for arm, ppc and s390x too
-> (and the "hw_compat_5_1" array in addition to the "pc_compat_5_1"
-> array), I'd like to request:
-> 
-> - that we please review and/or merge Daniel's patch in isolation (just
->   the first patch in the containing series, not the entire series!),
-> 
-> - and that you please rebase your series on top of Daniel's patch.
-
-Ack. Any series introducing compat options should have the machines
-patch as the first patch; depending on merge order, it can then be
-dropped again. (Usually, one of the architecture pull requests merges
-it; we just don't have anything merged yet.)
-
-> 
-> If Daniel's patch is approved as-is on the list, then I'm OK applying it
-> locally in isolation from the rest of the containing series, as a basis
-> for locally applying your v3.
-
-Just pick my original patch, it has a bunch of acks already.
-
-> 
-> (I could resolve the conflicts myself at once I guess, and proceed with
-> the review / testing -- but that's not really useful if I want to give a
-> formal Tested-by. I wouldn't be testing the patches as they were
-> posted.)
-> 
-> Thanks!
-> Laszlo
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDgxOTA4MDIwNi4yNzQy
+My0xLXBib256aW5pQHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRoZSBk
+b2NrZXItcXVpY2tAY2VudG9zNyBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBj
+b21tYW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFs
+bGVkLCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NS
+SVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAptYWtlIGRvY2tlci1pbWFnZS1jZW50b3M3IFY9MSBO
+RVRXT1JLPTEKdGltZSBtYWtlIGRvY2tlci10ZXN0LXF1aWNrQGNlbnRvczcgU0hPV19FTlY9MSBK
+PTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKICBURVNUICAgIGNoZWNrLXVu
+aXQ6IHRlc3RzL3Rlc3QtY2hhcgpVbmV4cGVjdGVkIGVycm9yIGluIG9iamVjdF9wcm9wZXJ0eV90
+cnlfYWRkKCkgYXQgL3RtcC9xZW11LXRlc3Qvc3JjL3FvbS9vYmplY3QuYzoxMTgxOgphdHRlbXB0
+IHRvIGFkZCBkdXBsaWNhdGUgcHJvcGVydHkgJ3NlcmlhbC1pZCcgdG8gb2JqZWN0ICh0eXBlICdj
+b250YWluZXInKQpFUlJPUiB0ZXN0LWNoYXIgLSB0b28gZmV3IHRlc3RzIHJ1biAoZXhwZWN0ZWQg
+MzgsIGdvdCA5KQptYWtlOiAqKiogW2NoZWNrLXVuaXRdIEVycm9yIDEKbWFrZTogKioqIFdhaXRp
+bmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4KICBURVNUICAgIGNoZWNrLXF0ZXN0LXg4Nl82NDog
+dGVzdHMvcXRlc3QvaGQtZ2VvLXRlc3QKcWVtdS1zeXN0ZW0tYWFyY2g2NDogLWFjY2VsIGt2bTog
+aW52YWxpZCBhY2NlbGVyYXRvciBrdm0KLS0tCiAgICByYWlzZSBDYWxsZWRQcm9jZXNzRXJyb3Io
+cmV0Y29kZSwgY21kKQpzdWJwcm9jZXNzLkNhbGxlZFByb2Nlc3NFcnJvcjogQ29tbWFuZCAnWydz
+dWRvJywgJy1uJywgJ2RvY2tlcicsICdydW4nLCAnLS1sYWJlbCcsICdjb20ucWVtdS5pbnN0YW5j
+ZS51dWlkPTIzOGI3MGJkMThhMTRjZGFiYjhhNzY1YzQ2Yzg3ZWNjJywgJy11JywgJzEwMDEnLCAn
+LS1zZWN1cml0eS1vcHQnLCAnc2VjY29tcD11bmNvbmZpbmVkJywgJy0tcm0nLCAnLWUnLCAnVEFS
+R0VUX0xJU1Q9JywgJy1lJywgJ0VYVFJBX0NPTkZJR1VSRV9PUFRTPScsICctZScsICdWPScsICct
+ZScsICdKPTE0JywgJy1lJywgJ0RFQlVHPScsICctZScsICdTSE9XX0VOVj0xJywgJy1lJywgJ0ND
+QUNIRV9ESVI9L3Zhci90bXAvY2NhY2hlJywgJy12JywgJy9ob21lL3BhdGNoZXcvLmNhY2hlL3Fl
+bXUtZG9ja2VyLWNjYWNoZTovdmFyL3RtcC9jY2FjaGU6eicsICctdicsICcvdmFyL3RtcC9wYXRj
+aGV3LXRlc3Rlci10bXAtb3l0bTdhMm4vc3JjL2RvY2tlci1zcmMuMjAyMC0wOC0xOS0wNC40Ni41
+NS42MTIzOi92YXIvdG1wL3FlbXU6eixybycsICdxZW11L2NlbnRvczcnLCAnL3Zhci90bXAvcWVt
+dS9ydW4nLCAndGVzdC1xdWljayddJyByZXR1cm5lZCBub24temVybyBleGl0IHN0YXR1cyAyLgpm
+aWx0ZXI9LS1maWx0ZXI9bGFiZWw9Y29tLnFlbXUuaW5zdGFuY2UudXVpZD0yMzhiNzBiZDE4YTE0
+Y2RhYmI4YTc2NWM0NmM4N2VjYwptYWtlWzFdOiAqKiogW2RvY2tlci1ydW5dIEVycm9yIDEKbWFr
+ZVsxXTogTGVhdmluZyBkaXJlY3RvcnkgYC92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC1veXRt
+N2Eybi9zcmMnCm1ha2U6ICoqKiBbZG9ja2VyLXJ1bi10ZXN0LXF1aWNrQGNlbnRvczddIEVycm9y
+IDIKCnJlYWwgICAgMTJtNTYuOTEwcwp1c2VyICAgIDBtOS41MTJzCgoKVGhlIGZ1bGwgbG9nIGlz
+IGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDIwMDgxOTA4MDIwNi4yNzQy
+My0xLXBib256aW5pQHJlZGhhdC5jb20vdGVzdGluZy5kb2NrZXItcXVpY2tAY2VudG9zNy8/dHlw
+ZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBb
+aHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNo
+ZXctZGV2ZWxAcmVkaGF0LmNvbQ==
 
