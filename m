@@ -2,69 +2,102 @@ Return-Path: <SRS0=bVMU=B5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37682C433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 19:23:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C17CC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 19:32:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 084832078D
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 19:23:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 111CB207BB
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 19:32:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="s8RSA4gX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 084832078D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W3KI5FWb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 111CB207BB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41220 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44336 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8TgB-0000Ts-9F
-	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 15:23:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45046)
+	id 1k8Tp2-0002UX-9j
+	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 15:32:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46768)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kbusch@kernel.org>) id 1k8Tfb-0008Qk-3f
- for qemu-devel@nongnu.org; Wed, 19 Aug 2020 15:22:47 -0400
-Received: from mail.kernel.org ([198.145.29.99]:45180)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kbusch@kernel.org>) id 1k8TfZ-0000Cm-Az
- for qemu-devel@nongnu.org; Wed, 19 Aug 2020 15:22:46 -0400
-Received: from dhcp-10-100-145-180.wdl.wdc.com (unknown [199.255.45.60])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 805282078D;
- Wed, 19 Aug 2020 19:22:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1597864962;
- bh=aMgQd33Dgsl7g8th17oHJhl57j+Lvy6p2VK2rAhd+q4=;
- h=Date:From:To:Cc:Subject:From;
- b=s8RSA4gX5cveZukNtAFeu3b8dICd8dKAwvemG6zmyvb5PYIDgDpwMmjDMrKPX5sZB
- MHZzn0xS+aeCf1PyPecdouJCelQzj75iB+7tDh7NJCYE+uWSSOQ/gRtENidqUH7FRI
- dOtIXv6XVjpFxo+jlo7glqOEXQlc9xdatXmfkS+0=
-Date: Wed, 19 Aug 2020 12:22:40 -0700
-From: Keith Busch <kbusch@kernel.org>
-To: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- Klaus Jensen <k.jensen@samsung.com>
-Subject: [PULL] nvme updates
-Message-ID: <20200819192240.GA25305@dhcp-10-100-145-180.wdl.wdc.com>
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1k8To6-00022d-5L
+ for qemu-devel@nongnu.org; Wed, 19 Aug 2020 15:31:34 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:38325
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1k8To3-0001Ek-Fv
+ for qemu-devel@nongnu.org; Wed, 19 Aug 2020 15:31:33 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1597865489;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=OYKEO60TWPRCVnMkUEZHKJbtqby5xrjAvH2bYr4AcD0=;
+ b=W3KI5FWbYHgMkHv2We8GBAPyQETcUufeKZAFToSPWLOJTiRaDlNVXG+mauhfXaljJKNMMq
+ eAc3ZQ1tO9ZjECTAJUblZ93y+xt+g9O4hHMswN/eZai20QMaNAajKIm27Kja1MQylkTv4H
+ iF04KpYbHBB+oE9+mdrFSptertS7PcM=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-483-XbohW95POYWdPPkR5_jfEg-1; Wed, 19 Aug 2020 15:31:25 -0400
+X-MC-Unique: XbohW95POYWdPPkR5_jfEg-1
+Received: by mail-ed1-f71.google.com with SMTP id c3so9659594edm.7
+ for <qemu-devel@nongnu.org>; Wed, 19 Aug 2020 12:31:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=OYKEO60TWPRCVnMkUEZHKJbtqby5xrjAvH2bYr4AcD0=;
+ b=uL35jdTxZeMyTcEGywt41tbYxSG0NUbX0WfRmZ/tx1b2ASB4noeodkTtnzQth1OOj5
+ EqnQzS67C9envZzERhTLkAfcddPW4t+scPyXT1l2v5wyQr+8+gO4uWxNG3UCjEStZ1kT
+ iyx3g9v7wgA2YI7A7iM+umNnMawc8QuqoeRaNQPC6Cx2vrWv+OHXnQxBPMhAHWodsYBj
+ xeacnN1gRKVJlfpOoCwU+PAafvdwePRWJWKH3RbTPk6J/5Wzqk8gXm2HDmpQZP1537kq
+ kGCw/7WOggnxBRDNZbRt9s0o/MVxkckLaDJ7sB0SwS+dwp73fRcF5oJXWew0VLBZuYGs
+ SzfQ==
+X-Gm-Message-State: AOAM531rlnYW32PdSZTCmBC8NP6tKaZqrLG5KU37IjnQ+0AkJfApdxqu
+ dzU4XYgdaHYHj2NBiTpXYGVLQqiIYC6ih1/l621hW+FnKn5FFVh6gqiTO5z+z4Gcof7mzuY0CXK
+ 9HmYqgXfjNb1w86iH9FbvXzop3bS3z+k=
+X-Received: by 2002:a17:906:328d:: with SMTP id
+ 13mr27561660ejw.71.1597865484649; 
+ Wed, 19 Aug 2020 12:31:24 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzSPwZz8/ud7bY/jWy+ZGe5s0AtpZhnSL+2z7KEUcCD7sCCv93NpcGwyxhA1Q/exldnozgb/QvXcoE9+V+BuLo=
+X-Received: by 2002:a17:906:328d:: with SMTP id
+ 13mr27561645ejw.71.1597865484412; 
+ Wed, 19 Aug 2020 12:31:24 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=198.145.29.99; envelope-from=kbusch@kernel.org;
- helo=mail.kernel.org
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/19 15:22:43
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -80
-X-Spam_score: -8.1
-X-Spam_bar: --------
-X-Spam_report: (-8.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+References: <20200819143525.2175-1-pbonzini@redhat.com>
+ <CAFEAcA_8VJecDyK8FR0ty=pknmo+Hc5s0OFj+-Y1Ah-OJ01FDQ@mail.gmail.com>
+ <CAFEAcA9jt21RHiu1eqAzK_PJAj9i6Ej27jT2=gfjSRZVjJsDKw@mail.gmail.com>
+ <CAFEAcA_1rtOJjs40MCNmJHmyaXG9ObFsdmyr1mb7FnieRBWO7g@mail.gmail.com>
+In-Reply-To: <CAFEAcA_1rtOJjs40MCNmJHmyaXG9ObFsdmyr1mb7FnieRBWO7g@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Wed, 19 Aug 2020 21:31:12 +0200
+Message-ID: <CABgObfbJg-zXXN=pf9JMqAGOKz_W67JFe50ruYSc7Vg_EjboNA@mail.gmail.com>
+Subject: Re: [PULL v6 000/150] Meson-based build system
+To: Peter Maydell <peter.maydell@linaro.org>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0.0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/alternative; boundary="00000000000099063305ad400ce7"
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/19 01:46:53
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_HI=-5, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -77,79 +110,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Klaus Jensen <its@irrelevant.dk>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We're trying our first nvme pull request from a dedicated development
-tree containing various fixes, cleanups, spec compliance, and welcoming
-Klaus Jensen to maintaining the emulated nvme device development.
+--00000000000099063305ad400ce7
+Content-Type: text/plain; charset="UTF-8"
 
-The following changes since commit d0ed6a69d399ae193959225cdeaa9382746c91cc:
+I can certainly add symlinks (that would be broken until make completes)
+but moving the build outputs is not possible since there's no recursive
+make anymore.
 
-  Update version for v5.1.0 release (2020-08-11 17:07:03 +0100)
+Paolo
 
-are available in the Git repository at:
+Il mer 19 ago 2020, 21:06 Peter Maydell <peter.maydell@linaro.org> ha
+scritto:
 
-  git://git.infradead.org/qemu-nvme.git nvme-next
+> On Wed, 19 Aug 2020 at 19:16, Peter Maydell <peter.maydell@linaro.org>
+> wrote:
+> > Spoke too soon; "make --output-sync -C build/all-linux-static check-tcg"
+> > failed with:
+> >
+> >   BUILD   TCG tests for mips-linux-user
+> >   CHECK   debian10
+> >   CHECK   debian-mips-cross
+> >   BUILD   mips-linux-user guest-tests with docker qemu/debian-mips-cross
+> >   RUN     TCG tests for mips-linux-user
+> >   CHECK   debian10
+> >   CHECK   debian-mips-cross
+> >   BUILD   mips-linux-user guest-tests with docker qemu/debian-mips-cross
+> >   RUN     tests for mips
+> >   TEST    threadcount on mips
+> > qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+> > timeout: the monitored command dumped core
+> > Segmentation fault
+> > ../Makefile.target:153: recipe for target 'run-threadcount' failed
+> > make[2]: *** [run-threadcount] Error 139
+> > /home/petmay01/linaro/qemu-for-merges/tests/tcg/Makefile.qemu:76:
+> > recipe for target 'run-guest-tests' failed
+> > make[1]: *** [run-guest-tests] Error 2
+> > /home/petmay01/linaro/qemu-for-merges/tests/Makefile.include:450:
+> > recipe for target 'run-tcg-tests-mips-linux-user' failed
+>
+> Seems to be consistent, so not an intermittent but presumably
+> an issue introduced by the meson changes.
+>
+> -- PMM
+>
+>
 
-for you to fetch changes up to 9257c77e4f0feaefb76f02fff3dc8d60b420ea4d:
+--00000000000099063305ad400ce7
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-  hw/block/nvme: remove explicit qsg/iov parameters (2020-08-17 08:40:54 +0200)
+<div dir=3D"auto">I can certainly add symlinks (that would be broken until =
+make completes) but moving the build outputs is not possible since there&#3=
+9;s no recursive make anymore.<div dir=3D"auto"><br></div><div dir=3D"auto"=
+>Paolo</div></div><br><div class=3D"gmail_quote"><div dir=3D"ltr" class=3D"=
+gmail_attr">Il mer 19 ago 2020, 21:06 Peter Maydell &lt;<a href=3D"mailto:p=
+eter.maydell@linaro.org">peter.maydell@linaro.org</a>&gt; ha scritto:<br></=
+div><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-lef=
+t:1px #ccc solid;padding-left:1ex">On Wed, 19 Aug 2020 at 19:16, Peter Mayd=
+ell &lt;<a href=3D"mailto:peter.maydell@linaro.org" target=3D"_blank" rel=
+=3D"noreferrer">peter.maydell@linaro.org</a>&gt; wrote:<br>
+&gt; Spoke too soon; &quot;make --output-sync -C build/all-linux-static che=
+ck-tcg&quot;<br>
+&gt; failed with:<br>
+&gt;<br>
+&gt;=C2=A0 =C2=A0BUILD=C2=A0 =C2=A0TCG tests for mips-linux-user<br>
+&gt;=C2=A0 =C2=A0CHECK=C2=A0 =C2=A0debian10<br>
+&gt;=C2=A0 =C2=A0CHECK=C2=A0 =C2=A0debian-mips-cross<br>
+&gt;=C2=A0 =C2=A0BUILD=C2=A0 =C2=A0mips-linux-user guest-tests with docker =
+qemu/debian-mips-cross<br>
+&gt;=C2=A0 =C2=A0RUN=C2=A0 =C2=A0 =C2=A0TCG tests for mips-linux-user<br>
+&gt;=C2=A0 =C2=A0CHECK=C2=A0 =C2=A0debian10<br>
+&gt;=C2=A0 =C2=A0CHECK=C2=A0 =C2=A0debian-mips-cross<br>
+&gt;=C2=A0 =C2=A0BUILD=C2=A0 =C2=A0mips-linux-user guest-tests with docker =
+qemu/debian-mips-cross<br>
+&gt;=C2=A0 =C2=A0RUN=C2=A0 =C2=A0 =C2=A0tests for mips<br>
+&gt;=C2=A0 =C2=A0TEST=C2=A0 =C2=A0 threadcount on mips<br>
+&gt; qemu: uncaught target signal 11 (Segmentation fault) - core dumped<br>
+&gt; timeout: the monitored command dumped core<br>
+&gt; Segmentation fault<br>
+&gt; ../Makefile.target:153: recipe for target &#39;run-threadcount&#39; fa=
+iled<br>
+&gt; make[2]: *** [run-threadcount] Error 139<br>
+&gt; /home/petmay01/linaro/qemu-for-merges/tests/tcg/Makefile.qemu:76:<br>
+&gt; recipe for target &#39;run-guest-tests&#39; failed<br>
+&gt; make[1]: *** [run-guest-tests] Error 2<br>
+&gt; /home/petmay01/linaro/qemu-for-merges/tests/Makefile.include:450:<br>
+&gt; recipe for target &#39;run-tcg-tests-mips-linux-user&#39; failed<br>
+<br>
+Seems to be consistent, so not an intermittent but presumably<br>
+an issue introduced by the meson changes.<br>
+<br>
+-- PMM<br>
+<br>
+</blockquote></div>
 
-----------------------------------------------------------------
-Keith Busch (1):
-      MAINTAINERS: update nvme entry
-
-Klaus Jensen (34):
-      hw/block/nvme: bump spec data structures to v1.3
-      hw/block/nvme: fix missing endian conversion
-      hw/block/nvme: additional tracing
-      hw/block/nvme: add support for the abort command
-      hw/block/nvme: add temperature threshold feature
-      hw/block/nvme: mark fw slot 1 as read-only
-      hw/block/nvme: add support for the get log page command
-      hw/block/nvme: add support for the asynchronous event request command
-      hw/block/nvme: move NvmeFeatureVal into hw/block/nvme.h
-      hw/block/nvme: flush write cache when disabled
-      hw/block/nvme: add remaining mandatory controller parameters
-      hw/block/nvme: support the get/set features select and save fields
-      hw/block/nvme: make sure ncqr and nsqr is valid
-      hw/block/nvme: support identify namespace descriptor list
-      hw/block/nvme: reject invalid nsid values in active namespace id list
-      hw/block/nvme: enforce valid queue creation sequence
-      hw/block/nvme: provide the mandatory subnqn field
-      hw/block/nvme: bump supported version to v1.3
-      hw/block/nvme: memset preallocated requests structures
-      hw/block/nvme: add mapping helpers
-      hw/block/nvme: replace dma_acct with blk_acct equivalent
-      hw/block/nvme: remove redundant has_sg member
-      hw/block/nvme: destroy request iov before reuse
-      hw/block/nvme: refactor dma read/write
-      hw/block/nvme: add tracing to nvme_map_prp
-      hw/block/nvme: add request mapping helper
-      hw/block/nvme: verify validity of prp lists in the cmb
-      hw/block/nvme: refactor request bounds checking
-      hw/block/nvme: add check for mdts
-      hw/block/nvme: be consistent about zeros vs zeroes
-      hw/block/nvme: add ns/cmd references in NvmeRequest
-      hw/block/nvme: consolidate qsg/iov clearing
-      hw/block/nvme: use preallocated qsg/iov in nvme_dma_prp
-      hw/block/nvme: remove explicit qsg/iov parameters
-
-Philippe Mathieu-Daudé (4):
-      hw/block/nvme: Update specification URL
-      hw/block/nvme: Use QEMU_PACKED on hardware/packet structures
-      hw/block/nvme: Fix pmrmsc register size
-      hw/block/nvme: Align I/O BAR to 4 KiB
-
- MAINTAINERS           |    2 +
- block/nvme.c          |   22 +-
- hw/block/nvme.c       | 1136 +++++++++++++++++++++++++++++++++++++++++--------
- hw/block/nvme.h       |   26 +-
- hw/block/trace-events |   31 +-
- include/block/nvme.h  |  271 +++++++++---
- 6 files changed, 1248 insertions(+), 240 deletions(-)
+--00000000000099063305ad400ce7--
 
 
