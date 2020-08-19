@@ -2,73 +2,110 @@ Return-Path: <SRS0=bVMU=B5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.4 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C438EC433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 15:38:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D20D6C433E3
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 15:49:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8AF22207FF
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 15:38:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A2F892063A
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 15:49:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="A64VMJg4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8AF22207FF
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VC6Lt8XT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2F892063A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59654 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37156 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8QAB-0004ZV-OC
-	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 11:38:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37872)
+	id 1k8QKk-0007ZF-Sy
+	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 11:49:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40862)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berto@igalia.com>)
- id 1k8Q9P-00048x-Pb; Wed, 19 Aug 2020 11:37:20 -0400
-Received: from fanzine.igalia.com ([178.60.130.6]:55339)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <berto@igalia.com>)
- id 1k8Q9M-00027Y-Cm; Wed, 19 Aug 2020 11:37:19 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
- s=20170329; 
- h=Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
- bh=0T4RlsT2sSUKUGPqYvw5XiBU2ZIeTCZIyh7Mpg1z6xI=; 
- b=A64VMJg41OeI27A+16EhWaHLt1RfYF9P8k4elxmZQ8UjXMo36wCjTfbtR2t6ijbvDL863ipBZI9fS0iXADkqORFHnx0KlciMFs2rNK3LzGuoouNVnkkyD0qAbLuyVXIVPeYCZFXnLt9QuiyTQFXSqKJNTM6lkEKkp14NL8wKK7lfdUICbpKjfdEWpYHxY5yofrRYf01SQbK0NnuKP05Mq6q4WT2XKS6yiaIExhQWmY+rxsqyvQWqhouxoyjk/wfPOCM4gxlB6ivpd+kcIxa7tLVT5K86K3rjzzVIpWE9ttrPmtgQXxeZax6be7DS2HsULm5CJZ3GGDi29pslakfeHA==;
-Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
- by fanzine.igalia.com with esmtps 
- (Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
- id 1k8Q9I-0002oF-OA; Wed, 19 Aug 2020 17:37:12 +0200
-Received: from berto by mail.igalia.com with local (Exim)
- id 1k8Q9I-0002Na-Et; Wed, 19 Aug 2020 17:37:12 +0200
-From: Alberto Garcia <berto@igalia.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Subject: Re: [PATCH 0/1] qcow2: Skip copy-on-write when allocating a zero
- cluster
-In-Reply-To: <20200819150711.GE10272@linux.fritz.box>
-References: <cover.1597416317.git.berto@igalia.com>
- <20200817101019.GD11402@linux.fritz.box>
- <w518sedz3td.fsf@maestria.local.igalia.com>
- <20200817155307.GS11402@linux.fritz.box>
- <w51pn7memr7.fsf@maestria.local.igalia.com>
- <20200819150711.GE10272@linux.fritz.box>
-User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
- (i586-pc-linux-gnu)
-Date: Wed, 19 Aug 2020 17:37:12 +0200
-Message-ID: <w51mu2qejfb.fsf@maestria.local.igalia.com>
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1k8QK7-0006lD-26
+ for qemu-devel@nongnu.org; Wed, 19 Aug 2020 11:48:23 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:28911
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1k8QK4-0003Pr-ST
+ for qemu-devel@nongnu.org; Wed, 19 Aug 2020 11:48:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1597852098;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=EpYbA9U6DEvr6fH5/sdQ8/3xjHK/yFaCRzjqKqZ5YHI=;
+ b=VC6Lt8XTL/RzO1Pqw8llnIzKo3th4PZcJBX9aWPUmSQ7LyzuFCl9qwmBT2IppuxGOtK6Ix
+ xtRVUvmfAdZkS8KbTuGEA2b5WGN9fnG6PaUcpE2dvzblo2DGObjs34SkfVpb+IyugkVKb6
+ oRfm/PA6tRoeXL9ajvbVEzzPV2S84cE=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-52-g7KPo9EhOo--Cs1DXyoZXg-1; Wed, 19 Aug 2020 11:48:14 -0400
+X-MC-Unique: g7KPo9EhOo--Cs1DXyoZXg-1
+Received: by mail-wr1-f71.google.com with SMTP id z1so9478663wrn.18
+ for <qemu-devel@nongnu.org>; Wed, 19 Aug 2020 08:48:14 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to;
+ bh=T6tPuZqsLFoI1BB3VEecLkd9Fes4LU46C9aXqdteRzo=;
+ b=GRwPEEwoBfMNpSZHy1MmXqk4cYzwfzROlNfeW8+CMfhqy9I/xWq7CoTXyBktBJb3g0
+ v1W3tTbqBRerr9Zamzr3w9SGXgb5rcA1ohK9nXUDY+7H3xruLrJEiXC1QA7y9UI90Oke
+ asKLWw1Sf88zLz8YPYo9y+ixqAbWKt0gcXBwLG6klGPrPwv5kjf6A2jXlDcMzTGAHVgg
+ TV7X3uL1HFdc+uGTqZXtxd/YJKT3QJZWIcs3sTbTAtfvSXcj/2UplFCGR2TxJNONzwbl
+ KPoVxrWg2uOmQ+NZZ1cdkTrsX9VxMHJ3Cff3G+eyIycndvpFSGBlnHbXKJb4IIyz+NvV
+ /2qg==
+X-Gm-Message-State: AOAM531HMKKH+VSmI4MMvzOBMGMnvVmdLIFEOTa3hNBEmUgo54fDkrE2
+ X0o4n3UBK3QdSiIbAJ65Vde4azCGiP7bt8/FF3V8UGWbZsy9UtP9iPgomTbivMsvjXcqMiod7s0
+ udIOjwxflFgOuBf0=
+X-Received: by 2002:a5d:51c9:: with SMTP id n9mr27016848wrv.423.1597852093251; 
+ Wed, 19 Aug 2020 08:48:13 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzPaT3bBG529rKsrMP5Jv+cvo9mK8dnAxeen/ALNWTeSNi/uvdKPEowsFrYsrlQ40r6Kc8fSQ==
+X-Received: by 2002:a5d:51c9:: with SMTP id n9mr27016785wrv.423.1597852092342; 
+ Wed, 19 Aug 2020 08:48:12 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:1cc0:4e4e:f1a9:1745?
+ ([2001:b07:6468:f312:1cc0:4e4e:f1a9:1745])
+ by smtp.gmail.com with ESMTPSA id f15sm43583586wrt.80.2020.08.19.08.48.10
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 19 Aug 2020 08:48:11 -0700 (PDT)
+Subject: Re: [PATCH v3 02/12] block/io.c: drop assertion on double waiting for
+ request serialisation
+To: Stefan Hajnoczi <stefanha@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+References: <20200817091553.283155-1-vsementsov@virtuozzo.com>
+ <20200817091553.283155-3-vsementsov@virtuozzo.com>
+ <20200819152836.GP366841@stefanha-x1.localdomain>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <890b5c05-1391-b2bb-7595-69061ace45c2@redhat.com>
+Date: Wed, 19 Aug 2020 17:48:09 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-Content-Type: text/plain
-Received-SPF: pass client-ip=178.60.130.6; envelope-from=berto@igalia.com;
- helo=fanzine.igalia.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/19 10:25:17
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200819152836.GP366841@stefanha-x1.localdomain>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="FkHAQUPRpgaEHz8MZJLBJMKRbKHxiUex7"
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 23:05:17
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -81,102 +118,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: bfoster@redhat.com, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: fam@euphon.net, kwolf@redhat.com, qemu-block@nongnu.org, armbru@redhat.com,
+ qemu-devel@nongnu.org, mreitz@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed 19 Aug 2020 05:07:11 PM CEST, Kevin Wolf wrote:
->> I checked with xfs on my computer. I'm not very familiar with that
->> filesystem so I was using the default options and I didn't tune
->> anything.
->> 
->> What I got with my tests (using fio):
->> 
->> - Using extent_size_hint didn't make any difference in my test case (I
->>   do see a clear difference however with the test case described in
->>   commit ffa244c84a).
->
-> Hm, interesting. What is your exact fio configuration? Specifically,
-> which iodepth are you using? I guess with a low iodepth (and O_DIRECT),
-> the effect of draining the queue might not be as visible.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--FkHAQUPRpgaEHz8MZJLBJMKRbKHxiUex7
+Content-Type: multipart/mixed; boundary="crLpDUKTw1WmKMgmHtNAkTmUBAcQDfyK5"
 
-fio --filename=/dev/vdb --direct=1 --randrepeat=1 --eta=always
-    --ioengine=libaio --iodepth=32 --numjobs=1 --name=test --size=25G
-    --io_limit=25G --ramp_time=5 --rw=randwrite --bs=4k --runtime=60
+--crLpDUKTw1WmKMgmHtNAkTmUBAcQDfyK5
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
->> - preallocation=off is still faster than preallocation=metadata.
->
-> Brian, can you help us here with some input?
->
-> Essentially what we're having here is a sparse image file on XFS that
-> is opened with O_DIRECT (presumably - Berto, is this right?), and
-> Berto is seeing cases where a random write benchmark is faster if
-> we're doing the 64k ZERO_RANGE + 4k pwrite when touching a 64k cluster
-> for the first time compared to always just doing the 4k pwrite. This
-> is with a 1 MB extent size hint.
+On 19/08/20 17:28, Stefan Hajnoczi wrote:
+> On Mon, Aug 17, 2020 at 12:15:43PM +0300, Vladimir Sementsov-Ogievskiy wr=
+ote:
+>> The comments states, that on misaligned request we should have already
+>> been waiting. But for bdrv_padding_rmw_read, we called
+>> bdrv_mark_request_serialising with align =3D request_alignment, and now
+>> we serialise with align =3D cluster_size. So we may have to wait again
+>> with larger alignment.
+>>
+>> Note, that the only user of BDRV_REQ_SERIALISING is backup which issues
+>> cluster-aligned requests, so seems the assertion should not fire for
+>> now. But it's wrong anyway.
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> ---
+>>  block/io.c | 11 +----------
+>>  1 file changed, 1 insertion(+), 10 deletions(-)
+>=20
+> This code was added by Paolo, CCing him.
 
-A couple of notes:
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 
-- Yes, it's O_DIRECT (the image is opened with cache=none and fio uses
-  --direct=1).
+bdrv_mark_request_serialising already calls
+bdrv_wait_serialising_requests_locked so it is okay.
 
-- The extent size hint is the default one, I didn't change or set
-  anything for this test (or should I have?).
+Thanks,
 
-> From the discussions we had the other day [1][2] I took away that your
-> suggestion is that we should not try to optimise things with
-> fallocate(), but just write the areas we really want to write and let
-> the filesystem deal with the sparse parts. Especially with the extent
-> size hint that we're now setting, I'm surprised to hear that doing a
-> ZERO_RANGE first still seems to improve the performance.
->
-> Do you have any idea why this is happening and what we should be doing
-> with this?
->
-> [1] https://bugzilla.redhat.com/show_bug.cgi?id=1850660
-> [2] https://bugzilla.redhat.com/show_bug.cgi?id=1666864
->
->>   If I disable handle_alloc_space() (so there is no ZERO_RANGE used)
->>   then it is much slower.
->
-> This makes some sense because then we're falling back to writing
-> explicit zero buffers (unless you disabled that, too).
+Paolo
 
-Exactly, this happens on both ext4 and xfs.
+>> diff --git a/block/io.c b/block/io.c
+>> index ad3a51ed53..b18680a842 100644
+>> --- a/block/io.c
+>> +++ b/block/io.c
+>> @@ -1881,7 +1881,6 @@ bdrv_co_write_req_prepare(BdrvChild *child, int64_=
+t offset, uint64_t bytes,
+>>                            BdrvTrackedRequest *req, int flags)
+>>  {
+>>      BlockDriverState *bs =3D child->bs;
+>> -    bool waited;
+>>      int64_t end_sector =3D DIV_ROUND_UP(offset + bytes, BDRV_SECTOR_SIZ=
+E);
+>> =20
+>>      if (bs->read_only) {
+>> @@ -1893,15 +1892,7 @@ bdrv_co_write_req_prepare(BdrvChild *child, int64=
+_t offset, uint64_t bytes,
+>>      assert(!(flags & ~BDRV_REQ_MASK));
+>> =20
+>>      if (flags & BDRV_REQ_SERIALISING) {
+>> -        waited =3D bdrv_mark_request_serialising(req, bdrv_get_cluster_=
+size(bs));
+>> -        /*
+>> -         * For a misaligned request we should have already waited earli=
+er,
+>> -         * because we come after bdrv_padding_rmw_read which must be ca=
+lled
+>> -         * with the request already marked as serialising.
+>> -         */
+>> -        assert(!waited ||
+>> -               (req->offset =3D=3D req->overlap_offset &&
+>> -                req->bytes =3D=3D req->overlap_bytes));
+>> +        bdrv_mark_request_serialising(req, bdrv_get_cluster_size(bs));
+>>      } else {
+>>          bdrv_wait_serialising_requests(req);
+>>      }
+>> --=20
+>> 2.18.0
+>>
 
->> - With preallocation=falloc I get the same results as with
->>   preallocation=metadata.
->
-> Interesting, this means that the fallocate() call costs you basically
-> no time. I would have expected preallocation=falloc to be a little
-> faster.
 
-I would expect preallocation=falloc to be at least as fast as
-preallocation=off (and it is, on ext4). However on xfs it seems to be
-slower (?). It doesn't make sense to me.
 
->> - preallocation=full is the fastest by far.
->
-> I guess this saves the conversion of unwritten extents to fully
-> allocated ones?
+--crLpDUKTw1WmKMgmHtNAkTmUBAcQDfyK5--
 
-However it is *much* *much* faster. I assume I must be missing something
-on how the filesystem works.
+--FkHAQUPRpgaEHz8MZJLBJMKRbKHxiUex7
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-I ran the test again on a newly created filesystem just to make sure,
-here are the full results (numbers are IOPS):
+-----BEGIN PGP SIGNATURE-----
 
-|----------------------+-------+-------|
-| preallocation        |  ext4 |   xfs |
-|----------------------+-------+-------|
-| off                  | 11688 |  6981 |
-| off (w/o ZERO_RANGE) |  2780 |  3196 |
-| metadata             |  9132 |  5764 |
-| falloc               | 13108 |  5727 |
-| full                 | 16351 | 40759 |
-|----------------------+-------+-------|
+iQEzBAEBCAAdFiEE8TM4V0tmI4mGbHaCv/vSX3jHroMFAl89SboACgkQv/vSX3jH
+roOjpQf/UTGqtbKf4JLupYGXVtWzwCdQR9KMjQq5zhJtxJ5NvBLtv7yiDeRRRF06
+/WEIFQOygu02RSuERp2Iil55HM6rAnHvW5Pnx3HUsarEgyNOAt6CMFkeCaL28yyE
+3v5zX+cpsuXc+yX0SRnF4MlaywlSnpOL2mGKAgKzkV9uu6qX9vg/ZAuGxRyDofcr
+U/dVJjkFMmMrWYUF/nU/RyfA0t32E9fQn417tbhXVDsuI6U7IMIEZeSSyAKMxiPf
+U8++0KB7hyVr1quaUupxs9/+OyjsyCz2JbOY7/2TJwywaUDIxRQzsxWXCqUPmuxI
+ldwNUX1o+Iqg8ayF2Jy8MAu7Hf2mMA==
+=F9DH
+-----END PGP SIGNATURE-----
 
-Berto
+--FkHAQUPRpgaEHz8MZJLBJMKRbKHxiUex7--
+
 
