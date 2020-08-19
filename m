@@ -2,77 +2,100 @@ Return-Path: <SRS0=bVMU=B5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-8.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 105D1C433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 02:49:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2722C433E1
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 02:49:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DB4EF2076E
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 02:49:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB4EF2076E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	by mail.kernel.org (Postfix) with ESMTPS id 6EC3F2076E
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 02:49:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="STBQv3vw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6EC3F2076E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53232 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54008 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8EAL-0003tN-55
-	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 22:49:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47856)
+	id 1k8EAX-0004Bu-Oo
+	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 22:49:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47960)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k8E76-00070Q-GF
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 22:46:08 -0400
-Received: from mail-ed1-f66.google.com ([209.85.208.66]:33337)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k8E72-0005ct-Bt
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 22:46:08 -0400
-Received: by mail-ed1-f66.google.com with SMTP id v22so16881771edy.0
- for <qemu-devel@nongnu.org>; Tue, 18 Aug 2020 19:46:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=DLH641eQFnc2YDUjL1CU6K47OGchbwvFiAQd3wIq/tI=;
- b=D5usJNpkKMzUKanBfLj4+LyfLtf9S+TNtz57JemgeiFkrDlh7shqPp08xRdiSznkd1
- 1kH3oTq0WBPNGZsf+C+6bz3LLFBxVSHInw3yFF7r6nTykrrOIVNczPUSZ72jW+YCb89w
- WV8yUfwslmC/LxWKFO5rhBvHLBvX84S0816hv7GoM8TomN+aCvnHATIu3958x4CssWSw
- qrSMHCRtNklwI5FanLyJSnfI99nmHLfoQCBa3JxZGEtiCP/FSLxHpzBRiboiHg0iUYVr
- zvos2oraOE9iR31ike9p8ChB5ucgmLOeAOBhms81QHvdLIfCY94yxb/wTIOtAYTS0KkP
- jOWA==
-X-Gm-Message-State: AOAM5307Y7duRQZu4Q5v4daRKa7FK+XIwUY95HgX4fifbcCfyjFn3D4T
- qI29bLCggUXfa0WYrzv+iSBsTemAFbqLNiZTGuU=
-X-Google-Smtp-Source: ABdhPJxzlyDR5hejsJsOK4huq3MefHA9IRL2wz7SM5manWcNoc7N6OHKmdWPMsp2Hh8Tzu6tgZeOdhvZJbr7t5tQn3c=
-X-Received: by 2002:aa7:c0d3:: with SMTP id j19mr22123332edp.157.1597805162534; 
- Tue, 18 Aug 2020 19:46:02 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
+ id 1k8E7Q-0007kw-6f
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 22:46:28 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:24669
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
+ id 1k8E7N-0005jO-KW
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 22:46:27 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1597805184;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=YHzwrXrXbLwizcmmmBRfV2cYeOLa+iyjDJxZ2l+hNLM=;
+ b=STBQv3vwU9pwGz930p7ZNu1xioeDhjCoY2tBpK9ABp5MfBeEvEvN4i/XPobIQsGh+fe3Lv
+ Xh9ryGV512nuAB5BoKIJBpurXMegPOQyp1CkrtI4h2VtyBEXXEuB0NIx66qaqY9ih7UR24
+ WxRFwGdlzkX/wx+WmrCD/IK5OpFQAVc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-445-6L_flAJUOaWxJy5I7WQLeA-1; Tue, 18 Aug 2020 22:46:20 -0400
+X-MC-Unique: 6L_flAJUOaWxJy5I7WQLeA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8390F81F028;
+ Wed, 19 Aug 2020 02:46:18 +0000 (UTC)
+Received: from [10.72.13.88] (ovpn-13-88.pek2.redhat.com [10.72.13.88])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 759E15D9E4;
+ Wed, 19 Aug 2020 02:45:59 +0000 (UTC)
+Subject: Re: device compatibility interface for live migration with assigned
+ devices
+To: Parav Pandit <parav@nvidia.com>, =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?=
+ <berrange@redhat.com>
+References: <20200805021654.GB30485@joy-OptiPlex-7040>
+ <2624b12f-3788-7e2b-2cb7-93534960bcb7@redhat.com>
+ <20200805075647.GB2177@nanopsycho>
+ <eb1d01c2-fbad-36b6-10cf-9e03483a736b@redhat.com>
+ <20200805093338.GC30485@joy-OptiPlex-7040> <20200805105319.GF2177@nanopsycho>
+ <20200810074631.GA29059@joy-OptiPlex-7040>
+ <e6e75807-0614-bd75-aeb6-64d643e029d3@redhat.com>
+ <20200814051601.GD15344@joy-OptiPlex-7040>
+ <a51209fe-a8c6-941f-ff54-7be06d73bc44@redhat.com>
+ <20200818085527.GB20215@redhat.com>
+ <3a073222-dcfe-c02d-198b-29f6a507b2e1@redhat.com>
+ <BY5PR12MB43222059335C96F7B050CFDCDC5C0@BY5PR12MB4322.namprd12.prod.outlook.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <934c8d2a-a34e-6c68-0e53-5de2a8f49d19@redhat.com>
+Date: Wed, 19 Aug 2020 10:45:57 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-References: <20200813222625.243136-1-ehabkost@redhat.com>
- <20200813222625.243136-2-ehabkost@redhat.com>
- <3af41d38-3d5f-bdc3-9624-8848151992ae@amsat.org>
- <20200818213033.GB500103@habkost.net>
-In-Reply-To: <20200818213033.GB500103@habkost.net>
-From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Date: Wed, 19 Aug 2020 04:45:50 +0200
-Message-ID: <CAAdtpL4bBJ+UmeWA-On-5XHTWw77SWfm99RaqTH75XOssaVi2Q@mail.gmail.com>
-Subject: Re: [PATCH 01/41] pl1110: Rename PL1110 enum
-To: Eduardo Habkost <ehabkost@redhat.com>
-Content-Type: multipart/alternative; boundary="000000000000221b7805ad3201c0"
-Received-SPF: pass client-ip=209.85.208.66;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ed1-f66.google.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 22:46:02
+In-Reply-To: <BY5PR12MB43222059335C96F7B050CFDCDC5C0@BY5PR12MB4322.namprd12.prod.outlook.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=jasowang@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 22:46:24
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -8
-X-Spam_score: -0.9
-X-Spam_bar: /
-X-Spam_report: (-0.9 / 5.0 requ) BAYES_00=-1.9, FREEMAIL_FORGED_FROMDOMAIN=1,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=1, HTML_MESSAGE=0.001,
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -85,170 +108,164 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- "Daniel P. Berrange" <berrange@redhat.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Peter Maydell <peter.maydell@linaro.org>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "libvir-list@redhat.com" <libvir-list@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Kirti Wankhede <kwankhede@nvidia.com>, "eauger@redhat.com" <eauger@redhat.com>,
+ "xin-ran.wang@intel.com" <xin-ran.wang@intel.com>,
+ "corbet@lwn.net" <corbet@lwn.net>, "openstack-discuss@lists.openstack.org"
+ <openstack-discuss@lists.openstack.org>,
+ "shaohe.feng@intel.com" <shaohe.feng@intel.com>,
+ "kevin.tian@intel.com" <kevin.tian@intel.com>, Yan Zhao <yan.y.zhao@intel.com>,
+ Parav Pandit <parav@mellanox.com>,
+ "jian-feng.ding@intel.com" <jian-feng.ding@intel.com>,
+ "dgilbert@redhat.com" <dgilbert@redhat.com>,
+ "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
+ "hejie.xu@intel.com" <hejie.xu@intel.com>,
+ "bao.yumeng@zte.com.cn" <bao.yumeng@zte.com.cn>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ "eskultet@redhat.com" <eskultet@redhat.com>,
+ "smooney@redhat.com" <smooney@redhat.com>,
+ "intel-gvt-dev@lists.freedesktop.org" <intel-gvt-dev@lists.freedesktop.org>,
+ Cornelia Huck <cohuck@redhat.com>, Jiri Pirko <jiri@mellanox.com>,
+ "dinechin@redhat.com" <dinechin@redhat.com>,
+ "devel@ovirt.org" <devel@ovirt.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000221b7805ad3201c0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Le mar. 18 ao=C3=BBt 2020 23:30, Eduardo Habkost <ehabkost@redhat.com> a =
-=C3=A9crit :
-
-> CCing maintainer (pmaydell).
+On 2020/8/18 下午5:32, Parav Pandit wrote:
+> Hi Jason,
 >
-> On Fri, Aug 14, 2020 at 07:45:40PM +0200, Philippe Mathieu-Daud=C3=A9 wro=
-te:
-> > On 8/14/20 12:25 AM, Eduardo Habkost wrote:
-> > > The PL1110 enum value name will conflict with the PL1110 type
-> > > cast checker, when we replace the existing macro with an inline
-> > > function.  Rename it to PL1110_STOCK.
-> >
-> > typo s/PL1110/PL110/ in subject and description.
+> From: Jason Wang <jasowang@redhat.com>
+> Sent: Tuesday, August 18, 2020 2:32 PM
 >
-> Thanks for spotting that!  Will be fixed in v2.
 >
-> >
-> > >
-> > > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> > > ---
-> > >  hw/display/pl110.c | 12 ++++++------
-> > >  1 file changed, 6 insertions(+), 6 deletions(-)
-> > >
-> > > diff --git a/hw/display/pl110.c b/hw/display/pl110.c
-> > > index c2991a28d2..4664fde3f2 100644
-> > > --- a/hw/display/pl110.c
-> > > +++ b/hw/display/pl110.c
-> > > @@ -42,7 +42,7 @@ enum pl110_bppmode
-> > >  /* The Versatile/PB uses a slightly modified PL110 controller.  */
-> > >  enum pl110_version
-> > >  {
-> > > -    PL110,
-> > > +    PL110_STOCK,
-> > >      PL110_VERSATILE,
-> > >      PL111
-> >
-> > For completeness I'd also rename PL111.
-> >
-> > What about:
-> >
-> >  enum pl110_version
-> >  {
-> >     PL110_VERSION,
-> >     PL110_VERSATILE_VERSION,
-> >     PL111_VERSION
-> >  }
-> >
-> > ?
+> On 2020/8/18 下午4:55, Daniel P. Berrangé wrote:
+> On Tue, Aug 18, 2020 at 11:24:30AM +0800, Jason Wang wrote:
+> On 2020/8/14 下午1:16, Yan Zhao wrote:
+> On Thu, Aug 13, 2020 at 12:24:50PM +0800, Jason Wang wrote:
+> On 2020/8/10 下午3:46, Yan Zhao wrote:
+> driver is it handled by?
+> It looks that the devlink is for network device specific, and in
+> devlink.h, it says
+> include/uapi/linux/devlink.h - Network physical device Netlink
+> interface,
+> Actually not, I think there used to have some discussion last year and the
+> conclusion is to remove this comment.
 >
-> That would work too, although I'm more used to enum values to
-> have a common prefix instead of a common suffix.
+> [...]
 >
-> Any objections to:
+>> Yes, but it could be hard. E.g vDPA will chose to use devlink (there's a long debate on sysfs vs devlink). So if we go with sysfs, at least two APIs needs to be supported ...
+> We had internal discussion and proposal on this topic.
+> I wanted Eli Cohen to be back from vacation on Wed 8/19, but since this is active discussion right now, I will share the thoughts anyway.
 >
->   enum pl110_version
->   {
->       VERSION_PL110,
->       VERSION_PL110_VERSATILE,
->       VERSION_PL111
->   }
+> Here are the initial round of thoughts and proposal.
 >
-> ?
->
-
-Sounds good.
+> User requirements:
+> ---------------------------
+> 1. User might want to create one or more vdpa devices per PCI PF/VF/SF.
+> 2. User might want to create one or more vdpa devices of type net/blk or other type.
+> 3. User needs to look and dump at the health of the queues for debug purpose.
+> 4. During vdpa net device creation time, user may have to provide a MAC address and/or VLAN.
+> 5. User should be able to set/query some of the attributes for debug/compatibility check
+> 6. When user wants to create vdpa device, it needs to know which device supports creation.
+> 7. User should be able to see the queue statistics of doorbells, wqes etc regardless of class type
 
 
-> --
-> Eduardo
+Note that wqes is probably not something common in all of the vendors.
+
+
 >
+> To address above requirements, there is a need of vendor agnostic tool, so that user can create/config/delete vdpa device(s) regardless of the vendor.
 >
+> Hence,
+> We should have a tool that lets user do it.
+>
+> Examples:
+> -------------
+> (a) List parent devices which supports creating vdpa devices.
+> It also shows which class types supported by this parent device.
+> In below command two parent devices support vdpa device creation.
+> First is PCI VF whose bdf is 03.00:5.
+> Second is PCI SF whose name is mlx5_sf.1
+>
+> $ vdpa list pd
 
---000000000000221b7805ad3201c0
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-<div dir=3D"auto"><div><div class=3D"gmail_quote"><div dir=3D"ltr" class=3D=
-"gmail_attr">Le mar. 18 ao=C3=BBt 2020 23:30, Eduardo Habkost &lt;<a href=
-=3D"mailto:ehabkost@redhat.com">ehabkost@redhat.com</a>&gt; a =C3=A9crit=C2=
-=A0:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;=
-border-left:1px #ccc solid;padding-left:1ex">CCing maintainer (pmaydell).<b=
-r>
-<br>
-On Fri, Aug 14, 2020 at 07:45:40PM +0200, Philippe Mathieu-Daud=C3=A9 wrote=
-:<br>
-&gt; On 8/14/20 12:25 AM, Eduardo Habkost wrote:<br>
-&gt; &gt; The PL1110 enum value name will conflict with the PL1110 type<br>
-&gt; &gt; cast checker, when we replace the existing macro with an inline<b=
-r>
-&gt; &gt; function.=C2=A0 Rename it to PL1110_STOCK.<br>
-&gt; <br>
-&gt; typo s/PL1110/PL110/ in subject and description.<br>
-<br>
-Thanks for spotting that!=C2=A0 Will be fixed in v2.<br>
-<br>
-&gt; <br>
-&gt; &gt; <br>
-&gt; &gt; Signed-off-by: Eduardo Habkost &lt;<a href=3D"mailto:ehabkost@red=
-hat.com" target=3D"_blank" rel=3D"noreferrer">ehabkost@redhat.com</a>&gt;<b=
-r>
-&gt; &gt; ---<br>
-&gt; &gt;=C2=A0 hw/display/pl110.c | 12 ++++++------<br>
-&gt; &gt;=C2=A0 1 file changed, 6 insertions(+), 6 deletions(-)<br>
-&gt; &gt; <br>
-&gt; &gt; diff --git a/hw/display/pl110.c b/hw/display/pl110.c<br>
-&gt; &gt; index c2991a28d2..4664fde3f2 100644<br>
-&gt; &gt; --- a/hw/display/pl110.c<br>
-&gt; &gt; +++ b/hw/display/pl110.c<br>
-&gt; &gt; @@ -42,7 +42,7 @@ enum pl110_bppmode<br>
-&gt; &gt;=C2=A0 /* The Versatile/PB uses a slightly modified PL110 controll=
-er.=C2=A0 */<br>
-&gt; &gt;=C2=A0 enum pl110_version<br>
-&gt; &gt;=C2=A0 {<br>
-&gt; &gt; -=C2=A0 =C2=A0 PL110,<br>
-&gt; &gt; +=C2=A0 =C2=A0 PL110_STOCK,<br>
-&gt; &gt;=C2=A0 =C2=A0 =C2=A0 PL110_VERSATILE,<br>
-&gt; &gt;=C2=A0 =C2=A0 =C2=A0 PL111<br>
-&gt; <br>
-&gt; For completeness I&#39;d also rename PL111.<br>
-&gt; <br>
-&gt; What about:<br>
-&gt; <br>
-&gt;=C2=A0 enum pl110_version<br>
-&gt;=C2=A0 {<br>
-&gt;=C2=A0 =C2=A0 =C2=A0PL110_VERSION,<br>
-&gt;=C2=A0 =C2=A0 =C2=A0PL110_VERSATILE_VERSION,<br>
-&gt;=C2=A0 =C2=A0 =C2=A0PL111_VERSION<br>
-&gt;=C2=A0 }<br>
-&gt; <br>
-&gt; ?<br>
-<br>
-That would work too, although I&#39;m more used to enum values to<br>
-have a common prefix instead of a common suffix.<br>
-<br>
-Any objections to:<br>
-<br>
-=C2=A0 enum pl110_version<br>
-=C2=A0 {<br>
-=C2=A0 =C2=A0 =C2=A0 VERSION_PL110,<br>
-=C2=A0 =C2=A0 =C2=A0 VERSION_PL110_VERSATILE,<br>
-=C2=A0 =C2=A0 =C2=A0 VERSION_PL111<br>
-=C2=A0 }<br>
-<br>
-?<br></blockquote></div></div><div dir=3D"auto"><br></div><div dir=3D"auto"=
->Sounds good.=C2=A0</div><div dir=3D"auto"><br></div><div dir=3D"auto"><div=
- class=3D"gmail_quote"><blockquote class=3D"gmail_quote" style=3D"margin:0 =
-0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">
-<br>
--- <br>
-Eduardo<br>
-<br>
-</blockquote></div></div></div>
+What did "pd" mean?
 
---000000000000221b7805ad3201c0--
+
+> pci/0000:03.00:5
+>    class_supports
+>      net vdpa
+> virtbus/mlx5_sf.1
+
+
+So creating mlx5_sf.1 is the charge of devlink?
+
+
+>    class_supports
+>      net
+>
+> (b) Now add a vdpa device and show the device.
+> $ vdpa dev add pci/0000:03.00:5 type net
+
+
+So if you want to create devices types other than vdpa on 
+pci/0000:03.00:5 it needs some synchronization with devlink?
+
+
+> $ vdpa dev show
+> vdpa0@pci/0000:03.00:5 type net state inactive maxqueues 8 curqueues 4
+>
+> (c) vdpa dev show features vdpa0
+> iommu platform
+> version 1
+>
+> (d) dump vdpa statistics
+> $ vdpa dev stats show vdpa0
+> kickdoorbells 10
+> wqes 100
+>
+> (e) Now delete a vdpa device previously created.
+> $ vdpa dev del vdpa0
+>
+> Design overview:
+> -----------------------
+> 1. Above example tool runs over netlink socket interface.
+> 2. This enables users to return meaningful error strings in addition to code so that user can be more informed.
+> Often this is missing in ioctl()/configfs/sysfs interfaces.
+> 3. This tool over netlink enables syscaller tests to be more usable like other subsystems to keep kernel robust
+> 4. This provides vendor agnostic view of all vdpa capable parent and vdpa devices.
+>
+> 5. Each driver which supports vdpa device creation, registers the parent device along with supported classes.
+>
+> FAQs:
+> --------
+> 1. Why not using devlink?
+> Ans: Because as vdpa echo system grows, devlink will fall short of extending vdpa specific params, attributes, stats.
+
+
+This should be fine but it's still not clear to me the difference 
+between a vdpa netlink and a vdpa object in devlink.
+
+Thanks
+
+
+>
+> 2. Why not use sysfs?
+> Ans:
+> (a) Because running syscaller infrastructure can run well over netlink sockets like it runs for several subsystem.
+> (b) it lacks the ability to return error messages. Doing via kernel log is just doesn't work.
+> (c) Why not using some ioctl()? It will reinvent the wheel of netlink that has TLV formats for several attributes.
+>
+> 3. Why not configs?
+> It follows same limitation as that of sysfs.
+>
+> Low level design and driver APIS:
+> --------------------------------------------
+> Will post once we discuss this further.
+
 
