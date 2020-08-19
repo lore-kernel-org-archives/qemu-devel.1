@@ -7,87 +7,111 @@ X-Spam-Status: No, score=-12.4 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3459C433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 14:48:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89389C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 14:49:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8988F20882
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 14:48:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 367862083B
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 14:49:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jWyIfAIf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8988F20882
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bGchlP9g"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 367862083B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50342 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54348 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8PO4-0004pw-JW
-	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 10:48:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51908)
+	id 1k8PPM-0006T4-C4
+	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 10:49:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52598)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1k8PMM-0002s0-CS
- for qemu-devel@nongnu.org; Wed, 19 Aug 2020 10:46:38 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:56799
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1k8POj-0005jh-Dp
+ for qemu-devel@nongnu.org; Wed, 19 Aug 2020 10:49:05 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:30078)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1k8PMJ-0003XG-AD
- for qemu-devel@nongnu.org; Wed, 19 Aug 2020 10:46:38 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1k8POh-0003kn-DK
+ for qemu-devel@nongnu.org; Wed, 19 Aug 2020 10:49:05 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597848394;
+ s=mimecast20190719; t=1597848542;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=pGzGd+pmy2Z8yJNArK4j87/1yNUdnvtyYX9XDWsyyBU=;
- b=jWyIfAIffZyXhk21zN0BrKH5MI75DKkzF+qLQNmRLZRG5seo58Tv/fS7J68rXgdKG5o/+t
- DcJCpO3osPqyaboIop00GsvMsYzfCtrMigl3AiGNu77pDd9ejXPqeXV49ckcW8DwdAkF12
- oFXg5MOT83ivsM9OUta74rSUjkgg5z8=
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=QD4+MwQRKRFDE1kdCzASjArjtxdwisiXqmByKhI3HZE=;
+ b=bGchlP9gd+J9QOL8FLf3exwphWSJYPgVufwCTcF0R8UKblYZVjVcmyr4+mXVZjun3DVttg
+ Zhr9qmwuxY0vqzQ95Xt/+dZa6WORuO3kvEj1WKqhJWoY/vltoMY3NHiAN5kXdtTzpjqBHp
+ UI1LBrEU9x3sNz7RbXchmsxhToPJuD8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-41-7DsyBykAMr6sTLEqrY8RyA-1; Wed, 19 Aug 2020 10:46:29 -0400
-X-MC-Unique: 7DsyBykAMr6sTLEqrY8RyA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-196-UlP2V-djPDGExWFCLNe9KA-1; Wed, 19 Aug 2020 10:48:59 -0400
+X-MC-Unique: UlP2V-djPDGExWFCLNe9KA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D9BB885C70A;
- Wed, 19 Aug 2020 14:46:27 +0000 (UTC)
-Received: from [10.3.112.136] (ovpn-112-136.phx2.redhat.com [10.3.112.136])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4BD3B10013C2;
- Wed, 19 Aug 2020 14:46:27 +0000 (UTC)
-Subject: Re: [PATCH v3] block/nbd: use non-blocking connect: fix vm hang on
- connect()
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-References: <20200812145237.4396-1-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <76eefe05-d608-2c1e-252a-361533ea4a0b@redhat.com>
-Date: Wed, 19 Aug 2020 09:46:26 -0500
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DAB6D1015DCB;
+ Wed, 19 Aug 2020 14:48:58 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-113-120.ams2.redhat.com
+ [10.36.113.120])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id CF13959;
+ Wed, 19 Aug 2020 14:48:57 +0000 (UTC)
+Subject: Re: [RFC PATCH 19/22] block/export: Move strong user reference to
+ block_exports
+To: Kevin Wolf <kwolf@redhat.com>
+References: <20200813162935.210070-1-kwolf@redhat.com>
+ <20200813162935.210070-20-kwolf@redhat.com>
+ <5bdf307f-0d1e-b64c-978f-c9075a3e2eb0@redhat.com>
+ <20200819142300.GD10272@linux.fritz.box>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <31aaea72-8352-145f-7f17-995b6cfe0e23@redhat.com>
+Date: Wed, 19 Aug 2020 16:48:56 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200812145237.4396-1-vsementsov@virtuozzo.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <20200819142300.GD10272@linux.fritz.box>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eblake@redhat.com
-X-Mimecast-Spam-Score: 0.003
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=eblake@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/19 04:00:34
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="v113ZkLpjYGrrHDyhieuA1PEbjOEmzQlq"
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/19 06:57:45
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,489 +124,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, den@openvz.org, qemu-devel@nongnu.org, mreitz@redhat.com
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/12/20 9:52 AM, Vladimir Sementsov-Ogievskiy wrote:
-> This make nbd connection_co to yield during reconnects, so that
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--v113ZkLpjYGrrHDyhieuA1PEbjOEmzQlq
+Content-Type: multipart/mixed; boundary="FlxPdpppbH9uAHXo3ESAoB9Wl5XH5w4N9"
 
-s/make nbd connection_co to/makes nbd's connection_co/
+--FlxPdpppbH9uAHXo3ESAoB9Wl5XH5w4N9
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-> reconnect doesn't hang up the main thread. This is very important in
+On 19.08.20 16:23, Kevin Wolf wrote:
+> Am 19.08.2020 um 13:56 hat Max Reitz geschrieben:
+>> On 13.08.20 18:29, Kevin Wolf wrote:
+>>> The reference owned by the user/monitor that is created when adding the
+>>> export and dropped when removing it was tied to the 'exports' list in
+>>> nbd/server.c. Every block export will have a user reference, so move it
+>>> to the block export level and tie it to the 'block_exports' list in
+>>> block/export/export.c instead. This is necessary for introducing a QMP
+>>> command for removing exports.
+>>>
+>>> Note that exports are present in block_exports even after the user has
+>>> requested shutdown. This is different from NBD's exports where exports
+>>> are immediately removed on a shutdown request, even if they are still i=
+n
+>>> the process of shutting down. In order to avoid that the user still
+>>> interacts with an export that is shutting down (and possibly removes it
+>>> a second time), we need to remember if the user actually still owns it.
+>>>
+>>> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+>>> ---
+>>>  include/block/export.h | 8 ++++++++
+>>>  block/export/export.c  | 4 ++++
+>>>  blockdev-nbd.c         | 5 -----
+>>>  nbd/server.c           | 2 --
+>>>  4 files changed, 12 insertions(+), 7 deletions(-)
+>>
+>> With this patch, there=E2=80=99s an abort in iotest 281.  Perhaps becaus=
+e
+>> blk_exp_unref() is now done by blk_exp_request_shutdown() outside of
+>> where the AIO context is locked?
+>=20
+> I have two fixes locally that were related to failing qemu-iotests. I
+> guess the first one might be for what you're seeing?
+>=20
+> Kevin
+>=20
+> diff --git a/block/export/export.c b/block/export/export.c
+> index 71d17bd440..d021b98b74 100644
+> --- a/block/export/export.c
+> +++ b/block/export/export.c
+> @@ -105,9 +105,14 @@ void blk_exp_unref(BlockExport *exp)
+>  {
+>      assert(exp->refcount > 0);
+>      if (--exp->refcount =3D=3D 0) {
 
-s/hang up/block/
+If this is done without locking the context, should this be an atomic
+operation?
 
-> case of unavailable nbd server host: connect() call may take a long
-
-s/of/of an/
-
-> time, blocking the main thread (and due to reconnect, it will hang
-> again and again with small gaps of working time during pauses between
-> connection attempts).
-> 
-> Realization notes:
-> 
->   - We don't want to implement non-blocking connect() over non-blocking
->   socket, because getaddrinfo() doesn't have portable non-blocking
->   realization anyway, so let's just use a thread for both getaddrinfo()
->   and connect().
-> 
->   - We can't use qio_channel_socket_connect_async (which behave
-
-behaves
-
->   similarly and start a thread to execute connect() call), as it's rely
-
-starts
-relying
-
->   on someone iterating main loop (g_main_loop_run() or something like
->   this), which is not always the case.
-> 
->   - We can't use thread_pool_submit_co API, as thread pool waits for all
->   threads to finish (but we don't want to wait for blocking reconnect
->   attempt on shutdown.
-> 
->   So, we just create the thread by hand. Some additional difficulties
->   are:
-> 
->   - We want our connect don't block drained sections and aio context
-
-s/don't block/to avoid blocking/
-
->   switches. To achieve this, we make it possible to "cancel" synchronous
->   wait for the connect (which is an coroutine yield actually), still,
-
-s/an/a/
-
->   the thread continues in background, and it successful result may be
-
-s/it successful/if successful, its/
-
->   reused on next reconnect attempt.
-> 
->   - We don't want to wait for reconnect on shutdown, so there is
->   CONNECT_THREAD_RUNNING_DETACHED thread state, which means that block
->   layer not more interested in a result, and thread should close new
-
-which means that the block layer is no longer interested
-
->   connected socket on finish and free the state.
-> 
-> How to reproduce the bug, fixed with this commit:
-> 
-> 1. Create an image on node1:
->     qemu-img create -f qcow2 xx 100M
-> 
-> 2. Start NBD server on node1:
->     qemu-nbd xx
-> 
-> 3. Start vm with second nbd disk on node2, like this:
-> 
->    ./x86_64-softmmu/qemu-system-x86_64 -nodefaults -drive \
->      file=/work/images/cent7.qcow2 -drive file=nbd+tcp://192.168.100.2 \
->      -vnc :0 -qmp stdio -m 2G -enable-kvm -vga std
-> 
-> 4. Access the vm through vnc (or some other way?), and check that NBD
->     drive works:
-> 
->     dd if=/dev/sdb of=/dev/null bs=1M count=10
-> 
->     - the command should succeed.
-> 
-> 5. Now, let's trigger nbd-reconnect loop in Qemu process. For this:
-> 
-> 5.1 Kill NBD server on node1
-> 
-> 5.2 run "dd if=/dev/sdb of=/dev/null bs=1M count=10" in the guest
->      again. The command should fail and a lot of error messages about
->      failing disk may appear as well.
-> 
->      Now NBD client driver in Qemu tries to reconnect.
->      Still, VM works well.
-> 
-> 6. Make node1 unavailable on NBD port, so connect() from node2 will
->     last for a long time:
-> 
->     On node1 (Note, that 10809 is just a default NBD port):
-> 
->     sudo iptables -A INPUT -p tcp --dport 10809 -j DROP
-> 
->     After some time the guest hangs, and you may check in gdb that Qemu
->     hangs in connect() call, issued from the main thread. This is the
->     BUG.
-> 
-> 7. Don't forget to drop iptables rule from your node1:
-> 
->     sudo iptables -D INPUT -p tcp --dport 10809 -j DROP
-> 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
-> 
-> Hi!
-> 
-> This a continuation of "[PATCH v2 for-5.1? 0/5] Fix nbd reconnect dead-locks",
-> which was mostly merged to 5.1. The only last patch was not merged, and
-> here is a no-change resend for convenience.
-> 
-> 
->   block/nbd.c | 266 +++++++++++++++++++++++++++++++++++++++++++++++++++-
->   1 file changed, 265 insertions(+), 1 deletion(-)
-
-Looks big, but the commit message goes into good detail about what the 
-problem is, why the solution takes the approach it does, and a good 
-formula for reproduction.
-
-> 
-> diff --git a/block/nbd.c b/block/nbd.c
-> index 7bb881fef4..919ec5e573 100644
-> --- a/block/nbd.c
-> +++ b/block/nbd.c
-> @@ -38,6 +38,7 @@
->   
->   #include "qapi/qapi-visit-sockets.h"
->   #include "qapi/qmp/qstring.h"
-> +#include "qapi/clone-visitor.h"
->   
->   #include "block/qdict.h"
->   #include "block/nbd.h"
-> @@ -62,6 +63,47 @@ typedef enum NBDClientState {
->       NBD_CLIENT_QUIT
->   } NBDClientState;
->   
-> +typedef enum NBDConnectThreadState {
-> +/* No thread, no pending results */
-> +    CONNECT_THREAD_NONE,
-
-I'd indent the comments by four spaces, to line up with the enumeration 
-values they describe.
-
+> +        AioContext *aio_context =3D exp->ctx;
 > +
-> +/* Thread is running, no results for now */
-> +    CONNECT_THREAD_RUNNING,
-> +
-> +/*
-> + * Thread is running, but requestor exited. Thread should close the new socket
-> + * and free the connect state on exit.
-> + */
-> +    CONNECT_THREAD_RUNNING_DETACHED,
-> +
-> +/* Thread finished, results are stored in a state */
-> +    CONNECT_THREAD_FAIL,
-> +    CONNECT_THREAD_SUCCESS
-> +} NBDConnectThreadState;
-> +
-> +typedef struct NBDConnectThread {
-> +    /* Initialization constants */
-> +    SocketAddress *saddr; /* address to connect to */
-> +    /*
-> +     * Bottom half to schedule on completion. Scheduled only if bh_ctx is not
-> +     * NULL
-> +     */
-> +    QEMUBHFunc *bh_func;
-> +    void *bh_opaque;
-> +
-> +    /*
-> +     * Result of last attempt. Valid in FAIL and SUCCESS states.
-> +     * If you want to steal error, don't forget to set pointer to NULL.
-> +     */
-> +    QIOChannelSocket *sioc;
-> +    Error *err;
-> +
-> +    /* state and bh_ctx are protected by mutex */
-> +    QemuMutex mutex;
-> +    NBDConnectThreadState state; /* current state of the thread */
-> +    AioContext *bh_ctx; /* where to schedule bh (NULL means don't schedule) */
-> +} NBDConnectThread;
-
-Looks reasonable.
-
-> @@ -246,6 +298,216 @@ static bool nbd_client_connecting_wait(BDRVNBDState *s)
->       return s->state == NBD_CLIENT_CONNECTING_WAIT;
->   }
->   
-> +static void connect_bh(void *opaque)
-> +{
-> +    BDRVNBDState *state = opaque;
-> +
-> +    assert(state->wait_connect);
-> +    state->wait_connect = false;
-> +    aio_co_wake(state->connection_co);
-> +}
-> +
-> +static void nbd_init_connect_thread(BDRVNBDState *s)
-> +{
-> +    s->connect_thread = g_new(NBDConnectThread, 1);
-> +
-> +    *s->connect_thread = (NBDConnectThread) {
-> +        .saddr = QAPI_CLONE(SocketAddress, s->saddr),
-> +        .state = CONNECT_THREAD_NONE,
-> +        .bh_func = connect_bh,
-> +        .bh_opaque = s
-> +    };
-
-I prefer using trailing commas in initializer lists (less churn if a 
-later patch needs to initialize another member)
-
-> +
-> +    qemu_mutex_init(&s->connect_thread->mutex);
-> +}
-> +
-> +static void nbd_free_connect_thread(NBDConnectThread *thr)
-> +{
-> +    if (thr->sioc) {
-> +        qio_channel_close(QIO_CHANNEL(thr->sioc), NULL);
-> +    }
-> +    error_free(thr->err);
-> +    qapi_free_SocketAddress(thr->saddr);
-> +    g_free(thr);
-> +}
-> +
-> +static void *connect_thread_func(void *opaque)
-> +{
-> +    NBDConnectThread *thr = opaque;
-> +    int ret;
-> +    bool do_free = false;
-> +
-> +    thr->sioc = qio_channel_socket_new();
-> +
-> +    error_free(thr->err);
-> +    thr->err = NULL;
-
-Why do we need to clear the error at startup?  Shouldn't it already be 
-created as starting life NULL?
-
-> +    ret = qio_channel_socket_connect_sync(thr->sioc, thr->saddr, &thr->err);
-> +    if (ret < 0) {
-> +        object_unref(OBJECT(thr->sioc));
-> +        thr->sioc = NULL;
-> +    }
-> +
-> +    qemu_mutex_lock(&thr->mutex);
-> +
-> +    switch (thr->state) {
-> +    case CONNECT_THREAD_RUNNING:
-> +        thr->state = ret < 0 ? CONNECT_THREAD_FAIL : CONNECT_THREAD_SUCCESS;
-> +        if (thr->bh_ctx) {
-> +            aio_bh_schedule_oneshot(thr->bh_ctx, thr->bh_func, thr->bh_opaque);
-> +
-> +            /* play safe, don't reuse bh_ctx on further connection attempts */
-> +            thr->bh_ctx = NULL;
-> +        }
-> +        break;
-> +    case CONNECT_THREAD_RUNNING_DETACHED:
-> +        do_free = true;
-> +        break;
-> +    default:
-> +        abort();
-> +    }
-> +
-> +    qemu_mutex_unlock(&thr->mutex);
-> +
-> +    if (do_free) {
-> +        nbd_free_connect_thread(thr);
-> +    }
-> +
-> +    return NULL;
-> +}
-> +
-> +static QIOChannelSocket *coroutine_fn
-> +nbd_co_establish_connection(BlockDriverState *bs, Error **errp)
-
-There's some inconsistency on whether you use:
-
-return_type name()
-
-or
-
-return_type
-name()
-
-It's aesthetic, but it would be nice to stick to one (I prefer the 
-second, but see that the qemu code base as a whole is inconsistent, so 
-the best we can do is stay consistent within a file)
-
-> +{
-> +    QemuThread thread;
-> +    BDRVNBDState *s = bs->opaque;
-> +    QIOChannelSocket *res;
-> +    NBDConnectThread *thr = s->connect_thread;
-> +
-> +    qemu_mutex_lock(&thr->mutex);
-
-Should we use the auto-cleanup macro magic here? ...
-
-> +
-> +    switch (thr->state) {
-> +    case CONNECT_THREAD_FAIL:
-> +    case CONNECT_THREAD_NONE:
-> +        error_free(thr->err);
-> +        thr->err = NULL;
-> +        thr->state = CONNECT_THREAD_RUNNING;
-> +        qemu_thread_create(&thread, "nbd-connect",
-> +                           connect_thread_func, thr, QEMU_THREAD_DETACHED);
-> +        break;
-> +    case CONNECT_THREAD_SUCCESS:
-> +        /* Previous attempt finally succeeded in background */
-> +        thr->state = CONNECT_THREAD_NONE;
-> +        res = thr->sioc;
-> +        thr->sioc = NULL;
-> +        qemu_mutex_unlock(&thr->mutex);
-> +        return res;
-> +    case CONNECT_THREAD_RUNNING:
-> +        /* Already running, will wait */
-> +        break;
-> +    default:
-> +        abort();
-> +    }
-> +
-> +    thr->bh_ctx = qemu_get_current_aio_context();
-> +
-> +    qemu_mutex_unlock(&thr->mutex);
-> +
+> +        aio_context_acquire(aio_context);
+>          QLIST_REMOVE(exp, next);
+>          exp->drv->delete(exp);
+>          blk_unref(exp->blk);
+> +        aio_context_release(aio_context);
 > +
 
-...to do so, you'd put the above in a nested scope, where the mutex is 
-released when the scope is exited.
+But for the crash I was seeing, this should be sufficient, yes.
 
-> +    /*
-> +     * We are going to wait for connect-thread finish, but
-> +     * nbd_client_co_drain_begin() can interrupt.
-> +     *
-> +     * Note that wait_connect variable is not visible for connect-thread. It
-> +     * doesn't need mutex protection, it used only inside home aio context of
-> +     * bs.
-> +     */
-> +    s->wait_connect = true;
-> +    qemu_coroutine_yield();
-> +
-> +    qemu_mutex_lock(&thr->mutex);
-> +
-> +    switch (thr->state) {
-> +    case CONNECT_THREAD_SUCCESS:
-> +    case CONNECT_THREAD_FAIL:
-> +        thr->state = CONNECT_THREAD_NONE;
-> +        error_propagate(errp, thr->err);
-> +        thr->err = NULL;
-> +        res = thr->sioc;
-> +        thr->sioc = NULL;
-> +        break;
-> +    case CONNECT_THREAD_RUNNING:
-> +    case CONNECT_THREAD_RUNNING_DETACHED:
-> +        /*
-> +         * Obviously, drained section wants to start. Report the attempt as
-> +         * failed. Still connect thread is executing in background, and its
-> +         * result may be used for next connection attempt.
-> +         */
-> +        res = NULL;
-> +        error_setg(errp, "Connection attempt cancelled by other operation");
-> +        break;
-> +
-> +    case CONNECT_THREAD_NONE:
-> +        /*
-> +         * Impossible. We've seen this thread running. So it should be
-> +         * running or at least give some results.
-> +         */
-> +        abort();
-> +
-> +    default:
-> +        abort();
-> +    }
-> +
-> +    qemu_mutex_unlock(&thr->mutex);
-> +
-> +    return res;
-> +}
+Max
 
-Looks sensible.
 
-> +
-> +/*
-> + * nbd_co_establish_connection_cancel
-> + * Cancel nbd_co_establish_connection asynchronously: it will finish soon, to
-> + * allow drained section to begin.
-> + *
-> + * If detach is true, also cleanup the state (or if thread is running, move it
-> + * to CONNECT_THREAD_RUNNING_DETACHED state). s->connect_thread becomes NULL if
-> + * detach is true.
-> + */
-> +static void nbd_co_establish_connection_cancel(BlockDriverState *bs,
-> +                                               bool detach)
-> +{
-> +    BDRVNBDState *s = (BDRVNBDState *)bs->opaque;
+--FlxPdpppbH9uAHXo3ESAoB9Wl5XH5w4N9--
 
-Is the cast necessary here?
+--v113ZkLpjYGrrHDyhieuA1PEbjOEmzQlq
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-> +    NBDConnectThread *thr = s->connect_thread;
-> +    bool wake = false;
-> +    bool do_free = false;
-> +
-> +    qemu_mutex_lock(&thr->mutex);
-> +
-> +    if (thr->state == CONNECT_THREAD_RUNNING) {
-> +        /* We can cancel only in running state, when bh is not yet scheduled */
-> +        thr->bh_ctx = NULL;
-> +        if (s->wait_connect) {
-> +            s->wait_connect = false;
-> +            wake = true;
-> +        }
-> +        if (detach) {
-> +            thr->state = CONNECT_THREAD_RUNNING_DETACHED;
-> +            s->connect_thread = NULL;
-> +        }
-> +    } else if (detach) {
-> +        do_free = true;
-> +    }
-> +
-> +    qemu_mutex_unlock(&thr->mutex);
-> +
-> +    if (do_free) {
-> +        nbd_free_connect_thread(thr);
-> +        s->connect_thread = NULL;
-> +    }
-> +
-> +    if (wake) {
-> +        aio_co_wake(s->connection_co);
-> +    }
-> +}
-> +
->   static coroutine_fn void nbd_reconnect_attempt(BDRVNBDState *s)
->   {
->       int ret;
-> @@ -289,7 +551,7 @@ static coroutine_fn void nbd_reconnect_attempt(BDRVNBDState *s)
->           s->ioc = NULL;
->       }
->   
-> -    sioc = nbd_establish_connection(s->saddr, &local_err);
-> +    sioc = nbd_co_establish_connection(s->bs, &local_err);
->       if (!sioc) {
->           ret = -ECONNREFUSED;
->           goto out;
-> @@ -1946,6 +2208,8 @@ static int nbd_open(BlockDriverState *bs, QDict *options, int flags,
->       /* successfully connected */
->       s->state = NBD_CLIENT_CONNECTED;
->   
-> +    nbd_init_connect_thread(s);
-> +
->       s->connection_co = qemu_coroutine_create(nbd_connection_entry, s);
->       bdrv_inc_in_flight(bs);
->       aio_co_schedule(bdrv_get_aio_context(bs), s->connection_co);
-> 
+-----BEGIN PGP SIGNATURE-----
 
-Overall this looks good to me.  I still want to run some tests 
-(including playing with your reproducer formula), but code-wise, I can 
-offer:
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl89O9gACgkQ9AfbAGHV
+z0CdXwf/Xeyvevz9X5PAt7jt+bOsHGbJZ5PwGxxJJw4BJedVgI50d0ADfTLM7l9H
+hF4d3J7eDLcJeiS3r0/2kvJ1jRe1HFiSikD2DQx/iwmq+Y8uPkAdNANnOZOLRRrz
+ME+7tybLsFdckGEuKnheOgqYv4+2RQJDhCBWlY3k+M2t8rNzT5dtng4v31t0HgjZ
+v2a2zSIBf+fxT83erXKqbYXe0ozIJ+i5m8onlmTYA9wKQ9+BWGyXK9vBAOFqljIO
+qOiJ2gDGRc/4i+kokn+ldirhUQBm4TCWEPuNeIyXij3u6/MjEfas4wBfRG7ou9cu
+DF0ZuuBPEpw2f6ByUp9tIkkoVRRSfw==
+=oyIA
+-----END PGP SIGNATURE-----
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
-I pointed out a number of grammar and format touchups; I don't mind 
-applying those locally, if there is no other reason to send a v4.
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+--v113ZkLpjYGrrHDyhieuA1PEbjOEmzQlq--
 
 
