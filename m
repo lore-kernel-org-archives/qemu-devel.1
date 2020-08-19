@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFCE3C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 14:40:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45C5DC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 14:41:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 892D42078D
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 14:40:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 15607207BB
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 14:41:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CoioFfxd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 892D42078D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PXF21e7p"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 15607207BB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53368 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55132 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8PGc-0002lm-O3
-	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 10:40:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49020)
+	id 1k8PGu-0003UZ-88
+	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 10:41:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48804)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <sgarzare@redhat.com>)
- id 1k8PFd-0000yx-UU
- for qemu-devel@nongnu.org; Wed, 19 Aug 2020 10:39:41 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:51331
- helo=us-smtp-1.mimecast.com)
+ id 1k8PFI-0000KZ-0k
+ for qemu-devel@nongnu.org; Wed, 19 Aug 2020 10:39:20 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:42926
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <sgarzare@redhat.com>)
- id 1k8PFc-0002AT-Dy
- for qemu-devel@nongnu.org; Wed, 19 Aug 2020 10:39:41 -0400
+ id 1k8PFG-00023m-7X
+ for qemu-devel@nongnu.org; Wed, 19 Aug 2020 10:39:19 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597847979;
+ s=mimecast20190719; t=1597847957;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ehGIYLQAKEMIRToBRGoYbRYuUV0B7Fyvr5joJ5ZwBs8=;
- b=CoioFfxdo3pbOasiB1U6RBiKmGI2sfNTYE8ZJdA4ykozkxcoywtN7BJEWMXT+CAuOO8dYD
- sSK0NSZ7nDrhLKiXRewDgdPJ1zEvu2lV0GtvA1mRuazP8n5yATR3Wa5BSH7w31yDMCF5OE
- Xka1EBRb67YkzynZbr9g/BSZGuGmp2M=
+ bh=OzOh70yaTNs0uTiq2/vD5Wi4o5uIzFKgdVh1Pbo4ad4=;
+ b=PXF21e7pA5+NDKlDdvBv5NoyGaCiV3eSbHmXXpm2SpGvjQi/64qzPYuWcoORDpWwM2NfHm
+ m9CVkkgLC3B53KHu2AX+fdQgBZhID/SDCq8RREI/0egpJDcngEI9QR8BBJUP/s3TOS7+e2
+ h5vTceWE/wowL+cvLFPoJ3U8xwebKMI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-297-588CTsdzPlytAndFRLsNyg-1; Wed, 19 Aug 2020 10:39:36 -0400
-X-MC-Unique: 588CTsdzPlytAndFRLsNyg-1
+ us-mta-574-wItj1giEN2q8AXfWr8REsw-1; Wed, 19 Aug 2020 10:39:15 -0400
+X-MC-Unique: wItj1giEN2q8AXfWr8REsw-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9E55F186A56F;
- Wed, 19 Aug 2020 14:39:34 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 352D71014DF9;
+ Wed, 19 Aug 2020 14:39:14 +0000 (UTC)
 Received: from steredhat.redhat.com (ovpn-113-40.ams2.redhat.com
  [10.36.113.40])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 219D05F7D8;
- Wed, 19 Aug 2020 14:39:29 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BDF2F5F7D8;
+ Wed, 19 Aug 2020 14:39:09 +0000 (UTC)
 From: Stefano Garzarella <sgarzare@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 3/3] vhost-vsock-ccw: force virtio version 1
-Date: Wed, 19 Aug 2020 16:38:51 +0200
-Message-Id: <20200819143851.78069-4-sgarzare@redhat.com>
+Subject: [PATCH v2 1/3] vhost-vsock-pci: force virtio version 1
+Date: Wed, 19 Aug 2020 16:38:49 +0200
+Message-Id: <20200819143851.78069-2-sgarzare@redhat.com>
 In-Reply-To: <20200819143851.78069-1-sgarzare@redhat.com>
 References: <20200819143851.78069-1-sgarzare@redhat.com>
 MIME-Version: 1.0
@@ -74,17 +74,17 @@ X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=sgarzare@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/19 04:00:34
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=sgarzare@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/19 04:57:22
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,33 +107,55 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Commit 9b3a35ec82 ("virtio: verify that legacy support is not
+accidentally on") added a safety check that requires to set
+'disable-legacy=on' on vhost-vsock-pci device:
+
+    $ ./qemu-system-x86_64 ... -device vhost-vsock-pci,guest-cid=5
+        qemu-system-x86_64: -device vhost-vsock-pci,guest-cid=5:
+        device is modern-only, use disable-legacy=on
+
 virtio-vsock was introduced after the release of VIRTIO 1.0
 specifications, so it should be 'modern-only'.
+In addition Cornelia verified that forcing a legacy mode on
+vhost-vsock-pci device using x86-64 host and s390x guest, so with
+different endianness, produces strange behaviours.
 
-This patch forces virtio version 1 as done for vhost-vsock-pci.
+This patch forces virtio version 1 and removes the 'transitional_name'
+property removing the need to specify 'disable-legacy=on' on
+vhost-vsock-pci device.
 
 Cc: qemu-stable@nongnu.org
+Reported-by: Qian Cai <caiqian@redhat.com>
+Reported-by: Qinghua Cheng <qcheng@redhat.com>
+Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1868449
 Suggested-by: Cornelia Huck <cohuck@redhat.com>
 Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
 ---
- hw/s390x/vhost-vsock-ccw.c | 2 ++
- 1 file changed, 2 insertions(+)
+ hw/virtio/vhost-vsock-pci.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/s390x/vhost-vsock-ccw.c b/hw/s390x/vhost-vsock-ccw.c
-index 0822ecca89..0759143efa 100644
---- a/hw/s390x/vhost-vsock-ccw.c
-+++ b/hw/s390x/vhost-vsock-ccw.c
-@@ -40,7 +40,9 @@ static void vhost_vsock_ccw_class_init(ObjectClass *klass, void *data)
- static void vhost_vsock_ccw_instance_init(Object *obj)
- {
-     VHostVSockCCWState *dev = VHOST_VSOCK_CCW(obj);
-+    VirtioCcwDevice *ccw_dev = VIRTIO_CCW_DEVICE(obj);
+diff --git a/hw/virtio/vhost-vsock-pci.c b/hw/virtio/vhost-vsock-pci.c
+index a815278e69..d1fcad0472 100644
+--- a/hw/virtio/vhost-vsock-pci.c
++++ b/hw/virtio/vhost-vsock-pci.c
+@@ -44,6 +44,7 @@ static void vhost_vsock_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
+     VHostVSockPCI *dev = VHOST_VSOCK_PCI(vpci_dev);
+     DeviceState *vdev = DEVICE(&dev->vdev);
  
-+    ccw_dev->force_revision_1 = true;
-     virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
-                                 TYPE_VHOST_VSOCK);
++    virtio_pci_force_virtio_1(vpci_dev);
+     qdev_realize(vdev, BUS(&vpci_dev->bus), errp);
  }
+ 
+@@ -72,7 +73,6 @@ static void vhost_vsock_pci_instance_init(Object *obj)
+ static const VirtioPCIDeviceTypeInfo vhost_vsock_pci_info = {
+     .base_name             = TYPE_VHOST_VSOCK_PCI,
+     .generic_name          = "vhost-vsock-pci",
+-    .transitional_name     = "vhost-vsock-pci-transitional",
+     .non_transitional_name = "vhost-vsock-pci-non-transitional",
+     .instance_size = sizeof(VHostVSockPCI),
+     .instance_init = vhost_vsock_pci_instance_init,
 -- 
 2.26.2
 
