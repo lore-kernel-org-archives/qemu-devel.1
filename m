@@ -2,85 +2,89 @@ Return-Path: <SRS0=bVMU=B5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 125A7C433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 05:54:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B5CCC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 05:54:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D677C20772
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 05:54:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 033DC20772
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 05:54:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g+e/hEYS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D677C20772
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K0zdCpex"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 033DC20772
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38780 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39994 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8H34-0002Rl-4x
-	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 01:54:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50264)
+	id 1k8H3Q-0002wd-A7
+	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 01:54:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50314)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1k8GwO-0007do-3H
- for qemu-devel@nongnu.org; Wed, 19 Aug 2020 01:47:16 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:52378)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1k8GwR-0007mW-73
+ for qemu-devel@nongnu.org; Wed, 19 Aug 2020 01:47:19 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:20416
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1k8GwH-0006h0-Lo
- for qemu-devel@nongnu.org; Wed, 19 Aug 2020 01:47:15 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1k8GwH-0006hm-MR
+ for qemu-devel@nongnu.org; Wed, 19 Aug 2020 01:47:18 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597816011;
+ s=mimecast20190719; t=1597816014;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=d/ToY+CksEUdIJwGBvYGmud0e5v2j522cJh+0DTTbS8=;
- b=g+e/hEYS2jhpJda0N/0NeRG2s7XuluvoSbMDN18xPhoZBP1VdlqvszOMCfgQzYT9Bq7Asf
- Zi/JODt8ycToPWd5n727L2nlw8a0VDKYXoXLRU0LqQi33PzN/7KYi8HAoQZxfOokgZ1u+b
- F9JG2VPYkVXBZ38nP4Pm9rhLVy8CuIg=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=mWZxIiY3QGnt5SuGA0W8f1qGrnG+uHzZfJsnzAfwqVI=;
+ b=K0zdCpexZUDz2Db+GSUL14GEwuvoLOmTCJUSfl+bsGw7IFGmQOMJOn4nF6TSvitSHj116w
+ e3awjyyaKhU4S/VJCAE1RIDXW2vwa0uxA3ixuNPSiDvUA7CX4/PANsj35quR8R/07W0END
+ C0L44j3L6MmnyGLQlnW/NH7OiZ1ZCdM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-544-oRc50urZM-O0t1UQCVr0gg-1; Wed, 19 Aug 2020 01:46:49 -0400
-X-MC-Unique: oRc50urZM-O0t1UQCVr0gg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-134-miF1LhLwOSq50cU4a3yxnw-1; Wed, 19 Aug 2020 01:46:52 -0400
+X-MC-Unique: miF1LhLwOSq50cU4a3yxnw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 399BF1DDF7
- for <qemu-devel@nongnu.org>; Wed, 19 Aug 2020 05:46:48 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 27D3C1084C85;
+ Wed, 19 Aug 2020 05:46:51 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-112-195.ams2.redhat.com
  [10.36.112.195])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2CC86100AE55;
- Wed, 19 Aug 2020 05:46:45 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2FF3F5C882;
+ Wed, 19 Aug 2020 05:46:49 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 4F6239D8F; Wed, 19 Aug 2020 07:46:44 +0200 (CEST)
+ id A3F7D204B8; Wed, 19 Aug 2020 07:46:44 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 00/17] Usb 20200819 patches
-Date: Wed, 19 Aug 2020 07:46:27 +0200
-Message-Id: <20200819054644.30610-1-kraxel@redhat.com>
+Subject: [PULL 09/17] hw/usb: Add U2F key passthru mode
+Date: Wed, 19 Aug 2020 07:46:36 +0200
+Message-Id: <20200819054644.30610-10-kraxel@redhat.com>
+In-Reply-To: <20200819054644.30610-1-kraxel@redhat.com>
+References: <20200819054644.30610-1-kraxel@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
 X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=kraxel@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/19 01:28:55
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 23:06:33
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,80 +97,474 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- Cleber Rosa <crosa@redhat.com>
+Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ =?UTF-8?q?C=C3=A9sar=20Belley?= <cesar.belley@lse.epita.fr>,
+ Gerd Hoffmann <kraxel@redhat.com>, Cleber Rosa <crosa@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit d0ed6a69d399ae193959225cdeaa9382746c91cc:
+From: César Belley <cesar.belley@lse.epita.fr>
 
-  Update version for v5.1.0 release (2020-08-11 17:07:03 +0100)
+This patch adds the U2F key pass-through mode.
 
-are available in the Git repository at:
+The pass-through mode consists of passing all requests made from the
+guest to the physical security key connected to the host machine and
+vice versa.
 
-  git://git.kraxel.org/qemu tags/usb-20200819-pull-request
+In addition, the dedicated pass-through allows to have a U2F security key
+shared on several guests which is not possible with a simple host device
+assignment pass-through.
 
-for you to fetch changes up to d7e5b2e1a4035fb81517a2034bb955e58f28d5b9:
+The pass-through mode is associated with a device inheriting from
+u2f-key base.
 
-  hw/usb: Add U2F device autoscan to passthru mode (2020-08-19 07:35:27 +0200)
+To work, it needs the path to a U2F hidraw, obtained from the Qemu
+command line, and passed by the user:
 
-----------------------------------------------------------------
-usb: usb_packet_map error handling for xhci/ehci
-usb: add U2F devices (GSoC).
+    qemu -usb -device u2f-passthru,hidraw=/dev/hidrawX
 
-----------------------------------------------------------------
+Autoscan and U2F compatibility checking features are given at the end
+of the patch series.
 
-César Belley (13):
-  hw/usb: Regroup USB HID protocol values
-  docs: Add USB U2F key device documentation
-  hw/usb: Add U2F key base class
-  hw/usb: Add U2F key base class implementation
-  hw/usb: Add U2F key passthru mode
-  hw/usb: Add U2F key emulated mode
-  hw/usb: Add U2F key build recipe
-  configure: Add USB U2F key device
-  docs/system: Add U2F key to the USB devices examples
-  docs/qdev-device-use.txt: Add USB U2F key to the QDEV devices examples
-  scripts: Add u2f-setup-gen script
-  hw/usb: Add U2F device check to passthru mode
-  hw/usb: Add U2F device autoscan to passthru mode
-
-Gerd Hoffmann (1):
-  ehci: drop pointless warn_report for guest bugs.
-
-Li Qiang (3):
-  hw: xhci: check return value of 'usb_packet_map'
-  hw: ehci: destroy sglist in error path
-  hw: ehci: check return value of 'usb_packet_map'
-
- configure                |  27 ++
- docs/qdev-device-use.txt |   1 +
- docs/u2f.txt             | 110 ++++++++
- scripts/u2f-setup-gen.py | 170 ++++++++++++
- hw/usb/u2f.h             |  92 +++++++
- include/hw/usb/hid.h     |  17 ++
- hw/usb/dev-hid.c         |  26 +-
- hw/usb/dev-wacom.c       |  12 +-
- hw/usb/hcd-ehci.c        |  12 +-
- hw/usb/hcd-xhci.c        |   5 +-
- hw/usb/u2f-emulated.c    | 405 ++++++++++++++++++++++++++++
- hw/usb/u2f-passthru.c    | 551 +++++++++++++++++++++++++++++++++++++++
- hw/usb/u2f.c             | 352 +++++++++++++++++++++++++
- docs/system/usb.rst      |   3 +
- hw/usb/Kconfig           |   5 +
- hw/usb/Makefile.objs     |   9 +
- 16 files changed, 1765 insertions(+), 32 deletions(-)
- create mode 100644 docs/u2f.txt
- create mode 100755 scripts/u2f-setup-gen.py
- create mode 100644 hw/usb/u2f.h
- create mode 100644 include/hw/usb/hid.h
- create mode 100644 hw/usb/u2f-emulated.c
+Signed-off-by: César Belley <cesar.belley@lse.epita.fr>
+Message-id: 20200812094135.20550-6-cesar.belley@lse.epita.fr
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ hw/usb/u2f-passthru.c | 423 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 423 insertions(+)
  create mode 100644 hw/usb/u2f-passthru.c
- create mode 100644 hw/usb/u2f.c
 
+diff --git a/hw/usb/u2f-passthru.c b/hw/usb/u2f-passthru.c
+new file mode 100644
+index 000000000000..106b5abf9ecc
+--- /dev/null
++++ b/hw/usb/u2f-passthru.c
+@@ -0,0 +1,423 @@
++/*
++ * U2F USB Passthru device.
++ *
++ * Copyright (c) 2020 César Belley <cesar.belley@lse.epita.fr>
++ * Written by César Belley <cesar.belley@lse.epita.fr>
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/module.h"
++#include "qemu/main-loop.h"
++#include "qemu/error-report.h"
++#include "qapi/error.h"
++#include "hw/qdev-properties.h"
++#include "hw/usb.h"
++#include "migration/vmstate.h"
++
++#include "u2f.h"
++
++#define NONCE_SIZE 8
++#define BROADCAST_CID 0xFFFFFFFF
++#define TRANSACTION_TIMEOUT 120000
++
++struct transaction {
++    uint32_t cid;
++    uint16_t resp_bcnt;
++    uint16_t resp_size;
++
++    /* Nonce for broadcast isolation */
++    uint8_t nonce[NONCE_SIZE];
++};
++
++typedef struct U2FPassthruState U2FPassthruState;
++
++#define CURRENT_TRANSACTIONS_NUM 4
++
++struct U2FPassthruState {
++    U2FKeyState base;
++
++    /* Host device */
++    char *hidraw;
++    int hidraw_fd;
++
++    /* Current Transactions */
++    struct transaction current_transactions[CURRENT_TRANSACTIONS_NUM];
++    uint8_t current_transactions_start;
++    uint8_t current_transactions_end;
++    uint8_t current_transactions_num;
++
++    /* Transaction time checking */
++    int64_t last_transaction_time;
++    QEMUTimer timer;
++};
++
++#define TYPE_U2F_PASSTHRU "u2f-passthru"
++#define PASSTHRU_U2F_KEY(obj) \
++    OBJECT_CHECK(U2FPassthruState, (obj), TYPE_U2F_PASSTHRU)
++
++/* Init packet sizes */
++#define PACKET_INIT_HEADER_SIZE 7
++#define PACKET_INIT_DATA_SIZE (U2FHID_PACKET_SIZE - PACKET_INIT_HEADER_SIZE)
++
++/* Cont packet sizes */
++#define PACKET_CONT_HEADER_SIZE 5
++#define PACKET_CONT_DATA_SIZE (U2FHID_PACKET_SIZE - PACKET_CONT_HEADER_SIZE)
++
++struct packet_init {
++    uint32_t cid;
++    uint8_t cmd;
++    uint8_t bcnth;
++    uint8_t bcntl;
++    uint8_t data[PACKET_INIT_DATA_SIZE];
++} QEMU_PACKED;
++
++static inline uint32_t packet_get_cid(const void *packet)
++{
++    return *((uint32_t *)packet);
++}
++
++static inline bool packet_is_init(const void *packet)
++{
++    return ((uint8_t *)packet)[4] & (1 << 7);
++}
++
++static inline uint16_t packet_init_get_bcnt(
++        const struct packet_init *packet_init)
++{
++    uint16_t bcnt = 0;
++    bcnt |= packet_init->bcnth << 8;
++    bcnt |= packet_init->bcntl;
++
++    return bcnt;
++}
++
++static void u2f_passthru_reset(U2FPassthruState *key)
++{
++    timer_del(&key->timer);
++    qemu_set_fd_handler(key->hidraw_fd, NULL, NULL, key);
++    key->last_transaction_time = 0;
++    key->current_transactions_start = 0;
++    key->current_transactions_end = 0;
++    key->current_transactions_num = 0;
++}
++
++static void u2f_timeout_check(void *opaque)
++{
++    U2FPassthruState *key = opaque;
++    int64_t time = qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL);
++
++    if (time > key->last_transaction_time + TRANSACTION_TIMEOUT) {
++        u2f_passthru_reset(key);
++    } else {
++        timer_mod(&key->timer, time + TRANSACTION_TIMEOUT / 4);
++    }
++}
++
++static int u2f_transaction_get_index(U2FPassthruState *key, uint32_t cid)
++{
++    for (int i = 0; i < key->current_transactions_num; ++i) {
++        int index = (key->current_transactions_start + i)
++            % CURRENT_TRANSACTIONS_NUM;
++        if (cid == key->current_transactions[index].cid) {
++            return index;
++        }
++    }
++    return -1;
++}
++
++static struct transaction *u2f_transaction_get(U2FPassthruState *key,
++                                               uint32_t cid)
++{
++    int index = u2f_transaction_get_index(key, cid);
++    if (index < 0) {
++        return NULL;
++    }
++    return &key->current_transactions[index];
++}
++
++static struct transaction *u2f_transaction_get_from_nonce(U2FPassthruState *key,
++                                const uint8_t nonce[NONCE_SIZE])
++{
++    for (int i = 0; i < key->current_transactions_num; ++i) {
++        int index = (key->current_transactions_start + i)
++            % CURRENT_TRANSACTIONS_NUM;
++        if (key->current_transactions[index].cid == BROADCAST_CID
++            && memcmp(nonce, key->current_transactions[index].nonce,
++                      NONCE_SIZE) == 0) {
++            return &key->current_transactions[index];
++        }
++    }
++    return NULL;
++}
++
++static void u2f_transaction_close(U2FPassthruState *key, uint32_t cid)
++{
++    int index, next_index;
++    index = u2f_transaction_get_index(key, cid);
++    if (index < 0) {
++        return;
++    }
++    next_index = (index + 1) % CURRENT_TRANSACTIONS_NUM;
++
++    /* Rearrange to ensure the oldest is at the start position */
++    while (next_index != key->current_transactions_end) {
++        memcpy(&key->current_transactions[index],
++               &key->current_transactions[next_index],
++               sizeof(struct transaction));
++
++        index = next_index;
++        next_index = (index + 1) % CURRENT_TRANSACTIONS_NUM;
++    }
++
++    key->current_transactions_end = index;
++    --key->current_transactions_num;
++
++    if (key->current_transactions_num == 0) {
++        u2f_passthru_reset(key);
++    }
++}
++
++static void u2f_transaction_add(U2FPassthruState *key, uint32_t cid,
++                                const uint8_t nonce[NONCE_SIZE])
++{
++    uint8_t index;
++    struct transaction *transaction;
++
++    if (key->current_transactions_num >= CURRENT_TRANSACTIONS_NUM) {
++        /* Close the oldest transaction */
++        index = key->current_transactions_start;
++        transaction = &key->current_transactions[index];
++        u2f_transaction_close(key, transaction->cid);
++    }
++
++    /* Index */
++    index = key->current_transactions_end;
++    key->current_transactions_end = (index + 1) % CURRENT_TRANSACTIONS_NUM;
++    ++key->current_transactions_num;
++
++    /* Transaction */
++    transaction = &key->current_transactions[index];
++    transaction->cid = cid;
++    transaction->resp_bcnt = 0;
++    transaction->resp_size = 0;
++
++    /* Nonce */
++    if (nonce != NULL) {
++        memcpy(transaction->nonce, nonce, NONCE_SIZE);
++    }
++}
++
++static void u2f_passthru_read(void *opaque);
++
++static void u2f_transaction_start(U2FPassthruState *key,
++                                  const struct packet_init *packet_init)
++{
++    int64_t time;
++
++    /* Transaction */
++    if (packet_init->cid == BROADCAST_CID) {
++        u2f_transaction_add(key, packet_init->cid, packet_init->data);
++    } else {
++        u2f_transaction_add(key, packet_init->cid, NULL);
++    }
++
++    /* Time */
++    time = qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL);
++    if (key->last_transaction_time == 0) {
++        qemu_set_fd_handler(key->hidraw_fd, u2f_passthru_read, NULL, key);
++        timer_init_ms(&key->timer, QEMU_CLOCK_VIRTUAL, u2f_timeout_check, key);
++        timer_mod(&key->timer, time + TRANSACTION_TIMEOUT / 4);
++    }
++    key->last_transaction_time = time;
++}
++
++static void u2f_passthru_recv_from_host(U2FPassthruState *key,
++                                    const uint8_t packet[U2FHID_PACKET_SIZE])
++{
++    struct transaction *transaction;
++    uint32_t cid;
++
++    /* Retrieve transaction */
++    cid = packet_get_cid(packet);
++    if (cid == BROADCAST_CID) {
++        struct packet_init *packet_init;
++        if (!packet_is_init(packet)) {
++            return;
++        }
++        packet_init = (struct packet_init *)packet;
++        transaction = u2f_transaction_get_from_nonce(key, packet_init->data);
++    } else {
++        transaction = u2f_transaction_get(key, cid);
++    }
++
++    /* Ignore no started transaction */
++    if (transaction == NULL) {
++        return;
++    }
++
++    if (packet_is_init(packet)) {
++        struct packet_init *packet_init = (struct packet_init *)packet;
++        transaction->resp_bcnt = packet_init_get_bcnt(packet_init);
++        transaction->resp_size = PACKET_INIT_DATA_SIZE;
++
++        if (packet_init->cid == BROADCAST_CID) {
++            /* Nonce checking for legitimate response */
++            if (memcmp(transaction->nonce, packet_init->data, NONCE_SIZE)
++                != 0) {
++                return;
++            }
++        }
++    } else {
++        transaction->resp_size += PACKET_CONT_DATA_SIZE;
++    }
++
++    /* Transaction end check */
++    if (transaction->resp_size >= transaction->resp_bcnt) {
++        u2f_transaction_close(key, cid);
++    }
++    u2f_send_to_guest(&key->base, packet);
++}
++
++static void u2f_passthru_read(void *opaque)
++{
++    U2FPassthruState *key = opaque;
++    U2FKeyState *base = &key->base;
++    uint8_t packet[2 * U2FHID_PACKET_SIZE];
++    int ret;
++
++    /* Full size base queue check */
++    if (base->pending_in_num >= U2FHID_PENDING_IN_NUM) {
++        return;
++    }
++
++    ret = read(key->hidraw_fd, packet, sizeof(packet));
++    if (ret < 0) {
++        /* Detach */
++        if (base->dev.attached) {
++            usb_device_detach(&base->dev);
++            u2f_passthru_reset(key);
++        }
++        return;
++    }
++    if (ret != U2FHID_PACKET_SIZE) {
++        return;
++    }
++    u2f_passthru_recv_from_host(key, packet);
++}
++
++static void u2f_passthru_recv_from_guest(U2FKeyState *base,
++                                    const uint8_t packet[U2FHID_PACKET_SIZE])
++{
++    U2FPassthruState *key = PASSTHRU_U2F_KEY(base);
++    uint8_t host_packet[U2FHID_PACKET_SIZE + 1];
++    ssize_t written;
++
++    if (packet_is_init(packet)) {
++        u2f_transaction_start(key, (struct packet_init *)packet);
++    }
++
++    host_packet[0] = 0;
++    memcpy(host_packet + 1, packet, U2FHID_PACKET_SIZE);
++
++    written = write(key->hidraw_fd, host_packet, sizeof(host_packet));
++    if (written != sizeof(host_packet)) {
++        error_report("%s: Bad written size (req 0x%lx, val 0x%lx)",
++                     TYPE_U2F_PASSTHRU, sizeof(host_packet), written);
++    }
++}
++
++static void u2f_passthru_unrealize(U2FKeyState *base)
++{
++    U2FPassthruState *key = PASSTHRU_U2F_KEY(base);
++
++    u2f_passthru_reset(key);
++    qemu_close(key->hidraw_fd);
++}
++
++static void u2f_passthru_realize(U2FKeyState *base, Error **errp)
++{
++    U2FPassthruState *key = PASSTHRU_U2F_KEY(base);
++    int fd;
++
++    if (key->hidraw == NULL) {
++        error_setg(errp, "%s: Missing hidraw", TYPE_U2F_PASSTHRU);
++        return;
++    }
++
++    fd = qemu_open(key->hidraw, O_RDWR);
++    if (fd < 0) {
++        error_setg(errp, "%s: Failed to open %s", TYPE_U2F_PASSTHRU,
++                   key->hidraw);
++        return;
++    }
++    key->hidraw_fd = fd;
++    u2f_passthru_reset(key);
++}
++
++static int u2f_passthru_post_load(void *opaque, int version_id)
++{
++    U2FPassthruState *key = opaque;
++    u2f_passthru_reset(key);
++    return 0;
++}
++
++static const VMStateDescription u2f_passthru_vmstate = {
++    .name = "u2f-key-passthru",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .post_load = u2f_passthru_post_load,
++    .fields = (VMStateField[]) {
++        VMSTATE_U2F_KEY(base, U2FPassthruState),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++static Property u2f_passthru_properties[] = {
++    DEFINE_PROP_STRING("hidraw", U2FPassthruState, hidraw),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void u2f_passthru_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++    U2FKeyClass *kc = U2F_KEY_CLASS(klass);
++
++    kc->realize = u2f_passthru_realize;
++    kc->unrealize = u2f_passthru_unrealize;
++    kc->recv_from_guest = u2f_passthru_recv_from_guest;
++    dc->desc = "QEMU U2F passthrough key";
++    dc->vmsd = &u2f_passthru_vmstate;
++    device_class_set_props(dc, u2f_passthru_properties);
++}
++
++static const TypeInfo u2f_key_passthru_info = {
++    .name = TYPE_U2F_PASSTHRU,
++    .parent = TYPE_U2F_KEY,
++    .instance_size = sizeof(U2FPassthruState),
++    .class_init = u2f_passthru_class_init
++};
++
++static void u2f_key_passthru_register_types(void)
++{
++    type_register_static(&u2f_key_passthru_info);
++}
++
++type_init(u2f_key_passthru_register_types)
 -- 
 2.18.4
 
