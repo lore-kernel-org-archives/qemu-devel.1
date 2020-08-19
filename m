@@ -2,85 +2,75 @@ Return-Path: <SRS0=bVMU=B5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A245DC433E3
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 12:42:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A079C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 12:42:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 780A4206B5
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 12:42:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 780A4206B5
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 1D293206B5
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 12:42:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="EWRTJPrM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D293206B5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43228 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45354 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8NPp-0003AC-Jf
-	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 08:42:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43758)
+	id 1k8NQF-00041n-E5
+	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 08:42:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43876)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k8NP7-0002fs-Ie
- for qemu-devel@nongnu.org; Wed, 19 Aug 2020 08:41:21 -0400
-Received: from indium.canonical.com ([91.189.90.7]:58808)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k8NP4-0002da-DE
- for qemu-devel@nongnu.org; Wed, 19 Aug 2020 08:41:21 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1k8NP2-0007Bp-2L
- for <qemu-devel@nongnu.org>; Wed, 19 Aug 2020 12:41:16 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 1036F2E80DC
- for <qemu-devel@nongnu.org>; Wed, 19 Aug 2020 12:41:16 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 19 Aug 2020 12:28:43 -0000
-From: Launchpad Bug Tracker <1883984@bugs.launchpad.net>
+ (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
+ id 1k8NPe-00037I-1M
+ for qemu-devel@nongnu.org; Wed, 19 Aug 2020 08:41:54 -0400
+Received: from lizzy.crudebyte.com ([91.194.90.13]:50555)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
+ id 1k8NPb-0002g2-MF
+ for qemu-devel@nongnu.org; Wed, 19 Aug 2020 08:41:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=crudebyte.com; s=lizzy; h=Content-Type:Content-Transfer-Encoding:
+ MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+ Content-ID:Content-Description;
+ bh=xgdWGINa39Xjy59JWXRhGzjBwPj5GnRCm6uvicveXrI=; b=EWRTJPrMxWoqnKxwk8efcIUFml
+ KhueEr3dmD8C8OIWSRlDlEzpyr6ASzN7zfYvTspoJ/624gmJss5fOZxfgzSex8t1G/a91BOUTmWXk
+ O5n9Imm/SqPvv5lKxQYnWZX+dI0MCNaSYZCwd13GsD/gv4qfs94iRRSxKlifA9LZ91TeWam1iEDV1
+ giekXJ2a0Piet7qSlfdLt8KvWLV2s9Sx6RSAl+zNv64g5522OXxqVhZrRUL9TzAyFFbaU0V5K3ka7
+ xuEKQzLPeM0euoa+CZGBxIVM3bPkciFFivJdJPT8yWI4X2PS3W6fmjn8AQ6wJW+F+3IeYskRbs5qg
+ N+I2hb1Q==;
+From: Christian Schoenebeck <qemu_oss@crudebyte.com>
 To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Fix Committed; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
- status=Fix Released; importance=Undecided; assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=focal; sourcepackage=qemu; 
- component=main; status=Triaged; importance=Medium;
- assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: bruno-clisp janitor nhfbeebe paelzer rth
-X-Launchpad-Bug-Reporter: Nelson H F Beebe (nhfbeebe)
-X-Launchpad-Bug-Modifier: Launchpad Janitor (janitor)
-References: <159243063748.16697.11009205973276249282.malonedeb@chaenomeles.canonical.com>
-Message-Id: <159784012796.3953.12958861668337523963.launchpad@ackee.canonical.com>
-Subject: [Bug 1883984] Re: QEMU S/390x sqxbr (128-bit IEEE 754 square root)
- crashes qemu-system-s390x
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="99c2d833c8d727fd05148486920aca032e908071"; Instance="production"
-X-Launchpad-Hash: 7bbd1ac29a699ecb99793fda5f1582b8281158b1
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/19 06:50:59
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
+Cc: Geoffrey McRae <geoff@hostfission.com>, kraxel@redhat.com
+Subject: Re: [PATCH] audio/jack: fix use after free segfault
+Date: Wed, 19 Aug 2020 14:41:48 +0200
+Message-ID: <1858869.V9CTJjVLrA@silver>
+In-Reply-To: <fdec112034e900c2d8408a634aa184b6@hostfission.com>
+References: <20200818131206.BB75F3A0B9F@moya.office.hostfission.com>
+ <2255329.JDkKyqenvo@silver>
+ <fdec112034e900c2d8408a634aa184b6@hostfission.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
+Received-SPF: pass client-ip=91.194.90.13; envelope-from=qemu_oss@crudebyte.com;
+ helo=lizzy.crudebyte.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/19 07:30:08
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -89,120 +79,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1883984 <1883984@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Merge proposal linked:
-   https://code.launchpad.net/~paelzer/ubuntu/+source/qemu/+git/qemu/+merge=
-/389527
+On Mittwoch, 19. August 2020 13:45:33 CEST Geoffrey McRae wrote:
+> > I still don't quite get how this correlates. So you are forcing a
+> > restart of
+> > jackd on host side in between, for what purpose? To simulate the
+> > Windows
+> > client being kicked by jackd?
+> 
+> For many reasons jack may need to be stopped and started again, such as
+> hardware changes when switching to a USB audio device, or tuning the
+> period size, etc. QEMU should be able to recover if the jack server goes
+> away, it's that simple.
 
--- =
+Most of that could be done without jackd restart, but yeah I got your point. 
+Thanks!
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1883984
+> The following sequence is what triggers this fault.
+> 
+>    client1 = jack_client_open();
+>    client2 = jack_client_open();
+> 
+> client1 gets a shutdown signal
+> 
+>    jack_client_close(client1);
+>    client1 = jack_client_open();
+> 
+> client2 gets a shutdown signal
+> 
+>    jack_client_close(client2);
+>    client2 = jack_client_open();
+> 
+> One would expect this sequence to work fine as it conforms to the JACK
+> documentation and common design practice, however, the call to
+> `jack_client_open` notices that there is the 2nd session and frees it
+> out from under the application.
+> 
+> This has been resolved in the v5 patch as suggested by Gerd by
+> scheduling a QEMUBH to perform the closures so they occur in order
+> before an attempt to open again. Even still this is clearly a design
+> flaw in the Jack2 library.
 
-Title:
-  QEMU S/390x sqxbr (128-bit IEEE 754 square root) crashes qemu-system-
-  s390x
+Agreed.
 
-Status in QEMU:
-  Fix Committed
-Status in qemu package in Ubuntu:
-  Fix Released
-Status in qemu source package in Focal:
-  Triaged
+I look at your v5 a bit later.
 
-Bug description:
-  [Impact]
+> > What latencies do you achieve BTW with Windows guests?
+> 
+> Never tested, it's not the reason why I use jack. 
 
-   * An instruction was described wrong so that on usage the program would =
+Surpring that you never checked the min. latency there, as you nailed quite an 
+ambitous jack driver into QEMU which I just realize now. Must have been 
+splipped my awareness due to traffic.
 
-     crash.
+> Suffice to say it's far better than PulseAudio,
 
-  [Test Case]
+Of course! :) I was shaking my head when distros started to pick PulseAudio as 
+standard sound server. I never got that decision as JACK was always way 
+superior than PA.
 
-   * Run s390x in emulation and there use this program:
-     For simplicity and speed you can use KVM guest as usual on s390x, that =
+Probably the only issue for consumer use cases is JACK's habit to kick 
+unreliable clients out of the graph. Even though this could be handled of 
+course.
 
-     after prep&install&compile of the test you run in qemu-tcg like:
+> I get no stuttering issues like is commonly
+> reported for ALSA and PA, and allows for a high degree of
+> reconfigurability. The guest VM overall performs far better also as
+> windows is never waiting on the audio device due to the decoupling
+> provided by the ring buffer in my implementation.
 
-     $ sudo qemu-system-s390x -machine s390-ccw-virtio,accel=3Dtcg -cpu max=
-,zpci=3Don -serial mon:stdio -display none -m 4096 -nic user,model=3Dvirtio=
-,hostfwd=3Dtcp::2222-:22 -drive file=3D/var/lib/uvtool/libvirt/images/focal=
--sqxbr.qcow,if=3Dnone,id=3Ddrive-virtio-disk0,format=3Dqcow2,cache=3Dnone -=
-device virtio-blk-ccw,devno=3Dfe.0.0001,drive=3Ddrive-virtio-disk0,id=3Dvir=
-tio-disk0,bootindex=3D1,scsi=3Doff
-     Obviously is you have no s390x access you need to use emulation right =
+Yeah, looks good indeed!
 
-     away.
+> >> I am aware and since these libraries are interchangeable I had assumed
+> >> that
+> >> JACK1 will have the same fault. If not I suppose we need to detect
+> >> which
+> >> is in
+> >> use and change this code appropriately.
+> > 
+> > I haven't checked this in the JACK1 code base yet, but I assume JACK1
+> > does not
+> > behave like JACK2 here, because the JACK API is very clear that it is
+> > the
+> > client's responsibility to free itself.
+> > 
+> > So it looks like a JACK2-only-bug to me.
+> 
+> Confirmed, this was investigated today.
+> 
+> > Very weird that there is no jack_client_version() in the shared weak
+> > API (i.e.
+> > missing on JACK1 side).
+> 
+> I raised this as an issue today:
+> https://github.com/jackaudio/jack2/issues/628
+> The developer there seems to feel that allowing the application to know
+> the jack client version is a bad thing.
 
-   * Build and run failing program
-     $ sudo apt install clang
-     $ cat > bug-sqrtl-one-line.c << EOF
-  int main(void) { volatile long double x, r; x =3D 4.0L; __asm__ =
+Yeah, I raised my voice there as well now.
 
-  __volatile__("sqxbr %0, %1" : "=3Df" (r) : "f" (x)); return (0);}
-  EOF
-     $ cc bug-sqrtl-one-line.c
-     $ ./a.out
-     Segmentation fault (core dumped)
+Best regards,
+Christian Schoenebeck
 
-     qemu is dead by now as long as the bug is present
 
-  [Regression Potential]
-
-   * The change only modifies 128 bit square root on s390x so regressions
-     should be limited to exactly that - which formerly before this fix was =
-
-     a broken instruction.
-
-  [Other Info]
-   =
-
-   * n/a
-
-  ---
-
-  In porting software to guest Ubuntu 18.04 and 20.04 VMs for S/390x, I dis=
-covered
-  that some of my own numerical programs, and also a GNU configure script f=
-or at
-  least one package with CC=3Dclang, would cause an instant crash of the VM=
-, sometimes
-  also destroying recently opened files, and producing long strings of NUL =
-characters
-  in /var/log/syslog in the S/390 guest O/S.
-
-  Further detective work narrowed the cause of the crash down to a single I=
-BM S/390
-  instruction: sqxbr (128-bit IEEE 754 square root).  Here is a one-line pr=
-ogram
-  that when compiled and run on a VM hosted on QEMUcc emulator version 4.2.0
-  (Debian 1:4.2-3ubuntu6.1) [hosted on Ubuntu 20.04 on a Dell Precision 7920
-  workstation with an Intel Xeon Platinum 8253 CPU],  and also on QEMU emul=
-ator
-  version 5.0.0, reproducibly produces a VM crash under qemu-system-s390x.
-
-  % cat bug-sqrtl-one-line.c
-  int main(void) { volatile long double x, r; x =3D 4.0L; __asm__ __volatil=
-e__("sqxbr %0, %1" : "=3Df" (r) : "f" (x)); return (0);}
-
-  % cc bug-sqrtl-one-line.c && ./a.out
-  Segmentation fault (core dumped)
-
-  The problem code may be the function float128_sqrt() defined in qemu-5.0.=
-0/fpu/softfloat.c
-  starting at line 7619.  I have NOT attempted to run the qemu-system-s390x=
- executable
-  under a debugger.  However, I observe that S/390 is the only CPU family t=
-hat I know of,
-  except possibly for a Fujitsu SPARC-64, that has a 128-bit square root in=
- hardware.
-  Thus, this instruction bug may not have been seen before.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1883984/+subscriptions
 
