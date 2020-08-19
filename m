@@ -7,76 +7,77 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6833C433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 18:33:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F0AAC433E1
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 18:34:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 81C6020658
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 18:33:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0128920658
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 18:34:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="F/Vy6ig4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 81C6020658
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XvHWAeRw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0128920658
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35378 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36740 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8SuA-0008R6-OU
-	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 14:33:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60150)
+	id 1k8SuR-0000Yu-8A
+	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 14:34:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60304)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
- id 1k8Sqx-00030h-2f
- for qemu-devel@nongnu.org; Wed, 19 Aug 2020 14:30:27 -0400
-Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:33816)
+ id 1k8Sr9-0003Kn-Ed
+ for qemu-devel@nongnu.org; Wed, 19 Aug 2020 14:30:39 -0400
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:45107)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <robert.foley@linaro.org>)
- id 1k8Squ-0001xc-H2
- for qemu-devel@nongnu.org; Wed, 19 Aug 2020 14:30:26 -0400
-Received: by mail-pj1-x1042.google.com with SMTP id c10so1486807pjn.1
- for <qemu-devel@nongnu.org>; Wed, 19 Aug 2020 11:30:24 -0700 (PDT)
+ id 1k8Sr2-0001zL-Km
+ for qemu-devel@nongnu.org; Wed, 19 Aug 2020 14:30:39 -0400
+Received: by mail-pl1-x642.google.com with SMTP id bh1so11223642plb.12
+ for <qemu-devel@nongnu.org>; Wed, 19 Aug 2020 11:30:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=lfY7bHrFHXynSVDo8ptewPOGV7rWpBju4iD77BNem5c=;
- b=F/Vy6ig4OwGRe58M2fAQ8YX9gUsZhSBu0NEwHt69H9UuLfbw7Ux4SXGlj6vdzDl7Y5
- xSmtlQxOzwstF81U+g8HsliT76DBYMFC63AKV5Bl77z+v63ZKlkZYiQCXt2+7ihiraMo
- FgfJzSypEA/Ib0T/IONW7vEg8er25At/5z5r7t2NmvWrMexzGV9ca8zB1SgnEsvwxq0g
- b2pCQ6ZOv9jN6QGaSpvO2NlYA7dDY5qtL6yTcAvcUCi2U27WAxEfJcTGXfc1wo6wSIGr
- Lmiaiq3WiCHMwX8YYJj6JBSIWLcfrPfauKKZxo3wZClTcE1+J/3dBV8AAsBVQN+Yceon
- ZgPQ==
+ bh=XjhVxP3wZMY8P1ZnNKA41CTeGCb1P/lneTETgUSsKQY=;
+ b=XvHWAeRw70TR0A1bl6pSaHwu4I4e4P7XH0xB+PR4yWp7m2N5gl4Dn9vQgRJ1xBAD5o
+ hfwy4oP+j13lWmnuYY4dAMqUm3nQaq7BmoodAu5MMP/rCle2gvT883c6y5H7osgt0X0Q
+ k46xng0htrR4MgIH1yYwEtHiLHBU8QInaGDCPOqibudpaOiUQd5mKRozv8uHrmIO72c5
+ LuUUsXMDcnncmEhu6T9Q6wWYEqpDYzXUCjUBoX9IBTO0h4Yf8ikcRFmxRzTDHKFTPhMQ
+ C/pS4abEgxpdUYd+Y6+rBJ4QOXV83TlGKUtnbVQHdCdBMoHQ72WYW7FLJM7XiWGDQB3q
+ 1IVQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=lfY7bHrFHXynSVDo8ptewPOGV7rWpBju4iD77BNem5c=;
- b=DBAum7Ba/3OcrkytrnontDlvZFFsstVuIhWarrZiLp243ndGY29y6uRp/YIfWGfyZA
- C8RkSOjkwxSFHy1Ixono3m6Pzehw82SSmJL1BEpa5QCduF2pHcBaVDyD1dbrNFk82DC5
- GCCoFlVq1W8F2yuyGm7XgmrP+YZGpxtAxPaqhDaP07j+plEBACGbsoBAtk9TgrWuSAtH
- zMXl4LrnvnYXtSD8qOb1C/ww/yCbdbMb28lz14Q5ye4zEHdS2xe8wHsgervbrLl64OLZ
- V+52LtmAsqWtFsHk6/zOKmKa0kxGQi7HLId1hZzs1P4s4cqeucTuSJcCXHWBbeUQqbqQ
- CXfw==
-X-Gm-Message-State: AOAM533e1LAOhzmIk9/g4gUtTqrp/nCmEf66Je0zZzbcdYgeMONbD82R
- a5UELtEoxoSFuInHdgf4Ru9TO8QsgjeSpv1+
-X-Google-Smtp-Source: ABdhPJwm/0hpsAPwXmdNFh/R0sR6jnousSmxARNTXMdpGukqoef4BSeiYBXpfCV59QVH7k7pJPURbw==
-X-Received: by 2002:a17:90a:8a87:: with SMTP id
- x7mr4618737pjn.81.1597861822894; 
- Wed, 19 Aug 2020 11:30:22 -0700 (PDT)
+ bh=XjhVxP3wZMY8P1ZnNKA41CTeGCb1P/lneTETgUSsKQY=;
+ b=JoYD50xQMTwj0fUwKWcMk1fdDmJmpFgaM1w/zjHxd+wj+TqTUEXbneOFAQJPoFVRpG
+ fFdp2O5zuEWsO5J6MaAZSAxHxyVkdyvHLUNReZ+KUwJuVxDOt6AxHJcs6Q4VxLRZD+Hd
+ mBxURBPMvXji77+Tbjz1Wszk/2zznDdRJUc3d5N86ZeUTwE4gjAKEySHl289AhFmrSu3
+ ug0grw35ifGgFU72vvhm8TSUeGBoIVgH+RNCAbywWnHAW7TC2Reb/cLOlHWuZ1ECJcdz
+ E2gp54HOdrJcZ4Ap0soRUPONGGRpvW76bjIdzEG5DQX3vPRe0JdYpWFSGN1zdsTPZTil
+ +6zw==
+X-Gm-Message-State: AOAM530YAq6Sk+g45NolI8jF4YAS5wqAGykFm06i/A9oBUQ6nhiAyEaz
+ piquEtXcUjs20KfDc10lSpMQ+3YXbvN5/xu5
+X-Google-Smtp-Source: ABdhPJxmi/XK+zKiwPRcOdRDnzEdolWeWcNDThIpgSnQc8DLWwLbsA3CT7xOMfDNbK9wZOFp+T72yg==
+X-Received: by 2002:a17:90a:ea82:: with SMTP id
+ h2mr5005878pjz.75.1597861830959; 
+ Wed, 19 Aug 2020 11:30:30 -0700 (PDT)
 Received: from Rfoley-MA01.hsd1.ma.comcast.net
  (c-73-47-162-176.hsd1.ma.comcast.net. [73.47.162.176])
- by smtp.gmail.com with ESMTPSA id p20sm220766pjg.44.2020.08.19.11.30.21
+ by smtp.gmail.com with ESMTPSA id p20sm220766pjg.44.2020.08.19.11.30.29
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 19 Aug 2020 11:30:22 -0700 (PDT)
+ Wed, 19 Aug 2020 11:30:30 -0700 (PDT)
 From: Robert Foley <robert.foley@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 3/7] target/cris: add CRISCPUClass->do_interrupt_locked
-Date: Wed, 19 Aug 2020 14:28:52 -0400
-Message-Id: <20200819182856.4893-4-robert.foley@linaro.org>
+Subject: [PATCH v2 5/7] accel/tcg: Change BQL critical section in
+ cpu_handle_interrupt
+Date: Wed, 19 Aug 2020 14:28:54 -0400
+Message-Id: <20200819182856.4893-6-robert.foley@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200819182856.4893-1-robert.foley@linaro.org>
 References: <20200819182856.4893-1-robert.foley@linaro.org>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1042;
- envelope-from=robert.foley@linaro.org; helo=mail-pj1-x1042.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::642;
+ envelope-from=robert.foley@linaro.org; helo=mail-pl1-x642.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -98,146 +99,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, pbonzini@redhat.com,
+Cc: pbonzini@redhat.com, Richard Henderson <rth@twiddle.net>,
  alex.bennee@linaro.org, robert.foley@linaro.org, peter.puhov@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Adding ->do_interrupt_locked to CRISCPUClass is preparation for
-pushing the BQL down into the per-arch implementation of ->do_interrupt.
+We are changing the critical section from being around
+the majority of the cpu_handle_interrupt to instead
+be around just the call to ->cpu_exec_interrupt.
 
-This is needed since Cris's *_cpu_exec_interrupt calls to *_do_interrupt.
-With the push down of the BQL into *_cpu_exec_interrupt and
-*_do_interrupt, *_cpu_exec_interrupt will call to ->do_interrupt
-with lock held.  Since ->do_interrupt also has the lock, we need a way
-to allow cpu_exec_interrupt to call do_interrupt with lock held.
-This patch solves the issue of *_cpu_exec_interrupt needing
-to call do_interrupt with lock held.
+This is in preparation for pushing down the BQL into the
+per arch implementation.
 
-This patch is part of a series of transitions to move the
-BQL down into the do_interrupt per arch functions.  This set of
-transitions is needed to maintain bisectability.
-
-This approach was suggested by Paolo Bonzini.
-For reference, here are two key posts in the discussion, explaining
-the reasoning/benefits of this approach.
-https://lists.gnu.org/archive/html/qemu-devel/2020-08/msg00784.html
-https://lists.gnu.org/archive/html/qemu-devel/2020-08/msg01517.html
-https://lists.gnu.org/archive/html/qemu-devel/2020-07/msg08731.html
-https://lists.gnu.org/archive/html/qemu-devel/2020-08/msg00044.html
+We should mention that we discussed these changes as well as
+some open questions here:
+https://lists.gnu.org/archive/html/qemu-devel/2020-08/msg01189.html
+With the main open question being:
+BQL is clearly needed to protect the critical section around the call to
+->cpu_exec_interrupt.  What else is the BQL protecting in cpu_handle_interrupt
+that we need to consider?  Are we missing anything here?
 
 Signed-off-by: Robert Foley <robert.foley@linaro.org>
 ---
- target/cris/cpu-qom.h | 3 +++
- target/cris/cpu.c     | 6 ++++++
- target/cris/helper.c  | 6 +++---
- 3 files changed, 12 insertions(+), 3 deletions(-)
+ accel/tcg/cpu-exec.c | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
 
-diff --git a/target/cris/cpu-qom.h b/target/cris/cpu-qom.h
-index f1de6041dc..dc94a17ffe 100644
---- a/target/cris/cpu-qom.h
-+++ b/target/cris/cpu-qom.h
-@@ -36,6 +36,7 @@
-  * @parent_realize: The parent class' realize handler.
-  * @parent_reset: The parent class' reset handler.
-  * @vr: Version Register value.
-+ * @do_interrupt_locked: Handler for interrupts (lock already held).
-  *
-  * A CRIS CPU model.
-  */
-@@ -48,6 +49,8 @@ typedef struct CRISCPUClass {
-     DeviceReset parent_reset;
+diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
+index e661635f06..499a8bdc5e 100644
+--- a/accel/tcg/cpu-exec.c
++++ b/accel/tcg/cpu-exec.c
+@@ -556,7 +556,6 @@ static inline bool cpu_handle_interrupt(CPUState *cpu,
+     if (unlikely(cpu_interrupt_request(cpu))) {
+         int interrupt_request;
  
-     uint32_t vr;
-+
-+    void (*do_interrupt_locked)(CPUState *cpu);
- } CRISCPUClass;
- 
- typedef struct CRISCPU CRISCPU;
-diff --git a/target/cris/cpu.c b/target/cris/cpu.c
-index 40b110f161..948eeb6260 100644
---- a/target/cris/cpu.c
-+++ b/target/cris/cpu.c
-@@ -200,6 +200,7 @@ static void crisv8_cpu_class_init(ObjectClass *oc, void *data)
- 
-     ccc->vr = 8;
-     cc->do_interrupt = crisv10_cpu_do_interrupt_locked;
-+    ccc->do_interrupt_locked = crisv10_cpu_do_interrupt_locked;
-     cc->gdb_read_register = crisv10_cpu_gdb_read_register;
-     cc->tcg_initialize = cris_initialize_crisv10_tcg;
- }
-@@ -211,6 +212,7 @@ static void crisv9_cpu_class_init(ObjectClass *oc, void *data)
- 
-     ccc->vr = 9;
-     cc->do_interrupt = crisv10_cpu_do_interrupt_locked;
-+    ccc->do_interrupt_locked = crisv10_cpu_do_interrupt_locked;
-     cc->gdb_read_register = crisv10_cpu_gdb_read_register;
-     cc->tcg_initialize = cris_initialize_crisv10_tcg;
- }
-@@ -222,6 +224,7 @@ static void crisv10_cpu_class_init(ObjectClass *oc, void *data)
- 
-     ccc->vr = 10;
-     cc->do_interrupt = crisv10_cpu_do_interrupt_locked;
-+    ccc->do_interrupt_locked = crisv10_cpu_do_interrupt_locked;
-     cc->gdb_read_register = crisv10_cpu_gdb_read_register;
-     cc->tcg_initialize = cris_initialize_crisv10_tcg;
- }
-@@ -233,6 +236,7 @@ static void crisv11_cpu_class_init(ObjectClass *oc, void *data)
- 
-     ccc->vr = 11;
-     cc->do_interrupt = crisv10_cpu_do_interrupt_locked;
-+    ccc->do_interrupt_locked = crisv10_cpu_do_interrupt_locked;
-     cc->gdb_read_register = crisv10_cpu_gdb_read_register;
-     cc->tcg_initialize = cris_initialize_crisv10_tcg;
- }
-@@ -244,6 +248,7 @@ static void crisv17_cpu_class_init(ObjectClass *oc, void *data)
- 
-     ccc->vr = 17;
-     cc->do_interrupt = crisv10_cpu_do_interrupt_locked;
-+    ccc->do_interrupt_locked = crisv10_cpu_do_interrupt_locked;
-     cc->gdb_read_register = crisv10_cpu_gdb_read_register;
-     cc->tcg_initialize = cris_initialize_crisv10_tcg;
- }
-@@ -269,6 +274,7 @@ static void cris_cpu_class_init(ObjectClass *oc, void *data)
-     cc->class_by_name = cris_cpu_class_by_name;
-     cc->has_work = cris_cpu_has_work;
-     cc->do_interrupt = cris_cpu_do_interrupt_locked;
-+    ccc->do_interrupt_locked = cris_cpu_do_interrupt_locked;
-     cc->cpu_exec_interrupt = cris_cpu_exec_interrupt;
-     cc->dump_state = cris_cpu_dump_state;
-     cc->set_pc = cris_cpu_set_pc;
-diff --git a/target/cris/helper.c b/target/cris/helper.c
-index e0ee6b4e05..3b7ee74813 100644
---- a/target/cris/helper.c
-+++ b/target/cris/helper.c
-@@ -290,7 +290,7 @@ hwaddr cris_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
- 
- bool cris_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
- {
--    CPUClass *cc = CPU_GET_CLASS(cs);
-+    CRISCPUClass *ccc = CRIS_CPU_CLASS(cs);
-     CRISCPU *cpu = CRIS_CPU(cs);
-     CPUCRISState *env = &cpu->env;
-     bool ret = false;
-@@ -299,7 +299,7 @@ bool cris_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
-         && (env->pregs[PR_CCS] & I_FLAG)
-         && !env->locked_irq) {
-         cs->exception_index = EXCP_IRQ;
--        cc->do_interrupt(cs);
-+        ccc->do_interrupt_locked(cs);
-         ret = true;
-     }
-     if (interrupt_request & CPU_INTERRUPT_NMI) {
-@@ -311,7 +311,7 @@ bool cris_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
+-        qemu_mutex_lock_iothread();
+         interrupt_request = cpu_interrupt_request(cpu);
+         if (unlikely(cpu->singlestep_enabled & SSTEP_NOIRQ)) {
+             /* Mask out external interrupts for this step. */
+@@ -565,7 +564,6 @@ static inline bool cpu_handle_interrupt(CPUState *cpu,
+         if (interrupt_request & CPU_INTERRUPT_DEBUG) {
+             cpu_reset_interrupt(cpu, CPU_INTERRUPT_DEBUG);
+             cpu->exception_index = EXCP_DEBUG;
+-            qemu_mutex_unlock_iothread();
+             return true;
          }
-         if ((env->pregs[PR_CCS] & m_flag_archval)) {
-             cs->exception_index = EXCP_NMI;
--            cc->do_interrupt(cs);
-+            ccc->do_interrupt_locked(cs);
-             ret = true;
+         if (replay_mode == REPLAY_MODE_PLAY && !replay_has_interrupt()) {
+@@ -575,13 +573,13 @@ static inline bool cpu_handle_interrupt(CPUState *cpu,
+             cpu_reset_interrupt(cpu, CPU_INTERRUPT_HALT);
+             cpu_halted_set(cpu, 1);
+             cpu->exception_index = EXCP_HLT;
+-            qemu_mutex_unlock_iothread();
+             return true;
          }
+ #if defined(TARGET_I386)
+         else if (interrupt_request & CPU_INTERRUPT_INIT) {
+             X86CPU *x86_cpu = X86_CPU(cpu);
+             CPUArchState *env = &x86_cpu->env;
++            qemu_mutex_lock_iothread();
+             replay_interrupt();
+             cpu_svm_check_intercept_param(env, SVM_EXIT_INIT, 0, 0);
+             do_cpu_init(x86_cpu);
+@@ -593,7 +591,6 @@ static inline bool cpu_handle_interrupt(CPUState *cpu,
+         else if (interrupt_request & CPU_INTERRUPT_RESET) {
+             replay_interrupt();
+             cpu_reset(cpu);
+-            qemu_mutex_unlock_iothread();
+             return true;
+         }
+ #endif
+@@ -602,6 +599,7 @@ static inline bool cpu_handle_interrupt(CPUState *cpu,
+            True when it is, and we should restart on a new TB,
+            and via longjmp via cpu_loop_exit.  */
+         else {
++            qemu_mutex_lock_iothread();
+             if (cc->cpu_exec_interrupt(cpu, interrupt_request)) {
+                 replay_interrupt();
+                 /*
+@@ -616,6 +614,7 @@ static inline bool cpu_handle_interrupt(CPUState *cpu,
+             /* The target hook may have updated the 'cpu->interrupt_request';
+              * reload the 'interrupt_request' value */
+             interrupt_request = cpu_interrupt_request(cpu);
++            qemu_mutex_unlock_iothread();
+         }
+         if (interrupt_request & CPU_INTERRUPT_EXITTB) {
+             cpu_reset_interrupt(cpu, CPU_INTERRUPT_EXITTB);
+@@ -625,7 +624,6 @@ static inline bool cpu_handle_interrupt(CPUState *cpu,
+         }
+ 
+         /* If we exit via cpu_loop_exit/longjmp it is reset in cpu_exec */
+-        qemu_mutex_unlock_iothread();
      }
+ 
+     /* Finally, check if we need to exit to the main loop.  */
 -- 
 2.17.1
 
