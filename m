@@ -2,125 +2,94 @@ Return-Path: <SRS0=bVMU=B5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.4 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80253C433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 09:49:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BFF96C433E1
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 09:49:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 48F4920738
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 09:49:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 84FCB20738
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 09:49:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="gWvJfeYf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48F4920738
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Id/M38uE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84FCB20738
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34188 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36444 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8Kig-0001qM-Dh
-	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 05:49:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49820)
+	id 1k8KjD-0002k4-P7
+	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 05:49:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49912)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1k8Kht-0000y0-Vl; Wed, 19 Aug 2020 05:48:33 -0400
-Received: from mail-eopbgr80112.outbound.protection.outlook.com
- ([40.107.8.112]:47342 helo=EUR04-VI1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1k8Khr-0003hS-CY; Wed, 19 Aug 2020 05:48:33 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=L5JJPF3/d8flGh/piDKD7sjPg7L4xhhEOz3pgdvh8ZgtGM7fp8Be57UBCz9vVj+qhCn86qVsGIES/TOl/8nw1tJkliSBXDFrepcHTtu6D6HokPL8R4PTsZwDWX7AmuLbDHE+sfWP7ZsEjfyvz+vINi5o6WnlpVOYxf767qRNRiNno2f5doQvyZFd1LiZHGkpU9Nw/+I6OiiTKdNnhyOlUFUkjYxR3SC0myv4C8nvcMXks4oAXJOuACJuCKKXNYlS6ufUvsvdRu9kqtxFUAiVKfmQE9F3ThFEprFYBrSjP7dompl7SA4Uw7VjC20mgzGNRiH/hyiNxGA29D1WSWmutA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=9vzkA0RJBsJ3Gfuy3w0yifRaf9dz3KK3YWtfJG3TwHU=;
- b=h/M7KrNv+nKj/1wGDixL8eTp/zCOcVpRHhygEhh07NjSTXg4M94r01amfDAtMArfCRYz9FlucKcaqTamKVt/95B01dCbL2cuksRbMLn01bmqjNe3/6Ww4D+myzY6SocZCbnO+nP5jukubNP6758/KtLmIlkqrreb5Bt839mVV5pECh/++xCXVwi/sY6EdKzmymy7mtoGO6FEilirWTnSnfjMOf24D08qujjoiB+GcTVOPIOTs9DOhdDWZYMukWtRKPL18TJM/0mrQirLPmtUxmQfOeqnXziXnDqL56Va7scZSrxtgrIcLsBV0cp2Ke2Il8t5wQ1Vb3DqwyUDABXzkw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=9vzkA0RJBsJ3Gfuy3w0yifRaf9dz3KK3YWtfJG3TwHU=;
- b=gWvJfeYfJlZU9G3WEWrt36fUfoIuL60SY/BcZ4GrZ4wus5RRbqkswH+1ciz3pDtSTed0rzhykAfWq2itPsjvAkrDx1zDwFpajud0j/XfdvupBUTuC/uq7e9Y/RGyXBfX7FHk75eRn0UK6JoTs8lAwrnewbZYAJ7MYBS+3ahb7do=
-Authentication-Results: openvz.org; dkim=none (message not signed)
- header.d=none;openvz.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM5PR0801MB1841.eurprd08.prod.outlook.com (2603:10a6:203:2e::7)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3283.15; Wed, 19 Aug
- 2020 09:48:28 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::8c0c:c056:97a5:484a]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::8c0c:c056:97a5:484a%3]) with mapi id 15.20.3283.027; Wed, 19 Aug 2020
- 09:48:28 +0000
-Subject: Re: [PATCH v5 1/5] block/io: fix bdrv_co_block_status_above
-To: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org
-References: <20200610120426.12826-1-vsementsov@virtuozzo.com>
- <20200610120426.12826-2-vsementsov@virtuozzo.com>
- <w51lficjb0d.fsf@maestria.local.igalia.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <57758b78-227a-c753-db9e-fe503b163927@virtuozzo.com>
-Date: Wed, 19 Aug 2020 12:48:25 +0300
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1k8KiG-0001Uz-FN
+ for qemu-devel@nongnu.org; Wed, 19 Aug 2020 05:48:56 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:39336
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1k8KiE-0003k4-IM
+ for qemu-devel@nongnu.org; Wed, 19 Aug 2020 05:48:56 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1597830533;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=CV5wzjyC0TWi4+0o2rjlapQblWwDACNKzSgsIdLbfHs=;
+ b=Id/M38uEV1rYVEOnWKjRbXPV8ibt2A1dCD6SU6QyLgfQcgX3Q2KELLYCSmbIp7J8MJ/MMa
+ aGNZ0mr2uEhH1PQVl+EZ5trFiH3ua5OGYIi79bOhSpGFV33pwvHUCmNTLQuy/yk+PBvlen
+ SZC9imNlrQkoZ4TYd7B5Yxg1VW278Ys=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-90-7na8iH7BOriyLQ84Gy3Mww-1; Wed, 19 Aug 2020 05:48:50 -0400
+X-MC-Unique: 7na8iH7BOriyLQ84Gy3Mww-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 36460100CF6F;
+ Wed, 19 Aug 2020 09:48:49 +0000 (UTC)
+Received: from [10.36.113.93] (ovpn-113-93.ams2.redhat.com [10.36.113.93])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6D6D27B90C;
+ Wed, 19 Aug 2020 09:48:41 +0000 (UTC)
+Subject: Re: virtio-vsock requires 'disable-legacy=on' in QEMU 5.1
+To: Cornelia Huck <cohuck@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>
+References: <CAGxU2F7pVNWtJG2BM2bk9qtJ_UHgDw4kjVqRmL-=yme7VX83Vg@mail.gmail.com>
+ <20200813112820.62ffd63e.cohuck@redhat.com>
+ <20200813102430.vjnc56anqjaxn4tw@steredhat.lan>
+ <20200813123737.25ba11d2.cohuck@redhat.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <ec3fde88-7c40-49f9-fa9a-06cd4f7308f2@redhat.com>
+Date: Wed, 19 Aug 2020 11:48:38 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
-In-Reply-To: <w51lficjb0d.fsf@maestria.local.igalia.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: AM4PR0701CA0011.eurprd07.prod.outlook.com
- (2603:10a6:200:42::21) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.5] (185.215.60.171) by
- AM4PR0701CA0011.eurprd07.prod.outlook.com (2603:10a6:200:42::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3305.13 via Frontend
- Transport; Wed, 19 Aug 2020 09:48:27 +0000
-X-Originating-IP: [185.215.60.171]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 6e119408-395f-4dd0-489b-08d844250601
-X-MS-TrafficTypeDiagnostic: AM5PR0801MB1841:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM5PR0801MB1841FDDF74FFD4494D9CAF83C15D0@AM5PR0801MB1841.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Bg0kTscfhWW/kISkI/ZKYJEO69zaNwU+9Ce9s5VRjn7BkSZyEvyn+djZ90PZePOcr5UIPMMErOoVRlQrhubc/d6nUpAoQlqn7l0GbTRCzu4BzBF+OHx4uNLXwOr83fOufFyeR4rfiuNfypXUVUeh56/H47gZ4b7EH2Eq74gHNtUtEspYKP086fFN/BMwuXKkb91J5SDCZlQFBAT3zrRN+0kmdFwRwfKWo2Re6g4Uaum8bxKsBlOkf2VzDf/jLLN9Mg+WPv1dwzfbg82EcP3jxzXsuzs7YGlIpitSjWwRM/Zs6ZNTBuUe/BDZfDGIJqUiYBSa33APjZoJa9bRMQ467qOBV4/RizWg7XFoLe4XDagjgvLIvoaw+S/CCm0UQhDd
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(346002)(376002)(39840400004)(396003)(366004)(136003)(6486002)(186003)(2616005)(36756003)(26005)(16526019)(8936002)(956004)(31686004)(2906002)(52116002)(8676002)(16576012)(83380400001)(66946007)(31696002)(66556008)(4326008)(66476007)(5660300002)(316002)(478600001)(86362001)(107886003)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: SNbL+w9yYHxV0uY61ICQMh3QqiGL8wrSL0ydzNZkDSUgxoEDUVRSruWgMZR6GjJ7qz6UT0bkjLjkcSqwqQ16+R/cPck8oPzoyR2jSdVt140s3XwT4Joe1EE/P6xtwYUUhL8wgu7hV8ioQpD85RTEkjgMv+/jue9mQ6dL4aG5UivGV109qe0Sgy1+PqJjrHLDkbhjc/IK5SVmjmO/2pw/pV7OfoawI7h+usWJYLtqDGBRpsg066Zz2uwOpC2tefOynSZHxibz5Ow6BmkbDtXNRft07Oohfl680uiPQZjNdXAZ7ggKiOmri01+wvnvPledKGpYwa9HVMZ4GkZ/F/OXC7oR7/HBFyN+sZlzFo0Xn/LoFlrqa5ob9ncWwI5s6RhNZkZ5OG/x+4h9LUYWXInKeqph0gZqOrnY2+oryCtl+NC8dhBUAUaKpfnhBxU6wfURQ7ksOd6WLf5prQa3HyP9nx475Z++NBkCNYMEFprKUMAvX7xag+1tbm9HsNkAMym3ShVIpSzvmA8F6YrV1ni9DaLjNbz8qxLTMtygD9ou2r+5W1owOcB96wAsazlu1pDVQVwSxCI5GrVvPYB0ocUWU1++0B7l1j/qomY6ZTYPTspODxyR+AJ+sr2y2h+/BKUOEJh0246/wKdZo238dex85Q==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6e119408-395f-4dd0-489b-08d844250601
-X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Aug 2020 09:48:27.9624 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Jvcn4UjbArIuwG1+ZzEOTUx0Eo3SNfcnqVmFXjwgq9lRYrlmA8gMelh3F3Ogy3brgMnlBwRnGf0/+Pe/mor+DEo3tsNyR5G2qQYak5clk/A=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM5PR0801MB1841
-Received-SPF: pass client-ip=40.107.8.112;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR04-VI1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/19 05:48:29
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -37
-X-Spam_score: -3.8
+In-Reply-To: <20200813123737.25ba11d2.cohuck@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eric.auger@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.120;
+ envelope-from=eric.auger@redhat.com; helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 23:05:17
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
 X-Spam_bar: ---
-X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -133,50 +102,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, kwolf@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com,
- stefanha@redhat.com, den@openvz.org
+Cc: Qinghua Cheng <qcheng@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Jean-Philippe Brucker <Jean-Philippe.Brucker@arm.com>,
+ qemu devel list <qemu-devel@nongnu.org>, Halil Pasic <pasic@linux.ibm.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Thanks a lot for reviewing!
-
-18.08.2020 17:15, Alberto Garcia wrote:
-> On Wed 10 Jun 2020 02:04:22 PM CEST, Vladimir Sementsov-Ogievskiy wrote:
->> +             * The top layer deferred to this layer, and because this layer is
->> +             * short, any zeroes that we synthesize beyond EOF behave as if they
->> +             * were allocated at this layer
->>                */
->> +            assert(ret & BDRV_BLOCK_EOF);
->>               *pnum = bytes;
->> +            if (file) {
->> +                *file = p;
->> +            }
->> +            return BDRV_BLOCK_ZERO | BDRV_BLOCK_ALLOCATED;
+Hi,
+On 8/13/20 12:37 PM, Cornelia Huck wrote:
+> On Thu, 13 Aug 2020 12:24:30 +0200
+> Stefano Garzarella <sgarzare@redhat.com> wrote:
 > 
-> You don't add BDRV_BLOCK_EOF to the return code here ?
+>> On Thu, Aug 13, 2020 at 11:28:20AM +0200, Cornelia Huck wrote:
+>>> On Thu, 13 Aug 2020 11:16:56 +0200
+>>> Stefano Garzarella <sgarzare@redhat.com> wrote:
+>>>   
+>>>> Hi,
+>>>>
+>>>> Qinghua discovered that virtio-vsock-pci requires 'disable-legacy=on' in
+>>>> QEMU 5.1:
+>>>>     $ ./qemu-system-x86_64 ... -device vhost-vsock-pci,guest-cid=5
+>>>>     qemu-system-x86_64: -device vhost-vsock-pci,guest-cid=5:
+>>>>     device is modern-only, use disable-legacy=on
 
-No we shouldn't, as this is the end of backing file when the top layer is larger.
+For info that's the same for virtio-iommu. + Jean-Philippe.
 
+Reading this thread to better understand what is the best thing to do
+now ;-)
+
+Thanks
+
+Eric
+>>>>
+>>>> Bisecting I found that this behaviour starts from this commit:
+>>>> 9b3a35ec82 ("virtio: verify that legacy support is not accidentally on")  
+>>>
+>>> Oh, I had heard that from others already, was still trying to figure
+>>> out what to do.
+>>>   
+>>>>
+>>>> IIUC virtio-vsock is modern-only, so I tried this patch and it works:
+>>>>
+>>>> diff --git a/hw/virtio/vhost-user-vsock-pci.c b/hw/virtio/vhost-user-vsock-pci.c
+>>>> index f4cf95873d..6e4cc874cd 100644
+>>>> --- a/hw/virtio/vhost-user-vsock-pci.c
+>>>> +++ b/hw/virtio/vhost-user-vsock-pci.c
+>>>> @@ -40,6 +40,7 @@ static void vhost_user_vsock_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
+>>>>      VHostUserVSockPCI *dev = VHOST_USER_VSOCK_PCI(vpci_dev);
+>>>>      DeviceState *vdev = DEVICE(&dev->vdev);
+>>>>
+>>>> +    virtio_pci_force_virtio_1(vpci_dev);
+>>>>      qdev_realize(vdev, BUS(&vpci_dev->bus), errp);
+>>>>  }
+>>>>
+>>>> diff --git a/hw/virtio/vhost-vsock-pci.c b/hw/virtio/vhost-vsock-pci.c
+>>>> index a815278e69..f641b974e9 100644
+>>>> --- a/hw/virtio/vhost-vsock-pci.c
+>>>> +++ b/hw/virtio/vhost-vsock-pci.c
+>>>> @@ -44,6 +44,7 @@ static void vhost_vsock_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
+>>>>      VHostVSockPCI *dev = VHOST_VSOCK_PCI(vpci_dev);
+>>>>      DeviceState *vdev = DEVICE(&dev->vdev);
+>>>>
+>>>> +    virtio_pci_force_virtio_1(vpci_dev);
+>>>>      qdev_realize(vdev, BUS(&vpci_dev->bus), errp);
+>>>>  }
+>>>>
+>>>>
+>>>> Do you think this is the right approach or is there a better way to
+>>>> solve this issue?  
+>>>
+>>> We basically have three possible ways to deal with this:
+>>>
+>>> - Force it to modern (i.e., what you have been doing; would need the
+>>>   equivalent changes in ccw as well.)  
+>>
+>> Oo, thanks for pointing out ccw!
+>> I don't know ccw well, in this case should we set dev->max_rev to 1 or 2
+>> to force to modern?
 > 
->> +        res = bdrv_block_status_above(bs, NULL, offset, bytes, &nr, NULL, NULL);
->> +        offset += nr;
->> +        bytes -= nr;
->> +    } while (res >= 0 && (res & BDRV_BLOCK_ZERO) && nr && bytes);
+> No, ->max_rev is the wrong side of the limit :) You want
 > 
-> About this last "... && nr && bytes", I think 'nr' already implies
-> 'bytes', maybe you want to use an assertion instead?
-
-No, on the last iteration, bytes would be 0 and nr is a last chunk. So, if we check
-only nr, we'll do one extra call of bdrv_block_status_above with bytes=0, I don't
-want do it.
-
+>     ccw_dev->force_revision_1 = true;
 > 
-> Berto
+> in _instance_init() (see e.g. virtio-ccw-gpu.c).
+> 
+>>
+>>>   Pro: looks like the cleanest approach.
+>>>   Con: not sure if we would need backwards compatibility support,
+>>>   which looks hairy.  
+>>
+>> Not sure too.
+> 
+> Yes, I'm not sure at all how to handle user-specified values for
+> legacy/modern.
+> 
+>>
+>>> - Add vsock to the list of devices with legacy support.
+>>>   Pro: Existing setups continue to work.
+>>>   Con: If vsock is really virtio-1-only, we still carry around
+>>>   possibly broken legacy support.  
+>>
+>> I'm not sure it is virtio-1-only, but virtio-vsock was introduced in
+>> 2016, so I supposed it is modern-only.
+> 
+> Yes, I would guess so as well.
+> 
+>>
+>> How can I verify that? Maybe forcing legacy mode and run some tests.
+> 
+> Probably yes. The likeliest area with issues is probably endianness, so
+> maybe with something big endian in the mix?
+> 
+>>
+>>> - Do nothing, have users force legacy off. Bad idea, as ccw has no way
+>>>   to do that on the command line.
+>>>
+>>> The first option is probably best.
+>>>  
+>>
+>> Yeah, I agree with you!
+> 
+> Yes, it's really a pity we only noticed this after the release; this
+> was supposed to stop new devices with legacy support creeping in, not
+> to break existing command lines :(
+> 
 > 
 
-
--- 
-Best regards,
-Vladimir
 
