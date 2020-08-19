@@ -2,88 +2,70 @@ Return-Path: <SRS0=bVMU=B5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D00E4C433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 14:15:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C690C433E1
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 14:17:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9871C20639
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 14:15:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CFDF620639
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 14:17:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CGPblsY8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9871C20639
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="m4er1Uio"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CFDF620639
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=163.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42288 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46856 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8OsQ-0002Vs-Ug
-	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 10:15:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41024)
+	id 1k8OuU-0004On-4i
+	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 10:17:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41874)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1k8Oqp-0000f6-4X
- for qemu-devel@nongnu.org; Wed, 19 Aug 2020 10:14:03 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36297)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1k8Oqn-0006iW-Dq
- for qemu-devel@nongnu.org; Wed, 19 Aug 2020 10:14:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597846440;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=XuQSGk1xLC0D9Z9pnyuZtZwysCty3Vs4FCDNPxUoJe4=;
- b=CGPblsY8gEWGIP9f+11YXneNc35EYWSuW3Yys/hXNc1+48yxbdzzYWF8QZ7y7Hc6njTTiW
- aCFI7qfg1GrQfx2UnkWtdnhJQ7JCh4hHrjPYrcVi0h0FySxxrAsC3Kc3J+OljQg7wdCYKT
- XMulYRI9Tk9Z3LjdPc6cnJTsdDsPJIc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-401-Wup_fGVzMN2DD1MLxhF-lQ-1; Wed, 19 Aug 2020 10:13:57 -0400
-X-MC-Unique: Wup_fGVzMN2DD1MLxhF-lQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1226664086;
- Wed, 19 Aug 2020 14:13:53 +0000 (UTC)
-Received: from localhost (ovpn-113-22.ams2.redhat.com [10.36.113.22])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2BD3C10098A7;
- Wed, 19 Aug 2020 14:13:45 +0000 (UTC)
-Date: Wed, 19 Aug 2020 15:13:45 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: Re: [PATCH v6 1/7] Open 5.2 development tree
-Message-ID: <20200819141345.GE366841@stefanha-x1.localdomain>
-References: <20200818143348.310613-1-stefanha@redhat.com>
- <20200818143348.310613-2-stefanha@redhat.com>
-MIME-Version: 1.0
-In-Reply-To: <20200818143348.310613-2-stefanha@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
-X-Mimecast-Spam-Score: 0.0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="BZaMRJmqxGScZ8Mx"
-Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=stefanha@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/19 10:07:28
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ (Exim 4.90_1) (envelope-from <liq3ea@163.com>) id 1k8Ot3-0003bT-Dq
+ for qemu-devel@nongnu.org; Wed, 19 Aug 2020 10:16:21 -0400
+Received: from mail-m975.mail.163.com ([123.126.97.5]:59168)
+ by eggs.gnu.org with esmtps (TLS1.2:DHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <liq3ea@163.com>) id 1k8Osv-0007Cb-4J
+ for qemu-devel@nongnu.org; Wed, 19 Aug 2020 10:16:20 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+ s=s110527; h=From:Subject:Date:Message-Id; bh=ok/hO3SbP+jaUNCSRn
+ 1mQzSYkyRJ4LXyqYAyM5lI3zY=; b=m4er1UioAt2XSprXluhFx1WUuG8satenW0
+ 68DLQWLPJ2JwyGmKfqacEA1tldivGe1tbkMdzfOcYfXCDzOUpU0JZo1haeN0HFc7
+ RDqyrphxFSDsHhUYJdbjyE1o9kNrcMWYXOpmR0rJMeyYOrDSYvGadkk67Ip3emu6
+ cNpnaZPZM=
+Received: from localhost.localdomain (unknown [60.177.59.214])
+ by smtp5 (Coremail) with SMTP id HdxpCgDXn7oKND1f775JEQ--.195S4;
+ Wed, 19 Aug 2020 22:15:42 +0800 (CST)
+From: Li Qiang <liq3ea@163.com>
+To: thuth@redhat.com, lvivier@redhat.com, pbonzini@redhat.com, alxndr@bu.edu
+Subject: [PATCH] qtest: add fuzz test case
+Date: Wed, 19 Aug 2020 07:15:33 -0700
+Message-Id: <20200819141533.66354-1-liq3ea@163.com>
+X-Mailer: git-send-email 2.17.1
+X-CM-TRANSID: HdxpCgDXn7oKND1f775JEQ--.195S4
+X-Coremail-Antispam: 1Uf129KBjvJXoWxXrWxGFyruF45Aw1ruw18Grg_yoW5tF4kpF
+ yqkwnYkrn7A3W7XrWfGF12qr15Ar4fAF4DGFZ7Jr1UuF40kay7GFn7KrWjqrn3G3yIv3yj
+ 93WktF1agFyrtaUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+ 9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07joyx_UUUUU=
+X-Originating-IP: [60.177.59.214]
+X-CM-SenderInfo: 5oltjvrd6rljoofrz/xtbBoRKFbVQHLSCAygAAsP
+Received-SPF: pass client-ip=123.126.97.5; envelope-from=liq3ea@163.com;
+ helo=mail-m975.mail.163.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/19 10:16:01
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,64 +78,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
- Thomas Huth <thuth@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- qemu-block@nongnu.org, Peter Maydell <peter.maydell@linaro.org>,
- cohuck@redhat.com, David Hildenbrand <david@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Raphael Norwitz <raphael.norwitz@nutanix.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- Fam Zheng <fam@euphon.net>, David Gibson <david@gibson.dropbear.id.au>,
- Max Reitz <mreitz@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Li Qiang <liq3ea@163.com>, liq3ea@gmail.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---BZaMRJmqxGScZ8Mx
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Currently the device fuzzer find a more and more issues.
+For every fuzz case, we need not only the fixes but also
+the coressponding test case. We can analysis the reproducer
+for every case and find what happened in where and write
+a beautiful test case. However the raw data of reproducer is not
+friendly to analysis. It will take a very long time, even far more
+than the fixes itself. So let's create a new file to hold all of
+the fuzz test cases and just use the raw data to act as the test
+case. This way nobody will be afraid of writing a test case for
+the fuzz reproducer.
 
-On Tue, Aug 18, 2020 at 03:33:42PM +0100, Stefan Hajnoczi wrote:
-> From: Peter Maydell <peter.maydell@linaro.org>
->=20
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  VERSION | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/VERSION b/VERSION
-> index 831446cbd2..7d40cb9d36 100644
-> --- a/VERSION
-> +++ b/VERSION
-> @@ -1 +1 @@
-> -5.1.0
-> +5.1.50
-> --=20
-> 2.26.2
+This patch adds the issue LP#1878263 test case.
 
-This patch was sent by accident, please skip it when applying the
-series. Git should do that automatically.
+Signed-off-by: Li Qiang <liq3ea@163.com>
+---
+ tests/qtest/Makefile.include |  2 ++
+ tests/qtest/fuzz-test.c      | 45 ++++++++++++++++++++++++++++++++++++
+ 2 files changed, 47 insertions(+)
+ create mode 100644 tests/qtest/fuzz-test.c
 
-Stefan
-
---BZaMRJmqxGScZ8Mx
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl89M5kACgkQnKSrs4Gr
-c8g3vgf+OR00zpvolbOLjqmOV9qD1cl8sDnvjoDOkHD80F84nawezKgNV4fNHUhv
-45jNcrs7yMs1xe1BugNvz8VYMJi6zq2I3dcQ6PwfxUZVQ6TcJfIfR9QlVbS2rXOn
-YVHmq2ReiPNloFjr/Y/OGGkk50kuR/J2+ud4Gv0KZ/F9ZtrPvSnvxtE9ccDj8o7m
-4xE8wwmlQZqUW9gQwAmcLwsvzpFpghoPOuEcd+ORFzBSNvvOgzyI1ckXJypk9OMe
-Nsnos7QksaRAQzkPTqOqdZoEEEDjiyiWLJPONt3HtOW/ZqasRmd2Xij4hqN/YQnG
-WyRVJECTMpTkzk56qcOwObiBdALzFg==
-=VDDg
------END PGP SIGNATURE-----
-
---BZaMRJmqxGScZ8Mx--
+diff --git a/tests/qtest/Makefile.include b/tests/qtest/Makefile.include
+index b0204e44f2..ff460179c5 100644
+--- a/tests/qtest/Makefile.include
++++ b/tests/qtest/Makefile.include
+@@ -7,6 +7,7 @@ check-qtest-generic-y += machine-none-test
+ check-qtest-generic-y += qmp-test
+ check-qtest-generic-y += qmp-cmd-test
+ check-qtest-generic-y += qom-test
++check-qtest-generic-y += fuzz-test
+ check-qtest-generic-$(CONFIG_MODULES) += modules-test
+ check-qtest-generic-y += test-hmp
+ 
+@@ -272,6 +273,7 @@ tests/qtest/m25p80-test$(EXESUF): tests/qtest/m25p80-test.o
+ tests/qtest/i440fx-test$(EXESUF): tests/qtest/i440fx-test.o $(libqos-pc-obj-y)
+ tests/qtest/q35-test$(EXESUF): tests/qtest/q35-test.o $(libqos-pc-obj-y)
+ tests/qtest/fw_cfg-test$(EXESUF): tests/qtest/fw_cfg-test.o $(libqos-pc-obj-y)
++tests/qtest/fuzz-test$(EXESUF): tests/qtest/fuzz-test.o $(libqos-pc-obj-y)
+ tests/qtest/rtl8139-test$(EXESUF): tests/qtest/rtl8139-test.o $(libqos-pc-obj-y)
+ tests/qtest/pnv-xscom-test$(EXESUF): tests/qtest/pnv-xscom-test.o
+ tests/qtest/wdt_ib700-test$(EXESUF): tests/qtest/wdt_ib700-test.o
+diff --git a/tests/qtest/fuzz-test.c b/tests/qtest/fuzz-test.c
+new file mode 100644
+index 0000000000..695c6dffb9
+--- /dev/null
++++ b/tests/qtest/fuzz-test.c
+@@ -0,0 +1,45 @@
++/*
++ * QTest testcase for fuzz case
++ *
++ * Copyright (c) 2020 Li Qiang <liq3ea@gmail.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
++
++
++#include "qemu/osdep.h"
++
++#include "libqtest.h"
++
++/*
++ * This used to trigger the assert in scsi_dma_complete
++ * https://bugs.launchpad.net/qemu/+bug/1878263
++ */
++static void test_megasas_zero_iov_cnt(void)
++{
++    QTestState *s;
++
++    s = qtest_init("-nographic -monitor none -serial none "
++                   "-M q35 -device megasas -device scsi-cd,drive=null0 "
++                   "-blockdev driver=null-co,read-zeroes=on,node-name=null0");
++    qtest_outl(s, 0xcf8, 0x80001818);
++    qtest_outl(s, 0xcfc, 0xc101);
++    qtest_outl(s, 0xcf8, 0x8000181c);
++    qtest_outl(s, 0xcf8, 0x80001804);
++    qtest_outw(s, 0xcfc, 0x7);
++    qtest_outl(s, 0xcf8, 0x8000186a);
++    qtest_writeb(s, 0x14, 0xfe);
++    qtest_writeb(s, 0x0, 0x02);
++    qtest_outb(s, 0xc1c0, 0x17);
++    qtest_quit(s);
++}
++
++int main(int argc, char **argv)
++{
++    g_test_init(&argc, &argv, NULL);
++
++    qtest_add_func("fuzz/megasas_zero_iov_cnt", test_megasas_zero_iov_cnt);
++
++    return g_test_run();
++}
+-- 
+2.17.1
 
 
