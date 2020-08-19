@@ -2,89 +2,129 @@ Return-Path: <SRS0=bVMU=B5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2826C433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 15:08:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A73A2C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 15:09:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BB04C20882
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 15:08:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 70EEC20882
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 15:09:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D/HTKm1r"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB04C20882
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NQTzTMDK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70EEC20882
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35704 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37518 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8PhJ-0006Cg-TV
-	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 11:08:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58256)
+	id 1k8PiC-00073i-PT
+	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 11:09:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58502)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1k8PgT-0005P6-Mt
- for qemu-devel@nongnu.org; Wed, 19 Aug 2020 11:07:25 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:27143
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k8Ph1-00064p-88
+ for qemu-devel@nongnu.org; Wed, 19 Aug 2020 11:07:59 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:46082
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1k8PgQ-0006c2-Dy
- for qemu-devel@nongnu.org; Wed, 19 Aug 2020 11:07:25 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k8Pgz-0006hW-Cy
+ for qemu-devel@nongnu.org; Wed, 19 Aug 2020 11:07:58 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597849640;
+ s=mimecast20190719; t=1597849676;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=AqWclChQ726Qg4ueFB4QItpCbxf6IQ5qkFhhKGlcaL8=;
- b=D/HTKm1ryBcy1EMkQx9uF1tVZ57bZtNn1wdei2qsEx4h1MhEXxC9VyHcPeLP59U9veDWI4
- WvsOxUnAFlIDo2YNs0u2wqNC9MbEggEdfCr5QadbZhBMgQB2s1GGDlp/Ex+OgVMjB0QxaG
- JflkR4WJWCfQkANwL0Ot8a5voXc/r/0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-74-HXFKHSl8PH6yUbpCxz_vxw-1; Wed, 19 Aug 2020 11:07:16 -0400
-X-MC-Unique: HXFKHSl8PH6yUbpCxz_vxw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 33EF414996;
- Wed, 19 Aug 2020 15:07:14 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-114-24.ams2.redhat.com [10.36.114.24])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id CA8405D9D5;
- Wed, 19 Aug 2020 15:07:12 +0000 (UTC)
-Date: Wed, 19 Aug 2020 17:07:11 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Alberto Garcia <berto@igalia.com>
-Subject: Re: [PATCH 0/1] qcow2: Skip copy-on-write when allocating a zero
- cluster
-Message-ID: <20200819150711.GE10272@linux.fritz.box>
-References: <cover.1597416317.git.berto@igalia.com>
- <20200817101019.GD11402@linux.fritz.box>
- <w518sedz3td.fsf@maestria.local.igalia.com>
- <20200817155307.GS11402@linux.fritz.box>
- <w51pn7memr7.fsf@maestria.local.igalia.com>
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=8tgCh1Gnl/SY6X0TB387F8Q22JTqiJcByf/+qfD2asA=;
+ b=NQTzTMDKRy6ebCNW+vUjo2KFhaagTSoH9fQP4dCtYX2VbjfV29CT3sahzv3+7RgG7z3kvE
+ bJ3+1qFt4l37X0oxHIcBJxMlp6DsUk0pyP3gwFBCZfm0nlSG23CU88lh7d7E696vYrmmkI
+ EeAAYcq+///B6OdvubqHhWCiQK0RKEc=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-282-0OkMt_0jNgqBip-wFsqlIA-1; Wed, 19 Aug 2020 11:07:53 -0400
+X-MC-Unique: 0OkMt_0jNgqBip-wFsqlIA-1
+Received: by mail-wr1-f70.google.com with SMTP id t3so9456941wrr.5
+ for <qemu-devel@nongnu.org>; Wed, 19 Aug 2020 08:07:53 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=8tgCh1Gnl/SY6X0TB387F8Q22JTqiJcByf/+qfD2asA=;
+ b=KoAg7Kr0nnd92E5n04weDepYxLnREZlPTmjMM8ygl2Nq00QViRmaksF1SLNsC602VV
+ eCZnLs+EUB0Mx9rK4xA1LZnhQ7TlryHRpDH8Jj244opeEym7G4dA6HwWx2i3kc0ZrpfZ
+ NGxrvDifclHDQuPTN4FzKZDBF+3PWCSdI2J2jeDiHX9JUet9x3s+YLRVZxs8Qgpb0kMg
+ GHokDMFMiwjZFpcexOmA0kiTFP39nG96uQol0tHrKGLzUd7avHE3RbB+LwMzIIXNBRy/
+ a4lDj9mdVkLqscyB5cDtt0HI1NPZofSmyJKdOZvD557xAFI6srCJ6OQYyW8+/2tj5f6H
+ 537w==
+X-Gm-Message-State: AOAM5306QLC+Q0vdfvjp/alxfBSY6sDEj6zJGnenkSQEsPJv0bYB2SmP
+ dzEmpDtXYmcZXy8+6PMEukLOUoZ0vnWKasMl0H+kj4Sh8t9H7cv3wJtGVNYaAwIppdCSLrzc4q2
+ /BzHsm330b3BI8pU=
+X-Received: by 2002:adf:f045:: with SMTP id t5mr26722024wro.288.1597849672007; 
+ Wed, 19 Aug 2020 08:07:52 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxPk/Gyen6s/XGYChUwTT2debHrwSdlauktExNrXSK3sYw+0BVrHA5zJ2UiDotbZJW8WpEvCg==
+X-Received: by 2002:adf:f045:: with SMTP id t5mr26722005wro.288.1597849671761; 
+ Wed, 19 Aug 2020 08:07:51 -0700 (PDT)
+Received: from [192.168.1.36] (121.red-81-40-121.staticip.rima-tde.net.
+ [81.40.121.121])
+ by smtp.gmail.com with ESMTPSA id w10sm6569123wmk.0.2020.08.19.08.07.50
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 19 Aug 2020 08:07:51 -0700 (PDT)
+Subject: Re: [PATCH] virtio: vdpa: omit check return of g_malloc
+To: Li Qiang <liq3ea@163.com>, mst@redhat.com, jasowang@redhat.com
+References: <20200819144309.67579-1-liq3ea@163.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <2a946eec-5158-0bca-e9c9-b7c81d557b1b@redhat.com>
+Date: Wed, 19 Aug 2020 17:07:49 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <w51pn7memr7.fsf@maestria.local.igalia.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <20200819144309.67579-1-liq3ea@163.com>
+Content-Language: en-US
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
-X-Mimecast-Spam-Score: 0.001
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=kwolf@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 23:05:17
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/19 04:57:22
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,90 +137,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: bfoster@redhat.com, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: liq3ea@gmail.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 19.08.2020 um 16:25 hat Alberto Garcia geschrieben:
-> On Mon 17 Aug 2020 05:53:07 PM CEST, Kevin Wolf wrote:
-> >> > Or are you saying that ZERO_RANGE + pwrite on a sparse file (=
-> >> > cluster allocation) is faster for you than just the pwrite alone (=
-> >> > writing to already allocated cluster)?
-> >> 
-> >> Yes, 20% faster in my tests (4KB random writes), but in the latter
-> >> case the cluster is already allocated only at the qcow2 level, not on
-> >> the filesystem. preallocation=falloc is faster than
-> >> preallocation=metadata (preallocation=off sits in the middle).
-> >
-> > Hm, this feels wrong. Doing more operations should never be faster
-> > than doing less operations.
-> >
-> > Maybe the difference is in allocating 64k at once instead of doing a
-> > separate allocation for every 4k block? But with the extent size hint
-> > patches to file-posix, we should allocate 1 MB at once by default now
-> > (if your test image was newly created). Can you check whether this is
-> > in effect for your image file?
+On 8/19/20 4:43 PM, Li Qiang wrote:
+> If g_malloc fails, the application will be terminated.
+
+Which we don't want... better to use g_try_malloc() instead?
+
+> No need to check the return value of g_malloc.
 > 
-> I checked with xfs on my computer. I'm not very familiar with that
-> filesystem so I was using the default options and I didn't tune
-> anything.
+> Signed-off-by: Li Qiang <liq3ea@163.com>
+> ---
+>  hw/virtio/vhost-vdpa.c | 7 +------
+>  1 file changed, 1 insertion(+), 6 deletions(-)
 > 
-> What I got with my tests (using fio):
+> diff --git a/hw/virtio/vhost-vdpa.c b/hw/virtio/vhost-vdpa.c
+> index 4580f3efd8..403ae3ae07 100644
+> --- a/hw/virtio/vhost-vdpa.c
+> +++ b/hw/virtio/vhost-vdpa.c
+> @@ -320,10 +320,8 @@ static int vhost_vdpa_set_config(struct vhost_dev *dev, const uint8_t *data,
+>      struct vhost_vdpa_config *config;
+>      int ret;
+>      unsigned long config_size = offsetof(struct vhost_vdpa_config, buf);
+> +
+>      config = g_malloc(size + config_size);
+> -    if (config == NULL) {
+> -        return -1;
+> -    }
+>      config->off = offset;
+>      config->len = size;
+>      memcpy(config->buf, data, size);
+> @@ -340,9 +338,6 @@ static int vhost_vdpa_get_config(struct vhost_dev *dev, uint8_t *config,
+>      int ret;
+>  
+>      v_config = g_malloc(config_len + config_size);
+> -    if (v_config == NULL) {
+> -        return -1;
+> -    }
+>      v_config->len = config_len;
+>      v_config->off = 0;
+>      ret = vhost_vdpa_call(dev, VHOST_VDPA_GET_CONFIG, v_config);
 > 
-> - Using extent_size_hint didn't make any difference in my test case (I
->   do see a clear difference however with the test case described in
->   commit ffa244c84a).
-
-Hm, interesting. What is your exact fio configuration? Specifically,
-which iodepth are you using? I guess with a low iodepth (and O_DIRECT),
-the effect of draining the queue might not be as visible.
-
-> - preallocation=off is still faster than preallocation=metadata.
-
-Brian, can you help us here with some input?
-
-Essentially what we're having here is a sparse image file on XFS that is
-opened with O_DIRECT (presumably - Berto, is this right?), and Berto is
-seeing cases where a random write benchmark is faster if we're doing the
-64k ZERO_RANGE + 4k pwrite when touching a 64k cluster for the first
-time compared to always just doing the 4k pwrite. This is with a 1 MB
-extent size hint.
-
-From the discussions we had the other day [1][2] I took away that your
-suggestion is that we should not try to optimise things with
-fallocate(), but just write the areas we really want to write and let
-the filesystem deal with the sparse parts. Especially with the extent
-size hint that we're now setting, I'm surprised to hear that doing a
-ZERO_RANGE first still seems to improve the performance.
-
-Do you have any idea why this is happening and what we should be doing
-with this?
-
-[1] https://bugzilla.redhat.com/show_bug.cgi?id=1850660
-[2] https://bugzilla.redhat.com/show_bug.cgi?id=1666864
-
->   If I disable handle_alloc_space() (so there is no ZERO_RANGE used)
->   then it is much slower.
-
-This makes some sense because then we're falling back to writing
-explicit zero buffers (unless you disabled that, too).
-
-> - With preallocation=falloc I get the same results as with
->   preallocation=metadata.
-
-Interesting, this means that the fallocate() call costs you basically no
-time. I would have expected preallocation=falloc to be a little faster.
-
-> - preallocation=full is the fastest by far.
-
-I guess this saves the conversion of unwritten extents to fully
-allocated ones?
-
-As the extent size hint doesn't seem to influence your test case anyway,
-can I assume that ext4 behaves similar to XFS in all four cases?
-
-Kevin
 
 
