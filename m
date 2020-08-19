@@ -7,76 +7,76 @@ X-Spam-Status: No, score=-13.9 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1CEDC433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 03:06:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C2F7C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 03:07:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AD2142065F
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 03:06:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0807D2065F
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 03:07:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JTZAdBDx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD2142065F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U6PcGA+p"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0807D2065F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60462 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35318 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8EQP-0007ex-Vr
-	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 23:06:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50588)
+	id 1k8ERj-0000Wr-AL
+	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 23:07:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50942)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k8EPi-0006uC-3J
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 23:05:22 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55618)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k8EQw-00088G-0I
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 23:06:38 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:51934)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k8EPe-00036b-Se
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 23:05:21 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k8EQu-0003L1-F3
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 23:06:37 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597806317;
+ s=mimecast20190719; t=1597806395;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=MWacM+NIVvc3VByuyCmZGI1Q8qi5g5iae7qqbUb/Knk=;
- b=JTZAdBDxWVaKRNt0VTWWAUzGiWQFnGuR9HQUagCzaMinBbiZjxa3K9TgYqjOf4MYdsWuP6
- 1AhEti4+SrlMDQumq/2Hw/jEo4KxeAbNVvwU6PPs0KcGhKhEy7Bip4F5C0HiviHx3GFvmg
- mOUk1XIXGavJLMJlIG1+K7B+qughqL0=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-19-9dBvKcUjP3-6zA4FDx8eRg-1; Tue, 18 Aug 2020 23:05:15 -0400
-X-MC-Unique: 9dBvKcUjP3-6zA4FDx8eRg-1
-Received: by mail-wr1-f69.google.com with SMTP id r29so8868753wrr.10
- for <qemu-devel@nongnu.org>; Tue, 18 Aug 2020 20:05:15 -0700 (PDT)
+ bh=ez2Petedxsrbf32eX1lpixm2JVQcCqCdk4pW+ZtTgbE=;
+ b=U6PcGA+pQpH7OgqYEjwSBQT3sPf2gFr26KVwH+3kbuxkrQJFsk99pzs78KRwwut3oJ7Kq2
+ kwDnxAno7XiKGR7GLpcUtUK3NW7vgNcuz37CGPuhwLaUutAljQ+8f8fAxOib0DbEUvLebn
+ ib1cHzqYD4/ReCvXlIJkb3ADta58w+Q=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-185-2NkN5IHKNCCWVpHgtEPP5Q-1; Tue, 18 Aug 2020 23:06:32 -0400
+X-MC-Unique: 2NkN5IHKNCCWVpHgtEPP5Q-1
+Received: by mail-wr1-f71.google.com with SMTP id m7so8848300wrb.20
+ for <qemu-devel@nongnu.org>; Tue, 18 Aug 2020 20:06:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=MWacM+NIVvc3VByuyCmZGI1Q8qi5g5iae7qqbUb/Knk=;
- b=kfoIeu6hBfI5Olou8M55IATySXMpGalQuYkdRxks5OcMsbWIZcpRCoyyvZ7arAB1H1
- PDFKHDwac3AW9gQNClK45hOznwuNCeUwBga9BA6jftW8fLqjTK4KbHs4I5gnH1iLn+Ob
- E+aHNDSWBmfOGrUoS0j+B35cwn9KnezLHzmERE1iZvWQGcHS92C3s2Kvo/KDuDF5oWak
- mVSbRDNwUHH7VAwFo3h0bNbdbtqHdr/vbQLzwlWKCoHlH4g1oqGXcVyfGLLF1ACECOAi
- qDXzt08IpM5smeoC33FLFiWJE1eRnz1aBMrtNwGolYR1sRyPpzlEii37qf7yteoFkEc8
- orjw==
-X-Gm-Message-State: AOAM530gL3a7K7UwOOf84Bzqe+vkSCCnYlCMIIAMs1z5wXP8TmgXfK9Y
- w2x6nCoSS8VvGNYXjAFpu605oomJeBHbHYbj41Q7J9Yn21cfF/N9YMVegjuy9PKC3taFhub0BTE
- +/pK38F3/ZayezqA=
-X-Received: by 2002:a5d:514c:: with SMTP id u12mr23762858wrt.90.1597806314778; 
- Tue, 18 Aug 2020 20:05:14 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxxXctLhjutrTG+ZPVi6KQDEUqI9Cm5nfMfL6gRv6KB/OrM+IYuwZkPQ2lxbqkiVN5+pCW/iQ==
-X-Received: by 2002:a5d:514c:: with SMTP id u12mr23762819wrt.90.1597806314480; 
- Tue, 18 Aug 2020 20:05:14 -0700 (PDT)
+ bh=ez2Petedxsrbf32eX1lpixm2JVQcCqCdk4pW+ZtTgbE=;
+ b=cBOXpe1ABEJiMMlSgIlpH7Vj6FcsB8Qk0s87k8tBeW4v8Q+Vl5Z2S8Wk+aNngZ1dX3
+ nRFHC0Wqn7LctcQlv4XVh/b1EfWTy3YxrdYMUc7UuMosLXIUCVhqFp6nWiB5+UPevnoP
+ aD8vsMo6uo/59f5en+chymfsbSsPcmzZxWCUS26XTRNHrhisbbZAysxCLoH+GWeNz+FA
+ IkxoJvOzz/R7eXlCutQ5VBSo/yJn3AuZhuNCqD71qrdXlSGENcj6075PGdATIaRsKVyB
+ qEFSrcPalTuxALItSmoKNEpYTE8pSBM6z5cucyDUBwRl+YqyLu6wo2bcL3zECgAx51RQ
+ kKuQ==
+X-Gm-Message-State: AOAM531v44oAoFwrRKdc4LcKUYvqpIOfzwowfB9vKt89DEn4wgnK5Bp5
+ Cn10h9DJceKBr91fuSj3U5xE9htQjplJcv0j55UIcJponBPDPPza2LIJGQGJOeUJCgDYEHoHkdq
+ IWNL5Gmt8/D56mi4=
+X-Received: by 2002:adf:a15c:: with SMTP id r28mr22792810wrr.151.1597806391240; 
+ Tue, 18 Aug 2020 20:06:31 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw4YyZlTR4nGMzBO/bZ7knvplcAmx9ejUSOvjSXJWN73xJ/V+Kj88i6BSCwF/muvahbjw7rpw==
+X-Received: by 2002:adf:a15c:: with SMTP id r28mr22792796wrr.151.1597806391052; 
+ Tue, 18 Aug 2020 20:06:31 -0700 (PDT)
 Received: from [192.168.1.36] (121.red-81-40-121.staticip.rima-tde.net.
  [81.40.121.121])
- by smtp.gmail.com with ESMTPSA id i6sm35347757wrp.92.2020.08.18.20.05.12
+ by smtp.gmail.com with ESMTPSA id g14sm2765340wme.16.2020.08.18.20.06.29
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 18 Aug 2020 20:05:13 -0700 (PDT)
-Subject: Re: [PATCH v5 4/8] ppc/e500: Use start-powered-off CPUState property
+ Tue, 18 Aug 2020 20:06:30 -0700 (PDT)
+Subject: Re: [PATCH v5 5/8] mips/cps: Use start-powered-off CPUState property
 To: Thiago Jung Bauermann <bauerman@linux.ibm.com>, qemu-ppc@nongnu.org
 References: <20200819024220.587612-1-bauerman@linux.ibm.com>
- <20200819024220.587612-5-bauerman@linux.ibm.com>
+ <20200819024220.587612-6-bauerman@linux.ibm.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Autocrypt: addr=philmd@redhat.com; keydata=
  mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
@@ -101,16 +101,16 @@ Autocrypt: addr=philmd@redhat.com; keydata=
  9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
  RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
  apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <1d7c519a-d0db-a579-e6d7-26255db07226@redhat.com>
-Date: Wed, 19 Aug 2020 05:05:11 +0200
+Message-ID: <48b61a7d-60e0-ed65-3ba9-cf8a65b56495@redhat.com>
+Date: Wed, 19 Aug 2020 05:06:28 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200819024220.587612-5-bauerman@linux.ibm.com>
+In-Reply-To: <20200819024220.587612-6-bauerman@linux.ibm.com>
 Content-Language: en-US
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0.003
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
@@ -124,7 +124,7 @@ X-Spam_bar: ----
 X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -156,8 +156,8 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 8/19/20 4:42 AM, Thiago Jung Bauermann wrote:
-> Instead of setting CPUState::halted to 1 in ppce500_cpu_reset_sec(), use
-> the start-powered-off property which makes cpu_common_reset() initialize it
+> Instead of setting CPUState::halted to 1 in main_cpu_reset(), use the
+> start-powered-off property which makes cpu_common_reset() initialize it
 > to 1 in common code.
 > 
 > Also change creation of CPU object from cpu_create() to object_new() and
@@ -165,53 +165,55 @@ On 8/19/20 4:42 AM, Thiago Jung Bauermann wrote:
 > possible to set a property after the object is realized.
 > 
 > Signed-off-by: Thiago Jung Bauermann <bauerman@linux.ibm.com>
+> ---
+>  hw/mips/cps.c | 14 ++++++++++----
+>  1 file changed, 10 insertions(+), 4 deletions(-)
+> 
+> diff --git a/hw/mips/cps.c b/hw/mips/cps.c
+> index 615e1a1ad2..4a98cf2287 100644
+> --- a/hw/mips/cps.c
+> +++ b/hw/mips/cps.c
+> @@ -52,9 +52,6 @@ static void main_cpu_reset(void *opaque)
+>      CPUState *cs = CPU(cpu);
+>  
+>      cpu_reset(cs);
+> -
+> -    /* All VPs are halted on reset. Leave powering up to CPC. */
+> -    cs->halted = 1;
+>  }
+>  
+>  static bool cpu_mips_itu_supported(CPUMIPSState *env)
+> @@ -76,7 +73,7 @@ static void mips_cps_realize(DeviceState *dev, Error **errp)
+>      bool saar_present = false;
+>  
+>      for (i = 0; i < s->num_vp; i++) {
+> -        cpu = MIPS_CPU(cpu_create(s->cpu_type));
+> +        cpu = MIPS_CPU(object_new(s->cpu_type));
+>  
+>          /* Init internal devices */
+>          cpu_mips_irq_init_cpu(cpu);
+> @@ -89,7 +86,16 @@ static void mips_cps_realize(DeviceState *dev, Error **errp)
+>              env->itc_tag = mips_itu_get_tag_region(&s->itu);
+>              env->itu = &s->itu;
+>          }
+> +        /* All VPs are halted on reset. Leave powering up to CPC. */
+> +        if (!object_property_set_bool(OBJECT(cpu), "start-powered-off", true,
+> +                                      errp)) {
+> +            return;
+
+Ah, better :)
 
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-> ---
->  hw/ppc/e500.c | 14 ++++++++++----
->  1 file changed, 10 insertions(+), 4 deletions(-)
-> 
-> diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
-> index ab9884e315..d7b803ef26 100644
-> --- a/hw/ppc/e500.c
-> +++ b/hw/ppc/e500.c
-> @@ -704,9 +704,6 @@ static void ppce500_cpu_reset_sec(void *opaque)
->  
->      cpu_reset(cs);
->  
-> -    /* Secondary CPU starts in halted state for now. Needs to change when
-> -       implementing non-kernel boot. */
-> -    cs->halted = 1;
->      cs->exception_index = EXCP_HLT;
->  }
->  
-> @@ -865,7 +862,7 @@ void ppce500_init(MachineState *machine)
->          CPUState *cs;
->          qemu_irq *input;
->  
-> -        cpu = POWERPC_CPU(cpu_create(machine->cpu_type));
-> +        cpu = POWERPC_CPU(object_new(machine->cpu_type));
->          env = &cpu->env;
->          cs = CPU(cpu);
->  
-> @@ -897,7 +894,16 @@ void ppce500_init(MachineState *machine)
->          } else {
->              /* Secondary CPUs */
->              qemu_register_reset(ppce500_cpu_reset_sec, cpu);
+> +        }
+>          qemu_register_reset(main_cpu_reset, cpu);
 > +
-> +            /*
-> +             * Secondary CPU starts in halted state for now. Needs to change
-> +             * when implementing non-kernel boot.
-> +             */
-> +            object_property_set_bool(OBJECT(cs), "start-powered-off", true,
-> +                                     &error_fatal);
->          }
-> +
-> +        qdev_realize_and_unref(DEVICE(cs), NULL, &error_fatal);
+> +        if (!qdev_realize_and_unref(DEVICE(cpu), NULL, errp)) {
+> +            return;
+> +        }
 >      }
 >  
->      env = firstenv;
+>      cpu = MIPS_CPU(first_cpu);
 > 
 
 
