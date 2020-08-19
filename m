@@ -7,44 +7,44 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52D88C433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 10:11:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00FA7C433E1
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 10:12:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2A480206B5
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 10:11:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A480206B5
+	by mail.kernel.org (Postfix) with ESMTPS id CF99320786
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 10:12:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF99320786
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55324 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35076 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8L3w-0003Qf-BH
-	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 06:11:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56016)
+	id 1k8L57-0006dp-2K
+	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 06:12:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56074)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <clg@kaod.org>)
- id 1k8L2q-00017F-0g; Wed, 19 Aug 2020 06:10:12 -0400
-Received: from smtpout1.mo529.mail-out.ovh.net ([178.32.125.2]:37529)
+ id 1k8L2r-00019o-Q9; Wed, 19 Aug 2020 06:10:13 -0400
+Received: from smtpout1.mo804.mail-out.ovh.net ([79.137.123.220]:51321)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <clg@kaod.org>)
- id 1k8L2n-0006We-Qc; Wed, 19 Aug 2020 06:10:11 -0400
-Received: from mxplan5.mail.ovh.net (unknown [10.108.4.188])
- by mo529.mail-out.ovh.net (Postfix) with ESMTPS id 8BCBD51E25BC;
- Wed, 19 Aug 2020 12:10:04 +0200 (CEST)
+ id 1k8L2p-0006W8-GE; Wed, 19 Aug 2020 06:10:13 -0400
+Received: from mxplan5.mail.ovh.net (unknown [10.109.156.21])
+ by mo804.mail-out.ovh.net (Postfix) with ESMTPS id 1B9825892832;
+ Wed, 19 Aug 2020 12:10:03 +0200 (CEST)
 Received: from kaod.org (37.59.142.101) by DAG4EX1.mxp5.local (172.16.2.31)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1979.3; Wed, 19 Aug
- 2020 12:10:03 +0200
+ 2020 12:10:01 +0200
 Authentication-Results: garm.ovh; auth=pass
- (GARM-101G00400b36d77-2d28-4ab8-8102-5943959efb0a,
+ (GARM-101G004e56e72f8-5a54-4b99-af1a-aa9c0c773d2a,
  56ABA3BD09B5898CED80C8E013D4E39E9C6048D1) smtp.auth=clg@kaod.org
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 To: Peter Maydell <peter.maydell@linaro.org>
-Subject: [PATCH v2 07/21] aspeed/smc: Fix max_slaves of the legacy SMC device
-Date: Wed, 19 Aug 2020 12:09:42 +0200
-Message-ID: <20200819100956.2216690-8-clg@kaod.org>
+Subject: [PATCH v2 04/21] aspeed/scu: Fix valid access size on AST2400
+Date: Wed, 19 Aug 2020 12:09:39 +0200
+Message-ID: <20200819100956.2216690-5-clg@kaod.org>
 X-Mailer: git-send-email 2.25.4
 In-Reply-To: <20200819100956.2216690-1-clg@kaod.org>
 References: <20200819100956.2216690-1-clg@kaod.org>
@@ -54,14 +54,14 @@ Content-Transfer-Encoding: 8bit
 X-Originating-IP: [37.59.142.101]
 X-ClientProxiedBy: DAG1EX1.mxp5.local (172.16.2.1) To DAG4EX1.mxp5.local
  (172.16.2.31)
-X-Ovh-Tracer-GUID: 13ae1290-9d50-4694-86d5-1309cc5e1f34
-X-Ovh-Tracer-Id: 18049301410510965542
+X-Ovh-Tracer-GUID: c5fc69af-930e-41d9-b349-eefbfe0f35ba
+X-Ovh-Tracer-Id: 18048738460076116841
 X-VR-SPAMSTATE: OK
 X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedruddtkedgvdduucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvufffkffojghfgggtgfhisehtkeertdertdejnecuhfhrohhmpeevrogurhhitgcunfgvucfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepheehfeegjeeitdfffeetjeduveejueefuefgtdefueelueetveeliefhhffgtdelnecukfhppedtrddtrddtrddtpdefjedrheelrddugedvrddutddunecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepmhigphhlrghnhedrmhgrihhlrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopegtlhhgsehkrghougdrohhrgh
-Received-SPF: pass client-ip=178.32.125.2; envelope-from=clg@kaod.org;
- helo=smtpout1.mo529.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/19 06:10:05
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedruddtkedgvdduucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvufffkffojghfgggtgfhisehtkeertdertdejnecuhfhrohhmpeevrogurhhitgcunfgvucfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepheehfeegjeeitdfffeetjeduveejueefuefgtdefueelueetveeliefhhffgtdelnecukfhppedtrddtrddtrddtpdefjedrheelrddugedvrddutddunecuvehluhhsthgvrhfuihiivgepudenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepmhigphhlrghnhedrmhgrihhlrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopegtlhhgsehkrghougdrohhrgh
+Received-SPF: pass client-ip=79.137.123.220; envelope-from=clg@kaod.org;
+ helo=smtpout1.mo804.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/19 06:10:01
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer
 X-Spam_score_int: -28
 X-Spam_score: -2.9
@@ -81,34 +81,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jeffery <andrew@aj.id.au>,
- =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-arm@nongnu.org,
- Joel Stanley <joel@jms.id.au>, qemu-devel@nongnu.org
+Cc: Andrew Jeffery <andrew@aj.id.au>, qemu-devel@nongnu.org,
+ erik-smit <erik.lucas.smit@gmail.com>, qemu-arm@nongnu.org,
+ =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
+ Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The legacy controller only has one slave.
+The read access size of the SCU registers can be 1/2/4 bytes and write
+is 4 bytes and all Aspeed models would need a .valid.accepts() handler.
 
+For the moment, set the min access size to 1 byte to cover both read
+and write operations on the AST2400 but keep the min access size of
+the other SoCs to 4 bytes as this is an unusual access size.
+
+This fixes support for some old firmware doing 2 bytes reads on the
+AST2400 SoC.
+
+Reported-by: erik-smit <erik.lucas.smit@gmail.com>
 Reviewed-by: Joel Stanley <joel@jms.id.au>
 Signed-off-by: Cédric Le Goater <clg@kaod.org>
 ---
- hw/ssi/aspeed_smc.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/misc/aspeed_scu.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/hw/ssi/aspeed_smc.c b/hw/ssi/aspeed_smc.c
-index 0646e0dca72e..8c79a5552f93 100644
---- a/hw/ssi/aspeed_smc.c
-+++ b/hw/ssi/aspeed_smc.c
-@@ -259,7 +259,7 @@ static const AspeedSMCController controllers[] = {
-         .r_timings         = R_TIMINGS,
-         .nregs_timings     = 1,
-         .conf_enable_w0    = CONF_ENABLE_W0,
--        .max_slaves        = 5,
-+        .max_slaves        = 1,
-         .segments          = aspeed_segments_legacy,
-         .flash_window_base = ASPEED_SOC_SMC_FLASH_BASE,
-         .flash_window_size = 0x6000000,
+diff --git a/hw/misc/aspeed_scu.c b/hw/misc/aspeed_scu.c
+index ec4fef900e27..764222404bef 100644
+--- a/hw/misc/aspeed_scu.c
++++ b/hw/misc/aspeed_scu.c
+@@ -328,9 +328,10 @@ static const MemoryRegionOps aspeed_ast2400_scu_ops = {
+     .read = aspeed_scu_read,
+     .write = aspeed_ast2400_scu_write,
+     .endianness = DEVICE_LITTLE_ENDIAN,
+-    .valid.min_access_size = 4,
+-    .valid.max_access_size = 4,
+-    .valid.unaligned = false,
++    .valid = {
++        .min_access_size = 1,
++        .max_access_size = 4,
++    },
+ };
+ 
+ static const MemoryRegionOps aspeed_ast2500_scu_ops = {
 -- 
 2.25.4
 
