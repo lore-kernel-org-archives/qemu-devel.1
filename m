@@ -2,91 +2,69 @@ Return-Path: <SRS0=bVMU=B5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.4 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81A9BC433E3
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 19:15:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37682C433E1
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 19:23:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 566552078D
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 19:15:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 084832078D
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 19:23:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FgtsLscB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 566552078D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="s8RSA4gX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 084832078D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38012 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41220 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8TYM-00071e-Gq
-	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 15:15:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43146)
+	id 1k8TgB-0000Ts-9F
+	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 15:23:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45046)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1k8TXh-0006Xq-Vu
- for qemu-devel@nongnu.org; Wed, 19 Aug 2020 15:14:38 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:58251
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1k8TXf-0007cg-Et
- for qemu-devel@nongnu.org; Wed, 19 Aug 2020 15:14:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597864473;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=CTzibKbteDt16nXH/QJ99cUuCX4AJTZ/nu4ES5Q5PNA=;
- b=FgtsLscB8qkjeriNfNAcC8RwqNtXe7ckAZh7PJHgu+peTk3D9yfiPLdelDRbPV1bNN6h44
- brULiHqW6K46/zbpxFXSLxO3WhlVtssYI/UDHfqKdIBM8aRJuSuB3wK5jGfMZ2yPhbj0VW
- B8K/j+DEsI1yaNUXhLQV9Ir7jYngbVI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-57-V49QrSWPMjmFkmt9WL-o9g-1; Wed, 19 Aug 2020 15:14:29 -0400
-X-MC-Unique: V49QrSWPMjmFkmt9WL-o9g-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.90_1) (envelope-from <kbusch@kernel.org>) id 1k8Tfb-0008Qk-3f
+ for qemu-devel@nongnu.org; Wed, 19 Aug 2020 15:22:47 -0400
+Received: from mail.kernel.org ([198.145.29.99]:45180)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <kbusch@kernel.org>) id 1k8TfZ-0000Cm-Az
+ for qemu-devel@nongnu.org; Wed, 19 Aug 2020 15:22:46 -0400
+Received: from dhcp-10-100-145-180.wdl.wdc.com (unknown [199.255.45.60])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2EFD91007B04;
- Wed, 19 Aug 2020 19:14:28 +0000 (UTC)
-Received: from [10.3.112.136] (ovpn-112-136.phx2.redhat.com [10.3.112.136])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id CE8937E300;
- Wed, 19 Aug 2020 19:14:27 +0000 (UTC)
-Subject: Re: [RFC PATCH 05/22] qemu-storage-daemon: Use qmp_block_export_add()
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-References: <20200813162935.210070-1-kwolf@redhat.com>
- <20200813162935.210070-6-kwolf@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <37c3adf9-6cc7-b730-def1-2d84468d21ea@redhat.com>
-Date: Wed, 19 Aug 2020 14:14:27 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ by mail.kernel.org (Postfix) with ESMTPSA id 805282078D;
+ Wed, 19 Aug 2020 19:22:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1597864962;
+ bh=aMgQd33Dgsl7g8th17oHJhl57j+Lvy6p2VK2rAhd+q4=;
+ h=Date:From:To:Cc:Subject:From;
+ b=s8RSA4gX5cveZukNtAFeu3b8dICd8dKAwvemG6zmyvb5PYIDgDpwMmjDMrKPX5sZB
+ MHZzn0xS+aeCf1PyPecdouJCelQzj75iB+7tDh7NJCYE+uWSSOQ/gRtENidqUH7FRI
+ dOtIXv6XVjpFxo+jlo7glqOEXQlc9xdatXmfkS+0=
+Date: Wed, 19 Aug 2020 12:22:40 -0700
+From: Keith Busch <kbusch@kernel.org>
+To: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ Klaus Jensen <k.jensen@samsung.com>
+Subject: [PULL] nvme updates
+Message-ID: <20200819192240.GA25305@dhcp-10-100-145-180.wdl.wdc.com>
 MIME-Version: 1.0
-In-Reply-To: <20200813162935.210070-6-kwolf@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eblake@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=eblake@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/19 01:46:53
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=198.145.29.99; envelope-from=kbusch@kernel.org;
+ helo=mail.kernel.org
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/19 15:22:43
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -80
+X-Spam_score: -8.1
+X-Spam_bar: --------
+X-Spam_report: (-8.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ RCVD_IN_DNSWL_HI=-5, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,26 +77,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, mreitz@redhat.com
+Cc: Klaus Jensen <its@irrelevant.dk>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/13/20 11:29 AM, Kevin Wolf wrote:
-> No reason to duplicate the functionality locally, we can now just reuse
-> the QMP command block-export-add for --export.
-> 
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->   qemu-storage-daemon.c | 13 +------------
->   1 file changed, 1 insertion(+), 12 deletions(-)
-> 
+We're trying our first nvme pull request from a dedicated development
+tree containing various fixes, cleanups, spec compliance, and welcoming
+Klaus Jensen to maintaining the emulated nvme device development.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+The following changes since commit d0ed6a69d399ae193959225cdeaa9382746c91cc:
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+  Update version for v5.1.0 release (2020-08-11 17:07:03 +0100)
+
+are available in the Git repository at:
+
+  git://git.infradead.org/qemu-nvme.git nvme-next
+
+for you to fetch changes up to 9257c77e4f0feaefb76f02fff3dc8d60b420ea4d:
+
+  hw/block/nvme: remove explicit qsg/iov parameters (2020-08-17 08:40:54 +0200)
+
+----------------------------------------------------------------
+Keith Busch (1):
+      MAINTAINERS: update nvme entry
+
+Klaus Jensen (34):
+      hw/block/nvme: bump spec data structures to v1.3
+      hw/block/nvme: fix missing endian conversion
+      hw/block/nvme: additional tracing
+      hw/block/nvme: add support for the abort command
+      hw/block/nvme: add temperature threshold feature
+      hw/block/nvme: mark fw slot 1 as read-only
+      hw/block/nvme: add support for the get log page command
+      hw/block/nvme: add support for the asynchronous event request command
+      hw/block/nvme: move NvmeFeatureVal into hw/block/nvme.h
+      hw/block/nvme: flush write cache when disabled
+      hw/block/nvme: add remaining mandatory controller parameters
+      hw/block/nvme: support the get/set features select and save fields
+      hw/block/nvme: make sure ncqr and nsqr is valid
+      hw/block/nvme: support identify namespace descriptor list
+      hw/block/nvme: reject invalid nsid values in active namespace id list
+      hw/block/nvme: enforce valid queue creation sequence
+      hw/block/nvme: provide the mandatory subnqn field
+      hw/block/nvme: bump supported version to v1.3
+      hw/block/nvme: memset preallocated requests structures
+      hw/block/nvme: add mapping helpers
+      hw/block/nvme: replace dma_acct with blk_acct equivalent
+      hw/block/nvme: remove redundant has_sg member
+      hw/block/nvme: destroy request iov before reuse
+      hw/block/nvme: refactor dma read/write
+      hw/block/nvme: add tracing to nvme_map_prp
+      hw/block/nvme: add request mapping helper
+      hw/block/nvme: verify validity of prp lists in the cmb
+      hw/block/nvme: refactor request bounds checking
+      hw/block/nvme: add check for mdts
+      hw/block/nvme: be consistent about zeros vs zeroes
+      hw/block/nvme: add ns/cmd references in NvmeRequest
+      hw/block/nvme: consolidate qsg/iov clearing
+      hw/block/nvme: use preallocated qsg/iov in nvme_dma_prp
+      hw/block/nvme: remove explicit qsg/iov parameters
+
+Philippe Mathieu-Daudé (4):
+      hw/block/nvme: Update specification URL
+      hw/block/nvme: Use QEMU_PACKED on hardware/packet structures
+      hw/block/nvme: Fix pmrmsc register size
+      hw/block/nvme: Align I/O BAR to 4 KiB
+
+ MAINTAINERS           |    2 +
+ block/nvme.c          |   22 +-
+ hw/block/nvme.c       | 1136 +++++++++++++++++++++++++++++++++++++++++--------
+ hw/block/nvme.h       |   26 +-
+ hw/block/trace-events |   31 +-
+ include/block/nvme.h  |  271 +++++++++---
+ 6 files changed, 1248 insertions(+), 240 deletions(-)
 
 
