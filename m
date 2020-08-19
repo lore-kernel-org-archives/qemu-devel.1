@@ -2,79 +2,101 @@ Return-Path: <SRS0=bVMU=B5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B185C433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 02:26:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25EA2C433E1
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 02:39:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E3841205CB
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 02:26:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3841205CB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id E46DA20639
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 02:39:17 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WTK7VuCk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E46DA20639
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48318 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53334 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8Dnz-0006LT-4z
-	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 22:26:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44770)
+	id 1k8E0T-0000bT-3C
+	for qemu-devel@archiver.kernel.org; Tue, 18 Aug 2020 22:39:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46934)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k8DnJ-0005uo-W5
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 22:25:42 -0400
-Received: from indium.canonical.com ([91.189.90.7]:36794)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k8DnH-0000lE-LZ
- for qemu-devel@nongnu.org; Tue, 18 Aug 2020 22:25:41 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1k8DnF-00011h-Is
- for <qemu-devel@nongnu.org>; Wed, 19 Aug 2020 02:25:37 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 8DAD02E80D2
- for <qemu-devel@nongnu.org>; Wed, 19 Aug 2020 02:25:37 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
+ id 1k8Dzv-00009M-D9
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 22:38:43 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:58259
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
+ id 1k8Dzs-0002fd-Gz
+ for qemu-devel@nongnu.org; Tue, 18 Aug 2020 22:38:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1597804718;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=0ahF9kHkk+KzE1v5hPws7TWhx97Oq/uytmMOo+VABGc=;
+ b=WTK7VuCkQxOZCOiwhioTQvhRJSYuLLCOxCsaJRwibqSW7nnih1HOWmGpaLbZUpVTX0waU/
+ CWzdFtOu4HjIGPgJ+SXsmOCHK+RTTdukc9hGr/O1kNJODnIkcX7Rt3ViPBLyP8OZ48nN4j
+ oNwEuVMVCQfL38VDGtlC8ejrl3zBveE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-407-tVAsAyPbNA6-594zY0pgiQ-1; Tue, 18 Aug 2020 22:38:36 -0400
+X-MC-Unique: tVAsAyPbNA6-594zY0pgiQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0CC671DDF4;
+ Wed, 19 Aug 2020 02:38:34 +0000 (UTC)
+Received: from [10.72.13.88] (ovpn-13-88.pek2.redhat.com [10.72.13.88])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 36A017DFDD;
+ Wed, 19 Aug 2020 02:38:14 +0000 (UTC)
+Subject: Re: device compatibility interface for live migration with assigned
+ devices
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+References: <20200805075647.GB2177@nanopsycho>
+ <eb1d01c2-fbad-36b6-10cf-9e03483a736b@redhat.com>
+ <20200805093338.GC30485@joy-OptiPlex-7040> <20200805105319.GF2177@nanopsycho>
+ <20200810074631.GA29059@joy-OptiPlex-7040>
+ <e6e75807-0614-bd75-aeb6-64d643e029d3@redhat.com>
+ <20200814051601.GD15344@joy-OptiPlex-7040>
+ <a51209fe-a8c6-941f-ff54-7be06d73bc44@redhat.com>
+ <20200818085527.GB20215@redhat.com>
+ <3a073222-dcfe-c02d-198b-29f6a507b2e1@redhat.com>
+ <20200818091628.GC20215@redhat.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <5aea4ae6-e8c8-1120-453d-20a78cee6b20@redhat.com>
+Date: Wed, 19 Aug 2020 10:38:13 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 19 Aug 2020 02:15:53 -0000
-From: "Tony.LI" <1890545@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: ajbennee bigboy0822 laurent-vivier pmaydell
-X-Launchpad-Bug-Reporter: Tony.LI (bigboy0822)
-X-Launchpad-Bug-Modifier: Tony.LI (bigboy0822)
-References: <159670025270.3099.13280483088179052036.malonedeb@gac.canonical.com>
-Message-Id: <159780335390.32636.17003821894872961114.malone@wampee.canonical.com>
-Subject: [Bug 1890545] Re: (ARM64) qemu-x86_64+schroot(Debian bullseye) can't
- run chrome and can't load HTML
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="99c2d833c8d727fd05148486920aca032e908071"; Instance="production"
-X-Launchpad-Hash: 68ac4146d0031ae1583dc5a5721d7bd12769122f
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 21:30:42
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200818091628.GC20215@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=jasowang@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 22:38:38
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -83,88 +105,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1890545 <1890545@bugs.launchpad.net>
+Cc: kvm@vger.kernel.org, libvir-list@redhat.com, qemu-devel@nongnu.org,
+ kwankhede@nvidia.com, eauger@redhat.com, xin-ran.wang@intel.com,
+ corbet@lwn.net, openstack-discuss@lists.openstack.org, shaohe.feng@intel.com,
+ kevin.tian@intel.com, Yan Zhao <yan.y.zhao@intel.com>,
+ Parav Pandit <parav@mellanox.com>, jian-feng.ding@intel.com,
+ dgilbert@redhat.com, zhenyuw@linux.intel.com, hejie.xu@intel.com,
+ bao.yumeng@zte.com.cn, Alex Williamson <alex.williamson@redhat.com>,
+ eskultet@redhat.com, smooney@redhat.com, intel-gvt-dev@lists.freedesktop.org,
+ Cornelia Huck <cohuck@redhat.com>, Jiri Pirko <jiri@mellanox.com>,
+ dinechin@redhat.com, devel@ovirt.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is where the error occurred:
-(gdb) x/30i 0x40007ff2c0
-   0x40007ff2c0:	xor    %al,%dh
-   0x40007ff2c2:	(bad)  =
 
-   0x40007ff2c3:	add    %al,(%rax)
-   0x40007ff2c5:	add    %al,(%rax)
-   0x40007ff2c7:	add    %ch,0x0(%rbp)
-   0x40007ff2cd:	add    %al,(%rax)
-   0x40007ff2cf:	add    %dl,0x62d7(%rax)
-   0x40007ff2d5:	add    %al,(%rax)
-   0x40007ff2d7:	add    %cl,-0x16(%rdx)
-   0x40007ff2da:	test   %ecx,(%rdx)
-   0x40007ff2dc:	add    %al,(%rax)
-   0x40007ff2df:	add    %al,(%rcx)
-   0x40007ff2e1:	repz jg 0x40007ff2e4
-   0x40007ff2e4:	add    %al,(%rax)
-   0x40007ff2e7:	add    %bl,-0xd(%rax)
-   0x40007ff2ea:	jg     0x40007ff2ec
-   0x40007ff2ec:	add    %al,(%rax)
-   0x40007ff2ef:	add    %bl,-0xd(%rax)
-   0x40007ff2f2:	jg     0x40007ff2f4
-   0x40007ff2f4:	add    %al,(%rax)
-   0x40007ff2f7:	add    %dh,(%rax)
-   0x40007ff2f9:	repz jg 0x40007ff2fc
-   0x40007ff2fc:	add    %al,(%rax)
+On 2020/8/18 下午5:16, Daniel P. Berrangé wrote:
+> Your mail came through as HTML-only so all the quoting and attribution
+> is mangled / lost now :-(
 
-(bad)?? What's it mean?
 
--- =
+My bad, sorry.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1890545
 
-Title:
-  (ARM64) qemu-x86_64+schroot(Debian bullseye) can't run chrome and
-  can't load HTML
+>
+> On Tue, Aug 18, 2020 at 05:01:51PM +0800, Jason Wang wrote:
+>>     On 2020/8/18 下午4:55, Daniel P. Berrangé wrote:
+>>
+>>   On Tue, Aug 18, 2020 at 11:24:30AM +0800, Jason Wang wrote:
+>>
+>>   On 2020/8/14 下午1:16, Yan Zhao wrote:
+>>
+>>   On Thu, Aug 13, 2020 at 12:24:50PM +0800, Jason Wang wrote:
+>>
+>>   On 2020/8/10 下午3:46, Yan Zhao wrote:
+>>   we actually can also retrieve the same information through sysfs, .e.g
+>>
+>>   |- [path to device]
+>>      |--- migration
+>>      |     |--- self
+>>      |     |   |---device_api
+>>      |    |   |---mdev_type
+>>      |    |   |---software_version
+>>      |    |   |---device_id
+>>      |    |   |---aggregator
+>>      |     |--- compatible
+>>      |     |   |---device_api
+>>      |    |   |---mdev_type
+>>      |    |   |---software_version
+>>      |    |   |---device_id
+>>      |    |   |---aggregator
+>>
+>>
+>>   Yes but:
+>>
+>>   - You need one file per attribute (one syscall for one attribute)
+>>   - Attribute is coupled with kobject
+>>
+>>   All of above seems unnecessary.
+>>
+>>   Another point, as we discussed in another thread, it's really hard to make
+>>   sure the above API work for all types of devices and frameworks. So having a
+>>   vendor specific API looks much better.
+>>
+>>   From the POV of userspace mgmt apps doing device compat checking / migration,
+>>   we certainly do NOT want to use different vendor specific APIs. We want to
+>>   have an API that can be used / controlled in a standard manner across vendors.
+>>
+>>     Yes, but it could be hard. E.g vDPA will chose to use devlink (there's a
+>>     long debate on sysfs vs devlink). So if we go with sysfs, at least two
+>>     APIs needs to be supported ...
+> NB, I was not questioning devlink vs sysfs directly. If devlink is related
+> to netlink, I can't say I'm enthusiastic as IMKE sysfs is easier to deal
+> with. I don't know enough about devlink to have much of an opinion though.
+> The key point was that I don't want the userspace APIs we need to deal with
+> to be vendor specific.
+>
+> What I care about is that we have a *standard* userspace API for performing
+> device compatibility checking / state migration, for use by QEMU/libvirt/
+> OpenStack, such that we can write code without countless vendor specific
+> code paths.
+>
+> If there is vendor specific stuff on the side, that's fine as we can ignore
+> that, but the core functionality for device compat / migration needs to be
+> standardized.
 
-Status in QEMU:
-  New
 
-Bug description:
-  First I creat a file system that is debian(bullseye amd64)on arm64
-  machine=EF=BC=8Cthen I download google-chrome=EF=BC=8Chowever, when I ran=
- Google
-  browser, some errors occurred.
+Ok, I agree with you.
 
-  $ google-chrome --no-sandbox
-  or =
+Thanks
 
-  $ qemu-x86_64-static google-chrome --no-sandbox
 
-  qemu: uncaught target signal 5 (Trace/breakpoint trap) - core dumped
-  qemu: uncaught target signal 5 (Trace/breakpoint trap) - core dumped
-  [1661:1661:0806/074307.502638:ERROR:nacl_fork_delegate_linux.cc(323)] Bad=
- NaCl helper startup ack (0 bytes)
-  [1664:1664:0806/074307.504159:ERROR:nacl_fork_delegate_linux.cc(323)] Bad=
- NaCl helper startup ack (0 bytes)
-  qemu: uncaught target signal 5 (Trace/breakpoint trap) - core dumped
-  qemu: uncaught target signal 5 (Trace/breakpoint trap) - core dumped
-  [1637:1678:0806/074308.337567:ERROR:file_path_watcher_linux.cc(315)] inot=
-ify_init() failed: Function not implemented (38)
-  Fontconfig warning: "/etc/fonts/fonts.conf", line 100: unknown element "b=
-lank"
-  qemu: unknown option 'type=3Dutility'
-  [1637:1680:0806/074313.598432:FATAL:gpu_data_manager_impl_private.cc(439)=
-] GPU process isn't usable. Goodbye.
-  qemu: uncaught target signal 5 (Trace/breakpoint trap) - core dumped
-  Trace/breakpoint trap
+>
+> Regards,
+> Daniel
 
-  Why?
-  And then I run firefox,it can be opened, but it can't load any web pages =
-and HTML.
-  I really need help=EF=BC=81
-  Thank.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1890545/+subscriptions
 
