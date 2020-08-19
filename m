@@ -2,92 +2,89 @@ Return-Path: <SRS0=bVMU=B5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.4 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41DC1C433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 20:59:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43232C433E1
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 21:11:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E92BA2078D
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 20:59:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 01B11207DE
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 21:11:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TNljdWD+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E92BA2078D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Mry/Xvi2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01B11207DE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55136 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59034 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8VBK-00076w-36
-	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 16:59:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38744)
+	id 1k8VNC-0001GH-Pt
+	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 17:11:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41598)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1k8VAU-0006bN-Er
- for qemu-devel@nongnu.org; Wed, 19 Aug 2020 16:58:46 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:31535
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1k8VAS-0004YX-48
- for qemu-devel@nongnu.org; Wed, 19 Aug 2020 16:58:46 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597870723;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=doKDOnJEz1BPETmmH4SHO+ZuHR9Dgxw08qL/Ukp7xH0=;
- b=TNljdWD+IttpLtjsw6h2jIIDIyADMmd8f8kcu6tAulpKRdX1eJYpVZHdUsFl6Mz89c53FB
- DLlvJ0o1l8fmFpldkY34HhjviXUjnLbwFQVnzsEuEhLE9cRwrsCy27gyHtqL1PV8s0HaRo
- 8+n5DJewn42o2kdfLz/3/AtipZa1m8M=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-243-1We99girOAeGgN_eI2pv6w-1; Wed, 19 Aug 2020 16:58:41 -0400
-X-MC-Unique: 1We99girOAeGgN_eI2pv6w-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4C5651885D82;
- Wed, 19 Aug 2020 20:58:40 +0000 (UTC)
-Received: from [10.3.112.136] (ovpn-112-136.phx2.redhat.com [10.3.112.136])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D5BDA19C4F;
- Wed, 19 Aug 2020 20:58:39 +0000 (UTC)
-Subject: Re: [RFC PATCH 13/22] block/export: Move refcount from NBDExport to
- BlockExport
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-References: <20200813162935.210070-1-kwolf@redhat.com>
- <20200813162935.210070-14-kwolf@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <0ff82c83-16eb-c544-553a-9a58c9453133@redhat.com>
-Date: Wed, 19 Aug 2020 15:58:39 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1k8VMc-0000qi-9v
+ for qemu-devel@nongnu.org; Wed, 19 Aug 2020 17:11:18 -0400
+Received: from mail-ej1-x642.google.com ([2a00:1450:4864:20::642]:35122)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1k8VMZ-00069S-Qe
+ for qemu-devel@nongnu.org; Wed, 19 Aug 2020 17:11:17 -0400
+Received: by mail-ej1-x642.google.com with SMTP id a26so130519ejc.2
+ for <qemu-devel@nongnu.org>; Wed, 19 Aug 2020 14:11:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=GBOHJ1hzbmDUjFBA/W3PGvGj68TJPhUSpLkFAtYeczo=;
+ b=Mry/Xvi2iHasQwYwzUEIz1OFzQ40oeH0/tXuQp3g8Imo0hjegsLIM5TbqHefzYx3cy
+ iGxD2IbnxZqJtRG9ePleKjdXRM9qanDLc4Eun/CZ33oyw//EU8aUgqMTftNL0zOsnF03
+ rID2bzhQr0+q6gC7R398UPMx8KzxYj1YapSJOnB5PiCawn9VA0HuzNz7vp0uHDTtldrl
+ Dnyb0LAFb8An+UNePBsAfbC4A/MCv7mr7s1q5lwDmvOh9lKakGquMYMzFj5JgIbGeCAM
+ 76T8ULK3cFjetRBnjxJwo9toTwBgdQK306uBblsoSo/XbqtBVBCFgKIVjLU+Sphq3t/n
+ D0ZA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=GBOHJ1hzbmDUjFBA/W3PGvGj68TJPhUSpLkFAtYeczo=;
+ b=LuBXY1Pdvp8QwGeB6eap6BJ8eIv6U8BPuq3KhELLsiCEyzgwLUz6SyTMo9OecDjHcD
+ CH8cTgz4C799o9OKJXyrHlmT+O/S0tSGZPM73zghQeMPznvEXIcHW3AvHjgDS6nfC8gz
+ DEstC6LaI0xFc9fbMDdLRTGeaINBGD33Lo5NTw/5Nc33P/7PgV9WMUNLPZzxurLWw7zT
+ yYvRKxi3EffKYy8M5G/mF9SKX9v2kXe4dCDRJhc59ED5g0V7+81rJBnFdmR/aCTfxgG3
+ 8csbkLPEZmCZ2lcBY4Ce4ceITJrEVEg/x2A2bzOWKe4Mgi3nlWyWfharCrXQtPytDucN
+ zu6Q==
+X-Gm-Message-State: AOAM5308R+ol/gqIa42AVDI9rw8GT/a+pHtFQFuIayOVuUo2FAZZGdC6
+ bVXJoOfPKUlpEvq5op8EVhTaPFALTrz7uwvzibY+lA==
+X-Google-Smtp-Source: ABdhPJz/bN6RFzsn5b7unqfcy6Pl9huLIZ24X0YfBjrtMHMGMYDXQFnZR9qSmtT7aw7iPPoTlWktbNQuVPa6sGrJJeg=
+X-Received: by 2002:a17:906:2cc2:: with SMTP id
+ r2mr212744ejr.482.1597871474279; 
+ Wed, 19 Aug 2020 14:11:14 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200813162935.210070-14-kwolf@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eblake@redhat.com
-X-Mimecast-Spam-Score: 0.003
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=eblake@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/19 16:00:16
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+References: <20200819143525.2175-1-pbonzini@redhat.com>
+ <CAFEAcA_8VJecDyK8FR0ty=pknmo+Hc5s0OFj+-Y1Ah-OJ01FDQ@mail.gmail.com>
+ <5d247082-4928-b47c-76c4-c366a9421e1a@msgid.tls.msk.ru>
+ <CAFEAcA_YU8QY_VRNdXmBV=YKuBFaX=scT0Pnk1F8JBWrrbsbJA@mail.gmail.com>
+ <72597e7a-6ee2-9875-536d-c5cd2d81950d@redhat.com>
+In-Reply-To: <72597e7a-6ee2-9875-536d-c5cd2d81950d@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 19 Aug 2020 22:11:03 +0100
+Message-ID: <CAFEAcA-RF4T43zeNMBb_NWaOqWOVS6H5iiRN4s4ocvnGgN65bw@mail.gmail.com>
+Subject: Re: [PULL v6 000/150] Meson-based build system
+To: Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::642;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x642.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,113 +97,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, mreitz@redhat.com
+Cc: Michael Tokarev <mjt@tls.msk.ru>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/13/20 11:29 AM, Kevin Wolf wrote:
-> Having a refcount makes sense for all types of block exports. It is also
-> a prerequisite for keeping a list of all exports at the BlockExport
-> level.
-> 
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
+On Wed, 19 Aug 2020 at 20:44, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> On 19/08/20 21:04, Peter Maydell wrote:
+> >> is it really that important? We've changed single target build
+> >> rules already (from subdir-x86_64-softmmu to x86_64-softmmu/all
+> >> for one), which broke quite some mostly automatic build
+> >> systems which needed some fixing. Moving executables isn't a
+> >> big deal after that, methinks..
+> > It breaks my setups and also my muscle memory for where
+> > executables live. So this is the limit of how much I'm
+> > willing to allow Meson to mess us around, I think.
+>
+> It's totally possible to accomodate this and I appreciate the help and
+> effort you're putting into something that you (understandably) are not
+> too confident in.
+>
+> However, this change was already in the first series that was posted
+> like a year ago...
 
-> +++ b/include/block/export.h
-> @@ -21,14 +21,24 @@ typedef struct BlockExport BlockExport;
->   typedef struct BlockExportDriver {
->       BlockExportType type;
->       BlockExport *(*create)(BlockExportOptions *, Error **);
-> +    void (*delete)(BlockExport *);
->   } BlockExportDriver;
->   
->   struct BlockExport {
->       const BlockExportDriver *drv;
-> +
-> +    /*
-> +     * Reference count for this block export. This includes strong references
-> +     * both from the owner (qemu-nbd or the monitor) and clients connected to
-> +     * the export.
+It's a hundred-and-fifty patch series, and I can't review everything.
+I took it on trust that it would be basically a drop-in replacement
+for our current makefile setup.
 
-I guess 'the monitor' includes qemu-storage-daemon.
-
-> +     */
-> +    int refcount;
->   };
->   
->   extern const BlockExportDriver blk_exp_nbd;
->   
->   BlockExport *blk_exp_add(BlockExportOptions *export, Error **errp);
-> +void blk_exp_ref(BlockExport *exp);
-> +void blk_exp_unref(BlockExport *exp);
-
-Yay, I think this naming is more consistent with the rest of qemu...
-
->   
->   #endif
-> diff --git a/include/block/nbd.h b/include/block/nbd.h
-> index 23030db3f1..af8509ab70 100644
-> --- a/include/block/nbd.h
-> +++ b/include/block/nbd.h
-> @@ -336,8 +336,6 @@ NBDExport *nbd_export_new(BlockDriverState *bs,
->   void nbd_export_set_on_eject_blk(BlockExport *exp, BlockBackend *blk);
->   void nbd_export_close(NBDExport *exp);
->   void nbd_export_remove(NBDExport *exp, NbdServerRemoveMode mode, Error **errp);
-> -void nbd_export_get(NBDExport *exp);
-> -void nbd_export_put(NBDExport *exp);
-
-...as opposed to this which is common in kernel but less so in this 
-project.  No hard feelings from me :)
-
-> +++ b/blockdev-nbd.c
-> @@ -232,7 +232,7 @@ BlockExport *nbd_export_create(BlockExportOptions *exp_args, Error **errp)
->       /* The list of named exports has a strong reference to this export now and
->        * our only way of accessing it is through nbd_export_find(), so we can drop
->        * the strong reference that is @exp. */
-> -    nbd_export_put(exp);
-> +    blk_exp_unref((BlockExport*) exp);
-
-Even a helper function that converts NBDBlockExport* to BlockExport* 
-rather than a cast might be nicer, but then again, I see from Max's 
-review that this may be a temporary state of things.
-
-(The QAPI contains such type-safe container casts, such as 
-qapi_DriveBackup_base(), if that helps...)
-
-
-> @@ -1537,7 +1536,8 @@ NBDExport *nbd_export_new(BlockDriverState *bs,
->   
->       exp = g_new0(NBDExport, 1);
->       exp->common = (BlockExport) {
-> -        .drv = &blk_exp_nbd,
-> +        .drv        = &blk_exp_nbd,
-> +        .refcount   = 1,
-
-I'm not sure whether trying to align the '=' is good, because the moment 
-you add a longer field name, every other line has to be touched.  I'm 
-fine with just one space on both side of =, even if it is more ragged to 
-read.  But you're the author, so you get to pick.
-
-
-> @@ -1626,8 +1625,9 @@ NBDExport *nbd_export_new(BlockDriverState *bs,
->       exp->ctx = ctx;
->       blk_add_aio_context_notifier(blk, blk_aio_attached, blk_aio_detach, exp);
->   
-> +    blk_exp_ref(&exp->common);
->       QTAILQ_INSERT_TAIL(&exports, exp, next);
-> -    nbd_export_get(exp);
-> +
-
-Is there any consequence to this changed ordering in grabbing the 
-reference vs. updating the list?
-
-
-Overall looks nice.
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
+thanks
+-- PMM
 
