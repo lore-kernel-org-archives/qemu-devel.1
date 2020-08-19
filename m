@@ -2,92 +2,81 @@ Return-Path: <SRS0=bVMU=B5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.4 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C17CC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 19:32:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 919F5C433E1
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 19:34:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 111CB207BB
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 19:32:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 61C26207BB
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 19:34:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W3KI5FWb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 111CB207BB
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V0r6seC0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61C26207BB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44336 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49210 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8Tp2-0002UX-9j
-	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 15:32:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46768)
+	id 1k8Tqs-0004X1-Lj
+	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 15:34:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47808)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k8To6-00022d-5L
- for qemu-devel@nongnu.org; Wed, 19 Aug 2020 15:31:34 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:38325
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1k8TqC-0003m3-Jn
+ for qemu-devel@nongnu.org; Wed, 19 Aug 2020 15:33:44 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:20994
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k8To3-0001Ek-Fv
- for qemu-devel@nongnu.org; Wed, 19 Aug 2020 15:31:33 -0400
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1k8Tq9-0001Z2-3D
+ for qemu-devel@nongnu.org; Wed, 19 Aug 2020 15:33:44 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597865489;
+ s=mimecast20190719; t=1597865619;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=OYKEO60TWPRCVnMkUEZHKJbtqby5xrjAvH2bYr4AcD0=;
- b=W3KI5FWbYHgMkHv2We8GBAPyQETcUufeKZAFToSPWLOJTiRaDlNVXG+mauhfXaljJKNMMq
- eAc3ZQ1tO9ZjECTAJUblZ93y+xt+g9O4hHMswN/eZai20QMaNAajKIm27Kja1MQylkTv4H
- iF04KpYbHBB+oE9+mdrFSptertS7PcM=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-483-XbohW95POYWdPPkR5_jfEg-1; Wed, 19 Aug 2020 15:31:25 -0400
-X-MC-Unique: XbohW95POYWdPPkR5_jfEg-1
-Received: by mail-ed1-f71.google.com with SMTP id c3so9659594edm.7
- for <qemu-devel@nongnu.org>; Wed, 19 Aug 2020 12:31:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=OYKEO60TWPRCVnMkUEZHKJbtqby5xrjAvH2bYr4AcD0=;
- b=uL35jdTxZeMyTcEGywt41tbYxSG0NUbX0WfRmZ/tx1b2ASB4noeodkTtnzQth1OOj5
- EqnQzS67C9envZzERhTLkAfcddPW4t+scPyXT1l2v5wyQr+8+gO4uWxNG3UCjEStZ1kT
- iyx3g9v7wgA2YI7A7iM+umNnMawc8QuqoeRaNQPC6Cx2vrWv+OHXnQxBPMhAHWodsYBj
- xeacnN1gRKVJlfpOoCwU+PAafvdwePRWJWKH3RbTPk6J/5Wzqk8gXm2HDmpQZP1537kq
- kGCw/7WOggnxBRDNZbRt9s0o/MVxkckLaDJ7sB0SwS+dwp73fRcF5oJXWew0VLBZuYGs
- SzfQ==
-X-Gm-Message-State: AOAM531rlnYW32PdSZTCmBC8NP6tKaZqrLG5KU37IjnQ+0AkJfApdxqu
- dzU4XYgdaHYHj2NBiTpXYGVLQqiIYC6ih1/l621hW+FnKn5FFVh6gqiTO5z+z4Gcof7mzuY0CXK
- 9HmYqgXfjNb1w86iH9FbvXzop3bS3z+k=
-X-Received: by 2002:a17:906:328d:: with SMTP id
- 13mr27561660ejw.71.1597865484649; 
- Wed, 19 Aug 2020 12:31:24 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzSPwZz8/ud7bY/jWy+ZGe5s0AtpZhnSL+2z7KEUcCD7sCCv93NpcGwyxhA1Q/exldnozgb/QvXcoE9+V+BuLo=
-X-Received: by 2002:a17:906:328d:: with SMTP id
- 13mr27561645ejw.71.1597865484412; 
- Wed, 19 Aug 2020 12:31:24 -0700 (PDT)
+ bh=n8gYDUhf1ZlJOPVEZPjAfjw1s+gDKRXRueaC6mAZQLo=;
+ b=V0r6seC041b3oAUXhdMjz6rwfJvmThLkttDzO1XDkOfgPHH/OSHiD9ABpShbFQMGWexysi
+ vjQDfqllCQNgN/d+oxYtsESCJoANpqeg6LZ//ziQ3xfCR5nUKo4WVMCynOJY3Ahtpnn22a
+ ReH1sq0kwsrpliuXTbnd5f8vVwxcalo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-395-9OP0q50hPbOMG8RT3N94pw-1; Wed, 19 Aug 2020 15:33:38 -0400
+X-MC-Unique: 9OP0q50hPbOMG8RT3N94pw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 392B964080;
+ Wed, 19 Aug 2020 19:33:37 +0000 (UTC)
+Received: from [10.3.112.136] (ovpn-112-136.phx2.redhat.com [10.3.112.136])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id CAA0526DD4;
+ Wed, 19 Aug 2020 19:33:36 +0000 (UTC)
+Subject: Re: [RFC PATCH 06/22] qemu-nbd: Use raw block driver for --offset
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+References: <20200813162935.210070-1-kwolf@redhat.com>
+ <20200813162935.210070-7-kwolf@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <4f9e0b0e-3f70-6237-86b3-c43c29847a0d@redhat.com>
+Date: Wed, 19 Aug 2020 14:33:36 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-References: <20200819143525.2175-1-pbonzini@redhat.com>
- <CAFEAcA_8VJecDyK8FR0ty=pknmo+Hc5s0OFj+-Y1Ah-OJ01FDQ@mail.gmail.com>
- <CAFEAcA9jt21RHiu1eqAzK_PJAj9i6Ej27jT2=gfjSRZVjJsDKw@mail.gmail.com>
- <CAFEAcA_1rtOJjs40MCNmJHmyaXG9ObFsdmyr1mb7FnieRBWO7g@mail.gmail.com>
-In-Reply-To: <CAFEAcA_1rtOJjs40MCNmJHmyaXG9ObFsdmyr1mb7FnieRBWO7g@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 19 Aug 2020 21:31:12 +0200
-Message-ID: <CABgObfbJg-zXXN=pf9JMqAGOKz_W67JFe50ruYSc7Vg_EjboNA@mail.gmail.com>
-Subject: Re: [PULL v6 000/150] Meson-based build system
-To: Peter Maydell <peter.maydell@linaro.org>
+In-Reply-To: <20200813162935.210070-7-kwolf@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0.0
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eblake@redhat.com
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/alternative; boundary="00000000000099063305ad400ce7"
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=pbonzini@redhat.com;
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=eblake@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/19 01:46:53
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -96,8 +85,8 @@ X-Spam_score: -4.1
 X-Spam_bar: ----
 X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -110,105 +99,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: qemu-devel@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000099063305ad400ce7
-Content-Type: text/plain; charset="UTF-8"
+On 8/13/20 11:29 AM, Kevin Wolf wrote:
+> Instead of implementing qemu-nbd --offset in the NBD code, just put a
+> raw block node with the requested offset on top of the user image and
+> rely on that doing the job.
+> 
+> This does not only simplify the nbd_export_new() interface and bring it
+> closer to the set of options that the nbd-server-add QMP command offers,
+> but in fact it also eliminates a potential source for bugs in the NBD
+> code which previously had to add the offset manually in all relevant
+> places.
 
-I can certainly add symlinks (that would be broken until make completes)
-but moving the build outputs is not possible since there's no recursive
-make anymore.
+Yay!  This patch alone is worth having, regardless of the fate of the 
+rest of the series: no change in end-user functionality, but by making 
+qemu-nbd turn it into proper syntactic sugar, we've reduced the 
+maintenance burden of duplicated code.
 
-Paolo
+> 
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>   include/block/nbd.h |  4 ++--
+>   blockdev-nbd.c      |  9 +--------
+>   nbd/server.c        | 34 +++++++++++++++++-----------------
+>   qemu-nbd.c          | 27 ++++++++++++---------------
+>   4 files changed, 32 insertions(+), 42 deletions(-)
+> 
 
-Il mer 19 ago 2020, 21:06 Peter Maydell <peter.maydell@linaro.org> ha
-scritto:
+> +++ b/nbd/server.c
+> @@ -89,7 +89,6 @@ struct NBDExport {
+>       BlockBackend *blk;
+>       char *name;
+>       char *description;
+> -    uint64_t dev_offset;
+>       uint64_t size;
 
-> On Wed, 19 Aug 2020 at 19:16, Peter Maydell <peter.maydell@linaro.org>
-> wrote:
-> > Spoke too soon; "make --output-sync -C build/all-linux-static check-tcg"
-> > failed with:
-> >
-> >   BUILD   TCG tests for mips-linux-user
-> >   CHECK   debian10
-> >   CHECK   debian-mips-cross
-> >   BUILD   mips-linux-user guest-tests with docker qemu/debian-mips-cross
-> >   RUN     TCG tests for mips-linux-user
-> >   CHECK   debian10
-> >   CHECK   debian-mips-cross
-> >   BUILD   mips-linux-user guest-tests with docker qemu/debian-mips-cross
-> >   RUN     tests for mips
-> >   TEST    threadcount on mips
-> > qemu: uncaught target signal 11 (Segmentation fault) - core dumped
-> > timeout: the monitored command dumped core
-> > Segmentation fault
-> > ../Makefile.target:153: recipe for target 'run-threadcount' failed
-> > make[2]: *** [run-threadcount] Error 139
-> > /home/petmay01/linaro/qemu-for-merges/tests/tcg/Makefile.qemu:76:
-> > recipe for target 'run-guest-tests' failed
-> > make[1]: *** [run-guest-tests] Error 2
-> > /home/petmay01/linaro/qemu-for-merges/tests/Makefile.include:450:
-> > recipe for target 'run-tcg-tests-mips-linux-user' failed
->
-> Seems to be consistent, so not an intermittent but presumably
-> an issue introduced by the meson changes.
->
-> -- PMM
->
->
+I'm trying to figure out if we can also drop 'size' here.  If we do, the 
+consequence would be that an NBD client could ask for beyond-EOF I/O, 
+and presumably the block layer would reject that gracefully (although 
+not necessarily with the same errno as NBD currently reports).  I'm fine 
+leaving it alone in this patch, though.
 
---00000000000099063305ad400ce7
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+> @@ -1569,7 +1574,7 @@ NBDExport *nbd_export_new(BlockDriverState *bs, uint64_t dev_offset,
+>           exp->nbdflags |= (NBD_FLAG_SEND_TRIM | NBD_FLAG_SEND_WRITE_ZEROES |
+>                             NBD_FLAG_SEND_FAST_ZERO);
+>       }
+> -    assert(size <= INT64_MAX - dev_offset);
+> +    assert(size <= INT64_MAX);
 
-<div dir=3D"auto">I can certainly add symlinks (that would be broken until =
-make completes) but moving the build outputs is not possible since there&#3=
-9;s no recursive make anymore.<div dir=3D"auto"><br></div><div dir=3D"auto"=
->Paolo</div></div><br><div class=3D"gmail_quote"><div dir=3D"ltr" class=3D"=
-gmail_attr">Il mer 19 ago 2020, 21:06 Peter Maydell &lt;<a href=3D"mailto:p=
-eter.maydell@linaro.org">peter.maydell@linaro.org</a>&gt; ha scritto:<br></=
-div><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-lef=
-t:1px #ccc solid;padding-left:1ex">On Wed, 19 Aug 2020 at 19:16, Peter Mayd=
-ell &lt;<a href=3D"mailto:peter.maydell@linaro.org" target=3D"_blank" rel=
-=3D"noreferrer">peter.maydell@linaro.org</a>&gt; wrote:<br>
-&gt; Spoke too soon; &quot;make --output-sync -C build/all-linux-static che=
-ck-tcg&quot;<br>
-&gt; failed with:<br>
-&gt;<br>
-&gt;=C2=A0 =C2=A0BUILD=C2=A0 =C2=A0TCG tests for mips-linux-user<br>
-&gt;=C2=A0 =C2=A0CHECK=C2=A0 =C2=A0debian10<br>
-&gt;=C2=A0 =C2=A0CHECK=C2=A0 =C2=A0debian-mips-cross<br>
-&gt;=C2=A0 =C2=A0BUILD=C2=A0 =C2=A0mips-linux-user guest-tests with docker =
-qemu/debian-mips-cross<br>
-&gt;=C2=A0 =C2=A0RUN=C2=A0 =C2=A0 =C2=A0TCG tests for mips-linux-user<br>
-&gt;=C2=A0 =C2=A0CHECK=C2=A0 =C2=A0debian10<br>
-&gt;=C2=A0 =C2=A0CHECK=C2=A0 =C2=A0debian-mips-cross<br>
-&gt;=C2=A0 =C2=A0BUILD=C2=A0 =C2=A0mips-linux-user guest-tests with docker =
-qemu/debian-mips-cross<br>
-&gt;=C2=A0 =C2=A0RUN=C2=A0 =C2=A0 =C2=A0tests for mips<br>
-&gt;=C2=A0 =C2=A0TEST=C2=A0 =C2=A0 threadcount on mips<br>
-&gt; qemu: uncaught target signal 11 (Segmentation fault) - core dumped<br>
-&gt; timeout: the monitored command dumped core<br>
-&gt; Segmentation fault<br>
-&gt; ../Makefile.target:153: recipe for target &#39;run-threadcount&#39; fa=
-iled<br>
-&gt; make[2]: *** [run-threadcount] Error 139<br>
-&gt; /home/petmay01/linaro/qemu-for-merges/tests/tcg/Makefile.qemu:76:<br>
-&gt; recipe for target &#39;run-guest-tests&#39; failed<br>
-&gt; make[1]: *** [run-guest-tests] Error 2<br>
-&gt; /home/petmay01/linaro/qemu-for-merges/tests/Makefile.include:450:<br>
-&gt; recipe for target &#39;run-tcg-tests-mips-linux-user&#39; failed<br>
-<br>
-Seems to be consistent, so not an intermittent but presumably<br>
-an issue introduced by the meson changes.<br>
-<br>
--- PMM<br>
-<br>
-</blockquote></div>
+As Max caught, this is now dead code.
 
---00000000000099063305ad400ce7--
+> @@ -2386,8 +2388,7 @@ static coroutine_fn int nbd_handle_request(NBDClient *client,
+>           if (request->flags & NBD_CMD_FLAG_FAST_ZERO) {
+>               flags |= BDRV_REQ_NO_FALLBACK;
+>           }
+> -        ret = blk_pwrite_zeroes(exp->blk, request->from + exp->dev_offset,
+> -                                request->len, flags);
+> +        ret = blk_pwrite_zeroes(exp->blk, request->from, request->len, flags);
+>           return nbd_send_generic_reply(client, request->handle, ret,
+>                                         "writing to file failed", errp);
+>   
+> @@ -2401,8 +2402,7 @@ static coroutine_fn int nbd_handle_request(NBDClient *client,
+>                                         "flush failed", errp);
+>   
+>       case NBD_CMD_TRIM:
+> -        ret = blk_co_pdiscard(exp->blk, request->from + exp->dev_offset,
+> -                              request->len);
+> +        ret = blk_co_pdiscard(exp->blk, request->from, request->len);
+
+Merge conflicts with 890cbccb08; should be obvious enough to resolve, 
+though.
+
+> +++ b/qemu-nbd.c
+> @@ -523,7 +523,6 @@ int main(int argc, char **argv)
+>       const char *port = NULL;
+>       char *sockpath = NULL;
+>       char *device = NULL;
+> -    int64_t fd_size;
+>       QemuOpts *sn_opts = NULL;
+>       const char *sn_id_or_name = NULL;
+>       const char *sopt = "hVb:o:p:rsnc:dvk:e:f:tl:x:T:D:B:L";
+> @@ -1028,6 +1027,17 @@ int main(int argc, char **argv)
+>       }
+>       bs = blk_bs(blk);
+>   
+> +    if (dev_offset) {
+> +        QDict *raw_opts = qdict_new();
+> +        qdict_put_str(raw_opts, "driver", "raw");
+> +        qdict_put_str(raw_opts, "file", bs->node_name);
+> +        qdict_put_int(raw_opts, "offset", dev_offset);
+
+Huh.  When 0bc16997f5 got rid of the --partition option, it also got rid 
+of the only way that the NBD driver could clamp down requests to a range 
+smaller than the end of the file.  Now that you are adding a raw driver 
+in the mix, that ability to clamp the end of the range (aka a --size 
+option, in addition to an --offset option) may be worth reinstating. 
+But that can be done as a separate patch, if at all (and whether 
+qemu-nbd should do it, or qemu-storage-daemon, or whether we just point 
+people at 'nbdkit --filter=partition', is part of that discussion).  But 
+for this patch, it looks like you are making a straight-across conversion.
+
+> +        bs = bdrv_open(NULL, NULL, raw_opts, flags, &error_fatal);
+> +        blk_remove_bs(blk);
+> +        blk_insert_bs(blk, bs, &error_fatal);
+> +        bdrv_unref(bs);
+> +    }
+> +
+
+Slick.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
