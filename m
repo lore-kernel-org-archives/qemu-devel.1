@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5D34C433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 10:52:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1222C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 10:52:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9F514206B5
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 10:52:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F514206B5
+	by mail.kernel.org (Postfix) with ESMTPS id 8728A206B5
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 10:52:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8728A206B5
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33726 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33808 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8LhM-0000MX-Tz
-	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 06:52:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40374)
+	id 1k8LhO-0000On-Qy
+	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 06:52:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40378)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k8LgN-0007iW-3Z
+ id 1k8LgN-0007id-DK
  for qemu-devel@nongnu.org; Wed, 19 Aug 2020 06:51:03 -0400
-Received: from indium.canonical.com ([91.189.90.7]:44552)
+Received: from indium.canonical.com ([91.189.90.7]:44572)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k8LgK-0004Dw-Uh
- for qemu-devel@nongnu.org; Wed, 19 Aug 2020 06:51:02 -0400
+ id 1k8LgL-0004Dy-Ih
+ for qemu-devel@nongnu.org; Wed, 19 Aug 2020 06:51:03 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1k8LgI-0004h7-Ni
- for <qemu-devel@nongnu.org>; Wed, 19 Aug 2020 10:50:58 +0000
+ id 1k8LgJ-0004ie-CO
+ for <qemu-devel@nongnu.org>; Wed, 19 Aug 2020 10:50:59 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id AD6152E8023
- for <qemu-devel@nongnu.org>; Wed, 19 Aug 2020 10:50:58 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 4DD8F2E80E9
+ for <qemu-devel@nongnu.org>; Wed, 19 Aug 2020 10:50:59 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 19 Aug 2020 10:36:53 -0000
+Date: Wed, 19 Aug 2020 10:41:35 -0000
 From: Jonathan Wakely <1886155@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -53,7 +53,7 @@ X-Launchpad-Bug-Commenters: jwakely mliska
 X-Launchpad-Bug-Reporter: Martin Liska (mliska)
 X-Launchpad-Bug-Modifier: Jonathan Wakely (jwakely)
 References: <159376359338.16005.10195773015354828175.malonedeb@soybean.canonical.com>
-Message-Id: <159783341366.32636.16429140323070349472.malone@wampee.canonical.com>
+Message-Id: <159783369523.16435.554838415958430933.malone@soybean.canonical.com>
 Subject: =?utf-8?q?=5BBug_1886155=5D_Re=3A_error=3A_argument_2_of_=E2=80=98?=
  =?utf-8?b?X19hdG9taWNfbG9hZOKAmSBkaXNjYXJkcyDigJhjb25zdOKAmSBxdWFsaWZpZXI=?=
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
@@ -61,7 +61,7 @@ X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="99c2d833c8d727fd05148486920aca032e908071"; Instance="production"
-X-Launchpad-Hash: b9a61b3f4528808d5056b512348df1f8e2c8341c
+X-Launchpad-Hash: d48c58c0ce430c9e70cbbb1c48d73967f459bb82
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/19 06:50:59
@@ -88,7 +88,21 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It looks like `typeof_strip_qual` doesn't work for pointer types.
+Which means that given an argument of type T * const this defines a
+local variable that is also T * const, and then tries to store the
+result of the atomic load into that const variable:
+
+
+```
+#define atomic_rcu_read(ptr)                          \
+    ({                                                \
+    typeof_strip_qual(*ptr) _val;                     \
+    atomic_rcu_read__nocheck(ptr, &_val);             \
+    _val;                                             \
+    })
+```
+
+GCC 11 correctly diagnoses that write to a const variable.
 
 -- =
 
