@@ -2,73 +2,90 @@ Return-Path: <SRS0=bVMU=B5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7137C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 07:51:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EA2BC433E1
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 08:01:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A224A20772
-	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 07:51:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A224A20772
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id D4E0B2067C
+	for <qemu-devel@archiver.kernel.org>; Wed, 19 Aug 2020 08:01:36 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HZUWEluE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D4E0B2067C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58462 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34768 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8Ism-0000n5-UO
-	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 03:51:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49864)
+	id 1k8J2O-0003Jy-30
+	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 04:01:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52756)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1k8Is5-00008c-FD
- for qemu-devel@nongnu.org; Wed, 19 Aug 2020 03:50:57 -0400
-Resent-Date: Wed, 19 Aug 2020 03:50:57 -0400
-Resent-Message-Id: <E1k8Is5-00008c-FD@lists.gnu.org>
-Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21336)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1k8J1V-0002rt-3N
+ for qemu-devel@nongnu.org; Wed, 19 Aug 2020 04:00:41 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:58376
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1k8Is3-0005QH-3g
- for qemu-devel@nongnu.org; Wed, 19 Aug 2020 03:50:57 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1597823444; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=RKYV8+Qkj1gxT8guUwHUh+fibQUNhH54A6KfwW4rjObQWko5WNNPX5xBMPwu2t84xEA7A9g15ihxcZybjsAgnUMyGBUVdfWCJyyU8ww//37SLcQ5ip5QOl9UYCOO8PJt3BHQ+MOo9EAl/OfgiVvtTYMMW9+I/EWEwTXTRcAFjVY=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1597823444;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=Wk93AfsfczPW8EDvMM72lD7TzZ5tuAorvoAxcZk/bOk=; 
- b=cf0zHyrjb2U/1Qq+iey8Dxv+cYfoUgn5mT8TOR4Y8f5hlTioaGjm+g2A0QP/dS7f+GE2xT0+glI91BfWLh/IwEkfDwk1ORlc4vQl+9FpnkY447xb/NHgQ2dA2qmi6aCJxmc2nfTsYwgrfif9/q5YL18qp5Xasy+Gb2AzykWx4a0=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1597823441931723.583491478047;
- Wed, 19 Aug 2020 00:50:41 -0700 (PDT)
-Subject: Re: [PATCH] hw/m68k: QOMify the mcf5206 system integration module
-Message-ID: <159782344069.25250.8248669151591715233@66eaa9a8a123>
-In-Reply-To: <20200819065201.4045-1-huth@tuxfamily.org>
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1k8J1R-0006sO-R4
+ for qemu-devel@nongnu.org; Wed, 19 Aug 2020 04:00:40 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1597824034;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=fVRyIK6Wc5Kn2X6ij0hhSVkeLp1CoK6bxQVW77SIXJI=;
+ b=HZUWEluEjT82f+lPl2pj5xA/kPvIIDGPc/lKoPoeOJ5xeIw2IPMSQl75q6cy64rWR08FTg
+ GTiOLCiq21+P28dTsm2FMyMXjQlAGWTzbbKvA0K0tIcmkhrj4hF87xUTQZYEwet0QcWKRl
+ IBxBnHseoO6DPTJEtOp1STYnjuVFz+M=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-217-kxBlyihEM-OKtCq2-lZsxg-1; Wed, 19 Aug 2020 04:00:32 -0400
+X-MC-Unique: kxBlyihEM-OKtCq2-lZsxg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E1501640C0;
+ Wed, 19 Aug 2020 08:00:30 +0000 (UTC)
+Received: from localhost (ovpn-114-41.ams2.redhat.com [10.36.114.41])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 58336101E247;
+ Wed, 19 Aug 2020 08:00:03 +0000 (UTC)
+Date: Wed, 19 Aug 2020 09:00:01 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+Subject: Re: [PATCH v8 17/20] multi-process: heartbeat messages to remote
+Message-ID: <20200819080001.GA334045@stefanha-x1.localdomain>
+References: <cover.1596217462.git.jag.raman@oracle.com>
+ <93b7566e5d565b9e5d8127849bb5be65057e25cc.1596217462.git.jag.raman@oracle.com>
+ <20200811144130.GC18223@stefanha-x1.localdomain>
+ <20200814230147.GA177362@heatpipe>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: huth@tuxfamily.org
-Date: Wed, 19 Aug 2020 00:50:41 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o53.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/19 03:50:52
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200814230147.GA177362@heatpipe>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="7AUc2qLy4jB3hD7Z"
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=stefanha@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/19 04:00:34
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -81,46 +98,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: laurent@vivier.eu, qemu-devel@nongnu.org, f4bug@amsat.org
+Cc: fam@euphon.net, john.g.johnson@oracle.com, swapnil.ingle@nutanix.com,
+ mst@redhat.com, qemu-devel@nongnu.org, kraxel@redhat.com,
+ Jagannathan Raman <jag.raman@oracle.com>, quintela@redhat.com,
+ armbru@redhat.com, kanth.ghatraju@oracle.com, felipe@nutanix.com,
+ thuth@redhat.com, ehabkost@redhat.com, konrad.wilk@oracle.com,
+ dgilbert@redhat.com, alex.williamson@redhat.com, thanos.makatos@nutanix.com,
+ rth@twiddle.net, kwolf@redhat.com, berrange@redhat.com, mreitz@redhat.com,
+ ross.lagerwall@citrix.com, marcandre.lureau@gmail.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDgxOTA2NTIwMS40MDQ1
-LTEtaHV0aEB0dXhmYW1pbHkub3JnLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUgZG9j
-a2VyLXF1aWNrQGNlbnRvczcgYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3RpbmcgY29t
-bWFuZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3RhbGxl
-ZCwgeW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFNDUklQ
-VCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKbWFrZSBkb2NrZXItaW1hZ2UtY2VudG9zNyBWPTEgTkVU
-V09SSz0xCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1xdWlja0BjZW50b3M3IFNIT1dfRU5WPTEgSj0x
-NCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCiAgVEVTVCAgICBjaGVjay11bml0
-OiB0ZXN0cy90ZXN0LWNoYXIKVW5leHBlY3RlZCBlcnJvciBpbiBvYmplY3RfcHJvcGVydHlfdHJ5
-X2FkZCgpIGF0IC90bXAvcWVtdS10ZXN0L3NyYy9xb20vb2JqZWN0LmM6MTE4MToKYXR0ZW1wdCB0
-byBhZGQgZHVwbGljYXRlIHByb3BlcnR5ICdzZXJpYWwtaWQnIHRvIG9iamVjdCAodHlwZSAnY29u
-dGFpbmVyJykKRVJST1IgdGVzdC1jaGFyIC0gdG9vIGZldyB0ZXN0cyBydW4gKGV4cGVjdGVkIDM4
-LCBnb3QgOSkKbWFrZTogKioqIFtjaGVjay11bml0XSBFcnJvciAxCm1ha2U6ICoqKiBXYWl0aW5n
-IGZvciB1bmZpbmlzaGVkIGpvYnMuLi4uCiAgVEVTVCAgICBpb3Rlc3QtcWNvdzI6IDAyNAogIFRF
-U1QgICAgaW90ZXN0LXFjb3cyOiAwMjUKLS0tCiAgICByYWlzZSBDYWxsZWRQcm9jZXNzRXJyb3Io
-cmV0Y29kZSwgY21kKQpzdWJwcm9jZXNzLkNhbGxlZFByb2Nlc3NFcnJvcjogQ29tbWFuZCAnWydz
-dWRvJywgJy1uJywgJ2RvY2tlcicsICdydW4nLCAnLS1sYWJlbCcsICdjb20ucWVtdS5pbnN0YW5j
-ZS51dWlkPWM3MDQzYTI3M2JkNDQyYmI5YTlhZGZmY2YwMTA0NjY3JywgJy11JywgJzEwMDEnLCAn
-LS1zZWN1cml0eS1vcHQnLCAnc2VjY29tcD11bmNvbmZpbmVkJywgJy0tcm0nLCAnLWUnLCAnVEFS
-R0VUX0xJU1Q9JywgJy1lJywgJ0VYVFJBX0NPTkZJR1VSRV9PUFRTPScsICctZScsICdWPScsICct
-ZScsICdKPTE0JywgJy1lJywgJ0RFQlVHPScsICctZScsICdTSE9XX0VOVj0xJywgJy1lJywgJ0ND
-QUNIRV9ESVI9L3Zhci90bXAvY2NhY2hlJywgJy12JywgJy9ob21lL3BhdGNoZXcvLmNhY2hlL3Fl
-bXUtZG9ja2VyLWNjYWNoZTovdmFyL3RtcC9jY2FjaGU6eicsICctdicsICcvdmFyL3RtcC9wYXRj
-aGV3LXRlc3Rlci10bXAtbjhndWd0bHYvc3JjL2RvY2tlci1zcmMuMjAyMC0wOC0xOS0wMy4zNy4w
-NS4xMDQ0MTovdmFyL3RtcC9xZW11Onoscm8nLCAncWVtdS9jZW50b3M3JywgJy92YXIvdG1wL3Fl
-bXUvcnVuJywgJ3Rlc3QtcXVpY2snXScgcmV0dXJuZWQgbm9uLXplcm8gZXhpdCBzdGF0dXMgMi4K
-ZmlsdGVyPS0tZmlsdGVyPWxhYmVsPWNvbS5xZW11Lmluc3RhbmNlLnV1aWQ9YzcwNDNhMjczYmQ0
-NDJiYjlhOWFkZmZjZjAxMDQ2NjcKbWFrZVsxXTogKioqIFtkb2NrZXItcnVuXSBFcnJvciAxCm1h
-a2VbMV06IExlYXZpbmcgZGlyZWN0b3J5IGAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtbjhn
-dWd0bHYvc3JjJwptYWtlOiAqKiogW2RvY2tlci1ydW4tdGVzdC1xdWlja0BjZW50b3M3XSBFcnJv
-ciAyCgpyZWFsICAgIDEzbTM2LjIwOXMKdXNlciAgICAwbTguOTA5cwoKClRoZSBmdWxsIGxvZyBp
-cyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAyMDA4MTkwNjUyMDEuNDA0
-NS0xLWh1dGhAdHV4ZmFtaWx5Lm9yZy90ZXN0aW5nLmRvY2tlci1xdWlja0BjZW50b3M3Lz90eXBl
-PW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFto
-dHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hl
-dy1kZXZlbEByZWRoYXQuY29t
+--7AUc2qLy4jB3hD7Z
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Fri, Aug 14, 2020 at 04:01:47PM -0700, Elena Ufimtseva wrote:
+> On Tue, Aug 11, 2020 at 03:41:30PM +0100, Stefan Hajnoczi wrote:
+> > On Fri, Jul 31, 2020 at 02:20:24PM -0400, Jagannathan Raman wrote:
+> > > @@ -343,3 +349,49 @@ static void probe_pci_info(PCIDevice *dev, Error=
+ **errp)
+> > >          }
+> > >      }
+> > >  }
+> > > +
+> > > +static void hb_msg(PCIProxyDev *dev)
+> > > +{
+> > > +    DeviceState *ds =3D DEVICE(dev);
+> > > +    Error *local_err =3D NULL;
+> > > +    MPQemuMsg msg =3D { 0 };
+> > > +
+> > > +    msg.cmd =3D PROXY_PING;
+> > > +    msg.bytestream =3D 0;
+> > > +    msg.size =3D 0;
+> > > +
+> > > +    (void)mpqemu_msg_send_and_await_reply(&msg, dev->ioc, &local_err=
+);
+> > > +    if (local_err) {
+> > > +        error_report_err(local_err);
+> > > +        qio_channel_close(dev->ioc, &local_err);
+> > > +        error_setg(&error_fatal, "Lost contact with device %s", ds->=
+id);
+> > > +    }
+> > > +}
+> >=20
+> > Here is my feedback from the last revision. Was this addressed?
+> >
+>=20
+> Hi Stefan,
+>=20
+> Thank you for reviewing the patchset. In this version we decided to=20
+> shutdown the guest when the heartbeat did not get a reply from the
+> remote by setting the error_fatal.
+> Should we approach it differently or you prefer us to get rid of the
+> heartbeat in this form?
+
+I think the only case that this patch handles is when the mpqemu channel
+is closed.
+
+The VM hangs when the channel is still open but the remote is
+unresponsive. (mpqemu_msg_send_and_await_reply() calls aio_poll() with
+the global mutex held so vcpus cannot make progress.)
+
+The heartbeat mechanism needs to handle the case where the other side
+isn't responding. It can't hang QEMU.
+
+I suggest dropping this patch. It can be done later.
+
+Stefan
+
+--7AUc2qLy4jB3hD7Z
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl883AEACgkQnKSrs4Gr
+c8j6zAgAwVEo1sk/SMZFufOa0bLBWNplceo+tuBq0E9IXWpuIdwXFHm/TrLF6yBQ
+ElLuT3DQTkYMRpvCkPc2D4+5op4MSRLpcdJACwTSxuxVIPEILufHoSZnb8+CdKBx
+aSct0Rcn3fKPMwoFATow1SgxiAuZ/p8t/CK69FjdiXZpqU1Cx1tYhtYjkRSLLRsU
+UxcRjdA7/XG4lmW0u9Z7zpaL6AXyZx+hXE6Fwlgl3nsGhvc1Dqsi459x0+6fvqMv
+i3WTaSI3gpxOHZXy4zv5NaP3BtI98lwk/R87xr7m+WUeRu4Ayv3zPP2mX33/Yitv
+39pOMFKV2pZuH69mofpAuI3FxlxBiw==
+=MtD/
+-----END PGP SIGNATURE-----
+
+--7AUc2qLy4jB3hD7Z--
+
 
