@@ -2,101 +2,104 @@ Return-Path: <SRS0=Dndf=B6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37C7BC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 11:53:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64650C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 11:56:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 051E82078B
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 11:53:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 333AB22BED
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 11:56:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fuRBEIxV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 051E82078B
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BNz7ns+k"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 333AB22BED
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59076 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33462 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8j7y-00057i-AQ
-	for qemu-devel@archiver.kernel.org; Thu, 20 Aug 2020 07:53:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37750)
+	id 1k8jBZ-0006QB-Ek
+	for qemu-devel@archiver.kernel.org; Thu, 20 Aug 2020 07:56:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39268)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k8j7R-0004ie-Em
- for qemu-devel@nongnu.org; Thu, 20 Aug 2020 07:52:33 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:54416
- helo=us-smtp-delivery-1.mimecast.com)
+ id 1k8jB3-00060z-UB
+ for qemu-devel@nongnu.org; Thu, 20 Aug 2020 07:56:17 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:49696
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k8j7O-00051f-L2
- for qemu-devel@nongnu.org; Thu, 20 Aug 2020 07:52:32 -0400
+ id 1k8jB1-0005uw-OS
+ for qemu-devel@nongnu.org; Thu, 20 Aug 2020 07:56:17 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597924349;
+ s=mimecast20190719; t=1597924574;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=DhsfkHPJhj1qFIEJR+38+Bl8S2u3FoReVRbKK2WRG2E=;
- b=fuRBEIxVdarK4Ak/tmsxhfAoeTFvT9yLZxnrlEE7BJ0aWz37mtWud4srR4+s7v1eN/w8hn
- TuoiZGsqO0yN8EHHcrTJwDSdqD7V9EoK2eEkX+FuRhjfWfgU5B3RcZszspqP5vSrAz7HON
- FcrV6y/wA/5yx1WJeRZN2Xi/C1ygxXY=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-429-OYSlYCs1P4yU0D74EO-qvQ-1; Thu, 20 Aug 2020 07:52:27 -0400
-X-MC-Unique: OYSlYCs1P4yU0D74EO-qvQ-1
-Received: by mail-wm1-f69.google.com with SMTP id z10so693103wmi.8
- for <qemu-devel@nongnu.org>; Thu, 20 Aug 2020 04:52:27 -0700 (PDT)
+ bh=UBhTjgNWAR+w2XmbqpDKvQvrse6BnD8mHONHHbHbeKg=;
+ b=BNz7ns+k/mRgapL3K/MwHO5lWxAdOygrrDo/nG72GXK2ppVmVPB56Kdjc/4SimX6z8n/P0
+ 71Gu83ihrzdJFjVDrdhVt34s98nsiLYaqRY5p9Wj7dh8DySrZkgQdC+BxMqS6J7SePkyIP
+ CTQCnSWaBbjyx2eT5gNXPDQ7q5wf5Pg=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-380-7PT5I7ufMpOIa4ly8Qtg6Q-1; Thu, 20 Aug 2020 07:56:11 -0400
+X-MC-Unique: 7PT5I7ufMpOIa4ly8Qtg6Q-1
+Received: by mail-wm1-f71.google.com with SMTP id z10so696543wmi.8
+ for <qemu-devel@nongnu.org>; Thu, 20 Aug 2020 04:56:11 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=DhsfkHPJhj1qFIEJR+38+Bl8S2u3FoReVRbKK2WRG2E=;
- b=I79++IpL1b+o9Fnsxk46HUL9mvUD5TnnsH//CKYCEtkMcw/RxDdkAyFvo50GFtWWXr
- OTzm46J60w+IlGjQi1hFc2KGW1Tvy5avLsCc0NzDsF3yFV6EINj4aMtrrEUEmeTcrl81
- oUs+df8IJbFzEn7OLCSo4Hem1+xCrvrRoXNyny+dqxudU1Pl41hopWEXmbNoIMRYBmCj
- srW7Tm96jzKs9f/Y94o+EqW/MZFbouOUft9kqy3QGqlgQuoBkiUUdxMk7+Bt2OgjhHDV
- 63ht2UBJ1Kqae94IZeJWtwVSW4k6oXAPI8sUCFyXEU/cLWP+xxztIA7hC7BneokfI9XB
- cu+g==
-X-Gm-Message-State: AOAM531VSb2S1glCNlbNeAaPme/JwWDkhJ5tCZY7XKjRmJ481+SY46j7
- elOKe/Frtbpw5SmsaA82VuoKHHDev8ZITJ0EMFn+DvFMvWnccjDvxgYVBWhEbSbtOe5Y4KR0nax
- PVU7I4RtxJs1eung=
-X-Received: by 2002:a5d:5084:: with SMTP id a4mr2984556wrt.191.1597924346303; 
- Thu, 20 Aug 2020 04:52:26 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw40qHw12SQYsz5bjgB5o0C+PpL4le6MFshuvKVSHUAa6mQ5yYV32cAr8ONi+WniBpHNT08lw==
-X-Received: by 2002:a5d:5084:: with SMTP id a4mr2984539wrt.191.1597924346020; 
- Thu, 20 Aug 2020 04:52:26 -0700 (PDT)
+ bh=UBhTjgNWAR+w2XmbqpDKvQvrse6BnD8mHONHHbHbeKg=;
+ b=XND3Y5t+FWEB78CZR2xzcDzCVncteXYk7xSxPIpGsxWjAWKRLtUxBFRpUisobDAADe
+ DZwV6o81i1ms+Lm7z4hSSjsFx5TMnTirx9QJPYZN8ezTDMHTW7imChkxJzizSUT0NUow
+ LyBwrGjp62YZvJ+XeoZl1VKv8wGfHZUILSsppMg7bTuke7eTZTUAdeE/FgC+/UVlnc/H
+ YOtvYjAdNbBn/9paXzBHFn/W22RI+gZOzVQ98sqa09kW5v8ARK9eQ+HXQCgjRHhnMGgc
+ acvukdKjbiK3pmM+7YWyymN1D2wrKkIQc15g6cSlIycCBQvGe/3D47Akg3QXXJzdmFcr
+ ao7A==
+X-Gm-Message-State: AOAM530VEk5wSR15fDQO3ECOw029Mbm7JQHqTNet6WHPQktfJEaizOli
+ ZLNcxpGduPRlpCtJ04UcmaYJIwczE9JvjMaA2h2/TiPzZ3T3tiQ6oJnaypUgab7ekS+Hy2APjOn
+ bn16xf0yfvXdEJTE=
+X-Received: by 2002:a1c:3b89:: with SMTP id i131mr3207897wma.30.1597924569822; 
+ Thu, 20 Aug 2020 04:56:09 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw7UAXXBkzEcBIkIISXILSSejq276vWZe+bjhshjPU9othTn3plZZCueHhaOY81K4XnbVC9Qw==
+X-Received: by 2002:a1c:3b89:: with SMTP id i131mr3207886wma.30.1597924569585; 
+ Thu, 20 Aug 2020 04:56:09 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:1cc0:4e4e:f1a9:1745?
  ([2001:b07:6468:f312:1cc0:4e4e:f1a9:1745])
- by smtp.gmail.com with ESMTPSA id c17sm3913058wrc.42.2020.08.20.04.52.25
+ by smtp.gmail.com with ESMTPSA id l11sm3607496wme.11.2020.08.20.04.56.08
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 20 Aug 2020 04:52:25 -0700 (PDT)
-Subject: Re: [PULL v7 000/151] Meson-based build system
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20200819213203.17876-1-pbonzini@redhat.com>
- <CAFEAcA86m9N5ceYB+Nu965Se=qyZ_3W-Cn76Qc+Dd75hEApz=w@mail.gmail.com>
+ Thu, 20 Aug 2020 04:56:08 -0700 (PDT)
+Subject: Re: deprecation of in-tree builds
+To: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+References: <CAFEAcA8E6goDHb-7kKCTp=wSpBsuJcfjMmLP0EgymiEL348r4A@mail.gmail.com>
+ <alpine.BSF.2.22.395.2003212338020.36211@zero.eik.bme.hu>
+ <20200323133244.GK261260@stefanha-x1.localdomain>
+ <CAFEAcA9VPgQ1MPYhcda4tdxMuhMC5R9fd6D=OVOZKRLMO8n_xw@mail.gmail.com>
+ <20200820105401.GA99531@linux.fritz.box>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <446a210a-7e88-ab9b-05f4-6b0ffabf97c6@redhat.com>
-Date: Thu, 20 Aug 2020 13:52:24 +0200
+Message-ID: <9bdbb3b9-01df-2a6b-0c82-b58ef6e0edf9@redhat.com>
+Date: Thu, 20 Aug 2020 13:56:07 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA86m9N5ceYB+Nu965Se=qyZ_3W-Cn76Qc+Dd75hEApz=w@mail.gmail.com>
+In-Reply-To: <20200820105401.GA99531@linux.fritz.box>
 Content-Language: en-US
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/19 20:12:44
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/20 03:03:32
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
@@ -117,43 +120,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 20/08/20 12:33, Peter Maydell wrote:
-> 'make check' still fails for the all-linux-static config, this
-> time for a different reason:
-> 
-> make: *** No rule to make target 'check-qtest', needed by 'check'. Stop.
+On 20/08/20 12:54, Kevin Wolf wrote:
+>> Paolo's conversion-to-Meson patchseries is about to land, so now
+>> is the time for people who would like this "automatically create
+>> a build directory and use it" behaviour to write the necessary
+>> patches. Any volunteers ?
+>>
+>> My current plan is to land the Meson series first, because it is
+>> really painful for Paolo to try to keep rebasing it as other
+>> changes to the old build system occur. This would break
+>> in-tree builds temporarily until the "automatic creation and
+>> use of a builddir" patches go in on top of it.
+>
+> Usually, our requirement is that patch series don't break anything. And
+> if something slips through, whoever broke it is supposed to fix it, not
+> whoever is affected.
 
-Oh, there are two "check:" rules.
-
-I pushed again the tag with just this delta:
-
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index ae4315e00e..9ac8f5b86a 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -526,13 +526,12 @@ check-acceptance: check-venv $(TESTS_RESULTS_DIR) get-vm-images
- check-block:
- check-build: build-unit
- 
--check: check-unit
- check-clean:
- 	rm -rf $(check-unit-y) tests/*.o tests/*/*.o $(QEMU_IOTESTS_HELPERS-y)
- 	rm -f tests/test-qapi-gen-timestamp
- 	rm -rf $(TESTS_VENV_DIR) $(TESTS_RESULTS_DIR)
- 
--check: check-block check-qapi-schema check-unit check-qtest check-decodetree
-+check: check-unit
- 
- clean: check-clean
- 
-
-If any more reasonable expectations from the older build system turn out to
-be broken, like in the binaries case, I will be happy to accomodate them
+The Meson conversion was announced in October 2019 as breaking in-tree
+builds, and the deprecation request is from March 2020.  So I don't
+think this is a breakage but rather a widely-announced change.
 
 Paolo
 
