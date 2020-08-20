@@ -2,76 +2,99 @@ Return-Path: <SRS0=Dndf=B6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.2 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81109C433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 10:34:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C291AC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 10:39:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4BEA620738
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 10:34:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4BEA620738
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8AD4A20639
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 10:39:52 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QvphAAAd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8AD4A20639
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47958 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53164 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8hu9-00019Z-Jj
-	for qemu-devel@archiver.kernel.org; Thu, 20 Aug 2020 06:34:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49724)
+	id 1k8hz5-0003U7-Q1
+	for qemu-devel@archiver.kernel.org; Thu, 20 Aug 2020 06:39:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50810)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jason.zeng@intel.com>)
- id 1k8htL-0008NS-4v
- for qemu-devel@nongnu.org; Thu, 20 Aug 2020 06:33:55 -0400
-Received: from mga07.intel.com ([134.134.136.100]:18846)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jason.zeng@intel.com>)
- id 1k8htH-000457-1K
- for qemu-devel@nongnu.org; Thu, 20 Aug 2020 06:33:54 -0400
-IronPort-SDR: jfoBOOedRjWUpOE5PY70IpbK5E8et0v68a5JUL9mPIxDtN9kWzgZdmv2b+s/ryYNPgmeCjxBF2
- nBcEWu1v4avQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9718"; a="219578400"
-X-IronPort-AV: E=Sophos;i="5.76,332,1592895600"; d="scan'208";a="219578400"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
- by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 20 Aug 2020 03:33:46 -0700
-IronPort-SDR: 3Fcpbz71AsR0S9yNoWraHHnV029hQsLE7eXxJI9uAWu1B95thhSGH5DNGANQyfICdELaJwcHFd
- asBPosTm6BzA==
-X-IronPort-AV: E=Sophos;i="5.76,332,1592895600"; d="scan'208";a="441941077"
-Received: from x48.bj.intel.com (HELO x48) ([10.238.157.64])
- by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 20 Aug 2020 03:33:42 -0700
-Date: Thu, 20 Aug 2020 18:33:33 +0800
-From: Jason Zeng <jason.zeng@intel.com>
-To: Steven Sistare <steven.sistare@oracle.com>
-Subject: Re: [PATCH V1 30/32] vfio-pci: save and restore
-Message-ID: <20200820103333.GA30987@x48>
-References: <1596122076-341293-1-git-send-email-steven.sistare@oracle.com>
- <1596122076-341293-31-git-send-email-steven.sistare@oracle.com>
- <20200806102259.GA25634@x48>
- <5d2e3c90-eb8c-569f-ef4a-5016756725c7@oracle.com>
- <20200810035059.GA3463@x48>
- <0da862c8-74bc-bf06-a436-4ebfcb9dd8d4@oracle.com>
+ (Exim 4.90_1) (envelope-from <danielhb413@gmail.com>)
+ id 1k8hyY-0002zN-IV; Thu, 20 Aug 2020 06:39:18 -0400
+Received: from mail-qk1-x741.google.com ([2607:f8b0:4864:20::741]:41088)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <danielhb413@gmail.com>)
+ id 1k8hyW-0004pP-MX; Thu, 20 Aug 2020 06:39:18 -0400
+Received: by mail-qk1-x741.google.com with SMTP id i20so1071960qkk.8;
+ Thu, 20 Aug 2020 03:39:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=zDUhElMAVJknbAYAEpgWdBXlJD2nUJaSxYd/OtlqVU0=;
+ b=QvphAAAde2977zcZa9xFwmYH/H+u0dnEfK7L9gVnEv1EzzHam9Jiv0KI3EVTZeQUjw
+ mWk3/toaZ0JpoX7lhcH8g4GiYa7+dyJcSQ8I7cISeYLQznSU6l953fIsf1aFXN4xusAI
+ raBtnQKBkhyvu2b5MFoLjc/qGou/8EQFBeKTnbMhaeNxgsl8mQzay2imI7h5lnN6MeZY
+ +dw9vU8/0nfFPpBITUCLWnzg4X7ELBxEWJOoHSfRJAO57o0Sq9+zggBqqF0mGEYsZd63
+ Bti/GwgX8fpMe7f9m4bidonwzgjxAF7IMVLoiOXthcS2aMH2vYt2EV1mW+rZtDd00Qx0
+ Edpg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=zDUhElMAVJknbAYAEpgWdBXlJD2nUJaSxYd/OtlqVU0=;
+ b=KkbJQJxAwByc/CbDuMLOxpcDsi84YUzTcJ23udrOYD+85D+rNb5xPrzZM+Qbz2RwJs
+ ePGxGoeTQ2dEsqnW34MfLzR99Yw8In8enzyVUVk0u4S03HP/SUi525bThkCvORM9L0Zc
+ VZQM5sd+gy0OYU1Gay1bKTrgpO2JAHtzsugbqiywelzWS6p0NDZONNzawjUyaS2A6KqI
+ CdkN4TiCmV1FR2aXfs5fYW1YxyvSKXlrUj5dLWwJUCFw6JiW3/OEMSqrMmwajgNRy8oe
+ Ud2x6Mc3DooDAjWjn7LKeSGjOyYbWK06arWKBV/MMerHZOvAVLVILb7HWsC1Rm+N0Xg2
+ MdSA==
+X-Gm-Message-State: AOAM531jI/ZmXZ95czueStxLhdmlBq35NL0QJD80FymF8y83Ul3BLJnk
+ 4FDwTOuRFRGB8BOKDdlkT4hiz703EvY=
+X-Google-Smtp-Source: ABdhPJyDEZFiMQh9nER9eaFBCQpCrfHifzHzG2452rxlyiLrP9XW1tYLSn1Oq5g13bYHCqXGeaN7Ug==
+X-Received: by 2002:a05:620a:13f7:: with SMTP id
+ h23mr2026220qkl.396.1597919955102; 
+ Thu, 20 Aug 2020 03:39:15 -0700 (PDT)
+Received: from ?IPv6:2804:431:c7c7:c152:6ea6:a44d:671e:88f?
+ ([2804:431:c7c7:c152:6ea6:a44d:671e:88f])
+ by smtp.gmail.com with ESMTPSA id w12sm1728902qkj.116.2020.08.20.03.39.13
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 20 Aug 2020 03:39:14 -0700 (PDT)
+Subject: Re: [PATCH 07/10] spapr: create helper to set ibm,associativity
+To: David Gibson <david@gibson.dropbear.id.au>
+References: <20200814205424.543857-1-danielhb413@gmail.com>
+ <20200814205424.543857-8-danielhb413@gmail.com>
+ <20200820030014.GM271315@yekko.fritz.box>
+From: Daniel Henrique Barboza <danielhb413@gmail.com>
+Message-ID: <9922d37f-cfb8-0dba-bf36-e5eec92f6656@gmail.com>
+Date: Thu, 20 Aug 2020 07:39:12 -0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0da862c8-74bc-bf06-a436-4ebfcb9dd8d4@oracle.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-Received-SPF: pass client-ip=134.134.136.100;
- envelope-from=jason.zeng@intel.com; helo=mga07.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/20 06:33:46
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200820030014.GM271315@yekko.fritz.box>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::741;
+ envelope-from=danielhb413@gmail.com; helo=mail-qk1-x741.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -84,264 +107,169 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>,
- Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
- Jason Zeng <jason.zeng@linux.intel.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Aug 19, 2020 at 05:15:11PM -0400, Steven Sistare wrote:
-> On 8/9/2020 11:50 PM, Jason Zeng wrote:
-> > On Fri, Aug 07, 2020 at 04:38:12PM -0400, Steven Sistare wrote:
-> >> On 8/6/2020 6:22 AM, Jason Zeng wrote:
-> >>> Hi Steve,
-> >>>
-> >>> On Thu, Jul 30, 2020 at 08:14:34AM -0700, Steve Sistare wrote:
-> >>>> @@ -3182,6 +3207,51 @@ static Property vfio_pci_dev_properties[] = {
-> >>>>      DEFINE_PROP_END_OF_LIST(),
-> >>>>  };
-> >>>>  
-> >>>> +static int vfio_pci_post_load(void *opaque, int version_id)
-> >>>> +{
-> >>>> +    int vector;
-> >>>> +    MSIMessage msg;
-> >>>> +    Error *err = 0;
-> >>>> +    VFIOPCIDevice *vdev = opaque;
-> >>>> +    PCIDevice *pdev = &vdev->pdev;
-> >>>> +
-> >>>> +    if (msix_enabled(pdev)) {
-> >>>> +        vfio_msix_enable(vdev);
-> >>>> +        pdev->msix_function_masked = false;
-> >>>> +
-> >>>> +        for (vector = 0; vector < vdev->pdev.msix_entries_nr; vector++) {
-> >>>> +            if (!msix_is_masked(pdev, vector)) {
-> >>>> +                msg = msix_get_message(pdev, vector);
-> >>>> +                vfio_msix_vector_use(pdev, vector, msg);
-> >>>> +            }
-> >>>> +        }
-> >>>
-> >>> It looks to me MSIX re-init here may lose device IRQs and impact
-> >>> device hardware state?
-> >>>
-> >>> The re-init will cause the kernel vfio driver to connect the device
-> >>> MSIX vectors to new eventfds and KVM instance. But before that, device
-> >>> IRQs will be routed to previous eventfd. Looks these IRQs will be lost.
-> >>
-> >> Thanks Jason, that sounds like a problem.  I could try reading and saving an 
-> >> event from eventfd before shutdown, and injecting it into the eventfd after
-> >> restart, but that would be racy unless I disable interrupts.  Or, unconditionally
-> >> inject a spurious interrupt after restart to kick it, in case an interrupt 
-> >> was lost.
-> >>
-> >> Do you have any other ideas?
-> > 
-> > Maybe we can consider to also hand over the eventfd file descriptor, or
-> 
-> I believe preserving this descriptor in isolation is not sufficient.  We would
-> also need to preserve the KVM instance which it is linked to.
-> 
-> > or even the KVM fds to the new Qemu?
-> > 
-> > If the KVM fds can be preserved, we will just need to restore Qemu KVM
-> > side states. But not sure how complicated the implementation would be.
-> 
-> That should work, but I fear it would require many code changes in QEMU
-> to re-use descriptors at object creation time and suppress the initial 
-> configuration ioctl's, so it's not my first choice for a solution.
-> 
-> > If we only preserve the eventfd fd, we can attach the old eventfd to
-> > vfio devices. But looks it may turn out we always inject an interrupt
-> > unconditionally, because kernel KVM irqfd eventfd handling is a bit
-> > different than normal user land eventfd read/write. It doesn't decrease
-> > the counter in the eventfd context. So if we read the eventfd from new
-> > Qemu, it looks will always have a non-zero counter, which requires an
-> > interrupt injection.
-> 
-> Good to know, thanks.
-> 
-> I will try creating a new eventfd and injecting an interrupt unconditionally.
-> I need a test case to demonstrate losing an interrupt, and fixing it with
-> injection.  Any advice?  My stress tests with a virtual function nic and a
-> directly assigned nvme block device have never failed across live update.
-> 
-
-I am not familiar with nvme devices. For nic device, to my understanding,
-stress nic testing will not have many IRQs, because nic driver usually
-enables NAPI, which only take the first interrupt, then disable interrupt
-and start polling. It will only re-enable interrupt after some packet
-quota reached or the traffic quiesces for a while. But anyway, if the
-test goes enough long time, the number of IRQs should also be big, not
-sure why it doesn't trigger any issue. Maybe we can have some study on
-the IRQ pattern for the testing and see how we can design a test case?
-or see if our assumption is wrong?
 
 
-> >>> And the re-init will make the device go through the procedure of
-> >>> disabling MSIX, enabling INTX, and re-enabling MSIX and vectors.
-> >>> So if the device is active, its hardware state will be impacted?
-> >>
-> >> Again thanks.  vfio_msix_enable() does indeed call vfio_disable_interrupts().
-> >> For a quick experiment, I deleted that call in for the post_load code path, and 
-> >> it seems to work fine, but I need to study it more.
-> > 
-> > vfio_msix_vector_use() will also trigger this procedure in the kernel.
+On 8/20/20 12:00 AM, David Gibson wrote:
+> On Fri, Aug 14, 2020 at 05:54:21PM -0300, Daniel Henrique Barboza wrote:
+>> We have several places around hw/ppc files where we use the
+>> same code to set the ibm,associativity array. This patch
+>> creates a helper called spapr_set_associativity() to do
+>> that in a single place. It'll also make it saner to change
+>> the value of ibm,associativity in the next patches.
+>>
+>> After this patch, only 2 places are left with open code
+>> ibm,associativity assignment:
+>>
+>> - spapr_dt_dynamic_reconfiguration_memory()
+>> - h_home_node_associativity() in spapr_hcall.c
+>>
+>> The update of associativity values will be made in these places
+>> manually later on.
+>>
+>> Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
 > 
-> Because that code path calls VFIO_DEVICE_SET_IRQS? Or something else?
-> Can you point to what it triggers in the kernel?
+> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+> 
+> I like this - any chance you could move this to the front of the
+> series so that we can make this code easier to follow while we're
+> still discussing the more meaningful changes?
 
 
-In vfio_msix_vector_use(), I see vfio_disable_irqindex() will be invoked
-if "vdev->nr_vectors < nr + 1" is true. Since the 'vdev' is re-inited,
-so this condition should be true, and vfio_disable_irqindex() will
-trigger VFIO_DEVICE_SET_IRQS with VFIO_IRQ_SET_DATA_NONE, which will
-cause kernel to disable MSIX.
+No problem. I'll move this up front in v2.
+
+
+DHB
 
 > 
-> > Looks we shouldn't trigger any kernel vfio actions here? Because we
-> > preserve vfio fds, so its kernel state shouldn't be touched. Here we
-> > may only need to restore Qemu states. Re-connect to KVM instance should
-> > be done automatically when we setup the KVM irqfds with the same eventfd.
-> > 
-> > BTW, if I remember correctly, it is not enough to only save MSIX state
-> > in the snapshot. We should also save the Qemu side pci config space
-> > cache to the snapshot, because Qemu's copy is not exactly the same as
-> > the kernel's copy. I encountered this before, but I don't remember which
-> > field it was.
+>> ---
+>>   hw/ppc/spapr.c         | 32 +++++++++++++++++++++-----------
+>>   hw/ppc/spapr_nvdimm.c  |  8 +++-----
+>>   hw/ppc/spapr_pci.c     |  8 +++-----
+>>   include/hw/ppc/spapr.h |  1 +
+>>   4 files changed, 28 insertions(+), 21 deletions(-)
+>>
+>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+>> index bc51d2db90..b80a6f6936 100644
+>> --- a/hw/ppc/spapr.c
+>> +++ b/hw/ppc/spapr.c
+>> @@ -201,15 +201,27 @@ static int spapr_fixup_cpu_smt_dt(void *fdt, int offset, PowerPCCPU *cpu,
+>>       return ret;
+>>   }
+>>   
+>> +void spapr_set_associativity(uint32_t *assoc, int node_id, int cpu_index)
+>> +{
+>> +    uint8_t assoc_size = 0x4;
+>> +
+>> +    if (cpu_index >= 0) {
+>> +        assoc_size = 0x5;
+>> +        assoc[5] = cpu_to_be32(cpu_index);
+>> +    }
+>> +
+>> +    assoc[0] = cpu_to_be32(assoc_size);
+>> +    assoc[1] = cpu_to_be32(0x0);
+>> +    assoc[2] = cpu_to_be32(0x0);
+>> +    assoc[3] = cpu_to_be32(0x0);
+>> +    assoc[4] = cpu_to_be32(node_id);
+>> +}
+>> +
+>>   static int spapr_fixup_cpu_numa_dt(void *fdt, int offset, PowerPCCPU *cpu)
+>>   {
+>>       int index = spapr_get_vcpu_id(cpu);
+>> -    uint32_t associativity[] = {cpu_to_be32(0x5),
+>> -                                cpu_to_be32(0x0),
+>> -                                cpu_to_be32(0x0),
+>> -                                cpu_to_be32(0x0),
+>> -                                cpu_to_be32(cpu->node_id),
+>> -                                cpu_to_be32(index)};
+>> +    uint32_t associativity[6];
+>> +    spapr_set_associativity(associativity, cpu->node_id, index);
+>>   
+>>       /* Advertise NUMA via ibm,associativity */
+>>       return fdt_setprop(fdt, offset, "ibm,associativity", associativity,
+>> @@ -325,15 +337,13 @@ static void add_str(GString *s, const gchar *s1)
+>>   static int spapr_dt_memory_node(void *fdt, int nodeid, hwaddr start,
+>>                                   hwaddr size)
+>>   {
+>> -    uint32_t associativity[] = {
+>> -        cpu_to_be32(0x4), /* length */
+>> -        cpu_to_be32(0x0), cpu_to_be32(0x0),
+>> -        cpu_to_be32(0x0), cpu_to_be32(nodeid)
+>> -    };
+>> +    uint32_t associativity[5];
+>>       char mem_name[32];
+>>       uint64_t mem_reg_property[2];
+>>       int off;
+>>   
+>> +    spapr_set_associativity(associativity, nodeid, -1);
+>> +
+>>       mem_reg_property[0] = cpu_to_be64(start);
+>>       mem_reg_property[1] = cpu_to_be64(size);
+>>   
+>> diff --git a/hw/ppc/spapr_nvdimm.c b/hw/ppc/spapr_nvdimm.c
+>> index 81410aa63f..bd109bfc00 100644
+>> --- a/hw/ppc/spapr_nvdimm.c
+>> +++ b/hw/ppc/spapr_nvdimm.c
+>> @@ -115,15 +115,13 @@ int spapr_dt_nvdimm(void *fdt, int parent_offset,
+>>                                                &error_abort);
+>>       uint64_t slot = object_property_get_uint(OBJECT(nvdimm), PC_DIMM_SLOT_PROP,
+>>                                                &error_abort);
+>> -    uint32_t associativity[] = {
+>> -        cpu_to_be32(0x4), /* length */
+>> -        cpu_to_be32(0x0), cpu_to_be32(0x0),
+>> -        cpu_to_be32(0x0), cpu_to_be32(node)
+>> -    };
+>> +    uint32_t associativity[5];
+>>       uint64_t lsize = nvdimm->label_size;
+>>       uint64_t size = object_property_get_int(OBJECT(nvdimm), PC_DIMM_SIZE_PROP,
+>>                                               NULL);
+>>   
+>> +    spapr_set_associativity(associativity, node, -1);
+>> +
+>>       drc = spapr_drc_by_id(TYPE_SPAPR_DRC_PMEM, slot);
+>>       g_assert(drc);
+>>   
+>> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+>> index 09ac58fd7f..c02ace226c 100644
+>> --- a/hw/ppc/spapr_pci.c
+>> +++ b/hw/ppc/spapr_pci.c
+>> @@ -2321,11 +2321,8 @@ int spapr_dt_phb(SpaprMachineState *spapr, SpaprPhbState *phb,
+>>           cpu_to_be32(1),
+>>           cpu_to_be32(RTAS_IBM_RESET_PE_DMA_WINDOW)
+>>       };
+>> -    uint32_t associativity[] = {cpu_to_be32(0x4),
+>> -                                cpu_to_be32(0x0),
+>> -                                cpu_to_be32(0x0),
+>> -                                cpu_to_be32(0x0),
+>> -                                cpu_to_be32(phb->numa_node)};
+>> +    uint32_t associativity[5];
+>> +
+>>       SpaprTceTable *tcet;
+>>       SpaprDrc *drc;
+>>       Error *err = NULL;
+>> @@ -2358,6 +2355,7 @@ int spapr_dt_phb(SpaprMachineState *spapr, SpaprPhbState *phb,
+>>   
+>>       /* Advertise NUMA via ibm,associativity */
+>>       if (phb->numa_node != -1) {
+>> +        spapr_set_associativity(associativity, phb->numa_node, -1);
+>>           _FDT(fdt_setprop(fdt, bus_off, "ibm,associativity", associativity,
+>>                            sizeof(associativity)));
+>>       }
+>> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+>> index d9f1afa8b2..cd158bf95a 100644
+>> --- a/include/hw/ppc/spapr.h
+>> +++ b/include/hw/ppc/spapr.h
+>> @@ -863,6 +863,7 @@ int spapr_phb_dt_populate(SpaprDrc *drc, SpaprMachineState *spapr,
+>>   
+>>   void spapr_rtc_read(SpaprRtcState *rtc, struct tm *tm, uint32_t *ns);
+>>   int spapr_rtc_import_offset(SpaprRtcState *rtc, int64_t legacy_offset);
+>> +void spapr_set_associativity(uint32_t *assoc, int node_id, int cpu_index);
+>>   
+>>   #define TYPE_SPAPR_RNG "spapr-rng"
+>>   
 > 
-> FYI all, Jason told me offline that qemu may emulate some pci capabilities and
-> hence keeps state in the shadow config that is never written to the kernel.
-> I need to study that.
-> 
-
-Sorry, I read the code again, see Qemu does write all config-space-write
-to kernel in vfio_pci_write_config(). Now I am also confused about what
-I was seeing previously :(. But it seems we still need to look at kernel
-code to see if mismatch is possibile for config space cache between Qemu
-and kernel.
-
-FYI. Some discussion about the VFIO PCI config space saving/restoring in
-live migration scenario:
-https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg06964.html
-
-thanks,
-Jason
-
-
-> > And another question, why don't we support MSI? I see the code only
-> > handles MSIX?
-> 
-> Yes, needs more code for MSI.
-> 
-> - Steve
->   
-> >>>> +
-> >>>> +    } else if (vfio_pci_read_config(pdev, PCI_INTERRUPT_PIN, 1)) {
-> >>>> +        vfio_intx_enable(vdev, &err);
-> >>>> +        if (err) {
-> >>>> +            error_report_err(err);
-> >>>> +        }
-> >>>> +    }
-> >>>> +
-> >>>> +    vdev->vbasedev.group->container->reused = false;
-> >>>> +    vdev->pdev.reused = false;
-> >>>> +
-> >>>> +    return 0;
-> >>>> +}
-> >>>> +
-> >>>> +static const VMStateDescription vfio_pci_vmstate = {
-> >>>> +    .name = "vfio-pci",
-> >>>> +    .unmigratable = 1,
-> >>>> +    .mode_mask = VMS_RESTART,
-> >>>> +    .version_id = 0,
-> >>>> +    .minimum_version_id = 0,
-> >>>> +    .post_load = vfio_pci_post_load,
-> >>>> +    .fields = (VMStateField[]) {
-> >>>> +        VMSTATE_MSIX(pdev, VFIOPCIDevice),
-> >>>> +        VMSTATE_END_OF_LIST()
-> >>>> +    }
-> >>>> +};
-> >>>> +
-> >>>>  static void vfio_pci_dev_class_init(ObjectClass *klass, void *data)
-> >>>>  {
-> >>>>      DeviceClass *dc = DEVICE_CLASS(klass);
-> >>>> @@ -3189,6 +3259,7 @@ static void vfio_pci_dev_class_init(ObjectClass *klass, void *data)
-> >>>>  
-> >>>>      dc->reset = vfio_pci_reset;
-> >>>>      device_class_set_props(dc, vfio_pci_dev_properties);
-> >>>> +    dc->vmsd = &vfio_pci_vmstate;
-> >>>>      dc->desc = "VFIO-based PCI device assignment";
-> >>>>      set_bit(DEVICE_CATEGORY_MISC, dc->categories);
-> >>>>      pdc->realize = vfio_realize;
-> >>>> diff --git a/hw/vfio/platform.c b/hw/vfio/platform.c
-> >>>> index ac2cefc..e6e1a5d 100644
-> >>>> --- a/hw/vfio/platform.c
-> >>>> +++ b/hw/vfio/platform.c
-> >>>> @@ -592,7 +592,7 @@ static int vfio_base_device_init(VFIODevice *vbasedev, Error **errp)
-> >>>>              return -EBUSY;
-> >>>>          }
-> >>>>      }
-> >>>> -    ret = vfio_get_device(group, vbasedev->name, vbasedev, errp);
-> >>>> +    ret = vfio_get_device(group, vbasedev->name, vbasedev, 0, errp);
-> >>>>      if (ret) {
-> >>>>          vfio_put_group(group);
-> >>>>          return ret;
-> >>>> diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
-> >>>> index bd07c86..c926a24 100644
-> >>>> --- a/include/hw/pci/pci.h
-> >>>> +++ b/include/hw/pci/pci.h
-> >>>> @@ -358,6 +358,7 @@ struct PCIDevice {
-> >>>>  
-> >>>>      /* ID of standby device in net_failover pair */
-> >>>>      char *failover_pair_id;
-> >>>> +    bool reused;
-> >>>>  };
-> >>>>  
-> >>>>  void pci_register_bar(PCIDevice *pci_dev, int region_num,
-> >>>> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-> >>>> index c78f3ff..4e2a332 100644
-> >>>> --- a/include/hw/vfio/vfio-common.h
-> >>>> +++ b/include/hw/vfio/vfio-common.h
-> >>>> @@ -73,6 +73,8 @@ typedef struct VFIOContainer {
-> >>>>      unsigned iommu_type;
-> >>>>      Error *error;
-> >>>>      bool initialized;
-> >>>> +    bool reused;
-> >>>> +    int cid;
-> >>>>      unsigned long pgsizes;
-> >>>>      QLIST_HEAD(, VFIOGuestIOMMU) giommu_list;
-> >>>>      QLIST_HEAD(, VFIOHostDMAWindow) hostwin_list;
-> >>>> @@ -177,7 +179,7 @@ void vfio_reset_handler(void *opaque);
-> >>>>  VFIOGroup *vfio_get_group(int groupid, AddressSpace *as, Error **errp);
-> >>>>  void vfio_put_group(VFIOGroup *group);
-> >>>>  int vfio_get_device(VFIOGroup *group, const char *name,
-> >>>> -                    VFIODevice *vbasedev, Error **errp);
-> >>>> +                    VFIODevice *vbasedev, bool *reused, Error **errp);
-> >>>>  
-> >>>>  extern const MemoryRegionOps vfio_region_ops;
-> >>>>  typedef QLIST_HEAD(VFIOGroupList, VFIOGroup) VFIOGroupList;
-> >>>> diff --git a/migration/savevm.c b/migration/savevm.c
-> >>>> index 881dc13..2606cf0 100644
-> >>>> --- a/migration/savevm.c
-> >>>> +++ b/migration/savevm.c
-> >>>> @@ -1568,7 +1568,7 @@ static int qemu_savevm_state(QEMUFile *f, VMStateMode mode, Error **errp)
-> >>>>          return -EINVAL;
-> >>>>      }
-> >>>>  
-> >>>> -    if (migrate_use_block()) {
-> >>>> +    if ((mode & (VMS_SNAPSHOT | VMS_MIGRATE)) && migrate_use_block()) {
-> >>>>          error_setg(errp, "Block migration and snapshots are incompatible");
-> >>>>          return -EINVAL;
-> >>>>      }
-> >>>> -- 
-> >>>> 1.8.3.1
-> >>>>
-> >>>>
 
