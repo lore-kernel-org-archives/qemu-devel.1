@@ -2,125 +2,92 @@ Return-Path: <SRS0=Dndf=B6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06B7BC433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 21:11:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD46FC433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 21:18:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BDFDC2075E
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 21:11:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 99FBD2076E
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 21:18:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="Llrf9U7y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDFDC2075E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NvGWLFPu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 99FBD2076E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52478 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56266 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8rq0-000812-0s
-	for qemu-devel@archiver.kernel.org; Thu, 20 Aug 2020 17:11:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41996)
+	id 1k8rxX-0001Sm-Qy
+	for qemu-devel@archiver.kernel.org; Thu, 20 Aug 2020 17:18:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43182)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1k8rp0-0007Rw-OB; Thu, 20 Aug 2020 17:10:06 -0400
-Received: from mail-eopbgr70117.outbound.protection.outlook.com
- ([40.107.7.117]:25070 helo=EUR04-HE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1k8rox-0004kV-5u; Thu, 20 Aug 2020 17:10:06 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=C+XEophCQjZf0IYhr3CHse7uskgUjvmCVuJfUiuMA4zwZOs4MCyXPCoVdqoAtKHmlv6iOwT2sRtQuKYtnZ8aKraAWQktkF3BNHU6acHUUIPBswHgqKbHlMcIu7x6afF0EOGWzVEYIZevzabCAYPpn6rReSX39ReZCXDfoaTOENTb7mu4ojPRh9rJi/3QZOb10H6Zz9dDDI8ryooC9ta7aUFwdl+Of9w3yijmUd0tharFW4ZDzfgKc8S98ASD+ZRyimT6oEk0l/GOSDe+iEOV8k9yShU8gWAR7skIcoujITl6LOZUKdaHBv20whrJkTwnjMIKy2fv5Y7MgNjvTVxoTg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=R7m/GssqI3O7hXfCXItLtUrqn/FJbj+UiuqkD+fU4tQ=;
- b=hKlzYWM2XD0CdBNO0VPxmNioop34wHFk3a1VVQyMWCs8zEaYI6SBbF98rCHNa0VSAxif9EFZJ7JWretKe9pd7bxb0cuZdGRzGfQtmOnZIGGav4noIQnSEGY1fBq95zBSmaHC4besHYA8Jk0taFrb95WVWrENfMyu/ronSd4U2sVe9zbV9bFVGKrJ3ghc+56Nlizx1UqfTBt+RaHYxhwnxwmtZ6ZnoD3V75vd3tMQa0iWjlg/t02OJjgo62GcFGnkawaca0UreQCsRLmBiJsraRxhE/cYe7Aa31l7MpMjtjy3thLkIttSHC/ZJYaAx7CMv4QPJBIRMjVUOmDHvzpeYQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=R7m/GssqI3O7hXfCXItLtUrqn/FJbj+UiuqkD+fU4tQ=;
- b=Llrf9U7yi781AJY2syx6OsssFRiZxSh75Hkr4m6Ap51RhwGogyh/e+SZ0gI8/VFNyCYGWwwtpCWLYbKlNtdQm49tiSmKGxANzO8XjsWQsH/U89HdBq9BcXk5R7lRxUWVYNY4S1MkfRSg+JkuODkahDeDsQiI76bs8UZQWMWwfDI=
-Authentication-Results: openvz.org; dkim=none (message not signed)
- header.d=none;openvz.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM6PR08MB4692.eurprd08.prod.outlook.com (2603:10a6:20b:d2::13)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3305.26; Thu, 20 Aug
- 2020 21:09:54 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::8c0c:c056:97a5:484a]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::8c0c:c056:97a5:484a%3]) with mapi id 15.20.3283.027; Thu, 20 Aug 2020
- 21:09:54 +0000
-Subject: Re: [PATCH v4 08/10] iotests.py: add verify_o_direct helper
-To: Nir Soffer <nsoffer@redhat.com>
-References: <20200820183950.13109-1-vsementsov@virtuozzo.com>
- <20200820183950.13109-9-vsementsov@virtuozzo.com>
- <CAMRbyyvpPyu9ONLUVax_xssXaS5f2O5pkaK7um0X7dWbng=2Jw@mail.gmail.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <fcb17574-8c8e-f823-31c7-08e7a650559e@virtuozzo.com>
-Date: Fri, 21 Aug 2020 00:09:51 +0300
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1k8ruu-0000X9-Mz
+ for qemu-devel@nongnu.org; Thu, 20 Aug 2020 17:16:12 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:46205
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1k8rur-0005aU-Ks
+ for qemu-devel@nongnu.org; Thu, 20 Aug 2020 17:16:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1597958167;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=o6RJ9n3ihAH6Yf/UdeFSXE4a3/Ae9k0wtArZablh7FQ=;
+ b=NvGWLFPuplcjOi+idMZRB4J+Smjpk4Ai2BHXJS1UC00Aa9I7pzBy5A9fBI5+Yz4tvNQQL5
+ 2GQtOJc9YWruNz2h1JxoPZVuU79R+HmQF7A6yAw3iFjZlN+fXtVvnpSQSAaVgEyGDxkjL/
+ gqmdAmA6jdviBK8CodjerlaZf/BrUH8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-275-9PzonHRaOr6ngog3OrrtcA-1; Thu, 20 Aug 2020 17:16:02 -0400
+X-MC-Unique: 9PzonHRaOr6ngog3OrrtcA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 75CD61007466;
+ Thu, 20 Aug 2020 21:16:00 +0000 (UTC)
+Received: from [10.3.114.63] (ovpn-114-63.phx2.redhat.com [10.3.114.63])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D411360BF1;
+ Thu, 20 Aug 2020 21:15:59 +0000 (UTC)
+Subject: Re: [PATCH v2] configure: add support for pseudo-"in source tree"
+ builds
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20200820173124.243984-1-berrange@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <814594a0-391c-01fb-a418-234e477793d3@redhat.com>
+Date: Thu, 20 Aug 2020 16:15:59 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
-In-Reply-To: <CAMRbyyvpPyu9ONLUVax_xssXaS5f2O5pkaK7um0X7dWbng=2Jw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: AM3PR05CA0107.eurprd05.prod.outlook.com
- (2603:10a6:207:1::33) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.5] (185.215.60.171) by
- AM3PR05CA0107.eurprd05.prod.outlook.com (2603:10a6:207:1::33) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3305.24 via Frontend Transport; Thu, 20 Aug 2020 21:09:53 +0000
-X-Originating-IP: [185.215.60.171]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 82bf8855-6852-4a74-3a33-08d8454d6254
-X-MS-TrafficTypeDiagnostic: AM6PR08MB4692:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM6PR08MB46921606B1E2DEE0F5C54AA8C15A0@AM6PR08MB4692.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: dmf3IPYpH/UiZB7QZgZt9bam7Y0vWxeL4fgSzjS/my9YqQ62szY6bmJgB8Y2xX1bxewX2Rez8Wluh2c9KwBhTgrxqCTy6S/tXObyHAeWPQlqFeezraS78gWGykQqzLMadH0K1Iwsk0iRccR8a7CYUjia3y6rQZ0NKSRfD3U3qyVDatYVysoNDovwssB0N7m9z853KMwJnMvD6vDG1byiw/7cr7VLtoORovy/qOY4FHM1Epl8B6rDbs7peSpdFPtH20Mw6C2VlMlNC6KjzgosB7cssP07U/G99Xd+8FeDEcvhngTXrLf/G3OnvUOKNW+ImHpWa9OF6bZXyIIrntvFeJUjxMYoNYbE6WZl/HDUv7I9rbyvzRexnS8/uvrMkA5Q
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(366004)(396003)(39840400004)(136003)(346002)(376002)(6486002)(8936002)(16526019)(186003)(107886003)(52116002)(5660300002)(31696002)(54906003)(316002)(53546011)(16576012)(15650500001)(83380400001)(4326008)(6916009)(2616005)(66946007)(66556008)(36756003)(26005)(956004)(66476007)(2906002)(8676002)(478600001)(31686004)(86362001)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: lM0WBVRdZuOeuYYtX2wPI+s6dE/wJgtqFtXKsrR9RVseViKGeBANQuPfuma+GgcFZTh1FJKTlIYipAR7wUHzPXgI7ZysPVcISnLbau3P7sG39dOOnD1cUaIyq7nYFpzj3gjwKXL3Gvw/HJNg4Y6jMw4b0o8r9tFyhYySM7vbhLWLNc1C+asL+GripaxoMM1U8eMKbjy/aqVyIhyadSsr9aXgKqBahZ1xhbcSZl4Lniscsw8RQqU3yNsMiDkdMZgk2Hl8M6Tbc/61MmyRodMB7r3X2UHgpjIV7JONpULcoaRklLnEpqxnjIp4lZQpqr4/VbtrJTRH+v+YfQN6ht9Tx+nk5wgRkEPc5asJVJUn49C2bkJiY22YtwLzLEV4ispK3PnTz4LmcGQGkuvQzAmPLq9Sg0MbOnlLGPkUD+gCTcvMkMCs/LIcvnsUH7rwj56AyRZ4x8199RuL/si7xgI7Z7g7qb697gLhxc0vS+H28aUKdvZTJA4j7rk1/mzFn3xDCyL7WuDIBLhFF98wXeCvYZrhN5+ugiSbldiqDsgxoyJqGyDgPTW7/XJGWmW/IQGUiZ9RQ3TNSzcC+pgmHAHTSdzhj+bb6/unTl5HYMQCzR+emW5whYJO6iSjnfvxmcxDsSvw4Yo1ixszh/thGvd+Xg==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 82bf8855-6852-4a74-3a33-08d8454d6254
-X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Aug 2020 21:09:53.9252 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 5Q+LnfGFqj1pef1Fqav8Mh/WWfTnvBcYG4f3X7HEnsNDEDM33XsQDpiRJkZZSG25poh+gbd/3ommhdeQaG9lGwkODOsvozH5FXzVjmVUkBo=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4692
-Received-SPF: pass client-ip=40.107.7.117;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR04-HE1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/20 17:09:59
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -37
-X-Spam_score: -3.8
-X-Spam_bar: ---
-X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200820173124.243984-1-berrange@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eblake@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=eblake@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/20 17:00:55
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -133,77 +100,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
- Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- den@openvz.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Stefan Hajnoczi <stefanha@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-21.08.2020 00:00, Nir Soffer wrote:
-> On Thu, Aug 20, 2020 at 9:49 PM Vladimir Sementsov-Ogievskiy
-> <vsementsov@virtuozzo.com> wrote:
->>
->> Add python notrun-helper similar to _check_o_direct for bash tests.
->> To be used in the following commit.
->>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
->> ---
->>   tests/qemu-iotests/iotests.py | 6 ++++++
->>   1 file changed, 6 insertions(+)
->>
->> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
->> index 717b5b652c..369e9918b4 100644
->> --- a/tests/qemu-iotests/iotests.py
->> +++ b/tests/qemu-iotests/iotests.py
->> @@ -1083,6 +1083,12 @@ def _verify_aio_mode(supported_aio_modes: Sequence[str] = ()) -> None:
->>       if supported_aio_modes and (aiomode not in supported_aio_modes):
->>           notrun('not suitable for this aio mode: %s' % aiomode)
->>
->> +def verify_o_direct() -> None:
->> +    with FilePath('test_o_direct') as f:
->> +        qemu_img_create('-f', 'raw', f, '1M')
->> +        if 'O_DIRECT' in qemu_io('-f', 'raw', '-t', 'none', '-c', 'quit', f):
->> +            notrun(f'file system at {test_dir} does not support O_DIRECT')
+On 8/20/20 12:31 PM, Daniel P. Berrangé wrote:
+> Meson requires the build dir to be separate from the source tree. Many
+> people are used to just running "./configure && make" though and the
+> meson conversion breaks that.
 > 
-> Why not:
-> 
->      with FilePath('test_o_direct') as f:
->          try:
->              fd = os.open(f, os.O_DIRECT | os.O_CREAT | os.O_RDWR)
->          except OSError as e:
->              if e.errno != errno.EINVAL:
->                  raise
->              notrun(...)
->          else:
->             os.close(fd)
-> 
-> More verbose, but the intent is more clear, and we do not depend on the output
-> of qemu-io which is not a public API. For example if someone improves qemu-io
-> to fail with:
-> 
->      Direct I/O is not supported
-> 
-> It would break the tests using this helper.
-> 
+> This introduces some backcompat support to make it appear as if an
+> "in source tree" build is being done, but with the the results in the
+> "build/" directory. This allows "./configure && make" to work as it
+> did historically, albeit with the output binaries staying under build/.
 
-Agree, that's better. Will use it, thanks!
+An observation:
 
-> 
->> +
->>   def supports_quorum():
->>       return 'quorum' in qemu_img_pipe('--help')
->>
->> --
->> 2.21.3
->>
->>
-> 
+If you already had out-of-tree builds, this does not change anything. 
+You can do an incremental build, where a tree that builds pre-merge 
+should continue to build incrementally with 'make -C dir' post-merge.
 
+If you are used to in-tree builds, and do a fresh checkout, this lets 
+you maintain the illusion of an in-tree build although binaries may be 
+located differently than you are used to.
+
+But if you do an incremental update to an in-tree build, this will cause 
+some odd behaviors, starting with the git update:
+
+$ git merge $paolos_tag
+error: The following untracked working tree files would be overwritten 
+by merge:
+	accel/kvm/trace.h
+...
+	util/trace.h
+Please move or remove them before you merge.
+Aborting
+$ find -name trace.h -delete
+$ git merge $paolos_tag
+$ git am $this_patch
+$ make
+config-host.mak is out-of-date, running configure
+Using './build' as the directory for build output
+Submodule 'meson' (https://github.com/mesonbuild/meson/) registered for 
+path 'meson'
+Cloning into '/home/eblake/qemu-tmp2/meson'...
+...
+Command line for building ['libcommon.fa'] is long, using a response file
+./ninjatool -t ninja2make --omit clean dist uninstall < build.ninja > 
+Makefile.ninja
+/bin/sh: build.ninja: No such file or directory
+   GEN     tests/test-qapi-gen
+make: Nothing to be done for 'all'.
+$ echo $?
+0
+$ make
+changing dir to build for make ""...
+make[1]: Entering directory '/home/eblake/qemu-tmp2/build'
+Makefile:84: *** This is an out of tree build but your source tree 
+(/home/eblake/qemu-tmp2) seems to have been used for an in-tree build. 
+You can fix this by running "make distclean && rm -rf *-linux-user 
+*-softmmu" in your source tree.  Stop.
+make[1]: Leaving directory '/home/eblake/qemu-tmp2/build'
+make: *** [GNUmakefile:11: all] Error 2
+$ echo $?
+2
+
+So I'm not sure why the first build gets as far as it does, but does NOT 
+complete things and yet does not fail make, but my advice is that you 
+should NOT try to an incremental build on in-tree build when crossing 
+the meson epoch.  If you are a fan of in-tree convenience, you need a 
+ONE-TIME distclean when pulling in these changes (the fact that you HAVE 
+to clean up trace.h files to merge in the meson stuff should be a hint 
+for that).  After that has been done, you can go back to pretending 
+meson supports in-tree.
 
 -- 
-Best regards,
-Vladimir
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
 
