@@ -2,101 +2,86 @@ Return-Path: <SRS0=Dndf=B6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9636EC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 17:11:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 844EEC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 17:11:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 61A26208A9
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 17:11:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4DFF3208A9
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 17:11:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WWbkb2We"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61A26208A9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xC4WGR7q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4DFF3208A9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57234 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58786 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8o5h-0002yR-Lp
-	for qemu-devel@archiver.kernel.org; Thu, 20 Aug 2020 13:11:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38926)
+	id 1k8o66-0003dk-KS
+	for qemu-devel@archiver.kernel.org; Thu, 20 Aug 2020 13:11:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39072)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k8o4w-0002HC-0q
- for qemu-devel@nongnu.org; Thu, 20 Aug 2020 13:10:18 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:25357
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k8o4u-0007jK-EW
- for qemu-devel@nongnu.org; Thu, 20 Aug 2020 13:10:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597943411;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=89jXPVPv2kkdtYzqNRsIdICSTxnn4TeU97yfa4KTTPA=;
- b=WWbkb2WeXdWjxMjijOIsd7WmcHPF6OpKhXly5cbyVoZgv9y43s9/KU0n8ncleQLmvSqt2Q
- 2sutcJC/3BHm9On2MjCVCW4T91QQWM7veMegga0806JNf5R2SsS/AqEm99sEPMmZvMaQg2
- VdlTPynyExnSn6tZJrUoH/y2WZb6txw=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-510-LtIcaIXJNP2jil9iyQCf1A-1; Thu, 20 Aug 2020 13:10:10 -0400
-X-MC-Unique: LtIcaIXJNP2jil9iyQCf1A-1
-Received: by mail-wm1-f69.google.com with SMTP id r14so215455wmh.1
- for <qemu-devel@nongnu.org>; Thu, 20 Aug 2020 10:10:09 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1k8o5Q-0002n0-RG
+ for qemu-devel@nongnu.org; Thu, 20 Aug 2020 13:10:48 -0400
+Received: from mail-ej1-x62f.google.com ([2a00:1450:4864:20::62f]:35942)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1k8o5P-0007xI-3h
+ for qemu-devel@nongnu.org; Thu, 20 Aug 2020 13:10:48 -0400
+Received: by mail-ej1-x62f.google.com with SMTP id kq25so3407467ejb.3
+ for <qemu-devel@nongnu.org>; Thu, 20 Aug 2020 10:10:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=2J7NlRo1UWCdOsxRzgIGG1Mp9IPn9u5pqb2f0ieyvEM=;
+ b=xC4WGR7qiZKnj5fjRwlC1UDNQtS6rOYtWf57HP+JK2NRvdZ/rF2dQPqkNwH+i1Su28
+ u16c468rAsI0tdBszI8oLYAmzGLhfsDEHJ6NRDMGv3rz+lrZwC31ykxzRFX4/wEE5VSf
+ DzKtxnKV4/yJf95Kznegy8Qe/pr0fvXsHUTkbhCE2L8Q+Euxu6+5ZK+ZjAZBATLX6Mex
+ EhndYhlbu5om8vz0VYvTXe9FXlrGtNLuFDu/Tp84ye2Ha0g3i/lOJk32zEVlbwQnWSKN
+ Bfm2SikSQ+t/LeuFODdGZ36LWpqJpw4gcXD00xTmY8q1/HO5ay+t6f7hTvVO7NkVfABy
+ zmqQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=89jXPVPv2kkdtYzqNRsIdICSTxnn4TeU97yfa4KTTPA=;
- b=ep8hu4vkiz/4Q2Xyq8X3MS5bTQVzl68GffW/JuvjSWqqBK5ZileTK5BejKu2tB+sm3
- W5CVBXga6I6ktFM3Vh9oZ9JKaWWgQ8KHUYQnwzGvg9ujUzaeU8EhD9M59kdAZRHASyRh
- ASUFHSztTFb1wFA3LW1GVNd2gXEAN9maDpRvyH//Y2b0z67UVL9tozSnX2kwtvkD+1Na
- y/Lqd9VOX15KNg0KV3WfJ7Q/7EQPaD1YdpOy3JG72POcQNLgb6xqeLJ73BULFJrkamPJ
- wXGwDJ9XAvF1tqQ80S5PnxOy45UbrDfX741qg2ViidsK0Ha9Z/YpfN/PuQi6tEFVFmce
- 1jQA==
-X-Gm-Message-State: AOAM533waN/Vi3nEDndUsqSKnTAk4fDplg0W0gHL6JZJ9TlWCtc+sYGT
- k6FCnqIJdyrH3KjqDNMevWRlhoOaX7wExBfA1qTWF8fqs8O902UYaCGBMxW14ERZhQtjAAw2Lu/
- hCrK/7DfvvPO6IXs=
-X-Received: by 2002:a7b:c15a:: with SMTP id z26mr4322655wmi.35.1597943408663; 
- Thu, 20 Aug 2020 10:10:08 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz6vkc/ENYEyyhE4ftbqk24JUQ0Qp4VGz2Q3SbBQ6VwkezIHv1bpIW0ANwviU60jSvBcGDRdg==
-X-Received: by 2002:a7b:c15a:: with SMTP id z26mr4322630wmi.35.1597943408390; 
- Thu, 20 Aug 2020 10:10:08 -0700 (PDT)
-Received: from x1w.redhat.com (121.red-81-40-121.staticip.rima-tde.net.
- [81.40.121.121])
- by smtp.gmail.com with ESMTPSA id k204sm5658211wma.21.2020.08.20.10.10.07
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 20 Aug 2020 10:10:07 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] util/vfio-helpers: Unify trace-events size format
-Date: Thu, 20 Aug 2020 19:10:06 +0200
-Message-Id: <20200820171006.1140228-1-philmd@redhat.com>
-X-Mailer: git-send-email 2.26.2
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=2J7NlRo1UWCdOsxRzgIGG1Mp9IPn9u5pqb2f0ieyvEM=;
+ b=auFAv688stBw/vCbysmmhw64eqmTqSsyswTIIOCclrJX51eN12AKnYw/orAsNKAh6v
+ NfDpz2Gnk+/dWOcMUTJUsER8hK4llBsSEElS4ntGH0J2xu6PFrsw91WxyoVFFTEFbuTh
+ LmyNiCt48xTLNVT2WZf/AA1iz51xGa4RoGfDivQcLLI+71fto3NU4HA2K6ZYJD05LRUA
+ WSMP4r7ftY+0g0t3uqfslvN8TM2FUIAGeqhz/Nw+B8sGo3iEAp2klMyBGJ+/b3XA3CVS
+ 96E/6v/t+vRVM3PMNTxVgLySkgMYyDzJU14iPv2PYVvhInRbmCS/HcP3icKZlWUOs31Z
+ L/pg==
+X-Gm-Message-State: AOAM532+0sVZR9IgtOHd0BNr5KFhr5+P5MYoXm8lg7oRsnnYRdCifAue
+ Aw0HX7dd3+K5sxRdX1PIxzT4oKrZTbEavjUR0hA45w==
+X-Google-Smtp-Source: ABdhPJxXocaeh4PG2q2okmw3NmjHOA8MHVNvEU2GEFD78VGxN+qBxZMT/JWxxKidKTbNUBpkLDcl2A6JypueSRGDE0o=
+X-Received: by 2002:a17:906:59b:: with SMTP id 27mr4154364ejn.56.1597943445406; 
+ Thu, 20 Aug 2020 10:10:45 -0700 (PDT)
 MIME-Version: 1.0
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8;
-	text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/20 03:03:34
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+References: <20200820165543.215372-1-berrange@redhat.com>
+In-Reply-To: <20200820165543.215372-1-berrange@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 20 Aug 2020 18:10:34 +0100
+Message-ID: <CAFEAcA_a+0N8FXQ4CrBwJ9jt8LptaTO3d=LZ_S2B0H7h1Ev94g@mail.gmail.com>
+Subject: Re: [PATCH] configure: add support for psuedo-"in source tree" builds
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::62f;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x62f.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -109,51 +94,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Some 'qemu_vfio_*' trace events sizes are displayed using
-decimal notation, other using hexadecimal notation:
+On Thu, 20 Aug 2020 at 17:56, Daniel P. Berrang=C3=A9 <berrange@redhat.com>=
+ wrote:
+> Meson requires the build dir to be separate from the source tree. Many
+> people are used to just running "./configure && make" though and the
+> meson conversion breaks that.
+>
+> This introduces some backcompat support to make it appear as if an
+> "in source tree" build is being done, but with the the results in the
+> "build/" directory. This allows "./configure && make" to work as it
+> did historically, albeit with the output binaries staying under build/.
 
-  qemu_vfio_ram_block_added s 0xaaaaf2448d90 host 0xffff5bc00000 size 0x4000000
-  qemu_vfio_dma_map s 0xaaaaf2448d90 host 0xffff5bc00000 size 67108864 temporary 0 iova (nil)
-  qemu_vfio_find_mapping s 0xaaaaf2448d90 host 0xffff5bc00000
-  qemu_vfio_new_mapping s 0xaaaaf2448d90 host 0xffff5bc00000 size 67108864 index 4 iova 0x114000
-  qemu_vfio_do_mapping s 0xaaaaf2448d90 host 0xffff5bc00000 size 67108864 iova 0x114000
+> +if test "$PWD" =3D=3D "$source_path"
+> +then
+> +    echo "Using './build' as the directory for build output"
+> +    rm -rf build
+> +    mkdir -p build
 
-As it is hard to follow, unify using hexadecimal for all sizes:
+Can we put in a mollyguard here so we only blow away build/
+if we previously auto-created it? Something like
 
-  qemu_vfio_ram_block_added s 0xaaaaf1c60d90 host 0xffff2bc00000 size 0x4000000
-  qemu_vfio_dma_map s 0xaaaaf1c60d90 host 0xffff2bc00000 size 0x4000000 temporary 0 iova (nil)
-  qemu_vfio_find_mapping s 0xaaaaf1c60d90 host 0xffff2bc00000
-  qemu_vfio_new_mapping s 0xaaaaf1c60d90 host 0xffff2bc00000 size 0x4000000 index 4 iova 0x114000
-  qemu_vfio_do_mapping s 0xaaaaf1c60d90 host 0xffff2bc00000 size 0x4000000 iova 0x114000
+      if ! -e build || -e build/created-by-configure; then
+          rm -rf build
+          mkdir -p build
+          touch build/created-by-configure
+      else
+          echo "some helpful error message here"
+      fi
 
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
----
- util/trace-events | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+(shell syntax probably wrong but you get the idea)
 
-diff --git a/util/trace-events b/util/trace-events
-index 0ce42822eba..d9a0b4f8c63 100644
---- a/util/trace-events
-+++ b/util/trace-events
-@@ -79,7 +79,7 @@ qemu_vfio_dma_reset_temporary(void *s) "s %p"
- qemu_vfio_ram_block_added(void *s, void *p, size_t size) "s %p host %p size 0x%zx"
- qemu_vfio_ram_block_removed(void *s, void *p, size_t size) "s %p host %p size 0x%zx"
- qemu_vfio_find_mapping(void *s, void *p) "s %p host %p"
--qemu_vfio_new_mapping(void *s, void *host, size_t size, int index, uint64_t iova) "s %p host %p size %zu index %d iova 0x%"PRIx64
--qemu_vfio_do_mapping(void *s, void *host, size_t size, uint64_t iova) "s %p host %p size %zu iova 0x%"PRIx64
--qemu_vfio_dma_map(void *s, void *host, size_t size, bool temporary, uint64_t *iova) "s %p host %p size %zu temporary %d iova %p"
-+qemu_vfio_new_mapping(void *s, void *host, size_t size, int index, uint64_t iova) "s %p host %p size 0x%zx index %d iova 0x%"PRIx64
-+qemu_vfio_do_mapping(void *s, void *host, size_t size, uint64_t iova) "s %p host %p size 0x%zx iova 0x%"PRIx64
-+qemu_vfio_dma_map(void *s, void *host, size_t size, bool temporary, uint64_t *iova) "s %p host %p size 0x%zx temporary %d iova %p"
- qemu_vfio_dma_unmap(void *s, void *host) "s %p host %p"
--- 
-2.26.2
+My current setup has multiple build-directories like
+build/x86, build/clang, ... and I'd like a guard against
+configure blowing them all away if I accidentally run it
+from the source tree some day.
 
+thanks
+-- PMM
 
