@@ -2,114 +2,125 @@ Return-Path: <SRS0=Dndf=B6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.4 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AA22C433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 10:29:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3813C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 10:32:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D994A20658
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 10:29:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 91B9E20658
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 10:32:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cA9ERQkz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D994A20658
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="ujr2JWgA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91B9E20658
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39186 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41692 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8hoj-0005nL-76
-	for qemu-devel@archiver.kernel.org; Thu, 20 Aug 2020 06:29:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48264)
+	id 1k8hri-00070J-TC
+	for qemu-devel@archiver.kernel.org; Thu, 20 Aug 2020 06:32:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48994)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1k8hoB-0005II-TY
- for qemu-devel@nongnu.org; Thu, 20 Aug 2020 06:28:36 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58780)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1k8ho9-0003Nn-NP
- for qemu-devel@nongnu.org; Thu, 20 Aug 2020 06:28:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597919310;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=cM0T8rn9IHg1rp01B/PgURaEezejJhiOPhwqrtbfcm8=;
- b=cA9ERQkzgnDtcGBf66W+ULaI6U9xNN6KE8LMU9d7eT+ecEKjajuTb+jtsyNETUQXkJRD9U
- DLqLwSQvrU5wzKSoitU6UCJHFu4n5ULyVVbojsCTUuKkgW/ytgkR/u/cq2Ke6q1qFZyYQl
- pKciGttJbWHnyNfuj7k9/uadD91WuII=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-289-Xe5l8NcfMjecVhqYcMznew-1; Thu, 20 Aug 2020 06:28:28 -0400
-X-MC-Unique: Xe5l8NcfMjecVhqYcMznew-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 01FAC81F024;
- Thu, 20 Aug 2020 10:28:27 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-113-133.ams2.redhat.com
- [10.36.113.133])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D6EE9600DD;
- Thu, 20 Aug 2020 10:28:25 +0000 (UTC)
-Subject: Re: [PATCH v7 33/47] mirror: Deal with filters
-To: Kevin Wolf <kwolf@redhat.com>
-References: <20200625152215.941773-1-mreitz@redhat.com>
- <20200625152215.941773-34-mreitz@redhat.com>
- <20200819165036.GH10272@linux.fritz.box>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <7d3e38bb-53ed-031a-9955-a3c23abe119d@redhat.com>
-Date: Thu, 20 Aug 2020 12:28:23 +0200
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1k8hqz-0006VY-3s; Thu, 20 Aug 2020 06:31:29 -0400
+Received: from mail-am6eur05on2121.outbound.protection.outlook.com
+ ([40.107.22.121]:55265 helo=EUR05-AM6-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1k8hqw-0003pz-Cc; Thu, 20 Aug 2020 06:31:28 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=PV4wMWwQWSBNI9BRYm78haUr4KLgtHqkbRVM8H9tY08fkkEEPw0HSiySm7R8xOshQvRuKekBGDou39WONZc58Mv91074TnINVOGeDe/uMPwyy09z7GRDVbX+s14e0auMP3KfcAbqkdmbBBw7jW66yDv0G44cPsIBAduP3z0+ZxLQPNmG89WCyCucLbVLrvXhUE9hVbyhvK1AToEzz+0pMAsddi+rHUaw4oIlrUpcBGYQfj1qgiA2ou3sMEmG68UJLo1ymrPzvQ8ObQz+mwrkDMV7uPPHzS7h8BFVm+PSqZ0vbRyrG/DzEX2qKx3R9A+KTgsaGeD4kaDscE4NfTzlGg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=T9v+dUDdVcpJEhYfE/cT6dOIJD2GwASdngYT/Y0tndk=;
+ b=JE21Ban+ahfGVhr2UmsZdcn6dFJP/+lC1bJLLT46dRD7SWaTRVqFmR01sUctjHHML56Tx0o+oJ8Rl7RyEIeOFNqfvvA53bpRQRaZWvTqyun0yC/aVawr4H2JYRDk+y7cHlIJUOjMRc+xDIKnHHPgwjEzdNx+YwkSt8Z3xb5vLZOgKsHYWGgW8fTcwQah0fdAvhx/ik9ZbbYtHKuAy0Ub/FxYuBsfnswIMDCP0mcZmASgLThR5upza5yCMcg2GOZLpVLASX/MjpcwkCwuwRGxcHmcQQoRA/NJtU+D6hfYIz4QNVgWO04Qx6rUnCbLiGXRT2cPT89ywTGxvLlnOn9OVA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=T9v+dUDdVcpJEhYfE/cT6dOIJD2GwASdngYT/Y0tndk=;
+ b=ujr2JWgAc3uRMGf3BduDxqVICUY1UMHMPqJBjhgH33TqPxWpzNI0g2aq0C4hAYNt0UJEG3ITT+qTXUPRWZFG1KJZbbcybhc7VVoui/Mj1+AoaYa1/m3a2q4uKVhlylQqXa/lLpap8BOYjwmVFKd9PqvGQbV8tjmBs/IqxRRY1kY=
+Authentication-Results: openvz.org; dkim=none (message not signed)
+ header.d=none;openvz.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM6PR08MB4280.eurprd08.prod.outlook.com (2603:10a6:20b:b6::19)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3305.24; Thu, 20 Aug
+ 2020 10:31:23 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::8c0c:c056:97a5:484a]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::8c0c:c056:97a5:484a%3]) with mapi id 15.20.3283.027; Thu, 20 Aug 2020
+ 10:31:23 +0000
+Subject: Re: [PATCH v3] block/nbd: use non-blocking connect: fix vm hang on
+ connect()
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+References: <20200812145237.4396-1-vsementsov@virtuozzo.com>
+ <8e5f317f-e9f5-10a1-839f-27e2a083c933@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <0c4fc05d-7d29-88c1-36c4-7c2687d3b666@virtuozzo.com>
+Date: Thu, 20 Aug 2020 13:31:22 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ Thunderbird/68.11.0
+In-Reply-To: <8e5f317f-e9f5-10a1-839f-27e2a083c933@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: AM0PR10CA0041.EURPRD10.PROD.OUTLOOK.COM
+ (2603:10a6:20b:150::21) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
 MIME-Version: 1.0
-In-Reply-To: <20200819165036.GH10272@linux.fritz.box>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
-X-Mimecast-Spam-Score: 0.0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="LOLFNF76Xeol2B55D6VqO7Odk8qKkVUpc"
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=mreitz@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/20 06:28:30
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.5] (185.215.60.171) by
+ AM0PR10CA0041.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:20b:150::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3305.24 via Frontend
+ Transport; Thu, 20 Aug 2020 10:31:23 +0000
+X-Originating-IP: [185.215.60.171]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: e51681e8-46b5-4ff9-252f-08d844f42fcc
+X-MS-TrafficTypeDiagnostic: AM6PR08MB4280:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM6PR08MB42802AB980CB321D4768F4ABC15A0@AM6PR08MB4280.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:5797;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 8gcJaPuZjTCMvYhAbwVyPSu7O+uH37BoVi0XPUMt7fq5RkUlWUlaLaOG0SlOEKhnbbJKy8/3ZvSRNXz1DRU68F2FMBmICziKSrtWMmf9TO04TYQxeo+fed0VcMlQuotZxlmAT/mBj6dewOoONBYVXuJhXRSKQPooRu7Ijd+y3kGhnh+ibov4ip2EN7FLk2EUWf+hF5YGZQcpKxPKfS51Ccoa/syne8X5xY7dwy9BIfwcxRkVQkPiKdtRp2pHgcxNiEcWebRrTpoGG6hAcOvz/Ip3g19vuSoYpPBn2QAKBXCHzxUPW2JRMZCHCVtZAsdPQ+AvRLXfSj5muZ351Kk1UWb9Zor7LblGTS1/KheQiI4mAH8z3qClIi0699b8BARH
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(4636009)(39840400004)(136003)(346002)(376002)(396003)(366004)(478600001)(31696002)(53546011)(316002)(36756003)(83380400001)(52116002)(2616005)(956004)(5660300002)(86362001)(2906002)(8676002)(8936002)(31686004)(186003)(107886003)(4326008)(16576012)(66476007)(16526019)(6486002)(26005)(66946007)(66556008)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: EnX8ZFBZGyo+kdHKyPcxAhH01bkczwKIx+bYbqyiOX/7I1M+dQdJWuGa6N0TKZ7HJpDR/+7G3pZU5ljs9FKBxwJ5zCNxsjxujUBq45vhfWmtylNTcoE1wu8F076VAnmeZj8yDlHgrLoV17LwA9SesgXbpI2TK9bhJxvn6OzKNbWni2JNi3LMB3sQigjoo44R1bNuXEyY2LMUORNsSOv4mTaGqu8Qt1F7Ct5JBUnCPwPcMNkUiHQAQsZHCslEOilcBc+Cs+CHWVhy5kgot8R5mWepi3sV9bgYxzY7+2jtqudfQixne5leFGxUXXcQenczfCkGkCKfOTlCTOoA9uvytaefOMeJ/96Zk+bz5b4sPSWe7aYIf/+2Xk2khYNp/aw5B47/rZR12IIRdK3rMZhbTzneG4Dl88lzMRp4TcJCyNQgaLmvVujGs9exKaw4BDtDPOY7XPpL6e8y0xDwWs+yhgIcJQSC5Yw2JtzwEsP9v0l03n3qB8+5/+Jf4+ESTorPqVsGhcvlbRDbIl8n3fF5RKW8+heiCfDcn23aqlb8QeYjCRZZoHcun9S2Qq8Sp33wgPyqa5sBqQOMUXVwHhXfUXzQPVsu6TBldIfodVXwV5YWXyyzBnVIYNK/lVegIc85x/0OFVibMxrJaMvGMGVRvw==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e51681e8-46b5-4ff9-252f-08d844f42fcc
+X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Aug 2020 10:31:23.8507 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Ev1N2XfJh3xtLsYwF/rLp5vuWtepScqs/4uSPsDCWS/J6zCNMYj2jDYHZ6ycRV+85Mrtvk9+TTJNzGfscrIVKKS1Y5WdHa8/86Zrtmdixlg=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4280
+Received-SPF: pass client-ip=40.107.22.121;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR05-AM6-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/20 06:31:24
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -122,94 +133,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, den@openvz.org, qemu-devel@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---LOLFNF76Xeol2B55D6VqO7Odk8qKkVUpc
-Content-Type: multipart/mixed; boundary="4nUboUfEMwZgc28dILjFhKltp0Zy5KEuv"
-
---4nUboUfEMwZgc28dILjFhKltp0Zy5KEuv
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 19.08.20 18:50, Kevin Wolf wrote:
-> Am 25.06.2020 um 17:22 hat Max Reitz geschrieben:
->> This includes some permission limiting (for example, we only need to
->> take the RESIZE permission for active commits where the base is smaller
->> than the top).
+19.08.2020 20:52, Eric Blake wrote:
+> On 8/12/20 9:52 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> This make nbd connection_co to yield during reconnects, so that
+>> reconnect doesn't hang up the main thread. This is very important in
+>> case of unavailable nbd server host: connect() call may take a long
+>> time, blocking the main thread (and due to reconnect, it will hang
+>> again and again with small gaps of working time during pauses between
+>> connection attempts).
 >>
->> Use this opportunity to rename qmp_drive_mirror()'s "source" BDS to
->> "target_backing_bs", because that is what it really refers to.
+> 
+>> How to reproduce the bug, fixed with this commit:
 >>
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->=20
->> @@ -1682,6 +1721,7 @@ static BlockJob *mirror_start_job(
->>      s->zero_target =3D zero_target;
->>      s->copy_mode =3D copy_mode;
->>      s->base =3D base;
->> +    s->base_overlay =3D bdrv_find_overlay(bs, base);
->>      s->granularity =3D granularity;
->>      s->buf_size =3D ROUND_UP(buf_size, granularity);
->>      s->unmap =3D unmap;
->=20
-> Is this valid without freezing the links between base_overlay and base?
+>> 1. Create an image on node1:
+>>     qemu-img create -f qcow2 xx 100M
+>>
+>> 2. Start NBD server on node1:
+>>     qemu-nbd xx
+>>
+>> 3. Start vm with second nbd disk on node2, like this:
+>>
+>>    ./x86_64-softmmu/qemu-system-x86_64 -nodefaults -drive \
+>>      file=/work/images/cent7.qcow2 -drive file=nbd+tcp://192.168.100.2 \
+>>      -vnc :0 -qmp stdio -m 2G -enable-kvm -vga std
+> 
+> Where is the configuration to set up retry on the nbd connection?  I wonder if you have a non-upstream patch that turns it on by default in your builds; for upstream, I would have expected something more along the lines of -blockdev driver=nbd,reconnect-delay=20,server.type=inet,server.data.hostname=192.168.100.2,server.data.port=10809 (typing off the top of my head, rather than actually tested).
 
-Er...
+No, it's not necessary: reconnect is enabled always. reconnect-delay just says what to do with guest requests when connection is down. By default, they just fails immediately. But even with reconnect-delay=0 reconnect code works and tries to reestablish the connection.
 
-> Actually, I guess we should freeze everything between bs and base (for
-> base !=3D NULL) and it's a preexisting problem that just happens to affec=
-t
-> this code, too.
+> 
+>>
+>> 4. Access the vm through vnc (or some other way?), and check that NBD
+>>     drive works:
+>>
+>>     dd if=/dev/sdb of=/dev/null bs=1M count=10
+>>
+>>     - the command should succeed.
+>>
+>> 5. Now, let's trigger nbd-reconnect loop in Qemu process. For this:
+>>
+>> 5.1 Kill NBD server on node1
+>>
+>> 5.2 run "dd if=/dev/sdb of=/dev/null bs=1M count=10" in the guest
+>>      again. The command should fail and a lot of error messages about
+>>      failing disk may appear as well.
+> 
+> Why does the guest access fail when the server goes away?  Shouldn't the pending guest requests merely be queued for retry (where the guest has not seen a failure yet, but may do so if timeouts are reached), rather than being instant errors?
 
-Yes, that=E2=80=99s how it looks to me, too.  I don=E2=80=99t think that ha=
-s anything to
-do with this patch.
+And that's exactly how it should work when reconnect-delay is 0. If you set reconnect-delay to be >0, then in this period of time after detection of connection failure all the requests will be queued.
 
-> Or maybe freezing everything is too much. We only want to make sure that
-> no non-filter is inserted between base and base_overlay and that base
-> (and now base_overlay) always stay in the backing chain of bs. But what
-> options apart from freezing do we have to achieve this?
+> 
+>>
+>>      Now NBD client driver in Qemu tries to reconnect.
+>>      Still, VM works well.
+>>
+>> 6. Make node1 unavailable on NBD port, so connect() from node2 will
+>>     last for a long time:
+>>
+>>     On node1 (Note, that 10809 is just a default NBD port):
+>>
+>>     sudo iptables -A INPUT -p tcp --dport 10809 -j DROP
+>>
+>>     After some time the guest hangs, and you may check in gdb that Qemu
+>>     hangs in connect() call, issued from the main thread. This is the
+>>     BUG.
+>>
+>> 7. Don't forget to drop iptables rule from your node1:
+>>
+>>     sudo iptables -D INPUT -p tcp --dport 10809 -j DROP
+>>
+> 
 
-I don=E2=80=99t know of any, and I don=E2=80=99t know whether anyone would =
-actually care
-if we were to just freeze everything.
 
-> Why is using base_overlay even better than using base? Assuming there is
-> a good reason, maybe the commit message could spell it out.
-
-The problem is that querying the block status for a filter node falls
-through to the underlying data-carrying node.  So if there=E2=80=99s a filt=
-er on
-top of @base, and we query for is_allocated_above above @base, then
-we=E2=80=99ll include @base, which we do not want.
-
-Max
-
-
---4nUboUfEMwZgc28dILjFhKltp0Zy5KEuv--
-
---LOLFNF76Xeol2B55D6VqO7Odk8qKkVUpc
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl8+UEgACgkQ9AfbAGHV
-z0AM8gf9EPZYl1O3apy5u4GXs3N12w/rgN/MQkTs/47undbDcDIfbXCUxdWRmVw+
-6/ijEbn+zkGAV3qNJOWb2rfPuijcL7e22Wvuq5G+BUkck/Cxro3u5cboqID4MDh7
-zLtBqkm62usEe0oML3L5d2cRn84PYQc4Uvj3jA8ld6d7fFIiVgGv14ALKHoFE2Q2
-Kol16dxBo+62rehctfxkUYeLLpE6P/oLVJr9ni5Y13al3x5z/YzGwxBsptiN4Qtl
-2vyeLNtkXXoc7m49NXqgJ+4crfj6IGU4A++diPMsV0KMOnCfrm+27FZS1vw9jgCn
-z04HxMQzxQwhdNR6m9TjQDAv70t2KA==
-=Y0HL
------END PGP SIGNATURE-----
-
---LOLFNF76Xeol2B55D6VqO7Odk8qKkVUpc--
-
+-- 
+Best regards,
+Vladimir
 
