@@ -2,74 +2,81 @@ Return-Path: <SRS0=Dndf=B6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FA15C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 06:43:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63B72C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 06:44:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D58B120786
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 06:43:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D58B120786
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 399D820786
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 06:44:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 399D820786
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59014 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32976 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8eIL-00025C-5p
-	for qemu-devel@archiver.kernel.org; Thu, 20 Aug 2020 02:43:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55620)
+	id 1k8eJW-0002yn-HS
+	for qemu-devel@archiver.kernel.org; Thu, 20 Aug 2020 02:44:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55856)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <clg@kaod.org>)
- id 1k8eH3-0000ub-5v; Thu, 20 Aug 2020 02:42:09 -0400
-Received: from smtpout1.mo804.mail-out.ovh.net ([79.137.123.220]:55411)
+ (Exim 4.90_1) (envelope-from <yan.y.zhao@intel.com>)
+ id 1k8eIB-00022I-BG
+ for qemu-devel@nongnu.org; Thu, 20 Aug 2020 02:43:19 -0400
+Received: from mga18.intel.com ([134.134.136.126]:59422)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <clg@kaod.org>)
- id 1k8eH1-00008L-ME; Thu, 20 Aug 2020 02:42:08 -0400
-Received: from mxplan5.mail.ovh.net (unknown [10.109.143.118])
- by mo804.mail-out.ovh.net (Postfix) with ESMTPS id 5D40F58D9D3C;
- Thu, 20 Aug 2020 08:42:05 +0200 (CEST)
-Received: from kaod.org (37.59.142.105) by DAG4EX1.mxp5.local (172.16.2.31)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1979.3; Thu, 20 Aug
- 2020 08:42:04 +0200
-Authentication-Results: garm.ovh; auth=pass
- (GARM-105G00621555f74-d5c7-48d5-b135-63568622732e,
- 02C359FD435C2C4122574921AFFD4D91C9CEEBEA) smtp.auth=clg@kaod.org
-Subject: Re: [PATCH v2 10/58] aspeed_timer: Fix ASPEED_TIMER macro definition
-To: Eduardo Habkost <ehabkost@redhat.com>, <qemu-devel@nongnu.org>
-References: <20200820001236.1284548-1-ehabkost@redhat.com>
- <20200820001236.1284548-11-ehabkost@redhat.com>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <56567ff0-65d5-0542-15e8-a054d01bb264@kaod.org>
-Date: Thu, 20 Aug 2020 08:42:03 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <yan.y.zhao@intel.com>)
+ id 1k8eI8-0000Dp-3D
+ for qemu-devel@nongnu.org; Thu, 20 Aug 2020 02:43:19 -0400
+IronPort-SDR: GWOOhaf1uTs23I9Fi7K7y8eVvfpzV8D6Z2oTw30obEQoUVn6E5YXfbMoG/IG+q6f1zaaFh3lUL
+ h8+Opk48a8LQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9718"; a="142881351"
+X-IronPort-AV: E=Sophos;i="5.76,332,1592895600"; d="scan'208";a="142881351"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+ by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 19 Aug 2020 23:43:10 -0700
+IronPort-SDR: HLPglho59sV+bWcp1XthpDVisF5ZarBv0N1Gpdh6hbLdI0j5j2u6kHH2lL0eaJ6YiN1E+nu1Hg
+ PFI5a8dS2M8A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.76,332,1592895600"; d="scan'208";a="327321900"
+Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
+ ([10.239.13.16])
+ by orsmga008.jf.intel.com with ESMTP; 19 Aug 2020 23:43:03 -0700
+Date: Thu, 20 Aug 2020 14:27:25 +0800
+From: Yan Zhao <yan.y.zhao@intel.com>
+To: Sean Mooney <smooney@redhat.com>
+Subject: Re: device compatibility interface for live migration with assigned
+ devices
+Message-ID: <20200820062725.GB24997@joy-OptiPlex-7040>
+References: <20200814051601.GD15344@joy-OptiPlex-7040>
+ <a51209fe-a8c6-941f-ff54-7be06d73bc44@redhat.com>
+ <20200818085527.GB20215@redhat.com>
+ <3a073222-dcfe-c02d-198b-29f6a507b2e1@redhat.com>
+ <20200818091628.GC20215@redhat.com>
+ <20200818113652.5d81a392.cohuck@redhat.com>
+ <20200820003922.GE21172@joy-OptiPlex-7040>
+ <242591bb809b68c618f62fdc93d4f8ae7b146b6d.camel@redhat.com>
+ <20200820040116.GB24121@joy-OptiPlex-7040>
+ <da140e6d262632e2fb707f69f220915748d25d35.camel@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200820001236.1284548-11-ehabkost@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [37.59.142.105]
-X-ClientProxiedBy: DAG7EX2.mxp5.local (172.16.2.62) To DAG4EX1.mxp5.local
- (172.16.2.31)
-X-Ovh-Tracer-GUID: 99b3238d-5211-4961-b792-f630648c7203
-X-Ovh-Tracer-Id: 1962725014723791663
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedruddtledgkeekucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfhisehtkeertddtfeejnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepjeekudeuudevleegudeugeekleffveeludejteffiedvledvgfekueefudehheefnecukfhppedtrddtrddtrddtpdefjedrheelrddugedvrddutdehnecuvehluhhsthgvrhfuihiivgepudenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepmhigphhlrghnhedrmhgrihhlrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopegvhhgrsghkohhsthesrhgvughhrghtrdgtohhm
-Received-SPF: pass client-ip=79.137.123.220; envelope-from=clg@kaod.org;
- helo=smtpout1.mo804.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/20 02:41:12
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+In-Reply-To: <da140e6d262632e2fb707f69f220915748d25d35.camel@redhat.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+Received-SPF: pass client-ip=134.134.136.126;
+ envelope-from=yan.y.zhao@intel.com; helo=mga18.intel.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/20 02:43:10
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -83,56 +90,230 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "Daniel P. Berrange" <berrange@redhat.com>, Andrew Jeffery <andrew@aj.id.au>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-arm@nongnu.org,
- Joel Stanley <joel@jms.id.au>, Paolo Bonzini <pbonzini@redhat.com>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: kvm@vger.kernel.org, libvir-list@redhat.com,
+ Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, kwankhede@nvidia.com,
+ eauger@redhat.com, xin-ran.wang@intel.com, corbet@lwn.net,
+ openstack-discuss@lists.openstack.org, shaohe.feng@intel.com,
+ kevin.tian@intel.com, Parav Pandit <parav@mellanox.com>,
+ jian-feng.ding@intel.com, dgilbert@redhat.com, zhenyuw@linux.intel.com,
+ hejie.xu@intel.com, bao.yumeng@zte.com.cn,
+ Alex Williamson <alex.williamson@redhat.com>, eskultet@redhat.com,
+ intel-gvt-dev@lists.freedesktop.org,
+ Daniel =?iso-8859-1?Q?P=2EBerrang=E9?= <berrange@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>, Jiri Pirko <jiri@mellanox.com>,
+ dinechin@redhat.com, devel@ovirt.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/20/20 2:11 AM, Eduardo Habkost wrote:
-> The macro definition had an extra semicolon.  This was never
-> noticed because the macro was only being used where it didn't
-> make a difference.
+On Thu, Aug 20, 2020 at 06:16:28AM +0100, Sean Mooney wrote:
+> On Thu, 2020-08-20 at 12:01 +0800, Yan Zhao wrote:
+> > On Thu, Aug 20, 2020 at 02:29:07AM +0100, Sean Mooney wrote:
+> > > On Thu, 2020-08-20 at 08:39 +0800, Yan Zhao wrote:
+> > > > On Tue, Aug 18, 2020 at 11:36:52AM +0200, Cornelia Huck wrote:
+> > > > > On Tue, 18 Aug 2020 10:16:28 +0100
+> > > > > Daniel P. Berrangé <berrange@redhat.com> wrote:
+> > > > > 
+> > > > > > On Tue, Aug 18, 2020 at 05:01:51PM +0800, Jason Wang wrote:
+> > > > > > >    On 2020/8/18 下午4:55, Daniel P. Berrangé wrote:
+> > > > > > > 
+> > > > > > >  On Tue, Aug 18, 2020 at 11:24:30AM +0800, Jason Wang wrote:
+> > > > > > > 
+> > > > > > >  On 2020/8/14 下午1:16, Yan Zhao wrote:
+> > > > > > > 
+> > > > > > >  On Thu, Aug 13, 2020 at 12:24:50PM +0800, Jason Wang wrote:
+> > > > > > > 
+> > > > > > >  On 2020/8/10 下午3:46, Yan Zhao wrote:  
+> > > > > > >  we actually can also retrieve the same information through sysfs, .e.g
+> > > > > > > 
+> > > > > > >  |- [path to device]
+> > > > > > >     |--- migration
+> > > > > > >     |     |--- self
+> > > > > > >     |     |   |---device_api
+> > > > > > >     |    |   |---mdev_type
+> > > > > > >     |    |   |---software_version
+> > > > > > >     |    |   |---device_id
+> > > > > > >     |    |   |---aggregator
+> > > > > > >     |     |--- compatible
+> > > > > > >     |     |   |---device_api
+> > > > > > >     |    |   |---mdev_type
+> > > > > > >     |    |   |---software_version
+> > > > > > >     |    |   |---device_id
+> > > > > > >     |    |   |---aggregator
+> > > > > > > 
+> > > > > > > 
+> > > > > > >  Yes but:
+> > > > > > > 
+> > > > > > >  - You need one file per attribute (one syscall for one attribute)
+> > > > > > >  - Attribute is coupled with kobject
+> > > > > 
+> > > > > Is that really that bad? You have the device with an embedded kobject
+> > > > > anyway, and you can just put things into an attribute group?
+> > > > > 
+> > > > > [Also, I think that self/compatible split in the example makes things
+> > > > > needlessly complex. Shouldn't semantic versioning and matching already
+> > > > > cover nearly everything? I would expect very few cases that are more
+> > > > > complex than that. Maybe the aggregation stuff, but I don't think we
+> > > > > need that self/compatible split for that, either.]
+> > > > 
+> > > > Hi Cornelia,
+> > > > 
+> > > > The reason I want to declare compatible list of attributes is that
+> > > > sometimes it's not a simple 1:1 matching of source attributes and target attributes
+> > > > as I demonstrated below,
+> > > > source mdev of (mdev_type i915-GVTg_V5_2 + aggregator 1) is compatible to
+> > > > target mdev of (mdev_type i915-GVTg_V5_4 + aggregator 2),
+> > > >                (mdev_type i915-GVTg_V5_8 + aggregator 4)
+> > > 
+> > > the way you are doing the nameing is till really confusing by the way
+> > > if this has not already been merged in the kernel can you chagne the mdev
+> > > so that mdev_type i915-GVTg_V5_2 is 2 of mdev_type i915-GVTg_V5_1 instead of half the device
+> > > 
+> > > currently you need to deived the aggratod by the number at the end of the mdev type to figure out
+> > > how much of the phsicial device is being used with is a very unfridly api convention
+> > > 
+> > > the way aggrator are being proposed in general is not really someting i like but i thin this at least
+> > > is something that should be able to correct.
+> > > 
+> > > with the complexity in the mdev type name + aggrator i suspect that this will never be support
+> > > in openstack nova directly requireing integration via cyborg unless we can pre partion the
+> > > device in to mdevs staicaly and just ignore this.
+> > > 
+> > > this is way to vendor sepecif to integrate into something like openstack in nova unless we can guarentee
+> > > taht how aggreator work will be portable across vendors genericly.
+> > > 
+> > > > 
+> > > > and aggragator may be just one of such examples that 1:1 matching does not
+> > > > fit.
+> > > 
+> > > for openstack nova i dont see us support anything beyond the 1:1 case where the mdev type does not change.
+> > > 
+> > 
+> > hi Sean,
+> > I understand it's hard for openstack. but 1:N is always meaningful.
+> > e.g.
+> > if source device 1 has cap A, it is compatible to
+> > device 2: cap A,
+> > device 3: cap A+B,
+> > device 4: cap A+B+C
+> > ....
+> > to allow openstack to detect it correctly, in compatible list of
+> > device 2, we would say compatible cap is A;
+> > device 3, compatible cap is A or A+B;
+> > device 4, compatible cap is A or A+B, or A+B+C;
+> > 
+> > then if openstack finds device A's self cap A is contained in compatible
+> > cap of device 2/3/4, it can migrate device 1 to device 2,3,4.
+> > 
+> > conversely,  device 1's compatible cap is only A,
+> > so it is able to migrate device 2 to device 1, and it is not able to
+> > migrate device 3/4 to device 1.
 > 
-> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-
-Reviewed-by: Cédric Le Goater <clg@kaod.org>
-
-Thanks,
-
-C.
-
-> ---
-> Changes v1 -> v2: none
+> yes we build the palcement servce aroudn the idea of capablites as traits on resocue providres.
+> which is why i originally asked if we coudl model compatibality with feature flags
 > 
-> ---
-> Cc: "Cédric Le Goater" <clg@kaod.org>
-> Cc: Peter Maydell <peter.maydell@linaro.org>
-> Cc: Andrew Jeffery <andrew@aj.id.au>
-> Cc: Joel Stanley <joel@jms.id.au>
-> Cc: qemu-arm@nongnu.org
-> Cc: qemu-devel@nongnu.org
-> ---
->  include/hw/timer/aspeed_timer.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> we can seaislyt model deivce as aupport A, A+B or  A+B+C
+> and then select hosts and evice based on that but
 > 
-> diff --git a/include/hw/timer/aspeed_timer.h b/include/hw/timer/aspeed_timer.h
-> index 948329893c..d7c7d8ad28 100644
-> --- a/include/hw/timer/aspeed_timer.h
-> +++ b/include/hw/timer/aspeed_timer.h
-> @@ -26,7 +26,7 @@
->  #include "hw/misc/aspeed_scu.h"
->  
->  #define ASPEED_TIMER(obj) \
-> -    OBJECT_CHECK(AspeedTimerCtrlState, (obj), TYPE_ASPEED_TIMER);
-> +    OBJECT_CHECK(AspeedTimerCtrlState, (obj), TYPE_ASPEED_TIMER)
->  #define TYPE_ASPEED_TIMER "aspeed.timer"
->  #define TYPE_ASPEED_2400_TIMER TYPE_ASPEED_TIMER "-ast2400"
->  #define TYPE_ASPEED_2500_TIMER TYPE_ASPEED_TIMER "-ast2500"
+> the list of compatable deivce you are propsoeing hide this feature infomation which whould be what we are matching on.
 > 
+> give me a lset of feature you want and list ting the feature avaiable on each device allow highre level ocestation to
+> easily match the request to a host that can fulllfile it btu thave a set of other compatihble device does not help with
+> that
+> 
+> so if a simple list a capabliteis can be advertiese d and if we know tha two dievce with the same capablity are
+> intercahangebale that is workabout i suspect that will not be the case however and it would onely work within a familay
+> of mdevs that are closely related.  which i think agian is an argument for not changeing the mdev type and at least
+> intially only look at migatreion where the mdev type doee not change initally. 
+>
+sorry Sean, I don't understand your words completely.
+Please allow me to write it down in my words, and please confirm if my
+understanding is right.
+1. you mean you agree on that each field is regarded as a trait, and
+openstack can compare by itself if source trait is a subset of target trait, right?
+e.g.
+source device
+field1=A1
+field2=A2+B2
+field3=A3
 
+target device
+field1=A1+B1
+field2=A2+B2
+filed3=A3
+
+then openstack sees that field1/2/3 in source is a subset of field1/2/3 in
+target, so it's migratable to target?
+
+2. mdev_type + aggregator make it hard to achieve the above elegant
+solution, so it's best to avoid the combined comparing of mdev_type + aggregator.
+do I understand it correctly?
+
+3. you don't like self list and compatible list, because it is hard for
+openstack to compare different traits?
+e.g. if we have self list and compatible list, then as below, openstack needs
+to compare if self field1/2/3 is a subset of compatible field 1/2/3.
+
+source device:
+self field1=A1
+self field2=A2+B2
+self field3=A3
+
+compatible field1=A1
+compatible field2=A2;B2;A2+B2;
+compatible field3=A3
+
+
+target device:
+self field1=A1+B1
+self field2=A2+B2
+self field3=A3
+
+compatible field1=A1;B1;A1+B1;
+compatible field2=A2;B2;A2+B2;
+compatible field3=A3
+
+
+Thanks
+Yan
+
+
+> > 
+> > 
+> > > i woudl really prefer if there was just one mdev type that repsented the minimal allcatable unit and the
+> > > aggragaotr where used to create compostions of that. i.e instad of i915-GVTg_V5_2 beign half the device,
+> > > have 1 mdev type i915-GVTg and if the device support 8 of them then we can aggrate 4 of i915-GVTg
+> > > 
+> > > if you want to have muplie mdev type to model the different amoutn of the resouce e.g. i915-GVTg_small i915-
+> > > GVTg_large
+> > > that is totlaly fine too or even i915-GVTg_4 indcating it sis 4 of i915-GVTg
+> > > 
+> > > failing that i would just expose an mdev type per composable resouce and allow us to compose them a the user level
+> > > with
+> > > some other construct mudeling a attament to the device. e.g. create composed mdev or somethig that is an aggreateion
+> > > of
+> > > multiple sub resouces each of which is an mdev. so kind of like how bond port work. we would create an mdev for each
+> > > of
+> > > the sub resouces and then create a bond or aggrated mdev by reference the other mdevs by uuid then attach only the
+> > > aggreated mdev to the instance.
+> > > 
+> > > the current aggrator syntax and sematic however make me rather uncofrotable when i think about orchestating vms on
+> > > top
+> > > of it even to boot them let alone migrate them.
+> > > > 
+> > > > So, we explicitly list out self/compatible attributes, and management
+> > > > tools only need to check if self attributes is contained compatible
+> > > > attributes.
+> > > > 
+> > > > or do you mean only compatible list is enough, and the management tools
+> > > > need to find out self list by themselves?
+> > > > But I think provide a self list is easier for management tools.
+> > > > 
+> > > > Thanks
+> > > > Yan
+> > > > 
+> > 
+> > 
+> 
 
