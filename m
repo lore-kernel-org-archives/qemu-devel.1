@@ -2,99 +2,92 @@ Return-Path: <SRS0=Dndf=B6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_IN_DEF_DKIM_WL autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.4 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE06CC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 01:53:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55E45C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 02:00:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9981A207DA
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 01:53:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1D844207DA
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 02:00:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wSXEA457"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9981A207DA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RstBmykx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D844207DA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47704 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50390 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8Zm1-0002lY-Tp
-	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 21:53:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37794)
+	id 1k8Zs8-0004Fs-Fv
+	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 22:00:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38908)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <hskinnemoen@google.com>)
- id 1k8ZlU-0002FY-KX
- for qemu-devel@nongnu.org; Wed, 19 Aug 2020 21:53:16 -0400
-Received: from mail-vs1-xe41.google.com ([2607:f8b0:4864:20::e41]:44303)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <hskinnemoen@google.com>)
- id 1k8ZlT-0004wS-43
- for qemu-devel@nongnu.org; Wed, 19 Aug 2020 21:53:16 -0400
-Received: by mail-vs1-xe41.google.com with SMTP id k25so340205vsm.11
- for <qemu-devel@nongnu.org>; Wed, 19 Aug 2020 18:53:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=5fY6uLENvIP8/O+yKASXa5VJ8j7ZSDVEkteHFxVGL1s=;
- b=wSXEA457EIkl+roCtRKkpd5BMbWUrS0lIfL4L4HsrhJQmkFwslBvB42Tfutci54nDn
- 1hCnYEqg50EBptOdeBNeJOuh7Sul/pW9uroKUYP3TyFMd5LEUQm/Nkm8d/NWKZpAi3xr
- GfWjrQ1nl2qlY7fPcq7t/6KFUc/6osBaOMlbUiAikTjEZv4JsNCUxpXvBXHm31VK2grw
- ioYyfACdQNrUl8veuxxcbbd+PDawU40bonKJb6BsGVTa4/toGh8VUCujEhcGOWxj4WV8
- FFW+qtZ8NWuvLhxofhLfE4CN9TFZtD8XyAViteHDHjdIdzSMwAcokKRsILrBNPInmcGM
- QTMg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=5fY6uLENvIP8/O+yKASXa5VJ8j7ZSDVEkteHFxVGL1s=;
- b=nDQBFkMsvC8KFG2k28zDmUnTwKf/Qd3wwpnIsI4dLbSpI8um9zgMc4bvKm5otX6XzK
- OxyipB/5NTDqI0e7qfIgycOqThjQviQcV8XtF0wDv4WIZTmHMdyE6qDHaFi85kjfX5bj
- 8O3gWjEaaBhC+IByw4WLm3GI50J7uwOzJUE2gVoNCWwrDPUqAx83dfn6+Tr8zrWQRn/7
- GFVCbGBhtHNx2SkgrA/YA/hniDog+zrHhSaIgQIWO2x8rweEyhR4m2sj2QIVANngGVG0
- YSWZ/T7TuBk7iNyrnpQ+f9KQ5pi/QLXJ7bH46THMqwymZHBIhtpzkjjYrORzw096O2UC
- nayA==
-X-Gm-Message-State: AOAM532NMylyu9PQqgBdBph3kn99YzT+LfatZRcO07C8emtBP8AuPZ+t
- YossQOAIiSRK+itDpPW0pIowktArfVZIzzNeaQZM0w==
-X-Google-Smtp-Source: ABdhPJx71sxin27FBlXNrUalaGbHoK06gYvb6dBlmvDcxf1Tib0JHsIrUIb3QK4x8QsQK+j5bhJh8gqDJSXgNkxblIo=
-X-Received: by 2002:a67:7d50:: with SMTP id y77mr665080vsc.207.1597888392435; 
- Wed, 19 Aug 2020 18:53:12 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1k8ZrL-0003q5-Tt
+ for qemu-devel@nongnu.org; Wed, 19 Aug 2020 21:59:19 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:56279
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1k8ZrJ-0005bR-Gu
+ for qemu-devel@nongnu.org; Wed, 19 Aug 2020 21:59:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1597888756;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=G96u0vkIPlqbldARBmecxhNdWLFNp1x5JbxhpJsYriw=;
+ b=RstBmykxRe0zbM7xor2xNoMQHdYNwicbJVxj5ndwhEP+MQQzmEV+mnCQg5RZH1R4JzzrsD
+ D2cKrpQ1vyF9l+NZfDvdORIR3ck0344F75MQ4KsBQzFuA4545Gpm6wSpLzdWEGRw2KiUQa
+ y+IfOpynChGrP5JBnUi9K8+wOvaSMmk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-295-Hk78k_TCPfW8vUw0qpflIg-1; Wed, 19 Aug 2020 21:59:01 -0400
+X-MC-Unique: Hk78k_TCPfW8vUw0qpflIg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 12AEF8030A7;
+ Thu, 20 Aug 2020 01:59:00 +0000 (UTC)
+Received: from [10.3.112.136] (ovpn-112-136.phx2.redhat.com [10.3.112.136])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0E1BE709DC;
+ Thu, 20 Aug 2020 01:58:58 +0000 (UTC)
+Subject: Re: [PATCH v4 4/4] iotests: Test node/bitmap aliases during migration
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+References: <20200818133240.195840-1-mreitz@redhat.com>
+ <20200818133240.195840-5-mreitz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <fe00acc5-a06f-5e65-63f6-5f0ed7ec3019@redhat.com>
+Date: Wed, 19 Aug 2020 20:58:58 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-References: <20200811004607.2133149-1-hskinnemoen@google.com>
- <20200811004607.2133149-14-hskinnemoen@google.com>
- <64f8cd56-306e-4961-488b-36c666894a54@amsat.org>
- <CAFQmdRbvSKYJ00tE_79Eh+gW_ge8kEco=1gqFtvMcoJGraozdw@mail.gmail.com>
-In-Reply-To: <CAFQmdRbvSKYJ00tE_79Eh+gW_ge8kEco=1gqFtvMcoJGraozdw@mail.gmail.com>
-From: Havard Skinnemoen <hskinnemoen@google.com>
-Date: Wed, 19 Aug 2020 18:53:01 -0700
-Message-ID: <CAFQmdRZCk5Rqb1C2TRCEUMaKmF608g2_Or8mLCTSG03nCQ1Ygg@mail.gmail.com>
-Subject: Re: [PATCH v7 13/13] tests/acceptance: console boot tests for
- quanta-gsj
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, 
- Joel Stanley <joel@jms.id.au>, qemu-arm <qemu-arm@nongnu.org>, 
- QEMU Developers <qemu-devel@nongnu.org>,
- IS20 Avi Fishman <Avi.Fishman@nuvoton.com>, 
- CS20 KFTing <kfting@nuvoton.com>, Cleber Rosa <crosa@redhat.com>, 
- Wainer dos Santos Moschetta <wainersm@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::e41;
- envelope-from=hskinnemoen@google.com; helo=mail-vs1-xe41.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -185
-X-Spam_score: -18.6
-X-Spam_bar: ------------------
-X-Spam_report: (-18.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=-1,
+In-Reply-To: <20200818133240.195840-5-mreitz@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eblake@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=eblake@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/19 20:13:02
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- ENV_AND_HDR_SPF_MATCH=-0.5, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, USER_IN_DEF_DKIM_WL=-7.5,
- USER_IN_DEF_SPF_WL=-7.5 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,62 +100,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+ Peter Krempa <pkrempa@redhat.com>, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Aug 11, 2020 at 8:26 PM Havard Skinnemoen
-<hskinnemoen@google.com> wrote:
->
-> On Tue, Aug 11, 2020 at 1:48 AM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.=
-org> wrote:
-> > INTERRUPTED: Test interrupted by SIGTERM
-> > Runner error occurred: Timeout reached
-> > (240.45 s)
-> >
-> > Is that expected?
->
-> I'm not sure why it only happens when running direct kernel boot with
-> unoptimized qemu, but it seems a little happier if I enable a few more
-> peripherals that I have queued up (sd, ehci, ohci and rng), though not
-> enough.
->
-> It still stalls for an awfully long time on "console: Run /init as
-> init process" though. I'm not sure what it's doing there. With -O2 it
-> only takes a couple of seconds to move on.
+On 8/18/20 8:32 AM, Max Reitz wrote:
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>   tests/qemu-iotests/300     | 595 +++++++++++++++++++++++++++++++++++++
+>   tests/qemu-iotests/300.out |   5 +
 
-So it turns out that the kernel gets _really_ sluggish when skipping
-the clock initialization normally done by the boot loader.
+Rather sparse output (I hate debugging those sorts of outputs when the 
+test is failing).
 
-I changed the reset value of CLKSEL like this:
+>   tests/qemu-iotests/group   |   1 +
+>   3 files changed, 601 insertions(+)
+>   create mode 100755 tests/qemu-iotests/300
+>   create mode 100644 tests/qemu-iotests/300.out
+> 
 
-diff --git a/hw/misc/npcm7xx_clk.c b/hw/misc/npcm7xx_clk.c
-index 21ab4200d1..5e9849410f 100644
---- a/hw/misc/npcm7xx_clk.c
-+++ b/hw/misc/npcm7xx_clk.c
-@@ -67,7 +67,7 @@ enum NPCM7xxCLKRegisters {
-  */
- static const uint32_t cold_reset_values[NPCM7XX_CLK_NR_REGS] =3D {
-     [NPCM7XX_CLK_CLKEN1]        =3D 0xffffffff,
--    [NPCM7XX_CLK_CLKSEL]        =3D 0x004aaaaa,
-+    [NPCM7XX_CLK_CLKSEL]        =3D 0x004aaba9,
-     [NPCM7XX_CLK_CLKDIV1]       =3D 0x5413f855,
-     [NPCM7XX_CLK_PLLCON0]       =3D 0x00222101 | PLLCON_LOKI,
-     [NPCM7XX_CLK_PLLCON1]       =3D 0x00202101 | PLLCON_LOKI,
+> +        # Dirty some random megabytes
+> +        for _ in range(9):
+> +            mb_ofs = random.randrange(1024)
+> +            self.vm_a.hmp_qemu_io(self.src_node_name, f'write {mb_ofs}M 1M')
 
-which switches the CPU core and UART to run from PLL2 instead of
-CLKREF (25 MHz).
+It turns out that the discard operation likewise dirties the bitmap, but 
+slightly faster (see edb90bbd).  We could optimize it on top, but I'm 
+not going to require a micro-optimizing to get it in.  The test takes 
+about 12 seconds to run for me, but you didn't mark it as such in 
+'group', so that's good; but it turns up a problem:
 
-With this change, the test passes without optimization:
+300      fail       [20:55:54] [20:56:06]                    output 
+mismatch (see 300.out.bad)
+--- /home/eblake/qemu-tmp2/tests/qemu-iotests/300.out	2020-08-19 
+20:53:11.087791988 -0500
++++ /home/eblake/qemu-tmp2/tests/qemu-iotests/300.out.bad	2020-08-19 
+20:56:06.092428756 -0500
+@@ -1,5 +1,41 @@
+-.....................................
++WARNING:qemu.machine:qemu received signal 11; command: 
+"/home/eblake/qemu-tmp2/tests/qemu-iotests/../../x86_64-softmmu/qemu-system-x86_64 
+-display none -vga none -chardev 
+socket,id=mon,path=/tmp/tmp.qT831UThme/qemu-b-798452-monitor.sock -mon 
+chardev=mon,mode=control -qtest 
+unix:path=/tmp/tmp.qT831UThme/qemu-b-798452-qtest.sock -accel qtest 
+-nodefaults -display none -accel qtest -blockdev 
+node-name=node0,driver=null-co -incoming unix:/tmp/tmp.qT831UThme/mig_sock"
++.............FE.......................
++======================================================================
++ERROR: test_migratee_bitmap_is_not_mapped_on_dst 
+(__main__.TestBlockBitmapMappingErrors)
++----------------------------------------------------------------------
++Traceback (most recent call last):
++  File 
+"/home/eblake/qemu-tmp2/tests/qemu-iotests/../../python/qemu/machine.py", 
+line 435, in _do_shutdown
++    self._soft_shutdown(timeout, has_quit)
++  File 
+"/home/eblake/qemu-tmp2/tests/qemu-iotests/../../python/qemu/machine.py", 
+line 415, in _soft_shutdown
++    self._qmp.cmd('quit')
++  File 
+"/home/eblake/qemu-tmp2/tests/qemu-iotests/../../python/qemu/qmp.py", 
+line 266, in cmd
++    return self.cmd_obj(qmp_cmd)
++  File 
+"/home/eblake/qemu-tmp2/tests/qemu-iotests/../../python/qemu/qmp.py", 
+line 246, in cmd_obj
++    self.__sock.sendall(json.dumps(qmp_cmd).encode('utf-8'))
++BrokenPipeError: [Errno 32] Broken pipe
++
++The above exception was the direct cause of the following exception:
++
++Traceback (most recent call last):
++  File "300", line 76, in tearDown
++    self.vm_b.shutdown()
++  File 
+"/home/eblake/qemu-tmp2/tests/qemu-iotests/../../python/qemu/machine.py", 
+line 465, in shutdown
++    self._do_shutdown(timeout, has_quit)
++  File 
+"/home/eblake/qemu-tmp2/tests/qemu-iotests/../../python/qemu/machine.py", 
+line 438, in _do_shutdown
++    raise AbnormalShutdown("Could not perform graceful shutdown") \
++qemu.machine.AbnormalShutdown: Could not perform graceful shutdown
++
++======================================================================
++FAIL: test_migratee_bitmap_is_not_mapped_on_dst 
+(__main__.TestBlockBitmapMappingErrors)
++----------------------------------------------------------------------
++Traceback (most recent call last):
++  File "300", line 384, in test_migratee_bitmap_is_not_mapped_on_dst
++    self.migrate(False)
++  File "300", line 99, in migrate
++    self.assertEqual(self.vm_a.wait_migration('postmigrate'),
++AssertionError: False != True
++
+  ----------------------------------------------------------------------
+  Ran 37 tests
 
- (02/19) tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_arm_q=
-uanta_gsj_initrd:
-PASS (39.62 s)
+-OK
++FAILED (failures=1, errors=1)
 
-It doesn't look like this change hurts booting from the bootrom (IIUC
-the nuvoton bootblock overwrites CLKSEL anyway), but it's not super
-clean.
+I'm not sure why I'm seeing that, but it looks like you've got a bad 
+deref somewhere in the alias code.
 
-Perhaps I should make it conditional on kernel_filename being set? Or
-would it be better to provide a write_board_setup hook for this?
+> +class TestLongBitmapNames(TestAliasMigration):
+> +    # Giving long bitmap names is OK, as long as there is a short alias for
+> +    # migration
+> +    src_bmap_name = 'a' * 512
+> +    dst_bmap_name = 'b' * 512
+
+This part's new compared to v3 ;)  Looks like you've made several 
+enhancements.
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
 
