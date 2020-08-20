@@ -2,58 +2,55 @@ Return-Path: <SRS0=Dndf=B6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F227C433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 01:44:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D227C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 01:45:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F0E9E2078B
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 01:44:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 02421207DA
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 01:45:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="RtAu3q3b"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0E9E2078B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="n2yrrZou"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02421207DA
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39526 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45118 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8Zcc-0007Nk-6l
-	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 21:44:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36262)
+	id 1k8Zdq-0001DQ-9a
+	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 21:45:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36264)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1k8Zbh-0005ns-Fe; Wed, 19 Aug 2020 21:43:09 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:39993 helo=ozlabs.org)
+ id 1k8Zbh-0005nv-Ht; Wed, 19 Aug 2020 21:43:09 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:51613 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1k8Zba-0003xW-TT; Wed, 19 Aug 2020 21:43:06 -0400
+ id 1k8Zbb-0003xV-Lw; Wed, 19 Aug 2020 21:43:06 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 4BX6q52txsz9sRN; Thu, 20 Aug 2020 11:42:57 +1000 (AEST)
+ id 4BX6q543bwz9sTR; Thu, 20 Aug 2020 11:42:57 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1597887777;
- bh=ayT+7kXcim4DgHaR1gcnfrUmq4FRALUxHxKVV9Yj5Uk=;
+ bh=iuIpG/F8UrzE4lEermCKFopXr2gJt10aW1SE2pBmWe4=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=RtAu3q3b6vgE7HhK5cHuPlugi5/DeWqzpXFwcR7oEJWKZPr90PXU52aJN7IXUqK5t
- B5yMz2BH+4Kcrh6TmGut+CCtzKWzYfdL8CpxUNJSL3Awu9dks+OL6T134/1HC0lhAv
- JjoTQbK26WePNyD9fr9A4BMIv3jJ59DoTbdRJq7s=
-Date: Thu, 20 Aug 2020 11:33:33 +1000
+ b=n2yrrZouE29lyrigx+mk7CFoZ/CrGdn3UszPT6VeXrObvFIzLwgBwqJAkbPdlBZ3S
+ EolxzTlzOf6oaakKDlEQqSgvrQPFRA45vVvqZME78OZqfkxWN+Ww36KNt1+5Rmf2uY
+ SiNDDAOu7Q5qa24DVjwII9MiISeuQP79qZ4yVp9c=
+Date: Thu, 20 Aug 2020 11:42:38 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Subject: Re: [PATCH 3/8] spapr/xive: Query the characteristics of a source in
- KVM
-Message-ID: <20200820013333.GG271315@yekko.fritz.box>
-References: <20200819130843.2230799-1-clg@kaod.org>
- <20200819130843.2230799-4-clg@kaod.org>
+To: Thiago Jung Bauermann <bauerman@linux.ibm.com>
+Subject: Re: [PATCH v6 0/8] Generalize start-powered-off property from ARM
+Message-ID: <20200820014238.GI271315@yekko.fritz.box>
+References: <20200819164306.625357-1-bauerman@linux.ibm.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="gvF4niNJ+uBMJnEh"
+ protocol="application/pgp-signature"; boundary="MFZs98Tklfu0WsCO"
 Content-Disposition: inline
-In-Reply-To: <20200819130843.2230799-4-clg@kaod.org>
+In-Reply-To: <20200819164306.625357-1-bauerman@linux.ibm.com>
 Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
  helo=ozlabs.org
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/19 20:59:03
@@ -77,137 +74,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>,
- Gustavo Romero <gromero@linux.ibm.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ David Hildenbrand <david@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
+ Jiaxun Yang <jiaxun.yang@flygoat.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Thomas Huth <thuth@redhat.com>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
+ Artyom Tarasenko <atar4qemu@gmail.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Greg Kurz <groug@kaod.org>,
+ qemu-s390x@nongnu.org, qemu-arm@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <rth@twiddle.net>, Cornelia Huck <cohuck@redhat.com>,
+ qemu-ppc@nongnu.org, Igor Mammedov <imammedo@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---gvF4niNJ+uBMJnEh
+--MFZs98Tklfu0WsCO
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Aug 19, 2020 at 03:08:38PM +0200, C=E9dric Le Goater wrote:
-> When running a guest with a kernel IRQ chip enabled, the XIVE
-> characteristics of the interrupts are advertised to the guest in the
-> H_INT_GET_SOURCE_INFO hcall. These characteristics depend on the
-> underlying HW interrupts but today, QEMU simply advertises its own
-> without checking what the host supports. It is not a problem for the
-> moment, but POWER10 will (re)add support for StoreEOI and we need a
-> way to in sync with the host.
+On Wed, Aug 19, 2020 at 01:42:58PM -0300, Thiago Jung Bauermann wrote:
+> This version has one small fix in patch 7, and adds Philippe's Reviewed-b=
+ys.
 >=20
-> The KVM_DEV_XIVE_GRP_SOURCE_INFO command lets QEMU query the XIVE
-> characteristics of the underlying HW interrupts and override any
-> previous setting done by QEMU. This allows the fallback mode, when the
-> XIVE device is emulated by QEMU, to use its own custom settings on the
-> sources but makes sure that we don't let a guest run with features
-> incompatible with KVM.
+> Applies cleanly on dgibson/ppc-for-5.2.
 >=20
-> It only applies to the StoreEOI feature for the moment.
+> Original cover letter below, followed by changelog:
+>=20
+>=20
+> The ARM code has a start-powered-off property in ARMCPU, which is a
+> subclass of CPUState. This property causes arm_cpu_reset() to set
+> CPUState::halted to 1, signalling that the CPU should start in a halted
+> state. Other architectures also have code which aim to achieve the same
+> effect, but without using a property.
+>=20
+> The ppc/spapr version has a bug where QEMU does a KVM_RUN on the vcpu
+> before cs->halted is set to 1, causing the vcpu to run while it's still in
+> an unitialized state (more details in patch 3).
+>=20
+> Peter Maydell mentioned the ARM start-powered-off property and
+> Eduardo=A0Habkost suggested making it generic, so this patch series does
+> that, for all cases which I was able to find via grep in the code.
+>=20
+> The only problem is that I was only able to test these changes on a ppc64=
+le
+> pseries KVM guest, so except for patches 2 and 3, all others are only
+> build-tested. Also, my grasp of QOM lifecycle is basically non-existant so
+> please be aware of that when reviewing this series.
+>=20
+> The last patch may be wrong, as pointed out by Eduardo, so I marked it as
+> RFC. It may make sense to drop it.
 
-Urgh.  This means that the source characteristics can change across a
-migration, that's kind of a problem.
+Applied to ppc-for-5.2.
 
-> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-> ---
->  include/hw/ppc/spapr_xive.h |  2 ++
->  hw/intc/spapr_xive.c        | 20 ++++++++++++++++++++
->  hw/intc/spapr_xive_kvm.c    | 26 ++++++++++++++++++++++++++
->  3 files changed, 48 insertions(+)
 >=20
-> diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
-> index 1dddcbcb9cdd..3f325723ea74 100644
-> --- a/include/hw/ppc/spapr_xive.h
-> +++ b/include/hw/ppc/spapr_xive.h
-> @@ -84,6 +84,8 @@ void kvmppc_xive_disconnect(SpaprInterruptController *i=
-ntc);
->  void kvmppc_xive_reset(SpaprXive *xive, Error **errp);
->  int kvmppc_xive_set_source_config(SpaprXive *xive, uint32_t lisn, XiveEA=
-S *eas,
->                                    Error **errp);
-> +int kvmppc_xive_get_source_info(SpaprXive *xive, uint32_t lisn, uint64_t=
- *flags,
-> +                                 Error **errp);
->  void kvmppc_xive_sync_source(SpaprXive *xive, uint32_t lisn, Error **err=
-p);
->  uint64_t kvmppc_xive_esb_rw(XiveSource *xsrc, int srcno, uint32_t offset,
->                              uint64_t data, bool write);
-> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-> index 1fa09f287ac0..943b9958a68b 100644
-> --- a/hw/intc/spapr_xive.c
-> +++ b/hw/intc/spapr_xive.c
-> @@ -932,6 +932,26 @@ static target_ulong h_int_get_source_info(PowerPCCPU=
- *cpu,
->          args[0] |=3D SPAPR_XIVE_SRC_STORE_EOI;
->      }
-> =20
-> +    if (kvm_irqchip_in_kernel()) {
-> +        Error *local_err =3D NULL;
-> +        uint64_t flags =3D 0;
-> +
-> +        kvmppc_xive_get_source_info(xive, lisn, &flags, &local_err);
-> +        if (local_err) {
-> +            error_report_err(local_err);
-> +            return H_HARDWARE;
-> +        }
-> +
-> +        /*
-> +         * Override QEMU settings with KVM values
-> +         */
-> +        if (flags & XIVE_SRC_STORE_EOI) {
-> +            args[0] |=3D SPAPR_XIVE_SRC_STORE_EOI;
-> +        } else {
-> +            args[0] &=3D ~SPAPR_XIVE_SRC_STORE_EOI;
-> +        }
-> +    }
-> +
->      /*
->       * Force the use of the H_INT_ESB hcall in case of an LSI
->       * interrupt. This is necessary under KVM to re-trigger the
-> diff --git a/hw/intc/spapr_xive_kvm.c b/hw/intc/spapr_xive_kvm.c
-> index e8667ce5f621..90f4509e6959 100644
-> --- a/hw/intc/spapr_xive_kvm.c
-> +++ b/hw/intc/spapr_xive_kvm.c
-> @@ -217,6 +217,32 @@ int kvmppc_xive_set_source_config(SpaprXive *xive, u=
-int32_t lisn, XiveEAS *eas,
->                               &kvm_src, true, errp);
->  }
-> =20
-> +int kvmppc_xive_get_source_info(SpaprXive *xive, uint32_t lisn, uint64_t=
- *flags,
-> +                                 Error **errp)
-> +{
-> +    struct kvm_ppc_xive_src kvm_src =3D { 0 };
-> +    int ret;
-> +
-> +    /*
-> +     * Check that KVM supports the new attribute to query source
-> +     * characteristics.
-> +     */
-> +    if (!kvm_device_check_attr(xive->fd, KVM_DEV_XIVE_GRP_SOURCE_INFO, 0=
-)) {
-> +        return 0;
-> +    }
-> +
-> +    ret =3D kvm_device_access(xive->fd, KVM_DEV_XIVE_GRP_SOURCE_INFO, li=
-sn,
-> +                            &kvm_src, false, errp);
-> +    if (ret < 0) {
-> +        return ret;
-> +    }
-> +
-> +    if (kvm_src.flags & KVM_XIVE_SOURCE_FLAG_STORE_EOI) {
-> +        *flags |=3D XIVE_SRC_STORE_EOI;
-> +    }
-> +    return 0;
-> +}
-> +
->  void kvmppc_xive_sync_source(SpaprXive *xive, uint32_t lisn, Error **err=
-p)
->  {
->      kvm_device_access(xive->fd, KVM_DEV_XIVE_GRP_SOURCE_SYNC, lisn,
+> Changes since v5:
+>=20
+> Patch "ppc/e500: Use start-powered-off CPUState property"
+> Patch "mips/cps: Use start-powered-off CPUState property"
+> Patch "sparc/sun4m: Remove main_cpu_reset()"
+> Patch "target/s390x: Use start-powered-off CPUState property"
+> - Added Philippe's Reviewed-by.
+>=20
+> Patch "sparc/sun4m: Use start-powered-off CPUState property"
+> - Move call to qdev_realize_and_unref() right after object_property_set_b=
+ool(),
+>   as suggested by Philippe.
+>=20
+> Changes since v4:
+>=20
+> Patch "ppc/e500: Use start-powered-off CPUState property"
+> Patch "sparc/sun4m: Use start-powered-off CPUState property"
+> - Use qdev_realize_and_unref() instead of qdev_realize(), as suggested
+>   by=A0Igor.
+> - Pass &error_fatal to qdev_realize_and_unref() instead of manually
+>   reporting the error and exiting QEMU, as suggested by Philippe.
+> - Changed object_property_set_bool() to use &error_fatal instead of
+>   &error_abort.
+>=20
+> Patch "mips/cps: Use start-powered-off CPUState property"
+> - Use qdev_realize_and_unref() instead of qdev_realize(), as suggested
+>   by=A0Igor.
+> - Use existing errp argument to propagate error back to the caller, as
+>   suggested by Philippe.
+> - Changed object_property_set_bool() to use existing errp argument to
+>   propagate error back to the caller instead of using &error_abort.
+>=20
+> Changes since v3:
+>=20
+> General:
+> - Added David's, Greg's and Cornelia's Reviewed-by and Acked-by to some
+>   of the patches.
+> - Rebased on top of dgibson/ppc-for-5.2.
+>=20
+> Patch "ppc/e500: Use start-powered-off CPUState property"
+> Patch "mips/cps: Use start-powered-off CPUState property"
+> Patch "sparc/sun4m: Use start-powered-off CPUState property"
+> - Initialize CPU object with object_new() and qdev_realize() instead
+>   of cpu_create().
+> - Removed Reviewed-by's and Acked-by's from these patches because of
+>   these changes.
+>=20
+> Changes since v2:
+>=20
+> General:
+> - Added Philippe's Reviewed-by to some of the patches.
+>=20
+> Patch "ppc/spapr: Use start-powered-off CPUState property"
+> - Set the CPUState::start_powered_off variable directly rather than using
+>   object_property_set_bool(). Suggested by Philippe.
+>=20
+> Patch "sparc/sun4m: Remove main_cpu_reset()"
+> - New patch. Suggested by Philippe.
+>=20
+> Patch "sparc/sun4m: Use start-powered-off CPUState property"
+> - Remove secondary_cpu_reset(). Suggested by Philippe.
+> - Remove setting of `cs->halted =3D 1` from cpu_devinit(). Suggested by P=
+hilippe.
+>=20
+> Patch "Don't set CPUState::halted in cpu_devinit()"
+> - Squashed into previous patch. Suggested by Philippe.
+>=20
+> Patch "sparc/sun4m: Use one cpu_reset() function for main and secondary C=
+PUs"
+> - Dropped.
+>=20
+> Patch "target/s390x: Use start-powered-off CPUState property"
+> - Set the CPUState::start_powered_off variable directly rather than using
+>   object_property_set_bool(). Suggested by Philippe.
+> - Mention in the commit message Eduardo's observation that before this
+>   patch, the code didn't set cs->halted on reset.
+>=20
+> Thiago Jung Bauermann (8):
+>   target/arm: Move start-powered-off property to generic CPUState
+>   target/arm: Move setting of CPU halted state to generic code
+>   ppc/spapr: Use start-powered-off CPUState property
+>   ppc/e500: Use start-powered-off CPUState property
+>   mips/cps: Use start-powered-off CPUState property
+>   sparc/sun4m: Remove main_cpu_reset()
+>   sparc/sun4m: Use start-powered-off CPUState property
+>   target/s390x: Use start-powered-off CPUState property
+>=20
+>  exec.c                  |  1 +
+>  hw/core/cpu.c           |  2 +-
+>  hw/mips/cps.c           | 14 ++++++++++----
+>  hw/ppc/e500.c           | 14 ++++++++++----
+>  hw/ppc/spapr_cpu_core.c | 10 +++++-----
+>  hw/sparc/sun4m.c        | 31 ++++---------------------------
+>  include/hw/core/cpu.h   |  4 ++++
+>  target/arm/cpu.c        |  4 +---
+>  target/arm/cpu.h        |  3 ---
+>  target/arm/kvm32.c      |  2 +-
+>  target/arm/kvm64.c      |  2 +-
+>  target/s390x/cpu.c      |  2 +-
+>  12 files changed, 39 insertions(+), 50 deletions(-)
+>=20
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -215,25 +243,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---gvF4niNJ+uBMJnEh
+--MFZs98Tklfu0WsCO
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl890usACgkQbDjKyiDZ
-s5JDAw/9GN/3LDbV22Ff3ub7O03+t9VS8FyZFAE+dKyrvYDzdgDbo0Zhvw9M8kpI
-7nySlrSw+AKrasEVFwYTUJ5tMDJap3m6hSBpTZXO5Sn2ITrKWpp/putgJgPPwxHQ
-bhvjXQ1McIGlSr7rWdhOQ/iLXQ1ihhsx301ouBUZdXj9dFYyerhL7mLxR7FnxeA9
-pE3IVqPiDXNWQw6rTab/96qfF3Ic+nefaSFtVnIMhV+5z8wuThVJ4E6VPaUOTOFz
-I7JNiqHFQ+b1n4WKjZPupszXKzVfV7g1N01AyyyOcIUrUiTxwjVtKsibjdUP55Sx
-bZK11wnQyPp/lKs99RMFcdVQ5QLEfiP+ZPT4msA9pjEis1gIgWCWXWKKK6SFoJQm
-NToTreGy4GdA3IBIVXcf337+2gomrmAxhkOijDUuJyapGCEMeb83aXulYYUPK3Bt
-1yWOlZQqX9bQStRmMG+8PWwAQtCQldGH59niWlyhZ7KoQOd2AdkF4wpjA2EWAB6x
-qPEm28XacFq3dp3U+hgBpJnAzfCoE/9kdgyyJXy+Q+Luot0gd/h+NDxVktmVSQoL
-sXRve4P3d8Fe51QqcOesKC/FVMnfmqI4RvFrneui/qdTwg1l9yl+pU+Um7A1WpcM
-6OoZPe34AJxOgPpEfwE4cryA8uXoGZFP/ALCvpMUV15nm6obdrE=
-=UhsZ
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl891Q4ACgkQbDjKyiDZ
+s5Ln+Q//ej17/yk3foCu19l8rVPvvPIR6cf0KzAFa0NjildGpMbU3VJ8MMBSoMrP
+HVFfD66xgPXEFhsmv+0DmQxOds2eAFLREnvRslNCee/RK1tHjiJ3S9lxrmFJN24V
+NHMJwx/1iitfNGX5MYaXTC68goiP6YHAwiHsgOzhIHGDHqc9Ue+mYQk9whaHnZY4
+vzOMIgnlJ2+B1+MkNBm0IlVu0FCJGVdpm7zsTOM3Lr/9PZV43BmUb2ItytrBnruM
+CRrLahXRHUAyibpiTG6t+dhiB1iZlq/tNlozN26JZVYXNe5OLpy+gnu/0Hp/+38Y
+rVa0k9aMT3MH6wnJavlqB+jaqvNvKtdqKzq8obMzZ1HZbZnWo4gV/7J/I9uSA4wx
+1S4J4Oe2AwcISH1KrMeSm7UdL6zywT9ZrheCyzGifFBOqR96IWpeUjdPk+QsJ/W7
+MyayVlUWg0dZpMmpagSW0D+9yc6r0e/OGQ8CeKByl1Wx8am0uHdnax7mL63RWXvl
+q3oMZ/M04gP0YI+SKAa6hL699K8Ms/nqGSzg6QqQLMqP5LlufnRDetlFTsa27j6I
+0Cd4+CEMeFnEcGRPelgKq9iynjexfe0vR1AdGW1/n51EsJv54G70GQ70RPG/RSUI
+Z/7zt76NMvIpDL3RNASXrjpwlj8oPwBzM3ftj1PR40zcxD4SpsY=
+=fFNL
 -----END PGP SIGNATURE-----
 
---gvF4niNJ+uBMJnEh--
+--MFZs98Tklfu0WsCO--
 
