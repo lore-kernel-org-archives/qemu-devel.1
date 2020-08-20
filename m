@@ -2,68 +2,83 @@ Return-Path: <SRS0=Dndf=B6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD525C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 04:00:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 843AEC433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 04:18:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A90BE20724
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 04:00:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="O36vQUUm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A90BE20724
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id 52F71207BB
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 04:18:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 52F71207BB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45434 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49592 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8bkT-0007cK-VW
-	for qemu-devel@archiver.kernel.org; Thu, 20 Aug 2020 00:00:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58034)
+	id 1k8c1m-0002Bd-J0
+	for qemu-devel@archiver.kernel.org; Thu, 20 Aug 2020 00:18:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32970)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1k8biK-00040c-5H; Wed, 19 Aug 2020 23:58:08 -0400
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:48685 helo=ozlabs.org)
+ (Exim 4.90_1) (envelope-from <yan.y.zhao@intel.com>)
+ id 1k8c1D-0001m6-6R
+ for qemu-devel@nongnu.org; Thu, 20 Aug 2020 00:17:39 -0400
+Received: from mga01.intel.com ([192.55.52.88]:28095)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1k8biF-0007LG-SO; Wed, 19 Aug 2020 23:58:07 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 4BX9pt1pv8z9sTb; Thu, 20 Aug 2020 13:57:58 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1597895878;
- bh=D+r9kW29ykdbbTiDlnYJurkPalrmPkOLweppE6OV9Po=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=O36vQUUmiB2ywdf6+zv2bOkvDcvkKarCIX9ydpqQm4tHsO5tbrh4r0UB5/hEKFmPu
- s8gmReYpeG1GcFMAhlJ+Nz3Wgr0ydzXUIy+vt/yGhrbhcNjVocQ3Hloge8ziR/rZ3g
- J4FXYeFGO6kbmlIVDR0Kn23732zrSMLV2eMSczqw=
-Date: Thu, 20 Aug 2020 13:00:14 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Daniel Henrique Barboza <danielhb413@gmail.com>
-Subject: Re: [PATCH 07/10] spapr: create helper to set ibm,associativity
-Message-ID: <20200820030014.GM271315@yekko.fritz.box>
-References: <20200814205424.543857-1-danielhb413@gmail.com>
- <20200814205424.543857-8-danielhb413@gmail.com>
+ (Exim 4.90_1) (envelope-from <yan.y.zhao@intel.com>)
+ id 1k8c1A-00019W-Bf
+ for qemu-devel@nongnu.org; Thu, 20 Aug 2020 00:17:38 -0400
+IronPort-SDR: an/ZJ5bobZjrW+1qF+9ah9e6VbPgbLXK44GfKgj3TInakBpjPQSjEIBIMzro8Ly6c1D8DdTLa9
+ Quyvsc806p+g==
+X-IronPort-AV: E=McAfee;i="6000,8403,9718"; a="173281889"
+X-IronPort-AV: E=Sophos;i="5.76,332,1592895600"; d="scan'208";a="173281889"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+ by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 19 Aug 2020 21:17:29 -0700
+IronPort-SDR: dKmYv5lKjelxEcNHuICrNn7mXFMSDL/4It7gVYgGUcXEsEm3Ly1KBPFrwzagYkitMC7xP6XTss
+ wsE1vs4BWGwg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.76,332,1592895600"; d="scan'208";a="327289452"
+Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
+ ([10.239.13.16])
+ by orsmga008.jf.intel.com with ESMTP; 19 Aug 2020 21:17:23 -0700
+Date: Thu, 20 Aug 2020 12:01:16 +0800
+From: Yan Zhao <yan.y.zhao@intel.com>
+To: Sean Mooney <smooney@redhat.com>
+Subject: Re: device compatibility interface for live migration with assigned
+ devices
+Message-ID: <20200820040116.GB24121@joy-OptiPlex-7040>
+References: <20200810074631.GA29059@joy-OptiPlex-7040>
+ <e6e75807-0614-bd75-aeb6-64d643e029d3@redhat.com>
+ <20200814051601.GD15344@joy-OptiPlex-7040>
+ <a51209fe-a8c6-941f-ff54-7be06d73bc44@redhat.com>
+ <20200818085527.GB20215@redhat.com>
+ <3a073222-dcfe-c02d-198b-29f6a507b2e1@redhat.com>
+ <20200818091628.GC20215@redhat.com>
+ <20200818113652.5d81a392.cohuck@redhat.com>
+ <20200820003922.GE21172@joy-OptiPlex-7040>
+ <242591bb809b68c618f62fdc93d4f8ae7b146b6d.camel@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="yklP1rR72f9kjNtc"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20200814205424.543857-8-danielhb413@gmail.com>
-Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
- helo=ozlabs.org
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -9
-X-Spam_score: -1.0
-X-Spam_bar: -
-X-Spam_report: (-1.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <242591bb809b68c618f62fdc93d4f8ae7b146b6d.camel@redhat.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+Received-SPF: pass client-ip=192.55.52.88; envelope-from=yan.y.zhao@intel.com;
+ helo=mga01.intel.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/20 00:17:30
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -68
+X-Spam_score: -6.9
+X-Spam_bar: ------
+X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -76,201 +91,150 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: kvm@vger.kernel.org, libvir-list@redhat.com,
+ Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, kwankhede@nvidia.com,
+ eauger@redhat.com, xin-ran.wang@intel.com, corbet@lwn.net,
+ openstack-discuss@lists.openstack.org, shaohe.feng@intel.com,
+ kevin.tian@intel.com, Parav Pandit <parav@mellanox.com>,
+ jian-feng.ding@intel.com, dgilbert@redhat.com, zhenyuw@linux.intel.com,
+ hejie.xu@intel.com, bao.yumeng@zte.com.cn,
+ Alex Williamson <alex.williamson@redhat.com>, eskultet@redhat.com,
+ intel-gvt-dev@lists.freedesktop.org,
+ Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>, Jiri Pirko <jiri@mellanox.com>,
+ dinechin@redhat.com, devel@ovirt.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Thu, Aug 20, 2020 at 02:29:07AM +0100, Sean Mooney wrote:
+> On Thu, 2020-08-20 at 08:39 +0800, Yan Zhao wrote:
+> > On Tue, Aug 18, 2020 at 11:36:52AM +0200, Cornelia Huck wrote:
+> > > On Tue, 18 Aug 2020 10:16:28 +0100
+> > > Daniel P. Berrangé <berrange@redhat.com> wrote:
+> > > 
+> > > > On Tue, Aug 18, 2020 at 05:01:51PM +0800, Jason Wang wrote:
+> > > > >    On 2020/8/18 下午4:55, Daniel P. Berrangé wrote:
+> > > > > 
+> > > > >  On Tue, Aug 18, 2020 at 11:24:30AM +0800, Jason Wang wrote:
+> > > > > 
+> > > > >  On 2020/8/14 下午1:16, Yan Zhao wrote:
+> > > > > 
+> > > > >  On Thu, Aug 13, 2020 at 12:24:50PM +0800, Jason Wang wrote:
+> > > > > 
+> > > > >  On 2020/8/10 下午3:46, Yan Zhao wrote:  
+> > > > >  we actually can also retrieve the same information through sysfs, .e.g
+> > > > > 
+> > > > >  |- [path to device]
+> > > > >     |--- migration
+> > > > >     |     |--- self
+> > > > >     |     |   |---device_api
+> > > > >     |    |   |---mdev_type
+> > > > >     |    |   |---software_version
+> > > > >     |    |   |---device_id
+> > > > >     |    |   |---aggregator
+> > > > >     |     |--- compatible
+> > > > >     |     |   |---device_api
+> > > > >     |    |   |---mdev_type
+> > > > >     |    |   |---software_version
+> > > > >     |    |   |---device_id
+> > > > >     |    |   |---aggregator
+> > > > > 
+> > > > > 
+> > > > >  Yes but:
+> > > > > 
+> > > > >  - You need one file per attribute (one syscall for one attribute)
+> > > > >  - Attribute is coupled with kobject
+> > > 
+> > > Is that really that bad? You have the device with an embedded kobject
+> > > anyway, and you can just put things into an attribute group?
+> > > 
+> > > [Also, I think that self/compatible split in the example makes things
+> > > needlessly complex. Shouldn't semantic versioning and matching already
+> > > cover nearly everything? I would expect very few cases that are more
+> > > complex than that. Maybe the aggregation stuff, but I don't think we
+> > > need that self/compatible split for that, either.]
+> > 
+> > Hi Cornelia,
+> > 
+> > The reason I want to declare compatible list of attributes is that
+> > sometimes it's not a simple 1:1 matching of source attributes and target attributes
+> > as I demonstrated below,
+> > source mdev of (mdev_type i915-GVTg_V5_2 + aggregator 1) is compatible to
+> > target mdev of (mdev_type i915-GVTg_V5_4 + aggregator 2),
+> >                (mdev_type i915-GVTg_V5_8 + aggregator 4)
+> the way you are doing the nameing is till really confusing by the way
+> if this has not already been merged in the kernel can you chagne the mdev
+> so that mdev_type i915-GVTg_V5_2 is 2 of mdev_type i915-GVTg_V5_1 instead of half the device
+> 
+> currently you need to deived the aggratod by the number at the end of the mdev type to figure out
+> how much of the phsicial device is being used with is a very unfridly api convention
+> 
+> the way aggrator are being proposed in general is not really someting i like but i thin this at least
+> is something that should be able to correct.
+> 
+> with the complexity in the mdev type name + aggrator i suspect that this will never be support
+> in openstack nova directly requireing integration via cyborg unless we can pre partion the
+> device in to mdevs staicaly and just ignore this.
+> 
+> this is way to vendor sepecif to integrate into something like openstack in nova unless we can guarentee
+> taht how aggreator work will be portable across vendors genericly.
+> 
+> > 
+> > and aggragator may be just one of such examples that 1:1 matching does not
+> > fit.
+> for openstack nova i dont see us support anything beyond the 1:1 case where the mdev type does not change.
+>
+hi Sean,
+I understand it's hard for openstack. but 1:N is always meaningful.
+e.g.
+if source device 1 has cap A, it is compatible to
+device 2: cap A,
+device 3: cap A+B,
+device 4: cap A+B+C
+....
+to allow openstack to detect it correctly, in compatible list of
+device 2, we would say compatible cap is A;
+device 3, compatible cap is A or A+B;
+device 4, compatible cap is A or A+B, or A+B+C;
 
---yklP1rR72f9kjNtc
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+then if openstack finds device A's self cap A is contained in compatible
+cap of device 2/3/4, it can migrate device 1 to device 2,3,4.
 
-On Fri, Aug 14, 2020 at 05:54:21PM -0300, Daniel Henrique Barboza wrote:
-> We have several places around hw/ppc files where we use the
-> same code to set the ibm,associativity array. This patch
-> creates a helper called spapr_set_associativity() to do
-> that in a single place. It'll also make it saner to change
-> the value of ibm,associativity in the next patches.
->=20
-> After this patch, only 2 places are left with open code
-> ibm,associativity assignment:
->=20
-> - spapr_dt_dynamic_reconfiguration_memory()
-> - h_home_node_associativity() in spapr_hcall.c
->=20
-> The update of associativity values will be made in these places
-> manually later on.
->=20
-> Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
+conversely,  device 1's compatible cap is only A,
+so it is able to migrate device 2 to device 1, and it is not able to
+migrate device 3/4 to device 1.
 
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Thanks
+Yan
 
-I like this - any chance you could move this to the front of the
-series so that we can make this code easier to follow while we're
-still discussing the more meaningful changes?
-
-> ---
->  hw/ppc/spapr.c         | 32 +++++++++++++++++++++-----------
->  hw/ppc/spapr_nvdimm.c  |  8 +++-----
->  hw/ppc/spapr_pci.c     |  8 +++-----
->  include/hw/ppc/spapr.h |  1 +
->  4 files changed, 28 insertions(+), 21 deletions(-)
->=20
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index bc51d2db90..b80a6f6936 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -201,15 +201,27 @@ static int spapr_fixup_cpu_smt_dt(void *fdt, int of=
-fset, PowerPCCPU *cpu,
->      return ret;
->  }
-> =20
-> +void spapr_set_associativity(uint32_t *assoc, int node_id, int cpu_index)
-> +{
-> +    uint8_t assoc_size =3D 0x4;
-> +
-> +    if (cpu_index >=3D 0) {
-> +        assoc_size =3D 0x5;
-> +        assoc[5] =3D cpu_to_be32(cpu_index);
-> +    }
-> +
-> +    assoc[0] =3D cpu_to_be32(assoc_size);
-> +    assoc[1] =3D cpu_to_be32(0x0);
-> +    assoc[2] =3D cpu_to_be32(0x0);
-> +    assoc[3] =3D cpu_to_be32(0x0);
-> +    assoc[4] =3D cpu_to_be32(node_id);
-> +}
-> +
->  static int spapr_fixup_cpu_numa_dt(void *fdt, int offset, PowerPCCPU *cp=
-u)
->  {
->      int index =3D spapr_get_vcpu_id(cpu);
-> -    uint32_t associativity[] =3D {cpu_to_be32(0x5),
-> -                                cpu_to_be32(0x0),
-> -                                cpu_to_be32(0x0),
-> -                                cpu_to_be32(0x0),
-> -                                cpu_to_be32(cpu->node_id),
-> -                                cpu_to_be32(index)};
-> +    uint32_t associativity[6];
-> +    spapr_set_associativity(associativity, cpu->node_id, index);
-> =20
->      /* Advertise NUMA via ibm,associativity */
->      return fdt_setprop(fdt, offset, "ibm,associativity", associativity,
-> @@ -325,15 +337,13 @@ static void add_str(GString *s, const gchar *s1)
->  static int spapr_dt_memory_node(void *fdt, int nodeid, hwaddr start,
->                                  hwaddr size)
->  {
-> -    uint32_t associativity[] =3D {
-> -        cpu_to_be32(0x4), /* length */
-> -        cpu_to_be32(0x0), cpu_to_be32(0x0),
-> -        cpu_to_be32(0x0), cpu_to_be32(nodeid)
-> -    };
-> +    uint32_t associativity[5];
->      char mem_name[32];
->      uint64_t mem_reg_property[2];
->      int off;
-> =20
-> +    spapr_set_associativity(associativity, nodeid, -1);
-> +
->      mem_reg_property[0] =3D cpu_to_be64(start);
->      mem_reg_property[1] =3D cpu_to_be64(size);
-> =20
-> diff --git a/hw/ppc/spapr_nvdimm.c b/hw/ppc/spapr_nvdimm.c
-> index 81410aa63f..bd109bfc00 100644
-> --- a/hw/ppc/spapr_nvdimm.c
-> +++ b/hw/ppc/spapr_nvdimm.c
-> @@ -115,15 +115,13 @@ int spapr_dt_nvdimm(void *fdt, int parent_offset,
->                                               &error_abort);
->      uint64_t slot =3D object_property_get_uint(OBJECT(nvdimm), PC_DIMM_S=
-LOT_PROP,
->                                               &error_abort);
-> -    uint32_t associativity[] =3D {
-> -        cpu_to_be32(0x4), /* length */
-> -        cpu_to_be32(0x0), cpu_to_be32(0x0),
-> -        cpu_to_be32(0x0), cpu_to_be32(node)
-> -    };
-> +    uint32_t associativity[5];
->      uint64_t lsize =3D nvdimm->label_size;
->      uint64_t size =3D object_property_get_int(OBJECT(nvdimm), PC_DIMM_SI=
-ZE_PROP,
->                                              NULL);
-> =20
-> +    spapr_set_associativity(associativity, node, -1);
-> +
->      drc =3D spapr_drc_by_id(TYPE_SPAPR_DRC_PMEM, slot);
->      g_assert(drc);
-> =20
-> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-> index 09ac58fd7f..c02ace226c 100644
-> --- a/hw/ppc/spapr_pci.c
-> +++ b/hw/ppc/spapr_pci.c
-> @@ -2321,11 +2321,8 @@ int spapr_dt_phb(SpaprMachineState *spapr, SpaprPh=
-bState *phb,
->          cpu_to_be32(1),
->          cpu_to_be32(RTAS_IBM_RESET_PE_DMA_WINDOW)
->      };
-> -    uint32_t associativity[] =3D {cpu_to_be32(0x4),
-> -                                cpu_to_be32(0x0),
-> -                                cpu_to_be32(0x0),
-> -                                cpu_to_be32(0x0),
-> -                                cpu_to_be32(phb->numa_node)};
-> +    uint32_t associativity[5];
-> +
->      SpaprTceTable *tcet;
->      SpaprDrc *drc;
->      Error *err =3D NULL;
-> @@ -2358,6 +2355,7 @@ int spapr_dt_phb(SpaprMachineState *spapr, SpaprPhb=
-State *phb,
-> =20
->      /* Advertise NUMA via ibm,associativity */
->      if (phb->numa_node !=3D -1) {
-> +        spapr_set_associativity(associativity, phb->numa_node, -1);
->          _FDT(fdt_setprop(fdt, bus_off, "ibm,associativity", associativit=
-y,
->                           sizeof(associativity)));
->      }
-> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> index d9f1afa8b2..cd158bf95a 100644
-> --- a/include/hw/ppc/spapr.h
-> +++ b/include/hw/ppc/spapr.h
-> @@ -863,6 +863,7 @@ int spapr_phb_dt_populate(SpaprDrc *drc, SpaprMachine=
-State *spapr,
-> =20
->  void spapr_rtc_read(SpaprRtcState *rtc, struct tm *tm, uint32_t *ns);
->  int spapr_rtc_import_offset(SpaprRtcState *rtc, int64_t legacy_offset);
-> +void spapr_set_associativity(uint32_t *assoc, int node_id, int cpu_index=
-);
-> =20
->  #define TYPE_SPAPR_RNG "spapr-rng"
-> =20
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---yklP1rR72f9kjNtc
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl895z4ACgkQbDjKyiDZ
-s5I3oBAAsTDfeFOjflm5NrUa0Bl/6zKpbaH69UAtlstnyz0QTXcblQez89cZO5t2
-6HuFKw1B4PBGZOxtQV9mgdGGxypD7cdH4n71a96jrhPgMofCFNmpSmJbTVnBiZlA
-V7+xGvRm/dl87RTs17Cnjv2EBSa7mroLiSNtb7YDxNvz+fnWgeDeC/QF5vvOoE9j
-GcpvN5LCvcO625MJ7es2RxHNKFMkovJQIma7jf5q7zBOvSf3kCpXIAJSmd6mryYt
-a+ChhV0qQUVezb9kWftNXcY2oyjLb9XLgdF21gFcWdHYhvSCUHpBWZwVOl7qqAU2
-MNZQUeBBVEt/kZVUx+PXkZs4SdGY7HsOEQZO0LGKdeDfN2tGWtFXSHig5pGX4ld6
-uff/cLseubPfwjjxm8AfZm6P5zf30QIaAgL3HGFsdCqwQgjclE2nJ8GHn3mlyuFq
-lvNlmNWcbyxAXJ0alTou6VA4H1K3lf3Fz6PixTUpdQcu1blXzq795BhN4ae+9SDK
-0Lsa1dE8NMi8j1MxEFT+DJYWa+OkBekvNBV9oQ3Rgl2Ovlf73mFV9vmZhuo7VhYu
-KFyDPxfliSnuR2/ITgXN1fUJqgMFwempfk56jKweXqq7Uk0sNOBAwVcKz8WvgfXg
-A1nqb7HLJyAo9s0jLEnTSfPwFwcWkbL4F0Mk0fF9aLmdyMQPjFw=
-=Dmtc
------END PGP SIGNATURE-----
-
---yklP1rR72f9kjNtc--
+> i woudl really prefer if there was just one mdev type that repsented the minimal allcatable unit and the
+> aggragaotr where used to create compostions of that. i.e instad of i915-GVTg_V5_2 beign half the device,
+> have 1 mdev type i915-GVTg and if the device support 8 of them then we can aggrate 4 of i915-GVTg
+> 
+> if you want to have muplie mdev type to model the different amoutn of the resouce e.g. i915-GVTg_small i915-GVTg_large
+> that is totlaly fine too or even i915-GVTg_4 indcating it sis 4 of i915-GVTg
+> 
+> failing that i would just expose an mdev type per composable resouce and allow us to compose them a the user level with
+> some other construct mudeling a attament to the device. e.g. create composed mdev or somethig that is an aggreateion of
+> multiple sub resouces each of which is an mdev. so kind of like how bond port work. we would create an mdev for each of
+> the sub resouces and then create a bond or aggrated mdev by reference the other mdevs by uuid then attach only the
+> aggreated mdev to the instance.
+> 
+> the current aggrator syntax and sematic however make me rather uncofrotable when i think about orchestating vms on top
+> of it even to boot them let alone migrate them.
+> > 
+> > So, we explicitly list out self/compatible attributes, and management
+> > tools only need to check if self attributes is contained compatible
+> > attributes.
+> > 
+> > or do you mean only compatible list is enough, and the management tools
+> > need to find out self list by themselves?
+> > But I think provide a self list is easier for management tools.
+> > 
+> > Thanks
+> > Yan
+> > 
+> 
 
