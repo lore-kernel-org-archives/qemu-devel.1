@@ -7,57 +7,56 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53D30C433E3
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 03:58:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0FB4C433E5
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 03:58:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 21D3D2078B
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 03:58:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 902F72078B
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 03:58:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="etNR8KVp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21D3D2078B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="KXKaGXiM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 902F72078B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40064 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40170 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8bj2-0005TN-7d
-	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 23:58:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58016)
+	id 1k8bj3-0005Vy-Rp
+	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 23:58:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58036)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1k8biI-00040N-V1; Wed, 19 Aug 2020 23:58:06 -0400
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:48125 helo=ozlabs.org)
+ id 1k8biK-00040g-C9; Wed, 19 Aug 2020 23:58:08 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:58711 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1k8biF-0007LD-R4; Wed, 19 Aug 2020 23:58:06 -0400
+ id 1k8biF-0007LF-Mc; Wed, 19 Aug 2020 23:58:08 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 4BX9pt1H0vz9sTR; Thu, 20 Aug 2020 13:57:58 +1000 (AEST)
+ id 4BX9pt0nLZz9sR4; Thu, 20 Aug 2020 13:57:57 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1597895878;
- bh=DF3d2YDoPsVqfXZpQZXmBNWWjAjfZFhLXMKm+dPHGJE=;
+ bh=ni9aoStGjZN/B3YxXmoYh2NSqsQdo9+Zb5Bnfj9xeUw=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=etNR8KVp4VoN5QRaZTlw+4Yvd6q8gf5JKY67I7opD0tL+vfrUMawAe7DCtavp7TGW
- jNOuP8d7/G4Z/J15CHwEBldLHOZp/l5xJDynmvsk40IG47ACi9hI+q7JxHOmm1gI9I
- U6rPYsmkJF6m6V+iK2G3vM+yqDctO1I98j0wisrw=
-Date: Thu, 20 Aug 2020 12:55:43 +1000
+ b=KXKaGXiM2jWMoi0cbpipwLKAkQap0MMmThElNan1Fp9QP5zh5n1XmWHaxUweJNxI8
+ xq3kocenhWr7qFGN0Amf8DQ2C1W2w8732C8jo07L5Jh7zdOX5SHyJ6t5ZyxRMzxq04
+ c11woCY568VUHEqmPjh4/Cp3x+cOmNOx/3XEcNXQ=
+Date: Thu, 20 Aug 2020 12:15:24 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
 To: Daniel Henrique Barboza <danielhb413@gmail.com>
-Subject: Re: [PATCH 05/10] spapr: make ibm,max-associativity-domains scale
- with user input
-Message-ID: <20200820025543.GL271315@yekko.fritz.box>
+Subject: Re: [PATCH 04/10] spapr: add spapr_machine_using_legacy_numa() helper
+Message-ID: <20200820021524.GK271315@yekko.fritz.box>
 References: <20200814205424.543857-1-danielhb413@gmail.com>
- <20200814205424.543857-6-danielhb413@gmail.com>
+ <20200814205424.543857-5-danielhb413@gmail.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="DXIF1lRUlMsbZ3S1"
+ protocol="application/pgp-signature"; boundary="W2ydbIOJmkm74tJ2"
 Content-Disposition: inline
-In-Reply-To: <20200814205424.543857-6-danielhb413@gmail.com>
-Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
+In-Reply-To: <20200814205424.543857-5-danielhb413@gmail.com>
+Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
  helo=ozlabs.org
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/19 23:57:59
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -9
 X-Spam_score: -1.0
 X-Spam_bar: -
@@ -83,77 +82,90 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---DXIF1lRUlMsbZ3S1
+--W2ydbIOJmkm74tJ2
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Aug 14, 2020 at 05:54:19PM -0300, Daniel Henrique Barboza wrote:
-> The ibm,max-associativity-domains is considering that only a single
-> associativity domain can exist in the same NUMA level. This is true
-> today because we do not support any type of NUMA distance user
-> customization, and all nodes are in the same distance to each other.
+On Fri, Aug 14, 2020 at 05:54:18PM -0300, Daniel Henrique Barboza wrote:
+> The changes to come to NUMA support are all guest visible. In
+> theory we could just create a new 5_1 class option flag to
+> avoid the changes to cascade to 5.1 and under. The reality is that
+> these changes are only relevant if the machine has more than one
+> NUMA node. There is no need to change guest behavior that has
+> been around for years needlesly.
 >=20
-> To enhance NUMA distance support in the pSeries machine we need to
-> make this limit flexible. This patch rewrites the max-associativity
-> logic to consider that multiple associativity domains can co-exist
-> in the same NUMA level. We're using the legacy_numa() helper to
-> avoid leaking unneeded guest changes.
-
-
-Hrm.  I find the above a bit hard to understand.  Having the limit be
-one less than the number of nodes at every level except the last seems
-kind of odd to me.
-
+> This new helper will be used by the next patches to determine
+> whether we should retain the (soon to be) legacy NUMA behavior
+> in the pSeries machine. The new behavior will only be exposed
+> if::
+>=20
+> - machine is pseries-5.2 and newer;
+> - more than one NUMA node is declared in NUMA state.
+>=20
 > Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
+
+Seems reasonable.
+
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+
 > ---
->  hw/ppc/spapr.c | 18 ++++++++++++++++--
->  1 file changed, 16 insertions(+), 2 deletions(-)
+>  hw/ppc/spapr.c         | 12 ++++++++++++
+>  include/hw/ppc/spapr.h |  2 ++
+>  2 files changed, 14 insertions(+)
 >=20
 > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 073a59c47d..b0c4b80a23 100644
+> index 22e78cfc84..073a59c47d 100644
 > --- a/hw/ppc/spapr.c
 > +++ b/hw/ppc/spapr.c
-> @@ -919,13 +919,20 @@ static void spapr_dt_rtas(SpaprMachineState *spapr,=
- void *fdt)
->          cpu_to_be32(SPAPR_MEMORY_BLOCK_SIZE & 0xffffffff),
->          cpu_to_be32(ms->smp.max_cpus / ms->smp.threads),
->      };
-> -    uint32_t maxdomain =3D cpu_to_be32(spapr->extra_numa_nodes > 1 ? 1 :=
- 0);
-> +
-> +    /* The maximum domains for a given NUMA level, supposing that every
-> +     * additional NUMA node belongs to the same domain (aside from the
-> +     * 4th level, where we must support all available NUMA domains), is
-> +     * total number of domains - 1. */
-> +    uint32_t total_nodes_number =3D ms->numa_state->num_nodes +
-> +                                  spapr->extra_numa_nodes;
-> +    uint32_t maxdomain =3D cpu_to_be32(total_nodes_number - 1);
->      uint32_t maxdomains[] =3D {
->          cpu_to_be32(4),
->          maxdomain,
->          maxdomain,
->          maxdomain,
-> -        cpu_to_be32(ms->numa_state->num_nodes + spapr->extra_numa_nodes),
-> +        cpu_to_be32(total_nodes_number),
->      };
+> @@ -308,6 +308,15 @@ static hwaddr spapr_node0_size(MachineState *machine)
+>      return machine->ram_size;
+>  }
 > =20
->      _FDT(rtas =3D fdt_add_subnode(fdt, 0, "rtas"));
-> @@ -962,6 +969,13 @@ static void spapr_dt_rtas(SpaprMachineState *spapr, =
-void *fdt)
->                       qemu_hypertas->str, qemu_hypertas->len));
->      g_string_free(qemu_hypertas, TRUE);
-> =20
-> +    if (spapr_machine_using_legacy_numa(spapr)) {
-> +        maxdomain =3D cpu_to_be32(spapr->extra_numa_nodes > 1 ? 1 : 0);
-> +        maxdomains[1] =3D maxdomain;
-> +        maxdomains[2] =3D maxdomain;
-> +        maxdomains[3] =3D maxdomain;
-> +    }
+> +bool spapr_machine_using_legacy_numa(SpaprMachineState *spapr)
+> +{
+> +    MachineState *machine =3D MACHINE(spapr);
+> +    SpaprMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(machine);
 > +
->      if (smc->pre_5_1_assoc_refpoints) {
->          nr_refpoints =3D 2;
->      }
+> +    return smc->pre_5_2_numa_associativity ||
+> +           machine->numa_state->num_nodes <=3D 1;
+> +}
+> +
+>  static void add_str(GString *s, const gchar *s1)
+>  {
+>      g_string_append_len(s, s1, strlen(s1) + 1);
+> @@ -4602,8 +4611,11 @@ DEFINE_SPAPR_MACHINE(5_2, "5.2", true);
+>   */
+>  static void spapr_machine_5_1_class_options(MachineClass *mc)
+>  {
+> +    SpaprMachineClass *smc =3D SPAPR_MACHINE_CLASS(mc);
+> +
+>      spapr_machine_5_2_class_options(mc);
+>      compat_props_add(mc->compat_props, hw_compat_5_1, hw_compat_5_1_len);
+> +    smc->pre_5_2_numa_associativity =3D true;
+>  }
+> =20
+>  DEFINE_SPAPR_MACHINE(5_1, "5.1", false);
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index 739a6a4942..d9f1afa8b2 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -130,6 +130,7 @@ struct SpaprMachineClass {
+>      bool smp_threads_vsmt; /* set VSMT to smp_threads by default */
+>      hwaddr rma_limit;          /* clamp the RMA to this size */
+>      bool pre_5_1_assoc_refpoints;
+> +    bool pre_5_2_numa_associativity;
+> =20
+>      void (*phb_placement)(SpaprMachineState *spapr, uint32_t index,
+>                            uint64_t *buid, hwaddr *pio,=20
+> @@ -847,6 +848,7 @@ int spapr_max_server_number(SpaprMachineState *spapr);
+>  void spapr_store_hpte(PowerPCCPU *cpu, hwaddr ptex,
+>                        uint64_t pte0, uint64_t pte1);
+>  void spapr_mce_req_event(PowerPCCPU *cpu, bool recovered);
+> +bool spapr_machine_using_legacy_numa(SpaprMachineState *spapr);
+> =20
+>  /* DRC callbacks. */
+>  void spapr_core_release(DeviceState *dev);
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -161,25 +173,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---DXIF1lRUlMsbZ3S1
+--W2ydbIOJmkm74tJ2
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl895i0ACgkQbDjKyiDZ
-s5LNlA/5AUpZ4waZqPwhIrda24H8tuhIUAM1eLZkJwgY7/NnQ4B51RJni/1xeW5M
-OWKMps/+NaPAyEkZjtJwI1Wxy/FSkBI7lqujn8QqDvAllfrN4vuLF1xeR/+lpj9o
-1IxWnQ2Qnihs2cJkIFY6X6vmk7+f84nBK+xYMUatjWEaU4a4p7+45nn92eH18Nll
-BarGUWbnTKp630JXndFrJMn5CSb7TE8syeuNgQLbQqNvdS0PAf+4tnlyjBeCgSOh
-LVIyBfjLecy3eYdnnuUtZiB3H/tN8pAZ+U7Z3S9/ZtwGMD+SKYNBdhy/qy9K+ffO
-iBlqdFJ+0PHSOJG84Iy5aTUTI7F1E1zOVbLLJPkDaxZM7G6hz29axjwc62z6ezNr
-2J4aGE0ZLPLtDy4dGEpSnYIXHaKIxpvvd8TOWlmTE+DFl1FLUoJzhLIKNe83U6dz
-VL3Z32qh11Us4/ucr5ftN6LrQdQRsY4h24+dUc/993vzbb/WvIHTBLQ/A4tpzuAD
-XfCz+m0Fk6aAASkkOpGQnIzslg1fZoIOWhL2adCvgmUPPQadj/fXl2nscSb3hyZ9
-OgS2X9nvynnC6bCQiErm24F2ZSqEUzOoyHb6BBdv6RIj+eKNY5qB0Z1KMHJ69y2X
-hnYVVLGZKIf+KDHyrX9kDqOe49se2VcsK1wGrTgKit/M90GB2So=
-=OnCx
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl893LwACgkQbDjKyiDZ
+s5IiiQ//XkXhqMuryw7fIfN4KRzSJNXwduf3A1dAP2IF3x9Id5cAfC1Ab6k4O987
+BSMA3y65BJGXqeEYp0O66ZrwLKGcKEROHq+T4Bm/L2GoymmYExO5T0nOpMev9IMH
+7/USaqolQ0t6ykpkwLx+eORZ8kRk0RvJ+KMDWGxUZ9VoFBv5dfzbktakMizelklg
+ThvW3XPJSoD7gUwYz9UC9puqIICQ8o7D//eyDwilGNvB9RZDHdILisd0/fRnUuKg
+2fyeHYbnoh9WLKiz5P03zYEw4lCN+dwOSgbiiE+LrzSC7xb4k5IHYpsID3uIiqqm
+CK1w6laBHYaYbVpyNq5BqVD4JQ+6m6l/7juvFGRwwW7cz+Bm21qSrd0rrB2BOlTg
+8yrcq1wASXI4HWSyXVV96JFn/ujRZE2phRsMloQ/aN635PTkzLv6xre3AFca1lV9
+bORp7CSDmASDmHRMSnaqv7ZCF03YpL57sLVgTHtzOH9k43a+vDdso+3UF9VZS19o
+P3ovJe0b5wsaJhYopyFsqyzKTzyqgo0jA4UktDlbbMzNd0E/4j8YrZ2dqYiTg3zl
+2EQuHyRPQrIrRb5Rc3Bn0rQ3bwjXwDeWdx1gKO7IcHKQ07VrpyHX1R9gfbJJxXc5
+GEVHeVjKVA4uo9k2fJAaidraLINEtqQFb2dncs0MfTwrgZHqfY4=
+=KGHY
 -----END PGP SIGNATURE-----
 
---DXIF1lRUlMsbZ3S1--
+--W2ydbIOJmkm74tJ2--
 
