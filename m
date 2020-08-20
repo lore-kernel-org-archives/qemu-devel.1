@@ -2,111 +2,70 @@ Return-Path: <SRS0=Dndf=B6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.4 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-17.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ECD36C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 07:35:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B1C4C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 07:37:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B3CC72078B
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 07:35:13 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T3HUbFOu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3CC72078B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 06998207DE
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 07:37:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06998207DE
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32924 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35394 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8f6O-0000WG-VV
-	for qemu-devel@archiver.kernel.org; Thu, 20 Aug 2020 03:35:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36990)
+	id 1k8f8g-0001gQ-64
+	for qemu-devel@archiver.kernel.org; Thu, 20 Aug 2020 03:37:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37442)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k8f5q-0008SY-M3
- for qemu-devel@nongnu.org; Thu, 20 Aug 2020 03:34:38 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:29275)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k8f5o-00065I-6a
- for qemu-devel@nongnu.org; Thu, 20 Aug 2020 03:34:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597908874;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=pJpQUZlO7tKiBQOn4lEYc/r1oJwFaGkZ8sKkn0++8lA=;
- b=T3HUbFOufNIT+cJPxIpru/zC4XCims07rXT5IT+6gLKA6eTae2QcE79tQpWrmr/c1PAIa2
- iM/DAywkIKW/NwoM++eEX2PMqgiF+/0Rc8n1z98nXxtOKKazu9LP9OHmG5nCi0hHCzk1Vx
- tLeNfNpJZauo3VC3GgRXoywUX9SKkzs=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-1-yLEBif8-Meq8aEyE0C61xQ-1; Thu, 20 Aug 2020 03:34:33 -0400
-X-MC-Unique: yLEBif8-Meq8aEyE0C61xQ-1
-Received: by mail-wm1-f70.google.com with SMTP id c124so642902wme.0
- for <qemu-devel@nongnu.org>; Thu, 20 Aug 2020 00:34:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=pJpQUZlO7tKiBQOn4lEYc/r1oJwFaGkZ8sKkn0++8lA=;
- b=fJdNA8V3pafbe2WGBcmLVR0oIgy2tTnyYpF2NuQ0YbjaEogGFgtUlH5iJBwcg4fpKp
- 4YLdewFUr/acQ8GLHDKB0O4zK5YOxabUJFSxQn4aXnZFBDlSrk+5bglm5O7IJvgqb3y9
- RFe7ACg5u3uW/2zyCMaoFcfTv/fInHUOM3QMUXzFJ5PqIrUb/lgIo2+wrpSh7Y195OuE
- IzF3ZYLiORgHJTA0ZhCJp5janpdN3aUU8QVnU2XOHhnqE3Un2lplzdjpDOgzr9UL+h7u
- d514pHOPvaY/8UbrL+Md69vOhNBVbLkYbMdV9bfROSu63ZAYI2RfRjsARjhZQSzZNhSJ
- Uh/w==
-X-Gm-Message-State: AOAM5326j/yKywpaijhhmbEmUpNuRMvaRU5+jj4YyQtZXE7V4hTC2ysr
- keUSupT0lDhgEayXWS9nobLg/YUJ7GFzHLt9ytDzDYfQz5bye74SSMBUHmWGZSok8VSbTgRVwUb
- JriPzgK6ELkdw3BE=
-X-Received: by 2002:adf:9c8c:: with SMTP id d12mr1748105wre.369.1597908871954; 
- Thu, 20 Aug 2020 00:34:31 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxMAc/7Ko5h2l0g3MLVloq7WiFP9ewgm+svqk5ITPlrYgDrAsi2r+q0Fgu8cWOIxvltMJQ8KA==
-X-Received: by 2002:adf:9c8c:: with SMTP id d12mr1748081wre.369.1597908871702; 
- Thu, 20 Aug 2020 00:34:31 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:1cc0:4e4e:f1a9:1745?
- ([2001:b07:6468:f312:1cc0:4e4e:f1a9:1745])
- by smtp.gmail.com with ESMTPSA id e16sm2504735wrx.30.2020.08.20.00.34.30
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 20 Aug 2020 00:34:31 -0700 (PDT)
-Subject: Re: [PATCH v7 0/7] coroutines: generate wrapper code
-To: Eric Blake <eblake@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Stefan Hajnoczi <stefanha@redhat.com>
-References: <20200610100336.23451-1-vsementsov@virtuozzo.com>
- <20200727124840.GC386429@stefanha-x1.localdomain>
- <c610e7b2-9c1a-30fd-4217-e1bcb812ec7c@virtuozzo.com>
- <76c463e6-0d63-d25d-8095-e87db97c5081@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <17034772-2b81-b8f9-1bfc-3ebdc6b07980@redhat.com>
-Date: Thu, 20 Aug 2020 09:34:29 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>)
+ id 1k8f88-00019Z-TA; Thu, 20 Aug 2020 03:37:00 -0400
+Received: from smtpout1.mo529.mail-out.ovh.net ([178.32.125.2]:38863)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>)
+ id 1k8f86-0006QR-CY; Thu, 20 Aug 2020 03:37:00 -0400
+Received: from mxplan5.mail.ovh.net (unknown [10.109.156.102])
+ by mo529.mail-out.ovh.net (Postfix) with ESMTPS id E35A1522ADA9;
+ Thu, 20 Aug 2020 09:36:53 +0200 (CEST)
+Received: from kaod.org (37.59.142.105) by DAG4EX1.mxp5.local (172.16.2.31)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1979.3; Thu, 20 Aug
+ 2020 09:36:53 +0200
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-105G006f5bb0c52-95b7-41a9-a726-f07b9e12a38d,
+ 02C359FD435C2C4122574921AFFD4D91C9CEEBEA) smtp.auth=clg@kaod.org
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Subject: [PATCH] ppc/pnv: Add a HIOMAP erase command
+Date: Thu, 20 Aug 2020 09:36:50 +0200
+Message-ID: <20200820073650.2315095-1-clg@kaod.org>
+X-Mailer: git-send-email 2.25.4
 MIME-Version: 1.0
-In-Reply-To: <76c463e6-0d63-d25d-8095-e87db97c5081@redhat.com>
-Content-Language: en-US
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/19 20:12:44
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [37.59.142.105]
+X-ClientProxiedBy: DAG4EX2.mxp5.local (172.16.2.32) To DAG4EX1.mxp5.local
+ (172.16.2.31)
+X-Ovh-Tracer-GUID: 3874bcc1-36b2-47d6-8a47-9feaf372f44e
+X-Ovh-Tracer-Id: 2888214737856269161
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedruddtledgleefucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvufffkffogggtgfhisehtkeertdertdejnecuhfhrohhmpeevrogurhhitgcunfgvucfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepuedtieekkeelgfduvdeijeeujefhheefjedtleegtdehteejteduuddtjeefjeeknecuffhomhgrihhnpehgihhthhhusgdrtghomhenucfkpheptddrtddrtddrtddpfeejrdehledrudegvddruddtheenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehmgihplhgrnhehrdhmrghilhdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtoheptghlgheskhgrohgurdhorhhg
+Received-SPF: pass client-ip=178.32.125.2; envelope-from=clg@kaod.org;
+ helo=smtpout1.mo529.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/20 02:45:31
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -28
+X-Spam_score: -2.9
+X-Spam_bar: --
+X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -120,24 +79,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, kwolf@redhat.com, ehabkost@redhat.com,
- qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com,
- crosa@redhat.com, den@openvz.org
+Cc: Andrew Jeffery <andrew@aj.id.au>, qemu-devel@nongnu.org,
+ Klaus Heinrich Kiwi <klaus@linux.vnet.ibm.com>, qemu-ppc@nongnu.org,
+ =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
+ Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 20/08/20 03:33, Eric Blake wrote:
->>>
->>
->> OK, will do. Thanks for taking a look!
-> 
-> As this series touched Makefile to add a generated .c, you'll also need
-> to rebase that part to apply on top of Paolo's meson conversion (cc'ing
-> him if you need help figuring it out)
+The OPAL test suite runs a read-erase-write test on the PNOR :
 
-It should be trivial to do so using custom_target.
+  https://github.com/open-power/op-test/blob/master/testcases/OpTestPNOR.py
 
-Paolo
+which revealed that the IPMI HIOMAP handlers didn't support
+HIOMAP_C_ERASE. Implement the sector erase command by writing 0xFF in
+the PNOR memory region.
+
+Reported-by: Klaus Heinrich Kiwi <klaus@linux.vnet.ibm.com>
+Signed-off-by: Cédric Le Goater <clg@kaod.org>
+---
+ hw/ppc/pnv_bmc.c | 31 ++++++++++++++++++++++++++++++-
+ 1 file changed, 30 insertions(+), 1 deletion(-)
+
+diff --git a/hw/ppc/pnv_bmc.c b/hw/ppc/pnv_bmc.c
+index 2e1a03daa45a..0fb082fcb8ee 100644
+--- a/hw/ppc/pnv_bmc.c
++++ b/hw/ppc/pnv_bmc.c
+@@ -140,6 +140,29 @@ static uint16_t bytes_to_blocks(uint32_t bytes)
+     return bytes >> BLOCK_SHIFT;
+ }
+ 
++static uint32_t blocks_to_bytes(uint16_t blocks)
++{
++    return blocks << BLOCK_SHIFT;
++}
++
++#define IPMI_ERR_UNSPECIFIED            0xff
++
++static int hiomap_erase(PnvPnor *pnor, uint32_t offset, uint32_t size)
++{
++    MemTxResult result;
++    int i;
++
++    for (i = 0; i < size / 4; i++) {
++        result = memory_region_dispatch_write(&pnor->mmio, offset + i * 4,
++                                              0xFFFFFFFF, MO_32,
++                                              MEMTXATTRS_UNSPECIFIED);
++        if (result != MEMTX_OK) {
++            return -1;
++        }
++    }
++    return 0;
++}
++
+ static void hiomap_cmd(IPMIBmcSim *ibs, uint8_t *cmd, unsigned int cmd_len,
+                        RspBuffer *rsp)
+ {
+@@ -155,10 +178,16 @@ static void hiomap_cmd(IPMIBmcSim *ibs, uint8_t *cmd, unsigned int cmd_len,
+     switch (cmd[2]) {
+     case HIOMAP_C_MARK_DIRTY:
+     case HIOMAP_C_FLUSH:
+-    case HIOMAP_C_ERASE:
+     case HIOMAP_C_ACK:
+         break;
+ 
++    case HIOMAP_C_ERASE:
++        if (hiomap_erase(pnor, blocks_to_bytes(cmd[5] << 8 | cmd[4]),
++                        blocks_to_bytes(cmd[7] << 8 | cmd[6]))) {
++            rsp_buffer_set_error(rsp, IPMI_ERR_UNSPECIFIED);
++        }
++        break;
++
+     case HIOMAP_C_GET_INFO:
+         rsp_buffer_push(rsp, 2);  /* Version 2 */
+         rsp_buffer_push(rsp, BLOCK_SHIFT); /* block size */
+-- 
+2.25.4
 
 
