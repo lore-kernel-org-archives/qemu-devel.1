@@ -7,83 +7,82 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21692C433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 00:26:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7880C433E3
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 00:26:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DD6F0207DA
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 00:26:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B386B207DA
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 00:26:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MFoTQeEY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD6F0207DA
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TP7pAAb/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B386B207DA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36752 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38678 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8YPI-000390-4K
-	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 20:26:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49304)
+	id 1k8YPZ-0003v7-SB
+	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 20:26:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49360)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1k8YCv-0005to-Q1
- for qemu-devel@nongnu.org; Wed, 19 Aug 2020 20:13:30 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23717
- helo=us-smtp-1.mimecast.com)
+ id 1k8YD2-000629-4j
+ for qemu-devel@nongnu.org; Wed, 19 Aug 2020 20:13:36 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:44247)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1k8YCu-0002Mb-9W
- for qemu-devel@nongnu.org; Wed, 19 Aug 2020 20:13:29 -0400
+ id 1k8YD0-0002NA-ET
+ for qemu-devel@nongnu.org; Wed, 19 Aug 2020 20:13:35 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597882406;
+ s=mimecast20190719; t=1597882413;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=nKVi7vWHEqaEDwKWow/pxgG7QhdWfJxb4rxtKwotnAk=;
- b=MFoTQeEYAbzH7lBS0vlir6ZZGNFyosmjvoqpJwTbDsd6BErHTFIbDLCJkjeXy4uKGO8MYe
- KKh0hLm6ExN+4ZZq9uCwcP0f4pTf8fGV+XHDDs0xzrzjvus4YyH+E4M1Z6hbcgqUJ75kpe
- zUYqEr/T9Zztq42BetfOBdZ3wibpBhA=
+ bh=BdHATW7RXZc6XkygCHgZmmg5inOmRl0H5VQmXbD8wiA=;
+ b=TP7pAAb/Ejyvz9HYLyMMWoHHs/QWlSTLbIIDTw08z2DA8wUhtudxD5ooE6K8oMdVIZ9f1e
+ fsi6iv4seJaHoEKnO6fNMfMpfnpWD67frwJWBuELzKF2h48eqXygtufd++Syl1NpyE3jtY
+ HsvqtqI4r9T5J1z8wiUs7O5EtBGyubs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-102-p8CqXUW0MHSgrH0tNM6Ysw-1; Wed, 19 Aug 2020 20:13:22 -0400
-X-MC-Unique: p8CqXUW0MHSgrH0tNM6Ysw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-423-JPwQDiBaOwWGGdQbbc_Nyg-1; Wed, 19 Aug 2020 20:13:31 -0400
+X-MC-Unique: JPwQDiBaOwWGGdQbbc_Nyg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3B9D810066FC;
- Thu, 20 Aug 2020 00:13:21 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6DD1A8030A3;
+ Thu, 20 Aug 2020 00:13:30 +0000 (UTC)
 Received: from localhost (ovpn-117-244.rdu2.redhat.com [10.10.117.244])
- by smtp.corp.redhat.com (Postfix) with ESMTP id CB86110013C4;
- Thu, 20 Aug 2020 00:13:20 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2FBE17E305;
+ Thu, 20 Aug 2020 00:13:30 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 16/58] throttle-groups: Move ThrottleGroup typedef to header
-Date: Wed, 19 Aug 2020 20:11:54 -0400
-Message-Id: <20200820001236.1284548-17-ehabkost@redhat.com>
+Subject: [PATCH v2 19/58] hvf: Move HVFState typedef to hvf.h
+Date: Wed, 19 Aug 2020 20:11:57 -0400
+Message-Id: <20200820001236.1284548-20-ehabkost@redhat.com>
 In-Reply-To: <20200820001236.1284548-1-ehabkost@redhat.com>
 References: <20200820001236.1284548-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
 X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=ehabkost@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 23:05:17
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=ehabkost@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/19 20:12:51
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,11 +95,10 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>,
- qemu-block@nongnu.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Max Reitz <mreitz@redhat.com>, Alberto Garcia <berto@igalia.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ Roman Bolshakov <r.bolshakov@yadro.com>,
+ "Daniel P. Berrange" <berrange@redhat.com>, Cameron Esfahani <dirty@apple.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -108,57 +106,55 @@ Sender: "Qemu-devel"
 Move typedef closer to the type check macros, to make it easier
 to convert the code to OBJECT_DEFINE_TYPE() in the future.
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
 Changes v1 -> v2: none
 
 ---
-Cc: Alberto Garcia <berto@igalia.com>
-Cc: Kevin Wolf <kwolf@redhat.com>
-Cc: Max Reitz <mreitz@redhat.com>
-Cc: qemu-block@nongnu.org
+Cc: Cameron Esfahani <dirty@apple.com>
+Cc: Roman Bolshakov <r.bolshakov@yadro.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
 Cc: qemu-devel@nongnu.org
 ---
- include/block/throttle-groups.h | 1 +
- block/throttle-groups.c         | 4 ++--
+ include/sysemu/hvf.h       | 1 +
+ target/i386/hvf/hvf-i386.h | 4 ++--
  2 files changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/include/block/throttle-groups.h b/include/block/throttle-groups.h
-index 712a8e64b4..5e77db700f 100644
---- a/include/block/throttle-groups.h
-+++ b/include/block/throttle-groups.h
-@@ -59,6 +59,7 @@ typedef struct ThrottleGroupMember {
- } ThrottleGroupMember;
+diff --git a/include/sysemu/hvf.h b/include/sysemu/hvf.h
+index d3bed80ea8..760d6c79a2 100644
+--- a/include/sysemu/hvf.h
++++ b/include/sysemu/hvf.h
+@@ -35,6 +35,7 @@ void hvf_vcpu_destroy(CPUState *);
  
- #define TYPE_THROTTLE_GROUP "throttle-group"
-+typedef struct ThrottleGroup ThrottleGroup;
- #define THROTTLE_GROUP(obj) OBJECT_CHECK(ThrottleGroup, (obj), TYPE_THROTTLE_GROUP)
+ #define TYPE_HVF_ACCEL ACCEL_CLASS_NAME("hvf")
  
- const char *throttle_group_get_name(ThrottleGroupMember *tgm);
-diff --git a/block/throttle-groups.c b/block/throttle-groups.c
-index 98fea7fd47..4e28365d8d 100644
---- a/block/throttle-groups.c
-+++ b/block/throttle-groups.c
-@@ -63,7 +63,7 @@ static void timer_cb(ThrottleGroupMember *tgm, bool is_write);
-  * access some other ThrottleGroupMember's timers only after verifying that
-  * that ThrottleGroupMember has throttled requests in the queue.
-  */
--typedef struct ThrottleGroup {
-+struct ThrottleGroup {
-     Object parent_obj;
++typedef struct HVFState HVFState;
+ #define HVF_STATE(obj) \
+     OBJECT_CHECK(HVFState, (obj), TYPE_HVF_ACCEL)
  
-     /* refuse individual property change if initialization is complete */
-@@ -79,7 +79,7 @@ typedef struct ThrottleGroup {
+diff --git a/target/i386/hvf/hvf-i386.h b/target/i386/hvf/hvf-i386.h
+index ef20c73eca..e0edffd077 100644
+--- a/target/i386/hvf/hvf-i386.h
++++ b/target/i386/hvf/hvf-i386.h
+@@ -57,13 +57,13 @@ typedef struct hvf_vcpu_caps {
+     uint64_t vmx_cap_preemption_timer;
+ } hvf_vcpu_caps;
  
-     /* This field is protected by the global QEMU mutex */
-     QTAILQ_ENTRY(ThrottleGroup) list;
--} ThrottleGroup;
+-typedef struct HVFState {
++struct HVFState {
+     AccelState parent;
+     hvf_slot slots[32];
+     int num_slots;
+ 
+     hvf_vcpu_caps *hvf_caps;
+-} HVFState;
 +};
+ extern HVFState *hvf_state;
  
- /* This is protected by the global QEMU mutex */
- static QTAILQ_HEAD(, ThrottleGroup) throttle_groups =
+ void hvf_set_phys_mem(MemoryRegionSection *, bool);
 -- 
 2.26.2
 
