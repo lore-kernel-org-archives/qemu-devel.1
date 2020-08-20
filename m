@@ -2,91 +2,95 @@ Return-Path: <SRS0=Dndf=B6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-6.4 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31FD1C433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 18:01:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C389C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 18:05:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ED4A920758
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 18:01:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1446320758
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 18:05:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XEXntaTa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED4A920758
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="vMFpZnnz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1446320758
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51636 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55076 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8osZ-00044X-8Y
-	for qemu-devel@archiver.kernel.org; Thu, 20 Aug 2020 14:01:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52494)
+	id 1k8ow7-0005jZ-1l
+	for qemu-devel@archiver.kernel.org; Thu, 20 Aug 2020 14:05:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53836)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1k8orn-0003W9-U7
- for qemu-devel@nongnu.org; Thu, 20 Aug 2020 14:00:47 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:29698
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1k8orj-0006JP-Eg
- for qemu-devel@nongnu.org; Thu, 20 Aug 2020 14:00:47 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597946442;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=1mVxrYNgd91tKatTsURrrq66rRuEmz+i4zeKFTzuuaM=;
- b=XEXntaTai8QuRvITawUz2x/0CZ/Y+Rfw/MI1HF8VJ7OYtfz5k+cW+8nqAR1c8NJjdMf35r
- NKqqRBoa8q0Hc/RZgIAvJu9TOSTpF6csGWOOLXznjK8EYmsObMwXRebmCp1h+sXUOMG4Y0
- FZtDJE7WJk1Bbr6SsF93Tk6g+pbS97o=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-396-ByBtxYltOVWLbRBL5Q1nZA-1; Thu, 20 Aug 2020 14:00:38 -0400
-X-MC-Unique: ByBtxYltOVWLbRBL5Q1nZA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 10356107464D;
- Thu, 20 Aug 2020 18:00:37 +0000 (UTC)
-Received: from work-vm (ovpn-114-2.ams2.redhat.com [10.36.114.2])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 38CF5619B5;
- Thu, 20 Aug 2020 18:00:35 +0000 (UTC)
-Date: Thu, 20 Aug 2020 19:00:32 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Eric Blake <eblake@redhat.com>
-Subject: Re: [PATCH v3 10/10] migration/dirtyrate: Implement
- qmp_cal_dirty_rate()/qmp_get_dirty_rate() function
-Message-ID: <20200820180032.GS2664@work-vm>
-References: <1597634433-18809-1-git-send-email-zhengchuan@huawei.com>
- <1597634433-18809-11-git-send-email-zhengchuan@huawei.com>
- <81958147-04dc-5edf-7bd4-97c3ebc3a037@redhat.com>
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1k8ovS-0005FK-PO; Thu, 20 Aug 2020 14:04:34 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:56266)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1k8ovQ-0006md-Sk; Thu, 20 Aug 2020 14:04:34 -0400
+Received: by mail-wm1-x343.google.com with SMTP id 9so2512594wmj.5;
+ Thu, 20 Aug 2020 11:04:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:references:cc:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=WJ3qcV357N/eYozDtF6/HSPKNKpo/fz9ueYEXIqvI84=;
+ b=vMFpZnnz2yVsklpdcCXHFJDhe2LYR+q8exXwRBxX2UsFzPo4N7cXVFPUs0WGBtzkX1
+ ygiPx0BeYxB49O78h94gon9TxwmE8pU7eZyx7df11RzWVf24MA3NmIaJQbNO8dqif0OY
+ BrWrAoD/5WVbeo4lLyy2bPd2pMvHrCg3Ink1ZdCEGr4HSevGfbqq+zPP5Aih1DujvhVp
+ z9YSJOQvkv3ty6JHl1QtVr6Gli7rGePzKtRC8aLxmn62HE1R+iHMZTzbSLFqYSQb+4TS
+ G1Th03jPmLBVZA+9th6N8fWORliu3/Jr30MUnCLM2sd63Nf5eXPIGQ9W6aVpOWFQPsbr
+ cteA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:references:cc:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=WJ3qcV357N/eYozDtF6/HSPKNKpo/fz9ueYEXIqvI84=;
+ b=cW0lZzjQsQB1rHuu6QsM8J8cGcHRQ6ClLbRQDWMNexpe6+jEguMUIZwQpolU1XitRm
+ D2NlhYqXQmyGW5zDha3fULZUVd1rP339JmH0vCxfi+eArxOwZiYao/QCO4yr6i+koM9M
+ zRteIWpbkjLeTloGfZw7iVJN6Uubt1zhy1BNNVPckcbtESBuiE579XABY2Emot7WIk5f
+ qS5CvBIlrfgSIGJDOFxMNemD50+5N8jCCwAtQ4qrrLP8l/R7w535qSWsgd1T4lgkf1m2
+ s84Drnz3AIgX5qBhBerMe+DzyHvbJYyrB6DgmHydKk52fQeE5r1hCyu25rglBwHKft2T
+ AEkQ==
+X-Gm-Message-State: AOAM5308VJONi7PFlOvwoOg6Y6byDYZ8Qkhdzk81Hyxzp58paXSviATq
+ 7wyydroHEeBT13yrqShGCkHpsGLC53Y=
+X-Google-Smtp-Source: ABdhPJzTVGjS7Hiu8vrrwplYo4Bnj4yL7MnPrs1g3tmwHCdtd/3I5RoEDEfGHEnECKwawYRLzAunpw==
+X-Received: by 2002:a1c:9a81:: with SMTP id c123mr38628wme.46.1597946670792;
+ Thu, 20 Aug 2020 11:04:30 -0700 (PDT)
+Received: from [192.168.1.36] (121.red-81-40-121.staticip.rima-tde.net.
+ [81.40.121.121])
+ by smtp.gmail.com with ESMTPSA id b129sm5403909wmb.29.2020.08.20.11.04.29
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 20 Aug 2020 11:04:29 -0700 (PDT)
+Subject: Re: [PATCH v2 0/3] hw/sd: Add Cadence SDHCI emulation
+To: qemu-devel@nongnu.org, Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
+References: <1597658633-12802-1-git-send-email-bin.meng@windriver.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <d57faf7d-3cfa-55ac-649b-59ca06dd11a8@amsat.org>
+Date: Thu, 20 Aug 2020 20:04:28 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <81958147-04dc-5edf-7bd4-97c3ebc3a037@redhat.com>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=dgilbert@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/20 03:03:34
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <1597658633-12802-1-git-send-email-bin.meng@windriver.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::343;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x343.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,94 +103,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alex.chen@huawei.com, zhang.zhanghailiang@huawei.com, quintela@redhat.com,
- linyilu@huawei.com, qemu-devel@nongnu.org, Chuan Zheng <zhengchuan@huawei.com>,
- ann.zhuangyanying@huawei.com, fangying1@huawei.com
+Cc: Bin Meng <bmeng.cn@gmail.com>, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Eric Blake (eblake@redhat.com) wrote:
-> On 8/16/20 10:20 PM, Chuan Zheng wrote:
-> > Implement qmp_cal_dirty_rate()/qmp_get_dirty_rate() function which could be called
-> > 
-> > Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
-> > ---
-> 
-> > +++ b/qapi/migration.json
-> > @@ -1621,3 +1621,45 @@
-> >   ##
-> >   { 'event': 'UNPLUG_PRIMARY',
-> >     'data': { 'device-id': 'str' } }
-> > +
-> > +##
-> > +# @DirtyRateInfo:
-> > +#
-> > +# Information about current dirty page rate of vm.
-> > +#
-> > +# @dirty-rate: @dirtyrate describing the dirty page rate of vm
-> > +#          in units of MB/s.
-> > +#          If this field return '-1', it means querying is not
-> > +#          start or not complete.
-> > +#
-> > +# @status: @status containing dirtyrate query status includes
-> > +#       status with 'not start measuring' or
-> > +#       'Still measuring' or 'measured'(since 5.2)
-> 
-> Missing space before (
-> 
-> > +##
-> > +{ 'struct': 'DirtyRateInfo',
-> > +  'data': {'dirty-rate': 'int64',
-> > +           'status': 'str'} }
-> 
-> Based on your description, this should be an enum type rather than an
-> open-coded string.  Something like:
-> 
-> { 'enum': 'DirtyRateStatus', 'data': [ 'unstarted', 'measuring', 'measured'
-> ] }
-> { 'struct': 'DirtyRateInfo', 'data': { 'dirty-rate': 'int64', 'status':
-> 'DirtyRateStatus' } }
+Hi Sai Pavan, you said you were interested to test the first 2
+patches. FYI I plan to queue them and send the pull request tomorrow
+or Saturday the latest.
 
-Yes, and if you do that I think you'll find qmp would automatically
-define a C enum type for you, so you don't need to define the
-CalculatingDirtyRateStage yourself;   see how MigrationStatus works.
-
-Dave
-
-
+On 8/17/20 12:03 PM, Bin Meng wrote:
+> This series is spun off from the following series as it is hw/sd
+> centric, so that it can be picked up separately by Philippe.
 > 
-> > +
-> > +##
-> > +# @calc-dirty-rate:
-> > +#
-> > +# start calculating dirty page rate for vm
-> > +#
-> > +# @calc-time: time in units of second for sample dirty pages
-> > +#
-> > +# Since: 5.2
-> > +#
-> > +# Example:
-> > +#   {"command": "cal-dirty-rate", "data": {"calc-time": 1} }
-> > +#
-> > +##
-> > +{ 'command': 'calc-dirty-rate', 'data': {'calc-time': 'int64'} }
-> > +
-> > +##
-> > +# @query-dirty-rate:
-> > +#
-> > +# query dirty page rate in units of MB/s for vm
-> > +#
-> > +# Since: 5.2
-> > +##
-> > +{ 'command': 'query-dirty-rate', 'returns': 'DirtyRateInfo' }
-> > 
+> http://patchwork.ozlabs.org/project/qemu-devel/list/?series=195648
 > 
-> -- 
-> Eric Blake, Principal Software Engineer
-> Red Hat, Inc.           +1-919-301-3226
-> Virtualization:  qemu.org | libvirt.org
--- 
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-
+> This series fixed 2 SD card issues, and added a new model for
+> Cadence SDHCI controller.
+> 
+> Patch "[09/18] hw/sd: sdhci: Make sdhci_poweron_reset() internal visible"
+> in this series per the review comments.
+> 
+> Changes in v2:
+> - remove the pointless zero initialization
+> - fix SDSC size check in sd_set_csd() too
+> - use 's' for the model state
+> - call device_cold_reset() in cadence_sdhci_reset()
+> - add .impl in cadence_sdhci_ops
+> - move Cadence specific register defines to cadence_sdhci.c
+> - use 'sdhci' instead of 'slot' to represent SDHCIState
+> - use sysbus_mmio_get_region() to access SDHCI model's memory region
+> - initialize TYPE_SYSBUS_SDHCI in the instance_init() so that users
+>   of Cadence SDHCI do not have to do that themselves
+> - propergate irq and 'sd-bus' from generic-sdhci
+> 
+> Bin Meng (3):
+>   hw/sd: sd: Fix incorrect populated function switch status data
+>     structure
+>   hw/sd: sd: Correct the maximum size of a Standard Capacity SD Memory
+>     Card
+>   hw/sd: Add Cadence SDHCI emulation
+> 
+>  hw/sd/Kconfig                 |   4 +
+>  hw/sd/Makefile.objs           |   1 +
+>  hw/sd/cadence_sdhci.c         | 200 ++++++++++++++++++++++++++++++++++++++++++
+>  hw/sd/sd.c                    |   9 +-
+>  include/hw/sd/cadence_sdhci.h |  46 ++++++++++
+>  5 files changed, 257 insertions(+), 3 deletions(-)
+>  create mode 100644 hw/sd/cadence_sdhci.c
+>  create mode 100644 include/hw/sd/cadence_sdhci.h
+> 
 
