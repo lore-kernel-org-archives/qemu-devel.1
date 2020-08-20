@@ -2,65 +2,71 @@ Return-Path: <SRS0=Dndf=B6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.4 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.4 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B989EC433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 11:28:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4997FC433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 11:44:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 73C8E207BB
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 11:28:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0FEE32054F
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 11:44:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aXAFcC4h"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 73C8E207BB
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g1u703lK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0FEE32054F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50494 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53782 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8ikE-0000E9-My
-	for qemu-devel@archiver.kernel.org; Thu, 20 Aug 2020 07:28:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60956)
+	id 1k8izi-0002V2-89
+	for qemu-devel@archiver.kernel.org; Thu, 20 Aug 2020 07:44:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35506)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1k8ijc-0008A9-G7
- for qemu-devel@nongnu.org; Thu, 20 Aug 2020 07:27:56 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:39178
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1k8izA-00020K-SI
+ for qemu-devel@nongnu.org; Thu, 20 Aug 2020 07:44:00 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:54978
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1k8ijZ-0002PP-1A
- for qemu-devel@nongnu.org; Thu, 20 Aug 2020 07:27:56 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1k8iz8-0003xh-CY
+ for qemu-devel@nongnu.org; Thu, 20 Aug 2020 07:44:00 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597922871;
+ s=mimecast20190719; t=1597923836;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=o3zKn/Z3Y3biHcffQnGwKJiQeRJA/o3vMTK10U8STHc=;
- b=aXAFcC4hLrRD4HIkPB7FS5A1JcDK9W/ZS3ZSDOZiXad2+Q9isA5oQrLaU97KEbBt5BHdAd
- Apcuk8PyPXmUn21dqgW9l0adrBRwJT2QAbOKB5jDd1sClN10cnzXzm8NXQ5uuWpi+g91K5
- 8fF5YQycTME0kGIka8fnm4AH5dV3+kM=
+ bh=zIMxa/krUz8APclTTJ8AIGIyYGRX8zIYy6yc1EchuMI=;
+ b=g1u703lKmzD7aV9cYdktVz+6RxjLwbVHBJcdF+jKbB1FDTcXjOHbQkh5ZNstMsFSuodjgp
+ ZFKgzEPF2K4nCP+leU9cvHjDfgDsdGrsiDJWraCzcJvUb9Vc6KRoFa6e9bHQt1vTzgwZ52
+ t2EQ3IRQiNVrbOXC8PkxlPjlijYI2k4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-440-6e80s9yWMZiw9VfJXYy_IA-1; Thu, 20 Aug 2020 07:27:47 -0400
-X-MC-Unique: 6e80s9yWMZiw9VfJXYy_IA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-75-tCSHQboRPIKLH0lW4o0bhQ-1; Thu, 20 Aug 2020 07:43:54 -0400
+X-MC-Unique: tCSHQboRPIKLH0lW4o0bhQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D8883427C0;
- Thu, 20 Aug 2020 11:27:46 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 26C648030C0;
+ Thu, 20 Aug 2020 11:43:53 +0000 (UTC)
 Received: from dresden.str.redhat.com (ovpn-113-133.ams2.redhat.com
  [10.36.113.133])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E2C382B3AE;
- Thu, 20 Aug 2020 11:27:43 +0000 (UTC)
-Subject: Re: [PATCH v7 35/47] commit: Deal with filters
-To: Kevin Wolf <kwolf@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 288C67B8F4;
+ Thu, 20 Aug 2020 11:43:51 +0000 (UTC)
+Subject: Re: [PATCH v7 14/47] stream: Deal with filters
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Kevin Wolf <kwolf@redhat.com>
 References: <20200625152215.941773-1-mreitz@redhat.com>
- <20200625152215.941773-36-mreitz@redhat.com>
- <20200819175106.GI10272@linux.fritz.box>
+ <20200625152215.941773-15-mreitz@redhat.com>
+ <20200818142851.GD6865@linux.fritz.box>
+ <59fe8d64-b073-aeff-1afb-b526e9a085f1@redhat.com>
+ <20200819151625.GF10272@linux.fritz.box>
+ <d3ba4a10-9abb-742b-9a5f-33282f9f9fc2@redhat.com>
+ <e424496d-cf18-c19b-3418-7c50bd58c8df@redhat.com>
+ <e543223d-0110-a846-db45-d0a5982a3699@virtuozzo.com>
 From: Max Reitz <mreitz@redhat.com>
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
@@ -86,23 +92,23 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <fe136446-ac29-67de-faf4-125145970fd1@redhat.com>
-Date: Thu, 20 Aug 2020 13:27:42 +0200
+Message-ID: <707f0e00-f1ec-a5d6-87ce-972db7f06d77@redhat.com>
+Date: Thu, 20 Aug 2020 13:43:50 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200819175106.GI10272@linux.fritz.box>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <e543223d-0110-a846-db45-d0a5982a3699@virtuozzo.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
-X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Spam-Score: 0.0
 X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="u4MXeACpouXnAasSCTtyu5NgE1qFiALGj"
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=mreitz@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/20 03:03:32
+ boundary="Pr1feb8hSSOmjn87yFZut3ZFOxO5FI6mE"
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/19 20:12:44
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
@@ -110,7 +116,7 @@ X-Spam_bar: ----
 X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -123,344 +129,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---u4MXeACpouXnAasSCTtyu5NgE1qFiALGj
-Content-Type: multipart/mixed; boundary="I1IcYJnqFtqpIbYtvasdGRfy5PrPBAva9"
+--Pr1feb8hSSOmjn87yFZut3ZFOxO5FI6mE
+Content-Type: multipart/mixed; boundary="410qqB5IwFluG6QTsgQVgUZkm4Lw95FUJ"
 
---I1IcYJnqFtqpIbYtvasdGRfy5PrPBAva9
+--410qqB5IwFluG6QTsgQVgUZkm4Lw95FUJ
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 19.08.20 19:58, Kevin Wolf wrote:
-> Am 25.06.2020 um 17:22 hat Max Reitz geschrieben:
->> This includes some permission limiting (for example, we only need to
->> take the RESIZE permission if the base is smaller than the top).
+On 20.08.20 12:49, Vladimir Sementsov-Ogievskiy wrote:
+> 20.08.2020 12:22, Max Reitz wrote:
+>> On 20.08.20 10:31, Max Reitz wrote:
 >>
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->> ---
->>  block/block-backend.c          |  9 +++-
->>  block/commit.c                 | 96 +++++++++++++++++++++++++---------
->>  block/monitor/block-hmp-cmds.c |  2 +-
->>  blockdev.c                     |  4 +-
->>  4 files changed, 81 insertions(+), 30 deletions(-)
+>> [...]
 >>
->> diff --git a/block/block-backend.c b/block/block-backend.c
->> index 6936b25c83..7f2c7dbccc 100644
->> --- a/block/block-backend.c
->> +++ b/block/block-backend.c
->> @@ -2271,8 +2271,13 @@ int blk_commit_all(void)
->>          AioContext *aio_context =3D blk_get_aio_context(blk);
->> =20
->>          aio_context_acquire(aio_context);
->> -        if (blk_is_inserted(blk) && blk->root->bs->backing) {
->> -            int ret =3D bdrv_commit(blk->root->bs);
+>>> So all in all, I believe the biggest surprise about what=E2=80=99s writ=
+ten into
+>>> the top layer isn=E2=80=99t that it may be a json:{} filename, but the =
+filename
+>>> of a node that maybe doesn=E2=80=99t even exist anymore?=C2=A0 (Oh, no,=
+ please don=E2=80=99t
+>>> tell me you can delete it and get an invalid pointer read...)
+>>
+>> (I tried triggering that, but, oh, it=E2=80=99s strdup=E2=80=99ed() in s=
+tream_start().
+>> I=E2=80=99m a bit daft.)
+>>
 >=20
-> The old code didn't try to commit nodes that don't have a backing file.
 >=20
->> +        if (blk_is_inserted(blk)) {
->> +            BlockDriverState *non_filter;
->> +            int ret;
->> +
->> +            /* Legacy function, so skip implicit filters */
->> +            non_filter =3D bdrv_skip_implicit_filters(blk->root->bs);
->> +            ret =3D bdrv_commit(non_filter);
->=20
-> The new one tries unconditionally. For nodes without a backing file,
-> bdrv_commit() will return -ENOTSUP, so the whole function fails.
+> If it's broken anyway, probably we can just revert c624b015bf and start
+> to freeze base again?
 
-:(
+Well, it=E2=80=99s only broken if you care about the backing filename strin=
+g
+that=E2=80=99s written to @top.  So it isn=E2=80=99t broken altogether.
 
-Hm.  Should I fix it by checking for
-bdrv_cow_bs(bdrv_skip_implicit_filters())?  Or bdrv_backing_chain_next()
-and change the bdrv_skip_implicit_filters() to a bdrv_skip_filters()?  I
-feel like that would make even more sense.
+Though, well.  If we all agree to just revert it and maybe add a @bottom
+parameter instead, then I suppose we could do it.
 
-> (First real bug at patch 35. I almost thought I wouldn't find any!)
-
-:)
-
->>              if (ret < 0) {
->>                  aio_context_release(aio_context);
->>                  return ret;
->> diff --git a/block/commit.c b/block/commit.c
->> index 7732d02dfe..4122b6736d 100644
->> --- a/block/commit.c
->> +++ b/block/commit.c
->> @@ -37,6 +37,7 @@ typedef struct CommitBlockJob {
->>      BlockBackend *top;
->>      BlockBackend *base;
->>      BlockDriverState *base_bs;
->> +    BlockDriverState *base_overlay;
->>      BlockdevOnError on_error;
->>      bool base_read_only;
->>      bool chain_frozen;
->=20
-> Hm, again this mysterious base_overlay. I know that stream introduced it
-> to avoid freezing the link to base, but commit doesn't seem to do that.
->=20
-> Is it to avoid using the block status of filter drivers between
-> base_overlay and base?
-
-Yes.
-
-> If so, I guess that goes back to the question I
-> raised earlier in this series: What is the block status supposed to tell
-> for filter nodes?
-
-Honestly, I would really like to get away without having to answer that
-question in this series.  Intuitively, I feel like falling through to
-the next data-bearing layer is not something most callers want.  But I=E2=
-=80=99d
-rather investigate that question separately from this series (even
-though that likely means we=E2=80=99ll never do it), and just treat it as i=
-t is
-in this series.
-
-> But anyway, in contrast to mirror, commit actually freezes the chain
-> between commit_top_bs and base, so it should be safe at least.
->=20
->> @@ -89,7 +90,7 @@ static void commit_abort(Job *job)
->>       * XXX Can (or should) we somehow keep 'consistent read' blocked ev=
-en
->>       * after the failed/cancelled commit job is gone? If we already wro=
-te
->>       * something to base, the intermediate images aren't valid any more=
-. */
->> -    bdrv_replace_node(s->commit_top_bs, backing_bs(s->commit_top_bs),
->> +    bdrv_replace_node(s->commit_top_bs, s->commit_top_bs->backing->bs,
->>                        &error_abort);
->> =20
->>      bdrv_unref(s->commit_top_bs);
->> @@ -153,7 +154,7 @@ static int coroutine_fn commit_run(Job *job, Error *=
-*errp)
->>              break;
->>          }
->>          /* Copy if allocated above the base */
->> -        ret =3D bdrv_is_allocated_above(blk_bs(s->top), blk_bs(s->base)=
-, false,
->> +        ret =3D bdrv_is_allocated_above(blk_bs(s->top), s->base_overlay=
-, true,
->>                                        offset, COMMIT_BUFFER_SIZE, &n);
->>          copy =3D (ret =3D=3D 1);
->>          trace_commit_one_iteration(s, offset, n, ret);
->> @@ -253,15 +254,35 @@ void commit_start(const char *job_id, BlockDriverS=
-tate *bs,
->>      CommitBlockJob *s;
->>      BlockDriverState *iter;
->>      BlockDriverState *commit_top_bs =3D NULL;
->> +    BlockDriverState *filtered_base;
->>      Error *local_err =3D NULL;
->> +    int64_t base_size, top_size;
->> +    uint64_t perms, iter_shared_perms;
->>      int ret;
->> =20
->>      assert(top !=3D bs);
->> -    if (top =3D=3D base) {
->> +    if (bdrv_skip_filters(top) =3D=3D bdrv_skip_filters(base)) {
->>          error_setg(errp, "Invalid files for merge: top and base are the=
- same");
->>          return;
->>      }
->> =20
->> +    base_size =3D bdrv_getlength(base);
->> +    if (base_size < 0) {
->> +        error_setg_errno(errp, -base_size, "Could not inquire base imag=
-e size");
->> +        return;
->> +    }
->> +
->> +    top_size =3D bdrv_getlength(top);
->> +    if (top_size < 0) {
->> +        error_setg_errno(errp, -top_size, "Could not inquire top image =
-size");
->> +        return;
->> +    }
->> +
->> +    perms =3D BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE;
->> +    if (base_size < top_size) {
->> +        perms |=3D BLK_PERM_RESIZE;
->> +    }
->=20
-> base_perms would indicate which permissions these are (particularly
-> because it's not the next thing that requires permissions, but only used
-> further down the function).
-
-%s/\<perms\>/base_perms/?  Sure.
-
->>      s =3D block_job_create(job_id, &commit_job_driver, NULL, bs, 0, BLK=
-_PERM_ALL,
->>                           speed, creation_flags, NULL, NULL, errp);
->>      if (!s) {
->> @@ -301,17 +322,43 @@ void commit_start(const char *job_id, BlockDriverS=
-tate *bs,
->> =20
->>      s->commit_top_bs =3D commit_top_bs;
->> =20
->> -    /* Block all nodes between top and base, because they will
->> -     * disappear from the chain after this operation. */
->> -    assert(bdrv_chain_contains(top, base));
->> -    for (iter =3D top; iter !=3D base; iter =3D backing_bs(iter)) {
->> -        /* XXX BLK_PERM_WRITE needs to be allowed so we don't block our=
-selves
->> -         * at s->base (if writes are blocked for a node, they are also =
-blocked
->> -         * for its backing file). The other options would be a second f=
-ilter
->> -         * driver above s->base. */
->> +    /*
->> +     * Block all nodes between top and base, because they will
->> +     * disappear from the chain after this operation.
->> +     * Note that this assumes that the user is fine with removing all
->> +     * nodes (including R/W filters) between top and base.  Assuring
->> +     * this is the responsibility of the interface (i.e. whoever calls
->> +     * commit_start()).
->> +     */
->> +    s->base_overlay =3D bdrv_find_overlay(top, base);
->> +    assert(s->base_overlay);
->> +
->> +    /*
->> +     * The topmost node with
->> +     * bdrv_skip_filters(filtered_base) =3D=3D bdrv_skip_filters(base)
->> +     */
->> +    filtered_base =3D bdrv_cow_bs(s->base_overlay);
->> +    assert(bdrv_skip_filters(filtered_base) =3D=3D bdrv_skip_filters(ba=
-se));
->> +
->> +    /*
->> +     * XXX BLK_PERM_WRITE needs to be allowed so we don't block ourselv=
-es
->> +     * at s->base (if writes are blocked for a node, they are also bloc=
-ked
->> +     * for its backing file). The other options would be a second filte=
-r
->> +     * driver above s->base.
->> +     */
->> +    iter_shared_perms =3D BLK_PERM_WRITE_UNCHANGED | BLK_PERM_WRITE;
->> +
->> +    for (iter =3D top; iter !=3D base; iter =3D bdrv_filter_or_cow_bs(i=
-ter)) {
->> +        if (iter =3D=3D filtered_base) {
->> +            /*
->> +             * From here on, all nodes are filters on the base.  This
->> +             * allows us to share BLK_PERM_CONSISTENT_READ.
->> +             */
->> +            iter_shared_perms |=3D BLK_PERM_CONSISTENT_READ;
->> +        }
->> +
->>          ret =3D block_job_add_bdrv(&s->common, "intermediate node", ite=
-r, 0,
->> -                                 BLK_PERM_WRITE_UNCHANGED | BLK_PERM_WR=
-ITE,
->> -                                 errp);
->> +                                 iter_shared_perms, errp);
->>          if (ret < 0) {
->>              goto fail;
->>          }
->> @@ -328,9 +375,7 @@ void commit_start(const char *job_id, BlockDriverSta=
-te *bs,
->>      }
->> =20
->>      s->base =3D blk_new(s->common.job.aio_context,
->> -                      BLK_PERM_CONSISTENT_READ
->> -                      | BLK_PERM_WRITE
->> -                      | BLK_PERM_RESIZE,
->> +                      perms,
->>                        BLK_PERM_CONSISTENT_READ
->>                        | BLK_PERM_GRAPH_MOD
->>                        | BLK_PERM_WRITE_UNCHANGED);
->> @@ -398,19 +443,22 @@ int bdrv_commit(BlockDriverState *bs)
->>      if (!drv)
->>          return -ENOMEDIUM;
->> =20
->> -    if (!bs->backing) {
->> +    backing_file_bs =3D bdrv_cow_bs(bs);
->> +
->> +    if (!backing_file_bs) {
->>          return -ENOTSUP;
->>      }
->> =20
->>      if (bdrv_op_is_blocked(bs, BLOCK_OP_TYPE_COMMIT_SOURCE, NULL) ||
->> -        bdrv_op_is_blocked(bs->backing->bs, BLOCK_OP_TYPE_COMMIT_TARGET=
-, NULL)) {
->> +        bdrv_op_is_blocked(backing_file_bs, BLOCK_OP_TYPE_COMMIT_TARGET=
-, NULL))
->> +    {
->>          return -EBUSY;
->>      }
->> =20
->> -    ro =3D bs->backing->bs->read_only;
->> +    ro =3D backing_file_bs->read_only;
->> =20
->>      if (ro) {
->> -        if (bdrv_reopen_set_read_only(bs->backing->bs, false, NULL)) {
->> +        if (bdrv_reopen_set_read_only(backing_file_bs, false, NULL)) {
->>              return -EACCES;
->>          }
->>      }
->> @@ -428,8 +476,6 @@ int bdrv_commit(BlockDriverState *bs)
->>      }
->> =20
->>      /* Insert commit_top block node above backing, so we can write to i=
-t */
->> -    backing_file_bs =3D backing_bs(bs);
->> -
->>      commit_top_bs =3D bdrv_new_open_driver(&bdrv_commit_top, NULL, BDRV=
-_O_RDWR,
->>                                           &local_err);
->>      if (commit_top_bs =3D=3D NULL) {
->> @@ -515,15 +561,13 @@ ro_cleanup:
->>      qemu_vfree(buf);
->> =20
->>      blk_unref(backing);
->> -    if (backing_file_bs) {
->> -        bdrv_set_backing_hd(bs, backing_file_bs, &error_abort);
->> -    }
->> +    bdrv_set_backing_hd(bs, backing_file_bs, &error_abort);
->=20
-> This means that bdrv_set_backing_hd() is now called to undo a change
-> that hasn't even been made yet. This fails (with &error_abort) if the
-> backing chain is frozen.
->=20
-> On the other hand, the other bdrv_set_backing_hd() calls in the same
-> function would fail the same way.
-
-True. :)
-
-Still, maybe there=E2=80=99s an op blocker from a concurrent job, so we go =
-to
-the failure path and then we=E2=80=99d abort here.  So better to guard it b=
-y
-checking whether bdrv_cow_bs(bs) !=3D backing_file_bs.
+(Maybe in a follow-up, though.)
 
 Max
 
 
---I1IcYJnqFtqpIbYtvasdGRfy5PrPBAva9--
+--410qqB5IwFluG6QTsgQVgUZkm4Lw95FUJ--
 
---u4MXeACpouXnAasSCTtyu5NgE1qFiALGj
+--Pr1feb8hSSOmjn87yFZut3ZFOxO5FI6mE
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl8+Xi4ACgkQ9AfbAGHV
-z0AdbQgAh58/Nup3mT67CqYFfo2jT2sRm4uis1hzYsw1jYcddKFEUWeOVTZ66TDV
-meay0QbyIiDAWgyRCSrqAXAPlP3uboVGRYlWlVtm4T926vW3vI2Wy3sI1w5Ragy5
-yon2AghiJfmfMvp9zWslPKHnhw6K+wvHscJ5GPBTxux/ztFoQPpHuGpMH+rl75L3
-Uhp4G/wCx6ZpvYnMZ01YQE+9rxmT7aa41Z1WqfjXNnUZGNcB1AbcJU2eK02WVDSJ
-4IzGdT0R8pLHbdUm3EGzB7ESIrZN54YJD8iuGhzA+KzEDBHMWwHg0oh524QhLqNj
-KhLJOPoSlVEq+h7T2LcoJBN8Wr8mhQ==
-=8XvR
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl8+YfYACgkQ9AfbAGHV
+z0BTugf/WkxLaujCZStFIMTvDA4OuLVIOqRqBw6fcpV+qBbJYQpqbkpGc8Yarjp5
+6uY1Fl9sRwIHAmYsk8ZUbz6sOdHdvhtS4B0q8b+EHHtpVpXn8/IhuOgcA/pkQWjs
+2pr0yonbxJ2HWRtkjCpVeeTrOgXhGlmYAP8SuByNal7vxsc0YJg+TjGh1t3iCP3q
+puxERlyHh3clr11x+nhAoVp7yfjZD+sjdoIJ/RZKQ22dIQrL37BaRGXb29JPbQ85
+rG0kahp21LoMr22jNQikAlacYSnlaie3Y8CPkfhHXuY6Ju9gSoz0cUetwTDE2ShY
+dvRvaTw5oFrJGhtsjq3m5ROKvQlw1w==
+=YrMl
 -----END PGP SIGNATURE-----
 
---u4MXeACpouXnAasSCTtyu5NgE1qFiALGj--
+--Pr1feb8hSSOmjn87yFZut3ZFOxO5FI6mE--
 
 
