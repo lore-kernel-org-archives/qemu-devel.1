@@ -2,116 +2,84 @@ Return-Path: <SRS0=Dndf=B6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACED3C433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 05:17:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F420C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 05:19:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 68ADC20786
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 05:17:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0DCEB20786
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 05:19:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JHjokFZH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 68ADC20786
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b="vOkuBhhz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0DCEB20786
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vayavyalabs.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35188 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37312 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8cwr-0003m7-JA
-	for qemu-devel@archiver.kernel.org; Thu, 20 Aug 2020 01:17:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41238)
+	id 1k8cyw-0004iK-Br
+	for qemu-devel@archiver.kernel.org; Thu, 20 Aug 2020 01:19:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41488)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <smooney@redhat.com>)
- id 1k8cwJ-0003N9-Gc
- for qemu-devel@nongnu.org; Thu, 20 Aug 2020 01:16:39 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:46338
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <smooney@redhat.com>)
- id 1k8cwG-0007k6-Bz
- for qemu-devel@nongnu.org; Thu, 20 Aug 2020 01:16:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597900594;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=1YBmMlDK08ygRLxBOtV4fn8Ya8+7txjXr1BlgEUxCss=;
- b=JHjokFZHYKQzd5z9qp/gu/ZdXLflKomFftXolJ9rSMZa6mZV7dAizgb83ObMvebEggMQAJ
- oF7ikEudiSbfs8PMUWpZw1B49OiyWMZWLKd9AdXEvS1rYJETynrQUiJDMw6xv6bg5Zi4gx
- J/VfefTzWcKAH1MfRKRC5QFC4zHw4g4=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-161-PM0W59DFPKeLZ0eCd4Fm9A-1; Thu, 20 Aug 2020 01:16:33 -0400
-X-MC-Unique: PM0W59DFPKeLZ0eCd4Fm9A-1
-Received: by mail-ej1-f70.google.com with SMTP id bx27so416522ejc.15
- for <qemu-devel@nongnu.org>; Wed, 19 Aug 2020 22:16:32 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <pratikp@vayavyalabs.com>)
+ id 1k8cyO-0004HD-Mb
+ for qemu-devel@nongnu.org; Thu, 20 Aug 2020 01:18:48 -0400
+Received: from mail-wr1-x431.google.com ([2a00:1450:4864:20::431]:44686)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <pratikp@vayavyalabs.com>)
+ id 1k8cyM-0007pp-SW
+ for qemu-devel@nongnu.org; Thu, 20 Aug 2020 01:18:48 -0400
+Received: by mail-wr1-x431.google.com with SMTP id c15so792286wrs.11
+ for <qemu-devel@nongnu.org>; Wed, 19 Aug 2020 22:18:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=vayavyalabs.com; s=vayavyalabs;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=25tPtt/gVQ47Ga9gAtoJUMCZH2ldWNAc7vglM8q5qL0=;
+ b=vOkuBhhzYOODKUqQmTYFWi4F3IFfm+7S5x09HbpDnf0YMF6mMyEr+/wETZlZy9I5Rz
+ cLJPosmNeaZUgyJEV0zmakNEwQuDIC8A63ZllZ/szbplpVS9FIT4n3w9XVDfk67ZuTga
+ 0qxrgmM9IxVL5MCz6mFFTbJLIap78k1IBdDNM=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=1YBmMlDK08ygRLxBOtV4fn8Ya8+7txjXr1BlgEUxCss=;
- b=pSipZccnthi9G58Tg1LuLXUncNZxJszzNgi/Z4chXUwAdWyp9Sk442Xo7ymxqBUJns
- wfKfLGKFGAWsXEPUVEPc50BZZDzhY4QGn8Xyaoc1LXSXfpiRiuDgXorczvOgREWQDBgo
- ux2Fx95ess0P9PUz4z6Y/U5hc7gbTlxfJAgvMjKSJMVmCoOLzzB3+XQKZEHvCvIRWIxC
- SZEZBqf4twDEDBMqATNUGtM/DtpHCUmRPapOqdAo9MryLUvbW2Yfye7Fxpf6N0pu8F22
- kzUxX9ipDuLHV1IZgqWv294YpJFLbLAZrEnzVxc5EMNJto7ojqhs4FLopbOD7rQP5Cp8
- 6CKw==
-X-Gm-Message-State: AOAM532dh/wFc0i/AyvQUVHSm/Xe+7eTC9Elz/BBnzOUxCcYtffUp2DH
- mWj1DGxJxju7+MeTCyQT+NBdFqJLZ9gfQDhg55xmYIAnUPWd0Q2mkKx3fBFq90TZlV/NlHG8rPo
- 3M1BYTgp9gSg96TI=
-X-Received: by 2002:a17:906:960a:: with SMTP id
- s10mr1623662ejx.60.1597900591861; 
- Wed, 19 Aug 2020 22:16:31 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxLVGyxG1fhJkbUY7K9ahB2oumCnCBxXdHKmSC3so6VH3GxguXSWKeiO37z2o8foD+A/q4xmQ==
-X-Received: by 2002:a17:906:960a:: with SMTP id
- s10mr1623641ejx.60.1597900591553; 
- Wed, 19 Aug 2020 22:16:31 -0700 (PDT)
-Received: from pop-os ([51.37.51.98])
- by smtp.gmail.com with ESMTPSA id bd13sm602373edb.38.2020.08.19.22.16.29
- (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
- Wed, 19 Aug 2020 22:16:30 -0700 (PDT)
-Message-ID: <da140e6d262632e2fb707f69f220915748d25d35.camel@redhat.com>
-Subject: Re: device compatibility interface for live migration with assigned
- devices
-From: Sean Mooney <smooney@redhat.com>
-To: Yan Zhao <yan.y.zhao@intel.com>
-Date: Thu, 20 Aug 2020 06:16:28 +0100
-In-Reply-To: <20200820040116.GB24121@joy-OptiPlex-7040>
-References: <20200810074631.GA29059@joy-OptiPlex-7040>
- <e6e75807-0614-bd75-aeb6-64d643e029d3@redhat.com>
- <20200814051601.GD15344@joy-OptiPlex-7040>
- <a51209fe-a8c6-941f-ff54-7be06d73bc44@redhat.com>
- <20200818085527.GB20215@redhat.com>
- <3a073222-dcfe-c02d-198b-29f6a507b2e1@redhat.com>
- <20200818091628.GC20215@redhat.com>
- <20200818113652.5d81a392.cohuck@redhat.com>
- <20200820003922.GE21172@joy-OptiPlex-7040>
- <242591bb809b68c618f62fdc93d4f8ae7b146b6d.camel@redhat.com>
- <20200820040116.GB24121@joy-OptiPlex-7040>
-X-Mailer: Evolution 3.28.5-0ubuntu0.18.04.2
-Mime-Version: 1.0
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=smooney@redhat.com
-X-Mimecast-Spam-Score: 0.501
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=smooney@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/20 01:16:34
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=25tPtt/gVQ47Ga9gAtoJUMCZH2ldWNAc7vglM8q5qL0=;
+ b=LpdF4wiaWFrvgQd5kWxAHoqE5c9Ft9bp8J1ZTzXn4ApVbsCCiDKbc0PP3w3qa1jWF2
+ nN4MF8agYvB97wnzx+b6KqMC6AR5HtjEOkER+uSL43nVFGy6RzMVsgvj10kWpXSBpec0
+ j5OoVFBgqZ+NdAkM7vg2jJ8r8UDjHdnoHRJjyIyXO56r/iaoLGK/WoeUnyUHttDRc7Yf
+ U2kxvSvfnl8mfSWW3RXQA9jhTHqwro8wYK6mgCedMMLFQO/A3a8WCU/Njped0OZfhaGx
+ EQX2U+h6vE1Skjxj4TPXeFZSqZxOyhmNv3lYBhLmGZp1cKrfk1FG0DCTrVVqSddUW0dU
+ JJBA==
+X-Gm-Message-State: AOAM533AWD+7/H3CmitIt8C4qWbpAE7qSqnuwpwG2VkxUeok1r6LPcjk
+ VTv4epXb2pO08g1s+snvy819oSfsL/VLWiltz//N6A==
+X-Google-Smtp-Source: ABdhPJxlbkDUDRmYB49fU1nNm6YDk0Bib2TxczKX/n///BE/8kgEF89BcKRUrP3l3o2HsEy0zIuXwGxaiNZMK8WT0As=
+X-Received: by 2002:a5d:4802:: with SMTP id l2mr1260360wrq.183.1597900724561; 
+ Wed, 19 Aug 2020 22:18:44 -0700 (PDT)
+MIME-Version: 1.0
+References: <CA+aXn+GrFDssmZWBCL0gh3QLX5BMhmgTQUywLSSQn=cpF2P1ZQ@mail.gmail.com>
+ <87r1se3k7m.fsf@linaro.org>
+In-Reply-To: <87r1se3k7m.fsf@linaro.org>
+From: Pratik Parvati <pratikp@vayavyalabs.com>
+Date: Thu, 20 Aug 2020 10:48:32 +0530
+Message-ID: <CA+aXn+FMW=wo93_aQ1waPSAhdgeD8_gxCB0ti1x20JT3G-6ysw@mail.gmail.com>
+Subject: Re: QEMU Library support
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Content-Type: multipart/alternative; boundary="0000000000001303b005ad4841b4"
+Received-SPF: pass client-ip=2a00:1450:4864:20::431;
+ envelope-from=pratikp@vayavyalabs.com; helo=mail-wr1-x431.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, HTML_MESSAGE=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -124,178 +92,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kvm@vger.kernel.org, libvir-list@redhat.com,
- Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, kwankhede@nvidia.com,
- eauger@redhat.com, xin-ran.wang@intel.com, corbet@lwn.net,
- openstack-discuss@lists.openstack.org, shaohe.feng@intel.com,
- kevin.tian@intel.com, Parav Pandit <parav@mellanox.com>,
- jian-feng.ding@intel.com, dgilbert@redhat.com, zhenyuw@linux.intel.com,
- hejie.xu@intel.com, bao.yumeng@zte.com.cn,
- Alex Williamson <alex.williamson@redhat.com>, eskultet@redhat.com,
- intel-gvt-dev@lists.freedesktop.org,
- "Daniel P. =?ISO-8859-1?Q?Berrang=E9?=" <berrange@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>, Jiri Pirko <jiri@mellanox.com>,
- dinechin@redhat.com, devel@ovirt.org
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 2020-08-20 at 12:01 +0800, Yan Zhao wrote:
-> On Thu, Aug 20, 2020 at 02:29:07AM +0100, Sean Mooney wrote:
-> > On Thu, 2020-08-20 at 08:39 +0800, Yan Zhao wrote:
-> > > On Tue, Aug 18, 2020 at 11:36:52AM +0200, Cornelia Huck wrote:
-> > > > On Tue, 18 Aug 2020 10:16:28 +0100
-> > > > Daniel P. Berrangé <berrange@redhat.com> wrote:
-> > > > 
-> > > > > On Tue, Aug 18, 2020 at 05:01:51PM +0800, Jason Wang wrote:
-> > > > > >    On 2020/8/18 下午4:55, Daniel P. Berrangé wrote:
-> > > > > > 
-> > > > > >  On Tue, Aug 18, 2020 at 11:24:30AM +0800, Jason Wang wrote:
-> > > > > > 
-> > > > > >  On 2020/8/14 下午1:16, Yan Zhao wrote:
-> > > > > > 
-> > > > > >  On Thu, Aug 13, 2020 at 12:24:50PM +0800, Jason Wang wrote:
-> > > > > > 
-> > > > > >  On 2020/8/10 下午3:46, Yan Zhao wrote:  
-> > > > > >  we actually can also retrieve the same information through sysfs, .e.g
-> > > > > > 
-> > > > > >  |- [path to device]
-> > > > > >     |--- migration
-> > > > > >     |     |--- self
-> > > > > >     |     |   |---device_api
-> > > > > >     |    |   |---mdev_type
-> > > > > >     |    |   |---software_version
-> > > > > >     |    |   |---device_id
-> > > > > >     |    |   |---aggregator
-> > > > > >     |     |--- compatible
-> > > > > >     |     |   |---device_api
-> > > > > >     |    |   |---mdev_type
-> > > > > >     |    |   |---software_version
-> > > > > >     |    |   |---device_id
-> > > > > >     |    |   |---aggregator
-> > > > > > 
-> > > > > > 
-> > > > > >  Yes but:
-> > > > > > 
-> > > > > >  - You need one file per attribute (one syscall for one attribute)
-> > > > > >  - Attribute is coupled with kobject
-> > > > 
-> > > > Is that really that bad? You have the device with an embedded kobject
-> > > > anyway, and you can just put things into an attribute group?
-> > > > 
-> > > > [Also, I think that self/compatible split in the example makes things
-> > > > needlessly complex. Shouldn't semantic versioning and matching already
-> > > > cover nearly everything? I would expect very few cases that are more
-> > > > complex than that. Maybe the aggregation stuff, but I don't think we
-> > > > need that self/compatible split for that, either.]
-> > > 
-> > > Hi Cornelia,
-> > > 
-> > > The reason I want to declare compatible list of attributes is that
-> > > sometimes it's not a simple 1:1 matching of source attributes and target attributes
-> > > as I demonstrated below,
-> > > source mdev of (mdev_type i915-GVTg_V5_2 + aggregator 1) is compatible to
-> > > target mdev of (mdev_type i915-GVTg_V5_4 + aggregator 2),
-> > >                (mdev_type i915-GVTg_V5_8 + aggregator 4)
-> > 
-> > the way you are doing the nameing is till really confusing by the way
-> > if this has not already been merged in the kernel can you chagne the mdev
-> > so that mdev_type i915-GVTg_V5_2 is 2 of mdev_type i915-GVTg_V5_1 instead of half the device
-> > 
-> > currently you need to deived the aggratod by the number at the end of the mdev type to figure out
-> > how much of the phsicial device is being used with is a very unfridly api convention
-> > 
-> > the way aggrator are being proposed in general is not really someting i like but i thin this at least
-> > is something that should be able to correct.
-> > 
-> > with the complexity in the mdev type name + aggrator i suspect that this will never be support
-> > in openstack nova directly requireing integration via cyborg unless we can pre partion the
-> > device in to mdevs staicaly and just ignore this.
-> > 
-> > this is way to vendor sepecif to integrate into something like openstack in nova unless we can guarentee
-> > taht how aggreator work will be portable across vendors genericly.
-> > 
-> > > 
-> > > and aggragator may be just one of such examples that 1:1 matching does not
-> > > fit.
-> > 
-> > for openstack nova i dont see us support anything beyond the 1:1 case where the mdev type does not change.
-> > 
-> 
-> hi Sean,
-> I understand it's hard for openstack. but 1:N is always meaningful.
-> e.g.
-> if source device 1 has cap A, it is compatible to
-> device 2: cap A,
-> device 3: cap A+B,
-> device 4: cap A+B+C
-> ....
-> to allow openstack to detect it correctly, in compatible list of
-> device 2, we would say compatible cap is A;
-> device 3, compatible cap is A or A+B;
-> device 4, compatible cap is A or A+B, or A+B+C;
-> 
-> then if openstack finds device A's self cap A is contained in compatible
-> cap of device 2/3/4, it can migrate device 1 to device 2,3,4.
-> 
-> conversely,  device 1's compatible cap is only A,
-> so it is able to migrate device 2 to device 1, and it is not able to
-> migrate device 3/4 to device 1.
+--0000000000001303b005ad4841b4
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-yes we build the palcement servce aroudn the idea of capablites as traits on resocue providres.
-which is why i originally asked if we coudl model compatibality with feature flags
+>> Hi team,
+>>
+>> Lately, I have been working on QEMU modeling and interfacing it into the
+>> existing platform. What actually I wanted to check is; whether QEMU
+>> supports library that gives developers a clean interface to develop and
+>> integrate peripheral model in to QEMU. I know of the Greensocs SystemC
+>> bridge - but that was quite difficult to work with in past.
 
-we can seaislyt model deivce as aupport A, A+B or  A+B+C
-and then select hosts and evice based on that but
+> Not really - with a few exceptions like vhost-user and in KVM device
+> emulation all devices are emulated in the QEMU code base. As a result
+> the best way to maintain a device is to have it integrated upstream
+> (along with some tests to ensure it is working).
 
-the list of compatable deivce you are propsoeing hide this feature infomation which whould be what we are matching on.
+> As you note there are various forks of QEMU that support device
+> modelling but none of these features have been merged upstream and would
+> likely need to assuage worries about such interfaces being used to avoid
+> GPL compliance.
 
-give me a lset of feature you want and list ting the feature avaiable on each device allow highre level ocestation to
-easily match the request to a host that can fulllfile it btu thave a set of other compatihble device does not help with
-that
+> What sort of devices are you looking to model? Are these existing
+> devices or experimental/research things?
 
-so if a simple list a capabliteis can be advertiese d and if we know tha two dievce with the same capablity are
-intercahangebale that is workabout i suspect that will not be the case however and it would onely work within a familay
-of mdevs that are closely related.  which i think agian is an argument for not changeing the mdev type and at least
-intially only look at migatreion where the mdev type doee not change initally. 
+Alex, to answer your earlier question, this is only for experimental
+purposes -
+to learn Qemu device modeling API better. I am trying to understand QEMU
+build hierarchy and proceed to see whether I can find any solution out of
+it.
 
-> 
-> Thanks
-> Yan
-> 
-> > i woudl really prefer if there was just one mdev type that repsented the minimal allcatable unit and the
-> > aggragaotr where used to create compostions of that. i.e instad of i915-GVTg_V5_2 beign half the device,
-> > have 1 mdev type i915-GVTg and if the device support 8 of them then we can aggrate 4 of i915-GVTg
-> > 
-> > if you want to have muplie mdev type to model the different amoutn of the resouce e.g. i915-GVTg_small i915-
-> > GVTg_large
-> > that is totlaly fine too or even i915-GVTg_4 indcating it sis 4 of i915-GVTg
-> > 
-> > failing that i would just expose an mdev type per composable resouce and allow us to compose them a the user level
-> > with
-> > some other construct mudeling a attament to the device. e.g. create composed mdev or somethig that is an aggreateion
-> > of
-> > multiple sub resouces each of which is an mdev. so kind of like how bond port work. we would create an mdev for each
-> > of
-> > the sub resouces and then create a bond or aggrated mdev by reference the other mdevs by uuid then attach only the
-> > aggreated mdev to the instance.
-> > 
-> > the current aggrator syntax and sematic however make me rather uncofrotable when i think about orchestating vms on
-> > top
-> > of it even to boot them let alone migrate them.
-> > > 
-> > > So, we explicitly list out self/compatible attributes, and management
-> > > tools only need to check if self attributes is contained compatible
-> > > attributes.
-> > > 
-> > > or do you mean only compatible list is enough, and the management tools
-> > > need to find out self list by themselves?
-> > > But I think provide a self list is easier for management tools.
-> > > 
-> > > Thanks
-> > > Yan
-> > > 
-> 
-> 
+Also - wanted to set right one point. The Greensocs SystemC bridge is
+definitely an option if one wants to integrate device models in SystemC -
+but in my case, I wanted to better understand Qemu internals.
 
+Regards,
+Pratik
+
+
+On Mon, Aug 10, 2020 at 3:18 PM Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
+rote:
+
+>
+> Pratik Parvati <pratikp@vayavyalabs.com> writes:
+>
+> > Hi team,
+> >
+> > Lately, I have been working on QEMU modeling and interfacing it into th=
+e
+> > existing platform. What actually I wanted to check is; whether QEMU
+> > supports library that gives developers a clean interface to develop and
+> > integrate peripheral model in to QEMU. I know of the Greensocs SystemC
+> > bridge - but that was quite difficult to work with in past.
+>
+> Not really - with a few exceptions like vhost-user and in KVM device
+> emulation all devices are emulated in the QEMU code base. As a result
+> the best way to maintain a device is to have it integrated upstream
+> (along with some tests to ensure it is working).
+>
+> As you note there are various forks of QEMU that support device
+> modelling but none of these features have been merged upstream and would
+> likely need to assuage worries about such interfaces being used to avoid
+> GPL compliance.
+>
+> What sort of devices are you looking to model? Are these existing
+> devices or experimental/research things?
+>
+> --
+> Alex Benn=C3=A9e
+>
+
+--0000000000001303b005ad4841b4
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><span class=3D"gmail-im" style=3D"color:rgb(80,0,80)">&gt;=
+&gt; Hi team,<br>&gt;&gt;<br>&gt;&gt; Lately, I have been working on QEMU m=
+odeling and interfacing it into the<br>&gt;&gt; existing platform. What act=
+ually I wanted to check is; whether QEMU<br>&gt;&gt; supports library that =
+gives developers a clean interface to develop and<br>&gt;&gt; integrate per=
+ipheral model in to QEMU. I know of the Greensocs SystemC<br>&gt;&gt; bridg=
+e - but that was quite difficult to work with in past.<br><br></span>&gt; N=
+ot really - with a few exceptions like vhost-user and in KVM device<br>&gt;=
+ emulation all devices are emulated in the QEMU code base. As a result<br>&=
+gt;=C2=A0the best way to maintain a device is to have it integrated upstrea=
+m<br>&gt; (along with some tests to ensure it is working).<br><br>&gt; As y=
+ou note there are various forks of QEMU that support device<br>&gt; modelli=
+ng but none of these features have been merged upstream and would<br>&gt; l=
+ikely need to assuage worries about such interfaces being used to avoid<br>=
+&gt; GPL compliance.<br><br>&gt; What sort of devices are you looking to mo=
+del? Are these existing<br>&gt; devices or experimental/research things?<di=
+v><br></div><div>Alex, to answer your earlier question, this is only for ex=
+perimental purposes -=C2=A0</div><div>to learn Qemu device modeling API bet=
+ter. I am trying to understand QEMU</div><div>build hierarchy and proceed t=
+o see whether I can find any solution out of it.<br><br>Also - wanted to se=
+t right one point. The Greensocs SystemC bridge is=C2=A0</div><div>definite=
+ly an option if one wants to integrate device models in SystemC -=C2=A0</di=
+v><div>but in my case, I wanted to better understand Qemu internals.</div><=
+div><br clear=3D"all"><div><div dir=3D"ltr" class=3D"gmail_signature" data-=
+smartmail=3D"gmail_signature"><div dir=3D"ltr">Regards,<div>Pratik</div></d=
+iv></div></div><br></div></div><br><div class=3D"gmail_quote"><div dir=3D"l=
+tr" class=3D"gmail_attr">On Mon, Aug 10, 2020 at 3:18 PM Alex Benn=C3=A9e &=
+lt;<a href=3D"mailto:alex.bennee@linaro.org">alex.bennee@linaro.org</a>&gt;=
+ wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px =
+0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex"><br>
+Pratik Parvati &lt;<a href=3D"mailto:pratikp@vayavyalabs.com" target=3D"_bl=
+ank">pratikp@vayavyalabs.com</a>&gt; writes:<br>
+<br>
+&gt; Hi team,<br>
+&gt;<br>
+&gt; Lately, I have been working on QEMU modeling and interfacing it into t=
+he<br>
+&gt; existing platform. What actually I wanted to check is; whether QEMU<br=
+>
+&gt; supports library that gives developers a clean interface to develop an=
+d<br>
+&gt; integrate peripheral model in to QEMU. I know of the Greensocs SystemC=
+<br>
+&gt; bridge - but that was quite difficult to work with in past.<br>
+<br>
+Not really - with a few exceptions like vhost-user and in KVM device<br>
+emulation all devices are emulated in the QEMU code base. As a result<br>
+the best way to maintain a device is to have it integrated upstream<br>
+(along with some tests to ensure it is working).<br>
+<br>
+As you note there are various forks of QEMU that support device<br>
+modelling but none of these features have been merged upstream and would<br=
+>
+likely need to assuage worries about such interfaces being used to avoid<br=
+>
+GPL compliance.<br>
+<br>
+What sort of devices are you looking to model? Are these existing<br>
+devices or experimental/research things?<br>
+<br>
+-- <br>
+Alex Benn=C3=A9e<br>
+</blockquote></div>
+
+--0000000000001303b005ad4841b4--
 
