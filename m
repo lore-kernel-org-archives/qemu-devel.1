@@ -2,116 +2,122 @@ Return-Path: <SRS0=Dndf=B6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.4 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0310C433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 13:33:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98B59C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 13:37:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 996E522BED
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 13:33:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 56EAC22B3F
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 13:37:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UsLhV6Z5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 996E522BED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="vHBJSGJh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56EAC22B3F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46436 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51340 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8kgs-0001xP-Rv
-	for qemu-devel@archiver.kernel.org; Thu, 20 Aug 2020 09:33:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37598)
+	id 1k8kkr-0004Nq-HF
+	for qemu-devel@archiver.kernel.org; Thu, 20 Aug 2020 09:37:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38826)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1k8kgC-0001T0-MN
- for qemu-devel@nongnu.org; Thu, 20 Aug 2020 09:32:32 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:55872
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1k8kgA-0002Gq-C8
- for qemu-devel@nongnu.org; Thu, 20 Aug 2020 09:32:32 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597930349;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=vgom4IAJOWKRK+wEDHDeykoc4S/pq1pH6BI5zhC82Ew=;
- b=UsLhV6Z5z2llo83kGPZbB2pBDRBmRVQvPgjHxRPjsQzACJGODqNOHbeFw+wCrA8Vnkr2dg
- yONJFfwluTbn1jLnoYHSV23b574cEwBbKztGKVgVCHVa0RYM2uyGOrhGWHkDBxdx6GPfD5
- snrQ2m+z7nSiR/8V7tySxhtPkzTiOsE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-61-fIQAfHaoOHagwiwaNupAng-1; Thu, 20 Aug 2020 09:32:24 -0400
-X-MC-Unique: fIQAfHaoOHagwiwaNupAng-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2E04E1008316;
- Thu, 20 Aug 2020 13:32:23 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-113-133.ams2.redhat.com
- [10.36.113.133])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2036E1001281;
- Thu, 20 Aug 2020 13:32:20 +0000 (UTC)
-Subject: Re: [PATCH v4 1/4] migration: Add block-bitmap-mapping parameter
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1k8kkE-0003rC-Hy; Thu, 20 Aug 2020 09:36:42 -0400
+Received: from mail-vi1eur05on2133.outbound.protection.outlook.com
+ ([40.107.21.133]:7905 helo=EUR05-VI1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1k8kkB-0002nS-8L; Thu, 20 Aug 2020 09:36:41 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=bqhWvs/c97c1+ul4drSf8ppFcxEc15WqwzGJDMxuQx5AoHz4Ux6ue72Atab0LALm+ro3DifRfmKeTRTRcDTIzDDBRGOr5EFlkyQyVinUF6Xri2exAvPAeJVeL/EoPzJZhestLAEIhnAIG1AQ4l4sH55WacMxV45fFSX8qmZQXzDLBJSNstaK01U8fW/kWNZKCuUwnH0ZhZf/yPK9R1n5AyMfRc4fTDwbCs8g62Wq7YJsERtTjF1w254eGTc6ciWRfUQr/c2yTW0kdDTM9lvwUxNTJ96YD2+bQjhX2hwUnAQrXX2CNd54y7R4cImcharFJNwoJhet5ebjhrFApgaDzg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=5PsWCikARkktDCqkdpo1P8QJXmWX7BUst1qh7bnulWs=;
+ b=LxNhgkr/f5aoeb7HI+AzkQULzA4enAf1oDwU8WMmEuIGcNlxmxuuJjY1gYbIBeZV4BOVFOzAsU7oCTWBCKPTHWYUPW8A3aMYgzQyFfnOlthSGdfc9LKyUxUMUR5jGY9ZSJgi2cVQYabDHwm+M0woJygGEQYOGl0MvBgiDkc095fO7F3zclNDsUvbmBlsNzr5QdSqQP+ENkKZN8qSF/JnpEiTTSBe9Gh3SLpe6UwM1YAWzR6+XaB7+iKuXAb+v/7BOQ7fhEfzr7lv9xbC1iab44JYe7zgyeZ1T74MQAdgj28MYCy6dXuC1tRyLPIw3yoJ0Hqo3Cyzga1t+jr2GQWS3w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=5PsWCikARkktDCqkdpo1P8QJXmWX7BUst1qh7bnulWs=;
+ b=vHBJSGJhppEV3HNe0Ahmwt9Cw5N9Qm6WFf2iBCeLdBdVyxsMjHT/yKowoW+kFlQgwTWrqhcqrVC9oC/7muyekmE0Y+ZW6M5oJSTLYGPP7p7e/izSukUj3nEW1xl1ZmEgtII3kAhT+fv5UGYUHSbKw8ZKl2NoaP4f7JsC5HIeX7I=
+Authentication-Results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM5PR0801MB1650.eurprd08.prod.outlook.com (2603:10a6:203:2f::19)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3305.24; Thu, 20 Aug
+ 2020 13:36:35 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::8c0c:c056:97a5:484a]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::8c0c:c056:97a5:484a%3]) with mapi id 15.20.3283.027; Thu, 20 Aug 2020
+ 13:36:35 +0000
+Subject: Re: [PATCH v4 2/4] iotests.py: Add wait_for_runstate()
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 References: <20200818133240.195840-1-mreitz@redhat.com>
- <20200818133240.195840-2-mreitz@redhat.com>
- <20376551-a9c1-75b0-d9fb-18a3f0ca997d@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <843eafdc-766f-e3c6-7429-f5b08f02e363@redhat.com>
-Date: Thu, 20 Aug 2020 15:32:19 +0200
+ <20200818133240.195840-3-mreitz@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <d6b5fb96-8611-1797-f941-def11739bf78@virtuozzo.com>
+Date: Thu, 20 Aug 2020 16:36:33 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ Thunderbird/68.11.0
+In-Reply-To: <20200818133240.195840-3-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: AM0PR03CA0035.eurprd03.prod.outlook.com
+ (2603:10a6:208:14::48) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
 MIME-Version: 1.0
-In-Reply-To: <20376551-a9c1-75b0-d9fb-18a3f0ca997d@virtuozzo.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="70JZBOhWHy7bNpeLMPuLD3cKU0VjnPida"
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=mreitz@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/20 08:28:03
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.5] (185.215.60.171) by
+ AM0PR03CA0035.eurprd03.prod.outlook.com (2603:10a6:208:14::48) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3305.25 via Frontend Transport; Thu, 20 Aug 2020 13:36:34 +0000
+X-Originating-IP: [185.215.60.171]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 217eab2f-b5c1-4d7f-f44d-08d8450e0ec3
+X-MS-TrafficTypeDiagnostic: AM5PR0801MB1650:
+X-Microsoft-Antispam-PRVS: <AM5PR0801MB16503DC3075C2FFC5387CC3BC15A0@AM5PR0801MB1650.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:400;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: kQr8cDv4qVCYLwPs4ESUP2u7/icpVsuK+R/EOiy2ykcSaU4wyYCiK9ZuDnoOEYp5RJVUnrcc0EJ6RXREYuuDAmZCn8cyqhkKqXGrU6VeXs1cnyn05YVIf8lNlLhkerUF9zvMjJj35lKLSrmyQdyckjeWTv5NAgEr32Q3GCWxdL28n1aCBCsGpBRAnODOCoczH1teUUKGnQZ36zykLnRlmXrSIvjPDhkF4FdNfgrXk5wYRbPvenVbRmeycJRRY/Nv3mCT1DkyWFsmi+4YstghRPfwdc87yaDQ2lcfjHaNe3fVh1kXiCRn6aKRJKGvq8x0wqctHTEHMyMjsXkLxH9iMffc1fja3ULamh3f7b6KJBZ+7227qaz9axakTMjhOZCH
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(4636009)(376002)(366004)(396003)(346002)(136003)(39840400004)(2906002)(52116002)(2616005)(31686004)(478600001)(66556008)(956004)(66946007)(66476007)(86362001)(316002)(36756003)(6486002)(186003)(8676002)(8936002)(31696002)(4326008)(558084003)(16576012)(54906003)(5660300002)(26005)(16526019)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: duLIPZ2sflslnfaRQehSW+HTKFax4kewPSWzvrJlWubP5W3FT6u8t8CeNOEdDWAtSKIvTDaBqi6731v43dg+kQ9xYrl4/x71WA4pA0BXpd2sucGYXWvpFELCfL4bKReYrEt7FRtGRHrgz6mdlJ85llzt6iSYcjH9zQWNrxsUwStGZ537wKa4+AvB4aAUN0RqNLKn9DgxlZ7ZYvdAfPDtfZR7FmJcIsDRtotEfm3/XxI+PVujSqxSBi1LtZhtt6gULz74XXyqAmDh+3PZS5h3VoWkU+ZLbZ72Ln5ods14Xq2oMRAMplqocFKqRAvsR/ZyKBVb2gP/VZ7V2wSWkxrWlQSGzpu2TzaguNzXhV1E8LDuOjW16dTotHaukLu/Ee6QamoCELq2Rn3GVZ1+c+lYiszI1DOnAG9oSeT5OyGo2rECzQxAJSpc1uDyYy64wtTqwg7yJ8HVPx7ucJXCUe/Ijugjv0IwAJNzFeZlw36+rORXyeRFXW+wFB/7UMq6OMBn6neix0u2RKHJe1VHhqtzJhjiR/EPRRcgrnVtjdGIqaAXnPRI7ASpwXzlaPBAo6ootfVz2BPYnVZmYpIIkmddSmPxSkD5duv7dAWKjLcNLNZYOA0osmm0A36Z8D0Fh8kfsdRmHH20ys82G7ZDsNrZuQ==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 217eab2f-b5c1-4d7f-f44d-08d8450e0ec3
+X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Aug 2020 13:36:35.3671 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: mcbvpXRnxlJvD6fPZRVBclEA0apZ1lWdTdvCsMCSCUS0ZbRZMU9WtX8kKG1Y9X/1d7O65uxE7vrRfXbwYnTeBCnN00Xi6sDg+kr++c16bpw=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM5PR0801MB1650
+Received-SPF: pass client-ip=40.107.21.133;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR05-VI1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/20 09:36:36
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -131,231 +137,12 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---70JZBOhWHy7bNpeLMPuLD3cKU0VjnPida
-Content-Type: multipart/mixed; boundary="IzRE7EY4qCyVg2mX5yYalIuu7dcZueMgE"
+18.08.2020 16:32, Max Reitz wrote:
+> Signed-off-by: Max Reitz<mreitz@redhat.com>
 
---IzRE7EY4qCyVg2mX5yYalIuu7dcZueMgE
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-On 20.08.20 14:58, Vladimir Sementsov-Ogievskiy wrote:
-> 18.08.2020 16:32, Max Reitz wrote:
->> This migration parameter allows mapping block node names and bitmap
->> names to aliases for the purpose of block dirty bitmap migration.
->>
->> This way, management tools can use different node and bitmap names on
->> the source and destination and pass the mapping of how bitmaps are to be
->> transferred to qemu (on the source, the destination, or even both with
->> arbitrary aliases in the migration stream).
->>
->> While touching this code, fix a bug where bitmap names longer than 255
->> bytes would fail an assertion in qemu_put_counted_string().
->>
->> Suggested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->> ---
->> =C2=A0 qapi/migration.json=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 | 101 +++++++-
->> =C2=A0 migration/migration.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 |=C2=A0=C2=A0 3 +
->> =C2=A0 migration/block-dirty-bitmap.c | 409 ++++++++++++++++++++++++++++=
------
->> =C2=A0 migration/migration.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 |=C2=A0 30 +++
->> =C2=A0 monitor/hmp-cmds.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 30 +++
->> =C2=A0 5 files changed, 517 insertions(+), 56 deletions(-)
->>
->> diff --git a/qapi/migration.json b/qapi/migration.json
->> index ea53b23dca..0c4ae102b1 100644
->> --- a/qapi/migration.json
->> +++ b/qapi/migration.json
->=20
-> [..]
->=20
->> =C2=A0 #
->> +# @block-bitmap-mapping: Maps block nodes and bitmaps on them to
->> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 aliases for the=
- purpose of dirty bitmap migration.=C2=A0 Such
->> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 aliases may for=
- example be the corresponding names on the
->> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 opposite site.
->> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 The mapping mus=
-t be one-to-one, but not necessarily
->> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 complete: On th=
-e source, unmapped bitmaps and all bitmaps
->> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 on unmapped nod=
-es will be ignored.=C2=A0 On the destination,
->> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 all unmapped al=
-iases in the incoming migration stream will
->> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 be reported, bu=
-t they will not result in failure.
-> Actually, on unknown alias we cancel incoming bitmap migration, which
-> means that destination vm continues to run, other (non-bitmap) migration
-> states continue to migrate but all further chunks of bitmap migration
-> will be ignored. (I'm not sure it worth be mentioned)
-
-Ah, yeah.
-
-[...]
-
->> @@ -303,21 +497,39 @@ static int add_bitmaps_to_list(DBMSaveState *s,
->> BlockDriverState *bs,
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return 0;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> =C2=A0 +=C2=A0=C2=A0=C2=A0 bitmap_name =3D bdrv_dirty_bitmap_name(bitmap=
-);
->> +
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!bs_name || strcmp(bs_name, "") =3D=
-=3D 0) {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_report("Bit=
-map '%s' in unnamed node can't be migrated",
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bdrv_dirty_bitmap_name(=
-bitmap));
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bitmap_name);
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return -1;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> =C2=A0 -=C2=A0=C2=A0=C2=A0 if (bs_name[0] =3D=3D '#') {
->> +=C2=A0=C2=A0=C2=A0 if (alias_map) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 const AliasMapInnerNode *ami=
-n =3D
->> g_hash_table_lookup(alias_map, bs_name);
->> +
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!amin) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* S=
-kip bitmaps on nodes with no alias */
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 retu=
-rn 0;
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> +
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 node_alias =3D amin->string;
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bitmap_aliases =3D amin->sub=
-tree;
->> +=C2=A0=C2=A0=C2=A0 } else {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 node_alias =3D bs_name;
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bitmap_aliases =3D NULL;
->> +=C2=A0=C2=A0=C2=A0 }
->> +
->> +=C2=A0=C2=A0=C2=A0 if (node_alias[0] =3D=3D '#') {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_report("Bit=
-map '%s' in a node with auto-generated "
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "name '%s' can=
-'t be migrated",
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bdrv_dirty_bitmap_name(=
-bitmap), bs_name);
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bitmap_name, node_alias=
-);
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return -1;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->=20
-> This check is related only to pre-alias_map behavior, so it's probably
-> better to keep it inside else{} branch above. Still, aliases already
-> checked to be wellformed, so this check will be always false anyway for
-> aliases and will not hurt.
-
-Hm, it=E2=80=99s a trade off.  It does look a bit weird, because how can al=
-iases
-be auto-generated?  But OTOH it makes it clearer that we=E2=80=99ll never a=
-llow
-non-wellformed aliases through.
-
-[...]
-
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (s->flags & DIRTY_BITMAP_MIG_FLAG_BITM=
-AP_NAME) {
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!qemu_get_counted_string=
-(f, s->bitmap_name)) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 const char *bitmap_name;
->> +
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!qemu_get_counted_string=
-(f, s->bitmap_alias)) {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 error_report("Unable to read bitmap name string");
->=20
-> Probably s/name/alias/ like for node error message.
-
-Why not.
-
-[...]
-
->> --- a/monitor/hmp-cmds.c
->> +++ b/monitor/hmp-cmds.c
->> @@ -469,6 +469,32 @@ void hmp_info_migrate_parameters(Monitor *mon,
->> const QDict *qdict)
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 monitor_printf(mo=
-n, "%s: '%s'\n",
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 MigrationParameter_str(MIGRATION_PARAMETER_TLS_AUTHZ),
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 params->tls_authz);
->> +
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (params->has_block_bitmap=
-_mapping) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 cons=
-t BitmapMigrationNodeAliasList *bmnal;
->> +
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 moni=
-tor_printf(mon, "%s:\n",
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 MigrationParameter_str(
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0
->> MIGRATION_PARAMETER_BLOCK_BITMAP_MAPPING));
->> +
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 for =
-(bmnal =3D params->block_bitmap_mapping;
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 bmnal;
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 bmnal =3D bmnal->next)
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 const BitmapMigrationNodeAlias *bmna =3D bmnal->value=
-;
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 const BitmapMigrationBitmapAliasList *bmbal;
->> +
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 monitor_printf(mon, "=C2=A0 '%s' -> '%s'\n",
->=20
-> '->' would look strange for incoming. Maybe, change to '--' or '~'.
-
-Hmm, I prefer ->.  The object=E2=80=99s name is the node/bitmap name, and t=
-hat
-object gets an alias.  So I find this to make sense even on the incoming
-side.
-
-Max
-
-
---IzRE7EY4qCyVg2mX5yYalIuu7dcZueMgE--
-
---70JZBOhWHy7bNpeLMPuLD3cKU0VjnPida
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl8+e2MACgkQ9AfbAGHV
-z0AV9AgAp9tqZJtWNU78gQAImDrn6+sa8PZepTUXL3HVef6EOBifwQ7SAndmRb7n
-Mb0GKzkAiQaDsynm66aq+9rnmRwOxQo2H5/uh5Cd5DEq99u2oegGAHD3sPfJg5YY
-0yJd/JRYWVydFyX2dCPHlUMmWEanfFylZ4AjAQ7qQ8N/Q+/k37PsDujfWEGS0CoZ
-AU49c40gfT5JTs+w9cFcSHppBP9NXlQyO+OJNv7XP/amF4/veuh2l94054JqfCB6
-B8lBZkkP38VGi0W70zM1F2q3y+HGaqmSml8PNIq+7eKUIXVeiEqtg7tG7on0qNj1
-vOGRFybTC7yzRmjrXLH4aKS0yhWdTA==
-=sBpq
------END PGP SIGNATURE-----
-
---70JZBOhWHy7bNpeLMPuLD3cKU0VjnPida--
-
+-- 
+Best regards,
+Vladimir
 
