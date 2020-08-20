@@ -7,64 +7,63 @@ X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DDE9C433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 15:26:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30478C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 15:26:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D6F21206DA
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 15:26:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6F21206DA
+	by mail.kernel.org (Postfix) with ESMTPS id 095EC206DA
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 15:26:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 095EC206DA
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53398 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53512 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8mSW-0006En-4Q
-	for qemu-devel@archiver.kernel.org; Thu, 20 Aug 2020 11:26:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35028)
+	id 1k8mSY-0006He-8J
+	for qemu-devel@archiver.kernel.org; Thu, 20 Aug 2020 11:26:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37466)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k8mDu-0006RB-Hc
- for qemu-devel@nongnu.org; Thu, 20 Aug 2020 11:11:26 -0400
-Received: from indium.canonical.com ([91.189.90.7]:50808)
+ id 1k8mNC-0000uh-Lm
+ for qemu-devel@nongnu.org; Thu, 20 Aug 2020 11:21:03 -0400
+Received: from indium.canonical.com ([91.189.90.7]:53138)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k8mDq-0006vp-I5
- for qemu-devel@nongnu.org; Thu, 20 Aug 2020 11:11:26 -0400
+ id 1k8mN9-0008B0-36
+ for qemu-devel@nongnu.org; Thu, 20 Aug 2020 11:21:02 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1k8mDi-0000Pg-Of
- for <qemu-devel@nongnu.org>; Thu, 20 Aug 2020 15:11:14 +0000
+ id 1k8mN5-0001mD-6c
+ for <qemu-devel@nongnu.org>; Thu, 20 Aug 2020 15:20:55 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id B16BC2E80EF
- for <qemu-devel@nongnu.org>; Thu, 20 Aug 2020 15:11:14 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id E2A9A2E80D2
+ for <qemu-devel@nongnu.org>; Thu, 20 Aug 2020 15:20:54 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 20 Aug 2020 15:01:32 -0000
-From: Thomas Huth <1879587@bugs.launchpad.net>
+Date: Thu, 20 Aug 2020 15:09:51 -0000
+From: Thomas Huth <1882784@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Tags: arm
+X-Launchpad-Bug: product=qemu; status=Fix Released; importance=High;
+ assignee=th.huth@posteo.de; 
+X-Launchpad-Bug-Tags: assign igd quirk
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: jfreche philmd pmaydell th-huth
-X-Launchpad-Bug-Reporter: Julien Freche (jfreche)
+X-Launchpad-Bug-Commenters: sshaikh th-huth thecatfelix
+X-Launchpad-Bug-Reporter: Shak (sshaikh)
 X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
-References: <158993429952.22373.5947926664408541430.malonedeb@wampee.canonical.com>
-Message-Id: <159793569246.16359.10170878106829025454.malone@soybean.canonical.com>
-Subject: [Bug 1879587] Re: Register number in ESR is incorrect for certain
- banked registers when switching from AA32 to AA64
+References: <159171166832.31735.6432186230204851906.malonedeb@gac.canonical.com>
+Message-Id: <159793619251.1692.16998545158563340089.launchpad@chaenomeles.canonical.com>
+Subject: [Bug 1882784] Re: Legacy IGD passthrough in QEMU 5 disabled
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="99c2d833c8d727fd05148486920aca032e908071"; Instance="production"
-X-Launchpad-Hash: 99f402745ad95a43331a8191b1b6328b33f20c79
+X-Launchpad-Hash: 46953ce512c433607385805cdde962725d2e92df
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/20 10:50:55
@@ -74,7 +73,8 @@ X-Spam_score: -5.9
 X-Spam_bar: -----
 X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
  RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -86,12 +86,10 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1879587 <1879587@bugs.launchpad.net>
+Reply-To: Bug 1882784 <1882784@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-
-https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3Da65dabf71a9f9b949
 
 ** Changed in: qemu
        Status: Fix Committed =3D> Fix Released
@@ -100,43 +98,55 @@ https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3Da65dabf71a9f9b949
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1879587
+https://bugs.launchpad.net/bugs/1882784
 
 Title:
-  Register number in ESR is incorrect for certain banked registers when
-  switching from AA32 to AA64
+  Legacy IGD passthrough in QEMU 5 disabled
 
 Status in QEMU:
   Fix Released
 
 Bug description:
-  I am running into a situation where I have:
-  - A hypervisor running in EL2, AA64
-  - A guest running in EL1, AA32
+  Bug with tag v5.0.0, or commit
+  fdd76fecdde1ad444ff4deb7f1c4f7e4a1ef97d6
 
-  We trap certain accesses to special registers such as DACR (via
-  HCR.TVM). One instruction that is trapped is:
+  As of QEMU 5 Legacy IGD PT is no longer working.
 
-  ee03ef10  ->    mcr     15, 0, lr, cr3, cr0, {0}
+  Host is a Xeon E3-1226 v3 and my method to test is to run the
+  following:
 
-  The guest is running in SVC mode. So, LR should refer to LR_svc there.
-  LR_svc is mapped to X18 in AA64. So, ESR should reflect that. However,
-  the actual ESR value is: 0xfe00dc0
+  ./qemu-system-x86_64 \
+    -device 'pci-bridge,id=3Dpci.1,chassis_nr=3D1,bus=3Dpci.0,addr=3D0x1f' \
+    -device 'vfio-pci,host=3D00:02.0,addr=3D02.0' \
+    -L '/usr/share/kvm' \
+    -nographic \
+    -vga none \
+    -nodefaults
 
-  If we decode the 'rt':
-  >>> (0xfe00dc0 >> 5) & 0x1f
-  14
+  in the hope of seeing a "IGD device 0000:00:02.0 cannot support legacy
+  mode due to existing devices at address 1f.0" error.
 
-  My understanding is that 14 is incorrect in the context of AA64. rt
-  should be set to 18. The current mode being SVC, LR refers to LR_svc
-  not LR_usr. In other words, the mapping between registers in AA64 and
-  AA32 doesn't seem to be accounted for. I've tested this with Qemu
-  5.0.0
+  The culprit appears to be this commit:
 
-  Let me know if that makes sense and if you would like more info. I am als=
-o happy to test patches.
-  Thanks for all the great work on Qemu!
+  https://github.com/qemu/qemu/commit/29d62771c81d8fd244a67c14a1d968c268d3f=
+b19
+
+  Specifically the following block in pci-quirks.c:
+
+  #ifdef CONFIG_VFIO_IGD
+      vfio_probe_igd_bar4_quirk(vdev, nr);
+  #endif
+
+  as the kconfig variable CONFIG_VFIO_IGD doesn't appear to be available
+  outside of makefiles as described here:
+  https://qemu.weilnetz.de/doc/devel/kconfig.html. I can confirm that
+  the igd code is being pulled in as removing this check, as would
+  defining the variable I presume, makes Legacy IGD PT work again (ie I
+  see the expected "existing devices" error).
+
+  I first spotted this in Proxmox, but have confirmed the bug by
+  building QEMU sources.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1879587/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1882784/+subscriptions
 
