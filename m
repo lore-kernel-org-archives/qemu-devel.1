@@ -2,83 +2,71 @@ Return-Path: <SRS0=Dndf=B6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 843AEC433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 04:18:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A855CC433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 04:28:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 52F71207BB
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 04:18:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 52F71207BB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 680542067C
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 04:28:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="dqWrL9kj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 680542067C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49592 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53954 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8c1m-0002Bd-J0
-	for qemu-devel@archiver.kernel.org; Thu, 20 Aug 2020 00:18:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32970)
+	id 1k8cBK-0004ei-Ii
+	for qemu-devel@archiver.kernel.org; Thu, 20 Aug 2020 00:28:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34160)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <yan.y.zhao@intel.com>)
- id 1k8c1D-0001m6-6R
- for qemu-devel@nongnu.org; Thu, 20 Aug 2020 00:17:39 -0400
-Received: from mga01.intel.com ([192.55.52.88]:28095)
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1k8cAc-0003Z6-LT; Thu, 20 Aug 2020 00:27:22 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:51801 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <yan.y.zhao@intel.com>)
- id 1k8c1A-00019W-Bf
- for qemu-devel@nongnu.org; Thu, 20 Aug 2020 00:17:38 -0400
-IronPort-SDR: an/ZJ5bobZjrW+1qF+9ah9e6VbPgbLXK44GfKgj3TInakBpjPQSjEIBIMzro8Ly6c1D8DdTLa9
- Quyvsc806p+g==
-X-IronPort-AV: E=McAfee;i="6000,8403,9718"; a="173281889"
-X-IronPort-AV: E=Sophos;i="5.76,332,1592895600"; d="scan'208";a="173281889"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
- by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 19 Aug 2020 21:17:29 -0700
-IronPort-SDR: dKmYv5lKjelxEcNHuICrNn7mXFMSDL/4It7gVYgGUcXEsEm3Ly1KBPFrwzagYkitMC7xP6XTss
- wsE1vs4BWGwg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.76,332,1592895600"; d="scan'208";a="327289452"
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
- ([10.239.13.16])
- by orsmga008.jf.intel.com with ESMTP; 19 Aug 2020 21:17:23 -0700
-Date: Thu, 20 Aug 2020 12:01:16 +0800
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: Sean Mooney <smooney@redhat.com>
-Subject: Re: device compatibility interface for live migration with assigned
- devices
-Message-ID: <20200820040116.GB24121@joy-OptiPlex-7040>
-References: <20200810074631.GA29059@joy-OptiPlex-7040>
- <e6e75807-0614-bd75-aeb6-64d643e029d3@redhat.com>
- <20200814051601.GD15344@joy-OptiPlex-7040>
- <a51209fe-a8c6-941f-ff54-7be06d73bc44@redhat.com>
- <20200818085527.GB20215@redhat.com>
- <3a073222-dcfe-c02d-198b-29f6a507b2e1@redhat.com>
- <20200818091628.GC20215@redhat.com>
- <20200818113652.5d81a392.cohuck@redhat.com>
- <20200820003922.GE21172@joy-OptiPlex-7040>
- <242591bb809b68c618f62fdc93d4f8ae7b146b6d.camel@redhat.com>
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1k8cAZ-0002Gc-OO; Thu, 20 Aug 2020 00:27:22 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 4BXBSf5p2Yz9sTQ; Thu, 20 Aug 2020 14:27:14 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1597897634;
+ bh=1EpChIuBXOU4rBwSnModWDpxsgEcyp0LlHp/iQnQwT0=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=dqWrL9kjs8pBIm7JLuXrpUmZQ6GGoZnrxqQNHCUt3L3PIdJI7PWkzhzaBh4vkGVL6
+ zLIEevcWLgFaXLoETcqXILrA9tNBqRbwYHUjzCrzoIVzW9xB/IgHaxhtgpKvrlte63
+ eyVKk06Jo5bV5GVZUaHRxXJodXROz/Ci8uY8BrLY=
+Date: Thu, 20 Aug 2020 14:15:04 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Subject: Re: [PATCH 02/10] numa: introduce
+ MachineClass::forbid_asymmetrical_numa
+Message-ID: <20200820041504.GN271315@yekko.fritz.box>
+References: <20200814205424.543857-1-danielhb413@gmail.com>
+ <20200814205424.543857-3-danielhb413@gmail.com>
+ <20200820011726.GF271315@yekko.fritz.box>
+ <20200820021128.GC642093@habkost.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="qi3SIpffvxS/TM8d"
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <242591bb809b68c618f62fdc93d4f8ae7b146b6d.camel@redhat.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-Received-SPF: pass client-ip=192.55.52.88; envelope-from=yan.y.zhao@intel.com;
- helo=mga01.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/20 00:17:30
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -68
-X-Spam_score: -6.9
-X-Spam_bar: ------
-X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200820021128.GC642093@habkost.net>
+Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
+ helo=ozlabs.org
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/19 23:57:59
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -9
+X-Spam_score: -1.0
+X-Spam_bar: -
+X-Spam_report: (-1.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -91,150 +79,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: kvm@vger.kernel.org, libvir-list@redhat.com,
- Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, kwankhede@nvidia.com,
- eauger@redhat.com, xin-ran.wang@intel.com, corbet@lwn.net,
- openstack-discuss@lists.openstack.org, shaohe.feng@intel.com,
- kevin.tian@intel.com, Parav Pandit <parav@mellanox.com>,
- jian-feng.ding@intel.com, dgilbert@redhat.com, zhenyuw@linux.intel.com,
- hejie.xu@intel.com, bao.yumeng@zte.com.cn,
- Alex Williamson <alex.williamson@redhat.com>, eskultet@redhat.com,
- intel-gvt-dev@lists.freedesktop.org,
- Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>, Jiri Pirko <jiri@mellanox.com>,
- dinechin@redhat.com, devel@ovirt.org
+Cc: John Snow <jsnow@redhat.com>,
+ Daniel Henrique Barboza <danielhb413@gmail.com>, qemu-ppc@nongnu.org,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Aug 20, 2020 at 02:29:07AM +0100, Sean Mooney wrote:
-> On Thu, 2020-08-20 at 08:39 +0800, Yan Zhao wrote:
-> > On Tue, Aug 18, 2020 at 11:36:52AM +0200, Cornelia Huck wrote:
-> > > On Tue, 18 Aug 2020 10:16:28 +0100
-> > > Daniel P. Berrangé <berrange@redhat.com> wrote:
-> > > 
-> > > > On Tue, Aug 18, 2020 at 05:01:51PM +0800, Jason Wang wrote:
-> > > > >    On 2020/8/18 下午4:55, Daniel P. Berrangé wrote:
-> > > > > 
-> > > > >  On Tue, Aug 18, 2020 at 11:24:30AM +0800, Jason Wang wrote:
-> > > > > 
-> > > > >  On 2020/8/14 下午1:16, Yan Zhao wrote:
-> > > > > 
-> > > > >  On Thu, Aug 13, 2020 at 12:24:50PM +0800, Jason Wang wrote:
-> > > > > 
-> > > > >  On 2020/8/10 下午3:46, Yan Zhao wrote:  
-> > > > >  we actually can also retrieve the same information through sysfs, .e.g
-> > > > > 
-> > > > >  |- [path to device]
-> > > > >     |--- migration
-> > > > >     |     |--- self
-> > > > >     |     |   |---device_api
-> > > > >     |    |   |---mdev_type
-> > > > >     |    |   |---software_version
-> > > > >     |    |   |---device_id
-> > > > >     |    |   |---aggregator
-> > > > >     |     |--- compatible
-> > > > >     |     |   |---device_api
-> > > > >     |    |   |---mdev_type
-> > > > >     |    |   |---software_version
-> > > > >     |    |   |---device_id
-> > > > >     |    |   |---aggregator
-> > > > > 
-> > > > > 
-> > > > >  Yes but:
-> > > > > 
-> > > > >  - You need one file per attribute (one syscall for one attribute)
-> > > > >  - Attribute is coupled with kobject
-> > > 
-> > > Is that really that bad? You have the device with an embedded kobject
-> > > anyway, and you can just put things into an attribute group?
-> > > 
-> > > [Also, I think that self/compatible split in the example makes things
-> > > needlessly complex. Shouldn't semantic versioning and matching already
-> > > cover nearly everything? I would expect very few cases that are more
-> > > complex than that. Maybe the aggregation stuff, but I don't think we
-> > > need that self/compatible split for that, either.]
-> > 
-> > Hi Cornelia,
-> > 
-> > The reason I want to declare compatible list of attributes is that
-> > sometimes it's not a simple 1:1 matching of source attributes and target attributes
-> > as I demonstrated below,
-> > source mdev of (mdev_type i915-GVTg_V5_2 + aggregator 1) is compatible to
-> > target mdev of (mdev_type i915-GVTg_V5_4 + aggregator 2),
-> >                (mdev_type i915-GVTg_V5_8 + aggregator 4)
-> the way you are doing the nameing is till really confusing by the way
-> if this has not already been merged in the kernel can you chagne the mdev
-> so that mdev_type i915-GVTg_V5_2 is 2 of mdev_type i915-GVTg_V5_1 instead of half the device
-> 
-> currently you need to deived the aggratod by the number at the end of the mdev type to figure out
-> how much of the phsicial device is being used with is a very unfridly api convention
-> 
-> the way aggrator are being proposed in general is not really someting i like but i thin this at least
-> is something that should be able to correct.
-> 
-> with the complexity in the mdev type name + aggrator i suspect that this will never be support
-> in openstack nova directly requireing integration via cyborg unless we can pre partion the
-> device in to mdevs staicaly and just ignore this.
-> 
-> this is way to vendor sepecif to integrate into something like openstack in nova unless we can guarentee
-> taht how aggreator work will be portable across vendors genericly.
-> 
-> > 
-> > and aggragator may be just one of such examples that 1:1 matching does not
-> > fit.
-> for openstack nova i dont see us support anything beyond the 1:1 case where the mdev type does not change.
->
-hi Sean,
-I understand it's hard for openstack. but 1:N is always meaningful.
-e.g.
-if source device 1 has cap A, it is compatible to
-device 2: cap A,
-device 3: cap A+B,
-device 4: cap A+B+C
-....
-to allow openstack to detect it correctly, in compatible list of
-device 2, we would say compatible cap is A;
-device 3, compatible cap is A or A+B;
-device 4, compatible cap is A or A+B, or A+B+C;
 
-then if openstack finds device A's self cap A is contained in compatible
-cap of device 2/3/4, it can migrate device 1 to device 2,3,4.
+--qi3SIpffvxS/TM8d
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-conversely,  device 1's compatible cap is only A,
-so it is able to migrate device 2 to device 1, and it is not able to
-migrate device 3/4 to device 1.
+On Wed, Aug 19, 2020 at 10:11:28PM -0400, Eduardo Habkost wrote:
+> On Thu, Aug 20, 2020 at 11:17:26AM +1000, David Gibson wrote:
+> > On Fri, Aug 14, 2020 at 05:54:16PM -0300, Daniel Henrique Barboza wrote:
+> > > The pSeries machine does not support asymmetrical NUMA
+> > > configurations.
+> >=20
+> > This seems a bit oddly specific to have as a global machine class
+> > property.
+> >=20
+> > Would it make more sense for machines with specific NUMA constraints
+> > to just verify those during their initialization?
+>=20
+> This would be much simpler.  However, I like the idea of
+> representing machine-specific configuration validation rules as
+> data that can eventually be exported to management software.
 
-Thanks
-Yan
+Ah, ok, so basically the usual tradeoff between flexibility and
+advertisability.
 
-> i woudl really prefer if there was just one mdev type that repsented the minimal allcatable unit and the
-> aggragaotr where used to create compostions of that. i.e instad of i915-GVTg_V5_2 beign half the device,
-> have 1 mdev type i915-GVTg and if the device support 8 of them then we can aggrate 4 of i915-GVTg
-> 
-> if you want to have muplie mdev type to model the different amoutn of the resouce e.g. i915-GVTg_small i915-GVTg_large
-> that is totlaly fine too or even i915-GVTg_4 indcating it sis 4 of i915-GVTg
-> 
-> failing that i would just expose an mdev type per composable resouce and allow us to compose them a the user level with
-> some other construct mudeling a attament to the device. e.g. create composed mdev or somethig that is an aggreateion of
-> multiple sub resouces each of which is an mdev. so kind of like how bond port work. we would create an mdev for each of
-> the sub resouces and then create a bond or aggrated mdev by reference the other mdevs by uuid then attach only the
-> aggreated mdev to the instance.
-> 
-> the current aggrator syntax and sematic however make me rather uncofrotable when i think about orchestating vms on top
-> of it even to boot them let alone migrate them.
-> > 
-> > So, we explicitly list out self/compatible attributes, and management
-> > tools only need to check if self attributes is contained compatible
-> > attributes.
-> > 
-> > or do you mean only compatible list is enough, and the management tools
-> > need to find out self list by themselves?
-> > But I think provide a self list is easier for management tools.
-> > 
-> > Thanks
-> > Yan
-> > 
-> 
+So, in that case, I guess the question is whether we envisage "no
+assymmetry" as a constraint common enough that it's worth creating an
+advertisable rule or not.  If we only ever have one user, then we
+haven't really done any better than hard coding the constraint in the
+manageent software.
+
+Of course to complicate matters, in the longer term we're looking at
+removing that constraint from pseries - but doing so will be dependent
+on the guest kernel understanding a new format for the NUMA
+information in the device tree.  So qemu alone won't have enough
+information to tell if such a configuration is possible or not.
+
+> (CCing John Snow, who had spent some time thinking about
+> configuration validation recently.)
+>=20
+>=20
+> > >=20
+> > > CC: Eduardo Habkost <ehabkost@redhat.com>
+> > > CC: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+> > > Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
+> > > ---
+> > >  hw/core/numa.c      | 7 +++++++
+> > >  hw/ppc/spapr.c      | 1 +
+> > >  include/hw/boards.h | 1 +
+> > >  3 files changed, 9 insertions(+)
+> > >=20
+> > > diff --git a/hw/core/numa.c b/hw/core/numa.c
+> > > index d1a94a14f8..1e81233c1d 100644
+> > > --- a/hw/core/numa.c
+> > > +++ b/hw/core/numa.c
+> > > @@ -547,6 +547,7 @@ static int parse_numa(void *opaque, QemuOpts *opt=
+s, Error **errp)
+> > >   */
+> > >  static void validate_numa_distance(MachineState *ms)
+> > >  {
+> > > +    MachineClass *mc =3D MACHINE_GET_CLASS(ms);
+> > >      int src, dst;
+> > >      bool is_asymmetrical =3D false;
+> > >      int nb_numa_nodes =3D ms->numa_state->num_nodes;
+> > > @@ -575,6 +576,12 @@ static void validate_numa_distance(MachineState =
+*ms)
+> > >      }
+> > > =20
+> > >      if (is_asymmetrical) {
+> > > +        if (mc->forbid_asymmetrical_numa) {
+> > > +            error_report("This machine type does not support "
+> > > +                         "asymmetrical numa distances.");
+> > > +            exit(EXIT_FAILURE);
+> > > +        }
+> > > +
+> > >          for (src =3D 0; src < nb_numa_nodes; src++) {
+> > >              for (dst =3D 0; dst < nb_numa_nodes; dst++) {
+> > >                  if (src !=3D dst && numa_info[src].distance[dst] =3D=
+=3D 0) {
+> > > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > > index dd2fa4826b..3b16edaf4c 100644
+> > > --- a/hw/ppc/spapr.c
+> > > +++ b/hw/ppc/spapr.c
+> > > @@ -4512,6 +4512,7 @@ static void spapr_machine_class_init(ObjectClas=
+s *oc, void *data)
+> > >       */
+> > >      mc->numa_mem_align_shift =3D 28;
+> > >      mc->auto_enable_numa =3D true;
+> > > +    mc->forbid_asymmetrical_numa =3D true;
+> > > =20
+> > >      smc->default_caps.caps[SPAPR_CAP_HTM] =3D SPAPR_CAP_OFF;
+> > >      smc->default_caps.caps[SPAPR_CAP_VSX] =3D SPAPR_CAP_ON;
+> > > diff --git a/include/hw/boards.h b/include/hw/boards.h
+> > > index bc5b82ad20..dc6cdd1c53 100644
+> > > --- a/include/hw/boards.h
+> > > +++ b/include/hw/boards.h
+> > > @@ -215,6 +215,7 @@ struct MachineClass {
+> > >      bool nvdimm_supported;
+> > >      bool numa_mem_supported;
+> > >      bool auto_enable_numa;
+> > > +    bool forbid_asymmetrical_numa;
+> > >      const char *default_ram_id;
+> > > =20
+> > >      HotplugHandler *(*get_hotplug_handler)(MachineState *machine,
+> >=20
+>=20
+>=20
+>=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--qi3SIpffvxS/TM8d
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl89+MYACgkQbDjKyiDZ
+s5I6Qw/+IuKzQ+9g7o2EbAYkSSt1LSQOYosrbIgVAtqS65Vac1Azikxs6wvHg1yc
+zjDHAwvT1OkdUy+8sED897FkmXwHHDLsEHLBQ0cCMSCl2OlCm/LeCeeYBCuSfWsu
+zarbJ9dd8QA9MMVLEoQnVIoF5XiR7MJdewQFJ8SoaVf79NCtG1CNkcSsmtc4QbBG
+y13iZwUnemr9Xe5Eq8/4iB7nN/YocRhdtDCzg+aUIJnJCdpFo9ltATQFnk0YGOyp
+bVkWs09OG1yws0S23oyaHHfjdqqje9YAYowLD6C2E7+tgaHpPtK4YKO0lTg/Bp18
+1x1SOgOuZfjF9LB0O4f0arOth1PXpWrNpKz+StPwe1WgANYF6EKMPClvzTcDDjP/
+mglLpVKxUGNFEvChOi1IuNUwEqhUrXOLJBZLroI/++h3RS02PHE4FUP6tVzGIDWD
+F43vh0mWQcVVFOhEYWWcTHyyECVmSx6wInSS+S4P4ipdJzWTWlGN0QihzfBML9eV
+55/JzD3cdncUnyKFHR3bCOrf9OsQC+6JjAqwSwwUrJFLPTrp/SWBeCe/pQ6AsjFo
+beQu9UDcwvAe1VsGpP44q3Z1zPG/n9inqdiN50pfO/tfRUIXpuIOmqAgOd6me61w
+WXPtQAwwx4/6xNJlRXY7vXDHZZOzTkR3p7WQ1qPILYVPuWFcgs4=
+=TV3B
+-----END PGP SIGNATURE-----
+
+--qi3SIpffvxS/TM8d--
 
