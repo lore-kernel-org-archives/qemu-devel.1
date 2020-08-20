@@ -8,77 +8,77 @@ X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 632B5C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 23:55:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D444BC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 23:56:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 312C720674
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 23:55:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9D9E120702
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 23:56:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kQM2m0OY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 312C720674
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ieRnS9/t"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D9E120702
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60904 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33488 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8uPT-00020i-E1
-	for qemu-devel@archiver.kernel.org; Thu, 20 Aug 2020 19:55:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45966)
+	id 1k8uPj-0002Ok-Tc
+	for qemu-devel@archiver.kernel.org; Thu, 20 Aug 2020 19:56:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46034)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <nirsof@gmail.com>)
- id 1k8uOC-0000H2-G2; Thu, 20 Aug 2020 19:54:36 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:40736)
+ id 1k8uOI-0000Z1-VA; Thu, 20 Aug 2020 19:54:42 -0400
+Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:40129)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <nirsof@gmail.com>)
- id 1k8uOA-00070m-L4; Thu, 20 Aug 2020 19:54:36 -0400
-Received: by mail-wr1-x443.google.com with SMTP id l2so339337wrc.7;
- Thu, 20 Aug 2020 16:54:34 -0700 (PDT)
+ id 1k8uOG-00072R-Nu; Thu, 20 Aug 2020 19:54:42 -0400
+Received: by mail-wr1-x42e.google.com with SMTP id l2so339544wrc.7;
+ Thu, 20 Aug 2020 16:54:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=dEMPiCqe9PefxpWTTe3SJ7uQAbS0drp2NTOLNfe8U44=;
- b=kQM2m0OYVuLBN6jSDlqJlSz6hPWcob2zyci9GLLCFUKYBdgmAWHr4wpkxt0V3fRuKn
- kiiDGhmJcZJPUL4kvhz0YtcmGsRrFHVvxcIv1CuQUM0jE1WGWTnqvHKxHoB/7LOZVrk4
- P87pelL9m3Vs7lTXcJ52yx43BADmwAecKHs+C30NGqQgRuWVrshHv4D/9WZiBZRGXHF6
- eEVpcV9lx7+a6An7F47Fjt/7wSTaWFERP3ywJm2x2u9bWXbBED8+on7805R76FkErRm3
- xKYlQHhuzQ/iOM9vN+qep1ZVaKbzTz1xmNSauY6EyTjhSQ2T9udrSFilS9YKGP2or0Dt
- VwVA==
+ bh=gC2hJbrUiIGgGDI/h0RY2Ob+Q69oEsfEZIUg5eipKcE=;
+ b=ieRnS9/t2idmp05ieVq6uL4x17BlWng5YactD6o1Co8uAuQrWnvJjydmf/Ew/chPvi
+ 0SFn6QsG669tR6QnZGsrDz4w5B7oB/Mr2EVOqvlxRYTVX7KneE4Q9wNMQ6Z9Owz3ITIL
+ B7MCsREhK03zGBEVUKHpWrAEVNrOIhrPY3n2TEyEYnry9gD5V2vNz2hEvC2iI7NIbMPT
+ AyXsJ2HEo6Wr00bKv6cwKRrcdCMvcsISIsfzqmN6TO9YhPK5XfcJxVWB4ewALI2ia/Kg
+ iDIWP5W7s87Ouk2ecvj5O75AmnTz/6rF8RLxBxW7/ANvSio1o4u6UNWKSmw6erJzT5lJ
+ 2wzw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=dEMPiCqe9PefxpWTTe3SJ7uQAbS0drp2NTOLNfe8U44=;
- b=q/YUsZ8SKMkreTYaZubcVl2694Jax4g+VZrNKS0cYrVBU0/0XDkPXduvYxpH0YVoQm
- nrGUG6sYNHFubJsavk09hw/a4RJOJAI8uWbAjgl1eNGHb4giyDNM1pa+saBjyF6VfuQ+
- 2f1IUK+9JNhHa3D1VL0mVcxOBMHYYozgMljGyZfPo570Evv91QS0K2o5Hr5R+8xKEAd6
- howeVJcTO7VLT6Q1PkuD6c1kFc7gPLCpp+xNZeGwXNE4wxeVvd0eOMs5GDtnAGkKY8KI
- 3s0SnPNrgvTmVTQc7EYDc5LrnxoplJueTOZEzqEzgOtRqcZ98hK0uiDHdLhlvqFrRyqd
- pCTw==
-X-Gm-Message-State: AOAM5322zNs+AoR4ThoNlp0aUiDKmPf6Jd3NeEIuQ9JpkCiAFOxamtWL
- xuSKwOX/lEnoF6LEinGklGD4tyGEljHfnL8/
-X-Google-Smtp-Source: ABdhPJwahq30JprhS/yA4Rb8O051zjWBIvx9eWrphPvKHw8RrOdVdQ/bR0sL6XTB4FL+S8uxyali4A==
-X-Received: by 2002:adf:80c7:: with SMTP id 65mr153449wrl.35.1597967672431;
- Thu, 20 Aug 2020 16:54:32 -0700 (PDT)
+ bh=gC2hJbrUiIGgGDI/h0RY2Ob+Q69oEsfEZIUg5eipKcE=;
+ b=ZMbkE3rPI9bveuiakUZeiin0397gqBhuKxurH7A76Zr474pRMXquxo4g534g1evHat
+ dmXp73xdKqkFxYf2XyojhSwKD+Bslg6XwWPbeYbeoJISEd4IW4fuEinGlvgp1iQ8ct/I
+ V8Iro956qai3GpOeU4bq+0ohE1pgOhu1MEN6hdOwjYJhRGMIaczbpCjAj3MvMSbPjXus
+ KaqBpba36fUPWRIKC8xLPVKjRyCkZv4l57T0eD8MyvfWy/Bag+OlbVUWrVb4JumgXStu
+ 1fneENIsJHx4MRTWPo4CZQhbelNQNbyEF80aoFzj8wg8agdEKyQuFEYui3Wc3nIlirbr
+ Ucjg==
+X-Gm-Message-State: AOAM533X0Zd+etvqO2/PI4IaVh6l6kqjdPgZSoDRNb9UlkAvIzG4kIjR
+ 996KuERDx/5hR04Wjjag2xVu3AGQQkFsu6yN
+X-Google-Smtp-Source: ABdhPJxVs5mlEN5+ggQADMze65/RDrhSS/ThKeNei1G5Kmn3o0jrWbOCHZbFXZKW4DNh8+u8i54zQw==
+X-Received: by 2002:a5d:480b:: with SMTP id l11mr148027wrq.85.1597967678675;
+ Thu, 20 Aug 2020 16:54:38 -0700 (PDT)
 Received: from localhost.localdomain (109-186-18-89.bb.netvision.net.il.
  [109.186.18.89])
- by smtp.gmail.com with ESMTPSA id o128sm556506wmo.39.2020.08.20.16.54.30
+ by smtp.gmail.com with ESMTPSA id o128sm556506wmo.39.2020.08.20.16.54.37
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 20 Aug 2020 16:54:31 -0700 (PDT)
+ Thu, 20 Aug 2020 16:54:38 -0700 (PDT)
 From: Nir Soffer <nirsof@gmail.com>
 X-Google-Original-From: Nir Soffer <nsoffer@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 1/5] qemu-iotests: Fix FilePaths cleanup
-Date: Fri, 21 Aug 2020 02:54:23 +0300
-Message-Id: <20200820235427.374645-2-nsoffer@redhat.com>
+Subject: [PATCH v2 5/5] qemu-iotests: Simplify FilePath __init__
+Date: Fri, 21 Aug 2020 02:54:27 +0300
+Message-Id: <20200820235427.374645-6-nsoffer@redhat.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200820235427.374645-1-nsoffer@redhat.com>
 References: <20200820235427.374645-1-nsoffer@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::443;
- envelope-from=nirsof@gmail.com; helo=mail-wr1-x443.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::42e;
+ envelope-from=nirsof@gmail.com; helo=mail-wr1-x42e.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -107,36 +107,29 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If os.remove() fails to remove one of the paths, for example if the file
-was removed by the test, the cleanup loop would exit silently, without
-removing the rest of the files.
+Use list comprehension instead of append loop.
 
-Fixes: de263986b5dc
 Signed-off-by: Nir Soffer <nsoffer@redhat.com>
 ---
- tests/qemu-iotests/iotests.py | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ tests/qemu-iotests/iotests.py | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
 diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-index 717b5b652c..16a04df8a3 100644
+index 1b5cdd493e..7ebd0bcc92 100644
 --- a/tests/qemu-iotests/iotests.py
 +++ b/tests/qemu-iotests/iotests.py
-@@ -468,11 +468,11 @@ class FilePaths:
-         return self.paths
+@@ -467,9 +467,8 @@ class FilePath:
  
-     def __exit__(self, exc_type, exc_val, exc_tb):
--        try:
--            for path in self.paths:
-+        for path in self.paths:
-+            try:
-                 os.remove(path)
--        except OSError:
--            pass
-+            except OSError:
-+                pass
-         return False
+     """
+     def __init__(self, *names, base_dir=test_dir):
+-        self.paths = []
+-        for name in names:
+-            self.paths.append(os.path.join(base_dir, file_pattern(name)))
++        self.paths = [os.path.join(base_dir, file_pattern(name))
++                      for name in names]
  
- class FilePath(FilePaths):
+     def __enter__(self):
+         if len(self.paths) == 1:
 -- 
 2.26.2
 
