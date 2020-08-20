@@ -6,43 +6,43 @@ X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E30FC433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 15:43:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B96EC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 15:45:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 625332075E
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 15:43:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 625332075E
+	by mail.kernel.org (Postfix) with ESMTPS id BF39A2075E
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 15:45:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF39A2075E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38078 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42456 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8mj5-0006z0-MJ
-	for qemu-devel@archiver.kernel.org; Thu, 20 Aug 2020 11:43:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42454)
+	id 1k8mkQ-0000Ka-Nc
+	for qemu-devel@archiver.kernel.org; Thu, 20 Aug 2020 11:45:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42434)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k8mgh-0004hT-He
- for qemu-devel@nongnu.org; Thu, 20 Aug 2020 11:41:11 -0400
-Received: from indium.canonical.com ([91.189.90.7]:33862)
+ id 1k8mgg-0004g4-3J
+ for qemu-devel@nongnu.org; Thu, 20 Aug 2020 11:41:10 -0400
+Received: from indium.canonical.com ([91.189.90.7]:33790)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k8mgf-0002Fi-SN
- for qemu-devel@nongnu.org; Thu, 20 Aug 2020 11:41:11 -0400
+ id 1k8mgd-0002Fa-Um
+ for qemu-devel@nongnu.org; Thu, 20 Aug 2020 11:41:09 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1k8mgb-0006UV-7I
- for <qemu-devel@nongnu.org>; Thu, 20 Aug 2020 15:41:05 +0000
+ id 1k8mgZ-0006Gj-Sy
+ for <qemu-devel@nongnu.org>; Thu, 20 Aug 2020 15:41:04 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 994FE2E811D
- for <qemu-devel@nongnu.org>; Thu, 20 Aug 2020 15:41:03 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 5CB542E8116
+ for <qemu-devel@nongnu.org>; Thu, 20 Aug 2020 15:41:02 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 20 Aug 2020 15:35:33 -0000
-From: Thomas Huth <1882817@bugs.launchpad.net>
+Date: Thu, 20 Aug 2020 15:34:42 -0000
+From: Thomas Huth <1886343@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
@@ -50,18 +50,18 @@ X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: philmd theartlav
-X-Launchpad-Bug-Reporter: Artyom (theartlav)
+X-Launchpad-Bug-Commenters: pmaydell th-huth wilson-q
+X-Launchpad-Bug-Reporter: Wilson-q (wilson-q)
 X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
-References: <159172265471.31406.7196816329603804386.malonedeb@gac.canonical.com>
-Message-Id: <159793773397.1469.11191325384966246146.launchpad@wampee.canonical.com>
-Subject: [Bug 1882817] Re: Segfault in audio_pcm_sw_write with audio over VNC
+References: <159397709821.1977.12730820791239292652.malonedeb@wampee.canonical.com>
+Message-Id: <159793768351.4574.4467072678349137878.launchpad@gac.canonical.com>
+Subject: [Bug 1886343] Re: configure has non-posix bash syntax
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="99c2d833c8d727fd05148486920aca032e908071"; Instance="production"
-X-Launchpad-Hash: d229cb31ad2f28a78ef99441ea7beaca205a199a
+X-Launchpad-Hash: 41a23c93466ca4e860274e61a0aae6d7bf9b74c4
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/20 10:50:55
@@ -83,7 +83,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1882817 <1882817@bugs.launchpad.net>
+Reply-To: Bug 1886343 <1886343@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -95,53 +95,33 @@ Sender: "Qemu-devel"
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1882817
+https://bugs.launchpad.net/bugs/1886343
 
 Title:
-  Segfault in audio_pcm_sw_write with audio over VNC
+  configure has non-posix bash syntax
 
 Status in QEMU:
   Fix Released
 
 Bug description:
-  QEMU 5.0.0, built with ./configure --target-list=3Dx86_64-softmmu
-  --enable-debug --disable-strip --disable-docs --disable-sdl
+  which gives an error when run on a system that uses dash for /bin/sh.
 
-  Running on a headless host (Ryzen 3600), Arch Linux, 64bit latest.
-  Guest is also Arch Linux, 64bit.
+  The problem is at line 6464 which has
+      if test "$have_keyring" =3D=3D "yes"
+  the double equal sign is non-posix bash syntax that isn't accepted by pos=
+ix shells like dash.  This was added 2020-05-25 according to git blame so l=
+ooks like a recent problem.
 
-  Started with qemu-system-x86_64 -vnc 0.0.0.0:0 -enable-kvm -m 4096 -cpu h=
-ost -smp cores=3D2,threads=3D1,sockets=3D1 -machine q35 -vga std -device
-   ich9-ahci,id=3Dahci -drive file=3Dvm0.qcow2,format=3Dqcow2,if=3Dnone,id=
-=3Ddsk0 -device ide-hd,drive=3Ddsk0,bus=3Dahci.0 -soundhw hda
+  On an Ubuntu 20.04 system with top of tree sources I get
+  gondor:2027$ ../qemu/configure --prefix=3D/home/wilson/FOSS/qemu/install-=
+qemu-tmp --target-list=3Driscv64-linux-user,riscv64-softmmu,riscv32-linux-u=
+ser,riscv32-softmmu
+  ../qemu/configure: 6464: test: yes: unexpected operator
+  ...
 
-  So, a headless VM is running on a server and is being connected to
-  over VNC. The virtual sound card is detected and speaker test is
-  running inside the VM. So far so good.
-
-  Then, i tell the VNC client to enable audio (QEMU Audio Client
-  Message, 255,1,0). QEMU responds with a "stream is about to start"
-  message (QEMU Audio Server Message, 255,1,1) and then promptly crashes
-  without sending anything else.
-
-  Running it in GDB produces a crash at audio/audio.c:739
-
-  Thread 1 "qemu-system-x86" received signal SIGSEGV, Segmentation fault.
-  audio_pcm_sw_write (sw=3D0x5555575bbf30, buf=3D0x0, size=3D1628) at audio=
-/audio.c:739
-  739             if (!sw->hw->pcm_ops->volume_out) {
-
-  The exact sequence of events does not matter - i can enable sound
-  before playing anything, and then it would say nothing and keep
-  working, but crash with the same message once anything sound-playing
-  is launched in the VM.
-
-  Using different soundhw or adding various audiodev options does not
-  seem to affect anything.
-
-  I can't quite figure out if the QEMU Audio VNC extension is supposed
-  to work at all or not, but it would be handy to me if it is.
+  configure completes OK, so this is a minor problem.  It is just one
+  configure test that is failing to work properly.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1882817/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1886343/+subscriptions
 
