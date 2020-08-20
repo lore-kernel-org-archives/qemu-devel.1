@@ -2,108 +2,98 @@ Return-Path: <SRS0=Dndf=B6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84727C433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 20:32:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0ED35C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 21:01:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3D0132076E
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 20:32:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C7D7420748
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 21:01:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="r9Nd+f5o"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D0132076E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eAdUKanN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7D7420748
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59226 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42602 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8rEj-0005BF-Eg
-	for qemu-devel@archiver.kernel.org; Thu, 20 Aug 2020 16:32:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33130)
+	id 1k8rh4-0003eQ-0j
+	for qemu-devel@archiver.kernel.org; Thu, 20 Aug 2020 17:01:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39664)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <hskinnemoen@google.com>)
- id 1k8rD5-00044D-G4
- for qemu-devel@nongnu.org; Thu, 20 Aug 2020 16:30:55 -0400
-Received: from mail-vs1-xe44.google.com ([2607:f8b0:4864:20::e44]:46234)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <hskinnemoen@google.com>)
- id 1k8rCv-0000Jh-UW
- for qemu-devel@nongnu.org; Thu, 20 Aug 2020 16:30:52 -0400
-Received: by mail-vs1-xe44.google.com with SMTP id b26so1770082vsa.13
- for <qemu-devel@nongnu.org>; Thu, 20 Aug 2020 13:30:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=avKOzD1xqNur7yDwT+dTnw38wAGDWbTeBDODCRqKZIA=;
- b=r9Nd+f5oDZYrHK6boncyLUpYqSYvESOEPJPQ++GN1x1FZNQzYrUmXBVVFegcRoVmio
- cFhgzKNA4ZaYI7Y9ls4aYdg8KpD+Jzg9VTjVJpwhBQ25Ohlo+ko3SgRzt+oaZnsbCTHq
- Lhiix5ZVYeB909NmRB7vOyr7+QLFZYh0uPSvpo3INejwxuoUYgTqAgV/YqN2bVl14L4L
- vwrh5s7gCR6V+eBozUiKIpfA6ilTzBsUNW8gl/VB1q4mD3iXc6Qq62NxDVc8QUJFnzjV
- PNTnbwsWwHMCYumZa55lqkoGaf72BKALjh0icO9GthFd1faUz1cS5ap965ouoXh9IvGC
- rYBA==
+ (Exim 4.90_1) (envelope-from <nsoffer@redhat.com>)
+ id 1k8rgC-00033U-EN
+ for qemu-devel@nongnu.org; Thu, 20 Aug 2020 17:01:00 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:44605
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <nsoffer@redhat.com>)
+ id 1k8rg9-0003hx-TO
+ for qemu-devel@nongnu.org; Thu, 20 Aug 2020 17:00:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1597957255;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=1UGKsi1wGGjTSlpR7HYDjqMwlxea6yaINbGOF1ZAbDg=;
+ b=eAdUKanNv65WFsKSuXLVYr4nUiyuQpiFaS2FUf5irRK74eUGYSCVA4gv9cjZvw9WUNV7Jp
+ 13lZiwMKbFizXdLLb6SaXjS3W4dptEAAauXxcWEq1bPAa4FRgGzXGtEaKTz/RC9GSfGclL
+ kEOsj7qgx+7mf+9YEKfUZTUaRFbNC2Q=
+Received: from mail-oo1-f71.google.com (mail-oo1-f71.google.com
+ [209.85.161.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-28-UCe0wfnXMtWfiG3L1T247Q-1; Thu, 20 Aug 2020 17:00:51 -0400
+X-MC-Unique: UCe0wfnXMtWfiG3L1T247Q-1
+Received: by mail-oo1-f71.google.com with SMTP id i25so1741649ooe.14
+ for <qemu-devel@nongnu.org>; Thu, 20 Aug 2020 14:00:51 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=avKOzD1xqNur7yDwT+dTnw38wAGDWbTeBDODCRqKZIA=;
- b=f8J4lXMrYPyfDLo0xkYl1BqodFaXEu9O1266VKT0s5nhELXZAwrZoUCv9xTgxHMJCU
- jiy4zG3mCxIKrT+eu0jv2mXIGXoqCoxqIgNKJESM3yfOZ7D0BXZL+goAYMX4eFIvdAWT
- efzt2eCtw+zns89wxIOX+ZN9Pl7W+FXdDFFNYSXt3goY+qCpVdKWlKvOw5CiVQwbEqMY
- UcaqbdKLS4PTtQ4GPAcMBofSolBAKer5YusjTvpTISZSU76upidO8xMLDE6ksjtX78WE
- mYu5iCBmnVAl6MsSA6VXBtcLAml9j3uSGJSGkAFJHFt+eDHp8omNERxw26/k2j/qRx4K
- J8wg==
-X-Gm-Message-State: AOAM532CAXn0QHA4l5FJAkzS4i8ngWaPjhgDbMmwaIg57KWWXsfAjkhc
- FTY0u8+OPHpYXWoli1L4V4a8ObhCj/ZNeALHsaF1xw==
-X-Google-Smtp-Source: ABdhPJzvNrbgDFzVR8Oa+SUv4WBPD0O7iAiLzJN7a8oXaOxhTOsq2oZ7HLK1cY3wY2VbnvciczxYjvX+V7IVGUujnVI=
-X-Received: by 2002:a67:cd10:: with SMTP id u16mr436361vsl.152.1597955443489; 
- Thu, 20 Aug 2020 13:30:43 -0700 (PDT)
+ :message-id:subject:to:cc;
+ bh=1UGKsi1wGGjTSlpR7HYDjqMwlxea6yaINbGOF1ZAbDg=;
+ b=Gedj8+4KUA7Di1muU928ywnroA2+B+20VjeSpTcdo3GxAPXRnmIziK4B1xtAMmPt4H
+ ys94zLXSjXsNHHKprXz4aq/lg6ht3DNTx7yDHbjKqjhH/mreVaYgb6qiekFvkbBy9U4x
+ AGS88qPgA/Yidwex5YCYXSRHzL54kc68MoS9ZogKAf6jOyTzl7gHP5u3QmFGui9WD0/K
+ Kc/4HesRheH8qc6zMK0uuc84bnKIMxyE1sf9EuTMTLznwngXHQCz8tjc6whAtDjMcKpI
+ AYU/XjcDzP+ndhh8yGelYh54AaFSccNHSWPANsfcz8J6W+9Nck6rGPglXjcgPj1biZZN
+ B/Hw==
+X-Gm-Message-State: AOAM533f40FrB0PCmxnLPIok5JRwKPa+qQTQRDLeu/k9VwT7MLpX/viT
+ PwKi2vG7n7acz6crpirRoL08Xu48MqZmQqR46fGMPw2YsqJNSl1K4hoN54LZ9X+22G5pkdUFbtk
+ 2ulZG8a0cEaioJbpv6PrAHS2PbP0xLu8=
+X-Received: by 2002:a9d:6f85:: with SMTP id h5mr405143otq.81.1597957250644;
+ Thu, 20 Aug 2020 14:00:50 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwmZUEkeHLVsl7MsOKYqztpxs2YTHJ+cA7u35ZVWpBi+NH98nNTRvRE7bIdahozv8tgafARFrwBdiG16Erzbks=
+X-Received: by 2002:a9d:6f85:: with SMTP id h5mr405127otq.81.1597957250380;
+ Thu, 20 Aug 2020 14:00:50 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200811004607.2133149-1-hskinnemoen@google.com>
- <20200811004607.2133149-14-hskinnemoen@google.com>
- <64f8cd56-306e-4961-488b-36c666894a54@amsat.org>
- <CAFQmdRbvSKYJ00tE_79Eh+gW_ge8kEco=1gqFtvMcoJGraozdw@mail.gmail.com>
- <CAFQmdRZCk5Rqb1C2TRCEUMaKmF608g2_Or8mLCTSG03nCQ1Ygg@mail.gmail.com>
- <28a30c64-7cc5-4b4f-2be2-b3d3af511cb1@amsat.org>
- <CAFQmdRYFLUdbs5mj3zHzNN1y+bvQXCrtGhY_iOLVfnydGxM0Jw@mail.gmail.com>
- <6a23375f-64ec-cfdd-10cf-272eef719dd6@amsat.org>
-In-Reply-To: <6a23375f-64ec-cfdd-10cf-272eef719dd6@amsat.org>
-From: Havard Skinnemoen <hskinnemoen@google.com>
-Date: Thu, 20 Aug 2020 13:30:31 -0700
-Message-ID: <CAFQmdRY9GSqjW+wcbRzsC6dEB9KMibnxWAp+F6jpmf2_9iBEFw@mail.gmail.com>
-Subject: Re: [PATCH v7 13/13] tests/acceptance: console boot tests for
- quanta-gsj
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, 
- Joel Stanley <joel@jms.id.au>, qemu-arm <qemu-arm@nongnu.org>, 
- QEMU Developers <qemu-devel@nongnu.org>,
- IS20 Avi Fishman <Avi.Fishman@nuvoton.com>, 
- CS20 KFTing <kfting@nuvoton.com>, Cleber Rosa <crosa@redhat.com>, 
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Eric Blake <eblake@redhat.com>, 
- Richard Henderson <rth@twiddle.net>, Andrew Jeffery <andrew@aj.id.au>, 
- Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>, 
- "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+References: <20200820183950.13109-1-vsementsov@virtuozzo.com>
+ <20200820183950.13109-9-vsementsov@virtuozzo.com>
+In-Reply-To: <20200820183950.13109-9-vsementsov@virtuozzo.com>
+From: Nir Soffer <nsoffer@redhat.com>
+Date: Fri, 21 Aug 2020 00:00:34 +0300
+Message-ID: <CAMRbyyvpPyu9ONLUVax_xssXaS5f2O5pkaK7um0X7dWbng=2Jw@mail.gmail.com>
+Subject: Re: [PATCH v4 08/10] iotests.py: add verify_o_direct helper
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=nsoffer@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::e44;
- envelope-from=hskinnemoen@google.com; helo=mail-vs1-xe44.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -185
-X-Spam_score: -18.6
-X-Spam_bar: ------------------
-X-Spam_report: (-18.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=-1,
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=nsoffer@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/20 17:00:55
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- ENV_AND_HDR_SPF_MATCH=-0.5, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, USER_IN_DEF_DKIM_WL=-7.5,
- USER_IN_DEF_SPF_WL=-7.5 autolearn=unavailable autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -116,162 +106,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Aug 20, 2020 at 10:46 AM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
-rg> wrote:
+On Thu, Aug 20, 2020 at 9:49 PM Vladimir Sementsov-Ogievskiy
+<vsementsov@virtuozzo.com> wrote:
 >
-> On 8/20/20 6:24 PM, Havard Skinnemoen wrote:
-> > On Wed, Aug 19, 2020 at 10:29 PM Philippe Mathieu-Daud=C3=A9 <f4bug@ams=
-at.org> wrote:
-> >>
-> >> +Eric / Richard for compiler optimizations.
-> >>
-> >> On 8/20/20 3:53 AM, Havard Skinnemoen wrote:
-> >>> On Tue, Aug 11, 2020 at 8:26 PM Havard Skinnemoen
-> >>> <hskinnemoen@google.com> wrote:
-> >>>>
-> >>>> On Tue, Aug 11, 2020 at 1:48 AM Philippe Mathieu-Daud=C3=A9 <f4bug@a=
-msat.org> wrote:
-> >>>>> INTERRUPTED: Test interrupted by SIGTERM
-> >>>>> Runner error occurred: Timeout reached
-> >>>>> (240.45 s)
-> >>>>>
-> >>>>> Is that expected?
-> >>>>
-> >>>> I'm not sure why it only happens when running direct kernel boot wit=
-h
-> >>>> unoptimized qemu, but it seems a little happier if I enable a few mo=
-re
-> >>>> peripherals that I have queued up (sd, ehci, ohci and rng), though n=
-ot
-> >>>> enough.
-> >>>>
-> >>>> It still stalls for an awfully long time on "console: Run /init as
-> >>>> init process" though. I'm not sure what it's doing there. With -O2 i=
-t
-> >>>> only takes a couple of seconds to move on.
-> >>>
-> >>> So it turns out that the kernel gets _really_ sluggish when skipping
-> >>> the clock initialization normally done by the boot loader.
-> >>>
-> >>> I changed the reset value of CLKSEL like this:
-> >>>
-> >>> diff --git a/hw/misc/npcm7xx_clk.c b/hw/misc/npcm7xx_clk.c
-> >>> index 21ab4200d1..5e9849410f 100644
-> >>> --- a/hw/misc/npcm7xx_clk.c
-> >>> +++ b/hw/misc/npcm7xx_clk.c
-> >>> @@ -67,7 +67,7 @@ enum NPCM7xxCLKRegisters {
-> >>>   */
-> >>>  static const uint32_t cold_reset_values[NPCM7XX_CLK_NR_REGS] =3D {
-> >>>      [NPCM7XX_CLK_CLKEN1]        =3D 0xffffffff,
-> >>> -    [NPCM7XX_CLK_CLKSEL]        =3D 0x004aaaaa,
-> >>> +    [NPCM7XX_CLK_CLKSEL]        =3D 0x004aaba9,
-> >>>      [NPCM7XX_CLK_CLKDIV1]       =3D 0x5413f855,
-> >>>      [NPCM7XX_CLK_PLLCON0]       =3D 0x00222101 | PLLCON_LOKI,
-> >>>      [NPCM7XX_CLK_PLLCON1]       =3D 0x00202101 | PLLCON_LOKI,
-> >>>
-> >>> which switches the CPU core and UART to run from PLL2 instead of
-> >>> CLKREF (25 MHz).
-> >>>
-> >>> With this change, the test passes without optimization:
-> >>>
-> >>>  (02/19) tests/acceptance/boot_linux_console.py:BootLinuxConsole.test=
-_arm_quanta_gsj_initrd:
-> >>> PASS (39.62 s)
-> >>>
-> >>> It doesn't look like this change hurts booting from the bootrom (IIUC
-> >>> the nuvoton bootblock overwrites CLKSEL anyway), but it's not super
-> >>> clean.
-> >>>
-> >>> Perhaps I should make it conditional on kernel_filename being set? Or
-> >>> would it be better to provide a write_board_setup hook for this?
-> >>
-> >> QEMU prefers to avoid ifdef'ry at all cost. However I find this
-> >> approach acceptable (anyway up to the maintainer):
-> >>
-> >> +static void npcm7xx_clk_cold_reset_fixup(NPCM7xxCLKState *s)
-> >> +{
-> >> +#ifndef __OPTIMIZE__
-> >> +    /*
-> >> +     * When built without optimization, ...
-> >> +     * so run CPU core and UART from PLL2 instead of CLKREF.
-> >> +     */
-> >> +    s->regs[NPCM7XX_CLK_CLKSEL] |=3D 0x103,
-> >> +#endif
-> >> +}
-> >
-> > I think this is actually a problem regardless of optimization level.
-> > Turning optimization off amplifies the problem, but the problem is
-> > still there with optimization on.
+> Add python notrun-helper similar to _check_o_direct for bash tests.
+> To be used in the following commit.
 >
-> OK, this reminds me few more details about the problem I had with the
-> raspi3 when adding the ClockPowerResetManager block.
-> Found the branch. A bit bitter/sad it was more than 1 year ago.
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+>  tests/qemu-iotests/iotests.py | 6 ++++++
+>  1 file changed, 6 insertions(+)
 >
-> So if ARM_FEATURE_GENERIC_TIMER is available, Linux polls the CNTFRQ_EL0
-> register. At that time this register were using a fixed frequency:
+> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
+> index 717b5b652c..369e9918b4 100644
+> --- a/tests/qemu-iotests/iotests.py
+> +++ b/tests/qemu-iotests/iotests.py
+> @@ -1083,6 +1083,12 @@ def _verify_aio_mode(supported_aio_modes: Sequence[str] = ()) -> None:
+>      if supported_aio_modes and (aiomode not in supported_aio_modes):
+>          notrun('not suitable for this aio mode: %s' % aiomode)
 >
-> #define ARM_CPU_FREQ 1000000000 /* FIXME: 1 GHz, should be configurable *=
-/
+> +def verify_o_direct() -> None:
+> +    with FilePath('test_o_direct') as f:
+> +        qemu_img_create('-f', 'raw', f, '1M')
+> +        if 'O_DIRECT' in qemu_io('-f', 'raw', '-t', 'none', '-c', 'quit', f):
+> +            notrun(f'file system at {test_dir} does not support O_DIRECT')
+
+Why not:
+
+    with FilePath('test_o_direct') as f:
+        try:
+            fd = os.open(f, os.O_DIRECT | os.O_CREAT | os.O_RDWR)
+        except OSError as e:
+            if e.errno != errno.EINVAL:
+                raise
+            notrun(...)
+        else:
+           os.close(fd)
+
+More verbose, but the intent is more clear, and we do not depend on the output
+of qemu-io which is not a public API. For example if someone improves qemu-io
+to fail with:
+
+    Direct I/O is not supported
+
+It would break the tests using this helper.
+
+Nir
+
+> +
+>  def supports_quorum():
+>      return 'quorum' in qemu_img_pipe('--help')
 >
-> Xilinx' fork does it this way:
-> https://github.com/Xilinx/qemu/commit/9e939b54e2d
+> --
+> 2.21.3
 >
-> Now I see Andrew Jeffery fixed that in 96eec6b2b38
-> ("target/arm: Prepare generic timer for per-platform CNTFRQ")
-> adding a 'cntfrq' property, which he then sets in the Aspeed
-> machine in commit 058d095532d ("ast2600: Configure CNTFRQ at 1125MHz").
 >
-> Maybe your SoC is simply missing this property?
 
-Hmm, it doesn't look like Cortex-A9 has this property...
-
-Unexpected error in object_property_find() at
-/usr/local/google/home/hskinnemoen/qemu/upstream/qom/object.c:1254:
-qemu-system-arm: Property '.cntfrq' not found
-
-However, I did notice there are a lot of constraints on input
-frequencies to the CPU and various peripherals, and many of these are
-not met by the power-on reset values.
-
-For example, the UART needs a 24 MHz input clock, but there's no way
-to generate this from the default 25 MHz reference clock. However,
-PLL2 is set up to run at 960 MHz by default (as soon as it's locked),
-with a fixed /2 divider. The UART uses a /20 divider by default, so it
-gets a 25 MHz / 20 =3D 1.25 MHz clock with power-on defaults. However,
-switching the source to PLL2 results in 960 MHz / 2 / 20 =3D 24 MHz.
-
-Similarly, the CPU is supposed to run at 800 MHz, but it runs at 25
-MHz with power-on defaults. PLL1 runs at 800 MHz by default, with a
-fixed /2 divider. The boot loader doubles the feedback divider so it
-turns into 1600 MHz / 2 =3D 800 MHz.
-
-Turns out I was wrong above, the patch snippet routes PLL1, not PLL2,
-to the CPU. But it will only result in half the recommended speed, so
-a patch to PLLCON1 is needed as well.
-
-It seems like the cleanest solution would be to add a
-write_board_setup hook to fix up these registers so clocks are within
-normal ranges when bypassing the boot loader. In particular:
-
-  - Switch UART to PLL2 for a 24 MHz input clock.
-  - Set up PLL1 to run at 1600 MHz.
-  - Switch the CPU core to PLL1 / 2 for a 800 MHz input clock.
-
-Does that make sense? It should be just three simple register writes,
-which is doable with hand-edited machine code.
-
-I'll add this as a separate patch (right before the acceptance test)
-so it's clear what's happening.
-
-Unfortunately, I haven't been able to make the flash boot test pass
-without optimization. U-boot seems to have a tiny buffer for the
-command line, so I can only disable two or three systemd services
-before it gets truncated. I might try to create a reduced openbmc
-image instead.
-
-Havard
 
