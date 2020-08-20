@@ -2,87 +2,125 @@ Return-Path: <SRS0=Dndf=B6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A7C5C433E3
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 09:24:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E5D1C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 09:47:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C9D7D22CE3
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 09:24:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6A5DF22BEA
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 09:47:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=anisinha-ca.20150623.gappssmtp.com header.i=@anisinha-ca.20150623.gappssmtp.com header.b="u7ReBjW3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C9D7D22CE3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=anisinha.ca
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="rCi6wbSf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A5DF22BEA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43218 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51322 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8gnt-000076-VZ
-	for qemu-devel@archiver.kernel.org; Thu, 20 Aug 2020 05:24:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59930)
+	id 1k8hA6-0004jA-O2
+	for qemu-devel@archiver.kernel.org; Thu, 20 Aug 2020 05:47:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37184)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1k8gmj-0007GT-Lv
- for qemu-devel@nongnu.org; Thu, 20 Aug 2020 05:23:01 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:45522)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1k8gmh-0002ws-Id
- for qemu-devel@nongnu.org; Thu, 20 Aug 2020 05:23:01 -0400
-Received: by mail-wr1-x441.google.com with SMTP id z18so1293573wrm.12
- for <qemu-devel@nongnu.org>; Thu, 20 Aug 2020 02:22:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=anisinha-ca.20150623.gappssmtp.com; s=20150623;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=3jJCb4qoAzH9kDZz4LVmAbFOZI2+0ILxucgj/GAiGrs=;
- b=u7ReBjW3worY+9nnvyeZ9eAP/IhlLfol/bCymQ5zvISZgRVEbuRRSYXP2GbGcO1JBh
- 2PWgqku44FkA8P6zRn7YRsS+qLcQWv3vClRThQyIp5tjn8z3EvWDqdYwMrlZHzgffxLi
- Fu0unTTjmLz87AXCeXOPtJ2fTWIvMzDUgkkdsEaSqO/s8Vyt0LvVgCqEeZEvqCT5vpx4
- 51GXxHL62LzuYcXaGF8vZIJLdus8/04xs4y3u8CyzWyLN/y19J7e9yPYg2NlSN523B1n
- HhX/hjmd5Ha6HzMdrEQz+m/xWNpoFk96sPkQMuBzEQV3zAGXfNdm+05dQATuVcx4ogKz
- rjkA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=3jJCb4qoAzH9kDZz4LVmAbFOZI2+0ILxucgj/GAiGrs=;
- b=lPCKwEEFsd7GWr+tH2F7JKANrP9wGrM0xotWidr8CGlqAUXSEmOjJh5/bz9GYrwgcA
- hzMuI/vT22nfFGk6ktgl0O6YHsdNzj7nLXd9WT/GggqT5HHOGRH1CRgI7LR6/ibsqFKF
- VANZUMsLZ43S7Uw8VnpRCp6kKULhdWtIeBJ1FlL/0enEDpaQFrBZksAIlliqLCnoPKjx
- Jnsp0s7jw7ESvwUseE0hNoNCv/AU8jP3jgtteijM4POIqoOP1jbk47afiCc5uB/9YcK1
- z0rPX+04iZhjsPGBUzCgl4GZhUnZ97EoOCRaTjf8U0f/Sm/gU6Jaeaz8bLb0K9jyjssS
- CuHA==
-X-Gm-Message-State: AOAM531Kv/h4caA0vk6qYqVEzYat1+6WHDhmyNmVoqNl5lwP0zEReEdV
- E6BIDnHOnSDFiI24kC9dk3zjhbJ5jMATfCjb+HQxzg==
-X-Google-Smtp-Source: ABdhPJz1ADy9FUfzzJ3j6Vv2vpyzAqZKOumW70F3Pw+eB3u7NsXvyotIKVMFw+11IVEVnr5CertVrTW+0/Z0HdMNkfk=
-X-Received: by 2002:adf:9c8c:: with SMTP id d12mr2192456wre.369.1597915377886; 
- Thu, 20 Aug 2020 02:22:57 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1k8h9G-0004AI-LS; Thu, 20 Aug 2020 05:46:19 -0400
+Received: from mail-eopbgr140097.outbound.protection.outlook.com
+ ([40.107.14.97]:22606 helo=EUR01-VE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1k8h9A-0006AL-1y; Thu, 20 Aug 2020 05:46:17 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=CEANAZOjEReEJHrVL9Ko2qEZOHPkBJN2dXC9WuJsoYMNhWE6Ed/B/ccVqcpSGy4SgAwQqhq0aXgQT1Tl8VSVQe9PpbY3kKQdT1JQuD9OS919wTbQ+h0b8cx9TvGoXm7+rpxDeYBGzw97weYc+c5YId0IJxEgfKVmhDPRslxkmqPfHAjwaDy5mtLavIJ/L0dM4LhocF0iM7q+0L60+4jGNuDqXijgSBsgxiLk4F+5byx+rMJPJki8jnpwWGxuKxO8aDgdccu1u5SkPJQAa45uA26UNe8ZM+lqXJRzcChE6adBvqczP9DP7oUgLa8oBTWfmw9Y+jopH/ZQSBWaEfGgsg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=E9fBuTKnKVAqSL+SyVVNDJ1UUCPygivqiMvsKTdXLds=;
+ b=OcsJZ4tF5e/DENZtOhBtfjtuLf95LfsUnq4DXJAboX9z/UO+YT7WDQfbKICnS3BGi1Mmp3x4siQMHikP1uHcmau46AouQNmjkdIaMIFa07R5gqaHOiqf2s805/m/YJM6a6mkNukL/be/MhbuknPNX5eRre9545LKF9AqCjLBDqErHRjxL0zNC4paCoIB6VlsrNwNcKt0JEAlKZzRN0Ev4e7SSzglT0XFO/tJ3bYBu+LJszN2Wftzk+rsegA9qR9HtqiBVgXdWWqDzZITHtvLnhgy9nq/0xUSadcMDzIXlNGCZHK4UGBzmzQepbBfFByE3HUPtir1y3AWE01uKv7+tA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=E9fBuTKnKVAqSL+SyVVNDJ1UUCPygivqiMvsKTdXLds=;
+ b=rCi6wbSfQ3LPPmf0JSQnrsEL/SX8AjQbPdxSoIcxTHgQN+FAbuuX/x5xloZg0/kA1UJfNzrD+7DsOpHs85uySZVfAifP2KW0RzoQFChhcO29exOh5B5gvpRa9NcmaBUXcAek36Mhr8oI/ENdXmTOW6jLQ+HCbn4eUNYoEFaLqmg=
+Authentication-Results: openvz.org; dkim=none (message not signed)
+ header.d=none;openvz.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM6PR08MB4342.eurprd08.prod.outlook.com (2603:10a6:20b:b4::22)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3283.18; Thu, 20 Aug
+ 2020 09:46:06 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::8c0c:c056:97a5:484a]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::8c0c:c056:97a5:484a%3]) with mapi id 15.20.3283.027; Thu, 20 Aug 2020
+ 09:46:06 +0000
+Subject: Re: [PATCH v3 12/12] block/qcow2: automatically insert preallocate
+ filter when on FUSE
+To: Stefan Hajnoczi <stefanha@redhat.com>
+References: <20200817091553.283155-1-vsementsov@virtuozzo.com>
+ <20200817091553.283155-13-vsementsov@virtuozzo.com>
+ <20200819151515.GO366841@stefanha-x1.localdomain>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <38f6c463-3121-d1d9-6bf2-74f6a9baa97d@virtuozzo.com>
+Date: Thu, 20 Aug 2020 12:46:04 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
+In-Reply-To: <20200819151515.GO366841@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: AM0PR03CA0027.eurprd03.prod.outlook.com
+ (2603:10a6:208:14::40) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
 MIME-Version: 1.0
-References: <20200820081659.17328-1-ani@anisinha.ca>
- <447c3e1d-ab86-13bd-4699-d791c1bc1d0d@redhat.com>
-In-Reply-To: <447c3e1d-ab86-13bd-4699-d791c1bc1d0d@redhat.com>
-From: Ani Sinha <ani@anisinha.ca>
-Date: Thu, 20 Aug 2020 14:52:46 +0530
-Message-ID: <CAARzgwxB+6At5nRw3f5TTu50bgc2SjNtnhf1Au6vtpH5yncP1w@mail.gmail.com>
-Subject: Re: [PATCH V5] Introduce a new flag for i440fx to disable PCI hotplug
- on the root bus
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: none client-ip=2a00:1450:4864:20::441;
- envelope-from=ani@anisinha.ca; helo=mail-wr1-x441.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.5] (185.215.60.171) by
+ AM0PR03CA0027.eurprd03.prod.outlook.com (2603:10a6:208:14::40) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3305.24 via Frontend Transport; Thu, 20 Aug 2020 09:46:05 +0000
+X-Originating-IP: [185.215.60.171]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 3b7a9296-8050-468f-fd40-08d844eddbe4
+X-MS-TrafficTypeDiagnostic: AM6PR08MB4342:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM6PR08MB4342FDC66C9A27C1C3355E91C15A0@AM6PR08MB4342.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: PglUHEckUEFgR90lsQQ6c3T3mMBVJJ38IFB9OgmZWDGyfuggKS7N/ccQNLZDPV0BdHHXratwkyFh7K3SFx5HX0Rq4uFzjLnG5WbbCEGV8pypPucnwDvddYKSQ+SA6Yoxc+/QNQ55s0iw1lge54MSL6XGlDS5EaWGTrEnZzo6f1QrqeFdaw5S2Md+qT/LXbrDcudnRHcVpphTdJejX5g6FaPlfANcraKYZs5opVAninChwaVsC28ENF5+Cbh+7nDDC/DSqTBqhTvuPJkxvvdbW/bgl29yeU39d7/TvTDvPb7qd7F2VRkgA0rEdnNLwA2x9m9olVkYmCWuigx1N41NgEz2P4gOU80y7xsBdi1XwL78W/XepytmQ3rMs7rgAcTj
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(4636009)(366004)(39840400004)(346002)(396003)(136003)(376002)(4326008)(66946007)(66556008)(36756003)(6916009)(66476007)(8676002)(6486002)(86362001)(316002)(107886003)(8936002)(26005)(16576012)(5660300002)(31696002)(478600001)(16526019)(186003)(52116002)(31686004)(83380400001)(2616005)(2906002)(956004)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: 8+cIrohD2PKNRxaLo7s9af9V7r+7KTqndC82PepGPQT0vrMkwbOzqU0Dp8MEodSeohFVj0a8mFlavBYmb4xFSSB1VV2LYZirOA4+666XHphrq9Q36BxUM/BNBmFuDtZ+ehrL9HcXEz/vzucQC5AKvuIdyafbPEzz9s3wBra241gEeMGH7ko7Z7h53FbwKajRrotL37Q/XR+03vCySY/T28Rlppm/t3oyBhBsLGdxh/0wqURdGXBUZdqlIqJE1MWdGBQv1zzZI6ann3OWqfnkYuL66/in3kFo66GqNutd8ai4JUaTolrwQTAqGAUiqPL3vw1VDNiIyLfanIMPcd6iLu2b18VKgpuHg+jrhqXaoknI7dxDGc6BLOMZ0QOLc6F9dashaeXAdc+d2CkAPUZbRMdNeyqeEiRj8ADcPcd9cYHt5sCNjcWj75Lt1OIlFCwg6MAdeNbxclTKbug2HMDuH0ME58yjMKZ4vCvm8uJ3qt4vvf+SrgH8ZYOR0bYMEUYiIcMZjYqOgJPhxPCm9XxUAXj5u8K7rjPvl/Ezz6AdA7I8PJcD6kaqscXVA3i+yvfkG45916xQrB8Yd0Xinp2VhuWm9o0jFXYj6xSacZL6JmzHLGyOjjz/JrDNDjNjpICkfH2zDPYpx4pSp9rGJ/T2Tw==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3b7a9296-8050-468f-fd40-08d844eddbe4
+X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Aug 2020 09:46:06.2848 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: N2VOVv07cl6WYPCeQO3wlR0XkpzIKyOsJ6u0TQv9MLwWPnLEiEBWON6yMi6H/3OEqwhv7BMUi17WTu0qekb8JZmjt+PpXNmVFvDQyrj2Cqo=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4342
+Received-SPF: pass client-ip=40.107.14.97;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR01-VE1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/20 05:46:07
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,237 +133,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
+Cc: fam@euphon.net, kwolf@redhat.com, qemu-block@nongnu.org, armbru@redhat.com,
+ qemu-devel@nongnu.org, mreitz@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Aug 20, 2020 at 2:21 PM Philippe Mathieu-Daud=C3=A9
-<philmd@redhat.com> wrote:
->
-> On 8/20/20 10:16 AM, Ani Sinha wrote:
-> > We introduce a new global flag 'acpi-root-pci-hotplug' for i440fx with =
-which
-> > we can turn on or off PCI device hotplug on the root bus. This flag can=
- be
-> > used to prevent all PCI devices from getting hotplugged or unplugged fr=
-om the
-> > root PCI bus.
-> > This feature is targetted mostly towards Windows VMs. It is useful in c=
-ases
-> > where some hypervisor admins want to deploy guest VMs in a way so that =
-the
-> > users of the guest OSes are not able to hot-eject certain PCI devices f=
-rom
-> > the Windows system tray. Laine has explained the use case here in detai=
-l:
-> > https://www.redhat.com/archives/libvir-list/2020-February/msg00110.html
-> >
-> > Julia has resolved this issue for PCIE buses with the following commit:
-> > 530a0963184e57e71a5b538 ("pcie_root_port: Add hotplug disabling option"=
-)
-> >
-> > This commit attempts to introduce similar behavior for PCI root buses u=
-sed in
-> > i440fx machine types (although in this case, we do not have a per-slot
-> > capability to turn hotplug on or off).
-> >
-> > Usage:
-> >    -global PIIX4_PM.acpi-root-pci-hotplug=3Doff
-> >
-> > By default, this option is enabled which means that hotplug is turned o=
-n for
-> > the PCI root bus.
-> >
-> > The previously existing flag 'acpi-pci-hotplug-with-bridge-support' for=
- PCI-PCI
-> > bridges remain as is and can be used along with this new flag to contro=
-l PCI
-> > hotplug on PCI bridges.
-> >
-> > This change has been tested using a Windows 2012R2 server guest image a=
-nd also
-> > with a Windows 2019 server guest image on a Ubuntu 18.04 host using the=
- latest
-> > master qemu from upstream.
->
-> "latest master qemu from upstream" -> "v5.1.0 tag"
+19.08.2020 18:15, Stefan Hajnoczi wrote:
+> On Mon, Aug 17, 2020 at 12:15:53PM +0300, Vladimir Sementsov-Ogievskiy wrote:
+>> vstorage has slow allocation, so this patch detect vstorage
+>> (I hope, we don't use other FUSE filesystems) and inserts preallocate
+>> filter between qcow2 node and its file child.
+>>
+>> The following test executes more than 10 times faster
+>> (43.2s -> 3.9s for me) with this patch. (/newssd3 is mount point of
+>> vstorage, both cs and mds are on same ssd local ssd disk)
+>>
+>>      IMG=/newssd3/z
+>>      FILE_OPTS=file.filename=$IMG
+>>      COUNT=15000
+>>      CHUNK=64K
+>>      CLUSTER=1M
+>>      rm -f $IMG
+>>      ./qemu-img create -f qcow2 -o cluster_size=$CLUSTER $IMG 1G
+>>      ./qemu-img bench -c $COUNT -d 1 -s $CHUNK -w -t none -f qcow2 $IMG
+> 
+> Kevin's input is needed here. I think the philosophy is that nodes are
+> not automatically inserted. The user should define the graph explicitly.
+> The management tool would be responsible for configuring a preallocate
+> filter node.
+> 
 
-Addressed in V6.
+This patch originally is not intended to be merged upstream, only for downstream.
+I post it just to possibly get some ideas, could it be somehow useful for others.
+(I'm not sure, that all FUSE filesystems needs this filter. But vstorage needs)
 
->
-> >
-> > Signed-off-by: Ani Sinha <ani@anisinha.ca>
-> > ---
-> >  hw/acpi/piix4.c      |  8 ++++++--
-> >  hw/i386/acpi-build.c | 26 +++++++++++++++++++-------
-> >  2 files changed, 25 insertions(+), 9 deletions(-)
-> >
-> > Change Log:
-> > V4..V5: Updated commit message to reflect the fact that testing was als=
-o
-> > performed on a Windows 2019 server guest image. Minor commit log format=
-ting
-> > to make sure 80 col rule is enforced.
-> >
-> > diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
-> > index 26bac4f16c..4f436e5bf3 100644
-> > --- a/hw/acpi/piix4.c
-> > +++ b/hw/acpi/piix4.c
-> > @@ -78,6 +78,7 @@ typedef struct PIIX4PMState {
-> >
-> >      AcpiPciHpState acpi_pci_hotplug;
-> >      bool use_acpi_hotplug_bridge;
-> > +    bool use_acpi_root_pci_hotplug;
-> >
-> >      uint8_t disable_s3;
-> >      uint8_t disable_s4;
-> > @@ -595,8 +596,9 @@ static void piix4_acpi_system_hot_add_init(MemoryRe=
-gion *parent,
-> >                            "acpi-gpe0", GPE_LEN);
-> >      memory_region_add_subregion(parent, GPE_BASE, &s->io_gpe);
-> >
-> > -    acpi_pcihp_init(OBJECT(s), &s->acpi_pci_hotplug, bus, parent,
-> > -                    s->use_acpi_hotplug_bridge);
-> > +    if (s->use_acpi_hotplug_bridge || s->use_acpi_root_pci_hotplug)
-> > +        acpi_pcihp_init(OBJECT(s), &s->acpi_pci_hotplug, bus, parent,
-> > +                        s->use_acpi_hotplug_bridge);
-> >
-> >      s->cpu_hotplug_legacy =3D true;
-> >      object_property_add_bool(OBJECT(s), "cpu-hotplug-legacy",
-> > @@ -635,6 +637,8 @@ static Property piix4_pm_properties[] =3D {
-> >      DEFINE_PROP_UINT8(ACPI_PM_PROP_S4_VAL, PIIX4PMState, s4_val, 2),
-> >      DEFINE_PROP_BOOL("acpi-pci-hotplug-with-bridge-support", PIIX4PMSt=
-ate,
-> >                       use_acpi_hotplug_bridge, true),
-> > +    DEFINE_PROP_BOOL("acpi-root-pci-hotplug", PIIX4PMState,
-> > +                     use_acpi_root_pci_hotplug, true),
-> >      DEFINE_PROP_BOOL("memory-hotplug-support", PIIX4PMState,
-> >                       acpi_memory_hotplug.is_enabled, true),
-> >      DEFINE_PROP_END_OF_LIST(),
-> > diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> > index b7bcbbbb2a..19a1702ad1 100644
-> > --- a/hw/i386/acpi-build.c
-> > +++ b/hw/i386/acpi-build.c
-> > @@ -95,6 +95,7 @@ typedef struct AcpiPmInfo {
-> >      bool s3_disabled;
-> >      bool s4_disabled;
-> >      bool pcihp_bridge_en;
-> > +    bool pcihp_root_en;
-> >      uint8_t s4_val;
-> >      AcpiFadtData fadt;
-> >      uint16_t cpu_hp_io_base;
-> > @@ -245,6 +246,9 @@ static void acpi_get_pm_info(MachineState *machine,=
- AcpiPmInfo *pm)
-> >      pm->pcihp_bridge_en =3D
-> >          object_property_get_bool(obj, "acpi-pci-hotplug-with-bridge-su=
-pport",
-> >                                   NULL);
-> > +    pm->pcihp_root_en =3D
-> > +        object_property_get_bool(obj, "acpi-root-pci-hotplug", NULL);
-> > +
-> >  }
-> >
-> >  static void acpi_get_misc_info(AcpiMiscInfo *info)
-> > @@ -337,15 +341,18 @@ static void build_append_pcihp_notify_entry(Aml *=
-method, int slot)
-> >  }
-> >
-> >  static void build_append_pci_bus_devices(Aml *parent_scope, PCIBus *bu=
-s,
-> > -                                         bool pcihp_bridge_en)
-> > +                                         bool pcihp_bridge_en,
-> > +                                         bool pcihp_root_en)
-> >  {
-> >      Aml *dev, *notify_method =3D NULL, *method;
-> >      QObject *bsel;
-> >      PCIBus *sec;
-> >      int i;
-> > +    bool root_bus =3D pci_bus_is_root(bus);
-> > +    bool root_pcihp_disabled =3D (root_bus && !pcihp_root_en);
-> >
-> >      bsel =3D object_property_get_qobject(OBJECT(bus), ACPI_PCIHP_PROP_=
-BSEL, NULL);
-> > -    if (bsel) {
-> > +    if (bsel && !root_pcihp_disabled) {
-> >          uint64_t bsel_val =3D qnum_get_uint(qobject_to(QNum, bsel));
-> >
-> >          aml_append(parent_scope, aml_name_decl("BSEL", aml_int(bsel_va=
-l)));
-> > @@ -361,6 +368,9 @@ static void build_append_pci_bus_devices(Aml *paren=
-t_scope, PCIBus *bus,
-> >          bool bridge_in_acpi;
-> >
-> >          if (!pdev) {
-> > +            /* skip if pci hotplug for the root bus is disabled */
-> > +            if (root_pcihp_disabled)
-> > +                continue;
-> >              if (bsel) { /* add hotplug slots for non present devices *=
-/
-> >                  dev =3D aml_device("S%.02X", PCI_DEVFN(slot, 0));
-> >                  aml_append(dev, aml_name_decl("_SUN", aml_int(slot)));
-> > @@ -419,7 +429,7 @@ static void build_append_pci_bus_devices(Aml *paren=
-t_scope, PCIBus *bus,
-> >              method =3D aml_method("_S3D", 0, AML_NOTSERIALIZED);
-> >              aml_append(method, aml_return(aml_int(s3d)));
-> >              aml_append(dev, method);
-> > -        } else if (hotplug_enabled_dev) {
-> > +        } else if (hotplug_enabled_dev && !root_pcihp_disabled) {
-> >              /* add _SUN/_EJ0 to make slot hotpluggable  */
-> >              aml_append(dev, aml_name_decl("_SUN", aml_int(slot)));
-> >
-> > @@ -439,13 +449,14 @@ static void build_append_pci_bus_devices(Aml *par=
-ent_scope, PCIBus *bus,
-> >               */
-> >              PCIBus *sec_bus =3D pci_bridge_get_sec_bus(PCI_BRIDGE(pdev=
-));
-> >
-> > -            build_append_pci_bus_devices(dev, sec_bus, pcihp_bridge_en=
-);
-> > +            build_append_pci_bus_devices(dev, sec_bus, pcihp_bridge_en=
-,
-> > +                                         pcihp_root_en);
-> >          }
-> >          /* slot descriptor has been composed, add it into parent conte=
-xt */
-> >          aml_append(parent_scope, dev);
-> >      }
-> >
-> > -    if (bsel) {
-> > +    if (bsel && !root_pcihp_disabled) {
-> >          aml_append(parent_scope, notify_method);
-> >      }
-> >
-> > @@ -455,7 +466,7 @@ static void build_append_pci_bus_devices(Aml *paren=
-t_scope, PCIBus *bus,
-> >      method =3D aml_method("PCNT", 0, AML_NOTSERIALIZED);
-> >
-> >      /* If bus supports hotplug select it and notify about local events=
- */
-> > -    if (bsel) {
-> > +    if (bsel && !root_pcihp_disabled) {
-> >          uint64_t bsel_val =3D qnum_get_uint(qobject_to(QNum, bsel));
-> >
-> >          aml_append(method, aml_store(aml_int(bsel_val), aml_name("BNUM=
-")));
-> > @@ -1818,7 +1829,8 @@ build_dsdt(GArray *table_data, BIOSLinker *linker=
-,
-> >          if (bus) {
-> >              Aml *scope =3D aml_scope("PCI0");
-> >              /* Scan all PCI buses. Generate tables to support hotplug.=
- */
-> > -            build_append_pci_bus_devices(scope, bus, pm->pcihp_bridge_=
-en);
-> > +            build_append_pci_bus_devices(scope, bus, pm->pcihp_bridge_=
-en,
-> > +                                         pm->pcihp_root_en);
-> >
-> >              if (TPM_IS_TIS_ISA(tpm)) {
-> >                  if (misc->tpm_version =3D=3D TPM_VERSION_2_0) {
-> >
->
+Hmm, about automatically inserted nodes: why not? block jobs insert their filters
+automatically.. Anyway, for our downstream process the simplest thing is to
+insert it automatically in Qemu.
+
+
+
+-- 
+Best regards,
+Vladimir
 
