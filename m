@@ -7,82 +7,83 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FED9C433E3
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 00:19:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88870C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 00:20:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EF6A2207DA
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 00:19:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5205F207DA
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 00:20:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FqwYt1EU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF6A2207DA
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F2ISKZw3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5205F207DA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39440 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43394 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8YJ8-00017o-6z
-	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 20:19:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49082)
+	id 1k8YK5-0002mL-Kd
+	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 20:20:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49326)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1k8YCT-00056b-H9
- for qemu-devel@nongnu.org; Wed, 19 Aug 2020 20:13:01 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:36799)
+ id 1k8YD0-0005xp-9u
+ for qemu-devel@nongnu.org; Wed, 19 Aug 2020 20:13:34 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:22989
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1k8YCO-0002Hu-ML
- for qemu-devel@nongnu.org; Wed, 19 Aug 2020 20:13:01 -0400
+ id 1k8YCy-0002My-7a
+ for qemu-devel@nongnu.org; Wed, 19 Aug 2020 20:13:33 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597882375;
+ s=mimecast20190719; t=1597882410;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=BjllJhUgvJbL1j6uUE8y4YGfsQ1OFdnnCZ9x3Ip0SR4=;
- b=FqwYt1EUT9Em2PnPSBGNXIE74qaNa5UVgO+jVuTAMtfi0njYBE9Cb0Ge4ydRAz6bUSzYwc
- UrgIGKEX2a/2dsi2nTdR7+5E4pWICAP+grvSHpEXeKBt1jXrZ2T0egpxc2bvBvnG1FjeFk
- wfzNtuLs0Wr3ifjss21qnMv+zsanzyo=
+ bh=PLQ4YM4HOl5sDL6JvLr02L/xDCuwfVsbnS0VjDb8xGM=;
+ b=F2ISKZw3KdVV41eRorzLAbah2oBQfsRkjQBKfV3cPkyfmrglEF/mt/FIH77SldI3LtJsGa
+ PM9uRr+srs144ll50Zj8aD6Db2mwTCrflqQDesR2ZBpUAS9XCfYJ1DqcT3JNThg9zGkaQW
+ dlOF5L4sLHfMzzdIAILYT2R3CVVU2wQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-290-453NJgWkONKS13E_1wd09w-1; Wed, 19 Aug 2020 20:12:54 -0400
-X-MC-Unique: 453NJgWkONKS13E_1wd09w-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-348-6Ux9dyhHMrWezRLlZ9-ykw-1; Wed, 19 Aug 2020 20:13:26 -0400
+X-MC-Unique: 6Ux9dyhHMrWezRLlZ9-ykw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BE8911DDF7;
- Thu, 20 Aug 2020 00:12:52 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8924B1DE16;
+ Thu, 20 Aug 2020 00:13:25 +0000 (UTC)
 Received: from localhost (ovpn-117-244.rdu2.redhat.com [10.10.117.244])
- by smtp.corp.redhat.com (Postfix) with ESMTP id EC507709DC;
- Thu, 20 Aug 2020 00:12:51 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 087D15C1D0;
+ Thu, 20 Aug 2020 00:13:21 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 07/58] opentitan: Rename memmap enum constants
-Date: Wed, 19 Aug 2020 20:11:45 -0400
-Message-Id: <20200820001236.1284548-8-ehabkost@redhat.com>
+Subject: [PATCH v2 17/58] pci: Move PCIBusClass typedef to pci.h
+Date: Wed, 19 Aug 2020 20:11:55 -0400
+Message-Id: <20200820001236.1284548-18-ehabkost@redhat.com>
 In-Reply-To: <20200820001236.1284548-1-ehabkost@redhat.com>
 References: <20200820001236.1284548-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
 X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=ehabkost@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/19 20:12:48
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=ehabkost@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 23:05:17
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,237 +96,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, qemu-riscv@nongnu.org,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Palmer Dabbelt <palmer@dabbelt.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ "Daniel P. Berrange" <berrange@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Some of the enum constant names conflict with the QOM type check
-macros (IBEX_PLIC, IBEX_UART).  This needs to be addressed to
-allow us to transform the QOM type check macros into functions
-generated by OBJECT_DECLARE_TYPE().
+Move typedef closer to the type check macros, to make it easier
+to convert the code to OBJECT_DEFINE_TYPE() in the future.
 
-Rename all the constants to IBEX_DEV_*, to avoid conflicts.
-
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
-Changes v1 -> v2:
-* Added more details to commit message
+Changes v1 -> v2: none
 
 ---
-Cc: Alistair Francis <Alistair.Francis@wdc.com>
-Cc: Palmer Dabbelt <palmer@dabbelt.com>
-Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
-Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Cc: qemu-riscv@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 Cc: qemu-devel@nongnu.org
 ---
- include/hw/riscv/opentitan.h | 38 ++++++++--------
- hw/riscv/opentitan.c         | 84 ++++++++++++++++++------------------
- 2 files changed, 61 insertions(+), 61 deletions(-)
+ include/hw/pci/pci.h     | 1 +
+ include/hw/pci/pci_bus.h | 4 ++--
+ 2 files changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/include/hw/riscv/opentitan.h b/include/hw/riscv/opentitan.h
-index 8f29b9cbbf..835a80f896 100644
---- a/include/hw/riscv/opentitan.h
-+++ b/include/hw/riscv/opentitan.h
-@@ -49,25 +49,25 @@ typedef struct OpenTitanState {
- } OpenTitanState;
+diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+index c1bf7d5356..4ca7258b5b 100644
+--- a/include/hw/pci/pci.h
++++ b/include/hw/pci/pci.h
+@@ -396,6 +396,7 @@ typedef int (*pci_map_irq_fn)(PCIDevice *pci_dev, int irq_num);
+ typedef PCIINTxRoute (*pci_route_irq_fn)(void *opaque, int pin);
  
- enum {
--    IBEX_ROM,
--    IBEX_RAM,
--    IBEX_FLASH,
--    IBEX_UART,
--    IBEX_GPIO,
--    IBEX_SPI,
--    IBEX_FLASH_CTRL,
--    IBEX_RV_TIMER,
--    IBEX_AES,
--    IBEX_HMAC,
--    IBEX_PLIC,
--    IBEX_PWRMGR,
--    IBEX_RSTMGR,
--    IBEX_CLKMGR,
--    IBEX_PINMUX,
--    IBEX_ALERT_HANDLER,
--    IBEX_NMI_GEN,
--    IBEX_USBDEV,
--    IBEX_PADCTRL,
-+    IBEX_DEV_ROM,
-+    IBEX_DEV_RAM,
-+    IBEX_DEV_FLASH,
-+    IBEX_DEV_UART,
-+    IBEX_DEV_GPIO,
-+    IBEX_DEV_SPI,
-+    IBEX_DEV_FLASH_CTRL,
-+    IBEX_DEV_RV_TIMER,
-+    IBEX_DEV_AES,
-+    IBEX_DEV_HMAC,
-+    IBEX_DEV_PLIC,
-+    IBEX_DEV_PWRMGR,
-+    IBEX_DEV_RSTMGR,
-+    IBEX_DEV_CLKMGR,
-+    IBEX_DEV_PINMUX,
-+    IBEX_DEV_ALERT_HANDLER,
-+    IBEX_DEV_NMI_GEN,
-+    IBEX_DEV_USBDEV,
-+    IBEX_DEV_PADCTRL,
- };
+ #define TYPE_PCI_BUS "PCI"
++typedef struct PCIBusClass PCIBusClass;
+ #define PCI_BUS(obj) OBJECT_CHECK(PCIBus, (obj), TYPE_PCI_BUS)
+ #define PCI_BUS_CLASS(klass) OBJECT_CLASS_CHECK(PCIBusClass, (klass), TYPE_PCI_BUS)
+ #define PCI_BUS_GET_CLASS(obj) OBJECT_GET_CLASS(PCIBusClass, (obj), TYPE_PCI_BUS)
+diff --git a/include/hw/pci/pci_bus.h b/include/hw/pci/pci_bus.h
+index 0714f578af..347440d42c 100644
+--- a/include/hw/pci/pci_bus.h
++++ b/include/hw/pci/pci_bus.h
+@@ -10,14 +10,14 @@
+  * use accessor functions in pci.h
+  */
  
- enum {
-diff --git a/hw/riscv/opentitan.c b/hw/riscv/opentitan.c
-index a8f0039e51..23ba3b4bfc 100644
---- a/hw/riscv/opentitan.c
-+++ b/hw/riscv/opentitan.c
-@@ -32,25 +32,25 @@ static const struct MemmapEntry {
-     hwaddr base;
-     hwaddr size;
- } ibex_memmap[] = {
--    [IBEX_ROM] =            {  0x00008000, 16 * KiB },
--    [IBEX_RAM] =            {  0x10000000,  0x10000 },
--    [IBEX_FLASH] =          {  0x20000000,  0x80000 },
--    [IBEX_UART] =           {  0x40000000,  0x10000 },
--    [IBEX_GPIO] =           {  0x40010000,  0x10000 },
--    [IBEX_SPI] =            {  0x40020000,  0x10000 },
--    [IBEX_FLASH_CTRL] =     {  0x40030000,  0x10000 },
--    [IBEX_PINMUX] =         {  0x40070000,  0x10000 },
--    [IBEX_RV_TIMER] =       {  0x40080000,  0x10000 },
--    [IBEX_PLIC] =           {  0x40090000,  0x10000 },
--    [IBEX_PWRMGR] =         {  0x400A0000,  0x10000 },
--    [IBEX_RSTMGR] =         {  0x400B0000,  0x10000 },
--    [IBEX_CLKMGR] =         {  0x400C0000,  0x10000 },
--    [IBEX_AES] =            {  0x40110000,  0x10000 },
--    [IBEX_HMAC] =           {  0x40120000,  0x10000 },
--    [IBEX_ALERT_HANDLER] =  {  0x40130000,  0x10000 },
--    [IBEX_NMI_GEN] =        {  0x40140000,  0x10000 },
--    [IBEX_USBDEV] =         {  0x40150000,  0x10000 },
--    [IBEX_PADCTRL] =        {  0x40160000,  0x10000 }
-+    [IBEX_DEV_ROM] =            {  0x00008000, 16 * KiB },
-+    [IBEX_DEV_RAM] =            {  0x10000000,  0x10000 },
-+    [IBEX_DEV_FLASH] =          {  0x20000000,  0x80000 },
-+    [IBEX_DEV_UART] =           {  0x40000000,  0x10000 },
-+    [IBEX_DEV_GPIO] =           {  0x40010000,  0x10000 },
-+    [IBEX_DEV_SPI] =            {  0x40020000,  0x10000 },
-+    [IBEX_DEV_FLASH_CTRL] =     {  0x40030000,  0x10000 },
-+    [IBEX_DEV_PINMUX] =         {  0x40070000,  0x10000 },
-+    [IBEX_DEV_RV_TIMER] =       {  0x40080000,  0x10000 },
-+    [IBEX_DEV_PLIC] =           {  0x40090000,  0x10000 },
-+    [IBEX_DEV_PWRMGR] =         {  0x400A0000,  0x10000 },
-+    [IBEX_DEV_RSTMGR] =         {  0x400B0000,  0x10000 },
-+    [IBEX_DEV_CLKMGR] =         {  0x400C0000,  0x10000 },
-+    [IBEX_DEV_AES] =            {  0x40110000,  0x10000 },
-+    [IBEX_DEV_HMAC] =           {  0x40120000,  0x10000 },
-+    [IBEX_DEV_ALERT_HANDLER] =  {  0x40130000,  0x10000 },
-+    [IBEX_DEV_NMI_GEN] =        {  0x40140000,  0x10000 },
-+    [IBEX_DEV_USBDEV] =         {  0x40150000,  0x10000 },
-+    [IBEX_DEV_PADCTRL] =        {  0x40160000,  0x10000 }
- };
+-typedef struct PCIBusClass {
++struct PCIBusClass {
+     /*< private >*/
+     BusClass parent_class;
+     /*< public >*/
  
- static void opentitan_board_init(MachineState *machine)
-@@ -66,12 +66,12 @@ static void opentitan_board_init(MachineState *machine)
-     qdev_realize(DEVICE(&s->soc), NULL, &error_abort);
+     int (*bus_num)(PCIBus *bus);
+     uint16_t (*numa_node)(PCIBus *bus);
+-} PCIBusClass;
++};
  
-     memory_region_init_ram(main_mem, NULL, "riscv.lowrisc.ibex.ram",
--        memmap[IBEX_RAM].size, &error_fatal);
-+        memmap[IBEX_DEV_RAM].size, &error_fatal);
-     memory_region_add_subregion(sys_mem,
--        memmap[IBEX_RAM].base, main_mem);
-+        memmap[IBEX_DEV_RAM].base, main_mem);
- 
-     if (machine->firmware) {
--        riscv_load_firmware(machine->firmware, memmap[IBEX_RAM].base, NULL);
-+        riscv_load_firmware(machine->firmware, memmap[IBEX_DEV_RAM].base, NULL);
-     }
- 
-     if (machine->kernel_filename) {
-@@ -115,28 +115,28 @@ static void lowrisc_ibex_soc_realize(DeviceState *dev_soc, Error **errp)
- 
-     /* Boot ROM */
-     memory_region_init_rom(&s->rom, OBJECT(dev_soc), "riscv.lowrisc.ibex.rom",
--                           memmap[IBEX_ROM].size, &error_fatal);
-+                           memmap[IBEX_DEV_ROM].size, &error_fatal);
-     memory_region_add_subregion(sys_mem,
--        memmap[IBEX_ROM].base, &s->rom);
-+        memmap[IBEX_DEV_ROM].base, &s->rom);
- 
-     /* Flash memory */
-     memory_region_init_rom(&s->flash_mem, OBJECT(dev_soc), "riscv.lowrisc.ibex.flash",
--                           memmap[IBEX_FLASH].size, &error_fatal);
--    memory_region_add_subregion(sys_mem, memmap[IBEX_FLASH].base,
-+                           memmap[IBEX_DEV_FLASH].size, &error_fatal);
-+    memory_region_add_subregion(sys_mem, memmap[IBEX_DEV_FLASH].base,
-                                 &s->flash_mem);
- 
-     /* PLIC */
-     if (!sysbus_realize(SYS_BUS_DEVICE(&s->plic), errp)) {
-         return;
-     }
--    sysbus_mmio_map(SYS_BUS_DEVICE(&s->plic), 0, memmap[IBEX_PLIC].base);
-+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->plic), 0, memmap[IBEX_DEV_PLIC].base);
- 
-     /* UART */
-     qdev_prop_set_chr(DEVICE(&(s->uart)), "chardev", serial_hd(0));
-     if (!sysbus_realize(SYS_BUS_DEVICE(&s->uart), errp)) {
-         return;
-     }
--    sysbus_mmio_map(SYS_BUS_DEVICE(&s->uart), 0, memmap[IBEX_UART].base);
-+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->uart), 0, memmap[IBEX_DEV_UART].base);
-     sysbus_connect_irq(SYS_BUS_DEVICE(&s->uart),
-                        0, qdev_get_gpio_in(DEVICE(&s->plic),
-                        IBEX_UART_TX_WATERMARK_IRQ));
-@@ -151,33 +151,33 @@ static void lowrisc_ibex_soc_realize(DeviceState *dev_soc, Error **errp)
-                        IBEX_UART_RX_OVERFLOW_IRQ));
- 
-     create_unimplemented_device("riscv.lowrisc.ibex.gpio",
--        memmap[IBEX_GPIO].base, memmap[IBEX_GPIO].size);
-+        memmap[IBEX_DEV_GPIO].base, memmap[IBEX_DEV_GPIO].size);
-     create_unimplemented_device("riscv.lowrisc.ibex.spi",
--        memmap[IBEX_SPI].base, memmap[IBEX_SPI].size);
-+        memmap[IBEX_DEV_SPI].base, memmap[IBEX_DEV_SPI].size);
-     create_unimplemented_device("riscv.lowrisc.ibex.flash_ctrl",
--        memmap[IBEX_FLASH_CTRL].base, memmap[IBEX_FLASH_CTRL].size);
-+        memmap[IBEX_DEV_FLASH_CTRL].base, memmap[IBEX_DEV_FLASH_CTRL].size);
-     create_unimplemented_device("riscv.lowrisc.ibex.rv_timer",
--        memmap[IBEX_RV_TIMER].base, memmap[IBEX_RV_TIMER].size);
-+        memmap[IBEX_DEV_RV_TIMER].base, memmap[IBEX_DEV_RV_TIMER].size);
-     create_unimplemented_device("riscv.lowrisc.ibex.pwrmgr",
--        memmap[IBEX_PWRMGR].base, memmap[IBEX_PWRMGR].size);
-+        memmap[IBEX_DEV_PWRMGR].base, memmap[IBEX_DEV_PWRMGR].size);
-     create_unimplemented_device("riscv.lowrisc.ibex.rstmgr",
--        memmap[IBEX_RSTMGR].base, memmap[IBEX_RSTMGR].size);
-+        memmap[IBEX_DEV_RSTMGR].base, memmap[IBEX_DEV_RSTMGR].size);
-     create_unimplemented_device("riscv.lowrisc.ibex.clkmgr",
--        memmap[IBEX_CLKMGR].base, memmap[IBEX_CLKMGR].size);
-+        memmap[IBEX_DEV_CLKMGR].base, memmap[IBEX_DEV_CLKMGR].size);
-     create_unimplemented_device("riscv.lowrisc.ibex.aes",
--        memmap[IBEX_AES].base, memmap[IBEX_AES].size);
-+        memmap[IBEX_DEV_AES].base, memmap[IBEX_DEV_AES].size);
-     create_unimplemented_device("riscv.lowrisc.ibex.hmac",
--        memmap[IBEX_HMAC].base, memmap[IBEX_HMAC].size);
-+        memmap[IBEX_DEV_HMAC].base, memmap[IBEX_DEV_HMAC].size);
-     create_unimplemented_device("riscv.lowrisc.ibex.pinmux",
--        memmap[IBEX_PINMUX].base, memmap[IBEX_PINMUX].size);
-+        memmap[IBEX_DEV_PINMUX].base, memmap[IBEX_DEV_PINMUX].size);
-     create_unimplemented_device("riscv.lowrisc.ibex.alert_handler",
--        memmap[IBEX_ALERT_HANDLER].base, memmap[IBEX_ALERT_HANDLER].size);
-+        memmap[IBEX_DEV_ALERT_HANDLER].base, memmap[IBEX_DEV_ALERT_HANDLER].size);
-     create_unimplemented_device("riscv.lowrisc.ibex.nmi_gen",
--        memmap[IBEX_NMI_GEN].base, memmap[IBEX_NMI_GEN].size);
-+        memmap[IBEX_DEV_NMI_GEN].base, memmap[IBEX_DEV_NMI_GEN].size);
-     create_unimplemented_device("riscv.lowrisc.ibex.usbdev",
--        memmap[IBEX_USBDEV].base, memmap[IBEX_USBDEV].size);
-+        memmap[IBEX_DEV_USBDEV].base, memmap[IBEX_DEV_USBDEV].size);
-     create_unimplemented_device("riscv.lowrisc.ibex.padctrl",
--        memmap[IBEX_PADCTRL].base, memmap[IBEX_PADCTRL].size);
-+        memmap[IBEX_DEV_PADCTRL].base, memmap[IBEX_DEV_PADCTRL].size);
- }
- 
- static void lowrisc_ibex_soc_class_init(ObjectClass *oc, void *data)
+ enum PCIBusFlags {
+     /* This bus is the root of a PCI domain */
 -- 
 2.26.2
 
