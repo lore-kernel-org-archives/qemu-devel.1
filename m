@@ -6,63 +6,62 @@ X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 557EDC433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 15:50:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46ED6C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 15:51:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2B542208DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 15:50:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B542208DB
+	by mail.kernel.org (Postfix) with ESMTPS id 1BBDD22D08
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 15:51:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BBDD22D08
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56722 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60312 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8mpO-0006KB-EL
-	for qemu-devel@archiver.kernel.org; Thu, 20 Aug 2020 11:50:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43662)
+	id 1k8mqZ-0007tS-D6
+	for qemu-devel@archiver.kernel.org; Thu, 20 Aug 2020 11:51:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43738)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k8mlE-0001CX-Sk
- for qemu-devel@nongnu.org; Thu, 20 Aug 2020 11:45:54 -0400
-Received: from indium.canonical.com ([91.189.90.7]:36312)
+ id 1k8mlJ-0001GL-CX
+ for qemu-devel@nongnu.org; Thu, 20 Aug 2020 11:45:57 -0400
+Received: from indium.canonical.com ([91.189.90.7]:36558)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k8mlD-0002ln-3s
- for qemu-devel@nongnu.org; Thu, 20 Aug 2020 11:45:52 -0400
+ id 1k8mlH-0002mQ-4J
+ for qemu-devel@nongnu.org; Thu, 20 Aug 2020 11:45:57 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1k8mlB-0007oE-3x
- for <qemu-devel@nongnu.org>; Thu, 20 Aug 2020 15:45:49 +0000
+ id 1k8mlE-0007oE-Ec
+ for <qemu-devel@nongnu.org>; Thu, 20 Aug 2020 15:45:52 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 0C3762E80EE
- for <qemu-devel@nongnu.org>; Thu, 20 Aug 2020 15:45:49 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 05DC62E8107
+ for <qemu-devel@nongnu.org>; Thu, 20 Aug 2020 15:45:52 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 20 Aug 2020 15:36:35 -0000
-From: Thomas Huth <1869497@bugs.launchpad.net>
+Date: Thu, 20 Aug 2020 15:39:59 -0000
+From: Thomas Huth <1861341@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
- assignee=wilburm@gmail.com; 
+ assignee=Laurent@vivier.eu; 
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: mattwilbur philmd pmaydell
-X-Launchpad-Bug-Reporter: Matt Wilbur (mattwilbur)
+X-Launchpad-Bug-Commenters: laurent-vivier rinigus-git
+X-Launchpad-Bug-Reporter: rinigus (rinigus-git)
 X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
-References: <158540989331.24425.14224651637245896063.malonedeb@soybean.canonical.com>
-Message-Id: <159793779802.16714.7970324078632321837.launchpad@soybean.canonical.com>
-Subject: [Bug 1869497] Re: x86_cpu_gdb_read_register segfaults when gdb
- requests registers
+References: <158033273927.19447.5685950954198072756.malonedeb@gac.canonical.com>
+Message-Id: <159793799965.1298.15249120737720849225.launchpad@chaenomeles.canonical.com>
+Subject: [Bug 1861341] Re: ARM QEMU: Unknown syscall 397
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="99c2d833c8d727fd05148486920aca032e908071"; Instance="production"
-X-Launchpad-Hash: e32d7047809853569c9e13c533274e9559b3c16f
+X-Launchpad-Hash: 36e102e106e2e741c04c1a67ee2d4fd7edcdaf11
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/20 10:50:55
@@ -84,7 +83,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1869497 <1869497@bugs.launchpad.net>
+Reply-To: Bug 1861341 <1861341@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -96,25 +95,50 @@ Sender: "Qemu-devel"
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1869497
+https://bugs.launchpad.net/bugs/1861341
 
 Title:
-  x86_cpu_gdb_read_register segfaults when gdb requests registers
+  ARM QEMU: Unknown syscall 397
 
 Status in QEMU:
   Fix Released
 
 Bug description:
-  When attempting to attach to the gdbstub, a segfault occurs.
+  QEMU is reporting
 
-  I traced this down to a problem in a call to gdb_get_reg16 where the
-  mem_buf was being treated like a uint8_t* instead of a GByteArray.
-  The buffer passed to gdb_get_reg16 ends up passing an invalid
-  GByteArray pointer, which subsequentlycauses a segfault in memcpy.
+  ```
+  Unknown syscall 397
+  ```
 
-  I have a fix for this - just need to educate myself on how to submit a
-  patch.
+  (statx if I read tables right) when used via flatpak for ARM images on
+  x86_64. This has been reproduced on Fedora and Gentoo.
+
+  To reproduce:
+
+  - get flatpak KDE 5.12 for arm:
+
+  flatpak install --user org.kde.Sdk/arm/5.12 org.kde.Platform/arm/5.12
+
+  =
+
+  - run qmake inside Sdk:
+
+  QEMU_STRACE=3D1 flatpak run --filesystem=3Dhost --command=3Dqmake
+  org.kde.Sdk/arm/5.12 .
+
+  =
+
+  You will get a host of messages with unknown syscall. In practice, qmake =
+will fail to find .pro files if you have them in that folder and libraries =
+in the system.
+
+  As far as I understand, Flatpak images are built on AARCH64 hardware.
+
+  My config on Gentoo:
+
+  kernel: 4.19.86-gentoo x86_64
+  app-emulation/qemu: ~4.2.0-r1 , same with 4.0.0
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1869497/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1861341/+subscriptions
 
