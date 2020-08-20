@@ -2,67 +2,68 @@ Return-Path: <SRS0=Dndf=B6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6F24C433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 00:36:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 697BDC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 00:38:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9E9D72078D
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 00:36:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2E9CB2078D
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 00:38:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aydnmiVZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E9D72078D
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YQtCnaqP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E9CB2078D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58400 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35908 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8YZN-0006q1-RX
-	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 20:36:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49638)
+	id 1k8Yat-0000kL-Em
+	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 20:38:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50036)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1k8YDU-0007Fx-O8
- for qemu-devel@nongnu.org; Wed, 19 Aug 2020 20:14:04 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:36403
- helo=us-smtp-1.mimecast.com)
+ id 1k8YEB-0000ZJ-Mb
+ for qemu-devel@nongnu.org; Wed, 19 Aug 2020 20:14:47 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:23930)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1k8YDT-0002RD-0F
- for qemu-devel@nongnu.org; Wed, 19 Aug 2020 20:14:04 -0400
+ id 1k8YE8-0002Xt-LG
+ for qemu-devel@nongnu.org; Wed, 19 Aug 2020 20:14:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597882442;
+ s=mimecast20190719; t=1597882483;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=D9F/zJODlTZa0Ik9V5FFLr0xn16D9Xi/6K5VZnCL0X8=;
- b=aydnmiVZVBYNgYhxh0Q9OtZKgsECmG3ItYw9JFDNUckZpeHbDlas61dezqHWX8k7Z9+iJf
- 5dH2QCGzwldjFoihPk6ORr17mKbxVdY7n1FkKDKBErfminQDc2xXplMNM9MhW8q8wukwjK
- fevsh9LSpS3HvT5DN8TiFbe5Sl9zDjc=
+ bh=BcAdcdXzRNxNFofrltUSexMRWXrtp8/eIWxMocHk1gI=;
+ b=YQtCnaqPIQIasIphhjCOOtphhE3JDJcornMTw27kAPZwbK/2cswwv5piuBMvIzerIDBtaN
+ Wbzq/L+JQZE/qSb7kNlWW0YG88/EWb/UA/QJnMTD7PovDq1ykTIdUwRPmECuEqzAwVaLaW
+ Uh0okQGy2FTI2S0TazQIFEztkMdhruI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-46-sy9pydsiPFaD92HxUyPSFA-1; Wed, 19 Aug 2020 20:14:00 -0400
-X-MC-Unique: sy9pydsiPFaD92HxUyPSFA-1
+ us-mta-503-WQYEl8JxMyeVogVpTGIq1g-1; Wed, 19 Aug 2020 20:14:41 -0400
+X-MC-Unique: WQYEl8JxMyeVogVpTGIq1g-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D5071186A579
- for <qemu-devel@nongnu.org>; Thu, 20 Aug 2020 00:13:59 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B17511007465
+ for <qemu-devel@nongnu.org>; Thu, 20 Aug 2020 00:14:40 +0000 (UTC)
 Received: from localhost (ovpn-117-244.rdu2.redhat.com [10.10.117.244])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A1C0160BEC;
- Thu, 20 Aug 2020 00:13:59 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 77D0D60BEC;
+ Thu, 20 Aug 2020 00:14:40 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 34/58] vmbus: Move QOM macros to vmbus.h
-Date: Wed, 19 Aug 2020 20:12:12 -0400
-Message-Id: <20200820001236.1284548-35-ehabkost@redhat.com>
+Subject: [PATCH v2 56/58] [automated] Use OBJECT_DECLARE_SIMPLE_TYPE when
+ possible
+Date: Wed, 19 Aug 2020 20:12:34 -0400
+Message-Id: <20200820001236.1284548-57-ehabkost@redhat.com>
 In-Reply-To: <20200820001236.1284548-1-ehabkost@redhat.com>
 References: <20200820001236.1284548-1-ehabkost@redhat.com>
 MIME-Version: 1.0
@@ -73,17 +74,18 @@ X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=ehabkost@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 23:05:17
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=ehabkost@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/19 20:12:51
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,68 +104,291 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Move all declarations related to TYPE_VMBUS to the same place in
-vmbus.h.
+Generated using:
 
-This will make future conversion to OBJECT_DECLARE* easier.
+ $ ./scripts/codeconverter/converter.py -i \
+   --pattern=ObjectDeclareType $(git grep -l '' -- '*.[ch]')
 
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
-Changes series v1 -> v2: new patch in series v2
-
-Cc: qemu-devel@nongnu.org
+Changes v1 -> v2: none
 ---
- include/hw/hyperv/vmbus-bridge.h | 3 +--
- include/hw/hyperv/vmbus.h        | 4 ++++
- hw/hyperv/vmbus.c                | 3 ---
- 3 files changed, 5 insertions(+), 5 deletions(-)
+ include/authz/list.h                | 7 ++-----
+ include/authz/listfile.h            | 7 ++-----
+ include/authz/pamacct.h             | 7 ++-----
+ include/authz/simple.h              | 7 ++-----
+ include/crypto/secret_keyring.h     | 7 ++-----
+ include/io/dns-resolver.h           | 7 ++-----
+ include/io/net-listener.h           | 7 ++-----
+ include/sysemu/vhost-user-backend.h | 7 ++-----
+ backends/dbus-vmstate.c             | 7 ++-----
+ ui/input-barrier.c                  | 7 ++-----
+ ui/input-linux.c                    | 7 ++-----
+ 11 files changed, 22 insertions(+), 55 deletions(-)
 
-diff --git a/include/hw/hyperv/vmbus-bridge.h b/include/hw/hyperv/vmbus-bridge.h
-index 33f93de64d..fe90bda01b 100644
---- a/include/hw/hyperv/vmbus-bridge.h
-+++ b/include/hw/hyperv/vmbus-bridge.h
-@@ -11,11 +11,10 @@
- #define HW_HYPERV_VMBUS_BRIDGE_H
+diff --git a/include/authz/list.h b/include/authz/list.h
+index e4e1040472..5676bb375c 100644
+--- a/include/authz/list.h
++++ b/include/authz/list.h
+@@ -27,8 +27,8 @@
  
- #include "hw/sysbus.h"
-+#include "hw/hyperv/vmbus.h"
+ #define TYPE_QAUTHZ_LIST "authz-list"
  
- #define TYPE_VMBUS_BRIDGE "vmbus-bridge"
+-OBJECT_DECLARE_TYPE(QAuthZList, QAuthZListClass,
+-                    qauthz_list, QAUTHZ_LIST)
++OBJECT_DECLARE_SIMPLE_TYPE(QAuthZList, qauthz_list,
++                           QAUTHZ_LIST, QAuthZClass)
  
--typedef struct VMBus VMBus;
--
- typedef struct VMBusBridge {
-     SysBusDevice parent_obj;
  
-diff --git a/include/hw/hyperv/vmbus.h b/include/hw/hyperv/vmbus.h
-index 40e8417eec..cd98ec24e7 100644
---- a/include/hw/hyperv/vmbus.h
-+++ b/include/hw/hyperv/vmbus.h
-@@ -26,6 +26,10 @@
- #define VMBUS_DEVICE_GET_CLASS(obj) \
-     OBJECT_GET_CLASS(VMBusDeviceClass, (obj), TYPE_VMBUS_DEVICE)
  
-+#define TYPE_VMBUS "vmbus"
-+typedef struct VMBus VMBus;
-+#define VMBUS(obj) OBJECT_CHECK(VMBus, (obj), TYPE_VMBUS)
-+
- /*
-  * Object wrapping a GPADL -- GPA Descriptor List -- an array of guest physical
-  * pages, to be used for various buffers shared between the host and the guest.
-diff --git a/hw/hyperv/vmbus.c b/hw/hyperv/vmbus.c
-index 34392e892a..75af6b83dd 100644
---- a/hw/hyperv/vmbus.c
-+++ b/hw/hyperv/vmbus.c
-@@ -20,9 +20,6 @@
- #include "cpu.h"
- #include "trace.h"
+@@ -68,9 +68,6 @@ struct QAuthZList {
+ };
  
--#define TYPE_VMBUS "vmbus"
--#define VMBUS(obj) OBJECT_CHECK(VMBus, (obj), TYPE_VMBUS)
--
- enum {
-     VMGPADL_INIT,
-     VMGPADL_ALIVE,
+ 
+-struct QAuthZListClass {
+-    QAuthZClass parent_class;
+-};
+ 
+ 
+ QAuthZList *qauthz_list_new(const char *id,
+diff --git a/include/authz/listfile.h b/include/authz/listfile.h
+index 89c5eafbfa..b491227bbe 100644
+--- a/include/authz/listfile.h
++++ b/include/authz/listfile.h
+@@ -27,8 +27,8 @@
+ 
+ #define TYPE_QAUTHZ_LIST_FILE "authz-list-file"
+ 
+-OBJECT_DECLARE_TYPE(QAuthZListFile, QAuthZListFileClass,
+-                    qauthz_list_file, QAUTHZ_LIST_FILE)
++OBJECT_DECLARE_SIMPLE_TYPE(QAuthZListFile, qauthz_list_file,
++                           QAUTHZ_LIST_FILE, QAuthZClass)
+ 
+ 
+ 
+@@ -87,9 +87,6 @@ struct QAuthZListFile {
+ };
+ 
+ 
+-struct QAuthZListFileClass {
+-    QAuthZClass parent_class;
+-};
+ 
+ 
+ QAuthZListFile *qauthz_list_file_new(const char *id,
+diff --git a/include/authz/pamacct.h b/include/authz/pamacct.h
+index 44bb5ff28d..7804853ddf 100644
+--- a/include/authz/pamacct.h
++++ b/include/authz/pamacct.h
+@@ -27,8 +27,8 @@
+ 
+ #define TYPE_QAUTHZ_PAM "authz-pam"
+ 
+-OBJECT_DECLARE_TYPE(QAuthZPAM, QAuthZPAMClass,
+-                    qauthz_pam, QAUTHZ_PAM)
++OBJECT_DECLARE_SIMPLE_TYPE(QAuthZPAM, qauthz_pam,
++                           QAUTHZ_PAM, QAuthZClass)
+ 
+ 
+ 
+@@ -79,9 +79,6 @@ struct QAuthZPAM {
+ };
+ 
+ 
+-struct QAuthZPAMClass {
+-    QAuthZClass parent_class;
+-};
+ 
+ 
+ QAuthZPAM *qauthz_pam_new(const char *id,
+diff --git a/include/authz/simple.h b/include/authz/simple.h
+index ba4a5ec5ea..346fcb0c6c 100644
+--- a/include/authz/simple.h
++++ b/include/authz/simple.h
+@@ -26,8 +26,8 @@
+ 
+ #define TYPE_QAUTHZ_SIMPLE "authz-simple"
+ 
+-OBJECT_DECLARE_TYPE(QAuthZSimple, QAuthZSimpleClass,
+-                    qauthz_simple, QAUTHZ_SIMPLE)
++OBJECT_DECLARE_SIMPLE_TYPE(QAuthZSimple, qauthz_simple,
++                           QAUTHZ_SIMPLE, QAuthZClass)
+ 
+ 
+ 
+@@ -62,9 +62,6 @@ struct QAuthZSimple {
+ };
+ 
+ 
+-struct QAuthZSimpleClass {
+-    QAuthZClass parent_class;
+-};
+ 
+ 
+ QAuthZSimple *qauthz_simple_new(const char *id,
+diff --git a/include/crypto/secret_keyring.h b/include/crypto/secret_keyring.h
+index cc2c7397db..73d2a8f501 100644
+--- a/include/crypto/secret_keyring.h
++++ b/include/crypto/secret_keyring.h
+@@ -26,8 +26,8 @@
+ #include "crypto/secret_common.h"
+ 
+ #define TYPE_QCRYPTO_SECRET_KEYRING "secret_keyring"
+-OBJECT_DECLARE_TYPE(QCryptoSecretKeyring, QCryptoSecretKeyringClass,
+-                    qcrypto_secret_keyring, QCRYPTO_SECRET_KEYRING)
++OBJECT_DECLARE_SIMPLE_TYPE(QCryptoSecretKeyring, qcrypto_secret_keyring,
++                           QCRYPTO_SECRET_KEYRING, QCryptoSecretCommonClass)
+ 
+ 
+ struct QCryptoSecretKeyring {
+@@ -36,8 +36,5 @@ struct QCryptoSecretKeyring {
+ };
+ 
+ 
+-struct QCryptoSecretKeyringClass {
+-    QCryptoSecretCommonClass parent;
+-};
+ 
+ #endif /* QCRYPTO_SECRET_KEYRING_H */
+diff --git a/include/io/dns-resolver.h b/include/io/dns-resolver.h
+index 8ae4857e05..e248fba5bd 100644
+--- a/include/io/dns-resolver.h
++++ b/include/io/dns-resolver.h
+@@ -26,8 +26,8 @@
+ #include "io/task.h"
+ 
+ #define TYPE_QIO_DNS_RESOLVER "qio-dns-resolver"
+-OBJECT_DECLARE_TYPE(QIODNSResolver, QIODNSResolverClass,
+-                    qio_dns_resolver, QIO_DNS_RESOLVER)
++OBJECT_DECLARE_SIMPLE_TYPE(QIODNSResolver, qio_dns_resolver,
++                           QIO_DNS_RESOLVER, ObjectClass)
+ 
+ 
+ /**
+@@ -133,9 +133,6 @@ struct QIODNSResolver {
+     Object parent;
+ };
+ 
+-struct QIODNSResolverClass {
+-    ObjectClass parent;
+-};
+ 
+ 
+ /**
+diff --git a/include/io/net-listener.h b/include/io/net-listener.h
+index 4f0847ff19..60fad29ff4 100644
+--- a/include/io/net-listener.h
++++ b/include/io/net-listener.h
+@@ -25,8 +25,8 @@
+ #include "qom/object.h"
+ 
+ #define TYPE_QIO_NET_LISTENER "qio-net-listener"
+-OBJECT_DECLARE_TYPE(QIONetListener, QIONetListenerClass,
+-                    qio_net_listener, QIO_NET_LISTENER)
++OBJECT_DECLARE_SIMPLE_TYPE(QIONetListener, qio_net_listener,
++                           QIO_NET_LISTENER, ObjectClass)
+ 
+ 
+ typedef void (*QIONetListenerClientFunc)(QIONetListener *listener,
+@@ -58,9 +58,6 @@ struct QIONetListener {
+     GDestroyNotify io_notify;
+ };
+ 
+-struct QIONetListenerClass {
+-    ObjectClass parent;
+-};
+ 
+ 
+ /**
+diff --git a/include/sysemu/vhost-user-backend.h b/include/sysemu/vhost-user-backend.h
+index 76ca06cf40..23205edeb8 100644
+--- a/include/sysemu/vhost-user-backend.h
++++ b/include/sysemu/vhost-user-backend.h
+@@ -22,13 +22,10 @@
+ #include "io/channel.h"
+ 
+ #define TYPE_VHOST_USER_BACKEND "vhost-user-backend"
+-OBJECT_DECLARE_TYPE(VhostUserBackend, VhostUserBackendClass,
+-                    vhost_user_backend, VHOST_USER_BACKEND)
++OBJECT_DECLARE_SIMPLE_TYPE(VhostUserBackend, vhost_user_backend,
++                           VHOST_USER_BACKEND, ObjectClass)
+ 
+ 
+-struct VhostUserBackendClass {
+-    ObjectClass parent_class;
+-};
+ 
+ struct VhostUserBackend {
+     /* private */
+diff --git a/backends/dbus-vmstate.c b/backends/dbus-vmstate.c
+index 55aea64af5..5173457148 100644
+--- a/backends/dbus-vmstate.c
++++ b/backends/dbus-vmstate.c
+@@ -23,12 +23,9 @@
+ 
+ 
+ #define TYPE_DBUS_VMSTATE "dbus-vmstate"
+-OBJECT_DECLARE_TYPE(DBusVMState, DBusVMStateClass,
+-                    dbus_vmstate, DBUS_VMSTATE)
++OBJECT_DECLARE_SIMPLE_TYPE(DBusVMState, dbus_vmstate,
++                           DBUS_VMSTATE, ObjectClass)
+ 
+-struct DBusVMStateClass {
+-    ObjectClass parent_class;
+-};
+ 
+ struct DBusVMState {
+     Object parent;
+diff --git a/ui/input-barrier.c b/ui/input-barrier.c
+index 6ff0a23ddb..8de18c92f8 100644
+--- a/ui/input-barrier.c
++++ b/ui/input-barrier.c
+@@ -20,8 +20,8 @@
+ #include "input-barrier.h"
+ 
+ #define TYPE_INPUT_BARRIER "input-barrier"
+-OBJECT_DECLARE_TYPE(InputBarrier, InputBarrierClass,
+-                    input_barrier, INPUT_BARRIER)
++OBJECT_DECLARE_SIMPLE_TYPE(InputBarrier, input_barrier,
++                           INPUT_BARRIER, ObjectClass)
+ 
+ 
+ #define MAX_HELLO_LENGTH 1024
+@@ -44,9 +44,6 @@ struct InputBarrier {
+     char buffer[MAX_HELLO_LENGTH];
+ };
+ 
+-struct InputBarrierClass {
+-    ObjectClass parent_class;
+-};
+ 
+ static const char *cmd_names[] = {
+     [barrierCmdCNoop]          = "CNOP",
+diff --git a/ui/input-linux.c b/ui/input-linux.c
+index d916c1eec1..7cd0bf3809 100644
+--- a/ui/input-linux.c
++++ b/ui/input-linux.c
+@@ -31,8 +31,8 @@ static bool linux_is_button(unsigned int lnx)
+ }
+ 
+ #define TYPE_INPUT_LINUX "input-linux"
+-OBJECT_DECLARE_TYPE(InputLinux, InputLinuxClass,
+-                    input_linux, INPUT_LINUX)
++OBJECT_DECLARE_SIMPLE_TYPE(InputLinux, input_linux,
++                           INPUT_LINUX, ObjectClass)
+ 
+ 
+ struct InputLinux {
+@@ -65,9 +65,6 @@ struct InputLinux {
+     QTAILQ_ENTRY(InputLinux) next;
+ };
+ 
+-struct InputLinuxClass {
+-    ObjectClass parent_class;
+-};
+ 
+ static QTAILQ_HEAD(, InputLinux) inputs = QTAILQ_HEAD_INITIALIZER(inputs);
+ 
 -- 
 2.26.2
 
