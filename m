@@ -2,91 +2,92 @@ Return-Path: <SRS0=Dndf=B6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.4 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FD9CC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 17:53:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4669C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 17:53:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5D26420885
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 17:53:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7093B20885
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 17:53:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e9RDpvwR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D26420885
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fKUFwHkA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7093B20885
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58282 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59818 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8okK-0003Gn-Lv
-	for qemu-devel@archiver.kernel.org; Thu, 20 Aug 2020 13:53:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49778)
+	id 1k8okb-0003t3-Mr
+	for qemu-devel@archiver.kernel.org; Thu, 20 Aug 2020 13:53:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49824)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1k8ojd-00027k-G4
- for qemu-devel@nongnu.org; Thu, 20 Aug 2020 13:52:21 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39634)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1k8ojr-0002Zg-73
+ for qemu-devel@nongnu.org; Thu, 20 Aug 2020 13:52:35 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35121
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1k8ojb-00052D-1J
- for qemu-devel@nongnu.org; Thu, 20 Aug 2020 13:52:21 -0400
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1k8ojp-00053q-Ht
+ for qemu-devel@nongnu.org; Thu, 20 Aug 2020 13:52:34 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597945938;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:in-reply-to:in-reply-to:  references:references;
- bh=eoSjKbIjZ61M4F/fiS7MUQTABuhiHSONQEo+JLBfK3s=;
- b=e9RDpvwR1HSHo1rThhW1Muwq82bZ7HC2OHJ0dMIGdW3frWSj7MMH7QyzVD+Nw+Qu76kM73
- kFey9ZyhxNR6IK5pljQ6rITfILCxkQOFZmwY9cOAa870hkl3GtBo7J1gsGjiGW4VHzeTVc
- kYLLGPddYohyRyJ8Ftwau9rmGidqDKo=
+ s=mimecast20190719; t=1597945952;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=q0JnO9S8Q31sL3Ots3YQgvCxsRneTWalPDDkUl8qm4c=;
+ b=fKUFwHkADUo61swNLUDakVup2cvrC4RiAJYkYCNHyyncaQHEiw9X/98qMYoucrJGd0G9hj
+ 8NVXiVEZZ2cSguoYpVtaznNe4+zd3+ZGOu4qs7vpNPduWeSeg0DlkeiZgbD8M/s3/p0WTg
+ N4rSN+yoTzwTUwL9HbgWNbfpIYqbWCc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-89-LNcile5DOOqGYfA2hqBg9w-1; Thu, 20 Aug 2020 13:51:56 -0400
-X-MC-Unique: LNcile5DOOqGYfA2hqBg9w-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-494-F1VsZ1xbP1GeppRwijK21A-1; Thu, 20 Aug 2020 13:52:28 -0400
+X-MC-Unique: F1VsZ1xbP1GeppRwijK21A-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7F9AD8030A9;
- Thu, 20 Aug 2020 17:51:54 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.110.46])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id DEE4F5DA78;
- Thu, 20 Aug 2020 17:51:51 +0000 (UTC)
-Date: Thu, 20 Aug 2020 18:51:49 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Subject: Re: [PATCH v3 05/10] migration/dirtyrate: Record hash results for
- each sampled page
-Message-ID: <20200820175149.GA244434@redhat.com>
-References: <1597634433-18809-1-git-send-email-zhengchuan@huawei.com>
- <1597634433-18809-6-git-send-email-zhengchuan@huawei.com>
- <20200820173009.GM2664@work-vm>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CFE478030C9;
+ Thu, 20 Aug 2020 17:52:27 +0000 (UTC)
+Received: from [10.3.114.63] (ovpn-114-63.phx2.redhat.com [10.3.114.63])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 3DBEA7E306;
+ Thu, 20 Aug 2020 17:52:27 +0000 (UTC)
+Subject: Re: [PATCH v2] configure: add support for pseudo-"in source tree"
+ builds
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20200820173124.243984-1-berrange@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <653438ac-0445-36a8-7546-b945fd42e781@redhat.com>
+Date: Thu, 20 Aug 2020 12:52:26 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200820173009.GM2664@work-vm>
-User-Agent: Mutt/1.14.5 (2020-06-23)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <20200820173124.243984-1-berrange@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
-X-Mimecast-Spam-Score: 0.002
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eblake@redhat.com
+X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=berrange@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/20 06:28:30
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=eblake@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/20 03:03:32
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
 X-Spam_bar: ----
 X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,64 +100,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: alex.chen@huawei.com, zhang.zhanghailiang@huawei.com, quintela@redhat.com,
- linyilu@huawei.com, qemu-devel@nongnu.org, Chuan Zheng <zhengchuan@huawei.com>,
- ann.zhuangyanying@huawei.com, fangying1@huawei.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Stefan Hajnoczi <stefanha@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Aug 20, 2020 at 06:30:09PM +0100, Dr. David Alan Gilbert wrote:
-> * Chuan Zheng (zhengchuan@huawei.com) wrote:
-> > Record hash results for each sampled page.
-> > 
-> > Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
-> > Signed-off-by: YanYing Zhuang <ann.zhuangyanying@huawei.com>
-> > ---
-> >  migration/dirtyrate.c | 144 ++++++++++++++++++++++++++++++++++++++++++++++++++
-> >  migration/dirtyrate.h |   7 +++
-> >  2 files changed, 151 insertions(+)
-> > 
-> > diff --git a/migration/dirtyrate.c b/migration/dirtyrate.c
-> > index c4304ef..62b6f69 100644
-> > --- a/migration/dirtyrate.c
-> > +++ b/migration/dirtyrate.c
-> > @@ -25,6 +25,7 @@
-> >  #include "dirtyrate.h"
-> >  
-> >  CalculatingDirtyRateState CalculatingState = CAL_DIRTY_RATE_INIT;
-> > +static unsigned long int qcrypto_hash_len = QCRYPTO_HASH_LEN;
+On 8/20/20 12:31 PM, Daniel P. Berrangé wrote:
+> Meson requires the build dir to be separate from the source tree. Many
+> people are used to just running "./configure && make" though and the
+> meson conversion breaks that.
 > 
-> Why do we need this static rather than just using the QCRYPTO_HASH_LEN ?
-> It's never going to change is it?
-> (and anyway it's just a MD5 len?)
+> This introduces some backcompat support to make it appear as if an
+> "in source tree" build is being done, but with the the results in the
 
-I wouldn't want to bet on that given that this is use of MD5. We might
-claim this isn't security critical, but surprises happen, and we will
-certainly be dinged on security audits for introducing new use of MD5
-no matter what.
+s/the the/the/
 
-If a cryptographic hash is required, then sha256 should be the choice
-for any new code that doesn't have back compat requirements.
+> "build/" directory. This allows "./configure && make" to work as it
+> did historically, albeit with the output binaries staying under build/.
+> 
+> Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+> ---
+> 
 
-If a cryptographic hash is not required then how about crc32 
+> 
+> In v2:
+> 
+>   - Use a marker file so we don't blow away a build/ dir
+>     we didn't create
+>   - Silence the distclean rule
+>   - Fix broken use of error_exit that's not defined yet
+>   - Add comment to GNUmakefile
+> 
+>   .gitignore |  2 ++
+>   configure  | 48 +++++++++++++++++++++++++++++++++++++++++++++---
+>   2 files changed, 47 insertions(+), 3 deletions(-)
+> 
+> diff --git a/.gitignore b/.gitignore
+> index 92311284ef..4ccb9ed975 100644
+> --- a/.gitignore
+> +++ b/.gitignore
+> @@ -1,3 +1,5 @@
+> +/GNUmakefile
+> +/build/
+>   /.doctrees
+>   /config-devices.*
+>   /config-all-devices.*
+> diff --git a/configure b/configure
+> index cc5f58f31a..cdffe221c7 100755
+> --- a/configure
+> +++ b/configure
+> @@ -11,6 +11,51 @@ unset CLICOLOR_FORCE GREP_OPTIONS
+>   # Don't allow CCACHE, if present, to use cached results of compile tests!
+>   export CCACHE_RECACHE=yes
+>   
+> +# make source path absolute
+> +source_path=$(cd "$(dirname -- "$0")"; pwd)
 
-IOW, it doesn't make a whole lot of sense to say we need a cryptographic
-hash, but then pick the most insecure one.
+Our mails crossed; my 1 comment about CDPATH impacting this is still valid.
 
-sha256 is slower than md5, but it is conceivable that in future we might
-gain support for something like Blake2b which is similar security level
-to SHA3, while being faster than MD5.
+> +
+> +if test "$PWD" == "$source_path"
 
-Overall I'm pretty unethusiastic about use of MD5 being introduced and
-worse, being hardcoded as the only option.
+and s/==/=/ for non-bash
 
-Regards,
-Daniel
+> +then
+> +    echo "Using './build' as the directory for build output"
+> +
+> +    MARKER=build/auto-created-by-configure
+> +
+> +    if test -e build
+> +    then
+> +	if test -f $MARKER
+> +	then
+> +	   rm -rf build
+> +	else
+> +	    echo "ERROR: ./build dir already exists and was not previously created by configure"
+> +	    exit 1
+
+TAB damage.
+
+> +	fi
+> +    fi
+> +
+> +    mkdir build
+> +    touch $MARKER
+> +
+> +    cat > GNUmakefile <<EOF
+> +# This file is auto-generated by configure to support in-source tree
+> +# 'make' command invokation
+
+invocation
+
+> +
+> +ifeq (\$(MAKECMDGOALS),)
+> +recurse: all
+> +endif
+> +
+> +.NOTPARALLEL: %
+> +%: force
+> +	@echo 'changing dir to build for \$(MAKE) "\$(MAKECMDGOALS)"...'
+> +	@\$(MAKE) -C build -f Makefile \$(MAKECMDGOALS)
+> +	@if test "\$(MAKECMDGOALS)" = "distclean" && test -e build/auto-created-by-configure ; then rm -rf build GNUmakefile ; fi
+> +force: ;
+> +.PHONY: force
+> +GNUmakefile: ;
+> +
+> +EOF
+
+Quote the first EOF to avoid having to quote all $ in the heredoc
+
+> +    cd build
+> +    exec $source_path/configure "$@"
+> +fi
+> +
+>   # Temporary directory used for files created while
+>   # configure runs. Since it is in the build directory
+>   # we can safely blow away any previous version of it
+> @@ -297,9 +342,6 @@ ld_has() {
+>       $ld --help 2>/dev/null | grep ".$1" >/dev/null 2>&1
+>   }
+>   
+> -# make source path absolute
+> -source_path=$(cd "$(dirname -- "$0")"; pwd)
+> -
+>   if printf %s\\n "$source_path" "$PWD" | grep -q "[[:space:]:]";
+>   then
+>     error_exit "main directory cannot contain spaces nor colons"
+> 
+
+With corrections, this is looking good; I'm okay if v3 includes:
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
