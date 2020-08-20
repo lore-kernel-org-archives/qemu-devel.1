@@ -2,93 +2,69 @@ Return-Path: <SRS0=Dndf=B6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.4 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82D31C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 01:34:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7B38C433E3
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 01:44:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 426112076E
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 01:34:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A53602078B
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 01:44:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fK735Hww"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 426112076E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="CU+OJldp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A53602078B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33604 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39450 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8ZTN-0004QP-FZ
-	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 21:34:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34222)
+	id 1k8Zcb-0007M2-Tw
+	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 21:44:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36260)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1k8ZSq-0003vZ-Ia
- for qemu-devel@nongnu.org; Wed, 19 Aug 2020 21:34:00 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:50981
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1k8ZSp-0002mT-2H
- for qemu-devel@nongnu.org; Wed, 19 Aug 2020 21:34:00 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597887238;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=N0/yWD34uNTfSRnuLrUHsOJAaeb4NKyeLvDPEJsBIeY=;
- b=fK735Hww42D6QZ9T5TgPC6URftttpv+if+jlkZIkYZBggykDAfYsBYCG/wyCU+4hE64XLe
- ikl6M9tur3sqaBeAoj+uVIB4qOrm43AtvodlfTcCT1c3IUlgMpNMZ5J7Zjl+RAktFUztSM
- 1FRaXwtd2Cijg1pCYyD+xi4AjTQXtCQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-41-hd96oWc1Mxua5mFtCPvhLg-1; Wed, 19 Aug 2020 21:33:43 -0400
-X-MC-Unique: hd96oWc1Mxua5mFtCPvhLg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B2F5D10066FB;
- Thu, 20 Aug 2020 01:33:42 +0000 (UTC)
-Received: from [10.3.112.136] (ovpn-112-136.phx2.redhat.com [10.3.112.136])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id EC08019C78;
- Thu, 20 Aug 2020 01:33:38 +0000 (UTC)
-Subject: Re: [PATCH v7 0/7] coroutines: generate wrapper code
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Stefan Hajnoczi <stefanha@redhat.com>
-References: <20200610100336.23451-1-vsementsov@virtuozzo.com>
- <20200727124840.GC386429@stefanha-x1.localdomain>
- <c610e7b2-9c1a-30fd-4217-e1bcb812ec7c@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <76c463e6-0d63-d25d-8095-e87db97c5081@redhat.com>
-Date: Wed, 19 Aug 2020 20:33:38 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1k8Zbh-0005nr-FZ; Wed, 19 Aug 2020 21:43:09 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:50675)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1k8Zbb-0003xS-6C; Wed, 19 Aug 2020 21:43:06 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 4BX6q54Ybfz9sTd; Thu, 20 Aug 2020 11:42:57 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1597887777;
+ bh=OYAjZmQAmdvEtNtV04p2In/ISMFgg8OnNUkEn8nIsNQ=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=CU+OJldp3hPnonTiTDPp3QodXUQYsfCmyk1In41sN+xzsc+XJlMw72vp5LMHXhyfA
+ zRTJXr3DuPA2esOto712t4N4KDfmdB/qNpgKbxXdQYKKlW2ah3A35NO31VuMC3RK4a
+ c0lmzezmoZNV6SFivKvVw/t7jNNhrcXcmJqzokPA=
+Date: Thu, 20 Aug 2020 11:36:59 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Subject: Re: [PATCH 7/8] spapr/xive: Use the xics flag to check for XIVE-only
+ IRQ backends
+Message-ID: <20200820013659.GH271315@yekko.fritz.box>
+References: <20200819130843.2230799-1-clg@kaod.org>
+ <20200819130843.2230799-8-clg@kaod.org>
 MIME-Version: 1.0
-In-Reply-To: <c610e7b2-9c1a-30fd-4217-e1bcb812ec7c@virtuozzo.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eblake@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=eblake@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/19 20:12:44
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="CNfT9TXqV7nd4cfk"
+Content-Disposition: inline
+In-Reply-To: <20200819130843.2230799-8-clg@kaod.org>
+Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
+ helo=ozlabs.org
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -9
+X-Spam_score: -1.0
+X-Spam_bar: -
+X-Spam_report: (-1.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,45 +77,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, kwolf@redhat.com, ehabkost@redhat.com,
- qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com,
- Paolo Bonzini <pbonzini@redhat.com>, crosa@redhat.com, den@openvz.org
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>,
+ Gustavo Romero <gromero@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/27/20 7:59 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 27.07.2020 15:48, Stefan Hajnoczi wrote:
->> On Wed, Jun 10, 2020 at 01:03:29PM +0300, Vladimir Sementsov-Ogievskiy 
->> wrote:
->>> Hi all!
->>>
->>> The aim of the series is to reduce code-duplication and writing
->>> parameters structure-packing by hand around coroutine function wrappers.
->>>
->>> Benefits:
->>>   - no code duplication
->>>   - less indirection
->>
->> Please add documentation so others know when and how to use this.
->>
->> I suggest adding a docs/devel/coroutine-wrapper.rst document and adding
->> a code comment to #define generated_co_wrapper pointing to the
->> documentation.
->>
->> Please rename coroutine-wrapper.py to block-coroutine-wrapper.py since
->> it is specific to the block layer.
->>
-> 
-> OK, will do. Thanks for taking a look!
 
-As this series touched Makefile to add a generated .c, you'll also need 
-to rebase that part to apply on top of Paolo's meson conversion (cc'ing 
-him if you need help figuring it out)
+--CNfT9TXqV7nd4cfk
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+On Wed, Aug 19, 2020 at 03:08:42PM +0200, C=E9dric Le Goater wrote:
 
+I can see why this is a good idea, but it really needs a rationale in
+the comment for posterity.
+
+> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+> ---
+>  hw/ppc/spapr_irq.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+> index 80cf1c3d6bb2..d036c8fef519 100644
+> --- a/hw/ppc/spapr_irq.c
+> +++ b/hw/ppc/spapr_irq.c
+> @@ -172,7 +172,7 @@ static int spapr_irq_check(SpaprMachineState *spapr, =
+Error **errp)
+>           * To cover both and not confuse the OS, add an early failure in
+>           * QEMU.
+>           */
+> -        if (spapr->irq =3D=3D &spapr_irq_xive) {
+> +        if (!spapr->irq->xics) {
+>              error_setg(errp, "XIVE-only machines require a POWER9 CPU");
+>              return -1;
+>          }
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--CNfT9TXqV7nd4cfk
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl8907sACgkQbDjKyiDZ
+s5IGixAAqDPziaEn7qa3dAuK1myBHJF1OovXagQeTvqNkX93y12DVRjiU0+6NIJU
+lnzC/+MgPZbYQ+QF6zEEB9gkdKeQOb1CIhiICiXdHEgGq86piTPtWR9QxiH/siVd
+xzMt1yP99OVfsEVqpVUxiZTlP50ShSXTH3/PT4apHC8ErX6cd5eVS2RKrRlNzpDt
+5n2+QbSPFyKFyIPChKfuV49YJ4bSRnYDqG55Cc+xn3oC2D6zLTTQq2sCUW17jxHU
+SjPtSOX4US+nOl2eyBRs4Zpok9PNvu4laB1PZTH7UNlWlNW4T+AiducVQtDTPqP1
+whXlhufQ91GwYilNAPoeDZMCS7c6IRc77WLRpSuXpN7VSZEXNN4lyYV6/zX3U+Kj
+qkvcRbpWxj6uZpf57udSWMm4Pq63p4F67Mu7f5pGAjnrqPg7qyLsc9yNH+floGyp
+qU0YuvTWNpq+B2jDw09d9SWDtANBly43v1TojnJuFfU7F0oOY0CKzTuRT08Jd0VP
+1cx5JfEVBl+gJuXuEu2VovePB4h1G+5rVBepaCl2uJe3JClzf2UB6rhf5hm/GGXX
+X842EXZcaRrueq50RIT7vVZ2/Sxe2AsIv21ly8sYQjD2BqLOdwnGTmaIy4y6hEFw
+f7FPgmNZfLtxSe6/T7FBk4WM8o4O07UEuZ8uEfl/+DiBtn3up/Q=
+=HwzW
+-----END PGP SIGNATURE-----
+
+--CNfT9TXqV7nd4cfk--
 
