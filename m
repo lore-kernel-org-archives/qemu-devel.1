@@ -5,49 +5,49 @@ X-Spam-Level:
 X-Spam-Status: No, score=-9.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37DA2C433E1
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43C69C433E3
 	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 13:15:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 02B2A22BF3
+	by mail.kernel.org (Postfix) with ESMTPS id 1019822C9F
 	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 13:15:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QMLHXd28"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02B2A22BF3
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YW4M9+Yj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1019822C9F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50068 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50018 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8kPv-0007eC-9y
+	id 1k8kPv-0007cr-83
 	for qemu-devel@archiver.kernel.org; Thu, 20 Aug 2020 09:15:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32784)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32774)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k8kOf-0006a1-Oj
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k8kOf-0006Zr-32
  for qemu-devel@nongnu.org; Thu, 20 Aug 2020 09:14:25 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39265
- helo=us-smtp-1.mimecast.com)
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29999)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k8kOe-00084D-57
- for qemu-devel@nongnu.org; Thu, 20 Aug 2020 09:14:25 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k8kOc-000848-FI
+ for qemu-devel@nongnu.org; Thu, 20 Aug 2020 09:14:24 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597929262;
+ s=mimecast20190719; t=1597929260;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
  bh=ey2XcRRkBrz6dEo6XwjEBXteJlr4MJ1+TiVoWIu0oic=;
- b=QMLHXd28Qinf972SisZWpvm4SHixEy1g34hoBr/vIn2eyEIIUE5t6hLpfABL1x9Kq8gPHb
- fpiJV04cJ57khvHZJTzBQ8SWfWuig2w/JKDTm6lwOQpPG70AP/UDNfAvuPcKfhp76S//5b
- ecHcp3FOtiiZYJtxS3hHYhglJQcJH0E=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-181-_dM_a3qiNRy2dMc5z90chA-1; Thu, 20 Aug 2020 09:14:19 -0400
-X-MC-Unique: _dM_a3qiNRy2dMc5z90chA-1
-Received: by mail-wm1-f69.google.com with SMTP id z1so967010wmk.1
+ b=YW4M9+Yji2STjU841KAs4THSj4/y+aoxA/j7WMuqKw237qNej6wWvMOjxnIpzp0CFfdbqz
+ gMz4CSBO5ABebktdhQ85MWD6Ua2U8B92YHH8hrAANfrI4yVa97FsXOCxFMEmyzec6H9zG9
+ He8NPm2RJyR+yJjZ7tH/TVXReYaWlEA=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-251-4OtlgFmkP5m1lI7e3dhVsQ-1; Thu, 20 Aug 2020 09:14:19 -0400
+X-MC-Unique: 4OtlgFmkP5m1lI7e3dhVsQ-1
+Received: by mail-wm1-f72.google.com with SMTP id c186so952354wmd.9
  for <qemu-devel@nongnu.org>; Thu, 20 Aug 2020 06:14:18 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
@@ -55,23 +55,23 @@ X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
  bh=ey2XcRRkBrz6dEo6XwjEBXteJlr4MJ1+TiVoWIu0oic=;
- b=BItju5BpchxwngkmxZ7ZlKoFQYJKY3AwwgSygP0/pLj0d26sKgnnmunti4UIxN1MoO
- gJbcAZ4zmAMROQWs+XjKuulAyn5M915fgSNiK7x9fmlXTrLLaOje6VYiTq8Aaks4PrOc
- Y47kG/a1utAWMbIKJv6zrR84Q9g0R0WJYMIk/QpfAorvoEzh7fwb2mPwXj+fVfJmhpge
- GlEJwujVQvc1vDIMCowrsRZXaVns1OZbMuq+I1tSSD1VI8+ORPdcv98PYai1XUTa5cCn
- AVsPEDlx9ZX0qpxm9Jvy6QomXT/5vvYMUsvC1HYmCTgvTYSV2uHn1IqWDc3MTbVXiSCl
- XJxw==
-X-Gm-Message-State: AOAM530U7ZzeqrFSgnWArZ1H9XzJDMEyDN6rzw/GXXguarwrc4tlJMA4
- 4XcQyIeaayElJ0eFavmP3LnXoLdUiwMrOY72UwMkqKv/3XMlCooVRDJh+KyResU708Q+5fp7x2y
- SOIJMaJNz9KbvP58=
-X-Received: by 2002:a5d:5710:: with SMTP id a16mr3381006wrv.217.1597929257746; 
+ b=t3AmK43IdUtyO6NHNihCUFJiOa93gLAQzIU73D1wp1F0LcWjH9tlwizvjDBxlj8OMo
+ FcPn3dVK9MluKmEDRiEN7wFj7W1t1UIDFQsi0OLuNlyhC9nHQwz7zKIX7u3ImZkv42us
+ CUPv9TERKnI7gRPHD3DKIKLehSOCYC+QQnAHNawn7Fit2qeThNKqEwWGbHVpmcaj2Oms
+ /czmgOkkrDb3lZN6Zpdy8R85STLrZd1cONXc09VXCeFFmRWJ+ZAfj0JNW0DQMKOdp0bb
+ PgRBwJAHSExsGxL7fFrzXjWcWT+NtNpl67HGnW1BEQiA6zozAZQlSBfkzM93rIS2FlKS
+ 3V6Q==
+X-Gm-Message-State: AOAM533CwVrMOtF8dRsct81bu+h+wtpBBWX4z4w3xpsMCx4L0uiXigpg
+ sHb8+xceth1xsCAfHHvX8zfeABZB5avhRdSOtf147oXUPhA7lsaIkJRe1l2nOJm/b9MRyA9PvGH
+ iGLfK3ItPiXB6BH4=
+X-Received: by 2002:adf:edc3:: with SMTP id v3mr3168391wro.193.1597929257490; 
  Thu, 20 Aug 2020 06:14:17 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxNqqchk7vfzsGmGkoG++I8Ghk5dkpetEBIy2ENEHyA68yOcaODIu4cR+heqfgCuHRgT3xR2A==
-X-Received: by 2002:a5d:5710:: with SMTP id a16mr3380987wrv.217.1597929257511; 
+X-Google-Smtp-Source: ABdhPJx+a0XdfXRo0p6nnJWnhtwxv/AnnwBUrBl5ePzkx4p0khK2MytwQFON3ZeQd1XKUuLYRMNIvw==
+X-Received: by 2002:adf:edc3:: with SMTP id v3mr3168377wro.193.1597929257208; 
  Thu, 20 Aug 2020 06:14:17 -0700 (PDT)
 Received: from [192.168.1.36] (121.red-81-40-121.staticip.rima-tde.net.
  [81.40.121.121])
- by smtp.gmail.com with ESMTPSA id o7sm4076493wrv.50.2020.08.20.06.14.16
+ by smtp.gmail.com with ESMTPSA id 32sm4651355wrh.18.2020.08.20.06.14.16
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
  Thu, 20 Aug 2020 06:14:16 -0700 (PDT)
@@ -103,7 +103,7 @@ Autocrypt: addr=philmd@redhat.com; keydata=
  9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
  RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
  apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <a56315f9-6148-31dd-f03a-117ce01ecdfd@redhat.com>
+Message-ID: <8dad7ae6-311c-9dcd-86d6-fdb9633c53af@redhat.com>
 Date: Thu, 20 Aug 2020 15:14:15 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
@@ -116,17 +116,17 @@ X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/20 08:28:03
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/20 06:28:30
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
 X-Spam_bar: ----
 X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
