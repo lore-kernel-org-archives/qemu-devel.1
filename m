@@ -2,76 +2,88 @@ Return-Path: <SRS0=Dndf=B6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3571C433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 07:00:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90AC9C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 07:04:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7ABA720724
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 07:00:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7ABA720724
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 5A54F20738
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 07:04:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DejyAb3K"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A54F20738
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46802 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49370 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8eYw-00018s-LO
-	for qemu-devel@archiver.kernel.org; Thu, 20 Aug 2020 03:00:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58764)
+	id 1k8ecg-0002N4-Mw
+	for qemu-devel@archiver.kernel.org; Thu, 20 Aug 2020 03:04:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59490)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <clg@kaod.org>)
- id 1k8eY6-0000IH-JW; Thu, 20 Aug 2020 02:59:46 -0400
-Received: from smtpout1.mo529.mail-out.ovh.net ([178.32.125.2]:39189)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <clg@kaod.org>)
- id 1k8eY5-00027e-43; Thu, 20 Aug 2020 02:59:46 -0400
-Received: from mxplan5.mail.ovh.net (unknown [10.108.20.10])
- by mo529.mail-out.ovh.net (Postfix) with ESMTPS id 6F8875227E1E;
- Thu, 20 Aug 2020 08:59:43 +0200 (CEST)
-Received: from kaod.org (37.59.142.104) by DAG4EX1.mxp5.local (172.16.2.31)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1979.3; Thu, 20 Aug
- 2020 08:59:43 +0200
-Authentication-Results: garm.ovh; auth=pass
- (GARM-104R0057fba59bf-66eb-4254-abda-37db32e338f4,
- 02C359FD435C2C4122574921AFFD4D91C9CEEBEA) smtp.auth=clg@kaod.org
-Subject: Re: [PATCH 7/8] spapr/xive: Use the xics flag to check for XIVE-only
- IRQ backends
-To: David Gibson <david@gibson.dropbear.id.au>
-References: <20200819130843.2230799-1-clg@kaod.org>
- <20200819130843.2230799-8-clg@kaod.org>
- <20200820013659.GH271315@yekko.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <423d3a3e-2725-63c2-1a32-1fc35ffde207@kaod.org>
-Date: Thu, 20 Aug 2020 08:59:42 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1k8ebo-0001vS-L1
+ for qemu-devel@nongnu.org; Thu, 20 Aug 2020 03:03:36 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:36135
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1k8ebm-0002aG-2p
+ for qemu-devel@nongnu.org; Thu, 20 Aug 2020 03:03:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1597907012;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=n7EGdybDzDVF3il1IbaODEo6IcTFK8vAtM/TXd3HvCs=;
+ b=DejyAb3Ktb4jhkcFtcWMZnF6efKlLiZcDSbFxnNn7HttNrXV57eVC6kUtnrd4qz89zJLKN
+ NhZx4NYpexyE+CYYUATHCF7oG46Yzuzb0lff8f8ss+Krp66zVm+HXwCjWSXkoZBYW5LQX/
+ vJwT6NM/w0Y85eH6f8pMDQgUXU2vnbo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-406-n-od0RceNjKEZmWyQEYXoA-1; Thu, 20 Aug 2020 03:03:30 -0400
+X-MC-Unique: n-od0RceNjKEZmWyQEYXoA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DABCA100CF6E;
+ Thu, 20 Aug 2020 07:03:29 +0000 (UTC)
+Received: from gondolin (ovpn-112-251.ams2.redhat.com [10.36.112.251])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1AEED1055800;
+ Thu, 20 Aug 2020 07:03:27 +0000 (UTC)
+Date: Thu, 20 Aug 2020 09:03:25 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Subject: Re: [PATCH v2 28/58] s390x: Move typedef SCLPEventFacility to
+ event-facility.h
+Message-ID: <20200820090325.0cf5b1b3.cohuck@redhat.com>
+In-Reply-To: <20200820001236.1284548-29-ehabkost@redhat.com>
+References: <20200820001236.1284548-1-ehabkost@redhat.com>
+ <20200820001236.1284548-29-ehabkost@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <20200820013659.GH271315@yekko.fritz.box>
-Content-Type: text/plain; charset="windows-1252"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [37.59.142.104]
-X-ClientProxiedBy: DAG5EX1.mxp5.local (172.16.2.41) To DAG4EX1.mxp5.local
- (172.16.2.31)
-X-Ovh-Tracer-GUID: 6c990ee7-02c4-485c-92eb-f39b42da4757
-X-Ovh-Tracer-Id: 2260525541776067491
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedruddtledgledtucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfhisehtkeertddtfeehnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepgeelgfejveehieefffduueehvdevfedtleeiudekjeegveeigfeifefhtdfffedtnecukfhppedtrddtrddtrddtpdefjedrheelrddugedvrddutdegnecuvehluhhsthgvrhfuihiivgepudenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepmhigphhlrghnhedrmhgrihhlrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehgrhhouhhgsehkrghougdrohhrgh
-Received-SPF: pass client-ip=178.32.125.2; envelope-from=clg@kaod.org;
- helo=smtpout1.mo529.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/20 02:45:31
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=cohuck@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=cohuck@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/20 03:03:32
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -85,44 +97,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>,
- Gustavo Romero <gromero@linux.ibm.com>
+Cc: Thomas Huth <thuth@redhat.com>, "Daniel P.
+ Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/20/20 3:36 AM, David Gibson wrote:
-> On Wed, Aug 19, 2020 at 03:08:42PM +0200, Cédric Le Goater wrote:
+On Wed, 19 Aug 2020 20:12:06 -0400
+Eduardo Habkost <ehabkost@redhat.com> wrote:
+
+> This will make future conversion to OBJECT_DECLARE* easier.
 > 
-> I can see why this is a good idea, but it really needs a rationale in
-> the comment for posterity.
-
-yes. I can send this one independently.
-
-Thanks,
-
-C.
-
-
+> In sclp.h, use "struct SCLPEventFacility" to avoid introducing
+> unnecessary header dependencies.
 > 
->> Signed-off-by: Cédric Le Goater <clg@kaod.org>
->> ---
->>  hw/ppc/spapr_irq.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
->> index 80cf1c3d6bb2..d036c8fef519 100644
->> --- a/hw/ppc/spapr_irq.c
->> +++ b/hw/ppc/spapr_irq.c
->> @@ -172,7 +172,7 @@ static int spapr_irq_check(SpaprMachineState *spapr, Error **errp)
->>           * To cover both and not confuse the OS, add an early failure in
->>           * QEMU.
->>           */
->> -        if (spapr->irq == &spapr_irq_xive) {
->> +        if (!spapr->irq->xics) {
->>              error_setg(errp, "XIVE-only machines require a POWER9 CPU");
->>              return -1;
->>          }
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> ---
+> Changes series v1 -> v2: new patch in series v2
 > 
+> Cc: Cornelia Huck <cohuck@redhat.com>
+> Cc: Halil Pasic <pasic@linux.ibm.com>
+> Cc: Christian Borntraeger <borntraeger@de.ibm.com>
+> Cc: Thomas Huth <thuth@redhat.com>
+> Cc: qemu-s390x@nongnu.org
+> Cc: qemu-devel@nongnu.org
+> ---
+>  include/hw/s390x/event-facility.h | 1 +
+>  include/hw/s390x/sclp.h           | 4 ++--
+>  2 files changed, 3 insertions(+), 2 deletions(-)
+
+Acked-by: Cornelia Huck <cohuck@redhat.com>
 
 
