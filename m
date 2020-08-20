@@ -2,125 +2,88 @@ Return-Path: <SRS0=Dndf=B6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 930E6C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 14:12:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9F65C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 14:16:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5F81220724
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 14:12:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A398820674
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 14:16:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="hi5Vyk14"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F81220724
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hg/NfVWa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A398820674
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35856 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39758 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8lIs-0006bP-Mu
-	for qemu-devel@archiver.kernel.org; Thu, 20 Aug 2020 10:12:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49100)
+	id 1k8lMu-0008TY-UV
+	for qemu-devel@archiver.kernel.org; Thu, 20 Aug 2020 10:16:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50218)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1k8lIB-000636-45; Thu, 20 Aug 2020 10:11:47 -0400
-Received: from mail-eopbgr140114.outbound.protection.outlook.com
- ([40.107.14.114]:33024 helo=EUR01-VE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1k8lI8-0007ax-FV; Thu, 20 Aug 2020 10:11:46 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=FkLFKpYB0SdhMmMqkbsJkES0HOkZgEFYzD3DsL0iViadgDni9CGWfGmV5z6gMjEKUGScs3Fnl/eZinDiIy6SVjb2jmb5W729PxX6eqYqyoqYVQTkNYtsdZd29H5ciRvQ8UnfFSfciprlvb3R1fn6erNh33+P2fy1Wbi6BcpTY1bBn194B3vyE6EP0L6OvegbW9dNSFZQKjpdGMxSUajBvuU7RMR9k/3dDnBPwb55MUlZ9sCxOy2HlADT0LgL+9YN0CmWXwVUoMpoZeX9jKAGIvcgTetFtVLH1znRXbDHKcaLCs4WYui6o7M8uCx5YSGAxr26T5ZsPl6ImndgNDg7hw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=OmcRLkITdEcUQTRBcvSBnz/nkBN4GmFtCstXXnU3F38=;
- b=Ig+gg0XV+JcnuUDDQb+iVP8lPIrXyHJUUvlrF/Jq8jkwXi57TvchzpMoogT+u6UsQJDv+dlPWT10is83Ub1s67nzJhBxBXtWgddqs8Wwv+ZmYBu3+UBYHgjoiDPXzDjgssWSR4Zz7NDn97j3AN7iGsqJaZvw2lJYaO+QSa7oxUgNQctwH4CHTKi+ulC06P0ZRY/arUtzKl7h/7MoVDnhmGoj7qOVfh99vKZz11ICdnjlE82UDuJ0GY8UQHLCVdIa4iI7OGm+mX2WPMzAFeUskBtSua8XYS0FAbZ6G4BqbXk2A2DkgLrBD/XyaRvZTD/TGIHYu0pEPERqy5fSVZNoxA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=OmcRLkITdEcUQTRBcvSBnz/nkBN4GmFtCstXXnU3F38=;
- b=hi5Vyk14rxxSdmonrcKyiGKfE9PjAmOgiQaQHQB2OzSLpmK4kUhblRpCBUki7VK4jb8U7NaivXBIQcPLApc5lDh12kXsjVfkkeuj9wx8LCxB7bJb8o+CJzkTbl+QKwNsE5SxIv9imAFfSLTNktVQaATkdFQrlrNCYZmohJzU7os=
-Authentication-Results: virtuozzo.com; dkim=none (message not signed)
- header.d=none;virtuozzo.com; dmarc=none action=none
- header.from=virtuozzo.com;
-Received: from HE1PR0801MB2124.eurprd08.prod.outlook.com (2603:10a6:3:89::22)
- by HE1PR08MB2857.eurprd08.prod.outlook.com (2603:10a6:7:2e::32) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3283.18; Thu, 20 Aug
- 2020 14:11:33 +0000
-Received: from HE1PR0801MB2124.eurprd08.prod.outlook.com
- ([fe80::b5e5:e4d:ed88:5a3a]) by HE1PR0801MB2124.eurprd08.prod.outlook.com
- ([fe80::b5e5:e4d:ed88:5a3a%9]) with mapi id 15.20.3283.028; Thu, 20 Aug 2020
- 14:11:32 +0000
-Subject: Re: [PATCH v13 00/11] iotests: Dump QCOW2 dirty bitmaps metadata
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-References: <1596742557-320265-1-git-send-email-andrey.shinkevich@virtuozzo.com>
- <8c84c4ca-f0e5-b973-d508-e13dd0ebaa74@virtuozzo.com>
- <1e6c7531-79a2-5ccc-daf2-a4a60f69468e@redhat.com>
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Message-ID: <1394993f-77b7-ef69-17f4-cf5014999d18@virtuozzo.com>
-Date: Thu, 20 Aug 2020 17:11:29 +0300
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.9.0
-In-Reply-To: <1e6c7531-79a2-5ccc-daf2-a4a60f69468e@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-GB
-X-ClientProxiedBy: AM0PR10CA0109.EURPRD10.PROD.OUTLOOK.COM
- (2603:10a6:208:e6::26) To HE1PR0801MB2124.eurprd08.prod.outlook.com
- (2603:10a6:3:89::22)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1k8lLk-0007vW-HL
+ for qemu-devel@nongnu.org; Thu, 20 Aug 2020 10:15:28 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41750
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1k8lLh-0007wU-Dd
+ for qemu-devel@nongnu.org; Thu, 20 Aug 2020 10:15:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1597932921;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=PaVB4l8qh968froKiExnji4R7K/eFW9mRp7Bvquepc0=;
+ b=hg/NfVWa89OIKQt1KsGy9OBgJhsXMbGEU2zW39YuFH3MCos2KSEdQ1fXBPaii6b/uWr5G6
+ 3voicgflaOabxG4fdehEgeU3zM5D/e1nXXA9NCruujuY0n3IwqzMHf4/BgaOxawrV+rAIo
+ 2i87vgiuU/JRn7quPH9PkcjtI1quELg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-298-xDuLzFiqNJO9-k_t9mDcag-1; Thu, 20 Aug 2020 10:15:19 -0400
+X-MC-Unique: xDuLzFiqNJO9-k_t9mDcag-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7372318A2241;
+ Thu, 20 Aug 2020 14:15:18 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-112-185.ams2.redhat.com [10.36.112.185])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1ED2968865;
+ Thu, 20 Aug 2020 14:15:15 +0000 (UTC)
+Date: Thu, 20 Aug 2020 16:15:14 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Subject: Re: [RFC PATCH 13/22] block/export: Move refcount from NBDExport to
+ BlockExport
+Message-ID: <20200820141514.GF99531@linux.fritz.box>
+References: <20200813162935.210070-1-kwolf@redhat.com>
+ <20200813162935.210070-14-kwolf@redhat.com>
+ <0ff82c83-16eb-c544-553a-9a58c9453133@redhat.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from Admins-MacBook-Pro.local (176.59.52.207) by
- AM0PR10CA0109.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:208:e6::26) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3305.24 via Frontend Transport; Thu, 20 Aug 2020 14:11:31 +0000
-X-Originating-IP: [176.59.52.207]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: cc89ff77-95f4-49ce-2d12-08d84512f0c6
-X-MS-TrafficTypeDiagnostic: HE1PR08MB2857:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <HE1PR08MB2857FEF7CE37A8EFD8C92E08F45A0@HE1PR08MB2857.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:5797;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 6I7YsCmWDnolfCjFHw8QceaYSVDh/yMHFR1KLyMipHLXEuownMA3VVLsD1YssXpLnx/8o3fbE61+sanhzfsz8huJItAt2mNwf/9GCqkeFqoLXe7ZzxhTnFVzgezMMmtR/H2SkaDXOmHPh3hv74WeWDYsEOlSAMfZeUnqMIgnAl7m8uKowanXw3EMJvyUgBK3shjWXQv6zJjnoa2EY7bAY+cxtefU+sK6r958w5HFyyPe+2+7wWvpP3AQfdmFqZWChPOAQv7v+gTClcXeaed6yyn26HZQWDWP+IGV0fVYkY9qL1C91pV52oVFk+aXehMWW8APiJ8eEr0uEWyL4SlYOYsMilDK6XG5jR6wsFwmWWQZq0Z+rwDhsqNOPLPZF0drsmeaZGOBv83mXOJb3z6X4w==
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:HE1PR0801MB2124.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(346002)(366004)(376002)(396003)(39840400004)(136003)(186003)(31686004)(66946007)(8676002)(5660300002)(66476007)(4744005)(2906002)(66556008)(16526019)(316002)(44832011)(8936002)(53546011)(6512007)(6506007)(31696002)(26005)(478600001)(6486002)(2616005)(956004)(83380400001)(52116002)(36756003)(86362001)(4326008)(107886003)(14143004)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: 1xonlQVL1cEiydJ6qV5+tpjjD4Eewbin3nuWP3p7ez4dBok41zeEb0ogc3zK+XZ8JOMxxbgSK9ZXRx0rBYw4AcD1DEz30IPETQgSyrAzhdlpg87xSMayZ99Y5bFT+0B4ui0ezOEdS47pUOcWhNVDKe1+ZjzDIWTBz4cRk+hB1M80JAoPN7fdU+oQVoDsxM9Yg+fPtj6u51rWzAAed5puzKOlwF0tBUDS6FD8HIrJz2nz08eCavLf3pDq6U/4uJ7PSEVL1Azvq1I4l6NOxeMvwoD40Idp3LSAoovviqN2BrE4LKnYGanAhvpSkWELxnuPm8MDbzyO+NyxuTieI1XIYGC1Lp7yJzTtsOFedx5RAVXj3BS55/sL35dKYNYcBszZ0dKoHzqc+hhEVpLcakWWkuDLT8ZMUoBf2SYTs+j9IiEgcEMfMCfinEN9K+di/iTzsjmUHmRNJWPF0eEH5JDhp7pY4bqv1dFy+pPRYYnto02aARAh+eACk/nbH/2LaR+dVG491b4xfRcOpHbHzolDkgCkULprhdLBAsuN2RaPeN/uhzECEJCb37Ow2gju2aV8MXtd2wbUxAlsR1dspN6KKBXhVqgbU77N6eLk87FcNe2biSFoMqCUE1pvQB44CijydqtiK1x2mFKYu6r2Gf6B/Q==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: cc89ff77-95f4-49ce-2d12-08d84512f0c6
-X-MS-Exchange-CrossTenant-AuthSource: HE1PR0801MB2124.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Aug 2020 14:11:32.6801 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 7JoXhEduiuI7UIl1h3sD64Ad9/iVRzxp4th1Ahhmm3cRV3EkEIafsR58inpGSY4cg32p3Yn7964qAPN+vFcODaBQ8mesc4BD0JdrWh85uk8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: HE1PR08MB2857
-Received-SPF: pass client-ip=40.107.14.114;
- envelope-from=andrey.shinkevich@virtuozzo.com;
- helo=EUR01-VE1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/20 10:11:40
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -4
-X-Spam_score: -0.5
-X-Spam_bar: /
-X-Spam_report: (-0.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
- RCVD_IN_SBL_CSS=3.335, SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
+In-Reply-To: <0ff82c83-16eb-c544-553a-9a58c9453133@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
+X-Mimecast-Spam-Score: 0.004
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=kwolf@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/20 03:03:32
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -133,29 +96,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, den@openvz.org, vsementsov@virtuozzo.com,
- qemu-devel@nongnu.org, mreitz@redhat.com
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 20.08.2020 03:49, Eric Blake wrote:
-> On 8/14/20 6:56 AM, Andrey Shinkevich wrote:
->> Dear Eric!
->>
->> Vladimir has compeated reviewing this series. I have not received any 
->> other responses to it so far.
->>
->> So, is it good for pull request now? Would you please consider taking 
->> this series as you did it with the Vladimir's related one?
->
-> I've spent some time playing with this; I have now queued it on my 
-> bitmaps tree, and will be posting a pull request as soon as Paolo's 
-> meson changes settle.  I also made the tweaks suggested on 9/11.
->
+Am 19.08.2020 um 22:58 hat Eric Blake geschrieben:
+> On 8/13/20 11:29 AM, Kevin Wolf wrote:
+> > Having a refcount makes sense for all types of block exports. It is also
+> > a prerequisite for keeping a list of all exports at the BlockExport
+> > level.
+> > 
+> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> > ---
+> 
+> > +++ b/include/block/export.h
+> > @@ -21,14 +21,24 @@ typedef struct BlockExport BlockExport;
+> >   typedef struct BlockExportDriver {
+> >       BlockExportType type;
+> >       BlockExport *(*create)(BlockExportOptions *, Error **);
+> > +    void (*delete)(BlockExport *);
+> >   } BlockExportDriver;
+> >   struct BlockExport {
+> >       const BlockExportDriver *drv;
+> > +
+> > +    /*
+> > +     * Reference count for this block export. This includes strong references
+> > +     * both from the owner (qemu-nbd or the monitor) and clients connected to
+> > +     * the export.
+> 
+> I guess 'the monitor' includes qemu-storage-daemon.
 
-Sounds good, thank you so much, Eric. I appreciate.
+Yes, qemu-storage-daemon has a QMP monitor, so I would count it there.
+Even the --export command line option only calls the QMP command
+internally.
 
-Andrey
+> > +     */
+> > +    int refcount;
+> >   };
+> >   extern const BlockExportDriver blk_exp_nbd;
+> >   BlockExport *blk_exp_add(BlockExportOptions *export, Error **errp);
+> > +void blk_exp_ref(BlockExport *exp);
+> > +void blk_exp_unref(BlockExport *exp);
+> 
+> Yay, I think this naming is more consistent with the rest of qemu...
+> 
+> >   #endif
+> > diff --git a/include/block/nbd.h b/include/block/nbd.h
+> > index 23030db3f1..af8509ab70 100644
+> > --- a/include/block/nbd.h
+> > +++ b/include/block/nbd.h
+> > @@ -336,8 +336,6 @@ NBDExport *nbd_export_new(BlockDriverState *bs,
+> >   void nbd_export_set_on_eject_blk(BlockExport *exp, BlockBackend *blk);
+> >   void nbd_export_close(NBDExport *exp);
+> >   void nbd_export_remove(NBDExport *exp, NbdServerRemoveMode mode, Error **errp);
+> > -void nbd_export_get(NBDExport *exp);
+> > -void nbd_export_put(NBDExport *exp);
+> 
+> ...as opposed to this which is common in kernel but less so in this project.
+> No hard feelings from me :)
+> 
+> > +++ b/blockdev-nbd.c
+> > @@ -232,7 +232,7 @@ BlockExport *nbd_export_create(BlockExportOptions *exp_args, Error **errp)
+> >       /* The list of named exports has a strong reference to this export now and
+> >        * our only way of accessing it is through nbd_export_find(), so we can drop
+> >        * the strong reference that is @exp. */
+> > -    nbd_export_put(exp);
+> > +    blk_exp_unref((BlockExport*) exp);
+> 
+> Even a helper function that converts NBDBlockExport* to BlockExport* rather
+> than a cast might be nicer, but then again, I see from Max's review that
+> this may be a temporary state of things.
+> (The QAPI contains such type-safe container casts, such as
+> qapi_DriveBackup_base(), if that helps...)
+
+Yes, this goes away before the end of the series.
+
+> > @@ -1537,7 +1536,8 @@ NBDExport *nbd_export_new(BlockDriverState *bs,
+> >       exp = g_new0(NBDExport, 1);
+> >       exp->common = (BlockExport) {
+> > -        .drv = &blk_exp_nbd,
+> > +        .drv        = &blk_exp_nbd,
+> > +        .refcount   = 1,
+> 
+> I'm not sure whether trying to align the '=' is good, because the moment you
+> add a longer field name, every other line has to be touched.  I'm fine with
+> just one space on both side of =, even if it is more ragged to read.  But
+> you're the author, so you get to pick.
+
+I generally prefer aligned '=' because the code is read much more often
+than it is written or modified, so being friendly for readers is
+important.
+
+> > @@ -1626,8 +1625,9 @@ NBDExport *nbd_export_new(BlockDriverState *bs,
+> >       exp->ctx = ctx;
+> >       blk_add_aio_context_notifier(blk, blk_aio_attached, blk_aio_detach, exp);
+> > +    blk_exp_ref(&exp->common);
+> >       QTAILQ_INSERT_TAIL(&exports, exp, next);
+> > -    nbd_export_get(exp);
+> > +
+> 
+> Is there any consequence to this changed ordering in grabbing the reference
+> vs. updating the list?
+
+No intended consequences, but if Max is right that the code (before and
+after this series) lacks some locking, it might make a theoretical
+difference. If it does, the new code is safer than the old one. If it
+doesn't, it's just more consistent with the order I'm used to see in
+other places: First take the reference, then use it.
+
+Kevin
 
 
