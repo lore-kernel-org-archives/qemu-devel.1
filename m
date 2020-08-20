@@ -2,89 +2,102 @@ Return-Path: <SRS0=Dndf=B6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_IN_DEF_DKIM_WL autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04A8AC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 16:21:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE5E6C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 16:25:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BEE74207BB
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 16:21:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9C769207BB
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 16:25:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BjVY0F6R"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BEE74207BB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jlOVpBE7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C769207BB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38304 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41338 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8nK0-0001st-14
-	for qemu-devel@archiver.kernel.org; Thu, 20 Aug 2020 12:21:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53792)
+	id 1k8nN8-0003I7-RL
+	for qemu-devel@archiver.kernel.org; Thu, 20 Aug 2020 12:25:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54894)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1k8nJG-0001RH-Dg
- for qemu-devel@nongnu.org; Thu, 20 Aug 2020 12:21:02 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:53310)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1k8nJE-0000NX-Dl
- for qemu-devel@nongnu.org; Thu, 20 Aug 2020 12:21:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597940458;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=YZbxT+ivIIfB6e+SeHHMDNhbf3Z5bzzzBxCaxW6AS/c=;
- b=BjVY0F6RgR6jkZ6KFLGme4gOtJAGKSWY/RO8NdgchonK85jFXxb3r5PtJgMWE2A14+6fQJ
- GwoAu6VSncWAwK/pUSkZS4/pLxbXFGgfhWh56F9sYpWUc9TYeIT7N1ff9HB9B1R0QOwFnh
- dpUariMluElGSg9N/AGU4yuR9HiFwc8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-18-x7F5dQgjPymodoxHWO3nAQ-1; Thu, 20 Aug 2020 12:20:53 -0400
-X-MC-Unique: x7F5dQgjPymodoxHWO3nAQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1EC5F107464C;
- Thu, 20 Aug 2020 16:20:52 +0000 (UTC)
-Received: from work-vm (ovpn-114-2.ams2.redhat.com [10.36.114.2])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 11C8F60BF1;
- Thu, 20 Aug 2020 16:20:49 +0000 (UTC)
-Date: Thu, 20 Aug 2020 17:20:47 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Chuan Zheng <zhengchuan@huawei.com>
-Subject: Re: [PATCH v3 02/10] migration/dirtyrate: Add RamlockDirtyInfo to
- store sampled page info
-Message-ID: <20200820162047.GJ2664@work-vm>
-References: <1597634433-18809-1-git-send-email-zhengchuan@huawei.com>
- <1597634433-18809-3-git-send-email-zhengchuan@huawei.com>
+ (Exim 4.90_1) (envelope-from <hskinnemoen@google.com>)
+ id 1k8nMS-0002lV-S3
+ for qemu-devel@nongnu.org; Thu, 20 Aug 2020 12:24:20 -0400
+Received: from mail-vs1-xe42.google.com ([2607:f8b0:4864:20::e42]:37240)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <hskinnemoen@google.com>)
+ id 1k8nMQ-0000mc-He
+ for qemu-devel@nongnu.org; Thu, 20 Aug 2020 12:24:20 -0400
+Received: by mail-vs1-xe42.google.com with SMTP id a1so1387395vsp.4
+ for <qemu-devel@nongnu.org>; Thu, 20 Aug 2020 09:24:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=Ehvs5f2nY3oQkJhvkODAEHBM5vFLkij2WxLo6jDIerk=;
+ b=jlOVpBE7OpX/K1g52mdFZoTJC/XwqxL5J+r4h4alGqSeB3pG1n9VC7JasXluWwLQYp
+ payJ9aGUc9RuTOcZS5BTxg0iJ4iv/UZFYfXt2mrMYhc0vuAV714p7jEfx9rje9Rh7hNj
+ DKsNLyhAluUxhhVbL1/XAoTa3ovGdT6E8qjpGf28r9donS39Li6Pi9U82FUbMzn/XI7v
+ /8SyeduW90NsjaTRJWmFy3YA12mB+KUsStjckZPQeFO6Mg5cJJHoMhROGECIShGCUTOV
+ gtrdAfYfa/OL9awzYQcLE+hnK4xkzB2x9c9Ze2aQmQ2RSS9Rz5MAaJmNURBfUQNucAXs
+ 2giQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=Ehvs5f2nY3oQkJhvkODAEHBM5vFLkij2WxLo6jDIerk=;
+ b=I2XCfIbNtIa9jFwCHQkFtmg+Qz3jZpltklVxNSg43OETxJbNFvkNKfoSfNGANilq9Z
+ m72qTwqiLbsN0U7J5rur6WCe1nFAFd4HlbhFokmzFN3zgbc8Fr5WTDZWfAjzsISJOcVO
+ PT9dzmJJ0GimaCmeHBG15l7yiFfeT3z3gMCh5TAM1wKYCP/4mw+DOzkD1BgUUEYsLZRV
+ aypEYDMocYTEf0ZBzUghHAhy2Ct+KnzL7/YpuJ7ypH7pJwQLlUtwcmzrsCFZ/itaoB8y
+ p1r1OdjyDporwkCoCC010/zs11leHEdcySC9mQk77PGZI+XYF2+ZzpHRscvLxfdS+a7N
+ i8uw==
+X-Gm-Message-State: AOAM532tdBNqkkU9doh3AMtTnWnNEKK+cL6yHvHeHpbL8uZ+4PAaF8NI
+ BswKthzt3qK/AZ1Imi+Y1N77kntIDuGW9KjB0zZFKA==
+X-Google-Smtp-Source: ABdhPJwRisc+1oGues+Z8+wN3GkpYKGuPJx3yNDjKSyMqFQdBUTDTkBQxEBNRtaDhSMzqpE/F2zHqaaiwMeQqZqHlvM=
+X-Received: by 2002:a67:cd10:: with SMTP id u16mr2407255vsl.152.1597940656886; 
+ Thu, 20 Aug 2020 09:24:16 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1597634433-18809-3-git-send-email-zhengchuan@huawei.com>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=dgilbert@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/20 09:00:23
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+References: <20200811004607.2133149-1-hskinnemoen@google.com>
+ <20200811004607.2133149-14-hskinnemoen@google.com>
+ <64f8cd56-306e-4961-488b-36c666894a54@amsat.org>
+ <CAFQmdRbvSKYJ00tE_79Eh+gW_ge8kEco=1gqFtvMcoJGraozdw@mail.gmail.com>
+ <CAFQmdRZCk5Rqb1C2TRCEUMaKmF608g2_Or8mLCTSG03nCQ1Ygg@mail.gmail.com>
+ <28a30c64-7cc5-4b4f-2be2-b3d3af511cb1@amsat.org>
+In-Reply-To: <28a30c64-7cc5-4b4f-2be2-b3d3af511cb1@amsat.org>
+From: Havard Skinnemoen <hskinnemoen@google.com>
+Date: Thu, 20 Aug 2020 09:24:05 -0700
+Message-ID: <CAFQmdRYFLUdbs5mj3zHzNN1y+bvQXCrtGhY_iOLVfnydGxM0Jw@mail.gmail.com>
+Subject: Re: [PATCH v7 13/13] tests/acceptance: console boot tests for
+ quanta-gsj
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, 
+ Joel Stanley <joel@jms.id.au>, qemu-arm <qemu-arm@nongnu.org>, 
+ QEMU Developers <qemu-devel@nongnu.org>,
+ IS20 Avi Fishman <Avi.Fishman@nuvoton.com>, 
+ CS20 KFTing <kfting@nuvoton.com>, Cleber Rosa <crosa@redhat.com>, 
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Eric Blake <eblake@redhat.com>, Richard Henderson <rth@twiddle.net>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::e42;
+ envelope-from=hskinnemoen@google.com; helo=mail-vs1-xe42.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -185
+X-Spam_score: -18.6
+X-Spam_bar: ------------------
+X-Spam_report: (-18.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ ENV_AND_HDR_SPF_MATCH=-0.5, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, USER_IN_DEF_DKIM_WL=-7.5,
+ USER_IN_DEF_SPF_WL=-7.5 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,73 +110,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: zhang.zhanghailiang@huawei.com, quintela@redhat.com, linyilu@huawei.com,
- qemu-devel@nongnu.org, alex.chen@huawei.com, ann.zhuangyanying@huawei.com,
- fangying1@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Chuan Zheng (zhengchuan@huawei.com) wrote:
-> Add RamlockDirtyInfo to store sampled page info of each ramblock.
-> 
-> Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
-> Signed-off-by: YanYing Zhuang <ann.zhuangyanying@huawei.com>
-> ---
->  migration/dirtyrate.h | 18 ++++++++++++++++++
->  1 file changed, 18 insertions(+)
-> 
-> diff --git a/migration/dirtyrate.h b/migration/dirtyrate.h
-> index 914c363..9650566 100644
-> --- a/migration/dirtyrate.h
-> +++ b/migration/dirtyrate.h
-> @@ -19,6 +19,11 @@
->   */
->  #define DIRTYRATE_DEFAULT_SAMPLE_PAGES            256
->  
-> +/*
-> + * Record ramblock idstr
-> + */
-> +#define RAMBLOCK_INFO_MAX_LEN                     256
-> +
->  /* Take 1s as default for calculation duration */
->  #define DEFAULT_FETCH_DIRTYRATE_TIME_SEC          1
->  
-> @@ -39,6 +44,19 @@ typedef enum {
->      CAL_DIRTY_RATE_END,
->  } CalculatingDirtyRateState;
->  
-> +/*
-> + * Store dirtypage info for each ramblock.
-> + */
-> +struct RamblockDirtyInfo {
-> +    char idstr[RAMBLOCK_INFO_MAX_LEN]; /* idstr for each ramblock */
+On Wed, Aug 19, 2020 at 10:29 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
+rg> wrote:
+>
+> +Eric / Richard for compiler optimizations.
+>
+> On 8/20/20 3:53 AM, Havard Skinnemoen wrote:
+> > On Tue, Aug 11, 2020 at 8:26 PM Havard Skinnemoen
+> > <hskinnemoen@google.com> wrote:
+> >>
+> >> On Tue, Aug 11, 2020 at 1:48 AM Philippe Mathieu-Daud=C3=A9 <f4bug@ams=
+at.org> wrote:
+> >>> INTERRUPTED: Test interrupted by SIGTERM
+> >>> Runner error occurred: Timeout reached
+> >>> (240.45 s)
+> >>>
+> >>> Is that expected?
+> >>
+> >> I'm not sure why it only happens when running direct kernel boot with
+> >> unoptimized qemu, but it seems a little happier if I enable a few more
+> >> peripherals that I have queued up (sd, ehci, ohci and rng), though not
+> >> enough.
+> >>
+> >> It still stalls for an awfully long time on "console: Run /init as
+> >> init process" though. I'm not sure what it's doing there. With -O2 it
+> >> only takes a couple of seconds to move on.
+> >
+> > So it turns out that the kernel gets _really_ sluggish when skipping
+> > the clock initialization normally done by the boot loader.
+> >
+> > I changed the reset value of CLKSEL like this:
+> >
+> > diff --git a/hw/misc/npcm7xx_clk.c b/hw/misc/npcm7xx_clk.c
+> > index 21ab4200d1..5e9849410f 100644
+> > --- a/hw/misc/npcm7xx_clk.c
+> > +++ b/hw/misc/npcm7xx_clk.c
+> > @@ -67,7 +67,7 @@ enum NPCM7xxCLKRegisters {
+> >   */
+> >  static const uint32_t cold_reset_values[NPCM7XX_CLK_NR_REGS] =3D {
+> >      [NPCM7XX_CLK_CLKEN1]        =3D 0xffffffff,
+> > -    [NPCM7XX_CLK_CLKSEL]        =3D 0x004aaaaa,
+> > +    [NPCM7XX_CLK_CLKSEL]        =3D 0x004aaba9,
+> >      [NPCM7XX_CLK_CLKDIV1]       =3D 0x5413f855,
+> >      [NPCM7XX_CLK_PLLCON0]       =3D 0x00222101 | PLLCON_LOKI,
+> >      [NPCM7XX_CLK_PLLCON1]       =3D 0x00202101 | PLLCON_LOKI,
+> >
+> > which switches the CPU core and UART to run from PLL2 instead of
+> > CLKREF (25 MHz).
+> >
+> > With this change, the test passes without optimization:
+> >
+> >  (02/19) tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_a=
+rm_quanta_gsj_initrd:
+> > PASS (39.62 s)
+> >
+> > It doesn't look like this change hurts booting from the bootrom (IIUC
+> > the nuvoton bootblock overwrites CLKSEL anyway), but it's not super
+> > clean.
+> >
+> > Perhaps I should make it conditional on kernel_filename being set? Or
+> > would it be better to provide a write_board_setup hook for this?
+>
+> QEMU prefers to avoid ifdef'ry at all cost. However I find this
+> approach acceptable (anyway up to the maintainer):
+>
+> +static void npcm7xx_clk_cold_reset_fixup(NPCM7xxCLKState *s)
+> +{
+> +#ifndef __OPTIMIZE__
+> +    /*
+> +     * When built without optimization, ...
+> +     * so run CPU core and UART from PLL2 instead of CLKREF.
+> +     */
+> +    s->regs[NPCM7XX_CLK_CLKSEL] |=3D 0x103,
+> +#endif
+> +}
 
-Can you remind me; why not just use RAMBlock* here of the block you're
-interested in, rather than storing the name?
+I think this is actually a problem regardless of optimization level.
+Turning optimization off amplifies the problem, but the problem is
+still there with optimization on.
 
-> +    uint8_t *ramblock_addr; /* base address of ramblock we measure */
-> +    size_t ramblock_pages; /* sum of dividation by 4K pages for ramblock */
+This does not affect booting a full flash image, as these fixups (and
+more) are done by the boot loader in that case.
 
-'dividation' is the wrong word, and 'sum' is only needed where you're
-adding things together.  I think this is 'ramblock size in TARGET_PAGEs'
-
-> +    size_t *sample_page_vfn; /* relative offset address for sampled page */
-> +    unsigned int sample_pages_count; /* sum of sampled pages */
-> +    unsigned int sample_dirty_count; /* sum of dirty pages we measure */
-
-These are both 'count' rather than 'sum'
-
-> +    uint8_t *hash_result; /* array of hash result for sampled pages */
-> +};
-> +
->  void *get_dirtyrate_thread(void *arg);
->  #endif
->  
-> -- 
-> 1.8.3.1
-> 
--- 
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-
+Havard
 
