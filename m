@@ -2,123 +2,121 @@ Return-Path: <SRS0=Dndf=B6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F344C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 18:45:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DDC9C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 18:45:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D5294206DA
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 18:45:08 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="Tdi3S7hV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5294206DA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id DC844207DE
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 18:45:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC844207DE
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38336 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39216 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8pYi-0007Nu-5J
-	for qemu-devel@archiver.kernel.org; Thu, 20 Aug 2020 14:45:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35214)
+	id 1k8pYw-0007jq-4a
+	for qemu-devel@archiver.kernel.org; Thu, 20 Aug 2020 14:45:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35496)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1k8pU5-0000gx-QY; Thu, 20 Aug 2020 14:40:21 -0400
-Received: from mail-eopbgr00105.outbound.protection.outlook.com
- ([40.107.0.105]:40648 helo=EUR02-AM5-obe.outbound.protection.outlook.com)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1k8pUk-0001bX-0P
+ for qemu-devel@nongnu.org; Thu, 20 Aug 2020 14:41:02 -0400
+Received: from mout.kundenserver.de ([212.227.17.24]:49685)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1k8pU2-0003Bm-BK; Thu, 20 Aug 2020 14:40:21 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=YGeHF3kvw+HTEehCTUCkPtJFhRSu4O/qsD+0UBSMWh1D6PnV72hxN7g3yEEcOGmwYI/oEcWyZwbnggWx7SbdNT8y7+Jk5xVyDDDC4tB/RPy4dg/x53EAgSzzbZKG3w9+9S5t94fbn1x8jJTzTygj/4Z0JI7gWHxULSStXWEIAe5VRAmQgH4glkUJtpx7qI1l7Y4CrhUezFEELlj3LEstH4X9EsYtH1zo8Xk+73VjcD6G0RcuJcS0SWU4U85XwYxOYc9a4CzG8WToqJppgu8NPFzD3cx1ddAMTYSHmJbNsVkfVeMf6qO7AHAIG5AInQkqJUY/iZ2G6O+NAn5dYBGsyA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0386wauxXmSK63FI+OC2yIics9gF/T4FfYX7cSlvOt0=;
- b=KErhmB8Wvh9zmzSn0Kh6lhjATEZPbl2kEDVnSQMp3o1ptrMmVqQy/nl4LeA1sZGe5UOOphuGUGTEKFvI8mnJxbWwSmBpwo8K2MW9IIoILpM1DDokHXG9zweD2jZm4mtr3J2oNjTqqvrcNuBdf/J2shV4q5vxA07aEy9i6ZGDQBublXJ8AslNVmLPgc5LK9cVWWrmdG9Jow52r/faEwQ7C6xu28wRSKJfciYVYjCMgRQR612u+ntwsbPI5+/1lH7y9hMQGjIEVTity9W/OHVCKtiHtxsczG24hwgMb2SdLQSLZh9gdx3NuplcyhjsvABaPMvGDwFVETZk+O1Fx+7xIw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0386wauxXmSK63FI+OC2yIics9gF/T4FfYX7cSlvOt0=;
- b=Tdi3S7hVyuXLkDaXsiCZbPGdgSjw39r2O8h5AEPcl8YRNtHeRZzopXIpxylTb5fOTpAbB4sS/Bv3vpTWbe1zGKzGJxqJMK9ahBnjXObeqniPsOyb/KgrPktIAlAVVy8/HbKZZDYOUR0KAAVNk6N6rEH1kjk12UPxh7boAfhhWjQ=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM6PR08MB3032.eurprd08.prod.outlook.com (2603:10a6:209:43::31)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3305.25; Thu, 20 Aug
- 2020 18:40:05 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::8c0c:c056:97a5:484a]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::8c0c:c056:97a5:484a%3]) with mapi id 15.20.3283.027; Thu, 20 Aug 2020
- 18:40:05 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH v4 02/10] block/io.c: drop assertion on double waiting for
- request serialisation
-Date: Thu, 20 Aug 2020 21:39:42 +0300
-Message-Id: <20200820183950.13109-3-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.21.3
-In-Reply-To: <20200820183950.13109-1-vsementsov@virtuozzo.com>
-References: <20200820183950.13109-1-vsementsov@virtuozzo.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: AM4PR0202CA0003.eurprd02.prod.outlook.com
- (2603:10a6:200:89::13) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1k8pUe-0003Se-5r
+ for qemu-devel@nongnu.org; Thu, 20 Aug 2020 14:41:01 -0400
+Received: from [192.168.100.1] ([82.252.135.186]) by mrelayeu.kundenserver.de
+ (mreue106 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1MkIEJ-1kXCsS3yFl-00kiT1; Thu, 20 Aug 2020 20:40:50 +0200
+Subject: Re: [PATCH v2 44/58] qom: provide convenient macros for declaring and
+ defining types
+To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
+References: <20200820001236.1284548-1-ehabkost@redhat.com>
+ <20200820001236.1284548-45-ehabkost@redhat.com>
+ <20200820174506.GE642093@habkost.net>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <3cbd1150-3b91-3213-7e42-6f01f45a511e@vivier.eu>
+Date: Thu, 20 Aug 2020 20:40:48 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from kvm.sw.ru (185.215.60.171) by
- AM4PR0202CA0003.eurprd02.prod.outlook.com (2603:10a6:200:89::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3305.25 via Frontend
- Transport; Thu, 20 Aug 2020 18:40:05 +0000
-X-Mailer: git-send-email 2.21.3
-X-Originating-IP: [185.215.60.171]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 6e34673f-3f3c-425e-50a8-08d8453874f9
-X-MS-TrafficTypeDiagnostic: AM6PR08MB3032:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM6PR08MB30323A77DA0E0E5C29CE4144C15A0@AM6PR08MB3032.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:2958;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: H22EwgTuQUNi7hdu14FGy9+7RD1CRKltrB8w7h3Wb+6JciMFIini2rXibTpjaG9JJ2bS952x2olvCYz6xRNcyJKQpaDBNVjOZ7ryqu9RTlyOlRIY7YVMvQCQiUhhSbudgblNDGlIRbcpsF6BYSUh0ir8RfELslhYJZn23/3mCtKGzDlzCjSPQG7bDp9QArEMbLsOILw2Z9tG25lnExXNbAYBxNdzAvRWyX42YDyWlX7Hu+d2J/GGdf40YXaD6ADalKsjwZGWZhbP5jPUikNhTQWCBCHzbJh3KAzHJfMya+mpM0untRIaKJDpmOcXZoObgEjOFWVfYp63o3RKWsfCPQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(366004)(39840400004)(376002)(346002)(396003)(136003)(4326008)(6666004)(8676002)(16526019)(186003)(26005)(316002)(6486002)(83380400001)(36756003)(86362001)(2906002)(478600001)(6916009)(5660300002)(8936002)(66946007)(66476007)(66556008)(6506007)(1076003)(6512007)(956004)(2616005)(52116002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: KSfhn5nAAh5+a7b1heexq1Y/jS1HH1BUg1DEZZDkSYKgfDeyvvFProl30RUoful3K/Ndd9jXqFJQQa/IARme8sS0TAm8udav/ggYfYECUGDKJcyBuu0OApmdTrgNaGS/jB3Wh/urZ6YjZv4iklqsnv2QS4dd5t39gCEQnxMJg3D7r0WZRlFRmuo35YnSZLZ+fxbc92X35vUkEqrX2Hh9M1xy5I1t1DJ4NX4vL2YdAerGLdbI/eCD0A+Dsl28ya1ZtpJ+crQCSPzTJqpoPY4kTYv+Oi4Licd7r9E4Mn2+pRccFA2/SXM4L7HFpjtLlHw+RzcsZ3eJFK/BCc+lAVMgbX8EfD6kEYNKmIrp9AH19YnCNGHg9L0FUwVwtFLiSP2GY3NZklPAs0QBqWhhT3O8r3nHdvHVhgtw41jshlWvvFnDOjpMLq4oUlu1RJ5MkJDt4hxGvwGkJTLz4LtM87r6tgP7E48UPsycV0tDcC2N5Fjacr/0nHisMTi1KzEqVZf50pJl9snONoiLvwUhPIIj8S1h38reiXEYGMf2SSjNob13kU1cNCIDayiRCfKYEPDwMzRdOQcagPAEXY5f1zO+cxDny3sr7bfUh16u+cmM/jKmVEowdS2oLS4k/JEWfRhxYdYZd0qx+aNBZN2Ml4Vb9g==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6e34673f-3f3c-425e-50a8-08d8453874f9
-X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Aug 2020 18:40:05.8305 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 4k4PWSpm3qvHMds9GsEQTLyjEjwaUMzpZokZkfbfiaIfdQ8UUQBHpdqynd+qOy/hsvd+sAF6YdlC1qR2KM0DNlkhz75bH/BHfPgOY9iOfDQ=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3032
-Received-SPF: pass client-ip=40.107.0.105;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR02-AM5-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/20 14:40:09
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -37
-X-Spam_score: -3.8
-X-Spam_bar: ---
-X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200820174506.GE642093@habkost.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:Tg3WslglKDK1BihjHiiqs+IAiJQDIR6vCgnt3Lh+d/053aad7qT
+ Lh90b1HFH8QahNJYQB8DbylYKrd54HrrZB8kjlMSEYMVols8OWNwi/z12QWtUxvEs0iXByi
+ uma1o9QBg9l5SCWMv0SJfp+OcuszKAYUnb0K2lI9QAHo+qQ2wz0SyAivhT+ycAd4sFoaEBW
+ XsAbeOiDJ9totZPxfqP6A==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:AjsjG4l9mfc=:Q8a60narI+JV+jaAJJlwVJ
+ zDbYJDGbotf6CqamSZfs8kypLjUUDASxJ4kSRns6K5G9G2RnOkYG1Axe6VLrH0d0BZqtzRRdM
+ /vSUlpUj2bFZWS+rSCu+VEK8LYTPPlzzQ1TjLpAvUJNYWg82oSbRYMQeGKplGbHLhJ5zI6xyc
+ A2LP22D5yCQ2V0zhIrKoQ+T7vvj6fadTSGGJDPBMK842ymiP2+j8wfpXIUEnkeKtzwzkKcNAU
+ fGicrJkkWkHychza2AC73NSFLCW2K5IcZznT9V5ubXIY+rPwp3lOBbdjmWiMSxzQyPeANIcPQ
+ O4cakuUJhmZFU3UUPfoGVt6/dXYPolRH7t1JHuq6ml0McgMCDF6IQfnmFXBCl5SSuIL3cPR9H
+ fD1rsI7+6tVQ67LFus7rtkYD6VDwN+Rsl6jHpPI2S6F4Wjd1D1aUrh34OkNWnKHc8sBiiKtM8
+ oVXET3VWofQnHXOx4/IVoO89WFJoWTuLilR5JcDPET0oIjAmQBz1Kuie5SUNDy27zw9uMbyu8
+ T9JKcH+yzvzZfaebUNx1awTqrNXmv7ImC+IRlkE1ylfg4YMgjuODXqgg9xJutUkxT9JrjuUVq
+ v+5vFhK+uE6uFMzLccX49eHTw5tKZGkivdwENy8WXWyqAWslXhy16j9Sj5ZSqesaIiCcA1WTj
+ +PrQSayFQISkDZBuG/nEUM2cfKEu0ElvZfvgUmzUlU0xVDIwc7bDVluja3VsUuQGfxgqV8hBg
+ aqrrwZtlP48XprSffAU9hv1YYwp76G5o6PcZ8i/IVO9RQHCHWLG0mlMl3OiLee5bXBaSY9NMt
+ duc+1CBn8TVUaRsDFkggwLvwEiGfJfnGujTO/WRu1dIOgcLyZmL+otCGvCFp+6UHmSAkoF+
+Received-SPF: none client-ip=212.227.17.24; envelope-from=laurent@vivier.eu;
+ helo=mout.kundenserver.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/20 14:40:54
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -28
+X-Spam_score: -2.9
+X-Spam_bar: --
+X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -131,59 +129,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, kwolf@redhat.com, vsementsov@virtuozzo.com,
- qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com,
- Paolo Bonzini <pbonzini@redhat.com>, den@openvz.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ "Daniel P. Berrange" <berrange@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The comments states, that on misaligned request we should have already
-been waiting. But for bdrv_padding_rmw_read, we called
-bdrv_mark_request_serialising with align = request_alignment, and now
-we serialise with align = cluster_size. So we may have to wait again
-with larger alignment.
+Le 20/08/2020 à 19:45, Eduardo Habkost a écrit :
+> (CCing Eric Blake, who reviewed the original patch.  Sorry for
+> not CCing you previously, Eric)
+> 
+> On Wed, Aug 19, 2020 at 08:12:22PM -0400, Eduardo Habkost wrote:
+> [...]
+>> +/**
+>> + * OBJECT_DECLARE_TYPE:
+>> + * @ModuleObjName: the object name with initial capitalization
+>> + * @module_obj_name: the object name in lowercase with underscore separators
+>> + * @MODULE_OBJ_NAME: the object name in uppercase with underscore separators
+> 
+> We need to decide what to do with TYPE_SWIM:
+> 
+>   #define TYPE_SWIM "swim"
+>   typedef struct SWIM SWIM;
+>   #define SWIM(obj) OBJECT_CHECK(SWIM, (obj), TYPE_SWIM)
+> 
+> Both the typedef and type checking macros are called "SWIM".
+> This makes usage of OBJECT_DECLARE_TYPE impossible (because the
+> type checking function can't have the same as the typedef).  What
+> should be the recommended style here?  Rename the struct to
+> "Swim"?
 
-Note, that the only user of BDRV_REQ_SERIALISING is backup which issues
-cluster-aligned requests, so seems the assertion should not fire for
-now. But it's wrong anyway.
+"Swim" looks good to me.
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
----
- block/io.c | 11 +----------
- 1 file changed, 1 insertion(+), 10 deletions(-)
-
-diff --git a/block/io.c b/block/io.c
-index ad3a51ed53..b18680a842 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -1881,7 +1881,6 @@ bdrv_co_write_req_prepare(BdrvChild *child, int64_t offset, uint64_t bytes,
-                           BdrvTrackedRequest *req, int flags)
- {
-     BlockDriverState *bs = child->bs;
--    bool waited;
-     int64_t end_sector = DIV_ROUND_UP(offset + bytes, BDRV_SECTOR_SIZE);
- 
-     if (bs->read_only) {
-@@ -1893,15 +1892,7 @@ bdrv_co_write_req_prepare(BdrvChild *child, int64_t offset, uint64_t bytes,
-     assert(!(flags & ~BDRV_REQ_MASK));
- 
-     if (flags & BDRV_REQ_SERIALISING) {
--        waited = bdrv_mark_request_serialising(req, bdrv_get_cluster_size(bs));
--        /*
--         * For a misaligned request we should have already waited earlier,
--         * because we come after bdrv_padding_rmw_read which must be called
--         * with the request already marked as serialising.
--         */
--        assert(!waited ||
--               (req->offset == req->overlap_offset &&
--                req->bytes == req->overlap_bytes));
-+        bdrv_mark_request_serialising(req, bdrv_get_cluster_size(bs));
-     } else {
-         bdrv_wait_serialising_requests(req);
-     }
--- 
-2.21.3
-
+Thanks,
+Laurent
 
