@@ -2,91 +2,127 @@ Return-Path: <SRS0=Dndf=B6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95FF7C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 13:51:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B90BEC433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 13:53:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 609B12067C
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 13:51:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 75A46206DA
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 13:53:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nuviainc-com.20150623.gappssmtp.com header.i=@nuviainc-com.20150623.gappssmtp.com header.b="q/QaA8FJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 609B12067C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nuviainc.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="Jk2xVX76"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 75A46206DA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45712 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48348 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8kyt-00061T-LB
-	for qemu-devel@archiver.kernel.org; Thu, 20 Aug 2020 09:51:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43312)
+	id 1k8l0F-00078c-Pu
+	for qemu-devel@archiver.kernel.org; Thu, 20 Aug 2020 09:53:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43610)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <graeme@nuviainc.com>)
- id 1k8ky8-0005ZO-9U
- for qemu-devel@nongnu.org; Thu, 20 Aug 2020 09:51:04 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:36898)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <graeme@nuviainc.com>)
- id 1k8ky4-0004e0-B3
- for qemu-devel@nongnu.org; Thu, 20 Aug 2020 09:51:03 -0400
-Received: by mail-wr1-x443.google.com with SMTP id y3so2105249wrl.4
- for <qemu-devel@nongnu.org>; Thu, 20 Aug 2020 06:50:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=nuviainc-com.20150623.gappssmtp.com; s=20150623;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=vYXewd6GjmPAqPohPeYMcDLKpv4ENl+6z1KY0U8cKWI=;
- b=q/QaA8FJtXn+2+6b3vtOoKgn15alBYAV6MJS+x649wqRaH5BRy+Eh/Nxh8tzZSTojt
- AIXK+0V6JjdHHBzIjeqJuR+B9sXjoi6ornBWGbdGx6xf1XfQjF5WQYRD7EpxdAaDJI/S
- mW3Otm/kgSMoTjdFDLeViVtePl0lDcRmbX5DmKVT6CTdvTAD0GowzJHitZHKk4OYfkwr
- +SBHbWP/hpftjRtCNWhktpztKWSjsU2NfaXszo3lqotRWQMctXtVHvOR2PDzstwtWZkl
- 4qraEYxdCdRrI8dPj4U2FBSA2RUMkVJlgeV9pismELTEs9wcRxUkqeFcVr5ceK0oMlGa
- r2dw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=vYXewd6GjmPAqPohPeYMcDLKpv4ENl+6z1KY0U8cKWI=;
- b=QHSup/Ypz+sByFGiiL9OjU3DjhONRHewmKrJ/phO8BTK1JzbqNzaT97dfcIhwK/P3b
- E+yduk4VR0C6Ch44TbfXfQtfKhLTnPPt+CJ335ulGgIx+q2BnHKciTrBB4P3YiGt0brr
- K+mT1vTq7qKDqH7lwCNMkv/BJ2/TouGDdi33NcOpXP6vkJpXib7s6J7il8uQW3XV1VcB
- W/7ZRrwtG/IAYzN1blTZ9VB+SyOxXptt5PbDvezU0RIy8y9RA1AawlfB3GjIE8pyffdX
- IhU219MIqbiV9j9G3pYSoizAKOJZG6hRpvuMgD7nSrb4ZWVez6UgIrS2V9AqDczJkGtJ
- DSTw==
-X-Gm-Message-State: AOAM530YvhH61+d4nZna2gv+YNtvPspFdtM/fs2g3Dfsy1Od6jbfaj2i
- BS2+IQ4Jt2nZfchEOHRk40nKYw==
-X-Google-Smtp-Source: ABdhPJwdTE9KjCQPk11y+xZGVcZg8AqGZLo7kPmkB2HGB+RTHM60EfQpj84G/0Ei2CWxy7rRmw/4mA==
-X-Received: by 2002:adf:f785:: with SMTP id q5mr3316581wrp.298.1597931458546; 
- Thu, 20 Aug 2020 06:50:58 -0700 (PDT)
-Received: from xora-monster ([2a02:8010:64d6::1d89])
- by smtp.gmail.com with ESMTPSA id t11sm4071719wrs.66.2020.08.20.06.50.57
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 20 Aug 2020 06:50:58 -0700 (PDT)
-Date: Thu, 20 Aug 2020 14:50:56 +0100
-From: Graeme Gregory <graeme@nuviainc.com>
-To: qemu-arm@nongnu.org
-Subject: Re: [PATCH] hw/arm/sbsa-ref.c : Add a fake embedded controller
-Message-ID: <20200820135056.qgageqiaghz2iihx@xora-monster>
-References: <20200820133201.80577-1-graeme@nuviainc.com>
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1k8kzH-0006MV-5L; Thu, 20 Aug 2020 09:52:15 -0400
+Received: from mail-db8eur05on2132.outbound.protection.outlook.com
+ ([40.107.20.132]:30689 helo=EUR05-DB8-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1k8kzC-0004l6-Pz; Thu, 20 Aug 2020 09:52:14 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=l/PHaei+wn1mGrnegzbEwiki/0lP3SLqEL/hsAnD+2Y71AqUh8a+b4w2dg4GHIROO/5U9z6duHmRVnwuRpQbci44OghwnzRDfSJnhKo/P4QylXyCPRaemL2vqyLLyW5CsHUmMpf61Xn41+iG1IM7nZjrVsaaOm7y13i5BRYpxXWM6KmLKUxxe5Sy+lK93eVN7L39vX9PoAZ1/TdjDJlno4MKg7xnlr1OJaSvnPnmgHne98bGAvesrcVtYYic4uTF5oEnVwyywdKSWiU9+EySmOh8g1LINq8L4VNVL4XrtJWRrMl4rEDcM26NZbskAjXhyxQ1OLP13FCGMY/Pi2ECJA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=lt1CkQPA+1XJI73XFtx1oEt61bhL6M0x5+QeP2+0mek=;
+ b=WJ6xFFfL+LIUIhy4xChdqOk2AN0By2OFdtqKkn1xSye5TdfgsUFDRvf56zQEKj3BMtHnSl2+jB9RfOyBg3I9jij0bLON9lsfkZERCOoZpCjFlH0B66CqxDq9KVuIShM0BVoFlBC6ywIsUbLtVf8O+1AZYXQHgv9N8vizHNEGx6yH79OkWLGHPw2xD8RteWg+CyCiZGkaMSOeVXvu8Vrf1DnBqYoIzFi8Fytcl+MkJkLMXrrkAQsQevyhg1J9OPwwzoCzQwGVK/4b75e488PgkMljRHQTgxFZX2tqJwa1ITvDauVu4X/1hYxLTqBiN8JvgyXY+21sFZCYMxakOnDwNA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=lt1CkQPA+1XJI73XFtx1oEt61bhL6M0x5+QeP2+0mek=;
+ b=Jk2xVX76sy0QKV8RIxfT4xwq4OE5owcJTLPJ70CYBAx05CGTHuohvl03pbKaeqV+O0spWeU1ToNJlx+mAdE86Qja1ZVbue5PHef2dpBjLuQKslEnE3XqNciM+3P64v335WsiD47Wx8OteS72byXglYYmzT1rZRAzOa8cel/6KqQ=
+Authentication-Results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM6PR08MB3158.eurprd08.prod.outlook.com (2603:10a6:209:44::31)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3283.20; Thu, 20 Aug
+ 2020 13:52:07 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::8c0c:c056:97a5:484a]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::8c0c:c056:97a5:484a%3]) with mapi id 15.20.3283.027; Thu, 20 Aug 2020
+ 13:52:07 +0000
+Subject: Re: [PATCH v4 4/4] iotests: Test node/bitmap aliases during migration
+To: Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>,
+ qemu-block@nongnu.org
+References: <20200818133240.195840-1-mreitz@redhat.com>
+ <20200818133240.195840-5-mreitz@redhat.com>
+ <fe00acc5-a06f-5e65-63f6-5f0ed7ec3019@redhat.com>
+ <28314d9e-714a-2acd-5bd0-cf61f9ca41b2@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <a07eed84-8c00-03d9-39cd-f78fe9cbf17f@virtuozzo.com>
+Date: Thu, 20 Aug 2020 16:52:05 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
+In-Reply-To: <28314d9e-714a-2acd-5bd0-cf61f9ca41b2@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: AM0PR10CA0004.EURPRD10.PROD.OUTLOOK.COM
+ (2603:10a6:208:17c::14) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200820133201.80577-1-graeme@nuviainc.com>
-Received-SPF: pass client-ip=2a00:1450:4864:20::443;
- envelope-from=graeme@nuviainc.com; helo=mail-wr1-x443.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.5] (185.215.60.171) by
+ AM0PR10CA0004.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:208:17c::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3305.24 via Frontend
+ Transport; Thu, 20 Aug 2020 13:52:06 +0000
+X-Originating-IP: [185.215.60.171]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: a2f3c74e-9782-4a8b-cdee-08d845103a14
+X-MS-TrafficTypeDiagnostic: AM6PR08MB3158:
+X-Microsoft-Antispam-PRVS: <AM6PR08MB3158A2846C1C52F4A0FF574EC15A0@AM6PR08MB3158.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:374;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: N+YFPUBekaahVqtV5z2uGy8eZVAavWLqtrFBju0yDv8hobO9CvMxiFfVChoiEa+G4a2zLeI54G3HLr7P56nj/ftAtceMrlkyKQUCQ7s+zStBd858S30Kvn2pUrYSHkbRivhexosX3yeIK+zvJE1tPyomxKCmeSftlhH6+pyCTf+DUkijMtSiazYhm47KpGW52QCKeN2D53OzyTR9538Jh4LLaZdpJ64qt8rI8HIIv8Hqu6yvlLOiXYlpic7lg3KNZ2W98t6vfA58Z5j/XnWQkOFTPyY85Np+Vu2rzKHKHWDFU1+7ZtsK+u8RiX7zX9VKOaSJMf/tmddx0gv6LMvUNnw9tuYwGIfTkAUzQXOzHht3lDhUiU/CG0UEmwpO2zCG
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(4636009)(346002)(136003)(39840400004)(376002)(366004)(396003)(26005)(86362001)(16526019)(36756003)(2906002)(53546011)(8936002)(956004)(478600001)(316002)(52116002)(186003)(4326008)(31686004)(31696002)(54906003)(66946007)(2616005)(16576012)(6486002)(66556008)(5660300002)(8676002)(83380400001)(110136005)(66476007)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: k7QIbIHzWRrV5qA7/wXfe2zNdbGjdaKyOxDc7mgXBxeYFBppI190DyK+tWyV9P0FQi07IfvzSQH5DK99hK+qVccIJctEdkOAhRwpA5zOh8b0DSamncxQoPJ/0y0ok0WL6QR/fqDNqgp7j7WIOqMSjtm6p6rsduJMeCHh7GHQ0D1qQMSrA/Zrhv6sxI4ythXsXaghCDkK7etgU8I0bxCx66mIij4UBHFH8uIcCe0zsoS0oifiamBublnXO1QHz2RUa8oFHtgOt+PNBwzVlmbl4T6ZgaNVpRL832gmp2yqdZRvMP9A+tvECsHiV7xDXd9BJkQz/uCrX7AqqgyXAFvJVd6fJIdbxz2sVZ1oOb+ez4njcnUdiMqLeLPLwmk9xnDZddFUkBOeCQw61ETQKZMvnzjOB4QkaP+QkOqdO6ChgkOBq2Ql4wPgJdHkGhRzcRM0UzWiVXpboCXgNy9BW/dikXOdLSAy9naW41uEFMxIIgK0/DhOLpCVYnupusFtMSc1eV8zlWLdimTt1zYH/ZXFJg4cIzOEfyb3T8OTfSpKtCa3mbH/I0d8lCCSC5ry2gt5nrytE5PRU5c0UNNYmT8VtVI8F1Bd/Qlg8uiej4PZuzjY2L29FI+WeVREjxTbJAoKiY3/MWHIiiUNddr2fsGndA==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a2f3c74e-9782-4a8b-cdee-08d845103a14
+X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Aug 2020 13:52:07.0106 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: d+u/fiA3KBCRaq+J/EbZPnGUzeYZlYcPZB/vYmQH8bNTHVau7bQA7DYnS874lFDhm1Ejx6DHQOalqFDb9Z199Jg9t5Wib6Gh3Adj+A8kJcc=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3158
+Received-SPF: pass client-ip=40.107.20.132;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR05-DB8-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/20 09:52:08
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,183 +135,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, leif@nuviainc.com, rad@semihalf.com,
- qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Krempa <pkrempa@redhat.com>,
+ Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Aug 20, 2020 at 02:32:01PM +0100, Graeme Gregory wrote:
-> A difference between sbsa platform and the virt platform is PSCI is
-> handled by ARM-TF in the sbsa platform. This means that the PSCI code
-> there needs to communicate some of the platform power changes down
-> to the qemu code for things like shutdown/reset control.
+20.08.2020 16:17, Max Reitz wrote:
+> On 20.08.20 03:58, Eric Blake wrote:
+>> On 8/18/20 8:32 AM, Max Reitz wrote:
+>>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>>> ---
+>>>    tests/qemu-iotests/300     | 595 +++++++++++++++++++++++++++++++++++++
+>>>    tests/qemu-iotests/300.out |   5 +
+>>
+>> Rather sparse output (I hate debugging those sorts of outputs when the
+>> test is failing).
 > 
-> Space has been left to extend the EC if we find other use cases in
-> future where ARM-TF and qemu need to communicate.
+> Hm.  I don’t know, the stack trace usually gives a good idea and
+> ./check -d gives QMP context.
 > 
-> Signed-off-by: Graeme Gregory <graeme@nuviainc.com>
-> ---
->  hw/arm/sbsa-ref.c | 95 +++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 95 insertions(+)
+> The advantage of a sparse output is that we don’t need to adjust the
+> reference output every time some optional field is added somewhere.
 > 
-> diff --git a/hw/arm/sbsa-ref.c b/hw/arm/sbsa-ref.c
-> index f030a416fd..c8743fc1d0 100644
-> --- a/hw/arm/sbsa-ref.c
-> +++ b/hw/arm/sbsa-ref.c
-> @@ -41,6 +41,7 @@
->  #include "hw/usb.h"
->  #include "hw/char/pl011.h"
->  #include "net/net.h"
-> +#include "migration/vmstate.h"
->  
->  #define RAMLIMIT_GB 8192
->  #define RAMLIMIT_BYTES (RAMLIMIT_GB * GiB)
-> @@ -62,6 +63,7 @@ enum {
->      SBSA_CPUPERIPHS,
->      SBSA_GIC_DIST,
->      SBSA_GIC_REDIST,
-> +    SBSA_SECURE_EC,
->      SBSA_SMMU,
->      SBSA_UART,
->      SBSA_RTC,
-> @@ -98,6 +100,14 @@ typedef struct {
->  #define SBSA_MACHINE(obj) \
->      OBJECT_CHECK(SBSAMachineState, (obj), TYPE_SBSA_MACHINE)
->  
-> +typedef struct {
-> +    SysBusDevice parent_obj;
-> +    MemoryRegion iomem;
-> +} SECUREECState;
-> +
-> +#define TYPE_SECURE_EC      "sbsa-secure-ec"
-> +#define SECURE_EC(obj) OBJECT_CHECK(SECUREECState, (obj), TYPE_SECURE_EC)
-> +
->  static const MemMapEntry sbsa_ref_memmap[] = {
->      /* 512M boot ROM */
->      [SBSA_FLASH] =              {          0, 0x20000000 },
-> @@ -107,6 +117,7 @@ static const MemMapEntry sbsa_ref_memmap[] = {
->      [SBSA_CPUPERIPHS] =         { 0x40000000, 0x00040000 },
->      [SBSA_GIC_DIST] =           { 0x40060000, 0x00010000 },
->      [SBSA_GIC_REDIST] =         { 0x40080000, 0x04000000 },
-> +    [SBSA_SECURE_EC] =          { 0x50000000, 0x00001000 },
->      [SBSA_UART] =               { 0x60000000, 0x00001000 },
->      [SBSA_RTC] =                { 0x60010000, 0x00001000 },
->      [SBSA_GPIO] =               { 0x60020000, 0x00001000 },
-> @@ -585,6 +596,65 @@ static void *sbsa_ref_dtb(const struct arm_boot_info *binfo, int *fdt_size)
->      return board->fdt;
->  }
->  
-> +enum sbsa_secure_ec_powerstates {
-> +    SBSA_SECURE_EC_CMD_NULL,
-> +    SBSA_SECURE_EC_CMD_POWEROFF,
-> +    SBSA_SECURE_EC_CMD_REBOOT,
-> +};
-> +
-> +static uint64_t secure_ec_read(void *opaque, hwaddr offset, unsigned size)
-> +{
-> +    /* No use for this currently */
-> +    return 0;
-> +}
-> +
-> +static void secure_ec_write(void *opaque, hwaddr offset,
-> +                     uint64_t value, unsigned size)
-> +{
-> +    if (offset == 0) { /* PSCI machine power command register */
-> +        switch (value) {
-> +        case SBSA_SECURE_EC_CMD_NULL:
-> +            break;
-> +        case SBSA_SECURE_EC_CMD_POWEROFF:
-> +            qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SHUTDOWN);
-> +            break;
-> +        case SBSA_SECURE_EC_CMD_REBOOT:
-> +            qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
-> +            break;
-> +        default:
-> +            error_report("sbsa-ref: ERROR Unkown power command");
+>>>    tests/qemu-iotests/group   |   1 +
+>>>    3 files changed, 601 insertions(+)
+>>>    create mode 100755 tests/qemu-iotests/300
+>>>    create mode 100644 tests/qemu-iotests/300.out
+>>>
+>>
+>>> +        # Dirty some random megabytes
+>>> +        for _ in range(9):
+>>> +            mb_ofs = random.randrange(1024)
+>>> +            self.vm_a.hmp_qemu_io(self.src_node_name, f'write
+>>> {mb_ofs}M 1M')
+>>
+>> It turns out that the discard operation likewise dirties the bitmap, but
+>> slightly faster (see edb90bbd).  We could optimize it on top, but I'm
+>> not going to require a micro-optimizing to get it in.  The test takes
+>> about 12 seconds to run for me, but you didn't mark it as such in
+>> 'group', so that's good; but it turns up a problem:
+>>
+>> 300      fail       [20:55:54] [20:56:06]                    output
+>> mismatch (see 300.out.bad)
+>> --- /home/eblake/qemu-tmp2/tests/qemu-iotests/300.out    2020-08-19
+>> 20:53:11.087791988 -0500
+>> +++ /home/eblake/qemu-tmp2/tests/qemu-iotests/300.out.bad    2020-08-19
+>> 20:56:06.092428756 -0500
+>> @@ -1,5 +1,41 @@
+>> -.....................................
+>> +WARNING:qemu.machine:qemu received signal 11; command:
+>> "/home/eblake/qemu-tmp2/tests/qemu-iotests/../../x86_64-softmmu/qemu-system-x86_64
+>> -display none -vga none -chardev
+>> socket,id=mon,path=/tmp/tmp.qT831UThme/qemu-b-798452-monitor.sock -mon
+>> chardev=mon,mode=control -qtest
+>> unix:path=/tmp/tmp.qT831UThme/qemu-b-798452-qtest.sock -accel qtest
+>> -nodefaults -display none -accel qtest -blockdev
+>> node-name=node0,driver=null-co -incoming unix:/tmp/tmp.qT831UThme/mig_sock"
+>> +.............FE.......................
+>> +======================================================================
+>> +ERROR: test_migratee_bitmap_is_not_mapped_on_dst
+>> (__main__.TestBlockBitmapMappingErrors)
+>> +----------------------------------------------------------------------
+>> +Traceback (most recent call last):
+>> +  File
+>> "/home/eblake/qemu-tmp2/tests/qemu-iotests/../../python/qemu/machine.py", line
+>> 435, in _do_shutdown
+>> +    self._soft_shutdown(timeout, has_quit)
+>> +  File
+>> "/home/eblake/qemu-tmp2/tests/qemu-iotests/../../python/qemu/machine.py", line
+>> 415, in _soft_shutdown
+>> +    self._qmp.cmd('quit')
+>> +  File
+>> "/home/eblake/qemu-tmp2/tests/qemu-iotests/../../python/qemu/qmp.py",
+>> line 266, in cmd
+>> +    return self.cmd_obj(qmp_cmd)
+>> +  File
+>> "/home/eblake/qemu-tmp2/tests/qemu-iotests/../../python/qemu/qmp.py",
+>> line 246, in cmd_obj
+>> +    self.__sock.sendall(json.dumps(qmp_cmd).encode('utf-8'))
+>> +BrokenPipeError: [Errno 32] Broken pipe
+>> +
+>> +The above exception was the direct cause of the following exception:
+>> +
+>> +Traceback (most recent call last):
+>> +  File "300", line 76, in tearDown
+>> +    self.vm_b.shutdown()
+>> +  File
+>> "/home/eblake/qemu-tmp2/tests/qemu-iotests/../../python/qemu/machine.py", line
+>> 465, in shutdown
+>> +    self._do_shutdown(timeout, has_quit)
+>> +  File
+>> "/home/eblake/qemu-tmp2/tests/qemu-iotests/../../python/qemu/machine.py", line
+>> 438, in _do_shutdown
+>> +    raise AbnormalShutdown("Could not perform graceful shutdown") \
+>> +qemu.machine.AbnormalShutdown: Could not perform graceful shutdown
+>> +
+>> +======================================================================
+>> +FAIL: test_migratee_bitmap_is_not_mapped_on_dst
+>> (__main__.TestBlockBitmapMappingErrors)
+>> +----------------------------------------------------------------------
+>> +Traceback (most recent call last):
+>> +  File "300", line 384, in test_migratee_bitmap_is_not_mapped_on_dst
+>> +    self.migrate(False)
+>> +  File "300", line 99, in migrate
+>> +    self.assertEqual(self.vm_a.wait_migration('postmigrate'),
+>> +AssertionError: False != True
+>> +
+>>   ----------------------------------------------------------------------
+>>   Ran 37 tests
+>>
+>> -OK
+>> +FAILED (failures=1, errors=1)
+>>
+>> I'm not sure why I'm seeing that, but it looks like you've got a bad
+>> deref somewhere in the alias code.
+> 
+> Ah, crap.
+> 
+> This should fix it:
+> 
+> diff --git a/migration/block-dirty-bitmap.c b/migration/block-dirty-bitmap.c
+> index 89cb16b12c..d407dfefea 100644
+> --- a/migration/block-dirty-bitmap.c
+> +++ b/migration/block-dirty-bitmap.c
+> @@ -1091,7 +1091,9 @@ static int dirty_bitmap_load_header(QEMUFile *f,
+> DBMLoadState *s,
+>               } else {
+>                   bitmap_name = s->bitmap_alias;
+>               }
 > +        }
-> +    } else {
-> +        error_report("sbsa-ref: unknown EC register");
-> +    }
-> +}
-> +
-> +static const MemoryRegionOps secure_ec_ops = {
-> +    .read = secure_ec_read,
-> +    .write = secure_ec_write,
-> +    .endianness = DEVICE_NATIVE_ENDIAN,
-> +};
-> +
-> +static void secure_ec_init(Object *obj)
-> +{
-> +    SECUREECState *s = SECURE_EC(obj);
-> +    SysBusDevice *dev = SYS_BUS_DEVICE(obj);
-> +
-> +    memory_region_init_io(&s->iomem, obj, &secure_ec_ops, s, "secure-ec",
-> +                            0x1000);
-> +    sysbus_init_mmio(dev, &s->iomem);
-> +}
-> +
-> +static void create_secure_ec(MemoryRegion *mem)
-> +{
-> +    hwaddr base = sbsa_ref_memmap[SBSA_SECURE_EC].base;
-> +    DeviceState *dev = qdev_create(NULL, TYPE_SECURE_EC);
-
-I've just discovered the API change here, I tested in an older tree, but
-Ill wait for other reviews before re-issuing.
-
-Graeme
-
-> +    SysBusDevice *s = SYS_BUS_DEVICE(dev);
-> +
-> +    memory_region_add_subregion(mem, base,
-> +                                sysbus_mmio_get_region(s, 0));
-> +}
-> +
->  static void sbsa_ref_init(MachineState *machine)
->  {
->      unsigned int smp_cpus = machine->smp.cpus;
-> @@ -708,6 +778,8 @@ static void sbsa_ref_init(MachineState *machine)
->  
->      create_pcie(sms);
->  
-> +    create_secure_ec(secure_sysmem);
-> +
->      sms->bootinfo.ram_size = machine->ram_size;
->      sms->bootinfo.nb_cpus = smp_cpus;
->      sms->bootinfo.board_id = -1;
-> @@ -798,8 +870,31 @@ static const TypeInfo sbsa_ref_info = {
->      .instance_size = sizeof(SBSAMachineState),
->  };
->  
-> +static const VMStateDescription vmstate_secure_ec_info = {
-> +    .name = "sbsa-secure-ec",
-> +    .version_id = 0,
-> +    .minimum_version_id = 0,
-> +};
-> +
-> +static void secure_ec_class_init(ObjectClass *klass, void *data)
-> +{
-> +    DeviceClass *dc = DEVICE_CLASS(klass);
-> +
-> +    dc->vmsd = &vmstate_secure_ec_info;
-> +    dc->user_creatable = false;
-> +}
-> +
-> +static const TypeInfo secure_ec_info = {
-> +    .name          = TYPE_SECURE_EC,
-> +    .parent        = TYPE_SYS_BUS_DEVICE,
-> +    .instance_size = sizeof(SECUREECState),
-> +    .instance_init = secure_ec_init,
-> +    .class_init    = secure_ec_class_init,
-> +};
-> +
->  static void sbsa_ref_machine_init(void)
->  {
-> +    type_register_static(&secure_ec_info);
->      type_register_static(&sbsa_ref_info);
->  }
->  
-> -- 
-> 2.25.1
 > 
+> +        if (!s->cancelled) {
+>               g_strlcpy(s->bitmap_name, bitmap_name, sizeof(s->bitmap_name));
+>               s->bitmap = bdrv_find_dirty_bitmap(s->bs, s->bitmap_name);
+> 
+> 
+
+That's correct thing to do
+
+> I had this originally, and then I decided to drop that hunk just before
+> sending v4 because I couldn’t see the point.  But we need it, because if
+> the bitmap alias is unknown, the migration is cancelled, so we need to
+> re-check s->cancalled after the alias lookup block.
+> 
+> Would you be OK with squashing that into patch 1?
+> 
+
+Ok for me.
+
+-- 
+Best regards,
+Vladimir
 
