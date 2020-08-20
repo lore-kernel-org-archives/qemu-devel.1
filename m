@@ -2,83 +2,72 @@ Return-Path: <SRS0=Dndf=B6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31723C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 21:57:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AC84C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 21:59:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F1BBF20674
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 21:57:02 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GE88iW/w"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1BBF20674
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id D51B320674
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 21:59:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D51B320674
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=fromorbit.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33522 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37562 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8sYQ-0000cx-9L
-	for qemu-devel@archiver.kernel.org; Thu, 20 Aug 2020 17:57:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50374)
+	id 1k8saM-0002L3-65
+	for qemu-devel@archiver.kernel.org; Thu, 20 Aug 2020 17:59:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50918)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1k8sXG-0007ie-Qe
- for qemu-devel@nongnu.org; Thu, 20 Aug 2020 17:55:50 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39345)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1k8sXF-0001Iy-Am
- for qemu-devel@nongnu.org; Thu, 20 Aug 2020 17:55:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597960548;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type;
- bh=Mua+x27GNP9PoMRmh9desET01GYPNoFzw4YIF8qk/S4=;
- b=GE88iW/wnGMmG1DAJgp4VYMlkhyGVr6vvieSg+GbjHGdOMUePz4ECU2dN1PvG22foGZ9ig
- WvdSS8AxtRbxqpcTXybbCt8H/75DBGRWiY5Y3oQg1Zn0DNm5PvGCy7NjMJp0gTGDw+4+Go
- wwyHVolwZVuqGLjFI84GpFQrawRKONE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-247-2pXW9Ak5Nv2rUFhHShv1Ig-1; Thu, 20 Aug 2020 17:55:45 -0400
-X-MC-Unique: 2pXW9Ak5Nv2rUFhHShv1Ig-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 95DEC100CFC0;
- Thu, 20 Aug 2020 21:55:41 +0000 (UTC)
-Received: from localhost (ovpn-117-244.rdu2.redhat.com [10.10.117.244])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6E30371780;
- Thu, 20 Aug 2020 21:55:30 +0000 (UTC)
-Date: Thu, 20 Aug 2020 17:55:29 -0400
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: "Daniel P. Berrange" <berrange@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
-Subject: Suspicious QOM types without instance/class size
-Message-ID: <20200820215529.GH642093@habkost.net>
+ (Exim 4.90_1) (envelope-from <david@fromorbit.com>)
+ id 1k8sZq-0001w0-6b; Thu, 20 Aug 2020 17:58:30 -0400
+Received: from mail105.syd.optusnet.com.au ([211.29.132.249]:57259)
+ by eggs.gnu.org with esmtp (Exim 4.90_1)
+ (envelope-from <david@fromorbit.com>)
+ id 1k8sZn-0001dZ-9D; Thu, 20 Aug 2020 17:58:29 -0400
+Received: from dread.disaster.area (pa49-181-146-199.pa.nsw.optusnet.com.au
+ [49.181.146.199])
+ by mail105.syd.optusnet.com.au (Postfix) with ESMTPS id 5EB853A5F39;
+ Fri, 21 Aug 2020 07:58:12 +1000 (AEST)
+Received: from dave by dread.disaster.area with local (Exim 4.92.3)
+ (envelope-from <david@fromorbit.com>)
+ id 1k8sZX-0007M4-Sg; Fri, 21 Aug 2020 07:58:11 +1000
+Date: Fri, 21 Aug 2020 07:58:11 +1000
+From: Dave Chinner <david@fromorbit.com>
+To: Alberto Garcia <berto@igalia.com>
+Subject: Re: [PATCH 0/1] qcow2: Skip copy-on-write when allocating a zero
+ cluster
+Message-ID: <20200820215811.GC7941@dread.disaster.area>
+References: <cover.1597416317.git.berto@igalia.com>
+ <20200817101019.GD11402@linux.fritz.box>
+ <w518sedz3td.fsf@maestria.local.igalia.com>
+ <20200817155307.GS11402@linux.fritz.box>
+ <w51pn7memr7.fsf@maestria.local.igalia.com>
+ <20200819150711.GE10272@linux.fritz.box>
+ <20200819175300.GA141399@bfoster>
+ <w51v9hdultt.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=ehabkost@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/20 17:32:49
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+In-Reply-To: <w51v9hdultt.fsf@maestria.local.igalia.com>
+X-Optus-CM-Score: 0
+X-Optus-CM-Analysis: v=2.3 cv=QIgWuTDL c=1 sm=1 tr=0 cx=a_idp_d
+ a=GorAHYkI+xOargNMzM6qxQ==:117 a=GorAHYkI+xOargNMzM6qxQ==:17
+ a=kj9zAlcOel0A:10 a=y4yBn9ojGxQA:10 a=7-415B0cAAAA:8
+ a=2Bx8Jmvsl4pN9QuK9MMA:9 a=CjuIK1q_8ugA:10 a=biEYGPWJfzWAr4FL6Ov7:22
+Received-SPF: none client-ip=211.29.132.249; envelope-from=david@fromorbit.com;
+ helo=mail105.syd.optusnet.com.au
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/20 17:58:22
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10
+X-Spam_score_int: -25
+X-Spam_score: -2.6
+X-Spam_bar: --
+X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
+ SPF_HELO_PASS=-0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -91,49 +80,199 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
- David Hildenbrand <david@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
- Gerd Hoffmann <kraxel@redhat.com>, qemu-block@nongnu.org,
- "Michael S. Tsirkin" <mst@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>,
- David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Alistair Francis <alistair@alistair23.me>, Cameron Esfahani <dirty@apple.com>,
- qemu-s390x@nongnu.org, qemu-arm@nongnu.org,
- =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>,
- Richard Henderson <rth@twiddle.net>, Cornelia Huck <cohuck@redhat.com>,
- Roman Bolshakov <r.bolshakov@yadro.com>, qemu-ppc@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org,
+ Brian Foster <bfoster@redhat.com>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, linux-xfs@vger.kernel.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-While trying to convert TypeInfo declarations to the new
-OBJECT_DECLARE* macros, I've stumbled on a few suspicious cases
-where instance_size or class_size is not set, despite having type
-checker macros that use a specific type.
+On Thu, Aug 20, 2020 at 10:03:10PM +0200, Alberto Garcia wrote:
+> Cc: linux-xfs
+> 
+> On Wed 19 Aug 2020 07:53:00 PM CEST, Brian Foster wrote:
+> > In any event, if you're seeing unclear or unexpected performance
+> > deltas between certain XFS configurations or other fs', I think the
+> > best thing to do is post a more complete description of the workload,
+> > filesystem/storage setup, and test results to the linux-xfs mailing
+> > list (feel free to cc me as well). As it is, aside from the questions
+> > above, it's not really clear to me what the storage stack looks like
+> > for this test, if/how qcow2 is involved, what the various
+> > 'preallocation=' modes actually mean, etc.
+> 
+> (see [1] for a bit of context)
+> 
+> I repeated the tests with a larger (125GB) filesystem. Things are a bit
+> faster but not radically different, here are the new numbers:
+> 
+> |----------------------+-------+-------|
+> | preallocation mode   |   xfs |  ext4 |
+> |----------------------+-------+-------|
+> | off                  |  8139 | 11688 |
+> | off (w/o ZERO_RANGE) |  2965 |  2780 |
+> | metadata             |  7768 |  9132 |
+> | falloc               |  7742 | 13108 |
+> | full                 | 41389 | 16351 |
+> |----------------------+-------+-------|
+> 
+> The numbers are I/O operations per second as reported by fio, running
+> inside a VM.
+> 
+> The VM is running Debian 9.7 with Linux 4.9.130 and the fio version is
+> 2.16-1. I'm using QEMU 5.1.0.
+> 
+> fio is sending random 4KB write requests to a 25GB virtual drive, this
+> is the full command line:
+> 
+> fio --filename=/dev/vdb --direct=1 --randrepeat=1 --eta=always
+>     --ioengine=libaio --iodepth=32 --numjobs=1 --name=test --size=25G
+>     --io_limit=25G --ramp_time=5 --rw=randwrite --bs=4k --runtime=60
+>   
+> The virtual drive (/dev/vdb) is a freshly created qcow2 file stored on
+> the host (on an xfs or ext4 filesystem as the table above shows), and
+> it is attached to QEMU using a virtio-blk-pci device:
+> 
+>    -drive if=virtio,file=image.qcow2,cache=none,l2-cache-size=200M
 
-The ones with "WARNING" are abstract types (maybe not serious if
-subclasses set the appropriate sizes).  The ones with "ERROR"
-don't seem to be abstract types.
+You're not using AIO on this image file, so it can't do
+concurrent IO? what happens when you add "aio=native" to this?
 
-WARNING: hw/arm/armsse.c:1159:1: class_size should be set to sizeof(ARMSSEClass)?
-WARNING: hw/audio/hda-codec.c:900:1: instance_size should be set to sizeof(HDAAudioState)?
-ERROR: hw/core/register.c:328:1: instance_size should be set to sizeof(RegisterInfo)?
-WARNING: hw/input/adb.c:310:1: class_size should be set to sizeof(ADBDeviceClass)?
-WARNING: hw/isa/isa-superio.c:181:1: instance_size should be set to sizeof(ISASuperIODevice)?
-WARNING: hw/ppc/pnv_lpc.c:771:1: instance_size should be set to sizeof(PnvLpcController)?
-ERROR: hw/ppc/spapr_drc.c:771:1: instance_size should be set to sizeof(SpaprDrc)?
-WARNING: hw/rtc/m48t59-isa.c:156:1: class_size should be set to sizeof(M48txxISADeviceClass)?
-WARNING: hw/rtc/m48t59.c:691:1: class_size should be set to sizeof(M48txxSysBusDeviceClass)?
-ERROR: hw/s390x/virtio-ccw.c:1237:1: class_size should be set to sizeof(VirtioCcwBusClass)?
-WARNING: hw/ssi/ssi.c:88:1: instance_size should be set to sizeof(SSISlave)?
-ERROR: hw/virtio/virtio-pci.c:2101:1: class_size should be set to sizeof(VirtioPCIBusClass)?
-WARNING: scsi/pr-manager.c:76:1: instance_size should be set to sizeof(PRManager)?
-ERROR: target/i386/hvf/hvf.c:908:1: instance_size should be set to sizeof(HVFState)?
+> cache=none means that the image is opened with O_DIRECT and
+> l2-cache-size is large enough so QEMU is able to cache all the
+> relevant qcow2 metadata in memory.
 
+What happens when you just use a sparse file (i.e. a raw image) with
+aio=native instead of using qcow2? XFS, ext4, btrfs, etc all support
+sparse files so using qcow2 to provide sparse image file support is
+largely an unnecessary layer of indirection and overhead...
+
+And with XFS, you don't need qcow2 for snapshots either because you
+can use reflink copies to take an atomic copy-on-write snapshot of
+the raw image file... (assuming you made the xfs filesystem with
+reflink support (which is the TOT default now)).
+
+I've been using raw sprase files on XFS for all my VMs for over a
+decade now, and using reflink to create COW copies of golden
+image files iwhen deploying new VMs for a couple of years now...
+
+> The host is running Linux 4.19.132 and has an SSD drive.
+> 
+> About the preallocation modes: a qcow2 file is divided into clusters
+> of the same size (64KB in this case). That is the minimum unit of
+> allocation, so when writing 4KB to an unallocated cluster QEMU needs
+> to fill the other 60KB with zeroes. So here's what happens with the
+> different modes:
+
+Which is something that sparse files on filesystems do not need to
+do. If, on XFS, you really want 64kB allocation clusters, use an
+extent size hint of 64kB. Though for image files, I highly recommend
+using 1MB or larger extent size hints.
+
+
+> 1) off: for every write request QEMU initializes the cluster (64KB)
+>         with fallocate(ZERO_RANGE) and then writes the 4KB of data.
+> 
+> 2) off w/o ZERO_RANGE: QEMU writes the 4KB of data and fills the rest
+>         of the cluster with zeroes.
+> 
+> 3) metadata: all clusters were allocated when the image was created
+>         but they are sparse, QEMU only writes the 4KB of data.
+> 
+> 4) falloc: all clusters were allocated with fallocate() when the image
+>         was created, QEMU only writes 4KB of data.
+> 
+> 5) full: all clusters were allocated by writing zeroes to all of them
+>         when the image was created, QEMU only writes 4KB of data.
+> 
+> As I said in a previous message I'm not familiar with xfs, but the
+> parts that I don't understand are
+> 
+>    - Why is (4) slower than (1)?
+
+Because fallocate() is a full IO serialisation barrier at the
+filesystem level. If you do:
+
+fallocate(whole file)
+<IO>
+<IO>
+<IO>
+.....
+
+The IO can run concurrent and does not serialise against anything in
+the filesysetm except unwritten extent conversions at IO completion
+(see answer to next question!)
+
+However, if you just use (4) you get:
+
+falloc(64k)
+  <wait for inflight IO to complete>
+  <allocates 64k as unwritten>
+<4k io>
+  ....
+falloc(64k)
+  <wait for inflight IO to complete>
+  ....
+  <4k IO completes, converts 4k to written>
+  <allocates 64k as unwritten>
+<4k io>
+falloc(64k)
+  <wait for inflight IO to complete>
+  ....
+  <4k IO completes, converts 4k to written>
+  <allocates 64k as unwritten>
+<4k io>
+  ....
+
+until all the clusters in the qcow2 file are intialised. IOWs, each
+fallocate() call serialises all IO in flight. Compare that to using
+extent size hints on a raw sparse image file for the same thing:
+
+<set 64k extent size hint>
+<4k IO>
+  <allocates 64k as unwritten>
+  ....
+<4k IO>
+  <allocates 64k as unwritten>
+  ....
+<4k IO>
+  <allocates 64k as unwritten>
+  ....
+...
+  <4k IO completes, converts 4k to written>
+  <4k IO completes, converts 4k to written>
+  <4k IO completes, converts 4k to written>
+....
+
+See the difference in IO pipelining here? You get the same "64kB
+cluster initialised at a time" behaviour as qcow2, but you don't get
+the IO pipeline stalls caused by fallocate() having to drain all the
+IO in flight before it does the allocation.
+
+>    - Why is (5) so much faster than everything else?
+
+The full file allocation in (5) means the IO doesn't have to modify
+the extent map hence all extent mapping is uses shared locking and
+the entire IO path can run concurrently without serialisation at
+all.
+
+Thing is, once your writes into sprase image files regularly start
+hitting written extents, the performance of (1), (2) and (4) will
+trend towards (5) as writes hit already allocated ranges of the file
+and the serialisation of extent mapping changes goes away. This
+occurs with guest filesystems that perform overwrite in place (such
+as XFS) and hence overwrites of existing data will hit allocated
+space in the image file and not require further allocation.
+
+IOWs, typical "write once" benchmark testing indicates the *worst*
+performance you are going to see. As the guest filesytsem ages and
+initialises more of the underlying image file, it will get faster,
+not slower.
+
+Cheers,
+
+Dave.
 -- 
-Eduardo
-
+Dave Chinner
+david@fromorbit.com
 
