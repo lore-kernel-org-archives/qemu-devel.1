@@ -2,114 +2,115 @@ Return-Path: <SRS0=Dndf=B6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.4 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 988A5C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 13:18:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7F0CC433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 13:25:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 40B1120658
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 13:18:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9EAAF208DB
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 13:25:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IZmhPUhx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 40B1120658
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OUqWKZuc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EAAF208DB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55694 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36170 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8kSG-0001eS-Fe
-	for qemu-devel@archiver.kernel.org; Thu, 20 Aug 2020 09:18:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33580)
+	id 1k8kZD-0005dw-S9
+	for qemu-devel@archiver.kernel.org; Thu, 20 Aug 2020 09:25:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35674)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1k8kRZ-00018v-Vg
- for qemu-devel@nongnu.org; Thu, 20 Aug 2020 09:17:25 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:54034)
+ (Exim 4.90_1) (envelope-from <smooney@redhat.com>)
+ id 1k8kYb-00058l-Qb
+ for qemu-devel@nongnu.org; Thu, 20 Aug 2020 09:24:41 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57249
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1k8kRY-0008Vl-1n
- for qemu-devel@nongnu.org; Thu, 20 Aug 2020 09:17:25 -0400
+ (Exim 4.90_1) (envelope-from <smooney@redhat.com>)
+ id 1k8kYY-00018C-FD
+ for qemu-devel@nongnu.org; Thu, 20 Aug 2020 09:24:41 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597929443;
+ s=mimecast20190719; t=1597929877;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=ZriRS5Leub4nLazWY2+HJbiFTDyaZsmX5OyW5cAatsY=;
- b=IZmhPUhxUSagUrh45qlJyIZlht11JM3pbMMsABYmCFv/Jnv0fiK/tLab2eYcvd9vJE4TLe
- Br3/gfECbKN82/pp99Lp6Y89SzesDh3/FoXy3E7VTXM+8JLSZyseiJ/sgTSLynROVhw3IX
- 8PNcEwm0QhfRe7ZmCFL+YxJdBhMSEhs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-340-s4Q2vJSgMT6vcbEy_3-lbA-1; Thu, 20 Aug 2020 09:17:18 -0400
-X-MC-Unique: s4Q2vJSgMT6vcbEy_3-lbA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A90DF81F038;
- Thu, 20 Aug 2020 13:17:17 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-113-133.ams2.redhat.com
- [10.36.113.133])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id AE9325DA81;
- Thu, 20 Aug 2020 13:17:15 +0000 (UTC)
-Subject: Re: [PATCH v4 4/4] iotests: Test node/bitmap aliases during migration
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-References: <20200818133240.195840-1-mreitz@redhat.com>
- <20200818133240.195840-5-mreitz@redhat.com>
- <fe00acc5-a06f-5e65-63f6-5f0ed7ec3019@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <28314d9e-714a-2acd-5bd0-cf61f9ca41b2@redhat.com>
-Date: Thu, 20 Aug 2020 15:17:14 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-MIME-Version: 1.0
-In-Reply-To: <fe00acc5-a06f-5e65-63f6-5f0ed7ec3019@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=n48rhMjZ4Z/v3a5NZW5TeQMUSzs2EVHjTw27OemSUbE=;
+ b=OUqWKZucdiJAZkPQCUS8ZhacEuwp2pYKNhQ43IEen1Ke3ltbQ5ZbQB8cT/0DlojledNhTY
+ 3gJU+PmgdysxpfBhIMk4WDv2Ce0HHe7CQ8pZESN2xTu3E2cMJ6lFsQsEXQ/LsEhpgRRlql
+ Co7CUslD8nwLNa/YfUo1lp9TJuEBpBk=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-6-PH-EtaQqPVmPR5IhEraoqA-1; Thu, 20 Aug 2020 09:24:35 -0400
+X-MC-Unique: PH-EtaQqPVmPR5IhEraoqA-1
+Received: by mail-wr1-f71.google.com with SMTP id t12so662639wrp.0
+ for <qemu-devel@nongnu.org>; Thu, 20 Aug 2020 06:24:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=n48rhMjZ4Z/v3a5NZW5TeQMUSzs2EVHjTw27OemSUbE=;
+ b=dHYhrvfQvIw5sykqi760RbGDlFhSvgx+8oXM/ytHsaiFysqLpdWz/ftKV7IynGjyFr
+ Bmg8mUVQOeKAf4XnHLpqW7QJbDE0ZV2ltEt4/g0d6bdhy4mmUe4/0EyvDIaS5n1RwVbM
+ y8eVBixHPudk0Kq443fDC0/O+CJWB9gPT+vGggVnM/jTsQVtH+X3KarqIDld3kRv37RB
+ DAwYU3XdL2kOtVPDpt/Uz1wOT8iJjtddY0hAEtOaIHr0gm6glSwJDWybfe4Z7sIep+om
+ HVNmAEzaRhzMEqEQCibdPKWQT8xyOouwHVVU1KE5b5fLYvWf1AXVwfmBg7iFsolVCIGp
+ mulQ==
+X-Gm-Message-State: AOAM530osdcRr9L1nDpgfAftpHt85f1gVE4PEJpv+xCnzcN36zjV+N36
+ K6fvFs9WIaETNbBCwfjPZmcjjQDnXuwUHiOcHdbplOnGlsvGWE2Puv7PWkOOWChPyfRPYvjnjZC
+ KLKX28H49CKXsvEU=
+X-Received: by 2002:adf:bc4b:: with SMTP id a11mr3038877wrh.381.1597929870959; 
+ Thu, 20 Aug 2020 06:24:30 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJywnJ34qAWHYR37Eqe9Veo6zlTBnj0hWN23IhsoxGgd9bAQmvHs83pqgk2Or1JgJeUyayTBDQ==
+X-Received: by 2002:adf:bc4b:: with SMTP id a11mr3038825wrh.381.1597929870502; 
+ Thu, 20 Aug 2020 06:24:30 -0700 (PDT)
+Received: from pop-os ([51.37.51.98])
+ by smtp.gmail.com with ESMTPSA id k15sm4144059wrp.43.2020.08.20.06.24.27
+ (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
+ Thu, 20 Aug 2020 06:24:27 -0700 (PDT)
+Message-ID: <47d216330e10152f0f5d27421da60a7b1c52e5f0.camel@redhat.com>
+Subject: Re: device compatibility interface for live migration with assigned
+ devices
+From: Sean Mooney <smooney@redhat.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Date: Thu, 20 Aug 2020 14:24:26 +0100
+In-Reply-To: <20200820062725.GB24997@joy-OptiPlex-7040>
+References: <20200814051601.GD15344@joy-OptiPlex-7040>
+ <a51209fe-a8c6-941f-ff54-7be06d73bc44@redhat.com>
+ <20200818085527.GB20215@redhat.com>
+ <3a073222-dcfe-c02d-198b-29f6a507b2e1@redhat.com>
+ <20200818091628.GC20215@redhat.com>
+ <20200818113652.5d81a392.cohuck@redhat.com>
+ <20200820003922.GE21172@joy-OptiPlex-7040>
+ <242591bb809b68c618f62fdc93d4f8ae7b146b6d.camel@redhat.com>
+ <20200820040116.GB24121@joy-OptiPlex-7040>
+ <da140e6d262632e2fb707f69f220915748d25d35.camel@redhat.com>
+ <20200820062725.GB24997@joy-OptiPlex-7040>
+X-Mailer: Evolution 3.28.5-0ubuntu0.18.04.2
+Mime-Version: 1.0
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
-X-Mimecast-Spam-Score: 0.001
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=smooney@redhat.com
+X-Mimecast-Spam-Score: 0.502
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="m3meJuln79jG7dxFdyFZhSuixq0QHdPXf"
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=mreitz@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/20 09:00:23
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=smooney@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/20 03:03:32
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=unavailable autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -122,212 +123,312 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- Peter Krempa <pkrempa@redhat.com>, John Snow <jsnow@redhat.com>
+Cc: kvm@vger.kernel.org, libvir-list@redhat.com,
+ Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, kwankhede@nvidia.com,
+ eauger@redhat.com, xin-ran.wang@intel.com, corbet@lwn.net,
+ openstack-discuss@lists.openstack.org, shaohe.feng@intel.com,
+ kevin.tian@intel.com, Parav Pandit <parav@mellanox.com>,
+ jian-feng.ding@intel.com, dgilbert@redhat.com, zhenyuw@linux.intel.com,
+ hejie.xu@intel.com, bao.yumeng@zte.com.cn,
+ Alex Williamson <alex.williamson@redhat.com>, eskultet@redhat.com,
+ intel-gvt-dev@lists.freedesktop.org,
+ Daniel =?ISO-8859-1?Q?P=2EBerrang=E9?= <berrange@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>, Jiri Pirko <jiri@mellanox.com>,
+ dinechin@redhat.com, devel@ovirt.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---m3meJuln79jG7dxFdyFZhSuixq0QHdPXf
-Content-Type: multipart/mixed; boundary="hkadBKqvfLpGyVolHA64GnuZHZ9NqgfcS"
+On Thu, 2020-08-20 at 14:27 +0800, Yan Zhao wrote:
+> On Thu, Aug 20, 2020 at 06:16:28AM +0100, Sean Mooney wrote:
+> > On Thu, 2020-08-20 at 12:01 +0800, Yan Zhao wrote:
+> > > On Thu, Aug 20, 2020 at 02:29:07AM +0100, Sean Mooney wrote:
+> > > > On Thu, 2020-08-20 at 08:39 +0800, Yan Zhao wrote:
+> > > > > On Tue, Aug 18, 2020 at 11:36:52AM +0200, Cornelia Huck wrote:
+> > > > > > On Tue, 18 Aug 2020 10:16:28 +0100
+> > > > > > Daniel P. Berrangé <berrange@redhat.com> wrote:
+> > > > > > 
+> > > > > > > On Tue, Aug 18, 2020 at 05:01:51PM +0800, Jason Wang wrote:
+> > > > > > > >    On 2020/8/18 下午4:55, Daniel P. Berrangé wrote:
+> > > > > > > > 
+> > > > > > > >  On Tue, Aug 18, 2020 at 11:24:30AM +0800, Jason Wang wrote:
+> > > > > > > > 
+> > > > > > > >  On 2020/8/14 下午1:16, Yan Zhao wrote:
+> > > > > > > > 
+> > > > > > > >  On Thu, Aug 13, 2020 at 12:24:50PM +0800, Jason Wang wrote:
+> > > > > > > > 
+> > > > > > > >  On 2020/8/10 下午3:46, Yan Zhao wrote:  
+> > > > > > > >  we actually can also retrieve the same information through sysfs, .e.g
+> > > > > > > > 
+> > > > > > > >  |- [path to device]
+> > > > > > > >     |--- migration
+> > > > > > > >     |     |--- self
+> > > > > > > >     |     |   |---device_api
+> > > > > > > >     |    |   |---mdev_type
+> > > > > > > >     |    |   |---software_version
+> > > > > > > >     |    |   |---device_id
+> > > > > > > >     |    |   |---aggregator
+> > > > > > > >     |     |--- compatible
+> > > > > > > >     |     |   |---device_api
+> > > > > > > >     |    |   |---mdev_type
+> > > > > > > >     |    |   |---software_version
+> > > > > > > >     |    |   |---device_id
+> > > > > > > >     |    |   |---aggregator
+> > > > > > > > 
+> > > > > > > > 
+> > > > > > > >  Yes but:
+> > > > > > > > 
+> > > > > > > >  - You need one file per attribute (one syscall for one attribute)
+> > > > > > > >  - Attribute is coupled with kobject
+> > > > > > 
+> > > > > > Is that really that bad? You have the device with an embedded kobject
+> > > > > > anyway, and you can just put things into an attribute group?
+> > > > > > 
+> > > > > > [Also, I think that self/compatible split in the example makes things
+> > > > > > needlessly complex. Shouldn't semantic versioning and matching already
+> > > > > > cover nearly everything? I would expect very few cases that are more
+> > > > > > complex than that. Maybe the aggregation stuff, but I don't think we
+> > > > > > need that self/compatible split for that, either.]
+> > > > > 
+> > > > > Hi Cornelia,
+> > > > > 
+> > > > > The reason I want to declare compatible list of attributes is that
+> > > > > sometimes it's not a simple 1:1 matching of source attributes and target attributes
+> > > > > as I demonstrated below,
+> > > > > source mdev of (mdev_type i915-GVTg_V5_2 + aggregator 1) is compatible to
+> > > > > target mdev of (mdev_type i915-GVTg_V5_4 + aggregator 2),
+> > > > >                (mdev_type i915-GVTg_V5_8 + aggregator 4)
+> > > > 
+> > > > the way you are doing the nameing is till really confusing by the way
+> > > > if this has not already been merged in the kernel can you chagne the mdev
+> > > > so that mdev_type i915-GVTg_V5_2 is 2 of mdev_type i915-GVTg_V5_1 instead of half the device
+> > > > 
+> > > > currently you need to deived the aggratod by the number at the end of the mdev type to figure out
+> > > > how much of the phsicial device is being used with is a very unfridly api convention
+> > > > 
+> > > > the way aggrator are being proposed in general is not really someting i like but i thin this at least
+> > > > is something that should be able to correct.
+> > > > 
+> > > > with the complexity in the mdev type name + aggrator i suspect that this will never be support
+> > > > in openstack nova directly requireing integration via cyborg unless we can pre partion the
+> > > > device in to mdevs staicaly and just ignore this.
+> > > > 
+> > > > this is way to vendor sepecif to integrate into something like openstack in nova unless we can guarentee
+> > > > taht how aggreator work will be portable across vendors genericly.
+> > > > 
+> > > > > 
+> > > > > and aggragator may be just one of such examples that 1:1 matching does not
+> > > > > fit.
+> > > > 
+> > > > for openstack nova i dont see us support anything beyond the 1:1 case where the mdev type does not change.
+> > > > 
+> > > 
+> > > hi Sean,
+> > > I understand it's hard for openstack. but 1:N is always meaningful.
+> > > e.g.
+> > > if source device 1 has cap A, it is compatible to
+> > > device 2: cap A,
+> > > device 3: cap A+B,
+> > > device 4: cap A+B+C
+> > > ....
+> > > to allow openstack to detect it correctly, in compatible list of
+> > > device 2, we would say compatible cap is A;
+> > > device 3, compatible cap is A or A+B;
+> > > device 4, compatible cap is A or A+B, or A+B+C;
+> > > 
+> > > then if openstack finds device A's self cap A is contained in compatible
+> > > cap of device 2/3/4, it can migrate device 1 to device 2,3,4.
+> > > 
+> > > conversely,  device 1's compatible cap is only A,
+> > > so it is able to migrate device 2 to device 1, and it is not able to
+> > > migrate device 3/4 to device 1.
+> > 
+> > yes we build the palcement servce aroudn the idea of capablites as traits on resocue providres.
+> > which is why i originally asked if we coudl model compatibality with feature flags
+> > 
+> > we can seaislyt model deivce as aupport A, A+B or  A+B+C
+> > and then select hosts and evice based on that but
+> > 
+> > the list of compatable deivce you are propsoeing hide this feature infomation which whould be what we are matching
+> > on.
+> > 
+> > give me a lset of feature you want and list ting the feature avaiable on each device allow highre level ocestation
+> > to
+> > easily match the request to a host that can fulllfile it btu thave a set of other compatihble device does not help
+> > with
+> > that
+> > 
+> > so if a simple list a capabliteis can be advertiese d and if we know tha two dievce with the same capablity are
+> > intercahangebale that is workabout i suspect that will not be the case however and it would onely work within a
+> > familay
+> > of mdevs that are closely related.  which i think agian is an argument for not changeing the mdev type and at least
+> > intially only look at migatreion where the mdev type doee not change initally. 
+> > 
+> 
+> sorry Sean, I don't understand your words completely.
+> Please allow me to write it down in my words, and please confirm if my
+> understanding is right.
+> 1. you mean you agree on that each field is regarded as a trait, and
+> openstack can compare by itself if source trait is a subset of target trait, right?
+> e.g.
+> source device
+> field1=A1
+> field2=A2+B2
+> field3=A3
+> 
+> target device
+> field1=A1+B1
+> field2=A2+B2
+> filed3=A3
+> 
+> then openstack sees that field1/2/3 in source is a subset of field1/2/3 in
+> target, so it's migratable to target?
 
---hkadBKqvfLpGyVolHA64GnuZHZ9NqgfcS
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+yes this is basically how cpu feature work.
+if we see the host cpu on the dest is a supperset of the cpu feature used
+by the vm we know its safe to migrate.
+> 
+> 2. mdev_type + aggregator make it hard to achieve the above elegant
+> solution, so it's best to avoid the combined comparing of mdev_type + aggregator.
+> do I understand it correctly?
+yes and no. one of the challange that mdevs pose right now is that sometiem mdev model
+independent resouces and sometimes multipe mdev types consume the same underlying resouces
+there is know way for openstack to know if i915-GVTg_V5_2 and i915-GVTg_V5_4 consume the same resouces
+or not. as such we cant do the accounting properly so i would much prefer to have just 1 mdev type
+i915-GVTg and which models the minimal allocatable unit and then say i want 4 of them comsed into 1 device
+then have a second mdev type that does that since
 
-On 20.08.20 03:58, Eric Blake wrote:
-> On 8/18/20 8:32 AM, Max Reitz wrote:
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->> ---
->> =C2=A0 tests/qemu-iotests/300=C2=A0=C2=A0=C2=A0=C2=A0 | 595 ++++++++++++=
-+++++++++++++++++++++++++
->> =C2=A0 tests/qemu-iotests/300.out |=C2=A0=C2=A0 5 +
->=20
-> Rather sparse output (I hate debugging those sorts of outputs when the
-> test is failing).
+what that means in pratice is we cannot trust the available_instances for a given mdev type
+as consuming a different mdev type might change it. aggrators makes that problem worse.
+which is why i siad i would prefer if instead of aggreator as prposed each consumable
+resouce was reported indepenedly as different mdev types and then we composed those
+like we would when bond ports creating an attachment or other logical aggration that refers
+to instance of mdevs of differing type which we expose as a singel mdev that is exposed to the guest.
+in a concreate example we might say create a aggreator of 64 cuda cores and 32 tensor cores and "bond them"
+or aggrate them as a single attachme mdev and provide that to a ml workload guest. a differnt guest could request
+1 instace of the nvenc video encoder and one instance of the nvenc video decoder but no cuda or tensor for a video
+transcoding workload.
 
-Hm.  I don=E2=80=99t know, the stack trace usually gives a good idea and
-./check -d gives QMP context.
+if each of those componets are indepent mdev types and can be composed with that granularity then i think that approch
+is better then the current aggreator with vendor sepcific fileds.
+we can model the phsical device as being multipel nested resouces with different traits for each type of resouce and
+different capsities for the same. we can even model how many of the attachments/compositions can be done indepently
+if there is a limit on that.
 
-The advantage of a sparse output is that we don=E2=80=99t need to adjust th=
-e
-reference output every time some optional field is added somewhere.
+|- [parent physical device]
+|--- Vendor-specific-attributes [optional]
+|--- [mdev_supported_types]
+|     |--- [<type-id>]
+|     |   |--- create
+|     |   |--- name
+|     |   |--- available_instances
+|     |   |--- device_api
+|     |   |--- description
+|     |   |--- [devices]
+|     |--- [<type-id>]
+|     |   |--- create
+|     |   |--- name
+|     |   |--- available_instances
+|     |   |--- device_api
+|     |   |--- description
+|     |   |--- [devices]
+|     |--- [<type-id>]
+|          |--- create
+|          |--- name
+|          |--- available_instances
+|          |--- device_api
+|          |--- description
+|          |--- [devices]
 
->> =C2=A0 tests/qemu-iotests/group=C2=A0=C2=A0 |=C2=A0=C2=A0 1 +
->> =C2=A0 3 files changed, 601 insertions(+)
->> =C2=A0 create mode 100755 tests/qemu-iotests/300
->> =C2=A0 create mode 100644 tests/qemu-iotests/300.out
->>
->=20
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # Dirty some random megabyte=
-s
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 for _ in range(9):
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 mb_o=
-fs =3D random.randrange(1024)
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 self=
-.vm_a.hmp_qemu_io(self.src_node_name, f'write
->> {mb_ofs}M 1M')
->=20
-> It turns out that the discard operation likewise dirties the bitmap, but
-> slightly faster (see edb90bbd).=C2=A0 We could optimize it on top, but I'=
-m
-> not going to require a micro-optimizing to get it in.=C2=A0 The test take=
-s
-> about 12 seconds to run for me, but you didn't mark it as such in
-> 'group', so that's good; but it turns up a problem:
->=20
-> 300=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 fail=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 [20:55:54] [20:56:06]=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 output
-> mismatch (see 300.out.bad)
-> --- /home/eblake/qemu-tmp2/tests/qemu-iotests/300.out=C2=A0=C2=A0=C2=A0 2=
-020-08-19
-> 20:53:11.087791988 -0500
-> +++ /home/eblake/qemu-tmp2/tests/qemu-iotests/300.out.bad=C2=A0=C2=A0=C2=
-=A0 2020-08-19
-> 20:56:06.092428756 -0500
-> @@ -1,5 +1,41 @@
-> -.....................................
-> +WARNING:qemu.machine:qemu received signal 11; command:
-> "/home/eblake/qemu-tmp2/tests/qemu-iotests/../../x86_64-softmmu/qemu-syst=
-em-x86_64
-> -display none -vga none -chardev
-> socket,id=3Dmon,path=3D/tmp/tmp.qT831UThme/qemu-b-798452-monitor.sock -mo=
-n
-> chardev=3Dmon,mode=3Dcontrol -qtest
-> unix:path=3D/tmp/tmp.qT831UThme/qemu-b-798452-qtest.sock -accel qtest
-> -nodefaults -display none -accel qtest -blockdev
-> node-name=3Dnode0,driver=3Dnull-co -incoming unix:/tmp/tmp.qT831UThme/mig=
-_sock"
-> +.............FE.......................
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> +ERROR: test_migratee_bitmap_is_not_mapped_on_dst
-> (__main__.TestBlockBitmapMappingErrors)
-> +----------------------------------------------------------------------
-> +Traceback (most recent call last):
-> +=C2=A0 File
-> "/home/eblake/qemu-tmp2/tests/qemu-iotests/../../python/qemu/machine.py",=
- line
-> 435, in _do_shutdown
-> +=C2=A0=C2=A0=C2=A0 self._soft_shutdown(timeout, has_quit)
-> +=C2=A0 File
-> "/home/eblake/qemu-tmp2/tests/qemu-iotests/../../python/qemu/machine.py",=
- line
-> 415, in _soft_shutdown
-> +=C2=A0=C2=A0=C2=A0 self._qmp.cmd('quit')
-> +=C2=A0 File
-> "/home/eblake/qemu-tmp2/tests/qemu-iotests/../../python/qemu/qmp.py",
-> line 266, in cmd
-> +=C2=A0=C2=A0=C2=A0 return self.cmd_obj(qmp_cmd)
-> +=C2=A0 File
-> "/home/eblake/qemu-tmp2/tests/qemu-iotests/../../python/qemu/qmp.py",
-> line 246, in cmd_obj
-> +=C2=A0=C2=A0=C2=A0 self.__sock.sendall(json.dumps(qmp_cmd).encode('utf-8=
-'))
-> +BrokenPipeError: [Errno 32] Broken pipe
-> +
-> +The above exception was the direct cause of the following exception:
-> +
-> +Traceback (most recent call last):
-> +=C2=A0 File "300", line 76, in tearDown
-> +=C2=A0=C2=A0=C2=A0 self.vm_b.shutdown()
-> +=C2=A0 File
-> "/home/eblake/qemu-tmp2/tests/qemu-iotests/../../python/qemu/machine.py",=
- line
-> 465, in shutdown
-> +=C2=A0=C2=A0=C2=A0 self._do_shutdown(timeout, has_quit)
-> +=C2=A0 File
-> "/home/eblake/qemu-tmp2/tests/qemu-iotests/../../python/qemu/machine.py",=
- line
-> 438, in _do_shutdown
-> +=C2=A0=C2=A0=C2=A0 raise AbnormalShutdown("Could not perform graceful sh=
-utdown") \
-> +qemu.machine.AbnormalShutdown: Could not perform graceful shutdown
-> +
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> +FAIL: test_migratee_bitmap_is_not_mapped_on_dst
-> (__main__.TestBlockBitmapMappingErrors)
-> +----------------------------------------------------------------------
-> +Traceback (most recent call last):
-> +=C2=A0 File "300", line 384, in test_migratee_bitmap_is_not_mapped_on_ds=
-t
-> +=C2=A0=C2=A0=C2=A0 self.migrate(False)
-> +=C2=A0 File "300", line 99, in migrate
-> +=C2=A0=C2=A0=C2=A0 self.assertEqual(self.vm_a.wait_migration('postmigrat=
-e'),
-> +AssertionError: False !=3D True
-> +
-> =C2=A0-------------------------------------------------------------------=
----
-> =C2=A0Ran 37 tests
->=20
-> -OK
-> +FAILED (failures=3D1, errors=3D1)
->=20
-> I'm not sure why I'm seeing that, but it looks like you've got a bad
-> deref somewhere in the alias code.
+a benifit of this appoch is we would be the mdev types would not change on migration 
+and we could jsut compuare a a simeple version stirgh and feature flag list to determin comaptiablity
+in a vendor neutral way. i dont nessisarly need to know what the vendeor flags mean just that the dest is a subset of
+the source and that the semaitic version numbers say the mdevs are compatible.
+> 
+> 3. you don't like self list and compatible list, because it is hard for
+> openstack to compare different traits?
+> e.g. if we have self list and compatible list, then as below, openstack needs
+> to compare if self field1/2/3 is a subset of compatible field 1/2/3.
+currnetly we only use mdevs for vGPUs and in our documentaiton we tell customer
+to model the mdev_type as a trait and request it as a reuiqred trait.
+so for customer that are doing that today changing mdev types is not really an option.
+we would prefer that they request the feature they need instead of a spefic mdev type
+so we can select any that meets there needs
+for example we have a bunch of traits for cuda support
+https://github.com/openstack/os-traits/blob/master/os_traits/hw/gpu/cuda.py
+or driectx/vulkan/opengl https://github.com/openstack/os-traits/blob/master/os_traits/hw/gpu/api.py
+these are closely analogous to cpu feature flag lix avx or sse
+https://github.com/openstack/os-traits/blob/master/os_traits/hw/cpu/x86/__init__.py#L16
 
-Ah, crap.
-
-This should fix it:
-
-diff --git a/migration/block-dirty-bitmap.c b/migration/block-dirty-bitmap.=
-c
-index 89cb16b12c..d407dfefea 100644
---- a/migration/block-dirty-bitmap.c
-+++ b/migration/block-dirty-bitmap.c
-@@ -1091,7 +1091,9 @@ static int dirty_bitmap_load_header(QEMUFile *f,
-DBMLoadState *s,
-             } else {
-                 bitmap_name =3D s->bitmap_alias;
-             }
-+        }
-
-+        if (!s->cancelled) {
-             g_strlcpy(s->bitmap_name, bitmap_name, sizeof(s->bitmap_name))=
-;
-             s->bitmap =3D bdrv_find_dirty_bitmap(s->bs, s->bitmap_name);
-
-
-I had this originally, and then I decided to drop that hunk just before
-sending v4 because I couldn=E2=80=99t see the point.  But we need it, becau=
-se if
-the bitmap alias is unknown, the migration is cancelled, so we need to
-re-check s->cancalled after the alias lookup block.
-
-Would you be OK with squashing that into patch 1?
-
-Max
-
-
---hkadBKqvfLpGyVolHA64GnuZHZ9NqgfcS--
-
---m3meJuln79jG7dxFdyFZhSuixq0QHdPXf
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl8+d9oACgkQ9AfbAGHV
-z0AKjggAqksgaxKrcRmQwOK/FH+U3HKicNfBrouSykz4mdrn+7HxH+7TO1+z8IdY
-P+XtCp8F4Dw+J+3eTG6k0/SXNEmFiQDz3DzAC8CezIkZUEneEJNqS/42z0uTIc+u
-VcMC8mXDXiC43BYv+FQI9xLDyjAn8YKjQk75gI1avvJvOAB2xI3utBFetvEbhFYZ
-BWfgKsF5GaVe5NUdMvFNCBo5CIp9iaeKTw0Qq/9wIKDb/xQRcCC7INtikXostC4O
-Vy47aKflA5BlCH+iZz8/Znq5R3X79iKPVPNvfc5s8DlTR/RLVBrpckkoTpQFIrKi
-SQQQySD3XoqaIHMRJLffnGdn8w+X5g==
-=XiEQ
------END PGP SIGNATURE-----
-
---m3meJuln79jG7dxFdyFZhSuixq0QHdPXf--
+so when it comes to compatiablities it would be ideal if you could express capablities as something like
+a cpu feature flag then we can eaisly model those as traits. 
+> 
+> source device:
+> self field1=A1
+> self field2=A2+B2
+> self field3=A3
+> 
+> compatible field1=A1
+> compatible field2=A2;B2;A2+B2;
+> compatible field3=A3
+> 
+> 
+> target device:
+> self field1=A1+B1
+> self field2=A2+B2
+> self field3=A3
+> 
+> compatible field1=A1;B1;A1+B1;
+> compatible field2=A2;B2;A2+B2;
+> compatible field3=A3
+> 
+> 
+> Thanks
+> Yan
+> 
+> 
+> > > 
+> > > 
+> > > > i woudl really prefer if there was just one mdev type that repsented the minimal allcatable unit and the
+> > > > aggragaotr where used to create compostions of that. i.e instad of i915-GVTg_V5_2 beign half the device,
+> > > > have 1 mdev type i915-GVTg and if the device support 8 of them then we can aggrate 4 of i915-GVTg
+> > > > 
+> > > > if you want to have muplie mdev type to model the different amoutn of the resouce e.g. i915-GVTg_small i915-
+> > > > GVTg_large
+> > > > that is totlaly fine too or even i915-GVTg_4 indcating it sis 4 of i915-GVTg
+> > > > 
+> > > > failing that i would just expose an mdev type per composable resouce and allow us to compose them a the user
+> > > > level
+> > > > with
+> > > > some other construct mudeling a attament to the device. e.g. create composed mdev or somethig that is an
+> > > > aggreateion
+> > > > of
+> > > > multiple sub resouces each of which is an mdev. so kind of like how bond port work. we would create an mdev for
+> > > > each
+> > > > of
+> > > > the sub resouces and then create a bond or aggrated mdev by reference the other mdevs by uuid then attach only
+> > > > the
+> > > > aggreated mdev to the instance.
+> > > > 
+> > > > the current aggrator syntax and sematic however make me rather uncofrotable when i think about orchestating vms
+> > > > on
+> > > > top
+> > > > of it even to boot them let alone migrate them.
+> > > > > 
+> > > > > So, we explicitly list out self/compatible attributes, and management
+> > > > > tools only need to check if self attributes is contained compatible
+> > > > > attributes.
+> > > > > 
+> > > > > or do you mean only compatible list is enough, and the management tools
+> > > > > need to find out self list by themselves?
+> > > > > But I think provide a self list is easier for management tools.
+> > > > > 
+> > > > > Thanks
+> > > > > Yan
+> > > > > 
+> > > 
+> > > 
+> 
+> 
 
 
