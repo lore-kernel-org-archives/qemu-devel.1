@@ -2,122 +2,88 @@ Return-Path: <SRS0=Dndf=B6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	FSL_HELO_FAKE,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DADAFC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 19:35:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A923C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 19:45:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9358420674
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 19:35:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3A1B3207DE
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 19:45:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="n6zoyzEe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9358420674
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="owqPY7lD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A1B3207DE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56094 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35418 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8qLi-0004OM-OP
-	for qemu-devel@archiver.kernel.org; Thu, 20 Aug 2020 15:35:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49326)
+	id 1k8qUq-00087N-AU
+	for qemu-devel@archiver.kernel.org; Thu, 20 Aug 2020 15:45:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51328)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1k8qL0-0003m8-Oy; Thu, 20 Aug 2020 15:35:02 -0400
-Received: from mail-vi1eur05on2125.outbound.protection.outlook.com
- ([40.107.21.125]:60417 helo=EUR05-VI1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1k8qKw-0001rq-QL; Thu, 20 Aug 2020 15:35:01 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Zv635mugApWDKFTNb5TSo/d8voadRuK7vgN33jAn9bh/yjncgtbpjLAUr5Q8e0Qhd/7QlPeooLeZP0YzH08AMPja7W8p47CTL/bTvi4906lU1iMfqtgBj4dr1ddwag0eI4pgiEoVLAu61F/Yh+w5M1oGv4LJsarIbw6zaRq3c/IdnAosxnv7QSya2Z3CMDgiSxCyCIm/AzAmV4s+sJKR3/LrxCktujO6vKISogdKUzxmA8Kgtcg84nL1cZ5MAc3lBCIddFP0I8RcTDTVTQjpOVBM48BoXbDDbqueklSSCFh70a04vjz2P6GYdx2SxwZ440pZH+SVgZD+nlfd47YlZg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=O3D1q7P4mxOFBUyFzTPTKjHfgcL9MWhTfBIQnrRjjXs=;
- b=GK/+Z1gQWG9SIZRqzzlBtjbOM9FuzYgef+6dXwe1M0jrbWMp5ZvoKkj+3qDRBcwaP1DBYw9IITzNVuTZwZa9c3ZmKB7x9YpecD2FB0RlpGW12Qp4TMxD5kcJdBEhPBPmFjlhz5GZ/NWA9wGfoIwZO/d80dKmgtgY28PszWzKTlbo6sWWWJ1lqsoJeuUmwm3gthSnH7e9MBSR/mCSfYMKXkDEwno0KrxBiJ3IEScUpcSzoqm6W5DFq4eTltYSrEVxgGnDjPTs/qP0g82gW3uehbD0biDgSQ67zhqlHydZu7cXXhjFBcR1ElIF2KzHXvACg+vhun9B1zTXOKX/cq5Jgg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=O3D1q7P4mxOFBUyFzTPTKjHfgcL9MWhTfBIQnrRjjXs=;
- b=n6zoyzEegrUQyAL+k8vpv49tZwph4LTZNe1Ea6+8/Q0ajdWH8EjKYZvDBWJTGttjf8qhtehydKET7mEbrVU5wFQEHCfKt57O4Eb/qPaGy2GzWMv0odsye++WCE/ssdoVvOk4XCmo/+rdJmgIFSpGK56KOx80oIeRm2iKKmfCVf0=
-Authentication-Results: openvz.org; dkim=none (message not signed)
- header.d=none;openvz.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM6PR08MB4721.eurprd08.prod.outlook.com (2603:10a6:20b:c7::19)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3305.26; Thu, 20 Aug
- 2020 19:34:53 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::8c0c:c056:97a5:484a]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::8c0c:c056:97a5:484a%3]) with mapi id 15.20.3283.027; Thu, 20 Aug 2020
- 19:34:53 +0000
-Subject: Re: [PATCH v4 00/10] preallocate filter
+ (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
+ id 1k8qTV-0006vp-LB; Thu, 20 Aug 2020 15:43:49 -0400
+Received: from mail-lj1-x230.google.com ([2a00:1450:4864:20::230]:43573)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
+ id 1k8qTS-000305-Np; Thu, 20 Aug 2020 15:43:47 -0400
+Received: by mail-lj1-x230.google.com with SMTP id v12so3403749ljc.10;
+ Thu, 20 Aug 2020 12:43:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=iQby6NjkdZDpj5Eu21WRa/aMPhqg4CaJZ3i36bO+0Co=;
+ b=owqPY7lDARmLL4RLDhfBrtXOScYGeFP4l7YM/i57DE5gtHfGWb5S43UHn/kQo9y8RO
+ /Zm90fCN8LQOX/KOgo+YTKhlpo9o5WzLlby3+Tbf4zPry3eJRxp9NFBnFkj4J02EtnYR
+ tsVEv1028ZY1aL/83oZcZoFwgrso8GC0kfNCq4vdLwES2bF7XMgtwGJIFg6gAnBtD5oH
+ lYast5G3USTOhfrPSncG47wC0/7433c9x9Bgq/ZaLqUc1EJjmJcmeMxmodwHSRi9r3Mh
+ z/IrnLcjT6MZLIMdU10hq3Ajy8DEeqQ7n9cLmZjp7YAQhM11zfaHm/kTY9nzCsr/1Dm1
+ fpuQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=iQby6NjkdZDpj5Eu21WRa/aMPhqg4CaJZ3i36bO+0Co=;
+ b=A4KelMia5m2XPYG6JFMa4VhK6WmfRtV5UBn/tzvR3P4FZH1mOHD4JT3lEvGyATq+dt
+ 61/b8JmRZSfuQju7KPtBXJN6RVp501ykD/egA8vjzw32rHRIIZQHA5jP1PwqAzgq0tKa
+ ET3LgkN/iUipl5qCVn8PlKq0Crc7TTgMRqxV/5EkJDlthv1w8Q2ByJJLnzP2Ju1vZkHy
+ 1AL+hT/ewxpI1gfLzqjMm7eQAuAoh0eAHqCI42cAwH94J4HiEaB5yjjuP6LDh97e2Gs5
+ Rj7+xc1pq0LBWrolGV1zlFw10EtaXfLtiR0jykrZU68gkGlJzbDFQ93APLU6s4e3VGHn
+ CT6Q==
+X-Gm-Message-State: AOAM531I5LOlF51rWVlRcYbrZpOkBKtUzp/aOTULP+pqSR8SXIsWhLY/
+ quY5sPTdvlML6mhL3AH32RUTV3nsZJ4=
+X-Google-Smtp-Source: ABdhPJyjmM0drbx02Yb2sqNV1iRNafbrYxrJra9liqaDYXyBvzeeEnLGf7W1hgfw+w+DyI9nHamoxw==
+X-Received: by 2002:a2e:8717:: with SMTP id m23mr2388939lji.245.1597952623703; 
+ Thu, 20 Aug 2020 12:43:43 -0700 (PDT)
+Received: from gmail.com (81-231-232-130-no39.tbcn.telia.com. [81.231.232.130])
+ by smtp.gmail.com with ESMTPSA id h13sm618499lji.134.2020.08.20.12.43.42
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 20 Aug 2020 12:43:42 -0700 (PDT)
+From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 To: qemu-devel@nongnu.org
-References: <159795100412.10087.13324527849844486009@66eaa9a8a123>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <5935199e-0b16-150c-e742-2366b185fc79@virtuozzo.com>
-Date: Thu, 20 Aug 2020 22:34:51 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
-In-Reply-To: <159795100412.10087.13324527849844486009@66eaa9a8a123>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: AM4PR07CA0018.eurprd07.prod.outlook.com
- (2603:10a6:205:1::31) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+Subject: [PATCH v1 0/2] pc-bios: petalogix: Re-generate DTB and add DTS files
+Date: Thu, 20 Aug 2020 21:43:40 +0200
+Message-Id: <20200820194342.1292611-1-edgar.iglesias@gmail.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.5] (185.215.60.171) by
- AM4PR07CA0018.eurprd07.prod.outlook.com (2603:10a6:205:1::31) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3326.10 via Frontend Transport; Thu, 20 Aug 2020 19:34:52 +0000
-X-Originating-IP: [185.215.60.171]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 9c71a1b8-c494-4321-f59e-08d845401c9b
-X-MS-TrafficTypeDiagnostic: AM6PR08MB4721:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM6PR08MB47217CDF742680BA9090B479C15A0@AM6PR08MB4721.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:5797;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: vjevIEBO7aMzOfirjlTcx1wiQYzYS7UeKD2FQq5jH99OqXv691KNh0xNV9EwVDOKCY3lr6MMM1JLdtdLjYWi7B21Brhnei63NDejdre6YQJWFOZqE1IUbNwjQWGcS+hx6zfvsaVMMGOmxbldMvElZU6Pqa9AgZps9l+5hPrM0kPbavqLV8Wa6a3Fm5VGRXNgO7hD2DzwyGmHYfioFzhqduDxTDMtZu1seoIxqeDruRM9O3G7gP9t/hZKtr7lZ3VbnetV33jArT1t2ZCquMmKgfvegiBX4M2azHuPXrBCmuMg3rnVXwpvGcuURMPzg6kX0i4R0hwLSC0Kunz5ML+A0aVY4HkROpNI3tUzb2IxB0Tgl38diBDlV3eE+tv5UELdCGNmR1cra7CmtENOAiDiBiUaHvDMKOMDgHGjyyRi7qIn5jo6s/pcmO3Sgwg9TFcFJ0qaY62icaad64ISN2GFGw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(366004)(376002)(346002)(136003)(39840400004)(396003)(107886003)(478600001)(36756003)(186003)(4326008)(6916009)(16526019)(26005)(5660300002)(52116002)(8936002)(8676002)(16576012)(31686004)(2616005)(956004)(316002)(966005)(83380400001)(66556008)(66946007)(66476007)(31696002)(6486002)(2906002)(86362001)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: 8f32MV8n49jr2kPqz2NOYKy7CwoqQaD7IHi1+xy9F7JyLskPbSgGFsF3c6yPjrsh6Pw7mJeuUDJ/r9yMacexUcsd2pUNzOaDynZKsxP5qPFKF7EoubzOj7+8Vpqotp+f0WREqAq6D2vIlm7GmJWr9hnbz11/t/dHqJ9f1t0ZflX7F1rvhmBKOnqHgg9k4AhLFH489ZujEJ6wVVYuvSDAHE6vhy+wnHGGgvstijZZoy+U3liDwZPrWi8AoYx4d5h6zv6MX3mgwCABu9tDsRpokgTf1EuA0JbK6ArzonXfpvSwucwXGkM7tsdkM1O9ny3l5guU4GZ+yhnHg+PrxlazHfjdOlrrt2vRrAG5o0LNHWCK7SQ6g/NOrNUxFs1kx6zdEyYohvd0ntf9B08JGBM5mF3UK27DK09UEZqvraHgKF1OZKbAlDZcotuNVwOW+XsFUMeSszcfd0TQaVaIRKkqYy0wcgYaqDwRn/XcrOBhwxpI5cVJiRyerEeJUk+CF1cIahJQPEsmcmm+VZ6rvQdCeM68MGI2krgh9Haw/n4k5SSYyi0A/Y4axD1GGSoP1FDnT8B/NxOM15nJNLykv8b/RdkleNlXIvft1akzhRKJHx3XCv99DTSnt4TIkUdjOaHqezQ/YbFaTmLS6HjvCcwxQQ==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9c71a1b8-c494-4321-f59e-08d845401c9b
-X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Aug 2020 19:34:53.4684 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: SLc+F/xNXvrZ+MO+c9W+H2zamvGL8aMdSvmTuSeCFeCtMFffVaab26weyspqEKub2GW88Ktxhs4gezmgdAvDA0SNauqJYX8P2Zk3UBAFwTY=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4721
-Received-SPF: pass client-ip=40.107.21.125;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR05-VI1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/20 15:34:55
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -37
-X-Spam_score: -3.8
-X-Spam_bar: ---
-X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::230;
+ envelope-from=edgar.iglesias@gmail.com; helo=mail-lj1-x230.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -10
+X-Spam_score: -1.1
+X-Spam_bar: -
+X-Spam_report: (-1.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ FSL_HELO_FAKE=1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -130,60 +96,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com,
- stefanha@redhat.com, den@openvz.org
+Cc: figlesia@xilinx.com, peter.maydell@linaro.org, sstabellini@kernel.org,
+ edgar.iglesias@xilinx.com, sai.pavan.boddu@xilinx.com,
+ frasse.iglesias@gmail.com, alistair@alistair23.me,
+ richard.henderson@linaro.org, frederic.konrad@adacore.com, qemu-arm@nongnu.org,
+ philmd@redhat.com, luc.michel@greensocs.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-20.08.2020 22:16, no-reply@patchew.org wrote:
-> Patchew URL: https://patchew.org/QEMU/20200820183950.13109-1-vsementsov@virtuozzo.com/
-> 
-> 
-> 
-> Hi,
-> 
-> This series failed the docker-quick@centos7 build test. Please find the testing commands and
-> their output below. If you have Docker installed, you can probably reproduce it
-> locally.
-> 
-> === TEST SCRIPT BEGIN ===
-> #!/bin/bash
-> make docker-image-centos7 V=1 NETWORK=1
-> time make docker-test-quick@centos7 SHOW_ENV=1 J=14 NETWORK=1
-> === TEST SCRIPT END ===
-> 
->    TEST    check-unit: tests/test-char
-> Unexpected error in object_property_try_add() at /tmp/qemu-test/src/qom/object.c:1181:
-> attempt to add duplicate property 'serial-id' to object (type 'container')
-> ERROR test-char - too few tests run (expected 38, got 9)
-> make: *** [check-unit] Error 1
-> make: *** Waiting for unfinished jobs....
->    TEST    iotest-qcow2: 018
->    TEST    iotest-qcow2: 019
-> ---
->      raise CalledProcessError(retcode, cmd)
-> subprocess.CalledProcessError: Command '['sudo', '-n', 'docker', 'run', '--label', 'com.qemu.instance.uuid=a80f0516394e4d83b19a19e329899c17', '-u', '1003', '--security-opt', 'seccomp=unconfined', '--rm', '-e', 'TARGET_LIST=', '-e', 'EXTRA_CONFIGURE_OPTS=', '-e', 'V=', '-e', 'J=14', '-e', 'DEBUG=', '-e', 'SHOW_ENV=1', '-e', 'CCACHE_DIR=/var/tmp/ccache', '-v', '/home/patchew2/.cache/qemu-docker-ccache:/var/tmp/ccache:z', '-v', '/var/tmp/patchew-tester-tmp-n_a2v5bj/src/docker-src.2020-08-20-15.00.31.12987:/var/tmp/qemu:z,ro', 'qemu/centos7', '/var/tmp/qemu/run', 'test-quick']' returned non-zero exit status 2.
-> filter=--filter=label=com.qemu.instance.uuid=a80f0516394e4d83b19a19e329899c17
-> make[1]: *** [docker-run] Error 1
-> make[1]: Leaving directory `/var/tmp/patchew-tester-tmp-n_a2v5bj/src'
-> make: *** [docker-run-test-quick@centos7] Error 2
-> 
-> real    16m13.105s
-> user    0m8.886s
-> 
-> 
-> The full log is available at
-> http://patchew.org/logs/20200820183950.13109-1-vsementsov@virtuozzo.com/testing.docker-quick@centos7/?type=message.
-> ---
-> Email generated automatically by Patchew [https://patchew.org/].
-> Please send your feedback to patchew-devel@redhat.com
-> 
+From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
+This adds missing device-tree source files for the petalogix boards
+with recompiled DTBs.
 
-Seems something unrelated
+Cheers,
+Edgar
+
+Edgar E. Iglesias (2):
+  microblaze: petalogix-ml605: Add device-tree source
+  microblaze: petalogix-s3adsp1800: Add device-tree source
+
+ pc-bios/petalogix-ml605.dtb      | Bin 9982 -> 9882 bytes
+ pc-bios/petalogix-ml605.dts      | 350 +++++++++++++++++++++++++++++++
+ pc-bios/petalogix-s3adsp1800.dtb | Bin 8259 -> 8161 bytes
+ pc-bios/petalogix-s3adsp1800.dts | 282 +++++++++++++++++++++++++
+ 4 files changed, 632 insertions(+)
+ create mode 100644 pc-bios/petalogix-ml605.dts
+ create mode 100644 pc-bios/petalogix-s3adsp1800.dts
 
 -- 
-Best regards,
-Vladimir
+2.25.1
+
 
