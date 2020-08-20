@@ -7,52 +7,52 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0FB4C433E5
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 03:58:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF665C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 03:58:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 902F72078B
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 03:58:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BE9F32078B
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 03:58:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="KXKaGXiM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 902F72078B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="MoOsAsRo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE9F32078B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40170 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40074 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8bj3-0005Vy-Rp
+	id 1k8bj3-0005TZ-1O
 	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 23:58:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58036)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58014)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1k8biK-00040g-C9; Wed, 19 Aug 2020 23:58:08 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:58711 helo=ozlabs.org)
+ id 1k8biI-00040K-On; Wed, 19 Aug 2020 23:58:06 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:35989 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1k8biF-0007LF-Mc; Wed, 19 Aug 2020 23:58:08 -0400
+ id 1k8biG-0007LE-2g; Wed, 19 Aug 2020 23:58:06 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 4BX9pt0nLZz9sR4; Thu, 20 Aug 2020 13:57:57 +1000 (AEST)
+ id 4BX9ps6rVbz9sTN; Thu, 20 Aug 2020 13:57:57 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1597895878;
- bh=ni9aoStGjZN/B3YxXmoYh2NSqsQdo9+Zb5Bnfj9xeUw=;
+ d=gibson.dropbear.id.au; s=201602; t=1597895877;
+ bh=VOBGGYxOOzcNq9pdAo1WZXjvFrzdlGNT41G+2GJ0sAg=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=KXKaGXiM2jWMoi0cbpipwLKAkQap0MMmThElNan1Fp9QP5zh5n1XmWHaxUweJNxI8
- xq3kocenhWr7qFGN0Amf8DQ2C1W2w8732C8jo07L5Jh7zdOX5SHyJ6t5ZyxRMzxq04
- c11woCY568VUHEqmPjh4/Cp3x+cOmNOx/3XEcNXQ=
-Date: Thu, 20 Aug 2020 12:15:24 +1000
+ b=MoOsAsRofug2n29sTtmENKVe8dUJssobpIPy4nLfuQKaxmqSIVNBuHxEqkqF9bgLO
+ fP0l+yLJY7nI4nQERtvYqqDdU7vNIi5mT9/f6NPArhw6Xg5KTu12m/uIEGboJ7kzPa
+ lDIhvyn6Oinx64CFlZGVmq51yqYcyNImQxohN0PI=
+Date: Thu, 20 Aug 2020 12:14:25 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
 To: Daniel Henrique Barboza <danielhb413@gmail.com>
-Subject: Re: [PATCH 04/10] spapr: add spapr_machine_using_legacy_numa() helper
-Message-ID: <20200820021524.GK271315@yekko.fritz.box>
+Subject: Re: [PATCH 03/10] spapr: robustify NVLink2 NUMA node logic
+Message-ID: <20200820021425.GJ271315@yekko.fritz.box>
 References: <20200814205424.543857-1-danielhb413@gmail.com>
- <20200814205424.543857-5-danielhb413@gmail.com>
+ <20200814205424.543857-4-danielhb413@gmail.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="W2ydbIOJmkm74tJ2"
+ protocol="application/pgp-signature"; boundary="HcccYpVZDxQ8hzPO"
 Content-Disposition: inline
-In-Reply-To: <20200814205424.543857-5-danielhb413@gmail.com>
+In-Reply-To: <20200814205424.543857-4-danielhb413@gmail.com>
 Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
  helo=ozlabs.org
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/19 23:57:59
@@ -82,90 +82,231 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---W2ydbIOJmkm74tJ2
+--HcccYpVZDxQ8hzPO
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Aug 14, 2020 at 05:54:18PM -0300, Daniel Henrique Barboza wrote:
-> The changes to come to NUMA support are all guest visible. In
-> theory we could just create a new 5_1 class option flag to
-> avoid the changes to cascade to 5.1 and under. The reality is that
-> these changes are only relevant if the machine has more than one
-> NUMA node. There is no need to change guest behavior that has
-> been around for years needlesly.
+On Fri, Aug 14, 2020 at 05:54:17PM -0300, Daniel Henrique Barboza wrote:
+> NVLink2 GPUs are allocated in their own NUMA node, at maximum
+> distance from every other resource in the board. The existing
+> logic makes some assumptions that don't scale well:
 >=20
-> This new helper will be used by the next patches to determine
-> whether we should retain the (soon to be) legacy NUMA behavior
-> in the pSeries machine. The new behavior will only be exposed
-> if::
+> - only NVLink2 GPUs will ever require such mechanism, meaning
+> that the GPU logic is tightly coupled with the NUMA setup of
+> the machine, via how ibm,max-associativity-domains is set.
 >=20
-> - machine is pseries-5.2 and newer;
-> - more than one NUMA node is declared in NUMA state.
+> - the code is relying on the lack of support for sparse NUMA
+> nodes in QEMU. Eventually this support can be implemented, and
+> then the assumption that spapr->gpu_numa_id represents the total
+> of NUMA nodes plus all generated NUMA ids for the GPUs, which
+> relies on all QEMU NUMA nodes not being sparsed, has a good
+> potential for disaster.
+>=20
+> This patch aims to fix both assumptions by creating a generic
+> mechanism to get an available NUMA node, regardless of the
+> NUMA setup being sparse or not. The idea is to rename the existing
+> spapr->gpu_numa_id to spapr->current_numa_id and add a new
+> spapr->extra_numa_nodes attribute. They are used in a new function
+> called spapr_pci_get_available_numa_id(), that takes into account
+> that the NUMA conf can be sparsed or not, to retrieve an available
+> NUMA id for the caller. Each consecutive call of
+> spapr_pci_get_available_numa_id() will generate a new ID, up
+> to the limit of numa_state->num_nodes + spapr->extra_numa_nodes
+> exceeding MAX_NODES. This is a generic code being used only by
+> NVLink2 ATM, being available to be used in the future by any
+> other device.
+>=20
+> With this new function in place, we can decouple
+> ibm,max-associativity-domains logic from NVLink2 logic by
+> using the new spapr->extra_numa_nodes to define the maxdomains
+> of the forth NUMA level. Instead of defining it as gpu_numa_id,
+> use num_nodes + extra_numa_nodes. This also makes it resilient
+> to any future change in the support of sparse NUMA nodes.
+>=20
+> Despite all the code juggling, no functional change was made
+> because sparse NUMA nodes isn't a thing and we do not support
+> distinct NUMA distances via user input. Next patches will
+> change that.
 >=20
 > Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
-
-Seems reasonable.
-
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-
 > ---
->  hw/ppc/spapr.c         | 12 ++++++++++++
->  include/hw/ppc/spapr.h |  2 ++
->  2 files changed, 14 insertions(+)
+>  hw/ppc/spapr.c              | 15 ++++++++++-----
+>  hw/ppc/spapr_pci.c          | 33 +++++++++++++++++++++++++++++++++
+>  hw/ppc/spapr_pci_nvlink2.c  | 10 ++++++----
+>  include/hw/pci-host/spapr.h |  2 ++
+>  include/hw/ppc/spapr.h      |  4 +++-
+>  5 files changed, 54 insertions(+), 10 deletions(-)
 >=20
 > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 22e78cfc84..073a59c47d 100644
+> index 3b16edaf4c..22e78cfc84 100644
 > --- a/hw/ppc/spapr.c
 > +++ b/hw/ppc/spapr.c
-> @@ -308,6 +308,15 @@ static hwaddr spapr_node0_size(MachineState *machine)
->      return machine->ram_size;
->  }
+> @@ -910,13 +910,13 @@ static void spapr_dt_rtas(SpaprMachineState *spapr,=
+ void *fdt)
+>          cpu_to_be32(SPAPR_MEMORY_BLOCK_SIZE & 0xffffffff),
+>          cpu_to_be32(ms->smp.max_cpus / ms->smp.threads),
+>      };
+> -    uint32_t maxdomain =3D cpu_to_be32(spapr->gpu_numa_id > 1 ? 1 : 0);
+> +    uint32_t maxdomain =3D cpu_to_be32(spapr->extra_numa_nodes > 1 ? 1 :=
+ 0);
+>      uint32_t maxdomains[] =3D {
+>          cpu_to_be32(4),
+>          maxdomain,
+>          maxdomain,
+>          maxdomain,
+> -        cpu_to_be32(spapr->gpu_numa_id),
+> +        cpu_to_be32(ms->numa_state->num_nodes + spapr->extra_numa_nodes),
+>      };
 > =20
-> +bool spapr_machine_using_legacy_numa(SpaprMachineState *spapr)
+>      _FDT(rtas =3D fdt_add_subnode(fdt, 0, "rtas"));
+> @@ -2824,13 +2824,18 @@ static void spapr_machine_init(MachineState *mach=
+ine)
+>      /*
+>       * NVLink2-connected GPU RAM needs to be placed on a separate NUMA n=
+ode.
+>       * We assign a new numa ID per GPU in spapr_pci_collect_nvgpu() whic=
+h is
+> -     * called from vPHB reset handler so we initialize the counter here.
+> +     * called from vPHB reset handler. We have code to generate an extra=
+ numa
+> +     * id to place the GPU via 'extra_numa_nodes' and 'current_numa_node=
+', which
+> +     * are initialized here.
+> +     *
+>       * If no NUMA is configured from the QEMU side, we start from 1 as G=
+PU RAM
+>       * must be equally distant from any other node.
+> -     * The final value of spapr->gpu_numa_id is going to be written to
+> +     *
+> +     * The extra NUMA node ids generated for GPU usage will be written to
+>       * max-associativity-domains in spapr_build_fdt().
+>       */
+> -    spapr->gpu_numa_id =3D MAX(1, machine->numa_state->num_nodes);
+> +    spapr->current_numa_id =3D 0;
+> +    spapr->extra_numa_nodes =3D 0;
+> =20
+>      if ((!kvm_enabled() || kvmppc_has_cap_mmu_radix()) &&
+>          ppc_type_check_compat(machine->cpu_type, CPU_POWERPC_LOGICAL_3_0=
+0, 0,
+> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+> index 0a418f1e67..09ac58fd7f 100644
+> --- a/hw/ppc/spapr_pci.c
+> +++ b/hw/ppc/spapr_pci.c
+> @@ -2492,3 +2492,36 @@ void spapr_pci_switch_vga(bool big_endian)
+>                             &big_endian);
+>      }
+>  }
+> +
+> +unsigned spapr_pci_get_available_numa_id(Error **errp)
 > +{
-> +    MachineState *machine =3D MACHINE(spapr);
-> +    SpaprMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(machine);
+> +    MachineState *machine =3D MACHINE(qdev_get_machine());
+> +    SpaprMachineState *spapr =3D SPAPR_MACHINE(machine);
+> +    NodeInfo *numa_info =3D machine->numa_state->nodes;
+> +    unsigned i, start;
 > +
-> +    return smc->pre_5_2_numa_associativity ||
-> +           machine->numa_state->num_nodes <=3D 1;
+> +    if (machine->numa_state->num_nodes + spapr->extra_numa_nodes >=3D MA=
+X_NODES) {
+> +        error_setg(errp,
+> +                   "Unable to get an extra NUMA node beyond MAX_NODES =
+=3D %d",
+> +                   MAX_NODES);
+> +        return spapr->current_numa_id;
+> +    }
+> +
+> +    if (spapr->extra_numa_nodes =3D=3D 0) {
+> +        start =3D 0;
+> +    } else {
+> +        start =3D spapr->current_numa_id + 1;
+> +    }
+> +
+> +    for (i =3D start; i < MAX_NODES; i++) {
+> +        if (!numa_info[i].present) {
+> +            spapr->extra_numa_nodes++;
+> +            spapr->current_numa_id =3D i;
+> +            return i;
+> +        }
+> +    }
+
+I think I see what you're trying to do, but this logic makes me a bit
+nervous.  I guess migration isn't really an issue for the GPUs, but as
+a general rule we want the NUMA ids for everything to be the same from
+boot to boot (assuming similar command line configuration).
+
+I think that's probably true here, but the rules are complex enough
+that it's hard to convince myself there isn't some edge case where
+something that doesn't seem relevant could change the numa nodes the
+gpus end up with.
+
+> +
+> +    error_setg(errp, "Unable to find a valid NUMA id");
+> +
+> +    return spapr->current_numa_id;
 > +}
-> +
->  static void add_str(GString *s, const gchar *s1)
+> diff --git a/hw/ppc/spapr_pci_nvlink2.c b/hw/ppc/spapr_pci_nvlink2.c
+> index 76ae77ebc8..611c8a2957 100644
+> --- a/hw/ppc/spapr_pci_nvlink2.c
+> +++ b/hw/ppc/spapr_pci_nvlink2.c
+> @@ -87,9 +87,8 @@ static void spapr_pci_collect_nvgpu(SpaprPhbPciNvGpuCon=
+fig *nvgpus,
+>                                      PCIDevice *pdev, uint64_t tgt,
+>                                      MemoryRegion *mr, Error **errp)
 >  {
->      g_string_append_len(s, s1, strlen(s1) + 1);
-> @@ -4602,8 +4611,11 @@ DEFINE_SPAPR_MACHINE(5_2, "5.2", true);
->   */
->  static void spapr_machine_5_1_class_options(MachineClass *mc)
->  {
-> +    SpaprMachineClass *smc =3D SPAPR_MACHINE_CLASS(mc);
+> -    MachineState *machine =3D MACHINE(qdev_get_machine());
+> -    SpaprMachineState *spapr =3D SPAPR_MACHINE(machine);
+>      SpaprPhbPciNvGpuSlot *nvslot =3D spapr_nvgpu_get_slot(nvgpus, tgt);
+> +    Error *local_err =3D NULL;
+> =20
+>      if (!nvslot) {
+>          error_setg(errp, "Found too many GPUs per vPHB");
+> @@ -100,8 +99,11 @@ static void spapr_pci_collect_nvgpu(SpaprPhbPciNvGpuC=
+onfig *nvgpus,
+> =20
+>      nvslot->gpa =3D nvgpus->nv2_ram_current;
+>      nvgpus->nv2_ram_current +=3D memory_region_size(mr);
+> -    nvslot->numa_id =3D spapr->gpu_numa_id;
+> -    ++spapr->gpu_numa_id;
 > +
->      spapr_machine_5_2_class_options(mc);
->      compat_props_add(mc->compat_props, hw_compat_5_1, hw_compat_5_1_len);
-> +    smc->pre_5_2_numa_associativity =3D true;
+> +    nvslot->numa_id =3D spapr_pci_get_available_numa_id(&local_err);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +    }
 >  }
 > =20
->  DEFINE_SPAPR_MACHINE(5_1, "5.1", false);
+>  static void spapr_pci_collect_nvnpu(SpaprPhbPciNvGpuConfig *nvgpus,
+> diff --git a/include/hw/pci-host/spapr.h b/include/hw/pci-host/spapr.h
+> index 600eb55c34..8d93223a76 100644
+> --- a/include/hw/pci-host/spapr.h
+> +++ b/include/hw/pci-host/spapr.h
+> @@ -129,6 +129,8 @@ struct SpaprPhbState {
+>  #define SPAPR_PCI_NV2ATSD_WIN_SIZE   (NVGPU_MAX_NUM * NVGPU_MAX_LINKS * \
+>                                        64 * KiB)
+> =20
+> +unsigned spapr_pci_get_available_numa_id(Error **errp);
+> +
+>  int spapr_dt_phb(SpaprMachineState *spapr, SpaprPhbState *phb,
+>                   uint32_t intc_phandle, void *fdt, int *node_offset);
+> =20
 > diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> index 739a6a4942..d9f1afa8b2 100644
+> index 3134d339e8..739a6a4942 100644
 > --- a/include/hw/ppc/spapr.h
 > +++ b/include/hw/ppc/spapr.h
-> @@ -130,6 +130,7 @@ struct SpaprMachineClass {
->      bool smp_threads_vsmt; /* set VSMT to smp_threads by default */
->      hwaddr rma_limit;          /* clamp the RMA to this size */
->      bool pre_5_1_assoc_refpoints;
-> +    bool pre_5_2_numa_associativity;
+> @@ -227,7 +227,9 @@ struct SpaprMachineState {
+>      bool cmd_line_caps[SPAPR_CAP_NUM];
+>      SpaprCapabilities def, eff, mig;
 > =20
->      void (*phb_placement)(SpaprMachineState *spapr, uint32_t index,
->                            uint64_t *buid, hwaddr *pio,=20
-> @@ -847,6 +848,7 @@ int spapr_max_server_number(SpaprMachineState *spapr);
->  void spapr_store_hpte(PowerPCCPU *cpu, hwaddr ptex,
->                        uint64_t pte0, uint64_t pte1);
->  void spapr_mce_req_event(PowerPCCPU *cpu, bool recovered);
-> +bool spapr_machine_using_legacy_numa(SpaprMachineState *spapr);
+> -    unsigned gpu_numa_id;
+> +    unsigned current_numa_id;
+
+The nane "current_numa_id" is a bit unclear.  AFAICT this is used
+specifically for the GPU "extra" numa nodes, which isn't obvious from
+the name.
+
+> +    unsigned extra_numa_nodes;
+> +
+>      SpaprTpmProxy *tpm_proxy;
 > =20
->  /* DRC callbacks. */
->  void spapr_core_release(DeviceState *dev);
+>      Error *fwnmi_migration_blocker;
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -173,25 +314,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---W2ydbIOJmkm74tJ2
+--HcccYpVZDxQ8hzPO
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl893LwACgkQbDjKyiDZ
-s5IiiQ//XkXhqMuryw7fIfN4KRzSJNXwduf3A1dAP2IF3x9Id5cAfC1Ab6k4O987
-BSMA3y65BJGXqeEYp0O66ZrwLKGcKEROHq+T4Bm/L2GoymmYExO5T0nOpMev9IMH
-7/USaqolQ0t6ykpkwLx+eORZ8kRk0RvJ+KMDWGxUZ9VoFBv5dfzbktakMizelklg
-ThvW3XPJSoD7gUwYz9UC9puqIICQ8o7D//eyDwilGNvB9RZDHdILisd0/fRnUuKg
-2fyeHYbnoh9WLKiz5P03zYEw4lCN+dwOSgbiiE+LrzSC7xb4k5IHYpsID3uIiqqm
-CK1w6laBHYaYbVpyNq5BqVD4JQ+6m6l/7juvFGRwwW7cz+Bm21qSrd0rrB2BOlTg
-8yrcq1wASXI4HWSyXVV96JFn/ujRZE2phRsMloQ/aN635PTkzLv6xre3AFca1lV9
-bORp7CSDmASDmHRMSnaqv7ZCF03YpL57sLVgTHtzOH9k43a+vDdso+3UF9VZS19o
-P3ovJe0b5wsaJhYopyFsqyzKTzyqgo0jA4UktDlbbMzNd0E/4j8YrZ2dqYiTg3zl
-2EQuHyRPQrIrRb5Rc3Bn0rQ3bwjXwDeWdx1gKO7IcHKQ07VrpyHX1R9gfbJJxXc5
-GEVHeVjKVA4uo9k2fJAaidraLINEtqQFb2dncs0MfTwrgZHqfY4=
-=KGHY
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl893H8ACgkQbDjKyiDZ
+s5KaaxAAs1PcKu9OrtuALr48cc3b6BiILUUjaZ8U+YAmhLunlsLvmFZvKEA/0iF7
+o9Pp8nkObXbNBRRbkhAN8M/tE69V0HgV9+TFo5MleIKoa5xUfnC/oasYC8/A5F6m
+LAJ1hU94HhCjRSHHiHFFsfOshyQHsT5XVundc1SryaXV7yCA5aP93LPkQDNV/d27
+0C1Ij87kJi+mof/MvutqrjYvnzzr+54Ndr35HHrqwkMfeSZs0pRX1ue84ErYmh2X
+hysKpNIs3N+Iemi6WfPC5RGH8H+cz7aVs+2vEC+NNhW7dlPiuCQI45AjG8Fsbz1h
+HCTARKUHj3ibTe2L+k4wzqbtcVZ3JDmxf22jRTQTE2EesetJQbGMYImHyjKdAAaN
+tZz+qCEjWVJCd9c7BohkU6GujZarYo6wIUN496KUSpvf98qB6Qn25lSl+2D7SX7a
+X82xmC25fAflejt7iQBadp7FYHxUhnl2q+Vqbaes56ZcHls5MKqQ5t2yxlouKggT
+uEXOl9zv4ZB8o8hnmVpu599kKYFzDHwBiANjHr1tfSYGyEaI3KR6ur/j5tt0q5PJ
+o5xG8AyeFFkUv7vkPyhjDLhYFyuhirHJyf+1j2l6PzhjYosHYdn8js6yf7rmbYvS
+xYpQFAOEuQ6lM1KgIGWLPnpOgV47qqPwbm42yu3CTQOf7DRJ9Vc=
+=DUMe
 -----END PGP SIGNATURE-----
 
---W2ydbIOJmkm74tJ2--
+--HcccYpVZDxQ8hzPO--
 
