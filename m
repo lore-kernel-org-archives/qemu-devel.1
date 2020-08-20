@@ -2,90 +2,88 @@ Return-Path: <SRS0=Dndf=B6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 697BDC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 00:38:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8BDFC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 00:38:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2E9CB2078D
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 00:38:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 506542078D
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 00:38:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YQtCnaqP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E9CB2078D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hNVidAQv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 506542078D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35908 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36712 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8Yat-0000kL-Em
-	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 20:38:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50036)
+	id 1k8Yb9-00015f-5E
+	for qemu-devel@archiver.kernel.org; Wed, 19 Aug 2020 20:38:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49782)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1k8YEB-0000ZJ-Mb
- for qemu-devel@nongnu.org; Wed, 19 Aug 2020 20:14:47 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:23930)
+ id 1k8YDk-0007qO-Qy
+ for qemu-devel@nongnu.org; Wed, 19 Aug 2020 20:14:20 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42671
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1k8YE8-0002Xt-LG
- for qemu-devel@nongnu.org; Wed, 19 Aug 2020 20:14:47 -0400
+ id 1k8YDi-0002Tt-AL
+ for qemu-devel@nongnu.org; Wed, 19 Aug 2020 20:14:20 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1597882483;
+ s=mimecast20190719; t=1597882457;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=BcAdcdXzRNxNFofrltUSexMRWXrtp8/eIWxMocHk1gI=;
- b=YQtCnaqPIQIasIphhjCOOtphhE3JDJcornMTw27kAPZwbK/2cswwv5piuBMvIzerIDBtaN
- Wbzq/L+JQZE/qSb7kNlWW0YG88/EWb/UA/QJnMTD7PovDq1ykTIdUwRPmECuEqzAwVaLaW
- Uh0okQGy2FTI2S0TazQIFEztkMdhruI=
+ bh=ZCKCsZjjbkt497a0oIxpTQls4QmY2jUqY0Ge+366AHQ=;
+ b=hNVidAQva7a8xlcMZFdTrprhi4Dq2RoiFuCKpszOkQ923CqRQqBaBWKHKSuU5lgaQfS8ZZ
+ hJynQOMTsjUCGGQFbosjxeBDLqIo/EAPghLLAY15D+GpX3uIOvbizm1/gJgz5TkCSk1NS7
+ 2PCXStxl+2wqSNR/D21H0rCMwOZa4+U=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-503-WQYEl8JxMyeVogVpTGIq1g-1; Wed, 19 Aug 2020 20:14:41 -0400
-X-MC-Unique: WQYEl8JxMyeVogVpTGIq1g-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-370-ESIW8woZOVKtiu3E8QIGmA-1; Wed, 19 Aug 2020 20:14:15 -0400
+X-MC-Unique: ESIW8woZOVKtiu3E8QIGmA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B17511007465
- for <qemu-devel@nongnu.org>; Thu, 20 Aug 2020 00:14:40 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9CEE5186A57F;
+ Thu, 20 Aug 2020 00:14:14 +0000 (UTC)
 Received: from localhost (ovpn-117-244.rdu2.redhat.com [10.10.117.244])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 77D0D60BEC;
- Thu, 20 Aug 2020 00:14:40 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6326310013C4;
+ Thu, 20 Aug 2020 00:14:14 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 56/58] [automated] Use OBJECT_DECLARE_SIMPLE_TYPE when
- possible
-Date: Wed, 19 Aug 2020 20:12:34 -0400
-Message-Id: <20200820001236.1284548-57-ehabkost@redhat.com>
+Subject: [PATCH v2 39/58] pxa2xx: Move QOM macros to header
+Date: Wed, 19 Aug 2020 20:12:17 -0400
+Message-Id: <20200820001236.1284548-40-ehabkost@redhat.com>
 In-Reply-To: <20200820001236.1284548-1-ehabkost@redhat.com>
 References: <20200820001236.1284548-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
 X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=ehabkost@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/19 20:12:51
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=ehabkost@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/18 23:05:17
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,296 +96,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, qemu-arm@nongnu.org,
  "Daniel P. Berrange" <berrange@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Generated using:
-
- $ ./scripts/codeconverter/converter.py -i \
-   --pattern=ObjectDeclareType $(git grep -l '' -- '*.[ch]')
+This will make future conversion to OBJECT_DECLARE* easier.
 
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
-Changes v1 -> v2: none
----
- include/authz/list.h                | 7 ++-----
- include/authz/listfile.h            | 7 ++-----
- include/authz/pamacct.h             | 7 ++-----
- include/authz/simple.h              | 7 ++-----
- include/crypto/secret_keyring.h     | 7 ++-----
- include/io/dns-resolver.h           | 7 ++-----
- include/io/net-listener.h           | 7 ++-----
- include/sysemu/vhost-user-backend.h | 7 ++-----
- backends/dbus-vmstate.c             | 7 ++-----
- ui/input-barrier.c                  | 7 ++-----
- ui/input-linux.c                    | 7 ++-----
- 11 files changed, 22 insertions(+), 55 deletions(-)
+Changes series v1 -> v2: new patch in series v2
 
-diff --git a/include/authz/list.h b/include/authz/list.h
-index e4e1040472..5676bb375c 100644
---- a/include/authz/list.h
-+++ b/include/authz/list.h
-@@ -27,8 +27,8 @@
- 
- #define TYPE_QAUTHZ_LIST "authz-list"
- 
--OBJECT_DECLARE_TYPE(QAuthZList, QAuthZListClass,
--                    qauthz_list, QAUTHZ_LIST)
-+OBJECT_DECLARE_SIMPLE_TYPE(QAuthZList, qauthz_list,
-+                           QAUTHZ_LIST, QAuthZClass)
- 
- 
- 
-@@ -68,9 +68,6 @@ struct QAuthZList {
- };
- 
- 
--struct QAuthZListClass {
--    QAuthZClass parent_class;
--};
- 
- 
- QAuthZList *qauthz_list_new(const char *id,
-diff --git a/include/authz/listfile.h b/include/authz/listfile.h
-index 89c5eafbfa..b491227bbe 100644
---- a/include/authz/listfile.h
-+++ b/include/authz/listfile.h
-@@ -27,8 +27,8 @@
- 
- #define TYPE_QAUTHZ_LIST_FILE "authz-list-file"
- 
--OBJECT_DECLARE_TYPE(QAuthZListFile, QAuthZListFileClass,
--                    qauthz_list_file, QAUTHZ_LIST_FILE)
-+OBJECT_DECLARE_SIMPLE_TYPE(QAuthZListFile, qauthz_list_file,
-+                           QAUTHZ_LIST_FILE, QAuthZClass)
- 
- 
- 
-@@ -87,9 +87,6 @@ struct QAuthZListFile {
- };
- 
- 
--struct QAuthZListFileClass {
--    QAuthZClass parent_class;
--};
- 
- 
- QAuthZListFile *qauthz_list_file_new(const char *id,
-diff --git a/include/authz/pamacct.h b/include/authz/pamacct.h
-index 44bb5ff28d..7804853ddf 100644
---- a/include/authz/pamacct.h
-+++ b/include/authz/pamacct.h
-@@ -27,8 +27,8 @@
- 
- #define TYPE_QAUTHZ_PAM "authz-pam"
- 
--OBJECT_DECLARE_TYPE(QAuthZPAM, QAuthZPAMClass,
--                    qauthz_pam, QAUTHZ_PAM)
-+OBJECT_DECLARE_SIMPLE_TYPE(QAuthZPAM, qauthz_pam,
-+                           QAUTHZ_PAM, QAuthZClass)
- 
- 
- 
-@@ -79,9 +79,6 @@ struct QAuthZPAM {
- };
- 
- 
--struct QAuthZPAMClass {
--    QAuthZClass parent_class;
--};
- 
- 
- QAuthZPAM *qauthz_pam_new(const char *id,
-diff --git a/include/authz/simple.h b/include/authz/simple.h
-index ba4a5ec5ea..346fcb0c6c 100644
---- a/include/authz/simple.h
-+++ b/include/authz/simple.h
-@@ -26,8 +26,8 @@
- 
- #define TYPE_QAUTHZ_SIMPLE "authz-simple"
- 
--OBJECT_DECLARE_TYPE(QAuthZSimple, QAuthZSimpleClass,
--                    qauthz_simple, QAUTHZ_SIMPLE)
-+OBJECT_DECLARE_SIMPLE_TYPE(QAuthZSimple, qauthz_simple,
-+                           QAUTHZ_SIMPLE, QAuthZClass)
- 
- 
- 
-@@ -62,9 +62,6 @@ struct QAuthZSimple {
- };
- 
- 
--struct QAuthZSimpleClass {
--    QAuthZClass parent_class;
--};
- 
- 
- QAuthZSimple *qauthz_simple_new(const char *id,
-diff --git a/include/crypto/secret_keyring.h b/include/crypto/secret_keyring.h
-index cc2c7397db..73d2a8f501 100644
---- a/include/crypto/secret_keyring.h
-+++ b/include/crypto/secret_keyring.h
-@@ -26,8 +26,8 @@
- #include "crypto/secret_common.h"
- 
- #define TYPE_QCRYPTO_SECRET_KEYRING "secret_keyring"
--OBJECT_DECLARE_TYPE(QCryptoSecretKeyring, QCryptoSecretKeyringClass,
--                    qcrypto_secret_keyring, QCRYPTO_SECRET_KEYRING)
-+OBJECT_DECLARE_SIMPLE_TYPE(QCryptoSecretKeyring, qcrypto_secret_keyring,
-+                           QCRYPTO_SECRET_KEYRING, QCryptoSecretCommonClass)
- 
- 
- struct QCryptoSecretKeyring {
-@@ -36,8 +36,5 @@ struct QCryptoSecretKeyring {
- };
- 
- 
--struct QCryptoSecretKeyringClass {
--    QCryptoSecretCommonClass parent;
--};
- 
- #endif /* QCRYPTO_SECRET_KEYRING_H */
-diff --git a/include/io/dns-resolver.h b/include/io/dns-resolver.h
-index 8ae4857e05..e248fba5bd 100644
---- a/include/io/dns-resolver.h
-+++ b/include/io/dns-resolver.h
-@@ -26,8 +26,8 @@
- #include "io/task.h"
- 
- #define TYPE_QIO_DNS_RESOLVER "qio-dns-resolver"
--OBJECT_DECLARE_TYPE(QIODNSResolver, QIODNSResolverClass,
--                    qio_dns_resolver, QIO_DNS_RESOLVER)
-+OBJECT_DECLARE_SIMPLE_TYPE(QIODNSResolver, qio_dns_resolver,
-+                           QIO_DNS_RESOLVER, ObjectClass)
- 
- 
- /**
-@@ -133,9 +133,6 @@ struct QIODNSResolver {
-     Object parent;
- };
- 
--struct QIODNSResolverClass {
--    ObjectClass parent;
--};
- 
- 
- /**
-diff --git a/include/io/net-listener.h b/include/io/net-listener.h
-index 4f0847ff19..60fad29ff4 100644
---- a/include/io/net-listener.h
-+++ b/include/io/net-listener.h
-@@ -25,8 +25,8 @@
- #include "qom/object.h"
- 
- #define TYPE_QIO_NET_LISTENER "qio-net-listener"
--OBJECT_DECLARE_TYPE(QIONetListener, QIONetListenerClass,
--                    qio_net_listener, QIO_NET_LISTENER)
-+OBJECT_DECLARE_SIMPLE_TYPE(QIONetListener, qio_net_listener,
-+                           QIO_NET_LISTENER, ObjectClass)
- 
- 
- typedef void (*QIONetListenerClientFunc)(QIONetListener *listener,
-@@ -58,9 +58,6 @@ struct QIONetListener {
-     GDestroyNotify io_notify;
- };
- 
--struct QIONetListenerClass {
--    ObjectClass parent;
--};
- 
- 
- /**
-diff --git a/include/sysemu/vhost-user-backend.h b/include/sysemu/vhost-user-backend.h
-index 76ca06cf40..23205edeb8 100644
---- a/include/sysemu/vhost-user-backend.h
-+++ b/include/sysemu/vhost-user-backend.h
-@@ -22,13 +22,10 @@
- #include "io/channel.h"
- 
- #define TYPE_VHOST_USER_BACKEND "vhost-user-backend"
--OBJECT_DECLARE_TYPE(VhostUserBackend, VhostUserBackendClass,
--                    vhost_user_backend, VHOST_USER_BACKEND)
-+OBJECT_DECLARE_SIMPLE_TYPE(VhostUserBackend, vhost_user_backend,
-+                           VHOST_USER_BACKEND, ObjectClass)
- 
- 
--struct VhostUserBackendClass {
--    ObjectClass parent_class;
--};
- 
- struct VhostUserBackend {
-     /* private */
-diff --git a/backends/dbus-vmstate.c b/backends/dbus-vmstate.c
-index 55aea64af5..5173457148 100644
---- a/backends/dbus-vmstate.c
-+++ b/backends/dbus-vmstate.c
-@@ -23,12 +23,9 @@
- 
- 
- #define TYPE_DBUS_VMSTATE "dbus-vmstate"
--OBJECT_DECLARE_TYPE(DBusVMState, DBusVMStateClass,
--                    dbus_vmstate, DBUS_VMSTATE)
-+OBJECT_DECLARE_SIMPLE_TYPE(DBusVMState, dbus_vmstate,
-+                           DBUS_VMSTATE, ObjectClass)
- 
--struct DBusVMStateClass {
--    ObjectClass parent_class;
--};
- 
- struct DBusVMState {
-     Object parent;
-diff --git a/ui/input-barrier.c b/ui/input-barrier.c
-index 6ff0a23ddb..8de18c92f8 100644
---- a/ui/input-barrier.c
-+++ b/ui/input-barrier.c
-@@ -20,8 +20,8 @@
- #include "input-barrier.h"
- 
- #define TYPE_INPUT_BARRIER "input-barrier"
--OBJECT_DECLARE_TYPE(InputBarrier, InputBarrierClass,
--                    input_barrier, INPUT_BARRIER)
-+OBJECT_DECLARE_SIMPLE_TYPE(InputBarrier, input_barrier,
-+                           INPUT_BARRIER, ObjectClass)
- 
- 
- #define MAX_HELLO_LENGTH 1024
-@@ -44,9 +44,6 @@ struct InputBarrier {
-     char buffer[MAX_HELLO_LENGTH];
- };
- 
--struct InputBarrierClass {
--    ObjectClass parent_class;
--};
- 
- static const char *cmd_names[] = {
-     [barrierCmdCNoop]          = "CNOP",
-diff --git a/ui/input-linux.c b/ui/input-linux.c
-index d916c1eec1..7cd0bf3809 100644
---- a/ui/input-linux.c
-+++ b/ui/input-linux.c
-@@ -31,8 +31,8 @@ static bool linux_is_button(unsigned int lnx)
+Cc: Andrzej Zaborowski <balrogg@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm@nongnu.org
+Cc: qemu-devel@nongnu.org
+---
+ include/hw/arm/pxa.h | 13 +++++++++++++
+ hw/arm/pxa2xx.c      |  7 -------
+ hw/pcmcia/pxa2xx.c   |  4 ----
+ hw/sd/pxa2xx_mmci.c  |  3 ---
+ 4 files changed, 13 insertions(+), 14 deletions(-)
+
+diff --git a/include/hw/arm/pxa.h b/include/hw/arm/pxa.h
+index 8843e5f910..f6359fe7c9 100644
+--- a/include/hw/arm/pxa.h
++++ b/include/hw/arm/pxa.h
+@@ -86,7 +86,10 @@ PXA2xxLCDState *pxa2xx_lcdc_init(MemoryRegion *sysmem,
+ void pxa2xx_lcd_vsync_notifier(PXA2xxLCDState *s, qemu_irq handler);
+ 
+ /* pxa2xx_mmci.c */
++#define TYPE_PXA2XX_MMCI "pxa2xx-mmci"
+ typedef struct PXA2xxMMCIState PXA2xxMMCIState;
++#define PXA2XX_MMCI(obj) OBJECT_CHECK(PXA2xxMMCIState, (obj), TYPE_PXA2XX_MMCI)
++
+ PXA2xxMMCIState *pxa2xx_mmci_init(MemoryRegion *sysmem,
+                 hwaddr base,
+                 BlockBackend *blk, qemu_irq irq,
+@@ -95,7 +98,11 @@ void pxa2xx_mmci_handlers(PXA2xxMMCIState *s, qemu_irq readonly,
+                 qemu_irq coverswitch);
+ 
+ /* pxa2xx_pcmcia.c */
++#define TYPE_PXA2XX_PCMCIA "pxa2xx-pcmcia"
+ typedef struct PXA2xxPCMCIAState PXA2xxPCMCIAState;
++#define PXA2XX_PCMCIA(obj) \
++    OBJECT_CHECK(PXA2xxPCMCIAState, obj, TYPE_PXA2XX_PCMCIA)
++
+ PXA2xxPCMCIAState *pxa2xx_pcmcia_init(MemoryRegion *sysmem,
+                                       hwaddr base);
+ int pxa2xx_pcmcia_attach(void *opaque, PCMCIACardState *card);
+@@ -120,8 +127,14 @@ PXA2xxI2CState *pxa2xx_i2c_init(hwaddr base,
+                 qemu_irq irq, uint32_t page_size);
+ I2CBus *pxa2xx_i2c_bus(PXA2xxI2CState *s);
+ 
++#define TYPE_PXA2XX_I2C "pxa2xx_i2c"
+ typedef struct PXA2xxI2SState PXA2xxI2SState;
++#define PXA2XX_I2C(obj) \
++    OBJECT_CHECK(PXA2xxI2CState, (obj), TYPE_PXA2XX_I2C)
++
++#define TYPE_PXA2XX_FIR "pxa2xx-fir"
+ typedef struct PXA2xxFIrState PXA2xxFIrState;
++#define PXA2XX_FIR(obj) OBJECT_CHECK(PXA2xxFIrState, (obj), TYPE_PXA2XX_FIR)
+ 
+ typedef struct {
+     ARMCPU *cpu;
+diff --git a/hw/arm/pxa2xx.c b/hw/arm/pxa2xx.c
+index 6203c4cfe0..037d415498 100644
+--- a/hw/arm/pxa2xx.c
++++ b/hw/arm/pxa2xx.c
+@@ -1250,10 +1250,6 @@ typedef struct PXA2xxI2CSlaveState {
+     PXA2xxI2CState *host;
+ } PXA2xxI2CSlaveState;
+ 
+-#define TYPE_PXA2XX_I2C "pxa2xx_i2c"
+-#define PXA2XX_I2C(obj) \
+-    OBJECT_CHECK(PXA2xxI2CState, (obj), TYPE_PXA2XX_I2C)
+-
+ struct PXA2xxI2CState {
+     /*< private >*/
+     SysBusDevice parent_obj;
+@@ -1786,9 +1782,6 @@ static PXA2xxI2SState *pxa2xx_i2s_init(MemoryRegion *sysmem,
  }
  
- #define TYPE_INPUT_LINUX "input-linux"
--OBJECT_DECLARE_TYPE(InputLinux, InputLinuxClass,
--                    input_linux, INPUT_LINUX)
-+OBJECT_DECLARE_SIMPLE_TYPE(InputLinux, input_linux,
-+                           INPUT_LINUX, ObjectClass)
+ /* PXA Fast Infra-red Communications Port */
+-#define TYPE_PXA2XX_FIR "pxa2xx-fir"
+-#define PXA2XX_FIR(obj) OBJECT_CHECK(PXA2xxFIrState, (obj), TYPE_PXA2XX_FIR)
+-
+ struct PXA2xxFIrState {
+     /*< private >*/
+     SysBusDevice parent_obj;
+diff --git a/hw/pcmcia/pxa2xx.c b/hw/pcmcia/pxa2xx.c
+index 5f4bf22a90..fcca7e571b 100644
+--- a/hw/pcmcia/pxa2xx.c
++++ b/hw/pcmcia/pxa2xx.c
+@@ -18,10 +18,6 @@
+ #include "hw/pcmcia.h"
+ #include "hw/arm/pxa.h"
  
+-#define TYPE_PXA2XX_PCMCIA "pxa2xx-pcmcia"
+-#define PXA2XX_PCMCIA(obj) \
+-    OBJECT_CHECK(PXA2xxPCMCIAState, obj, TYPE_PXA2XX_PCMCIA)
+-
+ struct PXA2xxPCMCIAState {
+     SysBusDevice parent_obj;
  
- struct InputLinux {
-@@ -65,9 +65,6 @@ struct InputLinux {
-     QTAILQ_ENTRY(InputLinux) next;
- };
+diff --git a/hw/sd/pxa2xx_mmci.c b/hw/sd/pxa2xx_mmci.c
+index 68bed24480..c400197815 100644
+--- a/hw/sd/pxa2xx_mmci.c
++++ b/hw/sd/pxa2xx_mmci.c
+@@ -22,9 +22,6 @@
+ #include "qemu/module.h"
+ #include "trace.h"
  
--struct InputLinuxClass {
--    ObjectClass parent_class;
--};
- 
- static QTAILQ_HEAD(, InputLinux) inputs = QTAILQ_HEAD_INITIALIZER(inputs);
+-#define TYPE_PXA2XX_MMCI "pxa2xx-mmci"
+-#define PXA2XX_MMCI(obj) OBJECT_CHECK(PXA2xxMMCIState, (obj), TYPE_PXA2XX_MMCI)
+-
+ #define TYPE_PXA2XX_MMCI_BUS "pxa2xx-mmci-bus"
+ #define PXA2XX_MMCI_BUS(obj) OBJECT_CHECK(SDBus, (obj), TYPE_PXA2XX_MMCI_BUS)
  
 -- 
 2.26.2
