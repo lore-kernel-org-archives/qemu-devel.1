@@ -2,70 +2,67 @@ Return-Path: <SRS0=Dndf=B6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E62BC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 15:56:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62E8EC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 15:56:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4F4902054F
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 15:56:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F4902054F
+	by mail.kernel.org (Postfix) with ESMTPS id 3611B2054F
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 15:56:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3611B2054F
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47156 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48538 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8mvS-0005mW-JU
-	for qemu-devel@archiver.kernel.org; Thu, 20 Aug 2020 11:56:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43816)
+	id 1k8mvh-0006MV-GJ
+	for qemu-devel@archiver.kernel.org; Thu, 20 Aug 2020 11:56:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44978)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k8mlP-0001JQ-SR
- for qemu-devel@nongnu.org; Thu, 20 Aug 2020 11:46:03 -0400
-Received: from indium.canonical.com ([91.189.90.7]:36848)
+ id 1k8mq1-0007hH-Lq
+ for qemu-devel@nongnu.org; Thu, 20 Aug 2020 11:50:49 -0400
+Received: from indium.canonical.com ([91.189.90.7]:38214)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k8mlK-0002mt-3I
- for qemu-devel@nongnu.org; Thu, 20 Aug 2020 11:46:03 -0400
+ id 1k8mpz-0003VW-Lz
+ for qemu-devel@nongnu.org; Thu, 20 Aug 2020 11:50:49 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1k8mlI-0008Gu-J6
- for <qemu-devel@nongnu.org>; Thu, 20 Aug 2020 15:45:56 +0000
+ id 1k8mpx-0000de-8O
+ for <qemu-devel@nongnu.org>; Thu, 20 Aug 2020 15:50:45 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 50E382E810C
- for <qemu-devel@nongnu.org>; Thu, 20 Aug 2020 15:45:56 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 243C62E8107
+ for <qemu-devel@nongnu.org>; Thu, 20 Aug 2020 15:50:45 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 20 Aug 2020 15:38:56 -0000
-From: Thomas Huth <1811533@bugs.launchpad.net>
+Date: Thu, 20 Aug 2020 15:40:43 -0000
+From: Thomas Huth <1843254@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
  assignee=None; 
+X-Launchpad-Bug-Tags: arm virtualization
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: dgilbert-h djdatte h-sieger th-huth vkuznets
- zaltysz
-X-Launchpad-Bug-Reporter: =?utf-8?q?=C5=BDilvinas_=C5=BDaltiena_=28zaltysz?=
- =?utf-8?q?=29?=
+X-Launchpad-Bug-Commenters: pmaydell udo-hypervisor
+X-Launchpad-Bug-Reporter: Udo Steinberg (udo-hypervisor)
 X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
-References: <154731859474.20612.3794172498936114295.malonedeb@soybean.canonical.com>
-Message-Id: <159793793688.1692.9332074237055371995.malone@chaenomeles.canonical.com>
-Subject: [Bug 1811533] Re: Unstable Win10 guest with qemu 3.1 + huge pages +
- hv_stimer
+References: <156802847195.6589.6854466446567964580.malonedeb@soybean.canonical.com>
+Message-Id: <159793804383.5685.7351486429220097541.launchpad@gac.canonical.com>
+Subject: [Bug 1843254] Re: arm emulation of HCR.TID3 traps are not implemented
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="99c2d833c8d727fd05148486920aca032e908071"; Instance="production"
-X-Launchpad-Hash: 95b31ad4acf32f0ecdde6bc5c97e6fefd4966acc
+X-Launchpad-Hash: 4cab9bd246e436c37f547fee3d939b107e3bbe29
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/20 10:50:55
@@ -87,12 +84,10 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1811533 <1811533@bugs.launchpad.net>
+Reply-To: Bug 1843254 <1843254@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-
-https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D76525114736e8f669766
 
 ** Changed in: qemu
        Status: Fix Committed =3D> Fix Released
@@ -101,51 +96,20 @@ https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D76525114736e8f669766
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1811533
+https://bugs.launchpad.net/bugs/1843254
 
 Title:
-  Unstable Win10 guest with qemu 3.1 + huge pages + hv_stimer
+  arm emulation of HCR.TID3 traps are not implemented
 
 Status in QEMU:
   Fix Released
 
 Bug description:
-  Host:
-  Gentoo linux x86_64, kernel 4.20.1
-  Qemu 3.1.0 =
-
-  CPU: Intel i7 6850K
-  Chipset: X99
-
-  Guest:
-  Windows 10 Pro 64bit (1809)
-  Machine type: pc-q35_3.1
-  Hyper-V enlightenments: hv_stimer,hv_reenlightenment,hv_frequencies,hv_va=
-pic,hv_reset,hv_synic,hv_runtime,hv_vpindex,hv_time,hv_relaxed,hv_spinlocks=
-=3D0x1fff
-  Memory: 16GB backed by 2MB huge pages
-
-  Issue:
-  Once guest is started, log gets flooded with:
-
-  qemu-system-x86_64: vhost_region_add_section: Overlapping but not
-  coherent sections at 103000
-
-  or
-
-  qemu-system-x86_64: vhost_region_add_section:Section rounded to 0
-  prior to previous 1f000
-
-  (line endings change)
-
-  and as time goes guest loses network access (virtio-net-pci) and
-  general performance diminishes to extent of freezing applications.
-
-  Observations:
-  1) problem disappears when hv_stimer is removed
-  2) problem disappears when memory backing with huge pages is disabled
-  3) problem disappears when machine type is downgraded to pc-q35_3.0
+  On ARM (aarch64), HCR_EL2.TID3 [bit18] is supposed to trap ID group 3,
+  which includes the ID_AA64{PFR,DFR,ISAR,MMFR,AFR}*_EL1 registers.
+  However, setting that HCR bit has no effect and accesses to those ID
+  registers are not trapped to EL2 with an EC syndrome value of 0x18.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1811533/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1843254/+subscriptions
 
