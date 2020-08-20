@@ -2,92 +2,89 @@ Return-Path: <SRS0=Dndf=B6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4244BC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 17:39:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C276BC433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 17:41:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 11908207DE
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 17:39:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 89281207DE
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 17:41:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="u7cHdir9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11908207DE
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zex7zTdU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 89281207DE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36714 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40974 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8oXe-0002Mr-AG
-	for qemu-devel@archiver.kernel.org; Thu, 20 Aug 2020 13:39:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45464)
+	id 1k8oYi-00049M-Pd
+	for qemu-devel@archiver.kernel.org; Thu, 20 Aug 2020 13:41:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45728)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <aladjev.andrew@gmail.com>)
- id 1k8oWj-0001B8-Oj
- for qemu-devel@nongnu.org; Thu, 20 Aug 2020 13:39:01 -0400
-Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:45759)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <aladjev.andrew@gmail.com>)
- id 1k8oWi-0002sc-6C
- for qemu-devel@nongnu.org; Thu, 20 Aug 2020 13:39:01 -0400
-Received: by mail-lj1-x241.google.com with SMTP id w25so2989437ljo.12
- for <qemu-devel@nongnu.org>; Thu, 20 Aug 2020 10:38:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=8WXZes1y04oUg9FXA0T8sp9tZMtYPGELgZbqWosaRUA=;
- b=u7cHdir99O0tJvEIecRKEpFV/0DUMQy5vBzjJhVXAEsRbN1aQGgMBmNCrBs3Ajmj4f
- VF5hk7WywRcyQuivHwh0o+B61UtQ6h9V/ULdVVtN7V2MvVtkiXGtlhcGStH6V+rhhRzg
- 8LQ496GBhflZIUaqHmNCNRzV7gDosPWCE/KmR2SW9TUJR4530CszD/YSVkzwQlo7H9lI
- 6DGjeljxmPHHDQdtdBSmBR59HK7mCp8jIxzy8mxYFJp3yBb7j9tP5yMjERxVy+7v2+t2
- C2GWXGjA0NewSQQwcmKYPpAB+sRvjscvTCbJkjADrru/HUfTzEozD/43C7PBw/JfFyy8
- 0XCw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=8WXZes1y04oUg9FXA0T8sp9tZMtYPGELgZbqWosaRUA=;
- b=ImpzYAVM+F825JWQGEAzcdRu65SLbchR648uSMSm6SUFc2CwfHzagu4nr0aDHgqwZz
- VS6LKxQXtwSrhxqf2QAw1m//S2PLmNHZVASjIDCW48c6B2WlRrGA6tKUAhlniMg+vKCK
- t8h74JxZ1xUSmJiUzVrOouWGbZiroxcS6feoF2Upp1OE9XY1hcrf5tqS4yOF+WZcEuWT
- 9tYwk49SCDemqZerXIOUe0Urw3AGI4wUEWL6J5tafpOg3NGRVMO7cC9IsDMi0yb5HCVu
- 141Vh3JligLRd0n6QfrKhQruI/yNRH8MnwTIffagBzyNpOuHNARbpN0jx2WuF4ZiEIPn
- 6w+Q==
-X-Gm-Message-State: AOAM532Tlcszua0WB9itO/NNtkRE9MfJrOBRnrbCFNfy9a1h0hHikKVA
- umxhznc4fN+SFHOvDvBHHLTPhLUSLC1w+Q==
-X-Google-Smtp-Source: ABdhPJwSQlIC4y3jIK4NNB5G1dbBTsTTvk2UP1ZetBNWJFxBcatxED2dWVcH7gGg7ghkjjQKN5mqKQ==
-X-Received: by 2002:a05:651c:233:: with SMTP id
- z19mr2175239ljn.347.1597945138235; 
- Thu, 20 Aug 2020 10:38:58 -0700 (PDT)
-Received: from mini.lan (ns331963.ip-37-187-122.eu. [37.187.122.190])
- by smtp.gmail.com with ESMTPSA id g19sm566930ljn.91.2020.08.20.10.38.56
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 20 Aug 2020 10:38:57 -0700 (PDT)
-From: Andrew Aladjev <aladjev.andrew@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 2/2] linux user: refactored is proc functions for syscalls
-Date: Thu, 20 Aug 2020 20:38:39 +0300
-Message-Id: <20200820173839.20184-2-aladjev.andrew@gmail.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200820173839.20184-1-aladjev.andrew@gmail.com>
-References: <20200820173839.20184-1-aladjev.andrew@gmail.com>
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1k8oXk-0002oZ-NG
+ for qemu-devel@nongnu.org; Thu, 20 Aug 2020 13:40:04 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:29678
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1k8oXj-0003Av-2Q
+ for qemu-devel@nongnu.org; Thu, 20 Aug 2020 13:40:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1597945202;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=1MSd+bh2opWOT1nEV8Etp4Xck0zoeKQEAMrJEJsf4xo=;
+ b=Zex7zTdUJvIuQcaivzbGXHTUz3fcUcl5Tn9ZNiRiZKPLmGE4sb9Dr4lvQHNPhf7CxIGk6f
+ H9C6LHqIzBcAUpHgB4huc0zZoEE998ekqtAqMLXRBXJU1xGBKSkdWTS5Go4uUm8DpuZy0m
+ WCDnRnzDi8QnK1S8z9Ix0QNzf05mzB8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-150-PrTGCjG7MP69gE1sRTCWcA-1; Thu, 20 Aug 2020 13:40:00 -0400
+X-MC-Unique: PrTGCjG7MP69gE1sRTCWcA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 16BA51DE05;
+ Thu, 20 Aug 2020 17:39:59 +0000 (UTC)
+Received: from work-vm (ovpn-114-2.ams2.redhat.com [10.36.114.2])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4339719D7D;
+ Thu, 20 Aug 2020 17:39:57 +0000 (UTC)
+Date: Thu, 20 Aug 2020 18:39:54 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Chuan Zheng <zhengchuan@huawei.com>
+Subject: Re: [PATCH v3 07/10] migration/dirtyrate: skip sampling ramblock
+ with size below MIN_RAMBLOCK_SIZE
+Message-ID: <20200820173954.GO2664@work-vm>
+References: <1597634433-18809-1-git-send-email-zhengchuan@huawei.com>
+ <1597634433-18809-8-git-send-email-zhengchuan@huawei.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::241;
- envelope-from=aladjev.andrew@gmail.com; helo=mail-lj1-x241.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+In-Reply-To: <1597634433-18809-8-git-send-email-zhengchuan@huawei.com>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
+X-Mimecast-Spam-Score: 0.003
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/20 03:03:34
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -101,130 +98,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Aladjev <aladjev.andrew@gmail.com>
+Cc: zhang.zhanghailiang@huawei.com, quintela@redhat.com, linyilu@huawei.com,
+ qemu-devel@nongnu.org, alex.chen@huawei.com, ann.zhuangyanying@huawei.com,
+ fangying1@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Andrew Aladjev <aladjev.andrew@gmail.com>
----
- linux-user/syscall.c | 81 ++++++++++++++++++++++++++++++--------------
- 1 file changed, 56 insertions(+), 25 deletions(-)
+* Chuan Zheng (zhengchuan@huawei.com) wrote:
+> In order to sample real RAM, skip ramblock with size below
+> 
+> Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 3d8c57522d..7b4d7cc197 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -7482,38 +7482,69 @@ static int open_self_auxv(void *cpu_env, int fd)
-     return 0;
- }
- 
--static int is_proc_myself(const char *filename, const char *entry)
--{
--    if (!strncmp(filename, "/proc/", strlen("/proc/"))) {
--        filename += strlen("/proc/");
--        if (!strncmp(filename, "self/", strlen("self/"))) {
--            filename += strlen("self/");
--        } else if (*filename >= '1' && *filename <= '9') {
--            char myself[80];
--            snprintf(myself, sizeof(myself), "%d/", getpid());
--            if (!strncmp(filename, myself, strlen(myself))) {
--                filename += strlen(myself);
--            } else {
--                return 0;
--            }
--        } else {
--            return 0;
--        }
--        if (!strcmp(filename, entry)) {
--            return 1;
-+#define PROC "/proc/"
-+#define SELF "self/"
-+
-+#define STARTS_WITH(path, CONSTANT) (              \
-+    strlen(path) >= strlen(CONSTANT) &&            \
-+    strncmp(path, CONSTANT, strlen(CONSTANT)) == 0 \
-+)
-+
-+static inline char *scope_to_proc(const char *path)
-+{
-+    if (STARTS_WITH(path, PROC)) {
-+        return (char *)path + strlen(PROC);
-+    }
-+
-+    return NULL;
-+}
-+
-+static inline char *scope_to_proc_myself(const char *path)
-+{
-+    char *scope_path = scope_to_proc(path);
-+    if (scope_path == NULL) {
-+        return NULL;
-+    }
-+
-+    if (STARTS_WITH(scope_path, SELF)) {
-+        return scope_path + strlen(SELF);
-+    }
-+
-+    if (strlen(scope_path) >= 1 &&
-+        *scope_path >= '1' && *scope_path <= '9') {
-+        char pid_path[80];
-+        snprintf(pid_path, sizeof(pid_path), "%d/", getpid());
-+        if (STARTS_WITH(scope_path, pid_path)) {
-+            return scope_path + strlen(pid_path);
-         }
-     }
--    return 0;
-+
-+    return NULL;
- }
- 
- #if defined(HOST_WORDS_BIGENDIAN) != defined(TARGET_WORDS_BIGENDIAN) || \
-     defined(TARGET_SPARC) || defined(TARGET_M68K) || defined(TARGET_HPPA)
--static int is_proc(const char *filename, const char *entry)
-+static int is_proc(const char *path, const char *entry)
- {
--    return strcmp(filename, entry) == 0;
-+    char *scope_path = scope_to_proc(path);
-+    if (scope_path == NULL) {
-+        return 0;
-+    }
-+
-+    return strcmp(scope_path, entry) == 0;
- }
- #endif
- 
-+static int is_proc_myself(const char *path, const char *entry)
-+{
-+    char *scope_path = scope_to_proc_myself(path);
-+    if (scope_path == NULL) {
-+        return 0;
-+    }
-+
-+    return strcmp(scope_path, entry) == 0;
-+}
-+
- #if defined(HOST_WORDS_BIGENDIAN) != defined(TARGET_WORDS_BIGENDIAN)
- static int open_net_route(void *cpu_env, int fd)
- {
-@@ -7601,13 +7632,13 @@ static int do_openat(void *cpu_env, int dirfd, const char *pathname, int flags,
-         { "auxv", open_self_auxv, is_proc_myself },
-         { "cmdline", open_self_cmdline, is_proc_myself },
- #if defined(HOST_WORDS_BIGENDIAN) != defined(TARGET_WORDS_BIGENDIAN)
--        { "/proc/net/route", open_net_route, is_proc },
-+        { "net/route", open_net_route, is_proc },
- #endif
- #if defined(TARGET_SPARC) || defined(TARGET_HPPA)
--        { "/proc/cpuinfo", open_cpuinfo, is_proc },
-+        { "cpuinfo", open_cpuinfo, is_proc },
- #endif
- #if defined(TARGET_M68K)
--        { "/proc/hardware", open_hardware, is_proc },
-+        { "hardware", open_hardware, is_proc },
- #endif
-         { NULL, NULL, NULL }
-     };
+OK,
+
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+> ---
+>  migration/dirtyrate.c | 24 ++++++++++++++++++++++++
+>  migration/dirtyrate.h |  5 +++++
+>  2 files changed, 29 insertions(+)
+> 
+> diff --git a/migration/dirtyrate.c b/migration/dirtyrate.c
+> index 3ce25f5..6f30f67 100644
+> --- a/migration/dirtyrate.c
+> +++ b/migration/dirtyrate.c
+> @@ -186,6 +186,24 @@ alloc_ramblock_dirty_info(int *block_index,
+>      return block_dinfo;
+>  }
+>  
+> +static int skip_sample_ramblock(RAMBlock *block)
+> +{
+> +    int64_t ramblock_size;
+> +
+> +    /* ramblock size in MB */
+> +    ramblock_size = qemu_ram_get_used_length(block) >> 20;
+> +
+> +    /*
+> +     * Consider ramblock with size larger than 128M is what we
+> +     * want to sample.
+> +     */
+> +    if (ramblock_size < MIN_RAMBLOCK_SIZE) {
+> +        return -1;
+> +    }
+> +
+> +    return 0;
+> +}
+> +
+>  static int record_ramblock_hash_info(struct RamblockDirtyInfo **block_dinfo,
+>                                       struct DirtyRateConfig config,
+>                                       int *block_index)
+> @@ -196,6 +214,9 @@ static int record_ramblock_hash_info(struct RamblockDirtyInfo **block_dinfo,
+>      int index = 0;
+>  
+>      RAMBLOCK_FOREACH_MIGRATABLE(block) {
+> +        if (skip_sample_ramblock(block) < 0) {
+> +            continue;
+> +        }
+>          dinfo = alloc_ramblock_dirty_info(&index, dinfo);
+>          if (dinfo == NULL) {
+>              return -1;
+> @@ -275,6 +296,9 @@ static int compare_page_hash_info(struct RamblockDirtyInfo *info,
+>      RAMBlock *block = NULL;
+>  
+>      RAMBLOCK_FOREACH_MIGRATABLE(block) {
+> +        if (skip_sample_ramblock(block) < 0) {
+> +            continue;
+> +        }
+>          block_dinfo = NULL;
+>          if (!find_page_matched(block, info, block_index + 1, &block_dinfo)) {
+>              continue;
+> diff --git a/migration/dirtyrate.h b/migration/dirtyrate.h
+> index 0812b16..fce2e3b 100644
+> --- a/migration/dirtyrate.h
+> +++ b/migration/dirtyrate.h
+> @@ -31,6 +31,11 @@
+>  
+>  #define QCRYPTO_HASH_LEN                          16
+>  
+> +/*
+> + * minimum ramblock size to sampled
+> + */
+> +#define MIN_RAMBLOCK_SIZE                        128
+> +
+>  /* Take 1s as default for calculation duration */
+>  #define DEFAULT_FETCH_DIRTYRATE_TIME_SEC          1
+>  
+> -- 
+> 1.8.3.1
+> 
 -- 
-2.26.2
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
