@@ -2,85 +2,64 @@ Return-Path: <SRS0=Dndf=B6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C9DEC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 08:18:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95DEFC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 08:18:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3237E21775
-	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 08:18:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=anisinha-ca.20150623.gappssmtp.com header.i=@anisinha-ca.20150623.gappssmtp.com header.b="SewWIlJZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3237E21775
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=anisinha.ca
+	by mail.kernel.org (Postfix) with ESMTPS id 5AD5821744
+	for <qemu-devel@archiver.kernel.org>; Thu, 20 Aug 2020 08:18:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5AD5821744
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39274 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39660 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8flw-0000CT-Dv
-	for qemu-devel@archiver.kernel.org; Thu, 20 Aug 2020 04:18:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46306)
+	id 1k8fm5-0000MN-MI
+	for qemu-devel@archiver.kernel.org; Thu, 20 Aug 2020 04:18:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46366)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1k8flE-0007c9-3K
- for qemu-devel@nongnu.org; Thu, 20 Aug 2020 04:17:24 -0400
-Received: from mail-pl1-x62c.google.com ([2607:f8b0:4864:20::62c]:40019)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1k8flB-0003G3-Ue
- for qemu-devel@nongnu.org; Thu, 20 Aug 2020 04:17:23 -0400
-Received: by mail-pl1-x62c.google.com with SMTP id u10so685522plr.7
- for <qemu-devel@nongnu.org>; Thu, 20 Aug 2020 01:17:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=anisinha-ca.20150623.gappssmtp.com; s=20150623;
- h=from:to:cc:subject:date:message-id;
- bh=YOiBU0s4yU1BUld7E7RNQYJwKzqxVPPyliOfDa3bUPQ=;
- b=SewWIlJZo5I1BBn0QF2KAZ9i7bKJ26NdjMSm8V5D5sEUFPL+MWbtPszYbmFy6Z+hjg
- VkL4o32q9M8wXuJJCDG/qkGOEaDR0E0ZK/wa3S2Vww65piZ267vRbLk6wZP8kWSlO4Cl
- I8C7TBx9rBwdhsQEK3JJzdR2IAfxFhwMj8W5Ed/Mp/SBhyWQ+RBM9eu3biJftQnO7bH7
- 68iApYQCuOG8DikoLvUkGifH5G1JTfR4IAZTYEIsK6ck2Ontj/IbHS7ibZi/3tGa3N/f
- uLtNSqaRXuY8NAJv5QNHxWGttYY198yvbkmTgX3ZV9XyKekQ3D2NglGSiwqnQ6bhGNtp
- 1lCA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id;
- bh=YOiBU0s4yU1BUld7E7RNQYJwKzqxVPPyliOfDa3bUPQ=;
- b=HFx3AU69zyW5f65avd3V5XAJqRsDnfuHLVqCYQodUxkJPJ+WBdOphXN6JqsEG97HJm
- oPaHL9+VlWh/WfjxRvKc+bYniI18K4uK1WHQir5r355GIbUvdJoZLmfL03ueL3LdZb9W
- CCNk+AL7meqlk2F967KoptEws1yDVyHuujZwtHMYqKARORh/boCcowhiYO+2Bgo7mxHk
- E16Ddm0ktj0zcjDpZ809FO2TOAgzg4kAiRo08shcrBlbeE4Lo821S+QgoSbZUW77VLy0
- Ni3NRqgYYiP7/S3bWQpwVEDtCF/TI1+7+ZFsJLI5T6wrUGoZrQ0TmKhLItCmTgDViYPF
- 6msg==
-X-Gm-Message-State: AOAM533OrXhY3ZiiGlONfrQ8LIurnJzzCTRQDyhTmOqEuwQ9kQUemhGv
- 1iCjLFHx56ACLzOgRFTOYN2NPtRkC0QEfjrc
-X-Google-Smtp-Source: ABdhPJw8Ab7p7w2JBUWoh7sHg1NclmJ9PbOn2fFL6cGmeulP6ZhIJ08d3iX3s5FoMlA+lLuNc3CZmg==
-X-Received: by 2002:a17:90b:138d:: with SMTP id
- hr13mr1008643pjb.14.1597911439920; 
- Thu, 20 Aug 2020 01:17:19 -0700 (PDT)
-Received: from localhost.localdomain ([115.96.156.17])
- by smtp.googlemail.com with ESMTPSA id m19sm1671339pgd.21.2020.08.20.01.17.15
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 20 Aug 2020 01:17:18 -0700 (PDT)
-From: Ani Sinha <ani@anisinha.ca>
-To: qemu-devel@nongnu.org
-Subject: [PATCH V5] Introduce a new flag for i440fx to disable PCI hotplug on
- the root bus
-Date: Thu, 20 Aug 2020 13:46:59 +0530
-Message-Id: <20200820081659.17328-1-ani@anisinha.ca>
-X-Mailer: git-send-email 2.17.1
-Received-SPF: none client-ip=2607:f8b0:4864:20::62c;
- envelope-from=ani@anisinha.ca; helo=mail-pl1-x62c.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1k8flM-0007mL-Ne
+ for qemu-devel@nongnu.org; Thu, 20 Aug 2020 04:17:32 -0400
+Received: from mx2.suse.de ([195.135.220.15]:49378)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1k8flJ-0003Gl-HP
+ for qemu-devel@nongnu.org; Thu, 20 Aug 2020 04:17:32 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+ by mx2.suse.de (Postfix) with ESMTP id D75D4AC65;
+ Thu, 20 Aug 2020 08:17:54 +0000 (UTC)
+Subject: Re: [RFC v3 2/8] cpus: prepare new CpusAccel cpu accelerator interface
+To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?=
+ <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+References: <20200803090533.7410-1-cfontana@suse.de>
+ <20200803090533.7410-3-cfontana@suse.de>
+From: Claudio Fontana <cfontana@suse.de>
+Message-ID: <d65ff2d0-0859-ae68-6186-6fa6e5e63370@suse.de>
+Date: Thu, 20 Aug 2020 10:17:26 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
+MIME-Version: 1.0
+In-Reply-To: <20200803090533.7410-3-cfontana@suse.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=195.135.220.15; envelope-from=cfontana@suse.de;
+ helo=mx2.suse.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/19 20:42:29
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,191 +72,783 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Ani Sinha <ani@anisinha.ca>,
- Igor Mammedov <imammedo@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
+ qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
+ Roman Bolshakov <r.bolshakov@yadro.com>, Pavel Dovgalyuk <dovgaluk@ispras.ru>,
+ Wenchao Wang <wenchao.wang@intel.com>, haxm-team@intel.com,
+ Sunil Muthuswamy <sunilmut@microsoft.com>, Richard Henderson <rth@twiddle.net>,
+ Colin Xu <colin.xu@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We introduce a new global flag 'acpi-root-pci-hotplug' for i440fx with which
-we can turn on or off PCI device hotplug on the root bus. This flag can be
-used to prevent all PCI devices from getting hotplugged or unplugged from the
-root PCI bus.
-This feature is targetted mostly towards Windows VMs. It is useful in cases
-where some hypervisor admins want to deploy guest VMs in a way so that the
-users of the guest OSes are not able to hot-eject certain PCI devices from
-the Windows system tray. Laine has explained the use case here in detail:
-https://www.redhat.com/archives/libvir-list/2020-February/msg00110.html
+Hi Paolo and all,
 
-Julia has resolved this issue for PCIE buses with the following commit:
-530a0963184e57e71a5b538 ("pcie_root_port: Add hotplug disabling option")
+back in RFC v3 I introduced cpus_get_virtual_clock in this patch.
 
-This commit attempts to introduce similar behavior for PCI root buses used in
-i440fx machine types (although in this case, we do not have a per-slot
-capability to turn hotplug on or off).
+I observed an issue when adding the get_virtual_clock to the CpusAccel interface, ie
+it seems that qemu_clock_get_ns() is called in some io-tests before the accelerator is initialized,
+which seems to collide with the idea to make it part of the CpusAccel interface:
 
-Usage:
-   -global PIIX4_PM.acpi-root-pci-hotplug=off
+(gdb) bt
+#0  0x00005555558e6af0 in cpus_get_virtual_clock () at /home/claudio/git/qemu-pristine/qemu/softmmu/cpus.c:219
+#1  0x0000555555c5099c in qemu_clock_get_ns (type=type@entry=QEMU_CLOCK_VIRTUAL)
+    at /home/claudio/(gdb) bt
+#0  0x00005555558e6af0 in cpus_get_virtual_clock () at /home/claudio/git/qemu-pristine/qemu/softmmu/cpus.c:219
+#1  0x0000555555c5099c in qemu_clock_get_ns (type=type@entry=QEMU_CLOCK_VIRTUAL)
+    at /home/claudio/git/qemu-pristine/qemu/util/qemu-timer.c:638
+#2  0x0000555555b6077a in qemu_clock_get_ms (type=QEMU_CLOCK_VIRTUAL) at /home/claudio/git/qemu-pristine/qemu/include/qemu/timer.h:118
+#3  0x0000555555b6077a in cache_clean_timer_init (bs=bs@entry=0x5555568381a0, context=0x555556821930)
+    at /home/claudio/git/qemu-pristine/qemu/block/qcow2.c:846
+#4  0x0000555555b63012 in qcow2_update_options_commit (bs=bs@entry=0x5555568381a0, r=r@entry=0x7fffd6a45e10)
+    at /home/claudio/git/qemu-pristine/qemu/block/qcow2.c:1221
+#5  0x0000555555b657ea in qcow2_update_options
+    (bs=bs@entry=0x5555568381a0, options=options@entry=0x55555683d600, flags=flags@entry=139266, errp=errp@entry=0x7fffffffd580)
+    at /home/claudio/git/qemu-pristine/qemu/block/qcow2.c:1248
+#6  0x0000555555b671a2 in qcow2_do_open (bs=0x5555568381a0, options=0x55555683d600, flags=139266, errp=0x7fffffffd580)
+    at /home/claudio/git/qemu-pristine/qemu/block/qcow2.c:1579
+#7  0x0000555555b67e62 in qcow2_open_entry (opaque=0x7fffffffd520) at /home/claudio/git/qemu-pristine/qemu/block/qcow2.c:1867
+#8  0x0000555555c4854c in coroutine_trampoline (i0=<optimized out>, i1=<optimized out>)
+    at /home/claudio/git/qemu-pristine/qemu/util/coroutine-ucontext.c:173
+#9  0x00007fffed3779c0 in __start_context () at /lib64/libc.so.6
+#10 0x00007fffffffcd90 in  ()
+#11 0x0000000000000000 in  ()
 
-By default, this option is enabled which means that hotplug is turned on for
-the PCI root bus.
+(gdb) p *current_machine
+$3 = {parent_obj = {class = 0x5555567a2090, free = 0x7ffff72d9840 <g_free>, Python Exception <class 'gdb.error'> There is no member named keys.: 
+properties = 0x55555681c580, ref = 2, 
+    parent = 0x55555682aa90}, sysbus_notifier = {notify = 0x555555990130 <machine_init_notify>, node = {le_next = 
+    0x5555564e1130 <chardev_machine_done_notify>, le_prev = 0x5555565079f0 <machine_init_done_notifiers>}}, dtb = 0x0, dumpdtb = 0x0, 
+  phandle_start = 0, dt_compatible = 0x0, dump_guest_core = true, mem_merge = true, usb = false, usb_disabled = false, firmware = 0x0, 
+  iommu = false, suppress_vmdesc = false, enforce_config_section = false, enable_graphics = true, memory_encryption = 0x0, 
+  ram_memdev_id = 0x0, ram = 0x0, device_memory = 0x0, ram_size = 0, maxram_size = 0, ram_slots = 0, boot_order = 0x0, 
+  kernel_filename = 0x0, kernel_cmdline = 0x0, initrd_filename = 0x0, cpu_type = 0x0, accelerator = 0x0, possible_cpus = 0x0, smp = {
+    cpus = 1, cores = 1, threads = 1, sockets = 1, max_cpus = 1}, nvdimms_state = 0x555556822850, numa_state = 0x555556822be0}
 
-The previously existing flag 'acpi-pci-hotplug-with-bridge-support' for PCI-PCI
-bridges remain as is and can be used along with this new flag to control PCI
-hotplug on PCI bridges.
 
-This change has been tested using a Windows 2012R2 server guest image and also
-with a Windows 2019 server guest image on a Ubuntu 18.04 host using the latest
-master qemu from upstream.
+The affected tests are:
 
-Signed-off-by: Ani Sinha <ani@anisinha.ca>
----
- hw/acpi/piix4.c      |  8 ++++++--
- hw/i386/acpi-build.c | 26 +++++++++++++++++++-------
- 2 files changed, 25 insertions(+), 9 deletions(-)
+Failures: 030 040 041 060 099 120 127 140 156 161 172 181 191 192 195 203 229 249 256 267
 
-Change Log:
-V4..V5: Updated commit message to reflect the fact that testing was also
-performed on a Windows 2019 server guest image. Minor commit log formatting
-to make sure 80 col rule is enforced.
+Are the tests wrong here, to trigger this call stack before the accel is set,
+or should the get virtual clock functionality be taken out of the interface, or ...?
 
-diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
-index 26bac4f16c..4f436e5bf3 100644
---- a/hw/acpi/piix4.c
-+++ b/hw/acpi/piix4.c
-@@ -78,6 +78,7 @@ typedef struct PIIX4PMState {
- 
-     AcpiPciHpState acpi_pci_hotplug;
-     bool use_acpi_hotplug_bridge;
-+    bool use_acpi_root_pci_hotplug;
- 
-     uint8_t disable_s3;
-     uint8_t disable_s4;
-@@ -595,8 +596,9 @@ static void piix4_acpi_system_hot_add_init(MemoryRegion *parent,
-                           "acpi-gpe0", GPE_LEN);
-     memory_region_add_subregion(parent, GPE_BASE, &s->io_gpe);
- 
--    acpi_pcihp_init(OBJECT(s), &s->acpi_pci_hotplug, bus, parent,
--                    s->use_acpi_hotplug_bridge);
-+    if (s->use_acpi_hotplug_bridge || s->use_acpi_root_pci_hotplug)
-+        acpi_pcihp_init(OBJECT(s), &s->acpi_pci_hotplug, bus, parent,
-+                        s->use_acpi_hotplug_bridge);
- 
-     s->cpu_hotplug_legacy = true;
-     object_property_add_bool(OBJECT(s), "cpu-hotplug-legacy",
-@@ -635,6 +637,8 @@ static Property piix4_pm_properties[] = {
-     DEFINE_PROP_UINT8(ACPI_PM_PROP_S4_VAL, PIIX4PMState, s4_val, 2),
-     DEFINE_PROP_BOOL("acpi-pci-hotplug-with-bridge-support", PIIX4PMState,
-                      use_acpi_hotplug_bridge, true),
-+    DEFINE_PROP_BOOL("acpi-root-pci-hotplug", PIIX4PMState,
-+                     use_acpi_root_pci_hotplug, true),
-     DEFINE_PROP_BOOL("memory-hotplug-support", PIIX4PMState,
-                      acpi_memory_hotplug.is_enabled, true),
-     DEFINE_PROP_END_OF_LIST(),
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index b7bcbbbb2a..19a1702ad1 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -95,6 +95,7 @@ typedef struct AcpiPmInfo {
-     bool s3_disabled;
-     bool s4_disabled;
-     bool pcihp_bridge_en;
-+    bool pcihp_root_en;
-     uint8_t s4_val;
-     AcpiFadtData fadt;
-     uint16_t cpu_hp_io_base;
-@@ -245,6 +246,9 @@ static void acpi_get_pm_info(MachineState *machine, AcpiPmInfo *pm)
-     pm->pcihp_bridge_en =
-         object_property_get_bool(obj, "acpi-pci-hotplug-with-bridge-support",
-                                  NULL);
-+    pm->pcihp_root_en =
-+        object_property_get_bool(obj, "acpi-root-pci-hotplug", NULL);
-+
- }
- 
- static void acpi_get_misc_info(AcpiMiscInfo *info)
-@@ -337,15 +341,18 @@ static void build_append_pcihp_notify_entry(Aml *method, int slot)
- }
- 
- static void build_append_pci_bus_devices(Aml *parent_scope, PCIBus *bus,
--                                         bool pcihp_bridge_en)
-+                                         bool pcihp_bridge_en,
-+                                         bool pcihp_root_en)
- {
-     Aml *dev, *notify_method = NULL, *method;
-     QObject *bsel;
-     PCIBus *sec;
-     int i;
-+    bool root_bus = pci_bus_is_root(bus);
-+    bool root_pcihp_disabled = (root_bus && !pcihp_root_en);
- 
-     bsel = object_property_get_qobject(OBJECT(bus), ACPI_PCIHP_PROP_BSEL, NULL);
--    if (bsel) {
-+    if (bsel && !root_pcihp_disabled) {
-         uint64_t bsel_val = qnum_get_uint(qobject_to(QNum, bsel));
- 
-         aml_append(parent_scope, aml_name_decl("BSEL", aml_int(bsel_val)));
-@@ -361,6 +368,9 @@ static void build_append_pci_bus_devices(Aml *parent_scope, PCIBus *bus,
-         bool bridge_in_acpi;
- 
-         if (!pdev) {
-+            /* skip if pci hotplug for the root bus is disabled */
-+            if (root_pcihp_disabled)
-+                continue;
-             if (bsel) { /* add hotplug slots for non present devices */
-                 dev = aml_device("S%.02X", PCI_DEVFN(slot, 0));
-                 aml_append(dev, aml_name_decl("_SUN", aml_int(slot)));
-@@ -419,7 +429,7 @@ static void build_append_pci_bus_devices(Aml *parent_scope, PCIBus *bus,
-             method = aml_method("_S3D", 0, AML_NOTSERIALIZED);
-             aml_append(method, aml_return(aml_int(s3d)));
-             aml_append(dev, method);
--        } else if (hotplug_enabled_dev) {
-+        } else if (hotplug_enabled_dev && !root_pcihp_disabled) {
-             /* add _SUN/_EJ0 to make slot hotpluggable  */
-             aml_append(dev, aml_name_decl("_SUN", aml_int(slot)));
- 
-@@ -439,13 +449,14 @@ static void build_append_pci_bus_devices(Aml *parent_scope, PCIBus *bus,
-              */
-             PCIBus *sec_bus = pci_bridge_get_sec_bus(PCI_BRIDGE(pdev));
- 
--            build_append_pci_bus_devices(dev, sec_bus, pcihp_bridge_en);
-+            build_append_pci_bus_devices(dev, sec_bus, pcihp_bridge_en,
-+                                         pcihp_root_en);
-         }
-         /* slot descriptor has been composed, add it into parent context */
-         aml_append(parent_scope, dev);
-     }
- 
--    if (bsel) {
-+    if (bsel && !root_pcihp_disabled) {
-         aml_append(parent_scope, notify_method);
-     }
- 
-@@ -455,7 +466,7 @@ static void build_append_pci_bus_devices(Aml *parent_scope, PCIBus *bus,
-     method = aml_method("PCNT", 0, AML_NOTSERIALIZED);
- 
-     /* If bus supports hotplug select it and notify about local events */
--    if (bsel) {
-+    if (bsel && !root_pcihp_disabled) {
-         uint64_t bsel_val = qnum_get_uint(qobject_to(QNum, bsel));
- 
-         aml_append(method, aml_store(aml_int(bsel_val), aml_name("BNUM")));
-@@ -1818,7 +1829,8 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
-         if (bus) {
-             Aml *scope = aml_scope("PCI0");
-             /* Scan all PCI buses. Generate tables to support hotplug. */
--            build_append_pci_bus_devices(scope, bus, pm->pcihp_bridge_en);
-+            build_append_pci_bus_devices(scope, bus, pm->pcihp_bridge_en,
-+                                         pm->pcihp_root_en);
- 
-             if (TPM_IS_TIS_ISA(tpm)) {
-                 if (misc->tpm_version == TPM_VERSION_2_0) {
--- 
-2.17.1
+Thanks for any advice,
+
+Ciao,
+
+Claudio  
+
+
+On 8/3/20 11:05 AM, Claudio Fontana wrote:
+> The new interface starts unused, will start being used by the
+> next patches.
+> 
+> It provides methods for each accelerator to start a vcpu, kick a vcpu,
+> synchronize state, get cpu virtual clock and elapsed ticks.
+> 
+> Signed-off-by: Claudio Fontana <cfontana@suse.de>
+> ---
+>  hw/core/cpu.c                  |   1 +
+>  hw/i386/x86.c                  |   2 +-
+>  include/sysemu/cpu-timers.h    |   9 +-
+>  include/sysemu/cpus.h          |  36 ++++++++
+>  include/sysemu/hw_accel.h      |  69 ++-------------
+>  softmmu/cpu-timers.c           |   9 +-
+>  softmmu/cpus.c                 | 194 ++++++++++++++++++++++++++++++++---------
+>  stubs/Makefile.objs            |   2 +
+>  stubs/cpu-synchronize-state.c  |  15 ++++
+>  stubs/cpus-get-virtual-clock.c |   8 ++
+>  util/qemu-timer.c              |   8 +-
+>  11 files changed, 231 insertions(+), 122 deletions(-)
+>  create mode 100644 stubs/cpu-synchronize-state.c
+>  create mode 100644 stubs/cpus-get-virtual-clock.c
+> 
+> diff --git a/hw/core/cpu.c b/hw/core/cpu.c
+> index 594441a150..b389a312df 100644
+> --- a/hw/core/cpu.c
+> +++ b/hw/core/cpu.c
+> @@ -33,6 +33,7 @@
+>  #include "hw/qdev-properties.h"
+>  #include "trace-root.h"
+>  #include "qemu/plugin.h"
+> +#include "sysemu/hw_accel.h"
+>  
+>  CPUInterruptHandler cpu_interrupt_handler;
+>  
+> diff --git a/hw/i386/x86.c b/hw/i386/x86.c
+> index 58cf2229d5..00c35bad7e 100644
+> --- a/hw/i386/x86.c
+> +++ b/hw/i386/x86.c
+> @@ -264,7 +264,7 @@ static long get_file_size(FILE *f)
+>  /* TSC handling */
+>  uint64_t cpu_get_tsc(CPUX86State *env)
+>  {
+> -    return cpu_get_ticks();
+> +    return cpus_get_elapsed_ticks();
+>  }
+>  
+>  /* IRQ handling */
+> diff --git a/include/sysemu/cpu-timers.h b/include/sysemu/cpu-timers.h
+> index 07d724672f..cb83cc5584 100644
+> --- a/include/sysemu/cpu-timers.h
+> +++ b/include/sysemu/cpu-timers.h
+> @@ -64,9 +64,8 @@ void cpu_enable_ticks(void);
+>  void cpu_disable_ticks(void);
+>  
+>  /*
+> - * return the time elapsed in VM between vm_start and vm_stop.  Unless
+> - * icount is active, cpu_get_ticks() uses units of the host CPU cycle
+> - * counter.
+> + * return the time elapsed in VM between vm_start and vm_stop.
+> + * cpu_get_ticks() uses units of the host CPU cycle counter.
+>   */
+>  int64_t cpu_get_ticks(void);
+>  
+> @@ -78,4 +77,8 @@ int64_t cpu_get_clock(void);
+>  
+>  void qemu_timer_notify_cb(void *opaque, QEMUClockType type);
+>  
+> +/* get the VIRTUAL clock and VM elapsed ticks via the cpus accel interface */
+> +int64_t cpus_get_virtual_clock(void);
+> +int64_t cpus_get_elapsed_ticks(void);
+> +
+>  #endif /* SYSEMU_CPU_TIMERS_H */
+> diff --git a/include/sysemu/cpus.h b/include/sysemu/cpus.h
+> index 149de000a0..db196dd96f 100644
+> --- a/include/sysemu/cpus.h
+> +++ b/include/sysemu/cpus.h
+> @@ -4,7 +4,43 @@
+>  #include "qemu/timer.h"
+>  
+>  /* cpus.c */
+> +
+> +/* CPU execution threads */
+> +
+> +typedef struct CpusAccel {
+> +    void (*create_vcpu_thread)(CPUState *cpu); /* MANDATORY */
+> +    void (*kick_vcpu_thread)(CPUState *cpu);
+> +
+> +    void (*synchronize_post_reset)(CPUState *cpu);
+> +    void (*synchronize_post_init)(CPUState *cpu);
+> +    void (*synchronize_state)(CPUState *cpu);
+> +    void (*synchronize_pre_loadvm)(CPUState *cpu);
+> +
+> +    int64_t (*get_virtual_clock)(void);
+> +    int64_t (*get_elapsed_ticks)(void);
+> +} CpusAccel;
+> +
+> +/* register accel-specific cpus interface implementation */
+> +void cpus_register_accel(CpusAccel *i);
+> +
+> +/* interface available for cpus accelerator threads */
+> +
+> +/* For temporary buffers for forming a name */
+> +#define VCPU_THREAD_NAME_SIZE 16
+> +
+> +void cpus_kick_thread(CPUState *cpu);
+> +bool cpu_work_list_empty(CPUState *cpu);
+> +bool cpu_thread_is_idle(CPUState *cpu);
+>  bool all_cpu_threads_idle(void);
+> +bool cpu_can_run(CPUState *cpu);
+> +void qemu_wait_io_event_common(CPUState *cpu);
+> +void qemu_wait_io_event(CPUState *cpu);
+> +void cpu_thread_signal_created(CPUState *cpu);
+> +void cpu_thread_signal_destroyed(CPUState *cpu);
+> +void cpu_handle_guest_debug(CPUState *cpu);
+> +
+> +/* end interface for cpus accelerator threads */
+> +
+>  bool qemu_in_vcpu_thread(void);
+>  void qemu_init_cpu_loop(void);
+>  void resume_all_vcpus(void);
+> diff --git a/include/sysemu/hw_accel.h b/include/sysemu/hw_accel.h
+> index e128f8b06b..ffed6192a3 100644
+> --- a/include/sysemu/hw_accel.h
+> +++ b/include/sysemu/hw_accel.h
+> @@ -1,5 +1,5 @@
+>  /*
+> - * QEMU Hardware accelertors support
+> + * QEMU Hardware accelerators support
+>   *
+>   * Copyright 2016 Google, Inc.
+>   *
+> @@ -17,68 +17,9 @@
+>  #include "sysemu/hvf.h"
+>  #include "sysemu/whpx.h"
+>  
+> -static inline void cpu_synchronize_state(CPUState *cpu)
+> -{
+> -    if (kvm_enabled()) {
+> -        kvm_cpu_synchronize_state(cpu);
+> -    }
+> -    if (hax_enabled()) {
+> -        hax_cpu_synchronize_state(cpu);
+> -    }
+> -    if (hvf_enabled()) {
+> -        hvf_cpu_synchronize_state(cpu);
+> -    }
+> -    if (whpx_enabled()) {
+> -        whpx_cpu_synchronize_state(cpu);
+> -    }
+> -}
+> -
+> -static inline void cpu_synchronize_post_reset(CPUState *cpu)
+> -{
+> -    if (kvm_enabled()) {
+> -        kvm_cpu_synchronize_post_reset(cpu);
+> -    }
+> -    if (hax_enabled()) {
+> -        hax_cpu_synchronize_post_reset(cpu);
+> -    }
+> -    if (hvf_enabled()) {
+> -        hvf_cpu_synchronize_post_reset(cpu);
+> -    }
+> -    if (whpx_enabled()) {
+> -        whpx_cpu_synchronize_post_reset(cpu);
+> -    }
+> -}
+> -
+> -static inline void cpu_synchronize_post_init(CPUState *cpu)
+> -{
+> -    if (kvm_enabled()) {
+> -        kvm_cpu_synchronize_post_init(cpu);
+> -    }
+> -    if (hax_enabled()) {
+> -        hax_cpu_synchronize_post_init(cpu);
+> -    }
+> -    if (hvf_enabled()) {
+> -        hvf_cpu_synchronize_post_init(cpu);
+> -    }
+> -    if (whpx_enabled()) {
+> -        whpx_cpu_synchronize_post_init(cpu);
+> -    }
+> -}
+> -
+> -static inline void cpu_synchronize_pre_loadvm(CPUState *cpu)
+> -{
+> -    if (kvm_enabled()) {
+> -        kvm_cpu_synchronize_pre_loadvm(cpu);
+> -    }
+> -    if (hax_enabled()) {
+> -        hax_cpu_synchronize_pre_loadvm(cpu);
+> -    }
+> -    if (hvf_enabled()) {
+> -        hvf_cpu_synchronize_pre_loadvm(cpu);
+> -    }
+> -    if (whpx_enabled()) {
+> -        whpx_cpu_synchronize_pre_loadvm(cpu);
+> -    }
+> -}
+> +void cpu_synchronize_state(CPUState *cpu);
+> +void cpu_synchronize_post_reset(CPUState *cpu);
+> +void cpu_synchronize_post_init(CPUState *cpu);
+> +void cpu_synchronize_pre_loadvm(CPUState *cpu);
+>  
+>  #endif /* QEMU_HW_ACCEL_H */
+> diff --git a/softmmu/cpu-timers.c b/softmmu/cpu-timers.c
+> index 64addb315d..3e1da79735 100644
+> --- a/softmmu/cpu-timers.c
+> +++ b/softmmu/cpu-timers.c
+> @@ -61,18 +61,13 @@ static int64_t cpu_get_ticks_locked(void)
+>  }
+>  
+>  /*
+> - * return the time elapsed in VM between vm_start and vm_stop.  Unless
+> - * icount is active, cpu_get_ticks() uses units of the host CPU cycle
+> - * counter.
+> + * return the time elapsed in VM between vm_start and vm_stop.
+> + * cpu_get_ticks() uses units of the host CPU cycle counter.
+>   */
+>  int64_t cpu_get_ticks(void)
+>  {
+>      int64_t ticks;
+>  
+> -    if (icount_enabled()) {
+> -        return icount_get();
+> -    }
+> -
+>      qemu_spin_lock(&timers_state.vm_clock_lock);
+>      ticks = cpu_get_ticks_locked();
+>      qemu_spin_unlock(&timers_state.vm_clock_lock);
+> diff --git a/softmmu/cpus.c b/softmmu/cpus.c
+> index 54fdb2761c..bad6302ca3 100644
+> --- a/softmmu/cpus.c
+> +++ b/softmmu/cpus.c
+> @@ -87,7 +87,7 @@ bool cpu_is_stopped(CPUState *cpu)
+>      return cpu->stopped || !runstate_is_running();
+>  }
+>  
+> -static inline bool cpu_work_list_empty(CPUState *cpu)
+> +bool cpu_work_list_empty(CPUState *cpu)
+>  {
+>      bool ret;
+>  
+> @@ -97,7 +97,7 @@ static inline bool cpu_work_list_empty(CPUState *cpu)
+>      return ret;
+>  }
+>  
+> -static bool cpu_thread_is_idle(CPUState *cpu)
+> +bool cpu_thread_is_idle(CPUState *cpu)
+>  {
+>      if (cpu->stop || !cpu_work_list_empty(cpu)) {
+>          return false;
+> @@ -215,6 +215,11 @@ void hw_error(const char *fmt, ...)
+>      abort();
+>  }
+>  
+> +/*
+> + * The chosen accelerator is supposed to register this.
+> + */
+> +static CpusAccel *cpus_accel;
+> +
+>  void cpu_synchronize_all_states(void)
+>  {
+>      CPUState *cpu;
+> @@ -251,6 +256,102 @@ void cpu_synchronize_all_pre_loadvm(void)
+>      }
+>  }
+>  
+> +void cpu_synchronize_state(CPUState *cpu)
+> +{
+> +    if (cpus_accel && cpus_accel->synchronize_state) {
+> +        cpus_accel->synchronize_state(cpu);
+> +    }
+> +    if (kvm_enabled()) {
+> +        kvm_cpu_synchronize_state(cpu);
+> +    }
+> +    if (hax_enabled()) {
+> +        hax_cpu_synchronize_state(cpu);
+> +    }
+> +    if (whpx_enabled()) {
+> +        whpx_cpu_synchronize_state(cpu);
+> +    }
+> +}
+> +
+> +void cpu_synchronize_post_reset(CPUState *cpu)
+> +{
+> +    if (cpus_accel && cpus_accel->synchronize_post_reset) {
+> +        cpus_accel->synchronize_post_reset(cpu);
+> +    }
+> +    if (kvm_enabled()) {
+> +        kvm_cpu_synchronize_post_reset(cpu);
+> +    }
+> +    if (hax_enabled()) {
+> +        hax_cpu_synchronize_post_reset(cpu);
+> +    }
+> +    if (whpx_enabled()) {
+> +        whpx_cpu_synchronize_post_reset(cpu);
+> +    }
+> +}
+> +
+> +void cpu_synchronize_post_init(CPUState *cpu)
+> +{
+> +    if (cpus_accel && cpus_accel->synchronize_post_init) {
+> +        cpus_accel->synchronize_post_init(cpu);
+> +    }
+> +    if (kvm_enabled()) {
+> +        kvm_cpu_synchronize_post_init(cpu);
+> +    }
+> +    if (hax_enabled()) {
+> +        hax_cpu_synchronize_post_init(cpu);
+> +    }
+> +    if (whpx_enabled()) {
+> +        whpx_cpu_synchronize_post_init(cpu);
+> +    }
+> +}
+> +
+> +void cpu_synchronize_pre_loadvm(CPUState *cpu)
+> +{
+> +    if (cpus_accel && cpus_accel->synchronize_pre_loadvm) {
+> +        cpus_accel->synchronize_pre_loadvm(cpu);
+> +    }
+> +    if (kvm_enabled()) {
+> +        kvm_cpu_synchronize_pre_loadvm(cpu);
+> +    }
+> +    if (hax_enabled()) {
+> +        hax_cpu_synchronize_pre_loadvm(cpu);
+> +    }
+> +    if (hvf_enabled()) {
+> +        hvf_cpu_synchronize_pre_loadvm(cpu);
+> +    }
+> +    if (whpx_enabled()) {
+> +        whpx_cpu_synchronize_pre_loadvm(cpu);
+> +    }
+> +}
+> +
+> +int64_t cpus_get_virtual_clock(void)
+> +{
+> +    if (cpus_accel && cpus_accel->get_virtual_clock) {
+> +        return cpus_accel->get_virtual_clock();
+> +    }
+> +    if (icount_enabled()) {
+> +        return icount_get();
+> +    } else if (qtest_enabled()) { /* for qtest_clock_warp */
+> +        return qtest_get_virtual_clock();
+> +    }
+> +    return cpu_get_clock();
+> +}
+> +
+> +/*
+> + * return the time elapsed in VM between vm_start and vm_stop.  Unless
+> + * icount is active, cpu_get_ticks() uses units of the host CPU cycle
+> + * counter.
+> + */
+> +int64_t cpus_get_elapsed_ticks(void)
+> +{
+> +    if (cpus_accel && cpus_accel->get_elapsed_ticks) {
+> +        return cpus_accel->get_elapsed_ticks();
+> +    }
+> +    if (icount_enabled()) {
+> +        return icount_get();
+> +    }
+> +    return cpu_get_ticks();
+> +}
+> +
+>  static int do_vm_stop(RunState state, bool send_stop)
+>  {
+>      int ret = 0;
+> @@ -279,7 +380,7 @@ int vm_shutdown(void)
+>      return do_vm_stop(RUN_STATE_SHUTDOWN, false);
+>  }
+>  
+> -static bool cpu_can_run(CPUState *cpu)
+> +bool cpu_can_run(CPUState *cpu)
+>  {
+>      if (cpu->stop) {
+>          return false;
+> @@ -290,7 +391,7 @@ static bool cpu_can_run(CPUState *cpu)
+>      return true;
+>  }
+>  
+> -static void cpu_handle_guest_debug(CPUState *cpu)
+> +void cpu_handle_guest_debug(CPUState *cpu)
+>  {
+>      gdb_set_stop_cpu(cpu);
+>      qemu_system_debug_request();
+> @@ -396,7 +497,7 @@ static void qemu_cpu_stop(CPUState *cpu, bool exit)
+>      qemu_cond_broadcast(&qemu_pause_cond);
+>  }
+>  
+> -static void qemu_wait_io_event_common(CPUState *cpu)
+> +void qemu_wait_io_event_common(CPUState *cpu)
+>  {
+>      atomic_mb_set(&cpu->thread_kicked, false);
+>      if (cpu->stop) {
+> @@ -421,7 +522,7 @@ static void qemu_tcg_rr_wait_io_event(void)
+>      }
+>  }
+>  
+> -static void qemu_wait_io_event(CPUState *cpu)
+> +void qemu_wait_io_event(CPUState *cpu)
+>  {
+>      bool slept = false;
+>  
+> @@ -437,7 +538,8 @@ static void qemu_wait_io_event(CPUState *cpu)
+>      }
+>  
+>  #ifdef _WIN32
+> -    /* Eat dummy APC queued by qemu_cpu_kick_thread.  */
+> +    /* Eat dummy APC queued by qemu_cpu_kick_thread. */
+> +    /* NB!!! Should not this be if (hax_enabled)? Is this wrong for whpx? */
+>      if (!tcg_enabled()) {
+>          SleepEx(0, TRUE);
+>      }
+> @@ -467,8 +569,7 @@ static void *qemu_kvm_cpu_thread_fn(void *arg)
+>      kvm_init_cpu_signals(cpu);
+>  
+>      /* signal CPU creation */
+> -    cpu->created = true;
+> -    qemu_cond_signal(&qemu_cpu_cond);
+> +    cpu_thread_signal_created(cpu);
+>      qemu_guest_random_seed_thread_part2(cpu->random_seed);
+>  
+>      do {
+> @@ -482,8 +583,7 @@ static void *qemu_kvm_cpu_thread_fn(void *arg)
+>      } while (!cpu->unplug || cpu_can_run(cpu));
+>  
+>      qemu_kvm_destroy_vcpu(cpu);
+> -    cpu->created = false;
+> -    qemu_cond_signal(&qemu_cpu_cond);
+> +    cpu_thread_signal_destroyed(cpu);
+>      qemu_mutex_unlock_iothread();
+>      rcu_unregister_thread();
+>      return NULL;
+> @@ -511,8 +611,7 @@ static void *qemu_dummy_cpu_thread_fn(void *arg)
+>      sigaddset(&waitset, SIG_IPI);
+>  
+>      /* signal CPU creation */
+> -    cpu->created = true;
+> -    qemu_cond_signal(&qemu_cpu_cond);
+> +    cpu_thread_signal_created(cpu);
+>      qemu_guest_random_seed_thread_part2(cpu->random_seed);
+>  
+>      do {
+> @@ -660,8 +759,7 @@ static void deal_with_unplugged_cpus(void)
+>      CPU_FOREACH(cpu) {
+>          if (cpu->unplug && !cpu_can_run(cpu)) {
+>              qemu_tcg_destroy_vcpu(cpu);
+> -            cpu->created = false;
+> -            qemu_cond_signal(&qemu_cpu_cond);
+> +            cpu_thread_signal_destroyed(cpu);
+>              break;
+>          }
+>      }
+> @@ -688,9 +786,8 @@ static void *qemu_tcg_rr_cpu_thread_fn(void *arg)
+>      qemu_thread_get_self(cpu->thread);
+>  
+>      cpu->thread_id = qemu_get_thread_id();
+> -    cpu->created = true;
+>      cpu->can_do_io = 1;
+> -    qemu_cond_signal(&qemu_cpu_cond);
+> +    cpu_thread_signal_created(cpu);
+>      qemu_guest_random_seed_thread_part2(cpu->random_seed);
+>  
+>      /* wait for initial kick-off after machine start */
+> @@ -800,11 +897,9 @@ static void *qemu_hax_cpu_thread_fn(void *arg)
+>      qemu_thread_get_self(cpu->thread);
+>  
+>      cpu->thread_id = qemu_get_thread_id();
+> -    cpu->created = true;
+>      current_cpu = cpu;
+> -
+>      hax_init_vcpu(cpu);
+> -    qemu_cond_signal(&qemu_cpu_cond);
+> +    cpu_thread_signal_created(cpu);
+>      qemu_guest_random_seed_thread_part2(cpu->random_seed);
+>  
+>      do {
+> @@ -843,8 +938,7 @@ static void *qemu_hvf_cpu_thread_fn(void *arg)
+>      hvf_init_vcpu(cpu);
+>  
+>      /* signal CPU creation */
+> -    cpu->created = true;
+> -    qemu_cond_signal(&qemu_cpu_cond);
+> +    cpu_thread_signal_created(cpu);
+>      qemu_guest_random_seed_thread_part2(cpu->random_seed);
+>  
+>      do {
+> @@ -858,8 +952,7 @@ static void *qemu_hvf_cpu_thread_fn(void *arg)
+>      } while (!cpu->unplug || cpu_can_run(cpu));
+>  
+>      hvf_vcpu_destroy(cpu);
+> -    cpu->created = false;
+> -    qemu_cond_signal(&qemu_cpu_cond);
+> +    cpu_thread_signal_destroyed(cpu);
+>      qemu_mutex_unlock_iothread();
+>      rcu_unregister_thread();
+>      return NULL;
+> @@ -884,8 +977,7 @@ static void *qemu_whpx_cpu_thread_fn(void *arg)
+>      }
+>  
+>      /* signal CPU creation */
+> -    cpu->created = true;
+> -    qemu_cond_signal(&qemu_cpu_cond);
+> +    cpu_thread_signal_created(cpu);
+>      qemu_guest_random_seed_thread_part2(cpu->random_seed);
+>  
+>      do {
+> @@ -902,8 +994,7 @@ static void *qemu_whpx_cpu_thread_fn(void *arg)
+>      } while (!cpu->unplug || cpu_can_run(cpu));
+>  
+>      whpx_destroy_vcpu(cpu);
+> -    cpu->created = false;
+> -    qemu_cond_signal(&qemu_cpu_cond);
+> +    cpu_thread_signal_destroyed(cpu);
+>      qemu_mutex_unlock_iothread();
+>      rcu_unregister_thread();
+>      return NULL;
+> @@ -936,10 +1027,9 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
+>      qemu_thread_get_self(cpu->thread);
+>  
+>      cpu->thread_id = qemu_get_thread_id();
+> -    cpu->created = true;
+>      cpu->can_do_io = 1;
+>      current_cpu = cpu;
+> -    qemu_cond_signal(&qemu_cpu_cond);
+> +    cpu_thread_signal_created(cpu);
+>      qemu_guest_random_seed_thread_part2(cpu->random_seed);
+>  
+>      /* process any pending work */
+> @@ -980,14 +1070,13 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
+>      } while (!cpu->unplug || cpu_can_run(cpu));
+>  
+>      qemu_tcg_destroy_vcpu(cpu);
+> -    cpu->created = false;
+> -    qemu_cond_signal(&qemu_cpu_cond);
+> +    cpu_thread_signal_destroyed(cpu);
+>      qemu_mutex_unlock_iothread();
+>      rcu_unregister_thread();
+>      return NULL;
+>  }
+>  
+> -static void qemu_cpu_kick_thread(CPUState *cpu)
+> +void cpus_kick_thread(CPUState *cpu)
+>  {
+>  #ifndef _WIN32
+>      int err;
+> @@ -1017,7 +1106,10 @@ static void qemu_cpu_kick_thread(CPUState *cpu)
+>  void qemu_cpu_kick(CPUState *cpu)
+>  {
+>      qemu_cond_broadcast(cpu->halt_cond);
+> -    if (tcg_enabled()) {
+> +
+> +    if (cpus_accel && cpus_accel->kick_vcpu_thread) {
+> +        cpus_accel->kick_vcpu_thread(cpu);
+> +    } else if (tcg_enabled()) {
+>          if (qemu_tcg_mttcg_enabled()) {
+>              cpu_exit(cpu);
+>          } else {
+> @@ -1031,14 +1123,14 @@ void qemu_cpu_kick(CPUState *cpu)
+>               */
+>              cpu->exit_request = 1;
+>          }
+> -        qemu_cpu_kick_thread(cpu);
+> +        cpus_kick_thread(cpu);
+>      }
+>  }
+>  
+>  void qemu_cpu_kick_self(void)
+>  {
+>      assert(current_cpu);
+> -    qemu_cpu_kick_thread(current_cpu);
+> +    cpus_kick_thread(current_cpu);
+>  }
+>  
+>  bool qemu_cpu_is_self(CPUState *cpu)
+> @@ -1088,6 +1180,21 @@ void qemu_cond_timedwait_iothread(QemuCond *cond, int ms)
+>      qemu_cond_timedwait(cond, &qemu_global_mutex, ms);
+>  }
+>  
+> +/* signal CPU creation */
+> +void cpu_thread_signal_created(CPUState *cpu)
+> +{
+> +    cpu->created = true;
+> +    qemu_cond_signal(&qemu_cpu_cond);
+> +}
+> +
+> +/* signal CPU destruction */
+> +void cpu_thread_signal_destroyed(CPUState *cpu)
+> +{
+> +    cpu->created = false;
+> +    qemu_cond_signal(&qemu_cpu_cond);
+> +}
+> +
+> +
+>  static bool all_vcpus_paused(void)
+>  {
+>      CPUState *cpu;
+> @@ -1163,9 +1270,6 @@ void cpu_remove_sync(CPUState *cpu)
+>      qemu_mutex_lock_iothread();
+>  }
+>  
+> -/* For temporary buffers for forming a name */
+> -#define VCPU_THREAD_NAME_SIZE 16
+> -
+>  static void qemu_tcg_init_vcpu(CPUState *cpu)
+>  {
+>      char thread_name[VCPU_THREAD_NAME_SIZE];
+> @@ -1286,6 +1390,13 @@ static void qemu_whpx_start_vcpu(CPUState *cpu)
+>  #endif
+>  }
+>  
+> +void cpus_register_accel(CpusAccel *ca)
+> +{
+> +    assert(ca != NULL);
+> +    assert(ca->create_vcpu_thread != NULL); /* mandatory */
+> +    cpus_accel = ca;
+> +}
+> +
+>  static void qemu_dummy_start_vcpu(CPUState *cpu)
+>  {
+>      char thread_name[VCPU_THREAD_NAME_SIZE];
+> @@ -1316,7 +1427,10 @@ void qemu_init_vcpu(CPUState *cpu)
+>          cpu_address_space_init(cpu, 0, "cpu-memory", cpu->memory);
+>      }
+>  
+> -    if (kvm_enabled()) {
+> +    if (cpus_accel) {
+> +        /* accelerator already implements the CpusAccel interface */
+> +        cpus_accel->create_vcpu_thread(cpu);
+> +    } else if (kvm_enabled()) {
+>          qemu_kvm_start_vcpu(cpu);
+>      } else if (hax_enabled()) {
+>          qemu_hax_start_vcpu(cpu);
+> diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
+> index e97ad407fa..16345eec43 100644
+> --- a/stubs/Makefile.objs
+> +++ b/stubs/Makefile.objs
+> @@ -1,6 +1,7 @@
+>  stub-obj-y += blk-commit-all.o
+>  stub-obj-y += cmos.o
+>  stub-obj-y += cpu-get-clock.o
+> +stub-obj-y += cpus-get-virtual-clock.o
+>  stub-obj-y += qemu-timer-notify-cb.o
+>  stub-obj-y += icount.o
+>  stub-obj-y += dump.o
+> @@ -28,6 +29,7 @@ stub-obj-y += trace-control.o
+>  stub-obj-y += vmgenid.o
+>  stub-obj-y += vmstate.o
+>  stub-obj-$(CONFIG_SOFTMMU) += win32-kbd-hook.o
+> +stub-obj-y += cpu-synchronize-state.o
+>  
+>  #######################################################################
+>  # code used by both qemu system emulation and qemu-img
+> diff --git a/stubs/cpu-synchronize-state.c b/stubs/cpu-synchronize-state.c
+> new file mode 100644
+> index 0000000000..3112fe439d
+> --- /dev/null
+> +++ b/stubs/cpu-synchronize-state.c
+> @@ -0,0 +1,15 @@
+> +#include "qemu/osdep.h"
+> +#include "sysemu/hw_accel.h"
+> +
+> +void cpu_synchronize_state(CPUState *cpu)
+> +{
+> +}
+> +void cpu_synchronize_post_reset(CPUState *cpu)
+> +{
+> +}
+> +void cpu_synchronize_post_init(CPUState *cpu)
+> +{
+> +}
+> +void cpu_synchronize_pre_loadvm(CPUState *cpu)
+> +{
+> +}
+> diff --git a/stubs/cpus-get-virtual-clock.c b/stubs/cpus-get-virtual-clock.c
+> new file mode 100644
+> index 0000000000..fd447d53f3
+> --- /dev/null
+> +++ b/stubs/cpus-get-virtual-clock.c
+> @@ -0,0 +1,8 @@
+> +#include "qemu/osdep.h"
+> +#include "sysemu/cpu-timers.h"
+> +#include "qemu/main-loop.h"
+> +
+> +int64_t cpus_get_virtual_clock(void)
+> +{
+> +    return cpu_get_clock();
+> +}
+> diff --git a/util/qemu-timer.c b/util/qemu-timer.c
+> index db51e68f25..50b325c65b 100644
+> --- a/util/qemu-timer.c
+> +++ b/util/qemu-timer.c
+> @@ -635,13 +635,7 @@ int64_t qemu_clock_get_ns(QEMUClockType type)
+>          return get_clock();
+>      default:
+>      case QEMU_CLOCK_VIRTUAL:
+> -        if (icount_enabled()) {
+> -            return icount_get();
+> -        } else if (qtest_enabled()) { /* for qtest_clock_warp */
+> -            return qtest_get_virtual_clock();
+> -        } else {
+> -            return cpu_get_clock();
+> -        }
+> +        return cpus_get_virtual_clock();
+>      case QEMU_CLOCK_HOST:
+>          return REPLAY_CLOCK(REPLAY_CLOCK_HOST, get_clock_realtime());
+>      case QEMU_CLOCK_VIRTUAL_RT:
+> 
 
 
