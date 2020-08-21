@@ -2,72 +2,71 @@ Return-Path: <SRS0=atk5=B7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NORMAL_HTTP_TO_IP,NUMERIC_HTTP_ADDR,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A24FC433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 10:28:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99B5AC433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 10:29:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D9EEA20748
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 10:28:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 63D7320748
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 10:29:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c7LM9AAT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9EEA20748
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="If6nUiX6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63D7320748
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54088 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55428 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k94I2-00026v-5m
-	for qemu-devel@archiver.kernel.org; Fri, 21 Aug 2020 06:28:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59348)
+	id 1k94IC-0002dl-Ls
+	for qemu-devel@archiver.kernel.org; Fri, 21 Aug 2020 06:29:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59504)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k94D3-0000T3-Cs
- for qemu-devel@nongnu.org; Fri, 21 Aug 2020 06:23:45 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47073)
+ id 1k94DB-0000my-Be
+ for qemu-devel@nongnu.org; Fri, 21 Aug 2020 06:23:53 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:32213)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k94D1-0001QU-Ei
- for qemu-devel@nongnu.org; Fri, 21 Aug 2020 06:23:45 -0400
+ id 1k94D8-0001SN-Uu
+ for qemu-devel@nongnu.org; Fri, 21 Aug 2020 06:23:53 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598005421;
+ s=mimecast20190719; t=1598005430;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=dVGF3E7lJx6P6MKIaUk/hhZTTCuLXFQFlFFNyp8bJj4=;
- b=c7LM9AATke7QS33QntnK76v3Rma8DDFTd+utM9POvqsKmDtxSl1RSdM44uvd4ms1NYGxd+
- oUOm1Yzr+2Jp1AnTGqPTYTOYaVFnG9EIhWGzvl0NezS6iBsjNkXfM1DI/M+c+BQ27sv8T3
- +VZMN2qfNh/bfwMmDQs3swf7onn2/0c=
+ bh=rgLa8OOgysOf7Sl9OK2QDbGQukQVDXrVrkDaQKpgc84=;
+ b=If6nUiX6b5/CirERaLZb5mNdcyANTf8Dw3YsHXx0MLaINrv+N5pWeO6UtqyLt6K8TdyMpl
+ uYswYosSIvl6taJUisSn6LXL3DsC4MLN6sRMsMCrgkpQRCqinWkVinlL16GOyPdT8jCLc7
+ BOZRQd/EKysTwhHEAlFlCKsCwMZBCCs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-303--OSF2e7WPhObF1C6GH5qBg-1; Fri, 21 Aug 2020 06:23:38 -0400
-X-MC-Unique: -OSF2e7WPhObF1C6GH5qBg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-211-6JMFfSczNLqJQfJTOjmoZw-1; Fri, 21 Aug 2020 06:23:48 -0400
+X-MC-Unique: 6JMFfSczNLqJQfJTOjmoZw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 80052191E2A1
- for <qemu-devel@nongnu.org>; Fri, 21 Aug 2020 10:23:37 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C32838030D1
+ for <qemu-devel@nongnu.org>; Fri, 21 Aug 2020 10:23:47 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3D79E19C78;
- Fri, 21 Aug 2020 10:23:37 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 909805DA74
+ for <qemu-devel@nongnu.org>; Fri, 21 Aug 2020 10:23:47 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v8 003/152] pc-bios/s390-ccw: do not use rules.mak
-Date: Fri, 21 Aug 2020 06:21:00 -0400
-Message-Id: <20200821102329.29777-4-pbonzini@redhat.com>
+Subject: [PULL v8 015/152] tests/vm: include setuptools
+Date: Fri, 21 Aug 2020 06:21:12 -0400
+Message-Id: <20200821102329.29777-16-pbonzini@redhat.com>
 In-Reply-To: <20200821102329.29777-1-pbonzini@redhat.com>
 References: <20200821102329.29777-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0.0
@@ -97,50 +96,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Thomas Huth <thuth@redhat.com>
+They are a dependency of Meson, so install them.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- pc-bios/s390-ccw/Makefile | 18 +++++++++++++++++-
- 1 file changed, 17 insertions(+), 1 deletion(-)
+ tests/vm/freebsd | 1 +
+ tests/vm/netbsd  | 1 +
+ tests/vm/openbsd | 1 +
+ 3 files changed, 3 insertions(+)
 
-diff --git a/pc-bios/s390-ccw/Makefile b/pc-bios/s390-ccw/Makefile
-index 50bc880272..cc0f77baa6 100644
---- a/pc-bios/s390-ccw/Makefile
-+++ b/pc-bios/s390-ccw/Makefile
-@@ -3,10 +3,26 @@ all: build-all
- 	@true
+diff --git a/tests/vm/freebsd b/tests/vm/freebsd
+index 29252fa4a6..b34b14fc53 100755
+--- a/tests/vm/freebsd
++++ b/tests/vm/freebsd
+@@ -33,6 +33,7 @@ class FreeBSDVM(basevm.BaseVM):
+         "pkgconf",
+         "bzip2",
+         "python37",
++        "py37-setuptools",
  
- include ../../config-host.mak
--include $(SRC_PATH)/rules.mak
+         # gnu tools
+         "bash",
+diff --git a/tests/vm/netbsd b/tests/vm/netbsd
+index 2e87199211..93d48b6fdd 100755
+--- a/tests/vm/netbsd
++++ b/tests/vm/netbsd
+@@ -31,6 +31,7 @@ class NetBSDVM(basevm.BaseVM):
+         "pkgconf",
+         "xz",
+         "python37",
++        "py37-setuptools",
  
-+quiet-command = $(if $(V),$1,$(if $(2),@printf "  %-7s %s\n" $2 $3 && $1, @$1))
-+cc-option = $(if $(shell $(CC) $1 -S -o /dev/null -xc /dev/null > /dev/null \
-+	      2>&1 && echo OK), $1, $2)
-+
-+VPATH_SUFFIXES = %.c %.h %.S %.m %.mak %.sh %.rc Kconfig% %.json.in
-+set-vpath = $(if $1,$(foreach PATTERN,$(VPATH_SUFFIXES),$(eval vpath $(PATTERN) $1)))
- $(call set-vpath, $(SRC_PATH)/pc-bios/s390-ccw)
+         # gnu tools
+         "bash",
+diff --git a/tests/vm/openbsd b/tests/vm/openbsd
+index dfe633e453..7e27fda642 100755
+--- a/tests/vm/openbsd
++++ b/tests/vm/openbsd
+@@ -30,6 +30,7 @@ class OpenBSDVM(basevm.BaseVM):
+         "git",
+         "pkgconf",
+         "bzip2", "xz",
++        "py3-setuptools",
  
-+# Flags for dependency generation
-+QEMU_DGFLAGS = -MMD -MP -MT $@ -MF $(@D)/$(*F).d
-+
-+%.o: %.c
-+	$(call quiet-command,$(CC) $(QEMU_CFLAGS) $(QEMU_DGFLAGS) $(CFLAGS) \
-+	       -c -o $@ $<,"CC","$(TARGET_DIR)$@")
-+
-+%.o: %.S
-+	$(call quiet-command,$(CCAS) $(QEMU_CFLAGS) $(QEMU_DGFLAGS) $(CFLAGS) \
-+	       -c -o $@ $<,"CCAS","$(TARGET_DIR)$@")
-+
- .PHONY : all clean build-all
- 
- OBJECTS = start.o main.o bootmap.o jump2ipl.o sclp.o menu.o \
+         # gnu tools
+         "bash",
 -- 
 2.26.2
 
