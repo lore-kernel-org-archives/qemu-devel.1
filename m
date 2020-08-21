@@ -7,70 +7,70 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BEB13C433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 17:45:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EACDC433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 17:47:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 901C02075E
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 17:45:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7010720702
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 17:47:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MW7F0ENT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 901C02075E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aS5vlcL8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7010720702
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48670 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53860 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k9B6R-0003Dg-S8
-	for qemu-devel@archiver.kernel.org; Fri, 21 Aug 2020 13:45:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57602)
+	id 1k9B85-0005RU-OB
+	for qemu-devel@archiver.kernel.org; Fri, 21 Aug 2020 13:47:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57548)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k9ArX-0001uO-6e; Fri, 21 Aug 2020 13:29:59 -0400
-Received: from mail-wr1-x431.google.com ([2a00:1450:4864:20::431]:38062)
+ id 1k9ArS-0001og-5h; Fri, 21 Aug 2020 13:29:55 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:50812)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k9ArU-0001Gw-CF; Fri, 21 Aug 2020 13:29:58 -0400
-Received: by mail-wr1-x431.google.com with SMTP id w13so2335082wrk.5;
- Fri, 21 Aug 2020 10:29:54 -0700 (PDT)
+ id 1k9ArQ-0001G5-Gy; Fri, 21 Aug 2020 13:29:53 -0400
+Received: by mail-wm1-x342.google.com with SMTP id t2so2399504wma.0;
+ Fri, 21 Aug 2020 10:29:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=7MDjqCYoGN9RsgmgtLGjf6jZggXntu+eUZw2U4ch4n0=;
- b=MW7F0ENTmRAsnb35u56Sy4I7+q5C1nGvAV68vJlxQAT2lLQcSrTDTLzTCMcDgxs84p
- wcd2WW24QQpd6254CONOUocMG3gt0ymPzcvfhGOwpIOBZpx9cxmBShRBrblh1ltCLFSv
- PhVTJxWDQyqja2yuhfN04Z3/7xwFve2UsI9NgFqluRF5TCTZ3EjBXLj+HOraG4Ezeswj
- QBjXkf3DWSnhIwIgkVYCzur/0f+eNMGthxmNpMj/n7Dl+KhY09WrCG9YBApxqDlkrMTu
- RaOL+Nje3k+k8ilR1kfSAnghsH7x+oajKFOdVhuvIVBWNs8xTCwu0NRrjhF666fhHIt+
- peHg==
+ bh=IZ0mmUXtbJnn9Ui7y/DaJV/VanYdeWJm2wImQIUXZuc=;
+ b=aS5vlcL8qehB+U2J50NH4eZyAOfZ+PhXUR22+pGkmktPjbaysW9ylCWg03AEvurp8v
+ kYwbN9TDynqtBc4Zpg+9K6l55Hl5oldB/jP/4JqN7zRn2unptpoBaUAni7ucYd7KsN29
+ qmqSj/ykYwBOUdeahnwj4Y9QPta4jCWiTewboU5tGtsDxlXKCSTZfhZWWvx3vTjFnIGP
+ LACFlNhVRnPyJlUX3jqMZ3W9m9AeFUIpuWgHWPdNRv1sRLfTI510aX2oxsFk5aqv1R/p
+ v60C0i7HdsRRr4pLYOJl638AO4TRZ0ONhhgKfsKc6eZsprz07fKWRAZI5PK4cxNFtvV7
+ kMLw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=7MDjqCYoGN9RsgmgtLGjf6jZggXntu+eUZw2U4ch4n0=;
- b=ddSX3nzSU97/CB3QmVRGJcAEoGu99z1qjcb73jMFk/TIy4mZipm9Uq8mebMB/1UDHx
- dj9J7y6Iqf1yqLcF/Qpydm62XJcBk7UTqs66cTa3ScL8YiteXMccpFxXxdZqJ4jnlh2o
- VBW0o/ToHhF+3pUYLNRaxmV/3CSB5cLddAjnqAwVS3oBlsMdMyZQUjwCTzh030hnClXs
- NvzIcrr533rnjBU3s3Yexx52VKCQ5qIXcWu24OuaeqMkIIDeFRT0LxmVYM10qsM3nylO
- SnEBppTbuVDyLh2XRiM6VsCWmcaxKdb/JVdT4AZzPtVip/iJhucXpy8f2O/VFzY/caFe
- Cslw==
-X-Gm-Message-State: AOAM530UGvsYVZWKUwpA9gNXeN1uO9d9Kx+TjD9vHqJOdRQ+UsUBCXuP
- GLU3O2DtpCdI7CIOW2N8ifXXUtIg8CQ=
-X-Google-Smtp-Source: ABdhPJxBX/2wYha+rIGx/AQJx4hoy7a3lGS+JtbJLmoGscR0j9TxuodKjYsi+xtTrHwS2zRQ0kNT0A==
-X-Received: by 2002:adf:ab57:: with SMTP id r23mr1834762wrc.386.1598030993404; 
- Fri, 21 Aug 2020 10:29:53 -0700 (PDT)
+ bh=IZ0mmUXtbJnn9Ui7y/DaJV/VanYdeWJm2wImQIUXZuc=;
+ b=Wj6Uk75awjAKBxNF/UpVLhgx4bdxvic/o7ivsAAaFVa9YuDuKY+K9NS/11GK0K+aj0
+ oUtO3eQjoUQJ4LbET4okEIuDHZHsU0hw80KGS/ce5Umada1wobauq2pPn5Pmy+WDB6A2
+ 4tinVSL0A3M2nxnmrwUQmRt9rssiqQbIVax1fkD5tO1L8gje8LK0rWorvdiL9CW16Fpi
+ H7mzXCefOXoR7NvmxF9WHFwMuk2r3K92yhq6M+F3sPK3SBkLbCt2E/8RKeljfHZH63YU
+ MWcEBxsf3KW+BKLzSl+VHBlHcNfUO3fKBtNJO7rKb3qSpRcUSLA25Ppcf+Z8FVSpdRfg
+ ZSug==
+X-Gm-Message-State: AOAM532t89XjvOGMdElHj/uarYCXNskXPcG2g1QwNL49NoB19XjH+/aT
+ JAXfx/G9W5kYy0Pa1Cxaw3y+jFxjcEc=
+X-Google-Smtp-Source: ABdhPJyGmxM9LZBu923ZkZzMHsKZ5DdRdF3tc7MiDvx257PgTryKKwfLUPu2PaIkVQU0h723M/eH7A==
+X-Received: by 2002:a1c:6243:: with SMTP id w64mr4079410wmb.3.1598030990045;
+ Fri, 21 Aug 2020 10:29:50 -0700 (PDT)
 Received: from localhost.localdomain (121.red-81-40-121.staticip.rima-tde.net.
  [81.40.121.121])
- by smtp.gmail.com with ESMTPSA id 32sm5315471wrn.86.2020.08.21.10.29.51
+ by smtp.gmail.com with ESMTPSA id 32sm5315471wrn.86.2020.08.21.10.29.48
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 21 Aug 2020 10:29:52 -0700 (PDT)
+ Fri, 21 Aug 2020 10:29:49 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 22/23] hw/sd: Fix incorrect populated function switch status
- data structure
-Date: Fri, 21 Aug 2020 19:29:15 +0200
-Message-Id: <20200821172916.1260954-23-f4bug@amsat.org>
+Subject: [PULL 20/23] hw/sd: Add sdbus_read_data() to read multiples bytes on
+ the data line
+Date: Fri, 21 Aug 2020 19:29:13 +0200
+Message-Id: <20200821172916.1260954-21-f4bug@amsat.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200821172916.1260954-1-f4bug@amsat.org>
 References: <20200821172916.1260954-1-f4bug@amsat.org>
@@ -78,8 +78,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::431;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x431.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::342;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x342.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -102,9 +102,8 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-block@nongnu.org,
- Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Bin Meng <bin.meng@windriver.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
  Andrew Baumann <Andrew.Baumann@microsoft.com>,
  Beniamino Galvani <b.galvani@gmail.com>, Michael Walle <michael@walle.cc>,
@@ -113,45 +112,65 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Bin Meng <bin.meng@windriver.com>
+Add a sdbus_read_data() method to read multiple bytes on the
+data line of a SD bus.
+We might improve the tracing later, for now keep logging each
+byte individually.
 
-At present the function switch status data structure bit [399:376]
-are wrongly pupulated. These 3 bytes encode function switch status
-for the 6 function groups, with 4 bits per group, starting from
-function group 6 at bit 399, then followed by function group 5 at
-bit 395, and so on.
-
-However the codes mistakenly fills in the function group 1 status
-at bit 399. This fixes the code logic.
-
-Fixes: a1bb27b1e9 ("SD card emulation (initial implementation)")
-Signed-off-by: Bin Meng <bin.meng@windriver.com>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Tested-by: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
-Message-Id: <1598021136-49525-1-git-send-email-bmeng.cn@gmail.com>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20200814092346.21825-7-f4bug@amsat.org>
 ---
- hw/sd/sd.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ include/hw/sd/sd.h |  9 +++++++++
+ hw/sd/core.c       | 15 +++++++++++++++
+ 2 files changed, 24 insertions(+)
 
-diff --git a/hw/sd/sd.c b/hw/sd/sd.c
-index 7c9d956f113..805e21fc883 100644
---- a/hw/sd/sd.c
-+++ b/hw/sd/sd.c
-@@ -807,11 +807,12 @@ static void sd_function_switch(SDState *sd, uint32_t arg)
-     sd->data[11] = 0x43;
-     sd->data[12] = 0x80;	/* Supported group 1 functions */
-     sd->data[13] = 0x03;
+diff --git a/include/hw/sd/sd.h b/include/hw/sd/sd.h
+index 3ae3e8939b3..ac02d61a7a0 100644
+--- a/include/hw/sd/sd.h
++++ b/include/hw/sd/sd.h
+@@ -184,6 +184,15 @@ uint8_t sdbus_read_byte(SDBus *sd);
+  * Write multiple bytes of data on the data lines of a SD bus.
+  */
+ void sdbus_write_data(SDBus *sdbus, const void *buf, size_t length);
++/**
++ * Read data from a SD bus.
++ * @sdbus: bus
++ * @buf: buffer to read data into
++ * @length: number of bytes to read
++ *
++ * Read multiple bytes of data on the data lines of a SD bus.
++ */
++void sdbus_read_data(SDBus *sdbus, void *buf, size_t length);
+ bool sdbus_data_ready(SDBus *sd);
+ bool sdbus_get_inserted(SDBus *sd);
+ bool sdbus_get_readonly(SDBus *sd);
+diff --git a/hw/sd/core.c b/hw/sd/core.c
+index 9c2781ebf96..957d116f1a7 100644
+--- a/hw/sd/core.c
++++ b/hw/sd/core.c
+@@ -144,6 +144,21 @@ uint8_t sdbus_read_byte(SDBus *sdbus)
+     return value;
+ }
+ 
++void sdbus_read_data(SDBus *sdbus, void *buf, size_t length)
++{
++    SDState *card = get_card(sdbus);
++    uint8_t *data = buf;
 +
-     for (i = 0; i < 6; i ++) {
-         new_func = (arg >> (i * 4)) & 0x0f;
-         if (mode && new_func != 0x0f)
-             sd->function_group[i] = new_func;
--        sd->data[14 + (i >> 1)] = new_func << ((i * 4) & 4);
-+        sd->data[16 - (i >> 1)] |= new_func << ((i % 2) * 4);
-     }
-     memset(&sd->data[17], 0, 47);
-     stw_be_p(sd->data + 64, sd_crc16(sd->data, 64));
++    if (card) {
++        SDCardClass *sc = SD_CARD_GET_CLASS(card);
++
++        for (size_t i = 0; i < length; i++) {
++            data[i] = sc->read_byte(card);
++            trace_sdbus_read(sdbus_name(sdbus), data[i]);
++        }
++    }
++}
++
+ bool sdbus_data_ready(SDBus *sdbus)
+ {
+     SDState *card = get_card(sdbus);
 -- 
 2.26.2
 
