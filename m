@@ -2,70 +2,91 @@ Return-Path: <SRS0=atk5=B7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15D46C433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 09:09:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ADCCFC433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 09:16:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CAA1620720
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 09:09:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CAA1620720
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 44525207DA
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 09:16:50 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HdjIDtf1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 44525207DA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60116 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38744 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k933D-0001R3-Sy
-	for qemu-devel@archiver.kernel.org; Fri, 21 Aug 2020 05:09:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44270)
+	id 1k93AH-0004mK-Do
+	for qemu-devel@archiver.kernel.org; Fri, 21 Aug 2020 05:16:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45872)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1k932V-0000rf-Td; Fri, 21 Aug 2020 05:08:47 -0400
-Resent-Date: Fri, 21 Aug 2020 05:08:47 -0400
-Resent-Message-Id: <E1k932V-0000rf-Td@lists.gnu.org>
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21737)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1k939W-00048e-ET
+ for qemu-devel@nongnu.org; Fri, 21 Aug 2020 05:16:02 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:46787
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1k932T-0000u1-7Q; Fri, 21 Aug 2020 05:08:47 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1598000910; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=b/nPUhHnJ7KyyPdACJ8duCj2w+7vGAKjM0/aisTakVFIjtdQ8Ue24LhwLhHnx3495QAEunkmTZOXMCcgKpuwswqy1uXQpX2VUcQYKOUEEDtHDSjOchZxJv/PAQ7kzLqOwIFQLvC1sY7ZBnnFJzhU3zOXH2VdVSxhkav+Gjh18C4=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1598000910;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=SUx9td7tRxWBycnBuX9UqkG6RxsdV2PWiBT5D+HS6vo=; 
- b=RNnZqNsp7ufrHvpgLAynySTPnYM2tLlgHRWDLw12YfQ610Db8+ofXMXh745TPjjuX+/kSG+KJ+8KwJ6JHkkoHDSCE3xS8wI8QHKtTX4yfjoviFScb7tVToqOAl+4gAI63TdACBIk4ogPQR6h9zDRt2/wVBR4VYZ9Znx5rV58MeI=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 15980009082081001.6626114745343;
- Fri, 21 Aug 2020 02:08:28 -0700 (PDT)
-Subject: Re: [PATCH] hw/arm/sbsa-ref: fix typo breaking PCIe IRQs
-Message-ID: <159800090688.18714.2270521033691750020@66eaa9a8a123>
-In-Reply-To: <20200821083853.356490-1-graeme@nuviainc.com>
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1k939T-0001qJ-4z
+ for qemu-devel@nongnu.org; Fri, 21 Aug 2020 05:16:01 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1598001356;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=4uhcSzcyCJ7jzmaEHzdokVvSLJcE70l9ujCXR+ILbwI=;
+ b=HdjIDtf1e5yGD5/1dNi6nm+lmwZgAPbwwmD9cCQ1Z2FtENQvYOIvZQKz6tS5bWrpNugjpH
+ TUkCHxg71UWfQy+CtlWUoIpsXISxT4f42QP31QsEwDTXQXfiuvLlTMWzdqCLx+VQ0ewD8S
+ iOTS/puiihTZdQ5Rc3k1428vfdHN1FU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-241-x7JnIFwAMFSt7PP_HgdrrA-1; Fri, 21 Aug 2020 05:15:54 -0400
+X-MC-Unique: x7JnIFwAMFSt7PP_HgdrrA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6F349107464F;
+ Fri, 21 Aug 2020 09:15:53 +0000 (UTC)
+Received: from redhat.com (unknown [10.36.110.21])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9014B7A5E4;
+ Fri, 21 Aug 2020 09:15:51 +0000 (UTC)
+Date: Fri, 21 Aug 2020 10:15:48 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Subject: Re: [PATCH] configure: add support for psuedo-"in source tree" builds
+Message-ID: <20200821091548.GD251583@redhat.com>
+References: <20200820165543.215372-1-berrange@redhat.com>
+ <938bfa57-01f9-a50a-6439-0965c91dce1b@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: graeme@nuviainc.com
-Date: Fri, 21 Aug 2020 02:08:28 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o57.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/21 05:08:41
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+In-Reply-To: <938bfa57-01f9-a50a-6439-0965c91dce1b@redhat.com>
+User-Agent: Mutt/1.14.5 (2020-06-23)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=berrange@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/21 05:15:56
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -79,48 +100,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: graeme@nuviainc.com, peter.maydell@linaro.org, rad@semihalf.com,
- qemu-devel@nongnu.org, qemu-arm@nongnu.org, leif@nuviainc.com,
- philmd@redhat.com
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
+ Stefan Hajnoczi <stefanha@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDgyMTA4Mzg1My4zNTY0
-OTAtMS1ncmFlbWVAbnV2aWFpbmMuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUg
-ZG9ja2VyLXF1aWNrQGNlbnRvczcgYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3Rpbmcg
-Y29tbWFuZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3Rh
-bGxlZCwgeW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFND
-UklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKbWFrZSBkb2NrZXItaW1hZ2UtY2VudG9zNyBWPTEg
-TkVUV09SSz0xCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1xdWlja0BjZW50b3M3IFNIT1dfRU5WPTEg
-Sj0xNCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCiAgVEVTVCAgICBjaGVjay11
-bml0OiB0ZXN0cy90ZXN0LWNoYXIKVW5leHBlY3RlZCBlcnJvciBpbiBvYmplY3RfcHJvcGVydHlf
-dHJ5X2FkZCgpIGF0IC90bXAvcWVtdS10ZXN0L3NyYy9xb20vb2JqZWN0LmM6MTE4MToKYXR0ZW1w
-dCB0byBhZGQgZHVwbGljYXRlIHByb3BlcnR5ICdzZXJpYWwtaWQnIHRvIG9iamVjdCAodHlwZSAn
-Y29udGFpbmVyJykKRVJST1IgdGVzdC1jaGFyIC0gdG9vIGZldyB0ZXN0cyBydW4gKGV4cGVjdGVk
-IDM4LCBnb3QgOSkKbWFrZTogKioqIFtjaGVjay11bml0XSBFcnJvciAxCm1ha2U6ICoqKiBXYWl0
-aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4uCiAgVEVTVCAgICBpb3Rlc3QtcWNvdzI6IDAyOQog
-IFRFU1QgICAgY2hlY2stcXRlc3QteDg2XzY0OiB0ZXN0cy9xdGVzdC9oZC1nZW8tdGVzdAotLS0K
-ICAgIHJhaXNlIENhbGxlZFByb2Nlc3NFcnJvcihyZXRjb2RlLCBjbWQpCnN1YnByb2Nlc3MuQ2Fs
-bGVkUHJvY2Vzc0Vycm9yOiBDb21tYW5kICdbJ3N1ZG8nLCAnLW4nLCAnZG9ja2VyJywgJ3J1bics
-ICctLWxhYmVsJywgJ2NvbS5xZW11Lmluc3RhbmNlLnV1aWQ9ZDAyMDU0MWQ4Mjc4NGNiMmFjODA0
-OTk0MjIwYmE0ZWMnLCAnLXUnLCAnMTAwMScsICctLXNlY3VyaXR5LW9wdCcsICdzZWNjb21wPXVu
-Y29uZmluZWQnLCAnLS1ybScsICctZScsICdUQVJHRVRfTElTVD0nLCAnLWUnLCAnRVhUUkFfQ09O
-RklHVVJFX09QVFM9JywgJy1lJywgJ1Y9JywgJy1lJywgJ0o9MTQnLCAnLWUnLCAnREVCVUc9Jywg
-Jy1lJywgJ1NIT1dfRU5WPTEnLCAnLWUnLCAnQ0NBQ0hFX0RJUj0vdmFyL3RtcC9jY2FjaGUnLCAn
-LXYnLCAnL2hvbWUvcGF0Y2hldy8uY2FjaGUvcWVtdS1kb2NrZXItY2NhY2hlOi92YXIvdG1wL2Nj
-YWNoZTp6JywgJy12JywgJy92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC1xNGZkNmNrcC9zcmMv
-ZG9ja2VyLXNyYy4yMDIwLTA4LTIxLTA0LjUyLjI5LjI5MDY3Oi92YXIvdG1wL3FlbXU6eixybycs
-ICdxZW11L2NlbnRvczcnLCAnL3Zhci90bXAvcWVtdS9ydW4nLCAndGVzdC1xdWljayddJyByZXR1
-cm5lZCBub24temVybyBleGl0IHN0YXR1cyAyLgpmaWx0ZXI9LS1maWx0ZXI9bGFiZWw9Y29tLnFl
-bXUuaW5zdGFuY2UudXVpZD1kMDIwNTQxZDgyNzg0Y2IyYWM4MDQ5OTQyMjBiYTRlYwptYWtlWzFd
-OiAqKiogW2RvY2tlci1ydW5dIEVycm9yIDEKbWFrZVsxXTogTGVhdmluZyBkaXJlY3RvcnkgYC92
-YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC1xNGZkNmNrcC9zcmMnCm1ha2U6ICoqKiBbZG9ja2Vy
-LXJ1bi10ZXN0LXF1aWNrQGNlbnRvczddIEVycm9yIDIKCnJlYWwgICAgMTVtNTguNjg3cwp1c2Vy
-ICAgIDBtOS4wMjVzCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hl
-dy5vcmcvbG9ncy8yMDIwMDgyMTA4Mzg1My4zNTY0OTAtMS1ncmFlbWVAbnV2aWFpbmMuY29tL3Rl
-c3RpbmcuZG9ja2VyLXF1aWNrQGNlbnRvczcvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVy
-YXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxl
-YXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On Thu, Aug 20, 2020 at 12:42:20PM -0500, Eric Blake wrote:
+> On 8/20/20 11:55 AM, Daniel P. Berrangé wrote:
+> > Meson requires the build dir to be separate from the source tree. Many
+> > people are used to just running "./configure && make" though and the
+> > meson conversion breaks that.
+> > 
+> > This introduces some backcompat support to make it appear as if an
+> > "in source tree" build is being done, but with the the results in the
+> > "build/" directory. This allows "./configure && make" to work as it
+> > did historically, albeit with the output binaries staying under build/.
+> > 
+> > Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+> > ---
+> 
+> In addition to reviews you already have,
+> 
+> 
+> > I've not tested it beyond that. Note it blows away the "build/"
+> > dir each time ./configure is run so it is pristine each time.
+> 
+> I definitely like the idea of only blowing away what we created - but if we
+> created build, then recreating it for each new configure run is nice.
+> 
+> > 
+> > We could optionally symlink binaries from build/ into $PWD
+> > if poeople think that is important, eg by changing GNUmakefile
+> > to have:
+> > 
+> > recurse: all
+> > 	for bin in `find build -maxdepth 1 -type f -executable | grep -v -E '(ninjatool|config.status)'`; \
+> 
+> Using -maxdepth gets rid of the need to pre-create empty directories for
+> nested binaries, but also loses out on binaries such as
+> x86_64-softmmu/qemu-system-x86_64.  Oh, it looks like meson creates
+> qemu-system-x86_64 as a binary in the top level, then a symlink in its old
+> location.  Populating symlinks to ALL old locations is thus trickier than
+> what you are proposing here, so it is fine to save that for a followup patch
+> (let's get the bare minimum in first, so that at least ./configure && make
+> works, before we worry about back-compat symlinks).
+> 
+> > 
+> > This goes on top of Paolo's most recent meson port v175 posting,
+> > or whatever number it is upto now :-)
+> 
+> Nice comment for reviewers, but doesn't quite need to be preserved in git.
+> 
+> > 
+> >   .gitignore |  2 ++
+> >   configure  | 40 ++++++++++++++++++++++++++++++++--------
+> >   2 files changed, 34 insertions(+), 8 deletions(-)
+> > 
+> > diff --git a/.gitignore b/.gitignore
+> > index 92311284ef..4ccb9ed975 100644
+> > --- a/.gitignore
+> > +++ b/.gitignore
+> > @@ -1,3 +1,5 @@
+> > +/GNUmakefile
+> > +/build/
+> >   /.doctrees
+> >   /config-devices.*
+> >   /config-all-devices.*
+> > diff --git a/configure b/configure
+> > index cc5f58f31a..a5c88ad1ac 100755
+> > --- a/configure
+> > +++ b/configure
+> > @@ -11,6 +11,38 @@ unset CLICOLOR_FORCE GREP_OPTIONS
+> >   # Don't allow CCACHE, if present, to use cached results of compile tests!
+> >   export CCACHE_RECACHE=yes
+> > +source_path=$(cd "$(dirname -- "$0")"; pwd)
+> 
+> This behaves wrong if CDPATH is set in the environment.  We should really
+> include CDPATH in our environment sanitization at the top of the file.
+
+This code is pre-existing, so any fixes wrt CDPATH can be done by
+a different patch.
+
+> 
+> > +
+> > +if printf %s\\n "$source_path" "$PWD" | grep -q "[[:space:]:]";
+> > +then
+> > +  error_exit "main directory cannot contain spaces nor colons"
+> > +fi
+> > +
+> > +if test "$PWD" == "$source_path"
+> 
+> bashism; s/==/=/ or you will break configure on dash systems
+> 
+> > +then
+> > +    echo "Using './build' as the directory for build output"
+> 
+> Do we want a way for a user to type './configure builddir=build/' and 'make
+> builddir=build/' so they can specify different builddir overrides per
+> invocation (of course, where builddir defaults to 'build/' if not
+> specified)?  But hardcoding to _just_ ./build/ for getting this patch in
+> quickly is fine.
+
+Adding "builddir=build" as an option would be introducing new
+functionality that doesn't already exist. The goal is just to
+do some minimal work to preserve existing functionality. If
+people want control over the name of their build dir, then
+they can do that by using a out-of-source tree build already.
+
+> 
+> > +    rm -rf build
+> > +    mkdir -p build
+> > +    cat > GNUmakefile <<EOF
+> 
+> If you use 'EOF' or \EOF here, then...
+> 
+> > +
+> > +ifeq (\$(MAKECMDGOALS),)
+> 
+> you wouldn't have to escape all these $.  Looking through the file...
+
+Ah, subtle, but nice.
+
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+
 
