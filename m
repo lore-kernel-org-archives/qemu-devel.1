@@ -2,85 +2,90 @@ Return-Path: <SRS0=atk5=B7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E111C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 21:45:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7890C433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 22:12:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C8CD9207CD
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 21:45:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8D98A20855
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 22:12:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cLxAbkf4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8CD9207CD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JSV6gG+Z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D98A20855
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45350 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56958 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k9Er0-0005Fb-0I
-	for qemu-devel@archiver.kernel.org; Fri, 21 Aug 2020 17:45:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59064)
+	id 1k9FH9-0003Wv-S7
+	for qemu-devel@archiver.kernel.org; Fri, 21 Aug 2020 18:12:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35886)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1k9EqJ-0004pA-2A
- for qemu-devel@nongnu.org; Fri, 21 Aug 2020 17:44:59 -0400
-Received: from mail-ed1-x533.google.com ([2a00:1450:4864:20::533]:38331)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1k9EqH-0007T0-Dz
- for qemu-devel@nongnu.org; Fri, 21 Aug 2020 17:44:58 -0400
-Received: by mail-ed1-x533.google.com with SMTP id b2so2769311edw.5
- for <qemu-devel@nongnu.org>; Fri, 21 Aug 2020 14:44:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=d2NSkNRqXhzbLDqCRw2ZU36ZaqCtFfo83voHvJ3kUZA=;
- b=cLxAbkf45NdYXWW/n0flOeaJNldI6kAdpOpCOk8yTEAzECC65g64haWVa24v8Dny/o
- yHNjPntKvglRO0c/gaeO5aFKQzG+F6uLIb1WNZCyb+gLSn7TBkUULGnv80YzA+7kQFg+
- 0xFeuweRhj16hQL3zwtkwtd01OoB/DJC4OFfIBaUqSU1gw4AOSz5vgh89YPjrkoLOvgd
- kvWbKkmY2awvz+LQ6tM7xBVRRY09Pj93Iyppv+5nMlxfX+XE+M67h1Y+1/bVIsfzhoVQ
- wri3190hi+Id33Bq1BZ5HwqgvBbkO3C+RQFwBV+reQHiiW5pVyXbvd6BWIJfIQsC1NdF
- 0cPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=d2NSkNRqXhzbLDqCRw2ZU36ZaqCtFfo83voHvJ3kUZA=;
- b=G0gp/8FCQufKf5qJV6JJVmVKMn+f1cLXj64d/Y+JDdVgmTCFRJGiV9gh0LK/nbMXaq
- 2xVVo145JK69t+dDk/loYXy9ciCC84NY/sam8VGjHuBctr8c1vhL7tOH1C1qb/G9DsOT
- 03Q9Y3QVLRY3i1tl1zMT8qeKVmMRdnznJiLw6EdPoYUr+qwUsvs7xM0RLPmOaJ7VgwQG
- RbXCX4fVP80zPJcz6MWkWfjGShgb7pb9oPvoDdEhRDgZJv+GHYPzHmNRenOaraTSTTxy
- u+sA3yuUY900o4tJgJ5MD3LwAZBx9E5AozeOX7smseeNSEVJJDj92nqS/dm9uPogrRxh
- sQLw==
-X-Gm-Message-State: AOAM531EtqnLMlSpjsOs+u6+rzvpMOF1aLdFXLSyATkeQk0lC050Huvq
- +Gd76emKsR4SCsqceKHkmcdRYFKb4/2DlzfGLgAxFw==
-X-Google-Smtp-Source: ABdhPJxIXylGdwxZc+7iA93wWoy5/dyYGJCZiPNu+mtR0nx3+b/iKzQe0UdfVmBjjvVm1asA+87BgchkrASokZ0N3Uk=
-X-Received: by 2002:aa7:d596:: with SMTP id r22mr4949785edq.204.1598046295125; 
- Fri, 21 Aug 2020 14:44:55 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1k9FGN-00037E-2j
+ for qemu-devel@nongnu.org; Fri, 21 Aug 2020 18:11:55 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:55927
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1k9FGJ-00024N-U9
+ for qemu-devel@nongnu.org; Fri, 21 Aug 2020 18:11:54 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1598047910;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=vFOz6dZbOBMAjSeMGlM1XFPLgzA0gUK5ylk8Vcs3OtQ=;
+ b=JSV6gG+ZPCfG0uyq5+SO6wiA/dSXezUfmcxiNWYXgJ5FnSrDFgyHpkxMSRVTVpMoKOoEis
+ ejxlTyHQTKV425Qvz6Jg0nawNZDA4xXhfWXhJ4v/o/ohkR4gsiwhdokUeUTWyNdv9D9lzr
+ +dKd6QIcpp2laDteC6qxmoocQZXlir0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-355-52ErADTyMC2LnmagFk8C5Q-1; Fri, 21 Aug 2020 18:11:46 -0400
+X-MC-Unique: 52ErADTyMC2LnmagFk8C5Q-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 967191DE12;
+ Fri, 21 Aug 2020 22:11:45 +0000 (UTC)
+Received: from localhost (unknown [10.10.67.254])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 445635DA7E;
+ Fri, 21 Aug 2020 22:11:42 +0000 (UTC)
+Date: Fri, 21 Aug 2020 18:11:41 -0400
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Subject: Re: [PATCH] hw/isa/isa-superio: Set abstract TYPE_ISA_SUPERIO
+ instance size
+Message-ID: <20200821221141.GO642093@habkost.net>
+References: <20200821173831.1262979-1-philmd@redhat.com>
 MIME-Version: 1.0
-References: <20200819054644.30610-1-kraxel@redhat.com>
-In-Reply-To: <20200819054644.30610-1-kraxel@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 21 Aug 2020 22:44:43 +0100
-Message-ID: <CAFEAcA9_=KW9jS8g0r_uN1y3YV-8vhmhUYjaHm8mMKO4K4FbcQ@mail.gmail.com>
-Subject: Re: [PULL 00/17] Usb 20200819 patches
-To: Gerd Hoffmann <kraxel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::533;
- envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x533.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200821173831.1262979-1-philmd@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=ehabkost@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/21 04:55:47
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,34 +98,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Cleber Rosa <crosa@redhat.com>,
- =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+ Jiaxun Yang <jiaxun.yang@flygoat.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Huacai Chen <chenhc@lemote.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 19 Aug 2020 at 06:54, Gerd Hoffmann <kraxel@redhat.com> wrote:
->
-> The following changes since commit d0ed6a69d399ae193959225cdeaa9382746c91cc:
->
->   Update version for v5.1.0 release (2020-08-11 17:07:03 +0100)
->
-> are available in the Git repository at:
->
->   git://git.kraxel.org/qemu tags/usb-20200819-pull-request
->
-> for you to fetch changes up to d7e5b2e1a4035fb81517a2034bb955e58f28d5b9:
->
->   hw/usb: Add U2F device autoscan to passthru mode (2020-08-19 07:35:27 +0200)
->
-> ----------------------------------------------------------------
-> usb: usb_packet_map error handling for xhci/ehci
-> usb: add U2F devices (GSoC).
+On Fri, Aug 21, 2020 at 07:38:31PM +0200, Philippe Mathieu-Daudé wrote:
+> Instead of setting the instance size on each implementations,
+> set it on the abstract parent, so we are sure no implementation
+> will forget to set it.
+> 
+> Reported-by: Eduardo Habkost <ehabkost@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Hi; this conflicts with the meson buildsystem merge, I'm
-afraid -- can you rebase and resend, please?
+Thanks!
 
-thanks
--- PMM
+The changes look good, but while we are at it we could also clear
+class_size at smc37c669_type_info and via_superio_info.
+
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+---
+diff --git a/hw/isa/smc37c669-superio.c b/hw/isa/smc37c669-superio.c
+index a988c55330..2dab9d90bf 100644
+--- a/hw/isa/smc37c669-superio.c
++++ b/hw/isa/smc37c669-superio.c
+@@ -103,7 +103,6 @@ static void smc37c669_class_init(ObjectClass *klass, void *data)
+ static const TypeInfo smc37c669_type_info = {
+     .name          = TYPE_SMC37C669_SUPERIO,
+     .parent        = TYPE_ISA_SUPERIO,
+-    .class_size    = sizeof(ISASuperIOClass),
+     .class_init    = smc37c669_class_init,
+ };
+ TYPE_INFO(smc37c669_type_info)
+diff --git a/hw/isa/vt82c686.c b/hw/isa/vt82c686.c
+index 4a9f8954a9..4fd3550cbb 100644
+--- a/hw/isa/vt82c686.c
++++ b/hw/isa/vt82c686.c
+@@ -542,7 +542,6 @@ static void vt82c686b_superio_class_init(ObjectClass *klass, void *data)
+ static const TypeInfo via_superio_info = {
+     .name          = TYPE_VT82C686B_SUPERIO,
+     .parent        = TYPE_ISA_SUPERIO,
+-    .class_size    = sizeof(ISASuperIOClass),
+     .class_init    = vt82c686b_superio_class_init,
+ };
+ TYPE_INFO(via_superio_info)
+
+> ---
+> See:
+> https://www.mail-archive.com/qemu-devel@nongnu.org/msg731954.html
+> ---
+>  hw/isa/isa-superio.c       | 2 +-
+>  hw/isa/smc37c669-superio.c | 1 -
+>  hw/isa/vt82c686.c          | 1 -
+>  3 files changed, 1 insertion(+), 3 deletions(-)
+> 
+> diff --git a/hw/isa/isa-superio.c b/hw/isa/isa-superio.c
+> index e2e47d8fd99..83eb21ebb2a 100644
+> --- a/hw/isa/isa-superio.c
+> +++ b/hw/isa/isa-superio.c
+> @@ -182,6 +182,7 @@ static const TypeInfo isa_superio_type_info = {
+>      .name = TYPE_ISA_SUPERIO,
+>      .parent = TYPE_ISA_DEVICE,
+>      .abstract = true,
+> +    .instance_size = sizeof(ISASuperIODevice),
+>      .class_size = sizeof(ISASuperIOClass),
+>      .class_init = isa_superio_class_init,
+>  };
+> @@ -200,7 +201,6 @@ static void fdc37m81x_class_init(ObjectClass *klass, void *data)
+>  static const TypeInfo fdc37m81x_type_info = {
+>      .name          = TYPE_FDC37M81X_SUPERIO,
+>      .parent        = TYPE_ISA_SUPERIO,
+> -    .instance_size = sizeof(ISASuperIODevice),
+>      .class_init    = fdc37m81x_class_init,
+>  };
+>  
+> diff --git a/hw/isa/smc37c669-superio.c b/hw/isa/smc37c669-superio.c
+> index 18287741cb4..9e59dc16039 100644
+> --- a/hw/isa/smc37c669-superio.c
+> +++ b/hw/isa/smc37c669-superio.c
+> @@ -103,7 +103,6 @@ static void smc37c669_class_init(ObjectClass *klass, void *data)
+>  static const TypeInfo smc37c669_type_info = {
+>      .name          = TYPE_SMC37C669_SUPERIO,
+>      .parent        = TYPE_ISA_SUPERIO,
+> -    .instance_size = sizeof(ISASuperIODevice),
+>      .class_size    = sizeof(ISASuperIOClass),
+>      .class_init    = smc37c669_class_init,
+>  };
+> diff --git a/hw/isa/vt82c686.c b/hw/isa/vt82c686.c
+> index 18160ca445d..a4b84d405d0 100644
+> --- a/hw/isa/vt82c686.c
+> +++ b/hw/isa/vt82c686.c
+> @@ -533,7 +533,6 @@ static void vt82c686b_superio_class_init(ObjectClass *klass, void *data)
+>  static const TypeInfo via_superio_info = {
+>      .name          = TYPE_VT82C686B_SUPERIO,
+>      .parent        = TYPE_ISA_SUPERIO,
+> -    .instance_size = sizeof(ISASuperIODevice),
+>      .class_size    = sizeof(ISASuperIOClass),
+>      .class_init    = vt82c686b_superio_class_init,
+>  };
+> -- 
+> 2.26.2
+> 
+
+-- 
+Eduardo
+
 
