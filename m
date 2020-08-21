@@ -2,89 +2,88 @@ Return-Path: <SRS0=atk5=B7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3798C433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 10:32:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AECFC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 10:33:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BF659204EA
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 10:32:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 65B0D204EA
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 10:33:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gUQN8day"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF659204EA
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AZDlK06L"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 65B0D204EA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43860 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48546 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k94Li-00011O-Uo
-	for qemu-devel@archiver.kernel.org; Fri, 21 Aug 2020 06:32:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59610)
+	id 1k94Mi-0002tz-Mt
+	for qemu-devel@archiver.kernel.org; Fri, 21 Aug 2020 06:33:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59530)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k94DI-00017U-VE
- for qemu-devel@nongnu.org; Fri, 21 Aug 2020 06:24:00 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33760
- helo=us-smtp-1.mimecast.com)
+ id 1k94DD-0000qs-4S
+ for qemu-devel@nongnu.org; Fri, 21 Aug 2020 06:23:55 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:30818)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k94DF-0001UB-JG
- for qemu-devel@nongnu.org; Fri, 21 Aug 2020 06:24:00 -0400
+ id 1k94D9-0001SQ-1z
+ for qemu-devel@nongnu.org; Fri, 21 Aug 2020 06:23:54 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598005436;
+ s=mimecast20190719; t=1598005430;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=zWejBK1qdEjq2SP4iRqwRDShLeAcevq9ZkOIRWuLssU=;
- b=gUQN8dayyMWbNGstHhz1BlY31XVyeeQ0/eVBojAjJTKWIhPnf3MwOR9VrDFEju2EkULFIm
- orzeH9keKGxdAdO2irFhttmmRJ5tusGo0ACTZGh5pwjusykFHvfBQVTgRPfD0ByyPhQwz0
- hUZMg9KRBJt0MNy0T9k2tehZh0cv9qY=
+ bh=Kk80jCxyomMpgXlesDhuCnTqD35HIKQS+oRgi8b6co0=;
+ b=AZDlK06L1GxSgvJO3bs93po+Hm/fSZoGGqHpwIFw82OrGU7KBdgJI4SGjTwGqQr7dGw1G2
+ EPbvJAi/d7YArlVX4gF9lB4/xArLDnU42ljRKaKnnKxEmxVE6PyQv3hI8omr30JVslfjGX
+ az5xjirhkU0N3INdnTdAf9z86FT3BBI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-442-7Po0KxotO7qlKSAT5pE0EQ-1; Fri, 21 Aug 2020 06:23:53 -0400
-X-MC-Unique: 7Po0KxotO7qlKSAT5pE0EQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-209-m53savGnPuKL2k-y_XXG1A-1; Fri, 21 Aug 2020 06:23:48 -0400
+X-MC-Unique: m53savGnPuKL2k-y_XXG1A-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 187978064B2
- for <qemu-devel@nongnu.org>; Fri, 21 Aug 2020 10:23:53 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 758398030C4
+ for <qemu-devel@nongnu.org>; Fri, 21 Aug 2020 10:23:47 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E91427AEC5;
- Fri, 21 Aug 2020 10:23:49 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 41AF65DA74
+ for <qemu-devel@nongnu.org>; Fri, 21 Aug 2020 10:23:47 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v8 020/152] build-sys: add meson submodule
-Date: Fri, 21 Aug 2020 06:21:17 -0400
-Message-Id: <20200821102329.29777-21-pbonzini@redhat.com>
+Subject: [PULL v8 014/152] configure: prepare CFLAGS/CXXFLAGS/LDFLAGS for Meson
+Date: Fri, 21 Aug 2020 06:21:11 -0400
+Message-Id: <20200821102329.29777-15-pbonzini@redhat.com>
 In-Reply-To: <20200821102329.29777-1-pbonzini@redhat.com>
 References: <20200821102329.29777-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/20 23:41:39
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/21 04:26:32
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
 X-Spam_bar: ----
 X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,161 +96,249 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Marc-André Lureau <marcandre.lureau@redhat.com>
+Split between CFLAGS/QEMU_CFLAGS and CXXFLAGS/QEMU_CXXFLAGS so that
+we will use CFLAGS and CXXFLAGS for flags that we do not want to
+pass to add_project_arguments.
 
-Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- .gitmodules               |  3 ++
- configure                 | 71 +++++++++++++++++++++++++++++++++++----
- meson                     |  1 +
- scripts/archive-source.sh |  3 +-
- 4 files changed, 70 insertions(+), 8 deletions(-)
- create mode 160000 meson
+ configure             | 80 ++++++++++++++++++++-----------------------
+ rules.mak             |  4 +--
+ softmmu/Makefile.objs |  2 +-
+ 3 files changed, 41 insertions(+), 45 deletions(-)
 
-diff --git a/.gitmodules b/.gitmodules
-index 9c0501a4d4..ce979398a8 100644
---- a/.gitmodules
-+++ b/.gitmodules
-@@ -58,3 +58,6 @@
- [submodule "roms/qboot"]
- 	path = roms/qboot
- 	url = https://github.com/bonzini/qboot
-+[submodule "meson"]
-+	path = meson
-+	url = https://github.com/mesonbuild/meson/
 diff --git a/configure b/configure
-index a82045352c..3360f40a33 100755
+index 373bb22287..35d6492343 100755
 --- a/configure
 +++ b/configure
-@@ -219,6 +219,25 @@ path_of() {
-     return 1
+@@ -107,15 +107,12 @@ update_cxxflags() {
+     # options which some versions of GCC's C++ compiler complain about
+     # because they only make sense for C programs.
+     QEMU_CXXFLAGS="$QEMU_CXXFLAGS -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS"
+-
++    CXXFLAGS=$(echo "$CFLAGS" | sed s/-std=gnu99/-std=gnu++11/)
+     for arg in $QEMU_CFLAGS; do
+         case $arg in
+             -Wstrict-prototypes|-Wmissing-prototypes|-Wnested-externs|\
+             -Wold-style-declaration|-Wold-style-definition|-Wredundant-decls)
+                 ;;
+-            -std=gnu99)
+-                QEMU_CXXFLAGS=${QEMU_CXXFLAGS:+$QEMU_CXXFLAGS }"-std=gnu++98"
+-                ;;
+             *)
+                 QEMU_CXXFLAGS=${QEMU_CXXFLAGS:+$QEMU_CXXFLAGS }$arg
+                 ;;
+@@ -125,13 +122,13 @@ update_cxxflags() {
+ 
+ compile_object() {
+   local_cflags="$1"
+-  do_cc $QEMU_CFLAGS $local_cflags -c -o $TMPO $TMPC
++  do_cc $CFLAGS $QEMU_CFLAGS $local_cflags -c -o $TMPO $TMPC
  }
  
-+version_ge () {
-+    local_ver1=`echo $1 | tr . ' '`
-+    local_ver2=`echo $2 | tr . ' '`
-+    while true; do
-+        set x $local_ver1
-+        local_first=${2-0}
-+        # shift 2 does nothing if there are less than 2 arguments
-+        shift; shift
-+        local_ver1=$*
-+        set x $local_ver2
-+        # the second argument finished, the first must be greater or equal
-+        test $# = 1 && return 0
-+        test $local_first -lt $2 && return 1
-+        test $local_first -gt $2 && return 0
-+        shift; shift
-+        local_ver2=$*
-+    done
-+}
+ compile_prog() {
+   local_cflags="$1"
+   local_ldflags="$2"
+-  do_cc $QEMU_CFLAGS $local_cflags -o $TMPE $TMPC $QEMU_LDFLAGS $local_ldflags
++  do_cc $CFLAGS $QEMU_CFLAGS $local_cflags -o $TMPE $TMPC $LDFLAGS $QEMU_LDFLAGS $local_ldflags
+ }
+ 
+ # symbolically link $1 to $2.  Portable version of "ln -sf".
+@@ -597,15 +594,14 @@ ARFLAGS="${ARFLAGS-rv}"
+ # left shift of signed integers is well defined and has the expected
+ # 2s-complement style results. (Both clang and gcc agree that it
+ # provides these semantics.)
+-QEMU_CFLAGS="-fno-strict-aliasing -fno-common -fwrapv -std=gnu99 $QEMU_CFLAGS"
+-QEMU_CFLAGS="-Wall -Wundef -Wwrite-strings -Wmissing-prototypes $QEMU_CFLAGS"
++QEMU_CFLAGS="-fno-strict-aliasing -fno-common -fwrapv $QEMU_CFLAGS"
++QEMU_CFLAGS="-Wundef -Wwrite-strings -Wmissing-prototypes $QEMU_CFLAGS"
+ QEMU_CFLAGS="-Wstrict-prototypes -Wredundant-decls $QEMU_CFLAGS"
+ QEMU_CFLAGS="-D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE $QEMU_CFLAGS"
+ QEMU_INCLUDES="-iquote . -iquote ${source_path} -iquote ${source_path}/accel/tcg -iquote ${source_path}/include"
+ QEMU_INCLUDES="$QEMU_INCLUDES -iquote ${source_path}/disas/libvixl"
+-if test "$debug_info" = "yes"; then
+-    CFLAGS="-g $CFLAGS"
+-fi
++CFLAGS="-std=gnu99 -Wall"
 +
- have_backend () {
-     echo "$trace_backends" | grep "$1" >/dev/null
- }
-@@ -959,6 +978,7 @@ fi
- # python 2.x, but some distros have it as python 3.x, so
- # we check that too
- python=
-+explicit_python=no
- for binary in "${PYTHON-python3}" python
- do
-     if has "$binary"
-@@ -1042,7 +1062,7 @@ for opt do
-   ;;
-   --install=*) install="$optarg"
-   ;;
--  --python=*) python="$optarg"
-+  --python=*) python="$optarg" ; explicit_python=yes
-   ;;
-   --sphinx-build=*) sphinx_build="$optarg"
-   ;;
-@@ -2023,15 +2043,52 @@ python_version=$($python -c 'import sys; print("%d.%d.%d" % (sys.version_info[0]
- # Suppress writing compiled files
- python="$python -B"
  
--if ! has "$meson"
--then
--    error_exit "Meson not found. Use --meson=/path/to/meson"
-+if test -z "$meson"; then
-+    if test "$explicit_python" = no && has meson && version_ge "$(meson --version)" 0.55.0; then
-+        meson=meson
-+    elif test -e "${source_path}/.git" && test $git_update = 'yes' ; then
-+        meson=git
-+    elif test -e "${source_path}/meson/meson.py" ; then
-+        meson=internal
-+    else
-+        if test "$explicit_python" = yes; then
-+            error_exit "--python requires using QEMU's embedded Meson distribution, but it was not found."
-+        else
-+            error_exit "Meson not found.  Use --meson=/path/to/meson"
-+        fi
-+    fi
-+else
-+    # Meson uses its own Python interpreter to invoke other Python scripts,
-+    # but the user wants to use the one they specified with --python.
-+    #
-+    # We do not want to override the distro Python interpreter (and sometimes
-+    # cannot: for example in Homebrew /usr/bin/meson is a bash script), so
-+    # just require --meson=git|internal together with --python.
-+    if test "$explicit_python" = yes; then
-+        case "$meson" in
-+            git | internal) ;;
-+            *) error_exit "--python requires using QEMU's embedded Meson distribution." ;;
-+        esac
-+    fi
- fi
--meson=$(command -v $meson)
+ # running configure in the source tree?
+ # we know that's the case if configure is there.
+@@ -886,7 +882,6 @@ SunOS)
+   QEMU_CFLAGS="-D_XOPEN_SOURCE=600 $QEMU_CFLAGS"
+ # needed for TIOCWIN* defines in termios.h
+   QEMU_CFLAGS="-D__EXTENSIONS__ $QEMU_CFLAGS"
+-  QEMU_CFLAGS="-std=gnu99 $QEMU_CFLAGS"
+   solarisnetlibs="-lsocket -lnsl -lresolv"
+   LIBS="$solarisnetlibs $LIBS"
+   libs_qga="$solarisnetlibs $libs_qga"
+@@ -963,7 +958,7 @@ if test "$mingw32" = "yes" ; then
+   EXESUF=".exe"
+   DSOSUF=".dll"
+   # MinGW needs -mthreads for TLS and macro _MT.
+-  QEMU_CFLAGS="-mthreads $QEMU_CFLAGS"
++  CFLAGS="-mthreads $CFLAGS"
+   LIBS="-lwinmm -lws2_32 $LIBS"
+   write_c_skeleton;
+   if compile_prog "" "-liberty" ; then
+@@ -2109,7 +2104,7 @@ EOF
+   for flag in $gcc_flags; do
+     # We need to check both a compile and a link, since some compiler
+     # setups fail only on a .c->.o compile and some only at link time
+-    if do_cc $QEMU_CFLAGS -Werror $flag -c -o $TMPO $TMPC &&
++    if compile_object "-Werror $flag" &&
+        compile_prog "-Werror $flag" ""; then
+       QEMU_CFLAGS="$QEMU_CFLAGS $flag"
+       QEMU_LDFLAGS="$QEMU_LDFLAGS $flag"
+@@ -2184,7 +2179,7 @@ fi
  
--if ! $python -c 'import pkg_resources' > /dev/null 2>&1; then
--  error_exit "Python setuptools not found"
-+if test "$meson" = git; then
-+    git_submodules="${git_submodules} meson"
+ if test "$static" = "yes"; then
+   if test "$pie" != "no" && compile_prog "-Werror -fPIE -DPIE" "-static-pie"; then
+-    QEMU_CFLAGS="-fPIE -DPIE $QEMU_CFLAGS"
++    CFLAGS="-fPIE -DPIE $CFLAGS"
+     QEMU_LDFLAGS="-static-pie $QEMU_LDFLAGS"
+     pie="yes"
+   elif test "$pie" = "yes"; then
+@@ -2194,11 +2189,11 @@ if test "$static" = "yes"; then
+     pie="no"
+   fi
+ elif test "$pie" = "no"; then
+-  QEMU_CFLAGS="$CFLAGS_NOPIE $QEMU_CFLAGS"
+-  QEMU_LDFLAGS="$LDFLAGS_NOPIE $QEMU_LDFLAGS"
++  CFLAGS="$CFLAGS_NOPIE $CFLAGS"
++  LDFLAGS="$LDFLAGS_NOPIE $LDFLAGS"
+ elif compile_prog "-Werror -fPIE -DPIE" "-pie"; then
+-  QEMU_CFLAGS="-fPIE -DPIE $QEMU_CFLAGS"
+-  QEMU_LDFLAGS="-pie $QEMU_LDFLAGS"
++  CFLAGS="-fPIE -DPIE $CFLAGS"
++  LDFLAGS="-pie $LDFLAGS"
+   pie="yes"
+ elif test "$pie" = "yes"; then
+   error_exit "PIE not available due to missing toolchain support"
+@@ -3981,7 +3976,7 @@ EOF
+ if ! compile_prog "$glib_cflags -Werror" "$glib_libs" ; then
+     if cc_has_warning_flag "-Wno-unknown-attributes"; then
+         glib_cflags="-Wno-unknown-attributes $glib_cflags"
+-        CFLAGS="-Wno-unknown-attributes $CFLAGS"
++        QEMU_CFLAGS="-Wno-unknown-attributes $CFLAGS"
+     fi
  fi
-+if test "$git_update" = yes; then
-+    (cd "${source_path}" && GIT="$git" "./scripts/git-submodule.sh" update "$git_submodules")
+ 
+@@ -6506,10 +6501,28 @@ if test "$gcov" = "yes" ; then
+   QEMU_CFLAGS="-fprofile-arcs -ftest-coverage -g $QEMU_CFLAGS"
+   QEMU_LDFLAGS="-fprofile-arcs -ftest-coverage $QEMU_LDFLAGS"
+ elif test "$fortify_source" = "yes" ; then
+-  CFLAGS="-O2 -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2 $CFLAGS"
+-elif test "$debug" = "no"; then
++  QEMU_CFLAGS="-U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2 $QEMU_CFLAGS"
++  debug=no
++fi
++if test "$debug" = "no"; then
+   CFLAGS="-O2 $CFLAGS"
+ fi
++if test "$debug_info" = "yes"; then
++  CFLAGS="-g $CFLAGS"
++  LDFLAGS="-g $LDFLAGS"
 +fi
 +
-+case "$meson" in
-+    git | internal)
-+        if ! $python -c 'import pkg_resources' > /dev/null 2>&1; then
-+            error_exit "Python setuptools not found"
-+        fi
-+        meson="$python ${source_path}/meson/meson.py"
-+        ;;
-+    *) meson=$(command -v meson) ;;
++case "$ARCH" in
++alpha)
++  # Ensure there's only a single GP
++  QEMU_CFLAGS="-msmall-data $QEMU_CFLAGS"
++;;
 +esac
 +
++if test "$gprof" = "yes" ; then
++  QEMU_CFLAGS="-p $QEMU_CFLAGS"
++  QEMU_LDFLAGS="-p $QEMU_LDFLAGS"
++fi
  
- # Check that the C compiler works. Doing this here before testing
- # the host CPU ensures that we had a valid CC to autodetect the
-diff --git a/meson b/meson
-new file mode 160000
-index 0000000000..d0c68dc115
---- /dev/null
-+++ b/meson
-@@ -0,0 +1 @@
-+Subproject commit d0c68dc11507a47b9b85de508e023d9590d60565
-diff --git a/scripts/archive-source.sh b/scripts/archive-source.sh
-index fb5d6b3918..c6169db69f 100755
---- a/scripts/archive-source.sh
-+++ b/scripts/archive-source.sh
-@@ -26,7 +26,8 @@ sub_file="${sub_tdir}/submodule.tar"
- # independent of what the developer currently has initialized
- # in their checkout, because the build environment is completely
- # different to the host OS.
--submodules="dtc slirp ui/keycodemapdb tests/fp/berkeley-softfloat-3 tests/fp/berkeley-testfloat-3"
-+submodules="dtc slirp meson ui/keycodemapdb"
-+submodules="$submodules tests/fp/berkeley-softfloat-3 tests/fp/berkeley-testfloat-3"
- sub_deinit=""
+ if test "$have_asan" = "yes"; then
+   QEMU_CFLAGS="-fsanitize=address $QEMU_CFLAGS"
+@@ -6782,7 +6795,7 @@ EOF
  
- function cleanup() {
+     update_cxxflags
+ 
+-    if do_cxx $QEMU_CXXFLAGS -o $TMPE $TMPCXX $TMPO $QEMU_LDFLAGS; then
++    if do_cxx $CXXFLAGS $QEMU_CXXFLAGS -o $TMPE $TMPCXX $TMPO $QEMU_LDFLAGS; then
+         # C++ compiler $cxx works ok with C compiler $cc
+         :
+     else
+@@ -7874,7 +7887,7 @@ if test "$fuzzing" = "yes" ; then
+   if test "$have_fuzzer" = "yes"; then
+     FUZZ_LDFLAGS=" -fsanitize=fuzzer"
+     FUZZ_CFLAGS=" -fsanitize=fuzzer"
+-    CFLAGS="$CFLAGS -fsanitize=fuzzer-no-link"
++    QEMU_CFLAGS="$QEMU_CFLAGS -fsanitize=fuzzer-no-link"
+   else
+     error_exit "Your compiler doesn't support -fsanitize=fuzzer"
+     exit 1
+@@ -7961,6 +7974,7 @@ echo "NM=$nm" >> $config_host_mak
+ echo "PKG_CONFIG=$pkg_config_exe" >> $config_host_mak
+ echo "WINDRES=$windres" >> $config_host_mak
+ echo "CFLAGS=$CFLAGS" >> $config_host_mak
++echo "CXXFLAGS=$CXXFLAGS" >> $config_host_mak
+ echo "CFLAGS_NOPIE=$CFLAGS_NOPIE" >> $config_host_mak
+ echo "QEMU_CFLAGS=$QEMU_CFLAGS" >> $config_host_mak
+ echo "QEMU_CXXFLAGS=$QEMU_CXXFLAGS" >> $config_host_mak
+@@ -8430,24 +8444,6 @@ if test "$tcg_interpreter" = "yes" ; then
+   disas_config "TCI"
+ fi
+ 
+-case "$ARCH" in
+-alpha)
+-  # Ensure there's only a single GP
+-  cflags="-msmall-data $cflags"
+-;;
+-esac
+-
+-if test "$gprof" = "yes" ; then
+-  if test "$target_linux_user" = "yes" ; then
+-    cflags="-p $cflags"
+-    ldflags="-p $ldflags"
+-  fi
+-  if test "$target_softmmu" = "yes" ; then
+-    ldflags="-p $ldflags"
+-    echo "GPROF_CFLAGS=-p" >> $config_target_mak
+-  fi
+-fi
+-
+ # Newer kernels on s390 check for an S390_PGSTE program header and
+ # enable the pgste page table extensions in that case. This makes
+ # the vm.allocate_pgste sysctl unnecessary. We enable this program
+diff --git a/rules.mak b/rules.mak
+index 56ba540a32..e79a4005a7 100644
+--- a/rules.mak
++++ b/rules.mak
+@@ -88,12 +88,12 @@ LINK = $(call quiet-command, $(LINKPROG) $(CFLAGS) $(QEMU_LDFLAGS) -o $@ \
+ 
+ %.o: %.cc
+ 	$(call quiet-command,$(CXX) $(QEMU_LOCAL_INCLUDES) $(QEMU_INCLUDES) \
+-	       $(QEMU_CXXFLAGS) $(QEMU_DGFLAGS) $(CFLAGS) $($@-cflags) \
++	       $(QEMU_CXXFLAGS) $(QEMU_DGFLAGS) $(CXXFLAGS) $($@-cflags) \
+ 	       -c -o $@ $<,"CXX","$(TARGET_DIR)$@")
+ 
+ %.o: %.cpp
+ 	$(call quiet-command,$(CXX) $(QEMU_LOCAL_INCLUDES) $(QEMU_INCLUDES) \
+-	       $(QEMU_CXXFLAGS) $(QEMU_DGFLAGS) $(CFLAGS) $($@-cflags) \
++	       $(QEMU_CXXFLAGS) $(QEMU_DGFLAGS) $(CXXFLAGS) $($@-cflags) \
+ 	       -c -o $@ $<,"CXX","$(TARGET_DIR)$@")
+ 
+ %.o: %.m
+diff --git a/softmmu/Makefile.objs b/softmmu/Makefile.objs
+index a414a74c50..c036887500 100644
+--- a/softmmu/Makefile.objs
++++ b/softmmu/Makefile.objs
+@@ -11,4 +11,4 @@ obj-y += memory_mapping.o
+ obj-y += qtest.o
+ 
+ obj-y += vl.o
+-vl.o-cflags := $(GPROF_CFLAGS) $(SDL_CFLAGS)
++vl.o-cflags := $(SDL_CFLAGS)
 -- 
 2.26.2
 
