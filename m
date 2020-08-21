@@ -2,97 +2,102 @@ Return-Path: <SRS0=atk5=B7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D418C433E4
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 12:40:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C28BC433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 12:48:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3AFBE207DA
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 12:40:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 583B12078D
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 12:48:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CzF0fOBH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3AFBE207DA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HvXEg/3g"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 583B12078D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49534 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54826 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k96L4-0003Kv-Hk
-	for qemu-devel@archiver.kernel.org; Fri, 21 Aug 2020 08:40:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34718)
+	id 1k96TZ-0005zv-LZ
+	for qemu-devel@archiver.kernel.org; Fri, 21 Aug 2020 08:48:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36880)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1k96KJ-0002XZ-Ov
- for qemu-devel@nongnu.org; Fri, 21 Aug 2020 08:39:23 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:56914
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1k96KG-0002BJ-IA
- for qemu-devel@nongnu.org; Fri, 21 Aug 2020 08:39:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598013559;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=exZ6e8JZ5+9mEgtc0J7odTL5oVSyrezyCyIp/SW25tE=;
- b=CzF0fOBHEvKC7x/IHNLkgWV/o/oAGgN8s1a5Frgp+se5i0F8U+r7RCntI9NG48VFd09Kuc
- ec1H5gOGKJgH/FJDdakXwpTtg3LPlHmMqSBx9KecJMd/Lf+YeB4zWPkMsQHZ9OZR4o8zKB
- EBkQxw43R2F0rUAfN5+1QKRoISUU35Y=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-579-zomGM9XRPz-kKLoZn4nUNQ-1; Fri, 21 Aug 2020 08:39:16 -0400
-X-MC-Unique: zomGM9XRPz-kKLoZn4nUNQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9BE9480733D;
- Fri, 21 Aug 2020 12:39:14 +0000 (UTC)
-Received: from work-vm (ovpn-113-246.ams2.redhat.com [10.36.113.246])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A96D374E2A;
- Fri, 21 Aug 2020 12:39:12 +0000 (UTC)
-Date: Fri, 21 Aug 2020 13:39:10 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Subject: Re: [PATCH v3 05/10] migration/dirtyrate: Record hash results for
- each sampled page
-Message-ID: <20200821123910.GC2655@work-vm>
-References: <1597634433-18809-1-git-send-email-zhengchuan@huawei.com>
- <1597634433-18809-6-git-send-email-zhengchuan@huawei.com>
- <20200820173009.GM2664@work-vm>
- <20200820175149.GA244434@redhat.com>
- <20200820175512.GQ2664@work-vm>
- <95894cf7-ba09-9862-357a-1073a192e934@huawei.com>
- <20200821123014.GK348677@redhat.com>
+ (Exim 4.90_1) (envelope-from <danielhb413@gmail.com>)
+ id 1k96SZ-0005Sl-O3; Fri, 21 Aug 2020 08:47:55 -0400
+Received: from mail-qk1-x743.google.com ([2607:f8b0:4864:20::743]:43251)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <danielhb413@gmail.com>)
+ id 1k96SX-0003LC-P0; Fri, 21 Aug 2020 08:47:55 -0400
+Received: by mail-qk1-x743.google.com with SMTP id 2so1194474qkf.10;
+ Fri, 21 Aug 2020 05:47:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=Q0yFN49bJUXLUtZTtYFUqfjHLv1446SG+JNw0BQfEGA=;
+ b=HvXEg/3gd/SVq7rCaGMqvgLlAPjGEoKchvrxhuasPoBLfwfiFFtA+ztdtZ8Ulchdmv
+ UwCb2jo6FYVpzJ1V6tBfgyZAq2FYF4AWXsfKsPaY4IXerxQDyAO9rmH1/4f4/tPFLStP
+ qrD3VfUqZM+TRNkR49EnC06vXOBb0W4xJF5U5fWEPmNcoPA/8Z27TG/58ndghHFEEC+f
+ HYUvt6lqN6TxIqd7iHRcd7QaGFlJNISckLOFv+W4ivU7mpu67ALmL7ekxvl8ogtWM2WV
+ xp/pTOw4+djiVYcVGQd6veDJvWJRYKRYCfG4mYk9/U0E0do3DLiqdTRDZ2x+iUagmXip
+ zavg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=Q0yFN49bJUXLUtZTtYFUqfjHLv1446SG+JNw0BQfEGA=;
+ b=m1umujv1DMl8LqGO7w2IKe8tHQN3jCL3VGeJu7JWrJsSCpyLlWvHxR2ybwQJpKaj0R
+ 6CmWAmPqDXnPtQyUyMYAF7EoPS65wLI7lVN9uLoIJPjdVB8nGUCTIKFCb6/d4idzLboI
+ n3OLtZ9ohVBEjHwbQTh4S3gL8Q9nY0yPaRS9CqaTpETcFCmFqGzp14Dkzn3flbk2qvWV
+ F7q4if1Bs8wZLcrPzsGzJ0Z9D4OYEEMdHhzS9UMVQHo7h3VTZKwmHuoRO7I0BDiCjxf2
+ bGAvOJI2qB+GJUbnIUG4MRNvF7d3BX3UW8a9TTGFkNTvwxFwPyjSCK30wufbyyg+nOWo
+ ARGQ==
+X-Gm-Message-State: AOAM5337AdMAaHlS8144rzSZ7cUOemt6eUrk6guKmG0P5zcMXmtscFH6
+ LO92H9iHa0O+ALwDaXPNaVjNei9gMsk=
+X-Google-Smtp-Source: ABdhPJwwuROA0MMIRFDgTaddnx6n4ObIV281hyDCH8NQswZVcsev29qTU6Kpb2YonB25FbtcYOyzzw==
+X-Received: by 2002:a05:620a:4ed:: with SMTP id
+ b13mr2703039qkh.493.1598014071766; 
+ Fri, 21 Aug 2020 05:47:51 -0700 (PDT)
+Received: from ?IPv6:2804:431:c7c7:c152:6ea6:a44d:671e:88f?
+ ([2804:431:c7c7:c152:6ea6:a44d:671e:88f])
+ by smtp.gmail.com with ESMTPSA id h20sm1580203qkk.79.2020.08.21.05.47.49
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 21 Aug 2020 05:47:50 -0700 (PDT)
+Subject: Re: [PATCH 02/10] numa: introduce
+ MachineClass::forbid_asymmetrical_numa
+To: Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+References: <20200814205424.543857-1-danielhb413@gmail.com>
+ <20200814205424.543857-3-danielhb413@gmail.com>
+ <20200820011726.GF271315@yekko.fritz.box>
+ <20200820021128.GC642093@habkost.net>
+ <20200820041504.GN271315@yekko.fritz.box>
+ <20200820165103.GD642093@habkost.net> <20200821105538.6f6b46c8@redhat.com>
+From: Daniel Henrique Barboza <danielhb413@gmail.com>
+Message-ID: <e007c59f-9533-48f0-a08a-6745a29b6600@gmail.com>
+Date: Fri, 21 Aug 2020 09:47:47 -0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200821123014.GK348677@redhat.com>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=dgilbert@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/21 05:15:56
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200821105538.6f6b46c8@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::743;
+ envelope-from=danielhb413@gmail.com; helo=mail-qk1-x743.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,117 +110,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alex.chen@huawei.com, zhang.zhanghailiang@huawei.com, quintela@redhat.com,
- linyilu@huawei.com, qemu-devel@nongnu.org, Zheng Chuan <zhengchuan@huawei.com>,
- ann.zhuangyanying@huawei.com, fangying1@huawei.com
+Cc: qemu-ppc@nongnu.org, John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Daniel P. Berrangé (berrange@redhat.com) wrote:
-> On Fri, Aug 21, 2020 at 08:22:06PM +0800, Zheng Chuan wrote:
-> > 
-> > 
-> > On 2020/8/21 1:55, Dr. David Alan Gilbert wrote:
-> > > * Daniel P. BerrangÃ© (berrange@redhat.com) wrote:
-> > >> On Thu, Aug 20, 2020 at 06:30:09PM +0100, Dr. David Alan Gilbert wrote:
-> > >>> * Chuan Zheng (zhengchuan@huawei.com) wrote:
-> > >>>> Record hash results for each sampled page.
-> > >>>>
-> > >>>> Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
-> > >>>> Signed-off-by: YanYing Zhuang <ann.zhuangyanying@huawei.com>
-> > >>>> ---
-> > >>>>  migration/dirtyrate.c | 144 ++++++++++++++++++++++++++++++++++++++++++++++++++
-> > >>>>  migration/dirtyrate.h |   7 +++
-> > >>>>  2 files changed, 151 insertions(+)
-> > >>>>
-> > >>>> diff --git a/migration/dirtyrate.c b/migration/dirtyrate.c
-> > >>>> index c4304ef..62b6f69 100644
-> > >>>> --- a/migration/dirtyrate.c
-> > >>>> +++ b/migration/dirtyrate.c
-> > >>>> @@ -25,6 +25,7 @@
-> > >>>>  #include "dirtyrate.h"
-> > >>>>  
-> > >>>>  CalculatingDirtyRateState CalculatingState = CAL_DIRTY_RATE_INIT;
-> > >>>> +static unsigned long int qcrypto_hash_len = QCRYPTO_HASH_LEN;
-> > >>>
-> > >>> Why do we need this static rather than just using the QCRYPTO_HASH_LEN ?
-> > >>> It's never going to change is it?
-> > >>> (and anyway it's just a MD5 len?)
-> > >>
-> > >> I wouldn't want to bet on that given that this is use of MD5. We might
-> > >> claim this isn't security critical, but surprises happen, and we will
-> > >> certainly be dinged on security audits for introducing new use of MD5
-> > >> no matter what.
-> > >>
-> > >> If a cryptographic hash is required, then sha256 should be the choice
-> > >> for any new code that doesn't have back compat requirements.
-> > >>
-> > >> If a cryptographic hash is not required then how about crc32 
-> > > 
-> > > It doesn't need to be cryptographic; is crc32 the fastest reasonable hash for use
-> > > in large areas?
-> > > 
-> > > Dave
-> > > 
-> > >> IOW, it doesn't make a whole lot of sense to say we need a cryptographic
-> > >> hash, but then pick the most insecure one.
-> > >>
-> > >> sha256 is slower than md5, but it is conceivable that in future we might
-> > >> gain support for something like Blake2b which is similar security level
-> > >> to SHA3, while being faster than MD5.
-> > >>
-> > >> Overall I'm pretty unethusiastic about use of MD5 being introduced and
-> > >> worse, being hardcoded as the only option.
-> > >>
-> > >> Regards,
-> > >> Daniel
-> > >> -- 
-> > >> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-> > >> |: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-> > >> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
-> > 
-> > Hi, Daniel, Dave.
-> > 
-> > I do compare MD5 and SHA256 with vm memory of 128G under mempress of 100G.
-> > 
-> > 1. Calculation speed
-> > 1） MD5 takes about 500ms to sample and hash all pages by record_ramblock_hash_info().
-> > 2)  SHA256 takes about 750ms to sample all pages by record_ramblock_hash_info().
-> > 
-> > 2. CPU Consumption
-> > 1)  MD5 may have instant rise up to 48% for dirtyrate thread
-> > 2)  SHA256 may have instant rise up to 75% for dirtyrate thread
-> > 
-> > 3. Memory Consumption
-> > SHA256 may need twice memory than MD5 due to its HASH_LEN.
-> > 
-> > I am trying to consider if crc32 is more faster and takes less memory and is more safer than MD5?
-> 
-> No, crc32 is absolutely *weaker* than MD5. It is NOT a cryptographic
-> hash so does not try to guarantee collision resistance. It only has
-> 2^32 possible outputs.
-> 
-> MD5 does try to guarantee collision resistance, but MD5 is considered
-> broken these days, so a malicious attacker can cause collisions if they
-> are motivated enough.
-> 
-> IOW if you need collision resistance that SHA256 should be used.
 
-There's no need to guard against malicious behaviour here - this is just
-a stat to guide migration.
-If CRC32 is likely to be faster than md5 I suspect it's enough.
 
-Dave
+On 8/21/20 5:55 AM, Igor Mammedov wrote:
+> On Thu, 20 Aug 2020 12:51:03 -0400
+> Eduardo Habkost <ehabkost@redhat.com> wrote:
+> 
+>> On Thu, Aug 20, 2020 at 02:15:04PM +1000, David Gibson wrote:
+>>> On Wed, Aug 19, 2020 at 10:11:28PM -0400, Eduardo Habkost wrote:
+>>>> On Thu, Aug 20, 2020 at 11:17:26AM +1000, David Gibson wrote:
+>>>>> On Fri, Aug 14, 2020 at 05:54:16PM -0300, Daniel Henrique Barboza wrote:
+>>>>>> The pSeries machine does not support asymmetrical NUMA
+>>>>>> configurations.
+>>>>>
+>>>>> This seems a bit oddly specific to have as a global machine class
+>>>>> property.
+>>>>>
+>>>>> Would it make more sense for machines with specific NUMA constraints
+>>>>> to just verify those during their initialization?
+>>>>
+>>>> This would be much simpler.  However, I like the idea of
+>>>> representing machine-specific configuration validation rules as
+>>>> data that can eventually be exported to management software.
+>>>
+>>> Ah, ok, so basically the usual tradeoff between flexibility and
+>>> advertisability.
+>>>
+>>> So, in that case, I guess the question is whether we envisage "no
+>>> assymmetry" as a constraint common enough that it's worth creating an
+>>> advertisable rule or not.  If we only ever have one user, then we
+>>> haven't really done any better than hard coding the constraint in the
+>>> manageent software.
+>>>
+>>> Of course to complicate matters, in the longer term we're looking at
+>>> removing that constraint from pseries - but doing so will be dependent
+>>> on the guest kernel understanding a new format for the NUMA
+>>> information in the device tree.  So qemu alone won't have enough
+>>> information to tell if such a configuration is possible or not.
+>>
+>> Requiring both QEMU (and possibly management software) to be
+>> patched again after the guest kernel is fixed sounds undesirable.
+> If we drop this restriction, then we don't need to touch QEMU when
+> guest kernel is ready.
+> 
+> Btw, what spapr spec says about the matter?
+
+
+LOPAPR support a somewhat asymmetrical NUMA setup in its current form, but
+the Linux kernel doesn't support it. The effort to implement it in the current
+spapr machine code, given that Linux wouldn't mind it, is not worth it. This
+is why I chose to invalidate it for pseries.
+
 
 > 
-> Regards,
-> Daniel
-> -- 
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-> |: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
--- 
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>> Perhaps a warning would be better in this case?
+>>
+>> In either case, it sounds like this won't be a common constraint
+>> and I now agree with your original suggestion of doing this in
+>> machine initialization code.
+> Agreed, if it goes to spapr specific machine code I will not object much.
+> (it will burden just spapr maintainers, so it's about convincing
+> David in the end)
 
+I believe he's ok with it given that he suggested it in his first reply.
+
+I'll move this verification to spapr machine_init in the next version.
+
+
+
+Thanks,
+
+DHB
+
+
+> 
 
