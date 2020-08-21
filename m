@@ -7,76 +7,76 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDDE9C433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 10:47:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 315DFC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 10:47:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BA3DD20656
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 10:47:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 021C420656
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 10:47:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dS4cI/0T"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA3DD20656
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S8Z9Q4du"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 021C420656
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34222 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34200 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k94Zs-0006Gk-14
+	id 1k94Zs-0006GE-6h
 	for qemu-devel@archiver.kernel.org; Fri, 21 Aug 2020 06:47:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59952)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60134)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k94DY-0001ie-3M
- for qemu-devel@nongnu.org; Fri, 21 Aug 2020 06:24:16 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:47727
- helo=us-smtp-1.mimecast.com)
+ id 1k94Dn-00021g-GS
+ for qemu-devel@nongnu.org; Fri, 21 Aug 2020 06:24:31 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:21623
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k94DV-0001aM-6L
- for qemu-devel@nongnu.org; Fri, 21 Aug 2020 06:24:15 -0400
+ id 1k94Di-0001cN-0E
+ for qemu-devel@nongnu.org; Fri, 21 Aug 2020 06:24:31 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598005452;
+ s=mimecast20190719; t=1598005462;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=S++sMXlk4ZbdRPKitxI0XFdZlmXCAv7kx45kPYA6yNU=;
- b=dS4cI/0TukWDtYbhGnrcKWXIqaO6T7HY7dinWR+eMa2tOAHfcE3ScCKhaagxJ+wb5qLqp/
- K6LBZNcxjhLElSHqipnAtV43x7E1vcWN1kAn18fOXQxQ3jmS0qi654JR3IJFAEpQdRUO/r
- ybgzHV1KmjguCCsda1F+trf0gFvxvNk=
+ bh=bRgqJhXghNrzQYE4BiirjVUChmbcjbePOcZgluZ1vrI=;
+ b=S8Z9Q4duWa5ITX9iw9PSvAZbvDTiF4+d1c51Q8apAdiIq96O4mavN95JE6T4AvwqNOiMpB
+ GaAKmutgkNOEagqGAhTt6hX4c3oTYjX6FSDBRle4qBoJBNHIZhlOu81LHy5Zd56URsItTw
+ iX2ZtSER0q6KEBvx/pEX9qphDWpWv/A=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-386-UM59yB9TPCijPbFnOOCKWQ-1; Fri, 21 Aug 2020 06:24:10 -0400
-X-MC-Unique: UM59yB9TPCijPbFnOOCKWQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-257-cdMJyJzAPyeO_cKyh8BZEg-1; Fri, 21 Aug 2020 06:24:20 -0400
+X-MC-Unique: cdMJyJzAPyeO_cKyh8BZEg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CEFA380EFBD
- for <qemu-devel@nongnu.org>; Fri, 21 Aug 2020 10:24:09 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CA81B56B5A
+ for <qemu-devel@nongnu.org>; Fri, 21 Aug 2020 10:24:18 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6688B5C1D0;
- Fri, 21 Aug 2020 10:24:09 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 888F960BF1;
+ Fri, 21 Aug 2020 10:24:18 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v8 045/152] meson: add qemu-bridge-helper
-Date: Fri, 21 Aug 2020 06:21:42 -0400
-Message-Id: <20200821102329.29777-46-pbonzini@redhat.com>
+Subject: [PULL v8 058/152] meson: convert authz directory to Meson
+Date: Fri, 21 Aug 2020 06:21:55 -0400
+Message-Id: <20200821102329.29777-59-pbonzini@redhat.com>
 In-Reply-To: <20200821102329.29777-1-pbonzini@redhat.com>
 References: <20200821102329.29777-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/20 23:41:39
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/21 05:15:56
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
@@ -97,8 +97,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -106,62 +105,120 @@ Sender: "Qemu-devel"
 From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Makefile    | 4 ----
- meson.build | 9 ++++++++-
- 2 files changed, 8 insertions(+), 5 deletions(-)
+ Makefile            |  1 -
+ Makefile.objs       |  3 ++-
+ Makefile.target     |  2 +-
+ authz/Makefile.objs |  7 -------
+ authz/meson.build   | 19 +++++++++++++++++++
+ meson.build         |  5 +++++
+ 6 files changed, 27 insertions(+), 10 deletions(-)
+ delete mode 100644 authz/Makefile.objs
+ create mode 100644 authz/meson.build
 
 diff --git a/Makefile b/Makefile
-index 8d3c8d8fbd..3addf50636 100644
+index 4b152e3587..d380271765 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -197,8 +197,6 @@ LIBS+=-lz $(LIBS_TOOLS)
+@@ -241,7 +241,6 @@ include $(SRC_PATH)/Makefile.objs
+ endif
  
- HELPERS-y = $(HELPERS)
+ dummy := $(call unnest-vars,, \
+-                authz-obj-y \
+                 chardev-obj-y \
+                 block-obj-y \
+                 block-obj-m \
+diff --git a/Makefile.objs b/Makefile.objs
+index 84bfa2a61a..0bc361d338 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -9,7 +9,8 @@ ifeq ($(call lor,$(CONFIG_SOFTMMU),$(CONFIG_TOOLS)),y)
  
--HELPERS-$(call land,$(CONFIG_SOFTMMU),$(CONFIG_LINUX)) += qemu-bridge-helper$(EXESUF)
+ chardev-obj-y = chardev/
+ 
+-authz-obj-y = authz/
++authz-obj-y = authz/libauthz.fa
++authz/libauthz.fa-libs = $(if $(CONFIG_AUTH_PAM),-lpam)
+ 
+ block-obj-y = block/ nbd/ scsi/
+ block-obj-y += block.o blockjob.o job.o
+diff --git a/Makefile.target b/Makefile.target
+index 1e04551a8e..79b6e02bed 100644
+--- a/Makefile.target
++++ b/Makefile.target
+@@ -192,9 +192,9 @@ common-obj-m :=
+ 
+ include $(SRC_PATH)/Makefile.objs
+ dummy := $(call fix-paths,../,, \
++              authz-obj-y \
+               qom-obj-y)
+ dummy := $(call unnest-vars,.., \
+-               authz-obj-y \
+                block-obj-y \
+                block-obj-m \
+                chardev-obj-y \
+diff --git a/authz/Makefile.objs b/authz/Makefile.objs
+deleted file mode 100644
+index ed7b273596..0000000000
+--- a/authz/Makefile.objs
++++ /dev/null
+@@ -1,7 +0,0 @@
+-authz-obj-y += base.o
+-authz-obj-y += simple.o
+-authz-obj-y += list.o
+-authz-obj-y += listfile.o
+-authz-obj-$(CONFIG_AUTH_PAM) += pamacct.o
 -
- # Sphinx does not allow building manuals into the same directory as
- # the source files, so if we're doing an in-tree QEMU build we must
- # build the manuals into a subdirectory (and then install them from
-@@ -431,8 +429,6 @@ qemu-nbd$(EXESUF): qemu-nbd.o $(authz-obj-y) $(block-obj-y) $(crypto-obj-y) $(io
- qemu-io$(EXESUF): qemu-io.o $(authz-obj-y) $(block-obj-y) $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
- qemu-storage-daemon$(EXESUF): qemu-storage-daemon.o $(authz-obj-y) $(block-obj-y) $(crypto-obj-y) $(chardev-obj-y) $(io-obj-y) $(qom-obj-y) $(storage-daemon-obj-y) $(COMMON_LDADDS)
- 
--qemu-bridge-helper$(EXESUF): qemu-bridge-helper.o $(COMMON_LDADDS)
--
- qemu-keymap$(EXESUF): qemu-keymap.o ui/input-keymap.o $(COMMON_LDADDS)
- 
- qemu-edid$(EXESUF): qemu-edid.o hw/display/edid-generate.o $(COMMON_LDADDS)
+-pamacct.o-libs = -lpam
+diff --git a/authz/meson.build b/authz/meson.build
+new file mode 100644
+index 0000000000..516d71f2e2
+--- /dev/null
++++ b/authz/meson.build
+@@ -0,0 +1,19 @@
++authz_ss = ss.source_set()
++authz_ss.add(genh)
++authz_ss.add(files(
++  'base.c',
++  'list.c',
++  'listfile.c',
++  'simple.c',
++))
++
++authz_ss.add(when: ['CONFIG_AUTH_PAM', pam], if_true: files('pamacct.c'))
++
++authz_ss = authz_ss.apply(config_host, strict: false)
++libauthz = static_library('authz', authz_ss.sources() + genh,
++                          dependencies: [authz_ss.dependencies()],
++                          name_suffix: 'fa',
++                          build_by_default: false)
++
++authz = declare_dependency(link_whole: libauthz,
++                           dependencies: qom)
 diff --git a/meson.build b/meson.build
-index 5cd8ee0298..3568b4816e 100644
+index 658d45c4c6..34363bff19 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -297,7 +297,6 @@ qemuutil = declare_dependency(link_with: libqemuutil,
+@@ -103,6 +103,10 @@ if 'CONFIG_GNUTLS' in config_host
+ endif
+ pixman = declare_dependency(compile_args: config_host['PIXMAN_CFLAGS'].split(),
+                             link_args: config_host['PIXMAN_LIBS'].split())
++pam = not_found
++if 'CONFIG_AUTH_PAM' in config_host
++  pam = cc.find_library('pam')
++endif
+ libattr = not_found
+ if 'CONFIG_ATTR' in config_host
+   libattr = declare_dependency(link_args: config_host['LIBATTR_LIBS'].split())
+@@ -341,6 +345,7 @@ qemuutil = declare_dependency(link_with: libqemuutil,
                                sources: genh + version_res)
  
+ subdir('qom')
++subdir('authz')
+ subdir('fsdev')
+ 
  # Other build targets
--
- if 'CONFIG_GUEST_AGENT' in config_host
-   subdir('qga')
- endif
-@@ -315,6 +314,14 @@ if have_tools
-     subdir('contrib/vhost-user-input')
-     subdir('contrib/vhost-user-scsi')
-   endif
-+
-+  if targetos == 'linux'
-+    executable('qemu-bridge-helper', files('qemu-bridge-helper.c'),
-+               dependencies: [qemuutil, libcap_ng],
-+               install: true,
-+               install_dir: get_option('libexecdir'))
-+  endif
-+
-   if 'CONFIG_IVSHMEM' in config_host
-     subdir('contrib/ivshmem-client')
-     subdir('contrib/ivshmem-server')
 -- 
 2.26.2
 
