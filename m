@@ -2,106 +2,129 @@ Return-Path: <SRS0=atk5=B7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0581CC433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 11:30:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 587ADC433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 11:30:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C21042072D
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 11:30:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 278992072D
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 11:30:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HqddCTD/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C21042072D
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="etIez6NM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 278992072D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59032 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59578 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k95FD-0004NH-TZ
-	for qemu-devel@archiver.kernel.org; Fri, 21 Aug 2020 07:30:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34138)
+	id 1k95FI-0004aa-BY
+	for qemu-devel@archiver.kernel.org; Fri, 21 Aug 2020 07:30:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36790)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <sgarzare@redhat.com>)
- id 1k94J1-0005HS-OU
- for qemu-devel@nongnu.org; Fri, 21 Aug 2020 06:29:55 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:41858)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k94YV-0003fS-5i
+ for qemu-devel@nongnu.org; Fri, 21 Aug 2020 06:45:55 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:58247
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <sgarzare@redhat.com>)
- id 1k94Iz-0002cG-VU
- for qemu-devel@nongnu.org; Fri, 21 Aug 2020 06:29:55 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k94YS-0004aH-UJ
+ for qemu-devel@nongnu.org; Fri, 21 Aug 2020 06:45:54 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598005793;
+ s=mimecast20190719; t=1598006751;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=+4pnbSrDnlxCt/KbRjsiXp4SKG8HWNOhQT+5aGwvJLE=;
- b=HqddCTD/wU0JlxWi0jKfiPx/ljosFKtsNR2Oo0DFbW3nllH2196ddtuC3FHGrA3Cf555qC
- q2evJ3OSdtDPnBMVbnKe5vgcd+crSnvjUHcsiO8Op/BC+RwPRWahLfxWDYUCVlqotICTP5
- 2g6o2X4fCD6g6OMzZzm5O4UNUu5Isro=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-468-cZXfWzkKOkmz-senmdTyiQ-1; Fri, 21 Aug 2020 06:29:49 -0400
-X-MC-Unique: cZXfWzkKOkmz-senmdTyiQ-1
-Received: by mail-wm1-f72.google.com with SMTP id h7so649440wmm.7
- for <qemu-devel@nongnu.org>; Fri, 21 Aug 2020 03:29:49 -0700 (PDT)
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=mfNaxaVa//Ptpg41/R+EuWBIgpNNPyWKFWiLOalNkPw=;
+ b=etIez6NMJVzkJ46QrQMmykCX9yndIT5xmnvF53F/Fr1rMKaJkrAuihcf1psRWnpahrH7YG
+ 1bCzj9/LRvIArojxefdMK7JFPTwDmjh1ZzhFOQ7BXKFCS+bQbpgry6bTvGhqQl0F1pD4C1
+ 3l17YeXTT33ABvYxWq1QniDXhuQPIOs=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-298-k2iJmns_Md-cbXBRdihemg-1; Fri, 21 Aug 2020 06:45:49 -0400
+X-MC-Unique: k2iJmns_Md-cbXBRdihemg-1
+Received: by mail-wr1-f72.google.com with SMTP id o10so426499wrs.21
+ for <qemu-devel@nongnu.org>; Fri, 21 Aug 2020 03:45:48 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=Tb60Up/BUBy/IR/p7cv54uNslKqKIns3yFa/SV4TQBs=;
- b=ftCzC6zWP0wEssXUUbaq1R/ngrqyrkS8tMtnEpSErupLepyyAnofoPxGYRFJVatBrK
- FMcUIh51LI2w+dZXG3gG4Q8xfkkDXA/xa2qMpW5QK6Nu51HcEHhpAjHfDgxBaLUmIo4E
- K7nm024nSwozxoWYkbo25bMWuUIwDJuefAjxnxnRHdwYCgme/8d8SkTOy2Jl3m6wzPv0
- GNK0HTSCEMVWEZgnR0aM+iXMf4RYPhloDESLfC2yQS7T6C1vp8Nf0dQN3frAydmkpMHK
- fxpTMnpygs8WclwbVzslMC6pkgDC+4NLznrKEEkFARW41tEYsepJ+BWxuNYhBl4T7+Nm
- 5MzQ==
-X-Gm-Message-State: AOAM531wg04K/2CSLEsiEo20G/iK5q5SloLaUitd8+mXYtQNwwhWbWIw
- v+VaKEFn4wkkuK/TGdDy0qjX51gvs2ZYFv8sjpajcvep6EoU9VSlY8rSqLJwgho7J3wmnE9xXbW
- SkSbqn7aJDaMYkuM=
-X-Received: by 2002:a1c:2646:: with SMTP id m67mr3255545wmm.137.1598005788466; 
- Fri, 21 Aug 2020 03:29:48 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyMB3DFWY6UyjEMn+SE/g+0d/YSurueZ30CAvkwJBlv3Vr5A8UtAz9T8IFjG+kF4M8FGKGSjg==
-X-Received: by 2002:a1c:2646:: with SMTP id m67mr3255520wmm.137.1598005788187; 
- Fri, 21 Aug 2020 03:29:48 -0700 (PDT)
-Received: from steredhat (host-79-33-191-244.retail.telecomitalia.it.
- [79.33.191.244])
- by smtp.gmail.com with ESMTPSA id x11sm3449636wrl.28.2020.08.21.03.29.45
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 21 Aug 2020 03:29:47 -0700 (PDT)
-Date: Fri, 21 Aug 2020 12:29:37 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: Re: [PATCH v5 15/15] block/nvme: Use an array of EventNotifier
-Message-ID: <20200821102937.bartqudtcfesdmzr@steredhat>
-References: <20200820165901.1139109-1-philmd@redhat.com>
- <20200820165901.1139109-16-philmd@redhat.com>
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=mfNaxaVa//Ptpg41/R+EuWBIgpNNPyWKFWiLOalNkPw=;
+ b=W7pSFyGGLekk1akcSzBXNBqaDesrx0kdSjuXNT1ZW8w41QHDpmfPOXw32gtXtECIKn
+ +cLaiTnkNUz9aWFI1+MCxOLgwPWA1egkZDg3F9WD94m+jDLJwGsVtQTM+0gcHfy2PXLe
+ 5ytHx/vafkeSTCVbGPx/wup9xOvLSRHOkF1PAo+pVN1MplpjLPk6+Nz8IZrIsfDGb9q/
+ g1HMJDqnTk/qT05Qtm2qRDxjN6QeRbC9Pd20Wz4tpcoq8/HozoqEHGVJwFE8q+CjaYDc
+ K5QUSc3tWgUYS/TvYybwr8EVOkxBXaFWoOFPX0c+N+XJGDZ4MBaborJNE4I9TWScAxOB
+ h1cQ==
+X-Gm-Message-State: AOAM532j875EprWjVvpTZKOXQWdWJcfos1eNxyscUDptvpgVGCe6h+ws
+ aEL/OPb0Y2SLVIwcko30VIUiWVe7gDADtia8Rr0aZES9a1ulReDeVbeCdS/isFrkRFKd1Poz3xb
+ Imdri5tYHgRfNFHs=
+X-Received: by 2002:a5d:538d:: with SMTP id d13mr2184868wrv.400.1598006748068; 
+ Fri, 21 Aug 2020 03:45:48 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwbMyO/3b2Q3arlx88Wk3oxt+xPRvLiJ2aBSRvLUQLsZhrpiG5z2PvThE2Rb28CZ/q16BKmXQ==
+X-Received: by 2002:a5d:538d:: with SMTP id d13mr2184852wrv.400.1598006747787; 
+ Fri, 21 Aug 2020 03:45:47 -0700 (PDT)
+Received: from [192.168.1.36] (121.red-81-40-121.staticip.rima-tde.net.
+ [81.40.121.121])
+ by smtp.gmail.com with ESMTPSA id j11sm3599911wrw.79.2020.08.21.03.45.46
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 21 Aug 2020 03:45:47 -0700 (PDT)
+Subject: Re: [PATCH] numa: hmat: fix cache size check
+To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+References: <20200821100519.1325691-1-imammedo@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <8f64b400-cff7-d7a7-bf1d-1eb641a475be@redhat.com>
+Date: Fri, 21 Aug 2020 12:45:45 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200820165901.1139109-16-philmd@redhat.com>
+In-Reply-To: <20200821100519.1325691-1-imammedo@redhat.com>
+Content-Language: en-US
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=sgarzare@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
 X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=sgarzare@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/21 02:43:55
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/20 23:41:39
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
 X-Spam_bar: ----
 X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -114,134 +137,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>
+Cc: mprivozn@redhat.com, ehabkost@redhat.com, jingqi.liu@intel.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Aug 20, 2020 at 06:59:01PM +0200, Philippe Mathieu-Daudé wrote:
-> In preparation of using multiple IRQ (thus multiple eventfds)
-> make BDRVNVMeState::irq_notifier an array (for now of a single
-> element, the admin queue notifier).
+On 8/21/20 12:05 PM, Igor Mammedov wrote:
+> when QEMU is started like:
 > 
-> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> qemu-system-x86_64 -smp 2 -machine hmat=on \
+>  -m 2G \
+>  -object memory-backend-ram,size=1G,id=m0 \
+>  -object memory-backend-ram,size=1G,id=m1 \
+>  -numa node,nodeid=0,memdev=m0 \
+>  -numa node,nodeid=1,memdev=m1,initiator=0 \
+>  -numa cpu,node-id=0,socket-id=0 \
+>  -numa cpu,node-id=0,socket-id=1 \
+>  -numa hmat-lb,initiator=0,target=0,hierarchy=memory,data-type=access-latency,latency=5 \
+>  -numa hmat-lb,initiator=0,target=0,hierarchy=memory,data-type=access-bandwidth,bandwidth=200M \
+>  -numa hmat-lb,initiator=0,target=1,hierarchy=memory,data-type=access-latency,latency=10 \
+>  -numa hmat-lb,initiator=0,target=1,hierarchy=memory,data-type=access-bandwidth,bandwidth=100M \
+>  -numa hmat-cache,node-id=0,size=8K,level=1,associativity=direct,policy=write-back,line=5 \
+>  -numa hmat-cache,node-id=0,size=16K,level=2,associativity=direct,policy=write-back,line=5
+> 
+> it errors out with:
+>  -numa hmat-cache,node-id=0,size=16K,level=2,associativity=direct,policy=write-back,line=5:
+>         Invalid size=16384, the size of level=2 should be less than the size(8192) of level=1
+> 
+> which doesn't look right as one would expect that L1 < L2 < L3 ...
+> Fix it by sawpping relevant size checks.
+
+It makes sense (typo "swapping").
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
+> 
+> Fixes: c412a48d4d91 (numa: Extend CLI to provide memory side cache information)
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 > ---
->  block/nvme.c | 31 +++++++++++++++++++++----------
->  1 file changed, 21 insertions(+), 10 deletions(-)
+> CC: jingqi.liu@intel.com
 > 
-> diff --git a/block/nvme.c b/block/nvme.c
-> index a61e86a83eb..fe8a40b7ede 100644
-> --- a/block/nvme.c
-> +++ b/block/nvme.c
-> @@ -106,6 +106,12 @@ QEMU_BUILD_BUG_ON(offsetof(NVMeRegs, doorbells) != 0x1000);
->  #define INDEX_ADMIN     0
->  #define INDEX_IO(n)     (1 + n)
->  
-> +/* This driver shares a single MSIX IRQ for the admin and I/O queues */
-> +enum {
-> +    MSIX_SHARED_IRQ_IDX = 0,
-> +    MSIX_IRQ_COUNT = 1
-> +};
-> +
->  struct BDRVNVMeState {
->      AioContext *aio_context;
->      QEMUVFIOState *vfio;
-> @@ -120,7 +126,7 @@ struct BDRVNVMeState {
->      /* How many uint32_t elements does each doorbell entry take. */
->      size_t doorbell_scale;
->      bool write_cache_supported;
-> -    EventNotifier irq_notifier;
-> +    EventNotifier irq_notifier[MSIX_IRQ_COUNT];
->  
->      uint64_t nsze; /* Namespace size reported by identify command */
->      int nsid;      /* The namespace id to read/write data. */
-> @@ -631,7 +637,8 @@ static bool nvme_poll_queues(BDRVNVMeState *s)
->  
->  static void nvme_handle_event(EventNotifier *n)
->  {
-> -    BDRVNVMeState *s = container_of(n, BDRVNVMeState, irq_notifier);
-> +    BDRVNVMeState *s = container_of(n, BDRVNVMeState,
-> +                                    irq_notifier[MSIX_SHARED_IRQ_IDX]);
->  
->      trace_nvme_handle_event(s);
->      event_notifier_test_and_clear(n);
-> @@ -683,7 +690,8 @@ out_error:
->  static bool nvme_poll_cb(void *opaque)
->  {
->      EventNotifier *e = opaque;
-> -    BDRVNVMeState *s = container_of(e, BDRVNVMeState, irq_notifier);
-> +    BDRVNVMeState *s = container_of(e, BDRVNVMeState,
-> +                                    irq_notifier[MSIX_SHARED_IRQ_IDX]);
->  
->      trace_nvme_poll_cb(s);
->      return nvme_poll_queues(s);
-> @@ -705,7 +713,7 @@ static int nvme_init(BlockDriverState *bs, const char *device, int namespace,
->      s->device = g_strdup(device);
->      s->nsid = namespace;
->      s->aio_context = bdrv_get_aio_context(bs);
-> -    ret = event_notifier_init(&s->irq_notifier, 0);
-> +    ret = event_notifier_init(&s->irq_notifier[MSIX_SHARED_IRQ_IDX], 0);
->      if (ret) {
->          error_setg(errp, "Failed to init event notifier");
->          return ret;
-> @@ -784,12 +792,13 @@ static int nvme_init(BlockDriverState *bs, const char *device, int namespace,
->          }
->      }
->  
-> -    ret = qemu_vfio_pci_init_irq(s->vfio, &s->irq_notifier,
-> +    ret = qemu_vfio_pci_init_irq(s->vfio, s->irq_notifier,
-
-Maybe we can use '&s->irq_notifier[MSIX_SHARED_IRQ_IDX]' to match the other
-changes.
-
->                                   VFIO_PCI_MSIX_IRQ_INDEX, errp);
->      if (ret) {
->          goto out;
->      }
-> -    aio_set_event_notifier(bdrv_get_aio_context(bs), &s->irq_notifier,
-> +    aio_set_event_notifier(bdrv_get_aio_context(bs),
-> +                           &s->irq_notifier[MSIX_SHARED_IRQ_IDX],
->                             false, nvme_handle_event, nvme_poll_cb);
->  
->      nvme_identify(bs, namespace, &local_err);
-> @@ -872,9 +881,10 @@ static void nvme_close(BlockDriverState *bs)
->          nvme_free_queue_pair(s->queues[i]);
->      }
->      g_free(s->queues);
-> -    aio_set_event_notifier(bdrv_get_aio_context(bs), &s->irq_notifier,
-> +    aio_set_event_notifier(bdrv_get_aio_context(bs),
-> +                           &s->irq_notifier[MSIX_SHARED_IRQ_IDX],
->                             false, NULL, NULL);
-> -    event_notifier_cleanup(&s->irq_notifier);
-> +    event_notifier_cleanup(&s->irq_notifier[MSIX_SHARED_IRQ_IDX]);
->      qemu_vfio_pci_unmap_bar(s->vfio, 0, (void *)s->regs, 0, NVME_BAR_SIZE);
->      qemu_vfio_close(s->vfio);
->  
-> @@ -1381,7 +1391,8 @@ static void nvme_detach_aio_context(BlockDriverState *bs)
->          q->completion_bh = NULL;
->      }
->  
-> -    aio_set_event_notifier(bdrv_get_aio_context(bs), &s->irq_notifier,
-> +    aio_set_event_notifier(bdrv_get_aio_context(bs),
-> +                           &s->irq_notifier[MSIX_SHARED_IRQ_IDX],
->                             false, NULL, NULL);
->  }
->  
-> @@ -1391,7 +1402,7 @@ static void nvme_attach_aio_context(BlockDriverState *bs,
->      BDRVNVMeState *s = bs->opaque;
->  
->      s->aio_context = new_context;
-> -    aio_set_event_notifier(new_context, &s->irq_notifier,
-> +    aio_set_event_notifier(new_context, &s->irq_notifier[MSIX_SHARED_IRQ_IDX],
->                             false, nvme_handle_event, nvme_poll_cb);
->  
->      for (int i = 0; i < s->nr_queues; i++) {
-> -- 
-> 2.26.2
+>  hw/core/numa.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
 > 
+> diff --git a/hw/core/numa.c b/hw/core/numa.c
+> index d1a94a14f8..f9593ec716 100644
+> --- a/hw/core/numa.c
+> +++ b/hw/core/numa.c
+> @@ -425,10 +425,10 @@ void parse_numa_hmat_cache(MachineState *ms, NumaHmatCacheOptions *node,
+>  
+>      if ((node->level > 1) &&
+>          ms->numa_state->hmat_cache[node->node_id][node->level - 1] &&
+> -        (node->size >=
+> +        (node->size <=
+>              ms->numa_state->hmat_cache[node->node_id][node->level - 1]->size)) {
+>          error_setg(errp, "Invalid size=%" PRIu64 ", the size of level=%" PRIu8
+> -                   " should be less than the size(%" PRIu64 ") of "
+> +                   " should be larger than the size(%" PRIu64 ") of "
+>                     "level=%u", node->size, node->level,
+>                     ms->numa_state->hmat_cache[node->node_id]
+>                                               [node->level - 1]->size,
+> @@ -438,10 +438,10 @@ void parse_numa_hmat_cache(MachineState *ms, NumaHmatCacheOptions *node,
+>  
+>      if ((node->level < HMAT_LB_LEVELS - 1) &&
+>          ms->numa_state->hmat_cache[node->node_id][node->level + 1] &&
+> -        (node->size <=
+> +        (node->size >=
+>              ms->numa_state->hmat_cache[node->node_id][node->level + 1]->size)) {
+>          error_setg(errp, "Invalid size=%" PRIu64 ", the size of level=%" PRIu8
+> -                   " should be larger than the size(%" PRIu64 ") of "
+> +                   " should be less than the size(%" PRIu64 ") of "
+>                     "level=%u", node->size, node->level,
+>                     ms->numa_state->hmat_cache[node->node_id]
+>                                               [node->level + 1]->size,
 > 
 
 
