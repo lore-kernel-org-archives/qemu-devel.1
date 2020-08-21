@@ -7,84 +7,84 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E26EAC433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 10:27:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC4B3C433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 10:27:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AE27020748
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 10:27:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B6BF220748
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 10:27:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zcbcshrn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE27020748
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N6DcAZBB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B6BF220748
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45812 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47016 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k94Gh-0007CW-U5
-	for qemu-devel@archiver.kernel.org; Fri, 21 Aug 2020 06:27:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59346)
+	id 1k94Gt-0007hD-OE
+	for qemu-devel@archiver.kernel.org; Fri, 21 Aug 2020 06:27:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59426)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k94D3-0000SX-5H
- for qemu-devel@nongnu.org; Fri, 21 Aug 2020 06:23:45 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52315
- helo=us-smtp-1.mimecast.com)
+ id 1k94D6-0000a7-Hn
+ for qemu-devel@nongnu.org; Fri, 21 Aug 2020 06:23:48 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22276)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k94Cz-0001QN-N3
- for qemu-devel@nongnu.org; Fri, 21 Aug 2020 06:23:44 -0400
+ id 1k94D4-0001RX-GF
+ for qemu-devel@nongnu.org; Fri, 21 Aug 2020 06:23:48 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598005421;
+ s=mimecast20190719; t=1598005425;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=0a0pdxj8URCPTrQRCRURzIJ/7kye+CS6zcsdxJWquRA=;
- b=ZcbcshrnM6kEEBPvnvb9rEs7N4TB5SYCSyCu4v9nSDAeYJDGtyyIW4pVEMRH9IkY02C78u
- NmdESxKid5xF/PxBjMYWbp7zUIiaP2bnnEKxlvDuxbDVaM3XRUuELn1/kv1GzszKyI2M6P
- wkpaY8YA9usdA6p95g4wJQlFs+0120M=
+ bh=wCwinYbY8KogL6MVGmLHlxl2ZdviDPrAvyQ0cEAXXVE=;
+ b=N6DcAZBB8ZQMaVO/ui6gGo0tDJflN5ub+8kK4h3KmadWTOuJlFZ/LuukzVAy6P6FN/UNpp
+ m+Q4xjsF8dbJUUroBfp0wBx6zguuhA0tsxLW6qPPzhjD2kkIUwgxPS1D3Gri/iFOEuyk2y
+ R7SrQ07ierRe8xVRmo8aZDf/75YOHeE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-525-qxQr2sRaOr2AlJ25p2dLVA-1; Fri, 21 Aug 2020 06:23:39 -0400
-X-MC-Unique: qxQr2sRaOr2AlJ25p2dLVA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-501-8BWqzBB5PnCLfVuhLbLmyA-1; Fri, 21 Aug 2020 06:23:44 -0400
+X-MC-Unique: 8BWqzBB5PnCLfVuhLbLmyA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 76BDC10082E0
- for <qemu-devel@nongnu.org>; Fri, 21 Aug 2020 10:23:38 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 35205873085
+ for <qemu-devel@nongnu.org>; Fri, 21 Aug 2020 10:23:43 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4548A19C78
- for <qemu-devel@nongnu.org>; Fri, 21 Aug 2020 10:23:38 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 021D15DA74
+ for <qemu-devel@nongnu.org>; Fri, 21 Aug 2020 10:23:42 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v8 006/152] meson: rename .inc.h files to .h.inc
-Date: Fri, 21 Aug 2020 06:21:03 -0400
-Message-Id: <20200821102329.29777-7-pbonzini@redhat.com>
+Subject: [PULL v8 010/152] tests/docker: add test script for static linux-user
+ builds
+Date: Fri, 21 Aug 2020 06:21:07 -0400
+Message-Id: <20200821102329.29777-11-pbonzini@redhat.com>
 In-Reply-To: <20200821102329.29777-1-pbonzini@redhat.com>
 References: <20200821102329.29777-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Spam-Score: 0.0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/21 04:55:47
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/21 04:26:32
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
 X-Spam_bar: ----
 X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,154 +101,42 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Make it consistent with '.c.inc' and '.rst.inc'.
-
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- include/exec/cpu-all.h                               | 10 +++++-----
- include/exec/memory.h                                | 12 ++++++------
- .../exec/{memory_ldst.inc.h => memory_ldst.h.inc}    |  0
- ...ry_ldst_cached.inc.h => memory_ldst_cached.h.inc} |  0
- ...memory_ldst_phys.inc.h => memory_ldst_phys.h.inc} |  0
- target/s390x/cpu_features.c                          |  2 +-
- target/s390x/cpu_features_def.h                      |  2 +-
- ...cpu_features_def.inc.h => cpu_features_def.h.inc} |  0
- 8 files changed, 13 insertions(+), 13 deletions(-)
- rename include/exec/{memory_ldst.inc.h => memory_ldst.h.inc} (100%)
- rename include/exec/{memory_ldst_cached.inc.h => memory_ldst_cached.h.inc} (100%)
- rename include/exec/{memory_ldst_phys.inc.h => memory_ldst_phys.h.inc} (100%)
- rename target/s390x/{cpu_features_def.inc.h => cpu_features_def.h.inc} (100%)
+ tests/docker/test-static | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
+ create mode 100755 tests/docker/test-static
 
-diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
-index fc403d456b..f6439c4705 100644
---- a/include/exec/cpu-all.h
-+++ b/include/exec/cpu-all.h
-@@ -189,13 +189,13 @@ extern unsigned long reserved_va;
- #define ARG1         as
- #define ARG1_DECL    AddressSpace *as
- #define TARGET_ENDIANNESS
--#include "exec/memory_ldst.inc.h"
-+#include "exec/memory_ldst.h.inc"
- 
- #define SUFFIX       _cached_slow
- #define ARG1         cache
- #define ARG1_DECL    MemoryRegionCache *cache
- #define TARGET_ENDIANNESS
--#include "exec/memory_ldst.inc.h"
-+#include "exec/memory_ldst.h.inc"
- 
- static inline void stl_phys_notdirty(AddressSpace *as, hwaddr addr, uint32_t val)
- {
-@@ -207,17 +207,17 @@ static inline void stl_phys_notdirty(AddressSpace *as, hwaddr addr, uint32_t val
- #define ARG1         as
- #define ARG1_DECL    AddressSpace *as
- #define TARGET_ENDIANNESS
--#include "exec/memory_ldst_phys.inc.h"
-+#include "exec/memory_ldst_phys.h.inc"
- 
- /* Inline fast path for direct RAM access.  */
- #define ENDIANNESS
--#include "exec/memory_ldst_cached.inc.h"
-+#include "exec/memory_ldst_cached.h.inc"
- 
- #define SUFFIX       _cached
- #define ARG1         cache
- #define ARG1_DECL    MemoryRegionCache *cache
- #define TARGET_ENDIANNESS
--#include "exec/memory_ldst_phys.inc.h"
-+#include "exec/memory_ldst_phys.h.inc"
- #endif
- 
- /* page related stuff */
-diff --git a/include/exec/memory.h b/include/exec/memory.h
-index 307e527835..0cfe987ab4 100644
---- a/include/exec/memory.h
-+++ b/include/exec/memory.h
-@@ -2133,12 +2133,12 @@ MemTxResult address_space_write_rom(AddressSpace *as, hwaddr addr,
- #define SUFFIX
- #define ARG1         as
- #define ARG1_DECL    AddressSpace *as
--#include "exec/memory_ldst.inc.h"
-+#include "exec/memory_ldst.h.inc"
- 
- #define SUFFIX
- #define ARG1         as
- #define ARG1_DECL    AddressSpace *as
--#include "exec/memory_ldst_phys.inc.h"
-+#include "exec/memory_ldst_phys.h.inc"
- 
- struct MemoryRegionCache {
-     void *ptr;
-@@ -2179,7 +2179,7 @@ struct MemoryRegionCache {
- #define SUFFIX       _cached_slow
- #define ARG1         cache
- #define ARG1_DECL    MemoryRegionCache *cache
--#include "exec/memory_ldst.inc.h"
-+#include "exec/memory_ldst.h.inc"
- 
- /* Inline fast path for direct RAM access.  */
- static inline uint8_t address_space_ldub_cached(MemoryRegionCache *cache,
-@@ -2205,15 +2205,15 @@ static inline void address_space_stb_cached(MemoryRegionCache *cache,
- }
- 
- #define ENDIANNESS   _le
--#include "exec/memory_ldst_cached.inc.h"
-+#include "exec/memory_ldst_cached.h.inc"
- 
- #define ENDIANNESS   _be
--#include "exec/memory_ldst_cached.inc.h"
-+#include "exec/memory_ldst_cached.h.inc"
- 
- #define SUFFIX       _cached
- #define ARG1         cache
- #define ARG1_DECL    MemoryRegionCache *cache
--#include "exec/memory_ldst_phys.inc.h"
-+#include "exec/memory_ldst_phys.h.inc"
- 
- /* address_space_cache_init: prepare for repeated access to a physical
-  * memory region
-diff --git a/include/exec/memory_ldst.inc.h b/include/exec/memory_ldst.h.inc
-similarity index 100%
-rename from include/exec/memory_ldst.inc.h
-rename to include/exec/memory_ldst.h.inc
-diff --git a/include/exec/memory_ldst_cached.inc.h b/include/exec/memory_ldst_cached.h.inc
-similarity index 100%
-rename from include/exec/memory_ldst_cached.inc.h
-rename to include/exec/memory_ldst_cached.h.inc
-diff --git a/include/exec/memory_ldst_phys.inc.h b/include/exec/memory_ldst_phys.h.inc
-similarity index 100%
-rename from include/exec/memory_ldst_phys.inc.h
-rename to include/exec/memory_ldst_phys.h.inc
-diff --git a/target/s390x/cpu_features.c b/target/s390x/cpu_features.c
-index 9f817e3cfa..31ea8df246 100644
---- a/target/s390x/cpu_features.c
-+++ b/target/s390x/cpu_features.c
-@@ -23,7 +23,7 @@
-         .desc = _DESC,                             \
-     },
- static const S390FeatDef s390_features[S390_FEAT_MAX] = {
--    #include "cpu_features_def.inc.h"
-+    #include "cpu_features_def.h.inc"
- };
- #undef DEF_FEAT
- 
-diff --git a/target/s390x/cpu_features_def.h b/target/s390x/cpu_features_def.h
-index 412d356feb..87df31848e 100644
---- a/target/s390x/cpu_features_def.h
-+++ b/target/s390x/cpu_features_def.h
-@@ -17,7 +17,7 @@
- 
- #define DEF_FEAT(_FEAT, ...) S390_FEAT_##_FEAT,
- typedef enum {
--    #include "cpu_features_def.inc.h"
-+    #include "cpu_features_def.h.inc"
-     S390_FEAT_MAX,
- } S390Feat;
- #undef DEF_FEAT
-diff --git a/target/s390x/cpu_features_def.inc.h b/target/s390x/cpu_features_def.h.inc
-similarity index 100%
-rename from target/s390x/cpu_features_def.inc.h
-rename to target/s390x/cpu_features_def.h.inc
+diff --git a/tests/docker/test-static b/tests/docker/test-static
+new file mode 100755
+index 0000000000..372ef6fac7
+--- /dev/null
++++ b/tests/docker/test-static
+@@ -0,0 +1,24 @@
++#!/bin/bash -e
++#
++# Compile QEMU user mode emulators as static binaries on Linux.
++#
++# Copyright (c) 2020 Red Hat Inc.
++#
++# Authors:
++#  Paolo Bonzini <pbonzini@redhat.com>
++#
++# This work is licensed under the terms of the GNU GPL, version 2
++# or (at your option) any later version. See the COPYING file in
++# the top-level directory.
++
++. common.rc
++
++cd "$BUILD_DIR"
++
++build_qemu \
++    --disable-system \
++    --disable-tools \
++    --disable-guest-agent \
++    --disable-docs \
++    --static
++install_qemu
 -- 
 2.26.2
 
