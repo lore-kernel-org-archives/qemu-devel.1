@@ -2,121 +2,86 @@ Return-Path: <SRS0=atk5=B7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7908C433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 14:13:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0823FC433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 14:14:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 82C9D20FC3
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 14:13:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C51032177B
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 14:14:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="Ux0CBAKn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82C9D20FC3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z6krHWy8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C51032177B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57538 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32968 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k97np-0000RT-NI
-	for qemu-devel@archiver.kernel.org; Fri, 21 Aug 2020 10:13:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55390)
+	id 1k97oV-0001u5-Rm
+	for qemu-devel@archiver.kernel.org; Fri, 21 Aug 2020 10:14:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54520)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1k97li-00056j-7x; Fri, 21 Aug 2020 10:11:46 -0400
-Received: from mail-eopbgr50124.outbound.protection.outlook.com
- ([40.107.5.124]:48515 helo=EUR03-VE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1k97le-00053q-T2; Fri, 21 Aug 2020 10:11:45 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=NIZNTyqkcxEbWMrMFvl5Z4A2gCLSaVtPhAA6IjGSageAi12ib8Bc2h4ljgjW/oBzNT2H3Ty5NQT3Y1hE+VJWQoHfRV2evGsUNktluUE9buYkYtt3Sft1ILT7lewWm5ssxh6Ri2erezNnF1CzRJH+FhkigZbp/hNzmg8rqCjvZhSfha3KtflOXU4SnG+zwZt+900me2b4DEyPxomfdm5yL4NuKsMlMTLQdz8c2UcynncuC7ATDBdGpfIOs8iV+2KJSfk24mi82E9ZZqkVyBGHygJEQskVbRIaFNGSNucpdiqsyrQICBG/ExqtZCPtK2zefNGgIarIYkd0r9E1d35SFw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=T6ADkc6uYMLabKqyv9ENA7/hX8HBJxK5upg5p8B/ZEw=;
- b=g7/CIBOEyA9BttwBp5n4x7UAUWyza9B1d3ch6dFsBLjZWG3b2pqJTxwgtbM08snirZfJHNomB7ob1v1eYuqjiBeW7e8/qwOQJDYDU4xi0PhtgRbbiwDFwoDCAb1zbhiGeTk0kUIirCw7i7qYpWUq4wFbhmD2Hlp2eBE4tHLCcRg4sq0kMx7sb4Kb6TU6cutxvG1u9XFZuTRWhl5efob86qNukxHAx0c0xdXue7eDMd760sFzoHXG5sRSwWSlBfVvfwyFnDxJAA6d8TFjP+BWpV6IXiiFb+znp5majKkPmygLizymPijsnNeNcgknP4x5kMRcQVZAE5sgPXIPhFm86g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=T6ADkc6uYMLabKqyv9ENA7/hX8HBJxK5upg5p8B/ZEw=;
- b=Ux0CBAKnl+zOgWyAu6DEc//n48WzJg8qckvawh/PvuRy407LB3ICz2VzqUBirHk2fJCW+AGc553nyo/1Z0zf+GkajvmlwlnBM3W9IbtNjK55LUij+PqxWuoslgfiKk6WZ9tHqno+TzxbG574YmBDmB9DFHQH0qhE5YTIy1vEmA8=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM6PR08MB5253.eurprd08.prod.outlook.com (2603:10a6:20b:ec::33)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3305.26; Fri, 21 Aug
- 2020 14:11:37 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::8c0c:c056:97a5:484a]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::8c0c:c056:97a5:484a%3]) with mapi id 15.20.3283.027; Fri, 21 Aug 2020
- 14:11:37 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH v5 01/10] block: simplify comment to BDRV_REQ_SERIALISING
-Date: Fri, 21 Aug 2020 17:11:14 +0300
-Message-Id: <20200821141123.28538-2-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.21.3
-In-Reply-To: <20200821141123.28538-1-vsementsov@virtuozzo.com>
-References: <20200821141123.28538-1-vsementsov@virtuozzo.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: AM3PR05CA0139.eurprd05.prod.outlook.com
- (2603:10a6:207:3::17) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1k97iz-0007KF-Br
+ for qemu-devel@nongnu.org; Fri, 21 Aug 2020 10:08:57 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:46210
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1k97ix-0004Xg-8e
+ for qemu-devel@nongnu.org; Fri, 21 Aug 2020 10:08:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1598018934;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Ft+sZwk9gcDvF38VuUsUZ21PepdX21tQNatQ9qp1XgI=;
+ b=Z6krHWy8fYMAbsQHxiLgJPLB2q3Tk78AzNFoOPAvDji4V8/esFUSj9h9/fdpAjNhtrWDmX
+ 4//T62zHVmVBdb26axNsNDKdzslRRAzon/DKnzOLyWtETthctp0/Xza9p0aI2AKx08iwue
+ IJhkPeCFoNy6SBusW66a6zjFBdEgTRA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-405-wIc2WR9CPPOCtde7RYdzLA-1; Fri, 21 Aug 2020 10:08:33 -0400
+X-MC-Unique: wIc2WR9CPPOCtde7RYdzLA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 44A441019633;
+ Fri, 21 Aug 2020 14:08:32 +0000 (UTC)
+Received: from blue.redhat.com (ovpn-113-220.phx2.redhat.com [10.3.113.220])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CE8617A40B;
+ Fri, 21 Aug 2020 14:08:31 +0000 (UTC)
+From: Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL 05/14] qcow2_format.py: Dump bitmap directory information
+Date: Fri, 21 Aug 2020 09:08:17 -0500
+Message-Id: <20200821140826.194322-6-eblake@redhat.com>
+In-Reply-To: <20200821140826.194322-1-eblake@redhat.com>
+References: <20200821140826.194322-1-eblake@redhat.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from kvm.sw.ru (185.215.60.171) by
- AM3PR05CA0139.eurprd05.prod.outlook.com (2603:10a6:207:3::17) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3305.25 via Frontend Transport; Fri, 21 Aug 2020 14:11:36 +0000
-X-Mailer: git-send-email 2.21.3
-X-Originating-IP: [185.215.60.171]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 4126218f-d288-480c-c881-08d845dc1e49
-X-MS-TrafficTypeDiagnostic: AM6PR08MB5253:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM6PR08MB5253BE28C43ABDD4CBE98C9CC15B0@AM6PR08MB5253.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: jjldiDGEnMqe+I5RF2cmcABvHBHzIRm5UVUiG9v66g93PiWruTtjVJGCY+cN0UyXiZksDH1jTOwqYFcdR5/dbg1njnm388fXXaDI4rI+44HCBA53b7jpv1bzxzGVe8B6+wZBoXwNXi5FwbsH4M/eaQ3PzBgguM3tHf4qAUGaZu9bBC3sV3o71CVv9H1krdemmfh5soEjJw5T+RPvFnoOspP+A8+ru9vG5RB66kYyHEquw/TE2DPbLu9ib4oGlBF/VwuxdAOaBKKLn07MM5qXiTIgSDcZ/VQMXKM69SeinX2+g7E9lVlwqYeyKk4jhnz9Q/IpEGqnTXokZhJ2tV5d6Q==
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(39840400004)(396003)(366004)(376002)(346002)(136003)(5660300002)(2906002)(2616005)(186003)(1076003)(316002)(6666004)(26005)(956004)(16526019)(66476007)(6486002)(6512007)(66946007)(66556008)(8936002)(83380400001)(8676002)(6506007)(36756003)(52116002)(478600001)(4326008)(6916009)(86362001);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: fZa0M9J0oBIQ8B44TRw9V0LUAL5UnwRXWgFd6KWVBuzdFFP0VPjCXO2RahWpPp2eknml1wB0WkumUXWtJj6VGhrJjoSAXCiO3CXYbAy0Clv6qRwPjWy2FUPVHcVDBLBUVxusxOlN37mgsM5gUaNpL7u3KOu/4GBnVa65mwlz3yi8RHo7dvrwqn4gRP4qpMzYBBog0Fq4dQ1m2grUlhKp/bqd2TN4V9TuY5oaCb8WYou1Qb00mt3e1JSO1d/lBqHdEcfYmCoiFdRMe5EZGL5JG5bgZ99I7C89KH9k6SQ+V2oryDScl0CwNhg8on5fJMimm/DXBhx/hkeifGiOa0F9/NkL7CmHuJy7zWGP4V+VrMdDzljZwQ8BJnJODJgDi5S6IpwhHXy7RM6d9+jVUmLQMnQhfCoLvqqiIjjoDEF19ivCfSvYrOOyu/oKM/78gwYsXmVGAIVJARtsc1Tx5+7ROtuxRDnLh1i+UGTrlmDSUq3G9GYSE9Agyy6fa4RI58cxuQpTlUt/uOHbYvVNJ0krc3eA638L2p/gdsZx3tev+tyZuMyV5fo/kD5R0QgPCraDFK3uuHq0Zj5A1wN8VuIbFknQZ08XncQ+pyvgsHwfhqZqbebo8vSUR2uNsL6JvgrCPXI0iJs+rNBe58ulCoL83A==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4126218f-d288-480c-c881-08d845dc1e49
-X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Aug 2020 14:11:37.7393 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: JUQkbaP7+fEEv8oBRTeCHrxaG3BxNCYA6g3j7nU+Xcqx7DXjgzNKiyfMcExbT0EcRSwbDUsgMDQdQi9I/TleT8GeaWMSJGr+lIpoym2zwPs=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB5253
-Received-SPF: pass client-ip=40.107.5.124;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR03-VE1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/21 10:11:37
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eblake@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=eblake@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/21 05:15:56
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -129,52 +94,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, kwolf@redhat.com, vsementsov@virtuozzo.com,
- armbru@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com,
- nsoffer@redhat.com, stefanha@redhat.com, den@openvz.org
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "open list:Block layer core" <qemu-block@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-1. BDRV_REQ_NO_SERIALISING doesn't exist already, don't mention it.
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 
-2. We are going to add one more user of BDRV_REQ_SERIALISING, so
-   comment about backup becomes a bit confusing here. The use case in
-   backup is documented in block/backup.c, so let's just drop
-   duplication here.
+Read and dump entries from the bitmap directory of QCOW2 image.
 
-3. The fact that BDRV_REQ_SERIALISING is only for write requests is
-   omitted. Add a note.
+Header extension:
+magic                     0x23852875 (Bitmaps)
+...
+Bitmap name               bitmap-1
+bitmap_table_offset       0xf0000
+bitmap_table_size         1
+flags                     0x2 (['auto'])
+type                      1
+granularity_bits          16
+name_size                 8
+extra_data_size           0
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Suggested-by: Kevin Wolf <kwolf@redhat.com>
+Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-Id: <1596742557-320265-6-git-send-email-andrey.shinkevich@virtuozzo.com>
+Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- include/block/block.h | 11 +----------
- 1 file changed, 1 insertion(+), 10 deletions(-)
+ tests/qemu-iotests/303.out         | 18 ++++++++++++
+ tests/qemu-iotests/qcow2_format.py | 47 ++++++++++++++++++++++++++++++
+ 2 files changed, 65 insertions(+)
 
-diff --git a/include/block/block.h b/include/block/block.h
-index 6e36154061..b8f4e86e8d 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -53,16 +53,7 @@ typedef enum {
-      * content. */
-     BDRV_REQ_WRITE_UNCHANGED    = 0x40,
- 
--    /*
--     * BDRV_REQ_SERIALISING forces request serialisation for writes.
--     * It is used to ensure that writes to the backing file of a backup process
--     * target cannot race with a read of the backup target that defers to the
--     * backing file.
--     *
--     * Note, that BDRV_REQ_SERIALISING is _not_ opposite in meaning to
--     * BDRV_REQ_NO_SERIALISING. A more descriptive name for the latter might be
--     * _DO_NOT_WAIT_FOR_SERIALISING, except that is too long.
--     */
-+    /* Forces request serialisation. Use only with write requests. */
-     BDRV_REQ_SERIALISING        = 0x80,
- 
-     /* Execute the request only if the operation can be offloaded or otherwise
+diff --git a/tests/qemu-iotests/303.out b/tests/qemu-iotests/303.out
+index 8d7973ccc201..038ba93a87d7 100644
+--- a/tests/qemu-iotests/303.out
++++ b/tests/qemu-iotests/303.out
+@@ -58,3 +58,21 @@ reserved32                0
+ bitmap_directory_size     0x40
+ bitmap_directory_offset   0x9d0000
+
++Bitmap name               bitmap-1
++bitmap_table_offset       0x9b0000
++bitmap_table_size         1
++flags                     0x2 (['auto'])
++type                      1
++granularity_bits          15
++name_size                 8
++extra_data_size           0
++
++Bitmap name               bitmap-2
++bitmap_table_offset       0x9c0000
++bitmap_table_size         1
++flags                     0x0 ([])
++type                      1
++granularity_bits          16
++name_size                 8
++extra_data_size           0
++
+diff --git a/tests/qemu-iotests/qcow2_format.py b/tests/qemu-iotests/qcow2_format.py
+index b4473442c9d4..05a8aa98f72c 100644
+--- a/tests/qemu-iotests/qcow2_format.py
++++ b/tests/qemu-iotests/qcow2_format.py
+@@ -134,6 +134,53 @@ class Qcow2BitmapExt(Qcow2Struct):
+         tail = struct.calcsize(self.fmt) % 8
+         if tail:
+             fd.seek(8 - tail, 1)
++        position = fd.tell()
++        self.read_bitmap_directory(fd)
++        fd.seek(position)
++
++    def read_bitmap_directory(self, fd):
++        fd.seek(self.bitmap_directory_offset)
++        self.bitmap_directory = \
++            [Qcow2BitmapDirEntry(fd) for _ in range(self.nb_bitmaps)]
++
++    def dump(self):
++        super().dump()
++        for entry in self.bitmap_directory:
++            print()
++            entry.dump()
++
++
++class Qcow2BitmapDirEntry(Qcow2Struct):
++
++    fields = (
++        ('u64', '{:#x}', 'bitmap_table_offset'),
++        ('u32', '{}', 'bitmap_table_size'),
++        ('u32', BitmapFlags, 'flags'),
++        ('u8',  '{}', 'type'),
++        ('u8',  '{}', 'granularity_bits'),
++        ('u16', '{}', 'name_size'),
++        ('u32', '{}', 'extra_data_size')
++    )
++
++    def __init__(self, fd):
++        super().__init__(fd=fd)
++        # Seek relative to the current position in the file
++        fd.seek(self.extra_data_size, 1)
++        bitmap_name = fd.read(self.name_size)
++        self.name = bitmap_name.decode('ascii')
++        # Move position to the end of the entry in the directory
++        entry_raw_size = self.bitmap_dir_entry_raw_size()
++        padding = ((entry_raw_size + 7) & ~7) - entry_raw_size
++        fd.seek(padding, 1)
++
++    def bitmap_dir_entry_raw_size(self):
++        return struct.calcsize(self.fmt) + self.name_size + \
++            self.extra_data_size
++
++    def dump(self):
++        print(f'{"Bitmap name":<25} {self.name}')
++        super(Qcow2BitmapDirEntry, self).dump()
++
+
+ QCOW2_EXT_MAGIC_BITMAPS = 0x23852875
+
 -- 
-2.21.3
+2.28.0
 
 
