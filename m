@@ -2,46 +2,46 @@ Return-Path: <SRS0=atk5=B7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D400EC433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 02:12:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 371CCC433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 02:26:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AAE3F2076E
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 02:12:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AAE3F2076E
+	by mail.kernel.org (Postfix) with ESMTPS id 0B90720732
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 02:26:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B90720732
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33298 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35862 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k8wX9-000204-Ui
-	for qemu-devel@archiver.kernel.org; Thu, 20 Aug 2020 22:11:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49250)
+	id 1k8wlC-0004Q6-4q
+	for qemu-devel@archiver.kernel.org; Thu, 20 Aug 2020 22:26:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53192)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k8wVw-0001Xr-BL
- for qemu-devel@nongnu.org; Thu, 20 Aug 2020 22:10:44 -0400
-Received: from indium.canonical.com ([91.189.90.7]:42944)
+ id 1k8wkR-0003wV-Iq
+ for qemu-devel@nongnu.org; Thu, 20 Aug 2020 22:25:44 -0400
+Received: from indium.canonical.com ([91.189.90.7]:44994)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k8wVu-0000AU-Ck
- for qemu-devel@nongnu.org; Thu, 20 Aug 2020 22:10:44 -0400
+ id 1k8wkO-0002MJ-Q9
+ for qemu-devel@nongnu.org; Thu, 20 Aug 2020 22:25:43 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1k8wVs-0006yo-Bx
- for <qemu-devel@nongnu.org>; Fri, 21 Aug 2020 02:10:40 +0000
+ id 1k8wkM-0008I1-7t
+ for <qemu-devel@nongnu.org>; Fri, 21 Aug 2020 02:25:38 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 4C4512E80DB
- for <qemu-devel@nongnu.org>; Fri, 21 Aug 2020 02:10:40 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 39BB72E805D
+ for <qemu-devel@nongnu.org>; Fri, 21 Aug 2020 02:25:38 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 21 Aug 2020 02:04:16 -0000
+Date: Fri, 21 Aug 2020 02:16:46 -0000
 From: Ahmed Karaman <1892441@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -53,15 +53,16 @@ X-Launchpad-Bug-Security-Vulnerability: no
 X-Launchpad-Bug-Commenters: ahmedkrmn
 X-Launchpad-Bug-Reporter: Ahmed Karaman (ahmedkrmn)
 X-Launchpad-Bug-Modifier: Ahmed Karaman (ahmedkrmn)
-Message-Id: <159797545688.2805.5115079878417995484.malonedeb@chaenomeles.canonical.com>
-Subject: [Bug 1892441] [NEW] "No zIPL section in IPL2 record" error when
+References: <159797545688.2805.5115079878417995484.malonedeb@chaenomeles.canonical.com>
+Message-Id: <159797620664.988.16247355712609272221.launchpad@wampee.canonical.com>
+Subject: [Bug 1892441] Re: "No zIPL section in IPL2 record" error when
  emulating Debian 10.5.0 on s390x
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="99c2d833c8d727fd05148486920aca032e908071"; Instance="production"
-X-Launchpad-Hash: 86b729490371dd3b7bea2b04819b236bede48a45
+X-Launchpad-Hash: 55893ec74d9cd308c19c493226edd446e0c83e36
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/20 22:10:40
@@ -88,37 +89,88 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+** Description changed:
 
-Hi,
+  Hi,
+  =
 
-I want to emulate Debian 10.5.0 for the s390x architecture. =
+- I want to emulate Debian 10.5.0 for the s390x architecture. =
 
-The Debian image is downloaded from the following link:
-https://cdimage.debian.org/debian-cd/current/s390x/iso-cd/debian-10.5.0-s39=
-0x-netinst.iso =
++ I want to emulate Debian 10.5.0 for the s390x architecture.
+  The Debian image is downloaded from the following link:
+- https://cdimage.debian.org/debian-cd/current/s390x/iso-cd/debian-10.5.0-s=
+390x-netinst.iso =
 
++ https://cdimage.debian.org/debian-cd/current/s390x/iso-cd/debian-10.5.0-s=
+390x-netinst.iso
+  =
 
-Using the latest QEMU version 5.1.0, running the debian image using the giv=
-en command:
-qemu-system-s390x -boot d -m 4096 -hda debian.qcow -cdrom debian-10.5.0-s39=
-0x-netinst.iso -nographic
+  Using the latest QEMU version 5.1.0, running the debian image using the g=
+iven command:
+  qemu-system-s390x -boot d -m 4096 -hda debian.qcow -cdrom debian-10.5.0-s=
+390x-netinst.iso -nographic
+  =
 
-causes the error output below:
+  causes the error output below:
+  =
 
-LOADPARM=3D[        ]
-Using virtio-blk.
-Using guessed DASD geometry.
-Using ECKD scheme (block size  4096), CDL
+  LOADPARM=3D[        ]
+  Using virtio-blk.
+  Using guessed DASD geometry.
+  Using ECKD scheme (block size  4096), CDL
+  =
 
-! No zIPL section in IPL2 record. !
+  ! No zIPL section in IPL2 record. !
++ =
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
++ Using exactly the same qemu command above with the Alpine 3.12 image for
++ s390x ran successfully without any errors.
 
+** Description changed:
 
-** Tags: s390x softmmu
+  Hi,
+  =
+
+- I want to emulate Debian 10.5.0 for the s390x architecture.
++ I want to emulate Debian 10.5.0 for the s390x architecture on an Ubuntu
++ x86_64 host.
++ =
+
+  The Debian image is downloaded from the following link:
+  https://cdimage.debian.org/debian-cd/current/s390x/iso-cd/debian-10.5.0-s=
+390x-netinst.iso
+  =
+
+- Using the latest QEMU version 5.1.0, running the debian image using the g=
+iven command:
++ Using the latest QEMU version 5.1.0, the Debian image is emulated using t=
+he given command:
+  qemu-system-s390x -boot d -m 4096 -hda debian.qcow -cdrom debian-10.5.0-s=
+390x-netinst.iso -nographic
+  =
+
+- causes the error output below:
++ Running the command causes the output below:
+  =
+
+- LOADPARM=3D[        ]
+- Using virtio-blk.
+- Using guessed DASD geometry.
+- Using ECKD scheme (block size  4096), CDL
+- =
+
+- ! No zIPL section in IPL2 record. !
++     LOADPARM=3D[        ]
++     Using virtio-blk.
++     Using guessed DASD geometry.
++     Using ECKD scheme (block size  4096), CDL
++     =
+
++     ! No zIPL section in IPL2 record. !
+  =
+
+  Using exactly the same qemu command above with the Alpine 3.12 image for
+  s390x ran successfully without any errors.
 
 -- =
 
@@ -136,26 +188,30 @@ Status in QEMU:
 Bug description:
   Hi,
 
-  I want to emulate Debian 10.5.0 for the s390x architecture. =
+  I want to emulate Debian 10.5.0 for the s390x architecture on an
+  Ubuntu x86_64 host.
 
   The Debian image is downloaded from the following link:
   https://cdimage.debian.org/debian-cd/current/s390x/iso-cd/debian-10.5.0-s=
-390x-netinst.iso =
+390x-netinst.iso
 
-
-  Using the latest QEMU version 5.1.0, running the debian image using the g=
-iven command:
+  Using the latest QEMU version 5.1.0, the Debian image is emulated using t=
+he given command:
   qemu-system-s390x -boot d -m 4096 -hda debian.qcow -cdrom debian-10.5.0-s=
 390x-netinst.iso -nographic
 
-  causes the error output below:
+  Running the command causes the output below:
 
-  LOADPARM=3D[        ]
-  Using virtio-blk.
-  Using guessed DASD geometry.
-  Using ECKD scheme (block size  4096), CDL
+      LOADPARM=3D[        ]
+      Using virtio-blk.
+      Using guessed DASD geometry.
+      Using ECKD scheme (block size  4096), CDL
+      =
 
-  ! No zIPL section in IPL2 record. !
+      ! No zIPL section in IPL2 record. !
+
+  Using exactly the same qemu command above with the Alpine 3.12 image
+  for s390x ran successfully without any errors.
 
 To manage notifications about this bug go to:
 https://bugs.launchpad.net/qemu/+bug/1892441/+subscriptions
