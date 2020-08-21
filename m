@@ -2,81 +2,81 @@ Return-Path: <SRS0=atk5=B7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D387AC433DF
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7B85C433E1
 	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 10:45:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A1F8320656
+	by mail.kernel.org (Postfix) with ESMTPS id 83D8920639
 	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 10:45:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Nm8xB7dP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1F8320656
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KCQbb7A5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83D8920639
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54088 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54056 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k94YO-0002vN-Ra
+	id 1k94YO-0002uZ-N5
 	for qemu-devel@archiver.kernel.org; Fri, 21 Aug 2020 06:45:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59916)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60128)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1k94DW-0001i1-Og
- for qemu-devel@nongnu.org; Fri, 21 Aug 2020 06:24:15 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:38088
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1k94Dn-00020I-0v
+ for qemu-devel@nongnu.org; Fri, 21 Aug 2020 06:24:31 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:22611
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1k94DT-0001ZT-Ts
- for qemu-devel@nongnu.org; Fri, 21 Aug 2020 06:24:14 -0400
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1k94Dc-0001c2-Vv
+ for qemu-devel@nongnu.org; Fri, 21 Aug 2020 06:24:30 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598005451;
+ s=mimecast20190719; t=1598005459;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=p4E6HEOfi78p3ES2eSn865l+/Vy4o3AovvHMBF9XOVc=;
- b=Nm8xB7dPDujuq2+/3DNYWniG2+ptjeIVDkRubHmGnQ1SHuBTL3xZXZdmue/oltHFVukygQ
- xXi4OCaKEC9yfiPGjc3dmyJJwisvLpwvNCOMDrhChILbTYTv8ncClFN/jN2slj7POgLYD7
- tVXAShz6GyYWX2NLbTrvTNzU6HTkKMc=
+ bh=k9HTeGilyaI7wJRI+sU9G7H/jdDDHwvS3kZ8oUXnhBM=;
+ b=KCQbb7A5oO/NGLqI3bFTCRdg7O8XUbDhccauwRtvJ1aA4iGKRLrfrlENtrwX+mCR081KXh
+ QNTJfk/ZYe5BCVqN01O5VpKhC+kb5gEYwyG8Fq58OXkbK4JiiAz+p7iQXRFu7b3XVuPjMP
+ z5vSlmvGXv9sZ1YKi3mC1lr4wHPTVlw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-357-T27Cn-sINPKtZTTGgkKbaQ-1; Fri, 21 Aug 2020 06:24:09 -0400
-X-MC-Unique: T27Cn-sINPKtZTTGgkKbaQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-101-43mEPy-JMwqyLfWQ63W4fw-1; Fri, 21 Aug 2020 06:24:17 -0400
+X-MC-Unique: 43mEPy-JMwqyLfWQ63W4fw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6DF714239F;
- Fri, 21 Aug 2020 10:24:08 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-113-251.ams2.redhat.com [10.36.113.251])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 08E045F704;
- Fri, 21 Aug 2020 10:24:03 +0000 (UTC)
-Date: Fri, 21 Aug 2020 12:24:02 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Subject: Re: [PATCH] configure: add support for psuedo-"in source tree" builds
-Message-ID: <20200821102402.GD5153@linux.fritz.box>
-References: <20200820165543.215372-1-berrange@redhat.com>
- <938bfa57-01f9-a50a-6439-0965c91dce1b@redhat.com>
- <20200821095821.GA5153@linux.fritz.box>
- <20200821101417.GG251583@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0C6A2191E2A0
+ for <qemu-devel@nongnu.org>; Fri, 21 Aug 2020 10:24:17 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com
+ (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id AD4B660BF1;
+ Fri, 21 Aug 2020 10:24:16 +0000 (UTC)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL v8 053/152] meson: handle edk2 bios and descriptors
+Date: Fri, 21 Aug 2020 06:21:50 -0400
+Message-Id: <20200821102329.29777-54-pbonzini@redhat.com>
+In-Reply-To: <20200821102329.29777-1-pbonzini@redhat.com>
+References: <20200821102329.29777-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200821101417.GG251583@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
-X-Mimecast-Spam-Score: 0.001
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=kwolf@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/21 04:55:47
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/21 05:15:56
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
@@ -84,7 +84,7 @@ X-Spam_bar: ----
 X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,110 +97,170 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>,
- Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 21.08.2020 um 12:14 hat Daniel P. Berrangé geschrieben:
-> On Fri, Aug 21, 2020 at 11:58:21AM +0200, Kevin Wolf wrote:
-> > Am 20.08.2020 um 19:42 hat Eric Blake geschrieben:
-> > > On 8/20/20 11:55 AM, Daniel P. BerrangÃƒÂ© wrote:
-> > > > Meson requires the build dir to be separate from the source tree. Many
-> > > > people are used to just running "./configure && make" though and the
-> > > > meson conversion breaks that.
-> > > > 
-> > > > This introduces some backcompat support to make it appear as if an
-> > > > "in source tree" build is being done, but with the the results in the
-> > > > "build/" directory. This allows "./configure && make" to work as it
-> > > > did historically, albeit with the output binaries staying under build/.
-> > > > 
-> > > > Signed-off-by: Daniel P. BerrangÃƒÂ© <berrange@redhat.com>
-> > > > ---
-> > > 
-> > > In addition to reviews you already have,
-> > > 
-> > > 
-> > > > I've not tested it beyond that. Note it blows away the "build/"
-> > > > dir each time ./configure is run so it is pristine each time.
-> > > 
-> > > I definitely like the idea of only blowing away what we created - but if we
-> > > created build, then recreating it for each new configure run is nice.
-> > 
-> > I think I actually wouldn't automatically remove anything on configure.
-> > It can be surprising behaviour for configure to delete directories, and
-> > the old setup didn't do an automatic "make clean" either. By having a
-> > separate build directory, manually emptying as needed has already become
-> > easier.
-> 
-> The issue is that previously you could do
-> 
->   ./configure
->   make
->   ./configure
->   make
-> 
-> This isn't possible with the new system because meson will refuse
-> to use the "build/" directory if it already contains a previous
-> configured build.
+From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
-Oh. So now you always have to create a new build directory if you want
-to change configure options?
+Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ Makefile                        | 29 -----------------------------
+ meson.build                     |  1 +
+ pc-bios/descriptors/meson.build | 14 ++++++++++++++
+ pc-bios/meson.build             | 27 +++++++++++++++++++++++++++
+ 4 files changed, 42 insertions(+), 29 deletions(-)
+ create mode 100644 pc-bios/descriptors/meson.build
+ create mode 100644 pc-bios/meson.build
 
-> Doing "rm -rf build" in configure lets the above sequence work.
-> 
-> I can remove the "rm -rf biuld" in configure if we are happy
-> to require
-> 
->   ./configure
->   make
->   make distclean
->   ./configure
->   make
-> 
-> because the "GNUmakefile" wires up "distclean" to purge the
-> build/ directory.
+diff --git a/Makefile b/Makefile
+index 13df463e33..bc7647d37b 100644
+--- a/Makefile
++++ b/Makefile
+@@ -127,10 +127,6 @@ generated-files-y += module_block.h
+ 
+ generated-files-y += .git-submodule-status
+ 
+-edk2-decompressed = $(basename $(wildcard pc-bios/edk2-*.fd.bz2))
+-pc-bios/edk2-%.fd: pc-bios/edk2-%.fd.bz2
+-	$(call quiet-command,bzip2 -d -c $< > $@,"BUNZIP2",$<)
+-
+ # Don't try to regenerate Makefile or configure
+ # We don't generate any of them
+ Makefile: ;
+@@ -274,9 +270,6 @@ $(SOFTMMU_ALL_RULES): $(chardev-obj-y)
+ $(SOFTMMU_ALL_RULES): $(crypto-obj-y)
+ $(SOFTMMU_ALL_RULES): $(io-obj-y)
+ $(SOFTMMU_ALL_RULES): config-all-devices.mak
+-ifdef DECOMPRESS_EDK2_BLOBS
+-$(SOFTMMU_ALL_RULES): $(edk2-decompressed)
+-endif
+ 
+ SOFTMMU_FUZZ_RULES=$(filter %-softmmu/fuzz, $(TARGET_DIRS_RULES))
+ $(SOFTMMU_FUZZ_RULES): $(authz-obj-y)
+@@ -384,7 +377,6 @@ clean: recurse-clean ninja-clean clean-ctlist
+ 		! -path ./roms/edk2/ArmPkg/Library/GccLto/liblto-arm.a \
+ 		! -path ./roms/edk2/BaseTools/Source/Python/UPT/Dll/sqlite3.dll \
+ 		-exec rm {} +
+-	rm -f $(edk2-decompressed)
+ 	rm -f $(filter-out %.tlb,$(TOOLS)) $(HELPERS-y) TAGS cscope.* *.pod *~ */*~
+ 	rm -f fsdev/*.pod scsi/*.pod
+ 	rm -f $(foreach f,$(generated-files-y),$(f) $(f)-timestamp)
+@@ -461,13 +453,8 @@ edk2-licenses.txt \
+ hppa-firmware.img \
+ opensbi-riscv32-sifive_u-fw_jump.bin opensbi-riscv32-virt-fw_jump.bin \
+ opensbi-riscv64-sifive_u-fw_jump.bin opensbi-riscv64-virt-fw_jump.bin
+-
+-
+-DESCS=50-edk2-i386-secure.json 50-edk2-x86_64-secure.json \
+-60-edk2-aarch64.json 60-edk2-arm.json 60-edk2-i386.json 60-edk2-x86_64.json
+ else
+ BLOBS=
+-DESCS=
+ endif
+ 
+ # Note that we manually filter-out the non-Sphinx documentation which
+@@ -544,7 +531,6 @@ install-includedir:
+ export DESTDIR
+ install: all $(if $(BUILD_DOCS),install-doc) \
+ 	install-datadir install-localstatedir install-includedir \
+-	$(if $(INSTALL_BLOBS),$(edk2-decompressed)) \
+ 	recurse-install
+ ifneq ($(TOOLS),)
+ 	$(call install-prog,$(TOOLS),$(DESTDIR)$(bindir))
+@@ -567,21 +553,6 @@ ifneq ($(BLOBS),)
+ 	set -e; for x in $(BLOBS); do \
+ 		$(INSTALL_DATA) $(SRC_PATH)/pc-bios/$$x "$(DESTDIR)$(qemu_datadir)"; \
+ 	done
+-endif
+-ifdef INSTALL_BLOBS
+-	set -e; for x in $(edk2-decompressed); do \
+-		$(INSTALL_DATA) $$x "$(DESTDIR)$(qemu_datadir)"; \
+-	done
+-endif
+-ifneq ($(DESCS),)
+-	$(INSTALL_DIR) "$(DESTDIR)$(qemu_datadir)/firmware"
+-	set -e; tmpf=$$(mktemp); trap 'rm -f -- "$$tmpf"' EXIT; \
+-	for x in $(DESCS); do \
+-		sed -e 's,@DATADIR@,$(qemu_datadir),' \
+-			"$(SRC_PATH)/pc-bios/descriptors/$$x" > "$$tmpf"; \
+-		$(INSTALL_DATA) "$$tmpf" \
+-			"$(DESTDIR)$(qemu_datadir)/firmware/$$x"; \
+-	done
+ endif
+ 	for s in $(ICON_SIZES); do \
+ 		mkdir -p "$(DESTDIR)$(qemu_icondir)/hicolor/$${s}/apps"; \
+diff --git a/meson.build b/meson.build
+index 222b0d0e77..528198b6bd 100644
+--- a/meson.build
++++ b/meson.build
+@@ -383,6 +383,7 @@ if have_tools
+ endif
+ 
+ subdir('tools')
++subdir('pc-bios')
+ 
+ summary_info = {}
+ summary_info += {'Install prefix':    config_host['prefix']}
+diff --git a/pc-bios/descriptors/meson.build b/pc-bios/descriptors/meson.build
+new file mode 100644
+index 0000000000..7c715bace8
+--- /dev/null
++++ b/pc-bios/descriptors/meson.build
+@@ -0,0 +1,14 @@
++foreach f: [
++  '50-edk2-i386-secure.json',
++  '50-edk2-x86_64-secure.json',
++  '60-edk2-aarch64.json',
++  '60-edk2-arm.json',
++  '60-edk2-i386.json',
++  '60-edk2-x86_64.json'
++]
++  configure_file(input: files(f),
++                 output: f,
++                 configuration: {'DATADIR': config_host['qemu_datadir']},
++                 install: install_blobs,
++                 install_dir: config_host['qemu_datadir'] / 'firmware')
++endforeach
+diff --git a/pc-bios/meson.build b/pc-bios/meson.build
+new file mode 100644
+index 0000000000..6e3bfe3ca4
+--- /dev/null
++++ b/pc-bios/meson.build
+@@ -0,0 +1,27 @@
++bzip2 = find_program('bzip2')
++
++install_blobs = 'INSTALL_BLOBS' in config_host
++if 'DECOMPRESS_EDK2_BLOBS' in config_host
++  fds = [
++    'edk2-aarch64-code.fd',
++    'edk2-arm-code.fd',
++    'edk2-arm-vars.fd',
++    'edk2-i386-code.fd',
++    'edk2-i386-secure-code.fd',
++    'edk2-i386-vars.fd',
++    'edk2-x86_64-code.fd',
++    'edk2-x86_64-secure-code.fd',
++  ]
++
++  foreach f : fds
++    custom_target(f,
++                  output: f,
++                  input: '@0@.bz2'.format(f),
++                  capture: true,
++                  install: install_blobs,
++                  install_dir: config_host['qemu_datadir'],
++                  command: [ bzip2, '-dc', '@INPUT0@' ])
++  endforeach
++endif
++
++subdir('descriptors')
+-- 
+2.26.2
 
-Hm, I see. Then maybe better keep the 'rm'.
-
-> > > > We could optionally symlink binaries from build/ into $PWD
-> > > > if poeople think that is important, eg by changing GNUmakefile
-> > > > to have:
-> > > > 
-> > > > recurse: all
-> > > > 	for bin in `find build -maxdepth 1 -type f -executable | grep -v -E '(ninjatool|config.status)'`; \
-> > > 
-> > > Using -maxdepth gets rid of the need to pre-create empty directories for
-> > > nested binaries, but also loses out on binaries such as
-> > > x86_64-softmmu/qemu-system-x86_64.  Oh, it looks like meson creates
-> > > qemu-system-x86_64 as a binary in the top level, then a symlink in its old
-> > > location.  Populating symlinks to ALL old locations is thus trickier than
-> > > what you are proposing here, so it is fine to save that for a followup patch
-> > > (let's get the bare minimum in first, so that at least ./configure && make
-> > > works, before we worry about back-compat symlinks).
-> > 
-> > Having the system emulator symlinks in the top level would be a change,
-> > but even more convenient than the original places. I'd vote for adding
-> > the auto-symlinking at least for the tools; if the top-level symlinks
-> > for system emulators get also symlinked by this, that's fine, too.
-> > 
-> > I was actually surprised that Dan reports "make check" from the source
-> > tree to be working without the symlinks. Some code must be cleverer than
-> > I thought!
-> 
-> That's because "make check" is not actually running from the source
-> tree. When you run "make check" in the source tree, what's acutally
-> happening is
-> 
->   cd build
->   make check
-> 
-> so it is actually running from build-dir context.
-
-Yup, I wasn't aware that it would do this.
-
-Kevin
 
 
