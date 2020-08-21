@@ -2,96 +2,77 @@ Return-Path: <SRS0=atk5=B7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCFF0C433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 17:36:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 200F6C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 17:37:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ABD2C20702
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 17:36:41 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Htm26PR3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ABD2C20702
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	by mail.kernel.org (Postfix) with ESMTPS id EA96820702
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 17:37:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA96820702
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44380 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48066 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k9Ay0-0006ZO-Rv
-	for qemu-devel@archiver.kernel.org; Fri, 21 Aug 2020 13:36:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57354)
+	id 1k9AyW-00084T-3I
+	for qemu-devel@archiver.kernel.org; Fri, 21 Aug 2020 13:37:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58858)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k9ArG-0001aj-PL; Fri, 21 Aug 2020 13:29:42 -0400
-Received: from mail-wm1-x331.google.com ([2a00:1450:4864:20::331]:37745)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k9Awv-000493-RJ
+ for qemu-devel@nongnu.org; Fri, 21 Aug 2020 13:35:33 -0400
+Received: from indium.canonical.com ([91.189.90.7]:46132)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k9ArF-0001DO-9A; Fri, 21 Aug 2020 13:29:42 -0400
-Received: by mail-wm1-x331.google.com with SMTP id k8so2576481wma.2;
- Fri, 21 Aug 2020 10:29:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=ArJcEdqJX+vmqubLA63riTsSiUZwEENuCNY6yovraRY=;
- b=Htm26PR3I+xSImMZ+2D5dPBeSWaQvQgzPuKkTiSIZuaeUTlV0FGpc6j7sYDmOPv1GP
- B/O2qWhIKbPgoE9K3QCnpzE75gJj9R7w1Sr9Fd45b62nFDwKhJz18Vw88Jt8CJuArmGe
- zpOtCVmm6pqRZlhVD9MwaAC3nQdhrTJN9HENpfIguK8uVtOYUVo9zsZ7yNQERhhyrOlD
- TAzucIqmUK25X57KlzLIxLw1w2XH3pyl2l6qoDJr9hP6vszpiq8TyMKTNt1dT5gUevzA
- y9jSmkQ663R06kVc2Czw7HSsUVOYpG+hvilQ7VSjo6C0qeTLQoa3rqpNeJoYG4PisUeA
- ydZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=ArJcEdqJX+vmqubLA63riTsSiUZwEENuCNY6yovraRY=;
- b=G0pSXNqLmQ2PAb1t62I8DeDJBLdwwWEommUiEsUE/cZRtl7JjvlxsMzHIP9I2+ZC0+
- n5HMyGVMAkyO3SY/m1wEMYj/f+UAC8qaTgq+r3yKAM6WGSj2csII7lBILns/XgkFX9B4
- X57ya9spSNmDFpGyjoQ+DCXoqhv8iK98+K+0DpdQFoxX4fq00w0IHC+BKpuKbqdPO/YR
- +yeJNcJPI+WASSYEZomv2thTWBDPE6nkLjNyt+qWs999RL1oILttT9Q3b09XtLNqFaG9
- Uf0XTdf1/7/tpzQpPPMnPZ+ybhdrBQccJn/zdPpd33BSzFNz8redxfnVp8nCvFmjwgtX
- TXjA==
-X-Gm-Message-State: AOAM532E6LlTH32vhmSM3LpsyBPTAj/vZ9VSPXtK+XfJO5CwBpnIGtmU
- ee2LqhajcQh2DaVZfKSpIgQlorz4euM=
-X-Google-Smtp-Source: ABdhPJyljEwfRG8mMFpdG2S9PmkHKqJ6NS2f3dmboL4emFFyg7z2Fj469HX9DY6Eh/+bJ18+xDZEvQ==
-X-Received: by 2002:a1c:1d92:: with SMTP id d140mr3993892wmd.157.1598030978727; 
- Fri, 21 Aug 2020 10:29:38 -0700 (PDT)
-Received: from localhost.localdomain (121.red-81-40-121.staticip.rima-tde.net.
- [81.40.121.121])
- by smtp.gmail.com with ESMTPSA id 32sm5315471wrn.86.2020.08.21.10.29.37
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 21 Aug 2020 10:29:38 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-Subject: [PULL 13/23] hw/sd/sdcard: Make sd_data_ready() static
-Date: Fri, 21 Aug 2020 19:29:06 +0200
-Message-Id: <20200821172916.1260954-14-f4bug@amsat.org>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200821172916.1260954-1-f4bug@amsat.org>
-References: <20200821172916.1260954-1-f4bug@amsat.org>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k9Awt-0001wl-4e
+ for qemu-devel@nongnu.org; Fri, 21 Aug 2020 13:35:33 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1k9Awq-0000TT-6M
+ for <qemu-devel@nongnu.org>; Fri, 21 Aug 2020 17:35:28 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 2E5DD2E806F
+ for <qemu-devel@nongnu.org>; Fri, 21 Aug 2020 17:35:28 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::331;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x331.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 0
-X-Spam_score: 0.0
-X-Spam_bar: /
-X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 21 Aug 2020 17:29:32 -0000
+From: Xavier Claessens <1892533@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: zdra
+X-Launchpad-Bug-Reporter: Xavier Claessens (zdra)
+X-Launchpad-Bug-Modifier: Xavier Claessens (zdra)
+Message-Id: <159803097267.15754.2795655095121321664.malonedeb@soybean.canonical.com>
+Subject: [Bug 1892533] [NEW] Meson: Missing config-host.mak
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="99c2d833c8d727fd05148486920aca032e908071"; Instance="production"
+X-Launchpad-Hash: 90e547ee9353f88a80cf26fcaa03282290e3cebe
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/21 13:35:28
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -100,55 +81,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-block@nongnu.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Andrew Baumann <Andrew.Baumann@microsoft.com>,
- Alistair Francis <alistair.francis@xilinx.com>,
- Beniamino Galvani <b.galvani@gmail.com>, Michael Walle <michael@walle.cc>,
- qemu-arm@nongnu.org
+Reply-To: Bug 1892533 <1892533@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-sd_data_ready() belongs to the legacy API. As its last user has
-been converted to the SDBus API, make it static.
+Public bug reported:
 
-Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
-Message-Id: <20180216022933.10945-7-f4bug@amsat.org>
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Acked-by: Peter Maydell <peter.maydell@linaro.org>
----
- include/hw/sd/sd.h | 1 -
- hw/sd/sd.c         | 2 +-
- 2 files changed, 1 insertion(+), 2 deletions(-)
+Wanted to give a try to the new build system, but a simple "meson build"
+gives that error:
 
-diff --git a/include/hw/sd/sd.h b/include/hw/sd/sd.h
-index a84b8e274a3..ace350e0e83 100644
---- a/include/hw/sd/sd.h
-+++ b/include/hw/sd/sd.h
-@@ -143,7 +143,6 @@ int sd_do_command(SDState *sd, SDRequest *req,
- void sd_write_data(SDState *sd, uint8_t value);
- uint8_t sd_read_data(SDState *sd);
- void sd_set_cb(SDState *sd, qemu_irq readonly, qemu_irq insert);
--bool sd_data_ready(SDState *sd);
- /* sd_enable should not be used -- it is only used on the nseries boards,
-  * where it is part of a broken implementation of the MMC card slot switch
-  * (there should be two card slots which are multiplexed to a single MMC
-diff --git a/hw/sd/sd.c b/hw/sd/sd.c
-index fad9cf1ee7a..a5ae5dccbe5 100644
---- a/hw/sd/sd.c
-+++ b/hw/sd/sd.c
-@@ -2082,7 +2082,7 @@ uint8_t sd_read_data(SDState *sd)
-     return ret;
- }
- 
--bool sd_data_ready(SDState *sd)
-+static bool sd_data_ready(SDState *sd)
- {
-     return sd->state == sd_sendingdata_state;
- }
--- 
-2.26.2
+meson.build:15:0: ERROR: Failed to load
+/home/xclaesse/programmation/qemu/build/config-host.mak: [Errno 2] No
+such file or directory: '/home/xclaesse/programmation/qemu/build/config-
+host.mak'
 
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1892533
+
+Title:
+  Meson: Missing config-host.mak
+
+Status in QEMU:
+  New
+
+Bug description:
+  Wanted to give a try to the new build system, but a simple "meson
+  build" gives that error:
+
+  meson.build:15:0: ERROR: Failed to load
+  /home/xclaesse/programmation/qemu/build/config-host.mak: [Errno 2] No
+  such file or directory: '/home/xclaesse/programmation/qemu/build
+  /config-host.mak'
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1892533/+subscriptions
 
