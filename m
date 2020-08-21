@@ -7,69 +7,70 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C52EC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 17:42:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D50E3C433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 17:43:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3D38620738
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 17:42:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A2FC620738
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 17:43:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OcTQNH9S"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D38620738
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i8OYIYYC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2FC620738
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40160 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42326 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k9B43-00086v-Hd
-	for qemu-devel@archiver.kernel.org; Fri, 21 Aug 2020 13:42:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57490)
+	id 1k9B4g-0000ZO-UO
+	for qemu-devel@archiver.kernel.org; Fri, 21 Aug 2020 13:43:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57574)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k9ArN-0001ij-EO; Fri, 21 Aug 2020 13:29:49 -0400
-Received: from mail-wr1-x430.google.com ([2a00:1450:4864:20::430]:39451)
+ id 1k9ArU-0001pl-1y; Fri, 21 Aug 2020 13:29:57 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:54394)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k9ArL-0001EQ-8s; Fri, 21 Aug 2020 13:29:49 -0400
-Received: by mail-wr1-x430.google.com with SMTP id a5so2656454wrm.6;
- Fri, 21 Aug 2020 10:29:45 -0700 (PDT)
+ id 1k9ArR-0001GS-VA; Fri, 21 Aug 2020 13:29:55 -0400
+Received: by mail-wm1-x344.google.com with SMTP id 83so2627896wme.4;
+ Fri, 21 Aug 2020 10:29:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=HEwX79oo8D7n/oZUencYO6rP85LqJ2NQ5PmlyfVwwIE=;
- b=OcTQNH9S1Lompx5HoQZj6DQH1bKC6QNN30kM2SLDoF3vL0MLI9KrjvBmla1PIv/gqu
- gYPM4hL78cUXKtqea0i69sLFg252dmfu1TDbvRrJmUU5CcurUPYGV4VYH0Zd5/L1T8MS
- d0/jpTQiZ/0dLZkao3O0LzEmBpMLQKEVNh2eaH0HCxXOz83onV+zpEibgrU6fVof6edk
- mCsf29RjRHFpQggm/ssxva9P92yKiOYpu+rwDg/syqo7rYZ4OMApl7sYfJhQ/tpBKQZp
- RU1MrNZ0BFEFORLXT5nZ3lR+p3I9w/3XU1iGPkQwr4DFDSn23VIATPQGaR55Ll55tcA8
- bwUw==
+ bh=6RaWSIQ7O/kyP/fOVD7Nn9+SCTDuG1HapMmgzJ7Bipo=;
+ b=i8OYIYYC7csM7gn/RNMoizJuGOYwwf20rOa6BZk9AOfR99ekwncKC0BNxfMW5vhPSp
+ J0zoHRZq7o7ysSblI4lg7uwvbpuw2/TQ8kkkHK+pJxsF1bdxRzQxBVYKE13gEt5fBTla
+ 2cJ7ahIN6lQ7wIyiv5px3uonXfFcclKTN7vdKaHGAxz1npBuP2RFrlHTcxTsJOJ1y7jX
+ K+KXt06UrYR7hDrTPznKwoGCB4nuC53z7BBd79PJ2HO6n432/7Zgw/rAgxrzVY0TZC+q
+ 5M2euS7G42cY5DvO3nHAFX04Ud47yH7+QQ9AtGZ+bYcKh/Mp4ugSm4SuLFzz5AjS13ug
+ hJfg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=HEwX79oo8D7n/oZUencYO6rP85LqJ2NQ5PmlyfVwwIE=;
- b=LQDLcErY1z/ODYyZqFlY0hpm81W/Jrkf1JdZvc3ORviFpVq880njI3JyQIDQqr/fBp
- vDXiIAgvL35BvenwVy7BrbN8iHaneSrb6KnF1pJlZKsnqD5lWHyVTXQeEvkZdVyclnN0
- HBCyRrHns22mhtZYl1C371ROX0qhlo/suWmUIy3rSanFx2/otwEbkWWpbZ6nVYCE+1EH
- RgKnw3qn+CsfKKvzyC9CxyYZpeUlEshlxFJT8gL1uY8hdKRZP4xqZlwSpovNn8wrMgrI
- L2HI2KcHRjKKncSiQba3c/1sB+wOCDbJwqa9W1WSyJaDcjewvxpEhJZEye77p9WHqO67
- Scvw==
-X-Gm-Message-State: AOAM530cAG3pq6q0lIYFBvwxc5RZa7oZPw9z7Dp674rQLC6CSTGcY9uf
- IprvDQymuEDBiAiBSlusfLsFDNo0jMs=
-X-Google-Smtp-Source: ABdhPJxkJL+KUn1JgAXaH10ibQ8TDhJ1vAVUUlQGnWsEQ+TviIwXo6Usfsr4zY/sWAmXbAigCBatxA==
-X-Received: by 2002:adf:ed49:: with SMTP id u9mr3604205wro.408.1598030983806; 
- Fri, 21 Aug 2020 10:29:43 -0700 (PDT)
+ bh=6RaWSIQ7O/kyP/fOVD7Nn9+SCTDuG1HapMmgzJ7Bipo=;
+ b=S6aU3/3wzftnpSAKvZB1Kkrs6H7cTZTRtR8dJ5h/toP6a+doRHjbpCsWJM/+IvlLrW
+ L6wsT3Felmixo0iJdIacHt2IPi22tnojFvhn0+XlVjZ3AarW0m+cgtlE0Zzp59MDqfLE
+ 9MHg9eWuYaeNeLrv/rXWQHOuBK8l3bze0NdQQpb6+qTAWv+sPxGt1HdXkI0ieNzy25/n
+ aUDURrT7Zqg0/TNGPDrohh3O4xbg5Ex6NSQEDJU9qYaZNN7piT0ANdPnHsATXSDO01BT
+ 06qW4Vu3lWN2A7RITd0q4+gx21VQAKrzkq7boyAgS7y/3Ym+qooHvw7FVPCSNLmBaiUR
+ Z+mQ==
+X-Gm-Message-State: AOAM532DcSiYfmpHGjHNTwsiAQUrOI0fOD+9wsYlkDCl1dFWOoGrg/ZE
+ Rq3l8Q8rqfVh3Z7p4X94Y9VTh8g1FoU=
+X-Google-Smtp-Source: ABdhPJx3jHbDSkrQ0GIo/BZ2/qIs2Bu11RRA7xBt01e2zx3nGsmkK+CYPHRAvBeFngDWEwVh494iTA==
+X-Received: by 2002:a1c:41c5:: with SMTP id o188mr4303845wma.187.1598030991628; 
+ Fri, 21 Aug 2020 10:29:51 -0700 (PDT)
 Received: from localhost.localdomain (121.red-81-40-121.staticip.rima-tde.net.
  [81.40.121.121])
- by smtp.gmail.com with ESMTPSA id 32sm5315471wrn.86.2020.08.21.10.29.42
+ by smtp.gmail.com with ESMTPSA id 32sm5315471wrn.86.2020.08.21.10.29.50
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 21 Aug 2020 10:29:43 -0700 (PDT)
+ Fri, 21 Aug 2020 10:29:51 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 16/23] hw/sd: Rename sdbus_write_data() as sdbus_write_byte()
-Date: Fri, 21 Aug 2020 19:29:09 +0200
-Message-Id: <20200821172916.1260954-17-f4bug@amsat.org>
+Subject: [PULL 21/23] hw/sd: Use sdbus_read_data() instead of
+ sdbus_read_byte() when possible
+Date: Fri, 21 Aug 2020 19:29:14 +0200
+Message-Id: <20200821172916.1260954-22-f4bug@amsat.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200821172916.1260954-1-f4bug@amsat.org>
 References: <20200821172916.1260954-1-f4bug@amsat.org>
@@ -77,8 +78,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::430;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x430.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::344;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x344.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
@@ -111,182 +112,148 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The sdbus_write_data() method do a single byte access on the data
-line of a SD bus. Rename it as sdbus_write_byte() and document it.
+Use the recently added sdbus_read_data() to read multiple
+bytes at once, instead of looping calling sdbus_read_byte().
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20200814092346.21825-3-f4bug@amsat.org>
+Message-Id: <20200814092346.21825-8-f4bug@amsat.org>
 ---
- include/hw/sd/sd.h        |  9 ++++++++-
- hw/sd/allwinner-sdhost.c  | 10 +++++-----
- hw/sd/bcm2835_sdhost.c    |  2 +-
- hw/sd/core.c              |  2 +-
- hw/sd/milkymist-memcard.c |  8 ++++----
- hw/sd/pl181.c             |  2 +-
- hw/sd/pxa2xx_mmci.c       |  2 +-
- hw/sd/sdhci.c             |  8 ++++----
- 8 files changed, 25 insertions(+), 18 deletions(-)
+ hw/sd/allwinner-sdhost.c  | 10 +++-------
+ hw/sd/milkymist-memcard.c |  7 ++-----
+ hw/sd/sdhci.c             | 28 ++++++++--------------------
+ 3 files changed, 13 insertions(+), 32 deletions(-)
 
-diff --git a/include/hw/sd/sd.h b/include/hw/sd/sd.h
-index b58b5a19afe..1e5ac955d05 100644
---- a/include/hw/sd/sd.h
-+++ b/include/hw/sd/sd.h
-@@ -158,7 +158,14 @@ void sdbus_set_voltage(SDBus *sdbus, uint16_t millivolts);
- uint8_t sdbus_get_dat_lines(SDBus *sdbus);
- bool sdbus_get_cmd_line(SDBus *sdbus);
- int sdbus_do_command(SDBus *sd, SDRequest *req, uint8_t *response);
--void sdbus_write_data(SDBus *sd, uint8_t value);
-+/**
-+ * Write a byte to a SD bus.
-+ * @sd: bus
-+ * @value: byte to write
-+ *
-+ * Write a byte on the data lines of a SD bus.
-+ */
-+void sdbus_write_byte(SDBus *sd, uint8_t value);
- uint8_t sdbus_read_data(SDBus *sd);
- bool sdbus_data_ready(SDBus *sd);
- bool sdbus_get_inserted(SDBus *sd);
 diff --git a/hw/sd/allwinner-sdhost.c b/hw/sd/allwinner-sdhost.c
-index f404e1fdb45..e05e8a3864c 100644
+index eea5659c5f1..f9eb92c09ed 100644
 --- a/hw/sd/allwinner-sdhost.c
 +++ b/hw/sd/allwinner-sdhost.c
-@@ -335,7 +335,7 @@ static uint32_t allwinner_sdhost_process_desc(AwSdHostState *s,
-                                       buf, buf_bytes);
- 
-             for (uint32_t i = 0; i < buf_bytes; i++) {
--                sdbus_write_data(&s->sdbus, buf[i]);
-+                sdbus_write_byte(&s->sdbus, buf[i]);
-             }
+@@ -337,9 +337,7 @@ static uint32_t allwinner_sdhost_process_desc(AwSdHostState *s,
  
          /* Read from SD bus */
-@@ -654,10 +654,10 @@ static void allwinner_sdhost_write(void *opaque, hwaddr offset,
-         s->startbit_detect = value;
+         } else {
+-            for (uint32_t i = 0; i < buf_bytes; i++) {
+-                buf[i] = sdbus_read_byte(&s->sdbus);
+-            }
++            sdbus_read_data(&s->sdbus, buf, buf_bytes);
+             cpu_physical_memory_write((desc->addr & DESC_SIZE_MASK) + num_done,
+                                        buf, buf_bytes);
+         }
+@@ -518,10 +516,8 @@ static uint64_t allwinner_sdhost_read(void *opaque, hwaddr offset,
          break;
      case REG_SD_FIFO:      /* Read/Write FIFO */
--        sdbus_write_data(&s->sdbus, value & 0xff);
--        sdbus_write_data(&s->sdbus, (value >> 8) & 0xff);
--        sdbus_write_data(&s->sdbus, (value >> 16) & 0xff);
--        sdbus_write_data(&s->sdbus, (value >> 24) & 0xff);
-+        sdbus_write_byte(&s->sdbus, value & 0xff);
-+        sdbus_write_byte(&s->sdbus, (value >> 8) & 0xff);
-+        sdbus_write_byte(&s->sdbus, (value >> 16) & 0xff);
-+        sdbus_write_byte(&s->sdbus, (value >> 24) & 0xff);
-         allwinner_sdhost_update_transfer_cnt(s, sizeof(uint32_t));
-         allwinner_sdhost_auto_stop(s);
-         allwinner_sdhost_update_irq(s);
-diff --git a/hw/sd/bcm2835_sdhost.c b/hw/sd/bcm2835_sdhost.c
-index 4a80fbcc861..16aba7cc92b 100644
---- a/hw/sd/bcm2835_sdhost.c
-+++ b/hw/sd/bcm2835_sdhost.c
-@@ -223,7 +223,7 @@ static void bcm2835_sdhost_fifo_run(BCM2835SDHostState *s)
-                 }
-                 n--;
-                 s->datacnt--;
--                sdbus_write_data(&s->sdbus, value & 0xff);
-+                sdbus_write_byte(&s->sdbus, value & 0xff);
-                 value >>= 8;
-             }
-         }
-diff --git a/hw/sd/core.c b/hw/sd/core.c
-index 79d96576ead..13b5ca03169 100644
---- a/hw/sd/core.c
-+++ b/hw/sd/core.c
-@@ -102,7 +102,7 @@ int sdbus_do_command(SDBus *sdbus, SDRequest *req, uint8_t *response)
-     return 0;
- }
- 
--void sdbus_write_data(SDBus *sdbus, uint8_t value)
-+void sdbus_write_byte(SDBus *sdbus, uint8_t value)
- {
-     SDState *card = get_card(sdbus);
- 
+         if (sdbus_data_ready(&s->sdbus)) {
+-            res = sdbus_read_byte(&s->sdbus);
+-            res |= sdbus_read_byte(&s->sdbus) << 8;
+-            res |= sdbus_read_byte(&s->sdbus) << 16;
+-            res |= sdbus_read_byte(&s->sdbus) << 24;
++            sdbus_read_data(&s->sdbus, &res, sizeof(uint32_t));
++            le32_to_cpus(&res);
+             allwinner_sdhost_update_transfer_cnt(s, sizeof(uint32_t));
+             allwinner_sdhost_auto_stop(s);
+             allwinner_sdhost_update_irq(s);
 diff --git a/hw/sd/milkymist-memcard.c b/hw/sd/milkymist-memcard.c
-index e9f5db5e22d..4128109c047 100644
+index 12e091a46e7..be89a938763 100644
 --- a/hw/sd/milkymist-memcard.c
 +++ b/hw/sd/milkymist-memcard.c
-@@ -209,10 +209,10 @@ static void memcard_write(void *opaque, hwaddr addr, uint64_t value,
+@@ -151,11 +151,8 @@ static uint64_t memcard_read(void *opaque, hwaddr addr,
          if (!s->enabled) {
-             break;
+             r = 0xffffffff;
+         } else {
+-            r = 0;
+-            r |= sdbus_read_byte(&s->sdbus) << 24;
+-            r |= sdbus_read_byte(&s->sdbus) << 16;
+-            r |= sdbus_read_byte(&s->sdbus) << 8;
+-            r |= sdbus_read_byte(&s->sdbus);
++            sdbus_read_data(&s->sdbus, &r, sizeof(r));
++            be32_to_cpus(&r);
          }
--        sdbus_write_data(&s->sdbus, (value >> 24) & 0xff);
--        sdbus_write_data(&s->sdbus, (value >> 16) & 0xff);
--        sdbus_write_data(&s->sdbus, (value >> 8) & 0xff);
--        sdbus_write_data(&s->sdbus, value & 0xff);
-+        sdbus_write_byte(&s->sdbus, (value >> 24) & 0xff);
-+        sdbus_write_byte(&s->sdbus, (value >> 16) & 0xff);
-+        sdbus_write_byte(&s->sdbus, (value >> 8) & 0xff);
-+        sdbus_write_byte(&s->sdbus, value & 0xff);
          break;
-     case R_ENABLE:
-         s->regs[addr] = value;
-diff --git a/hw/sd/pl181.c b/hw/sd/pl181.c
-index 574500ce600..771bae193f5 100644
---- a/hw/sd/pl181.c
-+++ b/hw/sd/pl181.c
-@@ -244,7 +244,7 @@ static void pl181_fifo_run(PL181State *s)
-                 }
-                 n--;
-                 s->datacnt--;
--                sdbus_write_data(&s->sdbus, value & 0xff);
-+                sdbus_write_byte(&s->sdbus, value & 0xff);
-                 value >>= 8;
-             }
-         }
-diff --git a/hw/sd/pxa2xx_mmci.c b/hw/sd/pxa2xx_mmci.c
-index 2996a2ef177..07ddc2eba3e 100644
---- a/hw/sd/pxa2xx_mmci.c
-+++ b/hw/sd/pxa2xx_mmci.c
-@@ -184,7 +184,7 @@ static void pxa2xx_mmci_fifo_update(PXA2xxMMCIState *s)
- 
-     if (s->cmdat & CMDAT_WR_RD) {
-         while (s->bytesleft && s->tx_len) {
--            sdbus_write_data(&s->sdbus, s->tx_fifo[s->tx_start++]);
-+            sdbus_write_byte(&s->sdbus, s->tx_fifo[s->tx_start++]);
-             s->tx_start &= 0x1f;
-             s->tx_len --;
-             s->bytesleft --;
+     case R_CLK2XDIV:
 diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
-index deac1818650..4bf1ee88b2a 100644
+index ddf36915619..1785d7e1f79 100644
 --- a/hw/sd/sdhci.c
 +++ b/hw/sd/sdhci.c
-@@ -515,7 +515,7 @@ static void sdhci_write_block_to_card(SDHCIState *s)
+@@ -399,8 +399,6 @@ static void sdhci_end_transfer(SDHCIState *s)
+ /* Fill host controller's read buffer with BLKSIZE bytes of data from card */
+ static void sdhci_read_block_from_card(SDHCIState *s)
+ {
+-    int index = 0;
+-    uint8_t data;
+     const uint16_t blk_size = s->blksize & BLOCK_SIZE_MASK;
+ 
+     if ((s->trnmod & SDHC_TRNS_MULTI) &&
+@@ -408,12 +406,9 @@ static void sdhci_read_block_from_card(SDHCIState *s)
+         return;
      }
  
-     for (index = 0; index < (s->blksize & BLOCK_SIZE_MASK); index++) {
--        sdbus_write_data(&s->sdbus, s->fifo_buffer[index]);
-+        sdbus_write_byte(&s->sdbus, s->fifo_buffer[index]);
+-    for (index = 0; index < blk_size; index++) {
+-        data = sdbus_read_byte(&s->sdbus);
+-        if (!FIELD_EX32(s->hostctl2, SDHC_HOSTCTL2, EXECUTE_TUNING)) {
+-            /* Device is not in tuning */
+-            s->fifo_buffer[index] = data;
+-        }
++    if (!FIELD_EX32(s->hostctl2, SDHC_HOSTCTL2, EXECUTE_TUNING)) {
++        /* Device is not in tuning */
++        sdbus_read_data(&s->sdbus, s->fifo_buffer, blk_size);
      }
  
-     /* Next data can be written through BUFFER DATORT register */
-@@ -642,7 +642,7 @@ static void sdhci_sdma_transfer_multi_blocks(SDHCIState *s)
-             s->sdmasysad += s->data_count - begin;
-             if (s->data_count == block_size) {
-                 for (n = 0; n < block_size; n++) {
--                    sdbus_write_data(&s->sdbus, s->fifo_buffer[n]);
-+                    sdbus_write_byte(&s->sdbus, s->fifo_buffer[n]);
-                 }
-                 s->data_count = 0;
-                 if (s->trnmod & SDHC_TRNS_BLK_CNT_EN) {
-@@ -679,7 +679,7 @@ static void sdhci_sdma_transfer_single_block(SDHCIState *s)
+     if (FIELD_EX32(s->hostctl2, SDHC_HOSTCTL2, EXECUTE_TUNING)) {
+@@ -574,7 +569,7 @@ static void sdhci_write_dataport(SDHCIState *s, uint32_t value, unsigned size)
+ static void sdhci_sdma_transfer_multi_blocks(SDHCIState *s)
+ {
+     bool page_aligned = false;
+-    unsigned int n, begin;
++    unsigned int begin;
+     const uint16_t block_size = s->blksize & BLOCK_SIZE_MASK;
+     uint32_t boundary_chk = 1 << (((s->blksize & ~BLOCK_SIZE_MASK) >> 12) + 12);
+     uint32_t boundary_count = boundary_chk - (s->sdmasysad % boundary_chk);
+@@ -596,9 +591,7 @@ static void sdhci_sdma_transfer_multi_blocks(SDHCIState *s)
+                 SDHC_DAT_LINE_ACTIVE;
+         while (s->blkcnt) {
+             if (s->data_count == 0) {
+-                for (n = 0; n < block_size; n++) {
+-                    s->fifo_buffer[n] = sdbus_read_byte(&s->sdbus);
+-                }
++                sdbus_read_data(&s->sdbus, s->fifo_buffer, block_size);
+             }
+             begin = s->data_count;
+             if (((boundary_count + begin) < block_size) && page_aligned) {
+@@ -662,13 +655,10 @@ static void sdhci_sdma_transfer_multi_blocks(SDHCIState *s)
+ /* single block SDMA transfer */
+ static void sdhci_sdma_transfer_single_block(SDHCIState *s)
+ {
+-    int n;
+     uint32_t datacnt = s->blksize & BLOCK_SIZE_MASK;
+ 
+     if (s->trnmod & SDHC_TRNS_READ) {
+-        for (n = 0; n < datacnt; n++) {
+-            s->fifo_buffer[n] = sdbus_read_byte(&s->sdbus);
+-        }
++        sdbus_read_data(&s->sdbus, s->fifo_buffer, datacnt);
+         dma_memory_write(s->dma_as, s->sdmasysad, s->fifo_buffer, datacnt);
      } else {
          dma_memory_read(s->dma_as, s->sdmasysad, s->fifo_buffer, datacnt);
-         for (n = 0; n < datacnt; n++) {
--            sdbus_write_data(&s->sdbus, s->fifo_buffer[n]);
-+            sdbus_write_byte(&s->sdbus, s->fifo_buffer[n]);
-         }
-     }
-     s->blkcnt--;
-@@ -815,7 +815,7 @@ static void sdhci_do_adma(SDHCIState *s)
-                     dscr.addr += s->data_count - begin;
-                     if (s->data_count == block_size) {
-                         for (n = 0; n < block_size; n++) {
--                            sdbus_write_data(&s->sdbus, s->fifo_buffer[n]);
-+                            sdbus_write_byte(&s->sdbus, s->fifo_buffer[n]);
-                         }
-                         s->data_count = 0;
-                         if (s->trnmod & SDHC_TRNS_BLK_CNT_EN) {
+@@ -731,7 +721,7 @@ static void get_adma_description(SDHCIState *s, ADMADescr *dscr)
+ 
+ static void sdhci_do_adma(SDHCIState *s)
+ {
+-    unsigned int n, begin, length;
++    unsigned int begin, length;
+     const uint16_t block_size = s->blksize & BLOCK_SIZE_MASK;
+     ADMADescr dscr = {};
+     int i;
+@@ -765,9 +755,7 @@ static void sdhci_do_adma(SDHCIState *s)
+             if (s->trnmod & SDHC_TRNS_READ) {
+                 while (length) {
+                     if (s->data_count == 0) {
+-                        for (n = 0; n < block_size; n++) {
+-                            s->fifo_buffer[n] = sdbus_read_byte(&s->sdbus);
+-                        }
++                        sdbus_read_data(&s->sdbus, s->fifo_buffer, block_size);
+                     }
+                     begin = s->data_count;
+                     if ((length + begin) < block_size) {
 -- 
 2.26.2
 
