@@ -7,76 +7,77 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82C7CC433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 10:36:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05DB1C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 10:36:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 05E6920738
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 10:36:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CA1D420738
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 10:36:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DFaf/46l"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 05E6920738
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EZyhjK8m"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA1D420738
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60030 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60158 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k94P6-0007dg-5F
-	for qemu-devel@archiver.kernel.org; Fri, 21 Aug 2020 06:36:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59612)
+	id 1k94P7-0007gp-2I
+	for qemu-devel@archiver.kernel.org; Fri, 21 Aug 2020 06:36:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59450)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k94DI-00017o-WF
- for qemu-devel@nongnu.org; Fri, 21 Aug 2020 06:24:01 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:55925
+ id 1k94D7-0000e1-PE
+ for qemu-devel@nongnu.org; Fri, 21 Aug 2020 06:23:49 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:37738
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k94DG-0001UL-3n
- for qemu-devel@nongnu.org; Fri, 21 Aug 2020 06:24:00 -0400
+ id 1k94D5-0001Ri-2h
+ for qemu-devel@nongnu.org; Fri, 21 Aug 2020 06:23:49 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598005437;
+ s=mimecast20190719; t=1598005426;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Jnt5uKu4kBTWpAPO0AzOsG/lDWm1TEp2iP/8NdnruOw=;
- b=DFaf/46lFckNg3BNN/L+YekwJYYpro3h52RO/x5G3xcD2QCA8O9MYKDsqIb39l31iOeFlW
- AnW4bmqg09Y4iDYsAnj20S6cjcuQMptez+Od7idteceh0Gis2dZMyvZO1oBkhwQZqXDRBA
- odmfGUwUB9Xa9K2PNTtnWcD10h+OxGc=
+ bh=pyogagIogekxmBEBJdMiIgfbzL4q1hqCl4ySl4yEPBY=;
+ b=EZyhjK8mWVw0fMcnoQGDMGGL4ALhf1k6MDT6BoJMyNgieBbRHdNZVvPDtv/HGVibw3PzaT
+ 2IeISB3JaF3ONEjPIIYBleZtc1vKbJl8xPRw8hM9kDu/RP/0Qrocb0Vn3RAGMyQFoiwpes
+ AgXRIDq+WgQlvZ4R9s/5EJc2Pn0Hqfs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-57-WYS5qWY_PR--vaxsR7ACHw-1; Fri, 21 Aug 2020 06:23:55 -0400
-X-MC-Unique: WYS5qWY_PR--vaxsR7ACHw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-372-_mQYiIYgOLChbPuFpXm2Pw-1; Fri, 21 Aug 2020 06:23:44 -0400
+X-MC-Unique: _mQYiIYgOLChbPuFpXm2Pw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 837561DE0D
- for <qemu-devel@nongnu.org>; Fri, 21 Aug 2020 10:23:54 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E2C3B873081
+ for <qemu-devel@nongnu.org>; Fri, 21 Aug 2020 10:23:43 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 527537AED2
- for <qemu-devel@nongnu.org>; Fri, 21 Aug 2020 10:23:54 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A02465DA78;
+ Fri, 21 Aug 2020 10:23:43 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v8 024/152] meson: add sparse support
-Date: Fri, 21 Aug 2020 06:21:21 -0400
-Message-Id: <20200821102329.29777-25-pbonzini@redhat.com>
+Subject: [PULL v8 012/152] configure: do not include $(...) variables in
+ config-host.mak
+Date: Fri, 21 Aug 2020 06:21:09 -0400
+Message-Id: <20200821102329.29777-13-pbonzini@redhat.com>
 In-Reply-To: <20200821102329.29777-1-pbonzini@redhat.com>
 References: <20200821102329.29777-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0.0
+X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/21 04:55:47
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/20 23:41:39
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
@@ -84,7 +85,7 @@ X-Spam_bar: ----
 X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,109 +98,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Do not use cgcc; instead, extract compilation commands from compile_commands.json
-and invoke sparse directly.
+This ensures that Meson will be able to reuse the results of
+the tests that are performed in the configure script.
 
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Makefile                |  1 +
- configure               |  8 ++------
- meson.build             |  7 +++++++
- scripts/check_sparse.py | 25 +++++++++++++++++++++++++
- 4 files changed, 35 insertions(+), 6 deletions(-)
- create mode 100644 scripts/check_sparse.py
+ configure | 32 ++++++++++++++++----------------
+ 1 file changed, 16 insertions(+), 16 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index ba8413d809..81c9642a30 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1261,6 +1261,7 @@ endif
- 	$(call print-help,install,Install QEMU, documentation and tools)
- 	$(call print-help,ctags/TAGS,Generate tags file for editors)
- 	$(call print-help,cscope,Generate cscope index)
-+	$(call print-help,sparse,Run sparse on the QEMU source)
- 	@echo  ''
- 	@$(if $(TARGET_DIRS), \
- 		echo 'Architecture specific targets:'; \
 diff --git a/configure b/configure
-index b2c498a0bf..e23b2f616f 100755
+index 625c14c500..606c327cca 100755
 --- a/configure
 +++ b/configure
-@@ -3054,7 +3054,7 @@ fi
- ##########################################
- # Sparse probe
- if test "$sparse" != "no" ; then
--  if has cgcc; then
-+  if has sparse; then
-     sparse=yes
-   else
-     if test "$sparse" = "yes" ; then
-@@ -7855,11 +7855,7 @@ echo "QEMU_CFLAGS=$QEMU_CFLAGS" >> $config_host_mak
- echo "QEMU_CXXFLAGS=$QEMU_CXXFLAGS" >> $config_host_mak
- echo "QEMU_INCLUDES=$QEMU_INCLUDES" >> $config_host_mak
- if test "$sparse" = "yes" ; then
--  echo "CC           := REAL_CC=\"\$(CC)\" cgcc"       >> $config_host_mak
--  echo "CPP          := REAL_CC=\"\$(CPP)\" cgcc"      >> $config_host_mak
--  echo "CXX          := REAL_CC=\"\$(CXX)\" cgcc"      >> $config_host_mak
--  echo "HOST_CC      := REAL_CC=\"\$(HOST_CC)\" cgcc"  >> $config_host_mak
--  echo "QEMU_CFLAGS  += -Wbitwise -Wno-transparent-union -Wno-old-initializer -Wno-non-pointer-null" >> $config_host_mak
-+  echo "SPARSE_CFLAGS = -Wbitwise -Wno-transparent-union -Wno-old-initializer -Wno-non-pointer-null" >> $config_host_mak
+@@ -610,8 +610,8 @@ QEMU_CFLAGS="-fno-strict-aliasing -fno-common -fwrapv -std=gnu99 $QEMU_CFLAGS"
+ QEMU_CFLAGS="-Wall -Wundef -Wwrite-strings -Wmissing-prototypes $QEMU_CFLAGS"
+ QEMU_CFLAGS="-Wstrict-prototypes -Wredundant-decls $QEMU_CFLAGS"
+ QEMU_CFLAGS="-D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE $QEMU_CFLAGS"
+-QEMU_INCLUDES="-iquote . -iquote \$(SRC_PATH) -iquote \$(SRC_PATH)/accel/tcg -iquote \$(SRC_PATH)/include"
+-QEMU_INCLUDES="$QEMU_INCLUDES -iquote \$(SRC_PATH)/disas/libvixl"
++QEMU_INCLUDES="-iquote . -iquote ${source_path} -iquote ${source_path}/accel/tcg -iquote ${source_path}/include"
++QEMU_INCLUDES="$QEMU_INCLUDES -iquote ${source_path}/disas/libvixl"
+ if test "$debug_info" = "yes"; then
+     CFLAGS="-g $CFLAGS"
  fi
- echo "QEMU_LDFLAGS=$QEMU_LDFLAGS" >> $config_host_mak
- echo "LDFLAGS_NOPIE=$LDFLAGS_NOPIE" >> $config_host_mak
-diff --git a/meson.build b/meson.build
-index 1a56ac8b26..86219e500a 100644
---- a/meson.build
-+++ b/meson.build
-@@ -25,6 +25,13 @@ if host_machine.system() == 'darwin'
-   add_languages('objc', required: false, native: false)
- endif
+@@ -911,7 +911,7 @@ Linux)
+   linux="yes"
+   linux_user="yes"
+   kvm="yes"
+-  QEMU_INCLUDES="-isystem \$(SRC_PATH)/linux-headers -isystem $PWD/linux-headers $QEMU_INCLUDES"
++  QEMU_INCLUDES="-isystem ${source_path}/linux-headers -I$PWD/linux-headers $QEMU_INCLUDES"
+   supported_os="yes"
+   libudev="yes"
+ ;;
+@@ -4397,8 +4397,8 @@ EOF
+           if [ "$pwd_is_source_path" != "y" ] ; then
+               symlink "$source_path/dtc/Makefile" "dtc/Makefile"
+           fi
+-          fdt_cflags="-I\$(SRC_PATH)/dtc/libfdt"
+-          fdt_ldflags="-L\$(BUILD_DIR)/dtc/libfdt"
++          fdt_cflags="-I${source_path}/dtc/libfdt"
++          fdt_ldflags="-L$PWD/dtc/libfdt"
+           fdt_libs="$fdt_libs"
+       elif test "$fdt" = "yes" ; then
+           # Not a git build & no libfdt found, prompt for system install
+@@ -5385,13 +5385,13 @@ case "$capstone" in
+       git_submodules="${git_submodules} capstone"
+     fi
+     mkdir -p capstone
+-    QEMU_CFLAGS="$QEMU_CFLAGS -I\$(SRC_PATH)/capstone/include"
++    QEMU_CFLAGS="$QEMU_CFLAGS -I${source_path}/capstone/include"
+     if test "$mingw32" = "yes"; then
+       LIBCAPSTONE=capstone.lib
+     else
+       LIBCAPSTONE=libcapstone.a
+     fi
+-    libs_cpu="-L\$(BUILD_DIR)/capstone -lcapstone $libs_cpu"
++    libs_cpu="-L$PWD/capstone -lcapstone $libs_cpu"
+     ;;
  
-+if 'SPARSE_CFLAGS' in config_host
-+  run_target('sparse',
-+             command: [find_program('scripts/check_sparse.py'),
-+                       config_host['SPARSE_CFLAGS'].split(),
-+                       'compile_commands.json'])
-+endif
-+
- configure_file(input: files('scripts/ninjatool.py'),
-                output: 'ninjatool',
-                configuration: config_host)
-diff --git a/scripts/check_sparse.py b/scripts/check_sparse.py
-new file mode 100644
-index 0000000000..0de7aa55d9
---- /dev/null
-+++ b/scripts/check_sparse.py
-@@ -0,0 +1,25 @@
-+#! /usr/bin/env python3
-+
-+# Invoke sparse based on the contents of compile_commands.json
-+
-+import json
-+import subprocess
-+import sys
-+import shlex
-+
-+def extract_cflags(shcmd):
-+    cflags = shlex.split(shcmd)
-+    return [x for x in cflags
-+            if x.startswith('-D') or x.startswith('-I') or x.startswith('-W')
-+               or x.startswith('-std=')]
-+
-+cflags = sys.argv[1:-1]
-+with open(sys.argv[-1], 'r') as fd:
-+    compile_commands = json.load(fd)
-+
-+for cmd in compile_commands:
-+    cmd = ['sparse'] + cflags + extract_cflags(cmd['command']) + [cmd['file']]
-+    print(' '.join((shlex.quote(x) for x in cmd)))
-+    r = subprocess.run(cmd)
-+    if r.returncode != 0:
-+        sys.exit(r.returncode)
+   system)
+@@ -6414,8 +6414,8 @@ case "$slirp" in
+       git_submodules="${git_submodules} slirp"
+     fi
+     mkdir -p slirp
+-    slirp_cflags="-I\$(SRC_PATH)/slirp/src -I\$(BUILD_DIR)/slirp/src"
+-    slirp_libs="-L\$(BUILD_DIR)/slirp -lslirp"
++    slirp_cflags="-I${source_path}/slirp/src -I$PWD/slirp/src"
++    slirp_libs="-L$PWD/slirp -lslirp"
+     if test "$mingw32" = "yes" ; then
+       slirp_libs="$slirp_libs -lws2_32 -liphlpapi"
+     fi
+@@ -7909,19 +7909,19 @@ if test "$secret_keyring" = "yes" ; then
+ fi
+ 
+ if test "$tcg_interpreter" = "yes"; then
+-  QEMU_INCLUDES="-iquote \$(SRC_PATH)/tcg/tci $QEMU_INCLUDES"
++  QEMU_INCLUDES="-iquote ${source_path}/tcg/tci $QEMU_INCLUDES"
+ elif test "$ARCH" = "sparc64" ; then
+-  QEMU_INCLUDES="-iquote \$(SRC_PATH)/tcg/sparc $QEMU_INCLUDES"
++  QEMU_INCLUDES="-iquote ${source_path}/tcg/sparc $QEMU_INCLUDES"
+ elif test "$ARCH" = "s390x" ; then
+-  QEMU_INCLUDES="-iquote \$(SRC_PATH)/tcg/s390 $QEMU_INCLUDES"
++  QEMU_INCLUDES="-iquote ${source_path}/tcg/s390 $QEMU_INCLUDES"
+ elif test "$ARCH" = "x86_64" || test "$ARCH" = "x32" ; then
+-  QEMU_INCLUDES="-iquote \$(SRC_PATH)/tcg/i386 $QEMU_INCLUDES"
++  QEMU_INCLUDES="-iquote ${source_path}/tcg/i386 $QEMU_INCLUDES"
+ elif test "$ARCH" = "ppc64" ; then
+-  QEMU_INCLUDES="-iquote \$(SRC_PATH)/tcg/ppc $QEMU_INCLUDES"
++  QEMU_INCLUDES="-iquote ${source_path}/tcg/ppc $QEMU_INCLUDES"
+ elif test "$ARCH" = "riscv32" || test "$ARCH" = "riscv64" ; then
+-  QEMU_INCLUDES="-I\$(SRC_PATH)/tcg/riscv $QEMU_INCLUDES"
++  QEMU_INCLUDES="-I${source_path}/tcg/riscv $QEMU_INCLUDES"
+ else
+-  QEMU_INCLUDES="-iquote \$(SRC_PATH)/tcg/\$(ARCH) $QEMU_INCLUDES"
++  QEMU_INCLUDES="-iquote ${source_path}/tcg/${ARCH} $QEMU_INCLUDES"
+ fi
+ 
+ echo "HELPERS=$helpers" >> $config_host_mak
 -- 
 2.26.2
 
