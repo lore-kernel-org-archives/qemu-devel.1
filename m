@@ -2,89 +2,89 @@ Return-Path: <SRS0=atk5=B7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-14.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4119AC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 11:32:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4E6EC433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 11:32:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EA58820720
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 11:32:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5A1A820720
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 11:32:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KuPOJpB9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA58820720
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hArZldAK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A1A820720
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39606 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41242 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k95HR-00081f-4h
-	for qemu-devel@archiver.kernel.org; Fri, 21 Aug 2020 07:32:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33384)
+	id 1k95Hh-0000G9-H8
+	for qemu-devel@archiver.kernel.org; Fri, 21 Aug 2020 07:32:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33376)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k94F6-0004J3-Ug
+ id 1k94F6-0004Fz-2S
  for qemu-devel@nongnu.org; Fri, 21 Aug 2020 06:25:52 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:46371)
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:56065
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k94Ej-0001zt-7h
- for qemu-devel@nongnu.org; Fri, 21 Aug 2020 06:25:52 -0400
+ id 1k94Ei-0001zc-Ig
+ for qemu-devel@nongnu.org; Fri, 21 Aug 2020 06:25:51 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598005528;
+ s=mimecast20190719; t=1598005527;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=OfzoV8/Q9g3/HeRjc+JcJSyCJbb7SzyXUfCCW5rOt8k=;
- b=KuPOJpB9WVIpJH22oZPHmdH0Asj2PbJJpB44rAJF/wdolTF+KG5Uz92Z/Pmnx7P8dIxtcX
- 8mBvcsCGKUURLGnMKJz+BzGAv7M7xU+fHWpsXniH+4h6WWzRVvH0goHbWq7urAY0hvwuwh
- g8mcmUfq/jT7VQO6FQWA8aLntRJOHyg=
+ bh=BcQFItMoXsE+BxLidykspeLgKyth44z+ZVhMNPbugE0=;
+ b=hArZldAKtxSN3wUitaiIyh4LTNYhePQbWIdHVvFqsBzwkpuO8IWxASFxuX4cNbhB7elJYO
+ 6OnF6p8FW5Om9Gs9AEKZbSTNMB2S2N76HIavIg/Q7wTyuEi/qzWnF90rRTvULGilPddNgO
+ SyoLMmPIKlJPG6N3qDw6WpkKbfdFpto=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-482-Dzo9Jv61OfqpU_PXbX41TQ-1; Fri, 21 Aug 2020 06:25:24 -0400
-X-MC-Unique: Dzo9Jv61OfqpU_PXbX41TQ-1
+ us-mta-502-w1thULDbOTeyX2smresyNA-1; Fri, 21 Aug 2020 06:25:22 -0400
+X-MC-Unique: w1thULDbOTeyX2smresyNA-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5F5F1191E2A2
- for <qemu-devel@nongnu.org>; Fri, 21 Aug 2020 10:25:23 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 00A7F100CF6F
+ for <qemu-devel@nongnu.org>; Fri, 21 Aug 2020 10:25:22 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2B69710098AE
- for <qemu-devel@nongnu.org>; Fri, 21 Aug 2020 10:25:23 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9F4DB10098AE;
+ Fri, 21 Aug 2020 10:25:21 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v8 144/152] rules.mak: drop unneeded macros
-Date: Fri, 21 Aug 2020 06:23:21 -0400
-Message-Id: <20200821102329.29777-145-pbonzini@redhat.com>
+Subject: [PULL v8 140/152] meson: sphinx-build
+Date: Fri, 21 Aug 2020 06:23:17 -0400
+Message-Id: <20200821102329.29777-141-pbonzini@redhat.com>
 In-Reply-To: <20200821102329.29777-1-pbonzini@redhat.com>
 References: <20200821102329.29777-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0.003
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/21 02:43:55
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/21 01:00:15
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
 X-Spam_bar: ----
 X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,539 +97,409 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+For now, sphinx is run on every invocation of make.  The previous mechanism
+using $(wildcard) is not reproducible in Meson and was also brittle; for
+example some .rst.inc files were left out.  The next patch will introduce
+a Sphinx extension to emit a depfile.
+
+Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- .gitignore                  |   1 -
- Makefile                    |   7 +-
- configure                   |  55 ++-------
- docs/devel/build-system.txt |   5 +-
- rules.mak                   | 231 +-----------------------------------
- scripts/create_config       |   6 +-
- 6 files changed, 23 insertions(+), 282 deletions(-)
+ Makefile           | 142 +++------------------------------------------
+ configure          |   1 -
+ docs/index.html.in |   4 +-
+ docs/meson.build   |  68 ++++++++++++++++++++++
+ meson.build        |   2 +
+ rules.mak          |  48 ---------------
+ 6 files changed, 79 insertions(+), 186 deletions(-)
+ create mode 100644 docs/meson.build
 
-diff --git a/.gitignore b/.gitignore
-index d1e5e06242..4ccb9ed975 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -80,7 +80,6 @@
- *.msi
- *.dll
- *.so
--*.mo
- *.fn
- *.ky
- *.log
 diff --git a/Makefile b/Makefile
-index f442895309..f33ec16a81 100644
+index 07b7ae4036..511c7102b1 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -142,7 +142,7 @@ endif
+@@ -135,36 +135,9 @@ $(call set-vpath, $(SRC_PATH))
  
- include $(SRC_PATH)/tests/Makefile.include
+ LIBS+=-lz $(LIBS_TOOLS)
  
--all: recurse-all modules
-+all: recurse-all
- 
- # LIBFDT_lib="": avoid breaking existing trees with objects requiring -fPIC
- DTC_MAKE_ARGS=-I$(SRC_PATH)/dtc VPATH=$(SRC_PATH)/dtc -C dtc V="$(V)" LIBFDT_lib=""
-@@ -197,7 +197,7 @@ clean: recurse-clean ninja-clean clean-ctlist
- 	-test -f ninjatool && ./ninjatool $(if $(V),-v,) -t clean
- # avoid old build problems by removing potentially incorrect old files
- 	rm -f config.mak op-i386.h opc-i386.h gen-op-i386.h op-arm.h opc-arm.h gen-op-arm.h
--	find . \( -name '*.so' -o -name '*.dll' -o -name '*.mo' -o -name '*.[oda]' \) -type f \
-+	find . \( -name '*.so' -o -name '*.dll' -o -name '*.[oda]' \) -type f \
- 		! -path ./roms/edk2/ArmPkg/Library/GccLto/liblto-aarch64.a \
- 		! -path ./roms/edk2/ArmPkg/Library/GccLto/liblto-arm.a \
- 		! -path ./roms/edk2/BaseTools/Source/Python/UPT/Dll/sqlite3.dll \
-@@ -382,9 +382,6 @@ print-help = $(quiet-@)$(call print-help-run,$1,$2)
- help:
- 	@echo  'Generic targets:'
- 	$(call print-help,all,Build all)
--ifdef CONFIG_MODULES
--	$(call print-help,modules,Build all modules)
+-# Sphinx does not allow building manuals into the same directory as
+-# the source files, so if we're doing an in-tree QEMU build we must
+-# build the manuals into a subdirectory (and then install them from
+-# there for 'make install'). For an out-of-tree build we can just
+-# use the docs/ subdirectory in the build tree as normal.
+-ifeq ($(realpath $(SRC_PATH)),$(realpath .))
+-MANUAL_BUILDDIR := docs/built
+-else
+-MANUAL_BUILDDIR := docs
 -endif
- 	$(call print-help,dir/file.o,Build specified target only)
- 	$(call print-help,install,Install QEMU, documentation and tools)
- 	$(call print-help,ctags/TAGS,Generate tags file for editors)
-diff --git a/configure b/configure
-index b7cf35c09f..3b0c33450b 100755
---- a/configure
-+++ b/configure
-@@ -74,7 +74,6 @@ TMPC="${TMPDIR1}/${TMPB}.c"
- TMPO="${TMPDIR1}/${TMPB}.o"
- TMPCXX="${TMPDIR1}/${TMPB}.cxx"
- TMPE="${TMPDIR1}/${TMPB}.exe"
--TMPMO="${TMPDIR1}/${TMPB}.mo"
- TMPTXT="${TMPDIR1}/${TMPB}.txt"
- 
- rm -f config.log
-@@ -465,7 +464,7 @@ bigendian="no"
- mingw32="no"
- gcov="no"
- EXESUF=""
--DSOSUF=".so"
-+HOST_DSOSUF=".so"
- LDFLAGS_SHARED="-shared"
- modules="no"
- module_upgrades="no"
-@@ -997,7 +996,7 @@ fi
- 
- if test "$mingw32" = "yes" ; then
-   EXESUF=".exe"
--  DSOSUF=".dll"
-+  HOST_DSOSUF=".dll"
-   # MinGW needs -mthreads for TLS and macro _MT.
-   CFLAGS="-mthreads $CFLAGS"
-   LIBS="-lwinmm -lws2_32 $LIBS"
-@@ -6251,31 +6250,6 @@ EOF
-   fi
- fi
- 
--#################################################
--# Sparc implicitly links with --relax, which is
--# incompatible with -r, so --no-relax should be
--# given. It does no harm to give it on other
--# platforms too.
 -
--# Note: the prototype is needed since QEMU_CFLAGS
--#       contains -Wmissing-prototypes
--cat > $TMPC << EOF
--extern int foo(void);
--int foo(void) { return 0; }
--EOF
--if ! compile_object ""; then
--  error_exit "Failed to compile object file for LD_REL_FLAGS test"
--fi
--for i in '-Wl,-r -Wl,--no-relax' -Wl,-r -r; do
--  if do_cc -nostdlib $i -o $TMPMO $TMPO; then
--    LD_REL_FLAGS=$i
--    break
--  fi
--done
--if test "$modules" = "yes" && test "$LD_REL_FLAGS" = ""; then
--  feature_not_found "modules" "Cannot find how to build relocatable objects"
--fi
+ ifdef BUILD_DOCS
+-DOCS+=$(MANUAL_BUILDDIR)/system/qemu.1
+-DOCS+=$(MANUAL_BUILDDIR)/tools/qemu-img.1
+-DOCS+=$(MANUAL_BUILDDIR)/tools/qemu-nbd.8
+-DOCS+=$(MANUAL_BUILDDIR)/interop/qemu-ga.8
+-ifeq ($(CONFIG_LINUX)$(CONFIG_SECCOMP)$(CONFIG_LIBCAP_NG),yyy)
+-DOCS+=$(MANUAL_BUILDDIR)/tools/virtiofsd.1
+-endif
+-DOCS+=$(MANUAL_BUILDDIR)/system/qemu-block-drivers.7
+ DOCS+=docs/interop/qemu-qmp-ref.html docs/interop/qemu-qmp-ref.txt docs/interop/qemu-qmp-ref.7
+ DOCS+=docs/interop/qemu-ga-ref.html docs/interop/qemu-ga-ref.txt docs/interop/qemu-ga-ref.7
+-DOCS+=$(MANUAL_BUILDDIR)/system/qemu-cpu-models.7
+-DOCS+=$(MANUAL_BUILDDIR)/index.html
+-ifdef CONFIG_VIRTFS
+-DOCS+=$(MANUAL_BUILDDIR)/tools/virtfs-proxy-helper.1
+-endif
+-ifdef CONFIG_TRACE_SYSTEMTAP
+-DOCS+=$(MANUAL_BUILDDIR)/tools/qemu-trace-stap.1
+-endif
+ else
+ DOCS=
+ endif
+@@ -248,11 +221,6 @@ dist: qemu-$(VERSION).tar.bz2
+ qemu-%.tar.bz2:
+ 	$(SRC_PATH)/scripts/make-release "$(SRC_PATH)" "$(patsubst qemu-%.tar.bz2,%,$@)"
+ 
+-define clean-manual =
+-rm -rf $(MANUAL_BUILDDIR)/$1/_static
+-rm -f $(MANUAL_BUILDDIR)/$1/objects.inv $(MANUAL_BUILDDIR)/$1/searchindex.js $(MANUAL_BUILDDIR)/$1/*.html
+-endef
 -
- ##########################################
- # check for sysmacros.h
+ distclean: clean ninja-distclean
+ 	-test -f ninjatool && ./ninjatool $(if $(V),-v,) -t clean -g
+ 	rm -f config-host.mak config-host.h* $(DOCS)
+@@ -272,13 +240,6 @@ distclean: clean ninja-distclean
+ 	rm -f docs/interop/qemu-qmp-ref.txt docs/interop/qemu-ga-ref.txt
+ 	rm -f docs/interop/qemu-qmp-ref.pdf docs/interop/qemu-ga-ref.pdf
+ 	rm -f docs/interop/qemu-qmp-ref.html docs/interop/qemu-ga-ref.html
+-	rm -rf .doctrees
+-	$(call clean-manual,devel)
+-	$(call clean-manual,interop)
+-	$(call clean-manual,specs)
+-	$(call clean-manual,system)
+-	$(call clean-manual,tools)
+-	$(call clean-manual,user)
+ 	rm -Rf .sdk
  
-@@ -7007,12 +6981,7 @@ fi
- echo "CONFIG_AUDIO_DRIVERS=$audio_drv_list" >> $config_host_mak
- for drv in $audio_drv_list; do
-     def=CONFIG_AUDIO_$(echo $drv | LC_ALL=C tr '[a-z]' '[A-Z]')
--    case "$drv" in
--	alsa | oss | pa | sdl)
--	    echo "$def=m" >> $config_host_mak ;;
--	*)
--	    echo "$def=y" >> $config_host_mak ;;
--    esac
-+    echo "$def=y" >> $config_host_mak
- done
- if test "$alsa" = "yes" ; then
-     echo "CONFIG_ALSA=y" >> $config_host_mak
-@@ -7101,7 +7070,7 @@ if test "$iconv" = "yes" ; then
-   echo "ICONV_LIBS=$iconv_lib" >> $config_host_mak
- fi
- if test "$curses" = "yes" ; then
--  echo "CONFIG_CURSES=m" >> $config_host_mak
-+  echo "CONFIG_CURSES=y" >> $config_host_mak
-   echo "CURSES_CFLAGS=$curses_inc" >> $config_host_mak
-   echo "CURSES_LIBS=$curses_lib" >> $config_host_mak
- fi
-@@ -7196,7 +7165,7 @@ if test "$bswap_h" = "yes" ; then
-   echo "CONFIG_MACHINE_BSWAP_H=y" >> $config_host_mak
- fi
- if test "$curl" = "yes" ; then
--  echo "CONFIG_CURL=m" >> $config_host_mak
-+  echo "CONFIG_CURL=y" >> $config_host_mak
-   echo "CURL_CFLAGS=$curl_cflags" >> $config_host_mak
-   echo "CURL_LIBS=$curl_libs" >> $config_host_mak
- fi
-@@ -7205,7 +7174,7 @@ if test "$brlapi" = "yes" ; then
-   echo "BRLAPI_LIBS=$brlapi_libs" >> $config_host_mak
- fi
- if test "$gtk" = "yes" ; then
--  echo "CONFIG_GTK=m" >> $config_host_mak
-+  echo "CONFIG_GTK=y" >> $config_host_mak
-   echo "GTK_CFLAGS=$gtk_cflags" >> $config_host_mak
-   echo "GTK_LIBS=$gtk_libs" >> $config_host_mak
-   if test "$gtk_gl" = "yes" ; then
-@@ -7468,13 +7437,13 @@ if test "$zstd" = "yes" ; then
- fi
- 
- if test "$libiscsi" = "yes" ; then
--  echo "CONFIG_LIBISCSI=m" >> $config_host_mak
-+  echo "CONFIG_LIBISCSI=y" >> $config_host_mak
-   echo "LIBISCSI_CFLAGS=$libiscsi_cflags" >> $config_host_mak
-   echo "LIBISCSI_LIBS=$libiscsi_libs" >> $config_host_mak
- fi
- 
- if test "$libnfs" = "yes" ; then
--  echo "CONFIG_LIBNFS=m" >> $config_host_mak
-+  echo "CONFIG_LIBNFS=y" >> $config_host_mak
-   echo "LIBNFS_LIBS=$libnfs_libs" >> $config_host_mak
- fi
- 
-@@ -7496,7 +7465,7 @@ if test "$qom_cast_debug" = "yes" ; then
-   echo "CONFIG_QOM_CAST_DEBUG=y" >> $config_host_mak
- fi
- if test "$rbd" = "yes" ; then
--  echo "CONFIG_RBD=m" >> $config_host_mak
-+  echo "CONFIG_RBD=y" >> $config_host_mak
-   echo "RBD_LIBS=$rbd_libs" >> $config_host_mak
- fi
- 
-@@ -7568,7 +7537,7 @@ if test "$getauxval" = "yes" ; then
- fi
- 
- if test "$glusterfs" = "yes" ; then
--  echo "CONFIG_GLUSTERFS=m" >> $config_host_mak
-+  echo "CONFIG_GLUSTERFS=y" >> $config_host_mak
-   echo "GLUSTERFS_CFLAGS=$glusterfs_cflags" >> $config_host_mak
-   echo "GLUSTERFS_LIBS=$glusterfs_libs" >> $config_host_mak
- fi
-@@ -7598,7 +7567,7 @@ if test "$glusterfs_iocb_has_stat" = "yes" ; then
- fi
- 
- if test "$libssh" = "yes" ; then
--  echo "CONFIG_LIBSSH=m" >> $config_host_mak
-+  echo "CONFIG_LIBSSH=y" >> $config_host_mak
-   echo "LIBSSH_CFLAGS=$libssh_cflags" >> $config_host_mak
-   echo "LIBSSH_LIBS=$libssh_libs" >> $config_host_mak
- fi
-@@ -7858,7 +7827,7 @@ echo "LIBS+=$LIBS" >> $config_host_mak
- echo "LIBS_TOOLS+=$libs_tools" >> $config_host_mak
- echo "PTHREAD_LIB=$PTHREAD_LIB" >> $config_host_mak
- echo "EXESUF=$EXESUF" >> $config_host_mak
--echo "DSOSUF=$DSOSUF" >> $config_host_mak
-+echo "HOST_DSOSUF=$HOST_DSOSUF" >> $config_host_mak
- echo "LDFLAGS_SHARED=$LDFLAGS_SHARED" >> $config_host_mak
- echo "LIBS_QGA=$libs_qga" >> $config_host_mak
- echo "TASN1_LIBS=$tasn1_libs" >> $config_host_mak
-diff --git a/docs/devel/build-system.txt b/docs/devel/build-system.txt
-index 41bd08ea3a..fea67b207c 100644
---- a/docs/devel/build-system.txt
-+++ b/docs/devel/build-system.txt
-@@ -404,10 +404,7 @@ using Makefile.target for the build rules.
- - rules.mak
- 
- This file provides the generic helper rules for invoking build tools, in
--particular the compiler and linker. This also contains the magic (hairy)
--'unnest-vars' function which is used to merge the variable definitions
--from all Makefile.objs in the source tree down into the main Makefile
--context.
-+particular the compiler and linker.
- 
- 
- - default-configs/*.mak
-diff --git a/rules.mak b/rules.mak
-index 6cab0b9cbd..c66c8218f0 100644
---- a/rules.mak
-+++ b/rules.mak
-@@ -33,11 +33,6 @@ QEMU_DGFLAGS += -MMD -MP -MT $@ -MF $(@D)/$(*F).d
- # different for target-dependent ones.
- QEMU_LOCAL_INCLUDES = -iquote $(BUILD_DIR) -iquote $(BUILD_DIR)/$(@D) -iquote $(@D)
- 
--WL_U := -Wl,-u,
--find-symbols = $(if $1, $(sort $(shell $(NM) -P -g $1 | $2)))
--defined-symbols = $(call find-symbols,$1,awk '$$2!="U"{print $$1}')
--undefined-symbols = $(call find-symbols,$1,awk '$$2=="U"{print $$1}')
--
- WL := -Wl,
- ifdef CONFIG_DARWIN
- whole-archive = $(WL)-force_load,$1
-@@ -45,32 +40,7 @@ else
- whole-archive = $(WL)--whole-archive $1 $(WL)--no-whole-archive
+ KEYMAPS=da     en-gb  et  fr     fr-ch  is  lt  no  pt-br  sv \
+@@ -312,28 +273,8 @@ else
+ BLOBS=
  endif
  
--# All the .mo objects in -m variables are also added into corresponding -y
--# variable in unnest-vars, but filtered out here, when LINK is called.
--#
--# The .mo objects are supposed to be linked as a DSO, for module build. So here
--# they are only used as a placeholders to generate those "archive undefined"
--# symbol options (-Wl,-u,$symbol_name), which are the archive functions
--# referenced by the code in the DSO.
--#
--# Also the presence in -y variables will also guarantee they are built before
--# linking executables that will load them. So we can look up symbol reference
--# in LINK.
--#
--# This is necessary because the exectuable itself may not use the function, in
--# which case the function would not be linked in. Then the DSO loading will
--# fail because of the missing symbol.
--process-archive-undefs = $(filter-out %.a %.fa %.mo %$(DSOSUF),$1) \
--                $(addprefix $(WL_U), \
--                     $(filter $(call defined-symbols,$(filter %.a %.fa, $1)), \
--		$(call undefined-symbols,$(filter %.mo %$(DSOSUF),$1)))) \
--		$(foreach l,$(filter %.fa,$1),$(call whole-archive,$l)) \
--		$(filter %.a,$1)
+-# Note that we manually filter-out the non-Sphinx documentation which
+-# is currently built into the docs/interop directory in the build tree,
+-# and also any sphinx-built manpages.
+-define install-manual =
+-for d in $$(cd $(MANUAL_BUILDDIR) && find $1 -type d); do $(INSTALL_DIR) "$(DESTDIR)$(qemu_docdir)/$$d"; done
+-for f in $$(cd $(MANUAL_BUILDDIR) && find $1 -type f -a '!' '(' -name '*.[0-9]' -o -name 'qemu-*-qapi.*' -o -name 'qemu-*-ref.*' ')' ); do $(INSTALL_DATA) "$(MANUAL_BUILDDIR)/$$f" "$(DESTDIR)$(qemu_docdir)/$$f"; done
+-endef
 -
--extract-libs = $(strip $(foreach o,$(filter-out %.mo %$(DSOSUF),$1),$($o-libs)))
--expand-objs = $(strip $(sort $(filter %.o,$1)) \
--		$(foreach o,$(filter %.mo %$(DSOSUF),$1),$($o-objs)) \
--		$(filter-out %.o %.mo %$(DSOSUF),$1))
-+extract-libs = $(strip $(foreach o,$1,$($o-libs)))
- 
- %.o: %.c
- 	@mkdir -p $(dir $@)
-@@ -83,7 +53,9 @@ expand-objs = $(strip $(sort $(filter %.o,$1)) \
- LINKPROG = $(or $(CXX),$(CC))
- 
- LINK = $(call quiet-command, $(LINKPROG) $(CFLAGS) $(QEMU_LDFLAGS) -o $@ \
--       $(call process-archive-undefs, $1) \
-+       $(filter-out %.a %.fa,$1) \
-+       $(foreach l,$(filter %.fa,$1),$(call whole-archive,$l)) \
-+       $(filter %.a,$1) \
-        $(call extract-libs,$1) $(LIBS),"LINK","$(TARGET_DIR)$@")
- 
- %.o: %.S
-@@ -109,25 +81,11 @@ LINK = $(call quiet-command, $(LINKPROG) $(CFLAGS) $(QEMU_LDFLAGS) -o $@ \
- %.o: %.dtrace
- 	$(call quiet-command,dtrace -o $@ -G -s $<,"GEN","$(TARGET_DIR)$@")
- 
--DSO_OBJ_CFLAGS := -fPIC -DBUILD_DSO
--module-common.o: CFLAGS += $(DSO_OBJ_CFLAGS)
--%$(DSOSUF): QEMU_LDFLAGS += $(LDFLAGS_SHARED)
--%$(DSOSUF): %.mo
--	$(call LINK,$^)
--	@# Copy to build root so modules can be loaded when program started without install
--	$(if $(findstring /,$@),$(call quiet-command,cp $@ $(subst /,-,$@),"CP","$(subst /,-,$@)"))
+-# Note that we deliberately do not install the "devel" manual: it is
+-# for QEMU developers, and not interesting to our users.
+-.PHONY: install-sphinxdocs
+-install-sphinxdocs: sphinxdocs
+-	$(call install-manual,interop)
+-	$(call install-manual,specs)
+-	$(call install-manual,system)
+-	$(call install-manual,tools)
+-	$(call install-manual,user)
 -
--
--LD_REL := $(CC) -nostdlib $(LD_REL_FLAGS)
--
--%.mo:
--	$(call quiet-command,$(LD_REL) -o $@ $^,"LD","$(TARGET_DIR)$@")
--
- .PHONY: modules
- modules:
+-install-doc: $(DOCS) install-sphinxdocs
++install-doc: $(DOCS)
+ 	$(INSTALL_DIR) "$(DESTDIR)$(qemu_docdir)"
+-	$(INSTALL_DATA) $(MANUAL_BUILDDIR)/index.html "$(DESTDIR)$(qemu_docdir)"
+-	$(INSTALL_DIR) "$(DESTDIR)$(qemu_docdir)/interop"
+ 	$(INSTALL_DATA) docs/interop/qemu-qmp-ref.html "$(DESTDIR)$(qemu_docdir)/interop"
+ 	$(INSTALL_DATA) docs/interop/qemu-qmp-ref.txt "$(DESTDIR)$(qemu_docdir)/interop"
+ ifdef CONFIG_POSIX
+@@ -341,19 +282,7 @@ ifdef CONFIG_POSIX
+ 	$(INSTALL_DATA) $(MANUAL_BUILDDIR)/system/qemu.1 "$(DESTDIR)$(mandir)/man1"
+ 	$(INSTALL_DIR) "$(DESTDIR)$(mandir)/man7"
+ 	$(INSTALL_DATA) docs/interop/qemu-qmp-ref.7 "$(DESTDIR)$(mandir)/man7"
+-	$(INSTALL_DATA) $(MANUAL_BUILDDIR)/system/qemu-block-drivers.7 "$(DESTDIR)$(mandir)/man7"
+-	$(INSTALL_DATA) $(MANUAL_BUILDDIR)/system/qemu-cpu-models.7 "$(DESTDIR)$(mandir)/man7"
+-ifeq ($(CONFIG_TOOLS),y)
+-	$(INSTALL_DATA) $(MANUAL_BUILDDIR)/tools/qemu-img.1 "$(DESTDIR)$(mandir)/man1"
+-	$(INSTALL_DIR) "$(DESTDIR)$(mandir)/man8"
+-	$(INSTALL_DATA) $(MANUAL_BUILDDIR)/tools/qemu-nbd.8 "$(DESTDIR)$(mandir)/man8"
+-endif
+-ifdef CONFIG_TRACE_SYSTEMTAP
+-	$(INSTALL_DATA) $(MANUAL_BUILDDIR)/tools/qemu-trace-stap.1 "$(DESTDIR)$(mandir)/man1"
+-endif
+ ifeq ($(CONFIG_GUEST_AGENT),y)
+-	$(INSTALL_DATA) $(MANUAL_BUILDDIR)/interop/qemu-ga.8 "$(DESTDIR)$(mandir)/man8"
+-	$(INSTALL_DIR) "$(DESTDIR)$(qemu_docdir)/interop"
+ 	$(INSTALL_DATA) docs/interop/qemu-ga-ref.html "$(DESTDIR)$(qemu_docdir)/interop"
+ 	$(INSTALL_DATA) docs/interop/qemu-ga-ref.txt "$(DESTDIR)$(qemu_docdir)/interop"
+ 	$(INSTALL_DATA) docs/interop/qemu-ga-ref.7 "$(DESTDIR)$(mandir)/man7"
+@@ -440,69 +369,6 @@ docs/version.texi: $(SRC_PATH)/VERSION config-host.mak
+ %.pdf: %.texi docs/version.texi
+ 	$(call quiet-command,texi2pdf $(TEXI2PDFFLAGS) $< -o $@,"GEN","$@")
  
- %$(EXESUF): %.o
--	$(call LINK,$(filter %.o %.a %.mo %.fa, $^))
-+	$(call LINK,$(filter %.o %.a %.fa, $^))
+-# Sphinx builds all its documentation at once in one invocation
+-# and handles "don't rebuild things unless necessary" itself.
+-# The '.doctrees' files are cached information to speed this up.
+-.PHONY: sphinxdocs
+-sphinxdocs: $(MANUAL_BUILDDIR)/devel/index.html \
+-            $(MANUAL_BUILDDIR)/interop/index.html \
+-            $(MANUAL_BUILDDIR)/specs/index.html \
+-            $(MANUAL_BUILDDIR)/system/index.html \
+-            $(MANUAL_BUILDDIR)/tools/index.html \
+-            $(MANUAL_BUILDDIR)/user/index.html
+-
+-# Canned command to build a single manual
+-# Arguments: $1 = manual name, $2 = Sphinx builder ('html' or 'man')
+-# Note the use of different doctree for each (manual, builder) tuple;
+-# this works around Sphinx not handling parallel invocation on
+-# a single doctree: https://github.com/sphinx-doc/sphinx/issues/2946
+-build-manual = $(call quiet-command,CONFDIR="$(qemu_confdir)" $(SPHINX_BUILD) $(if $(V),,-q) $(SPHINX_WERROR) -b $2 -D version=$(VERSION) -D release="$(FULL_VERSION)" -d .doctrees/$1-$2 $(SRC_PATH)/docs/$1 $(MANUAL_BUILDDIR)/$1 ,"SPHINX","$(MANUAL_BUILDDIR)/$1")
+-# We assume all RST files in the manual's directory are used in it
+-manual-deps = $(wildcard $(SRC_PATH)/docs/$1/*.rst $(SRC_PATH)/docs/$1/*/*.rst) \
+-              $(SRC_PATH)/docs/defs.rst.inc \
+-              $(SRC_PATH)/docs/$1/conf.py $(SRC_PATH)/docs/conf.py \
+-              $(SRC_PATH)/docs/sphinx/*.py
+-# Macro to write out the rule and dependencies for building manpages
+-# Usage: $(call define-manpage-rule,manualname,manpage1 manpage2...[,extradeps])
+-# 'extradeps' is optional, and specifies extra files (eg .hx files) that
+-# the manual page depends on.
+-define define-manpage-rule
+-$(call atomic,$(foreach manpage,$2,$(MANUAL_BUILDDIR)/$1/$(manpage)),$(call manual-deps,$1) $3)
+-	$(call build-manual,$1,man)
+-endef
+-
+-$(MANUAL_BUILDDIR)/devel/index.html: $(call manual-deps,devel)
+-	$(call build-manual,devel,html)
+-
+-$(MANUAL_BUILDDIR)/interop/index.html: $(call manual-deps,interop)
+-	$(call build-manual,interop,html)
+-
+-$(MANUAL_BUILDDIR)/specs/index.html: $(call manual-deps,specs)
+-	$(call build-manual,specs,html)
+-
+-$(MANUAL_BUILDDIR)/system/index.html: $(call manual-deps,system) $(SRC_PATH)/hmp-commands.hx $(SRC_PATH)/hmp-commands-info.hx $(SRC_PATH)/qemu-options.hx
+-	$(call build-manual,system,html)
+-
+-$(MANUAL_BUILDDIR)/tools/index.html: $(call manual-deps,tools) $(SRC_PATH)/qemu-img-cmds.hx $(SRC_PATH)/docs/qemu-option-trace.rst.inc
+-	$(call build-manual,tools,html)
+-
+-$(MANUAL_BUILDDIR)/user/index.html: $(call manual-deps,user)
+-	$(call build-manual,user,html)
+-
+-$(call define-manpage-rule,interop,qemu-ga.8)
+-
+-$(call define-manpage-rule,system,qemu.1 qemu-block-drivers.7 qemu-cpu-models.7)
+-
+-$(call define-manpage-rule,tools,\
+-       qemu-img.1 qemu-nbd.8 qemu-trace-stap.1\
+-       virtiofsd.1 virtfs-proxy-helper.1,\
+-       $(SRC_PATH)/qemu-img-cmds.hx $(SRC_PATH)/docs/qemu-option-trace.rst.inc)
+-
+-$(MANUAL_BUILDDIR)/index.html: $(SRC_PATH)/docs/index.html.in qemu-version.h
+-	@mkdir -p "$(MANUAL_BUILDDIR)"
+-	$(call quiet-command, sed "s|@@VERSION@@|${VERSION}|g" $< >$@, \
+-             "GEN","$@")
+-
+ docs/interop/qemu-qmp-qapi.texi: qapi/qapi-doc.texi
+ 	@cp -p $< $@
  
- %.a:
- 	$(call quiet-command,rm -f $@ && $(AR) rcs $@ $^,"AR","$(TARGET_DIR)$@")
-@@ -160,15 +118,6 @@ define install-prog
- 	$(if $(STRIP),$(STRIP) $(foreach T,$1,"$2/$(notdir $T)"),)
+@@ -525,6 +391,12 @@ docs/interop/qemu-qmp-ref.dvi docs/interop/qemu-qmp-ref.html \
+ 	docs/interop/qemu-qmp-ref.texi docs/interop/qemu-qmp-qapi.texi
+ 
+ $(filter %.1 %.7 %.8,$(DOCS)): scripts/texi2pod.pl
++	$(call quiet-command, \
++	  perl -Ww -- $(SRC_PATH)/scripts/texi2pod.pl $(TEXI2PODFLAGS) $< $@.pod && \
++	  $(POD2MAN) --section=$(subst .,,$(suffix $@)) --center=" " --release=" " $@.pod > $@, \
++	  "GEN","$@")
++
++man: $(filter %.1 %.7 %.8,$(DOCS))
+ 
+ ifdef CONFIG_WIN32
+ 
+diff --git a/configure b/configure
+index 6b1744aa34..b7cf35c09f 100755
+--- a/configure
++++ b/configure
+@@ -7820,7 +7820,6 @@ echo "INSTALL_PROG=$install -c -m 0755" >> $config_host_mak
+ echo "INSTALL_LIB=$install -c -m 0644" >> $config_host_mak
+ echo "PYTHON=$python" >> $config_host_mak
+ echo "SPHINX_BUILD=$sphinx_build" >> $config_host_mak
+-echo "SPHINX_WERROR=$sphinx_werror" >> $config_host_mak
+ echo "GENISOIMAGE=$genisoimage" >> $config_host_mak
+ echo "MESON=$meson" >> $config_host_mak
+ echo "CC=$cc" >> $config_host_mak
+diff --git a/docs/index.html.in b/docs/index.html.in
+index 6736fa4360..ca28047881 100644
+--- a/docs/index.html.in
++++ b/docs/index.html.in
+@@ -2,10 +2,10 @@
+ <html lang="en">
+     <head>
+         <meta charset="UTF-8">
+-        <title>QEMU @@VERSION@@ Documentation</title>
++        <title>QEMU @VERSION@ Documentation</title>
+     </head>
+     <body>
+-        <h1>QEMU @@VERSION@@ Documentation</h1>
++        <h1>QEMU @VERSION@ Documentation</h1>
+         <ul>
+             <li><a href="system/index.html">System Emulation User's Guide</a></li>
+             <li><a href="user/index.html">User Mode Emulation User's Guide</a></li>
+diff --git a/docs/meson.build b/docs/meson.build
+new file mode 100644
+index 0000000000..20fc92e2fe
+--- /dev/null
++++ b/docs/meson.build
+@@ -0,0 +1,68 @@
++SPHINX_ARGS = [config_host['SPHINX_BUILD'],
++               '-Dversion=' + meson.project_version(),
++               '-Drelease=' + config_host['PKGVERSION']]
++
++if get_option('werror')
++  SPHINX_ARGS += [ '-W' ]
++endif
++
++if build_docs
++  configure_file(output: 'index.html',
++                 input: files('index.html.in'),
++                 configuration: {'VERSION': meson.project_version()},
++                 install_dir: config_host['qemu_docdir'])
++  manuals = [ 'devel', 'interop', 'tools', 'specs', 'system', 'user' ]
++  man_pages = {
++    'interop' : {
++        'qemu-ga.8': (have_tools ? 'man8' : ''),
++    },
++    'tools': {
++        'qemu-img.1': (have_tools ? 'man1' : ''),
++        'qemu-nbd.8': (have_tools ? 'man8' : ''),
++        'qemu-trace-stap.1': (config_host.has_key('CONFIG_TRACE_SYSTEMTAP') ? 'man1' : ''),
++        'virtfs-proxy-helper.1': (have_virtfs_proxy_helper ? 'man1' : ''),
++        'virtiofsd.1': (have_virtiofsd ? 'man1' : ''),
++    },
++    'system': {
++        'qemu.1': 'man1',
++        'qemu-block-drivers.7': 'man7',
++        'qemu-cpu-models.7': 'man7'
++    },
++  }
++
++  sphinxdocs = []
++  sphinxmans = []
++  foreach manual : manuals
++    private_dir = meson.current_build_dir() / (manual + '.p')
++    input_dir = meson.current_source_dir() / manual
++    sphinxdocs += custom_target(manual + ' manual',
++                build_always_stale: true,
++                build_by_default: build_docs,
++                output: manual,
++                command: [SPHINX_ARGS, '-b', 'html', '-d', private_dir,
++                          input_dir, meson.current_build_dir() / manual])
++    if build_docs and manual != 'devel'
++      install_subdir(meson.current_build_dir() / manual,
++                     install_dir: config_host['qemu_docdir'])
++    endif
++
++    these_man_pages = []
++    install_dirs = []
++    foreach page, section : man_pages.get(manual, {})
++      these_man_pages += page
++      install_dirs += section == '' ? false : get_option('mandir') / section
++    endforeach
++    if these_man_pages.length() > 0
++      sphinxmans += custom_target(manual + ' man pages',
++                         build_always_stale: true,
++                         build_by_default: build_docs,
++                         output: these_man_pages,
++                         install: build_docs,
++                         install_dir: install_dirs,
++                         command: [SPHINX_ARGS, '-b', 'man', '-d', private_dir,
++                                   input_dir, meson.current_build_dir()])
++    endif
++  endforeach
++  alias_target('sphinxdocs', sphinxdocs)
++  alias_target('man', sphinxmans)
++endif
+diff --git a/meson.build b/meson.build
+index 108706f7e5..e270569f4d 100644
+--- a/meson.build
++++ b/meson.build
+@@ -11,6 +11,7 @@ cc = meson.get_compiler('c')
+ config_host = keyval.load(meson.current_build_dir() / 'config-host.mak')
+ config_all_disas = keyval.load(meson.current_build_dir() / 'config-all-disas.mak')
+ enable_modules = 'CONFIG_MODULES' in config_host
++build_docs = 'BUILD_DOCS' in config_host
+ 
+ add_project_arguments(config_host['QEMU_CFLAGS'].split(),
+                       native: false, language: ['c', 'objc'])
+@@ -1049,6 +1050,7 @@ endif
+ subdir('tools')
+ subdir('pc-bios')
+ subdir('tests')
++subdir('docs')
+ 
+ summary_info = {}
+ summary_info += {'Install prefix':    config_host['prefix']}
+diff --git a/rules.mak b/rules.mak
+index 6d89001f0a..6cab0b9cbd 100644
+--- a/rules.mak
++++ b/rules.mak
+@@ -375,53 +375,5 @@ define unnest-vars
+         $(eval $v := $(filter-out %/,$($v))))
  endef
  
--# find-in-path
--# Usage: $(call find-in-path, prog)
--# Looks in the PATH if the argument contains no slash, else only considers one
--# specific directory.  Returns an # empty string if the program doesn't exist
--# there.
--find-in-path = $(if $(findstring /, $1), \
--        $(wildcard $1), \
--        $(wildcard $(patsubst %, %/$1, $(subst :, ,$(PATH)))))
+-TEXI2MAN = $(call quiet-command, \
+-	perl -Ww -- $(SRC_PATH)/scripts/texi2pod.pl $(TEXI2PODFLAGS) $< $@.pod && \
+-	$(POD2MAN) --section=$(subst .,,$(suffix $@)) --center=" " --release=" " $@.pod > $@, \
+-	"GEN","$@")
 -
- # Logical functions (for operating on y/n values like CONFIG_FOO vars)
- # Inputs to these must be either "y" (true) or "n" or "" (both false)
- # Output is always either "y" or "n".
-@@ -205,175 +154,5 @@ clean: clean-timestamp
- # will delete the target of a rule if commands exit with a nonzero exit status
- .DELETE_ON_ERROR:
- 
--# save-vars
--# Usage: $(call save-vars, vars)
--# Save each variable $v in $vars as save-vars-$v, save their object's
--# variables, then clear $v.  saved-vars-$v contains the variables that
--# where saved for the objects, in order to speedup load-vars.
--define save-vars
--    $(foreach v,$1,
--        $(eval save-vars-$v := $(value $v))
--        $(eval saved-vars-$v := $(foreach o,$($v), \
--            $(if $($o-cflags), $o-cflags $(eval save-vars-$o-cflags := $($o-cflags))$(eval $o-cflags := )) \
--            $(if $($o-libs), $o-libs $(eval save-vars-$o-libs := $($o-libs))$(eval $o-libs := )) \
--            $(if $($o-objs), $o-objs $(eval save-vars-$o-objs := $($o-objs))$(eval $o-objs := ))))
--        $(eval $v := ))
--endef
+-%.1:
+-	$(call TEXI2MAN)
+-%.7:
+-	$(call TEXI2MAN)
+-%.8:
+-	$(call TEXI2MAN)
 -
--# load-vars
--# Usage: $(call load-vars, vars, add_var)
--# Load the saved value for each variable in @vars, and the per object
--# variables.
--# Append @add_var's current value to the loaded value.
--define load-vars
--    $(eval $2-new-value := $(value $2))
--    $(foreach v,$1,
--        $(eval $v := $(value save-vars-$v))
--        $(foreach o,$(saved-vars-$v),
--            $(eval $o := $(save-vars-$o)) $(eval save-vars-$o := ))
--        $(eval save-vars-$v := )
--        $(eval saved-vars-$v := ))
--    $(eval $2 := $(value $2) $($2-new-value))
--endef
+-# Support for building multiple output files by atomically executing
+-# a single rule which depends on several input files (so the rule
+-# will be executed exactly once, not once per output file, and
+-# not multiple times in parallel.) For more explanation see:
+-# https://www.cmcrossroads.com/article/atomic-rules-gnu-make
 -
--# fix-paths
--# Usage: $(call fix-paths, obj_path, src_path, vars)
--# Add prefix @obj_path to all objects in @vars, and add prefix @src_path to all
--# directories in @vars.
--define fix-paths
--    $(foreach v,$3,
--        $(foreach o,$($v),
--            $(if $($o-libs),
--                $(eval $1$o-libs := $($o-libs)))
--            $(if $($o-cflags),
--                $(eval $1$o-cflags := $($o-cflags)))
--            $(if $($o-objs),
--                $(eval $1$o-objs := $(addprefix $1,$($o-objs)))))
--        $(eval $v := $(addprefix $1,$(filter-out %/,$($v))) \
--                     $(addprefix $2,$(filter %/,$($v)))))
--endef
+-# Given a space-separated list of filenames, create the name of
+-# a 'sentinel' file to use to indicate that they have been built.
+-# We use fixed text on the end to avoid accidentally triggering
+-# automatic pattern rules, and . on the start to make the file
+-# not show up in ls output.
+-sentinel = .$(subst $(SPACE),_,$(subst /,_,$1)).sentinel.
 -
--# unnest-var-recursive
--# Usage: $(call unnest-var-recursive, obj_prefix, vars, var)
+-# Define an atomic rule that builds multiple outputs from multiple inputs.
+-# To use:
+-#    $(call atomic,out1 out2 ...,in1 in2 ...)
+-#    <TAB>rule to do the operation
 -#
--# Unnest @var by including subdir Makefile.objs, while protect others in @vars
--# unchanged.
+-# Make 4.3 will have native support for this, and you would be able
+-# to instead write:
+-#    out1 out2 ... &: in1 in2 ...
+-#    <TAB>rule to do the operation
 -#
--# @obj_prefix is the starting point of object path prefix.
--#
--define unnest-var-recursive
--    $(eval dirs := $(sort $(filter %/,$($3))))
--    $(eval $3 := $(filter-out %/,$($3)))
--    $(foreach d,$(dirs:%/=%),
--            $(call save-vars,$2)
--            $(eval obj := $(if $1,$1/)$d)
--            $(eval -include $(SRC_PATH)/$d/Makefile.objs)
--            $(call fix-paths,$(if $1,$1/)$d/,$d/,$2)
--            $(call load-vars,$2,$3)
--            $(call unnest-var-recursive,$1,$2,$3))
--endef
--
--# unnest-vars
--# Usage: $(call unnest-vars, obj_prefix, vars)
--#
--# @obj_prefix: object path prefix, can be empty, or '..', etc. Don't include
--# ending '/'.
--#
--# @vars: the list of variable names to unnest.
--#
--# This macro will scan subdirectories's Makefile.objs, include them, to build
--# up each variable listed in @vars.
--#
--# Per object and per module cflags and libs are saved with relative path fixed
--# as well, those variables include -libs, -cflags and -objs. Items in -objs are
--# also fixed to relative path against SRC_PATH plus the prefix @obj_prefix.
--#
--# All nested variables postfixed by -m in names are treated as DSO variables,
--# and will be built as modules, if enabled.
--#
--# A simple example of the unnest:
--#
--#     obj_prefix = ..
--#     vars = hot cold
--#     hot  = fire.o sun.o season/
--#     cold = snow.o water/ season/
--#
--# Unnest through a faked source directory structure:
--#
--#     SRC_PATH
--#        ├── water
--#        │   └── Makefile.objs──────────────────┐
--#        │       │ hot += steam.o               │
--#        │       │ cold += ice.mo               │
--#        │       │ ice.mo-libs := -licemaker    │
--#        │       │ ice.mo-objs := ice1.o ice2.o │
--#        │       └──────────────────────────────┘
--#        │
--#        └── season
--#            └── Makefile.objs──────┐
--#                │ hot += summer.o  │
--#                │ cold += winter.o │
--#                └──────────────────┘
--#
--# In the end, the result will be:
--#
--#     hot  = ../fire.o ../sun.o ../season/summer.o
--#     cold = ../snow.o ../water/ice.mo ../season/winter.o
--#     ../water/ice.mo-libs = -licemaker
--#     ../water/ice.mo-objs = ../water/ice1.o ../water/ice2.o
--#
--# Note that 'hot' didn't include 'water/' in the input, so 'steam.o' is not
--# included.
--#
--define unnest-vars
--    # In the case of target build (i.e. $1 == ..), fix path for top level
--    # Makefile.objs objects
--    $(if $1,$(call fix-paths,$1/,,$2))
--
--    # Descend and include every subdir Makefile.objs
--    $(foreach v, $2,
--        $(call unnest-var-recursive,$1,$2,$v)
--        # Pass the .mo-cflags and .mo-libs along to its member objects
--        $(foreach o, $(filter %.mo,$($v)),
--            $(foreach p,$($o-objs),
--                $(if $($o-cflags), $(eval $p-cflags += $($o-cflags)))
--                $(if $($o-libs), $(eval $p-libs += $($o-libs))))))
--
--    # For all %.mo objects that are directly added into -y, just expand them
--    $(foreach v,$(filter %-y,$2),
--        $(eval $v := $(foreach o,$($v),$(if $($o-objs),$($o-objs),$o))))
--
--    $(foreach v,$(filter %-m,$2),
--        # All .o found in *-m variables are single object modules, create .mo
--        # for them
--        $(foreach o,$(filter %.o,$($v)),
--            $(eval $(o:%.o=%.mo)-objs := $o))
--        # Now unify .o in -m variable to .mo
--        $(eval $v := $($v:%.o=%.mo))
--        $(eval modules-m += $($v))
--
--        # For module build, build shared libraries during "make modules"
--        # For non-module build, add -m to -y
--        $(if $(CONFIG_MODULES),
--             $(foreach o,$($v),
--                   $(eval $($o-objs): CFLAGS += $(DSO_OBJ_CFLAGS))
--                   $(eval $o: $($o-objs)))
--             $(eval $(patsubst %-m,%-y,$v) += $($v))
--             $(eval modules: $($v:%.mo=%$(DSOSUF))),
--             $(eval $(patsubst %-m,%-y,$v) += $(call expand-objs, $($v)))))
--
--    # Post-process all the unnested vars
--    $(foreach v,$2,
--        $(foreach o, $(filter %.mo,$($v)),
--            # Find all the .mo objects in variables and add dependency rules
--            # according to .mo-objs. Report error if not set
--            $(if $($o-objs),
--                $(eval $(o:%.mo=%$(DSOSUF)): module-common.o $($o-objs))))
--        $(shell mkdir -p ./ $(sort $(dir $($v))))
--        # Include all the .d files
--        $(eval -include $(patsubst %.o,%.d,$(patsubst %.mo,%.d,$(filter %.o,$($v)))))
--        $(eval $v := $(filter-out %/,$($v))))
--endef
+-# The way this works is that it creates a make rule
+-# "out1 out2 ... : sentinel-file ; @:" which says that the sentinel
+-# depends on the dependencies, and the rule to do that is "do nothing".
+-# Then we have a rule
+-# "sentinel-file : in1 in2 ..."
+-# whose commands start with "touch sentinel-file" and then continue
+-# with the rule text provided by the user of this 'atomic' function.
+-# The foreach... is there to delete the sentinel file if any of the
+-# output files don't exist, so that we correctly rebuild in that situation.
+-atomic = $(eval $1: $(call sentinel,$1) ; @:) \
+-         $(call sentinel,$1) : $2 ; @touch $$@ \
+-         $(foreach t,$1,$(if $(wildcard $t),,$(shell rm -f $(call sentinel,$1))))
 -
  print-%:
  	@echo '$*=$($*)'
-diff --git a/scripts/create_config b/scripts/create_config
-index bc82661041..ec5c0b4124 100755
---- a/scripts/create_config
-+++ b/scripts/create_config
-@@ -91,6 +91,9 @@ case $line in
-     name=${line%=*}
-     echo "#define $name 1"
-     ;;
-+ HOST_DSOSUF=*)
-+    echo "#define HOST_DSOSUF \"${line#*=}\""
-+    ;;
-  HOST_*=*) # configuration
-     name=${line%=*}
-     value=${line#*=}
-@@ -123,9 +126,6 @@ case $line in
-     value=${line#*=}
-     echo "#define $name $value"
-     ;;
-- DSOSUF=*)
--    echo "#define HOST_DSOSUF \"${line#*=}\""
--    ;;
- esac
- 
- done # read
 -- 
 2.26.2
 
