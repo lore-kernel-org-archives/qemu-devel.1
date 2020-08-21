@@ -2,89 +2,88 @@ Return-Path: <SRS0=atk5=B7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE874C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 10:30:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DEB30C433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 10:31:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7C455204EA
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 10:30:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A9143204EA
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 10:31:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GA2iRhaW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C455204EA
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cZQUHTjd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9143204EA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35592 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40418 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k94Jg-0005zY-HD
-	for qemu-devel@archiver.kernel.org; Fri, 21 Aug 2020 06:30:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59532)
+	id 1k94Kp-00083D-Rh
+	for qemu-devel@archiver.kernel.org; Fri, 21 Aug 2020 06:31:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59484)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k94DD-0000s6-I4
- for qemu-devel@nongnu.org; Fri, 21 Aug 2020 06:23:55 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29576
- helo=us-smtp-1.mimecast.com)
+ id 1k94DA-0000kn-Fc
+ for qemu-devel@nongnu.org; Fri, 21 Aug 2020 06:23:52 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:22260)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k94DB-0001TM-Hg
- for qemu-devel@nongnu.org; Fri, 21 Aug 2020 06:23:55 -0400
+ id 1k94D8-0001SH-Ry
+ for qemu-devel@nongnu.org; Fri, 21 Aug 2020 06:23:52 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598005432;
+ s=mimecast20190719; t=1598005429;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=d+4/G+9RPd3uE7o5pP5BcN0FDqnOuSLBhjK1SlQhots=;
- b=GA2iRhaWyF2QMU/K/cFAavIlqJ9mYa/BqRljsgnUUZVJz53PDvas6EoeO1chKEX8yWl+Nz
- wFol1KOLOjJLRJbm65mXg8dPEC3vTB3YLvcXo7sWykQ+tejTXdnnLuRF8g/e5n9+jnWfai
- pahM5G7OPfJUjvrzxNO/n3+ASu0BXdA=
+ bh=mQFyJVdpVjaE0U+2hL8BlOmtacuv/C9XnPeWiNd02zw=;
+ b=cZQUHTjdjJHNNl42tSVhTb4r4P5yQnnW21K4mz+T9xgGgUVa+N9vC6Y/qiNoURqD20wrMZ
+ 7afOFNq+UZzYYuKNnAEbSHK9QRf5tf/loAJIl4KuCq1r2paarZ4T5nWGg32tQmOjcw/h7D
+ spBklmMG93+qmvTElcKFuTI4KMV9r8Q=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-186-hrdFMXiNMAm2iqf6Z1nthg-1; Fri, 21 Aug 2020 06:23:49 -0400
-X-MC-Unique: hrdFMXiNMAm2iqf6Z1nthg-1
+ us-mta-352-YmnZXdoeMgOKopFD1aWA6A-1; Fri, 21 Aug 2020 06:23:47 -0400
+X-MC-Unique: YmnZXdoeMgOKopFD1aWA6A-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E16B71DE0F
- for <qemu-devel@nongnu.org>; Fri, 21 Aug 2020 10:23:48 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 25A2F191E2A2
+ for <qemu-devel@nongnu.org>; Fri, 21 Aug 2020 10:23:47 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9CB2E5DA74;
- Fri, 21 Aug 2020 10:23:48 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0B3555DA74;
+ Fri, 21 Aug 2020 10:23:43 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v8 018/152] configure: generate Meson cross file
-Date: Fri, 21 Aug 2020 06:21:15 -0400
-Message-Id: <20200821102329.29777-19-pbonzini@redhat.com>
+Subject: [PULL v8 013/152] configure: expand path variables for meson configure
+Date: Fri, 21 Aug 2020 06:21:10 -0400
+Message-Id: <20200821102329.29777-14-pbonzini@redhat.com>
 In-Reply-To: <20200821102329.29777-1-pbonzini@redhat.com>
 References: <20200821102329.29777-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/20 23:41:39
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/21 02:43:55
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
 X-Spam_bar: ----
 X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,117 +106,70 @@ From: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- configure   | 72 ++++++++++++++++++++++++++++++++++++++++++++++-------
- meson.build |  7 +++++-
- 2 files changed, 69 insertions(+), 10 deletions(-)
+ configure | 35 ++++++++++++++++++++---------------
+ 1 file changed, 20 insertions(+), 15 deletions(-)
 
 diff --git a/configure b/configure
-index ce32c568f8..a82045352c 100755
+index 606c327cca..373bb22287 100755
 --- a/configure
 +++ b/configure
-@@ -8626,21 +8626,75 @@ echo >> "$iotests_common_env"
- echo "export PYTHON='$python'" >> "$iotests_common_env"
+@@ -415,16 +415,7 @@ LDFLAGS_SHARED="-shared"
+ modules="no"
+ module_upgrades="no"
+ prefix="/usr/local"
+-mandir="\${prefix}/share/man"
+-datadir="\${prefix}/share"
+ firmwarepath="\${prefix}/share/qemu-firmware"
+-qemu_docdir="\${prefix}/share/doc/qemu"
+-bindir="\${prefix}/bin"
+-libdir="\${prefix}/lib"
+-libexecdir="\${prefix}/libexec"
+-includedir="\${prefix}/include"
+-sysconfdir="\${prefix}/etc"
+-local_statedir="\${prefix}/var"
+ confsuffix="/qemu"
+ slirp=""
+ oss_lib=""
+@@ -979,12 +970,6 @@ if test "$mingw32" = "yes" ; then
+     LIBS="-liberty $LIBS"
+   fi
+   prefix="c:/Program Files/QEMU"
+-  mandir="\${prefix}"
+-  datadir="\${prefix}"
+-  qemu_docdir="\${prefix}"
+-  bindir="\${prefix}"
+-  sysconfdir="\${prefix}"
+-  local_statedir=
+   confsuffix=""
+   libs_qga="-lws2_32 -lwinmm -lpowrprof -lwtsapi32 -lwininet -liphlpapi -lnetapi32 $libs_qga"
+ fi
+@@ -1638,6 +1623,26 @@ for opt do
+   esac
+ done
  
- if test "$skip_meson" = no; then
-+cross="config-meson.cross.new"
-+meson_quote() {
-+    echo "['$(echo $* | sed "s/ /','/g")']"
-+}
++libdir="${libdir:-$prefix/lib}"
++libexecdir="${libexecdir:-$prefix/libexec}"
++includedir="${includedir:-$prefix/include}"
 +
-+echo "# Automatically generated by configure - do not modify" > $cross
-+echo "[properties]" >> $cross
-+test -z "$cxx" && echo "link_language = 'c'" >> $cross
-+echo "[binaries]" >> $cross
-+echo "c = $(meson_quote $cc)" >> $cross
-+test -n "$cxx" && echo "cpp = $(meson_quote $cxx)" >> $cross
-+echo "ar = $(meson_quote $ar)" >> $cross
-+echo "nm = $(meson_quote $nm)" >> $cross
-+echo "pkgconfig = $(meson_quote $pkg_config_exe)" >> $cross
-+echo "ranlib = $(meson_quote $ranlib)" >> $cross
-+echo "strip = $(meson_quote $strip)" >> $cross
-+echo "windres = $(meson_quote $windres)" >> $cross
-+if test -n "$cross_prefix"; then
-+    cross_arg="--cross-file config-meson.cross"
-+    # Hack: Meson expects an absolute path for the *build* machine
-+    # for the prefix, so add a slash in front of a Windows path that
-+    # includes a drive letter.
-+    #
-+    # See https://github.com/mesonbuild/meson/issues/7577.
-+    echo "[host_machine]" >> $cross
-+    if test "$mingw32" = "yes" ; then
-+        echo "system = 'windows'" >> $cross
-+        case $prefix in
-+            ?:*) pre_prefix=/ ;;
-+        esac
-+    fi
-+    case "$ARCH" in
-+        i386|x86_64)
-+            echo "cpu_family = 'x86'" >> $cross
-+            ;;
-+        ppc64le)
-+            echo "cpu_family = 'ppc64'" >> $cross
-+            ;;
-+        *)
-+            echo "cpu_family = '$ARCH'" >> $cross
-+            ;;
-+    esac
-+    echo "cpu = '$cpu'" >> $cross
-+    if test "$bigendian" = "yes" ; then
-+        echo "endian = 'big'" >> $cross
-+    else
-+        echo "endian = 'little'" >> $cross
-+    fi
++if test "$mingw32" = "yes" ; then
++    mandir="$prefix"
++    datadir="$prefix"
++    qemu_docdir="$prefix"
++    bindir="$prefix"
++    sysconfdir="$prefix"
++    local_statedir=
 +else
-+    cross_arg="--native-file config-meson.cross"
++    mandir="${mandir:-$prefix/share/man}"
++    datadir="${datadir:-$prefix/share}"
++    qemu_docdir="${qemu_docdir:-$prefix/share/doc/qemu}"
++    bindir="${bindir:-$prefix/bin}"
++    sysconfdir="${sysconfdir:-$prefix/etc}"
++    local_statedir="${local_statedir:-$prefix/var}"
 +fi
-+mv $cross config-meson.cross
 +
- rm -rf meson-private meson-info meson-logs
- NINJA=$PWD/ninjatool $meson setup \
--        --prefix "$prefix" \
--        --libdir "$libdir" \
--        --libexecdir "$libexecdir" \
--        --bindir "$bindir" \
--        --includedir "$includedir" \
--        --datadir "$datadir" \
--        --mandir "$mandir" \
--        --sysconfdir "$sysconfdir" \
--        --localstatedir "$local_statedir" \
-+        --prefix "${pre_prefix}$prefix" \
-+        --libdir "${pre_prefix}$libdir" \
-+        --libexecdir "${pre_prefix}$libexecdir" \
-+        --bindir "${pre_prefix}$bindir" \
-+        --includedir "${pre_prefix}$includedir" \
-+        --datadir "${pre_prefix}$datadir" \
-+        --mandir "${pre_prefix}$mandir" \
-+        --sysconfdir "${pre_prefix}$sysconfdir" \
-+        --localstatedir "${pre_prefix}$local_statedir" \
-         -Doptimization=$(if test "$debug" = yes; then echo 0; else echo 2; fi) \
-         -Ddebug=$(if test "$debug_info" = yes; then echo true; else echo false; fi) \
-         -Dwerror=$(if test "$werror" = yes; then echo true; else echo false; fi) \
-         -Dstrip=$(if test "$strip_opt" = yes; then echo true; else echo false; fi) \
-+        $cross_arg \
-         "$PWD" "$source_path"
- 
- if test "$?" -ne 0 ; then
-diff --git a/meson.build b/meson.build
-index 613983e464..5ad85a7314 100644
---- a/meson.build
-+++ b/meson.build
-@@ -15,7 +15,12 @@ add_project_link_arguments(config_host['QEMU_LDFLAGS'].split(),
- add_project_arguments(config_host['QEMU_INCLUDES'].split(),
-                       language: ['c', 'cpp', 'objc'])
- 
--add_languages('cpp', required: false, native: false)
-+python = import('python').find_installation()
-+
-+link_language = meson.get_external_property('link_language', 'cpp')
-+if link_language == 'cpp'
-+  add_languages('cpp', required: true, native: false)
-+endif
- if host_machine.system() == 'darwin'
-   add_languages('objc', required: false, native: false)
- endif
+ case "$cpu" in
+     ppc)
+            CPU_CFLAGS="-m32"
 -- 
 2.26.2
 
