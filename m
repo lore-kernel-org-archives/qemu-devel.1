@@ -2,87 +2,87 @@ Return-Path: <SRS0=atk5=B7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62B7BC433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 10:09:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13116C433E8
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 10:09:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 25262207DA
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 10:09:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CEB4F207DE
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 10:09:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XBx8GUoe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25262207DA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e0Ex2m1L"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CEB4F207DE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49546 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49918 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k93yo-0001T7-DT
-	for qemu-devel@archiver.kernel.org; Fri, 21 Aug 2020 06:09:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55980)
+	id 1k93yt-0001cB-3p
+	for qemu-devel@archiver.kernel.org; Fri, 21 Aug 2020 06:09:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55794)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1k93y2-0000Yb-H9; Fri, 21 Aug 2020 06:08:14 -0400
-Received: from mail-yb1-xb41.google.com ([2607:f8b0:4864:20::b41]:46599)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1k93y1-0007y0-2f; Fri, 21 Aug 2020 06:08:14 -0400
-Received: by mail-yb1-xb41.google.com with SMTP id x10so739209ybj.13;
- Fri, 21 Aug 2020 03:08:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=ihHtQr1Sf+MQb3GVixUkYYl7KZnemtzdyyxzIMhuvXM=;
- b=XBx8GUoeefJrMQkl1QPN+kfMmmvTktCkEsSwl8gFBl6ExraZcldvKr2RJDFiuIcaNb
- rterZR6qPCSzI2KTsH+4I3sF3a5QtX3zY2KbfSoqqh1RSlySox+15lfOfC6E2xT2tntl
- mOtpgMJw9PWSp+9efV7cROCQwRFI7UnkgDEVGgwGzuKH6XRQLhGOeajlNW6C77bN2k8w
- 18C5d3SyNxpnwMglZU6IUvLX7l4uPDn4e1Bs3o4ohCQ9xA8ps142kdnXYcc0V3GxnMDq
- gmxX3sauVBRqNfuwLhysQNXBk3N6VXj+vW0SnO0XHZUlVj6lI/HOo6fOU9THUvbpRqxH
- FS9A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=ihHtQr1Sf+MQb3GVixUkYYl7KZnemtzdyyxzIMhuvXM=;
- b=ZGL3zeJcxutP8LYgaY9lA/a0iN/WIQEeyEValTWVIUgv6pdcrd2K7M6+5e8OnrDy7v
- sxbkMSFI0D1/vj7D26x9tUl3qyTN8jQy+Fk9fJ3iBj9Ds1OcmR/ZN5/6qb3Kxmapp6HA
- 9Z6c63+x9uqo4DkF1iTOY77nehK1MXlVzw+iIDx+AAJ84U6guowiiYmOvMHeL3zj5lbh
- arM480RfXc8c4uws9+pqXiJw4toCl/QtFNm0AMgXF5y8ICNAg6Eh05vdRmvpJBAvxr2+
- LZLeH4S/xQW6mrY2C3SJW4YLZ6YAy7ewEOhtPvP9lDi1RDazdENE3k/dE4EB7VL0CZ7e
- DiGA==
-X-Gm-Message-State: AOAM531dUMS1KeKpoNPcrmuY4xy57dlS0iKyg8BMAyiNRBE5tDDy/gQM
- /KFs0eFuD9KRk53c/tspZwS5DkP8E/iRl9jz98o=
-X-Google-Smtp-Source: ABdhPJwQs+pLJaS76RAjNqXTOYNDpWAQJ9r97JhLqE1F6gdiy0i9SzMovYFjuReDdrFpdHF5nLkz5kiuvHnQpZCAqjY=
-X-Received: by 2002:a25:f20d:: with SMTP id i13mr2607894ybe.152.1598004491447; 
- Fri, 21 Aug 2020 03:08:11 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1k93xM-0008Ec-Fs
+ for qemu-devel@nongnu.org; Fri, 21 Aug 2020 06:07:32 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:53866
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1k93xL-0007v2-0D
+ for qemu-devel@nongnu.org; Fri, 21 Aug 2020 06:07:32 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1598004450;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=O9NSb5tE0m7PmlF1tlP39mORpP7XxP573bqYJHmLqcM=;
+ b=e0Ex2m1LiLsQUnXUYDmSPifad2/eL8qBFTrK9f3lKj6b1TV010pjwXYbJJPK7A+asgWzTK
+ fUUm+G2nPTXvGnMXNFGaXbqA8U/zPeYkCwpenxxrjMeIVnCOrA33V9ZDYNSyxWC8zxrgbZ
+ Q1u+RUr3zL5M4i09yzp5D4rASSiGOuM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-96-XuE0L9XmNHqwLLULMt2tPg-1; Fri, 21 Aug 2020 06:07:28 -0400
+X-MC-Unique: XuE0L9XmNHqwLLULMt2tPg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A023D186A590;
+ Fri, 21 Aug 2020 10:07:27 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-112-195.ams2.redhat.com
+ [10.36.112.195])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 79A687C533;
+ Fri, 21 Aug 2020 10:07:24 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 2F0539AE2; Fri, 21 Aug 2020 12:07:23 +0200 (CEST)
+Date: Fri, 21 Aug 2020 12:07:23 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: Li Zhijian <lizhijian@cn.fujitsu.com>
+Subject: Re: [PATCH] virtio-gpu: fix unmap the already mapped items
+Message-ID: <20200821100723.vbyo5bpxwrmjqdyp@sirius.home.kraxel.org>
+References: <20200821084945.5264-1-lizhijian@cn.fujitsu.com>
 MIME-Version: 1.0
-References: <1597423256-14847-1-git-send-email-bmeng.cn@gmail.com>
- <1597423256-14847-8-git-send-email-bmeng.cn@gmail.com>
- <565d9936-3eda-db2f-b390-05f675cf6644@amsat.org>
- <BY5PR02MB67720168B25F53370840545BCA5C0@BY5PR02MB6772.namprd02.prod.outlook.com>
- <20200821100940.GA30457@xhdsaipava40.xilinx.com>
-In-Reply-To: <20200821100940.GA30457@xhdsaipava40.xilinx.com>
-From: Bin Meng <bmeng.cn@gmail.com>
-Date: Fri, 21 Aug 2020 18:08:00 +0800
-Message-ID: <CAEUhbmVX7_+SeVJpn_qPMoeLZXH-E3232ggVnq55UeskK3bDGQ@mail.gmail.com>
-Subject: Re: [PATCH 07/18] hw/sd: sd: Fix incorrect populated function switch
- status data structure
-To: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::b41;
- envelope-from=bmeng.cn@gmail.com; helo=mail-yb1-xb41.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+In-Reply-To: <20200821084945.5264-1-lizhijian@cn.fujitsu.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/20 23:41:39
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -96,34 +96,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Bin Meng <bin.meng@windriver.com>,
- "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Palmer Dabbelt <palmerdabbelt@google.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, saipava@xilinx.com,
- Alistair Francis <Alistair.Francis@wdc.com>
+Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Sai,
+On Fri, Aug 21, 2020 at 04:49:45PM +0800, Li Zhijian wrote:
+> we go here either (!(*iov)[i].iov_base) or (len != l), so we need to consider
+> to unmap the 'i'th item as well when the 'i'th item is not nil
+> 
+> Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
+> ---
+>  hw/display/virtio-gpu.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/hw/display/virtio-gpu.c b/hw/display/virtio-gpu.c
+> index 5f0dd7c150..1f777e43ff 100644
+> --- a/hw/display/virtio-gpu.c
+> +++ b/hw/display/virtio-gpu.c
+> @@ -656,7 +656,7 @@ int virtio_gpu_create_mapping_iov(VirtIOGPU *g,
+>              qemu_log_mask(LOG_GUEST_ERROR, "%s: failed to map MMIO memory for"
+>                            " resource %d element %d\n",
+>                            __func__, ab->resource_id, i);
+> -            virtio_gpu_cleanup_mapping_iov(g, *iov, i);
+> +            virtio_gpu_cleanup_mapping_iov(g, *iov, i + !!(*iov)[i].iov_base);
 
-On Fri, Aug 21, 2020 at 6:04 PM Sai Pavan Boddu
-<sai.pavan.boddu@xilinx.com> wrote:
->
-> Hi Philippe,
->
-> First two patch of SD look good. Tested them over zynqmp and versal
-> platforms.
->
+Cute trick, but the code should be readable without having to dig out
+the commit message which explains it.  Can we have something simpler
+along the lines of "if (iov_base) { i++; /* cleanup partial map */ }"
+please?
 
-Thanks for testing.
+thanks,
+  Gerd
 
-Can I add your Tested-by tag?
-
-Regards,
-Bin
 
