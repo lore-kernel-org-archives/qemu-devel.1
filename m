@@ -2,89 +2,86 @@ Return-Path: <SRS0=atk5=B7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DD78C433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 21:17:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C305FC433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 21:18:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 196D120791
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 21:17:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8A15B20791
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 21:18:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IX1p/Q5c"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 196D120791
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hFYqjkWh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A15B20791
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57376 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60518 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k9EPK-00052h-Dr
-	for qemu-devel@archiver.kernel.org; Fri, 21 Aug 2020 17:17:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53382)
+	id 1k9EQG-0006M8-L3
+	for qemu-devel@archiver.kernel.org; Fri, 21 Aug 2020 17:18:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53354)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k9EMi-0001Gp-5B
- for qemu-devel@nongnu.org; Fri, 21 Aug 2020 17:14:24 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:59685
- helo=us-smtp-1.mimecast.com)
+ id 1k9EMf-0001Cs-T7
+ for qemu-devel@nongnu.org; Fri, 21 Aug 2020 17:14:21 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:37676)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k9EMg-0003s6-Gz
- for qemu-devel@nongnu.org; Fri, 21 Aug 2020 17:14:23 -0400
+ id 1k9EMc-0003rN-SL
+ for qemu-devel@nongnu.org; Fri, 21 Aug 2020 17:14:21 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598044461;
+ s=mimecast20190719; t=1598044458;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=DUFPPIOWX+YIny/KMPTzOIGrj4KuMhUAHFKrA2SHM6k=;
- b=IX1p/Q5cozgtnjzuc+EzMMNDrfIXqgkFweI0SFT0fOQt9bVXJmTdZPpl1UQQPwwJd15/c8
- RzldGRmzd9Isxeg2CdGSh10ESz+b/W/cN8tcn/+G+iW7Ts3aCXy0pKzK0Lk9GHodyGrshs
- xg+YJ2aTj51YVGvDzffQCsFbUaD1SgM=
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=TpWbhUyXkt3LakPn/SludUGkFwKrG9hjWPw3DGhCPHE=;
+ b=hFYqjkWhRN6jjvUFiKZxZa1vtI8a7ibP+b9eY+7jSxEmEHgVYCIcNICfoaL1p4Vvy4VAnV
+ vQA5Zh9Otre2fyVNRLLDJUsMuQtVpOMmpYGiApsVSpumtTO1oVZ0qCu3/MUONW/OBSTxLJ
+ lrKMRKOjJeqA29h/g48G6hILl0W4CxA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-25-dtM8AzglPB2vYPJGEyr36A-1; Fri, 21 Aug 2020 17:14:19 -0400
-X-MC-Unique: dtM8AzglPB2vYPJGEyr36A-1
+ us-mta-499-Le0zxH00Nq-pC3OuW3Eb4g-1; Fri, 21 Aug 2020 17:14:14 -0400
+X-MC-Unique: Le0zxH00Nq-pC3OuW3Eb4g-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9ABE581F02D
- for <qemu-devel@nongnu.org>; Fri, 21 Aug 2020 21:14:18 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1E6821074657
+ for <qemu-devel@nongnu.org>; Fri, 21 Aug 2020 21:14:13 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4D73D5C1D0;
- Fri, 21 Aug 2020 21:14:18 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D6C045C1D0
+ for <qemu-devel@nongnu.org>; Fri, 21 Aug 2020 21:14:12 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 5/6] meson: Fix --disable-tools --enable-system builds
-Date: Fri, 21 Aug 2020 17:14:11 -0400
-Message-Id: <20200821211412.17321-6-pbonzini@redhat.com>
-In-Reply-To: <20200821211412.17321-1-pbonzini@redhat.com>
-References: <20200821211412.17321-1-pbonzini@redhat.com>
+Subject: [PULL 0/6] Meson build system fixes
+Date: Fri, 21 Aug 2020 17:14:06 -0400
+Message-Id: <20200821211412.17321-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/21 04:55:47
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/21 04:26:32
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
 X-Spam_bar: ----
 X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,48 +94,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+The following changes since commit d6f83a72a7db94a3ede9f5cc4fb39f9c8e89f954:
 
-Fixes:
+  Merge remote-tracking branch 'remotes/philmd-gitlab/tags/acceptance-testing-20200812' into staging (2020-08-21 14:51:43 +0100)
 
- $ ../configure --disable-tools --disable-user
- ../tests/qemu-iotests/meson.build:7:0: ERROR: Unknown variable "qemu_block_tools".
+are available in the Git repository at:
 
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <20200821150556.1235625-1-philmd@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- meson.build | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+  https://gitlab.com/bonzini/qemu.git tags/for-upstream
 
-diff --git a/meson.build b/meson.build
-index dd8016c9da..df5bf728b5 100644
---- a/meson.build
-+++ b/meson.build
-@@ -1068,12 +1068,13 @@ if 'CONFIG_XKBCOMMON' in config_host
-                            dependencies: [qemuutil, xkbcommon], install: have_tools)
- endif
- 
-+qemu_block_tools = []
- if have_tools
-   qemu_img = executable('qemu-img', [files('qemu-img.c'), hxdep],
-              dependencies: [authz, block, crypto, io, qom, qemuutil], install: true)
-   qemu_io = executable('qemu-io', files('qemu-io.c'),
-              dependencies: [block, qemuutil], install: true)
--  qemu_block_tools = [qemu_img, qemu_io]
-+  qemu_block_tools += [qemu_img, qemu_io]
-   if targetos == 'linux' or targetos == 'sunos' or targetos.endswith('bsd')
-     qemu_nbd = executable('qemu-nbd', files('qemu-nbd.c'),
-                dependencies: [block, qemuutil], install: true)
+for you to fetch changes up to 460b4664c6ad2b88ccfb2d69ab4cbb7d6c9165a0:
+
+  keymaps: update (2020-08-21 17:06:17 -0400)
+
+----------------------------------------------------------------
+meson fixes:
+
+* --disable-tools --enable-system build
+* s390 no-TCG build
+* fdmon-io_uring
+* 'shift' error message in version_ge()
+
+----------------------------------------------------------------
+Marc-André Lureau (1):
+      meson: convert pc-bios/keymaps/Makefile
+
+Paolo Bonzini (2):
+      target/s390x: fix meson.build issue
+      keymaps: update
+
+Philippe Mathieu-Daudé (1):
+      meson: Fix --disable-tools --enable-system builds
+
+Stefano Garzarella (2):
+      util/meson.build: fix fdmon-io_uring build
+      configure: silence 'shift' error message in version_ge()
+
+ Makefile                    |   8 --
+ configure                   |   6 +-
+ meson.build                 |  14 +--
+ pc-bios/keymaps/.gitignore  |   1 +
+ pc-bios/keymaps/Makefile    |  56 ----------
+ pc-bios/keymaps/ar          | 242 +++++++++++++++++++++++++++++++++++++++++++-
+ pc-bios/keymaps/bepo        | 242 +++++++++++++++++++++++++++++++++++++++++++-
+ pc-bios/keymaps/cz          | 242 +++++++++++++++++++++++++++++++++++++++++++-
+ pc-bios/keymaps/da          | 242 +++++++++++++++++++++++++++++++++++++++++++-
+ pc-bios/keymaps/de          | 242 +++++++++++++++++++++++++++++++++++++++++++-
+ pc-bios/keymaps/de-ch       | 242 +++++++++++++++++++++++++++++++++++++++++++-
+ pc-bios/keymaps/en-gb       | 242 +++++++++++++++++++++++++++++++++++++++++++-
+ pc-bios/keymaps/en-us       | 242 +++++++++++++++++++++++++++++++++++++++++++-
+ pc-bios/keymaps/es          | 242 +++++++++++++++++++++++++++++++++++++++++++-
+ pc-bios/keymaps/et          | 242 +++++++++++++++++++++++++++++++++++++++++++-
+ pc-bios/keymaps/fi          | 242 +++++++++++++++++++++++++++++++++++++++++++-
+ pc-bios/keymaps/fo          | 242 +++++++++++++++++++++++++++++++++++++++++++-
+ pc-bios/keymaps/fr          | 242 +++++++++++++++++++++++++++++++++++++++++++-
+ pc-bios/keymaps/fr-be       | 242 +++++++++++++++++++++++++++++++++++++++++++-
+ pc-bios/keymaps/fr-ca       | 242 +++++++++++++++++++++++++++++++++++++++++++-
+ pc-bios/keymaps/fr-ch       | 242 +++++++++++++++++++++++++++++++++++++++++++-
+ pc-bios/keymaps/hr          | 242 +++++++++++++++++++++++++++++++++++++++++++-
+ pc-bios/keymaps/hu          | 242 +++++++++++++++++++++++++++++++++++++++++++-
+ pc-bios/keymaps/is          | 242 +++++++++++++++++++++++++++++++++++++++++++-
+ pc-bios/keymaps/it          | 242 +++++++++++++++++++++++++++++++++++++++++++-
+ pc-bios/keymaps/ja          | 242 +++++++++++++++++++++++++++++++++++++++++++-
+ pc-bios/keymaps/lt          | 242 +++++++++++++++++++++++++++++++++++++++++++-
+ pc-bios/keymaps/lv          | 242 +++++++++++++++++++++++++++++++++++++++++++-
+ pc-bios/keymaps/meson.build |  56 ++++++++++
+ pc-bios/keymaps/mk          | 242 +++++++++++++++++++++++++++++++++++++++++++-
+ pc-bios/keymaps/nl          | 242 +++++++++++++++++++++++++++++++++++++++++++-
+ pc-bios/keymaps/no          | 242 +++++++++++++++++++++++++++++++++++++++++++-
+ pc-bios/keymaps/pl          | 242 +++++++++++++++++++++++++++++++++++++++++++-
+ pc-bios/keymaps/pt          | 242 +++++++++++++++++++++++++++++++++++++++++++-
+ pc-bios/keymaps/pt-br       | 242 +++++++++++++++++++++++++++++++++++++++++++-
+ pc-bios/keymaps/ru          | 242 +++++++++++++++++++++++++++++++++++++++++++-
+ pc-bios/keymaps/th          | 242 +++++++++++++++++++++++++++++++++++++++++++-
+ pc-bios/keymaps/tr          | 242 +++++++++++++++++++++++++++++++++++++++++++-
+ pc-bios/meson.build         |   1 +
+ target/s390x/meson.build    |   2 +-
+ ui/meson.build              |   2 +-
+ util/meson.build            |   2 +-
+ 42 files changed, 7752 insertions(+), 140 deletions(-)
+ create mode 100644 pc-bios/keymaps/.gitignore
+ delete mode 100644 pc-bios/keymaps/Makefile
+ create mode 100644 pc-bios/keymaps/meson.build
 -- 
 2.26.2
-
 
 
