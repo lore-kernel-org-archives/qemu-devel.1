@@ -2,102 +2,122 @@ Return-Path: <SRS0=atk5=B7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44377C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 13:14:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA80CC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 13:16:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 054B8207BB
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 13:14:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7321D20724
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 13:16:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DCf1DHCt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 054B8207BB
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CI2JVx+n"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7321D20724
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59408 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34428 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k96sa-0004Hn-44
-	for qemu-devel@archiver.kernel.org; Fri, 21 Aug 2020 09:14:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42042)
+	id 1k96uZ-0005mx-Pt
+	for qemu-devel@archiver.kernel.org; Fri, 21 Aug 2020 09:16:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42728)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k96rr-00030l-J7
- for qemu-devel@nongnu.org; Fri, 21 Aug 2020 09:14:03 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:24592
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k96ts-0005GI-KG
+ for qemu-devel@nongnu.org; Fri, 21 Aug 2020 09:16:08 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:26506
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k96rp-0006Lv-SC
- for qemu-devel@nongnu.org; Fri, 21 Aug 2020 09:14:03 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k96to-0006kQ-NH
+ for qemu-devel@nongnu.org; Fri, 21 Aug 2020 09:16:08 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598015641;
+ s=mimecast20190719; t=1598015763;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=iYYvOCtTYt8YU8/H2wnL0QJNGjqXq/SeFcePaZoRv9g=;
- b=DCf1DHCtW8y+qSz0IUQs9tSCGs1IGfiA812yJYQap1krOYOm/Blg8T0JHRwHW/RvBZq/Si
- vIm+rfMFrKO+QOWWzpfy9dIE04iRZ4LBnzoYyNVk9tJNlZ/WOWLGiqzKJKtzrYLblsIFhW
- iSAcRjfNriAz4OwHdC5ujM6qYNLt/jM=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-494-u1GDgbuRPkymaCgZwYh1jg-1; Fri, 21 Aug 2020 09:13:59 -0400
-X-MC-Unique: u1GDgbuRPkymaCgZwYh1jg-1
-Received: by mail-wm1-f70.google.com with SMTP id p184so957940wmp.7
- for <qemu-devel@nongnu.org>; Fri, 21 Aug 2020 06:13:59 -0700 (PDT)
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=68Vs14OLWpfM2KT7WTKOPCDagHBR9xHHtWgCFQ4ivSk=;
+ b=CI2JVx+nF0cflCwaphZusb6mNgE/toSigPGI+krQscqB/Fl25yd6OSuLaJbHoQGYGqMByL
+ LPvSEqejbvj15XfN/U3hjxGXTRCFyQEbEU92VKHYJaJrF+vyOI+KQJJiEl/qAQlckD8Fs+
+ 3Fg0DwEbwzP5kI/cRzgkXhP8wBVITAc=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-414-uYl8I969P2-9qZ5ZnT7ZvA-1; Fri, 21 Aug 2020 09:16:01 -0400
+X-MC-Unique: uYl8I969P2-9qZ5ZnT7ZvA-1
+Received: by mail-wr1-f70.google.com with SMTP id r14so546592wrq.3
+ for <qemu-devel@nongnu.org>; Fri, 21 Aug 2020 06:16:01 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=iYYvOCtTYt8YU8/H2wnL0QJNGjqXq/SeFcePaZoRv9g=;
- b=W9THIUg+MPNxmcUVEgnwpwelXV9WXV6J9oc8kW7dcqBxlpS9Z1E5/YXyIhUJGbODh0
- 09s4HBqupeD8fJ2BYKKzawj4bb2FumtYja2/Uo1UxAL+cYgbX5AnroFaoIsfBj5SCROE
- ZQUdAcdlurSBNDb2ktorZns01ARLMU+Hvsdeqsac+cfEjoicAWtkc/lV2EvJk9G9UCeo
- NTP6R/0Lyo9iYl/LumdBMDlY54/WkY3d/CVluOWuh/fz6tW3kwvkU30U3B+pfDX7g/f+
- yTgNRV0MsfI0yqe+rMobB9i/6Z3TDUHX5jp4E2oFz0eyK130yQQh46IvLRSpWlDKmFUR
- 4ghg==
-X-Gm-Message-State: AOAM531rCwFWrBVfVxv+jZVyg+Hw+I3OlmkX1jIg1/GTBlI/bDEYuaOI
- tTVX+4CPWwt6NvDBUqGSjc845YJhs/NnurzhEpSR3IEj/69gntSCOY0zhV2S1zYC6EYQKUZNv3w
- D6nhswBHI25AC40I=
-X-Received: by 2002:a1c:7d55:: with SMTP id y82mr3729637wmc.186.1598015637829; 
- Fri, 21 Aug 2020 06:13:57 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyid1AowhtjG87WcmMBzl3sMUWVxmVutc+0OMhn63IsSPTXO8z5L8HFWrw3MmNRDsw2TIQ6+Q==
-X-Received: by 2002:a1c:7d55:: with SMTP id y82mr3729621wmc.186.1598015637550; 
- Fri, 21 Aug 2020 06:13:57 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:1cc0:4e4e:f1a9:1745?
- ([2001:b07:6468:f312:1cc0:4e4e:f1a9:1745])
- by smtp.gmail.com with ESMTPSA id u3sm4773833wml.44.2020.08.21.06.13.56
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=68Vs14OLWpfM2KT7WTKOPCDagHBR9xHHtWgCFQ4ivSk=;
+ b=fdweHnIRMFHlO5SJojJzZ14uIEA+MtZRheRC1DVPq5IwPoefqRM9gMhmuWX/fvCTct
+ WqwrEOpRkVvqv65uvUPAXKZL+I11ZJdqNUzpMwa67jpNRQcgdzwWiIaxNmLDYk7zQ/c2
+ rDhukz+BZdTQ+4MEaC3jIgMktAvBD4v7HpGLUaCJlsU+qtS5FqylBoZ6tSsY+yOAjYi+
+ Q0+wwMS1JyZyifdZ1s7/WPtMYb0fvpf+AghYwmZAg4Na1HyceUAllACFvJCMlhoHjC0S
+ gA8fhhgKjePZVJLFMAoDONVb6Y1nB8T/hONWZIxy8AImD3Mkyv4SrZghZKh53PI6prWk
+ AEkg==
+X-Gm-Message-State: AOAM530dudKLaXFpmFoVA9jKg0qNPeZGcK8n8COtaPz8j/mu/std6ngZ
+ dL6bzlIxYhiLoJQzhdfE/RYcC5gOoGCV85ucmY5IGP3/xAdM3n/bOiObhfTioE0tCbR5qpI0LOd
+ vN51eACDnelYVr00=
+X-Received: by 2002:a5d:440e:: with SMTP id z14mr2666932wrq.422.1598015760551; 
+ Fri, 21 Aug 2020 06:16:00 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw/gReMvO0QSn/PnU0BIZ2oMPumyRiXg7aNSpVutE2ccYZJJxb4LS68A4AjrDXMre5an843TA==
+X-Received: by 2002:a5d:440e:: with SMTP id z14mr2666916wrq.422.1598015760342; 
+ Fri, 21 Aug 2020 06:16:00 -0700 (PDT)
+Received: from [192.168.1.36] (121.red-81-40-121.staticip.rima-tde.net.
+ [81.40.121.121])
+ by smtp.gmail.com with ESMTPSA id r129sm4636428wmr.40.2020.08.21.06.15.59
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 21 Aug 2020 06:13:56 -0700 (PDT)
-Subject: Re: [PATCH v5 1/1] audio/jack: fix use after free segfault
-To: Geoffrey McRae <geoff@hostfission.com>
-References: <20200819062940.52774-1-geoff@hostfission.com>
- <5029913.bOW1W81TKx@silver>
- <20200820053728.kv7pngxqzp32uky3@sirius.home.kraxel.org>
- <3140676.b1PlGooJ8z@silver> <c84d95de-c71d-3272-6b41-95753634482a@redhat.com>
- <a165417b4d27c7fbce404e81f6c38cda@hostfission.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <49a9b5f5-d1df-b6fb-d238-7c9e8d2aeb6c@redhat.com>
-Date: Fri, 21 Aug 2020 15:13:56 +0200
+ Fri, 21 Aug 2020 06:15:59 -0700 (PDT)
+Subject: Re: [PATCH v5 12/15] block/nvme: Replace BDRV_POLL_WHILE by
+ AIO_WAIT_WHILE
+To: Stefano Garzarella <sgarzare@redhat.com>
+References: <20200820165901.1139109-1-philmd@redhat.com>
+ <20200820165901.1139109-13-philmd@redhat.com>
+ <20200821101517.tgypwxqsjw2wfbxy@steredhat>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <84f6400d-1681-45e5-d271-d2311519dde7@redhat.com>
+Date: Fri, 21 Aug 2020 15:15:58 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <a165417b4d27c7fbce404e81f6c38cda@hostfission.com>
+In-Reply-To: <20200821101517.tgypwxqsjw2wfbxy@steredhat>
 Content-Language: en-US
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0.001
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
  helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/20 23:41:39
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -120,26 +140,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Christian Schoenebeck <qemu_oss@crudebyte.com>, qemu-devel@nongnu.org,
- Gerd Hoffmann <kraxel@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 21/08/20 13:28, Geoffrey McRae wrote:
+On 8/21/20 12:15 PM, Stefano Garzarella wrote:
+> On Thu, Aug 20, 2020 at 06:58:58PM +0200, Philippe Mathieu-DaudÃƒÂ© wrote:
+>> BDRV_POLL_WHILE() is defined as:
+>>
+>>   #define BDRV_POLL_WHILE(bs, cond) ({          \
+>>       BlockDriverState *bs_ = (bs);             \
+>>       AIO_WAIT_WHILE(bdrv_get_aio_context(bs_), \
+>>                      cond); })
+>>
+>> As we will remove the BlockDriverState use in the next commit,
+>> start by using the exploded version of BDRV_POLL_WHILE().
+>>
+>> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+>> Signed-off-by: Philippe Mathieu-DaudÃƒÂ© <philmd@redhat.com>
+>> ---
+>>  block/nvme.c | 3 ++-
+>>  1 file changed, 2 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/block/nvme.c b/block/nvme.c
+>> index 5b69fc75a60..456fe61f5ea 100644
+>> --- a/block/nvme.c
+>> +++ b/block/nvme.c
+>> @@ -493,6 +493,7 @@ static void nvme_cmd_sync_cb(void *opaque, int ret)
+>>  static int nvme_cmd_sync(BlockDriverState *bs, NVMeQueuePair *q,
+>>                           NvmeCmd *cmd)
+>>  {
+>> +    AioContext *aio_context = bdrv_get_aio_context(bs);
+>>      NVMeRequest *req;
+>>      int ret = -EINPROGRESS;
+>>      req = nvme_get_free_req(q);
+>> @@ -501,7 +502,7 @@ static int nvme_cmd_sync(BlockDriverState *bs, NVMeQueuePair *q,
+>>      }
+>>      nvme_submit_command(q, req, cmd, nvme_cmd_sync_cb, &ret);
+>>  
+>> -    BDRV_POLL_WHILE(bs, ret == -EINPROGRESS);
+>> +    AIO_WAIT_WHILE(aio_context, ret == -EINPROGRESS);
 > 
->> My suggestion is to work towards protecting the audio code with its own
->> mutex(es) and ignore the existence of the BQL for subsystems that can do
->> so (audio is a prime candidate).  Also please add comments to
->> audio_int.h about which functions are called from other threads than the
->> QEMU main thread.
+> Maybe I would have:
 > 
-> Ok, so to get back on topic, what exactly is the best way forward to fix
-> this issue in this patchset? Should I be managing a local mutex instead?
+>     AIO_WAIT_WHILE(bdrv_get_aio_context(bs), ret == -EINPROGRESS);
 
-I think adding a local mutex for audio stuff would be best, if it's not
-too hard.
+I extracted aio_context in this patch because in the following
+series it is passed by the caller as an argument to nvme_cmd_sync(),
+so this makes the next series simpler to review.
 
-Paolo
+> 
+> But it doesn't matter, LGTM:
+> 
+> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+
+Thanks!
+
+> 
+>>      return ret;
+>>  }
+>>  
+>> -- 
+>> 2.26.2
+>>
+>>
+> 
 
 
