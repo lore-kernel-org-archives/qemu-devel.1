@@ -7,76 +7,75 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB66DC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 15:31:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55161C433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 15:32:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 79C0F2063A
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 15:31:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 246772063A
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 15:32:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LNqcL0eU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79C0F2063A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Yg9dj3/l"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 246772063A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51906 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54826 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k990u-0007nK-QI
-	for qemu-devel@archiver.kernel.org; Fri, 21 Aug 2020 11:31:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44616)
+	id 1k992G-0000hm-FH
+	for qemu-devel@archiver.kernel.org; Fri, 21 Aug 2020 11:32:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45128)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k98z0-0006Qc-Th
- for qemu-devel@nongnu.org; Fri, 21 Aug 2020 11:29:34 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:27952
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k991T-0008Fx-0u
+ for qemu-devel@nongnu.org; Fri, 21 Aug 2020 11:32:07 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:56814)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k98yx-00062z-Se
- for qemu-devel@nongnu.org; Fri, 21 Aug 2020 11:29:34 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k991R-0006Qa-Fc
+ for qemu-devel@nongnu.org; Fri, 21 Aug 2020 11:32:06 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598023770;
+ s=mimecast20190719; t=1598023923;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding;
- bh=cvnB3su+5AR/IptiEh8NCGepT51dI755gYTFsFKWbp4=;
- b=LNqcL0eUfV3VffY8OW6b7EXE89IWuAHsY17HhwJ0EGQIAmCqDs25mWLL2L0X50ypmd7+XS
- aWPBYXbgCK0gEr3E5GrY7yOjTdkyaREfHZgmvfTylmVC+JvAj6ARtSXtsk3KrsrnCjVXgk
- HIGoIYrpqQXdS+bkGXt6JhCid03HBwU=
+ bh=hlkdlpuLwgIna/UKj+y6wdSkzPoctNh3j/Kz+JXFBIU=;
+ b=Yg9dj3/lkphRvAtONYnq/mnUxomRug/pEJi3eU4X0BXjg4xEzKg+XC1sedqrEGUaOHsA0H
+ U/oE90xg72ocwT0Rw2WbUR4Ka/3T0DhRmoX8jE2u+rprrlUSsm5z8+A5PGxgXLe14RvJEA
+ ap/MssmxdmOZmhe2yUbf8m3iaiqfZvE=
 Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
  [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-72-R_m_VWr8Moy0cbGo4nVS-A-1; Fri, 21 Aug 2020 11:29:28 -0400
-X-MC-Unique: R_m_VWr8Moy0cbGo4nVS-A-1
-Received: by mail-wr1-f72.google.com with SMTP id e14so645806wrr.7
- for <qemu-devel@nongnu.org>; Fri, 21 Aug 2020 08:29:27 -0700 (PDT)
+ us-mta-212-JEjMchzBNDOQuxdp6gMJIA-1; Fri, 21 Aug 2020 11:31:59 -0400
+X-MC-Unique: JEjMchzBNDOQuxdp6gMJIA-1
+Received: by mail-wr1-f72.google.com with SMTP id s23so650008wrb.12
+ for <qemu-devel@nongnu.org>; Fri, 21 Aug 2020 08:31:59 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
  :content-transfer-encoding;
- bh=cvnB3su+5AR/IptiEh8NCGepT51dI755gYTFsFKWbp4=;
- b=e8L5zeQUi5zWrtfc8JyIJ8/M/mK+O+MdPnVk1hwViwcXsg8G8R9SienI/UlNHPAYLQ
- PEdKR5I2wsME25VP7MMNQbF0tcoDT68VYzugUQmwPpVizg86aNJpyr8F9asI30UCZVwS
- 5JUdSeD9Kox7t+TQRpPTSSo2NrONDs7XkjIWoE5ndQTRb2G8RBbPLsqU46Gb8NOruHXO
- qKS0uJfrEmRgDGALjVy7oGMW7MvyKmj+6n7iUSkvtEukwWFntuJVetM8wspeWDyOketU
- Zu/3VfWNzwfIma/pDMFNIblzrjQseeXE9KKWd5Z0u9eqxTF1hrq5A8bijxYtsiGr718n
- dTdA==
-X-Gm-Message-State: AOAM531CZKE6skNu90IixL5hN059huHdbrkih4uvss/GL69VUyDfthm2
- QAAyNpTFoAcPZ1Dz1Vgs0yOmXu7ycVDBXpiYDGq5G5yktA3hQFzqu6qNKuc29DjmntdPMD/HNEp
- o7zMYroyvEe/2cGY=
-X-Received: by 2002:a5d:4947:: with SMTP id r7mr3168996wrs.165.1598023766600; 
- Fri, 21 Aug 2020 08:29:26 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzN7MZT2eswuXRZiNhQLEaRzZPpu8ejtlyqqeNgiW5I8KF0Wot5wxQKr6XYP3owgrwyMo0I9g==
-X-Received: by 2002:a5d:4947:: with SMTP id r7mr3168988wrs.165.1598023766357; 
- Fri, 21 Aug 2020 08:29:26 -0700 (PDT)
+ bh=hlkdlpuLwgIna/UKj+y6wdSkzPoctNh3j/Kz+JXFBIU=;
+ b=dpUVR5BsE/rjHgXvJQm8+lfHkD39/R+028H4Ow1g/o9/lgq4IY0es+R+F3r5oKdaKq
+ rN8QhKTHWXFOCjRyA5KnhHkDM5aCDJhW+uDyvJUJUkAZYbeoTuiZT84KuzZR8M9NNYCn
+ n+szFmkmd294BdxUhRnYr1e8m72jFVm9gqai6pzMtKwOYq8fG0CuNyc25si1czfw7N/Y
+ +/sYeq6SpYLgLZEDp5p7LzIo39oUPb+fseOax4hLlQiteGHc9VO/ob7ujGMu42UtTFBl
+ DebOQEfmX1ZuQXjG9swUY+DeiSHPJstPtLyWBYbGCsFVa9Va1DDKXUVeIrmrpjDu8CQw
+ NSlA==
+X-Gm-Message-State: AOAM531phABeNvUOkgq2YSRiJns7RWsaE7XRPS95wzSeT03eIcH9Wb8v
+ 0/sK599CoieyiVu4mqFid/gSg4QsKk4sOvsfi9Dl5M0cD1yYl9hNkWULCB5IlKD8nAe2vOabF4B
+ 3dYtUa7eknDMfi4Q=
+X-Received: by 2002:a1c:4b17:: with SMTP id y23mr3801291wma.143.1598023918309; 
+ Fri, 21 Aug 2020 08:31:58 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwS0EH8eM4rXMJXMsSUkAdR7TvHqbIoqF8pHhdUYeloX8+IXGvZqSIk6msPeXP9Dhx/ZqR1UQ==
+X-Received: by 2002:a1c:4b17:: with SMTP id y23mr3801275wma.143.1598023918095; 
+ Fri, 21 Aug 2020 08:31:58 -0700 (PDT)
 Received: from localhost.localdomain (121.red-81-40-121.staticip.rima-tde.net.
  [81.40.121.121])
- by smtp.gmail.com with ESMTPSA id k1sm4876329wrw.91.2020.08.21.08.29.25
+ by smtp.gmail.com with ESMTPSA id y84sm6008112wmg.38.2020.08.21.08.31.56
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 21 Aug 2020 08:29:25 -0700 (PDT)
+ Fri, 21 Aug 2020 08:31:57 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH] meson: Do not consider qemu-keymap a 'tool'
-Date: Fri, 21 Aug 2020 17:29:24 +0200
-Message-Id: <20200821152924.1246930-1-philmd@redhat.com>
+Subject: [PATCH v2] meson: Do not consider qemu-keymap a 'tool'
+Date: Fri, 21 Aug 2020 17:31:55 +0200
+Message-Id: <20200821153155.1247675-1-philmd@redhat.com>
 X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
 Authentication-Results: relay.mimecast.com;
@@ -86,17 +85,18 @@ X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8;
 	text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/21 01:00:15
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/21 02:43:55
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
 X-Spam_bar: ----
 X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=unavailable autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -128,28 +128,20 @@ This fixes when configuring with --disable-tools:
   Makefile.ninja:688: recipe for target 'qemu-keymap.p/ui_input-keymap.c.o' failed
   make: *** [qemu-keymap.p/ui_input-keymap.c.o] Error 1
 
+Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- meson.build | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+v2: Move to ui/ (Paolo)
+---
+ meson.build    | 5 -----
+ ui/meson.build | 5 +++++
+ 2 files changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/meson.build b/meson.build
-index 808f50b07ef..4036af7181c 100644
+index 808f50b07ef..709d7e6ccc2 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -1062,6 +1062,11 @@ if 'CONFIG_GUEST_AGENT' in config_host
-   subdir('qga')
- endif
- 
-+if 'CONFIG_XKBCOMMON' in config_host
-+executable('qemu-keymap', files('qemu-keymap.c', 'ui/input-keymap.c'),
-+           dependencies: [qemuutil, xkbcommon], install: true)
-+endif
-+
- if have_tools
-   qemu_img = executable('qemu-img', [files('qemu-img.c'), hxdep],
-              dependencies: [authz, block, crypto, io, qom, qemuutil], install: true)
-@@ -1078,11 +1083,6 @@ if have_tools
+@@ -1078,11 +1078,6 @@ if have_tools
    subdir('contrib/rdmacm-mux')
    subdir('contrib/elf2dmp')
  
@@ -161,6 +153,22 @@ index 808f50b07ef..4036af7181c 100644
    executable('qemu-edid', files('qemu-edid.c', 'hw/display/edid-generate.c'),
               dependencies: qemuutil,
               install: true)
+diff --git a/ui/meson.build b/ui/meson.build
+index 6f74d30ea06..2b7861073ff 100644
+--- a/ui/meson.build
++++ b/ui/meson.build
+@@ -96,6 +96,11 @@ keymaps = [
+ ]
+ 
+ if have_system
++  if 'CONFIG_XKBCOMMON' in config_host
++  executable('qemu-keymap', files('qemu-keymap.c', 'ui/input-keymap.c'),
++             dependencies: [qemuutil, xkbcommon], install: true)
++  endif
++
+   foreach e : keymaps
+     output = 'input-keymap-@0@-to-@1@.c.inc'.format(e[0], e[1])
+     genh += custom_target(output,
 -- 
 2.26.2
 
