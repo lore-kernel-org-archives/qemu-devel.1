@@ -2,106 +2,86 @@ Return-Path: <SRS0=atk5=B7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27197C433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 20:22:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CFFE7C433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 20:34:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D49D620735
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 20:22:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8AF3920791
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 20:34:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fXcT55Mi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D49D620735
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Au5dMfJS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8AF3920791
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45522 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51798 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k9DYM-0000Nv-0h
-	for qemu-devel@archiver.kernel.org; Fri, 21 Aug 2020 16:22:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43272)
+	id 1k9Dk7-0004Bv-Q0
+	for qemu-devel@archiver.kernel.org; Fri, 21 Aug 2020 16:34:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42204)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <sgarzare@redhat.com>)
- id 1k9DXk-0008OJ-BN
- for qemu-devel@nongnu.org; Fri, 21 Aug 2020 16:21:44 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:29931
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <sgarzare@redhat.com>)
- id 1k9DXh-0006Ie-TN
- for qemu-devel@nongnu.org; Fri, 21 Aug 2020 16:21:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598041299;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=xKHuuxWNTmhnT5f4rmQY10C0hGrWah9ThneXvxGLBOs=;
- b=fXcT55Mi/a0ONkmCBclLQv5Cnb7dxK6SbUBLWi6YVMCOkvmedwhIaGqc9wM6mRirQijPwp
- hWHXfRcJLQkJBpJQNfDY0J8JEDIBfZcRKPPMbDx8RHHTCaFKp56z9/JMyrPCNLkZSBgn+F
- LOgcVy/Sp6YpbjEBQOfleQ4Rkcp7QGE=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-274-Wpjxp7PUPjaCLwOoqZhqcQ-1; Fri, 21 Aug 2020 16:21:37 -0400
-X-MC-Unique: Wpjxp7PUPjaCLwOoqZhqcQ-1
-Received: by mail-wr1-f69.google.com with SMTP id o10so925250wrs.21
- for <qemu-devel@nongnu.org>; Fri, 21 Aug 2020 13:21:37 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <alex.j.carter@gmail.com>)
+ id 1k9DUP-0007wT-9b
+ for qemu-devel@nongnu.org; Fri, 21 Aug 2020 16:18:17 -0400
+Received: from mail-qv1-xf2a.google.com ([2607:f8b0:4864:20::f2a]:46494)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.j.carter@gmail.com>)
+ id 1k9DUN-0005qm-CD
+ for qemu-devel@nongnu.org; Fri, 21 Aug 2020 16:18:16 -0400
+Received: by mail-qv1-xf2a.google.com with SMTP id j10so1183879qvo.13
+ for <qemu-devel@nongnu.org>; Fri, 21 Aug 2020 13:18:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:from:date:message-id:subject:to:cc;
+ bh=ghHq/gN6HsAxHxp8Jxfh3H2YZBwkc0Pdir4IW4kIrZ4=;
+ b=Au5dMfJSOign/wgp4D2Sy6AmfRUYWO0xZzhYPp/QK9IIT6yZ+zW4P4YVxlMa041g/L
+ 6Kx+Gpumi+pcBSedV/gEAxVila9kHcIhNw6qg76JphTyK7TbgbCo68fWYBxc/0OpPgIT
+ ve2/0cAeWIxwaQPCK1PxxwnYfIik9lQbUdFeR7AYOloPkgHVFKAN6JWxgoy7qcPQfVWx
+ iI3Dx2+Jj5/KV2+yQoRBY+aHkHASUqc/r8xvRPaXYF1amLKFbOiDityVTp4/kqNwZcxf
+ LrO9QyQ1r6RY4toQypNx06estlkflxRuz+mIfyb/RQ6pjwbVK1DWdXltVxTE2PwwHmwz
+ RVfQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=xKHuuxWNTmhnT5f4rmQY10C0hGrWah9ThneXvxGLBOs=;
- b=czLZ1QqNEGvPyHqlpWU5BjYGzTTLNm4zrIiNtiXm6/h0CWfcqsPzMkzODvncxmZyiF
- Bd7qIgYfKu5Xut9sYll6XpE6Jduqg/jc2r1lQ6NhDZnb4B1Rp/53x3xm8zFfzFaerAPc
- w4+91xaxftOJ4PqRH9AunALmqZ1HkQzp1PPkDjB3xASqnk2vNsswphOvyZSnb4ICOgsP
- tAc/K25F0WH6CBJGm7NXvofpFrEdwqpddT+sLx7QucWRYstSDBd6iVL8pdAw+RE67tPn
- fdjjgmNEJ2KBefs5x/xPlCDYRxsWVl7PcEsbuW36P4Sm1HpPc452ZdIEb1y1QTRGebkY
- NQJQ==
-X-Gm-Message-State: AOAM533wRRG+oYr/fkuvR+F3g4r9RtR88MZNvDbqSQ0fS8O5aLMzLybF
- 01P42qBffJLRpnqMOWTtLTQ2GPW3K7HsIaRpixZyjFmBtaV+EDOeG9os4P/qNa0cA15OlwwLSx+
- rRdCM0X90d3FurAk=
-X-Received: by 2002:a7b:c452:: with SMTP id l18mr2067573wmi.13.1598041296288; 
- Fri, 21 Aug 2020 13:21:36 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy+JP8nf824+RINSedlj0fFNlRDT60fWhn12glX3xfstvCau5bvpfQ72qJ0DoGGnsOfSf8FWw==
-X-Received: by 2002:a7b:c452:: with SMTP id l18mr2067561wmi.13.1598041296022; 
- Fri, 21 Aug 2020 13:21:36 -0700 (PDT)
-Received: from steredhat (host-79-33-191-244.retail.telecomitalia.it.
- [79.33.191.244])
- by smtp.gmail.com with ESMTPSA id y142sm7742938wmd.3.2020.08.21.13.21.34
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 21 Aug 2020 13:21:35 -0700 (PDT)
-Date: Fri, 21 Aug 2020 22:21:32 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Eric Blake <eblake@redhat.com>
-Subject: Re: [PATCH v2] configure: silence 'shift' error message in
- version_ge()
-Message-ID: <20200821202132.ftstmvfh3gltgnrk@steredhat>
-References: <20200821163312.98184-1-sgarzare@redhat.com>
- <27abc546-0edc-caa1-32be-ac5d6cff79e4@redhat.com>
+ h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+ bh=ghHq/gN6HsAxHxp8Jxfh3H2YZBwkc0Pdir4IW4kIrZ4=;
+ b=EhNVGuLn6+Dn9Sr9+gipRVJ+oY2pLJVyWmJNG3PCysBCiaYH4Wjvz4Bmw3+IVVCvD1
+ ZonuZBAGFgbALtq9VAX3W4wjjPKh4OSmfUijjFBRBQLL1epBzxWIqtoWXh651kBWSMlf
+ nc1swwF3omARAsMGxcuDceyI4hYchQiXBJw4wR5EaVmOjOthZJ5BQ8y1AJvOLn1RLdxk
+ bFs4/tf9fCmpUIzAUIXmWiSr5d0KY0v9wMhc8cApTdm7l5ttAbJ4+rS0aViicEGpX9pa
+ XlkyuiBzo3gxicnUCk1CGL8ulH+li0uFXOrnNbUqu87RNg4Y0gcy3MX6aYbGbNSkyMzn
+ z9jg==
+X-Gm-Message-State: AOAM531Tk5EeeCakBakrH0lUAgDl8pVBr8g4zxXY+UsX7ScIRSQSQPnf
+ lZ6RNipIUWY6T/KoR/Odrjm6Pu83wMJHPRK7zdM=
+X-Google-Smtp-Source: ABdhPJzV4r2fZTyLhm42ZLBpZUCqhxnKUKodqMegyD/SQKhCPE+1EN42602rN8rc5QC5P5JEaCQDoZtmofrfvH3oNE8=
+X-Received: by 2002:a05:6214:108a:: with SMTP id
+ o10mr4047491qvr.239.1598041093913; 
+ Fri, 21 Aug 2020 13:18:13 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <27abc546-0edc-caa1-32be-ac5d6cff79e4@redhat.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=sgarzare@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=sgarzare@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/21 01:00:15
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+From: Alex Carter <alex.j.carter@gmail.com>
+Date: Fri, 21 Aug 2020 16:18:03 -0400
+Message-ID: <CAB12sgLhsgu282Ye=m2pjhdq7BE-zy2LHEdfxuxDdDLEas5+Gg@mail.gmail.com>
+Subject: Re: Why QEMU should move from C to Rust (clickbait alert ;))
+To: stefanha@gmail.com
+Content-Type: multipart/alternative; boundary="000000000000bd40b905ad68ef5b"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::f2a;
+ envelope-from=alex.j.carter@gmail.com; helo=mail-qv1-xf2a.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
+X-Mailman-Approved-At: Fri, 21 Aug 2020 16:33:43 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -113,52 +93,201 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Sergio Lopez <slp@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
+ Alexander <alxndr@bu.edu>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ Dave Gilbert <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Aug 21, 2020 at 01:18:54PM -0500, Eric Blake wrote:
-> On 8/21/20 11:33 AM, Stefano Garzarella wrote:
-> > If there are less than 2 arguments in version_ge(), the second
-> > 'shift' prints this error:
-> >      ../configure: line 232: shift: shift count out of range
-> > 
-> > Let's skip it if there are no more arguments.
-> > 
-> > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-> > ---
-> > v2:
-> > - do not shift if there are no more arguments [Peter]
-> > ---
-> >   configure | 2 +-
-> >   1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/configure b/configure
-> > index 4e5fe33211..5f5f370e2c 100755
-> > --- a/configure
-> > +++ b/configure
-> > @@ -229,7 +229,7 @@ version_ge () {
-> >           set x $local_ver1
-> >           local_first=${2-0}
-> >           # shift 2 does nothing if there are less than 2 arguments
-> > -        shift; shift
-> > +        shift; test $# -gt 0 && shift
-> 
-> 
-> That works.  Or you could go with the shorter one-liner:
-> 
-> shift ${2:+2}
+--000000000000bd40b905ad68ef5b
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-yeah, it is better!
+Hi everyone,
 
-I'll send v3.
+My name is Alex, I=E2=80=99m a student at the University of Michigan and I =
+just
+completed an internship at IBM Research. There, I have been working on a
+project very related to this topic. I tested using Cloud Hypervisor=E2=80=
+=99s
+Rust-based vhost-user virtiofs and block devices with QEMU. Bigger picture,
+I wanted to explore the implications of using Rust for vhost-user devices
+in QEMU.
 
-Thanks,
-Stefano
 
+
+I agree with the points from the original post, namely:
+
+=C2=B7      C programming bugs are responsible for a large number of CVEs, =
+and
+specifically CVEs coming from the implementations of virtual devices.
+
+=C2=B7      As a programming language, Rust has matured to a point where it=
+ is
+worth considering it more seriously for production use. It has extensive
+libraries and community support. Many big players in the industry are
+already using Rust for production workloads.
+
+
+
+Full Transparency: the Drawbacks:
+
+It would be deceptive to only showcase Rust in an ideal light.
+
+=C2=B7      The benchmarks I ran show a noticeable performance hit from
+switching to a RustVMM implementation of a virtiofsd device.
+
+=C2=B7      While Rust has matured greatly, it still is missing a bit. One
+example of this that came up was that the rust compiler does not have
+Control Flow Integrity (CFI) features. While these are not as important as
+in =E2=80=9Cunsafe=E2=80=9D languages such as C, the ability to express uns=
+afe portions of
+code does allow for some types of memory bugs =E2=80=93 although to a much =
+lesser
+extent (an interesting case of this surfaced from Firecracker, and the
+handling of mmio [1]). So further protections such as Control Flow
+Integrity can still be desirable, even with rust code.
+
+=C2=B7      There have been years of optimization work put into the C
+implementations of these devices, and it=E2=80=99s hard to evaluate how opt=
+imized
+the relatively novel rust implementations are.
+
+A piece of exciting news is that many of these drawbacks show a pathway for
+future improvement. Improvements to rust infrastructure are very realistic.
+Rust boils down to LLVM just like C, so porting over C=E2=80=99s CFI featur=
+es
+should be feasible. If more development resources are put into the RustVMM
+project, there is no reason their implementations can=E2=80=99t be as optim=
+ized as
+the C versions, and this could be greatly aided by expertise coming from
+the QEMU communities familiarity with these topics.
+
+
+
+I believe vhost-user devices are an excellent place to start since It
+lowers the entry barrier for developing in Rust. The device only has to
+interface with the C-based QEMU binary through a standardized protocol. It
+removes many worries of moving entirely away from C, since adding a set of
+Rust devices would simply be giving more options and room to explore.
+
+
+
+I am putting together the scripts I used for all of the tests at this repo:
+
+https://github.com/Alex-Carter01/Qemu-Rust-Testing
+
+I am working to standardize everything to make it easier to replicate. I
+would love any community involvement if people wanted to see how results
+differ based on the hardware setup, build configuration of the devices etc.
+
+The repo also has links to a recording of my original presentation and the
+slides I was using if you would like to look at that format or see the
+discussion which came out of it.
+
+--000000000000bd40b905ad68ef5b
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div dir=3D"ltr"><p class=3D"MsoNormal" style=3D"font-size=
+:medium;color:rgb(0,0,0);margin:0in;font-family:Calibri,sans-serif">Hi ever=
+yone,<span></span></p><p class=3D"MsoNormal" style=3D"font-size:medium;colo=
+r:rgb(0,0,0);margin:0in;font-family:Calibri,sans-serif">My name is Alex, I=
+=E2=80=99m a student at the University of Michigan and I just completed an =
+internship at IBM Research. There, I have been working on a project very re=
+lated to this topic. I tested using Cloud Hypervisor=E2=80=99s Rust-based v=
+host-user virtiofs and block devices with QEMU. Bigger picture, I wanted to=
+ explore the implications of using Rust for vhost-user devices in QEMU.=C2=
+=A0<span></span></p><p class=3D"MsoNormal" style=3D"font-size:medium;color:=
+rgb(0,0,0);margin:0in;font-family:Calibri,sans-serif"><span>=C2=A0</span></=
+p><p class=3D"MsoNormal" style=3D"font-size:medium;color:rgb(0,0,0);margin:=
+0in;font-family:Calibri,sans-serif">I agree with the points from the origin=
+al post, namely:<span></span></p><p class=3D"gmail-MsoListParagraphCxSpFirs=
+t" style=3D"margin:0in 0in 0in 0.5in;font-size:12pt;font-family:Calibri,san=
+s-serif"><span style=3D"font-family:Symbol">=C2=B7<span style=3D"font-stret=
+ch:normal;font-size:7pt;line-height:normal;font-family:&quot;Times New Roma=
+n&quot;">=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0</span></span>C programming bu=
+gs are responsible for a large number of CVEs, and specifically CVEs coming=
+ from the implementations of virtual devices.=C2=A0<span></span></p><p clas=
+s=3D"gmail-MsoListParagraphCxSpMiddle" style=3D"margin:0in 0in 0in 0.5in;fo=
+nt-size:12pt;font-family:Calibri,sans-serif"><span style=3D"font-family:Sym=
+bol">=C2=B7<span style=3D"font-stretch:normal;font-size:7pt;line-height:nor=
+mal;font-family:&quot;Times New Roman&quot;">=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0</span></span>As a programming language, Rust has matured to a point =
+where it is worth considering it more seriously for production use. It has =
+extensive libraries and community support. Many big players in the industry=
+ are already using Rust for production workloads.<span></span></p><p class=
+=3D"gmail-MsoListParagraphCxSpMiddle" style=3D"margin:0in;font-size:medium;=
+color:rgb(0,0,0);font-family:Calibri,sans-serif"><span>=C2=A0</span></p><p =
+class=3D"gmail-MsoListParagraphCxSpMiddle" style=3D"margin:0in;font-size:me=
+dium;color:rgb(0,0,0);font-family:Calibri,sans-serif">Full Transparency: th=
+e Drawbacks:<span></span></p><p class=3D"gmail-MsoListParagraphCxSpMiddle" =
+style=3D"margin:0in;font-size:medium;color:rgb(0,0,0);font-family:Calibri,s=
+ans-serif">It would be deceptive to only showcase Rust in an ideal light.=
+=C2=A0<span></span></p><p class=3D"gmail-MsoListParagraphCxSpMiddle" style=
+=3D"margin:0in 0in 0in 0.5in;font-size:12pt;font-family:Calibri,sans-serif"=
+><span style=3D"font-family:Symbol">=C2=B7<span style=3D"font-stretch:norma=
+l;font-size:7pt;line-height:normal;font-family:&quot;Times New Roman&quot;"=
+>=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0</span></span>The benchmarks I ran sho=
+w a noticeable performance hit from switching to a RustVMM implementation o=
+f a virtiofsd device.=C2=A0<span></span></p><p class=3D"gmail-MsoListParagr=
+aphCxSpMiddle" style=3D"margin:0in 0in 0in 0.5in;font-size:12pt;font-family=
+:Calibri,sans-serif"><span style=3D"font-family:Symbol">=C2=B7<span style=
+=3D"font-stretch:normal;font-size:7pt;line-height:normal;font-family:&quot;=
+Times New Roman&quot;">=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0</span></span>Wh=
+ile Rust has matured greatly, it still is missing a bit. One example of thi=
+s that came up was that the rust compiler does not have Control Flow Integr=
+ity (CFI) features. While these are not as important as in =E2=80=9Cunsafe=
+=E2=80=9D languages such as C, the ability to express unsafe portions of co=
+de does allow for some types of memory bugs =E2=80=93 although to a much le=
+sser extent (an interesting case of this surfaced from Firecracker, and the=
+ handling of mmio [1]). So further protections such as Control Flow Integri=
+ty can still be desirable, even with rust code.<span></span></p><p class=3D=
+"gmail-MsoListParagraphCxSpLast" style=3D"margin:0in 0in 0in 0.5in;font-siz=
+e:12pt;font-family:Calibri,sans-serif"><span style=3D"font-family:Symbol">=
+=C2=B7<span style=3D"font-stretch:normal;font-size:7pt;line-height:normal;f=
+ont-family:&quot;Times New Roman&quot;">=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0</span></span>There have been years of optimization work put into the C =
+implementations of these devices, and it=E2=80=99s hard to evaluate how opt=
+imized the relatively novel rust implementations are.<span></span></p><p cl=
+ass=3D"MsoNormal" style=3D"font-size:medium;color:rgb(0,0,0);margin:0in;fon=
+t-family:Calibri,sans-serif">A piece of exciting news is that many of these=
+ drawbacks show a pathway for future improvement. Improvements to rust infr=
+astructure are very realistic. Rust boils down to LLVM just like C, so port=
+ing over C=E2=80=99s CFI features should be feasible. If more development r=
+esources are put into the RustVMM project, there is no reason their impleme=
+ntations can=E2=80=99t be as optimized as the C versions, and this could be=
+ greatly aided by expertise coming from the QEMU communities familiarity wi=
+th these topics.<span></span></p><p class=3D"MsoNormal" style=3D"font-size:=
+medium;color:rgb(0,0,0);margin:0in;font-family:Calibri,sans-serif"><span>=
+=C2=A0</span></p><p class=3D"MsoNormal" style=3D"font-size:medium;color:rgb=
+(0,0,0);margin:0in;font-family:Calibri,sans-serif">I believe vhost-user dev=
+ices are an excellent place to start since It lowers the entry barrier for =
+developing in Rust. The device only has to interface with the C-based QEMU =
+binary through a standardized protocol. It removes many worries of moving e=
+ntirely away from C, since adding a set of Rust devices would simply be giv=
+ing more options and room to explore.=C2=A0<span></span></p><p class=3D"Mso=
+Normal" style=3D"font-size:medium;color:rgb(0,0,0);margin:0in;font-family:C=
+alibri,sans-serif"><span>=C2=A0</span></p><p class=3D"MsoNormal" style=3D"f=
+ont-size:medium;color:rgb(0,0,0);margin:0in;font-family:Calibri,sans-serif"=
+>I am putting together the scripts I used for all of the tests at this repo=
+:<span></span></p><p class=3D"MsoNormal" style=3D"font-size:medium;color:rg=
+b(0,0,0);margin:0in;font-family:Calibri,sans-serif"><a href=3D"https://gith=
+ub.com/Alex-Carter01/Qemu-Rust-Testing" style=3D"color:rgb(149,79,114);text=
+-decoration:underline">https://github.com/Alex-Carter01/Qemu-Rust-Testing</=
+a><span></span></p><p class=3D"MsoNormal" style=3D"font-size:medium;color:r=
+gb(0,0,0);margin:0in;font-family:Calibri,sans-serif">I am working to standa=
+rdize everything to make it easier to replicate. I would love any community=
+ involvement if people wanted to see how results differ based on the hardwa=
+re setup, build configuration of the devices etc.<span></span></p><p class=
+=3D"MsoNormal" style=3D"font-size:medium;color:rgb(0,0,0);margin:0in;font-f=
+amily:Calibri,sans-serif">The repo also has links to a recording of my orig=
+inal presentation and the slides I was using if you would like to look at t=
+hat format or see the discussion which came out of it.<span></span></p></di=
+v></div>
+
+--000000000000bd40b905ad68ef5b--
 
