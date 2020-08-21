@@ -2,85 +2,121 @@ Return-Path: <SRS0=atk5=B7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2472FC433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 11:34:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 929A6C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 11:34:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E484C20720
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 11:34:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6217C20720
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 11:34:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Tkp+OQow"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E484C20720
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="csLI32PN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6217C20720
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53494 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53826 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k95Ja-0005HN-4l
-	for qemu-devel@archiver.kernel.org; Fri, 21 Aug 2020 07:34:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34384)
+	id 1k95Jc-0005Qc-LH
+	for qemu-devel@archiver.kernel.org; Fri, 21 Aug 2020 07:34:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37862)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1k94KM-0007x2-9Q
- for qemu-devel@nongnu.org; Fri, 21 Aug 2020 06:31:18 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:21311
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k94dj-0007Ld-V7
+ for qemu-devel@nongnu.org; Fri, 21 Aug 2020 06:51:20 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:21452
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1k94KJ-0002vD-VD
- for qemu-devel@nongnu.org; Fri, 21 Aug 2020 06:31:17 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k94dg-00056k-HW
+ for qemu-devel@nongnu.org; Fri, 21 Aug 2020 06:51:18 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598005874;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
+ s=mimecast20190719; t=1598007075;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Fa3ZE2viBRz5vzvmvDpSQbVXv8jRGMA4oktFM+AV9fA=;
- b=Tkp+OQowXKj++M6slVxqV80umsCw5YMY/9ormoVd6qTWunJboXadBhxqtfSB7+Lh3gE35k
- 8dg8k271YywZRlkT2yVHKBH7b7Rt66sMPgrxW4FcuQp6oWFnoiSDI9uF0WOsYwCCg+2HjD
- txOJP930N8sc0revCRAYMjJoHOyuUeQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-411-HH_2FoxNO-GhaIJyEpN2NA-1; Fri, 21 Aug 2020 06:31:11 -0400
-X-MC-Unique: HH_2FoxNO-GhaIJyEpN2NA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2E1EA80733A;
- Fri, 21 Aug 2020 10:31:10 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.110.21])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 43F027A431;
- Fri, 21 Aug 2020 10:31:08 +0000 (UTC)
-Date: Fri, 21 Aug 2020 11:31:05 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Subject: Re: [PATCH v2] configure: add support for pseudo-"in source tree"
- builds
-Message-ID: <20200821103105.GI251583@redhat.com>
-References: <20200820173124.243984-1-berrange@redhat.com>
- <20200821101753.GC5153@linux.fritz.box>
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=gDjoGraokWvDw6WeO/Ilabe6thW/R3AW97b5+0TZ3BM=;
+ b=csLI32PNDVPjakQyXgho13jyDRSyKdveqbV5s32G8L+h0aPTfPdUGvUnMOYZnItGTmvU43
+ xpGXqRSvtN/pfZzBDzyVoZCGR0TlH+fgZwLa7TbnQO/vCRu3m6O275LVv5MEs1EiTXz3QA
+ /BBWoxQUvyzU1TUsyIWp031fGE9nIJA=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-428-iw8xGmkgPQaAwXDeMnr75w-1; Fri, 21 Aug 2020 06:51:11 -0400
+X-MC-Unique: iw8xGmkgPQaAwXDeMnr75w-1
+Received: by mail-wm1-f71.google.com with SMTP id c186so800762wmd.9
+ for <qemu-devel@nongnu.org>; Fri, 21 Aug 2020 03:51:11 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=gDjoGraokWvDw6WeO/Ilabe6thW/R3AW97b5+0TZ3BM=;
+ b=KxQDn/EyiuuHxxf0jktEri9vG/qeQbWPteJX7TZaeRCqzNJMfyav0Vm3CD/C6vd8/C
+ 8lNT6YNoHeOwA5stWWDG9ZkeiC+KZ9uSxj0YAiop9Fb+8077Dk4RU+fWzlqNBRZxN2B/
+ tFI3lBb7I62HBpX6TTPMUsyMnOnNNsrHA2UkSHw19KmhR9LLAAkZCbsN0FK+6skYP40S
+ 60LzZ4FSftCk2IKRTaQHsXoT9eIJo1u4mrtiXD8ritDFCpc9HjkCOh6Phc3tCucMtHtZ
+ r9+pWr7O6HCKknq87Z8YZXK578SznE8tPMxydD52qfNRsTZjBsC7Euu0dTlYrRxSVyD8
+ Lthw==
+X-Gm-Message-State: AOAM530gmIfiwTepeIaRoi0p1u864ou9MeYc9XHu6paGOb9Hga0Jd8HI
+ LhRPGUe4PyUuIUHUdKxn+Oyz/aNBCJ9m7VA+ZkFRmbzj83diQ0Dlh5Yorz5b6ME/P4g+uisFit3
+ 9KRXT77WcmEEOWR4=
+X-Received: by 2002:adf:b302:: with SMTP id j2mr2172531wrd.294.1598007070186; 
+ Fri, 21 Aug 2020 03:51:10 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyXG60OZPiAbWPAAf5z6w4TetreHSPc4aGjoeWSBehmhOicYDnWCZ0ynQw9k10IWwnZyrHj3A==
+X-Received: by 2002:adf:b302:: with SMTP id j2mr2172517wrd.294.1598007069922; 
+ Fri, 21 Aug 2020 03:51:09 -0700 (PDT)
+Received: from [192.168.1.36] (121.red-81-40-121.staticip.rima-tde.net.
+ [81.40.121.121])
+ by smtp.gmail.com with ESMTPSA id f6sm5376635wme.32.2020.08.21.03.51.08
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 21 Aug 2020 03:51:09 -0700 (PDT)
+Subject: Re: [PATCH] cirrus: handle wraparound in cirrus_invalidate_region
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+References: <20200821082622.7169-1-kraxel@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <0fb2b10e-320f-9b33-6812-f1c5d06b0563@redhat.com>
+Date: Fri, 21 Aug 2020 12:51:08 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200821101753.GC5153@linux.fritz.box>
-User-Agent: Mutt/1.14.5 (2020-06-23)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <20200821082622.7169-1-kraxel@redhat.com>
+Content-Language: en-US
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
 X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=berrange@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/21 05:15:56
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/20 23:41:39
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
@@ -88,7 +124,7 @@ X-Spam_bar: ----
 X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,90 +137,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Alexander Bulekov <alxndr@bu.edu>, Li Qiang <liq3ea@163.com>,
+ Prasad J Pandit <pjp@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Aug 21, 2020 at 12:17:53PM +0200, Kevin Wolf wrote:
-> Am 20.08.2020 um 19:31 hat Daniel P. BerrangÃÂ© geschrieben:
-> > Meson requires the build dir to be separate from the source tree. Many
-> > people are used to just running "./configure && make" though and the
-> > meson conversion breaks that.
-> > 
-> > This introduces some backcompat support to make it appear as if an
-> > "in source tree" build is being done, but with the the results in the
-> > "build/" directory. This allows "./configure && make" to work as it
-> > did historically, albeit with the output binaries staying under build/.
-> > 
-> > Signed-off-by: Daniel P. BerrangÃÂ© <berrange@redhat.com>
-> > ---
-> > 
-> > This is a simple integration of Eric's proposal from
-> > 
-> >   https://lists.gnu.org/archive/html/qemu-devel/2020-03/msg07290.html
-> > 
-> > with a bit of configure magic. It is enough to enable
-> > 
-> >    ./configure
-> >    make
-> >    make check
-> > 
-> > I've not tested it beyond that. Note it blows away the "build/"
-> > dir each time ./configure is run so it is pristine each time.
+On 8/21/20 10:26 AM, Gerd Hoffmann wrote:
+> Code simply asserts that there is no wraparound instead of handling
+> it properly.  The assert() can be triggered by the guest (must be
+> privilidged inside the guest though).  Fix it.
+
+Thanks for fixing this!
+
+> Buglink: https://bugs.launchpad.net/qemu/+bug/1880189
+> Cc: Li Qiang <liq3ea@163.com>
+> Reported-by: Alexander Bulekov <alxndr@bu.edu>
+
+Well, I reported this one 3 months ago to secalert, not Alex.
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+>  hw/display/cirrus_vga.c | 11 ++++++++---
+>  1 file changed, 8 insertions(+), 3 deletions(-)
 > 
-> I guess "make install" is the only other one that normal users would
-> care about. We shoud make sure that it works (I don't see why it
-> wouldn't, but worth testing anyway).
-
-I've just tested  "make instal DESTDIR=`pwd`/vroot" in order to
-validate that variables are passed through too, and it appears to
-be succesful.
-
-$  make install DESTDIR=`pwd`/vroot
-...snip...
-$ find vroot/ | head -30
-vroot/
-vroot/usr
-vroot/usr/local
-vroot/usr/local/bin
-vroot/usr/local/bin/qemu-nbd
-vroot/usr/local/bin/qemu-keymap
-vroot/usr/local/bin/qemu-pr-helper
-vroot/usr/local/bin/qemu-storage-daemon
-vroot/usr/local/bin/elf2dmp
-vroot/usr/local/bin/qemu-img
-vroot/usr/local/bin/qemu-edid
-vroot/usr/local/bin/qemu-system-x86_64
-vroot/usr/local/bin/qemu-ga
-vroot/usr/local/bin/qemu-io
-vroot/usr/local/var
-vroot/usr/local/var/run
-vroot/usr/local/libexec
-vroot/usr/local/libexec/vhost-user-gpu
-vroot/usr/local/libexec/qemu-bridge-helper
-vroot/usr/local/libexec/virtfs-proxy-helper
-vroot/usr/local/libexec/virtiofsd
-vroot/usr/local/share
-vroot/usr/local/share/icons
-vroot/usr/local/share/icons/hicolor
-vroot/usr/local/share/icons/hicolor/256x256
-vroot/usr/local/share/icons/hicolor/256x256/apps
-vroot/usr/local/share/icons/hicolor/256x256/apps/qemu.png
-vroot/usr/local/share/icons/hicolor/48x48
-vroot/usr/local/share/icons/hicolor/48x48/apps
-vroot/usr/local/share/icons/hicolor/48x48/apps/qemu.png
-...snip...
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+> diff --git a/hw/display/cirrus_vga.c b/hw/display/cirrus_vga.c
+> index 212d6f5e6145..b91b64347473 100644
+> --- a/hw/display/cirrus_vga.c
+> +++ b/hw/display/cirrus_vga.c
+> @@ -640,10 +640,15 @@ static void cirrus_invalidate_region(CirrusVGAState * s, int off_begin,
+>      }
+>  
+>      for (y = 0; y < lines; y++) {
+> -        off_cur = off_begin;
+> +        off_cur = off_begin & s->cirrus_addr_mask;
+>          off_cur_end = ((off_cur + bytesperline - 1) & s->cirrus_addr_mask) + 1;
+> -        assert(off_cur_end >= off_cur);
+> -        memory_region_set_dirty(&s->vga.vram, off_cur, off_cur_end - off_cur);
+> +        if (off_cur_end >= off_cur) {
+> +            memory_region_set_dirty(&s->vga.vram, off_cur, off_cur_end - off_cur);
+> +        } else {
+> +            /* wraparound */
+> +            memory_region_set_dirty(&s->vga.vram, off_cur, s->cirrus_addr_mask - off_cur);
+> +            memory_region_set_dirty(&s->vga.vram, 0, off_cur_end);
+> +        }
+>          off_begin += off_pitch;
+>      }
+>  }
+> 
 
 
