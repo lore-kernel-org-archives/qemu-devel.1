@@ -7,76 +7,76 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34AE2C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 11:18:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63F7AC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 11:19:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E777E2072D
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 11:18:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2EA392072D
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 11:19:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SVtm+khg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E777E2072D
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BBP6BCCY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2EA392072D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47870 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50550 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k954U-0002HI-3b
-	for qemu-devel@archiver.kernel.org; Fri, 21 Aug 2020 07:18:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32996)
+	id 1k954u-0003LG-Bh
+	for qemu-devel@archiver.kernel.org; Fri, 21 Aug 2020 07:19:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32946)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k94Eg-0003cw-AT
- for qemu-devel@nongnu.org; Fri, 21 Aug 2020 06:25:26 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54955
+ id 1k94Ee-0003Zz-Hr
+ for qemu-devel@nongnu.org; Fri, 21 Aug 2020 06:25:24 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40963
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k94EU-0001un-Qf
- for qemu-devel@nongnu.org; Fri, 21 Aug 2020 06:25:25 -0400
+ id 1k94EO-0001nZ-Uj
+ for qemu-devel@nongnu.org; Fri, 21 Aug 2020 06:25:24 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598005513;
+ s=mimecast20190719; t=1598005503;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=RNT/jS4WliFELB3Y4N1skk3//tCoNoB/v6xjsu+GKJM=;
- b=SVtm+khgJNNHfIbB7rEiorufINUL2erU4+Dxdbxvtgb7Gy21QpIn3gc9rV1dGjQm970fee
- 0aUhjAAk8+AyPRGhNT8MHkpB3YdpPNEieFYkwqoKl2x5YltrKW8pcrPR3A8Egy2Qsd/3WJ
- EfatzmDsYEhoE4Hnh/L1M8Do5M3wLJY=
+ bh=jOIdmTH1CYl8LnZvB8zBwKIw7Tiq/rsBYfxJzBvBBYc=;
+ b=BBP6BCCYmpQjP/VdmWAEZNjLc09wAPwJpTT/pdHh24P0WHX3aDeBwuEdqDD1fxsPIc3ndz
+ +NHTE8uZ7cAfK0bKh80trvb1yKkV2HVO7/Uep5Hxzxa6CwAMxGfKb5gO2ln2z7vL5PjJnn
+ MCQ7GGqQeLNmpXTpasgI9NYQUfF1qWM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-10-i3zxzCblOeK14KsPaGXxvQ-1; Fri, 21 Aug 2020 06:25:11 -0400
-X-MC-Unique: i3zxzCblOeK14KsPaGXxvQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-187-XJd3qz7YNUmBqMn5wqBrDQ-1; Fri, 21 Aug 2020 06:25:00 -0400
+X-MC-Unique: XJd3qz7YNUmBqMn5wqBrDQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DBED781F036
- for <qemu-devel@nongnu.org>; Fri, 21 Aug 2020 10:25:10 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F3801191E2A2;
+ Fri, 21 Aug 2020 10:24:59 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 95D4610098AE;
- Fri, 21 Aug 2020 10:25:10 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8DF1B60BF1;
+ Fri, 21 Aug 2020 10:24:59 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v8 122/152] meson: convert hw/char
-Date: Fri, 21 Aug 2020 06:22:59 -0400
-Message-Id: <20200821102329.29777-123-pbonzini@redhat.com>
+Subject: [PULL v8 111/152] meson: convert hw/ipmi
+Date: Fri, 21 Aug 2020 06:22:48 -0400
+Message-Id: <20200821102329.29777-112-pbonzini@redhat.com>
 In-Reply-To: <20200821102329.29777-1-pbonzini@redhat.com>
 References: <20200821102329.29777-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/20 23:41:39
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/21 04:55:47
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
@@ -97,7 +97,8 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ Corey Minyard <cminyard@mvista.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -105,126 +106,70 @@ Sender: "Qemu-devel"
 From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Corey Minyard <cminyard@mvista.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
  hw/Makefile.objs      |  1 -
- hw/char/Makefile.objs | 39 ---------------------------------------
- hw/char/meson.build   | 38 ++++++++++++++++++++++++++++++++++++++
+ hw/ipmi/Makefile.objs |  8 --------
+ hw/ipmi/meson.build   | 11 +++++++++++
  hw/meson.build        |  1 +
- 4 files changed, 39 insertions(+), 40 deletions(-)
- delete mode 100644 hw/char/Makefile.objs
- create mode 100644 hw/char/meson.build
+ 4 files changed, 12 insertions(+), 9 deletions(-)
+ delete mode 100644 hw/ipmi/Makefile.objs
+ create mode 100644 hw/ipmi/meson.build
 
 diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-index 97ad30295e..04cfb6ca6d 100644
+index a28e211e78..f136377866 100644
 --- a/hw/Makefile.objs
 +++ b/hw/Makefile.objs
-@@ -4,7 +4,6 @@ devices-dirs-y += acpi/
- devices-dirs-y += adc/
- devices-dirs-y += audio/
- devices-dirs-y += block/
--devices-dirs-y += char/
+@@ -15,7 +15,6 @@ devices-dirs-y += ide/
+ devices-dirs-y += input/
+ devices-dirs-y += intc/
+ devices-dirs-$(CONFIG_IPACK) += ipack/
+-devices-dirs-$(CONFIG_IPMI) += ipmi/
  endif
  
  common-obj-y += $(devices-dirs-y)
-diff --git a/hw/char/Makefile.objs b/hw/char/Makefile.objs
+diff --git a/hw/ipmi/Makefile.objs b/hw/ipmi/Makefile.objs
 deleted file mode 100644
-index bf177ac41d..0000000000
---- a/hw/char/Makefile.objs
+index 3cca10bc50..0000000000
+--- a/hw/ipmi/Makefile.objs
 +++ /dev/null
-@@ -1,39 +0,0 @@
--common-obj-$(CONFIG_IPACK) += ipoctal232.o
--common-obj-$(CONFIG_ESCC) += escc.o
--common-obj-$(CONFIG_NRF51_SOC) += nrf51_uart.o
--common-obj-$(CONFIG_PARALLEL) += parallel.o
--common-obj-$(CONFIG_ISA_BUS) += parallel-isa.o
--common-obj-$(CONFIG_PL011) += pl011.o
--common-obj-$(CONFIG_SERIAL) += serial.o
--common-obj-$(CONFIG_SERIAL_ISA) += serial-isa.o
--common-obj-$(CONFIG_SERIAL_PCI) += serial-pci.o
--common-obj-$(CONFIG_SERIAL_PCI_MULTI) += serial-pci-multi.o
--common-obj-$(CONFIG_VIRTIO_SERIAL) += virtio-console.o
--common-obj-$(CONFIG_XILINX) += xilinx_uartlite.o
--common-obj-$(CONFIG_XEN) += xen_console.o
--common-obj-$(CONFIG_CADENCE) += cadence_uart.o
--common-obj-$(CONFIG_IBEX) += ibex_uart.o
--
--common-obj-$(CONFIG_EXYNOS4) += exynos4210_uart.o
--common-obj-$(CONFIG_COLDFIRE) += mcf_uart.o
--common-obj-$(CONFIG_OMAP) += omap_uart.o
--common-obj-$(CONFIG_SH4) += sh_serial.o
--common-obj-$(CONFIG_DIGIC) += digic-uart.o
--common-obj-$(CONFIG_STM32F2XX_USART) += stm32f2xx_usart.o
--common-obj-$(CONFIG_RASPI) += bcm2835_aux.o
--common-obj-$(CONFIG_RENESAS_SCI) += renesas_sci.o
--common-obj-$(CONFIG_AVR_USART) += avr_usart.o
--
--common-obj-$(CONFIG_CMSDK_APB_UART) += cmsdk-apb-uart.o
--common-obj-$(CONFIG_ETRAXFS) += etraxfs_ser.o
--common-obj-$(CONFIG_ISA_DEBUG) += debugcon.o
--common-obj-$(CONFIG_GRLIB) += grlib_apbuart.o
--common-obj-$(CONFIG_IMX) += imx_serial.o
--common-obj-$(CONFIG_LM32) += lm32_juart.o
--common-obj-$(CONFIG_LM32) += lm32_uart.o
--common-obj-$(CONFIG_MILKYMIST) += milkymist-uart.o
--common-obj-$(CONFIG_SCLPCONSOLE) += sclpconsole.o sclpconsole-lm.o
--
--obj-$(CONFIG_VIRTIO) += virtio-serial-bus.o
--obj-$(CONFIG_PSERIES) += spapr_vty.o
--obj-$(CONFIG_TERMINAL3270) += terminal3270.o
-diff --git a/hw/char/meson.build b/hw/char/meson.build
+@@ -1,8 +0,0 @@
+-common-obj-$(CONFIG_IPMI) += ipmi.o ipmi_kcs.o ipmi_bt.o
+-common-obj-$(CONFIG_IPMI_LOCAL) += ipmi_bmc_sim.o
+-common-obj-$(CONFIG_IPMI_EXTERN) += ipmi_bmc_extern.o
+-common-obj-$(CONFIG_ISA_IPMI_KCS) += isa_ipmi_kcs.o
+-common-obj-$(CONFIG_PCI_IPMI_KCS) += pci_ipmi_kcs.o
+-common-obj-$(CONFIG_ISA_IPMI_BT) += isa_ipmi_bt.o
+-common-obj-$(CONFIG_PCI_IPMI_BT) += pci_ipmi_bt.o
+-common-obj-$(CONFIG_IPMI_SSIF) += smbus_ipmi.o
+diff --git a/hw/ipmi/meson.build b/hw/ipmi/meson.build
 new file mode 100644
-index 0000000000..e888215145
+index 0000000000..9622ea2a2c
 --- /dev/null
-+++ b/hw/char/meson.build
-@@ -0,0 +1,38 @@
-+softmmu_ss.add(when: 'CONFIG_CADENCE', if_true: files('cadence_uart.c'))
-+softmmu_ss.add(when: 'CONFIG_CMSDK_APB_UART', if_true: files('cmsdk-apb-uart.c'))
-+softmmu_ss.add(when: 'CONFIG_ESCC', if_true: files('escc.c'))
-+softmmu_ss.add(when: 'CONFIG_ETRAXFS', if_true: files('etraxfs_ser.c'))
-+softmmu_ss.add(when: 'CONFIG_GRLIB', if_true: files('grlib_apbuart.c'))
-+softmmu_ss.add(when: 'CONFIG_IBEX', if_true: files('ibex_uart.c'))
-+softmmu_ss.add(when: 'CONFIG_IMX', if_true: files('imx_serial.c'))
-+softmmu_ss.add(when: 'CONFIG_IPACK', if_true: files('ipoctal232.c'))
-+softmmu_ss.add(when: 'CONFIG_ISA_BUS', if_true: files('parallel-isa.c'))
-+softmmu_ss.add(when: 'CONFIG_ISA_DEBUG', if_true: files('debugcon.c'))
-+softmmu_ss.add(when: 'CONFIG_LM32', if_true: files('lm32_juart.c'))
-+softmmu_ss.add(when: 'CONFIG_LM32', if_true: files('lm32_uart.c'))
-+softmmu_ss.add(when: 'CONFIG_MILKYMIST', if_true: files('milkymist-uart.c'))
-+softmmu_ss.add(when: 'CONFIG_NRF51_SOC', if_true: files('nrf51_uart.c'))
-+softmmu_ss.add(when: 'CONFIG_PARALLEL', if_true: files('parallel.c'))
-+softmmu_ss.add(when: 'CONFIG_PL011', if_true: files('pl011.c'))
-+softmmu_ss.add(when: 'CONFIG_SCLPCONSOLE', if_true: files('sclpconsole.c', 'sclpconsole-lm.c'))
-+softmmu_ss.add(when: 'CONFIG_SERIAL', if_true: files('serial.c'))
-+softmmu_ss.add(when: 'CONFIG_SERIAL_ISA', if_true: files('serial-isa.c'))
-+softmmu_ss.add(when: 'CONFIG_SERIAL_PCI', if_true: files('serial-pci.c'))
-+softmmu_ss.add(when: 'CONFIG_SERIAL_PCI_MULTI', if_true: files('serial-pci-multi.c'))
-+softmmu_ss.add(when: 'CONFIG_VIRTIO_SERIAL', if_true: files('virtio-console.c'))
-+softmmu_ss.add(when: 'CONFIG_XEN', if_true: files('xen_console.c'))
-+softmmu_ss.add(when: 'CONFIG_XILINX', if_true: files('xilinx_uartlite.c'))
++++ b/hw/ipmi/meson.build
+@@ -0,0 +1,11 @@
++ipmi_ss = ss.source_set()
++ipmi_ss.add(when: 'CONFIG_IPMI', if_true: files('ipmi.c', 'ipmi_kcs.c', 'ipmi_bt.c'))
++ipmi_ss.add(when: 'CONFIG_IPMI_LOCAL', if_true: files('ipmi_bmc_sim.c'))
++ipmi_ss.add(when: 'CONFIG_IPMI_EXTERN', if_true: files('ipmi_bmc_extern.c'))
++ipmi_ss.add(when: 'CONFIG_ISA_IPMI_KCS', if_true: files('isa_ipmi_kcs.c'))
++ipmi_ss.add(when: 'CONFIG_PCI_IPMI_KCS', if_true: files('pci_ipmi_kcs.c'))
++ipmi_ss.add(when: 'CONFIG_ISA_IPMI_BT', if_true: files('isa_ipmi_bt.c'))
++ipmi_ss.add(when: 'CONFIG_PCI_IPMI_BT', if_true: files('pci_ipmi_bt.c'))
++ipmi_ss.add(when: 'CONFIG_IPMI_SSIF', if_true: files('smbus_ipmi.c'))
 +
-+softmmu_ss.add(when: 'CONFIG_AVR_USART', if_true: files('avr_usart.c'))
-+softmmu_ss.add(when: 'CONFIG_COLDFIRE', if_true: files('mcf_uart.c'))
-+softmmu_ss.add(when: 'CONFIG_DIGIC', if_true: files('digic-uart.c'))
-+softmmu_ss.add(when: 'CONFIG_EXYNOS4', if_true: files('exynos4210_uart.c'))
-+softmmu_ss.add(when: 'CONFIG_OMAP', if_true: files('omap_uart.c'))
-+softmmu_ss.add(when: 'CONFIG_RASPI', if_true: files('bcm2835_aux.c'))
-+softmmu_ss.add(when: 'CONFIG_RENESAS_SCI', if_true: files('renesas_sci.c'))
-+softmmu_ss.add(when: 'CONFIG_SH4', if_true: files('sh_serial.c'))
-+softmmu_ss.add(when: 'CONFIG_STM32F2XX_USART', if_true: files('stm32f2xx_usart.c'))
-+
-+specific_ss.add(when: 'CONFIG_TERMINAL3270', if_true: files('terminal3270.c'))
-+specific_ss.add(when: 'CONFIG_VIRTIO', if_true: files('virtio-serial-bus.c'))
-+specific_ss.add(when: 'CONFIG_PSERIES', if_true: files('spapr_vty.c'))
++softmmu_ss.add_all(when: 'CONFIG_IPMI', if_true: ipmi_ss)
 diff --git a/hw/meson.build b/hw/meson.build
-index 103da4840b..dd0c77ec2b 100644
+index 86598544e6..9796f95e5c 100644
 --- a/hw/meson.build
 +++ b/hw/meson.build
-@@ -1,3 +1,4 @@
-+subdir('char')
+@@ -1,4 +1,5 @@
  subdir('core')
- subdir('cpu')
- subdir('display')
++subdir('ipmi')
+ subdir('isa')
+ subdir('mem')
+ subdir('misc')
 -- 
 2.26.2
 
