@@ -2,83 +2,69 @@ Return-Path: <SRS0=atk5=B7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB533C433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 11:48:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C43FEC433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 11:50:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A3BA820732
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 11:48:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8CD16204EC
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 11:50:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=yadro.com header.i=@yadro.com header.b="K5I+qVLa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3BA820732
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yadro.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="HGctZZXs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8CD16204EC
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57468 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34950 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k95XD-0004pl-U8
-	for qemu-devel@archiver.kernel.org; Fri, 21 Aug 2020 07:48:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43820)
+	id 1k95Yx-0007EF-TD
+	for qemu-devel@archiver.kernel.org; Fri, 21 Aug 2020 07:50:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47444)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
- id 1k959M-0006eL-VY
- for qemu-devel@nongnu.org; Fri, 21 Aug 2020 07:24:01 -0400
-Received: from mta-02.yadro.com ([89.207.88.252]:59424 helo=mta-01.yadro.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
- id 1k959L-0000Lz-5w
- for qemu-devel@nongnu.org; Fri, 21 Aug 2020 07:24:00 -0400
-Received: from localhost (unknown [127.0.0.1])
- by mta-01.yadro.com (Postfix) with ESMTP id 3AE8E56774;
- Fri, 21 Aug 2020 11:23:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=yadro.com; h=
- in-reply-to:content-transfer-encoding:content-disposition
- :content-type:content-type:mime-version:references:message-id
- :subject:subject:from:from:date:date:received:received:received;
- s=mta-01; t=1598009036; x=1599823437; bh=8IS/00VtCUA9BCDC4FUtY0
- BvBTW6Mt7QKwHWtZ50nxI=; b=K5I+qVLaIG0D0X+uqJR19EGjWg2iRMhaEgCOnA
- 7mLJUqfaK1RHhCmG0XE46NIUBj0hdGl66y2UWR9oV8rvR8K6MECa+CYm6/NcuQAd
- KMmNQlacknEEhaS3oxTJPjzMiORG2rABME0wQWdm38CvWvqndOJF/dzTYu0FTytp
- sXsu8=
-X-Virus-Scanned: amavisd-new at yadro.com
-Received: from mta-01.yadro.com ([127.0.0.1])
- by localhost (mta-01.yadro.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id nn3RSQpny8Sb; Fri, 21 Aug 2020 14:23:56 +0300 (MSK)
-Received: from T-EXCH-02.corp.yadro.com (t-exch-02.corp.yadro.com
- [172.17.10.102])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
- (No client certificate requested)
- by mta-01.yadro.com (Postfix) with ESMTPS id B1F5F56264;
- Fri, 21 Aug 2020 14:23:55 +0300 (MSK)
-Received: from localhost (172.17.204.212) by T-EXCH-02.corp.yadro.com
- (172.17.10.102) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P384) id 15.1.669.32; Fri, 21
- Aug 2020 14:23:55 +0300
-Date: Fri, 21 Aug 2020 14:23:55 +0300
-From: Roman Bolshakov <r.bolshakov@yadro.com>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Subject: Re: [PATCH v2 19/58] hvf: Move HVFState typedef to hvf.h
-Message-ID: <20200821112355.GC89922@SPB-NB-133.local>
-References: <20200820001236.1284548-1-ehabkost@redhat.com>
- <20200820001236.1284548-20-ehabkost@redhat.com>
+ (Exim 4.90_1) (envelope-from <berto@igalia.com>)
+ id 1k95Ro-0005R5-Sr; Fri, 21 Aug 2020 07:43:05 -0400
+Received: from fanzine.igalia.com ([178.60.130.6]:33386)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <berto@igalia.com>)
+ id 1k95Rm-0002cj-1s; Fri, 21 Aug 2020 07:43:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+ s=20170329; 
+ h=Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
+ bh=byw5FHP0QNR9zGuxmfXyJoD9uwLZ4Jn9n8QdBxcGVW0=; 
+ b=HGctZZXsiJrdzbcJNaA3CwgEdC//xAQz06bOlUjUhb5G3isxxiColxa1dvVfBOZ9Coc9X+xzRWoB3srnAUttlwOWhIXN9tt/Mf8Hoi1XpU/RCNiOhpEoP7A5kdUZj+R8PpdPhj/AkZPB62/TFW9M0S+Mif3K8ipIGEU7ZEnaBIJqbjL3jlKXJfaSxG6rjskWjNr7ToRYiPsVBhsH2jNQsVQlRvSD421qvVKgsX27fBdOG/vYMc7KwVP9YQC2ML0MmmsNY37Jqmwf5BTL5JxLYlhMwRsskuE5x49SA9qfjNL/SEf7pNpc2kMcpRCfzL5fcHNOEJsOe/aHcOREw1qklg==;
+Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
+ by fanzine.igalia.com with esmtps 
+ (Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
+ id 1k95Rc-0006Wj-Rq; Fri, 21 Aug 2020 13:42:52 +0200
+Received: from berto by mail.igalia.com with local (Exim)
+ id 1k95Rc-0004rL-HW; Fri, 21 Aug 2020 13:42:52 +0200
+From: Alberto Garcia <berto@igalia.com>
+To: Brian Foster <bfoster@redhat.com>, Dave Chinner <david@fromorbit.com>
+Subject: Re: [PATCH 0/1] qcow2: Skip copy-on-write when allocating a zero
+ cluster
+In-Reply-To: <20200821110506.GB212879@bfoster>
+References: <cover.1597416317.git.berto@igalia.com>
+ <20200817101019.GD11402@linux.fritz.box>
+ <w518sedz3td.fsf@maestria.local.igalia.com>
+ <20200817155307.GS11402@linux.fritz.box>
+ <w51pn7memr7.fsf@maestria.local.igalia.com>
+ <20200819150711.GE10272@linux.fritz.box> <20200819175300.GA141399@bfoster>
+ <w51v9hdultt.fsf@maestria.local.igalia.com>
+ <20200820215811.GC7941@dread.disaster.area> <20200821110506.GB212879@bfoster>
+User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
+ (i586-pc-linux-gnu)
+Date: Fri, 21 Aug 2020 13:42:52 +0200
+Message-ID: <w51364gjkcj.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200820001236.1284548-20-ehabkost@redhat.com>
-X-Originating-IP: [172.17.204.212]
-X-ClientProxiedBy: T-EXCH-01.corp.yadro.com (172.17.10.101) To
- T-EXCH-02.corp.yadro.com (172.17.10.102)
-Received-SPF: pass client-ip=89.207.88.252; envelope-from=r.bolshakov@yadro.com;
- helo=mta-01.yadro.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/21 06:53:56
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+Content-Type: text/plain
+Received-SPF: pass client-ip=178.60.130.6; envelope-from=berto@igalia.com;
+ helo=fanzine.igalia.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/21 07:08:36
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
@@ -97,70 +83,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "Daniel P.
- Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org,
- Cameron Esfahani <dirty@apple.com>, Richard Henderson <rth@twiddle.net>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ linux-xfs@vger.kernel.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Aug 19, 2020 at 08:11:57PM -0400, Eduardo Habkost wrote:
-> Move typedef closer to the type check macros, to make it easier
-> to convert the code to OBJECT_DEFINE_TYPE() in the future.
-> 
-> Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> ---
-> Changes v1 -> v2: none
-> 
-> ---
-> Cc: Cameron Esfahani <dirty@apple.com>
-> Cc: Roman Bolshakov <r.bolshakov@yadro.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Richard Henderson <rth@twiddle.net>
-> Cc: Eduardo Habkost <ehabkost@redhat.com>
-> Cc: qemu-devel@nongnu.org
-> ---
->  include/sysemu/hvf.h       | 1 +
->  target/i386/hvf/hvf-i386.h | 4 ++--
->  2 files changed, 3 insertions(+), 2 deletions(-)
-> 
-> diff --git a/include/sysemu/hvf.h b/include/sysemu/hvf.h
-> index d3bed80ea8..760d6c79a2 100644
-> --- a/include/sysemu/hvf.h
-> +++ b/include/sysemu/hvf.h
-> @@ -35,6 +35,7 @@ void hvf_vcpu_destroy(CPUState *);
->  
->  #define TYPE_HVF_ACCEL ACCEL_CLASS_NAME("hvf")
->  
-> +typedef struct HVFState HVFState;
+On Fri 21 Aug 2020 01:05:06 PM CEST, Brian Foster <bfoster@redhat.com> wrote:
+>> > 1) off: for every write request QEMU initializes the cluster (64KB)
+>> >         with fallocate(ZERO_RANGE) and then writes the 4KB of data.
+>> > 
+>> > 2) off w/o ZERO_RANGE: QEMU writes the 4KB of data and fills the rest
+>> >         of the cluster with zeroes.
+>> > 
+>> > 3) metadata: all clusters were allocated when the image was created
+>> >         but they are sparse, QEMU only writes the 4KB of data.
+>> > 
+>> > 4) falloc: all clusters were allocated with fallocate() when the image
+>> >         was created, QEMU only writes 4KB of data.
+>> > 
+>> > 5) full: all clusters were allocated by writing zeroes to all of them
+>> >         when the image was created, QEMU only writes 4KB of data.
+>> > 
+>> > As I said in a previous message I'm not familiar with xfs, but the
+>> > parts that I don't understand are
+>> > 
+>> >    - Why is (4) slower than (1)?
+>> 
+>> Because fallocate() is a full IO serialisation barrier at the
+>> filesystem level. If you do:
+>> 
+>> fallocate(whole file)
+>> <IO>
+>> <IO>
+>> <IO>
+>> .....
+>> 
+>> The IO can run concurrent and does not serialise against anything in
+>> the filesysetm except unwritten extent conversions at IO completion
+>> (see answer to next question!)
+>> 
+>> However, if you just use (4) you get:
+>> 
+>> falloc(64k)
+>>   <wait for inflight IO to complete>
+>>   <allocates 64k as unwritten>
+>> <4k io>
+>>   ....
+>> falloc(64k)
+>>   <wait for inflight IO to complete>
+>>   ....
+>>   <4k IO completes, converts 4k to written>
+>>   <allocates 64k as unwritten>
+>> <4k io>
+>> falloc(64k)
+>>   <wait for inflight IO to complete>
+>>   ....
+>>   <4k IO completes, converts 4k to written>
+>>   <allocates 64k as unwritten>
+>> <4k io>
+>>   ....
+>> 
+>
+> Option 4 is described above as initial file preallocation whereas
+> option 1 is per 64k cluster prealloc. Prealloc mode mixup aside, Berto
+> is reporting that the initial file preallocation mode is slower than
+> the per cluster prealloc mode. Berto, am I following that right?
 
-Forward declaration of HVFState is missed before the typedef.
+Option (1) means that no qcow2 cluster is allocated at the beginning of
+the test so, apart from updating the relevant qcow2 metadata, each write
+request clears the cluster first (with fallocate(ZERO_RANGE)) then
+writes the requested 4KB of data. Further writes to the same cluster
+don't need changes on the qcow2 metadata so they go directly to the area
+that was cleared with fallocate().
 
->  #define HVF_STATE(obj) \
->      OBJECT_CHECK(HVFState, (obj), TYPE_HVF_ACCEL)
->  
-> diff --git a/target/i386/hvf/hvf-i386.h b/target/i386/hvf/hvf-i386.h
-> index ef20c73eca..e0edffd077 100644
-> --- a/target/i386/hvf/hvf-i386.h
-> +++ b/target/i386/hvf/hvf-i386.h
-> @@ -57,13 +57,13 @@ typedef struct hvf_vcpu_caps {
->      uint64_t vmx_cap_preemption_timer;
->  } hvf_vcpu_caps;
->  
-> -typedef struct HVFState {
-> +struct HVFState {
->      AccelState parent;
->      hvf_slot slots[32];
->      int num_slots;
->  
->      hvf_vcpu_caps *hvf_caps;
-> -} HVFState;
-> +};
->  extern HVFState *hvf_state;
->  
->  void hvf_set_phys_mem(MemoryRegionSection *, bool);
-> -- 
-> 2.26.2
-> 
+Option (4) means that all clusters are allocated when the image is
+created and they are initialized with fallocate() (actually with
+posix_fallocate() now that I read the code, I suppose it's the same for
+xfs?). Only after that the test starts. All write requests are simply
+forwarded to the disk, there is no need to touch any qcow2 metadata nor
+do anything else.
+
+And yes, (4) is a bit slower than (1) in my tests. On ext4 I get 10%
+more IOPS.
+
+I just ran the tests with aio=native and with a raw image instead of
+qcow2, here are the results:
+
+qcow2:
+|----------------------+-------------+------------|
+| preallocation        | aio=threads | aio=native |
+|----------------------+-------------+------------|
+| off                  |        8139 |       7649 |
+| off (w/o ZERO_RANGE) |        2965 |       2779 |
+| metadata             |        7768 |       8265 |
+| falloc               |        7742 |       7956 |
+| full                 |       41389 |      56668 |
+|----------------------+-------------+------------|
+
+raw:
+|---------------+-------------+------------|
+| preallocation | aio=threads | aio=native |
+|---------------+-------------+------------|
+| off           |        7647 |       7928 |
+| falloc        |        7662 |       7856 |
+| full          |       45224 |      58627 |
+|---------------+-------------+------------|
+
+A qcow2 file with preallocation=metadata is more or less similar to a
+sparse raw file (and the numbers are indeed similar).
+
+preallocation=off on qcow2 does not have an equivalent on raw files.
+
+Berto
 
