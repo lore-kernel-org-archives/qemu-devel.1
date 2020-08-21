@@ -6,87 +6,82 @@ X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A374C433E3
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 11:38:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9484DC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 11:39:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D772620FC3
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 11:38:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5C2F7221E2
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 11:39:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NGzZjLRt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D772620FC3
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Cp9N1D/E"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C2F7221E2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45548 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47372 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k95Nh-00055r-5n
-	for qemu-devel@archiver.kernel.org; Fri, 21 Aug 2020 07:38:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40396)
+	id 1k95O3-0005rG-Ji
+	for qemu-devel@archiver.kernel.org; Fri, 21 Aug 2020 07:39:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38762)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bfoster@redhat.com>)
- id 1k94rJ-0000Qk-FZ
- for qemu-devel@nongnu.org; Fri, 21 Aug 2020 07:05:21 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:42504
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1k94iP-0007mL-Gh
+ for qemu-devel@nongnu.org; Fri, 21 Aug 2020 06:56:09 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:31267)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <bfoster@redhat.com>)
- id 1k94rF-0006aA-K8
- for qemu-devel@nongnu.org; Fri, 21 Aug 2020 07:05:20 -0400
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1k94iN-0005o9-J0
+ for qemu-devel@nongnu.org; Fri, 21 Aug 2020 06:56:09 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598007915;
+ s=mimecast20190719; t=1598007366;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=5Tdf/vUuROfLOvM6j/aHdAtEkvfWUiPiHasSj+DyrRA=;
- b=NGzZjLRtibhvwqrRkcY/JgJkmHIJQyO8puJXvHQOSuk88gtZZzVA6MqIpeXQkpAH0TaYA6
- mlSCXo6ncVwmQ5utf+sBSe3QvRUZzuE1TC33h+PIqUtPsu6C1PX3/pDCjbZuOr871XrqNH
- yRFSEhM8poj65e8AlQ/y0kqwbZVYph8=
+ bh=ih6fZH5SzHMQ5OO8SIg3LAOzdJ8VCA84rFAdVVvNqVQ=;
+ b=Cp9N1D/E4B5TY0XO+nLTPavHh4V99QaYSWIxcUyGlR8xhtsUaDVQi7r3wTc95HMT8dbSiS
+ osIC9yvIkWTsgtmFHq6GH2a/yMObIIWPrGp8GWoWW9QBNn7aRYQQSCivfKwU7S9mB1qxon
+ QkJ3tzFZuEqrKTjbEqEQrIaYuwMk5Aw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-234-vo0kiTZNMkyI94lWtl2uFw-1; Fri, 21 Aug 2020 07:05:11 -0400
-X-MC-Unique: vo0kiTZNMkyI94lWtl2uFw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-111-Sma2VIOgMJWELhANf2pawg-1; Fri, 21 Aug 2020 06:56:03 -0400
+X-MC-Unique: Sma2VIOgMJWELhANf2pawg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5D2C980EF8B;
- Fri, 21 Aug 2020 11:05:10 +0000 (UTC)
-Received: from bfoster (ovpn-112-11.rdu2.redhat.com [10.10.112.11])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 983FD5DA78;
- Fri, 21 Aug 2020 11:05:08 +0000 (UTC)
-Date: Fri, 21 Aug 2020 07:05:06 -0400
-From: Brian Foster <bfoster@redhat.com>
-To: Dave Chinner <david@fromorbit.com>
-Subject: Re: [PATCH 0/1] qcow2: Skip copy-on-write when allocating a zero
- cluster
-Message-ID: <20200821110506.GB212879@bfoster>
-References: <cover.1597416317.git.berto@igalia.com>
- <20200817101019.GD11402@linux.fritz.box>
- <w518sedz3td.fsf@maestria.local.igalia.com>
- <20200817155307.GS11402@linux.fritz.box>
- <w51pn7memr7.fsf@maestria.local.igalia.com>
- <20200819150711.GE10272@linux.fritz.box>
- <20200819175300.GA141399@bfoster>
- <w51v9hdultt.fsf@maestria.local.igalia.com>
- <20200820215811.GC7941@dread.disaster.area>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2D4701005E73;
+ Fri, 21 Aug 2020 10:55:58 +0000 (UTC)
+Received: from gondolin (ovpn-113-4.ams2.redhat.com [10.36.113.4])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E9E5860BF1;
+ Fri, 21 Aug 2020 10:55:46 +0000 (UTC)
+Date: Fri, 21 Aug 2020 12:55:44 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: Robert Foley <robert.foley@linaro.org>
+Subject: Re: [PATCH v2 0/7] accel/tcg: remove implied BQL from
+ cpu_handle_interrupt/exception path
+Message-ID: <20200821125544.73fc1d7b.cohuck@redhat.com>
+In-Reply-To: <20200819182856.4893-1-robert.foley@linaro.org>
+References: <20200819182856.4893-1-robert.foley@linaro.org>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200820215811.GC7941@dread.disaster.area>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=bfoster@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/21 01:00:15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=cohuck@redhat.com
+X-Mimecast-Spam-Score: 0.003
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=cohuck@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/21 04:26:32
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
 X-Spam_bar: ----
 X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,211 +94,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
- linux-xfs@vger.kernel.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Sarah Harris <S.E.Harris@kent.ac.uk>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ David Hildenbrand <david@redhat.com>, Anthony Green <green@moxielogic.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
+ Jiaxun Yang <jiaxun.yang@flygoat.com>, Max Filippov <jcmvbkbc@gmail.com>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Guan Xuetao <gxt@mprc.pku.edu.cn>, Marek Vasut <marex@denx.de>,
+ Yoshinori Sato <ysato@users.sourceforge.jp>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>,
+ Artyom Tarasenko <atar4qemu@gmail.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Michael Rolnik <mrolnik@gmail.com>,
+ pbonzini@redhat.com, Stafford Horne <shorne@gmail.com>, alex.bennee@linaro.org,
+ David Gibson <david@gibson.dropbear.id.au>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Chris Wulff <crwulff@gmail.com>, Laurent Vivier <laurent@vivier.eu>,
+ Michael Walle <michael@walle.cc>, Palmer Dabbelt <palmer@dabbelt.com>,
+ peter.puhov@linaro.org, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Aug 21, 2020 at 07:58:11AM +1000, Dave Chinner wrote:
-> On Thu, Aug 20, 2020 at 10:03:10PM +0200, Alberto Garcia wrote:
-> > Cc: linux-xfs
-> > 
-> > On Wed 19 Aug 2020 07:53:00 PM CEST, Brian Foster wrote:
-> > > In any event, if you're seeing unclear or unexpected performance
-> > > deltas between certain XFS configurations or other fs', I think the
-> > > best thing to do is post a more complete description of the workload,
-> > > filesystem/storage setup, and test results to the linux-xfs mailing
-> > > list (feel free to cc me as well). As it is, aside from the questions
-> > > above, it's not really clear to me what the storage stack looks like
-> > > for this test, if/how qcow2 is involved, what the various
-> > > 'preallocation=' modes actually mean, etc.
-> > 
-> > (see [1] for a bit of context)
-> > 
-> > I repeated the tests with a larger (125GB) filesystem. Things are a bit
-> > faster but not radically different, here are the new numbers:
-> > 
-> > |----------------------+-------+-------|
-> > | preallocation mode   |   xfs |  ext4 |
-> > |----------------------+-------+-------|
-> > | off                  |  8139 | 11688 |
-> > | off (w/o ZERO_RANGE) |  2965 |  2780 |
-> > | metadata             |  7768 |  9132 |
-> > | falloc               |  7742 | 13108 |
-> > | full                 | 41389 | 16351 |
-> > |----------------------+-------+-------|
-> > 
-> > The numbers are I/O operations per second as reported by fio, running
-> > inside a VM.
-> > 
-> > The VM is running Debian 9.7 with Linux 4.9.130 and the fio version is
-> > 2.16-1. I'm using QEMU 5.1.0.
-> > 
-> > fio is sending random 4KB write requests to a 25GB virtual drive, this
-> > is the full command line:
-> > 
-> > fio --filename=/dev/vdb --direct=1 --randrepeat=1 --eta=always
-> >     --ioengine=libaio --iodepth=32 --numjobs=1 --name=test --size=25G
-> >     --io_limit=25G --ramp_time=5 --rw=randwrite --bs=4k --runtime=60
-> >   
-> > The virtual drive (/dev/vdb) is a freshly created qcow2 file stored on
-> > the host (on an xfs or ext4 filesystem as the table above shows), and
-> > it is attached to QEMU using a virtio-blk-pci device:
-> > 
-> >    -drive if=virtio,file=image.qcow2,cache=none,l2-cache-size=200M
-> 
-> You're not using AIO on this image file, so it can't do
-> concurrent IO? what happens when you add "aio=native" to this?
-> 
-> > cache=none means that the image is opened with O_DIRECT and
-> > l2-cache-size is large enough so QEMU is able to cache all the
-> > relevant qcow2 metadata in memory.
-> 
-> What happens when you just use a sparse file (i.e. a raw image) with
-> aio=native instead of using qcow2? XFS, ext4, btrfs, etc all support
-> sparse files so using qcow2 to provide sparse image file support is
-> largely an unnecessary layer of indirection and overhead...
-> 
-> And with XFS, you don't need qcow2 for snapshots either because you
-> can use reflink copies to take an atomic copy-on-write snapshot of
-> the raw image file... (assuming you made the xfs filesystem with
-> reflink support (which is the TOT default now)).
-> 
-> I've been using raw sprase files on XFS for all my VMs for over a
-> decade now, and using reflink to create COW copies of golden
-> image files iwhen deploying new VMs for a couple of years now...
-> 
-> > The host is running Linux 4.19.132 and has an SSD drive.
-> > 
-> > About the preallocation modes: a qcow2 file is divided into clusters
-> > of the same size (64KB in this case). That is the minimum unit of
-> > allocation, so when writing 4KB to an unallocated cluster QEMU needs
-> > to fill the other 60KB with zeroes. So here's what happens with the
-> > different modes:
-> 
-> Which is something that sparse files on filesystems do not need to
-> do. If, on XFS, you really want 64kB allocation clusters, use an
-> extent size hint of 64kB. Though for image files, I highly recommend
-> using 1MB or larger extent size hints.
-> 
-> 
-> > 1) off: for every write request QEMU initializes the cluster (64KB)
-> >         with fallocate(ZERO_RANGE) and then writes the 4KB of data.
-> > 
-> > 2) off w/o ZERO_RANGE: QEMU writes the 4KB of data and fills the rest
-> >         of the cluster with zeroes.
-> > 
-> > 3) metadata: all clusters were allocated when the image was created
-> >         but they are sparse, QEMU only writes the 4KB of data.
-> > 
-> > 4) falloc: all clusters were allocated with fallocate() when the image
-> >         was created, QEMU only writes 4KB of data.
-> > 
-> > 5) full: all clusters were allocated by writing zeroes to all of them
-> >         when the image was created, QEMU only writes 4KB of data.
-> > 
-> > As I said in a previous message I'm not familiar with xfs, but the
-> > parts that I don't understand are
-> > 
-> >    - Why is (4) slower than (1)?
-> 
-> Because fallocate() is a full IO serialisation barrier at the
-> filesystem level. If you do:
-> 
-> fallocate(whole file)
-> <IO>
-> <IO>
-> <IO>
-> .....
-> 
-> The IO can run concurrent and does not serialise against anything in
-> the filesysetm except unwritten extent conversions at IO completion
-> (see answer to next question!)
-> 
-> However, if you just use (4) you get:
-> 
-> falloc(64k)
->   <wait for inflight IO to complete>
->   <allocates 64k as unwritten>
-> <4k io>
->   ....
-> falloc(64k)
->   <wait for inflight IO to complete>
->   ....
->   <4k IO completes, converts 4k to written>
->   <allocates 64k as unwritten>
-> <4k io>
-> falloc(64k)
->   <wait for inflight IO to complete>
->   ....
->   <4k IO completes, converts 4k to written>
->   <allocates 64k as unwritten>
-> <4k io>
->   ....
-> 
+On Wed, 19 Aug 2020 14:28:49 -0400
+Robert Foley <robert.foley@linaro.org> wrote:
 
-Option 4 is described above as initial file preallocation whereas option
-1 is per 64k cluster prealloc. Prealloc mode mixup aside, Berto is
-reporting that the initial file preallocation mode is slower than the
-per cluster prealloc mode. Berto, am I following that right?
+> The purpose of this change is to set the groundwork
+> so that an arch could move towards removing
+> the BQL from the cpu_handle_interrupt/exception paths.
+> 
+> The BQL is a bottleneck in scaling to more cores.
+> And this cpu_handle_interrupt/exception path is one of
+> the key BQL users as measured by the QEMU sync profiling (qsp).
+> 
+> As the first step in removing the BQL from this path, we will make
+> changes to the core/common functions of cpu_handle_interrupt/exception
+> to drop the holding of the BQL. The holding of the BQL is pushed down
+> to the per-arch implementation code.
 
-Brian
+I have only skimmed the patches I was cc:ed on so far, but the series
+seems sane to me in general.
 
-> until all the clusters in the qcow2 file are intialised. IOWs, each
-> fallocate() call serialises all IO in flight. Compare that to using
-> extent size hints on a raw sparse image file for the same thing:
 > 
-> <set 64k extent size hint>
-> <4k IO>
->   <allocates 64k as unwritten>
->   ....
-> <4k IO>
->   <allocates 64k as unwritten>
->   ....
-> <4k IO>
->   <allocates 64k as unwritten>
->   ....
-> ...
->   <4k IO completes, converts 4k to written>
->   <4k IO completes, converts 4k to written>
->   <4k IO completes, converts 4k to written>
-> ....
+> This patch goes through several transitions of the code in order to
+> maintain correctness (bisectability).  In order to maintain
+> bisectability across these steps some patches need to touch many
+> files across different arches, however most of the changes are trivial.
 > 
-> See the difference in IO pipelining here? You get the same "64kB
-> cluster initialised at a time" behaviour as qcow2, but you don't get
-> the IO pipeline stalls caused by fallocate() having to drain all the
-> IO in flight before it does the allocation.
+> The general order of the changes is below where each step
+> represents one patch.
 > 
-> >    - Why is (5) so much faster than everything else?
+> 1) rename all *_do_interrupt functions to *_do_interrupt_locked
+
+I'm wondering whether this renaming could be done in an automated way
+(e.g. via Coccinelle). Reviewing the method for the renaming is often
+easier than looking at a lot of similar code patterns.
+
 > 
-> The full file allocation in (5) means the IO doesn't have to modify
-> the extent map hence all extent mapping is uses shared locking and
-> the entire IO path can run concurrently without serialisation at
-> all.
+> 2) add a new function *_do_interrupt that takes the BQL and calls
+> *_do_interrupt_locked, point ->do_interrupt to it, and remove 
+> the BQL from cpu-exec.c's cpu_handle_exception.
 > 
-> Thing is, once your writes into sprase image files regularly start
-> hitting written extents, the performance of (1), (2) and (4) will
-> trend towards (5) as writes hit already allocated ranges of the file
-> and the serialisation of extent mapping changes goes away. This
-> occurs with guest filesystems that perform overwrite in place (such
-> as XFS) and hence overwrites of existing data will hit allocated
-> space in the image file and not require further allocation.
+> 3) modify the BQL critical sections around
+> ->cpu_exec_interrupt, so that the BQL critical section covers just the  
+> call to ->cpu_exec_interrupt. 
 > 
-> IOWs, typical "write once" benchmark testing indicates the *worst*
-> performance you are going to see. As the guest filesytsem ages and
-> initialises more of the underlying image file, it will get faster,
-> not slower.
-> 
-> Cheers,
-> 
-> Dave.
-> -- 
-> Dave Chinner
-> david@fromorbit.com
-> 
+> 4/5) same as 1/2 for ->cpu_exec_interrupt.  This removes the BQL
+> from cpu_handle_exception.
+
+The method of doing this in steps looks fine, although the patches
+produced are a bit unwieldy -- that's something we have to live with, I
+guess.
 
 
