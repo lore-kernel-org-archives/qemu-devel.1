@@ -2,92 +2,84 @@ Return-Path: <SRS0=atk5=B7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F216DC433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 09:20:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85606C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 09:21:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AFCC2207DA
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 09:20:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4FAF4207DA
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 09:21:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GymLTFzg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AFCC2207DA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fD/BsSYB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4FAF4207DA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43378 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46686 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k93DX-0006qD-Sr
-	for qemu-devel@archiver.kernel.org; Fri, 21 Aug 2020 05:20:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46944)
+	id 1k93Es-0008KU-IR
+	for qemu-devel@archiver.kernel.org; Fri, 21 Aug 2020 05:21:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47312)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1k93Ci-00065i-TM
- for qemu-devel@nongnu.org; Fri, 21 Aug 2020 05:19:20 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60701)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1k93Ch-00027i-58
- for qemu-devel@nongnu.org; Fri, 21 Aug 2020 05:19:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598001558;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=myvedewLsiGoP4vD5UfnoFnQDdnCd66oynkthTZlP3Y=;
- b=GymLTFzg1cEA4fM+et1y1MRGB3jX2BeGAHrdaankDk7Oll6bCNoWzG2+9iULQasCB9An1Q
- 6kRcyfGCOhPHW/d35T80YXfIO0bNScQNjLUdEzfjA4J3TFRx1J34wWqg0UfbWBmcCCM5r5
- wXyFdje9V6zgcYP9ZRquz1Lkr6dd7rY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-149-V50PI8QDNi-APrNtOiXQKA-1; Fri, 21 Aug 2020 05:19:15 -0400
-X-MC-Unique: V50PI8QDNi-APrNtOiXQKA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 646DC83DC20;
- Fri, 21 Aug 2020 09:19:14 +0000 (UTC)
-Received: from redhat.com (unknown [10.36.110.21])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 936C610013C2;
- Fri, 21 Aug 2020 09:19:12 +0000 (UTC)
-Date: Fri, 21 Aug 2020 10:19:09 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH] configure: add support for psuedo-"in source tree" builds
-Message-ID: <20200821091909.GE251583@redhat.com>
-References: <20200820165543.215372-1-berrange@redhat.com>
- <CAFEAcA8Rk5yB-Cudx8abpxSEcR=87cWhg0Ywm9w6bvqa5nneGA@mail.gmail.com>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1k93Dr-0007Md-UB
+ for qemu-devel@nongnu.org; Fri, 21 Aug 2020 05:20:31 -0400
+Received: from mail-ej1-x643.google.com ([2a00:1450:4864:20::643]:44410)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1k93Do-0002Ji-Tc
+ for qemu-devel@nongnu.org; Fri, 21 Aug 2020 05:20:31 -0400
+Received: by mail-ej1-x643.google.com with SMTP id bo3so1473152ejb.11
+ for <qemu-devel@nongnu.org>; Fri, 21 Aug 2020 02:20:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=iZM0f53tTZvOsiU8zw9GifFti7zA/ofjtEtJ2j3dFJ0=;
+ b=fD/BsSYBstwKm7BTyDr6we6EdnEV1E47o4CMuIPK4HwshRnxBUGPkQqdQ19mPl+ffz
+ Ut8uiYQHRozfeicJ3f8W6A/IJzP0X5nylaVbyX0RrKj+vNNk8xOFcJFk2QUJfCp44W7P
+ ugZjyLiwD/wPBMjRU//P1mpIYfCJZf5NUc9H6hXhZvG6Frig5+d5Ug7mola+LfRcrGr3
+ 4NIY0AlwH+ZVT3PsHyQvUiGRRZ7bUNkeKyJowxUax2Ue02VKhlidX6eHqdHoL64wv6Zy
+ JISu/EkNSh39lmtNheipoGh9aI+RNT+Mh07thdS+bZIaSkWFguqyaD7SDSWcBSCnH+9Q
+ mXiA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=iZM0f53tTZvOsiU8zw9GifFti7zA/ofjtEtJ2j3dFJ0=;
+ b=JNWlBNhlcuVM+aXkphoIBFFgu7T8J6WVunvT4hP/nODxZwQNcMp86jL4WPa8alBxcc
+ XmfwbLOfaNL+6kuePfp638kZ81Y9PMzsHuJrqKpxDPKZ/RMLIFPbC/0xJief8S0jdxJC
+ SP4EMlJyAqFyMX8AXBI5LqO/Qga0Gxh8i+27glfPr7jesRnIpsHGpAiyA8mKs97rrZsi
+ xSCBZwdQMYRwnYRnYw9M4qUHYxYEtZ0mNbhclpJxz0DlCpsiyzY+fthevOzmgQCpTl77
+ NDytNjbYdhQEkQNuve4pld9S/cRgeilq++VXUKFPQ+ALkANHG0HzqJSTTNtkbIXZRdiD
+ jQaw==
+X-Gm-Message-State: AOAM5303qYHR4k1jJJTS/RnJm/AudvggOHpZk5wEZbIiikLoKw4JfjhZ
+ 66P3/q985+F45ftCZDonL2IJDf1lujWd772qYa2OLA==
+X-Google-Smtp-Source: ABdhPJxIHlTTggr58qOtS0T/ft1uvSRnsw1bi1I6em/+e/avcua84/PK/+n32UxGeV9yYF4lxBdp/cAcs098NrsKgpI=
+X-Received: by 2002:a17:906:59b:: with SMTP id 27mr2106121ejn.56.1598001625295; 
+ Fri, 21 Aug 2020 02:20:25 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8Rk5yB-Cudx8abpxSEcR=87cWhg0Ywm9w6bvqa5nneGA@mail.gmail.com>
-User-Agent: Mutt/1.14.5 (2020-06-23)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=berrange@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/21 04:26:32
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+References: <20200820215529.GH642093@habkost.net>
+In-Reply-To: <20200820215529.GH642093@habkost.net>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 21 Aug 2020 10:20:14 +0100
+Message-ID: <CAFEAcA-WvKaZWkEF1kP9ai2neic6FJVTvVe-p3RxwKU7OhBSNw@mail.gmail.com>
+Subject: Re: Suspicious QOM types without instance/class size
+To: Eduardo Habkost <ehabkost@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::643;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x643.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,41 +92,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>,
+ Qemu-block <qemu-block@nongnu.org>, David Hildenbrand <david@redhat.com>,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
+ David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>, Cameron Esfahani <dirty@apple.com>,
+ qemu-s390x <qemu-s390x@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
+ =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
+ Richard Henderson <rth@twiddle.net>,
+ "Daniel P. Berrange" <berrange@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ Roman Bolshakov <r.bolshakov@yadro.com>, qemu-ppc <qemu-ppc@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Aug 20, 2020 at 07:15:03PM +0100, Peter Maydell wrote:
-> On Thu, 20 Aug 2020 at 17:56, Daniel P. Berrangé <berrange@redhat.com> wrote:
-> >
-> > Meson requires the build dir to be separate from the source tree. Many
-> > people are used to just running "./configure && make" though and the
-> > meson conversion breaks that.
-> >
-> > This introduces some backcompat support to make it appear as if an
-> > "in source tree" build is being done, but with the the results in the
-> > "build/" directory. This allows "./configure && make" to work as it
-> > did historically, albeit with the output binaries staying under build/.
-> >
-> > Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
-> > ---
-> 
-> Oh, one more minor thing: 'make distclean' should remove
-> the created GNUMakefile (and also build/ if configure
-> created it? dunno).
+On Thu, 20 Aug 2020 at 22:55, Eduardo Habkost <ehabkost@redhat.com> wrote:
+>
+> While trying to convert TypeInfo declarations to the new
+> OBJECT_DECLARE* macros, I've stumbled on a few suspicious cases
+> where instance_size or class_size is not set, despite having type
+> checker macros that use a specific type.
+>
+> The ones with "WARNING" are abstract types (maybe not serious if
+> subclasses set the appropriate sizes).  The ones with "ERROR"
+> don't seem to be abstract types.
+>
+> WARNING: hw/arm/armsse.c:1159:1: class_size should be set to sizeof(ARMSSEClass)?
 
-Yes, I mistakenly put that logic for "make clean" in this v1. My v2
-has fixed this, and in v3 i'll remove the "GNUMakefile" too.
+Seems like a bug, yes. Here the subclasses are simple leaf classes
+which (correctly) don't set class_size, so the abstract parent
+class must set class_size.
 
+> ERROR: hw/core/register.c:328:1: instance_size should be set to sizeof(RegisterInfo)?
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Bug (we haven't noticed because the only thing that creates them
+is register_info() and it does object_initialize() into an existing
+struct rather than trying to object_new() it).
 
+thanks
+-- PMM
 
