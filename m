@@ -2,104 +2,75 @@ Return-Path: <SRS0=atk5=B7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C340AC433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 16:09:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 795A3C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 16:10:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8FE37207DE
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 16:09:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 49F55207BB
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 16:10:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ou4I0+AQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FE37207DE
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="NpdT7OOv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49F55207BB
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35886 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40474 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k99bA-0002TN-RK
-	for qemu-devel@archiver.kernel.org; Fri, 21 Aug 2020 12:09:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55116)
+	id 1k99cO-0004NO-Jt
+	for qemu-devel@archiver.kernel.org; Fri, 21 Aug 2020 12:10:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55428)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k99aO-00019g-BY
- for qemu-devel@nongnu.org; Fri, 21 Aug 2020 12:08:12 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:50897)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k99aM-0003dL-Ft
- for qemu-devel@nongnu.org; Fri, 21 Aug 2020 12:08:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598026089;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=QNLCUycU+nWEXithWdbVY34QeWXma92nS9kZQp9Eokg=;
- b=Ou4I0+AQzxUXDhtYRKdPk0yigzhCflbQRH3Z8P3Ty7k/hwfR4bF+UYMgd+ZwtXxIFtuikE
- sGrMPjAGN0OBCGoUyKb6fRQjHUm42NE+klf/N2AGdT7uouT7d6aYG8xvl0ho8oXRYxyexf
- 3VucyQWquaXTW4WrqG+bKO7310Mp08U=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-476-rXkbfj3lPxuhkLm_BUiIOg-1; Fri, 21 Aug 2020 12:08:07 -0400
-X-MC-Unique: rXkbfj3lPxuhkLm_BUiIOg-1
-Received: by mail-wr1-f70.google.com with SMTP id s23so684123wrb.12
- for <qemu-devel@nongnu.org>; Fri, 21 Aug 2020 09:08:07 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=QNLCUycU+nWEXithWdbVY34QeWXma92nS9kZQp9Eokg=;
- b=KXh+UZOBHW4pNwSiVGb7FpHuw1t3iAXyUmoKx5m2zaBOZWYbvnXtYWgZ1aTCzTH0Ss
- xAwpQe0cEtzeWvoEH7kOq+w3rodIQDCJTNBrOOXzVLFa1zQoWGfYaMNFhqTAvpH9I1NN
- ioCsVO+uM+6vspCM50KHMURXWGkRTFjqjIELlD7JtW1SRMamRfsJOGLgs5TybwUmxrYm
- Oi3KRpSgO+3bU/qNoLyni/VcHy4X68FijC1HgZ8tkKggDD6ZLYN8L2lP3A+OKQCwalWY
- O74SzIJODTFIJ6bHeH2v68ignAqlvHehV/Znq8OGLxxTHdzEDvY+NQcYAhLjw+Qih89j
- pARQ==
-X-Gm-Message-State: AOAM5302w9vN0RXSuHR0iPkZO0pVPk3H5MQFaFEilg0RohY/Bp7OCIbo
- bbbJ61FoVXUQWozaGhz8c6BvIn8cxCVOYu5S5lPT87it3hKnLFArZ0UVEgqP0iEpMCCYwdSIV0/
- Cmvhp06aB0JQJT8s=
-X-Received: by 2002:adf:df85:: with SMTP id z5mr3244730wrl.267.1598026085648; 
- Fri, 21 Aug 2020 09:08:05 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJybqY1gGLQxCIOVCTy4zsJkdmERZpYNG0uZJ2XZkMC5DYJEPlK0QBmd9Ywe/7r5THwGFp64pg==
-X-Received: by 2002:adf:df85:: with SMTP id z5mr3244718wrl.267.1598026085481; 
- Fri, 21 Aug 2020 09:08:05 -0700 (PDT)
-Received: from localhost.localdomain (121.red-81-40-121.staticip.rima-tde.net.
- [81.40.121.121])
- by smtp.gmail.com with ESMTPSA id v7sm5873634wmj.28.2020.08.21.09.08.04
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 21 Aug 2020 09:08:04 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3 2/2] meson: Do not consider qemu-keymap a 'tool'
-Date: Fri, 21 Aug 2020 18:07:52 +0200
-Message-Id: <20200821160752.1254102-3-philmd@redhat.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200821160752.1254102-1-philmd@redhat.com>
-References: <20200821160752.1254102-1-philmd@redhat.com>
+ (Exim 4.90_1) (envelope-from <berto@igalia.com>)
+ id 1k99ba-0003ii-Gt; Fri, 21 Aug 2020 12:09:26 -0400
+Received: from fanzine.igalia.com ([178.60.130.6]:50520)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <berto@igalia.com>)
+ id 1k99bX-0003kS-MN; Fri, 21 Aug 2020 12:09:26 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+ s=20170329; 
+ h=Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
+ bh=HKTMsNp5hdfddF2CMEl3UvWb/KifxWfDDcTpl5rgRVU=; 
+ b=NpdT7OOv3uSjYlG0n1d1NqLGxmDh4/0absUWX1et7DLHJdDyuluOh+MJwNjZkuF+Y5Wv0hNlrO9LIKCMmtw0tyFG7s5IQBPdxuFnz4dQ7kWYZYkHsBFkHKowhJYtvo/Rdr8u0OFsvvfhFwWUDmit3p+QtShaJLkHY75y9LGwzUrS8W3OcjuVO6SopYMo1BztZ6yjGKREIDbDv1krY2oVZigi3tw0BSLVMQjTa39f7Q9+Dtcoeb1N3km3R36sGbQjA8dXKtM58EKN5NVxyrs0zmdi30hHE5PeaSUPl0KNuoAc2HRPC9nlMPbT7WMHm8bA6ti6gUQVhfANvnyuN86SfA==;
+Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
+ by fanzine.igalia.com with esmtps 
+ (Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
+ id 1k99bR-0000ar-GM; Fri, 21 Aug 2020 18:09:17 +0200
+Received: from berto by mail.igalia.com with local (Exim)
+ id 1k99bR-0002JJ-6v; Fri, 21 Aug 2020 18:09:17 +0200
+From: Alberto Garcia <berto@igalia.com>
+To: Dave Chinner <david@fromorbit.com>
+Subject: Re: [PATCH 0/1] qcow2: Skip copy-on-write when allocating a zero
+ cluster
+In-Reply-To: <20200820215811.GC7941@dread.disaster.area>
+References: <cover.1597416317.git.berto@igalia.com>
+ <20200817101019.GD11402@linux.fritz.box>
+ <w518sedz3td.fsf@maestria.local.igalia.com>
+ <20200817155307.GS11402@linux.fritz.box>
+ <w51pn7memr7.fsf@maestria.local.igalia.com>
+ <20200819150711.GE10272@linux.fritz.box> <20200819175300.GA141399@bfoster>
+ <w51v9hdultt.fsf@maestria.local.igalia.com>
+ <20200820215811.GC7941@dread.disaster.area>
+User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
+ (i586-pc-linux-gnu)
+Date: Fri, 21 Aug 2020 18:09:17 +0200
+Message-ID: <w51pn7khtg2.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8;
-	text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/21 02:43:55
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=unavailable autolearn_force=no
+Content-Type: text/plain
+Received-SPF: pass client-ip=178.60.130.6; envelope-from=berto@igalia.com;
+ helo=fanzine.igalia.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/21 11:04:22
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -112,79 +83,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org,
+ Brian Foster <bfoster@redhat.com>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, linux-xfs@vger.kernel.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We need qemu-keymap to generate the keymaps.
+On Thu 20 Aug 2020 11:58:11 PM CEST, Dave Chinner wrote:
+>> The virtual drive (/dev/vdb) is a freshly created qcow2 file stored on
+>> the host (on an xfs or ext4 filesystem as the table above shows), and
+>> it is attached to QEMU using a virtio-blk-pci device:
+>> 
+>>    -drive if=virtio,file=image.qcow2,cache=none,l2-cache-size=200M
+>
+> You're not using AIO on this image file, so it can't do
+> concurrent IO? what happens when you add "aio=native" to this?
 
-This fixes when configuring with --disable-tools:
+I sent the results on a reply to Brian.
 
-  Compiling C object qemu-keymap.p/qemu-keymap.c.o
-  Compiling C object qemu-keymap.p/ui_input-keymap.c.o
-  Compiling C object qemu-edid.p/qemu-edid.c.o
-  ../ui/input-keymap.c:7:49: fatal error: ui/input-keymap-atset1-to-qcode.c.inc: No such file or directory
-  compilation terminated.
-  Makefile.ninja:688: recipe for target 'qemu-keymap.p/ui_input-keymap.c.o' failed
-  make: *** [qemu-keymap.p/ui_input-keymap.c.o] Error 1
+>> cache=none means that the image is opened with O_DIRECT and
+>> l2-cache-size is large enough so QEMU is able to cache all the
+>> relevant qcow2 metadata in memory.
+>
+> What happens when you just use a sparse file (i.e. a raw image) with
+> aio=native instead of using qcow2? XFS, ext4, btrfs, etc all support
+> sparse files so using qcow2 to provide sparse image file support is
+> largely an unnecessary layer of indirection and overhead...
+>
+> And with XFS, you don't need qcow2 for snapshots either because you
+> can use reflink copies to take an atomic copy-on-write snapshot of the
+> raw image file... (assuming you made the xfs filesystem with reflink
+> support (which is the TOT default now)).
 
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
----
-v3: Rebased on Marc-André keymap patch
+To be clear, I'm not trying to advocate for or against qcow2 on xfs, we
+were just analyzing different allocation strategies for qcow2 and we
+came across these results which we don't quite understand.
 
-Paolo feel free to improve the subject if qemu-keymap is a tool :)
----
- meson.build    | 11 ++++++-----
- ui/meson.build |  2 +-
- 2 files changed, 7 insertions(+), 6 deletions(-)
+>> 1) off: for every write request QEMU initializes the cluster (64KB)
+>>         with fallocate(ZERO_RANGE) and then writes the 4KB of data.
+>> 
+>> 2) off w/o ZERO_RANGE: QEMU writes the 4KB of data and fills the rest
+>>         of the cluster with zeroes.
+>> 
+>> 3) metadata: all clusters were allocated when the image was created
+>>         but they are sparse, QEMU only writes the 4KB of data.
+>> 
+>> 4) falloc: all clusters were allocated with fallocate() when the image
+>>         was created, QEMU only writes 4KB of data.
+>> 
+>> 5) full: all clusters were allocated by writing zeroes to all of them
+>>         when the image was created, QEMU only writes 4KB of data.
+>> 
+>> As I said in a previous message I'm not familiar with xfs, but the
+>> parts that I don't understand are
+>> 
+>>    - Why is (4) slower than (1)?
+>
+> Because fallocate() is a full IO serialisation barrier at the
+> filesystem level. If you do:
+>
+> fallocate(whole file)
+> <IO>
+> <IO>
+> <IO>
+> .....
+>
+> The IO can run concurrent and does not serialise against anything in
+> the filesysetm except unwritten extent conversions at IO completion
+> (see answer to next question!)
+>
+> However, if you just use (4) you get:
+>
+> falloc(64k)
+>   <wait for inflight IO to complete>
+>   <allocates 64k as unwritten>
+> <4k io>
+>   ....
+> falloc(64k)
+>   <wait for inflight IO to complete>
+>   ....
+>   <4k IO completes, converts 4k to written>
+>   <allocates 64k as unwritten>
+> <4k io>
 
-diff --git a/meson.build b/meson.build
-index 808f50b07ef..dd8016c9da3 100644
---- a/meson.build
-+++ b/meson.build
-@@ -1062,6 +1062,12 @@ if 'CONFIG_GUEST_AGENT' in config_host
-   subdir('qga')
- endif
- 
-+if 'CONFIG_XKBCOMMON' in config_host
-+  # used for the update-keymaps target, so include rules even if !have_tools
-+  qemu_keymap = executable('qemu-keymap', files('qemu-keymap.c', 'ui/input-keymap.c') + genh,
-+                           dependencies: [qemuutil, xkbcommon], install: have_tools)
-+endif
-+
- if have_tools
-   qemu_img = executable('qemu-img', [files('qemu-img.c'), hxdep],
-              dependencies: [authz, block, crypto, io, qom, qemuutil], install: true)
-@@ -1078,11 +1084,6 @@ if have_tools
-   subdir('contrib/rdmacm-mux')
-   subdir('contrib/elf2dmp')
- 
--  if 'CONFIG_XKBCOMMON' in config_host
--    executable('qemu-keymap', files('qemu-keymap.c', 'ui/input-keymap.c'),
--               dependencies: [qemuutil, xkbcommon], install: true)
--  endif
--
-   executable('qemu-edid', files('qemu-edid.c', 'hw/display/edid-generate.c'),
-              dependencies: qemuutil,
-              install: true)
-diff --git a/ui/meson.build b/ui/meson.build
-index 6f74d30ea06..6bf398213f3 100644
---- a/ui/meson.build
-+++ b/ui/meson.build
-@@ -95,7 +95,7 @@ keymaps = [
-   ['osx', 'qcode'],
- ]
- 
--if have_system
-+if have_system or have_tools
-   foreach e : keymaps
-     output = 'input-keymap-@0@-to-@1@.c.inc'.format(e[0], e[1])
-     genh += custom_target(output,
--- 
-2.26.2
+I think Brian pointed it out already, but scenario (4) is rather
+falloc(25GB), then QEMU is launched and the actual 4k IO requests start
+to happen.
 
+So I would expect that after falloc(25GB) all clusters are initialized
+and the end result would be closer to a full preallocation (i.e. writing
+25GB worth of zeroes to disk).
+
+> IOWs, typical "write once" benchmark testing indicates the *worst*
+> performance you are going to see. As the guest filesytsem ages and
+> initialises more of the underlying image file, it will get faster, not
+> slower.
+
+Yes, that's clear, once everything is allocation then it is fast (and
+really much faster in the case of xfs vs ext4), what we try to optimize
+in qcow2 is precisely the allocation of new clusters.
+
+Berto
 
