@@ -2,91 +2,90 @@ Return-Path: <SRS0=atk5=B7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19D15C433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 12:08:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38533C433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 12:09:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DCA522078D
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 12:08:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DF1C02078D
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 12:09:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QhYIjgCP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCA522078D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W34g0Ufv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF1C02078D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45870 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48026 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k95qo-0004lM-5y
-	for qemu-devel@archiver.kernel.org; Fri, 21 Aug 2020 08:08:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54428)
+	id 1k95rh-0005gS-UA
+	for qemu-devel@archiver.kernel.org; Fri, 21 Aug 2020 08:09:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54458)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1k95qG-0004Jl-09
- for qemu-devel@nongnu.org; Fri, 21 Aug 2020 08:08:20 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:57264)
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1k95qS-0004Xg-UK
+ for qemu-devel@nongnu.org; Fri, 21 Aug 2020 08:08:32 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:40083
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1k95qD-0006MB-CN
- for qemu-devel@nongnu.org; Fri, 21 Aug 2020 08:08:19 -0400
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1k95qR-0006O1-32
+ for qemu-devel@nongnu.org; Fri, 21 Aug 2020 08:08:32 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598011695;
+ s=mimecast20190719; t=1598011710;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=HyvW85sB+8IDDdNqBaIjFqWQqwDZ22FyC141G5DygQ0=;
- b=QhYIjgCPLNo6EWhmkrtUzOpEyV/j5jShEbydRwks71IoVtBoxBlfPYinSKvzvhIuOFDF/G
- URWaH38+nvHJNCmKGwy5ZIsVfKrPzJoPnWv7BTdCmGTz8b+aS35D3ET3NxGN3tQy+aBlKj
- D1U90PAxAK7bcVXp6mQ+qs+4UOE4SWU=
+ bh=511vb+bSSU4Y8b19YhsL8ZoU/Szz/eNR60yHK0LqGv8=;
+ b=W34g0Ufvlr+NX6Ih6pGkVDgThYcr98jaSp0g0VFcB6Ehr3K/uLOhcuBC3YcZUSupY9Ds8S
+ tgm7/3zc7B0RRPFc/5VC3NoV3RUL9wWcjmzTlDHkHe88psF0Sbjq0A/LLt/wA6jVrSNPbY
+ 8Mskl4TB6EhfsZw6NZd4r7mjNahRLFo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-99-eD4Or0JdPvW3SWCFjenVSg-1; Fri, 21 Aug 2020 08:08:11 -0400
-X-MC-Unique: eD4Or0JdPvW3SWCFjenVSg-1
+ us-mta-241-fWSUrqYZP2S_LTEgsyws2Q-1; Fri, 21 Aug 2020 08:08:28 -0400
+X-MC-Unique: fWSUrqYZP2S_LTEgsyws2Q-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7EDFC1885D87;
- Fri, 21 Aug 2020 12:08:10 +0000 (UTC)
-Received: from work-vm (ovpn-113-246.ams2.redhat.com [10.36.113.246])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 990AD7E30E;
- Fri, 21 Aug 2020 12:08:08 +0000 (UTC)
-Date: Fri, 21 Aug 2020 13:08:06 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Zheng Chuan <zhengchuan@huawei.com>
-Subject: Re: [PATCH v3 02/10] migration/dirtyrate: Add RamlockDirtyInfo to
- store sampled page info
-Message-ID: <20200821120806.GA2655@work-vm>
-References: <1597634433-18809-1-git-send-email-zhengchuan@huawei.com>
- <1597634433-18809-3-git-send-email-zhengchuan@huawei.com>
- <20200820162047.GJ2664@work-vm>
- <3f5ad1f2-59ab-6efd-c18e-2123dc771af8@huawei.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 36E7A1885D89;
+ Fri, 21 Aug 2020 12:08:27 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.114])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5C2787E30E;
+ Fri, 21 Aug 2020 12:08:17 +0000 (UTC)
+Date: Fri, 21 Aug 2020 14:08:15 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Julia Suvorova <jusual@redhat.com>
+Subject: Re: [RFC PATCH v2 2/4] hw/i386/acpi-build: Add ACPI PCI hot-plug
+ methods to q35
+Message-ID: <20200821140815.288f14db@redhat.com>
+In-Reply-To: <20200818215227.181654-3-jusual@redhat.com>
+References: <20200818215227.181654-1-jusual@redhat.com>
+ <20200818215227.181654-3-jusual@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <3f5ad1f2-59ab-6efd-c18e-2123dc771af8@huawei.com>
-User-Agent: Mutt/1.14.6 (2020-07-11)
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=imammedo@redhat.com
 X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=dgilbert@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/21 04:26:32
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=imammedo@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/21 05:15:56
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
 X-Spam_bar: ----
 X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,91 +98,190 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: zhang.zhanghailiang@huawei.com, quintela@redhat.com, qemu-devel@nongnu.org,
- xiexiangyou@huawei.com, alex.chen@huawei.com, ann.zhuangyanying@huawei.com,
- fangying1@huawei.com
+Cc: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Zheng Chuan (zhengchuan@huawei.com) wrote:
-> 
-> 
-> On 2020/8/21 0:20, Dr. David Alan Gilbert wrote:
-> > * Chuan Zheng (zhengchuan@huawei.com) wrote:
-> >> Add RamlockDirtyInfo to store sampled page info of each ramblock.
-> >>
-> >> Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
-> >> Signed-off-by: YanYing Zhuang <ann.zhuangyanying@huawei.com>
-> >> ---
-> >>  migration/dirtyrate.h | 18 ++++++++++++++++++
-> >>  1 file changed, 18 insertions(+)
-> >>
-> >> diff --git a/migration/dirtyrate.h b/migration/dirtyrate.h
-> >> index 914c363..9650566 100644
-> >> --- a/migration/dirtyrate.h
-> >> +++ b/migration/dirtyrate.h
-> >> @@ -19,6 +19,11 @@
-> >>   */
-> >>  #define DIRTYRATE_DEFAULT_SAMPLE_PAGES            256
-> >>  
-> >> +/*
-> >> + * Record ramblock idstr
-> >> + */
-> >> +#define RAMBLOCK_INFO_MAX_LEN                     256
-> >> +
-> >>  /* Take 1s as default for calculation duration */
-> >>  #define DEFAULT_FETCH_DIRTYRATE_TIME_SEC          1
-> >>  
-> >> @@ -39,6 +44,19 @@ typedef enum {
-> >>      CAL_DIRTY_RATE_END,
-> >>  } CalculatingDirtyRateState;
-> >>  
-> >> +/*
-> >> + * Store dirtypage info for each ramblock.
-> >> + */
-> >> +struct RamblockDirtyInfo {
-> >> +    char idstr[RAMBLOCK_INFO_MAX_LEN]; /* idstr for each ramblock */
-> >> Can you remind me; why not just use RAMBlock* here of the block you're
-> > interested in, rather than storing the name?
-> >
-> idstr is used to store which ramblock is sampled page in, we test it in
-> find_page_matched().
-> so you mean we just RAMBlock*, and take idstr out of RAMBlock* when it need to
-> find matched page?
+On Tue, 18 Aug 2020 23:52:25 +0200
+Julia Suvorova <jusual@redhat.com> wrote:
 
-I meant just use RAMBlock*, but I think I see why you don't;
-because you only hold the RCU around each part separately, the RAMBlock
-could disappear between the initial hash, and the later compare;  so
-using the name makes it safe.
+> Implement notifications and gpe to support q35 ACPI PCI hot-plug.
+> Use 0xcc4 - 0xcd7 range for 'acpi-pci-hotplug' io ports.
 
-Dave
+in addition to comment from Philippe
 
-> >> +    uint8_t *ramblock_addr; /* base address of ramblock we measure */
-> >> +    size_t ramblock_pages; /* sum of dividation by 4K pages for ramblock */
-> > 
-> > 'dividation' is the wrong word, and 'sum' is only needed where you're
-> > adding things together.  I think this is 'ramblock size in TARGET_PAGEs'
-> > 
-> >> +    size_t *sample_page_vfn; /* relative offset address for sampled page */
-> >> +    unsigned int sample_pages_count; /* sum of sampled pages */
-> >> +    unsigned int sample_dirty_count; /* sum of dirty pages we measure */
-> > 
-> > These are both 'count' rather than 'sum'
-> > 
-> OK, will be fixed in V4:)
+
 > 
-> >> +    uint8_t *hash_result; /* array of hash result for sampled pages */
-> >> +};
-> >> +
-> >>  void *get_dirtyrate_thread(void *arg);
-> >>  #endif
-> >>  
-> >> -- 
-> >> 1.8.3.1
-> >>
+> Signed-off-by: Julia Suvorova <jusual@redhat.com>
+> ---
+>  include/hw/acpi/pcihp.h |  3 ++-
+>  hw/acpi/pcihp.c         | 10 ++++++----
+>  hw/acpi/piix4.c         |  2 +-
+>  hw/i386/acpi-build.c    | 25 ++++++++++++++-----------
+>  4 files changed, 23 insertions(+), 17 deletions(-)
 > 
--- 
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> diff --git a/include/hw/acpi/pcihp.h b/include/hw/acpi/pcihp.h
+> index 8bc4a4c01d..1e9d246f57 100644
+> --- a/include/hw/acpi/pcihp.h
+> +++ b/include/hw/acpi/pcihp.h
+> @@ -54,7 +54,8 @@ typedef struct AcpiPciHpState {
+>  } AcpiPciHpState;
+>  
+>  void acpi_pcihp_init(Object *owner, AcpiPciHpState *, PCIBus *root,
+> -                     MemoryRegion *address_space_io, bool bridges_enabled);
+> +                     MemoryRegion *address_space_io, bool bridges_enabled,
+> +                     bool is_piix4);
+>  
+>  void acpi_pcihp_device_pre_plug_cb(HotplugHandler *hotplug_dev,
+>                                     DeviceState *dev, Error **errp);
+> diff --git a/hw/acpi/pcihp.c b/hw/acpi/pcihp.c
+> index 9e31ab2da4..9a35ed6c83 100644
+> --- a/hw/acpi/pcihp.c
+> +++ b/hw/acpi/pcihp.c
+> @@ -38,7 +38,8 @@
+>  #include "qom/qom-qobject.h"
+>  #include "trace.h"
+>  
+> -#define ACPI_PCIHP_ADDR 0xae00
+> +#define ACPI_PCIHP_ADDR_PIIX4 0xae00
+> +#define ACPI_PCIHP_ADDR_Q35 0x0cc4
+>  #define ACPI_PCIHP_SIZE 0x0014
+>  #define PCI_UP_BASE 0x0000
+>  #define PCI_DOWN_BASE 0x0004
+> @@ -359,12 +360,13 @@ static const MemoryRegionOps acpi_pcihp_io_ops = {
+>  };
+>  
+>  void acpi_pcihp_init(Object *owner, AcpiPciHpState *s, PCIBus *root_bus,
+> -                     MemoryRegion *address_space_io, bool bridges_enabled)
+> +                     MemoryRegion *address_space_io, bool bridges_enabled,
+> +                     bool is_piix4)
+>  {
+>      s->io_len = ACPI_PCIHP_SIZE;
+> -    s->io_base = ACPI_PCIHP_ADDR;
+> +    s->io_base = is_piix4 ? ACPI_PCIHP_ADDR_PIIX4 : ACPI_PCIHP_ADDR_Q35;
+>  
+> -    s->root= root_bus;
+> +    s->root = root_bus;
+>      s->legacy_piix = !bridges_enabled;
+>  
+>      memory_region_init_io(&s->io, owner, &acpi_pcihp_io_ops, s,
+> diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
+> index cdfa0e2998..1f27bfbd06 100644
+> --- a/hw/acpi/piix4.c
+> +++ b/hw/acpi/piix4.c
+> @@ -596,7 +596,7 @@ static void piix4_acpi_system_hot_add_init(MemoryRegion *parent,
+>      memory_region_add_subregion(parent, GPE_BASE, &s->io_gpe);
+>  
+>      acpi_pcihp_init(OBJECT(s), &s->acpi_pci_hotplug, bus, parent,
+> -                    s->use_acpi_hotplug_bridge);
+> +                    s->use_acpi_hotplug_bridge, true);
+>  
+>      s->cpu_hotplug_legacy = true;
+>      object_property_add_bool(OBJECT(s), "cpu-hotplug-legacy",
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index b7bcbbbb2a..f3cd52bd06 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -201,10 +201,6 @@ static void acpi_get_pm_info(MachineState *machine, AcpiPmInfo *pm)
+>          /* w2k requires FADT(rev1) or it won't boot, keep PC compatible */
+>          pm->fadt.rev = 1;
+>          pm->cpu_hp_io_base = PIIX4_CPU_HOTPLUG_IO_BASE;
+> -        pm->pcihp_io_base =
+> -            object_property_get_uint(obj, ACPI_PCIHP_IO_BASE_PROP, NULL);
+> -        pm->pcihp_io_len =
+> -            object_property_get_uint(obj, ACPI_PCIHP_IO_LEN_PROP, NULL);
+>      }
+>      if (lpc) {
+>          struct AcpiGenericAddress r = { .space_id = AML_AS_SYSTEM_IO,
+> @@ -214,6 +210,10 @@ static void acpi_get_pm_info(MachineState *machine, AcpiPmInfo *pm)
+>          pm->fadt.flags |= 1 << ACPI_FADT_F_RESET_REG_SUP;
+>          pm->cpu_hp_io_base = ICH9_CPU_HOTPLUG_IO_BASE;
+>      }
+> +    pm->pcihp_io_base =
+> +        object_property_get_uint(obj, ACPI_PCIHP_IO_BASE_PROP, NULL);
+> +    pm->pcihp_io_len =
+> +        object_property_get_uint(obj, ACPI_PCIHP_IO_LEN_PROP, NULL);
+>  
+>      /* The above need not be conditional on machine type because the reset port
+>       * happens to be the same on PIIX (pc) and ICH9 (q35). */
+> @@ -472,7 +472,7 @@ static void build_append_pci_bus_devices(Aml *parent_scope, PCIBus *bus,
+>          QLIST_FOREACH(sec, &bus->child, sibling) {
+>              int32_t devfn = sec->parent_dev->devfn;
+>  
+> -            if (pci_bus_is_root(sec) || pci_bus_is_express(sec)) {
+> +            if (pci_bus_is_root(sec)) {
+Does pcie bus on hostbridge fall into pci_bus_is_express() categiry or not?
+
+>                  continue;
+>              }
+>  
+> @@ -1368,7 +1368,7 @@ static void build_piix4_isa_bridge(Aml *table)
+>      aml_append(table, scope);
+>  }
+>  
+> -static void build_piix4_pci_hotplug(Aml *table)
+> +static void build_i386_pci_hotplug(Aml *table, uint64_t pcihp_addr)
+>  {
+>      Aml *scope;
+>      Aml *field;
+> @@ -1377,20 +1377,22 @@ static void build_piix4_pci_hotplug(Aml *table)
+>      scope =  aml_scope("_SB.PCI0");
+>  
+>      aml_append(scope,
+> -        aml_operation_region("PCST", AML_SYSTEM_IO, aml_int(0xae00), 0x08));
+> +        aml_operation_region("PCST", AML_SYSTEM_IO, aml_int(pcihp_addr), 0x08));
+>      field = aml_field("PCST", AML_DWORD_ACC, AML_NOLOCK, AML_WRITE_AS_ZEROS);
+>      aml_append(field, aml_named_field("PCIU", 32));
+>      aml_append(field, aml_named_field("PCID", 32));
+>      aml_append(scope, field);
+>  
+>      aml_append(scope,
+> -        aml_operation_region("SEJ", AML_SYSTEM_IO, aml_int(0xae08), 0x04));
+> +    aml_operation_region("SEJ", AML_SYSTEM_IO,
+> +                         aml_int(pcihp_addr + 0x08), 0x04));
+                                                 ^^^^
+how about turning this offset into macro?
+
+>      field = aml_field("SEJ", AML_DWORD_ACC, AML_NOLOCK, AML_WRITE_AS_ZEROS);
+>      aml_append(field, aml_named_field("B0EJ", 32));
+>      aml_append(scope, field);
+>  
+>      aml_append(scope,
+> -        aml_operation_region("BNMR", AML_SYSTEM_IO, aml_int(0xae10), 0x04));
+> +        aml_operation_region("BNMR", AML_SYSTEM_IO,
+> +                             aml_int(pcihp_addr + 0x10), 0x04));
+ditto
+
+>      field = aml_field("BNMR", AML_DWORD_ACC, AML_NOLOCK, AML_WRITE_AS_ZEROS);
+>      aml_append(field, aml_named_field("BNUM", 32));
+>      aml_append(scope, field);
+> @@ -1504,7 +1506,6 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+>          build_hpet_aml(dsdt);
+>          build_piix4_isa_bridge(dsdt);
+>          build_isa_devices_aml(dsdt);
+> -        build_piix4_pci_hotplug(dsdt);
+>          build_piix4_pci0_int(dsdt);
+>      } else {
+>          sb_scope = aml_scope("_SB");
+> @@ -1526,6 +1527,8 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+>          }
+>      }
+>  
+> +    build_i386_pci_hotplug(dsdt, pm->pcihp_io_base);
+> +
+>      if (pcmc->legacy_cpu_hotplug) {
+>          build_legacy_cpu_hotplug_aml(dsdt, machine, pm->cpu_hp_io_base);
+>      } else {
+> @@ -1546,7 +1549,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker,
+>      {
+>          aml_append(scope, aml_name_decl("_HID", aml_string("ACPI0006")));
+>  
+> -        if (misc->is_piix4) {
+> +        if (misc->is_piix4 || pm->pcihp_bridge_en) {
+>              method = aml_method("_E01", 0, AML_NOTSERIALIZED);
+>              aml_append(method,
+>                  aml_acquire(aml_name("\\_SB.PCI0.BLCK"), 0xFFFF));
 
 
