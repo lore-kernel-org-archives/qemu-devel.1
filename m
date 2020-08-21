@@ -2,93 +2,71 @@ Return-Path: <SRS0=atk5=B7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E52CC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 08:56:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15D46C433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 09:09:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CC765207DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 08:56:32 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Lin2Cwsy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC765207DF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id CAA1620720
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 09:09:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CAA1620720
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54250 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60116 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k92qe-0006R4-1c
-	for qemu-devel@archiver.kernel.org; Fri, 21 Aug 2020 04:56:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41528)
+	id 1k933D-0001R3-Sy
+	for qemu-devel@archiver.kernel.org; Fri, 21 Aug 2020 05:09:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44270)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1k92pz-0005Pw-3x
- for qemu-devel@nongnu.org; Fri, 21 Aug 2020 04:55:51 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:25094
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1k932V-0000rf-Td; Fri, 21 Aug 2020 05:08:47 -0400
+Resent-Date: Fri, 21 Aug 2020 05:08:47 -0400
+Resent-Message-Id: <E1k932V-0000rf-Td@lists.gnu.org>
+Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21737)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1k92pw-00081i-KX
- for qemu-devel@nongnu.org; Fri, 21 Aug 2020 04:55:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598000147;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=6RezNiE61y0l0GSmP6hX3ychcKgyBTYk0r1l3uJ6p+w=;
- b=Lin2CwsypvAfQ1MYDgINFguQWXoUsMEkvWTwyIQhJj8O0SSZDRKxjzBwN+taq80cDbyvxi
- 3mEgiMpV+stvx4RlGuf+WuahsR9m4vIET13m4QM6ZDzQrfa2TFwIIrNWQIg24lZEv2d1KZ
- HG/iJvurR96NkVeGXeOAho/b9ct5I/I=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-187-x-KVcU3PNCmp8XAosIwOKA-1; Fri, 21 Aug 2020 04:55:43 -0400
-X-MC-Unique: x-KVcU3PNCmp8XAosIwOKA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5C8B581CBEB;
- Fri, 21 Aug 2020 08:55:42 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.114])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5C1585DE81;
- Fri, 21 Aug 2020 08:55:40 +0000 (UTC)
-Date: Fri, 21 Aug 2020 10:55:38 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Subject: Re: [PATCH 02/10] numa: introduce
- MachineClass::forbid_asymmetrical_numa
-Message-ID: <20200821105538.6f6b46c8@redhat.com>
-In-Reply-To: <20200820165103.GD642093@habkost.net>
-References: <20200814205424.543857-1-danielhb413@gmail.com>
- <20200814205424.543857-3-danielhb413@gmail.com>
- <20200820011726.GF271315@yekko.fritz.box>
- <20200820021128.GC642093@habkost.net>
- <20200820041504.GN271315@yekko.fritz.box>
- <20200820165103.GD642093@habkost.net>
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1k932T-0000u1-7Q; Fri, 21 Aug 2020 05:08:47 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1598000910; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=b/nPUhHnJ7KyyPdACJ8duCj2w+7vGAKjM0/aisTakVFIjtdQ8Ue24LhwLhHnx3495QAEunkmTZOXMCcgKpuwswqy1uXQpX2VUcQYKOUEEDtHDSjOchZxJv/PAQ7kzLqOwIFQLvC1sY7ZBnnFJzhU3zOXH2VdVSxhkav+Gjh18C4=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1598000910;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=SUx9td7tRxWBycnBuX9UqkG6RxsdV2PWiBT5D+HS6vo=; 
+ b=RNnZqNsp7ufrHvpgLAynySTPnYM2tLlgHRWDLw12YfQ610Db8+ofXMXh745TPjjuX+/kSG+KJ+8KwJ6JHkkoHDSCE3xS8wI8QHKtTX4yfjoviFScb7tVToqOAl+4gAI63TdACBIk4ogPQR6h9zDRt2/wVBR4VYZ9Znx5rV58MeI=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 15980009082081001.6626114745343;
+ Fri, 21 Aug 2020 02:08:28 -0700 (PDT)
+Subject: Re: [PATCH] hw/arm/sbsa-ref: fix typo breaking PCIe IRQs
+Message-ID: <159800090688.18714.2270521033691750020@66eaa9a8a123>
+In-Reply-To: <20200821083853.356490-1-graeme@nuviainc.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=imammedo@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=imammedo@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/21 04:55:47
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: graeme@nuviainc.com
+Date: Fri, 21 Aug 2020 02:08:28 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o57.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/21 05:08:41
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,62 +79,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, Daniel Henrique Barboza <danielhb413@gmail.com>,
- John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org,
- David Gibson <david@gibson.dropbear.id.au>
+Reply-To: qemu-devel@nongnu.org
+Cc: graeme@nuviainc.com, peter.maydell@linaro.org, rad@semihalf.com,
+ qemu-devel@nongnu.org, qemu-arm@nongnu.org, leif@nuviainc.com,
+ philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 20 Aug 2020 12:51:03 -0400
-Eduardo Habkost <ehabkost@redhat.com> wrote:
-
-> On Thu, Aug 20, 2020 at 02:15:04PM +1000, David Gibson wrote:
-> > On Wed, Aug 19, 2020 at 10:11:28PM -0400, Eduardo Habkost wrote:  
-> > > On Thu, Aug 20, 2020 at 11:17:26AM +1000, David Gibson wrote:  
-> > > > On Fri, Aug 14, 2020 at 05:54:16PM -0300, Daniel Henrique Barboza wrote:  
-> > > > > The pSeries machine does not support asymmetrical NUMA
-> > > > > configurations.  
-> > > > 
-> > > > This seems a bit oddly specific to have as a global machine class
-> > > > property.
-> > > > 
-> > > > Would it make more sense for machines with specific NUMA constraints
-> > > > to just verify those during their initialization?  
-> > > 
-> > > This would be much simpler.  However, I like the idea of
-> > > representing machine-specific configuration validation rules as
-> > > data that can eventually be exported to management software.  
-> > 
-> > Ah, ok, so basically the usual tradeoff between flexibility and
-> > advertisability.
-> > 
-> > So, in that case, I guess the question is whether we envisage "no
-> > assymmetry" as a constraint common enough that it's worth creating an
-> > advertisable rule or not.  If we only ever have one user, then we
-> > haven't really done any better than hard coding the constraint in the
-> > manageent software.
-> > 
-> > Of course to complicate matters, in the longer term we're looking at
-> > removing that constraint from pseries - but doing so will be dependent
-> > on the guest kernel understanding a new format for the NUMA
-> > information in the device tree.  So qemu alone won't have enough
-> > information to tell if such a configuration is possible or not.  
-> 
-> Requiring both QEMU (and possibly management software) to be
-> patched again after the guest kernel is fixed sounds undesirable.
-If we drop this restriction, then we don't need to touch QEMU when
-guest kernel is ready.
-
-Btw, what spapr spec says about the matter?
-
-> Perhaps a warning would be better in this case?
-> 
-> In either case, it sounds like this won't be a common constraint
-> and I now agree with your original suggestion of doing this in
-> machine initialization code.
-Agreed, if it goes to spapr specific machine code I will not object much.
-(it will burden just spapr maintainers, so it's about convincing
-David in the end)
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDgyMTA4Mzg1My4zNTY0
+OTAtMS1ncmFlbWVAbnV2aWFpbmMuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUg
+ZG9ja2VyLXF1aWNrQGNlbnRvczcgYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3Rpbmcg
+Y29tbWFuZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3Rh
+bGxlZCwgeW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFND
+UklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKbWFrZSBkb2NrZXItaW1hZ2UtY2VudG9zNyBWPTEg
+TkVUV09SSz0xCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1xdWlja0BjZW50b3M3IFNIT1dfRU5WPTEg
+Sj0xNCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCiAgVEVTVCAgICBjaGVjay11
+bml0OiB0ZXN0cy90ZXN0LWNoYXIKVW5leHBlY3RlZCBlcnJvciBpbiBvYmplY3RfcHJvcGVydHlf
+dHJ5X2FkZCgpIGF0IC90bXAvcWVtdS10ZXN0L3NyYy9xb20vb2JqZWN0LmM6MTE4MToKYXR0ZW1w
+dCB0byBhZGQgZHVwbGljYXRlIHByb3BlcnR5ICdzZXJpYWwtaWQnIHRvIG9iamVjdCAodHlwZSAn
+Y29udGFpbmVyJykKRVJST1IgdGVzdC1jaGFyIC0gdG9vIGZldyB0ZXN0cyBydW4gKGV4cGVjdGVk
+IDM4LCBnb3QgOSkKbWFrZTogKioqIFtjaGVjay11bml0XSBFcnJvciAxCm1ha2U6ICoqKiBXYWl0
+aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4uCiAgVEVTVCAgICBpb3Rlc3QtcWNvdzI6IDAyOQog
+IFRFU1QgICAgY2hlY2stcXRlc3QteDg2XzY0OiB0ZXN0cy9xdGVzdC9oZC1nZW8tdGVzdAotLS0K
+ICAgIHJhaXNlIENhbGxlZFByb2Nlc3NFcnJvcihyZXRjb2RlLCBjbWQpCnN1YnByb2Nlc3MuQ2Fs
+bGVkUHJvY2Vzc0Vycm9yOiBDb21tYW5kICdbJ3N1ZG8nLCAnLW4nLCAnZG9ja2VyJywgJ3J1bics
+ICctLWxhYmVsJywgJ2NvbS5xZW11Lmluc3RhbmNlLnV1aWQ9ZDAyMDU0MWQ4Mjc4NGNiMmFjODA0
+OTk0MjIwYmE0ZWMnLCAnLXUnLCAnMTAwMScsICctLXNlY3VyaXR5LW9wdCcsICdzZWNjb21wPXVu
+Y29uZmluZWQnLCAnLS1ybScsICctZScsICdUQVJHRVRfTElTVD0nLCAnLWUnLCAnRVhUUkFfQ09O
+RklHVVJFX09QVFM9JywgJy1lJywgJ1Y9JywgJy1lJywgJ0o9MTQnLCAnLWUnLCAnREVCVUc9Jywg
+Jy1lJywgJ1NIT1dfRU5WPTEnLCAnLWUnLCAnQ0NBQ0hFX0RJUj0vdmFyL3RtcC9jY2FjaGUnLCAn
+LXYnLCAnL2hvbWUvcGF0Y2hldy8uY2FjaGUvcWVtdS1kb2NrZXItY2NhY2hlOi92YXIvdG1wL2Nj
+YWNoZTp6JywgJy12JywgJy92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC1xNGZkNmNrcC9zcmMv
+ZG9ja2VyLXNyYy4yMDIwLTA4LTIxLTA0LjUyLjI5LjI5MDY3Oi92YXIvdG1wL3FlbXU6eixybycs
+ICdxZW11L2NlbnRvczcnLCAnL3Zhci90bXAvcWVtdS9ydW4nLCAndGVzdC1xdWljayddJyByZXR1
+cm5lZCBub24temVybyBleGl0IHN0YXR1cyAyLgpmaWx0ZXI9LS1maWx0ZXI9bGFiZWw9Y29tLnFl
+bXUuaW5zdGFuY2UudXVpZD1kMDIwNTQxZDgyNzg0Y2IyYWM4MDQ5OTQyMjBiYTRlYwptYWtlWzFd
+OiAqKiogW2RvY2tlci1ydW5dIEVycm9yIDEKbWFrZVsxXTogTGVhdmluZyBkaXJlY3RvcnkgYC92
+YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC1xNGZkNmNrcC9zcmMnCm1ha2U6ICoqKiBbZG9ja2Vy
+LXJ1bi10ZXN0LXF1aWNrQGNlbnRvczddIEVycm9yIDIKCnJlYWwgICAgMTVtNTguNjg3cwp1c2Vy
+ICAgIDBtOS4wMjVzCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hl
+dy5vcmcvbG9ncy8yMDIwMDgyMTA4Mzg1My4zNTY0OTAtMS1ncmFlbWVAbnV2aWFpbmMuY29tL3Rl
+c3RpbmcuZG9ja2VyLXF1aWNrQGNlbnRvczcvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVy
+YXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxl
+YXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
 
