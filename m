@@ -2,112 +2,92 @@ Return-Path: <SRS0=atk5=B7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7309CC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 12:59:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD945C433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 13:01:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EEE1B2078D
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 12:59:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 87C83207BB
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 13:01:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IkiwKWPz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EEE1B2078D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a+l70nWJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87C83207BB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37178 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40262 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k96dI-0002ap-I7
-	for qemu-devel@archiver.kernel.org; Fri, 21 Aug 2020 08:59:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38496)
+	id 1k96fa-00049Y-Rk
+	for qemu-devel@archiver.kernel.org; Fri, 21 Aug 2020 09:01:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39004)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k96ce-0002Aa-GV
- for qemu-devel@nongnu.org; Fri, 21 Aug 2020 08:58:20 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:43684)
+ (Exim 4.90_1) (envelope-from <bfoster@redhat.com>)
+ id 1k96ei-0003Zg-EK
+ for qemu-devel@nongnu.org; Fri, 21 Aug 2020 09:00:29 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29942
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k96cc-0004Te-Fr
- for qemu-devel@nongnu.org; Fri, 21 Aug 2020 08:58:20 -0400
+ (Exim 4.90_1) (envelope-from <bfoster@redhat.com>)
+ id 1k96ef-0004hL-Ji
+ for qemu-devel@nongnu.org; Fri, 21 Aug 2020 09:00:28 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598014697;
+ s=mimecast20190719; t=1598014823;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=bq/ljcc6YItIYAmsgMRKTODv0741Lr8mvM1tUZfeha8=;
- b=IkiwKWPzYyYJKawnTDj5kAw7XpzvlVYxFvnNiKtg2kKOtzLIiS88EBebwzHB9/Q6/WZ8/0
- 9GHfmPDuWqH4OZQIXZ+86L/7fHCyNiFRDRFulIkDnOG4lsQHQD3mTTbOzA/+IZw5v+t1p7
- VFTvDaAdNK01B0eYesYmlYbUKPyQGNM=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-12-TVlUeR5tPgWmX3z78m5HRQ-1; Fri, 21 Aug 2020 08:58:13 -0400
-X-MC-Unique: TVlUeR5tPgWmX3z78m5HRQ-1
-Received: by mail-wr1-f69.google.com with SMTP id m7so523964wrb.20
- for <qemu-devel@nongnu.org>; Fri, 21 Aug 2020 05:58:13 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=bq/ljcc6YItIYAmsgMRKTODv0741Lr8mvM1tUZfeha8=;
- b=PPfVputFykpTKAyb1DcCiPHiBAlC0EGtu2wirdGqx5MFa+kNPH1ZFiO0itZHd8hdyR
- 5uO/DAMWWh/KgHfw2gVpfLu3WLVoXqgXC2tM7UtvOmBG7JGa8RvS4HrDV57TeGd5ROKP
- wN53B9MQShiVbxcOSGeGwQzBGyjORhpp+nKzjvWMBTO1FmXwAH/DdpRIkYhiMcGcSHh5
- wV52rykOubVQqFymRATsgjI93auQLYh7zsEygM9iqtad/fr0saCFOg2wK9CSz60w7d2s
- syG3T+7LxkfM5V0dmlqkwOQcfMwLx2B3Y3hwU8rWTjiPKCDr94xQ00Jh9lASLZ4pIjw7
- +tjA==
-X-Gm-Message-State: AOAM530BTiZEVa7ElstK0GptCU0kzLTkAcoGtlLEoKOE1sVsiSckPr2c
- DmyPXoNDcw+t15+9IHbLGYFDsGEidkS1JHRciy6iHWs0MFeQ0K+hQhGb/GN5ATyQJdsiobFkBvY
- nooh4zzZgddvPGqw=
-X-Received: by 2002:a7b:c195:: with SMTP id y21mr3084716wmi.20.1598014692522; 
- Fri, 21 Aug 2020 05:58:12 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyit81WMW51MJlUCcfMhAJST+kbXfaAVRn81fQqbJCkUikhxFyHBrcyf/FOkOMrPzICyXUiwQ==
-X-Received: by 2002:a7b:c195:: with SMTP id y21mr3084696wmi.20.1598014692256; 
- Fri, 21 Aug 2020 05:58:12 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:1cc0:4e4e:f1a9:1745?
- ([2001:b07:6468:f312:1cc0:4e4e:f1a9:1745])
- by smtp.gmail.com with ESMTPSA id b8sm4361808wrv.4.2020.08.21.05.58.11
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 21 Aug 2020 05:58:11 -0700 (PDT)
-Subject: Re: [PATCH v2] configure: add support for pseudo-"in source tree"
- builds
-To: Kevin Wolf <kwolf@redhat.com>
-References: <20200820173124.243984-1-berrange@redhat.com>
- <814594a0-391c-01fb-a418-234e477793d3@redhat.com>
- <20200821100426.GB5153@linux.fritz.box>
- <df28e5c2-ee4a-23d6-dcb2-04003a5d2757@redhat.com>
- <20200821105439.GE5153@linux.fritz.box>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <6414fb85-7267-2382-dc2d-f10f6c1cb115@redhat.com>
-Date: Fri, 21 Aug 2020 14:58:10 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+ bh=+LQ8GTLmp2P5ctZzLR7WCdxL3glFXWbr1uNxQsx5Svs=;
+ b=a+l70nWJdaORKsosw8Yt9hNrN8rlvrNAD+BDPZqV9rcKZWzXaMRccQVsUucqNT2qPRYt3A
+ 3qsdhAndx/33N9eiwjYBGXbpKs2wtgNKKafnDFD4yiD//qBrpo9vFj6vXrJInvIxR4fGrg
+ sXh4+jFxuGbdw1VNkF+ShhjXSN9mFEw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-550-cHYLhd90Ne227NVuRmo9Ng-1; Fri, 21 Aug 2020 09:00:19 -0400
+X-MC-Unique: cHYLhd90Ne227NVuRmo9Ng-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B43301008228;
+ Fri, 21 Aug 2020 12:59:46 +0000 (UTC)
+Received: from bfoster (ovpn-112-11.rdu2.redhat.com [10.10.112.11])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id CB2E119D6C;
+ Fri, 21 Aug 2020 12:59:45 +0000 (UTC)
+Date: Fri, 21 Aug 2020 08:59:44 -0400
+From: Brian Foster <bfoster@redhat.com>
+To: Alberto Garcia <berto@igalia.com>
+Subject: Re: [PATCH 0/1] qcow2: Skip copy-on-write when allocating a zero
+ cluster
+Message-ID: <20200821125944.GC212879@bfoster>
+References: <20200817101019.GD11402@linux.fritz.box>
+ <w518sedz3td.fsf@maestria.local.igalia.com>
+ <20200817155307.GS11402@linux.fritz.box>
+ <w51pn7memr7.fsf@maestria.local.igalia.com>
+ <20200819150711.GE10272@linux.fritz.box>
+ <20200819175300.GA141399@bfoster>
+ <w51v9hdultt.fsf@maestria.local.igalia.com>
+ <20200820215811.GC7941@dread.disaster.area>
+ <20200821110506.GB212879@bfoster>
+ <w51364gjkcj.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <20200821105439.GE5153@linux.fritz.box>
-Content-Language: en-US
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/21 02:43:55
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <w51364gjkcj.fsf@maestria.local.igalia.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=bfoster@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/20 23:41:39
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
 X-Spam_bar: ----
 X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -120,38 +100,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org,
+ Dave Chinner <david@fromorbit.com>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, linux-xfs@vger.kernel.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 21/08/20 12:54, Kevin Wolf wrote:
->>> Sounds like it will be painful to switch between branches based on make
->>> and branches based on meson. By extension, it will also be painful to
->>> check out and build old versions for comparison, or doing that even more
->>> than once during git bisect. :-(
->> Not if you switch to out-of-tree builds...
-> I don't see what out-of-tree builds change about this unless I delete
-> and reconfigure them after each step? Even in those cases where I use
-> out-of-tree builds, I often reuse the same directory.
+On Fri, Aug 21, 2020 at 01:42:52PM +0200, Alberto Garcia wrote:
+> On Fri 21 Aug 2020 01:05:06 PM CEST, Brian Foster <bfoster@redhat.com> wrote:
+> >> > 1) off: for every write request QEMU initializes the cluster (64KB)
+> >> >         with fallocate(ZERO_RANGE) and then writes the 4KB of data.
+> >> > 
+> >> > 2) off w/o ZERO_RANGE: QEMU writes the 4KB of data and fills the rest
+> >> >         of the cluster with zeroes.
+> >> > 
+> >> > 3) metadata: all clusters were allocated when the image was created
+> >> >         but they are sparse, QEMU only writes the 4KB of data.
+> >> > 
+> >> > 4) falloc: all clusters were allocated with fallocate() when the image
+> >> >         was created, QEMU only writes 4KB of data.
+> >> > 
+> >> > 5) full: all clusters were allocated by writing zeroes to all of them
+> >> >         when the image was created, QEMU only writes 4KB of data.
+> >> > 
+> >> > As I said in a previous message I'm not familiar with xfs, but the
+> >> > parts that I don't understand are
+> >> > 
+> >> >    - Why is (4) slower than (1)?
+> >> 
+> >> Because fallocate() is a full IO serialisation barrier at the
+> >> filesystem level. If you do:
+> >> 
+> >> fallocate(whole file)
+> >> <IO>
+> >> <IO>
+> >> <IO>
+> >> .....
+> >> 
+> >> The IO can run concurrent and does not serialise against anything in
+> >> the filesysetm except unwritten extent conversions at IO completion
+> >> (see answer to next question!)
+> >> 
+> >> However, if you just use (4) you get:
+> >> 
+> >> falloc(64k)
+> >>   <wait for inflight IO to complete>
+> >>   <allocates 64k as unwritten>
+> >> <4k io>
+> >>   ....
+> >> falloc(64k)
+> >>   <wait for inflight IO to complete>
+> >>   ....
+> >>   <4k IO completes, converts 4k to written>
+> >>   <allocates 64k as unwritten>
+> >> <4k io>
+> >> falloc(64k)
+> >>   <wait for inflight IO to complete>
+> >>   ....
+> >>   <4k IO completes, converts 4k to written>
+> >>   <allocates 64k as unwritten>
+> >> <4k io>
+> >>   ....
+> >> 
+> >
+> > Option 4 is described above as initial file preallocation whereas
+> > option 1 is per 64k cluster prealloc. Prealloc mode mixup aside, Berto
+> > is reporting that the initial file preallocation mode is slower than
+> > the per cluster prealloc mode. Berto, am I following that right?
+> 
+> Option (1) means that no qcow2 cluster is allocated at the beginning of
+> the test so, apart from updating the relevant qcow2 metadata, each write
+> request clears the cluster first (with fallocate(ZERO_RANGE)) then
+> writes the requested 4KB of data. Further writes to the same cluster
+> don't need changes on the qcow2 metadata so they go directly to the area
+> that was cleared with fallocate().
+> 
+> Option (4) means that all clusters are allocated when the image is
+> created and they are initialized with fallocate() (actually with
+> posix_fallocate() now that I read the code, I suppose it's the same for
+> xfs?). Only after that the test starts. All write requests are simply
+> forwarded to the disk, there is no need to touch any qcow2 metadata nor
+> do anything else.
+> 
 
-In two ways:
+Ok, I think that's consistent with what I described above (sorry, I find
+the preallocation mode names rather confusing so I was trying to avoid
+using them). Have you confirmed that posix_fallocate() in this case
+translates directly to fallocate()? I suppose that's most likely the
+case, otherwise you'd see numbers more like with preallocation=full
+(file preallocated via writing zeroes).
 
-1) bisection will rarely jump around the point where Meson was
-introduced.  First, because if it coincides with the 5.1.0 release, then
-you know in advance if the problem was introduced before or after the
-merge.  Second, because the bisection will quickly land on a merge
-commit, and then you can (just for going down the merged branch) use a
-separate out-of-tree build directory.
+> And yes, (4) is a bit slower than (1) in my tests. On ext4 I get 10%
+> more IOPS.
+> 
+> I just ran the tests with aio=native and with a raw image instead of
+> qcow2, here are the results:
+> 
+> qcow2:
+> |----------------------+-------------+------------|
+> | preallocation        | aio=threads | aio=native |
+> |----------------------+-------------+------------|
+> | off                  |        8139 |       7649 |
+> | off (w/o ZERO_RANGE) |        2965 |       2779 |
+> | metadata             |        7768 |       8265 |
+> | falloc               |        7742 |       7956 |
+> | full                 |       41389 |      56668 |
+> |----------------------+-------------+------------|
+> 
 
-2) for the rare case of working on a branch that was developed pre-Meson
-and has not been rebased (or need not be rebased), you again use a
-separate out-of-tree build directory just for that one, and you don't
-have to worry about doing distclean or an incremental builds.
+So this seems like Dave's suggestion to use native aio produced more
+predictable results with full file prealloc being a bit faster than per
+cluster prealloc. Not sure why that isn't the case with aio=threads. I
+was wondering if perhaps the threading affects something indirectly like
+the qcow2 metadata allocation itself, but I guess that would be
+inconsistent with ext4 showing a notable jump from (1) to (4) (assuming
+the previous ext4 numbers were with aio=threads).
 
-Paolo
+> raw:
+> |---------------+-------------+------------|
+> | preallocation | aio=threads | aio=native |
+> |---------------+-------------+------------|
+> | off           |        7647 |       7928 |
+> | falloc        |        7662 |       7856 |
+> | full          |       45224 |      58627 |
+> |---------------+-------------+------------|
+> 
+> A qcow2 file with preallocation=metadata is more or less similar to a
+> sparse raw file (and the numbers are indeed similar).
+> 
+> preallocation=off on qcow2 does not have an equivalent on raw files.
+> 
+
+It sounds like preallocation=off for qcow2 would be roughly equivalent
+to a raw file with a 64k extent size hint (on XFS).
+
+Brian
+
+> Berto
+> 
 
 
