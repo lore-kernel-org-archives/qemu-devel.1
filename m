@@ -2,125 +2,89 @@ Return-Path: <SRS0=atk5=B7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45672C433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 11:43:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BBAAC433E3
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 11:44:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EAC5820724
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 11:43:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2EEFE20724
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 11:44:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="s21ggCi5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EAC5820724
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=pass (2048-bit key) header.d=anisinha-ca.20150623.gappssmtp.com header.i=@anisinha-ca.20150623.gappssmtp.com header.b="m/Zx23Ec"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2EEFE20724
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=anisinha.ca
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40620 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43490 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k95SM-0006GH-1a
-	for qemu-devel@archiver.kernel.org; Fri, 21 Aug 2020 07:43:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46140)
+	id 1k95T5-0007R4-Bg
+	for qemu-devel@archiver.kernel.org; Fri, 21 Aug 2020 07:44:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42214)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1k95M7-0003XW-Pf; Fri, 21 Aug 2020 07:37:11 -0400
-Received: from mail-vi1eur05on2130.outbound.protection.outlook.com
- ([40.107.21.130]:30071 helo=EUR05-VI1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1k95M3-0001vv-8k; Fri, 21 Aug 2020 07:37:10 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Pccpsj78NhnN9Ug+mIuHZuQ1/ehyWScIjLfV2anDlUVgDPhQxLHMjFhSFaCgsAE+3ruBJGRuxxLLd/CtBL/pJiIH0ggT6afL5nB/lRcMa4BvwRk5tlsj58hCAcSqF1pyr9vuGXgC8g2Ww8t+0oHLx+r8+0BqLiQ/8+iGI3d0ZBoI4FYcr+XU279StUDugOt9/sC+U4m35+6ljaKykLNGKmiq2nGOmNSwluUN8Q681lWRU3pbaIf/xgaZ6DAIoPpQONOomqAsjWaht7uXkzMftAGwd7idlrSzsYOyMRtqPcooajE00cl9yCux3JJANNDSUZsV4Jmy14J3N+W+rYTIFA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=dpdM8wJ8fcFMbJTNORYMnZR1//giCGOTk4yGom46qFk=;
- b=WUI6+Ke1IU8CS2pldc0Ev+s4WsuLgApqh0iqe51f70k0uHFvfeK90WL0rvkCRkn8RidS38stqJThlRNv+QbkojS4S/AK9QdUP1BY3DUiHq0sfMOD/JO3VVO0XYoosvi9nXnXXlrymVyae0qHasrVj6G7Xsrj7/LcuwwhJAx41i2ZxwgE38eb8g2jzhMeBMp1FoyO5UqJtx+DrmG0jzIGyWKwC3TABlifeMHav7B06RBlFrw/4z63UEN/aM9/IlG3QWjTT7AFbsRZLQ2YKbtWb8qTg1V4vxNYrpCJUoN3hEm4PcdgttD9kBu35SKNKai1XTwtJaizATs+NMuGfj4pDg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=dpdM8wJ8fcFMbJTNORYMnZR1//giCGOTk4yGom46qFk=;
- b=s21ggCi5ryVeEc0V3Q99CqzM/t0yhud+X0jkq8ECAjSCg4PTG476Iu3Duqo/lFLyxUZr/wUhHBY+kmyztKC76F0zdu5TO89Asv92tsn1wX9pDk26JtbBPkF9CwcwcKkDgVjAUp4ZfWo0MEIy5QHz3LHfGmgFKYf0DNwOzwe/jYg=
-Authentication-Results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM6PR08MB4849.eurprd08.prod.outlook.com (2603:10a6:20b:c3::18)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3305.24; Fri, 21 Aug
- 2020 11:36:59 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::8c0c:c056:97a5:484a]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::8c0c:c056:97a5:484a%3]) with mapi id 15.20.3283.027; Fri, 21 Aug 2020
- 11:36:59 +0000
-Subject: Re: [PATCH v4 4/4] iotests: Test node/bitmap aliases during migration
-To: Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>,
- qemu-block@nongnu.org
-References: <20200818133240.195840-1-mreitz@redhat.com>
- <20200818133240.195840-5-mreitz@redhat.com>
- <b1ab8e28-f5ad-1cde-a706-02e4b32e1a0a@virtuozzo.com>
- <d5800911-0068-8810-f7e0-ab2b10f949b2@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <b3d1c4ca-66ee-d79d-1079-91838f3f814d@virtuozzo.com>
-Date: Fri, 21 Aug 2020 14:36:57 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
-In-Reply-To: <d5800911-0068-8810-f7e0-ab2b10f949b2@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: AM3PR05CA0126.eurprd05.prod.outlook.com
- (2603:10a6:207:2::28) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1k94zZ-0007vU-JY
+ for qemu-devel@nongnu.org; Fri, 21 Aug 2020 07:13:53 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:51458)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1k94zW-0007nd-W2
+ for qemu-devel@nongnu.org; Fri, 21 Aug 2020 07:13:53 -0400
+Received: by mail-wm1-x342.google.com with SMTP id p14so1469278wmg.1
+ for <qemu-devel@nongnu.org>; Fri, 21 Aug 2020 04:13:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=anisinha-ca.20150623.gappssmtp.com; s=20150623;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=KTJ84bLsfnq5pjvazwbe6znwCuqOyrGHCvam4hwbCsY=;
+ b=m/Zx23Ecgop//COvbfMOKD1cuGyeMVNndSdIvbPtWhxOrE7J5FH1Q1hB/+GDvs+J1p
+ LGNQyppMr/KiXqrilRPdpKGb+eG87Vb+dV0XAkl30VRKAn104r28ZZGpUa6o82Z4Xelm
+ Gno9qkVYimSe0e3XGZjalzyhgd3Kt0KvsWCWh+1aHGI9GqEIxC2Ll7/GZ9wJ+Lq5OCam
+ taaVMN97rRckPrPQNv/XBUqpwk04hT3Wc2D7ZyDDuPW+5geWGOBenOjSS9orde9kNd7z
+ gJidYojYSk4crZd3pMQ6RsEPb6dBKwnlqIt7rNihf0w3OMCIC06uqYLWddC61ogPMcG6
+ BeKw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=KTJ84bLsfnq5pjvazwbe6znwCuqOyrGHCvam4hwbCsY=;
+ b=syDCFok2dr9Sefs9fgybI3cebt2890g1cvgfQQqvQ7Y9jB8DwVhXn8LDDXpa+jy/nS
+ 5xyY+PMTfI/IFd6F/phSXGqqJuy0SskONrEGt1qjdTZVYUPBsJIj9vX7cqktJYc5tgeK
+ 23kw5aUskEtr/0hd3GUB8E/8X/CVCfrhkndBsnN2wfq4PL5us0FKbVBoKlYGXTQ6k2V0
+ bQATvgthfn51KG3Kp8W/AOueVfEUF5/B2SKfEw6R40z6y1bBZkx4ytVmeeFyMJvv4Eqq
+ m1skQB5KaToJBEzubTifiF2FXkZPe/52PYHSPrCLAwxliWfdJWhxt92CSsqqLWz6Jaqa
+ vuXA==
+X-Gm-Message-State: AOAM532SewZ6wy9e2dkOQZbgpTWYYKN5MGzdctg0rYIlgMJ1kYGKqsWs
+ hhIvuEgw/zKYmg8WIFhc5CiEpbdiwBcobDTGkJ6ZJw==
+X-Google-Smtp-Source: ABdhPJzs+Kx1Wufv1nYRjiy8lK1OIFPu4nSZXuYotkB90Q3GdnzK5UpmocjF2wMGpuPnM0XWpmQ+BYrBYn51sj2MB0s=
+X-Received: by 2002:a05:600c:2116:: with SMTP id
+ u22mr3272217wml.35.1598008428973; 
+ Fri, 21 Aug 2020 04:13:48 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.5] (185.215.60.171) by
- AM3PR05CA0126.eurprd05.prod.outlook.com (2603:10a6:207:2::28) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3305.24 via Frontend Transport; Fri, 21 Aug 2020 11:36:58 +0000
-X-Originating-IP: [185.215.60.171]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 8df21eb5-4a26-477f-2647-08d845c683a5
-X-MS-TrafficTypeDiagnostic: AM6PR08MB4849:
-X-Microsoft-Antispam-PRVS: <AM6PR08MB48497F0F31F9F762A8DAAF94C15B0@AM6PR08MB4849.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 4+csnJFdNiJCwu37AfMXaa2QnpaztvHKSngk8HX3f6OxHr3mKPB8lfAun7DeddvvPc+pS09xzj001rvFMIsGakUq6zOnsgwQJqNANNuqWqNthCnRKZzYCv+nHRJZ7BmK5xmKq0ozPYdeAvYZZ2A4NPILknszemSchVe3Lcwcl28zwpguMsbup3+urG/WPdZ1Xpke8MI5URllCUf5Iyle5Y7UtKIjZaCmGDjsqDRsOkArrzB3nwAKMJpYZUwaWhNxy0h3BlqCVoG3Zet5YBtOyxDaKMGnDQ/10yg6g3uE4LtKUbepnFBLNsce1JvasBhLlbPRtz9Sc9LrzgcA8t/tcsOE4z8jxSKkOH8tehIUysB803o/ez1PSLYKg3Wnve0N
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(346002)(396003)(376002)(39840400004)(366004)(136003)(53546011)(6486002)(5660300002)(66946007)(8936002)(66556008)(66476007)(16526019)(36756003)(83380400001)(8676002)(956004)(26005)(186003)(2616005)(2906002)(52116002)(478600001)(31696002)(54906003)(31686004)(110136005)(4326008)(16576012)(86362001)(316002)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: eZBtTuTPT5pn1qg/tYo0KPg1LPBvFoU9UCnP0tKNlrMFKLjolPbOTvNMX6kSTX6OBQGjaN7cDHLoDxtq1hvQ3FxzSToH15WviH/xewWlD/KWmFYZEDPtvc1dJ+zv35wti5nMCuw1WrsXgVEaf7ClbKVERQo64r2yP7i2aXmBIDqcjTlr6bL4jT9uY1SB/la2l0e42ExMLaAAA3RBk/odlFqLW2lpd3h5Gm9nPZBUmfTXtIaN0tqAC4bfdAmp2/p5DpQEOjGKYFtBgsKoy1x89T59uKgEiBdmpr1txYi8zY/PeATlMXHniWEiYNxobXyeP3gRneuiztWjMqeowgG4qV7gT4I/tOPSWAF84r9okLQJbu+4/i2lhGCGi++2PtCQzuiu0AkGe2igwsR0PlrVP7z3BJU2f3+WHzdnsa/T3XkehTgps8Irh+flWC5I5fbBMv/sasnYF6EdjRbzCrl5mMoIg/KVt1sCnz1Oyu5t4BkdRyXbFTrbsKVQCf9FO+OxCiUrKoxnB5EeRbM0Q3/ig5OeKCx1BCIptwULBgCOmSV9YBVIOKg6WSsG0b6CFQAHCfBG+oZVzBOviD6jVAnR+/QbWC+7puuN6dwHj2HjGp4iJ//RURE1SZ/Hx+1hwhBFBZHQ0u2+2r8tG3kDn9n8XQ==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8df21eb5-4a26-477f-2647-08d845c683a5
-X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Aug 2020 11:36:59.0192 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: G/+8kynbLIWHzmZi7Rgya+Q4W2K7n9akdLQDU9ag+7KxDBwRhm6tB4Trg2C5U5ZvTh4nedb4Wf05JU6le3cTxAt8HTubu45k0q3BTVA+244=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4849
-Received-SPF: pass client-ip=40.107.21.130;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR05-VI1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/21 07:37:00
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -37
-X-Spam_score: -3.8
-X-Spam_bar: ---
-X-Spam_report: (-3.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-1,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+References: <CAARzgwyuL_joY_4wq8=WY7U=E67F2roPJ36kaQLJFRVqLgpGXg@mail.gmail.com>
+ <96C3BCCD-7A5E-439D-8EDD-927D188C0946@anisinha.ca>
+ <20200821111612.5b04bc5e@redhat.com>
+In-Reply-To: <20200821111612.5b04bc5e@redhat.com>
+From: Ani Sinha <ani@anisinha.ca>
+Date: Fri, 21 Aug 2020 16:43:37 +0530
+Message-ID: <CAARzgwy17=msoLQ662VXfdMOLJd7=hBMpC6LNN_C5fvGgMM1YQ@mail.gmail.com>
+Subject: Re: [PATCH V6] Introduce a new flag for i440fx to disable PCI hotplug
+ on the root bus
+To: Igor Mammedov <imammedo@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: none client-ip=2a00:1450:4864:20::342;
+ envelope-from=ani@anisinha.ca; helo=mail-wm1-x342.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -133,120 +97,329 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Krempa <pkrempa@redhat.com>,
- Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>, John Snow <jsnow@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-21.08.2020 03:44, Eric Blake wrote:
-> On 8/20/20 10:49 AM, Vladimir Sementsov-Ogievskiy wrote:
->> # MYPYPATH=../../python/ mypy 300
->> 300:154: error: Item "None" of "Optional[Match[Any]]" has no attribute "group"
->> Found 1 error in 1 file (checked 1 source file)
->>
->> - the only complain. Suggest a fix:
->>
->> diff --git a/tests/qemu-iotests/300 b/tests/qemu-iotests/300
->> index c6d86b1dbc..0241903743 100755
->> --- a/tests/qemu-iotests/300
->> +++ b/tests/qemu-iotests/300
->> @@ -148,11 +148,11 @@ class TestDirtyBitmapMigration(iotests.QMPTestCase):
->>               result = vm.qmp('human-monitor-command',
->>                               command_line='info migrate_parameters')
->>
->> -            hmp_mapping = re.search(r'^block-bitmap-mapping:\r?(\n .*)*\n',
->> -                                    result['return'], flags=re.MULTILINE)
->> +            m = re.search(r'^block-bitmap-mapping:\r?(\n  .*)*\n',
->> +                          result['return'], flags=re.MULTILINE)
->> +            hmp_mapping = m.group(0).replace('\r', '') if m else None
->>
->> -            self.assertEqual(hmp_mapping.group(0).replace('\r', ''),
->> -                             self.to_hmp_mapping(mapping))
->> +            self.assertEqual(hmp_mapping, self.to_hmp_mapping(mapping))
->>           else:
->>               self.assert_qmp(result, 'error/desc', error)
-> 
-> Thanks; I'll fold that in to v5.
-> 
->>
->> ===
->>
->> # flake8 300
->> 300:24:1: F401 'time' imported but unused
->> 300:34:1: E302 expected 2 blank lines, found 1
->> 300:42:67: E502 the backslash is redundant between brackets
->> 300:47:67: E502 the backslash is redundant between brackets
->> 300:67:53: E502 the backslash is redundant between brackets
->> 300:122:9: E125 continuation line with same indent as next logical line
->> 300:134:9: E125 continuation line with same indent as next logical line
->> 300:185:52: E502 the backslash is redundant between brackets
->> 300:186:72: E502 the backslash is redundant between brackets
->> 300:285:77: E502 the backslash is redundant between brackets
->> 300:305:77: E502 the backslash is redundant between brackets
->> 300:306:78: E502 the backslash is redundant between brackets
->> 300:330:77: E502 the backslash is redundant between brackets
->> 300:350:77: E502 the backslash is redundant between brackets
->> 300:385:57: E502 the backslash is redundant between brackets
->> 300:386:59: E502 the backslash is redundant between brackets
->> 300:387:67: E502 the backslash is redundant between brackets
->> 300:412:78: E502 the backslash is redundant between brackets
->> 300:425:78: E502 the backslash is redundant between brackets
->> 300:435:78: E502 the backslash is redundant between brackets
->> 300:436:76: E502 the backslash is redundant between brackets
->> 300:451:66: E502 the backslash is redundant between brackets
->> 300:473:78: E502 the backslash is redundant between brackets
->> 300:474:79: E502 the backslash is redundant between brackets
->> 300:488:78: E502 the backslash is redundant between brackets
->> 300:489:77: E502 the backslash is redundant between brackets
->>
->> - I post it just because ALE plugin in vim highlights all these things for me. Up to you, I don't ask you to fix it.
-> 
-> Seems like an easy enough touchup to make.
-> 
-> 
->>> +    def test_alias_on_both_migration(self) -> None:
->>> +        src_map = self.mapping(self.src_node_name, 'node-alias',
->>> +                               self.src_bmap_name, 'bmap-alias')
->>> +
->>> +        dst_map = self.mapping(self.dst_node_name, 'node-alias',
->>> +                               self.dst_bmap_name, 'bmap-alias')
->>> +
->>> +        self.set_mapping(self.vm_a, src_map)
->>> +        self.set_mapping(self.vm_b, dst_map)
->>> +        self.migrate()
->>> +        self.verify_dest_error(None)
->>
->> Hmm, probably verify_dest_error() should be called from migrate(), as you call it (almost) always after migrate()
-> 
-> This one I did not touch; it can be a followup patch if desired.
-> 
->>
->>> +
->>> +
->>
->> [..]
->>
->>> +    def test_unused_mapping_on_dst(self) -> None:
->>> +        # Let the source not send any bitmaps
->>> +        self.set_mapping(self.vm_a, [])
->>> +
->>> +        # Establish some mapping on the destination
->>> +        self.set_mapping(self.vm_b, [])
->>
->> Seems, you wanted to specify non-empty mapping for vm_b, yes?
->> With any non-empty mapping here, just to better correspond to the comments:
->> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>
->> (or keep this case with both mappings empty, and add one similar with empty mapping only on src)
-> 
-> Adding another case will now have to be a separate patch.  At any rate, I've taken the liberty of including your R-b in my staging tree for the pending pull request, let me know if I should drop it.
-> 
+On Fri, Aug 21, 2020 at 2:46 PM Igor Mammedov <imammedo@redhat.com> wrote:
+>
+> On Thu, 20 Aug 2020 22:11:41 +0530
+> Ani Sinha <ani@anisinha.ca> wrote:
+>
+> > > On Aug 20, 2020, at 9:11 PM, Ani Sinha <ani@anisinha.ca> wrote:
+> > >
+> > > =EF=BB=BFOn Thu, Aug 20, 2020 at 7:37 PM Igor Mammedov <imammedo@redh=
+at.com> wrote:
+> > >>
+> > >>> On Thu, 20 Aug 2020 14:51:56 +0530
+> > >>> Ani Sinha <ani@anisinha.ca> wrote:
+> > >>>
+> > >>> We introduce a new global flag 'acpi-root-pci-hotplug' for i440fx w=
+ith which
+> > >>> we can turn on or off PCI device hotplug on the root bus. This flag=
+ can be
+> > >>> used to prevent all PCI devices from getting hotplugged or unplugge=
+d from the
+> > >>> root PCI bus.
+> > >>> This feature is targetted mostly towards Windows VMs. It is useful =
+in cases
+> > >>> where some hypervisor admins want to deploy guest VMs in a way so t=
+hat the
+> > >>> users of the guest OSes are not able to hot-eject certain PCI devic=
+es from
+> > >>> the Windows system tray. Laine has explained the use case here in d=
+etail:
+> > >>> https://www.redhat.com/archives/libvir-list/2020-February/msg00110.=
+html
+> > >>>
+> > >>> Julia has resolved this issue for PCIE buses with the following com=
+mit:
+> > >>> 530a0963184e57e71a5b538 ("pcie_root_port: Add hotplug disabling opt=
+ion")
+> > >>>
+> > >>> This commit attempts to introduce similar behavior for PCI root bus=
+es used in
+> > >>> i440fx machine types (although in this case, we do not have a per-s=
+lot
+> > >>> capability to turn hotplug on or off).
+> > >>>
+> > >>> Usage:
+> > >>>   -global PIIX4_PM.acpi-root-pci-hotplug=3Doff
+> > >>>
+> > >>> By default, this option is enabled which means that hotplug is turn=
+ed on for
+> > >>> the PCI root bus.
+> > >>>
+> > >>> The previously existing flag 'acpi-pci-hotplug-with-bridge-support'=
+ for PCI-PCI
+> > >>> bridges remain as is and can be used along with this new flag to co=
+ntrol PCI
+> > >>> hotplug on PCI bridges.
+> > >>>
+> > >>> This change has been tested using a Windows 2012R2 server guest ima=
+ge and also
+> > >>> with a Windows 2019 server guest image on a Ubuntu 18.04 host using=
+ the latest
+> > >>> master qemu from upstream (v5.1.0 tag).
+> > >>>
+> > >>> Signed-off-by: Ani Sinha <ani@anisinha.ca>
+> > >>> ---
+> > >>> hw/acpi/piix4.c      |  8 ++++++--
+> > >>> hw/i386/acpi-build.c | 26 +++++++++++++++++++-------
+> > >>> 2 files changed, 25 insertions(+), 9 deletions(-)
+> > >>>
+> > >>> Change Log:
+> > >>> V5..V6: specified upstream master tag information off which this pa=
+tch is
+> > >>> based off of.
+> > >>>
+> > >>> diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
+> > >>> index 26bac4f16c..4f436e5bf3 100644
+> > >>> --- a/hw/acpi/piix4.c
+> > >>> +++ b/hw/acpi/piix4.c
+> > >>> @@ -78,6 +78,7 @@ typedef struct PIIX4PMState {
+> > >>>
+> > >>>     AcpiPciHpState acpi_pci_hotplug;
+> > >>>     bool use_acpi_hotplug_bridge;
+> > >>> +    bool use_acpi_root_pci_hotplug;
+> > >>>
+> > >>>     uint8_t disable_s3;
+> > >>>     uint8_t disable_s4;
+> > >>
+> > >>> @@ -595,8 +596,9 @@ static void piix4_acpi_system_hot_add_init(Memo=
+ryRegion *parent,
+> > >>>                           "acpi-gpe0", GPE_LEN);
+> > >>>     memory_region_add_subregion(parent, GPE_BASE, &s->io_gpe);
+> > >>>
+> > >>> -    acpi_pcihp_init(OBJECT(s), &s->acpi_pci_hotplug, bus, parent,
+> > >>> -                    s->use_acpi_hotplug_bridge);
+> > >>> +    if (s->use_acpi_hotplug_bridge || s->use_acpi_root_pci_hotplug=
+)
+> > >>> +        acpi_pcihp_init(OBJECT(s), &s->acpi_pci_hotplug, bus, pare=
+nt,
+> > >>> +                        s->use_acpi_hotplug_bridge);
+> > >> If intent was to disable hardware part of ACPI hotplug,
+> > >> then this hunk is not enough. I'd say it introduces bug since you ar=
+e leaving
+> > >> device_add/del route open and "_E01" AML code around trying to acces=
+s no longer
+> > >> described/present io ports.
+> > >>
+> > >> Without this hunk patch is fine, as a means to hide hotplug from Win=
+dows.
+> > >>
+> > >> If you'd like to disable hw part, you will need to consider case whe=
+re hotplug is
+> > >> disabled completly and block all related AML and block device_add|de=
+l.
+> > >> So it would be a bit more than above hunk.
+> > >
+> > > Ok maybe I will just remove it.
+> > >
+> > >>
+> > >>
+> > >>>     s->cpu_hotplug_legacy =3D true;
+> > >>>     object_property_add_bool(OBJECT(s), "cpu-hotplug-legacy",
+> > >>> @@ -635,6 +637,8 @@ static Property piix4_pm_properties[] =3D {
+> > >>>     DEFINE_PROP_UINT8(ACPI_PM_PROP_S4_VAL, PIIX4PMState, s4_val, 2)=
+,
+> > >>>     DEFINE_PROP_BOOL("acpi-pci-hotplug-with-bridge-support", PIIX4P=
+MState,
+> > >>>                      use_acpi_hotplug_bridge, true),
+> > >>> +    DEFINE_PROP_BOOL("acpi-root-pci-hotplug", PIIX4PMState,
+> > >>> +                     use_acpi_root_pci_hotplug, true),
+> > >>>     DEFINE_PROP_BOOL("memory-hotplug-support", PIIX4PMState,
+> > >>>                      acpi_memory_hotplug.is_enabled, true),
+> > >>>     DEFINE_PROP_END_OF_LIST(),
+> > >>> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> > >>> index b7bcbbbb2a..19a1702ad1 100644
+> > >>> --- a/hw/i386/acpi-build.c
+> > >>> +++ b/hw/i386/acpi-build.c
+> > >>> @@ -95,6 +95,7 @@ typedef struct AcpiPmInfo {
+> > >>>     bool s3_disabled;
+> > >>>     bool s4_disabled;
+> > >>>     bool pcihp_bridge_en;
+> > >>> +    bool pcihp_root_en;
+> > >>>     uint8_t s4_val;
+> > >>>     AcpiFadtData fadt;
+> > >>>     uint16_t cpu_hp_io_base;
+> > >>> @@ -245,6 +246,9 @@ static void acpi_get_pm_info(MachineState *mach=
+ine, AcpiPmInfo *pm)
+> > >>>     pm->pcihp_bridge_en =3D
+> > >>>         object_property_get_bool(obj, "acpi-pci-hotplug-with-bridge=
+-support",
+> > >>>                                  NULL);
+> > >>> +    pm->pcihp_root_en =3D
+> > >>> +        object_property_get_bool(obj, "acpi-root-pci-hotplug", NUL=
+L);
+> > >>> +
+> > >>> }
+> > >>>
+> > >>> static void acpi_get_misc_info(AcpiMiscInfo *info)
+> > >>> @@ -337,15 +341,18 @@ static void build_append_pcihp_notify_entry(A=
+ml *method, int slot)
+> > >>> }
+> > >>>
+> > >>> static void build_append_pci_bus_devices(Aml *parent_scope, PCIBus =
+*bus,
+> > >>> -                                         bool pcihp_bridge_en)
+> > >>> +                                         bool pcihp_bridge_en,
+> > >>> +                                         bool pcihp_root_en)
+> > >>> {
+> > >>>     Aml *dev, *notify_method =3D NULL, *method;
+> > >>>     QObject *bsel;
+> > >>>     PCIBus *sec;
+> > >>>     int i;
+> > >>> +    bool root_bus =3D pci_bus_is_root(bus);
+> > >>> +    bool root_pcihp_disabled =3D (root_bus && !pcihp_root_en);
+> > >>>
+> > >>>     bsel =3D object_property_get_qobject(OBJECT(bus), ACPI_PCIHP_PR=
+OP_BSEL, NULL);
+> > >>> -    if (bsel) {
+> > >>> +    if (bsel && !root_pcihp_disabled) {
+> > >>
+> > >> have you considered to make bus not hotpluggable,
+> > >> which should make it not to have bsel, and hence skip this branch wi=
+thout
+> > >> root_pcihp_disabled?
+> > >>
+> > >> see: acpi_set_bsel()
+> > >>
+> > >>
+> > >> maybe you can drop pcihp_root_en and use bsel instead of it then.
+> > >>
+> > >> it also should block device_add/del route.
+> > >
+> > > This is a good idea. Therefore, I tried this:
+> > >
+> > > --- a/hw/acpi/piix4.c
+> > > +++ b/hw/acpi/piix4.c
+> > > @@ -28,6 +28,7 @@
+> > > #include "hw/pci/pci.h"
+> > > #include "hw/qdev-properties.h"
+> > > #include "hw/acpi/acpi.h"
+> > > +#include "hw/pci/pci_bus.h"
+> > > #include "sysemu/runstate.h"
+> > > #include "sysemu/sysemu.h"
+> > > #include "sysemu/xen.h"
+> > > @@ -507,7 +508,9 @@ static void piix4_pm_realize(PCIDevice *dev, Erro=
+r **errp)
+> > >
+> > >     piix4_acpi_system_hot_add_init(pci_address_space_io(dev),
+> > >                                    pci_get_bus(dev), s);
+> > > -    qbus_set_hotplug_handler(BUS(pci_get_bus(dev)), OBJECT(s));
+> > > +    if (s->use_acpi_root_pci_hotplug ||
+> > > +        !pci_bus_is_root(pci_get_bus(dev)))
+> > > +        qbus_set_hotplug_handler(BUS(pci_get_bus(dev)), OBJECT(s));
+> > >
+> > >     piix4_pm_add_propeties(s);
+> > > }
+> > >
+> > >
+> > > but this does not seem to be working. I am out of ideas as to why it
+> > > wouldn't work :(
+> >
+> > By that I mean the devices attached to bridges also seems to be disable=
+d from hotplug from within Windows. I do not understand why that would be t=
+he case when the pci_bus_is_root() should be false for the secondary buses.
+> >
+> >  Any ideas?
+> Looking at acpi_set_pci_info() and debugging it might help.
 
-OK, thanks, no objections.
+All my efforts in this space have failed to work :( I am feeling a
+little frustrated and out of ideas. I am inclined to resend V2 with
+the suggestions you suggested for the final patch unless you have
+better ideas.
 
--- 
-Best regards,
-Vladimir
+>
+> >
+> > >
+> > >>
+> > >>
+> > >>>         uint64_t bsel_val =3D qnum_get_uint(qobject_to(QNum, bsel))=
+;
+> > >>>
+> > >>>         aml_append(parent_scope, aml_name_decl("BSEL", aml_int(bsel=
+_val)));
+> > >>> @@ -361,6 +368,9 @@ static void build_append_pci_bus_devices(Aml *p=
+arent_scope, PCIBus *bus,
+> > >>>         bool bridge_in_acpi;
+> > >>>
+> > >>>         if (!pdev) {
+> > >>> +            /* skip if pci hotplug for the root bus is disabled */
+> > >>> +            if (root_pcihp_disabled)
+> > >>> +                continue;
+> > >>>             if (bsel) { /* add hotplug slots for non present device=
+s */
+> > >>>                 dev =3D aml_device("S%.02X", PCI_DEVFN(slot, 0));
+> > >>>                 aml_append(dev, aml_name_decl("_SUN", aml_int(slot)=
+));
+> > >>> @@ -419,7 +429,7 @@ static void build_append_pci_bus_devices(Aml *p=
+arent_scope, PCIBus *bus,
+> > >>>             method =3D aml_method("_S3D", 0, AML_NOTSERIALIZED);
+> > >>>             aml_append(method, aml_return(aml_int(s3d)));
+> > >>>             aml_append(dev, method);
+> > >>> -        } else if (hotplug_enabled_dev) {
+> > >>> +        } else if (hotplug_enabled_dev && !root_pcihp_disabled) {
+> > >>>             /* add _SUN/_EJ0 to make slot hotpluggable  */
+> > >>>             aml_append(dev, aml_name_decl("_SUN", aml_int(slot)));
+> > >>>
+> > >>> @@ -439,13 +449,14 @@ static void build_append_pci_bus_devices(Aml =
+*parent_scope, PCIBus *bus,
+> > >>>              */
+> > >>>             PCIBus *sec_bus =3D pci_bridge_get_sec_bus(PCI_BRIDGE(p=
+dev));
+> > >>>
+> > >>> -            build_append_pci_bus_devices(dev, sec_bus, pcihp_bridg=
+e_en);
+> > >>> +            build_append_pci_bus_devices(dev, sec_bus, pcihp_bridg=
+e_en,
+> > >>> +                                         pcihp_root_en);
+> > >>>         }
+> > >>>         /* slot descriptor has been composed, add it into parent co=
+ntext */
+> > >>>         aml_append(parent_scope, dev);
+> > >>>     }
+> > >>>
+> > >>> -    if (bsel) {
+> > >>> +    if (bsel && !root_pcihp_disabled) {
+> > >>>         aml_append(parent_scope, notify_method);
+> > >>>     }
+> > >>>
+> > >>> @@ -455,7 +466,7 @@ static void build_append_pci_bus_devices(Aml *p=
+arent_scope, PCIBus *bus,
+> > >>>     method =3D aml_method("PCNT", 0, AML_NOTSERIALIZED);
+> > >>>
+> > >>>     /* If bus supports hotplug select it and notify about local eve=
+nts */
+> > >>> -    if (bsel) {
+> > >>> +    if (bsel && !root_pcihp_disabled) {
+> > >>>         uint64_t bsel_val =3D qnum_get_uint(qobject_to(QNum, bsel))=
+;
+> > >>>
+> > >>>         aml_append(method, aml_store(aml_int(bsel_val), aml_name("B=
+NUM")));
+> > >>> @@ -1818,7 +1829,8 @@ build_dsdt(GArray *table_data, BIOSLinker *li=
+nker,
+> > >>>         if (bus) {
+> > >>>             Aml *scope =3D aml_scope("PCI0");
+> > >>>             /* Scan all PCI buses. Generate tables to support hotpl=
+ug. */
+> > >>> -            build_append_pci_bus_devices(scope, bus, pm->pcihp_bri=
+dge_en);
+> > >>> +            build_append_pci_bus_devices(scope, bus, pm->pcihp_bri=
+dge_en,
+> > >>> +                                         pm->pcihp_root_en);
+> > >>>
+> > >>>             if (TPM_IS_TIS_ISA(tpm)) {
+> > >>>                 if (misc->tpm_version =3D=3D TPM_VERSION_2_0) {
+> > >>
+> >
+>
 
