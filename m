@@ -7,81 +7,80 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0823FC433E1
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 14:14:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 408FAC433E1
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 14:14:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C51032177B
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 14:14:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ED8F32224D
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 14:14:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z6krHWy8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C51032177B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bb9OzKl+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED8F32224D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32968 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33302 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k97oV-0001u5-Rm
-	for qemu-devel@archiver.kernel.org; Fri, 21 Aug 2020 10:14:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54520)
+	id 1k97oZ-00023F-71
+	for qemu-devel@archiver.kernel.org; Fri, 21 Aug 2020 10:14:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54682)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1k97iz-0007KF-Br
- for qemu-devel@nongnu.org; Fri, 21 Aug 2020 10:08:57 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:46210
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1k97j8-0007k9-Lu
+ for qemu-devel@nongnu.org; Fri, 21 Aug 2020 10:09:06 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50399)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1k97ix-0004Xg-8e
- for qemu-devel@nongnu.org; Fri, 21 Aug 2020 10:08:57 -0400
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1k97j4-0004aM-Ek
+ for qemu-devel@nongnu.org; Fri, 21 Aug 2020 10:09:06 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598018934;
+ s=mimecast20190719; t=1598018941;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Ft+sZwk9gcDvF38VuUsUZ21PepdX21tQNatQ9qp1XgI=;
- b=Z6krHWy8fYMAbsQHxiLgJPLB2q3Tk78AzNFoOPAvDji4V8/esFUSj9h9/fdpAjNhtrWDmX
- 4//T62zHVmVBdb26axNsNDKdzslRRAzon/DKnzOLyWtETthctp0/Xza9p0aI2AKx08iwue
- IJhkPeCFoNy6SBusW66a6zjFBdEgTRA=
+ bh=utOUJzpcufX05SSRrX/MVtEK87W4K1Te9K0n/0E9ctc=;
+ b=bb9OzKl+vKTz/e0C+jvbHae8zruFz5MeP/rW1neKNRISav+5HnzMD18d5FaZcBnlG1ljMD
+ VCLTckdug2Lp8XsRB5j86ao0mpN2XU2IA0gkDM+/YsOk3FbrMsrdSUbZOgMWtTPZW2BTfS
+ xzsT7UmPaidWlwiYD0U3bWkqQ0EqliQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-405-wIc2WR9CPPOCtde7RYdzLA-1; Fri, 21 Aug 2020 10:08:33 -0400
-X-MC-Unique: wIc2WR9CPPOCtde7RYdzLA-1
+ us-mta-365-PG26rx8JO56qPydtWUH5YA-1; Fri, 21 Aug 2020 10:08:44 -0400
+X-MC-Unique: PG26rx8JO56qPydtWUH5YA-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 44A441019633;
- Fri, 21 Aug 2020 14:08:32 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F3786101962F;
+ Fri, 21 Aug 2020 14:08:43 +0000 (UTC)
 Received: from blue.redhat.com (ovpn-113-220.phx2.redhat.com [10.3.113.220])
- by smtp.corp.redhat.com (Postfix) with ESMTP id CE8617A40B;
- Fri, 21 Aug 2020 14:08:31 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8C4087AEC5;
+ Fri, 21 Aug 2020 14:08:43 +0000 (UTC)
 From: Eric Blake <eblake@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 05/14] qcow2_format.py: Dump bitmap directory information
-Date: Fri, 21 Aug 2020 09:08:17 -0500
-Message-Id: <20200821140826.194322-6-eblake@redhat.com>
+Subject: [PULL 14/14] iotests: Test node/bitmap aliases during migration
+Date: Fri, 21 Aug 2020 09:08:26 -0500
+Message-Id: <20200821140826.194322-15-eblake@redhat.com>
 In-Reply-To: <20200821140826.194322-1-eblake@redhat.com>
 References: <20200821140826.194322-1-eblake@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eblake@redhat.com
-X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=eblake@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/21 05:15:56
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=eblake@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/21 04:26:32
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
 X-Spam_bar: ----
 X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=unavailable autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,124 +94,650 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Kevin Wolf <kwolf@redhat.com>,
- Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  "open list:Block layer core" <qemu-block@nongnu.org>,
  Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
 
-Read and dump entries from the bitmap directory of QCOW2 image.
-
-Header extension:
-magic                     0x23852875 (Bitmaps)
-...
-Bitmap name               bitmap-1
-bitmap_table_offset       0xf0000
-bitmap_table_size         1
-flags                     0x2 (['auto'])
-type                      1
-granularity_bits          16
-name_size                 8
-extra_data_size           0
-
-Suggested-by: Kevin Wolf <kwolf@redhat.com>
-Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-Id: <1596742557-320265-6-git-send-email-andrey.shinkevich@virtuozzo.com>
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+Message-Id: <20200820150725.68687-4-mreitz@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Tested-by: Eric Blake <eblake@redhat.com>
+[eblake: fold in python cleanups recommended by Vladimir]
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- tests/qemu-iotests/303.out         | 18 ++++++++++++
- tests/qemu-iotests/qcow2_format.py | 47 ++++++++++++++++++++++++++++++
- 2 files changed, 65 insertions(+)
+ tests/qemu-iotests/300     | 593 +++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/300.out |   5 +
+ tests/qemu-iotests/group   |   1 +
+ 3 files changed, 599 insertions(+)
+ create mode 100755 tests/qemu-iotests/300
+ create mode 100644 tests/qemu-iotests/300.out
 
-diff --git a/tests/qemu-iotests/303.out b/tests/qemu-iotests/303.out
-index 8d7973ccc201..038ba93a87d7 100644
---- a/tests/qemu-iotests/303.out
-+++ b/tests/qemu-iotests/303.out
-@@ -58,3 +58,21 @@ reserved32                0
- bitmap_directory_size     0x40
- bitmap_directory_offset   0x9d0000
-
-+Bitmap name               bitmap-1
-+bitmap_table_offset       0x9b0000
-+bitmap_table_size         1
-+flags                     0x2 (['auto'])
-+type                      1
-+granularity_bits          15
-+name_size                 8
-+extra_data_size           0
+diff --git a/tests/qemu-iotests/300 b/tests/qemu-iotests/300
+new file mode 100755
+index 000000000000..5b75121b8496
+--- /dev/null
++++ b/tests/qemu-iotests/300
+@@ -0,0 +1,593 @@
++#!/usr/bin/env python3
++#
++# Copyright (C) 2020 Red Hat, Inc.
++#
++# Tests for dirty bitmaps migration with node aliases
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
 +
-+Bitmap name               bitmap-2
-+bitmap_table_offset       0x9c0000
-+bitmap_table_size         1
-+flags                     0x0 ([])
-+type                      1
-+granularity_bits          16
-+name_size                 8
-+extra_data_size           0
++import os
++import random
++import re
++from typing import Dict, List, Optional, Union
++import iotests
++import qemu
 +
-diff --git a/tests/qemu-iotests/qcow2_format.py b/tests/qemu-iotests/qcow2_format.py
-index b4473442c9d4..05a8aa98f72c 100644
---- a/tests/qemu-iotests/qcow2_format.py
-+++ b/tests/qemu-iotests/qcow2_format.py
-@@ -134,6 +134,53 @@ class Qcow2BitmapExt(Qcow2Struct):
-         tail = struct.calcsize(self.fmt) % 8
-         if tail:
-             fd.seek(8 - tail, 1)
-+        position = fd.tell()
-+        self.read_bitmap_directory(fd)
-+        fd.seek(position)
++BlockBitmapMapping = List[Dict[str, Union[str, List[Dict[str, str]]]]]
 +
-+    def read_bitmap_directory(self, fd):
-+        fd.seek(self.bitmap_directory_offset)
-+        self.bitmap_directory = \
-+            [Qcow2BitmapDirEntry(fd) for _ in range(self.nb_bitmaps)]
-+
-+    def dump(self):
-+        super().dump()
-+        for entry in self.bitmap_directory:
-+            print()
-+            entry.dump()
++assert iotests.sock_dir is not None
++mig_sock = os.path.join(iotests.sock_dir, 'mig_sock')
 +
 +
-+class Qcow2BitmapDirEntry(Qcow2Struct):
++class TestDirtyBitmapMigration(iotests.QMPTestCase):
++    src_node_name: str = ''
++    dst_node_name: str = ''
++    src_bmap_name: str = ''
++    dst_bmap_name: str = ''
 +
-+    fields = (
-+        ('u64', '{:#x}', 'bitmap_table_offset'),
-+        ('u32', '{}', 'bitmap_table_size'),
-+        ('u32', BitmapFlags, 'flags'),
-+        ('u8',  '{}', 'type'),
-+        ('u8',  '{}', 'granularity_bits'),
-+        ('u16', '{}', 'name_size'),
-+        ('u32', '{}', 'extra_data_size')
-+    )
++    def setUp(self) -> None:
++        self.vm_a = iotests.VM(path_suffix='-a')
++        self.vm_a.add_blockdev(f'node-name={self.src_node_name},'
++                               'driver=null-co')
++        self.vm_a.launch()
 +
-+    def __init__(self, fd):
-+        super().__init__(fd=fd)
-+        # Seek relative to the current position in the file
-+        fd.seek(self.extra_data_size, 1)
-+        bitmap_name = fd.read(self.name_size)
-+        self.name = bitmap_name.decode('ascii')
-+        # Move position to the end of the entry in the directory
-+        entry_raw_size = self.bitmap_dir_entry_raw_size()
-+        padding = ((entry_raw_size + 7) & ~7) - entry_raw_size
-+        fd.seek(padding, 1)
++        self.vm_b = iotests.VM(path_suffix='-b')
++        self.vm_b.add_blockdev(f'node-name={self.dst_node_name},'
++                               'driver=null-co')
++        self.vm_b.add_incoming(f'unix:{mig_sock}')
++        self.vm_b.launch()
 +
-+    def bitmap_dir_entry_raw_size(self):
-+        return struct.calcsize(self.fmt) + self.name_size + \
-+            self.extra_data_size
++        result = self.vm_a.qmp('block-dirty-bitmap-add',
++                               node=self.src_node_name,
++                               name=self.src_bmap_name)
++        self.assert_qmp(result, 'return', {})
 +
-+    def dump(self):
-+        print(f'{"Bitmap name":<25} {self.name}')
-+        super(Qcow2BitmapDirEntry, self).dump()
++        # Dirty some random megabytes
++        for _ in range(9):
++            mb_ofs = random.randrange(1024)
++            self.vm_a.hmp_qemu_io(self.src_node_name, f'discard {mb_ofs}M 1M')
 +
-
- QCOW2_EXT_MAGIC_BITMAPS = 0x23852875
-
++        result = self.vm_a.qmp('x-debug-block-dirty-bitmap-sha256',
++                               node=self.src_node_name,
++                               name=self.src_bmap_name)
++        self.bitmap_hash_reference = result['return']['sha256']
++
++        caps = [{'capability': name, 'state': True}
++                for name in ('dirty-bitmaps', 'events')]
++
++        for vm in (self.vm_a, self.vm_b):
++            result = vm.qmp('migrate-set-capabilities', capabilities=caps)
++            self.assert_qmp(result, 'return', {})
++
++    def tearDown(self) -> None:
++        self.vm_a.shutdown()
++        self.vm_b.shutdown()
++        try:
++            os.remove(mig_sock)
++        except OSError:
++            pass
++
++    def check_bitmap(self, bitmap_name_valid: bool) -> None:
++        result = self.vm_b.qmp('x-debug-block-dirty-bitmap-sha256',
++                               node=self.dst_node_name,
++                               name=self.dst_bmap_name)
++        if bitmap_name_valid:
++            self.assert_qmp(result, 'return/sha256',
++                            self.bitmap_hash_reference)
++        else:
++            self.assert_qmp(result, 'error/desc',
++                            f"Dirty bitmap '{self.dst_bmap_name}' not found")
++
++    def migrate(self, bitmap_name_valid: bool = True,
++                migration_success: bool = True) -> None:
++        result = self.vm_a.qmp('migrate', uri=f'unix:{mig_sock}')
++        self.assert_qmp(result, 'return', {})
++
++        with iotests.Timeout(5, 'Timeout waiting for migration to complete'):
++            self.assertEqual(self.vm_a.wait_migration('postmigrate'),
++                             migration_success)
++            self.assertEqual(self.vm_b.wait_migration('running'),
++                             migration_success)
++
++        if migration_success:
++            self.check_bitmap(bitmap_name_valid)
++
++    def verify_dest_error(self, msg: Optional[str]) -> None:
++        """
++        Check whether the given error message is present in vm_b's log.
++        (vm_b is shut down to do so.)
++        If @msg is None, check that there has not been any error.
++        """
++        self.vm_b.shutdown()
++        if msg is None:
++            self.assertNotIn('qemu-system-', self.vm_b.get_log())
++        else:
++            self.assertIn(msg, self.vm_b.get_log())
++
++    @staticmethod
++    def mapping(node_name: str, node_alias: str,
++                bitmap_name: str, bitmap_alias: str) -> BlockBitmapMapping:
++        return [{
++            'node-name': node_name,
++            'alias': node_alias,
++            'bitmaps': [{
++                'name': bitmap_name,
++                'alias': bitmap_alias
++            }]
++        }]
++
++    def set_mapping(self, vm: iotests.VM, mapping: BlockBitmapMapping,
++                    error: Optional[str] = None) -> None:
++        """
++        Invoke migrate-set-parameters on @vm to set the given @mapping.
++        Check for success if @error is None, or verify the error message
++        if it is not.
++        On success, verify that "info migrate_parameters" on HMP returns
++        our mapping.  (Just to check its formatting code.)
++        """
++        result = vm.qmp('migrate-set-parameters',
++                        block_bitmap_mapping=mapping)
++
++        if error is None:
++            self.assert_qmp(result, 'return', {})
++
++            result = vm.qmp('human-monitor-command',
++                            command_line='info migrate_parameters')
++
++            m = re.search(r'^block-bitmap-mapping:\r?(\n  .*)*\n',
++                          result['return'], flags=re.MULTILINE)
++            hmp_mapping = m.group(0).replace('\r', '') if m else None
++
++            self.assertEqual(hmp_mapping, self.to_hmp_mapping(mapping))
++        else:
++            self.assert_qmp(result, 'error/desc', error)
++
++    @staticmethod
++    def to_hmp_mapping(mapping: BlockBitmapMapping) -> str:
++        result = 'block-bitmap-mapping:\n'
++
++        for node in mapping:
++            result += f"  '{node['node-name']}' -> '{node['alias']}'\n"
++
++            assert isinstance(node['bitmaps'], list)
++            for bitmap in node['bitmaps']:
++                result += f"    '{bitmap['name']}' -> '{bitmap['alias']}'\n"
++
++        return result
++
++
++class TestAliasMigration(TestDirtyBitmapMigration):
++    src_node_name = 'node0'
++    dst_node_name = 'node0'
++    src_bmap_name = 'bmap0'
++    dst_bmap_name = 'bmap0'
++
++    def test_migration_without_alias(self) -> None:
++        self.migrate(self.src_node_name == self.dst_node_name and
++                     self.src_bmap_name == self.dst_bmap_name)
++
++        # Check for error message on the destination
++        if self.src_node_name != self.dst_node_name:
++            self.verify_dest_error(f"Cannot find "
++                                   f"device={self.src_node_name} nor "
++                                   f"node_name={self.src_node_name}")
++        else:
++            self.verify_dest_error(None)
++
++    def test_alias_on_src_migration(self) -> None:
++        mapping = self.mapping(self.src_node_name, self.dst_node_name,
++                               self.src_bmap_name, self.dst_bmap_name)
++
++        self.set_mapping(self.vm_a, mapping)
++        self.migrate()
++        self.verify_dest_error(None)
++
++    def test_alias_on_dst_migration(self) -> None:
++        mapping = self.mapping(self.dst_node_name, self.src_node_name,
++                               self.dst_bmap_name, self.src_bmap_name)
++
++        self.set_mapping(self.vm_b, mapping)
++        self.migrate()
++        self.verify_dest_error(None)
++
++    def test_alias_on_both_migration(self) -> None:
++        src_map = self.mapping(self.src_node_name, 'node-alias',
++                               self.src_bmap_name, 'bmap-alias')
++
++        dst_map = self.mapping(self.dst_node_name, 'node-alias',
++                               self.dst_bmap_name, 'bmap-alias')
++
++        self.set_mapping(self.vm_a, src_map)
++        self.set_mapping(self.vm_b, dst_map)
++        self.migrate()
++        self.verify_dest_error(None)
++
++
++class TestNodeAliasMigration(TestAliasMigration):
++    src_node_name = 'node-src'
++    dst_node_name = 'node-dst'
++
++
++class TestBitmapAliasMigration(TestAliasMigration):
++    src_bmap_name = 'bmap-src'
++    dst_bmap_name = 'bmap-dst'
++
++
++class TestFullAliasMigration(TestAliasMigration):
++    src_node_name = 'node-src'
++    dst_node_name = 'node-dst'
++    src_bmap_name = 'bmap-src'
++    dst_bmap_name = 'bmap-dst'
++
++
++class TestLongBitmapNames(TestAliasMigration):
++    # Giving long bitmap names is OK, as long as there is a short alias for
++    # migration
++    src_bmap_name = 'a' * 512
++    dst_bmap_name = 'b' * 512
++
++    # Skip all tests that do not use the intermediate alias
++    def test_migration_without_alias(self) -> None:
++        pass
++
++    def test_alias_on_src_migration(self) -> None:
++        pass
++
++    def test_alias_on_dst_migration(self) -> None:
++        pass
++
++
++class TestBlockBitmapMappingErrors(TestDirtyBitmapMigration):
++    src_node_name = 'node0'
++    dst_node_name = 'node0'
++    src_bmap_name = 'bmap0'
++    dst_bmap_name = 'bmap0'
++
++    """
++    Note that mapping nodes or bitmaps that do not exist is not an error.
++    """
++
++    def test_non_injective_node_mapping(self) -> None:
++        mapping: BlockBitmapMapping = [
++            {
++                'node-name': 'node0',
++                'alias': 'common-alias',
++                'bitmaps': [{
++                    'name': 'bmap0',
++                    'alias': 'bmap-alias0'
++                }]
++            },
++            {
++                'node-name': 'node1',
++                'alias': 'common-alias',
++                'bitmaps': [{
++                    'name': 'bmap1',
++                    'alias': 'bmap-alias1'
++                }]
++            }
++        ]
++
++        self.set_mapping(self.vm_a, mapping,
++                         "Invalid mapping given for block-bitmap-mapping: "
++                         "The node alias 'common-alias' is used twice")
++
++    def test_non_injective_bitmap_mapping(self) -> None:
++        mapping: BlockBitmapMapping = [{
++            'node-name': 'node0',
++            'alias': 'node-alias0',
++            'bitmaps': [
++                {
++                    'name': 'bmap0',
++                    'alias': 'common-alias'
++                },
++                {
++                    'name': 'bmap1',
++                    'alias': 'common-alias'
++                }
++            ]
++        }]
++
++        self.set_mapping(self.vm_a, mapping,
++                         "Invalid mapping given for block-bitmap-mapping: "
++                         "The bitmap alias 'node-alias0'/'common-alias' is "
++                         "used twice")
++
++    def test_ambiguous_node_mapping(self) -> None:
++        mapping: BlockBitmapMapping = [
++            {
++                'node-name': 'node0',
++                'alias': 'node-alias0',
++                'bitmaps': [{
++                    'name': 'bmap0',
++                    'alias': 'bmap-alias0'
++                }]
++            },
++            {
++                'node-name': 'node0',
++                'alias': 'node-alias1',
++                'bitmaps': [{
++                    'name': 'bmap0',
++                    'alias': 'bmap-alias0'
++                }]
++            }
++        ]
++
++        self.set_mapping(self.vm_a, mapping,
++                         "Invalid mapping given for block-bitmap-mapping: "
++                         "The node name 'node0' is mapped twice")
++
++    def test_ambiguous_bitmap_mapping(self) -> None:
++        mapping: BlockBitmapMapping = [{
++            'node-name': 'node0',
++            'alias': 'node-alias0',
++            'bitmaps': [
++                {
++                    'name': 'bmap0',
++                    'alias': 'bmap-alias0'
++                },
++                {
++                    'name': 'bmap0',
++                    'alias': 'bmap-alias1'
++                }
++            ]
++        }]
++
++        self.set_mapping(self.vm_a, mapping,
++                         "Invalid mapping given for block-bitmap-mapping: "
++                         "The bitmap 'node0'/'bmap0' is mapped twice")
++
++    def test_migratee_node_is_not_mapped_on_src(self) -> None:
++        self.set_mapping(self.vm_a, [])
++        # Should just ignore all bitmaps on unmapped nodes
++        self.migrate(False)
++        self.verify_dest_error(None)
++
++    def test_migratee_node_is_not_mapped_on_dst(self) -> None:
++        self.set_mapping(self.vm_b, [])
++        self.migrate(False)
++        self.verify_dest_error(f"Unknown node alias '{self.src_node_name}'")
++
++    def test_migratee_bitmap_is_not_mapped_on_src(self) -> None:
++        mapping: BlockBitmapMapping = [{
++            'node-name': self.src_node_name,
++            'alias': self.dst_node_name,
++            'bitmaps': []
++        }]
++
++        self.set_mapping(self.vm_a, mapping)
++        # Should just ignore all unmapped bitmaps
++        self.migrate(False)
++        self.verify_dest_error(None)
++
++    def test_migratee_bitmap_is_not_mapped_on_dst(self) -> None:
++        mapping: BlockBitmapMapping = [{
++            'node-name': self.dst_node_name,
++            'alias': self.src_node_name,
++            'bitmaps': []
++        }]
++
++        self.set_mapping(self.vm_b, mapping)
++        self.migrate(False)
++        self.verify_dest_error(f"Unknown bitmap alias "
++                               f"'{self.src_bmap_name}' "
++                               f"on node '{self.dst_node_name}' "
++                               f"(alias '{self.src_node_name}')")
++
++    def test_unused_mapping_on_dst(self) -> None:
++        # Let the source not send any bitmaps
++        self.set_mapping(self.vm_a, [])
++
++        # Establish some mapping on the destination
++        self.set_mapping(self.vm_b, [])
++
++        # The fact that there is a mapping on B without any bitmaps
++        # being received should be fine, not fatal
++        self.migrate(False)
++        self.verify_dest_error(None)
++
++    def test_non_wellformed_node_alias(self) -> None:
++        alias = '123-foo'
++
++        mapping: BlockBitmapMapping = [{
++            'node-name': self.src_node_name,
++            'alias': alias,
++            'bitmaps': []
++        }]
++
++        self.set_mapping(self.vm_a, mapping,
++                         f"Invalid mapping given for block-bitmap-mapping: "
++                         f"The node alias '{alias}' is not well-formed")
++
++    def test_node_alias_too_long(self) -> None:
++        alias = 'a' * 256
++
++        mapping: BlockBitmapMapping = [{
++            'node-name': self.src_node_name,
++            'alias': alias,
++            'bitmaps': []
++        }]
++
++        self.set_mapping(self.vm_a, mapping,
++                         f"Invalid mapping given for block-bitmap-mapping: "
++                         f"The node alias '{alias}' is longer than 255 bytes")
++
++    def test_bitmap_alias_too_long(self) -> None:
++        alias = 'a' * 256
++
++        mapping = self.mapping(self.src_node_name, self.dst_node_name,
++                               self.src_bmap_name, alias)
++
++        self.set_mapping(self.vm_a, mapping,
++                         f"Invalid mapping given for block-bitmap-mapping: "
++                         f"The bitmap alias '{alias}' is longer than 255 "
++                         f"bytes")
++
++    def test_bitmap_name_too_long(self) -> None:
++        name = 'a' * 256
++
++        result = self.vm_a.qmp('block-dirty-bitmap-add',
++                               node=self.src_node_name,
++                               name=name)
++        self.assert_qmp(result, 'return', {})
++
++        self.migrate(False, False)
++
++        # Check for the error in the source's log
++        self.vm_a.shutdown()
++        self.assertIn(f"Cannot migrate bitmap '{name}' on node "
++                      f"'{self.src_node_name}': Name is longer than 255 bytes",
++                      self.vm_a.get_log())
++
++        # Expect abnormal shutdown of the destination VM because of
++        # the failed migration
++        try:
++            self.vm_b.shutdown()
++        except qemu.machine.AbnormalShutdown:
++            pass
++
++    def test_aliased_bitmap_name_too_long(self) -> None:
++        # Longer than the maximum for bitmap names
++        self.dst_bmap_name = 'a' * 1024
++
++        mapping = self.mapping(self.dst_node_name, self.src_node_name,
++                               self.dst_bmap_name, self.src_bmap_name)
++
++        # We would have to create this bitmap during migration, and
++        # that would fail, because the name is too long.  Better to
++        # catch it early.
++        self.set_mapping(self.vm_b, mapping,
++                         f"Invalid mapping given for block-bitmap-mapping: "
++                         f"The bitmap name '{self.dst_bmap_name}' is longer "
++                         f"than 1023 bytes")
++
++    def test_node_name_too_long(self) -> None:
++        # Longer than the maximum for node names
++        self.dst_node_name = 'a' * 32
++
++        mapping = self.mapping(self.dst_node_name, self.src_node_name,
++                               self.dst_bmap_name, self.src_bmap_name)
++
++        # During migration, this would appear simply as a node that
++        # cannot be found.  Still better to catch impossible node
++        # names early (similar to test_non_wellformed_node_alias).
++        self.set_mapping(self.vm_b, mapping,
++                         f"Invalid mapping given for block-bitmap-mapping: "
++                         f"The node name '{self.dst_node_name}' is longer "
++                         f"than 31 bytes")
++
++
++class TestCrossAliasMigration(TestDirtyBitmapMigration):
++    """
++    Swap aliases, both to see that qemu does not get confused, and
++    that we can migrate multiple things at once.
++
++    So we migrate this:
++      node-a.bmap-a -> node-b.bmap-b
++      node-a.bmap-b -> node-b.bmap-a
++      node-b.bmap-a -> node-a.bmap-b
++      node-b.bmap-b -> node-a.bmap-a
++    """
++
++    src_node_name = 'node-a'
++    dst_node_name = 'node-b'
++    src_bmap_name = 'bmap-a'
++    dst_bmap_name = 'bmap-b'
++
++    def setUp(self) -> None:
++        TestDirtyBitmapMigration.setUp(self)
++
++        # Now create another block device and let both have two bitmaps each
++        result = self.vm_a.qmp('blockdev-add',
++                               node_name='node-b', driver='null-co')
++        self.assert_qmp(result, 'return', {})
++
++        result = self.vm_b.qmp('blockdev-add',
++                               node_name='node-a', driver='null-co')
++        self.assert_qmp(result, 'return', {})
++
++        bmaps_to_add = (('node-a', 'bmap-b'),
++                        ('node-b', 'bmap-a'),
++                        ('node-b', 'bmap-b'))
++
++        for (node, bmap) in bmaps_to_add:
++            result = self.vm_a.qmp('block-dirty-bitmap-add',
++                                   node=node, name=bmap)
++            self.assert_qmp(result, 'return', {})
++
++    @staticmethod
++    def cross_mapping() -> BlockBitmapMapping:
++        return [
++            {
++                'node-name': 'node-a',
++                'alias': 'node-b',
++                'bitmaps': [
++                    {
++                        'name': 'bmap-a',
++                        'alias': 'bmap-b'
++                    },
++                    {
++                        'name': 'bmap-b',
++                        'alias': 'bmap-a'
++                    }
++                ]
++            },
++            {
++                'node-name': 'node-b',
++                'alias': 'node-a',
++                'bitmaps': [
++                    {
++                        'name': 'bmap-b',
++                        'alias': 'bmap-a'
++                    },
++                    {
++                        'name': 'bmap-a',
++                        'alias': 'bmap-b'
++                    }
++                ]
++            }
++        ]
++
++    def verify_dest_has_all_bitmaps(self) -> None:
++        bitmaps = self.vm_b.query_bitmaps()
++
++        # Extract and sort bitmap names
++        for node in bitmaps:
++            bitmaps[node] = sorted((bmap['name'] for bmap in bitmaps[node]))
++
++        self.assertEqual(bitmaps,
++                         {'node-a': ['bmap-a', 'bmap-b'],
++                          'node-b': ['bmap-a', 'bmap-b']})
++
++    def test_alias_on_src(self) -> None:
++        self.set_mapping(self.vm_a, self.cross_mapping())
++
++        # Checks that node-a.bmap-a was migrated to node-b.bmap-b, and
++        # that is enough
++        self.migrate()
++        self.verify_dest_has_all_bitmaps()
++        self.verify_dest_error(None)
++
++    def test_alias_on_dst(self) -> None:
++        self.set_mapping(self.vm_b, self.cross_mapping())
++
++        # Checks that node-a.bmap-a was migrated to node-b.bmap-b, and
++        # that is enough
++        self.migrate()
++        self.verify_dest_has_all_bitmaps()
++        self.verify_dest_error(None)
++
++
++if __name__ == '__main__':
++    iotests.main(supported_protocols=['file'])
+diff --git a/tests/qemu-iotests/300.out b/tests/qemu-iotests/300.out
+new file mode 100644
+index 000000000000..cafb8161f7b1
+--- /dev/null
++++ b/tests/qemu-iotests/300.out
+@@ -0,0 +1,5 @@
++.....................................
++----------------------------------------------------------------------
++Ran 37 tests
++
++OK
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index ecff2621cddc..a53ea7f78b81 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -307,6 +307,7 @@
+ 296 rw
+ 297 meta
+ 299 auto quick
++300 migration
+ 301 backing quick
+ 302 quick
+ 303 rw quick
 -- 
 2.28.0
 
