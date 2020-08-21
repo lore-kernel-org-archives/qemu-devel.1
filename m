@@ -2,131 +2,74 @@ Return-Path: <SRS0=atk5=B7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB259C433E3
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 13:04:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BEB9C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 13:08:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A931B207BB
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 13:04:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JWMiDIaK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A931B207BB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 00E01207BB
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 13:08:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00E01207BB
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43774 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48638 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k96ip-0005jR-0E
-	for qemu-devel@archiver.kernel.org; Fri, 21 Aug 2020 09:04:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39846)
+	id 1k96mQ-0007v4-93
+	for qemu-devel@archiver.kernel.org; Fri, 21 Aug 2020 09:08:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40550)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k96i7-0004ry-Sk
- for qemu-devel@nongnu.org; Fri, 21 Aug 2020 09:03:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:54304)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k96i4-00053R-U6
- for qemu-devel@nongnu.org; Fri, 21 Aug 2020 09:03:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598015035;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=BiV4Hg4sqPpe614FirJhlM0C2jC5QA8vtoOD5fUXK30=;
- b=JWMiDIaKU1/0tm2M2XH29RuB41CykvjrIvbTdf/aCtEMjzEbcr2xj3zO1wW4n+ar+Au5PL
- roG62+gxNToKsO8OJblHmh3pB5pxZqBw/PSnvcJtZk5nmStnIJX2efpeLiKijb5vwUc4up
- u/EAI3vJHhy1/wF5lx7wKiaisRak7k0=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-117-y2IduTxqNRasBvgGtE9Hig-1; Fri, 21 Aug 2020 09:03:53 -0400
-X-MC-Unique: y2IduTxqNRasBvgGtE9Hig-1
-Received: by mail-wm1-f70.google.com with SMTP id v8so948330wma.6
- for <qemu-devel@nongnu.org>; Fri, 21 Aug 2020 06:03:53 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=BiV4Hg4sqPpe614FirJhlM0C2jC5QA8vtoOD5fUXK30=;
- b=UjVvvsGSY196WQLHLacc7sOda5TTn+cm2SxRhRS/CCBAtn4Q0gUehPqbLBDKVfO6yM
- 6JiwZCwjfkAD7mL0wnxsdUa2gFYTAuZH8w6IBYyvIL/TZ/uNlvcyDvv1wNAOZ4RcxIqV
- o/D5HKzUCIqgLgItMek1ua/6sGr9CSSoMvGMA6ZPCiK3K3nARMXxu4gxBpy3DSw+0e0D
- Ip+m8wr2x+Dw3vQl5Dzcwki5E36dP4ux52FKAGK713LB5MDAR8lpV2GENuWqCcr8nw1r
- Xkf5m3Scg2pXVkt1ycJiH9FaCilcnLQFu/IV/dOIrS1+Bx8fFTlnIPA/uaq0ExGxfj+Z
- yRSA==
-X-Gm-Message-State: AOAM533bKhyWOxQZcbNHIqHYnBOnS4Z1kPqqWhRTJIRwXWepzeBKt16E
- WgvDznimqQ1NOMXTJjKcJUz1Ba8uSO93wqHKEHF6QfQBziyOgbTCmc4YbA/iAvW40OD+RFDSIdH
- G15bT9TFtiaL+iHs=
-X-Received: by 2002:adf:ed49:: with SMTP id u9mr2634490wro.408.1598015032782; 
- Fri, 21 Aug 2020 06:03:52 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw9HPq5mifdCioXWUtxKxRlDLi+QPO89riRghrj9hWLfoY1MiW4FI4+E7f5D0IZ8uQ3qvdngg==
-X-Received: by 2002:adf:ed49:: with SMTP id u9mr2634453wro.408.1598015032274; 
- Fri, 21 Aug 2020 06:03:52 -0700 (PDT)
-Received: from [192.168.1.36] (121.red-81-40-121.staticip.rima-tde.net.
- [81.40.121.121])
- by smtp.gmail.com with ESMTPSA id q2sm4238227wro.8.2020.08.21.06.03.50
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 21 Aug 2020 06:03:51 -0700 (PDT)
-Subject: Re: [PATCH 3/3] nvdimm: honor -object memory-backend-file,
- readonly=on option
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org,
- Igor Mammedov <imammedo@redhat.com>
-References: <20200804101244.1283503-1-stefanha@redhat.com>
- <20200804101244.1283503-4-stefanha@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <db6f0cae-88ee-fba0-2d2c-82255f52e7f6@redhat.com>
-Date: Fri, 21 Aug 2020 15:03:50 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
+ id 1k96lU-0007CI-5z
+ for qemu-devel@nongnu.org; Fri, 21 Aug 2020 09:07:28 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:56916 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
+ id 1k96lQ-0005Td-Od
+ for qemu-devel@nongnu.org; Fri, 21 Aug 2020 09:07:27 -0400
+Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id B49CDFDF395FBEC6619E;
+ Fri, 21 Aug 2020 21:07:17 +0800 (CST)
+Received: from [127.0.0.1] (10.174.186.4) by DGGEMS413-HUB.china.huawei.com
+ (10.3.19.213) with Microsoft SMTP Server id 14.3.487.0; Fri, 21 Aug 2020
+ 21:07:09 +0800
+Subject: Re: [PATCH v3 05/10] migration/dirtyrate: Record hash results for
+ each sampled page
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+References: <1597634433-18809-1-git-send-email-zhengchuan@huawei.com>
+ <1597634433-18809-6-git-send-email-zhengchuan@huawei.com>
+ <20200820173009.GM2664@work-vm> <20200820175149.GA244434@redhat.com>
+ <20200820175512.GQ2664@work-vm>
+ <95894cf7-ba09-9862-357a-1073a192e934@huawei.com>
+ <20200821123014.GK348677@redhat.com> <20200821123910.GC2655@work-vm>
+From: Zheng Chuan <zhengchuan@huawei.com>
+Message-ID: <5d74c849-e7dd-63c5-db07-3471b3f8183e@huawei.com>
+Date: Fri, 21 Aug 2020 21:07:09 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200804101244.1283503-4-stefanha@redhat.com>
+In-Reply-To: <20200821123910.GC2655@work-vm>
+Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0.003
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/21 04:26:32
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
+X-Originating-IP: [10.174.186.4]
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.32; envelope-from=zhengchuan@huawei.com;
+ helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/21 09:07:18
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
 X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -139,82 +82,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Julio Montes <julio.montes@intel.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: zhang.zhanghailiang@huawei.com, quintela@redhat.com, linyilu@huawei.com,
+ qemu-devel@nongnu.org, alex.chen@huawei.com, ann.zhuangyanying@huawei.com,
+ fangying1@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/4/20 12:12 PM, Stefan Hajnoczi wrote:
-> Make it possible to present read-only files to the guest as "unarmed"
-> NVDIMMs. The Linux NVDIMM device (/dev/pmemX) is read-only.
+
+
+On 2020/8/21 20:39, Dr. David Alan Gilbert wrote:
+> * Daniel P. Berrangé (berrange@redhat.com) wrote:
+>> On Fri, Aug 21, 2020 at 08:22:06PM +0800, Zheng Chuan wrote:
+>>>
+>>>
+>>> On 2020/8/21 1:55, Dr. David Alan Gilbert wrote:
+>>>> * Daniel P. BerrangÃ© (berrange@redhat.com) wrote:
+>>>>> On Thu, Aug 20, 2020 at 06:30:09PM +0100, Dr. David Alan Gilbert wrote:
+>>>>>> * Chuan Zheng (zhengchuan@huawei.com) wrote:
+>>>>>>> Record hash results for each sampled page.
+>>>>>>>
+>>>>>>> Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
+>>>>>>> Signed-off-by: YanYing Zhuang <ann.zhuangyanying@huawei.com>
+>>>>>>> ---
+>>>>>>>  migration/dirtyrate.c | 144 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>>>>>>>  migration/dirtyrate.h |   7 +++
+>>>>>>>  2 files changed, 151 insertions(+)
+>>>>>>>
+>>>>>>> diff --git a/migration/dirtyrate.c b/migration/dirtyrate.c
+>>>>>>> index c4304ef..62b6f69 100644
+>>>>>>> --- a/migration/dirtyrate.c
+>>>>>>> +++ b/migration/dirtyrate.c
+>>>>>>> @@ -25,6 +25,7 @@
+>>>>>>>  #include "dirtyrate.h"
+>>>>>>>  
+>>>>>>>  CalculatingDirtyRateState CalculatingState = CAL_DIRTY_RATE_INIT;
+>>>>>>> +static unsigned long int qcrypto_hash_len = QCRYPTO_HASH_LEN;
+>>>>>>
+>>>>>> Why do we need this static rather than just using the QCRYPTO_HASH_LEN ?
+>>>>>> It's never going to change is it?
+>>>>>> (and anyway it's just a MD5 len?)
+>>>>>
+>>>>> I wouldn't want to bet on that given that this is use of MD5. We might
+>>>>> claim this isn't security critical, but surprises happen, and we will
+>>>>> certainly be dinged on security audits for introducing new use of MD5
+>>>>> no matter what.
+>>>>>
+>>>>> If a cryptographic hash is required, then sha256 should be the choice
+>>>>> for any new code that doesn't have back compat requirements.
+>>>>>
+>>>>> If a cryptographic hash is not required then how about crc32 
+>>>>
+>>>> It doesn't need to be cryptographic; is crc32 the fastest reasonable hash for use
+>>>> in large areas?
+>>>>
+>>>> Dave
+>>>>
+>>>>> IOW, it doesn't make a whole lot of sense to say we need a cryptographic
+>>>>> hash, but then pick the most insecure one.
+>>>>>
+>>>>> sha256 is slower than md5, but it is conceivable that in future we might
+>>>>> gain support for something like Blake2b which is similar security level
+>>>>> to SHA3, while being faster than MD5.
+>>>>>
+>>>>> Overall I'm pretty unethusiastic about use of MD5 being introduced and
+>>>>> worse, being hardcoded as the only option.
+>>>>>
+>>>>> Regards,
+>>>>> Daniel
+>>>>> -- 
+>>>>> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+>>>>> |: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+>>>>> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+>>>
+>>> Hi, Daniel, Dave.
+>>>
+>>> I do compare MD5 and SHA256 with vm memory of 128G under mempress of 100G.
+>>>
+>>> 1. Calculation speed
+>>> 1） MD5 takes about 500ms to sample and hash all pages by record_ramblock_hash_info().
+>>> 2)  SHA256 takes about 750ms to sample all pages by record_ramblock_hash_info().
+>>>
+>>> 2. CPU Consumption
+>>> 1)  MD5 may have instant rise up to 48% for dirtyrate thread
+>>> 2)  SHA256 may have instant rise up to 75% for dirtyrate thread
+>>>
+>>> 3. Memory Consumption
+>>> SHA256 may need twice memory than MD5 due to its HASH_LEN.
+>>>
+>>> I am trying to consider if crc32 is more faster and takes less memory and is more safer than MD5?
+>>
+>> No, crc32 is absolutely *weaker* than MD5. It is NOT a cryptographic
+>> hash so does not try to guarantee collision resistance. It only has
+>> 2^32 possible outputs.
+>>
+>> MD5 does try to guarantee collision resistance, but MD5 is considered
+>> broken these days, so a malicious attacker can cause collisions if they
+>> are motivated enough.
+>>
+>> IOW if you need collision resistance that SHA256 should be used.
 > 
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
->  docs/nvdimm.txt | 8 +++++++-
->  hw/mem/nvdimm.c | 4 ++++
->  2 files changed, 11 insertions(+), 1 deletion(-)
+> There's no need to guard against malicious behaviour here - this is just
+> a stat to guide migration.
+> If CRC32 is likely to be faster than md5 I suspect it's enough.
 > 
-> diff --git a/docs/nvdimm.txt b/docs/nvdimm.txt
-> index c2c6e441b3..c0b52de111 100644
-> --- a/docs/nvdimm.txt
-> +++ b/docs/nvdimm.txt
-> @@ -17,7 +17,7 @@ following command line options:
->  
->   -machine pc,nvdimm
->   -m $RAM_SIZE,slots=$N,maxmem=$MAX_SIZE
-> - -object memory-backend-file,id=mem1,share=on,mem-path=$PATH,size=$NVDIMM_SIZE
-> + -object memory-backend-file,id=mem1,share=on,mem-path=$PATH,size=$NVDIMM_SIZE,readonly=off
->   -device nvdimm,id=nvdimm1,memdev=mem1
->  
->  Where,
-> @@ -42,6 +42,12 @@ Where,
->     "share=off", then guest writes won't be applied to the backend
->     file and thus will be invisible to other guests.
->  
-> +   "readonly=on/off" controls whether the the file $PATH is opened read-only or
+> Dave
+> 
+OK, i'll take a test by crc32.
 
-Double "the the".
-
-> +   read/write (default). "readonly=on" sets the ACPI NFIT NVDIMM Region Mapping
-
-NFIT acronym for 'NVDIMM Firmware Interface Table', "NVDIMM" sounds
-redundant but makes it easier to understand, so OK.
-
-> +   Structure "NVDIMM State Flags" Bit 3 indicating that the device is "unarmed"
-> +   and cannot accept persistent writes. Linux guest drivers set the device to
-> +   read-only when this bit is present.
-> +
->   - "device nvdimm,id=nvdimm1,memdev=mem1" creates a virtual NVDIMM
->     device whose storage is provided by above memory backend device.
->  
-> diff --git a/hw/mem/nvdimm.c b/hw/mem/nvdimm.c
-> index e1574bc07c..694223450e 100644
-> --- a/hw/mem/nvdimm.c
-> +++ b/hw/mem/nvdimm.c
-> @@ -151,6 +151,10 @@ static void nvdimm_prepare_memory_region(NVDIMMDevice *nvdimm, Error **errp)
->                               "nvdimm-memory", mr, 0, pmem_size);
->      memory_region_set_nonvolatile(nvdimm->nvdimm_mr, true);
->      nvdimm->nvdimm_mr->align = align;
-> +
-> +    if (memory_region_is_rom(mr)) {
-> +        nvdimm->unarmed = true; /* this device is read-only */
-> +    }
-
-Can you move this hunk before the alias creation?
-(Just before nvdimm->nvdimm_mr = ...).
-
->  }
->  
->  static MemoryRegion *nvdimm_md_get_memory_region(MemoryDeviceState *md,
-
-I don't understand why MemoryDeviceClass::get_memory_region() implicitly
-calls DeviceClass::realize()...
-Anyway unrelated to this patch.
-
-With the comments addressed:
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+>>
+>> Regards,
+>> Daniel
+>> -- 
+>> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+>> |: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+>> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
