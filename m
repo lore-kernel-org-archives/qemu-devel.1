@@ -2,81 +2,99 @@ Return-Path: <SRS0=atk5=B7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9ECB8C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 10:44:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A315C433E3
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 10:44:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6BC4A20738
-	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 10:44:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6952A20738
+	for <qemu-devel@archiver.kernel.org>; Fri, 21 Aug 2020 10:44:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D5hbKcC9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6BC4A20738
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dbvRKvj4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6952A20738
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45592 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45720 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k94Ws-0007pB-NL
-	for qemu-devel@archiver.kernel.org; Fri, 21 Aug 2020 06:44:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60054)
+	id 1k94Wt-0007sL-LJ
+	for qemu-devel@archiver.kernel.org; Fri, 21 Aug 2020 06:44:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59880)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k94Di-0001tm-OH
- for qemu-devel@nongnu.org; Fri, 21 Aug 2020 06:24:26 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:24875
+ (Exim 4.90_1) (envelope-from <sgarzare@redhat.com>)
+ id 1k94DU-0001fe-VK
+ for qemu-devel@nongnu.org; Fri, 21 Aug 2020 06:24:12 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:60138
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1k94DX-0001bG-8V
- for qemu-devel@nongnu.org; Fri, 21 Aug 2020 06:24:26 -0400
+ (Exim 4.90_1) (envelope-from <sgarzare@redhat.com>)
+ id 1k94DO-0001XC-FS
+ for qemu-devel@nongnu.org; Fri, 21 Aug 2020 06:24:12 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598005454;
+ s=mimecast20190719; t=1598005445;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=SxRmxU806zYvkiylG7S95xkTXlDZAsWNyonD9C2PFxg=;
- b=D5hbKcC9tu6rhK+6V6ozTx1BbNDDJ6bp79VoDMjAsshEQISRHEY/4fizS9zjTspsLsdfcx
- 9xXo97cuWzoFFncuNfBs5m/ZdmKq5blPlG7zoh1ml0T2begxQpEi3YvtBi+FTpkRuS87fZ
- WydBDREvLO0QlvqZnNNLSoNnPK7hcfE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-291-t99EBUHbNx2Iy6Bl3ze8pg-1; Fri, 21 Aug 2020 06:24:12 -0400
-X-MC-Unique: t99EBUHbNx2Iy6Bl3ze8pg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BC84D425DC
- for <qemu-devel@nongnu.org>; Fri, 21 Aug 2020 10:24:11 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com
- (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6CB715C1D0;
- Fri, 21 Aug 2020 10:24:11 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL v8 049/152] meson: keymap-gen
-Date: Fri, 21 Aug 2020 06:21:46 -0400
-Message-Id: <20200821102329.29777-50-pbonzini@redhat.com>
-In-Reply-To: <20200821102329.29777-1-pbonzini@redhat.com>
-References: <20200821102329.29777-1-pbonzini@redhat.com>
+ bh=ZejmnbZ15jPkdA6DilS17pNMVEFhImwbB7OYg8dEuWw=;
+ b=dbvRKvj4n0OzUQO06mt7dv7lWBoJ0UlUswRNBt0psDW375VkqlxsdBu1YvkbDpMLAqIATA
+ RlrwsP8uB0F3VaUCAyDtjJBnxNOwKglDubUnDAiUIEwvfJaEcMgs+Q9bwnjpm9wdF/SP+d
+ J5pjo3s8dKoHHM5L65RAhWM0lTIic7M=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-410-DB0aW_0MPdO4-APCZD92qw-1; Fri, 21 Aug 2020 06:24:04 -0400
+X-MC-Unique: DB0aW_0MPdO4-APCZD92qw-1
+Received: by mail-wr1-f72.google.com with SMTP id 89so411997wrr.15
+ for <qemu-devel@nongnu.org>; Fri, 21 Aug 2020 03:24:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=QZRGaUfDp1IKr6Kru7sK9Zzdub+FNd3y+jD4LYTrtEo=;
+ b=NsovsCNoIzW0IipobqMtZTzo4bFR2qqdi48NE24yj0DOe1v58gwUp1TmQUWRA5fhmH
+ k2wevUW041KrUvLq8nlyRUCvIkBYmdnNSSBbgFI1sRMemsOLzbcbMoEHnsbE8X9LirSC
+ RcMk/Qxm2a+frxDwE2wz8B1g9m1xH15OxcrynlDETkulXtmq59q0yuN6ffbAp6ODmbWy
+ YiA3vBfOy60m8U9ecHvXt1euHUHZt806R255SU9EEmCqKWfZytAJ9E+UPoxgFg8fO73G
+ 67TXNdLvEAbyVJHV0a3NHRCpdsOm2iOF0pQ0PKTB/WoNakUJlKiUQlP08uSyBxTiAL37
+ wwfg==
+X-Gm-Message-State: AOAM532WtY5dMDQmakrAsBXGMQU9diWYUqIfeKLzIk0A5B0t4V+lmrjG
+ dVPwFxE0cYJy1KywYIJNco8f4QxP89o3+5AkV+PrzLfImWXqf7nf9h1cBwvWG9iUNfMreMdWE1Y
+ wedmmsFeC3Fvv4SU=
+X-Received: by 2002:a1c:9d85:: with SMTP id g127mr2447591wme.162.1598005442960; 
+ Fri, 21 Aug 2020 03:24:02 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzMpcxhZG/1Zoz2X0UKV/8g9SVEcj350h9FIhrLIzDnT0scwS24gTvZs+zwvh9bYclZBRfZiA==
+X-Received: by 2002:a1c:9d85:: with SMTP id g127mr2447572wme.162.1598005442739; 
+ Fri, 21 Aug 2020 03:24:02 -0700 (PDT)
+Received: from steredhat (host-79-33-191-244.retail.telecomitalia.it.
+ [79.33.191.244])
+ by smtp.gmail.com with ESMTPSA id u6sm3847399wmc.12.2020.08.21.03.23.58
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 21 Aug 2020 03:24:02 -0700 (PDT)
+Date: Fri, 21 Aug 2020 12:23:53 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Subject: Re: [PATCH v5 14/15] block/nvme: Extract nvme_poll_queue()
+Message-ID: <20200821102353.pi4jk4phmqmzrhir@steredhat>
+References: <20200820165901.1139109-1-philmd@redhat.com>
+ <20200820165901.1139109-15-philmd@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <20200820165901.1139109-15-philmd@redhat.com>
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0.001
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=sgarzare@redhat.com
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=sgarzare@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/21 04:55:47
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/20 23:41:39
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
@@ -84,7 +102,7 @@ X-Spam_bar: ----
 X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,125 +115,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Marc-André Lureau <marcandre.lureau@redhat.com>
+On Thu, Aug 20, 2020 at 06:59:00PM +0200, Philippe Mathieu-Daudé wrote:
+> As we want to do per-queue polling, extract the nvme_poll_queue()
+> method which operates on a single queue.
+> 
+> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> ---
+>  block/nvme.c | 44 +++++++++++++++++++++++++++-----------------
+>  1 file changed, 27 insertions(+), 17 deletions(-)
 
-Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- Makefile       | 38 --------------------------------------
- meson.build    |  1 +
- ui/meson.build | 34 ++++++++++++++++++++++++++++++++++
- 3 files changed, 35 insertions(+), 38 deletions(-)
- create mode 100644 ui/meson.build
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
-diff --git a/Makefile b/Makefile
-index 39633ec7db..c07b6bb5b8 100644
---- a/Makefile
-+++ b/Makefile
-@@ -141,44 +141,6 @@ generated-files-y += module_block.h
- 
- generated-files-y += .git-submodule-status
- 
--KEYCODEMAP_GEN = $(SRC_PATH)/ui/keycodemapdb/tools/keymap-gen
--KEYCODEMAP_CSV = $(SRC_PATH)/ui/keycodemapdb/data/keymaps.csv
--
--KEYCODEMAP_FILES = \
--		 ui/input-keymap-atset1-to-qcode.c.inc \
--		 ui/input-keymap-linux-to-qcode.c.inc \
--		 ui/input-keymap-qcode-to-atset1.c.inc \
--		 ui/input-keymap-qcode-to-atset2.c.inc \
--		 ui/input-keymap-qcode-to-atset3.c.inc \
--		 ui/input-keymap-qcode-to-linux.c.inc \
--		 ui/input-keymap-qcode-to-qnum.c.inc \
--		 ui/input-keymap-qcode-to-sun.c.inc \
--		 ui/input-keymap-qnum-to-qcode.c.inc \
--		 ui/input-keymap-usb-to-qcode.c.inc \
--		 ui/input-keymap-win32-to-qcode.c.inc \
--		 ui/input-keymap-x11-to-qcode.c.inc \
--		 ui/input-keymap-xorgevdev-to-qcode.c.inc \
--		 ui/input-keymap-xorgkbd-to-qcode.c.inc \
--		 ui/input-keymap-xorgxquartz-to-qcode.c.inc \
--		 ui/input-keymap-xorgxwin-to-qcode.c.inc \
--		 ui/input-keymap-osx-to-qcode.c.inc \
--		 $(NULL)
--
--generated-files-$(CONFIG_SOFTMMU) += $(KEYCODEMAP_FILES)
--
--ui/input-keymap-%.c.inc: $(KEYCODEMAP_GEN) $(KEYCODEMAP_CSV) $(SRC_PATH)/ui/Makefile.objs
--	$(call quiet-command,\
--	    stem=$* && src=$${stem%-to-*} dst=$${stem#*-to-} && \
--	    test -e $(KEYCODEMAP_GEN) && \
--	    $(PYTHON) $(KEYCODEMAP_GEN) \
--	          --lang glib2 \
--	          --varname qemu_input_map_$${src}_to_$${dst} \
--	          code-map $(KEYCODEMAP_CSV) $${src} $${dst} \
--	        > $@ || rm -f $@, "GEN", "$@")
--
--$(KEYCODEMAP_GEN): .git-submodule-status
--$(KEYCODEMAP_CSV): .git-submodule-status
--
- edk2-decompressed = $(basename $(wildcard pc-bios/edk2-*.fd.bz2))
- pc-bios/edk2-%.fd: pc-bios/edk2-%.fd.bz2
- 	$(call quiet-command,bzip2 -d -c $< > $@,"BUNZIP2",$<)
-diff --git a/meson.build b/meson.build
-index 3e9e0a9b33..b4a2f9db3a 100644
---- a/meson.build
-+++ b/meson.build
-@@ -292,6 +292,7 @@ subdir('trace')
- subdir('util')
- subdir('crypto')
- subdir('storage-daemon')
-+subdir('ui')
- 
- # Build targets from sourcesets
- 
-diff --git a/ui/meson.build b/ui/meson.build
-new file mode 100644
-index 0000000000..a6aa7f2b36
---- /dev/null
-+++ b/ui/meson.build
-@@ -0,0 +1,34 @@
-+keymaps = [
-+  ['atset1', 'qcode'],
-+  ['linux', 'qcode'],
-+  ['qcode', 'atset1'],
-+  ['qcode', 'atset2'],
-+  ['qcode', 'atset3'],
-+  ['qcode', 'linux'],
-+  ['qcode', 'qnum'],
-+  ['qcode', 'sun'],
-+  ['qnum', 'qcode'],
-+  ['usb', 'qcode'],
-+  ['win32', 'qcode'],
-+  ['x11', 'qcode'],
-+  ['xorgevdev', 'qcode'],
-+  ['xorgkbd', 'qcode'],
-+  ['xorgxquartz', 'qcode'],
-+  ['xorgxwin', 'qcode'],
-+  ['osx', 'qcode'],
-+]
-+
-+if have_system
-+  foreach e : keymaps
-+    output = 'input-keymap-@0@-to-@1@.c.inc'.format(e[0], e[1])
-+    genh += custom_target(output,
-+                  output: output,
-+                  capture: true,
-+                  build_by_default: true, # to be removed when added to a target
-+                  input: files('keycodemapdb/data/keymaps.csv'),
-+                  command: [python.full_path(), files('keycodemapdb/tools/keymap-gen'),
-+                            '--lang', 'glib2',
-+                            '--varname', 'qemu_input_map_@0@_to_@1@'.format(e[0], e[1]),
-+                            'code-map', '@INPUT0@', e[0], e[1]])
-+  endforeach
-+endif
--- 
-2.26.2
-
+> 
+> diff --git a/block/nvme.c b/block/nvme.c
+> index 1f67e888c84..a61e86a83eb 100644
+> --- a/block/nvme.c
+> +++ b/block/nvme.c
+> @@ -590,31 +590,41 @@ out:
+>      qemu_vfree(id);
+>  }
+>  
+> +static bool nvme_poll_queue(NVMeQueuePair *q)
+> +{
+> +    bool progress = false;
+> +
+> +    const size_t cqe_offset = q->cq.head * NVME_CQ_ENTRY_BYTES;
+> +    NvmeCqe *cqe = (NvmeCqe *)&q->cq.queue[cqe_offset];
+> +
+> +    /*
+> +     * Do an early check for completions. q->lock isn't needed because
+> +     * nvme_process_completion() only runs in the event loop thread and
+> +     * cannot race with itself.
+> +     */
+> +    if ((le16_to_cpu(cqe->status) & 0x1) == q->cq_phase) {
+> +        return false;
+> +    }
+> +
+> +    qemu_mutex_lock(&q->lock);
+> +    while (nvme_process_completion(q)) {
+> +        /* Keep polling */
+> +        progress = true;
+> +    }
+> +    qemu_mutex_unlock(&q->lock);
+> +
+> +    return progress;
+> +}
+> +
+>  static bool nvme_poll_queues(BDRVNVMeState *s)
+>  {
+>      bool progress = false;
+>      int i;
+>  
+>      for (i = 0; i < s->nr_queues; i++) {
+> -        NVMeQueuePair *q = s->queues[i];
+> -        const size_t cqe_offset = q->cq.head * NVME_CQ_ENTRY_BYTES;
+> -        NvmeCqe *cqe = (NvmeCqe *)&q->cq.queue[cqe_offset];
+> -
+> -        /*
+> -         * Do an early check for completions. q->lock isn't needed because
+> -         * nvme_process_completion() only runs in the event loop thread and
+> -         * cannot race with itself.
+> -         */
+> -        if ((le16_to_cpu(cqe->status) & 0x1) == q->cq_phase) {
+> -            continue;
+> -        }
+> -
+> -        qemu_mutex_lock(&q->lock);
+> -        while (nvme_process_completion(q)) {
+> -            /* Keep polling */
+> +        if (nvme_poll_queue(s->queues[i])) {
+>              progress = true;
+>          }
+> -        qemu_mutex_unlock(&q->lock);
+>      }
+>      return progress;
+>  }
+> -- 
+> 2.26.2
+> 
+> 
 
 
