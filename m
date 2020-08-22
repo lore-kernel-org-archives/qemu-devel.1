@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06585C433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 22 Aug 2020 14:01:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E684CC433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 22 Aug 2020 14:06:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D3F422078D
-	for <qemu-devel@archiver.kernel.org>; Sat, 22 Aug 2020 14:01:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3F422078D
+	by mail.kernel.org (Postfix) with ESMTPS id B02872078D
+	for <qemu-devel@archiver.kernel.org>; Sat, 22 Aug 2020 14:06:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B02872078D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40052 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43888 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k9U5l-0007Kc-5h
-	for qemu-devel@archiver.kernel.org; Sat, 22 Aug 2020 10:01:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53468)
+	id 1k9U9x-0000i5-1d
+	for qemu-devel@archiver.kernel.org; Sat, 22 Aug 2020 10:06:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54274)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k9U4l-00065f-0Q
- for qemu-devel@nongnu.org; Sat, 22 Aug 2020 10:00:55 -0400
-Received: from indium.canonical.com ([91.189.90.7]:47364)
+ id 1k9U9K-0000HF-JZ
+ for qemu-devel@nongnu.org; Sat, 22 Aug 2020 10:05:39 -0400
+Received: from indium.canonical.com ([91.189.90.7]:47728)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k9U4i-0000Y3-MG
- for qemu-devel@nongnu.org; Sat, 22 Aug 2020 10:00:54 -0400
+ id 1k9U9I-0000uo-SG
+ for qemu-devel@nongnu.org; Sat, 22 Aug 2020 10:05:38 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1k9U4g-00074g-Fl
- for <qemu-devel@nongnu.org>; Sat, 22 Aug 2020 14:00:50 +0000
+ id 1k9U9H-0007Us-PY
+ for <qemu-devel@nongnu.org>; Sat, 22 Aug 2020 14:05:35 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 765382E8073
- for <qemu-devel@nongnu.org>; Sat, 22 Aug 2020 14:00:50 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id B6AF22E8072
+ for <qemu-devel@nongnu.org>; Sat, 22 Aug 2020 14:05:35 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 22 Aug 2020 13:49:59 -0000
+Date: Sat, 22 Aug 2020 13:59:58 -0000
 From: Diego Viola <1892581@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -52,15 +52,16 @@ X-Launchpad-Bug-Security-Vulnerability: no
 X-Launchpad-Bug-Commenters: diego-viola
 X-Launchpad-Bug-Reporter: Diego Viola (diego-viola)
 X-Launchpad-Bug-Modifier: Diego Viola (diego-viola)
-Message-Id: <159810419955.15369.6411904597131705076.malonedeb@soybean.canonical.com>
-Subject: [Bug 1892581] [NEW] QEMU 5.1 no longer says anything about
- inaccessible devices
+References: <159810419955.15369.6411904597131705076.malonedeb@soybean.canonical.com>
+Message-Id: <159810479835.2034.9889159706004746233.malone@chaenomeles.canonical.com>
+Subject: [Bug 1892581] Re: QEMU 5.1 no longer says anything about inaccessible
+ devices
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="99c2d833c8d727fd05148486920aca032e908071"; Instance="production"
-X-Launchpad-Hash: 93336be88509c4aa6a0a34ee55718eb1979d1ca6
+X-Launchpad-Hash: b02890c99a83a224874b10c648f889ca99dffff8
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/22 10:00:50
@@ -87,60 +88,7 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
-
-Previously, with QEMU 5.0.0 running a VM with the following command:
-
-$ qemu-system-x86_64 -enable-kvm -hda arch-zoom.qcow2 -m 4G -device usb-
-ehci,id=3Dehci -device usb-
-host,bus=3Dehci.0,vendorid=3D0x04f2,productid=3D0xb449 -device intel-hda
--device hda-duplex -vga virtio
-
-Would display something like the following:
-
-libusb: error [_get_usbfs_fd] libusb couldn't open USB device /dev/bus/usb/=
-002/004: Permission denied
-libusb: error [_get_usbfs_fd] libusb requires write access to USB device no=
-des.
-libusb: error [_get_usbfs_fd] libusb couldn't open USB device /dev/bus/usb/=
-002/004: Permission denied
-libusb: error [_get_usbfs_fd] libusb requires write access to USB device no=
-des.
-
-With insufficient permissions.
-
-QEMU 5.1.0 no longer displays anything.
-
-I did a git bisect and this is the result:
-
-[diego@thinkpad qemu]$ git bisect bad
-9f815e83e983d247a3cd67579d2d9c1765adc644 is the first bad commit
-commit 9f815e83e983d247a3cd67579d2d9c1765adc644
-Author: Gerd Hoffmann <kraxel@redhat.com>
-Date:   Fri Jun 5 14:59:52 2020 +0200
-
-    usb: add hostdevice property to usb-host
-
-    The new property allows to specify usb host device name.  Uses standard
-    qemu_open(), so both file system path (/dev/bus/usb/$bus/$dev on linux)
-    and file descriptor passing can be used.
-
-    Requires libusb 1.0.23 or newer.  The hostdevice property is only
-    present in case qemu is compiled against a new enough library version,
-    so the presence of the property can be used for feature detection.
-
-    Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-    Message-Id: <20200605125952.13113-1-kraxel@redhat.com>
-
- hw/usb/host-libusb.c | 75 ++++++++++++++++++++++++++++++++++++++++++------=
-----
- hw/usb/trace-events  |  1 +
- 2 files changed, 62 insertions(+), 14 deletions(-)
-[diego@thinkpad qemu]$
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+My system is Arch Linux.
 
 -- =
 
