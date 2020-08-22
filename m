@@ -7,54 +7,54 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E759C433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 22 Aug 2020 21:24:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECFC0C433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 22 Aug 2020 21:25:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 274DD2086A
-	for <qemu-devel@archiver.kernel.org>; Sat, 22 Aug 2020 21:24:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B712A2086A
+	for <qemu-devel@archiver.kernel.org>; Sat, 22 Aug 2020 21:25:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=yadro.com header.i=@yadro.com header.b="J+jL68p3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 274DD2086A
+	dkim=pass (1024-bit key) header.d=yadro.com header.i=@yadro.com header.b="D9XaM8kl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B712A2086A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yadro.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37500 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39864 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k9azo-0001yE-Fm
-	for qemu-devel@archiver.kernel.org; Sat, 22 Aug 2020 17:24:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49016)
+	id 1k9b1C-00034J-2S
+	for qemu-devel@archiver.kernel.org; Sat, 22 Aug 2020 17:25:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49046)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
- id 1k9axH-0006Yf-6A
- for qemu-devel@nongnu.org; Sat, 22 Aug 2020 17:21:39 -0400
-Received: from mta-02.yadro.com ([89.207.88.252]:55278 helo=mta-01.yadro.com)
+ id 1k9axI-0006Ys-C9
+ for qemu-devel@nongnu.org; Sat, 22 Aug 2020 17:21:40 -0400
+Received: from mta-02.yadro.com ([89.207.88.252]:55286 helo=mta-01.yadro.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
- id 1k9axF-0002sD-FC
- for qemu-devel@nongnu.org; Sat, 22 Aug 2020 17:21:38 -0400
+ id 1k9axG-0002sJ-FA
+ for qemu-devel@nongnu.org; Sat, 22 Aug 2020 17:21:40 -0400
 Received: from localhost (unknown [127.0.0.1])
- by mta-01.yadro.com (Postfix) with ESMTP id 4F24E5604F
- for <qemu-devel@nongnu.org>; Sat, 22 Aug 2020 21:21:34 +0000 (UTC)
+ by mta-01.yadro.com (Postfix) with ESMTP id 5D8C757501
+ for <qemu-devel@nongnu.org>; Sat, 22 Aug 2020 21:21:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=yadro.com; h=
  content-type:content-type:content-transfer-encoding:mime-version
  :references:in-reply-to:x-mailer:message-id:date:date:subject
  :subject:from:from:received:received:received; s=mta-01; t=
- 1598131293; x=1599945694; bh=BqgzoMCid9ojGf6fIEty6qj4pgzcFFR1Rd2
- kQlnOsx0=; b=J+jL68p3XWAcuZxVysdThZsYfolCwkKyGqBlBlBoFelQdmT6gXX
- 8aomqbiLHbb6lKVxm+z9Bic8a2O1ePEd71m/mw6GF9zXM9+6StKKI/UoiPEKXSvv
- OqGbRkIJwg4MdRj7/F9lF0zMgO7huWqRJXenkpTaRC1yTi0U/WDhM4KU=
+ 1598131294; x=1599945695; bh=X0aqPMLO4Z8BTN6b/qCe3yclg9y0lybBAdT
+ fc4NP/Zs=; b=D9XaM8kl98RPz50Tp6IuNmFofoEz+5tLur9YpxxOer4XVIkwAK8
+ A1wEDhXJFiR476BK3WGlDPGPIg07EJec4nJy0HF4xdoluiUl5GGaLOJYLwQBznrF
+ k7EoTMr7ZEtbg1CIDPvDmxtVhslEVdQh2nx0O77Q2CrFFW5+Nv9BQlIo=
 X-Virus-Scanned: amavisd-new at yadro.com
 Received: from mta-01.yadro.com ([127.0.0.1])
  by localhost (mta-01.yadro.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id AQkc4fLGQILB for <qemu-devel@nongnu.org>;
- Sun, 23 Aug 2020 00:21:33 +0300 (MSK)
+ with ESMTP id 4xYNa3qSKoMA for <qemu-devel@nongnu.org>;
+ Sun, 23 Aug 2020 00:21:34 +0300 (MSK)
 Received: from T-EXCH-02.corp.yadro.com (t-exch-02.corp.yadro.com
  [172.17.10.102])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
  (No client certificate requested)
- by mta-01.yadro.com (Postfix) with ESMTPS id 35194574F4
+ by mta-01.yadro.com (Postfix) with ESMTPS id A4894574FE
  for <qemu-devel@nongnu.org>; Sun, 23 Aug 2020 00:21:33 +0300 (MSK)
 Received: from localhost (172.17.204.212) by T-EXCH-02.corp.yadro.com
  (172.17.10.102) with Microsoft SMTP Server (version=TLS1_2,
@@ -62,9 +62,9 @@ Received: from localhost (172.17.204.212) by T-EXCH-02.corp.yadro.com
  Aug 2020 00:21:33 +0300
 From: Roman Bolshakov <r.bolshakov@yadro.com>
 To: <qemu-devel@nongnu.org>
-Subject: [PATCH 1/4] configure: Use discovered make for in-source build
-Date: Sun, 23 Aug 2020 00:21:26 +0300
-Message-ID: <20200822212129.97758-2-r.bolshakov@yadro.com>
+Subject: [PATCH 2/4] Makefile: Require GNU make 3.82+
+Date: Sun, 23 Aug 2020 00:21:27 +0300
+Message-ID: <20200822212129.97758-3-r.bolshakov@yadro.com>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20200822212129.97758-1-r.bolshakov@yadro.com>
 References: <20200822212129.97758-1-r.bolshakov@yadro.com>
@@ -101,30 +101,34 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-A recursive make is inovked if in-source build is used but $(MAKE) is
-the same as the one used in the original make invocaton.
+QEMU build fails with cryptic messages if make is too old:
 
-Some platforms have preference to use gmake, or a make passed as an
-option to "configure". Honor the choice.
+  Makefile.ninja:2655: *** multiple target patterns.  Stop.
+
+To avoid the confusion it's worth to fail the build right away and print
+a friendly error message.
 
 Signed-off-by: Roman Bolshakov <r.bolshakov@yadro.com>
 ---
- configure | 2 ++
- 1 file changed, 2 insertions(+)
+ Makefile | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/configure b/configure
-index 4e5fe33211..9e0d505067 100755
---- a/configure
-+++ b/configure
-@@ -38,6 +38,8 @@ then
- # This file is auto-generated by configure to support in-source tree
- # 'make' command invocation
- 
-+include build/config-host.mak
-+
- ifeq ($(MAKECMDGOALS),)
- recurse: all
+diff --git a/Makefile b/Makefile
+index 8373ddccc9..45d688b87b 100644
+--- a/Makefile
++++ b/Makefile
+@@ -4,6 +4,11 @@ ifneq ($(words $(subst :, ,$(CURDIR))), 1)
+   $(error main directory cannot contain spaces nor colons)
  endif
+ 
++ifeq ($(filter undefine,$(value .FEATURES)),)
++$(error Unsupported Make version: $(MAKE_VERSION). \
++        Please use GNU Make 3.82 or above)
++endif
++
+ # Always point to the root of the build tree (needs GNU make).
+ BUILD_DIR=$(CURDIR)
+ 
 -- 
 2.28.0
 
