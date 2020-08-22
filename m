@@ -2,84 +2,63 @@ Return-Path: <SRS0=Iy1T=CA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B6F2C433E1
-	for <qemu-devel@archiver.kernel.org>; Sat, 22 Aug 2020 20:59:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE5D9C433E1
+	for <qemu-devel@archiver.kernel.org>; Sat, 22 Aug 2020 21:16:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 24CCD2054F
-	for <qemu-devel@archiver.kernel.org>; Sat, 22 Aug 2020 20:59:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oypKc9ne"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24CCD2054F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 94FC9207CD
+	for <qemu-devel@archiver.kernel.org>; Sat, 22 Aug 2020 21:16:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 94FC9207CD
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50602 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53768 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k9abQ-0002Lv-DJ
-	for qemu-devel@archiver.kernel.org; Sat, 22 Aug 2020 16:59:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45190)
+	id 1k9arq-00050K-R7
+	for qemu-devel@archiver.kernel.org; Sat, 22 Aug 2020 17:16:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47830)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1k9aak-0001L2-7e
- for qemu-devel@nongnu.org; Sat, 22 Aug 2020 16:58:22 -0400
-Received: from mail-ed1-x52c.google.com ([2a00:1450:4864:20::52c]:35206)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1k9aai-0000Kb-CY
- for qemu-devel@nongnu.org; Sat, 22 Aug 2020 16:58:21 -0400
-Received: by mail-ed1-x52c.google.com with SMTP id m20so4765442eds.2
- for <qemu-devel@nongnu.org>; Sat, 22 Aug 2020 13:58:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=9Bc1RzgUd+QOvMuRwlYYuUj9tiB1OO+2isp4JUxIXKw=;
- b=oypKc9neY3Y18Bt/AU6ffGxVO+linpxn0jvxV65k0oDHRtuiXSachtLXUa5bDEwwer
- qU8LV6Fy4hrrPktqOvWr7uabNlvNimAGLWL3lr31mqjvk9ro/biBQDU7OEs1XPZ1KS9M
- ggsvnCXorpjC39ndliwEtRLtmLPdP6wRO10VodOlIuugdCTnQODAzyf2IDWFmXw4pJGJ
- vO0/vPnOpo9helxuUe02mKAvH7Q3Oab6D6w5iO/VbTCiwUB+zE7Ec8XWnjIy+3J6Qh7U
- JkCJuxv26Uw9BxBVs3Eaoyd37NOaRccjHQ8ay44QQNRiNYPG0OuzImcncsxfOR6umUdn
- yl8Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=9Bc1RzgUd+QOvMuRwlYYuUj9tiB1OO+2isp4JUxIXKw=;
- b=JoW54BVaA111C+sGwGQTqctWWONfre6bJYMxpz1cJwVTbkZgkJjBeT5n4aj4tcudeg
- CZGuQq5TL2+wJqXLvjoI2y/hBOK+FuwWxjMLoorhJSi+/q+U5uyEv4TSIj+eZhweOeaU
- hI8hD0Cu/lji0Hq76I14Yewumvy+XVEFB4lp4xoggguP9FmAsymB0u/u5XZ2LKnAy9Uo
- vdNJV58HBO+GJE5lfEQjQuQw2RxQ/997D+j0mgV7Kc4/Ikz7rAWKOAsoJ17bK0tnOaKH
- P/+Up2D0bvmXLf8qlaij91KMXmPtn+/qjNgJbbRPwTDWD2MMbf6QI8naM/1lsOu/z3MO
- 0VEw==
-X-Gm-Message-State: AOAM533MrPxFFafXYWsyJ0JTRryQYyOVk4zvOFSeM5r+0N1euKCdd7HZ
- sd+l0Oro0myk49PcznHUQXuWbbqE9vZR2ZYKi1jV3w==
-X-Google-Smtp-Source: ABdhPJxSnP+N7SIrXFA0eeH2d6i2OMk+IpLnx6IVXQJwvb4lVWFpjYlgrHrWzymT4fVEJdEDj/tdZy9mcA1uMmu6w6w=
-X-Received: by 2002:aa7:d596:: with SMTP id r22mr8724779edq.204.1598129898201; 
- Sat, 22 Aug 2020 13:58:18 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
+ id 1k9ar8-0004WQ-SJ
+ for qemu-devel@nongnu.org; Sat, 22 Aug 2020 17:15:18 -0400
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:10550)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
+ id 1k9ar5-00020I-LH
+ for qemu-devel@nongnu.org; Sat, 22 Aug 2020 17:15:18 -0400
+Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
+ by localhost (Postfix) with SMTP id CB6D9746335;
+ Sat, 22 Aug 2020 23:15:01 +0200 (CEST)
+Received: by zero.eik.bme.hu (Postfix, from userid 432)
+ id A44AF745712; Sat, 22 Aug 2020 23:15:01 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+ by zero.eik.bme.hu (Postfix) with ESMTP id A22D2745702;
+ Sat, 22 Aug 2020 23:15:01 +0200 (CEST)
+Date: Sat, 22 Aug 2020 23:15:01 +0200 (CEST)
+To: =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>
+Subject: Re: [PATCH] ati-vga: Fix checks in ati_2d_blt() to avoid crash
+In-Reply-To: <2041026f-7a88-d8f7-8738-968e1394e8c6@redhat.com>
+Message-ID: <alpine.BSF.2.22.395.2008222259320.91574@zero.eik.bme.hu>
+References: <20200406204029.19559747D5D@zero.eik.bme.hu>
+ <2041026f-7a88-d8f7-8738-968e1394e8c6@redhat.com>
+User-Agent: Alpine 2.22 (BSF 395 2020-01-19)
 MIME-Version: 1.0
-References: <20200821140826.194322-1-eblake@redhat.com>
-In-Reply-To: <20200821140826.194322-1-eblake@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sat, 22 Aug 2020 21:58:07 +0100
-Message-ID: <CAFEAcA-v2MCkbCsfHZzm6EOC34DdZkPEeOQ5c7cP1ODS_5r63g@mail.gmail.com>
-Subject: Re: [PULL 00/14] bitmaps patches for 2020-08-21
-To: Eric Blake <eblake@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::52c;
- envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x52c.google.com
+Content-Type: multipart/mixed;
+ boundary="3866299591-361680149-1598130901=:91574"
+Received-SPF: pass client-ip=2001:738:2001:2001::2001;
+ envelope-from=balaton@eik.bme.hu; helo=zero.eik.bme.hu
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=unavailable autolearn_force=no
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -92,77 +71,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Qemu-block <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Mauro Matteo Cascella <mcascell@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>,
+ qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
+ Prasad J Pandit <pjp@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Reply-to: BALATON Zoltan <balaton@eik.bme.hu>
+From: BALATON Zoltan via <qemu-devel@nongnu.org>
 
-On Fri, 21 Aug 2020 at 15:12, Eric Blake <eblake@redhat.com> wrote:
-> ----------------------------------------------------------------
-> bitmaps patches for 2020-08-21
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
+
+--3866299591-361680149-1598130901=:91574
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8BIT
+
+On Sat, 22 Aug 2020, Philippe Mathieu-Daudé wrote:
+> On 4/6/20 10:34 PM, BALATON Zoltan wrote:
+>> In some corner cases (that never happen during normal operation but a
+>> malicious guest could program wrong values) pixman functions were
+>> called with parameters that result in a crash. Fix this and add more
+>> checks to disallow such cases.
 >
-> - Andrey Shinkevich: Enhance qcow2.py for iotest inspection of qcow2 images
-> - Max Reitz: Add block-bitmap-mapping migration parameter
+> (Fair) question on IRC. Is this patch fixing CVE-2020-24352?
+>
+> Public on August 14, 2020
+>
+> Description
+>
+> An out-of-bounds memory access flaw was found in the ATI VGA device
+> implementation of the QEMU emulator. This flaw occurs in the
+> ati_2d_blt() routine while handling MMIO write operations through the
+> ati_mm_write() callback. A malicious guest could use this flaw to crash
+> the QEMU process on the host, resulting in a denial of service.
 
-iotest 030 failure on ppc64be:
+Probably this patch does not fix all possible malicious register writes a 
+guest could do. This was fixing problems reported earlier but then I got 
+some more reports around 5.1.0 freeze about some more overruns which I 
+could not yet look at and nobody else was fixing it either so it's 
+possible some bugs are still left in the checks.
 
-  TEST    iotest-qcow2: 030 [fail]
-QEMU          --
-"/home/pm215/qemu/build/all/tests/qemu-iotests/../../qemu-system-ppc64"
--nodefaults -display none -accel qtest
-QEMU_IMG      -- "/home/pm215/qemu/build/all/tests/qemu-iotests/../../qemu-img"
-QEMU_IO       --
-"/home/pm215/qemu/build/all/tests/qemu-iotests/../../qemu-io"  --cache
-writeback --aio threads -f qcow2
-QEMU_NBD      -- "/home/pm215/qemu/build/all/tests/qemu-iotests/../../qemu-nbd"
-IMGFMT        -- qcow2 (compat=1.1)
-IMGPROTO      -- file
-PLATFORM      -- Linux/ppc64 gcc1-power7 3.10.0-862.14.4.el7.ppc64
-TEST_DIR      -- /home/pm215/qemu/build/all/tests/qemu-iotests/scratch
-SOCK_DIR      -- /tmp/tmp.2XM0XBi18t
-SOCKET_SCM_HELPER --
-/home/pm215/qemu/build/all/tests/qemu-iotests/socket_scm_helper
+However this is hardly security critical as ati-vga is experimental and 
+not fully implemented yet so anyone using it will likely get other 
+problems (such as drivers not loading) before a guest could exploit this. 
+I think QEMU only considers bugs in parts that are used for virtualisation 
+via KVM as security problems so maybe this does not even need a CVE and 
+could be normally reported/discussed on the mailing list.
 
---- /home/pm215/qemu/tests/qemu-iotests/030.out 2019-07-15
-15:12:04.941863802 +0000
-+++ /home/pm215/qemu/build/all/tests/qemu-iotests/030.out.bad
-2020-08-22 19:00:37.756291193 +0000
-@@ -1,5 +1,17 @@
--...........................
-+.............F.............
-+======================================================================
-+FAIL: test_stream_parallel (__main__.TestParallelOps)
-+----------------------------------------------------------------------
-+Traceback (most recent call last):
-+  File "030", line 251, in test_stream_parallel
-+    self.assert_qmp(result, 'return', {})
-+  File "/home/pm215/qemu/tests/qemu-iotests/iotests.py", line 888, in
-assert_qmp
-+    result = self.dictpath(d, path)
-+  File "/home/pm215/qemu/tests/qemu-iotests/iotests.py", line 862, in dictpath
-+    self.fail(f'failed path traversal for "{path}" in "{d}"')
-+AssertionError: failed path traversal for "return" in "{'error':
-{'class': 'DeviceNotActive', 'desc': "Block job 'stream-node8' not
-found"}}"
-+
- ----------------------------------------------------------------------
- Ran 27 tests
+Basically what needs to be done is go through the checks again to verify 
+that we don't pass params to pixman or set_dirty that result in access 
+outside the video ram area. Probably there's still an off by one error or 
+some other mistake. I'll eventually may try to fix it but if anyone is 
+sending a patch earlier that's welcome. I don't have much time for QEMU 
+now.
 
--OK
-+FAILED (failures=1)
-
-Intermittent; it passed second time around, so I'm guessing that this
-is unrelated to this particular pullreq, and I've applied it.
-
-Can we do something about iotest 030 ? It seems to be
-causing intermittent failures for me still :-(
-
-
-Applied, thanks.
-
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.2
-for any user-visible changes.
-
--- PMM
+Regards,
+BALATON Zoltan
+--3866299591-361680149-1598130901=:91574--
 
