@@ -2,73 +2,70 @@ Return-Path: <SRS0=Iy1T=CA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84594C433E1
-	for <qemu-devel@archiver.kernel.org>; Sat, 22 Aug 2020 06:26:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CAE75C433E1
+	for <qemu-devel@archiver.kernel.org>; Sat, 22 Aug 2020 06:59:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 54CE920825
-	for <qemu-devel@archiver.kernel.org>; Sat, 22 Aug 2020 06:26:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54CE920825
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9616A20724
+	for <qemu-devel@archiver.kernel.org>; Sat, 22 Aug 2020 06:59:23 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="KdCnuy+q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9616A20724
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37038 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52036 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k9MzE-0006xx-FV
-	for qemu-devel@archiver.kernel.org; Sat, 22 Aug 2020 02:26:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39938)
+	id 1k9NUo-0007O7-OU
+	for qemu-devel@archiver.kernel.org; Sat, 22 Aug 2020 02:59:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48508)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
- id 1k9MyH-0006SH-K6
- for qemu-devel@nongnu.org; Sat, 22 Aug 2020 02:25:45 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:52568 helo=huawei.com)
+ (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
+ id 1k9NUF-0006xV-OV
+ for qemu-devel@nongnu.org; Sat, 22 Aug 2020 02:58:47 -0400
+Received: from lizzy.crudebyte.com ([91.194.90.13]:45657)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
- id 1k9MyD-0003pl-K1
- for qemu-devel@nongnu.org; Sat, 22 Aug 2020 02:25:45 -0400
-Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id BAEFA3661BFED0DB99E5;
- Sat, 22 Aug 2020 14:25:29 +0800 (CST)
-Received: from [127.0.0.1] (10.174.186.4) by DGGEMS410-HUB.china.huawei.com
- (10.3.19.210) with Microsoft SMTP Server id 14.3.487.0; Sat, 22 Aug 2020
- 14:25:21 +0800
-Subject: Re: [PATCH v3 05/10] migration/dirtyrate: Record hash results for
- each sampled page
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-References: <1597634433-18809-1-git-send-email-zhengchuan@huawei.com>
- <1597634433-18809-6-git-send-email-zhengchuan@huawei.com>
- <20200820173009.GM2664@work-vm> <20200820175149.GA244434@redhat.com>
- <20200820175512.GQ2664@work-vm>
- <95894cf7-ba09-9862-357a-1073a192e934@huawei.com>
- <20200821123014.GK348677@redhat.com> <20200821123910.GC2655@work-vm>
-From: Zheng Chuan <zhengchuan@huawei.com>
-Message-ID: <cf76fa9f-1395-3b0c-2ef1-b02f8fb552c1@huawei.com>
-Date: Sat, 22 Aug 2020 14:25:20 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
+ id 1k9NUD-0008Cg-LI
+ for qemu-devel@nongnu.org; Sat, 22 Aug 2020 02:58:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=crudebyte.com; s=lizzy; h=Content-Type:Content-Transfer-Encoding:
+ MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+ Content-ID:Content-Description;
+ bh=djxahE3gQNKtWiL3TmRWxHr4lUmJq9tH0itK9xnDkfg=; b=KdCnuy+q3i+HQ9q8jhHeY47YWC
+ OuizEK4iZvS7jfhK3/OOQ1HiUwTU7h61n3yMJmaCcGDlOd1y6Rk2rMvSDEl7BxAm5Fwo97Z6FVLpe
+ A0iKVGzUA9NstD0BnZ6YpUiDB/jhKxvjQMBvkg5xukIvxKCAwXl8RQjG48B/EthhCBcSwLdANbpY6
+ zzAAEKJcqVYiVJd/mdSt/aJQ1n6fWMhgr0k9yF82m4RLxSFbgSgEbhEe3ThMv+cHz2PZHNon1u24b
+ dGXzKAMQTtoyytmcjx6eBZtE/2rR2YvUxKRTDLcUpQZ/cpaQHWmeuLrkp2vYJIKps8d3TBqeopAp+
+ S+LTFjsw==;
+From: Christian Schoenebeck <qemu_oss@crudebyte.com>
+To: qemu-devel@nongnu.org
+Cc: Geoffrey McRae <geoff@hostfission.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ kraxel@redhat.com
+Subject: Re: [PATCH v8 1/1] audio/jack: fix use after free segfault
+Date: Sat, 22 Aug 2020 08:58:41 +0200
+Message-ID: <4344040.8rWxCWeqvY@silver>
+In-Reply-To: <1f240cabf78098364f7c0a7d399e2773@hostfission.com>
+References: <20200821134554.101397-1-geoff@hostfission.com>
+ <0f297508-2b27-9303-002b-2eaa9983cabc@redhat.com>
+ <1f240cabf78098364f7c0a7d399e2773@hostfission.com>
 MIME-Version: 1.0
-In-Reply-To: <20200821123910.GC2655@work-vm>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.186.4]
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.32; envelope-from=zhengchuan@huawei.com;
- helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/22 02:25:30
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_PASS=-0.001,
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
+Received-SPF: pass client-ip=91.194.90.13; envelope-from=qemu_oss@crudebyte.com;
+ helo=lizzy.crudebyte.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/22 02:58:43
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -82,143 +79,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: zhang.zhanghailiang@huawei.com, quintela@redhat.com, qemu-devel@nongnu.org,
- xiexiangyou@huawei.com, alex.chen@huawei.com, ann.zhuangyanying@huawei.com,
- fangying1@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-
-On 2020/8/21 20:39, Dr. David Alan Gilbert wrote:
-> * Daniel P. Berrangé (berrange@redhat.com) wrote:
->> On Fri, Aug 21, 2020 at 08:22:06PM +0800, Zheng Chuan wrote:
->>>
->>>
->>> On 2020/8/21 1:55, Dr. David Alan Gilbert wrote:
->>>> * Daniel P. BerrangÃ© (berrange@redhat.com) wrote:
->>>>> On Thu, Aug 20, 2020 at 06:30:09PM +0100, Dr. David Alan Gilbert wrote:
->>>>>> * Chuan Zheng (zhengchuan@huawei.com) wrote:
->>>>>>> Record hash results for each sampled page.
->>>>>>>
->>>>>>> Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
->>>>>>> Signed-off-by: YanYing Zhuang <ann.zhuangyanying@huawei.com>
->>>>>>> ---
->>>>>>>  migration/dirtyrate.c | 144 ++++++++++++++++++++++++++++++++++++++++++++++++++
->>>>>>>  migration/dirtyrate.h |   7 +++
->>>>>>>  2 files changed, 151 insertions(+)
->>>>>>>
->>>>>>> diff --git a/migration/dirtyrate.c b/migration/dirtyrate.c
->>>>>>> index c4304ef..62b6f69 100644
->>>>>>> --- a/migration/dirtyrate.c
->>>>>>> +++ b/migration/dirtyrate.c
->>>>>>> @@ -25,6 +25,7 @@
->>>>>>>  #include "dirtyrate.h"
->>>>>>>  
->>>>>>>  CalculatingDirtyRateState CalculatingState = CAL_DIRTY_RATE_INIT;
->>>>>>> +static unsigned long int qcrypto_hash_len = QCRYPTO_HASH_LEN;
->>>>>>
->>>>>> Why do we need this static rather than just using the QCRYPTO_HASH_LEN ?
->>>>>> It's never going to change is it?
->>>>>> (and anyway it's just a MD5 len?)
->>>>>
->>>>> I wouldn't want to bet on that given that this is use of MD5. We might
->>>>> claim this isn't security critical, but surprises happen, and we will
->>>>> certainly be dinged on security audits for introducing new use of MD5
->>>>> no matter what.
->>>>>
->>>>> If a cryptographic hash is required, then sha256 should be the choice
->>>>> for any new code that doesn't have back compat requirements.
->>>>>
->>>>> If a cryptographic hash is not required then how about crc32 
->>>>
->>>> It doesn't need to be cryptographic; is crc32 the fastest reasonable hash for use
->>>> in large areas?
->>>>
->>>> Dave
->>>>
->>>>> IOW, it doesn't make a whole lot of sense to say we need a cryptographic
->>>>> hash, but then pick the most insecure one.
->>>>>
->>>>> sha256 is slower than md5, but it is conceivable that in future we might
->>>>> gain support for something like Blake2b which is similar security level
->>>>> to SHA3, while being faster than MD5.
->>>>>
->>>>> Overall I'm pretty unethusiastic about use of MD5 being introduced and
->>>>> worse, being hardcoded as the only option.
->>>>>
->>>>> Regards,
->>>>> Daniel
->>>>> -- 
->>>>> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
->>>>> |: https://libvirt.org         -o-            https://fstop138.berrange.com :|
->>>>> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
->>>
->>> Hi, Daniel, Dave.
->>>
->>> I do compare MD5 and SHA256 with vm memory of 128G under mempress of 100G.
->>>
->>> 1. Calculation speed
->>> 1） MD5 takes about 500ms to sample and hash all pages by record_ramblock_hash_info().
->>> 2)  SHA256 takes about 750ms to sample all pages by record_ramblock_hash_info().
->>>
->>> 2. CPU Consumption
->>> 1)  MD5 may have instant rise up to 48% for dirtyrate thread
->>> 2)  SHA256 may have instant rise up to 75% for dirtyrate thread
->>>
->>> 3. Memory Consumption
->>> SHA256 may need twice memory than MD5 due to its HASH_LEN.
->>>
->>> I am trying to consider if crc32 is more faster and takes less memory and is more safer than MD5?
->>
->> No, crc32 is absolutely *weaker* than MD5. It is NOT a cryptographic
->> hash so does not try to guarantee collision resistance. It only has
->> 2^32 possible outputs.
->>
->> MD5 does try to guarantee collision resistance, but MD5 is considered
->> broken these days, so a malicious attacker can cause collisions if they
->> are motivated enough.
->>
->> IOW if you need collision resistance that SHA256 should be used.
+On Samstag, 22. August 2020 02:16:23 CEST Geoffrey McRae wrote:
+> On 2020-08-22 03:47, Paolo Bonzini wrote:
+> > On 21/08/20 19:34, Christian Schoenebeck wrote:
+> >>>  static void qjack_fini_out(HWVoiceOut *hw)
+> >>>  {
+> >>>  
+> >>>      QJackOut *jo = (QJackOut *)hw;
+> >>>      qjack_client_fini(&jo->c);
+> >>> 
+> >>> +
+> >>> +    qemu_bh_delete(jo->c.shutdown_bh);
+> >> 
+> >> Paolo wrapped that qemu_bh_delete() call inside the lock as well. So I
+> >> guess
+> >> it makes a difference for the BH API?
+> > 
+> > It is not a problem as long as qjack_client_fini is idempotent.
 > 
-> There's no need to guard against malicious behaviour here - this is just
-> a stat to guide migration.
-> If CRC32 is likely to be faster than md5 I suspect it's enough.
+> `qjack_client_fini` is indeed idempotent
+
+Right.
+
+> >>> +    qemu_mutex_destroy(&jo->c.shutdown_lock);
+> >>> 
+> >>>  }
+> >> 
+> >> Hmmm, is this qemu_mutex_destroy() safe at this point?
+> > 
+> > Perhaps make the mutex global and not destroy it at all.
 > 
-> Dave
-> 
-Hi，Dave, Daniel.
+> It's safe at this point as `qjack_fini_out` is only called at device
+> destruction, and `qjack_client_fini` ensures that JACK is shut down
+> which prevents jack from trying to call the shutdown event handler.
 
-I did test by crc32，it is much faster than MD5 and SHA256:)
+You mean because jack_client_close() is synchronized. That prevents JACK from 
+firing the callback after jack_client_close() returns, that's correct.
 
-As for 128G vm it takes only about 50ms to sample and hash all pages by record_ramblock_hash_info().
-And the dirtyrate calculation is still good enough:)
-++++++++++++++++++++++++++++++++++++++++++
-|                      |    dirtyrate    |
-++++++++++++++++++++++++++++++++++++++++++
-| no mempress          |     4MB/s       |
-------------------------------------------
-| mempress 4096 1024   |    1248MB/s     |
-++++++++++++++++++++++++++++++++++++++++++
-| mempress 4096 4096   |    4060MB/s     |
-++++++++++++++++++++++++++++++++++++++++++
+But as qemu_bh_delete() is async, you do not have a guarantee that a 
+previously scheduled BH shutdown handler is no longer running. So it might 
+still hold the lock when you attempt to destroy the mutex.
 
-I will take crc32 in PatchV4, is that OK from the perspective of safety?
+On doubt I would do like Paolo suggested by making the mutex global and not 
+destroying it at all.
 
-In my opinion, it should be safe.
-The crc32 is only for compare and the recorder will be free after calculation is over.
-The output is just dirtyrate for user to guide migration.
+Best regards,
+Christian Schoenebeck
 
-What's more, i consider increase DIRTYRATE_DEFAULT_SAMPLE_PAGES from 256 to 512
-which may takes about 75ms to sample and hash all pages by record_ramblock_hash_info().
-
->>
->> Regards,
->> Daniel
->> -- 
->> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
->> |: https://libvirt.org         -o-            https://fstop138.berrange.com :|
->> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
