@@ -2,79 +2,100 @@ Return-Path: <SRS0=Iy1T=CA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49AE2C433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 22 Aug 2020 17:36:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4815C433E1
+	for <qemu-devel@archiver.kernel.org>; Sat, 22 Aug 2020 17:58:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1E4F9206C0
-	for <qemu-devel@archiver.kernel.org>; Sat, 22 Aug 2020 17:36:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E4F9206C0
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 9E8EF2078D
+	for <qemu-devel@archiver.kernel.org>; Sat, 22 Aug 2020 17:58:21 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c68RE57L"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E8EF2078D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43956 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52034 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k9XRH-0007AK-DS
-	for qemu-devel@archiver.kernel.org; Sat, 22 Aug 2020 13:36:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41842)
+	id 1k9XmW-0003rX-VH
+	for qemu-devel@archiver.kernel.org; Sat, 22 Aug 2020 13:58:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45242)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k9XQg-0006ja-5u
- for qemu-devel@nongnu.org; Sat, 22 Aug 2020 13:35:46 -0400
-Received: from indium.canonical.com ([91.189.90.7]:36424)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1k9Xlp-0002xo-5a; Sat, 22 Aug 2020 13:57:37 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:34721)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k9XQd-0003h4-UM
- for qemu-devel@nongnu.org; Sat, 22 Aug 2020 13:35:45 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1k9X2T-0005Xp-1U
- for <qemu-devel@nongnu.org>; Sat, 22 Aug 2020 17:10:45 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 096E42E8072
- for <qemu-devel@nongnu.org>; Sat, 22 Aug 2020 17:10:45 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1k9Xll-0005vm-FK; Sat, 22 Aug 2020 13:57:36 -0400
+Received: by mail-wm1-x343.google.com with SMTP id c19so3308441wmd.1;
+ Sat, 22 Aug 2020 10:57:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=4lq9MiktgJLSW3xe5r7N/GJL5nKudgRFWs3ZWW5EXa4=;
+ b=c68RE57L1XsvCNVtdKljCxqHAfM6s7WfV6C3BGqngOhES1GRS7Hg/v9sNx5qCejnol
+ HXEsX/n4iENGUfYGvcn1zYVijnK1dp53hbyLIo3Y1e2OAjjXswoF6VcZtMM93jG7E3zY
+ DTKsyoQTmdVUdnPqdf7B6gwCCEOq0LO/XCON494dEI5XgXLSSBIEyYzYos4VfvvwDmMk
+ 2AkmPTL7IMO9RvtkC9afTdysKHSVfaD+vv0O+M9rRggIQ48vTeXrk1bA0jxTlLHlJda+
+ /EO8pqW6rhWBHxxt0w8EDiomjYDcBwLP4GhNIYRZREZqdlmE19OQGRjJckQ9wQw7Dyf+
+ asxA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=4lq9MiktgJLSW3xe5r7N/GJL5nKudgRFWs3ZWW5EXa4=;
+ b=huyokMtDp9qyDRnuXe7bjMOkfzYZcT9M4ynFs21wWF9Jl4NiqLc0tSNl2/bD0v4CZW
+ 4gElBvnLFY4V+U+8h1v5OT3dSItaFE/5eHehIt9+I4NCT7VLG2u1viDLb4FVZ+GeRHjQ
+ rScg62U11gZxOwRKx3m1oXPg0ixgtA/1QEA9BI03/V+u2HRJLYGXdb3XK1LCJbRUq7tu
+ oEKJ+RP9NhGjPQrykQrHu0XOFoyueCJw2PSoXt0+cWGKRsaLTeon0AeUWQEHTyg1lYI4
+ g92hdy/kZNqRa1Dbco/6PcolK8aSxtzZqUtNBKYqyGDsWlSsLKjm4n3kwCyK9MWavTxQ
+ 5GCw==
+X-Gm-Message-State: AOAM532DLB+JDBvbK+bIgpbyQRo87HbnZ4wDy6ComIcwg3MsbiKg28Eb
+ n6GYIEvu4Aj4mfRAfLLgWj51YbLScR4=
+X-Google-Smtp-Source: ABdhPJzXZ0shoJouSLpIIZaDGXuCbff2t1tps908NJpjpgW1Z0efAErHnQDasKMhoQeUCl+fM/b3NA==
+X-Received: by 2002:a05:600c:4112:: with SMTP id
+ j18mr8800458wmi.187.1598119050596; 
+ Sat, 22 Aug 2020 10:57:30 -0700 (PDT)
+Received: from [192.168.1.36] (121.red-81-40-121.staticip.rima-tde.net.
+ [81.40.121.121])
+ by smtp.gmail.com with ESMTPSA id 33sm12823150wri.16.2020.08.22.10.57.29
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Sat, 22 Aug 2020 10:57:29 -0700 (PDT)
+Subject: Re: [PATCH] util/hexdump: Convert to take a void pointer argument
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20200822150457.1322519-1-f4bug@amsat.org>
+ <CAFEAcA_VexUZ70aL+6ecf2MNoFCVtRfPOUJf2Z8DQJqPDJbAKA@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <921af58a-5715-ce09-fd7d-8326550610d5@amsat.org>
+Date: Sat, 22 Aug 2020 19:57:28 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 22 Aug 2020 17:01:20 -0000
-From: Diego Viola <1892581@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: diego-viola
-X-Launchpad-Bug-Reporter: Diego Viola (diego-viola)
-X-Launchpad-Bug-Modifier: Diego Viola (diego-viola)
-References: <159810419955.15369.6411904597131705076.malonedeb@soybean.canonical.com>
-Message-Id: <159811568084.2425.15231271331249379762.malone@chaenomeles.canonical.com>
-Subject: [Bug 1892581] Re: QEMU 5.1 no longer says anything about inaccessible
- devices
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="99c2d833c8d727fd05148486920aca032e908071"; Instance="production"
-X-Launchpad-Hash: d1554f14304cd9894eb21883876aeae53ae1208a
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/22 12:55:35
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <CAFEAcA_VexUZ70aL+6ecf2MNoFCVtRfPOUJf2Z8DQJqPDJbAKA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::343;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x343.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 0
+X-Spam_score: 0.0
+X-Spam_bar: /
+X-Spam_report: (0.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=1, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=1, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -83,80 +104,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1892581 <1892581@bugs.launchpad.net>
+Cc: Qemu-block <qemu-block@nongnu.org>, Li Zhijian <lizhijian@cn.fujitsu.com>,
+ QEMU Trivial <qemu-trivial@nongnu.org>, Jason Wang <jasowang@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ QEMU Developers <qemu-devel@nongnu.org>, Zhang Chen <chen.zhang@intel.com>,
+ qemu-arm <qemu-arm@nongnu.org>, qemu-ppc <qemu-ppc@nongnu.org>,
+ Gerd Hoffmann <kraxel@redhat.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I was changing the /dev file permissions based on the output from above,
-that's why I decided to submit this bug report.
 
-Either way, the output from lsusb works too.
 
--- =
+On 8/22/20 6:18 PM, Peter Maydell wrote:
+> On Sat, 22 Aug 2020 at 16:05, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
+>> Most uses of qemu_hexdump() do not take an array of char
+>> as input, forcing use of cast. Since we can use this
+>> helper to dump any kind of buffer, use a pointer to void
+>> argument instead.
+>>
+>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> 
+>> -void qemu_hexdump(const char *buf, FILE *fp, const char *prefix, size_t size);
+>> +void qemu_hexdump(const void *ptr, FILE *fp, const char *prefix, size_t size);
+> 
+> Changing the type seems reasonable, but it is still a pointer
+> to a buffer, so I think keeping the name 'buf' is more descriptive.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1892581
+I'll use 'bufptr' so I don't have to modify the function body.
 
-Title:
-  QEMU 5.1 no longer says anything about inaccessible devices
+> 
+> As an aside, is it just me that finds the order of arguments
+> here a bit odd? The pointer to the buffer and the length of
+> the buffer are closely related arguments that are widely
+> separated in the argument list order, and the FILE* that
+> you might expect to come first doesn't. "fp, prefix, buf, size"
+> would seem more logical. Not sure it's worth the effort of
+> changing, though...
 
-Status in QEMU:
-  New
+Can do that. I expect this function to eventually disappear,
+as there are many efforts to not directly write to stdout/stderr
+(this function support generic FILE, but all callers use stdio).
 
-Bug description:
-  Previously, with QEMU 5.0.0 running a VM with the following command:
-
-  $ qemu-system-x86_64 -enable-kvm -hda arch-zoom.qcow2 -m 4G -device
-  usb-ehci,id=3Dehci -device usb-
-  host,bus=3Dehci.0,vendorid=3D0x04f2,productid=3D0xb449 -device intel-hda
-  -device hda-duplex -vga virtio
-
-  Would display something like the following:
-
-  libusb: error [_get_usbfs_fd] libusb couldn't open USB device /dev/bus/us=
-b/002/004: Permission denied
-  libusb: error [_get_usbfs_fd] libusb requires write access to USB device =
-nodes.
-  libusb: error [_get_usbfs_fd] libusb couldn't open USB device /dev/bus/us=
-b/002/004: Permission denied
-  libusb: error [_get_usbfs_fd] libusb requires write access to USB device =
-nodes.
-
-  With insufficient permissions.
-
-  QEMU 5.1.0 no longer displays anything.
-
-  I did a git bisect and this is the result:
-
-  [diego@thinkpad qemu]$ git bisect bad
-  9f815e83e983d247a3cd67579d2d9c1765adc644 is the first bad commit
-  commit 9f815e83e983d247a3cd67579d2d9c1765adc644
-  Author: Gerd Hoffmann <kraxel@redhat.com>
-  Date:   Fri Jun 5 14:59:52 2020 +0200
-
-      usb: add hostdevice property to usb-host
-
-      The new property allows to specify usb host device name.  Uses standa=
-rd
-      qemu_open(), so both file system path (/dev/bus/usb/$bus/$dev on linu=
-x)
-      and file descriptor passing can be used.
-
-      Requires libusb 1.0.23 or newer.  The hostdevice property is only
-      present in case qemu is compiled against a new enough library version,
-      so the presence of the property can be used for feature detection.
-
-      Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-      Message-Id: <20200605125952.13113-1-kraxel@redhat.com>
-
-   hw/usb/host-libusb.c | 75 ++++++++++++++++++++++++++++++++++++++++++----=
-------
-   hw/usb/trace-events  |  1 +
-   2 files changed, 62 insertions(+), 14 deletions(-)
-  [diego@thinkpad qemu]$
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1892581/+subscriptions
+> 
+> thanks
+> -- PMM
+> 
 
