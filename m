@@ -2,109 +2,82 @@ Return-Path: <SRS0=Iy1T=CA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B11B5C433E1
-	for <qemu-devel@archiver.kernel.org>; Sat, 22 Aug 2020 14:31:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A91CDC433E1
+	for <qemu-devel@archiver.kernel.org>; Sat, 22 Aug 2020 14:31:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7ACA6206B5
-	for <qemu-devel@archiver.kernel.org>; Sat, 22 Aug 2020 14:31:36 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dhyKjQET"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7ACA6206B5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7E79D206B5
+	for <qemu-devel@archiver.kernel.org>; Sat, 22 Aug 2020 14:31:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E79D206B5
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35944 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36188 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k9UYR-00027z-Na
-	for qemu-devel@archiver.kernel.org; Sat, 22 Aug 2020 10:31:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58648)
+	id 1k9UYW-0002Dv-Ky
+	for qemu-devel@archiver.kernel.org; Sat, 22 Aug 2020 10:31:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58918)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k9UVX-0007yK-Ul
- for qemu-devel@nongnu.org; Sat, 22 Aug 2020 10:28:35 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:58016
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k9UVW-0003EC-6v
- for qemu-devel@nongnu.org; Sat, 22 Aug 2020 10:28:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598106512;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=mQe3QmceCc/tiRIrUidZfVVvAGh31Rv4ZDjVDhX3dPk=;
- b=dhyKjQET/nTiFDb3P6JVZ0AsiUb03rdkoOucoJZzlNLAD4995t2q7VJ7lGymT6JsBbBXZ8
- pfS2HWcUcKklbCyRMpc6mg9XJtZ2LBQZxFtgwxZ9FIatXQl/5pyIadY2BxF+Q49UvYLo2z
- tNLgTEqPO+r6shnyYyo/cy46H1eMcNY=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-336-E0r9JirnPNGgrYQlMjgQNQ-1; Sat, 22 Aug 2020 10:28:30 -0400
-X-MC-Unique: E0r9JirnPNGgrYQlMjgQNQ-1
-Received: by mail-wr1-f72.google.com with SMTP id e12so1760110wra.13
- for <qemu-devel@nongnu.org>; Sat, 22 Aug 2020 07:28:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=mQe3QmceCc/tiRIrUidZfVVvAGh31Rv4ZDjVDhX3dPk=;
- b=FwGvkWpl6wRqX72pyRuGn6vtjVCk74xRLssFUMBohMcVZVFKU6FuszDTCEE4jO92VJ
- lSihciQ6wFU0TIfyi96srd5UdzGlnUwnhtFEQvYSj0CdJsduoCtNf7ROaL9yo2EHI7iZ
- mbubnm/0VZkqdYayfWSM+IsZWig+sj236m7/SHmyMazHfaLLjHw9RxXWRLqNOodSc2A9
- HQtSczEbsHkPHvEA4EM4GCPakQ953/J6UObqweeD6R2+9BGAtmF1cfWf6lf4Sy9pfs9g
- GbuUsDzNCCtnFbQ66lyJy8dubabXKG2gE9EScyZy+XaoZbFLFe8dJY8LKVv/X/2FgTEc
- pApA==
-X-Gm-Message-State: AOAM532OCwAZzqX3AtEESAlyPIgNUKvxoDkRTUP2yLg9CPpj+gUJiZSz
- 2zNFb3Teg4ysBKEL/4zLMO2JT8G0oHprVV70vPQxDsneA5ZnmVzoAkGiefJijSPI3dqpuUfY3+b
- 4Nj+Iq5MDD1RPfiw=
-X-Received: by 2002:a1c:283:: with SMTP id 125mr8972510wmc.12.1598106509463;
- Sat, 22 Aug 2020 07:28:29 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwaVN7dnbDmUJdjo97lChf1n2TBXjc+C5nifIFmPd4ikNVUf2yLTl89cgSlTNG3inH8AVEKdg==
-X-Received: by 2002:a1c:283:: with SMTP id 125mr8972496wmc.12.1598106509291;
- Sat, 22 Aug 2020 07:28:29 -0700 (PDT)
-Received: from localhost.localdomain (121.red-81-40-121.staticip.rima-tde.net.
- [81.40.121.121])
- by smtp.gmail.com with ESMTPSA id b14sm11434171wrj.93.2020.08.22.07.28.28
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 22 Aug 2020 07:28:28 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 2/2] hw/isa/superio: Do not enforce class_size when
- inherited from parent
-Date: Sat, 22 Aug 2020 16:28:16 +0200
-Message-Id: <20200822142816.1318214-3-philmd@redhat.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200822142816.1318214-1-philmd@redhat.com>
-References: <20200822142816.1318214-1-philmd@redhat.com>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k9UXZ-0001O1-Oz
+ for qemu-devel@nongnu.org; Sat, 22 Aug 2020 10:30:43 -0400
+Received: from indium.canonical.com ([91.189.90.7]:49554)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1k9UXX-0003XZ-2P
+ for qemu-devel@nongnu.org; Sat, 22 Aug 2020 10:30:41 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1k9UXV-0000nv-MG
+ for <qemu-devel@nongnu.org>; Sat, 22 Aug 2020 14:30:37 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 897172E807B
+ for <qemu-devel@nongnu.org>; Sat, 22 Aug 2020 14:30:37 +0000 (UTC)
 MIME-Version: 1.0
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8;
-	text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/22 10:28:32
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 22 Aug 2020 14:21:27 -0000
+From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1892540@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: gson laurent-vivier philmd
+X-Launchpad-Bug-Reporter: Andreas Gustafsson (gson)
+X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
+ =?utf-8?q?=29?=
+References: <159803735569.2614.10182276398047269277.malonedeb@chaenomeles.canonical.com>
+Message-ID: <20200822142127.1316231-1-f4bug@amsat.org>
+Subject: [Bug 1892540] [RFC PATCH v2] hw/display/tcx: Allow 64-bit accesses to
+ framebuffer stippler and blitter
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="99c2d833c8d727fd05148486920aca032e908071"; Instance="production"
+X-Launchpad-Hash: 87d7272661c968c9e74f7c2d4e5032a2dfc78732
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/22 10:00:50
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -58
+X-Spam_score: -5.9
+X-Spam_bar: -----
+X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001,
+ URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -113,54 +86,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Jiaxun Yang <jiaxun.yang@flygoat.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Huacai Chen <chenhc@lemote.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Reply-To: Bug 1892540 <1892540@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Message-ID: <20200822142127.j0uzi4LO0tc0f24fkRPZZ3GigQ4tylf3pHpObS03RxQ@z>
 
-From: Eduardo Habkost <ehabkost@redhat.com>
+The S24/TCX datasheet is listed as "Unable to locate" on [1].
 
-When a class inherits from an abstract parent, its class_size
-is already initialized to its parent size. If the class is not
-extended, it is pointless to set the class_size field again.
+However the NetBSD revision 1.32 of the driver introduced
+64-bit accesses to the stippler and blitter [2]. It is safe
+to assume these memory regions are 64-bit accessible.
+QEMU implementation is 32-bit, so fill the 'impl' fields.
 
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+[1] http://web.archive.org/web/20111209011516/http://wikis.sun.com/display/=
+FOSSdocs/Home
+[2] http://cvsweb.netbsd.org/bsdweb.cgi/src/sys/dev/sbus/tcx.c.diff?r1=3D1.=
+31&r2=3D1.32
+
+Reported-by: Andreas Gustafsson <gson@gson.org>
+Buglink: https://bugs.launchpad.net/bugs/1892540
+Fixes: 55d7bfe2293 ("tcx: Implement hardware acceleration")
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 ---
- hw/isa/smc37c669-superio.c | 1 -
- hw/isa/vt82c686.c          | 1 -
- 2 files changed, 2 deletions(-)
+Since v1:
+- added missing uncommitted staged changes... (tcx_blit_ops)
+---
+ hw/display/tcx.c | 18 +++++++++++++++---
+ 1 file changed, 15 insertions(+), 3 deletions(-)
 
-diff --git a/hw/isa/smc37c669-superio.c b/hw/isa/smc37c669-superio.c
-index 9e59dc16039..18cdc641e13 100644
---- a/hw/isa/smc37c669-superio.c
-+++ b/hw/isa/smc37c669-superio.c
-@@ -103,7 +103,6 @@ static void smc37c669_class_init(ObjectClass *klass, void *data)
- static const TypeInfo smc37c669_type_info = {
-     .name          = TYPE_SMC37C669_SUPERIO,
-     .parent        = TYPE_ISA_SUPERIO,
--    .class_size    = sizeof(ISASuperIOClass),
-     .class_init    = smc37c669_class_init,
+diff --git a/hw/display/tcx.c b/hw/display/tcx.c
+index 1fb45b1aab8..96c6898b149 100644
+--- a/hw/display/tcx.c
++++ b/hw/display/tcx.c
+@@ -548,20 +548,28 @@ static const MemoryRegionOps tcx_stip_ops =3D {
+     .read =3D tcx_stip_readl,
+     .write =3D tcx_stip_writel,
+     .endianness =3D DEVICE_NATIVE_ENDIAN,
+-    .valid =3D {
++    .impl =3D {
+         .min_access_size =3D 4,
+         .max_access_size =3D 4,
+     },
++    .valid =3D {
++        .min_access_size =3D 4,
++        .max_access_size =3D 8,
++    },
  };
- 
-diff --git a/hw/isa/vt82c686.c b/hw/isa/vt82c686.c
-index a4b84d405d0..49f2b21cebe 100644
---- a/hw/isa/vt82c686.c
-+++ b/hw/isa/vt82c686.c
-@@ -533,7 +533,6 @@ static void vt82c686b_superio_class_init(ObjectClass *klass, void *data)
- static const TypeInfo via_superio_info = {
-     .name          = TYPE_VT82C686B_SUPERIO,
-     .parent        = TYPE_ISA_SUPERIO,
--    .class_size    = sizeof(ISASuperIOClass),
-     .class_init    = vt82c686b_superio_class_init,
+ =
+
+ static const MemoryRegionOps tcx_rstip_ops =3D {
+     .read =3D tcx_stip_readl,
+     .write =3D tcx_rstip_writel,
+     .endianness =3D DEVICE_NATIVE_ENDIAN,
+-    .valid =3D {
++    .impl =3D {
+         .min_access_size =3D 4,
+         .max_access_size =3D 4,
+     },
++    .valid =3D {
++        .min_access_size =3D 4,
++        .max_access_size =3D 8,
++    },
  };
- 
--- 
+ =
+
+ static uint64_t tcx_blit_readl(void *opaque, hwaddr addr,
+@@ -650,10 +658,14 @@ static const MemoryRegionOps tcx_rblit_ops =3D {
+     .read =3D tcx_blit_readl,
+     .write =3D tcx_rblit_writel,
+     .endianness =3D DEVICE_NATIVE_ENDIAN,
+-    .valid =3D {
++    .impl =3D {
+         .min_access_size =3D 4,
+         .max_access_size =3D 4,
+     },
++    .valid =3D {
++        .min_access_size =3D 4,
++        .max_access_size =3D 8,
++    },
+ };
+ =
+
+ static void tcx_invalidate_cursor_position(TCXState *s)
+-- =
+
 2.26.2
 
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1892540
+
+Title:
+  qemu can no longer boot NetBSD/sparc
+
+Status in QEMU:
+  New
+
+Bug description:
+  Booting NetBSD/sparc in qemu no longer works.  It broke between qemu
+  version 5.0.0 and 5.1.0, and a bisection identified the following as
+  the offending commit:
+
+    [5d971f9e672507210e77d020d89e0e89165c8fc9] memory: Revert "memory:
+  accept mismatching sizes in memory_region_access_valid"
+
+  It's still broken as of 7fd51e68c34fcefdb4d6fd646ed3346f780f89f4.
+
+  To reproduce, run
+
+    wget http://ftp.netbsd.org/pub/NetBSD/NetBSD-9.0/images/NetBSD-9.0-spar=
+c.iso
+    qemu-system-sparc -nographic -cdrom NetBSD-9.0-sparc.iso -boot d
+
+  The expected behavior is that the guest boots to the prompt
+
+    Installation medium to load the additional utilities from:
+
+  The observed behavior is a panic:
+
+    [   1.0000050] system[0]: trap 0x29: pc=3D0xf0046b14 sfsr=3D0xb6 sfva=
+=3D0x54000000
+    [   1.0000050] cpu0: data fault: pc=3D0xf0046b14 addr=3D0x54000000 sfsr=
+=3D0xb6<PERR=3D0x0,LVL=3D0x0,AT=3D0x5,FT=3D0x5,FAV,OW>
+    [   1.0000050] panic: kernel fault
+    [   1.0000050] halted
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1892540/+subscriptions
 
