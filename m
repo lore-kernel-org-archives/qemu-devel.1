@@ -7,74 +7,74 @@ X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22099C433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 22 Aug 2020 15:17:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B515C433E1
+	for <qemu-devel@archiver.kernel.org>; Sat, 22 Aug 2020 15:18:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DAE1920738
-	for <qemu-devel@archiver.kernel.org>; Sat, 22 Aug 2020 15:17:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E427F20738
+	for <qemu-devel@archiver.kernel.org>; Sat, 22 Aug 2020 15:18:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DyKm2S5i"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DAE1920738
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VVUwrSh9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E427F20738
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35600 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37734 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k9VGm-0000Ti-3h
-	for qemu-devel@archiver.kernel.org; Sat, 22 Aug 2020 11:17:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38180)
+	id 1k9VI4-0001PL-56
+	for qemu-devel@archiver.kernel.org; Sat, 22 Aug 2020 11:18:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38408)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k9VFc-0008SU-8q
- for qemu-devel@nongnu.org; Sat, 22 Aug 2020 11:16:12 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:43290)
+ id 1k9VGm-0000ev-W6
+ for qemu-devel@nongnu.org; Sat, 22 Aug 2020 11:17:25 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:33500)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1k9VFY-00014f-4L
- for qemu-devel@nongnu.org; Sat, 22 Aug 2020 11:16:09 -0400
-Received: by mail-wr1-x444.google.com with SMTP id a15so4536882wrh.10
- for <qemu-devel@nongnu.org>; Sat, 22 Aug 2020 08:16:03 -0700 (PDT)
+ id 1k9VGk-00019k-OQ
+ for qemu-devel@nongnu.org; Sat, 22 Aug 2020 11:17:24 -0400
+Received: by mail-wm1-x342.google.com with SMTP id f18so3121794wmc.0
+ for <qemu-devel@nongnu.org>; Sat, 22 Aug 2020 08:17:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
  bh=Z2DGV5tXBjwcdNLj/197HsDwn4f9qW7jUzgpXaMsYNo=;
- b=DyKm2S5iaWdVL7a5DsKzgiBab8RP5KY5yU7KjNEn2vXix2OUlcA3AaHh6CRQ2ZApSS
- KW8pfBy6RJC2lgg4oKZEPYXTyjMQuW2j3RerNKaGfcb7TphUooukiGjqg7pl4SUQjw9e
- dahknF5Lw3zR6AOOL2Mcr8nn16fZs2pSxdUsbj1Ra9nAHOs2OFDR194BtH28Utg4803q
- f2f3hiKjF0gbJhH9RpRrXcnCMQCG+abpD93/p0hQu+vRZRn/6OgSbBrsH8XtNjNzf2C/
- OvZimFkYW9qwl3WJskec7qj77vYwEl/t1OsmZDicuVQK+ZrqJvNULUjEk0SSL7R1Hf+J
- 4iEQ==
+ b=VVUwrSh99juBACCBUgkLqLVXz2igkSGGiTtl8zqQc1QhlQJxHIPw7j94HJXaTHYfil
+ UmFfqygF6ey3zuIdRyyXXKCTDgW3zYtYd+e1+n3v+fR0FXuRh3THbKDDLDoZ3HP87twp
+ jGhJuigSt9VFw99gL+w3adtaPSD7PFEqUO/HQmPBdvIMH0dEAWjxSZMQXv4VOjrtP48j
+ OGYt0rjQv/YGqWMYmzmWjjITcs1dMC8oxFKiCZwt+zoLcqQdQv7b1/ccOFRhm0ATrxjp
+ mYpn4k/qNtiQjdYj5qQdu6P5Gt/B8K0ao8Yv6J/VeaBv6E36BrCa4mqckCYOMT8qo1/+
+ 01DQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
  bh=Z2DGV5tXBjwcdNLj/197HsDwn4f9qW7jUzgpXaMsYNo=;
- b=b1DsmFZ9kZGA1ABmzhvEaUzk9WbpKUrwwuZnAGRVLE3uzI3Cbc43jW/rOZXc/EGYo4
- oMsl3ZU/7oiJp2BiK0ncHOamafrGDy9Wz1H9X+4VgdoBwOJYH/rX/WO6TbQVpWLABCfh
- S8u02oheA7Z3LDQiAi8CFx6VbhqVptRAHlZ8rWnbzyxCLeSESkBjYGes31ueXokVAr1d
- 1Gt2/dGwnWQ05SHKl2cz4nVHBDY47Cfv7y+jCgaGpgn+78Ii22PFBva1uf82vSptGAXk
- i87Vro6qS8XgX/cCofKWKi9ADXvhA9RhrYvDHSbQHVHY24hjPyv8olaGxzM/uAwevaUl
- l0LA==
-X-Gm-Message-State: AOAM531kzbjuJY4AnPqr16pq9QR9omlRpVNJAKZH+0r6mnrVj0YJT9M2
- EbC2zGAwbywpofXBXINNiBc=
-X-Google-Smtp-Source: ABdhPJz9Dh+F94/YgXPtdbZyOkoeRWQPneGCI0yvTcJ05eqg70WkTtlCPZRoDj+N5Ci5jdpGwlSiYg==
-X-Received: by 2002:adf:fb87:: with SMTP id a7mr7952396wrr.390.1598109362013; 
- Sat, 22 Aug 2020 08:16:02 -0700 (PDT)
+ b=qO3UFYF3cdL1cJnY9spfqO4YZ/BYPXymHHqKdeJKy9QCLtLogzUtlDWsZjD6Ry2S3j
+ hmXo0LeG35+0yRnqoF9oZsBj3MWU1Gv3x/M+iocWta5nx78jduGjOT8+neMYBdYKz013
+ CYW0VTayX87S8GbkqCdI1xpsUKNATkMjeGG8j+LXnWvMFBuB0Rkdal6rfUfS2n7ANvi3
+ dWYVXgucJ72gTWsKUoZfuARykODqbi/walJeofk3EDL20tgAJEz+3f/L+1sLV2HcVxzG
+ lE3JSdx6scx+uYTXDrsNoUBmzfzltXhAGg2eakRVtPAncivG0eDC+ksltL4d0wZt4yHT
+ JiCQ==
+X-Gm-Message-State: AOAM533oxI6KuoGbN1pD1W7+F5nVottf8YDRgBdG54nYbfrbZ14PxJ7j
+ HnHqnNSi44yTy9f5umey8Us=
+X-Google-Smtp-Source: ABdhPJyPsHpJiWF3c/W1ewWbRpoPOmUhcOAuKUbtgZdlm82ta1dfQHW1r6/WH+lTvNeUaj6PdT+d4Q==
+X-Received: by 2002:a7b:c1d0:: with SMTP id a16mr8965902wmj.111.1598109439910; 
+ Sat, 22 Aug 2020 08:17:19 -0700 (PDT)
 Received: from [192.168.1.36] (121.red-81-40-121.staticip.rima-tde.net.
  [81.40.121.121])
- by smtp.gmail.com with ESMTPSA id 5sm1138563wmz.22.2020.08.22.08.16.00
+ by smtp.gmail.com with ESMTPSA id a10sm11478826wro.35.2020.08.22.08.17.18
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 22 Aug 2020 08:16:01 -0700 (PDT)
+ Sat, 22 Aug 2020 08:17:19 -0700 (PDT)
 Subject: Re: [RFC PATCH 0/9] hw/misc: Add support for interleaved memory
  accesses
 To: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 References: <20200817161853.593247-1-f4bug@amsat.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <c21cd155-31e2-5911-f5c3-7362e0819f75@amsat.org>
-Date: Sat, 22 Aug 2020 17:15:59 +0200
+Message-ID: <0309515c-506f-01da-2da2-b87e7d885d86@amsat.org>
+Date: Sat, 22 Aug 2020 17:17:18 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
@@ -82,8 +82,8 @@ In-Reply-To: <20200817161853.593247-1-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::342;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x342.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 0
