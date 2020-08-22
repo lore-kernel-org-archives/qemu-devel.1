@@ -4,80 +4,80 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8782BC433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 22 Aug 2020 06:06:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B045AC433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 22 Aug 2020 06:07:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 505F820724
-	for <qemu-devel@archiver.kernel.org>; Sat, 22 Aug 2020 06:06:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 78EEC20724
+	for <qemu-devel@archiver.kernel.org>; Sat, 22 Aug 2020 06:07:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="q/sksRmy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 505F820724
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="ZGBoQlKS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78EEC20724
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58384 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60492 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k9Mfd-0002mY-Kp
-	for qemu-devel@archiver.kernel.org; Sat, 22 Aug 2020 02:06:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34124)
+	id 1k9Mgu-0003fK-Mu
+	for qemu-devel@archiver.kernel.org; Sat, 22 Aug 2020 02:07:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34158)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=49637c5a7=alistair.francis@wdc.com>)
- id 1k9MRZ-0002mL-Lo
- for qemu-devel@nongnu.org; Sat, 22 Aug 2020 01:51:57 -0400
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:12936)
+ id 1k9MRd-0002rZ-Mo
+ for qemu-devel@nongnu.org; Sat, 22 Aug 2020 01:52:02 -0400
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:25955)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=49637c5a7=alistair.francis@wdc.com>)
- id 1k9MRX-0000D0-Of
- for qemu-devel@nongnu.org; Sat, 22 Aug 2020 01:51:57 -0400
+ id 1k9MRb-0000D6-EU
+ for qemu-devel@nongnu.org; Sat, 22 Aug 2020 01:52:01 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1598075516; x=1629611516;
+ t=1598075519; x=1629611519;
  h=from:to:cc:subject:date:message-id:in-reply-to:
  references:mime-version:content-transfer-encoding;
- bh=H6N5nONEFmouCSuhtKTlRxS0IEFghkaWRLRmSP+IO08=;
- b=q/sksRmytoqyrkUtBrQEx3yp9bYs0WgACpAbOzKYl35iYnDBVomHa+Ws
- FTGn7ofw/5bp/TzrMHKUDKllXufe/5rTwGkUTeVaM3d9YkAvG2vc/WaB+
- kU4L4sNNkZsfWhRFB37ugfhEuWvXIn3ixhj3Mnf8mYbY9NF1lhoUHBEEN
- PZ1QHseNPwvtq6t4JZiBoosKyniVr/YloWckgOow+ZxFKXiMOXLqaQn5m
- 3tebLqab+WY6pLPRm1Y7mT5f+XCo45ThjXRC45BpOWFbft66g5c1uv9U8
- eBQHhHfAw9RfW/GwF2ZlVW6QaTb5WJ0Lk58UYektl+gzNlRtnNbVJCo6M w==;
-IronPort-SDR: hsKXsEDxEyTazgkfTJLC5bbVk4cCN4nC0ihOrKvjpAvh+ta7OaUT+RWiem4wVUOfRxxzVaI+i5
- 0Tgks51HEvEaMhANtyQnU7yRUOWvb3PJMsMXk7ALwB5dsiJxS4XKS2MI01dDV5+kvjIPkeLpLu
- LM59CWC6hFR5VEL+BYfJyoM9vNmtZEAo3f1RDwEw7r8ek8PJqttCXvWpnHlVEZEZwI6rw9ADg/
- 021FwnifpijQ6twF040NV8DWv2CQNAr4Aykon7HY70z6IJIKH9kgX8tD2SQ2oxOIqmgCWK5HVr
- TmE=
-X-IronPort-AV: E=Sophos;i="5.76,339,1592841600"; d="scan'208";a="145571973"
-Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com)
- ([199.255.45.15])
+ bh=dHdymkxK2eCJ8OEQQg89j0/t4e6Yp5BPLgod0J6om/o=;
+ b=ZGBoQlKSSaCH5RcRFezip82tkyYX5Pw5ycWvK7prYbu8xHv4ytcZ5fcV
+ hcHWmzE3JJOoocWsTf8N0cpfTA5Eo4LiHmO11yL/Uzg3R8Ig4XX2FhaVG
+ Ni0mZZgrcptMkL79ESxwk4S/HhxvGNgq0QYbVdr6U74KtVLEMFMM0M2Y1
+ QnDwvjNR0qs7FFkoL6xA3nKwYfdTOp1cmrnyGgZEpaTuHL9GsjIRFqXa5
+ t/SBX45G2Ehqvr2EWuadnlO6z5zsV9L4GJ6usuC7FgEdVFxvnYkttkpa1
+ L7oxLiGOVeX2V95VRImtLkobuIe0xWqnIob6ZsHv4Z6pcZ2GpbLlKeZb7 w==;
+IronPort-SDR: 596mbxuDnyCOeMeyAMLN9M07mg5Y98oswzLY21t381pqh57MH/ijsR0qwbdkyZ2fUlAfzsP6Zd
+ wjzpHUzeWruv4XKsqPrtC7BiWQU/9RkyNaGKxRPXPtP0284K81MtAiE+oV6JZXFKv825hgzR99
+ asu1pAysXuaU3yqvakoMEBUHK1iU7TjmhDOXwPGplJKNQCXKlSSF/Lb+h6IhIDIenJiSTNT9G0
+ hnQm83Cr5mh8x/g4tbdYrbeeahyIsqqB3gFNRUVY0RYqnuLuKllZ+kIDxC7QwpzwwaQHcwtaKW
+ 9+g=
+X-IronPort-AV: E=Sophos;i="5.76,339,1592841600"; d="scan'208";a="145571974"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com)
+ ([199.255.45.14])
  by ob1.hgst.iphmx.com with ESMTP; 22 Aug 2020 13:51:22 +0800
-IronPort-SDR: 8UB7VkKY1wDa3BqMB7ymk954RfPF11CDcmnA9kIKkxk2DkbVYbWj9MCg1fQna4qmYRMmbEpkv3
- 0A1JUEsnN/SA==
+IronPort-SDR: WVNir2vDJfZ46vmOCLJm3kbqlNFEjxbs+0cyL6C7ncPGd5TQJU3yYGgKamMKX8LLU/Q5nk3Xo/
+ dm27UZpU+isA==
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
- by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 21 Aug 2020 22:38:15 -0700
-IronPort-SDR: 00P0Z48KQT7vwzB10DyFW/TS4i5cTJU60rXK8mbJ7zkVO8rLXFZMBNb/Aes3OolKlvk25UAWp1
- fLAdOvYPrvFw==
+ by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 21 Aug 2020 22:39:01 -0700
+IronPort-SDR: WGgeG07KdrQzkSXAeXTh6tiRoFOmkgbyYBMXoJeVJuwMXhl4FYliEJK7s0eRzvQYWg5AZulH1H
+ ec0is5U0QkFg==
 WDCIronportException: Internal
 Received: from 5zn13g2.ad.shared (HELO risc6-mainframe.hgst.com)
  ([10.86.59.90])
  by uls-op-cesaip02.wdc.com with ESMTP; 21 Aug 2020 22:51:22 -0700
 From: Alistair Francis <alistair.francis@wdc.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v3 19/20] hw/intc: ibex_plic: Don't allow repeat interrupts on
- claimed lines
-Date: Fri, 21 Aug 2020 22:41:00 -0700
-Message-Id: <20200822054101.1202175-20-alistair.francis@wdc.com>
+Subject: [PULL v3 20/20] hw/intc: ibex_plic: Honour source priorities
+Date: Fri, 21 Aug 2020 22:41:01 -0700
+Message-Id: <20200822054101.1202175-21-alistair.francis@wdc.com>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20200822054101.1202175-1-alistair.francis@wdc.com>
 References: <20200822054101.1202175-1-alistair.francis@wdc.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=216.71.153.144;
  envelope-from=prvs=49637c5a7=alistair.francis@wdc.com;
@@ -103,84 +103,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alistair23@gmail.com, alistair.francis@wdc.com
+Cc: alistair23@gmail.com, alistair.francis@wdc.com,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Jessica Clarke <jrtc27@jrtc27.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Once an interrupt has been claimed, but before it has been compelted we
-shouldn't receive any more pending interrupts. This patche keeps track
-of this to ensure that we don't see any more interrupts until it is
-completed.
+This patch follows what commit aa4d30f6618dc "riscv: plic: Honour source
+priorities" does and ensures that the highest priority interrupt will be
+serviced first.
 
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-Message-Id: <394c3f070615ff2b4fab61a1cf9cb48c122913b7.1595655188.git.alistair.francis@wdc.com>
+Cc: Jessica Clarke <jrtc27@jrtc27.com>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Message-Id: <a697ca8a31eff8eb18a88e09a28206063cf85d48.1595655188.git.alistair.francis@wdc.com>
 ---
- include/hw/intc/ibex_plic.h |  1 +
- hw/intc/ibex_plic.c         | 17 +++++++++++++++++
- 2 files changed, 18 insertions(+)
+ hw/intc/ibex_plic.c | 15 ++++++++++-----
+ 1 file changed, 10 insertions(+), 5 deletions(-)
 
-diff --git a/include/hw/intc/ibex_plic.h b/include/hw/intc/ibex_plic.h
-index ddc7909903..d8eb09b258 100644
---- a/include/hw/intc/ibex_plic.h
-+++ b/include/hw/intc/ibex_plic.h
-@@ -33,6 +33,7 @@ typedef struct IbexPlicState {
-     MemoryRegion mmio;
- 
-     uint32_t *pending;
-+    uint32_t *claimed;
-     uint32_t *source;
-     uint32_t *priority;
-     uint32_t *enable;
 diff --git a/hw/intc/ibex_plic.c b/hw/intc/ibex_plic.c
-index 578edd2ce0..669247ef08 100644
+index 669247ef08..f49fa67c91 100644
 --- a/hw/intc/ibex_plic.c
 +++ b/hw/intc/ibex_plic.c
-@@ -43,6 +43,14 @@ static void ibex_plic_irqs_set_pending(IbexPlicState *s, int irq, bool level)
+@@ -57,6 +57,8 @@ static void ibex_plic_irqs_set_pending(IbexPlicState *s, int irq, bool level)
+ static bool ibex_plic_irqs_pending(IbexPlicState *s, uint32_t context)
  {
-     int pending_num = irq / 32;
+     int i;
++    uint32_t max_irq = 0;
++    uint32_t max_prio = s->threshold;
  
-+    if (s->claimed[pending_num] & 1 << (irq % 32)) {
-+        /*
-+         * The interrupt has been claimed, but not compelted.
-+         * The pending bit can't be set.
-+         */
-+        return;
-+    }
-+
-     s->pending[pending_num] |= level << (irq % 32);
- }
- 
-@@ -120,6 +128,10 @@ static uint64_t ibex_plic_read(void *opaque, hwaddr addr,
-         int pending_num = s->claim / 32;
-         s->pending[pending_num] &= ~(1 << (s->claim % 32));
- 
-+        /* Set the interrupt as claimed, but not compelted */
-+        s->claimed[pending_num] |= 1 << (s->claim % 32);
-+
-+        /* Return the current claimed interrupt */
-         ret = s->claim;
- 
-         /* Update the interrupt status after the claim */
-@@ -155,6 +167,10 @@ static void ibex_plic_write(void *opaque, hwaddr addr,
-             /* Interrupt was completed */
-             s->claim = 0;
+     for (i = 0; i < s->pending_num; i++) {
+         uint32_t irq_num = ctz64(s->pending[i]) + (i * 32);
+@@ -66,14 +68,17 @@ static bool ibex_plic_irqs_pending(IbexPlicState *s, uint32_t context)
+             continue;
          }
-+        if (s->claimed[value / 32] & 1 << (value % 32)) {
-+            /* This value was already claimed, clear it. */
-+            s->claimed[value / 32] &= ~(1 << (value % 32));
-+        }
+ 
+-        if (s->priority[irq_num] > s->threshold) {
+-            if (!s->claim) {
+-                s->claim = irq_num;
+-            }
+-            return true;
++        if (s->priority[irq_num] > max_prio) {
++            max_irq = irq_num;
++            max_prio = s->priority[irq_num];
+         }
      }
  
-     ibex_plic_update(s);
-@@ -215,6 +231,7 @@ static void ibex_plic_realize(DeviceState *dev, Error **errp)
-     int i;
++    if (max_irq) {
++        s->claim = max_irq;
++        return true;
++    }
++
+     return false;
+ }
  
-     s->pending = g_new0(uint32_t, s->pending_num);
-+    s->claimed = g_new0(uint32_t, s->pending_num);
-     s->source = g_new0(uint32_t, s->source_num);
-     s->priority = g_new0(uint32_t, s->priority_num);
-     s->enable = g_new0(uint32_t, s->enable_num);
 -- 
 2.28.0
 
