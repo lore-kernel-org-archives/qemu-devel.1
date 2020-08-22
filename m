@@ -7,82 +7,82 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47CEBC433E1
-	for <qemu-devel@archiver.kernel.org>; Sat, 22 Aug 2020 05:54:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 328D5C433E3
+	for <qemu-devel@archiver.kernel.org>; Sat, 22 Aug 2020 05:54:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 123862072D
+	by mail.kernel.org (Postfix) with ESMTPS id F32B22072D
 	for <qemu-devel@archiver.kernel.org>; Sat, 22 Aug 2020 05:54:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="fwY9H120"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 123862072D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="KzRDH8cc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F32B22072D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56174 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56258 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k9MTX-0006go-9z
-	for qemu-devel@archiver.kernel.org; Sat, 22 Aug 2020 01:53:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33964)
+	id 1k9MTY-0006iq-4d
+	for qemu-devel@archiver.kernel.org; Sat, 22 Aug 2020 01:54:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33978)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=49637c5a7=alistair.francis@wdc.com>)
- id 1k9MR4-0001pb-7J
- for qemu-devel@nongnu.org; Sat, 22 Aug 2020 01:51:26 -0400
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:23553)
+ id 1k9MR5-0001s6-6a
+ for qemu-devel@nongnu.org; Sat, 22 Aug 2020 01:51:27 -0400
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:25955)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=49637c5a7=alistair.francis@wdc.com>)
- id 1k9MR1-0000Ci-5w
- for qemu-devel@nongnu.org; Sat, 22 Aug 2020 01:51:25 -0400
+ id 1k9MR3-0000D6-3S
+ for qemu-devel@nongnu.org; Sat, 22 Aug 2020 01:51:26 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1598075482; x=1629611482;
+ t=1598075485; x=1629611485;
  h=from:to:cc:subject:date:message-id:in-reply-to:
  references:mime-version:content-transfer-encoding;
- bh=w0VVDKkzsYUATBIteFJpXDlRNtdfq0Ead933D9XeTY4=;
- b=fwY9H120STqXa9Ux9XCNb/tdDSbWH21A+wTFIAdyQPwGrDTp9lC8HlRi
- 5I9B7Pa8ZJjC4GcQrrfwuevi3QiaUY9Al2opjALYR+lonR3tiDFSa+KvI
- 5v+DqVQOTw9E75hBdj4l79Ssh1zG01jAuoZz3i6uJpnQ5oQeNISx8u5/2
- Sa50NOxGqtTtw95a0F9g2iH3y/y7Q4ssJcFFqvZI1mCKBthdkh8kmZEbF
- /Wd6zyr+iPKkB3QYjsd2/aLnrwD5vCWHvw9MHIruieaCB1kGxQHBGwAkZ
- kD9faZgj3WOnCQYyES+b50QdmKCwwFbuyiTFQPbq+UnbXNuezSTw84MdA w==;
-IronPort-SDR: vvXOBNIBRN8/1AJFJihFGB/+dDkvat1Ur2ag1AjRDVKqa34EIFpgQ7LqCNClBB04HgUjgAMQk/
- jVGkwrkGrm5F+19KZ+uPV7cGfs29AQII5iT2ojHWuUNLpZpvC6APwun09lhXIoPMm4UQBtK2ia
- 46QNbXawIobBMhjJZp/lO7o4J3zms3bA5tXTOyoNV9iCKqrKofXjReZ7cfaZ3TKb2D7c8mqMAV
- csguJLpjGlXtUum54Z9wLKEr0CGOhGHnqIkaCoQPQw4jyGcp9fEdo6xZnQGVUPiYQ5iZNMMZRE
- 8aI=
-X-IronPort-AV: E=Sophos;i="5.76,339,1592841600"; d="scan'208";a="255030530"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com)
+ bh=6HxENhhq/BMko0T0xzWot/5sw6/Bg+BMrzC/fgaMlvU=;
+ b=KzRDH8ccstz4CRflJuzJPZkzN0JUaS8acaBR9h9zxil+g/9LJpz0B1Di
+ /KSJu2mQsXJFU2O10N0aAIW0YjpW9gV9Xa4o5NL1KZKD0uyn9wCqgY5Ab
+ x7JgUZj1PAK4FYptOzgk2t49ckTRmoqlzwVO1YcdPybvIOivxH5IBKY6s
+ 0shkSFYcWjlfhdC/JjHJZZITju3XtQ9uX+86iZWwRS2K6ZqHmkj6sEYe1
+ w7csF8PNg+IC5F2MXKs/GIFb/+ALivs+iKmG8Sell/DXf8wkL/zBOscwg
+ WCHcwfIj/idKmh1xXpXebjWizF99yrP+Cnk6Ebm0FNVnXvhiYAJTJJ2/5 g==;
+IronPort-SDR: G+LVLXvvUmArCOAQ2WNr7hxCtr8iEDeCR6Gx/jwQ5LzewJj3wC54kFkOnQhMxiBYoL7iEM/9kt
+ 7bE44Tkqcq2lxWsQK20oSqMGxicPm9oFtojQFgH9pgJb3eKDujPEZh5lSNu1fCj9J7DZ91p7gV
+ GK+hUlsV+nAb60GZcqGzSdDRjSJIDXccpPbvde+SFDPMGt8F5W30b25ANWldSNU6G/GanHd8B1
+ 4jkTGC1pBDOL4rW6gBS5o/pTwiMadIPuAPWg0dzQ5K2hxeQ5YMOCUpJCApOlQmtxaooYS4x6Tm
+ GcY=
+X-IronPort-AV: E=Sophos;i="5.76,339,1592841600"; d="scan'208";a="145571962"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com)
  ([199.255.45.14])
- by ob1.hgst.iphmx.com with ESMTP; 22 Aug 2020 13:51:16 +0800
-IronPort-SDR: ng5baJlTKeVsnB+bYjQzcqjwBMYxi7Eo0YLmWsfNi7eSjDQOo9iVY2G3BjzknV5dqTIywYOKvs
- 16z5be4F947w==
+ by ob1.hgst.iphmx.com with ESMTP; 22 Aug 2020 13:51:19 +0800
+IronPort-SDR: 1BBS0YlBSearsDjYWjyAEUHKLVXkmbKZC2UZ/zO0D56tXBYQtuJW/sMHc4pU00Zrt73uuwmKOH
+ q77I2F5KRzAQ==
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 21 Aug 2020 22:38:56 -0700
-IronPort-SDR: krcQR3O1UfmrI4aiZPUg91yQ+aWh8DjVVzsPcpnE0AtYaBivm5cFEb5wP6G2qDg/jTopnrF2Wg
- kpY+QxhJzsmA==
+ 21 Aug 2020 22:38:59 -0700
+IronPort-SDR: YIVvLQKvrjxPglQHp0xS3oM51Cz8MzI9ue1cdtmaE85y1oxMgkaTpc7fuDJpJvs2RRgjbJqytT
+ c6eVcqSlHt+Q==
 WDCIronportException: Internal
 Received: from 5zn13g2.ad.shared (HELO risc6-mainframe.hgst.com)
  ([10.86.59.90])
- by uls-op-cesaip02.wdc.com with ESMTP; 21 Aug 2020 22:51:17 -0700
+ by uls-op-cesaip02.wdc.com with ESMTP; 21 Aug 2020 22:51:19 -0700
 From: Alistair Francis <alistair.francis@wdc.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v3 03/20] target/riscv: Generate nanboxed results from
- trans_rvf.inc.c
-Date: Fri, 21 Aug 2020 22:40:44 -0700
-Message-Id: <20200822054101.1202175-4-alistair.francis@wdc.com>
+Subject: [PULL v3 12/20] roms/Makefile: Build the generic platform for RISC-V
+ OpenSBI firmware
+Date: Fri, 21 Aug 2020 22:40:53 -0700
+Message-Id: <20200822054101.1202175-13-alistair.francis@wdc.com>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20200822054101.1202175-1-alistair.francis@wdc.com>
 References: <20200822054101.1202175-1-alistair.francis@wdc.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=68.232.141.245;
+Received-SPF: pass client-ip=216.71.153.144;
  envelope-from=prvs=49637c5a7=alistair.francis@wdc.com;
- helo=esa1.hgst.iphmx.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/22 01:51:16
+ helo=esa5.hgst.iphmx.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/22 01:43:18
 X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
 X-Spam_score_int: -43
 X-Spam_score: -4.4
@@ -103,61 +103,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alistair23@gmail.com, Richard Henderson <richard.henderson@linaro.org>,
- alistair.francis@wdc.com, LIU Zhiwei <zhiwei_liu@c-sky.com>
+Cc: alistair23@gmail.com, Bin Meng <bin.meng@windriver.com>,
+ alistair.francis@wdc.com, Anup Patel <anup@brainfault.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Richard Henderson <richard.henderson@linaro.org>
+From: Bin Meng <bin.meng@windriver.com>
 
-Make sure that all results from inline single-precision scalar
-operations are properly nan-boxed to 64-bits.
+The RISC-V generic platform is a flattened device tree (FDT) based
+platform where all platform specific functionality is provided based
+on FDT passed by previous booting stage. The support was added in
+the upstream OpenSBI v0.8 release recently.
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
-Message-Id: <20200724002807.441147-4-richard.henderson@linaro.org>
+Update our Makefile to build the generic platform instead of building
+virt and sifive_u separately for RISC-V OpenSBI firmware, and change
+to use fw_dynamic type images as well.
+
+Signed-off-by: Bin Meng <bin.meng@windriver.com>
+Reviewed-by: Anup Patel <anup@brainfault.org>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Message-Id: <1596439832-29238-4-git-send-email-bmeng.cn@gmail.com>
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- target/riscv/insn_trans/trans_rvf.c.inc | 4 ++++
- 1 file changed, 4 insertions(+)
+ roms/Makefile | 32 ++++++++++----------------------
+ 1 file changed, 10 insertions(+), 22 deletions(-)
 
-diff --git a/target/riscv/insn_trans/trans_rvf.c.inc b/target/riscv/insn_trans/trans_rvf.c.inc
-index c7057482e8..264d3139f1 100644
---- a/target/riscv/insn_trans/trans_rvf.c.inc
-+++ b/target/riscv/insn_trans/trans_rvf.c.inc
-@@ -167,6 +167,7 @@ static bool trans_fsgnj_s(DisasContext *ctx, arg_fsgnj_s *a)
-         tcg_gen_deposit_i64(cpu_fpr[a->rd], cpu_fpr[a->rs2], cpu_fpr[a->rs1],
-                             0, 31);
-     }
-+    gen_nanbox_s(cpu_fpr[a->rd], cpu_fpr[a->rd]);
-     mark_fs_dirty(ctx);
-     return true;
- }
-@@ -183,6 +184,7 @@ static bool trans_fsgnjn_s(DisasContext *ctx, arg_fsgnjn_s *a)
-         tcg_gen_deposit_i64(cpu_fpr[a->rd], t0, cpu_fpr[a->rs1], 0, 31);
-         tcg_temp_free_i64(t0);
-     }
-+    gen_nanbox_s(cpu_fpr[a->rd], cpu_fpr[a->rd]);
-     mark_fs_dirty(ctx);
-     return true;
- }
-@@ -199,6 +201,7 @@ static bool trans_fsgnjx_s(DisasContext *ctx, arg_fsgnjx_s *a)
-         tcg_gen_xor_i64(cpu_fpr[a->rd], cpu_fpr[a->rs1], t0);
-         tcg_temp_free_i64(t0);
-     }
-+    gen_nanbox_s(cpu_fpr[a->rd], cpu_fpr[a->rd]);
-     mark_fs_dirty(ctx);
-     return true;
- }
-@@ -369,6 +372,7 @@ static bool trans_fmv_w_x(DisasContext *ctx, arg_fmv_w_x *a)
- #else
-     tcg_gen_extu_i32_i64(cpu_fpr[a->rd], t0);
- #endif
-+    gen_nanbox_s(cpu_fpr[a->rd], cpu_fpr[a->rd]);
+diff --git a/roms/Makefile b/roms/Makefile
+index f9acf39954..5d9f15b677 100644
+--- a/roms/Makefile
++++ b/roms/Makefile
+@@ -64,10 +64,8 @@ default help:
+ 	@echo "  u-boot.e500        -- update u-boot.e500"
+ 	@echo "  u-boot.sam460      -- update u-boot.sam460"
+ 	@echo "  efi                -- update UEFI (edk2) platform firmware"
+-	@echo "  opensbi32-virt     -- update OpenSBI for 32-bit virt machine"
+-	@echo "  opensbi64-virt     -- update OpenSBI for 64-bit virt machine"
+-	@echo "  opensbi32-sifive_u -- update OpenSBI for 32-bit sifive_u machine"
+-	@echo "  opensbi64-sifive_u -- update OpenSBI for 64-bit sifive_u machine"
++	@echo "  opensbi32-generic  -- update OpenSBI for 32-bit generic machine"
++	@echo "  opensbi64-generic  -- update OpenSBI for 64-bit generic machine"
+ 	@echo "  bios-microvm       -- update bios-microvm.bin (qboot)"
+ 	@echo "  clean              -- delete the files generated by the previous" \
+ 	                              "build targets"
+@@ -170,29 +168,19 @@ skiboot:
+ efi: edk2-basetools
+ 	$(MAKE) -f Makefile.edk2
  
-     mark_fs_dirty(ctx);
-     tcg_temp_free(t0);
+-opensbi32-virt:
++opensbi32-generic:
+ 	$(MAKE) -C opensbi \
+ 		CROSS_COMPILE=$(riscv32_cross_prefix) \
+-		PLATFORM="qemu/virt"
+-	cp opensbi/build/platform/qemu/virt/firmware/fw_jump.bin ../pc-bios/opensbi-riscv32-virt-fw_jump.bin
++		PLATFORM="generic"
++	cp opensbi/build/platform/generic/firmware/fw_dynamic.bin ../pc-bios/opensbi-riscv32-generic-fw_dynamic.bin
++	cp opensbi/build/platform/generic/firmware/fw_dynamic.elf ../pc-bios/opensbi-riscv32-generic-fw_dynamic.elf
+ 
+-opensbi64-virt:
++opensbi64-generic:
+ 	$(MAKE) -C opensbi \
+ 		CROSS_COMPILE=$(riscv64_cross_prefix) \
+-		PLATFORM="qemu/virt"
+-	cp opensbi/build/platform/qemu/virt/firmware/fw_jump.bin ../pc-bios/opensbi-riscv64-virt-fw_jump.bin
+-
+-opensbi32-sifive_u:
+-	$(MAKE) -C opensbi \
+-		CROSS_COMPILE=$(riscv32_cross_prefix) \
+-		PLATFORM="sifive/fu540"
+-	cp opensbi/build/platform/sifive/fu540/firmware/fw_jump.bin ../pc-bios/opensbi-riscv32-sifive_u-fw_jump.bin
+-
+-opensbi64-sifive_u:
+-	$(MAKE) -C opensbi \
+-		CROSS_COMPILE=$(riscv64_cross_prefix) \
+-		PLATFORM="sifive/fu540"
+-	cp opensbi/build/platform/sifive/fu540/firmware/fw_jump.bin ../pc-bios/opensbi-riscv64-sifive_u-fw_jump.bin
++		PLATFORM="generic"
++	cp opensbi/build/platform/generic/firmware/fw_dynamic.bin ../pc-bios/opensbi-riscv64-generic-fw_dynamic.bin
++	cp opensbi/build/platform/generic/firmware/fw_dynamic.elf ../pc-bios/opensbi-riscv64-generic-fw_dynamic.elf
+ 
+ bios-microvm:
+ 	$(MAKE) -C qboot
 -- 
 2.28.0
 
