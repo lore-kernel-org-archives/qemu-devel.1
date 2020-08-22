@@ -2,129 +2,67 @@ Return-Path: <SRS0=Iy1T=CA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 152ACC433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 22 Aug 2020 12:32:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91E24C433E1
+	for <qemu-devel@archiver.kernel.org>; Sat, 22 Aug 2020 13:19:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CCE1820720
-	for <qemu-devel@archiver.kernel.org>; Sat, 22 Aug 2020 12:32:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5DB0320720
+	for <qemu-devel@archiver.kernel.org>; Sat, 22 Aug 2020 13:19:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ikk1Ega7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CCE1820720
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="k/pNBXRY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5DB0320720
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50264 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38180 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k9ShB-0007fR-1G
-	for qemu-devel@archiver.kernel.org; Sat, 22 Aug 2020 08:32:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38906)
+	id 1k9TQt-0000jm-KG
+	for qemu-devel@archiver.kernel.org; Sat, 22 Aug 2020 09:19:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46450)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k9SgQ-0007F7-4R
- for qemu-devel@nongnu.org; Sat, 22 Aug 2020 08:31:42 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:24717
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1k9SgL-00084b-VH
- for qemu-devel@nongnu.org; Sat, 22 Aug 2020 08:31:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598099495;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=+mXslqVbulcl0bht9RQeTNVl2Xfx6SPn+lTtFneRWPo=;
- b=ikk1Ega7aUIlK2l0wmwaflSLCfz5CUBZp5KnaBGkDR1N4XhMRNC234vdX1+sWiiT+aghzJ
- DcLTuQKd8PbNPf2fWzs1mmNBxPn1UGG/xx7P2mUlOWw/ohaFV9F1jj4lkw+N8r5rdV1Ex9
- XXY7+QDR01Ac6m3+12sIG31i3vJjSTE=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-333-Z5djyi3ZNAGmYKZofm7XQg-1; Sat, 22 Aug 2020 08:31:33 -0400
-X-MC-Unique: Z5djyi3ZNAGmYKZofm7XQg-1
-Received: by mail-wr1-f70.google.com with SMTP id t3so1671265wrr.5
- for <qemu-devel@nongnu.org>; Sat, 22 Aug 2020 05:31:33 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=+mXslqVbulcl0bht9RQeTNVl2Xfx6SPn+lTtFneRWPo=;
- b=sj53N2O3BBCDdI7iuo7urydOp4V5pmKxq/+GuIF0Vh84gm5jDDtxl05eThwNe0Z8HG
- EOynljiX4NUD60N4idv/j2hNKG2yUtbenGtBUxEodnZQSq9d3D0aQFvcwZmID9S2kfXz
- rho3861K+yGCKAAzpiQukDZQpsWJnHhdEkn9LZUEN3o62kLt+bCSIpn1CKFQRepMz0gu
- 4yh+tFd3pULUItBqN2mnxlP2IQ4S7jqieSKRDFEaBSYnp0ZIGKqgbZDBES1a4s45sK25
- DkbEzrtjpk8L5uhSr3TXW0V0GQ0G51S52x8rlB+G8ormE2uWIo1mQms0fRCOJUsfkWKZ
- yvIw==
-X-Gm-Message-State: AOAM532JF+4EFMfRuqqP6R85r2fYxM2c96JJkvvoWIWkZMXpifPwQ5qL
- V/EY4So3zHJOjeOVC9s+k4c84nb27pvTNdJgEYD52Lm6m9iyvryh5qxQ9hR4xT27HrinSYcGiNU
- wLA4lj0nL02DQlog=
-X-Received: by 2002:a1c:e006:: with SMTP id x6mr245139wmg.128.1598099492172;
- Sat, 22 Aug 2020 05:31:32 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxy3LLpM5iH7+dMd8zWI+RP7oPJy06SPxzSzPLlYsz4rCDCgmdBx52XAND33eaNXGkrD8w8UQ==
-X-Received: by 2002:a1c:e006:: with SMTP id x6mr245113wmg.128.1598099491897;
- Sat, 22 Aug 2020 05:31:31 -0700 (PDT)
-Received: from [192.168.1.36] (121.red-81-40-121.staticip.rima-tde.net.
- [81.40.121.121])
- by smtp.gmail.com with ESMTPSA id o2sm10352365wrj.21.2020.08.22.05.31.30
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 22 Aug 2020 05:31:31 -0700 (PDT)
-Subject: Re: [PATCH] ati-vga: Fix checks in ati_2d_blt() to avoid crash
-To: BALATON Zoltan <balaton@eik.bme.hu>, qemu-devel@nongnu.org
-References: <20200406204029.19559747D5D@zero.eik.bme.hu>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <2041026f-7a88-d8f7-8738-968e1394e8c6@redhat.com>
-Date: Sat, 22 Aug 2020 14:31:29 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1k9TQG-0000D6-G5; Sat, 22 Aug 2020 09:19:04 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:35401 helo=ozlabs.org)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1k9TQD-0004Ni-5w; Sat, 22 Aug 2020 09:19:04 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 4BYf931Q5Dz9sR4; Sat, 22 Aug 2020 23:18:47 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1598102327;
+ bh=Y3DRYZnn2s6Ka+1KikjFBfOwDVAsO5the78gL0Yo6WU=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=k/pNBXRYmozy9JWbSOYtX8HxWFNRGVgHEPA6mmfgXrNoST/vtpgWg9dM+76kQx/Na
+ W7rt97g957CRDItohZSbXToE0XmqQ/FaCgQooQoxFTTKRXgdJHaNoEw3cc65yGriEH
+ o6OZXzeJWE7lkl3UtrK7JUtLj/gQmuMTeTxTW9S4=
+Date: Sat, 22 Aug 2020 23:18:37 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Subject: Re: [PATCH] ppc/pnv: Fix TypeInfo of PnvLpcController abstract class
+Message-ID: <20200822131837.GA4734@yekko.fritz.box>
+References: <20200822083920.2668930-1-clg@kaod.org>
 MIME-Version: 1.0
-In-Reply-To: <20200406204029.19559747D5D@zero.eik.bme.hu>
-Content-Language: en-US
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/22 08:31:35
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="W/nzBZO5zC0uMSeA"
+Content-Disposition: inline
+In-Reply-To: <20200822083920.2668930-1-clg@kaod.org>
+Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
+ helo=ozlabs.org
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/22 09:18:48
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -9
+X-Spam_score: -1.0
+X-Spam_bar: -
+X-Spam_report: (-1.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=1,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ URIBL_BLOCKED=0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -137,133 +75,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Mauro Matteo Cascella <mcascell@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>,
- Gerd Hoffmann <kraxel@redhat.com>, Prasad J Pandit <pjp@redhat.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 4/6/20 10:34 PM, BALATON Zoltan wrote:
-> In some corner cases (that never happen during normal operation but a
-> malicious guest could program wrong values) pixman functions were
-> called with parameters that result in a crash. Fix this and add more
-> checks to disallow such cases.
 
-(Fair) question on IRC. Is this patch fixing CVE-2020-24352?
+--W/nzBZO5zC0uMSeA
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Public on August 14, 2020
+On Sat, Aug 22, 2020 at 10:39:20AM +0200, C=E9dric Le Goater wrote:
+> It was missing the instance_size field.
+>=20
+> Cc: Eduardo Habkost <ehabkost@redhat.com>
+> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
 
-Description
+Applied to ppc-for-5.2, thanks.
 
-An out-of-bounds memory access flaw was found in the ATI VGA device
-implementation of the QEMU emulator. This flaw occurs in the
-ati_2d_blt() routine while handling MMIO write operations through the
-ati_mm_write() callback. A malicious guest could use this flaw to crash
-the QEMU process on the host, resulting in a denial of service.
-
-This points to a BZ#1847385 which is private:
-
-"You are not authorized to access bug #1847385.
-
-Most likely the bug has been restricted for internal development
-processes and we cannot grant access."
-
-https://bugzilla.redhat.com/show_bug.cgi?id=1847385
-
-Maybe we could improve the security process, when a CVE embargo
-expires, the public statement could point at the commit(s) fixing
-the bug.
-
-> 
-> Reported-by: Ziming Zhang <ezrakiez@gmail.com>
-
-I'm not sure this is the correct CVE because CVE-2020-24352
-is said reported by Yi Ren from the Alibaba Cloud Intelligence
-Security Team.
-
-Thanks,
-
-Phil.
-
-> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 > ---
->  hw/display/ati_2d.c | 37 ++++++++++++++++++++++++++-----------
->  1 file changed, 26 insertions(+), 11 deletions(-)
-> 
-> diff --git a/hw/display/ati_2d.c b/hw/display/ati_2d.c
-> index 42e82311eb..23a8ae0cd8 100644
-> --- a/hw/display/ati_2d.c
-> +++ b/hw/display/ati_2d.c
-> @@ -53,12 +53,20 @@ void ati_2d_blt(ATIVGAState *s)
->              s->vga.vbe_start_addr, surface_data(ds), surface_stride(ds),
->              surface_bits_per_pixel(ds),
->              (s->regs.dp_mix & GMC_ROP3_MASK) >> 16);
-> -    int dst_x = (s->regs.dp_cntl & DST_X_LEFT_TO_RIGHT ?
-> -                 s->regs.dst_x : s->regs.dst_x + 1 - s->regs.dst_width);
-> -    int dst_y = (s->regs.dp_cntl & DST_Y_TOP_TO_BOTTOM ?
-> -                 s->regs.dst_y : s->regs.dst_y + 1 - s->regs.dst_height);
-> +    unsigned dst_x = (s->regs.dp_cntl & DST_X_LEFT_TO_RIGHT ?
-> +                      s->regs.dst_x : s->regs.dst_x + 1 - s->regs.dst_width);
-> +    unsigned dst_y = (s->regs.dp_cntl & DST_Y_TOP_TO_BOTTOM ?
-> +                      s->regs.dst_y : s->regs.dst_y + 1 - s->regs.dst_height);
->      int bpp = ati_bpp_from_datatype(s);
-> +    if (!bpp) {
-> +        qemu_log_mask(LOG_GUEST_ERROR, "Invalid bpp\n");
-> +        return;
-> +    }
->      int dst_stride = DEFAULT_CNTL ? s->regs.dst_pitch : s->regs.default_pitch;
-> +    if (!dst_stride) {
-> +        qemu_log_mask(LOG_GUEST_ERROR, "Zero dest pitch\n");
-> +        return;
-> +    }
->      uint8_t *dst_bits = s->vga.vram_ptr + (DEFAULT_CNTL ?
->                          s->regs.dst_offset : s->regs.default_offset);
->  
-> @@ -82,12 +90,16 @@ void ati_2d_blt(ATIVGAState *s)
->      switch (s->regs.dp_mix & GMC_ROP3_MASK) {
->      case ROP3_SRCCOPY:
->      {
-> -        int src_x = (s->regs.dp_cntl & DST_X_LEFT_TO_RIGHT ?
-> -                     s->regs.src_x : s->regs.src_x + 1 - s->regs.dst_width);
-> -        int src_y = (s->regs.dp_cntl & DST_Y_TOP_TO_BOTTOM ?
-> -                     s->regs.src_y : s->regs.src_y + 1 - s->regs.dst_height);
-> +        unsigned src_x = (s->regs.dp_cntl & DST_X_LEFT_TO_RIGHT ?
-> +                       s->regs.src_x : s->regs.src_x + 1 - s->regs.dst_width);
-> +        unsigned src_y = (s->regs.dp_cntl & DST_Y_TOP_TO_BOTTOM ?
-> +                       s->regs.src_y : s->regs.src_y + 1 - s->regs.dst_height);
->          int src_stride = DEFAULT_CNTL ?
->                           s->regs.src_pitch : s->regs.default_pitch;
-> +        if (!src_stride) {
-> +            qemu_log_mask(LOG_GUEST_ERROR, "Zero source pitch\n");
-> +            return;
-> +        }
->          uint8_t *src_bits = s->vga.vram_ptr + (DEFAULT_CNTL ?
->                              s->regs.src_offset : s->regs.default_offset);
->  
-> @@ -137,8 +149,10 @@ void ati_2d_blt(ATIVGAState *s)
->                                      dst_y * surface_stride(ds),
->                                      s->regs.dst_height * surface_stride(ds));
->          }
-> -        s->regs.dst_x += s->regs.dst_width;
-> -        s->regs.dst_y += s->regs.dst_height;
-> +        s->regs.dst_x = (s->regs.dp_cntl & DST_X_LEFT_TO_RIGHT ?
-> +                         dst_x + s->regs.dst_width : dst_x);
-> +        s->regs.dst_y = (s->regs.dp_cntl & DST_Y_TOP_TO_BOTTOM ?
-> +                         dst_y + s->regs.dst_height : dst_y);
->          break;
->      }
->      case ROP3_PATCOPY:
-> @@ -179,7 +193,8 @@ void ati_2d_blt(ATIVGAState *s)
->                                      dst_y * surface_stride(ds),
->                                      s->regs.dst_height * surface_stride(ds));
->          }
-> -        s->regs.dst_y += s->regs.dst_height;
-> +        s->regs.dst_y = (s->regs.dp_cntl & DST_Y_TOP_TO_BOTTOM ?
-> +                         dst_y + s->regs.dst_height : dst_y);
->          break;
->      }
->      default:
-> 
+>  hw/ppc/pnv_lpc.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+>=20
+> diff --git a/hw/ppc/pnv_lpc.c b/hw/ppc/pnv_lpc.c
+> index b5ffa48dac71..23f1e09492b1 100644
+> --- a/hw/ppc/pnv_lpc.c
+> +++ b/hw/ppc/pnv_lpc.c
+> @@ -646,7 +646,6 @@ static void pnv_lpc_power8_class_init(ObjectClass *kl=
+ass, void *data)
+>  static const TypeInfo pnv_lpc_power8_info =3D {
+>      .name          =3D TYPE_PNV8_LPC,
+>      .parent        =3D TYPE_PNV_LPC,
+> -    .instance_size =3D sizeof(PnvLpcController),
+>      .class_init    =3D pnv_lpc_power8_class_init,
+>      .interfaces =3D (InterfaceInfo[]) {
+>          { TYPE_PNV_XSCOM_INTERFACE },
+> @@ -687,7 +686,6 @@ static void pnv_lpc_power9_class_init(ObjectClass *kl=
+ass, void *data)
+>  static const TypeInfo pnv_lpc_power9_info =3D {
+>      .name          =3D TYPE_PNV9_LPC,
+>      .parent        =3D TYPE_PNV_LPC,
+> -    .instance_size =3D sizeof(PnvLpcController),
+>      .class_init    =3D pnv_lpc_power9_class_init,
+>  };
+> =20
+> @@ -768,6 +766,7 @@ static void pnv_lpc_class_init(ObjectClass *klass, vo=
+id *data)
+>  static const TypeInfo pnv_lpc_info =3D {
+>      .name          =3D TYPE_PNV_LPC,
+>      .parent        =3D TYPE_DEVICE,
+> +    .instance_size =3D sizeof(PnvLpcController),
+>      .class_init    =3D pnv_lpc_class_init,
+>      .class_size    =3D sizeof(PnvLpcClass),
+>      .abstract      =3D true,
 
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--W/nzBZO5zC0uMSeA
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl9BGysACgkQbDjKyiDZ
+s5IxJRAApV8JuFCu1GSvCis3McIBOwVBVfR1HRta1YQF97z15UgZZRIXll4WLF8u
+UCMSqGum8relOdXvQ2oD/TBYIWVhYEuFx4lCRsien0CP88tvQOHH9maDlUBh1pbb
+7PuH1BBQkpPD7mI0JDnI7qdEK23fhqM3SzE4EUy56VbWAhVxeEwTg5bQYWKa7dqa
+hX7Co3byilg4vmgXKa6/VcVPcYVqYWY9mzg8kJwG3/9O2p3lOJwPZxC/1tNVUwkW
+u9INDbL4G6EaVEcv8xYwGzJXgjXbl+PX8+DOOh13u7d1r6sjM7aX1FnCWfpbnofI
+amyPuv78Lt/lq5yR7R1yjRvbgd0aJDBhhXYaO3BOfynl5EXlZfQVrILxuHiOLsog
+oU+vNNSun+mrcVPx1aFmz9RmgqmSXFOpsgWn7tkHuu2XUZgbtC9EBebKBxtxqSdp
+Hvg0fWis4OH3J7TPZDGguuK93tdUI5AViBtjBorkd7b1ZabMalzI311hSkrD/jYo
+fGw+HLCdvrY5W08I15WxtDQpYWH8NqPUz4aSfKaidcdQDHVRZah3htUDhYckMLGJ
+qA7qkjBscbtlDFpnfNA/DFHwuxl71ya8rlwGUIpeTZs59FpPcTkTDpycwUL/4kw/
+HuCNwGchb4H7PJn8e7+6FQJnL+t0iHpthlAe/xC+uMp/atvtHTg=
+=p4/f
+-----END PGP SIGNATURE-----
+
+--W/nzBZO5zC0uMSeA--
 
