@@ -2,79 +2,78 @@ Return-Path: <SRS0=Iy1T=CA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-0.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82052C433E1
-	for <qemu-devel@archiver.kernel.org>; Sat, 22 Aug 2020 11:09:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 551F2C433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 22 Aug 2020 11:23:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 479EC20720
-	for <qemu-devel@archiver.kernel.org>; Sat, 22 Aug 2020 11:09:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0FA722072D
+	for <qemu-devel@archiver.kernel.org>; Sat, 22 Aug 2020 11:23:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="p6b5RoE1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 479EC20720
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bd69C5jb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0FA722072D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55390 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60070 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k9RPI-0001Hn-J8
-	for qemu-devel@archiver.kernel.org; Sat, 22 Aug 2020 07:09:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55750)
+	id 1k9RcY-00041X-AR
+	for qemu-devel@archiver.kernel.org; Sat, 22 Aug 2020 07:23:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57338)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1k9ROT-0000qj-UB
- for qemu-devel@nongnu.org; Sat, 22 Aug 2020 07:09:05 -0400
-Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:39899)
+ id 1k9Rbw-0003bF-PC
+ for qemu-devel@nongnu.org; Sat, 22 Aug 2020 07:23:00 -0400
+Received: from mail-wm1-x334.google.com ([2a00:1450:4864:20::334]:51698)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1k9ROR-0008Bj-Rd
- for qemu-devel@nongnu.org; Sat, 22 Aug 2020 07:09:05 -0400
-Received: by mail-wr1-x434.google.com with SMTP id a5so4187912wrm.6
- for <qemu-devel@nongnu.org>; Sat, 22 Aug 2020 04:09:03 -0700 (PDT)
+ id 1k9Rbu-00016k-8B
+ for qemu-devel@nongnu.org; Sat, 22 Aug 2020 07:23:00 -0400
+Received: by mail-wm1-x334.google.com with SMTP id p14so4121388wmg.1
+ for <qemu-devel@nongnu.org>; Sat, 22 Aug 2020 04:22:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=fHTGMUds8xS31xKTH1dHltNEJ13HotOQmnjytc3G5cI=;
- b=p6b5RoE1NVOmAsI3MDe79CE/L3oAVhSuGri9qDBv6/nPxKfR1/rBETO9SpIGZoag6R
- dshxyt7DP3lDgRV7qeow+5+jxxDF2sCLrGzCzs8eorsPPLnRZdK42g9qwNdSAWwjw03n
- HogFP9wd+b4JFIWLUkh0DBa3x0RxGfWENoCSbB0d/ye6S2iMQveAK4TaTJYPIh7w/pjQ
- JxA6KsXcdUfJikjjhRwmK7OltbnWVvTj/WeKH7VeF6YmwiwMhnIFqgxUEN021/cuRLQJ
- SUmiIlYyF0ga+8E3rYZCf9WSoQEdZgcCnVOuRTNKnWAhGdwppBywkyJL4/DTIMJM2VUf
- QTKA==
+ :cc; bh=zDTmnSHAnorCWFeiU9WnVPYGZcmxkwKsQ5kIo3SjY0E=;
+ b=bd69C5jbjhzARLqHN4U6u0dVAcJJdu0VfENPx2RRAwlON3pi9HPPyAYfXpuXl5Gtqj
+ 7/FFKb7CtOzzZnMfQ8Ekb/0r7GN9GLTG7eDq7Hw4HE7d9tmFRwT2vzgB4ZNBfm/shgEn
+ tPqq8MMETID1lNBYDxvrlJ9lwx0TLzH+MXfy5U/sfLgDY71goWPR5R+QduhFKWTD5/5r
+ I6LV/bA5lbQcfNWaLIC8OMW9+F3nfsPDLq+wLGUTFXceXSlfCdoqwC61ce2y7PP/f5t2
+ KWG9Nr9I/bPF0PMZuy48A39ZkhnWrAkWeVbz8v3nZyXHVhIbtiPTo37HyNcHa4c8yE/q
+ u8VA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:in-reply-to:references:from:date
  :message-id:subject:to:cc;
- bh=fHTGMUds8xS31xKTH1dHltNEJ13HotOQmnjytc3G5cI=;
- b=XWRBlSKGqyCEm5EXwAnCKJY8gOnpLEz+FPTw3fY4ESEXZt0qyNZjHInv9yvZ63iWUd
- q7JALyKYQD20HGp+T/YTTuTWw+uwDyEN6dDVoVeKifSIqMAccuiiqXCz0XMINjZvDbfZ
- 8X30MLfVzV/M8reOz5GcmX929YRRQWgknD2DN42TKZCdR0ZPBZbIywOvm9HWf4L3zBX+
- tSPGHbrtnT6otbUgpMCBRvYkUzCJkRV/jM0I7oPmkuzIF+bZmEHIWGJgCs2fw7FD616q
- HVJ+4t1iYNMRvD5g6FivwCugF6WBqBKlTJowiDk2CT2cJniDSY/CZ9mV2UVaePYHN8R7
- hvUQ==
-X-Gm-Message-State: AOAM532DRUNVJy6yUi+pFWb8ds1SSdyoYzN2nTCaQV5tpULVZMj7NReU
- YuHSaSOthH4DCWRvbs1sNNzldq6Q713azvb0hMI=
-X-Google-Smtp-Source: ABdhPJw8DDuESaW4PaS3e8n/Qw0hicu+Y/7n7OFKlEhBVlXGkO5I0maSBivFjuW6tyhLV3AajRmtMX62oOVdUIu/Lss=
-X-Received: by 2002:adf:b34a:: with SMTP id k10mr6656768wrd.402.1598094542339; 
- Sat, 22 Aug 2020 04:09:02 -0700 (PDT)
+ bh=zDTmnSHAnorCWFeiU9WnVPYGZcmxkwKsQ5kIo3SjY0E=;
+ b=Yiln3/pm3aLKjI8n3wUaXN9NwvK63COsdy+J+HjHg+l+BZZrEWT/noetgZGl9OL8r3
+ Lb4/+LWYZ1njomZ9ETTCuOrKPc2aqjB4+Ld8q+jS3t4gUGIdloE42k8MV7mj2N0Wv/qE
+ NrtiOV0++MvhoEgxsxSNJfGTZATXygD9QDwbjKo18Eh2uM3vBPy1KQpcZda9WR5ifU5v
+ FYQMcmvjMpc5gYhwjECj49/A4Uc/tiVg/ti92vJjGvifdV9k8AzHKqEcwcRrKntB9Nd8
+ 7jVbuJTwiqOn6T1pQ/KZ53fbT8lcjZU+59yxKvuP/m2g2rgUewAZGbVkA4hUO4iadxEJ
+ eR8Q==
+X-Gm-Message-State: AOAM531+qnun2HAJXT/oVZW8qoNxb0Oar1FDmz84s56x9kNcM2JCne2R
+ 1j/l9Zjof1mLLfGhj0ug6KyBr3UICAxrxbuBbU0=
+X-Google-Smtp-Source: ABdhPJyscll7nBKfuZP2+c6GJMl/KSMVA9G71hMaiuhnrgLcYzmCP8ZDkDbICisVouTgMi4zw0G4LIukiY3l6fski/s=
+X-Received: by 2002:a1c:1bc2:: with SMTP id b185mr7200957wmb.168.1598095376174; 
+ Sat, 22 Aug 2020 04:22:56 -0700 (PDT)
 MIME-Version: 1.0
-Received: by 2002:a1c:2489:0:0:0:0:0 with HTTP; Sat, 22 Aug 2020 04:09:02
+Received: by 2002:a1c:2489:0:0:0:0:0 with HTTP; Sat, 22 Aug 2020 04:22:55
  -0700 (PDT)
-In-Reply-To: <CALTWKrWnseJidqDTDQM9TY3JfmvXy_0JufH9rR6hZHoAXkP8VQ@mail.gmail.com>
-References: <CALTWKrWnseJidqDTDQM9TY3JfmvXy_0JufH9rR6hZHoAXkP8VQ@mail.gmail.com>
+In-Reply-To: <5f3d9a64.1c69fb81.58fa8.0979@mx.google.com>
+References: <5f3d9a64.1c69fb81.58fa8.0979@mx.google.com>
 From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Date: Sat, 22 Aug 2020 13:09:02 +0200
-Message-ID: <CAHiYmc5Z5T9-vKe-c9N2GHwHdc+QM9Aznb84oOR6u+A53NuJOQ@mail.gmail.com>
-Subject: Re: [REPORT] [GSoC - TCG Continuous Benchmarking] [#6] Performance
- Comparison of Two QEMU Builds
+Date: Sat, 22 Aug 2020 13:22:55 +0200
+Message-ID: <CAHiYmc5ikDG2wOF5cv4j+weMJHw+scHBFWde60PF0nNTxqinQA@mail.gmail.com>
+Subject: Re: [REPORT] Nightly Performance Tests - Wednesday, August 19, 2020
 To: Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
-Content-Type: multipart/alternative; boundary="0000000000008381bf05ad756128"
-Received-SPF: pass client-ip=2a00:1450:4864:20::434;
- envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wr1-x434.google.com
+Content-Type: multipart/alternative; boundary="00000000000036d1ef05ad7593bb"
+Received-SPF: pass client-ip=2a00:1450:4864:20::334;
+ envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-wm1-x334.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -96,143 +95,513 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- "jsnow@redhat.com" <jsnow@redhat.com>,
- "luoyonggang@gmail.com" <luoyonggang@gmail.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000008381bf05ad756128
+--00000000000036d1ef05ad7593bb
 Content-Type: text/plain; charset="UTF-8"
 
-Hi, Ahmed.
+On Wednesday, August 19, 2020, Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
+wrote:
 
-The report, and the topic in general, look quite interesting. However, I
-would suggest two improvements:
+> Host CPU         : Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz
+> Host Memory      : 15.49 GB
+>
+> Start Time (UTC) : 2020-08-19 21:00:01
+> End Time (UTC)   : 2020-08-19 21:32:15
+> Execution Time   : 0:32:14.021998
+>
+> Status           : SUCCESS
+>
+> --------------------------------------------------------
+>
+>
+> I see we did not receive nightly report last night. The cause is most
+likely the change of our build system that happened yesterday.
 
-- The title should reflect the content in a clearer way. Let's say,
-"Compilers and QEMU performance" would be IMHO better. The expression "two
-builds" is just missing the central motivation of the report, which is
-comparing gcc-built QEMU and clang-built QEMU, performance-wise.
+I think the best approach for you is to start tonight "from scratch". So,
+with source code tree and all past data deleted - as if you execute the
+nighlies for the first time ever. This will cause a fresh checkout, and a
+recreation of 5.1 and 'latest' perfirmace data.
 
-- At the end, a section "Useful links" would be handy, akin to the similar
-section in Report 1. There were many people that analysed (and posted their
-results on the internet) gcc vs clang in terms of performance of produced
-executables (in contexts other than QEMU). Having the most useful and
-informative ones (3-5 links with a short summary for each one would be more
-than sufficient) listed in this report would enhance it significantly.
+Unrelated hint:
+
+Please include the following (or similar) text right before the tables with
+results:
+
+"'-----' denotes difference less than 0.01%."
+
+This way the readers will not be confused with '-----' meaning.
 
 Yours,
 Aleksandar
 
 
-On Monday, July 27, 2020, Ahmed Karaman <ahmedkhaledkaraman@gmail.com>
-wrote:
+>
+>
+>             SUMMARY REPORT - COMMIT 672b2f26
+> --------------------------------------------------------
+>                     AVERAGE RESULTS
+> --------------------------------------------------------
+> Target              Instructions      Latest      v5.1.0
+> ----------  --------------------  ----------  ----------
+> aarch64            2 118 484 879       -----       -----
+> alpha              1 838 407 216       -----       -----
+> arm                7 887 992 884       -----       -----
+> hppa               4 124 996 474       -----       -----
+> m68k               2 453 421 671       -----       -----
+> mips               1 812 636 995       -----       -----
+> mipsel             1 947 725 352       -----       -----
+> mips64             1 862 495 613       -----       -----
+> mips64el           1 984 211 702       -----       -----
+> ppc                2 394 319 834       -----       -----
+> ppc64              2 488 040 622       -----       -----
+> ppc64le            2 470 198 016       -----       -----
+> riscv64            1 367 774 718       -----       -----
+> s390x              3 058 498 362       -----       -----
+> sh4                2 278 490 061       -----       -----
+> sparc64            3 186 999 246       -----       -----
+> x86_64             1 734 475 394       -----       -----
+> --------------------------------------------------------
+>
+>                    DETAILED RESULTS
+> --------------------------------------------------------
+> Test Program: dijkstra_double
+> --------------------------------------------------------
+> Target              Instructions      Latest      v5.1.0
+> ----------  --------------------  ----------  ----------
+> aarch64            3 019 613 303       -----       -----
+> alpha              3 078 110 233       -----       -----
+> arm               15 982 079 823       -----       -----
+> hppa               7 012 014 505       -----       -----
+> m68k               3 914 631 319       -----       -----
+> mips               2 979 137 836       -----       -----
+> mipsel             3 141 391 810       -----       -----
+> mips64             3 163 713 203       -----       -----
+> mips64el           3 314 105 619       -----       -----
+> ppc                4 692 148 212       -----       -----
+> ppc64              4 875 585 404       -----       -----
+> ppc64le            4 859 857 200       -----       -----
+> riscv64            2 150 267 230       -----       -----
+> s390x              4 455 507 359       -----       -----
+> sh4                3 816 841 775       -----       -----
+> sparc64            4 399 783 149       -----       -----
+> x86_64             2 441 371 746       -----       -----
+> --------------------------------------------------------
+> --------------------------------------------------------
+> Test Program: dijkstra_int32
+> --------------------------------------------------------
+> Target              Instructions      Latest      v5.1.0
+> ----------  --------------------  ----------  ----------
+> aarch64            2 177 687 656       -----       -----
+> alpha              1 462 693 182       -----       -----
+> arm                8 048 440 634       -----       -----
+> hppa               5 053 362 217       -----       -----
+> m68k               1 683 346 196       -----       -----
+> mips               1 473 265 047       -----       -----
+> mipsel             1 475 326 892       -----       -----
+> mips64             1 683 560 350       -----       -----
+> mips64el           1 663 467 060       -----       -----
+> ppc                1 978 581 291       -----       -----
+> ppc64              2 160 088 877       -----       -----
+> ppc64le            2 151 841 575       -----       -----
+> riscv64            1 323 226 597       -----       -----
+> s390x              2 880 509 792       -----       -----
+> sh4                1 938 787 291       -----       -----
+> sparc64            2 768 217 627       -----       -----
+> x86_64             1 521 726 675       -----       -----
+> --------------------------------------------------------
+> --------------------------------------------------------
+> Test Program: matmult_double
+> --------------------------------------------------------
+> Target              Instructions      Latest      v5.1.0
+> ----------  --------------------  ----------  ----------
+> aarch64            1 408 042 295       -----       -----
+> alpha              3 009 129 018       -----       -----
+> arm                8 453 187 175       -----       -----
+> hppa               3 334 593 464       -----       -----
+> m68k               3 309 165 600       -----       -----
+> mips               2 252 644 394       -----       -----
+> mipsel             3 166 010 232       -----       -----
+> mips64             2 266 660 274       -----       -----
+> mips64el           3 179 408 969       -----       -----
+> ppc                3 108 563 525       -----       -----
+> ppc64              3 186 404 684       -----       -----
+> ppc64le            3 186 105 591       -----       -----
+> riscv64            1 218 230 013       -----       -----
+> s390x              2 715 954 030       -----       -----
+> sh4                3 330 300 193       -----       -----
+> sparc64            3 197 860 268       -----       -----
+> x86_64             1 244 922 914       -----       -----
+> --------------------------------------------------------
+> --------------------------------------------------------
+> Test Program: matmult_int32
+> --------------------------------------------------------
+> Target              Instructions      Latest      v5.1.0
+> ----------  --------------------  ----------  ----------
+> aarch64              595 215 814       -----       -----
+> alpha                369 955 794       -----       -----
+> arm                  735 842 738       -----       -----
+> hppa                 666 414 556       -----       -----
+> m68k                 406 857 412       -----       -----
+> mips                 497 082 899       -----       -----
+> mipsel               497 032 468       -----       -----
+> mips64               478 686 174       -----       -----
+> mips64el             462 210 845       -----       -----
+> ppc                  338 165 176       -----       -----
+> ppc64                390 046 801       -----       -----
+> ppc64le              390 236 162       -----       -----
+> riscv64              348 989 619       -----       -----
+> s390x                491 496 329       -----       -----
+> sh4                  399 095 487       -----       -----
+> sparc64              490 124 541       -----       -----
+> x86_64               399 613 899       -----       -----
+> --------------------------------------------------------
+> --------------------------------------------------------
+> Test Program: qsort_double
+> --------------------------------------------------------
+> Target              Instructions      Latest      v5.1.0
+> ----------  --------------------  ----------  ----------
+> aarch64            2 645 742 637       -----       -----
+> alpha              1 899 562 379       -----       -----
+> arm                8 113 107 429       -----       -----
+> hppa               3 098 469 739       -----       -----
+> m68k               4 302 051 049       -----       -----
+> mips               2 060 965 462       -----       -----
+> mipsel             2 061 404 232       -----       -----
+> mips64             1 933 231 416       -----       -----
+> mips64el           1 930 636 000       -----       -----
+> ppc                2 673 960 745       -----       -----
+> ppc64              2 623 577 315       -----       -----
+> ppc64le            2 580 240 728       -----       -----
+> riscv64            1 575 021 518       -----       -----
+> s390x              2 437 147 903       -----       -----
+> sh4                2 520 101 855       -----       -----
+> sparc64            3 882 349 298       -----       -----
+> x86_64             1 969 776 338       -----       -----
+> --------------------------------------------------------
+> --------------------------------------------------------
+> Test Program: qsort_int32
+> --------------------------------------------------------
+> Target              Instructions      Latest      v5.1.0
+> ----------  --------------------  ----------  ----------
+> aarch64            2 131 273 662       -----       -----
+> alpha              1 460 090 651       -----       -----
+> arm                3 372 526 755       -----       -----
+> hppa               2 196 131 815       -----       -----
+> m68k               1 779 454 745       -----       -----
+> mips               1 500 097 569       -----       -----
+> mipsel             1 502 804 063       -----       -----
+> mips64             1 497 347 136       -----       -----
+> mips64el           1 476 627 156       -----       -----
+> ppc                1 667 589 417       -----       -----
+> ppc64              1 779 203 387       -----       -----
+> ppc64le            1 728 565 582       -----       -----
+> riscv64            1 288 897 227       -----       -----
+> s390x              2 113 929 796       -----       -----
+> sh4                1 878 433 512       -----       -----
+> sparc64            3 353 723 284       -----       -----
+> x86_64             1 751 619 062       -----       -----
+> --------------------------------------------------------
+> --------------------------------------------------------
+> Test Program: qsort_string
+> --------------------------------------------------------
+> Target              Instructions      Latest      v5.1.0
+> ----------  --------------------  ----------  ----------
+> aarch64            2 529 811 267       -----       -----
+> alpha              1 793 314 577       -----       -----
+> arm                7 155 792 109       -----       -----
+> hppa               4 595 956 496       -----       -----
+> m68k               2 294 974 463       -----       -----
+> mips               2 113 124 208       -----       -----
+> mipsel             2 110 049 468       -----       -----
+> mips64             1 967 925 447       -----       -----
+> mips64el           1 950 320 901       -----       -----
+> ppc                2 428 056 923       -----       -----
+> ppc64              2 404 890 978       -----       -----
+> ppc64le            2 385 487 957       -----       -----
+> riscv64            1 563 271 793       -----       -----
+> s390x              3 934 075 315       -----       -----
+> sh4                2 097 732 542       -----       -----
+> sparc64            4 131 589 952       -----       -----
+> x86_64             2 864 598 485       -----       -----
+> --------------------------------------------------------
+> --------------------------------------------------------
+> Test Program: search_string
+> --------------------------------------------------------
+> Target              Instructions      Latest      v5.1.0
+> ----------  --------------------  ----------  ----------
+> aarch64            2 440 492 400       -----       -----
+> alpha              1 634 401 901       -----       -----
+> arm               11 242 966 409       -----       -----
+> hppa               7 043 029 003       -----       -----
+> m68k               1 936 892 588       -----       -----
+> mips               1 624 778 552       -----       -----
+> mipsel             1 627 783 657       -----       -----
+> mips64             1 908 840 910       -----       -----
+> mips64el           1 896 917 069       -----       -----
+> ppc                2 267 493 386       -----       -----
+> ppc64              2 484 527 533       -----       -----
+> ppc64le            2 479 249 335       -----       -----
+> riscv64            1 474 293 752       -----       -----
+> s390x              5 439 366 376       -----       -----
+> sh4                2 246 627 833       -----       -----
+> sparc64            3 272 345 849       -----       -----
+> x86_64             1 682 174 033       -----       -----
+> --------------------------------------------------------
+>
+>
+>
+>
 
-> Hi everyone,
->
-> The sixth report of the TCG Continuous Benchmarking project presents a
-> performance comparison between two different QEMU builds, GCC and Clang.
->
-> The report also presents five new benchmarks to allow for a variety of
-> test workloads. Each of the five benchmarks is executed for seventeen
-> different QEMU targets on both the GCC and Clang builds.
->
-> The resulting ten tables are then summarized then analyzed using the
-> list_helpers.py and list_fn_callees.py scripts. The entire workflow is
-> automated using Python scripts that are posted in the report.
->
-> Report link:
-> https://ahmedkrmn.github.io/TCG-Continuous-Benchmarking/
-> Performance-Comparison-of-Two-QEMU-Builds/
->
-> Previous reports:
-> Report 1 - Measuring Basic Performance Metrics of QEMU:
-> https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg06692.html
-> Report 2 - Dissecting QEMU Into Three Main Parts:
-> https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg09441.html
-> Report 3 - QEMU 5.0 and 5.1-pre-soft-freeze Dissect Comparison:
-> https://lists.gnu.org/archive/html/qemu-devel/2020-07/msg01978.html
-> Report 4 - Listing QEMU Helpers and Function Callees:
-> https://lists.gnu.org/archive/html/qemu-devel/2020-07/msg04227.html
-> Report 5 - Finding Commits Affecting QEMU Performance:
-> https://lists.gnu.org/archive/html/qemu-devel/2020-07/msg05769.html
->
-> Best regards,
-> Ahmed Karaman
->
-
---0000000000008381bf05ad756128
+--00000000000036d1ef05ad7593bb
 Content-Type: text/html; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi, Ahmed.<div><br></div><div>The report, and the topic in general, look qu=
-ite interesting. However, I would suggest two improvements:<div><div><br></=
-div><div>- The title should reflect the content in a clearer way. Let&#39;s=
- say, &quot;Compilers and QEMU performance&quot; would be IMHO better. The =
-expression &quot;two builds&quot; is just missing the central motivation of=
- the report, which is comparing gcc-built QEMU and clang-built QEMU, perfor=
-mance-wise.</div><div><br></div><div>- At the end, a section &quot;Useful l=
-inks&quot; would be handy, akin to the similar section in Report 1. There w=
-ere many people that analysed (and posted their results on the internet) gc=
-c vs clang in terms of performance of produced executables (in contexts oth=
-er than QEMU). Having the most useful and informative ones (3-5 links with =
-a short summary for each one would be more than sufficient) listed in this =
-report would enhance it significantly.</div><div><br></div><div>Yours,</div=
-><div>Aleksandar</div><div><br></div><div><br>On Monday, July 27, 2020, Ahm=
-ed Karaman &lt;<a href=3D"mailto:ahmedkhaledkaraman@gmail.com">ahmedkhaledk=
-araman@gmail.com</a>&gt; wrote:<br><blockquote class=3D"gmail_quote" style=
-=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex"><div dir=
-=3D"auto">Hi everyone,<br>
-<br>
-The sixth report of the TCG Continuous Benchmarking project presents a<br>
-performance comparison between two different QEMU builds, GCC and Clang.<br=
->
-<br>
-The report also presents five new benchmarks to allow for a variety of<br>
-test workloads. Each of the five benchmarks is executed for seventeen<br>
-different QEMU targets on both the GCC and Clang builds.<br>
-<br>
-The resulting ten tables are then summarized then analyzed using the<br>
-list_helpers.py and list_fn_callees.py scripts. The entire workflow is<br>
-automated using Python scripts that are posted in the report.<br>
-<br>
-Report link:<br>
-<a href=3D"https://ahmedkrmn.github.io/TCG-Continuous-Benchmarking/Performa=
-nce-Comparison-of-Two-QEMU-Builds/" rel=3D"noreferrer noreferrer" target=3D=
-"_blank">https://ahmedkrmn.github.io/<wbr>TCG-Continuous-Benchmarking/<wbr>=
-Performance-Comparison-of-Two-<wbr>QEMU-Builds/</a><br>
-<br>
-Previous reports:<br>
-Report 1 - Measuring Basic Performance Metrics of QEMU:<br>
-<a href=3D"https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg06692.h=
-tml" rel=3D"noreferrer noreferrer" target=3D"_blank">https://lists.gnu.org/=
-archive/<wbr>html/qemu-devel/2020-06/<wbr>msg06692.html</a><br>
-Report 2 - Dissecting QEMU Into Three Main Parts:<br>
-<a href=3D"https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg09441.h=
-tml" rel=3D"noreferrer noreferrer" target=3D"_blank">https://lists.gnu.org/=
-archive/<wbr>html/qemu-devel/2020-06/<wbr>msg09441.html</a><br>
-Report 3 - QEMU 5.0 and 5.1-pre-soft-freeze Dissect Comparison:<br>
-<a href=3D"https://lists.gnu.org/archive/html/qemu-devel/2020-07/msg01978.h=
-tml" rel=3D"noreferrer noreferrer" target=3D"_blank">https://lists.gnu.org/=
-archive/<wbr>html/qemu-devel/2020-07/<wbr>msg01978.html</a><br>
-Report 4 - Listing QEMU Helpers and Function Callees:<br>
-<a href=3D"https://lists.gnu.org/archive/html/qemu-devel/2020-07/msg04227.h=
-tml" rel=3D"noreferrer noreferrer" target=3D"_blank">https://lists.gnu.org/=
-archive/<wbr>html/qemu-devel/2020-07/<wbr>msg04227.html</a><br>
-Report 5 - Finding Commits Affecting QEMU Performance:<br>
-<a href=3D"https://lists.gnu.org/archive/html/qemu-devel/2020-07/msg05769.h=
-tml" rel=3D"noreferrer noreferrer" target=3D"_blank">https://lists.gnu.org/=
-archive/<wbr>html/qemu-devel/2020-07/<wbr>msg05769.html</a><br>
-<br>
-Best regards,<br>
-Ahmed Karaman<br></div>
-</blockquote></div></div></div>
+<br><br>On Wednesday, August 19, 2020, Ahmed Karaman &lt;<a href=3D"mailto:=
+ahmedkhaledkaraman@gmail.com">ahmedkhaledkaraman@gmail.com</a>&gt; wrote:<b=
+r><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:=
+1px #ccc solid;padding-left:1ex"><div><pre>Host CPU         : Intel(R) Core=
+(TM) i7-8750H CPU @ 2.20GHz
+Host Memory      : 15.49 GB
 
---0000000000008381bf05ad756128--
+Start Time (UTC) : 2020-08-19 21:00:01
+End Time (UTC)   : 2020-08-19 21:32:15
+Execution Time   : 0:32:14.021998
+
+Status           : SUCCESS
+
+------------------------------<wbr>--------------------------</pre><pre><br=
+></pre></div></blockquote><div>I see we did not receive nightly report last=
+ night. The cause is most likely the change of our build system that happen=
+ed yesterday.</div><div><br></div><div>I think the best approach for you is=
+ to start tonight &quot;from scratch&quot;. So, with source code tree and a=
+ll past data deleted - as if you execute the nighlies for the first time ev=
+er. This will cause a fresh checkout, and a recreation of 5.1 and &#39;late=
+st&#39; perfirmace data.</div><div><br></div><div>Unrelated hint:</div><div=
+><br></div><div>Please include the following (or similar) text right before=
+ the tables with results:</div><div><br></div><div>&quot;&#39;-----&#39; de=
+notes difference less than 0.01%.&quot;</div><div><br></div><div>This way t=
+he readers will not be confused with &#39;-----&#39; meaning.</div><div><br=
+></div><div>Yours,</div><div>Aleksandar</div><div><br></div><blockquote cla=
+ss=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;pa=
+dding-left:1ex"><div><pre><br></pre><pre><br></pre><pre>
+            SUMMARY REPORT - COMMIT 672b2f26
+------------------------------<wbr>--------------------------
+                    AVERAGE RESULTS
+------------------------------<wbr>--------------------------
+Target              Instructions      Latest      v5.1.0
+----------  --------------------  ----------  ----------
+aarch64            2 118 484 879       -----       -----
+alpha              1 838 407 216       -----       -----
+arm                7 887 992 884       -----       -----
+hppa               4 124 996 474       -----       -----
+m68k               2 453 421 671       -----       -----
+mips               1 812 636 995       -----       -----
+mipsel             1 947 725 352       -----       -----
+mips64             1 862 495 613       -----       -----
+mips64el           1 984 211 702       -----       -----
+ppc                2 394 319 834       -----       -----
+ppc64              2 488 040 622       -----       -----
+ppc64le            2 470 198 016       -----       -----
+riscv64            1 367 774 718       -----       -----
+s390x              3 058 498 362       -----       -----
+sh4                2 278 490 061       -----       -----
+sparc64            3 186 999 246       -----       -----
+x86_64             1 734 475 394       -----       -----
+------------------------------<wbr>--------------------------
+
+                   DETAILED RESULTS
+------------------------------<wbr>--------------------------
+Test Program: dijkstra_double
+------------------------------<wbr>--------------------------
+Target              Instructions      Latest      v5.1.0
+----------  --------------------  ----------  ----------
+aarch64            3 019 613 303       -----       -----
+alpha              3 078 110 233       -----       -----
+arm               15 982 079 823       -----       -----
+hppa               7 012 014 505       -----       -----
+m68k               3 914 631 319       -----       -----
+mips               2 979 137 836       -----       -----
+mipsel             3 141 391 810       -----       -----
+mips64             3 163 713 203       -----       -----
+mips64el           3 314 105 619       -----       -----
+ppc                4 692 148 212       -----       -----
+ppc64              4 875 585 404       -----       -----
+ppc64le            4 859 857 200       -----       -----
+riscv64            2 150 267 230       -----       -----
+s390x              4 455 507 359       -----       -----
+sh4                3 816 841 775       -----       -----
+sparc64            4 399 783 149       -----       -----
+x86_64             2 441 371 746       -----       -----
+------------------------------<wbr>--------------------------
+------------------------------<wbr>--------------------------
+Test Program: dijkstra_int32
+------------------------------<wbr>--------------------------
+Target              Instructions      Latest      v5.1.0
+----------  --------------------  ----------  ----------
+aarch64            2 177 687 656       -----       -----
+alpha              1 462 693 182       -----       -----
+arm                8 048 440 634       -----       -----
+hppa               5 053 362 217       -----       -----
+m68k               1 683 346 196       -----       -----
+mips               1 473 265 047       -----       -----
+mipsel             1 475 326 892       -----       -----
+mips64             1 683 560 350       -----       -----
+mips64el           1 663 467 060       -----       -----
+ppc                1 978 581 291       -----       -----
+ppc64              2 160 088 877       -----       -----
+ppc64le            2 151 841 575       -----       -----
+riscv64            1 323 226 597       -----       -----
+s390x              2 880 509 792       -----       -----
+sh4                1 938 787 291       -----       -----
+sparc64            2 768 217 627       -----       -----
+x86_64             1 521 726 675       -----       -----
+------------------------------<wbr>--------------------------
+------------------------------<wbr>--------------------------
+Test Program: matmult_double
+------------------------------<wbr>--------------------------
+Target              Instructions      Latest      v5.1.0
+----------  --------------------  ----------  ----------
+aarch64            1 408 042 295       -----       -----
+alpha              3 009 129 018       -----       -----
+arm                8 453 187 175       -----       -----
+hppa               3 334 593 464       -----       -----
+m68k               3 309 165 600       -----       -----
+mips               2 252 644 394       -----       -----
+mipsel             3 166 010 232       -----       -----
+mips64             2 266 660 274       -----       -----
+mips64el           3 179 408 969       -----       -----
+ppc                3 108 563 525       -----       -----
+ppc64              3 186 404 684       -----       -----
+ppc64le            3 186 105 591       -----       -----
+riscv64            1 218 230 013       -----       -----
+s390x              2 715 954 030       -----       -----
+sh4                3 330 300 193       -----       -----
+sparc64            3 197 860 268       -----       -----
+x86_64             1 244 922 914       -----       -----
+------------------------------<wbr>--------------------------
+------------------------------<wbr>--------------------------
+Test Program: matmult_int32
+------------------------------<wbr>--------------------------
+Target              Instructions      Latest      v5.1.0
+----------  --------------------  ----------  ----------
+aarch64              595 215 814       -----       -----
+alpha                369 955 794       -----       -----
+arm                  735 842 738       -----       -----
+hppa                 666 414 556       -----       -----
+m68k                 406 857 412       -----       -----
+mips                 497 082 899       -----       -----
+mipsel               497 032 468       -----       -----
+mips64               478 686 174       -----       -----
+mips64el             462 210 845       -----       -----
+ppc                  338 165 176       -----       -----
+ppc64                390 046 801       -----       -----
+ppc64le              390 236 162       -----       -----
+riscv64              348 989 619       -----       -----
+s390x                491 496 329       -----       -----
+sh4                  399 095 487       -----       -----
+sparc64              490 124 541       -----       -----
+x86_64               399 613 899       -----       -----
+------------------------------<wbr>--------------------------
+------------------------------<wbr>--------------------------
+Test Program: qsort_double
+------------------------------<wbr>--------------------------
+Target              Instructions      Latest      v5.1.0
+----------  --------------------  ----------  ----------
+aarch64            2 645 742 637       -----       -----
+alpha              1 899 562 379       -----       -----
+arm                8 113 107 429       -----       -----
+hppa               3 098 469 739       -----       -----
+m68k               4 302 051 049       -----       -----
+mips               2 060 965 462       -----       -----
+mipsel             2 061 404 232       -----       -----
+mips64             1 933 231 416       -----       -----
+mips64el           1 930 636 000       -----       -----
+ppc                2 673 960 745       -----       -----
+ppc64              2 623 577 315       -----       -----
+ppc64le            2 580 240 728       -----       -----
+riscv64            1 575 021 518       -----       -----
+s390x              2 437 147 903       -----       -----
+sh4                2 520 101 855       -----       -----
+sparc64            3 882 349 298       -----       -----
+x86_64             1 969 776 338       -----       -----
+------------------------------<wbr>--------------------------
+------------------------------<wbr>--------------------------
+Test Program: qsort_int32
+------------------------------<wbr>--------------------------
+Target              Instructions      Latest      v5.1.0
+----------  --------------------  ----------  ----------
+aarch64            2 131 273 662       -----       -----
+alpha              1 460 090 651       -----       -----
+arm                3 372 526 755       -----       -----
+hppa               2 196 131 815       -----       -----
+m68k               1 779 454 745       -----       -----
+mips               1 500 097 569       -----       -----
+mipsel             1 502 804 063       -----       -----
+mips64             1 497 347 136       -----       -----
+mips64el           1 476 627 156       -----       -----
+ppc                1 667 589 417       -----       -----
+ppc64              1 779 203 387       -----       -----
+ppc64le            1 728 565 582       -----       -----
+riscv64            1 288 897 227       -----       -----
+s390x              2 113 929 796       -----       -----
+sh4                1 878 433 512       -----       -----
+sparc64            3 353 723 284       -----       -----
+x86_64             1 751 619 062       -----       -----
+------------------------------<wbr>--------------------------
+------------------------------<wbr>--------------------------
+Test Program: qsort_string
+------------------------------<wbr>--------------------------
+Target              Instructions      Latest      v5.1.0
+----------  --------------------  ----------  ----------
+aarch64            2 529 811 267       -----       -----
+alpha              1 793 314 577       -----       -----
+arm                7 155 792 109       -----       -----
+hppa               4 595 956 496       -----       -----
+m68k               2 294 974 463       -----       -----
+mips               2 113 124 208       -----       -----
+mipsel             2 110 049 468       -----       -----
+mips64             1 967 925 447       -----       -----
+mips64el           1 950 320 901       -----       -----
+ppc                2 428 056 923       -----       -----
+ppc64              2 404 890 978       -----       -----
+ppc64le            2 385 487 957       -----       -----
+riscv64            1 563 271 793       -----       -----
+s390x              3 934 075 315       -----       -----
+sh4                2 097 732 542       -----       -----
+sparc64            4 131 589 952       -----       -----
+x86_64             2 864 598 485       -----       -----
+------------------------------<wbr>--------------------------
+------------------------------<wbr>--------------------------
+Test Program: search_string
+------------------------------<wbr>--------------------------
+Target              Instructions      Latest      v5.1.0
+----------  --------------------  ----------  ----------
+aarch64            2 440 492 400       -----       -----
+alpha              1 634 401 901       -----       -----
+arm               11 242 966 409       -----       -----
+hppa               7 043 029 003       -----       -----
+m68k               1 936 892 588       -----       -----
+mips               1 624 778 552       -----       -----
+mipsel             1 627 783 657       -----       -----
+mips64             1 908 840 910       -----       -----
+mips64el           1 896 917 069       -----       -----
+ppc                2 267 493 386       -----       -----
+ppc64              2 484 527 533       -----       -----
+ppc64le            2 479 249 335       -----       -----
+riscv64            1 474 293 752       -----       -----
+s390x              5 439 366 376       -----       -----
+sh4                2 246 627 833       -----       -----
+sparc64            3 272 345 849       -----       -----
+x86_64             1 682 174 033       -----       -----
+------------------------------<wbr>--------------------------
+
+
+</pre></div>
+</blockquote>
+
+--00000000000036d1ef05ad7593bb--
 
