@@ -2,95 +2,74 @@ Return-Path: <SRS0=Iy1T=CA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+X-Spam-Status: No, score=-12.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B045AC433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 22 Aug 2020 06:07:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84594C433E1
+	for <qemu-devel@archiver.kernel.org>; Sat, 22 Aug 2020 06:26:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 78EEC20724
-	for <qemu-devel@archiver.kernel.org>; Sat, 22 Aug 2020 06:07:49 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="ZGBoQlKS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78EEC20724
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
+	by mail.kernel.org (Postfix) with ESMTPS id 54CE920825
+	for <qemu-devel@archiver.kernel.org>; Sat, 22 Aug 2020 06:26:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54CE920825
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60492 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37038 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k9Mgu-0003fK-Mu
-	for qemu-devel@archiver.kernel.org; Sat, 22 Aug 2020 02:07:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34158)
+	id 1k9MzE-0006xx-FV
+	for qemu-devel@archiver.kernel.org; Sat, 22 Aug 2020 02:26:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39938)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=49637c5a7=alistair.francis@wdc.com>)
- id 1k9MRd-0002rZ-Mo
- for qemu-devel@nongnu.org; Sat, 22 Aug 2020 01:52:02 -0400
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:25955)
+ (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
+ id 1k9MyH-0006SH-K6
+ for qemu-devel@nongnu.org; Sat, 22 Aug 2020 02:25:45 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:52568 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=49637c5a7=alistair.francis@wdc.com>)
- id 1k9MRb-0000D6-EU
- for qemu-devel@nongnu.org; Sat, 22 Aug 2020 01:52:01 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1598075519; x=1629611519;
- h=from:to:cc:subject:date:message-id:in-reply-to:
- references:mime-version:content-transfer-encoding;
- bh=dHdymkxK2eCJ8OEQQg89j0/t4e6Yp5BPLgod0J6om/o=;
- b=ZGBoQlKSSaCH5RcRFezip82tkyYX5Pw5ycWvK7prYbu8xHv4ytcZ5fcV
- hcHWmzE3JJOoocWsTf8N0cpfTA5Eo4LiHmO11yL/Uzg3R8Ig4XX2FhaVG
- Ni0mZZgrcptMkL79ESxwk4S/HhxvGNgq0QYbVdr6U74KtVLEMFMM0M2Y1
- QnDwvjNR0qs7FFkoL6xA3nKwYfdTOp1cmrnyGgZEpaTuHL9GsjIRFqXa5
- t/SBX45G2Ehqvr2EWuadnlO6z5zsV9L4GJ6usuC7FgEdVFxvnYkttkpa1
- L7oxLiGOVeX2V95VRImtLkobuIe0xWqnIob6ZsHv4Z6pcZ2GpbLlKeZb7 w==;
-IronPort-SDR: 596mbxuDnyCOeMeyAMLN9M07mg5Y98oswzLY21t381pqh57MH/ijsR0qwbdkyZ2fUlAfzsP6Zd
- wjzpHUzeWruv4XKsqPrtC7BiWQU/9RkyNaGKxRPXPtP0284K81MtAiE+oV6JZXFKv825hgzR99
- asu1pAysXuaU3yqvakoMEBUHK1iU7TjmhDOXwPGplJKNQCXKlSSF/Lb+h6IhIDIenJiSTNT9G0
- hnQm83Cr5mh8x/g4tbdYrbeeahyIsqqB3gFNRUVY0RYqnuLuKllZ+kIDxC7QwpzwwaQHcwtaKW
- 9+g=
-X-IronPort-AV: E=Sophos;i="5.76,339,1592841600"; d="scan'208";a="145571974"
-Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com)
- ([199.255.45.14])
- by ob1.hgst.iphmx.com with ESMTP; 22 Aug 2020 13:51:22 +0800
-IronPort-SDR: WVNir2vDJfZ46vmOCLJm3kbqlNFEjxbs+0cyL6C7ncPGd5TQJU3yYGgKamMKX8LLU/Q5nk3Xo/
- dm27UZpU+isA==
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
- by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 21 Aug 2020 22:39:01 -0700
-IronPort-SDR: WGgeG07KdrQzkSXAeXTh6tiRoFOmkgbyYBMXoJeVJuwMXhl4FYliEJK7s0eRzvQYWg5AZulH1H
- ec0is5U0QkFg==
-WDCIronportException: Internal
-Received: from 5zn13g2.ad.shared (HELO risc6-mainframe.hgst.com)
- ([10.86.59.90])
- by uls-op-cesaip02.wdc.com with ESMTP; 21 Aug 2020 22:51:22 -0700
-From: Alistair Francis <alistair.francis@wdc.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL v3 20/20] hw/intc: ibex_plic: Honour source priorities
-Date: Fri, 21 Aug 2020 22:41:01 -0700
-Message-Id: <20200822054101.1202175-21-alistair.francis@wdc.com>
-X-Mailer: git-send-email 2.28.0
-In-Reply-To: <20200822054101.1202175-1-alistair.francis@wdc.com>
-References: <20200822054101.1202175-1-alistair.francis@wdc.com>
+ (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
+ id 1k9MyD-0003pl-K1
+ for qemu-devel@nongnu.org; Sat, 22 Aug 2020 02:25:45 -0400
+Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id BAEFA3661BFED0DB99E5;
+ Sat, 22 Aug 2020 14:25:29 +0800 (CST)
+Received: from [127.0.0.1] (10.174.186.4) by DGGEMS410-HUB.china.huawei.com
+ (10.3.19.210) with Microsoft SMTP Server id 14.3.487.0; Sat, 22 Aug 2020
+ 14:25:21 +0800
+Subject: Re: [PATCH v3 05/10] migration/dirtyrate: Record hash results for
+ each sampled page
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+References: <1597634433-18809-1-git-send-email-zhengchuan@huawei.com>
+ <1597634433-18809-6-git-send-email-zhengchuan@huawei.com>
+ <20200820173009.GM2664@work-vm> <20200820175149.GA244434@redhat.com>
+ <20200820175512.GQ2664@work-vm>
+ <95894cf7-ba09-9862-357a-1073a192e934@huawei.com>
+ <20200821123014.GK348677@redhat.com> <20200821123910.GC2655@work-vm>
+From: Zheng Chuan <zhengchuan@huawei.com>
+Message-ID: <cf76fa9f-1395-3b0c-2ef1-b02f8fb552c1@huawei.com>
+Date: Sat, 22 Aug 2020 14:25:20 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20200821123910.GC2655@work-vm>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.71.153.144;
- envelope-from=prvs=49637c5a7=alistair.francis@wdc.com;
- helo=esa5.hgst.iphmx.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/22 01:43:18
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -43
-X-Spam_score: -4.4
+X-Originating-IP: [10.174.186.4]
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.32; envelope-from=zhengchuan@huawei.com;
+ helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/22 02:25:30
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
 X-Spam_bar: ----
-X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,62 +82,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alistair23@gmail.com, alistair.francis@wdc.com,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Jessica Clarke <jrtc27@jrtc27.com>
+Cc: zhang.zhanghailiang@huawei.com, quintela@redhat.com, qemu-devel@nongnu.org,
+ xiexiangyou@huawei.com, alex.chen@huawei.com, ann.zhuangyanying@huawei.com,
+ fangying1@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch follows what commit aa4d30f6618dc "riscv: plic: Honour source
-priorities" does and ensures that the highest priority interrupt will be
-serviced first.
 
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-Cc: Jessica Clarke <jrtc27@jrtc27.com>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-Id: <a697ca8a31eff8eb18a88e09a28206063cf85d48.1595655188.git.alistair.francis@wdc.com>
----
- hw/intc/ibex_plic.c | 15 ++++++++++-----
- 1 file changed, 10 insertions(+), 5 deletions(-)
 
-diff --git a/hw/intc/ibex_plic.c b/hw/intc/ibex_plic.c
-index 669247ef08..f49fa67c91 100644
---- a/hw/intc/ibex_plic.c
-+++ b/hw/intc/ibex_plic.c
-@@ -57,6 +57,8 @@ static void ibex_plic_irqs_set_pending(IbexPlicState *s, int irq, bool level)
- static bool ibex_plic_irqs_pending(IbexPlicState *s, uint32_t context)
- {
-     int i;
-+    uint32_t max_irq = 0;
-+    uint32_t max_prio = s->threshold;
- 
-     for (i = 0; i < s->pending_num; i++) {
-         uint32_t irq_num = ctz64(s->pending[i]) + (i * 32);
-@@ -66,14 +68,17 @@ static bool ibex_plic_irqs_pending(IbexPlicState *s, uint32_t context)
-             continue;
-         }
- 
--        if (s->priority[irq_num] > s->threshold) {
--            if (!s->claim) {
--                s->claim = irq_num;
--            }
--            return true;
-+        if (s->priority[irq_num] > max_prio) {
-+            max_irq = irq_num;
-+            max_prio = s->priority[irq_num];
-         }
-     }
- 
-+    if (max_irq) {
-+        s->claim = max_irq;
-+        return true;
-+    }
-+
-     return false;
- }
- 
--- 
-2.28.0
+On 2020/8/21 20:39, Dr. David Alan Gilbert wrote:
+> * Daniel P. Berrangé (berrange@redhat.com) wrote:
+>> On Fri, Aug 21, 2020 at 08:22:06PM +0800, Zheng Chuan wrote:
+>>>
+>>>
+>>> On 2020/8/21 1:55, Dr. David Alan Gilbert wrote:
+>>>> * Daniel P. BerrangÃ© (berrange@redhat.com) wrote:
+>>>>> On Thu, Aug 20, 2020 at 06:30:09PM +0100, Dr. David Alan Gilbert wrote:
+>>>>>> * Chuan Zheng (zhengchuan@huawei.com) wrote:
+>>>>>>> Record hash results for each sampled page.
+>>>>>>>
+>>>>>>> Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
+>>>>>>> Signed-off-by: YanYing Zhuang <ann.zhuangyanying@huawei.com>
+>>>>>>> ---
+>>>>>>>  migration/dirtyrate.c | 144 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>>>>>>>  migration/dirtyrate.h |   7 +++
+>>>>>>>  2 files changed, 151 insertions(+)
+>>>>>>>
+>>>>>>> diff --git a/migration/dirtyrate.c b/migration/dirtyrate.c
+>>>>>>> index c4304ef..62b6f69 100644
+>>>>>>> --- a/migration/dirtyrate.c
+>>>>>>> +++ b/migration/dirtyrate.c
+>>>>>>> @@ -25,6 +25,7 @@
+>>>>>>>  #include "dirtyrate.h"
+>>>>>>>  
+>>>>>>>  CalculatingDirtyRateState CalculatingState = CAL_DIRTY_RATE_INIT;
+>>>>>>> +static unsigned long int qcrypto_hash_len = QCRYPTO_HASH_LEN;
+>>>>>>
+>>>>>> Why do we need this static rather than just using the QCRYPTO_HASH_LEN ?
+>>>>>> It's never going to change is it?
+>>>>>> (and anyway it's just a MD5 len?)
+>>>>>
+>>>>> I wouldn't want to bet on that given that this is use of MD5. We might
+>>>>> claim this isn't security critical, but surprises happen, and we will
+>>>>> certainly be dinged on security audits for introducing new use of MD5
+>>>>> no matter what.
+>>>>>
+>>>>> If a cryptographic hash is required, then sha256 should be the choice
+>>>>> for any new code that doesn't have back compat requirements.
+>>>>>
+>>>>> If a cryptographic hash is not required then how about crc32 
+>>>>
+>>>> It doesn't need to be cryptographic; is crc32 the fastest reasonable hash for use
+>>>> in large areas?
+>>>>
+>>>> Dave
+>>>>
+>>>>> IOW, it doesn't make a whole lot of sense to say we need a cryptographic
+>>>>> hash, but then pick the most insecure one.
+>>>>>
+>>>>> sha256 is slower than md5, but it is conceivable that in future we might
+>>>>> gain support for something like Blake2b which is similar security level
+>>>>> to SHA3, while being faster than MD5.
+>>>>>
+>>>>> Overall I'm pretty unethusiastic about use of MD5 being introduced and
+>>>>> worse, being hardcoded as the only option.
+>>>>>
+>>>>> Regards,
+>>>>> Daniel
+>>>>> -- 
+>>>>> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+>>>>> |: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+>>>>> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+>>>
+>>> Hi, Daniel, Dave.
+>>>
+>>> I do compare MD5 and SHA256 with vm memory of 128G under mempress of 100G.
+>>>
+>>> 1. Calculation speed
+>>> 1） MD5 takes about 500ms to sample and hash all pages by record_ramblock_hash_info().
+>>> 2)  SHA256 takes about 750ms to sample all pages by record_ramblock_hash_info().
+>>>
+>>> 2. CPU Consumption
+>>> 1)  MD5 may have instant rise up to 48% for dirtyrate thread
+>>> 2)  SHA256 may have instant rise up to 75% for dirtyrate thread
+>>>
+>>> 3. Memory Consumption
+>>> SHA256 may need twice memory than MD5 due to its HASH_LEN.
+>>>
+>>> I am trying to consider if crc32 is more faster and takes less memory and is more safer than MD5?
+>>
+>> No, crc32 is absolutely *weaker* than MD5. It is NOT a cryptographic
+>> hash so does not try to guarantee collision resistance. It only has
+>> 2^32 possible outputs.
+>>
+>> MD5 does try to guarantee collision resistance, but MD5 is considered
+>> broken these days, so a malicious attacker can cause collisions if they
+>> are motivated enough.
+>>
+>> IOW if you need collision resistance that SHA256 should be used.
+> 
+> There's no need to guard against malicious behaviour here - this is just
+> a stat to guide migration.
+> If CRC32 is likely to be faster than md5 I suspect it's enough.
+> 
+> Dave
+> 
+Hi，Dave, Daniel.
+
+I did test by crc32，it is much faster than MD5 and SHA256:)
+
+As for 128G vm it takes only about 50ms to sample and hash all pages by record_ramblock_hash_info().
+And the dirtyrate calculation is still good enough:)
+++++++++++++++++++++++++++++++++++++++++++
+|                      |    dirtyrate    |
+++++++++++++++++++++++++++++++++++++++++++
+| no mempress          |     4MB/s       |
+------------------------------------------
+| mempress 4096 1024   |    1248MB/s     |
+++++++++++++++++++++++++++++++++++++++++++
+| mempress 4096 4096   |    4060MB/s     |
+++++++++++++++++++++++++++++++++++++++++++
+
+I will take crc32 in PatchV4, is that OK from the perspective of safety?
+
+In my opinion, it should be safe.
+The crc32 is only for compare and the recorder will be free after calculation is over.
+The output is just dirtyrate for user to guide migration.
+
+What's more, i consider increase DIRTYRATE_DEFAULT_SAMPLE_PAGES from 256 to 512
+which may takes about 75ms to sample and hash all pages by record_ramblock_hash_info().
+
+>>
+>> Regards,
+>> Daniel
+>> -- 
+>> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+>> |: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+>> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
