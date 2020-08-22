@@ -2,82 +2,95 @@ Return-Path: <SRS0=Iy1T=CA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14401C433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 22 Aug 2020 14:26:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D50EC433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 22 Aug 2020 14:27:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DCA872072D
-	for <qemu-devel@archiver.kernel.org>; Sat, 22 Aug 2020 14:26:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCA872072D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id CC5452072D
+	for <qemu-devel@archiver.kernel.org>; Sat, 22 Aug 2020 14:27:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ccJf6UxB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC5452072D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54058 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56178 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k9UTD-0006CU-1h
-	for qemu-devel@archiver.kernel.org; Sat, 22 Aug 2020 10:26:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58152)
+	id 1k9UU5-00074K-35
+	for qemu-devel@archiver.kernel.org; Sat, 22 Aug 2020 10:27:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58280)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k9USg-0005nO-Pf
- for qemu-devel@nongnu.org; Sat, 22 Aug 2020 10:25:38 -0400
-Received: from indium.canonical.com ([91.189.90.7]:49398)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1k9USe-0002xx-FS
- for qemu-devel@nongnu.org; Sat, 22 Aug 2020 10:25:38 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1k9USc-0000bO-I4
- for <qemu-devel@nongnu.org>; Sat, 22 Aug 2020 14:25:34 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 629AF2E807B
- for <qemu-devel@nongnu.org>; Sat, 22 Aug 2020 14:25:34 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1k9UTT-0006dD-QS
+ for qemu-devel@nongnu.org; Sat, 22 Aug 2020 10:26:27 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:52294
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1k9UTQ-00035X-GR
+ for qemu-devel@nongnu.org; Sat, 22 Aug 2020 10:26:27 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1598106382;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=bM8s884cZddxjK1Xtu+aZjl/sWNaOI/OMaew1eNz3bM=;
+ b=ccJf6UxBAuVRAqvKz+GlAmf3Yt7Ns1ZBoxliSD6zCEQbCoVwSKhT2H5rx+kaAiAM1Vc81J
+ U/bin33+BUJ3FRoghEAw4lkv1GYaIxyHs2ge05wNmZmjhVmdL0o/aW4ouylf3PhS/cFktD
+ y66wfNva3HbfqCOy5iyQrhQGQdgnkgw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-274-LU7EZO2QMNONr0R-1K2XxA-1; Sat, 22 Aug 2020 10:26:16 -0400
+X-MC-Unique: LU7EZO2QMNONr0R-1K2XxA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7830B81F003;
+ Sat, 22 Aug 2020 14:26:15 +0000 (UTC)
+Received: from lacos-laptop-7.usersys.redhat.com (ovpn-112-61.ams2.redhat.com
+ [10.36.112.61])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 75C965D9F7;
+ Sat, 22 Aug 2020 14:25:56 +0000 (UTC)
+Subject: Re: [RFC PATCH v2 0/4] Use ACPI PCI hot-plug for q35
+To: Igor Mammedov <imammedo@redhat.com>, Julia Suvorova <jusual@redhat.com>
+References: <20200818215227.181654-1-jusual@redhat.com>
+ <20200821123007.3d390d51@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <2f874496-e9a2-d52f-2c6e-0595cc3ae9cb@redhat.com>
+Date: Sat, 22 Aug 2020 16:25:55 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Firefox/52.0 Thunderbird/52.9.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 22 Aug 2020 14:15:45 -0000
-From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1892540@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: gson laurent-vivier philmd
-X-Launchpad-Bug-Reporter: Andreas Gustafsson (gson)
-X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
- =?utf-8?q?=29?=
-References: <159803735569.2614.10182276398047269277.malonedeb@chaenomeles.canonical.com>
-Message-ID: <20200822141545.1314296-1-f4bug@amsat.org>
-Subject: [Bug 1892540] [RFC PATCH] hw/display/tcx: Allow 64-bit accesses to
- framebuffer stippler and blitter
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="99c2d833c8d727fd05148486920aca032e908071"; Instance="production"
-X-Launchpad-Hash: 3f92d0957b4eeb0974a1ec428b13ad3875535515
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/22 10:00:50
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, HEADER_FROM_DIFFERENT_DOMAINS=1,
- RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001,
- URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200821123007.3d390d51@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=lersek@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=lersek@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/22 08:01:29
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, URIBL_BLOCKED=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -86,131 +99,170 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1892540 <1892540@bugs.launchpad.net>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+ Gerd Hoffmann <kraxel@redhat.com>, Laine Stump <laine@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20200822141545.jkyi6gZxHuM_9zS6brCkOSlJS9R3n85EPCB7AScJKPM@z>
 
-The S24/TCX datasheet is listed as "Unable to locate" on [1].
++Marcel, Laine, Daniel
 
-However the NetBSD revision 1.32 of the driver introduced
-64-bit accesses to the stippler and blitter [2]. It is safe
-to assume these memory regions are 64-bit accessible.
-QEMU implementation is 32-bit, so fill the 'impl' fields.
+On 08/21/20 12:30, Igor Mammedov wrote:
+> On Tue, 18 Aug 2020 23:52:23 +0200
+> Julia Suvorova <jusual@redhat.com> wrote:
+>
+>> PCIe native hot-plug has numerous problems with racing events and
+>> unpredictable guest behaviour (Windows).
+> Documenting these misterious problems I've asked for  in previous
+> review hasn't been addressed.
+> Pls see v1 for comments and add requested info into cover letter at
+> least or in a commit message.
 
-[1] http://web.archive.org/web/20111209011516/http://wikis.sun.com/display/=
-FOSSdocs/Home
-[2] http://cvsweb.netbsd.org/bsdweb.cgi/src/sys/dev/sbus/tcx.c.diff?r1=3D1.=
-31&r2=3D1.32
+Igor, I assume you are referring to
 
-Reported-by: Andreas Gustafsson <gson@gson.org>
-Buglink: https://bugs.launchpad.net/bugs/1892540
-Fixes: 55d7bfe2293 ("tcx: Implement hardware acceleration")
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
----
- hw/display/tcx.c | 18 +++++++++++++++---
- 1 file changed, 15 insertions(+), 3 deletions(-)
+  http://mid.mail-archive.com/20200715153321.3495e62d@redhat.com
 
-diff --git a/hw/display/tcx.c b/hw/display/tcx.c
-index 1fb45b1aab8..96c6898b149 100644
---- a/hw/display/tcx.c
-+++ b/hw/display/tcx.c
-@@ -548,20 +548,28 @@ static const MemoryRegionOps tcx_stip_ops =3D {
-     .read =3D tcx_stip_readl,
-     .write =3D tcx_stip_writel,
-     .endianness =3D DEVICE_NATIVE_ENDIAN,
--    .valid =3D {
-+    .impl =3D {
-         .min_access_size =3D 4,
-         .max_access_size =3D 4,
-     },
-+    .valid =3D {
-+        .min_access_size =3D 4,
-+        .max_access_size =3D 8,
-+    },
- };
- =
+and I couldn't agree more.
 
- static const MemoryRegionOps tcx_rstip_ops =3D {
-     .read =3D tcx_stip_readl,
-     .write =3D tcx_rstip_writel,
-     .endianness =3D DEVICE_NATIVE_ENDIAN,
--    .valid =3D {
-+    .impl =3D {
-         .min_access_size =3D 4,
-         .max_access_size =3D 4,
-     },
-+    .valid =3D {
-+        .min_access_size =3D 4,
-+        .max_access_size =3D 8,
-+    },
- };
- =
+I'd like to understand the specific motivation for this patch series.
 
- static uint64_t tcx_blit_readl(void *opaque, hwaddr addr,
-@@ -650,10 +658,14 @@ static const MemoryRegionOps tcx_rblit_ops =3D {
-     .read =3D tcx_blit_readl,
-     .write =3D tcx_rblit_writel,
-     .endianness =3D DEVICE_NATIVE_ENDIAN,
--    .valid =3D {
-+    .impl =3D {
-         .min_access_size =3D 4,
-         .max_access_size =3D 4,
-     },
-+    .valid =3D {
-+        .min_access_size =3D 4,
-+        .max_access_size =3D 8,
-+    },
- };
- =
+- I'm very concerned that it could regress various hotplug scenarios
+with at least OVMF.
 
- static void tcx_invalidate_cursor_position(TCXState *s)
--- =
+So minimally I'm hoping that the work is being meticulously tested with
+OVMF.
 
-2.26.2
+- I don't recall testing native PCIe hot-*unplug*, but we had repeatedly
+tested native PCIe plug with both Linux and Windows guests, and in the
+end, it worked fine. (I recall working with at least Marcel on that; one
+historical reference I can find now is
+<https://bugzilla.tianocore.org/show_bug.cgi?id=75>.)
 
--- =
+I remember users confirming that native PCIe hotplug worked with
+assigned physical devices even (e.g. GPUs), assuming they made use of
+the resource reservation capability (e.g. they'd reserve large MMIO64
+areas during initial enumeration).
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1892540
+- I seem to remember that we had tested hotplug on extra root bridges
+(PXB) too; regressing that -- per the pxb-pcie mention in the blurb,
+quoted below -- wouldn't be great. At least, please don't flip the big
+switch so soon (IIUC, there is a big switch being proposed).
 
-Title:
-  qemu can no longer boot NetBSD/sparc
+- The documentation at "docs/pcie.txt" and "docs/pcie_pci_bridge.txt" is
+chock-full of hotplug references; we had spent days if not weeks for
+writing and reviewing those. I hope it's being evaluated how much of
+that is going to need an update.
 
-Status in QEMU:
-  New
+In particular, do we know how this work is going to affect the resource
+reservation capability?
 
-Bug description:
-  Booting NetBSD/sparc in qemu no longer works.  It broke between qemu
-  version 5.0.0 and 5.1.0, and a bisection identified the following as
-  the offending commit:
+$ qemu-system-x86_64 -device pcie-root-port,\? | grep reserve
+  bus-reserve=<uint32>   -  (default: 4294967295)
+  io-reserve=<size>      -  (default: 18446744073709551615)
+  mem-reserve=<size>     -  (default: 18446744073709551615)
+  pref32-reserve=<size>  -  (default: 18446744073709551615)
+  pref64-reserve=<size>  -  (default: 18446744073709551615)
 
-    [5d971f9e672507210e77d020d89e0e89165c8fc9] memory: Revert "memory:
-  accept mismatching sizes in memory_region_access_valid"
+The OVMF-side code (OvmfPkg/PciHotPlugInitDxe) was tough to write. As
+far as I remember, especially commit fe4049471bdf
+("OvmfPkg/PciHotPlugInitDxe: translate QEMU's resource reservation
+hints", 2017-10-03) had taken a lot of navel-gazing. So the best answer
+I'm looking for here is "this series does not affect resource
+reservation at all".
 
-  It's still broken as of 7fd51e68c34fcefdb4d6fd646ed3346f780f89f4.
+- If my message is suggesting that I'm alarmed: that's an
+understatement. This stuff is a mine-field. A good example is Gerd's
+(correct!) response "Oh no, please don't" to Igor's question in the v1
+thread, as to whether the piix4 IO port range could be reused:
 
-  To reproduce, run
+  http://mid.mail-archive.com/20200715065751.ogchtdqmnn7cxsyi@sirius.home.kraxel.org
 
-    wget http://ftp.netbsd.org/pub/NetBSD/NetBSD-9.0/images/NetBSD-9.0-spar=
-c.iso
-    qemu-system-sparc -nographic -cdrom NetBSD-9.0-sparc.iso -boot d
+That kind of "reuse" would have been a catastrophe, because for PCI IO
+port aperture, OVMF uses [0xC000..0xFFFF] on i440fx, but
+[0x6000..0xFFFF] on q35:
 
-  The expected behavior is that the guest boots to the prompt
+  commit bba734ab4c7c9b4386d39420983bf61484f65dda
+  Author: Laszlo Ersek <lersek@redhat.com>
+  Date:   Mon May 9 22:54:36 2016 +0200
 
-    Installation medium to load the additional utilities from:
+      OvmfPkg/PlatformPei: provide 10 * 4KB of PCI IO Port space on Q35
 
-  The observed behavior is a panic:
+      This can accommodate 10 bridges (including root bridges, PCIe upstream and
+      downstream ports, etc -- see
+      <https://bugzilla.redhat.com/show_bug.cgi?id=1333238#c12> for more
+      details).
 
-    [   1.0000050] system[0]: trap 0x29: pc=3D0xf0046b14 sfsr=3D0xb6 sfva=
-=3D0x54000000
-    [   1.0000050] cpu0: data fault: pc=3D0xf0046b14 addr=3D0x54000000 sfsr=
-=3D0xb6<PERR=3D0x0,LVL=3D0x0,AT=3D0x5,FT=3D0x5,FAV,OW>
-    [   1.0000050] panic: kernel fault
-    [   1.0000050] halted
+      10 is not a whole lot, but closer to the architectural limit of 15 than
+      our current 4, so it can be considered a stop-gap solution until all
+      guests manage to migrate to virtio-1.0, and no longer need PCI IO BARs
+      behind PCIe downstream ports.
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1892540/+subscriptions
+      Cc: Gabriel Somlo <somlo@cmu.edu>
+      Cc: Jordan Justen <jordan.l.justen@intel.com>
+      Ref: https://bugzilla.redhat.com/show_bug.cgi?id=1333238
+      Contributed-under: TianoCore Contribution Agreement 1.0
+      Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+      Reviewed-by: Jordan Justen <jordan.l.justen@intel.com>
+      Tested-by: Gabriel Somlo <somlo@cmu.edu>
+
+- If native PCIe hot-unplug is not working well (or at all) right now,
+then I guess I can't just summarily say "we had better drop this like
+hot potato".
+
+But then, if we are committed to *juggling* that potato, we should at
+least document the use case / motivation / current issues meticulously,
+please. Do we have a public BZ at least?
+
+- The other work, with regard to *disabling* unplug, which seems to be
+progressing in parallel, is similarly in need of a good explanation, in
+my opinion:
+
+  http://mid.mail-archive.com/20200820092157.17792-1-ani@anisinha.ca
+
+Yes, I have read Laine's long email, linked from the QEMU cover letter:
+
+  https://www.redhat.com/archives/libvir-list/2020-February/msg00110.html
+
+The whole use case "prevent guest admins from unplugging virtual
+devices" still doesn't make any sense to me. How is "some cloud admins
+don't want that" acceptable at face value, without further explanation?
+
+Thanks
+Laszlo
+
+>
+>
+>> Switching to ACPI hot-plug for now.
+>>
+>> Tested on RHEL 8 and Windows 2019.
+>> pxb-pcie is not yet supported.
+>>
+>> v2:
+>>     * new ioport range for acpiphp [Gerd]
+>>     * drop find_pci_host() [Igor]
+>>     * explain magic numbers in _OSC [Igor]
+>>     * drop build_q35_pci_hotplug() wrapper [Igor]
+>>
+>> Julia Suvorova (4):
+>>   hw/acpi/ich9: Trace ich9_gpe_readb()/writeb()
+>>   hw/i386/acpi-build: Add ACPI PCI hot-plug methods to q35
+>>   hw/i386/acpi-build: Turn off support of PCIe native hot-plug and SHPC
+>>     in _OSC
+>>   hw/acpi/ich9: Enable ACPI PCI hot-plug
+>>
+>>  hw/i386/acpi-build.h    | 12 ++++++++++
+>>  include/hw/acpi/ich9.h  |  3 +++
+>>  include/hw/acpi/pcihp.h |  3 ++-
+>>  hw/acpi/ich9.c          | 52 ++++++++++++++++++++++++++++++++++++++++-
+>>  hw/acpi/pcihp.c         | 15 ++++++++----
+>>  hw/acpi/piix4.c         |  2 +-
+>>  hw/i386/acpi-build.c    | 48 +++++++++++++++++++++++--------------
+>>  hw/i386/pc.c            |  1 +
+>>  hw/acpi/trace-events    |  4 ++++
+>>  9 files changed, 114 insertions(+), 26 deletions(-)
+>>
+>
+>
+
 
