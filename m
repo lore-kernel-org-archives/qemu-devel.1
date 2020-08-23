@@ -2,43 +2,43 @@ Return-Path: <SRS0=gE17=CB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19290C433DF
-	for <qemu-devel@archiver.kernel.org>; Sun, 23 Aug 2020 13:01:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4D6AC433DF
+	for <qemu-devel@archiver.kernel.org>; Sun, 23 Aug 2020 13:29:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D79FD2075B
-	for <qemu-devel@archiver.kernel.org>; Sun, 23 Aug 2020 13:01:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D79FD2075B
+	by mail.kernel.org (Postfix) with ESMTPS id 769B3206C0
+	for <qemu-devel@archiver.kernel.org>; Sun, 23 Aug 2020 13:29:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 769B3206C0
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35120 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41500 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k9pcR-00036y-3Q
-	for qemu-devel@archiver.kernel.org; Sun, 23 Aug 2020 09:01:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32846)
+	id 1k9q3t-0006z3-QO
+	for qemu-devel@archiver.kernel.org; Sun, 23 Aug 2020 09:29:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36836)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1k9pbc-0002Vg-GN
- for qemu-devel@nongnu.org; Sun, 23 Aug 2020 09:00:16 -0400
-Received: from mout.kundenserver.de ([212.227.126.133]:46963)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1k9q30-0006WX-LZ
+ for qemu-devel@nongnu.org; Sun, 23 Aug 2020 09:28:34 -0400
+Received: from mout.kundenserver.de ([212.227.126.131]:44765)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1k9pba-0003Sw-FM
- for qemu-devel@nongnu.org; Sun, 23 Aug 2020 09:00:16 -0400
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1k9q2y-0006BF-OW
+ for qemu-devel@nongnu.org; Sun, 23 Aug 2020 09:28:34 -0400
 Received: from [192.168.100.1] ([82.252.135.186]) by mrelayeu.kundenserver.de
- (mreue012 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1MnFps-1kt2KM2q3g-00jJFk; Sun, 23 Aug 2020 15:00:11 +0200
-Subject: Re: [PATCH v2] linux-user: detect mismatched ELF ABI in
- qemu-mips[n32][el]
-To: =?UTF-8?Q?Carlo_Marcelo_Arenas_Bel=c3=b3n?= <carenas@gmail.com>,
- qemu-devel@nongnu.org
-References: <20200823101703.18451-1-carenas@gmail.com>
+ (mreue009 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1MY60L-1k8uo535Uz-00YS52; Sun, 23 Aug 2020 15:28:28 +0200
+Subject: Re: [PULL 00/14] Linux user for 5.2 patches
 From: Laurent Vivier <laurent@vivier.eu>
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20200813064923.263565-1-laurent@vivier.eu>
+ <CAFEAcA9NUR6jzCypJv4pC-ghvzjk2ErfFJ65j6A=r1LUbzp6cw@mail.gmail.com>
+ <011ed14a-74d8-7145-3007-db7fce74ab7c@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
  WoeuLWDmXE7A3oJoIsRecD6BXHTb0OYS20lS608anr3B0xn5g0BX7es9Mw+hV/pL+63EOCVm
@@ -81,35 +81,35 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <dc73ce82-df23-d3c8-7b33-03dbbb7fc792@vivier.eu>
-Date: Sun, 23 Aug 2020 15:00:08 +0200
+Message-ID: <7071b368-3a42-282f-8308-584feef919a3@vivier.eu>
+Date: Sun, 23 Aug 2020 15:28:27 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200823101703.18451-1-carenas@gmail.com>
+In-Reply-To: <011ed14a-74d8-7145-3007-db7fce74ab7c@vivier.eu>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:X++bX0NxxqJboG1hWPf56YLSpdcGNJVYmmwn8WE+4ziwMcHIT/y
- C6q1FjwygxM/H0gMOzIx5HY3dibH30rMK/yTzM6px86wAsx72mR3NeIpmRGJZK/j+4XdrQy
- 0NYoZ3U0vewbwLI+96FZ+j4Mic+ZXsX++GfVKOj8GVDMtAWzwbKoDbbF7j+0dpmMx3a4sKz
- /CWLjecqyHhnWN5YfEUpA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:7G7ZlLgro2g=:HELLG4sxoLSIyg3t53qXXv
- KsxOr4Mf4a0DbLBPzmCYP0bQwSHe9FftMJ+rkDt9pAAzploRTtDwELbNl01awgGzObMf54pYb
- e73L4/D+IMzGplBlwiQcwgVn3u+0Hq2cgKxA9ea1ftmcT3XAFFNEc1DFdo4KWprv/3hScVFn/
- s67vd+hOiR2pBjpugcIFH5anVJ1kZav91e9k2T9xqqKrC9egC8Kg6JWIMfS1za0i07bzRNVz9
- 5Th8o96TOtxksORTQaaiwujA+SVj0nWKT+gFjny4NbNVgHyW9lm8RASb/7cXmGIVsi9EPNZ11
- 3aHYTtLtcGPn4e3EDT3HaoeSamwOvro9ZSRKp/yQlax7aRwpy2fad9I7PsjelVWRdfv1Xrnz9
- YbyJX1tWpCgJer0fFuSnKkOryVCyJZuLAQ2zXpDA6MsGv64DVQ5sPEjSbBObZvveRrQNGR25J
- Id9TgXG2Khs/EiKC2sYLJReqvn/BhIJ7mbahK6zgzS+e1HncmFW7f7LiMcsfFQFiP5leVrhSS
- JPc83/t+UtoFVqfly1j2e5Gzu6mkeBSt2bGD7upQVlpVn8htLf3La4WQZSlhJlM1ifdmCeLMY
- n90Wk/OVMsWRId23rXChOpsUbIoAQ3awD+O6qYZUVjjco4Phhp/DcSCI14gscLnF/2GwH+3Ys
- 5QGEvQm4GMoHkyh8YtfEibiZKAtiPLuZd5sUljor9ILPq2KGdLrJJVrLf/iSB4bFPXnrVvonl
- kpRRymkanRSBQfVZl+FMDt+i+Urn0p592Zm+GyQy34AweFCgfWNIQUdZykpTSdkeg38cpQYEc
- eApFJeNTOJqLAjJ2qDaen8V+b7UU4GWSApr0HavfeHQ6xWfcFE+27UKoKbNcb2SNxeIe8E5
-Received-SPF: none client-ip=212.227.126.133; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:LJToX0kbUMw2b4Q+GLZdsv4VjHeqiSHXW2zCyVJk9XRmUue6Bq1
+ u+U1SrhIfHUCwtN/84hf9SNztjGk5MVbFhKNBUThRamKC8knwYrme4bThM2EtZBkS1Am8hA
+ X0u+swtUuqdbBeEu2YFe+uQn603S5jpnq4Lp5Hg1wkNI4QtqYqiwPNNqiVe+0LzSPhLBKdr
+ l4In3vlq+w4SFE+/p3Otg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:YgfOdwhhW9k=:3G6bIsKGXRq+BcegKrmfG9
+ ZWCk+VFeGySDHs+XechvJLL9I5Q+c5rB/YTFrdTU7DQtsJZo6CcsxaFOV5VtIqvBy/QPLv2y+
+ QzgjV6RS8RmdA6S9OhcM6kVSn4EpeTq26EjnxXSabYvTqkJH3uqVjw+epLpv0SMLXFGEO44l9
+ a1ukOraAaaO/ay/J7YuF6IQ1z9MPMJq9E86Rx5GD43SACgkK7fHXKjurbXit3qhFiwq3BMBDm
+ 2VfTetNvOpCP0OJjdWcI/8/eO/kSs1+ReOgqBWDrvrJWp0wq2xSwPQqGBGS4UDg+r4bRnP12y
+ SHHuFSSR4dKyipcBKt8wiy+RJRM/+/BOHzZXcM2cvuZcnE5nCCylqz3px5kkrOEMiNWsARofY
+ 0GbkUGJ+/lVCYbNs1SvEF9ekE3h6IELJkcleSEgfCFYyjzW8/petVCqNC39MQdTZmiUdmubAc
+ G/4zaKZfVevkM8Ju+Df6KMSbetDhsu93uIoGOgZOEHaE0LaHgwVAcsbcD1FsylBou14RpjcCO
+ t5a3VbsrEyLY66bKTh26/FPChQd+BzQxb5UxO5mjMM3Xz3sAa0hZOnAa6RKcCir0raKaJNmrA
+ 6ClUCHvKIAR8raZ4KIz6wdNAc0dq0/U8favcIYn0qrJ91s3ofJgM6X3DgVAgdPQ2bPDlHiVvx
+ 7udbevAkFYYEf0+jW3n3B5hXOHZDHV+f8uKqnK8HuZJdYOgk+ayrORTvsi8pz29Thsqnd8xNt
+ dw+NPXGepDYyxLlRRsyJAbDJZ3pU3UDPaqqyin8RRoDrsReyaH3qTrIDcjTLXyICHsd6t0yc4
+ y2JugsQ9m/SyzSZ7nID2Rujs3e0//RkwpedJ7UxC/bmPPUSuxXggOgnXSiczFJ727wlr5Cy
+Received-SPF: none client-ip=212.227.126.131; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/23 09:00:12
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/23 09:28:29
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -32
 X-Spam_score: -3.3
@@ -129,75 +129,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: macro@linux-mips.org
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 23/08/2020 à 12:17, Carlo Marcelo Arenas Belón a écrit :
-> MIPS provides 2 ILP32 ABIs, and therefore 4 possible qemu-mips binaries
-> with 2 pairs using the same endianess and bitness.
+Le 21/08/2020 à 21:08, Laurent Vivier a écrit :
+> Le 21/08/2020 à 18:23, Peter Maydell a écrit :
+>> On Thu, 13 Aug 2020 at 07:51, Laurent Vivier <laurent@vivier.eu> wrote:
+>>>
+>>> The following changes since commit d0ed6a69d399ae193959225cdeaa9382746c91cc:
+>>>
+>>>   Update version for v5.1.0 release (2020-08-11 17:07:03 +0100)
+>>>
+>>> are available in the Git repository at:
+>>>
+>>>   git://github.com/vivier/qemu.git tags/linux-user-for-5.2-pull-request
+>>>
+>>> for you to fetch changes up to 04275cad60c8f99e0dd7f56aecda68ceac926da8:
+>>>
+>>>   linux-user: Fix 'utimensat()' implementation (2020-08-12 10:09:58 +0200)
+>>>
+>>> ----------------------------------------------------------------
+>>> Add btrfs ioctls
+>>> Add clock_getres_time64, timer_gettime64, timer_settime64,
+>>>     timerfd_gettime64, timerfd_settime64
+>>> Some fixes (page protection, print_fdset, timerspec, itimerspec)
+>>>
+>>> ----------------------------------------------------------------
+>>
+>> Fails to compile:
+>>
+>> ../../linux-user/syscall_types.h:407:28: error:
+>> ‘BTRFS_INO_LOOKUP_USER_PATH_MAX’ undeclared here (not in a function);
+>> did you mean ‘BTRFS_INO_LOOKUP_PATH_MAX’?
+>>         MK_ARRAY(TYPE_CHAR, BTRFS_INO_LOOKUP_USER_PATH_MAX)) /* path */
+>>                             ^
+>>
+>> ../../linux-user/syscall_types.h:451:17: error:
+>> ‘BTRFS_MAX_ROOTREF_BUFFER_NUM’ undeclared here (not in a function)
+>>                  BTRFS_MAX_ROOTREF_BUFFER_NUM), /* rootref */
+>>                  ^
+>>
+>> On PPC, even more errors, relating to not having
+>> BTRFS_PATH_NAME_MAX, PTRFS_VOL_NAME_MAX, etc.
+>>
+>> Not sure if this was a semantic conflict with the meson
+>> conversion, or just an assumption of a newer btrfs.h
+>> than some systems have.
 > 
-> This could lead to an O32 image loading in the N32 binary or vice versa
-> and in cryptic errors (if lucky that the CPU doesn't match the FPU used)
-> like :
+> Well, for me master is also broken (F32, linux-user only, static):
 > 
->   qemu: Unexpected FPU mode       (o32 ELF loaded to qemu-mipsn32[el])
->   ELF binary's NaN mode not supported by CPU    (n32 -> qemu-mips[el])
-> 
-> Add an ABI check macro that could be used while checking the ELF header
-> that relies in the ABI2 flag to identify n32 binaries and abort instead
-> early with a more descriptive error :
-> 
->   Invalid ELF image for this architecture
-> 
-> Signed-off-by: Carlo Marcelo Arenas Belón <carenas@gmail.com>
-> ---
-> Changes since v1:
-> - Use the provided definition from include/elf.h (per Laurent)
-> - Abort instead of warning (per Laurent, not using a custom error though)
-> - Expand the check to all other combinations (per Aleksandar)
-> 
->  linux-user/elfload.c | 11 +++++++++++
->  1 file changed, 11 insertions(+)
-> 
-> diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-> index fe9dfe795d..69936dcd45 100644
-> --- a/linux-user/elfload.c
-> +++ b/linux-user/elfload.c
-> @@ -918,6 +918,12 @@ static void elf_core_copy_regs(target_elf_gregset_t *regs, const CPUPPCState *en
->  
->  #define elf_check_arch(x) ((x) == EM_MIPS || (x) == EM_NANOMIPS)
->  
-> +#ifdef TARGET_ABI_MIPSN32
-> +#define elf_check_abi(x) ((x) & EF_MIPS_ABI2)
-> +#else
-> +#define elf_check_abi(x) (!((x) & EF_MIPS_ABI2))
-> +#endif
-> +
->  static inline void init_thread(struct target_pt_regs *regs,
->                                 struct image_info *infop)
->  {
-> @@ -1487,6 +1493,10 @@ static void elf_core_copy_regs(target_elf_gregset_t *regs,
->  #define elf_check_arch(x) ((x) == ELF_ARCH)
->  #endif
->  
-> +#ifndef elf_check_abi
-> +#define elf_check_abi(x) (1)
-> +#endif
-> +
->  #ifndef ELF_HWCAP
->  #define ELF_HWCAP 0
->  #endif
-> @@ -1644,6 +1654,7 @@ static bool elf_check_ident(struct elfhdr *ehdr)
->  static bool elf_check_ehdr(struct elfhdr *ehdr)
->  {
->      return (elf_check_arch(ehdr->e_machine)
-> +            && elf_check_abi(ehdr->e_flags)
->              && ehdr->e_ehsize == sizeof(struct elfhdr)
->              && ehdr->e_phentsize == sizeof(struct elf_phdr)
->              && (ehdr->e_type == ET_EXEC || ehdr->e_type == ET_DYN));
-> 
+> Compiling C object libqemuutil.a.p/util_compatfd.c.o
+> ../../../Projects/qemu/util/compatfd.c: In function 'qemu_signalfd':
+> ../../../Projects/qemu/util/compatfd.c:103:19: error: 'SYS_signalfd'
+> undeclared (first use in this function); did you mean 'SYS_signalfd4'?
+>   103 |     ret = syscall(SYS_signalfd, -1, mask, _NSIG / 8);
+>       |                   ^~~~~~~~~~~~
+>       |                   SYS_signalfd4
+> ../../../Projects/qemu/util/compatfd.c:103:19: note: each undeclared
+> identifier is reported only once for each function it appears in
 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+My build env was dirty and I had an asm/unistd.h that was not valid.
+
+Fixed now.
+
+Thanks,
+Laurent
+
 
