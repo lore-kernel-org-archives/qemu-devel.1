@@ -6,70 +6,73 @@ X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
 	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5553C433E1
-	for <qemu-devel@archiver.kernel.org>; Sun, 23 Aug 2020 10:46:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EECCCC433E1
+	for <qemu-devel@archiver.kernel.org>; Sun, 23 Aug 2020 10:48:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A36662072D
-	for <qemu-devel@archiver.kernel.org>; Sun, 23 Aug 2020 10:46:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B82B52072D
+	for <qemu-devel@archiver.kernel.org>; Sun, 23 Aug 2020 10:48:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="f7StqTjJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A36662072D
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="a4rFxelR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B82B52072D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33540 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36830 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k9nVx-0004qz-Rj
-	for qemu-devel@archiver.kernel.org; Sun, 23 Aug 2020 06:46:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39824)
+	id 1k9nY3-00061G-31
+	for qemu-devel@archiver.kernel.org; Sun, 23 Aug 2020 06:48:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40062)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1k9nV2-0004HZ-H7
- for qemu-devel@nongnu.org; Sun, 23 Aug 2020 06:45:20 -0400
-Received: from mail-ej1-x632.google.com ([2a00:1450:4864:20::632]:40901)
+ id 1k9nWf-0005Lq-Sp
+ for qemu-devel@nongnu.org; Sun, 23 Aug 2020 06:47:07 -0400
+Received: from mail-ed1-x52c.google.com ([2a00:1450:4864:20::52c]:44375)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1k9nUz-0006nd-H0
- for qemu-devel@nongnu.org; Sun, 23 Aug 2020 06:45:19 -0400
-Received: by mail-ej1-x632.google.com with SMTP id o18so8291937eje.7
- for <qemu-devel@nongnu.org>; Sun, 23 Aug 2020 03:45:17 -0700 (PDT)
+ id 1k9nWe-0006zi-77
+ for qemu-devel@nongnu.org; Sun, 23 Aug 2020 06:47:01 -0400
+Received: by mail-ed1-x52c.google.com with SMTP id l23so5545658edv.11
+ for <qemu-devel@nongnu.org>; Sun, 23 Aug 2020 03:46:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:from:date:message-id:subject:to;
- bh=ah7k9wLlHC4XGf2283AZ0zNpAcWRa/gMkDTTA/gVMNg=;
- b=f7StqTjJ2daqiRMz3NpymVHxRstW4eTkV89VIj62nAvPyd+0MCM4K+cGh501F3/MxA
- 0WEIWUYhM0b4ZMx/PZE/5884fNbu08Kc7LOdwU/3p0dOCc8iqibmsQ4c3/EmNI+LVuog
- JC7iCbAJ0sO6HFK9vkp05L/mkGSYHQXSl8uSzfNzgIBIJBsNjn1Z61AHgL91mTFSKj67
- XSH2SI1V8citiPyXz+Bc8XcNAGELebQmrWLr2yDAjD/UYd1pLvX0ONCoCpUwbhnOQc8Y
- Pv0S3BCBfnFKwoCTInnQWnjEqTxOwK9al8ezrg6gy1+vXLMr77ato4nRQtwLcyEl8ep2
- m5fw==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
+ bh=lkyhwDNnw7XZv6SYqjgm87YmPNWWjQPSa711ZWQL59o=;
+ b=a4rFxelRdgMUTZ8dr09znm0NVd778FQYj/oZ9/AKj0EzOrBfoKT1v1BnQWrJtS4/Se
+ NEGPhI5VrqjXoMY4Ose+l5ATh6TTJiS7JIGFDdfYbNmK3a3YO/rGCl0IwWLgmPWlZxmm
+ NnkxcUOBEVYRZAVWxWOtTmre8EjT68e/oT3oalzqLPEK+qv24x84B12ji6qRlY8pzzlR
+ ND9aLmuGWZz3mSGB2GsdBbWudF+EgYXBRhBn47X78Js/AYgA7eNbHLvdF39e8Zjs7TJp
+ 3cXpHoWNEF20eWh6ydJdY5P94oysoaMJmCVgzDVTumm0gtCVfwqgI2/6z9eyV7+EzHtC
+ DaLw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
- bh=ah7k9wLlHC4XGf2283AZ0zNpAcWRa/gMkDTTA/gVMNg=;
- b=TAU7U6Z8iQ6++z62JdcgMikUbgReeEPmIcsG47qxknz8634kHzGnUW6pBoJDthwesE
- lJzEhdPUeeEfI01FKdxIrdHHT/JEGZIw/2gslMsQqjGj/sSVETLh6gfrY5rFLY9KcqnN
- Jxv2Qkw7NE4nTtwyzmfiCbje5U4+rnHSkGWcysv0TMX6KU3zWWRAJQNlgtW6RPjhENfN
- 5NmDEyPG/qQMU2sBYet8FyTZB7z45ly4KdbsgZI1W9H5gqHVMAuLnCvtkGkPim9tybjw
- jju8/UaUSbcDnagGl0yhgtljAIpUlHwZhtUG8AZNbw/Jvz5W+0LSnGeLpj0XwXqwh5V7
- AVwg==
-X-Gm-Message-State: AOAM533g32wFcFbsT8k2n+f5Yw+mVhQr7UqmGHdx7uLttoee6A4Bxz6J
- U7ZMqT6YxEAZTAbEbDC43oLnbcvABMMozYGef/SIq279cYHDL19o
-X-Google-Smtp-Source: ABdhPJwpHW/gLjgBIDqRbRI6eVwmelWNjlMpbYA38AwVEb2VekFHciyX31xliYYCieSC8BGsqA2W39Z9d1QRWj8Voe0=
-X-Received: by 2002:a17:906:b814:: with SMTP id
- dv20mr1014662ejb.4.1598179515715; 
- Sun, 23 Aug 2020 03:45:15 -0700 (PDT)
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to;
+ bh=lkyhwDNnw7XZv6SYqjgm87YmPNWWjQPSa711ZWQL59o=;
+ b=SKXOJHIRZ5gbk6DO74a24BCR7UXxizSIPqLCE9pmUmUJWVPjzlF+xYm0KwlW9kUNha
+ X36OQt7L5TO0pRNMVl18YYtKbNPcZCxju2lJVdBaMaZUHyYjOrA6/pRWxqs2QtpMem1L
+ KfKQiPPaBc14C4TOmZM9snjUmo/pREN/2PG2/38if1uW3EqDd76mjFGXBwGIi+PZPI0l
+ Lsc6bj+xL60cF5AwvLAVUtZxGCXIaaSpqV7r9PlW6XJBwkC+ykA5itGL3rQghe5WGQA6
+ NJxAeNq3mkGhyr0cIrXPfO+o/6PxYIn4nmOlj0RPIgIDEmYNtNMkkOTBAQMCRQYk3QgE
+ CFQA==
+X-Gm-Message-State: AOAM531RISYbulZ82/3/9xx1IN1dP0PmPAKKfUZH99FAsy9vrFXVFB1S
+ j9LS8D6elAtvn8c1zfCQAbSXTLFUkpzqJ6loqDXCdtSZpiNSuQ==
+X-Google-Smtp-Source: ABdhPJxj+9T2JkyZhq9HrjZnFrq4ohuF0JnyfZvY99S9pQf18Y9R0h+33Qj0ZbX7SaxFnmZv/0EjiT+r/eEcjzEjURE=
+X-Received: by 2002:a05:6402:8cb:: with SMTP id
+ d11mr940109edz.100.1598179618575; 
+ Sun, 23 Aug 2020 03:46:58 -0700 (PDT)
 MIME-Version: 1.0
+References: <CAFEAcA-dDW27t7VcV5D=01ckBOD5oerr1XK0an7BemORdyQHHA@mail.gmail.com>
+In-Reply-To: <CAFEAcA-dDW27t7VcV5D=01ckBOD5oerr1XK0an7BemORdyQHHA@mail.gmail.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sun, 23 Aug 2020 11:45:04 +0100
-Message-ID: <CAFEAcA-dDW27t7VcV5D=01ckBOD5oerr1XK0an7BemORdyQHHA@mail.gmail.com>
-Subject: odd meson failure: Unknown variable "exe_name"
+Date: Sun, 23 Aug 2020 11:46:47 +0100
+Message-ID: <CAFEAcA-SmcO2ENZyXpPxxkqwybXP8=m5DXpeqkKw9PdaGnbm0g@mail.gmail.com>
+Subject: Re: odd meson failure: Unknown variable "exe_name"
 To: QEMU Developers <qemu-devel@nongnu.org>,
  Paolo Bonzini <pbonzini@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::632;
- envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x632.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::52c;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x52c.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -95,37 +98,41 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On my x86-64 Linux box, one of my local build trees turned out not
-to work:
+On Sun, 23 Aug 2020 at 11:45, Peter Maydell <peter.maydell@linaro.org> wrote:
+>
+> On my x86-64 Linux box, one of my local build trees turned out not
+> to work:
+>
+> $ rm -rf build/x86 && mkdir build/x86 && (cd build/x86 &&
+> '../../configure'
+> '--target-list=arm-softmmu,aarch64-softmmu,arm-linux-user,aarch64-linux-user'
+> '--enable-debug' '--cc=ccache gcc' '--audio-drv-list=pa'
+> '--with-pkgversion=pm215' '--enable-trace-backends=log,dtrace'
+> '--enable-docs')
+>
+> fails with
+> [...]
+> Program keycodemapdb/tools/keymap-gen found: YES
+> Program scripts/decodetree.py found: YES
+> Program ../scripts/modules/module_block.py found: YES
+> Program nm found: YES
+> Program scripts/undefsym.sh found: YES
+> Program scripts/feature_to_c.sh found: YES
+>
+> ../../meson.build:1030:14: ERROR: Unknown variable "exe_name".
+>
+> A full log can be found at
+> /home/petmay01/linaro/qemu-from-laptop/qemu/build/x86/meson-logs/meson-log.txt
+>
+> ERROR: meson setup failed
+>
+>
+> This is the same box that's worked fine for merge testing, so
+> presumably something about the particular set of configure
+> options is tripping it up.
 
-$ rm -rf build/x86 && mkdir build/x86 && (cd build/x86 &&
-'../../configure'
-'--target-list=arm-softmmu,aarch64-softmmu,arm-linux-user,aarch64-linux-user'
-'--enable-debug' '--cc=ccache gcc' '--audio-drv-list=pa'
-'--with-pkgversion=pm215' '--enable-trace-backends=log,dtrace'
-'--enable-docs')
+Dropping the '--enable-trace-backends=...' option lets it pass,
+so that's the area where the problem is.
 
-fails with
-[...]
-Program keycodemapdb/tools/keymap-gen found: YES
-Program scripts/decodetree.py found: YES
-Program ../scripts/modules/module_block.py found: YES
-Program nm found: YES
-Program scripts/undefsym.sh found: YES
-Program scripts/feature_to_c.sh found: YES
-
-../../meson.build:1030:14: ERROR: Unknown variable "exe_name".
-
-A full log can be found at
-/home/petmay01/linaro/qemu-from-laptop/qemu/build/x86/meson-logs/meson-log.txt
-
-ERROR: meson setup failed
-
-
-This is the same box that's worked fine for merge testing, so
-presumably something about the particular set of configure
-options is tripping it up.
-
-thanks
 -- PMM
 
