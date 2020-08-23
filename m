@@ -2,75 +2,58 @@ Return-Path: <SRS0=gE17=CB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=BAYES_00,HK_RANDOM_FROM,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39E6EC433DF
-	for <qemu-devel@archiver.kernel.org>; Sun, 23 Aug 2020 22:17:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AF96C433E1
+	for <qemu-devel@archiver.kernel.org>; Sun, 23 Aug 2020 22:59:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0E61A2067C
-	for <qemu-devel@archiver.kernel.org>; Sun, 23 Aug 2020 22:17:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E61A2067C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=fromorbit.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6F8D6206BE
+	for <qemu-devel@archiver.kernel.org>; Sun, 23 Aug 2020 22:59:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F8D6206BE
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33388 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38522 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k9yJB-0006Ze-Cq
-	for qemu-devel@archiver.kernel.org; Sun, 23 Aug 2020 18:17:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34492)
+	id 1k9yxO-0002st-MQ
+	for qemu-devel@archiver.kernel.org; Sun, 23 Aug 2020 18:59:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40238)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <david@fromorbit.com>)
- id 1k9yIP-000627-Iw; Sun, 23 Aug 2020 18:17:01 -0400
-Received: from mail106.syd.optusnet.com.au ([211.29.132.42]:47587)
- by eggs.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@fromorbit.com>)
- id 1k9yIN-0004k7-1Y; Sun, 23 Aug 2020 18:17:01 -0400
-Received: from dread.disaster.area (pa49-181-146-199.pa.nsw.optusnet.com.au
- [49.181.146.199])
- by mail106.syd.optusnet.com.au (Postfix) with ESMTPS id BC32C6AC639;
- Mon, 24 Aug 2020 08:16:45 +1000 (AEST)
-Received: from dave by dread.disaster.area with local (Exim 4.92.3)
- (envelope-from <david@fromorbit.com>)
- id 1k9yI8-0000XT-LS; Mon, 24 Aug 2020 08:16:44 +1000
-Date: Mon, 24 Aug 2020 08:16:44 +1000
-From: Dave Chinner <david@fromorbit.com>
-To: Brian Foster <bfoster@redhat.com>
-Subject: Re: [PATCH 0/1] qcow2: Skip copy-on-write when allocating a zero
- cluster
-Message-ID: <20200823221644.GI7941@dread.disaster.area>
-References: <w518sedz3td.fsf@maestria.local.igalia.com>
- <20200817155307.GS11402@linux.fritz.box>
- <w51pn7memr7.fsf@maestria.local.igalia.com>
- <20200819150711.GE10272@linux.fritz.box>
- <20200819175300.GA141399@bfoster>
- <w51v9hdultt.fsf@maestria.local.igalia.com>
- <20200820215811.GC7941@dread.disaster.area>
- <20200821110506.GB212879@bfoster>
- <w51364gjkcj.fsf@maestria.local.igalia.com>
- <20200821125944.GC212879@bfoster>
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1k9ywi-0002Mx-HR
+ for qemu-devel@nongnu.org; Sun, 23 Aug 2020 18:58:40 -0400
+Received: from relay64.bu.edu ([128.197.228.104]:46726)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1k9ywg-0000Dx-1D
+ for qemu-devel@nongnu.org; Sun, 23 Aug 2020 18:58:39 -0400
+X-Envelope-From: alxndr@bu.edu
+X-BU-AUTH: mozz.bu.edu [128.197.127.33]
+Received: from BU-AUTH (localhost.localdomain [127.0.0.1]) (authenticated
+ bits=0)
+ by relay64.bu.edu (8.14.3/8.14.3) with ESMTP id 07NMw4Qa005932
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+ Sun, 23 Aug 2020 18:58:09 -0400
+Date: Sun, 23 Aug 2020 18:58:04 -0400
+From: Alexander Bulekov <alxndr@bu.edu>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: [Fwd] Issue 25164 in oss-fuzz: qemu: Fuzzing build failure
+Message-ID: <20200823225804.umk5gh6knptqo5mw@mozz.bu.edu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200821125944.GC212879@bfoster>
-X-Optus-CM-Score: 0
-X-Optus-CM-Analysis: v=2.3 cv=LPwYv6e9 c=1 sm=1 tr=0 cx=a_idp_d
- a=GorAHYkI+xOargNMzM6qxQ==:117 a=GorAHYkI+xOargNMzM6qxQ==:17
- a=kj9zAlcOel0A:10 a=y4yBn9ojGxQA:10 a=20KFwNOVAAAA:8 a=7-415B0cAAAA:8
- a=Yn-qdE-4gtgSY-Nu0ZIA:9 a=CjuIK1q_8ugA:10 a=biEYGPWJfzWAr4FL6Ov7:22
-Received-SPF: none client-ip=211.29.132.42; envelope-from=david@fromorbit.com;
- helo=mail106.syd.optusnet.com.au
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/23 18:16:54
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10
-X-Spam_score_int: -8
-X-Spam_score: -0.9
-X-Spam_bar: /
-X-Spam_report: (-0.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_BL=0.01, RCVD_IN_MSPIKE_L4=1.7, SPF_HELO_PASS=-0.001,
- SPF_NONE=0.001 autolearn=no autolearn_force=no
+Received-SPF: pass client-ip=128.197.228.104; envelope-from=alxndr@bu.edu;
+ helo=relay64.bu.edu
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/23 18:58:35
+X-ACL-Warn: Detected OS   = Linux 2.6.x
+X-Spam_score_int: -31
+X-Spam_score: -3.2
+X-Spam_bar: ---
+X-Spam_report: (-3.2 / 5.0 requ) BAYES_00=-1.9, HK_RANDOM_ENVFROM=0.001,
+ HK_RANDOM_FROM=0.999, RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -83,92 +66,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
- linux-xfs@vger.kernel.org
+Cc: Darren Kenny <darren.kenny@oracle.com>, Bandan Das <bsd@redhat.com>,
+ qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Aug 21, 2020 at 08:59:44AM -0400, Brian Foster wrote:
-> On Fri, Aug 21, 2020 at 01:42:52PM +0200, Alberto Garcia wrote:
-> > On Fri 21 Aug 2020 01:05:06 PM CEST, Brian Foster <bfoster@redhat.com> wrote:
-> > And yes, (4) is a bit slower than (1) in my tests. On ext4 I get 10%
-> > more IOPS.
-> > 
-> > I just ran the tests with aio=native and with a raw image instead of
-> > qcow2, here are the results:
-> > 
-> > qcow2:
-> > |----------------------+-------------+------------|
-> > | preallocation        | aio=threads | aio=native |
-> > |----------------------+-------------+------------|
-> > | off                  |        8139 |       7649 |
-> > | off (w/o ZERO_RANGE) |        2965 |       2779 |
-> > | metadata             |        7768 |       8265 |
-> > | falloc               |        7742 |       7956 |
-> > | full                 |       41389 |      56668 |
-> > |----------------------+-------------+------------|
-> > 
-> 
-> So this seems like Dave's suggestion to use native aio produced more
-> predictable results with full file prealloc being a bit faster than per
-> cluster prealloc. Not sure why that isn't the case with aio=threads. I
+Hi Paolo,
+Our oss-fuzz builds started failing, after the meson merge. I think I
+tracked down the issues:
+1.) Looking at the build-log here:
+https://oss-fuzz-build-logs.storage.googleapis.com/log-d43d402c-1ce5-4422-b3db-ccbf83a862a0.txt
+The error happens at link-time. Re-running the build with V=1:
+"/usr/bin/ld" ...
+--whole-archive /usr/local/lib/clang/12.0.0/.../libclang_rt.asan-x86_64.a \
+--start-group ..... -T /src/qemu/tests/qtest/fuzz/fork_fuzz.ld  \
+-wrap qtest_inb -wrap qtest_inw ..... --end-group .....
 
-That will the context switch overhead with aio=threads becoming a
-performance limiting factor at higher IOPS. The "full" workload
-there is probably running at 80-120k context switches/s while the
-aio=native if probably under 10k ctxsw/s because it doesn't switch
-threads for every IO that has to be submitted/completed.
+I compared this against what we had before meson, and noticed that the
+start-group/end-group are new. Removing those manually from the link
+command, I can link successfully. It looks like these linker groups are
+something that meson controls. Is there something we can tweak to make
+the fork_fuzz.ld linker script apply to all the objects?
 
-For all the other results, I'd consider the difference to be noise -
-it's just not significant enough to draw any conclusions from at
-all.
+2.) 77afc75f69 ("oss-fuzz/build: remove LIB_FUZZING_ENGINE")
 
-FWIW, the other thing that aio=native gives us is plugging across
-batch IO submission. This allows bio merging before dispatch and
-that can greatly increase performance of AIO when the IO being
-submitted has some mergable submissions. That's not the case for
-pure random IO like this, but there are relatively few pure random
-IO workloads out there... :P
+On oss-fuzz, we cannot explicitly specify fsanitize=fuzzer: We have to
+leverage the $CC $CXX $CFLAGS $CXXFLAGS $LIB_FUZZING_ENGINE from
+oss-fuzz. That was the reason for the "make CONFIG_FUZZ CFLAGS" trickery
+in the original build script.
 
-> was wondering if perhaps the threading affects something indirectly like
-> the qcow2 metadata allocation itself, but I guess that would be
-> inconsistent with ext4 showing a notable jump from (1) to (4) (assuming
-> the previous ext4 numbers were with aio=threads).
+Details:
+https://google.github.io/oss-fuzz/getting-started/new-project-guide/#Requirements
 
-> > raw:
-> > |---------------+-------------+------------|
-> > | preallocation | aio=threads | aio=native |
-> > |---------------+-------------+------------|
-> > | off           |        7647 |       7928 |
-> > | falloc        |        7662 |       7856 |
-> > | full          |       45224 |      58627 |
-> > |---------------+-------------+------------|
-> > 
-> > A qcow2 file with preallocation=metadata is more or less similar to a
-> > sparse raw file (and the numbers are indeed similar).
-> > 
-> > preallocation=off on qcow2 does not have an equivalent on raw files.
-> > 
-> 
-> It sounds like preallocation=off for qcow2 would be roughly equivalent
-> to a raw file with a 64k extent size hint (on XFS).
+To work around this, I think we can create separate configure options
+--enable-oss-fuzz and --oss-fuzz-cflags and CONFIG_OSS_FUZZ. In meson we
+create a new "source-set" specific_oss_fuzz_ss which is identical to
+specific_fuzz_ss, except it does not depend on "-fsanitize=fuzzer",
+which is specified in tests/qtest/fuzz/meson.build
 
-Yes, the effect should be close to identical, the only difference is
-that qcow2 adds new clusters to the end of the file (i.e. the file
-itself is not sparse), while the extent size hint will just add 64kB
-extents into the file around the write offset. That demonstrates the
-other behavioural advantage that extent size hints have is they
-avoid needing to extend the file, which is yet another way to
-serialise concurrent IO and create IO pipeline stalls...
+I've been working on patches to do (2) but I don't know how to fix (1).
+Do you have any ideas?
 
-Cheers,
+-Alex
 
-Dave.
+----- Forwarded message from ClusterFuzz-External via monorail <monorail+v2.382749006@chromium.org> -----
+
+Date: Sun, 23 Aug 2020 03:10:14 -0700
+From: ClusterFuzz-External via monorail <monorail+v2.382749006@chromium.org>
+To: alxndr@bu.edu
+Subject: Issue 25164 in oss-fuzz: qemu: Fuzzing build failure
+
+Status: New
+Owner: ----
+CC: b...@redhat.com, stefa...@redhat.com, alx...@bu.edu, pbonz...@redhat.com, darren.k...@oracle.com 
+Labels: Proj-qemu
+Type: Build-Failure
+
+New issue 25164 by ClusterFuzz-External: qemu: Fuzzing build failure
+https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=25164
+
+The last 2 builds for qemu have been failing.
+Build log: https://oss-fuzz-build-logs.storage.googleapis.com/log-d43d402c-1ce5-4422-b3db-ccbf83a862a0.txt
+Build type: fuzzing
+
+To reproduce locally, please see: https://google.github.io/oss-fuzz/advanced-topics/reproducing#reproducing-build-failures
+
+This bug tracker is not being monitored by OSS-Fuzz team. If you have any questions, please create an issue at https://github.com/google/oss-fuzz/issues/new.
+
+**This bug will be automatically closed within a day once it is fixed.**
+
 -- 
-Dave Chinner
-david@fromorbit.com
+You received this message because:
+  1. You were specifically CC'd on the issue
+
+You may adjust your notification preferences at:
+https://bugs.chromium.org/hosting/settings
+
+Reply to this email to add a comment.
+
+----- End forwarded message -----
 
