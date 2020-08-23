@@ -2,84 +2,89 @@ Return-Path: <SRS0=gE17=CB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4ABF8C433DF
-	for <qemu-devel@archiver.kernel.org>; Sun, 23 Aug 2020 09:09:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 550C6C433DF
+	for <qemu-devel@archiver.kernel.org>; Sun, 23 Aug 2020 10:18:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 13F6F2072D
-	for <qemu-devel@archiver.kernel.org>; Sun, 23 Aug 2020 09:09:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1D8372075B
+	for <qemu-devel@archiver.kernel.org>; Sun, 23 Aug 2020 10:18:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=yadro.com header.i=@yadro.com header.b="WfUdZXVC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13F6F2072D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yadro.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YRwMaKI6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D8372075B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39250 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46742 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k9m0Y-0006LL-Ab
-	for qemu-devel@archiver.kernel.org; Sun, 23 Aug 2020 05:09:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54602)
+	id 1k9n4q-0005E9-7l
+	for qemu-devel@archiver.kernel.org; Sun, 23 Aug 2020 06:18:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35320)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
- id 1k9m03-0005wD-0H
- for qemu-devel@nongnu.org; Sun, 23 Aug 2020 05:09:15 -0400
-Received: from mta-02.yadro.com ([89.207.88.252]:51086 helo=mta-01.yadro.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
- id 1k9m00-0005YD-PH
- for qemu-devel@nongnu.org; Sun, 23 Aug 2020 05:09:14 -0400
-Received: from localhost (unknown [127.0.0.1])
- by mta-01.yadro.com (Postfix) with ESMTP id 7D52F542D0;
- Sun, 23 Aug 2020 09:09:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=yadro.com; h=
- content-transfer-encoding:content-type:content-type:mime-version
- :x-mailer:message-id:date:date:subject:subject:from:from
- :received:received:received; s=mta-01; t=1598173747; x=
- 1599988148; bh=wJ/2K3BgspuKgRFRYh1Qy4lgv1AI8fXCEnnDDkxSlOE=; b=W
- fUdZXVCfwsOEXH4zz9VoMEaaOEDRZ9t8vqh+dOKa9VdUIzgQ7HTqLhQJink/I+5X
- vQJFT/SRWxUatOHEeB1JvJ2blLnGeBOZdihItph+VYTjvdYZ/K8NX+rq2im/v7s2
- /M9DmyIgvtRuxHUDjcY3x1TF+TIeNItQZFAsvqDnUk=
-X-Virus-Scanned: amavisd-new at yadro.com
-Received: from mta-01.yadro.com ([127.0.0.1])
- by localhost (mta-01.yadro.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id cWVQZWiL9xVp; Sun, 23 Aug 2020 12:09:07 +0300 (MSK)
-Received: from T-EXCH-02.corp.yadro.com (t-exch-02.corp.yadro.com
- [172.17.10.102])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
- (No client certificate requested)
- by mta-01.yadro.com (Postfix) with ESMTPS id BD43453929;
- Sun, 23 Aug 2020 12:09:07 +0300 (MSK)
-Received: from localhost (10.199.0.58) by T-EXCH-02.corp.yadro.com
- (172.17.10.102) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P384) id 15.1.669.32; Sun, 23
- Aug 2020 12:09:07 +0300
-From: Roman Bolshakov <r.bolshakov@yadro.com>
-To: <qemu-devel@nongnu.org>
-Subject: [PATCH] meson: Don't make object files for dtrace on macOS
-Date: Sun, 23 Aug 2020 12:05:47 +0300
-Message-ID: <20200823090546.47957-1-r.bolshakov@yadro.com>
-X-Mailer: git-send-email 2.24.3 (Apple Git-128)
+ (Exim 4.90_1) (envelope-from <carenas@gmail.com>) id 1k9n3v-0004nU-IG
+ for qemu-devel@nongnu.org; Sun, 23 Aug 2020 06:17:19 -0400
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:39681)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <carenas@gmail.com>) id 1k9n3t-0003dV-W7
+ for qemu-devel@nongnu.org; Sun, 23 Aug 2020 06:17:19 -0400
+Received: by mail-pg1-x541.google.com with SMTP id v15so3123398pgh.6
+ for <qemu-devel@nongnu.org>; Sun, 23 Aug 2020 03:17:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=8XRPxZgxcWrPRhkolFPduV39pLKjLxVh0HTpBwB7nAU=;
+ b=YRwMaKI6MtXzF60uoaRZWzwXxeLiQDqLDEmnGrVRLs3zsXOqH0MNaYa3DvaOe8s6W2
+ zfQHsIs6R9RL1qDFAityi2yj/0m/XlX8GEfNaveJQHdV96Rr5S+C+O5B3SeoH7RVSb0E
+ /IMbUo69Jd1pCzCtftpbv18d2V9xaDWPiJvKqhr/LNrpn11jmiyoR+ahICVnLIvg+pCF
+ 3DJD2gBHUOwkdxARUZxqVaRkwo5/IAbwzce7ho6egdhBtKPYwiU6GHCHjpUFQBhrVLbj
+ O6l1oGE9jspAJmRtFmGDAA+vQjTLHn+7VB2GxoFTVj2wQcLeTFYQm9cKC63LKC/xAR9W
+ cVtg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=8XRPxZgxcWrPRhkolFPduV39pLKjLxVh0HTpBwB7nAU=;
+ b=fhd1ZwXNDpXUUlo0jcbTITvSrTyuvUm91cxNgtn98/BmN+CjL+Cg2COtNztvqIPbnv
+ XJ+FM44UcsOOOqeCdm6gokAdz2fXQ9tkNKgjGxzQ3+RIMsv0wsM4M/aPQQdMh7qeZSqj
+ rd1PDOEbc6jt0fJnyYD9FJVc5Jv7YmpzAFjszbNjdbuqkttTl872K3kDv3D9ws5Fd6bf
+ BxC0mA2zmwSyl866FpY1zgn+/tCklGL+vlV2bPR8SVHr6rlfX0Phy6YpZUqONXbq904Q
+ Jfk2sNtgbFEz/QgxFqWqmFu0JIyuPM780UHKX8wb0IS2ELWqynviN3HYp122v6QgXTR2
+ zI8Q==
+X-Gm-Message-State: AOAM532bt7WPqXijqoinU+HyN1oLEVTmyhhSB7z7J28xYBuzDU8Effru
+ zL3qSolNn2GvZGYp5ZdZehqr1JmZCEI=
+X-Google-Smtp-Source: ABdhPJxjld0OyFr+AyHGo9oHZv2LKsmDVdE9ZpIJCLkICu8A1f3SohuSFr56UGAlwBGCLUPsS1c4Dg==
+X-Received: by 2002:a63:eb58:: with SMTP id b24mr486169pgk.174.1598177835764; 
+ Sun, 23 Aug 2020 03:17:15 -0700 (PDT)
+Received: from localhost.localdomain (c-67-188-192-166.hsd1.ca.comcast.net.
+ [67.188.192.166])
+ by smtp.gmail.com with ESMTPSA id j4sm6528617pgf.8.2020.08.23.03.17.13
+ (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+ Sun, 23 Aug 2020 03:17:14 -0700 (PDT)
+From: =?UTF-8?q?Carlo=20Marcelo=20Arenas=20Bel=C3=B3n?= <carenas@gmail.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2] linux-user: detect mismatched ELF ABI in qemu-mips[n32][el]
+Date: Sun, 23 Aug 2020 03:17:03 -0700
+Message-Id: <20200823101703.18451-1-carenas@gmail.com>
+X-Mailer: git-send-email 2.28.0.424.gade71fd49b
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.199.0.58]
-X-ClientProxiedBy: T-EXCH-01.corp.yadro.com (172.17.10.101) To
- T-EXCH-02.corp.yadro.com (172.17.10.102)
-Received-SPF: pass client-ip=89.207.88.252; envelope-from=r.bolshakov@yadro.com;
- helo=mta-01.yadro.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/23 05:09:10
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+Received-SPF: pass client-ip=2607:f8b0:4864:20::541;
+ envelope-from=carenas@gmail.com; helo=mail-pg1-x541.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -93,58 +98,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Roman Bolshakov <r.bolshakov@yadro.com>,
- =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Cameron Esfahani <dirty@apple.com>
+Cc: =?UTF-8?q?Carlo=20Marcelo=20Arenas=20Bel=C3=B3n?= <carenas@gmail.com>,
+ laurent@vivier.eu, macro@linux-mips.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-dtrace on macOS uses unresolved symbols with a special prefix to define
-probes [1], only headers should be generated for USDT (dtrace(1)). But
-it doesn't support backwards compatible no-op -G flag [2] and implicit
-build rules fail.
+MIPS provides 2 ILP32 ABIs, and therefore 4 possible qemu-mips binaries
+with 2 pairs using the same endianess and bitness.
 
-1. https://markmail.org/message/6grq2ygr5nwdwsnb
-2. https://markmail.org/message/5xrxt2w5m42nojkz
+This could lead to an O32 image loading in the N32 binary or vice versa
+and in cryptic errors (if lucky that the CPU doesn't match the FPU used)
+like :
 
-Cc: Daniel P. Berrangé <berrange@redhat.com>
-Cc: Cameron Esfahani <dirty@apple.com>
-Signed-off-by: Roman Bolshakov <r.bolshakov@yadro.com>
+  qemu: Unexpected FPU mode       (o32 ELF loaded to qemu-mipsn32[el])
+  ELF binary's NaN mode not supported by CPU    (n32 -> qemu-mips[el])
+
+Add an ABI check macro that could be used while checking the ELF header
+that relies in the ABI2 flag to identify n32 binaries and abort instead
+early with a more descriptive error :
+
+  Invalid ELF image for this architecture
+
+Signed-off-by: Carlo Marcelo Arenas Belón <carenas@gmail.com>
 ---
- trace/meson.build | 13 ++++++++-----
- 1 file changed, 8 insertions(+), 5 deletions(-)
+Changes since v1:
+- Use the provided definition from include/elf.h (per Laurent)
+- Abort instead of warning (per Laurent, not using a custom error though)
+- Expand the check to all other combinations (per Aleksandar)
 
-This is an update of the previous patch that is no longer valid due to
-conversion of the build system to meson:
-https://lists.gnu.org/archive/html/qemu-devel/2020-08/msg02493.html
+ linux-user/elfload.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/trace/meson.build b/trace/meson.build
-index 56e870848e..1c1fb31a61 100644
---- a/trace/meson.build
-+++ b/trace/meson.build
-@@ -39,12 +39,15 @@ foreach dir : [ '.' ] + trace_events_subdirs
-                                    output: fmt.format('trace-dtrace', 'h'),
-                                    input: trace_dtrace,
-                                    command: [ 'dtrace', '-o', '@OUTPUT@', '-h', '-s', '@INPUT@' ])
--    trace_dtrace_o = custom_target(fmt.format('trace-dtrace', 'o'),
--                                   output: fmt.format('trace-dtrace', 'o'),
--                                   input: trace_dtrace,
--                                   command: [ 'dtrace', '-o', '@OUTPUT@', '-G', '-s', '@INPUT@' ])
-+    trace_ss.add(trace_dtrace_h)
-+    if host_machine.system() != 'darwin'
-+      trace_dtrace_o = custom_target(fmt.format('trace-dtrace', 'o'),
-+                                     output: fmt.format('trace-dtrace', 'o'),
-+                                     input: trace_dtrace,
-+                                     command: [ 'dtrace', '-o', '@OUTPUT@', '-G', '-s', '@INPUT@' ])
-+      trace_ss.add(trace_dtrace_o)
-+    endif
+diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+index fe9dfe795d..69936dcd45 100644
+--- a/linux-user/elfload.c
++++ b/linux-user/elfload.c
+@@ -918,6 +918,12 @@ static void elf_core_copy_regs(target_elf_gregset_t *regs, const CPUPPCState *en
  
--    trace_ss.add(trace_dtrace_h, trace_dtrace_o)
-     genh += trace_dtrace_h
-   endif
- endforeach
+ #define elf_check_arch(x) ((x) == EM_MIPS || (x) == EM_NANOMIPS)
+ 
++#ifdef TARGET_ABI_MIPSN32
++#define elf_check_abi(x) ((x) & EF_MIPS_ABI2)
++#else
++#define elf_check_abi(x) (!((x) & EF_MIPS_ABI2))
++#endif
++
+ static inline void init_thread(struct target_pt_regs *regs,
+                                struct image_info *infop)
+ {
+@@ -1487,6 +1493,10 @@ static void elf_core_copy_regs(target_elf_gregset_t *regs,
+ #define elf_check_arch(x) ((x) == ELF_ARCH)
+ #endif
+ 
++#ifndef elf_check_abi
++#define elf_check_abi(x) (1)
++#endif
++
+ #ifndef ELF_HWCAP
+ #define ELF_HWCAP 0
+ #endif
+@@ -1644,6 +1654,7 @@ static bool elf_check_ident(struct elfhdr *ehdr)
+ static bool elf_check_ehdr(struct elfhdr *ehdr)
+ {
+     return (elf_check_arch(ehdr->e_machine)
++            && elf_check_abi(ehdr->e_flags)
+             && ehdr->e_ehsize == sizeof(struct elfhdr)
+             && ehdr->e_phentsize == sizeof(struct elf_phdr)
+             && (ehdr->e_type == ET_EXEC || ehdr->e_type == ET_DYN));
 -- 
-2.24.3 (Apple Git-128)
+2.28.0.424.gade71fd49b
 
 
