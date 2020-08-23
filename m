@@ -2,86 +2,121 @@ Return-Path: <SRS0=gE17=CB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 369C4C433DF
-	for <qemu-devel@archiver.kernel.org>; Sun, 23 Aug 2020 11:22:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19290C433DF
+	for <qemu-devel@archiver.kernel.org>; Sun, 23 Aug 2020 13:01:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0061D2067C
-	for <qemu-devel@archiver.kernel.org>; Sun, 23 Aug 2020 11:22:27 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PEQigziq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0061D2067C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id D79FD2075B
+	for <qemu-devel@archiver.kernel.org>; Sun, 23 Aug 2020 13:01:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D79FD2075B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40998 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35120 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k9o4x-0004Ae-Ab
-	for qemu-devel@archiver.kernel.org; Sun, 23 Aug 2020 07:22:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45258)
+	id 1k9pcR-00036y-3Q
+	for qemu-devel@archiver.kernel.org; Sun, 23 Aug 2020 09:01:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32846)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1k9o19-0006ez-1K
- for qemu-devel@nongnu.org; Sun, 23 Aug 2020 07:18:31 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:51773)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1k9o17-0001hC-2j
- for qemu-devel@nongnu.org; Sun, 23 Aug 2020 07:18:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598181507;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=9jlBntRQUDknjqmzNuiWq8N4SPo7Ep0kpN6/oTS5vbE=;
- b=PEQigziqhExNvkfswuj7DLZ8QuIF7sP+Qw4k9cOofrToe9UQ1bmtWigfiImtL1mMqrCcdQ
- cTZnUYySOYdhiaiAVtGUVbqXrPbaT/mNKDUALamXcpxs27jX1d6oXg/hWMjzJYtsxQZl9l
- QjO7obMk3Tvs2JRrrZ5Sn3IqtQdprRg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-576-weR9322ZMv-Idm98PTYD1A-1; Sun, 23 Aug 2020 07:18:26 -0400
-X-MC-Unique: weR9322ZMv-Idm98PTYD1A-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C0E1B8030D7;
- Sun, 23 Aug 2020 11:18:24 +0000 (UTC)
-Received: from thuth.com (ovpn-112-57.ams2.redhat.com [10.36.112.57])
- by smtp.corp.redhat.com (Postfix) with ESMTP id EA4467E684;
- Sun, 23 Aug 2020 11:18:19 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-To: qemu-devel@nongnu.org,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: [PATCH v2 7/7] gitlab-ci: Add cross-compiling build tests
-Date: Sun, 23 Aug 2020 13:17:57 +0200
-Message-Id: <20200823111757.72002-8-thuth@redhat.com>
-In-Reply-To: <20200823111757.72002-1-thuth@redhat.com>
-References: <20200823111757.72002-1-thuth@redhat.com>
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1k9pbc-0002Vg-GN
+ for qemu-devel@nongnu.org; Sun, 23 Aug 2020 09:00:16 -0400
+Received: from mout.kundenserver.de ([212.227.126.133]:46963)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1k9pba-0003Sw-FM
+ for qemu-devel@nongnu.org; Sun, 23 Aug 2020 09:00:16 -0400
+Received: from [192.168.100.1] ([82.252.135.186]) by mrelayeu.kundenserver.de
+ (mreue012 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1MnFps-1kt2KM2q3g-00jJFk; Sun, 23 Aug 2020 15:00:11 +0200
+Subject: Re: [PATCH v2] linux-user: detect mismatched ELF ABI in
+ qemu-mips[n32][el]
+To: =?UTF-8?Q?Carlo_Marcelo_Arenas_Bel=c3=b3n?= <carenas@gmail.com>,
+ qemu-devel@nongnu.org
+References: <20200823101703.18451-1-carenas@gmail.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <dc73ce82-df23-d3c8-7b33-03dbbb7fc792@vivier.eu>
+Date: Sun, 23 Aug 2020 15:00:08 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20200823101703.18451-1-carenas@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: fr
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=thuth@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/23 06:26:26
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
-X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.959,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Provags-ID: V03:K1:X++bX0NxxqJboG1hWPf56YLSpdcGNJVYmmwn8WE+4ziwMcHIT/y
+ C6q1FjwygxM/H0gMOzIx5HY3dibH30rMK/yTzM6px86wAsx72mR3NeIpmRGJZK/j+4XdrQy
+ 0NYoZ3U0vewbwLI+96FZ+j4Mic+ZXsX++GfVKOj8GVDMtAWzwbKoDbbF7j+0dpmMx3a4sKz
+ /CWLjecqyHhnWN5YfEUpA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:7G7ZlLgro2g=:HELLG4sxoLSIyg3t53qXXv
+ KsxOr4Mf4a0DbLBPzmCYP0bQwSHe9FftMJ+rkDt9pAAzploRTtDwELbNl01awgGzObMf54pYb
+ e73L4/D+IMzGplBlwiQcwgVn3u+0Hq2cgKxA9ea1ftmcT3XAFFNEc1DFdo4KWprv/3hScVFn/
+ s67vd+hOiR2pBjpugcIFH5anVJ1kZav91e9k2T9xqqKrC9egC8Kg6JWIMfS1za0i07bzRNVz9
+ 5Th8o96TOtxksORTQaaiwujA+SVj0nWKT+gFjny4NbNVgHyW9lm8RASb/7cXmGIVsi9EPNZ11
+ 3aHYTtLtcGPn4e3EDT3HaoeSamwOvro9ZSRKp/yQlax7aRwpy2fad9I7PsjelVWRdfv1Xrnz9
+ YbyJX1tWpCgJer0fFuSnKkOryVCyJZuLAQ2zXpDA6MsGv64DVQ5sPEjSbBObZvveRrQNGR25J
+ Id9TgXG2Khs/EiKC2sYLJReqvn/BhIJ7mbahK6zgzS+e1HncmFW7f7LiMcsfFQFiP5leVrhSS
+ JPc83/t+UtoFVqfly1j2e5Gzu6mkeBSt2bGD7upQVlpVn8htLf3La4WQZSlhJlM1ifdmCeLMY
+ n90Wk/OVMsWRId23rXChOpsUbIoAQ3awD+O6qYZUVjjco4Phhp/DcSCI14gscLnF/2GwH+3Ys
+ 5QGEvQm4GMoHkyh8YtfEibiZKAtiPLuZd5sUljor9ILPq2KGdLrJJVrLf/iSB4bFPXnrVvonl
+ kpRRymkanRSBQfVZl+FMDt+i+Urn0p592Zm+GyQy34AweFCgfWNIQUdZykpTSdkeg38cpQYEc
+ eApFJeNTOJqLAjJ2qDaen8V+b7UU4GWSApr0HavfeHQ6xWfcFE+27UKoKbNcb2SNxeIe8E5
+Received-SPF: none client-ip=212.227.126.133; envelope-from=laurent@vivier.eu;
+ helo=mout.kundenserver.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/23 09:00:12
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -32
+X-Spam_score: -3.3
+X-Spam_bar: ---
+X-Spam_report: (-3.3 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-1.381,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,174 +129,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Stefan Weil <sw@weilnetz.de>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>, luoyonggang@gmail.com,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: macro@linux-mips.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Now that we can use all our QEMU test containers in the gitlab-CI, we can
-easily add some jobs that test cross-compilation for various architectures.
-There is just only small ugliness: Since the shared runners on gitlab.com
-are single-threaded, we have to split each compilation job into two parts
-(--disable-user and --disable-system), and exclude some additional targets,
-to avoid that the jobs are running too long and hitting the timeout of 1 h.
+Le 23/08/2020 à 12:17, Carlo Marcelo Arenas Belón a écrit :
+> MIPS provides 2 ILP32 ABIs, and therefore 4 possible qemu-mips binaries
+> with 2 pairs using the same endianess and bitness.
+> 
+> This could lead to an O32 image loading in the N32 binary or vice versa
+> and in cryptic errors (if lucky that the CPU doesn't match the FPU used)
+> like :
+> 
+>   qemu: Unexpected FPU mode       (o32 ELF loaded to qemu-mipsn32[el])
+>   ELF binary's NaN mode not supported by CPU    (n32 -> qemu-mips[el])
+> 
+> Add an ABI check macro that could be used while checking the ELF header
+> that relies in the ABI2 flag to identify n32 binaries and abort instead
+> early with a more descriptive error :
+> 
+>   Invalid ELF image for this architecture
+> 
+> Signed-off-by: Carlo Marcelo Arenas Belón <carenas@gmail.com>
+> ---
+> Changes since v1:
+> - Use the provided definition from include/elf.h (per Laurent)
+> - Abort instead of warning (per Laurent, not using a custom error though)
+> - Expand the check to all other combinations (per Aleksandar)
+> 
+>  linux-user/elfload.c | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
+> 
+> diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+> index fe9dfe795d..69936dcd45 100644
+> --- a/linux-user/elfload.c
+> +++ b/linux-user/elfload.c
+> @@ -918,6 +918,12 @@ static void elf_core_copy_regs(target_elf_gregset_t *regs, const CPUPPCState *en
+>  
+>  #define elf_check_arch(x) ((x) == EM_MIPS || (x) == EM_NANOMIPS)
+>  
+> +#ifdef TARGET_ABI_MIPSN32
+> +#define elf_check_abi(x) ((x) & EF_MIPS_ABI2)
+> +#else
+> +#define elf_check_abi(x) (!((x) & EF_MIPS_ABI2))
+> +#endif
+> +
+>  static inline void init_thread(struct target_pt_regs *regs,
+>                                 struct image_info *infop)
+>  {
+> @@ -1487,6 +1493,10 @@ static void elf_core_copy_regs(target_elf_gregset_t *regs,
+>  #define elf_check_arch(x) ((x) == ELF_ARCH)
+>  #endif
+>  
+> +#ifndef elf_check_abi
+> +#define elf_check_abi(x) (1)
+> +#endif
+> +
+>  #ifndef ELF_HWCAP
+>  #define ELF_HWCAP 0
+>  #endif
+> @@ -1644,6 +1654,7 @@ static bool elf_check_ident(struct elfhdr *ehdr)
+>  static bool elf_check_ehdr(struct elfhdr *ehdr)
+>  {
+>      return (elf_check_arch(ehdr->e_machine)
+> +            && elf_check_abi(ehdr->e_flags)
+>              && ehdr->e_ehsize == sizeof(struct elfhdr)
+>              && ehdr->e_phentsize == sizeof(struct elf_phdr)
+>              && (ehdr->e_type == ET_EXEC || ehdr->e_type == ET_DYN));
+> 
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- .gitlab-ci.d/crossbuilds.yml | 113 +++++++++++++++++++++++++++++++++++
- .gitlab-ci.yml               |   1 +
- MAINTAINERS                  |   1 +
- 3 files changed, 115 insertions(+)
- create mode 100644 .gitlab-ci.d/crossbuilds.yml
-
-diff --git a/.gitlab-ci.d/crossbuilds.yml b/.gitlab-ci.d/crossbuilds.yml
-new file mode 100644
-index 0000000000..4ec7226b5c
---- /dev/null
-+++ b/.gitlab-ci.d/crossbuilds.yml
-@@ -0,0 +1,113 @@
-+
-+.cross_system_build_job_template: &cross_system_build_job_definition
-+  stage: build
-+  image: $CI_REGISTRY_IMAGE/qemu/$IMAGE:latest
-+  script:
-+    - mkdir build
-+    - cd build
-+    - PKG_CONFIG_PATH=$PKG_CONFIG_PATH
-+      ../configure --enable-werror $QEMU_CONFIGURE_OPTS --disable-user
-+        --target-list-exclude="aarch64-softmmu i386-softmmu microblaze-softmmu
-+          mips-softmmu mipsel-softmmu mips64-softmmu ppc64-softmmu sh4-softmmu
-+          xtensa-softmmu"
-+    - make -j$(expr $(nproc) + 1) all check-build
-+
-+.cross_user_build_job_template: &cross_user_build_job_definition
-+  stage: build
-+  image: $CI_REGISTRY_IMAGE/qemu/$IMAGE:latest
-+  script:
-+    - mkdir build
-+    - cd build
-+    - PKG_CONFIG_PATH=$PKG_CONFIG_PATH
-+      ../configure --enable-werror $QEMU_CONFIGURE_OPTS --disable-system
-+    - make -j$(expr $(nproc) + 1) all check-build
-+
-+cross-armel-system:
-+  <<: *cross_system_build_job_definition
-+  variables:
-+    IMAGE: debian-armel-cross
-+
-+cross-armel-user:
-+  <<: *cross_user_build_job_definition
-+  variables:
-+    IMAGE: debian-armel-cross
-+
-+cross-armhf-system:
-+  <<: *cross_system_build_job_definition
-+  variables:
-+    IMAGE: debian-armhf-cross
-+
-+cross-armhf-user:
-+  <<: *cross_user_build_job_definition
-+  variables:
-+    IMAGE: debian-armhf-cross
-+
-+cross-arm64-system:
-+  <<: *cross_system_build_job_definition
-+  variables:
-+    IMAGE: debian-arm64-cross
-+
-+cross-arm64-user:
-+  <<: *cross_user_build_job_definition
-+  variables:
-+    IMAGE: debian-arm64-cross
-+
-+cross-mips-system:
-+  <<: *cross_system_build_job_definition
-+  variables:
-+    IMAGE: debian-mips-cross
-+
-+cross-mips-user:
-+  <<: *cross_user_build_job_definition
-+  variables:
-+    IMAGE: debian-mips-cross
-+
-+cross-mipsel-system:
-+  <<: *cross_system_build_job_definition
-+  variables:
-+    IMAGE: debian-mipsel-cross
-+
-+cross-mipsel-user:
-+  <<: *cross_user_build_job_definition
-+  variables:
-+    IMAGE: debian-mipsel-cross
-+
-+cross-mips64el-system:
-+  <<: *cross_system_build_job_definition
-+  variables:
-+    IMAGE: debian-mips64el-cross
-+
-+cross-mips64el-user:
-+  <<: *cross_user_build_job_definition
-+  variables:
-+    IMAGE: debian-mips64el-cross
-+
-+cross-ppc64el-system:
-+  <<: *cross_system_build_job_definition
-+  variables:
-+    IMAGE: debian-ppc64el-cross
-+
-+cross-ppc64el-user:
-+  <<: *cross_user_build_job_definition
-+  variables:
-+    IMAGE: debian-ppc64el-cross
-+
-+cross-s390x-system:
-+  <<: *cross_system_build_job_definition
-+  variables:
-+    IMAGE: debian-s390x-cross
-+
-+cross-s390x-user:
-+  <<: *cross_user_build_job_definition
-+  variables:
-+    IMAGE: debian-s390x-cross
-+
-+cross-win32-system:
-+  <<: *cross_system_build_job_definition
-+  variables:
-+    IMAGE: debian-win32-cross
-+
-+cross-win64-system:
-+  <<: *cross_system_build_job_definition
-+  variables:
-+    IMAGE: debian-win64-cross
-diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
-index b7967b9a13..8a4b67ecca 100644
---- a/.gitlab-ci.yml
-+++ b/.gitlab-ci.yml
-@@ -18,6 +18,7 @@ include:
-   - local: '/.gitlab-ci.d/edk2.yml'
-   - local: '/.gitlab-ci.d/opensbi.yml'
-   - local: '/.gitlab-ci.d/containers.yml'
-+  - local: '/.gitlab-ci.d/crossbuilds.yml'
- 
- .native_build_job_template: &native_build_job_definition
-   stage: build
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 0886eb3d2b..2731f7a594 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -3067,6 +3067,7 @@ M: Alex Bennée <alex.bennee@linaro.org>
- R: Wainer dos Santos Moschetta <wainersm@redhat.com>
- S: Maintained
- F: .gitlab-ci.yml
-+F: .gitlab-ci.d/crossbuilds.yml
- 
- Guest Test Compilation Support
- M: Alex Bennée <alex.bennee@linaro.org>
--- 
-2.18.2
-
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 
