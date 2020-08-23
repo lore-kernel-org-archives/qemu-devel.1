@@ -2,91 +2,84 @@ Return-Path: <SRS0=gE17=CB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3EC8C433E1
-	for <qemu-devel@archiver.kernel.org>; Sun, 23 Aug 2020 11:09:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBFAAC433E1
+	for <qemu-devel@archiver.kernel.org>; Sun, 23 Aug 2020 11:19:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 985362072D
-	for <qemu-devel@archiver.kernel.org>; Sun, 23 Aug 2020 11:09:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7F7132074D
+	for <qemu-devel@archiver.kernel.org>; Sun, 23 Aug 2020 11:19:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YO987A8H"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 985362072D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LwJ+QaS9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F7132074D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52282 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56596 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k9ns0-00056Y-UW
-	for qemu-devel@archiver.kernel.org; Sun, 23 Aug 2020 07:09:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43098)
+	id 1k9o1e-0007Rs-Mg
+	for qemu-devel@archiver.kernel.org; Sun, 23 Aug 2020 07:19:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45168)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mlureau@redhat.com>)
- id 1k9nqU-0004FB-3c
- for qemu-devel@nongnu.org; Sun, 23 Aug 2020 07:07:30 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:31433)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1k9o0s-00069Z-96
+ for qemu-devel@nongnu.org; Sun, 23 Aug 2020 07:18:14 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:21247
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mlureau@redhat.com>)
- id 1k9noX-0000Oo-5M
- for qemu-devel@nongnu.org; Sun, 23 Aug 2020 07:07:29 -0400
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1k9o0q-0001g2-A3
+ for qemu-devel@nongnu.org; Sun, 23 Aug 2020 07:18:13 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598180727;
+ s=mimecast20190719; t=1598181490;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=uig1qcUKI+nlESAiXx5kqcB5MiLLSBKvK+AC0+PjcmU=;
- b=YO987A8HibgWR1BZhquvU9R+J9z48I1dc9l2KCPYT4+9CxdVsGevAgLh/JLZgwP4I2OfZi
- DCW5fVkdeEgtBUyy3ea0tNVjkzsPiTsoGdOP+WdQRqjjfpF+KfHX7MUtdvKE3ExQHZ19rb
- jlcPx3jkJqcL28dWiLlwiYnOhiTzmMc=
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
- [209.85.166.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-306-OM7b7ZFuOre99GxUNeNTBg-1; Sun, 23 Aug 2020 07:05:23 -0400
-X-MC-Unique: OM7b7ZFuOre99GxUNeNTBg-1
-Received: by mail-il1-f197.google.com with SMTP id q16so4600546ils.19
- for <qemu-devel@nongnu.org>; Sun, 23 Aug 2020 04:05:23 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=uig1qcUKI+nlESAiXx5kqcB5MiLLSBKvK+AC0+PjcmU=;
- b=bXOTPQ3zIekh/NSuA95MtxPoHLqjqisdA63Bw+2Nelz74UFZCU8VQn5tUONbYWBA6/
- gtiYxGk+yiscNu+krsPxCzusilEPDJAQt7TTvCYubUg6YEf5gLH9jJrCG1BtuyQcZMmJ
- XzPph3XauJFGSQcZmE1OeWgk+7VrUf+xFCks1cwtN+jqgVnTppgSiN7hkR/i6uDGjL8n
- 3zAYFjAWDOIAUp486XPv6GdqXv2APKxiXNb5C3cg2adpWGxZ241rz7OHzZ9o8zvfBuyS
- hqHBS/LbSsVD3vWDbPGq5o9d89DqCC671uKXzJ4GpGs+QHDzEajQw3iJ+Kf6/Eodqw2L
- cItg==
-X-Gm-Message-State: AOAM5332zBcMksHb0XS5tdAtaiTF4JE61TKtfglQXDgQYti6l6soN7Ux
- kavckUcyh7Ruqf1z384LwQrEotfiHbSC+Q7ZCoFhV3/Jioop4YiU9t9NUS5BkGMLOpWFyrDSDL4
- Yj8mugr1fWvKmKJ7a7MLiO8VyZpVq2E8=
-X-Received: by 2002:a6b:600a:: with SMTP id r10mr806038iog.0.1598180723030;
- Sun, 23 Aug 2020 04:05:23 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx+jcMM6WERyxznpxaDB06oun6z9EDutYnqgOCufuZO1TkAgFTfftDSobhJlE43Mi16PIkWDtSooZtdQi7qurc=
-X-Received: by 2002:a6b:600a:: with SMTP id r10mr806027iog.0.1598180722796;
- Sun, 23 Aug 2020 04:05:22 -0700 (PDT)
+ content-transfer-encoding:content-transfer-encoding;
+ bh=J+CRd9oFi5EKkIwhDUt0/Yh52gFZKtXCZu+KKDV7H9s=;
+ b=LwJ+QaS9C3xGvdVcgyqAwh5y7T9+vN3QUQKGKIJsL0HfEP7FPYhZhFnzFtG52GRn0EzghZ
+ cCcbP1qacY9cuoiueG1Bcl/qcEIK9Kcu69FD8WFL6v1Dzm/jyaQ/j+ILsDLkh6plGxk2z/
+ 25rPEh8Pf9MmWj9GpcYCqPmFFhYbGEg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-260-o9o4zviAMe2rjlBfKUetVw-1; Sun, 23 Aug 2020 07:18:06 -0400
+X-MC-Unique: o9o4zviAMe2rjlBfKUetVw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5240510ABDA2;
+ Sun, 23 Aug 2020 11:18:05 +0000 (UTC)
+Received: from thuth.com (ovpn-112-57.ams2.redhat.com [10.36.112.57])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D786D5BAC3;
+ Sun, 23 Aug 2020 11:17:59 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: qemu-devel@nongnu.org,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: [PATCH v2 0/7] Run cross-compilation build tests in the gitlab-CI
+Date: Sun, 23 Aug 2020 13:17:50 +0200
+Message-Id: <20200823111757.72002-1-thuth@redhat.com>
 MIME-Version: 1.0
-References: <20200823083215.14952-1-thuth@redhat.com>
-In-Reply-To: <20200823083215.14952-1-thuth@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Date: Sun, 23 Aug 2020 15:05:11 +0400
-Message-ID: <CAMxuvazPueVDHu0uFi5_EnELCUzcSiD_oCMBFUiboVxJZsXiSg@mail.gmail.com>
-Subject: Re: [PATCH] meson: Build qemu-nbd on macOS again
-To: Thomas Huth <thuth@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mlureau@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
 X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=mlureau@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/23 06:26:26
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=thuth@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/23 07:18:10
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.959,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,49 +91,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
+Cc: =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Stefan Weil <sw@weilnetz.de>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>, luoyonggang@gmail.com,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi
+Now that we can use all our QEMU build containers in the gitlab-CI,
+we can also run the cross-compilation jobs there. Of course, some
+problems have to be fixed first, so this is taken care of in the first
+four patches.
 
-On Sun, Aug 23, 2020 at 12:32 PM Thomas Huth <thuth@redhat.com> wrote:
->
-> Before switching to the meson build system, we used to compile qemu-nbd
-> for macOS, too, which is especially important for running the iotests
-> there. Commit b7c70bf2c5 disabled it by accident, since it did not take
-> into consideration that the $bsd variable in the configure script was
-> also set to "yes" on macOS. Fix it by enabling qemu-nbd on all systems
-> but Windows now instead (which was likely the original intention of the
-> old code in the configure script).
->
-> Fixes: b7c70bf2c5 ("meson: qemu-{img,io,nbd}")
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+The following two patches make sure that we can also enable WHPX builds with
+our debian-win64-cross container, so that we can compile-test this accelerator
+code now, too.
 
-lgtm
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+The last patch then finally enables the cross-compilation jobs in the CI.
 
-> ---
->  meson.build | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/meson.build b/meson.build
-> index df5bf728b5..d79f849768 100644
-> --- a/meson.build
-> +++ b/meson.build
-> @@ -1075,7 +1075,7 @@ if have_tools
->    qemu_io =3D executable('qemu-io', files('qemu-io.c'),
->               dependencies: [block, qemuutil], install: true)
->    qemu_block_tools +=3D [qemu_img, qemu_io]
-> -  if targetos =3D=3D 'linux' or targetos =3D=3D 'sunos' or targetos.ends=
-with('bsd')
-> +  if targetos !=3D 'windows'
->      qemu_nbd =3D executable('qemu-nbd', files('qemu-nbd.c'),
->                 dependencies: [block, qemuutil], install: true)
->      qemu_block_tools +=3D [qemu_nbd]
-> --
-> 2.18.2
->
+v2:
+ - Dropped patches that are not necessary anymore
+ - Added the first two patches to fix problems with the new meson build
+   system
+
+Thomas Huth (7):
+  configure: Add system = 'linux' for meson when cross-compiling
+  tests/docker: Install python3-setuptools in the debian9-mxe containers
+  tests/Makefile: test-image-locking needs CONFIG_POSIX
+  tests/Makefile: test-replication needs CONFIG_POSIX
+  dockerfiles/debian-win64-cross: Download WHPX MinGW headers
+  configure: Allow automatic WHPX detection
+  gitlab-ci: Add cross-compiling build tests
+
+ .gitlab-ci.d/crossbuilds.yml                  | 113 ++++++++++++++++++
+ .gitlab-ci.yml                                |   1 +
+ MAINTAINERS                                   |   1 +
+ configure                                     |   4 +
+ tests/Makefile.include                        |   6 +-
+ .../dockerfiles/debian-win64-cross.docker     |   9 +-
+ tests/docker/dockerfiles/debian9-mxe.docker   |   2 +-
+ 7 files changed, 133 insertions(+), 3 deletions(-)
+ create mode 100644 .gitlab-ci.d/crossbuilds.yml
+
+-- 
+2.18.2
 
 
