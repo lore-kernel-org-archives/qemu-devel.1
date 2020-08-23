@@ -2,58 +2,67 @@ Return-Path: <SRS0=gE17=CB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=BAYES_00,HK_RANDOM_FROM,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE autolearn=no
+X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AF96C433E1
-	for <qemu-devel@archiver.kernel.org>; Sun, 23 Aug 2020 22:59:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50A16C433DF
+	for <qemu-devel@archiver.kernel.org>; Sun, 23 Aug 2020 23:22:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6F8D6206BE
-	for <qemu-devel@archiver.kernel.org>; Sun, 23 Aug 2020 22:59:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F8D6206BE
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
+	by mail.kernel.org (Postfix) with ESMTPS id 1BD3D20720
+	for <qemu-devel@archiver.kernel.org>; Sun, 23 Aug 2020 23:22:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Xv8ksRV3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BD3D20720
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38522 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44252 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1k9yxO-0002st-MQ
-	for qemu-devel@archiver.kernel.org; Sun, 23 Aug 2020 18:59:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40238)
+	id 1k9zJM-0006vp-AT
+	for qemu-devel@archiver.kernel.org; Sun, 23 Aug 2020 19:22:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43334)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1k9ywi-0002Mx-HR
- for qemu-devel@nongnu.org; Sun, 23 Aug 2020 18:58:40 -0400
-Received: from relay64.bu.edu ([128.197.228.104]:46726)
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1k9zIk-0006DM-43; Sun, 23 Aug 2020 19:21:26 -0400
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:51173 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1k9ywg-0000Dx-1D
- for qemu-devel@nongnu.org; Sun, 23 Aug 2020 18:58:39 -0400
-X-Envelope-From: alxndr@bu.edu
-X-BU-AUTH: mozz.bu.edu [128.197.127.33]
-Received: from BU-AUTH (localhost.localdomain [127.0.0.1]) (authenticated
- bits=0)
- by relay64.bu.edu (8.14.3/8.14.3) with ESMTP id 07NMw4Qa005932
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
- Sun, 23 Aug 2020 18:58:09 -0400
-Date: Sun, 23 Aug 2020 18:58:04 -0400
-From: Alexander Bulekov <alxndr@bu.edu>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: [Fwd] Issue 25164 in oss-fuzz: qemu: Fuzzing build failure
-Message-ID: <20200823225804.umk5gh6knptqo5mw@mozz.bu.edu>
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1k9zIh-0002X3-9C; Sun, 23 Aug 2020 19:21:25 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 4BZWTZ4Q8nz9sSG; Mon, 24 Aug 2020 09:21:06 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1598224866;
+ bh=LxVzKoeedsVPGy1y8TQiVQl8tso/aU+d8SWO557vrVY=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=Xv8ksRV3Fg0ABPkaQ8P0V9sI+VWFYJ4X83Tp11cQtgRHECFXwq7BJ62cuyibZ6u1N
+ KDihhK28ghWiAnEaPKSuTQLKB+Nx3GqzbcxO1k8NJxroSRlKadqEwqd6SkLJESbSGd
+ G2yDhhxDdSlhAO9i9RvnS+BmKGWIvyzv7+E8z6Rg=
+Date: Mon, 24 Aug 2020 09:21:01 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PULL 00/40] ppc-for-5.2 queue 20200818
+Message-ID: <20200823232101.GD4734@yekko.fritz.box>
+References: <20200818041922.251708-1-david@gibson.dropbear.id.au>
+ <CAFEAcA_=qV+B17Z=XZhaPK_dvhBOkGutNmCHYEP4xTYKnzukZw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="jCrbxBqMcLqd4mOl"
 Content-Disposition: inline
-Received-SPF: pass client-ip=128.197.228.104; envelope-from=alxndr@bu.edu;
- helo=relay64.bu.edu
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/23 18:58:35
-X-ACL-Warn: Detected OS   = Linux 2.6.x
-X-Spam_score_int: -31
-X-Spam_score: -3.2
-X-Spam_bar: ---
-X-Spam_report: (-3.2 / 5.0 requ) BAYES_00=-1.9, HK_RANDOM_ENVFROM=0.001,
- HK_RANDOM_FROM=0.999, RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <CAFEAcA_=qV+B17Z=XZhaPK_dvhBOkGutNmCHYEP4xTYKnzukZw@mail.gmail.com>
+Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
+ helo=ozlabs.org
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=0.25,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -66,85 +75,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Darren Kenny <darren.kenny@oracle.com>, Bandan Das <bsd@redhat.com>,
- qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: qemu-ppc <qemu-ppc@nongnu.org>, Greg Kurz <groug@kaod.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Paolo,
-Our oss-fuzz builds started failing, after the meson merge. I think I
-tracked down the issues:
-1.) Looking at the build-log here:
-https://oss-fuzz-build-logs.storage.googleapis.com/log-d43d402c-1ce5-4422-b3db-ccbf83a862a0.txt
-The error happens at link-time. Re-running the build with V=1:
-"/usr/bin/ld" ...
---whole-archive /usr/local/lib/clang/12.0.0/.../libclang_rt.asan-x86_64.a \
---start-group ..... -T /src/qemu/tests/qtest/fuzz/fork_fuzz.ld  \
--wrap qtest_inb -wrap qtest_inw ..... --end-group .....
 
-I compared this against what we had before meson, and noticed that the
-start-group/end-group are new. Removing those manually from the link
-command, I can link successfully. It looks like these linker groups are
-something that meson controls. Is there something we can tweak to make
-the fork_fuzz.ld linker script apply to all the objects?
+--jCrbxBqMcLqd4mOl
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-2.) 77afc75f69 ("oss-fuzz/build: remove LIB_FUZZING_ENGINE")
+On Sun, Aug 23, 2020 at 02:54:26PM +0100, Peter Maydell wrote:
+> On Tue, 18 Aug 2020 at 05:19, David Gibson <david@gibson.dropbear.id.au> =
+wrote:
+> >
+> > The following changes since commit d0ed6a69d399ae193959225cdeaa9382746c=
+91cc:
+> >
+> >   Update version for v5.1.0 release (2020-08-11 17:07:03 +0100)
+> >
+> > are available in the Git repository at:
+> >
+> >   git://github.com/dgibson/qemu.git tags/ppc-for-5.2-20200818
+> >
+> > for you to fetch changes up to 3110f0ee19ccdb50adff3dfa1321039f69efddcd:
+> >
+> >   spapr/xive: Use xive_source_esb_len() (2020-08-14 13:35:45 +1000)
+> >
+> > ----------------------------------------------------------------
+> > ppc patch queue 2020-08-18
+> >
+> > Here's my first pull request for qemu-5.2, which has quite a few
+> > accumulated things.  Highlights are:
+> >
+> >  * Preliminary support for POWER10 (Power ISA 3.1) instruction emulation
+> >  * Add documentation on the (very confusing) pseries NUMA configuration
+> >  * Fix some bugs handling edge cases with XICS, XIVE and kernel_irqchip
+> >  * Fix icount for a number of POWER registers
+> >  * Many cleanups to error handling in XIVE code
+> >  * Validate size of -prom-env data
+>=20
+> Hi -- it looks like you've updated the tag but I haven't seen
+> a new cover letter. Do you want me to apply it?
 
-On oss-fuzz, we cannot explicitly specify fsanitize=fuzzer: We have to
-leverage the $CC $CXX $CFLAGS $CXXFLAGS $LIB_FUZZING_ENGINE from
-oss-fuzz. That was the reason for the "make CONFIG_FUZZ CFLAGS" trickery
-in the original build script.
+Um.. I've updated the branch, but the tag should still be the same.
+I'd suggest merging the tag, since that's what I did my testing run
+on.
 
-Details:
-https://google.github.io/oss-fuzz/getting-started/new-project-guide/#Requirements
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-To work around this, I think we can create separate configure options
---enable-oss-fuzz and --oss-fuzz-cflags and CONFIG_OSS_FUZZ. In meson we
-create a new "source-set" specific_oss_fuzz_ss which is identical to
-specific_fuzz_ss, except it does not depend on "-fsanitize=fuzzer",
-which is specified in tests/qtest/fuzz/meson.build
+--jCrbxBqMcLqd4mOl
+Content-Type: application/pgp-signature; name="signature.asc"
 
-I've been working on patches to do (2) but I don't know how to fix (1).
-Do you have any ideas?
+-----BEGIN PGP SIGNATURE-----
 
--Alex
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl9C+dsACgkQbDjKyiDZ
+s5Jpmw//TlbqHMI4ai0MNNA2RdOH4kHiJ7wxTki+kEdKQrRw5vZUb8fR5POZ5NX1
+2G4xE5GFkC5N6kqWUY0wElaaHQbk6+2f11lKHpE80AzIAwo8CpDR6FFrCqX1/M92
+9BlprlVaRf0VrDqvA/U0bziIb35TbsSFWJPV9Y5RNZlojTDwH7VoO4uZ+ouDT5DQ
+lJYMcGQz5VWLODafYWUlSEGSSDzTnMiXt/ueeoYxat/GaAg80+P7SS7ykXa1lSKY
+nWxgAzgtSyjp0Bi2U/PJkbnoGuhVaaaqzw/htKC/R6I/bHEWXtwRXfh0ihV0ftjs
+T1k+3+mWtiSgP1IAvV6yI4OVOrGq5OvHLU8Znf4VElCBqHGuwsyqKa2gnLP4AYJr
+LeLt+TEAZUBwnLU7nISj886TTvhVDICluOyfzCucQwGxdcP2XikwRDjqzvYO+3XL
+ikkhqcxIBv4zFLGoKYCb/zuA+qcJW7GPNhJvqFu9zlzxEL6FjHNzORITh/YYA5VO
+glBB4Jp6I/t7poimYfqmahspaQxuSyEESaLbVcitct09J2S+INft5J5e2S3L1VdS
+9QNSCTTYU9zZRpGzItRMZ3rWRPLe6tSpa5l5UkE5bKhItutY/AKY4EXXKej3kaWN
++fvjZW3ryQG6+ZT81p4IaG5z2cuEF7plN50IQoNWhTxHYJK+DG4=
+=jIcV
+-----END PGP SIGNATURE-----
 
------ Forwarded message from ClusterFuzz-External via monorail <monorail+v2.382749006@chromium.org> -----
-
-Date: Sun, 23 Aug 2020 03:10:14 -0700
-From: ClusterFuzz-External via monorail <monorail+v2.382749006@chromium.org>
-To: alxndr@bu.edu
-Subject: Issue 25164 in oss-fuzz: qemu: Fuzzing build failure
-
-Status: New
-Owner: ----
-CC: b...@redhat.com, stefa...@redhat.com, alx...@bu.edu, pbonz...@redhat.com, darren.k...@oracle.com 
-Labels: Proj-qemu
-Type: Build-Failure
-
-New issue 25164 by ClusterFuzz-External: qemu: Fuzzing build failure
-https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=25164
-
-The last 2 builds for qemu have been failing.
-Build log: https://oss-fuzz-build-logs.storage.googleapis.com/log-d43d402c-1ce5-4422-b3db-ccbf83a862a0.txt
-Build type: fuzzing
-
-To reproduce locally, please see: https://google.github.io/oss-fuzz/advanced-topics/reproducing#reproducing-build-failures
-
-This bug tracker is not being monitored by OSS-Fuzz team. If you have any questions, please create an issue at https://github.com/google/oss-fuzz/issues/new.
-
-**This bug will be automatically closed within a day once it is fixed.**
-
--- 
-You received this message because:
-  1. You were specifically CC'd on the issue
-
-You may adjust your notification preferences at:
-https://bugs.chromium.org/hosting/settings
-
-Reply to this email to add a comment.
-
------ End forwarded message -----
+--jCrbxBqMcLqd4mOl--
 
