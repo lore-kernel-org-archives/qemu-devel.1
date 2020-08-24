@@ -2,124 +2,125 @@ Return-Path: <SRS0=JPH5=CC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,RCVD_ILLEGAL_IP,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A992DC433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 19:40:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49D2BC433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 19:51:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 58042206BE
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 19:40:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EE47D20706
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 19:51:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=syrmia.com header.i=@syrmia.com header.b="uba0B8yt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58042206BE
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=syrmia.com
+	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="LQnC/gdU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE47D20706
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52568 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55076 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAIKU-0006bf-IZ
-	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 15:40:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47460)
+	id 1kAIVG-0000GN-2G
+	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 15:51:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49788)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <Filip.Bozuta@syrmia.com>)
- id 1kAIIP-0004Sm-BY
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 15:38:21 -0400
-Received: from mail-eopbgr10113.outbound.protection.outlook.com
- ([40.107.1.113]:60643 helo=EUR02-HE1-obe.outbound.protection.outlook.com)
+ (Exim 4.90_1) (envelope-from <Babu.Moger@amd.com>)
+ id 1kAIUQ-0008CO-CP
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 15:50:46 -0400
+Received: from mail-co1nam11on2056.outbound.protection.outlook.com
+ ([40.107.220.56]:7361 helo=NAM11-CO1-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <Filip.Bozuta@syrmia.com>)
- id 1kAIIN-0000YT-6b
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 15:38:21 -0400
+ (Exim 4.90_1) (envelope-from <Babu.Moger@amd.com>)
+ id 1kAIUO-00029T-59
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 15:50:46 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=g/uPEYftRaO46Zi/pyxkTXeyqxLYj9y0l8KfD2ap2yOkFp7QJN4xSz9TH4dI9TyxbchZRgQ1D7MckUYt8bvu3BMZ4xQrHd9SOtyf7Yj7P+SU02gtYzeJMHEUDCFnW/l7qwxTM5PZxT5aJB7yg1O5C1BPrzFrOQweAZTQ8cy4NVAheNo8jSILp8K5D9DgD8DzXW8nSFjsysE+RTJPt7F+LlWNQDqoY9GzCV56gJ8wxF3Bry0vfxeqNBQH21fNFtfw15IuR6GP16HHciFEQYGf6pBzne86wr0vl50wxXLEn1dfBa5M+p9mAJpF7KBDjuhpZHi/+26MB6DSQyZvMKnMmQ==
+ b=AF57gHwCF/7msiPhsr/ZcFn0yVKTOyntg4iIm2g56aMYmPK28SuOxI2sdeCy5Htao1+USSr9ryo6ZZRU2N5QDPw0nbTmaa9MiskwuNs+sf8MfZwZ2HcMu/gdIOVQ/TVA9+ZPlfFT46dzjPaHYHTv2pTu3ErqzlXd3Xg6QqLhSQTzvIud43M95gbOxEd9p1sS9x/166L3ztBArv5DLeUMjhjEuasnkmC6eaVjSTEGCirnqvE7gtLQRibzpB6eZanDWHrtKGuOAaSUe/xfxi/AUJZUFes/x2TPuV+ix228e1w+CkX0sdhuQC8XYBVM1wry+AIQFSsrG7X5E1yPfEIn+g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=D58k38h9xk9Nq28XHZi+jEvQTLchwClfkZEJ2V5IM1Q=;
- b=QAcqPpXIEXCEbb4R6K8HM+VWO8wx1FbxKX7cL8L8Gd4zHMUn3AkLYmc67ynhnJr3+n1vf3sPj4pPfVOboBwKhJz3l4/ueimvGa43AmiS3aZGRh39XmyQMFiq7+mBWnHoYYIeCFle2VoB0m1Nd8tIeGIhmaUxA+7YFhAXB/JS8PVAbQG0KAyM+SaG8ZAxKzy5kxs/DMYIrSWhZC1FrbO2unjKsSgme4gCdo4RIgmkLYSeQlYVR8alikvMmB1gINrdyD4IQzF6xzgksQsBNiuQa0Mc5tO7nGJsqu9bp6GbgY8wMOn0QAqKAnDsKUKfaI0eu6NB2VwJFevnW+O9cL7ezw==
+ bh=okGdH0Mftms+PGoGkjMZO42tZCBfQ9qM7kprtGl9kAo=;
+ b=GKbYAOacl+bMbDIlYIDgK4Z1TJ1KJxEVYAUVeunRTmY8EEoKrg/PsRdZe9r30CifbNcIr41zxzhOBQ+4E2LjgqlLiqvUej+3shBpXpxZeFeQAfyymNy/2io3hFlcDOPSO+84xKYdzpbjANa8ynQKUdz+rHoDgZWoApPCY7Eq+bh24LaeyPCWdWA9U74eKSx1aoVjpC5YKCICm1QiavkQO/hlynIZK+iOMU2af4iH+eZcN1VKT9i1EmULSMQ3X+Y3TH/ByT3KKyk51XP+U0OWZxwjUTvzJIi6n85ZOkkdfaaqqOfKgYKXh7a+Tl3jvNNJvZQJoDhBFvSrtY1WXgD2jg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=syrmia.com; dmarc=pass action=none header.from=syrmia.com;
- dkim=pass header.d=syrmia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=syrmia.com;
- s=selector1;
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=D58k38h9xk9Nq28XHZi+jEvQTLchwClfkZEJ2V5IM1Q=;
- b=uba0B8yt8uSTanl5NHnwH7DtcgxARTBiqkMZesgd6geOr1NBRIIAkAn+eVmtKZxwZUhMPWUEXCj4nHGNeVWCACT5cQslpk81ToKfqXAmm8PyE1wx6UkTkA3i/foBD2vFddQ+vgEdFZPtmWJHxTUlB5vNjUKCZz7THX/SY4KCDVs=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=syrmia.com;
-Received: from VE1PR03MB5246.eurprd03.prod.outlook.com (2603:10a6:802:a1::22)
- by VE1PR03MB6047.eurprd03.prod.outlook.com (2603:10a6:803:114::30)
+ bh=okGdH0Mftms+PGoGkjMZO42tZCBfQ9qM7kprtGl9kAo=;
+ b=LQnC/gdUaUcBLk0qpRGfxsIjMxmhSe0cGMQrGAKhclYmkpGFOYNHvb8K6SdLl9kDwx/ZN8PzerXIEjNdPUVtepXkftSuhjl8bxa5tbxJstxf+bxaoNPvy9/XxxzvKm4G1cLKuSGae4R3d2KHN92wqtavPZGP2P8+7dKiyNhU2fg=
+Authentication-Results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=amd.com;
+Received: from SN1PR12MB2560.namprd12.prod.outlook.com (2603:10b6:802:26::19)
+ by SN6PR12MB2670.namprd12.prod.outlook.com (2603:10b6:805:6b::31)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3305.26; Mon, 24 Aug
- 2020 19:38:07 +0000
-Received: from VE1PR03MB5246.eurprd03.prod.outlook.com
- ([fe80::3568:5b4f:ab6b:e362]) by VE1PR03MB5246.eurprd03.prod.outlook.com
- ([fe80::3568:5b4f:ab6b:e362%6]) with mapi id 15.20.3261.026; Mon, 24 Aug 2020
- 19:38:07 +0000
-From: Filip Bozuta <Filip.Bozuta@syrmia.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3 2/2] linux-user: Add support for 'mq_timedsend_time64()'
- and 'mq_timedreceive_time64()'
-Date: Mon, 24 Aug 2020 21:37:52 +0200
-Message-Id: <20200824193752.67950-3-Filip.Bozuta@syrmia.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200824193752.67950-1-Filip.Bozuta@syrmia.com>
-References: <20200824193752.67950-1-Filip.Bozuta@syrmia.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: LO2P265CA0251.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:8a::23) To VE1PR03MB5246.eurprd03.prod.outlook.com
- (2603:10a6:802:a1::22)
+ 2020 19:20:36 +0000
+Received: from SN1PR12MB2560.namprd12.prod.outlook.com
+ ([fe80::ccd9:728:9577:200d]) by SN1PR12MB2560.namprd12.prod.outlook.com
+ ([fe80::ccd9:728:9577:200d%4]) with mapi id 15.20.3305.026; Mon, 24 Aug 2020
+ 19:20:36 +0000
+Subject: Re: [PATCH v5 0/8] Remove EPYC mode apicid decode and use generic
+ decode
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+References: <159804762216.39954.15502128500494116468.stgit@naples-babu.amd.com>
+ <20200824184112.GB2688@work-vm>
+From: Babu Moger <babu.moger@amd.com>
+Message-ID: <f602852c-b6af-694e-3e32-47974722e144@amd.com>
+Date: Mon, 24 Aug 2020 14:20:33 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+In-Reply-To: <20200824184112.GB2688@work-vm>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: DM5PR07CA0164.namprd07.prod.outlook.com
+ (2603:10b6:3:ee::30) To SN1PR12MB2560.namprd12.prod.outlook.com
+ (2603:10b6:802:26::19)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from localhost.localdomain (147.91.217.242) by
- LO2P265CA0251.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:8a::23) with Microsoft
+Received: from 255.255.255.255 (255.255.255.255) by
+ DM5PR07CA0164.namprd07.prod.outlook.com (2603:10b6:3:ee::30) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3305.25 via Frontend Transport; Mon, 24 Aug 2020 19:38:06 +0000
-X-Mailer: git-send-email 2.25.1
-X-Originating-IP: [147.91.217.242]
+ 15.20.3305.24 via Frontend Transport; Mon, 24 Aug 2020 19:20:34 +0000
+X-Originating-IP: [165.204.77.1]
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: cab737b7-fc58-4d53-418a-08d8486539eb
-X-MS-TrafficTypeDiagnostic: VE1PR03MB6047:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <VE1PR03MB60470445CEDB832FB317F4E9EB560@VE1PR03MB6047.eurprd03.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:3276;
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 7b13cdfe-c18b-4b57-4f00-08d84862c6fe
+X-MS-TrafficTypeDiagnostic: SN6PR12MB2670:
+X-Microsoft-Antispam-PRVS: <SN6PR12MB2670CF9484F83C1D844C32AF95560@SN6PR12MB2670.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: OUfroD0gBccWm2hQCWDTjeELfbtXk+FoTH+6Z97zGrUH8kAhYDOs50pkDJfURTigokvYOCHQ12xRr8I0crGeo+yBrVCDmPZGMKBmg18vYa4K8/QS2Ijp63OSZpZR+wFVz/g3nlmNuxUsaQ9roDOgtr3YkncsoEavEzoVsL0NR4/aZns+n9ntaivBUwhqe2aQ0mOb5XW2UGMaVCvQpSHa6H9cw0tiqEYf4XfMmXkD1o660UIjXRbxWPR45vewxF466q/Uq6Hqhvs3H2/J7dIQIhVD9nDlnawBqORYZVyEq/V+RwSMLc29kLGEs6MQyVTErLILLdoHxIx07l0qgBZbJdRYCYlVbL1eOc9LVfu4h/vIcWEvpQpRXd6BLpX4yx0VuSgrAE0055Cl471HxtM7yw+Ssp8OxCrlu19RQDBJ6RkaOh7lpsToknKDFlvjQCmAL0bLwY1jk3ji7/QXAX5S/A==
+X-Microsoft-Antispam-Message-Info: MUT/XPWd4Bj6oq8NIN4vOd29qYP+91nX5l2n1DYBmFUtHoqIRFaczx5AwkWQMwErBltAFyQY/wd4wPHTrbuYVXFR5nuYpWyutf8nFFnV23tGDeYSWGODzr2rbq/o3cQi2/y3+921abxm1Go5oNTUwKy2wzDPTzx/VHs2pk6ONToSIvkhK08L9FzGZ80XH9+vgWpLSob4wplIs/IXEEkQQb/1NY6mB35iTDcuPv1bNEnwHScAlYCvFLDCYMDZ++t0eF6/rMzMyc4FF0RR0SoVuwounGX11M4szoh3RXftuOy3vDI9ZCOF8jbT97D4X6ciA61LUnkdVyWEf34Ij4RW0Db41kM4bkxIFtBPDlmtQZbO1bWHvqAQwrXQNMyMLvI4vvIYNq5VTNizC13A5TkpSORe5/jj5CkAtooXA5imTHvp1y9r85mhWViDoY1neJAjncsWXTMTkl/HKDRcfV0pKRd6pFFC4miiE9RcYHCD8X4=
 X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:VE1PR03MB5246.eurprd03.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(346002)(136003)(366004)(39830400003)(376002)(396003)(16526019)(8936002)(66556008)(83380400001)(26005)(107886003)(2616005)(956004)(6916009)(86362001)(66476007)(5660300002)(1076003)(6512007)(186003)(6666004)(316002)(966005)(6506007)(66946007)(6486002)(8676002)(36756003)(69590400007)(4326008)(52116002)(2906002)(478600001)(54906003);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: A6BYmVdxr0qdnpIMAneX4lQZOJHNNbpHgn+QkcRyyDQid8psZrc7G9LWG+fGjrJzeBTM3vKa2NV0mUFOUa2upO6Lo9mE5Al15ZyrjClwjI/3eLaMfDns5IYh/BUilyR+FT4pr3rWWCHq9TwyG9XooQ8aCr1/j5ySe6gEueQjh7+26d6nzTEcdJ9aalwxqYov9+C/7FzKoS0K6VEEEJd/TOerj6j3F/iSfAjz5i9Oo8ox8d00MO2sJtHUY9MWfSkQoESwL6nt4ZAlTZPD/+cqDbAWAnlcZTb6SDG5kTBNT5rETbcsevLhqSbbkFztwmE48J/4oWAWw0J2giJAnqvB+MUPT6zAhSLEMQUv3MYJOt2FazkTFk7FE8+nu+vjpv67xAcmjWWUDMOWUGqWBoylM/b/hU9AzH+Ieirn0VQlcjUppw/cbFwpjDJYMreO5FQN02M9VTCJHueUsZZlz+FgQ+ugmRYNeDSEBBeMAkL2P66gCvM+KTREnT+2RGXkWW0YqrkvTLMq+IgaJUgjhuXfdWzLbL2lrYsUvXHPLY9dra+jzaq8/Fp9HP5464Ps63O3RY4irS4b1N/LDxRXyC6N2OS0MGgJWAcRo+rLWJmZXW4ppRHyJWfebnvfON6U1x8BSCVKWNsYN+utM/IkpIXg3g==
-X-OriginatorOrg: syrmia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: cab737b7-fc58-4d53-418a-08d8486539eb
-X-MS-Exchange-CrossTenant-AuthSource: VE1PR03MB5246.eurprd03.prod.outlook.com
+ IPV:NLI; SFV:NSPM; H:SN1PR12MB2560.namprd12.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(4636009)(366004)(39860400002)(376002)(136003)(346002)(396003)(36756003)(4326008)(86362001)(5660300002)(53546011)(52116002)(8676002)(31696002)(956004)(26005)(186003)(6486002)(478600001)(66946007)(66476007)(66556008)(44832011)(45080400002)(2616005)(316002)(31686004)(966005)(2906002)(8936002)(6916009)(16576012)(41533002)(43740500002);
+ DIR:OUT; SFP:1101; 
+X-MS-Exchange-AntiSpam-MessageData: 2uOfmief3eIWFSiyp7TuirSAzNQaE/Nfm5iDpWjVMibqP8AeBjf4INlOX6f2GlG5Smv+Gor0kv8frYrK15tu+5dzn7jfofDeKL+DL9a4YuFX7lfoFiwfjEw/I36dEe3CEna/yCbTBPy5Q75fkjvS76uT+DU/yiAxdb0c/Bzc8KY/1HKfl9rxSW2+es5bfvbencH0CRglxwx4klkk7M4WBfYKGbSUVg4ZU7olRIA39tLzpG7gig9sMzDR1vFMYEelGR6WH3xx8jk9Ylh9ime4ZYOQhbyvdSXZpEHQX1B0J6yKisVla527pDu11608Ku8JhHyj99AX99RhiPevnVF3uTRUilL3sjf0HQuWuw06KOGujBzYySB8DjjtHSWaCQ/Lu3Xygeajou7Xj7ksg457AN9OuYKNKszLkykjRYDKv/4quAmpyS6oNtRDTsXc3138dSKC16YmMXvV2PbCuHHGELGYI7ic2qr8ZJ/qtNVSNTUwz0o+cF11VvhwdicJM54PVlo9Gd7RbnJEzkKPMA5A2lwgVYmdpzzP4LryQ7eUdio8/Ct8Wee31wLkrVUdmrKz6yHBOcFd+qqcNMXFt+/KCXdjfyvZjmK0Qv1b334Oj3/0p9/+biRjZ+Ep2BnFWdOJhie45eLbLLcnDkmkeS8UGQ==
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7b13cdfe-c18b-4b57-4f00-08d84862c6fe
+X-MS-Exchange-CrossTenant-AuthSource: SN1PR12MB2560.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Aug 2020 19:38:07.4990 (UTC)
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Aug 2020 19:20:36.0982 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 19214a73-c1ab-4e19-8f59-14bdcb09a66e
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ozgM4d3R7v//wB5iX3XHtAB0XtwJx7zljzygsqH1rwWuDa9cWoHh3bbYj5FoKiZEPTshwqrWb39GRo5aeZgLkA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VE1PR03MB6047
-Received-SPF: pass client-ip=40.107.1.113;
- envelope-from=Filip.Bozuta@syrmia.com;
- helo=EUR02-HE1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/24 15:38:08
+X-MS-Exchange-CrossTenant-UserPrincipalName: /NpKMmz9Izt/aHRNfBmZkmviU1tYAhSnFpoN3wQiKYrLlY/l19//Pl9TeBCYgFie
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR12MB2670
+Received-SPF: none client-ip=40.107.220.56; envelope-from=Babu.Moger@amd.com;
+ helo=NAM11-CO1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/24 15:50:41
 X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_NONE=-0.0001,
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, FORGED_SPF_HELO=1, MSGID_FROM_MTA_HEADER=0.001,
+ NICE_REPLY_A=-2.25, RCVD_ILLEGAL_IP=1.3, RCVD_IN_DNSWL_NONE=-0.0001,
  RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -132,142 +133,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>,
- Filip Bozuta <Filip.Bozuta@syrmia.com>
+Cc: ehabkost@redhat.com, mst@redhat.com, qemu-devel@nongnu.org,
+ imammedo@redhat.com, pbonzini@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch implements functionality for following time64 syscalls:
+Hi Dave,
 
-*mq_timedsend_time64()
+On 8/24/20 1:41 PM, Dr. David Alan Gilbert wrote:
+> * Babu Moger (babu.moger@amd.com) wrote:
+>> To support some of the complex topology, we introduced EPYC mode apicid decode.
+>> But, EPYC mode decode is running into problems. Also it can become quite a
+>> maintenance problem in the future. So, it was decided to remove that code and
+>> use the generic decode which works for majority of the topology. Most of the
+>> SPECed configuration would work just fine. With some non-SPECed user inputs,
+>> it will create some sub-optimal configuration.
+>> Here is the discussion thread.
+>> https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Flore.kernel.org%2Fqemu-devel%2Fc0bcc1a6-1d84-a6e7-e468-d5b437c1b254%40amd.com%2F&amp;data=02%7C01%7Cbabu.moger%40amd.com%7C74d90724af9c4adcc75008d8485d4d16%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637338912853492167&amp;sdata=GTsMKcpeYXAA0CvpLTirPHKdNSdlJE3RuPjCtSyWtGQ%3D&amp;reserved=0
+>>
+>> This series removes all the EPYC mode specific apicid changes and use the generic
+>> apicid decode.
+> 
+> Hi Babu,
+>   This does simplify things a lot!
+> One worry, what happens about a live migration of a VM from an old qemu
+> that was using the node-id to a qemu with this new scheme?
 
-    This is a year 2038 safe vairant of syscall:
-
-    int mq_timedsend(mqd_t mqdes, const char *msg_ptr,
-                     size_t msg_len, unsigned int msg_prio,
-                     const struct timespec *abs_timeout)
-    --send a message to a message queue--
-    man page: https://www.man7.org/linux/man-pages/man2/mq_timedsend.2.html
-
-*mq_timedreceive_time64()
-
-    This is a year 2038 safe variant of syscall:
-
-    ssize_t mq_timedreceive(mqd_t mqdes, char *msg_ptr,
-                            size_t msg_len, unsigned int *msg_prio,
-                            const struct timespec *abs_timeout)
-    --receive a message from a message queue--
-    man page: https://man7.org/linux/man-pages/man3/mq_receive.3.html
-
-Implementation notes:
-
-    These syscalls were implemented in similar ways like
-    'mq_timedsend()' and 'mq_timedreceive' except that
-    functions 'target_to_host_timespec64()' and
-    'host_to_target_timespec64()' were used to convert
-    values of 'struct timespec' between host and target.
-
-Signed-off-by: Filip Bozuta <Filip.Bozuta@syrmia.com>
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
----
- linux-user/syscall.c | 58 +++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 55 insertions(+), 3 deletions(-)
-
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 4ee1de6e65..3331ec9fea 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -829,11 +829,13 @@ safe_syscall5(int, msgrcv, int, msgid, void *, msgp, size_t, sz,
- safe_syscall4(int, semtimedop, int, semid, struct sembuf *, tsops,
-               unsigned, nsops, const struct timespec *, timeout)
- #endif
--#ifdef TARGET_NR_mq_timedsend
-+#if defined(TARGET_NR_mq_timedsend) || \
-+    defined(TARGET_NR_mq_timedsend_time64)
- safe_syscall5(int, mq_timedsend, int, mqdes, const char *, msg_ptr,
-               size_t, len, unsigned, prio, const struct timespec *, timeout)
- #endif
--#ifdef TARGET_NR_mq_timedreceive
-+#if defined(TARGET_NR_mq_timedreceive) || \
-+    defined(TARGET_NR_mq_timedreceive_time64)
- safe_syscall5(int, mq_timedreceive, int, mqdes, char *, msg_ptr,
-               size_t, len, unsigned *, prio, const struct timespec *, timeout)
- #endif
-@@ -1243,7 +1245,9 @@ static inline abi_long target_to_host_timespec(struct timespec *host_ts,
- }
- #endif
- 
--#if defined(TARGET_NR_clock_settime64) || defined(TARGET_NR_futex_time64)
-+#if defined(TARGET_NR_clock_settime64) || defined(TARGET_NR_futex_time64) || \
-+    defined(TARGET_NR_mq_timedsend_time64) || \
-+    defined(TARGET_NR_mq_timedreceive_time64)
- static inline abi_long target_to_host_timespec64(struct timespec *host_ts,
-                                                  abi_ulong target_addr)
- {
-@@ -11831,6 +11835,27 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-         }
-         return ret;
- #endif
-+#ifdef TARGET_NR_mq_timedsend_time64
-+    case TARGET_NR_mq_timedsend_time64:
-+        {
-+            struct timespec ts;
-+
-+            p = lock_user(VERIFY_READ, arg2, arg3, 1);
-+            if (arg5 != 0) {
-+                if (target_to_host_timespec64(&ts, arg5)) {
-+                    return -TARGET_EFAULT;
-+                }
-+                ret = get_errno(safe_mq_timedsend(arg1, p, arg3, arg4, &ts));
-+                if (!is_error(ret) && host_to_target_timespec64(arg5, &ts)) {
-+                    return -TARGET_EFAULT;
-+                }
-+            } else {
-+                ret = get_errno(safe_mq_timedsend(arg1, p, arg3, arg4, NULL));
-+            }
-+            unlock_user(p, arg2, arg3);
-+        }
-+        return ret;
-+#endif
- 
- #ifdef TARGET_NR_mq_timedreceive
-     case TARGET_NR_mq_timedreceive:
-@@ -11858,6 +11883,33 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-         }
-         return ret;
- #endif
-+#ifdef TARGET_NR_mq_timedreceive_time64
-+    case TARGET_NR_mq_timedreceive_time64:
-+        {
-+            struct timespec ts;
-+            unsigned int prio;
-+
-+            p = lock_user(VERIFY_READ, arg2, arg3, 1);
-+            if (arg5 != 0) {
-+                if (target_to_host_timespec64(&ts, arg5)) {
-+                    return -TARGET_EFAULT;
-+                }
-+                ret = get_errno(safe_mq_timedreceive(arg1, p, arg3,
-+                                                     &prio, &ts));
-+                if (!is_error(ret) && host_to_target_timespec64(arg5, &ts)) {
-+                    return -TARGET_EFAULT;
-+                }
-+            } else {
-+                ret = get_errno(safe_mq_timedreceive(arg1, p, arg3,
-+                                                     &prio, NULL));
-+            }
-+            unlock_user(p, arg2, arg3);
-+            if (arg4 != 0) {
-+                put_user_u32(prio, arg4);
-+            }
-+        }
-+        return ret;
-+#endif
- 
-     /* Not implemented for now... */
- /*     case TARGET_NR_mq_notify: */
--- 
-2.25.1
-
+The node_id which we introduced was only used internally. This wasn't
+exposed outside. I don't think live migration will be an issue.
 
