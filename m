@@ -2,81 +2,83 @@ Return-Path: <SRS0=JPH5=CC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB47BC433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 14:31:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11DDBC433E3
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 14:31:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9224B205CB
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 14:31:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D4064205CB
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 14:31:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="N0Da1v34"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9224B205CB
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NUteb7xf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D4064205CB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43254 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43392 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kADUz-0001VG-LC
-	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 10:31:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42896)
+	id 1kADV1-0001Yg-1d
+	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 10:31:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42926)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kADTg-00081h-Il
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 10:29:40 -0400
-Received: from mail-wr1-x431.google.com ([2a00:1450:4864:20::431]:43064)
+ id 1kADTh-00081w-CN
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 10:29:41 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:40782)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kADTe-0002eb-PE
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 10:29:40 -0400
-Received: by mail-wr1-x431.google.com with SMTP id a15so8898394wrh.10
- for <qemu-devel@nongnu.org>; Mon, 24 Aug 2020 07:29:38 -0700 (PDT)
+ id 1kADTf-0002es-J4
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 10:29:41 -0400
+Received: by mail-wr1-x441.google.com with SMTP id l2so8915591wrc.7
+ for <qemu-devel@nongnu.org>; Mon, 24 Aug 2020 07:29:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:mime-version
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=NHUufnyxKdqWA9jlUAJvMBRPiSTfhinIWCD6n38nQJw=;
- b=N0Da1v34vjCpKLAG2ERU2lDTX6c4dcpCTijWBLQzZ5h+jLWUNidP5D0vxrGoAPg8/z
- ShQjTgcwQ68hvQu3Kq1qDUNvITH+Uq0Z5cydP7AphY1cbJg4oHheyUU6x1q4teDcpPrX
- DIG3zX3rpzT7CbJQSrwb/z80tO8kiVOLXcskmC+YVbt5kNPG43QP2vK2xmIZqpuSm5/J
- 3Yl1m8pVM6b8VkGoZmqb2/u6/uXPQbtEJF/Ud5qD3JxifaJSeDykqUz3Ryml5Z4NSaZM
- 2V4ucN/z6Kmo4fXv22aQvGH1CzfDFmE3i2K5t/5zWjBT7UFECrBpwPvTE5w9nfoEKVfQ
- 8+JQ==
+ bh=bJjPsrivssu5AFGU0GHe8QW+4C7NJ4zaWEp8nyO14bs=;
+ b=NUteb7xfBsXChWoGpvfQK34P1MGve0qQWzExVnDuouDw0Sxsh9vlvzu72ujN5p49Kt
+ v4ktEkMpG6O4xcj8nOQpw5YIC83LWG4QhcZKgdyhG0HzbtqvthA8TC0qaRttxJvjx/Vl
+ UDi5Y2Jy5er/EsU0n9gK1J/bmgdigzkbSf563G3OZT15aFBOuw56pWdJtrJWYiEmdgQb
+ 5NyhN+TB7mxt5VszFscF3TTf7vzs7ZTQTGq2IweGM30cDFdXNVhxodNiak7x/Qt0v2kM
+ EMpCE7coDVEKXgXg/RFqcFWgEdnq6dE29KdkYVAp4pb1b4gV51e+OfDRDYzml+g2M+S6
+ a6sA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=NHUufnyxKdqWA9jlUAJvMBRPiSTfhinIWCD6n38nQJw=;
- b=J/vhdVtH81Mm8sgb/vBKptd+USQ2jPN7R1dDndIcsEzx5b5aav1a8J95K4sNBZDaUa
- plOOGMVGovjOMTxvBsuS87zDWWBpOmi3+lVLwJpIdBayGj+MP8qlf+TcoiZmVrIiqB6u
- bb7nK+ZVGRe2fbZ2gkhJohDbPyHIEAfzM7YuFq6tWuVyeZgRfEOOZalRWPpnQRnA5Bve
- SCVRm/C2m+GjaLRCAhxbDz+VPyZilXZmVUgpYVe5ioSa01CYMA047pC5OREMOCXFpTEM
- /P8oqthuQ+67faWh5bCponRR07cqlAz4BldgrKI2bZXhisN8hzGttNrUeYu2qqfePZ0D
- XcNg==
-X-Gm-Message-State: AOAM532GqQODDhueovtPeUpYDfgF64izh7gI882h9ZHQAlAbHqXAp7Ix
- g+ilkw3mTakmg1CY3uQzfcyRnah68hBHM6cQ
-X-Google-Smtp-Source: ABdhPJzyGjHWoJrMX/up1gvaUrvDM25ojaPHta1BjgPIWjBE+6XjpmYF3N+XOGnBx9RCdvJKFhijmA==
-X-Received: by 2002:a5d:6646:: with SMTP id f6mr6106190wrw.155.1598279376934; 
- Mon, 24 Aug 2020 07:29:36 -0700 (PDT)
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=bJjPsrivssu5AFGU0GHe8QW+4C7NJ4zaWEp8nyO14bs=;
+ b=rcNEwNhQDSOefrnnhPYe3SJJ7uw1ivc8Z0DUu/ljPoK+JzPlEK7nO0HxVA3b3+fucB
+ TD2q4O6SPK3h7coOi78t7qxzrR7MdAl0ageUKxbtVMZpuDL2ACjBacHRkFWo4lYwcNdw
+ pxAwe6GAA4emleNOGH/GK/FpwFDR95/3X2MLh5hZDxFgdUTtuC3F/r9ijpwt18FCLdVX
+ LOTpN77DzFvxgHb6EvPE+MGD6GPhVS9BpsaPmaEQ54Qat0D6PF3F13F9WGmckrLxLg+V
+ mCaMA1uEKOA9ybYVOu21nrSzwuqjrO9BsGMz9HETimR9p39EruCM4HIYADrD7Iw0pXUF
+ /T7Q==
+X-Gm-Message-State: AOAM532l0e2HND2TETPTPIOsk+hmBtjJU1Z4SjQnWWrmfyr82mT10KNa
+ CJTgMQnZ53wceHgbRBixQ+fJyg==
+X-Google-Smtp-Source: ABdhPJzujpp5C0RVwb+DpFlscFm5V7CVxDxufrnipZzHez8iOgGuUyqlY47bEJg1MiNjJ7OnS7+TtQ==
+X-Received: by 2002:a5d:4746:: with SMTP id o6mr6497149wrs.410.1598279378153; 
+ Mon, 24 Aug 2020 07:29:38 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id b14sm24499091wrj.93.2020.08.24.07.29.35
+ by smtp.gmail.com with ESMTPSA id b14sm24499091wrj.93.2020.08.24.07.29.37
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 24 Aug 2020 07:29:36 -0700 (PDT)
+ Mon, 24 Aug 2020 07:29:37 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-arm@nongnu.org,
 	qemu-devel@nongnu.org
-Subject: [PATCH 00/22] target/arm: Implement fp16 for AArch32 VFP
-Date: Mon, 24 Aug 2020 15:29:12 +0100
-Message-Id: <20200824142934.20850-1-peter.maydell@linaro.org>
+Subject: [PATCH 01/22] target/arm: Remove local definitions of float constants
+Date: Mon, 24 Aug 2020 15:29:13 +0100
+Message-Id: <20200824142934.20850-2-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200824142934.20850-1-peter.maydell@linaro.org>
+References: <20200824142934.20850-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::431;
- envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x431.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::441;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x441.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -102,57 +104,69 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patchset implements fp16 support for AArch32 VFP.
-I've included the final "turn it on in -cpu max" patch for
-convenience for testing, but we shouldn't commit that until
-we've also added AArch32 Neon fp16 support. (I have a patchset
-for that in progress, but I still have a handful of insns still to
-convert; I figured I'd send this lot out for review rather than
-waiting and sending a 50-patch set that covered VFP and Neon.)
+In several places the target/arm code defines local float constants
+for 2, 3 and 1.5, which are also provided by include/fpu/softfloat.h.
+Remove the unnecessary local duplicate versions.
 
-I'll send out the risu patch that adds patterns for fp16
-insns in a moment.
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ target/arm/helper-a64.c    | 11 -----------
+ target/arm/translate-sve.c |  4 ----
+ target/arm/vfp_helper.c    |  4 ----
+ 3 files changed, 19 deletions(-)
 
-thanks
--- PMM
-
-Peter Maydell (22):
-  target/arm: Remove local definitions of float constants
-  target/arm: Use correct ID register check for aa32_fp16_arith
-  target/arm: Implement VFP fp16 for VFP_BINOP operations
-  target/arm: Implement VFP fp16 VMLA, VMLS, VNMLS, VNMLA, VNMUL
-  target/arm: Macroify trans functions for VFMA, VFMS, VFNMA, VFNMS
-  target/arm: Implement VFP fp16 for fused-multiply-add
-  target/arm: Macroify uses of do_vfp_2op_sp() and do_vfp_2op_dp()
-  target/arm: Implement VFP fp16 for VABS, VNEG, VSQRT
-  target/arm: Implement VFP fp16 for VMOV immediate
-  target/arm: Implement VFP fp16 VCMP
-  target/arm: Implement VFP fp16 VLDR and VSTR
-  target/arm: Implement VFP fp16 VCVT between float and integer
-  target/arm: Make VFP_CONV_FIX macros take separate float type and
-    float size
-  target/arm: Use macros instead of open-coding fp16 conversion helpers
-  target/arm: Implement VFP fp16 VCVT between float and fixed-point
-  target/arm: Implement VFP vp16 VCVT-with-specified-rounding-mode
-  target/arm: Implement VFP fp16 VSEL
-  target/arm: Implement VFP fp16 VRINT*
-  target/arm: Implement new VFP fp16 insn VINS
-  target/arm: Implement new VFP fp16 insn VMOVX
-  target/arm: Implement VFP fp16 VMOV between gp and halfprec registers
-  target/arm: Enable FP16 in '-cpu max'
-
- target/arm/cpu.h               |   7 +-
- target/arm/helper.h            |  22 +
- target/arm/vfp-uncond.decode   |  27 +-
- target/arm/vfp.decode          |  34 +-
- target/arm/cpu.c               |   3 +-
- target/arm/cpu64.c             |  10 +-
- target/arm/helper-a64.c        |  11 -
- target/arm/translate-sve.c     |   4 -
- target/arm/vfp_helper.c        | 198 ++++----
- target/arm/translate-vfp.c.inc | 810 +++++++++++++++++++++++++++++----
- 10 files changed, 894 insertions(+), 232 deletions(-)
-
+diff --git a/target/arm/helper-a64.c b/target/arm/helper-a64.c
+index 8682630ff6c..030821489b3 100644
+--- a/target/arm/helper-a64.c
++++ b/target/arm/helper-a64.c
+@@ -234,17 +234,6 @@ uint64_t HELPER(neon_cgt_f64)(float64 a, float64 b, void *fpstp)
+  * versions, these do a fully fused multiply-add or
+  * multiply-add-and-halve.
+  */
+-#define float16_two make_float16(0x4000)
+-#define float16_three make_float16(0x4200)
+-#define float16_one_point_five make_float16(0x3e00)
+-
+-#define float32_two make_float32(0x40000000)
+-#define float32_three make_float32(0x40400000)
+-#define float32_one_point_five make_float32(0x3fc00000)
+-
+-#define float64_two make_float64(0x4000000000000000ULL)
+-#define float64_three make_float64(0x4008000000000000ULL)
+-#define float64_one_point_five make_float64(0x3FF8000000000000ULL)
+ 
+ uint32_t HELPER(recpsf_f16)(uint32_t a, uint32_t b, void *fpstp)
+ {
+diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
+index d97cb37d83f..1e2bcf840e7 100644
+--- a/target/arm/translate-sve.c
++++ b/target/arm/translate-sve.c
+@@ -3872,10 +3872,6 @@ static bool trans_##NAME##_zpzi(DisasContext *s, arg_rpri_esz *a)         \
+     return true;                                                          \
+ }
+ 
+-#define float16_two  make_float16(0x4000)
+-#define float32_two  make_float32(0x40000000)
+-#define float64_two  make_float64(0x4000000000000000ULL)
+-
+ DO_FP_IMM(FADD, fadds, half, one)
+ DO_FP_IMM(FSUB, fsubs, half, one)
+ DO_FP_IMM(FMUL, fmuls, half, two)
+diff --git a/target/arm/vfp_helper.c b/target/arm/vfp_helper.c
+index 64266ece620..02ab8d7f2d8 100644
+--- a/target/arm/vfp_helper.c
++++ b/target/arm/vfp_helper.c
+@@ -582,10 +582,6 @@ uint32_t HELPER(vfp_fcvt_f64_to_f16)(float64 a, void *fpstp, uint32_t ahp_mode)
+     return r;
+ }
+ 
+-#define float32_two make_float32(0x40000000)
+-#define float32_three make_float32(0x40400000)
+-#define float32_one_point_five make_float32(0x3fc00000)
+-
+ float32 HELPER(recps_f32)(CPUARMState *env, float32 a, float32 b)
+ {
+     float_status *s = &env->vfp.standard_fp_status;
 -- 
 2.20.1
 
