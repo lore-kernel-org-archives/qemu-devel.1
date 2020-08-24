@@ -2,83 +2,83 @@ Return-Path: <SRS0=JPH5=CC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
+	WEIRD_QUOTING autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B836C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 09:50:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ABCD3C433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 09:50:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1558C2071E
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 09:50:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 717812071E
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 09:50:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GsUbUznF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1558C2071E
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Lw8I+PcT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 717812071E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40406 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40596 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kA97k-0001Ev-9O
-	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 05:50:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46694)
+	id 1kA97m-0001JU-Eh
+	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 05:50:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46818)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kA95V-0004hc-Fq
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 05:48:25 -0400
-Received: from mail-wr1-x435.google.com ([2a00:1450:4864:20::435]:45966)
+ id 1kA95e-00056J-1Q
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 05:48:34 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:35030)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kA95T-0004mj-La
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 05:48:25 -0400
-Received: by mail-wr1-x435.google.com with SMTP id h15so1253552wrt.12
- for <qemu-devel@nongnu.org>; Mon, 24 Aug 2020 02:48:23 -0700 (PDT)
+ id 1kA95a-0004nl-Jk
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 05:48:33 -0400
+Received: by mail-wr1-x444.google.com with SMTP id b17so7217696wru.2
+ for <qemu-devel@nongnu.org>; Mon, 24 Aug 2020 02:48:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=2GcBUZfUY5fhS5QEBbnbqWMBrEShvuavXlhO/jcgc7I=;
- b=GsUbUznFibTeSNfKWSwQZ7jXLC4An6bX/40YMYlmH5slAYAOs7dHtbCTdwBv/qUGFc
- 6Ls5/8N8qZFGmU/1h9RADN32obHxu/GypM5KdDvOuyveuLnGAO1VCriTbwcy0e1JCUR8
- 0am74xVzap1x5dcvvKQfnoOK/vvxF8dFXYkeFTn9CPzuK7VO2lKnB1Mm2xSqfkDQmrmi
- OXbhh9UZ6XezJ65JbwHNF6TGWpLwkzs+7z4eFi2YV2jvegs97SsBjYAiRKJVzzCCp+aV
- EGCJcaikkdFkQSJLQEB+SJuIfhls2b8oqkaOEy43B64trYoz6lQRyWiYrtl/svCG4FXU
- /zVg==
+ bh=nj/jVd48Yy5aWXuxg27tOObzp4JLkxMOKbL7+qjvNT8=;
+ b=Lw8I+PcTCJaQxUJUkvIA9teZ8/4b2LgVodn6EnSF8HXKsDIGI/BlCXfbYo1HzdRp1T
+ 0U6pKr05xyv8gopfs8geB4lty81gkgdJDjwmNo4qeeFtzTiJUuh0kkXaobuu4v/pWtr5
+ lkUUtKQ48xn77vLaXqg0fuO2EGZsdsiO6LpncALVq6fKr4hOXBgBAsSXHCXnFnf227wF
+ 98tyb5kobzT6QhnkiXxTM9avymz+UsH2033PPLymyN4qPC7Eb7s6Is5zknCkaa05yu0k
+ 8UAjX6v6d8tyVBUPOaW5GzoNEdYwVooP401zYLF1i2tyDBQs0eU/4jJrJQoPuDlulP+w
+ fb6g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=2GcBUZfUY5fhS5QEBbnbqWMBrEShvuavXlhO/jcgc7I=;
- b=JSSkosdEUZHDl9g4Iw5G0TdC2/Sujuz+J1NuEOA/0UFIkPj6IH8Q5V87Q1CCNN18QH
- 3cNtMgjKtmHiclq4OZT4JojBcrjFdhnQsKvckqAjYVywTtelgOVW7OOmqi5tOX2xUhT6
- 6sCGCGqfAM8LO3XiyZPTXCq/ET3ZtP0EVua19pMVm/6zsxrY1tMUtLKHA2mOKQTsgkHX
- BM0HkYtvBDETb97ovx4kgB6H2aS1dsz8hFYIUD6dgG4syjt96nudw8lmayECYdxmwFj/
- rKCmerHTKWX9DFXj6fTGVyIMNh/LF0dnHLIrvM2NWOuGn2Z8ER6ww86ziV2rXvBS75i3
- OZBQ==
-X-Gm-Message-State: AOAM5322wpQ/vdwXKXDDk5wD5wu9/gtpr1kp8Y2PI62xoRo5VAEZOMJE
- qg3SMQp/eg4yVe2cPHloex8LRvitH4xIujme
-X-Google-Smtp-Source: ABdhPJxFl3AAApigWCe47yR6zXlIRzOg62eP1MtHzabxkkX3SDxoiE5DahRAWOzaWLfaMiKKfol/zQ==
-X-Received: by 2002:adf:ee51:: with SMTP id w17mr5204638wro.239.1598262502002; 
- Mon, 24 Aug 2020 02:48:22 -0700 (PDT)
+ bh=nj/jVd48Yy5aWXuxg27tOObzp4JLkxMOKbL7+qjvNT8=;
+ b=G1s02of+Mk6FHz88fiB3Y/+4uAcYawvyAw1W349Nikhr2pfJCOjRBPl568v2k+hS0U
+ XEtPpvbSbimn8EbaLWLjPnvgg3IZ0PluGJTI3rsLFh8KSg2O/nY1g5w9J12tqM5V9hxE
+ byuMAaOKX2YKeO2AhtwCjDODBGg1r5REau4/VnII87Mz8/q5/o9FtQoWsUqMhe9dXV5x
+ oA81kMsB5R9I5k/Os4X1PjBP3uw8hdbG+md5V143OBIVNZX0x8F5bDzrXVYwHOn2Z5rN
+ 74TSVwuC49YjMm7EEQzfahGUF1lmcOXM970nWy5JFCz/41sHFLP/rJhWxU1WJedIVMOM
+ Oavg==
+X-Gm-Message-State: AOAM531qaDBOSU1SguOzi4dex/n3fnrYoZUutFONukbpJBnLuGhLiNtN
+ E4QMNXClSvhjjufGuS+mX6tSY7k+YOUw9s/m
+X-Google-Smtp-Source: ABdhPJzAEFMZBW5DdSBcAaK3tYEUt88dsoORNFgCz6cajvAYK2J9c8p16vCsTk9//YUZxay2vU+3Mg==
+X-Received: by 2002:adf:f007:: with SMTP id j7mr4745958wro.195.1598262508816; 
+ Mon, 24 Aug 2020 02:48:28 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id q6sm24877057wma.22.2020.08.24.02.48.20
+ by smtp.gmail.com with ESMTPSA id q6sm24877057wma.22.2020.08.24.02.48.27
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 24 Aug 2020 02:48:21 -0700 (PDT)
+ Mon, 24 Aug 2020 02:48:28 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 07/27] hw/arm/smmuv3: Introduce smmuv3_s1_range_inval() helper
-Date: Mon, 24 Aug 2020 10:47:51 +0100
-Message-Id: <20200824094811.15439-8-peter.maydell@linaro.org>
+Subject: [PULL 13/27] docs/system/arm: Document the Xilinx Versal Virt board
+Date: Mon, 24 Aug 2020 10:47:57 +0100
+Message-Id: <20200824094811.15439-14-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200824094811.15439-1-peter.maydell@linaro.org>
 References: <20200824094811.15439-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::435;
- envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x435.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x444.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -86,8 +86,8 @@ X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ WEIRD_QUOTING=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -104,98 +104,236 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Eric Auger <eric.auger@redhat.com>
+From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-Let's introduce an helper for S1 IOVA range invalidation.
-This will be used for NH_VA and NH_VAA commands. It decodes
-the same fields, trace, calls the UNMAP notifiers and
-invalidate the corresponding IOTLB entries.
+Document the Xilinx Versal Virt board.
 
-At the moment, we do not support 3.2 range invalidation yet.
-So it reduces to a single IOVA invalidation.
-
-Note the leaf bit now is also decoded for the CMD_TLBI_NH_VAA
-command. At the moment it is only used for tracing.
-
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Message-id: 20200803164749.301971-2-edgar.iglesias@gmail.com
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Message-id: 20200728150815.11446-7-eric.auger@redhat.com
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/arm/smmuv3.c     | 36 +++++++++++++++++-------------------
- hw/arm/trace-events |  3 +--
- 2 files changed, 18 insertions(+), 21 deletions(-)
+ docs/system/arm/xlnx-versal-virt.rst | 176 +++++++++++++++++++++++++++
+ docs/system/target-arm.rst           |   1 +
+ MAINTAINERS                          |   3 +-
+ 3 files changed, 179 insertions(+), 1 deletion(-)
+ create mode 100644 docs/system/arm/xlnx-versal-virt.rst
 
-diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
-index b717bde8320..e4a2cea7adc 100644
---- a/hw/arm/smmuv3.c
-+++ b/hw/arm/smmuv3.c
-@@ -836,6 +836,22 @@ static void smmuv3_inv_notifiers_iova(SMMUState *s, int asid, dma_addr_t iova)
-     }
- }
+diff --git a/docs/system/arm/xlnx-versal-virt.rst b/docs/system/arm/xlnx-versal-virt.rst
+new file mode 100644
+index 00000000000..2602d0f9953
+--- /dev/null
++++ b/docs/system/arm/xlnx-versal-virt.rst
+@@ -0,0 +1,176 @@
++Xilinx Versal Virt (``xlnx-versal-virt``)
++=========================================
++
++Xilinx Versal is a family of heterogeneous multi-core SoCs
++(System on Chip) that combine traditional hardened CPUs and I/O
++peripherals in a Processing System (PS) with runtime programmable
++FPGA logic (PL) and an Artificial Intelligence Engine (AIE).
++
++More details here:
++https://www.xilinx.com/products/silicon-devices/acap/versal.html
++
++The family of Versal SoCs share a single architecture but come in
++different parts with different speed grades, amounts of PL and
++other differences.
++
++The Xilinx Versal Virt board in QEMU is a model of a virtual board
++(does not exist in reality) with a virtual Versal SoC without I/O
++limitations. Currently, we support the following cores and devices:
++
++Implemented CPU cores:
++
++- 2 ACPUs (ARM Cortex-A72)
++
++Implemented devices:
++
++- Interrupt controller (ARM GICv3)
++- 2 UARTs (ARM PL011)
++- An RTC (Versal built-in)
++- 2 GEMs (Cadence MACB Ethernet MACs)
++- 8 ADMA (Xilinx zDMA) channels
++- 2 SD Controllers
++- OCM (256KB of On Chip Memory)
++- DDR memory
++
++QEMU does not yet model any other devices, including the PL and the AI Engine.
++
++Other differences between the hardware and the QEMU model:
++
++- QEMU allows the amount of DDR memory provided to be specified with the
++  ``-m`` argument. If a DTB is provided on the command line then QEMU will
++  edit it to include suitable entries describing the Versal DDR memory ranges.
++
++- QEMU provides 8 virtio-mmio virtio transports; these start at
++  address ``0xa0000000`` and have IRQs from 111 and upwards.
++
++Running
++"""""""
++If the user provides an Operating System to be loaded, we expect users
++to use the ``-kernel`` command line option.
++
++Users can load firmware or boot-loaders with the ``-device loader`` options.
++
++When loading an OS, QEMU generates a DTB and selects an appropriate address
++where it gets loaded. This DTB will be passed to the kernel in register x0.
++
++If there's no ``-kernel`` option, we generate a DTB and place it at 0x1000
++for boot-loaders or firmware to pick it up.
++
++If users want to provide their own DTB, they can use the ``-dtb`` option.
++These DTBs will have their memory nodes modified to match QEMU's
++selected ram_size option before they get passed to the kernel or FW.
++
++When loading an OS, we turn on QEMU's PSCI implementation with SMC
++as the PSCI conduit. When there's no ``-kernel`` option, we assume the user
++provides EL3 firmware to handle PSCI.
++
++A few examples:
++
++Direct Linux boot of a generic ARM64 upstream Linux kernel:
++
++.. code-block:: bash
++
++  $ qemu-system-aarch64 -M xlnx-versal-virt -m 2G \
++      -serial mon:stdio -display none \
++      -kernel arch/arm64/boot/Image \
++      -nic user -nic user \
++      -device virtio-rng-device,bus=virtio-mmio-bus.0 \
++      -drive if=none,index=0,file=hd0.qcow2,id=hd0,snapshot \
++      -drive file=qemu_sd.qcow2,if=sd,index=0,snapshot \
++      -device virtio-blk-device,drive=hd0 -append root=/dev/vda
++
++Direct Linux boot of PetaLinux 2019.2:
++
++.. code-block:: bash
++
++  $ qemu-system-aarch64  -M xlnx-versal-virt -m 2G \
++      -serial mon:stdio -display none \
++      -kernel petalinux-v2019.2/Image \
++      -append "rdinit=/sbin/init console=ttyAMA0,115200n8 earlycon=pl011,mmio,0xFF000000,115200n8" \
++      -net nic,model=cadence_gem,netdev=net0 -netdev user,id=net0 \
++      -device virtio-rng-device,bus=virtio-mmio-bus.0,rng=rng0 \
++      -object rng-random,filename=/dev/urandom,id=rng0
++
++Boot PetaLinux 2019.2 via ARM Trusted Firmware (2018.3 because the 2019.2
++version of ATF tries to configure the CCI which we don't model) and U-boot:
++
++.. code-block:: bash
++
++  $ qemu-system-aarch64 -M xlnx-versal-virt -m 2G \
++      -serial stdio -display none \
++      -device loader,file=petalinux-v2018.3/bl31.elf,cpu-num=0 \
++      -device loader,file=petalinux-v2019.2/u-boot.elf \
++      -device loader,addr=0x20000000,file=petalinux-v2019.2/Image \
++      -nic user -nic user \
++      -device virtio-rng-device,bus=virtio-mmio-bus.0,rng=rng0 \
++      -object rng-random,filename=/dev/urandom,id=rng0
++
++Run the following at the U-Boot prompt:
++
++.. code-block:: bash
++
++  Versal>
++  fdt addr $fdtcontroladdr
++  fdt move $fdtcontroladdr 0x40000000
++  fdt set /timer clock-frequency <0x3dfd240>
++  setenv bootargs "rdinit=/sbin/init maxcpus=1 console=ttyAMA0,115200n8 earlycon=pl011,mmio,0xFF000000,115200n8"
++  booti 20000000 - 40000000
++  fdt addr $fdtcontroladdr
++
++Boot Linux as DOM0 on Xen via U-Boot:
++
++.. code-block:: bash
++
++  $ qemu-system-aarch64 -M xlnx-versal-virt -m 4G \
++      -serial stdio -display none \
++      -device loader,file=petalinux-v2019.2/u-boot.elf,cpu-num=0 \
++      -device loader,addr=0x30000000,file=linux/2018-04-24/xen \
++      -device loader,addr=0x40000000,file=petalinux-v2019.2/Image \
++      -nic user -nic user \
++      -device virtio-rng-device,bus=virtio-mmio-bus.0,rng=rng0 \
++      -object rng-random,filename=/dev/urandom,id=rng0
++
++Run the following at the U-Boot prompt:
++
++.. code-block:: bash
++
++  Versal>
++  fdt addr $fdtcontroladdr
++  fdt move $fdtcontroladdr 0x20000000
++  fdt set /timer clock-frequency <0x3dfd240>
++  fdt set /chosen xen,xen-bootargs "console=dtuart dtuart=/uart@ff000000 dom0_mem=640M bootscrub=0 maxcpus=1 timer_slop=0"
++  fdt set /chosen xen,dom0-bootargs "rdinit=/sbin/init clk_ignore_unused console=hvc0 maxcpus=1"
++  fdt mknode /chosen dom0
++  fdt set /chosen/dom0 compatible "xen,multiboot-module"
++  fdt set /chosen/dom0 reg <0x00000000 0x40000000 0x0 0x03100000>
++  booti 30000000 - 20000000
++
++Boot Linux as Dom0 on Xen via ARM Trusted Firmware and U-Boot:
++
++.. code-block:: bash
++
++  $ qemu-system-aarch64 -M xlnx-versal-virt -m 4G \
++      -serial stdio -display none \
++      -device loader,file=petalinux-v2018.3/bl31.elf,cpu-num=0 \
++      -device loader,file=petalinux-v2019.2/u-boot.elf \
++      -device loader,addr=0x30000000,file=linux/2018-04-24/xen \
++      -device loader,addr=0x40000000,file=petalinux-v2019.2/Image \
++      -nic user -nic user \
++      -device virtio-rng-device,bus=virtio-mmio-bus.0,rng=rng0 \
++      -object rng-random,filename=/dev/urandom,id=rng0
++
++Run the following at the U-Boot prompt:
++
++.. code-block:: bash
++
++  Versal>
++  fdt addr $fdtcontroladdr
++  fdt move $fdtcontroladdr 0x20000000
++  fdt set /timer clock-frequency <0x3dfd240>
++  fdt set /chosen xen,xen-bootargs "console=dtuart dtuart=/uart@ff000000 dom0_mem=640M bootscrub=0 maxcpus=1 timer_slop=0"
++  fdt set /chosen xen,dom0-bootargs "rdinit=/sbin/init clk_ignore_unused console=hvc0 maxcpus=1"
++  fdt mknode /chosen dom0
++  fdt set /chosen/dom0 compatible "xen,multiboot-module"
++  fdt set /chosen/dom0 reg <0x00000000 0x40000000 0x0 0x03100000>
++  booti 30000000 - 20000000
++
+diff --git a/docs/system/target-arm.rst b/docs/system/target-arm.rst
+index 4c5b0e4aab8..afdb37e7384 100644
+--- a/docs/system/target-arm.rst
++++ b/docs/system/target-arm.rst
+@@ -93,6 +93,7 @@ undocumented; you can get a complete list by running
+    arm/sx1
+    arm/stellaris
+    arm/virt
++   arm/xlnx-versal-virt
  
-+static void smmuv3_s1_range_inval(SMMUState *s, Cmd *cmd)
-+{
-+    dma_addr_t addr = CMD_ADDR(cmd);
-+    uint8_t type = CMD_TYPE(cmd);
-+    uint16_t vmid = CMD_VMID(cmd);
-+    bool leaf = CMD_LEAF(cmd);
-+    int asid = -1;
-+
-+    if (type == SMMU_CMD_TLBI_NH_VA) {
-+        asid = CMD_ASID(cmd);
-+    }
-+    trace_smmuv3_s1_range_inval(vmid, asid, addr, leaf);
-+    smmuv3_inv_notifiers_iova(s, asid, addr);
-+    smmu_iotlb_inv_iova(s, asid, addr);
-+}
-+
- static int smmuv3_cmdq_consume(SMMUv3State *s)
- {
-     SMMUState *bs = ARM_SMMU(s);
-@@ -966,27 +982,9 @@ static int smmuv3_cmdq_consume(SMMUv3State *s)
-             smmu_iotlb_inv_all(bs);
-             break;
-         case SMMU_CMD_TLBI_NH_VAA:
--        {
--            dma_addr_t addr = CMD_ADDR(&cmd);
--            uint16_t vmid = CMD_VMID(&cmd);
--
--            trace_smmuv3_cmdq_tlbi_nh_vaa(vmid, addr);
--            smmuv3_inv_notifiers_iova(bs, -1, addr);
--            smmu_iotlb_inv_iova(bs, -1, addr);
--            break;
--        }
-         case SMMU_CMD_TLBI_NH_VA:
--        {
--            uint16_t asid = CMD_ASID(&cmd);
--            uint16_t vmid = CMD_VMID(&cmd);
--            dma_addr_t addr = CMD_ADDR(&cmd);
--            bool leaf = CMD_LEAF(&cmd);
--
--            trace_smmuv3_cmdq_tlbi_nh_va(vmid, asid, addr, leaf);
--            smmuv3_inv_notifiers_iova(bs, asid, addr);
--            smmu_iotlb_inv_iova(bs, asid, addr);
-+            smmuv3_s1_range_inval(bs, &cmd);
-             break;
--        }
-         case SMMU_CMD_TLBI_EL3_ALL:
-         case SMMU_CMD_TLBI_EL3_VA:
-         case SMMU_CMD_TLBI_EL2_ALL:
-diff --git a/hw/arm/trace-events b/hw/arm/trace-events
-index f74d3e920f1..c219fe9e828 100644
---- a/hw/arm/trace-events
-+++ b/hw/arm/trace-events
-@@ -45,8 +45,7 @@ smmuv3_cmdq_cfgi_ste_range(int start, int end) "start=0x%d - end=0x%d"
- smmuv3_cmdq_cfgi_cd(uint32_t sid) "streamid = %d"
- smmuv3_config_cache_hit(uint32_t sid, uint32_t hits, uint32_t misses, uint32_t perc) "Config cache HIT for sid %d (hits=%d, misses=%d, hit rate=%d)"
- smmuv3_config_cache_miss(uint32_t sid, uint32_t hits, uint32_t misses, uint32_t perc) "Config cache MISS for sid %d (hits=%d, misses=%d, hit rate=%d)"
--smmuv3_cmdq_tlbi_nh_va(int vmid, int asid, uint64_t addr, bool leaf) "vmid =%d asid =%d addr=0x%"PRIx64" leaf=%d"
--smmuv3_cmdq_tlbi_nh_vaa(int vmid, uint64_t addr) "vmid =%d addr=0x%"PRIx64
-+smmuv3_s1_range_inval(int vmid, int asid, uint64_t addr, bool leaf) "vmid =%d asid =%d addr=0x%"PRIx64" leaf=%d"
- smmuv3_cmdq_tlbi_nh(void) ""
- smmuv3_cmdq_tlbi_nh_asid(uint16_t asid) "asid=%d"
- smmuv3_config_cache_inv(uint32_t sid) "Config cache INV for sid %d"
+ Arm CPU features
+ ================
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 0886eb3d2b5..5a22c8be429 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -894,7 +894,7 @@ F: hw/misc/zynq*
+ F: include/hw/misc/zynq*
+ X: hw/ssi/xilinx_*
+ 
+-Xilinx ZynqMP
++Xilinx ZynqMP and Versal
+ M: Alistair Francis <alistair@alistair23.me>
+ M: Edgar E. Iglesias <edgar.iglesias@gmail.com>
+ M: Peter Maydell <peter.maydell@linaro.org>
+@@ -905,6 +905,7 @@ F: include/hw/*/xlnx*.h
+ F: include/hw/ssi/xilinx_spips.h
+ F: hw/display/dpcd.c
+ F: include/hw/display/dpcd.h
++F: docs/system/arm/xlnx-versal-virt.rst
+ 
+ ARM ACPI Subsystem
+ M: Shannon Zhao <shannon.zhaosl@gmail.com>
 -- 
 2.20.1
 
