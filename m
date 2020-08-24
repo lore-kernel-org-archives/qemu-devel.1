@@ -2,90 +2,90 @@ Return-Path: <SRS0=JPH5=CC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-6.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1452FC433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 14:25:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB47BC433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 14:31:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C69972071E
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 14:25:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9224B205CB
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 14:31:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KaXJUtcH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C69972071E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="N0Da1v34"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9224B205CB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34192 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43254 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kADPw-0005XU-F3
-	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 10:25:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41590)
+	id 1kADUz-0001VG-LC
+	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 10:31:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42896)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kADP2-0004r1-2X
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 10:24:52 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:60324)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kADOz-0001sO-A3
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 10:24:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598279087;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=vb+wXksz+bZhVwznQwRs5oQWakbq4EB6L166OWe5JHI=;
- b=KaXJUtcHmH+FYouqSCHJeCXobK+Qcx+ugPvx22xbwH5M4eknt1e7hr8U4ZFMduRhr+OPlX
- o7SMfgb4FOg+T12XRx/11QNN9Z3aeKGZDdLFUIUWUjWqIjWim0oQFWQgSH82EKfq2gRxak
- AIuzPrYyjGEt/il29vIpaM6sAMLEgKE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-118-2wp9q8ryNNyVxz80CJQozA-1; Mon, 24 Aug 2020 10:24:39 -0400
-X-MC-Unique: 2wp9q8ryNNyVxz80CJQozA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4A86D425CF;
- Mon, 24 Aug 2020 14:24:38 +0000 (UTC)
-Received: from redhat.com (ovpn-114-223.ams2.redhat.com [10.36.114.223])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 47B38648BA;
- Mon, 24 Aug 2020 14:24:34 +0000 (UTC)
-Date: Mon, 24 Aug 2020 15:24:31 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Roman Bolshakov <r.bolshakov@yadro.com>
-Subject: Re: [PATCH] meson: Don't make object files for dtrace on macOS
-Message-ID: <20200824142431.GL10011@redhat.com>
-References: <20200823090546.47957-1-r.bolshakov@yadro.com>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kADTg-00081h-Il
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 10:29:40 -0400
+Received: from mail-wr1-x431.google.com ([2a00:1450:4864:20::431]:43064)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kADTe-0002eb-PE
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 10:29:40 -0400
+Received: by mail-wr1-x431.google.com with SMTP id a15so8898394wrh.10
+ for <qemu-devel@nongnu.org>; Mon, 24 Aug 2020 07:29:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=NHUufnyxKdqWA9jlUAJvMBRPiSTfhinIWCD6n38nQJw=;
+ b=N0Da1v34vjCpKLAG2ERU2lDTX6c4dcpCTijWBLQzZ5h+jLWUNidP5D0vxrGoAPg8/z
+ ShQjTgcwQ68hvQu3Kq1qDUNvITH+Uq0Z5cydP7AphY1cbJg4oHheyUU6x1q4teDcpPrX
+ DIG3zX3rpzT7CbJQSrwb/z80tO8kiVOLXcskmC+YVbt5kNPG43QP2vK2xmIZqpuSm5/J
+ 3Yl1m8pVM6b8VkGoZmqb2/u6/uXPQbtEJF/Ud5qD3JxifaJSeDykqUz3Ryml5Z4NSaZM
+ 2V4ucN/z6Kmo4fXv22aQvGH1CzfDFmE3i2K5t/5zWjBT7UFECrBpwPvTE5w9nfoEKVfQ
+ 8+JQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=NHUufnyxKdqWA9jlUAJvMBRPiSTfhinIWCD6n38nQJw=;
+ b=J/vhdVtH81Mm8sgb/vBKptd+USQ2jPN7R1dDndIcsEzx5b5aav1a8J95K4sNBZDaUa
+ plOOGMVGovjOMTxvBsuS87zDWWBpOmi3+lVLwJpIdBayGj+MP8qlf+TcoiZmVrIiqB6u
+ bb7nK+ZVGRe2fbZ2gkhJohDbPyHIEAfzM7YuFq6tWuVyeZgRfEOOZalRWPpnQRnA5Bve
+ SCVRm/C2m+GjaLRCAhxbDz+VPyZilXZmVUgpYVe5ioSa01CYMA047pC5OREMOCXFpTEM
+ /P8oqthuQ+67faWh5bCponRR07cqlAz4BldgrKI2bZXhisN8hzGttNrUeYu2qqfePZ0D
+ XcNg==
+X-Gm-Message-State: AOAM532GqQODDhueovtPeUpYDfgF64izh7gI882h9ZHQAlAbHqXAp7Ix
+ g+ilkw3mTakmg1CY3uQzfcyRnah68hBHM6cQ
+X-Google-Smtp-Source: ABdhPJzyGjHWoJrMX/up1gvaUrvDM25ojaPHta1BjgPIWjBE+6XjpmYF3N+XOGnBx9RCdvJKFhijmA==
+X-Received: by 2002:a5d:6646:: with SMTP id f6mr6106190wrw.155.1598279376934; 
+ Mon, 24 Aug 2020 07:29:36 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id b14sm24499091wrj.93.2020.08.24.07.29.35
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 24 Aug 2020 07:29:36 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-arm@nongnu.org,
+	qemu-devel@nongnu.org
+Subject: [PATCH 00/22] target/arm: Implement fp16 for AArch32 VFP
+Date: Mon, 24 Aug 2020 15:29:12 +0100
+Message-Id: <20200824142934.20850-1-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <20200823090546.47957-1-r.bolshakov@yadro.com>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=berrange@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/24 06:48:00
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.956,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=2a00:1450:4864:20::431;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x431.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,36 +98,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org,
- Cameron Esfahani <dirty@apple.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, Aug 23, 2020 at 12:05:47PM +0300, Roman Bolshakov wrote:
-> dtrace on macOS uses unresolved symbols with a special prefix to define
-> probes [1], only headers should be generated for USDT (dtrace(1)). But
-> it doesn't support backwards compatible no-op -G flag [2] and implicit
-> build rules fail.
-> 
-> 1. https://markmail.org/message/6grq2ygr5nwdwsnb
-> 2. https://markmail.org/message/5xrxt2w5m42nojkz
-> 
-> Cc: Daniel P. Berrangé <berrange@redhat.com>
-> Cc: Cameron Esfahani <dirty@apple.com>
-> Signed-off-by: Roman Bolshakov <r.bolshakov@yadro.com>
-> ---
->  trace/meson.build | 13 ++++++++-----
->  1 file changed, 8 insertions(+), 5 deletions(-)
+This patchset implements fp16 support for AArch32 VFP.
+I've included the final "turn it on in -cpu max" patch for
+convenience for testing, but we shouldn't commit that until
+we've also added AArch32 Neon fp16 support. (I have a patchset
+for that in progress, but I still have a handful of insns still to
+convert; I figured I'd send this lot out for review rather than
+waiting and sending a 50-patch set that covered VFP and Neon.)
 
-Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
+I'll send out the risu patch that adds patterns for fp16
+insns in a moment.
 
-Regards,
-Daniel
+thanks
+-- PMM
+
+Peter Maydell (22):
+  target/arm: Remove local definitions of float constants
+  target/arm: Use correct ID register check for aa32_fp16_arith
+  target/arm: Implement VFP fp16 for VFP_BINOP operations
+  target/arm: Implement VFP fp16 VMLA, VMLS, VNMLS, VNMLA, VNMUL
+  target/arm: Macroify trans functions for VFMA, VFMS, VFNMA, VFNMS
+  target/arm: Implement VFP fp16 for fused-multiply-add
+  target/arm: Macroify uses of do_vfp_2op_sp() and do_vfp_2op_dp()
+  target/arm: Implement VFP fp16 for VABS, VNEG, VSQRT
+  target/arm: Implement VFP fp16 for VMOV immediate
+  target/arm: Implement VFP fp16 VCMP
+  target/arm: Implement VFP fp16 VLDR and VSTR
+  target/arm: Implement VFP fp16 VCVT between float and integer
+  target/arm: Make VFP_CONV_FIX macros take separate float type and
+    float size
+  target/arm: Use macros instead of open-coding fp16 conversion helpers
+  target/arm: Implement VFP fp16 VCVT between float and fixed-point
+  target/arm: Implement VFP vp16 VCVT-with-specified-rounding-mode
+  target/arm: Implement VFP fp16 VSEL
+  target/arm: Implement VFP fp16 VRINT*
+  target/arm: Implement new VFP fp16 insn VINS
+  target/arm: Implement new VFP fp16 insn VMOVX
+  target/arm: Implement VFP fp16 VMOV between gp and halfprec registers
+  target/arm: Enable FP16 in '-cpu max'
+
+ target/arm/cpu.h               |   7 +-
+ target/arm/helper.h            |  22 +
+ target/arm/vfp-uncond.decode   |  27 +-
+ target/arm/vfp.decode          |  34 +-
+ target/arm/cpu.c               |   3 +-
+ target/arm/cpu64.c             |  10 +-
+ target/arm/helper-a64.c        |  11 -
+ target/arm/translate-sve.c     |   4 -
+ target/arm/vfp_helper.c        | 198 ++++----
+ target/arm/translate-vfp.c.inc | 810 +++++++++++++++++++++++++++++----
+ 10 files changed, 894 insertions(+), 232 deletions(-)
+
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+2.20.1
 
 
