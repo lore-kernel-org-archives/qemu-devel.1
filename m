@@ -2,96 +2,90 @@ Return-Path: <SRS0=JPH5=CC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66B13C433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 14:23:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1452FC433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 14:25:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 321ED206F0
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 14:23:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C69972071E
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 14:25:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=dme-org.20150623.gappssmtp.com header.i=@dme-org.20150623.gappssmtp.com header.b="bAyREune"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 321ED206F0
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=dme.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KaXJUtcH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C69972071E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59174 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34192 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kADNG-0003zS-1e
-	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 10:23:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40900)
+	id 1kADPw-0005XU-F3
+	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 10:25:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41590)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dme@dme.org>) id 1kADLz-0003Ob-W9
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 10:21:44 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:51345)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <dme@dme.org>) id 1kADLy-0001Xc-0e
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 10:21:43 -0400
-Received: by mail-wm1-x342.google.com with SMTP id s20so3483803wmj.1
- for <qemu-devel@nongnu.org>; Mon, 24 Aug 2020 07:21:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=dme-org.20150623.gappssmtp.com; s=20150623;
- h=to:cc:subject:in-reply-to:references:from:date:message-id
- :mime-version; bh=z3N+sHXH4xnNVsdGuqjSm7hHX+cWbiH9KUTQyCZ93Xw=;
- b=bAyREune3tE1kGMyefLXKxWvV+ny60Sa7AsdUsBMr1Qh23hHF6n0AByKKXn1cKsnBL
- YEtTyxedEHFutwX70Czn5TLBwsctOz8jz8mgDKlmCm9B/IMvFAdFloMbxwYjcQq/SVei
- EZz0S24qbX84h4zNqWh8WQF3+gBGSxfKWe960WA0szMPR8/WeBzv223CvQYG5tapNcs5
- 3H1XvM2Gp095VctSEL8MF8TWMxjvSB7mboPTGTpjE/HaR0ow/gWNiv7Vz8HTrVjgST8D
- TVRjkZS+dUPejcBj42wx4dl2qKRar4srZHkMe85vR4DpfyrWssEQR1jK8+TWOmrsP4tf
- 3J6A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:to:cc:subject:in-reply-to:references:from:date
- :message-id:mime-version;
- bh=z3N+sHXH4xnNVsdGuqjSm7hHX+cWbiH9KUTQyCZ93Xw=;
- b=ZxuHSdNsvyK3ktLPw2D415d6vFPbMjI8Hvea5YrnwRlRPSHXzYrD2LP9UFNnlc0Q1S
- 1BVTK5LkSRxPdELTVPGQ5w5ifK9fCVHAt2e4mcRKFEdSL2wAvVPtnVqFzykmKgcbRgzf
- YtFpmzkpaTa90w3F6dRAKdO8Zzwkm7NqIubDgiH6wWEDISDa+Xo2nUNuePgQEgxvs1jf
- h0iJLDe48UCcoKcJ0y0NHSjXBwwVSyzJs4+bsS0rthcezhFM2mARLHLrXpvpy4Kch3Cd
- HqNHrkhj04ytKbafehhGF9q6D9AhooumNus8V0g3S+25I5kmhRh3zDx9fclbugWpl01d
- 1bjQ==
-X-Gm-Message-State: AOAM5332SL2I3bV+ucC8MFhIj0b9i8L34BGFvVBnHB3x4KGaB+un8VHB
- U/c7uPRHhgJeoBPBJOaU+BRryA==
-X-Google-Smtp-Source: ABdhPJwnc1etMTEUgkDc1FJ+L+SfiUW8Okw9+sUaQ9WIRzyJLxxCuLlndHIfkkSYuNJ0SdsCzzHFcQ==
-X-Received: by 2002:a1c:f207:: with SMTP id s7mr5836586wmc.22.1598278899286;
- Mon, 24 Aug 2020 07:21:39 -0700 (PDT)
-Received: from disaster-area.hh.sledj.net
- (8.a.e.d.0.0.0.0.0.0.0.0.4.6.0.0.0.4.1.7.1.7.b.b.0.b.8.0.1.0.0.2.ip6.arpa.
- [2001:8b0:bb71:7140:64::dea8])
- by smtp.gmail.com with ESMTPSA id o2sm23349992wrh.70.2020.08.24.07.21.37
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 24 Aug 2020 07:21:38 -0700 (PDT)
-Received: from localhost (disaster-area.hh.sledj.net [local])
- by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id 49b6382c;
- Mon, 24 Aug 2020 14:21:37 +0000 (UTC)
-To: Markus Armbruster <armbru@redhat.com>
-Subject: Re: [RFC PATCH 5/9] block/curl: Allow the blocksize to be specified
- by the user
-In-Reply-To: <87a6ykqizn.fsf@dusky.pond.sub.org>
-References: <20200818110845.3825105-1-david.edmondson@oracle.com>
- <20200818110845.3825105-6-david.edmondson@oracle.com>
- <87a6ykqizn.fsf@dusky.pond.sub.org>
-X-HGTTG: heart-of-gold
-From: David Edmondson <dme@dme.org>
-Date: Mon, 24 Aug 2020 15:21:36 +0100
-Message-ID: <m2pn7g15vz.fsf@dme.org>
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kADP2-0004r1-2X
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 10:24:52 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:60324)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kADOz-0001sO-A3
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 10:24:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1598279087;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=vb+wXksz+bZhVwznQwRs5oQWakbq4EB6L166OWe5JHI=;
+ b=KaXJUtcHmH+FYouqSCHJeCXobK+Qcx+ugPvx22xbwH5M4eknt1e7hr8U4ZFMduRhr+OPlX
+ o7SMfgb4FOg+T12XRx/11QNN9Z3aeKGZDdLFUIUWUjWqIjWim0oQFWQgSH82EKfq2gRxak
+ AIuzPrYyjGEt/il29vIpaM6sAMLEgKE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-118-2wp9q8ryNNyVxz80CJQozA-1; Mon, 24 Aug 2020 10:24:39 -0400
+X-MC-Unique: 2wp9q8ryNNyVxz80CJQozA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4A86D425CF;
+ Mon, 24 Aug 2020 14:24:38 +0000 (UTC)
+Received: from redhat.com (ovpn-114-223.ams2.redhat.com [10.36.114.223])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 47B38648BA;
+ Mon, 24 Aug 2020 14:24:34 +0000 (UTC)
+Date: Mon, 24 Aug 2020 15:24:31 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Roman Bolshakov <r.bolshakov@yadro.com>
+Subject: Re: [PATCH] meson: Don't make object files for dtrace on macOS
+Message-ID: <20200824142431.GL10011@redhat.com>
+References: <20200823090546.47957-1-r.bolshakov@yadro.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Received-SPF: neutral client-ip=2a00:1450:4864:20::342;
- envelope-from=dme@dme.org; helo=mail-wm1-x342.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -10
-X-Spam_score: -1.1
-X-Spam_bar: -
-X-Spam_report: (-1.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_NEUTRAL=0.779, UNPARSEABLE_RELAY=0.001 autolearn=no autolearn_force=no
+In-Reply-To: <20200823090546.47957-1-r.bolshakov@yadro.com>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=berrange@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/24 06:48:00
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.956,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -104,82 +98,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org,
+ Cameron Esfahani <dirty@apple.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Monday, 2020-08-24 at 15:19:24 +02, Markus Armbruster wrote:
+On Sun, Aug 23, 2020 at 12:05:47PM +0300, Roman Bolshakov wrote:
+> dtrace on macOS uses unresolved symbols with a special prefix to define
+> probes [1], only headers should be generated for USDT (dtrace(1)). But
+> it doesn't support backwards compatible no-op -G flag [2] and implicit
+> build rules fail.
+> 
+> 1. https://markmail.org/message/6grq2ygr5nwdwsnb
+> 2. https://markmail.org/message/5xrxt2w5m42nojkz
+> 
+> Cc: Daniel P. Berrangé <berrange@redhat.com>
+> Cc: Cameron Esfahani <dirty@apple.com>
+> Signed-off-by: Roman Bolshakov <r.bolshakov@yadro.com>
+> ---
+>  trace/meson.build | 13 ++++++++-----
+>  1 file changed, 8 insertions(+), 5 deletions(-)
 
-> David Edmondson <david.edmondson@oracle.com> writes:
->
->> Rather than a fixed 256kB blocksize, allow the user to specify the
->> size used. It must be a non-zero power of two, defaulting to 256kB.
->
-> Nitpick: any power of two is non-zero.  Scratch "non-zero".
+Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
 
-Indeed.
-
->> Signed-off-by: David Edmondson <david.edmondson@oracle.com>
->> ---
-> [...]
->> diff --git a/docs/system/device-url-syntax.rst.inc b/docs/system/device-url-syntax.rst.inc
->> index bc38b9df38..ee504ee41a 100644
->> --- a/docs/system/device-url-syntax.rst.inc
->> +++ b/docs/system/device-url-syntax.rst.inc
->> @@ -194,6 +194,13 @@ These are specified using a special URL syntax.
->>        Add an offset, in bytes, to all range requests sent to the
->>        remote server.
->>  
->> +   ``blocksize``
->> +      The size of all IO requests sent to the remote server. This
->> +      value may optionally have the suffix 'T', 'G', 'M', 'K', 'k' or
->> +      'b'. If it does not have a suffix, it will be assumed to be in
->> +      bytes. The value must be a non-zero power of two.  It defaults
->> +      to 256kB.
->> +
->>     Note that when passing options to qemu explicitly, ``driver`` is the
->>     value of <protocol>.
->>  
->> diff --git a/qapi/block-core.json b/qapi/block-core.json
->> index d6f5e91cc3..cd16197e1e 100644
->> --- a/qapi/block-core.json
->> +++ b/qapi/block-core.json
->> @@ -3764,10 +3764,14 @@
->>  # @proxy-password-secret: ID of a QCryptoSecret object providing a password
->>  #                         for proxy authentication (defaults to no password)
->>  #
->> +# @blocksize: Size of all IO requests sent to the remote server; must
->> +#             be a non-zero power of two (defaults to 1 256kB)
->
-> Scratch "non-zero".
->
-> "(defaults to 1 256kB)" confuses me.  Do you mean "(defaults to 256kB)"?
-
-Yes, thanks for catching it.
-
-> Please add "(since 5.2)".
-
-Will do.
-
->> +#
->>  # Since: 2.9
->>  ##
->>  { 'struct': 'BlockdevOptionsCurlBase',
->>    'data': { 'url': 'str',
->> +            '*blocksize': 'int',
->
-> Should we use 'size' rather than 'int'?
-
-Yes.
-
->>              '*timeout': 'int',
->>              '*username': 'str',
->>              '*password-secret': 'str',
-
-dme.
+Regards,
+Daniel
 -- 
-But are you safe Miss Gradenko?
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+
 
