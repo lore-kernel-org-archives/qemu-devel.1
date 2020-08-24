@@ -2,124 +2,120 @@ Return-Path: <SRS0=JPH5=CC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,RCVD_ILLEGAL_IP,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49D2BC433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 19:51:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3AE9C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 20:12:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EE47D20706
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 19:51:38 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="LQnC/gdU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE47D20706
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
+	by mail.kernel.org (Postfix) with ESMTPS id A4D852067C
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 20:12:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A4D852067C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55076 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39972 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAIVG-0000GN-2G
-	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 15:51:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49788)
+	id 1kAIpM-0006ql-RT
+	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 16:12:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54690)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <Babu.Moger@amd.com>)
- id 1kAIUQ-0008CO-CP
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 15:50:46 -0400
-Received: from mail-co1nam11on2056.outbound.protection.outlook.com
- ([40.107.220.56]:7361 helo=NAM11-CO1-obe.outbound.protection.outlook.com)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kAIop-0006S0-4Q
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 16:11:51 -0400
+Received: from mout.kundenserver.de ([212.227.126.134]:50069)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <Babu.Moger@amd.com>)
- id 1kAIUO-00029T-59
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 15:50:46 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=AF57gHwCF/7msiPhsr/ZcFn0yVKTOyntg4iIm2g56aMYmPK28SuOxI2sdeCy5Htao1+USSr9ryo6ZZRU2N5QDPw0nbTmaa9MiskwuNs+sf8MfZwZ2HcMu/gdIOVQ/TVA9+ZPlfFT46dzjPaHYHTv2pTu3ErqzlXd3Xg6QqLhSQTzvIud43M95gbOxEd9p1sS9x/166L3ztBArv5DLeUMjhjEuasnkmC6eaVjSTEGCirnqvE7gtLQRibzpB6eZanDWHrtKGuOAaSUe/xfxi/AUJZUFes/x2TPuV+ix228e1w+CkX0sdhuQC8XYBVM1wry+AIQFSsrG7X5E1yPfEIn+g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=okGdH0Mftms+PGoGkjMZO42tZCBfQ9qM7kprtGl9kAo=;
- b=GKbYAOacl+bMbDIlYIDgK4Z1TJ1KJxEVYAUVeunRTmY8EEoKrg/PsRdZe9r30CifbNcIr41zxzhOBQ+4E2LjgqlLiqvUej+3shBpXpxZeFeQAfyymNy/2io3hFlcDOPSO+84xKYdzpbjANa8ynQKUdz+rHoDgZWoApPCY7Eq+bh24LaeyPCWdWA9U74eKSx1aoVjpC5YKCICm1QiavkQO/hlynIZK+iOMU2af4iH+eZcN1VKT9i1EmULSMQ3X+Y3TH/ByT3KKyk51XP+U0OWZxwjUTvzJIi6n85ZOkkdfaaqqOfKgYKXh7a+Tl3jvNNJvZQJoDhBFvSrtY1WXgD2jg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=okGdH0Mftms+PGoGkjMZO42tZCBfQ9qM7kprtGl9kAo=;
- b=LQnC/gdUaUcBLk0qpRGfxsIjMxmhSe0cGMQrGAKhclYmkpGFOYNHvb8K6SdLl9kDwx/ZN8PzerXIEjNdPUVtepXkftSuhjl8bxa5tbxJstxf+bxaoNPvy9/XxxzvKm4G1cLKuSGae4R3d2KHN92wqtavPZGP2P8+7dKiyNhU2fg=
-Authentication-Results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=amd.com;
-Received: from SN1PR12MB2560.namprd12.prod.outlook.com (2603:10b6:802:26::19)
- by SN6PR12MB2670.namprd12.prod.outlook.com (2603:10b6:805:6b::31)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3305.26; Mon, 24 Aug
- 2020 19:20:36 +0000
-Received: from SN1PR12MB2560.namprd12.prod.outlook.com
- ([fe80::ccd9:728:9577:200d]) by SN1PR12MB2560.namprd12.prod.outlook.com
- ([fe80::ccd9:728:9577:200d%4]) with mapi id 15.20.3305.026; Mon, 24 Aug 2020
- 19:20:36 +0000
-Subject: Re: [PATCH v5 0/8] Remove EPYC mode apicid decode and use generic
- decode
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-References: <159804762216.39954.15502128500494116468.stgit@naples-babu.amd.com>
- <20200824184112.GB2688@work-vm>
-From: Babu Moger <babu.moger@amd.com>
-Message-ID: <f602852c-b6af-694e-3e32-47974722e144@amd.com>
-Date: Mon, 24 Aug 2020 14:20:33 -0500
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kAIon-0004xq-EF
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 16:11:50 -0400
+Received: from [192.168.100.1] ([82.252.135.186]) by mrelayeu.kundenserver.de
+ (mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1N32y5-1kcIsh3okP-013L9C; Mon, 24 Aug 2020 22:11:39 +0200
+To: Filip Bozuta <Filip.Bozuta@syrmia.com>, qemu-devel@nongnu.org
+References: <20200731190637.66698-1-Filip.Bozuta@syrmia.com>
+ <20200731190637.66698-2-Filip.Bozuta@syrmia.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Subject: Re: [PATCH 1/3] linux-user: Modify 'sendmmsg()' and 'recvmmsg()'
+ implementation
+Message-ID: <379457f8-3619-5438-566c-d74302188b55@vivier.eu>
+Date: Mon, 24 Aug 2020 22:11:36 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
-In-Reply-To: <20200824184112.GB2688@work-vm>
+MIME-Version: 1.0
+In-Reply-To: <20200731190637.66698-2-Filip.Bozuta@syrmia.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: DM5PR07CA0164.namprd07.prod.outlook.com
- (2603:10b6:3:ee::30) To SN1PR12MB2560.namprd12.prod.outlook.com
- (2603:10b6:802:26::19)
-MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from 255.255.255.255 (255.255.255.255) by
- DM5PR07CA0164.namprd07.prod.outlook.com (2603:10b6:3:ee::30) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3305.24 via Frontend Transport; Mon, 24 Aug 2020 19:20:34 +0000
-X-Originating-IP: [165.204.77.1]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 7b13cdfe-c18b-4b57-4f00-08d84862c6fe
-X-MS-TrafficTypeDiagnostic: SN6PR12MB2670:
-X-Microsoft-Antispam-PRVS: <SN6PR12MB2670CF9484F83C1D844C32AF95560@SN6PR12MB2670.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: MUT/XPWd4Bj6oq8NIN4vOd29qYP+91nX5l2n1DYBmFUtHoqIRFaczx5AwkWQMwErBltAFyQY/wd4wPHTrbuYVXFR5nuYpWyutf8nFFnV23tGDeYSWGODzr2rbq/o3cQi2/y3+921abxm1Go5oNTUwKy2wzDPTzx/VHs2pk6ONToSIvkhK08L9FzGZ80XH9+vgWpLSob4wplIs/IXEEkQQb/1NY6mB35iTDcuPv1bNEnwHScAlYCvFLDCYMDZ++t0eF6/rMzMyc4FF0RR0SoVuwounGX11M4szoh3RXftuOy3vDI9ZCOF8jbT97D4X6ciA61LUnkdVyWEf34Ij4RW0Db41kM4bkxIFtBPDlmtQZbO1bWHvqAQwrXQNMyMLvI4vvIYNq5VTNizC13A5TkpSORe5/jj5CkAtooXA5imTHvp1y9r85mhWViDoY1neJAjncsWXTMTkl/HKDRcfV0pKRd6pFFC4miiE9RcYHCD8X4=
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:SN1PR12MB2560.namprd12.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(366004)(39860400002)(376002)(136003)(346002)(396003)(36756003)(4326008)(86362001)(5660300002)(53546011)(52116002)(8676002)(31696002)(956004)(26005)(186003)(6486002)(478600001)(66946007)(66476007)(66556008)(44832011)(45080400002)(2616005)(316002)(31686004)(966005)(2906002)(8936002)(6916009)(16576012)(41533002)(43740500002);
- DIR:OUT; SFP:1101; 
-X-MS-Exchange-AntiSpam-MessageData: 2uOfmief3eIWFSiyp7TuirSAzNQaE/Nfm5iDpWjVMibqP8AeBjf4INlOX6f2GlG5Smv+Gor0kv8frYrK15tu+5dzn7jfofDeKL+DL9a4YuFX7lfoFiwfjEw/I36dEe3CEna/yCbTBPy5Q75fkjvS76uT+DU/yiAxdb0c/Bzc8KY/1HKfl9rxSW2+es5bfvbencH0CRglxwx4klkk7M4WBfYKGbSUVg4ZU7olRIA39tLzpG7gig9sMzDR1vFMYEelGR6WH3xx8jk9Ylh9ime4ZYOQhbyvdSXZpEHQX1B0J6yKisVla527pDu11608Ku8JhHyj99AX99RhiPevnVF3uTRUilL3sjf0HQuWuw06KOGujBzYySB8DjjtHSWaCQ/Lu3Xygeajou7Xj7ksg457AN9OuYKNKszLkykjRYDKv/4quAmpyS6oNtRDTsXc3138dSKC16YmMXvV2PbCuHHGELGYI7ic2qr8ZJ/qtNVSNTUwz0o+cF11VvhwdicJM54PVlo9Gd7RbnJEzkKPMA5A2lwgVYmdpzzP4LryQ7eUdio8/Ct8Wee31wLkrVUdmrKz6yHBOcFd+qqcNMXFt+/KCXdjfyvZjmK0Qv1b334Oj3/0p9/+biRjZ+Ep2BnFWdOJhie45eLbLLcnDkmkeS8UGQ==
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7b13cdfe-c18b-4b57-4f00-08d84862c6fe
-X-MS-Exchange-CrossTenant-AuthSource: SN1PR12MB2560.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Aug 2020 19:20:36.0982 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: /NpKMmz9Izt/aHRNfBmZkmviU1tYAhSnFpoN3wQiKYrLlY/l19//Pl9TeBCYgFie
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR12MB2670
-Received-SPF: none client-ip=40.107.220.56; envelope-from=Babu.Moger@amd.com;
- helo=NAM11-CO1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/24 15:50:41
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, FORGED_SPF_HELO=1, MSGID_FROM_MTA_HEADER=0.001,
- NICE_REPLY_A=-2.25, RCVD_ILLEGAL_IP=1.3, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:8nm0iAC2v/bq3NWegmoq9Bq220jlnHuT15FipmeUZ0Grgxf8PIF
+ thYVw0nxocYgHO1OhyeUPUBlcj8km/8hsy7Q3UemoZYi6DQr39CGHSvmi9H87E2sGmU35YX
+ AZnuzlJf5mHYPwKFgKrnjaKZwJqV+BYE5rXFu0NBiuMFHyaLrtra7BPIxBbh1lpKf5IhIb5
+ HeqeAdL11RwuEjICDJlyw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:M1ukPrMHmEU=:fI057ieO8lnED9BZxhuKmh
+ c+7j+zaKZpnMgcT0AdGjbdVpMcK7em8t2RmpdH5WyIw/TC+JtETKORl7cd86QuqPcxPB0mYF2
+ sNNgPGFwt6ryDIew4eDcCAEIONVS+MKtLfnxMxfamgHfcb0vBFK7sLotwI1faUbvk9hJbFHTJ
+ 6rziajmclTLaHq6CHfBA+pFycAipshuy4fsuwMPVwGOtHlKlEyphHYyqDJSETOvqTksKFxMQZ
+ UE8Tesj8LlBDOsJHSiSfpfwFz+lzuem2voQ/R8NtiwqUHCrjB+Sm+Ji9j0/cIRL/u0dPdLWlp
+ FtRUwBcrr9cJBtKFvB9KGh3i8weR0vcHB0eWzSx40Xe5+7Y9bDndXO/1olXJwwjED2AjwiGX4
+ 3vfBNUqGcMWYtZNa+6suUZ5ryS09/fttgrVsc7BivRr0p+AKN4yXOH0ubd9ELXWtIpNLAAIGs
+ 6x6jNm/A2eLFq7CPBvYJzkBRLRjqYHEHkD3KfGTie4zO6hdKmb9oJYAh+z3bGVE3QpEe8qb3Z
+ Vbeci2bLWCtAB2OlkocZo+WWKsBn9eIMvbMXNRuTa3hsbCVSz/QXZMpFrLj9xvl7NUp0pM6HV
+ RVpPfTA1ioTwOKMKRX2OqRhS+JzohJ8e3hLEZwNAyKMyx+AQUXkHhsnt6zG6TI5YR7fT8bAee
+ rz/h0v/xZO8R6MMFpGsEpRg6WkYarl6h3fn5z/Bjul5ubes4azzTCma3HMNaEliIMfcAYKPUG
+ jydo/jlJv1hu0IlBJGnVgBtr4Qfq4+78/nDU0R2qpXbt8CKMeSsZ+nRwkCJpH/vlqKyACv9xg
+ xJT2gD13BFUpt7PtxXi5GN8q8OSQgBWWDOBtYG7Bezu4k2FltbE7ayTkCJNN6oYfoU2MOyk
+Received-SPF: none client-ip=212.227.126.134; envelope-from=laurent@vivier.eu;
+ helo=mout.kundenserver.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/24 15:35:44
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-2.25,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -133,33 +129,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, mst@redhat.com, qemu-devel@nongnu.org,
- imammedo@redhat.com, pbonzini@redhat.com, rth@twiddle.net
+Cc: Riku Voipio <riku.voipio@iki.fi>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Dave,
-
-On 8/24/20 1:41 PM, Dr. David Alan Gilbert wrote:
-> * Babu Moger (babu.moger@amd.com) wrote:
->> To support some of the complex topology, we introduced EPYC mode apicid decode.
->> But, EPYC mode decode is running into problems. Also it can become quite a
->> maintenance problem in the future. So, it was decided to remove that code and
->> use the generic decode which works for majority of the topology. Most of the
->> SPECed configuration would work just fine. With some non-SPECed user inputs,
->> it will create some sub-optimal configuration.
->> Here is the discussion thread.
->> https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Flore.kernel.org%2Fqemu-devel%2Fc0bcc1a6-1d84-a6e7-e468-d5b437c1b254%40amd.com%2F&amp;data=02%7C01%7Cbabu.moger%40amd.com%7C74d90724af9c4adcc75008d8485d4d16%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637338912853492167&amp;sdata=GTsMKcpeYXAA0CvpLTirPHKdNSdlJE3RuPjCtSyWtGQ%3D&amp;reserved=0
->>
->> This series removes all the EPYC mode specific apicid changes and use the generic
->> apicid decode.
+Le 31/07/2020 à 21:06, Filip Bozuta a écrit :
+> Implementations of 'sendmmsg()' and 'recvmmsg()' in 'syscall.c' use
+> a loop over a host command of 'sendmsg()' and 'recvmsg()' respectively
+> to send/receive individual messages from a socket. This patch changes
+> these implementations to use the host commands 'sendmmsg()' and 'recvmmsg()'
+> to send all messages without looping over 'sendmsg()' and 'recvmsg()'.
 > 
-> Hi Babu,
->   This does simplify things a lot!
-> One worry, what happens about a live migration of a VM from an old qemu
-> that was using the node-id to a qemu with this new scheme?
+> Implementation notes:
+> 
+>     Parts of code from 'do_sendrecvmsg_locked()', that are used to transfer
+>     values of 'struct msghdr' between host and target, were moved to separate
+>     functions 'target_to_host_msghdr()' and 'host_to_target_msghdr()'. These
+>     functions are used in 'do_sendrecvmmsg()' to transfer the data of each
+>     individual 'struct msghdr' from the 'msgvec' argument. Memory allocation
+>     for the 'iovec' field is done outside of these functions as to ensure that
+>     the memory is freed after the syscall execution.
+> 
+> Signed-off-by: Filip Bozuta <Filip.Bozuta@syrmia.com>
+> ---
+>  linux-user/syscall.c | 243 ++++++++++++++++++++++++++++---------------
+>  1 file changed, 159 insertions(+), 84 deletions(-)
+> 
 
-The node_id which we introduced was only used internally. This wasn't
-exposed outside. I don't think live migration will be an issue.
+I'm sorry but after studying the changes needed I think it's better to
+keep the existing code.
+
+For instance, if we have a EFAULT (or EMSGSIZE) while reading the iovec
+we must stop to send  data and exit with the error code.
+
+Your code correctly manages the detection of the error and stops the
+conversion of the iovec. Then it uses the converted iovecs with
+sendmmsg() and recvmmsg(), but "ret" is overwritten and the error is lost.
+
+So, in the end, and as it is done in kernel, the best is to loop around
+sendmsg()... and this is what the existing code does.
+
+Thanks,
+Laurent
 
