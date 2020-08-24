@@ -2,72 +2,135 @@ Return-Path: <SRS0=JPH5=CC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A68A0C433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 16:52:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52F8BC433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 16:54:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 36B432067C
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 16:52:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36B432067C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 19E9120578
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 16:54:49 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="SIrm+OXp";
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=qualcomm.onmicrosoft.com header.i=@qualcomm.onmicrosoft.com header.b="HMvytey4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19E9120578
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=quicinc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43804 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45936 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAFhS-0003IA-7d
-	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 12:52:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33218)
+	id 1kAFk8-0004I9-Di
+	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 12:54:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33786)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kAFgo-0002hu-Rb
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 12:51:22 -0400
-Resent-Date: Mon, 24 Aug 2020 12:51:22 -0400
-Resent-Message-Id: <E1kAFgo-0002hu-Rb@lists.gnu.org>
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21787)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kAFgm-0001cS-B4
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 12:51:22 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1598287857; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=Fd++4swGnQARJ8AOkFPw8j4q6WOp0Rifgvgl1LCYJBDA90lhjfUKaPLekS8UK38UZ0JqPip5yjZ5AeG3tuXjUtVxWnFHv2/EI2kMxELz/oh6hQeG5Td0sxPbec+d1oUQLAetc5damyOCsFayRmNF1+dH18SKNfpB/UMT6sOJYIU=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1598287857;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=RraiESYbtjddFeh+8Qxg16CBgTg7skRSCx6UlhncX7Y=; 
- b=KW9kPRkspUYynkGVEYITxru/e5i8lddH/e07H/9/fPYNew6Er97cEY7FMS7oD36lY9pmqGVVu9hUXIgHVYfIa0kjT8B0LG5edN2SX6leQvvF9TUp8oIodKHJXdRTsrlne9e+IpRbn4oaO+4wOriiY4IiKCFbACwrO20uYkESaFM=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 159828785360965.43219945270903;
- Mon, 24 Aug 2020 09:50:53 -0700 (PDT)
-Subject: Re: [PATCH v5 00/12] *** A Method for evaluating dirty page rate ***
-Message-ID: <159828785286.9865.13927794691040241272@66eaa9a8a123>
-In-Reply-To: <1598260480-64862-1-git-send-email-zhengchuan@huawei.com>
+ (Exim 4.90_1) (envelope-from <tsimpson@quicinc.com>)
+ id 1kAFjW-0003r9-Ic
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 12:54:10 -0400
+Received: from alexa-out-sd-01.qualcomm.com ([199.106.114.38]:64955)
+ by eggs.gnu.org with esmtps (TLS1.2:RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <tsimpson@quicinc.com>)
+ id 1kAFjS-0001zs-Cu
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 12:54:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
+ t=1598288046; x=1629824046;
+ h=from:to:cc:subject:date:message-id:mime-version;
+ bh=omnIwrYtpykZC1On00BCL7+ll2tzad5gBjgGj61suCA=;
+ b=SIrm+OXpYmmHnXa8UXd/4MZdV5L8mMmRvPjhbwjTiKPiuJO++I35M9Rh
+ VzjKxlcbXPO6KlkagfxLGI/HVypvzge2vJf4JMUv85ABfv3HHoIYxL5zj
+ jMM+749ievpmXIL6D5sgcwJo7svVuGOQp458cSWtqUzxY5N7GF5UX4pjt s=;
+Received: from unknown (HELO ironmsg02-sd.qualcomm.com) ([10.53.140.142])
+ by alexa-out-sd-01.qualcomm.com with ESMTP; 24 Aug 2020 09:54:04 -0700
+Received: from nasanexm01g.na.qualcomm.com ([10.85.0.33])
+ by ironmsg02-sd.qualcomm.com with ESMTP/TLS/AES256-SHA;
+ 24 Aug 2020 09:54:04 -0700
+Received: from eusanexr01f.eu.qualcomm.com (10.85.0.101) by
+ NASANEXM01G.na.qualcomm.com (10.85.0.33) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.2; Mon, 24 Aug 2020 09:54:04 -0700
+Received: from nasanexm03d.na.qualcomm.com (10.85.0.91) by
+ eusanexr01f.eu.qualcomm.com (10.85.0.101) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.2; Mon, 24 Aug 2020 09:54:04 -0700
+Received: from NAM02-CY1-obe.outbound.protection.outlook.com (199.106.107.6)
+ by nasanexm03d.na.qualcomm.com (10.85.0.91) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2 via Frontend Transport; Mon, 24 Aug 2020 09:54:03 -0700
+Received: from BYAPR02MB4886.namprd02.prod.outlook.com (2603:10b6:a03:46::32)
+ by BY5PR02MB6579.namprd02.prod.outlook.com (2603:10b6:a03:20f::23)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3305.24; Mon, 24 Aug
+ 2020 16:54:01 +0000
+Received: from BYAPR02MB4886.namprd02.prod.outlook.com
+ ([fe80::6ce3:79e4:9697:313e]) by BYAPR02MB4886.namprd02.prod.outlook.com
+ ([fe80::6ce3:79e4:9697:313e%3]) with mapi id 15.20.3305.026; Mon, 24 Aug 2020
+ 16:54:01 +0000
+From: Taylor Simpson <tsimpson@quicinc.com>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Subject: Known issue?  qemu is much slower when built with clang vs gcc
+Thread-Topic: Known issue?  qemu is much slower when built with clang vs gcc
+Thread-Index: AdZ6NopuzkxtYB5mRZ+QosZlo2lMxg==
+Date: Mon, 24 Aug 2020 16:54:01 +0000
+Message-ID: <BYAPR02MB4886C5F9260C1B52B91DD95EDE560@BYAPR02MB4886.namprd02.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=none action=none header.from=quicinc.com;
+x-originating-ip: [76.120.51.212]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 78d61246-a103-472c-9cd5-08d8484e4d8c
+x-ms-traffictypediagnostic: BY5PR02MB6579:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <BY5PR02MB6579C28AC6F383AFE5D29773DE560@BY5PR02MB6579.namprd02.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:10000;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: W46BW4arO4QlkAmD9EPolL83mv9MKPwUcFuoWF7cwcVkV6H+Qr6WeyDzX2SGZow6x4G4sh/eal7yfq5ozP27E9J9Dq6IHITd4krc7EGbXBdfDIb1p1YFGbD9TvB4iGNajZMMwNjFSl4K8PV6NUzVKAWkkteZvmOAQWBs7hKMeAd3CSN5F5Knna6prr/xakUBGJtE97sHViFwAx2LGnEsvg5xam+1C+eSUCFDx8YbPmKU+5eBMab0V6r4D41lAT0og960GieFnWJ94zyehNouMWC0Vwpaki3ZYZi9ok0ltIaDpioGBHayf6AXJqxPmebA8biRLCu+tcQ7/ZESCxVUHQ==
+x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:BYAPR02MB4886.namprd02.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(136003)(376002)(366004)(39860400002)(396003)(346002)(107886003)(76116006)(33656002)(9686003)(64756008)(478600001)(55016002)(4744005)(2906002)(186003)(66446008)(66556008)(26005)(66946007)(66476007)(316002)(6916009)(71200400001)(6506007)(8936002)(7696005)(5660300002)(8676002)(4326008)(52536014)(83380400001)(86362001);
+ DIR:OUT; SFP:1102; 
+x-ms-exchange-antispam-messagedata: lcp8eHHEA8Zkuz9zGMdw5LSk0YpgqDEqa7v4ucVCud6NPCLTFU7jq05dobDbF4uRFYt8B/uJH+4tmNZd3/vbQ22Y340bzQEhjdrQqTDOOWyrzFblp1j7kUDKVC4YVBOuER7NwuE9YtYE1WzIbeTlAZL78XZ7JUw/wK5H94ZYi0B1xNiuLx5eKYRSDnG3bNJL+Tg0Yg8t7tM6VeUgN1CnCly1Qxdo7Fuxb9odpYJrhm4HB1I29ZLJR/mHdf7HbBixDqraau9zt6O+hpUDJcKQVeyzgqAhzcAhl1YF22I7/fGByGjktSkONrXE9cKg4b/3FJqH9dBDfdVFfkq6V1iEs/bqrg9TBt0TMnkCJaCDlKWX/71ef9big43AANlRjmlENZGMmZ58dcSqLP+dmpSedqZd7lIIBN5w4G89UX8a8IbszmJ4Zo6E7fSBOWMSJ1oJ/yICZ7eLv/b3Dya28h4lIMTEXut2H2FwLvCyec2MN6soqzzWppwGw0aq0tG2zGfC3276QU+qEKGpMM+/pYv75d3tHyBl7oogGHg5ijDMoTkcBDo78Rz+e4eT6XcZJxsSauN3bEEYZiOCT7EtdPstoeG+i7LzQPZOOcsxPy/n8gC7egs0vjuBNGbwfjosyIV8TOjiqBZxcalFG2hHACtTBA==
+arc-seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=HzcGQ+kQc5iriX54MK3Uzfp4KVu9BO7oOuQdhbYVTQyHAI19XH69JEwEhdZgAq3YqMxkm9k6m5FVvmdvv01vMf+zi2qa9/CBwKz5HHegnw5Jb/PpUsczqOmFCGlYz5l5p8SLUBVYyMvJGMQIXpXzfTREUnmUDpP7aTjZ9YB9J16Jg76tQMrQQev5ULxS2xg0mt8KnuyOLC47ZsPiMK/v2+X067AWHbvN4m2gZeN8fuSDqbhvSuyJ8/DswELUiV/7dvYBKpbaWHgrVlAQtI7/zZYGFjg37Dt+OcAsZaJy0cbIQA7GQAU+PQVCYMibvqsJHSXnAKVcmFxHIp7pRJJpgg==
+arc-message-signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=VNg25MBfRhXvR1HrE2VqjBGfwCCm1zlbLqHRdOcppUU=;
+ b=djEiIaJPx9wIVbOx5jqZ2GTUTLvWOV2LX/6Re36/62Uz1NSwPazZDJK7siQDFXVLm5zMe5CeP4EvpUos2r2yz8W9suaY7pm9ZOLm0HLoyANvWu6PVjRkYjFhLIHmINtxnIqakSj4fIaO0+qGlgT7cAkz2hwcovQmyvmYeddw1V0dZ9Hcf6Ayb7vp0mUVunq9GV5X+YF4s6Jk8zZemIcZuiwOJo81c0uukW/aWn1wqQk9bF9VT9mnZ1xFpVGTQm3d/Gh5gtteGfzjjuOLTGAaxhMqu3HxKvCHV5RFYELNHdsj9w6YTTOJbx6Z97B3lyG+IWXn013YVvIygHCXW+tw1Q==
+arc-authentication-results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=quicinc.com; dmarc=pass action=none header.from=quicinc.com;
+ dkim=pass header.d=quicinc.com; arc=none
+dkim-signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=qualcomm.onmicrosoft.com; s=selector1-qualcomm-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=VNg25MBfRhXvR1HrE2VqjBGfwCCm1zlbLqHRdOcppUU=;
+ b=HMvytey4VPkq3GxlgZ6Gxwc40mGLFMu3ZTdJlzR2jQsLUlK8g/9zhLBwXRyu8fkU5L/vKEIGin+9LYPjRg2ezM6aDldfzMAQ1n892UBzvjJuvVsIAVnb6IMJiR9wi/vvt0jC57dxUuoKrOaeQJjjPbKJiK3UmbVX0AOsrqQMaDQ=
+x-ms-exchange-crosstenant-authas: Internal
+x-ms-exchange-crosstenant-authsource: BYAPR02MB4886.namprd02.prod.outlook.com
+x-ms-exchange-crosstenant-network-message-id: 78d61246-a103-472c-9cd5-08d8484e4d8c
+x-ms-exchange-crosstenant-originalarrivaltime: 24 Aug 2020 16:54:01.7535 (UTC)
+x-ms-exchange-crosstenant-fromentityheader: Hosted
+x-ms-exchange-crosstenant-id: 98e9ba89-e1a1-4e38-9007-8bdabc25de1d
+x-ms-exchange-crosstenant-mailboxtype: HOSTED
+x-ms-exchange-crosstenant-userprincipalname: /4skneiXWX9AzBB9OjbeYDiIUk8avT0J2a/SjPksmgIHdm0PqS8ZpgAMfjOcZX+N1RPq6o/6CqXdLxJh4WMtFg==
+x-ms-exchange-transport-crosstenantheadersstamped: BY5PR02MB6579
+Content-Type: multipart/alternative;
+ boundary="_000_BYAPR02MB4886C5F9260C1B52B91DD95EDE560BYAPR02MB4886namp_"
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: zhengchuan@huawei.com
-Date: Mon, 24 Aug 2020 09:50:53 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o57.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/24 12:51:18
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+X-OriginatorOrg: quicinc.com
+Received-SPF: pass client-ip=199.106.114.38; envelope-from=tsimpson@quicinc.com;
+ helo=alexa-out-sd-01.qualcomm.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/24 12:54:05
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -43
+X-Spam_score: -4.4
+X-Spam_bar: ----
+X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, HTML_MESSAGE=0.001,
+ RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -81,132 +144,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: berrange@redhat.com, zhang.zhanghailiang@huawei.com, quintela@redhat.com,
- qemu-devel@nongnu.org, xiexiangyou@huawei.com, dgilbert@redhat.com,
- alex.chen@huawei.com, ann.zhuangyanying@huawei.com, fangying1@huawei.com
+Cc: Brian Cain <bcain@quicinc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTk4MjYwNDgwLTY0ODYyLTEt
-Z2l0LXNlbmQtZW1haWwtemhlbmdjaHVhbkBodWF3ZWkuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVz
-IHNlZW1zIHRvIGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVs
-b3cgZm9yCm1vcmUgaW5mb3JtYXRpb246CgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMTU5ODI2
-MDQ4MC02NDg2Mi0xLWdpdC1zZW5kLWVtYWlsLXpoZW5nY2h1YW5AaHVhd2VpLmNvbQpTdWJqZWN0
-OiBbUEFUQ0ggdjUgMDAvMTJdICoqKiBBIE1ldGhvZCBmb3IgZXZhbHVhdGluZyBkaXJ0eSBwYWdl
-IHJhdGUgKioqCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYt
-cGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYu
-cmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNv
-bmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRj
-aC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcg
-M2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0
-aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogICBkZDgwMTRlLi5kZjgyYWE3ICBtYXN0ZXIg
-ICAgIC0+IG1hc3RlcgogLSBbdGFnIHVwZGF0ZV0gICAgICBwYXRjaGV3LzIwMjAwNzI3MTEyMzA3
-LjM0MzYwOC0xLUZpbGlwLkJvenV0YUBzeXJtaWEuY29tIC0+IHBhdGNoZXcvMjAyMDA3MjcxMTIz
-MDcuMzQzNjA4LTEtRmlsaXAuQm96dXRhQHN5cm1pYS5jb20KIC0gW3RhZyB1cGRhdGVdICAgICAg
-cGF0Y2hldy8yMDIwMDgxNTAxMzE0NS41Mzk0MDktMS1yaWNoYXJkLmhlbmRlcnNvbkBsaW5hcm8u
-b3JnIC0+IHBhdGNoZXcvMjAyMDA4MTUwMTMxNDUuNTM5NDA5LTEtcmljaGFyZC5oZW5kZXJzb25A
-bGluYXJvLm9yZwogLSBbdGFnIHVwZGF0ZV0gICAgICBwYXRjaGV3LzIwMjAwODIyMjEyMTI5Ljk3
-NzU4LTEtci5ib2xzaGFrb3ZAeWFkcm8uY29tIC0+IHBhdGNoZXcvMjAyMDA4MjIyMTIxMjkuOTc3
-NTgtMS1yLmJvbHNoYWtvdkB5YWRyby5jb20KIC0gW3RhZyB1cGRhdGVdICAgICAgcGF0Y2hldy8y
-MDIwMDgyMzA4MzIxNS4xNDk1Mi0xLXRodXRoQHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDIwMDgy
-MzA4MzIxNS4xNDk1Mi0xLXRodXRoQHJlZGhhdC5jb20KIC0gW3RhZyB1cGRhdGVdICAgICAgcGF0
-Y2hldy8yMDIwMDgyMzA5MDU0Ni40Nzk1Ny0xLXIuYm9sc2hha292QHlhZHJvLmNvbSAtPiBwYXRj
-aGV3LzIwMjAwODIzMDkwNTQ2LjQ3OTU3LTEtci5ib2xzaGFrb3ZAeWFkcm8uY29tCiAtIFt0YWcg
-dXBkYXRlXSAgICAgIHBhdGNoZXcvMjAyMDA4MjQwNzQwNTcuMzY3My0xLWtyYXhlbEByZWRoYXQu
-Y29tIC0+IHBhdGNoZXcvMjAyMDA4MjQwNzQwNTcuMzY3My0xLWtyYXhlbEByZWRoYXQuY29tCiAt
-IFt0YWcgdXBkYXRlXSAgICAgIHBhdGNoZXcvMjAyMDA4MjQwOTQ4MTEuMTU0MzktMS1wZXRlci5t
-YXlkZWxsQGxpbmFyby5vcmcgLT4gcGF0Y2hldy8yMDIwMDgyNDA5NDgxMS4xNTQzOS0xLXBldGVy
-Lm1heWRlbGxAbGluYXJvLm9yZwogLSBbdGFnIHVwZGF0ZV0gICAgICBwYXRjaGV3LzIwMjAwODI0
-MTAwMDQxLjE4NjQ0MjAtMS1lZGdhci5pZ2xlc2lhc0BnbWFpbC5jb20gLT4gcGF0Y2hldy8yMDIw
-MDgyNDEwMDA0MS4xODY0NDIwLTEtZWRnYXIuaWdsZXNpYXNAZ21haWwuY29tCiAqIFtuZXcgdGFn
-XSAgICAgICAgIHBhdGNoZXcvMjAyMDA4MjQxNDI5MzQuMjA4NTAtMS1wZXRlci5tYXlkZWxsQGxp
-bmFyby5vcmcgLT4gcGF0Y2hldy8yMDIwMDgyNDE0MjkzNC4yMDg1MC0xLXBldGVyLm1heWRlbGxA
-bGluYXJvLm9yZwogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzIwMjAwODI0MTUyNDMwLjE4
-NDQxNTktMS1sYXVyZW50QHZpdmllci5ldSAtPiBwYXRjaGV3LzIwMjAwODI0MTUyNDMwLjE4NDQx
-NTktMS1sYXVyZW50QHZpdmllci5ldQogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzIwMjAw
-ODI0MTU1MTExLjc4OTQ2Ni0xLWJyb2dlcnNAc3VzZS5jb20gLT4gcGF0Y2hldy8yMDIwMDgyNDE1
-NTExMS43ODk0NjYtMS1icm9nZXJzQHN1c2UuY29tCiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNo
-ZXcvMjAyMDA4MjQxNTUyMTIuNzg5NTY4LTEtYnJvZ2Vyc0BzdXNlLmNvbSAtPiBwYXRjaGV3LzIw
-MjAwODI0MTU1MjEyLjc4OTU2OC0xLWJyb2dlcnNAc3VzZS5jb20KICogW25ldyB0YWddICAgICAg
-ICAgcGF0Y2hldy8yMDIwMDgyNDE1NTIzNi43ODk2MzUtMS1icm9nZXJzQHN1c2UuY29tIC0+IHBh
-dGNoZXcvMjAyMDA4MjQxNTUyMzYuNzg5NjM1LTEtYnJvZ2Vyc0BzdXNlLmNvbQogKiBbbmV3IHRh
-Z10gICAgICAgICBwYXRjaGV3LzIwMjAwODI0MTYxMDE0LjQwMTg4Mi0xLWNrdWVobEByZWRoYXQu
-Y29tIC0+IHBhdGNoZXcvMjAyMDA4MjQxNjEwMTQuNDAxODgyLTEtY2t1ZWhsQHJlZGhhdC5jb20K
-ICogW25ldyB0YWddICAgICAgICAgcGF0Y2hldy8yMDIwMDgyNDE2MzEwOS45NjkzOC0xLWJlcnJh
-bmdlQHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDIwMDgyNDE2MzEwOS45NjkzOC0xLWJlcnJhbmdl
-QHJlZGhhdC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwplNDIyYzQ4IG1pZ3Jh
-dGlvbi9kaXJ0eXJhdGU6IEFkZCB0cmFjZV9jYWxscyB0byBtYWtlIGl0IGVhc2llciB0byBkZWJ1
-ZwpkNTQ0MzU4IG1pZ3JhdGlvbi9kaXJ0eXJhdGU6IEltcGxlbWVudCBxbXBfY2FsX2RpcnR5X3Jh
-dGUoKS9xbXBfZ2V0X2RpcnR5X3JhdGUoKSBmdW5jdGlvbgpiMjQ1ZTNlIG1pZ3JhdGlvbi9kaXJ0
-eXJhdGU6IEltcGxlbWVudCBjYWxjdWxhdGVfZGlydHlyYXRlKCkgZnVuY3Rpb24KZjYzNGQ2MCBt
-aWdyYXRpb24vZGlydHlyYXRlOiBJbXBsZW1lbnQgZ2V0X3NhbXBsZV9wYWdlX3BlcmlvZCgpIGFu
-ZCBibG9ja19zYW1wbGVfcGFnZV9wZXJpb2QoKQowMzk4ODRjIG1pZ3JhdGlvbi9kaXJ0eXJhdGU6
-IHNraXAgc2FtcGxpbmcgcmFtYmxvY2sgd2l0aCBzaXplIGJlbG93IE1JTl9SQU1CTE9DS19TSVpF
-CmI2MmIwZjMgbWlncmF0aW9uL2RpcnR5cmF0ZTogQ29tcGFyZSBwYWdlIGhhc2ggcmVzdWx0cyBm
-b3IgcmVjb3JkZWQgc2FtcGxlZCBwYWdlCmEwYzc3ZjYgbWlncmF0aW9uL2RpcnR5cmF0ZTogUmVj
-b3JkIGhhc2ggcmVzdWx0cyBmb3IgZWFjaCBzYW1wbGVkIHBhZ2UKN2U0Yzk0MSBtaWdyYXRpb24v
-ZGlydHlyYXRlOiBtb3ZlIFJBTUJMT0NLX0ZPUkVBQ0hfTUlHUkFUQUJMRSBpbnRvIHJhbS5oCjVi
-ZDUzMWIgbWlncmF0aW9uL2RpcnR5cmF0ZTogQWRkIGRpcnR5cmF0ZSBzdGF0aXN0aWNzIHNlcmll
-cyBmdW5jdGlvbnMKYWY0ZjU2OSBtaWdyYXRpb24vZGlydHlyYXRlOiBBZGQgUmFtbG9ja0RpcnR5
-SW5mbyB0byBzdG9yZSBzYW1wbGVkIHBhZ2UgaW5mbwo5ZDJhYmU4IG1pZ3JhdGlvbi9kaXJ0eXJh
-dGU6IGFkZCBEaXJ0eVJhdGVTdGF0dXMgdG8gZGVub3RlIGNhbGN1bGF0aW9uIHN0YXR1cwo5ZGE4
-NzVlIG1pZ3JhdGlvbi9kaXJ0eXJhdGU6IHNldHVwIHVwIHF1ZXJ5LWRpcnR5cmF0ZSBmcmFtd29y
-awoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS8xMiBDaGVja2luZyBjb21taXQgOWRhODc1ZWY0MjVl
-IChtaWdyYXRpb24vZGlydHlyYXRlOiBzZXR1cCB1cCBxdWVyeS1kaXJ0eXJhdGUgZnJhbXdvcmsp
-CldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5F
-UlMgbmVlZCB1cGRhdGluZz8KIzE1OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVy
-cm9ycywgMSB3YXJuaW5ncywgNzggbGluZXMgY2hlY2tlZAoKUGF0Y2ggMS8xMiBoYXMgc3R5bGUg
-cHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxz
-ZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENI
-IGluIE1BSU5UQUlORVJTLgoyLzEyIENoZWNraW5nIGNvbW1pdCA5ZDJhYmU4YjQ4MGEgKG1pZ3Jh
-dGlvbi9kaXJ0eXJhdGU6IGFkZCBEaXJ0eVJhdGVTdGF0dXMgdG8gZGVub3RlIGNhbGN1bGF0aW9u
-IHN0YXR1cykKMy8xMiBDaGVja2luZyBjb21taXQgYWY0ZjU2OTc1OTg3IChtaWdyYXRpb24vZGly
-dHlyYXRlOiBBZGQgUmFtbG9ja0RpcnR5SW5mbyB0byBzdG9yZSBzYW1wbGVkIHBhZ2UgaW5mbykK
-NC8xMiBDaGVja2luZyBjb21taXQgNWJkNTMxYmIwMGNlIChtaWdyYXRpb24vZGlydHlyYXRlOiBB
-ZGQgZGlydHlyYXRlIHN0YXRpc3RpY3Mgc2VyaWVzIGZ1bmN0aW9ucykKNS8xMiBDaGVja2luZyBj
-b21taXQgN2U0Yzk0MWIzMmJjIChtaWdyYXRpb24vZGlydHlyYXRlOiBtb3ZlIFJBTUJMT0NLX0ZP
-UkVBQ0hfTUlHUkFUQUJMRSBpbnRvIHJhbS5oKQpFUlJPUjogTWFjcm9zIHdpdGggbXVsdGlwbGUg
-c3RhdGVtZW50cyBzaG91bGQgYmUgZW5jbG9zZWQgaW4gYSBkbyAtIHdoaWxlIGxvb3AKIzYyOiBG
-SUxFOiBtaWdyYXRpb24vcmFtLmg6NDI6CisjZGVmaW5lIFJBTUJMT0NLX0ZPUkVBQ0hfTk9UX0lH
-Tk9SRUQoYmxvY2spICAgICAgICAgICAgXAorICAgIElOVEVSTkFMX1JBTUJMT0NLX0ZPUkVBQ0go
-YmxvY2spICAgICAgICAgICAgICAgICAgIFwKKyAgICAgICAgaWYgKHJhbWJsb2NrX2lzX2lnbm9y
-ZWQoYmxvY2spKSB7fSBlbHNlCgpFUlJPUjogdHJhaWxpbmcgc3RhdGVtZW50cyBzaG91bGQgYmUg
-b24gbmV4dCBsaW5lCiM2NDogRklMRTogbWlncmF0aW9uL3JhbS5oOjQ0OgorICAgICAgICBpZiAo
-cmFtYmxvY2tfaXNfaWdub3JlZChibG9jaykpIHt9IGVsc2UKCkVSUk9SOiBNYWNyb3Mgd2l0aCBt
-dWx0aXBsZSBzdGF0ZW1lbnRzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBhIGRvIC0gd2hpbGUgbG9v
-cAojNjY6IEZJTEU6IG1pZ3JhdGlvbi9yYW0uaDo0NjoKKyNkZWZpbmUgUkFNQkxPQ0tfRk9SRUFD
-SF9NSUdSQVRBQkxFKGJsb2NrKSAgICAgICAgICAgICBcCisgICAgSU5URVJOQUxfUkFNQkxPQ0tf
-Rk9SRUFDSChibG9jaykgICAgICAgICAgICAgICAgICAgXAorICAgICAgICBpZiAoIXFlbXVfcmFt
-X2lzX21pZ3JhdGFibGUoYmxvY2spKSB7fSBlbHNlCgpFUlJPUjogdHJhaWxpbmcgc3RhdGVtZW50
-cyBzaG91bGQgYmUgb24gbmV4dCBsaW5lCiM2ODogRklMRTogbWlncmF0aW9uL3JhbS5oOjQ4Ogor
-ICAgICAgICBpZiAoIXFlbXVfcmFtX2lzX21pZ3JhdGFibGUoYmxvY2spKSB7fSBlbHNlCgpFUlJP
-UjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50
-CiM2ODogRklMRTogbWlncmF0aW9uL3JhbS5oOjQ4OgorICAgICAgICBpZiAoIXFlbXVfcmFtX2lz
-X21pZ3JhdGFibGUoYmxvY2spKSB7fSBlbHNlClsuLi5dCisgICAgICAgIGlmICghcWVtdV9yYW1f
-aXNfbWlncmF0YWJsZShibG9jaykpIHt9IGVsc2UKWy4uLl0KCnRvdGFsOiA1IGVycm9ycywgMCB3
-YXJuaW5ncywgNDUgbGluZXMgY2hlY2tlZAoKUGF0Y2ggNS8xMiBoYXMgc3R5bGUgcHJvYmxlbXMs
-IHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2
-ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5U
-QUlORVJTLgoKNi8xMiBDaGVja2luZyBjb21taXQgYTBjNzdmNjAzNGZjIChtaWdyYXRpb24vZGly
-dHlyYXRlOiBSZWNvcmQgaGFzaCByZXN1bHRzIGZvciBlYWNoIHNhbXBsZWQgcGFnZSkKNy8xMiBD
-aGVja2luZyBjb21taXQgYjYyYjBmM2M3MDMzIChtaWdyYXRpb24vZGlydHlyYXRlOiBDb21wYXJl
-IHBhZ2UgaGFzaCByZXN1bHRzIGZvciByZWNvcmRlZCBzYW1wbGVkIHBhZ2UpCjgvMTIgQ2hlY2tp
-bmcgY29tbWl0IDAzOTg4NGNmNDEwZSAobWlncmF0aW9uL2RpcnR5cmF0ZTogc2tpcCBzYW1wbGlu
-ZyByYW1ibG9jayB3aXRoIHNpemUgYmVsb3cgTUlOX1JBTUJMT0NLX1NJWkUpCjkvMTIgQ2hlY2tp
-bmcgY29tbWl0IGY2MzRkNjBkZjg3NSAobWlncmF0aW9uL2RpcnR5cmF0ZTogSW1wbGVtZW50IGdl
-dF9zYW1wbGVfcGFnZV9wZXJpb2QoKSBhbmQgYmxvY2tfc2FtcGxlX3BhZ2VfcGVyaW9kKCkpCjEw
-LzEyIENoZWNraW5nIGNvbW1pdCBiMjQ1ZTNlOWNkMGQgKG1pZ3JhdGlvbi9kaXJ0eXJhdGU6IElt
-cGxlbWVudCBjYWxjdWxhdGVfZGlydHlyYXRlKCkgZnVuY3Rpb24pCjExLzEyIENoZWNraW5nIGNv
-bW1pdCBkNTQ0MzU4ZmYyYjAgKG1pZ3JhdGlvbi9kaXJ0eXJhdGU6IEltcGxlbWVudCBxbXBfY2Fs
-X2RpcnR5X3JhdGUoKS9xbXBfZ2V0X2RpcnR5X3JhdGUoKSBmdW5jdGlvbikKMTIvMTIgQ2hlY2tp
-bmcgY29tbWl0IGU0MjJjNDg1MDJjOCAobWlncmF0aW9uL2RpcnR5cmF0ZTogQWRkIHRyYWNlX2Nh
-bGxzIHRvIG1ha2UgaXQgZWFzaWVyIHRvIGRlYnVnKQo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3Qg
-Y29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBh
-dApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8xNTk4MjYwNDgwLTY0ODYyLTEtZ2l0LXNlbmQtZW1h
-aWwtemhlbmdjaHVhbkBodWF3ZWkuY29tL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdl
-LgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9w
-YXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxA
-cmVkaGF0LmNvbQ==
+--_000_BYAPR02MB4886C5F9260C1B52B91DD95EDE560BYAPR02MB4886namp_
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+
+We're seeing significant slowdowns when we build qemu with clang instead of=
+ gcc.  I'm hoping this is a known issue and there is a workaround or fix.  =
+Please advise.
+
+I have an example where qemu is 29X slower when built with clang.  My first=
+ hunch was that there was something different happening in configure (e.g.,=
+ passing -O0 to clang instead of -O2).  However, I have ruled this out.
+
+Further investigation shows that we are calling the translator more often. =
+ The same code is getting translated multiple times.  So, my current theory=
+ is some different behavior in the translation block hashing causing the lo=
+okup not to find existing translations.  I know clang can be overly aggress=
+ive about optimizing undefined behavior.  So, I turned on clang's undefined=
+ behavior sanitizer.  Interestingly, it did not report anything, *and* we d=
+on't see the large performance difference.
+
+Thanks,
+Taylor
+
+
+--_000_BYAPR02MB4886C5F9260C1B52B91DD95EDE560BYAPR02MB4886namp_
+Content-Type: text/html; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+
+<html xmlns:v=3D"urn:schemas-microsoft-com:vml" xmlns:o=3D"urn:schemas-micr=
+osoft-com:office:office" xmlns:w=3D"urn:schemas-microsoft-com:office:word" =
+xmlns:m=3D"http://schemas.microsoft.com/office/2004/12/omml" xmlns=3D"http:=
+//www.w3.org/TR/REC-html40">
+<head>
+<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Dus-ascii"=
+>
+<meta name=3D"Generator" content=3D"Microsoft Word 15 (filtered medium)">
+<style><!--
+/* Font Definitions */
+@font-face
+	{font-family:"Cambria Math";
+	panose-1:2 4 5 3 5 4 6 3 2 4;}
+@font-face
+	{font-family:Calibri;
+	panose-1:2 15 5 2 2 2 4 3 2 4;}
+/* Style Definitions */
+p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{margin:0in;
+	margin-bottom:.0001pt;
+	font-size:11.0pt;
+	font-family:"Calibri",sans-serif;}
+span.EmailStyle17
+	{mso-style-type:personal-compose;
+	font-family:"Calibri",sans-serif;
+	color:windowtext;}
+.MsoChpDefault
+	{mso-style-type:export-only;
+	font-family:"Calibri",sans-serif;}
+@page WordSection1
+	{size:8.5in 11.0in;
+	margin:1.0in 1.0in 1.0in 1.0in;}
+div.WordSection1
+	{page:WordSection1;}
+--></style><!--[if gte mso 9]><xml>
+<o:shapedefaults v:ext=3D"edit" spidmax=3D"1026" />
+</xml><![endif]--><!--[if gte mso 9]><xml>
+<o:shapelayout v:ext=3D"edit">
+<o:idmap v:ext=3D"edit" data=3D"1" />
+</o:shapelayout></xml><![endif]-->
+</head>
+<body lang=3D"EN-US" link=3D"#0563C1" vlink=3D"#954F72">
+<div class=3D"WordSection1">
+<p class=3D"MsoNormal">We&#8217;re seeing significant slowdowns when we bui=
+ld qemu with clang instead of gcc.&nbsp; I&#8217;m hoping this is a known i=
+ssue and there is a workaround or fix.&nbsp; Please advise.<o:p></o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal">I have an example where qemu is 29X slower when buil=
+t with clang.&nbsp; My first hunch was that there was something different h=
+appening in configure (e.g., passing -O0 to clang instead of -O2).&nbsp; Ho=
+wever, I have ruled this out.<o:p></o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal">Further investigation shows that we are calling the =
+translator more often.&nbsp; The same code is getting translated multiple t=
+imes. &nbsp;So, my current theory is some different behavior in the transla=
+tion block hashing causing the lookup not to
+ find existing translations.&nbsp; I know clang can be overly aggressive ab=
+out optimizing undefined behavior.&nbsp; So, I turned on clang&#8217;s unde=
+fined behavior sanitizer.&nbsp; Interestingly, it did not report anything, =
+*<b>and</b>* we don&#8217;t see the large performance difference.<o:p></o:p=
+></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal">Thanks,<o:p></o:p></p>
+<p class=3D"MsoNormal">Taylor<o:p></o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+</div>
+</body>
+</html>
+
+--_000_BYAPR02MB4886C5F9260C1B52B91DD95EDE560BYAPR02MB4886namp_--
 
