@@ -2,81 +2,80 @@ Return-Path: <SRS0=JPH5=CC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 939A2C433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 13:22:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC49FC433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 13:27:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5BBED2078D
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 13:22:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 989EE206B5
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 13:27:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XT7hBdxO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BBED2078D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D6A9W9/l"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 989EE206B5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41668 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44874 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kACQh-0005sr-MP
-	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 09:22:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52414)
+	id 1kACVD-0007a2-Sg
+	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 09:27:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53334)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kACQ9-0005O4-LO
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 09:21:57 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:50989
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
+ id 1kACUg-00077v-1K
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 09:26:38 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:29745
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kACQ8-0001xT-5w
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 09:21:57 -0400
+ (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
+ id 1kACUe-0002Zc-Dd
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 09:26:37 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598275315;
+ s=mimecast20190719; t=1598275595;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=FqaUmHOTGYYKFr+8cBIx5E9YAPd+sxt9if0JGiX0Bao=;
- b=XT7hBdxO+zanJLoJiktAFEYZaFuJX3YOccjfWl+foFNk2yp3dVhpQFufBO8MMUl+A/hvIA
- IxWt3D8bGi47YNI7vtRREUTtfseEdcjJx/z8kbXGXc25gajyU/GcUl1rCNDgAtveyQW8wr
- M2uUKVzHnynCqdRzq6XNfENNhznCnEE=
+ bh=d5N9bJHCzhhGq1q1rcL50uhT0Yg+WzpXWcAoUxFTYIE=;
+ b=D6A9W9/lKCmL9ZemhZqzzvsS2y3/WYsRZ7f3LojBJSVaNqixifPbVVIfpJM38u/Xb2bst3
+ BKQc/iG0A5xOOSjt3dyPpZQZ0EPXruC7b2LujPiCvNpuu5DfjuONYvoI82R0OiZpPuIhee
+ SY1bkKlOztJEQgV/1p/UImXsbrkBuWQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-21-51gW-rYaOXysopDdTLmwaA-1; Mon, 24 Aug 2020 09:21:53 -0400
-X-MC-Unique: 51gW-rYaOXysopDdTLmwaA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-95-Ugdjsfr-Nr63UWsX26hDmw-1; Mon, 24 Aug 2020 09:26:33 -0400
+X-MC-Unique: Ugdjsfr-Nr63UWsX26hDmw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1E63610ABDA9;
- Mon, 24 Aug 2020 13:21:52 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-74.ams2.redhat.com
- [10.36.112.74])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B312C60BF1;
- Mon, 24 Aug 2020 13:21:51 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 490941138648; Mon, 24 Aug 2020 15:21:50 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Subject: Re: [PATCH v6 3/4] qapi: add filter-node-name to block-stream
-References: <1597785880-431103-1-git-send-email-andrey.shinkevich@virtuozzo.com>
- <1597785880-431103-4-git-send-email-andrey.shinkevich@virtuozzo.com>
-Date: Mon, 24 Aug 2020 15:21:50 +0200
-In-Reply-To: <1597785880-431103-4-git-send-email-andrey.shinkevich@virtuozzo.com>
- (Andrey Shinkevich's message of "Wed, 19 Aug 2020 00:24:39 +0300")
-Message-ID: <87364cqivl.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D46A018A2250;
+ Mon, 24 Aug 2020 13:26:31 +0000 (UTC)
+Received: from kaapi (unknown [10.74.9.190])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id EBEEA10027AB;
+ Mon, 24 Aug 2020 13:26:19 +0000 (UTC)
+Date: Mon, 24 Aug 2020 18:56:17 +0530 (IST)
+From: P J P <ppandit@redhat.com>
+X-X-Sender: pjp@kaapi
+To: =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>
+Subject: Re: [PATCH] ati-vga: Fix checks in ati_2d_blt() to avoid crash
+In-Reply-To: <2041026f-7a88-d8f7-8738-968e1394e8c6@redhat.com>
+Message-ID: <nycvar.YSQ.7.78.906.2008241842050.306228@xnncv>
+References: <20200406204029.19559747D5D@zero.eik.bme.hu>
+ <2041026f-7a88-d8f7-8738-968e1394e8c6@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-ID: <nycvar.YSQ.7.78.906.2008241851130.306228@xnncv>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
-X-Mimecast-Spam-Score: 0.002
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ppandit@redhat.com
+X-Mimecast-Spam-Score: 0.0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
- helo=us-smtp-1.mimecast.com
+Content-Type: multipart/mixed;
+ BOUNDARY="-1463810047-780288353-1598275116=:306228"
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=ppandit@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/24 05:21:34
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
@@ -98,46 +97,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org,
- qemu-devel@nongnu.org, mreitz@redhat.com, den@openvz.org, jsnow@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Mauro Matteo Cascella <mcascell@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>,
+ qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Andrey Shinkevich <andrey.shinkevich@virtuozzo.com> writes:
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
+---1463810047-780288353-1598275116=:306228
+Content-Type: text/plain; CHARSET=ISO-8859-15
+Content-Transfer-Encoding: 8BIT
+Content-ID: <nycvar.YSQ.7.78.906.2008241851131.306228@xnncv>
 
-> Provide the possibility to pass the 'filter-node-name' parameter to the
-> block-stream job as it is done for the commit block job. That will be
-> needed for further iotests implementations.
->
-> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-[...]
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index 0b8ccd3..1db6ce1 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -2524,6 +2524,11 @@
->  #            'stop' and 'enospc' can only be used if the block device
->  #            supports io-status (see BlockInfo).  Since 1.3.
->  #
-> +# @filter-node-name: the node name that should be assigned to the
-> +#                    filter driver that the stream job inserts into the graph
-> +#                    above @device. If this option is not given, a node name is
-> +#                    autogenerated. (Since: 5.1)
++-- On Sat, 22 Aug 2020, Philippe Mathieu-Daudé wrote --+
+| This points to a BZ#1847385 which is private:
+| "You are not authorized to access bug #1847385.
+| https://bugzilla.redhat.com/show_bug.cgi?id=1847385
 
-It's (Since: 5.2) now.
+CVE-2020-24352:
+  -> https://bugzilla.redhat.com/show_bug.cgi?id=1847584
 
-> +#
->  # @auto-finalize: When false, this job will wait in a PENDING state after it has
->  #                 finished its work, waiting for @block-job-finalize before
->  #                 making any block graph changes.
-> @@ -2554,6 +2559,7 @@
->    'data': { '*job-id': 'str', 'device': 'str', '*base': 'str',
->              '*base-node': 'str', '*backing-file': 'str', '*speed': 'int',
->              '*on-error': 'BlockdevOnError',
-> +            '*filter-node-name': 'str',
->              '*auto-finalize': 'bool', '*auto-dismiss': 'bool' } }
->  
->  ##
+This is the pubic bug.
+
+| Maybe we could improve the security process, when a CVE embargo
+| expires, the public statement could point at the commit(s) fixing
+| the bug.
+
+Yes, we generally tag/log upstream fixes against the CVE bugs. It seems 
+missing in this case, maybe because fix was sent upstream latter. Will fix it.
+
+
+Thank you.
+--
+Prasad J Pandit / Red Hat Product Security Team
+8685 545E B54C 486B C6EB 271E E285 8B5A F050 DE8D
+---1463810047-780288353-1598275116=:306228--
 
 
