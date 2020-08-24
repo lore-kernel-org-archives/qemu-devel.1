@@ -2,93 +2,85 @@ Return-Path: <SRS0=JPH5=CC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FE8EC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 14:57:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0DD9C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 15:01:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3E0FA206B5
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 14:57:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A9295206B5
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 15:01:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZhhR9VOI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E0FA206B5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rR+3gmij"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9295206B5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33642 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39322 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kADui-00031q-BU
-	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 10:57:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53718)
+	id 1kADyM-0005jT-Rj
+	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 11:01:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55104)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kADtg-00029r-S6
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 10:56:32 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:20525)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kADte-0007IN-Jp
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 10:56:32 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598280989;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ucQufPWxjvHLqZyA9xTid5ZblKSW79kzuBx4WciDw18=;
- b=ZhhR9VOI4d96or8w2jAFg3j2uOXR0qHTBUKsfaiceSCVQdKoyOHFtgr5AY9V4499V8ov8J
- Ap8D/uBs9nAQmus8Kk+c3T+BG19xlujJVpEyXZajUX0HmGeH9SSIG/Q4L1uMNGaMatAy3f
- LnYaJoWHqZxPRG4NA4FlqNW+b4Za0vU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-116-IKpqx1aDNzGoy0rKzc2Omw-1; Mon, 24 Aug 2020 10:56:26 -0400
-X-MC-Unique: IKpqx1aDNzGoy0rKzc2Omw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1DFDA801AEA;
- Mon, 24 Aug 2020 14:56:25 +0000 (UTC)
-Received: from [10.3.112.126] (ovpn-112-126.phx2.redhat.com [10.3.112.126])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C91F05DA2A;
- Mon, 24 Aug 2020 14:56:24 +0000 (UTC)
-Subject: Re: [PATCH 3/4] configure: Prefer gmake on darwin
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-References: <20200822212129.97758-1-r.bolshakov@yadro.com>
- <20200822212129.97758-4-r.bolshakov@yadro.com>
- <051b2296-f656-9488-f66a-1e74fdd53dc7@redhat.com>
- <20200824145127.GQ10011@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <8538549c-c5ea-66d0-4ab7-72acbd54d5ff@redhat.com>
-Date: Mon, 24 Aug 2020 09:56:24 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kADwz-0004vH-Hr
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 10:59:57 -0400
+Received: from mail-ej1-x644.google.com ([2a00:1450:4864:20::644]:43926)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kADwt-0007f2-Ns
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 10:59:57 -0400
+Received: by mail-ej1-x644.google.com with SMTP id m22so12293418eje.10
+ for <qemu-devel@nongnu.org>; Mon, 24 Aug 2020 07:59:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=S2K7RnPlwv9bbZgq9QtunSij/GhYcN31cF3lz0Vies8=;
+ b=rR+3gmijNeHRAqLILs9eYtOmLa9r1pwm8E6KrIOIztJe1utywjKxdRYvPyLkiTqrMW
+ oowuyhpBJ+0WbgYjcxRBXbyN6cwfo+1WxpUt96LgK2CipHG8x4YxdYvpHg/q5At8azou
+ 947ma2xaB/QQF9ulF/BfaiNZKTFLUnPYYlbl/EUC4vTIu1Ga7rk4kqkn9Hx4WCo9Jm+w
+ 4EOG8gJWmCv6+jTPetM3aq5EtlFCsJFGR50GPN0di3IwB9Qbm7lyPNyda2/vdIr0smm9
+ lBGuomy9JwLphBa8K6Vpy8L9WkajBdkgcCQNQKa2qgp1+l0TMIaIPVsILMsnz8ZNVAob
+ v+wA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=S2K7RnPlwv9bbZgq9QtunSij/GhYcN31cF3lz0Vies8=;
+ b=rZ/pGgcbiTieSldtqlHfgO9Bt9FWBS6We3RUWqO5A6Ng+8dFGTJ25Niy9XJOSGMA0B
+ wIqb1De01Joqh9I+9Qr934Xj7gB7y2jVE0gVbiWRRlBFN6WFRA6TKiSNeV+Ik+mG+18B
+ NjTa/BErzRYU4zr2V3xhHB9ATmCe4hXpTJmgfJbXQ/0bk++/bxJQCIlQqjW75APxsHlh
+ vmnp5n5sN53V7zJhK15rqDTSX0U2QddnR0ffmdC9vijr6uwFyM75avdeqRkslEldxzao
+ II5qQL6zzjKFD/+WstrL8M+/CwbzFUH8E/GuoC6Sv0lpwhHmp1Qcz4RimV051g5yMxtN
+ M0eA==
+X-Gm-Message-State: AOAM5337JtjWn3JCmLebD084rYLIgCsLP3H2U52myEgNIfgBD6aYrnkO
+ HIlolz72GpVj1sHaDVbGDnGZp6ijWuAUKfuMbSrvjnH+7z6NKCA1
+X-Google-Smtp-Source: ABdhPJwjzuea+jwpgLMWZYmPy3M49MTonEdFNdS8lFu07MZ7zbZ8ShX/tHNYuzNKYegWP36ZnffsX4RiszBNX7w8v+A=
+X-Received: by 2002:a17:906:59b:: with SMTP id 27mr6287544ejn.56.1598281189867; 
+ Mon, 24 Aug 2020 07:59:49 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200824145127.GQ10011@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eblake@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=eblake@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/24 06:48:00
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -52
-X-Spam_score: -5.3
-X-Spam_bar: -----
-X-Spam_report: (-5.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.956,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-2.25, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+References: <20200820133201.80577-1-graeme@nuviainc.com>
+In-Reply-To: <20200820133201.80577-1-graeme@nuviainc.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 24 Aug 2020 15:59:38 +0100
+Message-ID: <CAFEAcA_9WRk0Dr97wpDHacsjy2qpmBBq=kp6hOQTvUOvpWF0zw@mail.gmail.com>
+Subject: Re: [PATCH] hw/arm/sbsa-ref.c : Add a fake embedded controller
+To: Graeme Gregory <graeme@nuviainc.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::644;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x644.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,38 +93,170 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Roman Bolshakov <r.bolshakov@yadro.com>, qemu-devel@nongnu.org
+Cc: Leif Lindholm <leif@nuviainc.com>, qemu-arm <qemu-arm@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, rad@semihalf.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/24/20 9:51 AM, Daniel P. Berrangé wrote:
+On Thu, 20 Aug 2020 at 14:32, Graeme Gregory <graeme@nuviainc.com> wrote:
+>
+> A difference between sbsa platform and the virt platform is PSCI is
+> handled by ARM-TF in the sbsa platform. This means that the PSCI code
+> there needs to communicate some of the platform power changes down
+> to the qemu code for things like shutdown/reset control.
+>
+> Space has been left to extend the EC if we find other use cases in
+> future where ARM-TF and qemu need to communicate.
+>
+> Signed-off-by: Graeme Gregory <graeme@nuviainc.com>
+> ---
+>  hw/arm/sbsa-ref.c | 95 +++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 95 insertions(+)
+>
+> diff --git a/hw/arm/sbsa-ref.c b/hw/arm/sbsa-ref.c
+> index f030a416fd..c8743fc1d0 100644
+> --- a/hw/arm/sbsa-ref.c
+> +++ b/hw/arm/sbsa-ref.c
+> @@ -41,6 +41,7 @@
+>  #include "hw/usb.h"
+>  #include "hw/char/pl011.h"
+>  #include "net/net.h"
+> +#include "migration/vmstate.h"
+>
+>  #define RAMLIMIT_GB 8192
+>  #define RAMLIMIT_BYTES (RAMLIMIT_GB * GiB)
+> @@ -62,6 +63,7 @@ enum {
+>      SBSA_CPUPERIPHS,
+>      SBSA_GIC_DIST,
+>      SBSA_GIC_REDIST,
+> +    SBSA_SECURE_EC,
+>      SBSA_SMMU,
+>      SBSA_UART,
+>      SBSA_RTC,
+> @@ -98,6 +100,14 @@ typedef struct {
+>  #define SBSA_MACHINE(obj) \
+>      OBJECT_CHECK(SBSAMachineState, (obj), TYPE_SBSA_MACHINE)
+>
+> +typedef struct {
+> +    SysBusDevice parent_obj;
+> +    MemoryRegion iomem;
+> +} SECUREECState;
 
->>> @@ -916,6 +917,27 @@ Darwin)
->>>      # won't work when we're compiling with gcc as a C compiler.
->>>      QEMU_CFLAGS="-DOS_OBJECT_USE_OBJC=0 $QEMU_CFLAGS"
->>>      HOST_VARIANT_DIR="darwin"
->>> +  cat > GNUmakefile <<'EOF'
->>> +# This file is auto-generated by configure to implicitly switch from a 'make'
->>> +# invocation to 'gmake'
->>
->> Are we going to run into issues with an in-tree build trying to create
->> GNUmakefile to switch over to build/, while also creating build/GNUmakefile
->> to switch from make to gmake?
-> 
-> Don't think so - it just means we'll go through both GNUmakefile in
-> turn before getting to the real Makefile.
+Could you put the definition of the device in its own .c file,
+please (hw/misc/ seems like the right place). We generally
+prefer to keep the board and individual device models
+separate. (Some older code in the tree still has devices
+lurking in source files, but new stuff generally follows
+the rules.)
 
-Actually, we won't - the top-level in-tree GNUmakefile calls $(MAKE) -C 
-build -f Makefile, which means it skips build/GNUmakefile.  But on the 
-other hand, since this series adjusts both places to source 
-build/config-host.mak, which in turn assigns $MAKE in a timely manner, 
-the recursion should be run through the correct gmake whether done from 
-the top-level or directly from within build.
+> +enum sbsa_secure_ec_powerstates {
+> +    SBSA_SECURE_EC_CMD_NULL,
+> +    SBSA_SECURE_EC_CMD_POWEROFF,
+> +    SBSA_SECURE_EC_CMD_REBOOT,
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+The last two are clear enough, but what's a null power state for?
 
+> +static uint64_t secure_ec_read(void *opaque, hwaddr offset, unsigned size)
+> +{
+> +    /* No use for this currently */
+> +    return 0;
+> +}
+> +
+> +static void secure_ec_write(void *opaque, hwaddr offset,
+> +                     uint64_t value, unsigned size)
+> +{
+> +    if (offset == 0) { /* PSCI machine power command register */
+> +        switch (value) {
+> +        case SBSA_SECURE_EC_CMD_NULL:
+> +            break;
+> +        case SBSA_SECURE_EC_CMD_POWEROFF:
+> +            qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SHUTDOWN);
+> +            break;
+> +        case SBSA_SECURE_EC_CMD_REBOOT:
+> +            qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
+> +            break;
+> +        default:
+> +            error_report("sbsa-ref: ERROR Unkown power command");
+
+"unknown".
+
+We prefer qemu_log_mask(LOG_GUEST_ERROR, ...) for logging this
+kind of "guest code did something wrong" situation.
+(you could also do that for attempting to read this w/o register
+if you liked).
+
+> +        }
+> +    } else {
+> +        error_report("sbsa-ref: unknown EC register");
+
+similarly here
+
+> +    }
+> +}
+> +
+> +static const MemoryRegionOps secure_ec_ops = {
+> +    .read = secure_ec_read,
+> +    .write = secure_ec_write,
+> +    .endianness = DEVICE_NATIVE_ENDIAN,
+
+Consider explicitly specifying the permitted access size
+by setting .valid.min_access_size and .valid.max_access_size
+(restricting guests to only doing 32-bit writes will make
+life easier when you come to add registers later...)
+
+> +};
+> +
+> +static void secure_ec_init(Object *obj)
+> +{
+> +    SECUREECState *s = SECURE_EC(obj);
+> +    SysBusDevice *dev = SYS_BUS_DEVICE(obj);
+> +
+> +    memory_region_init_io(&s->iomem, obj, &secure_ec_ops, s, "secure-ec",
+> +                            0x1000);
+
+Minor indent error here.
+
+> +    sysbus_init_mmio(dev, &s->iomem);
+> +}
+> +
+> +static void create_secure_ec(MemoryRegion *mem)
+> +{
+> +    hwaddr base = sbsa_ref_memmap[SBSA_SECURE_EC].base;
+> +    DeviceState *dev = qdev_create(NULL, TYPE_SECURE_EC);
+> +    SysBusDevice *s = SYS_BUS_DEVICE(dev);
+> +
+> +    memory_region_add_subregion(mem, base,
+> +                                sysbus_mmio_get_region(s, 0));
+> +}
+> +
+>  static void sbsa_ref_init(MachineState *machine)
+>  {
+>      unsigned int smp_cpus = machine->smp.cpus;
+> @@ -708,6 +778,8 @@ static void sbsa_ref_init(MachineState *machine)
+>
+>      create_pcie(sms);
+>
+> +    create_secure_ec(secure_sysmem);
+> +
+>      sms->bootinfo.ram_size = machine->ram_size;
+>      sms->bootinfo.nb_cpus = smp_cpus;
+>      sms->bootinfo.board_id = -1;
+> @@ -798,8 +870,31 @@ static const TypeInfo sbsa_ref_info = {
+>      .instance_size = sizeof(SBSAMachineState),
+>  };
+>
+> +static const VMStateDescription vmstate_secure_ec_info = {
+> +    .name = "sbsa-secure-ec",
+> +    .version_id = 0,
+> +    .minimum_version_id = 0,
+> +};
+
+If you don't have any internal state in a device (as in
+this case), then you don't need to set dc->vmsd at all.
+Just have a comment in the class init saying
+    /* No vmstate or reset required: device has no internal state */
+
+thanks
+-- PMM
 
