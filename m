@@ -2,42 +2,42 @@ Return-Path: <SRS0=JPH5=CC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B7CBC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 20:59:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66670C433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 21:07:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1AD5E20738
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 20:59:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1AD5E20738
+	by mail.kernel.org (Postfix) with ESMTPS id 350002067C
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 21:07:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 350002067C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34346 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40120 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAJZD-0004sp-CX
-	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 16:59:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36512)
+	id 1kAJgu-0007tO-S8
+	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 17:07:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38310)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kAJYh-0004SP-1e
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 16:59:15 -0400
-Received: from mout.kundenserver.de ([212.227.126.130]:34155)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kAJfr-00071k-GE
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 17:06:39 -0400
+Received: from mout.kundenserver.de ([212.227.126.134]:58399)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kAJYf-0001cb-7Q
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 16:59:14 -0400
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kAJfp-0002Yz-Fa
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 17:06:39 -0400
 Received: from [192.168.100.1] ([82.252.135.186]) by mrelayeu.kundenserver.de
- (mreue012 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1Ml3ym-1ktVkJ2LUa-00lVym; Mon, 24 Aug 2020 22:59:03 +0200
-Subject: Re: [PATCH v3 1/2] linux-user: Fix 'mq_timedsend()' and
- 'mq_timedreceive()'
+ (mreue009 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1Mq2vS-1kxNfm0V98-00n5lB; Mon, 24 Aug 2020 23:06:24 +0200
+Subject: Re: [PATCH v3 2/2] linux-user: Add support for
+ 'rt_sigtimedwait_time64()' and 'sched_rr_get_interval_time64()'
 To: Filip Bozuta <Filip.Bozuta@syrmia.com>, qemu-devel@nongnu.org
-References: <20200824193752.67950-1-Filip.Bozuta@syrmia.com>
- <20200824193752.67950-2-Filip.Bozuta@syrmia.com>
+References: <20200824192116.65562-1-Filip.Bozuta@syrmia.com>
+ <20200824192116.65562-3-Filip.Bozuta@syrmia.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -81,36 +81,36 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <fa26afcf-1af9-dca1-e98c-4704ed42dcef@vivier.eu>
-Date: Mon, 24 Aug 2020 22:59:02 +0200
+Message-ID: <7991d99b-3be1-06bf-e9de-8e86371f4198@vivier.eu>
+Date: Mon, 24 Aug 2020 23:06:23 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200824193752.67950-2-Filip.Bozuta@syrmia.com>
+In-Reply-To: <20200824192116.65562-3-Filip.Bozuta@syrmia.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:qLEokLuoq4k6pcvLS1Yeby4haLdtm29XxPbY8dl4fdugh7z0XgA
- hGZH7tSx5vjMmPh2F+eBAQ6bUoq93ATXoZFaFyh5Cb0Ell8MeF/q6F1YyyxHkAOfPyA5B++
- uj+91wA08b81B2GmcQ4xe1HLzDcqRviHpwZf2kqkmvHe/yzdl0xZ8eV2k61ACMdeVXWDuBF
- h2HGlQVr2vKgkzIfl5WJg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:qmOipwJXhFU=:PyvVfvlxDagHAdC0/Y+F6d
- pC7If1ACoEwIvmsdWqV7wi9ppJm4ZoFwcI7ISnzj7A/emsDjGJNoVOvDe5fsgDJfQGNcUEMhR
- ovD+vcFC9JqWIx9Ib8nTZLxSoo4JGGnAjRy+xVvC3lSfUY1RfuflGJewh3FK7shSQvBfTl++s
- 6L/17Is33+OvXPZq8lCKE/udrUJa1HvcCD3Pvh4e3i+ubaKmUDIDeHoCMtH24oLq1ht2Z4xDh
- PA6Hdl4Dht4MT0uUx762IURG7Dr6AxFNhuEMRdEVa5A6fvSfwjyX/ufkT+ZJxJt+WT+pGiZJg
- mnyWYBJuzXpoOdwYGy87/aCH85tDB6T585X8g9MDWVS2TjxLG3NXL53F9j9Ct7vPAeFy5TD9S
- DlobYRaPwd1e/NDlgdPik3oZ7MrZzChsc1WeOYGHNjnzDxOm34+vUZ8tbWu167yPKWkuKUhiT
- bO6Y6Slwex1E74pQ0xsED74k27Ka6EW89DHEH/uxNjGuuKzOmN4QrVn1b8Ci6RnPOTDQmT9nM
- zlUY1//gFDm47NbaZ9g55Wb1CjsarPMOn3SfrXVGSPu8OU1QDFZGMVBw7b8PUd0mVpmQjt1J/
- YMHAE2FN5m1LkwCIT35Qw3rrYS8W1wIrlWDEXu1lr18egCl/eylRfKp/Ds9/3TB7QF7U55jJp
- ZJ7lMDqKMp3aHXFVdD7Xdg1sJ4j8f6A2maFWLQmhFyRte7K+2dhh/xaINdE4BDoXH0n0lgZea
- VQZvWDXDIrCKjAybd6/2p6Q0IZrzlK8q/AbgKDWRcxTRypEvMi9r5XRjBpAP3nj3giaMqrQHh
- OhYWls42gX2L3nqAccUrrFngEh9NEe6YdJvSOBnqTkqX+iU22eKEkkf3KvIoiQnel6KKMfJ
-Received-SPF: none client-ip=212.227.126.130; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:GqpBF09xDIgIYXDq/WAW83z1/pIYoSatKA2DLVeuWsG3Hk1dZDw
+ gul3YRvazk6I4QSLRuOMvSdvQuoidIf+DAK9DBbn/clK8nY4vaBP0r6gNWSwjUS+13l2E0W
+ JFTxGYzyXqe4mkH5PnNvs4ysF3D55IWfvqZWC0OaWvWNkCKh9fkneRxCU+Y7w2CPQHXGE5F
+ EzvOiuwD8aM+HfwJKWwjw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:KWt3dK5Rkhc=:G3cBdHDQM4pQI+7HG2gad9
+ hUopzgY8/A8PbzkWQpAWiv6+1R+viqlq084kHzyOvlZsV44ABxniD9js1tmWqXa6pgoeXn72Q
+ 4b7B6x98a0wfbPxipLLxEmybgkWXSPkof7cd6ucBW+9Dp6QJVi6yB/9GGT5vI2Y70b1p3psG6
+ vUwA82dzvRR8XxTuwokos+arn7xrONPGEl3HRwO+RGUVXOXhwZpwnPs268+ItXHzaoVV5OTRm
+ MSdjh2rSxcJLzukiui4IzdIqvRA5OEjZ6PLe8su3dKLckqAmwv5T1t2p/+KKK2iHnit2CFWLH
+ 05hSrM1WbqiiTheOPlqT4B5vUacCBzZcfVgzgSsG+X5nBHARXProSU9Tq7k+YtGz9Vvwp7FIz
+ sPK4wCPus+BjVk6prcaAjbsC7gdMJ555EPbmc3llIXSDc7hBMFjnfhucvLBISNL0J5lAURz90
+ dZ/W35onwjiLAkiiS9lW4k/0p0pI3k9Bm39f9h1ZmuaYofYC07ISK4pMytBASmkxWvQat6/jW
+ 3xQwXmchb5IJq6uJwsgUkMi8U8jC/nQFdvlt1BjqWoy5nlW7qRCFKcaDB9L8AQ9D34xhDpJ0Z
+ EM8HMwHkieCD7bIBZlplTZfrODdZMT2YkRFWwKY+NCXDAjw9RutCch4Kje9i2mUdXW69RdU4R
+ Y+2Bm3nsfg2JJgrChNFrI2etVXuo9noxe30LVHMEnnVqs9VIQMND2acEa0PDmEhMyjKUpFYLe
+ bCgnP2qdWg6GdLJBisynQJEAWGz3/cvPOL5Q9rmT1S0THKQgGfguaCBW6SrPFZ89ymaWkujQC
+ hi2hh/MPJVNLdVQNFhiy7Z7/NCA7bFAR1K+iFYYAY8n6PnI7aCI0w4e89Xebw+mJ33KSyo1
+Received-SPF: none client-ip=212.227.126.134; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/24 16:34:54
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/24 15:35:44
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
 X-Spam_bar: ----
@@ -134,76 +134,111 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 24/08/2020 à 21:37, Filip Bozuta a écrit :
-> Implementations of syscalls 'mq_timedsend()' and 'mq_timedreceive()'
-> in 'syscall.c' use functions 'target_to_host_timespec()' and
-> 'host_to_target_timespec()' to transfer the value of 'struct timespec'
-> between target and host. However, the implementations don't check whether
-> this conversion succeeds and thus can cause an unaproppriate error instead
-> of the 'EFAULT (Bad address)' which is supposed to be set if the conversion
-> from target to host fails. This was confirmed with the modified LTP
-> test suite where test cases with a bad adress for 'timespec' were
-> added. This modified test suite can be found at:
-> https://github.com/bozutaf/ltp
+Le 24/08/2020 à 21:21, Filip Bozuta a écrit :
+> This patch implements functionality for following time64 syscalls:
 > 
-> Without the changes from this patch the bad adress testcase for 'mq_timedsend()'
-> succeds unexpectedly, while the test returns errno 'ETIMEOUT' for
-> 'mq_timedreceive()':
+> *rt_sigtimedwait_time64()
 > 
-> mq_timedsend01.c:190: FAIL: mq_timedsend() returned 0, expected -1: SUCCESS (0)
-> mq_timedreceive01.c:178: FAIL: mq_timedreceive() failed unexpectedly,
-> expected EFAULT: ETIMEDOUT (110)
+>     This is a year 2038 safe variant of syscall:
 > 
-> After the changes from this patch, testcases for both syscalls fail with EFAULT
-> as expected, which is the same test result that is received with native execution:
+>     int rt_sigtimedwait(const sigset_t *set, siginfo_t *info,
+>                         const struct timespec *timeout, size_t sigsetsize)
+>     --synchronously wait for queued signals--
+>     man page: https://man7.org/linux/man-pages/man2/rt_sigtimedwait.2.html
 > 
-> mq_timedsend01.c:187: PASS: mq_timedsend() failed expectedly: EFAULT (14)
-> mq_timedreceive01.c:180: PASS: mq_timedreceive() failed expectedly: EFAULT (14)
+> *sched_rr_get_interval_time64()
 > 
-> (Patch with this new test case will be sent to LTP mailing list soon)
+>     This is a year 2038 safe variant of syscall:
+> 
+>     int sched_rr_get_interval(pid_t pid, struct timespec *tp)
+>     --get  the  SCHED_RR  interval  for the named process--
+>     man page: https://man7.org/linux/man-pages/man2/sched_rr_get_interval.2.html
+> 
+> Implementation notes:
+> 
+>     These syscalls were implemented in similar ways like
+>     'rt_sigtimedwait()' and 'sched_rr_get_interval()' except
+>     that functions 'target_to_host_timespec64()' and
+>     'host_to_target_timespec64()' were used to convert values
+>     of 'struct timespec' between host and target.
 > 
 > Signed-off-by: Filip Bozuta <Filip.Bozuta@syrmia.com>
+> Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 > ---
->  linux-user/syscall.c | 16 ++++++++++++----
->  1 file changed, 12 insertions(+), 4 deletions(-)
+>  linux-user/syscall.c | 53 ++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 53 insertions(+)
 > 
 > diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index 05f03919ff..4ee1de6e65 100644
+> index a359bd8620..0533a5a5bb 100644
 > --- a/linux-user/syscall.c
 > +++ b/linux-user/syscall.c
-> @@ -11817,9 +11817,13 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
->  
->              p = lock_user (VERIFY_READ, arg2, arg3, 1);
->              if (arg5 != 0) {
-> -                target_to_host_timespec(&ts, arg5);
-> +                if (target_to_host_timespec(&ts, arg5)) {
-> +                    return -TARGET_EFAULT;
-> +                }
->                  ret = get_errno(safe_mq_timedsend(arg1, p, arg3, arg4, &ts));
-> -                host_to_target_timespec(arg5, &ts);
-> +                if (!is_error(ret) && host_to_target_timespec(arg5, &ts)) {
-> +                    return -TARGET_EFAULT;
-> +                }
->              } else {
->                  ret = get_errno(safe_mq_timedsend(arg1, p, arg3, arg4, NULL));
+> @@ -8831,6 +8831,48 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
 >              }
-> @@ -11836,10 +11840,14 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
->  
->              p = lock_user (VERIFY_READ, arg2, arg3, 1);
->              if (arg5 != 0) {
-> -                target_to_host_timespec(&ts, arg5);
-> +                if (target_to_host_timespec(&ts, arg5)) {
+>          }
+>          return ret;
+> +#endif
+> +#ifdef TARGET_NR_rt_sigtimedwait_time64
+> +    case TARGET_NR_rt_sigtimedwait_time64:
+> +        {
+> +            sigset_t set;
+> +            struct timespec uts, *puts;
+> +            siginfo_t uinfo;
+> +
+> +            if (arg4 != sizeof(target_sigset_t)) {
+> +                return -TARGET_EINVAL;
+> +            }
+> +
+> +            p = lock_user(VERIFY_READ, arg1, sizeof(target_sigset_t), 1);
+> +            if (!p) {
+> +                return -TARGET_EFAULT;
+> +            }
+> +            target_to_host_sigset(&set, p);
+> +            unlock_user(p, arg1, 0);
+> +            if (arg3) {
+> +                puts = &uts;
+> +                if (target_to_host_timespec64(puts, arg3)) {
 > +                    return -TARGET_EFAULT;
 > +                }
->                  ret = get_errno(safe_mq_timedreceive(arg1, p, arg3,
->                                                       &prio, &ts));
-> -                host_to_target_timespec(arg5, &ts);
-> +                if (!is_error(ret) && host_to_target_timespec(arg5, &ts)) {
-> +                    return -TARGET_EFAULT;
+> +            } else {
+> +                puts = NULL;
+> +            }
+> +            ret = get_errno(safe_rt_sigtimedwait(&set, &uinfo, puts,
+> +                                                 SIGSET_T_SIZE));
+> +            if (!is_error(ret)) {
+> +                if (arg2) {
+> +                    p = lock_user(VERIFY_WRITE, arg2,
+> +                                  sizeof(target_siginfo_t), 0);
+> +                    if (!p) {
+> +                        return -TARGET_EFAULT;
+> +                    }
+> +                    host_to_target_siginfo(p, &uinfo);
+> +                    unlock_user(p, arg2, sizeof(target_siginfo_t));
 > +                }
->              } else {
->                  ret = get_errno(safe_mq_timedreceive(arg1, p, arg3,
->                                                       &prio, NULL));
+> +                ret = host_to_target_signal(ret);
+> +            }
+> +        }
+> +        return ret;
+>  #endif
+>      case TARGET_NR_rt_sigqueueinfo:
+>          {
+> @@ -10351,6 +10393,17 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+>          }
+>          return ret;
+>  #endif
+> +#ifdef TARGET_NR_sched_rr_get_interval_time64
+> +    case TARGET_NR_sched_rr_get_interval_time64:
+> +        {
+> +            struct timespec ts;
+> +            ret = get_errno(sched_rr_get_interval(arg1, &ts));
+> +            if (!is_error(ret)) {
+> +                ret = host_to_target_timespec64(arg2, &ts);
+> +            }
+> +        }
+> +        return ret;
+> +#endif
+>  #if defined(TARGET_NR_nanosleep)
+>      case TARGET_NR_nanosleep:
+>          {
 > 
 
 Applied to my linux-user-for-5.2 branch.
