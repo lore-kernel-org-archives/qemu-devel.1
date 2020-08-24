@@ -2,80 +2,76 @@ Return-Path: <SRS0=JPH5=CC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC8B3C433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 17:04:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C8C8C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 17:04:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9BB41206F0
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 17:04:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 46E3D206F0
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 17:04:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="imV7/iy7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9BB41206F0
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CETrA1SI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46E3D206F0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58710 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59660 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAFtZ-0001YK-SO
-	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 13:04:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36144)
+	id 1kAFtx-0001wk-Ip
+	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 13:04:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36140)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kAFrc-0007Sq-0o
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 13:02:32 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:45494)
+ id 1kAFrb-0007Rk-Ck
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 13:02:31 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:44561)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kAFra-0003MN-AC
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 13:02:31 -0400
+ id 1kAFrZ-0003MD-Ls
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 13:02:30 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598288549;
+ s=mimecast20190719; t=1598288548;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=BxySJVrnEnh7ML01Y3qGldicKlwFsU6fSDsmzi00OZ8=;
- b=imV7/iy7oZ8vFmCLP9wpqDBBXnTzs9/d3edulnDjMvBBDWo+c6ECaY2fbOu2gkhxCHieHl
- 1g5CCLIgwUzrS9buWcMawC0cmSZvN5v1LoT59/t/IA64GqFtNh9kLXhCcr5WVxi8ubW6UB
- /5xvhxKdPlL3heAt9ZAyX2ZLf7k3U1k=
+ content-transfer-encoding:content-transfer-encoding;
+ bh=FCTt98t3u6zrfdm0T/Hn/QgrW0ZHZuuF4kwsBEziFv0=;
+ b=CETrA1SIPdI9tioIK1loyrPRB8uGSUKYeHc+kLo6BB7H5zZDjxZsH+CmOakG1DfXkgt+iG
+ J+D0SATr423pxGne6dyV9laoxMl1O5LYBDLiYjoIuyldnGy3j3/HMXpnxUOE54g/owSBC1
+ XL+zHFaaZId3PJdWYFT11h8GbWUkfyM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-488-I0uoE8YsOmCOIqKYN7chMQ-1; Mon, 24 Aug 2020 13:02:26 -0400
-X-MC-Unique: I0uoE8YsOmCOIqKYN7chMQ-1
+ us-mta-133-QPvhVExhMC6_8SfM-qtXDQ-1; Mon, 24 Aug 2020 13:02:22 -0400
+X-MC-Unique: QPvhVExhMC6_8SfM-qtXDQ-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6EA74801AC9;
- Mon, 24 Aug 2020 17:02:25 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 714ED51B1;
+ Mon, 24 Aug 2020 17:02:21 +0000 (UTC)
 Received: from localhost.localdomain.com (ovpn-114-223.ams2.redhat.com
  [10.36.114.223])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C7DFC5C1BB;
- Mon, 24 Aug 2020 17:02:23 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id F0CA45C1BB;
+ Mon, 24 Aug 2020 17:02:19 +0000 (UTC)
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 2/2] nbd: disable signals and forking on Windows builds
-Date: Mon, 24 Aug 2020 18:02:18 +0100
-Message-Id: <20200824170218.106255-3-berrange@redhat.com>
-In-Reply-To: <20200824170218.106255-1-berrange@redhat.com>
-References: <20200824170218.106255-1-berrange@redhat.com>
+Subject: [PATCH 0/2] nbd: build qemu-nbd on Windows
+Date: Mon, 24 Aug 2020 18:02:16 +0100
+Message-Id: <20200824170218.106255-1-berrange@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
-X-Mimecast-Spam-Score: 0.003
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=berrange@redhat.com;
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=berrange@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/24 06:48:00
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/24 04:38:05
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -103,89 +99,46 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Disabling these parts are sufficient to get the qemu-nbd program
-compiling in a Windows build.
-
-Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
----
- meson.build |  7 ++-----
- qemu-nbd.c  | 10 +++++++++-
- 2 files changed, 11 insertions(+), 6 deletions(-)
-
-diff --git a/meson.build b/meson.build
-index df5bf728b5..1071871605 100644
---- a/meson.build
-+++ b/meson.build
-@@ -1074,12 +1074,9 @@ if have_tools
-              dependencies: [authz, block, crypto, io, qom, qemuutil], install: true)
-   qemu_io = executable('qemu-io', files('qemu-io.c'),
-              dependencies: [block, qemuutil], install: true)
--  qemu_block_tools += [qemu_img, qemu_io]
--  if targetos == 'linux' or targetos == 'sunos' or targetos.endswith('bsd')
--    qemu_nbd = executable('qemu-nbd', files('qemu-nbd.c'),
-+  qemu_nbd = executable('qemu-nbd', files('qemu-nbd.c'),
-                dependencies: [block, qemuutil], install: true)
--    qemu_block_tools += [qemu_nbd]
--  endif
-+  qemu_block_tools += [qemu_img, qemu_io, qemu_nbd]
- 
-   subdir('storage-daemon')
-   subdir('contrib/rdmacm-mux')
-diff --git a/qemu-nbd.c b/qemu-nbd.c
-index b102874f0f..c6fd6524d3 100644
---- a/qemu-nbd.c
-+++ b/qemu-nbd.c
-@@ -155,12 +155,13 @@ QEMU_COPYRIGHT "\n"
-     , name);
- }
- 
-+#ifndef WIN32
- static void termsig_handler(int signum)
- {
-     atomic_cmpxchg(&state, RUNNING, TERMINATE);
-     qemu_notify_event();
- }
--
-+#endif
- 
- static int qemu_nbd_client_list(SocketAddress *saddr, QCryptoTLSCreds *tls,
-                                 const char *hostname)
-@@ -587,6 +588,7 @@ int main(int argc, char **argv)
-     unsigned socket_activation;
-     const char *pid_file_name = NULL;
- 
-+#ifndef WIN32
-     /* The client thread uses SIGTERM to interrupt the server.  A signal
-      * handler ensures that "qemu-nbd -v -c" exits with a nice status code.
-      */
-@@ -594,6 +596,7 @@ int main(int argc, char **argv)
-     memset(&sa_sigterm, 0, sizeof(sa_sigterm));
-     sa_sigterm.sa_handler = termsig_handler;
-     sigaction(SIGTERM, &sa_sigterm, NULL);
-+#endif
- 
- #ifdef CONFIG_POSIX
-     signal(SIGPIPE, SIG_IGN);
-@@ -896,6 +899,7 @@ int main(int argc, char **argv)
- #endif
- 
-     if ((device && !verbose) || fork_process) {
-+#ifndef WIN32
-         int stderr_fd[2];
-         pid_t pid;
-         int ret;
-@@ -959,6 +963,10 @@ int main(int argc, char **argv)
-              */
-             exit(errors);
-         }
-+#else /* WIN32 */
-+        error_report("Unable to fork into background on Windows hosts");
-+        exit(EXIT_FAILURE);
-+#endif /* WIN32 */
-     }
- 
-     if (device != NULL && sockpath == NULL) {
--- 
-2.26.2
+We are already building the NBD client and server on Windows when it is=0D
+used via the main system emulator binaries. This demonstrates there is=0D
+no fundamental blocker to buildig the qemu-nbd binary too.=0D
+=0D
+=0D
+In testing this I used:=0D
+=0D
+   wine qemu-nbd.exe -t -p 9000 demo.img=20=0D
+=0D
+and=0D
+=0D
+   wine qemu-img.exe info nbd:localhost:9000=0D
+=0D
+In fact I tested the full matrix of native vs windows client and native=0D
+vs windows server.=0D
+=0D
+I did notice that native qemu-img will sometimes hang when talking to=0D
+the windows qemu-nbd.exe binary, and the windows qemu-img will almost=0D
+always hang.=0D
+=0D
+The hang happens in the "blk_unref" call in collect_image_info_list().=0D
+This suggests something related to the socket teardown / cleanup in=0D
+the NBD code.=0D
+=0D
+While we should obviously investigate and fix that, I didn't consider=0D
+it a blocker for enabling build of qemu-nbd.exe, since we're already=0D
+building the same (buggy) NBD code in the system emulators on Windows.=0D
+=0D
+Daniel P. Berrang=C3=A9 (2):=0D
+  block: add missing socket_init() calls to tools=0D
+  nbd: disable signals and forking on Windows builds=0D
+=0D
+ meson.build |  7 ++-----=0D
+ qemu-img.c  |  2 ++=0D
+ qemu-io.c   |  2 ++=0D
+ qemu-nbd.c  | 11 ++++++++++-=0D
+ 4 files changed, 16 insertions(+), 6 deletions(-)=0D
+=0D
+--=20=0D
+2.26.2=0D
+=0D
 
 
