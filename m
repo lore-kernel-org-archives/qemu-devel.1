@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34461C433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 22:05:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F8A1C433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 22:05:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F14FD20706
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 22:05:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2E6B520706
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 22:05:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RXm39c23"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F14FD20706
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WbS+GoCd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E6B520706
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47446 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47500 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAKaR-0002Xt-9o
-	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 18:05:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48580)
+	id 1kAKaS-0002ZE-PZ
+	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 18:05:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48836)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kAKVQ-0006Dq-Qo
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 17:59:57 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:58901
+ id 1kAKWQ-0007Ca-Ge
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 18:00:58 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:56297
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kAKVM-0008GV-8V
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 17:59:56 -0400
+ id 1kAKWO-00006L-MD
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 18:00:58 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598306390;
+ s=mimecast20190719; t=1598306455;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Z7X2ws78eCmnTUnSlsjYISkwZZ/DF3s6qLQ+bT7y+08=;
- b=RXm39c23Fg7tW2jNHIGGX59lnT/ThAQ3qCTZwM3tHmRhAVUYPiI2vBXHtfoQL2xYukeGZL
- k2O7wiQjPEtdgw2kLEVYo1O5t0L9X7EqDL4W74xN+jgg0Yw5ORaralWzZW1rLWDM+c7BEX
- ZNU4PdaO4OKi0+ZnBCRu1ps0d0dwEFk=
+ bh=x35caCXuOckWr0t/0QSl7Z1oGqEi1qLutXHP06QSpTE=;
+ b=WbS+GoCdplRMSWuIjHM6H1VMYdbSu4e1ixUweyoHhOuKZFwUgjvyxTd1kjgR8kVkrwGe6k
+ yXRV+/6YLWdSQNuqwtMZre7oEAQpvWDzTmOPzjj5/HWkGNFEWQipSlUvbqxwqPFCri9Wi5
+ jSaziu4KAVKmJytX36zpCf41avTfOBQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-81-QX1lQLUOO3uYjF9eFZ0maQ-1; Mon, 24 Aug 2020 17:59:49 -0400
-X-MC-Unique: QX1lQLUOO3uYjF9eFZ0maQ-1
+ us-mta-375-RqXHqp1-PZu48tR_cdJ9Ww-1; Mon, 24 Aug 2020 18:00:53 -0400
+X-MC-Unique: RqXHqp1-PZu48tR_cdJ9Ww-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2ACDD18A2246;
- Mon, 24 Aug 2020 21:59:48 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 754EF81F018;
+ Mon, 24 Aug 2020 22:00:52 +0000 (UTC)
 Received: from localhost (unknown [10.10.67.254])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DDFD55B680;
- Mon, 24 Aug 2020 21:59:47 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 85CD562A13;
+ Mon, 24 Aug 2020 22:00:18 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 1/6] xilinx_axidma: Use typedef name for instance_size
-Date: Mon, 24 Aug 2020 17:59:31 -0400
-Message-Id: <20200824215936.2961951-2-ehabkost@redhat.com>
+Subject: [PATCH 6/6] virtio-vga: Use typedef name for instance_size
+Date: Mon, 24 Aug 2020 17:59:36 -0400
+Message-Id: <20200824215936.2961951-7-ehabkost@redhat.com>
 In-Reply-To: <20200824215936.2961951-1-ehabkost@redhat.com>
 References: <20200824215936.2961951-1-ehabkost@redhat.com>
 MIME-Version: 1.0
@@ -112,37 +112,37 @@ simpler.
 
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
-Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Cc: Alistair Francis <alistair@alistair23.me>
-Cc: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 Cc: qemu-devel@nongnu.org
 ---
- hw/dma/xilinx_axidma.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ hw/display/virtio-vga.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/hw/dma/xilinx_axidma.c b/hw/dma/xilinx_axidma.c
-index a4812e480a..5ad8bd3d2e 100644
---- a/hw/dma/xilinx_axidma.c
-+++ b/hw/dma/xilinx_axidma.c
-@@ -634,7 +634,7 @@ static const TypeInfo axidma_info = {
- static const TypeInfo xilinx_axidma_data_stream_info = {
-     .name          = TYPE_XILINX_AXI_DMA_DATA_STREAM,
-     .parent        = TYPE_OBJECT,
--    .instance_size = sizeof(struct XilinxAXIDMAStreamSlave),
-+    .instance_size = sizeof(XilinxAXIDMAStreamSlave),
-     .class_init    = xilinx_axidma_stream_class_init,
-     .class_data    = &xilinx_axidma_data_stream_class,
-     .interfaces = (InterfaceInfo[]) {
-@@ -646,7 +646,7 @@ static const TypeInfo xilinx_axidma_data_stream_info = {
- static const TypeInfo xilinx_axidma_control_stream_info = {
-     .name          = TYPE_XILINX_AXI_DMA_CONTROL_STREAM,
-     .parent        = TYPE_OBJECT,
--    .instance_size = sizeof(struct XilinxAXIDMAStreamSlave),
-+    .instance_size = sizeof(XilinxAXIDMAStreamSlave),
-     .class_init    = xilinx_axidma_stream_class_init,
-     .class_data    = &xilinx_axidma_control_stream_class,
-     .interfaces = (InterfaceInfo[]) {
+diff --git a/hw/display/virtio-vga.c b/hw/display/virtio-vga.c
+index f533d7d1b4..7c995ddc81 100644
+--- a/hw/display/virtio-vga.c
++++ b/hw/display/virtio-vga.c
+@@ -194,8 +194,8 @@ static void virtio_vga_base_class_init(ObjectClass *klass, void *data)
+ static TypeInfo virtio_vga_base_info = {
+     .name          = TYPE_VIRTIO_VGA_BASE,
+     .parent        = TYPE_VIRTIO_PCI,
+-    .instance_size = sizeof(struct VirtIOVGABase),
+-    .class_size    = sizeof(struct VirtIOVGABaseClass),
++    .instance_size = sizeof(VirtIOVGABase),
++    .class_size    = sizeof(VirtIOVGABaseClass),
+     .class_init    = virtio_vga_base_class_init,
+     .abstract      = true,
+ };
+@@ -224,7 +224,7 @@ static void virtio_vga_inst_initfn(Object *obj)
+ static VirtioPCIDeviceTypeInfo virtio_vga_info = {
+     .generic_name  = TYPE_VIRTIO_VGA,
+     .parent        = TYPE_VIRTIO_VGA_BASE,
+-    .instance_size = sizeof(struct VirtIOVGA),
++    .instance_size = sizeof(VirtIOVGA),
+     .instance_init = virtio_vga_inst_initfn,
+ };
+ 
 -- 
 2.26.2
 
