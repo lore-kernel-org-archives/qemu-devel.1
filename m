@@ -2,79 +2,97 @@ Return-Path: <SRS0=JPH5=CC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0FE1C433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 16:19:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96E2CC433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 16:21:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6CED420838
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 16:19:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 61B4A2074D
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 16:21:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UAWlQ2+g"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6CED420838
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GOCeUR5N"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61B4A2074D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34672 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37900 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAFC5-0007As-Oi
-	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 12:19:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51754)
+	id 1kAFE7-0000Ff-MC
+	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 12:21:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52214)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kAFBU-0006k1-Ik
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 12:19:00 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:30114)
+ (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1kAFDJ-0007nW-QM
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 12:20:53 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60434)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kAFBR-0004ML-P6
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 12:18:59 -0400
+ (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1kAFDI-0004eU-58
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 12:20:53 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598285935;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:in-reply-to:in-reply-to:  references:references;
- bh=6C9vnfy79FGkgHoTaahogAabhfhEp/MSbIbKa2fs+nA=;
- b=UAWlQ2+gVhrlWRgcyxKC3DnQwSqBWNfCahrr0V08FHFoVpKqxeH50DeHDl3qScVbe8XH9D
- qDIZjo0993JlT9h+fwkug7EcHl0yPaysZ5oiO9jSsge2KhYz5cFVL9IJsBsnVIJQFV1jEK
- irZAJqZ7kf0sfcSEdb7G6fTXm7mf9Mc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-487-fALy6cfMNUu8WsfiqLfWSQ-1; Mon, 24 Aug 2020 12:18:53 -0400
-X-MC-Unique: fALy6cfMNUu8WsfiqLfWSQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 477471084C89;
- Mon, 24 Aug 2020 16:18:52 +0000 (UTC)
-Received: from redhat.com (ovpn-114-223.ams2.redhat.com [10.36.114.223])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E90045C1BB;
- Mon, 24 Aug 2020 16:18:50 +0000 (UTC)
-Date: Mon, 24 Aug 2020 17:18:48 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PULL v7 000/151] Meson-based build system
-Message-ID: <20200824161848.GW10011@redhat.com>
-References: <20200819213203.17876-1-pbonzini@redhat.com>
- <CABLmASFno04tFBRTq=V8AO7dj1d67-SNpugUJMVVa4yzrPq03Q@mail.gmail.com>
- <CABLmASECM5tVVw3TMJn+0bCT7O4H_guy5TJd9YQKYYx+QUKBKQ@mail.gmail.com>
- <dd66cee7-c6d2-a81e-2e53-eca34ed78be8@redhat.com>
+ s=mimecast20190719; t=1598286051;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=EZPqO0i9nwV9cKVEOUZrqTFf+kRqEfBSBGBt9p29VPU=;
+ b=GOCeUR5NqctHoqWxdQaq6DTTjWSDrCj9myx5ehVyWYNy8fxPx1Zlp8a1cs65g2Fw9Nk57K
+ tWcgWRQybE8LPAEjBByNGVZGrfd2mtYMZHjKKF0V0+vKEKARS93Y+BvMgyMIgPgb4o6CVE
+ wzm8XSoy/dtbD4shvJ1w+DLKMbpvNvY=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-343-HUazv-rYN3GUzbxl5k8CpA-1; Mon, 24 Aug 2020 12:20:48 -0400
+X-MC-Unique: HUazv-rYN3GUzbxl5k8CpA-1
+Received: by mail-qk1-f199.google.com with SMTP id 1so6749584qki.22
+ for <qemu-devel@nongnu.org>; Mon, 24 Aug 2020 09:20:48 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=EZPqO0i9nwV9cKVEOUZrqTFf+kRqEfBSBGBt9p29VPU=;
+ b=QDK6WA4qZYGDcRV5aFTmBxYdBZQgu/TswX/+YTBtHk3TAkKsGvyDwlkK3EgQfPIFY4
+ snNrXjHR0qtmEFuaXVeHCPTF8qFzSP6NNXuGVTjwGGRnYIKzW16fRGtTKcH0EOHf6Imf
+ m1O1H03e+KC+NatDL26WF7u9jo2hkK2aj+9q+lv/whzkjAZyRAZguYUEMKVaHCYDqPRl
+ hfy4S1DmhKhOMC3tUktu1lU3YL/RYHH8VxWz9XtKia392te/0XXssfDOhsWKZGPuhVSC
+ 5JzfBmDPwvZrhRCD6soCRLoqbmPYuFlr93Xcdzxpk2nbAovMzC8L+ZD0Gzq1+oL+QSU3
+ X6mw==
+X-Gm-Message-State: AOAM531UiJeB87AR3NbkJu8RWwpcd5V0PwFFwLPEc6GG9WuGviox5VXM
+ STx1dOy97JsQQdPV87WUFN6lEdolULsSZnqaXL+G7QeUX/pFdHL3zeZd3JDngsFGnkI/ZMLNaFP
+ iZLumeutAsPphfak=
+X-Received: by 2002:a05:6214:1709:: with SMTP id
+ db9mr5617589qvb.142.1598286044394; 
+ Mon, 24 Aug 2020 09:20:44 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxKz1vEw/5vRR+gk/q67juj9ndYT5x6NXmJHk0Z78d9heh3nFcVriVuguhPRLK5wyVbNFVjWQ==
+X-Received: by 2002:a05:6214:1709:: with SMTP id
+ db9mr5617562qvb.142.1598286044064; 
+ Mon, 24 Aug 2020 09:20:44 -0700 (PDT)
+Received: from xz-x1 (bras-vprn-toroon474qw-lp130-11-70-53-122-15.dsl.bell.ca.
+ [70.53.122.15])
+ by smtp.gmail.com with ESMTPSA id j72sm9555088qke.20.2020.08.24.09.20.41
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 24 Aug 2020 09:20:42 -0700 (PDT)
+Date: Mon, 24 Aug 2020 12:20:45 -0400
+From: Peter Xu <peterx@redhat.com>
+To: Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>
+Subject: Re: [RFC v5 3/3] intel_iommu: Do not notify regular iotlb to
+ device-iotlb notifiers
+Message-ID: <20200824162045.GA6424@xz-x1>
+References: <20200824104738.20664-1-eperezma@redhat.com>
+ <20200824104738.20664-4-eperezma@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <dd66cee7-c6d2-a81e-2e53-eca34ed78be8@redhat.com>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <20200824104738.20664-4-eperezma@redhat.com>
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
-X-Mimecast-Spam-Score: 0.001
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=peterx@redhat.com
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
 Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=berrange@redhat.com;
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=peterx@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/24 04:38:05
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -97,47 +115,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- qemu-devel qemu-devel <qemu-devel@nongnu.org>,
- Howard Spoelstra <hsp.cat7@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Yan Zhao <yan.y.zhao@intel.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Juan Quintela <quintela@redhat.com>,
+ Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ qemu-devel@nongnu.org, Eric Auger <eric.auger@redhat.com>, qemu-arm@nongnu.org,
+ Avi Kivity <avi@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Aug 21, 2020 at 02:33:12PM +0200, Paolo Bonzini wrote:
-> On 21/08/20 12:58, Howard Spoelstra wrote:
-> > I investigated a bit further and saw:
-> > ldd in Fedora tells me the executable is "not a dynamic executable".
+On Mon, Aug 24, 2020 at 12:47:38PM +0200, Eugenio Pérez wrote:
+> This improves performance in case of netperf with vhost-net:
+> * TCP_STREAM: From 1374.81Mbit/s to 1845Mbit/s (37%)
+> * TCP_RR: From 6559.36 trans/s to 7916.29/s (21%)
+> * UDP_RR: From 6705.39 trans/s to 8199.39/s (22%)
+> * UDP_STREAM: No change observed (not significant 0.1% improvement)
+
+Good to know that we can get such a perf boost by removing the extra
+invalidations!
+
 > 
-> How are you executing ldd?  I cross built a mingw executable from Fedora
-> and it was definitely using system DLLs.
+> Signed-off-by: Eugenio Pérez <eperezma@redhat.com>
+> ---
+>  hw/i386/intel_iommu.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
 > 
-> PIE builds and doesn't start (doesn't even reach main) but --disable-pie
-> works just fine.  I don't know if the same issue is present under
-> Windows or it's Wine-specific.
+> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> index 2ad6b9d796..d539a9f281 100644
+> --- a/hw/i386/intel_iommu.c
+> +++ b/hw/i386/intel_iommu.c
+> @@ -1959,6 +1959,12 @@ static void vtd_iotlb_domain_invalidate(IntelIOMMUState *s, uint16_t domain_id)
+>      vtd_iommu_unlock(s);
+>  
+>      QLIST_FOREACH(vtd_as, &s->vtd_as_with_notifiers, next) {
+> +        if (vtd_as->iommu.iommu_notify_flags & IOMMU_NOTIFIER_DEVIOTLB) {
+> +            /* If IOMMU memory region is DEVICE IOTLB type, it does not make
+> +             * sense to send regular IOMMU notifications. */
+> +            continue;
+> +        }
 
-I've just hit this problem too,  and can demo it without QEMU involved
+Though here IMHO a cleaner approach (rather than checking explicitly against
+DEVIOTLB flag) is to add a notification type into IOMMUTLBEntry.
 
-$ cat e.c
-#include <stdio.h>
-#include <stdlib.h>
+Then for domain invalidation, the caller is responsible to pass the type
+IOMMU_NOTIFIER_UNMAP into the type field. memory_region_notify_iommu_one() will
+automatically skip the message if not registerd by the notifier.
 
-  int main(int argc, char **argv) {    fprintf(stderr, "Hello\n");    exit(EXIT_SUCCESS); }
+Also, it would be nice to have this new type before or when introducing the
+DEVIOTLB message, otherwise the DEVIOTLB patch can be still slightly confusing
+by itself when notified as UNMAP.
 
-$ x86_64-w64-mingw32-gcc -pie -o e.exe e.c 
+So here's some patch layout I'm thinking:
 
-the resulting e.exe fails to run under *both* Wine and Windows 2008r2.
+  - patch 1: rename function, we can keep it
 
-Either there's some extra magic compiler flags we need to pass to make
-this work, or we need to just disable PIE on Windows. The original
-pre-meson build used -no-pie AFAICT.
+  - patch 2: introduce "type" for IOMMUTLBEntry, so far we only have MAP/UNMAP.
+    Modify all callers of memory_region_notify_iommu*() to fill in the type
+    correctly into IOMMUTLBEntry with map/unmap.  Won't hurt if we still keep
+    filling in UNMAP even for DEVIOTLB since that's after all the same old
+    behavior.
 
-Regards,
-Daniel
+  - patch 3: introduce DEVIOTLB, switch the type field of dev-iotlb
+    notifications to the new type and let vhost registers only to that.
+
+  - patch 4: at last, fix the assertion since we've got the DEVIOTLB messages.
+
+Would this be slightly cleaner?
+
+Thanks,
+
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Peter Xu
 
 
