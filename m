@@ -2,85 +2,66 @@ Return-Path: <SRS0=JPH5=CC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25FE0C433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 08:43:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E237C433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 08:44:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E60962087D
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 08:43:27 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="ZM5/PiAs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E60962087D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
+	by mail.kernel.org (Postfix) with ESMTPS id D92B32075B
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 08:44:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D92B32075B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47136 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49914 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kA84d-0006iL-7t
-	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 04:43:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58794)
+	id 1kA85B-0007rL-7D
+	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 04:44:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59188)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dimastep@yandex-team.ru>)
- id 1kA825-00024h-47; Mon, 24 Aug 2020 04:40:49 -0400
-Received: from forwardcorp1o.mail.yandex.net ([2a02:6b8:0:1a2d::193]:60064)
+ (Exim 4.90_1) (envelope-from <jiangyifei@huawei.com>)
+ id 1kA84H-0006L5-6M; Mon, 24 Aug 2020 04:43:05 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:4207 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dimastep@yandex-team.ru>)
- id 1kA822-0004yU-Tv; Mon, 24 Aug 2020 04:40:48 -0400
-Received: from myt5-23f0be3aa648.qloud-c.yandex.net
- (myt5-23f0be3aa648.qloud-c.yandex.net
- [IPv6:2a02:6b8:c12:3e29:0:640:23f0:be3a])
- by forwardcorp1o.mail.yandex.net (Yandex) with ESMTP id 041EE2E15D5;
- Mon, 24 Aug 2020 11:40:45 +0300 (MSK)
-Received: from myt4-18a966dbd9be.qloud-c.yandex.net
- (myt4-18a966dbd9be.qloud-c.yandex.net [2a02:6b8:c00:12ad:0:640:18a9:66db])
- by myt5-23f0be3aa648.qloud-c.yandex.net (mxbackcorp/Yandex) with ESMTP id
- C6NFGpzPhY-egvKwCiq; Mon, 24 Aug 2020 11:40:44 +0300
-Precedence: bulk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
- s=default; 
- t=1598258444; bh=q0+U/QfA4vXjDbbbTSlxDOvBDrzv7zTyuZdj9kiei3s=;
- h=In-Reply-To:In-Reply-To:Message-Id:References:References:Date:
- Subject:To:From:Cc;
- b=ZM5/PiAsRzOcn62ngg0MKB7uIeI/pG7FBSg2r2hBQq/KF/5FN0ZyF78G6/pYGqXF+
- jugxSiKeTdSAgZ+IQdjWiwKZ1VTyKZc1nzJxcQyR9BWJGLe/xCaOO3Vaz9IS9Jo0Yz
- 1tsKRtqzUsbjYbrAZke+BhAOlVa31UbxXmu2PcWo=
-Authentication-Results: myt5-23f0be3aa648.qloud-c.yandex.net;
- dkim=pass header.i=@yandex-team.ru
-Received: from dynamic-vpn.dhcp.yndx.net (dynamic-vpn.dhcp.yndx.net
- [2a02:6b8:b080:6622::1:7])
- by myt4-18a966dbd9be.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id
- B7dErHoRhW-egl46IZD; Mon, 24 Aug 2020 11:40:42 +0300
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
- (Client certificate not present)
-From: Dima Stepanov <dimastep@yandex-team.ru>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 6/7] tests/qtest/vhost-user-test: add migrate_reconnect test
-Date: Mon, 24 Aug 2020 11:39:31 +0300
-Message-Id: <7f5dfc30dcad34a7e2e7525e833e76ac6bfeef81.1598257839.git.dimastep@yandex-team.ru>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <cover.1598257838.git.dimastep@yandex-team.ru>
-References: <cover.1598257838.git.dimastep@yandex-team.ru>
-In-Reply-To: <cover.1598257838.git.dimastep@yandex-team.ru>
-References: <cover.1598257838.git.dimastep@yandex-team.ru>
-Received-SPF: pass client-ip=2a02:6b8:0:1a2d::193;
- envelope-from=dimastep@yandex-team.ru; helo=forwardcorp1o.mail.yandex.net
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+ (Exim 4.90_1) (envelope-from <jiangyifei@huawei.com>)
+ id 1kA84E-0005BE-VO; Mon, 24 Aug 2020 04:43:04 -0400
+Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id 90530E4BA5C2269DB681;
+ Mon, 24 Aug 2020 16:42:51 +0800 (CST)
+Received: from huawei.com (10.174.187.31) by DGGEMS404-HUB.china.huawei.com
+ (10.3.19.204) with Microsoft SMTP Server id 14.3.487.0; Mon, 24 Aug 2020
+ 16:42:44 +0800
+From: Yifei Jiang <jiangyifei@huawei.com>
+To: <qemu-devel@nongnu.org>, <qemu-riscv@nongnu.org>
+Subject: [PATCH] target/riscv: raise exception to HS-mode at
+ get_physical_address
+Date: Mon, 24 Aug 2020 16:41:58 +0800
+Message-ID: <20200824084158.1769-1-jiangyifei@huawei.com>
+X-Mailer: git-send-email 2.26.2.windows.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Originating-IP: [10.174.187.31]
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.190;
+ envelope-from=jiangyifei@huawei.com; helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/24 04:42:52
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_PASS=-0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -89,80 +70,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, lvivier@redhat.com, thuth@redhat.com,
- qemu-block@nongnu.org, mst@redhat.com, jasowang@redhat.com,
- dgilbert@redhat.com, mreitz@redhat.com, fengli@smartx.com,
- yc-core@yandex-team.ru, pbonzini@redhat.com, raphael.norwitz@nutanix.com
+Cc: zhang.zhanghailiang@huawei.com, sagark@eecs.berkeley.edu,
+ kbastian@mail.uni-paderborn.de, victor.zhangxiaofeng@huawei.com,
+ Yifei Jiang <jiangyifei@huawei.com>, Alistair.Francis@wdc.com,
+ yinyipeng1@huawei.com, palmer@dabbelt.com, wu.wubin@huawei.com,
+ dengkai1@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add new migrate_reconnect test for the vhost-user-blk device. Perform a
-disconnect after sending response for the VHOST_USER_SET_LOG_BASE
-command.
+VS-stage translation at get_physical_address needs to translate pte
+address by G-stage translation. But the G-stage translation error
+can not be distinguished from VS-stage translation error in
+riscv_cpu_tlb_fill. On migration, destination needs to rebuild pte,
+and this G-stage translation error must be handled by HS-mode. So
+introduce TRANSLATE_STAGE2_FAIL so that riscv_cpu_tlb_fill could
+distinguish and raise it to HS-mode.
 
-Signed-off-by: Dima Stepanov <dimastep@yandex-team.ru>
+Signed-off-by: Yifei Jiang <jiangyifei@huawei.com>
+Signed-off-by: Yipeng Yin <yinyipeng1@huawei.com>
 ---
- tests/qtest/vhost-user-test.c | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
+ target/riscv/cpu.h        |  1 +
+ target/riscv/cpu_helper.c | 12 ++++++++++--
+ 2 files changed, 11 insertions(+), 2 deletions(-)
 
-diff --git a/tests/qtest/vhost-user-test.c b/tests/qtest/vhost-user-test.c
-index 9b6e202..6b4c147 100644
---- a/tests/qtest/vhost-user-test.c
-+++ b/tests/qtest/vhost-user-test.c
-@@ -146,6 +146,7 @@ static VhostUserMsg m __attribute__ ((unused));
- enum {
-     TEST_FLAGS_OK,
-     TEST_FLAGS_DISCONNECT,
-+    TEST_FLAGS_MIGRATE_DISCONNECT,
-     TEST_FLAGS_BAD,
-     TEST_FLAGS_END,
- };
-@@ -436,6 +437,15 @@ static void chr_read(void *opaque, const uint8_t *buf, int size)
-         qemu_chr_fe_write_all(chr, p, VHOST_USER_HDR_SIZE);
+diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+index a804a5d0ba..8b3b368d6a 100644
+--- a/target/riscv/cpu.h
++++ b/target/riscv/cpu.h
+@@ -85,6 +85,7 @@ enum {
+ #define TRANSLATE_FAIL 1
+ #define TRANSLATE_SUCCESS 0
+ #define MMU_USER_IDX 3
++#define TRANSLATE_G_STAGE_FAIL 4
  
-         g_cond_broadcast(&s->data_cond);
-+        /*
-+         * Perform disconnect after sending a response. In this
-+         * case the next write command on the QEMU side (for now
-+         * it is SET_FEATURES will return -1, because of disconnect.
-+         */
-+        if (s->test_flags == TEST_FLAGS_MIGRATE_DISCONNECT) {
-+            qemu_chr_fe_disconnect(chr);
-+            s->test_flags = TEST_FLAGS_BAD;
+ #define MAX_RISCV_PMPS (16)
+ 
+diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
+index fd1d373b6f..1635b09c41 100644
+--- a/target/riscv/cpu_helper.c
++++ b/target/riscv/cpu_helper.c
+@@ -440,7 +440,10 @@ restart:
+                                                  mmu_idx, false, true);
+ 
+             if (vbase_ret != TRANSLATE_SUCCESS) {
+-                return vbase_ret;
++                env->guest_phys_fault_addr = (base |
++                                              (addr &
++                                               (TARGET_PAGE_SIZE - 1))) >> 2;
++                return TRANSLATE_G_STAGE_FAIL;
+             }
+ 
+             pte_addr = vbase + idx * ptesize;
+@@ -728,12 +731,17 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+         ret = get_physical_address(env, &pa, &prot, address, access_type,
+                                    mmu_idx, true, true);
+ 
++        if (ret == TRANSLATE_G_STAGE_FAIL) {
++            first_stage_error = false;
++            access_type = MMU_DATA_LOAD;
 +        }
-         break;
++
+         qemu_log_mask(CPU_LOG_MMU,
+                       "%s 1st-stage address=%" VADDR_PRIx " ret %d physical "
+                       TARGET_FMT_plx " prot %d\n",
+                       __func__, address, ret, pa, prot);
  
-     case VHOST_USER_SET_VRING_BASE:
-@@ -737,6 +747,17 @@ static void *vhost_user_test_setup_memfd(GString *cmd_line, void *arg)
-     return server;
- }
+-        if (ret != TRANSLATE_FAIL) {
++        if (ret != TRANSLATE_FAIL && ret != TRANSLATE_G_STAGE_FAIL) {
+             /* Second stage lookup */
+             im_address = pa;
  
-+static void *vhost_user_test_setup_migrate_reconnect(GString *cmd_line,
-+        void *arg)
-+{
-+    TestServer *server;
-+
-+    server = vhost_user_test_setup_memfd(cmd_line, arg);
-+    server->test_flags = TEST_FLAGS_MIGRATE_DISCONNECT;
-+
-+    return server;
-+}
-+
- static void test_read_guest_mem(void *obj, void *arg, QGuestAllocator *alloc)
- {
-     TestServer *server = arg;
-@@ -1151,5 +1172,9 @@ static void register_vhost_user_test(void)
-     opts.before = vhost_user_test_setup_memfd;
-     qos_add_test("migrate", "vhost-user-blk",
-                  test_migrate, &opts);
-+
-+    opts.before = vhost_user_test_setup_migrate_reconnect;
-+    qos_add_test("migrate_reconnect", "vhost-user-blk",
-+                 test_migrate, &opts);
- }
- libqos_init(register_vhost_user_test);
 -- 
-2.7.4
+2.19.1
+
 
 
