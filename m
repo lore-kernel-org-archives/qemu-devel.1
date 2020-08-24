@@ -7,44 +7,44 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CEC7CC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 03:43:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BDDDC433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 03:44:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A992D20774
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 03:43:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A992D20774
+	by mail.kernel.org (Postfix) with ESMTPS id 2FA782074D
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 03:44:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FA782074D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36678 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41926 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kA3OR-00039b-Tn
-	for qemu-devel@archiver.kernel.org; Sun, 23 Aug 2020 23:43:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58774)
+	id 1kA3Pd-0005Lk-GW
+	for qemu-devel@archiver.kernel.org; Sun, 23 Aug 2020 23:44:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58694)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
- id 1kA3M2-00078T-0g
- for qemu-devel@nongnu.org; Sun, 23 Aug 2020 23:41:06 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:4205 helo=huawei.com)
+ id 1kA3Lx-0006wv-J7
+ for qemu-devel@nongnu.org; Sun, 23 Aug 2020 23:41:01 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:48806 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
- id 1kA3Ly-0005Um-Ce
- for qemu-devel@nongnu.org; Sun, 23 Aug 2020 23:41:05 -0400
-Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 0DB2968BD3EE1A37DCAC;
+ id 1kA3Lt-0005Sw-0r
+ for qemu-devel@nongnu.org; Sun, 23 Aug 2020 23:41:01 -0400
+Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id 33DFE21AD12D7B5A3081;
  Mon, 24 Aug 2020 11:40:50 +0800 (CST)
 Received: from huawei.com (10.175.101.6) by DGGEMS411-HUB.china.huawei.com
  (10.3.19.211) with Microsoft SMTP Server id 14.3.487.0; Mon, 24 Aug 2020
- 11:40:41 +0800
+ 11:40:40 +0800
 From: Chuan Zheng <zhengchuan@huawei.com>
 To: <quintela@redhat.com>, <eblake@redhat.com>, <dgilbert@redhat.com>,
  <berrange@redhat.com>
-Subject: [PATCH v4 10/12] migration/dirtyrate: Implement calculate_dirtyrate()
- function
-Date: Mon, 24 Aug 2020 11:52:01 +0800
-Message-ID: <1598241123-118714-11-git-send-email-zhengchuan@huawei.com>
+Subject: [PATCH v4 09/12] migration/dirtyrate: Implement
+ get_sample_page_period() and block_sample_page_period()
+Date: Mon, 24 Aug 2020 11:52:00 +0800
+Message-ID: <1598241123-118714-10-git-send-email-zhengchuan@huawei.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1598241123-118714-1-git-send-email-zhengchuan@huawei.com>
 References: <1598241123-118714-1-git-send-email-zhengchuan@huawei.com>
@@ -52,9 +52,9 @@ MIME-Version: 1.0
 Content-Type: text/plain
 X-Originating-IP: [10.175.101.6]
 X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.190;
- envelope-from=zhengchuan@huawei.com; helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/23 23:40:45
+Received-SPF: pass client-ip=45.249.212.35; envelope-from=zhengchuan@huawei.com;
+ helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/23 23:40:50
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
 X-Spam_score_int: -41
 X-Spam_score: -4.2
@@ -81,77 +81,63 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Implement calculate_dirtyrate() function.
+Implement get_sample_page_period() and set_sample_page_period() to
+sleep specific time between sample actions.
 
 Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
-Signed-off-by: YanYing Zhuang <ann.zhuangyanying@huawei.com>
 ---
- migration/dirtyrate.c | 45 +++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 43 insertions(+), 2 deletions(-)
+ migration/dirtyrate.c | 24 ++++++++++++++++++++++++
+ migration/dirtyrate.h |  2 ++
+ 2 files changed, 26 insertions(+)
 
 diff --git a/migration/dirtyrate.c b/migration/dirtyrate.c
-index d1c0a78..9f52f5f 100644
+index bd398b7..d1c0a78 100644
 --- a/migration/dirtyrate.c
 +++ b/migration/dirtyrate.c
-@@ -171,6 +171,21 @@ static void get_ramblock_dirty_info(RAMBlock *block,
-     strcpy(info->idstr, qemu_ram_get_idstr(block));
- }
+@@ -28,6 +28,30 @@
+ static int CalculatingState = DIRTY_RATE_STATUS_UNSTARTED;
+ static struct DirtyRateStat DirtyStat;
  
-+static void free_ramblock_dirty_info(struct RamblockDirtyInfo *infos, int count)
++static int64_t set_sample_page_period(int64_t msec, int64_t initial_time)
 +{
-+    int i;
++    int64_t current_time;
 +
-+    if (!infos) {
-+        return;
++    current_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
++    if ((current_time - initial_time) >= msec) {
++        msec = current_time - initial_time;
++    } else {
++        g_usleep((msec + initial_time - current_time) * 1000);
 +    }
 +
-+    for (i = 0; i < count; i++) {
-+        g_free(infos[i].sample_page_vfn);
-+        g_free(infos[i].hash_result);
-+    }
-+    g_free(infos);
++    return msec;
 +}
 +
- static struct RamblockDirtyInfo *
- alloc_ramblock_dirty_info(int *block_index,
-                           struct RamblockDirtyInfo *block_dinfo)
-@@ -316,8 +331,34 @@ static int compare_page_hash_info(struct RamblockDirtyInfo *info,
- 
- static void calculate_dirtyrate(struct DirtyRateConfig config)
++static int64_t get_sample_page_period(int64_t sec)
++{
++    if (sec <= MIN_FETCH_DIRTYRATE_TIME_SEC ||
++        sec > MAX_FETCH_DIRTYRATE_TIME_SEC) {
++        sec = DEFAULT_FETCH_DIRTYRATE_TIME_SEC;
++    }
++
++    return sec;
++}
++
+ static int dirtyrate_set_state(int *state, int old_state, int new_state)
  {
--    /* todo */
--    return;
-+    struct RamblockDirtyInfo *block_dinfo = NULL;
-+    int block_index = 0;
-+    int64_t msec = 0;
-+    int64_t initial_time;
-+
-+    rcu_register_thread();
-+    reset_dirtyrate_stat();
-+    initial_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
-+    rcu_read_lock();
-+    if (record_ramblock_hash_info(&block_dinfo, config, &block_index) < 0) {
-+        goto out;
-+    }
-+    rcu_read_unlock();
-+
-+    msec = config.sample_period_seconds * 1000;
-+    msec = set_sample_page_period(msec, initial_time);
-+
-+    rcu_read_lock();
-+    if (compare_page_hash_info(block_dinfo, block_index) < 0) {
-+        goto out;
-+    }
-+
-+    update_dirtyrate(msec);
-+
-+out:
-+    rcu_read_unlock();
-+    free_ramblock_dirty_info(block_dinfo, block_index + 1);
-+    rcu_unregister_thread();
- }
+     assert(new_state < DIRTY_RATE_STATUS__MAX);
+diff --git a/migration/dirtyrate.h b/migration/dirtyrate.h
+index 41bc264..50a5636 100644
+--- a/migration/dirtyrate.h
++++ b/migration/dirtyrate.h
+@@ -51,6 +51,8 @@
  
- void *get_dirtyrate_thread(void *arg)
+ /* Take 1s as default for calculation duration */
+ #define DEFAULT_FETCH_DIRTYRATE_TIME_SEC          1
++#define MIN_FETCH_DIRTYRATE_TIME_SEC              0
++#define MAX_FETCH_DIRTYRATE_TIME_SEC              60
+ 
+ struct DirtyRateConfig {
+     uint64_t sample_pages_per_gigabytes; /* sample pages per GB */
 -- 
 1.8.3.1
 
