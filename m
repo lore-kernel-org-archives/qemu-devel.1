@@ -2,82 +2,84 @@ Return-Path: <SRS0=JPH5=CC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+X-Spam-Status: No, score=-12.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B34DC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 09:49:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33F31C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 09:49:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ECD1E206BE
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 09:49:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EEC3B206BE
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 09:49:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="V5I2C2vO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECD1E206BE
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aPZt7m8J"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EEC3B206BE
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59880 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59992 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kA96F-00063n-4B
-	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 05:49:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46580)
+	id 1kA96H-00067I-6a
+	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 05:49:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46590)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kA95N-0004Qc-IR
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 05:48:17 -0400
-Received: from mail-wr1-x431.google.com ([2a00:1450:4864:20::431]:39027)
+ id 1kA95O-0004Qj-6L
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 05:48:18 -0400
+Received: from mail-wr1-x42c.google.com ([2a00:1450:4864:20::42c]:41393)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kA95L-0004lf-Mq
+ id 1kA95M-0004lj-IG
  for qemu-devel@nongnu.org; Mon, 24 Aug 2020 05:48:17 -0400
-Received: by mail-wr1-x431.google.com with SMTP id a5so8008926wrm.6
- for <qemu-devel@nongnu.org>; Mon, 24 Aug 2020 02:48:15 -0700 (PDT)
+Received: by mail-wr1-x42c.google.com with SMTP id p17so2325966wrj.8
+ for <qemu-devel@nongnu.org>; Mon, 24 Aug 2020 02:48:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:mime-version
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=KUKI9967rGrdm6aNTROGc5KTicNLlCSQUkrlEBzGpOU=;
- b=V5I2C2vO4pDBxLFm7XXD6F8DvHxh2bMd0IEi/NgPmlmXDn7bBQjfOf78kIcMJSkVOe
- 6H5zaVvA7CJFNpa1IIlhWOFjzhJOYDwAeXaqXD8R39QGWa+DSjZn+C2irnoKyCvaRGn5
- d++QBtb/brl7w38Svh4mkHcJF0tAB4RoehWY4litA/zrE+bbg//gg/3/hp+r3HZ4jXFX
- VspD/JWOHi0LKa7AUS592Aqht5MBggAvjW251UFROBrZERzICvoa/3oJpPvhxgN5ly4G
- kvEVKZiwYPvPHWUs1V6f0LBwZeeIJZhVL15KWaTBICp1MVdSqd25ho3mEBnw3oukY7+p
- bm1A==
+ bh=nnYvgpj+yfRsy7MXb9YbrfpjgfASX8TYRFoNG96nT04=;
+ b=aPZt7m8JkaQvwbTXMevz23ilxf0f13elevH6ENQ0HyhGa4QSrpjGH3rs3/hmTvBnoP
+ peHdLzndhRCsOHq6jw0mhL3Rku0X+K74hT538BkqZIzcSIWHIKv7hG60O1bQLEBpPm7/
+ k9YOmsHXHrx/WxHDagNlI2UvWkF54wGtMsxy3mL+swUyKIcKsCovGKhU82f1Bfc3+lkt
+ wKmSOccLxYcktp8JHLJi/6OuNgcWKieLUWpCd00opCcyJcPIcmvBXZcpuIJnTLB3zwJO
+ pIbOU9spdoDPb6XIlT+iqAbETejpaLkHo9rj0WHAjEvupyz3Ig4YqR6AaPixFak/sKgJ
+ mKtA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=KUKI9967rGrdm6aNTROGc5KTicNLlCSQUkrlEBzGpOU=;
- b=JbxXL9qxu1ZLRd3dUz73tAvIIWPsTY15MOiLE6CjyICe4RS4ujCUG/RU0Zp3ofKmlf
- xzOdkFSBvcuOxcDI/jWiYfKbeCXsotUcn7DF7JRXaQfep7xRO2JGZyWjhIfw9M7/9tZH
- 77K3XiqZ1fdzEnzJ5yKYnI5s3JHBW/K/00aC6/xFHaTa8JYkxuWf/tBK1wQHOoIMpU0X
- MoiroCW72RxGI0tjdpYsAjVKJT2JATw3DKtBjfGdqTMKg88W3fGT9cLHRSkngpXXjOK+
- pXcFT5uRNkXVQPN/crZZaHNINwgxInfgSpgf/VLOUhkdo0vImMUuV45YB267PXtOmEFU
- hxJw==
-X-Gm-Message-State: AOAM531x3D8TITtsuy4ulXiZeobK2aUL7fx/8K8blwgvTFl6wTPruRYA
- JoS+8UhGc5KBAnb4H90YvUVVW94XB5xRcBJm
-X-Google-Smtp-Source: ABdhPJw82KK+3uw3qhzbz2hYv07hdcBC3Y5FJLXjYGFY+vaZM3j/ZDOLzsn1iAE4DaEP7mZnZlYQSg==
-X-Received: by 2002:adf:f610:: with SMTP id t16mr4759898wrp.97.1598262493532; 
- Mon, 24 Aug 2020 02:48:13 -0700 (PDT)
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=nnYvgpj+yfRsy7MXb9YbrfpjgfASX8TYRFoNG96nT04=;
+ b=YIH8s0q8X9zkMaEaW8abB1MXh5QJxtjrpv+9h6BfGzWjj/1sORIuTOMVumd9YVbtUX
+ vinOJpq6n+C+mZTLsSuFzEVlv4TDo2ZDmpCmiYd+91rVf17seCZ8xS0IOgyc+/Zue4To
+ 8aC3cnCawv0MG+JwcWlH4Aa9eo8sIlYF6ZpHbyemkJbkL3W8/OwCLVrngqKO9prdAIpi
+ qw+dwiSQdiKeUErc2/O4s9gkqKQqtyMuC7c4Px2LhmItSjnxeoykpUvvTpeLpjlZey2F
+ 3QMFqMH9H7igagtj8cfE+IV+ce++MpsCo0hZeLOoZv0a+bPka/YwVCii8sBCf38ibqMz
+ PG2w==
+X-Gm-Message-State: AOAM531AvDCABfynlkuJBFEdycnKTR+m3LvL6FfRYv57UcuugyE1XC3r
+ DLKPjK5SIr4SNYk37Y7QDX7POJWHBaXsu6vB
+X-Google-Smtp-Source: ABdhPJxHGG/Y4o7bQF12Sih+oJWcyZ97XuTtHHhmNWVQEHJoyrVPoQFjtCwWqPo6T/eOHyfTMcenSA==
+X-Received: by 2002:a5d:6806:: with SMTP id w6mr3775560wru.395.1598262494827; 
+ Mon, 24 Aug 2020 02:48:14 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id q6sm24877057wma.22.2020.08.24.02.48.12
+ by smtp.gmail.com with ESMTPSA id q6sm24877057wma.22.2020.08.24.02.48.13
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 24 Aug 2020 02:48:12 -0700 (PDT)
+ Mon, 24 Aug 2020 02:48:13 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 00/27] target-arm queue
-Date: Mon, 24 Aug 2020 10:47:44 +0100
-Message-Id: <20200824094811.15439-1-peter.maydell@linaro.org>
+Subject: [PULL 01/27] hw/cpu/a9mpcore: Verify the machine use Cortex-A9 cores
+Date: Mon, 24 Aug 2020 10:47:45 +0100
+Message-Id: <20200824094811.15439-2-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200824094811.15439-1-peter.maydell@linaro.org>
+References: <20200824094811.15439-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::431;
- envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x431.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::42c;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x42c.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -103,97 +105,61 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-First arm pullreq for 5.2: Eric's SMMU stuff, and a bunch of
-cleanup/refactoring from me.
+From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-thanks
--- PMM
+The 'Cortex-A9MPCore internal peripheral' block can only be
+used with Cortex A5 and A9 cores. As we don't model the A5
+yet, simply check the machine cpu core is a Cortex A9. If
+not return an error.
 
-The following changes since commit 8367a77c4d3f6e1e60890f5510304feb2c621611:
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Message-id: 20200709152337.15533-1-f4bug@amsat.org
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ hw/cpu/a9mpcore.c | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
 
-  Merge remote-tracking branch 'remotes/vivier2/tags/linux-user-for-5.2-pull-request' into staging (2020-08-23 16:34:43 +0100)
+diff --git a/hw/cpu/a9mpcore.c b/hw/cpu/a9mpcore.c
+index 351295e5187..ec186d49abd 100644
+--- a/hw/cpu/a9mpcore.c
++++ b/hw/cpu/a9mpcore.c
+@@ -15,6 +15,7 @@
+ #include "hw/irq.h"
+ #include "hw/qdev-properties.h"
+ #include "hw/core/cpu.h"
++#include "cpu.h"
+ 
+ #define A9_GIC_NUM_PRIORITY_BITS    5
+ 
+@@ -52,8 +53,18 @@ static void a9mp_priv_realize(DeviceState *dev, Error **errp)
+                  *wdtbusdev;
+     int i;
+     bool has_el3;
++    CPUState *cpu0;
+     Object *cpuobj;
+ 
++    cpu0 = qemu_get_cpu(0);
++    cpuobj = OBJECT(cpu0);
++    if (strcmp(object_get_typename(cpuobj), ARM_CPU_TYPE_NAME("cortex-a9"))) {
++        /* We might allow Cortex-A5 once we model it */
++        error_setg(errp,
++                   "Cortex-A9MPCore peripheral can only use Cortex-A9 CPU");
++        return;
++    }
++
+     scudev = DEVICE(&s->scu);
+     qdev_prop_set_uint32(scudev, "num-cpu", s->num_cpu);
+     if (!sysbus_realize(SYS_BUS_DEVICE(&s->scu), errp)) {
+@@ -70,7 +81,6 @@ static void a9mp_priv_realize(DeviceState *dev, Error **errp)
+     /* Make the GIC's TZ support match the CPUs. We assume that
+      * either all the CPUs have TZ, or none do.
+      */
+-    cpuobj = OBJECT(qemu_get_cpu(0));
+     has_el3 = object_property_find(cpuobj, "has_el3", NULL) &&
+         object_property_get_bool(cpuobj, "has_el3", &error_abort);
+     qdev_prop_set_bit(gicdev, "has-security-extensions", has_el3);
+-- 
+2.20.1
 
-are available in the Git repository at:
-
-  https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20200824
-
-for you to fetch changes up to b34aa5129e9c3aff890b4f4bcc84962e94185629:
-
-  target/arm: Use correct FPST for VCMLA, VCADD on fp16 (2020-08-24 10:15:12 +0100)
-
-----------------------------------------------------------------
-target-arm queue:
- * hw/cpu/a9mpcore: Verify the machine use Cortex-A9 cores
- * hw/arm/smmuv3: Implement SMMUv3.2 range-invalidation
- * docs/system/arm: Document the Xilinx Versal Virt board
- * target/arm: Make M-profile NOCP take precedence over UNDEF
- * target/arm: Use correct FPST for VCMLA, VCADD on fp16
- * target/arm: Various cleanups preparing for fp16 support
-
-----------------------------------------------------------------
-Edgar E. Iglesias (1):
-      docs/system/arm: Document the Xilinx Versal Virt board
-
-Eric Auger (11):
-      hw/arm/smmu-common: Factorize some code in smmu_ptw_64()
-      hw/arm/smmu-common: Add IOTLB helpers
-      hw/arm/smmu: Introduce smmu_get_iotlb_key()
-      hw/arm/smmu: Introduce SMMUTLBEntry for PTW and IOTLB value
-      hw/arm/smmu-common: Manage IOTLB block entries
-      hw/arm/smmuv3: Introduce smmuv3_s1_range_inval() helper
-      hw/arm/smmuv3: Get prepared for range invalidation
-      hw/arm/smmuv3: Fix IIDR offset
-      hw/arm/smmuv3: Let AIDR advertise SMMUv3.0 support
-      hw/arm/smmuv3: Support HAD and advertise SMMUv3.1 support
-      hw/arm/smmuv3: Advertise SMMUv3.2 range invalidation
-
-Peter Maydell (14):
-      target/arm: Pull handling of XScale insns out of disas_coproc_insn()
-      target/arm: Separate decode from handling of coproc insns
-      target/arm: Convert A32 coprocessor insns to decodetree
-      target/arm: Tidy up disas_arm_insn()
-      target/arm: Do M-profile NOCP checks early and via decodetree
-      target/arm: Convert T32 coprocessor insns to decodetree
-      target/arm: Remove ARCH macro
-      target/arm: Delete unused VFP_DREG macros
-      target/arm/translate.c: Delete/amend incorrect comments
-      target/arm: Delete unused ARM_FEATURE_CRC
-      target/arm: Replace A64 get_fpstatus_ptr() with generic fpstatus_ptr()
-      target/arm: Make A32/T32 use new fpstatus_ptr() API
-      target/arm: Implement FPST_STD_F16 fpstatus
-      target/arm: Use correct FPST for VCMLA, VCADD on fp16
-
-Philippe Mathieu-Daudé (1):
-      hw/cpu/a9mpcore: Verify the machine use Cortex-A9 cores
-
- docs/system/arm/xlnx-versal-virt.rst | 176 +++++++++++++++++++++++
- docs/system/target-arm.rst           |   1 +
- hw/arm/smmu-internal.h               |   8 ++
- hw/arm/smmuv3-internal.h             |  10 +-
- include/hw/arm/smmu-common.h         |  19 ++-
- include/hw/arm/smmuv3.h              |   1 +
- target/arm/cpu.h                     |  10 +-
- target/arm/translate-a64.h           |   1 -
- target/arm/translate.h               |  52 +++++++
- target/arm/a32.decode                |  19 +++
- target/arm/m-nocp.decode             |  42 ++++++
- target/arm/t32.decode                |  19 +++
- target/arm/vfp.decode                |   2 -
- hw/arm/smmu-common.c                 | 214 ++++++++++++++++++---------
- hw/arm/smmuv3.c                      | 142 +++++++++---------
- hw/cpu/a9mpcore.c                    |  12 +-
- target/arm/cpu.c                     |   3 +
- target/arm/helper.c                  |  29 ++++
- target/arm/translate-a64.c           |  89 +++++-------
- target/arm/translate-sve.c           |  34 ++---
- target/arm/translate.c               | 272 +++++++++++++++++------------------
- target/arm/vfp_helper.c              |   5 +
- MAINTAINERS                          |   3 +-
- hw/arm/trace-events                  |  12 +-
- target/arm/meson.build               |   1 +
- target/arm/translate-neon.c.inc      |  28 ++--
- target/arm/translate-vfp.c.inc       |  96 ++++++++-----
- 27 files changed, 885 insertions(+), 415 deletions(-)
- create mode 100644 docs/system/arm/xlnx-versal-virt.rst
- create mode 100644 target/arm/m-nocp.decode
 
