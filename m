@@ -2,83 +2,83 @@ Return-Path: <SRS0=JPH5=CC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-12.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
-	WEIRD_QUOTING autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABCD3C433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 09:50:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B1E5C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 09:52:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 717812071E
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 09:50:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2B6CB2075B
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 09:52:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Lw8I+PcT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 717812071E
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SSnA6cr1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B6CB2075B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40596 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48568 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kA97m-0001JU-Eh
-	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 05:50:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46818)
+	id 1kA997-0004V1-D8
+	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 05:52:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46688)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kA95e-00056J-1Q
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 05:48:34 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:35030)
+ id 1kA95U-0004fQ-Oa
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 05:48:24 -0400
+Received: from mail-wm1-x333.google.com ([2a00:1450:4864:20::333]:52974)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kA95a-0004nl-Jk
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 05:48:33 -0400
-Received: by mail-wr1-x444.google.com with SMTP id b17so7217696wru.2
- for <qemu-devel@nongnu.org>; Mon, 24 Aug 2020 02:48:30 -0700 (PDT)
+ id 1kA95S-0004ma-Ho
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 05:48:24 -0400
+Received: by mail-wm1-x333.google.com with SMTP id x5so7696175wmi.2
+ for <qemu-devel@nongnu.org>; Mon, 24 Aug 2020 02:48:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=nj/jVd48Yy5aWXuxg27tOObzp4JLkxMOKbL7+qjvNT8=;
- b=Lw8I+PcTCJaQxUJUkvIA9teZ8/4b2LgVodn6EnSF8HXKsDIGI/BlCXfbYo1HzdRp1T
- 0U6pKr05xyv8gopfs8geB4lty81gkgdJDjwmNo4qeeFtzTiJUuh0kkXaobuu4v/pWtr5
- lkUUtKQ48xn77vLaXqg0fuO2EGZsdsiO6LpncALVq6fKr4hOXBgBAsSXHCXnFnf227wF
- 98tyb5kobzT6QhnkiXxTM9avymz+UsH2033PPLymyN4qPC7Eb7s6Is5zknCkaa05yu0k
- 8UAjX6v6d8tyVBUPOaW5GzoNEdYwVooP401zYLF1i2tyDBQs0eU/4jJrJQoPuDlulP+w
- fb6g==
+ bh=Ygr0uj6t9xPd8aCefwuAXcYRZVoEMDhVPJTRyZnGj00=;
+ b=SSnA6cr11UTftlh7zaBK1WJbFKwuAFKOKrhIHSetDs+Ed+rT8fqp681VQrLhyLAlxa
+ HNu+Lsu7fBnVhmuPtXVTsQzVgjAaLxB2kHbuEmX9InmMTBNUcs2SWtzIpqVjdJHaKjKS
+ dBM5TbW4KaZOuo+byKKoUeizbbOqarMFe7tyhB6QTQcBFku0dnAtzE0by8QOLyFxKwM0
+ qIPmTZLWZMwSxatuOZpZa/0sjnRzN/0v+056VCvDrPzweoR9SLuCfbSYQs04gas37BBT
+ 3DH1OSv0CyYQim4VaoeagS4KoeYkkHMfmh8CgFqqtMepldMAaXUGnm+j9oaog7c9aMdi
+ hQLQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=nj/jVd48Yy5aWXuxg27tOObzp4JLkxMOKbL7+qjvNT8=;
- b=G1s02of+Mk6FHz88fiB3Y/+4uAcYawvyAw1W349Nikhr2pfJCOjRBPl568v2k+hS0U
- XEtPpvbSbimn8EbaLWLjPnvgg3IZ0PluGJTI3rsLFh8KSg2O/nY1g5w9J12tqM5V9hxE
- byuMAaOKX2YKeO2AhtwCjDODBGg1r5REau4/VnII87Mz8/q5/o9FtQoWsUqMhe9dXV5x
- oA81kMsB5R9I5k/Os4X1PjBP3uw8hdbG+md5V143OBIVNZX0x8F5bDzrXVYwHOn2Z5rN
- 74TSVwuC49YjMm7EEQzfahGUF1lmcOXM970nWy5JFCz/41sHFLP/rJhWxU1WJedIVMOM
- Oavg==
-X-Gm-Message-State: AOAM531qaDBOSU1SguOzi4dex/n3fnrYoZUutFONukbpJBnLuGhLiNtN
- E4QMNXClSvhjjufGuS+mX6tSY7k+YOUw9s/m
-X-Google-Smtp-Source: ABdhPJzAEFMZBW5DdSBcAaK3tYEUt88dsoORNFgCz6cajvAYK2J9c8p16vCsTk9//YUZxay2vU+3Mg==
-X-Received: by 2002:adf:f007:: with SMTP id j7mr4745958wro.195.1598262508816; 
- Mon, 24 Aug 2020 02:48:28 -0700 (PDT)
+ bh=Ygr0uj6t9xPd8aCefwuAXcYRZVoEMDhVPJTRyZnGj00=;
+ b=dYUho7VNHSUSbbNmsbp6Nm1ORHzB1MJ9XKIwROlLdemjd34AjsP4k+nQc87eLHbMXF
+ xaudbGJ91U4sCZQ4G9rUL5sYdcWSrPJzBhgndhzqWvbJMhKJTucgvfTwGtbw3ecophWb
+ rUCK5ja7/CUoRAmsaOVssEAtIDFYn12Ygi41ElncvMArQVSFl0+tGTFgANrrfgoAmG1F
+ nmIiOyEekdRq1lU3jPa/1uOcNDhFrzN1EANIh9zsFpo4OsFrUnFZrXB68sdi79q/LrvG
+ fPTHeefhN6bI2xMtla+GpMwphhjkhH6Ep4f0tX/D49Q38++ZKfND2BRYRXmZ/ltbbVIA
+ BVJQ==
+X-Gm-Message-State: AOAM5316xxHeYkJggeqHvZlbaFZ07K6rJ2ZLFsZboQF88JhKvLrhFy/J
+ ufDFvKANwZYXZ64rPmJtKkf1+BUOICCZXAdk
+X-Google-Smtp-Source: ABdhPJxMNKT8kDLR7WoegoQcCNkjDDPFHeQo5j+WC898cos1HSUSJDPQCTN9nO6IcnmMyH6BJid4PQ==
+X-Received: by 2002:a7b:c2e1:: with SMTP id e1mr961789wmk.27.1598262500754;
+ Mon, 24 Aug 2020 02:48:20 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id q6sm24877057wma.22.2020.08.24.02.48.27
+ by smtp.gmail.com with ESMTPSA id q6sm24877057wma.22.2020.08.24.02.48.19
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 24 Aug 2020 02:48:28 -0700 (PDT)
+ Mon, 24 Aug 2020 02:48:19 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 13/27] docs/system/arm: Document the Xilinx Versal Virt board
-Date: Mon, 24 Aug 2020 10:47:57 +0100
-Message-Id: <20200824094811.15439-14-peter.maydell@linaro.org>
+Subject: [PULL 06/27] hw/arm/smmu-common: Manage IOTLB block entries
+Date: Mon, 24 Aug 2020 10:47:50 +0100
+Message-Id: <20200824094811.15439-7-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200824094811.15439-1-peter.maydell@linaro.org>
 References: <20200824094811.15439-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x444.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::333;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x333.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -86,8 +86,8 @@ X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- WEIRD_QUOTING=0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -104,236 +104,257 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+From: Eric Auger <eric.auger@redhat.com>
 
-Document the Xilinx Versal Virt board.
+At the moment each entry in the IOTLB corresponds to a page sized
+mapping (4K, 16K or 64K), even if the page belongs to a mapped
+block. In case of block mapping this unefficiently consumes IOTLB
+entries.
 
-Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-Message-id: 20200803164749.301971-2-edgar.iglesias@gmail.com
+Change the value of the entry so that it reflects the actual
+mapping it belongs to (block or page start address and size).
+
+Also the level/tg of the entry is encoded in the key. In subsequent
+patches we will enable range invalidation. This latter is able
+to provide the level/tg of the entry.
+
+Encoding the level/tg directly in the key will allow to invalidate
+using g_hash_table_remove() when num_pages equals to 1.
+
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Message-id: 20200728150815.11446-6-eric.auger@redhat.com
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- docs/system/arm/xlnx-versal-virt.rst | 176 +++++++++++++++++++++++++++
- docs/system/target-arm.rst           |   1 +
- MAINTAINERS                          |   3 +-
- 3 files changed, 179 insertions(+), 1 deletion(-)
- create mode 100644 docs/system/arm/xlnx-versal-virt.rst
+ hw/arm/smmu-internal.h       |  7 ++++
+ include/hw/arm/smmu-common.h | 10 ++++--
+ hw/arm/smmu-common.c         | 67 ++++++++++++++++++++++++++----------
+ hw/arm/smmuv3.c              |  6 ++--
+ hw/arm/trace-events          |  2 +-
+ 5 files changed, 67 insertions(+), 25 deletions(-)
 
-diff --git a/docs/system/arm/xlnx-versal-virt.rst b/docs/system/arm/xlnx-versal-virt.rst
-new file mode 100644
-index 00000000000..2602d0f9953
---- /dev/null
-+++ b/docs/system/arm/xlnx-versal-virt.rst
-@@ -0,0 +1,176 @@
-+Xilinx Versal Virt (``xlnx-versal-virt``)
-+=========================================
-+
-+Xilinx Versal is a family of heterogeneous multi-core SoCs
-+(System on Chip) that combine traditional hardened CPUs and I/O
-+peripherals in a Processing System (PS) with runtime programmable
-+FPGA logic (PL) and an Artificial Intelligence Engine (AIE).
-+
-+More details here:
-+https://www.xilinx.com/products/silicon-devices/acap/versal.html
-+
-+The family of Versal SoCs share a single architecture but come in
-+different parts with different speed grades, amounts of PL and
-+other differences.
-+
-+The Xilinx Versal Virt board in QEMU is a model of a virtual board
-+(does not exist in reality) with a virtual Versal SoC without I/O
-+limitations. Currently, we support the following cores and devices:
-+
-+Implemented CPU cores:
-+
-+- 2 ACPUs (ARM Cortex-A72)
-+
-+Implemented devices:
-+
-+- Interrupt controller (ARM GICv3)
-+- 2 UARTs (ARM PL011)
-+- An RTC (Versal built-in)
-+- 2 GEMs (Cadence MACB Ethernet MACs)
-+- 8 ADMA (Xilinx zDMA) channels
-+- 2 SD Controllers
-+- OCM (256KB of On Chip Memory)
-+- DDR memory
-+
-+QEMU does not yet model any other devices, including the PL and the AI Engine.
-+
-+Other differences between the hardware and the QEMU model:
-+
-+- QEMU allows the amount of DDR memory provided to be specified with the
-+  ``-m`` argument. If a DTB is provided on the command line then QEMU will
-+  edit it to include suitable entries describing the Versal DDR memory ranges.
-+
-+- QEMU provides 8 virtio-mmio virtio transports; these start at
-+  address ``0xa0000000`` and have IRQs from 111 and upwards.
-+
-+Running
-+"""""""
-+If the user provides an Operating System to be loaded, we expect users
-+to use the ``-kernel`` command line option.
-+
-+Users can load firmware or boot-loaders with the ``-device loader`` options.
-+
-+When loading an OS, QEMU generates a DTB and selects an appropriate address
-+where it gets loaded. This DTB will be passed to the kernel in register x0.
-+
-+If there's no ``-kernel`` option, we generate a DTB and place it at 0x1000
-+for boot-loaders or firmware to pick it up.
-+
-+If users want to provide their own DTB, they can use the ``-dtb`` option.
-+These DTBs will have their memory nodes modified to match QEMU's
-+selected ram_size option before they get passed to the kernel or FW.
-+
-+When loading an OS, we turn on QEMU's PSCI implementation with SMC
-+as the PSCI conduit. When there's no ``-kernel`` option, we assume the user
-+provides EL3 firmware to handle PSCI.
-+
-+A few examples:
-+
-+Direct Linux boot of a generic ARM64 upstream Linux kernel:
-+
-+.. code-block:: bash
-+
-+  $ qemu-system-aarch64 -M xlnx-versal-virt -m 2G \
-+      -serial mon:stdio -display none \
-+      -kernel arch/arm64/boot/Image \
-+      -nic user -nic user \
-+      -device virtio-rng-device,bus=virtio-mmio-bus.0 \
-+      -drive if=none,index=0,file=hd0.qcow2,id=hd0,snapshot \
-+      -drive file=qemu_sd.qcow2,if=sd,index=0,snapshot \
-+      -device virtio-blk-device,drive=hd0 -append root=/dev/vda
-+
-+Direct Linux boot of PetaLinux 2019.2:
-+
-+.. code-block:: bash
-+
-+  $ qemu-system-aarch64  -M xlnx-versal-virt -m 2G \
-+      -serial mon:stdio -display none \
-+      -kernel petalinux-v2019.2/Image \
-+      -append "rdinit=/sbin/init console=ttyAMA0,115200n8 earlycon=pl011,mmio,0xFF000000,115200n8" \
-+      -net nic,model=cadence_gem,netdev=net0 -netdev user,id=net0 \
-+      -device virtio-rng-device,bus=virtio-mmio-bus.0,rng=rng0 \
-+      -object rng-random,filename=/dev/urandom,id=rng0
-+
-+Boot PetaLinux 2019.2 via ARM Trusted Firmware (2018.3 because the 2019.2
-+version of ATF tries to configure the CCI which we don't model) and U-boot:
-+
-+.. code-block:: bash
-+
-+  $ qemu-system-aarch64 -M xlnx-versal-virt -m 2G \
-+      -serial stdio -display none \
-+      -device loader,file=petalinux-v2018.3/bl31.elf,cpu-num=0 \
-+      -device loader,file=petalinux-v2019.2/u-boot.elf \
-+      -device loader,addr=0x20000000,file=petalinux-v2019.2/Image \
-+      -nic user -nic user \
-+      -device virtio-rng-device,bus=virtio-mmio-bus.0,rng=rng0 \
-+      -object rng-random,filename=/dev/urandom,id=rng0
-+
-+Run the following at the U-Boot prompt:
-+
-+.. code-block:: bash
-+
-+  Versal>
-+  fdt addr $fdtcontroladdr
-+  fdt move $fdtcontroladdr 0x40000000
-+  fdt set /timer clock-frequency <0x3dfd240>
-+  setenv bootargs "rdinit=/sbin/init maxcpus=1 console=ttyAMA0,115200n8 earlycon=pl011,mmio,0xFF000000,115200n8"
-+  booti 20000000 - 40000000
-+  fdt addr $fdtcontroladdr
-+
-+Boot Linux as DOM0 on Xen via U-Boot:
-+
-+.. code-block:: bash
-+
-+  $ qemu-system-aarch64 -M xlnx-versal-virt -m 4G \
-+      -serial stdio -display none \
-+      -device loader,file=petalinux-v2019.2/u-boot.elf,cpu-num=0 \
-+      -device loader,addr=0x30000000,file=linux/2018-04-24/xen \
-+      -device loader,addr=0x40000000,file=petalinux-v2019.2/Image \
-+      -nic user -nic user \
-+      -device virtio-rng-device,bus=virtio-mmio-bus.0,rng=rng0 \
-+      -object rng-random,filename=/dev/urandom,id=rng0
-+
-+Run the following at the U-Boot prompt:
-+
-+.. code-block:: bash
-+
-+  Versal>
-+  fdt addr $fdtcontroladdr
-+  fdt move $fdtcontroladdr 0x20000000
-+  fdt set /timer clock-frequency <0x3dfd240>
-+  fdt set /chosen xen,xen-bootargs "console=dtuart dtuart=/uart@ff000000 dom0_mem=640M bootscrub=0 maxcpus=1 timer_slop=0"
-+  fdt set /chosen xen,dom0-bootargs "rdinit=/sbin/init clk_ignore_unused console=hvc0 maxcpus=1"
-+  fdt mknode /chosen dom0
-+  fdt set /chosen/dom0 compatible "xen,multiboot-module"
-+  fdt set /chosen/dom0 reg <0x00000000 0x40000000 0x0 0x03100000>
-+  booti 30000000 - 20000000
-+
-+Boot Linux as Dom0 on Xen via ARM Trusted Firmware and U-Boot:
-+
-+.. code-block:: bash
-+
-+  $ qemu-system-aarch64 -M xlnx-versal-virt -m 4G \
-+      -serial stdio -display none \
-+      -device loader,file=petalinux-v2018.3/bl31.elf,cpu-num=0 \
-+      -device loader,file=petalinux-v2019.2/u-boot.elf \
-+      -device loader,addr=0x30000000,file=linux/2018-04-24/xen \
-+      -device loader,addr=0x40000000,file=petalinux-v2019.2/Image \
-+      -nic user -nic user \
-+      -device virtio-rng-device,bus=virtio-mmio-bus.0,rng=rng0 \
-+      -object rng-random,filename=/dev/urandom,id=rng0
-+
-+Run the following at the U-Boot prompt:
-+
-+.. code-block:: bash
-+
-+  Versal>
-+  fdt addr $fdtcontroladdr
-+  fdt move $fdtcontroladdr 0x20000000
-+  fdt set /timer clock-frequency <0x3dfd240>
-+  fdt set /chosen xen,xen-bootargs "console=dtuart dtuart=/uart@ff000000 dom0_mem=640M bootscrub=0 maxcpus=1 timer_slop=0"
-+  fdt set /chosen xen,dom0-bootargs "rdinit=/sbin/init clk_ignore_unused console=hvc0 maxcpus=1"
-+  fdt mknode /chosen dom0
-+  fdt set /chosen/dom0 compatible "xen,multiboot-module"
-+  fdt set /chosen/dom0 reg <0x00000000 0x40000000 0x0 0x03100000>
-+  booti 30000000 - 20000000
-+
-diff --git a/docs/system/target-arm.rst b/docs/system/target-arm.rst
-index 4c5b0e4aab8..afdb37e7384 100644
---- a/docs/system/target-arm.rst
-+++ b/docs/system/target-arm.rst
-@@ -93,6 +93,7 @@ undocumented; you can get a complete list by running
-    arm/sx1
-    arm/stellaris
-    arm/virt
-+   arm/xlnx-versal-virt
+diff --git a/hw/arm/smmu-internal.h b/hw/arm/smmu-internal.h
+index 3104f768cd2..55147f29be4 100644
+--- a/hw/arm/smmu-internal.h
++++ b/hw/arm/smmu-internal.h
+@@ -97,4 +97,11 @@ uint64_t iova_level_offset(uint64_t iova, int inputsize,
+ }
  
- Arm CPU features
- ================
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 0886eb3d2b5..5a22c8be429 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -894,7 +894,7 @@ F: hw/misc/zynq*
- F: include/hw/misc/zynq*
- X: hw/ssi/xilinx_*
+ #define SMMU_IOTLB_ASID(key) ((key).asid)
++
++typedef struct SMMUIOTLBPageInvInfo {
++    int asid;
++    uint64_t iova;
++    uint64_t mask;
++} SMMUIOTLBPageInvInfo;
++
+ #endif
+diff --git a/include/hw/arm/smmu-common.h b/include/hw/arm/smmu-common.h
+index 79c2c6486ad..ece62c36523 100644
+--- a/include/hw/arm/smmu-common.h
++++ b/include/hw/arm/smmu-common.h
+@@ -97,6 +97,8 @@ typedef struct SMMUPciBus {
+ typedef struct SMMUIOTLBKey {
+     uint64_t iova;
+     uint16_t asid;
++    uint8_t tg;
++    uint8_t level;
+ } SMMUIOTLBKey;
  
--Xilinx ZynqMP
-+Xilinx ZynqMP and Versal
- M: Alistair Francis <alistair@alistair23.me>
- M: Edgar E. Iglesias <edgar.iglesias@gmail.com>
- M: Peter Maydell <peter.maydell@linaro.org>
-@@ -905,6 +905,7 @@ F: include/hw/*/xlnx*.h
- F: include/hw/ssi/xilinx_spips.h
- F: hw/display/dpcd.c
- F: include/hw/display/dpcd.h
-+F: docs/system/arm/xlnx-versal-virt.rst
+ typedef struct SMMUState {
+@@ -159,12 +161,14 @@ IOMMUMemoryRegion *smmu_iommu_mr(SMMUState *s, uint32_t sid);
  
- ARM ACPI Subsystem
- M: Shannon Zhao <shannon.zhaosl@gmail.com>
+ #define SMMU_IOTLB_MAX_SIZE 256
+ 
+-SMMUTLBEntry *smmu_iotlb_lookup(SMMUState *bs, SMMUTransCfg *cfg, hwaddr iova);
++SMMUTLBEntry *smmu_iotlb_lookup(SMMUState *bs, SMMUTransCfg *cfg,
++                                SMMUTransTableInfo *tt, hwaddr iova);
+ void smmu_iotlb_insert(SMMUState *bs, SMMUTransCfg *cfg, SMMUTLBEntry *entry);
+-SMMUIOTLBKey smmu_get_iotlb_key(uint16_t asid, uint64_t iova);
++SMMUIOTLBKey smmu_get_iotlb_key(uint16_t asid, uint64_t iova,
++                                uint8_t tg, uint8_t level);
+ void smmu_iotlb_inv_all(SMMUState *s);
+ void smmu_iotlb_inv_asid(SMMUState *s, uint16_t asid);
+-void smmu_iotlb_inv_iova(SMMUState *s, uint16_t asid, dma_addr_t iova);
++void smmu_iotlb_inv_iova(SMMUState *s, int asid, dma_addr_t iova);
+ 
+ /* Unmap the range of all the notifiers registered to any IOMMU mr */
+ void smmu_inv_notifiers_all(SMMUState *s);
+diff --git a/hw/arm/smmu-common.c b/hw/arm/smmu-common.c
+index 398e958bb44..2922deec6fc 100644
+--- a/hw/arm/smmu-common.c
++++ b/hw/arm/smmu-common.c
+@@ -39,7 +39,7 @@ static guint smmu_iotlb_key_hash(gconstpointer v)
+ 
+     /* Jenkins hash */
+     a = b = c = JHASH_INITVAL + sizeof(*key);
+-    a += key->asid;
++    a += key->asid + key->level + key->tg;
+     b += extract64(key->iova, 0, 32);
+     c += extract64(key->iova, 32, 32);
+ 
+@@ -51,24 +51,41 @@ static guint smmu_iotlb_key_hash(gconstpointer v)
+ 
+ static gboolean smmu_iotlb_key_equal(gconstpointer v1, gconstpointer v2)
+ {
+-    const SMMUIOTLBKey *k1 = v1;
+-    const SMMUIOTLBKey *k2 = v2;
++    SMMUIOTLBKey *k1 = (SMMUIOTLBKey *)v1, *k2 = (SMMUIOTLBKey *)v2;
+ 
+-    return (k1->asid == k2->asid) && (k1->iova == k2->iova);
++    return (k1->asid == k2->asid) && (k1->iova == k2->iova) &&
++           (k1->level == k2->level) && (k1->tg == k2->tg);
+ }
+ 
+-SMMUIOTLBKey smmu_get_iotlb_key(uint16_t asid, uint64_t iova)
++SMMUIOTLBKey smmu_get_iotlb_key(uint16_t asid, uint64_t iova,
++                                uint8_t tg, uint8_t level)
+ {
+-    SMMUIOTLBKey key = {.asid = asid, .iova = iova};
++    SMMUIOTLBKey key = {.asid = asid, .iova = iova, .tg = tg, .level = level};
+ 
+     return key;
+ }
+ 
+ SMMUTLBEntry *smmu_iotlb_lookup(SMMUState *bs, SMMUTransCfg *cfg,
+-                                hwaddr iova)
++                                SMMUTransTableInfo *tt, hwaddr iova)
+ {
+-    SMMUIOTLBKey key = smmu_get_iotlb_key(cfg->asid, iova);
+-    SMMUTLBEntry *entry = g_hash_table_lookup(bs->iotlb, &key);
++    uint8_t tg = (tt->granule_sz - 10) / 2;
++    uint8_t inputsize = 64 - tt->tsz;
++    uint8_t stride = tt->granule_sz - 3;
++    uint8_t level = 4 - (inputsize - 4) / stride;
++    SMMUTLBEntry *entry = NULL;
++
++    while (level <= 3) {
++        uint64_t subpage_size = 1ULL << level_shift(level, tt->granule_sz);
++        uint64_t mask = subpage_size - 1;
++        SMMUIOTLBKey key;
++
++        key = smmu_get_iotlb_key(cfg->asid, iova & ~mask, tg, level);
++        entry = g_hash_table_lookup(bs->iotlb, &key);
++        if (entry) {
++            break;
++        }
++        level++;
++    }
+ 
+     if (entry) {
+         cfg->iotlb_hits++;
+@@ -89,13 +106,14 @@ SMMUTLBEntry *smmu_iotlb_lookup(SMMUState *bs, SMMUTransCfg *cfg,
+ void smmu_iotlb_insert(SMMUState *bs, SMMUTransCfg *cfg, SMMUTLBEntry *new)
+ {
+     SMMUIOTLBKey *key = g_new0(SMMUIOTLBKey, 1);
++    uint8_t tg = (new->granule - 10) / 2;
+ 
+     if (g_hash_table_size(bs->iotlb) >= SMMU_IOTLB_MAX_SIZE) {
+         smmu_iotlb_inv_all(bs);
+     }
+ 
+-    *key = smmu_get_iotlb_key(cfg->asid, new->entry.iova);
+-    trace_smmu_iotlb_insert(cfg->asid, new->entry.iova);
++    *key = smmu_get_iotlb_key(cfg->asid, new->entry.iova, tg, new->level);
++    trace_smmu_iotlb_insert(cfg->asid, new->entry.iova, tg, new->level);
+     g_hash_table_insert(bs->iotlb, key, new);
+ }
+ 
+@@ -114,12 +132,26 @@ static gboolean smmu_hash_remove_by_asid(gpointer key, gpointer value,
+     return SMMU_IOTLB_ASID(*iotlb_key) == asid;
+ }
+ 
+-inline void smmu_iotlb_inv_iova(SMMUState *s, uint16_t asid, dma_addr_t iova)
++static gboolean smmu_hash_remove_by_asid_iova(gpointer key, gpointer value,
++                                              gpointer user_data)
+ {
+-    SMMUIOTLBKey key = smmu_get_iotlb_key(asid, iova);
++    SMMUTLBEntry *iter = (SMMUTLBEntry *)value;
++    IOMMUTLBEntry *entry = &iter->entry;
++    SMMUIOTLBPageInvInfo *info = (SMMUIOTLBPageInvInfo *)user_data;
++    SMMUIOTLBKey iotlb_key = *(SMMUIOTLBKey *)key;
++
++    if (info->asid >= 0 && info->asid != SMMU_IOTLB_ASID(iotlb_key)) {
++        return false;
++    }
++    return (info->iova & ~entry->addr_mask) == entry->iova;
++}
++
++inline void smmu_iotlb_inv_iova(SMMUState *s, int asid, dma_addr_t iova)
++{
++    SMMUIOTLBPageInvInfo info = {.asid = asid, .iova = iova};
+ 
+     trace_smmu_iotlb_inv_iova(asid, iova);
+-    g_hash_table_remove(s->iotlb, &key);
++    g_hash_table_foreach_remove(s->iotlb, smmu_hash_remove_by_asid_iova, &info);
+ }
+ 
+ inline void smmu_iotlb_inv_asid(SMMUState *s, uint16_t asid)
+@@ -246,9 +278,6 @@ static int smmu_ptw_64(SMMUTransCfg *cfg,
+     baseaddr = extract64(tt->ttb, 0, 48);
+     baseaddr &= ~indexmask;
+ 
+-    tlbe->entry.iova = iova;
+-    tlbe->entry.addr_mask = (1 << granule_sz) - 1;
+-
+     while (level <= 3) {
+         uint64_t subpage_size = 1ULL << level_shift(level, granule_sz);
+         uint64_t mask = subpage_size - 1;
+@@ -298,7 +327,9 @@ static int smmu_ptw_64(SMMUTransCfg *cfg,
+             goto error;
+         }
+ 
+-        tlbe->entry.translated_addr = gpa + (iova & mask);
++        tlbe->entry.translated_addr = gpa;
++        tlbe->entry.iova = iova & ~mask;
++        tlbe->entry.addr_mask = mask;
+         tlbe->entry.perm = PTE_AP_TO_PERM(ap);
+         tlbe->level = level;
+         tlbe->granule = granule_sz;
+diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
+index db74d27add5..b717bde8320 100644
+--- a/hw/arm/smmuv3.c
++++ b/hw/arm/smmuv3.c
+@@ -674,7 +674,7 @@ static IOMMUTLBEntry smmuv3_translate(IOMMUMemoryRegion *mr, hwaddr addr,
+     page_mask = (1ULL << (tt->granule_sz)) - 1;
+     aligned_addr = addr & ~page_mask;
+ 
+-    cached_entry = smmu_iotlb_lookup(bs, cfg, aligned_addr);
++    cached_entry = smmu_iotlb_lookup(bs, cfg, tt, aligned_addr);
+     if (cached_entry) {
+         if ((flag & IOMMU_WO) && !(cached_entry->entry.perm & IOMMU_WO)) {
+             status = SMMU_TRANS_ERROR;
+@@ -744,7 +744,7 @@ epilogue:
+     case SMMU_TRANS_SUCCESS:
+         entry.perm = flag;
+         entry.translated_addr = cached_entry->entry.translated_addr +
+-                                    (addr & page_mask);
++                                    (addr & cached_entry->entry.addr_mask);
+         entry.addr_mask = cached_entry->entry.addr_mask;
+         trace_smmuv3_translate_success(mr->parent_obj.name, sid, addr,
+                                        entry.translated_addr, entry.perm);
+@@ -972,7 +972,7 @@ static int smmuv3_cmdq_consume(SMMUv3State *s)
+ 
+             trace_smmuv3_cmdq_tlbi_nh_vaa(vmid, addr);
+             smmuv3_inv_notifiers_iova(bs, -1, addr);
+-            smmu_iotlb_inv_all(bs);
++            smmu_iotlb_inv_iova(bs, -1, addr);
+             break;
+         }
+         case SMMU_CMD_TLBI_NH_VA:
+diff --git a/hw/arm/trace-events b/hw/arm/trace-events
+index b808a1bfc19..f74d3e920f1 100644
+--- a/hw/arm/trace-events
++++ b/hw/arm/trace-events
+@@ -16,7 +16,7 @@ smmu_iotlb_inv_iova(uint16_t asid, uint64_t addr) "IOTLB invalidate asid=%d addr
+ smmu_inv_notifiers_mr(const char *name) "iommu mr=%s"
+ smmu_iotlb_lookup_hit(uint16_t asid, uint64_t addr, uint32_t hit, uint32_t miss, uint32_t p) "IOTLB cache HIT asid=%d addr=0x%"PRIx64" hit=%d miss=%d hit rate=%d"
+ smmu_iotlb_lookup_miss(uint16_t asid, uint64_t addr, uint32_t hit, uint32_t miss, uint32_t p) "IOTLB cache MISS asid=%d addr=0x%"PRIx64" hit=%d miss=%d hit rate=%d"
+-smmu_iotlb_insert(uint16_t asid, uint64_t addr) "IOTLB ++ asid=%d addr=0x%"PRIx64
++smmu_iotlb_insert(uint16_t asid, uint64_t addr, uint8_t tg, uint8_t level) "IOTLB ++ asid=%d addr=0x%"PRIx64" tg=%d level=%d"
+ 
+ # smmuv3.c
+ smmuv3_read_mmio(uint64_t addr, uint64_t val, unsigned size, uint32_t r) "addr: 0x%"PRIx64" val:0x%"PRIx64" size: 0x%x(%d)"
 -- 
 2.20.1
 
