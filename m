@@ -2,42 +2,42 @@ Return-Path: <SRS0=JPH5=CC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-18.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1022C433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 20:58:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B7CBC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 20:59:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9435C2067C
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 20:58:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9435C2067C
+	by mail.kernel.org (Postfix) with ESMTPS id 1AD5E20738
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 20:59:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1AD5E20738
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60396 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34346 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAJXW-0003uX-NF
-	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 16:58:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36092)
+	id 1kAJZD-0004sp-CX
+	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 16:59:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36512)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kAJWp-0003Rd-Ej
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 16:57:19 -0400
-Received: from mout.kundenserver.de ([212.227.126.135]:35013)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kAJYh-0004SP-1e
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 16:59:15 -0400
+Received: from mout.kundenserver.de ([212.227.126.130]:34155)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kAJWm-0001R7-MU
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 16:57:19 -0400
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kAJYf-0001cb-7Q
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 16:59:14 -0400
 Received: from [192.168.100.1] ([82.252.135.186]) by mrelayeu.kundenserver.de
  (mreue012 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1M6H7o-1kGvEe3ol6-006jX2; Mon, 24 Aug 2020 22:57:13 +0200
-Subject: Re: [PATCH v4 5/5] linux-user: Add strace support for printing
- arguments of some clock and time functions
+ 1Ml3ym-1ktVkJ2LUa-00lVym; Mon, 24 Aug 2020 22:59:03 +0200
+Subject: Re: [PATCH v3 1/2] linux-user: Fix 'mq_timedsend()' and
+ 'mq_timedreceive()'
 To: Filip Bozuta <Filip.Bozuta@syrmia.com>, qemu-devel@nongnu.org
-References: <20200811164553.27713-1-Filip.Bozuta@syrmia.com>
- <20200811164553.27713-6-Filip.Bozuta@syrmia.com>
+References: <20200824193752.67950-1-Filip.Bozuta@syrmia.com>
+ <20200824193752.67950-2-Filip.Bozuta@syrmia.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -81,36 +81,36 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <c886a323-77bb-e027-30df-ca6563264b85@vivier.eu>
-Date: Mon, 24 Aug 2020 22:57:11 +0200
+Message-ID: <fa26afcf-1af9-dca1-e98c-4704ed42dcef@vivier.eu>
+Date: Mon, 24 Aug 2020 22:59:02 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200811164553.27713-6-Filip.Bozuta@syrmia.com>
+In-Reply-To: <20200824193752.67950-2-Filip.Bozuta@syrmia.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:Gh03gfL/6n5TWu9+e0CTLjdBVHZuI5gGiqygboHXToork9DaGW1
- PfA8oelUhR0bOFXtpQLwcE27hJX7wXzJQeua8RIoHwuv+yM02+UlculmU57G1YEUTPsclOE
- I3K4qL1c4nAus1v8FYnCOEbBFak5YH+u1Seqy2fNomkkDA4Wn0vg5DNPKWePmX7ONV7/mV1
- P4jiyTGtn066RhIhSmBUw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:4m2JrLgJRDs=:tMfCBc4x2ohWbzN86X/XyW
- Vq7gIYxMRV4BNm4UNYr0yCKk5jYQcxWWO4kr3V+t2FWh1fazYbsZMofy36crIA183GyL1Bbm+
- x43cWmvgg9uPC56bRYrp2aYFrVEzT/OzTBlg480H3cteB59EIe/+tuLbshtzf8Jajm87aKQAJ
- 801nEJGZLDbMqRiiz3bUI21KATTLD2quK/tPcXzLdpkEHDlQAl65tEnKpXl1ad1DccRxcSZCy
- 7lEZmI2CJ2YK6dnRblLRco07jgrTG94Fp/oJKLehQ41Kz9awOfeEVXRn1w9TfvTxmR8YaP7/j
- 7DXGipnRDs4og/2wf/U2f9Ak2pXI8rn51YFSOJ9Ko6rqEEK3iY5m09HgI+Oleves/BKB6MHMM
- y/fZrHCciIWKVr9lHVoh4cW+9Q9nU7fXrZrieNOWt9ZIGeb8EhrbtS176dvMAy7VlbefjOgWt
- qOlnXxh1HUWAer4GHg/SrzWgt0tcYF7cPHDE6w0A1ew9p9PivmUBlTgAZ40/Q9SFmlnBR7a9p
- /+usyjWIuYOIw1O8gGT0Qj652CyEq8wnSyFBjVw+SXO9YjkMt05RlWp7u0vCe2hlmou2Pcoyp
- vC8RJPVnzuOPCnwdSZtel2MvS28nwlheRe7CHEAik8JYmaZKHOZHsGi/ZURCLac+DmOWyceuL
- ieLQx7W8aanN63Fza3YGjiVOWeovNAkh5RCkHWfZaAiWs3qcWdwFYPv60SnNdsiqTsPtBU/qQ
- X0rvvXRtJ6AszmfZPr/c06bv8CuyqX2Fq/iWutWZt1j3fgdtbC0m9b+oEU3CmdlfGv0+Gs/N4
- yPaKoT1dgEim4s2agHtKSi8y27F7ovZHS3kXdmE6gpdxV+i4ScjkbtG49fkOyCwegQLUlAS
-Received-SPF: none client-ip=212.227.126.135; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:qLEokLuoq4k6pcvLS1Yeby4haLdtm29XxPbY8dl4fdugh7z0XgA
+ hGZH7tSx5vjMmPh2F+eBAQ6bUoq93ATXoZFaFyh5Cb0Ell8MeF/q6F1YyyxHkAOfPyA5B++
+ uj+91wA08b81B2GmcQ4xe1HLzDcqRviHpwZf2kqkmvHe/yzdl0xZ8eV2k61ACMdeVXWDuBF
+ h2HGlQVr2vKgkzIfl5WJg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:qmOipwJXhFU=:PyvVfvlxDagHAdC0/Y+F6d
+ pC7If1ACoEwIvmsdWqV7wi9ppJm4ZoFwcI7ISnzj7A/emsDjGJNoVOvDe5fsgDJfQGNcUEMhR
+ ovD+vcFC9JqWIx9Ib8nTZLxSoo4JGGnAjRy+xVvC3lSfUY1RfuflGJewh3FK7shSQvBfTl++s
+ 6L/17Is33+OvXPZq8lCKE/udrUJa1HvcCD3Pvh4e3i+ubaKmUDIDeHoCMtH24oLq1ht2Z4xDh
+ PA6Hdl4Dht4MT0uUx762IURG7Dr6AxFNhuEMRdEVa5A6fvSfwjyX/ufkT+ZJxJt+WT+pGiZJg
+ mnyWYBJuzXpoOdwYGy87/aCH85tDB6T585X8g9MDWVS2TjxLG3NXL53F9j9Ct7vPAeFy5TD9S
+ DlobYRaPwd1e/NDlgdPik3oZ7MrZzChsc1WeOYGHNjnzDxOm34+vUZ8tbWu167yPKWkuKUhiT
+ bO6Y6Slwex1E74pQ0xsED74k27Ka6EW89DHEH/uxNjGuuKzOmN4QrVn1b8Ci6RnPOTDQmT9nM
+ zlUY1//gFDm47NbaZ9g55Wb1CjsarPMOn3SfrXVGSPu8OU1QDFZGMVBw7b8PUd0mVpmQjt1J/
+ YMHAE2FN5m1LkwCIT35Qw3rrYS8W1wIrlWDEXu1lr18egCl/eylRfKp/Ds9/3TB7QF7U55jJp
+ ZJ7lMDqKMp3aHXFVdD7Xdg1sJ4j8f6A2maFWLQmhFyRte7K+2dhh/xaINdE4BDoXH0n0lgZea
+ VQZvWDXDIrCKjAybd6/2p6Q0IZrzlK8q/AbgKDWRcxTRypEvMi9r5XRjBpAP3nj3giaMqrQHh
+ OhYWls42gX2L3nqAccUrrFngEh9NEe6YdJvSOBnqTkqX+iU22eKEkkf3KvIoiQnel6KKMfJ
+Received-SPF: none client-ip=212.227.126.130; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/24 16:46:45
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/24 16:34:54
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
 X-Spam_score_int: -40
 X-Spam_score: -4.1
 X-Spam_bar: ----
@@ -129,482 +129,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Riku Voipio <riku.voipio@iki.fi>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 11/08/2020 à 18:45, Filip Bozuta a écrit :
-> This patch implements strace argument printing functionality for following syscalls:
+Le 24/08/2020 à 21:37, Filip Bozuta a écrit :
+> Implementations of syscalls 'mq_timedsend()' and 'mq_timedreceive()'
+> in 'syscall.c' use functions 'target_to_host_timespec()' and
+> 'host_to_target_timespec()' to transfer the value of 'struct timespec'
+> between target and host. However, the implementations don't check whether
+> this conversion succeeds and thus can cause an unaproppriate error instead
+> of the 'EFAULT (Bad address)' which is supposed to be set if the conversion
+> from target to host fails. This was confirmed with the modified LTP
+> test suite where test cases with a bad adress for 'timespec' were
+> added. This modified test suite can be found at:
+> https://github.com/bozutaf/ltp
 > 
->     * clock_getres, clock_gettime, clock_settime - clock and time functions
+> Without the changes from this patch the bad adress testcase for 'mq_timedsend()'
+> succeds unexpectedly, while the test returns errno 'ETIMEOUT' for
+> 'mq_timedreceive()':
 > 
->         int clock_getres(clockid_t clockid, struct timespec *res)
->         int clock_gettime(clockid_t clockid, struct timespec *tp)
->         int clock_settime(clockid_t clockid, const struct timespec *tp)
->         man page: https://man7.org/linux/man-pages/man2/clock_getres.2.html
+> mq_timedsend01.c:190: FAIL: mq_timedsend() returned 0, expected -1: SUCCESS (0)
+> mq_timedreceive01.c:178: FAIL: mq_timedreceive() failed unexpectedly,
+> expected EFAULT: ETIMEDOUT (110)
 > 
->     * gettimeofday - get time
+> After the changes from this patch, testcases for both syscalls fail with EFAULT
+> as expected, which is the same test result that is received with native execution:
 > 
->         int gettimeofday(struct timeval *tv, struct timezone *tz)
->         man page: https://man7.org/linux/man-pages/man2/gettimeofday.2.html
+> mq_timedsend01.c:187: PASS: mq_timedsend() failed expectedly: EFAULT (14)
+> mq_timedreceive01.c:180: PASS: mq_timedreceive() failed expectedly: EFAULT (14)
 > 
->     * getitimer, setitimer - get or set value of an interval timer
-> 
->         int getitimer(int which, struct itimerval *curr_value)
->         int setitimer(int which, const struct itimerval *new_value,
->                       struct itimerval *old_value)
->         man page: https://man7.org/linux/man-pages/man2/getitimer.2.html
-> 
-> Implementation notes:
-> 
->     All of the syscalls have some structue types as argument types and thus
->     a separate printing function was stated in file "strace.list" for each
->     of them. All of these functions use existing functions for their
->     appropriate structure types ("print_timeval()" and "print_timezone()").
-> 
->     Functions "print_timespec()" and "print_itimerval()" were added in this
->     patch so that they can be used to print types "struct timespec" and
->     "struct itimerval" used by some of the syscalls. Function "print_itimerval()"
->     uses the existing function "print_timeval()" to print fields of the
->     structure "struct itimerval" that are of type "struct timeval".
-> 
->     Function "print_enums()", which was introduced in the previous patch, is used
->     to print the interval timer type which is the first argument of "getitimer()"
->     and "setitimer()". Also, this function is used to print the clock id which
->     is the first argument of "clock_getres()" and "clock_gettime()". For that
->     reason, the existing function "print_clockid()" was removed in this patch.
->     Existing function "print_clock_adjtime()" was also changed for this reason
->     to use "print_enums()".
-> 
->     The existing function "print_timeval()" was changed a little so that it
->     prints the field names beside the values.
-> 
->     Syscalls "clock_getres()" and "clock_gettime()" have the same number
->     and types of arguments and thus their print functions "print_clock_getres"
->     and "print_clock_gettime" share a common definition in file "strace.c".
+> (Patch with this new test case will be sent to LTP mailing list soon)
 > 
 > Signed-off-by: Filip Bozuta <Filip.Bozuta@syrmia.com>
 > ---
->  linux-user/strace.c    | 287 +++++++++++++++++++++++++++++++----------
->  linux-user/strace.list |  17 ++-
->  2 files changed, 232 insertions(+), 72 deletions(-)
+>  linux-user/syscall.c | 16 ++++++++++++----
+>  1 file changed, 12 insertions(+), 4 deletions(-)
 > 
-> diff --git a/linux-user/strace.c b/linux-user/strace.c
-> index def92c4d73..1a5c4c820a 100644
-> --- a/linux-user/strace.c
-> +++ b/linux-user/strace.c
-> @@ -78,7 +78,9 @@ UNUSED static void print_string(abi_long, int);
->  UNUSED static void print_buf(abi_long addr, abi_long len, int last);
->  UNUSED static void print_raw_param(const char *, abi_long, int);
->  UNUSED static void print_timeval(abi_ulong, int);
-> +UNUSED static void print_timespec(abi_ulong, int);
->  UNUSED static void print_timezone(abi_ulong, int);
-> +UNUSED static void print_itimerval(abi_ulong, int);
->  UNUSED static void print_number(abi_long, int);
->  UNUSED static void print_signal(abi_ulong, int);
->  UNUSED static void print_sockaddr(abi_ulong, abi_long, int);
-> @@ -578,69 +580,6 @@ print_fdset(int n, abi_ulong target_fds_addr)
->  }
->  #endif
+> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+> index 05f03919ff..4ee1de6e65 100644
+> --- a/linux-user/syscall.c
+> +++ b/linux-user/syscall.c
+> @@ -11817,9 +11817,13 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
 >  
-> -#ifdef TARGET_NR_clock_adjtime
-> -/* IDs of the various system clocks */
-> -#define TARGET_CLOCK_REALTIME              0
-> -#define TARGET_CLOCK_MONOTONIC             1
-> -#define TARGET_CLOCK_PROCESS_CPUTIME_ID    2
-> -#define TARGET_CLOCK_THREAD_CPUTIME_ID     3
-> -#define TARGET_CLOCK_MONOTONIC_RAW         4
-> -#define TARGET_CLOCK_REALTIME_COARSE       5
-> -#define TARGET_CLOCK_MONOTONIC_COARSE      6
-> -#define TARGET_CLOCK_BOOTTIME              7
-> -#define TARGET_CLOCK_REALTIME_ALARM        8
-> -#define TARGET_CLOCK_BOOTTIME_ALARM        9
-> -#define TARGET_CLOCK_SGI_CYCLE             10
-> -#define TARGET_CLOCK_TAI                   11
-> -
-> -static void
-> -print_clockid(int clockid, int last)
-> -{
-> -    switch (clockid) {
-> -    case TARGET_CLOCK_REALTIME:
-> -        qemu_log("CLOCK_REALTIME");
-> -        break;
-> -    case TARGET_CLOCK_MONOTONIC:
-> -        qemu_log("CLOCK_MONOTONIC");
-> -        break;
-> -    case TARGET_CLOCK_PROCESS_CPUTIME_ID:
-> -        qemu_log("CLOCK_PROCESS_CPUTIME_ID");
-> -        break;
-> -    case TARGET_CLOCK_THREAD_CPUTIME_ID:
-> -        qemu_log("CLOCK_THREAD_CPUTIME_ID");
-> -        break;
-> -    case TARGET_CLOCK_MONOTONIC_RAW:
-> -        qemu_log("CLOCK_MONOTONIC_RAW");
-> -        break;
-> -    case TARGET_CLOCK_REALTIME_COARSE:
-> -        qemu_log("CLOCK_REALTIME_COARSE");
-> -        break;
-> -    case TARGET_CLOCK_MONOTONIC_COARSE:
-> -        qemu_log("CLOCK_MONOTONIC_COARSE");
-> -        break;
-> -    case TARGET_CLOCK_BOOTTIME:
-> -        qemu_log("CLOCK_BOOTTIME");
-> -        break;
-> -    case TARGET_CLOCK_REALTIME_ALARM:
-> -        qemu_log("CLOCK_REALTIME_ALARM");
-> -        break;
-> -    case TARGET_CLOCK_BOOTTIME_ALARM:
-> -        qemu_log("CLOCK_BOOTTIME_ALARM");
-> -        break;
-> -    case TARGET_CLOCK_SGI_CYCLE:
-> -        qemu_log("CLOCK_SGI_CYCLE");
-> -        break;
-> -    case TARGET_CLOCK_TAI:
-> -        qemu_log("CLOCK_TAI");
-> -        break;
-> -    default:
-> -        qemu_log("%d", clockid);
-> -        break;
-> -    }
-> -    qemu_log("%s", get_comma(last));
-> -}
-> -#endif
-> -
->  /*
->   * Sysycall specific output functions
->   */
-> @@ -839,6 +778,81 @@ print_syscall_ret_adjtimex(void *cpu_env, const struct syscallname *name,
->  }
->  #endif
+>              p = lock_user (VERIFY_READ, arg2, arg3, 1);
+>              if (arg5 != 0) {
+> -                target_to_host_timespec(&ts, arg5);
+> +                if (target_to_host_timespec(&ts, arg5)) {
+> +                    return -TARGET_EFAULT;
+> +                }
+>                  ret = get_errno(safe_mq_timedsend(arg1, p, arg3, arg4, &ts));
+> -                host_to_target_timespec(arg5, &ts);
+> +                if (!is_error(ret) && host_to_target_timespec(arg5, &ts)) {
+> +                    return -TARGET_EFAULT;
+> +                }
+>              } else {
+>                  ret = get_errno(safe_mq_timedsend(arg1, p, arg3, arg4, NULL));
+>              }
+> @@ -11836,10 +11840,14 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
 >  
-> +#if defined(TARGET_NR_clock_gettime) || defined(TARGET_NR_clock_getres)
-> +static void
-> +print_syscall_ret_clock_gettime(void *cpu_env, const struct syscallname *name,
-> +                                abi_long ret, abi_long arg0, abi_long arg1,
-> +                                abi_long arg2, abi_long arg3, abi_long arg4,
-> +                                abi_long arg5)
-> +{
-> +    if (!print_syscall_err(ret)) {
-> +        qemu_log(TARGET_ABI_FMT_ld, ret);
-> +        qemu_log(" (");
-> +        print_timespec(arg1, 1);
-> +        qemu_log(")");
-> +    }
-> +
-> +    qemu_log("\n");
-> +}
-> +#define print_syscall_ret_clock_getres     print_syscall_ret_clock_gettime
-> +#endif
-> +
-> +#ifdef TARGET_NR_gettimeofday
-> +static void
-> +print_syscall_ret_gettimeofday(void *cpu_env, const struct syscallname *name,
-> +                               abi_long ret, abi_long arg0, abi_long arg1,
-> +                               abi_long arg2, abi_long arg3, abi_long arg4,
-> +                               abi_long arg5)
-> +{
-> +    if (!print_syscall_err(ret)) {
-> +        qemu_log(TARGET_ABI_FMT_ld, ret);
-> +        qemu_log(" (");
-> +        print_timeval(arg0, 0);
-> +        print_timezone(arg1, 1);
-> +        qemu_log(")");
-> +    }
-> +
-> +    qemu_log("\n");
-> +}
-> +#endif
-> +
-> +#ifdef TARGET_NR_getitimer
-> +static void
-> +print_syscall_ret_getitimer(void *cpu_env, const struct syscallname *name,
-> +                            abi_long ret, abi_long arg0, abi_long arg1,
-> +                            abi_long arg2, abi_long arg3, abi_long arg4,
-> +                            abi_long arg5)
-> +{
-> +    if (!print_syscall_err(ret)) {
-> +        qemu_log(TARGET_ABI_FMT_ld, ret);
-> +        qemu_log(" (");
-> +        print_itimerval(arg1, 1);
-> +        qemu_log(")");
-> +    }
-> +
-> +    qemu_log("\n");
-> +}
-> +#endif
-> +
-> +
-> +#ifdef TARGET_NR_getitimer
-> +static void
-> +print_syscall_ret_setitimer(void *cpu_env, const struct syscallname *name,
-> +                            abi_long ret, abi_long arg0, abi_long arg1,
-> +                            abi_long arg2, abi_long arg3, abi_long arg4,
-> +                            abi_long arg5)
-> +{
-> +    if (!print_syscall_err(ret)) {
-> +        qemu_log(TARGET_ABI_FMT_ld, ret);
-> +        qemu_log(" (old_value = ");
-> +        print_itimerval(arg2, 1);
-> +        qemu_log(")");
-> +    }
-> +
-> +    qemu_log("\n");
-> +}
-> +#endif
-> +
->  #if defined(TARGET_NR_listxattr) || defined(TARGET_NR_llistxattr) \
->   || defined(TARGGET_NR_flistxattr)
->  static void
-> @@ -1217,6 +1231,43 @@ UNUSED static struct flags mlockall_flags[] = {
->      FLAG_END,
->  };
->  
-> +/* IDs of the various system clocks */
-> +#define TARGET_CLOCK_REALTIME              0
-> +#define TARGET_CLOCK_MONOTONIC             1
-> +#define TARGET_CLOCK_PROCESS_CPUTIME_ID    2
-> +#define TARGET_CLOCK_THREAD_CPUTIME_ID     3
-> +#define TARGET_CLOCK_MONOTONIC_RAW         4
-> +#define TARGET_CLOCK_REALTIME_COARSE       5
-> +#define TARGET_CLOCK_MONOTONIC_COARSE      6
-> +#define TARGET_CLOCK_BOOTTIME              7
-> +#define TARGET_CLOCK_REALTIME_ALARM        8
-> +#define TARGET_CLOCK_BOOTTIME_ALARM        9
-> +#define TARGET_CLOCK_SGI_CYCLE             10
-> +#define TARGET_CLOCK_TAI                   11
-> +
-> +UNUSED static struct enums clockids[] = {
-> +    ENUM_TARGET(CLOCK_REALTIME),
-> +    ENUM_TARGET(CLOCK_MONOTONIC),
-> +    ENUM_TARGET(CLOCK_PROCESS_CPUTIME_ID),
-> +    ENUM_TARGET(CLOCK_THREAD_CPUTIME_ID),
-> +    ENUM_TARGET(CLOCK_MONOTONIC_RAW),
-> +    ENUM_TARGET(CLOCK_REALTIME_COARSE),
-> +    ENUM_TARGET(CLOCK_MONOTONIC_COARSE),
-> +    ENUM_TARGET(CLOCK_BOOTTIME),
-> +    ENUM_TARGET(CLOCK_REALTIME_ALARM),
-> +    ENUM_TARGET(CLOCK_BOOTTIME_ALARM),
-> +    ENUM_TARGET(CLOCK_SGI_CYCLE),
-> +    ENUM_TARGET(CLOCK_TAI),
-> +    ENUM_END,
-> +};
-> +
-> +UNUSED static struct enums itimer_types[] = {
-> +    ENUM_GENERIC(ITIMER_REAL),
-> +    ENUM_GENERIC(ITIMER_VIRTUAL),
-> +    ENUM_GENERIC(ITIMER_PROF),
-> +    ENUM_END,
-> +};
-> +
->  /*
->   * print_xxx utility functions.  These are used to print syscall
->   * parameters in certain format.  All of these have parameter
-> @@ -1435,13 +1486,34 @@ print_timeval(abi_ulong tv_addr, int last)
->              print_pointer(tv_addr, last);
->              return;
->          }
-> -        qemu_log("{" TARGET_ABI_FMT_ld "," TARGET_ABI_FMT_ld "}%s",
-> -            tswapal(tv->tv_sec), tswapal(tv->tv_usec), get_comma(last));
-> +        qemu_log("{tv_sec = " TARGET_ABI_FMT_ld
-> +                 ",tv_usec = " TARGET_ABI_FMT_ld "}%s",
-> +                 tswapal(tv->tv_sec), tswapal(tv->tv_usec), get_comma(last));
->          unlock_user(tv, tv_addr, 0);
->      } else
->          qemu_log("NULL%s", get_comma(last));
->  }
->  
-> +static void
-> +print_timespec(abi_ulong ts_addr, int last)
-> +{
-> +    if (ts_addr) {
-> +        struct target_timespec *ts;
-> +
-> +        ts = lock_user(VERIFY_READ, ts_addr, sizeof(*ts), 1);
-> +        if (!ts) {
-> +            print_pointer(ts_addr, last);
-> +            return;
-> +        }
-> +        qemu_log("{tv_sec = " TARGET_ABI_FMT_ld
-> +                 ",tv_nsec = " TARGET_ABI_FMT_ld "}%s",
-> +                 tswapal(ts->tv_sec), tswapal(ts->tv_nsec), get_comma(last));
-> +        unlock_user(ts, ts_addr, 0);
-> +    } else {
-> +        qemu_log("NULL%s", get_comma(last));
-> +    }
-> +}
-> +
->  static void
->  print_timezone(abi_ulong tz_addr, int last)
->  {
-> @@ -1461,6 +1533,22 @@ print_timezone(abi_ulong tz_addr, int last)
->      }
->  }
->  
-> +static void
-> +print_itimerval(abi_ulong it_addr, int last)
-> +{
-> +    if (it_addr) {
-> +        qemu_log("{it_interval=");
-> +        print_timeval(it_addr +
-> +                      offsetof(struct target_itimerval, it_interval), 0);
-> +        qemu_log("it_value=");
-> +        print_timeval(it_addr +
-> +                      offsetof(struct target_itimerval, it_value), 0);
-> +        qemu_log("}%s", get_comma(last));
-> +    } else {
-> +        qemu_log("NULL%s", get_comma(last));
-> +    }
-> +}
-> +
->  #undef UNUSED
->  
->  #ifdef TARGET_NR_accept
-> @@ -1573,7 +1661,7 @@ print_clock_adjtime(void *cpu_env, const struct syscallname *name,
->                      abi_long arg3, abi_long arg4, abi_long arg5)
->  {
->      print_syscall_prologue(name);
-> -    print_clockid(arg0, 0);
-> +    print_enums(clockids, arg0, 0);
->      print_pointer(arg1, 1);
->      print_syscall_epilogue(name);
->  }
-> @@ -1903,6 +1991,19 @@ print_futimesat(void *cpu_env, const struct syscallname *name,
->  }
->  #endif
->  
-> +#ifdef TARGET_NR_gettimeofday
-> +static void
-> +print_gettimeofday(void *cpu_env, const struct syscallname *name,
-> +                   abi_long arg0, abi_long arg1, abi_long arg2,
-> +                   abi_long arg3, abi_long arg4, abi_long arg5)
-> +{
-> +    print_syscall_prologue(name);
-> +    print_pointer(arg0, 0);
-> +    print_pointer(arg1, 1);
-> +    print_syscall_epilogue(name);
-> +}
-> +#endif
-> +
->  #ifdef TARGET_NR_settimeofday
->  static void
->  print_settimeofday(void *cpu_env, const struct syscallname *name,
-> @@ -1916,6 +2017,60 @@ print_settimeofday(void *cpu_env, const struct syscallname *name,
->  }
->  #endif
->  
-> +#if defined(TARGET_NR_clock_gettime) || defined(TARGET_NR_clock_getres)
-> +static void
-> +print_clock_gettime(void *cpu_env, const struct syscallname *name,
-> +                    abi_long arg0, abi_long arg1, abi_long arg2,
-> +                    abi_long arg3, abi_long arg4, abi_long arg5)
-> +{
-> +    print_syscall_prologue(name);
-> +    print_enums(clockids, arg0, 0);
-> +    print_pointer(arg1, 1);
-> +    print_syscall_epilogue(name);
-> +}
-> +#define print_clock_getres     print_clock_gettime
-> +#endif
-> +
-> +#ifdef TARGET_NR_clock_settime
-> +static void
-> +print_clock_settime(void *cpu_env, const struct syscallname *name,
-> +                    abi_long arg0, abi_long arg1, abi_long arg2,
-> +                    abi_long arg3, abi_long arg4, abi_long arg5)
-> +{
-> +    print_syscall_prologue(name);
-> +    print_enums(clockids, arg0, 0);
-> +    print_timespec(arg1, 1);
-> +    print_syscall_epilogue(name);
-> +}
-> +#endif
-> +
-> +#ifdef TARGET_NR_getitimer
-> +static void
-> +print_getitimer(void *cpu_env, const struct syscallname *name,
-> +                abi_long arg0, abi_long arg1, abi_long arg2,
-> +                abi_long arg3, abi_long arg4, abi_long arg5)
-> +{
-> +    print_syscall_prologue(name);
-> +    print_enums(itimer_types, arg0, 0);
-> +    print_pointer(arg1, 1);
-> +    print_syscall_epilogue(name);
-> +}
-> +#endif
-> +
-> +#ifdef TARGET_NR_setitimer
-> +static void
-> +print_setitimer(void *cpu_env, const struct syscallname *name,
-> +                abi_long arg0, abi_long arg1, abi_long arg2,
-> +                abi_long arg3, abi_long arg4, abi_long arg5)
-> +{
-> +    print_syscall_prologue(name);
-> +    print_enums(itimer_types, arg0, 0);
-> +    print_itimerval(arg1, 0);
-> +    print_pointer(arg2, 1);
-> +    print_syscall_epilogue(name);
-> +}
-> +#endif
-> +
->  #ifdef TARGET_NR_link
->  static void
->  print_link(void *cpu_env, const struct syscallname *name,
-> diff --git a/linux-user/strace.list b/linux-user/strace.list
-> index d0ea7f3464..084048ab96 100644
-> --- a/linux-user/strace.list
-> +++ b/linux-user/strace.list
-> @@ -83,16 +83,18 @@
->  { TARGET_NR_clock_adjtime, "clock_adjtime" , NULL, print_clock_adjtime, NULL },
->  #endif
->  #ifdef TARGET_NR_clock_getres
-> -{ TARGET_NR_clock_getres, "clock_getres" , NULL, NULL, NULL },
-> +{ TARGET_NR_clock_getres, "clock_getres" , NULL, print_clock_getres,
-> +                          print_syscall_ret_clock_getres },
->  #endif
->  #ifdef TARGET_NR_clock_gettime
-> -{ TARGET_NR_clock_gettime, "clock_gettime" , NULL, NULL, NULL },
-> +{ TARGET_NR_clock_gettime, "clock_gettime" , NULL, print_clock_gettime,
-> +                           print_syscall_ret_clock_gettime },
->  #endif
->  #ifdef TARGET_NR_clock_nanosleep
->  { TARGET_NR_clock_nanosleep, "clock_nanosleep" , NULL, NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_clock_settime
-> -{ TARGET_NR_clock_settime, "clock_settime" , NULL, NULL, NULL },
-> +{ TARGET_NR_clock_settime, "clock_settime" , NULL, print_clock_settime, NULL },
->  #endif
->  #ifdef TARGET_NR_clone
->  { TARGET_NR_clone, "clone" , NULL, print_clone, NULL },
-> @@ -315,7 +317,8 @@
->  { TARGET_NR_gethostname, "gethostname" , NULL, NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_getitimer
-> -{ TARGET_NR_getitimer, "getitimer" , NULL, NULL, NULL },
-> +{ TARGET_NR_getitimer, "getitimer" , NULL, print_getitimer,
-> +                       print_syscall_ret_getitimer },
->  #endif
->  #ifdef TARGET_NR_get_kernel_syms
->  { TARGET_NR_get_kernel_syms, "get_kernel_syms" , NULL, NULL, NULL },
-> @@ -388,7 +391,8 @@
->  { TARGET_NR_gettid, "gettid" , "%s()", NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_gettimeofday
-> -{ TARGET_NR_gettimeofday, "gettimeofday" , NULL, NULL, NULL },
-> +{ TARGET_NR_gettimeofday, "gettimeofday" , NULL, print_gettimeofday,
-> +                          print_syscall_ret_gettimeofday },
->  #endif
->  #ifdef TARGET_NR_getuid
->  { TARGET_NR_getuid, "getuid" , "%s()", NULL, NULL },
-> @@ -1291,7 +1295,8 @@
->  { TARGET_NR_sethostname, "sethostname" , NULL, NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_setitimer
-> -{ TARGET_NR_setitimer, "setitimer" , NULL, NULL, NULL },
-> +{ TARGET_NR_setitimer, "setitimer" , NULL, print_setitimer,
-> +                       print_syscall_ret_setitimer },
->  #endif
->  #ifdef TARGET_NR_set_mempolicy
->  { TARGET_NR_set_mempolicy, "set_mempolicy" , NULL, NULL, NULL },
+>              p = lock_user (VERIFY_READ, arg2, arg3, 1);
+>              if (arg5 != 0) {
+> -                target_to_host_timespec(&ts, arg5);
+> +                if (target_to_host_timespec(&ts, arg5)) {
+> +                    return -TARGET_EFAULT;
+> +                }
+>                  ret = get_errno(safe_mq_timedreceive(arg1, p, arg3,
+>                                                       &prio, &ts));
+> -                host_to_target_timespec(arg5, &ts);
+> +                if (!is_error(ret) && host_to_target_timespec(arg5, &ts)) {
+> +                    return -TARGET_EFAULT;
+> +                }
+>              } else {
+>                  ret = get_errno(safe_mq_timedreceive(arg1, p, arg3,
+>                                                       &prio, NULL));
 > 
 
 Applied to my linux-user-for-5.2 branch.
