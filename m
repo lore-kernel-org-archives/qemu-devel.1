@@ -2,93 +2,93 @@ Return-Path: <SRS0=JPH5=CC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC50FC433E3
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 10:01:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DCD50C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 10:01:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 571AD2074D
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 10:01:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A8E0A2071E
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 10:01:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="W693syUv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 571AD2074D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="siPh5Teh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8E0A2071E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59916 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35554 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kA9Hg-000428-7I
-	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 06:01:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47030)
+	id 1kA9Ic-0005jF-Qi
+	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 06:01:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50058)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kA95u-0005ro-Q4
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 05:48:50 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:46191)
+ (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
+ id 1kA9HT-00045j-VX
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 06:00:48 -0400
+Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:32974)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kA95q-0004qE-CO
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 05:48:50 -0400
-Received: by mail-wr1-x444.google.com with SMTP id r15so7963123wrp.13
- for <qemu-devel@nongnu.org>; Mon, 24 Aug 2020 02:48:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
- :content-transfer-encoding;
- bh=LAl/MClU8bQ+8K7XrIqILgs8EvZ3f66imhAW3H8aksA=;
- b=W693syUvpL+PtHq97ntok6Q89KZ5UPLzfpJrOwifAIMzug17uJ7ixcH1I00DImmHx5
- 7ioJLTn7wJAdM2xzbEovAfmnKO/+ok4ZxgbWDONRdkwkwtlhCezTDlS8t5dYJr7o47Vv
- kOpsxNUUgctDJcm2IbffSKoXkN9KR2dlXS3kqDjXLu6YmvEn46Oj7TCidg+tjTTMHwbP
- a2z23Gt/hXxtOx/QFP7STR90jlDkV4mS7ZNrtP6TI6WUGqrvaVmjY7OzH7mP1uXMf48I
- jTLnxPgIl5qKtQYXyNOnjnMxIA+WPq5S7JIFZGAIeEl93zW3i+1ahnejS8IM16tFvIXH
- bhVA==
+ (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
+ id 1kA9HR-0006UD-L0
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 06:00:47 -0400
+Received: by mail-lj1-x242.google.com with SMTP id v4so8937833ljd.0
+ for <qemu-devel@nongnu.org>; Mon, 24 Aug 2020 03:00:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=BkCwcfBNM7BKOKl57gmWIMBqW7Axyc57b2XfxEBkcT0=;
+ b=siPh5TehtJdwwZWxZ0MkUjNuLJdkYO8qKCGrDJjVIP/ZTnuyE6VPS3P6ByQZsHnQ+z
+ Edqd1KIifkzPOJTlt5yH3xmjGoMwJn4HikLPrAHtlfVoNdAdJSMsAWlxNN9MrpzH0p7M
+ tw/yBRSRgLlheGv5DB8oI8su5U2rDWoqsmZQGhoP4yuM6oaBsLk7IIoohf6eaX/Nu2Vb
+ +XGLRaVgnoHJp/8fXWCekJQe8vmqF3eLFbKCWdYzsBsn80LdQEjuemRmUQVQdRd7PKsz
+ u1sdg59EuYORRApkrKUx4iLSARU45CS6YeCKoIoyTLrwcwD/LhE5tSt9gsdW3RWVt6QZ
+ p/qw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=LAl/MClU8bQ+8K7XrIqILgs8EvZ3f66imhAW3H8aksA=;
- b=HMftP6r/Mo2fgz+RNOqhxwke4mP2E6MKXBzkfJrs18kHq5+aCsT9ceJrVsj5hdC0cA
- RNWN4KGdFuyfMflptj/00Ri+dktKz0NezCQoZZaPuuxQiOx0o3MeAsjr4bmUwTxC0bSR
- FxOCte30oB+3/rLJw3HazVqgutlBH2lXJcIxXG+qlsj0VX83XzqIcNZ6TOWD5FCobKtW
- htJljbIAV26lziGe/sf+mf7mkNhqco8Lo5ycAVa+0WH/HcSATsZlKRfClJgHRoRn+o/u
- Nm5UWM3HTNdlTt7RPM99BPBiRER6/ntTnMFnNq7qmMP6MDuNV4yZLpiiuX8+5kkxr5wT
- 2/lA==
-X-Gm-Message-State: AOAM530x1j4spagHmzfb21mW/25aJXBDPU0wnRfvRnRVr1BWhvLxh8mD
- o30B9UxPNqerkjy1y3peWhVlymQPHnLe9K9x
-X-Google-Smtp-Source: ABdhPJwy8SxikkvuJvK+IAq9aY3jf7gUSf7cbQleJ+Y1nE4zOr4hKpjUenaX8WGb9cD8bAHG/VxThw==
-X-Received: by 2002:a5d:5352:: with SMTP id t18mr4919353wrv.407.1598262524259; 
- Mon, 24 Aug 2020 02:48:44 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id q6sm24877057wma.22.2020.08.24.02.48.43
- for <qemu-devel@nongnu.org>
+ bh=BkCwcfBNM7BKOKl57gmWIMBqW7Axyc57b2XfxEBkcT0=;
+ b=WVzuv7x3KrTwYjPnGGLw/PqTaaK63HrNDNpd8o9XTGpI4X+T2/aL+3NcgY6otWefwX
+ kMy4n4bWxEJxOqI/0fkhNnqJYjo3J2AmSdaf5WwiO5Aod+cNZgy8Hj8dkenXH/EnqjG/
+ c19yhQLogCm+TWIa4F63qx9UJb5yumoSop7iNXVDaX8HfudEDXN6pN1AmmtYANEIT9fR
+ 2HCQ6XvhmrYWz03dKQHqGy9PfkZwNvJPv8uMDE4tF1NmClRFNjT9pARzWYl/b3nEyIhl
+ tXWetcyHUivxjvgZub7jJc1hyjsbGoGErc5xW/5J5mrUqxrWrP3ccw8tY67g/sGjXXpP
+ VikA==
+X-Gm-Message-State: AOAM532qU9Tq3aH/HudmhOmxm6Rh6C81sNXeFhzmo8GaAie17Pvu4QvW
+ xgmKBcwchyygNDQqmt18W5RIMVv9aL0=
+X-Google-Smtp-Source: ABdhPJzVUPC6DazmOluXl4uGLfHkcAVslQcqB2WJtH2Xz4xw0g8DrF22MMkb0W5zzUdsOgIrrvkqVA==
+X-Received: by 2002:a05:651c:31b:: with SMTP id
+ a27mr2163418ljp.455.1598263243821; 
+ Mon, 24 Aug 2020 03:00:43 -0700 (PDT)
+Received: from gmail.com (81-231-232-130-no39.tbcn.telia.com. [81.231.232.130])
+ by smtp.gmail.com with ESMTPSA id l26sm2166500lfj.22.2020.08.24.03.00.43
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 24 Aug 2020 02:48:43 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
+ Mon, 24 Aug 2020 03:00:43 -0700 (PDT)
+From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 26/27] target/arm: Implement FPST_STD_F16 fpstatus
-Date: Mon, 24 Aug 2020 10:48:10 +0100
-Message-Id: <20200824094811.15439-27-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200824094811.15439-1-peter.maydell@linaro.org>
-References: <20200824094811.15439-1-peter.maydell@linaro.org>
+Subject: [PULL v1 1/8] target/microblaze: mbar: Transfer dc->rd to mbar_imm
+Date: Mon, 24 Aug 2020 12:00:34 +0200
+Message-Id: <20200824100041.1864420-2-edgar.iglesias@gmail.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200824100041.1864420-1-edgar.iglesias@gmail.com>
+References: <20200824100041.1864420-1-edgar.iglesias@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x444.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::242;
+ envelope-from=edgar.iglesias@gmail.com; helo=mail-lj1-x242.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: 16
+X-Spam_score: 1.6
+X-Spam_bar: +
+X-Spam_report: (1.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ FSL_HELO_FAKE=3.724, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,134 +101,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: edgar.iglesias@xilinx.com, peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Architecturally, Neon FP16 operations use the "standard FPSCR" like
-all other Neon operations.  However, this is defined in the Arm ARM
-pseudocode as "a fixed value, except that FZ16 (and AHP) follow the
-FPSCR bits". In QEMU, the softfloat float_status doesn't include
-separate flush-to-zero for FP16 operations, so we must keep separate
-fp_status for "Neon non-FP16" and "Neon fp16" operations, in the
-same way we do already for the non-Neon "fp_status" vs "fp_status_f16".
+From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-Add the extra float_status field to the CPU state structure,
-ensure it is correctly initialized and updated on FPSCR writes,
-and make fpstatus_ptr(FPST_STD_F16) return a pointer to it.
+Transfer dc->rd to mbar_imm to improve the readability when
+comparing to the specs.
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+No functional change.
+
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Message-id: 20200806104453.30393-4-peter.maydell@linaro.org
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 ---
- target/arm/cpu.h        | 9 ++++++++-
- target/arm/translate.h  | 3 ++-
- target/arm/cpu.c        | 3 +++
- target/arm/vfp_helper.c | 5 +++++
- 4 files changed, 18 insertions(+), 2 deletions(-)
+ target/microblaze/translate.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 9d2845c1797..ac857bdc2c1 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -609,6 +609,8 @@ typedef struct CPUARMState {
-          *  fp_status: is the "normal" fp status.
-          *  fp_status_fp16: used for half-precision calculations
-          *  standard_fp_status : the ARM "Standard FPSCR Value"
-+         *  standard_fp_status_fp16 : used for half-precision
-+         *       calculations with the ARM "Standard FPSCR Value"
-          *
-          * Half-precision operations are governed by a separate
-          * flush-to-zero control bit in FPSCR:FZ16. We pass a separate
-@@ -619,15 +621,20 @@ typedef struct CPUARMState {
-          * Neon) which the architecture defines as controlled by the
-          * standard FPSCR value rather than the FPSCR.
-          *
-+         * The "standard FPSCR but for fp16 ops" is needed because
-+         * the "standard FPSCR" tracks the FPSCR.FZ16 bit rather than
-+         * using a fixed value for it.
-+         *
-          * To avoid having to transfer exception bits around, we simply
-          * say that the FPSCR cumulative exception flags are the logical
--         * OR of the flags in the three fp statuses. This relies on the
-+         * OR of the flags in the four fp statuses. This relies on the
-          * only thing which needs to read the exception flags being
-          * an explicit FPSCR read.
-          */
-         float_status fp_status;
-         float_status fp_status_f16;
-         float_status standard_fp_status;
-+        float_status standard_fp_status_f16;
+diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
+index f6ff2591c3..47637f152b 100644
+--- a/target/microblaze/translate.c
++++ b/target/microblaze/translate.c
+@@ -1229,8 +1229,10 @@ static void dec_br(DisasContext *dc)
+     /* Memory barrier.  */
+     mbar = (dc->ir >> 16) & 31;
+     if (mbar == 2 && dc->imm == 4) {
++        uint16_t mbar_imm = dc->rd;
++
+         /* mbar IMM & 16 decodes to sleep.  */
+-        if (dc->rd & 16) {
++        if (mbar_imm & 16) {
+             TCGv_i32 tmp_hlt = tcg_const_i32(EXCP_HLT);
+             TCGv_i32 tmp_1 = tcg_const_i32(1);
  
-         /* ZCR_EL[1-3] */
-         uint64_t zcr_el[4];
-diff --git a/target/arm/translate.h b/target/arm/translate.h
-index e3680e65479..6d6d4c0f425 100644
---- a/target/arm/translate.h
-+++ b/target/arm/translate.h
-@@ -436,7 +436,8 @@ static inline TCGv_ptr fpstatus_ptr(ARMFPStatusFlavour flavour)
-         offset = offsetof(CPUARMState, vfp.standard_fp_status);
-         break;
-     case FPST_STD_F16:
--        /* Not yet used or implemented: fall through to assert */
-+        offset = offsetof(CPUARMState, vfp.standard_fp_status_f16);
-+        break;
-     default:
-         g_assert_not_reached();
-     }
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index 111579554fb..6b382fcd60e 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -391,12 +391,15 @@ static void arm_cpu_reset(DeviceState *dev)
-     set_flush_to_zero(1, &env->vfp.standard_fp_status);
-     set_flush_inputs_to_zero(1, &env->vfp.standard_fp_status);
-     set_default_nan_mode(1, &env->vfp.standard_fp_status);
-+    set_default_nan_mode(1, &env->vfp.standard_fp_status_f16);
-     set_float_detect_tininess(float_tininess_before_rounding,
-                               &env->vfp.fp_status);
-     set_float_detect_tininess(float_tininess_before_rounding,
-                               &env->vfp.standard_fp_status);
-     set_float_detect_tininess(float_tininess_before_rounding,
-                               &env->vfp.fp_status_f16);
-+    set_float_detect_tininess(float_tininess_before_rounding,
-+                              &env->vfp.standard_fp_status_f16);
- #ifndef CONFIG_USER_ONLY
-     if (kvm_enabled()) {
-         kvm_arm_reset_vcpu(cpu);
-diff --git a/target/arm/vfp_helper.c b/target/arm/vfp_helper.c
-index 60dcd4bf145..64266ece620 100644
---- a/target/arm/vfp_helper.c
-+++ b/target/arm/vfp_helper.c
-@@ -93,6 +93,8 @@ static uint32_t vfp_get_fpscr_from_host(CPUARMState *env)
-     /* FZ16 does not generate an input denormal exception.  */
-     i |= (get_float_exception_flags(&env->vfp.fp_status_f16)
-           & ~float_flag_input_denormal);
-+    i |= (get_float_exception_flags(&env->vfp.standard_fp_status_f16)
-+          & ~float_flag_input_denormal);
-     return vfp_exceptbits_from_host(i);
- }
- 
-@@ -124,7 +126,9 @@ static void vfp_set_fpscr_to_host(CPUARMState *env, uint32_t val)
-     if (changed & FPCR_FZ16) {
-         bool ftz_enabled = val & FPCR_FZ16;
-         set_flush_to_zero(ftz_enabled, &env->vfp.fp_status_f16);
-+        set_flush_to_zero(ftz_enabled, &env->vfp.standard_fp_status_f16);
-         set_flush_inputs_to_zero(ftz_enabled, &env->vfp.fp_status_f16);
-+        set_flush_inputs_to_zero(ftz_enabled, &env->vfp.standard_fp_status_f16);
-     }
-     if (changed & FPCR_FZ) {
-         bool ftz_enabled = val & FPCR_FZ;
-@@ -146,6 +150,7 @@ static void vfp_set_fpscr_to_host(CPUARMState *env, uint32_t val)
-     set_float_exception_flags(i, &env->vfp.fp_status);
-     set_float_exception_flags(0, &env->vfp.fp_status_f16);
-     set_float_exception_flags(0, &env->vfp.standard_fp_status);
-+    set_float_exception_flags(0, &env->vfp.standard_fp_status_f16);
- }
- 
- #else
+@@ -1246,7 +1248,7 @@ static void dec_br(DisasContext *dc)
+             tcg_temp_free_i32(tmp_1);
+             return;
+         }
+-        LOG_DIS("mbar %d\n", dc->rd);
++        LOG_DIS("mbar %d\n", mbar_imm);
+         /* Break the TB.  */
+         dc->cpustate_changed = 1;
+         return;
 -- 
-2.20.1
+2.25.1
 
 
