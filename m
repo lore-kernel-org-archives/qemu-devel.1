@@ -7,52 +7,52 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4BC6C433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 11:54:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD93BC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 11:54:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 38CE7206BE
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 11:54:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 877CB206BE
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 11:54:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=lse.epita.fr header.i=@lse.epita.fr header.b="YeItsgd2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38CE7206BE
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=lse.epita.fr header.i=@lse.epita.fr header.b="DHKOWM28"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 877CB206BE
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=lse.epita.fr
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55120 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57270 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAB3M-00049Z-HS
-	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 07:54:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51502)
+	id 1kAB3w-00050r-Ec
+	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 07:54:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51520)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <srs0=45nv=cc=lse.epita.fr=cesar.belley@cri.epita.fr>)
- id 1kAAyi-00032H-8t
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 07:49:32 -0400
-Received: from gate-2.cri.epita.net ([163.5.55.20]:54846
+ id 1kAAyj-00034L-Jf
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 07:49:33 -0400
+Received: from gate-2.cri.epita.net ([163.5.55.20]:54854
  helo=mail-2.srv.cri.epita.fr)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <srs0=45nv=cc=lse.epita.fr=cesar.belley@cri.epita.fr>)
- id 1kAAyg-0003dt-BR
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 07:49:31 -0400
+ id 1kAAyg-0003e1-Lk
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 07:49:32 -0400
 Received: from MattGorko-Laptop.home
  (lfbn-idf1-1-1395-83.w90-79.abo.wanadoo.fr [90.79.87.83])
  (Authenticated sender: cesar.belley)
- by mail-2.srv.cri.epita.fr (Postfix) with ESMTPSA id 1ABAA410E0;
+ by mail-2.srv.cri.epita.fr (Postfix) with ESMTPSA id 7185D412DD;
  Mon, 24 Aug 2020 13:49:19 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=lse.epita.fr; s=cri;
- t=1598269759; bh=WhUfeKytyuCUL59PtsGUkPGPstr2XF/LWbWzGaMaN3Y=;
+ t=1598269759; bh=oV+J1fqI2mcTVzHKlE6s1N2B0KJ3I3Q7UEclmD7xnak=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=YeItsgd22twBRUg/HkerPoW2IZYPNuc4HQ5DCvjNP9tEBBR04LNpjvm1J0ILns4hu
- J8BTCeSe6u/KF1LN2mMG02bZbcQjBnwEKwveBB11J/DRO0hLNg7XgJKTNu6YnaboKZ
- QqP5Oe/7EyM6X/wYcHsC+d2JtYrvKssTD7+PjCoo=
+ b=DHKOWM28qKcqN30RBm6HL+5B5YiUTMs+RJjyM3za1RjK+dseqTVtxJJgYhkf/2asl
+ jbBsCvNGWDqsKgevaYx1tua3kIQ0fP50Z0M//inOtt6RMp1Mg/Pqdib4TPCGrhdPgn
+ 9xWdXZtN2ZItZIb5AkC+mRcxBvDHXHBebPPMLv8w=
 From: =?UTF-8?q?C=C3=A9sar=20Belley?= <cesar.belley@lse.epita.fr>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 11/13] scripts: Add u2f-setup-gen script
-Date: Mon, 24 Aug 2020 13:48:25 +0200
-Message-Id: <20200824114827.81623-12-cesar.belley@lse.epita.fr>
+Subject: [PATCH v2 12/13] hw/usb: Add U2F device check to passthru mode
+Date: Mon, 24 Aug 2020 13:48:26 +0200
+Message-Id: <20200824114827.81623-13-cesar.belley@lse.epita.fr>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20200824114827.81623-1-cesar.belley@lse.epita.fr>
 References: <20200824114827.81623-1-cesar.belley@lse.epita.fr>
@@ -88,194 +88,83 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch adds the script used to generate setup directories, needed
-for the device u2f-emulated configuration in directory mode:
+This patchs adds a check to verify that the device passed through the
+hidraw property is a U2F device.
 
-    python u2f-setup-gen.py $DIR
-    qemu -usb -device u2f-emulated,dir=$DIR
+The check is done by ensuring that the first values of the report
+descriptor (USAGE PAGE and USAGE) correspond to those of a U2F device.
 
 Signed-off-by: César Belley <cesar.belley@lse.epita.fr>
 ---
- scripts/u2f-setup-gen.py | 170 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 170 insertions(+)
- create mode 100755 scripts/u2f-setup-gen.py
+ hw/usb/u2f-passthru.c | 41 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 41 insertions(+)
 
-diff --git a/scripts/u2f-setup-gen.py b/scripts/u2f-setup-gen.py
-new file mode 100755
-index 0000000000..2122598fed
---- /dev/null
-+++ b/scripts/u2f-setup-gen.py
-@@ -0,0 +1,170 @@
-+#!/usr/bin/env python3
-+#
-+# Libu2f-emu setup directory generator for USB U2F key emulation.
-+#
-+# Copyright (c) 2020 César Belley <cesar.belley@lse.epita.fr>
-+# Written by César Belley <cesar.belley@lse.epita.fr>
-+#
-+# This work is licensed under the terms of the GNU GPL, version 2
-+# or, at your option, any later version.  See the COPYING file in
-+# the top-level directory.
+diff --git a/hw/usb/u2f-passthru.c b/hw/usb/u2f-passthru.c
+index 106b5abf9e..f8771966c7 100644
+--- a/hw/usb/u2f-passthru.c
++++ b/hw/usb/u2f-passthru.c
+@@ -34,6 +34,12 @@
+ 
+ #include "u2f.h"
+ 
++#ifdef CONFIG_LIBUDEV
++#include <libudev.h>
++#endif
++#include <linux/hidraw.h>
++#include <sys/ioctl.h>
 +
-+import sys
-+import os
-+from random import randint
-+from typing import Tuple
+ #define NONCE_SIZE 8
+ #define BROADCAST_CID 0xFFFFFFFF
+ #define TRANSACTION_TIMEOUT 120000
+@@ -344,6 +350,34 @@ static void u2f_passthru_recv_from_guest(U2FKeyState *base,
+     }
+ }
+ 
++static bool u2f_passthru_is_u2f_device(int fd)
++{
++    int ret, rdesc_size;
++    struct hidraw_report_descriptor rdesc;
++    const uint8_t u2f_hid_report_desc_header[] = {
++        0x06, 0xd0, 0xf1, /* Usage Page (FIDO) */
++        0x09, 0x01,       /* Usage (FIDO) */
++    };
 +
-+from cryptography.hazmat.backends import default_backend
-+from cryptography.hazmat.primitives.asymmetric import ec
-+from cryptography.hazmat.primitives.serialization import Encoding, \
-+    NoEncryption, PrivateFormat, PublicFormat
-+from OpenSSL import crypto
++    /* Get report descriptor size */
++    ret = ioctl(fd, HIDIOCGRDESCSIZE, &rdesc_size);
++    if (ret < 0 || rdesc_size < sizeof(u2f_hid_report_desc_header)) {
++        return false;
++    }
 +
++    /* Get report descriptor */
++    memset(&rdesc, 0x0, sizeof(rdesc));
++    rdesc.size = rdesc_size;
++    ret = ioctl(fd, HIDIOCGRDESC, &rdesc);
++    if (ret < 0) {
++        return false;
++    }
 +
-+def write_setup_dir(dirpath: str, privkey_pem: bytes, cert_pem: bytes,
-+                    entropy: bytes, counter: int) -> None:
-+    """
-+    Write the setup directory.
++    /* Header bytes cover specific U2F rdesc values */
++    return memcmp(u2f_hid_report_desc_header, rdesc.value,
++                  sizeof(u2f_hid_report_desc_header)) == 0;
++}
 +
-+    Args:
-+        dirpath: The directory path.
-+        key_pem: The private key PEM.
-+        cert_pem: The certificate PEM.
-+        entropy: The 48 bytes of entropy.
-+        counter: The counter value.
-+    """
-+    # Directory
-+    os.mkdir(dirpath)
+ static void u2f_passthru_unrealize(U2FKeyState *base)
+ {
+     U2FPassthruState *key = PASSTHRU_U2F_KEY(base);
+@@ -368,6 +402,13 @@ static void u2f_passthru_realize(U2FKeyState *base, Error **errp)
+                    key->hidraw);
+         return;
+     }
 +
-+    # Private key
-+    with open(f'{dirpath}/private-key.pem', 'bw') as f:
-+        f.write(privkey_pem)
-+
-+    # Certificate
-+    with open(f'{dirpath}/certificate.pem', 'bw') as f:
-+        f.write(cert_pem)
-+
-+    # Entropy
-+    with open(f'{dirpath}/entropy', 'wb') as f:
-+        f.write(entropy)
-+
-+    # Counter
-+    with open(f'{dirpath}/counter', 'w') as f:
-+        f.write(f'{str(counter)}\n')
-+
-+
-+def generate_ec_key_pair() -> Tuple[str, str]:
-+    """
-+    Generate an ec key pair.
-+
-+    Returns:
-+        The private and public key PEM.
-+    """
-+    # Key generation
-+    privkey = ec.generate_private_key(ec.SECP256R1, default_backend())
-+    pubkey = privkey.public_key()
-+
-+    # PEM serialization
-+    privkey_pem = privkey.private_bytes(encoding=Encoding.PEM,
-+                                        format=PrivateFormat.TraditionalOpenSSL,
-+                                        encryption_algorithm=NoEncryption())
-+    pubkey_pem = pubkey.public_bytes(encoding=Encoding.PEM,
-+                                     format=PublicFormat.SubjectPublicKeyInfo)
-+    return privkey_pem, pubkey_pem
-+
-+
-+def generate_certificate(privkey_pem: str, pubkey_pem: str) -> str:
-+    """
-+    Generate a x509 certificate from a key pair.
-+
-+    Args:
-+        privkey_pem: The private key PEM.
-+        pubkey_pem: The public key PEM.
-+
-+    Returns:
-+        The certificate PEM.
-+    """
-+    # Convert key pair
-+    privkey = crypto.load_privatekey(crypto.FILETYPE_PEM, privkey_pem)
-+    pubkey = crypto.load_publickey(crypto.FILETYPE_PEM, pubkey_pem)
-+
-+    # New x509v3 certificate
-+    cert = crypto.X509()
-+    cert.set_version(0x2)
-+
-+    # Serial number
-+    cert.set_serial_number(randint(1, 2 ** 64))
-+
-+    # Before / After
-+    cert.gmtime_adj_notBefore(0)
-+    cert.gmtime_adj_notAfter(4 * (365 * 24 * 60 * 60))
-+
-+    # Public key
-+    cert.set_pubkey(pubkey)
-+
-+    # Subject name and issueer
-+    cert.get_subject().CN = "U2F emulated"
-+    cert.set_issuer(cert.get_subject())
-+
-+    # Extensions
-+    cert.add_extensions([
-+        crypto.X509Extension(b"subjectKeyIdentifier",
-+                             False, b"hash", subject=cert),
-+    ])
-+    cert.add_extensions([
-+        crypto.X509Extension(b"authorityKeyIdentifier",
-+                             False, b"keyid:always", issuer=cert),
-+    ])
-+    cert.add_extensions([
-+        crypto.X509Extension(b"basicConstraints", True, b"CA:TRUE")
-+    ])
-+
-+    # Signature
-+    cert.sign(privkey, 'sha256')
-+
-+    return crypto.dump_certificate(crypto.FILETYPE_PEM, cert)
-+
-+
-+def generate_setup_dir(dirpath: str) -> None:
-+    """
-+    Generates the setup directory.
-+
-+    Args:
-+        dirpath: The directory path.
-+    """
-+    # Key pair
-+    privkey_pem, pubkey_pem = generate_ec_key_pair()
-+
-+    # Certificate
-+    certificate_pem = generate_certificate(privkey_pem, pubkey_pem)
-+
-+    # Entropy
-+    entropy = os.urandom(48)
-+
-+    # Counter
-+    counter = 0
-+
-+    # Write
-+    write_setup_dir(dirpath, privkey_pem, certificate_pem, entropy, counter)
-+
-+
-+def main() -> None:
-+    """
-+    Main function
-+    """
-+    # Dir path
-+    if len(sys.argv) != 2:
-+        sys.stderr.write(f'Usage: {sys.argv[0]} <setup_dir>\n')
-+        exit(2)
-+    dirpath = sys.argv[1]
-+
-+    # Dir non existence
-+    if os.path.exists(dirpath):
-+        sys.stderr.write(f'Directory: {dirpath} already exists.\n')
-+        exit(1)
-+
-+    generate_setup_dir(dirpath)
-+
-+
-+if __name__ == '__main__':
-+    main()
++    if (!u2f_passthru_is_u2f_device(fd)) {
++        qemu_close(fd);
++        error_setg(errp, "%s: Passed hidraw does not represent "
++                   "a U2F HID device", TYPE_U2F_PASSTHRU);
++        return;
++    }
+     key->hidraw_fd = fd;
+     u2f_passthru_reset(key);
+ }
 -- 
 2.28.0
 
