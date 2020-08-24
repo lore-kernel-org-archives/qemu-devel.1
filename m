@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 284CBC433E4
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 08:42:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28523C433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 08:43:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E91D62075B
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 08:42:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E880621775
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 08:43:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="gAkG9F0m"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E91D62075B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="FLnSM8BQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E880621775
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39722 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45814 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kA83H-0003i0-50
-	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 04:42:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58772)
+	id 1kA84P-00069Q-4V
+	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 04:43:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58704)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dimastep@yandex-team.ru>)
- id 1kA822-0001yM-EJ; Mon, 24 Aug 2020 04:40:46 -0400
-Received: from forwardcorp1j.mail.yandex.net ([5.45.199.163]:47016)
+ id 1kA81u-0001gh-Ft; Mon, 24 Aug 2020 04:40:38 -0400
+Received: from forwardcorp1p.mail.yandex.net
+ ([2a02:6b8:0:1472:2741:0:8b6:217]:42042)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dimastep@yandex-team.ru>)
- id 1kA81z-0004xO-QM; Mon, 24 Aug 2020 04:40:46 -0400
+ id 1kA81s-0004ws-3A; Mon, 24 Aug 2020 04:40:38 -0400
 Received: from myt5-23f0be3aa648.qloud-c.yandex.net
  (myt5-23f0be3aa648.qloud-c.yandex.net
  [IPv6:2a02:6b8:c12:3e29:0:640:23f0:be3a])
- by forwardcorp1j.mail.yandex.net (Yandex) with ESMTP id 7E3282E1570;
- Mon, 24 Aug 2020 11:40:41 +0300 (MSK)
+ by forwardcorp1p.mail.yandex.net (Yandex) with ESMTP id 2037E2E15B8;
+ Mon, 24 Aug 2020 11:40:34 +0300 (MSK)
 Received: from myt4-18a966dbd9be.qloud-c.yandex.net
  (myt4-18a966dbd9be.qloud-c.yandex.net [2a02:6b8:c00:12ad:0:640:18a9:66db])
  by myt5-23f0be3aa648.qloud-c.yandex.net (mxbackcorp/Yandex) with ESMTP id
- ib5cfUIOd2-edvKr8VR; Mon, 24 Aug 2020 11:40:41 +0300
+ ot7BH4zlAu-eVviJKFm; Mon, 24 Aug 2020 11:40:34 +0300
 Precedence: bulk
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
  s=default; 
- t=1598258441; bh=0YiyaXGCteV6eAUx85YKD/nISwnScCEnn+mIKN9OdOg=;
+ t=1598258434; bh=gDOPq1RV3CLuGyPljyeYmAP4zg0EO7xHieFeyJevpn0=;
  h=In-Reply-To:In-Reply-To:Message-Id:References:References:Date:
  Subject:To:From:Cc;
- b=gAkG9F0mMYtx/M65u4erPOnj00hG07Ppskht6qy2OlJ5w+mqHuL5e+1IWvRp8o39P
- Ar0muTvkpvatFCop80rhCKKpXARfbjnxvz4ZoytDgCASX31M3dajJUEDIEb31Mh1IG
- IH07Zi5VUWHgkXSxfoU8fnbgJrt/utxrn3dHNF80=
+ b=FLnSM8BQtK1nBQxgN9cYQGDJKmDjJTA+5c70CaIgzkuwm7z6BJs3Sa7JVFuopKh9x
+ z0HmVM6S2NoaoxoL50bGKEYT/1dHokfKqLO/EaKEI0Rx8dL1XY+QxkF7ZTfui8Snfo
+ pbWUyaX7k2dq8/0kwUpAjdv8q15belE57hlBcllM=
 Authentication-Results: myt5-23f0be3aa648.qloud-c.yandex.net;
  dkim=pass header.i=@yandex-team.ru
 Received: from dynamic-vpn.dhcp.yndx.net (dynamic-vpn.dhcp.yndx.net
  [2a02:6b8:b080:6622::1:7])
  by myt4-18a966dbd9be.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id
- B7dErHoRhW-edl4uxhb; Mon, 24 Aug 2020 11:40:39 +0300
+ B7dErHoRhW-eVl4fjHC; Mon, 24 Aug 2020 11:40:31 +0300
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
  (Client certificate not present)
 From: Dima Stepanov <dimastep@yandex-team.ru>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 5/7] tests/qtest/vhost-user-test: add support for the
- vhost-user-blk device
-Date: Mon, 24 Aug 2020 11:39:30 +0300
-Message-Id: <c1b8f904f99b5d02eef4dff2792ae14eeefc364c.1598257838.git.dimastep@yandex-team.ru>
+Subject: [PATCH v2 3/7] tests/qtest/vhost-user-test: prepare the tests for
+ adding new dev class
+Date: Mon, 24 Aug 2020 11:39:28 +0300
+Message-Id: <73e50316d8ebb4c36d4f8e4deb09459cd5556743.1598257838.git.dimastep@yandex-team.ru>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <cover.1598257838.git.dimastep@yandex-team.ru>
 References: <cover.1598257838.git.dimastep@yandex-team.ru>
 In-Reply-To: <cover.1598257838.git.dimastep@yandex-team.ru>
 References: <cover.1598257838.git.dimastep@yandex-team.ru>
-Received-SPF: pass client-ip=5.45.199.163;
- envelope-from=dimastep@yandex-team.ru; helo=forwardcorp1j.mail.yandex.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/24 04:40:41
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
+Received-SPF: pass client-ip=2a02:6b8:0:1472:2741:0:8b6:217;
+ envelope-from=dimastep@yandex-team.ru; helo=forwardcorp1p.mail.yandex.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/24 04:40:17
+X-ACL-Warn: Detected OS   = ???
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_LOW=-0.7, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -99,294 +99,257 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add vhost_user_ops structure for the vhost-user-blk device class. Add
-the test_reconnect and test_migrate tests for this device.
+For now only vhost-user-net device is supported by the test. Other
+vhost-user devices are not tested. As a first step make source code
+refactoring so new devices can reuse the same test routines. To make
+this provide a new vhost_user_ops structure with the methods to
+initialize device, its command line or make a proper vhost-user
+responses.
 
 Signed-off-by: Dima Stepanov <dimastep@yandex-team.ru>
 ---
- tests/qtest/vhost-user-test.c | 140 +++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 138 insertions(+), 2 deletions(-)
+ tests/qtest/vhost-user-test.c | 105 ++++++++++++++++++++++++++++++------------
+ 1 file changed, 76 insertions(+), 29 deletions(-)
 
 diff --git a/tests/qtest/vhost-user-test.c b/tests/qtest/vhost-user-test.c
-index 3df5322..9b6e202 100644
+index 9ee0f1e..3df5322 100644
 --- a/tests/qtest/vhost-user-test.c
 +++ b/tests/qtest/vhost-user-test.c
-@@ -24,6 +24,7 @@
- #include "libqos/libqos.h"
- #include "libqos/pci-pc.h"
- #include "libqos/virtio-pci.h"
-+#include "libqos/virtio-blk.h"
- 
- #include "libqos/malloc-pc.h"
- #include "hw/virtio/virtio-net.h"
-@@ -31,6 +32,7 @@
- #include "standard-headers/linux/vhost_types.h"
- #include "standard-headers/linux/virtio_ids.h"
- #include "standard-headers/linux/virtio_net.h"
-+#include "standard-headers/linux/virtio_blk.h"
- 
- #ifdef CONFIG_LINUX
- #include <sys/vfs.h>
-@@ -43,6 +45,7 @@
-                         " -numa node,memdev=mem"
- #define QEMU_CMD_CHR    " -chardev socket,id=%s,path=%s%s"
- #define QEMU_CMD_NETDEV " -netdev vhost-user,id=hs0,chardev=%s,vhostforce"
-+#define QEMU_CMD_BLKCHR " -chardev socket,id=chdev0,path=%s%s"
- 
- #define HUGETLBFS_MAGIC       0x958458f6
- 
-@@ -55,6 +58,7 @@
- #define VHOST_USER_PROTOCOL_F_MQ 0
- #define VHOST_USER_PROTOCOL_F_LOG_SHMFD 1
- #define VHOST_USER_PROTOCOL_F_CROSS_ENDIAN   6
-+#define VHOST_USER_PROTOCOL_F_CONFIG 9
- 
- #define VHOST_LOG_PAGE 0x1000
- 
-@@ -78,6 +82,8 @@ typedef enum VhostUserRequest {
-     VHOST_USER_SET_PROTOCOL_FEATURES = 16,
-     VHOST_USER_GET_QUEUE_NUM = 17,
-     VHOST_USER_SET_VRING_ENABLE = 18,
-+    VHOST_USER_GET_CONFIG = 24,
-+    VHOST_USER_SET_CONFIG = 25,
-     VHOST_USER_MAX
- } VhostUserRequest;
- 
-@@ -99,6 +105,14 @@ typedef struct VhostUserLog {
-     uint64_t mmap_offset;
- } VhostUserLog;
- 
-+#define VHOST_USER_MAX_CONFIG_SIZE 256
-+typedef struct VhostUserConfig {
-+    uint32_t offset;
-+    uint32_t size;
-+    uint32_t flags;
-+    uint8_t region[VHOST_USER_MAX_CONFIG_SIZE];
-+} VhostUserConfig;
-+
- typedef struct VhostUserMsg {
-     VhostUserRequest request;
- 
-@@ -114,6 +128,7 @@ typedef struct VhostUserMsg {
-         struct vhost_vring_addr addr;
-         VhostUserMemory memory;
-         VhostUserLog log;
-+        VhostUserConfig config;
-     } payload;
- } QEMU_PACKED VhostUserMsg;
- 
-@@ -137,6 +152,7 @@ enum {
- 
- enum {
-     VHOST_USER_NET,
-+    VHOST_USER_BLK,
+@@ -135,6 +135,10 @@ enum {
+     TEST_FLAGS_END,
  };
  
++enum {
++    VHOST_USER_NET,
++};
++
  typedef struct TestServer {
-@@ -166,12 +182,15 @@ struct vhost_user_ops {
-     int type;
-     void (*append_opts)(TestServer *s, GString *cmd_line,
-             const char *chr_opts);
-+    void (*driver_init)(void *obj, QGuestAllocator *alloc);
+     gchar *socket_path;
+     gchar *mig_path;
+@@ -154,10 +158,25 @@ typedef struct TestServer {
+     bool test_fail;
+     int test_flags;
+     int queues;
++    struct vhost_user_ops *vu_ops;
+ } TestServer;
  
-     /* VHOST-USER commands. */
-     void (*set_features)(TestServer *s, CharBackend *chr,
-             VhostUserMsg *msg);
-     void (*get_protocol_features)(TestServer *s,
-             CharBackend *chr, VhostUserMsg *msg);
-+    void (*get_config)(TestServer *s, CharBackend *chr,
++struct vhost_user_ops {
++    /* Device types. */
++    int type;
++    void (*append_opts)(TestServer *s, GString *cmd_line,
++            const char *chr_opts);
++
++    /* VHOST-USER commands. */
++    void (*set_features)(TestServer *s, CharBackend *chr,
 +            VhostUserMsg *msg);
++    void (*get_protocol_features)(TestServer *s,
++            CharBackend *chr, VhostUserMsg *msg);
++};
++
+ static const char *init_hugepagefs(void);
+-static TestServer *test_server_new(const gchar *name);
++static TestServer *test_server_new(const gchar *name,
++        struct vhost_user_ops *ops);
+ static void test_server_free(TestServer *server);
+ static void test_server_listen(TestServer *server);
+ 
+@@ -167,7 +186,7 @@ enum test_memfd {
+     TEST_MEMFD_NO,
  };
  
- static const char *init_hugepagefs(void);
-@@ -194,6 +213,14 @@ static void append_vhost_net_opts(TestServer *s, GString *cmd_line,
-                            chr_opts, s->chr_name);
- }
- 
-+static void append_vhost_blk_opts(TestServer *s, GString *cmd_line,
-+                             const char *chr_opts)
-+{
-+    g_string_append_printf(cmd_line, QEMU_CMD_BLKCHR,
-+                           s->socket_path,
-+                           chr_opts);
-+}
-+
- static void append_mem_opts(TestServer *server, GString *cmd_line,
-                             int size, enum test_memfd memfd)
+-static void append_vhost_opts(TestServer *s, GString *cmd_line,
++static void append_vhost_net_opts(TestServer *s, GString *cmd_line,
+                              const char *chr_opts)
  {
-@@ -425,6 +452,12 @@ static void chr_read(void *opaque, const uint8_t *buf, int size)
-         qemu_chr_fe_write_all(chr, p, VHOST_USER_HDR_SIZE + msg.size);
+     g_string_append_printf(cmd_line, QEMU_CMD_CHR QEMU_CMD_NETDEV,
+@@ -332,25 +351,15 @@ static void chr_read(void *opaque, const uint8_t *buf, int size)
          break;
  
-+    case VHOST_USER_GET_CONFIG:
-+        if (s->vu_ops->get_config) {
-+            s->vu_ops->get_config(s, chr, &msg);
-+        }
-+        break;
-+
-     default:
+     case VHOST_USER_SET_FEATURES:
+-        g_assert_cmpint(msg.payload.u64 & (0x1ULL << VHOST_USER_F_PROTOCOL_FEATURES),
+-                        !=, 0ULL);
+-        if (s->test_flags == TEST_FLAGS_DISCONNECT) {
+-            qemu_chr_fe_disconnect(chr);
+-            s->test_flags = TEST_FLAGS_BAD;
++        if (s->vu_ops->set_features) {
++            s->vu_ops->set_features(s, chr, &msg);
+         }
          break;
-     }
-@@ -727,6 +760,9 @@ static void test_migrate(void *obj, void *arg, QGuestAllocator *alloc)
-     guint8 *log;
-     guint64 size;
  
-+    if (s->vu_ops->driver_init) {
-+        s->vu_ops->driver_init(obj, alloc);
-+    }
-     if (!wait_for_fds(s)) {
-         return;
-     }
-@@ -796,6 +832,24 @@ static void test_migrate(void *obj, void *arg, QGuestAllocator *alloc)
-     g_string_free(dest_cmdline, true);
+     case VHOST_USER_GET_PROTOCOL_FEATURES:
+-        /* send back features to qemu */
+-        msg.flags |= VHOST_USER_REPLY_MASK;
+-        msg.size = sizeof(m.payload.u64);
+-        msg.payload.u64 = 1 << VHOST_USER_PROTOCOL_F_LOG_SHMFD;
+-        msg.payload.u64 |= 1 << VHOST_USER_PROTOCOL_F_CROSS_ENDIAN;
+-        if (s->queues > 1) {
+-            msg.payload.u64 |= 1 << VHOST_USER_PROTOCOL_F_MQ;
++        if (s->vu_ops->get_protocol_features) {
++            s->vu_ops->get_protocol_features(s, chr, &msg);
+         }
+-        p = (uint8_t *) &msg;
+-        qemu_chr_fe_write_all(chr, p, VHOST_USER_HDR_SIZE + msg.size);
+         break;
+ 
+     case VHOST_USER_GET_VRING_BASE:
+@@ -467,7 +476,8 @@ static const char *init_hugepagefs(void)
+ #endif
  }
  
-+static void vu_blk_driver_init(void *obj, QGuestAllocator *alloc)
-+{
-+    QVirtioBlk *blk_if;
-+    QVirtioDevice *dev;
-+    QVirtQueue *vq;
-+    uint64_t features;
-+
-+    blk_if = obj;
-+    dev = blk_if->vdev;
-+    features = qvirtio_get_features(dev);
-+    qvirtio_set_features(dev, features);
-+
-+    vq = qvirtqueue_setup(dev, alloc, 0);
-+    g_assert(vq);
-+
-+    qvirtio_set_driver_ok(dev);
-+}
-+
- static void wait_for_rings_started(TestServer *s, size_t count)
+-static TestServer *test_server_new(const gchar *name)
++static TestServer *test_server_new(const gchar *name,
++        struct vhost_user_ops *ops)
  {
-     gint64 end_time;
-@@ -857,12 +911,22 @@ static void test_reconnect(void *obj, void *arg, QGuestAllocator *alloc)
- {
-     TestServer *s = arg;
-     GSource *src;
-+    int nq;
+     TestServer *server = g_new0(TestServer, 1);
+     char template[] = "/tmp/vhost-test-XXXXXX";
+@@ -495,6 +505,7 @@ static TestServer *test_server_new(const gchar *name)
  
-+    if (s->vu_ops->driver_init) {
-+        s->vu_ops->driver_init(obj, alloc);
-+    }
-     if (!wait_for_fds(s)) {
+     server->log_fd = -1;
+     server->queues = 1;
++    server->vu_ops = ops;
+ 
+     return server;
+ }
+@@ -669,11 +680,11 @@ static void vhost_user_test_cleanup(void *s)
+ 
+ static void *vhost_user_test_setup(GString *cmd_line, void *arg)
+ {
+-    TestServer *server = test_server_new("vhost-user-test");
++    TestServer *server = test_server_new("vhost-user-test", arg);
+     test_server_listen(server);
+ 
+     append_mem_opts(server, cmd_line, 256, TEST_MEMFD_AUTO);
+-    append_vhost_opts(server, cmd_line, "");
++    server->vu_ops->append_opts(server, cmd_line, "");
+ 
+     g_test_queue_destroy(vhost_user_test_cleanup, server);
+ 
+@@ -682,11 +693,11 @@ static void *vhost_user_test_setup(GString *cmd_line, void *arg)
+ 
+ static void *vhost_user_test_setup_memfd(GString *cmd_line, void *arg)
+ {
+-    TestServer *server = test_server_new("vhost-user-test");
++    TestServer *server = test_server_new("vhost-user-test", arg);
+     test_server_listen(server);
+ 
+     append_mem_opts(server, cmd_line, 256, TEST_MEMFD_YES);
+-    append_vhost_opts(server, cmd_line, "");
++    server->vu_ops->append_opts(server, cmd_line, "");
+ 
+     g_test_queue_destroy(vhost_user_test_cleanup, server);
+ 
+@@ -720,7 +731,7 @@ static void test_migrate(void *obj, void *arg, QGuestAllocator *alloc)
          return;
      }
  
--    wait_for_rings_started(s, 2);
-+    if (s->vu_ops->type == VHOST_USER_NET) {
-+        /* tx and rx queues */
-+        nq = 2;
-+    } else if (s->vu_ops->type == VHOST_USER_BLK) {
-+        nq = 1;
-+    }
-+    wait_for_rings_started(s, nq);
+-    dest = test_server_new("dest");
++    dest = test_server_new("dest", s->vu_ops);
+     dest_cmdline = g_string_new(qos_get_current_command_line());
+     uri = g_strdup_printf("%s%s", "unix:", dest->mig_path);
  
-     /* reconnect */
-     s->fds_num = 0;
-@@ -872,7 +936,7 @@ static void test_reconnect(void *obj, void *arg, QGuestAllocator *alloc)
-     g_source_attach(src, s->context);
-     g_source_unref(src);
-     g_assert(wait_for_fds(s));
--    wait_for_rings_started(s, 2);
-+    wait_for_rings_started(s, nq);
- }
+@@ -730,7 +741,7 @@ static void test_migrate(void *obj, void *arg, QGuestAllocator *alloc)
+     test_server_listen(dest);
+     g_string_append_printf(dest_cmdline, " -incoming %s", uri);
+     append_mem_opts(dest, dest_cmdline, 256, TEST_MEMFD_AUTO);
+-    append_vhost_opts(dest, dest_cmdline, "");
++    dest->vu_ops->append_opts(dest, dest_cmdline, "");
+     to = qtest_init(dest_cmdline->str);
+ 
+     /* This would be where you call qos_allocate_objects(to, NULL), if you want
+@@ -831,11 +842,11 @@ connect_thread(gpointer data)
+ 
+ static void *vhost_user_test_setup_reconnect(GString *cmd_line, void *arg)
+ {
+-    TestServer *s = test_server_new("reconnect");
++    TestServer *s = test_server_new("reconnect", arg);
+ 
+     g_thread_new("connect", connect_thread, s);
+     append_mem_opts(s, cmd_line, 256, TEST_MEMFD_AUTO);
+-    append_vhost_opts(s, cmd_line, ",server");
++    s->vu_ops->append_opts(s, cmd_line, ",server");
+ 
+     g_test_queue_destroy(vhost_user_test_cleanup, s);
+ 
+@@ -866,13 +877,13 @@ static void test_reconnect(void *obj, void *arg, QGuestAllocator *alloc)
  
  static void *vhost_user_test_setup_connect_fail(GString *cmd_line, void *arg)
-@@ -960,6 +1024,56 @@ static void vu_net_get_protocol_features(TestServer *s, CharBackend *chr,
-     qemu_chr_fe_write_all(chr, (uint8_t *)msg, VHOST_USER_HDR_SIZE + msg->size);
+ {
+-    TestServer *s = test_server_new("connect-fail");
++    TestServer *s = test_server_new("connect-fail", arg);
+ 
+     s->test_fail = true;
+ 
+     g_thread_new("connect", connect_thread, s);
+     append_mem_opts(s, cmd_line, 256, TEST_MEMFD_AUTO);
+-    append_vhost_opts(s, cmd_line, ",server");
++    s->vu_ops->append_opts(s, cmd_line, ",server");
+ 
+     g_test_queue_destroy(vhost_user_test_cleanup, s);
+ 
+@@ -881,13 +892,13 @@ static void *vhost_user_test_setup_connect_fail(GString *cmd_line, void *arg)
+ 
+ static void *vhost_user_test_setup_flags_mismatch(GString *cmd_line, void *arg)
+ {
+-    TestServer *s = test_server_new("flags-mismatch");
++    TestServer *s = test_server_new("flags-mismatch", arg);
+ 
+     s->test_flags = TEST_FLAGS_DISCONNECT;
+ 
+     g_thread_new("connect", connect_thread, s);
+     append_mem_opts(s, cmd_line, 256, TEST_MEMFD_AUTO);
+-    append_vhost_opts(s, cmd_line, ",server");
++    s->vu_ops->append_opts(s, cmd_line, ",server");
+ 
+     g_test_queue_destroy(vhost_user_test_cleanup, s);
+ 
+@@ -924,11 +935,47 @@ static void test_multiqueue(void *obj, void *arg, QGuestAllocator *alloc)
+     wait_for_rings_started(s, s->queues * 2);
  }
  
-+static void vu_blk_set_features(TestServer *s, CharBackend *chr,
++static void vu_net_set_features(TestServer *s, CharBackend *chr,
 +        VhostUserMsg *msg)
 +{
++    g_assert_cmpint(msg->payload.u64 &
++            (0x1ULL << VHOST_USER_F_PROTOCOL_FEATURES), !=, 0ULL);
 +    if (s->test_flags == TEST_FLAGS_DISCONNECT) {
 +        qemu_chr_fe_disconnect(chr);
 +        s->test_flags = TEST_FLAGS_BAD;
 +    }
 +}
 +
-+static void vu_blk_get_protocol_features(TestServer *s,
-+        CharBackend *chr, VhostUserMsg *msg)
++static void vu_net_get_protocol_features(TestServer *s, CharBackend *chr,
++        VhostUserMsg *msg)
 +{
 +    /* send back features to qemu */
 +    msg->flags |= VHOST_USER_REPLY_MASK;
 +    msg->size = sizeof(m.payload.u64);
 +    msg->payload.u64 = 1 << VHOST_USER_PROTOCOL_F_LOG_SHMFD;
-+    msg->payload.u64 |= 1 << VHOST_USER_PROTOCOL_F_CONFIG;
++    msg->payload.u64 |= 1 << VHOST_USER_PROTOCOL_F_CROSS_ENDIAN;
 +    if (s->queues > 1) {
 +        msg->payload.u64 |= 1 << VHOST_USER_PROTOCOL_F_MQ;
 +    }
 +    qemu_chr_fe_write_all(chr, (uint8_t *)msg, VHOST_USER_HDR_SIZE + msg->size);
 +}
 +
-+static void vu_blk_get_config(TestServer *s, CharBackend *chr,
-+        VhostUserMsg *msg)
-+{
-+    VhostUserConfig *config;
-+    struct virtio_blk_config *blk_config;
++/* Each VHOST-USER device should have its ops structure defined. */
++static struct vhost_user_ops g_vu_net_ops = {
++    .type = VHOST_USER_NET,
 +
-+    config = &msg->payload.config;
-+    memset(config, 0, sizeof(*config));
-+    config->size = sizeof(*blk_config);
++    .append_opts = append_vhost_net_opts,
 +
-+    blk_config = (struct virtio_blk_config *)&config->region;
-+    /*
-+     * Represent 128Mb test disk, with no real backend, just
-+     * to test vhost-user functionality.
-+     */
-+    blk_config->capacity = 262144;
-+    blk_config->size_max = 0x20000;
-+    blk_config->seg_max = 0x7e;
-+    blk_config->blk_size = 512;
-+    blk_config->min_io_size = 0x1;
-+    blk_config->num_queues = 0x1;
-+
-+    msg->size = sizeof(*config) - sizeof(config->region) + config->size;
-+    msg->flags |= VHOST_USER_REPLY_MASK;
-+    qemu_chr_fe_write_all(chr, (uint8_t *)msg, VHOST_USER_HDR_SIZE + msg->size);
-+}
-+
- /* Each VHOST-USER device should have its ops structure defined. */
- static struct vhost_user_ops g_vu_net_ops = {
-     .type = VHOST_USER_NET,
-@@ -970,6 +1084,17 @@ static struct vhost_user_ops g_vu_net_ops = {
-     .get_protocol_features = vu_net_get_protocol_features,
- };
- 
-+static struct vhost_user_ops g_vu_blk_ops = {
-+    .type = VHOST_USER_BLK,
-+
-+    .append_opts = append_vhost_blk_opts,
-+    .driver_init = vu_blk_driver_init,
-+
-+    .set_features = vu_blk_set_features,
-+    .get_protocol_features = vu_blk_get_protocol_features,
-+    .get_config = vu_blk_get_config,
++    .set_features = vu_net_set_features,
++    .get_protocol_features = vu_net_get_protocol_features,
 +};
 +
  static void register_vhost_user_test(void)
  {
      QOSGraphTestOptions opts = {
-@@ -1015,5 +1140,16 @@ static void register_vhost_user_test(void)
-     qos_add_test("vhost-user/multiqueue",
-                  "virtio-net",
-                  test_multiqueue, &opts);
-+    opts.edge.extra_device_opts = NULL;
-+
-+    /* vhost-user-blk tests */
-+    opts.arg = &g_vu_blk_ops;
-+    opts.before = vhost_user_test_setup_reconnect;
-+    qos_add_test("reconnect", "vhost-user-blk",
-+                 test_reconnect, &opts);
-+
-+    opts.before = vhost_user_test_setup_memfd;
-+    qos_add_test("migrate", "vhost-user-blk",
-+                 test_migrate, &opts);
- }
- libqos_init(register_vhost_user_test);
+         .before = vhost_user_test_setup,
+         .subprocess = true,
++        .arg = &g_vu_net_ops,
+     };
+ 
+     qemu_add_opts(&qemu_chardev_opts);
 -- 
 2.7.4
 
