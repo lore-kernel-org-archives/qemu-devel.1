@@ -2,85 +2,92 @@ Return-Path: <SRS0=JPH5=CC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1E89C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 14:46:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 498CBC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 14:46:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7DC99206B5
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 14:46:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 16741206B5
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 14:46:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lRexftFr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7DC99206B5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AUh8NeaQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16741206B5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60126 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60876 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kADkG-0006xx-L0
-	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 10:46:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45890)
+	id 1kADkP-0007Gr-7W
+	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 10:46:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44878)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1kADag-0003V1-9Z
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 10:36:54 -0400
-Received: from mail-yb1-xb41.google.com ([2607:f8b0:4864:20::b41]:36887)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1kADae-00040x-Fp
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 10:36:53 -0400
-Received: by mail-yb1-xb41.google.com with SMTP id e14so5282347ybf.4
- for <qemu-devel@nongnu.org>; Mon, 24 Aug 2020 07:36:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=mBpCtNCJOphd8OWWLOWNjBpI9AG+nfDHme3gqY3ytX0=;
- b=lRexftFr8PEel8o9eV98pEs9m6hXq92jiw4Ivd97HhgIwjjN7NpGJA/WyT5LR8z9ko
- ZaDaKNsram+KfQiJhqVPkZjAR2X0RmZBHuz/LYcsfMfKZpk2V91cI1+k4dfpxSAGJtyo
- /2KsWKkOTP7JlBfTL3xIFfMSVLCApZpqYx/+0IRY6gmNIrHfYjNqBA2/bgqlB439Vloq
- DiwiW0S1bqy4NUh6WOYpu1IgB0o7t7gz+02sObafpKEG3UamzpMrKwr+iYaNPtrN/JQV
- u5qaWDNt29HRdy9EY5itLiWIfn/grA+Jcr/bogK+m1Lc5+luKaaYzaScSPMDxFD+Qa1J
- m+tA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=mBpCtNCJOphd8OWWLOWNjBpI9AG+nfDHme3gqY3ytX0=;
- b=jTuP1dSUEgqBpIT+ydrMuI8iaxkbh4cIk0JDoF99Ijmy3QV77gOe+n6aPTDjfT9xzu
- l2qGGCnUhMNUXi6iaLVzhp1iuK+837i/LY8I4ZGPSULTZl5Ty+Nd6AKwTWp8uOTbPBpG
- taZH7GXGiqiPrwIHyo7sE/ByGyNG9edVaGKeSsAMAnIDVufx5xAyEQ8/VtPz621msm7J
- s8JLLbkCshfVDRNYjjfUDwIlrM/zh5lSNySnPngXSvZdSvcrzQHax4fIPf6JFP9t4/61
- jxklcGRlBFaaT7AAHfljuDyfCeA0fL5rCHE2cSTYFH3rFBFVw3QcCxS9qvp6OHQMpnF8
- eWAw==
-X-Gm-Message-State: AOAM531/Rczo7BTLYdcQoIXnjRN66UiqcMp5rCKJkSgnr/0R2BcPR7bc
- X9jrWSIXZJ+Kp4FxMEOkiIA/k2EScrGuF7dOIeo=
-X-Google-Smtp-Source: ABdhPJyjwQtqKNZtDiZXLM/031nSQrJOXjxkI5xy01vUvUO2bCXrLai1g1+5/Xn8cPeTtT6l5EjAJl3qCv6kaDVJYAs=
-X-Received: by 2002:a25:37ca:: with SMTP id e193mr8505438yba.387.1598279811002; 
- Mon, 24 Aug 2020 07:36:51 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kADXU-0006Ro-OO
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 10:33:36 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:53403)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kADXS-0003V1-0G
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 10:33:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1598279613;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=FlmQUhs2c6SvKBOxR3BiIdGHFakglNGy1Xso9J+a3a0=;
+ b=AUh8NeaQmDu5G5AG/NWfD7Pa3bifDup28o5M7HsdOGQuYAQcb6z3vMIouUzTjL90fIe7S/
+ JIn8Lnx78VDkEYr7hGMd8v8IYig0ErxboY0gavG5EvFVXrc+hZdwymEZFzWCu3JKNuruHL
+ d4a7MaGUE7FEnEbf6jL+cH3HX9q9YyQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-188-Pn46juQANJy691iZMNtwmA-1; Mon, 24 Aug 2020 10:33:30 -0400
+X-MC-Unique: Pn46juQANJy691iZMNtwmA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A20D110ABDA6;
+ Mon, 24 Aug 2020 14:33:29 +0000 (UTC)
+Received: from [10.3.112.126] (ovpn-112-126.phx2.redhat.com [10.3.112.126])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4EEC260BF1;
+ Mon, 24 Aug 2020 14:33:29 +0000 (UTC)
+Subject: Re: [PATCH RFC 01/10] qemu/: fix some comment spelling errors
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ zhaolichang <zhaolichang@huawei.com>
+References: <20200812101500.2066-1-zhaolichang@huawei.com>
+ <20200812101500.2066-2-zhaolichang@huawei.com> <87eeoc0x7i.fsf@linaro.org>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <750785b2-c912-489c-f0f0-ad9f2d5801a2@redhat.com>
+Date: Mon, 24 Aug 2020 09:33:28 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-References: <20200824074057.3673-1-kraxel@redhat.com>
-In-Reply-To: <20200824074057.3673-1-kraxel@redhat.com>
-From: Bin Meng <bmeng.cn@gmail.com>
-Date: Mon, 24 Aug 2020 22:36:37 +0800
-Message-ID: <CAEUhbmU+cZCVqupiCXmLc2V65O4h2TcNbhsrh5Mx6Y99DfPAUw@mail.gmail.com>
-Subject: Re: [PATCH] meson: drop keymaps symlink
-To: Gerd Hoffmann <kraxel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::b41;
- envelope-from=bmeng.cn@gmail.com; helo=mail-yb1-xb41.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <87eeoc0x7i.fsf@linaro.org>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eblake@redhat.com
+X-Mimecast-Spam-Score: 0.003
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=eblake@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/24 06:48:00
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -52
+X-Spam_score: -5.3
+X-Spam_bar: -----
+X-Spam_report: (-5.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.956,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-2.25, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,41 +100,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Aug 24, 2020 at 3:42 PM Gerd Hoffmann <kraxel@redhat.com> wrote:
->
-> We are building the keymaps by default now.  Drop the keymaps symlink
-> so the generated files are actually written to the build tree not the
-> source tree.
->
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  configure | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/configure b/configure
-> index 67832e3bab76..428fa33be140 100755
-> --- a/configure
-> +++ b/configure
-> @@ -8119,7 +8119,7 @@ DIRS="$DIRS roms/seabios"
->  LINKS="Makefile"
->  LINKS="$LINKS tests/tcg/lm32/Makefile"
->  LINKS="$LINKS tests/tcg/Makefile.target"
-> -LINKS="$LINKS pc-bios/optionrom/Makefile pc-bios/keymaps"
-> +LINKS="$LINKS pc-bios/optionrom/Makefile"
->  LINKS="$LINKS pc-bios/s390-ccw/Makefile"
->  LINKS="$LINKS roms/seabios/Makefile"
->  LINKS="$LINKS pc-bios/qemu-icon.bmp"
+On 8/12/20 9:12 AM, Alex Bennée wrote:
+> 
+> zhaolichang <zhaolichang@huawei.com> writes:
+> 
+>> I found that there are many spelling errors in the comments of qemu,
+>> so I used the spellcheck tool to check the spelling errors
+>> and finally found some spelling errors in the folder.
+>>
+>> Signed-off-by: zhaolichang <zhaolichang@huawei.com>
+>> ---
+> <snip>
+> 
+>> diff --git a/gdbstub.c b/gdbstub.c
+>> index f3a318c..bbe66b5 100644
+>> --- a/gdbstub.c
+>> +++ b/gdbstub.c
+>> @@ -698,7 +698,7 @@ static uint32_t gdb_get_cpu_pid(CPUState *cpu)
+>>   {
+>>       /* TODO: In user mode, we should use the task state PID */
+>>       if (cpu->cluster_index == UNASSIGNED_CLUSTER_INDEX) {
+>> -        /* Return the default process' PID */
+>> +        /* Return the default process's PID */
+> 
+> Hmm I thought this was correct usage as s's -> s' but apparently that is
+> only a given rule for possessive plural nouns (processes' PIDs) -
+> although apparently it is possible to have singular nouns in plural
+> forms so what do I know :-/
 
-This fixes the annoying pc-bios/keymaps/* file changes every time
-after a new build. Thanks!
+Yes, this is one case where s's is valid.  But if it bothers you, you 
+can always rewrite to:
 
-Tested-by: Bin Meng <bin.meng@windriver.com>
+/* Return the PID of the default process */
 
-Regards,
-Bin
+> 
+> Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+> 
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
 
