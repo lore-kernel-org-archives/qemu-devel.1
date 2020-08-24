@@ -2,123 +2,88 @@ Return-Path: <SRS0=JPH5=CC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8238BC433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 11:30:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F319DC433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 11:36:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 38DEF2074D
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 11:30:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BE2C420774
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 11:36:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="T/1sIdnG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38DEF2074D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E8YEjbb4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE2C420774
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42742 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48256 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAAge-0003Te-Fw
-	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 07:30:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46946)
+	id 1kAAmK-00063F-1f
+	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 07:36:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48660)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1kAAfy-0002zp-Qf; Mon, 24 Aug 2020 07:30:11 -0400
-Received: from mail-eopbgr80090.outbound.protection.outlook.com
- ([40.107.8.90]:52888 helo=EUR04-VI1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1kAAfu-000142-Kv; Mon, 24 Aug 2020 07:30:09 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=PW4edfJX3l8ONcKgCLUffZ5IqDr0o8A329B3WsRy7eJshcrq6QpiO2ErJLmfpjEKE1GYfOMVh5mr7OgqPqn0qGXPXpgOZZtOQDpeDIuHWC6o6W6BmBsYFodFhhegi2Dvchh+j7niqlGBWNNMPst+BrVQtIegkgnyDUXzkHDktbYzbYMUIzuEr5uXsvj6sqq7kXrr6wquXUiw41KW9OiOKGKHfuTQS8ZJ44Mg3+FyFdHCOhA8r62QJmS+XwNOyQRQlnHz2UoYrcy+otA0xQf3hPMZ0MvtgihmQ0fOwFlEwKvKS/vKbbTiEVQDOOZtWcKILFW4ymQ3RHWjT10X1rQE6g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4463lkOPspJItYKXl4UG51CN8DZKL60XfcF/rH4Rjoc=;
- b=csyRe/CtRhyX/kUNpqiMZIPn2A29LHZtKrFR2qWZssbL+xxdFcPbe70pi7zIdFTrGnzU1jF0+V0duB2+7QUxCFo9kBhCSrqXVz5fWkHdzD3YZuY50vGuoaVjrsx4a+qGM4NGabrS6VVUKrZdPyB32nGv1NJm87DRK/Mvsu00VLZRu2b1qULgKcSZjJIndoY/uL3I/w81D6nDi9fNPvUcu3diCJ0bF8LSJJ3EfrXSyNIPoFdGsU9GkKRWuvp2kdPUfObKL9B1vkr9BDw5thzd7PWq2GfJPM6taZg7m+IblS9sC3hx73ZR/aJkZPYWeEfiVcpX/k5S1oUR5hHxvC1Osw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4463lkOPspJItYKXl4UG51CN8DZKL60XfcF/rH4Rjoc=;
- b=T/1sIdnGzT4ooa/JPfF7Ek3ShRXwslAbPqEtniO6VPNL9W/ZPKCQXB4W1ESdKoGadmQagqFOXjrqrGwN9Taselj92h5/CZ06FbYqkLwfhUGrfi+nEZ0B63itvmti6k5apC2QWIWYZlyRgwegkchSosq4YzY1GNZhrlx08VSYRe0=
-Authentication-Results: openvz.org; dkim=none (message not signed)
- header.d=none;openvz.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM6PR08MB3447.eurprd08.prod.outlook.com (2603:10a6:20b:44::20)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3305.26; Mon, 24 Aug
- 2020 11:30:02 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::b179:9641:7589:d692]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::b179:9641:7589:d692%9]) with mapi id 15.20.3305.026; Mon, 24 Aug 2020
- 11:30:02 +0000
-Subject: Re: [PATCH v7 4/4] block: apply COR-filter to block-stream jobs
-To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-block@nongnu.org
-References: <1598257914-887267-1-git-send-email-andrey.shinkevich@virtuozzo.com>
- <1598257914-887267-5-git-send-email-andrey.shinkevich@virtuozzo.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <2eef369e-a79d-57c9-f8c8-40be9c3aaa2c@virtuozzo.com>
-Date: Mon, 24 Aug 2020 14:30:00 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
-In-Reply-To: <1598257914-887267-5-git-send-email-andrey.shinkevich@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: AM0PR08CA0001.eurprd08.prod.outlook.com
- (2603:10a6:208:d2::14) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1kAAlo-0005ed-Db
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 07:36:12 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:35167
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1kAAll-0001xv-Hs
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 07:36:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1598268968;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=5ppKCz11ZdzaXqgY/934fw1PDL2sl846SyceecSFN3Q=;
+ b=E8YEjbb4sXY6iHeFa6lq3U/QcCoL3OoYyofs5ZhkJT6l5XMS8llXhSDkArWQVVw7/agkH4
+ DRoC8QRVxfXl3uQHmiW2XAXMN7xAX0KuO7yVrZHt6R82s9/zJiT674o4F+CqNR6etxfwLE
+ +nwsM43oOXlSQW3CFht+Rw04Q8Z1CAw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-75-y9ZnCnjLO9GqVr2jlF8--Q-1; Mon, 24 Aug 2020 07:36:00 -0400
+X-MC-Unique: y9ZnCnjLO9GqVr2jlF8--Q-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 64D551008542;
+ Mon, 24 Aug 2020 11:35:59 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.114])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 18F1A5C1BB;
+ Mon, 24 Aug 2020 11:35:42 +0000 (UTC)
+Date: Mon, 24 Aug 2020 13:35:41 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Laszlo Ersek <lersek@redhat.com>
+Subject: Re: [RFC PATCH v2 0/4] Use ACPI PCI hot-plug for q35
+Message-ID: <20200824133541.0a5fe9a1@redhat.com>
+In-Reply-To: <2f874496-e9a2-d52f-2c6e-0595cc3ae9cb@redhat.com>
+References: <20200818215227.181654-1-jusual@redhat.com>
+ <20200821123007.3d390d51@redhat.com>
+ <2f874496-e9a2-d52f-2c6e-0595cc3ae9cb@redhat.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.5] (185.215.60.171) by
- AM0PR08CA0001.eurprd08.prod.outlook.com (2603:10a6:208:d2::14) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3305.24 via Frontend Transport; Mon, 24 Aug 2020 11:30:01 +0000
-X-Originating-IP: [185.215.60.171]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 5dca3dbe-9070-4ac2-6622-08d848210a53
-X-MS-TrafficTypeDiagnostic: AM6PR08MB3447:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM6PR08MB34470EDE1FBA08DD60119906C1560@AM6PR08MB3447.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:392;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: M7S+tHKe7HvjCn7G6pC041FPYad6iMwAfK50iaI81Jn8DySVoVLnyXVxBBG8afwWSN8ZOzlWaypAqU64zS13VB/VkwbZrVGmEfbOKRWS5fNpEvnja3VzHcHXwWgStCH6f7NPAMIjjpjnClLnnJ4jlXH6xwzs8Tzjg3XtLMrrY4FywmvUwsWS45p6CY7sQjFNKi/chGJ9b61DdoTsbUivM/fzF3vNbUyiOVQl3vDvK5d2MMbIoPuWftxOY0Maf9Kzk4xyhP3zel59eiStTg5XCRfiEUN1rYbf/szgqeTQAf5+OGArJrCxAnzCSxff6qvbMn1R8L2LVNUmthlageJBUc/h4PD+4wOxTAc2F0XrolDuspQRKJ+LfNSnvvnhUn5u
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(39840400004)(366004)(136003)(376002)(396003)(346002)(16576012)(86362001)(52116002)(31696002)(2616005)(16526019)(6486002)(186003)(26005)(31686004)(107886003)(956004)(316002)(8936002)(478600001)(2906002)(4326008)(5660300002)(83380400001)(66556008)(66476007)(66946007)(30864003)(8676002)(36756003)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: QPe0EnfKkEVgj9j6mpe1a0OOWGx8zWm/UPYs7rAZXzTFjgrF7VgvUu777M53BdGicHUVbtY4EGiEls22BOC/6IXdKmyGfsghRV8CWvO0/kBMxeCPr6dyOjmIPQf6NEpqwPWrwhEMCX8A95nmsMoMJaOdKB1kzFGdBAecdZ9NMM9itakWT8tbM2bhc9p8ozUg6sgkZBkKl39AjFEU6BK7pFFJ29YHnYkr/3ISBvXlHZWL2DfP5Cqeu8BhLgM1jzt8nRtgeGHoG3hB340nnLJZculauMza7qLwQ8BZJgKFtfx2vKpLo0eAWoURjFElDKBjf/IKBM1VAuddArOfMyEJGx4vniyDkvUaNCFiAbjQGb/rqCnkriI3jfvaUbcEMfrrceNIB0Xa2KKhcM5zZayDDsqAzVnKImQd52WekaZ+n1O9WRa+9pYyc3mrE2L4xi3gcd87cfiABARVos0llFdEbDw4Tog8TIJH4WoZCeFBqUWanKbosJwu3enJuWjPmp5dmhDccNShZSy8xctlhqGdKOKfByC1ElDfplv3dhjeYwPhvORpJtOQsbazo9XCI2+70xTFnhWy/9Fp7Tp9IJQ3rIeCApC5XriqNcjo8f5DHENSWwjTYqRP57JBv3L9bJD74t6xxCd+69t/14acET+B9A==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5dca3dbe-9070-4ac2-6622-08d848210a53
-X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Aug 2020 11:30:01.9951 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: rpMNWFgE+BVs96k2UP1xXNeQ3Fc54cJvsKHjvSYh8nXaTrZpPIbpx+Un9pTftLRO438+6u8YCnAKIM4uTUJVmvtr8JAR+0grzRyE4XDiPgc=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3447
-Received-SPF: pass client-ip=40.107.8.90;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR04-VI1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/24 07:30:03
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -43
-X-Spam_score: -4.4
-X-Spam_bar: ----
-X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, NICE_REPLY_A=-2.25, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=imammedo@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=imammedo@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/24 05:21:34
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.956,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -132,318 +97,203 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org, den@openvz.org,
- mreitz@redhat.com, jsnow@redhat.com
+Cc: "Daniel P. Berrange" <berrange@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Julia Suvorova <jusual@redhat.com>,
+ qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
+ Laine Stump <laine@redhat.com>, Ani Sinha <ani@anisinha.ca>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-24.08.2020 11:31, Andrey Shinkevich wrote:
-> This patch completes the series with the COR-filter insertion for
-> block-stream operations. Adding the filter makes it possible for copied
-> regions to be discarded in backing files during the block-stream job,
-> what will reduce the disk overuse.
-> The COR-filter insertion incurs changes in the iotests case
-> 245:test_block_stream_4 that reopens the backing chain during a
-> block-stream job. There are changes in the iotests #030 as well.
-> The iotests case 030:test_stream_parallel was deleted due to multiple
-> conflicts between the concurrent job operations over the same backing
-> chain. The base backing node for one job is the top node for another
-> job. It may change due to the filter node inserted into the backing
-> chain while both jobs are running. Another issue is that the parts of
-> the backing chain are being frozen by the running job and may not be
-> changed by the concurrent job when needed. The concept of the parallel
-> jobs with common nodes is considered vital no more.
+On Sat, 22 Aug 2020 16:25:55 +0200
+Laszlo Ersek <lersek@redhat.com> wrote:
+
+> +Marcel, Laine, Daniel
 > 
-> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-> ---
->   block/stream.c             | 58 +++++++++++++++++++++++++++++++++++-----------
->   tests/qemu-iotests/030     | 50 ++++-----------------------------------
->   tests/qemu-iotests/030.out |  4 ++--
->   tests/qemu-iotests/245     | 19 +++++++++++----
->   4 files changed, 65 insertions(+), 66 deletions(-)
+> On 08/21/20 12:30, Igor Mammedov wrote:
+> > On Tue, 18 Aug 2020 23:52:23 +0200
+> > Julia Suvorova <jusual@redhat.com> wrote:
+> >  
+> >> PCIe native hot-plug has numerous problems with racing events and
+> >> unpredictable guest behaviour (Windows).  
+> > Documenting these misterious problems I've asked for  in previous
+> > review hasn't been addressed.
+> > Pls see v1 for comments and add requested info into cover letter at
+> > least or in a commit message.  
 > 
-> diff --git a/block/stream.c b/block/stream.c
-> index 8bf6b6d..e927fed 100644
-> --- a/block/stream.c
-> +++ b/block/stream.c
-> @@ -19,6 +19,7 @@
->   #include "qapi/qmp/qerror.h"
->   #include "qemu/ratelimit.h"
->   #include "sysemu/block-backend.h"
-> +#include "block/copy-on-read.h"
->   
->   enum {
->       /*
-> @@ -33,6 +34,8 @@ typedef struct StreamBlockJob {
->       BlockJob common;
->       BlockDriverState *base_overlay; /* COW overlay (stream from this) */
->       BlockDriverState *above_base;   /* Node directly above the base */
-> +    BlockDriverState *cor_filter_bs;
-> +    BlockDriverState *target_bs;
->       BlockdevOnError on_error;
->       char *backing_file_str;
->       bool bs_read_only;
-> @@ -53,22 +56,20 @@ static void stream_abort(Job *job)
->       StreamBlockJob *s = container_of(job, StreamBlockJob, common.job);
->   
->       if (s->chain_frozen) {
-> -        BlockJob *bjob = &s->common;
-> -        bdrv_unfreeze_backing_chain(blk_bs(bjob->blk), s->above_base);
-> +        bdrv_unfreeze_backing_chain(s->cor_filter_bs, s->above_base);
->       }
->   }
->   
->   static int stream_prepare(Job *job)
->   {
->       StreamBlockJob *s = container_of(job, StreamBlockJob, common.job);
-> -    BlockJob *bjob = &s->common;
-> -    BlockDriverState *bs = blk_bs(bjob->blk);
-> +    BlockDriverState *bs = s->target_bs;
->       BlockDriverState *unfiltered_bs = bdrv_skip_filters(bs);
+> Igor, I assume you are referring to
+> 
+>   http://mid.mail-archive.com/20200715153321.3495e62d@redhat.com
+> 
+> and I couldn't agree more.
+> 
+> I'd like to understand the specific motivation for this patch series.
+> 
+> - I'm very concerned that it could regress various hotplug scenarios
+> with at least OVMF.
+> 
+> So minimally I'm hoping that the work is being meticulously tested with
+> OVMF.
+> 
+> - I don't recall testing native PCIe hot-*unplug*, but we had repeatedly
+> tested native PCIe plug with both Linux and Windows guests, and in the
+> end, it worked fine. (I recall working with at least Marcel on that; one
+> historical reference I can find now is
+> <https://bugzilla.tianocore.org/show_bug.cgi?id=75>.)
+> 
+> I remember users confirming that native PCIe hotplug worked with
+> assigned physical devices even (e.g. GPUs), assuming they made use of
+> the resource reservation capability (e.g. they'd reserve large MMIO64
+> areas during initial enumeration).
+> 
+> - I seem to remember that we had tested hotplug on extra root bridges
+> (PXB) too; regressing that -- per the pxb-pcie mention in the blurb,
+> quoted below -- wouldn't be great. At least, please don't flip the big
+> switch so soon (IIUC, there is a big switch being proposed).
 
-variable bs is used only here, we can directly use s->target_bs instead
+I'm suggesting to make ACPI hotplug on q35 opt-in,
+becasue it's only Windows guests that doesn't work well with unplug.
+Linux guests seems to be just fine with native hotplug.
 
->       BlockDriverState *base = bdrv_filter_or_cow_bs(s->above_base);
->       Error *local_err = NULL;
->       int ret = 0;
->   
-> -    bdrv_unfreeze_backing_chain(bs, s->above_base);
-> +    bdrv_unfreeze_backing_chain(s->cor_filter_bs, s->above_base);
->       s->chain_frozen = false;
->   
->       if (bdrv_cow_child(unfiltered_bs)) {
-> @@ -94,7 +95,9 @@ static void stream_clean(Job *job)
->   {
->       StreamBlockJob *s = container_of(job, StreamBlockJob, common.job);
->       BlockJob *bjob = &s->common;
-> -    BlockDriverState *bs = blk_bs(bjob->blk);
-> +    BlockDriverState *bs = s->target_bs;
+> - The documentation at "docs/pcie.txt" and "docs/pcie_pci_bridge.txt" is
+> chock-full of hotplug references; we had spent days if not weeks for
+> writing and reviewing those. I hope it's being evaluated how much of
+> that is going to need an update.
+> 
+> In particular, do we know how this work is going to affect the resource
+> reservation capability?
+My hunch is that should not be affected (but I will not bet on it).
+ACPI hotplug just changes route hotplug event is delivered, and unplug
+happens via ACPI as well. That works around drivers offlining/onlining
+devices in rapid succession during native unplug (that's quite crude
+justification).
 
-Here as well, I'd drop extra local bs variable
+So I'd like reasons to be well documented, including what ideas were
+tried to fix or workaround those issues (beside ACPI one), so the next
+time we look at it we don't have to start from ground up.
 
-> +
-> +    bdrv_cor_filter_drop(s->cor_filter_bs);
->   
->       /* Reopen the image back in read-only mode if necessary */
->       if (s->bs_read_only) {
-> @@ -110,7 +113,7 @@ static int coroutine_fn stream_run(Job *job, Error **errp)
->   {
->       StreamBlockJob *s = container_of(job, StreamBlockJob, common.job);
->       BlockBackend *blk = s->common.blk;
-> -    BlockDriverState *bs = blk_bs(blk);
-> +    BlockDriverState *bs = s->target_bs;
+ 
+> $ qemu-system-x86_64 -device pcie-root-port,\? | grep reserve
+>   bus-reserve=<uint32>   -  (default: 4294967295)
+>   io-reserve=<size>      -  (default: 18446744073709551615)
+>   mem-reserve=<size>     -  (default: 18446744073709551615)
+>   pref32-reserve=<size>  -  (default: 18446744073709551615)
+>   pref64-reserve=<size>  -  (default: 18446744073709551615)
+> 
+> The OVMF-side code (OvmfPkg/PciHotPlugInitDxe) was tough to write. As
+> far as I remember, especially commit fe4049471bdf
+> ("OvmfPkg/PciHotPlugInitDxe: translate QEMU's resource reservation
+> hints", 2017-10-03) had taken a lot of navel-gazing. So the best answer
+> I'm looking for here is "this series does not affect resource
+> reservation at all".
+> 
+> - If my message is suggesting that I'm alarmed: that's an
+> understatement. This stuff is a mine-field. A good example is Gerd's
+> (correct!) response "Oh no, please don't" to Igor's question in the v1
+> thread, as to whether the piix4 IO port range could be reused:
+> 
+>   http://mid.mail-archive.com/20200715065751.ogchtdqmnn7cxsyi@sirius.home.kraxel.org
+> 
+> That kind of "reuse" would have been a catastrophe, because for PCI IO
+> port aperture, OVMF uses [0xC000..0xFFFF] on i440fx, but
+> [0x6000..0xFFFF] on q35:
+> 
+>   commit bba734ab4c7c9b4386d39420983bf61484f65dda
+>   Author: Laszlo Ersek <lersek@redhat.com>
+>   Date:   Mon May 9 22:54:36 2016 +0200
+> 
+>       OvmfPkg/PlatformPei: provide 10 * 4KB of PCI IO Port space on Q35
+> 
+>       This can accommodate 10 bridges (including root bridges, PCIe upstream and
+>       downstream ports, etc -- see
+>       <https://bugzilla.redhat.com/show_bug.cgi?id=1333238#c12> for more
+>       details).
+> 
+>       10 is not a whole lot, but closer to the architectural limit of 15 than
+>       our current 4, so it can be considered a stop-gap solution until all
+>       guests manage to migrate to virtio-1.0, and no longer need PCI IO BARs
+>       behind PCIe downstream ports.
+> 
+>       Cc: Gabriel Somlo <somlo@cmu.edu>
+>       Cc: Jordan Justen <jordan.l.justen@intel.com>
+>       Ref: https://bugzilla.redhat.com/show_bug.cgi?id=1333238
+>       Contributed-under: TianoCore Contribution Agreement 1.0
+>       Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+>       Reviewed-by: Jordan Justen <jordan.l.justen@intel.com>
+>       Tested-by: Gabriel Somlo <somlo@cmu.edu>
+> 
+> - If native PCIe hot-unplug is not working well (or at all) right now,
+> then I guess I can't just summarily say "we had better drop this like
+> hot potato".
+> 
+> But then, if we are committed to *juggling* that potato, we should at
+> least document the use case / motivation / current issues meticulously,
+> please. Do we have a public BZ at least?
+> 
+> - The other work, with regard to *disabling* unplug, which seems to be
+> progressing in parallel, is similarly in need of a good explanation, in
+> my opinion:
+> 
+>   http://mid.mail-archive.com/20200820092157.17792-1-ani@anisinha.ca
+> 
+> Yes, I have read Laine's long email, linked from the QEMU cover letter:
+> 
+>   https://www.redhat.com/archives/libvir-list/2020-February/msg00110.html
+> 
+> The whole use case "prevent guest admins from unplugging virtual
+> devices" still doesn't make any sense to me. How is "some cloud admins
+> don't want that" acceptable at face value, without further explanation?
+My take on it that, Windows always exposes unplug icon, and lets VM users
+to unplug PCI devices. Notably, user is able to click away the only NIC
+VM was configured with.
 
-Now we have both bdrv_enable_copy_on_read(bs) and cor-filter, which doesn't seem correct. Also, we'll need "base" parameter for cor filter to not copy-on-read extra chunks.
+Unfortunatly the 'feature' can't be fixed on guest side, that's why
+hypervisors implement such hack to disable ACPI hotplug. Which I guess
+is backed by demand from users deploying Windows virtual desktops.
 
->       BlockDriverState *unfiltered_bs = bdrv_skip_filters(bs);
->       bool enable_cor = !bdrv_cow_child(s->base_overlay);
->       int64_t len;
-> @@ -231,6 +234,7 @@ void stream_start(const char *job_id, BlockDriverState *bs,
->       int basic_flags = BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE_UNCHANGED;
->       BlockDriverState *base_overlay = bdrv_find_overlay(bs, base);
->       BlockDriverState *above_base;
-> +    BlockDriverState *cor_filter_bs = NULL;
->   
->       if (!base_overlay) {
->           error_setg(errp, "'%s' is not in the backing chain of '%s'",
-> @@ -264,17 +268,36 @@ void stream_start(const char *job_id, BlockDriverState *bs,
->           }
->       }
->   
-> -    /* Prevent concurrent jobs trying to modify the graph structure here, we
-> -     * already have our own plans. Also don't allow resize as the image size is
-> -     * queried only at the job start and then cached. */
-> -    s = block_job_create(job_id, &stream_job_driver, NULL, bs,
-> -                         basic_flags | BLK_PERM_GRAPH_MOD,
-> -                         basic_flags | BLK_PERM_WRITE,
-> +    cor_filter_bs = bdrv_cor_filter_append(bs, filter_node_name, errp);
-> +    if (cor_filter_bs == NULL) {
-> +        goto fail;
-> +    }
-> +
-> +    if (bdrv_freeze_backing_chain(cor_filter_bs, bs, errp) < 0) {
-> +        bdrv_cor_filter_drop(cor_filter_bs);
-> +        cor_filter_bs = NULL;
-> +        goto fail;
-> +    }
-> +
-> +    s = block_job_create(job_id, &stream_job_driver, NULL, cor_filter_bs,
-> +                         BLK_PERM_CONSISTENT_READ,
-> +                         basic_flags | BLK_PERM_WRITE | BLK_PERM_GRAPH_MOD,
->                            speed, creation_flags, NULL, NULL, errp);
->       if (!s) {
->           goto fail;
->       }
->   
-> +    /*
-> +     * Prevent concurrent jobs trying to modify the graph structure here, we
-> +     * already have our own plans. Also don't allow resize as the image size is
-> +     * queried only at the job start and then cached.
-> +     */
-> +    if (block_job_add_bdrv(&s->common, "active node", bs,
-> +                           basic_flags | BLK_PERM_GRAPH_MOD,
-> +                           basic_flags | BLK_PERM_WRITE, &error_abort)) {
-> +        goto fail;
-> +    }
-> +
->       /* Block all intermediate nodes between bs and base, because they will
->        * disappear from the chain after this operation. The streaming job reads
->        * every block only once, assuming that it doesn't change, so forbid writes
-> @@ -294,6 +317,8 @@ void stream_start(const char *job_id, BlockDriverState *bs,
->   
->       s->base_overlay = base_overlay;
->       s->above_base = above_base;
-> +    s->cor_filter_bs = cor_filter_bs;
-> +    s->target_bs = bs;
->       s->backing_file_str = g_strdup(backing_file_str);
->       s->bs_read_only = bs_read_only;
->       s->chain_frozen = true;
-> @@ -307,5 +332,10 @@ fail:
->       if (bs_read_only) {
->           bdrv_reopen_set_read_only(bs, true, NULL);
->       }
-> -    bdrv_unfreeze_backing_chain(bs, above_base);
-> +    if (cor_filter_bs) {
-> +        bdrv_unfreeze_backing_chain(cor_filter_bs, above_base);
-> +        bdrv_cor_filter_drop(cor_filter_bs);
-> +    } else {
-> +        bdrv_unfreeze_backing_chain(bs, above_base);
+PS:
+I'd made PCI hotplug opt-in, since not everyone needs it.
+But that ship sailed long ago.
 
-as I see, in this case chain is not yet frozen
 
-> +    }
->   }
-> diff --git a/tests/qemu-iotests/030 b/tests/qemu-iotests/030
-> index 1cdd7e2..fec9d89 100755
-> --- a/tests/qemu-iotests/030
-> +++ b/tests/qemu-iotests/030
-> @@ -221,60 +221,20 @@ class TestParallelOps(iotests.QMPTestCase):
->           for img in self.imgs:
->               os.remove(img)
->   
-> -    # Test that it's possible to run several block-stream operations
-> -    # in parallel in the same snapshot chain
-> -    def test_stream_parallel(self):
-> -        self.assert_no_active_block_jobs()
-> -
-> -        # Check that the maps don't match before the streaming operations
-> -        for i in range(2, self.num_imgs, 2):
-> -            self.assertNotEqual(qemu_io('-f', iotests.imgfmt, '-rU', '-c', 'map', self.imgs[i]),
-> -                                qemu_io('-f', iotests.imgfmt, '-rU', '-c', 'map', self.imgs[i-1]),
-> -                                'image file map matches backing file before streaming')
-> -
-> -        # Create all streaming jobs
-> -        pending_jobs = []
-> -        for i in range(2, self.num_imgs, 2):
-> -            node_name = 'node%d' % i
-> -            job_id = 'stream-%s' % node_name
-> -            pending_jobs.append(job_id)
-> -            result = self.vm.qmp('block-stream', device=node_name, job_id=job_id, base=self.imgs[i-2], speed=512*1024)
-> -            self.assert_qmp(result, 'return', {})
-> -
-> -        for job in pending_jobs:
-> -            result = self.vm.qmp('block-job-set-speed', device=job, speed=0)
-> -            self.assert_qmp(result, 'return', {})
-> -
-> -        # Wait for all jobs to be finished.
-> -        while len(pending_jobs) > 0:
-> -            for event in self.vm.get_qmp_events(wait=True):
-> -                if event['event'] == 'BLOCK_JOB_COMPLETED':
-> -                    job_id = self.dictpath(event, 'data/device')
-> -                    self.assertTrue(job_id in pending_jobs)
-> -                    self.assert_qmp_absent(event, 'data/error')
-> -                    pending_jobs.remove(job_id)
-> -
-> -        self.assert_no_active_block_jobs()
-> -        self.vm.shutdown()
-> -
-> -        # Check that all maps match now
-> -        for i in range(2, self.num_imgs, 2):
-> -            self.assertEqual(qemu_io('-f', iotests.imgfmt, '-c', 'map', self.imgs[i]),
-> -                             qemu_io('-f', iotests.imgfmt, '-c', 'map', self.imgs[i-1]),
-> -                             'image file map does not match backing file after streaming')
-> -
->       # Test that it's not possible to perform two block-stream
->       # operations if there are nodes involved in both.
->       def test_overlapping_1(self):
->           self.assert_no_active_block_jobs()
->   
->           # Set a speed limit to make sure that this job blocks the rest
-> -        result = self.vm.qmp('block-stream', device='node4', job_id='stream-node4', base=self.imgs[1], speed=1024*1024)
-> +        result = self.vm.qmp('block-stream', device='node4',
-> +                             job_id='stream-node4', base=self.imgs[1],
-> +                             filter_node_name='stream-filter', speed=1024*1024)
->           self.assert_qmp(result, 'return', {})
->   
->           result = self.vm.qmp('block-stream', device='node5', job_id='stream-node5', base=self.imgs[2])
->           self.assert_qmp(result, 'error/desc',
-> -            "Node 'node4' is busy: block device is in use by block job: stream")
-> +            "Node 'stream-filter' is busy: block device is in use by block job: stream")
->   
->           result = self.vm.qmp('block-stream', device='node3', job_id='stream-node3', base=self.imgs[2])
->           self.assert_qmp(result, 'error/desc',
-> @@ -287,7 +247,7 @@ class TestParallelOps(iotests.QMPTestCase):
->           # block-commit should also fail if it touches nodes used by the stream job
->           result = self.vm.qmp('block-commit', device='drive0', base=self.imgs[4], job_id='commit-node4')
->           self.assert_qmp(result, 'error/desc',
-> -            "Node 'node4' is busy: block device is in use by block job: stream")
-> +            "Node 'stream-filter' is busy: block device is in use by block job: stream")
->   
->           result = self.vm.qmp('block-commit', device='drive0', base=self.imgs[1], top=self.imgs[3], job_id='commit-node1')
->           self.assert_qmp(result, 'error/desc',
-> diff --git a/tests/qemu-iotests/030.out b/tests/qemu-iotests/030.out
-> index 6d9bee1..5eb508d 100644
-> --- a/tests/qemu-iotests/030.out
-> +++ b/tests/qemu-iotests/030.out
-> @@ -1,5 +1,5 @@
-> -...........................
-> +..........................
->   ----------------------------------------------------------------------
-> -Ran 27 tests
-> +Ran 26 tests
->   
->   OK
-> diff --git a/tests/qemu-iotests/245 b/tests/qemu-iotests/245
-> index 5035763..6c262a0 100755
-> --- a/tests/qemu-iotests/245
-> +++ b/tests/qemu-iotests/245
-> @@ -898,17 +898,26 @@ class TestBlockdevReopen(iotests.QMPTestCase):
->           # make hd1 read-only and block-stream requires it to be read-write
->           # (Which error message appears depends on whether the stream job is
->           # already done with copying at this point.)
-> -        self.reopen(opts, {},
-> +        # As the COR-filter node is inserted into the backing chain with the
-> +        # 'block-stream' operation, we move the options to their proper nodes.
-> +        opts = hd_opts(1)
-> +        opts['backing'] = hd_opts(2)
-> +        opts['backing']['backing'] = None
-> +        self.reopen(opts, {'read-only': True},
->               ["Can't set node 'hd1' to r/o with copy-on-read enabled",
->                "Cannot make block node read-only, there is a writer on it"])
->   
->           # We can't remove hd2 while the stream job is ongoing
-> -        opts['backing']['backing'] = None
-> -        self.reopen(opts, {'backing.read-only': False}, "Cannot change 'backing' link from 'hd1' to 'hd2'")
-> +        opts['backing'] = None
-> +        self.reopen(opts, {'read-only': False},
-> +                    "Cannot change 'backing' link from 'hd1' to 'hd2'")
->   
-> -        # We can detach hd1 from hd0 because it doesn't affect the stream job
-> +        # We can't detach hd1 from hd0 because there is the COR-filter implicit
-> +        # node in between.
-> +        opts = hd_opts(0)
->           opts['backing'] = None
-> -        self.reopen(opts)
-> +        self.reopen(opts, {},
-> +                    "Cannot change backing link if 'hd0' has an implicit backing file")
->   
->           self.vm.run_job('stream0', auto_finalize = False, auto_dismiss = True)
->   
+
+> 
+> Thanks
+> Laszlo
+> 
+> >
+> >  
+> >> Switching to ACPI hot-plug for now.
+> >>
+> >> Tested on RHEL 8 and Windows 2019.
+> >> pxb-pcie is not yet supported.
+> >>
+> >> v2:
+> >>     * new ioport range for acpiphp [Gerd]
+> >>     * drop find_pci_host() [Igor]
+> >>     * explain magic numbers in _OSC [Igor]
+> >>     * drop build_q35_pci_hotplug() wrapper [Igor]
+> >>
+> >> Julia Suvorova (4):
+> >>   hw/acpi/ich9: Trace ich9_gpe_readb()/writeb()
+> >>   hw/i386/acpi-build: Add ACPI PCI hot-plug methods to q35
+> >>   hw/i386/acpi-build: Turn off support of PCIe native hot-plug and SHPC
+> >>     in _OSC
+> >>   hw/acpi/ich9: Enable ACPI PCI hot-plug
+> >>
+> >>  hw/i386/acpi-build.h    | 12 ++++++++++
+> >>  include/hw/acpi/ich9.h  |  3 +++
+> >>  include/hw/acpi/pcihp.h |  3 ++-
+> >>  hw/acpi/ich9.c          | 52 ++++++++++++++++++++++++++++++++++++++++-
+> >>  hw/acpi/pcihp.c         | 15 ++++++++----
+> >>  hw/acpi/piix4.c         |  2 +-
+> >>  hw/i386/acpi-build.c    | 48 +++++++++++++++++++++++--------------
+> >>  hw/i386/pc.c            |  1 +
+> >>  hw/acpi/trace-events    |  4 ++++
+> >>  9 files changed, 114 insertions(+), 26 deletions(-)
+> >>  
+> >
+> >  
 > 
 
-
--- 
-Best regards,
-Vladimir
 
