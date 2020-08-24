@@ -2,64 +2,71 @@ Return-Path: <SRS0=JPH5=CC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B1C3C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 11:46:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3076FC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 11:50:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 05476206BE
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 11:46:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 05476206BE
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=tls.msk.ru
+	by mail.kernel.org (Postfix) with ESMTPS id F0178206BE
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 11:50:10 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=lse.epita.fr header.i=@lse.epita.fr header.b="UjHpMBq3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0178206BE
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=lse.epita.fr
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54446 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33904 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAAw5-0000cs-1D
-	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 07:46:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49886)
+	id 1kAAzK-0003zC-7S
+	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 07:50:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51324)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mjt@tls.msk.ru>) id 1kAAsG-0007kw-PS
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 07:42:52 -0400
-Received: from isrv.corpit.ru ([86.62.121.231]:45755)
+ (Exim 4.90_1)
+ (envelope-from <srs0=45nv=cc=lse.epita.fr=cesar.belley@cri.epita.fr>)
+ id 1kAAyQ-0002U7-4H
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 07:49:15 -0400
+Received: from gate-2.cri.epita.net ([163.5.55.20]:54784
+ helo=mail-2.srv.cri.epita.fr)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mjt@tls.msk.ru>) id 1kAAsE-0002pp-Vp
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 07:42:52 -0400
-Received: from tsrv.corpit.ru (tsrv.tls.msk.ru [192.168.177.2])
- by isrv.corpit.ru (Postfix) with ESMTP id C636640450;
- Mon, 24 Aug 2020 14:42:39 +0300 (MSK)
-Received: from [192.168.177.99] (mjt.vpn.tls.msk.ru [192.168.177.99])
- by tsrv.corpit.ru (Postfix) with ESMTP id 094A993;
- Mon, 24 Aug 2020 14:42:41 +0300 (MSK)
-Subject: Re: [PATCH] ati-vga: Fix checks in ati_2d_blt() to avoid crash
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- BALATON Zoltan <balaton@eik.bme.hu>, qemu-devel@nongnu.org
-References: <20200406204029.19559747D5D@zero.eik.bme.hu>
- <2041026f-7a88-d8f7-8738-968e1394e8c6@redhat.com>
-From: Michael Tokarev <mjt@tls.msk.ru>
-Message-ID: <2def3847-58c7-af76-528b-c96d968eb410@msgid.tls.msk.ru>
-Date: Mon, 24 Aug 2020 14:42:39 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1)
+ (envelope-from <srs0=45nv=cc=lse.epita.fr=cesar.belley@cri.epita.fr>)
+ id 1kAAyN-0003bC-3o
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 07:49:13 -0400
+Received: from MattGorko-Laptop.home
+ (lfbn-idf1-1-1395-83.w90-79.abo.wanadoo.fr [90.79.87.83])
+ (Authenticated sender: cesar.belley)
+ by mail-2.srv.cri.epita.fr (Postfix) with ESMTPSA id A4CCB3FAC7;
+ Mon, 24 Aug 2020 13:49:02 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=lse.epita.fr; s=cri;
+ t=1598269742; bh=r701aNPAHNSWdnz4dXx7A6obnwYkRm7eCkDdBDW+vHw=;
+ h=From:To:Cc:Subject:Date:From;
+ b=UjHpMBq3eyBlV7lfWFnuCMbaVOhN229xHuHjOIjBZIWatvVsNZ7mioIhno7VLUZz7
+ gdgYCd3xYR7RG0NMIdZb36RDBCIm9S4bVHKFBjmqy72pvpBjUjxn1jNNxxe9z5YfHy
+ EbUAmOaRKNErO/YYbObMNMvH/nZd8/oJ5w3DDUhg=
+From: =?UTF-8?q?C=C3=A9sar=20Belley?= <cesar.belley@lse.epita.fr>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 00/13] Introduce USB U2F key device
+Date: Mon, 24 Aug 2020 13:48:14 +0200
+Message-Id: <20200824114827.81623-1-cesar.belley@lse.epita.fr>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
-In-Reply-To: <2041026f-7a88-d8f7-8738-968e1394e8c6@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: none client-ip=86.62.121.231; envelope-from=mjt@tls.msk.ru;
- helo=isrv.corpit.ru
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/24 07:42:40
+Received-SPF: pass client-ip=163.5.55.20;
+ envelope-from=srs0=45nv=cc=lse.epita.fr=cesar.belley@cri.epita.fr;
+ helo=mail-2.srv.cri.epita.fr
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/24 07:49:04
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -90
-X-Spam_score: -9.1
-X-Spam_bar: ---------
-X-Spam_report: (-9.1 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-2.25,
- RCVD_IN_DNSWL_HI=-5, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: -16
+X-Spam_score: -1.7
+X-Spam_bar: -
+X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_INVALID=0.1,
+ DKIM_SIGNED=0.1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -72,27 +79,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Mauro Matteo Cascella <mcascell@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Prasad J Pandit <pjp@redhat.com>
+Cc: =?UTF-8?q?C=C3=A9sar=20Belley?= <cesar.belley@lse.epita.fr>,
+ kraxel@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-22.08.2020 15:31, Philippe Mathieu-Daudé пишет:
-> On 4/6/20 10:34 PM, BALATON Zoltan wrote:
->> In some corner cases (that never happen during normal operation but a
->> malicious guest could program wrong values) pixman functions were
->> called with parameters that result in a crash. Fix this and add more
->> checks to disallow such cases.
-> 
-> (Fair) question on IRC. Is this patch fixing CVE-2020-24352?
+This patch series adds the U2F dedicated support to Qemu through a USB
+U2F key device that can operate in two modes: pass-through and emulated.
 
-Actually this is CVE-2020-11869. Almost of the same level as
-CVE-2020-24352, I think, especialy having in mind the experimental
-state of ati-vga.
+This work is also part of the GSoC program of this year and follows the
+proposal I made for the 'Virtual FIDO2/U2F security key' subject,
+suggested and mentored by Gerd Hoffmann.
 
-CVE-2020-24352 is still muddy.
+U2F is an open authentication standard. It enables relying parties
+exposed to the internet to offer a strong second factor option for end
+user authentication.
 
-/mjt
+The standard brings many advantages to both parties, client and server,
+allowing to reduce over-reliance on passwords, it increases
+authentication security and simplifies passwords.
+
+The second factor is materialized by a device implementing the U2F
+protocol. In case of a USB U2F security key, it is a USB HID device
+that implements the U2F protocol.
+
+The USB U2F key device given in this patch series allows to add guest
+U2F security keys via two possible modes: pass-through and emulated.
+
+The pass-through mode consists of passing all requests made from the
+guest to the physical security key connected to the host machine and
+vice versa. In addition, the dedicated pass-through allows to have a
+U2F security key shared on several guests which is not possible with
+a simple host device assignment pass-through.
+
+The emulated mode consists of completely emulating the behavior of an
+U2F device through software part. Libu2f-emu is used for that.
+
+Regards,
+César Belley
+
+History:
+
+v1 -> v2:
+- change build recipes to integrate meson build system
+
+César Belley (13):
+  hw/usb: Regroup USB HID protocol values
+  docs: Add USB U2F key device documentation
+  hw/usb: Add U2F key base class
+  hw/usb: Add U2F key base class implementation
+  hw/usb: Add U2F key passthru mode
+  hw/usb: Add U2F key emulated mode
+  hw/usb: Add U2F key build recipe
+  configure: Add USB U2F key device
+  docs/system: Add U2F key to the USB devices examples
+  docs/qdev-device-use.txt: Add USB U2F key to the QDEV devices examples
+  scripts: Add u2f-setup-gen script
+  hw/usb: Add U2F device check to passthru mode
+  hw/usb: Add U2F device autoscan to passthru mode
+
+ configure                |  26 ++
+ docs/qdev-device-use.txt |   1 +
+ docs/system/usb.rst      |   3 +
+ docs/u2f.txt             | 110 ++++++++
+ hw/usb/Kconfig           |   5 +
+ hw/usb/dev-hid.c         |  26 +-
+ hw/usb/dev-wacom.c       |  12 +-
+ hw/usb/meson.build       |   5 +
+ hw/usb/u2f-emulated.c    | 405 ++++++++++++++++++++++++++++
+ hw/usb/u2f-passthru.c    | 551 +++++++++++++++++++++++++++++++++++++++
+ hw/usb/u2f.c             | 352 +++++++++++++++++++++++++
+ hw/usb/u2f.h             |  92 +++++++
+ include/hw/usb/hid.h     |  17 ++
+ meson.build              |   6 +
+ scripts/u2f-setup-gen.py | 170 ++++++++++++
+ 15 files changed, 1753 insertions(+), 28 deletions(-)
+ create mode 100644 docs/u2f.txt
+ create mode 100644 hw/usb/u2f-emulated.c
+ create mode 100644 hw/usb/u2f-passthru.c
+ create mode 100644 hw/usb/u2f.c
+ create mode 100644 hw/usb/u2f.h
+ create mode 100644 include/hw/usb/hid.h
+ create mode 100755 scripts/u2f-setup-gen.py
+
+-- 
+2.28.0
+
 
