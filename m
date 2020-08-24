@@ -8,77 +8,78 @@ X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA706C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 10:03:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D950C433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 10:03:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 71D0A2071E
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 10:03:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 677032071E
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 10:03:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ANIBRops"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71D0A2071E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OaJXk2AB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 677032071E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43188 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43360 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kA9Jx-0000Q5-NO
-	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 06:03:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50122)
+	id 1kA9Jz-0000UN-NC
+	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 06:03:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50184)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
- id 1kA9HX-00047J-C6
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 06:00:51 -0400
-Received: from mail-lf1-x132.google.com ([2a00:1450:4864:20::132]:37434)
+ id 1kA9Hb-0004Ex-2l
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 06:00:55 -0400
+Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:38870)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
- id 1kA9HV-0006V6-NY
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 06:00:51 -0400
-Received: by mail-lf1-x132.google.com with SMTP id s9so4155704lfs.4
+ id 1kA9HV-0006V7-Mt
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 06:00:54 -0400
+Received: by mail-lj1-x244.google.com with SMTP id m22so8911653ljj.5
  for <qemu-devel@nongnu.org>; Mon, 24 Aug 2020 03:00:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=tOsYxxOVVUOXw/haaoRA8JuTUt7/rqYWB9o2RGYk5jg=;
- b=ANIBRops0jltDXrngIS0dY3S8GecFcmd5+bmZzcTP5eWRfs3crxqQ2aEa1Ombu3IM9
- UkRHgegzgC6VF3buMokQSLaNgsxYQfp3OT2IvSUpNTIRLm6Y+nZMtoM5mo8gDdNQ+A3I
- TwnSYC1c166W344Z468aWj5E29EnhCeerQ0CC2FsX+oTtSTfkNi+1VpQd+KfDB7WNCbU
- r1u2mn32hjSesUDQi5ksAiiORx7t84nC4t5gRd/SY/yoDmAeoHwzt9ePiCIm0PP2KpGd
- EGlOfEmmnKHL97pEIyOyAnZL2a1C3JvBjZ1RddADMN9F/GXYTRaua8L/ZNubqia/bIrM
- 9IUw==
+ bh=t3L8Z1SmwEHzDQ0NMcpyNGKg+ERouypWp63Pju5T3RM=;
+ b=OaJXk2ABkNrW6C4cUnqZXT0Xti2ZPCQPAqouRQAmtbFOStRqwlpmmU1M7vvj14U68c
+ PxAOsPtHtuoZQEfqShfeK75dGLxuNn1l8l8P8fACnxUVKqFkAnZfdipFcAiC0Zegub6t
+ msxFKGbrAYU9MGobwYZx9Ak2x1Zo6pbz5MlfN37aNCBYvrhMX32yT25GJX7UsjEHcO6K
+ EQPi9eeF5AZ9yUE9CedLfDoiXpTO10jDpKYIeHWn7aV22ealo0ooE8XHcvtBN+beQMnd
+ RBFZ7wm6RwxTc327GqbuXBeQ84M01r0//lTih24Qe62dhegJEW3xWQNAs4ds+kwzrp8O
+ GNog==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=tOsYxxOVVUOXw/haaoRA8JuTUt7/rqYWB9o2RGYk5jg=;
- b=sW6mETLNUFhCqPg8d7B/g1QdEmZyB8z9g7mpvUNAV6z7JY5U3EE1xvuBXWIVyvxyUz
- yFSMbUrCOMD4DyX1Hm0IJaDKwjNqU+lQKJhmZUcRMKrGg8QUnp8YtQCqxXWErTrIFS02
- iFnxff55eIBxL4T1hm14DVPSbMU7aMPljW8YfsILwRuiY/1/q/+HleZkveb+7rdFqHeG
- 99QAJlOiVv96m183vEBx0kF+HTLJhG5O8xdVP9u3i8n3Wmfl0k+u4k/I2ZbY2K4dqIVt
- StB8hLYH03Hzb1p2+DBKLu9Uu1mONdFQvawJMCL0oqL7spmpBridKDvxMKzBnZuU3cJc
- ED3Q==
-X-Gm-Message-State: AOAM530WPwfhbOiy4NYW4r/bFW733UvfuvrYakbLQGC4xH+kZ9mZCiOH
- K5omz9CDTWUmkyi9WwyDJv+BPXnZo3g=
-X-Google-Smtp-Source: ABdhPJyBds09UlW/kAkp/Bj84+y6X8CzaZ09zYqx2ZODbdzB4PueHV9wi98xRl3TR+faa/X1PxRulQ==
-X-Received: by 2002:ac2:55b4:: with SMTP id y20mr335362lfg.103.1598263247403; 
- Mon, 24 Aug 2020 03:00:47 -0700 (PDT)
-Received: from gmail.com (81-231-232-130-no39.tbcn.telia.com. [81.231.232.130])
- by smtp.gmail.com with ESMTPSA id f3sm2107511ljo.81.2020.08.24.03.00.46
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ bh=t3L8Z1SmwEHzDQ0NMcpyNGKg+ERouypWp63Pju5T3RM=;
+ b=NFVhRGyn58y2eOBUGc/O45XIMkrGMlGCtpWcnv9qidhoIV0HemrApL+xbzd1NTMfGh
+ W17WPT23j2ANc03x0yL4E4QUWYFAI6C3NFZQO4WSbL9vS7y4GgVg56kOhb1S8AlSfiyW
+ e+43Vs0y8orKOjVNHK4Y1avWD+3ZzglEXP0YxzbfsLp7VJ6UYAoCHlR3NcOdtD3RRngH
+ J0qFuqcj2lAeVTGGW09v2vMobkC+jQyb+T3z0EgJsq0l3vNgN93FmghHjl4f0cwh3Xav
+ 7T1Pet+p9nFC0JX89NRnu6qboL+WNrJFdBCKjOVqngbH3hjIv7N0VS16Vd7dtE8Y5YOt
+ wh8g==
+X-Gm-Message-State: AOAM53245ExW3YU+hOpMASPw6zKIU83ek3rSZfvS2k9zEJUU0jZgPQZt
+ h85Ik53XKW2fl3EOHnzlZtq67nWJGYM=
+X-Google-Smtp-Source: ABdhPJzHgYsSqpDSAOZqrJuW6MujRYaMEswvlMgkx94rnJwpmT1T0a8vA44i/MyLBKeusPnE064QeA==
+X-Received: by 2002:a2e:2f16:: with SMTP id v22mr2256890ljv.39.1598263246241; 
  Mon, 24 Aug 2020 03:00:46 -0700 (PDT)
+Received: from gmail.com (81-231-232-130-no39.tbcn.telia.com. [81.231.232.130])
+ by smtp.gmail.com with ESMTPSA id j4sm2075000ljc.116.2020.08.24.03.00.45
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 24 Aug 2020 03:00:45 -0700 (PDT)
 From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v1 4/8] target/microblaze: swx: Use atomic_cmpxchg
-Date: Mon, 24 Aug 2020 12:00:37 +0200
-Message-Id: <20200824100041.1864420-5-edgar.iglesias@gmail.com>
+Subject: [PULL v1 3/8] target/microblaze: mbar: Add support for data-access
+ barriers
+Date: Mon, 24 Aug 2020 12:00:36 +0200
+Message-Id: <20200824100041.1864420-4-edgar.iglesias@gmail.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200824100041.1864420-1-edgar.iglesias@gmail.com>
 References: <20200824100041.1864420-1-edgar.iglesias@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::132;
- envelope-from=edgar.iglesias@gmail.com; helo=mail-lf1-x132.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::244;
+ envelope-from=edgar.iglesias@gmail.com; helo=mail-lj1-x244.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 16
@@ -107,55 +108,31 @@ Sender: "Qemu-devel"
 
 From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-Use atomic_cmpxchg to implement the atomic cmpxchg sequence.
+Add support for data-access barriers.
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 ---
- target/microblaze/translate.c | 21 +++++++++++++--------
- 1 file changed, 13 insertions(+), 8 deletions(-)
+ target/microblaze/translate.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
 diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
-index c58f334a0f..530c15e5ad 100644
+index c1be76d4c8..c58f334a0f 100644
 --- a/target/microblaze/translate.c
 +++ b/target/microblaze/translate.c
-@@ -1075,14 +1075,16 @@ static void dec_store(DisasContext *dc)
-         swx_skip = gen_new_label();
-         tcg_gen_brcond_tl(TCG_COND_NE, env_res_addr, addr, swx_skip);
+@@ -1233,6 +1233,11 @@ static void dec_br(DisasContext *dc)
  
--        /* Compare the value loaded at lwx with current contents of
--           the reserved location.
--           FIXME: This only works for system emulation where we can expect
--           this compare and the following write to be atomic. For user
--           emulation we need to add atomicity between threads.  */
-+        /*
-+         * Compare the value loaded at lwx with current contents of
-+         * the reserved location.
-+         */
-         tval = tcg_temp_new_i32();
--        tcg_gen_qemu_ld_i32(tval, addr, cpu_mmu_index(&dc->cpu->env, false),
--                            MO_TEUL);
-+
-+        tcg_gen_atomic_cmpxchg_i32(tval, addr, env_res_val,
-+                                   cpu_R[dc->rd], mem_index,
-+                                   mop);
-+
-         tcg_gen_brcond_i32(TCG_COND_NE, env_res_val, tval, swx_skip);
-         write_carryi(dc, 0);
-         tcg_temp_free_i32(tval);
-@@ -1108,7 +1110,10 @@ static void dec_store(DisasContext *dc)
-                 break;
-         }
-     }
--    tcg_gen_qemu_st_i32(cpu_R[dc->rd], addr, mem_index, mop);
-+
-+    if (!ex) {
-+        tcg_gen_qemu_st_i32(cpu_R[dc->rd], addr, mem_index, mop);
-+    }
+         LOG_DIS("mbar %d\n", mbar_imm);
  
-     /* Verify alignment if needed.  */
-     if (dc->cpu->cfg.unaligned_exceptions && size > 1) {
++        /* Data access memory barrier.  */
++        if ((mbar_imm & 2) == 0) {
++            tcg_gen_mb(TCG_BAR_SC | TCG_MO_ALL);
++        }
++
+         /* mbar IMM & 16 decodes to sleep.  */
+         if (mbar_imm & 16) {
+             TCGv_i32 tmp_hlt = tcg_const_i32(EXCP_HLT);
 -- 
 2.25.1
 
