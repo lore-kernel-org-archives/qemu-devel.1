@@ -2,88 +2,85 @@ Return-Path: <SRS0=JPH5=CC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FCFFC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 22:11:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76099C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 22:31:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D8CFE20706
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 22:11:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 38DAA20656
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 22:31:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eDAqXFJw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8CFE20706
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yv2DfLaR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38DAA20656
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32902 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40432 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAKgH-0000DG-2a
-	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 18:11:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48754)
+	id 1kAL01-0004sV-Fg
+	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 18:31:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55416)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kAKW0-00072t-BG
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 18:00:36 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:50596
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kAKVt-0008Q8-N3
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 18:00:31 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598306423;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=1U+dClw/h0ApCnAUxAlsTHny3irD95tCjrN2Z9jbHL8=;
- b=eDAqXFJwtelPm1wOnsNxBVlsjtf8cPaL4TNbt/nM3gCuy599pmgpHW0PZ8sKIg3bTn7PCT
- KU3NNraVo9HoCibfKDwXpMXV16GNVNpadSzGzbh1r1rskfJRdRk0VrUBaVCSje6B1RK2BB
- jeMLUlI5ukbVU5P0rZLqGGJPPMTLANs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-193-X30bcuwkOaGSbtQ6eB2S-g-1; Mon, 24 Aug 2020 18:00:19 -0400
-X-MC-Unique: X30bcuwkOaGSbtQ6eB2S-g-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D1F8B1DDFE;
- Mon, 24 Aug 2020 22:00:17 +0000 (UTC)
-Received: from localhost (unknown [10.10.67.254])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8CFA319D6C;
- Mon, 24 Aug 2020 22:00:17 +0000 (UTC)
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 5/6] vhost-user-vga: Use typedef name for instance_size
-Date: Mon, 24 Aug 2020 17:59:35 -0400
-Message-Id: <20200824215936.2961951-6-ehabkost@redhat.com>
-In-Reply-To: <20200824215936.2961951-1-ehabkost@redhat.com>
-References: <20200824215936.2961951-1-ehabkost@redhat.com>
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1kAKz1-00040u-41; Mon, 24 Aug 2020 18:30:31 -0400
+Received: from mail-io1-xd42.google.com ([2607:f8b0:4864:20::d42]:37180)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1kAKyy-0003Nn-QS; Mon, 24 Aug 2020 18:30:30 -0400
+Received: by mail-io1-xd42.google.com with SMTP id b16so10477289ioj.4;
+ Mon, 24 Aug 2020 15:30:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=4CyWbdP5iO0Wlh/bmeZ88cYoBglVSBZngM56nSVAFT4=;
+ b=Yv2DfLaRxByJMSxlfTa+iFjN3nPSK14itcTGJdMN97P18LkRWlF2jd8BpimgAvJqOH
+ H6MnNFiFLfbRbqBoF5wTICxFQLb8PXCSfuiGrfS7zC+Jicjcuj/uKt9hsdIO0XUZLiN+
+ KZfQ8oPM0kDBzxd5/2tOwNYH+GtAsGhpcsRoJy8KfKsMDWMbWudKKLnNxQ3xLRBgLwQY
+ HlOBFXBd7J5wEFgM6ZeJHM/cQ2+o8lnhrvTUdI/0ZgGLdVd+LuuTCyKVcYAQ9urWCauE
+ OqLFcY/bIcWPj3NI8gN8kEIPfSs+Wm7IEN5w+8yEGAHbeQvFA604EDSw1ChMZGMiwusU
+ kg0w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=4CyWbdP5iO0Wlh/bmeZ88cYoBglVSBZngM56nSVAFT4=;
+ b=aIbDFTntjkB0TaWzb9Xff33kjtvf/pQSFoo1x43HWiE1/tRwclFUN2sBI0ZW/EfObw
+ MkiLY4A7K8u6sz2nf3ozIsRhp8giHrcAQQS1lkztsj/1Ogfvhiq7x7dI/bRwzp2qf501
+ Klk8p/p5vAGqJOMFEkIIf5SKc3eFcEF2wE751+VPHbt7xPOxQWEvOTQjUtEe0Y3yw0i7
+ hx1m2Sv8BCxcHYUF6oCpyyMIzCteioNjvvuh9/vW7xj4YuAIsHmKAvhs+EdfVFC4gFea
+ fCNy8O5kTfN+0PbZsSwlEsCncQtFqXLWdeC/QhU/fwSKkJMo7FnLM4Fek5kSiUqaiwbL
+ znsw==
+X-Gm-Message-State: AOAM532ECZDWZIARYWeZ0eTAsP5g7yFar7TL+ICBUFijKrJBV0GO1o8B
+ pGHzbwzqV5f7qRQV4iCkzKnuY+KibLfNVyRBloY=
+X-Google-Smtp-Source: ABdhPJz9il9hM0dW+HBzbmlPKniCwECxNO/8hMVPKUBsEqoDCV/QwL6e34Gfpb7J9nJJLX3xq5Xw7liyP6eOecuqpPM=
+X-Received: by 2002:a6b:e006:: with SMTP id z6mr6579306iog.118.1598308227054; 
+ Mon, 24 Aug 2020 15:30:27 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=ehabkost@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/24 17:57:35
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.956,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+References: <20200824215721.2960162-1-ehabkost@redhat.com>
+ <20200824215721.2960162-2-ehabkost@redhat.com>
+In-Reply-To: <20200824215721.2960162-2-ehabkost@redhat.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Mon, 24 Aug 2020 15:19:46 -0700
+Message-ID: <CAKmqyKMRBS3FXr==vwbvLmisMxH42PEysh_9WHBMRXc__7NRxQ@mail.gmail.com>
+Subject: Re: [PATCH 1/6] xilinx_axidma: Use typedef name for instance_size
+To: Eduardo Habkost <ehabkost@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::d42;
+ envelope-from=alistair23@gmail.com; helo=mail-io1-xd42.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,42 +95,61 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Peter Maydell <peter.maydell@linaro.org>,
  "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Alistair Francis <alistair@alistair23.me>, qemu-arm@nongnu.org,
- Gerd Hoffmann <kraxel@redhat.com>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ qemu-arm <qemu-arm@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>,
+ =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
  "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This makes the code consistent with the rest of QOM code in QEMU,
-and will make automated conversion to type declaration macros
-simpler.
+On Mon, Aug 24, 2020 at 2:58 PM Eduardo Habkost <ehabkost@redhat.com> wrote:
+>
+> This makes the code consistent with the rest of QOM code in QEMU,
+> and will make automated conversion to type declaration macros
+> simpler.
+>
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: "Marc-André Lureau" <marcandre.lureau@redhat.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org
----
- hw/display/vhost-user-vga.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-diff --git a/hw/display/vhost-user-vga.c b/hw/display/vhost-user-vga.c
-index 1690f6b610..78f58bd340 100644
---- a/hw/display/vhost-user-vga.c
-+++ b/hw/display/vhost-user-vga.c
-@@ -39,7 +39,7 @@ static void vhost_user_vga_inst_initfn(Object *obj)
- static const VirtioPCIDeviceTypeInfo vhost_user_vga_info = {
-     .generic_name  = TYPE_VHOST_USER_VGA,
-     .parent        = TYPE_VIRTIO_VGA_BASE,
--    .instance_size = sizeof(struct VhostUserVGA),
-+    .instance_size = sizeof(VhostUserVGA),
-     .instance_init = vhost_user_vga_inst_initfn,
- };
- 
--- 
-2.26.2
+Alistair
 
+> ---
+> Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+> Cc: Alistair Francis <alistair@alistair23.me>
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Cc: qemu-arm@nongnu.org
+> Cc: qemu-devel@nongnu.org
+> ---
+>  hw/dma/xilinx_axidma.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/hw/dma/xilinx_axidma.c b/hw/dma/xilinx_axidma.c
+> index a4812e480a..5ad8bd3d2e 100644
+> --- a/hw/dma/xilinx_axidma.c
+> +++ b/hw/dma/xilinx_axidma.c
+> @@ -634,7 +634,7 @@ static const TypeInfo axidma_info = {
+>  static const TypeInfo xilinx_axidma_data_stream_info = {
+>      .name          = TYPE_XILINX_AXI_DMA_DATA_STREAM,
+>      .parent        = TYPE_OBJECT,
+> -    .instance_size = sizeof(struct XilinxAXIDMAStreamSlave),
+> +    .instance_size = sizeof(XilinxAXIDMAStreamSlave),
+>      .class_init    = xilinx_axidma_stream_class_init,
+>      .class_data    = &xilinx_axidma_data_stream_class,
+>      .interfaces = (InterfaceInfo[]) {
+> @@ -646,7 +646,7 @@ static const TypeInfo xilinx_axidma_data_stream_info = {
+>  static const TypeInfo xilinx_axidma_control_stream_info = {
+>      .name          = TYPE_XILINX_AXI_DMA_CONTROL_STREAM,
+>      .parent        = TYPE_OBJECT,
+> -    .instance_size = sizeof(struct XilinxAXIDMAStreamSlave),
+> +    .instance_size = sizeof(XilinxAXIDMAStreamSlave),
+>      .class_init    = xilinx_axidma_stream_class_init,
+>      .class_data    = &xilinx_axidma_control_stream_class,
+>      .interfaces = (InterfaceInfo[]) {
+> --
+> 2.26.2
+>
+>
 
