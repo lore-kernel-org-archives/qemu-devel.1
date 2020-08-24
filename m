@@ -8,78 +8,77 @@ X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4EBAC433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 10:02:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2790C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 10:02:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9F8FB2071E
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 10:02:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ACC372071E
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 10:02:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c7Ln1MSM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F8FB2071E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pziHfGYh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACC372071E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35618 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35926 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kA9Id-0005l8-Rb
-	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 06:01:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50088)
+	id 1kA9Ii-0005sz-TY
+	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 06:02:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50160)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
- id 1kA9HU-000463-J9
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 06:00:48 -0400
-Received: from mail-lf1-x142.google.com ([2a00:1450:4864:20::142]:38045)
+ id 1kA9HY-0004AX-TT
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 06:00:52 -0400
+Received: from mail-lj1-x233.google.com ([2a00:1450:4864:20::233]:36886)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
- id 1kA9HT-0006UW-1S
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 06:00:48 -0400
-Received: by mail-lf1-x142.google.com with SMTP id k10so1168426lfm.5
- for <qemu-devel@nongnu.org>; Mon, 24 Aug 2020 03:00:46 -0700 (PDT)
+ id 1kA9HW-0006VN-MF
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 06:00:52 -0400
+Received: by mail-lj1-x233.google.com with SMTP id w14so8914852ljj.4
+ for <qemu-devel@nongnu.org>; Mon, 24 Aug 2020 03:00:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=PqHm69GgyLtMiUEuM+bi1ibVuXEct1ZgT4gQS/un0FM=;
- b=c7Ln1MSMX7NrzhfBXjwBYrWzvaHDtbM3Y3STk2Ko1Id3BiCgA+DXwM+sPaLXOhEcO4
- tEbXhzMyoF4tSkz3KmNPvwMw0DWlvdbYNt2YOq6yFTqY5UELfAsYaw9Q4fzqkfLxgq6D
- /sSgp/rr/c/7OTBBv6RrDnYAwYUKNx0mI0yZVBgvS9+Ocz4GupjmoUW88epB3cKNbgsN
- gwgTvZPuefiJ/JYROjuyuiE1/DjXAfg/TNE93wTcDPfFZPV7iflBUnCXpcpD6x3P9Myb
- KKq/3NHv5IXFVux7rgM+oYiIz1RQj7CaN7euffmIhThsSe75ncxAFtxImqDN/wsrctXa
- 88Cg==
+ bh=Dd0EJqBzQHROoOB+Rn94QdMh9XLX7GYS6cokwONIqVU=;
+ b=pziHfGYhMC/iWsOnUi2CgZkNDxcuFp2meX13mNkMLtXH6J3OT8jTyeWd6sudEaMI61
+ RyUc0pUt4PIaPGD7HM8/iG9yoAHAB4oRDAuhZNNPMyzw9Wje31Mrr7cmTut6HSL8q4vP
+ /Wbnul9O9lX6cwJSIWiw/y5sHoKmFq/VmcH2I+DtygW7y+ttXrmITxEe/fbRSGv5dwUl
+ jaF2Je6cO3Or8DeIiViSReVqv8IkYKBi08r7FuVF7vGtp2vfNCfr5dLSIAtcYo6xFU7I
+ qlCadpqkvWDvVZpkyP8kfVdBBXDEWiGIUosqKbp6eKggx5JLrTieL47lxn30pxN1/9Yu
+ OLWw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=PqHm69GgyLtMiUEuM+bi1ibVuXEct1ZgT4gQS/un0FM=;
- b=aRkjgvLzyspTB+DeMUnbacH2VSA+J1tp5K9bpmKzyMkA9t3MGsFY+fjt9t7XHBSWcA
- MEWmScUYTIUA+hSQFknxaRiYJtlJ+9evvbXkiSjqsKRF8vLXPEDZoHcjtRv29zicQGnb
- 8BtmDUMSNljzsNqKVu9XXmZxflBVVDFLv8TU2oNfhIMLEZjUNYBiE/Wkmwq+ciMxddRZ
- 6xwgvidLvjasag7SvDAZUCQiMHUpb0O635XbJCIzlEZLO+ddLNTg6LLMx5XZb00oXe4F
- 0K2VGANwogd1spPenWaZguauAyp3vDub6X4XYJG9jpv5m3+cuHvGsB7vhQGe/bnAvShs
- jDpw==
-X-Gm-Message-State: AOAM533MMUqP8o9WxSs6wyorK+oiVXFG2+qlNIL/deBd7lsEIJkF31kp
- NqkU1j4rhNCKfCiHH72/7o02sIHQBRw=
-X-Google-Smtp-Source: ABdhPJwtEn88dj2Cqrmf+iW8bANye9yZK7Rtxx7LzxCDWmYoxPYZliG4fAoAldUTylHAxLyQVzW/tg==
-X-Received: by 2002:a05:6512:3a5:: with SMTP id
- v5mr2253813lfp.138.1598263245079; 
- Mon, 24 Aug 2020 03:00:45 -0700 (PDT)
+ bh=Dd0EJqBzQHROoOB+Rn94QdMh9XLX7GYS6cokwONIqVU=;
+ b=DlElGDt9R/Q6qECyNrI4s5bxcPnHBuE+20LqjrB3VVbfmLsbuKS52Voa/a+0jNKTdN
+ iDxlt2E1ng6yKUsKaqpADd4p3ayEws0Ri/i3m1yao3QcBHyRRpdWcQoTIXsdCdYdKyUN
+ y+pZxwBDFpqasRmXtrpXfafGn4N2kof+xtiw6uWNyfoWy4Skch10fDeM0K10WbA5kko7
+ kt7tBIsgpN9j/2hjOHhpyOXCDgmhCvEJlWxLG9YgWX8K9hKEHitJB52S5fIESi3YbHOg
+ LuhEca7AR7ipW9rPRbQm7KP3D4hTqUNwA2GTntltpEX44pcRXZBaafW7V+mtCsD+WcuF
+ uiMg==
+X-Gm-Message-State: AOAM532FzdyVL5Np2luIVWn4evBCD7+1tZEu/dzWfR/XoOGBHlUXEsV1
+ bzxS1Nla0nUq7WAGhCr9ey33wXiOHhQ=
+X-Google-Smtp-Source: ABdhPJzUx//VV7Z8T+ypJUtu3bWSrAezzxKizV3qVivqXg/ycTKXcpSoVDnvCEoGS9C2/UCW5z8y7g==
+X-Received: by 2002:a2e:2c0e:: with SMTP id s14mr2424491ljs.28.1598263248682; 
+ Mon, 24 Aug 2020 03:00:48 -0700 (PDT)
 Received: from gmail.com (81-231-232-130-no39.tbcn.telia.com. [81.231.232.130])
- by smtp.gmail.com with ESMTPSA id u14sm2094383ljg.55.2020.08.24.03.00.44
+ by smtp.gmail.com with ESMTPSA id h13sm2080703lji.134.2020.08.24.03.00.47
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 24 Aug 2020 03:00:44 -0700 (PDT)
+ Mon, 24 Aug 2020 03:00:48 -0700 (PDT)
 From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v1 2/8] target/microblaze: mbar: Move LOG_DIS to before sleep
-Date: Mon, 24 Aug 2020 12:00:35 +0200
-Message-Id: <20200824100041.1864420-3-edgar.iglesias@gmail.com>
+Subject: [PULL v1 5/8] configure: microblaze: Enable mttcg
+Date: Mon, 24 Aug 2020 12:00:38 +0200
+Message-Id: <20200824100041.1864420-6-edgar.iglesias@gmail.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200824100041.1864420-1-edgar.iglesias@gmail.com>
 References: <20200824100041.1864420-1-edgar.iglesias@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::142;
- envelope-from=edgar.iglesias@gmail.com; helo=mail-lf1-x142.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::233;
+ envelope-from=edgar.iglesias@gmail.com; helo=mail-lj1-x233.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: 16
@@ -108,37 +107,24 @@ Sender: "Qemu-devel"
 
 From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-Move LOG_DIS log to before sleeping handling so that it logs
-for sleep instructions aswell.
-
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 ---
- target/microblaze/translate.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ configure | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
-index 47637f152b..c1be76d4c8 100644
---- a/target/microblaze/translate.c
-+++ b/target/microblaze/translate.c
-@@ -1231,6 +1231,8 @@ static void dec_br(DisasContext *dc)
-     if (mbar == 2 && dc->imm == 4) {
-         uint16_t mbar_imm = dc->rd;
- 
-+        LOG_DIS("mbar %d\n", mbar_imm);
-+
-         /* mbar IMM & 16 decodes to sleep.  */
-         if (mbar_imm & 16) {
-             TCGv_i32 tmp_hlt = tcg_const_i32(EXCP_HLT);
-@@ -1248,7 +1250,6 @@ static void dec_br(DisasContext *dc)
-             tcg_temp_free_i32(tmp_1);
-             return;
-         }
--        LOG_DIS("mbar %d\n", mbar_imm);
-         /* Break the TB.  */
-         dc->cpustate_changed = 1;
-         return;
+diff --git a/configure b/configure
+index 67832e3bab..b8f5b81a67 100755
+--- a/configure
++++ b/configure
+@@ -7782,6 +7782,7 @@ case "$target_name" in
+   microblaze|microblazeel)
+     TARGET_ARCH=microblaze
+     TARGET_SYSTBL_ABI=common
++    mttcg="yes"
+     bflt="yes"
+     echo "TARGET_ABI32=y" >> $config_target_mak
+   ;;
 -- 
 2.25.1
 
