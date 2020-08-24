@@ -2,93 +2,85 @@ Return-Path: <SRS0=JPH5=CC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.8 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	FROM_LOCAL_NOVOWEL,HEADER_FROM_DIFFERENT_DOMAINS,HK_RANDOM_FROM,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 349A1C433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 21:56:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA6C9C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 21:59:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EBB22204EA
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 21:56:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AF7E9204EA
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 21:59:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cQ0+Fotk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBB22204EA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TvjQWLKN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF7E9204EA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59370 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34782 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAKRf-0003ad-64
-	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 17:56:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47520)
+	id 1kAKUX-0005Jv-Vf
+	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 17:59:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48216)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jcmvbkbc@gmail.com>)
- id 1kAKQA-0002xy-N8
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 17:54:31 -0400
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:37532)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <jcmvbkbc@gmail.com>)
- id 1kAKQ7-0007fL-SB
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 17:54:29 -0400
-Received: by mail-pg1-x543.google.com with SMTP id g33so5320832pgb.4
- for <qemu-devel@nongnu.org>; Mon, 24 Aug 2020 14:54:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=DbD1Z7uTPMI5FnmXOrmqtfJxcQFtBq6rPcoTFLfxrP4=;
- b=cQ0+Fotk22qORmYLdgdHpywFBcg+Dm8pf1HG1ocHXb4NuagDNkf0LPfj/mG0alpirT
- 5I8H0xfvdwcSicEMLJFuep17BpFLyxf35OFQypmzRbfb9MZ2o7AshIMcgi1dEEYNI03w
- WAs4H5BlOh+tIWG53wFRk3SGtpkA4lqQWKIOh4oqh8EvRCCQKjyguP6YT1ITUMK/1/Av
- 2wvf7h+JqN0s6OF6E5SMFvpQEQe8VXx6aPF3iQO1QcolUX0zSO55Wv2zsBG91VfwKTir
- QiZp2byjGQrMQ2POjTT7n41Vif0Z3rdgEaTro4TxHMMMSYh3xhebogORqplM6DVCsp7V
- hs5w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=DbD1Z7uTPMI5FnmXOrmqtfJxcQFtBq6rPcoTFLfxrP4=;
- b=bH877SM8rsjA+1czeJ2gRkOzY6HYZ2aXkGn6MvVi501GnR9DdPoWsyb4pEIT186un8
- 3O9L8QYyMgobC1gIfzNYLTKDC+32TZrf+eIcoE183FNASdrDkyNTQZEdXX7nTTtKHXD1
- +EAe1R4WxvHjna1UqFdgWN7r7/ftdInFpBcadeiSQ7T+Iim6HXYIOiWUKgc7XRpQP/jf
- 4rBTtL6NFu0N+ZydyIiuyH6eIine+CCX5n64N8dRoW9xMWjy3vCiEp72FTTZ0NMlRsU6
- nmZnxGgw02dsnmBTkZo6PDvQK4HfWqj7y7xNYmaKX4TQXzwzIYolPwgQ/Wink6DdcYki
- NCGA==
-X-Gm-Message-State: AOAM533CZQ3rWjjwV2GHE2xcZqgOIImbuph4t8SKHQnjG/NkCQg0iKvl
- CqzeGCy+WHyUV/l3X28CS917B3EVfG03Ohh3AYQ=
-X-Google-Smtp-Source: ABdhPJw/GNnBdatiQIZDU4G8FLZQutJvJT2QyMQ3jQQBQ2Nvnrsy1i77yIwRv9YYDagfXvQFb1XCK4hxqptwHZcKsRw=
-X-Received: by 2002:a17:902:e906:: with SMTP id
- k6mr5295991pld.333.1598306065708; 
- Mon, 24 Aug 2020 14:54:25 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kAKTC-0004BZ-Gt
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 17:57:40 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:40543
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kAKT8-00087S-OD
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 17:57:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1598306253;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=XsuS4RWhkmHJmOqgg1gzMNuS2tjgVfSq3SfuWytoBDM=;
+ b=TvjQWLKNFRpRj/101TRdUjRRrh26vqda4MeB6uCqc8pEjbxiTaxXCFC7WsvC1KulwYHPWD
+ Syb7mJtuLKvzXse2zZsshIbBuwdJO3Pc9BbpJIM1s/YJAlRVQbQD151rpn1KmI/ExJOM6f
+ Mnz9r7Bb+5ETVJV//FBaLO49nh5WtH4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-428-u7qmLFJOMY294Cdmv79v6g-1; Mon, 24 Aug 2020 17:57:31 -0400
+X-MC-Unique: u7qmLFJOMY294Cdmv79v6g-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 43B2B81F010;
+ Mon, 24 Aug 2020 21:57:30 +0000 (UTC)
+Received: from localhost (unknown [10.10.67.254])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9013B60C0F;
+ Mon, 24 Aug 2020 21:57:22 +0000 (UTC)
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 0/6] qom: Use typedefs instead of struct names on
+ instance_size/class_size
+Date: Mon, 24 Aug 2020 17:57:15 -0400
+Message-Id: <20200824215721.2960162-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-References: <20200821205050.29066-1-jcmvbkbc@gmail.com>
- <8b20adcd-97e9-0f8f-1854-b9809060d6cd@amsat.org>
- <CAMo8BfKnW7oEe76akdszPh46R1GVU2kuGfTg3T7ypVHQnzDzTQ@mail.gmail.com>
- <CAFEAcA8sY720+g9ms4EyrGEfHnZaDK-W81Jb=RS0J+V9kCc68g@mail.gmail.com>
-In-Reply-To: <CAFEAcA8sY720+g9ms4EyrGEfHnZaDK-W81Jb=RS0J+V9kCc68g@mail.gmail.com>
-From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Mon, 24 Aug 2020 14:54:14 -0700
-Message-ID: <CAMo8BfK+LOyc+HSeBWWyJPEJKGzjJSVqAZ9ZE_XmC3bCfN60fA@mail.gmail.com>
-Subject: Re: [PULL v2 00/24] target/xtensa updates for 5.2
-To: Peter Maydell <peter.maydell@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::543;
- envelope-from=jcmvbkbc@gmail.com; helo=mail-pg1-x543.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -5
-X-Spam_score: -0.6
-X-Spam_bar: /
-X-Spam_report: (-0.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- FROM_LOCAL_NOVOWEL=0.5, HK_RANDOM_ENVFROM=0.001, HK_RANDOM_FROM=0.999,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=ehabkost@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/24 17:57:33
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.956,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,34 +93,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Taylor Simpson <tsimpson@quicinc.com>, Richard Henderson <rth@twiddle.net>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
- qemu-devel <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>, qemu-arm@nongnu.org,
+ Gerd Hoffmann <kraxel@redhat.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Aug 24, 2020 at 2:33 PM Peter Maydell <peter.maydell@linaro.org> wr=
-ote:
-> On Sat, 22 Aug 2020 at 20:48, Max Filippov <jcmvbkbc@gmail.com> wrote:
-> > On Sat, Aug 22, 2020 at 3:20 AM Philippe Mathieu-Daud=C3=A9 <f4bug@amsa=
-t.org> wrote:
-> > >
-> > > Where does that come from?
-> >
-> > Generated by xtensa processor generator, as one of many output artifact=
-s.
->
-> Is there anything different with the source for these cores
-> compared to the ones we already have in the tree, or are
-> these just "more cores, generated the same way as the old ones" ?
+This changes existing QOM boilerplate to use existing typedef=0D
+names when setting instance_size and class_size on TypeInfo=0D
+variables.  This makes the code more consistent and will make=0D
+future conversion to QOM type declaration macros easier.=0D
+=0D
+Cc: "Michael S. Tsirkin" <mst@redhat.com>=0D
+Cc: "Marc-Andr=C3=A9 Lureau" <marcandre.lureau@redhat.com>=0D
+Cc: Gerd Hoffmann <kraxel@redhat.com>=0D
+Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>=0D
+Cc: Alistair Francis <alistair@alistair23.me>=0D
+Cc: Peter Maydell <peter.maydell@linaro.org>=0D
+Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>=0D
+Cc: Jason Wang <jasowang@redhat.com>=0D
+Cc: qemu-devel@nongnu.org=0D
+Cc: qemu-arm@nongnu.org=0D
+=0D
+Eduardo Habkost (6):=0D
+  xilinx_axidma: Use typedef name for instance_size=0D
+  omap_intc: Use typedef name for instance_size=0D
+  lpc_ich9: Use typedef name for instance_size=0D
+  xilinx_axienet: Use typedef name for instance_size=0D
+  vhost-user-vga: Use typedef name for instance_size=0D
+  virtio-vga: Use typedef name for instance_size=0D
+=0D
+ hw/display/vhost-user-vga.c | 2 +-=0D
+ hw/display/virtio-vga.c     | 6 +++---=0D
+ hw/dma/xilinx_axidma.c      | 4 ++--=0D
+ hw/intc/omap_intc.c         | 2 +-=0D
+ hw/isa/lpc_ich9.c           | 2 +-=0D
+ hw/net/xilinx_axienet.c     | 4 ++--=0D
+ 6 files changed, 10 insertions(+), 10 deletions(-)=0D
+=0D
+--=20=0D
+2.26.2=0D
+=0D
 
-They are generated the same way as the old ones, but they have different
-configurations: they support FPU2000 and DFPU opcodes implemented
-earlier in this series. I've added them to enable testing of these opcodes.
-de233_fpu is supposed to be a platform for further xtensa gcc development.
-
---=20
-Thanks.
--- Max
 
