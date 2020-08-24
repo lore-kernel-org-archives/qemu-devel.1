@@ -2,40 +2,42 @@ Return-Path: <SRS0=JPH5=CC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3485AC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 16:21:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BF25C433E3
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 16:23:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 099C62072D
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 16:21:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 099C62072D
+	by mail.kernel.org (Postfix) with ESMTPS id 7512D20866
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 16:23:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7512D20866
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38288 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42036 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAFEE-0000Pv-9x
-	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 12:21:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52266)
+	id 1kAFFe-0001yj-Lp
+	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 12:23:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52834)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kAFDP-0007u8-3L
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 12:20:59 -0400
-Received: from mout.kundenserver.de ([212.227.126.135]:38747)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kAFEl-00016C-G6
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 12:22:23 -0400
+Received: from mout.kundenserver.de ([212.227.126.131]:41665)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kAFDM-0004gx-TL
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 12:20:58 -0400
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kAFEj-0004sZ-AT
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 12:22:23 -0400
 Received: from [192.168.100.1] ([82.252.135.186]) by mrelayeu.kundenserver.de
- (mreue009 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1N6bsM-1khZ910ORK-0183XZ; Mon, 24 Aug 2020 18:20:45 +0200
+ (mreue010 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1MScHp-1k3G1q3zdR-00SugU; Mon, 24 Aug 2020 18:22:12 +0200
+Subject: Re: [PATCH v2 2/2] linux-user: Add support for
+ 'mq_timedsend_time64()' and 'mq_timedreceive_time64()'
 To: Filip Bozuta <Filip.Bozuta@syrmia.com>, qemu-devel@nongnu.org
 References: <20200726235221.337529-1-Filip.Bozuta@syrmia.com>
- <20200726235221.337529-2-Filip.Bozuta@syrmia.com>
+ <20200726235221.337529-3-Filip.Bozuta@syrmia.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -79,37 +81,35 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Subject: Re: [PATCH v2 1/2] linux-user: Fix 'mq_timedsend()' and
- 'mq_timedreceive()'
-Message-ID: <1b45a25e-3ddb-c09d-be52-8cadbce148d0@vivier.eu>
-Date: Mon, 24 Aug 2020 18:20:44 +0200
+Message-ID: <1588c6d7-7d10-0f30-c157-aac44c67631a@vivier.eu>
+Date: Mon, 24 Aug 2020 18:22:10 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200726235221.337529-2-Filip.Bozuta@syrmia.com>
+In-Reply-To: <20200726235221.337529-3-Filip.Bozuta@syrmia.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:6jfHUOFk+Ywya6nI+Oas8Stg+Fvu8Lt0MAaes03aJE67xJ4ZAzV
- xnnuU+YqMesxCn97JtKDTqZQUGS7hwGX8ODwtSrQ9CUJoY0jETCk5H88ZzBOT6lOFIOUzSL
- DGKDEAUvPO71XsnnypjsaRgL3/BM+iCEgwtCBhDLyR7twGemrnT0/l9dWPoOJfsf5yNPhWS
- 927vdxX5kTkQ1NYcodO8w==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:uFOzNozFzN8=:IUYLoFr7PBiask91TGm4ob
- odSYygBBbmlKY3unJmKAt6FgJwS6Khsl4xnQ8WPESAEGzXbKU8pvl3NhuogPd0bWDKX0d23A5
- UYYlduHHGTggEFgJQEtckPbxwIzfBRsoTUzVr3gwUqn70vKi3WZYHVbf/I3fFMORcHJdoQCIS
- C7W+cGKwMfEQzhKgKvtiU/lKhqXoidrqROhd7C9o58TuyJSU46bXfVnqzKDz+aSFbrxP/SWdy
- JHW4QlV4sYyndlmD70H45nj26vFarqJWOnhXKuLqr185ez35ym52jj+E72+8LRP2zFW0iySQe
- 6q+pRkGzhm9KrDbRmdhyxcfyh5k9UZnU3gftlqHTqlXdm2S8A3fiP/LeqCEr0OpJDE2G4ax8a
- 0B4OzHrwJn05i05D2+mwTDsWXc7p0sRlHzSK/GkBfNsc+LjKT8fnnMOo6dqoL6CNGg1v2j7He
- Pfkycoc1flcin1Y2FR8RKFG2Lgw2wXfLDZXgqrRywL65mgK99tA6mo8gzGFh8d0ONY2OWDvw5
- 9EDwyN1VGdLU/r6nCg9l7tDZhUuyMy87cY2d+B972/KA00anTz60u/wzQcrrF3YF3eVJaGCmd
- vCQgkZ31cwZZg68sVbODNA+xsD3kKhwOgn5c2Tcyc4mfevT2GCzvwYu9RxwLUCKl6PZHhDXf8
- ibsrlHKPz+WCVHUgrpDrSkHaUsbL86JklIOFgGRtTz5ZPh5N+GFDPUQV7GSIqn+hiH0nvkJES
- f5t/2TK1uGAelEHpGKC3zzyjzVqxW2WPOkPsZvvr1QI2PWFtoDgLwqlQyD1qZ3GTAXM1ZdbKU
- +1g3DZo+hZ4aH5CDM3oRyrGY1XafqIv1iVixn5uA+tjxkxvTKQgPbGo629tQ4kHZ1watN1c
-Received-SPF: none client-ip=212.227.126.135; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:VwRdYXtHtrqIJ9RbWcTpfqhsFElrJcfuwfyhYaXQiOACrrPFq71
+ j23/FkJEXpiz204peUe8jNFhUUq+jNDEW96QaPRW1RuauLyrXdE0612XuMV9SLduqM47a46
+ C/exbfqs3fkURc4GOd+vbEtBYhADvMFKKuQ2CPD0SBrbzKdRr4fkTrUz6xmH6wxaE4246wR
+ EAiURRUY45HwBsaGK4Beg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:r5M/fcM46qQ=:zW0MfmbvlhB/zbEub8bw7t
+ VHoNBNjANzjI7yU4bZmg5k5gm4sRcIzCZ6ZwL+VGwLpJyarfSOruSz+WmdRyZsoXk86sumyUW
+ gy5rHoWOoot0p/KUvvs7PLxMLlyebgEYR1AljdJpfPHXqUKEDTxvv2di5mdfmfPPGP5Sw/F7Y
+ DJEku16kD00Tpv/zvwpCkEOmXKurvB1Mhj0WOQKYaf8N4sYbeiIOwLJF/2TPNpnKAIjQHT+3l
+ 8c39Bjeg96QApaCkR+S9/2UrnVSB2Y0vrTNYyPKk83DJAY7H0i+9LkRR9wZ3dO8CnUBmz4wMI
+ wUUw+BpPQc5i0yfFKT40TcTtBmgzNmvWitsD96zZx8So8p/X8PiCfIieCi5TadKUsDAglZTBb
+ j9Xu7a/PqPxmW//02cwXsBj6eAQySXzfLt+4350n2Z5Dfl0HDvrXP7oFEPSc904SASbnANcJE
+ 7bcxSLtl1Ex5BmIA4jQ5koysVJBKI90/1jfJWgl9hFQfE3J1pvW7vpUqCOOg03iZSHuikKY6x
+ gaHGkUlX69/rpWI7M2fQUCuW/9cO0IUjH15pNvIOsgcG7Srm+GDhDO7AG62X/+3E/+jtOhjqZ
+ 5zhBsAoQK5XuS8uxuMth+wG/G6TraUDBQptk+8/3KPoBeV/lbr6ncaegLQl6OXxnIe+9YDBzn
+ L0CMrJBdeUf43c4UWzKEjasxJkk8vmZzGav4KzJDIqcELi72OpxM1V4jkHYOThGuZzA9l1wDW
+ JZ0M8svwSydiARi9fSX06MFOqBPxSovGPzI0ERBD9vMNQgMeI3lEkSv9BJ8BQkWxppcDKUThw
+ kIVoM7r3GycfJC/mcNexBjcVt9x3m3hKULi8m7WpfEoHpEZWxo/NoLBVehXqx+9PcEtUr3A
+Received-SPF: none client-ip=212.227.126.131; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/24 12:20:55
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/24 11:24:39
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -40
 X-Spam_score: -4.1
@@ -135,89 +135,139 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Le 27/07/2020 à 01:52, Filip Bozuta a écrit :
-> Implementations of syscalls 'mq_timedsend()' and 'mq_timedreceive()'
-> in 'syscall.c' use functions 'target_to_host_timespec()' and
-> 'host_to_target_timespec()' to transfer the value of 'struct timespec'
-> between target and host. However, the implementations don't check whether
-> this conversion succeeds and thus can cause an unaproppriate error instead
-> of the 'EFAULT (Bad address)' which is supposed to be set if the conversion
-> from target to host fails. This was confirmed with the modified LTP
-> test suite where test cases with a bad adress for 'timespec' were
-> added. This modified test suite can be found at:
-> https://github.com/bozutaf/ltp
+> This patch implements functionality for following time64 syscalls:
 > 
-> Without the changes from this patch the bad adress testcase for 'mq_timedsend()'
-> succeds unexpectedly, while the test returns errno 'ETIMEOUT' for
-> 'mq_timedreceive()':
+> *mq_timedsend_time64()
 > 
-> mq_timedsend01.c:190: FAIL: mq_timedsend() returned 0, expected -1: SUCCESS (0)
-> mq_timedreceive01.c:178: FAIL: mq_timedreceive() failed unexpectedly,
-> expected EFAULT: ETIMEDOUT (110)
+>     This is a year 2038 safe vairant of syscall:
 > 
-> After the changes from this patch, testcases for both syscalls fail with EFAULT
-> as expected, which is the same test result that is received with native execution:
+>     int mq_timedsend(mqd_t mqdes, const char *msg_ptr,
+>                      size_t msg_len, unsigned int msg_prio,
+>                      const struct timespec *abs_timeout)
+>     --send a message to a message queue--
+>     man page: https://www.man7.org/linux/man-pages/man2/mq_timedsend.2.html
 > 
-> mq_timedsend01.c:187: PASS: mq_timedsend() failed expectedly: EFAULT (14)
-> mq_timedreceive01.c:180: PASS: mq_timedreceive() failed expectedly: EFAULT (14)
+> *mq_timedreceive_time64()
 > 
-> (Patch with this new test case will be sent to LTP mailing list soon)
+>     This is a year 2038 safe variant of syscall:
+> 
+>     ssize_t mq_timedreceive(mqd_t mqdes, char *msg_ptr,
+>                             size_t msg_len, unsigned int *msg_prio,
+>                             const struct timespec *abs_timeout)
+>     --receive a message from a message queue--
+>     man page: https://man7.org/linux/man-pages/man3/mq_receive.3.html
+> 
+> Implementation notes:
+> 
+>     These syscalls were implemented in similar ways like
+>     'mq_timedsend()' and 'mq_timedreceive' except that
+>     functions 'target_to_host_timespec64()' and
+>     'host_to_target_timespec64()' were used to convert
+>     values of 'struct timespec' between host and target.
 > 
 > Signed-off-by: Filip Bozuta <Filip.Bozuta@syrmia.com>
 > ---
->  linux-user/syscall.c | 16 ++++++++++++----
->  1 file changed, 12 insertions(+), 4 deletions(-)
+>  linux-user/syscall.c | 58 +++++++++++++++++++++++++++++++++++++++++---
+>  1 file changed, 55 insertions(+), 3 deletions(-)
 > 
 > diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index 05f03919ff..1f8d04934a 100644
+> index 1f8d04934a..d8cb3c0fd1 100644
 > --- a/linux-user/syscall.c
 > +++ b/linux-user/syscall.c
-> @@ -11817,9 +11817,13 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+> @@ -829,11 +829,13 @@ safe_syscall5(int, msgrcv, int, msgid, void *, msgp, size_t, sz,
+>  safe_syscall4(int, semtimedop, int, semid, struct sembuf *, tsops,
+>                unsigned, nsops, const struct timespec *, timeout)
+>  #endif
+> -#ifdef TARGET_NR_mq_timedsend
+> +#if defined(TARGET_NR_mq_timedsend) || \
+> +    defined(TARGET_NR_mq_timedsend_time64)
+>  safe_syscall5(int, mq_timedsend, int, mqdes, const char *, msg_ptr,
+>                size_t, len, unsigned, prio, const struct timespec *, timeout)
+>  #endif
+> -#ifdef TARGET_NR_mq_timedreceive
+> +#if defined(TARGET_NR_mq_timedreceive) || \
+> +    defined(TARGET_NR_mq_timedreceive_time64)
+>  safe_syscall5(int, mq_timedreceive, int, mqdes, char *, msg_ptr,
+>                size_t, len, unsigned *, prio, const struct timespec *, timeout)
+>  #endif
+> @@ -1243,7 +1245,9 @@ static inline abi_long target_to_host_timespec(struct timespec *host_ts,
+>  }
+>  #endif
 >  
->              p = lock_user (VERIFY_READ, arg2, arg3, 1);
->              if (arg5 != 0) {
-> -                target_to_host_timespec(&ts, arg5);
-> +                if (target_to_host_timespec(&ts, arg5)) {
+> -#if defined(TARGET_NR_clock_settime64) || defined(TARGET_NR_futex_time64)
+> +#if defined(TARGET_NR_clock_settime64) || defined(TARGET_NR_futex_time64) || \
+> +    defined(TARGET_NR_mq_timedsend_time64) || \
+> +    defined(TARGET_NR_mq_timedreceive_time64)
+>  static inline abi_long target_to_host_timespec64(struct timespec *host_ts,
+>                                                   abi_ulong target_addr)
+>  {
+> @@ -11831,6 +11835,27 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+>          }
+>          return ret;
+>  #endif
+> +#ifdef TARGET_NR_mq_timedsend_time64
+> +    case TARGET_NR_mq_timedsend_time64:
+> +        {
+> +            struct timespec ts;
+> +
+> +            p = lock_user(VERIFY_READ, arg2, arg3, 1);
+> +            if (arg5 != 0) {
+> +                if (target_to_host_timespec64(&ts, arg5)) {
 > +                    return -TARGET_EFAULT;
 > +                }
->                  ret = get_errno(safe_mq_timedsend(arg1, p, arg3, arg4, &ts));
-> -                host_to_target_timespec(arg5, &ts);
-> +                if (host_to_target_timespec(arg5, &ts)) {
-
-If mq_timedsend() fails, you clear the error value and the structure.
-
-You need to check if there is an error:
-
-                   if (!is_error(ret) &&
-                       host_to_target_timespec(arg5, &ts)) {
-
-
+> +                ret = get_errno(safe_mq_timedsend(arg1, p, arg3, arg4, &ts));
+> +                if (host_to_target_timespec64(arg5, &ts)) {
 > +                    return -TARGET_EFAULT;
 > +                }
->              } else {
->                  ret = get_errno(safe_mq_timedsend(arg1, p, arg3, arg4, NULL));
->              }
-> @@ -11836,10 +11840,14 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+> +            } else {
+> +                ret = get_errno(safe_mq_timedsend(arg1, p, arg3, arg4, NULL));
+> +            }
+> +            unlock_user(p, arg2, arg3);
+> +        }
+> +        return ret;
+> +#endif
 >  
->              p = lock_user (VERIFY_READ, arg2, arg3, 1);
->              if (arg5 != 0) {
-> -                target_to_host_timespec(&ts, arg5);
-> +                if (target_to_host_timespec(&ts, arg5)) {
+>  #ifdef TARGET_NR_mq_timedreceive
+>      case TARGET_NR_mq_timedreceive:
+> @@ -11858,6 +11883,33 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+>          }
+>          return ret;
+>  #endif
+> +#ifdef TARGET_NR_mq_timedreceive_time64
+> +    case TARGET_NR_mq_timedreceive_time64:
+> +        {
+> +            struct timespec ts;
+> +            unsigned int prio;
+> +
+> +            p = lock_user(VERIFY_READ, arg2, arg3, 1);
+> +            if (arg5 != 0) {
+> +                if (target_to_host_timespec64(&ts, arg5)) {
 > +                    return -TARGET_EFAULT;
 > +                }
->                  ret = get_errno(safe_mq_timedreceive(arg1, p, arg3,
->                                                       &prio, &ts));
-> -                host_to_target_timespec(arg5, &ts);
-> +                if (host_to_target_timespec(arg5, &ts)) {
-
-ditto
-
+> +                ret = get_errno(safe_mq_timedreceive(arg1, p, arg3,
+> +                                                     &prio, &ts));
+> +                if (host_to_target_timespec64(arg5, &ts)) {
 > +                    return -TARGET_EFAULT;
 > +                }
->              } else {
->                  ret = get_errno(safe_mq_timedreceive(arg1, p, arg3,
->                                                       &prio, NULL));
+> +            } else {
+> +                ret = get_errno(safe_mq_timedreceive(arg1, p, arg3,
+> +                                                     &prio, NULL));
+> +            }
+> +            unlock_user(p, arg2, arg3);
+> +            if (arg4 != 0) {
+> +                put_user_u32(prio, arg4);
+> +            }
+> +        }
+> +        return ret;
+> +#endif
+>  
+>      /* Not implemented for now... */
+>  /*     case TARGET_NR_mq_notify: */
 > 
 
-Thanks,
-Laurent
+Same comment as for PATCH 1.
+
+Except that:
+
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 
