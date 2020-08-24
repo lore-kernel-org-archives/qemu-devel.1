@@ -2,88 +2,86 @@ Return-Path: <SRS0=JPH5=CC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACE9EC433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 16:35:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6446C433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 16:37:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 76AE62067C
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 16:35:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 939A822D37
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 16:37:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="s6uBGgpr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 76AE62067C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="q+3q1fOG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 939A822D37
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52396 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55428 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAFR1-0007G4-Ma
-	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 12:35:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56074)
+	id 1kAFSv-0000Dg-SH
+	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 12:37:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56712)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kAFQF-0006QV-2n
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 12:34:15 -0400
-Received: from mail-ej1-x62b.google.com ([2a00:1450:4864:20::62b]:32833)
+ (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1kAFSK-0008D3-NM
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 12:36:24 -0400
+Received: from mail-ej1-x642.google.com ([2a00:1450:4864:20::642]:43326)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kAFQC-0006pe-UY
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 12:34:14 -0400
-Received: by mail-ej1-x62b.google.com with SMTP id u21so12061819ejz.0
- for <qemu-devel@nongnu.org>; Mon, 24 Aug 2020 09:34:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
- bh=BmoDD6A/4ncBdMV7K6LZHv3jQzCXA4C2mq7gqvOA80g=;
- b=s6uBGgpr87vY+5MQTlwsMiS6u2Sa9+OISAEHewprth0Rs615HMe3rosRyg3Q2HMRzi
- XCd9JNkQVPyfVtvpGrZIz6g061+Zr7jcQkJvlJrgxu/O+yFQguK8mgizYOmU/wEsi5kT
- pizLmN5UxOJ1/s4rDp6GYhhNEu3LjU1h4i0h5lpi//XZzVee2W8CWN2PB19lg/euRxVN
- Dh11sBR6VfZeaQ97Nl9kOFO6+bg4ly1bS0JOMil9cK8mKixN0aVX7FnVSDExIXrJkSSd
- iPlTjsuw2CUwioZwaxe8ZbxGsnT1fVLC8X+bBC2ddvZPG7p0GOKRQU0wsuBN6f4rlMm7
- 92Zg==
+ (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1kAFSJ-0007JB-1K
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 12:36:24 -0400
+Received: by mail-ej1-x642.google.com with SMTP id m22so12709555eje.10
+ for <qemu-devel@nongnu.org>; Mon, 24 Aug 2020 09:36:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=s0d9YG45Z+EX4DH+3DBnyDUD3m6wTfn6LFkEUob8EdU=;
+ b=q+3q1fOGLd6l8Q9Tiq4Ao+sql6vvQz8xJvmWQg9fkR7ZH09Fc2UXmS+FthnP7HL7oM
+ HOF6z3E1Kdvi+CnxK0bIF284eyrvH52FJs1l+ObebMFcLRM477R486Gwqy9HYDn/nzSu
+ IuVg6OzdVBoGt+0/pYWcpHIW8NedCsIHVkh3Vg6sIGet8vSBPUY1r8tCJ5eh+BhEUhTJ
+ WBKpd9/RkcF7tsoF6Ab9uI4sDfeCEQQhi0y4Falrc6PSz9WQYoRKdPWW8hKVuRhkv0zY
+ upfbigzLjbiEIiAL8OzWQBHhci8KKjAOy9rLI3mH4vaClPZWFqn+NBGaN1O7F7gK1cad
+ KzNg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to;
- bh=BmoDD6A/4ncBdMV7K6LZHv3jQzCXA4C2mq7gqvOA80g=;
- b=T7whp1iOOZ/3LRipg9EaGM36tVFaWYuXj8gJXsgFaeSvJzVhaJ4mTIry79GptU2DAK
- I3HFrJNmP3dqVDBD+4OZiHoav0jIoQn7DnsbXFh6tRbePn9Xq+kQjxDsZ5g1xvBWbnhd
- 4Dl+9yLfPuzxctzbEmqooDDaoGxn30iZhyF4IIzuXHMddXeYVeX9eoUfYvj0Yd1iBtM7
- oAdK4ncj0PKd1aqHq4xL5OdgtHCHHBQjVR5akWL4ok9S5hxAwygPDv/SonMoh6I7uTb9
- Tjub9iRCDzQDA4DgjysykmFLA4KC7aNnvn6SUT4d85id6RregTPxUe/bt5od1Gw6BXxv
- S20Q==
-X-Gm-Message-State: AOAM530sPi0voDvx1BtASRyItXhmSaUvDfr83BdZSIEus/Tbf8ahduGz
- OAovsUVFVXZt0/qODjS1pZElrXbHXbO6XQ3SBb2AquN/ybF0yA==
-X-Google-Smtp-Source: ABdhPJyD42vsitx/jSkaNaffJRtYT6DpUhZL0yuNYQzVnonjRVOrOMc9LLvbXP+NEwPQT9MjOg940bTrXkzKL8D17qU=
-X-Received: by 2002:a17:906:b814:: with SMTP id
- dv20mr6336153ejb.4.1598286847280; 
- Mon, 24 Aug 2020 09:34:07 -0700 (PDT)
+ :message-id:subject:to:cc;
+ bh=s0d9YG45Z+EX4DH+3DBnyDUD3m6wTfn6LFkEUob8EdU=;
+ b=igoewNcGDl33x+Rv1OkHUdwaN97h8vib2Q9rSwrgwfpMRhhtmn88yEm1NCjB2EFePZ
+ EJT6pgk3IGJDCuiCgSXjg+idMAWdqZi1JhYMZ1lRmDVm8e/L09zeThiMOmXInP5bz2wU
+ l8+VE3brIDzVp+PZHJ3Ure+/H2mbbOE0z5wWcyAZVH03KQdNC3WU1MN0vfS5udRZ76r2
+ 3Fe3kLQUFZOQK8+Og698Z05pizS/BsrHU7hHJcXp334g+tFjUJY8O7HUjxclGRuoUMTr
+ 94IRRpFxI2cYF/2EdTQuLQYIwRyXgHmwHetXULW6o6x6LwYx22Rt/DEJHy+EIspW1NPa
+ F/zw==
+X-Gm-Message-State: AOAM533VPo1EUjqIxISqDGPoLwNGZvlvJmhiy+cDHNU4CzcEZJTpHyLu
+ dlqpGAhLXAcWdA1G9d+Q1KTbJI9i0K1lKIZHW4E=
+X-Google-Smtp-Source: ABdhPJxl3J295azbWJ+gGOlbTa4D/0sVDMFNLh+5otvvbm/jdi26XTZ1T1Abi5mxtCEJyG57OHPAXeZzXlF/d0KZ3nQ=
+X-Received: by 2002:a17:906:b78e:: with SMTP id
+ dt14mr2393406ejb.527.1598286981617; 
+ Mon, 24 Aug 2020 09:36:21 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190118145805.6852-1-peter.maydell@linaro.org>
- <20190118145805.6852-40-peter.maydell@linaro.org>
-In-Reply-To: <20190118145805.6852-40-peter.maydell@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 24 Aug 2020 17:33:55 +0100
-Message-ID: <CAFEAcA9jUpJF4FQirb3avWJAMjh+AdkimW3DgMyMjbDjBCQSvQ@mail.gmail.com>
-Subject: Re: [PULL 39/49] target/arm: Filter cycle counter based on
- PMCCFILTR_EL0
-To: QEMU Developers <qemu-devel@nongnu.org>,
- Aaron Lindsay <Aaron@os.amperecomputing.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::62b;
- envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x62b.google.com
+References: <20200824155212.789568-1-brogers@suse.com>
+In-Reply-To: <20200824155212.789568-1-brogers@suse.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Mon, 24 Aug 2020 20:36:09 +0400
+Message-ID: <CAJ+F1CLxpP45ZZhrryWt7aSWug9i8ABvXKXOCyCX9ngXT9M5BQ@mail.gmail.com>
+Subject: Re: [PATCH] meson: Fix meson build with --enable-libdaxctl
+To: Bruce Rogers <brogers@suse.com>
+Content-Type: multipart/alternative; boundary="000000000000c9dd0405ada22f06"
+Received-SPF: pass client-ip=2a00:1450:4864:20::642;
+ envelope-from=marcandre.lureau@gmail.com; helo=mail-ej1-x642.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -97,68 +95,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ QEMU <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 18 Jan 2019 at 14:58, Peter Maydell <peter.maydell@linaro.org> wrote:
+--000000000000c9dd0405ada22f06
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hi
+
+On Mon, Aug 24, 2020 at 7:52 PM Bruce Rogers <brogers@suse.com> wrote:
+
+> The daxctl library needs to be linked against when daxctl is asked for
+> in configure.
 >
-> From: Aaron Lindsay <aaron@os.amperecomputing.com>
+> Signed-off-by: Bruce Rogers <brogers@suse.com>
 >
-> Rename arm_ccnt_enabled to pmu_counter_enabled, and add logic to only
-> return 'true' if the specified counter is enabled and neither prohibited
-> or filtered.
+
+I guess we should cover it too in the CI.
+
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
+---
+>  configure   | 1 +
+>  meson.build | 6 +++++-
+>  2 files changed, 6 insertions(+), 1 deletion(-)
 >
-> Signed-off-by: Aaron Lindsay <alindsay@codeaurora.org>
-> Signed-off-by: Aaron Lindsay <aclindsa@gmail.com>
-> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> Message-id: 20181211151945.29137-5-aaron@os.amperecomputing.com
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-
-Hi Aaron; I've just had somebody report what seems like a bug
-in this code from last year:
-
-> +/* Returns true if the counter (pass 31 for PMCCNTR) should count events using
-> + * the current EL, security state, and register configuration.
-> + */
-> +static bool pmu_counter_enabled(CPUARMState *env, uint8_t counter)
->  {
-> -    /* This does not support checking PMCCFILTR_EL0 register */
-> +    uint64_t filter;
-> +    bool e, p, u, nsk, nsu, nsh, m;
-> +    bool enabled, prohibited, filtered;
-> +    bool secure = arm_is_secure(env);
-> +    int el = arm_current_el(env);
-> +    uint8_t hpmn = env->cp15.mdcr_el2 & MDCR_HPMN;
+> diff --git a/configure b/configure
+> index 67832e3bab..15de7d10de 100755
+> --- a/configure
+> +++ b/configure
+> @@ -7488,6 +7488,7 @@ fi
 >
-> -    if (!(env->cp15.c9_pmcr & PMCRE) || !(env->cp15.c9_pmcnten & (1 << 31))) {
-> -        return false;
-> +    if (!arm_feature(env, ARM_FEATURE_EL2) ||
-> +            (counter < hpmn || counter == 31)) {
-> +        e = env->cp15.c9_pmcr & PMCRE;
-> +    } else {
-> +        e = env->cp15.mdcr_el2 & MDCR_HPME;
-> +    }
-> +    enabled = e && (env->cp15.c9_pmcnten & (1 << counter));
-> +
-> +    if (!secure) {
-> +        if (el == 2 && (counter < hpmn || counter == 31)) {
-> +            prohibited = env->cp15.mdcr_el2 & MDCR_HPMD;
-> +        } else {
-> +            prohibited = false;
-> +        }
-> +    } else {
-> +        prohibited = arm_feature(env, ARM_FEATURE_EL3) &&
-> +           (env->cp15.mdcr_el3 & MDCR_SPME);
+>  if test "$libdaxctl" =3D "yes" ; then
+>    echo "CONFIG_LIBDAXCTL=3Dy" >> $config_host_mak
+> +  echo "LIBDAXCTL_LIBS=3D$libdaxctl_libs" >> $config_host_mak
+>  fi
+>
+>  if test "$bochs" =3D "yes" ; then
+> diff --git a/meson.build b/meson.build
+> index df5bf728b5..0a24e5c31a 100644
+> --- a/meson.build
+> +++ b/meson.build
+> @@ -380,6 +380,10 @@ if 'CONFIG_LIBPMEM' in config_host
+>    libpmem =3D declare_dependency(compile_args:
+> config_host['LIBPMEM_CFLAGS'].split(),
+>                                 link_args:
+> config_host['LIBPMEM_LIBS'].split())
+>  endif
+> +libdaxctl =3D not_found
+> +if 'CONFIG_LIBDAXCTL' in config_host
+> +  libdaxctl =3D declare_dependency(link_args:
+> config_host['LIBDAXCTL_LIBS'].split())
+> +endif
+>
+>  # Create config-host.h
+>
+> @@ -786,7 +790,7 @@ common_ss.add(files('cpus-common.c'))
+>
+>  subdir('softmmu')
+>
+> -specific_ss.add(files('disas.c', 'exec.c', 'gdbstub.c'), capstone,
+> libpmem)
+> +specific_ss.add(files('disas.c', 'exec.c', 'gdbstub.c'), capstone,
+> libpmem, libdaxctl)
+>  specific_ss.add(files('exec-vary.c'))
+>  specific_ss.add(when: 'CONFIG_TCG', if_true: files(
+>    'fpu/softfloat.c',
+> --
+> 2.28.0
+>
+>
+>
 
-The Arm ARM says that MDCR.SPME is 0 to prohibit secure-state
-event counting, and 1 to enable it.  So shouldn't this test
-be "!(env->cp15.mdcr_el3 & MDCR_SPME)" ?
+--=20
+Marc-Andr=C3=A9 Lureau
 
-(compare also the AArch32.CountEvents pseudocode, which has
-a test "HaveEL3(EL3) && ISSecure() && spme == '0' &&...")
+--000000000000c9dd0405ada22f06
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-thanks
--- PMM
+<div dir=3D"ltr"><div dir=3D"ltr">Hi<br></div><br><div class=3D"gmail_quote=
+"><div dir=3D"ltr" class=3D"gmail_attr">On Mon, Aug 24, 2020 at 7:52 PM Bru=
+ce Rogers &lt;<a href=3D"mailto:brogers@suse.com">brogers@suse.com</a>&gt; =
+wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0=
+px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">The daxct=
+l library needs to be linked against when daxctl is asked for<br>
+in configure.<br>
+<br>
+Signed-off-by: Bruce Rogers &lt;<a href=3D"mailto:brogers@suse.com" target=
+=3D"_blank">brogers@suse.com</a>&gt;<br></blockquote><div><br></div><div>I =
+guess we should cover it too in the CI.</div><div><br></div><div>Reviewed-b=
+y: Marc-Andr=C3=A9 Lureau &lt;<a href=3D"mailto:marcandre.lureau@redhat.com=
+">marcandre.lureau@redhat.com</a>&gt;</div><div><br> </div><blockquote clas=
+s=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid r=
+gb(204,204,204);padding-left:1ex">
+---<br>
+=C2=A0configure=C2=A0 =C2=A0| 1 +<br>
+=C2=A0meson.build | 6 +++++-<br>
+=C2=A02 files changed, 6 insertions(+), 1 deletion(-)<br>
+<br>
+diff --git a/configure b/configure<br>
+index 67832e3bab..15de7d10de 100755<br>
+--- a/configure<br>
++++ b/configure<br>
+@@ -7488,6 +7488,7 @@ fi<br>
+<br>
+=C2=A0if test &quot;$libdaxctl&quot; =3D &quot;yes&quot; ; then<br>
+=C2=A0 =C2=A0echo &quot;CONFIG_LIBDAXCTL=3Dy&quot; &gt;&gt; $config_host_ma=
+k<br>
++=C2=A0 echo &quot;LIBDAXCTL_LIBS=3D$libdaxctl_libs&quot; &gt;&gt; $config_=
+host_mak<br>
+=C2=A0fi<br>
+<br>
+=C2=A0if test &quot;$bochs&quot; =3D &quot;yes&quot; ; then<br>
+diff --git a/meson.build b/meson.build<br>
+index df5bf728b5..0a24e5c31a 100644<br>
+--- a/meson.build<br>
++++ b/meson.build<br>
+@@ -380,6 +380,10 @@ if &#39;CONFIG_LIBPMEM&#39; in config_host<br>
+=C2=A0 =C2=A0libpmem =3D declare_dependency(compile_args: config_host[&#39;=
+LIBPMEM_CFLAGS&#39;].split(),<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 link_args: config_host[&#39;LIBPMEM_=
+LIBS&#39;].split())<br>
+=C2=A0endif<br>
++libdaxctl =3D not_found<br>
++if &#39;CONFIG_LIBDAXCTL&#39; in config_host<br>
++=C2=A0 libdaxctl =3D declare_dependency(link_args: config_host[&#39;LIBDAX=
+CTL_LIBS&#39;].split())<br>
++endif<br>
+<br>
+=C2=A0# Create config-host.h<br>
+<br>
+@@ -786,7 +790,7 @@ common_ss.add(files(&#39;cpus-common.c&#39;))<br>
+<br>
+=C2=A0subdir(&#39;softmmu&#39;)<br>
+<br>
+-specific_ss.add(files(&#39;disas.c&#39;, &#39;exec.c&#39;, &#39;gdbstub.c&=
+#39;), capstone, libpmem)<br>
++specific_ss.add(files(&#39;disas.c&#39;, &#39;exec.c&#39;, &#39;gdbstub.c&=
+#39;), capstone, libpmem, libdaxctl)<br>
+=C2=A0specific_ss.add(files(&#39;exec-vary.c&#39;))<br>
+=C2=A0specific_ss.add(when: &#39;CONFIG_TCG&#39;, if_true: files(<br>
+=C2=A0 =C2=A0&#39;fpu/softfloat.c&#39;,<br>
+-- <br>
+2.28.0<br>
+<br>
+<br>
+</blockquote></div><br clear=3D"all"><br>-- <br><div dir=3D"ltr" class=3D"g=
+mail_signature">Marc-Andr=C3=A9 Lureau<br></div></div>
+
+--000000000000c9dd0405ada22f06--
 
