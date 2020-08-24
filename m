@@ -2,90 +2,116 @@ Return-Path: <SRS0=JPH5=CC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C911C433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 23:01:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE042C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 23:35:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 35F0120702
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 23:01:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B95A62074D
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 23:35:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O7O3SG0L"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35F0120702
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="RglZzcjF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B95A62074D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33198 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42040 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kALSi-0007YZ-Gr
-	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 19:01:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60700)
+	id 1kALzn-0005Sj-1S
+	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 19:35:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38052)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kALR7-000694-Kw
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 18:59:33 -0400
-Received: from mail-pf1-x435.google.com ([2607:f8b0:4864:20::435]:42596)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kALR6-0006WL-3H
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 18:59:33 -0400
-Received: by mail-pf1-x435.google.com with SMTP id 17so5770033pfw.9
- for <qemu-devel@nongnu.org>; Mon, 24 Aug 2020 15:59:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=s3dYOgA7GkXXyUyxgB9kFfNBkj2FaL3vO8uRc/sluZg=;
- b=O7O3SG0LOfORL0K7NuQ08ocuSzFzaCoDJeSgve7HKedsZthOF1m9KKHIFZO2jMZUj8
- aF8bhM/m5Dj7UQRe8FSt+R0x503TVpLtVcbTBlsvZLxU2R8VP4TEHZGaP6hsSnCYJwgX
- oheLfA4uQFKyht4geONb9GOIIXT7w5rqDODq5lhlS9b32tNXI4RQ3TIc7eAbHoxz80A5
- zB3GdK4lNGKZXmFIl6ZLvP4SRHxBdzC4mc4TYxg0Ef/GYgPbKdPBvukE5P7h/xw2thDH
- OXzulHF2jtySKBS/NxtEp7t9jvJFDcEPZwgv78X91q3ntBwerEVD6YJFlnb4VUhPoh8W
- oP6A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=s3dYOgA7GkXXyUyxgB9kFfNBkj2FaL3vO8uRc/sluZg=;
- b=rw4U/rfMRW8I8vFZ6oJMUR8Cq6lQr/IK4T4tY3mfvxj7rLqFNidNhqGczYiTt5acbE
- zbcsK4umGxBGPT7iUgJM3XvhgDrZNx2EKEwXYK2JNN4Kp2xRoDVIQ0G4ADScSWPVE1iJ
- pBEUijq7hxHN1YrWW5B41WSBSHbbG9BslUKdpEAFKo1TOwkDWdIBocm+HUxAhOkw6t6s
- dZ5AJtOTRufSkdfmbJ4GNKhfH8hzd5WKm+y8URsO8MxqLz35Jhrlh7tsr9cfhDn3E0cq
- Sp8Ij3VQVn7IUNX7hwThs2ubJZbz+td+A0b0FaTMJSVwvX71L7nrI4X/cQ8stG9x6xd5
- sj+A==
-X-Gm-Message-State: AOAM5329oJ0GnkComGu/5ZJDTcNNxRn03ecK4raQaXERbIspjfd4lLvS
- ahR8Wky6xiWha28EJphd9eKXrzX6ET2cLQ==
-X-Google-Smtp-Source: ABdhPJyLd3LvuOWGZedv6Urm9PKCpFpemuoVgKL+VJf6A4Pjm6r9a/D5JDoX7htM1DSCaMmA2UBt/w==
-X-Received: by 2002:a62:78d6:: with SMTP id t205mr5814291pfc.68.1598309969906; 
- Mon, 24 Aug 2020 15:59:29 -0700 (PDT)
-Received: from localhost.localdomain ([222.95.248.6])
- by smtp.googlemail.com with ESMTPSA id gk19sm2027866pjb.2.2020.08.24.15.59.28
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 24 Aug 2020 15:59:29 -0700 (PDT)
-From: luoyonggang@gmail.com
-To: qemu-devel@nongnu.org
-Subject: [PATCH 2/2] fixes relpath may fail on win32.
-Date: Tue, 25 Aug 2020 06:59:03 +0800
-Message-Id: <20200824225903.1623-2-luoyonggang@gmail.com>
-X-Mailer: git-send-email 2.27.0.windows.1
-In-Reply-To: <20200824225903.1623-1-luoyonggang@gmail.com>
-References: <20200824225903.1623-1-luoyonggang@gmail.com>
+ (Exim 4.90_1) (envelope-from <bauerman@linux.ibm.com>)
+ id 1kALzA-0004qH-20; Mon, 24 Aug 2020 19:34:44 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:42264)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <bauerman@linux.ibm.com>)
+ id 1kALz8-0001ix-7G; Mon, 24 Aug 2020 19:34:43 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 07ONWif3144045; Mon, 24 Aug 2020 19:33:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
+ h=references : from : to :
+ cc : subject : in-reply-to : date : message-id : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=S8zw6Bgkz6PFEXBgnOpPvo7u9/SeY9sINEI+jQAWj0U=;
+ b=RglZzcjFN+6K8pm7GwSAH0rmXeet+wQlA4KfrfLEE21uk92Gvz2sby7YZcycTaPEuEtK
+ BTeFG9MBGc5cq1dHV2Klmle9DuT5tQOYa5N8HocLk5Nwspbu4o3OS3SyCjpxHDo256s7
+ 0sxETHZN4xOnKfyD4HuKoV0pnbHNJ8UbFojBjzkLvWwVYJmA2OwycAeffJbVluqIFM+M
+ c0NONiTuLBKY3fSHaQ2l/BhZ6WYRyHTajqQC07QjphIWopS7gdipfXT+fE4CWokP77Zx
+ UjXTvOhQZg/kTrhMHXQaN1Air+fTreLzXjyrck/yIwj6y8qA7Nf5njq3g60h/G9j1wTV kw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 334p541pw6-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 24 Aug 2020 19:33:53 -0400
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 07ONXr7C146785;
+ Mon, 24 Aug 2020 19:33:53 -0400
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com
+ [169.63.214.131])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 334p541pve-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 24 Aug 2020 19:33:53 -0400
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+ by ppma01dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 07ONQwl7028200;
+ Mon, 24 Aug 2020 23:33:52 GMT
+Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com
+ [9.57.198.26]) by ppma01dal.us.ibm.com with ESMTP id 332utt2dey-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 24 Aug 2020 23:33:52 +0000
+Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com
+ [9.57.199.111])
+ by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 07ONXpNL15139440
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 24 Aug 2020 23:33:51 GMT
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 59195AC05B;
+ Mon, 24 Aug 2020 23:33:51 +0000 (GMT)
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 50225AC059;
+ Mon, 24 Aug 2020 23:33:44 +0000 (GMT)
+Received: from morokweng.localdomain (unknown [9.163.25.204])
+ by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTPS;
+ Mon, 24 Aug 2020 23:33:43 +0000 (GMT)
+References: <20200819164306.625357-1-bauerman@linux.ibm.com>
+ <20200819164306.625357-5-bauerman@linux.ibm.com>
+ <3dd050ad-147e-c365-883a-3384130b0d2f@kaod.org>
+ <20200823071413.GB4734@yekko.fritz.box>
+User-agent: mu4e 1.2.0; emacs 26.3
+From: Thiago Jung Bauermann <bauerman@linux.ibm.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Subject: Re: [PATCH v6 4/8] ppc/e500: Use start-powered-off CPUState property
+In-reply-to: <20200823071413.GB4734@yekko.fritz.box>
+Date: Mon, 24 Aug 2020 20:33:41 -0300
+Message-ID: <87h7sr4o16.fsf@morokweng.localdomain>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::435;
- envelope-from=luoyonggang@gmail.com; helo=mail-pf1-x435.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
+ definitions=2020-08-24_12:2020-08-24,
+ 2020-08-24 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ adultscore=0 impostorscore=0
+ lowpriorityscore=0 suspectscore=0 spamscore=0 phishscore=0 bulkscore=0
+ mlxlogscore=999 malwarescore=0 priorityscore=1501 mlxscore=0 clxscore=1015
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2008240180
+Received-SPF: pass client-ip=148.163.156.1;
+ envelope-from=bauerman@linux.ibm.com; helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/23 22:50:46
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -26
+X-Spam_score: -2.7
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -99,41 +125,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, Yonggang Luo <luoyonggang@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ David Hildenbrand <david@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ Jiaxun Yang <jiaxun.yang@flygoat.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Artyom Tarasenko <atar4qemu@gmail.com>, Thomas Huth <thuth@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Greg Kurz <groug@kaod.org>,
+ qemu-devel@nongnu.org, qemu-s390x@nongnu.org, qemu-arm@nongnu.org,
+ =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <rth@twiddle.net>, Cornelia Huck <cohuck@redhat.com>,
+ qemu-ppc@nongnu.org, Igor Mammedov <imammedo@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Yonggang Luo <luoyonggang@gmail.com>
 
----
- scripts/mtest2make.py | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+David Gibson <david@gibson.dropbear.id.au> writes:
 
-diff --git a/scripts/mtest2make.py b/scripts/mtest2make.py
-index bdb257bbd9..d7a51bf97e 100644
---- a/scripts/mtest2make.py
-+++ b/scripts/mtest2make.py
-@@ -53,9 +53,16 @@ i = 0
- for test in json.load(sys.stdin):
-     env = ' '.join(('%s=%s' % (shlex.quote(k), shlex.quote(v))
-                     for k, v in test['env'].items()))
--    executable = os.path.relpath(test['cmd'][0])
-+    executable = test['cmd'][0]
-+    try:
-+        executable = os.path.relpath(executable)
-+    except:
-+        pass
-     if test['workdir'] is not None:
--        test['cmd'][0] = os.path.relpath(test['cmd'][0], test['workdir'])
-+        try:
-+            test['cmd'][0] = os.path.relpath(executable, test['workdir'])
-+        except:
-+            test['cmd'][0] = executable
-     else:
-         test['cmd'][0] = executable
-     cmd = '$(.test.env) %s %s' % (env, ' '.join((shlex.quote(x) for x in test['cmd'])))
--- 
-2.27.0.windows.1
+> On Sat, Aug 22, 2020 at 10:59:56AM +0200, C=C3=A9dric Le Goater wrote:
+>> Hello,
+>>=20
+>> On 8/19/20 6:43 PM, Thiago Jung Bauermann wrote:
+>> > Instead of setting CPUState::halted to 1 in ppce500_cpu_reset_sec(), u=
+se
+>> > the start-powered-off property which makes cpu_common_reset() initiali=
+ze it
+>> > to 1 in common code.
+>> >=20
+>> > Also change creation of CPU object from cpu_create() to object_new() a=
+nd
+>> > qdev_realize_and_unref() because cpu_create() realizes the CPU and it'=
+s not
+>> > possible to set a property after the object is realized.
+>> >=20
+>> > Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>> > Signed-off-by: Thiago Jung Bauermann <bauerman@linux.ibm.com>
+>>=20
+>>=20
+>> This is breaking make check :=20
+>>=20
+>>     tests/qtest/libqtest.c:175: kill_qemu() detected QEMU death from sig=
+nal 11 (Segmentation fault) (core dumped)
+>>     ERROR boot-serial-test - too few tests run (expected 7, got 0)
+>>     make: *** [/home/legoater/work/qemu/qemu-powernv-5.2.git/tests/Makef=
+ile.include:650: check-qtest-ppc64] Error 1
+>>     make: *** Waiting for unfinished jobs....
+>>=20=20=20=20=20
+>>=20=20=20=20=20
+>>     gdb --args build/ppc64-softmmu/qemu-system-ppc64  -display none   -M=
+ ppce500
+>>     ...
+>>     Thread 1 "qemu-system-ppc" received signal SIGSEGV, Segmentation fau=
+lt.
+>>     0x000055555596ebf2 in ppce500_init (machine=3D0x5555567aa6e0)
+>>         at /home/legoater/work/qemu/qemu-powernv-5.2.git/hw/ppc/e500.c:8=
+80
+>>     880	        irqs[i].irq[OPENPIC_OUTPUT_INT] =3D input[PPCE500_INPUT_=
+INT];
+>>=20=20
+>>=20=20=20=20=20
+>>     AFAIUI, 'input is not initialized since the CPU is not yet
+>>     realized.
+>
+> Sigh.  For future reference, Thiago, running an all-targets make check
+> is pretty much a minimum bar to test before posting.
 
+Sorry for the breakage. I'm working on it.
+
+--=20
+Thiago Jung Bauermann
+IBM Linux Technology Center
 
