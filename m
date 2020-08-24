@@ -2,89 +2,121 @@ Return-Path: <SRS0=JPH5=CC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B06C8C433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 20:56:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1022C433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 20:58:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 688CA2067C
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 20:56:06 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L8Mg8Tf3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 688CA2067C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9435C2067C
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 20:58:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9435C2067C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57798 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60396 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAJVd-0002jn-N3
-	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 16:56:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35854)
+	id 1kAJXW-0003uX-NF
+	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 16:58:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36092)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kAJV3-0002In-SC
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 16:55:29 -0400
-Received: from mail-lj1-x22a.google.com ([2a00:1450:4864:20::22a]:42973)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kAJV1-00019F-9R
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 16:55:29 -0400
-Received: by mail-lj1-x22a.google.com with SMTP id t6so11264952ljk.9
- for <qemu-devel@nongnu.org>; Mon, 24 Aug 2020 13:55:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:reply-to:from:date:message-id
- :subject:to; bh=FWVbszt9qaFcAHbxkJLARL0GdziLOhfbCC76VmTXQVc=;
- b=L8Mg8Tf3DFvPSvWiNTzGV1BRH7oN23zc15dNIOWBUUvfqgRmINPVeuE+1bt/Xz5lvp
- 8l/f2cBjeoLYFAhZtEZcq5ef96CpjPUFVAKkaerduAaIOP1cQ4P1p/4DBjPPihvTm5t1
- OK+kz0d6Bo/tzNP78GbcKZT7gsO9QZ8dgC/z26l8OnXAzpDmdCoZ4varBDnc4Neii8if
- XqVnhufeV6eN4yE3jiM1QQE52D/sMzEGR78FxsC6akp+Hb3VviV1gTumqSU5h7fxZA03
- nLeYG93se3K7giqy6kpRkY9lSxy4ZMtXsGbsohHVFCrPvCNBvGtnkcRXTKluCeCf7IHj
- xsTw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
- :from:date:message-id:subject:to;
- bh=FWVbszt9qaFcAHbxkJLARL0GdziLOhfbCC76VmTXQVc=;
- b=RrL0d+nsUOvlK4GymUovGh0tLIMWj7aJxL2PK8Yb4xMKXs/Hs/X0NKd2PH1Uex5/If
- vIWRbvlw5rspMxNnHPk/UzQXf8HZ5CoWY9FOXnjndBJon6NQ3m+SmjhKG+3S+WKiccMq
- 05hQuHylLbWBo9r0BL7VAeBkkICuQcWVyngevMa2OIPYrRjwrq6OaHZUVyyleDHAQSc4
- s70blS45v5oCdRzRRYkmxGRQ8W5kxAGcOjdHQDZeFNN/HlQ5lb0IH+oneNUuQPLBT+zh
- U+BEpUjyFdctM5drqrvcKdHxRJYMcPoLKYTCmPNmw122HwLN2SjZPu2FB3Czz/OnIsZI
- 2yng==
-X-Gm-Message-State: AOAM5305B+iH1lRJmqBCAJwlnB9GzWR2d4vgeCzvfyKIXGSB0phmEBX/
- NtqalTU7gmEIjSz27EDClzhyCmJ4mwOjG9ofK6ezxVfKU+46kA==
-X-Google-Smtp-Source: ABdhPJyXpLfCpTfW/11eBFc7nJLmWXLv4dzS7K3wjAXL3CbpRIPQA//TadbFQkdtjSOlsxuZ2n6lvYTHmmWjRyoNJ/c=
-X-Received: by 2002:a2e:8642:: with SMTP id i2mr3617046ljj.368.1598302525496; 
- Mon, 24 Aug 2020 13:55:25 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kAJWp-0003Rd-Ej
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 16:57:19 -0400
+Received: from mout.kundenserver.de ([212.227.126.135]:35013)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kAJWm-0001R7-MU
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 16:57:19 -0400
+Received: from [192.168.100.1] ([82.252.135.186]) by mrelayeu.kundenserver.de
+ (mreue012 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1M6H7o-1kGvEe3ol6-006jX2; Mon, 24 Aug 2020 22:57:13 +0200
+Subject: Re: [PATCH v4 5/5] linux-user: Add strace support for printing
+ arguments of some clock and time functions
+To: Filip Bozuta <Filip.Bozuta@syrmia.com>, qemu-devel@nongnu.org
+References: <20200811164553.27713-1-Filip.Bozuta@syrmia.com>
+ <20200811164553.27713-6-Filip.Bozuta@syrmia.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <c886a323-77bb-e027-30df-ca6563264b85@vivier.eu>
+Date: Mon, 24 Aug 2020 22:57:11 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-References: <CAE2XoE-bye0NfiXdLCRfOTrzFKmcT4HwYKrWO63pZyMbRNrJXQ@mail.gmail.com>
- <CAE2XoE8z9tijAdaovHNZ+XWLE8tBdFqbTS-v5hWshUP4bVaW0w@mail.gmail.com>
-In-Reply-To: <CAE2XoE8z9tijAdaovHNZ+XWLE8tBdFqbTS-v5hWshUP4bVaW0w@mail.gmail.com>
-From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
-Date: Tue, 25 Aug 2020 04:55:14 +0800
-Message-ID: <CAE2XoE-WcY+V2MyY3Gtm0a77UkMrbR7E-VwOaOCG56NhB=EkYw@mail.gmail.com>
-Subject: Re: msys2/mingw meson building fixes
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- qemu-level <qemu-devel@nongnu.org>, 
- Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: multipart/alternative; boundary="00000000000046a21f05ada5ce56"
-Received-SPF: pass client-ip=2a00:1450:4864:20::22a;
- envelope-from=luoyonggang@gmail.com; helo=mail-lj1-x22a.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200811164553.27713-6-Filip.Bozuta@syrmia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:Gh03gfL/6n5TWu9+e0CTLjdBVHZuI5gGiqygboHXToork9DaGW1
+ PfA8oelUhR0bOFXtpQLwcE27hJX7wXzJQeua8RIoHwuv+yM02+UlculmU57G1YEUTPsclOE
+ I3K4qL1c4nAus1v8FYnCOEbBFak5YH+u1Seqy2fNomkkDA4Wn0vg5DNPKWePmX7ONV7/mV1
+ P4jiyTGtn066RhIhSmBUw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:4m2JrLgJRDs=:tMfCBc4x2ohWbzN86X/XyW
+ Vq7gIYxMRV4BNm4UNYr0yCKk5jYQcxWWO4kr3V+t2FWh1fazYbsZMofy36crIA183GyL1Bbm+
+ x43cWmvgg9uPC56bRYrp2aYFrVEzT/OzTBlg480H3cteB59EIe/+tuLbshtzf8Jajm87aKQAJ
+ 801nEJGZLDbMqRiiz3bUI21KATTLD2quK/tPcXzLdpkEHDlQAl65tEnKpXl1ad1DccRxcSZCy
+ 7lEZmI2CJ2YK6dnRblLRco07jgrTG94Fp/oJKLehQ41Kz9awOfeEVXRn1w9TfvTxmR8YaP7/j
+ 7DXGipnRDs4og/2wf/U2f9Ak2pXI8rn51YFSOJ9Ko6rqEEK3iY5m09HgI+Oleves/BKB6MHMM
+ y/fZrHCciIWKVr9lHVoh4cW+9Q9nU7fXrZrieNOWt9ZIGeb8EhrbtS176dvMAy7VlbefjOgWt
+ qOlnXxh1HUWAer4GHg/SrzWgt0tcYF7cPHDE6w0A1ew9p9PivmUBlTgAZ40/Q9SFmlnBR7a9p
+ /+usyjWIuYOIw1O8gGT0Qj652CyEq8wnSyFBjVw+SXO9YjkMt05RlWp7u0vCe2hlmou2Pcoyp
+ vC8RJPVnzuOPCnwdSZtel2MvS28nwlheRe7CHEAik8JYmaZKHOZHsGi/ZURCLac+DmOWyceuL
+ ieLQx7W8aanN63Fza3YGjiVOWeovNAkh5RCkHWfZaAiWs3qcWdwFYPv60SnNdsiqTsPtBU/qQ
+ X0rvvXRtJ6AszmfZPr/c06bv8CuyqX2Fq/iWutWZt1j3fgdtbC0m9b+oEU3CmdlfGv0+Gs/N4
+ yPaKoT1dgEim4s2agHtKSi8y27F7ovZHS3kXdmE6gpdxV+i4ScjkbtG49fkOyCwegQLUlAS
+Received-SPF: none client-ip=212.227.126.135; envelope-from=laurent@vivier.eu;
+ helo=mout.kundenserver.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/24 16:46:45
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-2.25,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,364 +129,487 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: luoyonggang@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000046a21f05ada5ce56
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Le 11/08/2020 à 18:45, Filip Bozuta a écrit :
+> This patch implements strace argument printing functionality for following syscalls:
+> 
+>     * clock_getres, clock_gettime, clock_settime - clock and time functions
+> 
+>         int clock_getres(clockid_t clockid, struct timespec *res)
+>         int clock_gettime(clockid_t clockid, struct timespec *tp)
+>         int clock_settime(clockid_t clockid, const struct timespec *tp)
+>         man page: https://man7.org/linux/man-pages/man2/clock_getres.2.html
+> 
+>     * gettimeofday - get time
+> 
+>         int gettimeofday(struct timeval *tv, struct timezone *tz)
+>         man page: https://man7.org/linux/man-pages/man2/gettimeofday.2.html
+> 
+>     * getitimer, setitimer - get or set value of an interval timer
+> 
+>         int getitimer(int which, struct itimerval *curr_value)
+>         int setitimer(int which, const struct itimerval *new_value,
+>                       struct itimerval *old_value)
+>         man page: https://man7.org/linux/man-pages/man2/getitimer.2.html
+> 
+> Implementation notes:
+> 
+>     All of the syscalls have some structue types as argument types and thus
+>     a separate printing function was stated in file "strace.list" for each
+>     of them. All of these functions use existing functions for their
+>     appropriate structure types ("print_timeval()" and "print_timezone()").
+> 
+>     Functions "print_timespec()" and "print_itimerval()" were added in this
+>     patch so that they can be used to print types "struct timespec" and
+>     "struct itimerval" used by some of the syscalls. Function "print_itimerval()"
+>     uses the existing function "print_timeval()" to print fields of the
+>     structure "struct itimerval" that are of type "struct timeval".
+> 
+>     Function "print_enums()", which was introduced in the previous patch, is used
+>     to print the interval timer type which is the first argument of "getitimer()"
+>     and "setitimer()". Also, this function is used to print the clock id which
+>     is the first argument of "clock_getres()" and "clock_gettime()". For that
+>     reason, the existing function "print_clockid()" was removed in this patch.
+>     Existing function "print_clock_adjtime()" was also changed for this reason
+>     to use "print_enums()".
+> 
+>     The existing function "print_timeval()" was changed a little so that it
+>     prints the field names beside the values.
+> 
+>     Syscalls "clock_getres()" and "clock_gettime()" have the same number
+>     and types of arguments and thus their print functions "print_clock_getres"
+>     and "print_clock_gettime" share a common definition in file "strace.c".
+> 
+> Signed-off-by: Filip Bozuta <Filip.Bozuta@syrmia.com>
+> ---
+>  linux-user/strace.c    | 287 +++++++++++++++++++++++++++++++----------
+>  linux-user/strace.list |  17 ++-
+>  2 files changed, 232 insertions(+), 72 deletions(-)
+> 
+> diff --git a/linux-user/strace.c b/linux-user/strace.c
+> index def92c4d73..1a5c4c820a 100644
+> --- a/linux-user/strace.c
+> +++ b/linux-user/strace.c
+> @@ -78,7 +78,9 @@ UNUSED static void print_string(abi_long, int);
+>  UNUSED static void print_buf(abi_long addr, abi_long len, int last);
+>  UNUSED static void print_raw_param(const char *, abi_long, int);
+>  UNUSED static void print_timeval(abi_ulong, int);
+> +UNUSED static void print_timespec(abi_ulong, int);
+>  UNUSED static void print_timezone(abi_ulong, int);
+> +UNUSED static void print_itimerval(abi_ulong, int);
+>  UNUSED static void print_number(abi_long, int);
+>  UNUSED static void print_signal(abi_ulong, int);
+>  UNUSED static void print_sockaddr(abi_ulong, abi_long, int);
+> @@ -578,69 +580,6 @@ print_fdset(int n, abi_ulong target_fds_addr)
+>  }
+>  #endif
+>  
+> -#ifdef TARGET_NR_clock_adjtime
+> -/* IDs of the various system clocks */
+> -#define TARGET_CLOCK_REALTIME              0
+> -#define TARGET_CLOCK_MONOTONIC             1
+> -#define TARGET_CLOCK_PROCESS_CPUTIME_ID    2
+> -#define TARGET_CLOCK_THREAD_CPUTIME_ID     3
+> -#define TARGET_CLOCK_MONOTONIC_RAW         4
+> -#define TARGET_CLOCK_REALTIME_COARSE       5
+> -#define TARGET_CLOCK_MONOTONIC_COARSE      6
+> -#define TARGET_CLOCK_BOOTTIME              7
+> -#define TARGET_CLOCK_REALTIME_ALARM        8
+> -#define TARGET_CLOCK_BOOTTIME_ALARM        9
+> -#define TARGET_CLOCK_SGI_CYCLE             10
+> -#define TARGET_CLOCK_TAI                   11
+> -
+> -static void
+> -print_clockid(int clockid, int last)
+> -{
+> -    switch (clockid) {
+> -    case TARGET_CLOCK_REALTIME:
+> -        qemu_log("CLOCK_REALTIME");
+> -        break;
+> -    case TARGET_CLOCK_MONOTONIC:
+> -        qemu_log("CLOCK_MONOTONIC");
+> -        break;
+> -    case TARGET_CLOCK_PROCESS_CPUTIME_ID:
+> -        qemu_log("CLOCK_PROCESS_CPUTIME_ID");
+> -        break;
+> -    case TARGET_CLOCK_THREAD_CPUTIME_ID:
+> -        qemu_log("CLOCK_THREAD_CPUTIME_ID");
+> -        break;
+> -    case TARGET_CLOCK_MONOTONIC_RAW:
+> -        qemu_log("CLOCK_MONOTONIC_RAW");
+> -        break;
+> -    case TARGET_CLOCK_REALTIME_COARSE:
+> -        qemu_log("CLOCK_REALTIME_COARSE");
+> -        break;
+> -    case TARGET_CLOCK_MONOTONIC_COARSE:
+> -        qemu_log("CLOCK_MONOTONIC_COARSE");
+> -        break;
+> -    case TARGET_CLOCK_BOOTTIME:
+> -        qemu_log("CLOCK_BOOTTIME");
+> -        break;
+> -    case TARGET_CLOCK_REALTIME_ALARM:
+> -        qemu_log("CLOCK_REALTIME_ALARM");
+> -        break;
+> -    case TARGET_CLOCK_BOOTTIME_ALARM:
+> -        qemu_log("CLOCK_BOOTTIME_ALARM");
+> -        break;
+> -    case TARGET_CLOCK_SGI_CYCLE:
+> -        qemu_log("CLOCK_SGI_CYCLE");
+> -        break;
+> -    case TARGET_CLOCK_TAI:
+> -        qemu_log("CLOCK_TAI");
+> -        break;
+> -    default:
+> -        qemu_log("%d", clockid);
+> -        break;
+> -    }
+> -    qemu_log("%s", get_comma(last));
+> -}
+> -#endif
+> -
+>  /*
+>   * Sysycall specific output functions
+>   */
+> @@ -839,6 +778,81 @@ print_syscall_ret_adjtimex(void *cpu_env, const struct syscallname *name,
+>  }
+>  #endif
+>  
+> +#if defined(TARGET_NR_clock_gettime) || defined(TARGET_NR_clock_getres)
+> +static void
+> +print_syscall_ret_clock_gettime(void *cpu_env, const struct syscallname *name,
+> +                                abi_long ret, abi_long arg0, abi_long arg1,
+> +                                abi_long arg2, abi_long arg3, abi_long arg4,
+> +                                abi_long arg5)
+> +{
+> +    if (!print_syscall_err(ret)) {
+> +        qemu_log(TARGET_ABI_FMT_ld, ret);
+> +        qemu_log(" (");
+> +        print_timespec(arg1, 1);
+> +        qemu_log(")");
+> +    }
+> +
+> +    qemu_log("\n");
+> +}
+> +#define print_syscall_ret_clock_getres     print_syscall_ret_clock_gettime
+> +#endif
+> +
+> +#ifdef TARGET_NR_gettimeofday
+> +static void
+> +print_syscall_ret_gettimeofday(void *cpu_env, const struct syscallname *name,
+> +                               abi_long ret, abi_long arg0, abi_long arg1,
+> +                               abi_long arg2, abi_long arg3, abi_long arg4,
+> +                               abi_long arg5)
+> +{
+> +    if (!print_syscall_err(ret)) {
+> +        qemu_log(TARGET_ABI_FMT_ld, ret);
+> +        qemu_log(" (");
+> +        print_timeval(arg0, 0);
+> +        print_timezone(arg1, 1);
+> +        qemu_log(")");
+> +    }
+> +
+> +    qemu_log("\n");
+> +}
+> +#endif
+> +
+> +#ifdef TARGET_NR_getitimer
+> +static void
+> +print_syscall_ret_getitimer(void *cpu_env, const struct syscallname *name,
+> +                            abi_long ret, abi_long arg0, abi_long arg1,
+> +                            abi_long arg2, abi_long arg3, abi_long arg4,
+> +                            abi_long arg5)
+> +{
+> +    if (!print_syscall_err(ret)) {
+> +        qemu_log(TARGET_ABI_FMT_ld, ret);
+> +        qemu_log(" (");
+> +        print_itimerval(arg1, 1);
+> +        qemu_log(")");
+> +    }
+> +
+> +    qemu_log("\n");
+> +}
+> +#endif
+> +
+> +
+> +#ifdef TARGET_NR_getitimer
+> +static void
+> +print_syscall_ret_setitimer(void *cpu_env, const struct syscallname *name,
+> +                            abi_long ret, abi_long arg0, abi_long arg1,
+> +                            abi_long arg2, abi_long arg3, abi_long arg4,
+> +                            abi_long arg5)
+> +{
+> +    if (!print_syscall_err(ret)) {
+> +        qemu_log(TARGET_ABI_FMT_ld, ret);
+> +        qemu_log(" (old_value = ");
+> +        print_itimerval(arg2, 1);
+> +        qemu_log(")");
+> +    }
+> +
+> +    qemu_log("\n");
+> +}
+> +#endif
+> +
+>  #if defined(TARGET_NR_listxattr) || defined(TARGET_NR_llistxattr) \
+>   || defined(TARGGET_NR_flistxattr)
+>  static void
+> @@ -1217,6 +1231,43 @@ UNUSED static struct flags mlockall_flags[] = {
+>      FLAG_END,
+>  };
+>  
+> +/* IDs of the various system clocks */
+> +#define TARGET_CLOCK_REALTIME              0
+> +#define TARGET_CLOCK_MONOTONIC             1
+> +#define TARGET_CLOCK_PROCESS_CPUTIME_ID    2
+> +#define TARGET_CLOCK_THREAD_CPUTIME_ID     3
+> +#define TARGET_CLOCK_MONOTONIC_RAW         4
+> +#define TARGET_CLOCK_REALTIME_COARSE       5
+> +#define TARGET_CLOCK_MONOTONIC_COARSE      6
+> +#define TARGET_CLOCK_BOOTTIME              7
+> +#define TARGET_CLOCK_REALTIME_ALARM        8
+> +#define TARGET_CLOCK_BOOTTIME_ALARM        9
+> +#define TARGET_CLOCK_SGI_CYCLE             10
+> +#define TARGET_CLOCK_TAI                   11
+> +
+> +UNUSED static struct enums clockids[] = {
+> +    ENUM_TARGET(CLOCK_REALTIME),
+> +    ENUM_TARGET(CLOCK_MONOTONIC),
+> +    ENUM_TARGET(CLOCK_PROCESS_CPUTIME_ID),
+> +    ENUM_TARGET(CLOCK_THREAD_CPUTIME_ID),
+> +    ENUM_TARGET(CLOCK_MONOTONIC_RAW),
+> +    ENUM_TARGET(CLOCK_REALTIME_COARSE),
+> +    ENUM_TARGET(CLOCK_MONOTONIC_COARSE),
+> +    ENUM_TARGET(CLOCK_BOOTTIME),
+> +    ENUM_TARGET(CLOCK_REALTIME_ALARM),
+> +    ENUM_TARGET(CLOCK_BOOTTIME_ALARM),
+> +    ENUM_TARGET(CLOCK_SGI_CYCLE),
+> +    ENUM_TARGET(CLOCK_TAI),
+> +    ENUM_END,
+> +};
+> +
+> +UNUSED static struct enums itimer_types[] = {
+> +    ENUM_GENERIC(ITIMER_REAL),
+> +    ENUM_GENERIC(ITIMER_VIRTUAL),
+> +    ENUM_GENERIC(ITIMER_PROF),
+> +    ENUM_END,
+> +};
+> +
+>  /*
+>   * print_xxx utility functions.  These are used to print syscall
+>   * parameters in certain format.  All of these have parameter
+> @@ -1435,13 +1486,34 @@ print_timeval(abi_ulong tv_addr, int last)
+>              print_pointer(tv_addr, last);
+>              return;
+>          }
+> -        qemu_log("{" TARGET_ABI_FMT_ld "," TARGET_ABI_FMT_ld "}%s",
+> -            tswapal(tv->tv_sec), tswapal(tv->tv_usec), get_comma(last));
+> +        qemu_log("{tv_sec = " TARGET_ABI_FMT_ld
+> +                 ",tv_usec = " TARGET_ABI_FMT_ld "}%s",
+> +                 tswapal(tv->tv_sec), tswapal(tv->tv_usec), get_comma(last));
+>          unlock_user(tv, tv_addr, 0);
+>      } else
+>          qemu_log("NULL%s", get_comma(last));
+>  }
+>  
+> +static void
+> +print_timespec(abi_ulong ts_addr, int last)
+> +{
+> +    if (ts_addr) {
+> +        struct target_timespec *ts;
+> +
+> +        ts = lock_user(VERIFY_READ, ts_addr, sizeof(*ts), 1);
+> +        if (!ts) {
+> +            print_pointer(ts_addr, last);
+> +            return;
+> +        }
+> +        qemu_log("{tv_sec = " TARGET_ABI_FMT_ld
+> +                 ",tv_nsec = " TARGET_ABI_FMT_ld "}%s",
+> +                 tswapal(ts->tv_sec), tswapal(ts->tv_nsec), get_comma(last));
+> +        unlock_user(ts, ts_addr, 0);
+> +    } else {
+> +        qemu_log("NULL%s", get_comma(last));
+> +    }
+> +}
+> +
+>  static void
+>  print_timezone(abi_ulong tz_addr, int last)
+>  {
+> @@ -1461,6 +1533,22 @@ print_timezone(abi_ulong tz_addr, int last)
+>      }
+>  }
+>  
+> +static void
+> +print_itimerval(abi_ulong it_addr, int last)
+> +{
+> +    if (it_addr) {
+> +        qemu_log("{it_interval=");
+> +        print_timeval(it_addr +
+> +                      offsetof(struct target_itimerval, it_interval), 0);
+> +        qemu_log("it_value=");
+> +        print_timeval(it_addr +
+> +                      offsetof(struct target_itimerval, it_value), 0);
+> +        qemu_log("}%s", get_comma(last));
+> +    } else {
+> +        qemu_log("NULL%s", get_comma(last));
+> +    }
+> +}
+> +
+>  #undef UNUSED
+>  
+>  #ifdef TARGET_NR_accept
+> @@ -1573,7 +1661,7 @@ print_clock_adjtime(void *cpu_env, const struct syscallname *name,
+>                      abi_long arg3, abi_long arg4, abi_long arg5)
+>  {
+>      print_syscall_prologue(name);
+> -    print_clockid(arg0, 0);
+> +    print_enums(clockids, arg0, 0);
+>      print_pointer(arg1, 1);
+>      print_syscall_epilogue(name);
+>  }
+> @@ -1903,6 +1991,19 @@ print_futimesat(void *cpu_env, const struct syscallname *name,
+>  }
+>  #endif
+>  
+> +#ifdef TARGET_NR_gettimeofday
+> +static void
+> +print_gettimeofday(void *cpu_env, const struct syscallname *name,
+> +                   abi_long arg0, abi_long arg1, abi_long arg2,
+> +                   abi_long arg3, abi_long arg4, abi_long arg5)
+> +{
+> +    print_syscall_prologue(name);
+> +    print_pointer(arg0, 0);
+> +    print_pointer(arg1, 1);
+> +    print_syscall_epilogue(name);
+> +}
+> +#endif
+> +
+>  #ifdef TARGET_NR_settimeofday
+>  static void
+>  print_settimeofday(void *cpu_env, const struct syscallname *name,
+> @@ -1916,6 +2017,60 @@ print_settimeofday(void *cpu_env, const struct syscallname *name,
+>  }
+>  #endif
+>  
+> +#if defined(TARGET_NR_clock_gettime) || defined(TARGET_NR_clock_getres)
+> +static void
+> +print_clock_gettime(void *cpu_env, const struct syscallname *name,
+> +                    abi_long arg0, abi_long arg1, abi_long arg2,
+> +                    abi_long arg3, abi_long arg4, abi_long arg5)
+> +{
+> +    print_syscall_prologue(name);
+> +    print_enums(clockids, arg0, 0);
+> +    print_pointer(arg1, 1);
+> +    print_syscall_epilogue(name);
+> +}
+> +#define print_clock_getres     print_clock_gettime
+> +#endif
+> +
+> +#ifdef TARGET_NR_clock_settime
+> +static void
+> +print_clock_settime(void *cpu_env, const struct syscallname *name,
+> +                    abi_long arg0, abi_long arg1, abi_long arg2,
+> +                    abi_long arg3, abi_long arg4, abi_long arg5)
+> +{
+> +    print_syscall_prologue(name);
+> +    print_enums(clockids, arg0, 0);
+> +    print_timespec(arg1, 1);
+> +    print_syscall_epilogue(name);
+> +}
+> +#endif
+> +
+> +#ifdef TARGET_NR_getitimer
+> +static void
+> +print_getitimer(void *cpu_env, const struct syscallname *name,
+> +                abi_long arg0, abi_long arg1, abi_long arg2,
+> +                abi_long arg3, abi_long arg4, abi_long arg5)
+> +{
+> +    print_syscall_prologue(name);
+> +    print_enums(itimer_types, arg0, 0);
+> +    print_pointer(arg1, 1);
+> +    print_syscall_epilogue(name);
+> +}
+> +#endif
+> +
+> +#ifdef TARGET_NR_setitimer
+> +static void
+> +print_setitimer(void *cpu_env, const struct syscallname *name,
+> +                abi_long arg0, abi_long arg1, abi_long arg2,
+> +                abi_long arg3, abi_long arg4, abi_long arg5)
+> +{
+> +    print_syscall_prologue(name);
+> +    print_enums(itimer_types, arg0, 0);
+> +    print_itimerval(arg1, 0);
+> +    print_pointer(arg2, 1);
+> +    print_syscall_epilogue(name);
+> +}
+> +#endif
+> +
+>  #ifdef TARGET_NR_link
+>  static void
+>  print_link(void *cpu_env, const struct syscallname *name,
+> diff --git a/linux-user/strace.list b/linux-user/strace.list
+> index d0ea7f3464..084048ab96 100644
+> --- a/linux-user/strace.list
+> +++ b/linux-user/strace.list
+> @@ -83,16 +83,18 @@
+>  { TARGET_NR_clock_adjtime, "clock_adjtime" , NULL, print_clock_adjtime, NULL },
+>  #endif
+>  #ifdef TARGET_NR_clock_getres
+> -{ TARGET_NR_clock_getres, "clock_getres" , NULL, NULL, NULL },
+> +{ TARGET_NR_clock_getres, "clock_getres" , NULL, print_clock_getres,
+> +                          print_syscall_ret_clock_getres },
+>  #endif
+>  #ifdef TARGET_NR_clock_gettime
+> -{ TARGET_NR_clock_gettime, "clock_gettime" , NULL, NULL, NULL },
+> +{ TARGET_NR_clock_gettime, "clock_gettime" , NULL, print_clock_gettime,
+> +                           print_syscall_ret_clock_gettime },
+>  #endif
+>  #ifdef TARGET_NR_clock_nanosleep
+>  { TARGET_NR_clock_nanosleep, "clock_nanosleep" , NULL, NULL, NULL },
+>  #endif
+>  #ifdef TARGET_NR_clock_settime
+> -{ TARGET_NR_clock_settime, "clock_settime" , NULL, NULL, NULL },
+> +{ TARGET_NR_clock_settime, "clock_settime" , NULL, print_clock_settime, NULL },
+>  #endif
+>  #ifdef TARGET_NR_clone
+>  { TARGET_NR_clone, "clone" , NULL, print_clone, NULL },
+> @@ -315,7 +317,8 @@
+>  { TARGET_NR_gethostname, "gethostname" , NULL, NULL, NULL },
+>  #endif
+>  #ifdef TARGET_NR_getitimer
+> -{ TARGET_NR_getitimer, "getitimer" , NULL, NULL, NULL },
+> +{ TARGET_NR_getitimer, "getitimer" , NULL, print_getitimer,
+> +                       print_syscall_ret_getitimer },
+>  #endif
+>  #ifdef TARGET_NR_get_kernel_syms
+>  { TARGET_NR_get_kernel_syms, "get_kernel_syms" , NULL, NULL, NULL },
+> @@ -388,7 +391,8 @@
+>  { TARGET_NR_gettid, "gettid" , "%s()", NULL, NULL },
+>  #endif
+>  #ifdef TARGET_NR_gettimeofday
+> -{ TARGET_NR_gettimeofday, "gettimeofday" , NULL, NULL, NULL },
+> +{ TARGET_NR_gettimeofday, "gettimeofday" , NULL, print_gettimeofday,
+> +                          print_syscall_ret_gettimeofday },
+>  #endif
+>  #ifdef TARGET_NR_getuid
+>  { TARGET_NR_getuid, "getuid" , "%s()", NULL, NULL },
+> @@ -1291,7 +1295,8 @@
+>  { TARGET_NR_sethostname, "sethostname" , NULL, NULL, NULL },
+>  #endif
+>  #ifdef TARGET_NR_setitimer
+> -{ TARGET_NR_setitimer, "setitimer" , NULL, NULL, NULL },
+> +{ TARGET_NR_setitimer, "setitimer" , NULL, print_setitimer,
+> +                       print_syscall_ret_setitimer },
+>  #endif
+>  #ifdef TARGET_NR_set_mempolicy
+>  { TARGET_NR_set_mempolicy, "set_mempolicy" , NULL, NULL, NULL },
+> 
 
-After this fixes, the configure succeed, but the make -j10 failed
-with
-```
-$ make -j10
-python3 -B /e/CI-Cor-Ready/xemu/qemu.org/meson/meson.py introspect --tests
-| python3 -B scripts/mtest2make.py > Makefile.mtest
-./ninjatool -t ninja2make --omit clean dist uninstall < build.ninja >
-Makefile.ninja
-  GIT     ui/keycodemapdb tests/fp/berkeley-testfloat-3
-tests/fp/berkeley-softfloat-3 meson dtc capstone slirp
-  GEN     tests/test-qapi-gen
-Traceback (most recent call last):
-  File "scripts/mtest2make.py", line 56, in <module>
-    executable =3D os.path.relpath(test['cmd'][0])
-  File "C:/CI-Tools/msys64/mingw64/lib/python3.8/ntpath.py", line 716, in
-relpath
-    raise ValueError("path is on mount %r, start on mount %r" % (
-ValueError: path is on mount 'C:', start on mount 'E:'
-make: *** =E6=AD=A3=E5=9C=A8=E5=88=A0=E9=99=A4=E6=96=87=E4=BB=B6=E2=80=9CMa=
-kefile.mtest=E2=80=9D
-make[1]: =E8=BF=9B=E5=85=A5=E7=9B=AE=E5=BD=95=E2=80=9C/e/CI-Cor-Ready/xemu/=
-qemu.org/slirp=E2=80=9D
-  GEN     /e/CI-Cor-Ready/xemu/qemu.org-x64/slirp/src/libslirp-version.h
-  CC      /e/CI-Cor-Ready/xemu/qemu.org-x64/slirp/src/arp_table.o
-  CC      /e/CI-Cor-Ready/xemu/qemu.org-x64/slirp/src/bootp.o
-  CC      /e/CI-Cor-Ready/xemu/qemu.org-x64/slirp/src/cksum.o
-  CC      /e/CI-Cor-Ready/xemu/qemu.org-x64/slirp/src/dhcpv6.o
-  CC      /e/CI-Cor-Ready/xemu/qemu.org-x64/slirp/src/dnssearch.o
-         DEP /e/CI-Cor-Ready/xemu/qemu.org/dtc/libfdt/fdt_overlay.c
-         DEP /e/CI-Cor-Ready/xemu/qemu.org/dtc/libfdt/fdt_check.c
-  CC      /e/CI-Cor-Ready/xemu/qemu.org-x64/slirp/src/if.o
-  CC      cs.o
-  CC      utils.o
-         DEP /e/CI-Cor-Ready/xemu/qemu.org/dtc/libfdt/fdt_addresses.c
-         DEP /e/CI-Cor-Ready/xemu/qemu.org/dtc/libfdt/fdt_empty_tree.c
-  CC      SStream.o
-  CC      MCInstrDesc.o
-         DEP /e/CI-Cor-Ready/xemu/qemu.org/dtc/libfdt/fdt_strerror.c
-         DEP /e/CI-Cor-Ready/xemu/qemu.org/dtc/libfdt/fdt_rw.c
-  CC      MCRegisterInfo.o
-  CC      arch/ARM/ARMDisassembler.o
-  CC      /e/CI-Cor-Ready/xemu/qemu.org-x64/slirp/src/ip_icmp.o
-         DEP /e/CI-Cor-Ready/xemu/qemu.org/dtc/libfdt/fdt_sw.c
-         DEP /e/CI-Cor-Ready/xemu/qemu.org/dtc/libfdt/fdt_wip.c
-  CC      /e/CI-Cor-Ready/xemu/qemu.org-x64/slirp/src/ip_input.o
-         DEP /e/CI-Cor-Ready/xemu/qemu.org/dtc/libfdt/fdt_ro.c
-         DEP /e/CI-Cor-Ready/xemu/qemu.org/dtc/libfdt/fdt.c
-  CC      arch/ARM/ARMInstPrinter.o
-  CC      /e/CI-Cor-Ready/xemu/qemu.org-x64/slirp/src/ip_output.o
-  CC      /e/CI-Cor-Ready/xemu/qemu.org-x64/slirp/src/ip6_icmp.o
-  CC      arch/ARM/ARMModule.o
-  CC      arch/ARM/ARMMapping.o
-  CC      arch/AArch64/AArch64BaseInfo.o
-  CC      arch/AArch64/AArch64Disassembler.o
-  CC      arch/AArch64/AArch64InstPrinter.o
-  CC      arch/AArch64/AArch64Mapping.o
-         CC libfdt/fdt.o
-  CC      /e/CI-Cor-Ready/xemu/qemu.org-x64/slirp/src/ip6_input.o
-  CC      /e/CI-Cor-Ready/xemu/qemu.org-x64/slirp/src/ip6_output.o
-  CC      arch/AArch64/AArch64Module.o
-  CC      arch/Mips/MipsDisassembler.o
-  CC      arch/Mips/MipsInstPrinter.o
-         CC libfdt/fdt_ro.o
-  CC      arch/Mips/MipsMapping.o
-  CC      /e/CI-Cor-Ready/xemu/qemu.org-x64/slirp/src/mbuf.o
-  CC      arch/Mips/MipsModule.o
-  CC      arch/PowerPC/PPCDisassembler.o
-  CC      arch/PowerPC/PPCInstPrinter.o
-         CC libfdt/fdt_wip.o
-  CC      arch/PowerPC/PPCMapping.o
-         CC libfdt/fdt_sw.o
-  CC      /e/CI-Cor-Ready/xemu/qemu.org-x64/slirp/src/misc.o
-  CC      arch/PowerPC/PPCModule.o
-  CC      arch/Sparc/SparcDisassembler.o
-         CC libfdt/fdt_rw.o
-  CC      arch/Sparc/SparcInstPrinter.o
-  CC      arch/Sparc/SparcMapping.o
-  CC      /e/CI-Cor-Ready/xemu/qemu.org-x64/slirp/src/ncsi.o
-  CC      arch/Sparc/SparcModule.o
-  CC      arch/SystemZ/SystemZDisassembler.o
-         CC libfdt/fdt_strerror.o
-  CC      arch/SystemZ/SystemZInstPrinter.o
-  CC      arch/SystemZ/SystemZMapping.o
-  CC      arch/SystemZ/SystemZModule.o
-  CC      arch/SystemZ/SystemZMCTargetDesc.o
-         CC libfdt/fdt_empty_tree.o
-  CC      arch/X86/X86Disassembler.o
-  CC      arch/X86/X86DisassemblerDecoder.o
-  CC      arch/X86/X86IntelInstPrinter.o
-  CC      arch/X86/X86ATTInstPrinter.o
-         CC libfdt/fdt_addresses.o
-  CC      /e/CI-Cor-Ready/xemu/qemu.org-x64/slirp/src/ndp_table.o
-         CC libfdt/fdt_overlay.o
-  CC      arch/X86/X86Mapping.o
-  CC      arch/X86/X86Module.o
-  CC      /e/CI-Cor-Ready/xemu/qemu.org-x64/slirp/src/sbuf.o
-         CC libfdt/fdt_check.o
-  CC      arch/XCore/XCoreInstPrinter.o
-  CC      arch/XCore/XCoreDisassembler.o
-  CC      arch/XCore/XCoreMapping.o
-         AR libfdt/libfdt.a
-  CC      arch/XCore/XCoreModule.o
-  CC      MCInst.o
-  CC      /e/CI-Cor-Ready/xemu/qemu.org-x64/slirp/src/slirp.o
-a - libfdt/fdt.o
-a - libfdt/fdt_ro.o
-a - libfdt/fdt_wip.o
-a - libfdt/fdt_sw.o
-a - libfdt/fdt_rw.o
-a - libfdt/fdt_strerror.o
-a - libfdt/fdt_empty_tree.o
-a - libfdt/fdt_addresses.o
-a - libfdt/fdt_overlay.o
-a - libfdt/fdt_check.o
-C:/CI-Tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../.=
-./../x86_64-w64-mingw32/bin/ar.exe:
-creating libfdt/libfdt.a
-  CC      /e/CI-Cor-Ready/xemu/qemu.org-x64/slirp/src/socket.o
-  CC      /e/CI-Cor-Ready/xemu/qemu.org-x64/slirp/src/state.o
-  CC      /e/CI-Cor-Ready/xemu/qemu.org-x64/slirp/src/stream.o
-  CC      /e/CI-Cor-Ready/xemu/qemu.org-x64/slirp/src/tcp_input.o
-  CC      /e/CI-Cor-Ready/xemu/qemu.org-x64/slirp/src/tcp_output.o
-  CC      /e/CI-Cor-Ready/xemu/qemu.org-x64/slirp/src/tcp_subr.o
-  CC      /e/CI-Cor-Ready/xemu/qemu.org-x64/slirp/src/tcp_timer.o
-  CC      /e/CI-Cor-Ready/xemu/qemu.org-x64/slirp/src/tftp.o
-  CC      /e/CI-Cor-Ready/xemu/qemu.org-x64/slirp/src/udp.o
-  CC      /e/CI-Cor-Ready/xemu/qemu.org-x64/slirp/src/udp6.o
-  CC      /e/CI-Cor-Ready/xemu/qemu.org-x64/slirp/src/util.o
-  CC      /e/CI-Cor-Ready/xemu/qemu.org-x64/slirp/src/version.o
-  CC      /e/CI-Cor-Ready/xemu/qemu.org-x64/slirp/src/vmstate.o
-  AR      capstone.lib
-C:/CI-Tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../.=
-./../x86_64-w64-mingw32/bin/ar.exe:
-creating E:/CI-Cor-Ready/xemu/qemu.org-x64/capstone/capstone.lib
-  AR      /e/CI-Cor-Ready/xemu/qemu.org-x64/slirp/libslirp.a
-make[1]: =E7=A6=BB=E5=BC=80=E7=9B=AE=E5=BD=95=E2=80=9C/e/CI-Cor-Ready/xemu/=
-qemu.org/slirp=E2=80=9D
-Makefile.ninja:27: *** =E5=A4=9A=E4=B8=AA=E7=9B=AE=E6=A0=87=E5=8C=B9=E9=85=
-=8D=E3=80=82 =E5=81=9C=E6=AD=A2=E3=80=82
+Applied to my linux-user-for-5.2 branch.
 
-```
+Thanks,
+Laurent
 
-On Tue, Aug 25, 2020 at 4:53 AM =E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo) <=
-luoyonggang@gmail.com>
-wrote:
-
->
->
-> ---------- Forwarded message ---------
-> From: =E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo) <luoyonggang@gmail.com>
-> Date: Tue, Aug 25, 2020 at 4:50 AM
-> Subject: msys2/mingw meson building fixes
-> To: qemu-level <qemu-devel@nongnu.org>
->
->
-> I've create a pull request for fixes python ninja detection and usage on
-> msys2/mingw
-> at  https://github.com/mesonbuild/meson/pull/7637
->
->
-> --
->          =E6=AD=A4=E8=87=B4
-> =E7=A4=BC
-> =E7=BD=97=E5=8B=87=E5=88=9A
-> Yours
->     sincerely,
-> Yonggang Luo
->
->
-> --
->          =E6=AD=A4=E8=87=B4
-> =E7=A4=BC
-> =E7=BD=97=E5=8B=87=E5=88=9A
-> Yours
->     sincerely,
-> Yonggang Luo
->
-
-
---=20
-         =E6=AD=A4=E8=87=B4
-=E7=A4=BC
-=E7=BD=97=E5=8B=87=E5=88=9A
-Yours
-    sincerely,
-Yonggang Luo
-
---00000000000046a21f05ada5ce56
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr">After this fixes, the configure succeed, but the make -j10=
- failed<div>with</div><div>```</div><div>$ make -j10<br>python3 -B /e/CI-Co=
-r-Ready/xemu/<a href=3D"http://qemu.org/meson/meson.py">qemu.org/meson/meso=
-n.py</a> introspect --tests | python3 -B scripts/mtest2make.py &gt; Makefil=
-e.mtest<br>./ninjatool -t ninja2make --omit clean dist uninstall &lt; build=
-.ninja &gt; Makefile.ninja<br>=C2=A0 GIT =C2=A0 =C2=A0 ui/keycodemapdb test=
-s/fp/berkeley-testfloat-3 tests/fp/berkeley-softfloat-3 meson dtc capstone =
-slirp<br>=C2=A0 GEN =C2=A0 =C2=A0 tests/test-qapi-gen<br>Traceback (most re=
-cent call last):<br>=C2=A0 File &quot;scripts/mtest2make.py&quot;, line 56,=
- in &lt;module&gt;<br>=C2=A0 =C2=A0 executable =3D os.path.relpath(test[&#3=
-9;cmd&#39;][0])<br>=C2=A0 File &quot;C:/CI-Tools/msys64/mingw64/lib/python3=
-.8/ntpath.py&quot;, line 716, in relpath<br>=C2=A0 =C2=A0 raise ValueError(=
-&quot;path is on mount %r, start on mount %r&quot; % (<br>ValueError: path =
-is on mount &#39;C:&#39;, start on mount &#39;E:&#39;<br>make: *** =E6=AD=
-=A3=E5=9C=A8=E5=88=A0=E9=99=A4=E6=96=87=E4=BB=B6=E2=80=9CMakefile.mtest=E2=
-=80=9D<br>make[1]: =E8=BF=9B=E5=85=A5=E7=9B=AE=E5=BD=95=E2=80=9C/e/CI-Cor-R=
-eady/xemu/<a href=3D"http://qemu.org/slirp">qemu.org/slirp</a>=E2=80=9D<br>=
-=C2=A0 GEN =C2=A0 =C2=A0 /e/CI-Cor-Ready/xemu/qemu.org-x64/slirp/src/libsli=
-rp-version.h<br>=C2=A0 CC =C2=A0 =C2=A0 =C2=A0/e/CI-Cor-Ready/xemu/qemu.org=
--x64/slirp/src/arp_table.o<br>=C2=A0 CC =C2=A0 =C2=A0 =C2=A0/e/CI-Cor-Ready=
-/xemu/qemu.org-x64/slirp/src/bootp.o<br>=C2=A0 CC =C2=A0 =C2=A0 =C2=A0/e/CI=
--Cor-Ready/xemu/qemu.org-x64/slirp/src/cksum.o<br>=C2=A0 CC =C2=A0 =C2=A0 =
-=C2=A0/e/CI-Cor-Ready/xemu/qemu.org-x64/slirp/src/dhcpv6.o<br>=C2=A0 CC =C2=
-=A0 =C2=A0 =C2=A0/e/CI-Cor-Ready/xemu/qemu.org-x64/slirp/src/dnssearch.o<br=
->=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0DEP /e/CI-Cor-Ready/xemu/<a href=3D"http=
-://qemu.org/dtc/libfdt/fdt_overlay.c">qemu.org/dtc/libfdt/fdt_overlay.c</a>=
-<br>=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0DEP /e/CI-Cor-Ready/xemu/<a href=3D"h=
-ttp://qemu.org/dtc/libfdt/fdt_check.c">qemu.org/dtc/libfdt/fdt_check.c</a><=
-br>=C2=A0 CC =C2=A0 =C2=A0 =C2=A0/e/CI-Cor-Ready/xemu/qemu.org-x64/slirp/sr=
-c/if.o<br>=C2=A0 CC =C2=A0 =C2=A0 =C2=A0cs.o<br>=C2=A0 CC =C2=A0 =C2=A0 =C2=
-=A0utils.o<br>=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0DEP /e/CI-Cor-Ready/xemu/<a=
- href=3D"http://qemu.org/dtc/libfdt/fdt_addresses.c">qemu.org/dtc/libfdt/fd=
-t_addresses.c</a><br>=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0DEP /e/CI-Cor-Ready/=
-xemu/<a href=3D"http://qemu.org/dtc/libfdt/fdt_empty_tree.c">qemu.org/dtc/l=
-ibfdt/fdt_empty_tree.c</a><br>=C2=A0 CC =C2=A0 =C2=A0 =C2=A0SStream.o<br>=
-=C2=A0 CC =C2=A0 =C2=A0 =C2=A0MCInstrDesc.o<br>=C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0DEP /e/CI-Cor-Ready/xemu/<a href=3D"http://qemu.org/dtc/libfdt/fdt_st=
-rerror.c">qemu.org/dtc/libfdt/fdt_strerror.c</a><br>=C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0DEP /e/CI-Cor-Ready/xemu/<a href=3D"http://qemu.org/dtc/libfdt=
-/fdt_rw.c">qemu.org/dtc/libfdt/fdt_rw.c</a><br>=C2=A0 CC =C2=A0 =C2=A0 =C2=
-=A0MCRegisterInfo.o<br>=C2=A0 CC =C2=A0 =C2=A0 =C2=A0arch/ARM/ARMDisassembl=
-er.o<br>=C2=A0 CC =C2=A0 =C2=A0 =C2=A0/e/CI-Cor-Ready/xemu/qemu.org-x64/sli=
-rp/src/ip_icmp.o<br>=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0DEP /e/CI-Cor-Ready/x=
-emu/<a href=3D"http://qemu.org/dtc/libfdt/fdt_sw.c">qemu.org/dtc/libfdt/fdt=
-_sw.c</a><br>=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0DEP /e/CI-Cor-Ready/xemu/<a =
-href=3D"http://qemu.org/dtc/libfdt/fdt_wip.c">qemu.org/dtc/libfdt/fdt_wip.c=
-</a><br>=C2=A0 CC =C2=A0 =C2=A0 =C2=A0/e/CI-Cor-Ready/xemu/qemu.org-x64/sli=
-rp/src/ip_input.o<br>=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0DEP /e/CI-Cor-Ready/=
-xemu/<a href=3D"http://qemu.org/dtc/libfdt/fdt_ro.c">qemu.org/dtc/libfdt/fd=
-t_ro.c</a><br>=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0DEP /e/CI-Cor-Ready/xemu/<a=
- href=3D"http://qemu.org/dtc/libfdt/fdt.c">qemu.org/dtc/libfdt/fdt.c</a><br=
->=C2=A0 CC =C2=A0 =C2=A0 =C2=A0arch/ARM/ARMInstPrinter.o<br>=C2=A0 CC =C2=
-=A0 =C2=A0 =C2=A0/e/CI-Cor-Ready/xemu/qemu.org-x64/slirp/src/ip_output.o<br=
->=C2=A0 CC =C2=A0 =C2=A0 =C2=A0/e/CI-Cor-Ready/xemu/qemu.org-x64/slirp/src/=
-ip6_icmp.o<br>=C2=A0 CC =C2=A0 =C2=A0 =C2=A0arch/ARM/ARMModule.o<br>=C2=A0 =
-CC =C2=A0 =C2=A0 =C2=A0arch/ARM/ARMMapping.o<br>=C2=A0 CC =C2=A0 =C2=A0 =C2=
-=A0arch/AArch64/AArch64BaseInfo.o<br>=C2=A0 CC =C2=A0 =C2=A0 =C2=A0arch/AAr=
-ch64/AArch64Disassembler.o<br>=C2=A0 CC =C2=A0 =C2=A0 =C2=A0arch/AArch64/AA=
-rch64InstPrinter.o<br>=C2=A0 CC =C2=A0 =C2=A0 =C2=A0arch/AArch64/AArch64Map=
-ping.o<br>=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0CC libfdt/fdt.o<br>=C2=A0 CC =
-=C2=A0 =C2=A0 =C2=A0/e/CI-Cor-Ready/xemu/qemu.org-x64/slirp/src/ip6_input.o=
-<br>=C2=A0 CC =C2=A0 =C2=A0 =C2=A0/e/CI-Cor-Ready/xemu/qemu.org-x64/slirp/s=
-rc/ip6_output.o<br>=C2=A0 CC =C2=A0 =C2=A0 =C2=A0arch/AArch64/AArch64Module=
-.o<br>=C2=A0 CC =C2=A0 =C2=A0 =C2=A0arch/Mips/MipsDisassembler.o<br>=C2=A0 =
-CC =C2=A0 =C2=A0 =C2=A0arch/Mips/MipsInstPrinter.o<br>=C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0CC libfdt/fdt_ro.o<br>=C2=A0 CC =C2=A0 =C2=A0 =C2=A0arch/Mips/=
-MipsMapping.o<br>=C2=A0 CC =C2=A0 =C2=A0 =C2=A0/e/CI-Cor-Ready/xemu/qemu.or=
-g-x64/slirp/src/mbuf.o<br>=C2=A0 CC =C2=A0 =C2=A0 =C2=A0arch/Mips/MipsModul=
-e.o<br>=C2=A0 CC =C2=A0 =C2=A0 =C2=A0arch/PowerPC/PPCDisassembler.o<br>=C2=
-=A0 CC =C2=A0 =C2=A0 =C2=A0arch/PowerPC/PPCInstPrinter.o<br>=C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0CC libfdt/fdt_wip.o<br>=C2=A0 CC =C2=A0 =C2=A0 =C2=A0ar=
-ch/PowerPC/PPCMapping.o<br>=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0CC libfdt/fdt_=
-sw.o<br>=C2=A0 CC =C2=A0 =C2=A0 =C2=A0/e/CI-Cor-Ready/xemu/qemu.org-x64/sli=
-rp/src/misc.o<br>=C2=A0 CC =C2=A0 =C2=A0 =C2=A0arch/PowerPC/PPCModule.o<br>=
-=C2=A0 CC =C2=A0 =C2=A0 =C2=A0arch/Sparc/SparcDisassembler.o<br>=C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0CC libfdt/fdt_rw.o<br>=C2=A0 CC =C2=A0 =C2=A0 =C2=
-=A0arch/Sparc/SparcInstPrinter.o<br>=C2=A0 CC =C2=A0 =C2=A0 =C2=A0arch/Spar=
-c/SparcMapping.o<br>=C2=A0 CC =C2=A0 =C2=A0 =C2=A0/e/CI-Cor-Ready/xemu/qemu=
-.org-x64/slirp/src/ncsi.o<br>=C2=A0 CC =C2=A0 =C2=A0 =C2=A0arch/Sparc/Sparc=
-Module.o<br>=C2=A0 CC =C2=A0 =C2=A0 =C2=A0arch/SystemZ/SystemZDisassembler.=
-o<br>=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0CC libfdt/fdt_strerror.o<br>=C2=A0 C=
-C =C2=A0 =C2=A0 =C2=A0arch/SystemZ/SystemZInstPrinter.o<br>=C2=A0 CC =C2=A0=
- =C2=A0 =C2=A0arch/SystemZ/SystemZMapping.o<br>=C2=A0 CC =C2=A0 =C2=A0 =C2=
-=A0arch/SystemZ/SystemZModule.o<br>=C2=A0 CC =C2=A0 =C2=A0 =C2=A0arch/Syste=
-mZ/SystemZMCTargetDesc.o<br>=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0CC libfdt/fdt=
-_empty_tree.o<br>=C2=A0 CC =C2=A0 =C2=A0 =C2=A0arch/X86/X86Disassembler.o<b=
-r>=C2=A0 CC =C2=A0 =C2=A0 =C2=A0arch/X86/X86DisassemblerDecoder.o<br>=C2=A0=
- CC =C2=A0 =C2=A0 =C2=A0arch/X86/X86IntelInstPrinter.o<br>=C2=A0 CC =C2=A0 =
-=C2=A0 =C2=A0arch/X86/X86ATTInstPrinter.o<br>=C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0CC libfdt/fdt_addresses.o<br>=C2=A0 CC =C2=A0 =C2=A0 =C2=A0/e/CI-Cor-=
-Ready/xemu/qemu.org-x64/slirp/src/ndp_table.o<br>=C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0CC libfdt/fdt_overlay.o<br>=C2=A0 CC =C2=A0 =C2=A0 =C2=A0arch/X86=
-/X86Mapping.o<br>=C2=A0 CC =C2=A0 =C2=A0 =C2=A0arch/X86/X86Module.o<br>=C2=
-=A0 CC =C2=A0 =C2=A0 =C2=A0/e/CI-Cor-Ready/xemu/qemu.org-x64/slirp/src/sbuf=
-.o<br>=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0CC libfdt/fdt_check.o<br>=C2=A0 CC =
-=C2=A0 =C2=A0 =C2=A0arch/XCore/XCoreInstPrinter.o<br>=C2=A0 CC =C2=A0 =C2=
-=A0 =C2=A0arch/XCore/XCoreDisassembler.o<br>=C2=A0 CC =C2=A0 =C2=A0 =C2=A0a=
-rch/XCore/XCoreMapping.o<br>=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0AR libfdt/lib=
-fdt.a<br>=C2=A0 CC =C2=A0 =C2=A0 =C2=A0arch/XCore/XCoreModule.o<br>=C2=A0 C=
-C =C2=A0 =C2=A0 =C2=A0MCInst.o<br>=C2=A0 CC =C2=A0 =C2=A0 =C2=A0/e/CI-Cor-R=
-eady/xemu/qemu.org-x64/slirp/src/slirp.o<br>a - libfdt/fdt.o<br>a - libfdt/=
-fdt_ro.o<br>a - libfdt/fdt_wip.o<br>a - libfdt/fdt_sw.o<br>a - libfdt/fdt_r=
-w.o<br>a - libfdt/fdt_strerror.o<br>a - libfdt/fdt_empty_tree.o<br>a - libf=
-dt/fdt_addresses.o<br>a - libfdt/fdt_overlay.o<br>a - libfdt/fdt_check.o<br=
->C:/CI-Tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../=
-../../x86_64-w64-mingw32/bin/ar.exe: creating libfdt/libfdt.a<br>=C2=A0 CC =
-=C2=A0 =C2=A0 =C2=A0/e/CI-Cor-Ready/xemu/qemu.org-x64/slirp/src/socket.o<br=
->=C2=A0 CC =C2=A0 =C2=A0 =C2=A0/e/CI-Cor-Ready/xemu/qemu.org-x64/slirp/src/=
-state.o<br>=C2=A0 CC =C2=A0 =C2=A0 =C2=A0/e/CI-Cor-Ready/xemu/qemu.org-x64/=
-slirp/src/stream.o<br>=C2=A0 CC =C2=A0 =C2=A0 =C2=A0/e/CI-Cor-Ready/xemu/qe=
-mu.org-x64/slirp/src/tcp_input.o<br>=C2=A0 CC =C2=A0 =C2=A0 =C2=A0/e/CI-Cor=
--Ready/xemu/qemu.org-x64/slirp/src/tcp_output.o<br>=C2=A0 CC =C2=A0 =C2=A0 =
-=C2=A0/e/CI-Cor-Ready/xemu/qemu.org-x64/slirp/src/tcp_subr.o<br>=C2=A0 CC =
-=C2=A0 =C2=A0 =C2=A0/e/CI-Cor-Ready/xemu/qemu.org-x64/slirp/src/tcp_timer.o=
-<br>=C2=A0 CC =C2=A0 =C2=A0 =C2=A0/e/CI-Cor-Ready/xemu/qemu.org-x64/slirp/s=
-rc/tftp.o<br>=C2=A0 CC =C2=A0 =C2=A0 =C2=A0/e/CI-Cor-Ready/xemu/qemu.org-x6=
-4/slirp/src/udp.o<br>=C2=A0 CC =C2=A0 =C2=A0 =C2=A0/e/CI-Cor-Ready/xemu/qem=
-u.org-x64/slirp/src/udp6.o<br>=C2=A0 CC =C2=A0 =C2=A0 =C2=A0/e/CI-Cor-Ready=
-/xemu/qemu.org-x64/slirp/src/util.o<br>=C2=A0 CC =C2=A0 =C2=A0 =C2=A0/e/CI-=
-Cor-Ready/xemu/qemu.org-x64/slirp/src/version.o<br>=C2=A0 CC =C2=A0 =C2=A0 =
-=C2=A0/e/CI-Cor-Ready/xemu/qemu.org-x64/slirp/src/vmstate.o<br>=C2=A0 AR =
-=C2=A0 =C2=A0 =C2=A0capstone.lib<br>C:/CI-Tools/msys64/mingw64/bin/../lib/g=
-cc/x86_64-w64-mingw32/10.2.0/../../../../x86_64-w64-mingw32/bin/ar.exe: cre=
-ating E:/CI-Cor-Ready/xemu/qemu.org-x64/capstone/capstone.lib<br>=C2=A0 AR =
-=C2=A0 =C2=A0 =C2=A0/e/CI-Cor-Ready/xemu/qemu.org-x64/slirp/libslirp.a<br>m=
-ake[1]: =E7=A6=BB=E5=BC=80=E7=9B=AE=E5=BD=95=E2=80=9C/e/CI-Cor-Ready/xemu/<=
-a href=3D"http://qemu.org/slirp">qemu.org/slirp</a>=E2=80=9D<br>Makefile.ni=
-nja:27: *** =E5=A4=9A=E4=B8=AA=E7=9B=AE=E6=A0=87=E5=8C=B9=E9=85=8D=E3=80=82=
- =E5=81=9C=E6=AD=A2=E3=80=82<br><br></div><div>```</div></div><br><div clas=
-s=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">On Tue, Aug 25, 202=
-0 at 4:53 AM =E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo) &lt;<a href=3D"mailt=
-o:luoyonggang@gmail.com">luoyonggang@gmail.com</a>&gt; wrote:<br></div><blo=
-ckquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left=
-:1px solid rgb(204,204,204);padding-left:1ex"><div dir=3D"ltr"><br><br><div=
- class=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">---------- For=
-warded message ---------<br>From: <strong class=3D"gmail_sendername" dir=3D=
-"auto">=E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo)</strong> <span dir=3D"auto=
-">&lt;<a href=3D"mailto:luoyonggang@gmail.com" target=3D"_blank">luoyonggan=
-g@gmail.com</a>&gt;</span><br>Date: Tue, Aug 25, 2020 at 4:50 AM<br>Subject=
-: msys2/mingw meson building fixes<br>To: qemu-level &lt;<a href=3D"mailto:=
-qemu-devel@nongnu.org" target=3D"_blank">qemu-devel@nongnu.org</a>&gt;<br><=
-/div><br><br><div dir=3D"ltr">I&#39;ve create a pull request for fixes pyth=
-on ninja detection and usage on msys2/mingw<div>at=C2=A0
-
-<a href=3D"https://github.com/mesonbuild/meson/pull/7637" target=3D"_blank"=
->https://github.com/mesonbuild/meson/pull/7637</a>=C2=A0</div><div>=C2=A0<b=
-r></div><div><div><div><br></div>-- <br><div dir=3D"ltr">=C2=A0 =C2=A0 =C2=
-=A0 =C2=A0=C2=A0 =E6=AD=A4=E8=87=B4<br>=E7=A4=BC<br>=E7=BD=97=E5=8B=87=E5=
-=88=9A<br>Yours<br>=C2=A0 =C2=A0 sincerely,<br>Yonggang Luo<br></div></div>=
-</div></div>
-</div><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr">=C2=A0 =C2=
-=A0 =C2=A0 =C2=A0=C2=A0 =E6=AD=A4=E8=87=B4<br>=E7=A4=BC<br>=E7=BD=97=E5=8B=
-=87=E5=88=9A<br>Yours<br>=C2=A0 =C2=A0 sincerely,<br>Yonggang Luo<br></div>=
-</div>
-</blockquote></div><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr"=
- class=3D"gmail_signature">=C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =E6=AD=A4=E8=
-=87=B4<br>=E7=A4=BC<br>=E7=BD=97=E5=8B=87=E5=88=9A<br>Yours<br>=C2=A0 =C2=
-=A0 sincerely,<br>Yonggang Luo<br></div>
-
---00000000000046a21f05ada5ce56--
 
