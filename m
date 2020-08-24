@@ -2,107 +2,121 @@ Return-Path: <SRS0=JPH5=CC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-18.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96E2CC433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 16:21:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3485AC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 16:21:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 61B4A2074D
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 16:21:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GOCeUR5N"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61B4A2074D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 099C62072D
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 16:21:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 099C62072D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37900 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38288 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAFE7-0000Ff-MC
-	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 12:21:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52214)
+	id 1kAFEE-0000Pv-9x
+	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 12:21:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52266)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1kAFDJ-0007nW-QM
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 12:20:53 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60434)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1kAFDI-0004eU-58
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 12:20:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598286051;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=EZPqO0i9nwV9cKVEOUZrqTFf+kRqEfBSBGBt9p29VPU=;
- b=GOCeUR5NqctHoqWxdQaq6DTTjWSDrCj9myx5ehVyWYNy8fxPx1Zlp8a1cs65g2Fw9Nk57K
- tWcgWRQybE8LPAEjBByNGVZGrfd2mtYMZHjKKF0V0+vKEKARS93Y+BvMgyMIgPgb4o6CVE
- wzm8XSoy/dtbD4shvJ1w+DLKMbpvNvY=
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
- [209.85.222.199]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-343-HUazv-rYN3GUzbxl5k8CpA-1; Mon, 24 Aug 2020 12:20:48 -0400
-X-MC-Unique: HUazv-rYN3GUzbxl5k8CpA-1
-Received: by mail-qk1-f199.google.com with SMTP id 1so6749584qki.22
- for <qemu-devel@nongnu.org>; Mon, 24 Aug 2020 09:20:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=EZPqO0i9nwV9cKVEOUZrqTFf+kRqEfBSBGBt9p29VPU=;
- b=QDK6WA4qZYGDcRV5aFTmBxYdBZQgu/TswX/+YTBtHk3TAkKsGvyDwlkK3EgQfPIFY4
- snNrXjHR0qtmEFuaXVeHCPTF8qFzSP6NNXuGVTjwGGRnYIKzW16fRGtTKcH0EOHf6Imf
- m1O1H03e+KC+NatDL26WF7u9jo2hkK2aj+9q+lv/whzkjAZyRAZguYUEMKVaHCYDqPRl
- hfy4S1DmhKhOMC3tUktu1lU3YL/RYHH8VxWz9XtKia392te/0XXssfDOhsWKZGPuhVSC
- 5JzfBmDPwvZrhRCD6soCRLoqbmPYuFlr93Xcdzxpk2nbAovMzC8L+ZD0Gzq1+oL+QSU3
- X6mw==
-X-Gm-Message-State: AOAM531UiJeB87AR3NbkJu8RWwpcd5V0PwFFwLPEc6GG9WuGviox5VXM
- STx1dOy97JsQQdPV87WUFN6lEdolULsSZnqaXL+G7QeUX/pFdHL3zeZd3JDngsFGnkI/ZMLNaFP
- iZLumeutAsPphfak=
-X-Received: by 2002:a05:6214:1709:: with SMTP id
- db9mr5617589qvb.142.1598286044394; 
- Mon, 24 Aug 2020 09:20:44 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxKz1vEw/5vRR+gk/q67juj9ndYT5x6NXmJHk0Z78d9heh3nFcVriVuguhPRLK5wyVbNFVjWQ==
-X-Received: by 2002:a05:6214:1709:: with SMTP id
- db9mr5617562qvb.142.1598286044064; 
- Mon, 24 Aug 2020 09:20:44 -0700 (PDT)
-Received: from xz-x1 (bras-vprn-toroon474qw-lp130-11-70-53-122-15.dsl.bell.ca.
- [70.53.122.15])
- by smtp.gmail.com with ESMTPSA id j72sm9555088qke.20.2020.08.24.09.20.41
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 24 Aug 2020 09:20:42 -0700 (PDT)
-Date: Mon, 24 Aug 2020 12:20:45 -0400
-From: Peter Xu <peterx@redhat.com>
-To: Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>
-Subject: Re: [RFC v5 3/3] intel_iommu: Do not notify regular iotlb to
- device-iotlb notifiers
-Message-ID: <20200824162045.GA6424@xz-x1>
-References: <20200824104738.20664-1-eperezma@redhat.com>
- <20200824104738.20664-4-eperezma@redhat.com>
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kAFDP-0007u8-3L
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 12:20:59 -0400
+Received: from mout.kundenserver.de ([212.227.126.135]:38747)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kAFDM-0004gx-TL
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 12:20:58 -0400
+Received: from [192.168.100.1] ([82.252.135.186]) by mrelayeu.kundenserver.de
+ (mreue009 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1N6bsM-1khZ910ORK-0183XZ; Mon, 24 Aug 2020 18:20:45 +0200
+To: Filip Bozuta <Filip.Bozuta@syrmia.com>, qemu-devel@nongnu.org
+References: <20200726235221.337529-1-Filip.Bozuta@syrmia.com>
+ <20200726235221.337529-2-Filip.Bozuta@syrmia.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Subject: Re: [PATCH v2 1/2] linux-user: Fix 'mq_timedsend()' and
+ 'mq_timedreceive()'
+Message-ID: <1b45a25e-3ddb-c09d-be52-8cadbce148d0@vivier.eu>
+Date: Mon, 24 Aug 2020 18:20:44 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200824104738.20664-4-eperezma@redhat.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=peterx@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <20200726235221.337529-2-Filip.Bozuta@syrmia.com>
 Content-Type: text/plain; charset=utf-8
+Content-Language: fr
 Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=peterx@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/24 04:38:05
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.956,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Provags-ID: V03:K1:6jfHUOFk+Ywya6nI+Oas8Stg+Fvu8Lt0MAaes03aJE67xJ4ZAzV
+ xnnuU+YqMesxCn97JtKDTqZQUGS7hwGX8ODwtSrQ9CUJoY0jETCk5H88ZzBOT6lOFIOUzSL
+ DGKDEAUvPO71XsnnypjsaRgL3/BM+iCEgwtCBhDLyR7twGemrnT0/l9dWPoOJfsf5yNPhWS
+ 927vdxX5kTkQ1NYcodO8w==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:uFOzNozFzN8=:IUYLoFr7PBiask91TGm4ob
+ odSYygBBbmlKY3unJmKAt6FgJwS6Khsl4xnQ8WPESAEGzXbKU8pvl3NhuogPd0bWDKX0d23A5
+ UYYlduHHGTggEFgJQEtckPbxwIzfBRsoTUzVr3gwUqn70vKi3WZYHVbf/I3fFMORcHJdoQCIS
+ C7W+cGKwMfEQzhKgKvtiU/lKhqXoidrqROhd7C9o58TuyJSU46bXfVnqzKDz+aSFbrxP/SWdy
+ JHW4QlV4sYyndlmD70H45nj26vFarqJWOnhXKuLqr185ez35ym52jj+E72+8LRP2zFW0iySQe
+ 6q+pRkGzhm9KrDbRmdhyxcfyh5k9UZnU3gftlqHTqlXdm2S8A3fiP/LeqCEr0OpJDE2G4ax8a
+ 0B4OzHrwJn05i05D2+mwTDsWXc7p0sRlHzSK/GkBfNsc+LjKT8fnnMOo6dqoL6CNGg1v2j7He
+ Pfkycoc1flcin1Y2FR8RKFG2Lgw2wXfLDZXgqrRywL65mgK99tA6mo8gzGFh8d0ONY2OWDvw5
+ 9EDwyN1VGdLU/r6nCg9l7tDZhUuyMy87cY2d+B972/KA00anTz60u/wzQcrrF3YF3eVJaGCmd
+ vCQgkZ31cwZZg68sVbODNA+xsD3kKhwOgn5c2Tcyc4mfevT2GCzvwYu9RxwLUCKl6PZHhDXf8
+ ibsrlHKPz+WCVHUgrpDrSkHaUsbL86JklIOFgGRtTz5ZPh5N+GFDPUQV7GSIqn+hiH0nvkJES
+ f5t/2TK1uGAelEHpGKC3zzyjzVqxW2WPOkPsZvvr1QI2PWFtoDgLwqlQyD1qZ3GTAXM1ZdbKU
+ +1g3DZo+hZ4aH5CDM3oRyrGY1XafqIv1iVixn5uA+tjxkxvTKQgPbGo629tQ4kHZ1watN1c
+Received-SPF: none client-ip=212.227.126.135; envelope-from=laurent@vivier.eu;
+ helo=mout.kundenserver.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/24 12:20:55
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-2.25,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -115,77 +129,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Yan Zhao <yan.y.zhao@intel.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Juan Quintela <quintela@redhat.com>,
- Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- qemu-devel@nongnu.org, Eric Auger <eric.auger@redhat.com>, qemu-arm@nongnu.org,
- Avi Kivity <avi@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Riku Voipio <riku.voipio@iki.fi>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Aug 24, 2020 at 12:47:38PM +0200, Eugenio Pérez wrote:
-> This improves performance in case of netperf with vhost-net:
-> * TCP_STREAM: From 1374.81Mbit/s to 1845Mbit/s (37%)
-> * TCP_RR: From 6559.36 trans/s to 7916.29/s (21%)
-> * UDP_RR: From 6705.39 trans/s to 8199.39/s (22%)
-> * UDP_STREAM: No change observed (not significant 0.1% improvement)
-
-Good to know that we can get such a perf boost by removing the extra
-invalidations!
-
+Le 27/07/2020 à 01:52, Filip Bozuta a écrit :
+> Implementations of syscalls 'mq_timedsend()' and 'mq_timedreceive()'
+> in 'syscall.c' use functions 'target_to_host_timespec()' and
+> 'host_to_target_timespec()' to transfer the value of 'struct timespec'
+> between target and host. However, the implementations don't check whether
+> this conversion succeeds and thus can cause an unaproppriate error instead
+> of the 'EFAULT (Bad address)' which is supposed to be set if the conversion
+> from target to host fails. This was confirmed with the modified LTP
+> test suite where test cases with a bad adress for 'timespec' were
+> added. This modified test suite can be found at:
+> https://github.com/bozutaf/ltp
 > 
-> Signed-off-by: Eugenio Pérez <eperezma@redhat.com>
+> Without the changes from this patch the bad adress testcase for 'mq_timedsend()'
+> succeds unexpectedly, while the test returns errno 'ETIMEOUT' for
+> 'mq_timedreceive()':
+> 
+> mq_timedsend01.c:190: FAIL: mq_timedsend() returned 0, expected -1: SUCCESS (0)
+> mq_timedreceive01.c:178: FAIL: mq_timedreceive() failed unexpectedly,
+> expected EFAULT: ETIMEDOUT (110)
+> 
+> After the changes from this patch, testcases for both syscalls fail with EFAULT
+> as expected, which is the same test result that is received with native execution:
+> 
+> mq_timedsend01.c:187: PASS: mq_timedsend() failed expectedly: EFAULT (14)
+> mq_timedreceive01.c:180: PASS: mq_timedreceive() failed expectedly: EFAULT (14)
+> 
+> (Patch with this new test case will be sent to LTP mailing list soon)
+> 
+> Signed-off-by: Filip Bozuta <Filip.Bozuta@syrmia.com>
 > ---
->  hw/i386/intel_iommu.c | 6 ++++++
->  1 file changed, 6 insertions(+)
+>  linux-user/syscall.c | 16 ++++++++++++----
+>  1 file changed, 12 insertions(+), 4 deletions(-)
 > 
-> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> index 2ad6b9d796..d539a9f281 100644
-> --- a/hw/i386/intel_iommu.c
-> +++ b/hw/i386/intel_iommu.c
-> @@ -1959,6 +1959,12 @@ static void vtd_iotlb_domain_invalidate(IntelIOMMUState *s, uint16_t domain_id)
->      vtd_iommu_unlock(s);
+> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+> index 05f03919ff..1f8d04934a 100644
+> --- a/linux-user/syscall.c
+> +++ b/linux-user/syscall.c
+> @@ -11817,9 +11817,13 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
 >  
->      QLIST_FOREACH(vtd_as, &s->vtd_as_with_notifiers, next) {
-> +        if (vtd_as->iommu.iommu_notify_flags & IOMMU_NOTIFIER_DEVIOTLB) {
-> +            /* If IOMMU memory region is DEVICE IOTLB type, it does not make
-> +             * sense to send regular IOMMU notifications. */
-> +            continue;
-> +        }
+>              p = lock_user (VERIFY_READ, arg2, arg3, 1);
+>              if (arg5 != 0) {
+> -                target_to_host_timespec(&ts, arg5);
+> +                if (target_to_host_timespec(&ts, arg5)) {
+> +                    return -TARGET_EFAULT;
+> +                }
+>                  ret = get_errno(safe_mq_timedsend(arg1, p, arg3, arg4, &ts));
+> -                host_to_target_timespec(arg5, &ts);
+> +                if (host_to_target_timespec(arg5, &ts)) {
 
-Though here IMHO a cleaner approach (rather than checking explicitly against
-DEVIOTLB flag) is to add a notification type into IOMMUTLBEntry.
+If mq_timedsend() fails, you clear the error value and the structure.
 
-Then for domain invalidation, the caller is responsible to pass the type
-IOMMU_NOTIFIER_UNMAP into the type field. memory_region_notify_iommu_one() will
-automatically skip the message if not registerd by the notifier.
+You need to check if there is an error:
 
-Also, it would be nice to have this new type before or when introducing the
-DEVIOTLB message, otherwise the DEVIOTLB patch can be still slightly confusing
-by itself when notified as UNMAP.
+                   if (!is_error(ret) &&
+                       host_to_target_timespec(arg5, &ts)) {
 
-So here's some patch layout I'm thinking:
 
-  - patch 1: rename function, we can keep it
+> +                    return -TARGET_EFAULT;
+> +                }
+>              } else {
+>                  ret = get_errno(safe_mq_timedsend(arg1, p, arg3, arg4, NULL));
+>              }
+> @@ -11836,10 +11840,14 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+>  
+>              p = lock_user (VERIFY_READ, arg2, arg3, 1);
+>              if (arg5 != 0) {
+> -                target_to_host_timespec(&ts, arg5);
+> +                if (target_to_host_timespec(&ts, arg5)) {
+> +                    return -TARGET_EFAULT;
+> +                }
+>                  ret = get_errno(safe_mq_timedreceive(arg1, p, arg3,
+>                                                       &prio, &ts));
+> -                host_to_target_timespec(arg5, &ts);
+> +                if (host_to_target_timespec(arg5, &ts)) {
 
-  - patch 2: introduce "type" for IOMMUTLBEntry, so far we only have MAP/UNMAP.
-    Modify all callers of memory_region_notify_iommu*() to fill in the type
-    correctly into IOMMUTLBEntry with map/unmap.  Won't hurt if we still keep
-    filling in UNMAP even for DEVIOTLB since that's after all the same old
-    behavior.
+ditto
 
-  - patch 3: introduce DEVIOTLB, switch the type field of dev-iotlb
-    notifications to the new type and let vhost registers only to that.
-
-  - patch 4: at last, fix the assertion since we've got the DEVIOTLB messages.
-
-Would this be slightly cleaner?
+> +                    return -TARGET_EFAULT;
+> +                }
+>              } else {
+>                  ret = get_errno(safe_mq_timedreceive(arg1, p, arg3,
+>                                                       &prio, NULL));
+> 
 
 Thanks,
-
--- 
-Peter Xu
-
+Laurent
 
