@@ -2,127 +2,87 @@ Return-Path: <SRS0=JPH5=CC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BEEC4C433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 05:00:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF837C433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 05:24:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8566820774
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 05:00:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 953462071E
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 05:24:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="nAxV7mSi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8566820774
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JB5LpkNQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 953462071E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48460 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53714 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kA4ab-0008NH-PN
-	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 01:00:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46812)
+	id 1kA4y3-0003cJ-PY
+	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 01:24:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51838)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1kA4Zo-0007wO-Au; Mon, 24 Aug 2020 00:59:24 -0400
-Received: from mail-db8eur05on2132.outbound.protection.outlook.com
- ([40.107.20.132]:44997 helo=EUR05-DB8-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1kA4Zk-0005u2-Uf; Mon, 24 Aug 2020 00:59:23 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=T+IMSXR4TCNyiFr7tiZjR3+nxpWJDP7l7IcBoYgyOc2Va+1CIf5URlVnZqub7M16+MWYUKL9GEIXghPhXrQQxXgCrIUh1d26gy0KBXe6XJn8ji5+/LfLTkw4tApoVkqf+YUYZc37qpBKic/swZFkODyD1lOalGGl1tNpKP+Rs4BE4dJsXzTcwevOBDvrsh7w+E+2g5SuU/MA2wQ0upQWNBMgHojcoXAl4d0YrA4eHvix3CxeCzUHMizfAsfkLRj3vZiYgch+PIV9Zyhlo0d6KnChJPGV/0ALGjnwLefnRkyzoIG/szQWzRBzV773jO/pWI5A7FTEm3RK2F2qZ2c8sw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Mgy3rsSoajgcfpCTcJMYhU9XiCUoV7Wjy6kZoZ2qIEU=;
- b=LgpbMRJVasqHUY67dv3W0UZd1yKJ39n4jCDYaOaklSZazwYmqDq/BpNuWuLb39OT69nc6a4iemNlrkYiaHf/IqU0rfKhCR+VJhrkUulfdDTUuUc3Tz/I+9EBoUohWdzvpucJyfKGT0EFp+dNSVqR7U+dsjciCwG4o1dd8ucRsKcvn+ODa91sXqqmoOhp60BpHWaZ59ASLiQ1VmSEpGWPnM9Pg54GcoX+7ulkILo/F6BFWk47TkPHfntF8Ad0Ymm1EtE5xoYC7OsQLc6JbZi5DcPhCEkxCgUBUOdnNKKO54PLgs8D4fbjc2cniMkZN1/zhW41v+YyPbQa2SFQdupCRQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Mgy3rsSoajgcfpCTcJMYhU9XiCUoV7Wjy6kZoZ2qIEU=;
- b=nAxV7mSiY9EUUJ8rzwXExiKe+AjmIQCoNn3No79ov9o5nLMuraj1vXac9eiJuBJ7JexYH/qKFJXDRPHv4l3qRrSXofxytU9xudZ79lN6K8Ze2smVHVqnc83NyJNo+3sGH/uIZ/aXC9QOrhdmHXmy5CEjV/K72E2NRtYzGeRtcHU=
-Authentication-Results: openvz.org; dkim=none (message not signed)
- header.d=none;openvz.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from HE1PR0801MB2124.eurprd08.prod.outlook.com (2603:10a6:3:89::22)
- by HE1PR0801MB1676.eurprd08.prod.outlook.com (2603:10a6:3:81::22)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3305.25; Mon, 24 Aug
- 2020 04:59:14 +0000
-Received: from HE1PR0801MB2124.eurprd08.prod.outlook.com
- ([fe80::b5e5:e4d:ed88:5a3a]) by HE1PR0801MB2124.eurprd08.prod.outlook.com
- ([fe80::b5e5:e4d:ed88:5a3a%9]) with mapi id 15.20.3305.026; Mon, 24 Aug 2020
- 04:59:14 +0000
-Subject: Re: [PATCH v6 2/4] copy-on-read: add filter append/drop functions
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-References: <1597785880-431103-1-git-send-email-andrey.shinkevich@virtuozzo.com>
- <1597785880-431103-3-git-send-email-andrey.shinkevich@virtuozzo.com>
- <3f450bc2-73a5-49f8-53ad-d1bfa1051407@virtuozzo.com>
- <70d35670-2c60-eedc-c78b-29e249e88ad2@virtuozzo.com>
-Message-ID: <b89d5057-2cab-00e5-65af-b08c2447875c@virtuozzo.com>
-Date: Mon, 24 Aug 2020 07:59:11 +0300
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.9.0
-In-Reply-To: <70d35670-2c60-eedc-c78b-29e249e88ad2@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-GB
-X-ClientProxiedBy: AM0PR04CA0047.eurprd04.prod.outlook.com
- (2603:10a6:208:1::24) To HE1PR0801MB2124.eurprd08.prod.outlook.com
- (2603:10a6:3:89::22)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kA4xP-0003BC-3l
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 01:23:47 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:37188)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kA4xM-00008z-Va
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 01:23:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1598246623;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=BaF8NZECiIkufdHbMrsVKZVMDg4OKC++D7VVshCbCTk=;
+ b=JB5LpkNQtTg2v3K7CtFu492pJ1lWfbMBrxsYdTuGgYkJy4wincpnuHEDU8t5Uo1uj09t0/
+ MLunpHf4N4uoWrG37s2vZxxBigqxJiEdB0HnFm4dPe6zMx4uhGEpIpKZfY4HGDaUnYe3a9
+ MjYPg0F4MOPkHa1hoDD6KF23wC2h++s=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-573-KR37XZI_PzO7RIAnDoxSkg-1; Mon, 24 Aug 2020 01:23:41 -0400
+X-MC-Unique: KR37XZI_PzO7RIAnDoxSkg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5429B10059A4;
+ Mon, 24 Aug 2020 05:23:40 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-112-195.ams2.redhat.com
+ [10.36.112.195])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 29CE07E69B;
+ Mon, 24 Aug 2020 05:23:37 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 311ED17538; Mon, 24 Aug 2020 07:23:36 +0200 (CEST)
+Date: Mon, 24 Aug 2020 07:23:36 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Subject: Re: [PATCH v3 1/2] meson: convert pc-bios/keymaps/Makefile
+Message-ID: <20200824052336.gt7ycmo7wf6q5e2m@sirius.home.kraxel.org>
+References: <20200821160752.1254102-1-philmd@redhat.com>
+ <20200821160752.1254102-2-philmd@redhat.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from Admins-MacBook-Pro.local (109.252.114.22) by
- AM0PR04CA0047.eurprd04.prod.outlook.com (2603:10a6:208:1::24) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3305.24 via Frontend Transport; Mon, 24 Aug 2020 04:59:13 +0000
-X-Originating-IP: [109.252.114.22]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 7f0ca51c-67eb-43a2-77f4-08d847ea727f
-X-MS-TrafficTypeDiagnostic: HE1PR0801MB1676:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <HE1PR0801MB1676E617AABD7D412146CBF8F4560@HE1PR0801MB1676.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:2958;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: YXSaN3soSGO7sbWHRawMRwwAYF/OSwfOjOihM0qj9CIOeOt6YN7OImlteDPYc5nhjybGcVxG8BpHez3O6Qu0+565K79fCJReeO9XdEq1bcWbVGFq6etQcJhS+OPqBteoIeJ0W03n/VgcL6n50+2db1N9uWT60VxntofImFinj8IPqWZiC8LOTX+0sqjB7LZzPvJ0O2STz0xkT3pMe8VIAQgks6eSEy8+B00IyRPj64t5VCRBnrnjvtF2p7JWAGQGLanzR1Z4R22HFsCzqMASx1Prkn6RYcFH5TVXnYaooU2b+qUdL0yK/c3hiMkGc/gRzsNU9dxRQlVn/0pgPtBAhOMUV+kJ/tbhn1FqmlVyChPrSDDpG4F3YZc77r56GrzI
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:HE1PR0801MB2124.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(366004)(376002)(136003)(396003)(346002)(39830400003)(44832011)(316002)(8676002)(6486002)(31696002)(4326008)(107886003)(83380400001)(31686004)(6512007)(956004)(2616005)(6506007)(66946007)(52116002)(66476007)(66556008)(2906002)(186003)(16526019)(8936002)(36756003)(26005)(86362001)(478600001)(53546011)(5660300002)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: 7GshHzvBss0t71NS2azl/eJxo89KWBWNEBljgR3uIxOwB4NGOeOvW/Sz1ySL8KV0iJT1lELywlN9nQSkA6xpPGvzZxrNaAtDBzbsey52H2Wnp8Ic4BI7oRAYR0wqae/wp2aIY972n34nh8YJViF64hR7WWnDnnVfOm35q4oCS2HBMvQdqkHeOZwCBLRA03fAIKd3+pflHCnuXRl3qbmeY8W/IHsmprJPCzpKAGLZ3MzpD6yO1aFwZ46YAps3A/s2GzOIs4hdfps6p2k1IJkVsI0TorEvSYYyr2S4cpwQouCrJR02zdNCx+oHt9KCUZFFIITqKIMkgdMGDAipEfryzOcgHyoyWQS07AMUyScnVp/vpj0zTF87IGR+yTAwUY8ALJvF/t0vlVEQjpFQj8W5EG8YvpccxKh5Za5sz1+hRa8P0JwkuJ4jXXBkIKKxzW6U0Eog2c7kP1RNTKGGMFCwq8RveS59PfvR2WvPpHHtupi4bWQ8FSNQ2BDW1f4LNvisgtmk5Z5cm1T0Sv/jQ/mfae3IyCbmkRPHb8WBEKfUgz3e+Z9AWjgOeD//uSuEnhbw8L3jvcdnG3o/ZdmF8clkD1aAWcTRf3z4mjzagV4k7c3BVz9xSBAEXRZtUYLvj5rUb9CMjgZBWjHt2fcbP/tUBA==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7f0ca51c-67eb-43a2-77f4-08d847ea727f
-X-MS-Exchange-CrossTenant-AuthSource: HE1PR0801MB2124.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Aug 2020 04:59:14.4659 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: OmDn6RTH8U81Vvj9CjJ60cFA2bRs9CRHnjEEMOGhIVEaNMaU9VXFfba1HoNhozJ6auV7dK8frlmZYh0q4eki4NTV2i0LmnZFRaflRFcWurE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: HE1PR0801MB1676
-Received-SPF: pass client-ip=40.107.20.132;
- envelope-from=andrey.shinkevich@virtuozzo.com;
- helo=EUR05-DB8-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/24 00:59:16
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -34
-X-Spam_score: -3.5
-X-Spam_bar: ---
-X-Spam_report: (-3.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, NICE_REPLY_A=-1.381, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200821160752.1254102-2-philmd@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/24 01:23:43
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.959,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -135,83 +95,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org, den@openvz.org,
- mreitz@redhat.com, jsnow@redhat.com
+Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+ qemu-devel@nongnu.org,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 23.08.2020 22:35, Andrey Shinkevich wrote:
-> On 19.08.2020 13:21, Vladimir Sementsov-Ogievskiy wrote:
->> 19.08.2020 00:24, Andrey Shinkevich wrote:
->>> Provide API for the COR-filter insertion/removal.
->>> Also, drop the filter child permissions for an inactive state when the
->>> filter node is being removed.
->>>
->>> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
->>> ---
->>>   block/copy-on-read.c | 103 
->>> +++++++++++++++++++++++++++++++++++++++++++++++++++
->>>   block/copy-on-read.h |  36 ++++++++++++++++++
->>>   2 files changed, 139 insertions(+)
->>>   create mode 100644 block/copy-on-read.h
->>>
->>> diff --git a/block/copy-on-read.c b/block/copy-on-read.c
->>> index cb03e0f..150d9b7 100644
->>> --- a/block/copy-on-read.c
->>> +++ b/block/copy-on-read.c
->>> @@ -23,11 +23,21 @@
-...
->>> +BlockDriverState *bdrv_cor_filter_append(BlockDriverState *bs,
->>> +                                         const char *filter_node_name,
->>> +                                         Error **errp)
->>> +{
->>> +    BlockDriverState *cor_filter_bs;
->>> +    BDRVStateCOR *state;
->>> +    Error *local_err = NULL;
->>> +
->>> +    cor_filter_bs = create_filter_node(bs, filter_node_name, errp);
->>> +    if (cor_filter_bs == NULL) {
->>> +        error_prepend(errp, "Could not create filter node: ");
->>> +        return NULL;
->>> +    }
->>> +
->>> +    if (!filter_node_name) {
->>> +        cor_filter_bs->implicit = true;
->>> +    }
->>> +
->>> +    bdrv_drained_begin(bs);
->>> +    bdrv_replace_node(bs, cor_filter_bs, &local_err);
->>> +    bdrv_drained_end(bs);
->>> +
->>> +    if (local_err) {
->>> +        bdrv_unref(cor_filter_bs);
->>> +        error_propagate(errp, local_err);
->>> +        return NULL;
->>> +    }
->>> +
->>> +    state = cor_filter_bs->opaque;
->>> +    state->active = true;
->>
->> hmm stop. it's already active, after create_filter_node, so you don't 
->> need to set it again, isn't it?
->
->
-> I will remove the extra assignment from the cor_open() for consistancy.
->
-> Andrey
->
->
+> --- a/pc-bios/meson.build
+> +++ b/pc-bios/meson.build
+> @@ -25,3 +25,4 @@ if 'DECOMPRESS_EDK2_BLOBS' in config_host
+>  endif
+>  
+>  subdir('descriptors')
+> +subdir('keymaps')
 
-No, I won't. It is wrong to do that. COR-operations wouldn't work.
+Hmm, this hooks up the keymaps update to the default build.
+Not a good plan.  The output is not static, but defaults on
+the libxkbcommon version you have installed.  So I end up with
+a dirty tree now after each build.
 
-Andrey
+I guess we should either return to the traditional behavior of not
+building keymaps by default and have a "make keymaps" or similar for
+keymap updates.  Or write the generated maps to the build tree not
+the source tree.
 
+take care,
+  Gerd
 
->>
->>> +
->>> +    return cor_filter_bs;
->>> +}
->>> +
-...
 
