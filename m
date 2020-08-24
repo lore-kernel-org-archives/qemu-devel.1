@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4ECBC433E4
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 16:49:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A53F2C433E1
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 16:50:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7D0052078D
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 16:49:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6F4262067C
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 16:50:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Hii23Vc/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D0052078D
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yUcIXtQQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F4262067C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36916 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40504 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAFez-0008Md-Oy
-	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 12:49:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60124)
+	id 1kAFg6-0001WS-KA
+	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 12:50:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60256)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kAFcR-00053w-6O
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 12:46:51 -0400
-Received: from mail-ej1-x644.google.com ([2a00:1450:4864:20::644]:46856)
+ id 1kAFct-0005gh-Ps
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 12:47:20 -0400
+Received: from mail-ej1-x642.google.com ([2a00:1450:4864:20::642]:41226)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kAFcO-0000Xo-Nm
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 12:46:50 -0400
-Received: by mail-ej1-x644.google.com with SMTP id d11so12570087ejt.13
- for <qemu-devel@nongnu.org>; Mon, 24 Aug 2020 09:46:48 -0700 (PDT)
+ id 1kAFcr-0000bd-Fq
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 12:47:19 -0400
+Received: by mail-ej1-x642.google.com with SMTP id b17so4487091ejq.8
+ for <qemu-devel@nongnu.org>; Mon, 24 Aug 2020 09:47:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=LfYKuxH8UYP2z/bKyKdR6nRjWFdhgBq51vuHjVuYgUQ=;
- b=Hii23Vc/QxA89nHEvggsOn5aj1RGtjr+N/h9dJdY6aN40LqmqEb8X6uvZ0wu565xrA
- B4ytKwn21HUjtSiUAxbBjFqe/TidJOCsCWGpFw3ZTY9lW42NFF0Q+1Hg6xu4sUWwMAtI
- Dwq98eeXBEBTe7i+LCDDQPlA1H+iWxFJhmGL2XYtfFZRh6A/50pqn8WmQroMx6+SQR35
- pED5WLRrsnMqSZxgEOwUgAA3vrxqjCtlPshQmhbmvZdgPR50vK/n/Xp3QAlPYFTBo0S1
- yE7oEAZRLVGen2iYqyopw/YX9y2tnJzcR2lx7AzgTBpGfNq2on9JFzncOFqJE4cQR0RO
- 81jw==
+ :cc; bh=we7DWTsKaJs7xxQL4V3SZR8A6LK1d7yE7UlOoARrjjM=;
+ b=yUcIXtQQt0K5HWmnRknpyi/ibzcmi0m4DcsouOriTS7bpF0Vt75afCtomLAHYrB0bO
+ /BtyQVEZVKp4pC1oN5i0V8v1pD0eqeB5g2KE5a4AIdYgv2SVnC9A/SqXKD4c52CJtZl0
+ X9s5yfYvSLKu/YC/k7osVJTVbEldFSyGCvhHN/tIhUUYVdYcX8phws/bq2stzXfsPd01
+ 0pXvEONER+WIQEswRqQ4fL0u5CQWyPTRq2qV8h2frA5YChd+zXJsDdXjcPvbDcgFpuKg
+ IvdGonuxOOzXupQClSS51rQcn0cWW8QjEstCir/zGSnWpF2I6zqsj+OZD+EkqafJVfOD
+ kM2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=LfYKuxH8UYP2z/bKyKdR6nRjWFdhgBq51vuHjVuYgUQ=;
- b=jSgwjRjf5vWph6qvkzpmA9VUx5byooEfh4bFGIPLjkWcz3aZh6YGapfPmXzZIGK1PX
- U8sonP4DDe0FzMZ/fMhPeYNVQVsQtNOPtit/R9OeO3yi7GmhBirtL9KrYwOqQpqa2kFL
- slG4dfZHh5dc0OSGo3WeYttLC2Z6b576a4RJWAzvz+kkyuoX4BJQwLnGkScNbZDRHWhs
- Ir3djhB0Pp8lYuqn90eKiDAXdMzEYrEOsND1Z8pZPEyqi0kOlDrj1S0aC/eNVPOrohXc
- SZRXWmtespKV/id21AdeR61BfXIOiHHGxbH0MANRZMahfrcaOsQT85yaMPZ0oUnbg6QV
- bLfQ==
-X-Gm-Message-State: AOAM5325TEzH7GugeRcmfAdANMAK/01odX9UlRcSa5xEmh2LY1d/5vMS
- eRV9H/dHMjCKNwIfVPvmYaNIYDzBB7f9wTkALqgKIsX887uZGw==
-X-Google-Smtp-Source: ABdhPJxGpXQ50CK3g2NN6RA1aKkIgUYu1jQwKduUo+yK3mY1WZUvroUDA5q+B3qzPAY6LaJLGesYe9Xyi0uEMCrmMHs=
-X-Received: by 2002:a17:906:f28b:: with SMTP id
- gu11mr6190017ejb.407.1598287607275; 
- Mon, 24 Aug 2020 09:46:47 -0700 (PDT)
+ bh=we7DWTsKaJs7xxQL4V3SZR8A6LK1d7yE7UlOoARrjjM=;
+ b=lO8ZgANa9Es9IvKB1nKoXjr6eM/Q+umHBXE5KaXc4/asXrsM9qp4dezBzgQFVrTMwH
+ CVUh18FJ9KCRqIZBgiVEYA5R+C+LotZCD1tKBzPa+YqzkroY+Ub7Fhj/by74zrig5GSQ
+ xImmmy+i99dxVHIazOpxilg19wemhodNj6UiszdZ/h/uty0IWqJWUy9RcDfT2+cueGHD
+ SRSUkggDJXkEfVCQwYOpFIyILrAXBNP0yC8oIsTahfd3lCX4F19b1nIVYwznXAuHm4nJ
+ sbTTHiPX1HlRHkZk1hU+VoT7gCDXpRM5gdUH4NTn1Gwd1HLy0/MuYzBpm5DwcW8t3edU
+ PU8A==
+X-Gm-Message-State: AOAM530Du8DMcU0Qu8SYSppqsOaYkpUhXBiyxRw9jIG4Rl01MFrT/lkq
+ Llw6O0iiS2Ga9rRHD60eziE2TOQY7+SVMtfbt5OgpQ==
+X-Google-Smtp-Source: ABdhPJy6QNT7jSpHoDcZD+asateZ+41gd1kQO0WeWWWBvpyELOHT1gNxBK8HPepXb7Zaajf/qKA/QSulQXwJUp1GZrA=
+X-Received: by 2002:a17:906:b248:: with SMTP id
+ ce8mr6203960ejb.85.1598287636074; 
+ Mon, 24 Aug 2020 09:47:16 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200815013145.539409-1-richard.henderson@linaro.org>
- <20200815013145.539409-11-richard.henderson@linaro.org>
-In-Reply-To: <20200815013145.539409-11-richard.henderson@linaro.org>
+ <20200815013145.539409-12-richard.henderson@linaro.org>
+In-Reply-To: <20200815013145.539409-12-richard.henderson@linaro.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 24 Aug 2020 17:46:36 +0100
-Message-ID: <CAFEAcA__qkPKnbN-C=DndsKu3Dx5MxDqK4e1Z44c7+FfZByMWQ@mail.gmail.com>
-Subject: Re: [PATCH 10/20] target/arm: Split out gen_gvec_ool_zzp
+Date: Mon, 24 Aug 2020 17:47:05 +0100
+Message-ID: <CAFEAcA8zaJdadCqOZY_3Bdf_vvEykpgakTHnx6q58NhJVT0crg@mail.gmail.com>
+Subject: Re: [PATCH 11/20] target/arm: Split out gen_gvec_ool_zzz
 To: Richard Henderson <richard.henderson@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::644;
- envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x644.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::642;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x642.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -103,9 +103,10 @@ Sender: "Qemu-devel"
 On Sat, 15 Aug 2020 at 02:32, Richard Henderson
 <richard.henderson@linaro.org> wrote:
 >
-> Model after gen_gvec_fn_zzz et al.
->
 > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/arm/translate-sve.c | 53 +++++++++++++-------------------------
+>  1 file changed, 18 insertions(+), 35 deletions(-)
 
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
