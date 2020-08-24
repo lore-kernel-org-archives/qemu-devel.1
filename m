@@ -2,85 +2,90 @@ Return-Path: <SRS0=JPH5=CC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4772DC433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 11:02:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 405DDC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 11:06:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 15DA8206B5
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 11:02:15 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IqwQV+qJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 15DA8206B5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1419C206BE
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 11:06:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1419C206BE
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57582 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33232 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAAEw-0004i0-9o
-	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 07:02:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39222)
+	id 1kAAJC-0006a5-CW
+	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 07:06:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41028)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kAADs-0003PS-4b
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 07:01:08 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33259
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kAADq-00066P-9I
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 07:01:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598266865;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=WPdeBPoYa65DsJS4l7Ye8OnfTnGlcUHhwyXvmFVnVgA=;
- b=IqwQV+qJ4Qr+ax5pF58boGdcsnEupbvTYguO4S+Pt73Zy/MONSeK441u4vFmlkcMyD7RSm
- 2DdalkWihqulXDQ5wlZOwSOk3ghZZ8H59aLPLeAP8KT1j/hCWDM0qNQ/obVXs/zPj71yuP
- T/8B6HguiF/mvQRiN0SHaWbsR6L7a1Q=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-174-oCDHBdQkMEObk_nK1yx33A-1; Mon, 24 Aug 2020 07:01:03 -0400
-X-MC-Unique: oCDHBdQkMEObk_nK1yx33A-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8593981F015
- for <qemu-devel@nongnu.org>; Mon, 24 Aug 2020 11:01:02 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-112-195.ams2.redhat.com
- [10.36.112.195])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E7EDC7F463;
- Mon, 24 Aug 2020 11:00:58 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id C182D17538; Mon, 24 Aug 2020 13:00:57 +0200 (CEST)
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] usb-host: workaround libusb bug
-Date: Mon, 24 Aug 2020 13:00:57 +0200
-Message-Id: <20200824110057.32089-1-kraxel@redhat.com>
+ (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1kAAIh-0006AN-9n
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 07:06:07 -0400
+Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:60950
+ helo=mail.default.ilande.uk0.bigv.io)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1kAAId-0006i6-JL
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 07:06:07 -0400
+Received: from host217-42-19-185.range217-42.btcentralplus.com
+ ([217.42.19.185] helo=[192.168.1.65])
+ by mail.default.ilande.uk0.bigv.io with esmtpsa
+ (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
+ (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1kAAIz-0005ko-UU; Mon, 24 Aug 2020 12:06:28 +0100
+To: qemu-devel <qemu-devel@nongnu.org>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
+ mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
+ 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
+ E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
+ PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
+ PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
+ AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
+ OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
+ NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
+ mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
+ z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
+ T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
+ DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
+ y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
+ 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
+ 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
+ YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
+ Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
+ BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
+ opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
+ NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
+ Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
+ KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
+ imgcU9TTGC5qd9g=
+Message-ID: <d3adbbd0-fb9e-7f7f-8eaf-857c1d14d233@ilande.co.uk>
+Date: Mon, 24 Aug 2020 12:05:55 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=kraxel@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/24 06:40:32
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.956,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+X-SA-Exim-Connect-IP: 217.42.19.185
+X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
+Subject: meson: problems building under msys2/mingw-w64 native
+X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
+X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
+Received-SPF: pass client-ip=2001:41c9:1:41f::167;
+ envelope-from=mark.cave-ayland@ilande.co.uk;
+ helo=mail.default.ilande.uk0.bigv.io
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -94,83 +99,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-libusb_get_device_speed() does not work for
-libusb_wrap_sys_device() devices in v1.0.23.
+Hi Paolo,
 
-Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1871090
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- hw/usb/host-libusb.c | 37 ++++++++++++++++++++++++++++++++++++-
- 1 file changed, 36 insertions(+), 1 deletion(-)
+Yesterday I updated my msys2/mingw-w64 Windows 10 build environment for QEMU to the
+latest git to see if I could get the meson build to work, and found a couple of issues:
 
-diff --git a/hw/usb/host-libusb.c b/hw/usb/host-libusb.c
-index c474551d8456..77f1eaa5fe9e 100644
---- a/hw/usb/host-libusb.c
-+++ b/hw/usb/host-libusb.c
-@@ -39,6 +39,11 @@
- #endif
- #include <libusb.h>
- 
-+#ifdef CONFIG_LINUX
-+#include <sys/ioctl.h>
-+#include <linux/usbdevice_fs.h>
-+#endif
-+
- #include "qapi/error.h"
- #include "migration/vmstate.h"
- #include "monitor/monitor.h"
-@@ -885,6 +890,7 @@ static void usb_host_ep_update(USBHostDevice *s)
- static int usb_host_open(USBHostDevice *s, libusb_device *dev, int hostfd)
- {
-     USBDevice *udev = USB_DEVICE(s);
-+    int libusb_speed;
-     int bus_num = 0;
-     int addr = 0;
-     int rc;
-@@ -935,7 +941,36 @@ static int usb_host_open(USBHostDevice *s, libusb_device *dev, int hostfd)
-     usb_ep_init(udev);
-     usb_host_ep_update(s);
- 
--    udev->speed     = speed_map[libusb_get_device_speed(dev)];
-+    libusb_speed = libusb_get_device_speed(dev);
-+#ifdef CONFIG_LINUX
-+    if (hostfd && libusb_speed == 0) {
-+        /*
-+         * Workaround libusb bug: libusb_get_device_speed() does not
-+         * work for libusb_wrap_sys_device() devices in v1.0.23.
-+         *
-+         * Speeds are defined in linux/usb/ch9.h, file not included
-+         * due to name conflicts.
-+         */
-+        int rc = ioctl(hostfd, USBDEVFS_GET_SPEED, NULL);
-+        switch(rc) {
-+        case 1: /* low */
-+            libusb_speed = LIBUSB_SPEED_LOW;
-+            break;
-+        case 2: /* full */
-+            libusb_speed = LIBUSB_SPEED_FULL;
-+            break;
-+        case 3: /* high */
-+        case 4: /* wireless */
-+            libusb_speed = LIBUSB_SPEED_HIGH;
-+            break;
-+        case 5: /* super */
-+        case 6: /* super plus */
-+            libusb_speed = LIBUSB_SPEED_SUPER;
-+            break;
-+        }
-+    }
-+#endif
-+    udev->speed = speed_map[libusb_speed];
-     usb_host_speed_compat(s);
- 
-     if (s->ddesc.iProduct) {
--- 
-2.27.0
 
+1) Unable to launch build/ninjatool at the end of configure
+
+At the very end of configure after the build variables are displayed the build would
+terminate with the following stack trace:
+
+Traceback (most recent call last):
+  File "C:/msys64/home/Mark/qemu/meson/mesonbuild/mesonmain.py", line 131, in run
+    return options.run_func(options)
+  File "C:/msys64/home/Mark/qemu/meson/mesonbuild/msetup.py", line 245, in run
+    app.generate()
+  File "C:/msys64/home/Mark/qemu/meson/mesonbuild/msetup.py", line 159, in generate
+    self._generate(env)
+  File "C:/msys64/home/Mark/qemu/meson/mesonbuild/msetup.py", line 215, in _generate
+    intr.backend.generate()
+  File "C:/msys64/home/Mark/qemu/meson/mesonbuild/backend/ninjabackend.py", line 483,
+in generate
+    ninja = environment.detect_ninja_command_and_version(log=True)
+  File "C:/msys64/home/Mark/qemu/meson/mesonbuild/environment.py", line 167, in
+detect_ninja_command_and_version
+    p, found = Popen_safe([n, '--version'])[0:2]
+  File "C:/msys64/home/Mark/qemu/meson/mesonbuild/mesonlib.py", line 1197, in Popen_safe
+    p, o, e = Popen_safe_legacy(args, write=write, stdout=stdout, stderr=stderr,
+**kwargs)
+  File "C:/msys64/home/Mark/qemu/meson/mesonbuild/mesonlib.py", line 1213, in
+Popen_safe_legacy
+    p = subprocess.Popen(args, universal_newlines=False, close_fds=False,
+  File "C:/msys64/mingw64/lib/python3.8/subprocess.py", line 854, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+  File "C:/msys64/mingw64/lib/python3.8/subprocess.py", line 1307, in _execute_child
+    hp, ht, pid, tid = _winapi.CreateProcess(executable, args,
+OSError: [WinError 193] %1 is not a valid Win32 application
+
+
+I managed to catch up with some meson devs on IRC last night and they helped me
+figure out the problem is trying to launch "ninja --version" from configure.
+
+Within configure the default location to ninja is overridden via
+"NINJA=$PWD/ninjatool $meson setup ..." and subprocess.Popen() sends the filename to
+Win32's CreateProcess() which fails because ninjatool is not a native executable but
+a shell script. Any thoughts as to what would be the best solution here?
+
+
+2) GTK UI now depends on CONFIG_VTE
+
+This one I spotted on my local Linux setup as I didn't have the libvte-dev package
+installed and couldn't understand why I couldn't run QEMU with the GTK UI as I always
+do, even though configure reported that it found the GTK library and headers.
+
+A quick search showed that the GTK UI was being guarded by "if
+config_host.has_key('CONFIG_GTK') and config_host.has_key('CONFIG_VTE')" in
+ui/meson.build.
+
+For me the easy solution was to install libvte-dev, but since there are no VTE
+packages for Windows my guess is this will now make the GTK UI unavailable for
+Windows users.
+
+
+ATB,
+
+Mark.
 
