@@ -2,85 +2,122 @@ Return-Path: <SRS0=JPH5=CC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB81DC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 22:33:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2FEAC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 22:34:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 948C720656
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 22:33:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7DFA620656
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 22:34:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PWTVQjo8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 948C720656
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=syrmia.com header.i=@syrmia.com header.b="w8lohUUf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7DFA620656
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=syrmia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46866 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48636 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAL28-0007YB-TK
-	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 18:33:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55638)
+	id 1kAL2k-0008I0-Qn
+	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 18:34:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55626)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1kAL0K-0005Rc-5A; Mon, 24 Aug 2020 18:31:52 -0400
-Received: from mail-il1-x142.google.com ([2607:f8b0:4864:20::142]:34958)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1kAL0I-0003cT-8k; Mon, 24 Aug 2020 18:31:51 -0400
-Received: by mail-il1-x142.google.com with SMTP id q14so8753976ilm.2;
- Mon, 24 Aug 2020 15:31:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=6jhFcywO6Y8wq+zavJ0ww+xgsP8QGx5ARX43YJfFEg8=;
- b=PWTVQjo8JS5hJJXTGXcruPf8jjMrKL75jlMnFZVN/YcqkzkEa3mu7MLCwsMOZsaQdy
- y6q0LEMTMdW6/ow9+qy7ildRTuNoXQQkGvTCNPc88rzbk+CImxAPNvvjSp5TZmDsqc8T
- exmXJmujwN7bftkIq6bUisEmdkdGE5ls0e4lnwps1ViNrgQS80C0Muxsh9eOEKf7EDj9
- 4PVhxxIn2zQocoLwqYr8z5rQGUjLMn6ATaCw9HZ8uxa05zjpziuPQgekBWHCVj7ZQlZs
- Xa9LbhGZ61p2GvyIlwPXQTkYxa2XaPuGzkuFCX1RPquSS5dTqRZdHtbosI1q09jPz2Dn
- qh+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=6jhFcywO6Y8wq+zavJ0ww+xgsP8QGx5ARX43YJfFEg8=;
- b=S27ZY7d/br/HSspnKe865au7F3Z7rXJOMeRQSXEV02jrBzbb7pV6MLJL1X3F3Vxfos
- 0wyftO0FIRZmIT8ZeJLkekFOkiq4L1JWScFIGRc78UX9nvn0fslpM68igu8AbaVOfi0a
- 1kQojm4ffUFqApq/j9oJRo+U0y0cnrsecEEQqs5QcIXeliUnlnoLk5Y20LLhJ09ImRHs
- K347Xz5DfJ92MUytgk4CpPU6i2Oc2IWhC7pmN3tf3ayy7n2NxuJ7ArB9wm4jJDGmtaVT
- xoCaG6y+tNvSENKT2JWwaDXWWhMkovN24Pca9YAM+SKwWf2ommxBh3fb61b5gY/YREvA
- vwqQ==
-X-Gm-Message-State: AOAM530kFjt4wuufFJrSkvUk91AmGimBCiWhJ2J1G5ktoaPTZEwy52xr
- ZvCsTbZ9jZjavhwJ4bhxEwWwA8vbfooQjqmgQLQ=
-X-Google-Smtp-Source: ABdhPJyEACNJVMDcKBeMH7Zj81skXLWGqZdzLtGxwEFe5Gw+cqXXeRq3g/A0z80iKhYQsEC2baVIWFMf585ZqcmhUIA=
-X-Received: by 2002:a92:9117:: with SMTP id t23mr7220673ild.177.1598308308419; 
- Mon, 24 Aug 2020 15:31:48 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <Filip.Bozuta@syrmia.com>)
+ id 1kAL0G-0005JJ-GH
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 18:31:48 -0400
+Received: from mail-eopbgr10128.outbound.protection.outlook.com
+ ([40.107.1.128]:39578 helo=EUR02-HE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <Filip.Bozuta@syrmia.com>)
+ id 1kAL0E-0003by-VR
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 18:31:48 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=aFD8KUXFwN7LCuFBlBWV8aWyaaHUivtMMcNxFhZagXe9ZIsVyByDONEB7wc6Z7yS79wNSu0N5DgYl3YiEgR2MSJlHHdkkEv4bh8v/YTQgAsSX2A0o9S4mRTE/OYQqILUyChY3osgfM+aor2GcLBgTPdbOnaYYFN1Y92kD0P5hnXWTKn5jnru82cxt3+wsR8hkPe28mZuM4p2TlkI/OjGLoEkWdLoUvht/7DvQi74/6IuQzeS5ewK8+Yu170Tmbq1R6duSV/K5Mwr+P6HUSaVBb2da4ccVtsThKSzp0tUM9BYl/1GyIGUxMC6A37nAZ3UBmVwiTpb1Rs2PSoiYxcu6Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=QBbdD5nQGnUlNVNcqZ/DZs3bPnAMcgtXPCbBcZP2TT4=;
+ b=nOP3SExLxPwGrQ38AibOwhExK/Mq2YAy79g1VHFg6uO3U6nkmTndT8nJGe2wLiEiaV5CvxOrJOBiBKdAFOTBvPiaY0FMjRJZDrpz/+BLs/tAEMX+hIzG13mK/0GCWu36RJPw+VRv36cFwqgS6QQGFAzdEwGTaAtLWwH0ZDDXy4qKjQoKYF6ZypIbYt1xu/cn47Ay8N+O13OVb75bJ5kDrhO7bf0WIMQaZFtNN8Cn2sFEFh+60ypzVZrIFY2dxgr+3WFYWTYAsxqpHPdBNZCzA3elHhVmXqwnL0JUN6rYZT39quoAd6IuhIIyCVTbN6X1+DXLmQqUZdupgO9quFvhPw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=syrmia.com; dmarc=pass action=none header.from=syrmia.com;
+ dkim=pass header.d=syrmia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=syrmia.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=QBbdD5nQGnUlNVNcqZ/DZs3bPnAMcgtXPCbBcZP2TT4=;
+ b=w8lohUUf8wWNDdxE4EWLS+hnWO+trGNIIxGZviwZ9f5u3+3PbSWgXeCiQ4ARh8+upy7g1jTFKZor5/P91r7/TZ884gOVSb3JbR6o/fOQ7n8w4iH0ArGOBUaidl+FcIYrV1MlR9tlThik5W2WZZqNadRyfDqMcUOqOxqRnxVy3Po=
+Authentication-Results: nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=none action=none header.from=syrmia.com;
+Received: from VE1PR03MB5246.eurprd03.prod.outlook.com (2603:10a6:802:a1::22)
+ by VI1PR03MB4575.eurprd03.prod.outlook.com (2603:10a6:803:59::12)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3305.26; Mon, 24 Aug
+ 2020 22:31:05 +0000
+Received: from VE1PR03MB5246.eurprd03.prod.outlook.com
+ ([fe80::3568:5b4f:ab6b:e362]) by VE1PR03MB5246.eurprd03.prod.outlook.com
+ ([fe80::3568:5b4f:ab6b:e362%6]) with mapi id 15.20.3261.026; Mon, 24 Aug 2020
+ 22:31:05 +0000
+From: Filip Bozuta <Filip.Bozuta@syrmia.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 0/2] linux-user: Adding support for a group of 4 time64
+ syscalls
+Date: Tue, 25 Aug 2020 00:30:48 +0200
+Message-Id: <20200824223050.92032-1-Filip.Bozuta@syrmia.com>
+X-Mailer: git-send-email 2.25.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: LO2P265CA0070.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:60::34) To VE1PR03MB5246.eurprd03.prod.outlook.com
+ (2603:10a6:802:a1::22)
 MIME-Version: 1.0
-References: <20200824215936.2961951-1-ehabkost@redhat.com>
- <20200824215936.2961951-5-ehabkost@redhat.com>
-In-Reply-To: <20200824215936.2961951-5-ehabkost@redhat.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 24 Aug 2020 15:21:07 -0700
-Message-ID: <CAKmqyKMeO96oAoKWFqV-TtN8HGnnfGKaNu4j4gE4HWcFuxgZBA@mail.gmail.com>
-Subject: Re: [PATCH 4/6] xilinx_axienet: Use typedef name for instance_size
-To: Eduardo Habkost <ehabkost@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::142;
- envelope-from=alistair23@gmail.com; helo=mail-il1-x142.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from localhost.localdomain (147.91.217.235) by
+ LO2P265CA0070.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:60::34) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3305.25 via Frontend Transport; Mon, 24 Aug 2020 22:31:04 +0000
+X-Mailer: git-send-email 2.25.1
+X-Originating-IP: [147.91.217.235]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 5a7a28fc-01c6-40e0-4419-08d8487d634e
+X-MS-TrafficTypeDiagnostic: VI1PR03MB4575:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <VI1PR03MB4575D49A35829B224933424DEB560@VI1PR03MB4575.eurprd03.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: pbtqsHhD27cVBS87rV4VrnA+9u1m9rbFcwQFKovx375pcHiXeZ8AH4nsaipBd0kSdDM3XKpV9Vbt+sdZPBwVg7kODAe15/tta1DY2xPHyoQfpZnTTzLsrzJEGrJsbs+EqnBcIeVmM+WFzmqr4OHHkFScy16GtnK7R7JVV0qhTcYQRaKIah1txLVwJYF+8DY9WTxKISEC0FgZcLIHnaVPcG7uufeO8UceYnG8mHLyGuTL4lbpLhAmwK21CxHIGanx0A0ToyTmnguPzE7ddqBuHH3WzJ8KuXBQbU4JNSbg2sTDqrPwzs+3QYUG2zXrOfB2P6Dpz1edUt1bXxlyqdhOvfU/CoZxbusAkM7zZ3R4NCds47gD56OZhNDtyk2e3AX+
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:VE1PR03MB5246.eurprd03.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(376002)(136003)(346002)(366004)(396003)(39830400003)(6506007)(6486002)(6916009)(83380400001)(69590400007)(2906002)(956004)(8676002)(2616005)(8936002)(26005)(478600001)(36756003)(54906003)(316002)(66556008)(66946007)(186003)(16526019)(4326008)(66476007)(6666004)(4744005)(1076003)(52116002)(86362001)(107886003)(6512007)(5660300002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: cGAnyy3C2qtL4vTWCPcizzz25/L5LCdPV1wv8tqXGs0H9wZwvTCbTuqUukIVMlfbQEaPhNG3Ctj/Vrt/ZR2F5Df/1GBzuDUu8CzvQmDlG8p88dWkmYRWrrbxOuJvR7yh31E34H/L1R7VS0cXImQKmMK2Wj3rw7attCp8YWfvKHO5m6zRSPHMI6e2fWGDEYDEVX7eBjpoJWL9evYZI/fFSqZa0vu0tGoMM2iH1ols03oxjJz8dGms9Kt7muc7Fo2gHx3vRHEwu6MoP3775dR/lkw3MO4LJvYwcVmlaAPJ3wxvpylEClEXkNek5XzyhIMAZv1HIivxfhbZeJtx840rQ0S3vRl1UGoiFUBFj3sAcoNOXRXwS9BNkTqwk2vX2kEtxYG/Jw+pFMmIg6Qj6TRgt2CjHJboReDomm2A8XQqfcetoF0WqAKjuoe3SXaOsrewQPm8zqFH2haTXqTkwNrNhKhRqm4fr29N0DzPhx0fJ7O6AaUv+nneID3WeZpT23/awpgTMTeFFB9p9cXCUdn/l9xWmdd+CwI835oPQoPoVI4VHB8oA/FxCcwvepvnM4Caf4Ujw0fcYwqV2XYiG6aeB9LRlUTMqYBTDrf7GyFkH5PEax4csZOL5Bk10Ie4HmmkKj+wnMxyQKCyQv8xxCA9Hw==
+X-OriginatorOrg: syrmia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5a7a28fc-01c6-40e0-4419-08d8487d634e
+X-MS-Exchange-CrossTenant-AuthSource: VE1PR03MB5246.eurprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Aug 2020 22:31:04.8639 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 19214a73-c1ab-4e19-8f59-14bdcb09a66e
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: UY3YQ2yTXMtoUtVPzY/XvnP1eeXLVOcMCvgNQSj5I8ixf6T72r+bQ6zE6TZdZyN23Rl85tXvpcZ5FCEPY+FZEw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR03MB4575
+Received-SPF: pass client-ip=40.107.1.128;
+ envelope-from=Filip.Bozuta@syrmia.com;
+ helo=EUR02-HE1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/24 18:31:41
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -12
+X-Spam_score: -1.3
 X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+X-Spam_report: (-1.3 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
+ RCVD_IN_SORBS_WEB=1.5, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,64 +130,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Alistair Francis <alistair@alistair23.me>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- qemu-arm <qemu-arm@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Cc: Laurent Vivier <laurent@vivier.eu>, Filip Bozuta <Filip.Bozuta@syrmia.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Aug 24, 2020 at 3:02 PM Eduardo Habkost <ehabkost@redhat.com> wrote:
->
-> This makes the code consistent with the rest of QOM code in QEMU,
-> and will make automated conversion to type declaration macros
-> simpler.
->
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+This two patch series introduces functionality for following
+Year 2038 safe syscalls:
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+--Introduced in first patch--
+*ppoll_time64()
+*pselect6_time64()
 
-Alistair
+--Introduced in second patch--
+*utimensat_time64()
+*semtimedop_time64()
 
-> ---
-> Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-> Cc: Alistair Francis <alistair@alistair23.me>
-> Cc: Peter Maydell <peter.maydell@linaro.org>
-> Cc: Jason Wang <jasowang@redhat.com>
-> Cc: qemu-arm@nongnu.org
-> Cc: qemu-devel@nongnu.org
-> ---
->  hw/net/xilinx_axienet.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/hw/net/xilinx_axienet.c b/hw/net/xilinx_axienet.c
-> index 1e48eb70c9..ceb4652938 100644
-> --- a/hw/net/xilinx_axienet.c
-> +++ b/hw/net/xilinx_axienet.c
-> @@ -1069,7 +1069,7 @@ static const TypeInfo xilinx_enet_info = {
->  static const TypeInfo xilinx_enet_data_stream_info = {
->      .name          = TYPE_XILINX_AXI_ENET_DATA_STREAM,
->      .parent        = TYPE_OBJECT,
-> -    .instance_size = sizeof(struct XilinxAXIEnetStreamSlave),
-> +    .instance_size = sizeof(XilinxAXIEnetStreamSlave),
->      .class_init    = xilinx_enet_data_stream_class_init,
->      .interfaces = (InterfaceInfo[]) {
->              { TYPE_STREAM_SLAVE },
-> @@ -1080,7 +1080,7 @@ static const TypeInfo xilinx_enet_data_stream_info = {
->  static const TypeInfo xilinx_enet_control_stream_info = {
->      .name          = TYPE_XILINX_AXI_ENET_CONTROL_STREAM,
->      .parent        = TYPE_OBJECT,
-> -    .instance_size = sizeof(struct XilinxAXIEnetStreamSlave),
-> +    .instance_size = sizeof(XilinxAXIEnetStreamSlave),
->      .class_init    = xilinx_enet_control_stream_class_init,
->      .interfaces = (InterfaceInfo[]) {
->              { TYPE_STREAM_SLAVE },
-> --
-> 2.26.2
->
->
+Testing notes:
+
+   The implementations of these time64 syscalls was tested
+   using tests from the LTP test suite which was built inside
+   a chroot.
+
+v2:
+
+   -Moved code of 'ppoll()' and 'pselect6()' to a separate
+    function
+   -Changed 'time64' from 'int' to 'bool'
+
+Filip Bozuta (2):
+  linux-user: Add support for ppoll_time64() and pselect6_time64()
+  linux-user: Add support for utimensat_time64() and semtimedop_time64()
+
+ linux-user/syscall.c | 520 +++++++++++++++++++++++++------------------
+ 1 file changed, 300 insertions(+), 220 deletions(-)
+
+-- 
+2.25.1
+
 
