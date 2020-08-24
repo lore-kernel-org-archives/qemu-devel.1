@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-12.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 724DFC433E3
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 09:53:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9CE8C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 09:53:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3ED6E2071E
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 09:53:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A8F3F2075B
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 09:53:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sx5Ic1jE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3ED6E2071E
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dve8epIU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8F3F2075B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56958 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57128 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kA9Ao-0007ul-82
-	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 05:53:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46804)
+	id 1kA9Ap-0007yy-Tw
+	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 05:53:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46726)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kA95c-00052c-OR
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 05:48:32 -0400
-Received: from mail-wr1-x42f.google.com ([2a00:1450:4864:20::42f]:41984)
+ id 1kA95X-0004o4-Nb
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 05:48:27 -0400
+Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:37093)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kA95Z-0004na-Ce
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 05:48:32 -0400
-Received: by mail-wr1-x42f.google.com with SMTP id d16so7985907wrq.9
- for <qemu-devel@nongnu.org>; Mon, 24 Aug 2020 02:48:28 -0700 (PDT)
+ id 1kA95W-0004n9-0a
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 05:48:27 -0400
+Received: by mail-wm1-x335.google.com with SMTP id x9so3650509wmi.2
+ for <qemu-devel@nongnu.org>; Mon, 24 Aug 2020 02:48:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=C4FDGofxkhp2CW5sAZODmLDNNvMWWKgKI6wWO5BMgFQ=;
- b=sx5Ic1jEALy0P6us1DgVxG37lwqFttI+T7kib9lgHCKBtkyVf6G9vROR9jPSybEEXF
- Ln0FuUiIIYwZoqeEQSlYQD73Y++xTqxA8SpMzAQdcFNLzYuM3ZWk4r+Hp0ZNIa6zFvDl
- 4YAGKgvYOgGfuLcgmj8yQhSWODmtJTPZUBF88yHLWyswyPpULiLwQzOmDhOVOOJTmjIO
- V3X6RE0+5x3kBdQuBnVzlNrv0ldcrRUIhb3X7pSWf5xE1p6oMlPGNUUB5dlzyAHgTr1D
- TIiCRzKZ8zGfrc82MjTvrZnsUeVPY9JtWPgQdAAsHGOuigGIEEYoqPoiHSyaKR39IAsd
- 3lXA==
+ bh=apEmOXm4AQqmayGyw572zskFnVNsfChXfz8USNcN8vs=;
+ b=dve8epIUfMeiNe1rf+TGWWGzxvIwkaB+f9e1jikEu8IGtNxpNWW6dc3tGXIkOPr2dw
+ vgxpiYzDlSjUXRftVO/9Iq4k4Auh8dhtEsKGOlarMUdLE5KXdFxm3XcgtmofPShKXi6s
+ 0QUKn1hBSypr4Y6zK41W0O5cmYT3wA2jyWFwPnvJW2C+cDlY6TNacrokQDz+4gY6/ADR
+ XXwlR99lKWWijHITCJxPRtPWkR8oY0C5QZbbd8h2HO1N7xDmBPfJt4ktHR3OiyfJSA6L
+ ZGub/NL2PrhzyQs4otIrfni2MvN0I05Jp6LuT0gSndLt4iE+0NY7ezfzH5igN69+F7qF
+ ZNEw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=C4FDGofxkhp2CW5sAZODmLDNNvMWWKgKI6wWO5BMgFQ=;
- b=b3gJwHyHZA/KCTnpLsQ/IZ7VrkY9h3M7AqMDWIX57SaTePIbm5p5XCqGKPhzWlFoxm
- y65fdAEn6rbAZxDJaJS5Tgqn8KO5HWKlf3P0yi0xSoNakIWwV0TubDacO6GB30LwyINR
- NYTuN8quUWHf5GIT71s5+fwZBfSzmL4r9/tmlhRJ6LedATWafmlnyuw/NssQhwV8nkS2
- f1RS7c98jVh8NbjNWJheSAD34/owbO5BpqiFUrUu/wOR/yw7STY/DNNz26ITvrMMiAPu
- ovD5av/1QVTJcVwArsUUDpxdyA3gdSL+eECGky0UprqwwpoVrxtjxHT+wvEzn+VCVOhc
- yVcQ==
-X-Gm-Message-State: AOAM531aV5/WTSIdUNYx5LcUtAUZuLf5h91UPBVuxiMw4WEMozoVLFc7
- 1Fj8K3D7c/Ocxu78AAmsIW13e43e3pgoyLdr
-X-Google-Smtp-Source: ABdhPJwhGDeXHfcAoZchRXHfXzpmADT9ZbKrd7kYZYeVhdlkVyZmSbpFTi9GzTlCM/vG/9Rl2tJHWw==
-X-Received: by 2002:a5d:5704:: with SMTP id a4mr4914066wrv.318.1598262507630; 
- Mon, 24 Aug 2020 02:48:27 -0700 (PDT)
+ bh=apEmOXm4AQqmayGyw572zskFnVNsfChXfz8USNcN8vs=;
+ b=nSjfjrR1BXu3OqHUlkJixX5Mm8PJFzxFQt66Cn3cjk6/XjBHgR1Dqe8695wsD1Wv7A
+ FF4rROsPCKoxuE63zKhHM4YHxhsud1Mmfi7mNK4CnttigDV1NX0Q+iIKAWkt7J5chxI3
+ bfOP+9E72QdgOIzxVlwcUIC4+gN4GtjGY5dyGiZFk8XE1wVfHIlBb7TJEiRA6i0UZL8/
+ cDqZcp8fEE4zqbV8c92oRFNiDb04KklmeEpFd/HseFtPb2Fswd4BFJ0VzpzPtlj+O6KV
+ g76yJ8aEfdm0bAuxTjttO3sX8IzpRGFz1Mo/JJoFWGd2OW4oHCzyLO2t7mEaPqZNXVmD
+ OysQ==
+X-Gm-Message-State: AOAM532+x38f6+jektcU2pgcfnPI0+3YzdWMKWefR4HwdQKx43/smvlh
+ 1YO9izG6oLjZSkNdfwajD34D5tKq566OqFsj
+X-Google-Smtp-Source: ABdhPJxu62EuD6hDwXGTiVyy8g5O1En38Etfpqr7YzEg2xHZUW7JQYtvuvo3kwlcl/JWQTurbQ+vzg==
+X-Received: by 2002:a1c:f30f:: with SMTP id q15mr4886402wmq.60.1598262504540; 
+ Mon, 24 Aug 2020 02:48:24 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id q6sm24877057wma.22.2020.08.24.02.48.26
+ by smtp.gmail.com with ESMTPSA id q6sm24877057wma.22.2020.08.24.02.48.23
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 24 Aug 2020 02:48:26 -0700 (PDT)
+ Mon, 24 Aug 2020 02:48:23 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 12/27] hw/arm/smmuv3: Advertise SMMUv3.2 range invalidation
-Date: Mon, 24 Aug 2020 10:47:56 +0100
-Message-Id: <20200824094811.15439-13-peter.maydell@linaro.org>
+Subject: [PULL 09/27] hw/arm/smmuv3: Fix IIDR offset
+Date: Mon, 24 Aug 2020 10:47:53 +0100
+Message-Id: <20200824094811.15439-10-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200824094811.15439-1-peter.maydell@linaro.org>
 References: <20200824094811.15439-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::42f;
- envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x42f.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::335;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x335.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -106,44 +106,30 @@ Sender: "Qemu-devel"
 
 From: Eric Auger <eric.auger@redhat.com>
 
-Expose the RIL bit so that the guest driver uses range
-invalidation. Although RIL is a 3.2 features, We let
-the AIDR advertise SMMUv3.1 support as v3.x implementation
-is allowed to implement features from v3.(x+1).
+The SMMU IIDR register is at 0x018 offset.
 
+Fixes: 10a83cb9887 ("hw/arm/smmuv3: Skeleton")
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Message-id: 20200728150815.11446-12-eric.auger@redhat.com
+Message-id: 20200728150815.11446-9-eric.auger@redhat.com
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/arm/smmuv3-internal.h | 1 +
- hw/arm/smmuv3.c          | 1 +
- 2 files changed, 2 insertions(+)
+ hw/arm/smmuv3-internal.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/hw/arm/smmuv3-internal.h b/hw/arm/smmuv3-internal.h
-index 9ae7d97fafd..fa3c088972e 100644
+index 5babf72f7d5..ef093eaff50 100644
 --- a/hw/arm/smmuv3-internal.h
 +++ b/hw/arm/smmuv3-internal.h
-@@ -55,6 +55,7 @@ REG32(IDR1,                0x4)
- REG32(IDR2,                0x8)
- REG32(IDR3,                0xc)
-      FIELD(IDR3, HAD,         2, 1);
-+     FIELD(IDR3, RIL,        10, 1);
- REG32(IDR4,                0x10)
- REG32(IDR5,                0x14)
-      FIELD(IDR5, OAS,         0, 3);
-diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
-index b262f0e4a74..0122700e725 100644
---- a/hw/arm/smmuv3.c
-+++ b/hw/arm/smmuv3.c
-@@ -254,6 +254,7 @@ static void smmuv3_init_regs(SMMUv3State *s)
-     s->idr[1] = FIELD_DP32(s->idr[1], IDR1, EVENTQS, SMMU_EVENTQS);
-     s->idr[1] = FIELD_DP32(s->idr[1], IDR1, CMDQS,   SMMU_CMDQS);
+@@ -63,7 +63,7 @@ REG32(IDR5,                0x14)
  
-+    s->idr[3] = FIELD_DP32(s->idr[3], IDR3, RIL, 1);
-     s->idr[3] = FIELD_DP32(s->idr[3], IDR3, HAD, 1);
+ #define SMMU_IDR5_OAS 4
  
-    /* 4K and 64K granule support */
+-REG32(IIDR,                0x1c)
++REG32(IIDR,                0x18)
+ REG32(CR0,                 0x20)
+     FIELD(CR0, SMMU_ENABLE,   0, 1)
+     FIELD(CR0, EVENTQEN,      2, 1)
 -- 
 2.20.1
 
