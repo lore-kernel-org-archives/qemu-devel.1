@@ -2,40 +2,41 @@ Return-Path: <SRS0=JPH5=CC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 570D3C433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 20:35:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A74EC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 20:36:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2B513204EA
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 20:35:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B513204EA
+	by mail.kernel.org (Postfix) with ESMTPS id EF78D204EA
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 20:36:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF78D204EA
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56114 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59300 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAJC4-0006OF-9I
-	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 16:35:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59234)
+	id 1kAJCs-0007ge-42
+	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 16:36:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59458)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kAJBB-0005rY-Ou
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 16:34:57 -0400
-Received: from mout.kundenserver.de ([212.227.126.130]:38677)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kAJCE-0006qs-PD
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 16:36:02 -0400
+Received: from mout.kundenserver.de ([212.227.126.130]:33267)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kAJB9-0007LS-OA
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 16:34:57 -0400
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kAJCC-0007aN-Ta
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 16:36:02 -0400
 Received: from [192.168.100.1] ([82.252.135.186]) by mrelayeu.kundenserver.de
- (mreue009 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1M1Yl9-1kDLRn2g1r-0035g4; Mon, 24 Aug 2020 22:34:52 +0200
-Subject: Re: [PATCH] linux-user: Fix 'clock_nanosleep()' implementation
-To: Filip Bozuta <Filip.Bozuta@syrmia.com>, qemu-devel@nongnu.org
-References: <20200727201326.401519-1-Filip.Bozuta@syrmia.com>
+ (mreue012 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1MQgtC-1jwdxq0rEU-00NhvR; Mon, 24 Aug 2020 22:35:56 +0200
+Subject: Re: [PATCH v2] linux-user: syscall: ioctls: support
+ DRM_IOCTL_I915_GETPARAM
+To: chengang@emindsoft.com.cn
+References: <20200802133938.12055-1-chengang@emindsoft.com.cn>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -79,32 +80,32 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <b23e3d88-c57a-cf61-e9cc-205ff3d18427@vivier.eu>
-Date: Mon, 24 Aug 2020 22:34:51 +0200
+Message-ID: <21fbd5ab-1f1c-6b9a-c899-89af346e667e@vivier.eu>
+Date: Mon, 24 Aug 2020 22:35:54 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200727201326.401519-1-Filip.Bozuta@syrmia.com>
+In-Reply-To: <20200802133938.12055-1-chengang@emindsoft.com.cn>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:uCjGMqNbRWcgdyO9CE7OtYfWnHcEacMa/K5sOvvWqnq3gzgQlqn
- glF8N7XlSM1XiOcfWlQYGyxG64T+Mqw1ntDlNxTH5mcowmrnqs14vTRc3KFPpxwJdXf7mD1
- NZP9XnKkvSoMPbSsSMh3v3nbKjhSyCS1DpN1BBWD1zICRlXoZCH97LaA/32tOqoqH/fCV+f
- +qhynd4Wg/xk78yrciGxw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:/sWb3gZEx8Q=:W2bp0PcDnV7CoYkCq9UpyN
- ok2EX8pOueI15FCkNY0OP942E9S3zYxdJnbtX0LCEO2VU/2Ua++JJYP1L74QVOIZlYwlUVQYh
- uEXA0fu+NJNs+WVgnsf9p22lrEzZeXlryVcf3mVqU+SW/lqiKb5Rl85lUZSmxuJsqD1yc9fuq
- VJlXr0YiHu7e9azjty+gvqQ05RKSJZLaSvczRofBM8g56qwdeA86OAbQgo34+C37cSW21Of8t
- QPmyN6zj4LnB3vJIWnHfTRxetW96sPTEtfaeq1f/Knrx9NUF73oGaMJb8MIqACWLz93W+lG2n
- fHZfPovtV0G/ERmIz99xyyJdOzQlozsMmxq3RnPdEV+roxoH6Yn1J/DF81PX8MW69hbSD1KqF
- DY9g0UbEU3ZNh4RAspVdkoxRasfWqvwgmnYY6Bsi/E/KmOq+pZ/Ois6jEqKWDuXvweGTuN/BQ
- Edb5mfqmY5yQHeJvHiPjX+U6PymOcubXfolq+J0H6hjp0q/ScdDvwSK1ppGpvLBUXXUrc2ueF
- iUaLT0HMya6qRz3qvNvfbXNRQPnbbliLo8OsE3Zu4WMfApDXs/sPYsj+2qJtYcgz0wYwH8Rv3
- 2Z2UxCu6vZr5njNhOm/lRKw52+I28/Vio47gYZS5Jqaqrz59lIsPyvNNWm/JUBuWZ74YmxnoL
- CwRkYfQx913wNJOMfFEm0yhD5H51Pd3O12FDcHnFn2/x5yHEtA4XwSOwttLTtNl/mziM5ILMH
- Vdp0YpXBP9e0KD+ygdhNwXKFELFBDXnWSb2y4EIsOdCr0yHShItmVYCxD4jo6vzOc97RNJHzt
- urG2aqq7Zb5vzUrkAh2WRWucquYANbH+kQjXAnrGJc1mJUMkf70jnmEDcXDRa0obQx//3oG
+X-Provags-ID: V03:K1:5bQX7tP3Odu/O9oee1yjk3fx+NDJn5FHZq+BcS5fPlFG1U7AZzu
+ g6rX1bU0L25fX6441tIWmLsmiynBY3VKfNdedSD+WC1dnu2tAC24iyYibAWBhqC5Lf15ay6
+ BRI3IWUT4OMOfbPkp5Zxz2CSyl5V+VXZw83UrEDv3HsvRT/bJ+CRamnGuqEWnb9o427XnTo
+ 2UMOcZMz44cKy9RTjJr2Q==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:8HBp8YIbW40=:H2ASjisGztV00BEUrJxEeI
+ fhlOSmoebU+fmNqRt3OsEGNV6Wmkbc/OsVZxEPh8iBbzMLHwkyJRqlRXwbaXmoEo/HVQx9Ana
+ GwRrikNutJBmnDeRtKDXZ49uIu+R5tv8iMuoXzb1infHNZcVci0QYfVyiB3k1x58KOAnOFBxt
+ E7faM5QqaHjZ0NWCkUczECL4n2xLXMRT9f/UoVRh/F1N65zCI0+VCrqguZSZBFEJvsN5qrLUD
+ F+71IvkzStgg92aUAgnq3zmTdmmcYMo4cGI5DWajGdri2CceG58RkIdXI1whsd6zjKm+iw7M9
+ rX8GWQhCIgeUQb9F2IwWWCLJfWRrfmC02yyzo8ZYha577R0BYnbnVC1f7Ttefzb+/RJ0qtiO9
+ 0UcqdAdQje6e5Jv87wdkqXLDBzOhH1bOIiB0mQL7HKBgRItZByes+TRagE32SRlvTaRctNzYk
+ /UPs6Cl+pkU4onoZ7/mQ3zv6MlISYdJkMOExlpKu38sxSZFkImTZ+MPE3owUf0DORfs76xAbF
+ bocXBQ9xaQP31zJQeFq6Oa6QQHz48Ai53xi1uVfH9dG1LIV/idKCVibs3mddrU4DpGpKr4Skn
+ 6qmwmeAoKeZ7upTuHxCOLgnTspY2lUJ7XRx/k538rqXm2Or50TGILHmTVpTrvfwvHZQY2XsUo
+ Q0HT719nVBLw+aGVx74awCM2oS1xrb6CLXaVfleCQnxOLM1UKQXcqRMWdU2xGuzqCLWzu5bNF
+ wbFuwVPmd45JrEFTFCkNV2Os9sMzgq5qpB9GIjPaN8fZulloMNvFNuMd6NIAEZioHmJO8dvdk
+ 2hD0yb/RpdG6hrmDXqlkMAormCCTfO7nWp1DxMgo3xcvIm3ini7aYEwPRLT9JfVe9hcw6cK
 Received-SPF: none client-ip=212.227.126.130; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/24 16:34:54
@@ -127,56 +128,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 27/07/2020 à 22:13, Filip Bozuta a écrit :
-> Implementation of syscall 'clock_nanosleep()' in 'syscall.c' uses
-> functions 'target_to_host_timespec()' and 'host_to_target_timespec()'
-> to transfer the value of 'struct timespec' between target and host.
-> However, the implementation doesn't check whether this conversion
-> succeeds and thus can return an unaproppriate error instead of 'EFAULT'
-> that is expected. This was confirmed with the modified LTP test suite
-> where testcases with bad 'struct timespec' adress for 'clock_nanosleep()'
-> were added. This modified LTP suite can be found at:
-> https://github.com/bozutaf/ltp
+Le 02/08/2020 à 15:39, chengang@emindsoft.com.cn a écrit :
+> From: Chen Gang <chengang@emindsoft.com.cn>
 > 
-> (Patch with this new test case will be sent to LTP mailing list soon)
+> Another DRM_IOCTL_I915 patches will be sent next.
 > 
-> Signed-off-by: Filip Bozuta <Filip.Bozuta@syrmia.com>
+> Signed-off-by: Chen Gang <chengang@emindsoft.com.cn>
 > ---
->  linux-user/syscall.c | 9 ++++++---
->  1 file changed, 6 insertions(+), 3 deletions(-)
+>  linux-user/ioctls.h        |  3 +++
+>  linux-user/syscall.c       | 35 +++++++++++++++++++++++++++++++++++
+>  linux-user/syscall_defs.h  |  8 ++++++++
+>  linux-user/syscall_types.h |  4 ++++
+>  4 files changed, 50 insertions(+)
 > 
+> diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
+> index 0713ae1311..e2fc09b5a5 100644
+> --- a/linux-user/ioctls.h
+> +++ b/linux-user/ioctls.h
+> @@ -581,6 +581,9 @@
+>  #ifdef HAVE_DRM_H
+>    IOCTL_SPECIAL(DRM_IOCTL_VERSION, IOC_RW, do_ioctl_drm,
+>                  MK_PTR(MK_STRUCT(STRUCT_drm_version)))
+> +
+> +  IOCTL_SPECIAL(DRM_IOCTL_I915_GETPARAM, IOC_RW, do_ioctl_drm_i915,
+> +                MK_PTR(MK_STRUCT(STRUCT_drm_i915_getparam)))
+>  #endif
+>  
+>  #ifdef TARGET_TIOCSTART
 > diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index f5c4f6b95d..9f06dde947 100644
+> index 945fc25279..b0e15f373c 100644
 > --- a/linux-user/syscall.c
 > +++ b/linux-user/syscall.c
-> @@ -11828,7 +11828,9 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
->      case TARGET_NR_clock_nanosleep:
->      {
->          struct timespec ts;
-> -        target_to_host_timespec(&ts, arg3);
-> +        if (target_to_host_timespec(&ts, arg3)) {
-> +            return -TARGET_EFAULT;
-> +        }
->          ret = get_errno(safe_clock_nanosleep(arg1, arg2,
->                                               &ts, arg4 ? &ts : NULL));
->          /*
-> @@ -11836,8 +11838,9 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
->           * with error -TARGET_EINTR and if arg4 is not NULL and arg2 is not
->           * TIMER_ABSTIME, it returns the remaining unslept time in arg4.
->           */
-> -        if (ret == -TARGET_EINTR && arg4 && arg2 != TIMER_ABSTIME) {
-> -            host_to_target_timespec(arg4, &ts);
-> +        if (ret == -TARGET_EINTR && arg4 && arg2 != TIMER_ABSTIME &&
-> +            host_to_target_timespec(arg4, &ts)) {
-> +              return -TARGET_EFAULT;
->          }
+> @@ -114,6 +114,7 @@
+>  #include <sound/asound.h>
+>  #ifdef HAVE_DRM_H
+>  #include <libdrm/drm.h>
+> +#include <libdrm/i915_drm.h>
+>  #endif
+>  #include "linux_loop.h"
+>  #include "uname.h"
+> @@ -5413,6 +5414,40 @@ static abi_long do_ioctl_drm(const IOCTLEntry *ie, uint8_t *buf_temp,
+>      return -TARGET_ENOSYS;
+>  }
 >  
->          return ret;
+> +static abi_long do_ioctl_drm_i915_getparam(const IOCTLEntry *ie,
+> +                                           struct drm_i915_getparam *gparam,
+> +                                           int fd, abi_long arg)
+> +{
+> +    abi_long ret;
+> +    int value;
+> +    struct target_drm_i915_getparam *target_gparam;
+> +
+> +    if (!lock_user_struct(VERIFY_READ, target_gparam, arg, 0)) {
+> +        return -TARGET_EFAULT;
+> +    }
+> +
+> +    __get_user(gparam->param, &target_gparam->param);
+> +    gparam->value = &value;
+> +    ret = get_errno(safe_ioctl(fd, ie->host_cmd, gparam));
+> +    put_user_s32(value, target_gparam->value);
+> +
+> +    unlock_user_struct(target_gparam, arg, 0);
+> +    return ret;
+> +}
+> +
+> +static abi_long do_ioctl_drm_i915(const IOCTLEntry *ie, uint8_t *buf_temp,
+> +                                  int fd, int cmd, abi_long arg)
+> +{
+> +    switch (ie->host_cmd) {
+> +    case DRM_IOCTL_I915_GETPARAM:
+> +        return do_ioctl_drm_i915_getparam(ie,
+> +                                          (struct drm_i915_getparam *)buf_temp,
+> +                                          fd, arg);
+> +    default:
+> +        return -TARGET_ENOSYS;
+> +    }
+> +}
+> +
+>  #endif
+>  
+>  IOCTLEntry ioctl_entries[] = {
+> diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
+> index 3c261cff0e..5a1692aa26 100644
+> --- a/linux-user/syscall_defs.h
+> +++ b/linux-user/syscall_defs.h
+> @@ -1170,6 +1170,9 @@ struct target_rtc_pll_info {
+>  /* drm ioctls */
+>  #define TARGET_DRM_IOCTL_VERSION      TARGET_IOWRU('d', 0x00)
+>  
+> +/* drm i915 ioctls */
+> +#define TARGET_DRM_IOCTL_I915_GETPARAM              TARGET_IOWRU('d', 0x46)
+> +
+>  /* from asm/termbits.h */
+>  
+>  #define TARGET_NCC 8
+> @@ -2613,6 +2616,11 @@ struct target_drm_version {
+>      abi_ulong desc;
+>  };
+>  
+> +struct target_drm_i915_getparam {
+> +    int param;
+> +    abi_ulong value;
+> +};
+> +
+>  #include "socket.h"
+>  
+>  #include "errno_defs.h"
+> diff --git a/linux-user/syscall_types.h b/linux-user/syscall_types.h
+> index 3f1f033464..12bf3484e2 100644
+> --- a/linux-user/syscall_types.h
+> +++ b/linux-user/syscall_types.h
+> @@ -325,6 +325,10 @@ STRUCT(drm_version,
+>         TYPE_ULONG, /* desc_len */
+>         TYPE_PTRVOID) /* desc */
+>  
+> +STRUCT(drm_i915_getparam,
+> +       TYPE_INT, /* param */
+> +       TYPE_PTRVOID) /* value */
+> +
+>  STRUCT(file_clone_range,
+>         TYPE_LONGLONG, /* src_fd */
+>         TYPE_ULONGLONG, /* src_offset */
 > 
+
 
 Applied to my linux-user-for-5.2 branch.
 
