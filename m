@@ -2,54 +2,70 @@ Return-Path: <SRS0=JPH5=CC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA510C433E3
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 08:35:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5F4DC433E3
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 08:35:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8CD03206F0
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 08:35:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8CD03206F0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 84C74206F0
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 08:35:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=irrelevant.dk header.i=@irrelevant.dk header.b="yhxrsUQl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84C74206F0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54258 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54900 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kA7wd-0006C6-Rm
-	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 04:35:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57032)
+	id 1kA7wv-0006Rx-Nl
+	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 04:35:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57352)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1kA7uJ-0003Ap-NR; Mon, 24 Aug 2020 04:32:47 -0400
-Received: from relay.sw.ru ([185.231.240.75]:37904 helo=relay3.sw.ru)
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>) id 1kA7w7-0005XX-ML
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 04:34:39 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:55652)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1kA7uH-0003gP-Tw; Mon, 24 Aug 2020 04:32:47 -0400
-Received: from [172.16.25.136] (helo=localhost.sw.ru)
- by relay3.sw.ru with esmtp (Exim 4.94)
- (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1kA7tv-000xK2-3V; Mon, 24 Aug 2020 11:32:23 +0300
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH v7 3/4] qapi: add filter-node-name to block-stream
-Date: Mon, 24 Aug 2020 11:31:53 +0300
-Message-Id: <1598257914-887267-4-git-send-email-andrey.shinkevich@virtuozzo.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1598257914-887267-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-References: <1598257914-887267-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-Received-SPF: pass client-ip=185.231.240.75;
- envelope-from=andrey.shinkevich@virtuozzo.com; helo=relay3.sw.ru
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/24 04:32:09
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>) id 1kA7w5-0003pW-Hn
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 04:34:39 -0400
+Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net
+ [80.167.98.190])
+ by charlie.dont.surf (Postfix) with ESMTPSA id 04B66BF553;
+ Mon, 24 Aug 2020 08:34:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=irrelevant.dk;
+ s=default; t=1598258074;
+ bh=Aj8/Q8Q+mA1d2aldDGG1Yghwvl0LJFSd3zY2mZZ9COQ=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=yhxrsUQlkik5BtLVkmG8I/N7NbLy5+BRviivRy3ktYmTOkFjcyhG5YvP1taufb1YO
+ tdS9s/m5Q8gvDptilm7VI4vHboIAqFlUgMlPoR7+1prjnAdCpdlVGsh9yfPQXauZ9i
+ bkEOiKp5ojSC+0E31DCGdPyDhfgvf47796MMA/yHTPSXOXfKyjO+MapUYPOahPU7/d
+ Hmfpe51DfMI0rYjpuwwmEauL4jHRJ0RDSwUWtwYToHRquB02rYJDGHc5AYSoYBXe30
+ RjLEmeUJqUcYHdMHgsKDfWRuY+q8u7PTNlnI+CJ8KKHQKfYokJWs6z8swVgFTrGaVs
+ TCL/0+PlkWthg==
+Date: Mon, 24 Aug 2020 10:34:29 +0200
+From: Klaus Jensen <its@irrelevant.dk>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Subject: Re: [PATCH] meson: drop keymaps symlink
+Message-ID: <20200824083429.GA439541@apples.localdomain>
+References: <20200824074057.3673-1-kraxel@redhat.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="gKMricLos+KVdGMg"
+Content-Disposition: inline
+In-Reply-To: <20200824074057.3673-1-kraxel@redhat.com>
+Received-SPF: pass client-ip=128.199.63.193; envelope-from=its@irrelevant.dk;
+ helo=charlie.dont.surf
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/24 04:34:34
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -63,128 +79,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, armbru@redhat.com,
- qemu-devel@nongnu.org, andrey.shinkevich@virtuozzo.com, den@openvz.org,
- mreitz@redhat.com, jsnow@redhat.com
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Provide the possibility to pass the 'filter-node-name' parameter to the
-block-stream job as it is done for the commit block job.
 
-Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- block/monitor/block-hmp-cmds.c | 4 ++--
- block/stream.c                 | 4 +++-
- blockdev.c                     | 4 +++-
- include/block/block_int.h      | 7 ++++++-
- qapi/block-core.json           | 6 ++++++
- 5 files changed, 20 insertions(+), 5 deletions(-)
+--gKMricLos+KVdGMg
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/block/monitor/block-hmp-cmds.c b/block/monitor/block-hmp-cmds.c
-index 4d3db5e..4e66775 100644
---- a/block/monitor/block-hmp-cmds.c
-+++ b/block/monitor/block-hmp-cmds.c
-@@ -507,8 +507,8 @@ void hmp_block_stream(Monitor *mon, const QDict *qdict)
- 
-     qmp_block_stream(true, device, device, base != NULL, base, false, NULL,
-                      false, NULL, qdict_haskey(qdict, "speed"), speed, true,
--                     BLOCKDEV_ON_ERROR_REPORT, false, false, false, false,
--                     &error);
-+                     BLOCKDEV_ON_ERROR_REPORT, false, NULL, false, false, false,
-+                     false, &error);
- 
-     hmp_handle_error(mon, error);
- }
-diff --git a/block/stream.c b/block/stream.c
-index b9c1141..8bf6b6d 100644
---- a/block/stream.c
-+++ b/block/stream.c
-@@ -221,7 +221,9 @@ static const BlockJobDriver stream_job_driver = {
- void stream_start(const char *job_id, BlockDriverState *bs,
-                   BlockDriverState *base, const char *backing_file_str,
-                   int creation_flags, int64_t speed,
--                  BlockdevOnError on_error, Error **errp)
-+                  BlockdevOnError on_error,
-+                  const char *filter_node_name,
-+                  Error **errp)
- {
-     StreamBlockJob *s;
-     BlockDriverState *iter;
-diff --git a/blockdev.c b/blockdev.c
-index 237fffb..cc531cb 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -2476,6 +2476,7 @@ void qmp_block_stream(bool has_job_id, const char *job_id, const char *device,
-                       bool has_backing_file, const char *backing_file,
-                       bool has_speed, int64_t speed,
-                       bool has_on_error, BlockdevOnError on_error,
-+                      bool has_filter_node_name, const char *filter_node_name,
-                       bool has_auto_finalize, bool auto_finalize,
-                       bool has_auto_dismiss, bool auto_dismiss,
-                       Error **errp)
-@@ -2558,7 +2559,8 @@ void qmp_block_stream(bool has_job_id, const char *job_id, const char *device,
-     }
- 
-     stream_start(has_job_id ? job_id : NULL, bs, base_bs, base_name,
--                 job_flags, has_speed ? speed : 0, on_error, &local_err);
-+                 job_flags, has_speed ? speed : 0, on_error,
-+                 filter_node_name, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-         goto out;
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 465a601..3efde33 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -1122,6 +1122,9 @@ int is_windows_drive(const char *filename);
-  *                  See @BlockJobCreateFlags
-  * @speed: The maximum speed, in bytes per second, or 0 for unlimited.
-  * @on_error: The action to take upon error.
-+ * @filter_node_name: The node name that should be assigned to the filter
-+ * driver that the commit job inserts into the graph above @bs. NULL means
-+ * that a node name should be autogenerated.
-  * @errp: Error object.
-  *
-  * Start a streaming operation on @bs.  Clusters that are unallocated
-@@ -1134,7 +1137,9 @@ int is_windows_drive(const char *filename);
- void stream_start(const char *job_id, BlockDriverState *bs,
-                   BlockDriverState *base, const char *backing_file_str,
-                   int creation_flags, int64_t speed,
--                  BlockdevOnError on_error, Error **errp);
-+                  BlockdevOnError on_error,
-+                  const char *filter_node_name,
-+                  Error **errp);
- 
- /**
-  * commit_start:
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 0b8ccd3..1db6ce1 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -2524,6 +2524,11 @@
- #            'stop' and 'enospc' can only be used if the block device
- #            supports io-status (see BlockInfo).  Since 1.3.
- #
-+# @filter-node-name: the node name that should be assigned to the
-+#                    filter driver that the stream job inserts into the graph
-+#                    above @device. If this option is not given, a node name is
-+#                    autogenerated. (Since: 5.1)
-+#
- # @auto-finalize: When false, this job will wait in a PENDING state after it has
- #                 finished its work, waiting for @block-job-finalize before
- #                 making any block graph changes.
-@@ -2554,6 +2559,7 @@
-   'data': { '*job-id': 'str', 'device': 'str', '*base': 'str',
-             '*base-node': 'str', '*backing-file': 'str', '*speed': 'int',
-             '*on-error': 'BlockdevOnError',
-+            '*filter-node-name': 'str',
-             '*auto-finalize': 'bool', '*auto-dismiss': 'bool' } }
- 
- ##
--- 
-1.8.3.1
+On Aug 24 09:40, Gerd Hoffmann wrote:
+> We are building the keymaps by default now.  Drop the keymaps symlink
+> so the generated files are actually written to the build tree not the
+> source tree.
+>=20
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+>  configure | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/configure b/configure
+> index 67832e3bab76..428fa33be140 100755
+> --- a/configure
+> +++ b/configure
+> @@ -8119,7 +8119,7 @@ DIRS=3D"$DIRS roms/seabios"
+>  LINKS=3D"Makefile"
+>  LINKS=3D"$LINKS tests/tcg/lm32/Makefile"
+>  LINKS=3D"$LINKS tests/tcg/Makefile.target"
+> -LINKS=3D"$LINKS pc-bios/optionrom/Makefile pc-bios/keymaps"
+> +LINKS=3D"$LINKS pc-bios/optionrom/Makefile"
+>  LINKS=3D"$LINKS pc-bios/s390-ccw/Makefile"
+>  LINKS=3D"$LINKS roms/seabios/Makefile"
+>  LINKS=3D"$LINKS pc-bios/qemu-icon.bmp"
+> --=20
+> 2.27.0
+>=20
 
+Tested-by: Klaus Jensen <k.jensen@samsung.com>
+
+Awesome! This fixes cluttering of the source tree with changed
+pc-bios/keymaps/ files for me.
+
+--gKMricLos+KVdGMg
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEUigzqnXi3OaiR2bATeGvMW1PDekFAl9De5AACgkQTeGvMW1P
+Denq/wgAn/eONAi3+/R+idcoJ10502ePJLNX9f81lEJIVwKVxL+fJvZUjPt7Z5jr
+SdUSue5O4uGmB1EZkSNbwqqTChmpD0bBWj9Bk1ZQAbost/ntn9iHSrrtIgVlVSsI
+9MhF9D1NrMtv0nvjoZ1Z4RHqelEb4PaT0ijKTwCcC1fRIa2ZYvtb7DH79JwNNEER
+Fis3bVUWk/xlBHhPl4uLlG8/56d4S/vr5YlwhGK5NFWMCBtuL7QpBKT2H57QgqXn
+lNFLDh8wVeBHG+PJb6gI46Lvs0Lh9VJKjyKepCLy7zm+YSkR45sHVM8nCx+5Rndd
+iIl2nehruvN/gL9nffCFZ6FgXhD7oA==
+=mWO9
+-----END PGP SIGNATURE-----
+
+--gKMricLos+KVdGMg--
 
