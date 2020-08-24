@@ -7,79 +7,78 @@ X-Spam-Status: No, score=-12.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33F31C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 09:49:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25BAAC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 09:49:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EEC3B206BE
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 09:49:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DF06E206BE
+	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 09:49:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aPZt7m8J"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EEC3B206BE
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pmRdiGpV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF06E206BE
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59992 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60198 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kA96H-00067I-6a
-	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 05:49:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46590)
+	id 1kA96L-0006CF-67
+	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 05:49:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46606)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kA95O-0004Qj-6L
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 05:48:18 -0400
-Received: from mail-wr1-x42c.google.com ([2a00:1450:4864:20::42c]:41393)
+ id 1kA95P-0004R4-3S
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 05:48:19 -0400
+Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:34029)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kA95M-0004lj-IG
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 05:48:17 -0400
-Received: by mail-wr1-x42c.google.com with SMTP id p17so2325966wrj.8
- for <qemu-devel@nongnu.org>; Mon, 24 Aug 2020 02:48:16 -0700 (PDT)
+ id 1kA95N-0004ln-GI
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 05:48:18 -0400
+Received: by mail-wr1-x42e.google.com with SMTP id f7so8030100wrw.1
+ for <qemu-devel@nongnu.org>; Mon, 24 Aug 2020 02:48:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=nnYvgpj+yfRsy7MXb9YbrfpjgfASX8TYRFoNG96nT04=;
- b=aPZt7m8JkaQvwbTXMevz23ilxf0f13elevH6ENQ0HyhGa4QSrpjGH3rs3/hmTvBnoP
- peHdLzndhRCsOHq6jw0mhL3Rku0X+K74hT538BkqZIzcSIWHIKv7hG60O1bQLEBpPm7/
- k9YOmsHXHrx/WxHDagNlI2UvWkF54wGtMsxy3mL+swUyKIcKsCovGKhU82f1Bfc3+lkt
- wKmSOccLxYcktp8JHLJi/6OuNgcWKieLUWpCd00opCcyJcPIcmvBXZcpuIJnTLB3zwJO
- pIbOU9spdoDPb6XIlT+iqAbETejpaLkHo9rj0WHAjEvupyz3Ig4YqR6AaPixFak/sKgJ
- mKtA==
+ bh=d76Q5LBvtJQn3pY+eXI6scN5N0T9wemtRcn+yfENPBU=;
+ b=pmRdiGpVTUV8Fs7xfolkkHIzyaxRfwQ4lq1jAbGUBH1WY8+nIsIbSlfOLVw5xSS+Kq
+ MTjHNSi1igJQ2k5njpMkC6A7BGE91nnyCjkro6F+Z2rYN2d5Kbm9YoULA5z9ucYgbRtX
+ dTUMWm9goVk6dbV1qbIMT5UAessNmlfh6CJ9AaXvays566EaiqZpZbMfDoBJI3+1112Z
+ lYsEvw7jibRZsjJHo4VKvOFTDhIgq+6fnZ5pHYsmE047dnBaaUwQfJLLdF7HHd1a9ir8
+ JKBxJCkF6h1YybFDj/HhSujd6dS7vfJ3rrqjVoKyZkWSEqbGc0Cyu9ZmwMbBIKFfZkk6
+ MeaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=nnYvgpj+yfRsy7MXb9YbrfpjgfASX8TYRFoNG96nT04=;
- b=YIH8s0q8X9zkMaEaW8abB1MXh5QJxtjrpv+9h6BfGzWjj/1sORIuTOMVumd9YVbtUX
- vinOJpq6n+C+mZTLsSuFzEVlv4TDo2ZDmpCmiYd+91rVf17seCZ8xS0IOgyc+/Zue4To
- 8aC3cnCawv0MG+JwcWlH4Aa9eo8sIlYF6ZpHbyemkJbkL3W8/OwCLVrngqKO9prdAIpi
- qw+dwiSQdiKeUErc2/O4s9gkqKQqtyMuC7c4Px2LhmItSjnxeoykpUvvTpeLpjlZey2F
- 3QMFqMH9H7igagtj8cfE+IV+ce++MpsCo0hZeLOoZv0a+bPka/YwVCii8sBCf38ibqMz
- PG2w==
-X-Gm-Message-State: AOAM531AvDCABfynlkuJBFEdycnKTR+m3LvL6FfRYv57UcuugyE1XC3r
- DLKPjK5SIr4SNYk37Y7QDX7POJWHBaXsu6vB
-X-Google-Smtp-Source: ABdhPJxHGG/Y4o7bQF12Sih+oJWcyZ97XuTtHHhmNWVQEHJoyrVPoQFjtCwWqPo6T/eOHyfTMcenSA==
-X-Received: by 2002:a5d:6806:: with SMTP id w6mr3775560wru.395.1598262494827; 
- Mon, 24 Aug 2020 02:48:14 -0700 (PDT)
+ bh=d76Q5LBvtJQn3pY+eXI6scN5N0T9wemtRcn+yfENPBU=;
+ b=G0NVXXh7OX9DKQBVSpyyKooI7FrUYWKUUZNudcs2R6x/YCNDemOsy+uUyfSVeW71i0
+ j1n2glmijiYZG55RFcGvaNvUUcr02u6Z/uiX83yltcLmn4TNxlo2+cXGYIRIFBkgJ82e
+ dLLjf+5EZnmDVA/aHbHMvURyyD7++qHUiFLj1k8V4wwM8qB1LL4Ss0Axa/lm2oobnfVh
+ Ay7bDIbiTnOkQqtmWRShH+FvxyECcMmsdBOhYAmsdpSgLvrJniv8FOuU6WvNmANM4jaM
+ fB0BmUWRwodJ3A67Y6CPKF1jeiMYjQbtU5uVBoHnpUyOPrEFVuL7kMsNEhjK+NRRB/7j
+ aB3g==
+X-Gm-Message-State: AOAM530aDWGmTgZ50yfANZxAHXwBzpTbbF2EGkZDX7HJjjbLCMwY8E0q
+ 0SGsiRm6zwLdW2sXbmUSc62T9jw1EeRHHR5D
+X-Google-Smtp-Source: ABdhPJwL5cnKfXGwkhIGo0t4qfcqZqF1pvR5RWIZChOz/ADhyRu30HvwR40mf5wI62y+PZIvKpdwpA==
+X-Received: by 2002:adf:ec10:: with SMTP id x16mr4847820wrn.74.1598262495937; 
+ Mon, 24 Aug 2020 02:48:15 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id q6sm24877057wma.22.2020.08.24.02.48.13
+ by smtp.gmail.com with ESMTPSA id q6sm24877057wma.22.2020.08.24.02.48.14
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 24 Aug 2020 02:48:13 -0700 (PDT)
+ Mon, 24 Aug 2020 02:48:15 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 01/27] hw/cpu/a9mpcore: Verify the machine use Cortex-A9 cores
-Date: Mon, 24 Aug 2020 10:47:45 +0100
-Message-Id: <20200824094811.15439-2-peter.maydell@linaro.org>
+Subject: [PULL 02/27] hw/arm/smmu-common: Factorize some code in smmu_ptw_64()
+Date: Mon, 24 Aug 2020 10:47:46 +0100
+Message-Id: <20200824094811.15439-3-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200824094811.15439-1-peter.maydell@linaro.org>
 References: <20200824094811.15439-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::42c;
- envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x42c.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::42e;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x42e.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -105,60 +104,106 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+From: Eric Auger <eric.auger@redhat.com>
 
-The 'Cortex-A9MPCore internal peripheral' block can only be
-used with Cortex A5 and A9 cores. As we don't model the A5
-yet, simply check the machine cpu core is a Cortex A9. If
-not return an error.
+Page and block PTE decoding can share some code. Let's
+first handle table PTE and factorize some code shared by
+page and block PTEs.
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Message-id: 20200709152337.15533-1-f4bug@amsat.org
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Message-id: 20200728150815.11446-2-eric.auger@redhat.com
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/cpu/a9mpcore.c | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
+ hw/arm/smmu-common.c | 48 ++++++++++++++++----------------------------
+ 1 file changed, 17 insertions(+), 31 deletions(-)
 
-diff --git a/hw/cpu/a9mpcore.c b/hw/cpu/a9mpcore.c
-index 351295e5187..ec186d49abd 100644
---- a/hw/cpu/a9mpcore.c
-+++ b/hw/cpu/a9mpcore.c
-@@ -15,6 +15,7 @@
- #include "hw/irq.h"
- #include "hw/qdev-properties.h"
- #include "hw/core/cpu.h"
-+#include "cpu.h"
+diff --git a/hw/arm/smmu-common.c b/hw/arm/smmu-common.c
+index e13a5f4a7cb..a3f9e473985 100644
+--- a/hw/arm/smmu-common.c
++++ b/hw/arm/smmu-common.c
+@@ -186,7 +186,7 @@ static int smmu_ptw_64(SMMUTransCfg *cfg,
+         uint64_t subpage_size = 1ULL << level_shift(level, granule_sz);
+         uint64_t mask = subpage_size - 1;
+         uint32_t offset = iova_level_offset(iova, inputsize, level, granule_sz);
+-        uint64_t pte;
++        uint64_t pte, gpa;
+         dma_addr_t pte_addr = baseaddr + offset * sizeof(pte);
+         uint8_t ap;
  
- #define A9_GIC_NUM_PRIORITY_BITS    5
+@@ -199,56 +199,42 @@ static int smmu_ptw_64(SMMUTransCfg *cfg,
+         if (is_invalid_pte(pte) || is_reserved_pte(pte, level)) {
+             trace_smmu_ptw_invalid_pte(stage, level, baseaddr,
+                                        pte_addr, offset, pte);
+-            info->type = SMMU_PTW_ERR_TRANSLATION;
+-            goto error;
++            break;
+         }
  
-@@ -52,8 +53,18 @@ static void a9mp_priv_realize(DeviceState *dev, Error **errp)
-                  *wdtbusdev;
-     int i;
-     bool has_el3;
-+    CPUState *cpu0;
-     Object *cpuobj;
+-        if (is_page_pte(pte, level)) {
+-            uint64_t gpa = get_page_pte_address(pte, granule_sz);
++        if (is_table_pte(pte, level)) {
++            ap = PTE_APTABLE(pte);
  
-+    cpu0 = qemu_get_cpu(0);
-+    cpuobj = OBJECT(cpu0);
-+    if (strcmp(object_get_typename(cpuobj), ARM_CPU_TYPE_NAME("cortex-a9"))) {
-+        /* We might allow Cortex-A5 once we model it */
-+        error_setg(errp,
-+                   "Cortex-A9MPCore peripheral can only use Cortex-A9 CPU");
-+        return;
+-            ap = PTE_AP(pte);
+             if (is_permission_fault(ap, perm)) {
+                 info->type = SMMU_PTW_ERR_PERMISSION;
+                 goto error;
+             }
+-
+-            tlbe->translated_addr = gpa + (iova & mask);
+-            tlbe->perm = PTE_AP_TO_PERM(ap);
++            baseaddr = get_table_pte_address(pte, granule_sz);
++            level++;
++            continue;
++        } else if (is_page_pte(pte, level)) {
++            gpa = get_page_pte_address(pte, granule_sz);
+             trace_smmu_ptw_page_pte(stage, level, iova,
+                                     baseaddr, pte_addr, pte, gpa);
+-            return 0;
+-        }
+-        if (is_block_pte(pte, level)) {
++        } else {
+             uint64_t block_size;
+-            hwaddr gpa = get_block_pte_address(pte, level, granule_sz,
+-                                               &block_size);
+-
+-            ap = PTE_AP(pte);
+-            if (is_permission_fault(ap, perm)) {
+-                info->type = SMMU_PTW_ERR_PERMISSION;
+-                goto error;
+-            }
+ 
++            gpa = get_block_pte_address(pte, level, granule_sz,
++                                        &block_size);
+             trace_smmu_ptw_block_pte(stage, level, baseaddr,
+                                      pte_addr, pte, iova, gpa,
+                                      block_size >> 20);
+-
+-            tlbe->translated_addr = gpa + (iova & mask);
+-            tlbe->perm = PTE_AP_TO_PERM(ap);
+-            return 0;
+         }
+-
+-        /* table pte */
+-        ap = PTE_APTABLE(pte);
+-
++        ap = PTE_AP(pte);
+         if (is_permission_fault(ap, perm)) {
+             info->type = SMMU_PTW_ERR_PERMISSION;
+             goto error;
+         }
+-        baseaddr = get_table_pte_address(pte, granule_sz);
+-        level++;
+-    }
+ 
++        tlbe->translated_addr = gpa + (iova & mask);
++        tlbe->perm = PTE_AP_TO_PERM(ap);
++        return 0;
 +    }
-+
-     scudev = DEVICE(&s->scu);
-     qdev_prop_set_uint32(scudev, "num-cpu", s->num_cpu);
-     if (!sysbus_realize(SYS_BUS_DEVICE(&s->scu), errp)) {
-@@ -70,7 +81,6 @@ static void a9mp_priv_realize(DeviceState *dev, Error **errp)
-     /* Make the GIC's TZ support match the CPUs. We assume that
-      * either all the CPUs have TZ, or none do.
-      */
--    cpuobj = OBJECT(qemu_get_cpu(0));
-     has_el3 = object_property_find(cpuobj, "has_el3", NULL) &&
-         object_property_get_bool(cpuobj, "has_el3", &error_abort);
-     qdev_prop_set_bit(gicdev, "has-security-extensions", has_el3);
+     info->type = SMMU_PTW_ERR_TRANSLATION;
+ 
+ error:
 -- 
 2.20.1
 
