@@ -2,124 +2,95 @@ Return-Path: <SRS0=2GMi=CD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,RCVD_ILLEGAL_IP,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31374C433E5
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 19:09:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0487CC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 19:09:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0E2E02074D
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 19:09:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D15F12074D
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 19:09:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="CbBt/T9U"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E2E02074D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Amtm6D27"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D15F12074D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59564 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60594 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAeK2-0004S7-D4
-	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 15:09:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35192)
+	id 1kAeKH-0004sU-5T
+	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 15:09:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33674)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <Thomas.Lendacky@amd.com>)
- id 1kAeHR-0008RR-4B
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 15:06:49 -0400
-Received: from mail-bn7nam10on2076.outbound.protection.outlook.com
- ([40.107.92.76]:42272 helo=NAM10-BN7-obe.outbound.protection.outlook.com)
+ (Exim 4.90_1)
+ (envelope-from <prvs=49978a6e9=alistair.francis@wdc.com>)
+ id 1kAeAd-0004qZ-DT
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 14:59:47 -0400
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:58806)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <Thomas.Lendacky@amd.com>)
- id 1kAeHP-0003xT-Jt
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 15:06:48 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=X2jzrRPJ8/FLEwWrIkIiz57hacjxNNnGAK0Ty6EAsuWPibtYVKYLHu8PzgEPGXLXRFRikVah8r5AhW/IYGKrWh25666OEAT+w7X5763FuAg0lXkgss8OZJ2cvgL819LVebM5TJBI/L27djmruwRwQDWXhAwKA4llMk+kakuX7D2Zzbh7z4mWlAArhEU/qcQouSQNIrb81iUWO66vQsTA0r+0RejjbP4hOqzNCoql8PC3ZXysSlB3T1J+1DCZFAgvy1b8otUYIc1lzlD0Wo/TL7eedeG4QRdmeTLjO5yN3j9rmWg6TGeTaHsPdgf2/BOkK7MtSvDG7EbUc2gDvjXFIQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Ow1m4GXEZvMOOFuF2jbpJkKWGA1rQF6Uh32xVVBeyYY=;
- b=f949HC/wABCK7vrQwMZueC7ubGmqEYHaLYw/awLdp86wCxtZBuxkMcp6PlGiIdy4NBsmtVczqcvK/gIed3UjnIQwEGmmgZwMb8nZkE4/uvz8CuNrZx6Y9gTy+IGOlcLigt3a3LppIaYe/qLrC1OEIyyp+SSvkUoadKigVKtUiwFeSwPomURR5BjXUG80Y4uPIOj4EYllIIZv2n4W3gIJ1QpTwqmQbz/60NIUWYPPn6fh4m9Zi2I882s5S3U7X60+cTc1Zs572qZeui2aa306x737mAulx17UZIvXpVe4UZvpki4oDkKUgWzgEJ2SMnt32KsXgAICFibBWCRj37JEHA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Ow1m4GXEZvMOOFuF2jbpJkKWGA1rQF6Uh32xVVBeyYY=;
- b=CbBt/T9U0oR+io47rhdNhG/t1vt+AuTV0Vwt/uQDuJaOXcB5ToErF1FYbB02vsIhiIrHXVFuU388TdBFfDpRjZ4TvlziKP+IV+zAvyTnBNAIZygQf+wfCKqLGJY9x/umHHXACkDyegOhC/DbRN/QHB2cUPeNJVM6FmAyzAR3wbg=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=amd.com;
-Received: from DM5PR12MB1355.namprd12.prod.outlook.com (2603:10b6:3:6e::7) by
- DM5PR1201MB0219.namprd12.prod.outlook.com (2603:10b6:4:56::19) with
- Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3305.25; Tue, 25 Aug 2020 19:06:29 +0000
-Received: from DM5PR12MB1355.namprd12.prod.outlook.com
- ([fe80::299a:8ed2:23fc:6346]) by DM5PR12MB1355.namprd12.prod.outlook.com
- ([fe80::299a:8ed2:23fc:6346%3]) with mapi id 15.20.3305.026; Tue, 25 Aug 2020
- 19:06:29 +0000
-From: Tom Lendacky <thomas.lendacky@amd.com>
-To: qemu-devel@nongnu.org,
-	kvm@vger.kernel.org
-Subject: [PATCH 4/4] sev/i386: Enable an SEV-ES guest based on SEV policy
-Date: Tue, 25 Aug 2020 14:05:43 -0500
-Message-Id: <8390c20d2f7e638d166f7b771c3e11363a7852f6.1598382343.git.thomas.lendacky@amd.com>
+ (Exim 4.90_1)
+ (envelope-from <prvs=49978a6e9=alistair.francis@wdc.com>)
+ id 1kAeAa-0002vn-0e
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 14:59:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+ t=1598381985; x=1629917985;
+ h=from:to:cc:subject:date:message-id:in-reply-to:
+ references:mime-version:content-transfer-encoding;
+ bh=phuY6E/b88DLSXc1+8LIVym5ETpDpaL8va6SjjxdDfY=;
+ b=Amtm6D27FXS8urnbeKH34nrT+qrd7b1pF0kj9ugyjAJVwxQg/g0eGvDX
+ c6yOeqNNqXD2o622SbNT93iFAb91Elsol2v/PhQTzcUXZSz/Ebf80MNSf
+ OJJNc3h7xG7tpmfGkp+skxPhTsB3davdXsY07puHk8SVqkrhuTp+GuPcg
+ FbiVuBCnskQrPc/PogaJM63StvORWUKllayb3rPXILcBnpjFsHe7NRJY4
+ VM5OhIBgN4j246oEOZJj/RO4U8XODffzMwSUXTX1GOfbOcNg0/uqs68qw
+ KpKiU+wLExdDR7WyEUEi7js2o3cSt/VJUI+69IUvyNVW082VZKyLr96qz w==;
+IronPort-SDR: GqF0cf3sY7uVY2bzf0LduhKgsqJM4iSQIVPAZn1rrLMm1YCoaFEHcplzgtK0Z+lYHl987MKrWW
+ F/+SwM6oGIRoGy4KDJa6QToT6f4gZDRkVZb2GaHjQroUVFGSz9Ss+80CFDjkuQ9RJmoDWFbS8j
+ aieTlxo8NJ5fnOB5QtTZyJZsNGBreCqO/MRbomWOC/QIBcgcTxLnB59Nortnx9Bo5P6izC9TW8
+ azM5bVUZkLZmfzbQEyc6c9TGx3VQJmuAWc7isjfAmazuMtZh/i/66gPrLyt45bUNgJ0rn0XtGC
+ VVY=
+X-IronPort-AV: E=Sophos;i="5.76,353,1592841600"; d="scan'208";a="150145301"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com)
+ ([199.255.45.14])
+ by ob1.hgst.iphmx.com with ESMTP; 26 Aug 2020 02:58:58 +0800
+IronPort-SDR: jkT9f9xc9oiuDFJO6CaBVByvlphDsKnKgXCGt1dCwqZAaG6/Qo0riR8s/q+GpaIDORk8l8FSg7
+ 7vY/ugbw7r7w==
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+ by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 25 Aug 2020 11:46:33 -0700
+IronPort-SDR: cyBKwzjrLoXByKYGUcQ+Snlvq+S3/Yc0qwkbV8/3atAB0OFXZdbz7PGpKE9y66qn7z7JHxTyj2
+ SelwGBZEgV6A==
+WDCIronportException: Internal
+Received: from ind003389.ad.shared (HELO risc6-mainframe.hgst.com)
+ ([10.86.59.125])
+ by uls-op-cesaip02.wdc.com with ESMTP; 25 Aug 2020 11:58:57 -0700
+From: Alistair Francis <alistair.francis@wdc.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL 17/18] target/riscv: Return the exception from invalid CSR
+ accesses
+Date: Tue, 25 Aug 2020 11:48:35 -0700
+Message-Id: <20200825184836.1282371-18-alistair.francis@wdc.com>
 X-Mailer: git-send-email 2.28.0
-In-Reply-To: <cover.1598382343.git.thomas.lendacky@amd.com>
-References: <cover.1598382343.git.thomas.lendacky@amd.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: DM5PR13CA0065.namprd13.prod.outlook.com
- (2603:10b6:3:117::27) To DM5PR12MB1355.namprd12.prod.outlook.com
- (2603:10b6:3:6e::7)
+In-Reply-To: <20200825184836.1282371-1-alistair.francis@wdc.com>
+References: <20200825184836.1282371-1-alistair.francis@wdc.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from 255.255.255.255 (255.255.255.255) by
- DM5PR13CA0065.namprd13.prod.outlook.com (2603:10b6:3:117::27) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3326.10 via Frontend Transport; Tue, 25 Aug 2020 19:06:29 +0000
-X-Mailer: git-send-email 2.28.0
-X-Originating-IP: [165.204.77.1]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: bf206588-4478-40b8-1fdd-08d84929f930
-X-MS-TrafficTypeDiagnostic: DM5PR1201MB0219:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM5PR1201MB0219A795677B14EA9DC4EF3CEC570@DM5PR1201MB0219.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 8TxRoL0qImlDHXNa/LRrjIuYg43uUWsRKVsTlQQiTlKpIlE1w89ZdtP9YI+FNoUMb7LftmuFk/kCHV5qGJcYDavOKCxIOEuuy3u6MA1K0cNKJpquDgdZM/L+Jz8pQKzZ+4G2lUmryO8n8KpKIL8rIv3o7wc5CCAd5jiD0SPUm2/2ywZxwKZ0M8McMGnY5yiAH3MTgHgYKcroLXI0U1V4izxdD7SRxDkwKkNknLP4SFfeskRIgbi5ds46P2xLQn0zhzUXLFPk/Nm+HXKNyfxWRYtRMG5a8j6hHVWiK3cKhPICqZvTkh8PC0Ri9Lnf/4RnZr9+op+SGnunadfOqv0h1VRlHf0Q2/FAW9jKUti+0jNA4i566+3b6Z2LsrydT49g
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:DM5PR12MB1355.namprd12.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(396003)(136003)(376002)(39860400002)(366004)(346002)(4326008)(186003)(86362001)(8676002)(83380400001)(54906003)(16576012)(8936002)(6486002)(316002)(478600001)(36756003)(52116002)(26005)(6666004)(66556008)(2616005)(66476007)(66946007)(956004)(2906002)(5660300002)(136400200001);
- DIR:OUT; SFP:1101; 
-X-MS-Exchange-AntiSpam-MessageData: v9USAGvmyJacV4ftxTaw7YDNOgeBBeb2KTecAr3sguftgZROGaFvn4xacEiMq0aenoiYrtjKviuKh/vx/rwSxToO4CUVTG+qLbvHmVuiTs1y9o+9sNm3esze/6c1B0YSW2lxtvmBYXC1XYYLdPstrkrzUe1j6Inud4iJiBq/76dD6EYjw8IK3iHSvBeY6hYSVFE3eaN6kLd4QLzyLmM+Bq4EIbwNzQLwPwVDoM96WmFtBmWyYJq0rZaRjwWJHg63AmIHVAW0ngE+Cl9XAvOazaTgWtkrgDfumBbU4sbeBFXCRbnTP7Iz38cf1vybK2fsVpvF57bkodaMuxmFzlnqyP1wcB+6UKrKYciWMqsawUJ98HxGxVmdpcgLrhx6Hr3txU+B0IaazeV0u4Kkwz4BPY83ztOUd0LxOJA0HwG3ZLW5+HD9JLUtsNlO32s54TdTlz7Ox3VgMBa165Imo2CtqiAcBDXx+SAI044DJucF0hxAnQXhUWF+rbSpPNL4rIlVd64XvlfW7fy829FljVr4qj9y8PgMFURJcnZ5WNMgFA+WWYpAA+T+ZAIVIrphvpT+h+s/wZF5TK2b4WhoAvq2A94rJYixlQs3JRMREcZ+x0DQ4kcXNrWYFZEqKybfpi6ZTK2oxqkhaNbnM15RBwgFGQ==
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bf206588-4478-40b8-1fdd-08d84929f930
-X-MS-Exchange-CrossTenant-AuthSource: DM5PR12MB1355.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Aug 2020 19:06:29.8871 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: LY+WXkQ5tcVGnyGltdJIeO2p44VTO2hBlsBhIhUDkMIN0kpgO5szAy4zkjEsFdy3mRs5KxscjThILRcqbp3+ww==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR1201MB0219
-Received-SPF: none client-ip=40.107.92.76;
- envelope-from=Thomas.Lendacky@amd.com;
- helo=NAM10-BN7-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/25 15:06:39
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: 4
-X-Spam_score: 0.4
-X-Spam_bar: /
-X-Spam_report: (0.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- FORGED_SPF_HELO=1, MSGID_FROM_MTA_HEADER=0.001, RCVD_ILLEGAL_IP=1.3,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
- SPF_NONE=0.001 autolearn=no autolearn_force=no
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=216.71.153.141;
+ envelope-from=prvs=49978a6e9=alistair.francis@wdc.com;
+ helo=esa3.hgst.iphmx.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/25 14:58:53
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -43
+X-Spam_score: -4.4
+X-Spam_bar: ----
+X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -132,47 +103,272 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S . Tsirkin" <mst@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Jiri Slaby <jslaby@suse.cz>,
- Richard Henderson <rth@twiddle.net>
+Cc: alistair23@gmail.com, alistair.francis@wdc.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Tom Lendacky <thomas.lendacky@amd.com>
+When performing a CSR access let's return a negative exception value on
+an error instead of -1. This will allow us to specify the exception in
+future patches.
 
-Update the sev_es_enabled() function return value to be based on the SEV
-policy that has been specified. SEV-ES is enabled if SEV is enabled and
-the SEV-ES policy bit is set in the policy object.
-
-Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+Message-id: a487dad60c9b8fe7a2b992c5e0dcc2504a9000a7.1597259519.git.alistair.francis@wdc.com
+Message-Id: <a487dad60c9b8fe7a2b992c5e0dcc2504a9000a7.1597259519.git.alistair.francis@wdc.com>
 ---
- target/i386/sev.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ target/riscv/csr.c       | 46 ++++++++++++++++++++--------------------
+ target/riscv/op_helper.c | 18 ++++++++++------
+ 2 files changed, 35 insertions(+), 29 deletions(-)
 
-diff --git a/target/i386/sev.c b/target/i386/sev.c
-index 5146b788fb..153c2cba2c 100644
---- a/target/i386/sev.c
-+++ b/target/i386/sev.c
-@@ -70,6 +70,8 @@ struct SevGuestState {
- #define DEFAULT_GUEST_POLICY    0x1 /* disable debug */
- #define DEFAULT_SEV_DEVICE      "/dev/sev"
+diff --git a/target/riscv/csr.c b/target/riscv/csr.c
+index 7dc50e6299..197ce97e95 100644
+--- a/target/riscv/csr.c
++++ b/target/riscv/csr.c
+@@ -51,7 +51,7 @@ static int fs(CPURISCVState *env, int csrno)
+         return 0;
+     }
+     if (!env->debugger && !riscv_cpu_fp_enabled(env)) {
+-        return -1;
++        return -RISCV_EXCP_ILLEGAL_INST;
+     }
+ #endif
+     return 0;
+@@ -73,7 +73,7 @@ static int ctr(CPURISCVState *env, int csrno)
  
-+#define GUEST_POLICY_SEV_ES_BIT (1 << 2)
-+
- /* SEV Information Block GUID = 00f771de-1a7e-4fcb-890e-68c77e2fb44e */
- #define SEV_INFO_BLOCK_GUID "\xde\x71\xf7\x00\x7e\x1a\xcb\x4f\x89\x0e\x68\xc7\x7e\x2f\xb4\x4e"
+     if (!cpu->cfg.ext_counters) {
+         /* The Counters extensions is not enabled */
+-        return -1;
++        return -RISCV_EXCP_ILLEGAL_INST;
+     }
+ #endif
+     return 0;
+@@ -101,7 +101,7 @@ static int hmode(CPURISCVState *env, int csrno)
+         }
+     }
  
-@@ -374,7 +376,7 @@ sev_enabled(void)
- bool
- sev_es_enabled(void)
- {
--    return false;
-+    return (sev_enabled() && (sev_guest->policy & GUEST_POLICY_SEV_ES_BIT));
+-    return -1;
++    return -RISCV_EXCP_ILLEGAL_INST;
  }
  
- uint64_t
+ static int pmp(CPURISCVState *env, int csrno)
+@@ -115,7 +115,7 @@ static int read_fflags(CPURISCVState *env, int csrno, target_ulong *val)
+ {
+ #if !defined(CONFIG_USER_ONLY)
+     if (!env->debugger && !riscv_cpu_fp_enabled(env)) {
+-        return -1;
++        return -RISCV_EXCP_ILLEGAL_INST;
+     }
+ #endif
+     *val = riscv_cpu_get_fflags(env);
+@@ -126,7 +126,7 @@ static int write_fflags(CPURISCVState *env, int csrno, target_ulong val)
+ {
+ #if !defined(CONFIG_USER_ONLY)
+     if (!env->debugger && !riscv_cpu_fp_enabled(env)) {
+-        return -1;
++        return -RISCV_EXCP_ILLEGAL_INST;
+     }
+     env->mstatus |= MSTATUS_FS;
+ #endif
+@@ -138,7 +138,7 @@ static int read_frm(CPURISCVState *env, int csrno, target_ulong *val)
+ {
+ #if !defined(CONFIG_USER_ONLY)
+     if (!env->debugger && !riscv_cpu_fp_enabled(env)) {
+-        return -1;
++        return -RISCV_EXCP_ILLEGAL_INST;
+     }
+ #endif
+     *val = env->frm;
+@@ -149,7 +149,7 @@ static int write_frm(CPURISCVState *env, int csrno, target_ulong val)
+ {
+ #if !defined(CONFIG_USER_ONLY)
+     if (!env->debugger && !riscv_cpu_fp_enabled(env)) {
+-        return -1;
++        return -RISCV_EXCP_ILLEGAL_INST;
+     }
+     env->mstatus |= MSTATUS_FS;
+ #endif
+@@ -161,7 +161,7 @@ static int read_fcsr(CPURISCVState *env, int csrno, target_ulong *val)
+ {
+ #if !defined(CONFIG_USER_ONLY)
+     if (!env->debugger && !riscv_cpu_fp_enabled(env)) {
+-        return -1;
++        return -RISCV_EXCP_ILLEGAL_INST;
+     }
+ #endif
+     *val = (riscv_cpu_get_fflags(env) << FSR_AEXC_SHIFT)
+@@ -177,7 +177,7 @@ static int write_fcsr(CPURISCVState *env, int csrno, target_ulong val)
+ {
+ #if !defined(CONFIG_USER_ONLY)
+     if (!env->debugger && !riscv_cpu_fp_enabled(env)) {
+-        return -1;
++        return -RISCV_EXCP_ILLEGAL_INST;
+     }
+     env->mstatus |= MSTATUS_FS;
+ #endif
+@@ -291,7 +291,7 @@ static int read_time(CPURISCVState *env, int csrno, target_ulong *val)
+     uint64_t delta = riscv_cpu_virt_enabled(env) ? env->htimedelta : 0;
+ 
+     if (!env->rdtime_fn) {
+-        return -1;
++        return -RISCV_EXCP_ILLEGAL_INST;
+     }
+ 
+     *val = env->rdtime_fn() + delta;
+@@ -304,7 +304,7 @@ static int read_timeh(CPURISCVState *env, int csrno, target_ulong *val)
+     uint64_t delta = riscv_cpu_virt_enabled(env) ? env->htimedelta : 0;
+ 
+     if (!env->rdtime_fn) {
+-        return -1;
++        return -RISCV_EXCP_ILLEGAL_INST;
+     }
+ 
+     *val = (env->rdtime_fn() + delta) >> 32;
+@@ -570,7 +570,7 @@ static int write_mcounteren(CPURISCVState *env, int csrno, target_ulong val)
+ static int read_mscounteren(CPURISCVState *env, int csrno, target_ulong *val)
+ {
+     if (env->priv_ver < PRIV_VERSION_1_11_0) {
+-        return -1;
++        return -RISCV_EXCP_ILLEGAL_INST;
+     }
+     *val = env->mcounteren;
+     return 0;
+@@ -580,7 +580,7 @@ static int read_mscounteren(CPURISCVState *env, int csrno, target_ulong *val)
+ static int write_mscounteren(CPURISCVState *env, int csrno, target_ulong val)
+ {
+     if (env->priv_ver < PRIV_VERSION_1_11_0) {
+-        return -1;
++        return -RISCV_EXCP_ILLEGAL_INST;
+     }
+     env->mcounteren = val;
+     return 0;
+@@ -804,7 +804,7 @@ static int read_satp(CPURISCVState *env, int csrno, target_ulong *val)
+     }
+ 
+     if (env->priv == PRV_S && get_field(env->mstatus, MSTATUS_TVM)) {
+-        return -1;
++        return -RISCV_EXCP_ILLEGAL_INST;
+     } else {
+         *val = env->satp;
+     }
+@@ -821,7 +821,7 @@ static int write_satp(CPURISCVState *env, int csrno, target_ulong val)
+         ((val ^ env->satp) & (SATP_MODE | SATP_ASID | SATP_PPN)))
+     {
+         if (env->priv == PRV_S && get_field(env->mstatus, MSTATUS_TVM)) {
+-            return -1;
++            return -RISCV_EXCP_ILLEGAL_INST;
+         } else {
+             if((val ^ env->satp) & SATP_ASID) {
+                 tlb_flush(env_cpu(env));
+@@ -991,7 +991,7 @@ static int write_hgatp(CPURISCVState *env, int csrno, target_ulong val)
+ static int read_htimedelta(CPURISCVState *env, int csrno, target_ulong *val)
+ {
+     if (!env->rdtime_fn) {
+-        return -1;
++        return -RISCV_EXCP_ILLEGAL_INST;
+     }
+ 
+ #if defined(TARGET_RISCV32)
+@@ -1005,7 +1005,7 @@ static int read_htimedelta(CPURISCVState *env, int csrno, target_ulong *val)
+ static int write_htimedelta(CPURISCVState *env, int csrno, target_ulong val)
+ {
+     if (!env->rdtime_fn) {
+-        return -1;
++        return -RISCV_EXCP_ILLEGAL_INST;
+     }
+ 
+ #if defined(TARGET_RISCV32)
+@@ -1020,7 +1020,7 @@ static int write_htimedelta(CPURISCVState *env, int csrno, target_ulong val)
+ static int read_htimedeltah(CPURISCVState *env, int csrno, target_ulong *val)
+ {
+     if (!env->rdtime_fn) {
+-        return -1;
++        return -RISCV_EXCP_ILLEGAL_INST;
+     }
+ 
+     *val = env->htimedelta >> 32;
+@@ -1030,7 +1030,7 @@ static int read_htimedeltah(CPURISCVState *env, int csrno, target_ulong *val)
+ static int write_htimedeltah(CPURISCVState *env, int csrno, target_ulong val)
+ {
+     if (!env->rdtime_fn) {
+-        return -1;
++        return -RISCV_EXCP_ILLEGAL_INST;
+     }
+ 
+     env->htimedelta = deposit64(env->htimedelta, 32, 32, (uint64_t)val);
+@@ -1228,18 +1228,18 @@ int riscv_csrrw(CPURISCVState *env, int csrno, target_ulong *ret_value,
+ 
+     if ((write_mask && read_only) ||
+         (!env->debugger && (effective_priv < get_field(csrno, 0x300)))) {
+-        return -1;
++        return -RISCV_EXCP_ILLEGAL_INST;
+     }
+ #endif
+ 
+     /* ensure the CSR extension is enabled. */
+     if (!cpu->cfg.ext_icsr) {
+-        return -1;
++        return -RISCV_EXCP_ILLEGAL_INST;
+     }
+ 
+     /* check predicate */
+     if (!csr_ops[csrno].predicate || csr_ops[csrno].predicate(env, csrno) < 0) {
+-        return -1;
++        return -RISCV_EXCP_ILLEGAL_INST;
+     }
+ 
+     /* execute combined read/write operation if it exists */
+@@ -1249,7 +1249,7 @@ int riscv_csrrw(CPURISCVState *env, int csrno, target_ulong *ret_value,
+ 
+     /* if no accessor exists then return failure */
+     if (!csr_ops[csrno].read) {
+-        return -1;
++        return -RISCV_EXCP_ILLEGAL_INST;
+     }
+ 
+     /* read old value */
+diff --git a/target/riscv/op_helper.c b/target/riscv/op_helper.c
+index 4b64bfe7d2..948d204793 100644
+--- a/target/riscv/op_helper.c
++++ b/target/riscv/op_helper.c
+@@ -43,8 +43,10 @@ target_ulong helper_csrrw(CPURISCVState *env, target_ulong src,
+         target_ulong csr)
+ {
+     target_ulong val = 0;
+-    if (riscv_csrrw(env, csr, &val, src, -1) < 0) {
+-        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++    int ret = riscv_csrrw(env, csr, &val, src, -1);
++
++    if (ret < 0) {
++        riscv_raise_exception(env, -ret, GETPC());
+     }
+     return val;
+ }
+@@ -53,8 +55,10 @@ target_ulong helper_csrrs(CPURISCVState *env, target_ulong src,
+         target_ulong csr, target_ulong rs1_pass)
+ {
+     target_ulong val = 0;
+-    if (riscv_csrrw(env, csr, &val, -1, rs1_pass ? src : 0) < 0) {
+-        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++    int ret = riscv_csrrw(env, csr, &val, -1, rs1_pass ? src : 0);
++
++    if (ret < 0) {
++        riscv_raise_exception(env, -ret, GETPC());
+     }
+     return val;
+ }
+@@ -63,8 +67,10 @@ target_ulong helper_csrrc(CPURISCVState *env, target_ulong src,
+         target_ulong csr, target_ulong rs1_pass)
+ {
+     target_ulong val = 0;
+-    if (riscv_csrrw(env, csr, &val, 0, rs1_pass ? src : 0) < 0) {
+-        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
++    int ret = riscv_csrrw(env, csr, &val, 0, rs1_pass ? src : 0);
++
++    if (ret < 0) {
++        riscv_raise_exception(env, -ret, GETPC());
+     }
+     return val;
+ }
 -- 
 2.28.0
 
