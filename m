@@ -2,73 +2,76 @@ Return-Path: <SRS0=2GMi=CD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24C62C433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 10:53:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 630E6C433E3
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 10:53:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D83B42068E
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 10:53:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2E5542068E
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 10:53:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Aq92ZSfr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D83B42068E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XlWs3Gxp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E5542068E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50074 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50164 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAWZw-0003a2-Kj
-	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 06:53:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33610)
+	id 1kAWZy-0003cF-CM
+	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 06:53:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33612)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kAWZG-0002mg-Mi
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 06:52:42 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:21632)
+ id 1kAWZH-0002mr-Cn
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 06:52:43 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:50580)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kAWZF-0000z0-4S
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 06:52:42 -0400
+ id 1kAWZF-0000z9-Qm
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 06:52:43 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598352760;
+ s=mimecast20190719; t=1598352761;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=OwL6TO8oPaNBRlhmq2U3w2sTA/U5wns21ZdgqDbdMzk=;
- b=Aq92ZSfrzJ6ECljrvnzCVwsxq46Mx8m40ND9gn2aLxiiEMx+1XuHqO5ZjIpNmeHQSRwwUU
- scSwVahXo+CDJMlJQQ99n+tQutxTCbw8JtqVb65d7cJf2HcAiw8lLUkPC++WM4EOUJafaK
- 8g2fC6MJ0OdcOV+VL4nru01Zzsfk+sE=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=p3YqKvyaiSRHGj+SmYkoSjOJVT4VM/33GQvflFqSsPU=;
+ b=XlWs3GxpzR6/F3YuUlevT3owh/GweZgOaM1iA+3wtpEBpjuNra2GfPd4Z8VPkz0mp8Phr+
+ GUH4Y7v0TpcWW994Wn7eXELSJyu9Fh2LgdZxPPOlGEhyotBtKfyLu7DfnIfJsDi0cYY1us
+ BRrnJzypg1ehAP2Qm4WzPKfKlTDPc3M=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-414-uscT8t_DOn2j_vGlSAdvOg-1; Tue, 25 Aug 2020 06:52:37 -0400
-X-MC-Unique: uscT8t_DOn2j_vGlSAdvOg-1
+ us-mta-512-0c_pH-DNNZu-s7on6jEYDw-1; Tue, 25 Aug 2020 06:52:39 -0400
+X-MC-Unique: 0c_pH-DNNZu-s7on6jEYDw-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B4C1D186A577
- for <qemu-devel@nongnu.org>; Tue, 25 Aug 2020 10:52:36 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 28B71801AE6;
+ Tue, 25 Aug 2020 10:52:38 +0000 (UTC)
 Received: from localhost.localdomain.com (unknown [10.36.110.53])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DB2F460FC2;
- Tue, 25 Aug 2020 10:52:35 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 099446198D;
+ Tue, 25 Aug 2020 10:52:36 +0000 (UTC)
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 0/1] Socket next patches
-Date: Tue, 25 Aug 2020 11:52:33 +0100
-Message-Id: <20200825105234.634767-1-berrange@redhat.com>
+Subject: [PULL 1/1] tests: fix a memory in test_socket_unix_abstract_good
+Date: Tue, 25 Aug 2020 11:52:34 +0100
+Message-Id: <20200825105234.634767-2-berrange@redhat.com>
+In-Reply-To: <20200825105234.634767-1-berrange@redhat.com>
+References: <20200825105234.634767-1-berrange@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
 X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=63.128.21.124; envelope-from=berrange@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/25 06:38:59
@@ -92,39 +95,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Cc: Li Qiang <liq3ea@163.com>,
+ =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit 44423107e7b5731ef40c5c8632a5bad8b49d0838=
-:=0D
-=0D
-  Merge remote-tracking branch 'remotes/xtensa/tags/20200821-xtensa' into s=
-taging (2020-08-24 19:55:23 +0100)=0D
-=0D
-are available in the Git repository at:=0D
-=0D
-  https://github.com/berrange/qemu tags/socket-next-pull-request=0D
-=0D
-for you to fetch changes up to 74a57ddc02c41f8f4bb549cedb107c1086daba58:=0D
-=0D
-  tests: fix a memory in test_socket_unix_abstract_good (2020-08-25 11:49:4=
-9 +0100)=0D
-=0D
-----------------------------------------------------------------=0D
-Add support for UNIX sockets in the abstract namespace=0D
-=0D
-----------------------------------------------------------------=0D
-=0D
-Li Qiang (1):=0D
-  tests: fix a memory in test_socket_unix_abstract_good=0D
-=0D
- tests/test-util-sockets.c | 1 +=0D
- 1 file changed, 1 insertion(+)=0D
-=0D
---=20=0D
-2.26.2=0D
-=0D
+From: Li Qiang <liq3ea@163.com>
+
+After build qemu with '-fsanitize=address' extra-cflags,
+'make check' show following leak:
+
+=================================================================
+==44580==ERROR: LeakSanitizer: detected memory leaks
+
+Direct leak of 2500 byte(s) in 1 object(s) allocated from:
+    #0 0x7f1b5a8b8d28 in __interceptor_calloc (/usr/lib/x86_64-linux-gnu/libasan.so.4+0xded28)
+    #1 0x7f1b5a514b10 in g_malloc0 (/usr/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x51b10)
+    #2 0xd79ea4e4c0ad31c3  (<unknown module>)
+
+SUMMARY: AddressSanitizer: 2500 byte(s) leaked in 1 allocation(s).
+
+Call 'g_rand_free' in the end of function to avoid this.
+
+Fixes: 4d3a329af59("tests/util-sockets: add abstract unix socket cases")
+Signed-off-by: Li Qiang <liq3ea@163.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by:  xiaoqiang zhao <zxq_yx_007@163.com>
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ tests/test-util-sockets.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/tests/test-util-sockets.c b/tests/test-util-sockets.c
+index 261dc48c03..af9f5c0c70 100644
+--- a/tests/test-util-sockets.c
++++ b/tests/test-util-sockets.c
+@@ -313,6 +313,7 @@ static void test_socket_unix_abstract_good(void)
+     g_thread_join(serv);
+ 
+     g_free(abstract_sock_name);
++    g_rand_free(r);
+ }
+ #endif
+ 
+-- 
+2.26.2
 
 
