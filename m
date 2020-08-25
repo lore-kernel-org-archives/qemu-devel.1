@@ -2,88 +2,86 @@ Return-Path: <SRS0=2GMi=CD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0685C433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 06:58:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7742BC433E1
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 07:01:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9EBBA2076C
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 06:58:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3B49320639
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 07:01:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Qy4uZ0xX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EBBA2076C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JyyVLSuu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B49320639
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60580 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34684 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kASuc-0005Zo-Oa
-	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 02:58:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42408)
+	id 1kASx6-0006h4-A5
+	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 03:01:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42652)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kASu6-0005Aw-K2
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 02:57:58 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27480)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kASu4-0006Tr-JV
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 02:57:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598338675;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=ZZ8JhvCEx/uEiycsP3nRlgAJdAsj52JI8Lzza5AEWBw=;
- b=Qy4uZ0xX1GIAkE3RgiFEjnMgd/KVT7685MIXEanr3PqIFib4O1cViXrNKITpZo2MYrOE3A
- MAKvDVIPKFHvUNII73FrfrpjNgKqKcPMLcQgdZGstpo8ojQUKeLQTDosiVKimeSp+hmiNE
- n+6nrnZQ/0d7rDr/IvCfTZadiufVkTY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-207-AbiXBG_WN7OJK7Hbl8Og5w-1; Tue, 25 Aug 2020 02:57:49 -0400
-X-MC-Unique: AbiXBG_WN7OJK7Hbl8Og5w-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B92BA425CD;
- Tue, 25 Aug 2020 06:57:48 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-112-54.ams2.redhat.com
- [10.36.112.54])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 007BC5C1CF;
- Tue, 25 Aug 2020 06:57:47 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 0EF371753B; Tue, 25 Aug 2020 08:57:47 +0200 (CEST)
-Date: Tue, 25 Aug 2020 08:57:47 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: =?utf-8?B?Q8Opc2Fy?= Belley <cesar.belley@lse.epita.fr>
-Subject: Re: [PATCH v2 08/13] configure: Add USB U2F key device
-Message-ID: <20200825065747.pxa242epeyzk6n5e@sirius.home.kraxel.org>
-References: <20200824114827.81623-1-cesar.belley@lse.epita.fr>
- <20200824114827.81623-9-cesar.belley@lse.epita.fr>
+ (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1kASw1-00069b-7B
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 02:59:57 -0400
+Received: from mail-ed1-x533.google.com ([2a00:1450:4864:20::533]:42326)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1kASvz-0006Zg-E6
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 02:59:56 -0400
+Received: by mail-ed1-x533.google.com with SMTP id l63so7207361edl.9
+ for <qemu-devel@nongnu.org>; Mon, 24 Aug 2020 23:59:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=ek881MxKDLzapdNUB6+8AxPsGHINCpaS40pPP5PcJvU=;
+ b=JyyVLSuuiYz1nSulGsOgQnBXmK9TywghhAS70gDIEjNkCFZ04XzNek0eqok5961MxR
+ UlFo14kEeEQCEWwXmW/o1R18Fmc95TBUUEHNibCYKaVlGjbmkI+Fjmd4xRxhCDVGCGVE
+ V5JyPi6qgje4yw0hMMbIxbTTKNNTdkmTgUx3LpR8quYjoNAar6VOt+Meu7RsyU1l26Gg
+ ueIor8atB4+aBRXayGk4te8uAQQ2DzE7mkRrlMlWGy19UAR8oqmZ0TWkrQQ37pJ0tLCR
+ xmYcubgWbGLAYy6QGYQJ2l5BtMCIwCanE14pycvPX/Ond/4O6wdBfdgfmnHdlx/7WPB1
+ bN3A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=ek881MxKDLzapdNUB6+8AxPsGHINCpaS40pPP5PcJvU=;
+ b=nxrdICdRscEFFMZ2ImVqH1N/o66j9V9pw7rojyXXwifk207nj87hMnqO839aVKyk7F
+ /MJj99+OM6NVAWN87prj+MkfZsyCuloZNoo7ylP1kNZxKZj7Fi8V6WHKRyfl5WqGm2L8
+ rN3bFoP5nysEyJmONsLJ0XKAPgez+4I18xznlRVt22jpaz+2yNdvFNLK1T2pGswgA8fq
+ rJoQHhaMrJzOdRt0q31Vyoh4AL/RQBCRbMQwDqpJD7HSONYqgAoHThm9k+uH+DDRWKs4
+ 1ibdmqYkxhUfgtvUbB2UXyMLovT+Rx6WKaLSjFxoOe/1JQfnpVBYh4Es+h1TRvurD40X
+ wMPQ==
+X-Gm-Message-State: AOAM532n+4MRKtXa50qjGbgcIsNBBsgTL0+Hdk4B62RbjtCgVivUX6/x
+ G3E8SXP5FB3MQGNjPE3suXKrI9o7Xsi/jaRFZFo=
+X-Google-Smtp-Source: ABdhPJxrHzjg9aPCdHaZ/Y4ZxCW8S+FSS9+acmOQdE3+85dRlUH6dOMFuUpGMu8gCZEGXxXa5Blqrp54TLDYDUhbmow=
+X-Received: by 2002:aa7:d585:: with SMTP id r5mr8676356edq.30.1598338793934;
+ Mon, 24 Aug 2020 23:59:53 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200824114827.81623-9-cesar.belley@lse.epita.fr>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=kraxel@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/25 02:03:58
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.956,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+References: <20200825064342.2037-1-kraxel@redhat.com>
+In-Reply-To: <20200825064342.2037-1-kraxel@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 25 Aug 2020 10:59:42 +0400
+Message-ID: <CAJ+F1CJ0J5E2sJ=jvG7m=5pttOYohGvwqUjMFM1Vz5qBmhnk5Q@mail.gmail.com>
+Subject: Re: [PATCH] meson: set colorout to auto
+To: Gerd Hoffmann <kraxel@redhat.com>
+Content-Type: multipart/alternative; boundary="0000000000000b147905adae4039"
+Received-SPF: pass client-ip=2a00:1450:4864:20::533;
+ envelope-from=marcandre.lureau@gmail.com; helo=mail-ed1-x533.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,47 +94,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: QEMU <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-  Hi,
+--0000000000000b147905adae4039
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> +# check for u2f support
-> +if test "$u2f" != "no"; then
-> +    if $pkg_config --atleast-version=0.0.0 u2f-emu; then
-> +        u2f_emu_cflags=$($pkg_config --cflags u2f-emu)
-> +        u2f_emu_libs=$($pkg_config --libs u2f-emu)
-> +        u2f="yes"
-> +    else
-> +        if test "$u2f" = "yes"; then
-> +            feature_not_found "u2f" "Install u2f-emu"
-> +        fi
-> +        u2f="no"
-> +    fi
-> +fi
+Hi
 
-The libu2f-emu check can be handled by meson instead.  That will
-probably simplify things a bit thanks to meson's build-in pkg-config
-dependency support (no need for explicit cflags/libs variables).
+On Tue, Aug 25, 2020 at 10:44 AM Gerd Hoffmann <kraxel@redhat.com> wrote:
 
-Here is an example for moving a pkg-config check from
-configure to meson:
+> Dunno why the default is set to "always".  IMHO it should be "auto",
+> i.e. only colorize in case stdout goes to a terminal.  Cluttering
+> logfiles and confusing compiler message parsers with terminal control
+> sequences is not nice ...
+>
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+>
 
-https://patchwork.ozlabs.org/project/qemu-devel/patch/20200824152430.1844159-2-laurent@vivier.eu/
+"Enable colored output with GCC. Ninja redirects stdout/stderr so by
+default GCC thinks it is not talking to a terminal"
 
-> +if test "$u2f" = "yes" ; then
-> +  echo "CONFIG_U2F=y" >> $config_host_mak
-> +  echo "U2F_CFLAGS=$u2f_emu_cflags" >> $config_host_mak
-> +  echo "U2F_LIBS=$u2f_emu_libs" >> $config_host_mak
-> +fi
+https://github.com/mesonbuild/meson/commit/4f63fe498314c385de2d3b6a3a953d15=
+985914d2
 
-This is a bit confusing as patch #7 uses these variables already.  I'd
-suggest to either reorder the patches so the detection comes first, or
-just squash the two patches into one.
+Since we use make, I don't know if it's any better.
 
-take care,
-  Gerd
+Perhaps meson should set compiler/tools colors =3D always/never based on wh=
+at
+it is connected to at configure time instead?
 
+--=20
+Marc-Andr=C3=A9 Lureau
+
+--0000000000000b147905adae4039
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div dir=3D"ltr">Hi<br></div><br><div class=3D"gmail_quote=
+"><div dir=3D"ltr" class=3D"gmail_attr">On Tue, Aug 25, 2020 at 10:44 AM Ge=
+rd Hoffmann &lt;<a href=3D"mailto:kraxel@redhat.com">kraxel@redhat.com</a>&=
+gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0=
+px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">Dunno=
+ why the default is set to &quot;always&quot;.=C2=A0 IMHO it should be &quo=
+t;auto&quot;,<br>
+i.e. only colorize in case stdout goes to a terminal.=C2=A0 Cluttering<br>
+logfiles and confusing compiler message parsers with terminal control<br>
+sequences is not nice ...<br>
+<br>
+Signed-off-by: Gerd Hoffmann &lt;<a href=3D"mailto:kraxel@redhat.com" targe=
+t=3D"_blank">kraxel@redhat.com</a>&gt;<br></blockquote><div><br></div><div>=
+&quot;Enable colored output with GCC. Ninja redirects stdout/stderr so by d=
+efault GCC thinks it is not talking to a terminal&quot;</div><div><br></div=
+><div><a href=3D"https://github.com/mesonbuild/meson/commit/4f63fe498314c38=
+5de2d3b6a3a953d15985914d2">https://github.com/mesonbuild/meson/commit/4f63f=
+e498314c385de2d3b6a3a953d15985914d2</a></div><div><br> </div><div>Since we =
+use make, I don&#39;t know if it&#39;s any better.</div><div><br></div><div=
+>Perhaps meson should set compiler/tools colors =3D always/never based on w=
+hat it is connected to at configure time instead?<br></div></div><br>-- <br=
+><div dir=3D"ltr" class=3D"gmail_signature">Marc-Andr=C3=A9 Lureau<br></div=
+></div>
+
+--0000000000000b147905adae4039--
 
