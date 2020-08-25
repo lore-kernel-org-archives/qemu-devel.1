@@ -4,87 +4,86 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97AA2C433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 19:44:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0506FC433E3
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 19:44:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6B4492075E
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 19:44:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CED072075E
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 19:44:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KSyXZcV8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B4492075E
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SqqsyYW7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CED072075E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59438 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59582 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAerS-0003Zd-Le
-	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 15:44:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41800)
+	id 1kAerU-0003dI-1I
+	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 15:44:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40178)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kAeZj-0007EZ-4V
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 15:25:43 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:35992
- helo=us-smtp-1.mimecast.com)
+ id 1kAeWg-0000h5-5Q
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 15:22:34 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:22013
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kAeZg-0006iw-D2
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 15:25:42 -0400
+ id 1kAeWe-0006FF-68
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 15:22:33 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598383539;
+ s=mimecast20190719; t=1598383351;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=6XeewxHu3ltq2GDWr8JyYMpBgqadneC2GPeJqjWP9BI=;
- b=KSyXZcV8scsC38zcJizxKYOWsFjDIQJ0xoOFryX6Im7eXnGOSSI2NsNJcHHkOE/61IpPMw
- rxI4ybLLvMnutLsVG3YoKAXp7CuBPIZwPTXWr/CJ2FCtgJr63wC1Jl75/ktTs1mI0koipk
- Bih0wTJWTZo2PeW5YmN757vCtrA0koY=
+ bh=8wJ36udvm6pu4Eewx9JqnGIjQ112NfsHFCYV+ACUzTA=;
+ b=SqqsyYW78uTGF8dISj4xz8n7X3Y74kDsjz1bAuto1VClzni0Al6Nx/RfAUCDI+GZMTisXD
+ tu0PYOVizl2sV+SjJjpzB2ApRQbcpPdEpTjxd5FpdzyVvae1XcBo82eXrYeiHbhJIOYDXM
+ U6NHuQJC7ahJU7AuSUV/KcYFl8e9q+c=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-293-eiTiK1YrPb6dEmRgM-MKGA-1; Tue, 25 Aug 2020 15:25:37 -0400
-X-MC-Unique: eiTiK1YrPb6dEmRgM-MKGA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-227-25yC3YjKNrOUeCs0kUeAaw-1; Tue, 25 Aug 2020 15:22:29 -0400
+X-MC-Unique: 25yC3YjKNrOUeCs0kUeAaw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 13C041007467
- for <qemu-devel@nongnu.org>; Tue, 25 Aug 2020 19:25:37 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A23B681F01D
+ for <qemu-devel@nongnu.org>; Tue, 25 Aug 2020 19:22:28 +0000 (UTC)
 Received: from localhost (unknown [10.10.67.254])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9D39660E1C;
- Tue, 25 Aug 2020 19:25:36 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 68A01709C4;
+ Tue, 25 Aug 2020 19:22:28 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 74/74] crypto: use QOM macros for declaration/definition of
- TLS creds types
-Date: Tue, 25 Aug 2020 15:21:10 -0400
-Message-Id: <20200825192110.3528606-75-ehabkost@redhat.com>
+Subject: [PATCH v3 34/74] vmbus: Move QOM macros to vmbus.h
+Date: Tue, 25 Aug 2020 15:20:30 -0400
+Message-Id: <20200825192110.3528606-35-ehabkost@redhat.com>
 In-Reply-To: <20200825192110.3528606-1-ehabkost@redhat.com>
 References: <20200825192110.3528606-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
-X-Mimecast-Spam-Score: 0.003
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=ehabkost@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/25 01:37:44
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=ehabkost@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/25 15:21:30
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.958,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,303 +102,71 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Daniel P. Berrangé <berrange@redhat.com>
+Move all declarations related to TYPE_VMBUS to the same place in
+vmbus.h.
 
-This introduces the use of the OBJECT_DEFINE and OBJECT_DECLARE macro
-families in the TLS creds types, in order to eliminate boilerplate code.
+This will make future conversion to OBJECT_DECLARE* easier.
 
-Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
-Message-Id: <20200723181410.3145233-5-berrange@redhat.com>
-[ehabkost: rebase, update to pass additional arguments to macro]
+Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
-Changes v2 -> v3:
-* Fixed bug I had introduced on usage of OBJECT_DECLARE_SIMPLE_TYPE
-  (bug reported by Roman Bolshakov <r.bolshakov@yadro.com>)
+Changes v2 -> v3: none
 
-Changes v1 -> v2: none
+Changes series v1 -> v2: new patch in series v2
+
+Cc: qemu-devel@nongnu.org
 ---
- include/crypto/tlscreds.h     | 13 ++-----------
- include/crypto/tlscredsanon.h | 14 ++------------
- include/crypto/tlscredspsk.h  | 13 ++-----------
- include/crypto/tlscredsx509.h | 13 ++-----------
- crypto/tlscreds.c             | 20 +++-----------------
- crypto/tlscredsanon.c         | 24 +++++++-----------------
- crypto/tlscredspsk.c          | 26 ++++++++------------------
- crypto/tlscredsx509.c         | 24 ++++--------------------
- 8 files changed, 30 insertions(+), 117 deletions(-)
+ include/hw/hyperv/vmbus-bridge.h | 3 +--
+ include/hw/hyperv/vmbus.h        | 4 ++++
+ hw/hyperv/vmbus.c                | 3 ---
+ 3 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/include/crypto/tlscreds.h b/include/crypto/tlscreds.h
-index 079e376047..4b0afe96a6 100644
---- a/include/crypto/tlscreds.h
-+++ b/include/crypto/tlscreds.h
-@@ -29,11 +29,8 @@
- #endif
+diff --git a/include/hw/hyperv/vmbus-bridge.h b/include/hw/hyperv/vmbus-bridge.h
+index 33f93de64d..fe90bda01b 100644
+--- a/include/hw/hyperv/vmbus-bridge.h
++++ b/include/hw/hyperv/vmbus-bridge.h
+@@ -11,11 +11,10 @@
+ #define HW_HYPERV_VMBUS_BRIDGE_H
  
- #define TYPE_QCRYPTO_TLS_CREDS "tls-creds"
--typedef struct QCryptoTLSCreds QCryptoTLSCreds;
--DECLARE_INSTANCE_CHECKER(QCryptoTLSCreds, QCRYPTO_TLS_CREDS,
--                         TYPE_QCRYPTO_TLS_CREDS)
--
--typedef struct QCryptoTLSCredsClass QCryptoTLSCredsClass;
-+OBJECT_DECLARE_SIMPLE_TYPE(QCryptoTLSCreds, qcrypto_tls_creds,
-+                           QCRYPTO_TLS_CREDS, ObjectClass)
+ #include "hw/sysbus.h"
++#include "hw/hyperv/vmbus.h"
  
- #define QCRYPTO_TLS_CREDS_DH_PARAMS "dh-params.pem"
+ #define TYPE_VMBUS_BRIDGE "vmbus-bridge"
  
-@@ -58,10 +55,4 @@ struct QCryptoTLSCreds {
-     char *priority;
- };
+-typedef struct VMBus VMBus;
+-
+ typedef struct VMBusBridge {
+     SysBusDevice parent_obj;
  
--
--struct QCryptoTLSCredsClass {
--    ObjectClass parent_class;
--};
--
--
- #endif /* QCRYPTO_TLSCREDS_H */
-diff --git a/include/crypto/tlscredsanon.h b/include/crypto/tlscredsanon.h
-index 3f464a3809..4e240b7134 100644
---- a/include/crypto/tlscredsanon.h
-+++ b/include/crypto/tlscredsanon.h
-@@ -25,12 +25,8 @@
- #include "qom/object.h"
+diff --git a/include/hw/hyperv/vmbus.h b/include/hw/hyperv/vmbus.h
+index 40e8417eec..cd98ec24e7 100644
+--- a/include/hw/hyperv/vmbus.h
++++ b/include/hw/hyperv/vmbus.h
+@@ -26,6 +26,10 @@
+ #define VMBUS_DEVICE_GET_CLASS(obj) \
+     OBJECT_GET_CLASS(VMBusDeviceClass, (obj), TYPE_VMBUS_DEVICE)
  
- #define TYPE_QCRYPTO_TLS_CREDS_ANON "tls-creds-anon"
--typedef struct QCryptoTLSCredsAnon QCryptoTLSCredsAnon;
--DECLARE_INSTANCE_CHECKER(QCryptoTLSCredsAnon, QCRYPTO_TLS_CREDS_ANON,
--                         TYPE_QCRYPTO_TLS_CREDS_ANON)
--
--
--typedef struct QCryptoTLSCredsAnonClass QCryptoTLSCredsAnonClass;
-+OBJECT_DECLARE_SIMPLE_TYPE(QCryptoTLSCredsAnon, qcrypto_tls_creds_anon,
-+                           QCRYPTO_TLS_CREDS_ANON, QCryptoTLSCredsClass)
- 
- /**
-  * QCryptoTLSCredsAnon:
-@@ -103,10 +99,4 @@ struct QCryptoTLSCredsAnon {
- #endif
- };
- 
--
--struct QCryptoTLSCredsAnonClass {
--    QCryptoTLSCredsClass parent_class;
--};
--
--
- #endif /* QCRYPTO_TLSCREDSANON_H */
-diff --git a/include/crypto/tlscredspsk.h b/include/crypto/tlscredspsk.h
-index d7e6bdb5ed..e216d5afe3 100644
---- a/include/crypto/tlscredspsk.h
-+++ b/include/crypto/tlscredspsk.h
-@@ -25,11 +25,8 @@
- #include "qom/object.h"
- 
- #define TYPE_QCRYPTO_TLS_CREDS_PSK "tls-creds-psk"
--typedef struct QCryptoTLSCredsPSK QCryptoTLSCredsPSK;
--DECLARE_INSTANCE_CHECKER(QCryptoTLSCredsPSK, QCRYPTO_TLS_CREDS_PSK,
--                         TYPE_QCRYPTO_TLS_CREDS_PSK)
--
--typedef struct QCryptoTLSCredsPSKClass QCryptoTLSCredsPSKClass;
-+OBJECT_DECLARE_SIMPLE_TYPE(QCryptoTLSCredsPSK, qcrypto_tls_creds_psk,
-+                           QCRYPTO_TLS_CREDS_PSK, QCryptoTLSCredsClass)
- 
- #define QCRYPTO_TLS_CREDS_PSKFILE "keys.psk"
- 
-@@ -98,10 +95,4 @@ struct QCryptoTLSCredsPSK {
- #endif
- };
- 
--
--struct QCryptoTLSCredsPSKClass {
--    QCryptoTLSCredsClass parent_class;
--};
--
--
- #endif /* QCRYPTO_TLSCREDSPSK_H */
-diff --git a/include/crypto/tlscredsx509.h b/include/crypto/tlscredsx509.h
-index c6d89b7881..6feb84d00d 100644
---- a/include/crypto/tlscredsx509.h
-+++ b/include/crypto/tlscredsx509.h
-@@ -25,11 +25,8 @@
- #include "qom/object.h"
- 
- #define TYPE_QCRYPTO_TLS_CREDS_X509 "tls-creds-x509"
--typedef struct QCryptoTLSCredsX509 QCryptoTLSCredsX509;
--DECLARE_INSTANCE_CHECKER(QCryptoTLSCredsX509, QCRYPTO_TLS_CREDS_X509,
--                         TYPE_QCRYPTO_TLS_CREDS_X509)
--
--typedef struct QCryptoTLSCredsX509Class QCryptoTLSCredsX509Class;
-+OBJECT_DECLARE_SIMPLE_TYPE(QCryptoTLSCredsX509, qcrypto_tls_creds_x509,
-+                           QCRYPTO_TLS_CREDS_X509, QCryptoTLSCredsClass)
- 
- #define QCRYPTO_TLS_CREDS_X509_CA_CERT "ca-cert.pem"
- #define QCRYPTO_TLS_CREDS_X509_CA_CRL "ca-crl.pem"
-@@ -105,10 +102,4 @@ struct QCryptoTLSCredsX509 {
-     char *passwordid;
- };
- 
--
--struct QCryptoTLSCredsX509Class {
--    QCryptoTLSCredsClass parent_class;
--};
--
--
- #endif /* QCRYPTO_TLSCREDSX509_H */
-diff --git a/crypto/tlscreds.c b/crypto/tlscreds.c
-index bb3e6667b9..c238ff7d4b 100644
---- a/crypto/tlscreds.c
-+++ b/crypto/tlscreds.c
-@@ -24,6 +24,9 @@
- #include "tlscredspriv.h"
- #include "trace.h"
- 
-+OBJECT_DEFINE_ABSTRACT_TYPE(QCryptoTLSCreds, qcrypto_tls_creds,
-+                            QCRYPTO_TLS_CREDS, OBJECT)
++#define TYPE_VMBUS "vmbus"
++typedef struct VMBus VMBus;
++#define VMBUS(obj) OBJECT_CHECK(VMBus, (obj), TYPE_VMBUS)
 +
- #define DH_BITS 2048
- 
- #ifdef CONFIG_GNUTLS
-@@ -258,20 +261,3 @@ qcrypto_tls_creds_finalize(Object *obj)
-     g_free(creds->dir);
-     g_free(creds->priority);
- }
--
--
--static const TypeInfo qcrypto_tls_creds_info = {
--    .parent = TYPE_OBJECT,
--    .name = TYPE_QCRYPTO_TLS_CREDS,
--    .instance_size = sizeof(QCryptoTLSCreds),
--    .instance_init = qcrypto_tls_creds_init,
--    .instance_finalize = qcrypto_tls_creds_finalize,
--    .class_init = qcrypto_tls_creds_class_init,
--    .class_size = sizeof(QCryptoTLSCredsClass),
--    .abstract = true,
--};
--TYPE_INFO(qcrypto_tls_creds_info)
--
--
--
--
-diff --git a/crypto/tlscredsanon.c b/crypto/tlscredsanon.c
-index 16162e60b6..dc1b77e37c 100644
---- a/crypto/tlscredsanon.c
-+++ b/crypto/tlscredsanon.c
-@@ -26,6 +26,9 @@
- #include "qom/object_interfaces.h"
+ /*
+  * Object wrapping a GPADL -- GPA Descriptor List -- an array of guest physical
+  * pages, to be used for various buffers shared between the host and the guest.
+diff --git a/hw/hyperv/vmbus.c b/hw/hyperv/vmbus.c
+index 34392e892a..75af6b83dd 100644
+--- a/hw/hyperv/vmbus.c
++++ b/hw/hyperv/vmbus.c
+@@ -20,9 +20,6 @@
+ #include "cpu.h"
  #include "trace.h"
  
-+OBJECT_DEFINE_TYPE_WITH_INTERFACES(QCryptoTLSCredsAnon, qcrypto_tls_creds_anon,
-+                                   QCRYPTO_TLS_CREDS_ANON, QCRYPTO_TLS_CREDS,
-+                                   { TYPE_USER_CREATABLE }, { NULL })
- 
- #ifdef CONFIG_GNUTLS
- 
-@@ -191,20 +194,7 @@ qcrypto_tls_creds_anon_class_init(ObjectClass *oc, void *data)
- }
- 
- 
--static const TypeInfo qcrypto_tls_creds_anon_info = {
--    .parent = TYPE_QCRYPTO_TLS_CREDS,
--    .name = TYPE_QCRYPTO_TLS_CREDS_ANON,
--    .instance_size = sizeof(QCryptoTLSCredsAnon),
--    .instance_finalize = qcrypto_tls_creds_anon_finalize,
--    .class_size = sizeof(QCryptoTLSCredsAnonClass),
--    .class_init = qcrypto_tls_creds_anon_class_init,
--    .interfaces = (InterfaceInfo[]) {
--        { TYPE_USER_CREATABLE },
--        { }
--    }
--};
--TYPE_INFO(qcrypto_tls_creds_anon_info)
+-#define TYPE_VMBUS "vmbus"
+-#define VMBUS(obj) OBJECT_CHECK(VMBus, (obj), TYPE_VMBUS)
 -
--
--
--
-+static void
-+qcrypto_tls_creds_anon_init(Object *obj)
-+{
-+}
-diff --git a/crypto/tlscredspsk.c b/crypto/tlscredspsk.c
-index ea890f5837..0c66be3647 100644
---- a/crypto/tlscredspsk.c
-+++ b/crypto/tlscredspsk.c
-@@ -27,6 +27,10 @@
- #include "trace.h"
- 
- 
-+OBJECT_DEFINE_TYPE_WITH_INTERFACES(QCryptoTLSCredsPSK, qcrypto_tls_creds_psk,
-+                                   QCRYPTO_TLS_CREDS_PSK, QCRYPTO_TLS_CREDS,
-+                                   { TYPE_USER_CREATABLE }, { NULL })
-+
- #ifdef CONFIG_GNUTLS
- 
- static int
-@@ -281,21 +285,7 @@ qcrypto_tls_creds_psk_class_init(ObjectClass *oc, void *data)
-                                   qcrypto_tls_creds_psk_prop_set_username);
- }
- 
--
--static const TypeInfo qcrypto_tls_creds_psk_info = {
--    .parent = TYPE_QCRYPTO_TLS_CREDS,
--    .name = TYPE_QCRYPTO_TLS_CREDS_PSK,
--    .instance_size = sizeof(QCryptoTLSCredsPSK),
--    .instance_finalize = qcrypto_tls_creds_psk_finalize,
--    .class_size = sizeof(QCryptoTLSCredsPSKClass),
--    .class_init = qcrypto_tls_creds_psk_class_init,
--    .interfaces = (InterfaceInfo[]) {
--        { TYPE_USER_CREATABLE },
--        { }
--    }
--};
--TYPE_INFO(qcrypto_tls_creds_psk_info)
--
--
--
--
-+static void
-+qcrypto_tls_creds_psk_init(Object *obj)
-+{
-+}
-diff --git a/crypto/tlscredsx509.c b/crypto/tlscredsx509.c
-index 77f1beaf8b..a39555e5e6 100644
---- a/crypto/tlscredsx509.c
-+++ b/crypto/tlscredsx509.c
-@@ -28,6 +28,10 @@
- #include "trace.h"
- 
- 
-+OBJECT_DEFINE_TYPE_WITH_INTERFACES(QCryptoTLSCredsX509, qcrypto_tls_creds_x509,
-+                                   QCRYPTO_TLS_CREDS_X509, QCRYPTO_TLS_CREDS,
-+                                   { TYPE_USER_CREATABLE }, { NULL })
-+
- #ifdef CONFIG_GNUTLS
- 
- #include <gnutls/x509.h>
-@@ -814,23 +818,3 @@ qcrypto_tls_creds_x509_class_init(ObjectClass *oc, void *data)
-                                   qcrypto_tls_creds_x509_prop_get_passwordid,
-                                   qcrypto_tls_creds_x509_prop_set_passwordid);
- }
--
--
--static const TypeInfo qcrypto_tls_creds_x509_info = {
--    .parent = TYPE_QCRYPTO_TLS_CREDS,
--    .name = TYPE_QCRYPTO_TLS_CREDS_X509,
--    .instance_size = sizeof(QCryptoTLSCredsX509),
--    .instance_init = qcrypto_tls_creds_x509_init,
--    .instance_finalize = qcrypto_tls_creds_x509_finalize,
--    .class_size = sizeof(QCryptoTLSCredsX509Class),
--    .class_init = qcrypto_tls_creds_x509_class_init,
--    .interfaces = (InterfaceInfo[]) {
--        { TYPE_USER_CREATABLE },
--        { }
--    }
--};
--TYPE_INFO(qcrypto_tls_creds_x509_info)
--
--
--
--
+ enum {
+     VMGPADL_INIT,
+     VMGPADL_ALIVE,
 -- 
 2.26.2
 
