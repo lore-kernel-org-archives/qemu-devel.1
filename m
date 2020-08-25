@@ -2,95 +2,79 @@ Return-Path: <SRS0=2GMi=CD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F388C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 22:01:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2ACADC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 22:06:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4214720706
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 22:01:39 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="vDyI43j5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4214720706
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id EC16020706
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 22:06:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC16020706
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39390 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44650 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAh0c-0007kF-GV
-	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 18:01:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48316)
+	id 1kAh5S-0001nh-7i
+	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 18:06:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50450)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <danielhb413@gmail.com>)
- id 1kAgxD-0002Vb-MT; Tue, 25 Aug 2020 17:58:07 -0400
-Received: from mail-qt1-x841.google.com ([2607:f8b0:4864:20::841]:45587)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kAh4s-0001NG-N4
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 18:06:02 -0400
+Received: from indium.canonical.com ([91.189.90.7]:39576)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <danielhb413@gmail.com>)
- id 1kAgxB-0000YX-IE; Tue, 25 Aug 2020 17:58:07 -0400
-Received: by mail-qt1-x841.google.com with SMTP id p36so167933qtd.12;
- Tue, 25 Aug 2020 14:58:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=mJdoucNwI/OnnzvaQh846qvbJjNp6NDdrYfpoZKb5zI=;
- b=vDyI43j5QW2UHrMiUy7YS9k2xNQOUqKX6n7RPidjjbeazTgiqc/qiyV14x5rUn9BTL
- 4hhXEh1CwCsDlL1w36+xFACFpPkJNTrYa/GXMt1CJ2xilOibeOIrvHQoMjqLug+jzDBq
- iiee6hFUc/1zD0IYNHvabltOfVb2AUXZbLZDZoIxTYGurnQVyS+hzuGgHN3mZK24/p+Q
- tZgckjbN4FWuiPbR/+BiwA6gvx3T4oSXkl7nBEOMzEr0J1RCQq8nwPUUZ73n9PfxiS4k
- H0Mbf9f9U7+yZ5S0Hq+BGCz1A0wQDupjMDU1YTU/FynLsgph9W/I+7VruD/H+/YEHi5E
- rFMQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=mJdoucNwI/OnnzvaQh846qvbJjNp6NDdrYfpoZKb5zI=;
- b=DPr1KNneLb0YYR2n4a+fExrEWeHdUA3FJIq+V6oOnjg0WVmgpE1U+kAq4LvVFoNmN1
- znDWxARw/xDNtW3bi44bLIcNiRiXd/J2vcfVZMnY7BwJ8iOmiJOkPbCoDRWNXDAJN9ac
- I533mYYPjSu2bel+3sJfek8TSH7Z4+duCJMbN4QG+BjFQNfUkenSkvJlwunG3X28XgZK
- Rva6K1pn00WD65HYU4hmMpyluCiDgZIZI4HQ2pkMb2vQ6klpzcuOvsAc6ZrfafgVQ56P
- SI2I0npD2o7zaIsYA1d0R2+zyxBDnc6OQP9tMoGnxPI0SsKEL0zZzmw9ZOsIwRvy1owI
- vT8g==
-X-Gm-Message-State: AOAM533FKX6/wxPwwJGdhfAeKOidibwYryccZAsZjO6hM23bCVBbpUPD
- YpkACisV1gbm9jAex8Z4Wr7X+hvZp8k=
-X-Google-Smtp-Source: ABdhPJwwZtulvPRufcinJMi0gBKmPVJIhjvTIVGNRlAJSy1vmIYZWQEQXbWEBDYZRL39zh0mTguyOg==
-X-Received: by 2002:ac8:4b78:: with SMTP id g24mr11532474qts.248.1598392684073; 
- Tue, 25 Aug 2020 14:58:04 -0700 (PDT)
-Received: from localhost.localdomain ([2804:431:c7c7:c152:8180:e1dd:d6ac:1152])
- by smtp.gmail.com with ESMTPSA id z2sm347362qtu.11.2020.08.25.14.58.02
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 25 Aug 2020 14:58:03 -0700 (PDT)
-From: Daniel Henrique Barboza <danielhb413@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 3/3] ppc/spapr_nvdimm: do not enable support with 'nvdimm=off'
-Date: Tue, 25 Aug 2020 18:57:49 -0300
-Message-Id: <20200825215749.213536-4-danielhb413@gmail.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200825215749.213536-1-danielhb413@gmail.com>
-References: <20200825215749.213536-1-danielhb413@gmail.com>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kAh4q-0001dV-6f
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 18:06:02 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kAh4o-0005i6-E9
+ for <qemu-devel@nongnu.org>; Tue, 25 Aug 2020 22:05:58 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 66AED2E80EA
+ for <qemu-devel@nongnu.org>; Tue, 25 Aug 2020 22:05:58 +0000 (UTC)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::841;
- envelope-from=danielhb413@gmail.com; helo=mail-qt1-x841.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 25 Aug 2020 21:56:46 -0000
+From: Diego Viola <1882851@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: diego-viola kraxel-redhat
+X-Launchpad-Bug-Reporter: Diego Viola (diego-viola)
+X-Launchpad-Bug-Modifier: Diego Viola (diego-viola)
+References: <159174217343.32241.17743917589333297614.malonedeb@gac.canonical.com>
+Message-Id: <20200825215646.66853-1-diego.viola@gmail.com>
+Subject: [Bug 1882851] [PATCH] drm/virtio: fix unblank
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="99c2d833c8d727fd05148486920aca032e908071"; Instance="production"
+X-Launchpad-Hash: df90cc23592ec1f9b0510edfbec90834af0419e4
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/25 18:05:58
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.248, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -99,93 +83,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Daniel Henrique Barboza <danielhb413@gmail.com>, qemu-ppc@nongnu.org,
- david@gibson.dropbear.id.au
+Reply-To: Bug 1882851 <1882851@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The NVDIMM support for pSeries was introduced in 5.1, but it
-didn't contemplate the 'nvdimm' machine option that other
-archs uses. For every other arch, if no '-machine nvdimm(=on)'
-is present, it is assumed that the NVDIMM support is disabled.
-The user must explictly inform that the machine supports
-NVDIMM. For pseries-5.1 the 'nvdimm' option is completely
-ignored, and support is always assumed to exist. This
-leads to situations where the user is able to set 'nvdimm=off'
-but the guest boots up with the NVDIMMs anyway.
+From: Gerd Hoffmann <kraxel@redhat.com>
 
-Fixing this now, after 5.1 launch, can put the overall NVDIMM
-support for pseries in a strange place regarding this 'nvdimm'
-machine option. If we force everything to be like other archs,
-existing pseries-5.1 guests that didn't use 'nvdimm' to use NVDIMM
-devices will break. If we attempt to make the newer pseries
-machines (5.2+) behave like everyone else, but keep pseries-5.1
-untouched, we'll have consistency problems on machine upgrade
-(5.1 will have different default values for NVDIMM support than
-5.2).
+When going through a disable/enable cycle without changing the
+framebuffer the optimization added by commit 3954ff10e06e ("drm/virtio:
+skip set_scanout if framebuffer didn't change") causes the screen stay
+blank.  Add a bool to force an update to fix that.
 
-The common ground here is, if the user sets 'nvdimm=off', we
-must comply regardless of being 5.1 or 5.2+. This patch
-changes spapr_nvdimm_validate() to verify if the user set
-NVDIMM support off in the machine options and, in that
-case, error out if we have a NVDIMM device. The default
-value for 5.2+ pseries machines will still be 'nvdimm=on'
-when there is no 'nvdimm' option declared, just like it is today
-with pseries-5.1. In the end we'll have different default
-semantics from everyone else in the absence of the 'nvdimm'
-machine option, but this boat has sailed.
+v2: use drm_atomic_crtc_needs_modeset() (Daniel).
 
-Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1848887
-Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
+Cc: 1882851@bugs.launchpad.net
+Fixes: 3954ff10e06e ("drm/virtio: skip set_scanout if framebuffer didn't ch=
+ange")
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Tested-by: Jiri Slaby <jirislaby@kernel.org>
+Tested-by: Diego Viola <diego.viola@gmail.com>
 ---
- hw/ppc/spapr_nvdimm.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+ drivers/gpu/drm/virtio/virtgpu_display.c | 11 +++++++++++
+ drivers/gpu/drm/virtio/virtgpu_drv.h     |  1 +
+ drivers/gpu/drm/virtio/virtgpu_plane.c   |  4 +++-
+ 3 files changed, 15 insertions(+), 1 deletion(-)
 
-diff --git a/hw/ppc/spapr_nvdimm.c b/hw/ppc/spapr_nvdimm.c
-index bc2b65420c..95cbc30528 100644
---- a/hw/ppc/spapr_nvdimm.c
-+++ b/hw/ppc/spapr_nvdimm.c
-@@ -27,13 +27,17 @@
- #include "hw/ppc/spapr_nvdimm.h"
- #include "hw/mem/nvdimm.h"
- #include "qemu/nvdimm-utils.h"
-+#include "qemu/option.h"
- #include "hw/ppc/fdt.h"
- #include "qemu/range.h"
-+#include "sysemu/sysemu.h"
- 
- void spapr_nvdimm_validate(HotplugHandler *hotplug_dev, NVDIMMDevice *nvdimm,
-                            uint64_t size, Error **errp)
+diff --git a/drivers/gpu/drm/virtio/virtgpu_display.c b/drivers/gpu/drm/vir=
+tio/virtgpu_display.c
+index af55b334be2f..35b5c80f5d85 100644
+--- a/drivers/gpu/drm/virtio/virtgpu_display.c
++++ b/drivers/gpu/drm/virtio/virtgpu_display.c
+@@ -123,6 +123,17 @@ static int virtio_gpu_crtc_atomic_check(struct drm_crt=
+c *crtc,
+ static void virtio_gpu_crtc_atomic_flush(struct drm_crtc *crtc,
+ 					 struct drm_crtc_state *old_state)
  {
-     const MachineClass *mc = MACHINE_GET_CLASS(hotplug_dev);
-+    const MachineState *ms = MACHINE(hotplug_dev);
-+    const char *nvdimm_opt = qemu_opt_get(qemu_get_machine_opts(), "nvdimm");
-     g_autofree char *uuidstr = NULL;
-     QemuUUID uuid;
-     int ret;
-@@ -43,6 +47,20 @@ void spapr_nvdimm_validate(HotplugHandler *hotplug_dev, NVDIMMDevice *nvdimm,
-         return;
-     }
- 
-+    /*
-+     * NVDIMM support went live in 5.1 without considering that, in
-+     * other archs, the user needs to enable NVDIMM support with the
-+     * 'nvdimm' machine option and the default behavior is NVDIMM
-+     * support disabled. It is too late to roll back to the standard
-+     * behavior without breaking 5.1 guests. What we can do is to
-+     * ensure that, if the user sets nvdimm=off, we error out
-+     * regardless of being 5.1 or newer.
-+     */
-+    if (!ms->nvdimms_state->is_enabled && nvdimm_opt) {
-+        error_setg(errp, "nvdimm device found but 'nvdimm=off' was set");
-+        return;
-+    }
++	struct virtio_gpu_output *output =3D drm_crtc_to_virtio_gpu_output(crtc);
 +
-     if (object_property_get_int(OBJECT(nvdimm), NVDIMM_LABEL_SIZE_PROP,
-                                 &error_abort) == 0) {
-         error_setg(errp, "PAPR requires NVDIMM devices to have label-size set");
--- 
-2.26.2
++	/*
++	 * virtio-gpu can't do modeset and plane update operations
++	 * independant from each other.  So the actual modeset happens
++	 * in the plane update callback, and here we just check
++	 * whenever we must force the modeset.
++	 */
++	if (drm_atomic_crtc_needs_modeset(crtc->state)) {
++		output->needs_modeset =3D true;
++	}
+ }
+ =
 
+ static const struct drm_crtc_helper_funcs virtio_gpu_crtc_helper_funcs =3D=
+ {
+diff --git a/drivers/gpu/drm/virtio/virtgpu_drv.h b/drivers/gpu/drm/virtio/=
+virtgpu_drv.h
+index 9ff9f4ac0522..4ab1b0ba2925 100644
+--- a/drivers/gpu/drm/virtio/virtgpu_drv.h
++++ b/drivers/gpu/drm/virtio/virtgpu_drv.h
+@@ -138,6 +138,7 @@ struct virtio_gpu_output {
+ 	int cur_x;
+ 	int cur_y;
+ 	bool enabled;
++	bool needs_modeset;
+ };
+ #define drm_crtc_to_virtio_gpu_output(x) \
+ 	container_of(x, struct virtio_gpu_output, crtc)
+diff --git a/drivers/gpu/drm/virtio/virtgpu_plane.c b/drivers/gpu/drm/virti=
+o/virtgpu_plane.c
+index 52d24179bcec..65757409d9ed 100644
+--- a/drivers/gpu/drm/virtio/virtgpu_plane.c
++++ b/drivers/gpu/drm/virtio/virtgpu_plane.c
+@@ -163,7 +163,9 @@ static void virtio_gpu_primary_plane_update(struct drm_=
+plane *plane,
+ 	    plane->state->src_w !=3D old_state->src_w ||
+ 	    plane->state->src_h !=3D old_state->src_h ||
+ 	    plane->state->src_x !=3D old_state->src_x ||
+-	    plane->state->src_y !=3D old_state->src_y) {
++	    plane->state->src_y !=3D old_state->src_y ||
++	    output->needs_modeset) {
++		output->needs_modeset =3D false;
+ 		DRM_DEBUG("handle 0x%x, crtc %dx%d+%d+%d, src %dx%d+%d+%d\n",
+ 			  bo->hw_res_handle,
+ 			  plane->state->crtc_w, plane->state->crtc_h,
+-- =
+
+2.28.0
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1882851
+
+Title:
+  QEMU video freezes with "Guest disabled display" (virtio driver)
+
+Status in QEMU:
+  New
+
+Bug description:
+  I am using Arch Linux as my Guest and Host OS, after starting qemu
+  with the following command:
+
+    $ qemu-system-x86_64 -enable-kvm -hda arch-zoom.qcow2 -m 4G -vga
+  virtio
+
+  and waiting for a screen blank, I get this message:
+
+    Guest disabled display
+
+  And nothing happens after that, I can move the mouse or hit any key,
+  and the message is still there.
+
+  I can still reboot the VM but that's not optimal.
+
+  I can reproduce this with the latest QEMU release (5.0.0) or git master, =
+
+  I also tried this with older releases (4.0.0, 3.0.0) and the issue is sti=
+ll there.
+
+  I can't reproduce this with other video drivers (std, qxl).
+
+  With std/qxl the screen will blank a bit and then continue as normal.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1882851/+subscriptions
 
