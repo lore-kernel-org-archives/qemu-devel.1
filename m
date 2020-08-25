@@ -2,85 +2,87 @@ Return-Path: <SRS0=2GMi=CD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 350FCC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 05:48:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77EEBC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 05:51:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 00B772071E
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 05:48:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 43C612071E
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 05:51:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FXeX4xEK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00B772071E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AEldW8Dj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43C612071E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40424 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42548 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kARoW-0006Nj-7Z
-	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 01:48:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59392)
+	id 1kARrc-0007Zt-F0
+	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 01:51:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59658)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1kARnx-0005wa-53
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 01:47:33 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:39421)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1kARnv-0007gg-6Z
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 01:47:32 -0400
-Received: by mail-ot1-x341.google.com with SMTP id z18so9448199otk.6
- for <qemu-devel@nongnu.org>; Mon, 24 Aug 2020 22:47:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=8129R7RIt/pXEkp9qdumq2LLGoxvq1WJI5NAzQD/Nvg=;
- b=FXeX4xEK7cZO5Q8OymKL31w3uGRbFVx7FEIE2QtFlpXcwfRU+JeF3YGbV2KfOVMTEm
- dO7VJe+QaHo/P5CxJ8TgP7ORx7krw9z4OwWOO+3gXikcRIKigfeZUqh5dnMrz7a3LlqM
- 8RG1dCgF6zP//yuaeo+QrP5fzhSA3qevXPjO76DxR100Ba+wcsn81JQ1IN4gM4CSW9xP
- EOz/Vob694TsUEwp4GJMIXuxrmiOk4RtIZvUqRAW9GfurYzq1+/CrgXJRNPmLseuLw5X
- zHYdOljuvGOcMRYHmtPJUPrutlFshiWVcdw4SMD2f+ijw9l5VLFb+sv6bt4AFT7GxkHL
- Bd9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=8129R7RIt/pXEkp9qdumq2LLGoxvq1WJI5NAzQD/Nvg=;
- b=CoYU5Q0rf1HHcvbqc/HDfIadK7bb5NSfcTAdlnRKYg2mZYTm9GnbSuZAdJY/z0z/ew
- 7Gmsj76rpDIxYCfw2Tws8mZy659Uj45wVkbvDh5s9OKXIoNPfqZ6eRrgucxJ4tsCXSah
- QMbHFBZJhwBTRYvKOGMxLDlh+CWVZH2mb0Qp/AHwodg1u9uiPg7MM4sILnkbt0QrDKRn
- GDEELObbg/c61MGFHiPXj13uYYE/ezz3DyEGaYKj/ahbKUp6AywiSZkC4ZaiamqGgYvt
- GKCT3DZh1Qx+suyJUZ2IFzSCyxVMn/LOMS382KQL9yc8Rt4NWzXALLTercXeq+ooRKtV
- egKA==
-X-Gm-Message-State: AOAM5327PB9px+qA3VIP5aDLKFdHyQsEnpxEREvxBQG60wYDFgV7oNV0
- R/V3CWAApRyxg1Y6rYGC5JH9B/WRmTJIBzpNHM0=
-X-Google-Smtp-Source: ABdhPJziJhhHUHkEYypx1qvhveSCwFCpB/141KY+iGVZHTDBv1tblzhgKhsJ3Tpm/v7AnjK0UAF6KqCoCZixbkp+gas=
-X-Received: by 2002:a9d:7c92:: with SMTP id q18mr3305196otn.333.1598334449466; 
- Mon, 24 Aug 2020 22:47:29 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kARr3-00078L-HJ
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 01:50:45 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:20150
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kARr1-0007zx-K8
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 01:50:45 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1598334642;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=5ccRjVKuwYMcflsMajXtDQ1h/Iw/3YpycJlS3w9onxc=;
+ b=AEldW8DjYZ1ai4k+JYGz+9tAhXgCiyukitgtu52ghq4qowi70i2sF7XxCpbNf4+SHxNFlC
+ d41tTRD71DGQA9mr83MjnQ2zYLd2R4wFR5gpWixSXycQRpn6HIhnCIFxSfFxKyi41o33G1
+ j1611BV9NVY2cxCWTVz0vliN4vr5HNw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-187-Myr9DzcKPJqcGIA0Udd9zQ-1; Tue, 25 Aug 2020 01:50:40 -0400
+X-MC-Unique: Myr9DzcKPJqcGIA0Udd9zQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0AC001074665;
+ Tue, 25 Aug 2020 05:50:39 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-112-54.ams2.redhat.com
+ [10.36.112.54])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5282D7E33D;
+ Tue, 25 Aug 2020 05:50:33 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 75DAC1753B; Tue, 25 Aug 2020 07:50:32 +0200 (CEST)
+Date: Tue, 25 Aug 2020 07:50:32 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Subject: Re: [PATCH 6/6] virtio-vga: Use typedef name for instance_size
+Message-ID: <20200825055032.kyxqleo6lxzvbkru@sirius.home.kraxel.org>
+References: <20200824215936.2961951-1-ehabkost@redhat.com>
+ <20200824215936.2961951-7-ehabkost@redhat.com>
 MIME-Version: 1.0
-References: <20200825053636.29648-1-kraxel@redhat.com>
-In-Reply-To: <20200825053636.29648-1-kraxel@redhat.com>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Tue, 25 Aug 2020 13:46:53 +0800
-Message-ID: <CAKXe6SKrTLAgRE4Wnk4sJkxzvXHD_FoaXBBrM_utLRtbJrCvRw@mail.gmail.com>
-Subject: Re: [PATCH] usb: fix setup_len init (CVE-2020-14364)
-To: Gerd Hoffmann <kraxel@redhat.com>, Prasad J Pandit <pjp@fedoraproject.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::341;
- envelope-from=liq3ea@gmail.com; helo=mail-ot1-x341.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+In-Reply-To: <20200824215936.2961951-7-ehabkost@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/25 01:37:44
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.956,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -94,114 +96,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Gonglei <arei.gonglei@huawei.com>, Qemu Developers <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>, qemu-devel@nongnu.org,
+ qemu-arm@nongnu.org,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Gerd Hoffmann <kraxel@redhat.com> =E4=BA=8E2020=E5=B9=B48=E6=9C=8825=E6=97=
-=A5=E5=91=A8=E4=BA=8C =E4=B8=8B=E5=8D=881:37=E5=86=99=E9=81=93=EF=BC=9A
->
-> Store calculated setup_len in a local variable, verify it, and only
-> write it to the struct (USBDevice->setup_len) in case it passed the
-> sanity checks.
->
-> This prevents other code (do_token_{in,out} functions specifically)
-> from working with invalid USBDevice->setup_len values and overrunning
-> the USBDevice->setup_buf[] buffer.
->
-> Fixes: CVE-2020-14364
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> Tested-by: Gonglei <arei.gonglei@huawei.com>
+On Mon, Aug 24, 2020 at 05:59:36PM -0400, Eduardo Habkost wrote:
+> This makes the code consistent with the rest of QOM code in QEMU,
+> and will make automated conversion to type declaration macros
+> simpler.
+> 
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 
-Reviewed-by: Li Qiang <liq3ea@gmail.com>
+Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
 
-Just see the page.
--->https://access.redhat.com/security/cve/CVE-2020-14364
-
-The 'Attack Vector' of the CVSS score here is 'local'.
-
-Hi Prasad,
-I think this should be 'network' as the guest user can touch this in
-cloud environment?
-What's the consideration here?
-
-Thanks,
-Li Qiang
-
-> ---
->  hw/usb/core.c | 16 ++++++++++------
->  1 file changed, 10 insertions(+), 6 deletions(-)
->
-> diff --git a/hw/usb/core.c b/hw/usb/core.c
-> index 5abd128b6bc5..5234dcc73fea 100644
-> --- a/hw/usb/core.c
-> +++ b/hw/usb/core.c
-> @@ -129,6 +129,7 @@ void usb_wakeup(USBEndpoint *ep, unsigned int stream)
->  static void do_token_setup(USBDevice *s, USBPacket *p)
->  {
->      int request, value, index;
-> +    unsigned int setup_len;
->
->      if (p->iov.size !=3D 8) {
->          p->status =3D USB_RET_STALL;
-> @@ -138,14 +139,15 @@ static void do_token_setup(USBDevice *s, USBPacket =
-*p)
->      usb_packet_copy(p, s->setup_buf, p->iov.size);
->      s->setup_index =3D 0;
->      p->actual_length =3D 0;
-> -    s->setup_len   =3D (s->setup_buf[7] << 8) | s->setup_buf[6];
-> -    if (s->setup_len > sizeof(s->data_buf)) {
-> +    setup_len =3D (s->setup_buf[7] << 8) | s->setup_buf[6];
-> +    if (setup_len > sizeof(s->data_buf)) {
->          fprintf(stderr,
->                  "usb_generic_handle_packet: ctrl buffer too small (%d > =
-%zu)\n",
-> -                s->setup_len, sizeof(s->data_buf));
-> +                setup_len, sizeof(s->data_buf));
->          p->status =3D USB_RET_STALL;
->          return;
->      }
-> +    s->setup_len =3D setup_len;
->
->      request =3D (s->setup_buf[0] << 8) | s->setup_buf[1];
->      value   =3D (s->setup_buf[3] << 8) | s->setup_buf[2];
-> @@ -259,26 +261,28 @@ static void do_token_out(USBDevice *s, USBPacket *p=
-)
->  static void do_parameter(USBDevice *s, USBPacket *p)
->  {
->      int i, request, value, index;
-> +    unsigned int setup_len;
->
->      for (i =3D 0; i < 8; i++) {
->          s->setup_buf[i] =3D p->parameter >> (i*8);
->      }
->
->      s->setup_state =3D SETUP_STATE_PARAM;
-> -    s->setup_len   =3D (s->setup_buf[7] << 8) | s->setup_buf[6];
->      s->setup_index =3D 0;
->
->      request =3D (s->setup_buf[0] << 8) | s->setup_buf[1];
->      value   =3D (s->setup_buf[3] << 8) | s->setup_buf[2];
->      index   =3D (s->setup_buf[5] << 8) | s->setup_buf[4];
->
-> -    if (s->setup_len > sizeof(s->data_buf)) {
-> +    setup_len =3D (s->setup_buf[7] << 8) | s->setup_buf[6];
-> +    if (setup_len > sizeof(s->data_buf)) {
->          fprintf(stderr,
->                  "usb_generic_handle_packet: ctrl buffer too small (%d > =
-%zu)\n",
-> -                s->setup_len, sizeof(s->data_buf));
-> +                setup_len, sizeof(s->data_buf));
->          p->status =3D USB_RET_STALL;
->          return;
->      }
-> +    s->setup_len =3D setup_len;
->
->      if (p->pid =3D=3D USB_TOKEN_OUT) {
->          usb_packet_copy(p, s->data_buf, s->setup_len);
-> --
-> 2.27.0
->
->
 
