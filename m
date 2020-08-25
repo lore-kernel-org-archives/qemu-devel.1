@@ -2,87 +2,75 @@ Return-Path: <SRS0=2GMi=CD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73D4BC433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 11:19:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1CC6C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 11:19:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4384A20706
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 11:19:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7C9F820706
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 11:19:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SVEuzR7n"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4384A20706
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="PjxOJqmy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C9F820706
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51100 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52530 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAWzF-0003EK-FR
-	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 07:19:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42704)
+	id 1kAWzT-0003nc-Ol
+	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 07:19:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41868)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kAWy8-0001XW-5b
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 07:18:24 -0400
-Received: from mail-ej1-x641.google.com ([2a00:1450:4864:20::641]:40231)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kAWy1-0005Io-QI
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 07:18:21 -0400
-Received: by mail-ej1-x641.google.com with SMTP id o18so16019434eje.7
- for <qemu-devel@nongnu.org>; Tue, 25 Aug 2020 04:18:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=udVOhtccTRnf8ZkLvWGf4nZ8cCCKzpc0C5LgJy/IobU=;
- b=SVEuzR7nBRgKi0DRTNyvUD6t4IvGsBcmgxQP8I/fakSVzIjO66c3m7cHGF9ohGgdV/
- mFPfcmNQh+sDaOPAjO40JHlY9SB52sLKP2V8nKJs5Pi8G0nVXCsgmRkRur9XG87rFVh1
- z2+x8PdI+hOpwRAGqrfPeywp3KC3UK0rAAGQ2yS5jp0fnUN9tHsSWlO8P4d3R8jZHkJa
- H67gwNbfchfe5eKupmj/WsaQeQsmtUSxjWnuhh9ZhP3RMXwHBm/ICbsrVh3HgR4ITYW8
- qrRuXobbH1S8W1v1/YUJBPtdvSpTx3tEUe4s1p93mWJNdiewxSih1bDLRphaMoDhpHki
- Xexg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=udVOhtccTRnf8ZkLvWGf4nZ8cCCKzpc0C5LgJy/IobU=;
- b=Sfhht+yIIus0O7xBeAsz764vbsNkGfSNUUQFJA5nZtLeaexrxRUtceYjaf0MHmmBh5
- oAchL7CGmgQd0pKmdr4XzhvDKEgY1aFOtizLZ+ck56nVT0VwLnCuWbiHCtaX+9O6dymS
- V+duEq1QQLWFM+Nt1BecPC7qliMkp8Ea/Wo58UUQ8JqS2oKvorBjfUzYYSZBVFKbjv+c
- A3PCYfl/TvE+b10WxjMzd3y68i4a0v4C06XFGn3FJwom22rgMBSYy4bUs5+rr6muHj8h
- evqzam98aayiM6zcMxxKdbI144awd+wQE/M/X2Vxku4L8sLjmosEsN2Zi93nauPM0QmS
- SQ+w==
-X-Gm-Message-State: AOAM531AwGPs5QLfT4MPOqE3aQyA/Az+e4DrU8P3f3EJ5Ctm5JJHirlA
- f9qq67UVuRG972Fde5PgiFJSAECw4huT3hokBbCzzg==
-X-Google-Smtp-Source: ABdhPJzaRgnZNMMmg9IpEhx+zAU83z84MpdhiWhvfvosK7qkl3wWaRZ2PGH0sd1TfR3Jk0dQQg6QE/Kf/oO6/7rrsZw=
-X-Received: by 2002:a17:906:f28b:: with SMTP id
- gu11mr9675173ejb.407.1598354295777; 
- Tue, 25 Aug 2020 04:18:15 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1kAWwU-00072U-FX; Tue, 25 Aug 2020 07:16:43 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:41845)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1kAWwS-00053w-55; Tue, 25 Aug 2020 07:16:42 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 4BbRJc2dthz9sTm; Tue, 25 Aug 2020 21:16:31 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1598354192;
+ bh=EQPdCzGXEohFL8bGkVDNx+u+KUy8Mwb8RMIjqXsIKOE=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=PjxOJqmyPQNZQDdgru4qmelsmeO6iJ1MGo6YTFn9kbyN7oCcgrTmTjwneDk/K0l46
+ oZC59MdlvrThAQvUy2LGLd/uw8ofTn87CDWYyhQd8ExqHLugmUf1qDtwRnBqcC1AS+
+ Tc6otrfuSjIKH5RkvybhcNEFRo7nj4HKi6mZvPik=
+Date: Tue, 25 Aug 2020 21:12:08 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Daniel Henrique Barboza <danielhb413@gmail.com>
+Subject: Re: [PATCH 02/10] numa: introduce
+ MachineClass::forbid_asymmetrical_numa
+Message-ID: <20200825111208.GH4734@yekko.fritz.box>
+References: <20200820011726.GF271315@yekko.fritz.box>
+ <20200820021128.GC642093@habkost.net>
+ <20200820041504.GN271315@yekko.fritz.box>
+ <20200820165103.GD642093@habkost.net>
+ <20200821105538.6f6b46c8@redhat.com>
+ <e007c59f-9533-48f0-a08a-6745a29b6600@gmail.com>
+ <20200824060839.GE4734@yekko.fritz.box>
+ <f936f3a7-78d1-dd1f-511b-1705c165fc06@gmail.com>
+ <20200824234917.GF4734@yekko.fritz.box>
+ <98728fe4-1262-6be2-8dd1-1b38ffbe81e9@gmail.com>
 MIME-Version: 1.0
-References: <20200815013145.539409-1-richard.henderson@linaro.org>
- <20200815013145.539409-14-richard.henderson@linaro.org>
-In-Reply-To: <20200815013145.539409-14-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 25 Aug 2020 12:18:04 +0100
-Message-ID: <CAFEAcA8gsdU0FVsRnu3cBx4KGaetJDPr63KBaZXh42eCehsQfQ@mail.gmail.com>
-Subject: Re: [PATCH 13/20] target/arm: Tidy SVE tszimm shift formats
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::641;
- envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x641.google.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="YrlhzR9YrZtruaFS"
+Content-Disposition: inline
+In-Reply-To: <98728fe4-1262-6be2-8dd1-1b38ffbe81e9@gmail.com>
+Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
+ helo=ozlabs.org
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=0.248,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,24 +83,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: qemu-ppc@nongnu.org, Igor Mammedov <imammedo@redhat.com>,
+ John Snow <jsnow@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, 15 Aug 2020 at 02:32, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> Rather than require the user to fill in the immediate (shl or shr),
-> create full formats that include the immediate.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/arm/sve.decode | 35 ++++++++++++++++-------------------
->  1 file changed, 16 insertions(+), 19 deletions(-)
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+--YrlhzR9YrZtruaFS
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-thanks
--- PMM
+On Tue, Aug 25, 2020 at 06:56:46AM -0300, Daniel Henrique Barboza wrote:
+>=20
+>=20
+> On 8/24/20 8:49 PM, David Gibson wrote:
+> > On Mon, Aug 24, 2020 at 08:45:12AM -0300, Daniel Henrique Barboza wrote:
+> > >=20
+> > >=20
+>=20
+> [...]
+>=20
+> > > > > LOPAPR support a somewhat asymmetrical NUMA setup in its current
+> > > > > form,
+> > > >=20
+> > > > Huh, I didn't even realize that.  What's the mechanism?
+> > >=20
+> > > LOPAPR mentions that a single resource/node can have multiple associa=
+tivity
+> > > arrays. The idea is to contemplate the situations where the node has
+> > > more than one connection with the board.
+> > >=20
+> > > I say "somewhat" because, right after mentioning that, the spec also =
+says that
+> > > the OS should consider that the distance between two nodes must alway=
+s be
+> > > the shortest one of all available arrays. I'll copy/paste the except =
+here
+> > > (end of section 15.2, "Numa Resource Associativity":
+> >=20
+> > Ah.  I didn't think that's what "asymmetric NUMA" meant... but come to
+> > think of it, I'm not very sure about that.
+>=20
+>=20
+> This was a poor attempt of my part to cut PAPR some slack.
+>=20
+> TBH, even if current PAPR allows for some form of NUMA asymmetry, I don't=
+ think
+> it's worth implementing at all. It'll be more complexity on top of what I
+> already added here, and the best case scenario will be the kernel ignorin=
+g it
+> (worst case - kernel blowing it up because we're adding more associativity
+> arrays in each CPU and so on).
+
+Yes, I agree.
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--YrlhzR9YrZtruaFS
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl9E8gYACgkQbDjKyiDZ
+s5I3DRAAtF8dcAIIEBRolOFiMVxR+78skl5PnuCMJ4zasQNedouQEg2KL6HjMgX4
+0tgEpAea8UCw/yRRjzev+Gze0Onk6Veadmtb+LF4B4DNKuDaWFXDbqFHvKq5gz+2
+Mcpw1PL6ui8Qmh50DN1oQ07w/OVEQFco6tIJ5eop2cPS+P222DtCQ0+QegIAggL8
+6k+TjnoGwCqFlYbymPuC8p1wFTAFPo/PKTOHAFETpJJ4QQOzfjdYu1lhl5dTAVRi
+lz+wimWwXw8dwJbmEDzWpe7pDEm5791gQ4MCwZO4ZhGqoAT/ScObFAu0Zz1z+4uL
+UqQVnUmZ9TuX0kdM93GT6Ecyz08fCRJZ+SkVSrs/2DC6DRaN7yXfZqfvB1pWUdKA
+zcxcd54bn0V57ToIW3Q3AbfPea18WnOLua8e3yGqFOOXAjHZhEORRYVeFa6HdySE
+QLLkKWuw6iUR/AXQsySbx0KoxN/RiJL1lGrIINR/sCbU8WEp3voJDJC/nGPPTbAD
+17qriPebXLDH9EOiD4rzyTqWbBQphHg65tUpkae3GHyvHr9b3dZNaKA/tcWrizPs
+46E7kMRZD8BCVKKsVo3mdvr1xziX6548SohrkJO42ZYPN3G3D9WHpq/zfcgUL85k
+lOIIOHmg/6FHXGheBqaSGNuGZFZq1aNlOIBKIuLig7JxlJHxAIc=
+=lp04
+-----END PGP SIGNATURE-----
+
+--YrlhzR9YrZtruaFS--
 
