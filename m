@@ -2,91 +2,128 @@ Return-Path: <SRS0=2GMi=CD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0C3DC433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 14:40:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A09EC433E1
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 14:46:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 60462204FD
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 14:40:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3D90420786
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 14:46:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="chGwryvb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60462204FD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="UmrxwhJT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D90420786
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53208 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57718 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAa7y-0001zM-FW
-	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 10:40:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43060)
+	id 1kAaDC-0004PC-Ea
+	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 10:46:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45840)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kAa7H-00012M-Ih
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 10:40:03 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:60240
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kAa7G-0006cq-1i
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 10:40:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598366400;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=DtZUDai+s7L6QNSMrmPh12MI6mIeUr/342AVDTJ+krw=;
- b=chGwryvbPubBmBxHr4LYjML87gyd0Cgn1Twt0TliVbwtr0I2HWKkGRcopwHOuaUBuTROjn
- 61d5zGNw/nYYCuATxsQq1M+86rdTJGjnHZvqQK34lE0WL9SwUlffiJuTYrn2KDBWZaxAND
- PeYmmQTXpRYS+0a4iCoizCssN+ZMmT0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-238--XibY0vnNqeGH-cAKH_TmA-1; Tue, 25 Aug 2020 10:39:58 -0400
-X-MC-Unique: -XibY0vnNqeGH-cAKH_TmA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AA36E2FD03;
- Tue, 25 Aug 2020 14:39:57 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-74.ams2.redhat.com
- [10.36.112.74])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D03595D9CA;
- Tue, 25 Aug 2020 14:39:54 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 64C5E112D737; Tue, 25 Aug 2020 16:39:53 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Chen Qun <kuhn.chenqun@huawei.com>
-Subject: Re: [PATCH v2 08/10] usb/bus: Remove dead assignment in
- usb_get_fw_dev_path()
-References: <20200825112447.126308-1-kuhn.chenqun@huawei.com>
- <20200825112447.126308-9-kuhn.chenqun@huawei.com>
-Date: Tue, 25 Aug 2020 16:39:53 +0200
-In-Reply-To: <20200825112447.126308-9-kuhn.chenqun@huawei.com> (Chen Qun's
- message of "Tue, 25 Aug 2020 19:24:45 +0800")
-Message-ID: <87r1rudc1y.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (Exim 4.90_1) (envelope-from <jjherne@linux.ibm.com>)
+ id 1kAaCZ-0003qr-Jl; Tue, 25 Aug 2020 10:45:31 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33032
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <jjherne@linux.ibm.com>)
+ id 1kAaCX-0007mY-2l; Tue, 25 Aug 2020 10:45:31 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 07PEVmMv037185; Tue, 25 Aug 2020 10:45:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
+ h=reply-to : subject : to
+ : cc : references : from : message-id : date : mime-version : in-reply-to
+ : content-type : content-transfer-encoding; s=pp1;
+ bh=NZFx2nyBHJBaurVAiPKC9DFUP/zPSDe62Gk5caZIyfI=;
+ b=UmrxwhJThM9GGQdv9+Kx3mr8ZmRhk7wYTvLiBJW8XtkjrUgRpV0xa4jm+YMDtFpou/5k
+ /ywTwUKq98F+dNCse981qszczqfZJva7GOntyX2C1lAf1okXEzpQYHZnD+h27jaSL23R
+ 2hPeA9B3acupEar7G6XWcSMSESKNj4R839gzr1S5w9jQt1VBP4qMLDlLGnjvkl6D+xB7
+ Kd0MC5wbpzOgCgdJ5Itne4fh9UShfu+8K5hTkfmkrUUpYsmckumML6x0OZU+jGzLr6uN
+ g67R4t8ci80nELbSwAIIsT3VCv0D0BOuSgOHSdiMe/euYgKTHlDxtmGTaD4HmEa/ciLU Bw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 3353trt5qv-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 25 Aug 2020 10:45:25 -0400
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 07PEW1nl038364;
+ Tue, 25 Aug 2020 10:45:25 -0400
+Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com
+ [169.47.144.27])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 3353trt5qh-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 25 Aug 2020 10:45:25 -0400
+Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
+ by ppma05wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 07PEj1DK028290;
+ Tue, 25 Aug 2020 14:45:24 GMT
+Received: from b03cxnp08026.gho.boulder.ibm.com
+ (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
+ by ppma05wdc.us.ibm.com with ESMTP id 332uw7a3mr-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 25 Aug 2020 14:45:24 +0000
+Received: from b03ledav006.gho.boulder.ibm.com
+ (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
+ by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 07PEjIvW65864094
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 25 Aug 2020 14:45:18 GMT
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 5E5E0C66DB;
+ Tue, 25 Aug 2020 14:45:23 +0000 (GMT)
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id C8F90C66D8;
+ Tue, 25 Aug 2020 14:45:22 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.85.204.105])
+ by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
+ Tue, 25 Aug 2020 14:45:22 +0000 (GMT)
+Subject: Re: [PATCH] pc-bios: s390x: Only set lowcore iplb address on
+ list-directed IPL
+To: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
+ Cornelia Huck <cohuck@redhat.com>
+References: <20200817141734.5109-1-jjherne@linux.ibm.com>
+ <20200817183048.30cb6f9e.cohuck@redhat.com>
+ <f232a187-c989-cf77-52e5-2e31678e5bed@linux.ibm.com>
+ <173257e9-a6cb-48a5-62ed-794c060e3900@linux.ibm.com>
+ <20200819114538.7485d580.cohuck@redhat.com>
+ <81d2ca24-538a-56ba-04de-079d28a16cb3@linux.ibm.com>
+ <133e6840-d10a-0d8d-b555-dcbe40c554f8@redhat.com>
+From: "Jason J. Herne" <jjherne@linux.ibm.com>
+Organization: IBM
+Message-ID: <bbaba98a-6f5c-cafd-2744-20526ad7568b@linux.ibm.com>
+Date: Tue, 25 Aug 2020 10:45:22 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/25 01:35:36
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.958,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <133e6840-d10a-0d8d-b555-dcbe40c554f8@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
+ definitions=2020-08-25_04:2020-08-25,
+ 2020-08-25 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0
+ lowpriorityscore=0 phishscore=0 mlxlogscore=999 bulkscore=0 clxscore=1015
+ priorityscore=1501 suspectscore=0 spamscore=0 mlxscore=0 adultscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2008250107
+Received-SPF: pass client-ip=148.163.158.5; envelope-from=jjherne@linux.ibm.com;
+ helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/25 07:40:49
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -52
+X-Spam_score: -5.3
+X-Spam_bar: -----
+X-Spam_report: (-5.3 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-2.602,
+ RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,56 +136,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: zhang.zhanghailiang@huawei.com, qemu-trivial@nongnu.org,
- pannengyuan@huawei.com, qemu-devel@nongnu.org,
- Gerd Hoffmann <kraxel@redhat.com>, Euler Robot <euler.robot@huawei.com>
+Reply-To: jjherne@linux.ibm.com
+Cc: qemu-s390x@nongnu.org, Viktor Mihajlovski <mihajlov@linux.ibm.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Chen Qun <kuhn.chenqun@huawei.com> writes:
+On 8/25/20 7:38 AM, Thomas Huth wrote:
+> On 19/08/2020 12.46, Janosch Frank wrote:
+>> On 8/19/20 11:45 AM, Cornelia Huck wrote:
+>>> On Wed, 19 Aug 2020 11:32:34 +0200
+>>> Janosch Frank <frankja@linux.ibm.com> wrote:
+>>>
+>>>> On 8/17/20 7:51 PM, Jason J. Herne wrote:
+>>>>> On 8/17/20 12:30 PM, Cornelia Huck wrote:
+>>>>>> On Mon, 17 Aug 2020 10:17:34 -0400
+>>>>>> "Jason J. Herne" <jjherne@linux.ibm.com> wrote:
+>>>>>>   
+>>>>>>> The POP states that the IPLB location is only written to 0x14 for
+>>>>>>> list-directed IPL. Some operating systems expect 0x14 to not change on
+>>>>>>> boot and will fail IPL if it does change.
+>>>>>>>
+>>>>>>> Fixes: 9bfc04f9ef6802fff0
+>>>>>>
+>>>>>> Should be
+>>>>>>
+>>>>>> Fixes: 9bfc04f9ef68 ("pc-bios: s390x: Save iplb location in lowcore")
+>>>>>>   
+>>>>>>> Signed-off-by: Jason J. Herne <jjherne@linux.ibm.com>
+>>>>>>> Reviewed-by: Janosch Frank <frankja@de.ibm.com>
+>>>>>>> ---
+>>>>>>>    pc-bios/s390-ccw/jump2ipl.c | 5 ++++-
+>>>>>>>    1 file changed, 4 insertions(+), 1 deletion(-)
+>>>>>>>
+>>>>>>> diff --git a/pc-bios/s390-ccw/jump2ipl.c b/pc-bios/s390-ccw/jump2ipl.c
+>>>>>>> index 767012bf0c..5e3e13f4b0 100644
+>>>>>>> --- a/pc-bios/s390-ccw/jump2ipl.c
+>>>>>>> +++ b/pc-bios/s390-ccw/jump2ipl.c
+>>>>>>> @@ -33,7 +33,10 @@ void jump_to_IPL_code(uint64_t address)
+>>>>>>>    {
+>>>>>>>        /* store the subsystem information _after_ the bootmap was loaded */
+>>>>>>>        write_subsystem_identification();
+>>>>>>> -    write_iplb_location();
+>>>>>>> +
+>>>>>>> +    if (iplb.pbt != S390_IPL_TYPE_CCW) {
+>>>>>>> +            write_iplb_location();
+>>>>>>> +    }
+>>>>>>
+>>>>>> What happens for ipl types other than CCW and FCP? IOW, should that
+>>>>>> rather be a positive check for S390_IPL_TYPE_FCP?
+>>>>>>   
+>>>>>>>    
+>>>>>>>        /* prevent unknown IPL types in the guest */
+>>>>>>>        if (iplb.pbt == S390_IPL_TYPE_QEMU_SCSI) {
+>>>>>>   
+>>>>>
+>>>>> Based on my (admittedly limited) understanding of the architecture and
+>>>>> code, I believe write_iplb_location() should be called at least for
+>>>>> S390_IPL_TYPE_FCP but I'm not 100% sure on S390_IPL_TYPE_QEMU_SCSI.
+>>>>> Perhaps Janosch has an idea?
+>>>>>
+>>>>> It was originally unconditional, and my new conditional excludes vfio
+>>>>> CCW which is definitely a step in the right direction, in any case :).
+>>>>
+>>>> If I remember correctly the problem was that ZIPL used the IPLB lowcore
+>>>> ptr without checking how it was booted (CCW or FCP). That was fixed in
+>>>> mid of July by testing if diag308 gives back a config or not.
+>>>
+>>> So we have the problem that old zipl relies on the presence of a value
+>>> that must not be there if you follow the architecture? Nasty.
+>>>
+>>> (Is it really "must not change" vs "don't expect anything here"? Not
+>>> sure if I'm looking at the right part of the documentation.)
+>>
+>> Well if the loaded program overwrites absolute 0x0, we shouldn't modify
+>> it if we are not explicitly allowed to, no?
+>>
+>> We already talked about saving the exception new addresses and restoring
+>> them before jumping to the new kernel. I think we might need to go a
+>> step further and use a non zero prefix for the bios to avoid any changes
+>> to absolute 0x0.
+>>
+>> However that wouldn't fix this dilemma.
+> 
+> Sorry, I'm just back from summer vacation ... so what's the conclusion
+> for Jason's patch here? Should it be included as-is now or do we rather
+> neeed another rework here instead?
+> 
+>   Thomas
+> 
 
-> Clang static code analyzer show warning:
-> qemu/hw/usb/bus.c:615:13: warning: Value stored to 'pos' is never read
->             pos += snprintf(fw_path + pos, fw_len - pos, "%s@%lx",
->
-> Reported-by: Euler Robot <euler.robot@huawei.com>
-> Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
-> ---
-> Cc: Gerd Hoffmann <kraxel@redhat.com>
-> Cc: Markus Armbruster <armbru@redhat.com>
-> ---
->  hw/usb/bus.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/hw/usb/bus.c b/hw/usb/bus.c
-> index b17bda3b29..7bab0499ad 100644
-> --- a/hw/usb/bus.c
-> +++ b/hw/usb/bus.c
-> @@ -612,8 +612,8 @@ static char *usb_get_fw_dev_path(DeviceState *qdev)
-           if (in[0] == '.') {
-               /* some hub between root port and device */
-               pos += snprintf(fw_path + pos, fw_len - pos, "hub@%lx/", nr);
->              in++;
->          } else {
->              /* the device itself */
-> -            pos += snprintf(fw_path + pos, fw_len - pos, "%s@%lx",
-> -                            qdev_fw_name(qdev), nr);
-> +            snprintf(fw_path + pos, fw_len - pos, "%s@%lx", qdev_fw_name(qdev),
-> +                     nr);
->              break;
->          }
->      }
+After some discussion we've decided to keep this internal for now. As it turns out, 
+Janosch plans on making some changes here that will remove the need for this fix. So we'll 
+just use it internally for our own testing purposes until that time.
 
-I'd prefer to keep the line break where it is:
+Sorry for the noise :)
 
-            snprintf(fw_path + pos, fw_len - pos, "%s@%lx",
-                     qdev_fw_name(qdev), nr);
-
-The patch is safe, so
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-
-The loss of symmetry betwen the two arms of the if is a bit sad.  Up to
-Gerd.
-
+-- 
+-- Jason J. Herne (jjherne@linux.ibm.com)
 
