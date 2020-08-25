@@ -2,68 +2,114 @@ Return-Path: <SRS0=2GMi=CD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18238C433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 10:57:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D240FC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 10:58:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D448A2068E
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 10:57:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9A8822068E
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 10:58:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="CxDvU/Ik"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D448A2068E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dyKdwf0C"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A8822068E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57954 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58252 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAWeM-0007CL-2c
-	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 06:57:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34764)
+	id 1kAWeP-0007Jk-Qj
+	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 06:58:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34806)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kAWdd-0006E2-2h; Tue, 25 Aug 2020 06:57:13 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:55217)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kAWdZ-0001wT-SS; Tue, 25 Aug 2020 06:57:12 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 4BbQt723pWz9sTY; Tue, 25 Aug 2020 20:57:03 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1598353023;
- bh=6ElixnJqTqdSiX66H6c3MXroHiXNVRzgq+ont9xQV90=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=CxDvU/IkTedvWIv3OhOwysvGLoIBdMJ0Etu6U7sPbRm4r6NC8TCcSzohJh+MyKey3
- vwbt8FhzAJwpLvoww9va0LrvSFyfnyNCOv1X6qGM6BGOkwAFy6zUIPVw+09NxXB+DM
- /WlahZgxZvwi9v0194kaHrQU4dJl2o6WwcHoAFR4=
-Date: Tue, 25 Aug 2020 19:36:01 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Markus Armbruster <armbru@redhat.com>
-Subject: Re: [PATCH 1/1] spapr_vscsi: do not allow device hotplug
-Message-ID: <20200825093601.GG4734@yekko.fritz.box>
-References: <20200820190635.379657-1-danielhb413@gmail.com>
- <7f6ab4e6-42b1-3de4-5893-2ef09fc9dd26@redhat.com>
- <87k0xnjl4f.fsf@dusky.pond.sub.org>
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kAWdi-0006Jj-5G
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 06:57:18 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:58596
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kAWdg-00021o-5W
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 06:57:17 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1598353035;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=poCiqRa6UgH/qVwZxnw9VTGj7VqwsGQ5bmsTzqwwBlc=;
+ b=dyKdwf0C/2bJvgiIcyZdVmAmJdNXHwMDDZ51ucxns8P6yR/y3DhvkVInG1OiYU+zeyCWaP
+ HUjVSnYO+C0/gCvGBpdwp/qUuPYTO32xzClaXk1OxWFJeEy5WNtpSiyzHGD94+0Ex7UOYE
+ vKguRNm7JL8bOOjykxvYIbBn3xuCPNM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-175-tHBrfC_6OrGA8AjfFJE4EQ-1; Tue, 25 Aug 2020 06:57:13 -0400
+X-MC-Unique: tHBrfC_6OrGA8AjfFJE4EQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D90A71074663;
+ Tue, 25 Aug 2020 10:57:11 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-113-72.ams2.redhat.com
+ [10.36.113.72])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6F1C5709D2;
+ Tue, 25 Aug 2020 10:57:10 +0000 (UTC)
+Subject: Re: [PATCH v2 4/5] qemu-iotests: Merge FilePaths and FilePath
+To: Nir Soffer <nirsof@gmail.com>, qemu-devel@nongnu.org
+References: <20200820235427.374645-1-nsoffer@redhat.com>
+ <20200820235427.374645-5-nsoffer@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <fdbec025-1f08-16f6-68c4-7dfb5c7f4d34@redhat.com>
+Date: Tue, 25 Aug 2020 12:57:08 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
+In-Reply-To: <20200820235427.374645-5-nsoffer@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
+X-Mimecast-Spam-Score: 0.0
+X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="2NLGdgz3UMHa/lqP"
-Content-Disposition: inline
-In-Reply-To: <87k0xnjl4f.fsf@dusky.pond.sub.org>
-Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
- helo=ozlabs.org
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=0.248,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
+ protocol="application/pgp-signature";
+ boundary="NLRkFVYtYUZiEAal7FBkZMBS51YJ6gaUP"
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/25 01:37:44
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -56
+X-Spam_score: -5.7
+X-Spam_bar: -----
+X-Spam_report: (-5.7 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.958,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-2.602, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -76,139 +122,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Daniel Henrique Barboza <danielhb413@gmail.com>, qemu-devel@nongnu.org,
- qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Nir Soffer <nsoffer@redhat.com>,
+ John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--NLRkFVYtYUZiEAal7FBkZMBS51YJ6gaUP
+Content-Type: multipart/mixed; boundary="6goV4D73xPx55QNRI7riytbXwk60inXFi"
 
---2NLGdgz3UMHa/lqP
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+--6goV4D73xPx55QNRI7riytbXwk60inXFi
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Aug 25, 2020 at 08:27:28AM +0200, Markus Armbruster wrote:
-> Philippe Mathieu-Daud=E9 <philmd@redhat.com> writes:
+On 21.08.20 01:54, Nir Soffer wrote:
+> FilePath creates now one temporary file:
 >=20
-> > Cc'ing Markus
-> >
-> > On 8/20/20 9:06 PM, Daniel Henrique Barboza wrote:
-> >> We do not implement hotplug in the vscsi bus, but we forgot to
-> >> tell qdev about it. The result is that users are able to hotplug
-> >> devices in the vscsi bus, the devices appear in qdev, but they
-> >> aren't usable by the guest OS unless the user reboots it first.
-> >>=20
-> >> Setting qbus hotplug_handler to NULL will tell qdev-monitor, via
-> >> qbus_is_hotpluggable(), that we do not support hotplug operations
-> >> in spapr_vscsi.
-> >>=20
-> >> Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=3D1862059
-> >>=20
-> >> Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
-> >> ---
-> >>  hw/scsi/spapr_vscsi.c | 3 +++
-> >>  1 file changed, 3 insertions(+)
-> >>=20
-> >> diff --git a/hw/scsi/spapr_vscsi.c b/hw/scsi/spapr_vscsi.c
-> >> index d17dc03c73..57f0a1336f 100644
-> >> --- a/hw/scsi/spapr_vscsi.c
-> >> +++ b/hw/scsi/spapr_vscsi.c
-> >> @@ -1219,6 +1219,9 @@ static void spapr_vscsi_realize(SpaprVioDevice *=
-dev, Error **errp)
-> >> =20
-> >>      scsi_bus_new(&s->bus, sizeof(s->bus), DEVICE(dev),
-> >>                   &vscsi_scsi_info, NULL);
-> >> +
-> >> +    /* ibmvscsi SCSI bus does not allow hotplug. */
-> >> +    qbus_set_hotplug_handler(BUS(&s->bus), NULL);
-> >
-> > Can't this be a problem later in DeviceClass::unrealize()?
+>     with FilePath("a") as a:
 >=20
-> Can't say offhand.  Cc'ing QOM maintainers for actual expertise.
+> Or more:
 >=20
-> A quick grep coughs up virtio_serial_device_realize() /
-> virtio_serial_device_unrealize(), which set and unset the hotplug
-> handler of a bus their device provides.  Not the same as the code above,
-
-Hm, it almost is, actually.  Only difference is that virtio serial is
-setting the hotplug handler to something, rather than disabling it.
-
-> just a clue that messing with a bus's hotplug handler in a realize
-> method can work.
+>     with FilePath("a", "b", "c") as (a, b, c):
 >=20
-> qbus_set_hotplug_handler() is entirely undocumented.  It sets a link.
-> Might be intended for use by the device that provides the bus.
-
-Heh.
-
-> > I was expecting something like, overwriting the parent bus type:
-> >
-> > -- >8 --
-> > @@ -1271,6 +1271,7 @@ static void spapr_vscsi_class_init(ObjectClass
-> > *klass, void *data)
-> >      DeviceClass *dc =3D DEVICE_CLASS(klass);
-> >      SpaprVioDeviceClass *k =3D VIO_SPAPR_DEVICE_CLASS(klass);
-> >
-> > +    k->bus_type =3D NULL; /* ibmvscsi SCSI bus does not allow hotplug.=
- */
-> >      k->realize =3D spapr_vscsi_realize;
-> >      k->reset =3D spapr_vscsi_reset;
-> >      k->devnode =3D spapr_vscsi_devnode;
+> This is also the behavior of the file_path() helper, used by some of the
+> tests. Now we have only 2 helpers for creating temporary files instead
+> of 3.
 >=20
-> k->bus_type does not exist.  Do you mean dc->bus_type?
+> Signed-off-by: Nir Soffer <nsoffer@redhat.com>
+> ---
+>  tests/qemu-iotests/194        |  2 +-
+>  tests/qemu-iotests/208        |  2 +-
+>  tests/qemu-iotests/222        |  2 +-
+>  tests/qemu-iotests/257        |  4 ++--
+>  tests/qemu-iotests/iotests.py | 23 +++++++++++------------
+>  5 files changed, 16 insertions(+), 17 deletions(-)
 
-Yeah, I'm pretty sure changing the bus type is going to be worse than
-setting the hotplug handler.
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
-> TYPE_VIO_SPAPR_VSCSI_DEVICE is a subtype of TYPE_VIO_SPAPR_DEVICE is a
-> subtype of TYPE_DEVICE.
->=20
-> TYPE_DEVICE is bus-less, i.e. (concrete) instances do not plug into a
-> bus.
->=20
-> TYPE_VIO_SPAPR_DEVICE has bus_type TYPE_SPAPR_VIO_BUS, i.e. (concrete)
-> instances plug into a TYPE_SPAPR_VIO_BUS.  Both hot and cold plug.
->=20
-> Zapping TYPE_VIO_SPAPR_VSCSI_DEVICE's bus_type makes it bus-less.  I
-> doubt that's okay.  Also, it's not just about hot plug.  What are you
-> trying to accomplish?
 
-I'm pretty sure all of the above is not relevant.  It's the
-subordinate bus of TYPE_VIO_SPAPR_VSCSI_DEVICE on which we want to
-disable hotplugging, not the parent bus.  We can't hotplug spapr-vscsi
-controllers, but that's fine.  What we're trying to address here is
-that the controller supports a TYPE_SCSI_BUS, onto which disks can
-normally be hotplugged, but not in this case.
+--6goV4D73xPx55QNRI7riytbXwk60inXFi--
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---2NLGdgz3UMHa/lqP
+--NLRkFVYtYUZiEAal7FBkZMBS51YJ6gaUP
 Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl9E234ACgkQbDjKyiDZ
-s5Jk7w/+KsSBdI/yd4HPdRATeIphLPdv5mm/Cm/GFrt8JiMbt/PyIy3WjuWzsW0/
-5EYrQgHYZL2y2jIL/krA4EI+nY0UZ2MUxfDBxwMpDhs5yS2zkurHP1lfyrAwaWAL
-2ndCu9/mmYt3c3knplYcdCfvMiP//sYXnlUW54xLEira8TCHNDuosdigFAYQkhNN
-eGRASisLEMgk3x/MDkERgt6657gRhguDt31/kWNzefXhVEw+3nJ5HRy6NOl6pCwP
-/1+O4rUXcLDt+4fKfHjHvb3ZMThLJEeATgpSCflndSL43pfVurmn7r+FFk7xX6vv
-7GWE+IaeCyVne6WnfB8lYkN+pFvBSamO93r5y8upcvjdXOI/KpFgm/bgG1Ovm9+H
-CtLWqExkNZ5436k4nJskKG4PMkPEoIesaKeB16lXTlNcTZXDL3xnxnOX+Qb6hAfg
-TyXYAhGE+wzaU27Cwt+cVyopG56uA0iaO4tXhAW4W0TjWC34Tl+Ek6GrV8OkxlzN
-0BxKNH7AXYrSWnfZiSn/dkUIXWEzC4A6FaBx2AQuWxHmH3NXLaGn4ADS94SIoPKV
-Hs2kCnaDYgs0uHc1hpj0x/Ah66fVqBsJx0aXITbY92UG9WgM9QxSXnqelpMzcVin
-ncGm64ySQvYaQWFiT2gAFlmVs5Vd8h6CGIUzi6Wcuv2SiMSo/Vw=
-=XrFU
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl9E7oQACgkQ9AfbAGHV
+z0CuKwf/cK8PrAdQh25ykKt9o6FaCNMA/WmGAamFEDAAFGtfhxiuaLIAFGe90mdg
+qJnOAgOR0inpssh69HA6feSBXXsxIurwpQQFHE0c+2Vwb9WLl6E7/mFL85yi4/Rg
+2c0h6kG71ha6fZmDoVPWtzpMil3VlGEUYbqp957nNae72x4uGxVeVxypZ9eFJEQ2
+yA++MSnMkeKwkE2ArpF+xme6x+liUtQMt4DgQ/KfjYxqdRszwXlxa6/sR35eYP/a
+aCMYCfUOr8Vh9kI6pYA6zU4dWBnkcZfObeMIBr++HqBSlUJ+KFYR5ofjP8JV5ky+
+Mg+ka2lLjukRNgMpSq00WrPTrfeuag==
+=azrj
 -----END PGP SIGNATURE-----
 
---2NLGdgz3UMHa/lqP--
+--NLRkFVYtYUZiEAal7FBkZMBS51YJ6gaUP--
+
 
