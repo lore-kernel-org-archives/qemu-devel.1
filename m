@@ -2,92 +2,85 @@ Return-Path: <SRS0=2GMi=CD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3368C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 12:51:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32560C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 13:01:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B17C12075F
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 12:51:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E0CD020738
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 13:00:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EdjEcc1z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B17C12075F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gdI+6nDw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0CD020738
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53968 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57852 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAYPj-0006ah-Vc
-	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 08:50:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38204)
+	id 1kAYZP-0000t0-1w
+	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 09:00:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40614)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1kAYPD-00065p-Id
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 08:50:27 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:50522
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1kAYPB-00005P-0F
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 08:50:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598359823;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=M9tvBSaJMSYFv1fc5cVSCYsKK7qn9VQWyWAIG8G2kc4=;
- b=EdjEcc1zSwHCDqjmd+yGFW8dbvM6ITJgIuXA8et8xOEmvPJu9+W0uRByBpegRxKdgjleOF
- ZOPzzZb6jvhFkcEiHltVj6WNYNgy64+oAG/DG1w54jbXcrH5TgdRH/5Fr0E1+U4Qk933ut
- Bk5/+vmGoXkDCmOq5dFChzIhs9+b/G4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-320-EowPkB_SMaqieEY9fauHdA-1; Tue, 25 Aug 2020 08:50:21 -0400
-X-MC-Unique: EowPkB_SMaqieEY9fauHdA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6C55A8030AD;
- Tue, 25 Aug 2020 12:50:20 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-113-0.ams2.redhat.com
- [10.36.113.0])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 66376808A6;
- Tue, 25 Aug 2020 12:50:19 +0000 (UTC)
-Subject: Re: [PATCH v2 3/7] x86: cpuhp: refuse cpu hot-unplug request earlier
- if not supported
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-References: <20200818122208.1243901-1-imammedo@redhat.com>
- <20200818122208.1243901-4-imammedo@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <a0349df3-ab2f-1fa4-6a4b-f7edaa06e7fa@redhat.com>
-Date: Tue, 25 Aug 2020 14:50:18 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Firefox/52.0 Thunderbird/52.9.1
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kAYYJ-0000D6-B4
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 08:59:51 -0400
+Received: from mail-ej1-x633.google.com ([2a00:1450:4864:20::633]:35354)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kAYYH-0001HD-7P
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 08:59:50 -0400
+Received: by mail-ej1-x633.google.com with SMTP id a26so16423556ejc.2
+ for <qemu-devel@nongnu.org>; Tue, 25 Aug 2020 05:59:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=7Bk80A2gjYhW1OTUY3kazTZKsuhaegwUs/Fce+B+WeI=;
+ b=gdI+6nDwSWSrcF0pkHII1w7yHOFUXLLQ1cK61MPmIo78EpFhnF2kJwviAfw/OzHAv5
+ Ae6ZV3I/QMkc0JebluNrtW4wEQcob6LVP6gMfQAw2W5virmvAZM0iNMrJtlhjaryu5od
+ DIlhm106IX3QnkLTPAxkWoBC++uYHnfO1JtNFTXyz3FkOB8O8QXpl1V5Vk8XmZsnWOB2
+ W9TGhFJc0gaJSDWpXm1/TfnhreJ4I9USk9ZGZrgbUHx5tqavK8xA4yZFwJ3n11UrUFBp
+ hemb4T8Rtnjh2daB1GBeaONWPq2chZ9FQ4c3twBAyj91vqnHLf/vZnZ86bOkOdFaDfIl
+ 75wQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=7Bk80A2gjYhW1OTUY3kazTZKsuhaegwUs/Fce+B+WeI=;
+ b=nAU0V6VtiFzA9cC4qyG6PDIrEYzioFQqltT9+oa8P+PAiTrL5CDc+adgvYtnW6z0yg
+ GkyDGSMTF6ml89kHHMF+Sxte7ppznoUvmGgtbDWSKzXsCQZoI5xJFOHksX5eUOK1fwwO
+ xg0sjMaZJEEOBW/0s+1dNzkeCpTd8OwT54Z9xma1wBCryuoXDWG2kDTz7wpTlGwid6My
+ U4pTEPdqBzJPBD1XCTzoOyVuDnpMfeVyTQO5em3G0J6V3P4iMTRNWt21glizGL6ol1/f
+ COBAX3DQRWfHC+p+hfPfpHteFFK7mnbvy6PPFP/nwI5ZASI5MKY3hdWzkWGtHraUdX1a
+ VQyQ==
+X-Gm-Message-State: AOAM532vVApuHt1c+Sgjzxum+gHcocWzwLxQKOnYAHFOt52aG7t/DbJA
+ grQRR559FJLg4JGNkpHHyDC/mLNQlJx4OP/tEZT0Xg==
+X-Google-Smtp-Source: ABdhPJz64/e2Ffwyand31j+qVegkd/i3Q1AHZ1pBwrv/srr5qaOXw5xXv6ViGOwJpvI1R0SwEHuI0c2uWGS21qjh9aE=
+X-Received: by 2002:a17:907:2066:: with SMTP id
+ qp6mr1327528ejb.85.1598360387342; 
+ Tue, 25 Aug 2020 05:59:47 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200818122208.1243901-4-imammedo@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=lersek@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=lersek@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/25 01:35:36
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -56
-X-Spam_score: -5.7
-X-Spam_bar: -----
-X-Spam_report: (-5.7 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.958,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-2.602, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+References: <20200825062008.6502-1-kraxel@redhat.com>
+In-Reply-To: <20200825062008.6502-1-kraxel@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 25 Aug 2020 13:59:35 +0100
+Message-ID: <CAFEAcA_GwypdmJyRcyLyhcPdF0fqo2p8BhMfN-zmnsUCpV=XSw@mail.gmail.com>
+Subject: Re: [PULL 0/3] Fixes 20200825 patches
+To: Gerd Hoffmann <kraxel@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::633;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x633.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -101,69 +94,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: boris.ostrovsky@oracle.com, aaron.young@oracle.com
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 08/18/20 14:22, Igor Mammedov wrote:
-> CPU hot-unplug with SMM requires firmware participation to prevent
-> guest crash (i.e. CPU can be removed only after OS _and_ firmware
-> were prepared for the action).
-> Previous patches introduced ICH9_LPC_SMI_F_CPU_HOT_UNPLUG_BIT
-> feature bit, which is advertised by firmware when it has support
-> for CPU hot-unplug. Use it to check if guest is able to handle
-> unplug and make device_del fail gracefully if hot-unplug feature
-> hasn't been negotiated.
-> 
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> Tested-by: Laszlo Ersek <lersek@redhat.com>
-> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-> ---
-> v2:
->  - fix typo in commit message
->  - drop 5.1 version from hint message (Laszlo)
-> ---
->  hw/acpi/ich9.c | 12 ++++++++++++
->  1 file changed, 12 insertions(+)
-> 
-> diff --git a/hw/acpi/ich9.c b/hw/acpi/ich9.c
-> index 0acc9a3107..95cb0f935b 100644
-> --- a/hw/acpi/ich9.c
-> +++ b/hw/acpi/ich9.c
-> @@ -460,6 +460,18 @@ void ich9_pm_device_unplug_request_cb(HotplugHandler *hotplug_dev,
->                                        errp);
->      } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU) &&
->                 !lpc->pm.cpu_hotplug_legacy) {
-> +        uint64_t negotiated = lpc->smi_negotiated_features;
-> +
-> +        if (negotiated & BIT_ULL(ICH9_LPC_SMI_F_BROADCAST_BIT) &&
-> +            !(negotiated & BIT_ULL(ICH9_LPC_SMI_F_CPU_HOT_UNPLUG_BIT))) {
-> +            error_setg(errp, "cpu hot-unplug with SMI wasn't enabled "
-> +                             "by firmware");
-> +            error_append_hint(errp, "update machine type to a version having "
-> +                                    "x-smi-cpu-hotunplug=on and firmware that "
-> +                                    "supports CPU hot-unplug with SMM");
-> +            return;
-> +        }
-> +
->          acpi_cpu_unplug_request_cb(hotplug_dev, &lpc->pm.cpuhp_state,
->                                     dev, errp);
->      } else {
-> 
+On Tue, 25 Aug 2020 at 07:22, Gerd Hoffmann <kraxel@redhat.com> wrote:
+>
+> The following changes since commit 30aa19446d82358a30eac3b556b4d6641e00b7c1:
+>
+>   Merge remote-tracking branch 'remotes/cschoenebeck/tags/pull-9p-20200812' into staging (2020-08-24 16:39:53 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://git.kraxel.org/qemu tags/fixes-20200825-pull-request
+>
+> for you to fetch changes up to 9755c94a50c8b845ad133a6e660f55ca131b9c7a:
+>
+>   meson: avoid compiling qemu-keymap by default (2020-08-25 08:12:19 +0200)
+>
+> ----------------------------------------------------------------
+> meson: keymap fixes
+>
+> ----------------------------------------------------------------
 
-A trivial comment:
 
-Patch#2 says "x86: cphp: " in the subject line, but patch#3 says "x86:
-cpuhp: " (note the extra "u").
 
-I'm fine with either "cphp" or "cpuhp", but the subjects should be
-consistent -- both patches should use the same word.
+Applied, thanks.
 
-Preserve my T-b and R-b on both patches #2 and #3, after fixing up one
-of the subjects. (Up to you which one.)
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.2
+for any user-visible changes.
 
-Thanks!
-Laszlo
-
+-- PMM
 
