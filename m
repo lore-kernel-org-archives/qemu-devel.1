@@ -7,74 +7,74 @@ X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CBA8C433E4
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 19:38:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34EADC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 19:39:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E6C272075E
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 19:38:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 085652076C
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 19:39:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ib+xYkge"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6C272075E
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T9XuLvQl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 085652076C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56950 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60226 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAem1-00083l-35
-	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 15:38:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40176)
+	id 1kAemi-0000xB-9C
+	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 15:39:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40378)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kAeWf-0000gD-QY
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 15:22:33 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:43227)
+ id 1kAeWz-0001Y1-A4
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 15:22:53 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:54815)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kAeWd-0006F0-2L
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 15:22:33 -0400
+ id 1kAeWx-0006IE-Ec
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 15:22:52 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598383350;
+ s=mimecast20190719; t=1598383370;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=h0jc4y3pzQBp649mI+dEINndj2MNwTHkwFwmNAlFfKM=;
- b=ib+xYkgeBGrY69sAoYDfUmnbLGMh8PQF2l/z/Y5AE/Q8CgVBEtpmxOC7pAC17DCNgaUFi0
- DUrgau7h8lnOp+VfFoRawyq6Nrca1luOFuWjJaQPzR7Oall4FVjPcyc0WBM5FWINxZwjin
- +QwIsIvuOu/CXhU3cHWHRmrY6IyUIts=
+ bh=kpUdXIYBN+c71Zx0Thee68/jq9dVIOxyPTQmNz6rlaU=;
+ b=T9XuLvQlB02jPXeORCiv7NdaxVUoxZ52tQYi1nDKZDhvPsf8PZP2ci7y33SGrcUb170grS
+ xGxrjRogj6x6BfQDk5xKs7fVdGRHAwbRY1TiLM68/9y23kZjDNOf8LtBoHS+TNfXhWenZd
+ QMtW2wKdandpeO4ie7qY6xyX0bsD/Wk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-337--4R6HDb9MIG57e5q69B4-Q-1; Tue, 25 Aug 2020 15:22:28 -0400
-X-MC-Unique: -4R6HDb9MIG57e5q69B4-Q-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-512-Ng2TgE16PaqwGbE32pX11g-1; Tue, 25 Aug 2020 15:22:49 -0400
+X-MC-Unique: Ng2TgE16PaqwGbE32pX11g-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9C638801AB5
- for <qemu-devel@nongnu.org>; Tue, 25 Aug 2020 19:22:27 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0215185B67B;
+ Tue, 25 Aug 2020 19:22:48 +0000 (UTC)
 Received: from localhost (unknown [10.10.67.254])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B477A6F936;
- Tue, 25 Aug 2020 19:22:24 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8DC3010013C2;
+ Tue, 25 Aug 2020 19:22:47 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 33/74] pckbd: Move QOM macro to header
-Date: Tue, 25 Aug 2020 15:20:29 -0400
-Message-Id: <20200825192110.3528606-34-ehabkost@redhat.com>
+Subject: [PATCH v3 43/74] nubus: Rename class type checking macros
+Date: Tue, 25 Aug 2020 15:20:39 -0400
+Message-Id: <20200825192110.3528606-44-ehabkost@redhat.com>
 In-Reply-To: <20200825192110.3528606-1-ehabkost@redhat.com>
 References: <20200825192110.3528606-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
 X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=ehabkost@redhat.com;
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=ehabkost@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/25 02:03:58
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/25 06:38:59
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -96,56 +96,67 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Paolo Bonzini <pbonzini@redhat.com>,
- "Daniel P. Berrange" <berrange@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>
+ "Daniel P. Berrange" <berrange@redhat.com>, Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Move the I8042 macro close to the TYPE_I8042 define.
+Rename the existing class type checking macros to be consistent
+with the type name and instance type checking macro.  Use a
+NUBUS_MACFB prefix instead of MACFB_NUBUS.
 
 This will make future conversion to OBJECT_DECLARE* easier.
 
-Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
-Changes v2 -> v3: none
+Changes series v2 -> v3: new patch added in series v3
 
-Changes series v1 -> v2: new patch in series v2
-
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+---
+Cc: Laurent Vivier <laurent@vivier.eu>
 Cc: qemu-devel@nongnu.org
 ---
- include/hw/input/i8042.h | 1 +
- hw/input/pckbd.c         | 2 --
- 2 files changed, 1 insertion(+), 2 deletions(-)
+ include/hw/display/macfb.h | 4 ++--
+ hw/display/macfb.c         | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/include/hw/input/i8042.h b/include/hw/input/i8042.h
-index 8eaebf50ce..4569dfddd9 100644
---- a/include/hw/input/i8042.h
-+++ b/include/hw/input/i8042.h
-@@ -11,6 +11,7 @@
- #include "hw/isa/isa.h"
+diff --git a/include/hw/display/macfb.h b/include/hw/display/macfb.h
+index 26367ae2c4..347871b623 100644
+--- a/include/hw/display/macfb.h
++++ b/include/hw/display/macfb.h
+@@ -40,9 +40,9 @@ typedef struct {
+     MacfbState macfb;
+ } MacfbSysBusState;
  
- #define TYPE_I8042 "i8042"
-+#define I8042(obj) OBJECT_CHECK(ISAKBDState, (obj), TYPE_I8042)
+-#define MACFB_NUBUS_DEVICE_CLASS(class) \
++#define NUBUS_MACFB_CLASS(class) \
+     OBJECT_CLASS_CHECK(MacfbNubusDeviceClass, (class), TYPE_NUBUS_MACFB)
+-#define MACFB_NUBUS_GET_CLASS(obj) \
++#define NUBUS_MACFB_GET_CLASS(obj) \
+     OBJECT_GET_CLASS(MacfbNubusDeviceClass, (obj), TYPE_NUBUS_MACFB)
  
- #define I8042_A20_LINE "a20"
+ typedef struct MacfbNubusDeviceClass {
+diff --git a/hw/display/macfb.c b/hw/display/macfb.c
+index b68faff4bb..ff8bdb846b 100644
+--- a/hw/display/macfb.c
++++ b/hw/display/macfb.c
+@@ -391,7 +391,7 @@ static void macfb_nubus_realize(DeviceState *dev, Error **errp)
+ {
+     NubusDevice *nd = NUBUS_DEVICE(dev);
+     MacfbNubusState *s = NUBUS_MACFB(dev);
+-    MacfbNubusDeviceClass *ndc = MACFB_NUBUS_GET_CLASS(dev);
++    MacfbNubusDeviceClass *ndc = NUBUS_MACFB_GET_CLASS(dev);
+     MacfbState *ms = &s->macfb;
  
-diff --git a/hw/input/pckbd.c b/hw/input/pckbd.c
-index 29d633ca94..dde85ba6c6 100644
---- a/hw/input/pckbd.c
-+++ b/hw/input/pckbd.c
-@@ -481,8 +481,6 @@ void i8042_mm_init(qemu_irq kbd_irq, qemu_irq mouse_irq,
-     qemu_register_reset(kbd_reset, s);
- }
+     ndc->parent_realize(dev, errp);
+@@ -443,7 +443,7 @@ static void macfb_sysbus_class_init(ObjectClass *klass, void *data)
+ static void macfb_nubus_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
+-    MacfbNubusDeviceClass *ndc = MACFB_NUBUS_DEVICE_CLASS(klass);
++    MacfbNubusDeviceClass *ndc = NUBUS_MACFB_CLASS(klass);
  
--#define I8042(obj) OBJECT_CHECK(ISAKBDState, (obj), TYPE_I8042)
--
- struct ISAKBDState {
-     ISADevice parent_obj;
- 
+     device_class_set_parent_realize(dc, macfb_nubus_realize,
+                                     &ndc->parent_realize);
 -- 
 2.26.2
 
