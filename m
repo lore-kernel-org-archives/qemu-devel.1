@@ -2,84 +2,85 @@ Return-Path: <SRS0=2GMi=CD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77E7CC433E3
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 16:54:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C071C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 16:55:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 435A52074D
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 16:54:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5174E2074D
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 16:55:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qL+3KK6v"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 435A52074D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oOHrNjqj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5174E2074D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57576 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58164 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAcDi-0002Jm-FT
-	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 12:54:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58474)
+	id 1kAcDr-0002ZK-GW
+	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 12:54:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58518)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kAcD1-00017Q-PT
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 12:54:07 -0400
-Received: from mail-pg1-x52d.google.com ([2607:f8b0:4864:20::52d]:40815)
+ id 1kAcD6-0001Fj-GT
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 12:54:12 -0400
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:45541)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kAcD0-0003fb-6Q
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 12:54:07 -0400
-Received: by mail-pg1-x52d.google.com with SMTP id h12so7229681pgm.7
- for <qemu-devel@nongnu.org>; Tue, 25 Aug 2020 09:54:05 -0700 (PDT)
+ id 1kAcD4-0003gG-Rk
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 12:54:12 -0400
+Received: by mail-pf1-x444.google.com with SMTP id k15so1340716pfc.12
+ for <qemu-devel@nongnu.org>; Tue, 25 Aug 2020 09:54:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=5EU+iN7Rjwb8vHvybFENyYEoG6wKKZBygxn/P8M+ZLw=;
- b=qL+3KK6vayAx6K/Q77UmCkwnlV98CpiYY87x4B0bLtt4pUsgn8B29N2MkFYizRYI2w
- f+IYMotUh9O3lpuhEfWWf5xaZz04tjioRkqxyRFM8lBmHrN3Adji0Kr0T/g0AzftdH9S
- uqy4VNhgyZUCI25BZNBXuEgi+t9EPnGKLPGTG4amKSGBVHWpMun2wAspKMeiPnGFH0aq
- IKbFz9zMD6eMdji1lsvhRFQWJDVBCF7OGN7eYNj3QQqeOwrBrVvWJjWVyRSeBGUcfUJg
- IgnaY1pdXjaSvGQf90b72S3xub6TKjU6mCumVa7K4JCo5BRqC7URJLkwn5309iPV0Yg/
- pz4w==
+ bh=bzrUXWXJ2P4FPb4Z7Y3jIG7wAqzpJKqykSmKTUKfTsk=;
+ b=oOHrNjqjLxIlvODn6hHVZ0ptZCsU3Yxnup8VcCLSxqCnxWC+VFFbAMk/oQmjLKUJX2
+ qP5Qy2DiUAaTmwhr3DNsOkrl42YNWHJwhCAphi7YbV1JbHWjKKeBsA6tOLArK+qigfb8
+ Mmj5zN+ypOwg+7UIn7gJ/p6be3bmnLUM36hEsICpVE4FBFo0jea6mZALSSEvHfirvgsS
+ IshkTxESUo8V/kVd0LX+lf9eUPSV9tTogvedZ4sql6iLraDIabRq8pJqcpIZdhA6TxTc
+ QqVlBJ77rgRiRAU0hci/BYyPsVcFB+8cJfBkLLy9Qv+T/mNelAV4YQGNyFOhjuW5HTdj
+ 4q4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=5EU+iN7Rjwb8vHvybFENyYEoG6wKKZBygxn/P8M+ZLw=;
- b=N8gT3unX78ntFXiuNbDJseYlvImLfVXBByUyFk61crE7NCVKzyzuinxQJZpRVlD8Ah
- giNmu1d9YLQP6Za7TkKN7pEb6MtDSS1WD6rfaTlgTGmnde02VH4RW4JrlHf5Wot7BuJc
- FaFLWrXbdPEIXGAvs3Ty3HMmizGh6pk6PZsrPNIou1zgSIFituZsvmMWgXIz/cVo0+bm
- aJavkrnRYL6XDdgpkZLIQXoB8eB7S5Vi+Mvrs9uyS4S/isEP2NkdoXCEKSWC4i1xeg02
- k3DH7y2EtR4S0WVXqw3I8c473Uet+qdp1+C0CZkIGcQnpWWUjZTKeH8GpgVc128Zb4F+
- 3dSQ==
-X-Gm-Message-State: AOAM5314hmeGtGEYaYLJgw26cIHahjCR7tmy4ZZ/Y+qXpiuOo6Rr+5JL
- bY8S3knz8CYRFCZ1Y+tdh61MT5vnzNXruuACnqk=
-X-Google-Smtp-Source: ABdhPJxqwDwpHYF2VPB+TT8sCBC9YW7f4tqBjlFFpNbVkn4HbXTdEjDBQuyr9evHPWBD4ZaCdv8OGw==
-X-Received: by 2002:a17:902:d341:: with SMTP id
- l1mr7497165plk.36.1598374444231; 
- Tue, 25 Aug 2020 09:54:04 -0700 (PDT)
+ bh=bzrUXWXJ2P4FPb4Z7Y3jIG7wAqzpJKqykSmKTUKfTsk=;
+ b=hC1/2rr6lrDT3NMRRA2wC5JzMaE9HzRCgrkCS90GoakiTLVWYFFDcmGjwuvNDsuQJH
+ 7DbG3G6iwAcFhKiSqkJRxoVECU36/m4WObi1Rtl3M5tDxZhFOYVdaDiviO2EWE9vPN3B
+ nZBk67wxbudeC19M6c87sYecFlwnH+6nMXXFi/KTaodL/y0mp5CRy8+brbNg5KdtRN/O
+ S5H6I/Qjb5Oe2SCysFP28qC/SXkE8w53lwPcTJdqELRkBgDOIW9QdWqz9CwPJ1ZiHHWx
+ TQyh8eiUyb5T4ygfrmH9/gHiLPcyBsMlsJDKE3O3//fB56VT9vdqY/sPBiHck7rvHGMB
+ j3OA==
+X-Gm-Message-State: AOAM533NQGvDcU//0a9p177Of3+St6UIhC8obxNUmgoYZR/iGPIL9Dmx
+ Oar4vHWtaKmLHVsW/H/cxewSuZq8kUe0awBJTxA=
+X-Google-Smtp-Source: ABdhPJw7MMBTBkAMI4hCR53aQrxZ31YCKUkBEAWah2Tfg1yVhwecSp1pQRUbnW/JojZvxtd+0zU5Ng==
+X-Received: by 2002:a17:902:e901:: with SMTP id
+ k1mr8896107pld.189.1598374448962; 
+ Tue, 25 Aug 2020 09:54:08 -0700 (PDT)
 Received: from localhost.localdomain ([222.95.248.6])
  by smtp.googlemail.com with ESMTPSA id
- 193sm15988527pfu.169.2020.08.25.09.54.02
+ 193sm15988527pfu.169.2020.08.25.09.54.06
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 25 Aug 2020 09:54:03 -0700 (PDT)
+ Tue, 25 Aug 2020 09:54:08 -0700 (PDT)
 From: luoyonggang@gmail.com
 To: qemu-devel@nongnu.org
-Subject: [PATCH 2/4] meson: fixes relpath may fail on win32.
-Date: Wed, 26 Aug 2020 00:53:39 +0800
-Message-Id: <20200825165341.520-2-luoyonggang@gmail.com>
+Subject: [PATCH 4/4] configure: Fix include and linkage issue on msys2
+Date: Wed, 26 Aug 2020 00:53:41 +0800
+Message-Id: <20200825165341.520-4-luoyonggang@gmail.com>
 X-Mailer: git-send-email 2.27.0.windows.1
 In-Reply-To: <20200825165341.520-1-luoyonggang@gmail.com>
 References: <20200825165341.520-1-luoyonggang@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::52d;
- envelope-from=luoyonggang@gmail.com; helo=mail-pg1-x52d.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::444;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pf1-x444.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -109,36 +110,106 @@ Sender: "Qemu-devel"
 
 From: Yonggang Luo <luoyonggang@gmail.com>
 
-On win32, os.path.relpath would raise exception when do the following relpath:
-C:/msys64/mingw64/x.exe relative to E:/path/qemu-build would fail.
-So we try catch it for stopping it from raise exception on msys2
----
- scripts/mtest2make.py | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+On msys2, the -I/e/path/to/qemu -L/e/path/to/qemu are not recognized by the compiler
+Cause $PWD are result posix style path such as /e/path/to/qemu that can not be recognized
+by mingw gcc, and `pwd -W` are result Windows style path such as E:/path/to/qemu that can
+be recognized by the mingw gcc. So we replace all $PWD with $build_path that can
+building qemu under msys2/mingw environment.
 
-diff --git a/scripts/mtest2make.py b/scripts/mtest2make.py
-index bdb257bbd9..d7a51bf97e 100644
---- a/scripts/mtest2make.py
-+++ b/scripts/mtest2make.py
-@@ -53,9 +53,16 @@ i = 0
- for test in json.load(sys.stdin):
-     env = ' '.join(('%s=%s' % (shlex.quote(k), shlex.quote(v))
-                     for k, v in test['env'].items()))
--    executable = os.path.relpath(test['cmd'][0])
-+    executable = test['cmd'][0]
-+    try:
-+        executable = os.path.relpath(executable)
-+    except:
-+        pass
-     if test['workdir'] is not None:
--        test['cmd'][0] = os.path.relpath(test['cmd'][0], test['workdir'])
-+        try:
-+            test['cmd'][0] = os.path.relpath(executable, test['workdir'])
-+        except:
-+            test['cmd'][0] = executable
-     else:
-         test['cmd'][0] = executable
-     cmd = '$(.test.env) %s %s' % (env, ' '.join((shlex.quote(x) for x in test['cmd'])))
+Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
+---
+ configure | 28 +++++++++++++++++++---------
+ 1 file changed, 19 insertions(+), 9 deletions(-)
+
+diff --git a/configure b/configure
+index b1e11397a8..3b9e79923d 100755
+--- a/configure
++++ b/configure
+@@ -13,8 +13,13 @@ export CCACHE_RECACHE=yes
+ 
+ # make source path absolute
+ source_path=$(cd "$(dirname -- "$0")"; pwd)
++build_path=$PWD
++if [ "$MSYSTEM" = "MINGW64" -o  "$MSYSTEM" = "MINGW32" ]; then
++source_path=$(cd "$(dirname -- "$0")"; pwd -W)
++build_path=`pwd -W`
++fi
+ 
+-if test "$PWD" = "$source_path"
++if test "$build_path" = "$source_path"
+ then
+     echo "Using './build' as the directory for build output"
+ 
+@@ -346,7 +351,12 @@ ld_has() {
+     $ld --help 2>/dev/null | grep ".$1" >/dev/null 2>&1
+ }
+ 
+-if printf %s\\n "$source_path" "$PWD" | grep -q "[[:space:]:]";
++check_valid_build_path="[[:space:]:]"
++if [ "$MSYSTEM" = "MINGW64" -o  "$MSYSTEM" = "MINGW32" ]; then
++check_valid_build_path="[[:space:]]"
++fi
++
++if printf %s\\n "$source_path" "$build_path" | grep -q "$check_valid_build_path";
+ then
+   error_exit "main directory cannot contain spaces nor colons"
+ fi
+@@ -942,7 +952,7 @@ Linux)
+   linux="yes"
+   linux_user="yes"
+   kvm="yes"
+-  QEMU_INCLUDES="-isystem ${source_path}/linux-headers -I$PWD/linux-headers $QEMU_INCLUDES"
++  QEMU_INCLUDES="-isystem ${source_path}/linux-headers -I${build_path}/linux-headers $QEMU_INCLUDES"
+   libudev="yes"
+ ;;
+ esac
+@@ -4283,7 +4293,7 @@ EOF
+               symlink "$source_path/dtc/Makefile" "dtc/Makefile"
+           fi
+           fdt_cflags="-I${source_path}/dtc/libfdt"
+-          fdt_ldflags="-L$PWD/dtc/libfdt"
++          fdt_ldflags="-L${build_path}/dtc/libfdt"
+           fdt_libs="$fdt_libs"
+       elif test "$fdt" = "yes" ; then
+           # Not a git build & no libfdt found, prompt for system install
+@@ -5268,7 +5278,7 @@ case "$capstone" in
+     else
+       LIBCAPSTONE=libcapstone.a
+     fi
+-    capstone_libs="-L$PWD/capstone -lcapstone"
++    capstone_libs="-L${build_path}/capstone -lcapstone"
+     capstone_cflags="-I${source_path}/capstone/include"
+     ;;
+ 
+@@ -6268,8 +6278,8 @@ case "$slirp" in
+       git_submodules="${git_submodules} slirp"
+     fi
+     mkdir -p slirp
+-    slirp_cflags="-I${source_path}/slirp/src -I$PWD/slirp/src"
+-    slirp_libs="-L$PWD/slirp -lslirp"
++    slirp_cflags="-I${source_path}/slirp/src -I${build_path}/slirp/src"
++    slirp_libs="-L${build_path}/slirp -lslirp"
+     if test "$mingw32" = "yes" ; then
+       slirp_libs="$slirp_libs -lws2_32 -liphlpapi"
+     fi
+@@ -8212,7 +8222,7 @@ fi
+ mv $cross config-meson.cross
+ 
+ rm -rf meson-private meson-info meson-logs
+-NINJA=$PWD/ninjatool $meson setup \
++NINJA="${build_path}/ninjatool" $meson setup \
+         --prefix "${pre_prefix}$prefix" \
+         --libdir "${pre_prefix}$libdir" \
+         --libexecdir "${pre_prefix}$libexecdir" \
+@@ -8232,7 +8242,7 @@ NINJA=$PWD/ninjatool $meson setup \
+ 	-Dvnc=$vnc -Dvnc_sasl=$vnc_sasl -Dvnc_jpeg=$vnc_jpeg -Dvnc_png=$vnc_png \
+ 	-Dgettext=$gettext -Dxkbcommon=$xkbcommon \
+         $cross_arg \
+-        "$PWD" "$source_path"
++        "$build_path" "$source_path"
+ 
+ if test "$?" -ne 0 ; then
+     error_exit "meson setup failed"
 -- 
 2.27.0.windows.1
 
