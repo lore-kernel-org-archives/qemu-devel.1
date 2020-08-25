@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-12.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 200BCC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 20:30:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34471C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 20:31:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DEA3120715
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 20:30:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0018620715
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 20:31:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=yadro.com header.i=@yadro.com header.b="Iygl/1WW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DEA3120715
+	dkim=pass (1024-bit key) header.d=yadro.com header.i=@yadro.com header.b="CQpMNTi/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0018620715
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yadro.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57922 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60710 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAfaa-0008ML-3c
-	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 16:30:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55958)
+	id 1kAfbf-0001C8-94
+	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 16:31:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55974)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
- id 1kAfY8-0005X3-5s
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 16:28:08 -0400
-Received: from mta-02.yadro.com ([89.207.88.252]:35310 helo=mta-01.yadro.com)
+ id 1kAfYA-0005aH-0v
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 16:28:10 -0400
+Received: from mta-02.yadro.com ([89.207.88.252]:35288 helo=mta-01.yadro.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
- id 1kAfY5-0006O0-5y
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 16:28:07 -0400
+ id 1kAfY4-0006Ne-Tq
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 16:28:09 -0400
 Received: from localhost (unknown [127.0.0.1])
- by mta-01.yadro.com (Postfix) with ESMTP id A5AC457501;
- Tue, 25 Aug 2020 20:28:02 +0000 (UTC)
+ by mta-01.yadro.com (Postfix) with ESMTP id 746E457502;
+ Tue, 25 Aug 2020 20:28:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=yadro.com; h=
  content-type:content-type:content-transfer-encoding:mime-version
  :references:in-reply-to:x-mailer:message-id:date:date:subject
  :subject:from:from:received:received:received; s=mta-01; t=
- 1598387281; x=1600201682; bh=TbQEarL239nqt/ACiFvj/GPvI1T0st/AiN4
- tRxK7WqI=; b=Iygl/1WW8S88ikiqZ7idB404LBl3SPqxPfW9v1JYmr5bDCamwtE
- F4in4yZhm5DR0V0dmY4U7+nnC++UjsoAuUSaF1s2GWuy6T5gOE8k9Qh+OdYuSUFR
- 7bfbkJ0rjpCLvXA+5nC9bBNeSyohsQvUsFdSd7jq70I7gFxJ365Kn/NU=
+ 1598387280; x=1600201681; bh=b0G63lLIq4mnzK2xfL55xP+40i9MOQJLuKl
+ +0XEVZ5w=; b=CQpMNTi/byfL/qpJgx4RasPAJXwUu8C9RSZONQGpyJtOglrVaDc
+ VY57uil2g+nHWG4hWB/TRGUIj9E1WYJ5M4iDURpdBp/ARQ4DKeTCciYBIhmbGEz5
+ iwATTibxj1Wojs+TANf75+oP7byL7uiA00KI+IjPtkp9QW2QYoCuIiNE=
 X-Virus-Scanned: amavisd-new at yadro.com
 Received: from mta-01.yadro.com ([127.0.0.1])
  by localhost (mta-01.yadro.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 6kWsY9YtsYN8; Tue, 25 Aug 2020 23:28:01 +0300 (MSK)
+ with ESMTP id 37rjtLfX8I3o; Tue, 25 Aug 2020 23:28:00 +0300 (MSK)
 Received: from T-EXCH-02.corp.yadro.com (t-exch-02.corp.yadro.com
  [172.17.10.102])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
  (No client certificate requested)
- by mta-01.yadro.com (Postfix) with ESMTPS id 31DDF574EA;
- Tue, 25 Aug 2020 23:28:01 +0300 (MSK)
+ by mta-01.yadro.com (Postfix) with ESMTPS id 6484F574EC;
+ Tue, 25 Aug 2020 23:28:00 +0300 (MSK)
 Received: from localhost (172.17.204.212) by T-EXCH-02.corp.yadro.com
  (172.17.10.102) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P384) id 15.1.669.32; Tue, 25
- Aug 2020 23:28:01 +0300
+ Aug 2020 23:27:59 +0300
 From: Roman Bolshakov <r.bolshakov@yadro.com>
 To: <qemu-devel@nongnu.org>
-Subject: [PATCH v2 3/4] configure: Prefer gmake on darwin
-Date: Tue, 25 Aug 2020 23:27:54 +0300
-Message-ID: <20200825202755.50626-4-r.bolshakov@yadro.com>
+Subject: [PATCH v2 1/4] configure: Use discovered make for in-source build
+Date: Tue, 25 Aug 2020 23:27:52 +0300
+Message-ID: <20200825202755.50626-2-r.bolshakov@yadro.com>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20200825202755.50626-1-r.bolshakov@yadro.com>
 References: <20200825202755.50626-1-r.bolshakov@yadro.com>
@@ -102,60 +102,41 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-New meson/make build requires GNU make 3.82+ but macOS ships 3.81 even
-on Big Sur while homebrew provides GNU make 4.3 as 'gmake' in $PATH.
+A recursive make is invoked if in-source build is used but $(MAKE) is
+the same as the one used in the original make invocation.
 
-With the change, 'make' switches over to gmake implicitly.
+Some platforms have preference to use gmake, or a make passed as an
+option to "configure". Honor the choice.
 
 Signed-off-by: Roman Bolshakov <r.bolshakov@yadro.com>
 ---
- configure | 26 ++++++++++++++++++++++++++
- 1 file changed, 26 insertions(+)
+ configure | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
 diff --git a/configure b/configure
-index 07732bf011..664084992b 100755
+index b1e11397a8..07732bf011 100755
 --- a/configure
 +++ b/configure
-@@ -907,6 +907,7 @@ Darwin)
-   darwin="yes"
-   hax="yes"
-   hvf="yes"
-+  make="${MAKE-gmake}"
-   LDFLAGS_SHARED="-bundle -undefined dynamic_lookup"
-   if [ "$cpu" = "x86_64" ] ; then
-     QEMU_CFLAGS="-arch x86_64 $QEMU_CFLAGS"
-@@ -920,6 +921,31 @@ Darwin)
-   # won't work when we're compiling with gcc as a C compiler.
-   QEMU_CFLAGS="-DOS_OBJECT_USE_OBJC=0 $QEMU_CFLAGS"
-   HOST_VARIANT_DIR="darwin"
-+  cat > GNUmakefile <<'EOF'
-+# This file is auto-generated by configure to implicitly switch from a 'make'
-+# invocation to 'gmake'
-+
-+OLD_MAKE := $(MAKE)
-+
-+ifeq ($(wildcard config-host.mak),)
+@@ -38,6 +38,11 @@ then
+ # This file is auto-generated by configure to support in-source tree
+ # 'make' command invocation
+ 
++ifeq ($(wildcard build/config-host.mak),)
 +$(error Incomplete configuration. Please run `configure`)
 +endif
-+include config-host.mak
++include build/config-host.mak
 +
-+ifeq ($(MAKECMDGOALS),)
-+recurse: all
-+endif
-+
-+.NOTPARALLEL: %
-+%: force
-+	@echo 'Switch from $(OLD_MAKE) to $(MAKE)'
-+	@$(MAKE) -f Makefile $(MAKECMDGOALS)
-+force: ;
-+.PHONY: force
-+GNUmakefile: ;
-+config-host.mak: ;
-+
-+EOF
- ;;
- SunOS)
-   solaris="yes"
+ ifeq ($(MAKECMDGOALS),)
+ recurse: all
+ endif
+@@ -54,6 +59,7 @@ endif
+ force: ;
+ .PHONY: force
+ GNUmakefile: ;
++build/config-host.mak: ;
+ 
+ EOF
+     cd build
 -- 
 2.28.0
 
