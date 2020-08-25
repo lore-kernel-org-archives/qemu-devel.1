@@ -2,127 +2,91 @@ Return-Path: <SRS0=2GMi=CD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,RCVD_ILLEGAL_IP,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CA7FC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 14:52:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0369CC433E3
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 14:52:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3305120786
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 14:52:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C24F72075F
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 14:52:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b="c8hhhE6E"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3305120786
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=os.amperecomputing.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ohVoPahk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C24F72075F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42250 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46460 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAaIu-0001nn-Co
-	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 10:52:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48002)
+	id 1kAaJb-0003c7-1c
+	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 10:52:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49364)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <aaron@os.amperecomputing.com>)
- id 1kAaGa-0005gg-Em
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 10:49:40 -0400
-Received: from mail-mw2nam10on2112.outbound.protection.outlook.com
- ([40.107.94.112]:55521 helo=NAM10-MW2-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <aaron@os.amperecomputing.com>)
- id 1kAaGY-0008RH-JB
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 10:49:40 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=j6Rl4J5UUqQsUVQInraTUlVanFo72/mmp+Yx5DSOcPuZPQioUGmHuXehHHGwLNLuNhfipOshgcGX6Fto87bQlETwRglqu5SMbx5HiCuJlc0zvMjr2TilIoHHpPj8KIV59gNj8Bdjkj9Kfx8uEdcO4/1oGyYryJ9aa9Va5FwzzVt74GbTEmompmJ9nibo0Qq7c8wUNOmv8J1bzQUUt0yFo/kLSZzteDGtNwoqahba3yBGuJvp0BFQ5ZrnH3dfwl2g6b3YNisE2RrL3w03GHDAceLT1W7PVekt+aTDKVnKrBsD7qOWVRTQVUIdRc+ZftztFf6flBCpAeoiobsYAN13Aw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8An37WyOUMpteaKTZQmOKwiRU3d5MsT/RLHaGZFWzSg=;
- b=Mzi1JEU7DmcDiaOl5XlgNOKs9J2FB2McLRWO9nnwUBIhE9cR40r8iaGKvs0QDxbwMXOLoFaulJZrbMSYdXEu2clNgiPu6FhOgfZ/Es6EameqgJeFb87jZdhk/1llf9OjC+fp4eRDfnRcjO1sJmHHePzCqdbo9VKIza30auCL/xnpg8k16RgVZEbaxJG/WGTw8WMkzXlbueFH5puA/o3zeH12+UpXycdcrOYxyj16MPkcBBT6bMGsH5DuIO4/123UjXBtWQK8XpQeIGy1lie7zz1qfjEXjQ79Ho/w29ErbidlCpHBMG3IY4qPVcEGnzk1IH9rgKTK6u3BlZQx6zVzeQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
- header.from=os.amperecomputing.com; dkim=pass
- header.d=os.amperecomputing.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=os.amperecomputing.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8An37WyOUMpteaKTZQmOKwiRU3d5MsT/RLHaGZFWzSg=;
- b=c8hhhE6EsY4NC/X+5nijUao+i1/AoXGibDivXxTq4NzYktvsu4xdf9XdInax7ZEGGtXNy7E2RHkV9cbrl54S1RNFAPM7KzA5osA1H9XzaOJUIIzD1X5kkCpt78NUetws6f34FYSAL6sAAUNJFkwSNcgzPlyS2Rn37QGEgyUyr40=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none
- header.from=os.amperecomputing.com;
-Received: from SN6PR01MB4304.prod.exchangelabs.com (2603:10b6:805:a6::23) by
- SN6PR01MB4990.prod.exchangelabs.com (2603:10b6:805:c8::13) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3305.24; Tue, 25 Aug 2020 14:49:35 +0000
-Received: from SN6PR01MB4304.prod.exchangelabs.com
- ([fe80::447c:afdb:2702:e275]) by SN6PR01MB4304.prod.exchangelabs.com
- ([fe80::447c:afdb:2702:e275%5]) with mapi id 15.20.3305.032; Tue, 25 Aug 2020
- 14:49:34 +0000
-From: Aaron Lindsay <aaron@os.amperecomputing.com>
-To: qemu-devel@nongnu.org,
-	Peter Maydell <peter.maydell@linaro.org>
-Cc: Aaron Lindsay <aaron@os.amperecomputing.com>
-Subject: [PATCH] target/arm: Count PMU events when MDCR.SPME is set
-Date: Tue, 25 Aug 2020 10:48:10 -0400
-Message-Id: <20200825144810.1755379-1-aaron@os.amperecomputing.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <CAFEAcA9jUpJF4FQirb3avWJAMjh+AdkimW3DgMyMjbDjBCQSvQ@mail.gmail.com>
-References: <CAFEAcA9jUpJF4FQirb3avWJAMjh+AdkimW3DgMyMjbDjBCQSvQ@mail.gmail.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: MN2PR17CA0028.namprd17.prod.outlook.com
- (2603:10b6:208:15e::41) To SN6PR01MB4304.prod.exchangelabs.com
- (2603:10b6:805:a6::23)
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kAaIn-0001wS-3v
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 10:51:57 -0400
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:35937)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kAaIl-0000Xo-JX
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 10:51:56 -0400
+Received: by mail-pf1-x443.google.com with SMTP id m8so7551308pfh.3
+ for <qemu-devel@nongnu.org>; Tue, 25 Aug 2020 07:51:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=MU1D0gcoO3ZaMdBitGLyuB0vQmL5fSRzDQyIOcmupWk=;
+ b=ohVoPahkc/2gK3Rsd+a2bbGrnOOsqVW2vj8cBMSo1hoeFiuMskYoShu6gzrqMUyuwl
+ Fp/mzMmNpt8Ve3qsVCW5pJiUpLD8dAR6C20FQAEPyWTAOh47ysKH9BydAXtyYrCo3zLs
+ 1tz/dCuOCbVcGGqCgyVCVfDYuwGfc+Qa5T5M162UY4nTbrcGU5GjR3K/RsXzFPwVTgUR
+ 8UbkM9x+J/QTYsaaULPAobhdQLzax8d3w9AtHrXiUt+hn0HakVHT7y44gwj8650/kM/n
+ lg5LN6psD+MGUQ9c3gF9FoT5qlcR2fGu7MMqsX1QIby/x2GrMdV2n4Z7DbYJE+yO5hV1
+ +luA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=MU1D0gcoO3ZaMdBitGLyuB0vQmL5fSRzDQyIOcmupWk=;
+ b=IdAKP2ln4yd4EsMQDfyPHQUTCFdsIqR9E073vmsYBKxvPDhW15EUD34FzVqo0HbTN2
+ xrP9+hDfFjw/GThsVvZcThnvmmBvTgv1ipIXIjcpDZ1Xc8s8x0Ap3qnbEHm6hzYvOf82
+ qnJfKZ+BaX8vop0FgiZPG3YH5mBPqmoD6SBgwiDL2QQ27sE2rcOWOiGzaigWzwQkgwEA
+ y/f3xX4VBqmG5bxdsy7TPKcOICISd1jspbL7+GluUBSb/kevPyWJ5z0fCj1GJnZiFzH+
+ rfhtzUjAykqH8AYIEv2uEc5SFSWKRzlgpm5SomXHrzkZAuP8O3S+OE8JqZx0ECMaQzlh
+ 8Zvg==
+X-Gm-Message-State: AOAM533oDajoMPBBL0rxYSdrv0xHvyzhK9ksosUhie6iuQfjBR86roQA
+ RlcEhIbv9PFekjiTK/f3NE1pFa2BKiOYIkj7
+X-Google-Smtp-Source: ABdhPJy+opfCw285m1BaJXRV+7yNArTPmBS/bouh/w03m5MdGiQFj6z0EG+oVBuxSLOkXs/3EiSpTA==
+X-Received: by 2002:a17:902:7d85:: with SMTP id
+ a5mr8079601plm.148.1598367113655; 
+ Tue, 25 Aug 2020 07:51:53 -0700 (PDT)
+Received: from localhost.localdomain ([222.95.248.6])
+ by smtp.googlemail.com with ESMTPSA id m22sm3104383pja.36.2020.08.25.07.51.50
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 25 Aug 2020 07:51:52 -0700 (PDT)
+From: luoyonggang@gmail.com
+To: qemu-devel@nongnu.org
+Subject: [PATCH 1/4] meson: Fixes the ninjatool issue that E$$: are generated
+ in Makefile.ninja
+Date: Tue, 25 Aug 2020 22:51:30 +0800
+Message-Id: <20200825145133.178-1-luoyonggang@gmail.com>
+X-Mailer: git-send-email 2.27.0.windows.1
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from 255.255.255.255 (255.255.255.255) by
- MN2PR17CA0028.namprd17.prod.outlook.com (2603:10b6:208:15e::41) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3326.19 via Frontend
- Transport; Tue, 25 Aug 2020 14:49:34 +0000
-X-Mailer: git-send-email 2.27.0
-X-Originating-IP: [68.73.113.219]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: b72b8d38-48c2-45d5-125a-08d84906152a
-X-MS-TrafficTypeDiagnostic: SN6PR01MB4990:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SN6PR01MB4990E8615A844BE3B719BA858A570@SN6PR01MB4990.prod.exchangelabs.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:172;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: IXSeWXNg06NNIX8xudNKx7WQbaErK3NopsqJHqZuJQ7CJX/MHcpZExFK20W5UBSIWOnhqcb3iomRVcmcDmMzMW3dmujLiBysVI8m4MykdETYnY4XdZAaMOmHb8iB49AZAE1GYcT0SCmRAkHuYUbock5tLVeyqHTSB5zYaG1JqTy84vxV8aZqJojbugRiDJ+Lr9HRqaNw700AGqsm1337kVjWcEia3+CbpvZ2VlW24DyuqPctP9hLOyR4tVtu3vyNVfxcEoKxVJ5VT1b6xsp2BfW60qM1EGGU3An/RFf1yagfimeD3PJ3q6fne3I6OFGU
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:SN6PR01MB4304.prod.exchangelabs.com; PTR:; CAT:NONE;
- SFS:(4636009)(376002)(396003)(346002)(39840400004)(136003)(366004)(1076003)(83380400001)(66556008)(66946007)(186003)(6666004)(26005)(4326008)(66476007)(4744005)(52116002)(5660300002)(6486002)(6916009)(16576012)(8936002)(107886003)(86362001)(316002)(956004)(2906002)(8676002)(478600001)(2616005);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: 4ITKFQqr0X+LMdvVHONkVLEZI4ebHKkEgF2vuFR5gdBs/pHvBL1xQeVG2b+dLuUYhJor4gxH3BmNWVikrHfIejn7YIlLITR6jV/Us/oRUMdFiSniafNPz4nTucBjIb5sF5ODlsD2++xfFWcYLV1ZAGzh7UFp7t0oMdrfK+3ZzenMUMW6EghtNC3QhZXUoee009gFkKbG/2t9vPGAKQH2eL5P3xaBByPo7diXd6nsxhFX+xv03DCV6c2V9E1e0emknMXcJRS+Oy0e2U7YJrHNL0gZfeN2Ay0f4YjT3bp8rxiuSHKEOnj4C9JUrDB1cZ5rE4o186SKTJWsb9TmQJuKwbKgv8W/Mqj6AR6m/ncwUAvBc5bsrOQ05ccNxrLbg6dinhJ+yEQ+lzykrQ+uFBZhyxyBZeQdkcTPqVbw54EOMs/lzF2UdELQFe/vLfqNN3bmnl+1TVc4WDRugIxe1JMYjX3E6OjwDakH9O8wfJMq24zfn7Uwhoz/c4L9Rh6uUuz7C8AABAGFQbHssRSOs3qSfMY6p6oXNKSOz8HTpgs9mwGhQ99Fub773mUmXVcsqBEHl6/IwBqDXSZ3vl5gdFm7yG46vbm+E9QmIfYdGmgvTEapqR55UvqeX1NrCCIk3j10NC0a6gbttvLQXmGqr8AKDA==
-X-OriginatorOrg: os.amperecomputing.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b72b8d38-48c2-45d5-125a-08d84906152a
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR01MB4304.prod.exchangelabs.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Aug 2020 14:49:34.9753 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: JTpekrf+ke6+2kWo5PjdAgB9XwH1ijtd52bGZnG+tNkgDG22km5KIAUK2jypNxSyfjHeYXzAazUHyOaZu2VDgovZVqY1yL8RnUO9Jq1hLtE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR01MB4990
-Received-SPF: pass client-ip=40.107.94.112;
- envelope-from=aaron@os.amperecomputing.com;
- helo=NAM10-MW2-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/25 10:49:36
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -6
-X-Spam_score: -0.7
-X-Spam_bar: /
-X-Spam_report: (-0.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, MSGID_FROM_MTA_HEADER=0.001,
- RCVD_ILLEGAL_IP=1.3, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::443;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pf1-x443.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -135,34 +99,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Yonggang Luo <luoyonggang@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This check was backwards when introduced in commit
-033614c47de78409ad3fb39bb7bd1483b71c6789:
+From: Yonggang Luo <luoyonggang@gmail.com>
 
-    target/arm: Filter cycle counter based on PMCCFILTR_EL0
-
-Signed-off-by: Aaron Lindsay <aaron@os.amperecomputing.com>
+SIMPLE_PATH_RE should match the full path token.
+Or the $ and : contained in path would not matched if the path are start with C:/ and E:/
 ---
- target/arm/helper.c | 2 +-
+ scripts/ninjatool.py | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 6b4f0eb533..8e7730c7e3 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -1452,7 +1452,7 @@ static bool pmu_counter_enabled(CPUARMState *env, uint8_t counter)
-         }
-     } else {
-         prohibited = arm_feature(env, ARM_FEATURE_EL3) &&
--           (env->cp15.mdcr_el3 & MDCR_SPME);
-+           !(env->cp15.mdcr_el3 & MDCR_SPME);
-     }
+diff --git a/scripts/ninjatool.py b/scripts/ninjatool.py
+index cc77d51aa8..6ca8be6f10 100755
+--- a/scripts/ninjatool.py
++++ b/scripts/ninjatool.py
+@@ -55,7 +55,7 @@ else:
  
-     if (prohibited && counter == 31) {
+ PATH_RE = r"[^$\s:|]+|\$[$ :]|\$[a-zA-Z0-9_-]+|\$\{[a-zA-Z0-9_.-]+\}"
+ 
+-SIMPLE_PATH_RE = re.compile(r"[^$\s:|]+")
++SIMPLE_PATH_RE = re.compile(r"^[^$\s:|]+$")
+ IDENT_RE = re.compile(r"[a-zA-Z0-9_.-]+$")
+ STRING_RE = re.compile(r"(" + PATH_RE + r"|[\s:|])(?:\r?\n)?|.")
+ TOPLEVEL_RE = re.compile(r"([=:#]|\|\|?|^ +|(?:" + PATH_RE + r")+)\s*|.")
 -- 
-2.17.1
+2.27.0.windows.1
 
 
