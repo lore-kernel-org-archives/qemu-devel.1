@@ -7,84 +7,84 @@ X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFFFEC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 19:49:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2FECC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 19:50:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7446E2074D
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 19:49:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8D72C2074D
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 19:50:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LL4Xdszl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7446E2074D
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ro8piBKf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D72C2074D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34332 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36928 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAewm-0007rX-PJ
-	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 15:49:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40766)
+	id 1kAexH-0000Vt-QG
+	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 15:50:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40788)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kAeXS-0002on-CH
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 15:23:22 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:48213
- helo=us-smtp-1.mimecast.com)
+ id 1kAeXV-0002vl-05
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 15:23:25 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:34155
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kAeXP-0006MR-CZ
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 15:23:22 -0400
+ id 1kAeXS-0006N6-U6
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 15:23:24 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598383398;
+ s=mimecast20190719; t=1598383402;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=XOoqKwK91qvcNPxbczvja/Wv1Wrve6aqRb4thQeu3ZM=;
- b=LL4XdszlLOrvEhiC72O1UmpDvyleBadIQo/yCBCvaPFSYb8ZHqhf5u0E7JBEdroJ/6el2a
- 2NxQjtZLdh33SzvxssU342DrsGFU021e950fQ4IM8o3oFGA7qYHrTMXVEvHWs0geInu79G
- asxDciWRkoDU2Fj/Xz5WELiHuPDCKEs=
+ bh=TT6/e62rayLVNN7DTR4/EQL0/nIwdGVw2Nlxetc2M/o=;
+ b=Ro8piBKf7OrX77RcjUAZ8Rr6QyG6qsKU26e2+NYmXmwK1SuyejBrCIVJP3DksJo1YW6T+Z
+ Kpn3F3rb0zOeMVsWSM56OusEwX24iOnwHFtBC5HnDnpL7jyMFd0UofcHaXe91SlFVenfTM
+ hNUTQGfFG3H5H6URjWJyMFJ5PVU1QxU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-421-MqJEdihuMG-b_x8siVT9pQ-1; Tue, 25 Aug 2020 15:23:14 -0400
-X-MC-Unique: MqJEdihuMG-b_x8siVT9pQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-327-Y_kqjm2uOneHLh6CPqtI3A-1; Tue, 25 Aug 2020 15:23:18 -0400
+X-MC-Unique: Y_kqjm2uOneHLh6CPqtI3A-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6D05D1074641
- for <qemu-devel@nongnu.org>; Tue, 25 Aug 2020 19:23:13 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 69B7C1074640;
+ Tue, 25 Aug 2020 19:23:17 +0000 (UTC)
 Received: from localhost (unknown [10.10.67.254])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D8D0F808AA;
- Tue, 25 Aug 2020 19:23:11 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3148918B59;
+ Tue, 25 Aug 2020 19:23:17 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 55/74] qom: provide convenient macros for declaring and
- defining types
-Date: Tue, 25 Aug 2020 15:20:51 -0400
-Message-Id: <20200825192110.3528606-56-ehabkost@redhat.com>
+Subject: [PATCH v3 58/74] qom: Make type checker functions accept const
+ pointers
+Date: Tue, 25 Aug 2020 15:20:54 -0400
+Message-Id: <20200825192110.3528606-59-ehabkost@redhat.com>
 In-Reply-To: <20200825192110.3528606-1-ehabkost@redhat.com>
 References: <20200825192110.3528606-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
 X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=ehabkost@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/25 01:37:44
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=ehabkost@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/25 15:21:30
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.958,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,412 +98,58 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Paolo Bonzini <pbonzini@redhat.com>,
- "Daniel P. Berrange" <berrange@redhat.com>
+ "Daniel P. Berrange" <berrange@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Daniel P. Berrangé <berrange@redhat.com>
+The existing type check macros all unconditionally drop const
+qualifiers from their arguments.  Keep this behavior in the
+macros generated by DECLARE_*CHECKER* by now.
 
-When creating new QOM types, there is a lot of boilerplate code that
-must be repeated using a standard pattern. This is tedious to write
-and liable to suffer from subtle inconsistencies. Thus it would
-benefit from some simple automation.
-
-QOM was loosely inspired by GLib's GObject, and indeed GObject suffers
-from the same burden of boilerplate code, but has long provided a set of
-macros to eliminate this burden in the source implementation. More
-recently it has also provided a set of macros to eliminate this burden
-in the header declaration.
-
-In GLib there are the G_DECLARE_* and G_DEFINE_* family of macros
-for the header declaration and source implementation respectively:
-
-  https://developer.gnome.org/gobject/stable/chapter-gobject.html
-  https://developer.gnome.org/gobject/stable/howto-gobject.html
-
-This patch takes inspiration from GObject to provide the equivalent
-functionality for QOM.
-
-In the header file, instead of:
-
-    typedef struct MyDevice MyDevice;
-    typedef struct MyDeviceClass MyDeviceClass;
-
-    G_DEFINE_AUTOPTR_CLEANUP_FUNC(MyDeviceClass, object_unref)
-
-    #define MY_DEVICE_GET_CLASS(void *obj) \
-            OBJECT_GET_CLASS(MyDeviceClass, obj, TYPE_MY_DEVICE)
-    #define MY_DEVICE_CLASS(void *klass) \
-            OBJECT_CLASS_CHECK(MyDeviceClass, klass, TYPE_MY_DEVICE)
-    #define MY_DEVICE(void *obj)
-            OBJECT_CHECK(MyDevice, obj, TYPE_MY_DEVICE)
-
-    struct MyDeviceClass {
-        DeviceClass parent_class;
-    };
-
-We now have
-
-    OBJECT_DECLARE_SIMPLE_TYPE(MyDevice, my_device, MY_DEVICE, DEVICE)
-
-In cases where the class needs some virtual methods, it can be left
-to be implemented manually using
-
-    OBJECT_DECLARE_TYPE(MyDevice, my_device, MY_DEVICE)
-
-Note that these macros are including support for g_autoptr() for the
-object types, which is something previously only supported for variables
-declared as the base Object * type.
-
-Meanwhile in the source file, instead of:
-
-    static void my_device_finalize(Object *obj);
-    static void my_device_class_init(ObjectClass *oc, void *data);
-    static void my_device_init(Object *obj);
-
-    static const TypeInfo my_device_info = {
-        .parent = TYPE_DEVICE,
-        .name = TYPE_MY_DEVICE,
-        .instance_size = sizeof(MyDevice),
-        .instance_init = my_device_init,
-        .instance_finalize = my_device_finalize,
-        .class_size = sizeof(MyDeviceClass),
-        .class_init = my_device_class_init,
-    };
-
-    static void
-    my_device_register_types(void)
-    {
-        type_register_static(&my_device_info);
-    }
-    type_init(my_device_register_types);
-
-We now have
-
-    OBJECT_DEFINE_TYPE(MyDevice, my_device, MY_DEVICE, DEVICE)
-
-Or, if a class needs to implement interfaces:
-
-    OBJECT_DEFINE_TYPE_WITH_INTERFACES(MyDevice, my_device, MY_DEVICE, DEVICE,
-                                       { TYPE_USER_CREATABLE }, { NULL })
-
-Or, if a class needs to be abstract
-
-    OBJECT_DEFINE_ABSTRACT_TYPE(MyDevice, my_device, MY_DEVICE, DEVICE)
-
-IOW, in both cases the maintainer now only has to think about the
-interesting part of the code which implements useful functionality
-and avoids much of the boilerplate.
-
-Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
-Message-Id: <20200723181410.3145233-3-berrange@redhat.com>
-[ehabkost: Fix G_DEFINE_AUTOPTR_CLEANUP_FUNC usage]
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
-Changes v2 -> v3: none
+Changes v2 -> v3:
+* Removed reference to _Generic on comment
 
 Changes v1 -> v2:
-* Squashed "Fix G_DEFINE_AUTOPTR_CLEANUP_FUNC" into this patch
+* Removed note about _Generic from commit message, because it
+  won't be possible to do what I was planning without manual
+  #defines
 ---
- include/qom/object.h | 277 +++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 277 insertions(+)
+ include/qom/object.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/include/qom/object.h b/include/qom/object.h
-index 1f8aa2d48e..f515230f61 100644
+index 4cd84998c2..3626ae3c65 100644
 --- a/include/qom/object.h
 +++ b/include/qom/object.h
-@@ -304,6 +304,119 @@ typedef struct InterfaceInfo InterfaceInfo;
-  *
-  * The first example of such a QOM method was #CPUClass.reset,
-  * another example is #DeviceClass.realize.
-+ *
-+ * # Standard type declaration and definition macros #
-+ *
-+ * A lot of the code outlined above follows a standard pattern and naming
-+ * convention. To reduce the amount of boilerplate code that needs to be
-+ * written for a new type there are two sets of macros to generate the
-+ * common parts in a standard format.
-+ *
-+ * A type is declared using the OBJECT_DECLARE macro family. In types
-+ * which do not require any virtual functions in the class, the
-+ * OBJECT_DECLARE_SIMPLE_TYPE macro is suitable, and is commonly placed
-+ * in the header file:
-+ *
-+ * <example>
-+ *   <title>Declaring a simple type</title>
-+ *   <programlisting>
-+ *     OBJECT_DECLARE_SIMPLE_TYPE(MyDevice, my_device, MY_DEVICE, DEVICE)
-+ *   </programlisting>
-+ * </example>
-+ *
-+ * This is equivalent to the following:
-+ *
-+ * <example>
-+ *   <title>Expansion from declaring a simple type</title>
-+ *   <programlisting>
-+ *     typedef struct MyDevice MyDevice;
-+ *     typedef struct MyDeviceClass MyDeviceClass;
-+ *
-+ *     G_DEFINE_AUTOPTR_CLEANUP_FUNC(MyDeviceClass, object_unref)
-+ *
-+ *     #define MY_DEVICE_GET_CLASS(void *obj) \
-+ *             OBJECT_GET_CLASS(MyDeviceClass, obj, TYPE_MY_DEVICE)
-+ *     #define MY_DEVICE_CLASS(void *klass) \
-+ *             OBJECT_CLASS_CHECK(MyDeviceClass, klass, TYPE_MY_DEVICE)
-+ *     #define MY_DEVICE(void *obj)
-+ *             OBJECT_CHECK(MyDevice, obj, TYPE_MY_DEVICE)
-+ *
-+ *     struct MyDeviceClass {
-+ *         DeviceClass parent_class;
-+ *     };
-+ *   </programlisting>
-+ * </example>
-+ *
-+ * The 'struct MyDevice' needs to be declared separately.
-+ * If the type requires virtual functions to be declared in the class
-+ * struct, then the alternative OBJECT_DECLARE_TYPE() macro can be
-+ * used. This does the same as OBJECT_DECLARE_SIMPLE_TYPE(), but without
-+ * the 'struct MyDeviceClass' definition.
-+ *
-+ * To implement the type, the OBJECT_DEFINE macro family is available.
-+ * In the simple case the OBJECT_DEFINE_TYPE macro is suitable:
-+ *
-+ * <example>
-+ *   <title>Defining a simple type</title>
-+ *   <programlisting>
-+ *     OBJECT_DEFINE_TYPE(MyDevice, my_device, MY_DEVICE, DEVICE)
-+ *   </programlisting>
-+ * </example>
-+ *
-+ * This is equivalent to the following:
-+ *
-+ * <example>
-+ *   <title>Expansion from defining a simple type</title>
-+ *   <programlisting>
-+ *     static void my_device_finalize(Object *obj);
-+ *     static void my_device_class_init(ObjectClass *oc, void *data);
-+ *     static void my_device_init(Object *obj);
-+ *
-+ *     static const TypeInfo my_device_info = {
-+ *         .parent = TYPE_DEVICE,
-+ *         .name = TYPE_MY_DEVICE,
-+ *         .instance_size = sizeof(MyDevice),
-+ *         .instance_init = my_device_init,
-+ *         .instance_finalize = my_device_finalize,
-+ *         .class_size = sizeof(MyDeviceClass),
-+ *         .class_init = my_device_class_init,
-+ *     };
-+ *
-+ *     static void
-+ *     my_device_register_types(void)
-+ *     {
-+ *         type_register_static(&my_device_info);
-+ *     }
-+ *     type_init(my_device_register_types);
-+ *   </programlisting>
-+ * </example>
-+ *
-+ * This is sufficient to get the type registered with the type
-+ * system, and the three standard methods now need to be implemented
-+ * along with any other logic required for the type.
-+ *
-+ * If the type needs to implement one or more interfaces, then the
-+ * OBJECT_DEFINE_TYPE_WITH_INTERFACES() macro can be used instead.
-+ * This accepts an array of interface type names.
-+ *
-+ * <example>
-+ *   <title>Defining a simple type implementing interfaces</title>
-+ *   <programlisting>
-+ *     OBJECT_DEFINE_TYPE_WITH_INTERFACES(MyDevice, my_device,
-+ *                                        MY_DEVICE, DEVICE,
-+ *                                        { TYPE_USER_CREATABLE }, { NULL })
-+ *   </programlisting>
-+ * </example>
-+ *
-+ * If the type is not intended to be instantiated, then then
-+ * the OBJECT_DEFINE_ABSTRACT_TYPE() macro can be used instead:
-+ *
-+ * <example>
-+ *   <title>Defining a simple type</title>
-+ *   <programlisting>
-+ *     OBJECT_DEFINE_ABSTRACT_TYPE(MyDevice, my_device, MY_DEVICE, DEVICE)
-+ *   </programlisting>
-+ * </example>
+@@ -567,7 +567,7 @@ struct Object
   */
+ #define DECLARE_INSTANCE_CHECKER(InstanceType, OBJ_NAME, TYPENAME) \
+     static inline G_GNUC_UNUSED InstanceType * \
+-    OBJ_NAME(void *obj) \
++    OBJ_NAME(const void *obj) \
+     { return OBJECT_CHECK(InstanceType, obj, TYPENAME); }
  
- 
-@@ -440,6 +553,170 @@ struct Object
-     Object *parent;
- };
- 
-+/**
-+ * OBJECT_DECLARE_TYPE:
-+ * @ModuleObjName: the object name with initial capitalization
-+ * @module_obj_name: the object name in lowercase with underscore separators
-+ * @MODULE_OBJ_NAME: the object name in uppercase with underscore separators
-+ *
-+ * This macro is typically used in a header file, and will:
-+ *
-+ *   - create the typedefs for the object and class structs
-+ *   - register the type for use with g_autoptr
-+ *   - provide three standard type cast functions
-+ *
-+ * The object struct and class struct need to be declared manually.
-+ */
-+#define OBJECT_DECLARE_TYPE(ModuleObjName, module_obj_name, MODULE_OBJ_NAME) \
-+    typedef struct ModuleObjName ModuleObjName; \
-+    typedef struct ModuleObjName##Class ModuleObjName##Class; \
-+    \
-+    G_DEFINE_AUTOPTR_CLEANUP_FUNC(ModuleObjName, object_unref) \
-+    \
-+    static inline G_GNUC_UNUSED ModuleObjName##Class * \
-+    MODULE_OBJ_NAME##_GET_CLASS(void *obj) \
-+    { return OBJECT_GET_CLASS(ModuleObjName##Class, obj, \
-+                              TYPE_##MODULE_OBJ_NAME); } \
-+    \
-+    static inline G_GNUC_UNUSED ModuleObjName##Class * \
-+    MODULE_OBJ_NAME##_CLASS(void *klass) \
-+    { return OBJECT_CLASS_CHECK(ModuleObjName##Class, klass, \
-+                                TYPE_##MODULE_OBJ_NAME); } \
-+    \
-+    static inline G_GNUC_UNUSED ModuleObjName * \
-+    MODULE_OBJ_NAME(void *obj) \
-+    { return OBJECT_CHECK(ModuleObjName, obj, \
-+                          TYPE_##MODULE_OBJ_NAME); }
-+
-+/**
-+ * OBJECT_DECLARE_SIMPLE_TYPE:
-+ * @ModuleObjName: the object name with initial caps
-+ * @module_obj_name: the object name in lowercase with underscore separators
-+ * @MODULE_OBJ_NAME: the object name in uppercase with underscore separators
-+ * @ParentModuleObjName: the parent object name with initial caps
-+ *
-+ * This does the same as OBJECT_DECLARE_TYPE(), but also declares
-+ * the class struct, thus only the object struct needs to be declare
-+ * manually.
-+ *
-+ * This macro should be used unless the class struct needs to have
-+ * virtual methods declared.
-+ */
-+#define OBJECT_DECLARE_SIMPLE_TYPE(ModuleObjName, module_obj_name, \
-+                                   MODULE_OBJ_NAME, ParentModuleObjName) \
-+    OBJECT_DECLARE_TYPE(ModuleObjName, module_obj_name, MODULE_OBJ_NAME) \
-+    struct ModuleObjName##Class { ParentModuleObjName##Class parent_class; };
-+
-+
-+/**
-+ * OBJECT_DEFINE_TYPE_EXTENDED:
-+ * @ModuleObjName: the object name with initial caps
-+ * @module_obj_name: the object name in lowercase with underscore separators
-+ * @MODULE_OBJ_NAME: the object name in uppercase with underscore separators
-+ * @PARENT_MODULE_OBJ_NAME: the parent object name in uppercase with underscore
-+ *                          separators
-+ * @ABSTRACT: boolean flag to indicate whether the object can be instantiated
-+ * @...: list of initializers for "InterfaceInfo" to declare implemented interfaces
-+ *
-+ * This macro is typically used in a source file, and will:
-+ *
-+ *   - declare prototypes for _finalize, _class_init and _init methods
-+ *   - declare the TypeInfo struct instance
-+ *   - provide the constructor to register the type
-+ *
-+ * After using this macro, implementations of the _finalize, _class_init,
-+ * and _init methods need to be written. Any of these can be zero-line
-+ * no-op impls if no special logic is required for a given type.
-+ *
-+ * This macro should rarely be used, instead one of the more specialized
-+ * macros is usually a better choice.
-+ */
-+#define OBJECT_DEFINE_TYPE_EXTENDED(ModuleObjName, module_obj_name, \
-+                                    MODULE_OBJ_NAME, PARENT_MODULE_OBJ_NAME, \
-+                                    ABSTRACT, ...) \
-+    static void \
-+    module_obj_name##_finalize(Object *obj); \
-+    static void \
-+    module_obj_name##_class_init(ObjectClass *oc, void *data); \
-+    static void \
-+    module_obj_name##_init(Object *obj); \
-+    \
-+    static const TypeInfo module_obj_name##_info = { \
-+        .parent = TYPE_##PARENT_MODULE_OBJ_NAME, \
-+        .name = TYPE_##MODULE_OBJ_NAME, \
-+        .instance_size = sizeof(ModuleObjName), \
-+        .instance_init = module_obj_name##_init, \
-+        .instance_finalize = module_obj_name##_finalize, \
-+        .class_size = sizeof(ModuleObjName##Class), \
-+        .class_init = module_obj_name##_class_init, \
-+        .abstract = ABSTRACT, \
-+        .interfaces = (InterfaceInfo[]) { __VA_ARGS__ } , \
-+    }; \
-+    \
-+    static void \
-+    module_obj_name##_register_types(void) \
-+    { \
-+        type_register_static(&module_obj_name##_info); \
-+    } \
-+    type_init(module_obj_name##_register_types);
-+
-+/**
-+ * OBJECT_DEFINE_TYPE:
-+ * @ModuleObjName: the object name with initial caps
-+ * @module_obj_name: the object name in lowercase with underscore separators
-+ * @MODULE_OBJ_NAME: the object name in uppercase with underscore separators
-+ * @PARENT_MODULE_OBJ_NAME: the parent object name in uppercase with underscore
-+ *                          separators
-+ *
-+ * This is a specialization of OBJECT_DEFINE_TYPE_EXTENDED, which is suitable
-+ * for the common case of a non-abstract type, without any interfaces.
-+ */
-+#define OBJECT_DEFINE_TYPE(ModuleObjName, module_obj_name, MODULE_OBJ_NAME, \
-+                           PARENT_MODULE_OBJ_NAME) \
-+    OBJECT_DEFINE_TYPE_EXTENDED(ModuleObjName, module_obj_name, \
-+                                MODULE_OBJ_NAME, PARENT_MODULE_OBJ_NAME, \
-+                                false, { NULL })
-+
-+/**
-+ * OBJECT_DEFINE_TYPE_WITH_INTERFACES:
-+ * @ModuleObjName: the object name with initial caps
-+ * @module_obj_name: the object name in lowercase with underscore separators
-+ * @MODULE_OBJ_NAME: the object name in uppercase with underscore separators
-+ * @PARENT_MODULE_OBJ_NAME: the parent object name in uppercase with underscore
-+ *                          separators
-+ * @...: list of initializers for "InterfaceInfo" to declare implemented interfaces
-+ *
-+ * This is a specialization of OBJECT_DEFINE_TYPE_EXTENDED, which is suitable
-+ * for the common case of a non-abstract type, with one or more implemented
-+ * interfaces.
-+ *
-+ * Note when passing the list of interfaces, be sure to include the final
-+ * NULL entry, e.g.  { TYPE_USER_CREATABLE }, { NULL }
-+ */
-+#define OBJECT_DEFINE_TYPE_WITH_INTERFACES(ModuleObjName, module_obj_name, \
-+                                           MODULE_OBJ_NAME, \
-+                                           PARENT_MODULE_OBJ_NAME, ...) \
-+    OBJECT_DEFINE_TYPE_EXTENDED(ModuleObjName, module_obj_name, \
-+                                MODULE_OBJ_NAME, PARENT_MODULE_OBJ_NAME, \
-+                                false, __VA_ARGS__)
-+
-+/**
-+ * OBJECT_DEFINE_ABSTRACT_TYPE:
-+ * @ModuleObjName: the object name with initial caps
-+ * @module_obj_name: the object name in lowercase with underscore separators
-+ * @MODULE_OBJ_NAME: the object name in uppercase with underscore separators
-+ * @PARENT_MODULE_OBJ_NAME: the parent object name in uppercase with underscore
-+ *                          separators
-+ *
-+ * This is a specialization of OBJECT_DEFINE_TYPE_EXTENDED, which is suitable
-+ * for defining an abstract type, without any interfaces.
-+ */
-+#define OBJECT_DEFINE_ABSTRACT_TYPE(ModuleObjName, module_obj_name, \
-+                                    MODULE_OBJ_NAME, PARENT_MODULE_OBJ_NAME) \
-+    OBJECT_DEFINE_TYPE_EXTENDED(ModuleObjName, module_obj_name, \
-+                                MODULE_OBJ_NAME, PARENT_MODULE_OBJ_NAME, \
-+                                true, { NULL })
-+
  /**
-  * TypeInfo:
-  * @name: The name of the type.
+@@ -584,11 +584,11 @@ struct Object
+  */
+ #define DECLARE_CLASS_CHECKERS(ClassType, OBJ_NAME, TYPENAME) \
+     static inline G_GNUC_UNUSED ClassType * \
+-    OBJ_NAME##_GET_CLASS(void *obj) \
++    OBJ_NAME##_GET_CLASS(const void *obj) \
+     { return OBJECT_GET_CLASS(ClassType, obj, TYPENAME); } \
+     \
+     static inline G_GNUC_UNUSED ClassType * \
+-    OBJ_NAME##_CLASS(void *klass) \
++    OBJ_NAME##_CLASS(const void *klass) \
+     { return OBJECT_CLASS_CHECK(ClassType, klass, TYPENAME); }
+ 
+ /**
 -- 
 2.26.2
 
