@@ -2,115 +2,84 @@ Return-Path: <SRS0=2GMi=CD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C20FC433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 10:49:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24C62C433E1
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 10:53:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 347922068E
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 10:49:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D83B42068E
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 10:53:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PrutDeVG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 347922068E
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Aq92ZSfr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D83B42068E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46222 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50074 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAWWZ-0001fB-GQ
-	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 06:49:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60814)
+	id 1kAWZw-0003a2-Kj
+	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 06:53:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33610)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kAWVl-0000kT-HO
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 06:49:05 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:57411
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kAWZG-0002mg-Mi
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 06:52:42 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:21632)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kAWVj-0000Sn-ON
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 06:49:05 -0400
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kAWZF-0000z0-4S
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 06:52:42 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598352542;
+ s=mimecast20190719; t=1598352760;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=pAK5ADpCEZbRWTrXaTW86CVNlmo2ububKuU1ryNYPfw=;
- b=PrutDeVGMPdB23BuiWRH0EIjGt1ol0Oh/MnBC0ja8aVI3aXC/brtbiGOW0IoYm01KJ3Ziq
- v6jNEgvtqrFgBgKpp9bVEmS2iKv73KP2mGimxQq5ALnuuhCemQ/7SBMaL7XVicCsL8htgh
- DE5kcRPgwOyOGJCpXrQpZETalkE8Jc8=
+ content-transfer-encoding:content-transfer-encoding;
+ bh=OwL6TO8oPaNBRlhmq2U3w2sTA/U5wns21ZdgqDbdMzk=;
+ b=Aq92ZSfrzJ6ECljrvnzCVwsxq46Mx8m40ND9gn2aLxiiEMx+1XuHqO5ZjIpNmeHQSRwwUU
+ scSwVahXo+CDJMlJQQ99n+tQutxTCbw8JtqVb65d7cJf2HcAiw8lLUkPC++WM4EOUJafaK
+ 8g2fC6MJ0OdcOV+VL4nru01Zzsfk+sE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-544-0g7hLHMPPpGes64nNSau3w-1; Tue, 25 Aug 2020 06:49:00 -0400
-X-MC-Unique: 0g7hLHMPPpGes64nNSau3w-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-414-uscT8t_DOn2j_vGlSAdvOg-1; Tue, 25 Aug 2020 06:52:37 -0400
+X-MC-Unique: uscT8t_DOn2j_vGlSAdvOg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AC32280EDA4;
- Tue, 25 Aug 2020 10:48:59 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-113-72.ams2.redhat.com
- [10.36.113.72])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 25CD710013D5;
- Tue, 25 Aug 2020 10:48:57 +0000 (UTC)
-Subject: Re: [PATCH v2 3/5] qemu-iotests: Support varargs syntax in FilePaths
-To: Nir Soffer <nirsof@gmail.com>, qemu-devel@nongnu.org
-References: <20200820235427.374645-1-nsoffer@redhat.com>
- <20200820235427.374645-4-nsoffer@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <7567f6d6-0b0c-52a1-ba08-3b5dea11e5fd@redhat.com>
-Date: Tue, 25 Aug 2020 12:48:56 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B4C1D186A577
+ for <qemu-devel@nongnu.org>; Tue, 25 Aug 2020 10:52:36 +0000 (UTC)
+Received: from localhost.localdomain.com (unknown [10.36.110.53])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DB2F460FC2;
+ Tue, 25 Aug 2020 10:52:35 +0000 (UTC)
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL 0/1] Socket next patches
+Date: Tue, 25 Aug 2020 11:52:33 +0100
+Message-Id: <20200825105234.634767-1-berrange@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200820235427.374645-4-nsoffer@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
-X-Mimecast-Spam-Score: 0.0
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="nVKeSsZFi0YjXqEFKvBJxlo0wvdKgWi2X"
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=mreitz@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/25 01:35:36
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=berrange@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/25 06:38:59
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -56
-X-Spam_score: -5.7
-X-Spam_bar: -----
-X-Spam_report: (-5.7 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.958,
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.958,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-2.602, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -123,62 +92,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Nir Soffer <nsoffer@redhat.com>,
- John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
+Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---nVKeSsZFi0YjXqEFKvBJxlo0wvdKgWi2X
-Content-Type: multipart/mixed; boundary="TI3lPr82novaHU7tslne4fWjgMARiIqGr"
-
---TI3lPr82novaHU7tslne4fWjgMARiIqGr
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 21.08.20 01:54, Nir Soffer wrote:
-> Accept variable number of names instead of a sequence:
->=20
->     with FilePaths("a", "b", "c") as (a, b, c):
->=20
-> The disadvantage is that base_dir must be used as kwarg:
->=20
->     with FilePaths("a", "b", base_dir=3Dsoc_dir) as (sock1, sock2):
->=20
-> But this is more clear and calling optional argument as positional
-> arguments is bad idea anyway.
->=20
-> Signed-off-by: Nir Soffer <nsoffer@redhat.com>
-> ---
->  tests/qemu-iotests/194        |  4 ++--
->  tests/qemu-iotests/257        | 10 ++++------
->  tests/qemu-iotests/iotests.py |  6 +++---
->  3 files changed, 9 insertions(+), 11 deletions(-)
-
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-
-
---TI3lPr82novaHU7tslne4fWjgMARiIqGr--
-
---nVKeSsZFi0YjXqEFKvBJxlo0wvdKgWi2X
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl9E7JgACgkQ9AfbAGHV
-z0DVwQf/W2pGN5e/pl8O64Z5x+T/asic0yK4IHmkc+HO+/avsOtwKGo0xEJ1wQhL
-kb67FYrpzM17hdHIwTbBX8OEC+i1sUcXLtJTM8W4Z1MCRmAVNuuwnD1+U9RwZdYf
-NNdxQiagb8IgB9eK5G2+qtMxt9y+8Dnm3aVm+TFzHTDSCL1dHb98BL1PlOg50daS
-zl2ek1/Qf/FG4rhyhC4GzWHXhzdlcx2xnm6VK6JUFlUkIIY28XsfS7Q/XfAy4lXq
-UZ2Krf728/GdhxMSMMu0rlYu14oe4oE9AK5jtewIQA3Cj5M4N8OvcPIoIU6mqYb5
-rX2gD9QV+NZ8oumPrRloRNlnnVMfrg==
-=J1iX
------END PGP SIGNATURE-----
-
---nVKeSsZFi0YjXqEFKvBJxlo0wvdKgWi2X--
+The following changes since commit 44423107e7b5731ef40c5c8632a5bad8b49d0838=
+:=0D
+=0D
+  Merge remote-tracking branch 'remotes/xtensa/tags/20200821-xtensa' into s=
+taging (2020-08-24 19:55:23 +0100)=0D
+=0D
+are available in the Git repository at:=0D
+=0D
+  https://github.com/berrange/qemu tags/socket-next-pull-request=0D
+=0D
+for you to fetch changes up to 74a57ddc02c41f8f4bb549cedb107c1086daba58:=0D
+=0D
+  tests: fix a memory in test_socket_unix_abstract_good (2020-08-25 11:49:4=
+9 +0100)=0D
+=0D
+----------------------------------------------------------------=0D
+Add support for UNIX sockets in the abstract namespace=0D
+=0D
+----------------------------------------------------------------=0D
+=0D
+Li Qiang (1):=0D
+  tests: fix a memory in test_socket_unix_abstract_good=0D
+=0D
+ tests/test-util-sockets.c | 1 +=0D
+ 1 file changed, 1 insertion(+)=0D
+=0D
+--=20=0D
+2.26.2=0D
+=0D
 
 
