@@ -2,97 +2,85 @@ Return-Path: <SRS0=2GMi=CD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC00AC433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 13:48:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62BDBC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 13:51:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 90A5220738
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 13:48:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 32A5E20738
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 13:51:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nzlpWOmr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90A5220738
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hcOPay4V"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32A5E20738
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40810 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44888 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAZIv-00049F-Ss
-	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 09:48:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53824)
+	id 1kAZLq-0005xS-DC
+	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 09:51:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54320)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kAZI9-0003h7-QZ
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 09:47:14 -0400
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:43280)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kAZKm-0004wP-QN
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 09:49:56 -0400
+Received: from mail-ej1-x643.google.com ([2a00:1450:4864:20::643]:36394)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kAZI6-0007k1-6I
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 09:47:13 -0400
-Received: by mail-pf1-x442.google.com with SMTP id y206so7385488pfb.10
- for <qemu-devel@nongnu.org>; Tue, 25 Aug 2020 06:47:09 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kAZKl-0007wL-3C
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 09:49:56 -0400
+Received: by mail-ej1-x643.google.com with SMTP id l2so10596364eji.3
+ for <qemu-devel@nongnu.org>; Tue, 25 Aug 2020 06:49:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=8MgPMiVs43Ru9ZjHnrp90fz7N4U+Myk9wcpddjZBqpE=;
- b=nzlpWOmrOUg6E+gGJStQwG8k2k8ccW+YSr7L3fsEiht9sMBBrJ5Q0QcLfbyWoUhlzn
- eL/V3nidzs+MiT1NTvZ1CDYVKEw9of/u5nNUI+TCsuWhvBp2BHT2bdvGdzB9UZVVSrmN
- y6592tE/CYXIyH+DpQWK7QQs5Zwd7GJAKQRw06SqrkVCTBYO0BrmlvScNAt5fsXSC4eo
- gXR1KQ8Et+ukJqQYWek8LXeWBhkjQ4PRzvqtqLr4uwR0iUqrMYfHeTWZ9AdUUBHv52zj
- 2D3rlbWzNwMO9kPVt8CxaCRjnnunQtTrRE0ku160vEo5/tkBvrrZntGyboAKD7rx+tlZ
- 3lLQ==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=IrwLCuwFbPGLYup8f/G3fqANTB3ttMDuHxDlYTNB3XI=;
+ b=hcOPay4ViyGxp55HZWkG1kD9BCUdFK4WUtCRFVau7ruVHetxS+zIB1gNFzlDbKLm0u
+ W6VzfeCK+fHvVNmf4sbw281mDs0V75xdkGU11tBJdQB2aE2VpbjMPNYgtd0VG1SjoA0g
+ 8ATyOqGAHOq0P25L7Q0DUPy1vasstEh+jVWwafojyPoNVMLNJjcoSKjqH44a2Ns+RNlv
+ 4gHdpA9iRg7I274DE8kVhIDQ+5K8/3I/tlyKQtiT7BfRC9KIo4uISPLqSXJvtm5616hJ
+ PB5LcfZMbjVzKDJ1qY8Dp0XkjDTTLfaM9UzAYycxFgFs7qKKQfUFb4PBTPOu0YYl5Yt0
+ cFDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=8MgPMiVs43Ru9ZjHnrp90fz7N4U+Myk9wcpddjZBqpE=;
- b=GCJvaf+oOc8cXmVv7jz8En56+wrBVlvAo1RTnxmjDYG4GF5oDkQEnxZwaDNFyJqR+F
- /eo6fXv8Gh46LPXjpw8/UrdpiREEekKYf8A7zglNXbYTcmcpqzIuWT3zNEuAP4FL3MmY
- y/4oHBb5vQ4iZBrVgzq/lxak7o4la6abDaMvMv48h+biR2UTIDkEfAx1UEEd8s7276jU
- v/VOabVY3dThV1HWD4qwgTJQouYGrg09yjy/wyd7AFnYVWbBHpi+YMB1tHCzgMNIcq1r
- mEJmAMTSujm/rH8JwhBzs0gjiiwpTRpnbHd/59w5jiEXZwmraYNurJ0Pvr4okY5f3iMD
- ha9g==
-X-Gm-Message-State: AOAM532piKiJgCiepIeNNHALIEj1nwM3THTNwniARuwjwcgoDt9IH5Yw
- LbUd1rjoMtGo32Be4Nmj4N1vdOMSrK0ZtQ==
-X-Google-Smtp-Source: ABdhPJzdGDvcvH81kLqo3rQe6iqwTA7k/Hpb01i7biAV/w3lVVd1wSQlZwcZxglY1YVg1gCG37SyLg==
-X-Received: by 2002:a17:902:900b:: with SMTP id
- a11mr7811120plp.199.1598363228386; 
- Tue, 25 Aug 2020 06:47:08 -0700 (PDT)
-Received: from [192.168.81.79]
- (h216-228-167-147.bendor.dedicated.static.tds.net. [216.228.167.147])
- by smtp.gmail.com with ESMTPSA id j81sm7726471pfd.213.2020.08.25.06.47.07
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 25 Aug 2020 06:47:07 -0700 (PDT)
-Subject: Re: [PATCH 04/20] target/arm: Rearrange {sve,fp}_check_access assert
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20200815013145.539409-1-richard.henderson@linaro.org>
- <20200815013145.539409-5-richard.henderson@linaro.org>
- <CAFEAcA9a1m1w6=Ohdv1x0YpFioWLxV+AKSsi4BpHAv196c3raA@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <57c537ff-a008-29ca-bf7f-94d932be85cf@linaro.org>
-Date: Tue, 25 Aug 2020 06:47:05 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=IrwLCuwFbPGLYup8f/G3fqANTB3ttMDuHxDlYTNB3XI=;
+ b=hbyOxJdd3I13QJQkwXlji/jpJZ1ReLbiWfkd6St7Ct7XzPWvM+j3g0xJzVDe+lgAjV
+ 7/EOkKZQhJpZQSxDC+6XbgZwDHcDkYh3xmqtCaaev89ZQ8RlsBqoBJAquBaQcYNZta90
+ DZy8b9eTgPXX10ZlqdK2NGFSAIxVqURhVTWkcI18LtnMV3YMkvThvnUOk91mQ0pYbeH+
+ o82qZE8qNf/WCKwAG2iET5cu/iIeAQ3F8zYDBiXznZYx1Okarv6HLI0zaafEJhi7EEAN
+ 8CVSchuFss/cNGqDgSHrS9YoAfjIU8mqIX2Un1RTohSOyeke6UopUwiEFe0qVg4mwtLR
+ pQGg==
+X-Gm-Message-State: AOAM532V6IvLxYvwQnAWpMda0zKc22yMui4TxXIfYMvJ2z2y+5JTVjdH
+ bf17/7chIhgHdGuJsUWcbGkiCll+R+zEL97xlyoalw==
+X-Google-Smtp-Source: ABdhPJyWAWBT0oZoFvlsUNVQ2vhdpNIW0wx0xuDlJcR3Bg5r5qEbg0UAO7bApsjXRUFRjyRIT56vm9EfvJVy/gEz85A=
+X-Received: by 2002:a17:906:2b0b:: with SMTP id
+ a11mr1027071ejg.250.1598363393531; 
+ Tue, 25 Aug 2020 06:49:53 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9a1m1w6=Ohdv1x0YpFioWLxV+AKSsi4BpHAv196c3raA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::442;
- envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x442.google.com
+References: <20200815013145.539409-1-richard.henderson@linaro.org>
+ <20200815013145.539409-17-richard.henderson@linaro.org>
+In-Reply-To: <20200815013145.539409-17-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 25 Aug 2020 14:49:42 +0100
+Message-ID: <CAFEAcA8s==-CGT88P97xFaxcNkOf6WdNYi-3HSwjWRBXh+KQxw@mail.gmail.com>
+Subject: Re: [PATCH 16/20] target/arm: Fix sve_zip_p vs odd vector lengths
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::643;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x643.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -46
-X-Spam_score: -4.7
-X-Spam_bar: ----
-X-Spam_report: (-4.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-2.602,
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -107,29 +95,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Laurent Desnogues <laurent.desnogues@gmail.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/24/20 9:59 AM, Peter Maydell wrote:
->> +    bool sve_access_checked;
-> 
-> Is there anywhere it's worthwhile to put in an equivalent
-> of assert_fp_access_checked() for sve_access_checked, or is
-> there no point that's both (a) common to SVE accesses and
-> (b) not common to generic FP accesses ? One could put it
-> in pred_full_reg_offset() I suppose but I dunno if that
-> really gains us much. The existing fp_access_checked will
-> catch "forgot the check entirely" which seems more likely
-> as a bug than "put in the FP check when we wanted SVE".
+On Sat, 15 Aug 2020 at 02:32, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> Wrote too much with low-half zip (zip1) with vl % 512 != 0.
+>
+> Adjust all of the x + (y << s) to x | (y << s) as a style fix.
+>
+> Reported-by: Laurent Desnogues <laurent.desnogues@gmail.com>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/arm/sve_helper.c | 25 ++++++++++++++-----------
+>  1 file changed, 14 insertions(+), 11 deletions(-)
+>
+> diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
+> index fcb46f150f..b8651ae173 100644
+> --- a/target/arm/sve_helper.c
+> +++ b/target/arm/sve_helper.c
+> @@ -1870,6 +1870,7 @@ void HELPER(sve_zip_p)(void *vd, void *vn, void *vm, uint32_t pred_desc)
+>      intptr_t oprsz = extract32(pred_desc, 0, SIMD_OPRSZ_BITS) + 2;
+>      int esz = extract32(pred_desc, SIMD_DATA_SHIFT, 2);
+>      intptr_t high = extract32(pred_desc, SIMD_DATA_SHIFT + 2, 1);
+> +    int esize = 1 << esz;
+>      uint64_t *d = vd;
+>      intptr_t i;
+>
+> @@ -1882,33 +1883,35 @@ void HELPER(sve_zip_p)(void *vd, void *vn, void *vm, uint32_t pred_desc)
+>          mm = extract64(mm, high * half, half);
+>          nn = expand_bits(nn, esz);
+>          mm = expand_bits(mm, esz);
+> -        d[0] = nn + (mm << (1 << esz));
+> +        d[0] = nn | (mm << esize);
+>      } else {
+> -        ARMPredicateReg tmp_n, tmp_m;
+> +        ARMPredicateReg tmp;
+>
+>          /* We produce output faster than we consume input.
+>             Therefore we must be mindful of possible overlap.  */
+> -        if ((vn - vd) < (uintptr_t)oprsz) {
+> -            vn = memcpy(&tmp_n, vn, oprsz);
+> -        }
+> -        if ((vm - vd) < (uintptr_t)oprsz) {
+> -            vm = memcpy(&tmp_m, vm, oprsz);
+> +        if (vd == vn) {
+> +            vn = memcpy(&tmp, vn, oprsz);
+> +            if (vd == vm) {
+> +                vm = vn;
+> +            }
+> +        } else if (vd == vm) {
+> +            vm = memcpy(&tmp, vm, oprsz);
 
-While adding one to pred_full_ref_offset() might be useful, there are plenty of
-sve instructions that don't touch predicate registers.
+Why is it OK to only check vd==vn etc rather than checking for
+overlap the way the old code did ? The commit message doesn't
+mention this.
 
-I suppose I could make vec_full_reg_offset() be different between
-translate-a64.c and translate-sve.c, rather than sharing it via translate-a64.h.
-
-
-r~
+thanks
+-- PMM
 
