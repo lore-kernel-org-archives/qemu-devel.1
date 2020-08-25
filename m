@@ -2,99 +2,92 @@ Return-Path: <SRS0=2GMi=CD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CAD8FC433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 18:52:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8120FC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 19:00:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8F1E320738
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 18:52:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 37E5320782
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 19:00:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kHWS/Wks"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F1E320738
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="HfMqd7FN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37E5320782
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43050 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49130 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAe3o-0001qK-Qv
-	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 14:52:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60224)
+	id 1kAeAx-000551-9t
+	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 15:00:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33298)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kAe2k-00011v-Ex
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 14:51:38 -0400
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:35305)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kAe2h-00028w-VO
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 14:51:38 -0400
-Received: by mail-pf1-x443.google.com with SMTP id k1so1208059pfu.2
- for <qemu-devel@nongnu.org>; Tue, 25 Aug 2020 11:51:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:references:from:message-id:date:user-agent:mime-version
- :in-reply-to:content-language:content-transfer-encoding;
- bh=MIMHNjqCWChO1zQcIX6mrRMds4H3wWi3qxahwcJEa4A=;
- b=kHWS/WksGT7JXtxvjSx7h1BJklrzTydWDGhQJiZQ0YWmFH1R1vEQrreW7qkZ5zQPuw
- w/7Gvtw3bnyaaNw/konlmDu1Fd1M04A47JEaihCVo7dzazldb6p63LJrh6dKJZCmBPFD
- uO80vkzPaPwbQqsRXXtsLAF6MIwcIz5tQT0GOTSQLEgMZQa+Uka/x1N8IY9EmFo95Bs0
- id6Bd2IQ+Orgvlg9OfjXp8mZvGWpej/Z+jTMQVuNtMF5Ml7S8vclrmpj1yuPD5kIZw5k
- gDNsgD9qQ/cJnKOrg0CmEKCk5FKu6ogxYQf5iYOznoobLNruVkNHenPQDm9Ea5ZmJMbp
- jDrw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=MIMHNjqCWChO1zQcIX6mrRMds4H3wWi3qxahwcJEa4A=;
- b=kAdqOrShTzRDomt78kLAqMULESMOksRpf1HR50+Kk2COZvnelN8vXI+9PvEWzFMXS8
- rrlMVkTxngQgospUY+ZyiFshmga7aSmjP3QJJ9jJ+ZvHKmP9crB3GYhPgE20dtHlb/ZH
- GVvJ+E2BCofmJlNtPTD0LDzvn7PO13cs2p6WS7ykVoEG2FHkkEkOyJiRpcCaLUj+YFPr
- Ea804NdMT8FryN5yQT4qMYiV+0b5Nw6OvEZFRdCgQWW6dyNjNsAohgwA7VtNEd6E3E3v
- nUV31az0ta34eEv1uQLt7uGQxlHB1b6pWFkKIbgcgVPJLMOwMhznboGNzh5zQehSjvjM
- 9Ftg==
-X-Gm-Message-State: AOAM533Yz2p0KxrtvdEbR5AUGzD+PfYwhTmH8NlMSPE4aCqW9Q0H1Jys
- sEEX+GtGwUGmNLNib+LXwFlUiMa2rOeSKQ==
-X-Google-Smtp-Source: ABdhPJwSqIjMqZZXvJKATCif+ktNeHnwYyBvc0OJHlUH4pe4n4jZGg3GeZxleJS59hpd2m1QWgdwZw==
-X-Received: by 2002:a63:5c65:: with SMTP id n37mr7679134pgm.294.1598381494402; 
- Tue, 25 Aug 2020 11:51:34 -0700 (PDT)
-Received: from [192.168.81.79]
- (h216-228-167-147.bendor.dedicated.static.tds.net. [216.228.167.147])
- by smtp.gmail.com with ESMTPSA id i123sm2442577pfg.85.2020.08.25.11.51.33
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 25 Aug 2020 11:51:33 -0700 (PDT)
-Subject: Re: [PATCH 16/22] target/arm: Implement VFP vp16
- VCVT-with-specified-rounding-mode
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org
-References: <20200824142934.20850-1-peter.maydell@linaro.org>
- <20200824142934.20850-17-peter.maydell@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <4cea54f7-dea2-9e54-8f4a-a1c171d17bc4@linaro.org>
-Date: Tue, 25 Aug 2020 11:51:31 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1)
+ (envelope-from <prvs=49978a6e9=alistair.francis@wdc.com>)
+ id 1kAe9s-0003UK-2x
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 14:59:00 -0400
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:58806)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1)
+ (envelope-from <prvs=49978a6e9=alistair.francis@wdc.com>)
+ id 1kAe9o-0002vn-Qj
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 14:58:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+ t=1598381938; x=1629917938;
+ h=from:to:cc:subject:date:message-id:mime-version:
+ content-transfer-encoding;
+ bh=r+jRYzZGDNTuf5/RlCQsWlvwdX04Fg7L+XC2SA4r7XA=;
+ b=HfMqd7FNfO6H8J8OPFPqAGpH3LBkP74lMMITkuGnh0WnQZb3oJJd148W
+ jBiB1EB7j2lk1fAFcGrlgxhOU083nE6c8XnDIVJ7obnB87IBkXEEhhT+6
+ ndZr/FOEAE7ifWebS1E7w0WeUwo3SrcBcH7h8+0HUnsQjFZy4T9PkwGkU
+ L3K0cpJknsyAAUTyYR/6W0uQXcdzlEwjm4QjpsCltjtQ3sbZUUGOb6BN7
+ Jzc/k51F3X9GROoZDYXjY730jEGus+W5TgCPwhT0ZtXZFg/41TQMKPeQt
+ bOtj0D1s/ehrlid149ZUcdEYT52Wxbgez7GPEHdT4c/glAlqMz0WJ1LgU A==;
+IronPort-SDR: vA7+gArARYJ3GJc1i4ZuWkOP+QKfDMC9A0gTNKzh+VB0uYqU/PzY8dbGuUKS7OAdPH/qRhgEj0
+ MCEReHzlDr4WvP0+GvWT4JyVggUXt7NtrIB4pWfcSzZ7V/K7N36xXcZWoF06L/j3UgAGmwC0z2
+ JG3O6zG2dmFmJwwRbgb9ykNwWZvJJ2xktlIrTtklc58fHwjVdFuNzk7YULQ1+9Vs6MjOTnWrEG
+ eqWensDmk/BvkLUbUkJoZymCEav/sQSLrtN4gNNRbMybmUp8+5DCKFzOlshDEwSIprEa3yxFgC
+ QBg=
+X-IronPort-AV: E=Sophos;i="5.76,353,1592841600"; d="scan'208";a="150145282"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com)
+ ([199.255.45.14])
+ by ob1.hgst.iphmx.com with ESMTP; 26 Aug 2020 02:58:54 +0800
+IronPort-SDR: dNryOqRd4hG0QXOPHPn94JYUmeCODQPGneNyIGaThifuXC8f9o2nHKhXHIgiCC2lkiC/XShJ/Q
+ wrYyzlMwUWBg==
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+ by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 25 Aug 2020 11:46:29 -0700
+IronPort-SDR: uzSTaiFxznM/sHeKQfI1h/+hFZ1SZOEfLt6cg8EegMv/purVujvaBuKN+JVlll9PSOhjSrIUN2
+ RK4eHOTDK+sg==
+WDCIronportException: Internal
+Received: from ind003389.ad.shared (HELO risc6-mainframe.hgst.com)
+ ([10.86.59.125])
+ by uls-op-cesaip02.wdc.com with ESMTP; 25 Aug 2020 11:58:53 -0700
+From: Alistair Francis <alistair.francis@wdc.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL 00/18] riscv-to-apply queue
+Date: Tue, 25 Aug 2020 11:48:18 -0700
+Message-Id: <20200825184836.1282371-1-alistair.francis@wdc.com>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
-In-Reply-To: <20200824142934.20850-17-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::443;
- envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x443.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -46
-X-Spam_score: -4.7
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=216.71.153.141;
+ envelope-from=prvs=49978a6e9=alistair.francis@wdc.com;
+ helo=esa3.hgst.iphmx.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/25 14:58:53
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -43
+X-Spam_score: -4.4
 X-Spam_bar: ----
-X-Spam_report: (-4.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-2.602,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,23 +100,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: alistair23@gmail.com, alistair.francis@wdc.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/24/20 7:29 AM, Peter Maydell wrote:
-> Implement the fp16 versions of the VFP VCVT instruction forms
-> which convert between floating point and integer with a specified
-> rounding mode.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  target/arm/vfp-uncond.decode   |  6 ++++--
->  target/arm/translate-vfp.c.inc | 32 ++++++++++++++++++++++++--------
->  2 files changed, 28 insertions(+), 10 deletions(-)
+The following changes since commit 7774e403f2ac58b3e87bfe8d2f77676501ba893e:
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+  Merge remote-tracking branch 'remotes/kraxel/tags/fixes-20200825-pull-request' into staging (2020-08-25 10:54:51 +0100)
 
+are available in the Git repository at:
 
-r~
+  git@github.com:alistair23/qemu.git tags/pull-riscv-to-apply-20200825
+
+for you to fetch changes up to e39a8320b088dd5efc9ebaafe387e52b3d962665:
+
+  target/riscv: Support the Virtual Instruction fault (2020-08-25 09:11:36 -0700)
+
+----------------------------------------------------------------
+This pull request first adds support for multi-socket NUMA RISC-V
+machines. The Spike and Virt machines both support NUMA sockets.
+
+This PR also updates the current experimental Hypervisor support to the
+v0.6.1 spec.
+
+----------------------------------------------------------------
+Alistair Francis (13):
+      target/riscv: Allow setting a two-stage lookup in the virt status
+      target/riscv: Allow generating hlv/hlvx/hsv instructions
+      target/riscv: Do two-stage lookups on hlv/hlvx/hsv instructions
+      target/riscv: Don't allow guest to write to htinst
+      target/riscv: Convert MSTATUS MTL to GVA
+      target/riscv: Fix the interrupt cause code
+      target/riscv: Update the Hypervisor trap return/entry
+      target/riscv: Update the CSRs to the v0.6 Hyp extension
+      target/riscv: Only support a single VSXL length
+      target/riscv: Only support little endian guests
+      target/riscv: Support the v0.6 Hypervisor extension CRSs
+      target/riscv: Return the exception from invalid CSR accesses
+      target/riscv: Support the Virtual Instruction fault
+
+Anup Patel (5):
+      hw/riscv: Allow creating multiple instances of CLINT
+      hw/riscv: Allow creating multiple instances of PLIC
+      hw/riscv: Add helpers for RISC-V multi-socket NUMA machines
+      hw/riscv: spike: Allow creating multiple NUMA sockets
+      hw/riscv: virt: Allow creating multiple NUMA sockets
+
+ include/hw/riscv/numa.h                 | 113 +++++++
+ include/hw/riscv/sifive_clint.h         |   7 +-
+ include/hw/riscv/sifive_plic.h          |  12 +-
+ include/hw/riscv/spike.h                |  11 +-
+ include/hw/riscv/virt.h                 |   9 +-
+ target/riscv/cpu.h                      |   2 +
+ target/riscv/cpu_bits.h                 |  25 +-
+ target/riscv/helper.h                   |   4 +
+ target/riscv/insn32-64.decode           |   5 +
+ target/riscv/insn32.decode              |  11 +
+ hw/riscv/numa.c                         | 242 +++++++++++++++
+ hw/riscv/sifive_clint.c                 |  20 +-
+ hw/riscv/sifive_e.c                     |   4 +-
+ hw/riscv/sifive_plic.c                  |  24 +-
+ hw/riscv/sifive_u.c                     |   4 +-
+ hw/riscv/spike.c                        | 232 +++++++++-----
+ hw/riscv/virt.c                         | 526 ++++++++++++++++++--------------
+ target/riscv/cpu_helper.c               | 123 ++++----
+ target/riscv/csr.c                      | 171 +++++++++--
+ target/riscv/op_helper.c                | 176 ++++++++++-
+ target/riscv/translate.c                |  10 -
+ hw/riscv/meson.build                    |   1 +
+ target/riscv/insn_trans/trans_rvh.c.inc | 342 ++++++++++++++++++++-
+ 23 files changed, 1630 insertions(+), 444 deletions(-)
+ create mode 100644 include/hw/riscv/numa.h
+ create mode 100644 hw/riscv/numa.c
 
