@@ -2,88 +2,99 @@ Return-Path: <SRS0=2GMi=CD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA55BC433E3
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 19:48:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EED3BC433E1
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 19:48:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7B8622074D
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 19:48:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C2DB82074D
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 19:48:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YeVFSc8a"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B8622074D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GstEVyK2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2DB82074D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56352 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58018 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAevf-0005J4-M0
-	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 15:48:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40478)
+	id 1kAevx-0005zW-0w
+	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 15:48:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43038)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kAeX9-0001zo-IU
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 15:23:03 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:37094
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kAeX7-0006JR-SS
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 15:23:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598383381;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=PsS14lnkTW7yY+nKdiLwDs588t0SLM80gtExZmcSA4s=;
- b=YeVFSc8a50xpKP2ijYEF66bAtIuIYGgEY++I8DqDcKQceZBY8Zr5pFjvUfj4SqTSDyngYB
- rhWRUb79ozDmsNUeevvs7HdzLsLswKtgUO5+gKuOuxmePPoiSY/QWsescHxCLHHy5gUC+3
- R+CaYcAme7cJ6PJaTpRoU492SwrYrOk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-99-JNHvesqgOHeYYt0TPYgCJA-1; Tue, 25 Aug 2020 15:22:59 -0400
-X-MC-Unique: JNHvesqgOHeYYt0TPYgCJA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 877491DE02;
- Tue, 25 Aug 2020 19:22:58 +0000 (UTC)
-Received: from localhost (unknown [10.10.67.254])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4D581756E1;
- Tue, 25 Aug 2020 19:22:58 +0000 (UTC)
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3 47/74] rdma: Rename INTERFACE_RDMA_PROVIDER_CLASS macro
-Date: Tue, 25 Aug 2020 15:20:43 -0400
-Message-Id: <20200825192110.3528606-48-ehabkost@redhat.com>
-In-Reply-To: <20200825192110.3528606-1-ehabkost@redhat.com>
-References: <20200825192110.3528606-1-ehabkost@redhat.com>
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kAeeg-0000fP-U0
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 15:30:50 -0400
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:34255)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kAeef-0007MG-43
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 15:30:50 -0400
+Received: by mail-pf1-x443.google.com with SMTP id m71so8136621pfd.1
+ for <qemu-devel@nongnu.org>; Tue, 25 Aug 2020 12:30:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:references:from:message-id:date:user-agent:mime-version
+ :in-reply-to:content-language:content-transfer-encoding;
+ bh=w7+EdLOxHGbkMm10CGWFvzLy4NVAUtmc3MD806ii9MA=;
+ b=GstEVyK2mj3OWhC+5gYBtNBeGTnxA/T6VXJDnFBYnkqMshFrMP4JbNTVcEF/hmg+zW
+ fbU8lZjdr7gSAYsMES0YV6vy8/kEboj/D9QrOiB00hINdPJfxzGmjPvjrOwUFNr50eDL
+ GacfhUyAFW3+bSyVEBalmw+Pr0osp3hl9UVKW+nkpFlVBeiKq9TFU2P7l1LsykSYukrL
+ mGm//r05bzJOH2iS/1eGyWkgger1H1Lt37OA5AzZSSb7+MX5ciUp3NwoFh3dmRi3ASP8
+ /h0CE6UnMocjpdgDTtmpUdscf2Bi9maJiYeUCQEouTAANBiRK5N7IDY3vsLyjLKeqN7r
+ Ea9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=w7+EdLOxHGbkMm10CGWFvzLy4NVAUtmc3MD806ii9MA=;
+ b=aRlIVer2B3uTKH/51ck3Y458hcE4lZd1rHfjaeh8V/1wpd7HZoZUIMVNCCOqt3Lhhg
+ lMFvKVKFKhIh5cSsHZW+p7tqKo/rGxjgE3yIaOqQPH/p51oYHLJ2QAG3n40k8I+mZHUj
+ TQMYEejMzB4rZSmr2d6wEB3CBmZRHNOnzbai5sKna/2oLoB1C8vaROaQSvyFgYa6u+Cy
+ 6RCeNHusfuCNDmesBe8+UGIE4Ri3WPWDI+5cXLLqh/lG+WrIje/jesbYz5eMonc/pNKD
+ v+5QCxCXpaiY8kCAWQF6Sjg9MJm9FcnBJnuV987wqvF6x5WLDSQgN9jfVxkQQkKSP0t7
+ 78VA==
+X-Gm-Message-State: AOAM531ISuWbsjEPXAlWNQPFucjKmmxHMEX7orOIJTazCo1p7xsjvi5J
+ i5YU/0ZTJbDYie6dzWztxop6SJ3ciOi0+A==
+X-Google-Smtp-Source: ABdhPJxkHY1n9kW0eOqHE4n/gvf2JpuXDkxGxSIvNuAVClOKnsT1KlTsA+MnqGo1eyNknAEa7J8mRw==
+X-Received: by 2002:a05:6a00:90:: with SMTP id
+ c16mr9311495pfj.200.1598383847264; 
+ Tue, 25 Aug 2020 12:30:47 -0700 (PDT)
+Received: from [192.168.81.79]
+ (h216-228-167-147.bendor.dedicated.static.tds.net. [216.228.167.147])
+ by smtp.gmail.com with ESMTPSA id d128sm27038pfa.24.2020.08.25.12.30.46
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 25 Aug 2020 12:30:46 -0700 (PDT)
+Subject: Re: [PATCH 22/22] target/arm: Enable FP16 in '-cpu max'
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org
+References: <20200824142934.20850-1-peter.maydell@linaro.org>
+ <20200824142934.20850-23-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <c922abe6-ddd8-5110-31a0-560f96c312dc@linaro.org>
+Date: Tue, 25 Aug 2020 12:30:44 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=ehabkost@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/25 15:21:30
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.958,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200824142934.20850-23-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::443;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x443.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -46
+X-Spam_score: -4.7
+X-Spam_bar: ----
+X-Spam_report: (-4.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-2.602,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,58 +107,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- "Daniel P. Berrange" <berrange@redhat.com>,
- Yuval Shaia <yuval.shaia.ml@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Rename the macro to be consistent with RDMA_PROVIDER and
-RDMA_PROVIDER_GET_CLASS.
+On 8/24/20 7:29 AM, Peter Maydell wrote:
+> Set the MVFR1 ID register FPHP and SIMDHP fields to indicate
+> that our "-cpu max" has v8.2-FP16.
+> 
+> TODO: this patch needs to go at the end of the series.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  target/arm/cpu.c   |  3 ++-
+>  target/arm/cpu64.c | 10 ++++------
+>  2 files changed, 6 insertions(+), 7 deletions(-)
 
-This will make future conversion to OBJECT_DECLARE* easier.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
-Changes series v2 -> v3: new patch added to series v3
 
----
-Cc: Yuval Shaia <yuval.shaia.ml@gmail.com>
-Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Cc: qemu-devel@nongnu.org
----
- include/hw/rdma/rdma.h    | 2 +-
- hw/rdma/vmw/pvrdma_main.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/include/hw/rdma/rdma.h b/include/hw/rdma/rdma.h
-index 68290fb58c..fd3d70103d 100644
---- a/include/hw/rdma/rdma.h
-+++ b/include/hw/rdma/rdma.h
-@@ -19,7 +19,7 @@
- 
- #define INTERFACE_RDMA_PROVIDER "rdma"
- 
--#define INTERFACE_RDMA_PROVIDER_CLASS(klass) \
-+#define RDMA_PROVIDER_CLASS(klass) \
-     OBJECT_CLASS_CHECK(RdmaProviderClass, (klass), \
-                        INTERFACE_RDMA_PROVIDER)
- #define RDMA_PROVIDER_GET_CLASS(obj) \
-diff --git a/hw/rdma/vmw/pvrdma_main.c b/hw/rdma/vmw/pvrdma_main.c
-index 3254aadb6e..77b1235a3f 100644
---- a/hw/rdma/vmw/pvrdma_main.c
-+++ b/hw/rdma/vmw/pvrdma_main.c
-@@ -681,7 +681,7 @@ static void pvrdma_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(klass);
-     PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
--    RdmaProviderClass *ir = INTERFACE_RDMA_PROVIDER_CLASS(klass);
-+    RdmaProviderClass *ir = RDMA_PROVIDER_CLASS(klass);
- 
-     k->realize = pvrdma_realize;
-     k->vendor_id = PCI_VENDOR_ID_VMWARE;
--- 
-2.26.2
-
+r~
 
