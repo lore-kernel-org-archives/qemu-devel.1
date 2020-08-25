@@ -2,91 +2,84 @@ Return-Path: <SRS0=2GMi=CD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19255C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 05:51:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AF1FC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 05:59:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D6D352071E
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 05:51:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 563452071E
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 05:59:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h7UYpyAH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6D352071E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=jms.id.au header.i=@jms.id.au header.b="lj2t+wLX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 563452071E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=jms.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45334 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49276 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kARsB-0000LE-5F
-	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 01:51:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59710)
+	id 1kARzi-0002b5-Bx
+	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 01:59:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60624)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kARrT-0007a2-86
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 01:51:11 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:28203
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kARrR-00084l-D9
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 01:51:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598334668;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=u0cfDdbeye4qD5MxooN4jdgPpvP0o8GoajhDr+zPams=;
- b=h7UYpyAHsoazl+rGXiY3zbRrXB8Q5KMiXydrHy1SHpklo21U2NTvTz2xR2yqSYxARx4afB
- nHgZGQRY+E9u7clfD6IjFwob5R/RsfwBIfpiZAg0s9tguhKzfw37zJQeYauDLDElg3+aML
- aoKlzhutRTYujE1Exj4bYf6uhZzuJTc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-186-OWlVUljsNOW6wznWTFVBgg-1; Tue, 25 Aug 2020 01:51:03 -0400
-X-MC-Unique: OWlVUljsNOW6wznWTFVBgg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A373380EDA3;
- Tue, 25 Aug 2020 05:51:02 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-152.ams2.redhat.com [10.36.112.152])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 65E93100AE5B;
- Tue, 25 Aug 2020 05:51:01 +0000 (UTC)
-Subject: Re: Contributor wanting to get started with simple contributions
-To: Rohit Shinde <rohit.shinde12194@gmail.com>, qemu-devel@nongnu.org
-References: <CA+Ai=tAypbso9yMy0jtyzbeHCweQ1FPgDaJ8=bXxFvBA6pZyLA@mail.gmail.com>
- <CA+Ai=tBJqLB7yDbd-kqzDhr+d+65K9r3DQsZrB2kGi9wF8BaiA@mail.gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <2d69f1ac-df97-9d70-d2e2-e9cf27cf9b0c@redhat.com>
-Date: Tue, 25 Aug 2020 07:50:59 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (Exim 4.90_1) (envelope-from <joel.stan@gmail.com>)
+ id 1kARxC-0001yb-28; Tue, 25 Aug 2020 01:57:06 -0400
+Received: from mail-ed1-x544.google.com ([2a00:1450:4864:20::544]:33919)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <joel.stan@gmail.com>)
+ id 1kARx8-0000JG-Sj; Tue, 25 Aug 2020 01:57:05 -0400
+Received: by mail-ed1-x544.google.com with SMTP id bs17so10147057edb.1;
+ Mon, 24 Aug 2020 22:57:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jms.id.au; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=/aD9qkx3dItPYsJa84Gx5bqxbnbVUVWagU8sXmDR4hQ=;
+ b=lj2t+wLXySqKB8Ug4msLqUENDCJYbiAIoXr17RVJZ/aHPdFbp9T0ZvPQDyYrH6aewU
+ dfIGxQ6yu3HC3TGMsGT3PLvyrJv+ROeT+Ad0VvnoT3bwh+7ozj7aBytwGSukCr/2nzHt
+ vZk3FvqXVPf+HtcZDZs3vFa3ppgqkC6eBnogI=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=/aD9qkx3dItPYsJa84Gx5bqxbnbVUVWagU8sXmDR4hQ=;
+ b=cM/AkDOUFJPp1OJhmnq6MIQ+LvIFZbmDdWYPvznTgav1HBcG/J3FmnwM2a2FVdT/6L
+ gbj5LfleBjdF6NdURbR3w+DnLC5ZhIUB/cQN/YLRqGFCWpyMbpW+MBvo4IUx+bS3gtuF
+ 6+YJiIE5DJfRmxTCtEhpc7anVkxsGsYa2MG1nsQirMZP8M2oK3h1D1VsVjFYsy+NQmWS
+ SMMAK7X3XK8FF4tAZ0jiQRD8NdPRN/3ONVPuseDuUULO43tksKrrTgNvkebaZnbBrIuT
+ VNq0MUtbU6ZrD22G0KEaYuXYjC0Z/BCtrTscY0IlXNLeFS+3Dj0bbcTSWlnAl6s6SF4k
+ DHnQ==
+X-Gm-Message-State: AOAM531zB2/cHb4EgJqtjiKIsYS5Oo3WgMmm5lt5vcg2enhEYWYR3flg
+ Okx/o2EwkeGo1DwvV1TKnlMJ44iyRebqVYvuRCE=
+X-Google-Smtp-Source: ABdhPJzSIgdeIWO8WnYGMRyfPvAm9xwPG4Ifj5y/OQRtFO+1KX4bKGSS1p2skCYqnrW1uAPs8WbIpZ16EBklFupUylM=
+X-Received: by 2002:a50:f403:: with SMTP id r3mr7540875edm.260.1598335020522; 
+ Mon, 24 Aug 2020 22:57:00 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CA+Ai=tBJqLB7yDbd-kqzDhr+d+65K9r3DQsZrB2kGi9wF8BaiA@mail.gmail.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=thuth@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/25 01:35:36
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -52
-X-Spam_score: -5.3
-X-Spam_bar: -----
-X-Spam_report: (-5.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.956,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-2.25, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+References: <20200819100956.2216690-1-clg@kaod.org>
+ <20200819100956.2216690-9-clg@kaod.org>
+In-Reply-To: <20200819100956.2216690-9-clg@kaod.org>
+From: Joel Stanley <joel@jms.id.au>
+Date: Tue, 25 Aug 2020 05:56:47 +0000
+Message-ID: <CACPK8Xep5-nUqDFwd_HbG9OjV+vrwS1t_WgPsJJQoh9HHeSf+Q@mail.gmail.com>
+Subject: Re: [PATCH v2 08/21] aspeed/sdhci: Fix reset sequence
+To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::544;
+ envelope-from=joel.stan@gmail.com; helo=mail-ed1-x544.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -14
+X-Spam_score: -1.5
+X-Spam_bar: -
+X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.248,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,47 +92,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jsnow@redhat.com, ehabkost@redhat.com, crosa@redhat.com
+Cc: Andrew Jeffery <andrew@aj.id.au>, Peter Maydell <peter.maydell@linaro.org>,
+ qemu-arm <qemu-arm@nongnu.org>, Eddie James <eajames@linux.ibm.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 25/08/2020 04.26, Rohit Shinde wrote:
-> Hey John,
-> 
-> I sent this email a couple of weeks ago to the qemu mailing list since I 
-> didn't really know who to approach.
+On Wed, 19 Aug 2020 at 10:10, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+>
+> BIT(0) of the ASPEED_SDHCI_INFO register is set by SW and polled until
+> the bit is cleared by HW.
+>
+> Use the number of supported slots to define the default value of this
+> register (The AST2600 eMMC Controller only has one). Fix the reset
+> sequence by clearing automatically the RESET bit.
+>
+> Cc: Eddie James <eajames@linux.ibm.com>
+> Fixes: 2bea128c3d0b ("hw/sd/aspeed_sdhci: New device")
+> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 
-  Hi Rohit,
+Reviewed-by: Joel Stanley <joel@jms.id.au>
 
-The qemu-devel mailing list is very high traffic. So I'm sorry, but you 
-might need to be a little bit more specific with your questions if you 
-expect an answer...
-
->     I have built qemu from source and I have my machine setup for
->     git-publish via email.
-> 
->     I would like to start contributing with one of the bite sized tasks
->     mentioned in the wiki page. The one that interests me and which I
->     think is the easiest are the sections on "Compiler Driven Cleanup"
->     and "Dead Code Removal". I think this is a good way to get
->     introduced to the codebase.
-
-Sure, just go ahead and have a try! Once you've successfully wrote a 
-patch, please have a look at 
-https://wiki.qemu.org/Contribute/SubmitAPatch how to submit it.
-
->     I plan to stay and become a long term contributor. Is there any CS
-
-What does "CS" stand for?
-
->     theory that I would need to know other than what I mentioned above?
->     Is it possible to "learn on the go"?
-
-You certainly have to "learn on the go", since it is likely quite 
-impossible to grasp a huge project like QEMU at once.
-
-  Cheers,
-   Thomas
-
+> ---
+>  hw/sd/aspeed_sdhci.c | 14 ++++++++++++--
+>  1 file changed, 12 insertions(+), 2 deletions(-)
+>
+> diff --git a/hw/sd/aspeed_sdhci.c b/hw/sd/aspeed_sdhci.c
+> index 22cafce0fbdc..4f24b7d2f942 100644
+> --- a/hw/sd/aspeed_sdhci.c
+> +++ b/hw/sd/aspeed_sdhci.c
+> @@ -16,7 +16,9 @@
+>  #include "hw/qdev-properties.h"
+>
+>  #define ASPEED_SDHCI_INFO            0x00
+> -#define  ASPEED_SDHCI_INFO_RESET     0x00030000
+> +#define  ASPEED_SDHCI_INFO_SLOT1     (1 << 17)
+> +#define  ASPEED_SDHCI_INFO_SLOT0     (1 << 16)
+> +#define  ASPEED_SDHCI_INFO_RESET     (1 << 0)
+>  #define ASPEED_SDHCI_DEBOUNCE        0x04
+>  #define  ASPEED_SDHCI_DEBOUNCE_RESET 0x00000005
+>  #define ASPEED_SDHCI_BUS             0x08
+> @@ -67,6 +69,10 @@ static void aspeed_sdhci_write(void *opaque, hwaddr ad=
+dr, uint64_t val,
+>      AspeedSDHCIState *sdhci =3D opaque;
+>
+>      switch (addr) {
+> +    case ASPEED_SDHCI_INFO:
+> +        /* The RESET bit automatically clears. */
+> +        sdhci->regs[TO_REG(addr)] =3D (uint32_t)val & ~ASPEED_SDHCI_INFO=
+_RESET;
+> +        break;
+>      case ASPEED_SDHCI_SDIO_140:
+>          sdhci->slots[0].capareg =3D (uint64_t)(uint32_t)val;
+>          break;
+> @@ -155,7 +161,11 @@ static void aspeed_sdhci_reset(DeviceState *dev)
+>      AspeedSDHCIState *sdhci =3D ASPEED_SDHCI(dev);
+>
+>      memset(sdhci->regs, 0, ASPEED_SDHCI_REG_SIZE);
+> -    sdhci->regs[TO_REG(ASPEED_SDHCI_INFO)] =3D ASPEED_SDHCI_INFO_RESET;
+> +
+> +    sdhci->regs[TO_REG(ASPEED_SDHCI_INFO)] =3D ASPEED_SDHCI_INFO_SLOT0;
+> +    if (sdhci->num_slots =3D=3D 2) {
+> +        sdhci->regs[TO_REG(ASPEED_SDHCI_INFO)] |=3D ASPEED_SDHCI_INFO_SL=
+OT1;
+> +    }
+>      sdhci->regs[TO_REG(ASPEED_SDHCI_DEBOUNCE)] =3D ASPEED_SDHCI_DEBOUNCE=
+_RESET;
+>  }
+>
+> --
+> 2.25.4
+>
 
