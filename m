@@ -7,72 +7,72 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D3ABC433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 19:06:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6201C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 19:06:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DC8C42074D
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 19:06:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8D8E72074D
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 19:06:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="ErvDp95Z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC8C42074D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="eOCo1Vr0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D8E72074D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45290 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48024 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAeGj-0006zt-6T
-	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 15:06:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33604)
+	id 1kAeHU-00088J-Or
+	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 15:06:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33484)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=49978a6e9=alistair.francis@wdc.com>)
- id 1kAeAO-0004Mj-Dn
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 14:59:32 -0400
+ id 1kAeAB-00045w-Fh
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 14:59:20 -0400
 Received: from esa3.hgst.iphmx.com ([216.71.153.141]:58806)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=49978a6e9=alistair.francis@wdc.com>)
- id 1kAeAM-0002vn-3f
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 14:59:32 -0400
+ id 1kAeA8-0002vn-Tp
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 14:59:19 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1598381971; x=1629917971;
+ t=1598381958; x=1629917958;
  h=from:to:cc:subject:date:message-id:in-reply-to:
  references:mime-version:content-transfer-encoding;
- bh=KkXpN/My5uz42htygwoCwOQL9QQ/iHNRPhmz5fxkdlA=;
- b=ErvDp95ZOdDGmjSoMnrltA9d53Qx7XVpOOx7ngj1ks3FuC4c5vjZWW8b
- 8lhWgqFJAD4e+p14IAE3dvZIOhwxtgnv4GVL19QpPCpOA6UswW8jFyVmm
- pBJRY4xU5dJOik6FXfq86em8n1XFBhrYWH7tB94OWk+bqIiqTlnES28tx
- hq0+H+tvH9+FQAza2OWbIX/4x8GOc5lyxsEfq04Ymdv1wOfveXF5KU4il
- mHfvB8ME+c90VoFFSqPPc4sKoQzxFGLAto9u1qCb0KJHNSr8IW0B1DSPb
- 4Qz30dnP9XWyYy3z+vOeOborOCcNZnXZiWzGNUqDE/mJ0wbMJvUt0PNDo Q==;
-IronPort-SDR: P6cTXhiJsvtj7XSN5Evfaz7ODG86JQ7rvoHBmoGuzkis2asWzsOx3wZGeY11B/E+Xog6lQPh+u
- 5ZrAF4+rPARpjRMPVhjsBAoYSbLYnqfqqW4RkS8i12Ftw4K84uHHoaf6d6SahLfTb/k6FlQ7yT
- M6pv0KQtQpqADUq/brpfu1GA0x72yzKNEoia5emj4aWcg2tYcrVkGM+2D9eoCCwy7ENRc3X/kw
- w3RFdlAZxlqVZuqHqgdKCPpc59njk0vHOmpSXMIeQLenq2RZbKuXvc1yZ1X6TAALo5fpC7mcW9
- JwM=
-X-IronPort-AV: E=Sophos;i="5.76,353,1592841600"; d="scan'208";a="150145296"
+ bh=yV+tDkE0bdWABVC0vficSUBZAISIRPE0qfR9dB7A1Ac=;
+ b=eOCo1Vr0EYEd6oUMKay4sN+UcMqSnHIo9QsVTqMlKINAp4FFm+g15N59
+ 5/Zjx6XdTIJ+Gdab+HV4YBLM1f3OFyVCMkhvCl06HqRZTejrEZAdmxwsK
+ ZyJkvn7dvNx/BMknAkMC7UXE7Ihy37GfiPOwyx7oq0X8kyHmay3nQNzGz
+ 5jhsWOf4c8PY7C4Lz77UdoLv1JzldUFLDgfRtHRHwTnICp3OZHo/fM5jD
+ 76LZUi7kKn8t8aHTWPOGC6Cvwz99v+2galAA3MMRCSEbWBCHRB5jAjEAg
+ SLTLl3G/qCZURwiK8xdc7Ld0hdah+fmus19sMY6Orpm788vFQofv6aK2V Q==;
+IronPort-SDR: do2KZ6pHDUAPnu/8Kq3nxB6vjVOZEBcyZDKZBLC8viCE6/jG/3ZthNDxjyg35S4OpqHCCnrEb5
+ grs/rS9cBtnLMbeVcnjdFmAruKdsMA/9jt1JmJs/AP2ga/rvsqstZnLe0tnevaesXF175ImQLL
+ qNGlNei3zAo4sOtZtHCp6FHWGPewghhJOtJ37cTaFrNnBNFOdodm3hmelAAHafR5j8zWBDNAO0
+ FG9aNgr/zqXpC7LRFviNxpgVCtQCuJZISvUH+4yo3gmLe/vhHUT0MxLVlt/wkyiiX6aj8spuVM
+ +xE=
+X-IronPort-AV: E=Sophos;i="5.76,353,1592841600"; d="scan'208";a="150145293"
 Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com)
  ([199.255.45.14])
  by ob1.hgst.iphmx.com with ESMTP; 26 Aug 2020 02:58:57 +0800
-IronPort-SDR: wO9TFhbfKPpCmY6G8Z1WFJ3gTwjOOrk6pwq+1VlIDmcCIXRFOM7gZx54V/mUTkP9tSD2C5NddC
- BzTyMnVGvuPw==
+IronPort-SDR: iICafPTWUCyyMBLmXVwO+RmuMcA6ueszf+b25/C3KgybmnNvd/KsssmNyDqBS/In1mgAjSEzkX
+ I6Vqb8bUkYsQ==
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
  25 Aug 2020 11:46:32 -0700
-IronPort-SDR: vEoJnfuVBPhJXqHWkXH1ZQ7fi9BkfOHt1xp+9cbd/POL5aW2u6EejoTXd4W43ZnbsDSOXYalA1
- +Ze2+9Z9H65Q==
+IronPort-SDR: JH2hvVqGynwZjwoAW2SLX6tO/tS6IeG3ic0rflYoFJ9JfuYYyaTN87h0vZGtOQxB63an2N2IAv
+ l/+EegNPlmzw==
 WDCIronportException: Internal
 Received: from ind003389.ad.shared (HELO risc6-mainframe.hgst.com)
  ([10.86.59.125])
- by uls-op-cesaip02.wdc.com with ESMTP; 25 Aug 2020 11:58:56 -0700
+ by uls-op-cesaip02.wdc.com with ESMTP; 25 Aug 2020 11:58:55 -0700
 From: Alistair Francis <alistair.francis@wdc.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 14/18] target/riscv: Only support a single VSXL length
-Date: Tue, 25 Aug 2020 11:48:32 -0700
-Message-Id: <20200825184836.1282371-15-alistair.francis@wdc.com>
+Subject: [PULL 11/18] target/riscv: Fix the interrupt cause code
+Date: Tue, 25 Aug 2020 11:48:29 -0700
+Message-Id: <20200825184836.1282371-12-alistair.francis@wdc.com>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20200825184836.1282371-1-alistair.francis@wdc.com>
 References: <20200825184836.1282371-1-alistair.francis@wdc.com>
@@ -108,38 +108,34 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-Message-id: f3f4fd2ec22a07cc1d750e96895d6813f131de4d.1597259519.git.alistair.francis@wdc.com
-Message-Id: <f3f4fd2ec22a07cc1d750e96895d6813f131de4d.1597259519.git.alistair.francis@wdc.com>
+Message-id: 85b7fdba8abd87adb83275cdc3043ce35a1ed5c3.1597259519.git.alistair.francis@wdc.com
+Message-Id: <85b7fdba8abd87adb83275cdc3043ce35a1ed5c3.1597259519.git.alistair.francis@wdc.com>
 ---
- target/riscv/csr.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ target/riscv/cpu_helper.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/target/riscv/csr.c b/target/riscv/csr.c
-index f9ac21d687..390ef781e4 100644
---- a/target/riscv/csr.c
-+++ b/target/riscv/csr.c
-@@ -836,12 +836,21 @@ static int write_satp(CPURISCVState *env, int csrno, target_ulong val)
- static int read_hstatus(CPURISCVState *env, int csrno, target_ulong *val)
- {
-     *val = env->hstatus;
-+#ifdef TARGET_RISCV64
-+    /* We only support 64-bit VSXL */
-+    *val = set_field(*val, HSTATUS_VSXL, 2);
-+#endif
-     return 0;
- }
+diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
+index 0b4ad4bf46..661e790fdc 100644
+--- a/target/riscv/cpu_helper.c
++++ b/target/riscv/cpu_helper.c
+@@ -916,14 +916,15 @@ void riscv_cpu_do_interrupt(CPUState *cs)
  
- static int write_hstatus(CPURISCVState *env, int csrno, target_ulong val)
- {
-     env->hstatus = val;
-+#ifdef TARGET_RISCV64
-+    if (get_field(val, HSTATUS_VSXL) != 2) {
-+        qemu_log_mask(LOG_UNIMP, "QEMU does not support mixed HSXLEN options.");
-+    }
-+#endif
-     return 0;
- }
- 
+             if (riscv_cpu_virt_enabled(env) && ((hdeleg >> cause) & 1) &&
+                 !force_hs_execp) {
++                /* Trap to VS mode */
+                 /*
+                  * See if we need to adjust cause. Yes if its VS mode interrupt
+                  * no if hypervisor has delegated one of hs mode's interrupt
+                  */
+                 if (cause == IRQ_VS_TIMER || cause == IRQ_VS_SOFT ||
+-                    cause == IRQ_VS_EXT)
++                    cause == IRQ_VS_EXT) {
+                     cause = cause - 1;
+-                /* Trap to VS mode */
++                }
+                 env->hstatus = set_field(env->hstatus, HSTATUS_GVA, 0);
+             } else if (riscv_cpu_virt_enabled(env)) {
+                 /* Trap into HS mode, from virt */
 -- 
 2.28.0
 
