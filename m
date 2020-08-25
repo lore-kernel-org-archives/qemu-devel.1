@@ -4,80 +4,77 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F37FC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 09:34:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D2A8C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 09:54:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EFACE20706
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 09:34:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EC0D12071E
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 09:54:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OUVcOiqB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFACE20706
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UKcB3bRA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC0D12071E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46732 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51866 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAVLV-0007Qp-9g
-	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 05:34:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44124)
+	id 1kAVfL-0002bc-7D
+	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 05:54:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47684)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kAVL0-0006zV-4l
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 05:33:54 -0400
-Received: from mail-ej1-x644.google.com ([2a00:1450:4864:20::644]:41661)
+ id 1kAVeZ-00027E-BW
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 05:54:07 -0400
+Received: from mail-ej1-x636.google.com ([2a00:1450:4864:20::636]:34048)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kAVKx-0007c5-As
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 05:33:53 -0400
-Received: by mail-ej1-x644.google.com with SMTP id b17so7357800ejq.8
- for <qemu-devel@nongnu.org>; Tue, 25 Aug 2020 02:33:50 -0700 (PDT)
+ id 1kAVeX-0001Wv-Cb
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 05:54:07 -0400
+Received: by mail-ej1-x636.google.com with SMTP id d26so5615745ejr.1
+ for <qemu-devel@nongnu.org>; Tue, 25 Aug 2020 02:54:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=s+Sd+Stsb37fNw7VzduXNaMSen+ESVb2zhrpl7ocq0U=;
- b=OUVcOiqBmIizySoIzzOi16u2aO23FeqcQMhnCFXcxpFZLjaHqm2x7qmh3z/LmMqdrn
- i/pM82gH5U/pTRZCbmTylOV6W3pFxPVLyMeDJKD6OzPyQLu8rdPAboN+iPyKc/7XfV2d
- KvOppifKpKR21t18Hq1rZNnDdihTSlIfza6PGSvYW4VUfDJSLNXuiE2bxeNIROMllS36
- soNajqOe8VS5R3/Gk8ATeZTOku9+3rM6bKCWQVpKbt3nO1jVy76aZyUvlrUCIgENbGB4
- 9RcKcgAK5Vt6+eCdDPG+pNmJqNygdmiv3RGFBw8VqfuhsClRD/rSnjndsKomi41OXLs5
- IFSg==
+ :cc; bh=ysKmYptlhH46YY/Pfv8ih++Vxy1CXgmt2mkpOnMxJwo=;
+ b=UKcB3bRAvouZl6Qb7sNSv3PGctQinBBfee1nuy9RTvD49UDJuS+t52i6WZVTqcyBNe
+ OB9z0tM2loIh2fiILx5jlgfasA0sFwlOwXSAS8eNwprSK8vaHbGKfjZGAmVR8q9HymT9
+ staCgfQeNUxdNltQ2S2fSpnLlgBw36mfTGxvAaSZMcCHMHxIYRUtgfSTZUeqweR/HRbM
+ KbQxA9pOJS0rYTHW5i6hHzoqSzhFg5dWqZFLx6wHuy1XFbCY5V80vwILHGjwm60BAYWA
+ 43qlTgqMDFcAwPN2cpD6Mweazji34+qRRyjtbIKSG+ZrUSBBPEmLo95Jnu+TZM4qnTzz
+ IX4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=s+Sd+Stsb37fNw7VzduXNaMSen+ESVb2zhrpl7ocq0U=;
- b=R6iIaCOvKpAMBvSQHNUWnk4HW7id7HC06xICC23PvcMkPyArkO8yrxxXgFnS/SRyD9
- MfZ0SniVzrcY3hIYHhzmfEvLMFLpyyW5WzH10Nluz1a2l5BnOCrqb7XIaXYfhYcJgP7Y
- JPcmwEzbEx/GY93/jkNCdVtK4OVHTV/uTOo9jWduPH2UlmWFAIXJ/QTpQCIrO/KZ+CdN
- 3w/n9TJZ2SLcLVma7wH9m5LF2xaRO2pHkTePSjqYmvZXT9XS15FVxjVgVkmVAfMyBiqz
- BJlqQfzF69CTMPVtMde+4fSPesmolNBX3nB54i+4tcuLx4uQwkezy3o4kWipMXIW7ZTJ
- JApg==
-X-Gm-Message-State: AOAM530S634Cav+d1Z5UZ69S2jyu8S3oeiyYJOM19yoWvfiB672XLfCS
- 03Rzy8ODaCSYpjxsrBWXIl6ro9JT+EgzrW/k1j2ORg==
-X-Google-Smtp-Source: ABdhPJzeCInZQv0oQAKLwohzthVBcKijvqTigN83Ee2NcjVgjFvAyPjWBB2g7JLMhu/xOuvcSNpAl1CowFNT2GDIB3E=
-X-Received: by 2002:a17:906:b814:: with SMTP id
- dv20mr9561599ejb.4.1598348029478; 
- Tue, 25 Aug 2020 02:33:49 -0700 (PDT)
+ :message-id:subject:to:cc;
+ bh=ysKmYptlhH46YY/Pfv8ih++Vxy1CXgmt2mkpOnMxJwo=;
+ b=XrEy/OOLB7agugemlYJt0ZKeGTRI0MZ+kmtNOEdCvgIoRWOtYY2kRlpvq9BGZsXHBQ
+ rPNkTnYokzdO0vCFALz9YJD/AjJ0dm5AJUu4jFyBl974YthnFappFj02cOhVV0dhHIs+
+ /KUBHAzF2gCCE6qWfCfUXPEQuqbGP/nE9tbrlhRhikIPawgbJl88W+6k6QYBer4S34Bj
+ c0h6bM2R782r0a7Z+crpJx6dCGQqXSlagxoKnPzJb20gfBGME94TYthB1ROlQiQcgqH+
+ juVRPn2vjAgAtDC/wYSuFp7xvSQpyrtNZCk/pmfAaY76t+KnESkOxfGQg8dagGh7WCSE
+ 5K+A==
+X-Gm-Message-State: AOAM531673dFyC8aNAPBzwKtXkBg7W+MYk4lJfQqIa8HpcDpsGvE4PFh
+ X2ioNd/OA3Es76hs9E4k2bbLAXeo2EvVH8AHVU/afg==
+X-Google-Smtp-Source: ABdhPJwMVceK4p8WFZReg2LxXnju7KTiQyO3781Z/Q1l4T7f3KPIke3sZ3oSMITwUw4cbp9JSCAtJl0vWlJ5KEPxWqw=
+X-Received: by 2002:a17:906:f28b:: with SMTP id
+ gu11mr9353797ejb.407.1598349243082; 
+ Tue, 25 Aug 2020 02:54:03 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200821205050.29066-1-jcmvbkbc@gmail.com>
- <8b20adcd-97e9-0f8f-1854-b9809060d6cd@amsat.org>
- <CAMo8BfKnW7oEe76akdszPh46R1GVU2kuGfTg3T7ypVHQnzDzTQ@mail.gmail.com>
- <CAFEAcA8sY720+g9ms4EyrGEfHnZaDK-W81Jb=RS0J+V9kCc68g@mail.gmail.com>
- <CAMo8BfK+LOyc+HSeBWWyJPEJKGzjJSVqAZ9ZE_XmC3bCfN60fA@mail.gmail.com>
-In-Reply-To: <CAMo8BfK+LOyc+HSeBWWyJPEJKGzjJSVqAZ9ZE_XmC3bCfN60fA@mail.gmail.com>
+References: <CAFEAcA_0R9mQNFnyzdpR65YRHoDs0uPKWxmCOQUojbpAM-jP8A@mail.gmail.com>
+ <CAJ+F1CL1Hp-g8gNMpdGgk2d0KCzJfBde9f_mX8TLtewe3-B48g@mail.gmail.com>
+ <CAFEAcA_u_3P9MQ23zWTUH-aM8Nabbt+PVv+4qOWpEAhiuJq+cg@mail.gmail.com>
+ <e9155559-9a06-ec6f-4be0-2a692364c665@redhat.com>
+In-Reply-To: <e9155559-9a06-ec6f-4be0-2a692364c665@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 25 Aug 2020 10:33:38 +0100
-Message-ID: <CAFEAcA9SwjPqucXCudSGWpTicfXCS1YXUKGDU9XC1bg7MaP1AA@mail.gmail.com>
-Subject: Re: [PULL v2 00/24] target/xtensa updates for 5.2
-To: Max Filippov <jcmvbkbc@gmail.com>
+Date: Tue, 25 Aug 2020 10:53:52 +0100
+Message-ID: <CAFEAcA919wJg00vVTyVksaZGNmD50gH1jQj6RWA1ZAafEJAbOg@mail.gmail.com>
+Subject: Re: meson.build files are missing copyright/license headers
+To: Thomas Huth <thuth@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::644;
- envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x644.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::636;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x636.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -99,48 +96,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Taylor Simpson <tsimpson@quicinc.com>, Richard Henderson <rth@twiddle.net>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
- qemu-devel <qemu-devel@nongnu.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 24 Aug 2020 at 22:54, Max Filippov <jcmvbkbc@gmail.com> wrote:
+On Tue, 25 Aug 2020 at 06:57, Thomas Huth <thuth@redhat.com> wrote:
 >
-> On Mon, Aug 24, 2020 at 2:33 PM Peter Maydell <peter.maydell@linaro.org> =
-wrote:
-> > On Sat, 22 Aug 2020 at 20:48, Max Filippov <jcmvbkbc@gmail.com> wrote:
-> > > On Sat, Aug 22, 2020 at 3:20 AM Philippe Mathieu-Daud=C3=A9 <f4bug@am=
-sat.org> wrote:
-> > > >
-> > > > Where does that come from?
-> > >
-> > > Generated by xtensa processor generator, as one of many output artifa=
-cts.
+> On 24/08/2020 20.46, Peter Maydell wrote:
+> > We don't mandate SPDX[*],
+> > but it will do the job if you want to use it.
 > >
-> > Is there anything different with the source for these cores
-> > compared to the ones we already have in the tree, or are
-> > these just "more cores, generated the same way as the old ones" ?
+> > [*] Mostly because nobody's cared enough to say "we should
+> > standardize on this and convert existing files and add the
+> > check to checkpatch that new files have an SPDX line".
 >
-> They are generated the same way as the old ones, but they have different
-> configurations: they support FPU2000 and DFPU opcodes implemented
-> earlier in this series. I've added them to enable testing of these opcode=
-s.
-> de233_fpu is supposed to be a platform for further xtensa gcc development=
-.
+> We should standardize on this and convert existing files and add the
+> check to checkpatch that new files have an SPDX line! :-)
+>
+> Ok, now sombody said it loud. Would there be any objections to enforce
+> this via checkpatch on new files?
 
-OK, in that case I don't see any reason why we should keep them
-out of the tree. Which isn't to shut down the point Philippe has
-raised about generated sources, just that there's not much need
-to block this pullreq while we have that conversation since it's
-not a change from the status-quo.
+I wouldn't object, indeed I think checkpatch-enforcement is an
+important part of the process. I think that if we're going
+to move to SPDX we should:
+ * look at the SPDX spec and identify what we need to do beyond
+   just adding SPDX lines (eg do we need a LICENSES/ subdir
+   like the kernel has with a file per license?)
+ * document (in docs/devel?) that we require SPDX
+ * decide what our plan is for 3rd-party code (libvixl, etc)
+   [where any SPDX line we add will be lost again next time
+   we resync our copy of the code]
+ * put in a checkpatch check for new files (presumably the
+   Linux kernel has one we can borrow)
+ * update existing files (I think the kernel folks probably
+   have scripted stuff for the easy parts of this; multi-license
+   files like fpu/softfloat.c likely need by-hand conversion)
 
+Mostly I think if we're going to do this we should find somebody
+who wants to put in the work to push it forwards so we don't
+have a half-and-half interminably extended transition between
+old-style license notices and SPDX.
 
-Applied, thanks.
-
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.2
-for any user-visible changes.
-
+thanks
 -- PMM
 
