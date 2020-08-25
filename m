@@ -2,87 +2,114 @@ Return-Path: <SRS0=2GMi=CD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9043C433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 10:26:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15913C433E1
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 10:28:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B49002068F
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 10:26:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D4E312068F
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 10:28:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l+B48RQ9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B49002068F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S4pEbvkN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D4E312068F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42312 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44682 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAW9k-00048M-Uj
-	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 06:26:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54996)
+	id 1kAWBR-0005E1-6C
+	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 06:28:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55546)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
- id 1kAW91-0003g2-Cw
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 06:25:35 -0400
-Received: from mail-ej1-x641.google.com ([2a00:1450:4864:20::641]:35412)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
- id 1kAW8z-0005SM-Js
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 06:25:35 -0400
-Received: by mail-ej1-x641.google.com with SMTP id a26so15858520ejc.2
- for <qemu-devel@nongnu.org>; Tue, 25 Aug 2020 03:25:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=AbHzArxDYj8dmWYvIPHWadFaX+Hib+j3tm2ztHJMIrA=;
- b=l+B48RQ9TRZ1id9TdXphNZpezj3U6N5wp3wAAXRWre7FTiKY3ozuijgmLkYH/ZzNZR
- +2g+ZTZSIt15H1MKOSOeylYht1LA+6OWLSd32FVOeOxYqZH/ECwGkSkvLLAu8Lihj8Qn
- W4uQKdXwRqvZrzV3/oqQwyFvmgXom2dGc6i0qE+EBCFMoZ4vEoVggFisRJMXepTIg4Bg
- O+e5I2lxeraXgBfx0ba4IuiWVHiLNmT6glWtxDx4sh8S+QXMOL95JAZEPgJA2VNSspQR
- RlC9+EIb6AoI3dX/zhRbgpo7KvxJBrs0anA471OHaqs9t0n5S+jTxwN3p6OZlP2bdF3I
- uuJQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=AbHzArxDYj8dmWYvIPHWadFaX+Hib+j3tm2ztHJMIrA=;
- b=YEhOZJfJu/lQp7fPQe+emNHJJPCCu8nBIFfG/b+miHXwZjRCW884odm08VJEVfxRoc
- n2kUggjBm2zNtISYBqHYFyr4sAtepO1r9/YYfbCdqaASCh3Bg7Zr117PJw18YjaRBYoU
- QJKa73Mhkpp9CiXzK4yMO6kL2hxpGHtCRA+CVC1lWGkv9D6nN+uUn+ZDgLzp7EejKXy0
- ZDhaorxcv6syZSOPTAI1CQSM9CEPqMInEYPFI8yhMFdqT5o4VEMe96qzrSmRxOGOd0Nu
- wxL18H0ZNi4vCpUcrX7Iu8qcpaw7s8awLGwWMdIopv2+F2cACWI9WmDY38jpcgcyV90i
- nUkA==
-X-Gm-Message-State: AOAM532y0qvM+MosE1BMtAgYFk9RQk4AVUZBI78GkyAqOtv9woo85my0
- XeSFgy8g2WCZSsuveB7PKXGFPxo5uo38WEwx0Gw=
-X-Google-Smtp-Source: ABdhPJzclQ56AZicBtyu9QvHHajc0yaxIPCEe6e5YQeuXUd5leB2OBPRDWPjds2cyMtp6aaWC2i/OwUG9DUnC7RVu8k=
-X-Received: by 2002:a17:906:c10c:: with SMTP id
- do12mr6290840ejc.92.1598351132071; 
- Tue, 25 Aug 2020 03:25:32 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kAWAn-0004hc-Jg
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 06:27:25 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:57876
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kAWAl-0005ni-00
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 06:27:24 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1598351242;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=1hRlR4i9w+SWxYWr8iF02Qcop6zMYBgvGXMMS2bzuOE=;
+ b=S4pEbvkNkwoj4RdFTnIMI0X84nxle3B5DH72ChLOCUWBS3n4TwnjPVC6aQXvm0W1k1ILiL
+ 8VBFXy9Ex3hk5U/6684AqsSDNAblg5mqsgiouDRDjiFVsZ/jlXZ6cLJ741EE09HLWNE3Ut
+ HGPMhja93JbqNidv4HkHD4nHvDTHq9Q=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-305-8LwjaeMBP4uVvUAARULrXg-1; Tue, 25 Aug 2020 06:27:20 -0400
+X-MC-Unique: 8LwjaeMBP4uVvUAARULrXg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D90CE18B9EC2;
+ Tue, 25 Aug 2020 10:27:18 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-113-72.ams2.redhat.com
+ [10.36.113.72])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4D1BE5C1CF;
+ Tue, 25 Aug 2020 10:27:17 +0000 (UTC)
+Subject: Re: [PATCH v2 1/5] qemu-iotests: Fix FilePaths cleanup
+To: Nir Soffer <nirsof@gmail.com>, qemu-devel@nongnu.org
+References: <20200820235427.374645-1-nsoffer@redhat.com>
+ <20200820235427.374645-2-nsoffer@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <46545d0f-426b-777b-13fc-5fd912758a88@redhat.com>
+Date: Tue, 25 Aug 2020 12:27:15 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-References: <20200825001649.1811-1-luoyonggang@gmail.com>
-In-Reply-To: <20200825001649.1811-1-luoyonggang@gmail.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 25 Aug 2020 14:25:20 +0400
-Message-ID: <CAJ+F1CJYsR8Bf2EgaV+pMM_1DGnG-2tvCV-5LsjE6w3hk1-P_g@mail.gmail.com>
-Subject: Re: [PATCH] meson: Mingw64 gcc doesn't recognize system include_type
- for sdl2
-To: luoyonggang@gmail.com
-Content-Type: multipart/alternative; boundary="000000000000741b3b05adb11fb5"
-Received-SPF: pass client-ip=2a00:1450:4864:20::641;
- envelope-from=marcandre.lureau@gmail.com; helo=mail-ej1-x641.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200820235427.374645-2-nsoffer@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
+X-Mimecast-Spam-Score: 0.0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="RpvTpukbXWqCZH84j9SSERh4QhETjOX9x"
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/25 01:37:44
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -52
+X-Spam_score: -5.3
+X-Spam_bar: -----
+X-Spam_report: (-5.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.956,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-2.25, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,100 +122,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Nir Soffer <nsoffer@redhat.com>,
+ John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000741b3b05adb11fb5
-Content-Type: text/plain; charset="UTF-8"
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--RpvTpukbXWqCZH84j9SSERh4QhETjOX9x
+Content-Type: multipart/mixed; boundary="DXIoeyFGyF6Ab7od0oWppdYkd9u8TcRRW"
+
+--DXIoeyFGyF6Ab7od0oWppdYkd9u8TcRRW
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-Hi
-
-On Tue, Aug 25, 2020 at 4:17 AM <luoyonggang@gmail.com> wrote:
-
-> From: Yonggang Luo <luoyonggang@gmail.com>
->
+On 21.08.20 01:54, Nir Soffer wrote:
+> If os.remove() fails to remove one of the paths, for example if the file
+> was removed by the test, the cleanup loop would exit silently, without
+> removing the rest of the files.
+>=20
+> Fixes: de263986b5dc
+> Signed-off-by: Nir Soffer <nsoffer@redhat.com>
 > ---
->  meson.build | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
->
-> diff --git a/meson.build b/meson.build
-> index df5bf728b5..a3585881e1 100644
-> --- a/meson.build
-> +++ b/meson.build
-> @@ -224,8 +224,7 @@ if 'CONFIG_BRLAPI' in config_host
->    brlapi =3D declare_dependency(link_args:
-> config_host['BRLAPI_LIBS'].split())
->  endif
->
-> -sdl =3D dependency('sdl2', required: get_option('sdl'), static:
-> enable_static,
-> -                 include_type: 'system')
-> +sdl =3D dependency('sdl2', required: get_option('sdl'), static:
-> enable_static)
->  sdl_image =3D not_found
->  if sdl.found()
->    # work around 2.0.8 bug
-> --
-> 2.27.0.windows.1
->
->
->
-Which version of gcc are you using?
+>  tests/qemu-iotests/iotests.py | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
 
-Paolo, why did you you -isystem includes here? (if it's on purpose, it's
-worth to document it in build-system.rst since it takes sdl as an example
-and doesn't mention this)
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
---=20
-Marc-Andr=C3=A9 Lureau
+--DXIoeyFGyF6Ab7od0oWppdYkd9u8TcRRW--
 
---000000000000741b3b05adb11fb5
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+--RpvTpukbXWqCZH84j9SSERh4QhETjOX9x
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-<div dir=3D"ltr"><div dir=3D"ltr">Hi<br></div><br><div class=3D"gmail_quote=
-"><div dir=3D"ltr" class=3D"gmail_attr">On Tue, Aug 25, 2020 at 4:17 AM &lt=
-;<a href=3D"mailto:luoyonggang@gmail.com">luoyonggang@gmail.com</a>&gt; wro=
-te:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px =
-0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">From: Yongga=
-ng Luo &lt;<a href=3D"mailto:luoyonggang@gmail.com" target=3D"_blank">luoyo=
-nggang@gmail.com</a>&gt;<br>
-<br>
----<br>
-=C2=A0meson.build | 3 +--<br>
-=C2=A01 file changed, 1 insertion(+), 2 deletions(-)<br>
-<br>
-diff --git a/meson.build b/meson.build<br>
-index df5bf728b5..a3585881e1 100644<br>
---- a/meson.build<br>
-+++ b/meson.build<br>
-@@ -224,8 +224,7 @@ if &#39;CONFIG_BRLAPI&#39; in config_host<br>
-=C2=A0 =C2=A0brlapi =3D declare_dependency(link_args: config_host[&#39;BRLA=
-PI_LIBS&#39;].split())<br>
-=C2=A0endif<br>
-<br>
--sdl =3D dependency(&#39;sdl2&#39;, required: get_option(&#39;sdl&#39;), st=
-atic: enable_static,<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0include_type=
-: &#39;system&#39;)<br>
-+sdl =3D dependency(&#39;sdl2&#39;, required: get_option(&#39;sdl&#39;), st=
-atic: enable_static)<br>
-=C2=A0sdl_image =3D not_found<br>
-=C2=A0if sdl.found()<br>
-=C2=A0 =C2=A0# work around 2.0.8 bug<br>
--- <br>
-2.27.0.windows.1<br>
-<br>
-<br></blockquote><div><br></div><div>Which version of gcc are you using?</d=
-iv><div><br></div><div>Paolo, why did you you -isystem includes here? (if i=
-t&#39;s on purpose, it&#39;s worth to document it in build-system.rst since=
- it takes sdl as an example and doesn&#39;t mention this)<br></div></div><b=
-r clear=3D"all"><br>-- <br><div dir=3D"ltr" class=3D"gmail_signature">Marc-=
-Andr=C3=A9 Lureau<br></div></div>
+-----BEGIN PGP SIGNATURE-----
 
---000000000000741b3b05adb11fb5--
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl9E54MACgkQ9AfbAGHV
+z0ANiQgAiVJdG4g+pk9bHzw9aPs1Rg0umZ4/JLMyk1+BHWCa0R5kW6sqkWkA+xzx
+zVxU6GH0fGs5vAVLyIW7PkbBJrXVtToeRtUv8WKH3cPyu2FtrQV/i4rFQTzJxrgD
+t643v89dPhUmqZsm8xi23kLqKi3UdRnhpvc4p6XAqVUdB2PWDMJiv9elGf63mhb4
+C3LgUv3AR3xKs4u6wD73FucDvSc55mKP8fu3iWcZIKsrZVKkG9xT40Lj1DgjX9ow
+uc3Q/m5PGZC/pUInObS4qmwx5MXD1LsCyaO6l5ZmpgFaehOeKoxN4v2Q5YrwtOnX
+bRI4LUx2X6E68QOwgeDqZ9P4XY9umQ==
+=2Xmi
+-----END PGP SIGNATURE-----
+
+--RpvTpukbXWqCZH84j9SSERh4QhETjOX9x--
+
 
