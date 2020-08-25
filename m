@@ -2,125 +2,94 @@ Return-Path: <SRS0=2GMi=CD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,RCVD_ILLEGAL_IP,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B302FC433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 19:07:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 303F6C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 19:08:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8B3F52074D
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 19:07:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 063D52074D
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 19:08:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="M82Qy+3a"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B3F52074D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Vl+IvyGF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 063D52074D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52356 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52584 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAeIY-0001YJ-R2
-	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 15:07:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35146)
+	id 1kAeIa-0001dt-Af
+	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 15:08:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33616)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <Thomas.Lendacky@amd.com>)
- id 1kAeHL-0008Cq-Mr
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 15:06:43 -0400
-Received: from mail-bn7nam10on2076.outbound.protection.outlook.com
- ([40.107.92.76]:42272 helo=NAM10-BN7-obe.outbound.protection.outlook.com)
+ (Exim 4.90_1)
+ (envelope-from <prvs=49978a6e9=alistair.francis@wdc.com>)
+ id 1kAeAR-0004Nl-4u
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 14:59:36 -0400
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:58813)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <Thomas.Lendacky@amd.com>)
- id 1kAeHI-0003xT-Ni
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 15:06:43 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=dNTUSg/BzxrQJeQN1Lk0yWyn1flm6UQuwvT+YtlKEkKqJVDXB3sKTvULP7DwIIvx7ZHDybGTF7b1AG/YBkvhGPVq1MUidIu5JtrIvGGD8gjzS8xK3+94e4tVspUrxGEE4KRezcgvSEyNjmZmLXngAM1mJ60kpPoFvd7j7Ct4BQ9r/sj4mkpdqWoMQHv6xt4VB94TPwBYzCnTdzh645mSG9pBmn4DsWy+7GiT9MFNTWjjQr+1lfBGOY4X3hnAW361PurD1xdf911lJpW9VX/eZJn17Gudafj6oE0thqeZ4j5mVlzWOnXT6amGqRsu+sr07VPDmV0GL/bcW1XxNBoqkA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=MJ+BpJng5csN/LA+I/qcPQkYM/tISIORmRx+LOYMnks=;
- b=DEV843dJZ+BpWDH+gOM/8Io6mBBUm7EKKcCObNRwnOkNxG4VXfTnfH12V/rrkbbnRqTQ1hCQ+3vCGM7GSq0RMxNwJgVb7KVWNLRCwuAWr+vCgzDq2L8yxIIoX/uNXBJCs1EgxMg3HxhRJ7GYyqk6Nfnoibpumx7w5WyvU9YPJQeC3o65BUDtOgeuuFIR/lhRAZcB2tcQibmRtwxV2mbwwVuD1LzQMDKlReDiOsTcEihk1FPebmoXJ/exkecxlHpH3EfoLz8IUMet1wPl8GpJX/0sKr9cXrEAajP15/Ig4giorT1+CjQNI22EB+iP4mSfx7XZR8EMvXmz37Md+zR1mQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=MJ+BpJng5csN/LA+I/qcPQkYM/tISIORmRx+LOYMnks=;
- b=M82Qy+3a5osu+M9iWrXfWqCt4Q6ovsq/0fY57AimJmUc45CHCL2+EqLxJGArbzRQF52vABdFVPBzhdMNPHKvugfitsqfQ/cmw3y3ZxebeS9JNpgoNCfCz8O5HWGM2hCzQvCOn0wPAE1XcsamneEG1H3Whockj4xdMTQQQy+0UBM=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=amd.com;
-Received: from DM5PR12MB1355.namprd12.prod.outlook.com (2603:10b6:3:6e::7) by
- DM5PR1201MB0219.namprd12.prod.outlook.com (2603:10b6:4:56::19) with
- Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3305.25; Tue, 25 Aug 2020 19:06:06 +0000
-Received: from DM5PR12MB1355.namprd12.prod.outlook.com
- ([fe80::299a:8ed2:23fc:6346]) by DM5PR12MB1355.namprd12.prod.outlook.com
- ([fe80::299a:8ed2:23fc:6346%3]) with mapi id 15.20.3305.026; Tue, 25 Aug 2020
- 19:06:06 +0000
-From: Tom Lendacky <thomas.lendacky@amd.com>
-To: qemu-devel@nongnu.org,
-	kvm@vger.kernel.org
-Subject: [PATCH 1/4] sev/i386: Add initial support for SEV-ES
-Date: Tue, 25 Aug 2020 14:05:40 -0500
-Message-Id: <88dc46aaedd17a3509d7546a622a9754dad895cb.1598382343.git.thomas.lendacky@amd.com>
+ (Exim 4.90_1)
+ (envelope-from <prvs=49978a6e9=alistair.francis@wdc.com>)
+ id 1kAeAM-0002w2-L1
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 14:59:34 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+ t=1598381971; x=1629917971;
+ h=from:to:cc:subject:date:message-id:in-reply-to:
+ references:mime-version:content-transfer-encoding;
+ bh=JaJgYijSy03N5csPGH2OpxKfJYtfl+mklbnHCVhdze8=;
+ b=Vl+IvyGFpQxefkdykrzuNa41pCmRXf0RKXxcScoAC350oToWl7EddgbI
+ oxsk23iiuGxnny5TbIXdAOrFCQmSaYk8a5SfPyvbC+8kdFy5r4Z6dJk8c
+ Y7jr3n/GBsRgEjttw3uWXiW8jQnQGh++vStBaDlrh9m2y8gC5Kj7kCn5G
+ eCD2P4uOpPIJDtzvPvB8Z9QcOjX4Mo7LLjin4OOSTvGy19qP3EjYjuIHX
+ fT7DblL9M5L76Lw2vW000mT1PNtUyP1jvwBG/J+kb3ejZZLuXUcTsNQ8d
+ TOdiUWqid/EhIYlVC43OrnFwbbu2OR34YHVmGwQ5KpcUFEpzFvVpZT3jc g==;
+IronPort-SDR: ApM165vkjISWVrH4yemg+3/PjfgrkvaYKgbOSRqePIu9a3HWakWtGSLDZwvKKytRgLwl/E331Z
+ 4RL/IwPMMLePUrkNgVT+PEw2yB6ncR1WdhqmNB3714855jdXF2zL/IA4TDyz4rBFhAdXnoDgBi
+ PM2xcDz57Vwjt/+vxeN9N9lcTr3KU7xJDbIAx3JLryreUQ5L+ZhAg/Y15l1sYuhJbXBezE6dIC
+ tH0FU0fdw3yp9J/rThPzfWvvAtzZlFKI+mUxhOhYbgWJ7vCpVV97HTe5mgeR5aPEgQPCoSocE/
+ R6U=
+X-IronPort-AV: E=Sophos;i="5.76,353,1592841600"; d="scan'208";a="150145298"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com)
+ ([199.255.45.14])
+ by ob1.hgst.iphmx.com with ESMTP; 26 Aug 2020 02:58:58 +0800
+IronPort-SDR: FJxIg1ToPckyujRr3XB2jn0aEhoZgFt99OtJdjiulj/wH9HhTRsgrdFdF7woNJH1Yp9Lv/mYsU
+ ukpuaxiAN3Eg==
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+ by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 25 Aug 2020 11:46:33 -0700
+IronPort-SDR: FWXWQxX9JR6c53mSDHMFPpwds9AJa1YnkpbBoNscVNDTRh0oZlTWFuCgcJHt/C82SdJo3TEVwh
+ 2yONIte4Czpg==
+WDCIronportException: Internal
+Received: from ind003389.ad.shared (HELO risc6-mainframe.hgst.com)
+ ([10.86.59.125])
+ by uls-op-cesaip02.wdc.com with ESMTP; 25 Aug 2020 11:58:56 -0700
+From: Alistair Francis <alistair.francis@wdc.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL 15/18] target/riscv: Only support little endian guests
+Date: Tue, 25 Aug 2020 11:48:33 -0700
+Message-Id: <20200825184836.1282371-16-alistair.francis@wdc.com>
 X-Mailer: git-send-email 2.28.0
-In-Reply-To: <cover.1598382343.git.thomas.lendacky@amd.com>
-References: <cover.1598382343.git.thomas.lendacky@amd.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: DM5PR12CA0056.namprd12.prod.outlook.com
- (2603:10b6:3:103::18) To DM5PR12MB1355.namprd12.prod.outlook.com
- (2603:10b6:3:6e::7)
+In-Reply-To: <20200825184836.1282371-1-alistair.francis@wdc.com>
+References: <20200825184836.1282371-1-alistair.francis@wdc.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from 255.255.255.255 (255.255.255.255) by
- DM5PR12CA0056.namprd12.prod.outlook.com (2603:10b6:3:103::18) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3326.19 via Frontend Transport; Tue, 25 Aug 2020 19:06:05 +0000
-X-Mailer: git-send-email 2.28.0
-X-Originating-IP: [165.204.77.1]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 0ddc2d9c-82a0-433d-cdcc-08d84929eb1c
-X-MS-TrafficTypeDiagnostic: DM5PR1201MB0219:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM5PR1201MB02194578774DFC92EFC06EDCEC570@DM5PR1201MB0219.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:2043;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: DkWYuh3DAgGbkwvY6N0zDEGGnLrPTiyttB/aPom7rWNyU6KhXoCa+JES7AlQzbwpzX9CB4FtARrf37o57ANQtO648QaPdyhzw7kbzy+olcSh1Rju2lpQwzDxrf7PlTWuytO7krX68r+7zMHGx8dpQ4Jf6sihgFBboZW3MMzThwiaMn5tK/7yaHeEgCKPD58j4Msg9z+XTbgi9uy2jFS/dZ6/ra5U5HYWEPQIF/Lm+KFjDyVRSZv4DCb+1l987Od8VFTRs/STRoQI+FfEpkroRBuxQGtuVXm48fhQld1uYYAEusMNSq00BYAecSpn4ru2GCbDINHYBp4EsPM73bBiAxva7ygdFgVBEePoSxQhqkgxz7i+YnRJL3ZuJCPW4Xet3iALUsA3K+kpThZsjLaCpRqHK8rpm8KkGKPxJm4eqn8=
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:DM5PR12MB1355.namprd12.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(396003)(136003)(376002)(39860400002)(366004)(346002)(4326008)(186003)(86362001)(8676002)(83380400001)(54906003)(16576012)(8936002)(6486002)(316002)(478600001)(36756003)(52116002)(26005)(6666004)(66556008)(2616005)(66476007)(66946007)(956004)(2906002)(5660300002)(136400200001)(309714004);
- DIR:OUT; SFP:1101; 
-X-MS-Exchange-AntiSpam-MessageData: p7myolQbTVCGy+rCIbIy9j9eW4HKvjP0mF9pvwIJ0vIAI7rjWGvlwYeNraOpydLV6YdigRW34S15Z02gFF3np6IASPUPrhB3myGJypURXtQanDErxeA2tPpGO6X/8leH3/yAaMZWT3bviziLv2nAB36etu2ocv9eP0ebCxhvhRLoeccTIaYaZK5P+k2vSfMz9I1EigeQnH1hErw6NNaSAkU2rmNK8OZqNXwI4f0JOPJRioXX/w94NsXvOUqssy/IY5CsqsNG8HUJOy2pBeY7/N8dcJi4xB1RmLbGneBkwipWFSFpDJBIzHRiK5DAkh2RT+7Ki8zFT6oSZGkszLcQE5+LipGb0l2+hH6zKCKoSXM9wmWdQWpa7LJLbW8nLXi/sckD6gyN3ruMLAlMDyhm1uXxPnWl3OWjodAK1U0v0xtpwoB9Dxu6DYziEn91N8YOvii38PD7EtxMg2hoGyWmtwDK29CzCtm9SJ6SBbKQFwS4FMP/vv1AFAUINU0gJt4/ZlTw5Z5nPVE4NH2fVuAzxdMcgezlP0m1HMJmCXEDDurcllYA/AvllReLMlD2WB+SN8TA27970wPC3GYzprq5bTP9Y0G2Ze6RC8JVcFDpFfzWrpuhGsJs1IP4tF2lfY8TbR5tU48WmpXqN+E3cFYr0Q==
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0ddc2d9c-82a0-433d-cdcc-08d84929eb1c
-X-MS-Exchange-CrossTenant-AuthSource: DM5PR12MB1355.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Aug 2020 19:06:06.2874 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: y8XaMQylx0Z9UlituBiJIcmFv2XuzITUrNwiRXmh2Jqu24apH7ziFH2W4KQvyZO1ifj4m9tbCw8LpJcpdDebCw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR1201MB0219
-Received-SPF: none client-ip=40.107.92.76;
- envelope-from=Thomas.Lendacky@amd.com;
- helo=NAM10-BN7-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/25 15:06:39
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: 4
-X-Spam_score: 0.4
-X-Spam_bar: /
-X-Spam_report: (0.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- FORGED_SPF_HELO=1, MSGID_FROM_MTA_HEADER=0.001, RCVD_ILLEGAL_IP=1.3,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
- SPF_NONE=0.001 autolearn=no autolearn_force=no
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=216.71.153.141;
+ envelope-from=prvs=49978a6e9=alistair.francis@wdc.com;
+ helo=esa3.hgst.iphmx.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/25 14:58:53
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -43
+X-Spam_score: -4.4
+X-Spam_bar: ----
+X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -133,154 +102,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S . Tsirkin" <mst@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Jiri Slaby <jslaby@suse.cz>,
- Richard Henderson <rth@twiddle.net>
+Cc: alistair23@gmail.com, alistair.francis@wdc.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Tom Lendacky <thomas.lendacky@amd.com>
-
-Provide initial support for SEV-ES. This includes creating a function to
-indicate the guest is an SEV-ES guest (which will return false until all
-support is in place), performing the proper SEV initialization and
-ensuring that the guest CPU state is measured as part of the launch.
-
-Co-developed-by: Jiri Slaby <jslaby@suse.cz>
-Signed-off-by: Jiri Slaby <jslaby@suse.cz>
-Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+Message-id: 93e5d4f13eca0d2a588e407187f33c6437aeaaf9.1597259519.git.alistair.francis@wdc.com
+Message-Id: <93e5d4f13eca0d2a588e407187f33c6437aeaaf9.1597259519.git.alistair.francis@wdc.com>
 ---
- target/i386/cpu.c      |  1 +
- target/i386/sev-stub.c |  5 +++++
- target/i386/sev.c      | 46 ++++++++++++++++++++++++++++++++++++++++--
- target/i386/sev_i386.h |  1 +
- 4 files changed, 51 insertions(+), 2 deletions(-)
+ target/riscv/csr.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 588f32e136..bbbe581d35 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -5969,6 +5969,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
-         break;
-     case 0x8000001F:
-         *eax = sev_enabled() ? 0x2 : 0;
-+        *eax |= sev_es_enabled() ? 0x8 : 0;
-         *ebx = sev_get_cbit_position();
-         *ebx |= sev_get_reduced_phys_bits() << 6;
-         *ecx = 0;
-diff --git a/target/i386/sev-stub.c b/target/i386/sev-stub.c
-index 88e3f39a1e..040ac90563 100644
---- a/target/i386/sev-stub.c
-+++ b/target/i386/sev-stub.c
-@@ -49,3 +49,8 @@ SevCapability *sev_get_capabilities(Error **errp)
-     error_setg(errp, "SEV is not available in this QEMU");
-     return NULL;
- }
-+
-+bool sev_es_enabled(void)
-+{
-+    return false;
-+}
-diff --git a/target/i386/sev.c b/target/i386/sev.c
-index c3ecf86704..6c9cd0854b 100644
---- a/target/i386/sev.c
-+++ b/target/i386/sev.c
-@@ -359,6 +359,12 @@ sev_enabled(void)
-     return !!sev_guest;
+diff --git a/target/riscv/csr.c b/target/riscv/csr.c
+index 390ef781e4..5e50683c58 100644
+--- a/target/riscv/csr.c
++++ b/target/riscv/csr.c
+@@ -840,6 +840,8 @@ static int read_hstatus(CPURISCVState *env, int csrno, target_ulong *val)
+     /* We only support 64-bit VSXL */
+     *val = set_field(*val, HSTATUS_VSXL, 2);
+ #endif
++    /* We only support little endian */
++    *val = set_field(*val, HSTATUS_VSBE, 0);
+     return 0;
  }
  
-+bool
-+sev_es_enabled(void)
-+{
-+    return false;
-+}
-+
- uint64_t
- sev_get_me_mask(void)
- {
-@@ -578,6 +584,22 @@ sev_launch_update_data(SevGuestState *sev, uint8_t *addr, uint64_t len)
-     return ret;
- }
- 
-+static int
-+sev_launch_update_vmsa(SevGuestState *sev)
-+{
-+    int ret, fw_error;
-+
-+    ret = sev_ioctl(sev->sev_fd, KVM_SEV_LAUNCH_UPDATE_VMSA, NULL, &fw_error);
-+    if (ret) {
-+        error_report("%s: LAUNCH_UPDATE_VMSA ret=%d fw_error=%d '%s'",
-+                __func__, ret, fw_error, fw_error_to_str(fw_error));
-+        goto err;
-+    }
-+
-+err:
-+    return ret;
-+}
-+
- static void
- sev_launch_get_measure(Notifier *notifier, void *unused)
- {
-@@ -590,6 +612,14 @@ sev_launch_get_measure(Notifier *notifier, void *unused)
-         return;
+@@ -851,6 +853,9 @@ static int write_hstatus(CPURISCVState *env, int csrno, target_ulong val)
+         qemu_log_mask(LOG_UNIMP, "QEMU does not support mixed HSXLEN options.");
      }
- 
-+    if (sev_es_enabled()) {
-+        /* measure all the VM save areas before getting launch_measure */
-+        ret = sev_launch_update_vmsa(sev);
-+        if (ret) {
-+            exit(1);
-+        }
+ #endif
++    if (get_field(val, HSTATUS_VSBE) != 0) {
++        qemu_log_mask(LOG_UNIMP, "QEMU does not support big endian guests.");
 +    }
-+
-     measurement = g_new0(struct kvm_sev_launch_measure, 1);
+     return 0;
+ }
  
-     /* query the measurement blob length */
-@@ -684,7 +714,7 @@ sev_guest_init(const char *id)
- {
-     SevGuestState *sev;
-     char *devname;
--    int ret, fw_error;
-+    int ret, fw_error, cmd;
-     uint32_t ebx;
-     uint32_t host_cbitpos;
-     struct sev_user_data_status status = {};
-@@ -745,8 +775,20 @@ sev_guest_init(const char *id)
-     sev->api_major = status.api_major;
-     sev->api_minor = status.api_minor;
- 
-+    if (sev_es_enabled()) {
-+        if (!(status.flags & SEV_STATUS_FLAGS_CONFIG_ES)) {
-+            error_report("%s: guest policy requires SEV-ES, but "
-+                         "host SEV-ES support unavailable",
-+                         __func__);
-+            goto err;
-+        }
-+        cmd = KVM_SEV_ES_INIT;
-+    } else {
-+        cmd = KVM_SEV_INIT;
-+    }
-+
-     trace_kvm_sev_init();
--    ret = sev_ioctl(sev->sev_fd, KVM_SEV_INIT, NULL, &fw_error);
-+    ret = sev_ioctl(sev->sev_fd, cmd, NULL, &fw_error);
-     if (ret) {
-         error_report("%s: failed to initialize ret=%d fw_error=%d '%s'",
-                      __func__, ret, fw_error, fw_error_to_str(fw_error));
-diff --git a/target/i386/sev_i386.h b/target/i386/sev_i386.h
-index 4db6960f60..4f9a5e9b21 100644
---- a/target/i386/sev_i386.h
-+++ b/target/i386/sev_i386.h
-@@ -29,6 +29,7 @@
- #define SEV_POLICY_SEV          0x20
- 
- extern bool sev_enabled(void);
-+extern bool sev_es_enabled(void);
- extern uint64_t sev_get_me_mask(void);
- extern SevInfo *sev_get_info(void);
- extern uint32_t sev_get_cbit_position(void);
 -- 
 2.28.0
 
