@@ -7,41 +7,41 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF22FC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 11:27:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5B7FC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 11:27:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C447820715
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 11:27:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C447820715
+	by mail.kernel.org (Postfix) with ESMTPS id AAB0A20715
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 11:27:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AAB0A20715
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60198 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33080 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAX78-0002bq-0l
-	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 07:27:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46712)
+	id 1kAX7G-00035L-SB
+	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 07:27:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46822)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <kuhn.chenqun@huawei.com>)
- id 1kAX5n-0000Sh-MV; Tue, 25 Aug 2020 07:26:19 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:40250 helo=huawei.com)
+ id 1kAX5r-0000Yb-QV; Tue, 25 Aug 2020 07:26:24 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:40746 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <kuhn.chenqun@huawei.com>)
- id 1kAX5k-0006eT-E3; Tue, 25 Aug 2020 07:26:19 -0400
+ id 1kAX5o-0006ho-JI; Tue, 25 Aug 2020 07:26:23 -0400
 Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 013F08B673E9EFCE32DD;
- Tue, 25 Aug 2020 19:26:04 +0800 (CST)
+ by Forcepoint Email with ESMTP id 206286B484CC497F101D;
+ Tue, 25 Aug 2020 19:26:14 +0800 (CST)
 Received: from huawei.com (10.175.104.175) by DGGEMS414-HUB.china.huawei.com
  (10.3.19.214) with Microsoft SMTP Server id 14.3.487.0; Tue, 25 Aug 2020
- 19:25:55 +0800
+ 19:26:06 +0800
 From: Chen Qun <kuhn.chenqun@huawei.com>
 To: <qemu-devel@nongnu.org>, <qemu-trivial@nongnu.org>
-Subject: [PATCH v2 01/10] hw/arm/virt-acpi-build:Remove dead assignment in
- build_madt()
-Date: Tue, 25 Aug 2020 19:24:38 +0800
-Message-ID: <20200825112447.126308-2-kuhn.chenqun@huawei.com>
+Subject: [PATCH v2 08/10] usb/bus: Remove dead assignment in
+ usb_get_fw_dev_path()
+Date: Tue, 25 Aug 2020 19:24:45 +0800
+Message-ID: <20200825112447.126308-9-kuhn.chenqun@huawei.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20200825112447.126308-1-kuhn.chenqun@huawei.com>
 References: <20200825112447.126308-1-kuhn.chenqun@huawei.com>
@@ -72,51 +72,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, zhang.zhanghailiang@huawei.com,
- "Michael S. Tsirkin" <mst@redhat.com>, Euler Robot <euler.robot@huawei.com>,
- pannengyuan@huawei.com, Shannon Zhao <shannon.zhaosl@gmail.com>,
- qemu-arm@nongnu.org, Igor
- Mammedov <imammedo@redhat.com>, Chen Qun <kuhn.chenqun@huawei.com>
+Cc: zhang.zhanghailiang@huawei.com, pannengyuan@huawei.com,
+ Markus Armbruster <armbru@redhat.com>, Gerd
+ Hoffmann <kraxel@redhat.com>, Euler Robot <euler.robot@huawei.com>,
+ Chen Qun <kuhn.chenqun@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Clang static code analyzer show warning:
-hw/arm/virt-acpi-build.c:641:5: warning: Value stored to 'madt' is never read
-    madt = acpi_data_push(table_data, sizeof *madt);
-    ^      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+qemu/hw/usb/bus.c:615:13: warning: Value stored to 'pos' is never read
+            pos += snprintf(fw_path + pos, fw_len - pos, "%s@%lx",
 
 Reported-by: Euler Robot <euler.robot@huawei.com>
 Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 ---
-Cc: Shannon Zhao <shannon.zhaosl@gmail.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-arm@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>
 ---
- hw/arm/virt-acpi-build.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ hw/usb/bus.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-index 91f0df7b13..f830f9b779 100644
---- a/hw/arm/virt-acpi-build.c
-+++ b/hw/arm/virt-acpi-build.c
-@@ -633,12 +633,11 @@ build_madt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
-     int madt_start = table_data->len;
-     const MemMapEntry *memmap = vms->memmap;
-     const int *irqmap = vms->irqmap;
--    AcpiMultipleApicTable *madt;
-     AcpiMadtGenericDistributor *gicd;
-     AcpiMadtGenericMsiFrame *gic_msi;
-     int i;
- 
--    madt = acpi_data_push(table_data, sizeof *madt);
-+    acpi_data_push(table_data, sizeof(AcpiMultipleApicTable));
- 
-     gicd = acpi_data_push(table_data, sizeof *gicd);
-     gicd->type = ACPI_APIC_GENERIC_DISTRIBUTOR;
+diff --git a/hw/usb/bus.c b/hw/usb/bus.c
+index b17bda3b29..7bab0499ad 100644
+--- a/hw/usb/bus.c
++++ b/hw/usb/bus.c
+@@ -612,8 +612,8 @@ static char *usb_get_fw_dev_path(DeviceState *qdev)
+             in++;
+         } else {
+             /* the device itself */
+-            pos += snprintf(fw_path + pos, fw_len - pos, "%s@%lx",
+-                            qdev_fw_name(qdev), nr);
++            snprintf(fw_path + pos, fw_len - pos, "%s@%lx", qdev_fw_name(qdev),
++                     nr);
+             break;
+         }
+     }
 -- 
 2.23.0
 
