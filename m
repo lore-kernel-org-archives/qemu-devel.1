@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FC06C433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 18:02:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41E17C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 18:02:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2515E20715
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 18:02:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0A93E206EB
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 18:02:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dGvztryY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2515E20715
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ryq4XiQP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A93E206EB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57322 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58918 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAdH6-000436-Cd
-	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 14:02:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46460)
+	id 1kAdHP-0004hz-As
+	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 14:02:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46348)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <marcandre.lureau@redhat.com>)
- id 1kAdE4-0000Vg-OP
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 13:59:16 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:45221)
+ id 1kAdDm-0008HN-L6
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 13:58:58 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:46842)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <marcandre.lureau@redhat.com>)
- id 1kAdE2-0003Tr-CT
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 13:59:16 -0400
+ id 1kAdDk-0003SV-Rj
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 13:58:58 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598378353;
+ s=mimecast20190719; t=1598378335;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=9Yht4X/+ViXbgjzJlQR/gjv+vQ6cj6WUvGJ0e7LvyYw=;
- b=dGvztryYVqi+WnbkYA4OfiFoANQlGOdYsDOrgKDrpHMChvydeOH/ELY3DMeG0Bw0Ysqj9A
- R+m1GFHlpKjECL0FOnTcc86/7GNtiNXU951vPBdAv/M/Ik3Z2hQyYIA3UxwO6OHh/Nkop5
- RaDq5Dc1SGPpD+jLyyyBrMrvJd334BU=
+ bh=zrB6eiMbxp32SBkm8uz7db0X+q445dB/jQqAAccAcZY=;
+ b=Ryq4XiQPm2PQKF16+LzuSbX0IwBCcg/rJ4Oa9MU84kiWq2qrjFxhhHex2UDh7UmWffvhDD
+ uaZLFJyeekmtQVfr4aMKGI+MBu6Qqx1ynqLdY1pOuslDtPgpAzUqrXYN1zlkclqE33OVHI
+ QGa1v7xR5XKa5+aAvzdgVb+jYywhYL4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-551-mVcP5CXUNDSF1TXhXeoDSA-1; Tue, 25 Aug 2020 13:59:09 -0400
-X-MC-Unique: mVcP5CXUNDSF1TXhXeoDSA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-378-c5Dy4VhmPdOaTfGdua117g-1; Tue, 25 Aug 2020 13:58:50 -0400
+X-MC-Unique: c5Dy4VhmPdOaTfGdua117g-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DDB9D10082E7;
- Tue, 25 Aug 2020 17:59:08 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B4F7D81F01A;
+ Tue, 25 Aug 2020 17:58:49 +0000 (UTC)
 Received: from localhost (unknown [10.36.110.43])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9918A1002D48;
- Tue, 25 Aug 2020 17:59:07 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D914419144;
+ Tue, 25 Aug 2020 17:58:45 +0000 (UTC)
 From: marcandre.lureau@redhat.com
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 5/5] meson: add NSIS building
-Date: Tue, 25 Aug 2020 21:58:27 +0400
-Message-Id: <20200825175827.355940-6-marcandre.lureau@redhat.com>
+Subject: [PATCH v2 2/5] meson: use meson datadir instead of qemu_datadir
+Date: Tue, 25 Aug 2020 21:58:24 +0400
+Message-Id: <20200825175827.355940-3-marcandre.lureau@redhat.com>
 In-Reply-To: <20200825175827.355940-1-marcandre.lureau@redhat.com>
 References: <20200825175827.355940-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=marcandre.lureau@redhat.com
 X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124;
+Received-SPF: pass client-ip=63.128.21.124;
  envelope-from=marcandre.lureau@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/25 02:03:58
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/25 06:38:59
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -105,201 +105,121 @@ Sender: "Qemu-devel"
 
 From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
+When cross-compiling, by default qemu_datadir is 'c:\Program
+Files\QEMU', which is not recognized as being an absolute path, and
+meson will end up adding the prefix again.
+
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 ---
- Makefile        | 56 -----------------------------------
- meson.build     | 25 ++++++++++++++++
- scripts/nsis.py | 78 +++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 103 insertions(+), 56 deletions(-)
- create mode 100644 scripts/nsis.py
+ contrib/vhost-user-gpu/meson.build | 2 +-
+ meson.build                        | 3 ++-
+ pc-bios/descriptors/meson.build    | 2 +-
+ pc-bios/keymaps/meson.build        | 6 +++---
+ pc-bios/meson.build                | 2 +-
+ tools/virtiofsd/meson.build        | 2 +-
+ trace/meson.build                  | 2 +-
+ 7 files changed, 10 insertions(+), 9 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index 81794d5c34..3ebd6929b4 100644
---- a/Makefile
-+++ b/Makefile
-@@ -294,62 +294,6 @@ endif
- 		"$(DESTDIR)$(qemu_desktopdir)/qemu.desktop"
- 	$(INSTALL_DIR) "$(DESTDIR)$(qemu_datadir)/keymaps"
- 
--ifdef CONFIG_WIN32
--
--INSTALLER = qemu-setup-$(VERSION)$(EXESUF)
--
--nsisflags = -V2 -NOCD
--
--ifneq ($(wildcard $(SRC_PATH)/dll),)
--ifeq ($(ARCH),x86_64)
--# 64 bit executables
--DLL_PATH = $(SRC_PATH)/dll/w64
--nsisflags += -DW64
--else
--# 32 bit executables
--DLL_PATH = $(SRC_PATH)/dll/w32
--endif
--endif
--
--.PHONY: installer
--installer: $(INSTALLER)
--
--INSTDIR=/tmp/qemu-nsis
--
--$(INSTALLER): $(SRC_PATH)/qemu.nsi
--	$(MAKE) install DESTDIR=${INSTDIR}
--ifdef SIGNCODE
--	(cd ${INSTDIR}/${bindir}; \
--         for i in *.exe; do \
--           $(SIGNCODE) $${i}; \
--         done \
--        )
--endif # SIGNCODE
--	(cd ${INSTDIR}/${bindir}; \
--         for i in qemu-system-*.exe; do \
--           arch=$${i%.exe}; \
--           arch=$${arch#qemu-system-}; \
--           echo Section \"$$arch\" Section_$$arch; \
--           echo SetOutPath \"\$$INSTDIR\"; \
--           echo File \"\$${BINDIR}\\$$i\"; \
--           echo SectionEnd; \
--         done \
--        ) >${INSTDIR}/${bindir}/system-emulations.nsh
--	makensis $(nsisflags) \
--                $(if $(BUILD_DOCS),-DCONFIG_DOCUMENTATION="y") \
--                $(if $(CONFIG_GTK),-DCONFIG_GTK="y") \
--                -DBINDIR="${INSTDIR}/${bindir}" \
--                $(if $(DLL_PATH),-DDLLDIR="$(DLL_PATH)") \
--                -DSRCDIR="$(SRC_PATH)" \
--                -DOUTFILE="$(INSTALLER)" \
--                -DDISPLAYVERSION="$(VERSION)" \
--                $(SRC_PATH)/qemu.nsi
--	rm -r ${INSTDIR}
--ifdef SIGNCODE
--	$(SIGNCODE) $(INSTALLER)
--endif # SIGNCODE
--endif # CONFIG_WIN
--
- # Add a dependency on the generated files, so that they are always
- # rebuilt before other object files
- ifneq ($(wildcard config-host.mak),)
+diff --git a/contrib/vhost-user-gpu/meson.build b/contrib/vhost-user-gpu/meson.build
+index 6c1459f54a..8df4c13bc5 100644
+--- a/contrib/vhost-user-gpu/meson.build
++++ b/contrib/vhost-user-gpu/meson.build
+@@ -9,5 +9,5 @@ if 'CONFIG_TOOLS' in config_host and 'CONFIG_VIRGL' in config_host \
+   configure_file(input: '50-qemu-gpu.json.in',
+                  output: '50-qemu-gpu.json',
+                  configuration: config_host,
+-                 install_dir: config_host['qemu_datadir'] / 'vhost-user')
++                 install_dir: qemu_datadir / 'vhost-user')
+ endif
 diff --git a/meson.build b/meson.build
-index 0720a7d684..bc2bea23b2 100644
+index f0fe5f8799..20f20a7bfc 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -1217,6 +1217,31 @@ if build_docs
-   endif
+@@ -17,6 +17,7 @@ config_all_disas = keyval.load(meson.current_build_dir() / 'config-all-disas.mak
+ enable_modules = 'CONFIG_MODULES' in config_host
+ enable_static = 'CONFIG_STATIC' in config_host
+ build_docs = 'BUILD_DOCS' in config_host
++qemu_datadir = get_option('datadir') + get_option('confsuffix')
+ config_host_data = configuration_data()
+ genh = []
+ 
+@@ -1039,7 +1040,7 @@ foreach target : target_dirs
+                       output: exe_name + stp['ext'],
+                       capture: true,
+                       install: stp['install'],
+-                      install_dir: config_host['qemu_datadir'] / '../systemtap/tapset',
++                      install_dir: qemu_datadir / '../systemtap/tapset',
+                       command: [
+                         tracetool, '--group=all', '--format=' + stp['fmt'],
+                         '--binary=' + stp['bin'],
+diff --git a/pc-bios/descriptors/meson.build b/pc-bios/descriptors/meson.build
+index 7c715bace8..3798d32372 100644
+--- a/pc-bios/descriptors/meson.build
++++ b/pc-bios/descriptors/meson.build
+@@ -10,5 +10,5 @@ foreach f: [
+                  output: f,
+                  configuration: {'DATADIR': config_host['qemu_datadir']},
+                  install: install_blobs,
+-                 install_dir: config_host['qemu_datadir'] / 'firmware')
++                 install_dir: qemu_datadir / 'firmware')
+ endforeach
+diff --git a/pc-bios/keymaps/meson.build b/pc-bios/keymaps/meson.build
+index b737c82230..bbac83ece3 100644
+--- a/pc-bios/keymaps/meson.build
++++ b/pc-bios/keymaps/meson.build
+@@ -44,13 +44,13 @@ foreach km, args: keymaps
+                      build_by_default: true,
+                      output: km,
+                      command: [native_qemu_keymap, '-f', '@OUTPUT@', args.split()],
+-                     install_dir: config_host['qemu_datadir'] / 'keymaps')
++                     install_dir: qemu_datadir / 'keymaps')
+ endforeach
+ if t.length() > 0
+   alias_target('update-keymaps', t)
+ else
+   # install from the source tree
+-  install_data(keymaps.keys(), install_dir: config_host['qemu_datadir'] / 'keymaps')
++  install_data(keymaps.keys(), install_dir: qemu_datadir / 'keymaps')
  endif
  
-+if host_machine.system() == 'windows'
-+  nsis_cmd = [
-+    find_program('scripts/nsis.py'),
-+    '@OUTPUT@',
-+    get_option('prefix'),
-+    meson.current_source_dir(),
-+    host_machine.cpu_family(),
-+    '--',
-+    '-DDISPLAYVERSION=' + meson.project_version(),
-+  ]
-+  if build_docs
-+    nsis_cmd += '-DCONFIG_DOCUMENTATION=y'
-+  endif
-+  if 'CONFIG_GTK' in config_host
-+    nsis_cmd += '-DCONFIG_GTK=y'
-+  endif
-+
-+  nsis = custom_target('nsis',
-+                       output: 'qemu-setup-' + meson.project_version() + '.exe',
-+                       input: files('qemu.nsi'),
-+                       build_always_stale: true,
-+                       command: nsis_cmd + ['@INPUT@'])
-+  alias_target('installer', nsis)
-+endif
-+
- summary_info = {}
- summary_info += {'Install prefix':    config_host['prefix']}
- summary_info += {'BIOS directory':    config_host['qemu_datadir']}
-diff --git a/scripts/nsis.py b/scripts/nsis.py
-new file mode 100644
-index 0000000000..e1c409344e
---- /dev/null
-+++ b/scripts/nsis.py
-@@ -0,0 +1,78 @@
-+#!/usr/bin/env python3
-+#
-+# Copyright (C) 2020 Red Hat, Inc.
-+#
-+# SPDX-License-Identifier: GPL-2.0-or-later
-+
-+import argparse
-+import glob
-+import os
-+import shutil
-+import subprocess
-+import tempfile
-+
-+
-+def signcode(path):
-+    cmd = os.environ.get("SIGNCODE")
-+    if not cmd:
-+        return
-+    subprocess.run([cmd, path])
-+
-+
-+def main():
-+    parser = argparse.ArgumentParser(description="QEMU NSIS build helper.")
-+    parser.add_argument("outfile")
-+    parser.add_argument("prefix")
-+    parser.add_argument("srcdir")
-+    parser.add_argument("cpu")
-+    parser.add_argument("nsisargs", nargs="*")
-+    args = parser.parse_args()
-+
-+    destdir = tempfile.mkdtemp()
-+    try:
-+        subprocess.run(["make", "install", "DESTDIR=" + destdir + os.path.sep])
-+        with open(
-+            os.path.join(destdir + args.prefix, "system-emulations.nsh"), "w"
-+        ) as nsh:
-+            for exe in glob.glob(
-+                os.path.join(destdir + args.prefix, "qemu-system-*.exe")
-+            ):
-+                exe = os.path.basename(exe)
-+                arch = exe[12:-4]
-+                nsh.write(
-+                    """
-+                Section "{0}" Section_{0}
-+                SetOutPath "$INSTDIR"
-+                File "${{BINDIR}}\\{1}"
-+                SectionEnd
-+                """.format(
-+                        arch, exe
-+                    )
-+                )
-+
-+        for exe in glob.glob(os.path.join(destdir + args.prefix, "*.exe")):
-+            signcode(exe)
-+
-+        makensis = [
-+            "makensis",
-+            "-V2",
-+            "-NOCD",
-+            "-DSRCDIR=" + args.srcdir,
-+            "-DBINDIR=" + destdir + args.prefix,
-+        ]
-+        dlldir = "w32"
-+        if args.cpu == "x86_64":
-+            dlldir = "w64"
-+            makensis += ["-DW64"]
-+        if os.path.exists(os.path.join(args.srcdir, "dll")):
-+            makensis += "-DDLLDIR={0}/dll/{1}".format(args.srcdir, dlldir)
-+
-+        makensis += ["-DOUTFILE=" + args.outfile] + args.nsisargs
-+        subprocess.run(makensis)
-+        signcode(args.outfile)
-+    finally:
-+        shutil.rmtree(destdir)
-+
-+
-+if __name__ == "__main__":
-+    main()
+-install_data(['sl', 'sv'], install_dir: config_host['qemu_datadir'] / 'keymaps')
++install_data(['sl', 'sv'], install_dir: qemu_datadir / 'keymaps')
+diff --git a/pc-bios/meson.build b/pc-bios/meson.build
+index b6389f5148..c11e52ba26 100644
+--- a/pc-bios/meson.build
++++ b/pc-bios/meson.build
+@@ -19,7 +19,7 @@ if 'DECOMPRESS_EDK2_BLOBS' in config_host
+                   input: '@0@.bz2'.format(f),
+                   capture: true,
+                   install: install_blobs,
+-                  install_dir: config_host['qemu_datadir'],
++                  install_dir: qemu_datadir,
+                   command: [ bzip2, '-dc', '@INPUT0@' ])
+   endforeach
+ endif
+diff --git a/tools/virtiofsd/meson.build b/tools/virtiofsd/meson.build
+index d1e23c5760..50022ed89e 100644
+--- a/tools/virtiofsd/meson.build
++++ b/tools/virtiofsd/meson.build
+@@ -16,4 +16,4 @@ executable('virtiofsd', files(
+ configure_file(input: '50-qemu-virtiofsd.json.in',
+                output: '50-qemu-virtiofsd.json',
+                configuration: config_host,
+-               install_dir: config_host['qemu_datadir'] / 'vhost-user')
++               install_dir: qemu_datadir / 'vhost-user')
+diff --git a/trace/meson.build b/trace/meson.build
+index 56e870848e..5f0bf11cb5 100644
+--- a/trace/meson.build
++++ b/trace/meson.build
+@@ -55,7 +55,7 @@ trace_events_all = custom_target('trace-events-all',
+                                  command: [ 'cat', '@INPUT@' ],
+                                  capture: true,
+                                  install: true,
+-                                 install_dir: config_host['qemu_datadir'])
++                                 install_dir: qemu_datadir)
+ 
+ foreach d : [
+   ['generated-tcg-tracers.h', 'tcg-h'],
 -- 
 2.26.2
 
