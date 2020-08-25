@@ -5,84 +5,80 @@ X-Spam-Level:
 X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 771FEC433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 14:50:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 425DCC433E1
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 14:50:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3F057207BC
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 14:50:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 07DF02075F
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 14:50:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dFfugg3j"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F057207BC
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mL4t+5kQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07DF02075F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35686 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36138 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAaHm-0007IM-FG
-	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 10:50:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48028)
+	id 1kAaHq-0007Xu-2C
+	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 10:50:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48052)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kAaGb-0005iC-LA
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 10:49:41 -0400
-Received: from mail-pj1-x1033.google.com ([2607:f8b0:4864:20::1033]:35799)
+ id 1kAaGd-0005lg-Lw
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 10:49:43 -0400
+Received: from mail-pg1-x532.google.com ([2607:f8b0:4864:20::532]:37124)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kAaGZ-0008RQ-H3
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 10:49:41 -0400
-Received: by mail-pj1-x1033.google.com with SMTP id g6so1362966pjl.0
- for <qemu-devel@nongnu.org>; Tue, 25 Aug 2020 07:49:39 -0700 (PDT)
+ id 1kAaGc-0008S8-4H
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 10:49:43 -0400
+Received: by mail-pg1-x532.google.com with SMTP id g33so6982991pgb.4
+ for <qemu-devel@nongnu.org>; Tue, 25 Aug 2020 07:49:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=s3dYOgA7GkXXyUyxgB9kFfNBkj2FaL3vO8uRc/sluZg=;
- b=dFfugg3jvpd19ezcWaHDtjTFFFgGqRqfE1hCnT72Al0h9R0SgxnAIeSLezovhE6UFH
- 95zfNRGBTI9WC1EWGEnAoyTStPDUth03/PdOpxIcK2uxmBIbaV6AWnxahx+AI+fOXWtf
- a0+paZr3TcfZcXnHs3I+wbFBO46EKZtIpQOlk6Vc82UhO+QRHlBqTf5EtU6UP+xiSpo3
- IxiBWr3mp1P4VJs7V+giOeEWEljI6pUPUJ2l2QZ7SNCM9qd3GYyQuWKSmIcz3qCx8Ph1
- ReJq7sDylwkL6M7hf7Otk78comq0p54N62agWVfhqVVabEM7TsV1dUID92Qw2GFS4faI
- y6uQ==
+ bh=htMtb1NzKhLangZNeh4fyVQE1LaLJL7zHAVE3XWM2KA=;
+ b=mL4t+5kQR+qD0n7l12Y0V0Rjctr+8r5xeq8ZJfDtFa0jWrspoNZBSn9JaMTpU9JYh5
+ 09ocHvVPJubA7bBKZncRxpgNxyYyZu5Twz6ooRP2dvxp/XIDwRhjXHMthRjYtYLA/GUM
+ BSK3y+Cq/8tsrKhf99DfPqZ/Dg34bxZ88hXdhH0QkIMhAj7af/mE5Ek4WfZKAjvMDduf
+ RHcO8K5KzNQdV3SXgdMu27Qx0CPdi0TKU0AyOpSW4Zj5Zt/yQbyyZIE0QRZeaNVBisNL
+ MqHSodc7W/QS8GXj6U4s6VwclqvzM+lhZ44NP8qZJlhHH7jDouo7pOQgvI2WsCgwzN0s
+ laZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=s3dYOgA7GkXXyUyxgB9kFfNBkj2FaL3vO8uRc/sluZg=;
- b=kVZh3M/ag6ASy8Mf3ORwZmZAQBtOXlbZ3xRhxvaob2q/tFOzm5+1Je9NWtaNhNz29d
- lcI8t0sejSuJypfgiwvMtSrk19h0dIvbVReK9SiBoR0Zol1Z3YqlhRJRnxA9K7AJ7kqp
- 1oZ1/rkVxtA3p1MfxAcm7qmhsq2i7d2lb7pzhO1yRGhLPQlaKnkwOQVXwdHNHhCQRhLR
- NdV7/pTPlNTqcCs5gSwyaqMs+xiyLJoCccEfCr5yBqTaHYqqsYF6egyfgFGFaE2iEA0K
- RsO9uZSrlRppFqr/CpLW87OzI7yCAdyet7N4XhGY1alnpHToHqaXt+0lpKk21W8sun7E
- Xx9g==
-X-Gm-Message-State: AOAM531ofIoAzyZUPpeBfVOnRZXYU9g5/oJ3v1Io9j1hO2/2HWR7c+k3
- drarY1x49xbaPkCvEyI78B3L3TA50YVXPBh5
-X-Google-Smtp-Source: ABdhPJyJ2EUcZMaICoz0B1SMqd08XP1sObBzNFw7pYBVvGxg8HxP9rPZdX5DpfNifGQEQuhu2IMLZw==
-X-Received: by 2002:a17:90b:3197:: with SMTP id
- hc23mr1904911pjb.60.1598366977597; 
- Tue, 25 Aug 2020 07:49:37 -0700 (PDT)
+ bh=htMtb1NzKhLangZNeh4fyVQE1LaLJL7zHAVE3XWM2KA=;
+ b=Drf0mIfhZDfsx9OcDri/jJ+vbFyOopYOfR0kWMVtLe6/DuOPFgiu82rBM717y3GK7a
+ nC7Hk9A0D/n8+OxD/oKX8Z/ziMvwBK0ixAwrZDvyPCIREX0hFTPUO6JINagiMeCY9itJ
+ uKa44VUI9aHZpqBJTBXXORdqLMxfABJhokqxOQsIR92UB+btjIvcL4CcUdHkAnYZOIeL
+ 5U39E+hvjnc1vNdJiDtsGCnjJR7xad/uwASgUvN/8UlFUbkk+sNbmOKFVzfIeGRLtG2Y
+ MZFpUJhfTUSSIji6efJqN9OswrAygpFloS+YAKPgli5KVVe9v7ewwKzcpEND4s/0djmX
+ kMzQ==
+X-Gm-Message-State: AOAM533YJdBk0qclNy9pGn69NeZWKp3GTn7gq+0ByhZdCJqizrsNsKEk
+ 6Jdp7wCSvaC5blb7dV0ySDqATEVKaekzKT8V
+X-Google-Smtp-Source: ABdhPJyMxJtH29Hc2HKee3dVCCAhyxdbrsKfLcP8+MJ6TZsOmDbKIiMo2Viq93h3XEf44in6Ln8vGg==
+X-Received: by 2002:a65:45ca:: with SMTP id m10mr803125pgr.187.1598366980371; 
+ Tue, 25 Aug 2020 07:49:40 -0700 (PDT)
 Received: from localhost.localdomain ([222.95.248.6])
- by smtp.googlemail.com with ESMTPSA id s198sm3093188pgc.4.2020.08.25.07.49.34
+ by smtp.googlemail.com with ESMTPSA id s198sm3093188pgc.4.2020.08.25.07.49.38
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 25 Aug 2020 07:49:36 -0700 (PDT)
+ Tue, 25 Aug 2020 07:49:39 -0700 (PDT)
 From: luoyonggang@gmail.com
 To: qemu-devel@nongnu.org
-Subject: [PATCH 2/4] meson: fixes relpath may fail on win32. On win32,
- os.path.relpath would raise exception when do the following relpath:
- C:/msys64/mingw64/x.exe relative to E:/path/qemu-build would fail. So we try
- catch it for stopping it from raise exception on msys2
-Date: Tue, 25 Aug 2020 22:49:17 +0800
-Message-Id: <20200825144919.1217-2-luoyonggang@gmail.com>
+Subject: [PATCH 3/4] meson: Mingw64 gcc doesn't recognize system include_type
+ for sdl2
+Date: Tue, 25 Aug 2020 22:49:18 +0800
+Message-Id: <20200825144919.1217-3-luoyonggang@gmail.com>
 X-Mailer: git-send-email 2.27.0.windows.1
 In-Reply-To: <20200825144919.1217-1-luoyonggang@gmail.com>
 References: <20200825144919.1217-1-luoyonggang@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1033;
- envelope-from=luoyonggang@gmail.com; helo=mail-pj1-x1033.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::532;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pg1-x532.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -112,32 +108,23 @@ Sender: "Qemu-devel"
 From: Yonggang Luo <luoyonggang@gmail.com>
 
 ---
- scripts/mtest2make.py | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+ meson.build | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/scripts/mtest2make.py b/scripts/mtest2make.py
-index bdb257bbd9..d7a51bf97e 100644
---- a/scripts/mtest2make.py
-+++ b/scripts/mtest2make.py
-@@ -53,9 +53,16 @@ i = 0
- for test in json.load(sys.stdin):
-     env = ' '.join(('%s=%s' % (shlex.quote(k), shlex.quote(v))
-                     for k, v in test['env'].items()))
--    executable = os.path.relpath(test['cmd'][0])
-+    executable = test['cmd'][0]
-+    try:
-+        executable = os.path.relpath(executable)
-+    except:
-+        pass
-     if test['workdir'] is not None:
--        test['cmd'][0] = os.path.relpath(test['cmd'][0], test['workdir'])
-+        try:
-+            test['cmd'][0] = os.path.relpath(executable, test['workdir'])
-+        except:
-+            test['cmd'][0] = executable
-     else:
-         test['cmd'][0] = executable
-     cmd = '$(.test.env) %s %s' % (env, ' '.join((shlex.quote(x) for x in test['cmd'])))
+diff --git a/meson.build b/meson.build
+index df5bf728b5..a3585881e1 100644
+--- a/meson.build
++++ b/meson.build
+@@ -224,8 +224,7 @@ if 'CONFIG_BRLAPI' in config_host
+   brlapi = declare_dependency(link_args: config_host['BRLAPI_LIBS'].split())
+ endif
+ 
+-sdl = dependency('sdl2', required: get_option('sdl'), static: enable_static,
+-                 include_type: 'system')
++sdl = dependency('sdl2', required: get_option('sdl'), static: enable_static)
+ sdl_image = not_found
+ if sdl.found()
+   # work around 2.0.8 bug
 -- 
 2.27.0.windows.1
 
