@@ -7,83 +7,83 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33386C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 09:00:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC666C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 09:05:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F31EE2067C
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 09:00:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B6F682067C
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 09:05:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xm410D6M"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F31EE2067C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Cj6gmxw5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B6F682067C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49336 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54568 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAUp1-0002iB-64
-	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 05:00:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37148)
+	id 1kAUt4-00054Z-Vs
+	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 05:05:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38006)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kAUoC-0002AC-75
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 05:00:00 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:32234
- helo=us-smtp-delivery-1.mimecast.com)
+ id 1kAUsL-00044b-Ju
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 05:04:17 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:53914)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kAUoA-0003Yt-02
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 04:59:59 -0400
+ id 1kAUsJ-00043s-Mr
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 05:04:17 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598345996;
+ s=mimecast20190719; t=1598346254;
  h=from:from:reply-to:reply-to:subject:subject:date:date:
  message-id:message-id:to:to:cc:cc:mime-version:mime-version:
  content-type:content-type:in-reply-to:in-reply-to:  references:references;
- bh=21X8Lfh7GxJsVbJpciiN0q5eVKNS8soyxYzRJ7btzsk=;
- b=Xm410D6MKkoryWGRE/oYEucThQRnPTUky6XUiKQmz+AUHapmqWyk7F7Y06BOxaI+9/5jUz
- 9Zepab3/id/UNuoVU4f8gu5855ePvWnV7pmPanAdw7NgopP/hP58pHuF5VQGFmYyyW66aG
- zAfuums3sI1tQgXRQr6KBpdbJ79IuTc=
+ bh=kzt9sMQ2GK3B/ZPVxVobvhzRObQ2ft6dCw7yEioZdRM=;
+ b=Cj6gmxw5CKnT0UUB2MBgmvzpt1DBI+oetSKcUzZG4ce2ehOcgfS7AEwlcjw9Kl+O6S3Qep
+ bPup0nStrr8uVfWJc2EqEEIpNnVePk0FZIDFxLdsKNTVAXdIhGdw6XzaIFR449BZbydjYa
+ dFbQ/0+zNd9yIhHTZYgTViC4+hJIowk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-197-M-S_aw-gOEqn6V5bLIyHFQ-1; Tue, 25 Aug 2020 04:59:54 -0400
-X-MC-Unique: M-S_aw-gOEqn6V5bLIyHFQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-515-s96cHMgbPL6BuZsbJQslTQ-1; Tue, 25 Aug 2020 05:04:12 -0400
+X-MC-Unique: s96cHMgbPL6BuZsbJQslTQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6FBE318A2250;
- Tue, 25 Aug 2020 08:59:53 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DF93A801AE6;
+ Tue, 25 Aug 2020 09:04:11 +0000 (UTC)
 Received: from redhat.com (ovpn-114-231.ams2.redhat.com [10.36.114.231])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4B9D25C1CF;
- Tue, 25 Aug 2020 08:59:52 +0000 (UTC)
-Date: Tue, 25 Aug 2020 09:59:49 +0100
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D6FF35D9D3;
+ Tue, 25 Aug 2020 09:04:10 +0000 (UTC)
+Date: Tue, 25 Aug 2020 10:04:07 +0100
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 To: luoyonggang@gmail.com
-Subject: Re: [PATCH 4/5] meson: !/bin/sh are msys2 friendly.
-Message-ID: <20200825085949.GC107278@redhat.com>
+Subject: Re: [PATCH 5/5] configure: replace all $PWD with $build_path that
+ can handling msys2 properly
+Message-ID: <20200825090407.GD107278@redhat.com>
 References: <20200825083500.359-1-luoyonggang@gmail.com>
- <20200825083500.359-4-luoyonggang@gmail.com>
+ <20200825083500.359-5-luoyonggang@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20200825083500.359-4-luoyonggang@gmail.com>
+In-Reply-To: <20200825083500.359-5-luoyonggang@gmail.com>
 User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
-X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=berrange@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/25 01:36:47
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=berrange@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/25 02:03:58
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.956,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -103,27 +103,117 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Aug 25, 2020 at 04:34:59PM +0800, luoyonggang@gmail.com wrote:
+On Tue, Aug 25, 2020 at 04:35:00PM +0800, luoyonggang@gmail.com wrote:
+
+Please explain *why* the change is needed in the commit message.
+ie explain what's broken with current code.
+
 > From: Yonggang Luo <luoyonggang@gmail.com>
 > 
 > ---
->  scripts/undefsym.sh | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  configure | 34 ++++++++++++++++++++++------------
+>  1 file changed, 22 insertions(+), 12 deletions(-)
 > 
-> diff --git a/scripts/undefsym.sh b/scripts/undefsym.sh
-> index b9ec332e95..8189308b2c 100755
-> --- a/scripts/undefsym.sh
-> +++ b/scripts/undefsym.sh
-> @@ -1,4 +1,4 @@
-> -#! /usr/bin/env bash
-> +#!/bin/sh
-
-Does this script actually work on non-bash shells ?  If not, then this
-change will likely break on plaforms where /bin/sh is not bash.
-
+> diff --git a/configure b/configure
+> index b8f5b81a67..a0e2b20877 100755
+> --- a/configure
+> +++ b/configure
+> @@ -13,8 +13,13 @@ export CCACHE_RECACHE=yes
 >  
->  # Before a shared module's DSO is produced, a static library is built for it
->  # and passed to this script.  The script generates -Wl,-u options to force
+>  # make source path absolute
+>  source_path=$(cd "$(dirname -- "$0")"; pwd)
+> +build_path=$PWD
+> +if [ "$MSYSTEM" = "MINGW64" -o  "$MSYSTEM" = "MINGW32" ]; then
+> +source_path=$(cd "$(dirname -- "$0")"; pwd -W)
+> +build_path=`pwd -W`
+
+What is the -W arg - that seems to not exist in pwd that I
+see, so I guess its something msys custom.
+
+> +fi
+>  
+> -if test "$PWD" = "$source_path"
+> +if test "$build_path" = "$source_path"
+>  then
+>      echo "Using './build' as the directory for build output"
+>  
+> @@ -346,7 +351,12 @@ ld_has() {
+>      $ld --help 2>/dev/null | grep ".$1" >/dev/null 2>&1
+>  }
+>  
+> -if printf %s\\n "$source_path" "$PWD" | grep -q "[[:space:]:]";
+> +check_valid_build_path="[[:space:]:]"
+> +if [ "$MSYSTEM" = "MINGW64" -o  "$MSYSTEM" = "MINGW32" ]; then
+> +check_valid_build_path="[[:space:]]"
+> +fi
+> +
+> +if printf %s\\n "$source_path" "$build_path" | grep -q "$check_valid_build_path";
+>  then
+>    error_exit "main directory cannot contain spaces nor colons"
+>  fi
+> @@ -942,7 +952,7 @@ Linux)
+>    linux="yes"
+>    linux_user="yes"
+>    kvm="yes"
+> -  QEMU_INCLUDES="-isystem ${source_path}/linux-headers -I$PWD/linux-headers $QEMU_INCLUDES"
+> +  QEMU_INCLUDES="-isystem ${source_path}/linux-headers -I${build_path}/linux-headers $QEMU_INCLUDES"
+>    libudev="yes"
+>  ;;
+>  esac
+> @@ -4299,7 +4309,7 @@ EOF
+>                symlink "$source_path/dtc/Makefile" "dtc/Makefile"
+>            fi
+>            fdt_cflags="-I${source_path}/dtc/libfdt"
+> -          fdt_ldflags="-L$PWD/dtc/libfdt"
+> +          fdt_ldflags="-L${build_path}/dtc/libfdt"
+>            fdt_libs="$fdt_libs"
+>        elif test "$fdt" = "yes" ; then
+>            # Not a git build & no libfdt found, prompt for system install
+> @@ -5284,7 +5294,7 @@ case "$capstone" in
+>      else
+>        LIBCAPSTONE=libcapstone.a
+>      fi
+> -    capstone_libs="-L$PWD/capstone -lcapstone"
+> +    capstone_libs="-L${build_path}/capstone -lcapstone"
+>      capstone_cflags="-I${source_path}/capstone/include"
+>      ;;
+>  
+> @@ -6284,8 +6294,8 @@ case "$slirp" in
+>        git_submodules="${git_submodules} slirp"
+>      fi
+>      mkdir -p slirp
+> -    slirp_cflags="-I${source_path}/slirp/src -I$PWD/slirp/src"
+> -    slirp_libs="-L$PWD/slirp -lslirp"
+> +    slirp_cflags="-I${source_path}/slirp/src -I${build_path}/slirp/src"
+> +    slirp_libs="-L${build_path}/slirp -lslirp"
+>      if test "$mingw32" = "yes" ; then
+>        slirp_libs="$slirp_libs -lws2_32 -liphlpapi"
+>      fi
+> @@ -8233,7 +8243,7 @@ fi
+>  mv $cross config-meson.cross
+>  
+>  rm -rf meson-private meson-info meson-logs
+> -NINJA=$PWD/ninjatool $meson setup \
+> +NINJA="${build_path}/ninjatool" $meson setup \
+>          --prefix "${pre_prefix}$prefix" \
+>          --libdir "${pre_prefix}$libdir" \
+>          --libexecdir "${pre_prefix}$libexecdir" \
+> @@ -8249,11 +8259,11 @@ NINJA=$PWD/ninjatool $meson setup \
+>          -Dstrip=$(if test "$strip_opt" = yes; then echo true; else echo false; fi) \
+>          -Db_pie=$(if test "$pie" = yes; then echo true; else echo false; fi) \
+>          -Db_coverage=$(if test "$gcov" = yes; then echo true; else echo false; fi) \
+> -	-Dsdl=$sdl -Dsdl_image=$sdl_image \
+> -	-Dvnc=$vnc -Dvnc_sasl=$vnc_sasl -Dvnc_jpeg=$vnc_jpeg -Dvnc_png=$vnc_png \
+> -	-Dgettext=$gettext \
+> +        -Dsdl=$sdl -Dsdl_image=$sdl_image \
+> +        -Dvnc=$vnc -Dvnc_sasl=$vnc_sasl -Dvnc_jpeg=$vnc_jpeg -Dvnc_png=$vnc_png \
+> +        -Dgettext=$gettext \
+>          $cross_arg \
+> -        "$PWD" "$source_path"
+> +        "$build_path" "$source_path"
+>  
+>  if test "$?" -ne 0 ; then
+>      error_exit "meson setup failed"
 > -- 
 > 2.27.0.windows.1
 > 
