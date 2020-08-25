@@ -7,73 +7,72 @@ X-Spam-Status: No, score=-12.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C4FBC433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 21:21:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8277FC433E1
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 21:21:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 526402075F
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 21:21:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 439F720738
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 21:21:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qQpzcyXP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 526402075F
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xJwhO4Gk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 439F720738
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36312 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38912 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAgNM-0006Ob-9d
-	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 17:21:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36276)
+	id 1kAgNn-0007S9-GA
+	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 17:21:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36178)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kAg40-00006c-Cp
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 17:01:04 -0400
-Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:37182)
+ id 1kAg3t-0008Sx-U7
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 17:00:57 -0400
+Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:51218)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kAg3y-0001zi-74
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 17:01:04 -0400
-Received: by mail-pj1-x1042.google.com with SMTP id mw10so125102pjb.2
- for <qemu-devel@nongnu.org>; Tue, 25 Aug 2020 14:01:01 -0700 (PDT)
+ id 1kAg3r-0001ym-W3
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 17:00:57 -0400
+Received: by mail-pj1-x1042.google.com with SMTP id ds1so127720pjb.1
+ for <qemu-devel@nongnu.org>; Tue, 25 Aug 2020 14:00:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=50E0hW76gnTgLCYM21b2+hcWFagS0hoFg/XoJTnl9H8=;
- b=qQpzcyXPHl5M2j5TPXNFFdiSYbAEmQ3fn4o0rqJKPi2ReviyKR89mQP3kQC8ZmUse6
- 6pWzET3aU3LrOT58ZejZZ//AqmjVl57MhjNpNzkBUSF2WWp60YlFzBtSmdYASTv1oD5O
- lRrWQXIP2qZzG6HUTHnoqFNd31uoW3nHCkK3zzl5Acyye7ZhUdX+7rsauxeyxHs3gTAf
- oYb4zQmYgMeBUtNcCMZ0qeLXn4QQ65Po3dniUrwTOFgKI2TpcKLijihXDQQMUHJb5eEi
- GHLFMVvpcx7v88HN9AtKj3spm4lnj5OcjAv7meCPAKBHmyTtvjr7UtlOSa41AQzvBdOE
- et0Q==
+ bh=lr71+uB2rqlQWi1mZS+Omspl/b6K02nPk8zKl55dRRU=;
+ b=xJwhO4GkFEIATLuB40u5lM7hIblRgfF2xH+g39N9MOv4qzLRNC1VSzJFU5snBvfZPO
+ 8piLzuBeOwlB4uxhCMZBnV67tVpc0NhvPAsyStYU6eBpm2fWm7IaybIsz6iZsCO5IhQD
+ jZo0UHcp2CTmRjLRbTcr+VUX2Zx9303xYJqjbOVW2yFz7bZ2PLZgLscDiBbJx9TrMNk6
+ Lzw7dp2gXSLBiZJ/JujiqDZHI4IVPwPG7j8gLLbr+7FUzBCR1twaVDziTzuPknw0r7Su
+ YAOrwkFfZqm0KxwlM06TZSdXW9MxPo1ba3HCxNpb7HiKUcvDXhc57Gna+nOLFTDDSyur
+ aSfQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=50E0hW76gnTgLCYM21b2+hcWFagS0hoFg/XoJTnl9H8=;
- b=ugJTGPKSeCQkGnmSGWQUf9rRto9dmg70cJ8SS6WYxaBiGg8F7SzcWwPO4mAfzpf/Je
- YZ4J9XL9k3OKPg8ff2RqQlDyqd6d+RxsJxAIRe9hnGL5+cxlBbdP+zusLawepMsAKzjc
- ZW4LcPxKyF98K/6wq0llLOD33WVglJGW3G9pO2qJKnHVoQ4zI7Ns8xAtDsu64BzPhORc
- URaVAbYKsAVp7ncFovTwhl1vP3x5cM2Dn+h4D55HYVoREK78NTRBWw1+ytK5fu+kt/9O
- +CY7pZyBPMZpXfPkRHlXrmTa+p3J6ueb5/UwcUxZSmhfF8FQH2XVVvpxtBx2+KifPVhI
- aQSg==
-X-Gm-Message-State: AOAM533UNKC/EjxvmdN0Y5WQyjugTaehcv26N6qFvr4NjPhrehlKAL4J
- 9Kwyen8+6ZzfhFfYQkitf5kWYoZxyaXrCA==
-X-Google-Smtp-Source: ABdhPJyw8+AdkWYQCVGur+z4KFmsCkuFJrprta2T019tMcFqehLZttCj5o21jVn5WTi3JEeB4iXZIQ==
-X-Received: by 2002:a17:90b:110a:: with SMTP id
- gi10mr3107685pjb.104.1598389259764; 
- Tue, 25 Aug 2020 14:00:59 -0700 (PDT)
+ bh=lr71+uB2rqlQWi1mZS+Omspl/b6K02nPk8zKl55dRRU=;
+ b=RfmdvJ2D+pkM6qBon/e8CNILbWnzcfdxOcyEjAuQqTyslo6AydMJF2NypQvkGYNB4t
+ fpqhH+jm6CSnAD9JahvUZVeqCiX0DmkRpmt6mFUZoEOc60vlTO82dSnDiTRxBjtikhB3
+ 28fnIsd8We9EYk4xPoMqjrGXeZVuucyDmHNISWyG0EIz+LVHwN6npz47fAT9zvyatk14
+ P7e0/W6HQzUXCh0k3uuGhK4SgiHq+XVjzOsX9+1uqoXS4GVuIaOZh0+TA08HcpuJo0/J
+ Qmeilmi7IGtQdrA031YC4ts/O84ikuBVrloT3iypRm3sjodZ78+7CGhPk0zG3+xYPY+A
+ 8nsQ==
+X-Gm-Message-State: AOAM530sY8tJ114D2fVgpUt/y1HiEh8xPr9zjysdg6hImdlSJ23sXNi5
+ pKwPOYRxRJscZos7VwmB7EYsk2zoFidfUg==
+X-Google-Smtp-Source: ABdhPJybxn0bSrvHQxhD25Ecqmr2CfBs1e0P+0m9EHTCmfE90SeiQfnRhhx1PF+dTvOQj2wI6p8QzA==
+X-Received: by 2002:a17:90a:d510:: with SMTP id
+ t16mr3293775pju.210.1598389254287; 
+ Tue, 25 Aug 2020 14:00:54 -0700 (PDT)
 Received: from localhost.localdomain
  (h216-228-167-147.bendor.dedicated.static.tds.net. [216.228.167.147])
- by smtp.gmail.com with ESMTPSA id k4sm16074pgr.87.2020.08.25.14.00.58
+ by smtp.gmail.com with ESMTPSA id k4sm16074pgr.87.2020.08.25.14.00.53
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 25 Aug 2020 14:00:59 -0700 (PDT)
+ Tue, 25 Aug 2020 14:00:53 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 54/77] target/microblaze: Assert no overlap in flags making up
- tb_flags
-Date: Tue, 25 Aug 2020 13:59:27 -0700
-Message-Id: <20200825205950.730499-55-richard.henderson@linaro.org>
+Subject: [PATCH 50/77] target/microblaze: Replace MSR_EE_FLAG with MSR_EE
+Date: Tue, 25 Aug 2020 13:59:23 -0700
+Message-Id: <20200825205950.730499-51-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200825205950.730499-1-richard.henderson@linaro.org>
 References: <20200825205950.730499-1-richard.henderson@linaro.org>
@@ -107,47 +106,53 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Create MSR_TB_MASK.  Use it in cpu_get_tb_cpu_state, and check
-that IFLAGS_TB_MASK does not overlap.
+There's no reason to define MSR_EE_FLAG; we can just use the
+original MSR_EE define.  Document the other flags copied into
+tb_flags with iflag to reserve those bits.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/microblaze/cpu.h | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ target/microblaze/cpu.h       | 4 +++-
+ target/microblaze/translate.c | 4 ++--
+ 2 files changed, 5 insertions(+), 3 deletions(-)
 
 diff --git a/target/microblaze/cpu.h b/target/microblaze/cpu.h
-index 594501e4e7..2fc7cf26f1 100644
+index 013858b8e0..594501e4e7 100644
 --- a/target/microblaze/cpu.h
 +++ b/target/microblaze/cpu.h
-@@ -261,8 +261,11 @@ struct CPUMBState {
+@@ -254,7 +254,9 @@ struct CPUMBState {
+ 
+     /* Internal flags.  */
+ #define IMM_FLAG	4
+-#define MSR_EE_FLAG     (1 << 8)
++/* MSR_EE               (1 << 8)  */
++/* MSR_UM               (1 << 11) */
++/* MSR_VM               (1 << 13) */
+ #define DRTI_FLAG	(1 << 16)
  #define DRTE_FLAG	(1 << 17)
  #define DRTB_FLAG	(1 << 18)
- #define D_FLAG		(1 << 19)  /* Bit in ESR.  */
-+
- /* TB dependent CPUMBState.  */
- #define IFLAGS_TB_MASK  (D_FLAG | IMM_FLAG | DRTI_FLAG | DRTE_FLAG | DRTB_FLAG)
-+#define MSR_TB_MASK     (MSR_UM | MSR_VM | MSR_EE)
-+
-     uint32_t iflags;
- 
- #if !defined(CONFIG_USER_ONLY)
-@@ -372,12 +375,14 @@ typedef MicroBlazeCPU ArchCPU;
- 
- #include "exec/cpu-all.h"
- 
-+/* Ensure there is no overlap between the two masks. */
-+QEMU_BUILD_BUG_ON(MSR_TB_MASK & IFLAGS_TB_MASK);
-+
- static inline void cpu_get_tb_cpu_state(CPUMBState *env, target_ulong *pc,
-                                         target_ulong *cs_base, uint32_t *flags)
+diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
+index 7d1ada7aad..cb490488a6 100644
+--- a/target/microblaze/translate.c
++++ b/target/microblaze/translate.c
+@@ -162,7 +162,7 @@ static void gen_goto_tb(DisasContext *dc, int n, target_ulong dest)
+  */
+ static bool trap_illegal(DisasContext *dc, bool cond)
  {
-     *pc = env->pc;
--    *flags = (env->iflags & IFLAGS_TB_MASK) |
--             (env->msr & (MSR_UM | MSR_VM | MSR_EE));
-+    *flags = (env->iflags & IFLAGS_TB_MASK) | (env->msr & MSR_TB_MASK);
-     *cs_base = (*flags & IMM_FLAG ? env->imm : 0);
- }
+-    if (cond && (dc->tb_flags & MSR_EE_FLAG)
++    if (cond && (dc->tb_flags & MSR_EE)
+         && dc->cpu->cfg.illegal_opcode_exception) {
+         gen_raise_hw_excp(dc, ESR_EC_ILLEGAL_OP);
+     }
+@@ -178,7 +178,7 @@ static bool trap_userspace(DisasContext *dc, bool cond)
+     int mem_index = cpu_mmu_index(&dc->cpu->env, false);
+     bool cond_user = cond && mem_index == MMU_USER_IDX;
  
+-    if (cond_user && (dc->tb_flags & MSR_EE_FLAG)) {
++    if (cond_user && (dc->tb_flags & MSR_EE)) {
+         gen_raise_hw_excp(dc, ESR_EC_PRIVINSN);
+     }
+     return cond_user;
 -- 
 2.25.1
 
