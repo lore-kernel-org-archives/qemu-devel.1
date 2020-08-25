@@ -4,78 +4,79 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0506FC433E3
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 19:44:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A2E8C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 19:44:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CED072075E
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 19:44:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 51E1D207DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 19:44:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SqqsyYW7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CED072075E
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CITI1qzd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51E1D207DF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59582 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34196 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAerU-0003dI-1I
-	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 15:44:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40178)
+	id 1kAeru-0004ls-Jh
+	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 15:44:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40682)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kAeWg-0000h5-5Q
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 15:22:34 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:22013
+ id 1kAeXM-0002Yd-Bt
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 15:23:16 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:39834
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kAeWe-0006FF-68
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 15:22:33 -0400
+ id 1kAeXK-0006LM-92
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 15:23:15 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598383351;
+ s=mimecast20190719; t=1598383393;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=8wJ36udvm6pu4Eewx9JqnGIjQ112NfsHFCYV+ACUzTA=;
- b=SqqsyYW78uTGF8dISj4xz8n7X3Y74kDsjz1bAuto1VClzni0Al6Nx/RfAUCDI+GZMTisXD
- tu0PYOVizl2sV+SjJjpzB2ApRQbcpPdEpTjxd5FpdzyVvae1XcBo82eXrYeiHbhJIOYDXM
- U6NHuQJC7ahJU7AuSUV/KcYFl8e9q+c=
+ bh=/XFmSQxil6m9x0uqlxeY68vshsXG5CyWP9ebo2MkDbA=;
+ b=CITI1qzdxNA8/bTgCH80qcRSNwqKu5iyt7Qm0ZS9//2NkhoBoXaShtBmQxc9rVu9u/bYyn
+ ONz/gH3t1hythJ/+hiXkmWNRwIaF8goyfoDhJSE7TXd+wva4r3J2ShdsrhKvpyrLmTqjhk
+ xEYB83fWPhfQ9IbqVbZJn6l1AjVdnV8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-227-25yC3YjKNrOUeCs0kUeAaw-1; Tue, 25 Aug 2020 15:22:29 -0400
-X-MC-Unique: 25yC3YjKNrOUeCs0kUeAaw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-48-LUHRZBPmPQWdOM4CIzh4Ew-1; Tue, 25 Aug 2020 15:23:11 -0400
+X-MC-Unique: LUHRZBPmPQWdOM4CIzh4Ew-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A23B681F01D
- for <qemu-devel@nongnu.org>; Tue, 25 Aug 2020 19:22:28 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C8BF8807354
+ for <qemu-devel@nongnu.org>; Tue, 25 Aug 2020 19:23:10 +0000 (UTC)
 Received: from localhost (unknown [10.10.67.254])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 68A01709C4;
- Tue, 25 Aug 2020 19:22:28 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8F62619C4F;
+ Tue, 25 Aug 2020 19:23:10 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 34/74] vmbus: Move QOM macros to vmbus.h
-Date: Tue, 25 Aug 2020 15:20:30 -0400
-Message-Id: <20200825192110.3528606-35-ehabkost@redhat.com>
+Subject: [PATCH v3 54/74] qom: make object_ref/unref use a void * instead of
+ Object *.
+Date: Tue, 25 Aug 2020 15:20:50 -0400
+Message-Id: <20200825192110.3528606-55-ehabkost@redhat.com>
 In-Reply-To: <20200825192110.3528606-1-ehabkost@redhat.com>
 References: <20200825192110.3528606-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
 X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=ehabkost@redhat.com;
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=ehabkost@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/25 15:21:30
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/25 01:35:36
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -102,71 +103,75 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Move all declarations related to TYPE_VMBUS to the same place in
-vmbus.h.
+From: Daniel P. Berrangé <berrange@redhat.com>
 
-This will make future conversion to OBJECT_DECLARE* easier.
+The object_ref/unref methods are intended for use with any subclass of
+the base Object. Using "Object *" in the signature is not adding any
+meaningful level of type safety, since callers simply use "OBJECT(ptr)"
+and this expands to an unchecked cast "(Object *)".
 
-Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+By using "void *" we enable the object_unref() method to be used to
+provide support for g_autoptr() with any subclass.
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+Message-Id: <20200723181410.3145233-2-berrange@redhat.com>
 ---
 Changes v2 -> v3: none
 
-Changes series v1 -> v2: new patch in series v2
-
-Cc: qemu-devel@nongnu.org
+Changes v1 -> v2: none
 ---
- include/hw/hyperv/vmbus-bridge.h | 3 +--
- include/hw/hyperv/vmbus.h        | 4 ++++
- hw/hyperv/vmbus.c                | 3 ---
- 3 files changed, 5 insertions(+), 5 deletions(-)
+ include/qom/object.h | 4 ++--
+ qom/object.c         | 6 ++++--
+ 2 files changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/include/hw/hyperv/vmbus-bridge.h b/include/hw/hyperv/vmbus-bridge.h
-index 33f93de64d..fe90bda01b 100644
---- a/include/hw/hyperv/vmbus-bridge.h
-+++ b/include/hw/hyperv/vmbus-bridge.h
-@@ -11,11 +11,10 @@
- #define HW_HYPERV_VMBUS_BRIDGE_H
+diff --git a/include/qom/object.h b/include/qom/object.h
+index 0f3a60617c..1f8aa2d48e 100644
+--- a/include/qom/object.h
++++ b/include/qom/object.h
+@@ -1035,7 +1035,7 @@ GSList *object_class_get_list_sorted(const char *implements_type,
+  * as its reference count is greater than zero.
+  * Returns: @obj
+  */
+-Object *object_ref(Object *obj);
++Object *object_ref(void *obj);
  
- #include "hw/sysbus.h"
-+#include "hw/hyperv/vmbus.h"
+ /**
+  * object_unref:
+@@ -1044,7 +1044,7 @@ Object *object_ref(Object *obj);
+  * Decrease the reference count of a object.  A object cannot be freed as long
+  * as its reference count is greater than zero.
+  */
+-void object_unref(Object *obj);
++void object_unref(void *obj);
  
- #define TYPE_VMBUS_BRIDGE "vmbus-bridge"
+ /**
+  * object_property_try_add:
+diff --git a/qom/object.c b/qom/object.c
+index 00fdf89b3b..b1822a2ef4 100644
+--- a/qom/object.c
++++ b/qom/object.c
+@@ -1124,8 +1124,9 @@ GSList *object_class_get_list_sorted(const char *implements_type,
+                         object_class_cmp);
+ }
  
--typedef struct VMBus VMBus;
--
- typedef struct VMBusBridge {
-     SysBusDevice parent_obj;
+-Object *object_ref(Object *obj)
++Object *object_ref(void *objptr)
+ {
++    Object *obj = OBJECT(objptr);
+     if (!obj) {
+         return NULL;
+     }
+@@ -1133,8 +1134,9 @@ Object *object_ref(Object *obj)
+     return obj;
+ }
  
-diff --git a/include/hw/hyperv/vmbus.h b/include/hw/hyperv/vmbus.h
-index 40e8417eec..cd98ec24e7 100644
---- a/include/hw/hyperv/vmbus.h
-+++ b/include/hw/hyperv/vmbus.h
-@@ -26,6 +26,10 @@
- #define VMBUS_DEVICE_GET_CLASS(obj) \
-     OBJECT_GET_CLASS(VMBusDeviceClass, (obj), TYPE_VMBUS_DEVICE)
- 
-+#define TYPE_VMBUS "vmbus"
-+typedef struct VMBus VMBus;
-+#define VMBUS(obj) OBJECT_CHECK(VMBus, (obj), TYPE_VMBUS)
-+
- /*
-  * Object wrapping a GPADL -- GPA Descriptor List -- an array of guest physical
-  * pages, to be used for various buffers shared between the host and the guest.
-diff --git a/hw/hyperv/vmbus.c b/hw/hyperv/vmbus.c
-index 34392e892a..75af6b83dd 100644
---- a/hw/hyperv/vmbus.c
-+++ b/hw/hyperv/vmbus.c
-@@ -20,9 +20,6 @@
- #include "cpu.h"
- #include "trace.h"
- 
--#define TYPE_VMBUS "vmbus"
--#define VMBUS(obj) OBJECT_CHECK(VMBus, (obj), TYPE_VMBUS)
--
- enum {
-     VMGPADL_INIT,
-     VMGPADL_ALIVE,
+-void object_unref(Object *obj)
++void object_unref(void *objptr)
+ {
++    Object *obj = OBJECT(objptr);
+     if (!obj) {
+         return;
+     }
 -- 
 2.26.2
 
