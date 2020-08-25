@@ -2,83 +2,83 @@ Return-Path: <SRS0=2GMi=CD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1472C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 00:23:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3503FC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 00:24:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8B3A52074D
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 00:23:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F07FD2074D
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 00:24:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="rTFujelO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B3A52074D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="i93oxQc9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F07FD2074D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52292 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52760 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAMka-0007Hk-R0
-	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 20:23:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45268)
+	id 1kAMku-0007VN-8O
+	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 20:24:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45466)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from
- <3nVhEXwsKCmAFQIGLLCKMCLEMMEJC.AMKOCKS-BCTCJLMLELS.MPE@flex--hskinnemoen.bounces.google.com>)
- id 1kAMef-00049q-ME
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 20:17:37 -0400
-Received: from mail-pf1-x449.google.com ([2607:f8b0:4864:20::449]:50142)
+ <3qFhEXwsKCmsQbTRWWNVXNWPXXPUN.LXVZNVd-MNeNUWXWPWd.XaP@flex--hskinnemoen.bounces.google.com>)
+ id 1kAMes-0004Va-Vy
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 20:17:51 -0400
+Received: from mail-yb1-xb49.google.com ([2607:f8b0:4864:20::b49]:38511)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from
- <3nVhEXwsKCmAFQIGLLCKMCLEMMEJC.AMKOCKS-BCTCJLMLELS.MPE@flex--hskinnemoen.bounces.google.com>)
- id 1kAMed-00067x-Ma
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 20:17:37 -0400
-Received: by mail-pf1-x449.google.com with SMTP id b189so2794082pfa.16
- for <qemu-devel@nongnu.org>; Mon, 24 Aug 2020 17:17:34 -0700 (PDT)
+ <3qFhEXwsKCmsQbTRWWNVXNWPXXPUN.LXVZNVd-MNeNUWXWPWd.XaP@flex--hskinnemoen.bounces.google.com>)
+ id 1kAMep-00069Y-Q1
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 20:17:50 -0400
+Received: by mail-yb1-xb49.google.com with SMTP id l13so12783461ybf.5
+ for <qemu-devel@nongnu.org>; Mon, 24 Aug 2020 17:17:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=sender:date:in-reply-to:message-id:mime-version:references:subject
- :from:to:cc; bh=uYevUGfZIkhvqGlY6GhgrWEQ7RdmB99+oEnNEV3tBGs=;
- b=rTFujelO8n3UIY+fUEawiRZWIni7QZwK/68yUCs56OA02Ge16a0PWpDtVpM+gdt/Xy
- vxFQAMZNKmIyz0RzHj8AJsk47zhuTPZxgP15Rq54jp4sZpj1xUXpkgdYghhe7kNPlQ7o
- zhpD777cTeDpKMIgFU+MixeiHDTExLzHU4IjXlA7u+LANgQlndc61VovXP0V1g4q0Zqo
- gYSKVutTrsjaFGhbwhfK2RAipXxFPZry9v73SkbrKWpLg42gzr+GgcMxCD/l1yaq7SgE
- RYJ5cnMMHFiT9AyFdcDHIJ0j8UYvTye4ymnMU8GkI2SraUCqFGucFwVP5izAfqXCMg7+
- 9EfA==
+ :from:to:cc; bh=1eUKc4mUKGxpAfRnn7edRuE+wT0NYPxDKPSyLd06AXc=;
+ b=i93oxQc97gPif+5l4MHVqnL0YPMUFlN8wvY3LI9yWOg2mHfMPjZqLRqsQqH2ZNGD53
+ uevKckWnlmqo2HG4m9p3FxLYYDgsBVFk9xZWf/KjF2fUZs5BsaAWOeV4lmHe6Gq0PIOl
+ y6Veokzd3DM7fI5DO3EJks/63EmZLKJv3cqzXJgtrkQZiCw0Gprnq9eDBr9VoskVB/r0
+ Gx5cQilHKjRRZhTJU8mvC8ZRDoq+TERAdsnDFDiUBLK6dXDvenB55D3Uo6awa9Mc5O5M
+ Hs14JjX+++uxtEQMY7VDFU9ZhHS1H39ct+JdyNTxAL1h7DlL0/4TStCHfNv8v5CwEbtF
+ Vcxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=uYevUGfZIkhvqGlY6GhgrWEQ7RdmB99+oEnNEV3tBGs=;
- b=aj8hEiIwzp7S9X5VRFo69vUPDT2I4by0pc6UhNMStTAJpzqoGiGzWkeEZNp+prBgBl
- JRWAGXd3d7YAVQE5siOw7Zlus+0e0D+/2oMGgF3X5e1n7S2AWufkfQCvqObTXApVcNKi
- NG2IKPV4Pi9cVu7aHDx0RHUxFhxqXGdYScv14hgAqOKZCpiKL5DqxMauiJRaoSlnOqhJ
- ASMJCSr7dDvBYU86Tkz6wny3DkPCr1I3eDd94h0sWtDhhZziY4PiaCoZlk9z9yb1Zbrv
- /W77jy1D39uOYx8MImZ3VeV1UxSqdZqbmC7xxnd90yMd4htU6xG4tZKwXwRADHeMvw+w
- dEWw==
-X-Gm-Message-State: AOAM532XTtWw29XIocEzsrGNNEai2rw4mhiicd5grqEHeR1INMPJmPI2
- bmr0tXzvgL3prAWnxS2sRdjGRJa6eq3D0iy4Zw==
-X-Google-Smtp-Source: ABdhPJw/PYp83jZjxZfJ3FNnuKF5SAp3AawKv4/q/UG0YbAt9ixPoIiS2uTSEBR/Q2aG3F42gnouWNfycBaOxFzTVg==
+ bh=1eUKc4mUKGxpAfRnn7edRuE+wT0NYPxDKPSyLd06AXc=;
+ b=DG6IyTmWVKlloM0kPsUCtD36PhAv0N4fLVxWw5zisma/mkCTv/qc1ESIk/l+JIuQ8Z
+ Jef1zxeZ/Fn/SiRXJVYzv80Z1Kx571nM0hDdq1+ru6CPo+xzGiIRjQpv0DekepTAgtc7
+ r8B1Yq9fIlRWq8qUA2LKMRX/iBKxn3mIfTt5quWbwj/snIJhnVGynzdAZ/MIOikZlqx5
+ Fd+D0UBXsUOX3Lm71xDIypATj+7bzz93UIFHZvdUz+CIPYYDV52k5/VO9oLy42wc0LFE
+ u4m6BcSeip9UjRS5m+X8f5opEmIDkT/zk7L0PvUA7kMya5gG7tYLP2BcLVmbge2bDIm+
+ 5dmQ==
+X-Gm-Message-State: AOAM530obiKZyslmqCKgNeKazk0qkqQCiYiZr/51L99pGW0lpDDG+d3i
+ 3lQaGd1ajRs1EHPKsvRn3mMaNRwtntHbH5fPjQ==
+X-Google-Smtp-Source: ABdhPJzd9A40C16FQ7mckCF2szmBWC4wIp0sz2fyD7zOHFPIGpTyPZMmbiOUOa0VGQUEpRzvWd2lKxkp0bX+4XYlTg==
 X-Received: from skybert.c.googlers.com ([fda3:e722:ac3:10:24:72f4:c0a8:3107])
- (user=hskinnemoen job=sendgmr) by 2002:a17:902:d905:: with SMTP id
- c5mr5493386plz.34.1598314653278;
- Mon, 24 Aug 2020 17:17:33 -0700 (PDT)
-Date: Mon, 24 Aug 2020 17:17:03 -0700
+ (user=hskinnemoen job=sendgmr) by 2002:a25:9004:: with SMTP id
+ s4mr10468658ybl.247.1598314664144; Mon, 24 Aug 2020 17:17:44 -0700 (PDT)
+Date: Mon, 24 Aug 2020 17:17:09 -0700
 In-Reply-To: <20200825001711.1340443-1-hskinnemoen@google.com>
-Message-Id: <20200825001711.1340443-7-hskinnemoen@google.com>
+Message-Id: <20200825001711.1340443-13-hskinnemoen@google.com>
 Mime-Version: 1.0
 References: <20200825001711.1340443-1-hskinnemoen@google.com>
 X-Mailer: git-send-email 2.28.0.297.g1956fa8f8d-goog
-Subject: [PATCH v8 06/14] roms: Add virtual Boot ROM for NPCM7xx SoCs
+Subject: [PATCH v8 12/14] hw/arm/npcm7xx: add board setup stub for CPU and
+ UART clocks
 To: peter.maydell@linaro.org, f4bug@amsat.org
 Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, Avi.Fishman@nuvoton.com, 
  kfting@nuvoton.com, Havard Skinnemoen <hskinnemoen@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::449;
- envelope-from=3nVhEXwsKCmAFQIGLLCKMCLEMMEJC.AMKOCKS-BCTCJLMLELS.MPE@flex--hskinnemoen.bounces.google.com;
- helo=mail-pf1-x449.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::b49;
+ envelope-from=3qFhEXwsKCmsQbTRWWNVXNWPXXPUN.LXVZNVd-MNeNUWXWPWd.XaP@flex--hskinnemoen.bounces.google.com;
+ helo=mail-yb1-xb49.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -95
@@ -106,134 +106,96 @@ Sender: "Qemu-devel"
 Reply-to: Havard Skinnemoen <hskinnemoen@google.com>
 From: Havard Skinnemoen via <qemu-devel@nongnu.org>
 
-This is a minimalistic boot ROM written specifically for use with QEMU.
-It supports loading the second-stage loader from SPI flash into RAM, SMP
-boot, and not much else.
+When booting directly into a kernel, bypassing the boot loader, the CPU and
+UART clocks are not set up correctly. This makes the system appear very
+slow, and causes the initrd boot test to fail when optimization is off.
+
+The UART clock must run at 24 MHz. The default 25 MHz reference clock
+cannot achieve this, so switch to PLL2/2 @ 480 MHz, which works
+perfectly with the default /20 divider.
+
+The CPU clock should run at 800 MHz, so switch it to PLL1/2. PLL1 runs
+at 800 MHz by default, so we need to double the feedback divider as well
+to make it run at 1600 MHz (so PLL1/2 runs at 800 MHz).
+
+We don't bother checking for PLL lock because we know our emulated PLLs
+lock instantly.
 
 Signed-off-by: Havard Skinnemoen <hskinnemoen@google.com>
 ---
- Makefile                    |   1 +
- .gitmodules                 |   3 +++
- MAINTAINERS                 |   2 ++
- pc-bios/README              |   6 ++++++
- pc-bios/npcm7xx_bootrom.bin | Bin 0 -> 768 bytes
- roms/Makefile               |   7 +++++++
- roms/vbootrom               |   1 +
- 7 files changed, 20 insertions(+)
- create mode 100644 pc-bios/npcm7xx_bootrom.bin
- create mode 160000 roms/vbootrom
+ include/hw/arm/npcm7xx.h |  1 +
+ hw/arm/npcm7xx.c         | 32 ++++++++++++++++++++++++++++++++
+ 2 files changed, 33 insertions(+)
 
-diff --git a/Makefile b/Makefile
-index 81794d5c34..08e9af3793 100644
---- a/Makefile
-+++ b/Makefile
-@@ -246,6 +246,7 @@ s390-ccw.img s390-netboot.img \
- slof.bin skiboot.lid \
- palcode-clipper \
- u-boot.e500 u-boot-sam460-20100605.bin \
-+npcm7xx_bootrom.bin \
- qemu_vga.ndrv \
- edk2-licenses.txt \
- hppa-firmware.img \
-diff --git a/.gitmodules b/.gitmodules
-index ce979398a8..9ffb9f3f4f 100644
---- a/.gitmodules
-+++ b/.gitmodules
-@@ -61,3 +61,6 @@
- [submodule "meson"]
- 	path = meson
- 	url = https://github.com/mesonbuild/meson/
-+[submodule "roms/vbootrom"]
-+	path = roms/vbootrom
-+	url = https://github.com/google/vbootrom.git
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 3f72250630..d71afedc20 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -756,6 +756,8 @@ L: qemu-arm@nongnu.org
- S: Supported
- F: hw/*/npcm7xx*
- F: include/hw/*/npcm7xx*
-+F: pc-bios/npcm7xx_bootrom.bin
-+F: roms/vbootrom
+diff --git a/include/hw/arm/npcm7xx.h b/include/hw/arm/npcm7xx.h
+index 78d0d78c52..13106af215 100644
+--- a/include/hw/arm/npcm7xx.h
++++ b/include/hw/arm/npcm7xx.h
+@@ -37,6 +37,7 @@
+ #define NPCM7XX_SMP_LOADER_START        (0xffff0000)  /* Boot ROM */
+ #define NPCM7XX_SMP_BOOTREG_ADDR        (0xf080013c)  /* GCR.SCRPAD */
+ #define NPCM7XX_GIC_CPU_IF_ADDR         (0xf03fe100)  /* GIC within A9 */
++#define NPCM7XX_BOARD_SETUP_ADDR        (0xffff1000)  /* Boot ROM */
  
- nSeries
- M: Andrzej Zaborowski <balrogg@gmail.com>
-diff --git a/pc-bios/README b/pc-bios/README
-index fa8b58b797..4d6297fca7 100644
---- a/pc-bios/README
-+++ b/pc-bios/README
-@@ -71,3 +71,9 @@
-   ("Simplified BSD License" or "FreeBSD License", SPDX: BSD-2-Clause). OpenSBI
-   source code also contains code reused from other projects desribed here:
-   https://github.com/riscv/opensbi/blob/master/ThirdPartyNotices.md.
+ typedef struct NPCM7xxMachine {
+     MachineState        parent;
+diff --git a/hw/arm/npcm7xx.c b/hw/arm/npcm7xx.c
+index 7884b2b03d..037f3a26f2 100644
+--- a/hw/arm/npcm7xx.c
++++ b/hw/arm/npcm7xx.c
+@@ -55,6 +55,13 @@
+ #define NPCM7XX_ROM_BA          (0xffff0000)
+ #define NPCM7XX_ROM_SZ          (64 * KiB)
+ 
++/* Clock configuration values to be fixed up when bypassing bootloader */
 +
-+- npcm7xx_bootrom.bin is a simplified, free (Apache 2.0) boot ROM for Nuvoton
-+  NPCM7xx BMC devices. It currently implements the bare minimum to load, parse,
-+  initialize and run boot images stored in SPI flash, but may grow more
-+  features over time as needed. The source code is available at:
-+  https://github.com/google/vbootrom
-diff --git a/pc-bios/npcm7xx_bootrom.bin b/pc-bios/npcm7xx_bootrom.bin
-new file mode 100644
-index 0000000000000000000000000000000000000000..38f89d1b97b0c2e133af2a9fbed0521be132065b
-GIT binary patch
-literal 768
-zcmd5)JxClu6n-<aczPbVhZYusb8wKx;7TklHfmuZdYT9pDRLwd1p_t-DFpWpyA+8(
-zwKtZg3J4a0aCM3_X(ZL&4g;46VVk5e$K;z;L99|b@aE%v^S$rQ8)h(Vm@cB9IYc+2
-z2SHd4^NwTIGE%w>9S05p1#kf90Sj5Z(jG8}+)IZIp~iXK=T&)dL`%d-q*8aR#mq{7
-z9`=6;Dr(H0ACe72R5x?!)^86Qj-X%{+!K9iZNA@*wkBAV&iZ(l^I9?!Gz=S2I_*1d
-zr+tTQDHjvyzKnw(hu00yX`u!Fv<!~XVcX?@kr#<B0(gGU?$W{gSsQa}CF^8Cfzp2X
-z@P}yDV-bci(K9XL$FU!som2C`c)?Uc&294s^}Wzumap{hg1X^jN|V25M5tQZ=<9lN
-z%(zKz#t-qCwHKb;HygOCpvCNL_4@1tXV1YGf^XUE_$zr{g8zWh-6gz-teI(eibtxo
-z?0OZI4%rU0741PgUD`2xq@H|*4=+Rs?%N)Ox5G+q>C;DilBe_YlkeSUVHA-crNk+k
-jtiF_MudA<CB(}8|fqYwCf3re&=&@_s761P#-ID$TwgmBa
-
-literal 0
-HcmV?d00001
-
-diff --git a/roms/Makefile b/roms/Makefile
-index 5d9f15b677..7405d67326 100644
---- a/roms/Makefile
-+++ b/roms/Makefile
-@@ -34,6 +34,7 @@ find-cross-gcc = $(firstword $(wildcard $(patsubst %ld,%gcc,$(call find-cross-ld
- # finally strip off path + toolname so we get the prefix
- find-cross-prefix = $(subst gcc,,$(notdir $(call find-cross-gcc,$(1))))
- 
-+arm_cross_prefix := $(call find-cross-prefix,arm)
- powerpc64_cross_prefix := $(call find-cross-prefix,powerpc64)
- powerpc_cross_prefix := $(call find-cross-prefix,powerpc)
- x86_64_cross_prefix := $(call find-cross-prefix,x86_64)
-@@ -63,6 +64,7 @@ default help:
- 	@echo "  skiboot            -- update skiboot.lid"
- 	@echo "  u-boot.e500        -- update u-boot.e500"
- 	@echo "  u-boot.sam460      -- update u-boot.sam460"
-+	@echo "  npcm7xx_bootrom    -- update vbootrom for npcm7xx"
- 	@echo "  efi                -- update UEFI (edk2) platform firmware"
- 	@echo "  opensbi32-generic  -- update OpenSBI for 32-bit generic machine"
- 	@echo "  opensbi64-generic  -- update OpenSBI for 64-bit generic machine"
-@@ -186,6 +188,10 @@ bios-microvm:
- 	$(MAKE) -C qboot
- 	cp qboot/bios.bin ../pc-bios/bios-microvm.bin
- 
-+npcm7xx_bootrom:
-+	$(MAKE) -C vbootrom CROSS_COMPILE=$(arm_cross_prefix)
-+	cp vbootrom/npcm7xx_bootrom.bin ../pc-bios/npcm7xx_bootrom.bin
++/* Run PLL1 at 1600 MHz */
++#define NPCM7XX_PLLCON1_FIXUP_VAL   (0x00402101)
++/* Run the CPU from PLL1 and UART from PLL2 */
++#define NPCM7XX_CLKSEL_FIXUP_VAL    (0x004aaba9)
 +
- clean:
- 	rm -rf seabios/.config seabios/out seabios/builds
- 	$(MAKE) -C sgabios clean
-@@ -199,3 +205,4 @@ clean:
- 	$(MAKE) -f Makefile.edk2 clean
- 	$(MAKE) -C opensbi clean
- 	$(MAKE) -C qboot clean
-+	$(MAKE) -C vbootrom clean
-diff --git a/roms/vbootrom b/roms/vbootrom
-new file mode 160000
-index 0000000000..0c37a43527
---- /dev/null
-+++ b/roms/vbootrom
-@@ -0,0 +1 @@
-+Subproject commit 0c37a43527f0ee2b9584e7fb2fdc805e902635ac
+ /*
+  * Interrupt lines going into the GIC. This does not include internal Cortex-A9
+  * interrupts.
+@@ -132,6 +139,29 @@ static const struct {
+     },
+ };
+ 
++static void npcm7xx_write_board_setup(ARMCPU *cpu,
++                                      const struct arm_boot_info *info)
++{
++    uint32_t board_setup[] = {
++        0xe59f0010,     /* ldr r0, clk_base_addr */
++        0xe59f1010,     /* ldr r1, pllcon1_value */
++        0xe5801010,     /* str r1, [r0, #16] */
++        0xe59f100c,     /* ldr r1, clksel_value */
++        0xe5801004,     /* str r1, [r0, #4] */
++        0xe12fff1e,     /* bx lr */
++        NPCM7XX_CLK_BA,
++        NPCM7XX_PLLCON1_FIXUP_VAL,
++        NPCM7XX_CLKSEL_FIXUP_VAL,
++    };
++    int i;
++
++    for (i = 0; i < ARRAY_SIZE(board_setup); i++) {
++        board_setup[i] = tswap32(board_setup[i]);
++    }
++    rom_add_blob_fixed("board-setup", board_setup, sizeof(board_setup),
++                       info->board_setup_addr);
++}
++
+ static void npcm7xx_write_secondary_boot(ARMCPU *cpu,
+                                          const struct arm_boot_info *info)
+ {
+@@ -170,6 +200,8 @@ static struct arm_boot_info npcm7xx_binfo = {
+     .gic_cpu_if_addr        = NPCM7XX_GIC_CPU_IF_ADDR,
+     .write_secondary_boot   = npcm7xx_write_secondary_boot,
+     .board_id               = -1,
++    .board_setup_addr       = NPCM7XX_BOARD_SETUP_ADDR,
++    .write_board_setup      = npcm7xx_write_board_setup,
+ };
+ 
+ void npcm7xx_load_kernel(MachineState *machine, NPCM7xxState *soc)
 -- 
 2.28.0.297.g1956fa8f8d-goog
 
