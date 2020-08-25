@@ -7,44 +7,44 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98B13C433E3
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 01:32:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29612C433E1
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 01:32:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7242620738
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 01:32:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7242620738
+	by mail.kernel.org (Postfix) with ESMTPS id 03E2620738
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 01:32:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03E2620738
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50820 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51026 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kANoe-0006TL-Km
-	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 21:32:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60648)
+	id 1kANog-0006YJ-3K
+	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 21:32:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60642)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
- id 1kANno-0004tN-Cm
+ id 1kANno-0004tJ-5l
  for qemu-devel@nongnu.org; Mon, 24 Aug 2020 21:31:08 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:4210 helo=huawei.com)
+Received: from szxga04-in.huawei.com ([45.249.212.190]:4209 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
- id 1kANnj-0005pi-GD
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 21:31:08 -0400
+ id 1kANnj-0005pe-IA
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 21:31:07 -0400
 Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 3635A9AE33910D6DCE78;
+ by Forcepoint Email with ESMTP id 405201C9C8AF9ADF5ECF;
  Tue, 25 Aug 2020 09:30:57 +0800 (CST)
 Received: from huawei.com (10.175.101.6) by DGGEMS405-HUB.china.huawei.com
  (10.3.19.205) with Microsoft SMTP Server id 14.3.487.0; Tue, 25 Aug 2020
- 09:30:49 +0800
+ 09:30:50 +0800
 From: Chuan Zheng <zhengchuan@huawei.com>
 To: <quintela@redhat.com>, <eblake@redhat.com>, <dgilbert@redhat.com>,
  <berrange@redhat.com>
-Subject: [PATCH v5 01/12] migration/dirtyrate: setup up query-dirtyrate
- framwork
-Date: Tue, 25 Aug 2020 09:40:39 +0800
-Message-ID: <1598319650-36762-2-git-send-email-zhengchuan@huawei.com>
+Subject: [PATCH v5 04/12] migration/dirtyrate: Add dirtyrate statistics series
+ functions
+Date: Tue, 25 Aug 2020 09:40:42 +0800
+Message-ID: <1598319650-36762-5-git-send-email-zhengchuan@huawei.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1598319650-36762-1-git-send-email-zhengchuan@huawei.com>
 References: <1598319650-36762-1-git-send-email-zhengchuan@huawei.com>
@@ -81,114 +81,82 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add get_dirtyrate_thread() functions to setup query-dirtyrate
-framework.
+Add dirtyrate statistics to record/update dirtyrate info.
 
 Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
-Signed-off-by: YanYing Zhuang <ann.zhuangyanying@huawei.com>
 ---
- migration/dirtyrate.c | 39 +++++++++++++++++++++++++++++++++++++++
- migration/dirtyrate.h | 32 ++++++++++++++++++++++++++++++++
- migration/meson.build |  1 +
- 3 files changed, 72 insertions(+)
- create mode 100644 migration/dirtyrate.c
- create mode 100644 migration/dirtyrate.h
+ migration/dirtyrate.c | 29 +++++++++++++++++++++++++++++
+ migration/dirtyrate.h | 10 ++++++++++
+ 2 files changed, 39 insertions(+)
 
 diff --git a/migration/dirtyrate.c b/migration/dirtyrate.c
-new file mode 100644
-index 0000000..366f4e9
---- /dev/null
+index 91987c5..0d7163f 100644
+--- a/migration/dirtyrate.c
 +++ b/migration/dirtyrate.c
-@@ -0,0 +1,39 @@
-+/*
-+ * Dirtyrate implement code
-+ *
-+ * Copyright (c) 2017-2020 HUAWEI TECHNOLOGIES CO.,LTD.
-+ *
-+ * Authors:
-+ *  Chuan Zheng <zhengchuan@huawei.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "crypto/hash.h"
-+#include "crypto/random.h"
-+#include "qemu/config-file.h"
-+#include "exec/memory.h"
-+#include "exec/ramblock.h"
-+#include "exec/target_page.h"
-+#include "qemu/rcu_queue.h"
-+#include "qapi/qapi-commands-migration.h"
-+#include "migration.h"
-+#include "dirtyrate.h"
-+
-+static void calculate_dirtyrate(struct DirtyRateConfig config)
+@@ -24,6 +24,7 @@
+ #include "dirtyrate.h"
+ 
+ static int CalculatingState = DIRTY_RATE_STATUS_UNSTARTED;
++static struct DirtyRateStat DirtyStat;
+ 
+ static int dirtyrate_set_state(int *state, int old_state, int new_state)
+ {
+@@ -35,6 +36,34 @@ static int dirtyrate_set_state(int *state, int old_state, int new_state)
+     }
+ }
+ 
++static void reset_dirtyrate_stat(void)
 +{
-+    /* todo */
-+    return;
++    DirtyStat.total_dirty_samples = 0;
++    DirtyStat.total_sample_count = 0;
++    DirtyStat.total_block_mem_MB = 0;
++    DirtyStat.dirty_rate = 0;
 +}
 +
-+void *get_dirtyrate_thread(void *arg)
++static void update_dirtyrate_stat(struct RamblockDirtyInfo *info)
 +{
-+    struct DirtyRateConfig config = *(struct DirtyRateConfig *)arg;
-+
-+    calculate_dirtyrate(config);
-+
-+    return NULL;
++    DirtyStat.total_dirty_samples += info->sample_dirty_count;
++    DirtyStat.total_sample_count += info->sample_pages_count;
++    /* size of 4K pages in MB */
++    DirtyStat.total_block_mem_MB += info->ramblock_pages / 256;
 +}
++
++static void update_dirtyrate(uint64_t msec)
++{
++    uint64_t dirtyrate;
++    uint64_t total_dirty_samples = DirtyStat.total_dirty_samples;
++    uint64_t total_sample_count = DirtyStat.total_sample_count;
++    uint64_t total_block_mem_MB = DirtyStat.total_block_mem_MB;
++
++    dirtyrate = total_dirty_samples * total_block_mem_MB *
++                 1000 / (total_sample_count * msec);
++
++    DirtyStat.dirty_rate = dirtyrate;
++}
+ 
+ static void calculate_dirtyrate(struct DirtyRateConfig config)
+ {
 diff --git a/migration/dirtyrate.h b/migration/dirtyrate.h
-new file mode 100644
-index 0000000..33669b7
---- /dev/null
+index dc45419..8e25d93 100644
+--- a/migration/dirtyrate.h
 +++ b/migration/dirtyrate.h
-@@ -0,0 +1,32 @@
+@@ -45,6 +45,16 @@ struct RamblockDirtyInfo {
+     uint32_t *hash_result; /* array of hash result for sampled pages */
+ };
+ 
 +/*
-+ *  Dirtyrate common functions
-+ *
-+ *  Copyright (c) 2020 HUAWEI TECHNOLOGIES CO., LTD.
-+ *
-+ *  Authors:
-+ *  Chuan Zheng <zhengchuan@huawei.com>
-+ *
-+ *  This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ *  See the COPYING file in the top-level directory.
++ * Store calculation statistics for each measure.
 + */
-+
-+#ifndef QEMU_MIGRATION_DIRTYRATE_H
-+#define QEMU_MIGRATION_DIRTYRATE_H
-+
-+/*
-+ * Sample 512 pages per GB as default.
-+ * TODO: Make it configurable.
-+ */
-+#define DIRTYRATE_DEFAULT_SAMPLE_PAGES            512
-+
-+/* Take 1s as default for calculation duration */
-+#define DEFAULT_FETCH_DIRTYRATE_TIME_SEC          1
-+
-+struct DirtyRateConfig {
-+    uint64_t sample_pages_per_gigabytes; /* sample pages per GB */
-+    int64_t sample_period_seconds; /* time duration between two sampling */
++struct DirtyRateStat {
++    uint64_t total_dirty_samples; /* total dirty sampled page */
++    uint64_t total_sample_count; /* total sampled pages */
++    uint64_t total_block_mem_MB; /* size of total sampled pages in MB */
++    int64_t dirty_rate; /* dirty rate in MB/s */
 +};
 +
-+void *get_dirtyrate_thread(void *arg);
-+#endif
-+
-diff --git a/migration/meson.build b/migration/meson.build
-index ac8ff14..30cc6c3 100644
---- a/migration/meson.build
-+++ b/migration/meson.build
-@@ -21,6 +21,7 @@ softmmu_ss.add(files(
-   'channel.c',
-   'colo-failover.c',
-   'colo.c',
-+  'dirtyrate.c',
-   'exec.c',
-   'fd.c',
-   'global_state.c',
+ void *get_dirtyrate_thread(void *arg);
+ #endif
+ 
 -- 
 1.8.3.1
 
