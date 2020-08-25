@@ -2,66 +2,92 @@ Return-Path: <SRS0=2GMi=CD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7492C433E3
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 11:21:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A255C433E3
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 11:21:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7519620706
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 11:21:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F3BA820706
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 11:21:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="NcCvC9DR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7519620706
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Op/HLcul"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3BA820706
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57860 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59140 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAX0k-00067d-OK
-	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 07:21:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41898)
+	id 1kAX14-0006eu-60
+	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 07:21:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43334)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kAWwY-00075p-Vv; Tue, 25 Aug 2020 07:16:46 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:52403)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kAWwV-00054j-Mf; Tue, 25 Aug 2020 07:16:46 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 4BbRJj5xvFz9sTn; Tue, 25 Aug 2020 21:16:36 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1598354197;
- bh=YhTpF2S5cA8sgSuuYTIKOFn5DFo7TadLfI5D6Np14L4=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=NcCvC9DRG7A3dX88AvKNR1AzZes3kVCr887RNLWf1svrSUnMJsScd0n2EyzQarlEi
- tqShV2H3tF3Vf1+o00WtgRYIOVyiCIgw1Ja0MsodiaGQQ9Y5GOM9d9PtpVFuEr2/e9
- KYYp5FyerkFxm/Cqfr3f2Wr3xBullsJDmRrBjGEM=
-From: David Gibson <david@gibson.dropbear.id.au>
-To: ehabkost@redhat.com
-Subject: [PATCH 2/3] ppc/pnv: Fix TypeInfo of PnvLpcController abstract class
-Date: Tue, 25 Aug 2020 21:16:26 +1000
-Message-Id: <20200825111627.2007820-3-david@gibson.dropbear.id.au>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200825111627.2007820-1-david@gibson.dropbear.id.au>
-References: <20200825111627.2007820-1-david@gibson.dropbear.id.au>
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kAWzB-0003XF-M5
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 07:19:29 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:51709
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kAWz9-0005Sd-HR
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 07:19:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1598354366;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=zAsI8LK6oPInKx1ONhovrRt5nQCVumQ/7oPRz36Jo4Y=;
+ b=Op/HLculB796dGXoMpCdSfxOMkln2uQ5mg8epbkqEEL/C+r3ojCFwHDGPKZYqXC2WXKVQI
+ nio0Qp8xCaATXhLkLS67bWiTIPKSyOmAZ9KUUhLresGOI8XTZOIBhgNOcdDtMKWNI/90Nd
+ Vbyb/d9UksIddQmB7cSBKJFU73NlLT8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-27-WeonDC3_NISdwKDN5F9KDg-1; Tue, 25 Aug 2020 07:19:24 -0400
+X-MC-Unique: WeonDC3_NISdwKDN5F9KDg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AC5FB1084C96;
+ Tue, 25 Aug 2020 11:19:23 +0000 (UTC)
+Received: from redhat.com (ovpn-114-231.ams2.redhat.com [10.36.114.231])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0ACBF2AAAA;
+ Tue, 25 Aug 2020 11:19:21 +0000 (UTC)
+Date: Tue, 25 Aug 2020 12:19:19 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Subject: Re: [PATCH v2 38/58] rocker: Move QOM macros to header
+Message-ID: <20200825111919.GE107278@redhat.com>
+References: <20200820001236.1284548-1-ehabkost@redhat.com>
+ <20200820001236.1284548-39-ehabkost@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20200820001236.1284548-39-ehabkost@redhat.com>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
- helo=ozlabs.org
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=0.248,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=berrange@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/25 01:37:44
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.958,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -74,53 +100,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org,
- qemu-devel@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Jiri Pirko <jiri@resnulli.us>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Cédric Le Goater <clg@kaod.org>
+On Wed, Aug 19, 2020 at 08:12:16PM -0400, Eduardo Habkost wrote:
+> This will make future conversion to OBJECT_DECLARE* easier.
+> 
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> ---
+> Changes series v1 -> v2: new patch in series v2
+> 
+> Cc: Jiri Pirko <jiri@resnulli.us>
+> Cc: Jason Wang <jasowang@redhat.com>
+> Cc: qemu-devel@nongnu.org
+> ---
+>  hw/net/rocker/rocker.h | 6 +++++-
+>  hw/net/rocker/rocker.c | 5 -----
+>  2 files changed, 5 insertions(+), 6 deletions(-)
 
-It was missing the instance_size field.
+Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
 
-Cc: Eduardo Habkost <ehabkost@redhat.com>
-Signed-off-by: Cédric Le Goater <clg@kaod.org>
-Message-Id: <20200822083920.2668930-1-clg@kaod.org>
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
----
- hw/ppc/pnv_lpc.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/hw/ppc/pnv_lpc.c b/hw/ppc/pnv_lpc.c
-index b5ffa48dac..23f1e09492 100644
---- a/hw/ppc/pnv_lpc.c
-+++ b/hw/ppc/pnv_lpc.c
-@@ -646,7 +646,6 @@ static void pnv_lpc_power8_class_init(ObjectClass *klass, void *data)
- static const TypeInfo pnv_lpc_power8_info = {
-     .name          = TYPE_PNV8_LPC,
-     .parent        = TYPE_PNV_LPC,
--    .instance_size = sizeof(PnvLpcController),
-     .class_init    = pnv_lpc_power8_class_init,
-     .interfaces = (InterfaceInfo[]) {
-         { TYPE_PNV_XSCOM_INTERFACE },
-@@ -687,7 +686,6 @@ static void pnv_lpc_power9_class_init(ObjectClass *klass, void *data)
- static const TypeInfo pnv_lpc_power9_info = {
-     .name          = TYPE_PNV9_LPC,
-     .parent        = TYPE_PNV_LPC,
--    .instance_size = sizeof(PnvLpcController),
-     .class_init    = pnv_lpc_power9_class_init,
- };
- 
-@@ -768,6 +766,7 @@ static void pnv_lpc_class_init(ObjectClass *klass, void *data)
- static const TypeInfo pnv_lpc_info = {
-     .name          = TYPE_PNV_LPC,
-     .parent        = TYPE_DEVICE,
-+    .instance_size = sizeof(PnvLpcController),
-     .class_init    = pnv_lpc_class_init,
-     .class_size    = sizeof(PnvLpcClass),
-     .abstract      = true,
+Regards,
+Daniel
 -- 
-2.26.2
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
