@@ -2,92 +2,86 @@ Return-Path: <SRS0=2GMi=CD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77A88C433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 05:36:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0EE1C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 05:37:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4191C204FD
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 05:36:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ABAF3206F0
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 05:37:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MQWeeUI6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4191C204FD
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="awqVdeoC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ABAF3206F0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60628 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34564 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kARd1-0001w0-GZ
-	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 01:36:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57132)
+	id 1kAReE-0002sz-Ub
+	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 01:37:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57552)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kARcS-0001MV-86
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 01:35:40 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:38924
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kARda-0002Rb-FD
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 01:36:50 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:43308
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kARcP-0006SR-QN
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 01:35:39 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kARdY-0006YL-T4
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 01:36:50 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598333736;
+ s=mimecast20190719; t=1598333807;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=l/iBvo7Qvpf2Satl4i6QhyzLoYW8GgHyKSEUnZHPF70=;
- b=MQWeeUI6AbrlzU35hnARdegK7L8QGhdzYPqkzdh2Wg3KWIGwnFFhOKqWhZc7kWbeLRKAlN
- yOiPBrp4rvgBtqLN/tRzFmsjNqH4JkAr+wWHBD9bPqWc4Fshf3EGv+fdb+BcERWjFMwruf
- mpTxXW8t797PCEI74MiWQFJNIEnHH+c=
+ content-transfer-encoding:content-transfer-encoding;
+ bh=7fU5zpbSM5vcreKmXC/NArdGuxSaKbojqsfBEtqDc7Q=;
+ b=awqVdeoCiYvL/0Qc+JuBKrDlsR9IrJR96x9H4I6WkkX4z4JD499n6IOCcCjTcXNB/Xk9jM
+ ZMgSFMDKydDSeXJp/3Ypxr8r0rYN3nmZYBp41uXgbjI/OT++keD/0eWj7S67uLqTRgLLpg
+ shF2XmV1OauYxnKLbWn6Bbqu6Th2suA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-454-ll731cgIPJ2Nc49YoPer3g-1; Tue, 25 Aug 2020 01:35:32 -0400
-X-MC-Unique: ll731cgIPJ2Nc49YoPer3g-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-23-2U9NfKfwN4uS5WdObmRqWw-1; Tue, 25 Aug 2020 01:36:43 -0400
+X-MC-Unique: 2U9NfKfwN4uS5WdObmRqWw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4F83880732F;
- Tue, 25 Aug 2020 05:35:31 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-152.ams2.redhat.com [10.36.112.152])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E06C6100239B;
- Tue, 25 Aug 2020 05:35:29 +0000 (UTC)
-Subject: Re: [PATCH 2/2] nbd: disable signals and forking on Windows builds
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- qemu-devel@nongnu.org
-References: <20200824170218.106255-1-berrange@redhat.com>
- <20200824170218.106255-3-berrange@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <febc3a8b-baa1-f7b0-236a-26b11a80089b@redhat.com>
-Date: Tue, 25 Aug 2020 07:35:27 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 30C131DDFA;
+ Tue, 25 Aug 2020 05:36:41 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-112-54.ams2.redhat.com
+ [10.36.112.54])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 331115FC2A;
+ Tue, 25 Aug 2020 05:36:37 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id E9DB31753B; Tue, 25 Aug 2020 07:36:36 +0200 (CEST)
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] usb: fix setup_len init (CVE-2020-14364)
+Date: Tue, 25 Aug 2020 07:36:36 +0200
+Message-Id: <20200825053636.29648-1-kraxel@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200824170218.106255-3-berrange@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
-X-Mimecast-Spam-Score: 0.003
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
+X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=thuth@redhat.com;
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=kraxel@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/25 01:35:36
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/25 01:36:47
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -52
-X-Spam_score: -5.3
-X-Spam_bar: -----
-X-Spam_report: (-5.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.956,
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.956,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-2.25, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,106 +94,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>
+Cc: Gonglei <arei.gonglei@huawei.com>, Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 24/08/2020 19.02, Daniel P. Berrangé wrote:
-> Disabling these parts are sufficient to get the qemu-nbd program
-> compiling in a Windows build.
+Store calculated setup_len in a local variable, verify it, and only
+write it to the struct (USBDevice->setup_len) in case it passed the
+sanity checks.
 
-Maybe add:
-"This also enables compilation of qemu-nbd on macOS again (which got 
-disabled by accident during the conversion to the meson build system)"
+This prevents other code (do_token_{in,out} functions specifically)
+from working with invalid USBDevice->setup_len values and overrunning
+the USBDevice->setup_buf[] buffer.
 
-> Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
-> ---
->   meson.build |  7 ++-----
->   qemu-nbd.c  | 10 +++++++++-
->   2 files changed, 11 insertions(+), 6 deletions(-)
-> 
-> diff --git a/meson.build b/meson.build
-> index df5bf728b5..1071871605 100644
-> --- a/meson.build
-> +++ b/meson.build
-> @@ -1074,12 +1074,9 @@ if have_tools
->                dependencies: [authz, block, crypto, io, qom, qemuutil], install: true)
->     qemu_io = executable('qemu-io', files('qemu-io.c'),
->                dependencies: [block, qemuutil], install: true)
-> -  qemu_block_tools += [qemu_img, qemu_io]
-> -  if targetos == 'linux' or targetos == 'sunos' or targetos.endswith('bsd')
-> -    qemu_nbd = executable('qemu-nbd', files('qemu-nbd.c'),
-> +  qemu_nbd = executable('qemu-nbd', files('qemu-nbd.c'),
->                  dependencies: [block, qemuutil], install: true)
-> -    qemu_block_tools += [qemu_nbd]
-> -  endif
-> +  qemu_block_tools += [qemu_img, qemu_io, qemu_nbd]
->   
->     subdir('storage-daemon')
->     subdir('contrib/rdmacm-mux')
-> diff --git a/qemu-nbd.c b/qemu-nbd.c
-> index b102874f0f..c6fd6524d3 100644
-> --- a/qemu-nbd.c
-> +++ b/qemu-nbd.c
-> @@ -155,12 +155,13 @@ QEMU_COPYRIGHT "\n"
->       , name);
->   }
->   
-> +#ifndef WIN32
->   static void termsig_handler(int signum)
->   {
->       atomic_cmpxchg(&state, RUNNING, TERMINATE);
->       qemu_notify_event();
->   }
-> -
-> +#endif
->   
->   static int qemu_nbd_client_list(SocketAddress *saddr, QCryptoTLSCreds *tls,
->                                   const char *hostname)
-> @@ -587,6 +588,7 @@ int main(int argc, char **argv)
->       unsigned socket_activation;
->       const char *pid_file_name = NULL;
->   
-> +#ifndef WIN32
->       /* The client thread uses SIGTERM to interrupt the server.  A signal
->        * handler ensures that "qemu-nbd -v -c" exits with a nice status code.
->        */
-> @@ -594,6 +596,7 @@ int main(int argc, char **argv)
->       memset(&sa_sigterm, 0, sizeof(sa_sigterm));
->       sa_sigterm.sa_handler = termsig_handler;
->       sigaction(SIGTERM, &sa_sigterm, NULL);
-> +#endif
->   
->   #ifdef CONFIG_POSIX
+Fixes: CVE-2020-14364
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Tested-by: Gonglei <arei.gonglei@huawei.com>
+---
+ hw/usb/core.c | 16 ++++++++++------
+ 1 file changed, 10 insertions(+), 6 deletions(-)
 
-I wonder why the CONFIG_POSIX does not simply start earlier here ... I 
-think you could replace your #ifndef WIN32 with #ifdef CONFIG_POSIX that 
-way?
-
->       signal(SIGPIPE, SIG_IGN);
-> @@ -896,6 +899,7 @@ int main(int argc, char **argv)
->   #endif
->   
->       if ((device && !verbose) || fork_process) {
-> +#ifndef WIN32
->           int stderr_fd[2];
->           pid_t pid;
->           int ret;
-> @@ -959,6 +963,10 @@ int main(int argc, char **argv)
->                */
->               exit(errors);
->           }
-> +#else /* WIN32 */
-> +        error_report("Unable to fork into background on Windows hosts");
-> +        exit(EXIT_FAILURE);
-> +#endif /* WIN32 */
->       }
->   
->       if (device != NULL && sockpath == NULL) {
-> 
-
-  Thomas
+diff --git a/hw/usb/core.c b/hw/usb/core.c
+index 5abd128b6bc5..5234dcc73fea 100644
+--- a/hw/usb/core.c
++++ b/hw/usb/core.c
+@@ -129,6 +129,7 @@ void usb_wakeup(USBEndpoint *ep, unsigned int stream)
+ static void do_token_setup(USBDevice *s, USBPacket *p)
+ {
+     int request, value, index;
++    unsigned int setup_len;
+ 
+     if (p->iov.size != 8) {
+         p->status = USB_RET_STALL;
+@@ -138,14 +139,15 @@ static void do_token_setup(USBDevice *s, USBPacket *p)
+     usb_packet_copy(p, s->setup_buf, p->iov.size);
+     s->setup_index = 0;
+     p->actual_length = 0;
+-    s->setup_len   = (s->setup_buf[7] << 8) | s->setup_buf[6];
+-    if (s->setup_len > sizeof(s->data_buf)) {
++    setup_len = (s->setup_buf[7] << 8) | s->setup_buf[6];
++    if (setup_len > sizeof(s->data_buf)) {
+         fprintf(stderr,
+                 "usb_generic_handle_packet: ctrl buffer too small (%d > %zu)\n",
+-                s->setup_len, sizeof(s->data_buf));
++                setup_len, sizeof(s->data_buf));
+         p->status = USB_RET_STALL;
+         return;
+     }
++    s->setup_len = setup_len;
+ 
+     request = (s->setup_buf[0] << 8) | s->setup_buf[1];
+     value   = (s->setup_buf[3] << 8) | s->setup_buf[2];
+@@ -259,26 +261,28 @@ static void do_token_out(USBDevice *s, USBPacket *p)
+ static void do_parameter(USBDevice *s, USBPacket *p)
+ {
+     int i, request, value, index;
++    unsigned int setup_len;
+ 
+     for (i = 0; i < 8; i++) {
+         s->setup_buf[i] = p->parameter >> (i*8);
+     }
+ 
+     s->setup_state = SETUP_STATE_PARAM;
+-    s->setup_len   = (s->setup_buf[7] << 8) | s->setup_buf[6];
+     s->setup_index = 0;
+ 
+     request = (s->setup_buf[0] << 8) | s->setup_buf[1];
+     value   = (s->setup_buf[3] << 8) | s->setup_buf[2];
+     index   = (s->setup_buf[5] << 8) | s->setup_buf[4];
+ 
+-    if (s->setup_len > sizeof(s->data_buf)) {
++    setup_len = (s->setup_buf[7] << 8) | s->setup_buf[6];
++    if (setup_len > sizeof(s->data_buf)) {
+         fprintf(stderr,
+                 "usb_generic_handle_packet: ctrl buffer too small (%d > %zu)\n",
+-                s->setup_len, sizeof(s->data_buf));
++                setup_len, sizeof(s->data_buf));
+         p->status = USB_RET_STALL;
+         return;
+     }
++    s->setup_len = setup_len;
+ 
+     if (p->pid == USB_TOKEN_OUT) {
+         usb_packet_copy(p, s->data_buf, s->setup_len);
+-- 
+2.27.0
 
 
