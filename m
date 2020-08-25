@@ -2,93 +2,85 @@ Return-Path: <SRS0=2GMi=CD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71869C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 08:45:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BEE24C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 08:46:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3E02D2065F
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 08:45:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 864262065F
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 08:46:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="faZbjc9K"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E02D2065F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FQBQ0RnS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 864262065F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40140 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42438 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAUaU-00037b-Bq
-	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 04:45:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33002)
+	id 1kAUar-00045w-Nw
+	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 04:46:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60304)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kAUQl-00086t-18
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 04:35:47 -0400
-Received: from mail-pf1-x431.google.com ([2607:f8b0:4864:20::431]:41967)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kAUQh-00010K-F1
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 04:35:46 -0400
-Received: by mail-pf1-x431.google.com with SMTP id t9so2590298pfq.8
- for <qemu-devel@nongnu.org>; Tue, 25 Aug 2020 01:35:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=s3dYOgA7GkXXyUyxgB9kFfNBkj2FaL3vO8uRc/sluZg=;
- b=faZbjc9KpzRCNppP5iiWIh9cjaI4/rLkD82RKbX4NJFQLIj2PKF/D7fbQruN8JtD+q
- zfnIBcz21sQ7YQ4SmQC8J8hjOq1o5QR4x6PkdGJgM3oDVw9pwk2S8kRSd8+NdN6jnhQz
- EB5IAfJVXS31QrCNV9Jr1NuAsMmhEjV30KRxJzZ9FxZU+dSFip1MRkSQrcg3mEXeSKRV
- HsaOFFQKKeCeRpBHBUGm8fFHqtsqhFsIvegXrHA14gZfCBl20WmLxHIZWAV5B+4pFZ+9
- eTa6m6dIc8oIRrntn9aDNy04+/qoS4J13qXKmO9FJfWGqqh6syeWWIMa8BOVCxO2u7PD
- symw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=s3dYOgA7GkXXyUyxgB9kFfNBkj2FaL3vO8uRc/sluZg=;
- b=HdQ89eaDbX6Bu+s+a83HUj7DUAG+cKUwEt80+I/ikQettvojnFOr2jqZHnw4HoY07z
- Kltfkn4COAR6okk8vm5fCTXQTwabYxHTmvIVP7R2pkfgSbom97oYdlMEcgpi8NfoJllX
- whX9nhz1NONncFApOuVCU6kdstO/HtTM4hKuyjp8CmMH4uvgZYoe1JogdbuayTziNYaE
- DDxpq0x1voOALbdVeEnpEKJTLLQ4xXXxIDQiHWRF0CCmHaSgVJSxHV8dfTInKWBEPnZv
- 0AbkW3rLbiZLfRFeWme3/w9EKB5o62f4ohR33E1EBdEfFerm8pUR7X9q5a2Q5xG2qfwO
- 73dw==
-X-Gm-Message-State: AOAM530AWIq+c9FpVAiyp4hSg52OJX7GRdgTCaoGd0evvxH8WNrV17Gs
- 8cWK4OJ80xpu+KHB54/9ar46jSRlZRXaJ3nK
-X-Google-Smtp-Source: ABdhPJzlWxsMwAmPYmI8F5bJGHsvKN8v3XSABZtgkEVsSCbc/iKOpLQAXbJHzf2yZF5nq+azp85UjA==
-X-Received: by 2002:a65:5849:: with SMTP id s9mr6322324pgr.145.1598344541468; 
- Tue, 25 Aug 2020 01:35:41 -0700 (PDT)
-Received: from localhost.localdomain ([222.95.248.6])
- by smtp.googlemail.com with ESMTPSA id bn14sm1146683pjb.0.2020.08.25.01.35.39
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 25 Aug 2020 01:35:40 -0700 (PDT)
-From: luoyonggang@gmail.com
-To: qemu-devel@nongnu.org
-Subject: [PATCH 2/5] meson: fixes relpath may fail on win32. for example
- C:/msys64/mingw64/x.exe relative to E:/path/qemu-build would fail.
-Date: Tue, 25 Aug 2020 16:34:57 +0800
-Message-Id: <20200825083500.359-2-luoyonggang@gmail.com>
-X-Mailer: git-send-email 2.27.0.windows.1
-In-Reply-To: <20200825083500.359-1-luoyonggang@gmail.com>
-References: <20200825083500.359-1-luoyonggang@gmail.com>
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kAUOz-0004C3-Jc
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 04:33:57 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:32695)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kAUOw-0000eP-Ko
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 04:33:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1598344433;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Y333hMY6oPvy2uUYqIaHd1TDNc9W3Wxbnk34wZB2+vM=;
+ b=FQBQ0RnSv1PIfKYhpdbXQuP9oZikstkDxREcAE5cmcLgxOnWm6nRL1sevXDACTb07B14yx
+ b/QOo0GEO9A6qE+amh2jGcSjsEA/jDDINHG7hjm1K1tjr9xDBvhsqiQlKTnCmMtWZKqJBS
+ mxDpIkVzyF4Zew8PHC+4z3PH/H35AL4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-329-c0smku3rOI6e6NNN3HJNxQ-1; Tue, 25 Aug 2020 04:33:51 -0400
+X-MC-Unique: c0smku3rOI6e6NNN3HJNxQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8608E18A2251;
+ Tue, 25 Aug 2020 08:33:50 +0000 (UTC)
+Received: from localhost (ovpn-113-72.ams2.redhat.com [10.36.113.72])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2B93F7D939;
+ Tue, 25 Aug 2020 08:33:50 +0000 (UTC)
+From: Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org
+Subject: [PULL 16/34] qcow2: Add qcow2_cluster_is_allocated()
+Date: Tue, 25 Aug 2020 10:32:53 +0200
+Message-Id: <20200825083311.1098442-17-mreitz@redhat.com>
+In-Reply-To: <20200825083311.1098442-1-mreitz@redhat.com>
+References: <20200825083311.1098442-1-mreitz@redhat.com>
 MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::431;
- envelope-from=luoyonggang@gmail.com; helo=mail-pf1-x431.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/25 02:03:58
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.956,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,41 +93,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Yonggang Luo <luoyonggang@gmail.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Yonggang Luo <luoyonggang@gmail.com>
+From: Alberto Garcia <berto@igalia.com>
 
+This helper function tells us if a cluster is allocated (that is,
+there is an associated host offset for it).
+
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+Message-Id: <6d8771c5c79cbdc6c519875a5078e1cc85856d63.1594396418.git.berto@igalia.com>
+Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- scripts/mtest2make.py | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+ block/qcow2.h | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/scripts/mtest2make.py b/scripts/mtest2make.py
-index bdb257bbd9..d7a51bf97e 100644
---- a/scripts/mtest2make.py
-+++ b/scripts/mtest2make.py
-@@ -53,9 +53,16 @@ i = 0
- for test in json.load(sys.stdin):
-     env = ' '.join(('%s=%s' % (shlex.quote(k), shlex.quote(v))
-                     for k, v in test['env'].items()))
--    executable = os.path.relpath(test['cmd'][0])
-+    executable = test['cmd'][0]
-+    try:
-+        executable = os.path.relpath(executable)
-+    except:
-+        pass
-     if test['workdir'] is not None:
--        test['cmd'][0] = os.path.relpath(test['cmd'][0], test['workdir'])
-+        try:
-+            test['cmd'][0] = os.path.relpath(executable, test['workdir'])
-+        except:
-+            test['cmd'][0] = executable
-     else:
-         test['cmd'][0] = executable
-     cmd = '$(.test.env) %s %s' % (env, ' '.join((shlex.quote(x) for x in test['cmd'])))
+diff --git a/block/qcow2.h b/block/qcow2.h
+index 3aec6f452a..ea647c8bb5 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -780,6 +780,12 @@ QCow2SubclusterType qcow2_get_subcluster_type(BlockDriverState *bs,
+     }
+ }
+ 
++static inline bool qcow2_cluster_is_allocated(QCow2ClusterType type)
++{
++    return (type == QCOW2_CLUSTER_COMPRESSED || type == QCOW2_CLUSTER_NORMAL ||
++            type == QCOW2_CLUSTER_ZERO_ALLOC);
++}
++
+ /* Check whether refcounts are eager or lazy */
+ static inline bool qcow2_need_accurate_refcounts(BDRVQcow2State *s)
+ {
 -- 
-2.27.0.windows.1
+2.26.2
 
 
