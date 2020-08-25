@@ -2,83 +2,84 @@ Return-Path: <SRS0=2GMi=CD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-17.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3503FC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 00:24:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16410C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 00:24:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F07FD2074D
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 00:24:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D59AF2074D
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 00:24:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="i93oxQc9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F07FD2074D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="HPKYKVap"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D59AF2074D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52760 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54284 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAMku-0007VN-8O
-	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 20:24:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45466)
+	id 1kAMlH-00089S-66
+	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 20:24:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45498)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from
- <3qFhEXwsKCmsQbTRWWNVXNWPXXPUN.LXVZNVd-MNeNUWXWPWd.XaP@flex--hskinnemoen.bounces.google.com>)
- id 1kAMes-0004Va-Vy
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 20:17:51 -0400
-Received: from mail-yb1-xb49.google.com ([2607:f8b0:4864:20::b49]:38511)
+ <3q1hEXwsKCm4TeWUZZQYaQZSaaSXQ.OaYcQYg-PQhQXZaZSZg.adS@flex--hskinnemoen.bounces.google.com>)
+ id 1kAMeu-0004Wo-48
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 20:17:52 -0400
+Received: from mail-pj1-x1049.google.com ([2607:f8b0:4864:20::1049]:35267)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from
- <3qFhEXwsKCmsQbTRWWNVXNWPXXPUN.LXVZNVd-MNeNUWXWPWd.XaP@flex--hskinnemoen.bounces.google.com>)
- id 1kAMep-00069Y-Q1
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 20:17:50 -0400
-Received: by mail-yb1-xb49.google.com with SMTP id l13so12783461ybf.5
- for <qemu-devel@nongnu.org>; Mon, 24 Aug 2020 17:17:44 -0700 (PDT)
+ <3q1hEXwsKCm4TeWUZZQYaQZSaaSXQ.OaYcQYg-PQhQXZaZSZg.adS@flex--hskinnemoen.bounces.google.com>)
+ id 1kAMer-0006AB-FV
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 20:17:51 -0400
+Received: by mail-pj1-x1049.google.com with SMTP id z8so446850pje.0
+ for <qemu-devel@nongnu.org>; Mon, 24 Aug 2020 17:17:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=sender:date:in-reply-to:message-id:mime-version:references:subject
- :from:to:cc; bh=1eUKc4mUKGxpAfRnn7edRuE+wT0NYPxDKPSyLd06AXc=;
- b=i93oxQc97gPif+5l4MHVqnL0YPMUFlN8wvY3LI9yWOg2mHfMPjZqLRqsQqH2ZNGD53
- uevKckWnlmqo2HG4m9p3FxLYYDgsBVFk9xZWf/KjF2fUZs5BsaAWOeV4lmHe6Gq0PIOl
- y6Veokzd3DM7fI5DO3EJks/63EmZLKJv3cqzXJgtrkQZiCw0Gprnq9eDBr9VoskVB/r0
- Gx5cQilHKjRRZhTJU8mvC8ZRDoq+TERAdsnDFDiUBLK6dXDvenB55D3Uo6awa9Mc5O5M
- Hs14JjX+++uxtEQMY7VDFU9ZhHS1H39ct+JdyNTxAL1h7DlL0/4TStCHfNv8v5CwEbtF
- Vcxg==
+ :from:to:cc:content-transfer-encoding;
+ bh=Bm7spw+C0+41sKOlaxF7L66yvzmdTiJkotWkEKVYr68=;
+ b=HPKYKVapabI3RLWrwYaXngmKudG+ym6kGklYWil1WrqfyvLjFt+AIbfoXq+g3WS8Mb
+ yxrxKkPz75HRTyUpYcsX9dyHdLJJOFRHd1CYpBlHMVLR6TGIQkpsjmfG/GDSAa6hzC1J
+ DagqdsWNyI+sLY8VkDcaQj+6pHJC+2eiXsXEAS+RG1IW03FHyNUw8pN8tz9Kudj6+hPr
+ MBi9Pt5nGLXcPSVztd6cqnDkypFIgt3bZ4e0x7IBpjZDE1HA+nZh3z4moxy2AWTIosSh
+ p4VbR/MDVZQv6H70w/n+AqIoZ7o4GUSut/3Ho/+s+KoZToxGuYS9DukS8RkqRH8c/z6p
+ YWog==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
- :references:subject:from:to:cc;
- bh=1eUKc4mUKGxpAfRnn7edRuE+wT0NYPxDKPSyLd06AXc=;
- b=DG6IyTmWVKlloM0kPsUCtD36PhAv0N4fLVxWw5zisma/mkCTv/qc1ESIk/l+JIuQ8Z
- Jef1zxeZ/Fn/SiRXJVYzv80Z1Kx571nM0hDdq1+ru6CPo+xzGiIRjQpv0DekepTAgtc7
- r8B1Yq9fIlRWq8qUA2LKMRX/iBKxn3mIfTt5quWbwj/snIJhnVGynzdAZ/MIOikZlqx5
- Fd+D0UBXsUOX3Lm71xDIypATj+7bzz93UIFHZvdUz+CIPYYDV52k5/VO9oLy42wc0LFE
- u4m6BcSeip9UjRS5m+X8f5opEmIDkT/zk7L0PvUA7kMya5gG7tYLP2BcLVmbge2bDIm+
- 5dmQ==
-X-Gm-Message-State: AOAM530obiKZyslmqCKgNeKazk0qkqQCiYiZr/51L99pGW0lpDDG+d3i
- 3lQaGd1ajRs1EHPKsvRn3mMaNRwtntHbH5fPjQ==
-X-Google-Smtp-Source: ABdhPJzd9A40C16FQ7mckCF2szmBWC4wIp0sz2fyD7zOHFPIGpTyPZMmbiOUOa0VGQUEpRzvWd2lKxkp0bX+4XYlTg==
+ :references:subject:from:to:cc:content-transfer-encoding;
+ bh=Bm7spw+C0+41sKOlaxF7L66yvzmdTiJkotWkEKVYr68=;
+ b=EhcXst1T9/YXKRRTtUCNgAGnzndOxxWxTmtQI3EUuO01xPZczSCSRSUpfzhZrdt3yV
+ yPehdmevrTHKjMvED9PJzC4OJyUFNwZRtP2KrybLTxKBYr/HIRubq3ZM5h7YoCgOY6vF
+ 6ZYvIgxBlu2+LfjBFfTx7GatvBCJOR9yInbr/7N6ZXj0RfM6pX+uDrsKKa7B0Yr2CRDL
+ 3qXisxnNCO33PPgLWnfN/p5txlTrb2urJ/T2QyToswdfAMFkoelIhFvVPyL/1EAwBazT
+ uJ31UJPfnXaSGmKplcaEB69lHjJul8BGdl0Vd6eFezLAOm2y44CgzsdnKG8Z8Vh0xk40
+ rSnw==
+X-Gm-Message-State: AOAM5322YhLG1MNYHS5IbSuWyeGjGTdGsBAX+w/w93j7vmEnc8V2w+Ze
+ KRlTYdf3KvEOzJRDJHEZJQrN32QizPRgMP3MUA==
+X-Google-Smtp-Source: ABdhPJzIVap2ywO2wNYqR/Ui0TQX2EePssI+/SQ2oNOh0YvU9U18XZBDV+fwKerqkVONZ/ANaHI0fRD8xfnwv8hPgw==
 X-Received: from skybert.c.googlers.com ([fda3:e722:ac3:10:24:72f4:c0a8:3107])
- (user=hskinnemoen job=sendgmr) by 2002:a25:9004:: with SMTP id
- s4mr10468658ybl.247.1598314664144; Mon, 24 Aug 2020 17:17:44 -0700 (PDT)
-Date: Mon, 24 Aug 2020 17:17:09 -0700
+ (user=hskinnemoen job=sendgmr) by 2002:a62:7812:: with SMTP id
+ t18mr5806056pfc.73.1598314667592; Mon, 24 Aug 2020 17:17:47 -0700 (PDT)
+Date: Mon, 24 Aug 2020 17:17:11 -0700
 In-Reply-To: <20200825001711.1340443-1-hskinnemoen@google.com>
-Message-Id: <20200825001711.1340443-13-hskinnemoen@google.com>
+Message-Id: <20200825001711.1340443-15-hskinnemoen@google.com>
 Mime-Version: 1.0
 References: <20200825001711.1340443-1-hskinnemoen@google.com>
 X-Mailer: git-send-email 2.28.0.297.g1956fa8f8d-goog
-Subject: [PATCH v8 12/14] hw/arm/npcm7xx: add board setup stub for CPU and
- UART clocks
+Subject: [PATCH v8 14/14] tests/acceptance: console boot tests for quanta-gsj
 To: peter.maydell@linaro.org, f4bug@amsat.org
 Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, Avi.Fishman@nuvoton.com, 
  kfting@nuvoton.com, Havard Skinnemoen <hskinnemoen@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::b49;
- envelope-from=3qFhEXwsKCmsQbTRWWNVXNWPXXPUN.LXVZNVd-MNeNUWXWPWd.XaP@flex--hskinnemoen.bounces.google.com;
- helo=mail-yb1-xb49.google.com
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1049;
+ envelope-from=3q1hEXwsKCm4TeWUZZQYaQZSaaSXQ.OaYcQYg-PQhQXZaZSZg.adS@flex--hskinnemoen.bounces.google.com;
+ helo=mail-pj1-x1049.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -95
@@ -87,7 +88,7 @@ X-Spam_bar: ---------
 X-Spam_report: (-9.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- USER_IN_DEF_DKIM_WL=-7.5 autolearn=unavailable autolearn_force=no
+ USER_IN_DEF_DKIM_WL=-7.5 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -106,97 +107,130 @@ Sender: "Qemu-devel"
 Reply-to: Havard Skinnemoen <hskinnemoen@google.com>
 From: Havard Skinnemoen via <qemu-devel@nongnu.org>
 
-When booting directly into a kernel, bypassing the boot loader, the CPU and
-UART clocks are not set up correctly. This makes the system appear very
-slow, and causes the initrd boot test to fail when optimization is off.
+This adds two acceptance tests for the quanta-gsj machine.
 
-The UART clock must run at 24 MHz. The default 25 MHz reference clock
-cannot achieve this, so switch to PLL2/2 @ 480 MHz, which works
-perfectly with the default /20 divider.
+One test downloads a lightly patched openbmc flash image from github and
+verifies that it boots all the way to the login prompt.
 
-The CPU clock should run at 800 MHz, so switch it to PLL1/2. PLL1 runs
-at 800 MHz by default, so we need to double the feedback divider as well
-to make it run at 1600 MHz (so PLL1/2 runs at 800 MHz).
+The other test downloads a kernel, initrd and dtb built from the same
+openbmc source and verifies that the kernel detects all CPUs and boots
+to the point where it can't find the root filesystem (because we have no
+flash image in this case).
 
-We don't bother checking for PLL lock because we know our emulated PLLs
-lock instantly.
-
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Signed-off-by: Havard Skinnemoen <hskinnemoen@google.com>
 ---
- include/hw/arm/npcm7xx.h |  1 +
- hw/arm/npcm7xx.c         | 32 ++++++++++++++++++++++++++++++++
- 2 files changed, 33 insertions(+)
+ tests/acceptance/boot_linux_console.py | 83 ++++++++++++++++++++++++++
+ 1 file changed, 83 insertions(+)
 
-diff --git a/include/hw/arm/npcm7xx.h b/include/hw/arm/npcm7xx.h
-index 78d0d78c52..13106af215 100644
---- a/include/hw/arm/npcm7xx.h
-+++ b/include/hw/arm/npcm7xx.h
-@@ -37,6 +37,7 @@
- #define NPCM7XX_SMP_LOADER_START        (0xffff0000)  /* Boot ROM */
- #define NPCM7XX_SMP_BOOTREG_ADDR        (0xf080013c)  /* GCR.SCRPAD */
- #define NPCM7XX_GIC_CPU_IF_ADDR         (0xf03fe100)  /* GIC within A9 */
-+#define NPCM7XX_BOARD_SETUP_ADDR        (0xffff1000)  /* Boot ROM */
- 
- typedef struct NPCM7xxMachine {
-     MachineState        parent;
-diff --git a/hw/arm/npcm7xx.c b/hw/arm/npcm7xx.c
-index 7884b2b03d..037f3a26f2 100644
---- a/hw/arm/npcm7xx.c
-+++ b/hw/arm/npcm7xx.c
-@@ -55,6 +55,13 @@
- #define NPCM7XX_ROM_BA          (0xffff0000)
- #define NPCM7XX_ROM_SZ          (64 * KiB)
- 
-+/* Clock configuration values to be fixed up when bypassing bootloader */
+diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot=
+_linux_console.py
+index aaa781a581..4a366ce93e 100644
+--- a/tests/acceptance/boot_linux_console.py
++++ b/tests/acceptance/boot_linux_console.py
+@@ -568,6 +568,89 @@ class BootLinuxConsole(LinuxKernelTest):
+                                                 'sda')
+         # cubieboard's reboot is not functioning; omit reboot test.
+=20
++    def test_arm_quanta_gsj(self):
++        """
++        :avocado: tags=3Darch:arm
++        :avocado: tags=3Dmachine:quanta-gsj
++        """
++        # 25 MiB compressed, 32 MiB uncompressed.
++        image_url =3D (
++                'https://github.com/hskinnemoen/openbmc/releases/download/=
+'
++                '20200711-gsj-qemu-0/obmc-phosphor-image-gsj.static.mtd.gz=
+')
++        image_hash =3D '14895e634923345cb5c8776037ff7876df96f6b1'
++        image_path_gz =3D self.fetch_asset(image_url, asset_hash=3Dimage_h=
+ash)
++        image_name =3D 'obmc.mtd'
++        image_path =3D os.path.join(self.workdir, image_name)
++        archive.gzip_uncompress(image_path_gz, image_path)
 +
-+/* Run PLL1 at 1600 MHz */
-+#define NPCM7XX_PLLCON1_FIXUP_VAL   (0x00402101)
-+/* Run the CPU from PLL1 and UART from PLL2 */
-+#define NPCM7XX_CLKSEL_FIXUP_VAL    (0x004aaba9)
++        self.vm.set_console()
++        drive_args =3D 'file=3D' + image_path + ',if=3Dmtd,bus=3D0,unit=3D=
+0'
++        self.vm.add_args('-drive', drive_args)
++        self.vm.launch()
 +
- /*
-  * Interrupt lines going into the GIC. This does not include internal Cortex-A9
-  * interrupts.
-@@ -132,6 +139,29 @@ static const struct {
-     },
- };
- 
-+static void npcm7xx_write_board_setup(ARMCPU *cpu,
-+                                      const struct arm_boot_info *info)
-+{
-+    uint32_t board_setup[] = {
-+        0xe59f0010,     /* ldr r0, clk_base_addr */
-+        0xe59f1010,     /* ldr r1, pllcon1_value */
-+        0xe5801010,     /* str r1, [r0, #16] */
-+        0xe59f100c,     /* ldr r1, clksel_value */
-+        0xe5801004,     /* str r1, [r0, #4] */
-+        0xe12fff1e,     /* bx lr */
-+        NPCM7XX_CLK_BA,
-+        NPCM7XX_PLLCON1_FIXUP_VAL,
-+        NPCM7XX_CLKSEL_FIXUP_VAL,
-+    };
-+    int i;
++        # Disable drivers and services that stall for a long time during b=
+oot,
++        # to avoid running past the 90-second timeout. These may be remove=
+d
++        # as the corresponding device support is added.
++        kernel_command_line =3D self.KERNEL_COMMON_COMMAND_LINE + (
++                'console=3D${console} '
++                'mem=3D${mem} '
++                'initcall_blacklist=3Dnpcm_i2c_bus_driver_init '
++                'systemd.mask=3Dsystemd-random-seed.service '
++                'systemd.mask=3Ddropbearkey.service '
++        )
 +
-+    for (i = 0; i < ARRAY_SIZE(board_setup); i++) {
-+        board_setup[i] = tswap32(board_setup[i]);
-+    }
-+    rom_add_blob_fixed("board-setup", board_setup, sizeof(board_setup),
-+                       info->board_setup_addr);
-+}
++        self.wait_for_console_pattern('> BootBlock by Nuvoton')
++        self.wait_for_console_pattern('>Device: Poleg BMC NPCM730')
++        self.wait_for_console_pattern('>Skip DDR init.')
++        self.wait_for_console_pattern('U-Boot ')
++        interrupt_interactive_console_until_pattern(
++                self, 'Hit any key to stop autoboot:', 'U-Boot>')
++        exec_command_and_wait_for_pattern(
++                self, "setenv bootargs ${bootargs} " + kernel_command_line=
+,
++                'U-Boot>')
++        exec_command_and_wait_for_pattern(
++                self, 'run romboot', 'Booting Kernel from flash')
++        self.wait_for_console_pattern('Booting Linux on physical CPU 0x0')
++        self.wait_for_console_pattern('CPU1: thread -1, cpu 1, socket 0')
++        self.wait_for_console_pattern('OpenBMC Project Reference Distro')
++        self.wait_for_console_pattern('gsj login:')
 +
- static void npcm7xx_write_secondary_boot(ARMCPU *cpu,
-                                          const struct arm_boot_info *info)
- {
-@@ -170,6 +200,8 @@ static struct arm_boot_info npcm7xx_binfo = {
-     .gic_cpu_if_addr        = NPCM7XX_GIC_CPU_IF_ADDR,
-     .write_secondary_boot   = npcm7xx_write_secondary_boot,
-     .board_id               = -1,
-+    .board_setup_addr       = NPCM7XX_BOARD_SETUP_ADDR,
-+    .write_board_setup      = npcm7xx_write_board_setup,
- };
- 
- void npcm7xx_load_kernel(MachineState *machine, NPCM7xxState *soc)
--- 
++    def test_arm_quanta_gsj_initrd(self):
++        """
++        :avocado: tags=3Darch:arm
++        :avocado: tags=3Dmachine:quanta-gsj
++        """
++        initrd_url =3D (
++                'https://github.com/hskinnemoen/openbmc/releases/download/=
+'
++                '20200711-gsj-qemu-0/obmc-phosphor-initramfs-gsj.cpio.xz')
++        initrd_hash =3D '98fefe5d7e56727b1eb17d5c00311b1b5c945300'
++        initrd_path =3D self.fetch_asset(initrd_url, asset_hash=3Dinitrd_h=
+ash)
++        kernel_url =3D (
++                'https://github.com/hskinnemoen/openbmc/releases/download/=
+'
++                '20200711-gsj-qemu-0/uImage-gsj.bin')
++        kernel_hash =3D 'fa67b2f141d56d39b3c54305c0e8a899c99eb2c7'
++        kernel_path =3D self.fetch_asset(kernel_url, asset_hash=3Dkernel_h=
+ash)
++        dtb_url =3D (
++                'https://github.com/hskinnemoen/openbmc/releases/download/=
+'
++                '20200711-gsj-qemu-0/nuvoton-npcm730-gsj.dtb')
++        dtb_hash =3D '18315f7006d7b688d8312d5c727eecd819aa36a4'
++        dtb_path =3D self.fetch_asset(dtb_url, asset_hash=3Ddtb_hash)
++
++        self.vm.set_console()
++        kernel_command_line =3D (self.KERNEL_COMMON_COMMAND_LINE +
++                               'console=3DttyS0,115200n8 '
++                               'earlycon=3Duart8250,mmio32,0xf0001000')
++        self.vm.add_args('-kernel', kernel_path,
++                         '-initrd', initrd_path,
++                         '-dtb', dtb_path,
++                         '-append', kernel_command_line)
++        self.vm.launch()
++
++        self.wait_for_console_pattern('Booting Linux on physical CPU 0x0')
++        self.wait_for_console_pattern('CPU1: thread -1, cpu 1, socket 0')
++        self.wait_for_console_pattern(
++                'Give root password for system maintenance')
++
+     def test_arm_orangepi(self):
+         """
+         :avocado: tags=3Darch:arm
+--=20
 2.28.0.297.g1956fa8f8d-goog
 
 
