@@ -2,85 +2,90 @@ Return-Path: <SRS0=2GMi=CD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A53D9C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 14:02:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2A11C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 14:02:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 684742075F
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 14:02:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5DC772075F
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 14:02:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dYJD7xhq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 684742075F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E3zW10lI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5DC772075F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39924 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40348 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAZX7-0007q5-LS
-	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 10:02:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57166)
+	id 1kAZXD-00081f-Iq
+	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 10:02:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57228)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kAZVy-0006g2-Pf
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 10:01:30 -0400
-Received: from mail-ej1-x636.google.com ([2a00:1450:4864:20::636]:33992)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kAZVv-000128-H8
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 10:01:30 -0400
-Received: by mail-ej1-x636.google.com with SMTP id d26so6581840ejr.1
- for <qemu-devel@nongnu.org>; Tue, 25 Aug 2020 07:01:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=T6RRwTsSRAth4xTLvFoswLh74DDZmvoXs0ZuaSRR8mc=;
- b=dYJD7xhqjmsLiuyBW0eVNJTNkT9T6ExruOHSCvwZbuDnWNtGbNIIY7aLYqHhXOEGDk
- sVoeVDuG6aqPHm6yRKev5WSFdRreiq44wdnQ0iUz2ukA4t7/Sm5SHwee2RCfIjTueycZ
- gB6DNXL8WNfpzv1SZ6ZVJC469s+e1/lig6LcohDu2zZ+xaw5Z0du6GCkFy+pCWzioRlL
- wyDInbMHCstPnV7xudY05DxQeQo0l4hOSoeS9pGlqF5hOezJOWNxtwHZlQmildj70taD
- LSZfmv0uwWE41dfzUpnsRZ1qfvMM4Mfj19nRWtxyzqiWnnBBW2cQhjJAGAzvFivHsjRr
- Y3RQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=T6RRwTsSRAth4xTLvFoswLh74DDZmvoXs0ZuaSRR8mc=;
- b=L4Zpc8ckgZXT5Q8CxKngVNkzIRihV3Ug0cJFcRai0aD9VS8t5GKDCA10b4EIlVzIAB
- n1Q3vMax69yj0aVJkCxfG2Usdb1b1z38EGtPCB6cv1lnjoQfOr//jtZmlnu4k0UUf+Ts
- 4qGvbFW1M2KatVXgBSlPG0NG5q6BGx+ZNrLHBGpz5rSGVHLC/jZvsD5assIMDI9qQN0r
- AzjsbKqbT0lzxdFnWUyLoJCesDqMmB1VJNovA8HQPe/njzI8HeMsEtT11yESI+liRyeK
- LhQKvyoKUKO1uKuglne9EC74BR+TuBdcmFYj9SyYu0ARhfYqPXXYn0IUXq7BgLsm3Sz7
- BZEA==
-X-Gm-Message-State: AOAM532hCe4iFJSWwznwyDHq93JImO6WkeqVGBcaM9BmCeclE/194d4U
- sbWp9DA/PYWD8tl0QC+EZDSd+kQGThS1UnNO97SblQ==
-X-Google-Smtp-Source: ABdhPJyzoHlNK/Vq7qWjm25WTMiYtwXr3Gwwebgeo1trUjkNThTgcRay1VN1s188WOhFC1YCOyLwVQ6iV54W8+S2tiI=
-X-Received: by 2002:a17:906:59b:: with SMTP id
- 27mr11320715ejn.56.1598364085584; 
- Tue, 25 Aug 2020 07:01:25 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kAZWL-0006yW-Ch
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 10:01:53 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:22486
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kAZWJ-00012z-0h
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 10:01:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1598364109;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=ebP7aJVZ+3IQy7pSpxcFjrP/RdzbhDrAkBTyvoXT+6A=;
+ b=E3zW10lI5adFCw3+QI62nuHEmImfp8wzXtxsHltxNKLSYGrxXEoNoGfkBXpPP8H3Knu4kY
+ Z6/KO5Xo/umgDCCsbqaGarq5HTZOeVrsomleBgsHYeC1pcg3YfbYuPaBUz4XFJRTLKMz3M
+ xR+YB8WuhbkH0bxlRIoL76S9XzWPmA4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-145-L1hM0P1aP_2xOhJolDK8Sg-1; Tue, 25 Aug 2020 10:01:47 -0400
+X-MC-Unique: L1hM0P1aP_2xOhJolDK8Sg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8D0A580F043;
+ Tue, 25 Aug 2020 14:01:46 +0000 (UTC)
+Received: from localhost (unknown [10.10.67.254])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 40CF85C1CF;
+ Tue, 25 Aug 2020 14:01:46 +0000 (UTC)
+Date: Tue, 25 Aug 2020 10:01:45 -0400
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Xiaoyao Li <xiaoyao.li@intel.com>
+Subject: Re: [PATCH 2/2] target/i386: Add missed features to Cooperlake CPU
+ model
+Message-ID: <20200825140145.GU642093@habkost.net>
+References: <20191225063018.20038-1-xiaoyao.li@intel.com>
+ <20191225063018.20038-3-xiaoyao.li@intel.com>
+ <20200824220759.GS642093@habkost.net>
+ <9cdaaa8d-4ce2-88c7-2400-eed62ffe779b@intel.com>
 MIME-Version: 1.0
-References: <20200825083311.1098442-1-mreitz@redhat.com>
-In-Reply-To: <20200825083311.1098442-1-mreitz@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 25 Aug 2020 15:01:14 +0100
-Message-ID: <CAFEAcA-4bgPq2_8c7wo9y_A5Mp1KZ7iLuye5jQMMesXfE+fNhw@mail.gmail.com>
-Subject: Re: [PULL 00/34] Block patches
-To: Max Reitz <mreitz@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::636;
- envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x636.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+In-Reply-To: <9cdaaa8d-4ce2-88c7-2400-eed62ffe779b@intel.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=ehabkost@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/25 01:37:44
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.958,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -94,78 +99,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Qemu-block <qemu-block@nongnu.org>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Cathy Zhang <cathy.zhang@intel.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 25 Aug 2020 at 09:33, Max Reitz <mreitz@redhat.com> wrote:
->
-> The following changes since commit 30aa19446d82358a30eac3b556b4d6641e00b7c1:
->
->   Merge remote-tracking branch 'remotes/cschoenebeck/tags/pull-9p-20200812' into staging (2020-08-24 16:39:53 +0100)
->
-> are available in the Git repository at:
->
->   https://github.com/XanClic/qemu.git tags/pull-block-2020-08-25
->
-> for you to fetch changes up to c576fd97d4ca77b5a1a27728df11a61083dbfa98:
->
->   iotests: Add tests for qcow2 images with extended L2 entries (2020-08-25 10:20:18 +0200)
->
-> ----------------------------------------------------------------
-> Block patches:
-> - qcow2 subclusters (extended L2 entries)
+On Tue, Aug 25, 2020 at 08:20:35AM +0800, Xiaoyao Li wrote:
+> On 8/25/2020 6:07 AM, Eduardo Habkost wrote:
+> > On Wed, Dec 25, 2019 at 02:30:18PM +0800, Xiaoyao Li wrote:
+> > > It lacks VMX features and two security feature bits (disclosed recently) in
+> > > MSR_IA32_ARCH_CAPABILITIES in current Cooperlake CPU model, so add them.
+> > > 
+> > > Fixes: 22a866b6166d ("i386: Add new CPU model Cooperlake")
+> > > Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+> > > ---
+> > >   target/i386/cpu.c | 51 ++++++++++++++++++++++++++++++++++++++++++++++-
+> > >   1 file changed, 50 insertions(+), 1 deletion(-)
+> > > 
+> > > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> > > index e1eb9f473989..c9798ac8652b 100644
+> > > --- a/target/i386/cpu.c
+> > > +++ b/target/i386/cpu.c
+> > > @@ -3198,7 +3198,8 @@ static X86CPUDefinition builtin_x86_defs[] = {
+> > >               CPUID_7_0_EDX_SPEC_CTRL_SSBD | CPUID_7_0_EDX_ARCH_CAPABILITIES,
+> > >           .features[FEAT_ARCH_CAPABILITIES] =
+> > >               MSR_ARCH_CAP_RDCL_NO | MSR_ARCH_CAP_IBRS_ALL |
+> > > -            MSR_ARCH_CAP_SKIP_L1DFL_VMENTRY | MSR_ARCH_CAP_MDS_NO,
+> > > +            MSR_ARCH_CAP_SKIP_L1DFL_VMENTRY | MSR_ARCH_CAP_MDS_NO |
+> > > +            MSR_ARCH_CAP_PSCHANGE_MC_NO | MSR_ARCH_CAP_TAA_NO,
+> > 
+> > This seems to break on some Cooperlake hosts, see:
+> > 
+> > https://bugzilla.redhat.com/show_bug.cgi?id=1860743
+> > 
+> > Are all Cooperlake hosts supposed to have TAA_NO set?  Are there
+> > hosts where this requires a microcode update to be installed?
+> > 
+> 
+> All the production CPX in market should have IAA_NO bit. We can check it
+> directly with rdmsr(0x10a).
+> 
+> The problem of this issue is due to commit db616173d787 ("x86/tsx: Add
+> config options to set tsx=on|off|auto"), which sets the default to "off" for
+> 100% safety. However, default to off may cause noticeable regressions on TSX
+> safe platform, e.g., CPX.
+> 
+> Maybe we need to set CONFIG_X86_INTEL_TSX_MODE_AUTO=y for OSV released
+> kernel?
 
-This fails 'make check' on the BSDs because it assumes it has a bash
-in /bin/bash, which isn't necessarily true:
+Considering that disabling TSX is a policy decision likely to be
+taken by the OS vendor or by the system administrator, we could
+at least make the CPU model easier to use on those cases.
 
+Maybe we should provide a version of Cooperlake without TSX, like
+we already do for the other CPU models?
 
-  TEST    iotest-qcow2: 271 [fail]
-QEMU          --
-"/home/qemu/qemu-test.dvSnX6/build/tests/qemu-iotests/../../qemu-system-aarch64"
--nodefaults -display none -accel qtest -machine virt
-QEMU_IMG      --
-"/home/qemu/qemu-test.dvSnX6/build/tests/qemu-iotests/../../qemu-img"
-QEMU_IO       --
-"/home/qemu/qemu-test.dvSnX6/build/tests/qemu-iotests/../../qemu-io"
---cache writeback --aio threads -f qcow2
-QEMU_NBD      --
-"/home/qemu/qemu-test.dvSnX6/build/tests/qemu-iotests/../../qemu-nbd"
-IMGFMT        -- qcow2 (compat=1.1)
-IMGPROTO      -- file
-PLATFORM      -- NetBSD/amd64 localhost 9.0
-TEST_DIR      -- /home/qemu/qemu-test.dvSnX6/build/tests/qemu-iotests/scratch
-SOCK_DIR      -- /tmp/mktemp.fPDlHdxw
-SOCKET_SCM_HELPER --
+-- 
+Eduardo
 
---- /home/qemu/qemu-test.dvSnX6/src/tests/qemu-iotests/271.out
-2020-08-25 12:59:52.000000000 +0000
-+++ /home/qemu/qemu-test.dvSnX6/build/tests/qemu-iotests/271.out.bad
- 2020-08-25 13:11:25.483774595 +0000
-@@ -1,726 +1 @@
--QA output created by 271
--
--### Standard write tests (backing file: yes) ###
--
--Formatting 'TEST_DIR/t.IMGFMT.raw', fmt=raw size=1048576
--Formatting 'TEST_DIR/t.IMGFMT.base', fmt=raw size=1048576
--Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576
-backing_file=TEST_DIR/t.IMGFMT.base backing_fmt=raw
--write -q -P PATTERN 0 1k
--L2 entry #0: 0x8000000000050000 0000000000000001
--write -q -P PATTERN 3k 512
--L2 entry #0: 0x8000000000050000 0000000000000003
--write -q -P PATTERN 5k 1k
-[skip rest of expected output]
--wrote 2048/2048 bytes at offset 40960
--2 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
--*** done
-+./check: ./271: /bin/bash: bad interpreter: No such file or directory
-  TEST    iotest-qcow2: 283
-
-
-thanks
--- PMM
 
