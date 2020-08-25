@@ -2,65 +2,86 @@ Return-Path: <SRS0=2GMi=CD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB630C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 01:36:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED8DEC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 02:27:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 927EC20738
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 01:36:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 927EC20738
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id B852D2067C
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 02:27:36 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aWkFdvWA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B852D2067C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44940 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51394 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kANsx-00074o-TY
-	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 21:36:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60800)
+	id 1kAOgR-0005Gs-W5
+	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 22:27:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46124)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
- id 1kANo2-0005Oc-OW
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 21:31:22 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:4217 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
- id 1kANo0-0005rF-Mb
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 21:31:22 -0400
-Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id 41ED7F8F06CBE946409F;
- Tue, 25 Aug 2020 09:31:02 +0800 (CST)
-Received: from huawei.com (10.175.101.6) by DGGEMS405-HUB.china.huawei.com
- (10.3.19.205) with Microsoft SMTP Server id 14.3.487.0; Tue, 25 Aug 2020
- 09:30:55 +0800
-From: Chuan Zheng <zhengchuan@huawei.com>
-To: <quintela@redhat.com>, <eblake@redhat.com>, <dgilbert@redhat.com>,
- <berrange@redhat.com>
-Subject: [PATCH v5 12/12] migration/dirtyrate: Add trace_calls to make it
- easier to debug
-Date: Tue, 25 Aug 2020 09:40:50 +0800
-Message-ID: <1598319650-36762-13-git-send-email-zhengchuan@huawei.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1598319650-36762-1-git-send-email-zhengchuan@huawei.com>
-References: <1598319650-36762-1-git-send-email-zhengchuan@huawei.com>
+ (Exim 4.90_1) (envelope-from <rohit.shinde12194@gmail.com>)
+ id 1kAOfl-0004qf-EE
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 22:26:53 -0400
+Received: from mail-pf1-x42d.google.com ([2607:f8b0:4864:20::42d]:46143)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <rohit.shinde12194@gmail.com>)
+ id 1kAOfj-0004XO-EP
+ for qemu-devel@nongnu.org; Mon, 24 Aug 2020 22:26:53 -0400
+Received: by mail-pf1-x42d.google.com with SMTP id t185so3011236pfd.13
+ for <qemu-devel@nongnu.org>; Mon, 24 Aug 2020 19:26:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=c8qKziI075TS/H4gDlzJOi7RiQ4wsG4qIlvhPVMJ8mk=;
+ b=aWkFdvWA53iCC2nozcbJdiwduiDVH7OaSY+XnOPUeIFk5tMO0/N2XDPrnmfI9P1PuX
+ dKYwMUNRr1cgm4dIyQV63YWvrMr4lRW88cVpKoaLMmKTjc9jI+BIkhBzyKs6fjSpwuZD
+ vh5ukpz/VBCdPv/YtoKtD0ogYPIZCwR+i6TiFu/cUEa1nIqdw+80ajDK21sc4qHrtNE+
+ CeQhskA1Mdmu5X0hW5JUBWh1xs7pqWhk/ZxzeDjEJO2fK7ZVs7REXQ1n5BV/6qUHHqT3
+ LUYuEzBsjykSWFtccvivbEHFb4dyhyTgtNcByC0UixmsA85kBnERo/HbrlDZpNmLnfrn
+ yhuA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=c8qKziI075TS/H4gDlzJOi7RiQ4wsG4qIlvhPVMJ8mk=;
+ b=FS2yT8RpK7yH3RFo76XMwcuR1L1w8cfKOP8+iXvc4DADrGKuk51t5FlUccYqrhTt51
+ JGRjSztrdnr+RNS0Uzi/1sMRjWTe8VHs5F70UJdqmsUPFbrQA5dTJkQ930ahohOsHVIV
+ x9wKGd7np1K4dB6TZ9eaHS+bS25Us6+V5+k2Mst4W/4vOsApWlk/94M95qsi0qI3JKwg
+ tayBQ73ajasUy5HJ4+ptf3mfqzPrnOhl+OssK5+eukUzOB1YlpqwBK0bGnibhD41S3st
+ nCPjZRb2kafOw87JZkNngOTRNb+KLIw+3HPj4n1rYUBOuWqM0wVcZanXWt4jwP4qY7sG
+ 9Y8g==
+X-Gm-Message-State: AOAM530jnK7LymRAqQTBE4JvmNZokdezW+K4AcOfzoTmUsqRpuoPh6Dc
+ 8h2KC0/uMvBWbPN/vliTyhNR3JdfYOHNCwBFCYCKk8htfM4=
+X-Google-Smtp-Source: ABdhPJz44aqcIE3REIaTV/A+psdj1D9dKeSUZDmN/8nf7OsPVMIXTV+MkfkBjt6L8Mgfh3bqgl9Tm+zzwRM05QVKPxU=
+X-Received: by 2002:a17:902:a60f:: with SMTP id
+ u15mr5876202plq.239.1598322409135; 
+ Mon, 24 Aug 2020 19:26:49 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.175.101.6]
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.190;
- envelope-from=zhengchuan@huawei.com; helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/24 21:30:58
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_PASS=-0.001,
+References: <CA+Ai=tAypbso9yMy0jtyzbeHCweQ1FPgDaJ8=bXxFvBA6pZyLA@mail.gmail.com>
+In-Reply-To: <CA+Ai=tAypbso9yMy0jtyzbeHCweQ1FPgDaJ8=bXxFvBA6pZyLA@mail.gmail.com>
+From: Rohit Shinde <rohit.shinde12194@gmail.com>
+Date: Mon, 24 Aug 2020 22:26:38 -0400
+Message-ID: <CA+Ai=tBJqLB7yDbd-kqzDhr+d+65K9r3DQsZrB2kGi9wF8BaiA@mail.gmail.com>
+Subject: Re: Contributor wanting to get started with simple contributions
+To: qemu-devel@nongnu.org
+Content-Type: multipart/alternative; boundary="0000000000006ee0e605adaa6fdb"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::42d;
+ envelope-from=rohit.shinde12194@gmail.com; helo=mail-pf1-x42d.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001, HTML_MESSAGE=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -74,98 +95,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: zhang.zhanghailiang@huawei.com, qemu-devel@nongnu.org,
- xiexiangyou@huawei.com, alex.chen@huawei.com, ann.zhuangyanying@huawei.com,
- fangying1@huawei.com
+Cc: jsnow@redhat.com, ehabkost@redhat.com, crosa@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add trace_calls to  make it easier to debug
+--0000000000006ee0e605adaa6fdb
+Content-Type: text/plain; charset="UTF-8"
 
-Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
----
- migration/dirtyrate.c  | 7 +++++++
- migration/trace-events | 8 ++++++++
- 2 files changed, 15 insertions(+)
+Hey John,
 
-diff --git a/migration/dirtyrate.c b/migration/dirtyrate.c
-index 08c46d3..3513ef3 100644
---- a/migration/dirtyrate.c
-+++ b/migration/dirtyrate.c
-@@ -23,6 +23,7 @@
- #include "qapi/qapi-commands-migration.h"
- #include "migration.h"
- #include "ram.h"
-+#include "trace.h"
- #include "dirtyrate.h"
- 
- static int CalculatingState = DIRTY_RATE_STATUS_UNSTARTED;
-@@ -55,6 +56,7 @@ static int64_t get_sample_page_period(int64_t sec)
- static int dirtyrate_set_state(int *state, int old_state, int new_state)
- {
-     assert(new_state < DIRTY_RATE_STATUS__MAX);
-+    trace_dirtyrate_set_state(DirtyRateStatus_str(new_state));
-     if (atomic_cmpxchg(state, old_state, new_state) == old_state) {
-         return 0;
-     } else {
-@@ -78,6 +80,7 @@ static struct DirtyRateInfo *query_dirty_rate_info(void)
-      * Only support query once for each calculation,
-      * reset as DIRTY_RATE_STATUS_UNSTARTED after query
-      */
-+    trace_query_dirty_rate_info(DirtyRateStatus_str(CalculatingState));
-     (void)dirtyrate_set_state(&CalculatingState, CalculatingState,
-                               DIRTY_RATE_STATUS_UNSTARTED);
- 
-@@ -129,6 +132,7 @@ static uint32_t get_ramblock_vfn_hash(struct RamblockDirtyInfo *info,
- 
-     crc = crc32(0, iov_array.iov_base, iov_array.iov_len);
- 
-+    trace_get_ramblock_vfn_hash(info->idstr, vfn, crc);
-     return crc;
- }
- 
-@@ -246,6 +250,7 @@ static int skip_sample_ramblock(RAMBlock *block)
-      * want to sample.
-      */
-     if (ramblock_size < MIN_RAMBLOCK_SIZE) {
-+        trace_skip_sample_ramblock(block->idstr, ramblock_size);
-         return -1;
-     }
- 
-@@ -292,6 +297,7 @@ static int calc_page_dirty_rate(struct RamblockDirtyInfo *info)
-     for (i = 0; i < info->sample_pages_count; i++) {
-         crc = get_ramblock_vfn_hash(info, info->sample_page_vfn[i]);
-         if (crc != info->hash_result[i]) {
-+            trace_calc_page_dirty_rate(info->idstr, crc, info->hash_result[i]);
-             info->sample_dirty_count++;
-         }
-     }
-@@ -317,6 +323,7 @@ static bool find_page_matched(RAMBlock *block, struct RamblockDirtyInfo *infos,
-     if (infos[i].ramblock_addr != qemu_ram_get_host_addr(block) ||
-         infos[i].ramblock_pages !=
-             (qemu_ram_get_used_length(block) >> DIRTYRATE_PAGE_SHIFT_KB)) {
-+        trace_find_page_matched(block->idstr);
-         return false;
-     }
- 
-diff --git a/migration/trace-events b/migration/trace-events
-index 4ab0a50..34569b9 100644
---- a/migration/trace-events
-+++ b/migration/trace-events
-@@ -312,3 +312,11 @@ dirty_bitmap_load_bits_zeroes(void) ""
- dirty_bitmap_load_header(uint32_t flags) "flags 0x%x"
- dirty_bitmap_load_enter(void) ""
- dirty_bitmap_load_success(void) ""
-+
-+# dirtyrate.c
-+dirtyrate_set_state(const char *new_state) "new state %s"
-+query_dirty_rate_info(const char *new_state) "current state %s"
-+get_ramblock_vfn_hash(const char *idstr, uint64_t vfn, uint32_t crc) "ramblock name: %s, vfn: %"PRIu64 ", crc: %" PRIu32
-+calc_page_dirty_rate(const char *idstr, uint32_t new_crc, uint32_t old_crc) "ramblock name: %s, new crc: %" PRIu32 ", old crc: %" PRIu32
-+skip_sample_ramblock(const char *idstr, int64_t ramblock_size) "ramblock name: %s, ramblock size: %" PRIu64
-+find_page_matched(const char *idstr) "ramblock %s addr or size changed"
--- 
-1.8.3.1
+I sent this email a couple of weeks ago to the qemu mailing list since I
+didn't really know who to approach.
 
+I am interested in contributing to the python-qemu package. I have quite a
+bit of experience in Python, but no experience in packaging libraries.
+Whatever you mentioned in the reply to my comment on the bug, was pretty
+interesting. I would like to get started with at least ensuring that all
+python code is flake8/pylint compliant.
+
+Do let me know what you think of this.
+
+Thanks,
+Rohit.
+
+On Thu, Aug 13, 2020 at 7:18 AM Rohit Shinde <rohit.shinde12194@gmail.com>
+wrote:
+
+> Hello everyone,
+>
+> I am a hobby programmer (working as an SDE in the industry) and I have
+> been observing qemu for quite a while. I have always wanted to contribute
+> but I couldn't manage my time. I am good at Java and Python but quite a bit
+> rusty with C++ and C (although working with it will not be a problem, I
+> might have to google more than usual). On the theory side, I have a good
+> grasp of data structures and algorithms and a decent understanding of OS
+> and Compilers.
+>
+> I have built qemu from source and I have my machine setup for git-publish
+> via email.
+>
+> I would like to start contributing with one of the bite sized tasks
+> mentioned in the wiki page. The one that interests me and which I think is
+> the easiest are the sections on "Compiler Driven Cleanup" and "Dead Code
+> Removal". I think this is a good way to get introduced to the codebase.
+>
+> I plan to stay and become a long term contributor. Is there any CS theory
+> that I would need to know other than what I mentioned above? Is it possible
+> to "learn on the go"?
+>
+> I realize this is quite a long email and I would like to thank everyone in
+> advance for reading this!
+>
+> Regards,
+> Rohit.
+>
+
+--0000000000006ee0e605adaa6fdb
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr">Hey John,<div><br></div><div>I sent this email a couple of=
+ weeks ago to the qemu mailing list since I didn&#39;t really know who to a=
+pproach.</div><div><br></div><div>I am interested in contributing to the py=
+thon-qemu package. I have quite a bit of experience in Python, but no exper=
+ience in packaging libraries. Whatever you mentioned in the reply to my com=
+ment on the bug, was pretty interesting. I would like to get started with a=
+t least ensuring that all python code is flake8/pylint compliant.=C2=A0</di=
+v><div><br></div><div>Do let me know what you think of this.</div><div><br>=
+</div><div>Thanks,</div><div>Rohit.</div></div><br><div class=3D"gmail_quot=
+e"><div dir=3D"ltr" class=3D"gmail_attr">On Thu, Aug 13, 2020 at 7:18 AM Ro=
+hit Shinde &lt;<a href=3D"mailto:rohit.shinde12194@gmail.com">rohit.shinde1=
+2194@gmail.com</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" st=
+yle=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padd=
+ing-left:1ex"><div dir=3D"ltr">Hello everyone,<div><br></div><div>I am a ho=
+bby programmer (working as an SDE in the industry) and I have been observin=
+g qemu for quite a while. I have always wanted to contribute but I couldn&#=
+39;t manage my time. I am good at Java and Python but quite a bit rusty wit=
+h C++ and C (although working with it will not be a problem, I might have t=
+o google more than usual). On the theory side, I have a good grasp of data =
+structures and algorithms and a decent understanding of OS and Compilers.</=
+div><div><br></div><div>I have built qemu from source and I have my machine=
+ setup for git-publish via email.=C2=A0<br></div><div><br></div><div>I woul=
+d like to start contributing with one of the bite sized tasks mentioned in =
+the wiki page. The one that interests me and which I think is the easiest a=
+re the sections on &quot;Compiler Driven Cleanup&quot; and &quot;Dead Code =
+Removal&quot;. I think this is a good way to get introduced to the codebase=
+.</div><div><br></div><div>I plan to stay and become a long term contributo=
+r. Is there any CS theory that I would need to know other than what I menti=
+oned above? Is it possible to &quot;learn on the go&quot;?</div><div><br></=
+div><div>I realize this is quite a long email and I would like to thank eve=
+ryone in advance for reading this!</div><div><br></div><div>Regards,<br>Roh=
+it.</div></div>
+</blockquote></div>
+
+--0000000000006ee0e605adaa6fdb--
 
