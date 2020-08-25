@@ -7,69 +7,68 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBFBAC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 11:16:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AAF89C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 11:17:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 956A320706
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 11:16:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7587B2075B
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 11:17:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Dju9xgZR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 956A320706
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BG/zc2uN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7587B2075B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39136 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39494 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAWwc-0006gt-9r
-	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 07:16:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41322)
+	id 1kAWwq-0006pm-Hk
+	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 07:17:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41588)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kAWvD-00056l-59
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 07:15:23 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:29778
- helo=us-smtp-delivery-1.mimecast.com)
+ id 1kAWvk-0005pU-NF
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 07:15:56 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:20499)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kAWv9-0004o7-DI
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 07:15:22 -0400
+ id 1kAWvi-0004z6-MW
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 07:15:56 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598354118;
+ s=mimecast20190719; t=1598354153;
  h=from:from:reply-to:reply-to:subject:subject:date:date:
  message-id:message-id:to:to:cc:cc:mime-version:mime-version:
  content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=qWUe3q3b77RU3/Y6Vpg0G6Zer9oXx+EEVSeVjr+wETc=;
- b=Dju9xgZR4YkWHce3MtuXt4mQjmnF7goIDQaJByiLYc9tfWo7ZQabg1ElNHIv3btJVKU1Le
- vvFMp62ssGddKUpEO/3gnHUDOj8C9BnYqZ9N9cT8uynnUTpPUyGmZ30/Hm55nvapWWXh3s
- MXLb8twF4V4EWZ0VRqXv31B+DJQMYlU=
+ bh=Q6Dr3rlCXhG3tCIvGXfBVpNGXbRgW6dIM/eI2xrjDxs=;
+ b=BG/zc2uN7wVEltFUHKH0x0buGWvbd5SNwQDbYZuXgRA6JT/FQtbw+WhHy3IjwkCKIqq2xp
+ 4wSDDhfwDtj2XC3w8n4Gdp8jTU1+oB3jFwgbhFiR8dUcsQhJtHju9Q6Ig9AmgcRueLtJ+Q
+ lVP9X7nsiV5KO5RUf53S6LkcNpT3G7w=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-414-yKnToBd6Mt-fPXd-n4OC4g-1; Tue, 25 Aug 2020 07:15:16 -0400
-X-MC-Unique: yKnToBd6Mt-fPXd-n4OC4g-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-289-qA4bMM3XMvWku02lORhpIQ-1; Tue, 25 Aug 2020 07:15:50 -0400
+X-MC-Unique: qA4bMM3XMvWku02lORhpIQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F244E85C708
- for <qemu-devel@nongnu.org>; Tue, 25 Aug 2020 11:15:15 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 423D918BA282;
+ Tue, 25 Aug 2020 11:15:49 +0000 (UTC)
 Received: from redhat.com (ovpn-114-231.ams2.redhat.com [10.36.114.231])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2349D5D9FC;
- Tue, 25 Aug 2020 11:15:05 +0000 (UTC)
-Date: Tue, 25 Aug 2020 12:15:03 +0100
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C8643619C4;
+ Tue, 25 Aug 2020 11:15:47 +0000 (UTC)
+Date: Tue, 25 Aug 2020 12:15:44 +0100
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 To: Eduardo Habkost <ehabkost@redhat.com>
-Subject: Re: [PATCH v2 29/58] vhost-user-gpu: Move QOM macro to header
-Message-ID: <20200825111503.GV107278@redhat.com>
+Subject: Re: [PATCH v2 30/58] ahci: Move QOM macros to header
+Message-ID: <20200825111544.GW107278@redhat.com>
 References: <20200820001236.1284548-1-ehabkost@redhat.com>
- <20200820001236.1284548-30-ehabkost@redhat.com>
+ <20200820001236.1284548-31-ehabkost@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200820001236.1284548-30-ehabkost@redhat.com>
+In-Reply-To: <20200820001236.1284548-31-ehabkost@redhat.com>
 User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
 X-Mimecast-Spam-Score: 0.001
@@ -77,17 +76,17 @@ X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
 Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=berrange@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/25 01:35:36
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=berrange@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/25 02:03:58
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.958,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,17 +100,15 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
- qemu-devel@nongnu.org,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Aug 19, 2020 at 08:12:07PM -0400, Eduardo Habkost wrote:
-> Move the VHOST_USER_GPU type checking macro to virtio-gpu.h,
-> close to the TYPE_VHOST_USER_GPU #define.
+On Wed, Aug 19, 2020 at 08:12:08PM -0400, Eduardo Habkost wrote:
+> The TYPE_* constants and the typedefs are defined in ahci.h, so
+> we can move the type checking macros there too.
 > 
 > This will make future conversion to OBJECT_DECLARE* easier.
 > 
@@ -119,16 +116,16 @@ On Wed, Aug 19, 2020 at 08:12:07PM -0400, Eduardo Habkost wrote:
 > ---
 > Changes series v1 -> v2: new patch in series v2
 > 
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: "Marc-André Lureau" <marcandre.lureau@redhat.com>
-> Cc: Gerd Hoffmann <kraxel@redhat.com>
+> Cc: John Snow <jsnow@redhat.com>
+> Cc: qemu-block@nongnu.org
 > Cc: qemu-devel@nongnu.org
 > ---
->  include/hw/virtio/virtio-gpu.h | 2 ++
->  hw/display/vhost-user-gpu.c    | 3 ---
->  2 files changed, 2 insertions(+), 3 deletions(-)
+>  hw/ide/ahci_internal.h | 5 -----
+>  include/hw/ide/ahci.h  | 3 +++
+>  2 files changed, 3 insertions(+), 5 deletions(-)
 
 Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
+
 
 Regards,
 Daniel
