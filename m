@@ -2,92 +2,96 @@ Return-Path: <SRS0=2GMi=CD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.9 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE6A9C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 21:40:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68B4BC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 21:40:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 75192206EB
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 21:40:11 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iyLDZy3w"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 75192206EB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 3B336206EB
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 21:40:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B336206EB
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37428 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38270 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAgfq-0007mG-Po
-	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 17:40:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36562)
+	id 1kAggJ-000876-Fq
+	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 17:40:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43826)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kAg4K-0000cC-6v
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 17:01:24 -0400
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:44382)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kAg4G-00022X-UH
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 17:01:23 -0400
-Received: by mail-pg1-x544.google.com with SMTP id m34so7663753pgl.11
- for <qemu-devel@nongnu.org>; Tue, 25 Aug 2020 14:01:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=kCj2p6cdsHJiVaOy7fcU1XDToXHd7PgB9wDLfRyOeOo=;
- b=iyLDZy3wBLwPhZmiHBAYc/WrUacj+U3Brb76I1xPjhUvDlp9NIc9mko/K4JhM74Y6j
- FvB6t30ElGJlmryON6dyfr5f9a5XEopyPKgyg0bLoodaalqiHWt/dGdGDfN4OxRkharH
- BlgGu0mm35zhLxrAST9aXjbGC3W7N3DRsm20AA2HKYmg2yFCzooVveQdkaHoVCI9X2F0
- I1cw2S/PHQs9koepRJ/vBQ74BbsBuj8pQt2r+FFvrmfjG8xs3/WmcnO4geEmJTM7VLZ0
- 8pVI1jqBeSIbkzhvmIhMTEuWvyEZxmd6vjplebwbtsc15yEhNNGCy1CFGghtpUYtEC48
- hrSA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=kCj2p6cdsHJiVaOy7fcU1XDToXHd7PgB9wDLfRyOeOo=;
- b=WgoAP2hQ3l41bz9PR/zLbdY9+onD15q1KWwdpdvZMmV1pnE3jGGuRk1kOJNU10fk3S
- vGLBih1em7e2u9b/BnBg+OGYBIh+JKYSjSYwbSh/KLZ3dUo4ZXCw2w6/YqQGwelHXtbR
- X+pOHc7P7GaE6/Pb5RUrhNiND8fOXwoffqlWdVq9+vcBQ71xBVK1zB9T1KMXsVaAt6N+
- 2G3FPDnJ6BxdzTo+wVhqOp+bcQjiU/SMStCOm+S+gV5lENFr8d6YIuebHq0S7AuUAj1c
- P1YO/rBVPVnBzb7OPKr3INU+zbORMXGsKxpCiNPUKhDl4xDuOwjxhLVoYs5bBrGhr9L1
- dIng==
-X-Gm-Message-State: AOAM532ZO7BJmwCikYfzS1nbmr0ySpn9ooKL2x788BumXCD7hsdT3Nm1
- Iu4aBp/Rj3Z9run5K/ikIX/VD2dQG8Iqtg==
-X-Google-Smtp-Source: ABdhPJwPCYJbW1/+LoAXnWfKCZI6Ymk1YvtMFB0pqSX6Jv9Dc74iQ1U56/OpCzYhp/n8f24R4ZzKwQ==
-X-Received: by 2002:aa7:9ec4:: with SMTP id r4mr9368631pfq.48.1598389279162;
- Tue, 25 Aug 2020 14:01:19 -0700 (PDT)
-Received: from localhost.localdomain
- (h216-228-167-147.bendor.dedicated.static.tds.net. [216.228.167.147])
- by smtp.gmail.com with ESMTPSA id k4sm16074pgr.87.2020.08.25.14.01.18
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 25 Aug 2020 14:01:18 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 66/77] target/microblaze: Use tcg_gen_lookup_and_goto_ptr
-Date: Tue, 25 Aug 2020 13:59:39 -0700
-Message-Id: <20200825205950.730499-67-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200825205950.730499-1-richard.henderson@linaro.org>
-References: <20200825205950.730499-1-richard.henderson@linaro.org>
+ (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1kAgeB-00057u-Rl
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 17:38:28 -0400
+Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:36016
+ helo=mail.default.ilande.uk0.bigv.io)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1kAge9-0006OK-II
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 17:38:27 -0400
+Received: from host217-42-19-185.range217-42.btcentralplus.com
+ ([217.42.19.185] helo=[192.168.1.65])
+ by mail.default.ilande.uk0.bigv.io with esmtpsa
+ (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
+ (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1kAgeV-0002LL-T7; Tue, 25 Aug 2020 22:38:53 +0100
+To: luoyonggang@gmail.com, qemu-devel@nongnu.org
+References: <20200825165341.520-1-luoyonggang@gmail.com>
+ <20200825165341.520-3-luoyonggang@gmail.com>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
+ mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
+ 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
+ E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
+ PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
+ PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
+ AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
+ OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
+ NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
+ mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
+ z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
+ T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
+ DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
+ y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
+ 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
+ 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
+ YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
+ Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
+ BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
+ opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
+ NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
+ Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
+ KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
+ imgcU9TTGC5qd9g=
+Message-ID: <b4d17b13-2a11-58b4-0e5d-8ca95ec3068b@ilande.co.uk>
+Date: Tue, 25 Aug 2020 22:38:16 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
+In-Reply-To: <20200825165341.520-3-luoyonggang@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::544;
- envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x544.google.com
+X-SA-Exim-Connect-IP: 217.42.19.185
+X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
+Subject: Re: [PATCH 3/4] meson: Mingw64 gcc doesn't recognize system
+ include_type for sdl2
+X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
+X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
+Received-SPF: pass client-ip=2001:41c9:1:41f::167;
+ envelope-from=mark.cave-ayland@ilande.co.uk;
+ helo=mail.default.ilande.uk0.bigv.io
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: -44
+X-Spam_score: -4.5
+X-Spam_bar: ----
+X-Spam_report: (-4.5 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-2.602,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,43 +104,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: edgar.iglesias@gmail.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?B?RGFuaWVsIFAgLiBCZXJyYW5n6IyF?= <berrange@redhat.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When goto_tb cannot be used due to branch page crossing,
-or due to indirect jumping, tcg_gen_lookup_and_goto_ptr
-can be used instead.
+On 25/08/2020 17:53, luoyonggang@gmail.com wrote:
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/microblaze/translate.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+> From: Yonggang Luo <luoyonggang@gmail.com>
+> 
+> Fixes this for msys2/mingw64 by remove the include_type for sdl2 discovery in meson
+> ---
+>  meson.build | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/meson.build b/meson.build
+> index f0fe5f8799..1644bbd83c 100644
+> --- a/meson.build
+> +++ b/meson.build
+> @@ -224,8 +224,7 @@ if 'CONFIG_BRLAPI' in config_host
+>    brlapi = declare_dependency(link_args: config_host['BRLAPI_LIBS'].split())
+>  endif
+>  
+> -sdl = dependency('sdl2', required: get_option('sdl'), static: enable_static,
+> -                 include_type: 'system')
+> +sdl = dependency('sdl2', required: get_option('sdl'), static: enable_static)
+>  sdl_image = not_found
+>  if sdl.found()
+>    # work around 2.0.8 bug
 
-diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
-index 6f9b20d391..5bd771671b 100644
---- a/target/microblaze/translate.c
-+++ b/target/microblaze/translate.c
-@@ -152,7 +152,7 @@ static void gen_goto_tb(DisasContext *dc, int n, target_ulong dest)
-         tcg_gen_exit_tb(dc->base.tb, n);
-     } else {
-         tcg_gen_movi_i32(cpu_pc, dest);
--        tcg_gen_exit_tb(NULL, 0);
-+        tcg_gen_lookup_and_goto_ptr();
-     }
-     dc->base.is_jmp = DISAS_NORETURN;
- }
-@@ -1811,7 +1811,7 @@ static void mb_tr_tb_stop(DisasContextBase *dcb, CPUState *cs)
-         if (unlikely(cs->singlestep_enabled)) {
-             gen_raise_exception(dc, EXCP_DEBUG);
-         } else {
--            tcg_gen_exit_tb(NULL, 0);
-+            tcg_gen_lookup_and_goto_ptr();
-         }
-         return;
- 
--- 
-2.25.1
+This gets around the issue whereby "-isystem" paths are not escaped correctly on
+Windows, presumably by changing them to "-iquote" instead.
 
+Marc-André had a query about why this is marked as a system include, however I can
+confirm that it fixes the missing "SDL.h" issue during build.
+
+
+ATB,
+
+Mark.
 
