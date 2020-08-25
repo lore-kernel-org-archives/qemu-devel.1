@@ -7,52 +7,52 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93A31C433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 11:32:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2F71C433E1
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 11:33:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6D5CE2068E
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 11:32:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D5CE2068E
+	by mail.kernel.org (Postfix) with ESMTPS id C766B2075F
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 11:33:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C766B2075F
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55546 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57746 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAXCE-0003zt-Np
-	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 07:32:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46820)
+	id 1kAXCh-0004te-3x
+	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 07:33:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46838)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <kuhn.chenqun@huawei.com>)
- id 1kAX5r-0000Ya-QJ; Tue, 25 Aug 2020 07:26:24 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:40766 helo=huawei.com)
+ id 1kAX5s-0000Z7-Qg; Tue, 25 Aug 2020 07:26:24 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:39236 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <kuhn.chenqun@huawei.com>)
- id 1kAX5o-0006hs-K9; Tue, 25 Aug 2020 07:26:23 -0400
-Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 246F057BE1E5EF3D7E58;
- Tue, 25 Aug 2020 19:26:14 +0800 (CST)
+ id 1kAX5q-0006iN-K2; Tue, 25 Aug 2020 07:26:24 -0400
+Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id 3143A10728EF6FDE0833;
+ Tue, 25 Aug 2020 19:26:19 +0800 (CST)
 Received: from huawei.com (10.175.104.175) by DGGEMS414-HUB.china.huawei.com
  (10.3.19.214) with Microsoft SMTP Server id 14.3.487.0; Tue, 25 Aug 2020
- 19:26:03 +0800
+ 19:26:09 +0800
 From: Chen Qun <kuhn.chenqun@huawei.com>
 To: <qemu-devel@nongnu.org>, <qemu-trivial@nongnu.org>
-Subject: [PATCH v2 06/10] hw/net/virtio-net:Remove redundant statement in
- virtio_net_rsc_tcp_ctrl_check()
-Date: Tue, 25 Aug 2020 19:24:43 +0800
-Message-ID: <20200825112447.126308-7-kuhn.chenqun@huawei.com>
+Subject: [PATCH v2 10/10] hw/display/vga:Remove redundant statement in
+ vga_draw_graphic()
+Date: Tue, 25 Aug 2020 19:24:47 +0800
+Message-ID: <20200825112447.126308-11-kuhn.chenqun@huawei.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20200825112447.126308-1-kuhn.chenqun@huawei.com>
 References: <20200825112447.126308-1-kuhn.chenqun@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 X-Originating-IP: [10.175.104.175]
 X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.35;
+Received-SPF: pass client-ip=45.249.212.32;
  envelope-from=kuhn.chenqun@huawei.com; helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/25 07:26:04
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/25 07:26:19
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
 X-Spam_score_int: -41
 X-Spam_score: -4.2
@@ -72,45 +72,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: zhang.zhanghailiang@huawei.com, "Michael S.
- Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- pannengyuan@huawei.com, Euler Robot <euler.robot@huawei.com>,
- Chen Qun <kuhn.chenqun@huawei.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Chen Qun <kuhn.chenqun@huawei.com>, Gerd
+ Hoffmann <kraxel@redhat.com>, pannengyuan@huawei.com,
+ zhang.zhanghailiang@huawei.com, Euler Robot <euler.robot@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Clang static code analyzer show warning:
-hw/net/virtio-net.c:2077:5: warning: Value stored to 'tcp_flag' is never read
-    tcp_flag &= VIRTIO_NET_TCP_FLAG;
-    ^           ~~~~~~~~~~~~~~~~~~~
-
-The 'VIRTIO_NET_TCP_FLAG' is '0x3F'. The last ‘tcp_flag’ assignment statement is
- the same as that of the first two statements.
+hw/display/vga.c:1677:9: warning: Value stored to 'update' is never read
+        update = full_update;
+        ^        ~~~~~~~~~~~
 
 Reported-by: Euler Robot <euler.robot@huawei.com>
 Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 ---
- hw/net/virtio-net.c | 1 -
+ hw/display/vga.c | 1 -
  1 file changed, 1 deletion(-)
 
-diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-index a1fe9e9285..cb0d27084c 100644
---- a/hw/net/virtio-net.c
-+++ b/hw/net/virtio-net.c
-@@ -2075,7 +2075,6 @@ static int virtio_net_rsc_tcp_ctrl_check(VirtioNetRscChain *chain,
-     tcp_flag = htons(tcp->th_offset_flags);
-     tcp_hdr = (tcp_flag & VIRTIO_NET_TCP_HDR_LENGTH) >> 10;
-     tcp_flag &= VIRTIO_NET_TCP_FLAG;
--    tcp_flag = htons(tcp->th_offset_flags) & 0x3F;
-     if (tcp_flag & TH_SYN) {
-         chain->stat.tcp_syn++;
-         return RSC_BYPASS;
+diff --git a/hw/display/vga.c b/hw/display/vga.c
+index 061fd9ab8f..836ad50c7b 100644
+--- a/hw/display/vga.c
++++ b/hw/display/vga.c
+@@ -1674,7 +1674,6 @@ static void vga_draw_graphic(VGACommonState *s, int full_update)
+         if (!(s->cr[VGA_CRTC_MODE] & 2)) {
+             addr = (addr & ~0x8000) | ((y1 & 2) << 14);
+         }
+-        update = full_update;
+         page0 = addr & s->vbe_size_mask;
+         page1 = (addr + bwidth - 1) & s->vbe_size_mask;
+         if (full_update) {
 -- 
 2.23.0
 
