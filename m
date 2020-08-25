@@ -7,80 +7,78 @@ X-Spam-Status: No, score=-12.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2091C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 21:36:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D47D0C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 21:37:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6F29E206EB
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 21:36:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4D64F206EB
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 21:37:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="i1mG4tBB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F29E206EB
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KBHxp79q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D64F206EB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48060 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51830 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAgc4-0000fX-Mb
-	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 17:36:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36420)
+	id 1kAgcx-0002CE-69
+	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 17:37:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36172)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kAg4A-0000HH-LK
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 17:01:14 -0400
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:46074)
+ id 1kAg3s-0008RD-VN
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 17:00:56 -0400
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:44373)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kAg48-000219-KK
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 17:01:14 -0400
-Received: by mail-pf1-x441.google.com with SMTP id k15so1823277pfc.12
- for <qemu-devel@nongnu.org>; Tue, 25 Aug 2020 14:01:12 -0700 (PDT)
+ id 1kAg3q-0001yH-TL
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 17:00:56 -0400
+Received: by mail-pg1-x543.google.com with SMTP id m34so7662900pgl.11
+ for <qemu-devel@nongnu.org>; Tue, 25 Aug 2020 14:00:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=0IyoDEFe3ZWYDga+MAV6Bg/xEkFwuDqD20ZUdnvyl1Q=;
- b=i1mG4tBBmW5Rvw7Ff45f/KekuzbCVOHea7q3wNIXaWEXghFSU/Qf3QCeGeJSjEq9Ds
- wTz63U2RYBYkjGSd/Jb3QHJMz+GZEw4Axpb1IvYmO9hN6+7HYvbJI9YsNMF70B6VWZaC
- nXixW9pxyULrAfoyMXWgj8yQn0CiMO7+ttqvgx+CLthK+fwh6XvUyXoPXDmXE9vCi+Zz
- O0PU/gIJm2+wPIv5O94bMRGsVJmSBDSDH6U68xlayedQVz48OmKZRDH9gJMaFJpB/xBs
- KXFhKw8yFuZZp3VTzeDu1K15/C96t1eF+fjHEQ1wx+T2hGdGxt+I7/Mz652ZsTJWA58s
- so5w==
+ bh=92AClQgNXABacQ0i61DaYrNKkj8PxXy6qywPLdGfziI=;
+ b=KBHxp79qnB44H5MyTBLuOwUI1CUO5kzYtE2cLl+IS2YRaYx0dK3lIqZDU7yENZQjc4
+ yQAelPZqpY1p5DnzJMBC/HyP++d97PGcRcbat40mM/MHZZkeh9Hu8LiUXnxYICFAigAN
+ fkb3XSVDezESkxuPSZQuo42oVOagi2F3j8rLclIW0wyURj3VNmJPZQAr1He0XleiWtv9
+ NDRxn6VS/iqDj5Z9+t3cBoopsyGkQfektf9aVSEkQ2Jw3MTvyWWwlZ06gXEX/enOKGVD
+ yX9fUQ1Wh1AF4LIAx50i5n3yizLRqzEFz6VdO2kC2a5iuDgBxXfDumtZt8R3BjQErpZ+
+ xOmQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=0IyoDEFe3ZWYDga+MAV6Bg/xEkFwuDqD20ZUdnvyl1Q=;
- b=irimzTcjKflac/Kgz/W9GbZR/CtEWZbZOU/aYwKgSk2zRXMCFvW8sOS+QExH/4pn10
- kse2RlTrXFonyLeYnFcEpYgMjA9o9xG+ZdiY4HWLJ/yisYj/qClnNEU0mivPmGg6SY++
- 0hcCL3N2CHqvwCFiDIuwwFntVYBG0zppidNYcpU2MJt4wAJ7dumrX2mv5xP+ZDzDxaUC
- 9kGRMuSqB4ARvcMb7171alc798YpaHLnPBOPxT0IgPpcKS+znfBK3pZtuFpwfWfyGQKl
- AN8PH60eNRjvmRXA0agE1NfzRmnjZJtkeHH5DOZJeF5QnWeh4idVKG8u/P9aBVwAjIuK
- R/kA==
-X-Gm-Message-State: AOAM53015nXxQYoyLJQ9jDJjBTg4R+phipWln4x0xAXYS9WuuI7m9QrP
- 1S3hfSxAIIPOi6J4ABsDu8IteITGcg9s4w==
-X-Google-Smtp-Source: ABdhPJxodVQMv5bVGIs0sw8Q7Jl5NqeGZdmiMLbpNOTsDZ2nD7oEFwfPmMVIMjvWNPF/uPZ7pIzU2w==
-X-Received: by 2002:a05:6a00:14d0:: with SMTP id
- w16mr9330728pfu.39.1598389270962; 
- Tue, 25 Aug 2020 14:01:10 -0700 (PDT)
+ bh=92AClQgNXABacQ0i61DaYrNKkj8PxXy6qywPLdGfziI=;
+ b=cS1oInutvkylfuBCY1qRD5D8n7789b/b7YdukxTgw1xgqJrcc1eja5MklkA0kp09gy
+ tT6a+rQahIaSO/kao9U+fCwQCh8Pyr9fAjt+OPRwdUwt1JYHTAktk4pLmVwc9L59UVvh
+ qIIgyUXqy7M3U6knT6anaFrP+0nOt7HGq0cDbC4FcFKzvnVentwz2ikSOdo7Ug/DnJoD
+ /AvEWTTatU4nb4EQunZqs/YApabmhr7+PB8NGHKDyaoHU8GvnAPJPJM+K3KORJ3gKeH+
+ d5lP5nkbs3ss4bOn7v6MyhFR+D1DZmz9IZs6dmdGmmsKv5CgswqCoshNqKPNvhWLrUQp
+ Js1g==
+X-Gm-Message-State: AOAM530FUu5EoMOpdz4/8tYBCNIfzJZWNWByyPGE1grYtqQYmVKPc6HL
+ gkcyjzpDytUNhtSudDnCdZTUtQEg23rH3Q==
+X-Google-Smtp-Source: ABdhPJxw8zA6ZN4TKbN2+ABXBvzw8JwlC4F6Yl4aDDu3MLwomwmrW6fc1IHgkdty5lENgdUPzMdFaQ==
+X-Received: by 2002:a63:4e56:: with SMTP id o22mr7715010pgl.381.1598389253174; 
+ Tue, 25 Aug 2020 14:00:53 -0700 (PDT)
 Received: from localhost.localdomain
  (h216-228-167-147.bendor.dedicated.static.tds.net. [216.228.167.147])
- by smtp.gmail.com with ESMTPSA id k4sm16074pgr.87.2020.08.25.14.01.09
+ by smtp.gmail.com with ESMTPSA id k4sm16074pgr.87.2020.08.25.14.00.52
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 25 Aug 2020 14:01:10 -0700 (PDT)
+ Tue, 25 Aug 2020 14:00:52 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 59/77] target/microblaze: Replace clear_imm with
- tb_flags_to_set
-Date: Tue, 25 Aug 2020 13:59:32 -0700
-Message-Id: <20200825205950.730499-60-richard.henderson@linaro.org>
+Subject: [PATCH 49/77] target/microblaze: Mark fpu helpers TCG_CALL_NO_WG
+Date: Tue, 25 Aug 2020 13:59:22 -0700
+Message-Id: <20200825205950.730499-50-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200825205950.730499-1-richard.henderson@linaro.org>
 References: <20200825205950.730499-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::441;
- envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x441.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::543;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x543.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -107,63 +105,55 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This more general update variable will be able to handle
-delay slots as well.
+Now that FSR is no longer a tcg global temp, we can say that
+the fpu helpers do not write to tcg temps.  All temps are
+read implicitly by the fpu exception path.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/microblaze/translate.c | 15 +++++++++------
- 1 file changed, 9 insertions(+), 6 deletions(-)
+ target/microblaze/helper.h | 28 ++++++++++++++--------------
+ 1 file changed, 14 insertions(+), 14 deletions(-)
 
-diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
-index 6e70873333..18009103c7 100644
---- a/target/microblaze/translate.c
-+++ b/target/microblaze/translate.c
-@@ -75,7 +75,7 @@ typedef struct DisasContext {
-     unsigned int cpustate_changed;
-     unsigned int delayed_branch;
-     unsigned int tb_flags;
--    unsigned int clear_imm;
-+    unsigned int tb_flags_to_set;
-     int mem_index;
+diff --git a/target/microblaze/helper.h b/target/microblaze/helper.h
+index 79e1e8ecc7..64816c89e1 100644
+--- a/target/microblaze/helper.h
++++ b/target/microblaze/helper.h
+@@ -3,21 +3,21 @@ DEF_HELPER_FLAGS_2(raise_exception, TCG_CALL_NO_WG, noreturn, env, i32)
+ DEF_HELPER_FLAGS_3(divs, TCG_CALL_NO_WG, i32, env, i32, i32)
+ DEF_HELPER_FLAGS_3(divu, TCG_CALL_NO_WG, i32, env, i32, i32)
  
- #define JMP_NOJMP     0
-@@ -535,8 +535,7 @@ static bool trans_imm(DisasContext *dc, arg_imm *arg)
- {
-     dc->ext_imm = arg->imm << 16;
-     tcg_gen_movi_i32(cpu_imm, dc->ext_imm);
--    dc->tb_flags |= IMM_FLAG;
--    dc->clear_imm = 0;
-+    dc->tb_flags_to_set = IMM_FLAG;
-     return true;
- }
+-DEF_HELPER_3(fadd, i32, env, i32, i32)
+-DEF_HELPER_3(frsub, i32, env, i32, i32)
+-DEF_HELPER_3(fmul, i32, env, i32, i32)
+-DEF_HELPER_3(fdiv, i32, env, i32, i32)
+-DEF_HELPER_2(flt, i32, env, i32)
+-DEF_HELPER_2(fint, i32, env, i32)
+-DEF_HELPER_2(fsqrt, i32, env, i32)
++DEF_HELPER_FLAGS_3(fadd, TCG_CALL_NO_WG, i32, env, i32, i32)
++DEF_HELPER_FLAGS_3(frsub, TCG_CALL_NO_WG, i32, env, i32, i32)
++DEF_HELPER_FLAGS_3(fmul, TCG_CALL_NO_WG, i32, env, i32, i32)
++DEF_HELPER_FLAGS_3(fdiv, TCG_CALL_NO_WG, i32, env, i32, i32)
++DEF_HELPER_FLAGS_2(flt, TCG_CALL_NO_WG, i32, env, i32)
++DEF_HELPER_FLAGS_2(fint, TCG_CALL_NO_WG, i32, env, i32)
++DEF_HELPER_FLAGS_2(fsqrt, TCG_CALL_NO_WG, i32, env, i32)
  
-@@ -1680,7 +1679,8 @@ static void mb_tr_translate_insn(DisasContextBase *dcb, CPUState *cs)
-                   (uint32_t)dc->base.pc_next);
-     }
+-DEF_HELPER_3(fcmp_un, i32, env, i32, i32)
+-DEF_HELPER_3(fcmp_lt, i32, env, i32, i32)
+-DEF_HELPER_3(fcmp_eq, i32, env, i32, i32)
+-DEF_HELPER_3(fcmp_le, i32, env, i32, i32)
+-DEF_HELPER_3(fcmp_gt, i32, env, i32, i32)
+-DEF_HELPER_3(fcmp_ne, i32, env, i32, i32)
+-DEF_HELPER_3(fcmp_ge, i32, env, i32, i32)
++DEF_HELPER_FLAGS_3(fcmp_un, TCG_CALL_NO_WG, i32, env, i32, i32)
++DEF_HELPER_FLAGS_3(fcmp_lt, TCG_CALL_NO_WG, i32, env, i32, i32)
++DEF_HELPER_FLAGS_3(fcmp_eq, TCG_CALL_NO_WG, i32, env, i32, i32)
++DEF_HELPER_FLAGS_3(fcmp_le, TCG_CALL_NO_WG, i32, env, i32, i32)
++DEF_HELPER_FLAGS_3(fcmp_gt, TCG_CALL_NO_WG, i32, env, i32, i32)
++DEF_HELPER_FLAGS_3(fcmp_ne, TCG_CALL_NO_WG, i32, env, i32, i32)
++DEF_HELPER_FLAGS_3(fcmp_ge, TCG_CALL_NO_WG, i32, env, i32, i32)
  
--    dc->clear_imm = 1;
-+    dc->tb_flags_to_set = 0;
-+
-     ir = cpu_ldl_code(env, dc->base.pc_next);
-     if (!decode(dc, ir)) {
-         old_decode(dc, ir);
-@@ -1692,10 +1692,13 @@ static void mb_tr_translate_insn(DisasContextBase *dcb, CPUState *cs)
-         dc->r0_set = false;
-     }
- 
--    if (dc->clear_imm && (dc->tb_flags & IMM_FLAG)) {
--        dc->tb_flags &= ~IMM_FLAG;
-+    /* Discard the imm global when its contents cannot be used. */
-+    if ((dc->tb_flags & ~dc->tb_flags_to_set) & IMM_FLAG) {
-         tcg_gen_discard_i32(cpu_imm);
-     }
-+
-+    dc->tb_flags &= ~IMM_FLAG;
-+    dc->tb_flags |= dc->tb_flags_to_set;
-     dc->base.pc_next += 4;
- 
-     if (dc->delayed_branch && --dc->delayed_branch == 0) {
+ DEF_HELPER_FLAGS_2(pcmpbf, TCG_CALL_NO_RWG_SE, i32, i32, i32)
+ #if !defined(CONFIG_USER_ONLY)
 -- 
 2.25.1
 
