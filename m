@@ -1,4 +1,4 @@
-Return-Path: <SRS0=JPH5=CC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=2GMi=CD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-3.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	MENTIONS_GIT_HOSTING,MISSING_HEADERS,REPLYTO_WITHOUT_TO_CC,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10AEAC433E1
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 20:00:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 169E9C433E3
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 14:25:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B9E3E20656
-	for <qemu-devel@archiver.kernel.org>; Mon, 24 Aug 2020 20:00:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C785A20665
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 14:25:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mg.gitlab.com header.i=@mg.gitlab.com header.b="m6jSYIwk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9E3E20656
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=mg.gitlab.com header.i=@mg.gitlab.com header.b="g8fpWj8h"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C785A20665
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36322 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36444 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAIdz-0004dv-U1
-	for qemu-devel@archiver.kernel.org; Mon, 24 Aug 2020 16:00:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52100)
+	id 1kAZsh-0002Et-UJ
+	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 10:24:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34992)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <bounce+2dc402.947b4-qemu-devel=nongnu.org@mg.gitlab.com>)
- id 1kAId9-0004Ct-1A
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 15:59:47 -0400
-Received: from do158-143.mg.gitlab.com ([192.237.158.143]:55535)
+ id 1kAZs4-0001U4-Fx
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 10:24:20 -0400
+Received: from do158-143.mg.gitlab.com ([192.237.158.143]:32936)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1)
  (envelope-from <bounce+2dc402.947b4-qemu-devel=nongnu.org@mg.gitlab.com>)
- id 1kAId1-0003Ps-I9
- for qemu-devel@nongnu.org; Mon, 24 Aug 2020 15:59:46 -0400
+ id 1kAZs1-0003lr-Bh
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 10:24:20 -0400
 DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.gitlab.com;
  q=dns/txt; 
- s=mailo; t=1598299184; h=List-Id: Content-Transfer-Encoding:
+ s=mailo; t=1598365457; h=List-Id: Content-Transfer-Encoding:
  Content-Type: Mime-Version: Subject: Message-ID: Reply-To: From: Date:
- Sender; bh=DIt1oRVoF/DGklmFQGCDrtl5mx/dkEjLh+4G+1fA9zE=;
- b=m6jSYIwk95SZla3S9HYHD/LuJN/4Nx1uy0qUUeJevAob/SdGFR1TiRltQfmDAPNhBZI3+85i
- SzOlhIIMLi9YpyHt7KDjI1NJyeBe1JOBLJZA41fxSLSgB5RfVGDITKD6To2TaGBPFQ0wPfbl
- D7PL9WFzXNgH9DfjeREmwJ128h4=
+ Sender; bh=FTiCdWWZjzGdJvZrCxt/QgLorWIP/y83BKomt0IjnEI=;
+ b=g8fpWj8hqVNnmE/sreazvX7+Yxb/ROyyx5hgtAgMx4qBG65CPVcsUouS4rYxlWYVSfly3HQC
+ xVDfXiaSUwWTOR0h5eMHu3ajW/60Rt+sRBfcll+YZ8zix6zyqHaV5jx4wBHz9V0kfujKTNaD
+ axcPVGh3g6FqR8PLCUSbA26h5gU=
 X-Mailgun-Sending-Ip: 192.237.158.143
 X-Mailgun-Sid: WyI3MWYzYSIsICJxZW11LWRldmVsQG5vbmdudS5vcmciLCAiOTQ3YjQiXQ==
-Received: from mg.gitlab.com (70.90.74.34.bc.googleusercontent.com
- [34.74.90.70]) by smtp-out-n04.prod.us-east-1.postgun.com with SMTP id
- 5f441c15ca327a6430ce7ad2 (version=TLS1.3, cipher=TLS_AES_128_GCM_SHA256);
- Mon, 24 Aug 2020 19:59:17 GMT
-Date: Mon, 24 Aug 2020 19:59:17 +0000
-Message-ID: <5f441c1544da5_573c3fb019895b802760c@sidekiq-catchall-05-sv-gprd.mail>
-Subject: QEMU | Pipeline #181452066 has failed for master | 30aa1944
+Received: from mg.gitlab.com (64.90.74.34.bc.googleusercontent.com
+ [34.74.90.64]) by smtp-out-n02.prod.us-west-2.postgun.com with SMTP id
+ 5f451f0f4413b7d5dbadae00 (version=TLS1.3, cipher=TLS_AES_128_GCM_SHA256);
+ Tue, 25 Aug 2020 14:24:15 GMT
+Date: Tue, 25 Aug 2020 14:24:14 +0000
+Message-ID: <5f451f0e6573a_3bc93fc68fcbee50355375@sidekiq-catchall-07-sv-gprd.mail>
+Subject: QEMU | Pipeline #181767431 has failed for master | 7774e403
 Mime-Version: 1.0
 Content-Type: multipart/alternative;
- boundary="--==_mimepart_5f441c158dfa_573c3fb019895b802759d0";
+ boundary="--==_mimepart_5f451f0e5c5b4_3bc93fc68fcbee503552f1";
  charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-GitLab-Project: QEMU
 X-GitLab-Project-Id: 11167699
 X-GitLab-Project-Path: qemu-project/qemu
-X-GitLab-Pipeline-Id: 181452066
+X-GitLab-Pipeline-Id: 181767431
 X-GitLab-Pipeline-Ref: master
 X-GitLab-Pipeline-Status: failed
 Auto-Submitted: auto-generated
@@ -69,17 +69,16 @@ X-Auto-Response-Suppress: All
 Received-SPF: pass client-ip=192.237.158.143;
  envelope-from=bounce+2dc402.947b4-qemu-devel=nongnu.org@mg.gitlab.com;
  helo=do158-143.mg.gitlab.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/24 15:59:37
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/25 10:24:15
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
 X-Spam_score_int: -26
 X-Spam_score: -2.7
 X-Spam_bar: --
-X-Spam_report: (-2.7 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.956,
+X-Spam_report: (-2.7 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.958,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1,
  HTML_FONT_LOW_CONTRAST=0.001, HTML_MESSAGE=0.001, MISSING_HEADERS=1.021,
- RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H2=-0.001, REPLYTO_WITHOUT_TO_CC=1.552,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- WEIRD_PORT=0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_MED=-2.3, REPLYTO_WITHOUT_TO_CC=1.552, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,7 +98,7 @@ Reply-to: GitLab <noreply@gitlab.com>, GitLab <gitlab@mg.gitlab.com>
 From: GitLab via <qemu-devel@nongnu.org>
 
 
-----==_mimepart_5f441c158dfa_573c3fb019895b802759d0
+----==_mimepart_5f451f0e5c5b4_3bc93fc68fcbee503552f1
 Content-Type: text/plain;
  charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
@@ -111,70 +110,59 @@ Your pipeline has failed.
 Project: QEMU ( https://gitlab.com/qemu-project/qemu )
 Branch: master ( https://gitlab.com/qemu-project/qemu/-/commits/master )
 
-Commit: 30aa1944 ( https://gitlab.com/qemu-project/qemu/-/commit/30aa1944=
-6d82358a30eac3b556b4d6641e00b7c1 )
-Commit Message: Merge remote-tracking branch 'remotes/cschoeneb...
+Commit: 7774e403 ( https://gitlab.com/qemu-project/qemu/-/commit/7774e403=
+f2ac58b3e87bfe8d2f77676501ba893e )
+Commit Message: Merge remote-tracking branch 'remotes/kraxel/ta...
 Commit Author: Peter Maydell ( https://gitlab.com/pm215 )
 
-Pipeline #181452066 ( https://gitlab.com/qemu-project/qemu/-/pipelines/18=
-1452066 ) triggered by Alex Benn=C3=A9e ( https://gitlab.com/stsquad )
+Pipeline #181767431 ( https://gitlab.com/qemu-project/qemu/-/pipelines/18=
+1767431 ) triggered by Alex Benn=C3=A9e ( https://gitlab.com/stsquad )
 had 1 failed build.
 
-Job #701254385 ( https://gitlab.com/qemu-project/qemu/-/jobs/701254385/ra=
+Job #702680909 ( https://gitlab.com/qemu-project/qemu/-/jobs/702680909/ra=
 w )
 
 Stage: test
-Name: acceptance-system-fedora
-Trace: 19:43:54 ERROR| =
+Name: acceptance-system-centos
+Trace: 14:09:39 ERROR|   File "/builds/qemu-project/qemu/python/qemu/mach=
+ine.py", line 342, in launch
+    self._launch()
 
-19:43:54 ERROR| Reproduced traceback from: /builds/qemu-project/qemu/buil=
-d/tests/venv/lib64/python3.8/site-packages/avocado/core/test.py:846
-19:43:54 ERROR| Traceback (most recent call last):
-19:43:54 ERROR|   File "/builds/qemu-project/qemu/build/tests/acceptance/=
-avocado_qemu/__init__.py", line 171, in setUp
-19:43:54 ERROR|     self.cancel("No QEMU binary defined or found in the b=
-uild tree")
-19:43:54 ERROR|   File "/builds/qemu-project/qemu/build/tests/venv/lib64/=
-python3.8/site-packages/avocado/core/test.py", line 1081, in cancel
-19:43:54 ERROR|     raise exceptions.TestCancel(message)
-19:43:54 ERROR| avocado.core.exceptions.TestCancel: No QEMU binary define=
-d or found in the build tree
-19:43:54 ERROR| =
+14:09:39 ERROR|   File "/builds/qemu-project/qemu/python/qemu/machine.py"=
+, line 369, in _launch
+    self._post_launch()
 
-19:43:54 ERROR| CANCEL 31-tests/acceptance/vnc.py:Vnc.test_change_passwor=
-d_requires_a_password -> TestCancel: No QEMU binary defined or found in t=
-he build tree
-19:43:54 INFO | =
+14:09:39 ERROR|   File "/builds/qemu-project/qemu/python/qemu/machine.py"=
+, line 288, in _post_launch
+    self._qmp.accept()
 
-19:43:54 DEBUG| PARAMS (key=3Darch, path=3D*, default=3DNone) =3D> None
-19:43:54 DEBUG| PARAMS (key=3Dmachine, path=3D*, default=3DNone) =3D> Non=
-e
-19:43:54 DEBUG| PARAMS (key=3Dqemu_bin, path=3D*, default=3DNone) =3D> No=
-ne
-19:43:54 ERROR| =
+14:09:39 ERROR|   File "/builds/qemu-project/qemu/python/qemu/qmp.py", li=
+ne 236, in accept
+    return self.__negotiate_capabilities()
 
-19:43:54 ERROR| Reproduced traceback from: /builds/qemu-project/qemu/buil=
-d/tests/venv/lib64/python3.8/site-packages/avocado/core/test.py:846
-19:43:54 ERROR| Traceback (most recent call last):
-19:43:54 ERROR|   File "/builds/qemu-project/qemu/build/tests/acceptance/=
-avocado_qemu/__init__.py", line 171, in setUp
-19:43:54 ERROR|     self.cancel("No QEMU binary defined or found in the b=
-uild tree")
-19:43:54 ERROR|   File "/builds/qemu-project/qemu/build/tests/venv/lib64/=
-python3.8/site-packages/avocado/core/test.py", line 1081, in cancel
-19:43:54 ERROR|     raise exceptions.TestCancel(message)
-19:43:54 ERROR| avocado.core.exceptions.TestCancel: No QEMU binary define=
-d or found in the build tree
-19:43:54 ERROR| =
+14:09:39 ERROR|   File "/builds/qemu-project/qemu/python/qemu/qmp.py", li=
+ne 129, in __negotiate_capabilities
+    resp =3D self.cmd('qmp_capabilities')
 
-19:43:54 ERROR| CANCEL 32-tests/acceptance/vnc.py:Vnc.test_change_passwor=
-d -> TestCancel: No QEMU binary defined or found in the build tree
-19:43:54 INFO | =
+14:09:39 ERROR|   File "/builds/qemu-project/qemu/python/qemu/qmp.py", li=
+ne 266, in cmd
+    return self.cmd_obj(qmp_cmd)
+
+14:09:39 ERROR|   File "/builds/qemu-project/qemu/python/qemu/qmp.py", li=
+ne 249, in cmd_obj
+    raise QMPConnectError("Unexpected empty reply from server")
+
+14:09:39 ERROR| qemu.qmp.QMPConnectError: Unexpected empty reply from ser=
+ver
+
+14:09:39 ERROR| ERROR 34-tests/acceptance/vnc.py:Vnc.test_change_password=
+ -> QMPConnectError: Unexpected empty reply from server
+14:09:39 INFO | =
 
 =1B[32;1m$ du -chs ${CI_PROJECT_DIR}/avocado-cache=1B[0;m
-323M	/builds/qemu-project/qemu/avocado-cache
-323M	total
-section_end:1598298236:after_script
+1.2G	/builds/qemu-project/qemu/avocado-cache
+1.2G	total
+section_end:1598364584:after_script
 =1B[0K=1B[31;1mERROR: Job failed: exit code 1
 =1B[0;m
 
@@ -186,7 +174,7 @@ You're receiving this email because of your account on gitlab.com.
 
 
 
-----==_mimepart_5f441c158dfa_573c3fb019895b802759d0
+----==_mimepart_5f451f0e5c5b4_3bc93fc68fcbee503552f1
 Content-Type: text/html;
  charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
@@ -201,7 +189,7 @@ w.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <meta content=3D"width=3Ddevice-width, initial-scale=3D1" name=3D"viewpor=
 t" />
 <meta content=3D"IE=3Dedge" http-equiv=3D"X-UA-Compatible" />
-<title>QEMU | Pipeline #181452066 has failed for master | 30aa1944</title=
+<title>QEMU | Pipeline #181767431 has failed for master | 7774e403</title=
 >
 <style data-premailer=3D"ignore" type=3D"text/css">
 body,table,td,a{-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%}t=
@@ -369,17 +357,17 @@ ipeline_notif_v1/icon-commit-gray-c10243ac24cde64b549aec91de35e6b49c8739b=
 </td>
 <td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; fo=
 nt-size: 15px; line-height: 1.4;" valign=3D"middle">
-<a href=3D"https://gitlab.com/qemu-project/qemu/-/commit/30aa19446d82358a=
-30eac3b556b4d6641e00b7c1" style=3D"color: #3777b0; text-decoration: none;=
+<a href=3D"https://gitlab.com/qemu-project/qemu/-/commit/7774e403f2ac58b3=
+e87bfe8d2f77676501ba893e" style=3D"color: #3777b0; text-decoration: none;=
 ">
-30aa1944
+7774e403
 </a>
 </td>
 </tr>
 </tbody>
 </table>
 <div class=3D"commit" style=3D"color: #5c5c5c; font-weight: 300;">
-Merge remote-tracking branch 'remotes/cschoeneb...
+Merge remote-tracking branch 'remotes/kraxel/ta...
 </div>
 </td>
 </tr>
@@ -436,9 +424,9 @@ le=3D"border-collapse: collapse; margin: 0 auto;">
 <td style=3D"font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; fo=
 nt-size: 15px; font-weight: 500; line-height: 1.4;" valign=3D"baseline">
 Pipeline
-<a href=3D"https://gitlab.com/qemu-project/qemu/-/pipelines/181452066" st=
+<a href=3D"https://gitlab.com/qemu-project/qemu/-/pipelines/181767431" st=
 yle=3D"color: #3777b0; text-decoration: none;">
-#181452066
+#181767431
 </a>
 triggered by
 </td>
@@ -515,9 +503,9 @@ test
 <td align=3D"right" style=3D"font-family: 'Helvetica Neue',Helvetica,Aria=
 l,sans-serif; color: #8c8c8c; font-weight: 500; font-size: 14px; padding:=
  16px 0;">
-<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/701254385" style=3D=
+<a href=3D"https://gitlab.com/qemu-project/qemu/-/jobs/702680909" style=3D=
 "color: #3777b0; text-decoration: none;">
-acceptance-system-fedora
+acceptance-system-centos
 </a>
 
 </td>
@@ -528,41 +516,29 @@ sans-serif; padding: 0 0 16px;">
 <pre style=3D"font-family: Monaco,'Lucida Console','Courier New',Courier,=
 monospace; background-color: #fafafa; border-radius: 4px; overflow: hidde=
 n; white-space: pre-wrap; word-break: break-all; font-size: 13px; line-he=
-ight: 1.4; color: #333333; margin: 0; padding: 16px 8px;"><span>19:43:54 =
-ERROR| <br />19:43:54 ERROR| Reproduced traceback from: /builds/qemu-proj=
-ect/qemu/build/tests/venv/lib64/python3.8/site-packages/avocado/core/test=
-.py:846<br />19:43:54 ERROR| Traceback (most recent call last):<br />19:4=
-3:54 ERROR|   File "/builds/qemu-project/qemu/build/tests/acceptance/avoc=
-ado_qemu/__init__.py", line 171, in setUp<br />19:43:54 ERROR|     self.c=
-ancel("No QEMU binary defined or found in the build tree")<br />19:43:54 =
-ERROR|   File "/builds/qemu-project/qemu/build/tests/venv/lib64/python3.8=
-/site-packages/avocado/core/test.py", line 1081, in cancel<br />19:43:54 =
-ERROR|     raise exceptions.TestCancel(message)<br />19:43:54 ERROR| avoc=
-ado.core.exceptions.TestCancel: No QEMU binary defined or found in the bu=
-ild tree<br />19:43:54 ERROR| <br />19:43:54 ERROR| CANCEL 31-tests/accep=
-tance/vnc.py:Vnc.test_change_password_requires_a_password -&gt; TestCance=
-l: No QEMU binary defined or found in the build tree<br />19:43:54 INFO |=
- <br />19:43:54 DEBUG| PARAMS (key=3Darch, path=3D*, default=3DNone) =3D&=
-gt; None<br />19:43:54 DEBUG| PARAMS (key=3Dmachine, path=3D*, default=3D=
-None) =3D&gt; None<br />19:43:54 DEBUG| PARAMS (key=3Dqemu_bin, path=3D*,=
- default=3DNone) =3D&gt; None<br />19:43:54 ERROR| <br />19:43:54 ERROR| =
-Reproduced traceback from: /builds/qemu-project/qemu/build/tests/venv/lib=
-64/python3.8/site-packages/avocado/core/test.py:846<br />19:43:54 ERROR| =
-Traceback (most recent call last):<br />19:43:54 ERROR|   File "/builds/q=
-emu-project/qemu/build/tests/acceptance/avocado_qemu/__init__.py", line 1=
-71, in setUp<br />19:43:54 ERROR|     self.cancel("No QEMU binary defined=
- or found in the build tree")<br />19:43:54 ERROR|   File "/builds/qemu-p=
-roject/qemu/build/tests/venv/lib64/python3.8/site-packages/avocado/core/t=
-est.py", line 1081, in cancel<br />19:43:54 ERROR|     raise exceptions.T=
-estCancel(message)<br />19:43:54 ERROR| avocado.core.exceptions.TestCance=
-l: No QEMU binary defined or found in the build tree<br />19:43:54 ERROR|=
- <br />19:43:54 ERROR| CANCEL 32-tests/acceptance/vnc.py:Vnc.test_change_=
-password -&gt; TestCancel: No QEMU binary defined or found in the build t=
-ree<br />19:43:54 INFO | <br /></span><span class=3D"term-fg-l-green term=
--bold">$ du -chs ${CI_PROJECT_DIR}/avocado-cache</span><span><br />323M	/=
-builds/qemu-project/qemu/avocado-cache<br />323M	total<br /></span><span =
-class=3D"term-fg-l-red term-bold">ERROR: Job failed: exit code 1<br /></s=
-pan></pre>
+ight: 1.4; color: #333333; margin: 0; padding: 16px 8px;"><span>14:09:39 =
+ERROR|   File "/builds/qemu-project/qemu/python/qemu/machine.py", line 34=
+2, in launch<br />    self._launch()<br /><br />14:09:39 ERROR|   File "/=
+builds/qemu-project/qemu/python/qemu/machine.py", line 369, in _launch<br=
+ />    self._post_launch()<br /><br />14:09:39 ERROR|   File "/builds/qem=
+u-project/qemu/python/qemu/machine.py", line 288, in _post_launch<br />  =
+  self._qmp.accept()<br /><br />14:09:39 ERROR|   File "/builds/qemu-proj=
+ect/qemu/python/qemu/qmp.py", line 236, in accept<br />    return self.__=
+negotiate_capabilities()<br /><br />14:09:39 ERROR|   File "/builds/qemu-=
+project/qemu/python/qemu/qmp.py", line 129, in __negotiate_capabilities<b=
+r />    resp =3D self.cmd('qmp_capabilities')<br /><br />14:09:39 ERROR| =
+  File "/builds/qemu-project/qemu/python/qemu/qmp.py", line 266, in cmd<b=
+r />    return self.cmd_obj(qmp_cmd)<br /><br />14:09:39 ERROR|   File "/=
+builds/qemu-project/qemu/python/qemu/qmp.py", line 249, in cmd_obj<br /> =
+   raise QMPConnectError("Unexpected empty reply from server")<br /><br /=
+>14:09:39 ERROR| qemu.qmp.QMPConnectError: Unexpected empty reply from se=
+rver<br /><br />14:09:39 ERROR| ERROR 34-tests/acceptance/vnc.py:Vnc.test=
+_change_password -&gt; QMPConnectError: Unexpected empty reply from serve=
+r<br />14:09:39 INFO | <br /></span><span class=3D"term-fg-l-green term-b=
+old">$ du -chs ${CI_PROJECT_DIR}/avocado-cache</span><span><br />1.2G	/bu=
+ilds/qemu-project/qemu/avocado-cache<br />1.2G	total<br /></span><span cl=
+ass=3D"term-fg-l-red term-bold">ERROR: Job failed: exit code 1<br /></spa=
+n></pre>
 </td>
 </tr>
 </tbody>
@@ -610,5 +586,5 @@ lor: #5c5c5c; padding: 25px 0;">
 </body>
 </html>
 
-----==_mimepart_5f441c158dfa_573c3fb019895b802759d0--
+----==_mimepart_5f451f0e5c5b4_3bc93fc68fcbee503552f1--
 
