@@ -7,80 +7,79 @@ X-Spam-Status: No, score=-12.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77B4FC433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 21:23:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05AA1C433E1
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 21:24:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4028420738
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 21:23:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BD16B20738
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 21:24:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qvup682K"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4028420738
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JirQcFos"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD16B20738
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51890 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55870 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAgPx-0004Gy-Eh
-	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 17:23:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35918)
+	id 1kAgQi-0005tR-Uj
+	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 17:24:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35932)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kAg3c-0007uR-Bi
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 17:00:40 -0400
-Received: from mail-pj1-x1034.google.com ([2607:f8b0:4864:20::1034]:40897)
+ id 1kAg3d-0007vl-0v
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 17:00:41 -0400
+Received: from mail-pj1-x1041.google.com ([2607:f8b0:4864:20::1041]:36391)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kAg3Z-0001qe-Oe
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 17:00:39 -0400
-Received: by mail-pj1-x1034.google.com with SMTP id kx11so117296pjb.5
- for <qemu-devel@nongnu.org>; Tue, 25 Aug 2020 14:00:37 -0700 (PDT)
+ id 1kAg3a-0001qp-Oz
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 17:00:40 -0400
+Received: by mail-pj1-x1041.google.com with SMTP id q1so127786pjd.1
+ for <qemu-devel@nongnu.org>; Tue, 25 Aug 2020 14:00:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=wse7zD0pJo6WjEez5LvLZIudG6q/fbgb3bbbGW9ilgU=;
- b=qvup682KlHmC6NHpdjStw6DoA6H7z+FFELiqX1kk3MhAe3NdEI4K856PV9u8uqE3Yq
- lZQrTdSVRGxEawqC0LTxRiKVq+P5iEOxTK/3sBBFnrPSVuOLT9qSeI93LTE/pGQBOdSQ
- xBvUv05slXAMSHJ9kHRUWuyf6o71LzbJETBfzTL+lEnTVjU7dzlyWrkFGCtIobPRu2a3
- +M0IGDGT1f6mom9jbShcNMHwp7U9mspy6rIhaiCzM8tGnrxw32HDZLPb0FZLXFM66lzp
- mVDR92iTE6Sa9SyeYSHbj1N+4+hoQVxrUZhQbtaW14GzyXNScAxEnvS9L4c/YdtKSB6h
- Hoig==
+ bh=+kEx0UptQCrtmnph6sgV6tFoh7UCNGXW3aCpI+f1tQA=;
+ b=JirQcFosAldNZ6rO3H280is1x7IULX1PDBdPGd8uRJlUHzt6usQsJH4G2C84x3Dqf5
+ PIJnchcgAlY1gX9d766RFTcyWGdA8uL1xcje11qb4LJzA7s7YtVI+gextsJNbIslVILB
+ Iln98xYoWhJmuOhEXeNV+kuRRJU8QfdfePFFG5mTupp+dNBrK4mGmgcmnVV+DiLDcd49
+ XRYvgWFVVuN9D/twJTqSR8d52JT9BvaDiPSy4Kx+RPgYEhfSMk7ufnb4+MfbxG2IPcAa
+ 8ccHya6h9jHcVU29TNiknuLdgcn1gglsYlTg7LuJu7lrJYQZONEgkYyE7XWfrO2qUgrw
+ a7pA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=wse7zD0pJo6WjEez5LvLZIudG6q/fbgb3bbbGW9ilgU=;
- b=rp7E+rJqNXmxo9uc8UDiImpWAt62zWvVATqJ77/p4DqLaiJBkkBejK15o/JNSi8Jxv
- UUL2I1sQGHKMOeeOtNYp2sDVPUaIbzegvO2kmb+3s++lQieG0iUCyNWU9WPj1OECSUtT
- Vy33WSposO4XXlJLk77bUmOe9xEoBDv7ugwuu8iBr+Zh19CaV71pt3Sz+GxntnS/d9yi
- SVGHNcDsI3Dkswkx5tJSkyuyPF2vbawrmoWpdh7nKHEIgCGsgM1VykBS+SLy+xe5ALFI
- YcIhrzb7Mt1xKU6hVwukiJhoi4Vo1CtqsVMPMDBr6l0tITw/WRJ2AyXpdFoTTlkg4Rpm
- Z4jQ==
-X-Gm-Message-State: AOAM531byIW58JfGCDCmWBMjDjXDAZMPi3Ve7Oe49zFd7c4BovbpuiRC
- iEDnnbJftg6ln21u0vS+jId6NyXEF2/jWQ==
-X-Google-Smtp-Source: ABdhPJz4nHZ9fPnjKq8LNvUpv7voVQ8QEWrFWVB/JlSjN2zeZjkZPm8CZp0Y61igN+gWwxC8DZa3tw==
-X-Received: by 2002:a17:90a:a101:: with SMTP id
- s1mr2841013pjp.205.1598389235827; 
- Tue, 25 Aug 2020 14:00:35 -0700 (PDT)
+ bh=+kEx0UptQCrtmnph6sgV6tFoh7UCNGXW3aCpI+f1tQA=;
+ b=BfpjMmrNVvM8mbEpvwEyexnau48jZ/K2Cz4jCREjnHDomXq21Q0jDYKcei5ecR44iw
+ 8KPJmxIB6dgEM8F1YKEmT2uBsf7Z3uDZHTnG1kTe6wkCUtiP37RunLxjy1CvtAHlkT7o
+ TxG4bs51IJZpomD3JCw55K2yMmkVlj6W1lbtPHB+SeSLN0t9YMEvo/WtzXYZ4IiTb0ha
+ 73NszmMhhes1acn3NW2m+W1yYohqVYmbWNHswSRQDPaGumYo4EZk0QS5tCAAp0jSWz/2
+ gQNu19sd91WAbYiuGie/hWYFy5nCty5GCLriurJSX8ukvyGV+tsGBs5bX7BGTccktFgS
+ sEoA==
+X-Gm-Message-State: AOAM532i3+cr2mBD9ixltLGs8qiw8vrVKCld62DyPS8aa0QTHVjJe9yC
+ ZevtSFhW1xn6J85tbNSLwOV8x0uUOnw6dQ==
+X-Google-Smtp-Source: ABdhPJwuLlJ8t9RgDEIv81vfPjWICQjTgUAwio3om+FZ90Sq/Iwgaz7OyXK+kwHwpviVWMqHugVGdQ==
+X-Received: by 2002:a17:90b:1108:: with SMTP id
+ gi8mr2960746pjb.7.1598389237031; 
+ Tue, 25 Aug 2020 14:00:37 -0700 (PDT)
 Received: from localhost.localdomain
  (h216-228-167-147.bendor.dedicated.static.tds.net. [216.228.167.147])
- by smtp.gmail.com with ESMTPSA id k4sm16074pgr.87.2020.08.25.14.00.34
+ by smtp.gmail.com with ESMTPSA id k4sm16074pgr.87.2020.08.25.14.00.35
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 25 Aug 2020 14:00:35 -0700 (PDT)
+ Tue, 25 Aug 2020 14:00:36 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 34/77] target/microblaze: Ensure imm constant is always
- available
-Date: Tue, 25 Aug 2020 13:59:07 -0700
-Message-Id: <20200825205950.730499-35-richard.henderson@linaro.org>
+Subject: [PATCH 35/77] target/microblaze: Add decodetree infrastructure
+Date: Tue, 25 Aug 2020 13:59:08 -0700
+Message-Id: <20200825205950.730499-36-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200825205950.730499-1-richard.henderson@linaro.org>
 References: <20200825205950.730499-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1034;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1034.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1041;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1041.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -107,233 +106,96 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Include the env->imm value in the TB values when IMM_FLAG is set.
-This means that we can always reconstruct the complete 32-bit imm.
-Discard env_imm when its contents can no longer be accessed.
-
-Fix user-mode checks for BRK/BRKI, which depend on IMM.
+The new interface is a stub that recognizes no instructions.
+It falls back to the old decoder for all instructions.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/microblaze/cpu.h       |   2 +-
- target/microblaze/translate.c | 111 ++++++++++++++++++++--------------
- 2 files changed, 67 insertions(+), 46 deletions(-)
+ target/microblaze/insns.decode | 18 ++++++++++++++++++
+ target/microblaze/translate.c  | 11 +++++++++--
+ target/microblaze/meson.build  |  3 +++
+ 3 files changed, 30 insertions(+), 2 deletions(-)
+ create mode 100644 target/microblaze/insns.decode
 
-diff --git a/target/microblaze/cpu.h b/target/microblaze/cpu.h
-index 7066878ac7..013858b8e0 100644
---- a/target/microblaze/cpu.h
-+++ b/target/microblaze/cpu.h
-@@ -374,9 +374,9 @@ static inline void cpu_get_tb_cpu_state(CPUMBState *env, target_ulong *pc,
-                                         target_ulong *cs_base, uint32_t *flags)
- {
-     *pc = env->pc;
--    *cs_base = 0;
-     *flags = (env->iflags & IFLAGS_TB_MASK) |
-              (env->msr & (MSR_UM | MSR_VM | MSR_EE));
-+    *cs_base = (*flags & IMM_FLAG ? env->imm : 0);
- }
- 
- #if !defined(CONFIG_USER_ONLY)
+diff --git a/target/microblaze/insns.decode b/target/microblaze/insns.decode
+new file mode 100644
+index 0000000000..1ed9ca0731
+--- /dev/null
++++ b/target/microblaze/insns.decode
+@@ -0,0 +1,18 @@
++#
++# MicroBlaze instruction decode definitions.
++#
++# Copyright (c) 2020 Richard Henderson <rth@twiddle.net>
++#
++# This library is free software; you can redistribute it and/or
++# modify it under the terms of the GNU Lesser General Public
++# License as published by the Free Software Foundation; either
++# version 2.1 of the License, or (at your option) any later version.
++#
++# This library is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++# Lesser General Public License for more details.
++#
++# You should have received a copy of the GNU Lesser General Public
++# License along with this library; if not, see <http://www.gnu.org/licenses/>.
++#
 diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
-index 133ec24870..65ce8f3cd6 100644
+index 65ce8f3cd6..e624093745 100644
 --- a/target/microblaze/translate.c
 +++ b/target/microblaze/translate.c
-@@ -61,6 +61,7 @@ typedef struct DisasContext {
-     /* Decoder.  */
-     int type_b;
-     uint32_t ir;
-+    uint32_t ext_imm;
-     uint8_t opcode;
-     uint8_t rd, ra, rb;
-     uint16_t imm;
-@@ -169,24 +170,23 @@ static bool trap_userspace(DisasContext *dc, bool cond)
-     return cond_user;
- }
+@@ -81,6 +81,9 @@ typedef struct DisasContext {
+     int abort_at_next_insn;
+ } DisasContext;
  
--/* True if ALU operand b is a small immediate that may deserve
--   faster treatment.  */
--static inline int dec_alu_op_b_is_small_imm(DisasContext *dc)
-+static int32_t dec_alu_typeb_imm(DisasContext *dc)
- {
--    /* Immediate insn without the imm prefix ?  */
--    return dc->type_b && !(dc->tb_flags & IMM_FLAG);
-+    tcg_debug_assert(dc->type_b);
-+    if (dc->tb_flags & IMM_FLAG) {
-+        return dc->ext_imm | dc->imm;
-+    } else {
-+        return (int16_t)dc->imm;
-+    }
- }
- 
- static inline TCGv_i32 *dec_alu_op_b(DisasContext *dc)
- {
-     if (dc->type_b) {
--        if (dc->tb_flags & IMM_FLAG)
--            tcg_gen_ori_i32(cpu_imm, cpu_imm, dc->imm);
--        else
--            tcg_gen_movi_i32(cpu_imm, (int32_t)((int16_t)dc->imm));
-+        tcg_gen_movi_i32(cpu_imm, dec_alu_typeb_imm(dc));
-         return &cpu_imm;
--    } else
--        return &cpu_R[dc->rb];
-+    }
-+    return &cpu_R[dc->rb];
- }
- 
- static void dec_add(DisasContext *dc)
-@@ -776,14 +776,14 @@ static inline void sync_jmpstate(DisasContext *dc)
- 
- static void dec_imm(DisasContext *dc)
- {
--    tcg_gen_movi_i32(cpu_imm, (dc->imm << 16));
-+    dc->ext_imm = dc->imm << 16;
-+    tcg_gen_movi_i32(cpu_imm, dc->ext_imm);
-     dc->tb_flags |= IMM_FLAG;
-     dc->clear_imm = 0;
- }
- 
- static inline void compute_ldst_addr(DisasContext *dc, bool ea, TCGv t)
- {
--    bool extimm = dc->tb_flags & IMM_FLAG;
-     /* Should be set to true if r1 is used by loadstores.  */
-     bool stackprot = false;
-     TCGv_i32 t32;
-@@ -836,11 +836,7 @@ static inline void compute_ldst_addr(DisasContext *dc, bool ea, TCGv t)
-     }
-     /* Immediate.  */
-     t32 = tcg_temp_new_i32();
--    if (!extimm) {
--        tcg_gen_addi_i32(t32, cpu_R[dc->ra], (int16_t)dc->imm);
--    } else {
--        tcg_gen_add_i32(t32, cpu_R[dc->ra], *(dec_alu_op_b(dc)));
--    }
-+    tcg_gen_addi_i32(t32, cpu_R[dc->ra], dec_alu_typeb_imm(dc));
-     tcg_gen_extu_i32_tl(t, t32);
-     tcg_temp_free_i32(t32);
- 
-@@ -1134,15 +1130,13 @@ static void dec_bcc(DisasContext *dc)
-         dec_setup_dslot(dc);
-     }
- 
--    if (dec_alu_op_b_is_small_imm(dc)) {
--        int32_t offset = (int32_t)((int16_t)dc->imm); /* sign-extend.  */
--
--        tcg_gen_movi_i32(cpu_btarget, dc->base.pc_next + offset);
-+    if (dc->type_b) {
-         dc->jmp = JMP_DIRECT_CC;
--        dc->jmp_pc = dc->base.pc_next + offset;
-+        dc->jmp_pc = dc->base.pc_next + dec_alu_typeb_imm(dc);
-+        tcg_gen_movi_i32(cpu_btarget, dc->jmp_pc);
-     } else {
-         dc->jmp = JMP_INDIRECT;
--        tcg_gen_addi_i32(cpu_btarget, *dec_alu_op_b(dc), dc->base.pc_next);
-+        tcg_gen_addi_i32(cpu_btarget, cpu_R[dc->rb], dc->base.pc_next);
-     }
-     eval_cc(dc, cc, cpu_btaken, cpu_R[dc->ra]);
- }
-@@ -1192,38 +1186,63 @@ static void dec_br(DisasContext *dc)
-         return;
-     }
- 
-+    if (abs && link && !dslot) {
-+        if (dc->type_b) {
-+            /* BRKI */
-+            uint32_t imm = dec_alu_typeb_imm(dc);
-+            if (trap_userspace(dc, imm != 8 && imm != 0x18)) {
-+                return;
-+            }
-+        } else {
-+            /* BRK */
-+            if (trap_userspace(dc, true)) {
-+                return;
-+            }
-+        }
-+    }
++/* Include the auto-generated decoder.  */
++#include "decode-insns.c.inc"
 +
-     dc->delayed_branch = 1;
-     if (dslot) {
-         dec_setup_dslot(dc);
+ static inline void t_sync_flags(DisasContext *dc)
+ {
+     /* Synch the tb dependent flags between translator and runtime.  */
+@@ -1506,7 +1509,7 @@ static struct decoder_info {
+     {{0, 0}, dec_null}
+ };
+ 
+-static inline void decode(DisasContext *dc, uint32_t ir)
++static void old_decode(DisasContext *dc, uint32_t ir)
+ {
+     int i;
+ 
+@@ -1584,6 +1587,7 @@ static void mb_tr_translate_insn(DisasContextBase *dcb, CPUState *cs)
+ {
+     DisasContext *dc = container_of(dcb, DisasContext, base);
+     CPUMBState *env = cs->env_ptr;
++    uint32_t ir;
+ 
+     /* TODO: This should raise an exception, not terminate qemu. */
+     if (dc->base.pc_next & 3) {
+@@ -1592,7 +1596,10 @@ static void mb_tr_translate_insn(DisasContextBase *dcb, CPUState *cs)
      }
--    if (link && dc->rd)
-+    if (link && dc->rd) {
-         tcg_gen_movi_i32(cpu_R[dc->rd], dc->base.pc_next);
-+    }
- 
--    dc->jmp = JMP_INDIRECT;
-     if (abs) {
--        tcg_gen_movi_i32(cpu_btaken, 1);
--        tcg_gen_mov_i32(cpu_btarget, *(dec_alu_op_b(dc)));
--        if (link && !dslot) {
--            if (!(dc->tb_flags & IMM_FLAG) &&
--                (dc->imm == 8 || dc->imm == 0x18)) {
-+        if (dc->type_b) {
-+            uint32_t dest = dec_alu_typeb_imm(dc);
-+
-+            dc->jmp = JMP_DIRECT;
-+            dc->jmp_pc = dest;
-+            tcg_gen_movi_i32(cpu_btarget, dest);
-+            if (link && !dslot) {
-+                switch (dest) {
-+                case 8:
-+                case 0x18:
-+                    gen_raise_exception_sync(dc, EXCP_BREAK);
-+                    break;
-+                case 0:
-+                    gen_raise_exception_sync(dc, EXCP_DEBUG);
-+                    break;
-+                }
-+            }
-+        } else {
-+            dc->jmp = JMP_INDIRECT;
-+            tcg_gen_mov_i32(cpu_btarget, cpu_R[dc->rb]);
-+            if (link && !dslot) {
-                 gen_raise_exception_sync(dc, EXCP_BREAK);
-             }
--            if (dc->imm == 0) {
--                if (trap_userspace(dc, true)) {
--                    return;
--                }
--                gen_raise_exception_sync(dc, EXCP_DEBUG);
--            }
-         }
-+    } else if (dc->type_b) {
-+        dc->jmp = JMP_DIRECT;
-+        dc->jmp_pc = dc->base.pc_next + dec_alu_typeb_imm(dc);
-+        tcg_gen_movi_i32(cpu_btarget, dc->jmp_pc);
-     } else {
--        if (dec_alu_op_b_is_small_imm(dc)) {
--            dc->jmp = JMP_DIRECT;
--            dc->jmp_pc = dc->base.pc_next + (int32_t)((int16_t)dc->imm);
--        } else {
--            tcg_gen_movi_i32(cpu_btaken, 1);
--            tcg_gen_addi_i32(cpu_btarget, *dec_alu_op_b(dc), dc->base.pc_next);
--        }
-+        dc->jmp = JMP_INDIRECT;
-+        tcg_gen_addi_i32(cpu_btarget, cpu_R[dc->rb], dc->base.pc_next);
-     }
-+    tcg_gen_movi_i32(cpu_btaken, 1);
- }
- 
- static inline void do_rti(DisasContext *dc)
-@@ -1529,6 +1548,7 @@ static void mb_tr_init_disas_context(DisasContextBase *dcb, CPUState *cs)
-     dc->jmp = dc->delayed_branch ? JMP_INDIRECT : JMP_NOJMP;
-     dc->cpustate_changed = 0;
-     dc->abort_at_next_insn = 0;
-+    dc->ext_imm = dc->base.tb->cs_base;
- 
-     bound = -(dc->base.pc_first | TARGET_PAGE_MASK) / 4;
-     dc->base.max_insns = MIN(dc->base.max_insns, bound);
-@@ -1573,8 +1593,9 @@ static void mb_tr_translate_insn(DisasContextBase *dcb, CPUState *cs)
  
      dc->clear_imm = 1;
-     decode(dc, cpu_ldl_code(env, dc->base.pc_next));
--    if (dc->clear_imm) {
-+    if (dc->clear_imm && (dc->tb_flags & IMM_FLAG)) {
+-    decode(dc, cpu_ldl_code(env, dc->base.pc_next));
++    ir = cpu_ldl_code(env, dc->base.pc_next);
++    if (!decode(dc, ir)) {
++        old_decode(dc, ir);
++    }
+     if (dc->clear_imm && (dc->tb_flags & IMM_FLAG)) {
          dc->tb_flags &= ~IMM_FLAG;
-+        tcg_gen_discard_i32(cpu_imm);
-     }
-     dc->base.pc_next += 4;
- 
+         tcg_gen_discard_i32(cpu_imm);
+diff --git a/target/microblaze/meson.build b/target/microblaze/meson.build
+index b8fe4afe61..639c3f73a8 100644
+--- a/target/microblaze/meson.build
++++ b/target/microblaze/meson.build
+@@ -1,4 +1,7 @@
++gen = decodetree.process('insns.decode')
++
+ microblaze_ss = ss.source_set()
++microblaze_ss.add(gen)
+ microblaze_ss.add(files(
+   'cpu.c',
+   'gdbstub.c',
 -- 
 2.25.1
 
