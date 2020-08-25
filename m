@@ -2,96 +2,94 @@ Return-Path: <SRS0=2GMi=CD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.9 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00667C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 07:52:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B332FC433E1
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 07:53:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BDCDF206EB
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 07:52:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ceqspJgY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDCDF206EB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8D1ED2071E
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 07:53:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D1ED2071E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60162 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34772 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kATl4-0003ix-19
-	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 03:52:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52244)
+	id 1kATm4-0004uX-T6
+	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 03:53:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52296)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kATkI-0002qw-CP
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 03:51:54 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32787
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kATkG-0004JS-JI
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 03:51:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598341911;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=tGAlwAWi/BDkgxVdhpGUzgiF+KH832G9maqRl8UY6iU=;
- b=ceqspJgYSV8hAzVqyN/mhW9eTwSiOuH/acXDo0VcoNau7FerWZbcFhWUq2OyEHOa8XJ7CS
- T1cn1bOLb2A2gCUNEFT8IkUoDBpuvuEGGCQqpMQ3Q8LhC3vRPkI1IyEoS88TvFkMXS4dgu
- qBht2kpoEUACzqm+BMRW+lFvdLeSiTM=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-564-HWv2BqMJOrCvnX6ItuGizA-1; Tue, 25 Aug 2020 03:51:47 -0400
-X-MC-Unique: HWv2BqMJOrCvnX6ItuGizA-1
-Received: by mail-ed1-f70.google.com with SMTP id dd25so4273521edb.6
- for <qemu-devel@nongnu.org>; Tue, 25 Aug 2020 00:51:46 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=tGAlwAWi/BDkgxVdhpGUzgiF+KH832G9maqRl8UY6iU=;
- b=lLitewGiFXzfN9FCMkMnE+6EiJIzjeUSMmCG5OLr/izHztXhBfCRbg4b6S90I8kxFO
- AjjgXNtWjD8+74pXzZY4d798Ii9aoZgKuATcj1FOYjelilPh89ricsmzRWyk0gBkt/9X
- /2as1eH246hjZqlckONknjHiJ8zNaxuVTKe90Y1l1+MhB6qfiQpZGSQ5ve/aO8lc/mkH
- SdBSaWPAr95I9pMG57AvmwbwNuekgZKjp5akc/97fwM0MCHHZoCVi6lCwU7NsxY8eGez
- 1A2lY/Nok1qza4M7jgghRp0IpVYsHb8UFjLqL7cSBf5wdB2IJogmVV0+DSl1ot0RqdfK
- SZtg==
-X-Gm-Message-State: AOAM530g6PdyI1wqj87XPhPfiOCJ3Ctiwzw1FR99bfSMMAEzV9JXK/Vh
- ynQrPzBXrxnYBsLssZCrbNE8JD/YXCH6h+Za9t49gVndal0EnRnIeNfGFFj6EYWFlbSAhrW8NNc
- 7hpaLYWRcVyVHELgWxP/jcsYQ1iSa0Hg=
-X-Received: by 2002:a50:ee96:: with SMTP id f22mr8514506edr.243.1598341905983; 
- Tue, 25 Aug 2020 00:51:45 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwNzXEqCxRsHymRTuEqmE3Ps/lZhNvoZT/sQtKF0cfje4ccwRUvqoNmWIOTWh5BwwE4EWUsNhG+Lh+Nw467dgk=
-X-Received: by 2002:a50:ee96:: with SMTP id f22mr8514490edr.243.1598341905753; 
- Tue, 25 Aug 2020 00:51:45 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1kATkV-00038l-AE
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 03:52:07 -0400
+Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:34378
+ helo=mail.default.ilande.uk0.bigv.io)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1kATkT-0004LI-8W
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 03:52:07 -0400
+Received: from host217-42-19-185.range217-42.btcentralplus.com
+ ([217.42.19.185] helo=[192.168.1.65])
+ by mail.default.ilande.uk0.bigv.io with esmtpsa
+ (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
+ (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1kATkq-0004bf-Pl; Tue, 25 Aug 2020 08:52:33 +0100
+To: Gerd Hoffmann <kraxel@redhat.com>
+References: <d3adbbd0-fb9e-7f7f-8eaf-857c1d14d233@ilande.co.uk>
+ <20200824113729.a3yfnllxep4kjfwc@sirius.home.kraxel.org>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
+ mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
+ 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
+ E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
+ PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
+ PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
+ AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
+ OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
+ NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
+ mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
+ z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
+ T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
+ DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
+ y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
+ 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
+ 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
+ YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
+ Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
+ BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
+ opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
+ NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
+ Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
+ KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
+ imgcU9TTGC5qd9g=
+Message-ID: <09b683be-0a13-00cc-9398-285385ea290d@ilande.co.uk>
+Date: Tue, 25 Aug 2020 08:51:58 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-References: <20200824155236.789635-1-brogers@suse.com>
-In-Reply-To: <20200824155236.789635-1-brogers@suse.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 25 Aug 2020 09:51:34 +0200
-Message-ID: <CABgObfYpyWT7GcUkiL46NqQtakyL8qcRVtD3g0=Xc=n684npNg@mail.gmail.com>
-Subject: Re: [PATCH] meson: Fix chardev-baum.so name
-To: Bruce Rogers <brogers@suse.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0.0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/alternative; boundary="00000000000085bf9205adaef95d"
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/25 02:05:08
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.956,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+In-Reply-To: <20200824113729.a3yfnllxep4kjfwc@sirius.home.kraxel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 217.42.19.185
+X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
+Subject: Re: meson: problems building under msys2/mingw-w64 native
+X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
+X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
+Received-SPF: pass client-ip=2001:41c9:1:41f::167;
+ envelope-from=mark.cave-ayland@ilande.co.uk;
+ helo=mail.default.ilande.uk0.bigv.io
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-2.25,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -105,85 +103,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000085bf9205adaef95d
-Content-Type: text/plain; charset="UTF-8"
+On 24/08/2020 12:37, Gerd Hoffmann wrote:
 
-Queued, thanks.
+>> 2) GTK UI now depends on CONFIG_VTE
+>>
+>> This one I spotted on my local Linux setup as I didn't have the libvte-dev package
+>> installed and couldn't understand why I couldn't run QEMU with the GTK UI as I always
+>> do, even though configure reported that it found the GTK library and headers.
+>>
+>> A quick search showed that the GTK UI was being guarded by "if
+>> config_host.has_key('CONFIG_GTK') and config_host.has_key('CONFIG_VTE')" in
+>> ui/meson.build.
+> 
+> That is not correct.  vte is intentionally not a hard dependency ...
+> 
+>> For me the easy solution was to install libvte-dev, but since there are no VTE
+>> packages for Windows my guess is this will now make the GTK UI unavailable for
+>> Windows users.
+> 
+> .. because we don't have that on windows.
+> 
+> I think simply dropping the "and config_host.has_key('CONFIG_VTE')"
+> should work, can you try that?
 
-Paolo
+Hi Gerd,
 
-Il lun 24 ago 2020, 17:52 Bruce Rogers <brogers@suse.com> ha scritto:
+I can't get the native Windows build to complete yet, however I've removed the
+libvte-dev headers again on my Linux setup and confirmed that GTK works once again
+with the below diff:
 
-> Somehow in the conversion to meson, the module named chardev-baum got
-> renamed to chardev-brlapi. Change it back.
->
-> Signed-off-by: Bruce Rogers <brogers@suse.com>
-> ---
->  chardev/meson.build | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/chardev/meson.build b/chardev/meson.build
-> index a46a6237be..7726837e34 100644
-> --- a/chardev/meson.build
-> +++ b/chardev/meson.build
-> @@ -39,7 +39,7 @@ chardev_modules = {}
->  if config_host.has_key('CONFIG_BRLAPI') and sdl.found()
->    module_ss = ss.source_set()
->    module_ss.add(when: [sdl, brlapi], if_true: files('baum.c'))
-> -  chardev_modules += { 'brlapi': module_ss }
-> +  chardev_modules += { 'baum': module_ss }
->  endif
->
->  modules += { 'chardev': chardev_modules }
-> --
-> 2.28.0
->
->
+diff --git a/ui/meson.build b/ui/meson.build
+index 81fd393432..cc71f51f37 100644
+--- a/ui/meson.build
++++ b/ui/meson.build
+@@ -42,7 +42,7 @@ if config_host.has_key('CONFIG_CURSES')
+   ui_modules += {'curses' : curses_ss}
+ endif
 
---00000000000085bf9205adaef95d
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+-if config_host.has_key('CONFIG_GTK') and config_host.has_key('CONFIG_VTE')
++if config_host.has_key('CONFIG_GTK')
+   softmmu_ss.add(when: 'CONFIG_WIN32', if_true: files('win32-kbd-hook.c'))
 
-<div dir=3D"auto"><span style=3D"font-family:sans-serif">Queued, thanks.</s=
-pan><div dir=3D"auto" style=3D"font-family:sans-serif"><br></div><div dir=
-=3D"auto" style=3D"font-family:sans-serif">Paolo</div></div><br><div class=
-=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">Il lun 24 ago 2020, =
-17:52 Bruce Rogers &lt;<a href=3D"mailto:brogers@suse.com">brogers@suse.com=
-</a>&gt; ha scritto:<br></div><blockquote class=3D"gmail_quote" style=3D"ma=
-rgin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">Somehow in the=
- conversion to meson, the module named chardev-baum got<br>
-renamed to chardev-brlapi. Change it back.<br>
-<br>
-Signed-off-by: Bruce Rogers &lt;<a href=3D"mailto:brogers@suse.com" target=
-=3D"_blank" rel=3D"noreferrer">brogers@suse.com</a>&gt;<br>
----<br>
-=C2=A0chardev/meson.build | 2 +-<br>
-=C2=A01 file changed, 1 insertion(+), 1 deletion(-)<br>
-<br>
-diff --git a/chardev/meson.build b/chardev/meson.build<br>
-index a46a6237be..7726837e34 100644<br>
---- a/chardev/meson.build<br>
-+++ b/chardev/meson.build<br>
-@@ -39,7 +39,7 @@ chardev_modules =3D {}<br>
-=C2=A0if config_host.has_key(&#39;CONFIG_BRLAPI&#39;) and sdl.found()<br>
-=C2=A0 =C2=A0module_ss =3D ss.source_set()<br>
-=C2=A0 =C2=A0module_ss.add(when: [sdl, brlapi], if_true: files(&#39;baum.c&=
-#39;))<br>
--=C2=A0 chardev_modules +=3D { &#39;brlapi&#39;: module_ss }<br>
-+=C2=A0 chardev_modules +=3D { &#39;baum&#39;: module_ss }<br>
-=C2=A0endif<br>
-<br>
-=C2=A0modules +=3D { &#39;chardev&#39;: chardev_modules }<br>
--- <br>
-2.28.0<br>
-<br>
-</blockquote></div>
+   gtk_ss = ss.source_set()
 
---00000000000085bf9205adaef95d--
 
+ATB,
+
+Mark.
 
