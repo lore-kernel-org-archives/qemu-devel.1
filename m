@@ -7,80 +7,82 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50764C433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 10:08:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A163C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 10:10:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1B6602068E
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 10:08:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 150382068E
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 10:10:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nuviainc-com.20150623.gappssmtp.com header.i=@nuviainc-com.20150623.gappssmtp.com header.b="H+1jNWzE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B6602068E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nuviainc-com.20150623.gappssmtp.com header.i=@nuviainc-com.20150623.gappssmtp.com header.b="FoeZqrt3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 150382068E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nuviainc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33712 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36076 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAVsj-0007ca-AQ
-	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 06:08:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50518)
+	id 1kAVu3-0000Az-Cs
+	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 06:10:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50734)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <graeme@nuviainc.com>)
- id 1kAVs5-00072e-IB
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 06:08:05 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:52084)
+ id 1kAVtV-00085T-T7
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 06:09:33 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:55525)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <graeme@nuviainc.com>)
- id 1kAVs2-0003AU-GW
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 06:08:05 -0400
-Received: by mail-wm1-x344.google.com with SMTP id s20so1834052wmj.1
- for <qemu-devel@nongnu.org>; Tue, 25 Aug 2020 03:08:01 -0700 (PDT)
+ id 1kAVtS-0003GG-VR
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 06:09:33 -0400
+Received: by mail-wm1-x341.google.com with SMTP id a65so1793632wme.5
+ for <qemu-devel@nongnu.org>; Tue, 25 Aug 2020 03:09:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=nuviainc-com.20150623.gappssmtp.com; s=20150623;
  h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=tckjd+QUu/Bv2pA5Uamz22Rt64XOK+nD0dwnQuEvkmU=;
- b=H+1jNWzEreU1N+Ff12Q4HgwFBm/eHj+lwULnF3muv5UpK98uYM1nhUflWpYEk38RYs
- sdocDZN7dp8mzs/zDtY5J2KJ0uGyUbMy8IUq6j/Y+ZMkgZDgDuGZzGI8dqIMMFNnjDxv
- AjHIwkEdFnXyq+1GkpyI988MyaMJjVgKAb63k1ZjS8diLxs6tQIEk9YJcOl7FhJbZ620
- moTELh1uaKehEJsGrnyF0oV/xFK2usUnl21wWpP/SSJ3C4O8+13d48lFcz/VIlUd4mGX
- CM5oZ4AvnGPBQS1kKgoA6d9GywuR0u90+PBIqHN5cjYRNOREvWc8by4nB4kMgu6/jaeL
- PDDw==
+ :content-disposition:content-transfer-encoding:in-reply-to;
+ bh=SP/3NlgDxnUh6FWvjlFkhG+Ksa3o6IJOYxOy1Ajys6Y=;
+ b=FoeZqrt3fBfG3aVl/3VSWfyi8KQFSkTcakVbJsQ5RnUn548IiaqLrN86eGSFlxdXRg
+ 3STyhZC/kUvY/6uppXFt75mrH5Ge/bHqu3d9YBsH2j1z721kELbJSAEen4gdaDcF/Ql8
+ ynmnOu6jCT5r+rUIqyo9wxCNvyuLOEMhww2zJ5V4SM4v1exTwx4+8DfBBl2B0Nl1IcR8
+ 9qJw1Ntxh9jmm6eDtUVZL2D59cAXFlW6NwU5+6JFO9XaEsDwEfBL1JC/CF9970XqhKNT
+ DG54Hzmu3TbG3cEi22wZwbg7tqrFsRJAwRdRGNsHLZtZOMzT91IIUdAWU4WePn5qV4YI
+ pNNg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=tckjd+QUu/Bv2pA5Uamz22Rt64XOK+nD0dwnQuEvkmU=;
- b=dYwNH1A5ghu6qkbPXx9axrJ3wdOJbr7lSg/0Ma37fHRZn2leatlgQudtVplm6nkkwT
- YOQNRjmBa3QTASoioem8N9kQx9l9220FJspL+199YnGVPf4WTxhwgJdKRJ4dfQprooY5
- aLYwrEAbXlV1fyvnt4mlaA8cI/FTYhOfvuExF4xvWpvfFJbuOcegjG5JguOJ8VADp4Jh
- vg7n6XVIHIECybjOyKDFExXa+5Q0cbA7i5s1yj5NlPUQLOA6mVv+QjBf/twCMFd8HIaS
- IavdhQDvpSuPwMGFbXjvPC2ACzRtAngn8M3kZxrn10iX4rHpIWNiJHl2eyKNuuVxAudj
- Q5qA==
-X-Gm-Message-State: AOAM532+yj9AQKzq2kEF3gJLz3Ok0TAtC7b7l4VHD08oSG8Ev0h45dc+
- 2qTYka82cqp/ygFP8lJ/YIgR/Q==
-X-Google-Smtp-Source: ABdhPJzPDlgSJV0swikSU500A9/yNl6R1fLMzawEhJE7hGdaIia2n3BiAbaoXN9BEJPPu8Xs8Zc/dg==
-X-Received: by 2002:a1c:bac1:: with SMTP id k184mr1394300wmf.10.1598350080468; 
- Tue, 25 Aug 2020 03:08:00 -0700 (PDT)
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=SP/3NlgDxnUh6FWvjlFkhG+Ksa3o6IJOYxOy1Ajys6Y=;
+ b=mn8J2yOFHinxAxVyx8MHs/EvNzbqesoGegLZlQPaecYIxkkQ6oXbIU6LiyBpLyi1Oe
+ 4vzvPQii4mxrZKVxdvJe+5iKp67Fx8gsga8iHsgYhT5aT7x/TOXCFAkTUUZHsbTumtiV
+ iK+TFqEcIN/+Yed6skkUEchmobOI397/CIPsWQty6kJUYM3z7LyHs2gTh6r77fB8rIAu
+ FLAb6EwjndyIkeizaja+nu6Ys3bB6eXul/eUctAEFDT3EedIOAQXqohFE76cP3/row8/
+ Yh2OGwMdkcSiZeoW8c21U7a/Co48MwrbtqNYeEpXlbCxa2kscDU8k8LafuytQTMYgY44
+ M9aA==
+X-Gm-Message-State: AOAM5320KNed9WrTsroTGmOZ5NpAopkEdiJxWmMfuOS7BoeLiqpYzsLw
+ j7/YwCCqOBHjuDXZQ/UxCpQydQ==
+X-Google-Smtp-Source: ABdhPJzMC0T5udEPObCYrTqGmx6PVXrDTC+KJ70ZDDk0RINCl3crT6yJ9FYPoWYKR9obop/0s/sbqg==
+X-Received: by 2002:a1c:2045:: with SMTP id g66mr1258761wmg.184.1598350169469; 
+ Tue, 25 Aug 2020 03:09:29 -0700 (PDT)
 Received: from xora-monster ([2a02:8010:64d6::1d89])
- by smtp.gmail.com with ESMTPSA id v16sm4971206wmj.14.2020.08.25.03.07.59
+ by smtp.gmail.com with ESMTPSA id 36sm9815278wrs.25.2020.08.25.03.09.28
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 25 Aug 2020 03:07:59 -0700 (PDT)
-Date: Tue, 25 Aug 2020 11:07:57 +0100
+ Tue, 25 Aug 2020 03:09:29 -0700 (PDT)
+Date: Tue, 25 Aug 2020 11:09:27 +0100
 From: Graeme Gregory <graeme@nuviainc.com>
-To: Peter Maydell <peter.maydell@linaro.org>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Subject: Re: [EXTERNAL] Re: [PATCH] hw/arm/sbsa-ref.c : Add a fake embedded
  controller
-Message-ID: <20200825100757.r54ba26kmavntqrb@xora-monster>
+Message-ID: <20200825100927.56qnpaoq57juwmcc@xora-monster>
 References: <20200820133201.80577-1-graeme@nuviainc.com>
- <CAFEAcA_9WRk0Dr97wpDHacsjy2qpmBBq=kp6hOQTvUOvpWF0zw@mail.gmail.com>
+ <6dd097d4-bae0-d629-7f4c-398f74f9a0e9@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <CAFEAcA_9WRk0Dr97wpDHacsjy2qpmBBq=kp6hOQTvUOvpWF0zw@mail.gmail.com>
-Received-SPF: pass client-ip=2a00:1450:4864:20::344;
- envelope-from=graeme@nuviainc.com; helo=mail-wm1-x344.google.com
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <6dd097d4-bae0-d629-7f4c-398f74f9a0e9@amsat.org>
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=graeme@nuviainc.com; helo=mail-wm1-x341.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -18
@@ -101,28 +103,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Leif Lindholm <leif@nuviainc.com>, qemu-arm <qemu-arm@nongnu.org>,
- QEMU Developers <qemu-devel@nongnu.org>, rad@semihalf.com
+Cc: peter.maydell@linaro.org, rad@semihalf.com, qemu-devel@nongnu.org,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-arm@nongnu.org,
+ leif@nuviainc.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Aug 24, 2020 at 03:59:38PM +0100, Peter Maydell wrote:
-> On Thu, 20 Aug 2020 at 14:32, Graeme Gregory <graeme@nuviainc.com> wrote:
-> >
+On Fri, Aug 21, 2020 at 03:49:11PM +0200, Philippe Mathieu-Daudé wrote:
+> On 8/20/20 3:32 PM, Graeme Gregory wrote:
 > > A difference between sbsa platform and the virt platform is PSCI is
 > > handled by ARM-TF in the sbsa platform. This means that the PSCI code
 > > there needs to communicate some of the platform power changes down
 > > to the qemu code for things like shutdown/reset control.
-> >
+> 
+> No need to explicit 'fake' in patch subject, almost all emulated
+> devices are fake.
+> 
+Noted, will change.
+
+> > 
 > > Space has been left to extend the EC if we find other use cases in
 > > future where ARM-TF and qemu need to communicate.
-> >
+> > 
 > > Signed-off-by: Graeme Gregory <graeme@nuviainc.com>
 > > ---
 > >  hw/arm/sbsa-ref.c | 95 +++++++++++++++++++++++++++++++++++++++++++++++
 > >  1 file changed, 95 insertions(+)
-> >
+> > 
 > > diff --git a/hw/arm/sbsa-ref.c b/hw/arm/sbsa-ref.c
 > > index f030a416fd..c8743fc1d0 100644
 > > --- a/hw/arm/sbsa-ref.c
@@ -132,7 +140,7 @@ On Mon, Aug 24, 2020 at 03:59:38PM +0100, Peter Maydell wrote:
 > >  #include "hw/char/pl011.h"
 > >  #include "net/net.h"
 > > +#include "migration/vmstate.h"
-> >
+> >  
 > >  #define RAMLIMIT_GB 8192
 > >  #define RAMLIMIT_BYTES (RAMLIMIT_GB * GiB)
 > > @@ -62,6 +63,7 @@ enum {
@@ -146,32 +154,36 @@ On Mon, Aug 24, 2020 at 03:59:38PM +0100, Peter Maydell wrote:
 > > @@ -98,6 +100,14 @@ typedef struct {
 > >  #define SBSA_MACHINE(obj) \
 > >      OBJECT_CHECK(SBSAMachineState, (obj), TYPE_SBSA_MACHINE)
-> >
+> >  
 > > +typedef struct {
 > > +    SysBusDevice parent_obj;
 > > +    MemoryRegion iomem;
 > > +} SECUREECState;
-> 
-> Could you put the definition of the device in its own .c file,
-> please (hw/misc/ seems like the right place). We generally
-> prefer to keep the board and individual device models
-> separate. (Some older code in the tree still has devices
-> lurking in source files, but new stuff generally follows
-> the rules.)
-> 
-Yes, certainly!
-
+> > +
+> > +#define TYPE_SECURE_EC      "sbsa-secure-ec"
+> > +#define SECURE_EC(obj) OBJECT_CHECK(SECUREECState, (obj), TYPE_SECURE_EC)
+> > +
+> >  static const MemMapEntry sbsa_ref_memmap[] = {
+> >      /* 512M boot ROM */
+> >      [SBSA_FLASH] =              {          0, 0x20000000 },
+> > @@ -107,6 +117,7 @@ static const MemMapEntry sbsa_ref_memmap[] = {
+> >      [SBSA_CPUPERIPHS] =         { 0x40000000, 0x00040000 },
+> >      [SBSA_GIC_DIST] =           { 0x40060000, 0x00010000 },
+> >      [SBSA_GIC_REDIST] =         { 0x40080000, 0x04000000 },
+> > +    [SBSA_SECURE_EC] =          { 0x50000000, 0x00001000 },
+> >      [SBSA_UART] =               { 0x60000000, 0x00001000 },
+> >      [SBSA_RTC] =                { 0x60010000, 0x00001000 },
+> >      [SBSA_GPIO] =               { 0x60020000, 0x00001000 },
+> > @@ -585,6 +596,65 @@ static void *sbsa_ref_dtb(const struct arm_boot_info *binfo, int *fdt_size)
+> >      return board->fdt;
+> >  }
+> >  
 > > +enum sbsa_secure_ec_powerstates {
 > > +    SBSA_SECURE_EC_CMD_NULL,
 > > +    SBSA_SECURE_EC_CMD_POWEROFF,
 > > +    SBSA_SECURE_EC_CMD_REBOOT,
-> 
-> The last two are clear enough, but what's a null power state for?
-> 
-My personal dislike of sending 0 to hardware as its harder to spot
-when using scopes/logic analyzers. I can remove it if you wish and
-explicitly number the states.
-
+> > +};
+> > +
 > > +static uint64_t secure_ec_read(void *opaque, hwaddr offset, unsigned size)
 > > +{
 > > +    /* No use for this currently */
@@ -193,22 +205,9 @@ explicitly number the states.
 > > +            break;
 > > +        default:
 > > +            error_report("sbsa-ref: ERROR Unkown power command");
-> 
-> "unknown".
-> 
-> We prefer qemu_log_mask(LOG_GUEST_ERROR, ...) for logging this
-> kind of "guest code did something wrong" situation.
-> (you could also do that for attempting to read this w/o register
-> if you liked).
-> 
-Excellent that is much better, Ill make that change.
-
 > > +        }
 > > +    } else {
 > > +        error_report("sbsa-ref: unknown EC register");
-> 
-> similarly here
-> 
 > > +    }
 > > +}
 > > +
@@ -216,14 +215,6 @@ Excellent that is much better, Ill make that change.
 > > +    .read = secure_ec_read,
 > > +    .write = secure_ec_write,
 > > +    .endianness = DEVICE_NATIVE_ENDIAN,
-> 
-> Consider explicitly specifying the permitted access size
-> by setting .valid.min_access_size and .valid.max_access_size
-> (restricting guests to only doing 32-bit writes will make
-> life easier when you come to add registers later...)
-> 
-That was my original intent so i will do this.
-
 > > +};
 > > +
 > > +static void secure_ec_init(Object *obj)
@@ -233,11 +224,6 @@ That was my original intent so i will do this.
 > > +
 > > +    memory_region_init_io(&s->iomem, obj, &secure_ec_ops, s, "secure-ec",
 > > +                            0x1000);
-> 
-> Minor indent error here.
-> 
-Will fix, just FYI checkpatch does not pick this up currently.
-
 > > +    sysbus_init_mmio(dev, &s->iomem);
 > > +}
 > > +
@@ -245,6 +231,13 @@ Will fix, just FYI checkpatch does not pick this up currently.
 > > +{
 > > +    hwaddr base = sbsa_ref_memmap[SBSA_SECURE_EC].base;
 > > +    DeviceState *dev = qdev_create(NULL, TYPE_SECURE_EC);
+> 
+> This API has been removed in 2194abd6231 ("qdev: qdev_create(),
+> qdev_try_create() are now unused, drop"), can you rebase please?
+> 
+Yes, I accidently sent from a work branch not top of tree, noticed
+1ms after sending!
+
 > > +    SysBusDevice *s = SYS_BUS_DEVICE(dev);
 > > +
 > > +    memory_region_add_subregion(mem, base,
@@ -255,9 +248,9 @@ Will fix, just FYI checkpatch does not pick this up currently.
 > >  {
 > >      unsigned int smp_cpus = machine->smp.cpus;
 > > @@ -708,6 +778,8 @@ static void sbsa_ref_init(MachineState *machine)
-> >
+> >  
 > >      create_pcie(sms);
-> >
+> >  
 > > +    create_secure_ec(secure_sysmem);
 > > +
 > >      sms->bootinfo.ram_size = machine->ram_size;
@@ -266,21 +259,50 @@ Will fix, just FYI checkpatch does not pick this up currently.
 > > @@ -798,8 +870,31 @@ static const TypeInfo sbsa_ref_info = {
 > >      .instance_size = sizeof(SBSAMachineState),
 > >  };
-> >
+> >  
 > > +static const VMStateDescription vmstate_secure_ec_info = {
 > > +    .name = "sbsa-secure-ec",
 > > +    .version_id = 0,
 > > +    .minimum_version_id = 0,
-> > +};
 > 
-> If you don't have any internal state in a device (as in
-> this case), then you don't need to set dc->vmsd at all.
-> Just have a comment in the class init saying
->     /* No vmstate or reset required: device has no internal state */
+> I'm think you need to initialize that, but VMStateDescription
+> is not my cup of tea, so better wait for confirmation by someone
+> more confident with it.
 > 
-Thanks, that is cleaner, Ill do this.
+>     .fields = (VMStateField[]) {
+>         VMSTATE_END_OF_LIST()
+>     }
+> 
+Peter answered this so Ill implement how he suggested without vmstate.
 
-Thanks for the review, Ill get right on v2.
+> > +};
+> > +
+> > +static void secure_ec_class_init(ObjectClass *klass, void *data)
+> > +{
+> > +    DeviceClass *dc = DEVICE_CLASS(klass);
+> > +
+> > +    dc->vmsd = &vmstate_secure_ec_info;
+> > +    dc->user_creatable = false;
+> > +}
+> > +
+> > +static const TypeInfo secure_ec_info = {
+> > +    .name          = TYPE_SECURE_EC,
+> > +    .parent        = TYPE_SYS_BUS_DEVICE,
+> > +    .instance_size = sizeof(SECUREECState),
+> > +    .instance_init = secure_ec_init,
+> > +    .class_init    = secure_ec_class_init,
+> > +};
+> > +
+> >  static void sbsa_ref_machine_init(void)
+> >  {
+> > +    type_register_static(&secure_ec_info);
+> >      type_register_static(&sbsa_ref_info);
+> >  }
+> >  
+> > 
+> 
+
+Thanks for the review.
 
 Graeme
 
