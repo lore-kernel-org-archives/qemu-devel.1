@@ -2,91 +2,93 @@ Return-Path: <SRS0=2GMi=CD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84B9EC433E3
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 15:19:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA40BC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 15:20:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 53B1220786
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 15:19:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6648E20786
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 15:20:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="urgY6okH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53B1220786
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q93Za6B0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6648E20786
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54872 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59188 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAajB-0007Nq-LV
-	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 11:19:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59340)
+	id 1kAako-0000qr-MN
+	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 11:20:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59698)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kAaiS-0006pd-CP
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 11:18:28 -0400
-Received: from mail-ed1-x541.google.com ([2a00:1450:4864:20::541]:45962)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kAaiP-0005Nw-U0
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 11:18:27 -0400
-Received: by mail-ed1-x541.google.com with SMTP id di22so11558885edb.12
- for <qemu-devel@nongnu.org>; Tue, 25 Aug 2020 08:18:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=GD8vABY/m9QvuX/7MfAI9rjpW0f+q+G1T72CQzvCM8o=;
- b=urgY6okHsz2cfxzlbzzCT+Bw93aKTAZ0X3EBVvqULrDq1WiqGUCwzbBoyaaYPE+dLG
- FU5vMaxEaHYrPyum2wrOm82SMpl3+3wlvw0UI1SOuWbVhG2nE5zQOcSmeAcTNjn1Rn6n
- hwoqjKnVuP7bRJ0K0RxXBXFG40sEJFcYkSQaniwNX67+mHXuldztVeCAXNL7BiUzToTU
- HxIdlgseSurPztsWr1lvQpl8HBmPFy3Yx8NKLsESIKdk4FpYABCyO6Wxsi1bUo6nLnjR
- 6OiyftW5SyhEtSvddDs/LBy+YNZeSXDRtflNKyVwtJs5OezWDXKbEhw1oIGHLV5NSfPA
- L4Eg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=GD8vABY/m9QvuX/7MfAI9rjpW0f+q+G1T72CQzvCM8o=;
- b=spgpxXJDvxJ22O4aJAoGVD3w1UFBxd1rvnlLQfAQ3Jo9gR9aWY/eejEuAcvYSP1TPg
- YDnMFAAErOqqErgTDQUp3WbFPOULL/zGLQl+iX1FfTZ9ia0Iylm0yKn5ukD9CZFLElEx
- C+Ml0c+YYFmpy/SljlESO0vkgPW9P6v7eF03AatnL60GNusqko5fU4zJXd6ig+gcPPp7
- R68iDnj7sGNj/QsjkpU1aCuPWs1M/KwqgDtkzf0/oCMzvi/ntE9h6HF21oJWCkVT4N/V
- Uu42TRH/GBEocVlxGDlZ76WAYGtrn1udNf3Y+yUHj4ImH9F6YIiQuf/RA3HSnPwrWwwZ
- vfgw==
-X-Gm-Message-State: AOAM532zWHQbEQMg/IST5WMVGyfp+CYUcKlZwI4Clk+0NnfUPQMs0Wdj
- eqN7lhDpdIF5DgIXuKS/ka06z1OXBZnS5/d3gf2SAg==
-X-Google-Smtp-Source: ABdhPJyPuPeysCp5Aqf2265KN/87DiXoj8GetMQdRf9U2J/CYukzyYmUyC9zFLZzOgqmac0qwkB8id/8wfMrAWz4Di4=
-X-Received: by 2002:a50:8f45:: with SMTP id 63mr11051082edy.52.1598368704299; 
- Tue, 25 Aug 2020 08:18:24 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kAajy-0008IK-Bj
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 11:20:02 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28801)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kAajw-0005WT-Mf
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 11:20:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1598368800;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=se9sO8jreycLljbjBwbC7pWldI4+TZFGLNc6Y00EnPw=;
+ b=Q93Za6B0zFO/a4qjrOrsE/GjwIK6hpLR7aT3Z6j9mEFtmpcoi7e3rOO9KLFugcwm5RkBpw
+ +y8o7SY0TR2odP8ZgeAEBit0DO5B6cuwrRbvlcTZf/fn3ao34832W/GDTDHbVNyskZIsa8
+ kk4qLQFVM+/lvPK8aNGYxePNTca12z4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-575-f6OcYccqMiSp2ShVVdJYxQ-1; Tue, 25 Aug 2020 11:19:56 -0400
+X-MC-Unique: f6OcYccqMiSp2ShVVdJYxQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1D45A10ABDCE;
+ Tue, 25 Aug 2020 15:19:55 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-74.ams2.redhat.com
+ [10.36.112.74])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E05485D9CA;
+ Tue, 25 Aug 2020 15:19:54 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 936E3112D737; Tue, 25 Aug 2020 17:19:53 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Daniel P. =?utf-8?Q?Berrang=C3=A9?= <berrange@redhat.com>
+Subject: Re: [PATCH v4 5/6] util: give a specific error message when O_DIRECT
+ doesn't work
+References: <20200821172105.608752-1-berrange@redhat.com>
+ <20200821172105.608752-6-berrange@redhat.com>
+Date: Tue, 25 Aug 2020 17:19:53 +0200
+In-Reply-To: <20200821172105.608752-6-berrange@redhat.com> ("Daniel
+ P. =?utf-8?Q?Berrang=C3=A9=22's?= message of "Fri, 21 Aug 2020 18:21:04
+ +0100")
+Message-ID: <87o8mybvmu.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-References: <20200819100956.2216690-1-clg@kaod.org>
- <20200819100956.2216690-6-clg@kaod.org>
- <CAFEAcA_GwY5qqLFYcttobLRnt_b=HoMNHMXEZrDHyRZJ4mjGug@mail.gmail.com>
- <CA+MHfou4eE3wYCMv4ojLSnnUeffKy73V6FhpaBC551bsfkqa+A@mail.gmail.com>
-In-Reply-To: <CA+MHfou4eE3wYCMv4ojLSnnUeffKy73V6FhpaBC551bsfkqa+A@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 25 Aug 2020 16:18:13 +0100
-Message-ID: <CAFEAcA9e=wbzXD8-Fim7JE4etNc0kmB5_Uuh7=q3tUa0vmk__w@mail.gmail.com>
-Subject: Re: [PATCH v2 05/21] hw/arm/aspeed: Add board model for Supermicro
- X11 BMC
-To: Erik Smit <erik.lucas.smit@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::541;
- envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x541.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- T_FILL_THIS_FORM_SHORT=0.01 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=armbru@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/25 02:03:58
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.958,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,39 +101,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jeffery <andrew@aj.id.au>, QEMU Developers <qemu-devel@nongnu.org>,
- qemu-arm <qemu-arm@nongnu.org>,
- =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
- Joel Stanley <joel@jms.id.au>
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 25 Aug 2020 at 15:37, Erik Smit <erik.lucas.smit@gmail.com> wrote:
-> On Tue, Aug 25, 2020, 4:33 PM Peter Maydell <peter.maydell@linaro.org> wr=
-ote:
->>
->> On Wed, 19 Aug 2020 at 11:10, C=C3=A9dric Le Goater <clg@kaod.org> wrote=
-:
->> >
->> > From: erik-smit <erik.lucas.smit@gmail.com>
->> >
->> > The BMC Firmware can be downloaded from :
->> >
->> >   https://www.supermicro.com/en/products/motherboard/X11SSL-F
->> >
->> > Signed-off-by: erik-smit <erik.lucas.smit@gmail.com>
->>
->> Should the name in the From and Signed-off-by: here be
->> "Erik Smit" rather than "erik-smit" ?
+Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
+
+> A common error scenario is to tell QEMU to use O_DIRECT in combination
+> with a filesystem that doesn't support it. To aid users to diagnosing
+> their mistake we want to provide a clear error message when this happens.
 >
-> I don't know if it matters. I'm fine with either.
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> ---
+>  util/osdep.c | 13 +++++++++++++
+>  1 file changed, 13 insertions(+)
+>
+> diff --git a/util/osdep.c b/util/osdep.c
+> index a4956fbf6b..6c24985f7a 100644
+> --- a/util/osdep.c
+> +++ b/util/osdep.c
+> @@ -345,6 +345,19 @@ qemu_open_internal(const char *name, int flags, mode=
+_t mode, Error **errp)
+> =20
+>      if (ret =3D=3D -1) {
+>          const char *action =3D flags & O_CREAT ? "create" : "open";
+> +#ifdef O_DIRECT
+> +        if (errno =3D=3D EINVAL && (flags & O_DIRECT)) {
+> +            ret =3D open(name, flags & ~O_DIRECT, mode);
+> +            if (ret !=3D -1) {
+> +                close(ret);
+> +                error_setg(errp, "Could not %s '%s' flags 0x%x: "
+> +                           "filesystem does not support O_DIRECT",
+> +                           action, name, flags);
+> +                errno =3D EINVAL; /* close() clobbered earlier errno */
 
-It's supposed to be "your real name" (ie not a pseudonym,
-email address or username); obviously for some people that
-really is a single word or all-lower-case, but I usually
-check because separate-words-with-caps is the more common.
+More precise: close() may have clobbered
 
-thanks
--- PMM
+Sure open() can only fail with EINVAL here?
+
+> +                return -1;
+> +            }
+> +        }
+> +#endif /* O_DIRECT */
+>          error_setg_errno(errp, errno, "Could not %s '%s' flags 0x%x",
+>                           action, name, flags);
+>      }
+
+There is no qemu_set_cloexec().  Intentional?
+
 
