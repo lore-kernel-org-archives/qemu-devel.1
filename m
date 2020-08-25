@@ -2,99 +2,87 @@ Return-Path: <SRS0=2GMi=CD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C06FC433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 19:22:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 247ADC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 19:22:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 06CFC2071E
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 19:22:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EE9B22071E
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 19:22:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jrOlbpJB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06CFC2071E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eoDBhvnZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE9B22071E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58356 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58730 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAeWR-0007v0-7g
-	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 15:22:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39078)
+	id 1kAeWU-00085D-8M
+	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 15:22:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39158)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kAeVN-0005yK-86
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 15:21:13 -0400
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:40342)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kAeVL-000609-Mr
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 15:21:12 -0400
-Received: by mail-pg1-x544.google.com with SMTP id h12so7506370pgm.7
- for <qemu-devel@nongnu.org>; Tue, 25 Aug 2020 12:21:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:references:from:message-id:date:user-agent:mime-version
- :in-reply-to:content-language:content-transfer-encoding;
- bh=ZcOtDISNju5VANZIDXq3Afvny9xaiP4LvHS7gNWmCK8=;
- b=jrOlbpJBoH84haagiXAR1X5LpDriUG9l2ako7Ga3gL8K+GcaHmbGipee2mwdxTIEkP
- yzSEN6OJj/CjkSOZxC5OM9PsQZgU+k41L5K/DvokO70UAm+AsxYVYv4cb+AX1V5sRbti
- +F202gC0kGM6/cWYe/8KmKOM/hIeKiPaF0UDnmGvF3GCpmyrqRu0vXY2FI17d/ioGl55
- FLasSXprJ5IEtXDkTV9oRfaF39+ZLo0/61IsmeonTzfeldafTduDgbqN07FnwEjgIRdu
- oubm8td3hFyeOkrzMaHAmx4nTk/g1mSbys7Vk9S4cRYEpVrc9iOcY6ryjGF/TPrgKuSF
- Gc9Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=ZcOtDISNju5VANZIDXq3Afvny9xaiP4LvHS7gNWmCK8=;
- b=fYH7hN5ihpIL2VLt88uxeg/vXx6Rck3vznIcaWaIac4xDCrOBtKEb7MHa6DKcTSsQ8
- lILOvW5USjYUNPYxZefGDi5pIFUvVIxo41oTFthdYNv+PUab5IbrSWOtd++YIfwEg4us
- PxbcoB2/CuOsABcKXSG/Xv5V7j+DyqhnIRaJxbBpZSA2CBYFQ4xoX8kek+BCXu3BF//v
- dlAql6VtPaLkR4cEts7PaIHDRzuGmBEuH6H+VaKNcBpknQcqYzUAzyoSzuFXnXYllCmb
- EHYnwr20uskIZ7s8DOHNwIf0iTU2TSXReW0MOKxCSEtW7Ey5mX11EbsZWh3z0jxvi7uk
- A35A==
-X-Gm-Message-State: AOAM532Q3bNzdWwBca+QS6vBxzuIaNOgeUwVJ67KNYX7ysy276jiwx9O
- aa1mblratPM3vTv3SMyJK6YayAtZbAzZVA==
-X-Google-Smtp-Source: ABdhPJzBXooN/icF+lpnpq4hE8/NTI+e2o5BkYG8lJwbYv3gkXZ8EoZ+d+5tRHL0w+pQC8XoN/zmjg==
-X-Received: by 2002:a17:902:121:: with SMTP id
- 30mr9062086plb.205.1598383270104; 
- Tue, 25 Aug 2020 12:21:10 -0700 (PDT)
-Received: from [192.168.81.79]
- (h216-228-167-147.bendor.dedicated.static.tds.net. [216.228.167.147])
- by smtp.gmail.com with ESMTPSA id r28sm15303418pfg.158.2020.08.25.12.21.09
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 25 Aug 2020 12:21:09 -0700 (PDT)
-Subject: Re: [PATCH 18/22] target/arm: Implement VFP fp16 VRINT*
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org
-References: <20200824142934.20850-1-peter.maydell@linaro.org>
- <20200824142934.20850-19-peter.maydell@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <b909d0b5-003f-dc41-9c15-3fead63b684f@linaro.org>
-Date: Tue, 25 Aug 2020 12:21:07 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kAeVZ-0006JU-9D
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 15:21:25 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28698)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kAeVX-00061L-Dl
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 15:21:24 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1598383282;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=UFVSPpKNsJ4GtROn1SjP6U6WtnAWBNC+GV8OVQyPMUs=;
+ b=eoDBhvnZFeU55COfU6SKSegoFw1Ll2CqMwIDn5c90y49zmb2wRL+LxAtaWgyHrObBOqS6g
+ 1swKiR4Tnwa8I0mdACVymUAuDqaQ88vrHejrnj5+uSGb7SD9Kr9xId0sbGia6v+UsUQF1Q
+ Ev6NXiaYlFqYCM94bDiMQtYulADXALY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-511-3emnBBR3Ma-j_634wDHCyA-1; Tue, 25 Aug 2020 15:21:20 -0400
+X-MC-Unique: 3emnBBR3Ma-j_634wDHCyA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2C57D3FD1;
+ Tue, 25 Aug 2020 19:21:19 +0000 (UTC)
+Received: from localhost (unknown [10.10.67.254])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DAEC319C58;
+ Tue, 25 Aug 2020 19:21:18 +0000 (UTC)
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 02/74] megasas: Rename QOM class cast macros
+Date: Tue, 25 Aug 2020 15:19:58 -0400
+Message-Id: <20200825192110.3528606-3-ehabkost@redhat.com>
+In-Reply-To: <20200825192110.3528606-1-ehabkost@redhat.com>
+References: <20200825192110.3528606-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200824142934.20850-19-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::544;
- envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x544.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -46
-X-Spam_score: -4.7
-X-Spam_bar: ----
-X-Spam_report: (-4.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-2.602,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=ehabkost@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/25 02:03:58
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.958,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,25 +95,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Fam Zheng <fam@euphon.net>, Paolo Bonzini <pbonzini@redhat.com>,
+ Hannes Reinecke <hare@suse.com>, "Daniel P. Berrange" <berrange@redhat.com>,
+ qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/24/20 7:29 AM, Peter Maydell wrote:
-> Implement the fp16 version of the VFP VRINT* insns.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  target/arm/helper.h            |  2 +
->  target/arm/vfp-uncond.decode   |  6 ++-
->  target/arm/vfp.decode          |  3 ++
->  target/arm/vfp_helper.c        | 21 ++++++++
->  target/arm/translate-vfp.c.inc | 98 +++++++++++++++++++++++++++++++---
->  5 files changed, 122 insertions(+), 8 deletions(-)
+Rename the MEGASAS_DEVICE_CLASS() and MEGASAS_DEVICE_GET_CLASS()
+macros to be consistent with the MEGASAS() instance cast macro.
 
-Same comments re the helper types.  Otherwise,
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+This will allow us to register the type cast macros using
+OBJECT_DECLARE_TYPE later.
 
+Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+---
+Changes v2 -> v3: none
 
-r~
+Changes v1 -> v2: none
+
+---
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org
+---
+ hw/scsi/megasas.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/hw/scsi/megasas.c b/hw/scsi/megasas.c
+index 5cfd1bf22e..390c2f2edb 100644
+--- a/hw/scsi/megasas.c
++++ b/hw/scsi/megasas.c
+@@ -134,9 +134,9 @@ typedef struct MegasasBaseClass {
+ #define MEGASAS(obj) \
+     OBJECT_CHECK(MegasasState, (obj), TYPE_MEGASAS_BASE)
+ 
+-#define MEGASAS_DEVICE_CLASS(oc) \
++#define MEGASAS_CLASS(oc) \
+     OBJECT_CLASS_CHECK(MegasasBaseClass, (oc), TYPE_MEGASAS_BASE)
+-#define MEGASAS_DEVICE_GET_CLASS(oc) \
++#define MEGASAS_GET_CLASS(oc) \
+     OBJECT_GET_CLASS(MegasasBaseClass, (oc), TYPE_MEGASAS_BASE)
+ 
+ #define MEGASAS_INTR_DISABLED_MASK 0xFFFFFFFF
+@@ -733,7 +733,7 @@ static int megasas_ctrl_get_info(MegasasState *s, MegasasCmd *cmd)
+ {
+     PCIDevice *pci_dev = PCI_DEVICE(s);
+     PCIDeviceClass *pci_class = PCI_DEVICE_GET_CLASS(pci_dev);
+-    MegasasBaseClass *base_class = MEGASAS_DEVICE_GET_CLASS(s);
++    MegasasBaseClass *base_class = MEGASAS_GET_CLASS(s);
+     struct mfi_ctrl_info info;
+     size_t dcmd_size = sizeof(info);
+     BusChild *kid;
+@@ -1999,7 +1999,7 @@ static uint64_t megasas_mmio_read(void *opaque, hwaddr addr,
+ {
+     MegasasState *s = opaque;
+     PCIDevice *pci_dev = PCI_DEVICE(s);
+-    MegasasBaseClass *base_class = MEGASAS_DEVICE_GET_CLASS(s);
++    MegasasBaseClass *base_class = MEGASAS_GET_CLASS(s);
+     uint32_t retval = 0;
+ 
+     switch (addr) {
+@@ -2322,7 +2322,7 @@ static const struct SCSIBusInfo megasas_scsi_info = {
+ static void megasas_scsi_realize(PCIDevice *dev, Error **errp)
+ {
+     MegasasState *s = MEGASAS(dev);
+-    MegasasBaseClass *b = MEGASAS_DEVICE_GET_CLASS(s);
++    MegasasBaseClass *b = MEGASAS_GET_CLASS(s);
+     uint8_t *pci_conf;
+     int i, bar_type;
+     Error *err = NULL;
+@@ -2506,7 +2506,7 @@ static void megasas_class_init(ObjectClass *oc, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(oc);
+     PCIDeviceClass *pc = PCI_DEVICE_CLASS(oc);
+-    MegasasBaseClass *e = MEGASAS_DEVICE_CLASS(oc);
++    MegasasBaseClass *e = MEGASAS_CLASS(oc);
+     const MegasasInfo *info = data;
+ 
+     pc->realize = megasas_scsi_realize;
+-- 
+2.26.2
+
 
