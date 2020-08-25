@@ -7,45 +7,45 @@ X-Spam-Status: No, score=-12.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3FB5C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 11:19:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67146C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 11:19:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7893F20706
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 11:19:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3570C20706
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 11:19:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="JGPKiPy5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7893F20706
+	dkim=pass (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Y5No8DgF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3570C20706
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49806 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50712 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAWz4-0002iD-KW
-	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 07:19:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41896)
+	id 1kAWzC-00034t-By
+	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 07:19:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41872)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kAWwY-00075D-Mf; Tue, 25 Aug 2020 07:16:46 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:40573)
+ id 1kAWwU-00072f-HZ; Tue, 25 Aug 2020 07:16:43 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:52765)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kAWwV-00054x-Lp; Tue, 25 Aug 2020 07:16:45 -0400
+ id 1kAWwS-00054A-4Y; Tue, 25 Aug 2020 07:16:42 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 4BbRJl13vqz9sTY; Tue, 25 Aug 2020 21:16:37 +1000 (AEST)
+ id 4BbRJg4Tfkz9sTX; Tue, 25 Aug 2020 21:16:32 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1598354199;
- bh=4t5MAMMK6onGP/lGX+I5BpEIIRqMhE3LhB0EH21vbJk=;
+ d=gibson.dropbear.id.au; s=201602; t=1598354195;
+ bh=MrGE/TpCR1qUcgPMnE2s3PEkLpFlXx8qX3wKLCtJ45w=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=JGPKiPy5fQ9NqHxHTQZMbkxFLA2suYwNAb8gFG5Ax8QzE6MVTK6f37uyTuErNAY0s
- Qlji+AoeHDGznfxmt6VrTuAHt4jPva1JTtx93tl1gRzCVI8jFjcwlfxcZnmdD0uKJU
- nJzc6u45rA5886q2J3H1u/Q6rxV8J604GYRvN6lI=
+ b=Y5No8DgFqqvi880lFJ6YRdDHbMIDoyhKcPYH1iNseulbOVvar+EAwifti7xUwYrut
+ ljWznq4CUNODuCSuqavwIodAtNtDfYZKmUqCgRVSioAPOSBHTQ57TDbZt1s9TwtPNd
+ Cy/IM1+EomVqWYOVFxjUPC+DLpyg6WbZ0+7eL6z0=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: ehabkost@redhat.com
-Subject: [PATCH 3/3] spapr: Correct type for SPAPR_DRC_PCI
-Date: Tue, 25 Aug 2020 21:16:27 +1000
-Message-Id: <20200825111627.2007820-4-david@gibson.dropbear.id.au>
+Subject: [PATCH 1/3] adb: Correct class size on TYPE_ADB_DEVICE
+Date: Tue, 25 Aug 2020 21:16:25 +1000
+Message-Id: <20200825111627.2007820-2-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200825111627.2007820-1-david@gibson.dropbear.id.au>
 References: <20200825111627.2007820-1-david@gibson.dropbear.id.au>
@@ -79,28 +79,27 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-TYPE_SPAPR_DRC_PCI inherits from TYPE_SPAPR_DRC_PHYSICAL, so its checker
-macro should use the corresponding instance type.  We got away with it
-because we never actually used that checker macro.
+The TypeInfo incorrectly just lets the class size be inherited.  It won't
+actually break things, since the class is abstract, but we should get it
+right.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- include/hw/ppc/spapr_drc.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/input/adb.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/include/hw/ppc/spapr_drc.h b/include/hw/ppc/spapr_drc.h
-index 21af8deac1..baaaba3c1f 100644
---- a/include/hw/ppc/spapr_drc.h
-+++ b/include/hw/ppc/spapr_drc.h
-@@ -59,7 +59,7 @@
-         OBJECT_GET_CLASS(SpaprDrcClass, obj, TYPE_SPAPR_DRC_PCI)
- #define SPAPR_DRC_PCI_CLASS(klass) \
-         OBJECT_CLASS_CHECK(SpaprDrcClass, klass, TYPE_SPAPR_DRC_PCI)
--#define SPAPR_DRC_PCI(obj) OBJECT_CHECK(SpaprDrc, (obj), \
-+#define SPAPR_DRC_PCI(obj) OBJECT_CHECK(SpaprDrcPhysical, (obj), \
-                                         TYPE_SPAPR_DRC_PCI)
- 
- #define TYPE_SPAPR_DRC_LMB "spapr-drc-lmb"
+diff --git a/hw/input/adb.c b/hw/input/adb.c
+index 013fcc9c54..84331b9fce 100644
+--- a/hw/input/adb.c
++++ b/hw/input/adb.c
+@@ -309,6 +309,7 @@ static void adb_device_class_init(ObjectClass *oc, void *data)
+ static const TypeInfo adb_device_type_info = {
+     .name = TYPE_ADB_DEVICE,
+     .parent = TYPE_DEVICE,
++    .class_size = sizeof(ADBDeviceClass),
+     .instance_size = sizeof(ADBDevice),
+     .abstract = true,
+     .class_init = adb_device_class_init,
 -- 
 2.26.2
 
