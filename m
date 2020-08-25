@@ -7,73 +7,74 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 583CAC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 08:42:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A884DC433E1
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 08:42:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2135B20706
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 08:42:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7431220706
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 08:42:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aovwVDf+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2135B20706
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dp+HCNpb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7431220706
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54002 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54442 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAUXY-0005Rf-Bq
-	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 04:42:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60704)
+	id 1kAUXb-0005e9-Oq
+	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 04:42:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60132)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kAUPU-00058C-Kh
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 04:34:28 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:20310
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kAUOm-0003dN-NC
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 04:33:44 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:25164
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kAUPG-0000gb-5C
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 04:34:28 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kAUOl-0000bQ-3m
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 04:33:44 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598344452;
+ s=mimecast20190719; t=1598344422;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Oo5bAV2uAzDaBjBb4hYGQWIO0cuVTr/ye2fx1mDnnwI=;
- b=aovwVDf+SZ0izg8xi8E+kMBKh3Y9PbbUNXJc4QJe1nnxwQ5lqUCDZczPtpa+FTYMZKvbib
- cwxGltZjgFF/LiRjtP7MyvETFre4G/RcrLgKeXNo3N5ZbBVPs+V+wtomKIrblRR14GFrup
- gZB1Q79SmUuzivp/al3Q1v6+ah0Uhvs=
+ bh=IF+qIwEj4AnXLg/zSDT7l4rI8v2q2gB0oz0qhKXxhoI=;
+ b=dp+HCNpbpPi+0eExaLqt9Yf0vDObyq9BKHLEX05AJwk4S3xCTa/yqpv35WNOpukxmPGug6
+ OkF+ZHQNDXeQ8zCpzHMVqXf4S2QLQJ33rW42JM7/y2AAFcxhMQAxM9t8EQOADMlgMq7wsj
+ 2lrJVERrCledg4zfIBsI8Bfo3kMdBjQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-395-83Pbj0wEMGaiGiAU5YNwZA-1; Tue, 25 Aug 2020 04:34:10 -0400
-X-MC-Unique: 83Pbj0wEMGaiGiAU5YNwZA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-300-ntXjHnpvN3ObuhBSRuBrVg-1; Tue, 25 Aug 2020 04:33:40 -0400
+X-MC-Unique: ntXjHnpvN3ObuhBSRuBrVg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2E70618A2250;
- Tue, 25 Aug 2020 08:34:09 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4974818A2250;
+ Tue, 25 Aug 2020 08:33:39 +0000 (UTC)
 Received: from localhost (ovpn-113-72.ams2.redhat.com [10.36.113.72])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C425A808AB;
- Tue, 25 Aug 2020 08:34:08 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id DF38819144;
+ Tue, 25 Aug 2020 08:33:38 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PULL 24/34] qcow2: Add subcluster support to check_refcounts_l2()
-Date: Tue, 25 Aug 2020 10:33:01 +0200
-Message-Id: <20200825083311.1098442-25-mreitz@redhat.com>
+Subject: [PULL 11/34] qcow2: Add offset_into_subcluster() and
+ size_to_subclusters()
+Date: Tue, 25 Aug 2020 10:32:48 +0200
+Message-Id: <20200825083311.1098442-12-mreitz@redhat.com>
 In-Reply-To: <20200825083311.1098442-1-mreitz@redhat.com>
 References: <20200825083311.1098442-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
 X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=mreitz@redhat.com;
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=mreitz@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/25 01:36:47
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/25 01:35:36
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -102,78 +103,44 @@ Sender: "Qemu-devel"
 
 From: Alberto Garcia <berto@igalia.com>
 
-The offset field of an uncompressed cluster's L2 entry must be aligned
-to the cluster size, otherwise it is invalid. If the cluster has no
-data then it means that the offset points to a preallocation, so we
-can clear the offset field without affecting the guest-visible data.
-This is what 'qemu-img check' does when run in repair mode.
-
-On traditional qcow2 images this can only happen when QCOW_OFLAG_ZERO
-is set, and repairing such entries turns the clusters from ZERO_ALLOC
-into ZERO_PLAIN.
-
-Extended L2 entries have no ZERO_ALLOC clusters and no QCOW_OFLAG_ZERO
-but the idea is the same: if none of the subclusters are allocated
-then we can clear the offset field and leave the bitmap untouched.
+Like offset_into_cluster() and size_to_clusters(), but for
+subclusters.
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
-Message-Id: <9f4ed1d0a34b0a545b032c31ecd8c14734065342.1594396418.git.berto@igalia.com>
+Message-Id: <3cc2390dcdef3d234d47c741b708bd8734490862.1594396418.git.berto@igalia.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/qcow2-refcount.c     | 16 +++++++++++-----
- tests/qemu-iotests/060.out |  2 +-
- 2 files changed, 12 insertions(+), 6 deletions(-)
+ block/qcow2.h | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
-index 770c5dbc83..aae52607eb 100644
---- a/block/qcow2-refcount.c
-+++ b/block/qcow2-refcount.c
-@@ -1669,12 +1669,18 @@ static int check_refcounts_l2(BlockDriverState *bs, BdrvCheckResult *res,
+diff --git a/block/qcow2.h b/block/qcow2.h
+index 2503374677..4fe31adfd3 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -555,11 +555,21 @@ static inline int64_t offset_into_cluster(BDRVQcow2State *s, int64_t offset)
+     return offset & (s->cluster_size - 1);
+ }
  
-             /* Correct offsets are cluster aligned */
-             if (offset_into_cluster(s, offset)) {
-+                bool contains_data;
-                 res->corruptions++;
- 
--                if (qcow2_get_cluster_type(bs, l2_entry) ==
--                    QCOW2_CLUSTER_ZERO_ALLOC)
--                {
--                    fprintf(stderr, "%s offset=%" PRIx64 ": Preallocated zero "
-+                if (has_subclusters(s)) {
-+                    uint64_t l2_bitmap = get_l2_bitmap(s, l2_table, i);
-+                    contains_data = (l2_bitmap & QCOW_L2_BITMAP_ALL_ALLOC);
-+                } else {
-+                    contains_data = !(l2_entry & QCOW_OFLAG_ZERO);
-+                }
++static inline int64_t offset_into_subcluster(BDRVQcow2State *s, int64_t offset)
++{
++    return offset & (s->subcluster_size - 1);
++}
 +
-+                if (!contains_data) {
-+                    fprintf(stderr, "%s offset=%" PRIx64 ": Preallocated "
-                             "cluster is not properly aligned; L2 entry "
-                             "corrupted.\n",
-                             fix & BDRV_FIX_ERRORS ? "Repairing" : "ERROR",
-@@ -1686,7 +1692,7 @@ static int check_refcounts_l2(BlockDriverState *bs, BdrvCheckResult *res,
-                         int ign = active ? QCOW2_OL_ACTIVE_L2 :
-                                            QCOW2_OL_INACTIVE_L2;
+ static inline uint64_t size_to_clusters(BDRVQcow2State *s, uint64_t size)
+ {
+     return (size + (s->cluster_size - 1)) >> s->cluster_bits;
+ }
  
--                        l2_entry = QCOW_OFLAG_ZERO;
-+                        l2_entry = has_subclusters(s) ? 0 : QCOW_OFLAG_ZERO;
-                         set_l2_entry(s, l2_table, i, l2_entry);
-                         ret = qcow2_pre_write_overlap_check(bs, ign,
-                                 l2e_offset, l2_entry_size(s), false);
-diff --git a/tests/qemu-iotests/060.out b/tests/qemu-iotests/060.out
-index e574c38797..b2804a0d07 100644
---- a/tests/qemu-iotests/060.out
-+++ b/tests/qemu-iotests/060.out
-@@ -320,7 +320,7 @@ discard 65536/65536 bytes at offset 0
- qcow2: Marking image as corrupt: Preallocated zero cluster offset 0x2a00 unaligned (guest offset: 0); further corruption events will be suppressed
- write failed: Input/output error
- --- Repairing ---
--Repairing offset=2a00: Preallocated zero cluster is not properly aligned; L2 entry corrupted.
-+Repairing offset=2a00: Preallocated cluster is not properly aligned; L2 entry corrupted.
- The following inconsistencies were found and repaired:
- 
-     0 leaked clusters
++static inline uint64_t size_to_subclusters(BDRVQcow2State *s, uint64_t size)
++{
++    return (size + (s->subcluster_size - 1)) >> s->subcluster_bits;
++}
++
+ static inline int64_t size_to_l1(BDRVQcow2State *s, int64_t size)
+ {
+     int shift = s->cluster_bits + s->l2_bits;
 -- 
 2.26.2
 
