@@ -2,91 +2,90 @@ Return-Path: <SRS0=2GMi=CD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+X-Spam-Status: No, score=-8.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BA90C433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 21:43:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24094C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 21:43:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 64A83206EB
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 21:43:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E19E6206EB
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 21:43:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WCymE3jW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64A83206EB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dx8IXna5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E19E6206EB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48688 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50574 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAgj1-00044o-NZ
-	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 17:43:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36454)
+	id 1kAgjR-0004rR-3b
+	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 17:43:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44752)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kAg4C-0000Mm-Su
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 17:01:16 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:40631)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kAg4A-00021U-Tl
- for qemu-devel@nongnu.org; Tue, 25 Aug 2020 17:01:16 -0400
-Received: by mail-pg1-x542.google.com with SMTP id h12so7675219pgm.7
- for <qemu-devel@nongnu.org>; Tue, 25 Aug 2020 14:01:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=0+lbMujB7ENQF6DPdS7wnVUjhoKJE7Rkmv+oxgd9wrg=;
- b=WCymE3jWbHXk76hlDjCJUVQXgckSWgcpPrdABXMw7zDyqOP7b2H5O9zMWMH2ou5sxd
- 9qYxMOH/q2VsyQywqGSPGugNgKB7981voHZxR16L26suMOfJzw72U3ZyWPGVM4OBLOjp
- ZkwYIPszghuKLsSJzmLLfWotazsxHN+wR8jnQ+csnSXcDqf2DPufkW4ROug4Z9QdWwm1
- evkLhMrp50+O44XPGzR9UJdmC7DSOlxnuBU2o7brm/CzEVjrJyaaziHXaijW7o1LP+OJ
- WzWJQmq1pNzyqPEO3lV3nuCwPTvfN+le52Lx2ejtn8f104ozxKdqSQQynlMzCDVN//lL
- iXKg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=0+lbMujB7ENQF6DPdS7wnVUjhoKJE7Rkmv+oxgd9wrg=;
- b=reNXmVRGErl1jSRITy8Yi8hjQSxMiAPXMwH6rBdVfB1ki9THprd94WApaTgQlPXUOk
- QhTX3UpveAN+8tB15GvbrQgjUmZ8CrdFgVSRTvnEmbqEsUxfcgeIVJpAoOF4Pkcf78r0
- wEdoF5MkXKDIdPCpemCU3atpNDoNgnOgR/qJUnWEcAgiiePmB6p35VgS33H2tSvEVhTN
- ZyqPDyqPmKIvidL1/04qzt8sBMTujZkzWODwsOIDqKCYs4bbjm9WhKs6M0BgNyPPo3Pl
- WJTtLFBCzt229V0vyEdvd/u+TXQ6eV87kkq6F72aWmkSFMVyPRwZnIFhCclKMbGi2HXz
- JPzw==
-X-Gm-Message-State: AOAM531UsInpbCEMXzEK982xLqexrXSzVOkBWgBxjYwnjhvLRI42Nyti
- bp5ItMwkmAAn4Mvdc1fAtr1ONdmETRLxeQ==
-X-Google-Smtp-Source: ABdhPJwk6KWRlM+HN1HWXL2lk1QWBzxeH+3ZnFn6qnra1WrGnQIM8nNt5L4kMp+W5zxDGoSQk0kbZQ==
-X-Received: by 2002:aa7:924b:: with SMTP id 11mr9274257pfp.185.1598389273161; 
- Tue, 25 Aug 2020 14:01:13 -0700 (PDT)
-Received: from localhost.localdomain
- (h216-228-167-147.bendor.dedicated.static.tds.net. [216.228.167.147])
- by smtp.gmail.com with ESMTPSA id k4sm16074pgr.87.2020.08.25.14.01.12
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 25 Aug 2020 14:01:12 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 61/77] target/microblaze: Tidy mb_cpu_dump_state
-Date: Tue, 25 Aug 2020 13:59:34 -0700
-Message-Id: <20200825205950.730499-62-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200825205950.730499-1-richard.henderson@linaro.org>
-References: <20200825205950.730499-1-richard.henderson@linaro.org>
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kAgia-0003YY-1U
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 17:43:00 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:34337)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kAgiX-0006xr-EA
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 17:42:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1598391775;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=RpIpIgzeMd9jR3nmKiVH8lFFkJ9XeJyQdGtV2kpy7i8=;
+ b=dx8IXna5jt0cjHblYxzLYNXmB9M3OdjYufY1n9enfN+Ed9CFjepxnq5AQrVRNj9Bud48r0
+ /9RoG0TJdbkb6+w84CJhRI6/W3vqy8krBWB95ZcRmbPyQ08KjVmBeuRm63zASCSE3S5tIF
+ kBR0+lm0x6UAJ0GMn8P+99qHrHUk1W0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-464-xGtbMqBuN4yn4X4w3JoWlA-1; Tue, 25 Aug 2020 17:42:50 -0400
+X-MC-Unique: xGtbMqBuN4yn4X4w3JoWlA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6FE4F1005E5B;
+ Tue, 25 Aug 2020 21:42:49 +0000 (UTC)
+Received: from [10.3.112.126] (ovpn-112-126.phx2.redhat.com [10.3.112.126])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D9AEA5D9D3;
+ Tue, 25 Aug 2020 21:42:48 +0000 (UTC)
+Subject: Re: [PATCH 1/4] meson: Fixes the ninjatool issue that E$$: are
+ generated in Makefile.ninja
+To: luoyonggang@gmail.com, qemu-devel@nongnu.org
+References: <20200825165341.520-1-luoyonggang@gmail.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <05e2badc-19b5-6f47-73f8-de30732fa236@redhat.com>
+Date: Tue, 25 Aug 2020 16:42:48 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::542;
- envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x542.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+In-Reply-To: <20200825165341.520-1-luoyonggang@gmail.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eblake@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=eblake@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/25 17:42:55
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -56
+X-Spam_score: -5.7
+X-Spam_bar: -----
+X-Spam_report: (-5.7 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.958,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-2.602, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -100,108 +99,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: edgar.iglesias@gmail.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?B?RGFuaWVsIFAgLiBCZXJyYW5n6IyF?= <berrange@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Using lookup_symbol is quite slow; remove that.  Decode the
-various bits of iflags; only show imm, btaken, btarget when
-they are relevant to iflags.  Improve formatting.
+On 8/25/20 11:53 AM, luoyonggang@gmail.com wrote:
+> From: Yonggang Luo <luoyonggang@gmail.com>
+> 
+> SIMPLE_PATH_RE should match the full path token.
+> Or the $ and : contained in path would not matched if the path are start with C:/ and E:/
+> ---
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/microblaze/translate.c | 67 +++++++++++++++++++++--------------
- 1 file changed, 41 insertions(+), 26 deletions(-)
+Missing a Signed-off-by tag.  Without that, we cannot apply it.
 
-diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
-index 3ba2dc1800..4675326083 100644
---- a/target/microblaze/translate.c
-+++ b/target/microblaze/translate.c
-@@ -1810,41 +1810,56 @@ void mb_cpu_dump_state(CPUState *cs, FILE *f, int flags)
- {
-     MicroBlazeCPU *cpu = MICROBLAZE_CPU(cs);
-     CPUMBState *env = &cpu->env;
-+    uint32_t iflags;
-     int i;
- 
--    if (!env) {
--        return;
--    }
--
--    qemu_fprintf(f, "IN: PC=%x %s\n",
--                 env->pc, lookup_symbol(env->pc));
--    qemu_fprintf(f, "rmsr=%x resr=%x rear=%" PRIx64 " "
--                 "imm=%x iflags=%x fsr=%x rbtr=%x\n",
--                 env->msr, env->esr, env->ear,
--                 env->imm, env->iflags, env->fsr, env->btr);
--    qemu_fprintf(f, "btaken=%d btarget=%x mode=%s(saved=%s) eip=%d ie=%d\n",
--                 env->btaken, env->btarget,
-+    qemu_fprintf(f, "pc=0x%08x msr=0x%05x mode=%s(saved=%s) eip=%d ie=%d\n",
-+                 env->pc, env->msr,
-                  (env->msr & MSR_UM) ? "user" : "kernel",
-                  (env->msr & MSR_UMS) ? "user" : "kernel",
-                  (bool)(env->msr & MSR_EIP),
-                  (bool)(env->msr & MSR_IE));
--    for (i = 0; i < 12; i++) {
--        qemu_fprintf(f, "rpvr%2.2d=%8.8x ", i, env->pvr.regs[i]);
--        if ((i + 1) % 4 == 0) {
--            qemu_fprintf(f, "\n");
--        }
-+
-+    iflags = env->iflags;
-+    qemu_fprintf(f, "iflags: 0x%08x", iflags);
-+    if (iflags & IMM_FLAG) {
-+        qemu_fprintf(f, " IMM(0x%08x)", env->imm);
-+    }
-+    if (iflags & BIMM_FLAG) {
-+        qemu_fprintf(f, " BIMM");
-+    }
-+    if (iflags & D_FLAG) {
-+        qemu_fprintf(f, " D(btaken=%d btarget=0x%08x)",
-+                     env->btaken, env->btarget);
-+    }
-+    if (iflags & DRTI_FLAG) {
-+        qemu_fprintf(f, " DRTI");
-+    }
-+    if (iflags & DRTE_FLAG) {
-+        qemu_fprintf(f, " DRTE");
-+    }
-+    if (iflags & DRTB_FLAG) {
-+        qemu_fprintf(f, " DRTB");
-+    }
-+    if (iflags & ESR_ESS_FLAG) {
-+        qemu_fprintf(f, " ESR_ESS(0x%04x)", iflags & ESR_ESS_MASK);
-+    }
-+
-+    qemu_fprintf(f, "\nesr=0x%04x fsr=0x%02x btr=0x%08x edr=0x%x\n"
-+                 "ear=0x%016" PRIx64 " slr=0x%x shr=0x%x\n",
-+                 env->esr, env->fsr, env->btr, env->edr,
-+                 env->ear, env->slr, env->shr);
-+
-+    for (i = 0; i < 12; i++) {
-+        qemu_fprintf(f, "rpvr%-2d=%08x%c",
-+                     i, env->pvr.regs[i], i % 4 == 3 ? '\n' : ' ');
-     }
- 
--    /* Registers that aren't modeled are reported as 0 */
--    qemu_fprintf(f, "redr=%x rpid=0 rzpr=0 rtlbx=0 rtlbsx=0 "
--                    "rtlblo=0 rtlbhi=0\n", env->edr);
--    qemu_fprintf(f, "slr=%x shr=%x\n", env->slr, env->shr);
-     for (i = 0; i < 32; i++) {
--        qemu_fprintf(f, "r%2.2d=%8.8x ", i, env->regs[i]);
--        if ((i + 1) % 4 == 0)
--            qemu_fprintf(f, "\n");
--        }
--    qemu_fprintf(f, "\n\n");
-+        qemu_fprintf(f, "r%2.2d=%08x%c",
-+                     i, env->regs[i], i % 4 == 3 ? '\n' : ' ');
-+    }
-+    qemu_fprintf(f, "\n");
- }
- 
- void mb_tcg_init(void)
+Also missing a 0/4 cover letter; less essential, but useful for 
+continuous integration tools and for replying to the series as a whole.
+
+More patch submission hints can be found at 
+https://wiki.qemu.org/Contribute/SubmitAPatch
+
 -- 
-2.25.1
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
