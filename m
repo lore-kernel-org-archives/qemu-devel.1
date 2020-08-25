@@ -2,87 +2,108 @@ Return-Path: <SRS0=2GMi=CD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25589C433E1
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 21:58:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D066C433E1
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 21:59:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E16F22071E
-	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 21:58:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 27E542071E
+	for <qemu-devel@archiver.kernel.org>; Tue, 25 Aug 2020 21:59:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BPyV0Owd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E16F22071E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JhcuUCr0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27E542071E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59140 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59558 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAgy2-0004AB-5s
-	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 17:58:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48224)
+	id 1kAgy5-0004LZ-8L
+	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 17:59:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48326)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <danielhb413@gmail.com>)
- id 1kAgx8-0002Ga-3F; Tue, 25 Aug 2020 17:58:02 -0400
-Received: from mail-qt1-x836.google.com ([2607:f8b0:4864:20::836]:41896)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <danielhb413@gmail.com>)
- id 1kAgx6-0000Xn-Ba; Tue, 25 Aug 2020 17:58:01 -0400
-Received: by mail-qt1-x836.google.com with SMTP id t20so12877qtr.8;
- Tue, 25 Aug 2020 14:57:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=FEigj0tks3uCXSAIXp/Z8YnpMQG37caq+pO/8EeIF+I=;
- b=BPyV0OwdeuqoJ0E4Cc3TFOKfFD1mC5vfHEsDzIMrAyTTBKNF5hYixFWfbReQIJPsdi
- eN1zxHCA7yFvxHQRkY1raTc9TX83VUnqN1ri7/1y91S54ILabJAZHhBEEKUn0YyI/s+z
- QKgFcUwfftbDpuZxVD5XxNrBvdqPafFjlBsMOTI6ySMd1+1nQU3BuMIbeFW0DwAbTTdU
- LYgupnlQWD9+l2P/6MeBJdAT4B6yrKC0eM8L1P51uDPAGLB99weKy4qzsL5ERU7Eg+YB
- YUVbqJShFVVOZZVkEwfcIxZyk5FhdtkQd5fb9XaA0cFbTK/fG9Hu46KL0ncJ1zEU1giE
- mpHA==
+ (Exim 4.90_1) (envelope-from <ckuehl@redhat.com>) id 1kAgxE-0002W7-CO
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 17:58:08 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:23983)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <ckuehl@redhat.com>) id 1kAgxB-0000YQ-Ji
+ for qemu-devel@nongnu.org; Tue, 25 Aug 2020 17:58:07 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1598392684;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=X9qEEMjQk+TM7XgbVKWryx3YB2XMwDW8oj4udKG4l5g=;
+ b=JhcuUCr06lh3tep+ldijF1urL0mN38WugNYaY8z/HPi3Tqq3rR9f6jz5CtO9r6foEMHQxA
+ BVi0L/Y0bGQpeqC6c8Ukse9n2esttnQOP6gYrMNhONNnIEMATdb/ciAZ/nz5Yvm50ppACl
+ 9wjS9V6R/uNd1QoWHpNtIU10Rb9+N/w=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-538-LrsC6VixPxCPZ5bjq5Q_Tw-1; Tue, 25 Aug 2020 17:58:01 -0400
+X-MC-Unique: LrsC6VixPxCPZ5bjq5Q_Tw-1
+Received: by mail-qk1-f198.google.com with SMTP id t10so301334qke.11
+ for <qemu-devel@nongnu.org>; Tue, 25 Aug 2020 14:58:00 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ h=x-gm-message-state:subject:from:to:cc:references:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=FEigj0tks3uCXSAIXp/Z8YnpMQG37caq+pO/8EeIF+I=;
- b=Dc2eymSXYDVdT1InZhOS7ZqR77emRMHYNtJ3FvLRBpcLKBw3HeR6zd/qxMKmWHqaAd
- Hb+hSdehsLEQjruMhsoCcEM5F/sMcc1pnQpgG0ZotDxcQRPZwaDPetZAQL1RgsD4dM4E
- 9rz95jWS4BEVwY9IThIUbWLCW9DG+ys8Z1z6EgWTlQxup0AcDOWvNee9aHZOyVEkqqi9
- QNjhxqhwq+Q1QZ56OEzK/auFXnzWagEC23l6zs/IrYj59mMAjLaJG8QIUtn6RxNWTfZi
- BAmtXeCSE6u1zpIWtLpSYYx3qTD5fhOgHY3HTk/6TWfSi+nU9Rg3KOH9p3sRy6xk4/l8
- gBsw==
-X-Gm-Message-State: AOAM530ARzIlbm7ZfbCpxB7JGs3Q+0CjJDjV+z6tpFzU8AiqyZujP9w1
- E0tEXgXulYfB6p9rRR2oxPq+nvBsj4o=
-X-Google-Smtp-Source: ABdhPJwacyXXNLaSYSGtRgMlwsiJq8VIx1h6rX+RiltksMu15xZ0NeL7czfxFiuhZW6jea4d7+m+0g==
-X-Received: by 2002:ac8:3568:: with SMTP id z37mr2466535qtb.59.1598392678046; 
- Tue, 25 Aug 2020 14:57:58 -0700 (PDT)
-Received: from localhost.localdomain ([2804:431:c7c7:c152:8180:e1dd:d6ac:1152])
- by smtp.gmail.com with ESMTPSA id z2sm347362qtu.11.2020.08.25.14.57.56
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 25 Aug 2020 14:57:57 -0700 (PDT)
-From: Daniel Henrique Barboza <danielhb413@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 0/3] spapr NVDIMM: consider 'nvdimm' machine option
-Date: Tue, 25 Aug 2020 18:57:46 -0300
-Message-Id: <20200825215749.213536-1-danielhb413@gmail.com>
-X-Mailer: git-send-email 2.26.2
+ bh=X9qEEMjQk+TM7XgbVKWryx3YB2XMwDW8oj4udKG4l5g=;
+ b=UhqdXhz+vQtKpvjDl+ZGkrmlUPyySg7Yfp4zGvv5DgIVU/E1tQ2Wl/dCZeccJ0SXQl
+ yVOagqQAddmBw0jMts5t4yOoJdQVmemFFzF7P+73BIBQAaZiGVzDuFYwOkbrY5P7REfD
+ Zo/qt4KYZ5Joe5COaD04DinNymovH7ChRyX8EQjyr/JeKCla0Yl+LSq2ZpaKhAFJ0oYE
+ qnjlPTgI0z073q1dYnoPgT/WV7jV7kpjTXGchFSVYvRXrso6EAE5ZYuc+yJ+HnmIuAQ/
+ Bqob4p7ZTyxfTZbLpoCGHtteF2FP5DhNRJ/EBgoYi28U0UyWQoK+Imsb8rlXGcOY4l5U
+ Tzow==
+X-Gm-Message-State: AOAM5325RjuQB1TvgL0z9yN4c14rlwi8cNf/a4Rj1VTWsPKG5k8ordeF
+ BLbDokXvyhLeoPQOLSzH1dD/x/X5v2kdsXD/QaQANuzCbdJC5JaxSlSpskjPEJNgLfsZEMe7TC0
+ /l2iR48LvoPI85Qk=
+X-Received: by 2002:a05:620a:22a1:: with SMTP id
+ p1mr4787993qkh.14.1598392680324; 
+ Tue, 25 Aug 2020 14:58:00 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxZwkFbHQEM1KP/jkcTAGd7bTS5JL8PD6Kl+ieLhqcWBvbk7EDULCTtKFS0EezlhhLgisHn4w==
+X-Received: by 2002:a05:620a:22a1:: with SMTP id
+ p1mr4787986qkh.14.1598392680097; 
+ Tue, 25 Aug 2020 14:58:00 -0700 (PDT)
+Received: from [192.168.0.172] (ip68-103-222-6.ks.ok.cox.net. [68.103.222.6])
+ by smtp.gmail.com with ESMTPSA id
+ s33sm237236qts.48.2020.08.25.14.57.59
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 25 Aug 2020 14:57:59 -0700 (PDT)
+Subject: Re: [PATCH v3] block: Raise an error when backing file parameter is
+ an empty string
+From: Connor Kuehl <ckuehl@redhat.com>
+To: kwolf@redhat.com, mreitz@redhat.com
+References: <20200813134722.802180-1-ckuehl@redhat.com>
+Message-ID: <0977d901-c2fd-40b9-f694-914e1b895653@redhat.com>
+Date: Tue, 25 Aug 2020 16:57:58 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::836;
- envelope-from=danielhb413@gmail.com; helo=mail-qt1-x836.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+In-Reply-To: <20200813134722.802180-1-ckuehl@redhat.com>
+Content-Language: en-US
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ckuehl@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=ckuehl@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/25 17:42:55
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -56
+X-Spam_score: -5.7
+X-Spam_bar: -----
+X-Spam_report: (-5.7 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.958,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-2.602, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -96,43 +117,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Daniel Henrique Barboza <danielhb413@gmail.com>, qemu-ppc@nongnu.org,
- david@gibson.dropbear.id.au
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This series aims to solve bug [1].
+On 8/13/20 8:47 AM, Connor Kuehl wrote:
+> Providing an empty string for the backing file parameter like so:
+> 
+> 	qemu-img create -f qcow2 -b '' /tmp/foo
+> 
+> allows the flow of control to reach and subsequently fail an assert
+> statement because passing an empty string to
+> 
+> 	bdrv_get_full_backing_filename_from_filename()
+> 
+> simply results in NULL being returned without an error being raised.
+> 
+> To fix this, let's check for an empty string when getting the value from
+> the opts list.
+> 
+> Reported-by: Attila Fazekas <afazekas@redhat.com>
+> Fixes: https://bugzilla.redhat.com/1809553
+> Signed-off-by: Connor Kuehl <ckuehl@redhat.com>
+> ---
+> v3:
+>    - Moved test case into 049 instead of taking up
+>      298.
+> 
+> v2:
+>    - Removed 4 spaces to resolve pylint warning
+>    - Updated format to be 'iotests.imgfmt' instead
+>      of hardcoding 'qcow2'
+>    - Use temporary file instead of '/tmp/foo'
+>    - Give a size parameter to qemu-img
+>    - Run test for qcow2, qcow, qed and *not* raw
 
-First patch is a trivial cleanup, feel free to squash into
-patch 02. Patch 02 attempts a code simplification to put
-all NVDIMM related logic in the same function.
-
-Patch 03 is where the actual fix is implemented. My initial
-approach here was to make the handling of '-machine nvdimm' for
-pSeries similar to how it is handled elsewhere, but I wasn't
-able to accomplish that without either (1) breaking up existing
-pseries-5.1 guests that didn't care about this option or (2)
-make pseries-5.1 and pseries-5.2+ machines to have different
-semantics for it.
-
-I ended up doing what I was sure was sensible: if the user puts
-'-machine nvdimm=off', we must comply to that.
-
-
-[1] https://bugzilla.redhat.com/show_bug.cgi?id=1848887
-
-Daniel Henrique Barboza (3):
-  ppc/spapr_nvdimm: use g_autofree in spapr_nvdimm_validate_opts()
-  spapr, spapr_nvdimm: fold NVDIMM validation in the same place
-  ppc/spapr_nvdimm: do not enable support with 'nvdimm=off'
-
- hw/ppc/spapr.c                | 18 ++++++------------
- hw/ppc/spapr_nvdimm.c         | 31 +++++++++++++++++++++++++++----
- include/hw/ppc/spapr_nvdimm.h |  4 ++--
- 3 files changed, 35 insertions(+), 18 deletions(-)
-
--- 
-2.26.2
+Ping
 
 
