@@ -7,52 +7,52 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A776BC433E3
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 11:46:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C756C433E1
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 11:46:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 623FB20707
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 11:46:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F02BA20707
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 11:46:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=lse.epita.fr header.i=@lse.epita.fr header.b="bwfikXaH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 623FB20707
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=lse.epita.fr header.i=@lse.epita.fr header.b="O51UEbZA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F02BA20707
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=lse.epita.fr
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39702 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39906 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAtt3-0003PV-N1
-	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 07:46:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56562)
+	id 1kAtt5-0003Ug-9g
+	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 07:46:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56608)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <srs0=n7r+=ce=lse.epita.fr=cesar.belley@cri.epita.fr>)
- id 1kAtpK-0004fZ-3A
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 07:42:50 -0400
-Received: from gate-2.cri.epita.net ([163.5.55.20]:47898
+ id 1kAtpL-0004h8-DK
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 07:42:51 -0400
+Received: from gate-2.cri.epita.net ([163.5.55.20]:47916
  helo=mail-2.srv.cri.epita.fr)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <srs0=n7r+=ce=lse.epita.fr=cesar.belley@cri.epita.fr>)
- id 1kAtpH-00085Y-PY
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 07:42:49 -0400
+ id 1kAtpJ-00085n-CX
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 07:42:51 -0400
 Received: from MattGorko-Laptop.home
  (lfbn-idf1-1-1395-83.w90-79.abo.wanadoo.fr [90.79.87.83])
  (Authenticated sender: cesar.belley)
- by mail-2.srv.cri.epita.fr (Postfix) with ESMTPSA id 90E43412D9;
- Wed, 26 Aug 2020 13:42:46 +0200 (CEST)
+ by mail-2.srv.cri.epita.fr (Postfix) with ESMTPSA id 7C56D412DC;
+ Wed, 26 Aug 2020 13:42:47 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=lse.epita.fr; s=cri;
- t=1598442166; bh=btRqdaUXVRbDKjkqGiCstodc5y/Je6n9QgR65B0DETM=;
+ t=1598442167; bh=pXjOhnz/ejL0oC4wPTqjtOBcoqXZnfCQ63MGA0Z0KNY=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=bwfikXaHumT4LUR/bR/kPSoUdXeSwF0y+ZdjajO9yNZ+iOTlHpaj0S3wI40POFdGk
- CCr4Zcdlmu8k1M/T/UTX2q1mAvtiAQnj1cY6qWZUVXKT/qyTjC4Nyqhd1m3INwQ+OH
- iaYILSCntQHskF2ovPDxgDdbDWAkm6bxY10O5Au0=
+ b=O51UEbZAfp2KOm3cEuur0IvJ05gJ8P9QdiwK96P9NM3MMbINLDF6fGXrmD+iDoYtr
+ +XatVnQOOxcISQScBg/3bqnHgSuSXnzm8X/Y7b1rTFJYt5aGYepnlhq2QJ6xPzA5Am
+ vaDx3ML5MQT724wNpZahrwh5sQAaAxKgODCA7zm8=
 From: =?UTF-8?q?C=C3=A9sar=20Belley?= <cesar.belley@lse.epita.fr>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 05/12] hw/usb: Add U2F key passthru mode
-Date: Wed, 26 Aug 2020 13:42:02 +0200
-Message-Id: <20200826114209.28821-6-cesar.belley@lse.epita.fr>
+Subject: [PATCH v3 07/12] meson: Add U2F key to meson
+Date: Wed, 26 Aug 2020 13:42:04 +0200
+Message-Id: <20200826114209.28821-8-cesar.belley@lse.epita.fr>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20200826114209.28821-1-cesar.belley@lse.epita.fr>
 References: <20200826114209.28821-1-cesar.belley@lse.epita.fr>
@@ -88,462 +88,133 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch adds the U2F key pass-through mode.
-
-The pass-through mode consists of passing all requests made from the
-guest to the physical security key connected to the host machine and
-vice versa.
-
-In addition, the dedicated pass-through allows to have a U2F security key
-shared on several guests which is not possible with a simple host device
-assignment pass-through.
-
-The pass-through mode is associated with a device inheriting from
-u2f-key base.
-
-To work, it needs the path to a U2F hidraw, obtained from the Qemu
-command line, and passed by the user:
-
-    qemu -usb -device u2f-passthru,hidraw=/dev/hidrawX
-
-Autoscan and U2F compatibility checking features are given at the end
-of the patch series.
-
 Signed-off-by: César Belley <cesar.belley@lse.epita.fr>
 ---
- hw/usb/u2f-passthru.c | 423 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 423 insertions(+)
- create mode 100644 hw/usb/u2f-passthru.c
+ configure          | 8 +++++++-
+ hw/usb/Kconfig     | 5 +++++
+ hw/usb/meson.build | 7 +++++++
+ meson.build        | 7 +++++++
+ meson_options.txt  | 1 +
+ 5 files changed, 27 insertions(+), 1 deletion(-)
 
-diff --git a/hw/usb/u2f-passthru.c b/hw/usb/u2f-passthru.c
-new file mode 100644
-index 0000000000..106b5abf9e
---- /dev/null
-+++ b/hw/usb/u2f-passthru.c
-@@ -0,0 +1,423 @@
-+/*
-+ * U2F USB Passthru device.
-+ *
-+ * Copyright (c) 2020 César Belley <cesar.belley@lse.epita.fr>
-+ * Written by César Belley <cesar.belley@lse.epita.fr>
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/module.h"
-+#include "qemu/main-loop.h"
-+#include "qemu/error-report.h"
-+#include "qapi/error.h"
-+#include "hw/qdev-properties.h"
-+#include "hw/usb.h"
-+#include "migration/vmstate.h"
-+
-+#include "u2f.h"
-+
-+#define NONCE_SIZE 8
-+#define BROADCAST_CID 0xFFFFFFFF
-+#define TRANSACTION_TIMEOUT 120000
-+
-+struct transaction {
-+    uint32_t cid;
-+    uint16_t resp_bcnt;
-+    uint16_t resp_size;
-+
-+    /* Nonce for broadcast isolation */
-+    uint8_t nonce[NONCE_SIZE];
-+};
-+
-+typedef struct U2FPassthruState U2FPassthruState;
-+
-+#define CURRENT_TRANSACTIONS_NUM 4
-+
-+struct U2FPassthruState {
-+    U2FKeyState base;
-+
-+    /* Host device */
-+    char *hidraw;
-+    int hidraw_fd;
-+
-+    /* Current Transactions */
-+    struct transaction current_transactions[CURRENT_TRANSACTIONS_NUM];
-+    uint8_t current_transactions_start;
-+    uint8_t current_transactions_end;
-+    uint8_t current_transactions_num;
-+
-+    /* Transaction time checking */
-+    int64_t last_transaction_time;
-+    QEMUTimer timer;
-+};
-+
-+#define TYPE_U2F_PASSTHRU "u2f-passthru"
-+#define PASSTHRU_U2F_KEY(obj) \
-+    OBJECT_CHECK(U2FPassthruState, (obj), TYPE_U2F_PASSTHRU)
-+
-+/* Init packet sizes */
-+#define PACKET_INIT_HEADER_SIZE 7
-+#define PACKET_INIT_DATA_SIZE (U2FHID_PACKET_SIZE - PACKET_INIT_HEADER_SIZE)
-+
-+/* Cont packet sizes */
-+#define PACKET_CONT_HEADER_SIZE 5
-+#define PACKET_CONT_DATA_SIZE (U2FHID_PACKET_SIZE - PACKET_CONT_HEADER_SIZE)
-+
-+struct packet_init {
-+    uint32_t cid;
-+    uint8_t cmd;
-+    uint8_t bcnth;
-+    uint8_t bcntl;
-+    uint8_t data[PACKET_INIT_DATA_SIZE];
-+} QEMU_PACKED;
-+
-+static inline uint32_t packet_get_cid(const void *packet)
-+{
-+    return *((uint32_t *)packet);
-+}
-+
-+static inline bool packet_is_init(const void *packet)
-+{
-+    return ((uint8_t *)packet)[4] & (1 << 7);
-+}
-+
-+static inline uint16_t packet_init_get_bcnt(
-+        const struct packet_init *packet_init)
-+{
-+    uint16_t bcnt = 0;
-+    bcnt |= packet_init->bcnth << 8;
-+    bcnt |= packet_init->bcntl;
-+
-+    return bcnt;
-+}
-+
-+static void u2f_passthru_reset(U2FPassthruState *key)
-+{
-+    timer_del(&key->timer);
-+    qemu_set_fd_handler(key->hidraw_fd, NULL, NULL, key);
-+    key->last_transaction_time = 0;
-+    key->current_transactions_start = 0;
-+    key->current_transactions_end = 0;
-+    key->current_transactions_num = 0;
-+}
-+
-+static void u2f_timeout_check(void *opaque)
-+{
-+    U2FPassthruState *key = opaque;
-+    int64_t time = qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL);
-+
-+    if (time > key->last_transaction_time + TRANSACTION_TIMEOUT) {
-+        u2f_passthru_reset(key);
-+    } else {
-+        timer_mod(&key->timer, time + TRANSACTION_TIMEOUT / 4);
-+    }
-+}
-+
-+static int u2f_transaction_get_index(U2FPassthruState *key, uint32_t cid)
-+{
-+    for (int i = 0; i < key->current_transactions_num; ++i) {
-+        int index = (key->current_transactions_start + i)
-+            % CURRENT_TRANSACTIONS_NUM;
-+        if (cid == key->current_transactions[index].cid) {
-+            return index;
-+        }
-+    }
-+    return -1;
-+}
-+
-+static struct transaction *u2f_transaction_get(U2FPassthruState *key,
-+                                               uint32_t cid)
-+{
-+    int index = u2f_transaction_get_index(key, cid);
-+    if (index < 0) {
-+        return NULL;
-+    }
-+    return &key->current_transactions[index];
-+}
-+
-+static struct transaction *u2f_transaction_get_from_nonce(U2FPassthruState *key,
-+                                const uint8_t nonce[NONCE_SIZE])
-+{
-+    for (int i = 0; i < key->current_transactions_num; ++i) {
-+        int index = (key->current_transactions_start + i)
-+            % CURRENT_TRANSACTIONS_NUM;
-+        if (key->current_transactions[index].cid == BROADCAST_CID
-+            && memcmp(nonce, key->current_transactions[index].nonce,
-+                      NONCE_SIZE) == 0) {
-+            return &key->current_transactions[index];
-+        }
-+    }
-+    return NULL;
-+}
-+
-+static void u2f_transaction_close(U2FPassthruState *key, uint32_t cid)
-+{
-+    int index, next_index;
-+    index = u2f_transaction_get_index(key, cid);
-+    if (index < 0) {
-+        return;
-+    }
-+    next_index = (index + 1) % CURRENT_TRANSACTIONS_NUM;
-+
-+    /* Rearrange to ensure the oldest is at the start position */
-+    while (next_index != key->current_transactions_end) {
-+        memcpy(&key->current_transactions[index],
-+               &key->current_transactions[next_index],
-+               sizeof(struct transaction));
-+
-+        index = next_index;
-+        next_index = (index + 1) % CURRENT_TRANSACTIONS_NUM;
-+    }
-+
-+    key->current_transactions_end = index;
-+    --key->current_transactions_num;
-+
-+    if (key->current_transactions_num == 0) {
-+        u2f_passthru_reset(key);
-+    }
-+}
-+
-+static void u2f_transaction_add(U2FPassthruState *key, uint32_t cid,
-+                                const uint8_t nonce[NONCE_SIZE])
-+{
-+    uint8_t index;
-+    struct transaction *transaction;
-+
-+    if (key->current_transactions_num >= CURRENT_TRANSACTIONS_NUM) {
-+        /* Close the oldest transaction */
-+        index = key->current_transactions_start;
-+        transaction = &key->current_transactions[index];
-+        u2f_transaction_close(key, transaction->cid);
-+    }
-+
-+    /* Index */
-+    index = key->current_transactions_end;
-+    key->current_transactions_end = (index + 1) % CURRENT_TRANSACTIONS_NUM;
-+    ++key->current_transactions_num;
-+
-+    /* Transaction */
-+    transaction = &key->current_transactions[index];
-+    transaction->cid = cid;
-+    transaction->resp_bcnt = 0;
-+    transaction->resp_size = 0;
-+
-+    /* Nonce */
-+    if (nonce != NULL) {
-+        memcpy(transaction->nonce, nonce, NONCE_SIZE);
-+    }
-+}
-+
-+static void u2f_passthru_read(void *opaque);
-+
-+static void u2f_transaction_start(U2FPassthruState *key,
-+                                  const struct packet_init *packet_init)
-+{
-+    int64_t time;
-+
-+    /* Transaction */
-+    if (packet_init->cid == BROADCAST_CID) {
-+        u2f_transaction_add(key, packet_init->cid, packet_init->data);
-+    } else {
-+        u2f_transaction_add(key, packet_init->cid, NULL);
-+    }
-+
-+    /* Time */
-+    time = qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL);
-+    if (key->last_transaction_time == 0) {
-+        qemu_set_fd_handler(key->hidraw_fd, u2f_passthru_read, NULL, key);
-+        timer_init_ms(&key->timer, QEMU_CLOCK_VIRTUAL, u2f_timeout_check, key);
-+        timer_mod(&key->timer, time + TRANSACTION_TIMEOUT / 4);
-+    }
-+    key->last_transaction_time = time;
-+}
-+
-+static void u2f_passthru_recv_from_host(U2FPassthruState *key,
-+                                    const uint8_t packet[U2FHID_PACKET_SIZE])
-+{
-+    struct transaction *transaction;
-+    uint32_t cid;
-+
-+    /* Retrieve transaction */
-+    cid = packet_get_cid(packet);
-+    if (cid == BROADCAST_CID) {
-+        struct packet_init *packet_init;
-+        if (!packet_is_init(packet)) {
-+            return;
-+        }
-+        packet_init = (struct packet_init *)packet;
-+        transaction = u2f_transaction_get_from_nonce(key, packet_init->data);
-+    } else {
-+        transaction = u2f_transaction_get(key, cid);
-+    }
-+
-+    /* Ignore no started transaction */
-+    if (transaction == NULL) {
-+        return;
-+    }
-+
-+    if (packet_is_init(packet)) {
-+        struct packet_init *packet_init = (struct packet_init *)packet;
-+        transaction->resp_bcnt = packet_init_get_bcnt(packet_init);
-+        transaction->resp_size = PACKET_INIT_DATA_SIZE;
-+
-+        if (packet_init->cid == BROADCAST_CID) {
-+            /* Nonce checking for legitimate response */
-+            if (memcmp(transaction->nonce, packet_init->data, NONCE_SIZE)
-+                != 0) {
-+                return;
-+            }
-+        }
-+    } else {
-+        transaction->resp_size += PACKET_CONT_DATA_SIZE;
-+    }
-+
-+    /* Transaction end check */
-+    if (transaction->resp_size >= transaction->resp_bcnt) {
-+        u2f_transaction_close(key, cid);
-+    }
-+    u2f_send_to_guest(&key->base, packet);
-+}
-+
-+static void u2f_passthru_read(void *opaque)
-+{
-+    U2FPassthruState *key = opaque;
-+    U2FKeyState *base = &key->base;
-+    uint8_t packet[2 * U2FHID_PACKET_SIZE];
-+    int ret;
-+
-+    /* Full size base queue check */
-+    if (base->pending_in_num >= U2FHID_PENDING_IN_NUM) {
-+        return;
-+    }
-+
-+    ret = read(key->hidraw_fd, packet, sizeof(packet));
-+    if (ret < 0) {
-+        /* Detach */
-+        if (base->dev.attached) {
-+            usb_device_detach(&base->dev);
-+            u2f_passthru_reset(key);
-+        }
-+        return;
-+    }
-+    if (ret != U2FHID_PACKET_SIZE) {
-+        return;
-+    }
-+    u2f_passthru_recv_from_host(key, packet);
-+}
-+
-+static void u2f_passthru_recv_from_guest(U2FKeyState *base,
-+                                    const uint8_t packet[U2FHID_PACKET_SIZE])
-+{
-+    U2FPassthruState *key = PASSTHRU_U2F_KEY(base);
-+    uint8_t host_packet[U2FHID_PACKET_SIZE + 1];
-+    ssize_t written;
-+
-+    if (packet_is_init(packet)) {
-+        u2f_transaction_start(key, (struct packet_init *)packet);
-+    }
-+
-+    host_packet[0] = 0;
-+    memcpy(host_packet + 1, packet, U2FHID_PACKET_SIZE);
-+
-+    written = write(key->hidraw_fd, host_packet, sizeof(host_packet));
-+    if (written != sizeof(host_packet)) {
-+        error_report("%s: Bad written size (req 0x%lx, val 0x%lx)",
-+                     TYPE_U2F_PASSTHRU, sizeof(host_packet), written);
-+    }
-+}
-+
-+static void u2f_passthru_unrealize(U2FKeyState *base)
-+{
-+    U2FPassthruState *key = PASSTHRU_U2F_KEY(base);
-+
-+    u2f_passthru_reset(key);
-+    qemu_close(key->hidraw_fd);
-+}
-+
-+static void u2f_passthru_realize(U2FKeyState *base, Error **errp)
-+{
-+    U2FPassthruState *key = PASSTHRU_U2F_KEY(base);
-+    int fd;
-+
-+    if (key->hidraw == NULL) {
-+        error_setg(errp, "%s: Missing hidraw", TYPE_U2F_PASSTHRU);
-+        return;
-+    }
-+
-+    fd = qemu_open(key->hidraw, O_RDWR);
-+    if (fd < 0) {
-+        error_setg(errp, "%s: Failed to open %s", TYPE_U2F_PASSTHRU,
-+                   key->hidraw);
-+        return;
-+    }
-+    key->hidraw_fd = fd;
-+    u2f_passthru_reset(key);
-+}
-+
-+static int u2f_passthru_post_load(void *opaque, int version_id)
-+{
-+    U2FPassthruState *key = opaque;
-+    u2f_passthru_reset(key);
-+    return 0;
-+}
-+
-+static const VMStateDescription u2f_passthru_vmstate = {
-+    .name = "u2f-key-passthru",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .post_load = u2f_passthru_post_load,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_U2F_KEY(base, U2FPassthruState),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static Property u2f_passthru_properties[] = {
-+    DEFINE_PROP_STRING("hidraw", U2FPassthruState, hidraw),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void u2f_passthru_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+    U2FKeyClass *kc = U2F_KEY_CLASS(klass);
-+
-+    kc->realize = u2f_passthru_realize;
-+    kc->unrealize = u2f_passthru_unrealize;
-+    kc->recv_from_guest = u2f_passthru_recv_from_guest;
-+    dc->desc = "QEMU U2F passthrough key";
-+    dc->vmsd = &u2f_passthru_vmstate;
-+    device_class_set_props(dc, u2f_passthru_properties);
-+}
-+
-+static const TypeInfo u2f_key_passthru_info = {
-+    .name = TYPE_U2F_PASSTHRU,
-+    .parent = TYPE_U2F_KEY,
-+    .instance_size = sizeof(U2FPassthruState),
-+    .class_init = u2f_passthru_class_init
-+};
-+
-+static void u2f_key_passthru_register_types(void)
-+{
-+    type_register_static(&u2f_key_passthru_info);
-+}
-+
-+type_init(u2f_key_passthru_register_types)
+diff --git a/configure b/configure
+index b1e11397a8..24137d49d6 100755
+--- a/configure
++++ b/configure
+@@ -495,6 +495,7 @@ trace_file="trace"
+ spice=""
+ rbd=""
+ smartcard=""
++u2f="auto"
+ libusb=""
+ usb_redir=""
+ opengl=""
+@@ -1411,6 +1412,10 @@ for opt do
+   ;;
+   --enable-smartcard) smartcard="yes"
+   ;;
++  --disable-u2f) u2f="disabled"
++  ;;
++  --enable-u2f) u2f="enabled"
++  ;;
+   --disable-libusb) libusb="no"
+   ;;
+   --enable-libusb) libusb="yes"
+@@ -1940,6 +1945,7 @@ disabled with --disable-FEATURE, default is enabled if available:
+   libiscsi        iscsi support
+   libnfs          nfs support
+   smartcard       smartcard support (libcacard)
++  u2f             U2F support (u2f-emu)
+   libusb          libusb (for usb passthrough)
+   live-block-migration   Block migration in the main migration stream
+   usb-redir       usb network redirection support
+@@ -8230,7 +8236,7 @@ NINJA=$PWD/ninjatool $meson setup \
+         -Db_coverage=$(if test "$gcov" = yes; then echo true; else echo false; fi) \
+ 	-Dsdl=$sdl -Dsdl_image=$sdl_image \
+ 	-Dvnc=$vnc -Dvnc_sasl=$vnc_sasl -Dvnc_jpeg=$vnc_jpeg -Dvnc_png=$vnc_png \
+-	-Dgettext=$gettext -Dxkbcommon=$xkbcommon \
++	-Dgettext=$gettext -Dxkbcommon=$xkbcommon -Du2f=$u2f\
+         $cross_arg \
+         "$PWD" "$source_path"
+ 
+diff --git a/hw/usb/Kconfig b/hw/usb/Kconfig
+index 5e63dc75f8..3fc8fbe3c7 100644
+--- a/hw/usb/Kconfig
++++ b/hw/usb/Kconfig
+@@ -96,6 +96,11 @@ config USB_STORAGE_MTP
+     default y
+     depends on USB
+ 
++config USB_U2F
++    bool
++    default y
++    depends on USB
++
+ config IMX_USBPHY
+     bool
+     default y
+diff --git a/hw/usb/meson.build b/hw/usb/meson.build
+index 3c44a1b069..a25109b88c 100644
+--- a/hw/usb/meson.build
++++ b/hw/usb/meson.build
+@@ -50,6 +50,13 @@ if config_host.has_key('CONFIG_SMARTCARD')
+   hw_usb_modules += {'smartcard': usbsmartcard_ss}
+ endif
+ 
++# U2F
++softmmu_ss.add(when: 'CONFIG_USB_U2F', if_true: files('u2f.c'))
++softmmu_ss.add(when: ['CONFIG_LINUX', 'CONFIG_USB_U2F'], if_true: files('u2f-passthru.c'))
++if u2f.found()
++  softmmu_ss.add(when: 'CONFIG_USB_U2F', if_true: [u2f, files('u2f-emulated.c')])
++endif
++
+ # usb redirect
+ if config_host.has_key('CONFIG_USB_REDIR')
+   usbredir_ss = ss.source_set()
+diff --git a/meson.build b/meson.build
+index f0fe5f8799..ae90fdbfe3 100644
+--- a/meson.build
++++ b/meson.build
+@@ -360,6 +360,11 @@ if 'CONFIG_SMARTCARD' in config_host
+   cacard = declare_dependency(compile_args: config_host['SMARTCARD_CFLAGS'].split(),
+                               link_args: config_host['SMARTCARD_LIBS'].split())
+ endif
++u2f = dependency('u2f-emu', required: get_option('u2f'), static: enable_static,
++                 include_type: 'system')
++if u2f.found()
++  u2f = declare_dependency(dependencies: u2f)
++endif
+ usbredir = not_found
+ if 'CONFIG_USB_REDIR' in config_host
+   usbredir = declare_dependency(compile_args: config_host['USB_REDIR_CFLAGS'].split(),
+@@ -385,6 +390,7 @@ endif
+ 
+ config_host_data.set('CONFIG_SDL', sdl.found())
+ config_host_data.set('CONFIG_SDL_IMAGE', sdl_image.found())
++config_host_data.set('CONFIG_U2F', u2f.found())
+ config_host_data.set('CONFIG_VNC', vnc.found())
+ config_host_data.set('CONFIG_VNC_JPEG', jpeg.found())
+ config_host_data.set('CONFIG_VNC_PNG', png.found())
+@@ -1365,6 +1371,7 @@ summary_info += {'spice support':     config_host.has_key('CONFIG_SPICE')}
+ summary_info += {'rbd support':       config_host.has_key('CONFIG_RBD')}
+ summary_info += {'xfsctl support':    config_host.has_key('CONFIG_XFS')}
+ summary_info += {'smartcard support': config_host.has_key('CONFIG_SMARTCARD')}
++summary_info += {'U2F support':       u2f.found()}
+ summary_info += {'libusb':            config_host.has_key('CONFIG_USB_LIBUSB')}
+ summary_info += {'usb net redir':     config_host.has_key('CONFIG_USB_REDIR')}
+ summary_info += {'OpenGL support':    config_host.has_key('CONFIG_OPENGL')}
+diff --git a/meson_options.txt b/meson_options.txt
+index c55f9cd94c..aef2de6523 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -1,6 +1,7 @@
+ option('gettext', type : 'boolean', value : true)
+ option('sdl', type : 'feature', value : 'auto')
+ option('sdl_image', type : 'feature', value : 'auto')
++option('u2f', type : 'feature', value : 'auto')
+ option('vnc', type : 'feature', value : 'enabled')
+ option('vnc_jpeg', type : 'feature', value : 'auto')
+ option('vnc_png', type : 'feature', value : 'auto')
 -- 
 2.28.0
 
