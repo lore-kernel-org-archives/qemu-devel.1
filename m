@@ -2,89 +2,91 @@ Return-Path: <SRS0=H0ck=CE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URI_HEX autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EB32C433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 18:13:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82722C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 18:29:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 313FF2083B
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 18:13:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3200B20737
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 18:29:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="HdysGc9H"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 313FF2083B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UuUr0XAN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3200B20737
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42388 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50632 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAzvk-0005Cb-Ed
-	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 14:13:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51706)
+	id 1kB0BF-0001FC-Cy
+	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 14:29:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55800)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
- id 1kAzv8-0004kX-2h
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 14:13:14 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:35891)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <frank.chang@sifive.com>)
- id 1kAzv4-0005ih-2Y
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 14:13:13 -0400
-Received: by mail-ot1-x341.google.com with SMTP id x24so2284943otp.3
- for <qemu-devel@nongnu.org>; Wed, 26 Aug 2020 11:13:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=mcEB64DEsR6QP9HJnPaP7PjbQjOvXxUngpsgJxfUkfs=;
- b=HdysGc9HqiOwo3OEe42bMWJRtXtOw7drsj8UhBYD+wxeB8WubsDw/giNyHoX56m8RT
- VDse0WVmrWwCir697t/SpilMGgvmXyuxa3Pc/+JuFJIVnsicTZHg7Zw2MmdRn+wK0kA5
- 8T4kX4GI+2Nm7dR0GepCMPa6T7HlSqt0r4+t2608HuvMTvArzXrYcrONlubpXQVRusDX
- ktSDJmoZ36xeVRovjo4m8Beti03gIq7KEPhEScs2rMFmgGLbvN92MaXoid1TAYUqkiOO
- vfd+h9qGRiSiw0EGfumDBPEqmU1YMg2bCCJl+g3Dvi716rn1QGKDPOWitg6SQQscZHha
- uPbQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=mcEB64DEsR6QP9HJnPaP7PjbQjOvXxUngpsgJxfUkfs=;
- b=XY4JFEi/Ia9PJMYWmgbzS1HIW633NJd8HsJBeQMmVOPzZb9xfkjFkriXuiYDLgMyhT
- 8w7k+RGEsvw6HdlTmvGCVGik/PM7IptWIPxiaI3hdrPZADQXVWlGO/BepdYxKZs4KJZX
- csI6/ZNDLuQeORWnGGGCCx1QINvHO6S9q8d6PrMKwDKHZa/4adqIjGMcW17Hnc3iVDUy
- xKjbI+MpkyY6AxXjvUG2QHO5PZm0phMBiuK77VXUG1KmsqWnv6kp14sxbLv2JnznZkrX
- ue8lKGk5FSIQl7B0KgQSnoHNOQCej08hEew2nCLQwHZNhrYxFBxkeRBDhG+aW+JtsxYq
- F9LA==
-X-Gm-Message-State: AOAM5321fRZfhhF22u4iA/JPkj1I5F3Z9kDUwDeuVJRVRc1rudh+Wcyf
- Wr8Vdo0G+45x+rZjpN1FAhnyn2zjtWgIKCUoBeg3yA==
-X-Google-Smtp-Source: ABdhPJy55T8ZekqznS1zbjiDN8zTbw8N8ng+slcmukFIX0vt27LLHZuIHfq9boJKeOCpmKmeX83lOCu3SwX9wuQhQPo=
-X-Received: by 2002:a9d:3443:: with SMTP id v61mr11310073otb.139.1598465588725; 
- Wed, 26 Aug 2020 11:13:08 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kB0AE-0000DH-Ti
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 14:28:50 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:51502)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kB0A9-0007b6-La
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 14:28:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1598466523;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=+paFAaEDiUUK3T6U8/uTfm9aHXWUJmAKUiyarpno+yE=;
+ b=UuUr0XAN31TvYgmwzaXBL4n/JMOaxEkbqaCFR6hC9NiYtP+4hPOXq5pYsqGBBDsvS/5ekq
+ cObrDxc+yHydfnIC8Fi7lnrsozpDdq8ijotLCfVm+4iJ50Ic0YsjOWMG/idEmnwIgcJsh4
+ Sac7743W/VSRw1dnQ1abujSvnjfj6zw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-272-gm-9V9cEPnCYLogU0rD-6Q-1; Wed, 26 Aug 2020 14:28:32 -0400
+X-MC-Unique: gm-9V9cEPnCYLogU0rD-6Q-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B8BB610082EB;
+ Wed, 26 Aug 2020 18:28:30 +0000 (UTC)
+Received: from redhat.com (ovpn-114-142.ams2.redhat.com [10.36.114.142])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A0B6C704AE;
+ Wed, 26 Aug 2020 18:28:27 +0000 (UTC)
+Date: Wed, 26 Aug 2020 19:28:24 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: Re: [PATCH v2 (BROKEN) 0/6] migration: bring improved
+ savevm/loadvm/delvm to QMP
+Message-ID: <20200826182824.GA190807@redhat.com>
+References: <20200727150843.3419256-1-berrange@redhat.com>
+ <877dtls8ux.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-References: <20200817084955.28793-1-frank.chang@sifive.com>
- <CAE_xrPjmrmwVW3YOTXLVuVpvT=mT+gnwKJy+yYjo6t24xC8ZDg@mail.gmail.com>
- <CAKmqyKOU8MUAaiCadAEp4YwArJOpsPRbd_sQmmTDO8g=v-Nw2g@mail.gmail.com>
- <CAE_xrPhcp74tJNqsRzOe++4PboVxEv0O4dEK9yEaK4CWn_VRHQ@mail.gmail.com>
- <CAKmqyKNog9-AQ3cwC1NGe3jhoyt9Vaqxur7OJgF2AGJY3eg2HA@mail.gmail.com>
-In-Reply-To: <CAKmqyKNog9-AQ3cwC1NGe3jhoyt9Vaqxur7OJgF2AGJY3eg2HA@mail.gmail.com>
-From: Frank Chang <frank.chang@sifive.com>
-Date: Thu, 27 Aug 2020 02:12:57 +0800
-Message-ID: <CAE_xrPihO4Eu5LV+-Vd9QgcrwRY-4Tu_D3Zp=AQdTfwbhS+ZNQ@mail.gmail.com>
-Subject: Re: [RFC v4 00/70] support vector extension v1.0
-To: Alistair Francis <alistair23@gmail.com>
-Content-Type: multipart/alternative; boundary="0000000000009a26f905adcbc5a8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::341;
- envelope-from=frank.chang@sifive.com; helo=mail-ot1-x341.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -19
-X-Spam_score: -2.0
-X-Spam_bar: --
-X-Spam_report: (-2.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, HTML_MESSAGE=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- URI_HEX=0.1 autolearn=unavailable autolearn_force=no
+In-Reply-To: <877dtls8ux.fsf@dusky.pond.sub.org>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
+X-Mimecast-Spam-Score: 0.005
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=berrange@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/26 14:05:19
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.959,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,565 +99,330 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Krempa <pkrempa@redhat.com>,
+ "Denis V. Lunev" <den@virtuozzo.com>, qemu-block@nongnu.org,
+ Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>,
+ Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000009a26f905adcbc5a8
-Content-Type: text/plain; charset="UTF-8"
-
-On Thu, Aug 27, 2020 at 2:03 AM Alistair Francis <alistair23@gmail.com>
-wrote:
-
-> On Wed, Aug 26, 2020 at 10:39 AM Frank Chang <frank.chang@sifive.com>
-> wrote:
+On Wed, Aug 26, 2020 at 05:52:06PM +0200, Markus Armbruster wrote:
+> Sorry for taking so long to reply.
+> 
+> Daniel P. Berrangé <berrange@redhat.com> writes:
+> 
+> > A followup to:
 > >
-> > On Thu, Aug 27, 2020 at 12:56 AM Alistair Francis <alistair23@gmail.com>
-> wrote:
-> >>
-> >> On Tue, Aug 25, 2020 at 1:29 AM Frank Chang <frank.chang@sifive.com>
-> wrote:
-> >> >
-> >> > On Mon, Aug 17, 2020 at 4:50 PM <frank.chang@sifive.com> wrote:
-> >> >>
-> >> >> From: Frank Chang <frank.chang@sifive.com>
-> >> >>
-> >> >> This patchset implements the vector extension v1.0 for RISC-V on
-> QEMU.
-> >> >>
-> >> >> This patchset is sent as RFC because RVV v1.0 is still in draft
-> state.
-> >> >> v2 patchset was sent for RVV v0.9 and bumped to RVV v1.0 since v3
-> patchset.
-> >> >>
-> >> >> The port is available here:
-> >> >> https://github.com/sifive/qemu/tree/rvv-1.0-upstream-v4
-> >> >>
-> >> >> You can change the cpu argument: vext_spec to v1.0 (i.e.
-> vext_spec=v1.0)
-> >> >> to run with RVV v1.0 instructions.
-> >> >>
-> >> >> Note: This patchset depends on two other patchsets listed in Based-on
-> >> >>       section below so it might not able to be built unless those two
-> >> >>       patchsets are applied.
-> >> >>
-> >> >> Changelog:
-> >> >>
-> >> >> v4
-> >> >>   * remove explicit float flmul variable in DisasContext.
-> >> >>   * replace floating-point calculations with shift operations to
-> >> >>     improve performance.
-> >> >>   * relax RV_VLEN_MAX to 512-bits.
-> >> >>
-> >> >> v3
-> >> >>   * apply nan-box helpers from Richard Henderson.
-> >> >>   * remove fp16 api changes as they are sent independently in another
-> >> >>     pathcset by Chih-Min Chao.
-> >> >>   * remove all tail elements clear functions as tail elements can
-> >> >>     retain unchanged for either VTA set to undisturbed or agnostic.
-> >> >>   * add fp16 nan-box check generator function.
-> >> >>   * add floating-point rounding mode enum.
-> >> >>   * replace flmul arithmetic with shifts to avoid floating-point
-> >> >>     conversions.
-> >> >>   * add Zvqmac extension.
-> >> >>   * replace gdbstub vector register xml files with dynamic generator.
-> >> >>   * bumped to RVV v1.0.
-> >> >>   * RVV v1.0 related changes:
-> >> >>     * add vl<nf>re<eew>.v and vs<nf>r.v vector whole register
-> >> >>       load/store instructions
-> >> >>     * add vrgatherei16 instruction.
-> >> >>     * rearranged bits in vtype to make vlmul bits into a contiguous
-> >> >>       field.
-> >> >>
-> >> >> v2
-> >> >>   * drop v0.7.1 support.
-> >> >>   * replace invisible return check macros with functions.
-> >> >>   * move mark_vs_dirty() to translators.
-> >> >>   * add SSTATUS_VS flag for s-mode.
-> >> >>   * nan-box scalar fp register for floating-point operations.
-> >> >>   * add gdbstub files for vector registers to allow system-mode
-> >> >>     debugging with GDB.
-> >> >>
-> >> >> Based-on: <20200724002807.441147-1-richard.henderson@linaro.org/>
-> >> >> Based-on: <
-> 1596102747-20226-1-git-send-email-chihmin.chao@sifive.com/>
-> >> >>
-> >> >> Frank Chang (62):
-> >> >>   target/riscv: drop vector 0.7.1 and add 1.0 support
-> >> >>   target/riscv: Use FIELD_EX32() to extract wd field
-> >> >>   target/riscv: rvv-1.0: introduce writable misa.v field
-> >> >>   target/riscv: rvv-1.0: remove rvv related codes from fcsr registers
-> >> >>   target/riscv: rvv-1.0: check MSTATUS_VS when accessing vector csr
-> >> >>     registers
-> >> >>   target/riscv: rvv-1.0: remove MLEN calculations
-> >> >>   target/riscv: rvv-1.0: add fractional LMUL
-> >> >>   target/riscv: rvv-1.0: add VMA and VTA
-> >> >>   target/riscv: rvv-1.0: update check functions
-> >> >>   target/riscv: introduce more imm value modes in translator
-> functions
-> >> >>   target/riscv: rvv:1.0: add translation-time nan-box helper function
-> >> >>   target/riscv: rvv-1.0: configure instructions
-> >> >>   target/riscv: rvv-1.0: stride load and store instructions
-> >> >>   target/riscv: rvv-1.0: index load and store instructions
-> >> >>   target/riscv: rvv-1.0: fix address index overflow bug of indexed
-> >> >>     load/store insns
-> >> >>   target/riscv: rvv-1.0: fault-only-first unit stride load
-> >> >>   target/riscv: rvv-1.0: amo operations
-> >> >>   target/riscv: rvv-1.0: load/store whole register instructions
-> >> >>   target/riscv: rvv-1.0: update vext_max_elems() for load/store insns
-> >> >>   target/riscv: rvv-1.0: take fractional LMUL into vector max
-> elements
-> >> >>     calculation
-> >> >>   target/riscv: rvv-1.0: floating-point square-root instruction
-> >> >>   target/riscv: rvv-1.0: floating-point classify instructions
-> >> >>   target/riscv: rvv-1.0: mask population count instruction
-> >> >>   target/riscv: rvv-1.0: find-first-set mask bit instruction
-> >> >>   target/riscv: rvv-1.0: set-X-first mask bit instructions
-> >> >>   target/riscv: rvv-1.0: iota instruction
-> >> >>   target/riscv: rvv-1.0: element index instruction
-> >> >>   target/riscv: rvv-1.0: allow load element with sign-extended
-> >> >>   target/riscv: rvv-1.0: register gather instructions
-> >> >>   target/riscv: rvv-1.0: integer scalar move instructions
-> >> >>   target/riscv: rvv-1.0: floating-point move instruction
-> >> >>   target/riscv: rvv-1.0: floating-point scalar move instructions
-> >> >>   target/riscv: rvv-1.0: whole register move instructions
-> >> >>   target/riscv: rvv-1.0: integer extension instructions
-> >> >>   target/riscv: rvv-1.0: single-width averaging add and subtract
-> >> >>     instructions
-> >> >>   target/riscv: rvv-1.0: single-width bit shift instructions
-> >> >>   target/riscv: rvv-1.0: integer add-with-carry/subtract-with-borrow
-> >> >>   target/riscv: rvv-1.0: narrowing integer right shift instructions
-> >> >>   target/riscv: rvv-1.0: widening integer multiply-add instructions
-> >> >>   target/riscv: rvv-1.0: add Zvqmac extension
-> >> >>   target/riscv: rvv-1.0: quad-widening integer multiply-add
-> instructions
-> >> >>   target/riscv: rvv-1.0: single-width saturating add and subtract
-> >> >>     instructions
-> >> >>   target/riscv: rvv-1.0: integer comparison instructions
-> >> >>   target/riscv: use softfloat lib float16 comparison functions
-> >> >>   target/riscv: rvv-1.0: floating-point compare instructions
-> >> >>   target/riscv: rvv-1.0: mask-register logical instructions
-> >> >>   target/riscv: rvv-1.0: slide instructions
-> >> >>   target/riscv: rvv-1.0: floating-point slide instructions
-> >> >>   target/riscv: rvv-1.0: narrowing fixed-point clip instructions
-> >> >>   target/riscv: rvv-1.0: single-width floating-point reduction
-> >> >>   target/riscv: rvv-1.0: widening floating-point reduction
-> instructions
-> >> >>   target/riscv: rvv-1.0: single-width scaling shift instructions
-> >> >>   target/riscv: rvv-1.0: remove widening saturating scaled
-> multiply-add
-> >> >>   target/riscv: rvv-1.0: remove vmford.vv and vmford.vf
-> >> >>   target/riscv: rvv-1.0: remove integer extract instruction
-> >> >>   target/riscv: rvv-1.0: floating-point min/max instructions
-> >> >>   target/riscv: introduce floating-point rounding mode enum
-> >> >>   target/riscv: rvv-1.0: floating-point/integer type-convert
-> >> >>     instructions
-> >> >>   target/riscv: rvv-1.0: widening floating-point/integer type-convert
-> >> >>   target/riscv: add "set round to odd" rounding mode helper function
-> >> >>   target/riscv: rvv-1.0: narrowing floating-point/integer
-> type-convert
-> >> >>   target/riscv: rvv-1.0: relax RV_VLEN_MAX to 512-bits
-> >> >>
-> >> >> Greentime Hu (2):
-> >> >>   target/riscv: rvv-1.0: add vlenb register
-> >> >>   target/riscv: gdb: support vector registers for rv32
-> >> >>
-> >> >> Hsiangkai Wang (2):
-> >> >>   target/riscv: gdb: modify gdb csr xml file to align with csr
-> register
-> >> >>     map
-> >> >>   target/riscv: gdb: support vector registers for rv64
-> >> >>
-> >> >> LIU Zhiwei (4):
-> >> >>   target/riscv: rvv-1.0: add mstatus VS field
-> >> >>   target/riscv: rvv-1.0: add sstatus VS field
-> >> >>   target/riscv: rvv-1.0: add translation-time vector context status
-> >> >>   target/riscv: rvv-1.0: add vcsr register
-> >> >>
-> >> >>  gdb-xml/riscv-32bit-csr.xml             |   18 +-
-> >> >>  gdb-xml/riscv-64bit-csr.xml             |   18 +-
-> >> >>  target/riscv/cpu.c                      |   12 +-
-> >> >>  target/riscv/cpu.h                      |   97 +-
-> >> >>  target/riscv/cpu_bits.h                 |   10 +
-> >> >>  target/riscv/cpu_helper.c               |   16 +-
-> >> >>  target/riscv/csr.c                      |   73 +-
-> >> >>  target/riscv/fpu_helper.c               |   17 +-
-> >> >>  target/riscv/gdbstub.c                  |  126 +-
-> >> >>  target/riscv/helper.h                   |  523 ++--
-> >> >>  target/riscv/insn32-64.decode           |   18 +-
-> >> >>  target/riscv/insn32.decode              |  295 +-
-> >> >>  target/riscv/insn_trans/trans_rvv.inc.c | 2366 ++++++++++------
-> >> >>  target/riscv/internals.h                |   19 +-
-> >> >>  target/riscv/translate.c                |   68 +-
-> >> >>  target/riscv/vector_helper.c            | 3269
-> +++++++++++------------
-> >> >>  16 files changed, 4051 insertions(+), 2894 deletions(-)
-> >> >>
-> >> >> --
-> >> >> 2.17.1
-> >> >>
-> >> >
-> >> > ping~
-> >>
-> >> I wasn't really following too closely, but didn't Richard give comments?
-> >>
-> >> Alistair
+> >  v1: https://lists.gnu.org/archive/html/qemu-devel/2020-07/msg00866.html
 > >
+> > When QMP was first introduced some 10+ years ago now, the snapshot
+> > related commands (savevm/loadvm/delvm) were not converted. This was
+> > primarily because their implementation causes blocking of the thread
+> > running the monitor commands. This was (and still is) considered
+> > undesirable behaviour both in HMP and QMP.
+> 
+> One of several reasons.
+> 
+> > In theory someone was supposed to fix this flaw at some point in the
+> > past 10 years and bring them into the QMP world. Sadly, thus far it
+> > hasn't happened as people always had more important things to work
+> > on. Enterprise apps were much more interested in external snapshots
+> > than internal snapshots as they have many more features.
+> 
+> Several attempts have been made to bring the functionality to QMP.
+> Sadly, they went nowhere.
+> 
+> I posted an analysis of the issues in reply to one of the more serious
+> attempts:
+> 
+>     Message-ID: <87lh7l783q.fsf@blackfin.pond.sub.org>
+>     https://lists.nongnu.org/archive/html/qemu-devel/2016-01/msg03593.html
+> 
+> I'd like to hear your take on it.  I append the relevant part for your
+> convenience.  Perhaps your code is already close to what I describe
+> there.  I'm interested in where it falls short.
+> 
+> > Meanwhile users still want to use internal snapshots as there is
+> > a certainly simplicity in having everything self-contained in one
+> > image, even though it has limitations. Thus the apps that end up
+> > executing the savevm/loadvm/delvm via the "human-monitor-command"
+> > QMP command.
 > >
-> > Yeah, they were given in v3 patchset and I've made the changes
-> > based on Richard's comments in this v4 patchset.
->
-> Ah ok. I missed that while I was on holidays.
->
-> Did you want to wait until the v1.0 spec is released or have the draft
-> extensions merged?
->
-> Alistair
->
+> > IOW, the problematic blocking behaviour that was one of the reasons
+> > for not having savevm/loadvm/delvm in QMP is experienced by applications
+> > regardless. By not portting the commands to QMP due to one design flaw,
+> > we've forced apps and users to suffer from other design flaws of HMP (
+> > bad error reporting, strong type checking of args, no introspection) for
+> > an additional 10 years. This feels rather sub-optimal :-(
 > >
-> > Frank Chang
->
+> > In practice users don't appear to care strongly about the fact that these
+> > commands block the VM while they run. I might have seen one bug report
+> > about it, but it certainly isn't something that comes up as a frequent
+> > topic except among us QEMU maintainers. Users do care about having
+> > access to the snapshot feature.
+> >
+> > Where I am seeing frequent complaints is wrt the use of OVMF combined
+> > with snapshots which has some serious pain points. This is getting worse
+> > as the push to ditch legacy BIOS in favour of UEFI gain momentum both
+> > across OS vendors and mgmt apps. Solving it requires new parameters to
+> > the commands, but doing this in HMP is super unappealing.
+> >
+> > After 10 years, I think it is time for us to be a little pragmatic about
+> > our handling of snapshots commands. My desire is that libvirt should never
+> > use "human-monitor-command" under any circumstances, because of the
+> > inherant flaws in HMP as a protocol for machine consumption.
+> >
+> > Thus in this series I'm proposing a fairly direct mapping of the existing
+> > HMP commands for savevm/loadvm/delvm into QMP as a first step. This does
+> > not solve the blocking thread problem, but it does put in a place a
+> > design using the jobs framework which can facilitate solving it later.
+> > It does also solve the error reporting, type checking and introspection
+> > problems inherant to HMP. So we're winning on 3 out of the 4 problems,
+> > and pushed apps to a QMP design that will let us solve the last
+> > remaining problem.
+> >
+> > With a QMP variant, we reasonably deal with the problems related to OVMF:
+> >
+> >  - The logic to pick which disk to store the vmstate in is not
+> >    satsifactory.
+> >
+> >    The first block driver state cannot be assumed to be the root disk
+> >    image, it might be OVMF varstore and we don't want to store vmstate
+> >    in there.
+> 
+> Yes, this is one of the issues.  Glad you're addressing it.
+> 
+> >  - The logic to decide which disks must be snapshotted is hardwired
+> >    to all disks which are writable
+> >
+> >    Again with OVMF there might be a writable varstore, but this can be
+> >    raw rather than qcow2 format, and thus unable to be snapshotted.
+> >    While users might wish to snapshot their varstore, in some/many/most
+> >    cases it is entirely uneccessary. Users are blocked from snapshotting
+> >    their VM though due to this varstore.
+> 
+> Another one.  Glad again.
+> 
+> > These are solved by adding two parameters to the commands. The first is
+> > a block device node name that identifies the image to store vmstate in,
+> > and the second is a list of node names to include for the snapshots.
+> > If the list of nodes isn't given, it falls back to the historical
+> > behaviour of using all disks matching some undocumented criteria.
+> >
+> > In the block code I've only dealt with node names for block devices, as
+> > IIUC, this is all that libvirt should need in the -blockdev world it now
+> > lives in. IOW, I've made not attempt to cope with people wanting to use
+> > these QMP commands in combination with -drive args.
+> >
+> > I've done some minimal work in libvirt to start to make use of the new
+> > commands to validate their functionality, but this isn't finished yet.
+> >
+> > My ultimate goal is to make the GNOME Boxes maintainer happy again by
+> > having internal snapshots work with OVMF:
+> >
+> >   https://gitlab.gnome.org/GNOME/gnome-boxes/-/commit/c486da262f6566326fbcb5e=
+> > f45c5f64048f16a6e
+> >
+> > HELP NEEDED:  this series starts to implement the approach that Kevin
+> > suggested wrto use of generic jobs.
+> 
+> Does this mean you're trying to use the jobs infrastructure?
 
-I'm okay to wait until v1.0 spec. is released as I'm just sending
-RFC patchset for now. As far as I know there are still couple of
-instructions not implemented for RVV v1.0 yet (e.g. *vfrsqrt7.v*
-and *vfrece7.v*). Not sure what else is going to be changed before
-v1.0 spec. is ratified.
+Yes, this is working now.
 
-However, it would still be nice if someone can take a look of current
-patches so it might speed up the process to get these patches merged
-into mainline once v1.0 spec. is released.
 
-Thanks,
-Frank Chang
+> Relevant part of Message-ID: <87lh7l783q.fsf@blackfin.pond.sub.org>
+> 
+> If we can't make a sane QMP interface, I'd rather have no QMP interface.
 
---0000000000009a26f905adcbc5a8
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+I strongly disagree with this. This absolutist position is why we
+have made zero progress in 10+ years, leaving mgmt apps suffering
+with HMP passthrough, as described above. 
 
-<div dir=3D"ltr"><div dir=3D"ltr">On Thu, Aug 27, 2020 at 2:03 AM Alistair =
-Francis &lt;<a href=3D"mailto:alistair23@gmail.com">alistair23@gmail.com</a=
->&gt; wrote:<br></div><div class=3D"gmail_quote"><blockquote class=3D"gmail=
-_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204=
-,204);padding-left:1ex">On Wed, Aug 26, 2020 at 10:39 AM Frank Chang &lt;<a=
- href=3D"mailto:frank.chang@sifive.com" target=3D"_blank">frank.chang@sifiv=
-e.com</a>&gt; wrote:<br>
-&gt;<br>
-&gt; On Thu, Aug 27, 2020 at 12:56 AM Alistair Francis &lt;<a href=3D"mailt=
-o:alistair23@gmail.com" target=3D"_blank">alistair23@gmail.com</a>&gt; wrot=
-e:<br>
-&gt;&gt;<br>
-&gt;&gt; On Tue, Aug 25, 2020 at 1:29 AM Frank Chang &lt;<a href=3D"mailto:=
-frank.chang@sifive.com" target=3D"_blank">frank.chang@sifive.com</a>&gt; wr=
-ote:<br>
-&gt;&gt; &gt;<br>
-&gt;&gt; &gt; On Mon, Aug 17, 2020 at 4:50 PM &lt;<a href=3D"mailto:frank.c=
-hang@sifive.com" target=3D"_blank">frank.chang@sifive.com</a>&gt; wrote:<br=
->
-&gt;&gt; &gt;&gt;<br>
-&gt;&gt; &gt;&gt; From: Frank Chang &lt;<a href=3D"mailto:frank.chang@sifiv=
-e.com" target=3D"_blank">frank.chang@sifive.com</a>&gt;<br>
-&gt;&gt; &gt;&gt;<br>
-&gt;&gt; &gt;&gt; This patchset implements the vector extension v1.0 for RI=
-SC-V on QEMU.<br>
-&gt;&gt; &gt;&gt;<br>
-&gt;&gt; &gt;&gt; This patchset is sent as RFC because RVV v1.0 is still in=
- draft state.<br>
-&gt;&gt; &gt;&gt; v2 patchset was sent for RVV v0.9 and bumped to RVV v1.0 =
-since v3 patchset.<br>
-&gt;&gt; &gt;&gt;<br>
-&gt;&gt; &gt;&gt; The port is available here:<br>
-&gt;&gt; &gt;&gt; <a href=3D"https://github.com/sifive/qemu/tree/rvv-1.0-up=
-stream-v4" rel=3D"noreferrer" target=3D"_blank">https://github.com/sifive/q=
-emu/tree/rvv-1.0-upstream-v4</a><br>
-&gt;&gt; &gt;&gt;<br>
-&gt;&gt; &gt;&gt; You can change the cpu argument: vext_spec to v1.0 (i.e. =
-vext_spec=3Dv1.0)<br>
-&gt;&gt; &gt;&gt; to run with RVV v1.0 instructions.<br>
-&gt;&gt; &gt;&gt;<br>
-&gt;&gt; &gt;&gt; Note: This patchset depends on two other patchsets listed=
- in Based-on<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0section below so it might not a=
-ble to be built unless those two<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0patchsets are applied.<br>
-&gt;&gt; &gt;&gt;<br>
-&gt;&gt; &gt;&gt; Changelog:<br>
-&gt;&gt; &gt;&gt;<br>
-&gt;&gt; &gt;&gt; v4<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0* remove explicit float flmul variable in Dis=
-asContext.<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0* replace floating-point calculations with sh=
-ift operations to<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0 =C2=A0improve performance.<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0* relax RV_VLEN_MAX to 512-bits.<br>
-&gt;&gt; &gt;&gt;<br>
-&gt;&gt; &gt;&gt; v3<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0* apply nan-box helpers from Richard Henderso=
-n.<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0* remove fp16 api changes as they are sent in=
-dependently in another<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0 =C2=A0pathcset by Chih-Min Chao.<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0* remove all tail elements clear functions as=
- tail elements can<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0 =C2=A0retain unchanged for either VTA set to=
- undisturbed or agnostic.<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0* add fp16 nan-box check generator function.<=
-br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0* add floating-point rounding mode enum.<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0* replace flmul arithmetic with shifts to avo=
-id floating-point<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0 =C2=A0conversions.<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0* add Zvqmac extension.<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0* replace gdbstub vector register xml files w=
-ith dynamic generator.<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0* bumped to RVV v1.0.<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0* RVV v1.0 related changes:<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0 =C2=A0* add vl&lt;nf&gt;re&lt;eew&gt;.v and =
-vs&lt;nf&gt;r.v vector whole register<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0load/store instructions<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0 =C2=A0* add vrgatherei16 instruction.<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0 =C2=A0* rearranged bits in vtype to make vlm=
-ul bits into a contiguous<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0field.<br>
-&gt;&gt; &gt;&gt;<br>
-&gt;&gt; &gt;&gt; v2<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0* drop v0.7.1 support.<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0* replace invisible return check macros with =
-functions.<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0* move mark_vs_dirty() to translators.<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0* add SSTATUS_VS flag for s-mode.<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0* nan-box scalar fp register for floating-poi=
-nt operations.<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0* add gdbstub files for vector registers to a=
-llow system-mode<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0 =C2=A0debugging with GDB.<br>
-&gt;&gt; &gt;&gt;<br>
-&gt;&gt; &gt;&gt; Based-on: &lt;<a href=3D"http://20200724002807.441147-1-r=
-ichard.henderson@linaro.org/" rel=3D"noreferrer" target=3D"_blank">20200724=
-002807.441147-1-richard.henderson@linaro.org/</a>&gt;<br>
-&gt;&gt; &gt;&gt; Based-on: &lt;<a href=3D"http://1596102747-20226-1-git-se=
-nd-email-chihmin.chao@sifive.com/" rel=3D"noreferrer" target=3D"_blank">159=
-6102747-20226-1-git-send-email-chihmin.chao@sifive.com/</a>&gt;<br>
-&gt;&gt; &gt;&gt;<br>
-&gt;&gt; &gt;&gt; Frank Chang (62):<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: drop vector 0.7.1 and add 1.0 s=
-upport<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: Use FIELD_EX32() to extract wd =
-field<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: rvv-1.0: introduce writable mis=
-a.v field<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: rvv-1.0: remove rvv related cod=
-es from fcsr registers<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: rvv-1.0: check MSTATUS_VS when =
-accessing vector csr<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0 =C2=A0registers<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: rvv-1.0: remove MLEN calculatio=
-ns<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: rvv-1.0: add fractional LMUL<br=
->
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: rvv-1.0: add VMA and VTA<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: rvv-1.0: update check functions=
-<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: introduce more imm value modes =
-in translator functions<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: rvv:1.0: add translation-time n=
-an-box helper function<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: rvv-1.0: configure instructions=
-<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: rvv-1.0: stride load and store =
-instructions<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: rvv-1.0: index load and store i=
-nstructions<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: rvv-1.0: fix address index over=
-flow bug of indexed<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0 =C2=A0load/store insns<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: rvv-1.0: fault-only-first unit =
-stride load<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: rvv-1.0: amo operations<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: rvv-1.0: load/store whole regis=
-ter instructions<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: rvv-1.0: update vext_max_elems(=
-) for load/store insns<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: rvv-1.0: take fractional LMUL i=
-nto vector max elements<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0 =C2=A0calculation<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: rvv-1.0: floating-point square-=
-root instruction<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: rvv-1.0: floating-point classif=
-y instructions<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: rvv-1.0: mask population count =
-instruction<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: rvv-1.0: find-first-set mask bi=
-t instruction<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: rvv-1.0: set-X-first mask bit i=
-nstructions<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: rvv-1.0: iota instruction<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: rvv-1.0: element index instruct=
-ion<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: rvv-1.0: allow load element wit=
-h sign-extended<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: rvv-1.0: register gather instru=
-ctions<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: rvv-1.0: integer scalar move in=
-structions<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: rvv-1.0: floating-point move in=
-struction<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: rvv-1.0: floating-point scalar =
-move instructions<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: rvv-1.0: whole register move in=
-structions<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: rvv-1.0: integer extension inst=
-ructions<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: rvv-1.0: single-width averaging=
- add and subtract<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0 =C2=A0instructions<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: rvv-1.0: single-width bit shift=
- instructions<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: rvv-1.0: integer add-with-carry=
-/subtract-with-borrow<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: rvv-1.0: narrowing integer righ=
-t shift instructions<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: rvv-1.0: widening integer multi=
-ply-add instructions<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: rvv-1.0: add Zvqmac extension<b=
-r>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: rvv-1.0: quad-widening integer =
-multiply-add instructions<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: rvv-1.0: single-width saturatin=
-g add and subtract<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0 =C2=A0instructions<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: rvv-1.0: integer comparison ins=
-tructions<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: use softfloat lib float16 compa=
-rison functions<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: rvv-1.0: floating-point compare=
- instructions<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: rvv-1.0: mask-register logical =
-instructions<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: rvv-1.0: slide instructions<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: rvv-1.0: floating-point slide i=
-nstructions<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: rvv-1.0: narrowing fixed-point =
-clip instructions<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: rvv-1.0: single-width floating-=
-point reduction<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: rvv-1.0: widening floating-poin=
-t reduction instructions<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: rvv-1.0: single-width scaling s=
-hift instructions<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: rvv-1.0: remove widening satura=
-ting scaled multiply-add<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: rvv-1.0: remove vmford.vv and v=
-mford.vf<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: rvv-1.0: remove integer extract=
- instruction<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: rvv-1.0: floating-point min/max=
- instructions<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: introduce floating-point roundi=
-ng mode enum<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: rvv-1.0: floating-point/integer=
- type-convert<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0 =C2=A0instructions<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: rvv-1.0: widening floating-poin=
-t/integer type-convert<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: add &quot;set round to odd&quot=
-; rounding mode helper function<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: rvv-1.0: narrowing floating-poi=
-nt/integer type-convert<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: rvv-1.0: relax RV_VLEN_MAX to 5=
-12-bits<br>
-&gt;&gt; &gt;&gt;<br>
-&gt;&gt; &gt;&gt; Greentime Hu (2):<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: rvv-1.0: add vlenb register<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: gdb: support vector registers f=
-or rv32<br>
-&gt;&gt; &gt;&gt;<br>
-&gt;&gt; &gt;&gt; Hsiangkai Wang (2):<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: gdb: modify gdb csr xml file to=
- align with csr register<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0 =C2=A0map<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: gdb: support vector registers f=
-or rv64<br>
-&gt;&gt; &gt;&gt;<br>
-&gt;&gt; &gt;&gt; LIU Zhiwei (4):<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: rvv-1.0: add mstatus VS field<b=
-r>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: rvv-1.0: add sstatus VS field<b=
-r>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: rvv-1.0: add translation-time v=
-ector context status<br>
-&gt;&gt; &gt;&gt;=C2=A0 =C2=A0target/riscv: rvv-1.0: add vcsr register<br>
-&gt;&gt; &gt;&gt;<br>
-&gt;&gt; &gt;&gt;=C2=A0 gdb-xml/riscv-32bit-csr.xml=C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 =C2=A018 +-<br>
-&gt;&gt; &gt;&gt;=C2=A0 gdb-xml/riscv-64bit-csr.xml=C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 =C2=A018 +-<br>
-&gt;&gt; &gt;&gt;=C2=A0 target/riscv/cpu.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A012 +-<br>
-&gt;&gt; &gt;&gt;=C2=A0 target/riscv/cpu.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A097 +-<br>
-&gt;&gt; &gt;&gt;=C2=A0 target/riscv/cpu_bits.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 =C2=A010 +<br>
-&gt;&gt; &gt;&gt;=C2=A0 target/riscv/cpu_helper.c=C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 =C2=A016 +-<br>
-&gt;&gt; &gt;&gt;=C2=A0 target/riscv/csr.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A073 +-<br>
-&gt;&gt; &gt;&gt;=C2=A0 target/riscv/fpu_helper.c=C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 =C2=A017 +-<br>
-&gt;&gt; &gt;&gt;=C2=A0 target/riscv/gdbstub.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 126 +-<br>
-&gt;&gt; &gt;&gt;=C2=A0 target/riscv/helper.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 523 ++--<br>
-&gt;&gt; &gt;&gt;=C2=A0 target/riscv/insn32-64.decode=C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0|=C2=A0 =C2=A018 +-<br>
-&gt;&gt; &gt;&gt;=C2=A0 target/riscv/insn32.decode=C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 295 +-<br>
-&gt;&gt; &gt;&gt;=C2=A0 target/riscv/insn_trans/trans_rvv.inc.c | 2366 ++++=
-++++++------<br>
-&gt;&gt; &gt;&gt;=C2=A0 target/riscv/internals.h=C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A019 +-<br>
-&gt;&gt; &gt;&gt;=C2=A0 target/riscv/translate.c=C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A068 +-<br>
-&gt;&gt; &gt;&gt;=C2=A0 target/riscv/vector_helper.c=C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 | 3269 +++++++++++------------<br>
-&gt;&gt; &gt;&gt;=C2=A0 16 files changed, 4051 insertions(+), 2894 deletion=
-s(-)<br>
-&gt;&gt; &gt;&gt;<br>
-&gt;&gt; &gt;&gt; --<br>
-&gt;&gt; &gt;&gt; 2.17.1<br>
-&gt;&gt; &gt;&gt;<br>
-&gt;&gt; &gt;<br>
-&gt;&gt; &gt; ping~<br>
-&gt;&gt;<br>
-&gt;&gt; I wasn&#39;t really following too closely, but didn&#39;t Richard =
-give comments?<br>
-&gt;&gt;<br>
-&gt;&gt; Alistair<br>
-&gt;<br>
-&gt;<br>
-&gt; Yeah, they were given in v3 patchset and I&#39;ve made the changes<br>
-&gt; based on Richard&#39;s comments in this v4 patchset.<br>
-<br>
-Ah ok. I missed that while I was on holidays.<br>
-<br>
-Did you want to wait until the v1.0 spec is released or have the draft<br>
-extensions merged?<br>
-<br>
-Alistair<br>
-<br>
-&gt;<br>
-&gt; Frank Chang<br></blockquote><div><br></div><div>I&#39;m okay to wait u=
-ntil v1.0 spec. is released as I&#39;m just sending</div><div>RFC patchset =
-for now. As far as I know there are still couple of</div><div>instructions =
-not implemented for RVV v1.0 yet (e.g. <i>vfrsqrt7.v</i></div><div>and <i>v=
-frece7.v</i>). Not sure what else is going to be changed before</div><div>v=
-1.0 spec. is ratified.</div><div><br></div><div>However, it would still be =
-nice if someone can take a look of current</div><div>patches so it might sp=
-eed up the process to get these patches merged</div><div>into mainline once=
- v1.0 spec. is released.</div><div><br></div><div>Thanks,</div><div>Frank C=
-hang</div></div></div>
+This is a prime example of perfect being the enemy of good.
 
---0000000000009a26f905adcbc5a8--
+> However, I believe we *can* make a sane QMP interface if we put in the
+> design work.
+
+We should make a credible attempt at QMP design, but if perfection
+isn't practical, we should none the less do *something* in QMP, even
+if we find we need to deprecate & replace it later.
+
+> The design work must start with a review of what we're trying to
+> accomplish, and how to fit it into the rest of the system.  Here's my
+> attempt.  Since my knowledge on snapshots is rather superficial, I'm
+> cc'ing Kevin for additional snapshot expertise.  Kevin, please correct
+> me when I talk nonsense.  I'm further cc'ing Eric and Peter for the
+> management layer perspective.
+
+The things I'm trying to accomplish as listed in the text above.
+Primarily this is about fixing the ability to snapshot guests where
+QEMU's heuristics for picking block devices is broken. ie explicitly
+list the disks to snapshot and which to store vmstate in.
+
+Converting from HMP to QMP is esentially an enabler, because adding
+new args to existing savevm/loadvm HMP commands is just too horrible
+to contemplate, as mgmt apps have no sane way to probe HMP. That's
+what QMP is for.
+
+Essentially the goal is to fix the inability to use internal snapshots
+with UEFI based VMs that is causing immediate pain for mgmt apps due
+to increased need to support UEFI.
+
+> A point-in-time snapshot of a system consists of a snapshot of its
+> machine state and snapshots of its storage.  All the snapshots need to
+> be made at the same point in time for the result to be consistent.
+> 
+> Snapshots of read-only storage carry no information and are commonly
+> omitted.
+> 
+> Isolated storage snapshots can make sense, but snapshotting the machine
+> state without also snapshotting the machine's storage doesn't sound
+> useful to me.
+> 
+> Both storage and machine state snapshots come in two flavours: internal
+> and external.
+> 
+> External ones can be made with any block backend, but internal storage
+> snapshots work only with certain formats, notably qcow2.  QMP supports
+> both kinds of storage snapshots.
+> 
+> Both kinds of storage snapshots need exclusive access while they work.
+> They're relatively quick, but the delay could be noticable for large
+> internal snapshots, and perhaps for external snapshots on really slow
+> storage.
+> 
+> Internal machine state snapshots are currently only available via HMP's
+> savevm, which integrates internal machine state and storage snapshots.
+> This is non-live, i.e. the guest is stopped while the snapshot gets
+> saved.  I figure we could make it live if we really wanted to.  Another
+> instance of the emerging background job concept.
+> 
+> On the implementation level, QCOW2 can't currently store a machine state
+> snapshot without also storing a storage snapshot.  I guess we could
+> change this if we really wanted to.
+> 
+> External machine state snapshots are basically migrate to file.
+> Supported by QMP.
+> 
+> Live migration to file is possible, but currently wastes space, because
+> memory dirtied during migration gets saved multiple times.  Could be
+> fixed either by making migration update previously saved memory instead
+> of appending (beware, random I/O), or by compacting the file afterwards.
+> 
+> Non-live migration to file doesn't waste space that way.
+> 
+> To take multiple *consistent* snapshots, you have to bundle them up in a
+> transaction.  Transactions currently support only *storage* snapshots,
+> though.
+> 
+> Work-around for external machine state snapshot: migrate to file
+> (possibly live), leaving the guest sopped on completion, take storage
+> snapshots, resume guest.
+> 
+> You can combine internal and external storage snapshots with an external
+> machine state snapshot to get a mixed system snapshot.
+> 
+> You currently can't do that with an internal machine state snapshot: the
+> only way to take one is HMP savevm, which insists on internally
+> snapshotting all writable storage, and doesn't transact together with
+> external storage snapshots.
+> 
+> Except for the case "purely internal snapshot with just one writable
+> storage device", a system snapshot consists of multiple parts stored in
+> separate files.  Tying the parts together is a management problem.  QEMU
+> provides rudimentary management for purely internal snapshots, but it's
+> flawed: missing storage isn't detected, and additional storage can creep
+> in if snapshot tags or IDs happen to match.  I guess managing the parts
+> is better left to the management layer.
+> 
+> I figure a fully general QMP interface would let you perform a system
+> snapshot by combining storage snapshots of either kind with either kind
+> of machine state snapshot.
+> 
+> We already have most of the building blocks: we can take external and
+> internal storage snapshots, and combine them in transactions.
+> 
+> What's missing is transactionable machine state snapshots.
+> 
+> We know how to work around it for external machine state snapshots (see
+> above), but a transaction-based solution might be nicer.
+> 
+> Any solution for internal machine state snapshots in QMP should at least
+> try to fit into this.  Some restrictions are okay.  For instance, we
+> probably need to restrict internal machine state snapshots to piggyback
+> on an internal storage snapshot for now, so we don't have to dig up
+> QCOW2 just to get QMP support.
+
+From the POV of practicality, making a design that unifies internal
+and external snapshots is something I'm considering out of scope.
+It increases the design time burden, as well as implementation burden.
+On my side, improving internal snapshots is a "spare time" project,
+not something I can justify spending weeks or months on.
+
+My goal is to implement something that is achievable in a short
+amount of time that gets us out of the hole we've been in for 10
+years. Minimal refactoring of the internal snapshot code aside
+from fixing the critical limitations we have today around choice
+of disks to snapshot.
+
+If someone later wants to come up with a grand unified design
+for everything that's fine, we can deprecate the new QMP commands
+I'm proposing now.
+
+> We can talk about more convenient interfaces for common special cases,
+> but I feel we need to design for the general case.  We don't have to
+> implement the completely general case right away, though.  As long as we
+> know where we want to go, incremental steps towards that goal are fine.
+> 
+> Can we create a transactionable QMP command to take an internal machine
+> state snapshot?
+> 
+> This would be like HMP savevm with the following differences:
+> 
+> * Separate parameters for tag and ID.  I'll have none of this
+>   overloading nonsense in QMP.
+> 
+> * Specify the destination block device.  I'll have none of this "pick a
+>   device in some magic, undocumented way" in QMP.
+> 
+> * Leave alone the other block devices.  Adding transaction actions to
+>   snapshot all the writable block devices to get a full system snapshot
+>   is the user's responsibility.
+> 
+> Limitations:
+> 
+> * No live internal machine snapshot, yet.
+> 
+> * The storage device taking the internal snapshot must also be
+>   internally snapshot for now.  In fact, the command does both
+>   (tolerable wart).
+> 
+> Open questions:
+> 
+> * Do we want the QMP command to delete existing snapshots with
+>   conflicting tag / ID, like HMP savevm does?  Or do we want it to fail
+>   the transaction?
+
+The intent is for the QMP commands to operate exclusively on
+'tags', and never consider "ID".
+
+> * Do we need transactions for switching to a system snapshot, too?
+> 
+> Opinions?
+
+
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+
 
