@@ -7,52 +7,52 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C756C433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 11:46:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C247C433E3
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 11:47:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F02BA20707
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 11:46:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DE67620707
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 11:47:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=lse.epita.fr header.i=@lse.epita.fr header.b="O51UEbZA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F02BA20707
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=lse.epita.fr header.i=@lse.epita.fr header.b="mQTGdZJr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE67620707
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=lse.epita.fr
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39906 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43760 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAtt5-0003Ug-9g
-	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 07:46:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56608)
+	id 1kAtuE-00051p-4D
+	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 07:47:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56670)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <srs0=n7r+=ce=lse.epita.fr=cesar.belley@cri.epita.fr>)
- id 1kAtpL-0004h8-DK
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 07:42:51 -0400
-Received: from gate-2.cri.epita.net ([163.5.55.20]:47916
+ id 1kAtpR-0004vp-MW
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 07:42:57 -0400
+Received: from gate-2.cri.epita.net ([163.5.55.20]:47946
  helo=mail-2.srv.cri.epita.fr)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <srs0=n7r+=ce=lse.epita.fr=cesar.belley@cri.epita.fr>)
- id 1kAtpJ-00085n-CX
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 07:42:51 -0400
+ id 1kAtpP-00086m-R2
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 07:42:57 -0400
 Received: from MattGorko-Laptop.home
  (lfbn-idf1-1-1395-83.w90-79.abo.wanadoo.fr [90.79.87.83])
  (Authenticated sender: cesar.belley)
- by mail-2.srv.cri.epita.fr (Postfix) with ESMTPSA id 7C56D412DC;
- Wed, 26 Aug 2020 13:42:47 +0200 (CEST)
+ by mail-2.srv.cri.epita.fr (Postfix) with ESMTPSA id 973D6412E8;
+ Wed, 26 Aug 2020 13:42:54 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=lse.epita.fr; s=cri;
- t=1598442167; bh=pXjOhnz/ejL0oC4wPTqjtOBcoqXZnfCQ63MGA0Z0KNY=;
+ t=1598442174; bh=WhUfeKytyuCUL59PtsGUkPGPstr2XF/LWbWzGaMaN3Y=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=O51UEbZAfp2KOm3cEuur0IvJ05gJ8P9QdiwK96P9NM3MMbINLDF6fGXrmD+iDoYtr
- +XatVnQOOxcISQScBg/3bqnHgSuSXnzm8X/Y7b1rTFJYt5aGYepnlhq2QJ6xPzA5Am
- vaDx3ML5MQT724wNpZahrwh5sQAaAxKgODCA7zm8=
+ b=mQTGdZJrNPu+4rjVogUCz+BRYee/10/D09/nA9+30PBHpJrrrh8i9lFsbAHz2ut2r
+ Q2OZVThp4OzA0jWW217P6u8wCVVv8ShVkphQZOy2Yae7gcy6OzSYc+KB53ym6qqe4Z
+ oHK7rLyrEflQ3Ef7a2tENqUKE28Y+QQA7C1r5I24=
 From: =?UTF-8?q?C=C3=A9sar=20Belley?= <cesar.belley@lse.epita.fr>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 07/12] meson: Add U2F key to meson
-Date: Wed, 26 Aug 2020 13:42:04 +0200
-Message-Id: <20200826114209.28821-8-cesar.belley@lse.epita.fr>
+Subject: [PATCH v3 10/12] scripts: Add u2f-setup-gen script
+Date: Wed, 26 Aug 2020 13:42:07 +0200
+Message-Id: <20200826114209.28821-11-cesar.belley@lse.epita.fr>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20200826114209.28821-1-cesar.belley@lse.epita.fr>
 References: <20200826114209.28821-1-cesar.belley@lse.epita.fr>
@@ -88,133 +88,194 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This patch adds the script used to generate setup directories, needed
+for the device u2f-emulated configuration in directory mode:
+
+    python u2f-setup-gen.py $DIR
+    qemu -usb -device u2f-emulated,dir=$DIR
+
 Signed-off-by: César Belley <cesar.belley@lse.epita.fr>
 ---
- configure          | 8 +++++++-
- hw/usb/Kconfig     | 5 +++++
- hw/usb/meson.build | 7 +++++++
- meson.build        | 7 +++++++
- meson_options.txt  | 1 +
- 5 files changed, 27 insertions(+), 1 deletion(-)
+ scripts/u2f-setup-gen.py | 170 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 170 insertions(+)
+ create mode 100755 scripts/u2f-setup-gen.py
 
-diff --git a/configure b/configure
-index b1e11397a8..24137d49d6 100755
---- a/configure
-+++ b/configure
-@@ -495,6 +495,7 @@ trace_file="trace"
- spice=""
- rbd=""
- smartcard=""
-+u2f="auto"
- libusb=""
- usb_redir=""
- opengl=""
-@@ -1411,6 +1412,10 @@ for opt do
-   ;;
-   --enable-smartcard) smartcard="yes"
-   ;;
-+  --disable-u2f) u2f="disabled"
-+  ;;
-+  --enable-u2f) u2f="enabled"
-+  ;;
-   --disable-libusb) libusb="no"
-   ;;
-   --enable-libusb) libusb="yes"
-@@ -1940,6 +1945,7 @@ disabled with --disable-FEATURE, default is enabled if available:
-   libiscsi        iscsi support
-   libnfs          nfs support
-   smartcard       smartcard support (libcacard)
-+  u2f             U2F support (u2f-emu)
-   libusb          libusb (for usb passthrough)
-   live-block-migration   Block migration in the main migration stream
-   usb-redir       usb network redirection support
-@@ -8230,7 +8236,7 @@ NINJA=$PWD/ninjatool $meson setup \
-         -Db_coverage=$(if test "$gcov" = yes; then echo true; else echo false; fi) \
- 	-Dsdl=$sdl -Dsdl_image=$sdl_image \
- 	-Dvnc=$vnc -Dvnc_sasl=$vnc_sasl -Dvnc_jpeg=$vnc_jpeg -Dvnc_png=$vnc_png \
--	-Dgettext=$gettext -Dxkbcommon=$xkbcommon \
-+	-Dgettext=$gettext -Dxkbcommon=$xkbcommon -Du2f=$u2f\
-         $cross_arg \
-         "$PWD" "$source_path"
- 
-diff --git a/hw/usb/Kconfig b/hw/usb/Kconfig
-index 5e63dc75f8..3fc8fbe3c7 100644
---- a/hw/usb/Kconfig
-+++ b/hw/usb/Kconfig
-@@ -96,6 +96,11 @@ config USB_STORAGE_MTP
-     default y
-     depends on USB
- 
-+config USB_U2F
-+    bool
-+    default y
-+    depends on USB
+diff --git a/scripts/u2f-setup-gen.py b/scripts/u2f-setup-gen.py
+new file mode 100755
+index 0000000000..2122598fed
+--- /dev/null
++++ b/scripts/u2f-setup-gen.py
+@@ -0,0 +1,170 @@
++#!/usr/bin/env python3
++#
++# Libu2f-emu setup directory generator for USB U2F key emulation.
++#
++# Copyright (c) 2020 César Belley <cesar.belley@lse.epita.fr>
++# Written by César Belley <cesar.belley@lse.epita.fr>
++#
++# This work is licensed under the terms of the GNU GPL, version 2
++# or, at your option, any later version.  See the COPYING file in
++# the top-level directory.
 +
- config IMX_USBPHY
-     bool
-     default y
-diff --git a/hw/usb/meson.build b/hw/usb/meson.build
-index 3c44a1b069..a25109b88c 100644
---- a/hw/usb/meson.build
-+++ b/hw/usb/meson.build
-@@ -50,6 +50,13 @@ if config_host.has_key('CONFIG_SMARTCARD')
-   hw_usb_modules += {'smartcard': usbsmartcard_ss}
- endif
- 
-+# U2F
-+softmmu_ss.add(when: 'CONFIG_USB_U2F', if_true: files('u2f.c'))
-+softmmu_ss.add(when: ['CONFIG_LINUX', 'CONFIG_USB_U2F'], if_true: files('u2f-passthru.c'))
-+if u2f.found()
-+  softmmu_ss.add(when: 'CONFIG_USB_U2F', if_true: [u2f, files('u2f-emulated.c')])
-+endif
++import sys
++import os
++from random import randint
++from typing import Tuple
 +
- # usb redirect
- if config_host.has_key('CONFIG_USB_REDIR')
-   usbredir_ss = ss.source_set()
-diff --git a/meson.build b/meson.build
-index f0fe5f8799..ae90fdbfe3 100644
---- a/meson.build
-+++ b/meson.build
-@@ -360,6 +360,11 @@ if 'CONFIG_SMARTCARD' in config_host
-   cacard = declare_dependency(compile_args: config_host['SMARTCARD_CFLAGS'].split(),
-                               link_args: config_host['SMARTCARD_LIBS'].split())
- endif
-+u2f = dependency('u2f-emu', required: get_option('u2f'), static: enable_static,
-+                 include_type: 'system')
-+if u2f.found()
-+  u2f = declare_dependency(dependencies: u2f)
-+endif
- usbredir = not_found
- if 'CONFIG_USB_REDIR' in config_host
-   usbredir = declare_dependency(compile_args: config_host['USB_REDIR_CFLAGS'].split(),
-@@ -385,6 +390,7 @@ endif
- 
- config_host_data.set('CONFIG_SDL', sdl.found())
- config_host_data.set('CONFIG_SDL_IMAGE', sdl_image.found())
-+config_host_data.set('CONFIG_U2F', u2f.found())
- config_host_data.set('CONFIG_VNC', vnc.found())
- config_host_data.set('CONFIG_VNC_JPEG', jpeg.found())
- config_host_data.set('CONFIG_VNC_PNG', png.found())
-@@ -1365,6 +1371,7 @@ summary_info += {'spice support':     config_host.has_key('CONFIG_SPICE')}
- summary_info += {'rbd support':       config_host.has_key('CONFIG_RBD')}
- summary_info += {'xfsctl support':    config_host.has_key('CONFIG_XFS')}
- summary_info += {'smartcard support': config_host.has_key('CONFIG_SMARTCARD')}
-+summary_info += {'U2F support':       u2f.found()}
- summary_info += {'libusb':            config_host.has_key('CONFIG_USB_LIBUSB')}
- summary_info += {'usb net redir':     config_host.has_key('CONFIG_USB_REDIR')}
- summary_info += {'OpenGL support':    config_host.has_key('CONFIG_OPENGL')}
-diff --git a/meson_options.txt b/meson_options.txt
-index c55f9cd94c..aef2de6523 100644
---- a/meson_options.txt
-+++ b/meson_options.txt
-@@ -1,6 +1,7 @@
- option('gettext', type : 'boolean', value : true)
- option('sdl', type : 'feature', value : 'auto')
- option('sdl_image', type : 'feature', value : 'auto')
-+option('u2f', type : 'feature', value : 'auto')
- option('vnc', type : 'feature', value : 'enabled')
- option('vnc_jpeg', type : 'feature', value : 'auto')
- option('vnc_png', type : 'feature', value : 'auto')
++from cryptography.hazmat.backends import default_backend
++from cryptography.hazmat.primitives.asymmetric import ec
++from cryptography.hazmat.primitives.serialization import Encoding, \
++    NoEncryption, PrivateFormat, PublicFormat
++from OpenSSL import crypto
++
++
++def write_setup_dir(dirpath: str, privkey_pem: bytes, cert_pem: bytes,
++                    entropy: bytes, counter: int) -> None:
++    """
++    Write the setup directory.
++
++    Args:
++        dirpath: The directory path.
++        key_pem: The private key PEM.
++        cert_pem: The certificate PEM.
++        entropy: The 48 bytes of entropy.
++        counter: The counter value.
++    """
++    # Directory
++    os.mkdir(dirpath)
++
++    # Private key
++    with open(f'{dirpath}/private-key.pem', 'bw') as f:
++        f.write(privkey_pem)
++
++    # Certificate
++    with open(f'{dirpath}/certificate.pem', 'bw') as f:
++        f.write(cert_pem)
++
++    # Entropy
++    with open(f'{dirpath}/entropy', 'wb') as f:
++        f.write(entropy)
++
++    # Counter
++    with open(f'{dirpath}/counter', 'w') as f:
++        f.write(f'{str(counter)}\n')
++
++
++def generate_ec_key_pair() -> Tuple[str, str]:
++    """
++    Generate an ec key pair.
++
++    Returns:
++        The private and public key PEM.
++    """
++    # Key generation
++    privkey = ec.generate_private_key(ec.SECP256R1, default_backend())
++    pubkey = privkey.public_key()
++
++    # PEM serialization
++    privkey_pem = privkey.private_bytes(encoding=Encoding.PEM,
++                                        format=PrivateFormat.TraditionalOpenSSL,
++                                        encryption_algorithm=NoEncryption())
++    pubkey_pem = pubkey.public_bytes(encoding=Encoding.PEM,
++                                     format=PublicFormat.SubjectPublicKeyInfo)
++    return privkey_pem, pubkey_pem
++
++
++def generate_certificate(privkey_pem: str, pubkey_pem: str) -> str:
++    """
++    Generate a x509 certificate from a key pair.
++
++    Args:
++        privkey_pem: The private key PEM.
++        pubkey_pem: The public key PEM.
++
++    Returns:
++        The certificate PEM.
++    """
++    # Convert key pair
++    privkey = crypto.load_privatekey(crypto.FILETYPE_PEM, privkey_pem)
++    pubkey = crypto.load_publickey(crypto.FILETYPE_PEM, pubkey_pem)
++
++    # New x509v3 certificate
++    cert = crypto.X509()
++    cert.set_version(0x2)
++
++    # Serial number
++    cert.set_serial_number(randint(1, 2 ** 64))
++
++    # Before / After
++    cert.gmtime_adj_notBefore(0)
++    cert.gmtime_adj_notAfter(4 * (365 * 24 * 60 * 60))
++
++    # Public key
++    cert.set_pubkey(pubkey)
++
++    # Subject name and issueer
++    cert.get_subject().CN = "U2F emulated"
++    cert.set_issuer(cert.get_subject())
++
++    # Extensions
++    cert.add_extensions([
++        crypto.X509Extension(b"subjectKeyIdentifier",
++                             False, b"hash", subject=cert),
++    ])
++    cert.add_extensions([
++        crypto.X509Extension(b"authorityKeyIdentifier",
++                             False, b"keyid:always", issuer=cert),
++    ])
++    cert.add_extensions([
++        crypto.X509Extension(b"basicConstraints", True, b"CA:TRUE")
++    ])
++
++    # Signature
++    cert.sign(privkey, 'sha256')
++
++    return crypto.dump_certificate(crypto.FILETYPE_PEM, cert)
++
++
++def generate_setup_dir(dirpath: str) -> None:
++    """
++    Generates the setup directory.
++
++    Args:
++        dirpath: The directory path.
++    """
++    # Key pair
++    privkey_pem, pubkey_pem = generate_ec_key_pair()
++
++    # Certificate
++    certificate_pem = generate_certificate(privkey_pem, pubkey_pem)
++
++    # Entropy
++    entropy = os.urandom(48)
++
++    # Counter
++    counter = 0
++
++    # Write
++    write_setup_dir(dirpath, privkey_pem, certificate_pem, entropy, counter)
++
++
++def main() -> None:
++    """
++    Main function
++    """
++    # Dir path
++    if len(sys.argv) != 2:
++        sys.stderr.write(f'Usage: {sys.argv[0]} <setup_dir>\n')
++        exit(2)
++    dirpath = sys.argv[1]
++
++    # Dir non existence
++    if os.path.exists(dirpath):
++        sys.stderr.write(f'Directory: {dirpath} already exists.\n')
++        exit(1)
++
++    generate_setup_dir(dirpath)
++
++
++if __name__ == '__main__':
++    main()
 -- 
 2.28.0
 
