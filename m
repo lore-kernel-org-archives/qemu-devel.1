@@ -2,95 +2,131 @@ Return-Path: <SRS0=H0ck=CE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88F20C433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 11:20:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A4A5C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 11:21:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4FCBA20786
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 11:20:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 41A2E20786
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 11:21:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SUvX3GEP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4FCBA20786
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="XILd9QRG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41A2E20786
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37042 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39964 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAtUA-00034T-KB
-	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 07:20:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50224)
+	id 1kAtUn-0004GJ-Fw
+	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 07:21:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50462)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kAtTF-00023Y-Gg
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 07:20:01 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:22851
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kAtTD-0004xM-H3
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 07:20:01 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598440798;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=JW3cbo9TNsVhO86tFiK37jfCs/Lns4fiNoifcTZK1jE=;
- b=SUvX3GEP8hf+DvmllJVhtqPJn+CtM9jy9LnU2PQuD+wuoNPkDoO3MsRgXtaWMatTFTXZ2T
- evRH8fnzXokWE+XzxfA98bw0C6kS24ozzYihI9nA00BjppIR86S5j2DoPhCExPEcdZmd9K
- JNYrKLUQsf294HyGqHVqBB12A8NQCoQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-512-cXIszKsTO-eY8boda73MkA-1; Wed, 26 Aug 2020 07:19:56 -0400
-X-MC-Unique: cXIszKsTO-eY8boda73MkA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D79161DDF7;
- Wed, 26 Aug 2020 11:19:55 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-74.ams2.redhat.com
- [10.36.112.74])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7B1641944D;
- Wed, 26 Aug 2020 11:19:55 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id F30B8112D737; Wed, 26 Aug 2020 13:19:53 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Daniel P. =?utf-8?Q?Berrang=C3=A9?= <berrange@redhat.com>
-Subject: Re: [PATCH v4 5/6] util: give a specific error message when O_DIRECT
- doesn't work
-References: <20200821172105.608752-1-berrange@redhat.com>
- <20200821172105.608752-6-berrange@redhat.com>
- <87o8mybvmu.fsf@dusky.pond.sub.org>
- <20200825152319.GX107278@redhat.com>
-Date: Wed, 26 Aug 2020 13:19:53 +0200
-In-Reply-To: <20200825152319.GX107278@redhat.com> ("Daniel P. =?utf-8?Q?Be?=
- =?utf-8?Q?rrang=C3=A9=22's?=
- message of "Tue, 25 Aug 2020 16:23:19 +0100")
-Message-ID: <875z957ixy.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1kAtU0-00033N-4P; Wed, 26 Aug 2020 07:20:48 -0400
+Received: from mail-eopbgr00103.outbound.protection.outlook.com
+ ([40.107.0.103]:32109 helo=EUR02-AM5-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1kAtTw-00058Y-BF; Wed, 26 Aug 2020 07:20:47 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=NS6/wmy6BzybPMjB8ftQurm8AI+QIFtVMuIA0ZDLpS4ekl/RJRR/GiAvd3zCx8DCJzj2Wg0XlYZQ7h0iXpqZE0Av6kf+qDhoUVLm0b15n6NY4HtrQ4wZ3oezbPU01OPECV91NBerjPCHlAQQqLXmvl2l348DH5GjLheyTSOHmV/yW8xBjt5i86KgMS0xn7V35n2amIqZnzvP+b/6C1bcTzrpKI/MuGeNB7h792BSO8tV5xbjJxqBrgdGfFOqeJ6Idv0bpOuO3i83SDrUkx4NEW3tceKTJ/UmWIppER8bNMAnclEmA4f8WK6zO9A0xKacH19aLyRPzic23NEtO+gO+w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=9uqFn+69RRHzY9XfBlJuVjkApCGL5Fk99IFo6EpveBE=;
+ b=iuJnRexxtg9NG/mz6Q5JGz7sB+l+2P0gCCqVl35hqlPddtfAI9F+Qm8ONY8ouBkxcztDeCwKAaKlvY4xvVe36eNolzwC/G89p0mzY4c5iDQGNEo9horM6jDf8lEmEd41M44JbV7lKNk8s01XA/kSF1lORLACF+Hlad8z2H3UqOnbqL1dOZKOdm0oZHZ5tx3P+H2JtF/UFqpxGA9Pc1Uf5zkJbKYZi1sGuCZPdAJHWlVhAPfnxhBhrNuDaXipjrpscMwgX+HEF3pVfMGoATBq5Pd7CJgTiR2wyFglWIdh31Yajij4M7xp7Ukw8qnM6IfYEV6SSInvZmIumRaOUTZW9w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=9uqFn+69RRHzY9XfBlJuVjkApCGL5Fk99IFo6EpveBE=;
+ b=XILd9QRGm9phMnPVTIZQ6RuwWbC4UjwQYQMBDFVYgJrCVHi6oi3m+f6qw5OOMCOsu+UjCfNEV19jYjEMesQ2L009AB3/DoGrkgaLSAVORiz8qB4h6O2KFf4rAZkJgZJO6dZUQ2ec2gMc9sCakVU+G8KoG/JsTSv53sbYuyxRysk=
+Authentication-Results: virtuozzo.com; dkim=none (message not signed)
+ header.d=none;virtuozzo.com; dmarc=none action=none
+ header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM6PR08MB3093.eurprd08.prod.outlook.com (2603:10a6:209:41::15)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3305.26; Wed, 26 Aug
+ 2020 11:20:35 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::b179:9641:7589:d692]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::b179:9641:7589:d692%9]) with mapi id 15.20.3305.032; Wed, 26 Aug 2020
+ 11:20:35 +0000
+Subject: Re: [PATCH for-4.2 v2 3/3] block/file-posix: Let post-EOF fallocate
+ serialize
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, qemu-stable@nongnu.org,
+ "Denis V . Lunev" <den@openvz.org>, Kevin Wolf <kwolf@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ Anton Nefedov <anton.nefedov@virtuozzo.com>
+References: <20191101152510.11719-1-mreitz@redhat.com>
+ <20191101152510.11719-4-mreitz@redhat.com>
+ <d85c544c-70c0-6860-0b5c-a2d46d740d1c@virtuozzo.com>
+ <de210b71-47e9-e119-3ab9-1dbf0812a4b6@virtuozzo.com>
+ <ea6e644b-2e02-9317-8eac-14ae404df0e6@virtuozzo.com>
+Message-ID: <69095367-0d24-c08d-12d7-c1d1c8fc32ce@virtuozzo.com>
+Date: Wed, 26 Aug 2020 14:20:33 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
+In-Reply-To: <ea6e644b-2e02-9317-8eac-14ae404df0e6@virtuozzo.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: FR2P281CA0025.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:14::12) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/26 01:10:45
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.959,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.5] (185.215.60.171) by
+ FR2P281CA0025.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10:14::12) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3326.10 via Frontend Transport; Wed, 26 Aug 2020 11:20:35 +0000
+X-Originating-IP: [185.215.60.171]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 3dd15b44-4e6b-4a52-c0b9-08d849b20dc8
+X-MS-TrafficTypeDiagnostic: AM6PR08MB3093:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM6PR08MB309382E396EAE28277382E51C1540@AM6PR08MB3093.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:235;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Q1L4Cv5rgE5qWpKZqfTl4jp1nNZK1vVlnrE8ghMHi0gL17MQLQrwCG6ZGGwF8qzW+ahShrGJh7WgfCZT03uGAOMZ/+St6+7ni1X8xtpvHjtn3ImKk/jEXJiMGItMaoAwdo5K+cYDqqoSu/VOGXw46N+uSbJXQW23e1wXbwgUgCARTWMKwvuEmLl+fvjm/oDqmqyTGmimELc/Z67i0gx3WAKiAba8hb6+iV9uvDyfG7WbRAxHGA3hHmpCPHfzJGJnnZ+jvgZCR9wIZnLsR4lB4LO1BiHw3+fazSgZ3E+zUXPsvRd1Gn310toy3LYcblEBs3cG24jp6fSYQJmQ8EQQrohTpvdogouC8o7Yasi2fG8GmLLqfVk+D/m0hg1t8sWx
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(4636009)(376002)(346002)(136003)(396003)(366004)(39840400004)(956004)(6486002)(5660300002)(4326008)(107886003)(31696002)(86362001)(16576012)(2616005)(83380400001)(8676002)(31686004)(316002)(16526019)(478600001)(26005)(66476007)(66946007)(66556008)(186003)(36756003)(52116002)(8936002)(2906002)(54906003)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: dn0rKYhWt4QuOi0+4q/YUOegLYGQp/dI4vUxtj3nQxrrXqOjs+L5BO/XGGxzIJLXayWk3pd5AJdlBoEh0YW8p+dC9gaZXqDyhbfCVsPJ+yQVQRiS+TS1rdQrs4xaCOcV39TavkqfC6Y0NHZkj/lbl64OQUJd7Q4fRk4Ujgv1JOGSC4z3hGBn6xO/nKCQf3Hey9oLDZsRNDG/KCHz6zVBu8c89CpujkwNul/gbX43R4GvWa5HIBao6EMeNJ2UPiWS7eMs0DORaq6Vt44x4ngTQbGIKZr3PKZ7BUZtQ/ZU4pvMbHnN3sXwvczffb1ci1fk+MwtrPsq0cX8JG9FtjOHdQb0AdLB5dR7R+PS1Ta70bAD0VpTO/P4vCvcJZiz2oToUtviwMqdt1oFomnQTDULAhYH9hesp1ViuZbHQjdfuiKQ9SQFy5e4SHd9mzV7Ya+PBBhzfLMFolJAY90RFgP6GeCzQkBAkrhEKYkY8ycOgrkMfTOZ9bPhkohECEMyBkSq4svaF0Wqt53dUlK1zejimYLeTll9AW1QHYGcQvuOZ7f7osDB0Zq4qEgC3Op73fBJDDpjOw8LTXJRSTmrwFt7XiFHT7nrl1WT0BPJ28EbeOa/QfNmbhZ6kj7kHbQ9F4TbVZwneCZzolsj6xqJ//Ouag==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3dd15b44-4e6b-4a52-c0b9-08d849b20dc8
+X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Aug 2020 11:20:35.8794 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: loAVsofvyXIp2w7xdgzqeVMkgKjuzYP5ug245FQNVLxbt+elTusF5eGxPDGq2WAh7zIR7q9HHl8heQTSbtNv5kpM01qrtQtFjXR8HbhEWfc=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3093
+Received-SPF: pass client-ip=40.107.0.103;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR02-AM5-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/26 07:20:40
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -42
+X-Spam_score: -4.3
+X-Spam_bar: ----
+X-Spam_report: (-4.3 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, NICE_REPLY_A=-2.239, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -104,153 +140,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Philippe =?utf-8?Q?Mathi?= =?utf-8?Q?eu-Daud=C3=A9?= <f4bug@amsat.org>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
+26.08.2020 11:23, Vladimir Sementsov-Ogievskiy wrote:
+> 22.08.2020 20:04, Vladimir Sementsov-Ogievskiy wrote:
+>> 22.08.2020 20:03, Vladimir Sementsov-Ogievskiy wrote:
+>>> 01.11.2019 18:25, Max Reitz wrote:
+>>>> The XFS kernel driver has a bug that may cause data corruption for qcow2
+>>>> images as of qemu commit c8bb23cbdbe32f.  We can work around it by
+>>>> treating post-EOF fallocates as serializing up until infinity (INT64_MAX
+>>>> in practice).
+>>>
+>>> Hi! I'm doing some investigation, and here is an interesting result:
+>>>
+>>> Consider the following test:
+>>>
+>>> img=/ssd/x.qcow2; ./qemu-img create -f qcow2 $img 16G; ./qemu-img bench -c 50000 -d 64 -f qcow2 -o 1k -s 64k -t none -w $img
+>>>
+>>>
+>>> Bisecting results changes between 2.12 and 5.1, I found the following:
+>>>
+>>> 2.12: ~20s
+>>>
+>>> ....
+>>>
+>>> c8bb23cbdbe32 "qcow2: skip writing zero buffers to empty COW areas"  -> becomes ~12s  [1]
+>>>
+>>> ....
+>>>
+>>>
+>>> 292d06b925b27 "block/file-posix: Let post-EOF fallocate serialize"   -> becomes ~9s  [2]
+>>>
+>>> ....
+>>>
+>>> v5.1 ~9s
+>>>
+>>>
+>>> And [1] is obvious, it is the main purpose of c8bb23cbdbe32. But [2] is a surprise for me.. Any ideas?
+>>>
+>>> ===
+>>>
+>>> just to check: staying at c8bb23cbdbe32 I revert c8bb23cbdbe32 and get again ~19.7s. So [2] doesn't substitute [1].
+>>>
+>>
+>> Note, it's all ext4.
+>>
+> 
+> 
+> Let's go further:
+> 
+> If I add -n, to use aio native:
+> ./qemu-img create -f qcow2 $img 16G; ./qemu-img bench -c 50000 -d 64 -f qcow2 -o 1k -s 64k -t none -n -w $img;
+> 
+> Then this patch doesn't have such effect..
+> 
+> But if consider the test without an offset on hdd, the effect is very significant:
+> 
+> ./qemu-img create -f qcow2 $img 16G; ./qemu-img bench -c 45000 -d 64 -f qcow2  -s 16k -t none -n -w $img;
+> 
+> v2.12 ~10.4s
+> c8bb23cbdbe32^ ~10.6s
+> c8bb23cbdbe32 qcow2: skip writing zero buffers to empty COW areas: ~16.7s : degradation!!!
+> 292d06b925b27^ ~16.4s
+> 292d06b925 block/file-posix: Let post-EOF fallocate serialize: ~7.6s: great improvement !
+> 
 
-> On Tue, Aug 25, 2020 at 05:19:53PM +0200, Markus Armbruster wrote:
->> Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
->>=20
->> > A common error scenario is to tell QEMU to use O_DIRECT in combination
->> > with a filesystem that doesn't support it. To aid users to diagnosing
->> > their mistake we want to provide a clear error message when this happe=
-ns.
->> >
->> > Reviewed-by: Eric Blake <eblake@redhat.com>
->> > Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
->> > ---
->> >  util/osdep.c | 13 +++++++++++++
->> >  1 file changed, 13 insertions(+)
->> >
->> > diff --git a/util/osdep.c b/util/osdep.c
->> > index a4956fbf6b..6c24985f7a 100644
->> > --- a/util/osdep.c
->> > +++ b/util/osdep.c
->> > @@ -345,6 +345,19 @@ qemu_open_internal(const char *name, int flags, m=
-ode_t mode, Error **errp)
->> > =20
->> >      if (ret =3D=3D -1) {
->> >          const char *action =3D flags & O_CREAT ? "create" : "open";
->> > +#ifdef O_DIRECT
->> > +        if (errno =3D=3D EINVAL && (flags & O_DIRECT)) {
+Hmm, a bit more accurate results (use separate partition on non-root hard drive). I post just numbers I get from iterations, not calculating the average.
 
-Suggest
+v2.12.0 9.227 8.999 9.059 8.793
+c8bb23cbdbe32^ 9.264 8.996 8.969
+c8bb23cbdbe32 20.694 16.050 15.898 15.918 16.136
+292d06b925b27^ 15.509 15.343 16.549
+292d06b925 8.368 8.529 8.342 7.503 8.361 8.353 8.416 13.043 12.594 7.898 7.907 11.914
 
-                  /*
-                   * Check whether open() failed due to use of O_DIRECT,
-                   * and set a more helpful error then.
-                   */
+292d06b925 + don't-handle-alloc 18.730 9.321 9.016 9.037 18.286 18.268
 
->> > +            ret =3D open(name, flags & ~O_DIRECT, mode);
->> > +            if (ret !=3D -1) {
->> > +                close(ret);
->> > +                error_setg(errp, "Could not %s '%s' flags 0x%x: "
->> > +                           "filesystem does not support O_DIRECT",
->> > +                           action, name, flags);
->> > +                errno =3D EINVAL; /* close() clobbered earlier errno =
-*/
->>=20
->> More precise: close() may have clobbered
->
-> Either open or close in fact.
->
->>=20
->> Sure open() can only fail with EINVAL here?
->
-> We don't care about the errno from the open() call seen in this context,
-> we're restoring the EINVAL from the previous open() call above this patch
-> contxt, that we match on with  "if (errno =3D=3D EINVAL && ...)" line.
+(don't handle alloc is don't call qcow2_handle_alloc function which is actual revert of c8bb23cbdbe32)
 
-Ah, got it now.
+very interesting..
 
-I'd prefer
+292d06b925^ + don't-handle-alloc 9.200 9.285 9.297 9.296 9.194 9.332 9.155
 
-                errno =3D EINVAL; /* restore first open()'s errno */
->>=20
->> > +                return -1;
->> > +            }
->> > +        }
->> > +#endif /* O_DIRECT */
->> >          error_setg_errno(errp, errno, "Could not %s '%s' flags 0x%x",
->> >                           action, name, flags);
->> >      }
->>=20
->> There is no qemu_set_cloexec().  Intentional?
->
-> We've called close() immediately after open(). Adding qemu_set_cloexec()
-> doesnt make it any less racy on platforms lacking O_CLOSEXEC
-
-You're right.  I misread the code.
-
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-
-
-Now back to my dislike of the #ifdeffery I voiced in reply to PATCH 2.
-
-Code now:
-
-    #ifdef O_CLOEXEC
-        flags |=3D O_CLOEXEC;
-    #endif /* O_CLOEXEC */
-
-        ret =3D open(name, flags, mode);
-
-    #ifndef O_CLOEXEC
-        if (ret >=3D 0) {
-            qemu_set_cloexec(ret);
-        }
-    #endif /* ! O_CLOEXEC */
-
-        if (ret =3D=3D -1) {
-            const char *action =3D flags & O_CREAT ? "create" : "open";
-    #ifdef O_DIRECT
-            if (errno =3D=3D EINVAL && (flags & O_DIRECT)) {
-                ret =3D open(name, flags & ~O_DIRECT, mode);
-                if (ret !=3D -1) {
-                    close(ret);
-                    [O_DIRECT not supported error...]
-                    errno =3D EINVAL; /* close() clobbered earlier errno */
-                    return -1;
-                }
-            }
-    #endif /* O_DIRECT */
-            [generic error...]
-        }
-
-Compare:
-
-    #ifdef O_CLOEXEC
-        flags |=3D O_CLOEXEC;
-        ret =3D open(name, flags, mode);
-    #else
-        ret =3D open(name, flags, mode);
-        if (ret >=3D 0) {
-            qemu_set_cloexec(ret);
-        }
-    #endif /* ! O_CLOEXEC */
-
-        if (ret =3D=3D -1) {
-            const char *action =3D flags & O_CREAT ? "create" : "open";
-    #ifdef O_DIRECT
-            if (errno =3D=3D EINVAL && (flags & O_DIRECT)) {
-                ret =3D open(name, flags & ~O_DIRECT, mode);
-                if (ret !=3D -1) {
-                    close(ret);
-                    [O_DIRECT not supported error...]
-                    errno =3D EINVAL; /* close() clobbered earlier errno */
-                    return -1;
-                }
-            }
-    #endif /* O_DIRECT */
-            [generic error...]
-        }
-
-I like this a bit better, but not enough to make a strong
-recommendation, let alone demand.
-
+-- 
+Best regards,
+Vladimir
 
