@@ -2,66 +2,67 @@ Return-Path: <SRS0=H0ck=CE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5A85C433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 08:56:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F610C433E3
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 08:56:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B47262071E
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 08:56:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B47262071E
+	by mail.kernel.org (Postfix) with ESMTPS id CD9262071E
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 08:56:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD9262071E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51642 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51708 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kArEZ-00037w-0H
-	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 04:56:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42770)
+	id 1kArEa-00039b-38
+	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 04:56:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42812)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kArDb-0002H5-S9
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 04:55:43 -0400
-Received: from indium.canonical.com ([91.189.90.7]:58390)
+ id 1kArDe-0002Hd-NI
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 04:55:46 -0400
+Received: from indium.canonical.com ([91.189.90.7]:58484)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kArDZ-0002dw-Ly
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 04:55:43 -0400
+ id 1kArDc-0002eQ-Ta
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 04:55:46 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kArDX-0003UB-P0
- for <qemu-devel@nongnu.org>; Wed, 26 Aug 2020 08:55:39 +0000
+ id 1kArDb-0003X4-8W
+ for <qemu-devel@nongnu.org>; Wed, 26 Aug 2020 08:55:43 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id BC0D52E80E8
- for <qemu-devel@nongnu.org>; Wed, 26 Aug 2020 08:55:39 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 3F4B92E80DB
+ for <qemu-devel@nongnu.org>; Wed, 26 Aug 2020 08:55:43 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 26 Aug 2020 08:43:26 -0000
-From: Mike Gelfand <1893010@bugs.launchpad.net>
+Date: Wed, 26 Aug 2020 08:43:12 -0000
+From: Mike Gelfand <1893003@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: linux-user
+X-Launchpad-Bug-Tags: linux-user ppc s390x
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
 X-Launchpad-Bug-Commenters: mike.dld
 X-Launchpad-Bug-Reporter: Mike Gelfand (mike.dld)
 X-Launchpad-Bug-Modifier: Mike Gelfand (mike.dld)
-References: <159843096085.1469.8304847352897420087.malonedeb@wampee.canonical.com>
-Message-Id: <159843140720.4657.14434567805819248669.launchpad@gac.canonical.com>
-Subject: [Bug 1893010] Re: qemu linux-user doesn't support OFD fcntl locks
+References: <159842808665.2865.2216413646645324343.malonedeb@chaenomeles.canonical.com>
+Message-Id: <159843139349.16164.4541379650960164501.launchpad@soybean.canonical.com>
+Subject: [Bug 1893003] Re: qemu linux-user doesn't translate host/target data
+ for iovec I/O
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="99c2d833c8d727fd05148486920aca032e908071"; Instance="production"
-X-Launchpad-Hash: ba42593c07bc4fc295020a13696e026dc8602f53
+X-Launchpad-Hash: 2751d96ff6c0c7db8235b175ee2b1b57e479a506
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/26 03:55:37
@@ -84,42 +85,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1893010 <1893010@bugs.launchpad.net>
+Reply-To: Bug 1893003 <1893003@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 ** Summary changed:
 
-- qemu-user doesn't support OFD fcntl locks
-+ qemu linux-user doesn't support OFD fcntl locks
+- qemu-user doesn't translate host/target data for iovec I/O
++ qemu linux-user doesn't translate host/target data for iovec I/O
 
 ** Tags added: linux-user
+
+** Tags added: ppc s390x
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1893010
+https://bugs.launchpad.net/bugs/1893003
 
 Title:
-  qemu linux-user doesn't support OFD fcntl locks
+  qemu linux-user doesn't translate host/target data for iovec I/O
 
 Status in QEMU:
   New
 
 Bug description:
-  "Open file description locks (non-POSIX)", as they are described in
-  fcntl(2) man page, aren't supported by qemu-user  and attempting to
-  use those results in EINVAL. I'm on Gentoo with latest QEMU version
-  currently available (5.0.0-r2), and trying to emulate ppc64 and s390x
-  on x86_64.
+  When using iovec I/O functions (like `readv`), no data translation
+  happens. I'm hitting this issue with libevent upon constructing a
+  bufferevent over an inotify descriptor, and then building for either
+  ppc64 or s390x (both big-endian) on x86_64 (little-endian) and running
+  resulting code with qemu-ppc64 or qemu-s390x on Gentoo using latest
+  QEMU version available (5.0.0-r2).
 
-  Looking at linux-user/syscall.c, I'm guessing the issue is in (at
-  least) `target_to_host_fcntl_cmd` where switch reaches the default
-  clause as there're no cases for F_OFD_SETLK / F_OFD_SETLKW /
-  F_OFD_GETLK.
+  The code in question is in
+  https://github.com/transmission/transmission/blob/master/libtransmission
+  /watchdir-inotify.c (`tr_watchdir_inotify_new`,
+  `tr_watchdir_inotify_on_event`).
+
+  While `read` syscall is handled properly, `readv` (which libevent is
+  using in my case) doesn't have any logic to call
+  `host_to_target_data_inotify` or any other translation function,
+  leaving inotify data unchanged (with values in little-endian), which
+  then leads to unit test failures. Quoting `do_syscall1` implementation
+  bits for the reference:
+
+  ---8<---begin---
+      case TARGET_NR_read:
+          if (arg2 =3D=3D 0 && arg3 =3D=3D 0) {
+              return get_errno(safe_read(arg1, 0, 0));
+          } else {
+              if (!(p =3D lock_user(VERIFY_WRITE, arg2, arg3, 0)))
+                  return -TARGET_EFAULT;
+              ret =3D get_errno(safe_read(arg1, p, arg3));
+              if (ret >=3D 0 &&
+                  fd_trans_host_to_target_data(arg1)) {
+                  ret =3D fd_trans_host_to_target_data(arg1)(p, ret);
+              }
+              unlock_user(p, arg2, ret);
+          }
+          return ret;
+  ...
+      case TARGET_NR_readv:
+          {
+              struct iovec *vec =3D lock_iovec(VERIFY_WRITE, arg2, arg3, 0);
+              if (vec !=3D NULL) {
+                  ret =3D get_errno(safe_readv(arg1, vec, arg3));
+                  unlock_iovec(vec, arg2, arg3, 1);
+              } else {
+                  ret =3D -host_to_target_errno(errno);
+              }
+          }
+          return ret;
+  ---8<---end---
+
+  To reiterate, the issue is not only with `readv` but with other iovec
+  functions as well.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1893010/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1893003/+subscriptions
 
