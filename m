@@ -2,88 +2,89 @@ Return-Path: <SRS0=H0ck=CE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACA59C433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 11:01:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36681C433E1
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 11:02:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6A1EE20838
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 11:01:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F30A820838
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 11:02:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S1nQo6yM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A1EE20838
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IS/XI7VT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F30A820838
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35338 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38638 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAtBc-00048u-K1
-	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 07:01:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44362)
+	id 1kAtCA-0005Wm-6R
+	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 07:02:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44350)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kAt3U-0006E7-Gk
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 06:53:24 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:30967)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kAt3T-0006CQ-Sn
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 06:53:23 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:38750
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kAt3I-0001XA-21
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 06:53:24 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kAt3I-0001Xl-GJ
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 06:53:23 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
  s=mimecast20190719; t=1598439191;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Q87ecpsNNNutlO4IVI6Piu8gKwSdRRSLA3FAoxrDPjM=;
- b=S1nQo6yMET7rxOc5z16US5u0Z2hjsYET4iui9tYINZpUAkavKaZB0/hXbaNqxQ6kljuaIf
- BaC+vs0Qc04x4ZwBMTCJ0d6Rpt92jZuQ2F8bApHqNRWPvT1aEfAYhrJl6KdTUy6JbhPjUG
- ZOaToEAV0Du/Mj8mcw8bjwW0IVnVlxI=
+ bh=1v/PAt3CshJX/VrDKv2rrFSFurASfaywl/Okvrdx+NQ=;
+ b=IS/XI7VTotHE6wMPttjwTH86DEc7LtO6lNLMhcfHSui44G650zCyMTjnHQh6TygGfBGVmv
+ w1P/oInik3YA2v89HzfqD+YS4A3ejlhi7UDQO6UOfEsafm9pqF8yMql2ol8z4B2E9TWZoX
+ Hq58mcJvpy5ZY5b3HrTeRgNGHZ94+Iw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-148-gfOKycizNGWYNI5zf9zAPA-1; Wed, 26 Aug 2020 06:53:07 -0400
-X-MC-Unique: gfOKycizNGWYNI5zf9zAPA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-481-8FVxc0hcNvCp6OPrGwtFdQ-1; Wed, 26 Aug 2020 06:53:08 -0400
+X-MC-Unique: 8FVxc0hcNvCp6OPrGwtFdQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 792AD186A585;
- Wed, 26 Aug 2020 10:53:06 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 05DFC186A58C;
+ Wed, 26 Aug 2020 10:53:07 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-112-54.ams2.redhat.com
  [10.36.112.54])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9FE3739A55;
- Wed, 26 Aug 2020 10:53:05 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9147E5D9E4;
+ Wed, 26 Aug 2020 10:53:06 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 787BB204A1; Wed, 26 Aug 2020 12:52:54 +0200 (CEST)
+ id DF3F431FC3; Wed, 26 Aug 2020 12:52:54 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 08/20] microvm/acpi: add minimal acpi support
-Date: Wed, 26 Aug 2020 12:52:42 +0200
-Message-Id: <20200826105254.28496-9-kraxel@redhat.com>
+Subject: [PATCH v6 17/20] tests/acpi: allow microvm test data updates.
+Date: Wed, 26 Aug 2020 12:52:51 +0200
+Message-Id: <20200826105254.28496-18-kraxel@redhat.com>
 In-Reply-To: <20200826105254.28496-1-kraxel@redhat.com>
 References: <20200826105254.28496-1-kraxel@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
-X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Spam-Score: 0.0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=kraxel@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/26 06:53:10
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/26 03:16:15
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.958,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,364 +108,37 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-$subject says all.  Can be controlled using -M microvm,acpi=on/off.
+Also add empty test data files.
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- hw/i386/acpi-microvm.h    |   8 ++
- include/hw/i386/microvm.h |   9 ++
- hw/i386/acpi-microvm.c    | 187 ++++++++++++++++++++++++++++++++++++++
- hw/i386/microvm.c         |  40 ++++++++
- hw/i386/Kconfig           |   1 +
- hw/i386/meson.build       |   2 +-
- 6 files changed, 246 insertions(+), 1 deletion(-)
- create mode 100644 hw/i386/acpi-microvm.h
- create mode 100644 hw/i386/acpi-microvm.c
+ tests/qtest/bios-tables-test-allowed-diff.h | 3 +++
+ tests/data/acpi/microvm/APIC                | 0
+ tests/data/acpi/microvm/DSDT                | 0
+ tests/data/acpi/microvm/FACP                | 0
+ 4 files changed, 3 insertions(+)
+ create mode 100644 tests/data/acpi/microvm/APIC
+ create mode 100644 tests/data/acpi/microvm/DSDT
+ create mode 100644 tests/data/acpi/microvm/FACP
 
-diff --git a/hw/i386/acpi-microvm.h b/hw/i386/acpi-microvm.h
+diff --git a/tests/qtest/bios-tables-test-allowed-diff.h b/tests/qtest/bios-tables-test-allowed-diff.h
+index dfb8523c8bf4..97c3fa621b7f 100644
+--- a/tests/qtest/bios-tables-test-allowed-diff.h
++++ b/tests/qtest/bios-tables-test-allowed-diff.h
+@@ -1 +1,4 @@
+ /* List of comma-separated changed AML files to ignore */
++"tests/data/acpi/microvm/APIC",
++"tests/data/acpi/microvm/DSDT",
++"tests/data/acpi/microvm/FACP",
+diff --git a/tests/data/acpi/microvm/APIC b/tests/data/acpi/microvm/APIC
 new file mode 100644
-index 000000000000..dfe853690e15
---- /dev/null
-+++ b/hw/i386/acpi-microvm.h
-@@ -0,0 +1,8 @@
-+#ifndef HW_I386_ACPI_MICROVM_H
-+#define HW_I386_ACPI_MICROVM_H
-+
-+#include "hw/i386/microvm.h"
-+
-+void acpi_setup_microvm(MicrovmMachineState *mms);
-+
-+#endif
-diff --git a/include/hw/i386/microvm.h b/include/hw/i386/microvm.h
-index 03e735723726..b6e0d4395af7 100644
---- a/include/hw/i386/microvm.h
-+++ b/include/hw/i386/microvm.h
-@@ -24,12 +24,18 @@
- 
- #include "hw/boards.h"
- #include "hw/i386/x86.h"
-+#include "hw/acpi/acpi_dev_interface.h"
- 
- /* Platform virtio definitions */
- #define VIRTIO_MMIO_BASE      0xfeb00000
- #define VIRTIO_NUM_TRANSPORTS 8
- #define VIRTIO_CMDLINE_MAXLEN 64
- 
-+#define GED_MMIO_BASE         0xfea00000
-+#define GED_MMIO_BASE_MEMHP   (GED_MMIO_BASE + 0x100)
-+#define GED_MMIO_BASE_REGS    (GED_MMIO_BASE + 0x200)
-+#define GED_MMIO_IRQ          9
-+
- /* Machine type options */
- #define MICROVM_MACHINE_PIT                 "pit"
- #define MICROVM_MACHINE_PIC                 "pic"
-@@ -58,6 +64,9 @@ typedef struct {
-     /* Machine state */
-     uint32_t virtio_irq_base;
-     bool kernel_cmdline_fixed;
-+    Notifier machine_done;
-+    Notifier powerdown_req;
-+    AcpiDeviceIf *acpi_dev;
- } MicrovmMachineState;
- 
- #define TYPE_MICROVM_MACHINE   MACHINE_TYPE_NAME("microvm")
-diff --git a/hw/i386/acpi-microvm.c b/hw/i386/acpi-microvm.c
+index 000000000000..e69de29bb2d1
+diff --git a/tests/data/acpi/microvm/DSDT b/tests/data/acpi/microvm/DSDT
 new file mode 100644
-index 000000000000..06ef33949f5f
---- /dev/null
-+++ b/hw/i386/acpi-microvm.c
-@@ -0,0 +1,187 @@
-+/* Support for generating ACPI tables and passing them to Guests
-+ *
-+ * Copyright (C) 2008-2010  Kevin O'Connor <kevin@koconnor.net>
-+ * Copyright (C) 2006 Fabrice Bellard
-+ * Copyright (C) 2013 Red Hat Inc
-+ *
-+ * Author: Michael S. Tsirkin <mst@redhat.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+
-+ * You should have received a copy of the GNU General Public License along
-+ * with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+
-+#include "exec/memory.h"
-+#include "hw/acpi/acpi.h"
-+#include "hw/acpi/aml-build.h"
-+#include "hw/acpi/bios-linker-loader.h"
-+#include "hw/acpi/generic_event_device.h"
-+#include "hw/acpi/utils.h"
-+#include "hw/boards.h"
-+#include "hw/i386/fw_cfg.h"
-+#include "hw/i386/microvm.h"
-+
-+#include "acpi-common.h"
-+#include "acpi-microvm.h"
-+
-+static void
-+build_dsdt_microvm(GArray *table_data, BIOSLinker *linker,
-+                   MicrovmMachineState *mms)
-+{
-+    X86MachineState *x86ms = X86_MACHINE(mms);
-+    Aml *dsdt, *sb_scope, *scope, *pkg;
-+    bool ambiguous;
-+    Object *isabus;
-+
-+    isabus = object_resolve_path_type("", TYPE_ISA_BUS, &ambiguous);
-+    assert(isabus);
-+    assert(!ambiguous);
-+
-+    dsdt = init_aml_allocator();
-+
-+    /* Reserve space for header */
-+    acpi_data_push(dsdt->buf, sizeof(AcpiTableHeader));
-+
-+    sb_scope = aml_scope("_SB");
-+    fw_cfg_add_acpi_dsdt(sb_scope, x86ms->fw_cfg);
-+    isa_build_aml(ISA_BUS(isabus), sb_scope);
-+    build_ged_aml(sb_scope, GED_DEVICE, HOTPLUG_HANDLER(mms->acpi_dev),
-+                  GED_MMIO_IRQ, AML_SYSTEM_MEMORY, GED_MMIO_BASE);
-+    acpi_dsdt_add_power_button(sb_scope);
-+    aml_append(dsdt, sb_scope);
-+
-+    /* ACPI 5.0: Table 7-209 System State Package */
-+    scope = aml_scope("\\");
-+    pkg = aml_package(4);
-+    aml_append(pkg, aml_int(ACPI_GED_SLP_TYP_S5));
-+    aml_append(pkg, aml_int(0)); /* ignored */
-+    aml_append(pkg, aml_int(0)); /* reserved */
-+    aml_append(pkg, aml_int(0)); /* reserved */
-+    aml_append(scope, aml_name_decl("_S5", pkg));
-+    aml_append(dsdt, scope);
-+
-+    /* copy AML table into ACPI tables blob and patch header there */
-+    g_array_append_vals(table_data, dsdt->buf->data, dsdt->buf->len);
-+    build_header(linker, table_data,
-+        (void *)(table_data->data + table_data->len - dsdt->buf->len),
-+        "DSDT", dsdt->buf->len, 2, NULL, NULL);
-+    free_aml_allocator();
-+}
-+
-+static void acpi_build_microvm(AcpiBuildTables *tables,
-+                               MicrovmMachineState *mms)
-+{
-+    MachineState *machine = MACHINE(mms);
-+    GArray *table_offsets;
-+    GArray *tables_blob = tables->table_data;
-+    unsigned dsdt, xsdt;
-+    AcpiFadtData pmfadt = {
-+        /* ACPI 5.0: 4.1 Hardware-Reduced ACPI */
-+        .rev = 5,
-+        .flags = ((1 << ACPI_FADT_F_HW_REDUCED_ACPI) |
-+                  (1 << ACPI_FADT_F_RESET_REG_SUP)),
-+
-+        /* ACPI 5.0: 4.8.3.7 Sleep Control and Status Registers */
-+        .sleep_ctl = {
-+            .space_id = AML_AS_SYSTEM_MEMORY,
-+            .bit_width = 8,
-+            .address = GED_MMIO_BASE_REGS + ACPI_GED_REG_SLEEP_CTL,
-+        },
-+        .sleep_sts = {
-+            .space_id = AML_AS_SYSTEM_MEMORY,
-+            .bit_width = 8,
-+            .address = GED_MMIO_BASE_REGS + ACPI_GED_REG_SLEEP_STS,
-+        },
-+
-+        /* ACPI 5.0: 4.8.3.6 Reset Register */
-+        .reset_reg = {
-+            .space_id = AML_AS_SYSTEM_MEMORY,
-+            .bit_width = 8,
-+            .address = GED_MMIO_BASE_REGS + ACPI_GED_REG_RESET,
-+        },
-+        .reset_val = ACPI_GED_RESET_VALUE,
-+    };
-+
-+    table_offsets = g_array_new(false, true /* clear */,
-+                                        sizeof(uint32_t));
-+    bios_linker_loader_alloc(tables->linker,
-+                             ACPI_BUILD_TABLE_FILE, tables_blob,
-+                             64 /* Ensure FACS is aligned */,
-+                             false /* high memory */);
-+
-+    dsdt = tables_blob->len;
-+    build_dsdt_microvm(tables_blob, tables->linker, mms);
-+
-+    pmfadt.dsdt_tbl_offset = &dsdt;
-+    pmfadt.xdsdt_tbl_offset = &dsdt;
-+    acpi_add_table(table_offsets, tables_blob);
-+    build_fadt(tables_blob, tables->linker, &pmfadt, NULL, NULL);
-+
-+    acpi_add_table(table_offsets, tables_blob);
-+    acpi_build_madt(tables_blob, tables->linker, X86_MACHINE(machine),
-+                    mms->acpi_dev, false);
-+
-+    xsdt = tables_blob->len;
-+    build_xsdt(tables_blob, tables->linker, table_offsets, NULL, NULL);
-+
-+    /* RSDP is in FSEG memory, so allocate it separately */
-+    {
-+        AcpiRsdpData rsdp_data = {
-+            /* ACPI 2.0: 5.2.4.3 RSDP Structure */
-+            .revision = 2, /* xsdt needs v2 */
-+            .oem_id = ACPI_BUILD_APPNAME6,
-+            .xsdt_tbl_offset = &xsdt,
-+            .rsdt_tbl_offset = NULL,
-+        };
-+        build_rsdp(tables->rsdp, tables->linker, &rsdp_data);
-+    }
-+
-+    /* Cleanup memory that's no longer used. */
-+    g_array_free(table_offsets, true);
-+}
-+
-+static void acpi_build_no_update(void *build_opaque)
-+{
-+    /* nothing, microvm tables don't change at runtime */
-+}
-+
-+void acpi_setup_microvm(MicrovmMachineState *mms)
-+{
-+    X86MachineState *x86ms = X86_MACHINE(mms);
-+    AcpiBuildTables tables;
-+
-+    assert(x86ms->fw_cfg);
-+
-+    if (!x86_machine_is_acpi_enabled(x86ms)) {
-+        return;
-+    }
-+
-+    acpi_build_tables_init(&tables);
-+    acpi_build_microvm(&tables, mms);
-+
-+    /* Now expose it all to Guest */
-+    acpi_add_rom_blob(acpi_build_no_update, NULL,
-+                      tables.table_data,
-+                      ACPI_BUILD_TABLE_FILE,
-+                      ACPI_BUILD_TABLE_MAX_SIZE);
-+    acpi_add_rom_blob(acpi_build_no_update, NULL,
-+                      tables.linker->cmd_blob,
-+                      "etc/table-loader", 0);
-+    acpi_add_rom_blob(acpi_build_no_update, NULL,
-+                      tables.rsdp,
-+                      ACPI_BUILD_RSDP_FILE, 0);
-+
-+    acpi_build_tables_cleanup(&tables, false);
-+}
-diff --git a/hw/i386/microvm.c b/hw/i386/microvm.c
-index e4501f2cdfbd..e1b86da8a92e 100644
---- a/hw/i386/microvm.c
-+++ b/hw/i386/microvm.c
-@@ -26,6 +26,8 @@
- #include "sysemu/cpus.h"
- #include "sysemu/numa.h"
- #include "sysemu/reset.h"
-+#include "sysemu/runstate.h"
-+#include "acpi-microvm.h"
- 
- #include "hw/loader.h"
- #include "hw/irq.h"
-@@ -41,6 +43,8 @@
- #include "hw/i386/e820_memory_layout.h"
- #include "hw/i386/fw_cfg.h"
- #include "hw/virtio/virtio-mmio.h"
-+#include "hw/acpi/acpi.h"
-+#include "hw/acpi/generic_event_device.h"
- 
- #include "cpu.h"
- #include "elf.h"
-@@ -129,6 +133,17 @@ static void microvm_devices_init(MicrovmMachineState *mms)
-     }
- 
-     /* Optional and legacy devices */
-+    if (x86_machine_is_acpi_enabled(x86ms)) {
-+        DeviceState *dev = qdev_new(TYPE_ACPI_GED_X86);
-+        qdev_prop_set_uint32(dev, "ged-event", ACPI_GED_PWR_DOWN_EVT);
-+        sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, GED_MMIO_BASE);
-+        /* sysbus_mmio_map(SYS_BUS_DEVICE(dev), 1, GED_MMIO_BASE_MEMHP); */
-+        sysbus_mmio_map(SYS_BUS_DEVICE(dev), 2, GED_MMIO_BASE_REGS);
-+        sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0,
-+                           x86ms->gsi[GED_MMIO_IRQ]);
-+        sysbus_realize(SYS_BUS_DEVICE(dev), &error_fatal);
-+        mms->acpi_dev = ACPI_DEVICE_IF(dev);
-+    }
- 
-     if (mms->pic == ON_OFF_AUTO_ON || mms->pic == ON_OFF_AUTO_AUTO) {
-         qemu_irq *i8259;
-@@ -438,6 +453,26 @@ static void microvm_machine_set_auto_kernel_cmdline(Object *obj, bool value,
-     mms->auto_kernel_cmdline = value;
- }
- 
-+static void microvm_machine_done(Notifier *notifier, void *data)
-+{
-+    MicrovmMachineState *mms = container_of(notifier, MicrovmMachineState,
-+                                            machine_done);
-+
-+    acpi_setup_microvm(mms);
-+}
-+
-+static void microvm_powerdown_req(Notifier *notifier, void *data)
-+{
-+    MicrovmMachineState *mms = container_of(notifier, MicrovmMachineState,
-+                                            powerdown_req);
-+
-+    if (mms->acpi_dev) {
-+        Object *obj = OBJECT(mms->acpi_dev);
-+        AcpiDeviceIfClass *adevc = ACPI_DEVICE_IF_GET_CLASS(obj);
-+        adevc->send_event(mms->acpi_dev, ACPI_POWER_DOWN_STATUS);
-+    }
-+}
-+
- static void microvm_machine_initfn(Object *obj)
- {
-     MicrovmMachineState *mms = MICROVM_MACHINE(obj);
-@@ -452,6 +487,11 @@ static void microvm_machine_initfn(Object *obj)
- 
-     /* State */
-     mms->kernel_cmdline_fixed = false;
-+
-+    mms->machine_done.notify = microvm_machine_done;
-+    qemu_add_machine_init_done_notifier(&mms->machine_done);
-+    mms->powerdown_req.notify = microvm_powerdown_req;
-+    qemu_register_powerdown_notifier(&mms->powerdown_req);
- }
- 
- static void microvm_class_init(ObjectClass *oc, void *data)
-diff --git a/hw/i386/Kconfig b/hw/i386/Kconfig
-index 03e347b2078f..d0bd8b537d55 100644
---- a/hw/i386/Kconfig
-+++ b/hw/i386/Kconfig
-@@ -103,6 +103,7 @@ config MICROVM
-     select I8259
-     select MC146818RTC
-     select VIRTIO_MMIO
-+    select ACPI_HW_REDUCED
- 
- config X86_IOMMU
-     bool
-diff --git a/hw/i386/meson.build b/hw/i386/meson.build
-index 1a7d1a685d77..e5d109f5c64d 100644
---- a/hw/i386/meson.build
-+++ b/hw/i386/meson.build
-@@ -11,7 +11,7 @@ i386_ss.add(when: 'CONFIG_X86_IOMMU', if_true: files('x86-iommu.c'),
-                                       if_false: files('x86-iommu-stub.c'))
- i386_ss.add(when: 'CONFIG_AMD_IOMMU', if_true: files('amd_iommu.c'))
- i386_ss.add(when: 'CONFIG_I440FX', if_true: files('pc_piix.c'))
--i386_ss.add(when: 'CONFIG_MICROVM', if_true: files('microvm.c'))
-+i386_ss.add(when: 'CONFIG_MICROVM', if_true: files('microvm.c', 'acpi-microvm.c'))
- i386_ss.add(when: 'CONFIG_Q35', if_true: files('pc_q35.c'))
- i386_ss.add(when: 'CONFIG_VMMOUSE', if_true: files('vmmouse.c'))
- i386_ss.add(when: 'CONFIG_VMPORT', if_true: files('vmport.c'))
+index 000000000000..e69de29bb2d1
+diff --git a/tests/data/acpi/microvm/FACP b/tests/data/acpi/microvm/FACP
+new file mode 100644
+index 000000000000..e69de29bb2d1
 -- 
 2.27.0
 
