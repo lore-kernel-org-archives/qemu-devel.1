@@ -2,88 +2,90 @@ Return-Path: <SRS0=H0ck=CE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A4F2C433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 14:30:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B1B7C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 14:35:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 43DD421741
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 14:30:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3A2422177B
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 14:35:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="c36NkZKa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43DD421741
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vXc1pX2E"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A2422177B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59822 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33958 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAwRN-0008Pv-Hl
-	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 10:30:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44404)
+	id 1kAwW4-0001Fa-Ek
+	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 10:35:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45476)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kAwQm-0007y0-O1
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 10:29:40 -0400
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:42089)
+ id 1kAwVV-0000pK-2C
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 10:34:33 -0400
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:42146)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kAwQk-0005Dx-RE
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 10:29:40 -0400
-Received: by mail-pg1-x541.google.com with SMTP id g1so1101287pgm.9
- for <qemu-devel@nongnu.org>; Wed, 26 Aug 2020 07:29:38 -0700 (PDT)
+ id 1kAwVT-0005jx-HY
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 10:34:32 -0400
+Received: by mail-pg1-x543.google.com with SMTP id g1so1108535pgm.9
+ for <qemu-devel@nongnu.org>; Wed, 26 Aug 2020 07:34:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=/8PBR3k/r2NCRoMrI78K9H5qgznee/2LFVwyC6xM0LA=;
- b=c36NkZKah1WWH1Dn9C9SGcjy+VdTyDsIndlWpSNmPoN14/berC4Um3z2IaUoEhzpuF
- WaoBz6TWuoxwjlsWoILwHKhNyu5Ic9dcN7V4z4mr99Cl4QI2oLelvBysaehBvI/caVJR
- yN4Sga1ziRx9duY5yjpY2Rgek+kNyk6r/hlS9T0H9+DnbW3x3eA3fwCwB0MZUFTP09Ld
- bc0+SHOoAeUTdCWIzhPcIwYjur25kzGuhHH1tl2mXA1G/T5RCNEgW4Xp2zYI7zXfwAiG
- 8Dbqi9TFehFr8M56435AsUKxULE2AcwkT+HMayOGZerV1JG7djPfBWvEQTJrSAjoFpbI
- orAw==
+ bh=CPkmGFObJrzj6Vz259X9NlyAgcPYN6V6ePMw+OQBPj4=;
+ b=vXc1pX2Ecqrxb4sOJ5tvF/FE9Q5i0zNqHNwtlu23cQ0AIpaj1RnhHOQY6KOuju+pye
+ NXV4qA9ZHPnsEZ2/nRQsHhAToqQv3PVdg8U0lxMMDilZ0mW7GC8ImpQAUtY9xYkSiKUL
+ sYTx8jbps51JHjLoTbBrFc9Z3YIASaEuA32UZaNbe64Wa6jJQYN3YS1PTL2hWwRrWZDG
+ elZ49foG6XtND297PDv9q2b+PkDYyeDMJxi+IwPQP3TSZLnBcZ/liJLeqVlmWAyE09pk
+ aRIHjdh+F0+bEDoPZ/89mziJ4+tyEEMYOzLzFhlK4s6RcLKjVnRZnxQfF8rApSkL1W0H
+ 8/Tg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=/8PBR3k/r2NCRoMrI78K9H5qgznee/2LFVwyC6xM0LA=;
- b=IuQmNXhhDer7ehwc8SpEYStTjzxRx8yuoZEPLeSNosmtmrDT0xyOft4NdDza5SYSqM
- /b98tr/nKfHvbN5YuJu5prjA2ccna7clEqXuABm8By/7NtjYqowmKGPA286yv/NjgzKj
- y+FfQrylp7isWY7knFFPluxvpcb9/yd3fi+mHZhSSFpGiyFGcZSfxIA0En6bPXDDEf81
- OfiX58Jis1ZjhcPbt0Q/MxQ99aSOrPFKwhrwAL4bJNDdbKVneOqs1JxFZmLEFKKBStIX
- noSPtBGxIHlC6JBPOzQOTAVH7ZHX2BRpC5jHSSXpvl0nzWUL+AudERcCUcwCKRGdsMM2
- 4tBQ==
-X-Gm-Message-State: AOAM530+Bwv1dtBW1+ICs4AFyPmQm41O4Qf0j3K3hIT9uAKm9aJtQ9ja
- Abs4dzklefRgyKV8TKt8jlAa1A==
-X-Google-Smtp-Source: ABdhPJzbt6NGCy1Edsnxv1fDzx9uYSuEtoPhy2pC5Skc1qSdMN1vBHz6aomq55hfyl6BSpeAa9oPUQ==
-X-Received: by 2002:a63:5a41:: with SMTP id k1mr10437720pgm.346.1598452177531; 
- Wed, 26 Aug 2020 07:29:37 -0700 (PDT)
+ bh=CPkmGFObJrzj6Vz259X9NlyAgcPYN6V6ePMw+OQBPj4=;
+ b=RzVC8BiJIm/0qxLbWnnKR7jEX5jLjP6PU4GQGJ3IvnW5ooGRcevVtUnhDRtbNUP6Mv
+ DxCRU+VuMpZcZvQTUSy6zJ7kPvIRPnYFOIvHXGnfTSST6KVmmUg4woGksqDotvX63aBP
+ UwczaVymI1JoqG9ADjH10cCtPjUx2WFjNrZfqSvVRec/+JcXd6VBC7pX78BGm8QYn4cK
+ 81AbU/RvskckpCC31hxarSSM+zNdH7DwSs0zb6V1HWdxAS6okZF6ov56KQtf6ydvboHu
+ WOxhURv0kttAHVENo3TEkiMwHzO0gt0YejwFsMlnAgDqkEtaoWHiDEkYaREfDVrI2ATK
+ 7bAw==
+X-Gm-Message-State: AOAM532z97VAVZL2JQfs5YxLzjslI1MFx3gfUnhPDzFlaZunU3L4+ev3
+ fOvlDJ9zMt66aqEuQucNWGOnHQ==
+X-Google-Smtp-Source: ABdhPJw2uZW956peViVPG3fSj+Gf6hDNuM3zU0P17FhCs7wazn7mMzCtAoe/2DmVnpI8QZjdSg3MNg==
+X-Received: by 2002:a05:6a00:22c9:: with SMTP id
+ f9mr12348078pfj.212.1598452469891; 
+ Wed, 26 Aug 2020 07:34:29 -0700 (PDT)
 Received: from [192.168.81.79]
  (h216-228-167-147.bendor.dedicated.static.tds.net. [216.228.167.147])
- by smtp.gmail.com with ESMTPSA id j2sm2298733pga.12.2020.08.26.07.29.35
+ by smtp.gmail.com with ESMTPSA id b185sm3191842pfg.71.2020.08.26.07.34.28
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 26 Aug 2020 07:29:36 -0700 (PDT)
-Subject: Re: [RFC PATCH v3 11/34] Hexagon (target/hexagon) register fields
+ Wed, 26 Aug 2020 07:34:29 -0700 (PDT)
+Subject: Re: [RFC PATCH v3 12/34] Hexagon (target/hexagon) instruction
+ attributes
 To: Taylor Simpson <tsimpson@quicinc.com>, qemu-devel@nongnu.org
 References: <1597765847-16637-1-git-send-email-tsimpson@quicinc.com>
- <1597765847-16637-12-git-send-email-tsimpson@quicinc.com>
+ <1597765847-16637-13-git-send-email-tsimpson@quicinc.com>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <9116d651-9b54-1507-9723-d3a365812dc4@linaro.org>
-Date: Wed, 26 Aug 2020 07:29:33 -0700
+Message-ID: <5d13ad4c-6ff7-8ccc-c5eb-303c97cd9664@linaro.org>
+Date: Wed, 26 Aug 2020 07:34:26 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <1597765847-16637-12-git-send-email-tsimpson@quicinc.com>
+In-Reply-To: <1597765847-16637-13-git-send-email-tsimpson@quicinc.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::541;
- envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x541.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::543;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x543.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -42
@@ -112,68 +114,18 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 8/18/20 8:50 AM, Taylor Simpson wrote:
-> Declare bitfields within registers such as user status register (USR)
-> 
-> Signed-off-by: Taylor Simpson <tsimpson@quicinc.com>
-> ---
->  target/hexagon/reg_fields.h     | 40 +++++++++++++++++++++
->  target/hexagon/reg_fields_def.h | 78 +++++++++++++++++++++++++++++++++++++++++
->  target/hexagon/reg_fields.c     | 28 +++++++++++++++
->  3 files changed, 146 insertions(+)
->  create mode 100644 target/hexagon/reg_fields.h
->  create mode 100644 target/hexagon/reg_fields_def.h
->  create mode 100644 target/hexagon/reg_fields.c
-> 
-> diff --git a/target/hexagon/reg_fields.h b/target/hexagon/reg_fields.h
-> new file mode 100644
-> index 0000000..cf168f0
-> --- /dev/null
-> +++ b/target/hexagon/reg_fields.h
-> @@ -0,0 +1,40 @@
-> +/*
-> + *  Copyright(c) 2019-2020 Qualcomm Innovation Center, Inc. All Rights Reserved.
-> + *
-> + *  This program is free software; you can redistribute it and/or modify
-> + *  it under the terms of the GNU General Public License as published by
-> + *  the Free Software Foundation; either version 2 of the License, or
-> + *  (at your option) any later version.
-> + *
-> + *  This program is distributed in the hope that it will be useful,
-> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + *  GNU General Public License for more details.
-> + *
-> + *  You should have received a copy of the GNU General Public License
-> + *  along with this program; if not, see <http://www.gnu.org/licenses/>.
-> + */
-> +
-> +#ifndef HEXAGON_REG_FIELDS_H
-> +#define HEXAGON_REG_FIELDS_H
-> +
-> +#define NUM_GEN_REGS 32
+> +#define ATTRIB_WIDTH 32
+> +#define GET_ATTRIB(opcode, attrib) \
+> +    (((opcode_attribs[opcode][attrib / ATTRIB_WIDTH])\
+> +    >> (attrib % ATTRIB_WIDTH)) & 0x1)
 
-What's this?  It doesn't appear to be field related.
+Can you define GET_ATTRIB in terms of qemu/bitops.h?
 
-> +extern reg_field_t reg_field_info[];
+I'm leery of ATTRIB_WIDTH being separate from the actual definition of
+opcode_attribs, over in opcodes.h.
 
-const.
-
-> +enum reg_fields_enum {
-
-Doesn't follow naming guidelines.  But you don't actually use the name at all,
-so better to just drop the name entirely?
-
-> +/* USR fields */
-> +DEF_REG_FIELD(USR_OVF,
-> +    "ovf", 0, 1,
-> +    "Sticky Saturation Overflow - "
-> +    "Set when saturation occurs while executing instruction that specifies "
-> +    "optional saturation, remains set until explicitly cleared by a USR=Rs "
-> +    "instruction.")
-
-Is the description as a string really useful, or even used?
-A comment would seem to do just as well, not consume space in the final binary,
-and even then seems redundant with the actual architecture manual.
+Why does attribs.h need to live separately?  They're clearly closely related,
+and cannot in fact be used separately.
 
 
 r~
