@@ -2,74 +2,74 @@ Return-Path: <SRS0=H0ck=CE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26464C433E3
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 14:58:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E181C433E1
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 14:58:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E942E2078D
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 14:58:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5BD332078D
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 14:58:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hDtR+Yrs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E942E2078D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iZYq4uV0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BD332078D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53492 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54028 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAwsl-0008Ac-6y
-	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 10:58:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50820)
+	id 1kAwsu-0008P7-MF
+	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 10:58:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50804)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kAwnF-0006i6-Sr
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 10:52:54 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58550)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kAwnD-0008LI-Cd
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kAwnF-0006go-AA
  for qemu-devel@nongnu.org; Wed, 26 Aug 2020 10:52:53 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:51388)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kAwnD-0008LA-6C
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 10:52:52 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
  s=mimecast20190719; t=1598453570;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=LYMY1TJzScePIyALLqkaqwZt57Dewu7kAwmHWhsDJLk=;
- b=hDtR+YrsWnJxRrG/eSuJ3XWXD5wT/Z7Xg8jcTRIZNeP4mhoEuon3n1o/B0pyuIvTo0+/1N
- oyNhcr4sL8nv6+n2yfp31RYd7Q755jvyBDdgMkUb4z0pJGl8WTO73w0OGW+v0FAK32OYEq
- 89nWWshbaaYRHOKvFSEm4QzTF8UXnak=
+ bh=Nz2sZrJX4qzBF63OonFqdCb3a+jIn0R8qkWmHt5YvFQ=;
+ b=iZYq4uV0+QILOqoT7G3R79JVd24QmjoCr6bSFCgefrszQ7b81bJZ687avT8w3X38zdSDy4
+ InZjXjYBLBwj5wI9JsD8/NkoetJZmAOhRa47s2O69IBO8WUB9tNEDTZSnlMepQVeYRaLLj
+ RotiaquahxRFc0TrnsJpDR80XHBS6AE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-11-fBQwp5RGNz-iKD8ZCdVnYQ-1; Wed, 26 Aug 2020 10:52:47 -0400
-X-MC-Unique: fBQwp5RGNz-iKD8ZCdVnYQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-19-E8FT3JpZNzuxYUY4TJwSUA-1; Wed, 26 Aug 2020 10:52:47 -0400
+X-MC-Unique: E8FT3JpZNzuxYUY4TJwSUA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0D2831074648;
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A4F1281F02D;
  Wed, 26 Aug 2020 14:52:46 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-112-54.ams2.redhat.com
  [10.36.112.54])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4437519C58;
- Wed, 26 Aug 2020 14:52:44 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3125F5FCA2;
+ Wed, 26 Aug 2020 14:52:46 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id D99D731F62; Wed, 26 Aug 2020 16:52:39 +0200 (CEST)
+ id 2A46531FBC; Wed, 26 Aug 2020 16:52:40 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 06/18] docs: Add USB U2F key device documentation
-Date: Wed, 26 Aug 2020 16:52:27 +0200
-Message-Id: <20200826145239.6077-7-kraxel@redhat.com>
+Subject: [PULL 12/18] docs/system: Add U2F key to the USB devices examples
+Date: Wed, 26 Aug 2020 16:52:33 +0200
+Message-Id: <20200826145239.6077-13-kraxel@redhat.com>
 In-Reply-To: <20200826145239.6077-1-kraxel@redhat.com>
 References: <20200826145239.6077-1-kraxel@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
-X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -106,128 +106,27 @@ Sender: "Qemu-devel"
 
 From: César Belley <cesar.belley@lse.epita.fr>
 
-Add USB U2F key device documentation:
-- USB U2F key device
-- Building
-- Using u2f-emulated
-- Using u2f-passthru
-- Libu2f-emu
-
 Signed-off-by: César Belley <cesar.belley@lse.epita.fr>
-Message-id: 20200826114209.28821-3-cesar.belley@lse.epita.fr
+Message-id: 20200826114209.28821-9-cesar.belley@lse.epita.fr
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- docs/u2f.txt | 101 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 101 insertions(+)
- create mode 100644 docs/u2f.txt
+ docs/system/usb.rst | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/docs/u2f.txt b/docs/u2f.txt
-new file mode 100644
-index 000000000000..f60052882ec3
---- /dev/null
-+++ b/docs/u2f.txt
-@@ -0,0 +1,101 @@
-+QEMU U2F Key Device Documentation.
+diff --git a/docs/system/usb.rst b/docs/system/usb.rst
+index ddfa828d74ae..9a2f1927c451 100644
+--- a/docs/system/usb.rst
++++ b/docs/system/usb.rst
+@@ -81,6 +81,9 @@ option or the ``device_add`` monitor command. Available devices are:
+ ``usb-audio``
+    USB audio device
+ 
++``u2f-{emulated,passthru}``
++   Universal Second Factor device
 +
-+Contents
-+1. USB U2F key device
-+2. Building
-+3. Using u2f-emulated
-+4. Using u2f-passthru
-+5. Libu2f-emu
-+
-+1. USB U2F key device
-+
-+U2F is an open authentication standard that enables relying parties
-+exposed to the internet to offer a strong second factor option for end
-+user authentication.
-+
-+The standard brings many advantages to both parties, client and server,
-+allowing to reduce over-reliance on passwords, it increases authentication
-+security and simplifies passwords.
-+
-+The second factor is materialized by a device implementing the U2F
-+protocol. In case of a USB U2F security key, it is a USB HID device
-+that implements the U2F protocol.
-+
-+In Qemu, the USB U2F key device offers a dedicated support of U2F, allowing
-+guest USB FIDO/U2F security keys operating in two possible modes:
-+pass-through and emulated.
-+
-+The pass-through mode consists of passing all requests made from the guest
-+to the physical security key connected to the host machine and vice versa.
-+In addition, the dedicated pass-through allows to have a U2F security key
-+shared on several guests which is not possible with a simple host device
-+assignment pass-through.
-+
-+The emulated mode consists of completely emulating the behavior of an
-+U2F device through software part. Libu2f-emu is used for that.
-+
-+
-+2. Building
-+
-+To ensure the build of the u2f-emulated device variant which depends
-+on libu2f-emu: configuring and building:
-+
-+    ./configure --enable-u2f && make
-+
-+
-+3. Using u2f-emulated
-+
-+To work, an emulated U2F device must have four elements:
-+ * ec x509 certificate
-+ * ec private key
-+ * counter (four bytes value)
-+ * 48 bytes of entropy (random bits)
-+
-+To use this type of device, this one has to be configured, and these
-+four elements must be passed one way or another.
-+
-+Assuming that you have a working libu2f-emu installed on the host.
-+There are three possible ways of configurations:
-+ * ephemeral
-+ * setup directory
-+ * manual
-+
-+Ephemeral is the simplest way to configure, it lets the device generate
-+all the elements it needs for a single use of the lifetime of the device.
-+
-+    qemu -usb -device u2f-emulated
-+
-+Setup directory allows to configure the device from a directory containing
-+four files:
-+ * certificate.pem: ec x509 certificate
-+ * private-key.pem: ec private key
-+ * counter: counter value
-+ * entropy: 48 bytes of entropy
-+
-+    qemu -usb -device u2f-emulated,dir=$dir
-+
-+Manual allows to configure the device more finely by specifying each
-+of the elements necessary for the device:
-+ * cert
-+ * priv
-+ * counter
-+ * entropy
-+
-+    qemu -usb -device u2f-emulated,cert=$DIR1/$FILE1,priv=$DIR2/$FILE2,counter=$DIR3/$FILE3,entropy=$DIR4/$FILE4
-+
-+
-+4. Using u2f-passthru
-+
-+On the host specify the u2f-passthru device with a suitable hidraw:
-+
-+    qemu -usb -device u2f-passthru,hidraw=/dev/hidraw0
-+
-+
-+5. Libu2f-emu
-+
-+The u2f-emulated device uses libu2f-emu for the U2F key emulation. Libu2f-emu
-+implements completely the U2F protocol device part for all specified
-+transport given by the FIDO Alliance.
-+
-+For more information about libu2f-emu see this page:
-+https://github.com/MattGorko/libu2f-emu.
+ .. _host_005fusb_005fdevices:
+ 
+ Using host USB devices on a Linux host
 -- 
 2.27.0
 
