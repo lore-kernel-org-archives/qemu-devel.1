@@ -7,87 +7,87 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62AEAC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 15:24:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A819C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 15:26:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2F3EA2078D
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 15:24:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 00CCD2075E
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 15:26:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X9dqKiJf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F3EA2078D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PB30Ao+m"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00CCD2075E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57800 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60516 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAxHc-00016d-Gw
-	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 11:24:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32790)
+	id 1kAxJW-0002NX-7p
+	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 11:26:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33580)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kAxGk-0000eh-E6
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 11:23:22 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:36532
+ id 1kAxIO-0001Yl-1X
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 11:25:04 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:37404
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kAxGi-0005Mw-BJ
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 11:23:22 -0400
+ id 1kAxIL-0005cJ-KK
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 11:25:03 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598455399;
+ s=mimecast20190719; t=1598455499;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=/eY+XHFIQVWWePO9nZ2oFD7CfyyAagegqaOn7z/Bi1M=;
- b=X9dqKiJfNwjRSTxTuN+nK1Zx9MrX0u9NOJRWdb0fO0VxO5slvD3eaUUvzS2y8YC8gF1a5V
- dlycCcZQKxnXWMskU3Vyax39eUscrctTS8irmgdfXugItJTgwD0HXGFYj3ySqCL7DU/Wmh
- OLvEJMyVYl1FN5auVSL9ySh6tbKJG2I=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-442-fhmtgjTjPFy2VsSpDlNi_w-1; Wed, 26 Aug 2020 11:23:17 -0400
-X-MC-Unique: fhmtgjTjPFy2VsSpDlNi_w-1
-Received: by mail-ej1-f70.google.com with SMTP id g20so1141799ejd.8
- for <qemu-devel@nongnu.org>; Wed, 26 Aug 2020 08:23:11 -0700 (PDT)
+ bh=o+c7umsoqgSuxBJu524SupUvNdvO+iUlCyXYztttk/Y=;
+ b=PB30Ao+mZMkOLecPB1vSdjT+DxvW0Zs4118SHwyVVGByTs552S8ueQgU+tWHI/GEtEns4D
+ jKylxjkfgqlbKIKam/Yvqmu48trf6WV6EmVJ/sLS5VtlGyxZTg/Mez6J+Yhj9c/SPJl84e
+ SNzgFB45AUzddfUg7sjmp+pkXaF+5/U=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-343-keCi4m5lNXGN_dKfkhAFPw-1; Wed, 26 Aug 2020 11:24:55 -0400
+X-MC-Unique: keCi4m5lNXGN_dKfkhAFPw-1
+Received: by mail-ed1-f70.google.com with SMTP id u11so801367eds.23
+ for <qemu-devel@nongnu.org>; Wed, 26 Aug 2020 08:24:55 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=/eY+XHFIQVWWePO9nZ2oFD7CfyyAagegqaOn7z/Bi1M=;
- b=BG8+dsiovNSdXCDqq5G32bYo7to1FgbfxpNcKjiiHujyJZgazRqjGaGSCZ/okDUFjC
- z/c0LIeu5sdNK/Z9EABTs5IBUNVzdkG+duaQfu0ssySyQRn5n3LidWCU0CU2Qio+xR8U
- +cu8QleKdP6IppPtfahwOwPmCVxLc5+uRZ4H+kIbrqWw36y0Go1HA+6N+siwXSTOuVBj
- KX/qn/Iha5tk24W6nKsWwxLpBnyq+fY8JXUh8WNHtGbbeXbn5hzlBGTFBv4xAK0ZcURq
- Nfj7nRPfWfJF07q5wLJUo35veF2tWJ4i7mF4D9Tm55G4rQG0n8/5dGIOLdaqYRAV14lp
- Ne5w==
-X-Gm-Message-State: AOAM530TZ/ho+sW+5Kf7mYtcmNQo2Fyiol//7RreXin526dQmVkq4Lrq
- XvzzojLAFPzi02f3jVDVuiVqpmoD1q82FRpCPVmMYkDCyyV6aO4jETxOBb7bJZy2TUTPO9a/Uga
- 9gKTepvxZEGshUVOAOKQ+xHNk9s9A/dI=
-X-Received: by 2002:a17:906:d9db:: with SMTP id
- qk27mr15323353ejb.230.1598455390313; 
- Wed, 26 Aug 2020 08:23:10 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyTXTgfEQxQinbwD2709kgSBmsnJ0ZlmX+BgGMgWNr1gO8ekkulh6ugbB1IyhjnO48P0E7euyOEgMS2091M4Tw=
-X-Received: by 2002:a17:906:d9db:: with SMTP id
- qk27mr15323333ejb.230.1598455390055; 
- Wed, 26 Aug 2020 08:23:10 -0700 (PDT)
+ bh=o+c7umsoqgSuxBJu524SupUvNdvO+iUlCyXYztttk/Y=;
+ b=nDDwuEUA7bImHYM6aSmtT7TPhwJH58+W4fkoVmU/OnpagSBa30N+JjvqUkjZJrdyM7
+ HWUgYW+uyJTr0J4Wztz5ic6ovflksCXq4JRQzOTw6xthcuEJJZqWHVpqkJ4lfCpB2pEA
+ PHTXm1U61ui+gp6+C2rR88CEe9R5p49sLCo1hQsB7taoCR3J9s4XwejT2z4RplhGBo9K
+ hvfwZJ2DwPfuhZxe6ZS2rSM7NjD5z6sKKoqNAwkFp0IxgWy44zH+nvWPoHWx6RYr+kv8
+ WmLYCoZW9NjNzlfPDcGu9PVgf1KM8Z4L6oSvMg+8tjOoYpqwC3sUHMB2BJ7wMz8zqT0t
+ y4OQ==
+X-Gm-Message-State: AOAM533D44YP/LcVUiHUksivNKEr/oXxcfHyN2gHbpY0QAn3lG8wPtWq
+ xQwGLEqUL9B0rPoq8PaXWZZ6EIA2teOilewd/fBhwhnogNMhoRZdxkybAAc64zoq9bZuBnnlsgg
+ FIpY5IvgH3bs7IRsJMBgOGryrU80eY0E=
+X-Received: by 2002:a17:906:57d9:: with SMTP id
+ u25mr15280292ejr.543.1598455494364; 
+ Wed, 26 Aug 2020 08:24:54 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwySn6G+LMnxTfXzGxwv6Agr9sjUuYawDR0Z/h3aoJc67OMf/KtGF+NnIpJyInlCLr7iJQEpnDr0p/bvefxdac=
+X-Received: by 2002:a17:906:57d9:: with SMTP id
+ u25mr15280269ejr.543.1598455494090; 
+ Wed, 26 Aug 2020 08:24:54 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200826151006.80-1-luoyonggang@gmail.com>
- <20200826151006.80-6-luoyonggang@gmail.com>
-In-Reply-To: <20200826151006.80-6-luoyonggang@gmail.com>
+ <20200826151006.80-4-luoyonggang@gmail.com>
+In-Reply-To: <20200826151006.80-4-luoyonggang@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 26 Aug 2020 17:22:59 +0200
-Message-ID: <CABgObfYK_BC0U+iXC9Y8VPSRXJT+vwZHhzT+Db+N4hTTqEVKRA@mail.gmail.com>
-Subject: Re: [PATCH v5 6/6] meson: Convert undefsym.sh to undefsym.py
+Date: Wed, 26 Aug 2020 17:24:43 +0200
+Message-ID: <CABgObfbL9rdB1T0gzYvT4uR9D8ghLmo7OYaVdk+Vdk_vSjjvoA@mail.gmail.com>
+Subject: Re: [PATCH v5 4/6] configure: Fix include and linkage issue on msys2
 To: luoyonggang@gmail.com
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/26 01:10:45
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/26 03:56:58
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -114,14 +114,11 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Careful, the original script:
+I'm a bit wary of this patch, the effects are quite wide-ranging. If
+we move all the detection of dependencies to meson, it will take a
+while but we should get a similar effect.
 
--comm -12 \
--  <( $NM -P -g $staticlib | awk '$2!="U"{print "-Wl,-u," $1}' | sort -u) \
--  <( $NM -P -g "$@" | awk '$2=="U"{print "-Wl,-u," $1}' | sort -u)
-
-looks for lines that *are* U in the modules. So using filter_lines_set
-is correct for static libraries but wrong for modules.
+However, I'm testing and queuing patches 1 to 3.
 
 Paolo
 
@@ -129,118 +126,106 @@ On Wed, Aug 26, 2020 at 5:13 PM <luoyonggang@gmail.com> wrote:
 >
 > From: Yonggang Luo <luoyonggang@gmail.com>
 >
-> undefsym.sh are not msys2 compatible, convert it to python script
+> On msys2, the -I/e/path/to/qemu -L/e/path/to/qemu are not recognized by the compiler
+> Cause $PWD are result posix style path such as /e/path/to/qemu that can not be recognized
+> by mingw gcc, and `pwd -W` are result Windows style path such as E:/path/to/qemu that can
+> be recognized by the mingw gcc. So we replace all $PWD with $build_path that can
+> building qemu under msys2/mingw environment.
 >
 > Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
 > ---
->  meson.build         |  2 +-
->  scripts/undefsym.py | 56 +++++++++++++++++++++++++++++++++++++++++++++
->  scripts/undefsym.sh | 20 ----------------
->  3 files changed, 57 insertions(+), 21 deletions(-)
->  create mode 100644 scripts/undefsym.py
->  delete mode 100755 scripts/undefsym.sh
+>  configure | 28 +++++++++++++++++++---------
+>  1 file changed, 19 insertions(+), 9 deletions(-)
 >
-> diff --git a/meson.build b/meson.build
-> index 1644bbd83c..d6e3bcea7e 100644
-> --- a/meson.build
-> +++ b/meson.build
-> @@ -845,7 +845,7 @@ foreach d, list : modules
->  endforeach
+> diff --git a/configure b/configure
+> index b1e11397a8..3b9e79923d 100755
+> --- a/configure
+> +++ b/configure
+> @@ -13,8 +13,13 @@ export CCACHE_RECACHE=yes
 >
->  nm = find_program('nm')
-> -undefsym = find_program('scripts/undefsym.sh')
-> +undefsym = find_program('scripts/undefsym.py')
->  block_syms = custom_target('block.syms', output: 'block.syms',
->                               input: [libqemuutil, block_mods],
->                               capture: true,
-> diff --git a/scripts/undefsym.py b/scripts/undefsym.py
-> new file mode 100644
-> index 0000000000..ebc009fb24
-> --- /dev/null
-> +++ b/scripts/undefsym.py
-> @@ -0,0 +1,56 @@
-> +#!/usr/bin/env python3
-> +# -*- coding: utf-8 -*-
+>  # make source path absolute
+>  source_path=$(cd "$(dirname -- "$0")"; pwd)
+> +build_path=$PWD
+> +if [ "$MSYSTEM" = "MINGW64" -o  "$MSYSTEM" = "MINGW32" ]; then
+> +source_path=$(cd "$(dirname -- "$0")"; pwd -W)
+> +build_path=`pwd -W`
+> +fi
+>
+> -if test "$PWD" = "$source_path"
+> +if test "$build_path" = "$source_path"
+>  then
+>      echo "Using './build' as the directory for build output"
+>
+> @@ -346,7 +351,12 @@ ld_has() {
+>      $ld --help 2>/dev/null | grep ".$1" >/dev/null 2>&1
+>  }
+>
+> -if printf %s\\n "$source_path" "$PWD" | grep -q "[[:space:]:]";
+> +check_valid_build_path="[[:space:]:]"
+> +if [ "$MSYSTEM" = "MINGW64" -o  "$MSYSTEM" = "MINGW32" ]; then
+> +check_valid_build_path="[[:space:]]"
+> +fi
 > +
-> +# Before a shared module's DSO is produced, a static library is built for it
-> +# and passed to this script.  The script generates -Wl,-u options to force
-> +# the inclusion of symbol from libqemuutil.a if the shared modules need them,
-> +# This is necessary because the modules may use functions not needed by the
-> +# executable itself, which would cause the function to not be linked in.
-> +# Then the DSO loading would fail because of the missing symbol.
-> +
-> +
-> +"""
-> +Compare the static library for compute the symbol duplication
-> +"""
-> +
-> +import sys
-> +import subprocess
-> +
-> +def filter_lines_set(stdout):
-> +    linesSet = set()
-> +    for line in stdout.splitlines():
-> +        tokens = line.split(b' ')
-> +        if len(tokens) >= 1:
-> +            if len(tokens) > 1 and tokens[1] == b'U':
-> +                continue
-> +            new_line = b'-Wl,-u,' + tokens[0]
-> +            if not new_line in linesSet:
-> +                linesSet.add(new_line)
-> +    return linesSet
-> +
-> +def main(args):
-> +    global _SCRIPT
-> +    print(" ".join(args),  file=sys.stderr)
-> +    if len(args) <= 3:
-> +        sys.exit(0)
-> +
-> +    nm = args[1]
-> +    staticlib = args[2]
-> +    pc = subprocess.run([nm, "-P", "-g", staticlib], stdout=subprocess.PIPE)
-> +    if pc.returncode != 0:
-> +        sys.exit(-1)
-> +    lines_set_left = filter_lines_set(pc.stdout)
-> +
-> +    shared_modules = args[3:]
-> +    pc = subprocess.run([nm, "-P", "-g"] + shared_modules, stdout=subprocess.PIPE)
-> +    if pc.returncode != 0:
-> +        sys.exit(-1)
-> +    lines_set_right = filter_lines_set(pc.stdout)
-> +    lines = []
-> +    for line in sorted(list(lines_set_right)):
-> +        if line in lines_set_left:
-> +            lines.append(line)
-> +    sys.stdout.write(b'\n'.join(lines).decode())
-> +
-> +if __name__ == "__main__":
-> +    main(sys.argv)
-> diff --git a/scripts/undefsym.sh b/scripts/undefsym.sh
-> deleted file mode 100755
-> index b9ec332e95..0000000000
-> --- a/scripts/undefsym.sh
-> +++ /dev/null
-> @@ -1,20 +0,0 @@
-> -#! /usr/bin/env bash
-> -
-> -# Before a shared module's DSO is produced, a static library is built for it
-> -# and passed to this script.  The script generates -Wl,-u options to force
-> -# the inclusion of symbol from libqemuutil.a if the shared modules need them,
-> -# This is necessary because the modules may use functions not needed by the
-> -# executable itself, which would cause the function to not be linked in.
-> -# Then the DSO loading would fail because of the missing symbol.
-> -
-> -if test $# -le 2; then
-> -  exit 0
-> -fi
-> -
-> -NM=$1
-> -staticlib=$2
-> -shift 2
-> -# Find symbols defined in static libraries and undefined in shared modules
-> -comm -12 \
-> -  <( $NM -P -g $staticlib | awk '$2!="U"{print "-Wl,-u," $1}' | sort -u) \
-> -  <( $NM -P -g "$@" | awk '$2=="U"{print "-Wl,-u," $1}' | sort -u)
+> +if printf %s\\n "$source_path" "$build_path" | grep -q "$check_valid_build_path";
+>  then
+>    error_exit "main directory cannot contain spaces nor colons"
+>  fi
+> @@ -942,7 +952,7 @@ Linux)
+>    linux="yes"
+>    linux_user="yes"
+>    kvm="yes"
+> -  QEMU_INCLUDES="-isystem ${source_path}/linux-headers -I$PWD/linux-headers $QEMU_INCLUDES"
+> +  QEMU_INCLUDES="-isystem ${source_path}/linux-headers -I${build_path}/linux-headers $QEMU_INCLUDES"
+>    libudev="yes"
+>  ;;
+>  esac
+> @@ -4283,7 +4293,7 @@ EOF
+>                symlink "$source_path/dtc/Makefile" "dtc/Makefile"
+>            fi
+>            fdt_cflags="-I${source_path}/dtc/libfdt"
+> -          fdt_ldflags="-L$PWD/dtc/libfdt"
+> +          fdt_ldflags="-L${build_path}/dtc/libfdt"
+>            fdt_libs="$fdt_libs"
+>        elif test "$fdt" = "yes" ; then
+>            # Not a git build & no libfdt found, prompt for system install
+> @@ -5268,7 +5278,7 @@ case "$capstone" in
+>      else
+>        LIBCAPSTONE=libcapstone.a
+>      fi
+> -    capstone_libs="-L$PWD/capstone -lcapstone"
+> +    capstone_libs="-L${build_path}/capstone -lcapstone"
+>      capstone_cflags="-I${source_path}/capstone/include"
+>      ;;
+>
+> @@ -6268,8 +6278,8 @@ case "$slirp" in
+>        git_submodules="${git_submodules} slirp"
+>      fi
+>      mkdir -p slirp
+> -    slirp_cflags="-I${source_path}/slirp/src -I$PWD/slirp/src"
+> -    slirp_libs="-L$PWD/slirp -lslirp"
+> +    slirp_cflags="-I${source_path}/slirp/src -I${build_path}/slirp/src"
+> +    slirp_libs="-L${build_path}/slirp -lslirp"
+>      if test "$mingw32" = "yes" ; then
+>        slirp_libs="$slirp_libs -lws2_32 -liphlpapi"
+>      fi
+> @@ -8212,7 +8222,7 @@ fi
+>  mv $cross config-meson.cross
+>
+>  rm -rf meson-private meson-info meson-logs
+> -NINJA=$PWD/ninjatool $meson setup \
+> +NINJA="${build_path}/ninjatool" $meson setup \
+>          --prefix "${pre_prefix}$prefix" \
+>          --libdir "${pre_prefix}$libdir" \
+>          --libexecdir "${pre_prefix}$libexecdir" \
+> @@ -8232,7 +8242,7 @@ NINJA=$PWD/ninjatool $meson setup \
+>         -Dvnc=$vnc -Dvnc_sasl=$vnc_sasl -Dvnc_jpeg=$vnc_jpeg -Dvnc_png=$vnc_png \
+>         -Dgettext=$gettext -Dxkbcommon=$xkbcommon \
+>          $cross_arg \
+> -        "$PWD" "$source_path"
+> +        "$build_path" "$source_path"
+>
+>  if test "$?" -ne 0 ; then
+>      error_exit "meson setup failed"
 > --
 > 2.27.0.windows.1
 >
