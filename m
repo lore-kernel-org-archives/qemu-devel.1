@@ -7,53 +7,52 @@ X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77DDAC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 10:16:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D89DC433E1
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 10:16:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4B64B2071E
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 10:16:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B64B2071E
+	by mail.kernel.org (Postfix) with ESMTPS id E5B672071E
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 10:16:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5B672071E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38272 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41716 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAsTH-0002el-Gf
-	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 06:15:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34134)
+	id 1kAsU9-00043u-6J
+	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 06:16:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34262)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.chen@huawei.com>)
- id 1kAsSj-0002Ei-53
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 06:15:25 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:46854 helo=huawei.com)
+ id 1kAsTN-0002uM-Uz
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 06:16:05 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:4269 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.chen@huawei.com>)
- id 1kAsSg-0004lL-No
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 06:15:24 -0400
-Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 6FAC430402F0239D0259;
- Wed, 26 Aug 2020 18:15:09 +0800 (CST)
+ id 1kAsTM-0004zk-9w
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 06:16:05 -0400
+Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id 58686A781E1CE4EBD91A;
+ Wed, 26 Aug 2020 18:16:00 +0800 (CST)
 Received: from [127.0.0.1] (10.174.187.160) by DGGEMS401-HUB.china.huawei.com
  (10.3.19.201) with Microsoft SMTP Server id 14.3.487.0;
- Wed, 26 Aug 2020 18:15:02 +0800
-Message-ID: <5F463618.10000@huawei.com>
-Date: Wed, 26 Aug 2020 18:14:48 +0800
+ Wed, 26 Aug 2020 18:15:53 +0800
+Message-ID: <5F463659.8080101@huawei.com>
+Date: Wed, 26 Aug 2020 18:15:53 +0800
 From: AlexChen <alex.chen@huawei.com>
 User-Agent: Mozilla/5.0 (Windows NT 6.2; WOW64;
  rv:17.0) Gecko/20130509 Thunderbird/17.0.6
 MIME-Version: 1.0
-To: <pbonzini@redhat.com>
-Subject: =?UTF-8?B?b3NsaWItcG9zaXjvvJpGaXggaGFuZGxlIGZkIGxlYWsgaW4gcWVtdV8=?=
- =?UTF-8?B?d3JpdGVfcGlkZmlsZSgp?=
-Content-Type: text/plain; charset="UTF-8"
+To: Viktor Prutyanov <viktor.prutyanov@phystech.edu>
+Subject: elf2dmp: Fix memory leak on main() error paths
+Content-Type: text/plain; charset="ISO-8859-1"
 Content-Transfer-Encoding: 7bit
 X-Originating-IP: [10.174.187.160]
 X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.35; envelope-from=alex.chen@huawei.com;
+Received-SPF: pass client-ip=45.249.212.191; envelope-from=alex.chen@huawei.com;
  helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/26 06:15:10
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/26 06:03:24
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
 X-Spam_score_int: -41
 X-Spam_score: -4.2
@@ -79,27 +78,35 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: alexchen <alex.chen@huawei.com>
+From: AlexChen <alex.chen@huawei.com>
 
-The fd will leak when (a.st_ino == b.st_ino) is true, fix it.
+The 'kdgb' is allocating memory in get_kdbg(), but it is not freed
+in both fill_header() and fill_context() failed branches, fix it.
 
 Signed-off-by: AlexChen <alex.chen@huawei.com>
 ---
- util/oslib-posix.c | 1 +
- 1 file changed, 1 insertion(+)
+ contrib/elf2dmp/main.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/util/oslib-posix.c b/util/oslib-posix.c
-index ad8001a4ad..74cf5e9c73 100644
---- a/util/oslib-posix.c
-+++ b/util/oslib-posix.c
-@@ -176,6 +176,7 @@ bool qemu_write_pidfile(const char *path, Error **errp)
-         goto fail_unlink;
+diff --git a/contrib/elf2dmp/main.c b/contrib/elf2dmp/main.c
+index 9a2dbc2902..ac746e49e0 100644
+--- a/contrib/elf2dmp/main.c
++++ b/contrib/elf2dmp/main.c
+@@ -568,12 +568,12 @@ int main(int argc, char *argv[])
+     if (fill_header(&header, &ps, &vs, KdDebuggerDataBlock, kdbg,
+             KdVersionBlock, qemu_elf.state_nr)) {
+         err = 1;
+-        goto out_pdb;
++        goto out_kdbg;
      }
 
-+    close(fd);
-     return true;
+     if (fill_context(kdbg, &vs, &qemu_elf)) {
+         err = 1;
+-        goto out_pdb;
++        goto out_kdbg;
+     }
 
- fail_unlink:
+     if (write_dump(&ps, &header, argv[2])) {
 -- 
 2.19.1
 
