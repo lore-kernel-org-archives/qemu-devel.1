@@ -2,94 +2,96 @@ Return-Path: <SRS0=H0ck=CE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB748C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 14:12:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99E5EC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 14:17:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9451B221E2
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 14:12:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5FC62208E4
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 14:17:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jt563RoN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9451B221E2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Kkod/4j1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FC62208E4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37340 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41362 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAwA6-0006RW-Ug
-	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 10:12:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39830)
+	id 1kAwEl-0008OC-I3
+	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 10:17:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41544)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kAw8j-0005Ls-6t
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 10:11:01 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:56256
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kAw8h-0002lq-4J
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 10:11:00 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598451058;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=060HA3Ej2j8fRecfrWiXc44k7FJecGyc21VqHHQ2h+U=;
- b=Jt563RoNBQOaNLVKq3wjeEUgBq+gyBmp3jbw1S+tP3Wae9/xS+hJlZNMZ2y1HwYRcrzedY
- nuoLtOyHv5bNb4Zy5owYZ5AujgmnbslXaor+9LoKCq3mJ8IqhevAStwyfxp5gDyeJyJqmk
- ryVGl/kLw1/qhAoF8Yvt656sdCyV2HA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-500-DL702ihvPqyYZp5UC-Junw-1; Wed, 26 Aug 2020 10:10:54 -0400
-X-MC-Unique: DL702ihvPqyYZp5UC-Junw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B05EA80B71A;
- Wed, 26 Aug 2020 14:10:53 +0000 (UTC)
-Received: from work-vm (ovpn-114-48.ams2.redhat.com [10.36.114.48])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 52A2519C58;
- Wed, 26 Aug 2020 14:10:49 +0000 (UTC)
-Date: Wed, 26 Aug 2020 15:10:46 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Igor Mammedov <imammedo@redhat.com>
-Subject: Re: [PATCH v5 0/8] Remove EPYC mode apicid decode and use generic
- decode
-Message-ID: <20200826141046.GB2727@work-vm>
-References: <159804762216.39954.15502128500494116468.stgit@naples-babu.amd.com>
- <20200824184112.GB2688@work-vm>
- <f602852c-b6af-694e-3e32-47974722e144@amd.com>
- <20200825081504.GA2646@work-vm>
- <20200825163846.10185087@redhat.com>
- <20200825152521.GA3574@work-vm>
- <20200826144324.56335302@redhat.com>
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kAwEB-0007wb-GN
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 10:16:39 -0400
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:45833)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kAwE9-0003cn-Ep
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 10:16:39 -0400
+Received: by mail-pg1-x541.google.com with SMTP id 67so1076034pgd.12
+ for <qemu-devel@nongnu.org>; Wed, 26 Aug 2020 07:16:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=IMi4MfHRZ9m9PqRyr2T0Uns27ZnXmEPDYxyqbpjQ0hE=;
+ b=Kkod/4j10+Ug1/HRluvUN6sBeeKwW9X6OU3HBQ0rq29f6uq9KdjepDP48+92F1Y/h6
+ A3vRURUeoF6fXAYr0kkijAoFM6ay+HA15r9Kr7A237ETlk9pxyYqvvmmDsgPVD/bP12E
+ XNiAVXuUStssF9cgTmktnTqax+UmePkkl54PVsMShkoC/+X8qLg7Oa4eIfqopqe4zgs+
+ s0+oz0eee8ZYYp5HbK706JYCvrRZxyAKxAy0MT9efytP5NFeek4asV553/EA4Gkk/yy/
+ 8wRFoHaswC/Nrpd3YWxMWgLAhYCUnL7eZzbWPm2KlEJCEqj51nnvobiUR0z2j8wfwWpv
+ 8N8Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=IMi4MfHRZ9m9PqRyr2T0Uns27ZnXmEPDYxyqbpjQ0hE=;
+ b=Yd1YZs8j2IoXnOALz7V19HMmtKzO1IBGhFWd+V/47PMFd7fOr4+LLK40OIR3AhgMDS
+ t5z6lhjC5oxI61nRiNYAtgUF92l9zuIAzto1vInpG+IihMO4m4bA54wTTOJf8U/vdzh5
+ KMfHxQjFxomI8UVNAihu2bNUroaE1lREdYIZNEumMIZlOeux5/V4jrMCdATn4pmKbJLU
+ /cHomWk2zxenvxv8Bj8y0ae4ceJV6Gn4uk5zFfZAAazdoZdiD33L1H1IaSuv++AXuV8a
+ /LwIdZweef6F/oL349nN1y3JuUbgpqVvBmdjdhRe0LRnmYbNeKTx1VX1RRI6etSsECon
+ +HPQ==
+X-Gm-Message-State: AOAM532kckrrtUV/elymLehN2d0VsxM7ZP2S8bpmN1Z4f1SvEjndb0R7
+ NGUaPZEjTNhVikit+0sajEfRQA==
+X-Google-Smtp-Source: ABdhPJwMkxurzR1O8irqAGRHMD60dz5d1F6NrQEmwG8goYvRi1R2zFxlQLvunB1Wvaf0M1fncTMuyg==
+X-Received: by 2002:aa7:858c:: with SMTP id w12mr7273660pfn.157.1598451395750; 
+ Wed, 26 Aug 2020 07:16:35 -0700 (PDT)
+Received: from [192.168.81.79]
+ (h216-228-167-147.bendor.dedicated.static.tds.net. [216.228.167.147])
+ by smtp.gmail.com with ESMTPSA id s17sm2565815pgm.63.2020.08.26.07.16.34
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 26 Aug 2020 07:16:34 -0700 (PDT)
+Subject: Re: [RFC PATCH v3 07/34] Hexagon (target/hexagon) scalar core helpers
+To: Taylor Simpson <tsimpson@quicinc.com>, qemu-devel@nongnu.org
+References: <1597765847-16637-1-git-send-email-tsimpson@quicinc.com>
+ <1597765847-16637-8-git-send-email-tsimpson@quicinc.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <7014720f-eda6-50f9-4594-8510d5745d63@linaro.org>
+Date: Wed, 26 Aug 2020 07:16:32 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200826144324.56335302@redhat.com>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=dgilbert@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/26 01:10:45
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.959,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+In-Reply-To: <1597765847-16637-8-git-send-email-tsimpson@quicinc.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::541;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x541.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -42
+X-Spam_score: -4.3
+X-Spam_bar: ----
+X-Spam_report: (-4.3 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-2.239,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -103,119 +105,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, mst@redhat.com, qemu-devel@nongnu.org,
- Babu Moger <babu.moger@amd.com>, pbonzini@redhat.com, rth@twiddle.net
+Cc: ale@rev.ng, riku.voipio@iki.fi, philmd@redhat.com, laurent@vivier.eu,
+ aleksandar.m.mail@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Igor Mammedov (imammedo@redhat.com) wrote:
-> On Tue, 25 Aug 2020 16:25:21 +0100
-> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+On 8/18/20 8:50 AM, Taylor Simpson wrote:
+> The majority of helpers are generated.  Define the helper functions needed
+> then include the generated file
 > 
-> > * Igor Mammedov (imammedo@redhat.com) wrote:
-> > > On Tue, 25 Aug 2020 09:15:04 +0100
-> > > "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> > >   
-> > > > * Babu Moger (babu.moger@amd.com) wrote:  
-> > > > > Hi Dave,
-> > > > > 
-> > > > > On 8/24/20 1:41 PM, Dr. David Alan Gilbert wrote:    
-> > > > > > * Babu Moger (babu.moger@amd.com) wrote:    
-> > > > > >> To support some of the complex topology, we introduced EPYC mode apicid decode.
-> > > > > >> But, EPYC mode decode is running into problems. Also it can become quite a
-> > > > > >> maintenance problem in the future. So, it was decided to remove that code and
-> > > > > >> use the generic decode which works for majority of the topology. Most of the
-> > > > > >> SPECed configuration would work just fine. With some non-SPECed user inputs,
-> > > > > >> it will create some sub-optimal configuration.
-> > > > > >> Here is the discussion thread.
-> > > > > >> https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Flore.kernel.org%2Fqemu-devel%2Fc0bcc1a6-1d84-a6e7-e468-d5b437c1b254%40amd.com%2F&amp;data=02%7C01%7Cbabu.moger%40amd.com%7C74d90724af9c4adcc75008d8485d4d16%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637338912853492167&amp;sdata=GTsMKcpeYXAA0CvpLTirPHKdNSdlJE3RuPjCtSyWtGQ%3D&amp;reserved=0
-> > > > > >>
-> > > > > >> This series removes all the EPYC mode specific apicid changes and use the generic
-> > > > > >> apicid decode.    
-> > > > > > 
-> > > > > > Hi Babu,
-> > > > > >   This does simplify things a lot!
-> > > > > > One worry, what happens about a live migration of a VM from an old qemu
-> > > > > > that was using the node-id to a qemu with this new scheme?    
-> > > > > 
-> > > > > The node_id which we introduced was only used internally. This wasn't
-> > > > > exposed outside. I don't think live migration will be an issue.    
-> > > > 
-> > > > Didn't it become part of the APIC ID visible to the guest?  
-> > > 
-> > > Daniel asked similar question wrt hard error on start up,
-> > > when CLI is not sufficient to create EPYC cpu.
-> > > 
-> > > https://www.mail-archive.com/qemu-devel@nongnu.org/msg728536.html
-> > > 
-> > > Migration might fall into the same category.
-> > > Also looking at the history, 5.0 commit 
-> > >   247b18c593ec29 target/i386: Enable new apic id encoding for EPYC based cpus models
-> > > silently broke APIC ID (without versioning), for all EPYC models (that's were 1 new and 1 old one).
-> > > 
-> > > (I'm not aware of somebody complaining about it)
-> > > 
-> > > Another commit ed78467a21459, changed CPUID_8000_001E without versioning as well.
-> > > 
-> > > 
-> > > With current EPYC apicid code, if all starts align (no numa or 1 numa node only on
-> > > CLI and no -smp dies=) it might produce a valid CPU (apicid+CPUID_8000_001E).
-> > > No numa is gray area, since EPYC spec implies that it has to be numa machine in case of real EPYC cpus.
-> > > Multi-node configs would be correct only if user assigns cpus to numa nodes
-> > > by duplicating internal node_id algorithm that this series removes.
-> > > 
-> > > There might be other broken cases that I don't recall anymore
-> > > (should be mentioned in previous versions of this series)
-> > > 
-> > > 
-> > > To summarize from migration pov (ignoring ed78467a21459 change):
-> > > 
-> > >  1) old qemu pre-5.0 ==>  qemu 5.0, 5.1 - broken migration  
-> > 
-> > Oh ....
-> > 
-> > >  2) with this series (lets call it qemu 5.2)
-> > >      pre-5.0 ==> qemu 5.2 - should work as series basically rollbacks current code to pre-5.0
-> > >      qemu 5.0, 5.1 ==> qemu 5.2 - broken
-> > > 
-> > > It's all about picking which poison to choose,
-> > > I'd preffer 2nd case as it lets drop a lot of complicated code that
-> > > doesn't work as expected.  
-> > 
-> > I think that would make our lives easier for other reasons; so I'm happy
-> > to go with that.
+> Signed-off-by: Taylor Simpson <tsimpson@quicinc.com>
+> ---
+>  target/hexagon/helper.h    |  33 ++++
+>  target/hexagon/op_helper.c | 368 +++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 401 insertions(+)
+>  create mode 100644 target/hexagon/helper.h
+>  create mode 100644 target/hexagon/op_helper.c
 > 
-> to make things less painful for users, me wonders if there is a way
-> to block migration if epyc and specific QEMU versions are used?
+> diff --git a/target/hexagon/helper.h b/target/hexagon/helper.h
+> new file mode 100644
+> index 0000000..48b1917
+> --- /dev/null
+> +++ b/target/hexagon/helper.h
+> @@ -0,0 +1,33 @@
+> +/*
+> + *  Copyright(c) 2019-2020 Qualcomm Innovation Center, Inc. All Rights Reserved.
+> + *
+> + *  This program is free software; you can redistribute it and/or modify
+> + *  it under the terms of the GNU General Public License as published by
+> + *  the Free Software Foundation; either version 2 of the License, or
+> + *  (at your option) any later version.
+> + *
+> + *  This program is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + *  GNU General Public License for more details.
+> + *
+> + *  You should have received a copy of the GNU General Public License
+> + *  along with this program; if not, see <http://www.gnu.org/licenses/>.
+> + */
+> +
+> +DEF_HELPER_2(raise_exception, noreturn, env, i32)
+> +DEF_HELPER_1(debug_start_packet, void, env)
+> +DEF_HELPER_3(debug_check_store_width, void, env, int, int)
+> +DEF_HELPER_3(debug_commit_end, void, env, int, int)
+> +DEF_HELPER_3(merge_inflight_store1s, s32, env, s32, s32)
+> +DEF_HELPER_3(merge_inflight_store1u, s32, env, s32, s32)
+> +DEF_HELPER_3(merge_inflight_store2s, s32, env, s32, s32)
+> +DEF_HELPER_3(merge_inflight_store2u, s32, env, s32, s32)
+> +DEF_HELPER_3(merge_inflight_store4s, s32, env, s32, s32)
+> +DEF_HELPER_3(merge_inflight_store4u, s32, env, s32, s32)
+> +DEF_HELPER_3(merge_inflight_store8u, s64, env, s32, s64)
 
-We have no way to block based on version - and that's a pretty painful
-thing to do; we can block based on machine type.
+Please use DEF_HELPER_FLAGS_N when possible.
 
-But before we get there; can we understand in which combinations that
-things break and why exactly - would it break on a 1 or 2 vCPU guest -
-or would it only break when we get to the point the upper bits start
-being used for example?  Why exaclty would it break - i.e. is it going
-to change the name of sections in the migration stream - or are the
-values we need actually going to migrate OK?
+You should be able to know when
 
-Dave
+(1) No exceptions are possible, and nothing is touched except the inputs.  In
+this case use TCG_CALL_NO_RWG_SE.
+
+(2) No exceptions are possible, and nothing in env is touched for which you
+have created a tcg variable in hexagon_translate_init().  In this case use
+TCG_CALL_NO_RWG.
+
+(3) Exceptions are possible, and no tcg variables are touched on the
+non-exceptional path.  In this case use TCG_CALL_NO_WG.
+
+> +static inline void log_pred_write(CPUHexagonState *env, int pnum,
+> +                                  target_ulong val)
+
+You might be better off letting the compiler decide about inlining.
+
+> +/*
+> + * Handle mem_noshuf
+> + *
+> + * This occurs when there is a load that might need data forwarded
+> + * from an inflight store in slot 1.  Note that the load and store
+> + * might have different sizes, so we can't simply compare the
+> + * addresses.  We merge only the bytes that overlap (if any).
+> + */
+> +static int64_t merge_bytes(CPUHexagonState *env, target_ulong load_addr,
+> +                           int64_t load_data, uint32_t load_width)
+> +{
+> +    /* Don't do anything if slot 1 was cancelled */
+> +    const int store_slot = 1;
+> +    if (env->slot_cancelled & (1 << store_slot)) {
+> +        return load_data;
+> +    }
+> +
+> +    int store_width = env->mem_log_stores[store_slot].width;
+> +    target_ulong store_addr = env->mem_log_stores[store_slot].va;
+> +    union {
+> +        uint8_t bytes[8];
+> +        uint32_t data32;
+> +        uint64_t data64;
+> +    } retdata, storedata;
+
+Red flag here.  This is assuming that the host and the target are both
+little-endian.
+
+> +    int bigmask = ((-load_width) & (-store_width));
+> +    if ((load_addr & bigmask) != (store_addr & bigmask)) {
+
+Huh?  This doesn't detect overlap.  Counter example:
+
+  load_addr = 0, load_width = 4,
+  store_addr = 1, store_width = 1.
+
+  bigmask = -4 & -1 -> -4.
+
+  (0 & -4) != (1 & -4) -> 0 != 1
 
 
-> > > PS:
-> > >  I didn't review it yet, but with this series we aren't
-> > >  making up internal node_ids that should match user provided numa node ids somehow.
-> > >  It seems series lost the patch that would enforce numa in case -smp dies>1,
-> > >  but otherwise it heads in the right direction.  
-> > 
-> > Dave
-> > 
-> > > > 
-> > > > Dave
-> > > >   
-> > >   
-> 
--- 
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> +    while ((i < load_width) && (j < store_width)) {
+> +        retdata.bytes[i] = storedata.bytes[j];
+> +        i++;
+> +        j++;
+> +    }
+> +    return retdata.data64;
 
+This most definitely requires host-endian adjustment.
+
+> +/* Helpful for printing intermediate values within instructions */
+> +void HELPER(debug_value)(CPUHexagonState *env, int32_t value)
+> +{
+> +    HEX_DEBUG_LOG("value = 0x%x\n", value);
+> +}
+> +
+> +void HELPER(debug_value_i64)(CPUHexagonState *env, int64_t value)
+> +{
+> +    HEX_DEBUG_LOG("value_i64 = 0x%lx\n", value);
+> +}
+
+I think we need to lose all of this.
+There are other ways to debug TCG.
+
+
+r~
 
