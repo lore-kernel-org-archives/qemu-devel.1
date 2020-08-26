@@ -2,60 +2,92 @@ Return-Path: <SRS0=H0ck=CE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=BAYES_00,HK_RANDOM_FROM,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 468B2C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 13:57:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6764BC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 13:57:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 08023208E4
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 13:57:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08023208E4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
+	by mail.kernel.org (Postfix) with ESMTPS id 34169208E4
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 13:57:08 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="URWT4LaR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34169208E4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49254 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49458 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAvvE-0007XG-7f
-	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 09:57:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35770)
+	id 1kAvvH-0007ca-GA
+	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 09:57:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35790)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kAvuP-0006fW-6w
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 09:56:13 -0400
-Received: from relay68.bu.edu ([128.197.228.73]:48859)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kAvuL-00014q-Q9
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 09:56:12 -0400
-X-Envelope-From: alxndr@bu.edu
-X-BU-AUTH: mozz.bu.edu [128.197.127.33]
-Received: from BU-AUTH (localhost.localdomain [127.0.0.1]) (authenticated
- bits=0)
- by relay68.bu.edu (8.14.3/8.14.3) with ESMTP id 07QDtDit020124
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
- Wed, 26 Aug 2020 09:55:16 -0400
-Date: Wed, 26 Aug 2020 09:55:13 -0400
-From: Alexander Bulekov <alxndr@bu.edu>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [Fwd] Issue 25164 in oss-fuzz: qemu: Fuzzing build failure
-Message-ID: <20200826135513.ay5ga3xi2ilcagqf@mozz.bu.edu>
-References: <20200823225804.umk5gh6knptqo5mw@mozz.bu.edu>
- <CABgObfZtGY-TuTLXNJNU9m_yQLfE6AM-+MdfqaaRjfMcWC8+Og@mail.gmail.com>
+ (Exim 4.90_1) (envelope-from <eblot.com@gmail.com>)
+ id 1kAvuS-0006fy-2g
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 09:56:16 -0400
+Received: from mail-wm1-x32c.google.com ([2a00:1450:4864:20::32c]:36304)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <eblot.com@gmail.com>)
+ id 1kAvuO-000159-Mr
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 09:56:15 -0400
+Received: by mail-wm1-x32c.google.com with SMTP id z9so1868304wmk.1
+ for <qemu-devel@nongnu.org>; Wed, 26 Aug 2020 06:56:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=i21jYN1rb1ssaRcH0pt9EWaKZ298pcauQwU2bsVQdCE=;
+ b=URWT4LaRL+1YHjgcgS9d5NICqD2L1yM/7BLOI2Mmke8Riha1y3xOzXZQNkkaH7iZe8
+ lze87mXAd3vyGOVJ/TFISELeM3PpirOAc6SKVn11/SiHeh6Dpg6QIYeIgwB+jc7wzvcH
+ yXNmFAQztBTFRXRdNVPKHzIH9JmUsDpB4hmvvfOYJ0M183B8T7ZvFPeCZZefPSSIXJ3+
+ RhkWLaRHT3UqTP3ZGMV3REsjqF9Y3cHg5EwyCsRE7qiuBUAinCrykMrWY6CLz17I7nmG
+ X1GwlwW8jmgjYJXOyA3rJzzFDtxkgglWPQ58orzhd491LSkoC6bTOG0eNuGQhNuCMiof
+ lLUA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=i21jYN1rb1ssaRcH0pt9EWaKZ298pcauQwU2bsVQdCE=;
+ b=omGrIPzU19D/PzMDQgSTtfydyy6RSczgQWfpdGStPPacMC04Ha5QI3z5Tqe6B33eua
+ 8TEFSUst6EmK8h/Epc0jEli9CS4HDXPWUvvC91pSqbE2hZsl6s5/FWmcbxLW3CazFljB
+ 1pdZ5Recp8qYarFpC85NfmAZCgCp2+7ccrzJHVnOzvs5aMr7M3yiviAxBB7H9lVdn08F
+ NYFOpHklopE19ILm4WF7qzVqX2xXE2EyLMmfvKV/5jAl20gJkRJ5VeSYEiNIaUt1e/So
+ A6jMzajLpmnTXA2IUfO0v9DngzQp3AIcBgxIqKAPB3/9tVCE+NiESKqMWDtb0bk24UHb
+ axXA==
+X-Gm-Message-State: AOAM533cuSZddpDk/OO6XnPYXFpsM8rKCzIWWuA3GTouFcOCcWBb060k
+ l44y163TuyNdBD3MQEkidAk=
+X-Google-Smtp-Source: ABdhPJxj6RF4YYyYV2lVECyHr5pqJlha22Czn8XV9702M72dnlTVzA6h/C/2BYYYTtYmjVBgZq0BOA==
+X-Received: by 2002:a1c:105:: with SMTP id 5mr7675252wmb.83.1598450169856;
+ Wed, 26 Aug 2020 06:56:09 -0700 (PDT)
+Received: from [192.168.15.71] ([195.200.173.126])
+ by smtp.gmail.com with ESMTPSA id v29sm6468007wrv.51.2020.08.26.06.56.08
+ (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+ Wed, 26 Aug 2020 06:56:08 -0700 (PDT)
+From: "Emmanuel Blot" <eblot.com@gmail.com>
+To: "=?utf-8?q?Marc-Andr=C3=A9?= Lureau" <marcandre.lureau@gmail.com>
+Subject: Re: Issue with submodules on macOS & meson
+Date: Wed, 26 Aug 2020 15:56:07 +0200
+X-Mailer: MailMate (1.13.1r5671)
+Message-ID: <EC53DB3B-58D1-40CA-BE7C-845089C68567@gmail.com>
+In-Reply-To: <CAJ+F1CKk_jYqPPsGUPLk+MLBUymSeMNjEKpqRR2e-xQry9N3=Q@mail.gmail.com>
+References: <9AB9A3F5-8AA6-4F82-9693-D331251AA0CB@gmail.com>
+ <CAJ+F1CKk_jYqPPsGUPLk+MLBUymSeMNjEKpqRR2e-xQry9N3=Q@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CABgObfZtGY-TuTLXNJNU9m_yQLfE6AM-+MdfqaaRjfMcWC8+Og@mail.gmail.com>
-Received-SPF: pass client-ip=128.197.228.73; envelope-from=alxndr@bu.edu;
- helo=relay68.bu.edu
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/26 09:56:07
-X-ACL-Warn: Detected OS   = Linux 2.6.x
-X-Spam_score_int: -31
-X-Spam_score: -3.2
-X-Spam_bar: ---
-X-Spam_report: (-3.2 / 5.0 requ) BAYES_00=-1.9, HK_RANDOM_ENVFROM=0.001,
- HK_RANDOM_FROM=0.999, RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_NONE=0.001,
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::32c;
+ envelope-from=eblot.com@gmail.com; helo=mail-wm1-x32c.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -69,110 +101,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Darren Kenny <darren.kenny@oracle.com>, Bandan Das <bsd@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: QEMU <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 200825 0958, Paolo Bonzini wrote:
-> Il lun 24 ago 2020, 00:58 Alexander Bulekov <alxndr@bu.edu> ha scritto:
-> 
-> > Hi Paolo,
-> > Our oss-fuzz builds started failing, after the meson merge. I think I
-> > tracked down the issues:
-> > 1.) Looking at the build-log here:
-> >
-> > https://oss-fuzz-build-logs.storage.googleapis.com/log-d43d402c-1ce5-4422-b3db-ccbf83a862a0.txt
-> > The error happens at link-time. Re-running the build with V=1:
-> > "/usr/bin/ld" ...
-> > --whole-archive /usr/local/lib/clang/12.0.0/.../libclang_rt.asan-x86_64.a \
-> > --start-group ..... -T /src/qemu/tests/qtest/fuzz/fork_fuzz.ld  \
-> > -wrap qtest_inb -wrap qtest_inw ..... --end-group .....
-> >
-> 
-> I think you can put everything into a response for and include it with
-> @fuzz.cmd in the command line.
+On 26 Aug 2020, at 15:50, Marc-André Lureau wrote:
 
-I don't think I understand. Should I provide the entire linker command,
-by email?
--Alex
+H Marc-André,
 
-> 
-> > 2.) 77afc75f69 ("oss-fuzz/build: remove LIB_FUZZING_ENGINE")
-> >
-> > On oss-fuzz, we cannot explicitly specify fsanitize=fuzzer: We have to
-> > leverage the $CC $CXX $CFLAGS $CXXFLAGS $LIB_FUZZING_ENGINE from
-> > oss-fuzz. That was the reason for the "make CONFIG_FUZZ CFLAGS" trickery
-> > in the original build script.
-> >
-> > Details:
-> >
-> > https://google.github.io/oss-fuzz/getting-started/new-project-guide/#Requirements
-> >
-> > To work around this, I think we can create separate configure options
-> > --enable-oss-fuzz and --oss-fuzz-cflags and CONFIG_OSS_FUZZ. In meson we
-> > create a new "source-set" specific_oss_fuzz_ss which is identical to
-> > specific_fuzz_ss, except it does not depend on "-fsanitize=fuzzer",
-> > which is specified in tests/qtest/fuzz/meson.build
-> >
-> > I've been working on patches to do (2)
-> 
-> 
-> Great, I can review them. Should you use $LIB_FUZZING_ENGINE directly
-> instead of a separate command line option?
-> 
-> Paolo
-> 
-> but I don't know how to fix (1).
-> > Do you have any ideas?
-> >
-> > -Alex
-> >
-> > ----- Forwarded message from ClusterFuzz-External via monorail <
-> > monorail+v2.382749006@chromium.org> -----
-> >
-> > Date: Sun, 23 Aug 2020 03:10:14 -0700
-> > From: ClusterFuzz-External via monorail <
-> > monorail+v2.382749006@chromium.org>
-> > To: alxndr@bu.edu
-> > Subject: Issue 25164 in oss-fuzz: qemu: Fuzzing build failure
-> >
-> > Status: New
-> > Owner: ----
-> > CC: b...@redhat.com, stefa...@redhat.com, alx...@bu.edu,
-> > pbonz...@redhat.com, darren.k...@oracle.com
-> > Labels: Proj-qemu
-> > Type: Build-Failure
-> >
-> > New issue 25164 by ClusterFuzz-External: qemu: Fuzzing build failure
-> > https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=25164
-> >
-> > The last 2 builds for qemu have been failing.
-> > Build log:
-> > https://oss-fuzz-build-logs.storage.googleapis.com/log-d43d402c-1ce5-4422-b3db-ccbf83a862a0.txt
-> > Build type: fuzzing
-> >
-> > To reproduce locally, please see:
-> > https://google.github.io/oss-fuzz/advanced-topics/reproducing#reproducing-build-failures
-> >
-> > This bug tracker is not being monitored by OSS-Fuzz team. If you have any
-> > questions, please create an issue at
-> > https://github.com/google/oss-fuzz/issues/new.
-> >
-> > **This bug will be automatically closed within a day once it is fixed.**
-> >
-> > --
-> > You received this message because:
-> >   1. You were specifically CC'd on the issue
-> >
-> > You may adjust your notification preferences at:
-> > https://bugs.chromium.org/hosting/settings
-> >
-> > Reply to this email to add a comment.
-> >
-> > ----- End forwarded message -----
-> >
-> >
+>> You need to run 'make' (at least once - but still by preference for now).
+> Submodule handling is done by Makefile.
+
+Ok, thanks a lot for this tip.
+
 
