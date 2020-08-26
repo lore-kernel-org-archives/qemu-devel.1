@@ -2,87 +2,82 @@ Return-Path: <SRS0=H0ck=CE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FEFAC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 11:07:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C835C433E1
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 11:07:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4C96A2083B
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 11:07:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 09C9C2083B
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 11:07:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jCrTOJub"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C96A2083B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Yea+hGhZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09C9C2083B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34142 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38170 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAtGl-0006gE-Ev
-	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 07:07:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47368)
+	id 1kAtHL-0008HV-7y
+	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 07:07:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47462)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>)
- id 1kAtFo-0005Ql-A4; Wed, 26 Aug 2020 07:06:08 -0400
-Received: from mail-oo1-xc41.google.com ([2607:f8b0:4864:20::c41]:38245)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>)
- id 1kAtDy-00035y-KS; Wed, 26 Aug 2020 07:06:07 -0400
-Received: by mail-oo1-xc41.google.com with SMTP id z11so347163oon.5;
- Wed, 26 Aug 2020 04:04:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=fgSZbO7M5TnMgI+6Y7mF/x3aurPUq0c8aQSVxmuMyQw=;
- b=jCrTOJublfGs2Lm6BT0NPoocEPhGnVrjbjGTK5/LOEqVlgnQhwGnAv4KrOGriGp54w
- mGn7dvzVHAUZtXr4gouEHyNhVZU5SDCdBNfIJVqtP+nTJS1Q3UcUhjYO70s5nYq1N6Lv
- 8xGSGpdvWzsM4ZIWOYFyrOUqNiB0VCSzPAX1sFWfUtfOPPvcxGnKi2rhKWKmkn/byQHw
- JmGdBgrwCbSvK707nj77vBpOQ7UErOTmA1YBVVZwQBL2wkXcbG8bjkDRtC2zEuN3wEeW
- ocF4qNMxVBR5qv2kVRI2MaeJqrhbBQkk4TsLT2dJyO1vHZd3/TnA5wVGycfMnVOY+usV
- C9pA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=fgSZbO7M5TnMgI+6Y7mF/x3aurPUq0c8aQSVxmuMyQw=;
- b=sMIKEKJR0G2L15KT8+DTImN7FtQBR7YgWs74hvfFK1YDoaE1zgXZafi2c3dga9qE6D
- 6PKwLbixxMl7KkYSRF7EkqaVwHLwjPRIv15DCAJQErGPaUn8SfU535c0qjC0polR8eE3
- I4OnvX4iKi3ywgQcw0Nsesk6bdoifP1Rmy5Ckg0XQO5/qSK75N7XeK6IYTY7tKK0R499
- 6HKueX1m+AgbN5J5msLSuT0qOHWq4shhcLhMHkfPp7vJhHT5XjsF4qLS6A/1uWTo5IKd
- D/5yMOUdWf9YjrEXXKzuX72F6h2kPFDuvT8q0LcMK+zClJ80/9rx5TeNzTHXp4+bDwf+
- 7jYg==
-X-Gm-Message-State: AOAM532aLixNjiuD3E4Vh0UmDPK/b+ARARw/Pi4lFplorZBh5yxqyDSe
- M4TnFPmgWPw/OwU7+qSMjNHFfW7dSSCrR1r/0iE=
-X-Google-Smtp-Source: ABdhPJzt3GPwy88oK2cLOEI2uScIoMZryU0aW2Zx6BwyvUpZyWSnYqoPXWhKQLGkgXA2/PJuN6xYjthZ0551MFLs1ls=
-X-Received: by 2002:a4a:4201:: with SMTP id h1mr10171742ooj.1.1598439852987;
- Wed, 26 Aug 2020 04:04:12 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <marcandre.lureau@redhat.com>)
+ id 1kAtGR-0006et-NQ
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 07:06:47 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:29050
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <marcandre.lureau@redhat.com>)
+ id 1kAtEV-00038N-6d
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 07:06:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1598439885;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=bEQk/7b4iuk15wbAGxtyI0iAv4L+NwU0U/kEhBXITRM=;
+ b=Yea+hGhZMyzs+m5RBX6tGP258TEPHClqB3LeKJIdYbN52ZC+XW1pwxnUSXiMGF/o/A4swq
+ NeUnqkIyr2lHwIhUeN2l/1DGfc0Uje82f+FMNn3GWOSrR7XIFx5yr6eAPF5SkY+VBTNq5z
+ 58AthdBVjSkh8PUkt4IP9FQqjWPIjHQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-173-f7akZ9LFNoecRrzRpqeSwA-1; Wed, 26 Aug 2020 07:04:41 -0400
+X-MC-Unique: f7akZ9LFNoecRrzRpqeSwA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4EAF3807334;
+ Wed, 26 Aug 2020 11:04:40 +0000 (UTC)
+Received: from localhost (unknown [10.36.110.43])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3DD5A1972A;
+ Wed, 26 Aug 2020 11:04:38 +0000 (UTC)
+From: marcandre.lureau@redhat.com
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 2/8] configure: always /-seperate directory from qemu_suffix
+Date: Wed, 26 Aug 2020 15:04:13 +0400
+Message-Id: <20200826110419.528931-3-marcandre.lureau@redhat.com>
+In-Reply-To: <20200826110419.528931-1-marcandre.lureau@redhat.com>
+References: <20200826110419.528931-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-References: <20200814160241.7915-1-pannengyuan@huawei.com>
- <20200814160241.7915-3-pannengyuan@huawei.com>
-In-Reply-To: <20200814160241.7915-3-pannengyuan@huawei.com>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Wed, 26 Aug 2020 19:03:37 +0800
-Message-ID: <CAKXe6S+MV3fyCoyDbDV01CbuGoR8JO3e1=VAh4OFP5bKUVMXkA@mail.gmail.com>
-Subject: Re: [PATCH 02/12] hw/vfio/ap: Plug memleak in vfio_ap_get_group()
-To: Pan Nengyuan <pannengyuan@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::c41;
- envelope-from=liq3ea@gmail.com; helo=mail-oo1-xc41.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
-X-Spam_action: no action
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=marcandre.lureau@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.81;
+ envelope-from=marcandre.lureau@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/26 03:16:15
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,64 +89,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Tony Krowiak <akrowiak@linux.ibm.com>, Thomas Huth <thuth@redhat.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- zhanghailiang <zhang.zhanghailiang@huawei.com>,
- Pierre Morel <pmorel@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>,
- Qemu Developers <qemu-devel@nongnu.org>, Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Euler Robot <euler.robot@huawei.com>, Chen Qun <kuhn.chenqun@huawei.com>
+Cc: sw@weilnetz.de, berrange@redhat.com,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Pan Nengyuan <pannengyuan@huawei.com> =E4=BA=8E2020=E5=B9=B48=E6=9C=8814=E6=
-=97=A5=E5=91=A8=E4=BA=94 =E4=B8=8B=E5=8D=886:29=E5=86=99=E9=81=93=EF=BC=9A
->
-> Missing g_error_free() in vfio_ap_get_group() error path. Fix that.
->
-> Reported-by: Euler Robot <euler.robot@huawei.com>
-> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
+From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
-Reviewed-by: Li Qiang <liq3ea@gmail.com>
+Otherwise, we may accept very strange directory names...
 
-I see Cornelia Huck has merged this in his tree.
-Don't know whether this series will go separate maintainer's tree or
-as go only one maintainer's tree(maybe Paolo's misc tree?).
+While at it, quote the variables.
 
+Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+---
+ configure | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-Thanks,
-Li Qiang
+diff --git a/configure b/configure
+index 0e04c47722..61216b9210 100755
+--- a/configure
++++ b/configure
+@@ -474,7 +474,7 @@ modules="no"
+ module_upgrades="no"
+ prefix="/usr/local"
+ firmwarepath="\${prefix}/share/qemu-firmware"
+-qemu_suffix="/qemu"
++qemu_suffix="qemu"
+ slirp=""
+ oss_lib=""
+ bsd="no"
+@@ -1823,12 +1823,12 @@ Advanced options (experts only):
+   --with-git=GIT           use specified git [$git]
+   --static                 enable static build [$static]
+   --mandir=PATH            install man pages in PATH
+-  --datadir=PATH           install firmware in PATH$qemu_suffix
+-  --docdir=PATH            install documentation in PATH$qemu_suffix
++  --datadir=PATH           install firmware in PATH/$qemu_suffix
++  --docdir=PATH            install documentation in PATH/$qemu_suffix
+   --bindir=PATH            install binaries in PATH
+   --libdir=PATH            install libraries in PATH
+   --libexecdir=PATH        install helper binaries in PATH
+-  --sysconfdir=PATH        install config in PATH$qemu_suffix
++  --sysconfdir=PATH        install config in PATH/$qemu_suffix
+   --localstatedir=PATH     install local state in PATH (set at runtime on win32)
+   --firmwarepath=PATH      search PATH for firmware files
+   --efi-aarch64=PATH       PATH of efi file to use for aarch64 VMs.
+@@ -6467,9 +6467,9 @@ EOF
+     fi
+ fi
+ 
+-qemu_confdir=$sysconfdir$qemu_suffix
+-qemu_moddir=$libdir$qemu_suffix
+-qemu_datadir=$datadir$qemu_suffix
++qemu_confdir="$sysconfdir/$qemu_suffix"
++qemu_moddir="$libdir/$qemu_suffix"
++qemu_datadir="$datadir/$qemu_suffix"
+ qemu_localedir="$datadir/locale"
+ qemu_icondir="$datadir/icons"
+ qemu_desktopdir="$datadir/applications"
+-- 
+2.26.2
 
-> ---
-> Cc: Cornelia Huck <cohuck@redhat.com>
-> Cc: Thomas Huth <thuth@redhat.com>
-> Cc: Christian Borntraeger <borntraeger@de.ibm.com>
-> Cc: Tony Krowiak <akrowiak@linux.ibm.com>
-> Cc: Halil Pasic <pasic@linux.ibm.com>
-> Cc: Pierre Morel <pmorel@linux.ibm.com>
-> Cc: Alex Williamson <alex.williamson@redhat.com>
-> Cc: qemu-s390x@nongnu.org
-> ---
->  hw/vfio/ap.c | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/hw/vfio/ap.c b/hw/vfio/ap.c
-> index b9330a8e6f..cec6fe1599 100644
-> --- a/hw/vfio/ap.c
-> +++ b/hw/vfio/ap.c
-> @@ -71,6 +71,7 @@ static VFIOGroup *vfio_ap_get_group(VFIOAPDevice *vapde=
-v, Error **errp)
->      if (!group_path) {
->          error_setg(errp, "%s: no iommu_group found for %s: %s",
->                     VFIO_AP_DEVICE_TYPE, vapdev->vdev.sysfsdev, gerror->m=
-essage);
-> +        g_error_free(gerror);
->          return NULL;
->      }
->
-> --
-> 2.18.2
->
->
 
