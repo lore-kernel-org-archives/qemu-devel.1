@@ -7,100 +7,99 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F21F2C433E3
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 05:59:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B853C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 06:00:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BF1C9206FA
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 05:59:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EA06D206FA
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 06:00:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ElcX4pV7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF1C9206FA
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="HIubkjMJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA06D206FA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51830 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54106 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAoT0-0000k9-2b
-	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 01:59:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60090)
+	id 1kAoTr-0001h4-7I
+	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 02:00:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60168)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bauerman@linux.ibm.com>)
- id 1kAoQJ-0004lw-2F; Wed, 26 Aug 2020 01:56:39 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:19892)
+ id 1kAoQd-0005db-7y; Wed, 26 Aug 2020 01:56:59 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:13202)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bauerman@linux.ibm.com>)
- id 1kAoQH-0005ss-85; Wed, 26 Aug 2020 01:56:38 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+ id 1kAoQb-0005uv-AM; Wed, 26 Aug 2020 01:56:58 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
  by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 07Q5W2Gh121076; Wed, 26 Aug 2020 01:56:06 -0400
+ 07Q5WLNc127402; Wed, 26 Aug 2020 01:56:29 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
  h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=MJVxnsr+PE9RmmiXUlrGdTqgD3hIqKlsXA4ckkbFYx8=;
- b=ElcX4pV7Wg1xzlKcmzDwC4dhbjZhLd/dFI7U4OO2f4RZjOrOWHHC37x3rPTXSuzBMDap
- w5nsXhxQvUWhEmWgLZUcbO+CU35zBNgdDg5DNcJRbYEJgMbMQCLuA0hxgmyL2F76K3S4
- /FanzsS6Uujrz0MpsgWyXWlB2MkqE/PuBhUajD8drYE8EosAeLywxUT0QbZdnNJr2sxW
- TmAuAMMOenuFt0fobe/wBspxrH1RZRZmqcVxt5ajFYy4I/G6bUEMvj7y6cITajZ4Woz4
- ZKXEMLQ7bkF41W8B7wH9bg3xqcn/NQT3xpK7LoPcZJREVIJnedXcQJ2wraU3pjT0ES60 xg== 
+ content-transfer-encoding; s=pp1;
+ bh=wcozulgcpqPylsZTrgmzgmyFL/R2nv2XemoN+wFJmJI=;
+ b=HIubkjMJggF2D+x0NQlQqvF1ps9s1d/eJYbNTod45ypCyfCrevQOGopz3/7rIrRwEiTS
+ AsRzvUH9PsEF7gM1Y53hxjG7bZodD6T7oz/HC88HUKkX0P2Dq/VxHbyx2o+GrP1Y/sJq
+ 4FWa6nc+BUS1A6ODm7S3otSYhxPb/2t4oALf6GheBLvdI4RaRjplOhy3g5eMEcHOsVMR
+ XwR8cyxvnPJxWbCo58t7ZGmlaUEn42diE3flZoy6tKsIAV1UH3KteuW0Hwkkn4tjAbWW
+ FyO4NDXaEngTDGVNxBV1J8ljd3o3QYgg0CFgGPSCQEn4wGjYRY7SdM/YTIr9xEOdVnpx Ng== 
 Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 335ggsa5r4-1
+ by mx0a-001b2d01.pphosted.com with ESMTP id 335hmj0jn5-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 26 Aug 2020 01:56:06 -0400
-Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 07Q5WVNT123769;
- Wed, 26 Aug 2020 01:56:05 -0400
-Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com
- [169.63.121.186])
- by mx0a-001b2d01.pphosted.com with ESMTP id 335ggsa5q6-1
+ Wed, 26 Aug 2020 01:56:29 -0400
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 07Q5WNxs127572;
+ Wed, 26 Aug 2020 01:56:28 -0400
+Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com
+ [169.62.189.10])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 335hmj0jmj-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 26 Aug 2020 01:56:05 -0400
-Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
- by ppma03wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 07Q5mXcU023204;
- Wed, 26 Aug 2020 05:56:04 GMT
-Received: from b03cxnp07029.gho.boulder.ibm.com
- (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
- by ppma03wdc.us.ibm.com with ESMTP id 332utqy88c-1
+ Wed, 26 Aug 2020 01:56:28 -0400
+Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
+ by ppma02dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 07Q5lq4n007972;
+ Wed, 26 Aug 2020 05:56:27 GMT
+Received: from b03cxnp08028.gho.boulder.ibm.com
+ (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
+ by ppma02dal.us.ibm.com with ESMTP id 332utuf1jt-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 26 Aug 2020 05:56:04 +0000
+ Wed, 26 Aug 2020 05:56:27 +0000
 Received: from b03ledav006.gho.boulder.ibm.com
  (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
- by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 07Q5u3dn39649760
+ by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 07Q5uQnn62062848
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 26 Aug 2020 05:56:03 GMT
+ Wed, 26 Aug 2020 05:56:26 GMT
 Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 243C7C605D;
- Wed, 26 Aug 2020 05:56:03 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 15BBCC605A;
+ Wed, 26 Aug 2020 05:56:26 +0000 (GMT)
 Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id EE0E7C6055;
- Wed, 26 Aug 2020 05:55:57 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id D4470C6055;
+ Wed, 26 Aug 2020 05:56:20 +0000 (GMT)
 Received: from morokweng.localdomain.com (unknown [9.163.48.38])
  by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
- Wed, 26 Aug 2020 05:55:57 +0000 (GMT)
+ Wed, 26 Aug 2020 05:56:20 +0000 (GMT)
 From: Thiago Jung Bauermann <bauerman@linux.ibm.com>
 To: qemu-ppc@nongnu.org
-Subject: [PATCH v7 2/8] target/arm: Move setting of CPU halted state to
- generic code
-Date: Wed, 26 Aug 2020 02:55:29 -0300
-Message-Id: <20200826055535.951207-3-bauerman@linux.ibm.com>
+Subject: [PATCH v7 6/8] sparc/sun4m: Don't set cs->halted = 0 in
+ main_cpu_reset()
+Date: Wed, 26 Aug 2020 02:55:33 -0300
+Message-Id: <20200826055535.951207-7-bauerman@linux.ibm.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200826055535.951207-1-bauerman@linux.ibm.com>
 References: <20200826055535.951207-1-bauerman@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
  definitions=2020-08-25_11:2020-08-25,
  2020-08-26 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 spamscore=0
- priorityscore=1501 adultscore=0 mlxscore=0 mlxlogscore=999
- lowpriorityscore=0 malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ phishscore=0
+ priorityscore=1501 mlxscore=0 mlxlogscore=999 clxscore=1015 malwarescore=0
+ suspectscore=1 bulkscore=0 impostorscore=0 lowpriorityscore=0 spamscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2006250000 definitions=main-2008260040
 Received-SPF: pass client-ip=148.163.156.1;
  envelope-from=bauerman@linux.ibm.com; helo=mx0a-001b2d01.pphosted.com
@@ -145,42 +144,24 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This change is in a separate patch because it's not so obvious that it
-won't cause a regression.
+We rely on cpu_common_reset() to set cs->halted to 0, it's redundant to do
+it in main_cpu_reset().
 
-Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Thiago Jung Bauermann <bauerman@linux.ibm.com>
 ---
- hw/core/cpu.c    | 2 +-
- target/arm/cpu.c | 1 -
- 2 files changed, 1 insertion(+), 2 deletions(-)
+ hw/sparc/sun4m.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/hw/core/cpu.c b/hw/core/cpu.c
-index 594441a150..71bb7859f1 100644
---- a/hw/core/cpu.c
-+++ b/hw/core/cpu.c
-@@ -258,7 +258,7 @@ static void cpu_common_reset(DeviceState *dev)
-     }
+diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
+index cf7dfa4af5..7484aa4438 100644
+--- a/hw/sparc/sun4m.c
++++ b/hw/sparc/sun4m.c
+@@ -224,7 +224,6 @@ static void main_cpu_reset(void *opaque)
+     CPUState *cs = CPU(cpu);
  
-     cpu->interrupt_request = 0;
--    cpu->halted = 0;
-+    cpu->halted = cpu->start_powered_off;
-     cpu->mem_io_pc = 0;
-     cpu->icount_extra = 0;
-     atomic_set(&cpu->icount_decr_ptr->u32, 0);
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index ec65c7653f..b6c65e4df6 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -175,7 +175,6 @@ static void arm_cpu_reset(DeviceState *dev)
-     env->vfp.xregs[ARM_VFP_MVFR2] = cpu->isar.mvfr2;
+     cpu_reset(cs);
+-    cs->halted = 0;
+ }
  
-     cpu->power_state = s->start_powered_off ? PSCI_OFF : PSCI_ON;
--    s->halted = s->start_powered_off;
- 
-     if (arm_feature(env, ARM_FEATURE_IWMMXT)) {
-         env->iwmmxt.cregs[ARM_IWMMXT_wCID] = 0x69051000 | 'Q';
+ static void secondary_cpu_reset(void *opaque)
 
