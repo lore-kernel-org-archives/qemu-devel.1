@@ -2,96 +2,60 @@ Return-Path: <SRS0=H0ck=CE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=BAYES_00,HK_RANDOM_FROM,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B422DC433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 13:53:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 468B2C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 13:57:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8463022B47
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 13:53:57 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AS4tdv/o"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8463022B47
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 08023208E4
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 13:57:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08023208E4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42044 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49254 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAvsC-0004PC-Sj
-	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 09:53:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34174)
+	id 1kAvvE-0007XG-7f
+	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 09:57:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35770)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kAvqk-0002lV-J2
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 09:52:26 -0400
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:40077)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kAvqi-0000ES-S3
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 09:52:26 -0400
-Received: by mail-pg1-x543.google.com with SMTP id h12so1056500pgm.7
- for <qemu-devel@nongnu.org>; Wed, 26 Aug 2020 06:52:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=j2MdWTXrVhnhQ+ibtc2fhVrnWv0Vkniz9grEFn+s5Is=;
- b=AS4tdv/oiEjRoRkw2e2S3zfIQjlIEgExdC0f8aXf+ZjT+LzYBSmM38XKIPS0h4ylvG
- 8JM7RLV8lrIMXKlCp02UIU0CvLJ88AU+A5XWnOTVGRZ/O2lDxI9WFX/YInrZpHpYUak4
- /8k9nMVCeLADU4zOlwzzBvvGtMOJQvVkJvEoBb9MTEWL/9NKl4vCrmhTNutiyhhxbtoR
- 9h3kfX06WracCj8lErQznO9WSLv5eIfaqHOjtB9fKUwEdhSQdYijU9kHcb3ZTqQa2PHp
- prBxvkLm1UGCtF7I1s4GJHJWQqlLdFi/ATBnr8tQMEmmPVf3aJzDljD8yG3p3ZOI2S3I
- dAFQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=j2MdWTXrVhnhQ+ibtc2fhVrnWv0Vkniz9grEFn+s5Is=;
- b=UVRXjMEZAww0NGrRzD/Rkuteof+vf9dSgvIVrTTdTEfWV1TvCi6GLuQzMW0lq5JPHE
- RQ5gBn1Y973kMUexCbAE4UbMiQyiS9Qym1kiG9TogEufkLho6cXVrBbmdTD25wUnajGX
- SAfrnwdT8u8lW5JzgTc37jgcrzFVp4d78AQNWPaAdSpZkYBRirefKuwjfHH7eXCR4zC2
- x7gtQeFbzn9Fgy7r8/fEvCnqtoQsPv+HaoSf5D3vTO8rcyzbkcAqv9sBvoqAD+vmhnib
- k8+ibSJLlJmsLgxJIesNw0ReF6uVKCSIv/ohiMGsAq9aD9YiAOaChrITFA7ywvu9+hQ5
- cXMw==
-X-Gm-Message-State: AOAM530UiwgV/YscLWDyA1eEepLgSDuZaqowMDjc+5e7wbv8/EienKYX
- l5q4b3J4QrpUvY9/uJCSoAUFXg==
-X-Google-Smtp-Source: ABdhPJziOxlqoLabumb43cO1gcJW7IMTH/7RDF0IeZ1ukOc1P1Y25Xjck1Rj5QQk33/vXQTqRzILrQ==
-X-Received: by 2002:a63:d34e:: with SMTP id u14mr10276070pgi.122.1598449943091; 
- Wed, 26 Aug 2020 06:52:23 -0700 (PDT)
-Received: from [192.168.81.79]
- (h216-228-167-147.bendor.dedicated.static.tds.net. [216.228.167.147])
- by smtp.gmail.com with ESMTPSA id u8sm3101266pfm.133.2020.08.26.06.52.22
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 26 Aug 2020 06:52:22 -0700 (PDT)
-Subject: Re: [RFC PATCH v3 06/34] Hexagon (disas) disassembler
-To: Taylor Simpson <tsimpson@quicinc.com>, qemu-devel@nongnu.org
-References: <1597765847-16637-1-git-send-email-tsimpson@quicinc.com>
- <1597765847-16637-7-git-send-email-tsimpson@quicinc.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <96c192d2-e0ba-9b80-d3cd-50eadf3dc349@linaro.org>
-Date: Wed, 26 Aug 2020 06:52:20 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kAvuP-0006fW-6w
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 09:56:13 -0400
+Received: from relay68.bu.edu ([128.197.228.73]:48859)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kAvuL-00014q-Q9
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 09:56:12 -0400
+X-Envelope-From: alxndr@bu.edu
+X-BU-AUTH: mozz.bu.edu [128.197.127.33]
+Received: from BU-AUTH (localhost.localdomain [127.0.0.1]) (authenticated
+ bits=0)
+ by relay68.bu.edu (8.14.3/8.14.3) with ESMTP id 07QDtDit020124
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+ Wed, 26 Aug 2020 09:55:16 -0400
+Date: Wed, 26 Aug 2020 09:55:13 -0400
+From: Alexander Bulekov <alxndr@bu.edu>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [Fwd] Issue 25164 in oss-fuzz: qemu: Fuzzing build failure
+Message-ID: <20200826135513.ay5ga3xi2ilcagqf@mozz.bu.edu>
+References: <20200823225804.umk5gh6knptqo5mw@mozz.bu.edu>
+ <CABgObfZtGY-TuTLXNJNU9m_yQLfE6AM-+MdfqaaRjfMcWC8+Og@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1597765847-16637-7-git-send-email-tsimpson@quicinc.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::543;
- envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x543.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -42
-X-Spam_score: -4.3
-X-Spam_bar: ----
-X-Spam_report: (-4.3 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-2.239,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CABgObfZtGY-TuTLXNJNU9m_yQLfE6AM-+MdfqaaRjfMcWC8+Og@mail.gmail.com>
+Received-SPF: pass client-ip=128.197.228.73; envelope-from=alxndr@bu.edu;
+ helo=relay68.bu.edu
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/26 09:56:07
+X-ACL-Warn: Detected OS   = Linux 2.6.x
+X-Spam_score_int: -31
+X-Spam_score: -3.2
+X-Spam_bar: ---
+X-Spam_report: (-3.2 / 5.0 requ) BAYES_00=-1.9, HK_RANDOM_ENVFROM=0.001,
+ HK_RANDOM_FROM=0.999, RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -105,37 +69,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ale@rev.ng, riku.voipio@iki.fi, philmd@redhat.com, laurent@vivier.eu,
- aleksandar.m.mail@gmail.com
+Cc: Darren Kenny <darren.kenny@oracle.com>, Bandan Das <bsd@redhat.com>,
+ qemu-devel <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/18/20 8:50 AM, Taylor Simpson wrote:
-> +    len = disassemble_hexagon(words, i, buf, PACKET_BUFFER_LEN);
-> +    slen = strlen(buf);
-> +    if (buf[slen - 1] == '\n') {
-> +        buf[slen - 1] = '\0';
-> +    }
-> +    (*info->fprintf_func)(info->stream, "%s", buf);
+On 200825 0958, Paolo Bonzini wrote:
+> Il lun 24 ago 2020, 00:58 Alexander Bulekov <alxndr@bu.edu> ha scritto:
+> 
+> > Hi Paolo,
+> > Our oss-fuzz builds started failing, after the meson merge. I think I
+> > tracked down the issues:
+> > 1.) Looking at the build-log here:
+> >
+> > https://oss-fuzz-build-logs.storage.googleapis.com/log-d43d402c-1ce5-4422-b3db-ccbf83a862a0.txt
+> > The error happens at link-time. Re-running the build with V=1:
+> > "/usr/bin/ld" ...
+> > --whole-archive /usr/local/lib/clang/12.0.0/.../libclang_rt.asan-x86_64.a \
+> > --start-group ..... -T /src/qemu/tests/qtest/fuzz/fork_fuzz.ld  \
+> > -wrap qtest_inb -wrap qtest_inw ..... --end-group .....
+> >
+> 
+> I think you can put everything into a response for and include it with
+> @fuzz.cmd in the command line.
 
-Normally our disassemblers print the instruction address; sometimes the raw
-bytes (or word) of the instruction.
+I don't think I understand. Should I provide the entire linker command,
+by email?
+-Alex
 
-Looking forward to patch 14 where disassemble_hexagon is defined, I see none of
-that.  Indeed, if disassembly fails, we get...
-
-> +    if (decode_this(nwords, words, &pkt)) {
-> +        snprint_a_pkt(buf, bufsize, &pkt);
-> +        return pkt.encod_pkt_size_in_bytes;
-> +    } else {
-> +        snprintf(buf, bufsize, "<invalid>");
-> +        return 0;
-> +    }
-
-... no indication at all what happened or where, just "<invalid>".  That's not
-going to make it easy to find problems.
-
-
-r~
+> 
+> > 2.) 77afc75f69 ("oss-fuzz/build: remove LIB_FUZZING_ENGINE")
+> >
+> > On oss-fuzz, we cannot explicitly specify fsanitize=fuzzer: We have to
+> > leverage the $CC $CXX $CFLAGS $CXXFLAGS $LIB_FUZZING_ENGINE from
+> > oss-fuzz. That was the reason for the "make CONFIG_FUZZ CFLAGS" trickery
+> > in the original build script.
+> >
+> > Details:
+> >
+> > https://google.github.io/oss-fuzz/getting-started/new-project-guide/#Requirements
+> >
+> > To work around this, I think we can create separate configure options
+> > --enable-oss-fuzz and --oss-fuzz-cflags and CONFIG_OSS_FUZZ. In meson we
+> > create a new "source-set" specific_oss_fuzz_ss which is identical to
+> > specific_fuzz_ss, except it does not depend on "-fsanitize=fuzzer",
+> > which is specified in tests/qtest/fuzz/meson.build
+> >
+> > I've been working on patches to do (2)
+> 
+> 
+> Great, I can review them. Should you use $LIB_FUZZING_ENGINE directly
+> instead of a separate command line option?
+> 
+> Paolo
+> 
+> but I don't know how to fix (1).
+> > Do you have any ideas?
+> >
+> > -Alex
+> >
+> > ----- Forwarded message from ClusterFuzz-External via monorail <
+> > monorail+v2.382749006@chromium.org> -----
+> >
+> > Date: Sun, 23 Aug 2020 03:10:14 -0700
+> > From: ClusterFuzz-External via monorail <
+> > monorail+v2.382749006@chromium.org>
+> > To: alxndr@bu.edu
+> > Subject: Issue 25164 in oss-fuzz: qemu: Fuzzing build failure
+> >
+> > Status: New
+> > Owner: ----
+> > CC: b...@redhat.com, stefa...@redhat.com, alx...@bu.edu,
+> > pbonz...@redhat.com, darren.k...@oracle.com
+> > Labels: Proj-qemu
+> > Type: Build-Failure
+> >
+> > New issue 25164 by ClusterFuzz-External: qemu: Fuzzing build failure
+> > https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=25164
+> >
+> > The last 2 builds for qemu have been failing.
+> > Build log:
+> > https://oss-fuzz-build-logs.storage.googleapis.com/log-d43d402c-1ce5-4422-b3db-ccbf83a862a0.txt
+> > Build type: fuzzing
+> >
+> > To reproduce locally, please see:
+> > https://google.github.io/oss-fuzz/advanced-topics/reproducing#reproducing-build-failures
+> >
+> > This bug tracker is not being monitored by OSS-Fuzz team. If you have any
+> > questions, please create an issue at
+> > https://github.com/google/oss-fuzz/issues/new.
+> >
+> > **This bug will be automatically closed within a day once it is fixed.**
+> >
+> > --
+> > You received this message because:
+> >   1. You were specifically CC'd on the issue
+> >
+> > You may adjust your notification preferences at:
+> > https://bugs.chromium.org/hosting/settings
+> >
+> > Reply to this email to add a comment.
+> >
+> > ----- End forwarded message -----
+> >
+> >
 
