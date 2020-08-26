@@ -2,129 +2,88 @@ Return-Path: <SRS0=H0ck=CE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,RCVD_ILLEGAL_IP,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C3C0C433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 19:40:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 632F1C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 19:54:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EDCEF2076C
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 19:40:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 20C9A207BC
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 19:54:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="JPwIO50N"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDCEF2076C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FoEJX3eW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20C9A207BC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40706 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48616 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kB1HO-0002rI-9E
-	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 15:40:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44760)
+	id 1kB1VY-0007FS-DC
+	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 15:54:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48368)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <Thomas.Lendacky@amd.com>)
- id 1kB1Gn-0002PV-57
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 15:39:41 -0400
-Received: from mail-co1nam11on2063.outbound.protection.outlook.com
- ([40.107.220.63]:50272 helo=NAM11-CO1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <Thomas.Lendacky@amd.com>)
- id 1kB1Gk-00087E-40
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 15:39:40 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=WtjZri9JtxDB97vPpnafp7vKJYW4ja3OgDHtIQnSB7VQT5ciB8RgyHd9rh/8v1VbMvJNqBMVtXoUU8MeMZ8DL5TEWNWFhDBepr8tTs92W6pCyI2r3gL646wpJ4mjTvXL2RdQDeYqTRDsVkJNcALdLgC2fT0c3KV3GhnAsz7cSkShc0W0TLen+U2PzlvH8CYSVwm4uPvZwRj3bldy845yYGGzQ8yHyIdwLE2t5ge1StkU+wVqGxIyYjxZ8RcIviYB9bcGv9JDF2k49mpvx2GlFsR2NJZPD/212/QGWgCrKPx/Mj0/itYnA2LZaukBnFiYfnma61ImqAHOpWaf4uvZVw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ILvPigiAOF9JYcifou24gmexah1gvAGHFPjwUT30giM=;
- b=GVuiuubEbv0CjG8qlJvh8stqkBgGfG07Pl49Z1PWL5SwxrmnUcrYaCuZ3gMFkIpnl0V9wWiFx83NKBa2OlNQmAe7MD+Waxg5crqUIPr/HGH4OAMd8fISDP48OMiWa9exXyDo9BYQLFS/z2IQL8jrzHo/H1Xf+QLNjZZrp6Zljmaq9RNVkiWAq6U8N3tk+mJSGT7W7hqP1XxtT/ApiQyTqskWClX3iWGv8RQqNb3khJYHdeUkzdNx0ycQb3afFTA6z0Z0soY5uUHayqowHv46B+DDUn7O/iz9fHUAX6SLfphi2L3ukA+EfLuM2b7rtTGCeppvRKIDAVhI0INZavVv3Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ILvPigiAOF9JYcifou24gmexah1gvAGHFPjwUT30giM=;
- b=JPwIO50N8LBlBj38xwF+01zBg+HwRAcYUSMFjHtVU8ly11wv8DZjryT/TqS+m+XGY23q7ZxLbPooyVDqp2KnTkgrFSRljl4KfAdtx/v2TbIioQD+NJ36/czEzgp4wUnEYbFUiw1cr9DHUzkJ63i4CMFVi33LzmDm2D/T4r3Ko1k=
-Authentication-Results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=amd.com;
-Received: from DM5PR12MB1355.namprd12.prod.outlook.com (2603:10b6:3:6e::7) by
- DM6PR12MB2985.namprd12.prod.outlook.com (2603:10b6:5:116::18) with
- Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3305.26; Wed, 26 Aug 2020 19:24:31 +0000
-Received: from DM5PR12MB1355.namprd12.prod.outlook.com
- ([fe80::299a:8ed2:23fc:6346]) by DM5PR12MB1355.namprd12.prod.outlook.com
- ([fe80::299a:8ed2:23fc:6346%3]) with mapi id 15.20.3305.032; Wed, 26 Aug 2020
- 19:24:31 +0000
-Subject: Re: [PATCH 1/4] sev/i386: Add initial support for SEV-ES
-To: Connor Kuehl <ckuehl@redhat.com>, qemu-devel@nongnu.org,
- kvm@vger.kernel.org
-References: <cover.1598382343.git.thomas.lendacky@amd.com>
- <88dc46aaedd17a3509d7546a622a9754dad895cb.1598382343.git.thomas.lendacky@amd.com>
- <9cd2e58f-dfa2-e2ae-4886-dc194318c411@redhat.com>
-From: Tom Lendacky <thomas.lendacky@amd.com>
-Message-ID: <661cc790-f1de-56ab-cd9f-14f087851eb6@amd.com>
-Date: Wed, 26 Aug 2020 14:24:28 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-In-Reply-To: <9cd2e58f-dfa2-e2ae-4886-dc194318c411@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SN4PR0701CA0029.namprd07.prod.outlook.com
- (2603:10b6:803:2d::14) To DM5PR12MB1355.namprd12.prod.outlook.com
- (2603:10b6:3:6e::7)
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kB1Uu-0006pa-Ss
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 15:54:17 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32334
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kB1RA-0000w6-N2
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 15:54:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1598471362;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=KrLEEkpUDk59fGsNOaQL+LkZ6p5ffFliyiEINgieX+E=;
+ b=FoEJX3eW5GSAmyeM8WbJPdQQ3W7lO2BGjtvqeXpczGLdgmQ46KnaWx2tW6+HxN/eJk5rGH
+ 3MHwA4bp/nyP7SBP8Hb6jkHXV6d3dEpgbaYjvcD+rIpxoxsboDQ58zX0+lwx7L6dkIsb1G
+ e8bKysTMBNtgCUl8w2l9rsecncIRK6g=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-235-FeDs58TeM7apl8PdWmrbGA-1; Wed, 26 Aug 2020 15:49:20 -0400
+X-MC-Unique: FeDs58TeM7apl8PdWmrbGA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0D72364086;
+ Wed, 26 Aug 2020 19:49:19 +0000 (UTC)
+Received: from localhost (unknown [10.10.67.254])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A28C619C58;
+ Wed, 26 Aug 2020 19:49:18 +0000 (UTC)
+Date: Wed, 26 Aug 2020 15:49:18 -0400
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Alistair Francis <alistair.francis@wdc.com>
+Subject: Re: [PATCH v2 1/1] core/register: Specify instance_size in the
+ TypeInfo
+Message-ID: <20200826194918.GG642093@habkost.net>
+References: <4cf1beb7dafb9143c261d266557d3173bf160524.1598376594.git.alistair.francis@wdc.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from 255.255.255.255 (255.255.255.255) by
- SN4PR0701CA0029.namprd07.prod.outlook.com (2603:10b6:803:2d::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3326.19 via Frontend
- Transport; Wed, 26 Aug 2020 19:24:30 +0000
-X-Originating-IP: [67.79.209.213]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 2c4b9eea-52f1-49e2-6e66-08d849f5a82c
-X-MS-TrafficTypeDiagnostic: DM6PR12MB2985:
-X-Microsoft-Antispam-PRVS: <DM6PR12MB298595736207263AB43239A8EC540@DM6PR12MB2985.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: w/sedoGysyEEgkBqkdBq4vn9IF3KQaY8D127Lp9dHn7+B2VLNgSEsH+Sg8eL6wjigE+TjAGtivGDluB5BwhunK5xRs3xXUgwP8EY0u34y2tNhx5cqKGYFBnLU/cQffNbvbLVLHboF4kygEKn2Zf4QYGg7y4wG50WT6spQYilgXTVG66j5ejS8VR1EFQLJjBSEjP9evFh5dvask4p3G+zanecFnFY18XHI1VI4o6W7MawQI7syrJzFeeHOFFbQvE008BI7Tujopr5PsVCTBE56JB6IAz0kUFdp02/dU5EdQnq9XaMSxYi35DD8S2+mlkARmJ+5m4krMDyktKv88cF40LoKngc6ovz0RooepxeVn2Ug8U0wlVl/41j1RuuXlq8KCeLIrNT8ZpZlHdhpgMJosqcfTIN8P0h3GIT4D1ghnI=
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:DM5PR12MB1355.namprd12.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(136003)(376002)(39860400002)(366004)(396003)(346002)(31696002)(478600001)(66556008)(86362001)(66946007)(2906002)(66476007)(5660300002)(316002)(31686004)(36756003)(16576012)(6486002)(4326008)(186003)(7416002)(2616005)(54906003)(53546011)(8936002)(26005)(956004)(52116002)(8676002)(83380400001)(43740500002)(309714004);
- DIR:OUT; SFP:1101; 
-X-MS-Exchange-AntiSpam-MessageData: 91Eoyx+U6NJUK2o6AgZMQNAqpBNBeHB4j0C01x0m7j0NYlI6Fxx2dzFilFqB8/jk9KO4sUY3kxJOm7gD9ArYlIls9pI0xUghL02yOCtq0w0HoiRGf8EnClNL5ZRoaDziqXschMDr7H7YvQ0vEm6M1NCLKQM8CMZMCyZDK0P5eABpknddkkHk1ixgQg3znRAddNDqBr3aJkDuY0AB5wI81de88W1G5VyQG2u6hKPS4+D2hyKLMyTsbbELSn8oWnr11Hkonc/LLQSAyrQ6gbZCjRqGOJbscU0Uk0LeAabezARdZGJQh+VIfRnA/u8hbGKK9JXadXhcldrLWzIdIZZ3Z3Hv33v+OQW/p1NdWVtAE96dcwG0HVgB0RywUOtKeL1PVJZ3iSW3hwE1TUFwAiDwQ9LWRXSia+joOB99RwYnWU8W8k5Zw3c7cguDWeKSK008oWvpThAecGVBWrrAKw2Wz4+ZSM3CAiIZeOIhbXrDTzc4wVPvHCQ3G3NKGCGBrOBDURBM5olZiU/g5gJJdkTusX21Y5SXHhbbxMTBBYvhrG2tMurQMAAigTQaDEAtJ13EY3Dl7vOum5N8q+5zcJyag+dbS2FQHKzicsk6+lowyQjM/1jSCY378fifiWeitCdBoNhYsgfjyo3FxIhFaiXMuw==
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2c4b9eea-52f1-49e2-6e66-08d849f5a82c
-X-MS-Exchange-CrossTenant-AuthSource: DM5PR12MB1355.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Aug 2020 19:24:31.2153 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: x8G1d0ewGNtJYCe6jxEH9UHplbOE2wngqK9mVIiBDPVlP9QK0jMnybGST0oq3A5ccixsLOR08VAo8XreNrUFAg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB2985
-Received-SPF: none client-ip=40.107.220.63;
- envelope-from=Thomas.Lendacky@amd.com;
- helo=NAM11-CO1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/26 15:39:35
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, FORGED_SPF_HELO=1, MSGID_FROM_MTA_HEADER=0.001,
- NICE_REPLY_A=-2.239, RCVD_ILLEGAL_IP=1.3, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <4cf1beb7dafb9143c261d266557d3173bf160524.1598376594.git.alistair.francis@wdc.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=ehabkost@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/26 03:56:58
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.959,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -137,194 +96,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S . Tsirkin" <mst@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Jiri Slaby <jslaby@suse.cz>,
- Richard Henderson <rth@twiddle.net>
+Cc: alistair23@gmail.com, qemu-devel@nongnu.org, f4bug@amsat.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/26/20 2:07 PM, Connor Kuehl wrote:
-> On 8/25/20 2:05 PM, Tom Lendacky wrote:
->> From: Tom Lendacky <thomas.lendacky@amd.com>
->>
->> Provide initial support for SEV-ES. This includes creating a function to
->> indicate the guest is an SEV-ES guest (which will return false until all
->> support is in place), performing the proper SEV initialization and
->> ensuring that the guest CPU state is measured as part of the launch.
->>
->> Co-developed-by: Jiri Slaby <jslaby@suse.cz>
->> Signed-off-by: Jiri Slaby <jslaby@suse.cz>
->> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+On Tue, Aug 25, 2020 at 10:30:59AM -0700, Alistair Francis wrote:
+> Reported-by: Eduardo Habkost <ehabkost@redhat.com>
+> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> ---
+>  hw/core/register.c | 31 +++++++++++++------------------
+>  1 file changed, 13 insertions(+), 18 deletions(-)
 > 
-> Hi Tom!
+> diff --git a/hw/core/register.c b/hw/core/register.c
+> index ddf91eb445..31038bd7cc 100644
+> --- a/hw/core/register.c
+> +++ b/hw/core/register.c
+> @@ -176,17 +176,6 @@ void register_reset(RegisterInfo *reg)
+>      }
+>  }
+>  
+> -void register_init(RegisterInfo *reg)
+> -{
+> -    assert(reg);
+> -
+> -    if (!reg->data || !reg->access) {
+> -        return;
+> -    }
+> -
+> -    object_initialize((void *)reg, sizeof(*reg), TYPE_REGISTER);
+> -}
+> -
+>  void register_write_memory(void *opaque, hwaddr addr,
+>                             uint64_t value, unsigned size)
+>  {
+> @@ -269,13 +258,18 @@ static RegisterInfoArray *register_init_block(DeviceState *owner,
+>          int index = rae[i].addr / data_size;
+>          RegisterInfo *r = &ri[index];
+>  
+> -        *r = (RegisterInfo) {
+> -            .data = data + data_size * index,
+> -            .data_size = data_size,
+> -            .access = &rae[i],
+> -            .opaque = owner,
+> -        };
+> -        register_init(r);
+> +        if (data + data_size * index == 0 || !&rae[i]) {
 
-Hi Connor,
+Do you know what's the goal of this check?
 
+Can `data` or `rae` be NULL?  If not, it seems impossible for
+this condition to be true.  If they can, this seems to be a weird
+and fragile way of checking for NULL arguments.
+
+> +            continue;
+> +        }
+> +
+> +        /* Init the register, this will zero it. */
+> +        object_initialize((void *)r, sizeof(*r), TYPE_REGISTER);
+> +
+> +        /* Set the properties of the register */
+> +        r->data = data + data_size * index;
+> +        r->data_size = data_size;
+> +        r->access = &rae[i];
+> +        r->opaque = owner;
+>  
+>          r_array->r[i] = r;
+>      }
+> @@ -329,6 +323,7 @@ static const TypeInfo register_info = {
+>      .name  = TYPE_REGISTER,
+>      .parent = TYPE_DEVICE,
+>      .class_init = register_class_init,
+> +    .instance_size = sizeof(RegisterInfo),
+>  };
+>  
+>  static void register_register_types(void)
+> -- 
+> 2.28.0
 > 
-> Overall I think the patch set looks good. I mainly just have 1 question 
-> regarding some error handling and a couple of checkpatch related messages.
 
-Ugh, I was positive I ran checkpatch, but obviously I didn't.
+-- 
+Eduardo
 
-> 
->> ---
->>   target/i386/cpu.c      |  1 +
->>   target/i386/sev-stub.c |  5 +++++
->>   target/i386/sev.c      | 46 ++++++++++++++++++++++++++++++++++++++++--
->>   target/i386/sev_i386.h |  1 +
->>   4 files changed, 51 insertions(+), 2 deletions(-)
->>
->> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
->> index 588f32e136..bbbe581d35 100644
->> --- a/target/i386/cpu.c
->> +++ b/target/i386/cpu.c
->> @@ -5969,6 +5969,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t 
->> index, uint32_t count,
->>           break;
->>       case 0x8000001F:
->>           *eax = sev_enabled() ? 0x2 : 0;
->> +        *eax |= sev_es_enabled() ? 0x8 : 0;
->>           *ebx = sev_get_cbit_position();
->>           *ebx |= sev_get_reduced_phys_bits() << 6;
->>           *ecx = 0;
->> diff --git a/target/i386/sev-stub.c b/target/i386/sev-stub.c
->> index 88e3f39a1e..040ac90563 100644
->> --- a/target/i386/sev-stub.c
->> +++ b/target/i386/sev-stub.c
->> @@ -49,3 +49,8 @@ SevCapability *sev_get_capabilities(Error **errp)
->>       error_setg(errp, "SEV is not available in this QEMU");
->>       return NULL;
->>   }
->> +
->> +bool sev_es_enabled(void)
-> 
-> I don't think this bothers checkpatch, but it'd be consistent with the 
-> rest of your series if this function put the return type on the line above.
-
-I was being consistent with the file that it is in where all the other 
-functions are defined this way.
-
-> 
->> +{
->> +    return false;
->> +}
->> diff --git a/target/i386/sev.c b/target/i386/sev.c
->> index c3ecf86704..6c9cd0854b 100644
->> --- a/target/i386/sev.c
->> +++ b/target/i386/sev.c
->> @@ -359,6 +359,12 @@ sev_enabled(void)
->>       return !!sev_guest;
->>   }
->> +bool
->> +sev_es_enabled(void)
->> +{
->> +    return false;
->> +}
->> +
->>   uint64_t
->>   sev_get_me_mask(void)
->>   {
->> @@ -578,6 +584,22 @@ sev_launch_update_data(SevGuestState *sev, uint8_t 
->> *addr, uint64_t len)
->>       return ret;
->>   }
->> +static int
->> +sev_launch_update_vmsa(SevGuestState *sev)
->> +{
->> +    int ret, fw_error;
->> +
->> +    ret = sev_ioctl(sev->sev_fd, KVM_SEV_LAUNCH_UPDATE_VMSA, NULL, 
->> &fw_error);
->> +    if (ret) {
->> +        error_report("%s: LAUNCH_UPDATE_VMSA ret=%d fw_error=%d '%s'",
->> +                __func__, ret, fw_error, fw_error_to_str(fw_error));
->> +        goto err;
->> +    }
->> +
->> +err:
->> +    return ret;
->> +}
->> +
->>   static void
->>   sev_launch_get_measure(Notifier *notifier, void *unused)
->>   {
->> @@ -590,6 +612,14 @@ sev_launch_get_measure(Notifier *notifier, void 
->> *unused)
->>           return;
->>       }
->> +    if (sev_es_enabled()) {
->> +        /* measure all the VM save areas before getting launch_measure */
->> +        ret = sev_launch_update_vmsa(sev);
->> +        if (ret) {
->> +            exit(1);
-> 
-> Disclaimer: I'm still learning the QEMU source code, sorry if this comes 
-> across as naive.
-> 
-> Is exit() what we want here? I was looking around the rest of the source 
-> code and unfortunately the machine_init_done_notifiers mechanism doesn't 
-> allow for a return value to indicate an error, so I'm wondering if there's 
-> a more appropriate place in the initialization code to handle these 
-> fallible operations and if so, propagate the error down. This way if there 
-> are other resources that need to be cleaned up on the way out, they can 
-> be. Thoughts?
-
-I was following the existing method of terminating that is being performed 
-in this file. I'll see if others have an idea about how to handle these 
-types of errors, which could probably be addressed as a separate patch series.
-
-Thanks,
-Tom
-
-> 
->> +        }
->> +    }
->> +
->>       measurement = g_new0(struct kvm_sev_launch_measure, 1);
->>       /* query the measurement blob length */
->> @@ -684,7 +714,7 @@ sev_guest_init(const char *id)
->>   {
->>       SevGuestState *sev;
->>       char *devname;
->> -    int ret, fw_error;
->> +    int ret, fw_error, cmd;
->>       uint32_t ebx;
->>       uint32_t host_cbitpos;
->>       struct sev_user_data_status status = {};
->> @@ -745,8 +775,20 @@ sev_guest_init(const char *id)
->>       sev->api_major = status.api_major;
->>       sev->api_minor = status.api_minor;
->> +    if (sev_es_enabled()) {
->> +        if (!(status.flags & SEV_STATUS_FLAGS_CONFIG_ES)) {
->> +            error_report("%s: guest policy requires SEV-ES, but "
->> +                         "host SEV-ES support unavailable",
->> +                         __func__);
->> +            goto err;
->> +        }
->> +        cmd = KVM_SEV_ES_INIT;
->> +    } else {
->> +        cmd = KVM_SEV_INIT;
->> +    }
->> +
->>       trace_kvm_sev_init();
->> -    ret = sev_ioctl(sev->sev_fd, KVM_SEV_INIT, NULL, &fw_error);
->> +    ret = sev_ioctl(sev->sev_fd, cmd, NULL, &fw_error);
->>       if (ret) {
->>           error_report("%s: failed to initialize ret=%d fw_error=%d '%s'",
->>                        __func__, ret, fw_error, fw_error_to_str(fw_error));
->> diff --git a/target/i386/sev_i386.h b/target/i386/sev_i386.h
->> index 4db6960f60..4f9a5e9b21 100644
->> --- a/target/i386/sev_i386.h
->> +++ b/target/i386/sev_i386.h
->> @@ -29,6 +29,7 @@
->>   #define SEV_POLICY_SEV          0x20
->>   extern bool sev_enabled(void);
->> +extern bool sev_es_enabled(void);
->>   extern uint64_t sev_get_me_mask(void);
->>   extern SevInfo *sev_get_info(void);
->>   extern uint32_t sev_get_cbit_position(void);
->>
-> 
 
