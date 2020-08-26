@@ -7,82 +7,83 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE96EC433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 14:55:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C991DC433E1
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 14:56:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 78B8021741
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 14:55:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 84F782078D
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 14:56:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Wx7eYLyh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78B8021741
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="faZHgswT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84F782078D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41056 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46772 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAwpZ-00031F-Nf
-	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 10:55:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50876)
+	id 1kAwqx-0005P6-Rh
+	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 10:56:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50800)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kAwnH-0006l5-K7
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 10:52:55 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:45158)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kAwnF-0006gZ-3r
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 10:52:53 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:43392
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kAwnF-0008MC-MH
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 10:52:55 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kAwnC-0008L0-FZ
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 10:52:52 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598453573;
+ s=mimecast20190719; t=1598453569;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=wq5Pda4Lt5SRqI7o7hjLCdVq24fwCUMV/EoS3UXA+x0=;
- b=Wx7eYLyhs+rsv97RQweB+oHy7qa2LqxyhleQc5apyS+l0XQcLjn+KymoJTyGjQyNn5dFvW
- Tud5dQRrJj45Y4URy+gJozDKqCqpncGU4DhUOWLP8Q+wfDqktF4tCjN+WXIwempZyFv34H
- m/qPgCuM+3uEkyc1hNBseoENT/FbhCw=
+ bh=dTE+G237rTzPCXBR1JEpjCjPVXH6rj6XiPtZ2JTJp2c=;
+ b=faZHgswT+l8VjkH5ilD8aMBO2TYc65eEq5ThW316PBcglnaPMk/sQRE930HgH3I8hKiKME
+ EPlH0C86urjJzO1fRxBtWdP+SSdRzBf/w2zUaAXwS6Y7OpB0uHgR8pOKwY5fM+qk+lvLjj
+ qN364WY0PNQfW1FQkpkPQSMQbgvalbY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-99-McyJr8XxMsqWcKC87aeRkQ-1; Wed, 26 Aug 2020 10:52:47 -0400
-X-MC-Unique: McyJr8XxMsqWcKC87aeRkQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-29-eddQ6HJUNGuN5U17hwLwTQ-1; Wed, 26 Aug 2020 10:52:47 -0400
+X-MC-Unique: eddQ6HJUNGuN5U17hwLwTQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BA022801AED;
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 43850801AE7;
  Wed, 26 Aug 2020 14:52:46 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-112-54.ams2.redhat.com
  [10.36.112.54])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3497B65F5E;
- Wed, 26 Aug 2020 14:52:46 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 348CA747C6;
+ Wed, 26 Aug 2020 14:52:45 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 3E30031FC5; Wed, 26 Aug 2020 16:52:40 +0200 (CEST)
+ id ED9BA31F73; Wed, 26 Aug 2020 16:52:39 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 14/18] scripts: Add u2f-setup-gen script
-Date: Wed, 26 Aug 2020 16:52:35 +0200
-Message-Id: <20200826145239.6077-15-kraxel@redhat.com>
+Subject: [PULL 08/18] hw/usb: Add U2F key base class implementation
+Date: Wed, 26 Aug 2020 16:52:29 +0200
+Message-Id: <20200826145239.6077-9-kraxel@redhat.com>
 In-Reply-To: <20200826145239.6077-1-kraxel@redhat.com>
 References: <20200826145239.6077-1-kraxel@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
 X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=kraxel@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/25 23:30:47
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/26 03:16:15
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.959,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -106,196 +107,381 @@ Sender: "Qemu-devel"
 
 From: César Belley <cesar.belley@lse.epita.fr>
 
-This patch adds the script used to generate setup directories, needed
-for the device u2f-emulated configuration in directory mode:
+This patch adds the U2F key base class implementation.
 
-    python u2f-setup-gen.py $DIR
-    qemu -usb -device u2f-emulated,dir=$DIR
+The U2F key base mainly takes care of the HID interfacing with guest.
+On the one hand, it retrieves the guest U2FHID packets and transmits
+them to the variant associated according to the mode: pass-through
+or emulated.
+On the other hand, it provides the public API used by its variants to
+send U2FHID packets to the guest.
 
 Signed-off-by: César Belley <cesar.belley@lse.epita.fr>
-Message-id: 20200826114209.28821-11-cesar.belley@lse.epita.fr
+Message-id: 20200826114209.28821-5-cesar.belley@lse.epita.fr
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- scripts/u2f-setup-gen.py | 170 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 170 insertions(+)
- create mode 100755 scripts/u2f-setup-gen.py
+ hw/usb/u2f.c | 352 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 352 insertions(+)
+ create mode 100644 hw/usb/u2f.c
 
-diff --git a/scripts/u2f-setup-gen.py b/scripts/u2f-setup-gen.py
-new file mode 100755
-index 000000000000..2122598fed8e
+diff --git a/hw/usb/u2f.c b/hw/usb/u2f.c
+new file mode 100644
+index 000000000000..bc09191f063e
 --- /dev/null
-+++ b/scripts/u2f-setup-gen.py
-@@ -0,0 +1,170 @@
-+#!/usr/bin/env python3
-+#
-+# Libu2f-emu setup directory generator for USB U2F key emulation.
-+#
-+# Copyright (c) 2020 César Belley <cesar.belley@lse.epita.fr>
-+# Written by César Belley <cesar.belley@lse.epita.fr>
-+#
-+# This work is licensed under the terms of the GNU GPL, version 2
-+# or, at your option, any later version.  See the COPYING file in
-+# the top-level directory.
++++ b/hw/usb/u2f.c
+@@ -0,0 +1,352 @@
++/*
++ * U2F USB device.
++ *
++ * Copyright (c) 2020 César Belley <cesar.belley@lse.epita.fr>
++ * Written by César Belley <cesar.belley@lse.epita.fr>
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
 +
-+import sys
-+import os
-+from random import randint
-+from typing import Tuple
++#include "qemu/osdep.h"
++#include "qemu/module.h"
++#include "qapi/error.h"
++#include "hw/usb.h"
++#include "hw/usb/hid.h"
++#include "migration/vmstate.h"
++#include "desc.h"
 +
-+from cryptography.hazmat.backends import default_backend
-+from cryptography.hazmat.primitives.asymmetric import ec
-+from cryptography.hazmat.primitives.serialization import Encoding, \
-+    NoEncryption, PrivateFormat, PublicFormat
-+from OpenSSL import crypto
++#include "u2f.h"
 +
++/* U2F key Vendor / Product */
++#define U2F_KEY_VENDOR_NUM     0x46f4 /* CRC16() of "QEMU" */
++#define U2F_KEY_PRODUCT_NUM    0x0005
 +
-+def write_setup_dir(dirpath: str, privkey_pem: bytes, cert_pem: bytes,
-+                    entropy: bytes, counter: int) -> None:
-+    """
-+    Write the setup directory.
++enum {
++    STR_MANUFACTURER = 1,
++    STR_PRODUCT,
++    STR_SERIALNUMBER,
++    STR_CONFIG,
++    STR_INTERFACE
++};
 +
-+    Args:
-+        dirpath: The directory path.
-+        key_pem: The private key PEM.
-+        cert_pem: The certificate PEM.
-+        entropy: The 48 bytes of entropy.
-+        counter: The counter value.
-+    """
-+    # Directory
-+    os.mkdir(dirpath)
++static const USBDescStrings desc_strings = {
++    [STR_MANUFACTURER]     = "QEMU",
++    [STR_PRODUCT]          = "U2F USB key",
++    [STR_SERIALNUMBER]     = "0",
++    [STR_CONFIG]           = "U2F key config",
++    [STR_INTERFACE]        = "U2F key interface"
++};
 +
-+    # Private key
-+    with open(f'{dirpath}/private-key.pem', 'bw') as f:
-+        f.write(privkey_pem)
++static const USBDescIface desc_iface_u2f_key = {
++    .bInterfaceNumber              = 0,
++    .bNumEndpoints                 = 2,
++    .bInterfaceClass               = USB_CLASS_HID,
++    .bInterfaceSubClass            = 0x0,
++    .bInterfaceProtocol            = 0x0,
++    .ndesc                         = 1,
++    .descs = (USBDescOther[]) {
++        {
++            /* HID descriptor */
++            .data = (uint8_t[]) {
++                0x09,          /*  u8  bLength */
++                USB_DT_HID,    /*  u8  bDescriptorType */
++                0x10, 0x01,    /*  u16 HID_class */
++                0x00,          /*  u8  country_code */
++                0x01,          /*  u8  num_descriptors */
++                USB_DT_REPORT, /*  u8  type: Report */
++                0x22, 0,       /*  u16 len */
++            },
++        },
++    },
++    .eps = (USBDescEndpoint[]) {
++        {
++            .bEndpointAddress      = USB_DIR_IN | 0x01,
++            .bmAttributes          = USB_ENDPOINT_XFER_INT,
++            .wMaxPacketSize        = U2FHID_PACKET_SIZE,
++            .bInterval             = 0x05,
++        }, {
++            .bEndpointAddress      = USB_DIR_OUT | 0x01,
++            .bmAttributes          = USB_ENDPOINT_XFER_INT,
++            .wMaxPacketSize        = U2FHID_PACKET_SIZE,
++            .bInterval             = 0x05,
++        },
++    },
 +
-+    # Certificate
-+    with open(f'{dirpath}/certificate.pem', 'bw') as f:
-+        f.write(cert_pem)
++};
 +
-+    # Entropy
-+    with open(f'{dirpath}/entropy', 'wb') as f:
-+        f.write(entropy)
++static const USBDescDevice desc_device_u2f_key = {
++    .bcdUSB                        = 0x0100,
++    .bMaxPacketSize0               = U2FHID_PACKET_SIZE,
++    .bNumConfigurations            = 1,
++    .confs = (USBDescConfig[]) {
++        {
++            .bNumInterfaces        = 1,
++            .bConfigurationValue   = 1,
++            .iConfiguration        = STR_CONFIG,
++            .bmAttributes          = USB_CFG_ATT_ONE,
++            .bMaxPower             = 15,
++            .nif = 1,
++            .ifs = &desc_iface_u2f_key,
++        },
++    },
++};
 +
-+    # Counter
-+    with open(f'{dirpath}/counter', 'w') as f:
-+        f.write(f'{str(counter)}\n')
++static const USBDesc desc_u2f_key = {
++    .id = {
++        .idVendor          = U2F_KEY_VENDOR_NUM,
++        .idProduct         = U2F_KEY_PRODUCT_NUM,
++        .bcdDevice         = 0,
++        .iManufacturer     = STR_MANUFACTURER,
++        .iProduct          = STR_PRODUCT,
++        .iSerialNumber     = STR_SERIALNUMBER,
++    },
++    .full = &desc_device_u2f_key,
++    .str  = desc_strings,
++};
 +
++static const uint8_t u2f_key_hid_report_desc[] = {
++    0x06, 0xd0, 0xf1, /* Usage Page (FIDO) */
++    0x09, 0x01,       /* Usage (FIDO) */
++    0xa1, 0x01,       /* Collection (HID Application) */
++    0x09, 0x20,       /*    Usage (FIDO data in) */
++    0x15, 0x00,       /*        Logical Minimum (0) */
++    0x26, 0xFF, 0x00, /*        Logical Maximum (0xff) */
++    0x75, 0x08,       /*        Report Size (8) */
++    0x95, 0x40,       /*        Report Count (0x40) */
++    0x81, 0x02,       /*        Input (Data, Variable, Absolute) */
++    0x09, 0x21,       /*    Usage (FIDO data out) */
++    0x15, 0x00,       /*        Logical Minimum (0) */
++    0x26, 0xFF, 0x00, /*        Logical Maximum  (0xFF) */
++    0x75, 0x08,       /*        Report Size (8) */
++    0x95, 0x40,       /*        Report Count (0x40) */
++    0x91, 0x02,       /*        Output (Data, Variable, Absolute) */
++    0xC0              /* End Collection */
++};
 +
-+def generate_ec_key_pair() -> Tuple[str, str]:
-+    """
-+    Generate an ec key pair.
++static void u2f_key_reset(U2FKeyState *key)
++{
++    key->pending_in_start = 0;
++    key->pending_in_end = 0;
++    key->pending_in_num = 0;
++}
 +
-+    Returns:
-+        The private and public key PEM.
-+    """
-+    # Key generation
-+    privkey = ec.generate_private_key(ec.SECP256R1, default_backend())
-+    pubkey = privkey.public_key()
++static void u2f_key_handle_reset(USBDevice *dev)
++{
++    U2FKeyState *key = U2F_KEY(dev);
 +
-+    # PEM serialization
-+    privkey_pem = privkey.private_bytes(encoding=Encoding.PEM,
-+                                        format=PrivateFormat.TraditionalOpenSSL,
-+                                        encryption_algorithm=NoEncryption())
-+    pubkey_pem = pubkey.public_bytes(encoding=Encoding.PEM,
-+                                     format=PublicFormat.SubjectPublicKeyInfo)
-+    return privkey_pem, pubkey_pem
++    u2f_key_reset(key);
++}
 +
++static void u2f_key_handle_control(USBDevice *dev, USBPacket *p,
++               int request, int value, int index, int length, uint8_t *data)
++{
++    U2FKeyState *key = U2F_KEY(dev);
++    int ret;
 +
-+def generate_certificate(privkey_pem: str, pubkey_pem: str) -> str:
-+    """
-+    Generate a x509 certificate from a key pair.
++    ret = usb_desc_handle_control(dev, p, request, value, index, length, data);
++    if (ret >= 0) {
++        return;
++    }
 +
-+    Args:
-+        privkey_pem: The private key PEM.
-+        pubkey_pem: The public key PEM.
++    switch (request) {
++    case InterfaceRequest | USB_REQ_GET_DESCRIPTOR:
++        switch (value >> 8) {
++        case 0x22:
++            memcpy(data, u2f_key_hid_report_desc,
++                   sizeof(u2f_key_hid_report_desc));
++            p->actual_length = sizeof(u2f_key_hid_report_desc);
++            break;
++        default:
++            goto fail;
++        }
++        break;
++    case HID_GET_IDLE:
++        data[0] = key->idle;
++        p->actual_length = 1;
++        break;
++    case HID_SET_IDLE:
++        key->idle = (uint8_t)(value >> 8);
++        break;
++    default:
++    fail:
++        p->status = USB_RET_STALL;
++        break;
++    }
 +
-+    Returns:
-+        The certificate PEM.
-+    """
-+    # Convert key pair
-+    privkey = crypto.load_privatekey(crypto.FILETYPE_PEM, privkey_pem)
-+    pubkey = crypto.load_publickey(crypto.FILETYPE_PEM, pubkey_pem)
++}
 +
-+    # New x509v3 certificate
-+    cert = crypto.X509()
-+    cert.set_version(0x2)
++static void u2f_key_recv_from_guest(U2FKeyState *key, USBPacket *p)
++{
++    U2FKeyClass *kc = U2F_KEY_GET_CLASS(key);
++    uint8_t packet[U2FHID_PACKET_SIZE];
 +
-+    # Serial number
-+    cert.set_serial_number(randint(1, 2 ** 64))
++    if (kc->recv_from_guest == NULL || p->iov.size != U2FHID_PACKET_SIZE) {
++        return;
++    }
 +
-+    # Before / After
-+    cert.gmtime_adj_notBefore(0)
-+    cert.gmtime_adj_notAfter(4 * (365 * 24 * 60 * 60))
++    usb_packet_copy(p, packet, p->iov.size);
++    kc->recv_from_guest(key, packet);
++}
 +
-+    # Public key
-+    cert.set_pubkey(pubkey)
++static void u2f_pending_in_add(U2FKeyState *key,
++                               const uint8_t packet[U2FHID_PACKET_SIZE])
++{
++    uint8_t index;
 +
-+    # Subject name and issueer
-+    cert.get_subject().CN = "U2F emulated"
-+    cert.set_issuer(cert.get_subject())
++    if (key->pending_in_num >= U2FHID_PENDING_IN_NUM) {
++        return;
++    }
 +
-+    # Extensions
-+    cert.add_extensions([
-+        crypto.X509Extension(b"subjectKeyIdentifier",
-+                             False, b"hash", subject=cert),
-+    ])
-+    cert.add_extensions([
-+        crypto.X509Extension(b"authorityKeyIdentifier",
-+                             False, b"keyid:always", issuer=cert),
-+    ])
-+    cert.add_extensions([
-+        crypto.X509Extension(b"basicConstraints", True, b"CA:TRUE")
-+    ])
++    index = key->pending_in_end;
++    key->pending_in_end = (index + 1) % U2FHID_PENDING_IN_NUM;
++    ++key->pending_in_num;
 +
-+    # Signature
-+    cert.sign(privkey, 'sha256')
++    memcpy(key->pending_in[index], packet, U2FHID_PACKET_SIZE);
++}
 +
-+    return crypto.dump_certificate(crypto.FILETYPE_PEM, cert)
++static uint8_t *u2f_pending_in_get(U2FKeyState *key)
++{
++    uint8_t index;
 +
++    if (key->pending_in_num == 0) {
++        return NULL;
++    }
 +
-+def generate_setup_dir(dirpath: str) -> None:
-+    """
-+    Generates the setup directory.
++    index = key->pending_in_start;
++    key->pending_in_start = (index + 1) % U2FHID_PENDING_IN_NUM;
++    --key->pending_in_num;
 +
-+    Args:
-+        dirpath: The directory path.
-+    """
-+    # Key pair
-+    privkey_pem, pubkey_pem = generate_ec_key_pair()
++    return key->pending_in[index];
++}
 +
-+    # Certificate
-+    certificate_pem = generate_certificate(privkey_pem, pubkey_pem)
++static void u2f_key_handle_data(USBDevice *dev, USBPacket *p)
++{
++    U2FKeyState *key = U2F_KEY(dev);
++    uint8_t *packet_in;
 +
-+    # Entropy
-+    entropy = os.urandom(48)
++    /* Endpoint number check */
++    if (p->ep->nr != 1) {
++        p->status = USB_RET_STALL;
++        return;
++    }
 +
-+    # Counter
-+    counter = 0
++    switch (p->pid) {
++    case USB_TOKEN_OUT:
++        u2f_key_recv_from_guest(key, p);
++        break;
++    case USB_TOKEN_IN:
++        packet_in = u2f_pending_in_get(key);
++        if (packet_in == NULL) {
++            p->status = USB_RET_NAK;
++            return;
++        }
++        usb_packet_copy(p, packet_in, U2FHID_PACKET_SIZE);
++        break;
++    default:
++        p->status = USB_RET_STALL;
++        break;
++    }
++}
 +
-+    # Write
-+    write_setup_dir(dirpath, privkey_pem, certificate_pem, entropy, counter)
++void u2f_send_to_guest(U2FKeyState *key,
++                       const uint8_t packet[U2FHID_PACKET_SIZE])
++{
++    u2f_pending_in_add(key, packet);
++    usb_wakeup(key->ep, 0);
++}
 +
++static void u2f_key_unrealize(USBDevice *dev)
++{
++    U2FKeyState *key = U2F_KEY(dev);
++    U2FKeyClass *kc = U2F_KEY_GET_CLASS(key);
 +
-+def main() -> None:
-+    """
-+    Main function
-+    """
-+    # Dir path
-+    if len(sys.argv) != 2:
-+        sys.stderr.write(f'Usage: {sys.argv[0]} <setup_dir>\n')
-+        exit(2)
-+    dirpath = sys.argv[1]
++    if (kc->unrealize != NULL) {
++        kc->unrealize(key);
++    }
++}
 +
-+    # Dir non existence
-+    if os.path.exists(dirpath):
-+        sys.stderr.write(f'Directory: {dirpath} already exists.\n')
-+        exit(1)
++static void u2f_key_realize(USBDevice *dev, Error **errp)
++{
++    U2FKeyState *key = U2F_KEY(dev);
++    U2FKeyClass *kc = U2F_KEY_GET_CLASS(key);
++    Error *local_err = NULL;
 +
-+    generate_setup_dir(dirpath)
++    usb_desc_create_serial(dev);
++    usb_desc_init(dev);
++    u2f_key_reset(key);
 +
++    if (kc->realize != NULL) {
++        kc->realize(key, &local_err);
++        if (local_err != NULL) {
++            error_propagate(errp, local_err);
++            return;
++        }
++    }
++    key->ep = usb_ep_get(dev, USB_TOKEN_IN, 1);
++}
 +
-+if __name__ == '__main__':
-+    main()
++const VMStateDescription vmstate_u2f_key = {
++    .name = "u2f-key",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_USB_DEVICE(dev, U2FKeyState),
++        VMSTATE_UINT8(idle, U2FKeyState),
++        VMSTATE_UINT8_2DARRAY(pending_in, U2FKeyState,
++            U2FHID_PENDING_IN_NUM, U2FHID_PACKET_SIZE),
++        VMSTATE_UINT8(pending_in_start, U2FKeyState),
++        VMSTATE_UINT8(pending_in_end, U2FKeyState),
++        VMSTATE_UINT8(pending_in_num, U2FKeyState),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++static void u2f_key_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++    USBDeviceClass *uc = USB_DEVICE_CLASS(klass);
++
++    uc->product_desc   = "QEMU U2F USB key";
++    uc->usb_desc       = &desc_u2f_key;
++    uc->handle_reset   = u2f_key_handle_reset;
++    uc->handle_control = u2f_key_handle_control;
++    uc->handle_data    = u2f_key_handle_data;
++    uc->handle_attach  = usb_desc_attach;
++    uc->realize        = u2f_key_realize;
++    uc->unrealize      = u2f_key_unrealize;
++    dc->desc           = "QEMU U2F key";
++    dc->vmsd           = &vmstate_u2f_key;
++}
++
++static const TypeInfo u2f_key_info = {
++    .name          = TYPE_U2F_KEY,
++    .parent        = TYPE_USB_DEVICE,
++    .instance_size = sizeof(U2FKeyState),
++    .abstract      = true,
++    .class_size    = sizeof(U2FKeyClass),
++    .class_init    = u2f_key_class_init,
++};
++
++static void u2f_key_register_types(void)
++{
++    type_register_static(&u2f_key_info);
++    usb_legacy_register(TYPE_U2F_KEY, "u2f-key", NULL);
++}
++
++type_init(u2f_key_register_types)
 -- 
 2.27.0
 
