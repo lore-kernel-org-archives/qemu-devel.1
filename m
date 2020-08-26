@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74A6BC433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 01:26:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FA03C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 01:28:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 22A7420737
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 01:26:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6AC1E20737
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 01:28:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EObYDINO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22A7420737
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c2v+j0vh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6AC1E20737
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57092 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59778 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAkCl-0000mO-9N
-	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 21:26:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37220)
+	id 1kAkET-0001v9-PN
+	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 21:28:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37658)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>)
- id 1kAkCE-0000F5-Go; Tue, 25 Aug 2020 21:25:50 -0400
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:43509)
+ id 1kAkDx-0001OG-Uv; Tue, 25 Aug 2020 21:27:37 -0400
+Received: from mail-oo1-xc43.google.com ([2607:f8b0:4864:20::c43]:44319)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>)
- id 1kAkCC-0000eP-OY; Tue, 25 Aug 2020 21:25:50 -0400
-Received: by mail-oi1-x242.google.com with SMTP id j21so114456oii.10;
- Tue, 25 Aug 2020 18:25:47 -0700 (PDT)
+ id 1kAkDw-000115-Hb; Tue, 25 Aug 2020 21:27:37 -0400
+Received: by mail-oo1-xc43.google.com with SMTP id g1so75891oop.11;
+ Tue, 25 Aug 2020 18:27:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=PyEcmIQJtRJ5Wh85UWdGlRCg+EVUGQ1qqz6mWEzpTpg=;
- b=EObYDINOTB51juo2YgM85CvGoXDSjCFc/HyCMsWnSHuXweJQJazJvU9wKkO4ye2UBe
- 9hFxWxci8p/xt+P4n8Zg5vouvhXCrh8AaZGpF0HLlZ4BtN347R2FhJGi75+l7ATWYp40
- M12BEh8x+U1J0+p/kwlFsP6Skv5Boux4MVee29b1GqXEX08RIJ3Oa2uXTXELT+cQLBhs
- 07V3p5xgXGb38adbT3iJazXZeefqBcDoewv76H6Cecknv/M50KVZTWpaohBqJxr4cZx5
- laVo7hpsGLSQN9dWu7sF3a8q1DgoBIuuH3t0EYds97+M16+QNzmj7a+ZWhZsIq0Ou7YW
- YZ9w==
+ bh=/Kn6Jr1NLsjJ2ty3jP1i3N2SUnZYCWFTZxXXEsKURHc=;
+ b=c2v+j0vhCFEARrc62vmUptbxP6jBtNbaQOStS+wAb2pRBAQ8yHGmIOuF1n+2qktRN1
+ 6Jja1VhcAuLEaoGeQwD/F5d5T7I8TJl7nsJTKNrHYOlVcHn8/SvPe8caKkXbvfgAks0V
+ HCqrg8EY3s6DKZpBxyKD5qwCB/QpbiV53cCYpy3GtUTeg11/j2TERgPc7UAZn1IeZOz4
+ W79HFJ5E7jBbbkXfzKunDSJsBgpVPW05+mYfRjroF+U/FvHU9Zfkv4LRylmOvG0oVfo9
+ kS8u8CMejV8cjuEjY6HhEUjzPUeBq2Gopr4F8tUVtSCH+61OJ8xMiPB65H2IiTfrUGMs
+ Dgjw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=PyEcmIQJtRJ5Wh85UWdGlRCg+EVUGQ1qqz6mWEzpTpg=;
- b=gMImJemMilkl3SyKvIRs6V8XfsL4XFvQ1ldo75ffDIpXaV4yLUPx9UO9dpkFR82NZw
- 6wIZCwdFTzVc0Hagc4jKhAI16cOJmQOKehedED2tuoDU22jzvcFFARuM36aCsgYo6eO9
- 4HmFEO8GFjWJfO4jAacXaoFBctYB+YlwJDvTifgw0zygmLbr1cCT9ygmwJAU5N7s3FJJ
- G+cpUmwYc9uuB/bDmKZFcvqA4o4RGLGWUL+NBUNEu1oNG/MfaWzmqmGwGcJECaf4BohS
- sUP6V7dqUzA3btxDRiEVJFU/lOl2x8izdFeascyYpf5ZOVgIsKCaG21s/K89jiThwdKT
- xSqg==
-X-Gm-Message-State: AOAM5301wBlPWhkoDbHLeJ/B8xqdVYo8K0A9FYUfCt1lxGH4azfW0OeH
- yKd/yXYDeY3/mTkLZofFJ8Rokh4drhf2rk6jijA=
-X-Google-Smtp-Source: ABdhPJy4LQSMWncaAgbT63OQECpK++T3sIjNEdKpu0Oymz9ffcn1CETulBx7epIAAaOYMwALk7tWhYloJFrziEqo9ic=
-X-Received: by 2002:aca:c0c1:: with SMTP id q184mr2768943oif.56.1598405146929; 
- Tue, 25 Aug 2020 18:25:46 -0700 (PDT)
+ bh=/Kn6Jr1NLsjJ2ty3jP1i3N2SUnZYCWFTZxXXEsKURHc=;
+ b=RZsmGzmTbBdPwWO230Z5YgE1BJrdlK2DRkIKcZKb2Px8SXQ25JR4NfkaaXBb/xUcK5
+ 8fq3GJ3oln+Rg3ZKpqIjroXahRsiR0yv5MhXvYb9R5fAZL0ex9+A3Iix8tOTZrObKSZd
+ CuMolYrxOKisxRkCOXk64FeNtuzHRFts8kMwZm/yG3+t8pFxzTPw1JF1TBtLnCLZWWTn
+ u8ZoJqsCiso/3IfqPHXCz8Rd5R3Rym6e4p9Y+1Uc9302Adw3FxUKfuXBfIj2FnXlRpGh
+ rBkYYwSI8LZ0If1pTDl4euj6L7tdTlXm8uVnOoo84V3b+NAilI/pyBJWiv7RQDID3iQL
+ WqAA==
+X-Gm-Message-State: AOAM531CPDrzwjtlcLaGgdFw1d08LiuBnpx4VN51Gl5NPkK0M3XwqZtb
+ jMZo0vVaZzC2N2H3uaYhxuG2yF//+jWHYM9tYh4=
+X-Google-Smtp-Source: ABdhPJy/sZZ/zFISgmwP/Zp8mgA3pstcT6Sd6rkZiON6BqNZJdtTqO9XZOdGfR/rfTz13rMKVid3x9CDwJk6C0qMPwc=
+X-Received: by 2002:a4a:be0c:: with SMTP id l12mr8940671oop.22.1598405254793; 
+ Tue, 25 Aug 2020 18:27:34 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200825112447.126308-1-kuhn.chenqun@huawei.com>
- <20200825112447.126308-2-kuhn.chenqun@huawei.com>
-In-Reply-To: <20200825112447.126308-2-kuhn.chenqun@huawei.com>
+ <20200825112447.126308-3-kuhn.chenqun@huawei.com>
+In-Reply-To: <20200825112447.126308-3-kuhn.chenqun@huawei.com>
 From: Li Qiang <liq3ea@gmail.com>
-Date: Wed, 26 Aug 2020 09:25:10 +0800
-Message-ID: <CAKXe6SLQ2AxeW-eK3Mc+Z81LYM0qPhUXorrytZ54=S7GQgrjhQ@mail.gmail.com>
-Subject: Re: [PATCH v2 01/10] hw/arm/virt-acpi-build:Remove dead assignment in
- build_madt()
+Date: Wed, 26 Aug 2020 09:26:58 +0800
+Message-ID: <CAKXe6SJapcZVnSPznGw_+DkLRv9awtXKNz1hB308s_F_yCz5kQ@mail.gmail.com>
+Subject: Re: [PATCH v2 02/10] hw/arm/omap1:Remove redundant statement in
+ omap_clkdsp_read()
 To: Chen Qun <kuhn.chenqun@huawei.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::242;
- envelope-from=liq3ea@gmail.com; helo=mail-oi1-x242.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::c43;
+ envelope-from=liq3ea@gmail.com; helo=mail-oo1-xc43.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -96,59 +96,47 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Peter Maydell <peter.maydell@linaro.org>,
- zhanghailiang <zhang.zhanghailiang@huawei.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, qemu-trivial@nongnu.org,
+ zhanghailiang <zhang.zhanghailiang@huawei.com>, qemu-trivial@nongnu.org,
  Pan Nengyuan <pannengyuan@huawei.com>, Qemu Developers <qemu-devel@nongnu.org>,
- Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org,
- Euler Robot <euler.robot@huawei.com>, Igor Mammedov <imammedo@redhat.com>
+ qemu-arm@nongnu.org, Euler Robot <euler.robot@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Chen Qun <kuhn.chenqun@huawei.com> =E4=BA=8E2020=E5=B9=B48=E6=9C=8825=E6=97=
-=A5=E5=91=A8=E4=BA=8C =E4=B8=8B=E5=8D=887:26=E5=86=99=E9=81=93=EF=BC=9A
+=A5=E5=91=A8=E4=BA=8C =E4=B8=8B=E5=8D=887:30=E5=86=99=E9=81=93=EF=BC=9A
 >
 > Clang static code analyzer show warning:
-> hw/arm/virt-acpi-build.c:641:5: warning: Value stored to 'madt' is never =
-read
->     madt =3D acpi_data_push(table_data, sizeof *madt);
->     ^      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> hw/arm/omap1.c:1760:15: warning: Value stored to 'cpu' during its
+> initialization is never read
+>     CPUState *cpu =3D CPU(s->cpu);
+>               ^~~   ~~~~~~~~~~~
 >
 > Reported-by: Euler Robot <euler.robot@huawei.com>
 > Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
-> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
 Reviewed-by: Li Qiang <liq3ea@gmail.com>
 
 > ---
-> Cc: Shannon Zhao <shannon.zhaosl@gmail.com>
 > Cc: Peter Maydell <peter.maydell@linaro.org>
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Igor Mammedov <imammedo@redhat.com>
 > Cc: qemu-arm@nongnu.org
 > ---
->  hw/arm/virt-acpi-build.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
+>  hw/arm/omap1.c | 1 -
+>  1 file changed, 1 deletion(-)
 >
-> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> index 91f0df7b13..f830f9b779 100644
-> --- a/hw/arm/virt-acpi-build.c
-> +++ b/hw/arm/virt-acpi-build.c
-> @@ -633,12 +633,11 @@ build_madt(GArray *table_data, BIOSLinker *linker, =
-VirtMachineState *vms)
->      int madt_start =3D table_data->len;
->      const MemMapEntry *memmap =3D vms->memmap;
->      const int *irqmap =3D vms->irqmap;
-> -    AcpiMultipleApicTable *madt;
->      AcpiMadtGenericDistributor *gicd;
->      AcpiMadtGenericMsiFrame *gic_msi;
->      int i;
+> diff --git a/hw/arm/omap1.c b/hw/arm/omap1.c
+> index 6ba0df6b6d..02c0f66431 100644
+> --- a/hw/arm/omap1.c
+> +++ b/hw/arm/omap1.c
+> @@ -1774,7 +1774,6 @@ static uint64_t omap_clkdsp_read(void *opaque, hwad=
+dr addr,
+>          return s->clkm.dsp_rstct2;
 >
-> -    madt =3D acpi_data_push(table_data, sizeof *madt);
-> +    acpi_data_push(table_data, sizeof(AcpiMultipleApicTable));
->
->      gicd =3D acpi_data_push(table_data, sizeof *gicd);
->      gicd->type =3D ACPI_APIC_GENERIC_DISTRIBUTOR;
+>      case 0x18: /* DSP_SYSST */
+> -        cpu =3D CPU(s->cpu);
+>          return (s->clkm.clocking_scheme << 11) | s->clkm.cold_start |
+>                  (cpu->halted << 6);      /* Quite useless... */
+>      }
 > --
 > 2.23.0
 >
