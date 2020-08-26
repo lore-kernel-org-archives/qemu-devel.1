@@ -2,124 +2,141 @@ Return-Path: <SRS0=H0ck=CE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0444C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 22:51:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48322C433E1
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 23:53:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5AD9220737
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 22:51:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5AD9220737
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 0E19420679
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 23:53:11 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="DESLNI4n";
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=qualcomm.onmicrosoft.com header.i=@qualcomm.onmicrosoft.com header.b="SAsna4QW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E19420679
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=quicinc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46442 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60272 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kB4GY-0002zM-MH
-	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 18:51:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52290)
+	id 1kB5E7-0004lO-8F
+	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 19:53:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34784)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kB4Fy-0002aH-Ix
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 18:51:02 -0400
-Received: from mout.kundenserver.de ([212.227.126.133]:38979)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kB4Fw-00052o-6f
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 18:51:02 -0400
-Received: from [192.168.100.1] ([82.252.135.186]) by mrelayeu.kundenserver.de
- (mreue012 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1Mvbr4-1kQnv72IVC-00scoR; Thu, 27 Aug 2020 00:50:55 +0200
-Subject: Re: [PATCH v2 2/2] linux-user: Add support for utimensat_time64() and
- semtimedop_time64()
-From: Laurent Vivier <laurent@vivier.eu>
-To: Filip Bozuta <Filip.Bozuta@syrmia.com>, qemu-devel@nongnu.org
-References: <20200824223050.92032-1-Filip.Bozuta@syrmia.com>
- <20200824223050.92032-3-Filip.Bozuta@syrmia.com>
- <a5e54c27-a604-2b6a-6099-f4045eb2825c@vivier.eu>
- <626ac58f-cd0f-0e64-07d7-c5de1d009b47@vivier.eu>
- <fe09ba5a-b521-073b-6e85-3f4e9520be78@vivier.eu>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <0640cf00-1b5c-c407-c86d-86c7459d2538@vivier.eu>
-Date: Thu, 27 Aug 2020 00:50:54 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <tsimpson@quicinc.com>)
+ id 1kB5D5-00043x-6z
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 19:52:08 -0400
+Received: from alexa-out-sd-01.qualcomm.com ([199.106.114.38]:54740)
+ by eggs.gnu.org with esmtps (TLS1.2:RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <tsimpson@quicinc.com>)
+ id 1kB5D2-0003LB-CV
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 19:52:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
+ t=1598485924; x=1630021924;
+ h=from:to:cc:subject:date:message-id:references:
+ in-reply-to:content-transfer-encoding:mime-version;
+ bh=YDOvNXtjpi+IlzZKXxbwEobxlKU7MoR7jgjeidpHg50=;
+ b=DESLNI4n8xOAks+navqUpYGR3P718E3d0egSB4rD8yj4NWjTpgQhzImP
+ Cngcv3xntcNf+7irSVG7I1JxSHTi6JvYW22zsI2D8gBqF9GWUC/ijchUr
+ EsfmGpwI2efxpUT3LZq3AaDxzwqYIEVgECT+5x5DfdE5BDmJe/DRYAIKR 4=;
+Received: from unknown (HELO ironmsg03-sd.qualcomm.com) ([10.53.140.143])
+ by alexa-out-sd-01.qualcomm.com with ESMTP; 26 Aug 2020 16:52:00 -0700
+Received: from nasanexm01b.na.qualcomm.com ([10.85.0.82])
+ by ironmsg03-sd.qualcomm.com with ESMTP/TLS/AES256-SHA;
+ 26 Aug 2020 16:51:59 -0700
+Received: from nasanexm03d.na.qualcomm.com (10.85.0.91) by
+ NASANEXM01B.na.qualcomm.com (10.85.0.82) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.2; Wed, 26 Aug 2020 16:51:59 -0700
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (199.106.107.6)
+ by nasanexm03d.na.qualcomm.com (10.85.0.91) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2 via Frontend Transport; Wed, 26 Aug 2020 16:51:59 -0700
+Received: from BYAPR02MB4886.namprd02.prod.outlook.com (2603:10b6:a03:46::32)
+ by BYAPR02MB4952.namprd02.prod.outlook.com (2603:10b6:a03:45::18)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3305.25; Wed, 26 Aug
+ 2020 23:51:58 +0000
+Received: from BYAPR02MB4886.namprd02.prod.outlook.com
+ ([fe80::6ce3:79e4:9697:313e]) by BYAPR02MB4886.namprd02.prod.outlook.com
+ ([fe80::6ce3:79e4:9697:313e%3]) with mapi id 15.20.3305.031; Wed, 26 Aug 2020
+ 23:51:58 +0000
+From: Taylor Simpson <tsimpson@quicinc.com>
+To: Richard Henderson <richard.henderson@linaro.org>, "qemu-devel@nongnu.org"
+ <qemu-devel@nongnu.org>
+Subject: RE: [RFC PATCH v3 04/34] Hexagon (target/hexagon) scalar core
+ definition
+Thread-Topic: [RFC PATCH v3 04/34] Hexagon (target/hexagon) scalar core
+ definition
+Thread-Index: AQHWdXddxlIHEo97/0ar/BthZny+aqlKcLKAgABkbxA=
+Date: Wed, 26 Aug 2020 23:51:58 +0000
+Message-ID: <BYAPR02MB4886C178FAE038F23D4FC0B4DE540@BYAPR02MB4886.namprd02.prod.outlook.com>
+References: <1597765847-16637-1-git-send-email-tsimpson@quicinc.com>
+ <1597765847-16637-5-git-send-email-tsimpson@quicinc.com>
+ <929004a5-f633-376a-d8d2-6ad8e0368e13@linaro.org>
+In-Reply-To: <929004a5-f633-376a-d8d2-6ad8e0368e13@linaro.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: linaro.org; dkim=none (message not signed)
+ header.d=none;linaro.org; dmarc=none action=none header.from=quicinc.com;
+x-originating-ip: [76.120.51.212]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: a7d2951e-faf5-4a76-df9f-08d84a1b0516
+x-ms-traffictypediagnostic: BYAPR02MB4952:
+x-microsoft-antispam-prvs: <BYAPR02MB49524E28BFCEB6E24D53AFABDE540@BYAPR02MB4952.namprd02.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8882;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 1cDP5ibNOslfmFC7XXOsVgDcC92sF/1k7k1W+LadPdoG4P796GKHm7pmTREaRZgZIdCxZRTIT1ufhln9ViYNDwUEKk7NL/CC+6K5osEUoRVDhQiAWcdAay4oetE91MFDhdvhrji1gDh2n94UHQzdlNU2Wbm9NeSJh8mhGWMand9AHqR7Mc4jJCy0kPOEWLtr5xcVmON7wbxXTAIf0fwHz9s4nyk8gqNIT7wonNuvVdF/g5qkwIawcztdwtzF8sYytIGnRDyKtnk1SP2SKmoyXVbSqCSduiyvKK1a5ct18Q/QlZO54zSv54W3k+ZyZz9HzzlPdaqrhsfzBWUH904tcA==
+x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:BYAPR02MB4886.namprd02.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(366004)(39860400002)(396003)(346002)(376002)(136003)(478600001)(6506007)(26005)(52536014)(71200400001)(5660300002)(83380400001)(186003)(86362001)(8936002)(53546011)(55016002)(54906003)(316002)(33656002)(9686003)(110136005)(7696005)(8676002)(64756008)(66946007)(2906002)(4326008)(66446008)(66476007)(66556008)(76116006);
+ DIR:OUT; SFP:1102; 
+x-ms-exchange-antispam-messagedata: AU5Jxtl6GJg9Gxr5HjLOpoJ2Zex8c1tPYX0fgasquLTFlO+WzHpm4+JnYorOh5sPCzylGcZTMFz94SLwZStY6fcUTyy1HtPe2TnIzfeGrtNwtk0GStGmQOUtdfm0u0F6Ap0IkESpU5dHlzVupaqNWfRyutBNkMJse7m/GZGVS7lt8oXGqsUVkkMf1kIjv88XKrkiKf7NNBtiKaBE4riHpTwf9BjkGevV/9SWRtt1g4iGtHEEWaOCOAkYnLOeXEVv3mU3VMK79MS0rKSwHUeWrqsamQKEQ6sGaRJAfgy594lU5qTlqsGap5wTbkzeYkZIcVqAugQGUuPuG2R5YB452Ada5venxUCVI6VbsMyPghVvnAa3nhuqv09uDSk2AD91Tp+U6Q2uFJOiB2aE7CM4DFcqSIavRzNvyisGvPuJUf440A2OTtn5TrT6W8imUBVWTOGZzyLwsxscDzKbkIR6MgyJIuVbtqbp+FSNpZzYMc40X7C9MQ8GXYv2f4gll1GIJsCAdUCDmFFX3PCeTz9Gm74rW9hdIbYUkFtPxl5mnjZv0CgJu/3u0JSPJZ5PORlaBjksbRMhZf6CVi1tsMvUO1C1953pJPk1D5E7Le/X+5QT1zxjEQRrbAgbEby2ZeJVDJ/ALU/O9oYx+rTpTNGLwg==
+x-ms-exchange-transport-forked: True
+arc-seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=kbu1XU2k0onjAjbX4/dTgyTbJD0MQYLt+WpTqyGLQW7F2A0hmX3aleKecjG7vXBkWe4wQfNM5QG+YAFbReiLqIpeV1iORCy+/K73R4BckuL7K21igkmaHtHYHVJNMrNO26uh6eENzYh97WHPp6W5TdCBNO78ODOVnfnwe2Ho9RS6U+Rg3FuLDmbGGdjqUD0Wv0EZc8RLngQIGl48f0KHK/nr9EVVEEzIyFVtAYvCskhQ5xGm+E2IDF6JdFi+DE5OJDTrAhN1sPbo73B1WBSIagvz4K4SMySgAMiXAxomA3+UNxPAWxgdSVHavI4duA+JqwqAIEldoppf3porw2aGiw==
+arc-message-signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=crLOmbuzX2I2CzfrjLZkTe1gY8Y7IcoDazgX8uwDNXQ=;
+ b=frQdkTvjN70s66a+li0Tg82L4LbT6cUP5VSLyAPXaQJdU0ILlaCbHquatQWhXJlidOsaMQUKDBDACatFTZyPv9eAkJPDvLfwTnNSgVKIBnbsXAZ6AyHFD3O50edGfvyhHxThZmz59XUihJ1ZP8Hoe0yyvJL91QZHavzW2VZctms+XKtubCiK+5G+7mSvXW3QYwp60/ETvaH6jRb5I7Np8mPTebjLiJ4moNDnUncRsfcpVsI45lJj8ke+ORpulxy9wlv9tRSQGpWNdGFKoyNEdCS0u9l0P0rP7ZpMoNEZ1Dvcze7e/wD+lgst31iVUJUjojBSnHUT7iUmpM4aZl9Huw==
+arc-authentication-results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=quicinc.com; dmarc=pass action=none header.from=quicinc.com;
+ dkim=pass header.d=quicinc.com; arc=none
+dkim-signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=qualcomm.onmicrosoft.com; s=selector1-qualcomm-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=crLOmbuzX2I2CzfrjLZkTe1gY8Y7IcoDazgX8uwDNXQ=;
+ b=SAsna4QWWcClm8/Ow4Cmaas2sXea3Df/sZ5KXQc5yQ0oRKIXxJTDVXo6Tvf7gfhUWYAN6ERZXgXyz1RX6kONzziTFvIJel54HvsE/TTmJY05JotksErwV64zEg6HKayQm7T98XbinA66MHp/s0mJvDyFiL1SN3P1y4WAeNqWOnA=
+x-ms-exchange-crosstenant-authas: Internal
+x-ms-exchange-crosstenant-authsource: BYAPR02MB4886.namprd02.prod.outlook.com
+x-ms-exchange-crosstenant-network-message-id: a7d2951e-faf5-4a76-df9f-08d84a1b0516
+x-ms-exchange-crosstenant-originalarrivaltime: 26 Aug 2020 23:51:58.1053 (UTC)
+x-ms-exchange-crosstenant-fromentityheader: Hosted
+x-ms-exchange-crosstenant-id: 98e9ba89-e1a1-4e38-9007-8bdabc25de1d
+x-ms-exchange-crosstenant-mailboxtype: HOSTED
+x-ms-exchange-crosstenant-userprincipalname: sDw+M+KH0oV2qpuV6474VIcXzzgrR62qMPT+lTMRbkzVoNEKzoG6+jTlCaU2EFODURgq0/UV2+2FuhXgzSGhog==
+x-ms-exchange-transport-crosstenantheadersstamped: BYAPR02MB4952
+x-originatororg: quicinc.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <fe09ba5a-b521-073b-6e85-3f4e9520be78@vivier.eu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: fr
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:oU3Oatx8iohha2uAJf8jw4L4tKSDs3lvYLIWs6k6MtKtBXXxTpS
- ACDVO7TtaksJKWZP5nVpnIizJHhzsBUeA0q84oCrp0uIBu1x4hfbtyA/qZGww8v5vg7+4qr
- /CxRKq+Cq0V8B/COXMeju1Pu985AdR5f7iltvcOZZnc5KDaQPEh2PM89VRGL6DPUP6AKF8l
- vk10SBdR8U1zbHF9wwKkQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:Sw/dSgEw/eA=:D54MkFgKr3y7WpI0pzVGlC
- upmMNkLeIaciGQ2QSlky0XLMe2RIKTGnoPmnrGnCywM24xWzRzbWZ50V80A6n3ewp6l5KFDKr
- vWzRH2N9fvZcK7MVfZuvzi/p2eQ7MOoukOGV4UW6//fUon0R65NTJxfWguq4eT9QpIPV0xOq6
- c6Ucexv91qDkR6xunxKc+e5A6ejZNBKEUiO2lzAcdQS33smDY6UBNBbbL7HuzJWPcdnT5BY2P
- kPDANaws5ebLUf8N8CM2dfdQcrhFyJa1SDPlZxQHxwjrp2Cmppq0tttYe8hYg+b22TgOWApGX
- r7PJGArc4YJkm/Sxgbj/G/2vbHqJv5o2nxrRFcSUY6ApBLWjG8IzBQUpYi12+mM1u91FxTO9M
- LldgCfrjnj+2gZw2OpolYCLcYsjsNz6/4FCa62JjUR6El+rvBGT1sFzGwuILmEMTBmcqMb1Y7
- wmKgDfCScwIl4Gno+1nSrJHrY+e+K07nCSrUf3WWLpZk9e4xawxuz8DwX4DbnS8+GnGCNk2g5
- aMRzT6Zr6Ot/MNQq4u5uLGQA00THOJDSAuVqeRoLuNEymm2sFyateRnADLWXdTrvIFetLOiyp
- WIcUppw7ZY1x+j0HITfjkEAJgXx3f+CHzMF1sCxuzNu0eT1/RyRjTZp1aL+x6uVkGjnTcjecd
- bMpdNspz92YEz9YhWWXginHGfkmI8ckF5qfRr6gwy5KcxxFW3uIQH+hn20iz2X1Lj+vCYFMM0
- WZJhsxRoeep7sZQzuiKqFK9Qyx5kele17uAyUTOeYntckuR71oq+Vnyrv+0jCwSpQh69elHpx
- 2K/7s5WRuhLH0awR3J4WbD5qloWKWiTVc1m3P7jv3onPHpJtI5W8+Ut9RDP++GFI3E/ZeDC
-Received-SPF: none client-ip=212.227.126.133; envelope-from=laurent@vivier.eu;
- helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/26 18:50:57
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -40
-X-Spam_score: -4.1
+Received-SPF: pass client-ip=199.106.114.38; envelope-from=tsimpson@quicinc.com;
+ helo=alexa-out-sd-01.qualcomm.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/26 19:52:00
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -43
+X-Spam_score: -4.4
 X-Spam_bar: ----
-X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-2.239,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -132,218 +149,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: "ale@rev.ng" <ale@rev.ng>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>,
+ "philmd@redhat.com" <philmd@redhat.com>,
+ "laurent@vivier.eu" <laurent@vivier.eu>,
+ "aleksandar.m.mail@gmail.com" <aleksandar.m.mail@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 26/08/2020 à 15:58, Laurent Vivier a écrit :
-> Le 25/08/2020 à 16:23, Laurent Vivier a écrit :
->> Le 25/08/2020 à 09:18, Laurent Vivier a écrit :
->>> Le 25/08/2020 à 00:30, Filip Bozuta a écrit :
->>>> This patch introduces functionality for following time64 syscalls:
->>>>
->>>> *utimensat_time64()
->>>>
->>>>     int utimensat(int dirfd, const char *pathname,
->>>>                   const struct timespec times[2], int flags);
->>>>     -- change file timestamps with nanosecond precision --
->>>>     man page: https://man7.org/linux/man-pages/man2/utimensat.2.html
->>>>
->>>> *semtimedop_time64()
->>>>
->>>>     int semtimedop(int semid, struct sembuf *sops, size_t nsops,
->>>>                    const struct timespec *timeout);
->>>>     -- System V semaphore operations --
->>>>     man page: https://www.man7.org/linux/man-pages/man2/semtimedop.2.html
->>>>
->>>> Implementation notes:
->>>>
->>>>    Syscall 'utimensat_time64()' is implemented in similar way as its
->>>>    regular variants only difference being that time64 converting function
->>>>    is used to convert values of 'struct timespec' between host and target
->>>>    ('target_to_host_timespec64()').
->>>>
->>>>    For syscall 'semtimedop_time64()' and additional argument is added
->>>>    in function 'do_semtimedop()' through which the aproppriate 'struct timespec'
->>>>    converting function is called (false for regular target_to_host_timespec()
->>>>    and true for target_to_host_timespec64()). For 'do_ipc()' a
->>>>    check was added as that additional argument: 'TARGET_ABI_BITS == 64'.
->>>>
->>>> Signed-off-by: Filip Bozuta <Filip.Bozuta@syrmia.com>
->>>> Reviewed-by: Laurent Vivier <laurent@vivier.eu>
->>>> ---
->>>>  linux-user/syscall.c | 60 ++++++++++++++++++++++++++++++++++++--------
->>>>  1 file changed, 50 insertions(+), 10 deletions(-)
->>>>
->>>> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
->>>> index fc6a6e32e4..4d460af744 100644
->>>> --- a/linux-user/syscall.c
->>>> +++ b/linux-user/syscall.c
->>>> @@ -1253,7 +1253,8 @@ static inline abi_long target_to_host_timespec(struct timespec *host_ts,
->>>>  #endif
->>>>  
->>>>  #if defined(TARGET_NR_clock_settime64) || defined(TARGET_NR_futex_time64) || \
->>>> -    defined(TARGET_NR_pselect6_time64) || defined(TARGET_NR_ppoll_time64)
->>>> +    defined(TARGET_NR_pselect6_time64) || defined(TARGET_NR_ppoll_time64) || \
->>>> +    defined(TARGET_NR_utimensat_time64) || defined(TARGET_NR_semtimedop_time64)
->>>>  static inline abi_long target_to_host_timespec64(struct timespec *host_ts,
->>>>                                                   abi_ulong target_addr)
->>>>  {
->>>> @@ -4117,7 +4118,7 @@ static inline abi_long target_to_host_sembuf(struct sembuf *host_sembuf,
->>>>  }
->>>>  
->>>>  #if defined(TARGET_NR_ipc) || defined(TARGET_NR_semop) || \
->>>> -    defined(TARGET_NR_semtimedop)
->>>> +    defined(TARGET_NR_semtimedop) || defined(TARGET_NR_semtimedop_time64)
->>>>  
->>>>  /*
->>>>   * This macro is required to handle the s390 variants, which passes the
->>>> @@ -4134,7 +4135,7 @@ static inline abi_long target_to_host_sembuf(struct sembuf *host_sembuf,
->>>>  static inline abi_long do_semtimedop(int semid,
->>>>                                       abi_long ptr,
->>>>                                       unsigned nsops,
->>>> -                                     abi_long timeout)
->>>> +                                     abi_long timeout, bool time64)
->>>>  {
->>>>      struct sembuf sops[nsops];
->>>>      struct timespec ts, *pts = NULL;
->>>> @@ -4142,8 +4143,14 @@ static inline abi_long do_semtimedop(int semid,
->>>>  
->>>>      if (timeout) {
->>>>          pts = &ts;
->>>> -        if (target_to_host_timespec(pts, timeout)) {
->>>> -            return -TARGET_EFAULT;
->>>> +        if (time64) {
->>>> +            if (target_to_host_timespec64(pts, timeout)) {
->>>> +                return -TARGET_EFAULT;
->>>> +            }
->>>> +        } else {
->>>> +            if (target_to_host_timespec(pts, timeout)) {
->>>> +                return -TARGET_EFAULT;
->>>> +            }
->>>>          }
->>>>      }
->>>>  
->>>> @@ -4657,7 +4664,7 @@ static abi_long do_ipc(CPUArchState *cpu_env,
->>>>  
->>>>      switch (call) {
->>>>      case IPCOP_semop:
->>>> -        ret = do_semtimedop(first, ptr, second, 0);
->>>> +        ret = do_semtimedop(first, ptr, second, 0, false);
->>>>          break;
->>>>      case IPCOP_semtimedop:
->>>>      /*
->>>> @@ -4667,9 +4674,9 @@ static abi_long do_ipc(CPUArchState *cpu_env,
->>>>       * to a struct timespec where the generic variant uses fifth parameter.
->>>>       */
->>>>  #if defined(TARGET_S390X)
->>>> -        ret = do_semtimedop(first, ptr, second, third);
->>>> +        ret = do_semtimedop(first, ptr, second, third, TARGET_ABI_BITS == 64);
->>>>  #else
->>>> -        ret = do_semtimedop(first, ptr, second, fifth);
->>>> +        ret = do_semtimedop(first, ptr, second, fifth, TARGET_ABI_BITS == 64);
->>>>  #endif
->>>>          break;
->>>>  
->>>> @@ -9887,11 +9894,15 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
->>>>  #endif
->>>>  #ifdef TARGET_NR_semop
->>>>      case TARGET_NR_semop:
->>>> -        return do_semtimedop(arg1, arg2, arg3, 0);
->>>> +        return do_semtimedop(arg1, arg2, arg3, 0, false);
->>>>  #endif
->>>>  #ifdef TARGET_NR_semtimedop
->>>>      case TARGET_NR_semtimedop:
->>>> -        return do_semtimedop(arg1, arg2, arg3, arg4);
->>>> +        return do_semtimedop(arg1, arg2, arg3, arg4, false);
->>>> +#endif
->>>> +#ifdef TARGET_NR_semtimedop_time64
->>>> +    case TARGET_NR_semtimedop_time64:
->>>> +        return do_semtimedop(arg1, arg2, arg3, arg4, true);
->>>>  #endif
->>>>  #ifdef TARGET_NR_semctl
->>>>      case TARGET_NR_semctl:
->>>> @@ -11938,6 +11949,35 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
->>>>          }
->>>>          return ret;
->>>>  #endif
->>>> +#ifdef TARGET_NR_utimensat_time64
->>>> +    case TARGET_NR_utimensat_time64:
->>>> +        {
->>>> +            struct timespec *tsp, ts[2];
->>>> +            if (!arg3) {
->>>> +                tsp = NULL;
->>>> +            } else {
->>>> +                if (target_to_host_timespec64(ts, arg3)) {
->>>> +                    return -TARGET_EFAULT;
->>>> +                }
->>>> +                if (target_to_host_timespec64(ts + 1, arg3 +
->>>> +                                     sizeof(struct target__kernel_timespec))) {
->>>> +                    return -TARGET_EFAULT;
->>>> +                }
->>>> +                tsp = ts;
->>>> +            }
->>>> +            if (!arg2)
->>>> +                ret = get_errno(sys_utimensat(arg1, NULL, tsp, arg4));
->>>> +            else {
->>>> +                p = lock_user_string(arg2);
->>>> +                if (!p) {
->>>> +                    return -TARGET_EFAULT;
->>>> +                }
->>>> +                ret = get_errno(sys_utimensat(arg1, path(p), tsp, arg4));
->>>> +                unlock_user(p, arg2, 0);
->>>> +            }
->>>> +        }
->>>> +        return ret;
->>>> +#endif
->>>>  #ifdef TARGET_NR_futex
->>>>      case TARGET_NR_futex:
->>>>          return do_futex(arg1, arg2, arg3, arg4, arg5, arg6);
->>>>
->>>
->>> Applied to my linux-user-for-5.2 branch.
->>
->> I have removed it from my queue because the "TARGET_NR_utimensat_time64"
->> part breaks something (at least with sh4/sid on x86_64):
->>
->> $ touch a
->> $ cp -p a b
->> /usr/bin/cp: preserving times for 'b': Invalid argument
-> 
-> In fact, on sh4, he timespec64 conversion is broken for all syscalls.
-> tv_sec is ok but tv_nsec is totally corrupted (as it would be only a
-> 32bit value).
-
-In kernel, in get_timespec64(), we have:
-
-            /* In 32-bit mode, this drops the padding */
-            ts->tv_nsec = kts.tv_nsec;
-
-and ts is "struct timespec64" (kts is __kernel_timespec):
-
-    struct timespec64 {
-            time64_t        tv_sec;                 /* seconds */
-            long            tv_nsec;                /* nanoseconds */
-    };
-
-So I think we need something like:
-
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index c82b73e03234..5f53d5d65eb6 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -1253,6 +1253,8 @@ static inline abi_long
-target_to_host_timespec64(struct timespec *host_ts,
-     }
-     __get_user(host_ts->tv_sec, &target_ts->tv_sec);
-     __get_user(host_ts->tv_nsec, &target_ts->tv_nsec);
-+    /* in 32bit mode this drops the padding */
-+    host_ts->tv_nsec = (abi_long)host_ts->tv_nsec;
-     unlock_user_struct(target_ts, target_addr, 0);
-     return 0;
- }
-
-Thanks,
-Laurent
-
+VGhhbmtzIGZvciB0aGUgZmVlZGJhY2ssIFJpY2hhcmQhIQ0KDQoNCg0KPiAtLS0tLU9yaWdpbmFs
+IE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBSaWNoYXJkIEhlbmRlcnNvbiA8cmljaGFyZC5oZW5kZXJz
+b25AbGluYXJvLm9yZz4NCj4gU2VudDogV2VkbmVzZGF5LCBBdWd1c3QgMjYsIDIwMjAgNzozNiBB
+TQ0KPiBUbzogVGF5bG9yIFNpbXBzb24gPHRzaW1wc29uQHF1aWNpbmMuY29tPjsgcWVtdS1kZXZl
+bEBub25nbnUub3JnDQo+IENjOiBwaGlsbWRAcmVkaGF0LmNvbTsgbGF1cmVudEB2aXZpZXIuZXU7
+IHJpa3Uudm9pcGlvQGlraS5maTsNCj4gYWxla3NhbmRhci5tLm1haWxAZ21haWwuY29tOyBhbGVA
+cmV2Lm5nDQo+IFN1YmplY3Q6IFJlOiBbUkZDIFBBVENIIHYzIDA0LzM0XSBIZXhhZ29uICh0YXJn
+ZXQvaGV4YWdvbikgc2NhbGFyIGNvcmUNCj4gZGVmaW5pdGlvbg0KPg0KPiBPbiA4LzE4LzIwIDg6
+NTAgQU0sIFRheWxvciBTaW1wc29uIHdyb3RlOg0KPiA+ICsjaW5jbHVkZSA8ZmVudi5oPg0KPg0K
+PiBUaGlzIHNob3VsZCBub3QgYmUgaW4gY3B1LmguICBXaGF0J3MgdXA/DQoNCldlJ3JlIG5vdCB1
+c2luZyBxZW11IHNvZnRmbG9hdCAoaXQncyBvbiB0aGUgVE9ETyBsaXN0KSwgc28gdGhlcmUncyBh
+IGZlbnZfdCBmaWVsZCBpbiBDUFVIZXhhZ29uU3RhdGUuDQoNCj4gPiArI2RlZmluZSBUQVJHRVRf
+UEFHRV9CSVRTIDE2ICAgICAvKiA2NEsgcGFnZXMgKi8NCj4gPiArI2RlZmluZSBUQVJHRVRfTE9O
+R19CSVRTIDMyDQo+DQo+IEJlbG9uZ3MgaW4gY3B1LXBhcmFtLmgNCg0KT0sNCg0KPiA+ICsjaWZk
+ZWYgQ09ORklHX1VTRVJfT05MWQ0KPiA+ICsjZGVmaW5lIFRPVEFMX1BFUl9USFJFQURfUkVHUyA2
+NA0KPiA+ICsjZWxzZQ0KPiAuLi4NCj4gPiArICAgIHRhcmdldF91bG9uZyBncHJbVE9UQUxfUEVS
+X1RIUkVBRF9SRUdTXTsNCj4NCj4gRG8gSSBub3QgdW5kZXJzdGFuZCBoZXhhZ29uIGVub3VnaCB0
+byBrbm93IHdoeSB0aGUgbnVtYmVyIG9mIGdlbmVyYWwNCj4gcmVnaXN0ZXJzDQo+IHdvdWxkIHZh
+cnkgd2l0aCBzeXN0ZW0gbW9kZT8gIFdoeSBpcyB0aGUgZGVmaW5lIGNvbmRpdGlvbmFsIG9uIHVz
+ZXItb25seT8NCg0KWWVzLCB0aGVyZSBhcmUgc29tZSByZWdpc3RlcnMgdGhhdCBhcmUgb25seSBh
+dmFpbGFibGUgaW4gc3lzdGVtIG1vZGUuICBTaW5jZSB0aGlzIHNlcmllcyBpcyBvbmx5IGZvciBs
+aW51eC11c2VyIG1vZGUsIEknbGwgcmVtb3ZlIHRoZSBpZmRlZiBmb3Igbm93Lg0KDQpXZSdyZSB3
+b3JraW5nIG9uIHN5c3RlbSBtb2RlLiAgV2hlbiB0aGF0IHNlcmllcyBpcyByZWFkeSwgd2UgY2Fu
+IHB1dCB0aGUgaWZkZWYgYmFjayBpbi4gIEF0IHRoYXQgdGltZSwgeW91J2xsIGFsc28gc2VlIHRo
+ZSBleHRyYSByZWdpc3RlcnMgaW4gaGV4X3JlZ3MuaC4NCg0KPiBOby4gIFRoZXJlIGFyZSBwbGVu
+dHkgb2YgYmFkIGV4YW1wbGVzIG9mIHRoaXMgaW4gcWVtdSwgbGV0J3Mgbm90IGFkZCBhbm90aGVy
+Lg0KPg0KPiBGaXJzdCwgdGhlIGxvY2sgZG9lc24ndCBkbyB3aGF0IHlvdSB0aGluay4NCj4gU2Vj
+b25kLCBzdGRlcnIgaXMgbmV2ZXIgcmlnaHQuDQo+IFRoaXJkLCBqdXN0IGFib3V0IGFueSB0aW1l
+IHlvdSB3YW50IHRoaXMsIHRoZXJlJ3MgYSB0cmFjZXBvaW50IHRoYXQgeW91IGNvdWxkDQo+IGFk
+ZCB0aGF0IHdvdWxkIGJlIGJldHRlciwgY29ycmVjdCwgYW5kIHRvZ2dsZWFibGUgZnJvbSB0aGUg
+Y29tbWFuZC1saW5lLg0KDQpPSw0KDQo+IEkgdW5kZXJzdGFuZCB5b3VyIGRlc2lyZSBmb3IgdGhp
+cyBzb3J0IG9mIGNvbXBhcmlzb24uICBXaGF0IEkgZG9uJ3QNCj4gdW5kZXJzdGFuZA0KPiBpcyB0
+aGUgbWV0aG9kLiAgU3VyZWx5IGl0IHdvdWxkIGJlIHByZWZlcmFibGUgdG8gYWN0dWFsbHkgY2hh
+bmdlIHRoZSBzdGFjaw0KPiBsb2NhdGlvbiBpbiBxZW11LCByYXRoZXIgdGhhbiBjb25zdGFudGx5
+IGFkanVzdCBmb3IgaXQuDQo+DQo+IEFkZCBhIHBlci10YXJnZXQgaG9vayB0byBsaW51eC11c2Vy
+L2hleGFnb24vdGFyZ2V0X2VsZi5oIHRoYXQgY29udHJvbHMgdGhlDQo+IGFsbG9jYXRpb24gb2Yg
+dGhlIHN0YWNrIGluIGVsZmxvYWQuYywgc2V0dXBfYXJnX3BhZ2VzKCkuDQoNCk9LLCB3aWxsIGxv
+b2sgaW50byB0aGlzLiAgVGhhbmtzIGZvciB0aGUgYWR2aWNlLCBJIHdhc24ndCBhd2FyZSB0aGlz
+IHdhcyBwb3NzaWJsZS4NCg0KPg0KPiA+ICtzdGF0aWMgdm9pZCBoZXhhZ29uX2R1bXAoQ1BVSGV4
+YWdvblN0YXRlICplbnYsIEZJTEUgKmYpDQo+ID4gK3sNCj4gPiArICAgIHN0YXRpYyB0YXJnZXRf
+dWxvbmcgbGFzdF9wYzsNCj4gPiArICAgIGludCBpOw0KPiA+ICsNCj4gPiArICAgIC8qDQo+ID4g
+KyAgICAgKiBXaGVuIGNvbXBhcmluZyB3aXRoIExMREIsIGl0IGRvZXNuJ3Qgc3RlcCB0aHJvdWdo
+IHNpbmdsZS1jeWNsZQ0KPiA+ICsgICAgICogaGFyZHdhcmUgbG9vcHMgdGhlIHNhbWUgd2F5LiAg
+U28sIHdlIGp1c3Qgc2tpcCB0aGVtIGhlcmUNCj4gPiArICAgICAqLw0KPiA+ICsgICAgaWYgKGVu
+di0+Z3ByW0hFWF9SRUdfUENdID09IGxhc3RfcGMpIHsNCj4gPiArICAgICAgICByZXR1cm47DQo+
+ID4gKyAgICB9DQo+DQo+IE11bHRpLXRocmVhZGVkIGRhdGEgcmFjZS4gIE1pZ2h0IGFzIHdlbGwg
+bW92ZSBsYXN0X3BjIHRvIGVudi0+ZHVtcF9sYXN0X3BjDQo+IG9yDQo+IHNvbWV0aGluZy4NCj4N
+Cj4gQnV0IEknZCBhbHNvIHN1Z2dlc3QgdGhhdCBhbGwgb2YgdGhpcyBsbGRiIGNvbXBhdGliaWxp
+dHkgc3R1ZmYgYmUgb3B0aW9uYWwsDQo+IHN3aXRjaGFibGUgZnJvbSB0aGUgY29tbWFuZC1saW5l
+IHdpdGggYSBjcHUgcHJvcGVydHkuICBCZWNhdXNlIHRoZXJlIGFyZQ0KPiBnb2luZw0KPiB0byBi
+ZSByZWFsIGNhc2VzIHdoZXJlICpub3QqIHNpbmdsZS1zdGVwcGluZyB3aWxsIHJlc3VsdCBpbiBk
+dW1wcyBmcm9tIHRoZQ0KPiBzYW1lDQo+IFBDLCBhbmQgeW91J3ZlIGp1c3Qgc3F1YXNoZWQgYWxs
+IG9mIHRob3NlLg0KPg0KPiBDYWxsIHRoZSBwcm9wZXJ0eSB4LWxsZGItY29tcGF0LCBvciBzb21l
+dGhpbmcsIGFuZCBkZWZhdWx0IGl0IHRvIG9mZi4gIFlvdSB0aGVuDQo+IHR1cm4gaXQgb24gd2l0
+aCAiLWNwdSB2NjcseC1sbGRiLWNvbXBhdD1vbiIuDQoNCk9LDQoNCg==
 
