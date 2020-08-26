@@ -2,93 +2,87 @@ Return-Path: <SRS0=H0ck=CE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77BD9C433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 13:51:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A79FC433E1
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 13:51:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 328F8208E4
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 13:51:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 28A08208E4
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 13:51:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Cj31U1V3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 328F8208E4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XAb+01qd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28A08208E4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60664 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33072 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAvpW-0000UI-EL
-	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 09:51:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33268)
+	id 1kAvpg-0000kc-Ce
+	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 09:51:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33448)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kAvoS-00083V-VN
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 09:50:04 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:55525
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kAvoN-0008F7-WE
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 09:50:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598449794;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=+mmCuAgiFQNVQ9Y0/dbpan2KFSVOjIfo+WjdBsZrpWM=;
- b=Cj31U1V30rSMNJq2W9bqpy7ye7rjbBkqnhucJqAzIna4cCYbgDsDi9tp3+e045+j8uJxUX
- fWg4n2e4utqzAVaFwcxJAA2FkhMb3YG0jFRdWb/OIkdFZWdVFlWEi5Ly9Wix41Xvsw5JYZ
- xuqm7XMVVXxiQvMuusvjiKFUKNvIXa0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-454-R-dvUnOgNzWDltlBqkaOCw-1; Wed, 26 Aug 2020 09:49:52 -0400
-X-MC-Unique: R-dvUnOgNzWDltlBqkaOCw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EA2DA101962C;
- Wed, 26 Aug 2020 13:49:51 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-114-67.ams2.redhat.com [10.36.114.67])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A91155D9E8;
- Wed, 26 Aug 2020 13:49:50 +0000 (UTC)
-Date: Wed, 26 Aug 2020 15:49:49 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Subject: Re: [PATCH] Coroutine-aware monitor_cur() with coroutine-specific data
-Message-ID: <20200826134949.GE7485@linux.fritz.box>
-References: <20200528153742.274164-1-kwolf@redhat.com>
- <20200528153742.274164-7-kwolf@redhat.com>
- <87tuxia5a9.fsf@dusky.pond.sub.org>
- <20200804160604.GB4860@linux.fritz.box>
- <87sgd15z5w.fsf@dusky.pond.sub.org>
- <87a6z6wqkg.fsf_-_@dusky.pond.sub.org>
- <87mu36zis7.fsf_-_@dusky.pond.sub.org>
- <20200810125856.GD14538@linux.fritz.box>
- <87r1rt4m25.fsf@dusky.pond.sub.org>
+ (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1kAvos-0008Jd-Pz
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 09:50:32 -0400
+Received: from mail-ej1-x62d.google.com ([2a00:1450:4864:20::62d]:46329)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1kAvon-0008M8-1c
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 09:50:29 -0400
+Received: by mail-ej1-x62d.google.com with SMTP id d11so2906819ejt.13
+ for <qemu-devel@nongnu.org>; Wed, 26 Aug 2020 06:50:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=bUBfWFnHFK4Sbwf8GvU2FpRepm+4AfQNfSiY7GdqAaU=;
+ b=XAb+01qdxAu//jN3qVSHwzUguMhDSvC0IeD699mxFgackR2fcbdZWzbM4cXgBFxmyD
+ m+5bib+JPL+j/6iQeq2XlRRhlUzDD6N76uNN35uaRHqhZjgSmo/xMJxcbT4Qvj0yWCQg
+ wLTg2kr1BjXCk9xLMq11tYWqRo4fi6w19Ij78MKrgLKJJaAJ4FOw8tY3/NqqznxxO0Q8
+ h3asFkqTwUPH5gD17Zt4R8I32hS2zhfDO/KUUH/tCSN4rXTaj/dW0KfTmk12IFYwff8h
+ 6rH61rLCTf2ku7H/IcAd0wIsAa24716qNfKY2DnB7cB/kEAWVYnDijoY2/nBVvDdOuyG
+ rwyg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=bUBfWFnHFK4Sbwf8GvU2FpRepm+4AfQNfSiY7GdqAaU=;
+ b=F51+z+BY3UUThC2KYcIfoL/BVj6CtCo2gCmO1JEcc97wVb3+6q9BgCphTseOxVkFO3
+ D09VAay7CP4a3MIV4OT6nWOwJiC+CUw+WEBizAQr00B8qNkG17P+aV+vez9sDiyS+bCR
+ J/5+/pjf2ovmwouOhj59sdBd4YFSNyM48M4ieJPhsRF6EdDfT9zs574rqmkO10sUPmBu
+ wFRp3fxCNGRO2w6oq4wAHmsfaOpn+8QJ8e4u1/3aPs8ws4Ts7MDJ/lWpcelNx83+G2DF
+ mLKuMMMSUfY/dlDq2FgE/LR1wi4Zav4MdwTXJxWETCM2pu4JKR5JXO45/YgmVu6lV+jd
+ +Y9Q==
+X-Gm-Message-State: AOAM532jZcirH9mGnphqBfkPh4efOD5gJdYVo8IRAK4yxkjiJ2y9rIhh
+ RusGooKFSnGkqEpZeRgOGCpAZPWqA9s+8JV0olk=
+X-Google-Smtp-Source: ABdhPJyV2ZGwwbI/e/Iiga16jgCYjTB7G32Z+HTfUBEW/Zz7Q2uPCNrRpDjOxSsYeGIt0rZLIrRCJgl6BnT0L0shhhs=
+X-Received: by 2002:a17:906:3816:: with SMTP id
+ v22mr15606040ejc.105.1598449821919; 
+ Wed, 26 Aug 2020 06:50:21 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <87r1rt4m25.fsf@dusky.pond.sub.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=kwolf@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/26 06:53:09
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.959,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+References: <9AB9A3F5-8AA6-4F82-9693-D331251AA0CB@gmail.com>
+In-Reply-To: <9AB9A3F5-8AA6-4F82-9693-D331251AA0CB@gmail.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Wed, 26 Aug 2020 17:50:10 +0400
+Message-ID: <CAJ+F1CKk_jYqPPsGUPLk+MLBUymSeMNjEKpqRR2e-xQry9N3=Q@mail.gmail.com>
+Subject: Re: Issue with submodules on macOS & meson
+To: Emmanuel Blot <eblot.com@gmail.com>
+Content-Type: multipart/alternative; boundary="000000000000d3ae3b05adc8195e"
+Received-SPF: pass client-ip=2a00:1450:4864:20::62d;
+ envelope-from=marcandre.lureau@gmail.com; helo=mail-ej1-x62d.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,269 +95,247 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@gmail.com,
- Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: QEMU <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 26.08.2020 um 14:40 hat Markus Armbruster geschrieben:
-> Kevin Wolf <kwolf@redhat.com> writes:
-> 
-> > Am 07.08.2020 um 15:29 hat Markus Armbruster geschrieben:
-> >> This is just a sketch.  It needs comments and a real commit message.
-> >> 
-> >> As is, it goes on top of Kevin's series.  It is meant to be squashed
-> >> into PATCH 06.
-> >> 
-> >> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> >> ---
-> >>  include/qemu/coroutine.h     |  4 ++++
-> >>  include/qemu/coroutine_int.h |  2 ++
-> >>  monitor/monitor.c            | 36 +++++++++++++++---------------------
-> >>  util/qemu-coroutine.c        | 20 ++++++++++++++++++++
-> >>  4 files changed, 41 insertions(+), 21 deletions(-)
-> >> 
-> >> diff --git a/include/qemu/coroutine.h b/include/qemu/coroutine.h
-> >> index dfd261c5b1..11da47092c 100644
-> >> --- a/include/qemu/coroutine.h
-> >> +++ b/include/qemu/coroutine.h
-> >> @@ -65,6 +65,10 @@ typedef void coroutine_fn CoroutineEntry(void *opaque);
-> >>   */
-> >>  Coroutine *qemu_coroutine_create(CoroutineEntry *entry, void *opaque);
-> >>  
-> >> +Coroutine *qemu_coroutine_create_with_storage(CoroutineEntry *entry,
-> >> +                                              void *opaque, size_t storage);
-> >> +void *qemu_coroutine_local_storage(Coroutine *co);
-> >> +
-> >>  /**
-> >>   * Transfer control to a coroutine
-> >>   */
-> >> diff --git a/include/qemu/coroutine_int.h b/include/qemu/coroutine_int.h
-> >> index bd6b0468e1..7d7865a02f 100644
-> >> --- a/include/qemu/coroutine_int.h
-> >> +++ b/include/qemu/coroutine_int.h
-> >> @@ -41,6 +41,8 @@ struct Coroutine {
-> >>      void *entry_arg;
-> >>      Coroutine *caller;
-> >>  
-> >> +    void *coroutine_local_storage;
-> >> +
-> >>      /* Only used when the coroutine has terminated.  */
-> >>      QSLIST_ENTRY(Coroutine) pool_next;
-> >
-> > This increases the size of Coroutine objects typically by 8 bytes and
-> > shifts the following fields by the same amount. On my x86_64 build, we
-> > have exactly those 8 bytes left in CoroutineUContext until a new
-> > cacheline would start. With different CONFIG_* settings, it could be the
-> > change that increases the size to a new cacheline. No idea what this
-> > looks like on other architectures.
-> >
-> > Does this or the shifting of fields matter for performance? I don't
-> > know. It might even be unlikely. But cache effects are hard to predict
-> > and not wanting to do the work of proving that it's indeed harmless is
-> > one of the reasons why for the slow paths in question I preferred a
-> > solution that doesn't touch the coroutine core at all.
-> 
-> Point taken.
-> 
-> Possible mitigation: add at the end rather than in the middle.
+--000000000000d3ae3b05adc8195e
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Doesn't work: This is a struct that is embedded at the start of
-CoroutineUContext, so while you can move it down a bit, you'll never get
-to the end of the actual struct used at runtime.
+Hi
 
-> >> diff --git a/monitor/monitor.c b/monitor/monitor.c
-> >> index 50fb5b20d3..047a8fb380 100644
-> >> --- a/monitor/monitor.c
-> >> +++ b/monitor/monitor.c
-> >> @@ -82,38 +82,32 @@ bool qmp_dispatcher_co_shutdown;
-> >>   */
-> >>  bool qmp_dispatcher_co_busy;
-> >>  
-> >> -/*
-> >> - * Protects mon_list, monitor_qapi_event_state, coroutine_mon,
-> >> - * monitor_destroyed.
-> >> - */
-> >> +/* Protects mon_list, monitor_qapi_event_state, monitor_destroyed. */
-> >>  QemuMutex monitor_lock;
-> >>  static GHashTable *monitor_qapi_event_state;
-> >> -static GHashTable *coroutine_mon; /* Maps Coroutine* to Monitor* */
-> >>  
-> >>  MonitorList mon_list;
-> >>  int mon_refcount;
-> >>  static bool monitor_destroyed;
-> >>  
-> >> +static Monitor **monitor_curp(Coroutine *co)
-> >> +{
-> >> +    static __thread Monitor *global_cur_mon;
-> >> +
-> >> +    if (co == qmp_dispatcher_co) {
-> >> +        return qemu_coroutine_local_storage(co);
-> >> +    }
-> >> +    return &global_cur_mon;
-> >> +}
-> >
-> > Like the other patch, this needs to be extended for HMP. global_cur_mon
-> > is never meant to be set.
-> 
-> It is, for OOB commands.
+On Wed, Aug 26, 2020 at 5:40 PM Emmanuel Blot <eblot.com@gmail.com> wrote:
 
-Right, I missed this.
+> Hi,
+>
+> Using current master 78dca230 w/ Meson/ninja, build fails with capstone
+> dependency.
+>
+> * ../configure --target-list=3Driscv64-softmmu && ninja
+>
 
-> > The solution fails as soon as we have more than a single monitor
-> > coroutine running at the same time because it relies on
-> > qmp_dispatcher_co.
-> 
-> Yes, but pretty much everything below handle_qmp_command() falls apart
-> then.  Remembering to update monitor_curp() would be the least of my
-> worries :)
+You need to run 'make' (at least once - but still by preference for now).
+Submodule handling is done by Makefile.
 
-Fair enough.
+   fails because capstone is automatically enabled @ configure stage,
+> but capstone is not installed on the host, and the local capstone/
+> submodule is not automatically populated:
+>
+> cc -Ilibqemu-riscv64-softmmu.fa.p -I. -I.. -Itarget/riscv
+> -I../target/riscv -Iqapi -Itrace -Iui -Iui/shader
+> -I/usr/local/Cellar/pixman/0.40.0/include/pixman-1
+> -I/usr/local/Cellar/glib/2.64.4_2/include
+> -I/usr/local/Cellar/glib/2.64.4_2/include/glib-2.0
+> -I/usr/local/Cellar/glib/2.64.4_2/lib/glib-2.0/include
+> -I/usr/local/opt/gettext/include -I/usr/local/Cellar/pcre/8.44/include
+> -I/usr/local/Cellar/gnutls/3.6.14/include
+> -I/usr/local/Cellar/nettle/3.6/include
+> -I/usr/local/Cellar/libtasn1/4.16.0/include
+> -I/usr/local/Cellar/libidn2/2.3.0/include
+> -I/usr/local/Cellar/p11-kit/0.23.20_1/include/p11-kit-1
+> -I/Users/eblot/Sources/Git/github.com/QEMU/upstream/capstone/include
+> -Xclang -fcolor-diagnostics -pipe -Wall -Winvalid-pch -std=3Dgnu99 -O2 -g
+> -m64 -mcx16 -DOS_OBJECT_USE_OBJC=3D0 -arch x86_64 -D_GNU_SOURCE
+> -D_FILE_OFFSET_BITS=3D64 -D_LARGEFILE_SOURCE -Wstrict-prototypes
+> -Wredundant-decls -Wundef -Wwrite-strings -Wmissing-prototypes
+> -fno-strict-aliasing -fno-common -fwrapv -Wold-style-definition
+> -Wtype-limits -Wformat-security -Wformat-y2k -Winit-self
+> -Wignored-qualifiers -Wempty-body -Wnested-externs -Wendif-labels
+> -Wexpansion-to-defined -Wno-initializer-overrides
+> -Wno-missing-include-dirs -Wno-shift-negative-value -Wno-string-plus-int
+> -Wno-typedef-redefinition -Wno-tautological-type-limit-compare
+> -fstack-protector-strong -iquote
+> /Users/eblot/Sources/Git/github.com/QEMU/upstream/tcg/i386 -iquote .
+> -iquote /Users/eblot/Sources/Git/github.com/QEMU/upstream -iquote
+> /Users/eblot/Sources/Git/github.com/QEMU/upstream/accel/tcg -iquote
+> /Users/eblot/Sources/Git/github.com/QEMU/upstream/include -iquote
+> /Users/eblot/Sources/Git/github.com/QEMU/upstream/disas/libvixl
+> -DNEED_CPU_H '-DCONFIG_TARGET=3D"riscv64-softmmu-config-target.h"'
+> '-DCONFIG_DEVICES=3D"riscv64-softmmu-config-devices.h"' -MD -MQ
+> libqemu-riscv64-softmmu.fa.p/disas.c.o -MF
+> libqemu-riscv64-softmmu.fa.p/disas.c.o.d -o
+> libqemu-riscv64-softmmu.fa.p/disas.c.o -c ../disas.c
+> In file included from ../disas.c:9:
+> /Users/eblot/Sources/Git/
+> github.com/QEMU/upstream/include/disas/capstone.h:6:10:
+> error: 'capstone.h' file not found with <angled> include; use "quotes"
+> instead
+> #include <capstone.h>
+>           ^~~~~~~~~~~~
+>           "capstone.h"
+>
+> * ../configure --target-list=3Driscv64-softmmu =E2=80=94enable-capstone=
+=3Dgit &&
+> ninja
+>    fails for the same reason (git submodule is not pulled)
+>
+> * git submodule init && git submodule update capstone && ../configure
+> --target-list=3Driscv64-softmmu && ninja
+>    fails because capstone.h is now found, but the library is not built:
+>
+>      ld: library not found for -lcapstone
+>      clang: error: linker command failed with exit code 1 (use -v to see
+> invocation)
+>
+>     build/capstone is created but stays empty.
+>
+> * ../configure --target-list=3Driscv64-softmmu =E2=80=94disable-capstone
+>     seems ok
+>
+> A similar issue arises with slirp: slirp is automatically selected while
+> not installed on the host and not pulled as a submodule. If the
+> submodule is manually pulled, slirp is not built and QEMU fails to build
+> because libslirp-version.h is not generated.
+>
+>     /Users/eblot/Sources/Git/
+> github.com/QEMU/upstream/slirp/src/libslirp.h:17:10:
+> fatal error: 'libslirp-version.h' file not found
+>
+> Am I missing something obvious?
+>
+> I cannot reproduce those issues with v.5.1.0
+>
+>
+> Thanks,
+> Emmanuel.
+>
+>
 
-> >                    In this respect, it makes the same assumptions as the
-> > simple hack.
-> >
-> > Only knowing that qmp_dispatcher_co is always created with storage
-> > containing a Monitor** makes this safe.
-> 
-> Correct.
-> 
-> >>  Monitor *monitor_cur(void)
-> >>  {
-> >> -    Monitor *mon;
-> >> -
-> >> -    qemu_mutex_lock(&monitor_lock);
-> >> -    mon = g_hash_table_lookup(coroutine_mon, qemu_coroutine_self());
-> >> -    qemu_mutex_unlock(&monitor_lock);
-> >> -
-> >> -    return mon;
-> >> +    return *monitor_curp(qemu_coroutine_self());
-> >>  }
-> >>  
-> >>  void monitor_set_cur(Coroutine *co, Monitor *mon)
-> >>  {
-> >> -    qemu_mutex_lock(&monitor_lock);
-> >> -    if (mon) {
-> >> -        g_hash_table_replace(coroutine_mon, co, mon);
-> >> -    } else {
-> >> -        g_hash_table_remove(coroutine_mon, co);
-> >> -    }
-> >> -    qemu_mutex_unlock(&monitor_lock);
-> >> +    *monitor_curp(co) = mon;
-> >>  }
-> >>  
-> >>  /**
-> >> @@ -666,14 +660,14 @@ void monitor_init_globals_core(void)
-> >>  {
-> >>      monitor_qapi_event_init();
-> >>      qemu_mutex_init(&monitor_lock);
-> >> -    coroutine_mon = g_hash_table_new(NULL, NULL);
-> >>  
-> >>      /*
-> >>       * The dispatcher BH must run in the main loop thread, since we
-> >>       * have commands assuming that context.  It would be nice to get
-> >>       * rid of those assumptions.
-> >>       */
-> >> -    qmp_dispatcher_co = qemu_coroutine_create(monitor_qmp_dispatcher_co, NULL);
-> >> +    qmp_dispatcher_co = qemu_coroutine_create_with_storage(
-> >> +        monitor_qmp_dispatcher_co, NULL, sizeof(Monitor **));
-> >>      atomic_mb_set(&qmp_dispatcher_co_busy, true);
-> >>      aio_co_schedule(iohandler_get_aio_context(), qmp_dispatcher_co);
-> >>  }
-> >> diff --git a/util/qemu-coroutine.c b/util/qemu-coroutine.c
-> >> index c3caa6c770..87bf7f0fc0 100644
-> >> --- a/util/qemu-coroutine.c
-> >> +++ b/util/qemu-coroutine.c
-> >> @@ -81,8 +81,28 @@ Coroutine *qemu_coroutine_create(CoroutineEntry *entry, void *opaque)
-> >>      return co;
-> >>  }
-> >>  
-> >> +Coroutine *qemu_coroutine_create_with_storage(CoroutineEntry *entry,
-> >> +                                              void *opaque, size_t storage)
-> >> +{
-> >> +    Coroutine *co = qemu_coroutine_create(entry, opaque);
-> >> +
-> >> +    if (!co) {
-> >> +        return NULL;
-> >> +    }
-> >> +
-> >> +    co->coroutine_local_storage = g_malloc0(storage);
-> >> +    return co;
-> >> +}
-> >
-> > As the code above shows, this interface is only useful if you can
-> > identify the coroutine. It cannot be used in code that didn't create the
-> > current coroutine because then it can't know whether or not the
-> > coroutine has coroutine local storage, and if it has, what its structure
-> > is.
-> >
-> > For a supposedly generic solution, I think this is a bit weak.
-> 
-> Yes, that's fair.
-> 
-> The solution Daniel proposed is makes the weakness more explicit:
-> instead of relying on "coroutine was created with this coroutine-local
-> storage", we'd rely on "coroutine_getspecific(key) does not fail".  It
-> can fail only if coroutine_setspecific(key, ...) was not called.  Not
-> much better in practice.
+--=20
+Marc-Andr=C3=A9 Lureau
 
-It would be a little more generic, I guess. So for a solution that wants
-to look generic, it might be better.
+--000000000000d3ae3b05adc8195e
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-But as long as we don't have a second user (not even in our
-imagination), I'm not sure how important it is to have something that
-looks generic. With the simple and stupid patch, it would be more
-obvious that it doesn't hurt cases that are unrelated to the monitor.
+<div dir=3D"ltr"><div dir=3D"ltr">Hi<br></div><br><div class=3D"gmail_quote=
+"><div dir=3D"ltr" class=3D"gmail_attr">On Wed, Aug 26, 2020 at 5:40 PM Emm=
+anuel Blot &lt;<a href=3D"mailto:eblot.com@gmail.com">eblot.com@gmail.com</=
+a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0p=
+x 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">Hi=
+,<br>
+<br>
+Using current master 78dca230 w/ Meson/ninja, build fails with capstone <br=
+>
+dependency.<br>
+<br>
+* ../configure --target-list=3Driscv64-softmmu &amp;&amp; ninja<br></blockq=
+uote><div><br></div><div>You need to run &#39;make&#39; (at least once - bu=
+t still by preference for now). Submodule handling is done by Makefile.<br>=
+</div><div> <br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px=
+ 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">
+=C2=A0 =C2=A0fails because capstone is automatically enabled @ configure st=
+age, <br>
+but capstone is not installed on the host, and the local capstone/ <br>
+submodule is not automatically populated:<br>
+<br>
+cc -Ilibqemu-riscv64-softmmu.fa.p -I. -I.. -Itarget/riscv <br>
+-I../target/riscv -Iqapi -Itrace -Iui -Iui/shader <br>
+-I/usr/local/Cellar/pixman/0.40.0/include/pixman-1 <br>
+-I/usr/local/Cellar/glib/2.64.4_2/include <br>
+-I/usr/local/Cellar/glib/2.64.4_2/include/glib-2.0 <br>
+-I/usr/local/Cellar/glib/2.64.4_2/lib/glib-2.0/include <br>
+-I/usr/local/opt/gettext/include -I/usr/local/Cellar/pcre/8.44/include <br>
+-I/usr/local/Cellar/gnutls/3.6.14/include <br>
+-I/usr/local/Cellar/nettle/3.6/include <br>
+-I/usr/local/Cellar/libtasn1/4.16.0/include <br>
+-I/usr/local/Cellar/libidn2/2.3.0/include <br>
+-I/usr/local/Cellar/p11-kit/0.23.20_1/include/p11-kit-1 <br>
+-I/Users/eblot/Sources/Git/<a href=3D"http://github.com/QEMU/upstream/capst=
+one/include" rel=3D"noreferrer" target=3D"_blank">github.com/QEMU/upstream/=
+capstone/include</a> <br>
+-Xclang -fcolor-diagnostics -pipe -Wall -Winvalid-pch -std=3Dgnu99 -O2 -g <=
+br>
+-m64 -mcx16 -DOS_OBJECT_USE_OBJC=3D0 -arch x86_64 -D_GNU_SOURCE <br>
+-D_FILE_OFFSET_BITS=3D64 -D_LARGEFILE_SOURCE -Wstrict-prototypes <br>
+-Wredundant-decls -Wundef -Wwrite-strings -Wmissing-prototypes <br>
+-fno-strict-aliasing -fno-common -fwrapv -Wold-style-definition <br>
+-Wtype-limits -Wformat-security -Wformat-y2k -Winit-self <br>
+-Wignored-qualifiers -Wempty-body -Wnested-externs -Wendif-labels <br>
+-Wexpansion-to-defined -Wno-initializer-overrides <br>
+-Wno-missing-include-dirs -Wno-shift-negative-value -Wno-string-plus-int <b=
+r>
+-Wno-typedef-redefinition -Wno-tautological-type-limit-compare <br>
+-fstack-protector-strong -iquote <br>
+/Users/eblot/Sources/Git/<a href=3D"http://github.com/QEMU/upstream/tcg/i38=
+6" rel=3D"noreferrer" target=3D"_blank">github.com/QEMU/upstream/tcg/i386</=
+a> -iquote . <br>
+-iquote /Users/eblot/Sources/Git/<a href=3D"http://github.com/QEMU/upstream=
+" rel=3D"noreferrer" target=3D"_blank">github.com/QEMU/upstream</a> -iquote=
+ <br>
+/Users/eblot/Sources/Git/<a href=3D"http://github.com/QEMU/upstream/accel/t=
+cg" rel=3D"noreferrer" target=3D"_blank">github.com/QEMU/upstream/accel/tcg=
+</a> -iquote <br>
+/Users/eblot/Sources/Git/<a href=3D"http://github.com/QEMU/upstream/include=
+" rel=3D"noreferrer" target=3D"_blank">github.com/QEMU/upstream/include</a>=
+ -iquote <br>
+/Users/eblot/Sources/Git/<a href=3D"http://github.com/QEMU/upstream/disas/l=
+ibvixl" rel=3D"noreferrer" target=3D"_blank">github.com/QEMU/upstream/disas=
+/libvixl</a> <br>
+-DNEED_CPU_H &#39;-DCONFIG_TARGET=3D&quot;riscv64-softmmu-config-target.h&q=
+uot;&#39; <br>
+&#39;-DCONFIG_DEVICES=3D&quot;riscv64-softmmu-config-devices.h&quot;&#39; -=
+MD -MQ <br>
+libqemu-riscv64-softmmu.fa.p/disas.c.o -MF <br>
+libqemu-riscv64-softmmu.fa.p/disas.c.o.d -o <br>
+libqemu-riscv64-softmmu.fa.p/disas.c.o -c ../disas.c<br>
+In file included from ../disas.c:9:<br>
+/Users/eblot/Sources/Git/<a href=3D"http://github.com/QEMU/upstream/include=
+/disas/capstone.h:6:10" rel=3D"noreferrer" target=3D"_blank">github.com/QEM=
+U/upstream/include/disas/capstone.h:6:10</a>: <br>
+error: &#39;capstone.h&#39; file not found with &lt;angled&gt; include; use=
+ &quot;quotes&quot; <br>
+instead<br>
+#include &lt;capstone.h&gt;<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ^~~~~~~~~~~~<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 &quot;capstone.h&quot;<br>
+<br>
+* ../configure --target-list=3Driscv64-softmmu =E2=80=94enable-capstone=3Dg=
+it &amp;&amp; <br>
+ninja<br>
+=C2=A0 =C2=A0fails for the same reason (git submodule is not pulled)<br>
+<br>
+* git submodule init &amp;&amp; git submodule update capstone &amp;&amp; ..=
+/configure <br>
+--target-list=3Driscv64-softmmu &amp;&amp; ninja<br>
+=C2=A0 =C2=A0fails because capstone.h is now found, but the library is not =
+built:<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0ld: library not found for -lcapstone<br>
+=C2=A0 =C2=A0 =C2=A0clang: error: linker command failed with exit code 1 (u=
+se -v to see <br>
+invocation)<br>
+<br>
+=C2=A0 =C2=A0 build/capstone is created but stays empty.<br>
+<br>
+* ../configure --target-list=3Driscv64-softmmu =E2=80=94disable-capstone<br=
+>
+=C2=A0 =C2=A0 seems ok<br>
+<br>
+A similar issue arises with slirp: slirp is automatically selected while <b=
+r>
+not installed on the host and not pulled as a submodule. If the <br>
+submodule is manually pulled, slirp is not built and QEMU fails to build <b=
+r>
+because libslirp-version.h is not generated.<br>
+<br>
+=C2=A0 =C2=A0 /Users/eblot/Sources/Git/<a href=3D"http://github.com/QEMU/up=
+stream/slirp/src/libslirp.h:17:10" rel=3D"noreferrer" target=3D"_blank">git=
+hub.com/QEMU/upstream/slirp/src/libslirp.h:17:10</a>: <br>
+fatal error: &#39;libslirp-version.h&#39; file not found<br>
+<br>
+Am I missing something obvious?<br>
+<br>
+I cannot reproduce those issues with v.5.1.0<br>
+<br>
+<br>
+Thanks,<br>
+Emmanuel.<br>
+<br>
+</blockquote></div><br clear=3D"all"><br>-- <br><div dir=3D"ltr" class=3D"g=
+mail_signature">Marc-Andr=C3=A9 Lureau<br></div></div>
 
-> > Effectively, this might be a one-off solution in disguise because
-> > it's a big restriction on the possible use cases.
-> 
-> Daniel's solution is basically pthread_getspecific() for coroutines,
-> with the keys dumbed down.
-> 
-> If pthread_getspecific() was good enough for pthreads...
-> 
-> Well, it wasn't, or rather it was only because something better could
-> not be had with just a library, without toolchain support.  And that's
-> where we are with coroutines.
-> 
-> >> +void *qemu_coroutine_local_storage(Coroutine *co)
-> >> +{
-> >> +    return co->coroutine_local_storage;
-> >> +}
-> >> +
-> >>  static void coroutine_delete(Coroutine *co)
-> >>  {
-> >> +    g_free(co->coroutine_local_storage);
-> >> +    co->coroutine_local_storage = NULL;
-> >>      co->caller = NULL;
-> >>  
-> >>      if (CONFIG_COROUTINE_POOL) {
-> >
-> > Your list of pros/cons didn't mention coroutine creation/deletion as a
-> > hot path at all (which it is, we have one coroutine per request).
-> 
-> I did not expect coroutine creation / deletion to be a hot path.
-> 
-> It is not a hot path for QMP, because QMP is not a hot path.
-> 
-> I'm ready to accept the proposition that it's a hot path elsewhere.
-
-It is a hot path for block device requests. To be more specific, the
-part that is executed when taking a coroutine from the pool or putting
-it back to the pool is. The code to create a coroutine from scratch or
-to actually free it may be less relevant.
-
-Kevin
-
-> > You leave qemu_coroutine_create() untouched (except indirectly by a
-> > larger g_malloc0() in the non-pooled case, which is negligible) and I
-> > assume that g_free(NULL) is cheap, so at least this is probably as good
-> > as it gets for something integrated in the coroutine core. Maybe an
-> > explicit if (co->coroutine_local_storage) would improve it slightly.
-> >
-> > Kevin
-
+--000000000000d3ae3b05adc8195e--
 
