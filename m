@@ -2,85 +2,89 @@ Return-Path: <SRS0=H0ck=CE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E294AC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 14:58:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8BA0C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 15:00:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B2C532078D
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 14:58:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 704D8214F1
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 15:00:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zu8RpSGN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2C532078D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ieeUuNuL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 704D8214F1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54008 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59312 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAwsu-0008Ok-Vb
-	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 10:58:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51486)
+	id 1kAwuj-0002Cd-NO
+	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 11:00:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50888)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1kAwpT-0003BO-Hy
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 10:55:11 -0400
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:34062)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1kAwpR-0000F0-Vf
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 10:55:11 -0400
-Received: by mail-oi1-x243.google.com with SMTP id z22so1764703oid.1
- for <qemu-devel@nongnu.org>; Wed, 26 Aug 2020 07:55:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=GJL0mruKKVRO32qiMzIO/kqKr+HXNmSg+Ygwqd+hL5s=;
- b=Zu8RpSGNtrZ1j+hAqCRdOako4Wk4ZiE56wxpSTBitURCfYlA0XlA6iphFfqRjGwumF
- wkglcBlCUjsxRLF9Ghm6fF1b7Tx+BSiPN00YkMEgNGZv05Z6sn6GWiHz0nrokdhVm4bR
- VUdtQsUMsVOAJiYPfts7kKaIKNZUwv8ZdjAuNXdQwq3GUZVp9u+FoO8UO6d+9Xg0ISrE
- tl4mRrfefVSNu9PhqRANUbUunoNdP3zwSt8lqlk1x/7I4i1J4jZvygNBRBDMOl5cpYcy
- pKiDg0lZjcr9TeWWsC6Q02YEVkyoKHZUMFZ5rV8AFYhvUT8oLWCNPmdMhy+RH58fYGXV
- ZcPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=GJL0mruKKVRO32qiMzIO/kqKr+HXNmSg+Ygwqd+hL5s=;
- b=dRP3emxxztU2ZmP5bPj7C3JiitoyBYrKLW9DJpAz41Sh7mPWTnQFFevcN4b0K588A/
- nPDn7SBBn7PrnMgWo5ZtxHcjTYSlOg7CpJSk4DLHBsRtARnSwIVglrMRbkCaN2gocfuA
- TXrQtCGQ/2neZjZLIV5rZ6FvRYvIZWVY+IAjV5XeiXIM0OnU0iVF8pP45n0nqNk0YuJt
- IgK/hjhBf69t4hR2uJxqEuWlBh4bEbIHtss1o1uAKliGUrCho7+LeV8eCRggWTagvZRT
- qpoeFuC/vE4JRZZ76xtyXfSWmfuSn3hl6VANhzQbCqyYlarBVG7C9b7mWH+xEw6Y8gGy
- VpZg==
-X-Gm-Message-State: AOAM530xgyaq25fVgugsqRJpdcjRlVQBhfeCW6RaLncWNs2NGViInZwL
- 3+d17yQhG0xdjjsUmo+B8QMXYI3ZOMl5xJUeyCY=
-X-Google-Smtp-Source: ABdhPJxJmNeMcDQU4zY7xxf5Va2qrLsujVHPmSykrEAlMfzynQiPrawet47YjSl1jx8QPSuwoUmfGQxL+aUoOxn+Np8=
-X-Received: by 2002:aca:1117:: with SMTP id 23mr4191950oir.97.1598453708425;
- Wed, 26 Aug 2020 07:55:08 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kAwnJ-0006p1-KC
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 10:52:57 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:60891
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kAwnG-0008MN-7b
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 10:52:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1598453573;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=9roSgM66IiBIQZjYMh8WgmO1UZqEEROPpB96xe/qOl0=;
+ b=ieeUuNuLze6h8APAQOlI3vL+EMUIJcKYN38yBZ3fpQO/pwNTorekKrqXtcrYHfi1nLMok6
+ c+pOt3XGwGNxHy2fKFef0+0w82VsPbXSlD7UJaqIIxSyxafUteibpB3FP9eeTxTNZVMxBp
+ 3+SJ2KTzA8n7azBk/zXPmCQViPRb1Ow=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-534-4rpVTDsSONCdyWEZj2seaw-1; Wed, 26 Aug 2020 10:52:49 -0400
+X-MC-Unique: 4rpVTDsSONCdyWEZj2seaw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 57EF310074AF;
+ Wed, 26 Aug 2020 14:52:48 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-112-54.ams2.redhat.com
+ [10.36.112.54])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id ED1CF5D9E4;
+ Wed, 26 Aug 2020 14:52:45 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 20A6931F97; Wed, 26 Aug 2020 16:52:40 +0200 (CEST)
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL 11/18] meson: Add U2F key to meson
+Date: Wed, 26 Aug 2020 16:52:32 +0200
+Message-Id: <20200826145239.6077-12-kraxel@redhat.com>
+In-Reply-To: <20200826145239.6077-1-kraxel@redhat.com>
+References: <20200826145239.6077-1-kraxel@redhat.com>
 MIME-Version: 1.0
-References: <20200821104708.4632-1-lizhijian@cn.fujitsu.com>
-In-Reply-To: <20200821104708.4632-1-lizhijian@cn.fujitsu.com>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Wed, 26 Aug 2020 22:54:32 +0800
-Message-ID: <CAKXe6S+5M9Ue=y-W+oJDecYuya7oRbfJsVXg_ZkHhkE2jyz+og@mail.gmail.com>
-Subject: Re: [PATCH v2] virtio-gpu: fix unmap the already mapped items
-To: Li Zhijian <lizhijian@cn.fujitsu.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::243;
- envelope-from=liq3ea@gmail.com; helo=mail-oi1-x243.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/26 06:53:09
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.959,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,53 +97,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Qemu Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>
+Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ =?UTF-8?q?C=C3=A9sar=20Belley?= <cesar.belley@lse.epita.fr>,
+ Gerd Hoffmann <kraxel@redhat.com>, Cleber Rosa <crosa@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Li Zhijian <lizhijian@cn.fujitsu.com> =E4=BA=8E2020=E5=B9=B48=E6=9C=8821=E6=
-=97=A5=E5=91=A8=E4=BA=94 =E4=B8=8B=E5=8D=887:34=E5=86=99=E9=81=93=EF=BC=9A
->
-> we go here either (!(*iov)[i].iov_base) or (len !=3D l), so we need to co=
-nsider
-> to unmap the 'i'th item as well when the 'i'th item is not nil
->
-> Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
->
-> ---
-> v2: address Gerd's comments
-> ---
->  hw/display/virtio-gpu.c | 3 +++
->  1 file changed, 3 insertions(+)
->
-> diff --git a/hw/display/virtio-gpu.c b/hw/display/virtio-gpu.c
-> index 5f0dd7c150..e93f99932a 100644
-> --- a/hw/display/virtio-gpu.c
-> +++ b/hw/display/virtio-gpu.c
-> @@ -656,6 +656,9 @@ int virtio_gpu_create_mapping_iov(VirtIOGPU *g,
->              qemu_log_mask(LOG_GUEST_ERROR, "%s: failed to map MMIO memor=
-y for"
->                            " resource %d element %d\n",
->                            __func__, ab->resource_id, i);
-> +            if ((*iov)[i].iov_base) {
-> +                i++; /* cleanup the 'i'th map */
+From: César Belley <cesar.belley@lse.epita.fr>
 
-Should we also reset (*iov)[i].iov_len to 'len' so the
-dma_memory_unmap has the right size?
+Signed-off-by: César Belley <cesar.belley@lse.epita.fr>
+Message-id: 20200826114209.28821-8-cesar.belley@lse.epita.fr
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ configure          | 8 +++++++-
+ meson_options.txt  | 1 +
+ hw/usb/Kconfig     | 5 +++++
+ hw/usb/meson.build | 7 +++++++
+ meson.build        | 7 +++++++
+ 5 files changed, 27 insertions(+), 1 deletion(-)
 
-Thanks,
-Li Qiang
+diff --git a/configure b/configure
+index b1e11397a827..24137d49d6f4 100755
+--- a/configure
++++ b/configure
+@@ -495,6 +495,7 @@ trace_file="trace"
+ spice=""
+ rbd=""
+ smartcard=""
++u2f="auto"
+ libusb=""
+ usb_redir=""
+ opengl=""
+@@ -1411,6 +1412,10 @@ for opt do
+   ;;
+   --enable-smartcard) smartcard="yes"
+   ;;
++  --disable-u2f) u2f="disabled"
++  ;;
++  --enable-u2f) u2f="enabled"
++  ;;
+   --disable-libusb) libusb="no"
+   ;;
+   --enable-libusb) libusb="yes"
+@@ -1940,6 +1945,7 @@ disabled with --disable-FEATURE, default is enabled if available:
+   libiscsi        iscsi support
+   libnfs          nfs support
+   smartcard       smartcard support (libcacard)
++  u2f             U2F support (u2f-emu)
+   libusb          libusb (for usb passthrough)
+   live-block-migration   Block migration in the main migration stream
+   usb-redir       usb network redirection support
+@@ -8230,7 +8236,7 @@ NINJA=$PWD/ninjatool $meson setup \
+         -Db_coverage=$(if test "$gcov" = yes; then echo true; else echo false; fi) \
+ 	-Dsdl=$sdl -Dsdl_image=$sdl_image \
+ 	-Dvnc=$vnc -Dvnc_sasl=$vnc_sasl -Dvnc_jpeg=$vnc_jpeg -Dvnc_png=$vnc_png \
+-	-Dgettext=$gettext -Dxkbcommon=$xkbcommon \
++	-Dgettext=$gettext -Dxkbcommon=$xkbcommon -Du2f=$u2f\
+         $cross_arg \
+         "$PWD" "$source_path"
+ 
+diff --git a/meson_options.txt b/meson_options.txt
+index c55f9cd94cb2..aef2de652332 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -1,6 +1,7 @@
+ option('gettext', type : 'boolean', value : true)
+ option('sdl', type : 'feature', value : 'auto')
+ option('sdl_image', type : 'feature', value : 'auto')
++option('u2f', type : 'feature', value : 'auto')
+ option('vnc', type : 'feature', value : 'enabled')
+ option('vnc_jpeg', type : 'feature', value : 'auto')
+ option('vnc_png', type : 'feature', value : 'auto')
+diff --git a/hw/usb/Kconfig b/hw/usb/Kconfig
+index 5e63dc75f815..3fc8fbe3c74c 100644
+--- a/hw/usb/Kconfig
++++ b/hw/usb/Kconfig
+@@ -96,6 +96,11 @@ config USB_STORAGE_MTP
+     default y
+     depends on USB
+ 
++config USB_U2F
++    bool
++    default y
++    depends on USB
++
+ config IMX_USBPHY
+     bool
+     default y
+diff --git a/hw/usb/meson.build b/hw/usb/meson.build
+index 3c44a1b06954..a25109b88c91 100644
+--- a/hw/usb/meson.build
++++ b/hw/usb/meson.build
+@@ -50,6 +50,13 @@ if config_host.has_key('CONFIG_SMARTCARD')
+   hw_usb_modules += {'smartcard': usbsmartcard_ss}
+ endif
+ 
++# U2F
++softmmu_ss.add(when: 'CONFIG_USB_U2F', if_true: files('u2f.c'))
++softmmu_ss.add(when: ['CONFIG_LINUX', 'CONFIG_USB_U2F'], if_true: files('u2f-passthru.c'))
++if u2f.found()
++  softmmu_ss.add(when: 'CONFIG_USB_U2F', if_true: [u2f, files('u2f-emulated.c')])
++endif
++
+ # usb redirect
+ if config_host.has_key('CONFIG_USB_REDIR')
+   usbredir_ss = ss.source_set()
+diff --git a/meson.build b/meson.build
+index f0fe5f8799e0..ae90fdbfe306 100644
+--- a/meson.build
++++ b/meson.build
+@@ -360,6 +360,11 @@ if 'CONFIG_SMARTCARD' in config_host
+   cacard = declare_dependency(compile_args: config_host['SMARTCARD_CFLAGS'].split(),
+                               link_args: config_host['SMARTCARD_LIBS'].split())
+ endif
++u2f = dependency('u2f-emu', required: get_option('u2f'), static: enable_static,
++                 include_type: 'system')
++if u2f.found()
++  u2f = declare_dependency(dependencies: u2f)
++endif
+ usbredir = not_found
+ if 'CONFIG_USB_REDIR' in config_host
+   usbredir = declare_dependency(compile_args: config_host['USB_REDIR_CFLAGS'].split(),
+@@ -385,6 +390,7 @@ endif
+ 
+ config_host_data.set('CONFIG_SDL', sdl.found())
+ config_host_data.set('CONFIG_SDL_IMAGE', sdl_image.found())
++config_host_data.set('CONFIG_U2F', u2f.found())
+ config_host_data.set('CONFIG_VNC', vnc.found())
+ config_host_data.set('CONFIG_VNC_JPEG', jpeg.found())
+ config_host_data.set('CONFIG_VNC_PNG', png.found())
+@@ -1365,6 +1371,7 @@ summary_info += {'spice support':     config_host.has_key('CONFIG_SPICE')}
+ summary_info += {'rbd support':       config_host.has_key('CONFIG_RBD')}
+ summary_info += {'xfsctl support':    config_host.has_key('CONFIG_XFS')}
+ summary_info += {'smartcard support': config_host.has_key('CONFIG_SMARTCARD')}
++summary_info += {'U2F support':       u2f.found()}
+ summary_info += {'libusb':            config_host.has_key('CONFIG_USB_LIBUSB')}
+ summary_info += {'usb net redir':     config_host.has_key('CONFIG_USB_REDIR')}
+ summary_info += {'OpenGL support':    config_host.has_key('CONFIG_OPENGL')}
+-- 
+2.27.0
 
-> +            }
->              virtio_gpu_cleanup_mapping_iov(g, *iov, i);
->              g_free(ents);
->              *iov =3D NULL;
-> --
-> 2.17.1
->
->
->
->
 
