@@ -7,49 +7,49 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF6B3C433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 07:48:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9B7CC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 07:49:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A759020707
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 07:48:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A759020707
+	by mail.kernel.org (Postfix) with ESMTPS id 684DE20707
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 07:49:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 684DE20707
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42550 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44796 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAqAs-0003d6-W2
-	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 03:48:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53614)
+	id 1kAqBI-0004XN-Kk
+	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 03:49:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53738)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhaolichang@huawei.com>)
- id 1kAq9Q-0000rz-T9; Wed, 26 Aug 2020 03:47:20 -0400
-Received: from szxga03-in.huawei.com ([45.249.212.189]:2103 helo=huawei.com)
+ id 1kAqA2-0002LM-Ni; Wed, 26 Aug 2020 03:47:58 -0400
+Received: from szxga03-in.huawei.com ([45.249.212.189]:2104 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhaolichang@huawei.com>)
- id 1kAq9O-00024L-04; Wed, 26 Aug 2020 03:47:20 -0400
-Received: from dggemi404-hub.china.huawei.com (unknown [172.30.72.55])
- by Forcepoint Email with ESMTP id 5A17D83BF21275014EFC;
- Wed, 26 Aug 2020 15:47:13 +0800 (CST)
+ id 1kAq9z-00028W-Uw; Wed, 26 Aug 2020 03:47:58 -0400
+Received: from dggemi403-hub.china.huawei.com (unknown [172.30.72.54])
+ by Forcepoint Email with ESMTP id 250DE44ED93AE378A15A;
+ Wed, 26 Aug 2020 15:47:53 +0800 (CST)
 Received: from DGGEMI522-MBS.china.huawei.com ([169.254.8.252]) by
- dggemi404-hub.china.huawei.com ([10.3.17.142]) with mapi id 14.03.0487.000;
- Wed, 26 Aug 2020 15:47:04 +0800
+ dggemi403-hub.china.huawei.com ([10.3.17.136]) with mapi id 14.03.0487.000;
+ Wed, 26 Aug 2020 15:47:44 +0800
 From: zhaolichang <zhaolichang@huawei.com>
 To: "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>
-Subject: [PATCH V2 05/10] util/: fix some comment spelling errors
-Thread-Topic: [PATCH V2 05/10] util/: fix some comment spelling errors
-Thread-Index: AdZ7fA5ARD06DsV/RbafQUaDtvlmZw==
-Date: Wed, 26 Aug 2020 07:47:04 +0000
-Message-ID: <640CDEE67BE2784FAE298BB2517210E48AC3E1@dggemi522-mbs.china.huawei.com>
+Subject: [PATCH V2 07/10] block/: fix some comment spelling errors
+Thread-Topic: [PATCH V2 07/10] block/: fix some comment spelling errors
+Thread-Index: AdZ7fE1rIxaMRRSdTo6XVvpZzb5RsA==
+Date: Wed, 26 Aug 2020 07:47:45 +0000
+Message-ID: <640CDEE67BE2784FAE298BB2517210E48AC401@dggemi522-mbs.china.huawei.com>
 Accept-Language: en-US
 Content-Language: zh-CN
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
 x-originating-ip: [10.174.186.227]
 Content-Type: multipart/alternative;
- boundary="_000_640CDEE67BE2784FAE298BB2517210E48AC3E1dggemi522mbschina_"
+ boundary="_000_640CDEE67BE2784FAE298BB2517210E48AC401dggemi522mbschina_"
 MIME-Version: 1.0
 X-CFilter-Loop: Reflected
 Received-SPF: pass client-ip=45.249.212.189;
@@ -80,122 +80,123 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---_000_640CDEE67BE2784FAE298BB2517210E48AC3E1dggemi522mbschina_
-Content-Type: text/plain; charset="iso-8859-1"
+--_000_640CDEE67BE2784FAE298BB2517210E48AC401dggemi522mbschina_
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 
 I found that there are many spelling errors in the comments of qemu,
 so I used the spellcheck tool to check the spelling errors
-and finally found some spelling errors in the util folder.
+and finally found some spelling errors in the block folder.
 
 Signed-off-by: zhaolichang <zhaolichang@huawei.com>
-Reviewed-by: Alex Benn=E9e <alex.bennee@linaro.org>
 ---
-util/osdep.c             | 2 +-
-util/qemu-progress.c     | 2 +-
-util/qemu-sockets.c      | 2 +-
-util/qemu-thread-win32.c | 2 +-
-util/qht.c               | 2 +-
-util/trace-events        | 2 +-
-6 files changed, 6 insertions(+), 6 deletions(-)
+block/block-copy.c | 2 +-
+block/linux-aio.c  | 2 +-
+block/mirror.c     | 2 +-
+block/vhdx.c       | 2 +-
+block/vhdx.h       | 4 ++--
+5 files changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/util/osdep.c b/util/osdep.c
-index 4829c07ff6..e50dc2214e 100644
---- a/util/osdep.c
-+++ b/util/osdep.c
-@@ -392,7 +392,7 @@ int qemu_unlink(const char *name)
-  * Set errno if fewer than `count' bytes are written.
+diff --git a/block/block-copy.c b/block/block-copy.c
+index a30b9097ef..d648306ce5 100644
+--- a/block/block-copy.c
++++ b/block/block-copy.c
+@@ -321,7 +321,7 @@ static coroutine_fn int block_copy_task_run(AioTaskPool=
+ *pool,
+  * Do copy of cluster-aligned chunk. Requested region is allowed to exceed
+  * s->len only to cover last cluster when s->len is not aligned to cluster=
+s.
   *
-  * This function don't work with non-blocking fd's.
-- * Any of the possibilities with non-bloking fd's is bad:
-+ * Any of the possibilities with non-blocking fd's is bad:
-  *   - return a short write (then name is wrong)
-  *   - busy wait adding (errno =3D=3D EAGAIN) to the loop
+- * No sync here: nor bitmap neighter intersecting requests handling, only =
+copy.
++ * No sync here: neither bitmap nor intersecting requests handling, only c=
+opy.
+  *
+  * Returns 0 on success.
   */
-diff --git a/util/qemu-progress.c b/util/qemu-progress.c
-index 3c2223c1a2..20d51f8c12 100644
---- a/util/qemu-progress.c
-+++ b/util/qemu-progress.c
-@@ -131,7 +131,7 @@ void qemu_progress_end(void)
-/*
-  * Report progress.
-  * @delta is how much progress we made.
-- * If @max is zero, @delta is an absolut value of the total job done.
-+ * If @max is zero, @delta is an absolute value of the total job done.
-  * Else, @delta is a progress delta since the last call, as a fraction
-  * of @max.  I.e. the delta is @delta * @max / 100. This allows
-  * relative accounting of functions which may be a different fraction of
-diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
-index b37d288866..99ce2fd5e6 100644
---- a/util/qemu-sockets.c
-+++ b/util/qemu-sockets.c
-@@ -416,7 +416,7 @@ static struct addrinfo *inet_parse_connect_saddr(InetSo=
-cketAddress *saddr,
+diff --git a/block/linux-aio.c b/block/linux-aio.c
+index 3c0527c2bf..772ff860ea 100644
+--- a/block/linux-aio.c
++++ b/block/linux-aio.c
+@@ -222,7 +222,7 @@ static void qemu_laio_process_completions(LinuxAioState=
+ *s)
 
-     /* At least FreeBSD and OS-X 10.6 declare AI_V4MAPPED but
-      * then don't implement it in their getaddrinfo(). Detect
--     * this and retry without the flag since that's preferrable
-+     * this and retry without the flag since that's preferable
-      * to a fatal error
-      */
-     if (rc =3D=3D EAI_BADFLAGS &&
-diff --git a/util/qemu-thread-win32.c b/util/qemu-thread-win32.c
-index 56a83333da..d207b0cb58 100644
---- a/util/qemu-thread-win32.c
-+++ b/util/qemu-thread-win32.c
-@@ -289,7 +289,7 @@ void qemu_event_wait(QemuEvent *ev)
-             ResetEvent(ev->event);
+     /* If we are nested we have to notify the level above that we are done
+      * by setting event_max to zero, upper level will then jump out of it'=
+s
+-     * own `for` loop.  If we are the last all counters droped to zero. */
++     * own `for` loop.  If we are the last all counters dropped to zero. *=
+/
+     s->event_max =3D 0;
+     s->event_idx =3D 0;
+}
+diff --git a/block/mirror.c b/block/mirror.c
+index e8e8844afc..22d574167e 100644
+--- a/block/mirror.c
++++ b/block/mirror.c
+@@ -478,7 +478,7 @@ static uint64_t coroutine_fn mirror_iteration(MirrorBlo=
+ckJob *s)
 
-             /* Tell qemu_event_set that there are waiters.  No need to ret=
-ry
--             * because there cannot be a concurent busy->free transition.
-+             * because there cannot be a concurrent busy->free transition.
-              * After the CAS, the event will be either set or busy.
-              */
-             if (atomic_cmpxchg(&ev->value, EV_FREE, EV_BUSY) =3D=3D EV_SET=
-) {
-diff --git a/util/qht.c b/util/qht.c
-index 67e5d5b916..b2e020c398 100644
---- a/util/qht.c
-+++ b/util/qht.c
-@@ -49,7 +49,7 @@
-  * it anymore.
-  *
-  * Writers check for concurrent resizes by comparing ht->map before and af=
-ter
-- * acquiring their bucket lock. If they don't match, a resize has occured
-+ * acquiring their bucket lock. If they don't match, a resize has occurred
-  * while the bucket spinlock was being acquired.
-  *
-  * Related Work:
-diff --git a/util/trace-events b/util/trace-events
-index 0ce42822eb..4bc01808af 100644
---- a/util/trace-events
-+++ b/util/trace-events
-@@ -28,7 +28,7 @@ qemu_file_monitor_add_watch(void *mon, const char *dirpat=
-h, const char *filename
-qemu_file_monitor_remove_watch(void *mon, const char *dirpath, int64_t id) =
-"File monitor %p remove watch dir=3D'%s' id=3D%" PRId64
-qemu_file_monitor_new(void *mon, int fd) "File monitor %p created fd=3D%d"
-qemu_file_monitor_enable_watch(void *mon, const char *dirpath, int id) "Fil=
-e monitor %p enable watch dir=3D'%s' id=3D%u"
--qemu_file_monitor_disable_watch(void *mon, const char *dirpath, int id) "F=
-le monitor %p disable watch dir=3D'%s' id=3D%u"
-+qemu_file_monitor_disable_watch(void *mon, const char *dirpath, int id) "F=
-ile monitor %p disable watch dir=3D'%s' id=3D%u"
-qemu_file_monitor_event(void *mon, const char *dirpath, const char *filenam=
-e, int mask, unsigned int id) "File monitor %p event dir=3D'%s' file=3D'%s'=
- mask=3D0x%x id=3D%u"
-qemu_file_monitor_dispatch(void *mon, const char *dirpath, const char *file=
-name, int ev, void *cb, void *opaque, int64_t id) "File monitor %p dispatch=
- dir=3D'%s' file=3D'%s' ev=3D%d cb=3D%p opaque=3D%p id=3D%" PRId64
+     job_pause_point(&s->common.job);
 
+-    /* Find the number of consective dirty chunks following the first dirt=
+y
++    /* Find the number of consecutive dirty chunks following the first dir=
+ty
+      * one, and wait for in flight requests in them. */
+     bdrv_dirty_bitmap_lock(s->dirty_bitmap);
+     while (nb_chunks * s->granularity < s->buf_size) {
+diff --git a/block/vhdx.c b/block/vhdx.c
+index 791eb90263..84eedee83f 100644
+--- a/block/vhdx.c
++++ b/block/vhdx.c
+@@ -1073,7 +1073,7 @@ static int vhdx_open(BlockDriverState *bs, QDict *opt=
+ions, int flags,
+         goto fail;
+     }
+
+-    /* endian convert populated BAT field entires */
++    /* endian convert populated BAT field entries */
+     for (i =3D 0; i < s->bat_entries; i++) {
+         s->bat[i] =3D le64_to_cpu(s->bat[i]);
+     }
+diff --git a/block/vhdx.h b/block/vhdx.h
+index 0b74924cee..e385e484b4 100644
+--- a/block/vhdx.h
++++ b/block/vhdx.h
+@@ -212,7 +212,7 @@ typedef struct QEMU_PACKED VHDXLogDataSector {
+     uint32_t    sequence_high;          /* 4 MSB of 8 byte sequence_number=
+ */
+     uint8_t     data[4084];             /* raw data, bytes 8-4091 (inclusi=
+ve).
+                                            see the data descriptor field f=
+or the
+-                                           other mising bytes */
++                                           other missing bytes */
+     uint32_t    sequence_low;           /* 4 LSB of 8 byte sequence_number=
+ */
+} VHDXLogDataSector;
+
+@@ -257,7 +257,7 @@ typedef struct QEMU_PACKED VHDXMetadataTableHeader {
+
+#define VHDX_META_FLAGS_IS_USER         0x01    /* max 1024 entries */
+#define VHDX_META_FLAGS_IS_VIRTUAL_DISK 0x02    /* virtual disk metadata if=
+ set,
+-                                                   otherwise file metdata =
+*/
++                                                   otherwise file metadata=
+ */
+#define VHDX_META_FLAGS_IS_REQUIRED     0x04    /* parse must understand th=
+is
+                                                    entry to open the file =
+*/
+typedef struct QEMU_PACKED VHDXMetadataTableEntry {
 --
 2.26.2.windows.1
 
 
---_000_640CDEE67BE2784FAE298BB2517210E48AC3E1dggemi522mbschina_
-Content-Type: text/html; charset="iso-8859-1"
+--_000_640CDEE67BE2784FAE298BB2517210E48AC401dggemi522mbschina_
+Content-Type: text/html; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 
 <html xmlns:v=3D"urn:schemas-microsoft-com:vml" xmlns:o=3D"urn:schemas-micr=
@@ -203,8 +204,8 @@ osoft-com:office:office" xmlns:w=3D"urn:schemas-microsoft-com:office:word" =
 xmlns:m=3D"http://schemas.microsoft.com/office/2004/12/omml" xmlns=3D"http:=
 //www.w3.org/TR/REC-html40">
 <head>
-<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Diso-8859-=
-1">
+<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Dus-ascii"=
+>
 <meta name=3D"Generator" content=3D"Microsoft Word 15 (filtered medium)">
 <style><!--
 /* Font Definitions */
@@ -265,197 +266,202 @@ lling errors in the comments of qemu,<o:p></o:p></span></p>
 <p class=3D"MsoNormal"><span lang=3D"EN-US">so I used the spellcheck tool t=
 o check the spelling errors<o:p></o:p></span></p>
 <p class=3D"MsoNormal"><span lang=3D"EN-US">and finally found some spelling=
- errors in the util folder.<o:p></o:p></span></p>
+ errors in the block folder.<o:p></o:p></span></p>
 <p class=3D"MsoNormal"><span lang=3D"EN-US"><o:p>&nbsp;</o:p></span></p>
 <p class=3D"MsoNormal"><span lang=3D"EN-US">Signed-off-by: zhaolichang &lt;=
 zhaolichang@huawei.com&gt;<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">Reviewed-by: Alex Benn=E9e &lt;=
-alex.bennee@linaro.org&gt;<o:p></o:p></span></p>
 <p class=3D"MsoNormal"><span lang=3D"EN-US">---<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">util/osdep.c&nbsp;&nbsp;&nbsp;&=
-nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | 2 &#43;-<o:p></o:p>=
-</span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">util/qemu-progress.c&nbsp;&nbsp=
-;&nbsp;&nbsp; | 2 &#43;-<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">util/qemu-sockets.c&nbsp;&nbsp;=
-&nbsp;&nbsp;&nbsp; | 2 &#43;-<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">util/qemu-thread-win32.c | 2 &#=
-43;-<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">util/qht.c&nbsp;&nbsp;&nbsp;&nb=
-sp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | 2 &#43;-<=
-o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">util/trace-events&nbsp;&nbsp;&n=
-bsp;&nbsp;&nbsp;&nbsp;&nbsp; | 2 &#43;-<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">6 files changed, 6 insertions(&=
+<p class=3D"MsoNormal"><span lang=3D"EN-US">block/block-copy.c | 2 &#43;-<o=
+:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">block/linux-aio.c&nbsp; | 2 &#4=
+3;-<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">block/mirror.c&nbsp;&nbsp;&nbsp=
+;&nbsp; | 2 &#43;-<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">block/vhdx.c&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp; | 2 &#43;-<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">block/vhdx.h&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp; | 4 &#43;&#43;--<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">5 files changed, 6 insertions(&=
 #43;), 6 deletions(-)<o:p></o:p></span></p>
 <p class=3D"MsoNormal"><span lang=3D"EN-US"><o:p>&nbsp;</o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">diff --git a/util/osdep.c b/uti=
-l/osdep.c<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">index 4829c07ff6..e50dc2214e 10=
+<p class=3D"MsoNormal"><span lang=3D"EN-US">diff --git a/block/block-copy.c=
+ b/block/block-copy.c<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">index a30b9097ef..d648306ce5 10=
 0644<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">--- a/util/osdep.c<o:p></o:p></=
-span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">&#43;&#43;&#43; b/util/osdep.c<=
-o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">@@ -392,7 &#43;392,7 @@ int qem=
-u_unlink(const char *name)<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp; * Set errno if fewer tha=
-n `count' bytes are written.<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp; *<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp; * This function don't wo=
-rk with non-blocking fd's.<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">- * Any of the possibilities wi=
-th non-bloking fd's is bad:<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">&#43; * Any of the possibilitie=
-s with non-blocking fd's is bad:<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp; *&nbsp;&nbsp; - return a=
- short write (then name is wrong)<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp; *&nbsp;&nbsp; - busy wai=
-t adding (errno =3D=3D EAGAIN) to the loop<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp; */<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">diff --git a/util/qemu-progress=
-.c b/util/qemu-progress.c<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">index 3c2223c1a2..20d51f8c12 10=
-0644<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">--- a/util/qemu-progress.c<o:p>=
-</o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">&#43;&#43;&#43; b/util/qemu-pro=
-gress.c<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">@@ -131,7 &#43;131,7 @@ void qe=
-mu_progress_end(void)<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">/*<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp; * Report progress.<o:p><=
-/o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp; * @delta is how much pro=
-gress we made.<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">- * If @max is zero, @delta is =
-an absolut value of the total job done.<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">&#43; * If @max is zero, @delta=
- is an absolute value of the total job done.<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp; * Else, @delta is a prog=
-ress delta since the last call, as a fraction<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp; * of @max.&nbsp; I.e. th=
-e delta is @delta * @max / 100. This allows<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp; * relative accounting of=
- functions which may be a different fraction of<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">diff --git a/util/qemu-sockets.=
-c b/util/qemu-sockets.c<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">index b37d288866..99ce2fd5e6 10=
-0644<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">--- a/util/qemu-sockets.c<o:p><=
-/o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">&#43;&#43;&#43; b/util/qemu-soc=
-kets.c<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">@@ -416,7 &#43;416,7 @@ static =
-struct addrinfo *inet_parse_connect_saddr(InetSocketAddress *saddr,<o:p></o=
-:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US"><o:p>&nbsp;</o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp; /* At =
-least FreeBSD and OS-X 10.6 declare AI_V4MAPPED but<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; =
-* then don't implement it in their getaddrinfo(). Detect<o:p></o:p></span><=
-/p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">-&nbsp;&nbsp;&nbsp;&nbsp; * thi=
-s and retry without the flag since that's preferrable<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">&#43;&nbsp;&nbsp;&nbsp;&nbsp; *=
- this and retry without the flag since that's preferable<o:p></o:p></span><=
-/p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; =
-* to a fatal error<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; =
-*/<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp; if (rc=
- =3D=3D EAI_BADFLAGS &amp;&amp;<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">diff --git a/util/qemu-thread-w=
-in32.c b/util/qemu-thread-win32.c<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">index 56a83333da..d207b0cb58 10=
-0644<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">--- a/util/qemu-thread-win32.c<=
-o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">&#43;&#43;&#43; b/util/qemu-thr=
-ead-win32.c<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">@@ -289,7 &#43;289,7 @@ void qe=
-mu_event_wait(QemuEvent *ev)<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
-nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ResetEvent(ev-&gt;event);<o:p></o=
-:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US"><o:p>&nbsp;</o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
-nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /* Tell qemu_event_set that there=
- are waiters.&nbsp; No need to retry<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * because there cannot be a conc=
-urent busy-&gt;free transition.<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">&#43;&nbsp;&nbsp;&nbsp;&nbsp;&n=
-bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * because there cannot be a =
-concurrent busy-&gt;free transition.<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
-nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * After the CAS, the event =
-will be either set or busy.<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
-nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; */<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
-nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if (atomic_cmpxchg(&amp;ev-&gt;va=
-lue, EV_FREE, EV_BUSY) =3D=3D EV_SET) {<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">diff --git a/util/qht.c b/util/=
-qht.c<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">index 67e5d5b916..b2e020c398 10=
-0644<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">--- a/util/qht.c<o:p></o:p></sp=
-an></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">&#43;&#43;&#43; b/util/qht.c<o:=
-p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">@@ -49,7 &#43;49,7 @@<o:p></o:p=
-></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp; * it anymore.<o:p></o:p>=
-</span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp; *<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp; * Writers check for conc=
-urrent resizes by comparing ht-&gt;map before and after<o:p></o:p></span></=
+<p class=3D"MsoNormal"><span lang=3D"EN-US">--- a/block/block-copy.c<o:p></=
+o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&#43;&#43;&#43; b/block/block-c=
+opy.c<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">@@ -321,7 &#43;321,7 @@ static =
+coroutine_fn int block_copy_task_run(AioTaskPool *pool,<o:p></o:p></span></=
 p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">- * acquiring their bucket lock=
-. If they don't match, a resize has occured<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">&#43; * acquiring their bucket =
-lock. If they don't match, a resize has occurred<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp; * while the bucket spinl=
-ock was being acquired.<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp; * Do copy of cluster-ali=
+gned chunk. Requested region is allowed to exceed<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp; * s-&gt;len only to cove=
+r last cluster when s-&gt;len is not aligned to clusters.<o:p></o:p></span>=
+</p>
 <p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp; *<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp; * Related Work:<o:p></o:=
-p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">diff --git a/util/trace-events =
-b/util/trace-events<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">index 0ce42822eb..4bc01808af 10=
+<p class=3D"MsoNormal"><span lang=3D"EN-US">- * No sync here: nor bitmap ne=
+ighter intersecting requests handling, only copy.<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&#43; * No sync here: neither b=
+itmap nor intersecting requests handling, only copy.<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp; *<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp; * Returns 0 on success.<=
+o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp; */<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">diff --git a/block/linux-aio.c =
+b/block/linux-aio.c<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">index 3c0527c2bf..772ff860ea 10=
 0644<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">--- a/util/trace-events<o:p></o=
+<p class=3D"MsoNormal"><span lang=3D"EN-US">--- a/block/linux-aio.c<o:p></o=
 :p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">&#43;&#43;&#43; b/util/trace-ev=
-ents<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">@@ -28,7 &#43;28,7 @@ qemu_file=
-_monitor_add_watch(void *mon, const char *dirpath, const char *filename<o:p=
-></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">qemu_file_monitor_remove_watch(=
-void *mon, const char *dirpath, int64_t id) &quot;File monitor %p remove wa=
-tch dir=3D'%s' id=3D%&quot; PRId64<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">qemu_file_monitor_new(void *mon=
-, int fd) &quot;File monitor %p created fd=3D%d&quot;<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">qemu_file_monitor_enable_watch(=
-void *mon, const char *dirpath, int id) &quot;File monitor %p enable watch =
-dir=3D'%s' id=3D%u&quot;<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">-qemu_file_monitor_disable_watc=
-h(void *mon, const char *dirpath, int id) &quot;Fle monitor %p disable watc=
-h dir=3D'%s' id=3D%u&quot;<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">&#43;qemu_file_monitor_disable_=
-watch(void *mon, const char *dirpath, int id) &quot;File monitor %p disable=
- watch dir=3D'%s' id=3D%u&quot;<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">qemu_file_monitor_event(void *m=
-on, const char *dirpath, const char *filename, int mask, unsigned int id) &=
-quot;File monitor %p event dir=3D'%s' file=3D'%s' mask=3D0x%x id=3D%u&quot;=
-<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">qemu_file_monitor_dispatch(void=
- *mon, const char *dirpath, const char *filename, int ev, void *cb, void *o=
-paque, int64_t id) &quot;File monitor %p dispatch dir=3D'%s' file=3D'%s' ev=
-=3D%d cb=3D%p opaque=3D%p id=3D%&quot; PRId64<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&#43;&#43;&#43; b/block/linux-a=
+io.c<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">@@ -222,7 &#43;222,7 @@ static =
+void qemu_laio_process_completions(LinuxAioState *s)<o:p></o:p></span></p>
 <p class=3D"MsoNormal"><span lang=3D"EN-US"><o:p>&nbsp;</o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp; /* If =
+we are nested we have to notify the level above that we are done<o:p></o:p>=
+</span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; =
+* by setting event_max to zero, upper level will then jump out of it's<o:p>=
+</o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">-&nbsp;&nbsp;&nbsp;&nbsp; * own=
+ `for` loop.&nbsp; If we are the last all counters droped to zero. */<o:p><=
+/o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&#43;&nbsp;&nbsp;&nbsp;&nbsp; *=
+ own `for` loop.&nbsp; If we are the last all counters dropped to zero. */<=
+o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp; s-&gt;=
+event_max =3D 0;<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp; s-&gt;=
+event_idx =3D 0;<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">}<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">diff --git a/block/mirror.c b/b=
+lock/mirror.c<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">index e8e8844afc..22d574167e 10=
+0644<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">--- a/block/mirror.c<o:p></o:p>=
+</span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&#43;&#43;&#43; b/block/mirror.=
+c<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">@@ -478,7 &#43;478,7 @@ static =
+uint64_t coroutine_fn mirror_iteration(MirrorBlockJob *s)<o:p></o:p></span>=
+</p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US"><o:p>&nbsp;</o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp; job_pa=
+use_point(&amp;s-&gt;common.job);<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US"><o:p>&nbsp;</o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">-&nbsp;&nbsp;&nbsp; /* Find the=
+ number of consective dirty chunks following the first dirty<o:p></o:p></sp=
+an></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&#43;&nbsp;&nbsp;&nbsp; /* Find=
+ the number of consecutive dirty chunks following the first dirty<o:p></o:p=
+></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; =
+* one, and wait for in flight requests in them. */<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp; bdrv_d=
+irty_bitmap_lock(s-&gt;dirty_bitmap);<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp; while =
+(nb_chunks * s-&gt;granularity &lt; s-&gt;buf_size) {<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">diff --git a/block/vhdx.c b/blo=
+ck/vhdx.c<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">index 791eb90263..84eedee83f 10=
+0644<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">--- a/block/vhdx.c<o:p></o:p></=
+span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&#43;&#43;&#43; b/block/vhdx.c<=
+o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">@@ -1073,7 &#43;1073,7 @@ stati=
+c int vhdx_open(BlockDriverState *bs, QDict *options, int flags,<o:p></o:p>=
+</span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp; goto fail;<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp; }<o:p>=
+</o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US"><o:p>&nbsp;</o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">-&nbsp;&nbsp;&nbsp; /* endian c=
+onvert populated BAT field entires */<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&#43;&nbsp;&nbsp;&nbsp; /* endi=
+an convert populated BAT field entries */<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp; for (i=
+ =3D 0; i &lt; s-&gt;bat_entries; i&#43;&#43;) {<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp; s-&gt;bat[i] =3D le64_to_cpu(s-&gt;bat[i]);<o:p></o:p></s=
+pan></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp; }<o:p>=
+</o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">diff --git a/block/vhdx.h b/blo=
+ck/vhdx.h<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">index 0b74924cee..e385e484b4 10=
+0644<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">--- a/block/vhdx.h<o:p></o:p></=
+span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&#43;&#43;&#43; b/block/vhdx.h<=
+o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">@@ -212,7 &#43;212,7 @@ typedef=
+ struct QEMU_PACKED VHDXLogDataSector {<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp; &nbsp;&nbsp;&nbsp;uint32=
+_t&nbsp;&nbsp;&nbsp; sequence_high;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp; /* 4 MSB of 8 byte sequence_number */<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp; uint8_=
+t&nbsp;&nbsp;&nbsp;&nbsp; data[4084];&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /* raw data, bytes 8-4091 (inclusive).<o=
+:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p; see the data descriptor field for the<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
+;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ot=
+her mising bytes */<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&#43;&nbsp;&nbsp;&nbsp;&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
+;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
+; other missing bytes */<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp; uint32=
+_t&nbsp;&nbsp;&nbsp; sequence_low;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
+;&nbsp;&nbsp;&nbsp; /* 4 LSB of 8 byte sequence_number */<o:p></o:p></span>=
+</p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">} VHDXLogDataSector;<o:p></o:p>=
+</span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US"><o:p>&nbsp;</o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">@@ -257,7 &#43;257,7 @@ typedef=
+ struct QEMU_PACKED VHDXMetadataTableHeader {<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US"><o:p>&nbsp;</o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">#define VHDX_META_FLAGS_IS_USER=
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0x01&nbsp;&nbsp;&nbsp; /* =
+max 1024 entries */<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">#define VHDX_META_FLAGS_IS_VIRT=
+UAL_DISK 0x02&nbsp;&nbsp;&nbsp; /* virtual disk metadata if set,<o:p></o:p>=
+</span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
+sp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
+sp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; otherwise file metdata */<o:p=
+></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&#43;&nbsp;&nbsp;&nbsp;&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
+;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
+;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; otherwise file metadata *=
+/<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">#define VHDX_META_FLAGS_IS_REQU=
+IRED&nbsp;&nbsp;&nbsp;&nbsp; 0x04&nbsp;&nbsp;&nbsp; /* parse must understan=
+d this<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; entry to open the file *=
+/<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">typedef struct QEMU_PACKED VHDX=
+MetadataTableEntry {<o:p></o:p></span></p>
 <p class=3D"MsoNormal"><span lang=3D"EN-US">-- <o:p></o:p></span></p>
 <p class=3D"MsoNormal"><span lang=3D"EN-US">2.26.2.windows.1<o:p></o:p></sp=
 an></p>
@@ -464,5 +470,5 @@ an></p>
 </body>
 </html>
 
---_000_640CDEE67BE2784FAE298BB2517210E48AC3E1dggemi522mbschina_--
+--_000_640CDEE67BE2784FAE298BB2517210E48AC401dggemi522mbschina_--
 
