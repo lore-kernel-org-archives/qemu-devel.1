@@ -2,91 +2,99 @@ Return-Path: <SRS0=H0ck=CE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	FSL_HELO_FAKE,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCBD0C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 15:28:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB973C433E1
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 15:30:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8038D2075E
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 15:28:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 81A772075E
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 15:30:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i8AgZ6hI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8038D2075E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SHxSLj5U"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 81A772075E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39402 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41918 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAxLf-0005Kb-Oj
-	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 11:28:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34414)
+	id 1kAxNE-0006f9-OG
+	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 11:30:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34716)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
- id 1kAxKf-0003nV-Mv
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 11:27:25 -0400
-Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:38937)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
- id 1kAxKd-00065H-PJ
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 11:27:25 -0400
-Received: by mail-lj1-x243.google.com with SMTP id v9so2839877ljk.6
- for <qemu-devel@nongnu.org>; Wed, 26 Aug 2020 08:27:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=55zhA5pKlv0I6ZkhL0OcZoGb1tERNQd2kAKX/Br7Cgk=;
- b=i8AgZ6hIc14F3pI85JSmoVGViIoFq6Ms2cuu3RYiDMGIuzZvmyMBGbnjCEIm83oukr
- +MAyn6oyBfsKhUn8d8q8BRfKV93WgG0XR/NHvRjimjArcAjb6sZ3pFvEeuCjZlLQtu/0
- Oupe4+K4pODlYH5WXC1vgGVAJ4EZoXfx76oeE9q/I80GvW+9Uz8ES8wDlGfqex/KP61H
- S0P39LofE6JxutSVjolziYMQZe8S3yGwtwTl3GWuxCfJ3+qOrrEbIB27lXAsem09pSn7
- RAyEKCeqKFru7z/UQCeC4jIkzG7NwJCMmFRgp2Q50gRxR/XO925Fl5EBm4tPFNSExDl4
- Oc2g==
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kAxM0-0005tO-2f
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 11:28:48 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:40814
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kAxLy-0006D5-Kj
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 11:28:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1598455725;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=qv3x2T4bhkSmSkSgh4x5t8Cmxd7N0NQqOf4BLHJwBL8=;
+ b=SHxSLj5UpSM2v+wWqScMikZ9b36/GUwshLky18Ct2zxHDmZGCZFqOc3WaX+U6/3OUU2Vfz
+ 9x2KoQW2Y/gWHMmPJY/R3fSd2KY6sxLl4Y3tSCAys7TMLYX8Y+MIGrx45wNU+dsdNS8Tpt
+ ehn7yc7VficN9wEw7Vtpy9aerB/8kbc=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-462-18QPukacPUyDSrXwL-JKfw-1; Wed, 26 Aug 2020 11:28:43 -0400
+X-MC-Unique: 18QPukacPUyDSrXwL-JKfw-1
+Received: by mail-ej1-f72.google.com with SMTP id f13so1141180ejt.16
+ for <qemu-devel@nongnu.org>; Wed, 26 Aug 2020 08:28:42 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=55zhA5pKlv0I6ZkhL0OcZoGb1tERNQd2kAKX/Br7Cgk=;
- b=R+infusn+HfJoqXdbsJncnseXyFn9SEFpioameJcslxzudMk43OeOKXkx1j30ld3Z2
- wxa9C/X+QbbsEZxwZz68cyBl6RnDO+kUB/yOdWWtvctjIoqnlgS+1l+YG4AtMohdNpsp
- 4l7C7YNrzTC9EOv+/jHqaINYBArBv8gvhzHzgfV8A/L8ehozM8vWbk/w3h9K5NOS8hOl
- zS1TVXVWQjBfLGuulVT9gPqLDTuaJzylKZrRoA4RDDSG3cZMtRGup0YG/JPQyWULNp7M
- 44fOwu9cJ+s5nkOwNoSk1cm1SZt96LpfKjcmRL6phx/D9B8Gu+PSwOBaqhiyDWz8snDW
- rCpg==
-X-Gm-Message-State: AOAM532fMebWa6sz5bw/UhyuunbtCvC62PXCcGIOWOwGHC6WlPiVt3kb
- TFgA+wtZgn2BB7TudikszqA=
-X-Google-Smtp-Source: ABdhPJyN+9WgJAyp94FbY2IepkTh3YoYpJtRGwUpX4dL1Vv9sX6ARxtPFkQqPyZvprDzT9bIDVmFHw==
-X-Received: by 2002:a2e:9cd3:: with SMTP id g19mr7597196ljj.229.1598455641594; 
- Wed, 26 Aug 2020 08:27:21 -0700 (PDT)
-Received: from gmail.com (81-231-232-130-no39.tbcn.telia.com. [81.231.232.130])
- by smtp.gmail.com with ESMTPSA id a4sm645794lfr.2.2020.08.26.08.27.20
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 26 Aug 2020 08:27:20 -0700 (PDT)
-Date: Wed, 26 Aug 2020 17:27:20 +0200
-From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-To: Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH 00/77] target/microblaze improvements
-Message-ID: <20200826152720.GE2954729@toto>
-References: <20200825205950.730499-1-richard.henderson@linaro.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=qv3x2T4bhkSmSkSgh4x5t8Cmxd7N0NQqOf4BLHJwBL8=;
+ b=hFTEhBDz9nmy0VHxxE9eHG99RJSY1DHavhnLz61qPDXA0+7Kk/qflYsQUqYZQQGlrF
+ r/s5zIMct9OLwWw9TQAyzwRqbvNb3uIjpJ/wMG//mPstxU1IxaW/Y1T/XCrPr4/6m5aG
+ 1yoMRCwDAXoU6CuO6UDeRiBfAjE9CaA4Yfsz3TxxjYRPy9f6lHDJ/CmgsYST7iIBDFG8
+ iVnhyzfE9AsRu8AUWJrx0zISxu0WqrlbrkixOfTFWXRGkAp8mdfnIeF5Fubb74uaiiws
+ mMb7FQOdj9/LtDAT5YlyQPz1ivXYN4m0EakzEFbGT0UAKiukMfx2hrPNR3iS0XUv1CqZ
+ JC7g==
+X-Gm-Message-State: AOAM532zLUKFljkDbl+yjRn2yKn9UW0xzXeB78UFG30Ley6NvyXBInRc
+ a4fSszCQxSdbIwRuTOtaZKH3pBwukzGkHXIQgPaBCRF2O9t0ohptqdTscbEc0cBD49z4RSBE0bw
+ ihZbxsAf3uXBPE8CBfI/rwSww2x3EYlo=
+X-Received: by 2002:a17:907:693:: with SMTP id
+ wn19mr7018564ejb.121.1598455721755; 
+ Wed, 26 Aug 2020 08:28:41 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxgQZD7WliIrlx0zzrBEJPQSnROtQ2PwALR8mQjCTtNNbnPqlop60xph4Y1s6oxeSojPLKqnN/pdZ0cbv4TbA8=
+X-Received: by 2002:a17:907:693:: with SMTP id
+ wn19mr7018547ejb.121.1598455721546; 
+ Wed, 26 Aug 2020 08:28:41 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200825205950.730499-1-richard.henderson@linaro.org>
-Received-SPF: pass client-ip=2a00:1450:4864:20::243;
- envelope-from=edgar.iglesias@gmail.com; helo=mail-lj1-x243.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 10
-X-Spam_score: 1.0
-X-Spam_bar: +
-X-Spam_report: (1.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- FSL_HELO_FAKE=3.066, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+References: <20200826151006.80-1-luoyonggang@gmail.com>
+In-Reply-To: <20200826151006.80-1-luoyonggang@gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Wed, 26 Aug 2020 17:28:30 +0200
+Message-ID: <CABgObfYdjLouNp8ZvqHmB-xsOJdUgxv3zJL4A1GKuWggh7fnbA@mail.gmail.com>
+Subject: Re: [PATCH v5 1/6] meson: Fixes the ninjatool issue that E$$: are
+ generated in Makefile.ninja
+To: luoyonggang@gmail.com
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/26 01:10:45
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.959,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,163 +107,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Daniel_P_=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Aug 25, 2020 at 01:58:33PM -0700, Richard Henderson wrote:
-> Well, this is larger than I expected.
-> 
+On Wed, Aug 26, 2020 at 5:12 PM <luoyonggang@gmail.com> wrote:
+>
+> From: Yonggang Luo <luoyonggang@gmail.com>
+>
+> SIMPLE_PATH_RE should match the full path token.
+> Or the $ and : contained in path would not matched if the path are start with C:/ and E:/
 
-Wow, thanks for working on this Richard!
-
-I'll run some tests on it and go through the patches.
+I don't understand this, SIMPLE_PATH_RE is used with re.match which
+only matches at the beginning of the string. Can you send me your
+build.ninja file offlist?
 
 Thanks,
-Edgar
 
+Paolo
 
-> I started off thinking conversion to decodetree would be quick,
-> after I reviewed the mttcg patches last week.  Then I realized
-> that this could also use conversion to the generic translation loop.
-> Then I realized that there were a number of bugs, and some
-> inefficiencies, that could be fixed by using tcg exception unwind
-> properly.
-> 
-> Hopefully most of these are small and easy to understand.
-> 
-> I begin by adding enough stuff to test/tcg to make use of a
-> self-built musl cross-environment.  I'll note that linuxtest
-> does not pass before or after this patch set -- I think that
-> linux-user/microblaze/signal.c needs work -- but that the
-> other tests do work.
-> 
-> I also have an old copy of a microblaze system test image,
-> which I think used to be hosted on our wiki.  After basic kernel
-> boot, it contains a "selftest" script which runs a bunch of
-> user-land isa tests.  That still works fine too.
-> 
-> HOWEVER: That's not nearly complete.  There are cpu config options
-> that aren't default and I don't know how to change or test.
-> 
-> In addition, the manual is really not clear on what's supposed to
-> happen under various edge conditions, especially with MSR[EE] unset.
-> E.g. unaligned access: Does the insn get nop-ed out?  Do the low
-> bits of the address get ignored?  Right now (before and after) the
-> access simply happens unaligned, which doesn't seem correct.
-> I assume the reason for having this configure option is to reduce
-> the size of the FPGA so that the unaligned access handling hw
-> simply isn't present.
-> 
-> Lemme know what you think.
-> 
-> 
-> r~
-> 
-> 
-> Richard Henderson (77):
->   tests/tcg: Add microblaze to arches filter
->   tests/tcg: Do not require FE_TOWARDZERO
->   tests/tcg: Do not require FE_* exception bits
->   target/microblaze: Tidy gdbstub
->   target/microblaze: Split out PC from env->sregs
->   target/microblaze: Split out MSR from env->sregs
->   target/microblaze: Split out EAR from env->sregs
->   target/microblaze: Split out ESR from env->sregs
->   target/microblaze: Split out FSR from env->sregs
->   target/microblaze: Split out BTR from env->sregs
->   target/microblaze: Split out EDR from env->sregs
->   target/microblaze: Split the cpu_SR array
->   target/microblaze: Fix width of PC and BTARGET
->   target/microblaze: Fix width of MSR
->   target/microblaze: Fix width of ESR
->   target/microblaze: Fix width of FSR
->   target/microblaze: Fix width of BTR
->   target/microblaze: Fix width of EDR
->   target/microblaze: Remove cpu_ear
->   target/microblaze: Tidy raising of exceptions
->   target/microblaze: Mark raise_exception as noreturn
->   target/microblaze: Remove helper_debug and env->debug
->   target/microblaze: Rename env_* tcg variables to cpu_*
->   target/microblaze: Tidy mb_tcg_init
->   target/microblaze: Split out MSR[C] to its own variable
->   target/microblaze: Use DISAS_NORETURN
->   target/microblaze: Check singlestep_enabled in gen_goto_tb
->   target/microblaze: Convert to DisasContextBase
->   target/microblaze: Convert to translator_loop
->   target/microblaze: Remove SIM_COMPAT
->   target/microblaze: Remove DISAS_GNU
->   target/microblaze: Remove empty D macros
->   target/microblaze: Remove LOG_DIS
->   target/microblaze: Ensure imm constant is always available
->   target/microblaze: Add decodetree infrastructure
->   target/microblaze: Convert dec_add to decodetree
->   target/microblaze: Convert dec_sub to decodetree
->   target/microblaze: Implement cmp and cmpu inline
->   target/microblaze: Convert dec_pattern to decodetree
->   target/microblaze: Convert dec_and, dec_or, dec_xor to decodetree
->   target/microblaze: Convert dec_mul to decodetree
->   target/microblaze: Convert dec_div to decodetree
->   target/microblaze: Unwind properly when raising divide-by-zero
->   target/microblaze: Convert dec_bit to decodetree
->   target/microblaze: Convert dec_barrel to decodetree
->   target/microblaze: Convert dec_imm to decodetree
->   target/microblaze: Convert dec_fpu to decodetree
->   target/microblaze: Fix cpu unwind for fpu exceptions
->   target/microblaze: Mark fpu helpers TCG_CALL_NO_WG
->   target/microblaze: Replace MSR_EE_FLAG with MSR_EE
->   target/microblaze: Cache mem_index in DisasContext
->   target/microblaze: Fix cpu unwind for stackprot
->   target/microblaze: Convert dec_load and dec_store to decodetree
->   target/microblaze: Assert no overlap in flags making up tb_flags
->   target/microblaze: Move bimm to BIMM_FLAG
->   target/microblaze: Store "current" iflags in insn_start
->   tcg: Add tcg_get_insn_start_param
->   target/microblaze: Use cc->do_unaligned_access
->   target/microblaze: Replace clear_imm with tb_flags_to_set
->   target/microblaze: Replace delayed_branch with tb_flags_to_set
->   target/microblaze: Tidy mb_cpu_dump_state
->   target/microblaze: Try to keep imm and delay slot together
->   target/microblaze: Convert brk and brki to decodetree
->   target/microblaze: Convert mbar to decodetree
->   target/microblaze: Reorganize branching
->   target/microblaze: Use tcg_gen_lookup_and_goto_ptr
->   target/microblaze: Convert dec_br to decodetree
->   target/microblaze: Convert dec_bcc to decodetree
->   target/microblaze: Convert dec_rts to decodetree
->   target/microblaze: Tidy do_rti, do_rtb, do_rte
->   target/microblaze: Convert msrclr, msrset to decodetree
->   target/microblaze: Convert dec_msr to decodetree
->   target/microblaze: Convert dec_stream to decodetree
->   target/microblaze: Remove last of old decoder
->   target/microblaze: Remove cpu_R[0]
->   target/microblaze: Add flags markup to some helpers
->   target/microblaze: Reduce linux-user address space to 32-bit
-> 
->  include/tcg/tcg.h                   |   15 +
->  target/microblaze/cpu-param.h       |   15 +
->  target/microblaze/cpu.h             |   67 +-
->  target/microblaze/helper.h          |   49 +-
->  tests/tcg/multiarch/float_helpers.h |   17 +
->  target/microblaze/insns.decode      |  253 +++
->  linux-user/elfload.c                |    9 +-
->  linux-user/microblaze/cpu_loop.c    |   26 +-
->  linux-user/microblaze/signal.c      |    8 +-
->  target/microblaze/cpu.c             |    9 +-
->  target/microblaze/gdbstub.c         |  193 +-
->  target/microblaze/helper.c          |  164 +-
->  target/microblaze/mmu.c             |    4 +-
->  target/microblaze/op_helper.c       |  175 +-
->  target/microblaze/translate.c       | 3250 ++++++++++++++-------------
->  tests/tcg/multiarch/float_convs.c   |    2 +
->  tests/tcg/multiarch/float_madds.c   |    2 +
->  target/microblaze/meson.build       |    3 +
->  tests/tcg/configure.sh              |    2 +-
->  19 files changed, 2309 insertions(+), 1954 deletions(-)
->  create mode 100644 target/microblaze/insns.decode
-> 
-> -- 
-> 2.25.1
-> 
 
