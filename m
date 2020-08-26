@@ -2,94 +2,99 @@ Return-Path: <SRS0=H0ck=CE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 861F0C433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 21:24:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E906C433E1
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 21:27:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3D3AC20737
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 21:24:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1520C20737
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 21:27:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="lD+Obou9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D3AC20737
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gmx.de
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ca5bfPY4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1520C20737
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37222 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43364 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kB2tm-0005dC-8d
-	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 17:24:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35320)
+	id 1kB2xF-0008OS-BO
+	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 17:27:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35844)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <deller@gmx.de>) id 1kB2k9-0008R4-V1
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 17:14:05 -0400
-Received: from mout.gmx.net ([212.227.17.21]:48933)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <deller@gmx.de>) id 1kB2k4-0002Vh-D2
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 17:14:05 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
- s=badeba3b8450; t=1598476430;
- bh=yi/ZvGbDbrIWKgg46+4OlOrFcTrRqKN6hBd0HkJl3lk=;
- h=X-UI-Sender-Class:From:To:Cc:Subject:Date:In-Reply-To:References;
- b=lD+Obou9dgM78uYPyFhvtU20D3F910URQ1hRk/Pk00EN1zxSJaZZv1zv/pm9Lc8Od
- JxXDFWOcLK/GxAqVj7G7vPSl+PJrxk/NeTR1/CbyrH9s/VQI7su8P1tivbnNJ25saj
- tTK/l+HYGmMxdSe+k7uFjNBBG2NH+0hc3ICqp/pY=
-X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
-Received: from ls3530.fritz.box ([92.116.186.77]) by mail.gmx.com (mrgmx105
- [212.227.17.168]) with ESMTPSA (Nemesis) id 1Mirng-1knOEU1qJo-00etNX; Wed, 26
- Aug 2020 23:13:50 +0200
-From: Helge Deller <deller@gmx.de>
-To: peter.maydell@linaro.org,
-	qemu-devel@nongnu.org
-Subject: [PULL v5 06/12] hw/display/artist: Check offset in draw_line to avoid
- buffer over-run
-Date: Wed, 26 Aug 2020 23:13:39 +0200
-Message-Id: <20200826211345.14295-7-deller@gmx.de>
-X-Mailer: git-send-email 2.21.3
-In-Reply-To: <20200826211345.14295-1-deller@gmx.de>
-References: <20200826211345.14295-1-deller@gmx.de>
+ (Exim 4.90_1) (envelope-from <danielhb413@gmail.com>)
+ id 1kB2nZ-0001tJ-Ad; Wed, 26 Aug 2020 17:17:37 -0400
+Received: from mail-qk1-x742.google.com ([2607:f8b0:4864:20::742]:37121)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <danielhb413@gmail.com>)
+ id 1kB2nX-0002yW-BN; Wed, 26 Aug 2020 17:17:37 -0400
+Received: by mail-qk1-x742.google.com with SMTP id b14so3805081qkn.4;
+ Wed, 26 Aug 2020 14:17:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=RUSLX6L8biv4VKymPT/6xwTGpdMdk3HPdf9fCj/Ml8o=;
+ b=ca5bfPY4/3rIZsSlMOlAMyKHu4thraKskekFnc74y/dQ+L/6GvE7//VbKy0DqPyBFW
+ yvy2hTRtZ4C960hPqY0V/yKfN2GLaQDXn8gNcItbjTXMo3rbDzt5H0ExUC8ndhvP9h8i
+ nUmU2dCHT81MJ0kN6uejllMz9dsD03IIXZ8IWTUaj+kDjwUQn4052FhrThrfmq+vnJ+t
+ EaH+V+F0N+C9kq7O746GDhuBeFmIxmuotJHq05A+O3GgbKYCvmgWLtf1b9S3AO/sT+F1
+ 5dt4qfmTdlrQoiSCVgwi6OM7AoqO428JKrBUQW0EoArkiPjKPrcrl1m1QvbtbxcLPKR3
+ XZTQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=RUSLX6L8biv4VKymPT/6xwTGpdMdk3HPdf9fCj/Ml8o=;
+ b=XMTTKXSCSQ5b9/kG/6oXZkGynvqcpwWt855PzBbpi+ZTknl1mDp/UzxO3PEZRxMFt7
+ PkXiwUMVc4CH2Qrvuk7ovEuWqQr6/DaQfaagzNaylImslaPE36IGIGsDNbeD1Q+lqlCx
+ SSr9YD4Us8En1ZLsXJgramDR0MYxUAuSmYibBexF7RSMYNO0VT6F/zuhKsIjaiXvsGVB
+ xReLQFyz4DLt/5utGvY/vtQ/glYnHyKtpb+iE6Ig2FK44P4njiCaM7eyvfZjmdstD/O6
+ kv9wbYCS2mZcfcR5UbKvB0eue6q9bNYn83AD6hGVeJ1bXYPzQlHxJC5bG7k03kb4TlZn
+ mi5Q==
+X-Gm-Message-State: AOAM532QptmVmspvzi2VJeC8g0Mh4yfw5ganUQ2g4LnAugxcjOLwDpHz
+ cjZ2m/P+CTaHTtfhrww9SzdIc4RmhF0=
+X-Google-Smtp-Source: ABdhPJwCVlnMoVL5W/BEb6LHmcn6SsRMT9BWELAfXK3TwXZfw1JRjJymcS0DVwknxvmgZcXkmoQzPA==
+X-Received: by 2002:ae9:df85:: with SMTP id
+ t127mr16548013qkf.265.1598476652637; 
+ Wed, 26 Aug 2020 14:17:32 -0700 (PDT)
+Received: from ?IPv6:2804:431:c7c7:c152:8180:e1dd:d6ac:1152?
+ ([2804:431:c7c7:c152:8180:e1dd:d6ac:1152])
+ by smtp.gmail.com with ESMTPSA id s5sm217142qks.16.2020.08.26.14.17.31
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 26 Aug 2020 14:17:31 -0700 (PDT)
+Subject: Re: [PATCH 05/10] spapr: make ibm,max-associativity-domains scale
+ with user input
+To: David Gibson <david@gibson.dropbear.id.au>
+References: <20200814205424.543857-1-danielhb413@gmail.com>
+ <20200814205424.543857-6-danielhb413@gmail.com>
+ <20200820025543.GL271315@yekko.fritz.box>
+From: Daniel Henrique Barboza <danielhb413@gmail.com>
+Message-ID: <e057d212-e3bc-a21b-d3d4-86995b6b568e@gmail.com>
+Date: Wed, 26 Aug 2020 18:17:29 -0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:3BX/k/m9DiLy0krgzyvVx+tmnvMqKnTXB2++vxhDWiWURsNv/Dx
- xM07gXS3cw5rTmZK6uEJ6uRIIslANWdA6rI4bgGDdmpLxSpAvNcfdLMyUd075pgORDoE7xa
- /fUMqeFYoh9V3j7oSqNw7S9MHmaUElCFk2Idc8hcOs3Y7FwKNaJrrNkMb7wjl62wYu4uwgW
- buAwM5YIihpaU9dXGqSgA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:jjLw4FqLnV4=:NPo750Jp+QkRIZ9Geo8+WA
- nIY4pv10QSy0NyEDLl9aOPU7vTxYTJPJZmFktWEMuEKUE8BTup+/ZLfr9PCVQK8qdjjcOhJSi
- 9MpL2x1bAc4KktbyxLUND4UvbC42/HsuDe4vELYnZrKUSvbR7q+ObN+/HXvjryauVOEYKgy1e
- NvkfjvdYmIhwu87c4whUme4+zNn138IbR4/JNokjJfaPgyXdtlEejuXCtlZkTPkUKYtBhR96n
- 7K/rw/zvw8VFGmSfDlxLECUgGUeHyUE72wAB67YhaMibkmmgO24l7owlSa9w/PfVg3fykPfoG
- lZWde1XB/FtKm6cDmMgFLwnG1w5Lrg3Fba2nzdReTLORN7ETxifWRF3HdZG5osv0QNDyLeEk5
- 18IswpQsGeS3pVLVuZhbeL/M+4ngYi18hGaqLhAZBKyHKEpcmCWhNZx3kTOeTHr/2L3R67Yyv
- o9RPoiAq/59d+M4T1sKlL25CDXikmZc56mr2RVsl6dhnJJDm2yRWaR/7ruROhopV3cQbxTvAq
- xm3M3x7sgvFQ1Hxf0MQxAIM84BlNjSPDlVSWsTnb8efX5AqYal2W/YcQp+RfDrW3CW1w7lPd8
- m6xDFEDwC3Zb/lXqXRWLf3PIl50uTeFIo1Wg6AThKoyzoLtS+Df+2NvnvafSTEyZI/xwHkQhI
- kVqUf/m+zk3gFgnlu1o7TiRhkbOdU86OiQdGID0/rdzBrzXB+ujurvgvBK3hUybTd6Sg7Phul
- OZvT2rlQ4qv9GldZwNg+idmVf/jDGmapAi/Xt2OmrU80Ksc0Z33Z0ACVo53kS7osooxqDKXSS
- 0Y215+x1d0R2m4d76aAqMya8c31OHQarIzigsD60H0ojwHl/1F5RcTr9CtEtzThkt+SftktAN
- n8pcNgifElUaR3Kk7ceL4NefTIB25vtlQUmKtR3uDqdJ/h5cPMvLdVR9ylmSkdPriu5NTUlIB
- 7eNXXs2HwMwzWsjiEP/vjwP/F+/l/wASdWTD5tUSGDS+H40XMrvJjWFTlbLe+r4t1X20qqZpC
- FCwMTQFADYkj5rpRoWxY2qUylHdS56a10pUdsR+MelajtXg6Vx6+QvOy02ptaY+RpPPqOLm+U
- E2bhFiwxDGRtWYqa5PhU4lvhVOf1MbBpIHafvrueMyv/u2eRTeM4VaFtCDGPJaiQSq2QU6aX1
- jibCVfhNFWs3z0JpLkzAu1FDIsOxDde+kip1NPDcLy+Zw+InDzGY7Ngc0itgAx46q6PQ8H6EN
- +coMq5Bd6ec9p25VD
-Received-SPF: pass client-ip=212.227.17.21; envelope-from=deller@gmx.de;
- helo=mout.gmx.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/26 17:13:54
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -25
-X-Spam_score: -2.6
-X-Spam_bar: --
-X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, FREEMAIL_FROM=0.001, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+In-Reply-To: <20200820025543.GL271315@yekko.fritz.box>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::742;
+ envelope-from=danielhb413@gmail.com; helo=mail-qk1-x742.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001, NICE_REPLY_A=-2.239,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -103,78 +108,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Helge Deller <deller@gmx.de>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Richard Henderson <rth@twiddle.net>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-Invalid I/O writes can craft an offset out of the vram_buffer range.
 
-We avoid:
+On 8/19/20 11:55 PM, David Gibson wrote:
+> On Fri, Aug 14, 2020 at 05:54:19PM -0300, Daniel Henrique Barboza wrote:
+>> The ibm,max-associativity-domains is considering that only a single
+>> associativity domain can exist in the same NUMA level. This is true
+>> today because we do not support any type of NUMA distance user
+>> customization, and all nodes are in the same distance to each other.
+>>
+>> To enhance NUMA distance support in the pSeries machine we need to
+>> make this limit flexible. This patch rewrites the max-associativity
+>> logic to consider that multiple associativity domains can co-exist
+>> in the same NUMA level. We're using the legacy_numa() helper to
+>> avoid leaking unneeded guest changes.
+> 
+> 
+> Hrm.  I find the above a bit hard to understand.  Having the limit be
+> one less than the number of nodes at every level except the last seems
+> kind of odd to me.
 
-  Program terminated with signal SIGSEGV, Segmentation fault.
-  284             *dst &=3D ~plane_mask;
-  (gdb) bt
-  #0  0x000055d5dccdc5c0 in artist_rop8 (s=3D0x55d5defee510, dst=3D0x7f8e8=
-4ed8216 <error: Cannot access memory at address 0x7f8e84ed8216>, val=3D0 '=
-\000') at hw/display/artist.c:284
-  #1  0x000055d5dccdcf83 in fill_window (s=3D0x55d5defee510, startx=3D22, =
-starty=3D5674, width=3D65, height=3D5697) at hw/display/artist.c:551
-  #2  0x000055d5dccddfb9 in artist_reg_write (opaque=3D0x55d5defee510, add=
-r=3D1051140, val=3D4265537, size=3D4) at hw/display/artist.c:902
-  #3  0x000055d5dcb42a7c in memory_region_write_accessor (mr=3D0x55d5defee=
-a10, addr=3D1051140, value=3D0x7ffe57db08c8, size=3D4, shift=3D0, mask=3D4=
-294967295, attrs=3D...) at memory.c:483
+I took a bit to reply on this because I was reconsidering this logic.
 
-Reported-by: LLVM libFuzzer
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Signed-off-by: Helge Deller <deller@gmx.de>
-=2D--
- hw/display/artist.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+I tried to "not be greedy" with this maximum number and ended up doing
+something that breaks in a simple scenario. Today, in a single conf with
+a single NUMA node with a single CPU, and say 2 GPUs, given that all GPUs
+are in their own associativity domains, we would have something like:
 
-diff --git a/hw/display/artist.c b/hw/display/artist.c
-index de56200dbf..a206afe641 100644
-=2D-- a/hw/display/artist.c
-+++ b/hw/display/artist.c
-@@ -555,7 +555,7 @@ static void fill_window(ARTISTState *s, int startx, in=
-t starty,
- static void draw_line(ARTISTState *s, int x1, int y1, int x2, int y2,
-                       bool update_start, int skip_pix, int max_pix)
- {
--    struct vram_buffer *buf;
-+    struct vram_buffer *buf =3D &s->vram_buffer[ARTIST_BUFFER_AP];
-     uint8_t color;
-     int dx, dy, t, e, x, y, incy, diago, horiz;
-     bool c1;
-@@ -563,6 +563,12 @@ static void draw_line(ARTISTState *s, int x1, int y1,=
- int x2, int y2,
+cpu0: 0 0 0 0 0 0
+gpu1: gpu_1 gpu_1 gpu_1 gpu_1
+gpu2: gpu_2 gpu_2 gpu_2 gpu_2
 
-     trace_artist_draw_line(x1, y1, x2, y2);
+This would already break apart what I did there. I think we should simplify
+and just set maxdomains to be all nodes in all levels, like we do today
+but using spapr->gpu_numa_id as an alias to maxnodes.
 
-+    if (x1 * y1 >=3D buf->size || x2 * y2 >=3D buf->size) {
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "draw_line (%d,%d) (%d,%d)\n", x1, y1, x2, y2);
-+        return;
-+    }
-+
-     if (update_start) {
-         s->vram_start =3D (x2 << 16) | y2;
-     }
-@@ -620,7 +626,6 @@ static void draw_line(ARTISTState *s, int x1, int y1, =
-int x2, int y2,
-     x =3D x1;
-     y =3D y1;
-     color =3D artist_get_color(s);
--    buf =3D &s->vram_buffer[ARTIST_BUFFER_AP];
 
-     do {
-         if (c1) {
-=2D-
-2.21.3
+Thanks,
 
+DHB
+
+> 
+>> Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
+>> ---
+>>   hw/ppc/spapr.c | 18 ++++++++++++++++--
+>>   1 file changed, 16 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+>> index 073a59c47d..b0c4b80a23 100644
+>> --- a/hw/ppc/spapr.c
+>> +++ b/hw/ppc/spapr.c
+>> @@ -919,13 +919,20 @@ static void spapr_dt_rtas(SpaprMachineState *spapr, void *fdt)
+>>           cpu_to_be32(SPAPR_MEMORY_BLOCK_SIZE & 0xffffffff),
+>>           cpu_to_be32(ms->smp.max_cpus / ms->smp.threads),
+>>       };
+>> -    uint32_t maxdomain = cpu_to_be32(spapr->extra_numa_nodes > 1 ? 1 : 0);
+>> +
+>> +    /* The maximum domains for a given NUMA level, supposing that every
+>> +     * additional NUMA node belongs to the same domain (aside from the
+>> +     * 4th level, where we must support all available NUMA domains), is
+>> +     * total number of domains - 1. */
+>> +    uint32_t total_nodes_number = ms->numa_state->num_nodes +
+>> +                                  spapr->extra_numa_nodes;
+>> +    uint32_t maxdomain = cpu_to_be32(total_nodes_number - 1);
+>>       uint32_t maxdomains[] = {
+>>           cpu_to_be32(4),
+>>           maxdomain,
+>>           maxdomain,
+>>           maxdomain,
+>> -        cpu_to_be32(ms->numa_state->num_nodes + spapr->extra_numa_nodes),
+>> +        cpu_to_be32(total_nodes_number),
+>>       };
+>>   
+>>       _FDT(rtas = fdt_add_subnode(fdt, 0, "rtas"));
+>> @@ -962,6 +969,13 @@ static void spapr_dt_rtas(SpaprMachineState *spapr, void *fdt)
+>>                        qemu_hypertas->str, qemu_hypertas->len));
+>>       g_string_free(qemu_hypertas, TRUE);
+>>   
+>> +    if (spapr_machine_using_legacy_numa(spapr)) {
+>> +        maxdomain = cpu_to_be32(spapr->extra_numa_nodes > 1 ? 1 : 0);
+>> +        maxdomains[1] = maxdomain;
+>> +        maxdomains[2] = maxdomain;
+>> +        maxdomains[3] = maxdomain;
+>> +    }
+>> +
+>>       if (smc->pre_5_1_assoc_refpoints) {
+>>           nr_refpoints = 2;
+>>       }
+> 
 
