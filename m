@@ -2,81 +2,87 @@ Return-Path: <SRS0=H0ck=CE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A994C433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 12:36:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E45B5C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 12:38:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 234DF2076C
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 12:36:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A51972076C
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 12:38:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YI2Lkxvr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 234DF2076C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CqY6MOdq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A51972076C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50606 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53310 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAuep-00087w-FH
-	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 08:36:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41270)
+	id 1kAuhE-0000uu-Tc
+	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 08:38:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41970)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kAue0-0007Tr-MY
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 08:35:12 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59860)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kAugE-0000HQ-OJ
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 08:37:30 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:44799)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kAudx-0006Ly-MW
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 08:35:12 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kAugC-0006kK-VA
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 08:37:30 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598445308;
+ s=mimecast20190719; t=1598445447;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=U2Gsd+TtvH4aV0D4/AMdqMEuAsE0kgh6s92mL6WNz+U=;
- b=YI2LkxvrHxA/x0NW5us6GnmsdTF1lwZVFrCCjUb/KfO255ZM91cZ+aKNKOJMg45dM9NVZS
- gn5pgzjkEDPX00Gd5mOfKkB/uVfdPC20f6mTVLPQbdagvd0LWQiXxIBhArkd3AX2pK8sOP
- DB+1+1PRg9bSKVpASulUeb+jnGA4ZNo=
+ bh=INCJSKbEURRAD7KgW/GKvENm5IQMlVSL+Cr47vo44Po=;
+ b=CqY6MOdqx1lBPevyZ9pSiDOvLWhkioPIa7zNHElyyNhnQsnYC4DEo0/p3H3RVyuui2G7Du
+ RGuY2oT0U7vgx0zwO2VB5PAbMjDvXvJHqV1EWQPST1xwVPuwnlQqhs+BqDnhNqlCjHxVqt
+ dOQ3NzMk7Etfdo2bnPDqizD4/Na2eMA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-315-JxhoinXhMOitwNev0Mbqiw-1; Wed, 26 Aug 2020 08:35:07 -0400
-X-MC-Unique: JxhoinXhMOitwNev0Mbqiw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-218-OFaF0X-TN8eslkhBlsu8Ug-1; Wed, 26 Aug 2020 08:37:26 -0400
+X-MC-Unique: OFaF0X-TN8eslkhBlsu8Ug-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C229180EF8B;
- Wed, 26 Aug 2020 12:35:05 +0000 (UTC)
-Received: from work-vm (ovpn-114-48.ams2.redhat.com [10.36.114.48])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9D1EF1992F;
- Wed, 26 Aug 2020 12:35:03 +0000 (UTC)
-Date: Wed, 26 Aug 2020 13:35:01 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Chuan Zheng <zhengchuan@huawei.com>
-Subject: Re: [PATCH v5 06/12] migration/dirtyrate: Record hash results for
- each sampled page
-Message-ID: <20200826123501.GG2726@work-vm>
-References: <1598319650-36762-1-git-send-email-zhengchuan@huawei.com>
- <1598319650-36762-7-git-send-email-zhengchuan@huawei.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2630D189E60C;
+ Wed, 26 Aug 2020 12:37:25 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-74.ams2.redhat.com
+ [10.36.112.74])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E66CD77DC2;
+ Wed, 26 Aug 2020 12:37:23 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 694F0112D737; Wed, 26 Aug 2020 14:37:22 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Subject: Re: [PATCH] Simple & stupid coroutine-aware monitor_cur()
+References: <20200528153742.274164-1-kwolf@redhat.com>
+ <20200528153742.274164-7-kwolf@redhat.com>
+ <87tuxia5a9.fsf@dusky.pond.sub.org>
+ <20200804160604.GB4860@linux.fritz.box>
+ <87sgd15z5w.fsf@dusky.pond.sub.org>
+ <87a6z6wqkg.fsf_-_@dusky.pond.sub.org>
+ <87sgcyziul.fsf_-_@dusky.pond.sub.org>
+ <20200810121914.GC14538@linux.fritz.box>
+Date: Wed, 26 Aug 2020 14:37:22 +0200
+In-Reply-To: <20200810121914.GC14538@linux.fritz.box> (Kevin Wolf's message of
+ "Mon, 10 Aug 2020 14:19:14 +0200")
+Message-ID: <87tuwp4m7x.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.3 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <1598319650-36762-7-git-send-email-zhengchuan@huawei.com>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
 X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=dgilbert@redhat.com;
+Content-Type: text/plain
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=armbru@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/25 23:30:47
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/26 06:53:10
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -97,221 +103,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: berrange@redhat.com, zhang.zhanghailiang@huawei.com, quintela@redhat.com,
- qemu-devel@nongnu.org, xiexiangyou@huawei.com, alex.chen@huawei.com,
- ann.zhuangyanying@huawei.com, fangying1@huawei.com
+Cc: marcandre.lureau@gmail.com,
+ "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Chuan Zheng (zhengchuan@huawei.com) wrote:
-> Record hash results for each sampled page, crc32 is taken to calculate
-> hash results for each sampled 4K-page.
-> 
-> Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
-> Signed-off-by: YanYing Zhuang <ann.zhuangyanying@huawei.com>
-> ---
->  migration/dirtyrate.c | 136 ++++++++++++++++++++++++++++++++++++++++++++++++++
->  migration/dirtyrate.h |  15 ++++++
->  2 files changed, 151 insertions(+)
-> 
-> diff --git a/migration/dirtyrate.c b/migration/dirtyrate.c
-> index f6a94d8..66de426 100644
-> --- a/migration/dirtyrate.c
-> +++ b/migration/dirtyrate.c
-> @@ -10,6 +10,7 @@
->   * See the COPYING file in the top-level directory.
->   */
->  
-> +#include <zlib.h>
->  #include "qemu/osdep.h"
->  #include "qapi/error.h"
->  #include "crypto/hash.h"
-> @@ -66,6 +67,141 @@ static void update_dirtyrate(uint64_t msec)
->      DirtyStat.dirty_rate = dirtyrate;
->  }
->  
-> +/*
-> + * get hash result for the sampled memory with length of 4K byte in ramblock,
-> + * which starts from ramblock base address.
-> + */
-> +static uint32_t get_ramblock_vfn_hash(struct RamblockDirtyInfo *info,
-> +                                      uint64_t vfn)
-> +{
-> +    struct iovec iov_array;
-> +    uint32_t crc;
-> +
-> +    iov_array.iov_base = info->ramblock_addr +
-> +                         vfn * DIRTYRATE_SAMPLE_PAGE_SIZE;
-> +    iov_array.iov_len = DIRTYRATE_SAMPLE_PAGE_SIZE;
-> +
-> +    crc = crc32(0, iov_array.iov_base, iov_array.iov_len);
-> +
-> +    return crc;
-> +}
-> +
-> +static int save_ramblock_hash(struct RamblockDirtyInfo *info)
-> +{
-> +    unsigned int sample_pages_count;
-> +    int i;
-> +    int ret = -1;
-> +    GRand *rand = g_rand_new();
-> +
-> +    sample_pages_count = info->sample_pages_count;
-> +
-> +    /* ramblock size less than one page, return success to skip this ramblock */
-> +    if (unlikely(info->ramblock_pages == 0 || sample_pages_count == 0)) {
-> +        ret = 0;
-> +        goto out;
-> +    }
-> +
-> +    info->hash_result = g_try_malloc0_n(sample_pages_count,
-> +                                        sizeof(uint32_t));
-> +    if (!info->hash_result) {
-> +        ret = -1;
-> +        goto out;
-> +    }
-> +
-> +    info->sample_page_vfn = g_try_malloc0_n(sample_pages_count,
-> +                                            sizeof(uint64_t));
-> +    if (!info->sample_page_vfn) {
-> +        g_free(info->hash_result);
-> +        ret = -1;
-> +        goto out;
-> +    }
-> +
-> +    for (i = 0; i < sample_pages_count; i++) {
-> +        info->sample_page_vfn[i] = g_rand_int_range(rand, 0,
-> +                                                    info->ramblock_pages - 1);
-> +        info->hash_result[i] = get_ramblock_vfn_hash(info,
-> +                                                     info->sample_page_vfn[i]);
-> +    }
-> +    ret = 0;
-> +
-> +out:
-> +    g_rand_free(rand);
-> +    return ret;
-> +}
-> +
-> +static void get_ramblock_dirty_info(RAMBlock *block,
-> +                                    struct RamblockDirtyInfo *info,
-> +                                    struct DirtyRateConfig *config)
-> +{
-> +    uint64_t sample_pages_per_gigabytes = config->sample_pages_per_gigabytes;
-> +
-> +    /* Right shift 30 bits to calc block size in GB */
-> +    info->sample_pages_count = (qemu_ram_get_used_length(block) *
-> +                                sample_pages_per_gigabytes) >>
-> +                                DIRTYRATE_PAGE_SHIFT_GB;
-> +
-> +    /* Right shift 12 bits to calc page count in 4KB */
-> +    info->ramblock_pages = qemu_ram_get_used_length(block) >>
-> +                           DIRTYRATE_PAGE_SHIFT_KB;
-> +    info->ramblock_addr = qemu_ram_get_host_addr(block);
-> +    strcpy(info->idstr, qemu_ram_get_idstr(block));
-> +}
-> +
-> +static struct RamblockDirtyInfo *
-> +alloc_ramblock_dirty_info(int *block_index,
-> +                          struct RamblockDirtyInfo *block_dinfo)
-> +{
-> +    struct RamblockDirtyInfo *info = NULL;
-> +    int index = *block_index;
-> +
-> +    if (!block_dinfo) {
-> +        index = 0;
-> +        block_dinfo = g_try_new(struct RamblockDirtyInfo, 1);
-> +    } else {
-> +        index++;
-> +        block_dinfo = g_try_realloc(block_dinfo, (index + 1) *
-> +                                    sizeof(struct RamblockDirtyInfo));
-> +    }
-> +    if (!block_dinfo) {
-> +        return NULL;
-> +    }
-> +
-> +    info = &block_dinfo[index];
-> +    *block_index = index;
-> +    memset(info, 0, sizeof(struct RamblockDirtyInfo));
-> +
-> +    return block_dinfo;
-> +}
-> +
-> +static int record_ramblock_hash_info(struct RamblockDirtyInfo **block_dinfo,
-> +                                     struct DirtyRateConfig config,
-> +                                     int *block_index)
-> +{
-> +    struct RamblockDirtyInfo *info = NULL;
-> +    struct RamblockDirtyInfo *dinfo = NULL;
-> +    RAMBlock *block = NULL;
-> +    int index = 0;
-> +
-> +    RAMBLOCK_FOREACH_MIGRATABLE(block) {
-> +        dinfo = alloc_ramblock_dirty_info(&index, dinfo);
-> +        if (dinfo == NULL) {
-> +            return -1;
-> +        }
-> +        info = &dinfo[index];
-> +        get_ramblock_dirty_info(block, info, &config);
-> +        if (save_ramblock_hash(info) < 0) {
-> +            *block_dinfo = dinfo;
-> +            *block_index = index;
-> +            return -1;
-> +        }
-> +    }
-> +
-> +    *block_dinfo = dinfo;
-> +    *block_index = index;
-> +
-> +    return 0;
-> +}
-> +
->  static void calculate_dirtyrate(struct DirtyRateConfig config)
->  {
->      /* todo */
-> diff --git a/migration/dirtyrate.h b/migration/dirtyrate.h
-> index 8e25d93..e3adead 100644
-> --- a/migration/dirtyrate.h
-> +++ b/migration/dirtyrate.h
-> @@ -24,6 +24,21 @@
->   */
->  #define RAMBLOCK_INFO_MAX_LEN                     256
->  
-> +/*
-> + * Sample page size 4K as default.
-> + */
-> +#define DIRTYRATE_SAMPLE_PAGE_SIZE                4096
-> +
-> +/*
-> + * Sample page size 4K shift
-> + */
-> +#define DIRTYRATE_PAGE_SHIFT_KB                   12
-> +
-> +/*
-> + * Sample page size 1G shift
-> + */
-> +#define DIRTYRATE_PAGE_SHIFT_GB                   30
+Kevin Wolf <kwolf@redhat.com> writes:
 
-Your naming is really odd here;  'PAGE_SHIFT_KB' divides
-by 4KB, where as 'PAGE_SHIFT_GB' divices by 1KB.
+> Am 07.08.2020 um 15:27 hat Markus Armbruster geschrieben:
+>> This is just a sketch.  It's incomplete, needs comments and a real
+>> commit message.
+>> 
+>> Support for "[PATCH v6 09/12] hmp: Add support for coroutine command
+>> handlers" is missing.  Marked FIXME.
+>> 
+>> As is, it goes on top of Kevin's series.  It is meant to be squashed
+>> into PATCH 06, except for the FIXME, which needs to be resolved in PATCH
+>> 09 instead.
+>> 
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>>  monitor/monitor.c | 35 +++++++++++++++--------------------
+>>  1 file changed, 15 insertions(+), 20 deletions(-)
+>> 
+>> diff --git a/monitor/monitor.c b/monitor/monitor.c
+>> index 50fb5b20d3..8601340285 100644
+>> --- a/monitor/monitor.c
+>> +++ b/monitor/monitor.c
+>> @@ -82,38 +82,34 @@ bool qmp_dispatcher_co_shutdown;
+>>   */
+>>  bool qmp_dispatcher_co_busy;
+>>  
+>> -/*
+>> - * Protects mon_list, monitor_qapi_event_state, coroutine_mon,
+>> - * monitor_destroyed.
+>> - */
+>> +/* Protects mon_list, monitor_qapi_event_state, * monitor_destroyed. */
+>>  QemuMutex monitor_lock;
+>>  static GHashTable *monitor_qapi_event_state;
+>> -static GHashTable *coroutine_mon; /* Maps Coroutine* to Monitor* */
+>>  
+>>  MonitorList mon_list;
+>>  int mon_refcount;
+>>  static bool monitor_destroyed;
+>>  
+>> +static Monitor **monitor_curp(Coroutine *co)
+>> +{
+>> +    static __thread Monitor *thread_local_mon;
+>> +    static Monitor *qmp_dispatcher_co_mon;
+>> +
+>> +    if (qemu_coroutine_self() == qmp_dispatcher_co) {
+>> +        return &qmp_dispatcher_co_mon;
+>> +    }
+>> +    /* FIXME the coroutine hidden in handle_hmp_command() */
+>> +    return &thread_local_mon;
+>> +}
+>
+> Is thread_local_mon supposed to ever be set? The only callers of
+> monitor_set_cur() are the HMP and QMP dispatchers, which will return
+> something different.
 
-Simplify this;  you can just do >>30 for GB because it's well known;
-you don't need a #define constant for simple KB,MB,GB since
-we all know them.
+OOB commands are executed in @mon_iothread, outside coroutine context.
+qmp_dispatch() calls monitor_set_cur(), which sets thread_local_mon
+then.
 
-Also, I've asked before - do you really want 4KB explicitly - or
-should you just use TARGET_PAGE_SIZE and TARGET_PAGE_BITS ?
+Since there is just one @mon_iothread, a @global_mon without __thread
+would do, but I don't see a need to exploit that here.
 
-Dave
+> So should we return NULL insetad of thread_local_mon...
+>
+>>  Monitor *monitor_cur(void)
+>>  {
+>> -    Monitor *mon;
+>> -
+>> -    qemu_mutex_lock(&monitor_lock);
+>> -    mon = g_hash_table_lookup(coroutine_mon, qemu_coroutine_self());
+>> -    qemu_mutex_unlock(&monitor_lock);
+>> -
+>> -    return mon;
+>> +    return *monitor_curp(qemu_coroutine_self());
+>>  }
+>
+> ...and return NULL here if monitor_curp() returned NULL...
+>
+>>  void monitor_set_cur(Coroutine *co, Monitor *mon)
+>>  {
+>> -    qemu_mutex_lock(&monitor_lock);
+>> -    if (mon) {
+>> -        g_hash_table_replace(coroutine_mon, co, mon);
+>> -    } else {
+>> -        g_hash_table_remove(coroutine_mon, co);
+>> -    }
+>> -    qemu_mutex_unlock(&monitor_lock);
+>> +    *monitor_curp(co) = mon;
+>
+> ...and assert(monitor_curp(co) != NULL) here?
+>
+> This approach looks workable, though the implementation of
+> monitor_curp() feels a bit brittle. The code is not significantly
+> simpler than the hash table based approach, but the assumptions it makes
+> are a bit more hidden.
+>
+> Saving the locks is more a theoretical improvement because all callers
+> are slows paths anyway.
 
-> +
->  /* Take 1s as default for calculation duration */
->  #define DEFAULT_FETCH_DIRTYRATE_TIME_SEC          1
->  
-> -- 
-> 1.8.3.1
-> 
--- 
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+The hash table only ever has three keys: qmp_dispatcher_co, the
+coroutine hidden in handle_hmp_command(), and mon_iothread's leader (not
+in coroutine context).
+
+My version replaces the hash table by three pointer variables (two in
+the sketch above, because I didn't implement the third).
+
+You point out my code relies on an argument about which coroutines can
+execute commands.  True.  But I have to make that argument anyway to
+understand how the coroutine-enabled monitor works.
+
+On the other hand, it doesn't rely on an argument about the consistency
+of the hash table with the coroutines.
 
 
