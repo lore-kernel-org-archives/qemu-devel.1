@@ -2,80 +2,79 @@ Return-Path: <SRS0=H0ck=CE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43188C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 16:39:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED62CC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 16:52:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 11E83206FA
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 16:39:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B7DFD2078B
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 16:52:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uPbqrV/V"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11E83206FA
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RoUrXREz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7DFD2078B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58996 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35220 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAySQ-0004a9-Bz
-	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 12:39:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53128)
+	id 1kAyfG-0007qr-TH
+	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 12:52:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56488)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
- id 1kAyRg-00047f-Ma
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 12:38:44 -0400
-Received: from mail-ej1-x641.google.com ([2a00:1450:4864:20::641]:46909)
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kAyeb-00077H-MQ; Wed, 26 Aug 2020 12:52:05 -0400
+Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:42108)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
- id 1kAyRe-0000q8-LR
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 12:38:44 -0400
-Received: by mail-ej1-x641.google.com with SMTP id d11so3703924ejt.13
- for <qemu-devel@nongnu.org>; Wed, 26 Aug 2020 09:38:40 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kAyeZ-0002am-LK; Wed, 26 Aug 2020 12:52:05 -0400
+Received: by mail-lj1-x241.google.com with SMTP id t6so3141207ljk.9;
+ Wed, 26 Aug 2020 09:52:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=7FIqljMOKZKFI9EP0j9P51Wc4RiazV6rlPwYeJKlg5U=;
- b=uPbqrV/V2CNRI70AF2ENAjj7stEcJksex1O7ktP1f6WvTdC32HQyZIeYweKgdlHfJK
- SYOtBmr/TSNdljW2U1ORZlEIXs7Uf7k7mi6cp3mnM1mXmcpcS8/SEG8XykDX4//g0EG3
- jEKOFIDIojSltWd8ere+ZuJhdQS7y1gFMFuonNFfc94iFSCmMJpBhbRiQYwUD+Kb3cAQ
- Tl53lcEYQcViJX9K88eZphUSKOqMZgWeifSfbJC2u/XTHsq3QrJS3HEQB9ZSudD/SHZa
- L9/bZ8lYmInYA87CTu+IjCJQj9hsWPxy50GY1zmSjQn0g58lFviBOvfkxKtV8qjfO99i
- W7iw==
+ h=mime-version:references:in-reply-to:reply-to:from:date:message-id
+ :subject:to:cc;
+ bh=zuNk7v+IEG1NX946w4US+NnSDslhmTRg4grXH/qysdU=;
+ b=RoUrXREz1IAhYdIoE3vYJyfanZuzTqBHkOMfhc8I9YPEW3N87Fj4+VGFSy7EJrXSy2
+ rjG9N0mb+/Ke3iMJDopKx7JVtcsfUpjp/1kVyKlxOTdYdY0SIpk4Bu8V1iwKlsYxlCx+
+ lU+y9RQk8aib7IFRW98MyU+ViTd8/0SGdfMBXZvKUYHj2nV1dY6za7Xs9Kn7WRqXBlKT
+ 6mcSl2odua88EaLfTVrky1kaiEYpNED70BOdNZM4jnszr9m6FM095uvkpIZQSEaQecW9
+ ZwqcSr5YKZl1hX1neo8QMsqvuWFLOGESXwKj3yYcTrZ1nB1xciINi8R3wNka53geWELM
+ oTug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=7FIqljMOKZKFI9EP0j9P51Wc4RiazV6rlPwYeJKlg5U=;
- b=mBO1RlN66ACFjltGf8kD0XARSJsWVfCokTw4HW6S7pji6Mbz1UYeL9qu/7GNIlCCrE
- ikPZTjJXrPLbZrUVNBYTEycgFLQWKpZMkB3tfCEfygrIcDd8IfB6tFCGy6DVzuxM2VAu
- lhTdUiOH+bZyPPq4mmfhZvimXmoAhYjny6lU7x3gHhLTk1PBCgNPH4zmbadpl234e9tV
- IX+7UkARhxemdvUn4n2Apxbn6rjtuGcOXBCcIwMtYW8cRBde49QM8FUGRKEEenUotm7c
- 6l/3OLUA5vwDuhfNw05ar7RoR3BQ2Kj+A3KJ1ADCJFYARFXFdYpMBQYD4rj3WWRKk674
- UNtQ==
-X-Gm-Message-State: AOAM5315qzlLc5vmOIsQqq5g7y8c/KwyrFpiLxP3lxs2cGVXvXxGXTFO
- 9Ws8OFsaJRtLBXoCOGc7zEU2wkVbCD0R2mOUanY=
-X-Google-Smtp-Source: ABdhPJxvFmESC8409DDJpN9hKBYUPLaM6xeW+C7k7tUeNn3YcCgNGbwwtbCmPMLWzyNWNC1lZKSGuBq46hHm0rBc5RY=
-X-Received: by 2002:a17:906:f150:: with SMTP id
- gw16mr8425597ejb.532.1598459918119; 
- Wed, 26 Aug 2020 09:38:38 -0700 (PDT)
+ h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
+ :from:date:message-id:subject:to:cc;
+ bh=zuNk7v+IEG1NX946w4US+NnSDslhmTRg4grXH/qysdU=;
+ b=TFhqeRZx3cA66x/TCX3O756FmbaSWqE4L45wDfJ/acuzXcSyE4BvctgSKCBj9MZ8JU
+ rrnF/bYb7tTL9OKdtCfglyfOTwLVvTdErbtCaWW9tE/J3v0XD8JQ3r/d241Aiv4UvUMn
+ YT87KbcQQBKwdXp0jYjC0qUW5u4+Eryp4HQENtudqhNRecA4/ePR3QMKzWFUobv+S4JB
+ gcWNUT4PqXFJz+nLnbC8lbbQM22ceWX8RmoYzY2gfMoVkOwo4jKU7YEmHhl73jcIsqEm
+ HOaXveIylXIITAzy+pzx1IBfvmPIdYxx0sGDx7vkZ2Sy6XrQzeGTF7n+HtI5wI3uHM89
+ OLAg==
+X-Gm-Message-State: AOAM533jsqTtcu+Q+YMroOFjTvtY9jCqKZFC2RADTPSfb4IGAXjeyqMf
+ LXggSuPbBUlNR+ooXwJwv6IEfVkyH3KtEHyOQqU=
+X-Google-Smtp-Source: ABdhPJxaBO/UIAe6yxemUUFv81+VfrrCMuo8TAPHXZ2FfWsCSwXHDNrOJkZvjpy+oqCqH7Le8bxbI0f2juscaPw6kyY=
+X-Received: by 2002:a2e:7315:: with SMTP id o21mr938830ljc.120.1598460720926; 
+ Wed, 26 Aug 2020 09:52:00 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200826110419.528931-1-marcandre.lureau@redhat.com>
- <CABgObfa1Xa_2EBNHo9=XOYEWFUBqUhKmu6kDfsiE1+hMTwdDvA@mail.gmail.com>
- <CAJ+F1CLqew5KdKGN1zjoBUEtm9q79dWw-9QmhyBu1mYD0qeMWA@mail.gmail.com>
- <CABgObfZZPixkG55c-eUUEzVKczK+nzxGOyO7HPLnXSRwggekBg@mail.gmail.com>
-In-Reply-To: <CABgObfZZPixkG55c-eUUEzVKczK+nzxGOyO7HPLnXSRwggekBg@mail.gmail.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Wed, 26 Aug 2020 20:38:24 +0400
-Message-ID: <CAJ+F1C+AGbFD888ydast+t0KRXBu+RxuuOyDwGJ2s=EODrVNCw@mail.gmail.com>
-Subject: Re: [PATCH v3 0/8] meson: mingw installation fixes & nsis conversion
-To: Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: multipart/alternative; boundary="0000000000009b770305adca7332"
-Received-SPF: pass client-ip=2a00:1450:4864:20::641;
- envelope-from=marcandre.lureau@gmail.com; helo=mail-ej1-x641.google.com
+References: <20200625191651.5817-1-eperezma@redhat.com>
+ <20200826143651.7915-1-eperezma@redhat.com>
+ <20200826143651.7915-13-eperezma@redhat.com>
+In-Reply-To: <20200826143651.7915-13-eperezma@redhat.com>
+From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
+Date: Thu, 27 Aug 2020 00:51:48 +0800
+Message-ID: <CAE2XoE9kFuavzHzTWvCony77iHk1_+kjrYj-budDVTdgKfTeaQ@mail.gmail.com>
+Subject: Re: [RFC v6 12/13] intel_iommu: Do not notify regular iotlb to
+ device-iotlb notifiers
+To: =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>
+Content-Type: multipart/alternative; boundary="000000000000755af905adcaa32b"
+Received-SPF: pass client-ip=2a00:1450:4864:20::241;
+ envelope-from=luoyonggang@gmail.com; helo=mail-lj1-x241.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -97,216 +96,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: sw <sw@weilnetz.de>, "Daniel P. Berrange" <berrange@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>
+Reply-To: luoyonggang@gmail.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ Yan Zhao <yan.y.zhao@intel.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Juan Quintela <quintela@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, qemu-level <qemu-devel@nongnu.org>,
+ Peter Xu <peterx@redhat.com>, Eric Auger <eric.auger@redhat.com>,
+ qemu-arm@nongnu.org, =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
+ Avi Kivity <avi@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000009b770305adca7332
+--000000000000755af905adcaa32b
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi
+On Wed, Aug 26, 2020 at 10:42 PM Eugenio P=C3=A9rez <eperezma@redhat.com> w=
+rote:
 
-On Wed, Aug 26, 2020 at 5:47 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+> This improves performance in case of netperf with vhost-net:
+> * TCP_STREAM: From 9049.59Mbit/s to 9049.59Mbit/s (13%)
+>
+What's improvement ? they are the same
 
-> We should document the difference in the 5.2 changelog then (it's okay to
-> introduce it since the configure option is named differently).
+
+> * TCP_RR: From 8464.73 trans/s to 8932.703333 trans/s (5.5%)
+> * UDP_RR: From 8562.08 trans/s to 9005.62/s (5.1%)
+> * UDP_STREAM: No change observed (insignificant 0.1% improvement)
+>
+> Signed-off-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
+> ---
+>  hw/i386/intel_iommu.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+>
+> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> index ddb828da1f..7620a1abbf 100644
+> --- a/hw/i386/intel_iommu.c
+> +++ b/hw/i386/intel_iommu.c
+> @@ -1960,6 +1960,12 @@ static void
+> vtd_iotlb_domain_invalidate(IntelIOMMUState *s, uint16_t domain_id)
+>      vtd_iommu_unlock(s);
+>
+>      QLIST_FOREACH(vtd_as, &s->vtd_as_with_notifiers, next) {
+> +        if (vtd_as->iommu.iommu_notify_flags & IOMMU_NOTIFIER_DEVIOTLB) =
+{
+> +            /* If IOMMU memory region is DEVICE IOTLB type, it does not
+> make
+> +             * sense to send regular IOMMU notifications. */
+> +            continue;
+> +        }
+> +
+>          if (!vtd_dev_to_context_entry(s, pci_bus_num(vtd_as->bus),
+>                                        vtd_as->devfn, &ce) &&
+>              domain_id =3D=3D vtd_get_domain_id(s, &ce)) {
+> --
+> 2.18.1
 >
 >
-Not directly related, but I can't help thinking that we would be better off
-maintaining the changelog in git too, with sphinx yada yada..
-
-Il mer 26 ago 2020, 13:50 Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.co=
-m> ha
-> scritto:
->
->> Hi
->>
->> On Wed, Aug 26, 2020 at 3:38 PM Paolo Bonzini <pbonzini@redhat.com>
->> wrote:
->>
->>> Since behavioral changes should be reviewed separately let's just
->>> include v2 first.
->>>
->>>
->>  I am more confident that this version doesn't introduce regressions
->> though.. The use of + qemu_confsuffix was problematic, and I noticed som=
-e
->> weird behaviour that I couldn't clearly identify (when updating meson &
->> running make only - iow, fresh configure && make should be ok, but for t=
-he
->> rest it's not as "clean" as this version..).
->>
->> Paolo
->>>
->>> Il mer 26 ago 2020, 13:04 <marcandre.lureau@redhat.com> ha scritto:
->>>
->>>> From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->>>>
->>>> Hi,
->>>>
->>>> The following patches fix installation path when cross-compiling Windo=
-ws
->>>> version, and move the NSIS build rule to meson.
->>>>
->>>> v3:
->>>>  - change qemu suffix handling, make /-separator implicit
->>>>  - use qemu suffix to build qemu_docdir, as --help says
->>>>  - use / to construct qemu directory variables in meson
->>>>  - add a few signed-off from Daniel
->>>>
->>>> v2:
->>>>  - replaced the shell script by a python version
->>>>  - add copyright/license for the new python script
->>>>
->>>> Marc-Andr=C3=A9 Lureau (8):
->>>>   configure: rename confsuffix option
->>>>   configure: always /-seperate directory from qemu_suffix
->>>>   configure: build docdir like other suffixed directories
->>>>   meson: pass qemu_suffix option
->>>>   meson: use meson datadir instead of qemu_datadir
->>>>   meson: pass docdir option
->>>>   meson: use meson mandir instead of qemu_mandir
->>>>   meson: add NSIS building
->>>>
->>>>  Makefile                           | 56 ---------------------
->>>>  configure                          | 27 ++++++-----
->>>>  contrib/vhost-user-gpu/meson.build |  2 +-
->>>>  docs/meson.build                   |  4 +-
->>>>  meson.build                        | 34 +++++++++++--
->>>>  meson_options.txt                  |  4 ++
->>>>  pc-bios/descriptors/meson.build    |  2 +-
->>>>  pc-bios/keymaps/meson.build        |  6 +--
->>>>  pc-bios/meson.build                |  2 +-
->>>>  scripts/nsis.py                    | 78 +++++++++++++++++++++++++++++=
-+
->>>>  tools/virtiofsd/meson.build        |  2 +-
->>>>  trace/meson.build                  |  2 +-
->>>>  12 files changed, 138 insertions(+), 81 deletions(-)
->>>>  create mode 100644 scripts/nsis.py
->>>>
->>>> --
->>>> 2.26.2
->>>>
->>>>
->>>>
->>
->> --
->> Marc-Andr=C3=A9 Lureau
->>
 >
 
 --=20
-Marc-Andr=C3=A9 Lureau
+         =E6=AD=A4=E8=87=B4
+=E7=A4=BC
+=E7=BD=97=E5=8B=87=E5=88=9A
+Yours
+    sincerely,
+Yonggang Luo
 
---0000000000009b770305adca7332
+--000000000000755af905adcaa32b
 Content-Type: text/html; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-<div dir=3D"ltr"><div dir=3D"ltr">Hi<br></div><br><div class=3D"gmail_quote=
-"><div dir=3D"ltr" class=3D"gmail_attr">On Wed, Aug 26, 2020 at 5:47 PM Pao=
-lo Bonzini &lt;<a href=3D"mailto:pbonzini@redhat.com">pbonzini@redhat.com</=
-a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0p=
-x 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex"><d=
-iv dir=3D"auto">We should document the difference in the 5.2 changelog then=
- (it&#39;s okay to introduce it since the configure option is named differe=
-ntly).</div><br></blockquote><div><br></div><div>Not directly related, but =
-I can&#39;t help thinking that we would be better off maintaining the chang=
-elog in git too, with sphinx yada yada..</div><div> <br></div><blockquote c=
-lass=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px soli=
-d rgb(204,204,204);padding-left:1ex"><div class=3D"gmail_quote"><div dir=3D=
-"ltr" class=3D"gmail_attr">Il mer 26 ago 2020, 13:50 Marc-Andr=C3=A9 Lureau=
- &lt;<a href=3D"mailto:marcandre.lureau@gmail.com" target=3D"_blank">marcan=
-dre.lureau@gmail.com</a>&gt; ha scritto:<br></div><blockquote class=3D"gmai=
-l_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,20=
-4,204);padding-left:1ex"><div dir=3D"ltr"><div>Hi<br></div><br><div class=
-=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">On Wed, Aug 26, 2020=
- at 3:38 PM Paolo Bonzini &lt;<a href=3D"mailto:pbonzini@redhat.com" rel=3D=
-"noreferrer" target=3D"_blank">pbonzini@redhat.com</a>&gt; wrote:<br></div>=
-<blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-=
-left:1px solid rgb(204,204,204);padding-left:1ex"><div dir=3D"auto">Since b=
-ehavioral changes should be reviewed separately let&#39;s just include v2 f=
-irst.<div dir=3D"auto"><br></div></div></blockquote><div><br></div><div>=C2=
-=A0I am more confident that this version doesn&#39;t introduce regressions =
-though.. The use of + qemu_confsuffix was problematic, and I noticed some w=
-eird behaviour that I couldn&#39;t clearly identify (when updating meson &a=
-mp; running make only - iow, fresh configure &amp;&amp; make should be ok, =
-but for the rest it&#39;s not as &quot;clean&quot; as this version..).<br><=
-/div><div><br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0=
-px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex"><div =
-dir=3D"auto"><div dir=3D"auto"></div><div dir=3D"auto">Paolo</div></div><br=
-><div class=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">Il mer 26=
- ago 2020, 13:04  &lt;<a href=3D"mailto:marcandre.lureau@redhat.com" rel=3D=
-"noreferrer" target=3D"_blank">marcandre.lureau@redhat.com</a>&gt; ha scrit=
-to:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px =
-0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">From: Marc-A=
-ndr=C3=A9 Lureau &lt;<a href=3D"mailto:marcandre.lureau@redhat.com" rel=3D"=
-noreferrer noreferrer" target=3D"_blank">marcandre.lureau@redhat.com</a>&gt=
-;<br>
+<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
+<div dir=3D"ltr" class=3D"gmail_attr">On Wed, Aug 26, 2020 at 10:42 PM Euge=
+nio P=C3=A9rez &lt;<a href=3D"mailto:eperezma@redhat.com">eperezma@redhat.c=
+om</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margi=
+n:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex=
+">This improves performance in case of netperf with vhost-net:<br>
+* TCP_STREAM: From 9049.59Mbit/s to 9049.59Mbit/s (13%)<br></blockquote><di=
+v>What&#39;s improvement ? they are the same</div><div>=C2=A0</div><blockqu=
+ote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px=
+ solid rgb(204,204,204);padding-left:1ex">
+* TCP_RR: From 8464.73 trans/s to 8932.703333 trans/s (5.5%)<br>
+* UDP_RR: From 8562.08 trans/s to 9005.62/s (5.1%)<br>
+* UDP_STREAM: No change observed (insignificant 0.1% improvement)<br>
 <br>
-Hi,<br>
+Signed-off-by: Eugenio P=C3=A9rez &lt;<a href=3D"mailto:eperezma@redhat.com=
+" target=3D"_blank">eperezma@redhat.com</a>&gt;<br>
+---<br>
+=C2=A0hw/i386/intel_iommu.c | 6 ++++++<br>
+=C2=A01 file changed, 6 insertions(+)<br>
 <br>
-The following patches fix installation path when cross-compiling Windows<br=
->
-version, and move the NSIS build rule to meson.<br>
+diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c<br>
+index ddb828da1f..7620a1abbf 100644<br>
+--- a/hw/i386/intel_iommu.c<br>
++++ b/hw/i386/intel_iommu.c<br>
+@@ -1960,6 +1960,12 @@ static void vtd_iotlb_domain_invalidate(IntelIOMMUSt=
+ate *s, uint16_t domain_id)<br>
+=C2=A0 =C2=A0 =C2=A0vtd_iommu_unlock(s);<br>
 <br>
-v3:<br>
-=C2=A0- change qemu suffix handling, make /-separator implicit<br>
-=C2=A0- use qemu suffix to build qemu_docdir, as --help says<br>
-=C2=A0- use / to construct qemu directory variables in meson<br>
-=C2=A0- add a few signed-off from Daniel<br>
-<br>
-v2:<br>
-=C2=A0- replaced the shell script by a python version<br>
-=C2=A0- add copyright/license for the new python script<br>
-<br>
-Marc-Andr=C3=A9 Lureau (8):<br>
-=C2=A0 configure: rename confsuffix option<br>
-=C2=A0 configure: always /-seperate directory from qemu_suffix<br>
-=C2=A0 configure: build docdir like other suffixed directories<br>
-=C2=A0 meson: pass qemu_suffix option<br>
-=C2=A0 meson: use meson datadir instead of qemu_datadir<br>
-=C2=A0 meson: pass docdir option<br>
-=C2=A0 meson: use meson mandir instead of qemu_mandir<br>
-=C2=A0 meson: add NSIS building<br>
-<br>
-=C2=A0Makefile=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0| 56 ---------------------<br>
-=C2=A0configure=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 | 27 ++++++-----<br>
-=C2=A0contrib/vhost-user-gpu/meson.build |=C2=A0 2 +-<br>
-=C2=A0docs/meson.build=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0|=C2=A0 4 +-<br>
-=C2=A0meson.build=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 | 34 +++++++++++--<br>
-=C2=A0meson_options.txt=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 |=C2=A0 4 ++<br>
-=C2=A0pc-bios/descriptors/meson.build=C2=A0 =C2=A0 |=C2=A0 2 +-<br>
-=C2=A0pc-bios/keymaps/meson.build=C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 6 +--<=
-br>
-=C2=A0pc-bios/meson.build=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 |=C2=A0 2 +-<br>
-=C2=A0scripts/nsis.py=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 | 78 ++++++++++++++++++++++++++++++<br>
-=C2=A0tools/virtiofsd/meson.build=C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 2 +-<b=
-r>
-=C2=A0trace/meson.build=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 |=C2=A0 2 +-<br>
-=C2=A012 files changed, 138 insertions(+), 81 deletions(-)<br>
-=C2=A0create mode 100644 scripts/nsis.py<br>
-<br>
+=C2=A0 =C2=A0 =C2=A0QLIST_FOREACH(vtd_as, &amp;s-&gt;vtd_as_with_notifiers,=
+ next) {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (vtd_as-&gt;iommu.iommu_notify_flags &amp; =
+IOMMU_NOTIFIER_DEVIOTLB) {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 /* If IOMMU memory region is DEV=
+ICE IOTLB type, it does not make<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* sense to send regular IO=
+MMU notifications. */<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 continue;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
++<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0if (!vtd_dev_to_context_entry(s, pci_bus_=
+num(vtd_as-&gt;bus),<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0vtd_as-&g=
+t;devfn, &amp;ce) &amp;&amp;<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0domain_id =3D=3D vtd_get_do=
+main_id(s, &amp;ce)) {<br>
 -- <br>
-2.26.2<br>
+2.18.1<br>
 <br>
 <br>
-</blockquote></div>
-</blockquote></div><br clear=3D"all"><br>-- <br><div dir=3D"ltr">Marc-Andr=
-=C3=A9 Lureau<br></div></div>
-</blockquote></div>
-</blockquote></div><br clear=3D"all"><br>-- <br><div dir=3D"ltr" class=3D"g=
-mail_signature">Marc-Andr=C3=A9 Lureau<br></div></div>
+</blockquote></div><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr"=
+ class=3D"gmail_signature">=C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =E6=AD=A4=E8=
+=87=B4<br>=E7=A4=BC<br>=E7=BD=97=E5=8B=87=E5=88=9A<br>Yours<br>=C2=A0 =C2=
+=A0 sincerely,<br>Yonggang Luo<br></div></div>
 
---0000000000009b770305adca7332--
+--000000000000755af905adcaa32b--
 
