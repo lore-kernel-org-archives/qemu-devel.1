@@ -2,117 +2,90 @@ Return-Path: <SRS0=H0ck=CE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AEF90C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 08:38:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7423DC433E3
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 08:39:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 648D720707
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 08:38:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2D37C2071E
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 08:39:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JpHRX/62"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 648D720707
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FTei+Qkf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D37C2071E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59588 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34128 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAqwU-00022k-K9
-	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 04:38:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38818)
+	id 1kAqyC-0003FR-0E
+	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 04:39:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39280)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kAqvg-0001XS-Dk
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 04:37:14 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:41063
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kAqve-0000Fg-Bq
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 04:37:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598431029;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=9MxhvbZMpIVsBmGYilfS4WLnJzv7AkSFTma7aODI3dg=;
- b=JpHRX/623Z66nofb6cxsiHcCJwq6UeDO9X/srRLfY55PNjt9jkRbpxyrecMsTb9MJ/BT62
- bK+sHTtKaFf9q6mR2fNdCQZaqjKaqxDsPy7G3ohzN2l3LNOrKdyQpVrjB74eOx0l8PXow0
- GPjLamOM0Wnw3qJHN7js2eipFZEAVlA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-303-1RXlpl3rMb662uSw3VUKDw-1; Wed, 26 Aug 2020 04:37:07 -0400
-X-MC-Unique: 1RXlpl3rMb662uSw3VUKDw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 36FBF805EE3;
- Wed, 26 Aug 2020 08:37:06 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-112-172.ams2.redhat.com
- [10.36.112.172])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0AF57709D2;
- Wed, 26 Aug 2020 08:37:00 +0000 (UTC)
-Subject: Re: [PATCH v5 06/10] block: introduce BDRV_REQ_NO_WAIT flag
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-References: <20200821141123.28538-1-vsementsov@virtuozzo.com>
- <20200821141123.28538-7-vsementsov@virtuozzo.com>
- <15cbc4e6-2a81-935f-ea26-5e98b80f40c2@redhat.com>
- <dc2c501f-ef45-d6b7-6801-ca0d1a4ec9b6@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <7e2240d1-03f8-ae64-5b4b-9f87a3d967fd@redhat.com>
-Date: Wed, 26 Aug 2020 10:36:58 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1kAqxW-0002pb-HK
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 04:39:06 -0400
+Received: from mail-ed1-x544.google.com ([2a00:1450:4864:20::544]:38107)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1kAqxU-0000Pg-Ea
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 04:39:06 -0400
+Received: by mail-ed1-x544.google.com with SMTP id b2so1017589edw.5
+ for <qemu-devel@nongnu.org>; Wed, 26 Aug 2020 01:39:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=nIJQg+8J+SR99dD888D0GFwHpuBt874o2Mw5bGZWhaM=;
+ b=FTei+QkfVlpHh5BBN9hW4+W0EGV3Q9KKwkID52A+6hdUA6HkbHF8LlWIoGC5lejVmB
+ rXuqVL9YKtWVxsOR4vcgOQJ9LWRDk3JEJ+voYZPA+HYFn0i9s90sQsrTbVKRgzT11WkZ
+ r154z+Hf7P/Kdat+p02+agE+ynu1QmZqw2NqDzvImSV3VQY+Yj68T0c6gCuUFVSp/11O
+ cn/Jit5kFT/zGV77TcB6JQYwUmW4cVV8xZhL0zDI+yINgMD6aeWzE2bFC4hl0bfKBd52
+ /PMo2H6p/xpPdO17UA8/g7LAFiwvL1DKpHXpuU69BWfss7XkxvOncWGD1Ef4yQwqRZsv
+ q3Ow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=nIJQg+8J+SR99dD888D0GFwHpuBt874o2Mw5bGZWhaM=;
+ b=PDctDiwpUFD8MnewWKYiSvTS18+v3LmW/AGKxn9O/bA9bjVg13CywaLpEXLtWGiKVb
+ nZlyYYk/OeL2o6yC//mTQtG6OeQx59mPpEBwX1wkDF7PZOJ7IYQvIRRToQpR7VMX1027
+ nw2Fg00Qy7oie2zqpw2zHpslk4WLXvYFQ3KJvNVUWWlAywWpB4ox4itNeMuAg/ynrL/+
+ c1QIX1czh5BS0zRLjpY/6KbDQefUbXyDwjJ52YTXuIThP9y3uIM6slA/7zRi9+8yjYEU
+ Qf5gTVm1kA7leJy/L8xcf/4w1U7x5pnjkEzR6jAPEBkQ04eg7JfdLSzOjbAUjG8gtvLf
+ UNog==
+X-Gm-Message-State: AOAM531k8G3nShVM66sC5yuco1/qN/gz8xgvgykE+6xwC8QYoVzRYzLr
+ HgPiLxWbTjEABoqu7VVFjnoDUM+JvF6LL8o6kPk=
+X-Google-Smtp-Source: ABdhPJx9QBeqni+4aWhUljgZORYHgkwz8aeSau0SSIMf9tA9+PEubdP6/VVxq7U5x+Yy1JoLRPQ3CQiokKVx8aNiT/o=
+X-Received: by 2002:a05:6402:1427:: with SMTP id
+ c7mr14577534edx.245.1598431141760; 
+ Wed, 26 Aug 2020 01:39:01 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <dc2c501f-ef45-d6b7-6801-ca0d1a4ec9b6@virtuozzo.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="WNPMzw5ZJptagO6rvcBoCqcVTtitS8qzX"
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=mreitz@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/26 03:56:58
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -56
-X-Spam_score: -5.7
-X-Spam_bar: -----
-X-Spam_report: (-5.7 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.958,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-2.602, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+References: <20200825175827.355940-1-marcandre.lureau@redhat.com>
+ <20200825175827.355940-4-marcandre.lureau@redhat.com>
+ <20200826083234.GE168515@redhat.com>
+In-Reply-To: <20200826083234.GE168515@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Wed, 26 Aug 2020 12:38:50 +0400
+Message-ID: <CAJ+F1C+8a_wYynmqyxc++8yvxzU17J678okXGnf=v5iXAxdyPA@mail.gmail.com>
+Subject: Re: [PATCH v2 3/5] meson: add docdir option and pass pre-prefix
+ qemu_docdir
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Content-Type: multipart/alternative; boundary="00000000000067147105adc3c004"
+Received-SPF: pass client-ip=2a00:1450:4864:20::544;
+ envelope-from=marcandre.lureau@gmail.com; helo=mail-ed1-x544.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -125,148 +98,182 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, kwolf@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com,
- nsoffer@redhat.com, stefanha@redhat.com, den@openvz.org
+Cc: Stefan Weil <sw@weilnetz.de>, QEMU <qemu-devel@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---WNPMzw5ZJptagO6rvcBoCqcVTtitS8qzX
-Content-Type: multipart/mixed; boundary="0LMOnj7Ul7BATN6XPslX8Rj7w35QTme5w"
-
---0LMOnj7Ul7BATN6XPslX8Rj7w35QTme5w
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+--00000000000067147105adc3c004
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On 26.08.20 08:26, Vladimir Sementsov-Ogievskiy wrote:
-> 25.08.2020 16:10, Max Reitz wrote:
->> On 21.08.20 16:11, Vladimir Sementsov-Ogievskiy wrote:
->>> Add flag to make serialising request no wait: if there are conflicting
->>> requests, just return error immediately. It's will be used in upcoming
->>> preallocate filter.
->>>
->>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>> ---
->>> =C2=A0 include/block/block.h |=C2=A0 9 ++++++++-
->>> =C2=A0 block/io.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 | 11 ++++++++++-
->>> =C2=A0 2 files changed, 18 insertions(+), 2 deletions(-)
->>>
->>> diff --git a/include/block/block.h b/include/block/block.h
->>> index b8f4e86e8d..877fda06a4 100644
->>> --- a/include/block/block.h
->>> +++ b/include/block/block.h
->>> @@ -67,8 +67,15 @@ typedef enum {
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * written to qiov parameter which =
-may be NULL.
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 */
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BDRV_REQ_PREFETCH=C2=A0 =3D 0x200,
->>> +
->>> +=C2=A0=C2=A0=C2=A0 /*
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 * If we need to wait for other requests, just=
- fail immediately.
->>> Used
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 * only together with BDRV_REQ_SERIALISING.
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 */
->>> +=C2=A0=C2=A0=C2=A0 BDRV_REQ_NO_WAIT =3D 0x400,
->>> +
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* Mask of valid flags */
->>> -=C2=A0=C2=A0=C2=A0 BDRV_REQ_MASK=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =3D 0x3ff,
->>> +=C2=A0=C2=A0=C2=A0 BDRV_REQ_MASK=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =3D 0x7ff,
->>> =C2=A0 } BdrvRequestFlags;
->>> =C2=A0 =C2=A0 typedef struct BlockSizes {
->>> diff --git a/block/io.c b/block/io.c
->>> index dd28befb08..c93b1e98a3 100644
->>> --- a/block/io.c
->>> +++ b/block/io.c
->>> @@ -1912,9 +1912,18 @@ bdrv_co_write_req_prepare(BdrvChild *child,
->>> int64_t offset, uint64_t bytes,
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 assert(!(bs->open_flags & BDRV_O_INACTIV=
-E));
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 assert((bs->open_flags & BDRV_O_NO_IO) =
-=3D=3D 0);
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 assert(!(flags & ~BDRV_REQ_MASK));
->>> +=C2=A0=C2=A0=C2=A0 assert(!((flags & BDRV_REQ_NO_WAIT) && !(flags &
->>> BDRV_REQ_SERIALISING)));
->>> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (flags & BDRV_REQ_SERIALISING)=
- {
->>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bdrv_make_request_serialisi=
-ng(req, bdrv_get_cluster_size(bs));
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 QEMU_LOCK_GUARD(&bs->reqs_l=
-ock);
->>> +
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 tracked_request_set_seriali=
-sing(req,
->>> bdrv_get_cluster_size(bs));
->>> +
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if ((flags & BDRV_REQ_NO_WA=
-IT) &&
->>> bdrv_find_conflicting_request(req)) {
->>
->> bdrv_find_conflicting_request() will return NULL even if there are
->> conflicting requests, but those have a non-NULL waiting_for.=C2=A0 Is th=
-at
->> something to consider?
->>
->> (I would like to think that will never have a real impact because then
->> we must find some other conflicting request; but isn=E2=80=99t is possib=
-le that
->> we find an overlapping request that waits for another request with which
->> it overlaps, but our request does not?)
->>
->=20
-> Actually check in bdrv_find_conflicting_request() is the same like in
-> the following
-> bdrv_wait_serialising_requests_locked(), so, if
-> bdrv_find_conflicting_request() returns
-> NULL, it means that in bdrv_wait_serialising_requests_locked() it will
-> return NULL
-> again (as there are no yield points) and we will not wait, so all is OK.
+Hi
 
-OK.  I thought that maybe we would want to avoid that other requests
-might have to wait for the preallocation write.  (Of course, we can=E2=80=
-=99t
-avoid that altogether, but if we already know of such requests at the
-beginning of the request...)
+On Wed, Aug 26, 2020 at 12:32 PM Daniel P. Berrang=C3=A9 <berrange@redhat.c=
+om>
+wrote:
 
-Well, if the only thing to look out for is that preallocation writes
-themselves do not wait:
-
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-
-> And, why is it OK to ignore already waiting requests in
-> bdrv_wait_serialising_requests_locked(): just because if we proceed now
-> with our request,
-> these waiting requests will have to wait for us, when they wake and go
-> to the next iteration
-> of waiting loop.
-
-Sure.
+> On Tue, Aug 25, 2020 at 09:58:25PM +0400, marcandre.lureau@redhat.com
+> wrote:
+> > From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> >
+> > When cross-compiling, by default qemu_docdir is 'c:\Program Files\QEMU\=
+'
+> > which is not recognized as being an absolute path, and meson will end u=
+p
+> > adding the prefix again.
+> >
+> > Add an option to pass docdir location to meson, pre-prefixed like we do
+> > with other directories and use that instead of
+> config_host['qemu_docdir'].
+> >
+> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> > ---
+> >  configure         | 1 +
+> >  docs/meson.build  | 4 ++--
+> >  meson.build       | 3 ++-
+> >  meson_options.txt | 1 +
+> >  4 files changed, 6 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/configure b/configure
+> > index e19e2de2f0..e644841299 100755
+> > --- a/configure
+> > +++ b/configure
+> > @@ -8223,6 +8223,7 @@ NINJA=3D$PWD/ninjatool $meson setup \
+> >          --sysconfdir "${pre_prefix}$sysconfdir" \
+> >          --localstatedir "${pre_prefix}$local_statedir" \
+> >          -Dconfsuffix=3D"$confsuffix" \
+> > +        -Ddocdir=3D"${pre_prefix}$qemu_docdir" \
+>
+> This is passing an absolute path.....
+>
+>
+> > diff --git a/meson_options.txt b/meson_options.txt
+> > index 7bb2c0fca9..fb9312fddd 100644
+> > --- a/meson_options.txt
+> > +++ b/meson_options.txt
+> > @@ -1,4 +1,5 @@
+> >  option('confsuffix', type : 'string', value: 'qemu')
+> > +option('docdir', type : 'string', value : 'doc/qemu')
+>
+> ...but this default is a relative dir, presumably relative to
+> datadir.  The code expects an absolute dir.
+>
 
 
---0LMOnj7Ul7BATN6XPslX8Rj7w35QTme5w--
+Meson accepts both absolute and relative path for installation location. If
+it's relative, it will be under the $prefix directory.
 
---WNPMzw5ZJptagO6rvcBoCqcVTtitS8qzX
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
------BEGIN PGP SIGNATURE-----
+>
+> Regards,
+> Daniel
+> --
+> |: https://berrange.com      -o-
+> https://www.flickr.com/photos/dberrange :|
+> |: https://libvirt.org         -o-
+> https://fstop138.berrange.com :|
+> |: https://entangle-photo.org    -o-
+> https://www.instagram.com/dberrange :|
+>
+>
+>
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl9GHyoACgkQ9AfbAGHV
-z0CnkQf+Pfgc7pUyjk2her2pIudhBav5lArDkNaR96PapARPnWPwf4lO6jKkvBCc
-Se70bCKzVA3+UEqB0HVEaaW8luOyEHTdX76PJv8oJcJKrzYm6vClD51DoW6ttXZB
-JA4KtvzHCYN5wD0qBQ7WkbjPRI41/KIPsb1kngq9Xo9zWGXKe68Ze2reuUQGa0oX
-2OeKbNyk70up2LGeDlXSM/Jpn4+1D/+JZ7H9rSGISmRVx2LNXyZfvj7xaJczAVt6
-miN8Mr9nISvq4izIOARB00eY11FbttkSUHgxXM/Gv78ZpSM0D9+uy8HPxNsvxh8J
-77kRV81Qs/yu2XHb8tyjtxoNp7aohg==
-=S9cB
------END PGP SIGNATURE-----
+--=20
+Marc-Andr=C3=A9 Lureau
 
---WNPMzw5ZJptagO6rvcBoCqcVTtitS8qzX--
+--00000000000067147105adc3c004
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+<div dir=3D"ltr"><div dir=3D"ltr">Hi<br></div><br><div class=3D"gmail_quote=
+"><div dir=3D"ltr" class=3D"gmail_attr">On Wed, Aug 26, 2020 at 12:32 PM Da=
+niel P. Berrang=C3=A9 &lt;<a href=3D"mailto:berrange@redhat.com">berrange@r=
+edhat.com</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=
+=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding=
+-left:1ex">On Tue, Aug 25, 2020 at 09:58:25PM +0400, <a href=3D"mailto:marc=
+andre.lureau@redhat.com" target=3D"_blank">marcandre.lureau@redhat.com</a> =
+wrote:<br>
+&gt; From: Marc-Andr=C3=A9 Lureau &lt;<a href=3D"mailto:marcandre.lureau@re=
+dhat.com" target=3D"_blank">marcandre.lureau@redhat.com</a>&gt;<br>
+&gt; <br>
+&gt; When cross-compiling, by default qemu_docdir is &#39;c:\Program Files\=
+QEMU\&#39;<br>
+&gt; which is not recognized as being an absolute path, and meson will end =
+up<br>
+&gt; adding the prefix again.<br>
+&gt; <br>
+&gt; Add an option to pass docdir location to meson, pre-prefixed like we d=
+o<br>
+&gt; with other directories and use that instead of config_host[&#39;qemu_d=
+ocdir&#39;].<br>
+&gt; <br>
+&gt; Signed-off-by: Marc-Andr=C3=A9 Lureau &lt;<a href=3D"mailto:marcandre.=
+lureau@redhat.com" target=3D"_blank">marcandre.lureau@redhat.com</a>&gt;<br=
+>
+&gt; ---<br>
+&gt;=C2=A0 configure=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0| 1 +<br>
+&gt;=C2=A0 docs/meson.build=C2=A0 | 4 ++--<br>
+&gt;=C2=A0 meson.build=C2=A0 =C2=A0 =C2=A0 =C2=A0| 3 ++-<br>
+&gt;=C2=A0 meson_options.txt | 1 +<br>
+&gt;=C2=A0 4 files changed, 6 insertions(+), 3 deletions(-)<br>
+&gt; <br>
+&gt; diff --git a/configure b/configure<br>
+&gt; index e19e2de2f0..e644841299 100755<br>
+&gt; --- a/configure<br>
+&gt; +++ b/configure<br>
+&gt; @@ -8223,6 +8223,7 @@ NINJA=3D$PWD/ninjatool $meson setup \<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 --sysconfdir &quot;${pre_prefix}$sys=
+confdir&quot; \<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 --localstatedir &quot;${pre_prefix}$=
+local_statedir&quot; \<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 -Dconfsuffix=3D&quot;$confsuffix&quo=
+t; \<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 -Ddocdir=3D&quot;${pre_prefix}$qemu_docdi=
+r&quot; \<br>
+<br>
+This is passing an absolute path.....<br>
+<br>
+<br>
+&gt; diff --git a/meson_options.txt b/meson_options.txt<br>
+&gt; index 7bb2c0fca9..fb9312fddd 100644<br>
+&gt; --- a/meson_options.txt<br>
+&gt; +++ b/meson_options.txt<br>
+&gt; @@ -1,4 +1,5 @@<br>
+&gt;=C2=A0 option(&#39;confsuffix&#39;, type : &#39;string&#39;, value: &#3=
+9;qemu&#39;)<br>
+&gt; +option(&#39;docdir&#39;, type : &#39;string&#39;, value : &#39;doc/qe=
+mu&#39;)<br>
+<br>
+...but this default is a relative dir, presumably relative to<br>
+datadir.=C2=A0 The code expects an absolute dir.<br></blockquote><div><br><=
+/div><div><br></div><div>Meson accepts both absolute and relative path for =
+installation location. If it&#39;s relative, it will be under the $prefix d=
+irectory.</div><div> <br></div><blockquote class=3D"gmail_quote" style=3D"m=
+argin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left=
+:1ex">
+<br>
+<br>
+Regards,<br>
+Daniel<br>
+-- <br>
+|: <a href=3D"https://berrange.com" rel=3D"noreferrer" target=3D"_blank">ht=
+tps://berrange.com</a>=C2=A0 =C2=A0 =C2=A0 -o-=C2=A0 =C2=A0 <a href=3D"http=
+s://www.flickr.com/photos/dberrange" rel=3D"noreferrer" target=3D"_blank">h=
+ttps://www.flickr.com/photos/dberrange</a> :|<br>
+|: <a href=3D"https://libvirt.org" rel=3D"noreferrer" target=3D"_blank">htt=
+ps://libvirt.org</a>=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0-o-=C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 <a href=3D"https://fstop138.berrange.com" rel=3D"n=
+oreferrer" target=3D"_blank">https://fstop138.berrange.com</a> :|<br>
+|: <a href=3D"https://entangle-photo.org" rel=3D"noreferrer" target=3D"_bla=
+nk">https://entangle-photo.org</a>=C2=A0 =C2=A0 -o-=C2=A0 =C2=A0 <a href=3D=
+"https://www.instagram.com/dberrange" rel=3D"noreferrer" target=3D"_blank">=
+https://www.instagram.com/dberrange</a> :|<br>
+<br>
+<br>
+</blockquote></div><br clear=3D"all"><br>-- <br><div dir=3D"ltr" class=3D"g=
+mail_signature">Marc-Andr=C3=A9 Lureau<br></div></div>
+
+--00000000000067147105adc3c004--
 
