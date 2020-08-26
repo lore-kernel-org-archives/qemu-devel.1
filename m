@@ -2,84 +2,83 @@ Return-Path: <SRS0=H0ck=CE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0511C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 14:22:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A4F2C433E1
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 14:30:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 673F7221E2
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 14:22:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 43DD421741
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 14:30:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vQqoTB2e"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 673F7221E2
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="c36NkZKa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43DD421741
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57248 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59822 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAwK3-0006gz-Nn
-	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 10:22:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42724)
+	id 1kAwRN-0008Pv-Hl
+	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 10:30:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44404)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kAwJS-0006BD-GL
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 10:22:06 -0400
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:33399)
+ id 1kAwQm-0007y0-O1
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 10:29:40 -0400
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:42089)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kAwJQ-0004EM-9i
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 10:22:05 -0400
-Received: by mail-pg1-x541.google.com with SMTP id o13so1115315pgf.0
- for <qemu-devel@nongnu.org>; Wed, 26 Aug 2020 07:22:03 -0700 (PDT)
+ id 1kAwQk-0005Dx-RE
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 10:29:40 -0400
+Received: by mail-pg1-x541.google.com with SMTP id g1so1101287pgm.9
+ for <qemu-devel@nongnu.org>; Wed, 26 Aug 2020 07:29:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=RLAqJRnY5i7j/F/xs3iBksPzOSFcsXzPDlzZZ0zuwmY=;
- b=vQqoTB2eO81Dy1LEmyuhKwb5hHe23yDw/JjanVpsGXGwDPUE+OiJmPt1idXgg7sx2f
- 3vT+mjp+gdOiyF6Zf6JvJemRk0TQUq79NyLo6YaTXNfSFqJCvYxee4KnAoIpwz51MBC7
- UObrlRCMIYAHulhOYoI4fF4ceINpKMNKKY1a/Npm4ia9JBgTwBmvCdRe9iHwEMR0IGbB
- k9wKxAy2oskljIF+xaYjMn1Y0NqpV2v01aJXuhti7zCRmdapCmdbYEQWaShHpkN3psDO
- 242kbz4D+EFSGy6QcyqweyVGZW6v34g1OZB4cTgVCqe5Z4hf8O7n2hVbXpLIpZl9DTMK
- HmIw==
+ bh=/8PBR3k/r2NCRoMrI78K9H5qgznee/2LFVwyC6xM0LA=;
+ b=c36NkZKah1WWH1Dn9C9SGcjy+VdTyDsIndlWpSNmPoN14/berC4Um3z2IaUoEhzpuF
+ WaoBz6TWuoxwjlsWoILwHKhNyu5Ic9dcN7V4z4mr99Cl4QI2oLelvBysaehBvI/caVJR
+ yN4Sga1ziRx9duY5yjpY2Rgek+kNyk6r/hlS9T0H9+DnbW3x3eA3fwCwB0MZUFTP09Ld
+ bc0+SHOoAeUTdCWIzhPcIwYjur25kzGuhHH1tl2mXA1G/T5RCNEgW4Xp2zYI7zXfwAiG
+ 8Dbqi9TFehFr8M56435AsUKxULE2AcwkT+HMayOGZerV1JG7djPfBWvEQTJrSAjoFpbI
+ orAw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=RLAqJRnY5i7j/F/xs3iBksPzOSFcsXzPDlzZZ0zuwmY=;
- b=oHs9Qrlgac+lR0v49hmaXqdsyyxnj7JXid/SVd0tzjWEyCjFrMV6g2qHUffBpFYZKO
- gVwcTVJePkaW6HHItLFSUMwUXwg5KxWbTchi2ZN2iB228qcbKalWT2a8HB3RJWyVKvOx
- lvEqNFVg2TRWxCMjeqznZ8rBaUlK45a/rT6M3nj+ICO+3yHpUwaM2mRzrc2E1TxnlEBz
- lMn9u7KxBeO2cfaa4axZfYDcXLku54/krtghU4OhHz2RakedJ8RX7i9IiaKgwtYPSsDd
- 6dpQsgQQtJAqaC+oc8mewSZJXckh3vPkqlqrfXRtI0rJmxWo9FWmS7XaXu8yUJw5WthA
- mbUg==
-X-Gm-Message-State: AOAM5336QEKOn1Sl1C0H4vq8D+/oqGYEJAIEjMZzzPTfataIhjsNwWu3
- Vu+uDs3NmxgGnP8orNzZx9b9GA==
-X-Google-Smtp-Source: ABdhPJwxqJnyOIcHvE4jau5v/BG3mVzLdJRes/u5ZEsukc+2pWp5ccJa7YpenkAJlULUsXYkR61jzQ==
-X-Received: by 2002:aa7:9427:: with SMTP id y7mr12533977pfo.12.1598451722629; 
- Wed, 26 Aug 2020 07:22:02 -0700 (PDT)
+ bh=/8PBR3k/r2NCRoMrI78K9H5qgznee/2LFVwyC6xM0LA=;
+ b=IuQmNXhhDer7ehwc8SpEYStTjzxRx8yuoZEPLeSNosmtmrDT0xyOft4NdDza5SYSqM
+ /b98tr/nKfHvbN5YuJu5prjA2ccna7clEqXuABm8By/7NtjYqowmKGPA286yv/NjgzKj
+ y+FfQrylp7isWY7knFFPluxvpcb9/yd3fi+mHZhSSFpGiyFGcZSfxIA0En6bPXDDEf81
+ OfiX58Jis1ZjhcPbt0Q/MxQ99aSOrPFKwhrwAL4bJNDdbKVneOqs1JxFZmLEFKKBStIX
+ noSPtBGxIHlC6JBPOzQOTAVH7ZHX2BRpC5jHSSXpvl0nzWUL+AudERcCUcwCKRGdsMM2
+ 4tBQ==
+X-Gm-Message-State: AOAM530+Bwv1dtBW1+ICs4AFyPmQm41O4Qf0j3K3hIT9uAKm9aJtQ9ja
+ Abs4dzklefRgyKV8TKt8jlAa1A==
+X-Google-Smtp-Source: ABdhPJzbt6NGCy1Edsnxv1fDzx9uYSuEtoPhy2pC5Skc1qSdMN1vBHz6aomq55hfyl6BSpeAa9oPUQ==
+X-Received: by 2002:a63:5a41:: with SMTP id k1mr10437720pgm.346.1598452177531; 
+ Wed, 26 Aug 2020 07:29:37 -0700 (PDT)
 Received: from [192.168.81.79]
  (h216-228-167-147.bendor.dedicated.static.tds.net. [216.228.167.147])
- by smtp.gmail.com with ESMTPSA id mp1sm2594454pjb.27.2020.08.26.07.22.01
+ by smtp.gmail.com with ESMTPSA id j2sm2298733pga.12.2020.08.26.07.29.35
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 26 Aug 2020 07:22:02 -0700 (PDT)
-Subject: Re: [RFC PATCH v3 10/34] Hexagon (target/hexagon) instruction and
- packet types
+ Wed, 26 Aug 2020 07:29:36 -0700 (PDT)
+Subject: Re: [RFC PATCH v3 11/34] Hexagon (target/hexagon) register fields
 To: Taylor Simpson <tsimpson@quicinc.com>, qemu-devel@nongnu.org
 References: <1597765847-16637-1-git-send-email-tsimpson@quicinc.com>
- <1597765847-16637-11-git-send-email-tsimpson@quicinc.com>
+ <1597765847-16637-12-git-send-email-tsimpson@quicinc.com>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <182cb39f-7a49-22e4-141c-a3df790b56ab@linaro.org>
-Date: Wed, 26 Aug 2020 07:22:00 -0700
+Message-ID: <9116d651-9b54-1507-9723-d3a365812dc4@linaro.org>
+Date: Wed, 26 Aug 2020 07:29:33 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <1597765847-16637-11-git-send-email-tsimpson@quicinc.com>
+In-Reply-To: <1597765847-16637-12-git-send-email-tsimpson@quicinc.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -113,28 +112,68 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 8/18/20 8:50 AM, Taylor Simpson wrote:
-> +struct Instruction {
-> +    semantic_insn_t generate;            /* pointer to genptr routine */
-> +    size1u_t regno[REG_OPERANDS_MAX];    /* reg operands including predicates */
-> +    size2u_t opcode;
+> Declare bitfields within registers such as user status register (USR)
+> 
+> Signed-off-by: Taylor Simpson <tsimpson@quicinc.com>
+> ---
+>  target/hexagon/reg_fields.h     | 40 +++++++++++++++++++++
+>  target/hexagon/reg_fields_def.h | 78 +++++++++++++++++++++++++++++++++++++++++
+>  target/hexagon/reg_fields.c     | 28 +++++++++++++++
+>  3 files changed, 146 insertions(+)
+>  create mode 100644 target/hexagon/reg_fields.h
+>  create mode 100644 target/hexagon/reg_fields_def.h
+>  create mode 100644 target/hexagon/reg_fields.c
+> 
+> diff --git a/target/hexagon/reg_fields.h b/target/hexagon/reg_fields.h
+> new file mode 100644
+> index 0000000..cf168f0
+> --- /dev/null
+> +++ b/target/hexagon/reg_fields.h
+> @@ -0,0 +1,40 @@
+> +/*
+> + *  Copyright(c) 2019-2020 Qualcomm Innovation Center, Inc. All Rights Reserved.
+> + *
+> + *  This program is free software; you can redistribute it and/or modify
+> + *  it under the terms of the GNU General Public License as published by
+> + *  the Free Software Foundation; either version 2 of the License, or
+> + *  (at your option) any later version.
+> + *
+> + *  This program is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + *  GNU General Public License for more details.
+> + *
+> + *  You should have received a copy of the GNU General Public License
+> + *  along with this program; if not, see <http://www.gnu.org/licenses/>.
+> + */
 > +
-> +    size4u_t iclass:6;
-> +    size4u_t slot:3;
-> +    size4u_t part1:1;        /*
-> +                              * cmp-jumps are split into two insns.
-> +                              * set for the compare and clear for the jump
-> +                              */
-> +    size4u_t extension_valid:1;   /* Has a constant extender attached */
-> +    size4u_t which_extended:1;    /* If has an extender, which immediate */
-> +    size4u_t is_endloop:1;   /* This is an end of loop */
-> +    size4u_t new_value_producer_slot:4;
-> +    size4s_t immed[IMMEDS_MAX];    /* immediate field */
-> +};
+> +#ifndef HEXAGON_REG_FIELDS_H
+> +#define HEXAGON_REG_FIELDS_H
+> +
+> +#define NUM_GEN_REGS 32
 
-Is this an imported file or not?
+What's this?  It doesn't appear to be field related.
 
-If it is not imported, I'd very much prefer that we stick to the stdint.h type
-names.
+> +extern reg_field_t reg_field_info[];
+
+const.
+
+> +enum reg_fields_enum {
+
+Doesn't follow naming guidelines.  But you don't actually use the name at all,
+so better to just drop the name entirely?
+
+> +/* USR fields */
+> +DEF_REG_FIELD(USR_OVF,
+> +    "ovf", 0, 1,
+> +    "Sticky Saturation Overflow - "
+> +    "Set when saturation occurs while executing instruction that specifies "
+> +    "optional saturation, remains set until explicitly cleared by a USR=Rs "
+> +    "instruction.")
+
+Is the description as a string really useful, or even used?
+A comment would seem to do just as well, not consume space in the final binary,
+and even then seems redundant with the actual architecture manual.
 
 
 r~
