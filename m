@@ -2,57 +2,57 @@ Return-Path: <SRS0=H0ck=CE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B640C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 11:45:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 613A2C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 11:45:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 583B520707
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 11:45:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 217E320707
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 11:45:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=lse.epita.fr header.i=@lse.epita.fr header.b="e+qFHPF+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 583B520707
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=lse.epita.fr header.i=@lse.epita.fr header.b="FkI3PwOr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 217E320707
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=lse.epita.fr
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33418 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33608 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAtre-0000oP-JB
-	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 07:45:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56546)
+	id 1kAtrh-0000t2-BP
+	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 07:45:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56564)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <srs0=n7r+=ce=lse.epita.fr=cesar.belley@cri.epita.fr>)
- id 1kAtpJ-0004fB-KI
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 07:42:49 -0400
-Received: from gate-2.cri.epita.net ([163.5.55.20]:47880
+ id 1kAtpK-0004fb-3v
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 07:42:50 -0400
+Received: from gate-2.cri.epita.net ([163.5.55.20]:47892
  helo=mail-2.srv.cri.epita.fr)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <srs0=n7r+=ce=lse.epita.fr=cesar.belley@cri.epita.fr>)
- id 1kAtpG-00085N-O2
+ id 1kAtpH-00085V-Ev
  for qemu-devel@nongnu.org; Wed, 26 Aug 2020 07:42:49 -0400
 Received: from MattGorko-Laptop.home
  (lfbn-idf1-1-1395-83.w90-79.abo.wanadoo.fr [90.79.87.83])
  (Authenticated sender: cesar.belley)
- by mail-2.srv.cri.epita.fr (Postfix) with ESMTPSA id 8CA25412C9;
- Wed, 26 Aug 2020 13:42:45 +0200 (CEST)
+ by mail-2.srv.cri.epita.fr (Postfix) with ESMTPSA id 40268412D2;
+ Wed, 26 Aug 2020 13:42:46 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=lse.epita.fr; s=cri;
- t=1598442165; bh=mXjkHDuBA2Pelp7FvLqsvotpGAVI+Oj+eqQ5xB79ZVs=;
+ t=1598442166; bh=bZPaLgMb0FgA40ZLz8H5S+gZV0ArePaSLMEk5AtLEio=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=e+qFHPF+ct+KgowQcnM03cBIJejo5jjvqi0aU69KphXhROqYxdfLd8IWSAQQscKUQ
- mcW6SMpwDaQ1PeG2iEmQpbSr1JtzvzF40ly914amkbASre1+MM6zhMiyVTjGO0M3/b
- jtmwbCrp2BhL1gXiiG5gK+GSFWuxp5Yk+763uiB4=
+ b=FkI3PwOrNGkfBgF4t9AWqH2/SGc6FlseSUGUIT0SmZwh1U+LwRqrG2mic0RnAusfJ
+ WmoOdcJ40yYV3efoU9+6ECGWWP7lT/9mtl35Fg4sj3FUlIcXKbdVqrlWXlyYbTEpdf
+ pdiKYaJQ7HBd3OsttO72Geo4SG9fSQGCSAbC8Ih0=
 From: =?UTF-8?q?C=C3=A9sar=20Belley?= <cesar.belley@lse.epita.fr>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 02/12] docs: Add USB U2F key device documentation
-Date: Wed, 26 Aug 2020 13:41:59 +0200
-Message-Id: <20200826114209.28821-3-cesar.belley@lse.epita.fr>
+Subject: [PATCH v3 04/12] hw/usb: Add U2F key base class implementation
+Date: Wed, 26 Aug 2020 13:42:01 +0200
+Message-Id: <20200826114209.28821-5-cesar.belley@lse.epita.fr>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20200826114209.28821-1-cesar.belley@lse.epita.fr>
 References: <20200826114209.28821-1-cesar.belley@lse.epita.fr>
@@ -88,126 +88,379 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add USB U2F key device documentation:
-- USB U2F key device
-- Building
-- Using u2f-emulated
-- Using u2f-passthru
-- Libu2f-emu
+This patch adds the U2F key base class implementation.
+
+The U2F key base mainly takes care of the HID interfacing with guest.
+On the one hand, it retrieves the guest U2FHID packets and transmits
+them to the variant associated according to the mode: pass-through
+or emulated.
+On the other hand, it provides the public API used by its variants to
+send U2FHID packets to the guest.
 
 Signed-off-by: César Belley <cesar.belley@lse.epita.fr>
 ---
- docs/u2f.txt | 101 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 101 insertions(+)
- create mode 100644 docs/u2f.txt
+ hw/usb/u2f.c | 352 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 352 insertions(+)
+ create mode 100644 hw/usb/u2f.c
 
-diff --git a/docs/u2f.txt b/docs/u2f.txt
+diff --git a/hw/usb/u2f.c b/hw/usb/u2f.c
 new file mode 100644
-index 0000000000..f60052882e
+index 0000000000..bc09191f06
 --- /dev/null
-+++ b/docs/u2f.txt
-@@ -0,0 +1,101 @@
-+QEMU U2F Key Device Documentation.
++++ b/hw/usb/u2f.c
+@@ -0,0 +1,352 @@
++/*
++ * U2F USB device.
++ *
++ * Copyright (c) 2020 César Belley <cesar.belley@lse.epita.fr>
++ * Written by César Belley <cesar.belley@lse.epita.fr>
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
 +
-+Contents
-+1. USB U2F key device
-+2. Building
-+3. Using u2f-emulated
-+4. Using u2f-passthru
-+5. Libu2f-emu
++#include "qemu/osdep.h"
++#include "qemu/module.h"
++#include "qapi/error.h"
++#include "hw/usb.h"
++#include "hw/usb/hid.h"
++#include "migration/vmstate.h"
++#include "desc.h"
 +
-+1. USB U2F key device
++#include "u2f.h"
 +
-+U2F is an open authentication standard that enables relying parties
-+exposed to the internet to offer a strong second factor option for end
-+user authentication.
++/* U2F key Vendor / Product */
++#define U2F_KEY_VENDOR_NUM     0x46f4 /* CRC16() of "QEMU" */
++#define U2F_KEY_PRODUCT_NUM    0x0005
 +
-+The standard brings many advantages to both parties, client and server,
-+allowing to reduce over-reliance on passwords, it increases authentication
-+security and simplifies passwords.
++enum {
++    STR_MANUFACTURER = 1,
++    STR_PRODUCT,
++    STR_SERIALNUMBER,
++    STR_CONFIG,
++    STR_INTERFACE
++};
 +
-+The second factor is materialized by a device implementing the U2F
-+protocol. In case of a USB U2F security key, it is a USB HID device
-+that implements the U2F protocol.
++static const USBDescStrings desc_strings = {
++    [STR_MANUFACTURER]     = "QEMU",
++    [STR_PRODUCT]          = "U2F USB key",
++    [STR_SERIALNUMBER]     = "0",
++    [STR_CONFIG]           = "U2F key config",
++    [STR_INTERFACE]        = "U2F key interface"
++};
 +
-+In Qemu, the USB U2F key device offers a dedicated support of U2F, allowing
-+guest USB FIDO/U2F security keys operating in two possible modes:
-+pass-through and emulated.
++static const USBDescIface desc_iface_u2f_key = {
++    .bInterfaceNumber              = 0,
++    .bNumEndpoints                 = 2,
++    .bInterfaceClass               = USB_CLASS_HID,
++    .bInterfaceSubClass            = 0x0,
++    .bInterfaceProtocol            = 0x0,
++    .ndesc                         = 1,
++    .descs = (USBDescOther[]) {
++        {
++            /* HID descriptor */
++            .data = (uint8_t[]) {
++                0x09,          /*  u8  bLength */
++                USB_DT_HID,    /*  u8  bDescriptorType */
++                0x10, 0x01,    /*  u16 HID_class */
++                0x00,          /*  u8  country_code */
++                0x01,          /*  u8  num_descriptors */
++                USB_DT_REPORT, /*  u8  type: Report */
++                0x22, 0,       /*  u16 len */
++            },
++        },
++    },
++    .eps = (USBDescEndpoint[]) {
++        {
++            .bEndpointAddress      = USB_DIR_IN | 0x01,
++            .bmAttributes          = USB_ENDPOINT_XFER_INT,
++            .wMaxPacketSize        = U2FHID_PACKET_SIZE,
++            .bInterval             = 0x05,
++        }, {
++            .bEndpointAddress      = USB_DIR_OUT | 0x01,
++            .bmAttributes          = USB_ENDPOINT_XFER_INT,
++            .wMaxPacketSize        = U2FHID_PACKET_SIZE,
++            .bInterval             = 0x05,
++        },
++    },
 +
-+The pass-through mode consists of passing all requests made from the guest
-+to the physical security key connected to the host machine and vice versa.
-+In addition, the dedicated pass-through allows to have a U2F security key
-+shared on several guests which is not possible with a simple host device
-+assignment pass-through.
++};
 +
-+The emulated mode consists of completely emulating the behavior of an
-+U2F device through software part. Libu2f-emu is used for that.
++static const USBDescDevice desc_device_u2f_key = {
++    .bcdUSB                        = 0x0100,
++    .bMaxPacketSize0               = U2FHID_PACKET_SIZE,
++    .bNumConfigurations            = 1,
++    .confs = (USBDescConfig[]) {
++        {
++            .bNumInterfaces        = 1,
++            .bConfigurationValue   = 1,
++            .iConfiguration        = STR_CONFIG,
++            .bmAttributes          = USB_CFG_ATT_ONE,
++            .bMaxPower             = 15,
++            .nif = 1,
++            .ifs = &desc_iface_u2f_key,
++        },
++    },
++};
 +
++static const USBDesc desc_u2f_key = {
++    .id = {
++        .idVendor          = U2F_KEY_VENDOR_NUM,
++        .idProduct         = U2F_KEY_PRODUCT_NUM,
++        .bcdDevice         = 0,
++        .iManufacturer     = STR_MANUFACTURER,
++        .iProduct          = STR_PRODUCT,
++        .iSerialNumber     = STR_SERIALNUMBER,
++    },
++    .full = &desc_device_u2f_key,
++    .str  = desc_strings,
++};
 +
-+2. Building
++static const uint8_t u2f_key_hid_report_desc[] = {
++    0x06, 0xd0, 0xf1, /* Usage Page (FIDO) */
++    0x09, 0x01,       /* Usage (FIDO) */
++    0xa1, 0x01,       /* Collection (HID Application) */
++    0x09, 0x20,       /*    Usage (FIDO data in) */
++    0x15, 0x00,       /*        Logical Minimum (0) */
++    0x26, 0xFF, 0x00, /*        Logical Maximum (0xff) */
++    0x75, 0x08,       /*        Report Size (8) */
++    0x95, 0x40,       /*        Report Count (0x40) */
++    0x81, 0x02,       /*        Input (Data, Variable, Absolute) */
++    0x09, 0x21,       /*    Usage (FIDO data out) */
++    0x15, 0x00,       /*        Logical Minimum (0) */
++    0x26, 0xFF, 0x00, /*        Logical Maximum  (0xFF) */
++    0x75, 0x08,       /*        Report Size (8) */
++    0x95, 0x40,       /*        Report Count (0x40) */
++    0x91, 0x02,       /*        Output (Data, Variable, Absolute) */
++    0xC0              /* End Collection */
++};
 +
-+To ensure the build of the u2f-emulated device variant which depends
-+on libu2f-emu: configuring and building:
++static void u2f_key_reset(U2FKeyState *key)
++{
++    key->pending_in_start = 0;
++    key->pending_in_end = 0;
++    key->pending_in_num = 0;
++}
 +
-+    ./configure --enable-u2f && make
++static void u2f_key_handle_reset(USBDevice *dev)
++{
++    U2FKeyState *key = U2F_KEY(dev);
 +
++    u2f_key_reset(key);
++}
 +
-+3. Using u2f-emulated
++static void u2f_key_handle_control(USBDevice *dev, USBPacket *p,
++               int request, int value, int index, int length, uint8_t *data)
++{
++    U2FKeyState *key = U2F_KEY(dev);
++    int ret;
 +
-+To work, an emulated U2F device must have four elements:
-+ * ec x509 certificate
-+ * ec private key
-+ * counter (four bytes value)
-+ * 48 bytes of entropy (random bits)
++    ret = usb_desc_handle_control(dev, p, request, value, index, length, data);
++    if (ret >= 0) {
++        return;
++    }
 +
-+To use this type of device, this one has to be configured, and these
-+four elements must be passed one way or another.
++    switch (request) {
++    case InterfaceRequest | USB_REQ_GET_DESCRIPTOR:
++        switch (value >> 8) {
++        case 0x22:
++            memcpy(data, u2f_key_hid_report_desc,
++                   sizeof(u2f_key_hid_report_desc));
++            p->actual_length = sizeof(u2f_key_hid_report_desc);
++            break;
++        default:
++            goto fail;
++        }
++        break;
++    case HID_GET_IDLE:
++        data[0] = key->idle;
++        p->actual_length = 1;
++        break;
++    case HID_SET_IDLE:
++        key->idle = (uint8_t)(value >> 8);
++        break;
++    default:
++    fail:
++        p->status = USB_RET_STALL;
++        break;
++    }
 +
-+Assuming that you have a working libu2f-emu installed on the host.
-+There are three possible ways of configurations:
-+ * ephemeral
-+ * setup directory
-+ * manual
++}
 +
-+Ephemeral is the simplest way to configure, it lets the device generate
-+all the elements it needs for a single use of the lifetime of the device.
++static void u2f_key_recv_from_guest(U2FKeyState *key, USBPacket *p)
++{
++    U2FKeyClass *kc = U2F_KEY_GET_CLASS(key);
++    uint8_t packet[U2FHID_PACKET_SIZE];
 +
-+    qemu -usb -device u2f-emulated
++    if (kc->recv_from_guest == NULL || p->iov.size != U2FHID_PACKET_SIZE) {
++        return;
++    }
 +
-+Setup directory allows to configure the device from a directory containing
-+four files:
-+ * certificate.pem: ec x509 certificate
-+ * private-key.pem: ec private key
-+ * counter: counter value
-+ * entropy: 48 bytes of entropy
++    usb_packet_copy(p, packet, p->iov.size);
++    kc->recv_from_guest(key, packet);
++}
 +
-+    qemu -usb -device u2f-emulated,dir=$dir
++static void u2f_pending_in_add(U2FKeyState *key,
++                               const uint8_t packet[U2FHID_PACKET_SIZE])
++{
++    uint8_t index;
 +
-+Manual allows to configure the device more finely by specifying each
-+of the elements necessary for the device:
-+ * cert
-+ * priv
-+ * counter
-+ * entropy
++    if (key->pending_in_num >= U2FHID_PENDING_IN_NUM) {
++        return;
++    }
 +
-+    qemu -usb -device u2f-emulated,cert=$DIR1/$FILE1,priv=$DIR2/$FILE2,counter=$DIR3/$FILE3,entropy=$DIR4/$FILE4
++    index = key->pending_in_end;
++    key->pending_in_end = (index + 1) % U2FHID_PENDING_IN_NUM;
++    ++key->pending_in_num;
 +
++    memcpy(key->pending_in[index], packet, U2FHID_PACKET_SIZE);
++}
 +
-+4. Using u2f-passthru
++static uint8_t *u2f_pending_in_get(U2FKeyState *key)
++{
++    uint8_t index;
 +
-+On the host specify the u2f-passthru device with a suitable hidraw:
++    if (key->pending_in_num == 0) {
++        return NULL;
++    }
 +
-+    qemu -usb -device u2f-passthru,hidraw=/dev/hidraw0
++    index = key->pending_in_start;
++    key->pending_in_start = (index + 1) % U2FHID_PENDING_IN_NUM;
++    --key->pending_in_num;
 +
++    return key->pending_in[index];
++}
 +
-+5. Libu2f-emu
++static void u2f_key_handle_data(USBDevice *dev, USBPacket *p)
++{
++    U2FKeyState *key = U2F_KEY(dev);
++    uint8_t *packet_in;
 +
-+The u2f-emulated device uses libu2f-emu for the U2F key emulation. Libu2f-emu
-+implements completely the U2F protocol device part for all specified
-+transport given by the FIDO Alliance.
++    /* Endpoint number check */
++    if (p->ep->nr != 1) {
++        p->status = USB_RET_STALL;
++        return;
++    }
 +
-+For more information about libu2f-emu see this page:
-+https://github.com/MattGorko/libu2f-emu.
++    switch (p->pid) {
++    case USB_TOKEN_OUT:
++        u2f_key_recv_from_guest(key, p);
++        break;
++    case USB_TOKEN_IN:
++        packet_in = u2f_pending_in_get(key);
++        if (packet_in == NULL) {
++            p->status = USB_RET_NAK;
++            return;
++        }
++        usb_packet_copy(p, packet_in, U2FHID_PACKET_SIZE);
++        break;
++    default:
++        p->status = USB_RET_STALL;
++        break;
++    }
++}
++
++void u2f_send_to_guest(U2FKeyState *key,
++                       const uint8_t packet[U2FHID_PACKET_SIZE])
++{
++    u2f_pending_in_add(key, packet);
++    usb_wakeup(key->ep, 0);
++}
++
++static void u2f_key_unrealize(USBDevice *dev)
++{
++    U2FKeyState *key = U2F_KEY(dev);
++    U2FKeyClass *kc = U2F_KEY_GET_CLASS(key);
++
++    if (kc->unrealize != NULL) {
++        kc->unrealize(key);
++    }
++}
++
++static void u2f_key_realize(USBDevice *dev, Error **errp)
++{
++    U2FKeyState *key = U2F_KEY(dev);
++    U2FKeyClass *kc = U2F_KEY_GET_CLASS(key);
++    Error *local_err = NULL;
++
++    usb_desc_create_serial(dev);
++    usb_desc_init(dev);
++    u2f_key_reset(key);
++
++    if (kc->realize != NULL) {
++        kc->realize(key, &local_err);
++        if (local_err != NULL) {
++            error_propagate(errp, local_err);
++            return;
++        }
++    }
++    key->ep = usb_ep_get(dev, USB_TOKEN_IN, 1);
++}
++
++const VMStateDescription vmstate_u2f_key = {
++    .name = "u2f-key",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_USB_DEVICE(dev, U2FKeyState),
++        VMSTATE_UINT8(idle, U2FKeyState),
++        VMSTATE_UINT8_2DARRAY(pending_in, U2FKeyState,
++            U2FHID_PENDING_IN_NUM, U2FHID_PACKET_SIZE),
++        VMSTATE_UINT8(pending_in_start, U2FKeyState),
++        VMSTATE_UINT8(pending_in_end, U2FKeyState),
++        VMSTATE_UINT8(pending_in_num, U2FKeyState),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++static void u2f_key_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++    USBDeviceClass *uc = USB_DEVICE_CLASS(klass);
++
++    uc->product_desc   = "QEMU U2F USB key";
++    uc->usb_desc       = &desc_u2f_key;
++    uc->handle_reset   = u2f_key_handle_reset;
++    uc->handle_control = u2f_key_handle_control;
++    uc->handle_data    = u2f_key_handle_data;
++    uc->handle_attach  = usb_desc_attach;
++    uc->realize        = u2f_key_realize;
++    uc->unrealize      = u2f_key_unrealize;
++    dc->desc           = "QEMU U2F key";
++    dc->vmsd           = &vmstate_u2f_key;
++}
++
++static const TypeInfo u2f_key_info = {
++    .name          = TYPE_U2F_KEY,
++    .parent        = TYPE_USB_DEVICE,
++    .instance_size = sizeof(U2FKeyState),
++    .abstract      = true,
++    .class_size    = sizeof(U2FKeyClass),
++    .class_init    = u2f_key_class_init,
++};
++
++static void u2f_key_register_types(void)
++{
++    type_register_static(&u2f_key_info);
++    usb_legacy_register(TYPE_U2F_KEY, "u2f-key", NULL);
++}
++
++type_init(u2f_key_register_types)
 -- 
 2.28.0
 
