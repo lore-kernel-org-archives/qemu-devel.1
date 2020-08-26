@@ -2,90 +2,87 @@ Return-Path: <SRS0=H0ck=CE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2960C433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 10:34:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02B23C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 10:39:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AD77520786
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 10:34:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C611C20786
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 10:39:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WM+jXmUZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD77520786
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lp7ujeXg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C611C20786
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41702 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44068 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAsl7-0007xo-Vh
-	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 06:34:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39590)
+	id 1kAspY-0000lO-59
+	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 06:39:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40498)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kAskR-0007Xd-Od
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 06:33:43 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:52487)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kAskP-0007gn-F0
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 06:33:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598438020;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=IW3gN9+0RDuDLGIydtzmFYpj3H2MYw6BOZ52gAPegQA=;
- b=WM+jXmUZGhs8wKI97BEHs0ttqBR989I6OgWAt0onfYmul3LyrAkyrX3TlNvV4gq4N/4G1U
- 9rbEe0wwyEeiWyNqKbtDfurDNR9OLfNqqUYx0tQtx5qnDJsdVrHx9cYxKbBmx/gJbeOmK3
- XRN6/u9x8jz6DoJosdUAlKKPaLl0iZ8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-371-HpO-CzPGOyyfD4M1Zoh9jQ-1; Wed, 26 Aug 2020 06:33:38 -0400
-X-MC-Unique: HpO-CzPGOyyfD4M1Zoh9jQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B27041074644;
- Wed, 26 Aug 2020 10:33:36 +0000 (UTC)
-Received: from work-vm (ovpn-114-48.ams2.redhat.com [10.36.114.48])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B09471992F;
- Wed, 26 Aug 2020 10:33:33 +0000 (UTC)
-Date: Wed, 26 Aug 2020 11:33:30 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: David Edmondson <dme@dme.org>
-Subject: Re: [PATCH v5 03/12] migration/dirtyrate: Add RamlockDirtyInfo to
- store sampled page info
-Message-ID: <20200826103330.GB2726@work-vm>
-References: <1598260480-64862-1-git-send-email-zhengchuan@huawei.com>
- <1598260480-64862-4-git-send-email-zhengchuan@huawei.com>
- <m2lfi1lpqj.fsf@dme.org>
+ (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1kAsp2-0000Hm-4E
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 06:38:28 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:46275)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1kAsp0-0008Ag-Fe
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 06:38:27 -0400
+Received: by mail-oi1-x243.google.com with SMTP id v13so1062973oiv.13
+ for <qemu-devel@nongnu.org>; Wed, 26 Aug 2020 03:38:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=QnahO6RaE7Swl7ORyoZff6JyJLeR1Uxy7pFWOUSO9v8=;
+ b=lp7ujeXgJgBO2ayhfXnq2HGsb5VxbTMZkRJWEddB/HugRuHu6DT3uXuRSb5ywyS1Qh
+ MFFPtEokT8EGNIatENwLo4zQ/LMhMije5jAlHTBzN6EU5qEd2NxM4WVAWGvXuXqjXFJ9
+ dPCdzhBWx0OMKYSgGnKM87yx6WjirNyQW93iJA+Afc30EQSzblVwm5rCijP4JPaxyKzE
+ E4z72geQZsolmT30N1rXndhP6THkB3LCu1Bov7HUKlf+YNnty8lrm5HfA96rTj84t+Az
+ Xv3mBFSzDC1+2hBuexa44i6auuOFuf7EGwW0aanrkMCXI1ReykZV7QLroXEJHG26Emv+
+ uheA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=QnahO6RaE7Swl7ORyoZff6JyJLeR1Uxy7pFWOUSO9v8=;
+ b=h09gVlTrTK78wf8MvBLxOpAhmKFakZMFsb6Oj3wKs61K9Mtds8MHBd/F4W5uVROKKm
+ UvvQ8vxy5KoYVv1Zi5De3kTmqegSGptp96yFf5yAs7aWh1uZoppFweFTsL3ODTDgGrvg
+ BbH3zKF++Qk8r8YJXN95mc4Dtxxdpfvrp/mNODZ2Xyjj9KJVOw5PuOKIo+PMRDy40DkG
+ nnqZcd66MjG/ruPPzEgRYtOZ36ZbiUkwD0GqvfkohrVPGYaARnCbbXShfg5fSnhIOOy5
+ +1L9pPlklPZedlNJXuhV5Suy9qIqicKq++3KWGSCrimfJjKsiOJrFTiULWAzeDEwiHfw
+ FgSg==
+X-Gm-Message-State: AOAM532u5BwQqOhp8DS9uvTN+Au07IErdDAhaQKOTjvcbA0+ZiBo6sAa
+ 3jTJCwV4iTiuw2PybnRaOJsdiNnbnfyzpvyOBD8=
+X-Google-Smtp-Source: ABdhPJxlLHsRrk7WFi8tIXFV4gRMK3X90aO55c5aqdz7ynI5tI7qwpUbmQwfn69k5cVkGXmENb3T5MvyKL3pIW7SR58=
+X-Received: by 2002:aca:1117:: with SMTP id 23mr3566926oir.97.1598438304969;
+ Wed, 26 Aug 2020 03:38:24 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <m2lfi1lpqj.fsf@dme.org>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=dgilbert@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/25 23:30:47
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.958,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+References: <20200814160241.7915-1-pannengyuan@huawei.com>
+ <20200814160241.7915-12-pannengyuan@huawei.com>
+In-Reply-To: <20200814160241.7915-12-pannengyuan@huawei.com>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Wed, 26 Aug 2020 18:37:49 +0800
+Message-ID: <CAKXe6S+8mDZ4Ka8kenPBOu8-Jx=hm8Jk9wNedN11Wy75y0YApw@mail.gmail.com>
+Subject: Re: [PATCH 11/12] vnc-auth-sasl: Plug memleak in
+ vnc_socket_ip_addr_string
+To: Pan Nengyuan <pannengyuan@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::243;
+ envelope-from=liq3ea@gmail.com; helo=mail-oi1-x243.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,91 +95,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alex.chen@huawei.com, berrange@redhat.com, zhang.zhanghailiang@huawei.com,
- quintela@redhat.com, qemu-devel@nongnu.org, xiexiangyou@huawei.com,
- Chuan Zheng <zhengchuan@huawei.com>, ann.zhuangyanying@huawei.com,
- fangying1@huawei.com
+Cc: Chen Qun <kuhn.chenqun@huawei.com>,
+ zhanghailiang <zhang.zhanghailiang@huawei.com>,
+ Euler Robot <euler.robot@huawei.com>, Qemu Developers <qemu-devel@nongnu.org>,
+ Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* David Edmondson (dme@dme.org) wrote:
-> On Monday, 2020-08-24 at 17:14:31 +08, Chuan Zheng wrote:
-> 
-> > Add RamlockDirtyInfo to store sampled page info of each ramblock.
-> >
-> > Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
-> > ---
-> >  migration/dirtyrate.h | 18 ++++++++++++++++++
-> >  1 file changed, 18 insertions(+)
-> >
-> > diff --git a/migration/dirtyrate.h b/migration/dirtyrate.h
-> > index 33669b7..70000da 100644
-> > --- a/migration/dirtyrate.h
-> > +++ b/migration/dirtyrate.h
-> > @@ -19,6 +19,11 @@
-> >   */
-> >  #define DIRTYRATE_DEFAULT_SAMPLE_PAGES            512
-> >  
-> > +/*
-> > + * Record ramblock idstr
-> > + */
-> > +#define RAMBLOCK_INFO_MAX_LEN                     256
-> > +
-> >  /* Take 1s as default for calculation duration */
-> >  #define DEFAULT_FETCH_DIRTYRATE_TIME_SEC          1
-> >  
-> > @@ -27,6 +32,19 @@ struct DirtyRateConfig {
-> >      int64_t sample_period_seconds; /* time duration between two sampling */
-> >  };
-> >  
-> > +/*
-> > + * Store dirtypage info for each ramblock.
-> > + */
-> > +struct RamblockDirtyInfo {
-> > +    char idstr[RAMBLOCK_INFO_MAX_LEN]; /* idstr for each ramblock */
-> > +    uint8_t *ramblock_addr; /* base address of ramblock we measure */
-> > +    uint64_t ramblock_pages; /* ramblock size in 4K-page */
-> 
-> It's probably a stupid question, but why not store a pointer to the
-> RAMBlock rather than copying some of the details?
+Pan Nengyuan <pannengyuan@huawei.com> =E4=BA=8E2020=E5=B9=B48=E6=9C=8814=E6=
+=97=A5=E5=91=A8=E4=BA=94 =E4=B8=8B=E5=8D=886:40=E5=86=99=E9=81=93=EF=BC=9A
+>
+> 'addr' forgot to free in vnc_socket_ip_addr_string error path. Fix that.
 
-I think I figured that out in the last round;  this code runs as:
+s/forgot/is forgot, I think the maintainer will do this minor adjustment.
 
-    rcu lock {
-       calculate initial CRCs
-    }
+.
 
-    <sleep 1 second ish>
-    rcu lock {
-       calculate new CRCs
-    }
 
-A RAMBlock might get deleted between the two.
 
-Dave
+>
+> Reported-by: Euler Robot <euler.robot@huawei.com>
+> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
 
-       
-> > +    uint64_t *sample_page_vfn; /* relative offset address for sampled page */
-> > +    uint64_t sample_pages_count; /* count of sampled pages */
-> > +    uint64_t sample_dirty_count; /* cout of dirty pages we measure */
-> 
-> "cout" -> "count"
-> 
-> > +    uint32_t *hash_result; /* array of hash result for sampled pages */
-> > +};
-> > +
-> >  void *get_dirtyrate_thread(void *arg);
-> >  #endif
-> >  
-> > -- 
-> > 1.8.3.1
-> 
-> dme.
-> -- 
-> Please forgive me if I act a little strange, for I know not what I do.
-> 
--- 
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Reviewed-by: Li Qiang <liq3ea@gmail.com>
 
+> ---
+> Cc: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+>  ui/vnc-auth-sasl.c | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/ui/vnc-auth-sasl.c b/ui/vnc-auth-sasl.c
+> index 7b2b09f242..0517b2ead9 100644
+> --- a/ui/vnc-auth-sasl.c
+> +++ b/ui/vnc-auth-sasl.c
+> @@ -522,6 +522,7 @@ vnc_socket_ip_addr_string(QIOChannelSocket *ioc,
+>
+>      if (addr->type !=3D SOCKET_ADDRESS_TYPE_INET) {
+>          error_setg(errp, "Not an inet socket type");
+> +        qapi_free_SocketAddress(addr);
+>          return NULL;
+>      }
+>      ret =3D g_strdup_printf("%s;%s", addr->u.inet.host, addr->u.inet.por=
+t);
+> --
+> 2.18.2
+>
+>
 
