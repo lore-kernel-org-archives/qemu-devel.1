@@ -7,64 +7,63 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12C51C433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 14:40:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3F4CC433E3
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 14:40:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D18F2214F1
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 14:40:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6F2B0221E2
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 14:40:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dekTiL2X"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D18F2214F1
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jT4VNCd/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F2B0221E2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55054 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56806 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAwaq-0001XY-TF
-	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 10:40:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46346)
+	id 1kAwb8-0002GF-Kq
+	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 10:40:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46710)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <eperezma@redhat.com>)
- id 1kAwYo-0005Pt-El
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 10:37:58 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:60479
- helo=us-smtp-delivery-1.mimecast.com)
+ id 1kAwZo-000875-23
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 10:39:00 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:52873)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <eperezma@redhat.com>)
- id 1kAwYm-0006EI-IX
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 10:37:58 -0400
+ id 1kAwZm-0006KP-EG
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 10:38:59 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598452675;
+ s=mimecast20190719; t=1598452737;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=JMsC3c9/DHjUOSpDAcJrFyNttzIeCnsKLwCmZ6jNiU0=;
- b=dekTiL2X/i7zvpLj2wL9OMeFyHPKqhuUk9rakvKxnis/PvtgKHigeDcgMfct1C5hkVmZHa
- 6QuaRyzvru8/4yvja2reoghaHqmtlbD+Gy6lulyC8udbdPvppOC7U1CaYTKccenOPn4Ph6
- zoTbG7TXlQ7o1275fZSbR4KHEsmmrmE=
+ bh=KaGyxX2iurcUU1VjRNA2tYBF2S9PFsb51ufyJr6sbM4=;
+ b=jT4VNCd/YZwICgLTPg1Lt28TTP0MxkTS24ON0SmNSA88cvePFZRvecxWtk2r35i0NHPrXq
+ r9dQAD+53FlUUb18e8zw8Sr/9gPVUbAR/IGSzYNkrmwSSm8RvPLD+ye3bao386Rju4z/n/
+ fop1AUvo2MW4nnUWHEN5y6d3w1Xns6w=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-339-ydLYk1WANgaMukVqQFrxhg-1; Wed, 26 Aug 2020 10:37:53 -0400
-X-MC-Unique: ydLYk1WANgaMukVqQFrxhg-1
+ us-mta-172-7KLE7cvNMXm15MpKIEaYMA-1; Wed, 26 Aug 2020 10:38:53 -0400
+X-MC-Unique: 7KLE7cvNMXm15MpKIEaYMA-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 913221005E5B;
- Wed, 26 Aug 2020 14:37:50 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0DE9E801AE5;
+ Wed, 26 Aug 2020 14:38:52 +0000 (UTC)
 Received: from eperezma.remote.csb (ovpn-115-59.ams2.redhat.com [10.36.115.59])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2B6A276E00;
- Wed, 26 Aug 2020 14:37:34 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0B41576E00;
+ Wed, 26 Aug 2020 14:38:38 +0000 (UTC)
 From: =?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>
 To: qemu-devel@nongnu.org,
 	Peter Xu <peterx@redhat.com>
-Subject: [RFC v6 03/13] hw/alpha/typhoon: Mark all IOMMUTLBEntry as
- IOMMU_IOTLB_NONE type
-Date: Wed, 26 Aug 2020 16:36:41 +0200
-Message-Id: <20200826143651.7915-4-eperezma@redhat.com>
+Subject: [RFC v6 09/13] intel_iommu: Set IOMMUTLBEntry type in
+ vtd_page_walk_level
+Date: Wed, 26 Aug 2020 16:36:47 +0200
+Message-Id: <20200826143651.7915-10-eperezma@redhat.com>
 In-Reply-To: <20200826143651.7915-1-eperezma@redhat.com>
 References: <20200625191651.5817-1-eperezma@redhat.com>
  <20200826143651.7915-1-eperezma@redhat.com>
@@ -76,16 +75,16 @@ X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=eperezma@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/26 03:16:15
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=eperezma@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/26 06:53:10
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.959,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -114,21 +113,21 @@ Sender: "Qemu-devel"
 
 Signed-off-by: Eugenio Pérez <eperezma@redhat.com>
 ---
- hw/alpha/typhoon.c | 1 +
+ hw/i386/intel_iommu.c | 1 +
  1 file changed, 1 insertion(+)
 
-diff --git a/hw/alpha/typhoon.c b/hw/alpha/typhoon.c
-index 29d44dfb06..b1e6c4e929 100644
---- a/hw/alpha/typhoon.c
-+++ b/hw/alpha/typhoon.c
-@@ -615,6 +615,7 @@ static bool make_iommu_tlbe(hwaddr taddr, hwaddr mask, IOMMUTLBEntry *ret)
-         .translated_addr = taddr,
-         .addr_mask = mask,
-         .perm = IOMMU_RW,
-+        .type = IOMMU_IOTLB_NONE,
-     };
-     return true;
- }
+diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+index ed83e496b8..0b3399874f 100644
+--- a/hw/i386/intel_iommu.c
++++ b/hw/i386/intel_iommu.c
+@@ -1251,6 +1251,7 @@ static int vtd_page_walk_level(dma_addr_t addr, uint64_t start,
+             entry.addr_mask = ~subpage_mask;
+             /* NOTE: this is only meaningful if entry_valid == true */
+             entry.translated_addr = vtd_get_slpte_addr(slpte, info->aw);
++            entry.type = entry.perm ? IOMMU_IOTLB_MAP : IOMMU_IOTLB_UNMAP;
+             ret = vtd_page_walk_one(&entry, info);
+         }
+ 
 -- 
 2.18.1
 
