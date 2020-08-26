@@ -2,57 +2,57 @@ Return-Path: <SRS0=H0ck=CE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3D57C433E3
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 11:48:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB2A0C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 11:49:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A3FBD20707
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 11:48:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 83E4F20707
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 11:49:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=lse.epita.fr header.i=@lse.epita.fr header.b="cT+NYuUE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3FBD20707
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=lse.epita.fr header.i=@lse.epita.fr header.b="oo9CWw7A"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83E4F20707
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=lse.epita.fr
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46078 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49638 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAtuc-0005xZ-VE
-	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 07:48:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56614)
+	id 1kAtvW-0007Oo-So
+	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 07:49:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56724)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <srs0=n7r+=ce=lse.epita.fr=cesar.belley@cri.epita.fr>)
- id 1kAtpL-0004hd-Kt
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 07:42:51 -0400
-Received: from gate-2.cri.epita.net ([163.5.55.20]:47914
+ id 1kAtpd-00058v-94
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 07:43:09 -0400
+Received: from gate-2.cri.epita.net ([163.5.55.20]:47968
  helo=mail-2.srv.cri.epita.fr)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <srs0=n7r+=ce=lse.epita.fr=cesar.belley@cri.epita.fr>)
- id 1kAtpJ-00085m-CU
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 07:42:51 -0400
+ id 1kAtpb-00086x-9c
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 07:43:08 -0400
 Received: from MattGorko-Laptop.home
  (lfbn-idf1-1-1395-83.w90-79.abo.wanadoo.fr [90.79.87.83])
  (Authenticated sender: cesar.belley)
- by mail-2.srv.cri.epita.fr (Postfix) with ESMTPSA id 14D77412DB;
- Wed, 26 Aug 2020 13:42:47 +0200 (CEST)
+ by mail-2.srv.cri.epita.fr (Postfix) with ESMTPSA id 58254412EA;
+ Wed, 26 Aug 2020 13:42:55 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=lse.epita.fr; s=cri;
- t=1598442167; bh=YJhDGPHCamtSTbZXVCPZAZHaVE0kAI955YrNVx6bkSA=;
+ t=1598442175; bh=5gfXi+frrtfkG33iM3G746wi4KGxTaFnB9zd62r5J60=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=cT+NYuUEXNN9pZ81Oxy9eTxI6qZmx2miloNWI7q4Pw9kJDalu3mhftzjq4HNisR8w
- MHb9dkowG1AhFzFDxi6zTbsgG7/priEmeJWOOsyH7OD16F0A3R4gv/TnllS3ODzHNe
- uOgNEjxB0Ibfj99mYcDSOz/yvvNIQVkA+BHzS2uQ=
+ b=oo9CWw7A2gpqgYnoLwQFgDUa/veUJSeknkYOS5DxfxHPoGDivjuq3yOBzyYjWlvs7
+ us7BYmZmMas2cgAhCl4LLrtq3wGTG5BR4eIQ149zMf9pTociY+3yy0iFedKN5/nByM
+ B61G8WfD25sn3v8fmm236genAzZs4fv2TEXWbenQ=
 From: =?UTF-8?q?C=C3=A9sar=20Belley?= <cesar.belley@lse.epita.fr>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 06/12] hw/usb: Add U2F key emulated mode
-Date: Wed, 26 Aug 2020 13:42:03 +0200
-Message-Id: <20200826114209.28821-7-cesar.belley@lse.epita.fr>
+Subject: [PATCH v3 12/12] hw/usb: Add U2F device autoscan to passthru mode
+Date: Wed, 26 Aug 2020 13:42:09 +0200
+Message-Id: <20200826114209.28821-13-cesar.belley@lse.epita.fr>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20200826114209.28821-1-cesar.belley@lse.epita.fr>
 References: <20200826114209.28821-1-cesar.belley@lse.epita.fr>
@@ -88,443 +88,196 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch adds the U2F key emulated mode.
+This patch adds an autoscan to let u2f-passthru choose the first U2F
+device it finds.
 
-The emulated mode consists of completely emulating the behavior of a
-U2F device through software part. Libu2f-emu is used for that.
+The autoscan is performed using libudev with an enumeration of all the
+hidraw devices present on the host.
 
-The emulated mode is associated with a device inheriting from
-u2f-key base.
-
-To work, an emulated U2F device must have differents elements which
-can be given in different ways. This is detailed in docs/u2f.txt.
-
-The Ephemeral one is the simplest way to configure, it lets the device
-generate all the elements it needs for a single use of the lifetime
-of the device:
-
-    qemu -usb -device u2f-emulated
-
-For more information about libu2f-emu see this page:
-https://github.com/MattGorko/libu2f-emu.
+The first device which happens to be a U2F device is taken to do the
+passtru.
 
 Signed-off-by: César Belley <cesar.belley@lse.epita.fr>
 ---
- hw/usb/u2f-emulated.c | 405 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 405 insertions(+)
- create mode 100644 hw/usb/u2f-emulated.c
+ docs/u2f.txt          |   9 ++++
+ hw/usb/meson.build    |   2 +-
+ hw/usb/u2f-passthru.c | 113 +++++++++++++++++++++++++++++++++++++-----
+ 3 files changed, 110 insertions(+), 14 deletions(-)
 
-diff --git a/hw/usb/u2f-emulated.c b/hw/usb/u2f-emulated.c
-new file mode 100644
-index 0000000000..9e1b829f3d
---- /dev/null
-+++ b/hw/usb/u2f-emulated.c
-@@ -0,0 +1,405 @@
-+/*
-+ * U2F USB Emulated device.
-+ *
-+ * Copyright (c) 2020 César Belley <cesar.belley@lse.epita.fr>
-+ * Written by César Belley <cesar.belley@lse.epita.fr>
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
+diff --git a/docs/u2f.txt b/docs/u2f.txt
+index f60052882e..8f44994818 100644
+--- a/docs/u2f.txt
++++ b/docs/u2f.txt
+@@ -42,6 +42,10 @@ on libu2f-emu: configuring and building:
+ 
+     ./configure --enable-u2f && make
+ 
++The pass-through mode is built by default on Linux. To take advantage
++of the autoscan option it provides, make sure you have a working libudev
++installed on the host.
 +
-+#include "qemu/osdep.h"
-+#include "qemu/module.h"
-+#include "qemu/thread.h"
-+#include "qemu/main-loop.h"
-+#include "qapi/error.h"
-+#include "hw/usb.h"
-+#include "hw/qdev-properties.h"
+ 
+ 3. Using u2f-emulated
+ 
+@@ -90,6 +94,11 @@ On the host specify the u2f-passthru device with a suitable hidraw:
+ 
+     qemu -usb -device u2f-passthru,hidraw=/dev/hidraw0
+ 
++Alternately, the u2f-passthru device can autoscan to take the first
++U2F device it finds on the host (this requires a working libudev):
 +
-+#include <u2f-emu/u2f-emu.h>
++    qemu -usb -device u2f-passthru
 +
-+#include "u2f.h"
-+
-+/* Counter which sync with a file */
-+struct synced_counter {
-+    /* Emulated device counter */
-+    struct u2f_emu_vdev_counter vdev_counter;
-+
-+    /* Private attributes */
-+    uint32_t value;
-+    FILE *fp;
-+};
-+
-+static void counter_increment(struct u2f_emu_vdev_counter *vdev_counter)
+ 
+ 5. Libu2f-emu
+ 
+diff --git a/hw/usb/meson.build b/hw/usb/meson.build
+index a25109b88c..b7c7ff23bf 100644
+--- a/hw/usb/meson.build
++++ b/hw/usb/meson.build
+@@ -52,7 +52,7 @@ endif
+ 
+ # U2F
+ softmmu_ss.add(when: 'CONFIG_USB_U2F', if_true: files('u2f.c'))
+-softmmu_ss.add(when: ['CONFIG_LINUX', 'CONFIG_USB_U2F'], if_true: files('u2f-passthru.c'))
++softmmu_ss.add(when: ['CONFIG_LINUX', 'CONFIG_USB_U2F'], if_true: [libudev, files('u2f-passthru.c')])
+ if u2f.found()
+   softmmu_ss.add(when: 'CONFIG_USB_U2F', if_true: [u2f, files('u2f-emulated.c')])
+ endif
+diff --git a/hw/usb/u2f-passthru.c b/hw/usb/u2f-passthru.c
+index f8771966c7..1311530ee5 100644
+--- a/hw/usb/u2f-passthru.c
++++ b/hw/usb/u2f-passthru.c
+@@ -378,6 +378,84 @@ static bool u2f_passthru_is_u2f_device(int fd)
+                   sizeof(u2f_hid_report_desc_header)) == 0;
+ }
+ 
++#ifdef CONFIG_LIBUDEV
++static int u2f_passthru_open_from_device(struct udev_device *device)
 +{
-+    struct synced_counter *counter = (struct synced_counter *)vdev_counter;
-+    ++counter->value;
++    const char *devnode = udev_device_get_devnode(device);
 +
-+    /* Write back */
-+    if (fseek(counter->fp, 0, SEEK_SET) == -1) {
-+        return;
++    int fd = qemu_open(devnode, O_RDWR);
++    if (fd < 0) {
++        return -1;
++    } else if (!u2f_passthru_is_u2f_device(fd)) {
++        qemu_close(fd);
++        return -1;
 +    }
-+    fprintf(counter->fp, "%u\n", counter->value);
++    return fd;
 +}
 +
-+static uint32_t counter_read(struct u2f_emu_vdev_counter *vdev_counter)
++static int u2f_passthru_open_from_enumerate(struct udev *udev,
++                                            struct udev_enumerate *enumerate)
 +{
-+    struct synced_counter *counter = (struct synced_counter *)vdev_counter;
-+    return counter->value;
-+}
++    struct udev_list_entry *devices, *entry;
++    int ret, fd;
 +
-+typedef struct U2FEmulatedState U2FEmulatedState;
-+
-+#define PENDING_OUT_NUM 32
-+
-+struct U2FEmulatedState {
-+    U2FKeyState base;
-+
-+    /* U2F virtual emulated device */
-+    u2f_emu_vdev *vdev;
-+    QemuMutex vdev_mutex;
-+
-+    /* Properties */
-+    char *dir;
-+    char *cert;
-+    char *privkey;
-+    char *entropy;
-+    char *counter;
-+    struct synced_counter synced_counter;
-+
-+    /* Pending packets received from the guest */
-+    uint8_t pending_out[PENDING_OUT_NUM][U2FHID_PACKET_SIZE];
-+    uint8_t pending_out_start;
-+    uint8_t pending_out_end;
-+    uint8_t pending_out_num;
-+    QemuMutex pending_out_mutex;
-+
-+    /* Emulation thread and sync */
-+    QemuCond key_cond;
-+    QemuMutex key_mutex;
-+    QemuThread key_thread;
-+    bool stop_thread;
-+    EventNotifier notifier;
-+};
-+
-+#define TYPE_U2F_EMULATED "u2f-emulated"
-+#define EMULATED_U2F_KEY(obj) \
-+    OBJECT_CHECK(U2FEmulatedState, (obj), TYPE_U2F_EMULATED)
-+
-+static void u2f_emulated_reset(U2FEmulatedState *key)
-+{
-+    key->pending_out_start = 0;
-+    key->pending_out_end = 0;
-+    key->pending_out_num = 0;
-+}
-+
-+static void u2f_pending_out_add(U2FEmulatedState *key,
-+                                const uint8_t packet[U2FHID_PACKET_SIZE])
-+{
-+    int index;
-+
-+    if (key->pending_out_num >= PENDING_OUT_NUM) {
-+        return;
++    ret = udev_enumerate_scan_devices(enumerate);
++    if (ret < 0) {
++        return -1;
 +    }
 +
-+    index = key->pending_out_end;
-+    key->pending_out_end = (index + 1) % PENDING_OUT_NUM;
-+    ++key->pending_out_num;
++    devices = udev_enumerate_get_list_entry(enumerate);
++    udev_list_entry_foreach(entry, devices) {
++        struct udev_device *device;
++        const char *syspath = udev_list_entry_get_name(entry);
 +
-+    memcpy(&key->pending_out[index], packet, U2FHID_PACKET_SIZE);
-+}
-+
-+static uint8_t *u2f_pending_out_get(U2FEmulatedState *key)
-+{
-+    int index;
-+
-+    if (key->pending_out_num == 0) {
-+        return NULL;
-+    }
-+
-+    index  = key->pending_out_start;
-+    key->pending_out_start = (index + 1) % PENDING_OUT_NUM;
-+    --key->pending_out_num;
-+
-+    return key->pending_out[index];
-+}
-+
-+static void u2f_emulated_recv_from_guest(U2FKeyState *base,
-+                                    const uint8_t packet[U2FHID_PACKET_SIZE])
-+{
-+    U2FEmulatedState *key = EMULATED_U2F_KEY(base);
-+
-+    qemu_mutex_lock(&key->pending_out_mutex);
-+    u2f_pending_out_add(key, packet);
-+    qemu_mutex_unlock(&key->pending_out_mutex);
-+
-+    qemu_mutex_lock(&key->key_mutex);
-+    qemu_cond_signal(&key->key_cond);
-+    qemu_mutex_unlock(&key->key_mutex);
-+}
-+
-+static void *u2f_emulated_thread(void* arg)
-+{
-+    U2FEmulatedState *key = arg;
-+    uint8_t packet[U2FHID_PACKET_SIZE];
-+    uint8_t *packet_out = NULL;
-+
-+
-+    while (true) {
-+        /* Wait signal */
-+        qemu_mutex_lock(&key->key_mutex);
-+        qemu_cond_wait(&key->key_cond, &key->key_mutex);
-+        qemu_mutex_unlock(&key->key_mutex);
-+
-+        /* Exit thread check */
-+        if (key->stop_thread) {
-+            key->stop_thread = false;
-+            break;
-+        }
-+
-+        qemu_mutex_lock(&key->pending_out_mutex);
-+        packet_out = u2f_pending_out_get(key);
-+        if (packet_out == NULL) {
-+            qemu_mutex_unlock(&key->pending_out_mutex);
++        if (syspath == NULL) {
 +            continue;
 +        }
-+        memcpy(packet, packet_out, U2FHID_PACKET_SIZE);
-+        qemu_mutex_unlock(&key->pending_out_mutex);
 +
-+        qemu_mutex_lock(&key->vdev_mutex);
-+        u2f_emu_vdev_send(key->vdev, U2F_EMU_USB, packet,
-+                          U2FHID_PACKET_SIZE);
-+
-+        /* Notify response */
-+        if (u2f_emu_vdev_has_response(key->vdev, U2F_EMU_USB)) {
-+            event_notifier_set(&key->notifier);
++        device = udev_device_new_from_syspath(udev, syspath);
++        if (device == NULL) {
++            continue;
 +        }
-+        qemu_mutex_unlock(&key->vdev_mutex);
-+    }
-+    return NULL;
-+}
 +
-+static ssize_t u2f_emulated_read(const char *path, char *buffer,
-+                                 size_t buffer_len)
-+{
-+    int fd;
-+    ssize_t ret;
-+
-+    fd = qemu_open(path, O_RDONLY);
-+    if (fd < 0) {
-+        return -1;
-+    }
-+
-+    ret = read(fd, buffer, buffer_len);
-+    close(fd);
-+
-+    return ret;
-+}
-+
-+static bool u2f_emulated_setup_counter(const char *path,
-+                                       struct synced_counter *counter)
-+{
-+    int fd, ret;
-+    FILE *fp;
-+
-+    fd = qemu_open(path, O_RDWR);
-+    if (fd < 0) {
-+        return false;
-+    }
-+    fp = fdopen(fd, "r+");
-+    if (fp == NULL) {
-+        close(fd);
-+        return false;
-+    }
-+    ret = fscanf(fp, "%u", &counter->value);
-+    if (ret == EOF) {
-+        fclose(fp);
-+        return false;
-+    }
-+    counter->fp = fp;
-+    counter->vdev_counter.counter_increment = counter_increment;
-+    counter->vdev_counter.counter_read = counter_read;
-+
-+    return true;
-+}
-+
-+static u2f_emu_rc u2f_emulated_setup_vdev_manualy(U2FEmulatedState *key)
-+{
-+    ssize_t ret;
-+    char cert_pem[4096], privkey_pem[2048];
-+    struct u2f_emu_vdev_setup setup_info;
-+
-+    /* Certificate */
-+    ret = u2f_emulated_read(key->cert, cert_pem, sizeof(cert_pem));
-+    if (ret < 0) {
-+        return -1;
-+    }
-+
-+    /* Private key */
-+    ret = u2f_emulated_read(key->privkey, privkey_pem, sizeof(privkey_pem));
-+    if (ret < 0) {
-+        return -1;
-+    }
-+
-+    /* Entropy */
-+    ret = u2f_emulated_read(key->entropy, (char *)&setup_info.entropy,
-+                            sizeof(setup_info.entropy));
-+    if (ret < 0) {
-+        return -1;
-+    }
-+
-+    /* Counter */
-+    if (!u2f_emulated_setup_counter(key->counter, &key->synced_counter)) {
-+        return -1;
-+    }
-+
-+    /* Setup */
-+    setup_info.certificate = cert_pem;
-+    setup_info.private_key = privkey_pem;
-+    setup_info.counter = (struct u2f_emu_vdev_counter *)&key->synced_counter;
-+
-+    return u2f_emu_vdev_new(&key->vdev, &setup_info);
-+}
-+
-+static void u2f_emulated_event_handler(EventNotifier *notifier)
-+{
-+    U2FEmulatedState *key = container_of(notifier, U2FEmulatedState, notifier);
-+    size_t packet_size;
-+    uint8_t *packet_in = NULL;
-+
-+    event_notifier_test_and_clear(&key->notifier);
-+    qemu_mutex_lock(&key->vdev_mutex);
-+    while (u2f_emu_vdev_has_response(key->vdev, U2F_EMU_USB)) {
-+        packet_size = u2f_emu_vdev_get_response(key->vdev, U2F_EMU_USB,
-+                                                &packet_in);
-+        if (packet_size == U2FHID_PACKET_SIZE) {
-+            u2f_send_to_guest(&key->base, packet_in);
++        fd = u2f_passthru_open_from_device(device);
++        udev_device_unref(device);
++        if (fd >= 0) {
++            return fd;
 +        }
-+        u2f_emu_vdev_free_response(packet_in);
 +    }
-+    qemu_mutex_unlock(&key->vdev_mutex);
++    return -1;
 +}
 +
-+static void u2f_emulated_realize(U2FKeyState *base, Error **errp)
++static int u2f_passthru_open_from_scan(void)
 +{
-+    U2FEmulatedState *key = EMULATED_U2F_KEY(base);
-+    u2f_emu_rc rc;
++    struct udev *udev;
++    struct udev_enumerate *enumerate;
++    int ret, fd = -1;
 +
-+    if (key->cert != NULL || key->privkey != NULL || key->entropy != NULL
-+        || key->counter != NULL) {
-+        if (key->cert != NULL && key->privkey != NULL
-+            && key->entropy != NULL && key->counter != NULL) {
-+            rc = u2f_emulated_setup_vdev_manualy(key);
-+        } else {
-+            error_setg(errp, "%s: cert, priv, entropy and counter "
-+                       "parameters must be provided to manualy configure "
-+                       "the emulated device", TYPE_U2F_EMULATED);
++    udev = udev_new();
++    if (udev == NULL) {
++        return -1;
++    }
++
++    enumerate = udev_enumerate_new(udev);
++    if (enumerate == NULL) {
++        udev_unref(udev);
++        return -1;
++    }
++
++    ret = udev_enumerate_add_match_subsystem(enumerate, "hidraw");
++    if (ret >= 0) {
++        fd = u2f_passthru_open_from_enumerate(udev, enumerate);
++    }
++
++    udev_enumerate_unref(enumerate);
++    udev_unref(udev);
++
++    return fd;
++}
++#endif
++
+ static void u2f_passthru_unrealize(U2FKeyState *base)
+ {
+     U2FPassthruState *key = PASSTHRU_U2F_KEY(base);
+@@ -392,22 +470,31 @@ static void u2f_passthru_realize(U2FKeyState *base, Error **errp)
+     int fd;
+ 
+     if (key->hidraw == NULL) {
++#ifdef CONFIG_LIBUDEV
++        fd = u2f_passthru_open_from_scan();
++        if (fd < 0) {
++            error_setg(errp, "%s: Failed to find a U2F USB device",
++                       TYPE_U2F_PASSTHRU);
 +            return;
 +        }
-+    } else if (key->dir != NULL) {
-+        rc = u2f_emu_vdev_new_from_dir(&key->vdev, key->dir);
++#else
+         error_setg(errp, "%s: Missing hidraw", TYPE_U2F_PASSTHRU);
+         return;
+-    }
+-
+-    fd = qemu_open(key->hidraw, O_RDWR);
+-    if (fd < 0) {
+-        error_setg(errp, "%s: Failed to open %s", TYPE_U2F_PASSTHRU,
+-                   key->hidraw);
+-        return;
+-    }
++#endif
 +    } else {
-+        rc = u2f_emu_vdev_new_ephemeral(&key->vdev);
-+    }
-+
-+    if (rc != U2F_EMU_OK) {
-+        error_setg(errp, "%s: Failed to setup the key", TYPE_U2F_EMULATED);
-+        return;
-+    }
-+
-+    if (event_notifier_init(&key->notifier, false) < 0) {
-+        error_setg(errp, "%s: Failed to initialize notifier",
-+                   TYPE_U2F_EMULATED);
-+        return;
-+    }
-+    /* Notifier */
-+    event_notifier_set_handler(&key->notifier, u2f_emulated_event_handler);
-+
-+    /* Synchronization */
-+    qemu_cond_init(&key->key_cond);
-+    qemu_mutex_init(&key->vdev_mutex);
-+    qemu_mutex_init(&key->pending_out_mutex);
-+    qemu_mutex_init(&key->key_mutex);
-+    u2f_emulated_reset(key);
-+
-+    /* Thread */
-+    key->stop_thread = false;
-+    qemu_thread_create(&key->key_thread, "u2f-key", u2f_emulated_thread,
-+                       key, QEMU_THREAD_JOINABLE);
-+}
-+
-+static void u2f_emulated_unrealize(U2FKeyState *base)
-+{
-+    U2FEmulatedState *key = EMULATED_U2F_KEY(base);
-+
-+    /* Thread */
-+    key->stop_thread = true;
-+    qemu_cond_signal(&key->key_cond);
-+    qemu_thread_join(&key->key_thread);
-+
-+    /* Notifier */
-+    event_notifier_set_handler(&key->notifier, NULL);
-+    event_notifier_cleanup(&key->notifier);
-+
-+    /* Synchronization */
-+    qemu_cond_destroy(&key->key_cond);
-+    qemu_mutex_destroy(&key->vdev_mutex);
-+    qemu_mutex_destroy(&key->key_mutex);
-+    qemu_mutex_destroy(&key->pending_out_mutex);
-+
-+    /* Vdev */
-+    u2f_emu_vdev_free(key->vdev);
-+    if (key->synced_counter.fp != NULL) {
-+        fclose(key->synced_counter.fp);
-+    }
-+}
-+
-+static Property u2f_emulated_properties[] = {
-+    DEFINE_PROP_STRING("dir", U2FEmulatedState, dir),
-+    DEFINE_PROP_STRING("cert", U2FEmulatedState, cert),
-+    DEFINE_PROP_STRING("privkey", U2FEmulatedState, privkey),
-+    DEFINE_PROP_STRING("entropy", U2FEmulatedState, entropy),
-+    DEFINE_PROP_STRING("counter", U2FEmulatedState, counter),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void u2f_emulated_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+    U2FKeyClass *kc = U2F_KEY_CLASS(klass);
-+
-+    kc->realize = u2f_emulated_realize;
-+    kc->unrealize = u2f_emulated_unrealize;
-+    kc->recv_from_guest = u2f_emulated_recv_from_guest;
-+    dc->desc = "QEMU U2F emulated key";
-+    device_class_set_props(dc, u2f_emulated_properties);
-+}
-+
-+static const TypeInfo u2f_key_emulated_info = {
-+    .name = TYPE_U2F_EMULATED,
-+    .parent = TYPE_U2F_KEY,
-+    .instance_size = sizeof(U2FEmulatedState),
-+    .class_init = u2f_emulated_class_init
-+};
-+
-+static void u2f_key_emulated_register_types(void)
-+{
-+    type_register_static(&u2f_key_emulated_info);
-+}
-+
-+type_init(u2f_key_emulated_register_types)
++        fd = qemu_open(key->hidraw, O_RDWR);
++        if (fd < 0) {
++            error_setg(errp, "%s: Failed to open %s", TYPE_U2F_PASSTHRU,
++                       key->hidraw);
++            return;
++        }
+ 
+-    if (!u2f_passthru_is_u2f_device(fd)) {
+-        qemu_close(fd);
+-        error_setg(errp, "%s: Passed hidraw does not represent "
+-                   "a U2F HID device", TYPE_U2F_PASSTHRU);
+-        return;
++        if (!u2f_passthru_is_u2f_device(fd)) {
++            qemu_close(fd);
++            error_setg(errp, "%s: Passed hidraw does not represent "
++                       "a U2F HID device", TYPE_U2F_PASSTHRU);
++            return;
++        }
+     }
+     key->hidraw_fd = fd;
+     u2f_passthru_reset(key);
 -- 
 2.28.0
 
