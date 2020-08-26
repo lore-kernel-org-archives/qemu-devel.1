@@ -2,87 +2,89 @@ Return-Path: <SRS0=H0ck=CE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED62CC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 16:52:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7098C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 16:55:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B7DFD2078B
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 16:52:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7484E2078B
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 16:55:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RoUrXREz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7DFD2078B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dpKxgLId"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7484E2078B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35220 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37442 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAyfG-0007qr-TH
-	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 12:52:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56488)
+	id 1kAyhl-0000hP-PM
+	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 12:55:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57078)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kAyeb-00077H-MQ; Wed, 26 Aug 2020 12:52:05 -0400
-Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:42108)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kAyeZ-0002am-LK; Wed, 26 Aug 2020 12:52:05 -0400
-Received: by mail-lj1-x241.google.com with SMTP id t6so3141207ljk.9;
- Wed, 26 Aug 2020 09:52:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:reply-to:from:date:message-id
- :subject:to:cc;
- bh=zuNk7v+IEG1NX946w4US+NnSDslhmTRg4grXH/qysdU=;
- b=RoUrXREz1IAhYdIoE3vYJyfanZuzTqBHkOMfhc8I9YPEW3N87Fj4+VGFSy7EJrXSy2
- rjG9N0mb+/Ke3iMJDopKx7JVtcsfUpjp/1kVyKlxOTdYdY0SIpk4Bu8V1iwKlsYxlCx+
- lU+y9RQk8aib7IFRW98MyU+ViTd8/0SGdfMBXZvKUYHj2nV1dY6za7Xs9Kn7WRqXBlKT
- 6mcSl2odua88EaLfTVrky1kaiEYpNED70BOdNZM4jnszr9m6FM095uvkpIZQSEaQecW9
- ZwqcSr5YKZl1hX1neo8QMsqvuWFLOGESXwKj3yYcTrZ1nB1xciINi8R3wNka53geWELM
- oTug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
- :from:date:message-id:subject:to:cc;
- bh=zuNk7v+IEG1NX946w4US+NnSDslhmTRg4grXH/qysdU=;
- b=TFhqeRZx3cA66x/TCX3O756FmbaSWqE4L45wDfJ/acuzXcSyE4BvctgSKCBj9MZ8JU
- rrnF/bYb7tTL9OKdtCfglyfOTwLVvTdErbtCaWW9tE/J3v0XD8JQ3r/d241Aiv4UvUMn
- YT87KbcQQBKwdXp0jYjC0qUW5u4+Eryp4HQENtudqhNRecA4/ePR3QMKzWFUobv+S4JB
- gcWNUT4PqXFJz+nLnbC8lbbQM22ceWX8RmoYzY2gfMoVkOwo4jKU7YEmHhl73jcIsqEm
- HOaXveIylXIITAzy+pzx1IBfvmPIdYxx0sGDx7vkZ2Sy6XrQzeGTF7n+HtI5wI3uHM89
- OLAg==
-X-Gm-Message-State: AOAM533jsqTtcu+Q+YMroOFjTvtY9jCqKZFC2RADTPSfb4IGAXjeyqMf
- LXggSuPbBUlNR+ooXwJwv6IEfVkyH3KtEHyOQqU=
-X-Google-Smtp-Source: ABdhPJxaBO/UIAe6yxemUUFv81+VfrrCMuo8TAPHXZ2FfWsCSwXHDNrOJkZvjpy+oqCqH7Le8bxbI0f2juscaPw6kyY=
-X-Received: by 2002:a2e:7315:: with SMTP id o21mr938830ljc.120.1598460720926; 
- Wed, 26 Aug 2020 09:52:00 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1kAyh4-0000E0-2o
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 12:54:38 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36190
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1kAyh1-0002tp-23
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 12:54:37 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1598460873;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=7oTdfLx27jQhJZo2wtzB6hySjgfYYw+iH+MPL30OmC8=;
+ b=dpKxgLIdxRoyVT/tyKSJ5joJKas1a53c1O0CRhwfsx8KESp8DAk1/HqD1XSrtzNHHT6zU5
+ 86gI6WdZnuozczrfa1tZQhPO9T8jEKiZbznu3WTHsS+M1EXsXMYx0VuJ5R3D8Xt2FdRA+1
+ hS3w64fbCaTDTQP8n4uCwSrzOSOBC5E=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-341-DvrZI4sPO1OM6fCmK8BHTQ-1; Wed, 26 Aug 2020 12:54:31 -0400
+X-MC-Unique: DvrZI4sPO1OM6fCmK8BHTQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2A0EF80F059;
+ Wed, 26 Aug 2020 16:54:30 +0000 (UTC)
+Received: from work-vm (ovpn-112-133.ams2.redhat.com [10.36.112.133])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C511E19C78;
+ Wed, 26 Aug 2020 16:54:27 +0000 (UTC)
+Date: Wed, 26 Aug 2020 17:54:25 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Chuan Zheng <zhengchuan@huawei.com>
+Subject: Re: [PATCH v5 08/12] migration/dirtyrate: skip sampling ramblock
+ with size below MIN_RAMBLOCK_SIZE
+Message-ID: <20200826165425.GD3932@work-vm>
+References: <1598319650-36762-1-git-send-email-zhengchuan@huawei.com>
+ <1598319650-36762-9-git-send-email-zhengchuan@huawei.com>
 MIME-Version: 1.0
-References: <20200625191651.5817-1-eperezma@redhat.com>
- <20200826143651.7915-1-eperezma@redhat.com>
- <20200826143651.7915-13-eperezma@redhat.com>
-In-Reply-To: <20200826143651.7915-13-eperezma@redhat.com>
-From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
-Date: Thu, 27 Aug 2020 00:51:48 +0800
-Message-ID: <CAE2XoE9kFuavzHzTWvCony77iHk1_+kjrYj-budDVTdgKfTeaQ@mail.gmail.com>
-Subject: Re: [RFC v6 12/13] intel_iommu: Do not notify regular iotlb to
- device-iotlb notifiers
-To: =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>
-Content-Type: multipart/alternative; boundary="000000000000755af905adcaa32b"
-Received-SPF: pass client-ip=2a00:1450:4864:20::241;
- envelope-from=luoyonggang@gmail.com; helo=mail-lj1-x241.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+In-Reply-To: <1598319650-36762-9-git-send-email-zhengchuan@huawei.com>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
+X-Mimecast-Spam-Score: 0.003
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/26 03:56:58
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.959,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -96,134 +98,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: luoyonggang@gmail.com
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Yan Zhao <yan.y.zhao@intel.com>, Eduardo Habkost <ehabkost@redhat.com>,
- Juan Quintela <quintela@redhat.com>, Jason Wang <jasowang@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, qemu-level <qemu-devel@nongnu.org>,
- Peter Xu <peterx@redhat.com>, Eric Auger <eric.auger@redhat.com>,
- qemu-arm@nongnu.org, =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
- Avi Kivity <avi@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: berrange@redhat.com, zhang.zhanghailiang@huawei.com, quintela@redhat.com,
+ qemu-devel@nongnu.org, xiexiangyou@huawei.com, alex.chen@huawei.com,
+ ann.zhuangyanying@huawei.com, fangying1@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000755af905adcaa32b
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Aug 26, 2020 at 10:42 PM Eugenio P=C3=A9rez <eperezma@redhat.com> w=
-rote:
-
-> This improves performance in case of netperf with vhost-net:
-> * TCP_STREAM: From 9049.59Mbit/s to 9049.59Mbit/s (13%)
->
-What's improvement ? they are the same
-
-
-> * TCP_RR: From 8464.73 trans/s to 8932.703333 trans/s (5.5%)
-> * UDP_RR: From 8562.08 trans/s to 9005.62/s (5.1%)
-> * UDP_STREAM: No change observed (insignificant 0.1% improvement)
->
-> Signed-off-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
+* Chuan Zheng (zhengchuan@huawei.com) wrote:
+> In order to sample real RAM, skip ramblock with size below MIN_RAMBLOCK_SIZE
+> which is set as 128M.
+> 
+> Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
 > ---
->  hw/i386/intel_iommu.c | 6 ++++++
->  1 file changed, 6 insertions(+)
->
-> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> index ddb828da1f..7620a1abbf 100644
-> --- a/hw/i386/intel_iommu.c
-> +++ b/hw/i386/intel_iommu.c
-> @@ -1960,6 +1960,12 @@ static void
-> vtd_iotlb_domain_invalidate(IntelIOMMUState *s, uint16_t domain_id)
->      vtd_iommu_unlock(s);
->
->      QLIST_FOREACH(vtd_as, &s->vtd_as_with_notifiers, next) {
-> +        if (vtd_as->iommu.iommu_notify_flags & IOMMU_NOTIFIER_DEVIOTLB) =
-{
-> +            /* If IOMMU memory region is DEVICE IOTLB type, it does not
-> make
-> +             * sense to send regular IOMMU notifications. */
+>  migration/dirtyrate.c | 24 ++++++++++++++++++++++++
+>  migration/dirtyrate.h | 10 ++++++++++
+>  2 files changed, 34 insertions(+)
+> 
+> diff --git a/migration/dirtyrate.c b/migration/dirtyrate.c
+> index 050270d..bd398b7 100644
+> --- a/migration/dirtyrate.c
+> +++ b/migration/dirtyrate.c
+> @@ -173,6 +173,24 @@ alloc_ramblock_dirty_info(int *block_index,
+>      return block_dinfo;
+>  }
+>  
+> +static int skip_sample_ramblock(RAMBlock *block)
+> +{
+> +    int64_t ramblock_size;
+> +
+> +    /* ramblock size in MB */
+> +    ramblock_size = qemu_ram_get_used_length(block) >> DIRTYRATE_PAGE_SHIFT_MB;
+> +
+> +    /*
+> +     * Consider ramblock with size larger than 128M is what we
+> +     * want to sample.
+> +     */
+> +    if (ramblock_size < MIN_RAMBLOCK_SIZE) {
+> +        return -1;
+> +    }
+
+This seems way too complicated for:
+
+  if (qemu_ram_get_used_length(block) < (MIN_RAMBLOCK_SIZE << 10)) {
+      return -1;
+  }
+
+  return 0;
+
+(even easier if it just returned bool from the comparison)
+
+Dave
+
+> +    return 0;
+> +}
+> +
+>  static int record_ramblock_hash_info(struct RamblockDirtyInfo **block_dinfo,
+>                                       struct DirtyRateConfig config,
+>                                       int *block_index)
+> @@ -183,6 +201,9 @@ static int record_ramblock_hash_info(struct RamblockDirtyInfo **block_dinfo,
+>      int index = 0;
+>  
+>      RAMBLOCK_FOREACH_MIGRATABLE(block) {
+> +        if (skip_sample_ramblock(block) < 0) {
 > +            continue;
 > +        }
+>          dinfo = alloc_ramblock_dirty_info(&index, dinfo);
+>          if (dinfo == NULL) {
+>              return -1;
+> @@ -249,6 +270,9 @@ static int compare_page_hash_info(struct RamblockDirtyInfo *info,
+>      RAMBlock *block = NULL;
+>  
+>      RAMBLOCK_FOREACH_MIGRATABLE(block) {
+> +        if (skip_sample_ramblock(block) < 0) {
+> +            continue;
+> +        }
+>          block_dinfo = NULL;
+>          if (!find_page_matched(block, info, block_index + 1, &block_dinfo)) {
+>              continue;
+> diff --git a/migration/dirtyrate.h b/migration/dirtyrate.h
+> index e3adead..600bceb 100644
+> --- a/migration/dirtyrate.h
+> +++ b/migration/dirtyrate.h
+> @@ -35,10 +35,20 @@
+>  #define DIRTYRATE_PAGE_SHIFT_KB                   12
+>  
+>  /*
+> + * Sample page size MB shift
+> + */
+> +#define DIRTYRATE_PAGE_SHIFT_MB                   20
 > +
->          if (!vtd_dev_to_context_entry(s, pci_bus_num(vtd_as->bus),
->                                        vtd_as->devfn, &ce) &&
->              domain_id =3D=3D vtd_get_domain_id(s, &ce)) {
-> --
-> 2.18.1
->
->
->
+> +/*
+>   * Sample page size 1G shift
+>   */
+>  #define DIRTYRATE_PAGE_SHIFT_GB                   30
+>  
+> +/*
+> + * minimum ramblock size to sampled
+> + */
+> +#define MIN_RAMBLOCK_SIZE                         128
+> +
+>  /* Take 1s as default for calculation duration */
+>  #define DEFAULT_FETCH_DIRTYRATE_TIME_SEC          1
+>  
+> -- 
+> 1.8.3.1
+> 
+-- 
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
---=20
-         =E6=AD=A4=E8=87=B4
-=E7=A4=BC
-=E7=BD=97=E5=8B=87=E5=88=9A
-Yours
-    sincerely,
-Yonggang Luo
-
---000000000000755af905adcaa32b
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
-<div dir=3D"ltr" class=3D"gmail_attr">On Wed, Aug 26, 2020 at 10:42 PM Euge=
-nio P=C3=A9rez &lt;<a href=3D"mailto:eperezma@redhat.com">eperezma@redhat.c=
-om</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margi=
-n:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex=
-">This improves performance in case of netperf with vhost-net:<br>
-* TCP_STREAM: From 9049.59Mbit/s to 9049.59Mbit/s (13%)<br></blockquote><di=
-v>What&#39;s improvement ? they are the same</div><div>=C2=A0</div><blockqu=
-ote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px=
- solid rgb(204,204,204);padding-left:1ex">
-* TCP_RR: From 8464.73 trans/s to 8932.703333 trans/s (5.5%)<br>
-* UDP_RR: From 8562.08 trans/s to 9005.62/s (5.1%)<br>
-* UDP_STREAM: No change observed (insignificant 0.1% improvement)<br>
-<br>
-Signed-off-by: Eugenio P=C3=A9rez &lt;<a href=3D"mailto:eperezma@redhat.com=
-" target=3D"_blank">eperezma@redhat.com</a>&gt;<br>
----<br>
-=C2=A0hw/i386/intel_iommu.c | 6 ++++++<br>
-=C2=A01 file changed, 6 insertions(+)<br>
-<br>
-diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c<br>
-index ddb828da1f..7620a1abbf 100644<br>
---- a/hw/i386/intel_iommu.c<br>
-+++ b/hw/i386/intel_iommu.c<br>
-@@ -1960,6 +1960,12 @@ static void vtd_iotlb_domain_invalidate(IntelIOMMUSt=
-ate *s, uint16_t domain_id)<br>
-=C2=A0 =C2=A0 =C2=A0vtd_iommu_unlock(s);<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0QLIST_FOREACH(vtd_as, &amp;s-&gt;vtd_as_with_notifiers,=
- next) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (vtd_as-&gt;iommu.iommu_notify_flags &amp; =
-IOMMU_NOTIFIER_DEVIOTLB) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 /* If IOMMU memory region is DEV=
-ICE IOTLB type, it does not make<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* sense to send regular IO=
-MMU notifications. */<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 continue;<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
-+<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0if (!vtd_dev_to_context_entry(s, pci_bus_=
-num(vtd_as-&gt;bus),<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0vtd_as-&g=
-t;devfn, &amp;ce) &amp;&amp;<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0domain_id =3D=3D vtd_get_do=
-main_id(s, &amp;ce)) {<br>
--- <br>
-2.18.1<br>
-<br>
-<br>
-</blockquote></div><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr"=
- class=3D"gmail_signature">=C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =E6=AD=A4=E8=
-=87=B4<br>=E7=A4=BC<br>=E7=BD=97=E5=8B=87=E5=88=9A<br>Yours<br>=C2=A0 =C2=
-=A0 sincerely,<br>Yonggang Luo<br></div></div>
-
---000000000000755af905adcaa32b--
 
