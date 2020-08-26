@@ -2,80 +2,85 @@ Return-Path: <SRS0=H0ck=CE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3253AC433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 14:05:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E975CC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 14:11:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EB5052075E
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 14:05:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AF0552078D
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 14:11:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RebM7xcP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB5052075E
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E9k3IW8m"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF0552078D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33000 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35212 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAw3T-0004OT-5k
-	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 10:05:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38290)
+	id 1kAw93-0005ZQ-Vy
+	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 10:11:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39792)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kAw2n-0003nj-7l
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 10:04:53 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:42063
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1kAw8W-0005A2-Hp
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 10:10:48 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:50877
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kAw2l-0001yn-HA
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 10:04:52 -0400
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1kAw8U-0002hN-CM
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 10:10:48 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598450690;
+ s=mimecast20190719; t=1598451044;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=+RD3i4vU98qjQJ/dBGBTDX9E4OEBnfMQH7imHBPr804=;
- b=RebM7xcP8KvglJpUdaCKHsDvpO8Odv15NZajhGBmBf/59YXaQnmZirqEc/Tv/AO2auKCxN
- KqEDf311YzcvQAiXXNE5LexEd+w6JPS7HXX1M1R2pMbpz6SAFty5euxzg+ruSPZ0LaVsZj
- 0fHNU1tf0CsEYRnKS+6JFOn8MsFke2A=
+ bh=ALZdBGD5wV8lb7oxVwCf8xN4QF6syFYXWOXXNDu+Vzc=;
+ b=E9k3IW8mq/hagGo6PnWJQasSLqIYS/AJhkTXaXxZHUyjvhcf6DXfYxl9VTsivndQyj83a7
+ znXibT0VWjoOMlHe037sXLiKenBkx8gupYE13Mmj84D6z2hgcZtG0F35ONLf9DPCs95CG8
+ VHIYi29bE9OGQaDkdxRjecV030HUyjw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-163-R6o9u2nIMbStoeFSAxHD0g-1; Wed, 26 Aug 2020 10:04:46 -0400
-X-MC-Unique: R6o9u2nIMbStoeFSAxHD0g-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-418-Sy9bk9CfNWKFgyVRoqRmzQ-1; Wed, 26 Aug 2020 10:10:40 -0400
+X-MC-Unique: Sy9bk9CfNWKFgyVRoqRmzQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 733321DDFF;
- Wed, 26 Aug 2020 14:04:45 +0000 (UTC)
-Received: from localhost (unknown [10.10.67.254])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 791CF708FF;
- Wed, 26 Aug 2020 14:04:42 +0000 (UTC)
-Date: Wed, 26 Aug 2020 10:04:41 -0400
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Igor Mammedov <imammedo@redhat.com>
-Subject: Re: [PATCH v5 0/8] Remove EPYC mode apicid decode and use generic
- decode
-Message-ID: <20200826140441.GX642093@habkost.net>
-References: <159804762216.39954.15502128500494116468.stgit@naples-babu.amd.com>
- <20200826143849.59f6970b@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8D075800493;
+ Wed, 26 Aug 2020 14:10:39 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.114])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4D46819C58;
+ Wed, 26 Aug 2020 14:10:38 +0000 (UTC)
+Date: Wed, 26 Aug 2020 16:10:36 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Laszlo Ersek <lersek@redhat.com>
+Subject: Re: [PATCH v2 6/7] x68: acpi: trigger SMI before sending hotplug
+ Notify event to OSPM
+Message-ID: <20200826161036.26d9e23a@redhat.com>
+In-Reply-To: <1f563a82-4439-6346-e92e-d734e93418a1@redhat.com>
+References: <20200818122208.1243901-1-imammedo@redhat.com>
+ <20200818122208.1243901-7-imammedo@redhat.com>
+ <382e54cc-1ac0-61e5-bf5d-0653480222a0@redhat.com>
+ <cfd4dd52-4827-2288-4b4e-b396d48494f0@redhat.com>
+ <1f563a82-4439-6346-e92e-d734e93418a1@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200826143849.59f6970b@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
-X-Mimecast-Spam-Score: 0.001
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=imammedo@redhat.com
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=ehabkost@redhat.com;
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=imammedo@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/26 03:16:15
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/26 06:53:09
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -96,51 +101,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- mst@redhat.com, Michal Privoznik <mprivozn@redhat.com>, qemu-devel@nongnu.org,
- Babu Moger <babu.moger@amd.com>, pbonzini@redhat.com, rth@twiddle.net
+Cc: boris.ostrovsky@oracle.com,
+ Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org, aaron.young@oracle.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Aug 26, 2020 at 02:38:49PM +0200, Igor Mammedov wrote:
-> On Fri, 21 Aug 2020 17:12:19 -0500
-> Babu Moger <babu.moger@amd.com> wrote:
-> 
-> > To support some of the complex topology, we introduced EPYC mode apicid decode.
-> > But, EPYC mode decode is running into problems. Also it can become quite a
-> > maintenance problem in the future. So, it was decided to remove that code and
-> > use the generic decode which works for majority of the topology. Most of the
-> > SPECed configuration would work just fine. With some non-SPECed user inputs,
-> > it will create some sub-optimal configuration.
-> > Here is the discussion thread.
-> > https://lore.kernel.org/qemu-devel/c0bcc1a6-1d84-a6e7-e468-d5b437c1b254@amd.com/
+On Wed, 26 Aug 2020 15:32:07 +0200
+Laszlo Ersek <lersek@redhat.com> wrote:
+
+> On 08/26/20 11:24, Laszlo Ersek wrote:
+> > Hi Igor,
 > > 
-> > This series removes all the EPYC mode specific apicid changes and use the generic
-> > apicid decode.
+> > On 08/25/20 19:25, Laszlo Ersek wrote:
+> >   
+> >> So I would suggest fetching the CNEW array element back into "uid"
+> >> first, then using "uid" for both the NOTIFY call, and the (currently
+> >> missing) restoration of CSEL. Then we can write 1 to CINS.
+> >>
+> >> Expressed as a patch on top of yours:
+> >>  
+> >>> diff --git a/hw/acpi/cpu.c b/hw/acpi/cpu.c
+> >>> index 4864c3b39694..2bea6144fd5e 100644
+> >>> --- a/hw/acpi/cpu.c
+> >>> +++ b/hw/acpi/cpu.c
+> >>> @@ -564,8 +564,11 @@ void build_cpus_aml(Aml *table, MachineState *machine, CPUHotplugFeatures opts,
+> >>>              aml_append(method, aml_store(zero, cpu_idx));
+> >>>              while_ctx = aml_while(aml_lless(cpu_idx, num_added_cpus));
+> >>>              {
+> >>> -                aml_append(while_ctx, aml_call2(CPU_NOTIFY_METHOD,
+> >>> -                    aml_derefof(aml_index(new_cpus, cpu_idx)), dev_chk));
+> >>> +                aml_append(while_ctx,
+> >>> +                    aml_store(aml_derefof(aml_index(new_cpus, cpu_idx)), uid));
+> >>> +                aml_append(while_ctx,
+> >>> +                    aml_call2(CPU_NOTIFY_METHOD, uid, dev_chk));
+> >>> +                aml_append(while_ctx, aml_store(uid, cpu_selector));
+> >>>                  aml_append(while_ctx, aml_store(one, ins_evt));
+> >>>                  aml_append(while_ctx, aml_increment(cpu_idx));
+> >>>              }  
+> >>
+> >> This effects the following change, in the decompiled method:
+> >>  
+> >>> @@ -37,15 +37,17 @@
+> >>>      If ((Local_NumAddedCpus != Zero))
+> >>>      {
+> >>>          \_SB.PCI0.SMI0.SMIC = 0x04
+> >>>      }
+> >>>
+> >>>      Local_CpuIdx = Zero
+> >>>      While ((Local_CpuIdx < Local_NumAddedCpus))
+> >>>      {
+> >>> -        CTFY (DerefOf (CNEW [Local_CpuIdx]), One)
+> >>> +        Local_Uid = DerefOf (CNEW [Local_CpuIdx])
+> >>> +        CTFY (Local_Uid, One)
+> >>> +        \_SB.PCI0.PRES.CSEL = Local_Uid
+> >>>          \_SB.PCI0.PRES.CINS = One
+> >>>          Local_CpuIdx++
+> >>>      }
+> >>>
+> >>>      Release (\_SB.PCI0.PRES.CPLK)
+> >>>  }  
+> >>
+> >> With this change, the
+> >>
+> >>   virsh setvcpus DOMAIN 8 --live
+> >>
+> >> command works for me. The topology in my test domain has CPU#0 and
+> >> CPU#2 cold-plugged, so the command adds 6 VCPUs. Viewed from the
+> >> firmware side, the 6 "device_add" commands, issued in close succession
+> >> by libvirtd, coalesce into 4 "batches". (And of course the firmware
+> >> sees the 4 batches back-to-back.)  
+> > 
+> > unfortunately, with more testing, I have run into two more races:
+> > 
+> > (1) When a "device_add" occurs after the ACPI loop collects the CPUS
+> >     from the register block, but before the SMI.
+> > 
+> >     Here, the "stray CPU" is processed fine by the firmware. However,
+> >     the CTFY loop in ACPI does not know about the CPU, so it doesn't
+> >     clear the pending insert event for it. And when the firmware is
+> >     entered with an SMI for the *next* time, the firmware sees the same
+> >     CPU *again* as pending, and tries to relocate it again. Bad things
+> >     happen.
+> > 
+> > (2) When a "device_add" occurs after the SMI, but before the firmware
+> >     collects the pending CPUs from the register block.
+> > 
+> >     Here, the firmware collects the "stray CPU". However, the "broadcast
+> >     SMI", with which we entered the firmware, did *not* cover the stray
+> >     CPU -- the CPU_FOREACH() loop in ich9_apm_ctrl_changed() could not
+> >     make the SMI pending for the new CPU, because at that time, the CPU
+> >     had not been added yet. As a result, when the firmware sends an
+> >     INIT-SIPI-SIPI to the new CPU, expecting it to boot right into SMM,
+> >     the new CPU instead boots straight into the post-RSM (normal mode)
+> >     "pen", skipping its initial SMI handler. Meaning that the CPU halts
+> >     nicely, but its SMBASE is never relocated, and the SMRAM message
+> >     exchange with the BSP falls apart.
+> > 
+> > Possible mitigations I can think of:
+> > 
+> > For problem (1):
+> > 
+> >   (1a) Change the firmware so it notices that it has relocated the
+> >        "stray" CPU before -- such CPUs should be simply skipped in the
+> >        firmware. The next time the CTFY loop runs in ACPI, it will clear
+> >        the pending event.
+> > 
+> >   (1b) Alternatively, stop consuming the hotplug register block in the
+> >        firmware altogether, and work out general message passing, from
+> >        ACPI to firmware. See the outline here:
+> > 
+> >          http://mid.mail-archive.com/cf887d74-f65d-602a-9629-3d25cef93a69@redhat.com
+> > 
+> > For problem (2):
+> > 
+> >   (2a) Change the firmware so that it sends a directed SMI as well to
+> >        each CPU, just before sending an INIT-SIPI-SIPI. This should be
+> >        idempotent -- if the broadcast SMI *has* covered the the CPU,
+> >        then sending a directed SMI should make no difference.
+> > 
+> >   (2b) Alternatively, change the "device_add" command in QEMU so that,
+> >        if "CPU hotplug with SMI" has been negotiated, the new CPU is
+> >        added with the SMI made pending for it at once. (That is, no
+> >        hot-plugged CPU would exist with the directed SMI *not* pending
+> >        for it.)
+> > 
+> >   (2c) Alternatively, approach (1b) would fix problem (2) as well -- the
+> >        firmware would only relocate such CPUs that ACPI collected before
+> >        injecting the SMI. So all those CPUs would have the SMI pending.
+> > 
+> > 
+> > I can experiment with (1a) and (2a),  
 > 
-> the main difference between EPYC and all other CPUs is that
-> it requires numa configuration (it's not optional)
-> so we need an extra patch on top of this series to enfoce that, i.e:
+> My patches for (1a) and (1b) seem to work -- my workstation has 10
+> PCPUs, and I'm using a guest with 20 possible VCPUs and 2 cold-plugged
+> VCPUs on it, for testing. The patches survive the hot-plugging of 18
+> VCPUs in one go, or two batches like 9+9. I can see the fixes being
+> exercised.
 > 
->  if (epyc && !numa) 
->     error("EPYC cpu requires numa to be configured")
-> 
-> I think there was a patch in previous revisions that aimed for this.
-> Simplest form would be above snippet.
-> 
-> More complex one, would be moving auto_enable_numa from MachineClass to
-> MachineState so we can change it at runtime if EPYC is used. That should
-> take care of use case where user hasn't provided -numa.
+> Unless you strongly disagree (or I find issues in further testing), I
+> propose that I post these fixes to edk2-devel (they should still be in
+> scope for the upcoming release), and that we stick with your current
+> patch series for QEMU (v3 -- upcoming, or maybe already posted).
 
-This sounds like a good solution.  It actually sounds simpler
-than the alternatives (which just move the complexity to other
-components).
+Lets do as you suggest.
+As for QEMU side, I'll try to post next revision next week.
 
-We can keep MachineClass::auto_enable_numa as is, and just use it
-to initialize the default value of MachineState::auto_enable_numa.
-
--- 
-Eduardo
+> 
+> Thanks!
+> Laszlo
+> 
+> 
 
 
