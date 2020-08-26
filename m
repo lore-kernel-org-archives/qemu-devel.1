@@ -2,92 +2,87 @@ Return-Path: <SRS0=H0ck=CE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C595C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 08:41:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8561C433E1
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 08:45:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D427420707
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 08:41:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8F0232071E
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 08:45:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DbKa3Yb/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D427420707
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gwnTv95D"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F0232071E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36172 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38290 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAqzt-0004FW-5p
-	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 04:41:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39656)
+	id 1kAr3g-0005Kz-TF
+	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 04:45:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40816)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kAqzN-0003pz-1O
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 04:41:01 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:27151
- helo=us-smtp-delivery-1.mimecast.com)
+ id 1kAr37-0004ur-L1
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 04:44:53 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:20459
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kAqzL-0000s0-8L
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 04:41:00 -0400
+ id 1kAr35-0001CI-OF
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 04:44:53 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598431258;
+ s=mimecast20190719; t=1598431490;
  h=from:from:reply-to:reply-to:subject:subject:date:date:
  message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=EChZqYvt84M6anPPVoSlnG/rc3IeolDKRfAP8tZk3IQ=;
- b=DbKa3Yb/ujDp7G3RcNnFUbJk0HtdAWEQ67IkuDV5aUgAH8mcMkevssB7T/J/xwTQwdetWe
- 6+a7hd7H5wcrg+YA3GCBBwZbVcvEgWdI5koToqHHducTJaWxeYQIvO1yKiPBZ5iuuXCc1K
- wEXwUxU42bgwVhVNYKzKiOzBbMgD3ZI=
+ content-type:content-type:in-reply-to:in-reply-to:  references:references;
+ bh=cUZ0MZdDipPbWrS4uNtDj5PpuGn1UxYq6JXLkN5KTLg=;
+ b=gwnTv95DvXpUpC4q6oR6twCfyaM65lwIgADS5L5p2sjUc6xGZq7TmW7OhUAlkczZRo1j27
+ KRTqDRpYTRYsUnk2WxtvnMTt02mfKHYmC2KbFYka7SahdvGgwcwFU+hBC3mFsLSVzIBEE5
+ QGfYlP+/ZAerTxkx3XF8cYkZBk2U6/I=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-560--gOksbavPJuXquV5srZWrw-1; Wed, 26 Aug 2020 04:40:55 -0400
-X-MC-Unique: -gOksbavPJuXquV5srZWrw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-251-Dzvd_I-TOTayTEO0TxaBXg-1; Wed, 26 Aug 2020 04:44:48 -0400
+X-MC-Unique: Dzvd_I-TOTayTEO0TxaBXg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E47F4107467E;
- Wed, 26 Aug 2020 08:40:53 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AE7FC64095;
+ Wed, 26 Aug 2020 08:44:47 +0000 (UTC)
 Received: from redhat.com (ovpn-114-142.ams2.redhat.com [10.36.114.142])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B434760C0F;
- Wed, 26 Aug 2020 08:40:49 +0000 (UTC)
-Date: Wed, 26 Aug 2020 09:40:47 +0100
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 604BA7C5F6;
+ Wed, 26 Aug 2020 08:44:45 +0000 (UTC)
+Date: Wed, 26 Aug 2020 09:44:42 +0100
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: marcandre.lureau@redhat.com
-Subject: Re: [PATCH v2 5/5] meson: add NSIS building
-Message-ID: <20200826084047.GG168515@redhat.com>
-References: <20200825175827.355940-1-marcandre.lureau@redhat.com>
- <20200825175827.355940-6-marcandre.lureau@redhat.com>
+To: Laurent Vivier <laurent@vivier.eu>
+Subject: Re: linux-user static build broken
+Message-ID: <20200826084442.GH168515@redhat.com>
+References: <40710b94-094f-f91a-6ddb-94e51199a8c3@vivier.eu>
 MIME-Version: 1.0
-In-Reply-To: <20200825175827.355940-6-marcandre.lureau@redhat.com>
+In-Reply-To: <40710b94-094f-f91a-6ddb-94e51199a8c3@vivier.eu>
 User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
-X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
 Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=berrange@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/26 02:47:00
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=berrange@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/26 03:56:58
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.958,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,56 +96,41 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: sw@weilnetz.de, qemu-devel@nongnu.org, pbonzini@redhat.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Aug 25, 2020 at 09:58:27PM +0400, marcandre.lureau@redhat.com wrote:
-> From: Marc-André Lureau <marcandre.lureau@redhat.com>
+On Tue, Aug 25, 2020 at 10:36:13PM +0200, Laurent Vivier wrote:
+> Hi,
 > 
-> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-> ---
->  Makefile        | 56 -----------------------------------
->  meson.build     | 25 ++++++++++++++++
->  scripts/nsis.py | 78 +++++++++++++++++++++++++++++++++++++++++++++++++
->  3 files changed, 103 insertions(+), 56 deletions(-)
->  create mode 100644 scripts/nsis.py
+> since we have switched to meson, the statically linked binaries of qemu
+> linux-user are broken:
+> 
+> cd $OBJ
+> $SRC/configure --static --target-list=m68k-linux-user
+> make
+> ./qemu-m68k
+> Segmentation fault (core dumped)
+> 
+> Program received signal SIGSEGV, Segmentation fault.
+> 0x00007ffff7bd6833 in __dcigettext ()
+> (gdb) bt
+> #0  0x00007ffff7bd6833 in __dcigettext ()
+> #1  0x00007ffff7bd5352 in __assert_fail ()
+> #2  0x00007ffff7c4d74c in _dl_relocate_static_pie ()
+> #3  0x00007ffff7bc713e in __libc_start_main ()
+> #4  0x00007ffff7a0029e in _start ()
+> 
+> If I build with --disable-pie it works again.
+> 
+> Any idea?
 
-> diff --git a/scripts/nsis.py b/scripts/nsis.py
-> new file mode 100644
-> index 0000000000..e1c409344e
-> --- /dev/null
-> +++ b/scripts/nsis.py
-> @@ -0,0 +1,78 @@
-> +#!/usr/bin/env python3
-> +#
-> +# Copyright (C) 2020 Red Hat, Inc.
-> +#
-> +# SPDX-License-Identifier: GPL-2.0-or-later
-> +
-> +import argparse
-> +import glob
-> +import os
-> +import shutil
-> +import subprocess
-> +import tempfile
-> +
-> +
-> +def signcode(path):
-> +    cmd = os.environ.get("SIGNCODE")
-> +    if not cmd:
-> +        return
-> +    subprocess.run([cmd, path])
-
-I know the existing makefile used  $SIGNCODE env variable, but I can't
-help thinking it would be better to have it as a configure arg, and
-in turn a meson arg.
-
-None the less, it isn't worse than what already exists so
-
-Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
-
+I'd suggest checking the compiler args used with v5.1.0 vs git master
+and see if any flags related to PIE or similar changed. I already found
+one bug wrt PIE on Windows builds this way.
 
 Regards,
 Daniel
