@@ -2,109 +2,129 @@ Return-Path: <SRS0=H0ck=CE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,RCVD_ILLEGAL_IP,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EEF2C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 19:09:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EF04C433E1
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 19:27:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F2CBD207BC
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 19:09:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D1FEB207DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 19:27:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="idwZagCV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F2CBD207BC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="R/ZkaRCG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1FEB207DF
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49292 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59368 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kB0nz-0000pb-8E
-	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 15:09:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36670)
+	id 1kB14g-0006Mq-5h
+	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 15:27:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40718)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ckuehl@redhat.com>) id 1kB0m1-000614-Ux
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 15:07:53 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:34001
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ckuehl@redhat.com>) id 1kB0lz-00048u-Rv
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 15:07:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598468871;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=a07nTm9p+uFL/cBgcEJoDBqsweuoxo7VFuGlsvwVi7g=;
- b=idwZagCVap9bM4chbt0I4Vzdj3zmq7OtDohHYH4OX//qpjXetKDoz6NVk4ed8323RZ1erA
- h8IIAh9jqg+2auBuHgEmQ9S2dLEFa57a/L4rP37Fc/TwP7tsrBYWPkDSpHYQjZO/QV0HZ6
- No4VvQeehqn8zonJoHsEmXR0K09TP04=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-577-s6-bZEPiOMq7KmBaL4swXw-1; Wed, 26 Aug 2020 15:07:49 -0400
-X-MC-Unique: s6-bZEPiOMq7KmBaL4swXw-1
-Received: by mail-qk1-f200.google.com with SMTP id t10so2518910qke.11
- for <qemu-devel@nongnu.org>; Wed, 26 Aug 2020 12:07:49 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=a07nTm9p+uFL/cBgcEJoDBqsweuoxo7VFuGlsvwVi7g=;
- b=ME/kGGEY92kggJWCy4zcID8uklnWVzD9hfRequKLFFU+1Q8LhP0WdDnK4PWVsMLYXQ
- wG3/dSh6G1b/byY+hIJA7GJQXXKfLx/+lzQlXuR1nwohWyI2j1pEQOXgrJNSxO/RJaHq
- BolqdKG7l02zzwD8y3aR4HamTzGQN/2EDNbCK/GMtQSEZ+3h1J0hJwD4ZZUnyRwr6xVF
- ZjLy/2VWW0jinnY2bBbHLxPF2l9VpaJJ+UVoA8xAkYzdD47i0sqKPL7YCkQOvjVI9bkM
- wbh9YBYXQ+GXzsP9HdoFnvNyWCmqPMN9LUjWMrgvjQDhi+7HJFRBhQcokF/zA+nK0IcK
- NMFQ==
-X-Gm-Message-State: AOAM531f83aXD654Dr6bFN+PQRl6TKBTAz1FfEXY2B/dlYAkS7DAYcjc
- g9tXMySHbxmH5Nr55xVydmaR6RirZhBStKtqq1IzX8/fLsRLMtkyhR8AP1vT9G8FsBESJuG4mrU
- xCe34QrH+bZangVs=
-X-Received: by 2002:ac8:73c4:: with SMTP id v4mr7726521qtp.116.1598468868884; 
- Wed, 26 Aug 2020 12:07:48 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxfSJRaiXyFaBnrtMqYioa6gOA8mWlW2AiQlgfUQDXoQJXHGjysYw3Myhe4RXoiDi92cVEGdw==
-X-Received: by 2002:ac8:73c4:: with SMTP id v4mr7726501qtp.116.1598468868637; 
- Wed, 26 Aug 2020 12:07:48 -0700 (PDT)
-Received: from [192.168.0.172] (ip68-103-222-6.ks.ok.cox.net. [68.103.222.6])
- by smtp.gmail.com with ESMTPSA id
- q34sm2885634qtk.32.2020.08.26.12.07.47
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 26 Aug 2020 12:07:48 -0700 (PDT)
-Subject: Re: [PATCH 3/4] sev/i386: Don't allow a system reset under an SEV-ES
- guest
-To: Tom Lendacky <thomas.lendacky@amd.com>, qemu-devel@nongnu.org,
+ (Exim 4.90_1) (envelope-from <Thomas.Lendacky@amd.com>)
+ id 1kB13Z-00059p-T7
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 15:26:02 -0400
+Received: from mail-mw2nam10on2048.outbound.protection.outlook.com
+ ([40.107.94.48]:19809 helo=NAM10-MW2-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <Thomas.Lendacky@amd.com>)
+ id 1kB13X-0006PC-P1
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 15:26:01 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=XZVCeB6tFEZA1Zw8dNGssAc+cJQjDyJFYLy4qhn1+zvpQNZT+ityYyAvspLz1Hs9aAySN+ngLvEsTcBtC4yMO7Bl7tUGhUERGoNlRQzc9tAA3NAxqCKMeSvVy326dtBNy/02zMh2pneU6yKLU0AHLYKV9IppwCynFLU3V2bQPvW1zrZ1JvkzUxNp/EAC0KLPBQB+tTwxYNKiJ2FAX3cDM+uVndNQhalQrGYMTZzq8zTqq92TcK5ERhtfpOxZKi8GFHyQmzsdqgxl/aVkdXcNDvHdXM6ZtGOl2nbLgt1i/5eEbAmndaSUmsjpz5qHqWRGb5YjXVGT1IUH9dGCK/SmXw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=RoR+XJXnLl+x2xJM+WZfy0JX2FPXYVM5GxN5tlAA6yk=;
+ b=UL27eG8VIrkw/PUBStpOnUlsU0YITUmDCM/YW+yLdByXta2o4RRosLkJNoG+Mes36VpC2Y2pNWUKOag/kn7mxeeWatqp0Kv0MswMzmr8y/B1s9W/jUFXlGi8li06bf/JwHHmTe5kzUZ1jVOD3OyBUGPG4pRLg+AGCwX0I5B75HG+Q+pXWRIdfGVE431cDw3b+/zUfrg/rN9Xpg+lEILTJ7XMA5ES3wYNc3LTmORJoQWwLHIXzSue9emUyuHkBwoCUmQMNHICG/5UZbShBUurP4APOEMkBRmMiqf/QH1mlPKMQT2pzGfDTsmAwhJTbvy8L1FLhKNEeCMa7xcF9Ij+wA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=RoR+XJXnLl+x2xJM+WZfy0JX2FPXYVM5GxN5tlAA6yk=;
+ b=R/ZkaRCGMzX7bT3rrPIJ4qUW6FudzakS6Ny8BBYuJtF4+z9caJ7XloWGsTVwq99XhcfZL9aYz9ixzRiREJRCxfONd/vcwoTsEwjrtwF9tFWfonjj1ZIzceFWbMqeTj/gzP+2kXg3TbBhEuKQ/+cUP3kpsx6e+Pb2owdWFhKEqg8=
+Authentication-Results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=amd.com;
+Received: from DM5PR12MB1355.namprd12.prod.outlook.com (2603:10b6:3:6e::7) by
+ DM6PR12MB2985.namprd12.prod.outlook.com (2603:10b6:5:116::18) with
+ Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3305.26; Wed, 26 Aug 2020 19:25:25 +0000
+Received: from DM5PR12MB1355.namprd12.prod.outlook.com
+ ([fe80::299a:8ed2:23fc:6346]) by DM5PR12MB1355.namprd12.prod.outlook.com
+ ([fe80::299a:8ed2:23fc:6346%3]) with mapi id 15.20.3305.032; Wed, 26 Aug 2020
+ 19:25:25 +0000
+Subject: Re: [PATCH 2/4] sev/i386: Allow AP booting under SEV-ES
+To: Connor Kuehl <ckuehl@redhat.com>, qemu-devel@nongnu.org,
  kvm@vger.kernel.org
 References: <cover.1598382343.git.thomas.lendacky@amd.com>
- <b394ef2e743ebd57d3b8fb5ce1d5069c030ffcfc.1598382343.git.thomas.lendacky@amd.com>
-From: Connor Kuehl <ckuehl@redhat.com>
-Message-ID: <cfca1081-15e1-c57c-e3b9-d26421cfc21a@redhat.com>
-Date: Wed, 26 Aug 2020 14:07:46 -0500
+ <a3fc1bfb697a85865710fa99a3e1169e7d355a18.1598382343.git.thomas.lendacky@amd.com>
+ <93275d7f-1bfd-c115-be4b-3d20952bf376@redhat.com>
+From: Tom Lendacky <thomas.lendacky@amd.com>
+Message-ID: <aedbb207-d2de-54f8-b3f3-13f9b8d3dcea@amd.com>
+Date: Wed, 26 Aug 2020 14:25:23 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
-MIME-Version: 1.0
-In-Reply-To: <b394ef2e743ebd57d3b8fb5ce1d5069c030ffcfc.1598382343.git.thomas.lendacky@amd.com>
-Content-Language: en-US
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ckuehl@redhat.com
-X-Mimecast-Spam-Score: 0.004
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <93275d7f-1bfd-c115-be4b-3d20952bf376@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=ckuehl@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/26 03:56:58
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -52
-X-Spam_score: -5.3
-X-Spam_bar: -----
-X-Spam_report: (-5.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.959,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-2.239, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SN4PR0701CA0035.namprd07.prod.outlook.com
+ (2603:10b6:803:2d::25) To DM5PR12MB1355.namprd12.prod.outlook.com
+ (2603:10b6:3:6e::7)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from 255.255.255.255 (255.255.255.255) by
+ SN4PR0701CA0035.namprd07.prod.outlook.com (2603:10b6:803:2d::25) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3326.19 via Frontend
+ Transport; Wed, 26 Aug 2020 19:25:24 +0000
+X-Originating-IP: [67.79.209.213]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 5e92e1d8-b262-436d-57e9-08d849f5c8a3
+X-MS-TrafficTypeDiagnostic: DM6PR12MB2985:
+X-Microsoft-Antispam-PRVS: <DM6PR12MB2985D003D6E23D7FEC119541EC540@DM6PR12MB2985.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: qL3SpFUgA7QQl0eg8lklMI6oXEpxj8X0ewNice2XMXxXy3mtgBwzQmQKXf5peT/eu+uzQTu5S8q0suRk4CRO9brxQTo3diSpk4GD5PrZs0XdJ5XWPi1b6PnbXfhcTuq8MHynv2pUSmkIftdrl5K6WbrjQxQ1rM5P6wrCZAgQbwGWRzC+Pj8VnXGqYJF6kS/iJlTlvtUTkaq8RWsjrWlj+Xc+X80NGcQo57o6cd1BR8oY9G1/LslKRV9xKyuoDoCXv3yJurJod4jPcGS0B434hZBWZe13vNQ+aCTra13sqbaubSegnGXB4oOLcejA/VREGds+4AzGW3GlF3dyTlwO1/rlufCluTQHGOb4mIV3KJvufjaA2uIJxHs64w2Qp1NJ
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:DM5PR12MB1355.namprd12.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(4636009)(136003)(376002)(39860400002)(366004)(396003)(346002)(31696002)(478600001)(66556008)(86362001)(66946007)(2906002)(66476007)(5660300002)(316002)(31686004)(36756003)(16576012)(6486002)(4326008)(186003)(7416002)(2616005)(54906003)(53546011)(8936002)(26005)(956004)(52116002)(8676002)(83380400001)(43740500002);
+ DIR:OUT; SFP:1101; 
+X-MS-Exchange-AntiSpam-MessageData: Esa0Vf2vq/yVX7M6a/m1Hj577ipXklKWYDtaY6nv0LC408ftsDlislPGnJLI805SVzYcRsTu/w/lLDtS+ao47TKleeb9H2TZhCK4Z4moxwbbwqGIwn+M4jlsuG1Is8Rx3dnRP773I8aT/Y/iJf9AkYk6C6akYx5WuJZTOBBk2VcTs9C6bGkyHOMu/o9rte20IlwwJVEQtzgF8+r7aHBdSFxN65JUavFoRnGjsH68/V7jqpTos6e8gXHkzVPY0Hum+e1ohSyhQLtMpIJM3OfPWvuR4Vbcw7lNE0+ynsrXP60GmxzgMBv1qewW8mHl96oSXfD8ihuTVDeHRUUG2+UiRuKitDDRzBpiZuKXPTm/eOcvRvoujDocbl9RJVarCL+Bn58t4K4MYy8zoHMAts5LdOA9FJppgWCocModKFbt4Izi+XyQgr5bsnuE6ajiVxhrdbVTAPSzfY9mzp8dDCLPzTmhhKz1mUwlcnLeIfP3YnnUlzP0O/im4vcDuZqmhjVriUjJ2UwOuR6OYHR2fLj2LlzjhBIYMs7fFpETtcxw2PAo6g75mDRTEYVQrg3rU1RxOtcZsodPvt9QE/WwMXQcrlpNYxP55u3Ou24HAI0UAX97z2KglrRtTE3FHDjQMDJoyXMDNjbRv6qTZQJiE2kfDQ==
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5e92e1d8-b262-436d-57e9-08d849f5c8a3
+X-MS-Exchange-CrossTenant-AuthSource: DM5PR12MB1355.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Aug 2020 19:25:25.6997 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: iOJeYAXVfrrTyp6BRXmDQn6Z537eZfc/2ViLHoHf8JXvP4LYrH9fQzyJykFQ2E1xdH1piW9S9kGTC3otoLVCGw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB2985
+Received-SPF: none client-ip=40.107.94.48;
+ envelope-from=Thomas.Lendacky@amd.com;
+ helo=NAM10-MW2-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/26 15:25:58
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, FORGED_SPF_HELO=1, MSGID_FROM_MTA_HEADER=0.001,
+ NICE_REPLY_A=-2.239, RCVD_ILLEGAL_IP=1.3, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -125,120 +145,39 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/25/20 2:05 PM, Tom Lendacky wrote:
-> From: Tom Lendacky <thomas.lendacky@amd.com>
+On 8/26/20 2:07 PM, Connor Kuehl wrote:
+> On 8/25/20 2:05 PM, Tom Lendacky wrote:
+>> From: Tom Lendacky <thomas.lendacky@amd.com>
+>>
+>> When SEV-ES is enabled, it is not possible modify the guests register
+>> state after it has been initially created, encrypted and measured.
+>>
+>> Normally, an INIT-SIPI-SIPI request is used to boot the AP. However, the
+>> hypervisor cannot emulate this because it cannot update the AP register
+>> state. For the very first boot by an AP, the reset vector CS segment
+>> value and the EIP value must be programmed before the register has been
+>> encrypted and measured.
+>>
+>> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+>> ---
+>>   accel/kvm/kvm-all.c    | 60 ++++++++++++++++++++++++++++++++++++++++++
+>>   accel/stubs/kvm-stub.c |  5 ++++
+>>   hw/i386/pc_sysfw.c     | 10 ++++++-
+>>   include/sysemu/kvm.h   | 16 +++++++++++
+>>   include/sysemu/sev.h   |  2 ++
+>>   target/i386/kvm.c      |  2 ++
+>>   target/i386/sev.c      | 47 +++++++++++++++++++++++++++++++++
+>>   7 files changed, 141 insertions(+), 1 deletion(-)
 > 
-> An SEV-ES guest does not allow register state to be altered once it has
-> been measured. When a SEV-ES guest issues a reboot command, Qemu will
-> reset the vCPU state and resume the guest. This will cause failures under
-> SEV-ES, so prevent that from occurring.
-> 
-> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
-> ---
->   accel/kvm/kvm-all.c       | 8 ++++++++
->   include/sysemu/cpus.h     | 2 ++
->   include/sysemu/hw_accel.h | 4 ++++
->   include/sysemu/kvm.h      | 2 ++
->   softmmu/cpus.c            | 5 +++++
->   softmmu/vl.c              | 5 ++++-
->   6 files changed, 25 insertions(+), 1 deletion(-)
-> 
-> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-> index 54e8fd098d..1d925821b2 100644
-> --- a/accel/kvm/kvm-all.c
-> +++ b/accel/kvm/kvm-all.c
-> @@ -2384,6 +2384,14 @@ void kvm_flush_coalesced_mmio_buffer(void)
->       s->coalesced_flush_in_progress = false;
->   }
->   
-> +bool kvm_cpu_check_resettable(void)
-> +{
-> +    /* If we have a valid reset vector override, then SEV-ES is active
-> +     * and the CPU can't be reset.
-> +     */
-> +    return !kvm_state->reset_valid;
-> +}
-> +
->   static void do_kvm_cpu_synchronize_state(CPUState *cpu, run_on_cpu_data arg)
->   {
->       if (!cpu->vcpu_dirty) {
-> diff --git a/include/sysemu/cpus.h b/include/sysemu/cpus.h
-> index 3c1da6a018..6d688c757f 100644
-> --- a/include/sysemu/cpus.h
-> +++ b/include/sysemu/cpus.h
-> @@ -24,6 +24,8 @@ void dump_drift_info(void);
->   void qemu_cpu_kick_self(void);
->   void qemu_timer_notify_cb(void *opaque, QEMUClockType type);
->   
-> +bool cpu_is_resettable(void);
-> +
->   void cpu_synchronize_all_states(void);
->   void cpu_synchronize_all_post_reset(void);
->   void cpu_synchronize_all_post_init(void);
-> diff --git a/include/sysemu/hw_accel.h b/include/sysemu/hw_accel.h
-> index e128f8b06b..1fddf4f5e1 100644
-> --- a/include/sysemu/hw_accel.h
-> +++ b/include/sysemu/hw_accel.h
-> @@ -17,6 +17,10 @@
->   #include "sysemu/hvf.h"
->   #include "sysemu/whpx.h"
->   
-> +static inline bool cpu_check_resettable(void)
-> +{
-> +    return kvm_enabled() ? kvm_cpu_check_resettable() : true;
-> +}
+> Just a heads-up: ./scripts/checkpatch.pl does report a couple of style 
+> errors. I've seen other series go by where maintainers didn't mind the 
+> line length errors, but there are a couple that have to do with braces 
+> around if-statement contents that may need to be addressed.
 
-There's a missing newline here that would separate the closing brace 
-from the function below this one.
+Yup, I'll run checkpatch and make the necessary changes.
 
->   static inline void cpu_synchronize_state(CPUState *cpu)
->   {
->       if (kvm_enabled()) {
-> diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-> index f74cfa85ab..eb94bbbff9 100644
-> --- a/include/sysemu/kvm.h
-> +++ b/include/sysemu/kvm.h
-> @@ -494,6 +494,8 @@ int kvm_physical_memory_addr_from_host(KVMState *s, void *ram_addr,
->   
->   #endif /* NEED_CPU_H */
->   
-> +bool kvm_cpu_check_resettable(void);
-> +
->   void kvm_cpu_synchronize_state(CPUState *cpu);
->   void kvm_cpu_synchronize_post_reset(CPUState *cpu);
->   void kvm_cpu_synchronize_post_init(CPUState *cpu);
-> diff --git a/softmmu/cpus.c b/softmmu/cpus.c
-> index a802e899ab..32f286643f 100644
-> --- a/softmmu/cpus.c
-> +++ b/softmmu/cpus.c
-> @@ -927,6 +927,11 @@ void hw_error(const char *fmt, ...)
->       abort();
->   }
->   
-> +bool cpu_is_resettable(void)
-> +{
-> +    return cpu_check_resettable();
-> +}
-> +
->   void cpu_synchronize_all_states(void)
->   {
->       CPUState *cpu;
-> diff --git a/softmmu/vl.c b/softmmu/vl.c
-> index 4eb9d1f7fd..422fbb1650 100644
-> --- a/softmmu/vl.c
-> +++ b/softmmu/vl.c
-> @@ -1475,7 +1475,10 @@ void qemu_system_guest_crashloaded(GuestPanicInformation *info)
->   
->   void qemu_system_reset_request(ShutdownCause reason)
->   {
-> -    if (no_reboot && reason != SHUTDOWN_CAUSE_SUBSYSTEM_RESET) {
-> +    if (!cpu_is_resettable()) {
-> +        error_report("cpus are not resettable, terminating");
-> +        shutdown_requested = reason;
-> +    } else if (no_reboot && reason != SHUTDOWN_CAUSE_SUBSYSTEM_RESET) {
->           shutdown_requested = reason;
->       } else {
->           reset_requested = reason;
+Thanks,
+Tom
+
 > 
-
 
