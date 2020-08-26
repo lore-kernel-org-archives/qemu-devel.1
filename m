@@ -7,57 +7,54 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBFFBC433E3
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 07:49:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2500C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 07:50:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9247E20707
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 07:49:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9247E20707
+	by mail.kernel.org (Postfix) with ESMTPS id B047D20707
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 07:50:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B047D20707
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48736 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50152 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAqBy-00067y-Ol
-	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 03:49:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53966)
+	id 1kAqCB-0006ht-Un
+	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 03:50:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53698)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhaolichang@huawei.com>)
- id 1kAqB5-0004Tl-6I; Wed, 26 Aug 2020 03:49:03 -0400
-Received: from szxga03-in.huawei.com ([45.249.212.189]:2105 helo=huawei.com)
+ id 1kAq9k-0001eu-Ta; Wed, 26 Aug 2020 03:47:40 -0400
+Received: from szxga02-in.huawei.com ([45.249.212.188]:2535 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhaolichang@huawei.com>)
- id 1kAqB2-0002Dp-MN; Wed, 26 Aug 2020 03:49:02 -0400
-Received: from dggemi406-hub.china.huawei.com (unknown [172.30.72.56])
- by Forcepoint Email with ESMTP id C07CDB5BF5E871EB8FFC;
- Wed, 26 Aug 2020 15:48:57 +0800 (CST)
-Received: from DGGEMI421-HUB.china.huawei.com (10.1.199.150) by
- dggemi406-hub.china.huawei.com (10.3.17.144) with Microsoft SMTP Server (TLS)
- id 14.3.487.0; Wed, 26 Aug 2020 15:48:57 +0800
+ id 1kAq9i-00027O-2F; Wed, 26 Aug 2020 03:47:40 -0400
+Received: from dggemi401-hub.china.huawei.com (unknown [172.30.72.55])
+ by Forcepoint Email with ESMTP id 744E4494B988589E294A;
+ Wed, 26 Aug 2020 15:47:35 +0800 (CST)
 Received: from DGGEMI522-MBS.china.huawei.com ([169.254.8.252]) by
- dggemi421-hub.china.huawei.com ([10.1.199.150]) with mapi id 14.03.0487.000;
- Wed, 26 Aug 2020 15:48:48 +0800
+ dggemi401-hub.china.huawei.com ([10.3.17.134]) with mapi id 14.03.0487.000;
+ Wed, 26 Aug 2020 15:47:28 +0800
 From: zhaolichang <zhaolichang@huawei.com>
 To: "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>
-Subject: [PATCH V2 10/10] contrib/: fix some comment spelling errors
-Thread-Topic: [PATCH V2 10/10] contrib/: fix some comment spelling errors
-Thread-Index: AdZ7fJ5t0Q3CdhebSvmANGpggTrYMA==
-Date: Wed, 26 Aug 2020 07:48:47 +0000
-Message-ID: <640CDEE67BE2784FAE298BB2517210E48AC436@dggemi522-mbs.china.huawei.com>
+Subject: [PATCH V2 06/10] linux-user/: fix some comment spelling errors
+Thread-Topic: [PATCH V2 06/10] linux-user/: fix some comment spelling errors
+Thread-Index: AdZ7fCiFmI5TQf6xTrCZ0G7eSMl9KQ==
+Date: Wed, 26 Aug 2020 07:47:28 +0000
+Message-ID: <640CDEE67BE2784FAE298BB2517210E48AC3F2@dggemi522-mbs.china.huawei.com>
 Accept-Language: en-US
 Content-Language: zh-CN
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
 x-originating-ip: [10.174.186.227]
 Content-Type: multipart/alternative;
- boundary="_000_640CDEE67BE2784FAE298BB2517210E48AC436dggemi522mbschina_"
+ boundary="_000_640CDEE67BE2784FAE298BB2517210E48AC3F2dggemi522mbschina_"
 MIME-Version: 1.0
 X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.189;
+Received-SPF: pass client-ip=45.249.212.188;
  envelope-from=zhaolichang@huawei.com; helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/26 03:47:14
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/26 03:46:00
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
 X-Spam_score_int: -41
 X-Spam_score: -4.2
@@ -83,105 +80,143 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---_000_640CDEE67BE2784FAE298BB2517210E48AC436dggemi522mbschina_
+--_000_640CDEE67BE2784FAE298BB2517210E48AC3F2dggemi522mbschina_
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 
 I found that there are many spelling errors in the comments of qemu,
 so I used the spellcheck tool to check the spelling errors
-and finally found some spelling errors in the contrib folder.
+and finally found some spelling errors in the linux-user folder.
 
 Signed-off-by: zhaolichang <zhaolichang@huawei.com>
 Reviewed-by: Alex Benn=E9e <alex.bennee@linaro.org>
 ---
-contrib/gitdm/filetypes.txt             | 6 +++---
-contrib/ivshmem-client/ivshmem-client.h | 2 +-
-contrib/libvhost-user/libvhost-user.c   | 4 ++--
-contrib/libvhost-user/libvhost-user.h   | 2 +-
-4 files changed, 7 insertions(+), 7 deletions(-)
+linux-user/aarch64/signal.c              | 2 +-
+linux-user/cris/target_syscall.h         | 4 ++--
+linux-user/flat.h                        | 2 +-
+linux-user/flatload.c                    | 4 ++--
+linux-user/host/ppc64/safe-syscall.inc.S | 2 +-
+linux-user/syscall.c                     | 4 ++--
+6 files changed, 9 insertions(+), 9 deletions(-)
 
-diff --git a/contrib/gitdm/filetypes.txt b/contrib/gitdm/filetypes.txt
-index 9e9c505205..d2d6f6db8d 100644
---- a/contrib/gitdm/filetypes.txt
-+++ b/contrib/gitdm/filetypes.txt
-@@ -22,7 +22,7 @@
-# in the gitdm sample-config directory.
-#
-# This file contains associations parameters regarding filetypes
--# (documentation, develompent, multimedia, images...)
-+# (documentation, development, multimedia, images...)
-#
-# format:
-# filetype <type> <regex> [<comment>]
-@@ -59,8 +59,8 @@ filetype code \.s$ # Assembly
-filetype code \.S$     # Assembly
-filetype code \.asm$        # Assembly
-filetype code \.awk$         # awk
--filetype code ^common$  # script fragements
--filetype code ^common.*$  # script fragements
-+filetype code ^common$  # script fragments
-+filetype code ^common.*$  # script fragments
-filetype code (qom|qmp)-\w+$  # python script fragments
+diff --git a/linux-user/aarch64/signal.c b/linux-user/aarch64/signal.c
+index cd521ee42d..d50c1ae583 100644
+--- a/linux-user/aarch64/signal.c
++++ b/linux-user/aarch64/signal.c
+@@ -78,7 +78,7 @@ struct target_sve_context {
+     struct target_aarch64_ctx head;
+     uint16_t vl;
+     uint16_t reserved[3];
+-    /* The actual SVE data immediately follows.  It is layed out
++    /* The actual SVE data immediately follows.  It is laid out
+      * according to TARGET_SVE_SIG_{Z,P}REG_OFFSET, based off of
+      * the original struct pointer.
+      */
+diff --git a/linux-user/cris/target_syscall.h b/linux-user/cris/target_sysc=
+all.h
+index 29d69009ff..c7ae89d73a 100644
+--- a/linux-user/cris/target_syscall.h
++++ b/linux-user/cris/target_syscall.h
+@@ -4,7 +4,7 @@
+#define UNAME_MACHINE "cris"
+#define UNAME_MINIMUM_RELEASE "2.6.32"
 
-#
-diff --git a/contrib/ivshmem-client/ivshmem-client.h b/contrib/ivshmem-clie=
-nt/ivshmem-client.h
-index fe3cc4a03d..fc45a38060 100644
---- a/contrib/ivshmem-client/ivshmem-client.h
-+++ b/contrib/ivshmem-client/ivshmem-client.h
-@@ -174,7 +174,7 @@ int ivshmem_client_notify_all_vects(const IvshmemClient=
- *client,
-                                     const IvshmemClientPeer *peer);
+-/* pt_regs not only specifices the format in the user-struct during
++/* pt_regs not only specifies the format in the user-struct during
+  * ptrace but is also the frame format used in the kernel prologue/epilogu=
+es
+  * themselves
+  */
+@@ -32,7 +32,7 @@ struct target_pt_regs {
+         unsigned long spc;
+         unsigned long ccs;
+         unsigned long srp;
+-        unsigned long erp; /* This is actually the debugged process' PC */
++        unsigned long erp; /* This is actually the debugged process's PC *=
+/
+         /* For debugging purposes; saved only when needed. */
+         unsigned long exs;
+         unsigned long eda;
+diff --git a/linux-user/flat.h b/linux-user/flat.h
+index 1e44b33443..ed518e2013 100644
+--- a/linux-user/flat.h
++++ b/linux-user/flat.h
+@@ -43,7 +43,7 @@ struct flat_hdr {
+         abi_ulong reloc_count;  /* Number of relocation records */
+         abi_ulong flags;
+         abi_ulong build_date;   /* When the program/library was built */
+-        abi_ulong filler[5];    /* Reservered, set to zero */
++       abi_ulong filler[5];    /* Reserved, set to zero */
+};
 
-/**
-- * Broadcat a notification to all vectors of all peers
-+ * Broadcast a notification to all vectors of all peers
-  *
-  * @client: The ivshmem client
-  *
-diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-user/=
-libvhost-user.c
-index 53f16bdf08..9d30ff2283 100644
---- a/contrib/libvhost-user/libvhost-user.c
-+++ b/contrib/libvhost-user/libvhost-user.c
-@@ -684,7 +684,7 @@ vu_add_mem_reg(VuDev *dev, VhostUserMsg *vmsg) {
+#define FLAT_FLAG_RAM    0x0001 /* load program entirely into RAM */
+diff --git a/linux-user/flatload.c b/linux-user/flatload.c
+index 8fb448f0bf..14d2999d15 100644
+--- a/linux-user/flatload.c
++++ b/linux-user/flatload.c
+@@ -442,7 +442,7 @@ static int load_flat_file(struct linux_binprm * bprm,
+     indx_len =3D (indx_len + 15) & ~(abi_ulong)15;
 
      /*
-      * If we are in postcopy mode and we receive a u64 payload with a 0 va=
-lue
--     * we know all the postcopy client bases have been recieved, and we
-+     * we know all the postcopy client bases have been received, and we
-      * should start generating faults.
+-     * Alloate the address space.
++     * Allocate the address space.
       */
-     if (track_ramblocks &&
-@@ -973,7 +973,7 @@ vu_set_mem_table_exec(VuDev *dev, VhostUserMsg *vmsg)
-     for (i =3D 0; i < dev->max_queues; i++) {
-         if (dev->vq[i].vring.desc) {
-             if (map_ring(dev, &dev->vq[i])) {
--                vu_panic(dev, "remaping queue %d during setmemtable", i);
-+                vu_panic(dev, "remapping queue %d during setmemtable", i);
-             }
-         }
-     }
-diff --git a/contrib/libvhost-user/libvhost-user.h b/contrib/libvhost-user/=
-libvhost-user.h
-index 844c37c648..287ac5fec7 100644
---- a/contrib/libvhost-user/libvhost-user.h
-+++ b/contrib/libvhost-user/libvhost-user.h
-@@ -424,7 +424,7 @@ typedef struct VuVirtqElement {
-  * @remove_watch: a remove_watch callback
-  * @iface: a VuDevIface structure with vhost-user device callbacks
-  *
-- * Intializes a VuDev vhost-user context.
-+ * Initializes a VuDev vhost-user context.
-  *
-  * Returns: true on success, false on failure.
-  **/
+     probe_guest_base(bprm->filename, 0,
+                      text_len + data_len + extra + indx_len);
+@@ -794,7 +794,7 @@ int load_flt_binary(struct linux_binprm *bprm, struct i=
+mage_info *info)
+#error here
+     for (i =3D MAX_SHARED_LIBS-1; i>0; i--) {
+             if (libinfo[i].loaded) {
+-                    /* Push previos first to call address */
++                    /* Push previous first to call address */
+                     --sp;
+                     if (put_user_ual(start_addr, sp))
+                         return -EFAULT;
+diff --git a/linux-user/host/ppc64/safe-syscall.inc.S b/linux-user/host/ppc=
+64/safe-syscall.inc.S
+index 8ed73a5b86..875133173b 100644
+--- a/linux-user/host/ppc64/safe-syscall.inc.S
++++ b/linux-user/host/ppc64/safe-syscall.inc.S
+@@ -84,7 +84,7 @@ safe_syscall_end:
+
+       /* code path when we didn't execute the syscall */
+0:      addi 3, 0, -TARGET_ERESTARTSYS
+-        ld 14, 16(1) /* restore r14 to its orginal value */
++       ld 14, 16(1) /* restore r14 to its original value */
+         blr
+         .cfi_endproc
+
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index b4a7b605f3..bdfa51dde8 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -477,7 +477,7 @@ _syscall4(int, sys_prlimit64, pid_t, pid, int, resource=
+,
+
+ #if defined(TARGET_NR_timer_create)
+-/* Maxiumum of 32 active POSIX timers allowed at any one time. */
++/* Maximum of 32 active POSIX timers allowed at any one time. */
+static timer_t g_posix_timers[32] =3D { 0, } ;
+
+static inline int next_free_host_timer(void)
+@@ -7800,7 +7800,7 @@ static abi_long do_syscall1(void *cpu_env, int num, a=
+bi_long arg1,
+     switch(num) {
+     case TARGET_NR_exit:
+         /* In old applications this may be used to implement _exit(2).
+-           However in threaded applictions it is used for thread terminati=
+on,
++           However in threaded applications it is used for thread terminat=
+ion,
+            and _exit_group is used for application termination.
+            Do thread termination if we have more then one thread.  */
+
 --
 2.26.2.windows.1
 
 
---_000_640CDEE67BE2784FAE298BB2517210E48AC436dggemi522mbschina_
+--_000_640CDEE67BE2784FAE298BB2517210E48AC3F2dggemi522mbschina_
 Content-Type: text/html; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 
@@ -252,171 +287,264 @@ lling errors in the comments of qemu,<o:p></o:p></span></p>
 <p class=3D"MsoNormal"><span lang=3D"EN-US">so I used the spellcheck tool t=
 o check the spelling errors<o:p></o:p></span></p>
 <p class=3D"MsoNormal"><span lang=3D"EN-US">and finally found some spelling=
- errors in the contrib folder.<o:p></o:p></span></p>
+ errors in the linux-user folder.<o:p></o:p></span></p>
 <p class=3D"MsoNormal"><span lang=3D"EN-US"><o:p>&nbsp;</o:p></span></p>
 <p class=3D"MsoNormal"><span lang=3D"EN-US">Signed-off-by: zhaolichang &lt;=
 zhaolichang@huawei.com&gt;<o:p></o:p></span></p>
 <p class=3D"MsoNormal"><span lang=3D"EN-US">Reviewed-by: Alex Benn=E9e &lt;=
 alex.bennee@linaro.org&gt;<o:p></o:p></span></p>
 <p class=3D"MsoNormal"><span lang=3D"EN-US">---<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">contrib/gitdm/filetypes.txt&nbs=
-p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | 6 &#=
-43;&#43;&#43;---<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">contrib/ivshmem-client/ivshmem-=
-client.h | 2 &#43;-<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">contrib/libvhost-user/libvhost-=
-user.c&nbsp;&nbsp; | 4 &#43;&#43;--<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">contrib/libvhost-user/libvhost-=
-user.h&nbsp;&nbsp; | 2 &#43;-<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">4 files changed, 7 insertions(&=
-#43;), 7 deletions(-)<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US"><o:p>&nbsp;</o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">diff --git a/contrib/gitdm/file=
-types.txt b/contrib/gitdm/filetypes.txt<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">index 9e9c505205..d2d6f6db8d 10=
-0644<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">--- a/contrib/gitdm/filetypes.t=
-xt<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">&#43;&#43;&#43; b/contrib/gitdm=
-/filetypes.txt<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">@@ -22,7 &#43;22,7 @@<o:p></o:p=
-></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US"># in the gitdm sample-config di=
-rectory.<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">#<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US"># This file contains associatio=
-ns parameters regarding filetypes<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">-# (documentation, develompent,=
- multimedia, images...)<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">&#43;# (documentation, developm=
-ent, multimedia, images...)<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">#<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US"># format:<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US"># filetype &lt;type&gt; &lt;reg=
-ex&gt; [&lt;comment&gt;]<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">@@ -59,8 &#43;59,8 @@ filetype =
-code \.s$ # Assembly<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">filetype code \.S$&nbsp;&nbsp;&=
-nbsp;&nbsp; # Assembly<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">filetype code \.asm$&nbsp;&nbsp=
-;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; # Assembly<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">filetype code \.awk$&nbsp;&nbsp=
-;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; # awk<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">-filetype code ^common$&nbsp; #=
- script fragements<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">-filetype code ^common.*$&nbsp;=
- # script fragements<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">&#43;filetype code ^common$&nbs=
-p; # script fragments<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">&#43;filetype code ^common.*$&n=
-bsp; # script fragments<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">filetype code (qom|qmp)-\w&#43;=
-$&nbsp; # python script fragments<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US"><o:p>&nbsp;</o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">#<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">diff --git a/contrib/ivshmem-cl=
-ient/ivshmem-client.h b/contrib/ivshmem-client/ivshmem-client.h<o:p></o:p><=
-/span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">index fe3cc4a03d..fc45a38060 10=
-0644<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">--- a/contrib/ivshmem-client/iv=
-shmem-client.h<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">&#43;&#43;&#43; b/contrib/ivshm=
-em-client/ivshmem-client.h<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">@@ -174,7 &#43;174,7 @@ int ivs=
-hmem_client_notify_all_vects(const IvshmemClient *client,<o:p></o:p></span>=
-</p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
-nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+<p class=3D"MsoNormal"><span lang=3D"EN-US">linux-user/aarch64/signal.c&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; =
+| 2 &#43;-<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">linux-user/cris/target_syscall.=
+h&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | 4 &#43;&#43;--<o:p></o:=
+p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">linux-user/flat.h&nbsp;&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
+;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | 2 &#43;-<o:p></o:p></sp=
+an></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">linux-user/flatload.c&nbsp;&nbs=
 p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
-nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; const IvshmemClientPeer *peer);<o:p></o=
-:p></span></p>
+nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | 4 &#43;&#43;--<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">linux-user/host/ppc64/safe-sysc=
+all.inc.S | 2 &#43;-<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">linux-user/syscall.c&nbsp;&nbsp=
+;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | 4 &#43;&#43;--<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">6 files changed, 9 insertions(&=
+#43;), 9 deletions(-)<o:p></o:p></span></p>
 <p class=3D"MsoNormal"><span lang=3D"EN-US"><o:p>&nbsp;</o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">/**<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">- * Broadcat a notification to =
-all vectors of all peers<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">&#43; * Broadcast a notificatio=
-n to all vectors of all peers<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp; *<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp; * @client: The ivshmem c=
-lient<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp; *<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">diff --git a/contrib/libvhost-u=
-ser/libvhost-user.c b/contrib/libvhost-user/libvhost-user.c<o:p></o:p></spa=
-n></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">index 53f16bdf08..9d30ff2283 10=
+<p class=3D"MsoNormal"><span lang=3D"EN-US">diff --git a/linux-user/aarch64=
+/signal.c b/linux-user/aarch64/signal.c<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">index cd521ee42d..d50c1ae583 10=
 0644<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">--- a/contrib/libvhost-user/lib=
-vhost-user.c<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">&#43;&#43;&#43; b/contrib/libvh=
-ost-user/libvhost-user.c<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">@@ -684,7 &#43;684,7 @@ vu_add_=
-mem_reg(VuDev *dev, VhostUserMsg *vmsg) {<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">--- a/linux-user/aarch64/signal=
+.c<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&#43;&#43;&#43; b/linux-user/aa=
+rch64/signal.c<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">@@ -78,7 &#43;78,7 @@ struct ta=
+rget_sve_context {<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp; struct=
+ target_aarch64_ctx head;<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp; uint16=
+_t vl;<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp; uint16=
+_t reserved[3];<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">-&nbsp;&nbsp;&nbsp; /* The actu=
+al SVE data immediately follows.&nbsp; It is layed out<o:p></o:p></span></p=
+>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&#43;&nbsp;&nbsp;&nbsp; /* The =
+actual SVE data immediately follows.&nbsp; It is laid out<o:p></o:p></span>=
+</p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; =
+* according to TARGET_SVE_SIG_{Z,P}REG_OFFSET, based off of<o:p></o:p></spa=
+n></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; =
+* the original struct pointer.<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; =
+*/<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">diff --git a/linux-user/cris/ta=
+rget_syscall.h b/linux-user/cris/target_syscall.h<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">index 29d69009ff..c7ae89d73a 10=
+0644<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">--- a/linux-user/cris/target_sy=
+scall.h<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&#43;&#43;&#43; b/linux-user/cr=
+is/target_syscall.h<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">@@ -4,7 &#43;4,7 @@<o:p></o:p><=
+/span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">#define UNAME_MACHINE &quot;cri=
+s&quot;<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">#define UNAME_MINIMUM_RELEASE &=
+quot;2.6.32&quot;<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US"><o:p>&nbsp;</o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">-/* pt_regs not only specifices=
+ the format in the user-struct during<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&#43;/* pt_regs not only specif=
+ies the format in the user-struct during<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp; * ptrace but is also the=
+ frame format used in the kernel prologue/epilogues<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp; * themselves<o:p></o:p><=
+/span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp; */<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">@@ -32,7 &#43;32,7 @@ struct ta=
+rget_pt_regs {<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp; unsigned long spc;<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp; &nbsp;&nbsp;unsigned long ccs;<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp; unsigned long srp;<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=
+&nbsp;&nbsp; unsigned long erp; /* This is actually the debugged process' P=
+C */<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&#43;&nbsp;&nbsp;&nbsp;&nbsp;&n=
+bsp;&nbsp;&nbsp; unsigned long erp; /* This is actually the debugged proces=
+s's PC */<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp; /* For debugging purposes; saved only when needed. */<o:p=
+></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp; unsigned long exs;<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp; unsigned long eda;<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">diff --git a/linux-user/flat.h =
+b/linux-user/flat.h<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">index 1e44b33443..ed518e2013 10=
+0644<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">--- a/linux-user/flat.h<o:p></o=
+:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&#43;&#43;&#43; b/linux-user/fl=
+at.h<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">@@ -43,7 &#43;43,7 @@ struct fl=
+at_hdr {<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp; abi_ulong reloc_count;&nbsp; /* Number of relocation reco=
+rds */<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp; abi_ulong flags;<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp; abi_ulong build_date;&nbsp;&nbsp; /* When the program/lib=
+rary was built */<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=
+&nbsp;&nbsp; abi_ulong filler[5];&nbsp;&nbsp;&nbsp; /* Reservered, set to z=
+ero */<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&#43;&nbsp;&nbsp;&nbsp;&nbsp;&n=
+bsp;&nbsp; abi_ulong filler[5];&nbsp;&nbsp;&nbsp; /* Reserved, set to zero =
+*/<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">};<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US"><o:p>&nbsp;</o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">#define FLAT_FLAG_RAM&nbsp;&nbs=
+p;&nbsp; 0x0001 /* load program entirely into RAM */<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">diff --git a/linux-user/flatloa=
+d.c b/linux-user/flatload.c<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">index 8fb448f0bf..14d2999d15 10=
+0644<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">--- a/linux-user/flatload.c<o:p=
+></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&#43;&#43;&#43; b/linux-user/fl=
+atload.c<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">@@ -442,7 &#43;442,7 @@ static =
+int load_flat_file(struct linux_binprm * bprm,<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp; indx_l=
+en =3D (indx_len &#43; 15) &amp; ~(abi_ulong)15;<o:p></o:p></span></p>
 <p class=3D"MsoNormal"><span lang=3D"EN-US"><o:p>&nbsp;</o:p></span></p>
 <p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp; /*<o:p=
 ></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; =
-* If we are in postcopy mode and we receive a u64 payload with a 0 value<o:=
-p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">-&nbsp;&nbsp;&nbsp;&nbsp; * we =
-know all the postcopy client bases have been recieved, and we<o:p></o:p></s=
-pan></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">-&nbsp;&nbsp;&nbsp;&nbsp; * All=
+oate the address space.<o:p></o:p></span></p>
 <p class=3D"MsoNormal"><span lang=3D"EN-US">&#43;&nbsp;&nbsp;&nbsp;&nbsp; *=
- we know all the postcopy client bases have been received, and we<o:p></o:p=
-></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; =
-* should start generating faults.<o:p></o:p></span></p>
+ Allocate the address space.<o:p></o:p></span></p>
 <p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; =
 */<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp; if (tr=
-ack_ramblocks &amp;&amp;<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">@@ -973,7 &#43;973,7 @@ vu_set_=
-mem_table_exec(VuDev *dev, VhostUserMsg *vmsg)<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp; probe_=
+guest_base(bprm-&gt;filename, 0,<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp; text_len &#43; data_len &#43; extra &#43; indx_len);<o=
+:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">@@ -794,7 &#43;794,7 @@ int loa=
+d_flt_binary(struct linux_binprm *bprm, struct image_info *info)<o:p></o:p>=
+</span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">#error here<o:p></o:p></span></=
+p>
 <p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp; for (i=
- =3D 0; i &lt; dev-&gt;max_queues; i&#43;&#43;) {<o:p></o:p></span></p>
+ =3D MAX_SHARED_LIBS-1; i&gt;0; i--) {<o:p></o:p></span></p>
 <p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
-nbsp;&nbsp;&nbsp; if (dev-&gt;vq[i].vring.desc) {<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
-nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if (map_ring(dev, &amp;dev-&gt;vq=
-[i])) {<o:p></o:p></span></p>
+nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if (libinfo[i].loaded) {<o:p></o:=
+p></span></p>
 <p class=3D"MsoNormal"><span lang=3D"EN-US">-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; vu_panic(dev, =
-&quot;remaping queue %d during setmemtable&quot;, i);<o:p></o:p></span></p>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
+sp;&nbsp; /* Push previos first to call address */<o:p></o:p></span></p>
 <p class=3D"MsoNormal"><span lang=3D"EN-US">&#43;&nbsp;&nbsp;&nbsp;&nbsp;&n=
-bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; vu_panic(d=
-ev, &quot;remapping queue %d during setmemtable&quot;, i);<o:p></o:p></span=
-></p>
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
+;&nbsp;&nbsp; /* Push previous first to call address */<o:p></o:p></span></=
+p>
 <p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
-nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }<o:p></o:p></span></p>
+nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp; --sp;<o:p></o:p></span></p>
 <p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
-nbsp;&nbsp;&nbsp; }<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp; }<o:p>=
-</o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">diff --git a/contrib/libvhost-u=
-ser/libvhost-user.h b/contrib/libvhost-user/libvhost-user.h<o:p></o:p></spa=
-n></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">index 844c37c648..287ac5fec7 10=
-0644<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">--- a/contrib/libvhost-user/lib=
-vhost-user.h<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">&#43;&#43;&#43; b/contrib/libvh=
-ost-user/libvhost-user.h<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">@@ -424,7 &#43;424,7 @@ typedef=
- struct VuVirtqElement {<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp; * @remove_watch: a remov=
-e_watch callback<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp; * @iface: a VuDevIface s=
-tructure with vhost-user device callbacks<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp; *<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">- * Intializes a VuDev vhost-us=
-er context.<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">&#43; * Initializes a VuDev vho=
-st-user context.<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp; *<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp; * Returns: true on succe=
-ss, false on failure.<o:p></o:p></span></p>
-<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp; **/<o:p></o:p></span></p=
+nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp; if (put_user_ual(start_addr, sp))<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return -EFAULT;<o:p></o:p></span></p=
 >
+<p class=3D"MsoNormal"><span lang=3D"EN-US">diff --git a/linux-user/host/pp=
+c64/safe-syscall.inc.S b/linux-user/host/ppc64/safe-syscall.inc.S<o:p></o:p=
+></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">index 8ed73a5b86..875133173b 10=
+0644<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">--- a/linux-user/host/ppc64/saf=
+e-syscall.inc.S<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&#43;&#43;&#43; b/linux-user/ho=
+st/ppc64/safe-syscall.inc.S<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">@@ -84,7 &#43;84,7 @@ safe_sysc=
+all_end:<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US"><o:p>&nbsp;</o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp; /* code path when we didn't execute the syscall */<o:p></o:p></span><=
+/p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">0:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
+; addi 3, 0, -TARGET_ERESTARTSYS<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=
+&nbsp;&nbsp; ld 14, 16(1) /* restore r14 to its orginal value */<o:p></o:p>=
+</span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&#43;&nbsp;&nbsp;&nbsp;&nbsp;&n=
+bsp;&nbsp; ld 14, 16(1) /* restore r14 to its original value */<o:p></o:p><=
+/span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp; blr<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp; .cfi_endproc<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US"><o:p>&nbsp;</o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">diff --git a/linux-user/syscall=
+.c b/linux-user/syscall.c<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">index b4a7b605f3..bdfa51dde8 10=
+0644<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">--- a/linux-user/syscall.c<o:p>=
+</o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&#43;&#43;&#43; b/linux-user/sy=
+scall.c<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">@@ -477,7 &#43;477,7 @@ _syscal=
+l4(int, sys_prlimit64, pid_t, pid, int, resource,<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US"><o:p>&nbsp;</o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US"><o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;#if defined(TARGET_NR_tim=
+er_create)<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">-/* Maxiumum of 32 active POSIX=
+ timers allowed at any one time. */<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&#43;/* Maximum of 32 active PO=
+SIX timers allowed at any one time. */<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">static timer_t g_posix_timers[3=
+2] =3D { 0, } ;<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US"><o:p>&nbsp;</o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">static inline int next_free_hos=
+t_timer(void)<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">@@ -7800,7 &#43;7800,7 @@ stati=
+c abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,<o:p></o:p></s=
+pan></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp; switch=
+(num) {<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp; case T=
+ARGET_NR_exit:<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp; /* In old applications this may be used to implement _exi=
+t(2).<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; However in threaded applictions it is used f=
+or thread termination,<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&#43;&nbsp;&nbsp;&nbsp;&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; However in threaded applications it is u=
+sed for thread termination,<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; and _exit_group is used for application=
+ termination.<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Do thread termination if we have more t=
+hen one thread.&nbsp; */<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US"><o:p>&nbsp;</o:p></span></p>
 <p class=3D"MsoNormal"><span lang=3D"EN-US">-- <o:p></o:p></span></p>
 <p class=3D"MsoNormal"><span lang=3D"EN-US">2.26.2.windows.1<o:p></o:p></sp=
 an></p>
@@ -425,5 +553,5 @@ an></p>
 </body>
 </html>
 
---_000_640CDEE67BE2784FAE298BB2517210E48AC436dggemi522mbschina_--
+--_000_640CDEE67BE2784FAE298BB2517210E48AC3F2dggemi522mbschina_--
 
