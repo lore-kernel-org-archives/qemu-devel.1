@@ -7,83 +7,84 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EFE5EC433E3
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 10:54:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CFF75C433E4
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 10:54:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B9B13206EB
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 10:54:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 983A9206EB
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 10:54:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KQ0IDuwr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9B13206EB
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WjpSPTk8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 983A9206EB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58622 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58716 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAt49-0007W9-Uh
-	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 06:54:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43998)
+	id 1kAt4A-0007YB-Lv
+	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 06:54:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44078)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kAt3G-0005fD-MP
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 06:53:10 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:20256)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kAt3I-0005h2-Bg
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 06:53:12 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:57867
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kAt3E-0001VT-Sb
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 06:53:10 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kAt3F-0001Vl-Lc
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 06:53:12 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598439188;
+ s=mimecast20190719; t=1598439189;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=lhw8FdRsCo8/Q3iUVLr0spC3/H0VtfVEyVbdPoYCY8M=;
- b=KQ0IDuwrIKpHe/W8EjSl671Z+67SyA5d7tO9ZpDt244hm2IT3J0ZnJkSHqtCWczCjbRtAI
- 2gR3eKi96QpiPy3LC7up2tj7jigt3d4jSYamX8D6CPG8I13s5NDzwHXPPcZlQ0epLzANC6
- Sj4GBa4bEgS8X7FtnQa1Q5BiEulvgw8=
+ bh=weYslzUVJLl87DZKqYmD4AiiQEzxi3Q5a5q5Zh55/vU=;
+ b=WjpSPTk8fV7YOSCv05XmYriUkN1TtRLMSZEpyfe/PqUcJ33o458dq7byxo7cLDF5QTNKEJ
+ xjNFh9HghPXIz30JAB+DJyCNsmapP1GxTlqxeVTy8uoY7sZtpiidsriifrWJDCBen1KBTb
+ /huY0mn+7C6zShNDeSwf+TcYxapmaLo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-343-8Do7R5RsPzevwY8jk9b_4g-1; Wed, 26 Aug 2020 06:53:04 -0400
-X-MC-Unique: 8Do7R5RsPzevwY8jk9b_4g-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-263-lh-a5QAPMDeu_qIzoySBfw-1; Wed, 26 Aug 2020 06:53:07 -0400
+X-MC-Unique: lh-a5QAPMDeu_qIzoySBfw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8256E1074646;
- Wed, 26 Aug 2020 10:53:03 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ED911186A577;
+ Wed, 26 Aug 2020 10:53:05 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-112-54.ams2.redhat.com
  [10.36.112.54])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0B2735D9E4;
- Wed, 26 Aug 2020 10:52:55 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 94BCF1972A;
+ Wed, 26 Aug 2020 10:53:05 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 2D27E9C87; Wed, 26 Aug 2020 12:52:54 +0200 (CEST)
+ id 4F010991; Wed, 26 Aug 2020 12:52:54 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 02/20] seabios: add microvm config, update build rules
-Date: Wed, 26 Aug 2020 12:52:36 +0200
-Message-Id: <20200826105254.28496-3-kraxel@redhat.com>
+Subject: [PATCH v6 05/20] acpi: ged: add x86 device variant.
+Date: Wed, 26 Aug 2020 12:52:39 +0200
+Message-Id: <20200826105254.28496-6-kraxel@redhat.com>
 In-Reply-To: <20200826105254.28496-1-kraxel@redhat.com>
 References: <20200826105254.28496-1-kraxel@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
 X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=kraxel@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/25 23:30:47
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/26 03:16:15
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.958,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,63 +108,87 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- roms/Makefile               |  5 ++++-
- roms/config.seabios-microvm | 26 ++++++++++++++++++++++++++
- 2 files changed, 30 insertions(+), 1 deletion(-)
- create mode 100644 roms/config.seabios-microvm
+Set AcpiDeviceIfClass->madt_cpu,
+otherwise identical to TYPE_ACPI_GED.
 
-diff --git a/roms/Makefile b/roms/Makefile
-index 2673a39f9dc2..f8890c7e39de 100644
---- a/roms/Makefile
-+++ b/roms/Makefile
-@@ -70,9 +70,12 @@ default help:
- 	@echo "  clean              -- delete the files generated by the previous" \
- 	                              "build targets"
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+---
+ include/hw/acpi/generic_event_device.h |  4 +++
+ hw/i386/generic_event_device_x86.c     | 36 ++++++++++++++++++++++++++
+ hw/i386/meson.build                    |  1 +
+ 3 files changed, 41 insertions(+)
+ create mode 100644 hw/i386/generic_event_device_x86.c
+
+diff --git a/include/hw/acpi/generic_event_device.h b/include/hw/acpi/generic_event_device.h
+index 4533cddb486c..bd79cfff2b6a 100644
+--- a/include/hw/acpi/generic_event_device.h
++++ b/include/hw/acpi/generic_event_device.h
+@@ -69,6 +69,10 @@
+ #define ACPI_GED(obj) \
+     OBJECT_CHECK(AcpiGedState, (obj), TYPE_ACPI_GED)
  
--bios: build-seabios-config-seabios-128k build-seabios-config-seabios-256k
-+bios: build-seabios-config-seabios-128k \
-+		build-seabios-config-seabios-256k \
-+		build-seabios-config-seabios-microvm
- 	cp seabios/builds/seabios-128k/bios.bin ../pc-bios/bios.bin
- 	cp seabios/builds/seabios-256k/bios.bin ../pc-bios/bios-256k.bin
-+	cp seabios/builds/seabios-microvm/bios.bin ../pc-bios/bios-microvm.bin
++#define TYPE_ACPI_GED_X86 "acpi-ged-x86"
++#define ACPI_GED_X86(obj) \
++    OBJECT_CHECK(AcpiGedX86State, (obj), TYPE_ACPI_GED_X86)
++
+ #define ACPI_GED_EVT_SEL_OFFSET    0x0
+ #define ACPI_GED_EVT_SEL_LEN       0x4
  
- vgabios seavgabios: $(patsubst %,seavgabios-%,$(vgabios_variants))
- 
-diff --git a/roms/config.seabios-microvm b/roms/config.seabios-microvm
+diff --git a/hw/i386/generic_event_device_x86.c b/hw/i386/generic_event_device_x86.c
 new file mode 100644
-index 000000000000..a253e2edc6ec
+index 000000000000..e26fb02a2ef6
 --- /dev/null
-+++ b/roms/config.seabios-microvm
-@@ -0,0 +1,26 @@
-+CONFIG_QEMU=y
-+CONFIG_QEMU_HARDWARE=y
-+CONFIG_PERMIT_UNALIGNED_PCIROM=y
-+CONFIG_ROM_SIZE=128
-+CONFIG_XEN=n
-+CONFIG_BOOTSPLASH=n
-+CONFIG_ATA=n
-+CONFIG_AHCI=n
-+CONFIG_SDCARD=n
-+CONFIG_PVSCSI=n
-+CONFIG_ESP_SCSI=n
-+CONFIG_LSI_SCSI=n
-+CONFIG_MEGASAS=n
-+CONFIG_MPT_SCSI=n
-+CONFIG_FLOPPY=n
-+CONFIG_FLASH_FLOPPY=n
-+CONFIG_NVME=n
-+CONFIG_PS2PORT=n
-+CONFIG_USB=n
-+CONFIG_LPT=n
-+CONFIG_RTC_TIMER=n
-+CONFIG_USE_SMM=n
-+CONFIG_PMTIMER=n
-+CONFIG_TCGBIOS=n
-+CONFIG_HARDWARE_IRQ=n
-+CONFIG_ACPI_PARSE=y
++++ b/hw/i386/generic_event_device_x86.c
+@@ -0,0 +1,36 @@
++/*
++ * x86 variant of the generic event device for hw reduced acpi
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms and conditions of the GNU General Public License,
++ * version 2 or later, as published by the Free Software Foundation.
++ */
++
++#include "qemu/osdep.h"
++#include "hw/acpi/generic_event_device.h"
++#include "hw/i386/pc.h"
++
++static void acpi_ged_x86_class_init(ObjectClass *class, void *data)
++{
++    AcpiDeviceIfClass *adevc = ACPI_DEVICE_IF_CLASS(class);
++
++    adevc->madt_cpu = pc_madt_cpu_entry;
++}
++
++static const TypeInfo acpi_ged_x86_info = {
++    .name          = TYPE_ACPI_GED_X86,
++    .parent        = TYPE_ACPI_GED,
++    .class_init    = acpi_ged_x86_class_init,
++    .interfaces = (InterfaceInfo[]) {
++        { TYPE_HOTPLUG_HANDLER },
++        { TYPE_ACPI_DEVICE_IF },
++        { }
++    }
++};
++
++static void acpi_ged_x86_register_types(void)
++{
++    type_register_static(&acpi_ged_x86_info);
++}
++
++type_init(acpi_ged_x86_register_types)
+diff --git a/hw/i386/meson.build b/hw/i386/meson.build
+index 63918fbe22f9..1a7d1a685d77 100644
+--- a/hw/i386/meson.build
++++ b/hw/i386/meson.build
+@@ -18,6 +18,7 @@ i386_ss.add(when: 'CONFIG_VMPORT', if_true: files('vmport.c'))
+ i386_ss.add(when: 'CONFIG_VTD', if_true: files('intel_iommu.c'))
+ 
+ i386_ss.add(when: 'CONFIG_ACPI', if_true: files('acpi-common.c'))
++i386_ss.add(when: 'CONFIG_ACPI_HW_REDUCED', if_true: files('generic_event_device_x86.c'))
+ i386_ss.add(when: 'CONFIG_PC', if_true: files(
+   'pc.c',
+   'pc_sysfw.c',
 -- 
 2.27.0
 
