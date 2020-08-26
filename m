@@ -2,80 +2,77 @@ Return-Path: <SRS0=H0ck=CE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A470C433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 09:26:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A04D1C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 09:29:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 542DA207DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 09:26:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6571B20786
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 09:29:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VLDvV3ft"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 542DA207DF
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LLfS9+V/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6571B20786
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49026 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51188 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kArh8-0006qA-Iq
-	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 05:26:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50438)
+	id 1kArjn-0007oD-IU
+	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 05:28:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51038)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kArgQ-0006Lg-ES
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 05:25:30 -0400
-Received: from mail-ed1-x541.google.com ([2a00:1450:4864:20::541]:39664)
+ id 1kArjG-0007NC-AM
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 05:28:26 -0400
+Received: from mail-ej1-x636.google.com ([2a00:1450:4864:20::636]:36609)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kArgO-0006d0-Ky
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 05:25:29 -0400
-Received: by mail-ed1-x541.google.com with SMTP id c10so1123387edk.6
- for <qemu-devel@nongnu.org>; Wed, 26 Aug 2020 02:25:28 -0700 (PDT)
+ id 1kArjC-0006vn-Sv
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 05:28:26 -0400
+Received: by mail-ej1-x636.google.com with SMTP id l2so1906540eji.3
+ for <qemu-devel@nongnu.org>; Wed, 26 Aug 2020 02:28:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=H5xefrUnBvIyfsTK6oiWBLDD4LgQNL/PySRH96YrVQY=;
- b=VLDvV3ftZ3ac06RP1+OdiSgykaSi5KXZ8/QgTMQeQafALiGH9VEcDkgW+t6NT++edr
- o2dtPuVVA6lxUaJufqPa5i62bf2fA0pzlAPZB8QQxXGxJC0d93hA/ewPXCV9/nTQtGu4
- 4ptU+rLbkS24g7BVdPt80Ko4a5DfCVP/QFLpa7HLrj7YL0EglFI8X/npoIqmzP1PUwS7
- 5GnWVbQsXilySnjWgSO92ifo0CjJNgIUlZRJMIeUn0Ozn9wJrl0cTuYghCr1Ibvy1fhV
- vmLejSrODDEJg4wfkOGvk2uc+kadPQhtZFZw+bvTt0ftEkod3E+ViEXpMkB018jwtCYE
- VJlQ==
+ :cc; bh=j+PDRQWtWAJTvGIAbkz/PW7iAzWByhixu01vicGYo+Q=;
+ b=LLfS9+V/UKt7PG0YtnWYtOXhYEG+vvChhrDyX04/x/JSuvdqgoVyJ8BQp426Z1jfGS
+ asDIOY00w1c7x84bq5tMqLlh1x4cZH3glPBLi15neK2QtqoJeCWagLZbYm2UA5BDuV7d
+ L7YsrKImkm2q2y5tofMFhHPdwOYWtPmj0dhYpzAWk/pdVvHqylsJLWZ2QhE5rIMSRD+U
+ gEoF5MY2z2C1ivdklcPQS7JPxC2aTkMQYKDJW1ewv3zPLOfd+eoHzsgKXxsYw0Tl75xB
+ Q4hUtkhK9AVZkCJXIGrycuICc/N1XWEVQ2I/ZIeRLN0iItdhbVw43QBl+Oq8vqVi+lO8
+ x0+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=H5xefrUnBvIyfsTK6oiWBLDD4LgQNL/PySRH96YrVQY=;
- b=QKWwZyBvbsMETEpAjK86V+e+BEy+2ptbPZx/d6p3e0bgpdi8Lg59cZkWCrqYMiCgdH
- Y+J2UhPOWLFmN8C16icIiQEi/fK95z/IEjSVtvoBwmuHVeM5ECfrPo9nSQJNgDSArNJn
- y7dd1YqYrdBdQT01/moruk0egGqmGS4Z7CLl/ZFTgKS0O46nUGIp1D8Fh0vrh6yLyk8k
- xy+i64kTZw1kNSsk17sWx0inrsa8v4DpW3vOTzdVnANXliRoKgPp2IhN10B6W7ABbnDu
- SkqINA0p/OtZFHfQW3nYy9E+PnU7Jxb1UyOskS1ShF6r9opIgswCqR8nlAx1binOGfZn
- vPIg==
-X-Gm-Message-State: AOAM531I2ArFeDK9QO533StyUEj4532qZ8qPqWUFpMtFBBxIRmV3OYdV
- jQqVY5edUb79rSikQrWt2Y2NTCnR/YeEPGhxlEKlIg==
-X-Google-Smtp-Source: ABdhPJx86Up6dsNgsootQ+LX21iOS6lQGhmzkdJwP3fJOjqyvytsAUyb0U8u25pwDsXUHMJ1vksTKoK/oNYgBvDflZY=
-X-Received: by 2002:aa7:ca14:: with SMTP id y20mr10640706eds.100.1598433927060; 
- Wed, 26 Aug 2020 02:25:27 -0700 (PDT)
+ bh=j+PDRQWtWAJTvGIAbkz/PW7iAzWByhixu01vicGYo+Q=;
+ b=SiifnGaaULY5UDFbhd9/OLUAIGyknJVztxlkkDmON8qUo64SPzaxN+6/lLve99xs7x
+ xoPLz0ERqbNObXd49hCpUyv8uu3H963uWFGwWyLNbPK6oX1cg+C29zdk+pEl8/ophhta
+ xJu0nMNpi+0q+iQFYyWbN33WQZltvvofkBSaRSyq/WmS5jqOVomMBtuE8FXPmAGQveQ4
+ +J1pLu0m1J6KZFC5F2J4sVi4ey8hEFln6C4Y677gI4qX5UK7NGM7TIcH/UpewUwljZ53
+ CN9E1JvsPJvlNoHGQyK9d98i0meKf8N8TiDQYkP/ThcFJ9tvHkMGXZwhT3qfu3CPDwbo
+ OBNg==
+X-Gm-Message-State: AOAM532Xk7rxGt70nwcROj7+RHaS4QEEJCpRIoy061XFKBlal9qHILx7
+ A/+agY3T6R7LV0v2S1CNfFmLrWyaVtM+ZHoxx641Ug==
+X-Google-Smtp-Source: ABdhPJxMRhciyz3D6803Ri616omDqyFWZbOdVu4iMZx9cHLoJdmCPw8kFXdzKx6SsrL9pMWtPK+OzIitpVUAvUtIdrs=
+X-Received: by 2002:a17:906:2b0b:: with SMTP id
+ a11mr5017829ejg.250.1598434101484; 
+ Wed, 26 Aug 2020 02:28:21 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200825184836.1282371-1-alistair.francis@wdc.com>
- <CAFEAcA8=Mf=EPh__tNhJyGv8+ouD-HH+MuMb+HhtTFes+XqUSQ@mail.gmail.com>
- <CAKmqyKNxURXyNSEePPU1jY7FzcZjRThr2qAvwR393+nqUXBxJQ@mail.gmail.com>
- <CAFEAcA8x=ck1mmJ8Y8o-0NQXWhRgOg5Gp7GvHNkNnLb6rDxygg@mail.gmail.com>
- <CAKmqyKP6OUoaR6iZ6SD6qZPvYF0bKqpB_rRNeQOteg8BtcqKeQ@mail.gmail.com>
- <CAEUhbmWN93n1JoGszsW6WrkGbdFD6VsGyi7Ji6bS6wF+DbMOBw@mail.gmail.com>
-In-Reply-To: <CAEUhbmWN93n1JoGszsW6WrkGbdFD6VsGyi7Ji6bS6wF+DbMOBw@mail.gmail.com>
+In-Reply-To: <20200825184836.1282371-1-alistair.francis@wdc.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 26 Aug 2020 10:25:15 +0100
-Message-ID: <CAFEAcA9026WV-t5Q9EbV-nZi+6GZ3WoKCx2tA9QeAXu5iD5ryg@mail.gmail.com>
+Date: Wed, 26 Aug 2020 10:28:10 +0100
+Message-ID: <CAFEAcA-cXvpiOX+hvy2x0yN-Qx2GdzDr=G9yRLBbRCznQ3fw5A@mail.gmail.com>
 Subject: Re: [PULL 00/18] riscv-to-apply queue
-To: Bin Meng <bmeng.cn@gmail.com>
+To: Alistair Francis <alistair.francis@wdc.com>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::541;
- envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x541.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::636;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x636.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -98,39 +95,38 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Alistair Francis <alistair23@gmail.com>,
- Alistair Francis <alistair.francis@wdc.com>,
  QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 26 Aug 2020 at 04:21, Bin Meng <bmeng.cn@gmail.com> wrote:
-> On Wed, Aug 26, 2020 at 6:41 AM Alistair Francis <alistair23@gmail.com> wrote:
-> > Richard and Philippe review patches and some of the RISC-V patches get
-> > reviewed by the RISC-V community. The main problem (which is a common
-> > problem in open source) is that large technical patch series just get
-> > ignored.
+On Tue, 25 Aug 2020 at 20:01, Alistair Francis <alistair.francis@wdc.com> wrote:
 >
-> Yep, I am only comfortable reviewing patches which I have confidence
-> in. Right now I am not working on any H- or V - extension for RISC-V
-> so I cannot contribute to any review of these large numbers of H- or
-> V- extension related patches. Sorry!
+> The following changes since commit 7774e403f2ac58b3e87bfe8d2f77676501ba893e:
+>
+>   Merge remote-tracking branch 'remotes/kraxel/tags/fixes-20200825-pull-request' into staging (2020-08-25 10:54:51 +0100)
+>
+> are available in the Git repository at:
+>
+>   git@github.com:alistair23/qemu.git tags/pull-riscv-to-apply-20200825
+>
+> for you to fetch changes up to e39a8320b088dd5efc9ebaafe387e52b3d962665:
+>
+>   target/riscv: Support the Virtual Instruction fault (2020-08-25 09:11:36 -0700)
+>
+> ----------------------------------------------------------------
+> This pull request first adds support for multi-socket NUMA RISC-V
+> machines. The Spike and Virt machines both support NUMA sockets.
+>
+> This PR also updates the current experimental Hypervisor support to the
+> v0.6.1 spec.
+>
 
-So, everybody has a ton of work they need to do and only a limited
-amount of time they might have for code review, so it's important to
-prioritise. But I would encourage you, and other people contributing
-to RISC-V parts of QEMU, to at least sometimes review changes that are
-a little bit out of your "comfort zone" if nobody else seems to be
-doing so. Review can find bugs, areas that are confusing or need
-comments, etc, even without a thorough knowledge of the relevant spec.
-(In fact, not knowing the spec can help in identifying where
-explanatory comments can help the reader!) And for the project it means
-we have more people who at least have some idea of what that bit of code
-is doing. Review that is limited to "this code seems to make sense but
-I haven't checked it against the spec" is better than patches getting
-no review at all, I think. And it's a good way to build your knowledge
-of the codebase and the architecture over time.
 
-thanks
+Applied, thanks.
+
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.2
+for any user-visible changes.
+
 -- PMM
 
