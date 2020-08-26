@@ -2,87 +2,100 @@ Return-Path: <SRS0=H0ck=CE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AEE9C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 12:26:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8829C433E1
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 12:28:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D3CC12080C
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 12:26:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9F89A2080C
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 12:28:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sdGpmDk6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3CC12080C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hVeJjHhL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F89A2080C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35710 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37888 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAuVz-0001cw-4n
-	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 08:26:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39270)
+	id 1kAuXH-0002XD-Uj
+	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 08:28:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39542)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1kAuV9-0001Ci-BP
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 08:26:03 -0400
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:45953)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1kAuV7-0005Hu-Rr
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 08:26:03 -0400
-Received: by mail-oi1-x241.google.com with SMTP id d189so880958oig.12
- for <qemu-devel@nongnu.org>; Wed, 26 Aug 2020 05:26:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=TFFlo8E1SdYI0QV4T1bf1+0/GADx5ROdVez4Qs9xttM=;
- b=sdGpmDk6uYvD+s/qBpu1yg1LDb8u98i5LWD7BcvpqOK0bWUu/Hgf51VrKR46kLjZTe
- VtjAVLWg/HA7d9J4FbpwNcaGOHEEKusLNAMebcw0dkpZ7wuoxxyFRXsQ2GJiOCiokf3B
- +T1KVr9UieHVQbr5cGtbXBiEZ5jAHRQbj4qM0LlRPtUOReJ1j6VvwcZgm5e2f7etD9LY
- g886wg3Li7TN8Hm2txPU87ZVxKn9cIthQT2rzwiu8at/bXUlXlJ3N1e2n3UK5YClUDW0
- 6Do4hydoW6snluqhGbJkWYAD+6Kxi4Ai/is7VUJCQrHl7xJhfFTPth++uTsNHPxi3ONH
- XczA==
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kAuWE-00023H-JU
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 08:27:10 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:32252)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kAuWB-0005Pq-UP
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 08:27:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1598444825;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=rkkQI/wYXENlCW1Jvqq6bXzYIJuw8NEg9m3IFD6BwCs=;
+ b=hVeJjHhLORhsrr3dhEKoGSAT1FqsOU7bQUC1/R0Dwe4W8gtL8jDAYZIR7Hag4mr/Zxe6+J
+ 4I4Oksl2GMqVqv6L9+dFAWoA80QilFLsV8J/XlSq4aVPEGH39vdHit0wUbYGYMfI/KWe09
+ P+3q5yrCk587SrZxoqDpRnwBpfpOsLY=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-390-rIY7T5n3O2KyXi9MHBse8A-1; Wed, 26 Aug 2020 08:27:04 -0400
+X-MC-Unique: rIY7T5n3O2KyXi9MHBse8A-1
+Received: by mail-wm1-f72.google.com with SMTP id g79so847611wmg.0
+ for <qemu-devel@nongnu.org>; Wed, 26 Aug 2020 05:27:03 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=TFFlo8E1SdYI0QV4T1bf1+0/GADx5ROdVez4Qs9xttM=;
- b=o+7vospqSWNb52qn2JiHjF1gKgvE23A3qEnQNqW6xwnQIVhBhlBdYz0mrPQAdpJnh8
- 5RbPXGWLchhFqbN+QSU9IIWM8DDxTe+SbAuk3vPMEv7AXQx6ivH5la687ko2e/7IqXEQ
- WGy0C6Bc7Uwds+szD9AVyhpJTHcSM1ZCzRUz49f769HwfRv1neTU0JrG193s5iccpzUE
- pJ51AA6DGkKoinE3zruxmu6uLN6rCgbq9KdNwoQFZ5cN+ZOanQtsw+LG2wPNFSlmJYaW
- hbXcVhh+RwagPfZX3lzZsnmj5OYM6882wHrKIHGj0xWqd5WFORBKduH4JDpP1oa7dI9Y
- GaNA==
-X-Gm-Message-State: AOAM5308DoOKsBRpWf6GgKTRKbM3VBSnRJ9w9kxR6Viv5wxLzabgutU1
- mCuqhjfQsezWUiedUn4ctZL3YoCnGTAZ1GX15pQ=
-X-Google-Smtp-Source: ABdhPJzytAmsz28zfKeDij65XyXNKncz4lw579UgHHymwF9d+YEuzF7gvpTwy7zW5nRCloEcBekV9/oKTlb2h0ZVTPk=
-X-Received: by 2002:aca:c0c1:: with SMTP id q184mr3967125oif.56.1598444760535; 
- Wed, 26 Aug 2020 05:26:00 -0700 (PDT)
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=rkkQI/wYXENlCW1Jvqq6bXzYIJuw8NEg9m3IFD6BwCs=;
+ b=RNCl9TJhVRWYW1OYL3arWtS5YRggD1i58tLYjF9EmhROUcQj0Kqri3tIm41hW2D2CU
+ q+JIpP0k/MHhQ7Y9x4WeIZPZt1jmqlRILOMawTrulC6HThhpU0t2J/oDFufjzHXDHuYb
+ 0vtxH5kFl4cb02LSX1QooXeiT5uGBroZsTqzouX446SD0x2dnauF10uR6dQNzeXbh6Rd
+ yvZWWDv+Dy3p4kuoDyPVNtzUNeoJEFkoi9Z8mXrvZ7iZr9JzGEM4+jEI3zOQ7NVFdI+z
+ OXSTT9VWYEncxGgSkVpFcI1fEkUL9ByEoZ3YX3bpXT//ShiEwB3G8J3r0X6gD0yA6Ool
+ TLqw==
+X-Gm-Message-State: AOAM530H31sELUf7QgYcKhnZO+ELHg85rrD9ndK25vnZCbdDXT24EJzw
+ EJbLUYIIezDnMQQdUoS4nOvyxc37Kc3k6IpXTbxhJfsqHlmKExmI+w+hnuXd6cyzzhdkfB1FQMc
+ NQhZ6I677FNLcyj0=
+X-Received: by 2002:a5d:4dcb:: with SMTP id f11mr16012165wru.9.1598444822774; 
+ Wed, 26 Aug 2020 05:27:02 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw0xbC9dzkRh8kdZb85jaCpn6wU2yctKY2q7jCpoCcHlZEv5/EKsYUsT9W3INNqvjYLG61L9g==
+X-Received: by 2002:a5d:4dcb:: with SMTP id f11mr16012138wru.9.1598444822448; 
+ Wed, 26 Aug 2020 05:27:02 -0700 (PDT)
+Received: from redhat.com (bzq-109-67-46-169.red.bezeqint.net. [109.67.46.169])
+ by smtp.gmail.com with ESMTPSA id v4sm4912619wml.46.2020.08.26.05.27.00
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 26 Aug 2020 05:27:01 -0700 (PDT)
+Date: Wed, 26 Aug 2020 08:26:58 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Laurent Vivier <lvivier@redhat.com>
+Subject: Re: [PATCH v3] virtio-rng: return available data with O_NONBLOCK
+Message-ID: <20200826082613-mutt-send-email-mst@kernel.org>
+References: <20200811142821.12323-1-mwilck@suse.com>
+ <4ae4f348-c186-f7e4-f7e3-b1f1e4a4b408@redhat.com>
 MIME-Version: 1.0
-References: <20200814160241.7915-1-pannengyuan@huawei.com>
- <20200814160241.7915-8-pannengyuan@huawei.com>
-In-Reply-To: <20200814160241.7915-8-pannengyuan@huawei.com>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Wed, 26 Aug 2020 20:25:24 +0800
-Message-ID: <CAKXe6SKO-NHr6YJ9Tmgy-pR2womYBXB5zWvgZXVmRUDg2Jnw_A@mail.gmail.com>
-Subject: Re: [PATCH 07/12] target/i386/cpu: Fix memleak in
- x86_cpu_class_check_missing_features
-To: Pan Nengyuan <pannengyuan@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::241;
- envelope-from=liq3ea@gmail.com; helo=mail-oi1-x241.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <4ae4f348-c186-f7e4-f7e3-b1f1e4a4b408@redhat.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=mst@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/26 06:53:10
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.959,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,48 +108,180 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Chen Qun <kuhn.chenqun@huawei.com>,
- Qemu Developers <qemu-devel@nongnu.org>, Euler Robot <euler.robot@huawei.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
- zhanghailiang <zhang.zhanghailiang@huawei.com>
+Cc: Amit Shah <amit@kernel.org>, Jason Wang <jasowang@redhat.com>,
+ qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>, mwilck@suse.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Pan Nengyuan <pannengyuan@huawei.com> =E4=BA=8E2020=E5=B9=B48=E6=9C=8814=E6=
-=97=A5=E5=91=A8=E4=BA=94 =E4=B8=8B=E5=8D=886:38=E5=86=99=E9=81=93=EF=BC=9A
->
-> 'err' forgot to free in x86_cpu_class_check_missing_features error path.
-> Fix that.
->
-> Reported-by: Euler Robot <euler.robot@huawei.com>
-> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
+On Tue, Aug 11, 2020 at 04:42:32PM +0200, Laurent Vivier wrote:
+> On 11/08/2020 16:28, mwilck@suse.com wrote:
+> > From: Martin Wilck <mwilck@suse.com>
+> > 
+> > If a program opens /dev/hwrng with O_NONBLOCK and uses poll() and
+> > non-blocking read() to retrieve random data, it ends up in a tight
+> > loop with poll() always returning POLLIN and read() returning EAGAIN.
+> > This repeats forever until some process makes a blocking read() call.
+> > The reason is that virtio_read() always returns 0 in non-blocking mode,
+> > even if data is available. Worse, it fetches random data from the
+> > hypervisor after every non-blocking call, without ever using this data.
+> > 
+> > The following test program illustrates the behavior and can be used
+> > for testing and experiments. The problem will only be seen if all
+> > tasks use non-blocking access; otherwise the blocking reads will
+> > "recharge" the random pool and cause other, non-blocking reads to
+> > succeed at least sometimes.
+> > 
+> > /* Whether to use non-blocking mode in a task, problem occurs if CONDITION is 1 */
+> > //#define CONDITION (getpid() % 2 != 0)
+> > 
+> > static volatile sig_atomic_t stop;
+> > static void handler(int sig __attribute__((unused))) { stop = 1; }
+> > 
+> > static void loop(int fd, int sec)
+> > {
+> > 	struct pollfd pfd = { .fd = fd, .events  = POLLIN, };
+> > 	unsigned long errors = 0, eagains = 0, bytes = 0, succ = 0;
+> > 	int size, rc, rd;
+> > 
+> > 	srandom(getpid());
+> > 	if (CONDITION && fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) | O_NONBLOCK) == -1)
+> > 		perror("fcntl");
+> > 	size = MINBUFSIZ + random() % (MAXBUFSIZ - MINBUFSIZ + 1);
+> > 
+> > 	for(;;) {
+> > 		char buf[size];
+> > 
+> > 		if (stop)
+> > 			break;
+> > 		rc = poll(&pfd, 1, sec);
+> > 		if (rc > 0) {
+> > 			rd = read(fd, buf, sizeof(buf));
+> > 			if (rd == -1 && errno == EAGAIN)
+> > 				eagains++;
+> > 			else if (rd == -1)
+> > 				errors++;
+> > 			else {
+> > 				succ++;
+> > 				bytes += rd;
+> > 				write(1, buf, sizeof(buf));
+> > 			}
+> > 		} else if (rc == -1) {
+> > 			if (errno != EINTR)
+> > 				perror("poll");
+> > 			break;
+> > 		} else
+> > 			fprintf(stderr, "poll: timeout\n");
+> > 	}
+> > 	fprintf(stderr,
+> > 		"pid %d %sblocking, bufsize %d, %d seconds, %lu bytes read, %lu success, %lu eagain, %lu errors\n",
+> > 		getpid(), CONDITION ? "non-" : "", size, sec, bytes, succ, eagains, errors);
+> > }
+> > 
+> > int main(void)
+> > {
+> > 	int fd;
+> > 
+> > 	fork(); fork();
+> > 	fd = open("/dev/hwrng", O_RDONLY);
+> > 	if (fd == -1) {
+> > 		perror("open");
+> > 		return 1;
+> > 	};
+> > 	signal(SIGALRM, handler);
+> > 	alarm(SECONDS);
+> > 	loop(fd, SECONDS);
+> > 	close(fd);
+> > 	wait(NULL);
+> > 	return 0;
+> > }
+> > 
+> > void loop(int fd)
+> > {
+> >         struct pollfd pfd0 = { .fd = fd, .events  = POLLIN, };
+> >         int rc;
+> >         unsigned int n;
+> > 
+> >         for (n = LOOPS; n > 0; n--) {
+> >                 struct pollfd pfd = pfd0;
+> >                 char buf[SIZE];
+> > 
+> >                 rc = poll(&pfd, 1, 1);
+> >                 if (rc > 0) {
+> >                         int rd = read(fd, buf, sizeof(buf));
+> > 
+> >                         if (rd == -1)
+> >                                 perror("read");
+> >                         else
+> >                                 printf("read %d bytes\n", rd);
+> >                 } else if (rc == -1)
+> >                         perror("poll");
+> >                 else
+> >                         fprintf(stderr, "timeout\n");
+> > 
+> >         }
+> > }
+> > 
+> > int main(void)
+> > {
+> >         int fd;
+> > 
+> >         fd = open("/dev/hwrng", O_RDONLY|O_NONBLOCK);
+> >         if (fd == -1) {
+> >                 perror("open");
+> >                 return 1;
+> >         };
+> >         loop(fd);
+> >         close(fd);
+> >         return 0;
+> > }
+> > 
+> > This can be observed in the real word e.g. with nested qemu/KVM virtual
+> > machines, if both the "outer" and "inner" VMs have a virtio-rng device.
+> > If the "inner" VM requests random data, qemu running in the "outer" VM
+> > uses this device in a non-blocking manner like the test program above.
+> > 
+> > Fix it by returning available data if a previous hypervisor call has
+> > completed. I tested this patch with the program above, and with rng-tools.
+> > 
+> > v2 -> v3: Simplified the implementation as suggested by Laurent Vivier
+> > 
+> > Signed-off-by: Martin Wilck <mwilck@suse.com>
+> > ---
+> >  drivers/char/hw_random/virtio-rng.c | 4 ++--
+> >  1 file changed, 2 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/drivers/char/hw_random/virtio-rng.c b/drivers/char/hw_random/virtio-rng.c
+> > index a90001e02bf7..8eaeceecb41e 100644
+> > --- a/drivers/char/hw_random/virtio-rng.c
+> > +++ b/drivers/char/hw_random/virtio-rng.c
+> > @@ -65,7 +65,7 @@ static int virtio_read(struct hwrng *rng, void *buf, size_t size, bool wait)
+> >  		register_buffer(vi, buf, size);
+> >  	}
+> >  
+> > -	if (!wait)
+> > +	if (!wait && !completion_done(&vi->have_data))
+> >  		return 0;
+> >  
+> >  	ret = wait_for_completion_killable(&vi->have_data);
+> > @@ -74,7 +74,7 @@ static int virtio_read(struct hwrng *rng, void *buf, size_t size, bool wait)
+> >  
+> >  	vi->busy = false;
+> >  
+> > -	return vi->data_avail;
+> > +	return min_t(size_t, size, vi->data_avail);
+> >  }
+> >  
+> >  static void virtio_cleanup(struct hwrng *rng)
+> > 
+> 
+> Reviewed-by: Laurent Vivier <lvivier@redhat.com>
 
-Reviewed-by: Li Qiang <liq3ea@gmail.com>
+Laurent didn't we agree the real fix is private buffers in the driver,
+and copying out from there?
 
-> ---
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Richard Henderson <rth@twiddle.net>
-> Cc: Eduardo Habkost <ehabkost@redhat.com>
-> ---
->  target/i386/cpu.c | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 588f32e136..4678aac0b4 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -4872,6 +4872,7 @@ static void x86_cpu_class_check_missing_features(X8=
-6CPUClass *xcc,
->          new->value =3D g_strdup("type");
->          *next =3D new;
->          next =3D &new->next;
-> +        error_free(err);
->      }
->
->      x86_cpu_filter_features(xc, false);
-> --
-> 2.18.2
->
->
+-- 
+MST
+
 
