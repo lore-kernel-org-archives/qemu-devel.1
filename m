@@ -2,89 +2,84 @@ Return-Path: <SRS0=H0ck=CE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7098C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 16:55:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19A2DC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 16:57:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7484E2078B
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 16:55:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D8D0F2078B
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 16:57:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dpKxgLId"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7484E2078B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jBniptIC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8D0F2078B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37442 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40422 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAyhl-0000hP-PM
-	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 12:55:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57078)
+	id 1kAyjM-000265-3q
+	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 12:57:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57380)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kAyh4-0000E0-2o
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 12:54:38 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36190
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kAyh1-0002tp-23
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 12:54:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598460873;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=7oTdfLx27jQhJZo2wtzB6hySjgfYYw+iH+MPL30OmC8=;
- b=dpKxgLIdxRoyVT/tyKSJ5joJKas1a53c1O0CRhwfsx8KESp8DAk1/HqD1XSrtzNHHT6zU5
- 86gI6WdZnuozczrfa1tZQhPO9T8jEKiZbznu3WTHsS+M1EXsXMYx0VuJ5R3D8Xt2FdRA+1
- hS3w64fbCaTDTQP8n4uCwSrzOSOBC5E=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-341-DvrZI4sPO1OM6fCmK8BHTQ-1; Wed, 26 Aug 2020 12:54:31 -0400
-X-MC-Unique: DvrZI4sPO1OM6fCmK8BHTQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2A0EF80F059;
- Wed, 26 Aug 2020 16:54:30 +0000 (UTC)
-Received: from work-vm (ovpn-112-133.ams2.redhat.com [10.36.112.133])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C511E19C78;
- Wed, 26 Aug 2020 16:54:27 +0000 (UTC)
-Date: Wed, 26 Aug 2020 17:54:25 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Chuan Zheng <zhengchuan@huawei.com>
-Subject: Re: [PATCH v5 08/12] migration/dirtyrate: skip sampling ramblock
- with size below MIN_RAMBLOCK_SIZE
-Message-ID: <20200826165425.GD3932@work-vm>
-References: <1598319650-36762-1-git-send-email-zhengchuan@huawei.com>
- <1598319650-36762-9-git-send-email-zhengchuan@huawei.com>
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1kAyiZ-0001Wu-M1; Wed, 26 Aug 2020 12:56:11 -0400
+Received: from mail-il1-x143.google.com ([2607:f8b0:4864:20::143]:45778)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1kAyiW-0003Bn-V4; Wed, 26 Aug 2020 12:56:11 -0400
+Received: by mail-il1-x143.google.com with SMTP id k4so2365219ilr.12;
+ Wed, 26 Aug 2020 09:56:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=1yctldKr0wzYTBMSQmLZXZK7xKPnrNzao1VcYREm7EA=;
+ b=jBniptICDuPEWiigXMZg6ofwiWoUzUBsTGb4CHLNx226xOrvqcK5Ui3fPZtGC9EfJ3
+ HC8TT/ZT52FvqLnWo/zFRRb4Hfx1Tu6bPqrBIv6PWLUGbjA3cDq4r8KnOTjdM5fxTf/s
+ nkBW6xYoiHJGfSc3jFA3/50y0R6JorP4G0sylrez8HnAJxUrDG72MvxPBwmcbKd+zzq+
+ qs6wXCSAJbM5+LlQ5aDFEtsDX9Cy2QSQgqQb13oJ45UfpB5vj9+ij6dT2de6b0SZVE/C
+ +pa+/9eqKDZ/KUzj0wxdk2OyJYTgkiGepPGupEqdoW52GiR98LYRsGIbICl+L73on26X
+ 4asg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=1yctldKr0wzYTBMSQmLZXZK7xKPnrNzao1VcYREm7EA=;
+ b=P/KgtZVhjSRDqM9HDpev1RIXzIo+65Nk8KPKMxb4J6Iopa/8CHdlsBoKkhySghodWg
+ yrz/YIqDOKAKXqzhSjvXtb8LgdXKFZRfNeKPUs5DQ+ReyxyEhRWWJ+0C3A/QKd4L9izt
+ LpNOyvGiXVBLlvCclkIVD3snEnGE+YcwoZOWRll8jWyJZJyqXavDdN0C6yxz8vVZoY00
+ rx+YgX7G5jxx7xeu5w3jJg6or2ezdO3Vs4E/HKDJGo1wBs2kpxsoqrgrjS1VYNP2scZ/
+ 2N4V7rMfUxIrYP+PPQOa75WVCNWnrx7P7ex1cW6vOA3oxGczCJyr/mwGfYMNy+wfWc/s
+ ifUA==
+X-Gm-Message-State: AOAM5303wvaANc9E3VrWoL9pThXyp+Gd1eQbkXesf13KaKz2QABl02ds
+ WsuKObMh5t4FnGl8D3aNklWoP1Y9Faox5PLC6Z4=
+X-Google-Smtp-Source: ABdhPJx9Y3T0Gz0Ny6XIs4fhZeXVLFKdNlBzaJ6bD/PT8K11nW70BXBRAndgAb0fRXU6MlC8XsW+Lg4zcJnBtcQDL9s=
+X-Received: by 2002:a92:c7d4:: with SMTP id g20mr14214722ilk.40.1598460966560; 
+ Wed, 26 Aug 2020 09:56:06 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1598319650-36762-9-git-send-email-zhengchuan@huawei.com>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
-X-Mimecast-Spam-Score: 0.003
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=dgilbert@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/26 03:56:58
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.959,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+References: <20200817084955.28793-1-frank.chang@sifive.com>
+ <CAE_xrPjmrmwVW3YOTXLVuVpvT=mT+gnwKJy+yYjo6t24xC8ZDg@mail.gmail.com>
+In-Reply-To: <CAE_xrPjmrmwVW3YOTXLVuVpvT=mT+gnwKJy+yYjo6t24xC8ZDg@mail.gmail.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Wed, 26 Aug 2020 09:45:22 -0700
+Message-ID: <CAKmqyKOU8MUAaiCadAEp4YwArJOpsPRbd_sQmmTDO8g=v-Nw2g@mail.gmail.com>
+Subject: Re: [RFC v4 00/70] support vector extension v1.0
+To: Frank Chang <frank.chang@sifive.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::143;
+ envelope-from=alistair23@gmail.com; helo=mail-il1-x143.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -98,113 +93,183 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: berrange@redhat.com, zhang.zhanghailiang@huawei.com, quintela@redhat.com,
- qemu-devel@nongnu.org, xiexiangyou@huawei.com, alex.chen@huawei.com,
- ann.zhuangyanying@huawei.com, fangying1@huawei.com
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Chuan Zheng (zhengchuan@huawei.com) wrote:
-> In order to sample real RAM, skip ramblock with size below MIN_RAMBLOCK_SIZE
-> which is set as 128M.
-> 
-> Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
-> ---
->  migration/dirtyrate.c | 24 ++++++++++++++++++++++++
->  migration/dirtyrate.h | 10 ++++++++++
->  2 files changed, 34 insertions(+)
-> 
-> diff --git a/migration/dirtyrate.c b/migration/dirtyrate.c
-> index 050270d..bd398b7 100644
-> --- a/migration/dirtyrate.c
-> +++ b/migration/dirtyrate.c
-> @@ -173,6 +173,24 @@ alloc_ramblock_dirty_info(int *block_index,
->      return block_dinfo;
->  }
->  
-> +static int skip_sample_ramblock(RAMBlock *block)
-> +{
-> +    int64_t ramblock_size;
-> +
-> +    /* ramblock size in MB */
-> +    ramblock_size = qemu_ram_get_used_length(block) >> DIRTYRATE_PAGE_SHIFT_MB;
-> +
-> +    /*
-> +     * Consider ramblock with size larger than 128M is what we
-> +     * want to sample.
-> +     */
-> +    if (ramblock_size < MIN_RAMBLOCK_SIZE) {
-> +        return -1;
-> +    }
+On Tue, Aug 25, 2020 at 1:29 AM Frank Chang <frank.chang@sifive.com> wrote:
+>
+> On Mon, Aug 17, 2020 at 4:50 PM <frank.chang@sifive.com> wrote:
+>>
+>> From: Frank Chang <frank.chang@sifive.com>
+>>
+>> This patchset implements the vector extension v1.0 for RISC-V on QEMU.
+>>
+>> This patchset is sent as RFC because RVV v1.0 is still in draft state.
+>> v2 patchset was sent for RVV v0.9 and bumped to RVV v1.0 since v3 patchset.
+>>
+>> The port is available here:
+>> https://github.com/sifive/qemu/tree/rvv-1.0-upstream-v4
+>>
+>> You can change the cpu argument: vext_spec to v1.0 (i.e. vext_spec=v1.0)
+>> to run with RVV v1.0 instructions.
+>>
+>> Note: This patchset depends on two other patchsets listed in Based-on
+>>       section below so it might not able to be built unless those two
+>>       patchsets are applied.
+>>
+>> Changelog:
+>>
+>> v4
+>>   * remove explicit float flmul variable in DisasContext.
+>>   * replace floating-point calculations with shift operations to
+>>     improve performance.
+>>   * relax RV_VLEN_MAX to 512-bits.
+>>
+>> v3
+>>   * apply nan-box helpers from Richard Henderson.
+>>   * remove fp16 api changes as they are sent independently in another
+>>     pathcset by Chih-Min Chao.
+>>   * remove all tail elements clear functions as tail elements can
+>>     retain unchanged for either VTA set to undisturbed or agnostic.
+>>   * add fp16 nan-box check generator function.
+>>   * add floating-point rounding mode enum.
+>>   * replace flmul arithmetic with shifts to avoid floating-point
+>>     conversions.
+>>   * add Zvqmac extension.
+>>   * replace gdbstub vector register xml files with dynamic generator.
+>>   * bumped to RVV v1.0.
+>>   * RVV v1.0 related changes:
+>>     * add vl<nf>re<eew>.v and vs<nf>r.v vector whole register
+>>       load/store instructions
+>>     * add vrgatherei16 instruction.
+>>     * rearranged bits in vtype to make vlmul bits into a contiguous
+>>       field.
+>>
+>> v2
+>>   * drop v0.7.1 support.
+>>   * replace invisible return check macros with functions.
+>>   * move mark_vs_dirty() to translators.
+>>   * add SSTATUS_VS flag for s-mode.
+>>   * nan-box scalar fp register for floating-point operations.
+>>   * add gdbstub files for vector registers to allow system-mode
+>>     debugging with GDB.
+>>
+>> Based-on: <20200724002807.441147-1-richard.henderson@linaro.org/>
+>> Based-on: <1596102747-20226-1-git-send-email-chihmin.chao@sifive.com/>
+>>
+>> Frank Chang (62):
+>>   target/riscv: drop vector 0.7.1 and add 1.0 support
+>>   target/riscv: Use FIELD_EX32() to extract wd field
+>>   target/riscv: rvv-1.0: introduce writable misa.v field
+>>   target/riscv: rvv-1.0: remove rvv related codes from fcsr registers
+>>   target/riscv: rvv-1.0: check MSTATUS_VS when accessing vector csr
+>>     registers
+>>   target/riscv: rvv-1.0: remove MLEN calculations
+>>   target/riscv: rvv-1.0: add fractional LMUL
+>>   target/riscv: rvv-1.0: add VMA and VTA
+>>   target/riscv: rvv-1.0: update check functions
+>>   target/riscv: introduce more imm value modes in translator functions
+>>   target/riscv: rvv:1.0: add translation-time nan-box helper function
+>>   target/riscv: rvv-1.0: configure instructions
+>>   target/riscv: rvv-1.0: stride load and store instructions
+>>   target/riscv: rvv-1.0: index load and store instructions
+>>   target/riscv: rvv-1.0: fix address index overflow bug of indexed
+>>     load/store insns
+>>   target/riscv: rvv-1.0: fault-only-first unit stride load
+>>   target/riscv: rvv-1.0: amo operations
+>>   target/riscv: rvv-1.0: load/store whole register instructions
+>>   target/riscv: rvv-1.0: update vext_max_elems() for load/store insns
+>>   target/riscv: rvv-1.0: take fractional LMUL into vector max elements
+>>     calculation
+>>   target/riscv: rvv-1.0: floating-point square-root instruction
+>>   target/riscv: rvv-1.0: floating-point classify instructions
+>>   target/riscv: rvv-1.0: mask population count instruction
+>>   target/riscv: rvv-1.0: find-first-set mask bit instruction
+>>   target/riscv: rvv-1.0: set-X-first mask bit instructions
+>>   target/riscv: rvv-1.0: iota instruction
+>>   target/riscv: rvv-1.0: element index instruction
+>>   target/riscv: rvv-1.0: allow load element with sign-extended
+>>   target/riscv: rvv-1.0: register gather instructions
+>>   target/riscv: rvv-1.0: integer scalar move instructions
+>>   target/riscv: rvv-1.0: floating-point move instruction
+>>   target/riscv: rvv-1.0: floating-point scalar move instructions
+>>   target/riscv: rvv-1.0: whole register move instructions
+>>   target/riscv: rvv-1.0: integer extension instructions
+>>   target/riscv: rvv-1.0: single-width averaging add and subtract
+>>     instructions
+>>   target/riscv: rvv-1.0: single-width bit shift instructions
+>>   target/riscv: rvv-1.0: integer add-with-carry/subtract-with-borrow
+>>   target/riscv: rvv-1.0: narrowing integer right shift instructions
+>>   target/riscv: rvv-1.0: widening integer multiply-add instructions
+>>   target/riscv: rvv-1.0: add Zvqmac extension
+>>   target/riscv: rvv-1.0: quad-widening integer multiply-add instructions
+>>   target/riscv: rvv-1.0: single-width saturating add and subtract
+>>     instructions
+>>   target/riscv: rvv-1.0: integer comparison instructions
+>>   target/riscv: use softfloat lib float16 comparison functions
+>>   target/riscv: rvv-1.0: floating-point compare instructions
+>>   target/riscv: rvv-1.0: mask-register logical instructions
+>>   target/riscv: rvv-1.0: slide instructions
+>>   target/riscv: rvv-1.0: floating-point slide instructions
+>>   target/riscv: rvv-1.0: narrowing fixed-point clip instructions
+>>   target/riscv: rvv-1.0: single-width floating-point reduction
+>>   target/riscv: rvv-1.0: widening floating-point reduction instructions
+>>   target/riscv: rvv-1.0: single-width scaling shift instructions
+>>   target/riscv: rvv-1.0: remove widening saturating scaled multiply-add
+>>   target/riscv: rvv-1.0: remove vmford.vv and vmford.vf
+>>   target/riscv: rvv-1.0: remove integer extract instruction
+>>   target/riscv: rvv-1.0: floating-point min/max instructions
+>>   target/riscv: introduce floating-point rounding mode enum
+>>   target/riscv: rvv-1.0: floating-point/integer type-convert
+>>     instructions
+>>   target/riscv: rvv-1.0: widening floating-point/integer type-convert
+>>   target/riscv: add "set round to odd" rounding mode helper function
+>>   target/riscv: rvv-1.0: narrowing floating-point/integer type-convert
+>>   target/riscv: rvv-1.0: relax RV_VLEN_MAX to 512-bits
+>>
+>> Greentime Hu (2):
+>>   target/riscv: rvv-1.0: add vlenb register
+>>   target/riscv: gdb: support vector registers for rv32
+>>
+>> Hsiangkai Wang (2):
+>>   target/riscv: gdb: modify gdb csr xml file to align with csr register
+>>     map
+>>   target/riscv: gdb: support vector registers for rv64
+>>
+>> LIU Zhiwei (4):
+>>   target/riscv: rvv-1.0: add mstatus VS field
+>>   target/riscv: rvv-1.0: add sstatus VS field
+>>   target/riscv: rvv-1.0: add translation-time vector context status
+>>   target/riscv: rvv-1.0: add vcsr register
+>>
+>>  gdb-xml/riscv-32bit-csr.xml             |   18 +-
+>>  gdb-xml/riscv-64bit-csr.xml             |   18 +-
+>>  target/riscv/cpu.c                      |   12 +-
+>>  target/riscv/cpu.h                      |   97 +-
+>>  target/riscv/cpu_bits.h                 |   10 +
+>>  target/riscv/cpu_helper.c               |   16 +-
+>>  target/riscv/csr.c                      |   73 +-
+>>  target/riscv/fpu_helper.c               |   17 +-
+>>  target/riscv/gdbstub.c                  |  126 +-
+>>  target/riscv/helper.h                   |  523 ++--
+>>  target/riscv/insn32-64.decode           |   18 +-
+>>  target/riscv/insn32.decode              |  295 +-
+>>  target/riscv/insn_trans/trans_rvv.inc.c | 2366 ++++++++++------
+>>  target/riscv/internals.h                |   19 +-
+>>  target/riscv/translate.c                |   68 +-
+>>  target/riscv/vector_helper.c            | 3269 +++++++++++------------
+>>  16 files changed, 4051 insertions(+), 2894 deletions(-)
+>>
+>> --
+>> 2.17.1
+>>
+>
+> ping~
 
-This seems way too complicated for:
+I wasn't really following too closely, but didn't Richard give comments?
 
-  if (qemu_ram_get_used_length(block) < (MIN_RAMBLOCK_SIZE << 10)) {
-      return -1;
-  }
-
-  return 0;
-
-(even easier if it just returned bool from the comparison)
-
-Dave
-
-> +    return 0;
-> +}
-> +
->  static int record_ramblock_hash_info(struct RamblockDirtyInfo **block_dinfo,
->                                       struct DirtyRateConfig config,
->                                       int *block_index)
-> @@ -183,6 +201,9 @@ static int record_ramblock_hash_info(struct RamblockDirtyInfo **block_dinfo,
->      int index = 0;
->  
->      RAMBLOCK_FOREACH_MIGRATABLE(block) {
-> +        if (skip_sample_ramblock(block) < 0) {
-> +            continue;
-> +        }
->          dinfo = alloc_ramblock_dirty_info(&index, dinfo);
->          if (dinfo == NULL) {
->              return -1;
-> @@ -249,6 +270,9 @@ static int compare_page_hash_info(struct RamblockDirtyInfo *info,
->      RAMBlock *block = NULL;
->  
->      RAMBLOCK_FOREACH_MIGRATABLE(block) {
-> +        if (skip_sample_ramblock(block) < 0) {
-> +            continue;
-> +        }
->          block_dinfo = NULL;
->          if (!find_page_matched(block, info, block_index + 1, &block_dinfo)) {
->              continue;
-> diff --git a/migration/dirtyrate.h b/migration/dirtyrate.h
-> index e3adead..600bceb 100644
-> --- a/migration/dirtyrate.h
-> +++ b/migration/dirtyrate.h
-> @@ -35,10 +35,20 @@
->  #define DIRTYRATE_PAGE_SHIFT_KB                   12
->  
->  /*
-> + * Sample page size MB shift
-> + */
-> +#define DIRTYRATE_PAGE_SHIFT_MB                   20
-> +
-> +/*
->   * Sample page size 1G shift
->   */
->  #define DIRTYRATE_PAGE_SHIFT_GB                   30
->  
-> +/*
-> + * minimum ramblock size to sampled
-> + */
-> +#define MIN_RAMBLOCK_SIZE                         128
-> +
->  /* Take 1s as default for calculation duration */
->  #define DEFAULT_FETCH_DIRTYRATE_TIME_SEC          1
->  
-> -- 
-> 1.8.3.1
-> 
--- 
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-
+Alistair
 
