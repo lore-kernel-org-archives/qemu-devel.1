@@ -2,86 +2,98 @@ Return-Path: <SRS0=H0ck=CE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0A8CC433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 14:19:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9B6BC433E1
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 14:20:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 67762208E4
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 14:19:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8FE5A208E4
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 14:20:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OGN22Ik7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67762208E4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EBPS5v8A"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FE5A208E4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45784 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47882 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAwGi-0001oc-LT
-	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 10:19:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41822)
+	id 1kAwHb-0002h0-TC
+	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 10:20:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42104)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kAwFZ-0000kL-9a
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 10:18:05 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:24704
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kAwFW-0003i4-Qo
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 10:18:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598451481;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=nw23zQsj3FR90Q5khVNmwMxegiJKzbvKv8zCLe1i7SQ=;
- b=OGN22Ik7GLSPep7dAK4NUs3S5akziPFNGjj5m7m6fPzMuEGsvKUNfDBp771zbWXJB9xF3A
- zW1blySZgdHYXdL7w+UQRp+nZKoi40yAvoYdlMCPhLOqDI3/dDyvORrIzAFYNL+C06eiY/
- VCHvcVyjCYhPNN7TocQuqSD0y8V21BA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-342-bSkG7VcEOLuMSXChKMkaPg-1; Wed, 26 Aug 2020 10:17:56 -0400
-X-MC-Unique: bSkG7VcEOLuMSXChKMkaPg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4B7D51007465;
- Wed, 26 Aug 2020 14:17:55 +0000 (UTC)
-Received: from localhost (unknown [10.10.67.254])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0FDA05C1C2;
- Wed, 26 Aug 2020 14:17:54 +0000 (UTC)
-Date: Wed, 26 Aug 2020 10:17:54 -0400
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Igor Mammedov <imammedo@redhat.com>
-Subject: Re: [PATCH] numa: hmat: fix cache size check
-Message-ID: <20200826141754.GA642093@habkost.net>
-References: <20200821100519.1325691-1-imammedo@redhat.com>
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kAwH0-0002Aw-UT
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 10:19:34 -0400
+Received: from mail-pj1-x1041.google.com ([2607:f8b0:4864:20::1041]:39648)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kAwGz-0003q8-DC
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 10:19:34 -0400
+Received: by mail-pj1-x1041.google.com with SMTP id s2so342369pjr.4
+ for <qemu-devel@nongnu.org>; Wed, 26 Aug 2020 07:19:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=8OHx5jO/kav4lj8u22V3saFr2wMXN1jueodhUQb/5jI=;
+ b=EBPS5v8AxpVZspew/CEMOmIOEb+WrFmfjQDgK/DziShqqhN8hFmC4lnetpQho2FB91
+ xUKzXUz4HLQZr2af2vkU1AC4E35XHqbck9HINOLOf+P+5kFokm6bKJA5L4IlSP4e/wlv
+ 6fJ0yx0qhrqtpiTxlG2O9KIFV2C3pVjvHVnv+rv1ndre4tyw4grUaOL98pwuPo+kuPtI
+ /r0aeEU5wluQTxUzo5p0cb6SwRpYGLs4E4rEMC8KlOHa715C6EiuugxSTVrsXjDxTTQS
+ INhBf+qoLf0YgtLeKx1KNdXx0R+t/Bo3pBuaObGWxo/RZcnEkphKDgCcdVPlVtwauVym
+ 1p9A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=8OHx5jO/kav4lj8u22V3saFr2wMXN1jueodhUQb/5jI=;
+ b=s9Dl9ihfiEOSwy9p8EUZdvkjef3BMP3jXOkBBxjMk0aY/5+fM580xH6sg/fzG5iFhl
+ 1oKNM+oPxkVWhvUJLzE4qOCdiYMwGpoIzW8dWnMPjqeC3mnta7jsm+huuiRZuLlmcsjU
+ Oz2BD4xylmU9v4bUuYP8YYbXNXWB0uEL5Bmu+Z89QVngeyj4/ySMS46/fL+pO973Fcsi
+ gAFhVAgS4mpbhGw8OvdoohnbZwwMRXAu1XkgtTnkcdq7sTv6Qqcmv7KYEGbdbqjS6+J7
+ u7zHl/WL2zG+AhxBxfsxEq9+2GKRT2L+aEYF+dpnFx/nRs5l7BzsKNTypXoqdl6ctRgj
+ 4jyQ==
+X-Gm-Message-State: AOAM531kK+1OfQZROVNddGYLmv0ZPRxbHXXPe9Fm4B9Lg5PtK6bzT1yr
+ AwRUqsRPRG07L2CXjDsGMyNXsg==
+X-Google-Smtp-Source: ABdhPJyK5NyLJxeH7I9OYlAGUczQMatibe24L6hmK6hLPF59rknf07pYoz6vAo2L+SrNnYnvcCtTHA==
+X-Received: by 2002:a17:90a:7e15:: with SMTP id
+ i21mr5134233pjl.175.1598451571910; 
+ Wed, 26 Aug 2020 07:19:31 -0700 (PDT)
+Received: from [192.168.81.79]
+ (h216-228-167-147.bendor.dedicated.static.tds.net. [216.228.167.147])
+ by smtp.gmail.com with ESMTPSA id x19sm3340486pfq.43.2020.08.26.07.19.30
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 26 Aug 2020 07:19:31 -0700 (PDT)
+Subject: Re: [RFC PATCH v3 09/34] Hexagon (target/hexagon) architecture types
+To: Taylor Simpson <tsimpson@quicinc.com>, qemu-devel@nongnu.org
+References: <1597765847-16637-1-git-send-email-tsimpson@quicinc.com>
+ <1597765847-16637-10-git-send-email-tsimpson@quicinc.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <264c9851-81c4-67e3-3e04-865b30c06ec1@linaro.org>
+Date: Wed, 26 Aug 2020 07:19:29 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200821100519.1325691-1-imammedo@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=ehabkost@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/26 06:53:09
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.959,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <1597765847-16637-10-git-send-email-tsimpson@quicinc.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1041;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1041.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -42
+X-Spam_score: -4.3
+X-Spam_bar: ----
+X-Spam_report: (-4.3 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-2.239,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,42 +106,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mprivozn@redhat.com, qemu-devel@nongnu.org, jingqi.liu@intel.com
+Cc: ale@rev.ng, riku.voipio@iki.fi, philmd@redhat.com, laurent@vivier.eu,
+ aleksandar.m.mail@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Aug 21, 2020 at 06:05:19AM -0400, Igor Mammedov wrote:
-> when QEMU is started like:
-> 
-> qemu-system-x86_64 -smp 2 -machine hmat=on \
->  -m 2G \
->  -object memory-backend-ram,size=1G,id=m0 \
->  -object memory-backend-ram,size=1G,id=m1 \
->  -numa node,nodeid=0,memdev=m0 \
->  -numa node,nodeid=1,memdev=m1,initiator=0 \
->  -numa cpu,node-id=0,socket-id=0 \
->  -numa cpu,node-id=0,socket-id=1 \
->  -numa hmat-lb,initiator=0,target=0,hierarchy=memory,data-type=access-latency,latency=5 \
->  -numa hmat-lb,initiator=0,target=0,hierarchy=memory,data-type=access-bandwidth,bandwidth=200M \
->  -numa hmat-lb,initiator=0,target=1,hierarchy=memory,data-type=access-latency,latency=10 \
->  -numa hmat-lb,initiator=0,target=1,hierarchy=memory,data-type=access-bandwidth,bandwidth=100M \
->  -numa hmat-cache,node-id=0,size=8K,level=1,associativity=direct,policy=write-back,line=5 \
->  -numa hmat-cache,node-id=0,size=16K,level=2,associativity=direct,policy=write-back,line=5
-> 
-> it errors out with:
->  -numa hmat-cache,node-id=0,size=16K,level=2,associativity=direct,policy=write-back,line=5:
->         Invalid size=16384, the size of level=2 should be less than the size(8192) of level=1
-> 
-> which doesn't look right as one would expect that L1 < L2 < L3 ...
-> Fix it by sawpping relevant size checks.
-> 
-> Fixes: c412a48d4d91 (numa: Extend CLI to provide memory side cache information)
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+On 8/18/20 8:50 AM, Taylor Simpson wrote:
+> +#ifndef HEXAGON_ARCH_TYPES_H
+> +#define HEXAGON_ARCH_TYPES_H
+> +
+> +#include <stdint.h>
 
-Queued, thanks!
+Do you really need to re-include this?
+This was done in "qemu/osdep.h".
 
--- 
-Eduardo
+In general, osdep.h must be included first, and it takes care of all of the
+basic system includes.
 
+
+r~
 
