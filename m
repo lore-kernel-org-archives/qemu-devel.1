@@ -7,83 +7,83 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8022AC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 10:11:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90514C433E1
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 10:13:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4B201206EB
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 10:11:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5BD06206EB
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 10:13:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=dme-org.20150623.gappssmtp.com header.i=@dme-org.20150623.gappssmtp.com header.b="Wn7ytF5Q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B201206EB
+	dkim=pass (2048-bit key) header.d=dme-org.20150623.gappssmtp.com header.i=@dme-org.20150623.gappssmtp.com header.b="GFoylxmw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BD06206EB
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=dme.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60742 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35738 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAsPC-00006r-IL
-	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 06:11:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33090)
+	id 1kAsQV-0001TT-ML
+	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 06:13:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33576)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dme@dme.org>) id 1kAsOO-00085L-D0
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 06:10:56 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:42242)
+ (Exim 4.90_1) (envelope-from <dme@dme.org>) id 1kAsPv-0000tL-NV
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 06:12:31 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:44805)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <dme@dme.org>) id 1kAsOM-0004Aq-Kk
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 06:10:56 -0400
-Received: by mail-wr1-x441.google.com with SMTP id q14so1198661wrn.9
- for <qemu-devel@nongnu.org>; Wed, 26 Aug 2020 03:10:50 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <dme@dme.org>) id 1kAsPu-0004SE-7C
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 06:12:31 -0400
+Received: by mail-wr1-x443.google.com with SMTP id c15so1194917wrs.11
+ for <qemu-devel@nongnu.org>; Wed, 26 Aug 2020 03:12:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=dme-org.20150623.gappssmtp.com; s=20150623;
  h=to:cc:subject:in-reply-to:references:from:date:message-id
- :mime-version; bh=L5HWJYfB6pDygSM9chcj4L5PnsK9E+tjUJFHOpZtJak=;
- b=Wn7ytF5QijnEdmdfaumBKt94WgZboPvmMPB0PXcHGocmV4WbdYJ/lFnEE6IiZMLO+b
- Aizs1MT6TqXe/1MJb+hNLBh0Ss6QU/OMG3Myb7qodMqvifI5s5j666bSetoqW/WuIYcg
- KdhFN7PeDs7aqPiSXDXB5ZfqErUCzbHU2CI822t0NXP0ff+OKNuWnO7gzFmNfPOwXWUj
- D3Lo3WcbhPewcvZ9MORgg4veVh0Dj5bqeWK+fUOTKS0Qrxfea7UNZZHWELubhzAuHuLN
- neDZz7cyjNoW8Qi1d7ArsHy4yT/tfVmW+Nb0ks3Xi0+YNjxcu39MuVC5IcoBqF0Z/rkJ
- A3Dw==
+ :mime-version; bh=RlOLEeFqoNCCTp4IjynWPIJsEAOOe/5UsKpjZ8mPxbY=;
+ b=GFoylxmwbd++AGQyTHd76KTagSqRb75qItAy+oH8mJgmABW1Il6YxFqM/FSjUKCmMl
+ ScwT7VgNROTOOVOqqN13mynyhtyOiJ9r76PPq8tWbUqjjIWwDdKvKkypmh2lr2oylqR+
+ QEAgaZszTWlHt5DxikiMcWkgvefNDVTKOswDUjeTscr96Y2XP5CFnQMb/2sfH2+5/95I
+ XRJxTgo7O1yGdOs64q+8FskyG/AyAaFBs3FjWbHXjYl+OQ5yl3RQt4xCZKpuROvu3v8N
+ 2Y9oiOVSyAnrxfRMUAokFf5V/diCZAR0C9oR08mV0I5UHE61Sx2R9je6+SkldUEwtYXs
+ PNVg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:to:cc:subject:in-reply-to:references:from:date
  :message-id:mime-version;
- bh=L5HWJYfB6pDygSM9chcj4L5PnsK9E+tjUJFHOpZtJak=;
- b=B2TyVQ+g7Rflde6IhC4YjM/UB6ff7LnrPs7KYcHTNE0Mbw2f/XdLy0CvU3SLa8RFEg
- 0FLmV5yQbBkCG5AedlZFons67JjTesuKfgib1Ofi0cFb2DDw06SErDEKhufJxrasqd8a
- R3N5rwnasRKQHEWIc6hsji+iFr5mp5hkuK4wIjI/lEyV55wXLjg34DI1zy0zulUhOJws
- OtLQXJ1h5U+CheiIZ+Kz0JBcPkUjMjwgwF5M9l8pj+mPHZNEw28GQxS/nsSBM0lwwdYl
- 6nNUQ5SkQ24zQ+ywA47406zfcyd0leu/1mNuBoOD2+ZW3f2lC0AVz1AnLrug+RHTdwWP
- TsmA==
-X-Gm-Message-State: AOAM530RWXmQSfCh+ZYDWjnAG/SM1NEjcIKhtGyXmUHL6rr2sEn7+qCA
- LyiNcgNYeGjDWG4xNB4/b9RhBXaMGldzC0K4Rn0=
-X-Google-Smtp-Source: ABdhPJwlsoQuYEFhZlrEr8YwqEZtpFHxT2LSrAfu6BJQvzh00EWmG5KD8wEttqechqhxXoTgwp06gQ==
-X-Received: by 2002:a5d:6288:: with SMTP id k8mr14531018wru.273.1598436648893; 
- Wed, 26 Aug 2020 03:10:48 -0700 (PDT)
+ bh=RlOLEeFqoNCCTp4IjynWPIJsEAOOe/5UsKpjZ8mPxbY=;
+ b=Juwz+2P5eq7c55660kaiIWMaM7q38L62MDhx2JA71FxhVFI6Krq7V1nstrEW8gK17F
+ emQ08lukLAMrmmEHkHuo3BNfQ43gI2H3ZL/1uDRcZGIgbo6V7djznaYMboh3O8PY1iMV
+ LRgg3piIRP9CkMqzHKZw0Rx3hI4Rg0yPuZUA3V3XXeqIUaQS6LCmdT/cLK6HFXgF/8+Z
+ PNnMlkHE79VemgzLG1iGQW2juq585ZbPaxMw9Tvgv0gTdr/tDkCCvIdpYxwjTWyIWZyi
+ t5Rd1ein4o3Ya07kciMaJH40EcqR4VYyrClDkbVLoKeNLYfCapquOa6Oat0fUEMtO/lf
+ fCmw==
+X-Gm-Message-State: AOAM533vQa/42OwqUGVQfTm0oQv2LzxPfEMb3qq2o46ECLUYqkaVugmN
+ CD7BCFXcSx1Rw+HpDoM/ibG5Gw==
+X-Google-Smtp-Source: ABdhPJxn5lljTptcAfISkrrXeyxPDE0rVAVPdwsy0neHFDN/xTXaeE38st/k49y2XWBsLG4Pgt2Myg==
+X-Received: by 2002:adf:db43:: with SMTP id f3mr16059669wrj.219.1598436748806; 
+ Wed, 26 Aug 2020 03:12:28 -0700 (PDT)
 Received: from disaster-area.hh.sledj.net
  (8.a.e.d.0.0.0.0.0.0.0.0.4.6.0.0.0.4.1.7.1.7.b.b.0.b.8.0.1.0.0.2.ip6.arpa.
  [2001:8b0:bb71:7140:64::dea8])
- by smtp.gmail.com with ESMTPSA id o125sm4822186wma.27.2020.08.26.03.10.47
+ by smtp.gmail.com with ESMTPSA id r16sm5551383wrv.33.2020.08.26.03.12.27
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 26 Aug 2020 03:10:48 -0700 (PDT)
+ Wed, 26 Aug 2020 03:12:28 -0700 (PDT)
 Received: from localhost (disaster-area.hh.sledj.net [local])
- by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id 213f46ba;
- Wed, 26 Aug 2020 10:10:41 +0000 (UTC)
+ by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id 6701e96f;
+ Wed, 26 Aug 2020 10:12:27 +0000 (UTC)
 To: Chuan Zheng <zhengchuan@huawei.com>, quintela@redhat.com,
  eblake@redhat.com, dgilbert@redhat.com, berrange@redhat.com
-Subject: Re: [PATCH v5 07/12] migration/dirtyrate: Compare page hash results
- for recorded sampled page
-In-Reply-To: <1598260480-64862-8-git-send-email-zhengchuan@huawei.com>
+Subject: Re: [PATCH v5 08/12] migration/dirtyrate: skip sampling ramblock
+ with size below MIN_RAMBLOCK_SIZE
+In-Reply-To: <1598260480-64862-9-git-send-email-zhengchuan@huawei.com>
 References: <1598260480-64862-1-git-send-email-zhengchuan@huawei.com>
- <1598260480-64862-8-git-send-email-zhengchuan@huawei.com>
+ <1598260480-64862-9-git-send-email-zhengchuan@huawei.com>
 X-HGTTG: heart-of-gold
 From: David Edmondson <dme@dme.org>
-Date: Wed, 26 Aug 2020 11:10:41 +0100
-Message-ID: <m2blixlntq.fsf@dme.org>
+Date: Wed, 26 Aug 2020 11:12:27 +0100
+Message-ID: <m25z95lnqs.fsf@dme.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-Received-SPF: neutral client-ip=2a00:1450:4864:20::441;
- envelope-from=dme@dme.org; helo=mail-wr1-x441.google.com
+Received-SPF: neutral client-ip=2a00:1450:4864:20::443;
+ envelope-from=dme@dme.org; helo=mail-wr1-x443.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -10
@@ -111,101 +111,98 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Monday, 2020-08-24 at 17:14:35 +08, Chuan Zheng wrote:
+On Monday, 2020-08-24 at 17:14:36 +08, Chuan Zheng wrote:
 
-> Compare page hash results for recorded sampled page.
+> In order to sample real RAM, skip ramblock with size below MIN_RAMBLOCK_SIZE
+> which is set as 128M.
 >
 > Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
-> Signed-off-by: YanYing Zhuang <ann.zhuangyanying@huawei.com>
 > ---
->  migration/dirtyrate.c | 64 +++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 64 insertions(+)
+>  migration/dirtyrate.c | 24 ++++++++++++++++++++++++
+>  migration/dirtyrate.h | 10 ++++++++++
+>  2 files changed, 34 insertions(+)
 >
 > diff --git a/migration/dirtyrate.c b/migration/dirtyrate.c
-> index 66de426..050270d 100644
+> index 050270d..bd398b7 100644
 > --- a/migration/dirtyrate.c
 > +++ b/migration/dirtyrate.c
-> @@ -202,6 +202,70 @@ static int record_ramblock_hash_info(struct RamblockDirtyInfo **block_dinfo,
->      return 0;
+> @@ -173,6 +173,24 @@ alloc_ramblock_dirty_info(int *block_index,
+>      return block_dinfo;
 >  }
 >  
-> +static int calc_page_dirty_rate(struct RamblockDirtyInfo *info)
-
-This never fails - could be void?
-
+> +static int skip_sample_ramblock(RAMBlock *block)
 > +{
-> +    uint32_t crc;
-> +    int i;
+> +    int64_t ramblock_size;
 > +
-> +    for (i = 0; i < info->sample_pages_count; i++) {
-> +        crc = get_ramblock_vfn_hash(info, info->sample_page_vfn[i]);
-> +        if (crc != info->hash_result[i]) {
-> +            info->sample_dirty_count++;
-> +        }
-> +    }
+> +    /* ramblock size in MB */
+> +    ramblock_size = qemu_ram_get_used_length(block) >> DIRTYRATE_PAGE_SHIFT_MB;
 > +
-> +    return 0;
-> +}
-> +
-> +static bool find_page_matched(RAMBlock *block, struct RamblockDirtyInfo *infos,
-> +                              int count, struct RamblockDirtyInfo **matched)
-
-This might as well just return a struct RamblockDirtyInfo pointer (or NULL).
-
-> +{
-> +    int i;
-> +
-> +    for (i = 0; i < count; i++) {
-> +        if (!strcmp(infos[i].idstr, qemu_ram_get_idstr(block))) {
-> +            break;
-> +        }
-> +    }
-> +
-> +    if (i == count) {
-> +        return false;
-> +    }
-> +
-> +    if (infos[i].ramblock_addr != qemu_ram_get_host_addr(block) ||
-> +        infos[i].ramblock_pages !=
-> +            (qemu_ram_get_used_length(block) >> DIRTYRATE_PAGE_SHIFT_KB)) {
-> +        return false;
-> +    }
-> +
-> +    *matched = &infos[i];
-> +    return true;
-> +}
-> +
-> +static int compare_page_hash_info(struct RamblockDirtyInfo *info,
-> +                                  int block_index)
-> +{
-> +    struct RamblockDirtyInfo *block_dinfo = NULL;
-> +    RAMBlock *block = NULL;
-> +
-> +    RAMBLOCK_FOREACH_MIGRATABLE(block) {
-> +        block_dinfo = NULL;
-> +        if (!find_page_matched(block, info, block_index + 1, &block_dinfo)) {
-> +            continue;
-> +        }
-> +        if (calc_page_dirty_rate(block_dinfo) < 0) {
-> +            return -1;
-> +        }
-> +        update_dirtyrate_stat(block_dinfo);
-> +    }
-> +
-> +    if (!DirtyStat.total_sample_count) {
+> +    /*
+> +     * Consider ramblock with size larger than 128M is what we
+> +     * want to sample.
+> +     */
+> +    if (ramblock_size < MIN_RAMBLOCK_SIZE) {
 > +        return -1;
 > +    }
 > +
 > +    return 0;
 > +}
 > +
->  static void calculate_dirtyrate(struct DirtyRateConfig config)
->  {
->      /* todo */
+>  static int record_ramblock_hash_info(struct RamblockDirtyInfo **block_dinfo,
+>                                       struct DirtyRateConfig config,
+>                                       int *block_index)
+> @@ -183,6 +201,9 @@ static int record_ramblock_hash_info(struct RamblockDirtyInfo **block_dinfo,
+>      int index = 0;
+>  
+>      RAMBLOCK_FOREACH_MIGRATABLE(block) {
+> +        if (skip_sample_ramblock(block) < 0) {
+> +            continue;
+> +        }
+>          dinfo = alloc_ramblock_dirty_info(&index, dinfo);
+>          if (dinfo == NULL) {
+>              return -1;
+> @@ -249,6 +270,9 @@ static int compare_page_hash_info(struct RamblockDirtyInfo *info,
+>      RAMBlock *block = NULL;
+>  
+>      RAMBLOCK_FOREACH_MIGRATABLE(block) {
+> +        if (skip_sample_ramblock(block) < 0) {
+> +            continue;
+> +        }
+>          block_dinfo = NULL;
+>          if (!find_page_matched(block, info, block_index + 1, &block_dinfo)) {
+>              continue;
+> diff --git a/migration/dirtyrate.h b/migration/dirtyrate.h
+> index 5050add..41bc264 100644
+> --- a/migration/dirtyrate.h
+> +++ b/migration/dirtyrate.h
+> @@ -35,10 +35,20 @@
+>  #define DIRTYRATE_PAGE_SHIFT_KB                   12
+>  
+>  /*
+> + * Sample page size MB shift
+> + */
+> +#define DIRTYRATE_PAGE_SHIFT_MB                   20
+> +
+> +/*
+>   * Sample page size 1G shift
+>   */
+>  #define DIRTYRATE_PAGE_SHIFT_GB                   30
+>  
+> +/*
+> + * minimum ramblock size to sampled
+
+"Minimum RAMBlock size to sample, in megabytes."
+
+> + */
+> +#define MIN_RAMBLOCK_SIZE                         128
+> +
+>  /* Take 1s as default for calculation duration */
+>  #define DEFAULT_FETCH_DIRTYRATE_TIME_SEC          1
+>  
 > -- 
 > 1.8.3.1
 
 dme.
 -- 
-Sometimes these eyes, forget the face they're peering from.
+I went starin' out of my window, been caught doin' it once or twice.
 
