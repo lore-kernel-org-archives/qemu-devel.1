@@ -2,89 +2,101 @@ Return-Path: <SRS0=H0ck=CE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B373AC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 12:32:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DB3DC433E1
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 12:34:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 82FCD20707
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 12:32:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82FCD20707
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 195D72076C
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 12:34:13 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=dme-org.20150623.gappssmtp.com header.i=@dme-org.20150623.gappssmtp.com header.b="jMF9UWQg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 195D72076C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=dme.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43542 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46310 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAubW-00053G-SU
-	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 08:32:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40414)
+	id 1kAud2-0006Dw-EE
+	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 08:34:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40832)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kAua4-0003ow-Mw
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 08:31:08 -0400
-Received: from indium.canonical.com ([91.189.90.7]:57998)
+ (Exim 4.90_1) (envelope-from <dme@dme.org>) id 1kAuc6-0005gJ-3U
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 08:33:14 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:38529)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kAua0-0005yX-6w
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 08:31:08 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kAuZx-0003Yg-Ri
- for <qemu-devel@nongnu.org>; Wed, 26 Aug 2020 12:31:01 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id B38CE2E80DC
- for <qemu-devel@nongnu.org>; Wed, 26 Aug 2020 12:31:01 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <dme@dme.org>) id 1kAuc3-0006Aa-0A
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 08:33:13 -0400
+Received: by mail-wm1-x342.google.com with SMTP id t14so1597318wmi.3
+ for <qemu-devel@nongnu.org>; Wed, 26 Aug 2020 05:33:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=dme-org.20150623.gappssmtp.com; s=20150623;
+ h=to:cc:subject:in-reply-to:references:from:date:message-id
+ :mime-version; bh=+UWYFPwXMZOF13qqkzkc62QlO2r+ogjteClRM+PM/60=;
+ b=jMF9UWQgeiqN+gziJ84+7BQO6+JXn+zNFrQMnFYm1DMpNm3KxM24OlGeSGW01aDvMj
+ nMsY8r3hXTJUOZNaNOR7uowOoIqYLZrM4OuF90baJ04lyKBFuYToSzlAc3E0rR6izE3z
+ iHjmuKU6ke1mIofCyIyJ5SCHsTXxm5OJaNS8OqPws0rv0EeeG2T9Pml8phRD6IXNOd7a
+ BK4C5ZYI+iKPBS7L2SfqRK+BPbz6msTKyPKWSZFBodhWBmwrcxesZfKFkdyO2V3P1d6k
+ R9OiRIO1JQ+p7I4WhWP0oFH98jy100fqTiPmCLxzHgovFuEhXDpLqyzBAjKLQ2JO878g
+ e/JA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:to:cc:subject:in-reply-to:references:from:date
+ :message-id:mime-version;
+ bh=+UWYFPwXMZOF13qqkzkc62QlO2r+ogjteClRM+PM/60=;
+ b=HCm8jnL4roiKFAZM63Rw1IJPiHsNpRUU8PtQGGQWQqreSJc+iwMA7eP77ZX+O3VWhU
+ WW/ovL2856x0dcHJfid2yHJRLiClekJ945vXFCvBAmnXXklmMYyz1KKYslh3DWqS9asW
+ TQvOt8afCUfiQwHteYGscizkGg3wCnzM8UELC9MFpbpPn9AzVN/J9ArRh2f9jSYoqqNB
+ 0TqTcmRmD5AZy7jt/V1VBM4zSFTBLjghnbEiRnENStSgj4WAGqZL+gp+t+5e88ehG9Iv
+ GLhciR24LPu1vWC5CI0ahJ7kF6yifFcFOdA4F567VTcx0M2XyQCK8PGVXTvs2CqWROil
+ u0nA==
+X-Gm-Message-State: AOAM531l5qyrSjvKHohoZ7SCSBccpk292G8Nb1pvlKujMEWsAPCqjB9O
+ YjKFhzFDllT7/cGLFPIBm/TH/g==
+X-Google-Smtp-Source: ABdhPJyOHY976zagODNRaF5DxYjdtDNTRugj0EuNNAjGMSfjFLar7n2de9iOWg8twfNIvu59Vh5MCQ==
+X-Received: by 2002:a05:600c:10cf:: with SMTP id
+ l15mr7012719wmd.149.1598445189341; 
+ Wed, 26 Aug 2020 05:33:09 -0700 (PDT)
+Received: from disaster-area.hh.sledj.net
+ (8.a.e.d.0.0.0.0.0.0.0.0.4.6.0.0.0.4.1.7.1.7.b.b.0.b.8.0.1.0.0.2.ip6.arpa.
+ [2001:8b0:bb71:7140:64::dea8])
+ by smtp.gmail.com with ESMTPSA id q12sm4874771wrn.94.2020.08.26.05.33.08
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 26 Aug 2020 05:33:08 -0700 (PDT)
+Received: from localhost (disaster-area.hh.sledj.net [local])
+ by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id 906820e8;
+ Wed, 26 Aug 2020 12:33:07 +0000 (UTC)
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Subject: Re: [PATCH v5 06/12] migration/dirtyrate: Record hash results for
+ each sampled page
+In-Reply-To: <20200826123016.GA2727@work-vm>
+References: <1598260480-64862-1-git-send-email-zhengchuan@huawei.com>
+ <1598260480-64862-7-git-send-email-zhengchuan@huawei.com>
+ <m2eentlogl.fsf@dme.org> <20200826123016.GA2727@work-vm>
+X-HGTTG: heart-of-gold
+From: David Edmondson <dme@dme.org>
+Date: Wed, 26 Aug 2020 13:33:07 +0100
+Message-ID: <m2r1rtk2nw.fsf@dme.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 26 Aug 2020 12:19:48 -0000
-From: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF?= <1883984@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
- status=Fix Released; importance=Undecided; assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=focal; sourcepackage=qemu; 
- component=main; status=Fix Committed; importance=Medium;
- assignee=None; 
-X-Launchpad-Bug-Tags: verification-done verification-done-focal
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: bruno-clisp janitor nhfbeebe paelzer rth tjaalton
- ubuntu-sru-bot
-X-Launchpad-Bug-Reporter: Nelson H F Beebe (nhfbeebe)
-X-Launchpad-Bug-Modifier: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF_=28paelzer?=
- =?utf-8?q?=29?=
-References: <159243063748.16697.11009205973276249282.malonedeb@chaenomeles.canonical.com>
-Message-Id: <159844438899.1756.14534341872365500187.malone@chaenomeles.canonical.com>
-Subject: [Bug 1883984] Re: QEMU S/390x sqxbr (128-bit IEEE 754 square root)
- crashes qemu-system-s390x
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="99c2d833c8d727fd05148486920aca032e908071"; Instance="production"
-X-Launchpad-Hash: bba5aef87dc3dd5a85881d60c697b38db42fca08
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/26 07:50:40
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.25, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain
+Received-SPF: neutral client-ip=2a00:1450:4864:20::342;
+ envelope-from=dme@dme.org; helo=mail-wm1-x342.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -10
+X-Spam_score: -1.1
+X-Spam_bar: -
+X-Spam_report: (-1.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_NEUTRAL=0.779, UNPARSEABLE_RELAY=0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -93,157 +105,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1883984 <1883984@bugs.launchpad.net>
+Cc: alex.chen@huawei.com, berrange@redhat.com, zhang.zhanghailiang@huawei.com,
+ quintela@redhat.com, qemu-devel@nongnu.org, xiexiangyou@huawei.com,
+ Chuan Zheng <zhengchuan@huawei.com>, ann.zhuangyanying@huawei.com,
+ fangying1@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-old version
-sudo apt install qemu-system-s390x=3D1:4.2-3ubuntu6.4
-...test as listed in the test instructions ...
+On Wednesday, 2020-08-26 at 13:30:16 +01, Dr. David Alan Gilbert wrote:
 
-ubuntu@focal-sqxbr:~$ ./a.out =
+> * David Edmondson (dme@dme.org) wrote:
+>> On Monday, 2020-08-24 at 17:14:34 +08, Chuan Zheng wrote:
+>> 
+>> > Record hash results for each sampled page, crc32 is taken to calculate
+>> > hash results for each sampled 4K-page.
+>> >
+>> > Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
+>> > Signed-off-by: YanYing Zhuang <ann.zhuangyanying@huawei.com>
+>> > ---
+>> >  migration/dirtyrate.c | 136 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>> >  migration/dirtyrate.h |  15 ++++++
+>> >  2 files changed, 151 insertions(+)
+>> >
+>> > diff --git a/migration/dirtyrate.c b/migration/dirtyrate.c
+>> > index f6a94d8..66de426 100644
+>> > --- a/migration/dirtyrate.c
+>> > +++ b/migration/dirtyrate.c
+>> > @@ -10,6 +10,7 @@
+>> >   * See the COPYING file in the top-level directory.
+>> >   */
+>> >  
+>> > +#include <zlib.h>
+>> >  #include "qemu/osdep.h"
+>> >  #include "qapi/error.h"
+>> >  #include "crypto/hash.h"
+>> > @@ -66,6 +67,141 @@ static void update_dirtyrate(uint64_t msec)
+>> >      DirtyStat.dirty_rate = dirtyrate;
+>> >  }
+>> >  
+>> > +/*
+>> > + * get hash result for the sampled memory with length of 4K byte in ramblock,
+>> > + * which starts from ramblock base address.
+>> > + */
+>> > +static uint32_t get_ramblock_vfn_hash(struct RamblockDirtyInfo *info,
+>> > +                                      uint64_t vfn)
+>> > +{
+>> > +    struct iovec iov_array;
+>> 
+>> There's no need for an iovec now that crc32() is being used.
+>> 
+>> > +    uint32_t crc;
+>> > +
+>> > +    iov_array.iov_base = info->ramblock_addr +
+>> > +                         vfn * DIRTYRATE_SAMPLE_PAGE_SIZE;
+>> > +    iov_array.iov_len = DIRTYRATE_SAMPLE_PAGE_SIZE;
+>> > +
+>> > +    crc = crc32(0, iov_array.iov_base, iov_array.iov_len);
+>> > +
+>> > +    return crc;
+>> > +}
+>> > +
+>> > +static int save_ramblock_hash(struct RamblockDirtyInfo *info)
+>> > +{
+>> > +    unsigned int sample_pages_count;
+>> > +    int i;
+>> > +    int ret = -1;
+>> 
+>> There's no need to initialise "ret".
+>> 
+>> > +    GRand *rand = g_rand_new();
+>> 
+>> Calling g_rand_new() when the result may not be used (because of the
+>> various conditions immediately below) seems as though it might waste
+>> entropy. Could this be pushed down just above the loop? It would even
+>> get rid of the gotos ;-)
+>> 
+>> > +    sample_pages_count = info->sample_pages_count;
+>> > +
+>> > +    /* ramblock size less than one page, return success to skip this ramblock */
+>> > +    if (unlikely(info->ramblock_pages == 0 || sample_pages_count == 0)) {
+>> > +        ret = 0;
+>> > +        goto out;
+>> > +    }
+>> > +
+>> > +    info->hash_result = g_try_malloc0_n(sample_pages_count,
+>> > +                                        sizeof(uint32_t));
+>> > +    if (!info->hash_result) {
+>> > +        ret = -1;
+>> > +        goto out;
+>> > +    }
+>> > +
+>> > +    info->sample_page_vfn = g_try_malloc0_n(sample_pages_count,
+>> > +                                            sizeof(uint64_t));
+>> > +    if (!info->sample_page_vfn) {
+>> > +        g_free(info->hash_result);
+>> > +        ret = -1;
+>> > +        goto out;
+>> > +    }
+>> > +
+>> > +    for (i = 0; i < sample_pages_count; i++) {
+>> > +        info->sample_page_vfn[i] = g_rand_int_range(rand, 0,
+>> > +                                                    info->ramblock_pages - 1);
+>> > +        info->hash_result[i] = get_ramblock_vfn_hash(info,
+>> > +                                                     info->sample_page_vfn[i]);
+>> > +    }
+>> > +    ret = 0;
+>> > +
+>> > +out:
+>> > +    g_rand_free(rand);
+>> > +    return ret;
+>> > +}
+>> > +
+>> > +static void get_ramblock_dirty_info(RAMBlock *block,
+>> > +                                    struct RamblockDirtyInfo *info,
+>> > +                                    struct DirtyRateConfig *config)
+>> > +{
+>> > +    uint64_t sample_pages_per_gigabytes = config->sample_pages_per_gigabytes;
+>> > +
+>> > +    /* Right shift 30 bits to calc block size in GB */
+>> > +    info->sample_pages_count = (qemu_ram_get_used_length(block) *
+>> > +                                sample_pages_per_gigabytes) >>
+>> > +                                DIRTYRATE_PAGE_SHIFT_GB;
+>> 
+>> Doing the calculation this way around seems odd. Why was it not:
+>> 
+>>     info->sample_pages_count = (qemu_ram_get_used_length(block) >>
+>>                                 DIRTYRATE_PAGE_SHIFT_GB) *
+>>                                 sample_pages_per_gigabytes;
+>> 
+>> ?
+>
+> Because that would give 0 for a 0.5GB block
 
-Segmentation fault
-(qemu is dead at this point)
+Ouch, obviously :-) Thanks.
 
-$ sudo apt install qemu-system-s390x=3D1:4.2-3ubuntu6.5
-Reading package lists... Done
-Building dependency tree       =
-
-Reading state information... Done
-The following packages will be upgraded:
-  qemu-system-s390x
-1 upgraded, 0 newly installed, 0 to remove and 315 not upgraded.
-Need to get 2334 kB of archives.
-After this operation, 4096 B of additional disk space will be used.
-Get:1 http://ports.ubuntu.com focal-proposed/main s390x qemu-system-s390x s=
-390x 1:4.2-3ubuntu6.5 [2334 kB]
-Fetched 2334 kB in 1s (3927 kB/s)      =
-
-(Reading database ... 203254 files and directories currently installed.)
-Preparing to unpack .../qemu-system-s390x_1%3a4.2-3ubuntu6.5_s390x.deb ...
-Unpacking qemu-system-s390x (1:4.2-3ubuntu6.5) over (1:4.2-3ubuntu6.4) ...
-Setting up qemu-system-s390x (1:4.2-3ubuntu6.5) ...
-Processing triggers for man-db (2.9.3-2) ...
-ubuntu@s1lp05:~$ =
-
-
-ubuntu@focal-sqxbr:~$ ./a.out =
-
-(no crash)
-
-
-Setting verified
-
-** Tags removed: verification-needed verification-needed-focal
-** Tags added: verification-done verification-done-focal
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1883984
-
-Title:
-  QEMU S/390x sqxbr (128-bit IEEE 754 square root) crashes qemu-system-
-  s390x
-
-Status in QEMU:
-  Fix Released
-Status in qemu package in Ubuntu:
-  Fix Released
-Status in qemu source package in Focal:
-  Fix Committed
-
-Bug description:
-  [Impact]
-
-   * An instruction was described wrong so that on usage the program would =
-
-     crash.
-
-  [Test Case]
-
-   * Run s390x in emulation and there use this program:
-     For simplicity and speed you can use KVM guest as usual on s390x, that =
-
-     after prep&install&compile of the test you run in qemu-tcg like:
-
-     $ sudo qemu-system-s390x -machine s390-ccw-virtio,accel=3Dtcg -cpu max=
-,zpci=3Don -serial mon:stdio -display none -m 4096 -nic user,model=3Dvirtio=
-,hostfwd=3Dtcp::2222-:22 -drive file=3D/var/lib/uvtool/libvirt/images/focal=
--sqxbr.qcow,if=3Dnone,id=3Ddrive-virtio-disk0,format=3Dqcow2,cache=3Dnone -=
-device virtio-blk-ccw,devno=3Dfe.0.0001,drive=3Ddrive-virtio-disk0,id=3Dvir=
-tio-disk0,bootindex=3D1,scsi=3Doff
-     Obviously is you have no s390x access you need to use emulation right =
-
-     away.
-
-   * Build and run failing program
-     $ sudo apt install clang
-     $ cat > bug-sqrtl-one-line.c << EOF
-  int main(void) { volatile long double x, r; x =3D 4.0L; __asm__ =
-
-  __volatile__("sqxbr %0, %1" : "=3Df" (r) : "f" (x)); return (0);}
-  EOF
-     $ cc bug-sqrtl-one-line.c
-     $ ./a.out
-     Segmentation fault (core dumped)
-
-     qemu is dead by now as long as the bug is present
-
-  [Regression Potential]
-
-   * The change only modifies 128 bit square root on s390x so regressions
-     should be limited to exactly that - which formerly before this fix was =
-
-     a broken instruction.
-
-  [Other Info]
-   =
-
-   * n/a
-
-  ---
-
-  In porting software to guest Ubuntu 18.04 and 20.04 VMs for S/390x, I dis=
-covered
-  that some of my own numerical programs, and also a GNU configure script f=
-or at
-  least one package with CC=3Dclang, would cause an instant crash of the VM=
-, sometimes
-  also destroying recently opened files, and producing long strings of NUL =
-characters
-  in /var/log/syslog in the S/390 guest O/S.
-
-  Further detective work narrowed the cause of the crash down to a single I=
-BM S/390
-  instruction: sqxbr (128-bit IEEE 754 square root).  Here is a one-line pr=
-ogram
-  that when compiled and run on a VM hosted on QEMUcc emulator version 4.2.0
-  (Debian 1:4.2-3ubuntu6.1) [hosted on Ubuntu 20.04 on a Dell Precision 7920
-  workstation with an Intel Xeon Platinum 8253 CPU],  and also on QEMU emul=
-ator
-  version 5.0.0, reproducibly produces a VM crash under qemu-system-s390x.
-
-  % cat bug-sqrtl-one-line.c
-  int main(void) { volatile long double x, r; x =3D 4.0L; __asm__ __volatil=
-e__("sqxbr %0, %1" : "=3Df" (r) : "f" (x)); return (0);}
-
-  % cc bug-sqrtl-one-line.c && ./a.out
-  Segmentation fault (core dumped)
-
-  The problem code may be the function float128_sqrt() defined in qemu-5.0.=
-0/fpu/softfloat.c
-  starting at line 7619.  I have NOT attempted to run the qemu-system-s390x=
- executable
-  under a debugger.  However, I observe that S/390 is the only CPU family t=
-hat I know of,
-  except possibly for a Fujitsu SPARC-64, that has a 128-bit square root in=
- hardware.
-  Thus, this instruction bug may not have been seen before.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1883984/+subscriptions
+dme.
+-- 
+And removed his hat, in respect of her presence.
 
