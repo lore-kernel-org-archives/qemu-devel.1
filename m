@@ -2,41 +2,41 @@ Return-Path: <SRS0=H0ck=CE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D6E5C433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 10:19:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04F52C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 10:20:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 37BAB2071E
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 10:19:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37BAB2071E
+	by mail.kernel.org (Postfix) with ESMTPS id CEEB92071E
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 10:20:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CEEB92071E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51424 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54108 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAsWs-00082H-IY
-	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 06:19:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35196)
+	id 1kAsXK-0000hU-4G
+	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 06:20:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35322)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kAsVz-0006nI-Br
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 06:18:47 -0400
-Received: from mout.kundenserver.de ([212.227.126.131]:39485)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
+ id 1kAsWQ-0007Lz-NT; Wed, 26 Aug 2020 06:19:14 -0400
+Received: from mout.kundenserver.de ([212.227.126.131]:32877)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kAsVx-0005Is-E5
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 06:18:47 -0400
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
+ id 1kAsWO-0005M1-C9; Wed, 26 Aug 2020 06:19:14 -0400
 Received: from [192.168.100.1] ([82.252.135.186]) by mrelayeu.kundenserver.de
- (mreue010 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1MF3U0-1kQEbR0WiG-00FVls; Wed, 26 Aug 2020 12:18:41 +0200
-Subject: Re: [PATCH v3 43/74] nubus: Rename class type checking macros
+ (mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1Mg6Na-1kp9HR3UgI-00hhXy; Wed, 26 Aug 2020 12:19:08 +0200
+Subject: Re: [PATCH v3 49/74] swim: Rename struct SWIM to Swim
 To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
 References: <20200825192110.3528606-1-ehabkost@redhat.com>
- <20200825192110.3528606-44-ehabkost@redhat.com>
+ <20200825192110.3528606-50-ehabkost@redhat.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -80,32 +80,32 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <ed1b2bae-9beb-8211-41e3-0fb78986256d@vivier.eu>
-Date: Wed, 26 Aug 2020 12:18:40 +0200
+Message-ID: <cf381ba6-96b6-1782-acdb-d6771bcf29cd@vivier.eu>
+Date: Wed, 26 Aug 2020 12:19:06 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200825192110.3528606-44-ehabkost@redhat.com>
+In-Reply-To: <20200825192110.3528606-50-ehabkost@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:BzA/3layirPQYLnzQ/BC4karYBijDpggOni3KarLmp+a3rhLK76
- IrC5iM9mY0yzKQs+qia1R8Ytxhm398Tvska2+YPVdH5lu61nvQI/x8VKEQtU5KhlmYo3d+q
- pzv0snkGfK9ALlI/Fk/U3dYk6EbNV0d0j9hwSf/fJ/4ewqeLTrW4eW3J7XUR6TRC5+fA4xs
- fwNv5yshbk35+vIlUYU0w==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:Z6FvHEooUsE=:RIuenHAx3m5CpzPFreOp5O
- L0qXfGHd775AcSlsi58YWe2xxPSbwVtJLI83KgM4a06Wdfpv2V2HviP16C4YooNgUWiAHdrx/
- 0TQfZn6kFS/a+cHEvrkKx3Vsv0kKkkaGWiONvnxB4lFxpwrTGvlSBTD+VGKwGYghVRSdqugbJ
- PLBDzkgdTo20+/b8xW5NrMiE+PPvxA3HjQikKb57HCqi7YqI1pEPPfFNoagvEC2UEuhaTC1e7
- x4fkbdsLQ9fVk1gbI1R+Swj6e+TXsGtALgBVL1V5LBRuugyEKkx7tMXZxn/7+l+NvD704/hE3
- DPq6Ab6jPvk+tTMIhlKQJ1/OSj4K5kFEBS8N1rzlPMNYxPEF4NTTMGEdZtOemGfvrtjCl4PLa
- wxNlZUw3p+iO0YgUK1kysyfZzq5/+FXwdn7bK6SyAWgxxNv97Tz+MQkXXr5SGVR46B/WRKfZv
- GlOWjsfAh6Kcr8GqqBEd3qcK7zJaZiuNJrFUKWLmLP9vdqSS1SY0TaweZ8+8o93Pd27fbjVUE
- hMo60xuhXWRHdnMzpH7+YFjYeLqFraRZT1xK8ybaxzFr+0+1cAZgxXdL1nnLbTUoiISxmiyrd
- +KVnBDb4LTyYpKV+H6Gx4m76trmXPPFmshWd7OwLPD0qFQmZvSwzzOTOz7+Hi7QNrTo9q3MAr
- osu4IjH63GqztUkatCQX2r3pREHrgOU/+RD6HIXLBFjBMbrG2hrh1sgFTN5wqqbNd50z7Dxe3
- d+DXTEfmjpEFuhIY1t9NmyuSaqP9Ov32qJRlsU8wAWcNKwne960pkQ6umgqLdDnR5K7hMdYjV
- 3rFAr+14JHSHRAZ2rFUo27jxe2SRbHC/uT8IRSehi2HDYUqPPr/HP0C/1n14TGGz9lHrLKY
+X-Provags-ID: V03:K1:AWlmIXZvUQel1AwEMTttrOQtWkMeLxjcjUeQBkuTP8+F3O+SpOQ
+ pm4XYcjY6BgbDXRZpPDUEBGtRVc9mkhA1Vu0vOg0QyZKYoPsmM3mzVT6VozFwmTDST0Sq5m
+ UcTTLkLmgo1rYYCUSB7FTcneNoIQsbkvNfW9FaRRuawa7e9iqXg1QH6rvBGXAk/ezOq8h6Z
+ LptETr19fDY/9MiagZD7g==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:RAFyOA8Iv94=:dewkJwPoAe0XflC31SxHOG
+ oKBtyo8zx55IJWnvJt1IqzLyNLerlbGYQhlTPXzrnlxdmf8uuVzGOXU67LQESanP5iHSZVM+d
+ rzwCTlYRxgrDNMqsW2rrEfn1OJeR9s7uTgODYuw/plq82XKQ5GlE1Z1dTdeKFI0UxNw6SqWo/
+ YhWhEuP/mg8J7ySaGHgxXTYk5FzKBLHcy9zUs61o0oJAFfWQ7hei5Kp6oqPvWpSu96NHVoa78
+ ty+yrMc/FMumvSjkc+pMvUS00N0wGesnOorKLr1jfeNJVzO0wZnwbkxRRBGri1nBDs/5r1p3h
+ paHoixKFC/PHRqoO5NYUVFo9qsybLt00oabVaC9HZywePngwBOHZZ1FoQs7a5gODDf2Q/xI97
+ g7CsewUOKQE7M6rKg0X5asgyRoOGKuYlhfW71qh8yM/czn852BQBwJXcxuq7G1WlUXXEE1MpQ
+ iYOCWVyG1OycaPMOyAwz6GLJIVi2pdLezK8nf/HrDqNkgSkC0erRRXUiCmHttqCyBaziTXZCD
+ Us+dh6SHLcWEPX5Ru791NLus68X834SVJpcYstgfBA3xg6/lIbBNiZME/EjgBiXMoUrf4D5hK
+ Nrt9aCamgQAPBhk84GgzLMNJ2CCDo1CXbMVIfkDicZpnWLCB/b8POuX7UFx00xLPaKUcC3P5G
+ kmI4lUth+OTUCQa2fvLHx2NPUmvvF9MGRXxm/6DoDWvxkYSgQP4EH90Go/hOq075o3ogONM/h
+ JoqL8+1Fy4GkMbeFbqKATWCtrJS83/rEBuumb1O+TXK1N0VZIVYHkBEfSWmfpn8b2t3v64ZJ6
+ XXQXSkkwqkzSrwTVAjj2BOABvp2wy1VLM9UMcWdEbUogBM9MhQ4tpeebVt4DIZH5Grm4Bdh
 Received-SPF: none client-ip=212.227.126.131; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/26 04:51:53
@@ -128,69 +128,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ "Daniel P. Berrange" <berrange@redhat.com>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Le 25/08/2020 à 21:20, Eduardo Habkost a écrit :
-> Rename the existing class type checking macros to be consistent
-> with the type name and instance type checking macro.  Use a
-> NUBUS_MACFB prefix instead of MACFB_NUBUS.
+> Currently we have a SWIM typedef and a SWIM type checking macro,
+> but OBJECT_DECLARE* would transform the SWIM macro into a
+> function, and the function name would conflict with the SWIM
+> typedef name.
 > 
-> This will make future conversion to OBJECT_DECLARE* easier.
+> Rename the struct and typedef to "Swim". This will make future
+> conversion to OBJECT_DECLARE* easier.
 > 
 > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 > ---
-> Changes series v2 -> v3: new patch added in series v3
+> Changes series v2 -> v3: new patch added to series v3
 > 
 > ---
 > Cc: Laurent Vivier <laurent@vivier.eu>
+> Cc: Kevin Wolf <kwolf@redhat.com>
+> Cc: Max Reitz <mreitz@redhat.com>
+> Cc: qemu-block@nongnu.org
 > Cc: qemu-devel@nongnu.org
-> ---
->  include/hw/display/macfb.h | 4 ++--
->  hw/display/macfb.c         | 4 ++--
->  2 files changed, 4 insertions(+), 4 deletions(-)
 > 
-> diff --git a/include/hw/display/macfb.h b/include/hw/display/macfb.h
-> index 26367ae2c4..347871b623 100644
-> --- a/include/hw/display/macfb.h
-> +++ b/include/hw/display/macfb.h
-> @@ -40,9 +40,9 @@ typedef struct {
->      MacfbState macfb;
->  } MacfbSysBusState;
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> ---
+>  include/hw/block/swim.h |  6 +++---
+>  hw/block/swim.c         | 10 +++++-----
+>  2 files changed, 8 insertions(+), 8 deletions(-)
+> 
+> diff --git a/include/hw/block/swim.h b/include/hw/block/swim.h
+> index 6add3499d0..9d8b65c561 100644
+> --- a/include/hw/block/swim.h
+> +++ b/include/hw/block/swim.h
+> @@ -67,10 +67,10 @@ struct SWIMCtrl {
+>  };
 >  
-> -#define MACFB_NUBUS_DEVICE_CLASS(class) \
-> +#define NUBUS_MACFB_CLASS(class) \
->      OBJECT_CLASS_CHECK(MacfbNubusDeviceClass, (class), TYPE_NUBUS_MACFB)
-> -#define MACFB_NUBUS_GET_CLASS(obj) \
-> +#define NUBUS_MACFB_GET_CLASS(obj) \
->      OBJECT_GET_CLASS(MacfbNubusDeviceClass, (obj), TYPE_NUBUS_MACFB)
+>  #define TYPE_SWIM "swim"
+> -#define SWIM(obj) OBJECT_CHECK(SWIM, (obj), TYPE_SWIM)
+> +#define SWIM(obj) OBJECT_CHECK(Swim, (obj), TYPE_SWIM)
 >  
->  typedef struct MacfbNubusDeviceClass {
-> diff --git a/hw/display/macfb.c b/hw/display/macfb.c
-> index b68faff4bb..ff8bdb846b 100644
-> --- a/hw/display/macfb.c
-> +++ b/hw/display/macfb.c
-> @@ -391,7 +391,7 @@ static void macfb_nubus_realize(DeviceState *dev, Error **errp)
+> -typedef struct SWIM {
+> +typedef struct Swim {
+>      SysBusDevice parent_obj;
+>      SWIMCtrl     ctrl;
+> -} SWIM;
+> +} Swim;
+>  #endif
+> diff --git a/hw/block/swim.c b/hw/block/swim.c
+> index 74f56e8f46..20133a814c 100644
+> --- a/hw/block/swim.c
+> +++ b/hw/block/swim.c
+> @@ -387,7 +387,7 @@ static const MemoryRegionOps swimctrl_mem_ops = {
+>  
+>  static void sysbus_swim_reset(DeviceState *d)
 >  {
->      NubusDevice *nd = NUBUS_DEVICE(dev);
->      MacfbNubusState *s = NUBUS_MACFB(dev);
-> -    MacfbNubusDeviceClass *ndc = MACFB_NUBUS_GET_CLASS(dev);
-> +    MacfbNubusDeviceClass *ndc = NUBUS_MACFB_GET_CLASS(dev);
->      MacfbState *ms = &s->macfb;
+> -    SWIM *sys = SWIM(d);
+> +    Swim *sys = SWIM(d);
+>      SWIMCtrl *ctrl = &sys->ctrl;
+>      int i;
 >  
->      ndc->parent_realize(dev, errp);
-> @@ -443,7 +443,7 @@ static void macfb_sysbus_class_init(ObjectClass *klass, void *data)
->  static void macfb_nubus_class_init(ObjectClass *klass, void *data)
+> @@ -408,7 +408,7 @@ static void sysbus_swim_reset(DeviceState *d)
+>  static void sysbus_swim_init(Object *obj)
 >  {
->      DeviceClass *dc = DEVICE_CLASS(klass);
-> -    MacfbNubusDeviceClass *ndc = MACFB_NUBUS_DEVICE_CLASS(klass);
-> +    MacfbNubusDeviceClass *ndc = NUBUS_MACFB_CLASS(klass);
+>      SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
+> -    SWIM *sbs = SWIM(obj);
+> +    Swim *sbs = SWIM(obj);
+>      SWIMCtrl *swimctrl = &sbs->ctrl;
 >  
->      device_class_set_parent_realize(dc, macfb_nubus_realize,
->                                      &ndc->parent_realize);
+>      memory_region_init_io(&swimctrl->iomem, obj, &swimctrl_mem_ops, swimctrl,
+> @@ -418,7 +418,7 @@ static void sysbus_swim_init(Object *obj)
+>  
+>  static void sysbus_swim_realize(DeviceState *dev, Error **errp)
+>  {
+> -    SWIM *sys = SWIM(dev);
+> +    Swim *sys = SWIM(dev);
+>      SWIMCtrl *swimctrl = &sys->ctrl;
+>  
+>      qbus_create_inplace(&swimctrl->bus, sizeof(SWIMBus), TYPE_SWIM_BUS, dev,
+> @@ -460,7 +460,7 @@ static const VMStateDescription vmstate_sysbus_swim = {
+>      .name = "SWIM",
+>      .version_id = 1,
+>      .fields = (VMStateField[]) {
+> -        VMSTATE_STRUCT(ctrl, SWIM, 0, vmstate_swim, SWIMCtrl),
+> +        VMSTATE_STRUCT(ctrl, Swim, 0, vmstate_swim, SWIMCtrl),
+>          VMSTATE_END_OF_LIST()
+>      }
+>  };
+> @@ -477,7 +477,7 @@ static void sysbus_swim_class_init(ObjectClass *oc, void *data)
+>  static const TypeInfo sysbus_swim_info = {
+>      .name          = TYPE_SWIM,
+>      .parent        = TYPE_SYS_BUS_DEVICE,
+> -    .instance_size = sizeof(SWIM),
+> +    .instance_size = sizeof(Swim),
+>      .instance_init = sysbus_swim_init,
+>      .class_init    = sysbus_swim_class_init,
+>  };
 > 
 
 Acked-by: Laurent Vivier <laurent@vivier.eu>
