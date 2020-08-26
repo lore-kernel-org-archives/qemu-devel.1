@@ -2,95 +2,81 @@ Return-Path: <SRS0=H0ck=CE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83FEBC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 13:12:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 329D9C433E3
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 13:21:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0699D20738
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 13:12:30 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TZM9aNvs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0699D20738
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0B9CC20B1F
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 13:21:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B9CC20B1F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40018 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48548 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAvE6-0003Vv-2G
-	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 09:12:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50500)
+	id 1kAvND-0007qc-6w
+	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 09:21:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53042)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblot.ml@gmail.com>)
- id 1kAvCu-0002VE-FA
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 09:11:16 -0400
-Received: from mail-wm1-x332.google.com ([2a00:1450:4864:20::332]:50243)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kAvME-0005uO-Sc
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 09:20:54 -0400
+Received: from indium.canonical.com ([91.189.90.7]:42044)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <eblot.ml@gmail.com>)
- id 1kAvCs-0002jW-OS
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 09:11:16 -0400
-Received: by mail-wm1-x332.google.com with SMTP id t2so1701815wma.0
- for <qemu-devel@nongnu.org>; Wed, 26 Aug 2020 06:11:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=p3782pjVKEIST6AJb8oZZ3aB4b1LVv0uYVCW54CyN94=;
- b=TZM9aNvs1uYlkDlHY2XPGZ1fzCE1gr5FKZoWnBPp5uDoYnsu0fE1jFE3+MokyNtaRs
- pLxAHP7ZOyZ0aiJtiAGlvwCW8c46HYE05MLwczC4ffRqHbChlULE8ilYSY3bth3pT+ua
- dK1PketQ4d3S8X/naitjeFeyELA2G1T04zKI7FJmlWin2pPnBc09g3euDBepb1IJxImh
- ncLZulPtSoov8lqHQtdzjlTht7XAzOvJ0ZdgTAIwDF6HED6vYWA1WAMyx9OZftWZuGsU
- 8fOHevZQOh10sXarfSWortBTgp1fmsA9LsDBPoheFdVYUVbLonqHeMKA6kvphOSyRs2D
- ZkDQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=p3782pjVKEIST6AJb8oZZ3aB4b1LVv0uYVCW54CyN94=;
- b=TnF/ctgVEfLOtHL/URAb1X/fg3njjIoZqyWPblX50vHtK/6N6Ts9NNP8b1VLB4+07d
- 6wSUmGnvtqpQJa4Xy81TTHhtIemSsiygjKFbillxxafmbUwJk8wZpMSGgnArXW8FFkCd
- nFaAnTZoRk+hmFF5+uE8FCY9Xe72fJ2uCZwJ25Pn/7Hq+VD79IuW1O4UAjUWVe2Imcv0
- D+yZCnUtnk4z2JcZEn5d+3Kxdmg1g4BV4/V5vaZSOdJbwkD0dLcojjjvhWHXBaao/LUi
- ZXbFn92rfyZfgKPL0zgSgK57lA83cH0SocMAkMFuRhTRqt+B5gHTdGO58/gvwy07OzWX
- ODFA==
-X-Gm-Message-State: AOAM532X+g5zzzXYC3U7bo5Xd8X/djC14yySBFL71hn7AQBodHReq6FM
- oSHLE0yyXS7P1noFiBdxU7YI2Do1HJhjNQ==
-X-Google-Smtp-Source: ABdhPJwHhB2BzMMj8gQ6T209czlnK1veSfz7uZJHyOwT3a/wCiNXHPjSs8TvAQta4AaGvPrFuv6G3w==
-X-Received: by 2002:a1c:f20e:: with SMTP id s14mr5144146wmc.23.1598447472673; 
- Wed, 26 Aug 2020 06:11:12 -0700 (PDT)
-Received: from [192.168.15.71] ([195.200.173.126])
- by smtp.gmail.com with ESMTPSA id v12sm6433315wri.47.2020.08.26.06.11.12
- for <qemu-devel@nongnu.org>
- (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 26 Aug 2020 06:11:12 -0700 (PDT)
-From: "Emmanuel Blot" <eblot.ml@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: Meson build on macOS: undefined symbol treatment
-Date: Wed, 26 Aug 2020 15:11:11 +0200
-X-Mailer: MailMate (1.13.1r5671)
-Message-ID: <E79B1486-1C3C-4271-9B76-62B2C4B8BCA7@gmail.com>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kAvMC-0004KI-Gg
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 09:20:54 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kAvMA-0002oE-49
+ for <qemu-devel@nongnu.org>; Wed, 26 Aug 2020 13:20:50 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id E66242E80EA
+ for <qemu-devel@nongnu.org>; Wed, 26 Aug 2020 13:20:49 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::332;
- envelope-from=eblot.ml@gmail.com; helo=mail-wm1-x332.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Date: Wed, 26 Aug 2020 13:14:56 -0000
+From: Guirish Salgaonkar <1893040@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: berrange gsalgaon
+X-Launchpad-Bug-Reporter: Guirish Salgaonkar (gsalgaon)
+X-Launchpad-Bug-Modifier: Guirish Salgaonkar (gsalgaon)
+References: <159844225257.1396.12890490778938419036.malonedeb@wampee.canonical.com>
+Message-Id: <159844769668.1736.11033155415826590591.malone@wampee.canonical.com>
+Subject: [Bug 1893040] Re: External modules retreval using Go1.15 on s390x
+ appears to have checksum and ECDSA verification issues
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="99c2d833c8d727fd05148486920aca032e908071"; Instance="production"
+X-Launchpad-Hash: 656cf2cd1c1b5d407ff2a5b8f92af156b5852836
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/26 07:50:40
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.25, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -99,85 +85,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: Bug 1893040 <1893040@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+Yes we have observed that the issue persist in later QEMU version too.
 
-I=E2=80=99ve noticed that since meson builds have been enabled, on macOS,=
- the =
+-- =
 
-build outcome with undefined symbols has changed:
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1893040
 
-- prior to meson introduction (v5.1.0):
-   * referencing an undeclared symbol in source code led to a warning at =
+Title:
+   External modules retreval using Go1.15 on s390x appears to have
+  checksum and ECDSA verification issues
 
-compile stage
-   * referencing an undeclared symbol at link stage led to a fatal build =
+Status in QEMU:
+  Incomplete
 
-error (as usually expected)
+Bug description:
+  We are observing issue while building go-runner image and we suspect it i=
+s due to QEMU version being used. As referred in below issue:
+  https://github.com/golang/go/issues/40949
 
-- since meson introduction
-   * same behavior at compile stage
-   * however, the linker does silently generate an application - which =
+  We tried to build go-runner image using go1.15 and register QEMU
+  (docker run --rm --privileged multiarch/qemu-user-
+  static@sha256:c772ee1965aa0be9915ee1b018a0dd92ea361b4fa1bcab5bbc033517749=
+b2af4
+  --reset -p yes) as mentioned in PR
+  https://github.com/kubernetes/release/pull/1499. We observed below
+  failure during build:
 
-fails at launch since the symbol is undefined.
+  -------------------------------------------------------------------------=
+--------
+  ERROR: executor failed running [/bin/sh -c CGO_ENABLED=3D0 GOOS=3Dlinux G=
+OARCH=3D${ARCH}     go build -ldflags '-s -w -buildid=3D -extldflags "-stat=
+ic"'     -o go-runner ${package}]: buildkit-runc did not terminate successf=
+ully
+  ------
+  =C2=A0> [builder 7/7] RUN CGO_ENABLED=3D0 GOOS=3Dlinux GOARCH=3D${ARCH}  =
+   go build -ldflags '-s -w -buildid=3D -extldflags "-static"'     -o go-ru=
+nner .:
+  ------
+  failed to solve: rpc error: code =3D Unknown desc =3D executor failed run=
+ning [/bin/sh -c CGO_ENABLED=3D0 GOOS=3Dlinux GOARCH=3D${ARCH}     go build=
+ -ldflags '-s -w -buildid=3D -extldflags "-static"'     -o go-runner ${pack=
+age}]: buildkit-runc did not terminate successfully
+  Makefile:52: recipe for target 'container' failed
+  make: *** [container] Error 1
+  -------------------------------------------------------------------------=
+--------
 
-Step to reproduce:
-
-   from softmmu/main.c, replace for example call to qemu_init() with =
-
-qemu_init2();
-
-- v5.1.0:
-   softmmu/main.c:48:5: warning: implicit declaration of function =
-
-'qemu_init2' is invalid in C99 [-Wimplicit-function-declaration]
-     qemu_init2(argc, argv, envp);
-       LINK    riscv64-softmmu/qemu-system-riscv64
-   Undefined symbols for architecture x86_64:
-     "_qemu_init2", referenced from:
-         _qemu_main in main.o
-   ld: symbol(s) not found for architecture x86_64
-   clang: error: linker command failed with exit code 1 (use -v to see =
-
-invocation)
-   make[1]: *** [qemu-system-riscv64] Error 1
-
-- current master:
-   softmmu/main.c:49:5: warning: implicit declaration of function =
-
-'qemu_init2' is invalid in C99 [-Wimplicit-function-declaration]
-     qemu_init2(argc, argv, envp);
-     ^
-   1 warning generated.
-   [3/3] Linking target qemu-system-riscv64
-
-  > riscv64-softmmu/qemu-system-riscv64
-   dyld: lazy symbol binding failed: Symbol not found: _qemu_init2
-     Referenced from: =
-
-/Users/eblot/Sources/Git/github.com/QEMU/upstream/build/riscv64-softmmu/q=
-emu-system-riscv64
-     Expected in: flat namespace
-
-     'riscv64-softmmu/qemu-system-ris=E2=80=A6' terminated by signal SIGA=
-BRT =
-
-(Abort)
-
-
-This new behavior is likely to come from the linker flag:
-
-    -Wl,-undefined,dynamic_lookup
-
-I=E2=80=99m not sure whether it is a new feature or a bug, but if the for=
-mer =
-
-stands true, is there a way to disable this feature?
-
-
-Thanks,
-Emmanuel.
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1893040/+subscriptions
 
