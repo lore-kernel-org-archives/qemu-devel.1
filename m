@@ -2,117 +2,73 @@ Return-Path: <SRS0=H0ck=CE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0123C433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 05:49:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55BA8C433E1
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 05:52:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5FBF3206FA
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 05:49:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1C25E206FA
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 05:52:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="FQzx9+Pi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FBF3206FA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=irrelevant.dk header.i=@irrelevant.dk header.b="hjNJgxJD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C25E206FA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36082 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39304 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAoJa-000288-Lp
-	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 01:49:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58766)
+	id 1kAoMU-0003ej-9C
+	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 01:52:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59384)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bauerman@linux.ibm.com>)
- id 1kAoJ2-0001ax-7C; Wed, 26 Aug 2020 01:49:08 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:29210
- helo=mx0a-001b2d01.pphosted.com)
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>) id 1kAoLX-0002s0-1C
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 01:51:43 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:59220)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bauerman@linux.ibm.com>)
- id 1kAoJ0-0004yC-20; Wed, 26 Aug 2020 01:49:07 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 07Q5Vvxj183636; Wed, 26 Aug 2020 01:48:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
- h=references : from : to :
- cc : subject : in-reply-to : date : message-id : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=dcxb6Jwuf5SJkfmaOFW772Frk9TrnM/XhuhQrCIIzgo=;
- b=FQzx9+PiX8LG0duB9qrOZyl/BdWG75BCU9n796+GFnQUuWlG3EPkQQSz+ERBYUbsIM8H
- QQyPcctr38JQpGRTNg28bUw6L2rE/VmgfJYGk49eB4NagE2gw811qJZyKgo7MpnJNrKP
- psBoHRNnWV8UvaW8uue3EMmMVxU0FYwUFqgJug9JQRgOpNVx4ZwT2X3sbsMdSecy48d2
- BTvHQHCBtul1vRyK4xkZ/t0n9GaNFgoAmwZXnyeLIUww69WQU9LkcuTYCvGBhi9nLkT2
- k3B/gkHvSdhFRy69ZHv0FKSaTS6dzw3/5qOZM3DSRwRfBcLL3A7n4ZT7Rd3NbSIEd0Rv yg== 
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0b-001b2d01.pphosted.com with ESMTP id 335hfbrpe7-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 26 Aug 2020 01:48:35 -0400
-Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 07Q5XFf3186641;
- Wed, 26 Aug 2020 01:48:34 -0400
-Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com
- [169.53.41.122])
- by mx0b-001b2d01.pphosted.com with ESMTP id 335hfbrpdt-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 26 Aug 2020 01:48:34 -0400
-Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
- by ppma04dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 07Q5la4Z013503;
- Wed, 26 Aug 2020 05:48:34 GMT
-Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com
- [9.57.198.24]) by ppma04dal.us.ibm.com with ESMTP id 332ujr6yf1-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 26 Aug 2020 05:48:34 +0000
-Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com
- [9.57.199.111])
- by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 07Q5mXfK41550106
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 26 Aug 2020 05:48:33 GMT
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 375BBAC059;
- Wed, 26 Aug 2020 05:48:33 +0000 (GMT)
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 78B97AC05B;
- Wed, 26 Aug 2020 05:48:26 +0000 (GMT)
-Received: from morokweng.localdomain (unknown [9.163.48.38])
- by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTPS;
- Wed, 26 Aug 2020 05:48:26 +0000 (GMT)
-References: <20200819164306.625357-1-bauerman@linux.ibm.com>
- <20200819164306.625357-5-bauerman@linux.ibm.com>
- <3dd050ad-147e-c365-883a-3384130b0d2f@kaod.org>
- <2fee9e37-f420-c0d0-dc57-c0ce273a1882@redhat.com>
-User-agent: mu4e 1.4.10; emacs 26.3
-From: Thiago Jung Bauermann <bauerman@linux.ibm.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: Re: [PATCH v6 4/8] ppc/e500: Use start-powered-off CPUState property
-In-reply-to: <2fee9e37-f420-c0d0-dc57-c0ce273a1882@redhat.com>
-Date: Wed, 26 Aug 2020 02:48:22 -0300
-Message-ID: <87v9h69cux.fsf@morokweng.localdomain>
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>) id 1kAoLT-0005ML-UG
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 01:51:42 -0400
+Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net
+ [80.167.98.190])
+ by charlie.dont.surf (Postfix) with ESMTPSA id 9C59BBF827;
+ Wed, 26 Aug 2020 05:51:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=irrelevant.dk;
+ s=default; t=1598421096;
+ bh=MEEL5jTSSUgb37dNylQmWwiFLzjQkVvC8oSdVcqy2e4=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=hjNJgxJDlIjNi+BUwCrqfAppktF/YVb/banmSoXwRQF5uqIHQT4Z1pRAMcPQuUMPR
+ ci4MwPE2wl1sop5aEw/mKdfkeENB7/Yh+Yv8TX78I+TYxXhkErcnIDzcBc1w6b3OkN
+ dGze7lbH/21vS2HDb7TxZEbtP/LrAmRyRVy6Nli7kCGQjzIVJBzW3e8u6RTHG8scWR
+ gxwPdV8nvJA95LzTGJMK74SzWOne9a7PjtZLeeYPUYjlNALlQcWURVMIXnQp+xZEys
+ XF7DHsWkFKKLWX4Vgq2ARTYN8IteruvLPrZCxIotsUbgVz3cHdKz5Z3a+WmhFBgxAt
+ ZieL4iX/g1qoQ==
+Date: Wed, 26 Aug 2020 07:51:33 +0200
+From: Klaus Jensen <its@irrelevant.dk>
+To: Keith Busch <kbusch@kernel.org>
+Subject: Re: [PULL] nvme updates
+Message-ID: <20200826055133.GA897000@apples.localdomain>
+References: <20200819192240.GA25305@dhcp-10-100-145-180.wdl.wdc.com>
+ <CAFEAcA8-VgEDTZ7+T9ZgB2LR9KWRrejBtZN=iwy2GGPcuFuz2Q@mail.gmail.com>
+ <20200825201242.GA20971@redsun51.ssa.fujisawa.hgst.com>
+ <CAFEAcA-SD1WMODNzZpJkq_39bk72Gf+XFhCKWEDjTb0Lvdfe9g@mail.gmail.com>
+ <20200825222804.GB20971@redsun51.ssa.fujisawa.hgst.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
- definitions=2020-08-25_11:2020-08-25,
- 2020-08-26 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 mlxscore=0
- adultscore=0 mlxlogscore=999 impostorscore=0 clxscore=1015
- lowpriorityscore=0 phishscore=0 bulkscore=0 malwarescore=0 spamscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2008260040
-Received-SPF: pass client-ip=148.163.158.5;
- envelope-from=bauerman@linux.ibm.com; helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/26 01:49:04
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -26
-X-Spam_score: -2.7
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="45Z9DzgjV8m4Oswq"
+Content-Disposition: inline
+In-Reply-To: <20200825222804.GB20971@redsun51.ssa.fujisawa.hgst.com>
+Received-SPF: pass client-ip=128.199.63.193; envelope-from=its@irrelevant.dk;
+ helo=charlie.dont.surf
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/26 01:51:37
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -126,82 +82,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>,
- Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org,
- Greg Kurz <groug@kaod.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, qemu-s390x@nongnu.org,
- qemu-arm@nongnu.org, qemu-ppc@nongnu.org,
- =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>,
- Artyom Tarasenko <atar4qemu@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>,
- Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Klaus Jensen <k.jensen@samsung.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+--45Z9DzgjV8m4Oswq
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> On 8/22/20 10:59 AM, C=C3=A9dric Le Goater wrote:
->> Hello,
->>=20
->> On 8/19/20 6:43 PM, Thiago Jung Bauermann wrote:
->>> Instead of setting CPUState::halted to 1 in ppce500_cpu_reset_sec(), use
->>> the start-powered-off property which makes cpu_common_reset() initializ=
-e it
->>> to 1 in common code.
->>>
->>> Also change creation of CPU object from cpu_create() to object_new() and
->>> qdev_realize_and_unref() because cpu_create() realizes the CPU and it's=
- not
->>> possible to set a property after the object is realized.
->>>
->>> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->>> Signed-off-by: Thiago Jung Bauermann <bauerman@linux.ibm.com>
->>=20
->>=20
->> This is breaking make check :=20
->>=20
->>     tests/qtest/libqtest.c:175: kill_qemu() detected QEMU death from sig=
-nal 11 (Segmentation fault) (core dumped)
->>     ERROR boot-serial-test - too few tests run (expected 7, got 0)
->>     make: *** [/home/legoater/work/qemu/qemu-powernv-5.2.git/tests/Makef=
-ile.include:650: check-qtest-ppc64] Error 1
->>     make: *** Waiting for unfinished jobs....
->>=20=20=20=20=20
->>=20=20=20=20=20
->>     gdb --args build/ppc64-softmmu/qemu-system-ppc64  -display none   -M=
- ppce500
->>     ...
->>     Thread 1 "qemu-system-ppc" received signal SIGSEGV, Segmentation fau=
-lt.
->>     0x000055555596ebf2 in ppce500_init (machine=3D0x5555567aa6e0)
->>         at /home/legoater/work/qemu/qemu-powernv-5.2.git/hw/ppc/e500.c:8=
-80
->>     880	        irqs[i].irq[OPENPIC_OUTPUT_INT] =3D input[PPCE500_INPUT_=
-INT];
->>=20=20
->>=20=20=20=20=20
->>     AFAIUI, 'input is not initialized since the CPU is not yet realized.
->
-> Thiago, see ad938fc1d53 ("hw/arm/palm.c: Encapsulate misc GPIO handling
-> in a device") and eventually f8a865d36dc ("hw/arm/allwinner-a10:
-> Simplify by passing IRQs with qdev_pass_gpios") to get an idea how you
-> can fix that.
+On Aug 26 07:28, Keith Busch wrote:
+> On Tue, Aug 25, 2020 at 10:43:23PM +0100, Peter Maydell wrote:
+> > On Tue, 25 Aug 2020 at 21:12, Keith Busch <kbusch@kernel.org> wrote:
+> > >
+> > > On Sun, Aug 23, 2020 at 02:56:12PM +0100, Peter Maydell wrote:
+> > > > Hi; it looks like this isn't a gpg-signed tag?
+> > > >
+> > > > error: remotes/nvme/nvme-next: cannot verify a non-tag object of ty=
+pe commit.
+> > >
+> > > Oops, sorry I forgot about that part of the procedure here. The repo =
+should
+> > > have a signed tag now:
+> >=20
+> > Thanks; the gpg key setup looks ok.
+> >=20
+> > I notice that all the commits in the repo have Klaus's signed-off-by.
+> > Usually the expectation is that the person who sends the pull req
+> > is the one who's curated the tree and added their signed-off-by,
+> > but are you doing a jointly-administered tree here ?
+>=20
+> Right, Klaus is the primary committer for our joint repository, and I
+> added his info to the MAINTAINERS file in the first commit of this pull.
+> Since he's not currently listed upstream, I thought it made sense to
+> make the introduction here. We'll coordinate pull requests as you've
+> described going forward.
+> =20
+> > The build has a format string issue that shows up on OSX, Windows,
+> > and 32-bit builds:
+>=20
+> Sorry about that, we'll fix it up ASAP.
+>=20
+> > In file included from ../../hw/block/trace.h:1:0,
+> >                  from ../../hw/block/fdc.c:48:
+> > ./trace/trace-hw_block.h: In function '_nocheck__trace_pci_nvme_err_mdt=
+s':
+> > ./trace/trace-hw_block.h:2162:18: error: format '%llu' expects
+> > argument of type 'long long unsigned int', but argument 6 has type
+> > 'size_t {aka unsigned int}' [-Werror=3Dformat=3D]
+> >          qemu_log("%d@%zu.%06zu:pci_nvme_err_mdts " "cid %"PRIu16" len
+> > %"PRIu64"" "\n",
+> >                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> >=20
 
-I ended up not following this route. There were other patches in this
-series which also caused problems in make check, but in those cases it
-wasn't related to IRQ setup.
+That's on me. Keith, fixed in our tree now.
 
-I started feeling like I had fallen into a rabbit hole so I opted
-instead to solve these problems by minimizing the consequences of the
-changes made by this patch series.
+Peter, this doesn't seem to get picked up by, say, `make
+docker-test-mingw@fedora`. Should it?
 
---=20
-Thiago Jung Bauermann
-IBM Linux Technology Center
+--45Z9DzgjV8m4Oswq
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEUigzqnXi3OaiR2bATeGvMW1PDekFAl9F+GAACgkQTeGvMW1P
+Dek/Egf/VUxbyOsSg3ojM4aNXXfb5K6tB2yCodF25LV/LLvgZ2Ycq58BikzASXzI
+5JPUk0KoNyFu96oS8imfHazQ1PQ1dr2RG3cQK2uHi04CSO5A6EOoiTFX01n3Onpw
+sKvR9yFoyw8L4o6GvQZkwJx7MV6nWNhIaxgkSZBYSgyx8ZqBFzdkBYoIXlK0AiVv
+8gGKRS/8SGwoeSSkyZ3NlfYQizSDjlc6rkebPrsijJvA0b5MMt2eyFmGxskVqK8K
++y5cuw9B6pTu1nUtOKH9Cn7T4WGO0HwiNpAx9MDkHwnjqGXIaFyc4k4T9gpoEeyb
+OjMwl5JH5NGYimmFLdk7JC/6HNECzA==
+=X5Og
+-----END PGP SIGNATURE-----
+
+--45Z9DzgjV8m4Oswq--
 
