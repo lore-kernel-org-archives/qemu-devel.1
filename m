@@ -2,45 +2,42 @@ Return-Path: <SRS0=H0ck=CE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 045D1C433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 12:18:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4844C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 12:18:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CAEC42080C
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 12:18:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CAEC42080C
+	by mail.kernel.org (Postfix) with ESMTPS id 7ADAE2080C
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 12:18:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7ADAE2080C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52454 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52888 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAuNr-00056N-Vr
-	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 08:18:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37514)
+	id 1kAuNv-0005Gw-Ou
+	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 08:18:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37512)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <s.reiter@proxmox.com>)
- id 1kAuMf-0003ax-BV; Wed, 26 Aug 2020 08:17:17 -0400
-Received: from proxmox-new.maurer-it.com ([212.186.127.180]:39896)
+ id 1kAuMe-0003aS-7T; Wed, 26 Aug 2020 08:17:16 -0400
+Received: from proxmox-new.maurer-it.com ([212.186.127.180]:36724)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <s.reiter@proxmox.com>)
- id 1kAuMb-0004Cl-UM; Wed, 26 Aug 2020 08:17:17 -0400
+ id 1kAuMb-0004Cm-ST; Wed, 26 Aug 2020 08:17:15 -0400
 Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
- by proxmox-new.maurer-it.com (Proxmox) with ESMTP id 98364448C0;
+ by proxmox-new.maurer-it.com (Proxmox) with ESMTP id 228B9448BE;
  Wed, 26 Aug 2020 14:17:01 +0200 (CEST)
 From: Stefan Reiter <s.reiter@proxmox.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH 3/3] backup: initialize bcs bitmap on job create, not start
-Date: Wed, 26 Aug 2020 14:13:59 +0200
-Message-Id: <20200826121359.15450-4-s.reiter@proxmox.com>
+Subject: [PATCH 0/3] Add support for sequential backups
+Date: Wed, 26 Aug 2020 14:13:56 +0200
+Message-Id: <20200826121359.15450-1-s.reiter@proxmox.com>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200826121359.15450-1-s.reiter@proxmox.com>
-References: <20200826121359.15450-1-s.reiter@proxmox.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=212.186.127.180;
@@ -71,46 +68,34 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-After backup_init_bcs_bitmap the copy-before-write behaviour is active.
-This way, multiple backup jobs created at once but running in a
-sequential transaction will still represent the same point in time.
+Backups can already be done for multiple drives in a transaction. However, these
+jobs will start all at once, potentially hogging a lot of disk IO all at once.
+This problem is made worse, since IO throttling is only available on a per-job
+basis.
 
-Signed-off-by: Stefan Reiter <s.reiter@proxmox.com>
----
+Add a flag to QMP to support sequential transactions for backups. This way,
+every job will be executed one after the other, while still providing the
+benefit of transactions (i.e. once one fails, all remaining ones will be
+cancelled).
 
-I'd imagine this was done on job start for a purpose, so this is potentially
-wrong. In testing it works fine.
-
-Sent along for feedback, since it would be necessary to really make use of the
-sequential backup feature (without it, the individual backup jobs would not have
-a consistent view of the guest).
+We've internally (in Proxmox VE) been doing sequential backups for a long time
+with great success, albeit in a different fashion. This series is the result of
+aligning our internal changes closer to upstream, and might be useful for other
+people as well.
 
 
- block/backup.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Stefan Reiter (3):
+  job: add sequential transaction support
+  blockdev: add sequential mode to *-backup transactions
+  backup: initialize bcs bitmap on job create, not start
 
-diff --git a/block/backup.c b/block/backup.c
-index 4f13bb20a5..14660eef45 100644
---- a/block/backup.c
-+++ b/block/backup.c
-@@ -237,8 +237,6 @@ static int coroutine_fn backup_run(Job *job, Error **errp)
-     BackupBlockJob *s = container_of(job, BackupBlockJob, common.job);
-     int ret = 0;
- 
--    backup_init_bcs_bitmap(s);
--
-     if (s->sync_mode == MIRROR_SYNC_MODE_TOP) {
-         int64_t offset = 0;
-         int64_t count;
-@@ -471,6 +469,8 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
-     block_job_add_bdrv(&job->common, "target", target, 0, BLK_PERM_ALL,
-                        &error_abort);
- 
-+    backup_init_bcs_bitmap(job);
-+
-     return &job->common;
- 
-  error:
+ block/backup.c        |  4 ++--
+ blockdev.c            | 25 ++++++++++++++++++++++---
+ include/qemu/job.h    | 12 ++++++++++++
+ job.c                 | 24 ++++++++++++++++++++++++
+ qapi/transaction.json |  6 +++++-
+ 5 files changed, 65 insertions(+), 6 deletions(-)
+
 -- 
 2.20.1
 
