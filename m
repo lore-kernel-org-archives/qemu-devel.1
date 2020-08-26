@@ -2,84 +2,82 @@ Return-Path: <SRS0=H0ck=CE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 103D3C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 17:19:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73032C433E1
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 17:21:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D23D1206FA
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 17:19:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 42C3B206FA
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 17:21:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H50fY1JK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D23D1206FA
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SQXjBY0C"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42C3B206FA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59532 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34098 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAz4h-0002iv-Ba
-	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 13:19:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35808)
+	id 1kAz7I-00041L-Ft
+	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 13:21:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36478)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kAz47-0002JG-CR
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 13:18:27 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:30500
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1kAz6i-0003bu-DV
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 13:21:09 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23897
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kAz42-0006L8-B6
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 13:18:26 -0400
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1kAz6g-0006k4-Ge
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 13:21:08 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598462299;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
+ s=mimecast20190719; t=1598462465;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=nq8AvZNWexBMkWg/iT0zDxjsP+pUVqBU0M8XewGMWhk=;
- b=H50fY1JKityDjFY9yFyuQ6rVFHqJT88seF90uP8B2FfuYqLrntqhA4ZQswvWfoSFTbRx1H
- 0e5reG6Voff4r8tF10SV2fr2UCeG6gt2LA1k01LVsB7q5q5ttfnYhxgIhKwpUPzVjYY82+
- PzUEyXvhP3xI1dd5HswZgs14dSqjwyc=
+ bh=Z20/pak5feU2b+o3+dukIpQ3ZpiSQaEhnnel2tGGyT0=;
+ b=SQXjBY0CpMai3BjrqpqhZBeiYa66ewFVq4Icqdj0Zw3gwykifyh0gs2kAUGctNART9Z2cu
+ zRJFU2hFk5oeJo1xju2xZ7gIT09ypPzRRfChbjNmirIzrindBZKBK7Vl4nePlpX95UNPJF
+ xFIO4z777WEQbXUzzpAC8HMWhYljhv4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-296-tzEskdFtNGKD6ZREQz3xSQ-1; Wed, 26 Aug 2020 13:18:13 -0400
-X-MC-Unique: tzEskdFtNGKD6ZREQz3xSQ-1
+ us-mta-483-1SLMQPPZNYG1z_DVw0zSXA-1; Wed, 26 Aug 2020 13:21:04 -0400
+X-MC-Unique: 1SLMQPPZNYG1z_DVw0zSXA-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 86A3E80BCA5
- for <qemu-devel@nongnu.org>; Wed, 26 Aug 2020 17:18:12 +0000 (UTC)
-Received: from redhat.com (ovpn-114-142.ams2.redhat.com [10.36.114.142])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 57F93757C4;
- Wed, 26 Aug 2020 17:18:11 +0000 (UTC)
-Date: Wed, 26 Aug 2020 18:18:08 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Subject: Re: [PATCH 4/4] tls-cipher-suites: Correct instance_size
-Message-ID: <20200826171808.GQ168515@redhat.com>
-References: <20200826171005.4055015-1-ehabkost@redhat.com>
- <20200826171005.4055015-5-ehabkost@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 69E75873081;
+ Wed, 26 Aug 2020 17:21:02 +0000 (UTC)
+Received: from work-vm (ovpn-112-133.ams2.redhat.com [10.36.112.133])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1D554757C4;
+ Wed, 26 Aug 2020 17:20:59 +0000 (UTC)
+Date: Wed, 26 Aug 2020 18:20:57 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Chuan Zheng <zhengchuan@huawei.com>
+Subject: Re: [PATCH v5 12/12] migration/dirtyrate: Add trace_calls to make it
+ easier to debug
+Message-ID: <20200826172057.GE3932@work-vm>
+References: <1598319650-36762-1-git-send-email-zhengchuan@huawei.com>
+ <1598319650-36762-13-git-send-email-zhengchuan@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20200826171005.4055015-5-ehabkost@redhat.com>
+In-Reply-To: <1598319650-36762-13-git-send-email-zhengchuan@huawei.com>
 User-Agent: Mutt/1.14.6 (2020-07-11)
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
-X-Mimecast-Spam-Score: 0.002
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
+X-Mimecast-Spam-Score: 0.003
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=berrange@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/26 06:53:09
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/26 03:56:58
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -100,34 +98,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: berrange@redhat.com, zhang.zhanghailiang@huawei.com, quintela@redhat.com,
+ qemu-devel@nongnu.org, xiexiangyou@huawei.com, alex.chen@huawei.com,
+ ann.zhuangyanying@huawei.com, fangying1@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Aug 26, 2020 at 01:10:05PM -0400, Eduardo Habkost wrote:
-> We do have a QCryptoTLSCipherSuites struct.  It must be used when
-> setting instance_size of the QOM type.  Luckily this never caused
-> problems because the QCryptoTLSCipherSuites struct has only a
-> parent_obj field and nothing else.
+* Chuan Zheng (zhengchuan@huawei.com) wrote:
+> Add trace_calls to  make it easier to debug
 > 
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
 > ---
-> Cc: "Daniel P. Berrangé" <berrange@redhat.com>
-> Cc: qemu-devel@nongnu.org
-> ---
->  crypto/tls-cipher-suites.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-
-Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
-
-
-Regards,
-Daniel
+>  migration/dirtyrate.c  | 7 +++++++
+>  migration/trace-events | 8 ++++++++
+>  2 files changed, 15 insertions(+)
+> 
+> diff --git a/migration/dirtyrate.c b/migration/dirtyrate.c
+> index 08c46d3..3513ef3 100644
+> --- a/migration/dirtyrate.c
+> +++ b/migration/dirtyrate.c
+> @@ -23,6 +23,7 @@
+>  #include "qapi/qapi-commands-migration.h"
+>  #include "migration.h"
+>  #include "ram.h"
+> +#include "trace.h"
+>  #include "dirtyrate.h"
+>  
+>  static int CalculatingState = DIRTY_RATE_STATUS_UNSTARTED;
+> @@ -55,6 +56,7 @@ static int64_t get_sample_page_period(int64_t sec)
+>  static int dirtyrate_set_state(int *state, int old_state, int new_state)
+>  {
+>      assert(new_state < DIRTY_RATE_STATUS__MAX);
+> +    trace_dirtyrate_set_state(DirtyRateStatus_str(new_state));
+>      if (atomic_cmpxchg(state, old_state, new_state) == old_state) {
+>          return 0;
+>      } else {
+> @@ -78,6 +80,7 @@ static struct DirtyRateInfo *query_dirty_rate_info(void)
+>       * Only support query once for each calculation,
+>       * reset as DIRTY_RATE_STATUS_UNSTARTED after query
+>       */
+> +    trace_query_dirty_rate_info(DirtyRateStatus_str(CalculatingState));
+>      (void)dirtyrate_set_state(&CalculatingState, CalculatingState,
+>                                DIRTY_RATE_STATUS_UNSTARTED);
+>  
+> @@ -129,6 +132,7 @@ static uint32_t get_ramblock_vfn_hash(struct RamblockDirtyInfo *info,
+>  
+>      crc = crc32(0, iov_array.iov_base, iov_array.iov_len);
+>  
+> +    trace_get_ramblock_vfn_hash(info->idstr, vfn, crc);
+>      return crc;
+>  }
+>  
+> @@ -246,6 +250,7 @@ static int skip_sample_ramblock(RAMBlock *block)
+>       * want to sample.
+>       */
+>      if (ramblock_size < MIN_RAMBLOCK_SIZE) {
+> +        trace_skip_sample_ramblock(block->idstr, ramblock_size);
+>          return -1;
+>      }
+>  
+> @@ -292,6 +297,7 @@ static int calc_page_dirty_rate(struct RamblockDirtyInfo *info)
+>      for (i = 0; i < info->sample_pages_count; i++) {
+>          crc = get_ramblock_vfn_hash(info, info->sample_page_vfn[i]);
+>          if (crc != info->hash_result[i]) {
+> +            trace_calc_page_dirty_rate(info->idstr, crc, info->hash_result[i]);
+>              info->sample_dirty_count++;
+>          }
+>      }
+> @@ -317,6 +323,7 @@ static bool find_page_matched(RAMBlock *block, struct RamblockDirtyInfo *infos,
+>      if (infos[i].ramblock_addr != qemu_ram_get_host_addr(block) ||
+>          infos[i].ramblock_pages !=
+>              (qemu_ram_get_used_length(block) >> DIRTYRATE_PAGE_SHIFT_KB)) {
+> +        trace_find_page_matched(block->idstr);
+>          return false;
+>      }
+>  
+> diff --git a/migration/trace-events b/migration/trace-events
+> index 4ab0a50..34569b9 100644
+> --- a/migration/trace-events
+> +++ b/migration/trace-events
+> @@ -312,3 +312,11 @@ dirty_bitmap_load_bits_zeroes(void) ""
+>  dirty_bitmap_load_header(uint32_t flags) "flags 0x%x"
+>  dirty_bitmap_load_enter(void) ""
+>  dirty_bitmap_load_success(void) ""
+> +
+> +# dirtyrate.c
+> +dirtyrate_set_state(const char *new_state) "new state %s"
+> +query_dirty_rate_info(const char *new_state) "current state %s"
+> +get_ramblock_vfn_hash(const char *idstr, uint64_t vfn, uint32_t crc) "ramblock name: %s, vfn: %"PRIu64 ", crc: %" PRIu32
+> +calc_page_dirty_rate(const char *idstr, uint32_t new_crc, uint32_t old_crc) "ramblock name: %s, new crc: %" PRIu32 ", old crc: %" PRIu32
+> +skip_sample_ramblock(const char *idstr, int64_t ramblock_size) "ramblock name: %s, ramblock size: %" PRIu64
+> +find_page_matched(const char *idstr) "ramblock %s addr or size changed"
+> -- 
+> 1.8.3.1
+> 
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
