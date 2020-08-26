@@ -2,95 +2,98 @@ Return-Path: <SRS0=H0ck=CE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 719CCC433E1
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 15:21:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79B70C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 15:21:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 345292078D
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 15:21:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3F33E2078D
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 15:21:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fFO0ZVxI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 345292078D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VQGDOkhI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F33E2078D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53598 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53650 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAxER-0007fy-EX
-	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 11:20:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59346)
+	id 1kAxEU-0007hN-Ab
+	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 11:21:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59066)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kAxBz-0005Tp-So
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 11:18:27 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:46324
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kAxBx-0004fm-TC
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 11:18:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598455105;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=cgMfiR/KhzIg7M/zoUnFvwyXE3ODRvfXkaBiJ3uzGag=;
- b=fFO0ZVxImGw+oSglRihD/HFAMFcyGrtHU/oEP4/Bma8x62QPPa37k/sr/b1fHysZMcCK1+
- 2a2dtGghxmxYYfBl6YEV3WA7b7JeizAQwxYrx+ZtrAql7vZcGe57LYmj+ww0obeBN4/OSc
- QL2VjCKUz4JHxCDXaKdTZl47xpkJAT0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-516-W6dBb9iYP5anD5FlPR5lHw-1; Wed, 26 Aug 2020 11:18:23 -0400
-X-MC-Unique: W6dBb9iYP5anD5FlPR5lHw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6A1BD801AE8;
- Wed, 26 Aug 2020 15:18:20 +0000 (UTC)
-Received: from localhost (unknown [10.10.67.254])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 875D760C0F;
- Wed, 26 Aug 2020 15:18:17 +0000 (UTC)
-Date: Wed, 26 Aug 2020 11:18:16 -0400
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Subject: Re: [PATCH v5 0/8] Remove EPYC mode apicid decode and use generic
- decode
-Message-ID: <20200826151816.GC642093@habkost.net>
-References: <159804762216.39954.15502128500494116468.stgit@naples-babu.amd.com>
- <20200826143849.59f6970b@redhat.com>
- <20200826125059.GN168515@redhat.com>
- <20200826153034.115126cb@redhat.com>
- <20200826133638.GO168515@redhat.com>
- <20200826160258.0e9047f4@redhat.com>
- <20200826150340.GP168515@redhat.com>
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kAxB3-0004U4-De
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 11:17:29 -0400
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:35595)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kAxB1-0004b1-JU
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 11:17:29 -0400
+Received: by mail-pf1-x444.google.com with SMTP id k1so1154055pfu.2
+ for <qemu-devel@nongnu.org>; Wed, 26 Aug 2020 08:17:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=KhxCPcFjyEBQpjfyeIcNjqcX9Xj3CtjhkjDuLlufOxo=;
+ b=VQGDOkhIUTols85bqOeJMeUuecBmgucp1YFZIvZWRF3mR2+PNIe6rfRp22XCq2gk8T
+ qMQR3izYwQuh/4F9ndRpzrnC9p1LCHG1CzgMqPJkXqtzIi/0BTgv4Viqgsuft4D8Rhha
+ YQr354tKmLSSvDal0+IITFI0UMEzDjCfEZ49Rc2Cenv2tv3BemKpyaZlBmbz0Il8rpxT
+ Lrw6OxIzcds+UXuAQjIvtygHtWNuNvjOr5pNtkh7PnDV/DQQO1XPlkbzcU7XE9NVB4sh
+ jc8NHD5j7S6Tu4xV3ojCa0TdaviVLI96B3+ahARjYlt9cA6uV03X3qjcLkqgxGAaJzsO
+ BkMg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=KhxCPcFjyEBQpjfyeIcNjqcX9Xj3CtjhkjDuLlufOxo=;
+ b=dYzzwuVM+iVcQzxyyU3ztnsiA79fF0P+U1drI7P7PNq74f3hMyf4JIsyBnmpnjKWLu
+ xQYOkSqboxvhlBVDukUkjNruFS2nLLdw/rWmluCwB1QIAfFPfLcUHkMyP4FYJxdk//kl
+ 0Q2t3dg0n8/g5KnAgcxbvnQlW855uWOdnTAwgw7fOJS8RMpHFcdhTnWywchlg+9miq7j
+ y3jWBX9EIi70lqtgacpRxVSe6mRdcFUO7Mero//lvV3tjjJeS0KkdLi/VKyAdqlHJJvx
+ 9yQ9Emb/eN8v29DBhiyNV6Klr6KGUyuFTx1avYcWbqzhswCQTV6mw6aOY13G2UizdCbm
+ RFYQ==
+X-Gm-Message-State: AOAM531PlfEiFQrGFU9lyPdQyq9Do9CS5RXnCdspo4xX/Sf6gN5QSDn+
+ cJoLbdJOcKtmKOnQXH0tEXaqFA==
+X-Google-Smtp-Source: ABdhPJxiyE33GKFrNngrOTPcp3NVOJvPM1nNa07Fq9QxBx/XCsb+Z5g1cZs9g6maX8WowViTAWYdxA==
+X-Received: by 2002:a63:d504:: with SMTP id c4mr9771168pgg.138.1598455046107; 
+ Wed, 26 Aug 2020 08:17:26 -0700 (PDT)
+Received: from [192.168.81.79]
+ (h216-228-167-147.bendor.dedicated.static.tds.net. [216.228.167.147])
+ by smtp.gmail.com with ESMTPSA id g5sm2479060pjx.53.2020.08.26.08.17.25
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 26 Aug 2020 08:17:25 -0700 (PDT)
+Subject: Re: [RFC PATCH v3 17/34] Hexagon (target/hexagon/imported) arch
+ import - macro definitions
+To: Taylor Simpson <tsimpson@quicinc.com>, qemu-devel@nongnu.org
+References: <1597765847-16637-1-git-send-email-tsimpson@quicinc.com>
+ <1597765847-16637-18-git-send-email-tsimpson@quicinc.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <283ca509-1ab9-71db-2aa9-6ed19f22c18b@linaro.org>
+Date: Wed, 26 Aug 2020 08:17:23 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200826150340.GP168515@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=ehabkost@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/26 06:53:09
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.959,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <1597765847-16637-18-git-send-email-tsimpson@quicinc.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::444;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x444.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -42
+X-Spam_score: -4.3
+X-Spam_bar: ----
+X-Spam_report: (-4.3 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-2.239,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,85 +106,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mst@redhat.com, Michal Privoznik <mprivozn@redhat.com>,
- qemu-devel@nongnu.org, Babu Moger <babu.moger@amd.com>, pbonzini@redhat.com,
- Igor Mammedov <imammedo@redhat.com>, rth@twiddle.net
+Cc: ale@rev.ng, riku.voipio@iki.fi, philmd@redhat.com, laurent@vivier.eu,
+ aleksandar.m.mail@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Aug 26, 2020 at 04:03:40PM +0100, Daniel P. Berrangé wrote:
-> On Wed, Aug 26, 2020 at 04:02:58PM +0200, Igor Mammedov wrote:
-> > On Wed, 26 Aug 2020 14:36:38 +0100
-> > Daniel P. Berrangé <berrange@redhat.com> wrote:
-> > 
-> > > On Wed, Aug 26, 2020 at 03:30:34PM +0200, Igor Mammedov wrote:
-> > > > On Wed, 26 Aug 2020 13:50:59 +0100
-> > > > Daniel P. Berrangé <berrange@redhat.com> wrote:
-> > > >   
-> > > > > On Wed, Aug 26, 2020 at 02:38:49PM +0200, Igor Mammedov wrote:  
-> > > > > > On Fri, 21 Aug 2020 17:12:19 -0500
-> > > > > > Babu Moger <babu.moger@amd.com> wrote:
-> > > > > >     
-> > > > > > > To support some of the complex topology, we introduced EPYC mode apicid decode.
-> > > > > > > But, EPYC mode decode is running into problems. Also it can become quite a
-> > > > > > > maintenance problem in the future. So, it was decided to remove that code and
-> > > > > > > use the generic decode which works for majority of the topology. Most of the
-> > > > > > > SPECed configuration would work just fine. With some non-SPECed user inputs,
-> > > > > > > it will create some sub-optimal configuration.
-> > > > > > > Here is the discussion thread.
-> > > > > > > https://lore.kernel.org/qemu-devel/c0bcc1a6-1d84-a6e7-e468-d5b437c1b254@amd.com/
-> > > > > > > 
-> > > > > > > This series removes all the EPYC mode specific apicid changes and use the generic
-> > > > > > > apicid decode.    
-> > > > > > 
-> > > > > > the main difference between EPYC and all other CPUs is that
-> > > > > > it requires numa configuration (it's not optional)
-> > > > > > so we need an extra patch on top of this series to enfoce that, i.e:
-> > > > > > 
-> > > > > >  if (epyc && !numa) 
-> > > > > >     error("EPYC cpu requires numa to be configured")    
-> > > > > 
-> > > > > Please no. This will break 90% of current usage of the EPYC CPU in
-> > > > > real world QEMU deployments. That is way too user hostile to introduce
-> > > > > as a requirement.
-> > > > > 
-> > > > > Why do we need to force this ?  People have been successfuly using
-> > > > > EPYC CPUs without NUMA in QEMU for years now.
-> > > > > 
-> > > > > It might not match behaviour of bare metal silicon, but that hasn't
-> > > > > obviously caused the world to come crashing down.  
-> > > > So far it produces warning in linux kernel (RHBZ1728166),
-> > > > (resulting performance might be suboptimal), but I haven't seen
-> > > > anyone reporting crashes yet.
-> > > > 
-> > > > 
-> > > > What other options do we have?
-> > > > Perhaps we can turn on strict check for new machine types only,
-> > > > so old configs can keep broken topology (CPUID),
-> > > > while new ones would require -numa and produce correct topology.  
-> > > 
-> > > No, tieing this to machine types is not viable either. That is still
-> > > going to break essentially every single management application that
-> > > exists today using QEMU.
-> > for that we have deprecation process, so users could switch to new CLI
-> > that would be required.
+On 8/18/20 8:50 AM, Taylor Simpson wrote:
+> The macro definitions specify instruction attributes that are applied
+> to each instruction that references the macro. The generator will
+> recursively apply attributes to each instruction that used the macro.
 > 
-> We could, but I don't find the cost/benefit tradeoff is compelling.
-> 
-> There are so many places where we diverge from what bare metal would
-> do, that I don't see a good reason to introduce this breakage, even
-> if we notify users via a deprecation message. 
-> 
-> If QEMU wants to require NUMA for EPYC, then QEMU could internally
-> create a single NUMA node if none was specified for new machine
-> types, such that there is no visible change or breakage to any
-> mgmt apps.  
+> Signed-off-by: Taylor Simpson <tsimpson@quicinc.com>
+> ---
+>  target/hexagon/imported/macros.def | 1529 ++++++++++++++++++++++++++++++++++++
+>  1 file changed, 1529 insertions(+)
+>  create mode 100755 target/hexagon/imported/macros.def
 
-Is anything expected to break if we just set
-auto_enable_numa=true unconditionally on pc-*-5.2 and newer?
 
--- 
-Eduardo
+You might as well squash all of the patches dealing with imported files,
+because they're beyond review.  They are what they are: another project's files.
+
+Give that squashed patch my
+
+Acked-by: Richard Henderson <richard.henderson@linaro.org>
+
+
+r~
+
+
+PS: I notice that the README mentions archlib, but does not give a pointer to it.
 
 
