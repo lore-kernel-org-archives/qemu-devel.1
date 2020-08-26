@@ -2,100 +2,128 @@ Return-Path: <SRS0=H0ck=CE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3D44C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 09:09:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C16DDC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 09:16:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 605DE206FA
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 09:09:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 70041206FA
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 09:16:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JC4yuX66"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 605DE206FA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="tsNHwAyH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70041206FA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34482 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38174 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kArQr-0000Av-DM
-	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 05:09:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46954)
+	id 1kArXl-00028s-IW
+	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 05:16:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48622)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kArQ9-0008B8-OZ
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 05:08:41 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:57496
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kArQ7-0004fF-5V
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 05:08:40 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598432917;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=qxl9vlCwiiTOgAfPIuFWwCHrZ9zaueF8xCwIbAevxJc=;
- b=JC4yuX66uDZ4Dvycej9mIODzRQ2p1kUVWBHEEcypSNJKJH6zi+bccI/HM08IRmxSkLJwRW
- Spt1m+jjepm940+XOqRX8hKxyDv3cIqkoNttOe42Oa10eKcPwpFKBceZxJrmUzJ5L5WCX3
- qtdW2p6bDokoLQcvJ1vJE+ujoDEB+g8=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-415-ROSypqrpMBSgGLC2dJMqyA-1; Wed, 26 Aug 2020 05:08:33 -0400
-X-MC-Unique: ROSypqrpMBSgGLC2dJMqyA-1
-Received: by mail-ej1-f69.google.com with SMTP id fy10so666353ejb.9
- for <qemu-devel@nongnu.org>; Wed, 26 Aug 2020 02:08:33 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=qxl9vlCwiiTOgAfPIuFWwCHrZ9zaueF8xCwIbAevxJc=;
- b=AuFlfJsEPpLfw6Fig3Mss1s4+UUOx40n/jc+P/oxtE6VMN96gVSvt5XMKlo814lDfc
- eKJnVXTyEAJcsJOrzS4txPWCSvZmd5ykKOyyWhyTLqgjT7Vqrr77PuDKinZJUeXRgm8W
- TWQzW4uw7ae+WPa7LQAayV06Nf5Wysr0mGk+F8GGU+D+BlmiASd8pjMnAug3clEzlkKM
- eI13aBC2+64Z7fz+d49A4TLrPb2mfDU14k1AzTTCwoOfIaawKqp+pmx5mNF5PEs4xtuE
- eq8pq/jPD95ZVKXaqnxAwx8xh3llWEIidsQa1k78drhgl/e6O3MTCu/dwKp5fYMx2XR3
- Po5w==
-X-Gm-Message-State: AOAM530bW2O9UiuymSDI5cLBjj/tqgd8YVpavla4Tf0rcqC+k0HfzsgP
- T92gUpkxERVT6kxWsiGfavqyYv+ePQV7poLDN9Xhn6gSb1WhXrJRKbpYaJPHZfPyEC7NpzCO7WW
- xbMPPRvfHEUaZBct98/rUHDFRh8dlOwQ=
-X-Received: by 2002:a17:906:130a:: with SMTP id
- w10mr46576ejb.106.1598432912519; 
- Wed, 26 Aug 2020 02:08:32 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxzW9yakzvdwK6CVDJtE6n7tRdtzgK67p8vtnsnouVoPVh+NzoJPhJ4SK/qGa3rgHuxuVcZbza6CbdlyrNVaNw=
-X-Received: by 2002:a17:906:130a:: with SMTP id
- w10mr46564ejb.106.1598432912320; 
- Wed, 26 Aug 2020 02:08:32 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1kArXC-0001fj-8n; Wed, 26 Aug 2020 05:15:58 -0400
+Received: from mail-eopbgr10122.outbound.protection.outlook.com
+ ([40.107.1.122]:54423 helo=EUR02-HE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1kArX8-0005jx-9n; Wed, 26 Aug 2020 05:15:57 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=CBo5YXcW7OMgICIeUTZF7lLf3ZuXCYbMOj3CVKMCNmURj/DRm+pIUKlG3BtuM0vRshEgG3m8YqcaliAva1glCIODvMVNm1BIDekEf9eIx3wlIVTIH6sThJ3GOXIBwHv5ZXwqcUT0ED87xQhfO8aDwBn3tzPYTX0wGG+DiyJx9xPMQOoF5+WRTiZf9ycifY1onh5Jnr7U8MMjUwi1ZfplGlKLtI5rhxh1kAQ29imNNmnQxhggWY7WVo7351CU01hEsvGZKZ3rublvsC6DzVEbrmuWhOcSdAkN3xvrZO641u4mejCu+2ObJz5sW9frjqbhTY1CtjrgTA3BwV2sdISVMQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=mvO/AhEv8fwWyME883uw96cKuBBq/fwQ9huGRxkHbs4=;
+ b=KL1YBS3dHsGJ1pT+q01DefOYmVkAxv/Ie6VOwaOO/FaQL3pCRgw2Ck1x/TvFMyc68O3G4YBBTS+KvtX9d9g3MFLIewJ6Or4M4cwTB3nLu5F8sgJftyqi0ReyQ/ax7Ek+rFcaB8IO7upE+w8FRAppaRQ0zLfT5gLg5lbErPmraRaoBx24R72CPTCI2lAZo5MrfvW12RGmWRpOejap1M0N5RjeM48/FgfVRCU5m/Ps25yYo+G54Fhjuxk+AHGPH4Br49RhkDjHkLiqwkQgXn+AaVsZMr4/sy2nre/AfbRcNqzOKb85j5LeAofDLU6cdcDl/9Ni95ltC7x3FK8C8/MUfw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=mvO/AhEv8fwWyME883uw96cKuBBq/fwQ9huGRxkHbs4=;
+ b=tsNHwAyHDdE7/2tY2ryteDGshsnl12lV8lCxm7BqcAUMPVI7imUVmcH3vso3j5m262aYvxImdO9cp6fjtH/4je1cl5YE8JPSeRahdD/NDXSlrsCoG2nrQDLZT3LLWbYZbYVBcIwvYh7OdAAQfZtnryttzs2cC03utKcl6Lxa6uc=
+Authentication-Results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM6PR08MB3767.eurprd08.prod.outlook.com (2603:10a6:20b:84::28)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3305.25; Wed, 26 Aug
+ 2020 09:15:48 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::b179:9641:7589:d692]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::b179:9641:7589:d692%9]) with mapi id 15.20.3305.032; Wed, 26 Aug 2020
+ 09:15:48 +0000
+Subject: Re: [PATCH v5 07/10] block: introduce preallocate filter
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+References: <20200821141123.28538-1-vsementsov@virtuozzo.com>
+ <20200821141123.28538-8-vsementsov@virtuozzo.com>
+ <9d22c3be-df5f-0bd1-0634-6217889670ec@redhat.com>
+ <9195846d-13ab-67d6-dae0-f29056577be1@virtuozzo.com>
+ <3d155eaf-7365-70a7-f4fe-1abe88383087@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <09281829-fbe3-7007-ca03-b57b6581c3bc@virtuozzo.com>
+Date: Wed, 26 Aug 2020 12:15:47 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
+In-Reply-To: <3d155eaf-7365-70a7-f4fe-1abe88383087@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: AM4PR0501CA0065.eurprd05.prod.outlook.com
+ (2603:10a6:200:68::33) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
 MIME-Version: 1.0
-References: <40710b94-094f-f91a-6ddb-94e51199a8c3@vivier.eu>
- <20200826084442.GH168515@redhat.com>
- <cabd3284-bca8-07ff-e0bc-22ba41df7298@vivier.eu>
-In-Reply-To: <cabd3284-bca8-07ff-e0bc-22ba41df7298@vivier.eu>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 26 Aug 2020 11:08:20 +0200
-Message-ID: <CABgObfbHtkmp0C5nN+kyAr2a80eRO3LRYa9=MwVqME0O6XMHWQ@mail.gmail.com>
-Subject: Re: linux-user static build broken
-To: Laurent Vivier <laurent@vivier.eu>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/alternative; boundary="000000000000efc70805adc4293a"
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/26 03:56:58
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.958,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.5] (185.215.60.171) by
+ AM4PR0501CA0065.eurprd05.prod.outlook.com (2603:10a6:200:68::33) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3326.19 via Frontend
+ Transport; Wed, 26 Aug 2020 09:15:48 +0000
+X-Originating-IP: [185.215.60.171]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 19f71e1a-1e74-4c52-d9fc-08d849a09f20
+X-MS-TrafficTypeDiagnostic: AM6PR08MB3767:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM6PR08MB376743E332C37119E59AD278C1540@AM6PR08MB3767.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:3173;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 29LRkIDY353iNrfyJKmCFRSkCVhhn87aVYdSMkcO8SQ2n82TFM2bWMw8AlZ/FcYmwIk1ud7ocqIsPulwvW3WRa6SCFGuMH6QZFIqT+t5Vb/9VksKRI/qkzhxH//AVrICD6C9RXpQBV9zNGdxtZZutApaX3KKss6XnAQ+KafQF68Te7DInmELz8G+ZaBgCCc2Xa5JpPlD2jjxgKOO7Z4nyA2Pohm4J1PUVBan620DDV1SUbcFsgv0oF4k1fpvGXx8e0f6u8ZEn+82GhTQTdFstuVvtfdPF5qPVrmmzJfsHci9RU7FSO+MQr2Wts5zSPd3V9zo9mwhUyymDJJ4tq+C0sK9zl3MGxEqJCuebGsHnwp5kJF5cimXg4eOeTtGkV6Zbg9/eX4acBRGn2fxfnLkAQC58xqbyGSkeCvlpjBtunb9cM93F0FynZCv43yP3lkkQVUK1Al3MyblzkPJv6Be2xuBJ9EL/E4mXQSYL5bfxfg=
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(4636009)(346002)(376002)(366004)(39840400004)(396003)(136003)(8936002)(478600001)(53546011)(8676002)(86362001)(52116002)(36756003)(26005)(186003)(16526019)(31686004)(83380400001)(956004)(2616005)(2906002)(4326008)(16576012)(6486002)(66556008)(66476007)(66946007)(31696002)(5660300002)(316002)(2004002)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: uizP2MDZ7pu3mRK1458iQpYWPn+/kAUjmJq/tdE1l5lLteqk3nr24Vw2GZ/duIgCu0QrELHgfCJ3XQOcubZucJpz3PUj1RSA5//eJgyAOHpyljGvPEzptyJ8jVdzn+6Z3Qh7CEwra0QxlXXKg3yDnY/tZ3iFIagvkRrfpW/McBRGzkMqqD0CTQrDHXPCX+5GZhQE6LpVDUF7+2+TLFJS+z3o3SPEG3vQ8AnFIvbhjdlZxegSU8SdQ4334wYFzvfnrAQhf8hypBHy84ZmlbOfAE2mV8exTVY+3pCDQdiM+eYe1r1y/ZTvojrVhDBtFbvnAt5keIAud6g4mPpbvoXRp6YLS7/Q3TkXJHv2xCfLHiTh7J49fRckr9a50nY9Kq/dNAQbcH+3ScLPIxu9py2p8xvPoaBuE4GpStwoF9MBWacxGujxwo3COwCgNt1RdArVgYuhP9pDgssqTipyORU4kEScTLimpkeTt0hqkoWrPk6OUn5O0mB2TSyE8kq+NJh8tLTZ2qGA299GYhMkW6a17/F5wcOHM/g5vPATlR+ZJdDmc8PfcUDKMek8WP8p7AXQ4MRl8RmnZ2THjVrlf1wtg64H44MB2oaUFvTTwZuBRFVHbm66WIp52TN0vtADa2cju4uz/hZETW9xB/j7E8P73Q==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 19f71e1a-1e74-4c52-d9fc-08d849a09f20
+X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Aug 2020 09:15:48.8391 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: tryu7zHD7eOkDPkoAOBVObsfEhIesRGMkYa0Vdb6GMXlfhmhXlinsFjwUDrsT7Zgolz9KrZAtOfpH7qgkGNzlbRTow5xQ55Cw6Bv3NXnJ68=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3767
+Received-SPF: pass client-ip=40.107.1.122;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR02-HE1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/26 05:15:50
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -53
+X-Spam_score: -5.4
+X-Spam_bar: -----
+X-Spam_report: (-5.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, NICE_REPLY_A=-2.602, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -108,135 +136,223 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: fam@euphon.net, kwolf@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com,
+ nsoffer@redhat.com, stefanha@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000efc70805adc4293a
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+26.08.2020 11:52, Max Reitz wrote:
+> On 26.08.20 08:49, Vladimir Sementsov-Ogievskiy wrote:
+>> 25.08.2020 18:11, Max Reitz wrote:
+>>> On 21.08.20 16:11, Vladimir Sementsov-Ogievskiy wrote:
+>>>> It's intended to be inserted between format and protocol nodes to
+>>>> preallocate additional space (expanding protocol file) on writes
+>>>> crossing EOF. It improves performance for file-systems with slow
+>>>> allocation.
+>>>>
+>>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>>>> ---
+>>>>    docs/system/qemu-block-drivers.rst.inc |  26 +++
+>>>>    qapi/block-core.json                   |  20 +-
+>>>>    block/preallocate.c                    | 291 +++++++++++++++++++++++++
+>>>>    block/Makefile.objs                    |   1 +
+>>>>    4 files changed, 337 insertions(+), 1 deletion(-)
+>>>>    create mode 100644 block/preallocate.c
+> 
+> [...]
+> 
+>>>> diff --git a/block/preallocate.c b/block/preallocate.c
+>>>> new file mode 100644
+>>>> index 0000000000..bdf54dbd2f
+>>>> --- /dev/null
+>>>> +++ b/block/preallocate.c
+>>>> @@ -0,0 +1,291 @@
+>>>> +/*
+>>>> + * preallocate filter driver
+>>>> + *
+>>>> + * The driver performs preallocate operation: it is injected above
+>>>> + * some node, and before each write over EOF it does additional
+>>>> preallocating
+>>>> + * write-zeroes request.
+>>>> + *
+>>>> + * Copyright (c) 2020 Virtuozzo International GmbH.
+>>>> + *
+>>>> + * Author:
+>>>> + *  Sementsov-Ogievskiy Vladimir <vsementsov@virtuozzo.com>
+>>>> + *
+>>>> + * This program is free software; you can redistribute it and/or modify
+>>>> + * it under the terms of the GNU General Public License as published by
+>>>> + * the Free Software Foundation; either version 2 of the License, or
+>>>> + * (at your option) any later version.
+>>>> + *
+>>>> + * This program is distributed in the hope that it will be useful,
+>>>> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+>>>> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+>>>> + * GNU General Public License for more details.
+>>>> + *
+>>>> + * You should have received a copy of the GNU General Public License
+>>>> + * along with this program. If not, see <http://www.gnu.org/licenses/>.
+>>>> + */
+>>>> +
+>>>> +#include "qemu/osdep.h"
+>>>> +
+>>>> +#include "qapi/error.h"
+>>>> +#include "qemu/module.h"
+>>>> +#include "qemu/option.h"
+>>>> +#include "qemu/units.h"
+>>>> +#include "block/block_int.h"
+>>>> +
+>>>> +
+>>>> +typedef struct BDRVPreallocateState {
+>>>> +    int64_t prealloc_size;
+>>>> +    int64_t prealloc_align;
+>>>> +
+>>>> +    /*
+>>>> +     * Filter is started as not-active, so it doesn't do any
+>>>> preallocations nor
+>>>> +     * requires BLK_PERM_RESIZE on its child. This is needed to
+>>>> create filter
+>>>> +     * above another node-child and then do bdrv_replace_node to
+>>>> insert the
+>>>> +     * filter.
+>>>
+>>> A bit weird, but seems fair.  It’s basically just a cache for whether
+>>> this node has a writer on it or not.
+>>>
+>>> Apart from the weirdness, I don’t understand the “another node-child”.
+>>> Say you have “format” -> “proto”, and then you want to insert
+>>> “prealloc”.  Wouldn’t you blockdev-add prealloc,file=proto and then
+>>> blockdev-replace format.file=prealloc?
+>>
+>> Yes something like this. Actually, I'm about inserting the filter
+>> automatically from block layer code, but your reasoning is about same
+>> thing and is better.
+>>
+>>> So what is that “other node-child”?
+>>
+>> Hmm, just my misleading wording. At least '-' in wrong place. Just
+>> "other node child", or "child of another node"..
+> 
+> OK.
+> 
+>>>> +     *
+>>>> +     * Filter becomes active the first time it detects that its
+>>>> parents have
+>>>> +     * BLK_PERM_RESIZE on it.
+>>>> +     * Filter becomes active forever: it doesn't lose active status
+>>>> if parents
+>>>> +     * lose BLK_PERM_RESIZE, otherwise we'll not be able to shrink
+>>>> the file on
+>>>> +     * filter close.
+>>>
+>>> Oh, the file is shrunk?  That wasn’t clear from the documentation.
+>>>
+>>> Hm.  Seems like useful behavior.  I just wonder if keeping the
+>>> permission around indefinitely makes sense.  Why not just truncate it
+>>> when the permission is revoked?
+>>
+>> How? Parent is closed earlier, so on close we will not have the
+>> permission. So, we force-keep the permission up to our close().
+> 
+> I thought that preallocate_child_perm() would be invoked when the parent
+> is detached, so we could do the truncate there, before relinquishing
+> preallocate’s RESIZE permission.
+> 
 
-$ORIGIN is a special literal used by ld.so. It's probably fixed by the same
-patch that was posted for msys.
+Hmm, I can check it. I just a bit afraid of doing something serious like truncation in .bdrv_child_perm() handler, which doesn't seem to imply such usage.
 
-Paolo
+> 
+>>>> +static void preallocate_close(BlockDriverState *bs)
+>>>> +{
+>>>> +    BDRVPreallocateState *s = bs->opaque;
+>>>> +
+>>>> +    if (s->active && s->data_end >= 0 &&
+>>>> +        bdrv_getlength(bs->file->bs) > s->data_end)
+>>>> +    {
+>>>> +        bdrv_truncate(bs->file, s->data_end, true,
+>>>> PREALLOC_MODE_OFF, 0, NULL);
+>>>
+>>> Now that I think more about it...  What if there are other writers on
+>>> bs->file?  This may throw data away.
+>>
+>> Good point. Actually, if bs->file has other writing parents, the logic
+>> of the filter
+>> around "data_end" is broken. So we must unshare WRITE and RESIZE
+>> permissions.
+> 
+> That’s certainly a heavy hammer, but it’d work.
+> 
+>>>   Maybe BDS.wr_highest_offset can
+>>> help to make a better call?
+>>
+>> Anyway, we'll have to use wr_highest_offset of the filter not the child
+>> node
+>> (in the child wr_highest_offset will track preallocations as well),
+> 
+> That’s true.
+> 
+>> so we want to unshare WRITE/RESIZE permissions.
+> 
+> [...]
+> 
+>>>> +static int coroutine_fn
+>>>> +preallocate_co_truncate(BlockDriverState *bs, int64_t offset,
+>>>> +                        bool exact, PreallocMode prealloc,
+>>>> +                        BdrvRequestFlags flags, Error **errp)
+>>>> +{
+>>>> +    BDRVPreallocateState *s = bs->opaque;
+>>>> +    int ret = bdrv_co_truncate(bs->file, offset, exact, prealloc,
+>>>> flags, errp);
+>>>> +
+>>>> +    /* s->data_end may become negative here, which means unknown
+>>>> data end */
+>>>> +    s->data_end = bdrv_getlength(bs->file->bs);
+>>>
+>>> What would be the problem with just setting data_end = offset?  We only
+>>> use data_end to truncate down on close, so basically repeat the
+>>> bdrv_co_truncate() call here, which seems correct.
+>>
+>> We can use offset only if ret >= 0 && exact is true..
+> 
+> Well, on close, we ignore any errors from truncate() anyway.  So even if
+> we used exact=false here, it shouldn’t matter.
 
-Il mer 26 ago 2020, 10:51 Laurent Vivier <laurent@vivier.eu> ha scritto:
+Here we handle truncate from user. If I understand "exact" correctly the following is possible:
 
-> Le 26/08/2020 =C3=A0 10:44, Daniel P. Berrang=C3=A9 a =C3=A9crit :
-> > On Tue, Aug 25, 2020 at 10:36:13PM +0200, Laurent Vivier wrote:
-> >> Hi,
-> >>
-> >> since we have switched to meson, the statically linked binaries of qem=
-u
-> >> linux-user are broken:
-> >>
-> >> cd $OBJ
-> >> $SRC/configure --static --target-list=3Dm68k-linux-user
-> >> make
-> >> ./qemu-m68k
-> >> Segmentation fault (core dumped)
-> >>
-> >> Program received signal SIGSEGV, Segmentation fault.
-> >> 0x00007ffff7bd6833 in __dcigettext ()
-> >> (gdb) bt
-> >> #0  0x00007ffff7bd6833 in __dcigettext ()
-> >> #1  0x00007ffff7bd5352 in __assert_fail ()
-> >> #2  0x00007ffff7c4d74c in _dl_relocate_static_pie ()
-> >> #3  0x00007ffff7bc713e in __libc_start_main ()
-> >> #4  0x00007ffff7a0029e in _start ()
-> >>
-> >> If I build with --disable-pie it works again.
-> >>
-> >> Any idea?
-> >
-> > I'd suggest checking the compiler args used with v5.1.0 vs git master
-> > and see if any flags related to PIE or similar changed. I already found
-> > one bug wrt PIE on Windows builds this way.
-> >
-> > Regards,
-> > Daniel
-> >
->
-> It's what I'm doing.
->
-> There are both "--static-pie" and "--pie" on the new command line, but
-> keeping only the first doesn't fix the problem.
->
-> There is also a strange '-Wl,-rpath,RIGIN/' that would mean "make" is
-> not using $(ORIGIN) but $ORIGIN...
->
-> Thanks,
-> Laurent
->
->
+1. parent does truncate 1M -> 2M, exact=false
+2. driver decides to truncate to 5M (exact condition is sutisfied)
+3. but we remember s->data_end = 2M, and on close will shrink to 2M
 
---000000000000efc70805adc4293a
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Doesn't seem a real problem.. So, we just consider the preallocation done by driver as our preallocation to be dropped on close().
 
-<div dir=3D"auto">$ORIGIN is a special literal used by ld.so. It&#39;s prob=
-ably fixed by the same patch that was posted for msys.<div dir=3D"auto"><br=
-></div><div dir=3D"auto">Paolo</div></div><br><div class=3D"gmail_quote"><d=
-iv dir=3D"ltr" class=3D"gmail_attr">Il mer 26 ago 2020, 10:51 Laurent Vivie=
-r &lt;<a href=3D"mailto:laurent@vivier.eu">laurent@vivier.eu</a>&gt; ha scr=
-itto:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex=
-;border-left:1px #ccc solid;padding-left:1ex">Le 26/08/2020 =C3=A0 10:44, D=
-aniel P. Berrang=C3=A9 a =C3=A9crit=C2=A0:<br>
-&gt; On Tue, Aug 25, 2020 at 10:36:13PM +0200, Laurent Vivier wrote:<br>
-&gt;&gt; Hi,<br>
-&gt;&gt;<br>
-&gt;&gt; since we have switched to meson, the statically linked binaries of=
- qemu<br>
-&gt;&gt; linux-user are broken:<br>
-&gt;&gt;<br>
-&gt;&gt; cd $OBJ<br>
-&gt;&gt; $SRC/configure --static --target-list=3Dm68k-linux-user<br>
-&gt;&gt; make<br>
-&gt;&gt; ./qemu-m68k<br>
-&gt;&gt; Segmentation fault (core dumped)<br>
-&gt;&gt;<br>
-&gt;&gt; Program received signal SIGSEGV, Segmentation fault.<br>
-&gt;&gt; 0x00007ffff7bd6833 in __dcigettext ()<br>
-&gt;&gt; (gdb) bt<br>
-&gt;&gt; #0=C2=A0 0x00007ffff7bd6833 in __dcigettext ()<br>
-&gt;&gt; #1=C2=A0 0x00007ffff7bd5352 in __assert_fail ()<br>
-&gt;&gt; #2=C2=A0 0x00007ffff7c4d74c in _dl_relocate_static_pie ()<br>
-&gt;&gt; #3=C2=A0 0x00007ffff7bc713e in __libc_start_main ()<br>
-&gt;&gt; #4=C2=A0 0x00007ffff7a0029e in _start ()<br>
-&gt;&gt;<br>
-&gt;&gt; If I build with --disable-pie it works again.<br>
-&gt;&gt;<br>
-&gt;&gt; Any idea?<br>
-&gt; <br>
-&gt; I&#39;d suggest checking the compiler args used with v5.1.0 vs git mas=
-ter<br>
-&gt; and see if any flags related to PIE or similar changed. I already foun=
-d<br>
-&gt; one bug wrt PIE on Windows builds this way.<br>
-&gt; <br>
-&gt; Regards,<br>
-&gt; Daniel<br>
-&gt; <br>
-<br>
-It&#39;s what I&#39;m doing.<br>
-<br>
-There are both &quot;--static-pie&quot; and &quot;--pie&quot; on the new co=
-mmand line, but<br>
-keeping only the first doesn&#39;t fix the problem.<br>
-<br>
-There is also a strange &#39;-Wl,-rpath,RIGIN/&#39; that would mean &quot;m=
-ake&quot; is<br>
-not using $(ORIGIN) but $ORIGIN...<br>
-<br>
-Thanks,<br>
-Laurent<br>
-<br>
-</blockquote></div>
+Could there be problems on user shrink?
 
---000000000000efc70805adc4293a--
+1. parent does truncate 2M -> 1M, exact=false
+2. driver decides to do notihng (why not)
+3. on close() we'll shrink to 1M..
 
+Again, seems no real problems.
+
+But in case when bdrv_co_truncate failed, we should call bdrv_getlength anyway, as we don't know the result of failed truncation. Or we can just set s->data_end = -1, and not care too much about fail-scenarios.
+
+So, probably we can do
+s->data_end = ret < 0 : ret : offset;
+
+But I just feel safer with additional bdrv_getlength().
+
+> 
+>> But simpler is
+>> just call
+>> bdrv_getlength() anyway.
+> 
+> Certainly simpler than thinking about potential edge cases, true.
+> 
+> Max
+> 
+
+
+-- 
+Best regards,
+Vladimir
 
