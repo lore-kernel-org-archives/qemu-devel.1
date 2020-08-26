@@ -2,81 +2,83 @@ Return-Path: <SRS0=H0ck=CE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C71BC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 05:05:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E68B1C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 05:11:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0051F2076C
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 05:05:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AD4B5206FA
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 05:11:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QRrxImU/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0051F2076C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fPrjJo7x"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD4B5206FA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48230 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53236 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAndE-0001oE-3P
-	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 01:05:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49860)
+	id 1kAniT-00045V-Tn
+	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 01:11:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50940)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kAnce-0001Hm-Qe
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 01:05:20 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:24188
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kAnhw-0003fv-Gf
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 01:10:48 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:26956
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kAncc-0007y6-0t
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 01:05:19 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kAnhu-0000VG-9U
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 01:10:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598418316;
+ s=mimecast20190719; t=1598418645;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=iU69F1TtzUKygTBozYbgCXh2SE8FidbtXWBriLumDnY=;
- b=QRrxImU/dEDsjG68dn0D8UQvUbtVu8moJs0nYH3IKGqzc2TkjW21bkDZ1uGX7UtnaggYp9
- CKMWdN6BsMkbxe5ZvvjrPTWZbHZjWFVEicJ4MUxyoIKzqGrjy5/n8b4bxi96Azg6DzDGQC
- xBXLrhxGZkk6SRXhoaMYo1VG8YZ99+c=
+ bh=meb/mBcE+sfVkCvoQYTXflHyDQ1I11dvEkapvvwluuA=;
+ b=fPrjJo7xrVfJqbuDFvcF8H15v/TM/PR9/qS9jDfJDjrsGf9TUI7gVzOWkqBXavZWdccqBy
+ OEx36F9iL8ota2YcySpRyyWOEdKauITv/9QAOpDa/Ad39E65HnnyJiHhT5Z2PbrgxpPz3s
+ PmAXKPOeD/wFVYS8N8RQZDnUweqDJqI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-411-XlL7IFCaO-CJnvE3RB92Ng-1; Wed, 26 Aug 2020 01:05:12 -0400
-X-MC-Unique: XlL7IFCaO-CJnvE3RB92Ng-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-122-8a7w9jy9PpGdMCZH-1kHog-1; Wed, 26 Aug 2020 01:10:42 -0400
+X-MC-Unique: 8a7w9jy9PpGdMCZH-1kHog-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3578D189E606;
- Wed, 26 Aug 2020 05:05:11 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E257F8030AC;
+ Wed, 26 Aug 2020 05:10:41 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-112-54.ams2.redhat.com
  [10.36.112.54])
- by smtp.corp.redhat.com (Postfix) with ESMTP id CE1017A403;
- Wed, 26 Aug 2020 05:05:10 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 904B17C874;
+ Wed, 26 Aug 2020 05:10:41 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id D85F39C86; Wed, 26 Aug 2020 07:05:09 +0200 (CEST)
-Date: Wed, 26 Aug 2020 07:05:09 +0200
+ id BD99F9C86; Wed, 26 Aug 2020 07:10:40 +0200 (CEST)
+Date: Wed, 26 Aug 2020 07:10:40 +0200
 From: Gerd Hoffmann <kraxel@redhat.com>
-To: Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH] meson: set colorout to auto
-Message-ID: <20200826050509.5626ao35salut3ma@sirius.home.kraxel.org>
-References: <20200825064342.2037-1-kraxel@redhat.com>
- <8cdf13b9-49c4-f12c-c67e-6e03e8e802b7@linaro.org>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Subject: Re: [PATCH v3 14/74] hcd-dwc2: Rename USB_*CLASS macros for
+ consistency
+Message-ID: <20200826051040.i5rhksiube5zv2ar@sirius.home.kraxel.org>
+References: <20200825192110.3528606-1-ehabkost@redhat.com>
+ <20200825192110.3528606-15-ehabkost@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <8cdf13b9-49c4-f12c-c67e-6e03e8e802b7@linaro.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <20200825192110.3528606-15-ehabkost@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
-X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=kraxel@redhat.com;
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=kraxel@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/26 01:05:16
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/26 01:10:45
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -97,32 +99,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Aug 25, 2020 at 06:26:33AM -0700, Richard Henderson wrote:
-> On 8/24/20 11:43 PM, Gerd Hoffmann wrote:
-> > Dunno why the default is set to "always".  IMHO it should be "auto",
-> > i.e. only colorize in case stdout goes to a terminal.  Cluttering
-> > logfiles and confusing compiler message parsers with terminal control
-> > sequences is not nice ...
-> > 
-> > Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> > ---
-> >  meson.build | 3 ++-
-> >  1 file changed, 2 insertions(+), 1 deletion(-)
+On Tue, Aug 25, 2020 at 03:20:10PM -0400, Eduardo Habkost wrote:
+> Rename the DWC2_CLASS to DWC2_USB_CLASS and DWC2_GET_CLASS to
+> DWC2_USB_GET_CLASS, for consistency with the DWC2_USB macro.
 > 
-> Yes please.  All the color escape codes has broken emacs make next-error.
-> 
-> Although applying this doesn't seem to have helped...
+> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 
-meson remembers the state of the options, so running a build alone
-doesn't help.  rm -rf $builddir and starting over will pick up the
-new default.  You can probably also use "meson configure $something".
-
-HTH,
-  Gerd
+Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
 
 
