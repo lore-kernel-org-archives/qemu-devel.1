@@ -2,86 +2,70 @@ Return-Path: <SRS0=H0ck=CE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D34E9C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 01:39:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB289C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 01:47:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9CAB72072D
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 01:39:26 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tbgNj3Iy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9CAB72072D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id B7635206E3
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 01:47:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7635206E3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43998 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46798 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAkPN-0007Le-Vs
-	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 21:39:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39512)
+	id 1kAkXf-0000Vo-3N
+	for qemu-devel@archiver.kernel.org; Tue, 25 Aug 2020 21:47:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40774)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>)
- id 1kAkOk-0006vW-AN; Tue, 25 Aug 2020 21:38:46 -0400
-Received: from mail-oo1-xc44.google.com ([2607:f8b0:4864:20::c44]:46592)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>)
- id 1kAkOh-00024z-UK; Tue, 25 Aug 2020 21:38:45 -0400
-Received: by mail-oo1-xc44.google.com with SMTP id r6so78725oon.13;
- Tue, 25 Aug 2020 18:38:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=mwWExfqR1cZ+WdH+CcHQFPtm0abNw0zaCrpDyZHD8Hk=;
- b=tbgNj3IyhKgqtl6FFhy6yTWCHuxaT1WlPdHL0uePEdOYNBpeVJTJOcUMR3nmLAlKbU
- WhBz0iVNFGwc+8WQ4sThKd9RXnVaL8d3vGRXwftGs7TRMjHYxdb4G66ndVSIzVOU3MLj
- DEv3DXmGn6/9CMskgWQH6Zq7Kn6CnFOk/apw6wMJ50mPhHw2CMTHc6TIfz86fp4yhdli
- pL6LAW646V/01MAuZpWeAyMcq5hWLQ6toGU40xM2SFwEJe8tOM8lsjbYwOiPG1OKhYDQ
- FbEsbnOn/JuMPY5x6YGYqMMixeVIxWpjJtZSHVXBJjJAFXcjWin/HjCvKToNj3OStskO
- Zs8w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=mwWExfqR1cZ+WdH+CcHQFPtm0abNw0zaCrpDyZHD8Hk=;
- b=aO06cly6Nr3BKydQMtpsI45jsFZRF542AZ8i490nhNt3TB71soWR6B9SlgaDrLbc1B
- cRkH36xMLzc+2tHQoKSXyI89QR9DuTldq+EpelddSmjCfIjxjugyzlST32UFZDFfTBIl
- 6xL4Ltd/7Mh18iz7rRqUYqyccEK7mCHZDJwzuUjQB6ZTSQ29sBaxyDsSWq4SLKG3U3oL
- 0vk/uMAuFDGvJqz6M0bUCOvXkjsa9yeBf5pNSbsQ1d5QG6sPuCam7SjvDBzqk2LlLdjg
- Swq3CvicG2ci+oOMRo/gJ3o/UiM/6FnrbiJYQPweCkqe/m/qyc3XEfvv3X+qVrTWyagy
- bysA==
-X-Gm-Message-State: AOAM531m6y9VuRFh0o1oS1maRsg/thMmi0bHh94UANbezWrNUrDTtDf6
- 1Akt3XcZZY4mc9PsniHISVsfcBpPKzhERK18RVg=
-X-Google-Smtp-Source: ABdhPJw+A6teYU152k068AY15I+EevRooMFjQcGN0weScmqWXNbFOs+qe6wOcjN409eDYJ1cAZIWEGC1+WDeNXhU824=
-X-Received: by 2002:a4a:be0c:: with SMTP id l12mr8963853oop.22.1598405922478; 
- Tue, 25 Aug 2020 18:38:42 -0700 (PDT)
-MIME-Version: 1.0
+ (Exim 4.90_1) (envelope-from <kuhn.chenqun@huawei.com>)
+ id 1kAkX7-0008OR-4m; Tue, 25 Aug 2020 21:47:25 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:2924 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <kuhn.chenqun@huawei.com>)
+ id 1kAkX5-00035H-0s; Tue, 25 Aug 2020 21:47:24 -0400
+Received: from DGGEMM405-HUB.china.huawei.com (unknown [172.30.72.55])
+ by Forcepoint Email with ESMTP id 9EB401279F9843CC924F;
+ Wed, 26 Aug 2020 09:47:12 +0800 (CST)
+Received: from DGGEMM511-MBX.china.huawei.com ([169.254.1.141]) by
+ DGGEMM405-HUB.china.huawei.com ([10.3.20.213]) with mapi id 14.03.0487.000;
+ Wed, 26 Aug 2020 09:47:02 +0800
+From: "Chenqun (kuhn)" <kuhn.chenqun@huawei.com>
+To: Li Qiang <liq3ea@gmail.com>
+Subject: RE: [PATCH v2 07/10] vfio/platform: Remove dead assignment in
+ vfio_intp_interrupt()
+Thread-Topic: [PATCH v2 07/10] vfio/platform: Remove dead assignment in
+ vfio_intp_interrupt()
+Thread-Index: AQHWetKKG1C120Vf5E2prTROrs4ndKlJF1UAgACHUtA=
+Date: Wed, 26 Aug 2020 01:47:02 +0000
+Message-ID: <7412CDE03601674DA8197E2EBD8937E83B8E23ED@dggemm511-mbx.china.huawei.com>
 References: <20200825112447.126308-1-kuhn.chenqun@huawei.com>
  <20200825112447.126308-8-kuhn.chenqun@huawei.com>
-In-Reply-To: <20200825112447.126308-8-kuhn.chenqun@huawei.com>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Wed, 26 Aug 2020 09:38:06 +0800
-Message-ID: <CAKXe6S+BBKztHmBG0TLRTJH6bDntyz4=mWpgccctaZgYWn_TdA@mail.gmail.com>
-Subject: Re: [PATCH v2 07/10] vfio/platform: Remove dead assignment in
- vfio_intp_interrupt()
-To: Chen Qun <kuhn.chenqun@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::c44;
- envelope-from=liq3ea@gmail.com; helo=mail-oo1-xc44.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ <CAKXe6S+BBKztHmBG0TLRTJH6bDntyz4=mWpgccctaZgYWn_TdA@mail.gmail.com>
+In-Reply-To: <CAKXe6S+BBKztHmBG0TLRTJH6bDntyz4=mWpgccctaZgYWn_TdA@mail.gmail.com>
+Accept-Language: en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.174.187.50]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.187;
+ envelope-from=kuhn.chenqun@huawei.com; helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/25 21:47:13
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_PASS=-0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -95,8 +79,9 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: zhanghailiang <zhang.zhanghailiang@huawei.com>, qemu-trivial@nongnu.org,
- Pan Nengyuan <pannengyuan@huawei.com>, Qemu Developers <qemu-devel@nongnu.org>,
+Cc: Zhanghailiang <zhang.zhanghailiang@huawei.com>,
+ "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>,
+ Pannengyuan <pannengyuan@huawei.com>, Qemu Developers <qemu-devel@nongnu.org>,
  Eric Auger <eric.auger@redhat.com>,
  Alex Williamson <alex.williamson@redhat.com>,
  Stefan Hajnoczi <stefanha@redhat.com>, Euler Robot <euler.robot@huawei.com>
@@ -104,46 +89,29 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Chen Qun <kuhn.chenqun@huawei.com> =E4=BA=8E2020=E5=B9=B48=E6=9C=8825=E6=97=
-=A5=E5=91=A8=E4=BA=8C =E4=B8=8B=E5=8D=887:31=E5=86=99=E9=81=93=EF=BC=9A
->
-> Clang static code analyzer show warning:
-> hw/vfio/platform.c:239:9: warning: Value stored to 'ret' is never read
->         ret =3D event_notifier_test_and_clear(intp->interrupt);
->         ^     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->
-> Reported-by: Euler Robot <euler.robot@huawei.com>
-> Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
-> Reviewed-by: Eric Auger <eric.auger@redhat.com>
-> ---
-> Cc: Alex Williamson <alex.williamson@redhat.com>
-> Cc: Eric Auger <eric.auger@redhat.com>
-> Cc: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
->  hw/vfio/platform.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/hw/vfio/platform.c b/hw/vfio/platform.c
-> index ac2cefc9b1..869ed2c39d 100644
-> --- a/hw/vfio/platform.c
-> +++ b/hw/vfio/platform.c
-> @@ -236,7 +236,7 @@ static void vfio_intp_interrupt(VFIOINTp *intp)
->          trace_vfio_intp_interrupt_set_pending(intp->pin);
->          QSIMPLEQ_INSERT_TAIL(&vdev->pending_intp_queue,
->                               intp, pqnext);
-> -        ret =3D event_notifier_test_and_clear(intp->interrupt);
-
-Shouldn't we check the 'ret' like the other place in this function?
-
-Thanks,
-Li Qiang
-
-> +        event_notifier_test_and_clear(intp->interrupt);
->          return;
->      }
->
-> --
-> 2.23.0
->
->
+DQo+ID4gQ2xhbmcgc3RhdGljIGNvZGUgYW5hbHl6ZXIgc2hvdyB3YXJuaW5nOg0KPiA+IGh3L3Zm
+aW8vcGxhdGZvcm0uYzoyMzk6OTogd2FybmluZzogVmFsdWUgc3RvcmVkIHRvICdyZXQnIGlzIG5l
+dmVyIHJlYWQNCj4gPiAgICAgICAgIHJldCA9IGV2ZW50X25vdGlmaWVyX3Rlc3RfYW5kX2NsZWFy
+KGludHAtPmludGVycnVwdCk7DQo+ID4gICAgICAgICBeICAgICB+fn5+fn5+fn5+fn5+fn5+fn5+
+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+DQo+ID4NCj4gPiBSZXBvcnRlZC1ieTogRXVsZXIg
+Um9ib3QgPGV1bGVyLnJvYm90QGh1YXdlaS5jb20+DQo+ID4gU2lnbmVkLW9mZi1ieTogQ2hlbiBR
+dW4gPGt1aG4uY2hlbnF1bkBodWF3ZWkuY29tPg0KPiA+IFJldmlld2VkLWJ5OiBFcmljIEF1Z2Vy
+IDxlcmljLmF1Z2VyQHJlZGhhdC5jb20+DQo+ID4gLS0tDQo+ID4gQ2M6IEFsZXggV2lsbGlhbXNv
+biA8YWxleC53aWxsaWFtc29uQHJlZGhhdC5jb20+DQo+ID4gQ2M6IEVyaWMgQXVnZXIgPGVyaWMu
+YXVnZXJAcmVkaGF0LmNvbT4NCj4gPiBDYzogU3RlZmFuIEhham5vY3ppIDxzdGVmYW5oYUByZWRo
+YXQuY29tPg0KPiA+IC0tLQ0KPiA+ICBody92ZmlvL3BsYXRmb3JtLmMgfCAyICstDQo+ID4gIDEg
+ZmlsZSBjaGFuZ2VkLCAxIGluc2VydGlvbigrKSwgMSBkZWxldGlvbigtKQ0KPiA+DQo+ID4gZGlm
+ZiAtLWdpdCBhL2h3L3ZmaW8vcGxhdGZvcm0uYyBiL2h3L3ZmaW8vcGxhdGZvcm0uYyBpbmRleA0K
+PiA+IGFjMmNlZmM5YjEuLjg2OWVkMmMzOWQgMTAwNjQ0DQo+ID4gLS0tIGEvaHcvdmZpby9wbGF0
+Zm9ybS5jDQo+ID4gKysrIGIvaHcvdmZpby9wbGF0Zm9ybS5jDQo+ID4gQEAgLTIzNiw3ICsyMzYs
+NyBAQCBzdGF0aWMgdm9pZCB2ZmlvX2ludHBfaW50ZXJydXB0KFZGSU9JTlRwICppbnRwKQ0KPiA+
+ICAgICAgICAgIHRyYWNlX3ZmaW9faW50cF9pbnRlcnJ1cHRfc2V0X3BlbmRpbmcoaW50cC0+cGlu
+KTsNCj4gPiAgICAgICAgICBRU0lNUExFUV9JTlNFUlRfVEFJTCgmdmRldi0+cGVuZGluZ19pbnRw
+X3F1ZXVlLA0KPiA+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGludHAsIHBxbmV4dCk7
+DQo+ID4gLSAgICAgICAgcmV0ID0gZXZlbnRfbm90aWZpZXJfdGVzdF9hbmRfY2xlYXIoaW50cC0+
+aW50ZXJydXB0KTsNCj4gDQo+IFNob3VsZG4ndCB3ZSBjaGVjayB0aGUgJ3JldCcgbGlrZSB0aGUg
+b3RoZXIgcGxhY2UgaW4gdGhpcyBmdW5jdGlvbj8NCg0KSGksIExpIFFpYW5nLA0KDQpFcmlj44CB
+QWxleOOAgVN0ZWZhbiBoYXMgYWxyZWFkeSBkaXNjdXNzZWQgdGhpcyBwb2ludCBpbiB0aGUgVjEg
+dmVyc2lvbi4NCmh0dHBzOi8vcGF0Y2h3b3JrLmtlcm5lbC5vcmcvcGF0Y2gvMTE3MTE4OTcvDQoN
+ClRoYW5rcy4NCg==
 
