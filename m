@@ -2,83 +2,83 @@ Return-Path: <SRS0=H0ck=CE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E82EEC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 19:35:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61B43C433E1
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 19:37:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A825B2076C
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 19:35:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 20A992076C
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 19:37:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mfJKnXAt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A825B2076C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iwqXNzke"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20A992076C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36084 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38520 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kB1CK-0000aN-UG
-	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 15:35:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43472)
+	id 1kB1EB-0001l5-FG
+	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 15:36:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44052)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kB1Bm-00008f-Cp
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 15:34:30 -0400
-Received: from mail-ej1-x643.google.com ([2a00:1450:4864:20::643]:40095)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1kB1Dd-0001EM-4S; Wed, 26 Aug 2020 15:36:25 -0400
+Received: from mail-il1-x141.google.com ([2607:f8b0:4864:20::141]:42883)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kB1Bj-0007Vi-Tv
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 15:34:30 -0400
-Received: by mail-ej1-x643.google.com with SMTP id o18so4464003eje.7
- for <qemu-devel@nongnu.org>; Wed, 26 Aug 2020 12:34:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1kB1Db-0007qC-IH; Wed, 26 Aug 2020 15:36:24 -0400
+Received: by mail-il1-x141.google.com with SMTP id t13so2822761ile.9;
+ Wed, 26 Aug 2020 12:36:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=AJYVAIksZwFEHAZNcHOnSEZrcCpGNDBV8FUK4gCkFIY=;
- b=mfJKnXAtUMtKIuKrHyvZFz0Y69ZPrNR1C7O6ODlTMfrXsk76aU37D2GPD6/MU6Noa+
- iZDN23NMoanNRGiHwRCTDkBNhwU4BOA/QbMkfIrawF69QtAidO2d2QUzUr6OVQYDE2Ng
- Y4w0Mv1ZXv1wgNs7mYSlpZJGS29UaqOsPrIxuhd5P+evaiduJ/h6OC10LA/HjIgDFflp
- c3YKoycrrnN7WFigXFUrrPck/anMUP1xeSxyL21bhdj4GLRnmRa5QZAV0E8j896aZTq1
- TIH0MemBm2OEasBeye/ToUT5XlTr3K8mLP5htCt02CVeoS4T24NazShDUIb5G/mEmwkX
- 6jxw==
+ :cc; bh=AzSIttkuRPeIHlpJlGefUgU+fioPk+GRw4KlyI8Q9Sg=;
+ b=iwqXNzke9h955624DayAmXC3DM2ErlT3++u7RHtnDGevwntuh+r76cL7u1RdvOtKrO
+ Z1e0+VzzsgDJ3DiNdZ7UPuHEheVC4avq52hkgMKXijhQMhH0FjYmfOhKy6GJu8tIb5Eu
+ mVFhTZSdE3wk23KEmDqcp0msQOaCzNHEU4Tlb06yHGpj6ULRFfg+JxYMWXrKJdxQ4tLU
+ Dks6lAd9xVItMmNOD7z+q/JGnEMng5H8HqtALdxe4l2MGswN2kEUFsZhnRyqKcl8Tehi
+ mZn1cZeQpbTRpe4Jumn3/zcYxLbruRsUe7NS6AbQo2KysjYWnHe5aG68TFfQALAhy+nE
+ 8XGg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=AJYVAIksZwFEHAZNcHOnSEZrcCpGNDBV8FUK4gCkFIY=;
- b=Ug50fF93m8YGCkvNv6XJQzA4KIC9aAK1/zNh5twQLQaPFHX2ZYmXDvSIsX7tdtSWAv
- 0lmzKWenrDNrWJ7ggHL+Hp4cM58rVaqnzQ4OekptF4xeCBjt46phoAhaGcyS50YdJNEf
- djJpcBgrp0JzYj3A75fHxlxHyzIDkEk3WSIP3Ee0w9ynxv66tog276sY6BAaT7JBHeU2
- FmbUqyjm4vk6C63pfunOUmScZgOUwQZ6PE4OP8RmOSMlOebGfxO07MXRKd+Yq1hM3tW3
- 3R8gcOx9MMpkgkwN+KsSPsyg8qBDQTEzKYboifagFJL0U0RxufON6g/gUEohWLDtRdmp
- +6hw==
-X-Gm-Message-State: AOAM531BkwahlSRJnColgo+yrdzgseHGhPpQ6yJ9R5Q9sGz2SrgkPprg
- Ns1QaBfQCbBgYuU4NwR0GVV1DsQT1mIxzEkASXLuQA==
-X-Google-Smtp-Source: ABdhPJxTPIK05Wdsmf0X2xWMpSOoVi3XpZUNQ/Bud6DI5Ma1Nwvh/EjsN+65+dacIwNZSg7ABB4fZd51KYz3L3d9WnA=
-X-Received: by 2002:a17:906:d8ca:: with SMTP id
- re10mr16685927ejb.382.1598470466206; 
- Wed, 26 Aug 2020 12:34:26 -0700 (PDT)
+ bh=AzSIttkuRPeIHlpJlGefUgU+fioPk+GRw4KlyI8Q9Sg=;
+ b=Zw7WN9J1DBhJVr/Jtxg1MfcumPDO+MKp3ziKRMKki09TpFMpGaTUUCQ3/L+tAQBGVz
+ NoIUVUl9UU/Nr8gLaMdVxyMmARvzV8L4XBG4r+2Sgsi6IwMZZbrpPT1FNHg1Yg+tYJha
+ SgNhsDGnYd2bcwTgrB/mNPkOHpFxYJLlMzOj01xLdcYjrZd+2O/IQYA8pMuyiKKw59Nv
+ 4gBZppMtDONiWA7mcO1QyNoQ6Kit010kBvsG9pYuwcY4TCjO85Z6Y39pV1ns01Rf0VEQ
+ HCpjeeXqOVjiCsiTN0sNW6wn/9M0d+IrQLy821F99Tp3apWopZsWsT4mgyuzy9WcG7lm
+ w3fg==
+X-Gm-Message-State: AOAM533lAp/BIr5Ijd7ASxpah/tm9vAhkLePmZK1zpojFshT8W5cPbgQ
+ xOy0Ip1lhQxf3FEo+EKaJsNKfJo8QJXLbGgV9sA=
+X-Google-Smtp-Source: ABdhPJxp3gT2EvfbmGmuTLoMfKxPjzTBoTNu5EPlKhl8ijpppCIwbma1exC3dftfaZC6RW6NYZOUVCxm4k6m5d/tHK0=
+X-Received: by 2002:a92:c7d4:: with SMTP id g20mr14760623ilk.40.1598470581921; 
+ Wed, 26 Aug 2020 12:36:21 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200826190128.22707-1-pbonzini@redhat.com>
-In-Reply-To: <20200826190128.22707-1-pbonzini@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 26 Aug 2020 20:34:15 +0100
-Message-ID: <CAFEAcA8MSzo7+zSWTr8vmU294M3oYkZKk17SFRrBZLmqfxGdmQ@mail.gmail.com>
-Subject: Re: [PATCH] ninjatool: quote dollars in variables
-To: Paolo Bonzini <pbonzini@redhat.com>
+References: <20200826184334.4120620-1-ehabkost@redhat.com>
+ <20200826184334.4120620-6-ehabkost@redhat.com>
+In-Reply-To: <20200826184334.4120620-6-ehabkost@redhat.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Wed, 26 Aug 2020 12:25:36 -0700
+Message-ID: <CAKmqyKPNo3h9NY6QsFnpXDrK5tZTJDjAyDMugqPZEeeYfL9B2A@mail.gmail.com>
+Subject: Re: [PATCH 5/8] xlnx-zcu102: Use TYPE_ZCU102_MACHINE constant
+To: Eduardo Habkost <ehabkost@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::643;
- envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x643.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::141;
+ envelope-from=alistair23@gmail.com; helo=mail-il1-x141.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -93,22 +93,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "Daniel P. Berrange" <berrange@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ qemu-arm <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 26 Aug 2020 at 20:03, Paolo Bonzini <pbonzini@redhat.com> wrote:
+On Wed, Aug 26, 2020 at 11:47 AM Eduardo Habkost <ehabkost@redhat.com> wrote:
 >
-> Otherwise, dollars (such as in the special $ORIGIN rpath) are
-> eaten by Make.
+> This will make future conversion to use OBJECT_DECLARE* easier.
+>
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 
-Incidentally, why are we using rpath anyway? I'm pretty
-sure the old build system didn't need it, and it's one of
-those features I have mentally filed away under "liable
-to confusing and non-portable weirdness"...
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-thanks
--- PMM
+Alistair
+
+> ---
+> Cc: Alistair Francis <alistair@alistair23.me>
+> Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Cc: qemu-arm@nongnu.org
+> Cc: qemu-devel@nongnu.org
+> ---
+>  hw/arm/xlnx-zcu102.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/hw/arm/xlnx-zcu102.c b/hw/arm/xlnx-zcu102.c
+> index 5997262459..672d9d4bd1 100644
+> --- a/hw/arm/xlnx-zcu102.c
+> +++ b/hw/arm/xlnx-zcu102.c
+> @@ -238,7 +238,7 @@ static void xlnx_zcu102_machine_class_init(ObjectClass *oc, void *data)
+>  }
+>
+>  static const TypeInfo xlnx_zcu102_machine_init_typeinfo = {
+> -    .name       = MACHINE_TYPE_NAME("xlnx-zcu102"),
+> +    .name       = TYPE_ZCU102_MACHINE,
+>      .parent     = TYPE_MACHINE,
+>      .class_init = xlnx_zcu102_machine_class_init,
+>      .instance_init = xlnx_zcu102_machine_instance_init,
+> --
+> 2.26.2
+>
+>
 
