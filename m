@@ -2,76 +2,79 @@ Return-Path: <SRS0=H0ck=CE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3ABDC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 16:23:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EEADC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 16:28:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8F9B52074A
-	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 16:23:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CCEE72078B
+	for <qemu-devel@archiver.kernel.org>; Wed, 26 Aug 2020 16:28:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DMUXc/Ga"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F9B52074A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ja5H/w2H"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CCEE72078B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42424 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48446 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kAyCv-0004Qb-Q4
-	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 12:23:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48582)
+	id 1kAyHp-0007Tt-UU
+	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 12:28:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50328)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kAyBH-00024Z-Ai
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 12:21:47 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:31854
+ id 1kAyH4-0006wy-QP
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 12:27:46 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:27014
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kAyBE-0006U5-CH
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 12:21:46 -0400
+ id 1kAyH1-0007Ro-LU
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 12:27:45 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598458901;
+ s=mimecast20190719; t=1598459261;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=YsHjPb4FFMwNeHVseWVR1V5wR7cvs+q2u2S/LJB7KrA=;
- b=DMUXc/GafB6SjX6/u30KdzlJGt9HR21h7F0UZ3IgIxWDBvA7Ybvt1IL7h1R4Xgxb3dy9W5
- UWAs1pAqAtO5v0/BOMAUcMhz+UgWb+sJ6OiaJPROJbH8Is4S/7OD0mx6i1vSVsclhEQcKF
- QCtupG6GWP+kh6lt6/A4bZb94MlQ5Ts=
+ bh=6cUJIiott+NDaKNBjT45zu6Y6bQ0+FXy5MRgP1gEMVg=;
+ b=Ja5H/w2Hzz1T2ag+08UJTPdZMBaIAOhW6ZFQNpxULsI89EwjvVu3R7G8RloYyNAyisgELN
+ mqcMynqL9vPI10Yn+kliVUXKWdOs/YoFG23NLHeLRrStv0IwkwCZ1oZ0dwZzybzzWD5Dfd
+ yWe7fA7KQJuld/rDniSb1BKC0GvV5IE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-159-CsHi4iHCOq-7Sa20yA7y2Q-1; Wed, 26 Aug 2020 12:21:39 -0400
-X-MC-Unique: CsHi4iHCOq-7Sa20yA7y2Q-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-173-pc2nQDgQPrmAYT5Dl37I1w-1; Wed, 26 Aug 2020 12:27:40 -0400
+X-MC-Unique: pc2nQDgQPrmAYT5Dl37I1w-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B14E31074646;
- Wed, 26 Aug 2020 16:21:38 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8BDCA18B9ED3;
+ Wed, 26 Aug 2020 16:27:38 +0000 (UTC)
 Received: from localhost (unknown [10.10.67.254])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7D17C74E85;
- Wed, 26 Aug 2020 16:21:37 +0000 (UTC)
-Date: Wed, 26 Aug 2020 12:21:37 -0400
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 77A1960C13;
+ Wed, 26 Aug 2020 16:27:35 +0000 (UTC)
+Date: Wed, 26 Aug 2020 12:27:33 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-To: David Gibson <david@gibson.dropbear.id.au>
-Subject: Re: [PATCH 3/3] spapr: Correct type for SPAPR_DRC_PCI
-Message-ID: <20200826162137.GE642093@habkost.net>
-References: <20200825111627.2007820-1-david@gibson.dropbear.id.au>
- <20200825111627.2007820-4-david@gibson.dropbear.id.au>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Subject: Re: [PATCH v2 1/2] hw/isa/superio: Set abstract TYPE_ISA_SUPERIO
+ instance size
+Message-ID: <20200826162733.GF642093@habkost.net>
+References: <20200822142816.1318214-1-philmd@redhat.com>
+ <20200822142816.1318214-2-philmd@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200825111627.2007820-4-david@gibson.dropbear.id.au>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <20200822142816.1318214-2-philmd@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
 X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 Content-Disposition: inline
 Received-SPF: pass client-ip=207.211.31.120; envelope-from=ehabkost@redhat.com;
  helo=us-smtp-1.mimecast.com
@@ -96,41 +99,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Huacai Chen <chenhc@lemote.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Aug 25, 2020 at 09:16:27PM +1000, David Gibson wrote:
-> TYPE_SPAPR_DRC_PCI inherits from TYPE_SPAPR_DRC_PHYSICAL, so its checker
-> macro should use the corresponding instance type.  We got away with it
-> because we never actually used that checker macro.
+On Sat, Aug 22, 2020 at 04:28:15PM +0200, Philippe Mathieu-Daudé wrote:
+> Instead of setting the instance size on each implementations,
+> set it on the abstract parent, so we are sure no implementation
+> will forget to set it.
 > 
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> Reported-by: Eduardo Habkost <ehabkost@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
+Thanks!
+
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+
 > ---
->  include/hw/ppc/spapr_drc.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  hw/isa/isa-superio.c       | 2 +-
+>  hw/isa/smc37c669-superio.c | 1 -
+>  hw/isa/vt82c686.c          | 1 -
+>  3 files changed, 1 insertion(+), 3 deletions(-)
 > 
-> diff --git a/include/hw/ppc/spapr_drc.h b/include/hw/ppc/spapr_drc.h
-> index 21af8deac1..baaaba3c1f 100644
-> --- a/include/hw/ppc/spapr_drc.h
-> +++ b/include/hw/ppc/spapr_drc.h
-> @@ -59,7 +59,7 @@
->          OBJECT_GET_CLASS(SpaprDrcClass, obj, TYPE_SPAPR_DRC_PCI)
->  #define SPAPR_DRC_PCI_CLASS(klass) \
->          OBJECT_CLASS_CHECK(SpaprDrcClass, klass, TYPE_SPAPR_DRC_PCI)
-> -#define SPAPR_DRC_PCI(obj) OBJECT_CHECK(SpaprDrc, (obj), \
-> +#define SPAPR_DRC_PCI(obj) OBJECT_CHECK(SpaprDrcPhysical, (obj), \
->                                          TYPE_SPAPR_DRC_PCI)
-
-I'm not sure this is really what we want to do.  This is what
-triggered the warning in my script, but it doesn't mean we want
-to use SpaprDrcPhysical here.
-
-Code that needs a SpaprDrc* can use SPAPR_DR_CONNECTOR();
-code that needs a SpaprDrcPhysical* can use SPAPR_DRC_PHYSICAL().
-All the other OBJECT_CHECK(SpaprDrc, ...) and
-OBJECT_CHECK(SpaprDrcPhysical, ...) macros seem unnecessary.
+> diff --git a/hw/isa/isa-superio.c b/hw/isa/isa-superio.c
+> index e2e47d8fd99..83eb21ebb2a 100644
+> --- a/hw/isa/isa-superio.c
+> +++ b/hw/isa/isa-superio.c
+> @@ -182,6 +182,7 @@ static const TypeInfo isa_superio_type_info = {
+>      .name = TYPE_ISA_SUPERIO,
+>      .parent = TYPE_ISA_DEVICE,
+>      .abstract = true,
+> +    .instance_size = sizeof(ISASuperIODevice),
+>      .class_size = sizeof(ISASuperIOClass),
+>      .class_init = isa_superio_class_init,
+>  };
+> @@ -200,7 +201,6 @@ static void fdc37m81x_class_init(ObjectClass *klass, void *data)
+>  static const TypeInfo fdc37m81x_type_info = {
+>      .name          = TYPE_FDC37M81X_SUPERIO,
+>      .parent        = TYPE_ISA_SUPERIO,
+> -    .instance_size = sizeof(ISASuperIODevice),
+>      .class_init    = fdc37m81x_class_init,
+>  };
+>  
+> diff --git a/hw/isa/smc37c669-superio.c b/hw/isa/smc37c669-superio.c
+> index 18287741cb4..9e59dc16039 100644
+> --- a/hw/isa/smc37c669-superio.c
+> +++ b/hw/isa/smc37c669-superio.c
+> @@ -103,7 +103,6 @@ static void smc37c669_class_init(ObjectClass *klass, void *data)
+>  static const TypeInfo smc37c669_type_info = {
+>      .name          = TYPE_SMC37C669_SUPERIO,
+>      .parent        = TYPE_ISA_SUPERIO,
+> -    .instance_size = sizeof(ISASuperIODevice),
+>      .class_size    = sizeof(ISASuperIOClass),
+>      .class_init    = smc37c669_class_init,
+>  };
+> diff --git a/hw/isa/vt82c686.c b/hw/isa/vt82c686.c
+> index 18160ca445d..a4b84d405d0 100644
+> --- a/hw/isa/vt82c686.c
+> +++ b/hw/isa/vt82c686.c
+> @@ -533,7 +533,6 @@ static void vt82c686b_superio_class_init(ObjectClass *klass, void *data)
+>  static const TypeInfo via_superio_info = {
+>      .name          = TYPE_VT82C686B_SUPERIO,
+>      .parent        = TYPE_ISA_SUPERIO,
+> -    .instance_size = sizeof(ISASuperIODevice),
+>      .class_size    = sizeof(ISASuperIOClass),
+>      .class_init    = vt82c686b_superio_class_init,
+>  };
+> -- 
+> 2.26.2
+> 
 
 -- 
 Eduardo
