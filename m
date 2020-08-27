@@ -8,78 +8,79 @@ X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3AB8C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 05:07:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EFD4CC433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 05:07:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AFC8F2177B
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 05:07:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B7A002080C
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 05:07:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YsLcjvRX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AFC8F2177B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B3wBalM/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7A002080C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43510 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44462 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBA7q-0004VO-Q1
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 01:07:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33904)
+	id 1kBA7z-0004sp-Uj
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 01:07:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33958)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kBA6x-0002vv-Eo
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 01:06:07 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:43394)
+ id 1kBA76-0003FT-CF
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 01:06:16 -0400
+Received: from mail-pj1-x1033.google.com ([2607:f8b0:4864:20::1033]:55620)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kBA6t-0005e7-O0
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 01:06:07 -0400
-Received: by mail-pg1-x542.google.com with SMTP id d19so2483370pgl.10
- for <qemu-devel@nongnu.org>; Wed, 26 Aug 2020 22:06:03 -0700 (PDT)
+ id 1kBA74-0005f6-Ou
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 01:06:16 -0400
+Received: by mail-pj1-x1033.google.com with SMTP id 2so1994258pjx.5
+ for <qemu-devel@nongnu.org>; Wed, 26 Aug 2020 22:06:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=nHEmWVZQoKiBv31d0b1nWAUGSiNgf5i9gDUSz3OTqd8=;
- b=YsLcjvRX+WcK6eYyQRSaanX+IZhHcI5T0+N+EkuDFA/XgBL1wUT0v2qtab52rcEz32
- BluOivHgKqkFGzVstEKM1sFXCyeHoKR+XqA0CVU87AUitr+ZbIuyGXx4EREpI34uv35E
- mj3TxbEprXtZlZb5qehgDVzyR9AGp2FxH/Zd6YzztNcr8iNKUq3jEdeyW4uRDsefwfVu
- emHPoyyzdMDQKh3+V7PtWYJ/dgh2NROrvdjzhL1K1gSX+9/dNbBai7EZo+vibRdDWnTa
- BGptbtcKpxkD+qVBfcGCJ0RR9LWkUZHZZghnGlXokjRszq+4Ef+MKnD1lOR/uzaTJr15
- zAqA==
+ bh=kZmgaDEBNjpxaFbsHI9krVOWSzauPOV79k08lIpZd10=;
+ b=B3wBalM/yDYmUtfyBo1U/JZUa5rZT3EMGdbAd10MfTBZ+zwrKkWkllIQkl9/CO32RH
+ TyOvL32luqe8bwdMqF0Ys8o9o6U3vyefVGx+r3dsR2yDs86fQ2efvqkKj4eTjtX+8nb6
+ 0/zJqemfVaIvAJfGeZsMRCDgdoaX4yIIBsBqMNMFr8O28ASxV6d7TFhbyxM7LqR4dqh4
+ xO5AYA0/WLMpDbbn4Poy9YbdCvrRmUzMAkH53ypPrRWxV0HJEwxlKLqKrbqQg8Wqua5n
+ hbJJKS7uVyThZ0xfBCUIgZYJsRJFcJxkCgmjj9NN9KEcZImueba+Q1utpgMk+lUUC4Qv
+ HZPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=nHEmWVZQoKiBv31d0b1nWAUGSiNgf5i9gDUSz3OTqd8=;
- b=Uk83Z7rGD2clMaXGir3XQWichT9WZMS39bojcIcUbku9fQhjzWp5JgFnUsz0PGjMyv
- jkQsO3QV705tSKwEJ1LxbfyQGFTLYj18AVJY3y9z6ycRnAO9hJC3hxZSQP72/c7eO1nY
- x6aYevCPxDsxVqKNvMNMm3pwl2wZkeSLOWGUR/i4/SMFGG4fXNI7T/wRwsv9vhd459gX
- z4o/jsmj54hLL5A3iZoXR/XGKJkMXWZtAy0lnuCy2D+TEgRIfLtG2uKA0g5iTrp3oy4K
- Ffk4tBBgMXaheapcNKIzSnEgZln7U+9b5jPtIBExSuFP7dyAmWv4gxuDAGTPa+nvTDac
- yi6w==
-X-Gm-Message-State: AOAM532R4NBS1bwnB0WiI092PhG8eq/v4W77XMBMfu03wx5eXQqlmiKJ
- jqCHWXTWPqTAFx6ZUKe/vDp26K1Ez6JAXm9CMUE=
-X-Google-Smtp-Source: ABdhPJyyOwff+ERLih2sCkkfjAaEHr8X/PeBp3LipdcXvTxUVItcCl4i8F9hQbAlzVb8OwASse6MPg==
-X-Received: by 2002:a63:ca4e:: with SMTP id o14mr13594865pgi.213.1598504761754; 
- Wed, 26 Aug 2020 22:06:01 -0700 (PDT)
+ bh=kZmgaDEBNjpxaFbsHI9krVOWSzauPOV79k08lIpZd10=;
+ b=c4mOc6devKTY7yzlAo5pXig8M3QWKbdTf13hMP28TIhfT4iAvksjskrYhVQXRrLZED
+ lFmOs26uVw88Mu5mDaJm6rT8igsDABNC+6eKFfoayr62G7Zi+KDX3fE9Ik78l6evXG2y
+ wYqyYr/Fupi1/7nDfqn7iPT+mTd1ze8OFNNt2pyJsKkuYzwJ8uA3+RAlixO7UmvdgJkh
+ 4CnRkv8souL6VcuDJGJSexb03CqGH6wmBh9pZ2JI/TE2A772B3rpCyIVCRUAzxvYU/lY
+ n0DFsSZuNU/hQfBXHq6A2gCDs9BECN9qNP5SjyK0Uv8Loo3I9OoB55qTLB8oL+mTriqy
+ qnaw==
+X-Gm-Message-State: AOAM532b9uS+iVoLhoHOq7gdVMmWpfdUQCvJP5YuoQTbCarFbURpTl33
+ KUzwSv8Vahyotm0pGVFurPXRJWeBG76wIeMFdjo=
+X-Google-Smtp-Source: ABdhPJzox6zVI7SZ2VdIibKNtUHjdRTTqySlXPSzOJnAvPE5ZVJyCGjkLQJJ9jVaO65ED9YzGc6N2w==
+X-Received: by 2002:a17:90a:c505:: with SMTP id
+ k5mr8718507pjt.188.1598504772817; 
+ Wed, 26 Aug 2020 22:06:12 -0700 (PDT)
 Received: from localhost.localdomain ([103.94.185.75])
- by smtp.googlemail.com with ESMTPSA id u3sm724213pjn.29.2020.08.26.22.05.59
+ by smtp.googlemail.com with ESMTPSA id u3sm724213pjn.29.2020.08.26.22.06.10
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 26 Aug 2020 22:06:00 -0700 (PDT)
+ Wed, 26 Aug 2020 22:06:12 -0700 (PDT)
 From: luoyonggang@gmail.com
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 1/6] meson: Fixes the ninjatool issue that E$$: are
- generated in Makefile.ninja
-Date: Thu, 27 Aug 2020 13:05:38 +0800
-Message-Id: <20200827050543.44-2-luoyonggang@gmail.com>
+Subject: [PATCH v2 5/6] meson: Fixes ninjatool can not be recognized as script
+ under Window/MSYS2
+Date: Thu, 27 Aug 2020 13:05:42 +0800
+Message-Id: <20200827050543.44-6-luoyonggang@gmail.com>
 X-Mailer: git-send-email 2.27.0.windows.1
 In-Reply-To: <20200827050543.44-1-luoyonggang@gmail.com>
 References: <20200827050543.44-1-luoyonggang@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::542;
- envelope-from=luoyonggang@gmail.com; helo=mail-pg1-x542.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1033;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pj1-x1033.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -109,27 +110,26 @@ Sender: "Qemu-devel"
 
 From: Yonggang Luo <luoyonggang@gmail.com>
 
-SIMPLE_PATH_RE should match the full path token.
-Or the $ and : contained in path would not matched if the path are start with C:/ and E:/
+use ninja instead ${build_path}/ninjatool
 
 Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
 ---
- scripts/ninjatool.py | 2 +-
+ configure | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/scripts/ninjatool.py b/scripts/ninjatool.py
-index cc77d51aa8..6ca8be6f10 100755
---- a/scripts/ninjatool.py
-+++ b/scripts/ninjatool.py
-@@ -55,7 +55,7 @@ else:
+diff --git a/configure b/configure
+index 3b9e79923d..2ad0c58492 100755
+--- a/configure
++++ b/configure
+@@ -8222,7 +8222,7 @@ fi
+ mv $cross config-meson.cross
  
- PATH_RE = r"[^$\s:|]+|\$[$ :]|\$[a-zA-Z0-9_-]+|\$\{[a-zA-Z0-9_.-]+\}"
- 
--SIMPLE_PATH_RE = re.compile(r"[^$\s:|]+")
-+SIMPLE_PATH_RE = re.compile(r"^[^$\s:|]+$")
- IDENT_RE = re.compile(r"[a-zA-Z0-9_.-]+$")
- STRING_RE = re.compile(r"(" + PATH_RE + r"|[\s:|])(?:\r?\n)?|.")
- TOPLEVEL_RE = re.compile(r"([=:#]|\|\|?|^ +|(?:" + PATH_RE + r")+)\s*|.")
+ rm -rf meson-private meson-info meson-logs
+-NINJA="${build_path}/ninjatool" $meson setup \
++NINJA="ninja" $meson setup \
+         --prefix "${pre_prefix}$prefix" \
+         --libdir "${pre_prefix}$libdir" \
+         --libexecdir "${pre_prefix}$libexecdir" \
 -- 
 2.27.0.windows.1
 
