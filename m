@@ -2,95 +2,94 @@ Return-Path: <SRS0=k4hX=CF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3F50C433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 16:14:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5BA0C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 16:17:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BB4CF2080C
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 16:14:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB4CF2080C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id AF3FE2177B
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 16:17:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BpiDuNHe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF3FE2177B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58238 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60520 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBKXy-0005sA-Ub
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 12:14:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38340)
+	id 1kBKan-0006zx-Td
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 12:17:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39210)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kBKXS-0005R2-CD
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 12:14:10 -0400
-Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:39460
- helo=mail.default.ilande.uk0.bigv.io)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kBKXQ-0006St-6z
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 12:14:10 -0400
-Received: from host217-42-19-185.range217-42.btcentralplus.com
- ([217.42.19.185] helo=[192.168.1.65])
- by mail.default.ilande.uk0.bigv.io with esmtpsa
- (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
- (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kBKXs-0000oG-CO; Thu, 27 Aug 2020 17:14:37 +0100
-To: luoyonggang@gmail.com, qemu-devel@nongnu.org
-References: <20200826151006.80-1-luoyonggang@gmail.com>
- <20200826151006.80-4-luoyonggang@gmail.com>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
- mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
- 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
- E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
- PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
- PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
- AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
- OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
- NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
- mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
- z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
- T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
- DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
- y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
- 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
- 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
- YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
- Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
- BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
- opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
- NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
- Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
- KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
- imgcU9TTGC5qd9g=
-Message-ID: <431d774b-d8ce-4190-8b06-6a8e8a3c7828@ilande.co.uk>
-Date: Thu, 27 Aug 2020 17:14:04 +0100
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kBKaF-0006Zb-Sg
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 12:17:03 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:51465
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kBKaD-0006w5-Id
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 12:17:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1598545020;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=wvjIJZtqLcW4H7zem9wdtUQ/NTkZKhpBp9YluL5XSWs=;
+ b=BpiDuNHecm+L70nZEOUJogcIlONlK3tJMXXMJOks//31sxNpekUBba1xQf7DY/nDq1ndAo
+ RZEx+mJM4SXJ28edaCCsU0MgKdvMnc6I5ivc+HCyB+0QTq1PUjU0sYTaR/aN1X7BdgJ5IE
+ WMoKDINsUXkPdPy+3mBOIts0At9RR3w=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-161-_xU0mbSCNgyrN3Bwv0DhnA-1; Thu, 27 Aug 2020 12:16:57 -0400
+X-MC-Unique: _xU0mbSCNgyrN3Bwv0DhnA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 89D671DDFF;
+ Thu, 27 Aug 2020 16:16:56 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-56.ams2.redhat.com [10.36.112.56])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E0D1C10013D0;
+ Thu, 27 Aug 2020 16:16:55 +0000 (UTC)
+Subject: Re: [PATCH RFC v2 3/4] pc-bios: s390x: Save io and external new PSWs
+ before overwriting them
+To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
+References: <20200827093152.3026-1-frankja@linux.ibm.com>
+ <20200827093152.3026-4-frankja@linux.ibm.com>
+ <c5190ed1-a4f9-45c3-97b3-4924cff5da31@redhat.com>
+ <3428e0f6-43a1-b509-d804-fad083c21cb8@linux.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <741b1d4f-1d01-2ec8-77b7-183e08a56aec@redhat.com>
+Date: Thu, 27 Aug 2020 18:16:55 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200826151006.80-4-luoyonggang@gmail.com>
+In-Reply-To: <3428e0f6-43a1-b509-d804-fad083c21cb8@linux.ibm.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 217.42.19.185
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: Re: [PATCH v5 4/6] configure: Fix include and linkage issue on msys2
-X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
-Received-SPF: pass client-ip=2001:41c9:1:41f::167;
- envelope-from=mark.cave-ayland@ilande.co.uk;
- helo=mail.default.ilande.uk0.bigv.io
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -36
-X-Spam_score: -3.7
-X-Spam_bar: ---
-X-Spam_report: (-3.7 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-1.782,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Language: en-US
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=thuth@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 00:53:04
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -47
+X-Spam_score: -4.8
+X-Spam_bar: ----
+X-Spam_report: (-4.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.959,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-1.782, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,129 +102,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 26/08/2020 16:10, luoyonggang@gmail.com wrote:
-
-> From: Yonggang Luo <luoyonggang@gmail.com>
+On 27/08/2020 16.30, Janosch Frank wrote:
+> On 8/27/20 2:52 PM, Thomas Huth wrote:
+>> On 27/08/2020 11.31, Janosch Frank wrote:
+>>> Currently we always overwrite the mentioned exception new PSWs before
+>>> loading the enabled wait PSW. Let's save the PSW before overwriting
+>>> and restore it right before starting the loaded kernel.
+>>>
+>>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>>> ---
+>>>
+>>> Maybe we should rather statically allocate a lowcore so we don't dirty
+>>> 0x0 at all.
+>>>
+>>> ---
+>>>  pc-bios/s390-ccw/jump2ipl.c |  3 ++
+>>>  pc-bios/s390-ccw/start.S    | 62 +++++++++++++++++++++++++++----------
+>>>  2 files changed, 48 insertions(+), 17 deletions(-)
+>>>
+>>> diff --git a/pc-bios/s390-ccw/jump2ipl.c b/pc-bios/s390-ccw/jump2ipl.c
+>>> index 143d027bf7..a44f3ab5b3 100644
+>>> --- a/pc-bios/s390-ccw/jump2ipl.c
+>>> +++ b/pc-bios/s390-ccw/jump2ipl.c
+>>> @@ -13,12 +13,15 @@
+>>>  #define KERN_IMAGE_START 0x010000UL
+>>>  #define RESET_PSW_MASK (PSW_MASK_SHORTPSW | PSW_MASK_64)
+>>>  
+>>> +extern uint64_t *psw_save_io, *psw_save_ext;
+>>
+>> I think that should be
+>>
+>>  extern uint64_t psw_save_io[], psw_save_ext[];
+>>
+>> instead ... otherwise you'll end up with some funny bugs here, won't you?
 > 
-> On msys2, the -I/e/path/to/qemu -L/e/path/to/qemu are not recognized by the compiler
-> Cause $PWD are result posix style path such as /e/path/to/qemu that can not be recognized
-> by mingw gcc, and `pwd -W` are result Windows style path such as E:/path/to/qemu that can
-> be recognized by the mingw gcc. So we replace all $PWD with $build_path that can
-> building qemu under msys2/mingw environment.
+> What kind of bugs are you expecting?
+
+Well, "extern uint64_t var[];" and "extern uint64_t *var;" are two
+different kind of things. One is an array, one is a pointer variable.
+Looking at your assembler code, you obviously tried to declare an array
+there, not a pointer variable.
+
+Have a try with this test program:
+
+ #include <string.h>
+
+ extern unsigned long *var;
+
+ void main(void)
+ {
+	asm volatile (" nop ; nop ; nop "); /* marker */
+	memcpy((void *)0x1f0, var, 16);
+	asm volatile (" nop ; nop ; nop "); /* marker */
+ }
+
+After compiling that with -O2, and disassembling the corresponding .o
+file, I get this code between the nops:
+
+   c:	c4 18 00 00 00 00 	lgrl	%r1,c <main+0xc>
+			e: R_390_PC32DBL	var+0x2
+  12:	e7 00 10 00 00 06 	vl	%v0,0(%r1)
+  18:	e7 00 01 f0 00 0e 	vst	%v0,496
+
+The "lgrl %r1,var" is likely not what you wanted here.
+
+If you now replace the "*var" with "var[]", you get this instead:
+
+   c:	c0 10 00 00 00 00 	larl	%r1,c <main+0xc>
+			e: R_390_PC32DBL	var+0x2
+  12:	e7 00 10 00 00 06 	vl	%v0,0(%r1)
+  18:	e7 00 01 f0 00 0e 	vst	%v0,496
+
+"larl" looks better now, doesn't it?
+
+>>
+>>>  uint64_t *reset_psw = 0, save_psw, ipl_continue;
+>>>  
+>>>  static void jump_to_IPL_2(void)
+>>>  {
+>>>      /* Restore reset PSW and io and external new PSWs */
+>>
+>> Ok, now the comment makes sense :-)
+>>>      *reset_psw = save_psw;
+>>> +    memcpy((void *)0x1f0, psw_save_io, 16);
+>>> +    memcpy((void *)0x1b0, psw_save_ext, 16);
+>>
+>> Could you use &lowcore->external_new_psw and &lowcore->io_new_psw
+>> instead of the magic numbers?
 > 
-> Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
-> ---
->  configure | 28 +++++++++++++++++++---------
->  1 file changed, 19 insertions(+), 9 deletions(-)
-> 
-> diff --git a/configure b/configure
-> index b1e11397a8..3b9e79923d 100755
-> --- a/configure
-> +++ b/configure
-> @@ -13,8 +13,13 @@ export CCACHE_RECACHE=yes
->  
->  # make source path absolute
->  source_path=$(cd "$(dirname -- "$0")"; pwd)
-> +build_path=$PWD
-> +if [ "$MSYSTEM" = "MINGW64" -o  "$MSYSTEM" = "MINGW32" ]; then
+> I can, but that means that I need to declare lowcore in netmain.c as
+> well as including s390-arch.h
 
-This still doesn't match the existing indentation as per my previous comment.
+If that does not cause any other big hurdles, I think I'd prefer that
+instead of using magic numbers.
 
-> +source_path=$(cd "$(dirname -- "$0")"; pwd -W)
-> +build_path=`pwd -W`
-> +fi
->  
-> -if test "$PWD" = "$source_path"
-> +if test "$build_path" = "$source_path"
->  then
->      echo "Using './build' as the directory for build output"
->  
-> @@ -346,7 +351,12 @@ ld_has() {
->      $ld --help 2>/dev/null | grep ".$1" >/dev/null 2>&1
->  }
->  
-> -if printf %s\\n "$source_path" "$PWD" | grep -q "[[:space:]:]";
-> +check_valid_build_path="[[:space:]:]"
-> +if [ "$MSYSTEM" = "MINGW64" -o  "$MSYSTEM" = "MINGW32" ]; then
+ Thanks,
+  Thomas
 
-Same again here too.
-
-> +check_valid_build_path="[[:space:]]"
-> +fi
-> +
-> +if printf %s\\n "$source_path" "$build_path" | grep -q "$check_valid_build_path";
->  then
->    error_exit "main directory cannot contain spaces nor colons"
->  fi
-> @@ -942,7 +952,7 @@ Linux)
->    linux="yes"
->    linux_user="yes"
->    kvm="yes"
-> -  QEMU_INCLUDES="-isystem ${source_path}/linux-headers -I$PWD/linux-headers $QEMU_INCLUDES"
-> +  QEMU_INCLUDES="-isystem ${source_path}/linux-headers -I${build_path}/linux-headers $QEMU_INCLUDES"
->    libudev="yes"
->  ;;
->  esac
-> @@ -4283,7 +4293,7 @@ EOF
->                symlink "$source_path/dtc/Makefile" "dtc/Makefile"
->            fi
->            fdt_cflags="-I${source_path}/dtc/libfdt"
-> -          fdt_ldflags="-L$PWD/dtc/libfdt"
-> +          fdt_ldflags="-L${build_path}/dtc/libfdt"
->            fdt_libs="$fdt_libs"
->        elif test "$fdt" = "yes" ; then
->            # Not a git build & no libfdt found, prompt for system install
-> @@ -5268,7 +5278,7 @@ case "$capstone" in
->      else
->        LIBCAPSTONE=libcapstone.a
->      fi
-> -    capstone_libs="-L$PWD/capstone -lcapstone"
-> +    capstone_libs="-L${build_path}/capstone -lcapstone"
->      capstone_cflags="-I${source_path}/capstone/include"
->      ;;
->  
-> @@ -6268,8 +6278,8 @@ case "$slirp" in
->        git_submodules="${git_submodules} slirp"
->      fi
->      mkdir -p slirp
-> -    slirp_cflags="-I${source_path}/slirp/src -I$PWD/slirp/src"
-> -    slirp_libs="-L$PWD/slirp -lslirp"
-> +    slirp_cflags="-I${source_path}/slirp/src -I${build_path}/slirp/src"
-> +    slirp_libs="-L${build_path}/slirp -lslirp"
->      if test "$mingw32" = "yes" ; then
->        slirp_libs="$slirp_libs -lws2_32 -liphlpapi"
->      fi
-> @@ -8212,7 +8222,7 @@ fi
->  mv $cross config-meson.cross
->  
->  rm -rf meson-private meson-info meson-logs
-> -NINJA=$PWD/ninjatool $meson setup \
-> +NINJA="${build_path}/ninjatool" $meson setup \
->          --prefix "${pre_prefix}$prefix" \
->          --libdir "${pre_prefix}$libdir" \
->          --libexecdir "${pre_prefix}$libexecdir" \
-> @@ -8232,7 +8242,7 @@ NINJA=$PWD/ninjatool $meson setup \
->  	-Dvnc=$vnc -Dvnc_sasl=$vnc_sasl -Dvnc_jpeg=$vnc_jpeg -Dvnc_png=$vnc_png \
->  	-Dgettext=$gettext -Dxkbcommon=$xkbcommon \
->          $cross_arg \
-> -        "$PWD" "$source_path"
-> +        "$build_path" "$source_path"
->  
->  if test "$?" -ne 0 ; then
->      error_exit "meson setup failed"
-
-Is the change to this last section for the NINJA variable really required to fix
-linking? It would be useful to keep the NINJA variable and executable detection fix
-as a separate patch if possible.
-
-
-ATB,
-
-Mark.
 
