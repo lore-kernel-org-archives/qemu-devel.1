@@ -7,82 +7,82 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC919C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 12:12:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC4ECC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 12:15:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A75D9207F7
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 12:12:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 785B922B40
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 12:15:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Dyeuk6fZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A75D9207F7
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IUJFNrGU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 785B922B40
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56358 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58626 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBGld-0000x5-T7
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 08:12:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51808)
+	id 1kBGoJ-0001wG-4s
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 08:15:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52666)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kBGkf-0000DG-Dp
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 08:11:33 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:21978
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kBGnh-0001Vi-7X
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 08:14:41 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:44427
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kBGkd-0002Ov-4L
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 08:11:33 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kBGnc-0002eC-Bh
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 08:14:40 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598530290;
+ s=mimecast20190719; t=1598530475;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=hXHdZE897zbysGYlqKTIk8w3OS0oHNUgRlarmGehde8=;
- b=Dyeuk6fZzM7qCFwZngTVh46OAv2HFoHdR+qGSScMph/9AkjN/ej+lS/isFP8+ndn0A8foK
- tIeQYQ2Wrm1zw4tl2l9ILmssLomtjz3kp9V7ZYr4O7tkZOFmhL312yAF2ySTPI2InWzNQ6
- Jj9tp6HoqQPPVRMY5ORnNhjsxw8uAOY=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-503-hJoosnvOPCeLDSWiJdwYVA-1; Thu, 27 Aug 2020 08:11:28 -0400
-X-MC-Unique: hJoosnvOPCeLDSWiJdwYVA-1
-Received: by mail-wm1-f72.google.com with SMTP id a5so1983422wmj.5
- for <qemu-devel@nongnu.org>; Thu, 27 Aug 2020 05:11:28 -0700 (PDT)
+ bh=+1OL25OArQujGvxo6NHAnDTHx2gtwb7OLmIAPD5cbIo=;
+ b=IUJFNrGUw6R+RabhXw8hBPALAKN/35ycPuHCfa2zolB6cQvu7V/VhDFCWb8xyw9O+OqlX0
+ 9N5Lcn1xpaIle3D4rRtme683cdRzuc7kJn5XiB2XJfHQsQe0uYkbHogkV43j/Pu95x57ui
+ j1uUc0tTlHFy/KGfcvoiaXwhh+aTVaQ=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-403-6aM8KL26OXiE_pxFF1-L8g-1; Thu, 27 Aug 2020 08:14:33 -0400
+X-MC-Unique: 6aM8KL26OXiE_pxFF1-L8g-1
+Received: by mail-wr1-f70.google.com with SMTP id o10so1468591wrs.21
+ for <qemu-devel@nongnu.org>; Thu, 27 Aug 2020 05:14:33 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=hXHdZE897zbysGYlqKTIk8w3OS0oHNUgRlarmGehde8=;
- b=pAjSmdmKOjYAC7bloHGlMb23e5YYchrGTI7pFpqCplk0Qs0QkviSDiRzqSZDVEugGu
- GMTLnjRqNBJfnXslxAUTwMo2mcVdnQnV38xknJNREyWXJGtMm7HZek3IOgcTu2SnMoxc
- oI+4On2Htt4rdQ/rhaKiLERMfWCrxlqjkPawddEsda6GxIXo4ap4R0zUmp5KTzfVQSzV
- YFVEs4PE5hsJX7SaokEMCYaiBNLg80Ynyg1DIb3ha/C0BuYccWEDPwPpGRQmnFwz8Z2O
- QPMsYjUYEqOGStPAqpY9iVNfyVbFmoLcypw7TAGNQIpTjftYZj19jmHis3Mpuxu/3jMj
- upcg==
-X-Gm-Message-State: AOAM533Hen3/j/bQLckrBk2OMNrLfyICbHde476HyxwZrZB9ni275Um9
- ub8EvohNAVlsiaycd9r9zz5MrnV+zOEKtIF2tPSXkbGB1hVQd8H2RJDFiPOOgmpQ20eKfhdUB22
- LD6DIRqwGAzQItH8=
-X-Received: by 2002:a1c:a70c:: with SMTP id q12mr11668923wme.89.1598530286682; 
- Thu, 27 Aug 2020 05:11:26 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzEUiojX4Bkf4wT/SK0HSkqo4H8jkeMcVpT9ftOKGIc66BXMDsTB/LxfItjAc9ud8GEJxcJrg==
-X-Received: by 2002:a1c:a70c:: with SMTP id q12mr11668892wme.89.1598530286376; 
- Thu, 27 Aug 2020 05:11:26 -0700 (PDT)
-Received: from redhat.com (bzq-79-180-15-82.red.bezeqint.net. [79.180.15.82])
- by smtp.gmail.com with ESMTPSA id
- b14sm5268940wrj.93.2020.08.27.05.11.24
+ bh=+1OL25OArQujGvxo6NHAnDTHx2gtwb7OLmIAPD5cbIo=;
+ b=X3YbiivS9uPGQzDocNwYESOVobzhF8CKOfpdTE1PyAIuZxZJXXf+1DoeO9x1nE/Xeh
+ SCyQjbYYxMg+r8OtWs710EwZ7jdwtHjCyXaLK6+rLeqhRnSCmCaSxhiSRBfQERs6Kh25
+ 0WJzYCof/m1lIn7xlVhjy65yCL9/aFVk0ytQbPlwf3mGzDpmSNUEEschMT204vTpWNpD
+ 7v11TvzBCV1CQlLSK9/sOiB+r0fzOWcgVZwiXaiJ3HqGL+qboy+2i9DIrMjOhZVQ/CF3
+ GMIz3KWwGd1wRl4lGwi94pmuXr7+exMeYCvGO3sp182iMQiPMWsVXLwBXkaDSkII2W8W
+ FhzA==
+X-Gm-Message-State: AOAM532AME/zXko7Rpx5hmT37jjYUQraXt1rZm1VbnIZFbmhxM7TlZ/J
+ aCSCZmmUI8y/ENLiiklg76TlfTRZF2YKbJk2xNO17qQLFjYp2+yTzV2AKL2MINI3CPs4Z1ezwGe
+ 6TATZeqCaA1lltyQ=
+X-Received: by 2002:a5d:574e:: with SMTP id q14mr9394668wrw.281.1598530472249; 
+ Thu, 27 Aug 2020 05:14:32 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyov7Hex+KBdzDk+IW50EUICx2hVV5tMMP7NYHHFFQbwIVLikWaRsMvk4NVFjKVZh+vZArjrQ==
+X-Received: by 2002:a5d:574e:: with SMTP id q14mr9394640wrw.281.1598530471906; 
+ Thu, 27 Aug 2020 05:14:31 -0700 (PDT)
+Received: from redhat.com (bzq-109-67-46-169.red.bezeqint.net. [109.67.46.169])
+ by smtp.gmail.com with ESMTPSA id e2sm5906924wrt.66.2020.08.27.05.14.29
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 27 Aug 2020 05:11:25 -0700 (PDT)
-Date: Thu, 27 Aug 2020 08:11:22 -0400
+ Thu, 27 Aug 2020 05:14:31 -0700 (PDT)
+Date: Thu, 27 Aug 2020 08:14:22 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Jiajun Chen <chenjiajun8@huawei.com>
-Subject: Re: [PATCH] vhost-user: add separate memslot counter for vhost-user
-Message-ID: <20200827081005-mutt-send-email-mst@kernel.org>
-References: <20200811014343.17140-1-chenjiajun8@huawei.com>
+To: Hogan Wang <hogan.wang@huawei.com>
+Subject: Re: [PATCH] hw/pci-host: save/restore pci host config register for
+ old ones
+Message-ID: <20200827081352-mutt-send-email-mst@kernel.org>
+References: <20200810085806.1221-1-hogan.wang@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20200811014343.17140-1-chenjiajun8@huawei.com>
+In-Reply-To: <20200810085806.1221-1-hogan.wang@huawei.com>
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
-X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Spam-Score: 0.004
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
@@ -109,306 +109,272 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: zhang.zhanghailiang@huawei.com, jasowang@redhat.com, qemu-devel@nongnu.org,
- xiexiangyou@huawei.com, raphael.norwitz@nutanix.com, kraxel@redhat.com,
- marcandre.lureau@redhat.com, imammedo@redhat.com
+Cc: weidong.huang@huawei.com, wangxinxin.wang@huawei.com, jusual@redhat.com,
+ dgilbert@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Aug 11, 2020 at 09:43:43AM +0800, Jiajun Chen wrote:
-> Used_memslots is equal to dev->mem->nregions now, it is true for
-> vhost kernel, but not for vhost user, which uses the memory regions
-> that have file descriptor. In fact, not all of the memory regions
-> have file descriptor.
-> It is usefully in some scenarios, e.g. used_memslots is 8, and only
-> 5 memory slots can be used by vhost user, it is failed to hot plug
-> a new memory RAM because vhost_has_free_slot just returned false,
-> but we can hot plug it safely in fact.
+On Mon, Aug 10, 2020 at 04:58:06PM +0800, Hogan Wang wrote:
+> The i440fx and q35 machines integrate i440FX or MCH PCI device by default.
+> Refer to i440FX and ICH9-LPC spcifications, there are some reserved
+> configuration registers can used to save/restore PCIHostState.config_reg.
+> It's nasty but friendly to old ones.
 > 
-> Signed-off-by: Jiajun Chen <chenjiajun8@huawei.com>
-> Signed-off-by: Jianjay Zhou <jianjay.zhou@huawei.com>
+> Reproducer steps:
+> step 1. Make modifications to seabios and qemu for increase reproduction
+> efficiency, write 0xf0 to 0x402 port notify qemu to stop vcpu after
+> 0x0cf8 port wrote i440 configure register. qemu stop vcpu when catch
+> 0x402 port wrote 0xf0.
+> 
+> seabios:/src/hw/pci.c
+> @@ -52,6 +52,11 @@ void pci_config_writeb(u16 bdf, u32 addr, u8 val)
+>          writeb(mmconfig_addr(bdf, addr), val);
+>      } else {
+>          outl(ioconfig_cmd(bdf, addr), PORT_PCI_CMD);
+> +       if (bdf == 0 && addr == 0x72 && val == 0xa) {
+> +            dprintf(1, "stop vcpu\n");
+> +            outb(0xf0, 0x402); // notify qemu to stop vcpu
+> +            dprintf(1, "resume vcpu\n");
+> +        }
+>          outb(val, PORT_PCI_DATA + (addr & 3));
+>      }
+>  }
+> 
+> qemu:hw/char/debugcon.c
+> @@ -60,6 +61,9 @@ static void debugcon_ioport_write(void *opaque, hwaddr addr, uint64_t val,
+>      printf(" [debugcon: write addr=0x%04" HWADDR_PRIx " val=0x%02" PRIx64 "]\n", addr, val);
+>  #endif
+> 
+> +    if (ch == 0xf0) {
+> +        vm_stop(RUN_STATE_PAUSED);
+> +    }
+>      /* XXX this blocks entire thread. Rewrite to use
+>       * qemu_chr_fe_write and background I/O callbacks */
+>      qemu_chr_fe_write_all(&s->chr, &ch, 1);
+> 
+> step 2. start vm1 by the following command line, and then vm stopped.
+> $ qemu-system-x86_64 -machine pc-i440fx-5.0,accel=kvm\
+>  -netdev tap,ifname=tap-test,id=hostnet0,vhost=on,downscript=no,script=no\
+>  -device virtio-net-pci,netdev=hostnet0,id=net0,bus=pci.0,addr=0x13,bootindex=3\
+>  -device cirrus-vga,id=video0,vgamem_mb=16,bus=pci.0,addr=0x2\
+>  -chardev file,id=seabios,path=/var/log/test.seabios,append=on\
+>  -device isa-debugcon,iobase=0x402,chardev=seabios\
+>  -monitor stdio
+> 
+> step 3. start vm2 to accept vm1 state.
+> $ qemu-system-x86_64 -machine pc-i440fx-5.0,accel=kvm\
+>  -netdev tap,ifname=tap-test1,id=hostnet0,vhost=on,downscript=no,script=no\
+>  -device virtio-net-pci,netdev=hostnet0,id=net0,bus=pci.0,addr=0x13,bootindex=3\
+>  -device cirrus-vga,id=video0,vgamem_mb=16,bus=pci.0,addr=0x2\
+>  -chardev file,id=seabios,path=/var/log/test.seabios,append=on\
+>  -device isa-debugcon,iobase=0x402,chardev=seabios\
+>  -monitor stdio \
+>  -incoming tcp:127.0.0.1:8000
+> 
+> step 4. execute the following qmp command in vm1 to migrate.
+> (qemu) migrate tcp:127.0.0.1:8000
+> 
+> step 5. execute the following qmp command in vm2 to resume vcpu.
+> (qemu) cont
+> 
+> Before this patch, we get KVM "emulation failure" error on vm2.
+> This patch fixes it.
+> 
+> Signed-off-by: Hogan Wang <hogan.wang@huawei.com>
 
-cc a bunch more people
+
+dgilbrt so what is your take on this?
+Also, how about a capability that will make hacks like this
+one redundant in the future?
 
 > ---
->  hw/virtio/vhost-backend.c         | 14 ++++++++
->  hw/virtio/vhost-user.c            | 28 ++++++++++++++++
->  hw/virtio/vhost.c                 | 54 +++++++++++++++++++++++++------
->  include/hw/virtio/vhost-backend.h |  5 +++
->  include/hw/virtio/vhost.h         |  1 +
->  net/vhost-user.c                  |  7 ++++
->  6 files changed, 100 insertions(+), 9 deletions(-)
+>  hw/pci-host/i440fx.c      | 46 +++++++++++++++++++++++++++++++++++++++
+>  hw/pci-host/q35.c         | 44 +++++++++++++++++++++++++++++++++++++
+>  hw/pci/pci_host.c         |  4 ++--
+>  include/hw/pci/pci_host.h |  2 +-
+>  4 files changed, 93 insertions(+), 3 deletions(-)
 > 
-> diff --git a/hw/virtio/vhost-backend.c b/hw/virtio/vhost-backend.c
-> index 782b1d67d9..35eec7e166 100644
-> --- a/hw/virtio/vhost-backend.c
-> +++ b/hw/virtio/vhost-backend.c
-> @@ -20,6 +20,8 @@
->  #include <linux/vhost.h>
->  #include <sys/ioctl.h>
+> diff --git a/hw/pci-host/i440fx.c b/hw/pci-host/i440fx.c
+> index 8ed2417f0c..707e7e9dfb 100644
+> --- a/hw/pci-host/i440fx.c
+> +++ b/hw/pci-host/i440fx.c
+> @@ -64,6 +64,14 @@ typedef struct I440FXState {
+>   */
+>  #define I440FX_COREBOOT_RAM_SIZE 0x57
 >  
-> +static unsigned int vhost_kernel_used_memslots;
+> +/* Older I440FX machines (5.0 and older) do not support i440FX-pcihost state
+> + * migration, use some reserved INTEL 82441 configuration registers to
+> + * save/restore i440FX-pcihost config register. Refer to [INTEL 440FX PCISET
+> + * 82441FX PCI AND MEMORY CONTROLLER (PMC) AND 82442FX DATA BUS ACCELERATOR
+> + * (DBX) Table 1. PMC Configuration Space]
+> + */
+> +#define I440FX_PCI_HOST_CONFIG_REG 0x94
 > +
->  static int vhost_kernel_call(struct vhost_dev *dev, unsigned long int request,
->                               void *arg)
+>  static void i440fx_update_memory_mappings(PCII440FXState *d)
 >  {
-> @@ -238,6 +240,16 @@ static void vhost_kernel_set_iotlb_callback(struct vhost_dev *dev,
->          qemu_set_fd_handler((uintptr_t)dev->opaque, NULL, NULL, NULL);
+>      int i;
+> @@ -98,15 +106,53 @@ static void i440fx_write_config(PCIDevice *dev,
+>  static int i440fx_post_load(void *opaque, int version_id)
+>  {
+>      PCII440FXState *d = opaque;
+> +    PCIDevice *dev;
+> +    PCIHostState *s = OBJECT_CHECK(PCIHostState,
+> +                                   object_resolve_path("/machine/i440fx", NULL),
+> +                                   TYPE_PCI_HOST_BRIDGE);
+>  
+>      i440fx_update_memory_mappings(d);
+> +
+> +    if (!s->config_reg_mig_enabled) {
+> +        dev = PCI_DEVICE(d);
+> +        s->config_reg = pci_get_long(&dev->config[I440FX_PCI_HOST_CONFIG_REG]);
+> +        pci_set_long(&dev->config[I440FX_PCI_HOST_CONFIG_REG], 0);
+> +    }
+> +    return 0;
+> +}
+> +
+> +static int i440fx_pre_save(void *opaque)
+> +{
+> +    PCIDevice *dev = opaque;
+> +    PCIHostState *s = OBJECT_CHECK(PCIHostState,
+> +                                   object_resolve_path("/machine/i440fx", NULL),
+> +                                   TYPE_PCI_HOST_BRIDGE);
+> +    if (!s->config_reg_mig_enabled) {
+> +        pci_set_long(&dev->config[I440FX_PCI_HOST_CONFIG_REG],
+> +                     s->config_reg);
+> +    }
+> +    return 0;
+> +}
+> +
+> +static int i440fx_post_save(void *opaque)
+> +{
+> +    PCIDevice *dev = opaque;
+> +    PCIHostState *s = OBJECT_CHECK(PCIHostState,
+> +                                   object_resolve_path("/machine/i440fx", NULL),
+> +                                   TYPE_PCI_HOST_BRIDGE);
+> +    if (!s->config_reg_mig_enabled) {
+> +        pci_set_long(&dev->config[I440FX_PCI_HOST_CONFIG_REG], 0);
+> +    }
+>      return 0;
 >  }
 >  
-> +static void vhost_kernel_set_used_memslots(struct vhost_dev *dev)
-> +{
-> +    vhost_kernel_used_memslots = dev->mem->nregions;
+> +
+>  static const VMStateDescription vmstate_i440fx = {
+>      .name = "I440FX",
+>      .version_id = 3,
+>      .minimum_version_id = 3,
+> +    .pre_save = i440fx_pre_save,
+> +    .post_save = i440fx_post_save,
+>      .post_load = i440fx_post_load,
+>      .fields = (VMStateField[]) {
+>          VMSTATE_PCI_DEVICE(parent_obj, PCII440FXState),
+> diff --git a/hw/pci-host/q35.c b/hw/pci-host/q35.c
+> index b67cb9c29f..40c975948c 100644
+> --- a/hw/pci-host/q35.c
+> +++ b/hw/pci-host/q35.c
+> @@ -43,6 +43,14 @@
+>  
+>  #define Q35_PCI_HOST_HOLE64_SIZE_DEFAULT (1ULL << 35)
+>  
+> +/* Older Q35 machines (5.0 and older) do not support q35-pcihost state
+> + * migration, use some reserved INTEL MCH configuration registers to
+> + * save/restore q35-pcihost config register. Refer to [Intel 3 Series
+> + * Chipset Family Datasheet Table 5-1. DRAM Controller Register Address
+> + * Map (D0:F0)]
+> + */
+> +#define Q35_PCI_HOST_CONFIG_REG 0x70
+> +
+>  static void q35_host_realize(DeviceState *dev, Error **errp)
+>  {
+>      PCIHostState *pci = PCI_HOST_BRIDGE(dev);
+> @@ -513,14 +521,50 @@ static void mch_update(MCHPCIState *mch)
+>  static int mch_post_load(void *opaque, int version_id)
+>  {
+>      MCHPCIState *mch = opaque;
+> +    PCIDevice *dev;
+> +    PCIHostState *s = OBJECT_CHECK(PCIHostState,
+> +                                   object_resolve_path("/machine/q35", NULL),
+> +                                   TYPE_PCI_HOST_BRIDGE);
+>      mch_update(mch);
+> +    if (!s->config_reg_mig_enabled) {
+> +        dev = PCI_DEVICE(mch);
+> +        s->config_reg = pci_get_long(&dev->config[Q35_PCI_HOST_CONFIG_REG]);
+> +        pci_set_long(&dev->config[Q35_PCI_HOST_CONFIG_REG], 0);
+> +    }
+> +    return 0;
 > +}
 > +
-> +static unsigned int vhost_kernel_get_used_memslots(void)
+> +static int mch_pre_save(void *opaque)
 > +{
-> +    return vhost_kernel_used_memslots;
+> +    PCIDevice *dev = opaque;
+> +    PCIHostState *s = OBJECT_CHECK(PCIHostState,
+> +                                   object_resolve_path("/machine/q35", NULL),
+> +                                   TYPE_PCI_HOST_BRIDGE);
+> +    if (!s->config_reg_mig_enabled) {
+> +        pci_set_long(&dev->config[Q35_PCI_HOST_CONFIG_REG], s->config_reg);
+> +    }
+>      return 0;
+>  }
+>  
+> +static int mch_post_save(void *opaque)
+> +{
+> +    PCIDevice *dev = opaque;
+> +    PCIHostState *s = OBJECT_CHECK(PCIHostState,
+> +                                   object_resolve_path("/machine/q35", NULL),
+> +                                   TYPE_PCI_HOST_BRIDGE);
+> +    if (!s->config_reg_mig_enabled) {
+> +        pci_set_long(&dev->config[Q35_PCI_HOST_CONFIG_REG], 0);
+> +    }
+> +    return 0;
 > +}
 > +
->  static const VhostOps kernel_ops = {
->          .backend_type = VHOST_BACKEND_TYPE_KERNEL,
->          .vhost_backend_init = vhost_kernel_init,
-> @@ -269,6 +281,8 @@ static const VhostOps kernel_ops = {
->  #endif /* CONFIG_VHOST_VSOCK */
->          .vhost_set_iotlb_callback = vhost_kernel_set_iotlb_callback,
->          .vhost_send_device_iotlb_msg = vhost_kernel_send_device_iotlb_msg,
-> +        .vhost_set_used_memslots = vhost_kernel_set_used_memslots,
-> +        .vhost_get_used_memslots = vhost_kernel_get_used_memslots,
+> +
+>  static const VMStateDescription vmstate_mch = {
+>      .name = "mch",
+>      .version_id = 1,
+>      .minimum_version_id = 1,
+> +    .pre_save = mch_pre_save,
+> +    .post_save = mch_post_save,
+>      .post_load = mch_post_load,
+>      .fields = (VMStateField[]) {
+>          VMSTATE_PCI_DEVICE(parent_obj, MCHPCIState),
+> diff --git a/hw/pci/pci_host.c b/hw/pci/pci_host.c
+> index 8ca5fadcbd..c24daea84e 100644
+> --- a/hw/pci/pci_host.c
+> +++ b/hw/pci/pci_host.c
+> @@ -205,7 +205,7 @@ const MemoryRegionOps pci_host_data_be_ops = {
+>  static bool pci_host_needed(void *opaque)
+>  {
+>      PCIHostState *s = opaque;
+> -    return s->mig_enabled;
+> +    return s->config_reg_mig_enabled;
+>  }
+>  
+>  const VMStateDescription vmstate_pcihost = {
+> @@ -221,7 +221,7 @@ const VMStateDescription vmstate_pcihost = {
+>  
+>  static Property pci_host_properties_common[] = {
+>      DEFINE_PROP_BOOL("x-config-reg-migration-enabled", PCIHostState,
+> -                     mig_enabled, true),
+> +                     config_reg_mig_enabled, true),
+>      DEFINE_PROP_END_OF_LIST(),
 >  };
->  #endif
 >  
-> diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-> index 31231218dc..04d20fc3ee 100644
-> --- a/hw/virtio/vhost-user.c
-> +++ b/hw/virtio/vhost-user.c
-> @@ -232,6 +232,7 @@ static VhostUserMsg m __attribute__ ((unused));
+> diff --git a/include/hw/pci/pci_host.h b/include/hw/pci/pci_host.h
+> index 6210a7e14d..23d6249979 100644
+> --- a/include/hw/pci/pci_host.h
+> +++ b/include/hw/pci/pci_host.h
+> @@ -45,7 +45,7 @@ struct PCIHostState {
+>      MemoryRegion data_mem;
+>      MemoryRegion mmcfg;
+>      uint32_t config_reg;
+> -    bool mig_enabled;
+> +    bool config_reg_mig_enabled;
+>      PCIBus *bus;
 >  
->  /* The version of the protocol we support */
->  #define VHOST_USER_VERSION    (0x1)
-> +static unsigned int vhost_user_used_memslots;
->  
->  struct vhost_user {
->      struct vhost_dev *dev;
-> @@ -2354,6 +2355,31 @@ void vhost_user_cleanup(VhostUserState *user)
->      user->chr = NULL;
->  }
->  
-> +static void vhost_user_set_used_memslots(struct vhost_dev *dev)
-> +{
-> +    unsigned int counter = 0;
-> +    int i;
-> +
-> +    for (i = 0; i < dev->mem->nregions; ++i) {
-> +        struct vhost_memory_region *reg = dev->mem->regions + i;
-> +        ram_addr_t offset;
-> +        MemoryRegion *mr;
-> +
-> +        assert((uintptr_t)reg->userspace_addr == reg->userspace_addr);
-> +        mr = memory_region_from_host((void *)(uintptr_t)reg->userspace_addr,
-> +                                    &offset);
-> +        if (mr && memory_region_get_fd(mr) > 0) {
-> +            counter++;
-> +        }
-> +    }
-> +    vhost_user_used_memslots = counter;
-> +}
-> +
-> +static unsigned int vhost_user_get_used_memslots(void)
-> +{
-> +    return vhost_user_used_memslots;
-> +}
-> +
->  const VhostOps user_ops = {
->          .backend_type = VHOST_BACKEND_TYPE_USER,
->          .vhost_backend_init = vhost_user_backend_init,
-> @@ -2387,4 +2413,6 @@ const VhostOps user_ops = {
->          .vhost_backend_mem_section_filter = vhost_user_mem_section_filter,
->          .vhost_get_inflight_fd = vhost_user_get_inflight_fd,
->          .vhost_set_inflight_fd = vhost_user_set_inflight_fd,
-> +        .vhost_set_used_memslots = vhost_user_set_used_memslots,
-> +        .vhost_get_used_memslots = vhost_user_get_used_memslots,
->  };
-> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-> index 1a1384e7a6..7f36d7af25 100644
-> --- a/hw/virtio/vhost.c
-> +++ b/hw/virtio/vhost.c
-> @@ -45,20 +45,22 @@
->  static struct vhost_log *vhost_log;
->  static struct vhost_log *vhost_log_shm;
->  
-> -static unsigned int used_memslots;
->  static QLIST_HEAD(, vhost_dev) vhost_devices =
->      QLIST_HEAD_INITIALIZER(vhost_devices);
->  
-> +bool used_memslots_exceeded;
-> +
->  bool vhost_has_free_slot(void)
->  {
-> -    unsigned int slots_limit = ~0U;
->      struct vhost_dev *hdev;
->  
->      QLIST_FOREACH(hdev, &vhost_devices, entry) {
-> -        unsigned int r = hdev->vhost_ops->vhost_backend_memslots_limit(hdev);
-> -        slots_limit = MIN(slots_limit, r);
-> +        if (hdev->vhost_ops->vhost_get_used_memslots() >=
-> +            hdev->vhost_ops->vhost_backend_memslots_limit(hdev)) {
-> +            return false;
-> +        }
->      }
-> -    return slots_limit > used_memslots;
-> +    return true;
->  }
->  
->  static void vhost_dev_sync_region(struct vhost_dev *dev,
-> @@ -502,7 +504,6 @@ static void vhost_commit(MemoryListener *listener)
->                         dev->n_mem_sections * sizeof dev->mem->regions[0];
->      dev->mem = g_realloc(dev->mem, regions_size);
->      dev->mem->nregions = dev->n_mem_sections;
-> -    used_memslots = dev->mem->nregions;
->      for (i = 0; i < dev->n_mem_sections; i++) {
->          struct vhost_memory_region *cur_vmr = dev->mem->regions + i;
->          struct MemoryRegionSection *mrs = dev->mem_sections + i;
-> @@ -678,6 +679,7 @@ static void vhost_region_add_section(struct vhost_dev *dev,
->          dev->tmp_sections[dev->n_tmp_sections - 1].fv = NULL;
->          memory_region_ref(section->mr);
->      }
-> +    dev->vhost_ops->vhost_set_used_memslots(dev);
->  }
->  
->  /* Used for both add and nop callbacks */
-> @@ -693,6 +695,17 @@ static void vhost_region_addnop(MemoryListener *listener,
->      vhost_region_add_section(dev, section);
->  }
->  
-> +static void vhost_region_del(MemoryListener *listener,
-> +                             MemoryRegionSection *section)
-> +{
-> +    struct vhost_dev *dev = container_of(listener, struct vhost_dev,
-> +                                         memory_listener);
-> +    if (!vhost_section(dev, section)) {
-> +        return;
-> +    }
-> +    dev->vhost_ops->vhost_set_used_memslots(dev);
-> +}
-> +
->  static void vhost_iommu_unmap_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
->  {
->      struct vhost_iommu *iommu = container_of(n, struct vhost_iommu, n);
-> @@ -1248,6 +1261,19 @@ static void vhost_virtqueue_cleanup(struct vhost_virtqueue *vq)
->      event_notifier_cleanup(&vq->masked_notifier);
->  }
->  
-> +static bool vhost_dev_used_memslots_is_exceeded(struct vhost_dev *hdev)
-> +{
-> +    if (hdev->vhost_ops->vhost_get_used_memslots() >
-> +        hdev->vhost_ops->vhost_backend_memslots_limit(hdev)) {
-> +        error_report("vhost backend memory slots limit is less"
-> +                " than current number of present memory slots");
-> +        used_memslots_exceeded = true;
-> +        return true;
-> +    }
-> +    used_memslots_exceeded = false;
-> +    return false;
-> +}
-> +
->  int vhost_dev_init(struct vhost_dev *hdev, void *opaque,
->                     VhostBackendType backend_type, uint32_t busyloop_timeout)
->  {
-> @@ -1300,6 +1326,7 @@ int vhost_dev_init(struct vhost_dev *hdev, void *opaque,
->      hdev->memory_listener = (MemoryListener) {
->          .begin = vhost_begin,
->          .commit = vhost_commit,
-> +        .region_del = vhost_region_del,
->          .region_add = vhost_region_addnop,
->          .region_nop = vhost_region_addnop,
->          .log_start = vhost_log_start,
-> @@ -1346,9 +1373,13 @@ int vhost_dev_init(struct vhost_dev *hdev, void *opaque,
->      memory_listener_register(&hdev->memory_listener, &address_space_memory);
->      QLIST_INSERT_HEAD(&vhost_devices, hdev, entry);
->  
-> -    if (used_memslots > hdev->vhost_ops->vhost_backend_memslots_limit(hdev)) {
-> -        error_report("vhost backend memory slots limit is less"
-> -                " than current number of present memory slots");
-> +    /*
-> +     * If we started a VM without any vhost device,
-> +     * vhost_dev_used_memslots_is_exceeded will always return false for the
-> +     * first time vhost device hot-plug(vhost_get_used_memslots is always 0),
-> +     * so it needs to double check here
-> +     */
-> +    if (vhost_dev_used_memslots_is_exceeded(hdev)) {
->          r = -1;
->          if (busyloop_timeout) {
->              goto fail_busyloop;
-> @@ -1773,3 +1804,8 @@ int vhost_net_set_backend(struct vhost_dev *hdev,
->  
->      return -1;
->  }
-> +
-> +bool used_memslots_is_exceeded(void)
-> +{
-> +    return used_memslots_exceeded;
-> +}
-> diff --git a/include/hw/virtio/vhost-backend.h b/include/hw/virtio/vhost-backend.h
-> index 8825bd278f..ed43a93692 100644
-> --- a/include/hw/virtio/vhost-backend.h
-> +++ b/include/hw/virtio/vhost-backend.h
-> @@ -124,6 +124,9 @@ typedef int (*vhost_get_device_id_op)(struct vhost_dev *dev, uint32_t *dev_id);
->  
->  typedef bool (*vhost_force_iommu_op)(struct vhost_dev *dev);
->  
-> +typedef void (*vhost_set_used_memslots_op)(struct vhost_dev *dev);
-> +typedef unsigned int (*vhost_get_used_memslots_op)(void);
-> +
->  typedef struct VhostOps {
->      VhostBackendType backend_type;
->      vhost_backend_init vhost_backend_init;
-> @@ -168,6 +171,8 @@ typedef struct VhostOps {
->      vhost_vq_get_addr_op  vhost_vq_get_addr;
->      vhost_get_device_id_op vhost_get_device_id;
->      vhost_force_iommu_op vhost_force_iommu;
-> +    vhost_set_used_memslots_op vhost_set_used_memslots;
-> +    vhost_get_used_memslots_op vhost_get_used_memslots;
->  } VhostOps;
->  
->  extern const VhostOps user_ops;
-> diff --git a/include/hw/virtio/vhost.h b/include/hw/virtio/vhost.h
-> index 767a95ec0b..bf7cec445f 100644
-> --- a/include/hw/virtio/vhost.h
-> +++ b/include/hw/virtio/vhost.h
-> @@ -144,4 +144,5 @@ int vhost_dev_set_inflight(struct vhost_dev *dev,
->                             struct vhost_inflight *inflight);
->  int vhost_dev_get_inflight(struct vhost_dev *dev, uint16_t queue_size,
->                             struct vhost_inflight *inflight);
-> +bool used_memslots_is_exceeded(void);
->  #endif
-> diff --git a/net/vhost-user.c b/net/vhost-user.c
-> index 17532daaf3..2f0216b518 100644
-> --- a/net/vhost-user.c
-> +++ b/net/vhost-user.c
-> @@ -20,6 +20,7 @@
->  #include "qemu/error-report.h"
->  #include "qemu/option.h"
->  #include "trace.h"
-> +#include "include/hw/virtio/vhost.h"
->  
->  typedef struct NetVhostUserState {
->      NetClientState nc;
-> @@ -347,6 +348,12 @@ static int net_vhost_user_init(NetClientState *peer, const char *device,
->          qemu_chr_fe_set_handlers(&s->chr, NULL, NULL,
->                                   net_vhost_user_event, NULL, nc0->name, NULL,
->                                   true);
-> +
-> +        if (used_memslots_is_exceeded()) {
-> +            error_report("used memslots exceeded the backend limit, quit "
-> +                            "loop");
-> +            goto err;
-> +        }
->      } while (!s->started);
->  
->      assert(s->vhost_net);
+>      QLIST_ENTRY(PCIHostState) next;
 > -- 
-> 2.27.0.dirty
+> 2.27.0
+> 
 
 
