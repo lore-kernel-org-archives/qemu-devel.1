@@ -2,83 +2,88 @@ Return-Path: <SRS0=k4hX=CF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F47DC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 13:13:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 589A2C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 13:29:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DAEA5206F0
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 13:13:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 223DF2177B
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 13:29:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PiTGoyCH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DAEA5206F0
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z2HwxYxT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 223DF2177B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48618 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60252 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBHir-0006yJ-6d
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 09:13:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41292)
+	id 1kBHxg-0004Cf-IZ
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 09:29:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44788)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kBHiJ-0006Yw-Py
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 09:13:11 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:21386
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kBHwn-0003hK-2Y
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 09:28:09 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:48033
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kBHiH-0002qP-DE
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 09:13:11 -0400
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kBHwk-0004dP-GF
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 09:28:08 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598533988;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ s=mimecast20190719; t=1598534885;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=DrLZX4TQrbIQFwp7wTqkTnR/fS8O7/RZetW0XJRyvnI=;
- b=PiTGoyCHwz+PAInLOLOy9lnAkvebdQNfSLfdj/Sn2ZtOp8CvzagA5c387sqlGjkB6Vi/Pd
- bkPGPSWFD+ZuZlJNf/rnQzM6Jgh54qIbgd1fFwKB/+AF/rdXCIf6jDlKqFrKqXMhJ3Q1u9
- /LBwoSJJS0lnUWBWApPouv8TRQeMqwo=
+ bh=1UXZYCUCwH5vjxgLsuBy1Ll76hP6hUOqDIwdIMqnje8=;
+ b=Z2HwxYxTakcsE3lTr3cOtSFHCVSpMtFj1Crs3bjfdQb1BNecyCiM9SPrmQbGFkYBunWuQs
+ gAilh1HkVyNrgj5bythArFVbyR52LoplqT62MZLXWpv9+n9usJulq6WjBFE3cbkBegEKrY
+ bgDqf6YVYSj2y3aMOLiwnm8cbicQO7o=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-395-t82iGpTXNjiEwLQNSPypRQ-1; Thu, 27 Aug 2020 09:13:06 -0400
-X-MC-Unique: t82iGpTXNjiEwLQNSPypRQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-296-Fjv05oBKOAiJULa3TMYmFQ-1; Thu, 27 Aug 2020 09:28:03 -0400
+X-MC-Unique: Fjv05oBKOAiJULa3TMYmFQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 324731054F90;
- Thu, 27 Aug 2020 13:13:05 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-114-182.ams2.redhat.com [10.36.114.182])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D8F8861100;
- Thu, 27 Aug 2020 13:13:02 +0000 (UTC)
-Date: Thu, 27 Aug 2020 15:13:01 +0200
-From: Kevin Wolf <kwolf@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 403181084C92;
+ Thu, 27 Aug 2020 13:28:02 +0000 (UTC)
+Received: from redhat.com (ovpn-114-113.ams2.redhat.com [10.36.114.113])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 86FDD7D4F2;
+ Thu, 27 Aug 2020 13:28:00 +0000 (UTC)
+Date: Thu, 27 Aug 2020 14:27:57 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 To: Markus Armbruster <armbru@redhat.com>
-Subject: Re: [PATCH v2 (BROKEN) 0/6] migration: bring improved
- savevm/loadvm/delvm to QMP
-Message-ID: <20200827131301.GA5520@linux.fritz.box>
-References: <20200727150843.3419256-1-berrange@redhat.com>
- <877dtls8ux.fsf@dusky.pond.sub.org>
- <20200826182824.GA190807@redhat.com>
- <20200826183425.GA191632@redhat.com>
- <87zh6gmjq1.fsf@dusky.pond.sub.org>
+Subject: Re: [PATCH v4 3/6] util: add Error object for qemu_open_internal
+ error reporting
+Message-ID: <20200827132757.GU192458@redhat.com>
+References: <20200821172105.608752-1-berrange@redhat.com>
+ <20200821172105.608752-4-berrange@redhat.com>
+ <87wo1mbvw2.fsf@dusky.pond.sub.org>
+ <20200825153627.GA107278@redhat.com>
+ <87k0xl7jpk.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <87zh6gmjq1.fsf@dusky.pond.sub.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <87k0xl7jpk.fsf@dusky.pond.sub.org>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
 X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
 Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=kwolf@redhat.com;
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=berrange@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 02:56:52
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 00:13:19
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -99,49 +104,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Krempa <pkrempa@redhat.com>,
- Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- "Denis V. Lunev" <den@virtuozzo.com>, qemu-block@nongnu.org,
- Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>,
- Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>,
- John Snow <jsnow@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 27.08.2020 um 13:06 hat Markus Armbruster geschrieben:
+On Wed, Aug 26, 2020 at 01:03:19PM +0200, Markus Armbruster wrote:
 > Daniel P. Berrangé <berrange@redhat.com> writes:
 > 
-> > On Wed, Aug 26, 2020 at 07:28:24PM +0100, Daniel P. Berrangé wrote:
-> >> On Wed, Aug 26, 2020 at 05:52:06PM +0200, Markus Armbruster wrote:
-> >> > Open questions:
-> >> > 
-> >> > * Do we want the QMP command to delete existing snapshots with
-> >> >   conflicting tag / ID, like HMP savevm does?  Or do we want it to fail
-> >> >   the transaction?
+> > On Tue, Aug 25, 2020 at 05:14:21PM +0200, Markus Armbruster wrote:
+> >> Daniel P. Berrangé <berrange@redhat.com> writes:
 > >> 
-> >> The intent is for the QMP commands to operate exclusively on
-> >> 'tags', and never consider "ID".
+> >> > Instead of relying on the limited information from errno, we can now
+> >> > also provide detailed error messages.
+> >> 
+> >> The more detailed error messages are currently always ignored, but the
+> >> next patches will fix that.
+> >> 
+> >> > Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+> >> > ---
+> >> >  util/osdep.c | 21 +++++++++++++++++++--
+> >> >  1 file changed, 19 insertions(+), 2 deletions(-)
+> >> >
+> >> > diff --git a/util/osdep.c b/util/osdep.c
+> >> > index 9ff92551e7..9c7118d3cb 100644
+> >> > --- a/util/osdep.c
+> >> > +++ b/util/osdep.c
+> >> > @@ -284,7 +284,7 @@ int qemu_lock_fd_test(int fd, int64_t start, int64_t len, bool exclusive)
+> >> >   * Opens a file with FD_CLOEXEC set
+> >> >   */
+> >> >  static int
+> >> > -qemu_open_internal(const char *name, int flags, mode_t mode)
+> >> > +qemu_open_internal(const char *name, int flags, mode_t mode, Error **errp)
+> >> >  {
+> >> >      int ret;
+> >> >  
+> >> > @@ -298,24 +298,31 @@ qemu_open_internal(const char *name, int flags, mode_t mode)
+> >> >  
+> >> >          fdset_id = qemu_parse_fdset(fdset_id_str);
+> >> >          if (fdset_id == -1) {
+> >> > +            error_setg(errp, "Could not parse fdset %s", name);
+> >> >              errno = EINVAL;
+> >> >              return -1;
+> >> >          }
+> >> >  
+> >> >          fd = monitor_fdset_get_fd(fdset_id, flags);
+> >> >          if (fd < 0) {
+> >> > +            error_setg_errno(errp, -fd, "Could not acquire FD for %s flags %x",
+> >> > +                             name, flags);
+> >> >              errno = -fd;
+> >> >              return -1;
+> >> >          }
+> >> >  
+> >> >          dupfd = qemu_dup_flags(fd, flags);
+> >> >          if (dupfd == -1) {
+> >> > +            error_setg_errno(errp, errno, "Could not dup FD for %s flags %x",
+> >> > +                             name, flags);
+> >> >              return -1;
+> >> >          }
+> >> >  
+> >> >          ret = monitor_fdset_dup_fd_add(fdset_id, dupfd);
+> >> >          if (ret == -1) {
+> >> >              close(dupfd);
+> >> > +            error_setg(errp, "Could not save FD for %s flags %x",
+> >> > +                       name, flags);
+> >> 
+> >> Can this happen?
 > >
-> > I forgot that even HMP ignores "ID" now and works exclusively in terms
-> > of tags since:
-> >
-> >
-> >   commit 6ca080453ea403959ccde661030ca16264acc181
-> >   Author: Daniel Henrique Barboza <danielhb413@gmail.com>
-> >   Date:   Wed Nov 7 11:09:58 2018 -0200
-> >
-> >     block/snapshot.c: eliminate use of ID input in snapshot operations
+> > Well there's code in monitor_fdset_dup_fd_add that can return -1.
 > 
-> Almost a year after I sent the memo I quoted.  It's an incompatible
-> change, but nobody complained, and I'm glad we got this issue out of the
-> way.
+> It fails when
+> 
+> * @fdset_id contains @dupfd
+> 
+>   @dupfd is a fresh file descriptor.  If @fdset_id already contains it,
+>   it's stale there.  That would be a programming error.  Recommend to
+>   assert.
+> 
+> * @fdset_id is not in @mon_fdsets
+> 
+>   monitor_fdset_get_fd() fails the same way.  monitor_fdset_dup_fd_add()
+>   can fail that way after monitor_fdset_get_fd() succeed only if the fd
+>   set went away between the two.  Could that happen?  Would it be safe?
+> 
+>   This is the only user of monitor_fdset_dup_fd_add().  Why not remove
+>   the awkward failure mode by making monitor_fdset_dup_fd_add() dup the
+>   fd and add?
 
-FWIW, I would have ignored any complaint about incompatible changes in
-HMP. It's not supposed to be a stable API, but UI.
+Once we push  the qemu_dup call into monitor_fdset_dup_fd_add, we
+might as well go the whole way and merge monitor_fdset_get_fd
+into it too. So I've done that, turning 3 calls into 1.
 
-Kevin
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
