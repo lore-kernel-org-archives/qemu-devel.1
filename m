@@ -2,89 +2,90 @@ Return-Path: <SRS0=k4hX=CF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 286C1C433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 04:53:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A315C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 05:07:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E80572177B
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 04:53:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 315AA2080C
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 05:07:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ep5gwaK6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E80572177B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WAZjq6Gw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 315AA2080C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36838 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43110 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kB9uw-0000iu-7W
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 00:53:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60004)
+	id 1kBA7n-0004LS-CT
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 01:06:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33892)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kB9uP-0000I3-1K
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 00:53:09 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:45543
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kB9uL-000455-V6
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 00:53:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598503984;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Pdpv7UQJiZxAeWDRb3n2YB0Nf5eGJJJwTC1SMKh0+vU=;
- b=ep5gwaK6Ip8VxcdcSBMcToS6QgqOU6eLEP2HwnDGzi7ZHnZVhUyQZDdzmwUu6xKnRen/ug
- F5GbwCVbfKSbmNAjuViMxi3hEbklCIJLBkd2gi88edCz8yc+QSA8TQiEZ0t07Ex8E63hv8
- AQcxAGBxBvzPkhMIwn+CQPHKsXZ6UOo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-163-8qnab6huO5aFVSuptCY23Q-1; Thu, 27 Aug 2020 00:53:00 -0400
-X-MC-Unique: 8qnab6huO5aFVSuptCY23Q-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 65F3118A2251;
- Thu, 27 Aug 2020 04:52:59 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-56.ams2.redhat.com [10.36.112.56])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 164AA5C1DA;
- Thu, 27 Aug 2020 04:52:57 +0000 (UTC)
-Subject: Re: [PATCH] meson: move pixman detection to meson
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-References: <20200826070243.11969-1-pbonzini@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <cc6af807-a24f-42bb-b1f7-8c8c5e59200b@redhat.com>
-Date: Thu, 27 Aug 2020 06:52:56 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kBA6u-0002tZ-QE
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 01:06:04 -0400
+Received: from mail-pf1-x42a.google.com ([2607:f8b0:4864:20::42a]:40720)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kBA6r-0005dz-B6
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 01:06:04 -0400
+Received: by mail-pf1-x42a.google.com with SMTP id k18so2552317pfp.7
+ for <qemu-devel@nongnu.org>; Wed, 26 Aug 2020 22:06:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=vniRuLy9oaWQgxB4s7ZLPuZdH+uA7ntw8bf40dJEyKE=;
+ b=WAZjq6GwDYnf1yS+9OAhhXk/uLUkX4ZOWygvl8xSg0iQMurvpWT44dS7+Sn58tmcWB
+ ec+gIbuU1kjxEznG0zkKIT5kXZIfv9/+oZTxHpQmvNNYueVCPtBMPhKAuzU1wIZ42LRV
+ mSs1P2d6exgZf/sAX7WT7jN52K5ocRHf7iJeJGylFpv7lrssDM3jLw7jXC7kiyK6tFHd
+ CALh7F3btjsyVkTmFeypoHrovOhdkyX9A1uXSL14j8wr7Z09MKtmt9yCFd4giSkddhFL
+ e/Uznh8MjvJmZFgenUgi8ytnIVtaKF6io2XRe1M/vWZhNKIOVL3Juqj91hD6epWm1vRT
+ u7qQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=vniRuLy9oaWQgxB4s7ZLPuZdH+uA7ntw8bf40dJEyKE=;
+ b=JHb/aeHX+0dv5fPLqpIs/UwOccNNu6eg7knmF9XaI8xPcuw8RYCsNFLfAvMemfnC5N
+ xRXiOHC+l+Zfnhb+lhKDfe+d4P6gBERP/vewH9XZ49izX5K+3CECshDgKczWuYZAM6Gn
+ Idx9MqsA1vopS66Sq9txbeRSq7uCztsnYuyL2fW5wnkbOEO8duEe/4pl7MGZbGSN6v7w
+ EQPh/y3arf6pV09qPmkynuTL8rbdw8t8AkHkGoIZTpF8Qq4g4L8sYojGEsT6LHtwZCDe
+ 1/LO+shoxCL8HNxHQPwrr2IHsU9S83lk1wX8twxkvXkdbcczqh5p0c3/cSQcH8ZGeQcZ
+ +V9Q==
+X-Gm-Message-State: AOAM5305bd6T2+itHUORJtZl3HJ9oy6TL+4YR/zdmFoF0EFz5yliAKi8
+ V0+c85dIu2W+LawRT3MepsALazVl+gYAEgUQ3Pc=
+X-Google-Smtp-Source: ABdhPJxG7X5gzy81eCbBLpLv1F80MvoEXzga3JpXMKoPsVTTMFJMmsYOMEgg11o6RLqHET4G2KnOfA==
+X-Received: by 2002:a17:902:a403:: with SMTP id
+ p3mr14824170plq.104.1598504758925; 
+ Wed, 26 Aug 2020 22:05:58 -0700 (PDT)
+Received: from localhost.localdomain ([103.94.185.75])
+ by smtp.googlemail.com with ESMTPSA id u3sm724213pjn.29.2020.08.26.22.05.56
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 26 Aug 2020 22:05:58 -0700 (PDT)
+From: luoyonggang@gmail.com
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 0/6] Fixes msys2 building after the meson convert
+Date: Thu, 27 Aug 2020 13:05:37 +0800
+Message-Id: <20200827050543.44-1-luoyonggang@gmail.com>
+X-Mailer: git-send-email 2.27.0.windows.1
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <20200826070243.11969-1-pbonzini@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=thuth@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 00:53:04
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -52
-X-Spam_score: -5.3
-X-Spam_bar: -----
-X-Spam_report: (-5.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.959,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-2.239, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::42a;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pf1-x42a.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -98,145 +99,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Rafael Kitover <rkitover@gmail.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Yonggang Luo <luoyonggang@gmail.com>,
+ =?UTF-8?q?Daniel=20P=20=2E=20Berrang=E8=8C=85?= <berrange@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 26/08/2020 09.02, Paolo Bonzini wrote:
-> When pixman is not installed (or too old), but virglrenderer is available
-> and "configure" has been run with "--disable-system", the build currently
-> aborts when trying to compile vhost-user-gpu (since it requires pixman).
-> 
-> Let's skip the build of vhost-user-gpu when pixman is not installed or
-> too old.  Instead of adding CONFIG_PIXMAN, it is simpler to move the
-> detection to pixman.
-> 
-> Based on a patch by Thomas Huth. <thuth@redhat.com>
-> 
-> Fixes: 9b52b17ba5 ("configure: Allow to build tools without pixman")
-> Reported-by: Rafael Kitover <rkitover@gmail.com>
-> Reported-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  configure                          | 21 ++-------------------
->  contrib/vhost-user-gpu/meson.build |  3 ++-
->  meson.build                        | 12 +++++++-----
->  3 files changed, 11 insertions(+), 25 deletions(-)
-> 
-> diff --git a/configure b/configure
-> index a5fa472c64..51b6164f69 100755
-> --- a/configure
-> +++ b/configure
-> @@ -3923,20 +3923,6 @@ if test "$modules" = yes; then
->      fi
->  fi
->  
-> -##########################################
-> -# pixman support probe
-> -
-> -if test "$softmmu" = "no"; then
-> -  pixman_cflags=
-> -  pixman_libs=
-> -elif $pkg_config --atleast-version=0.21.8 pixman-1 > /dev/null 2>&1; then
-> -  pixman_cflags=$($pkg_config --cflags pixman-1)
-> -  pixman_libs=$($pkg_config --libs pixman-1)
-> -else
-> -  error_exit "pixman >= 0.21.8 not present." \
-> -      "Please install the pixman devel package."
-> -fi
+From: Yonggang Luo <luoyonggang@gmail.com>=0D
 
-The "else" part now got completely lost, didn't it? pixman is required
-for building the softmmu targets, so we should error out if configure is
-run with a softmmu target on systems where pixman is not installed.
-
-Maybe you can simply replace the above check with:
-
-if test "$softmmu" = "yes" && ! $pkg_config --atleast-version=0.21.8
-pixman-1 > /dev/null 2>&1; then
-  error_exit "pixman >= 0.21.8 not present." \
-      "Please install the pixman devel package."
-fi
-
-?
-
- Thomas
-
-
->  ##########################################
->  # libmpathpersist probe
->  
-> @@ -6649,8 +6635,8 @@ echo_version() {
->      fi
->  }
->  
-> -# prepend pixman and ftd flags after all config tests are done
-> -QEMU_CFLAGS="$pixman_cflags $fdt_cflags $QEMU_CFLAGS"
-> +# prepend ftd flags after all config tests are done
-> +QEMU_CFLAGS="$fdt_cflags $QEMU_CFLAGS"
->  QEMU_LDFLAGS="$fdt_ldflags $QEMU_LDFLAGS"
->  
->  config_host_mak="config-host.mak"
-> @@ -8053,9 +8039,6 @@ fi
->  
->  done # for target in $targets
->  
-> -echo "PIXMAN_CFLAGS=$pixman_cflags" >> $config_host_mak
-> -echo "PIXMAN_LIBS=$pixman_libs" >> $config_host_mak
-> -
->  if [ "$fdt" = "git" ]; then
->    subdirs="$subdirs dtc"
->  fi
-> diff --git a/contrib/vhost-user-gpu/meson.build b/contrib/vhost-user-gpu/meson.build
-> index 8df4c13bc5..7d9b29da8b 100644
-> --- a/contrib/vhost-user-gpu/meson.build
-> +++ b/contrib/vhost-user-gpu/meson.build
-> @@ -1,5 +1,6 @@
->  if 'CONFIG_TOOLS' in config_host and 'CONFIG_VIRGL' in config_host \
-> -    and 'CONFIG_GBM' in config_host and 'CONFIG_LINUX' in config_host
-> +    and 'CONFIG_GBM' in config_host and 'CONFIG_LINUX' in config_host \
-> +    and pixman.found()
->    executable('vhost-user-gpu', files('vhost-user-gpu.c', 'virgl.c', 'vugbm.c'),
->               link_with: libvhost_user,
->               dependencies: [qemuutil, pixman, gbm, virgl],
-> diff --git a/meson.build b/meson.build
-> index bcd39b39da..57c2fe2b65 100644
-> --- a/meson.build
-> +++ b/meson.build
-> @@ -114,8 +114,11 @@ if 'CONFIG_GNUTLS' in config_host
->    gnutls = declare_dependency(compile_args: config_host['GNUTLS_CFLAGS'].split(),
->                                link_args: config_host['GNUTLS_LIBS'].split())
->  endif
-> -pixman = declare_dependency(compile_args: config_host['PIXMAN_CFLAGS'].split(),
-> -                            link_args: config_host['PIXMAN_LIBS'].split())
-> +pixman = not_found
-> +if have_system or have_tools
-> +  pixman = dependency('pixman', required: have_system, version:'>=0.21.8',
-> +                      static: enable_static)
-> +endif
->  pam = not_found
->  if 'CONFIG_AUTH_PAM' in config_host
->    pam = cc.find_library('pam')
-> @@ -1094,9 +1097,7 @@ if have_tools
->    if 'CONFIG_VHOST_USER' in config_host
->      subdir('contrib/libvhost-user')
->      subdir('contrib/vhost-user-blk')
-> -    if 'CONFIG_LINUX' in config_host
-> -      subdir('contrib/vhost-user-gpu')
-> -    endif
-> +    subdir('contrib/vhost-user-gpu')
->      subdir('contrib/vhost-user-input')
->      subdir('contrib/vhost-user-scsi')
->    endif
-> @@ -1303,6 +1304,7 @@ summary_info += {'SDL image support': sdl_image.found()}
->  # TODO: add back version
->  summary_info += {'GTK support':       config_host.has_key('CONFIG_GTK')}
->  summary_info += {'GTK GL support':    config_host.has_key('CONFIG_GTK_GL')}
-> +summary_info += {'pixman':            pixman.found()}
->  # TODO: add back version
->  summary_info += {'VTE support':       config_host.has_key('CONFIG_VTE')}
->  summary_info += {'TLS priority':      config_host['CONFIG_TLS_PRIORITY']}
-> 
-
+These patch series fixes the building of newest qemu under=0D
+msys2 environment=0D
+=0D
+Yonggang Luo (6):=0D
+  meson: Fixes the ninjatool issue that E$$: are generated in=0D
+    Makefile.ninja=0D
+  meson: fixes relpath may fail on win32.=0D
+  meson: Mingw64 gcc doesn't recognize system include_type for sdl2=0D
+  configure: Fix include and linkage issue on msys2=0D
+  meson: Fixes ninjatool can not be recognized as script under=0D
+    Window/MSYS2=0D
+  meson: Convert undefsym.sh to undefsym.py=0D
+=0D
+ configure             | 28 ++++++++++++++-------=0D
+ meson.build           |  5 ++--=0D
+ scripts/mtest2make.py | 11 +++++++--=0D
+ scripts/ninjatool.py  |  2 +-=0D
+ scripts/undefsym.py   | 57 +++++++++++++++++++++++++++++++++++++++++++=0D
+ scripts/undefsym.sh   | 20 ---------------=0D
+ 6 files changed, 88 insertions(+), 35 deletions(-)=0D
+ create mode 100644 scripts/undefsym.py=0D
+ delete mode 100755 scripts/undefsym.sh=0D
+=0D
+-- =0D
+2.27.0.windows.1=0D
+=0D
 
