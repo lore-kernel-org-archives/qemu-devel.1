@@ -2,91 +2,73 @@ Return-Path: <SRS0=k4hX=CF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=0.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	FSL_HELO_FAKE,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33D49C433E3
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 09:12:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87BBDC433E3
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 09:12:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E35AE22B47
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 09:12:29 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="czsSxRKL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E35AE22B47
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 59C18206F0
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 09:12:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59C18206F0
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60140 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33268 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBDxN-0002o8-2r
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 05:12:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54346)
+	id 1kBDxZ-0003Ln-F9
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 05:12:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54434)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
- id 1kBDwU-0001Lj-6E
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 05:11:34 -0400
-Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:44282)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
- id 1kBDwS-0001yz-L8
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 05:11:33 -0400
-Received: by mail-lj1-x244.google.com with SMTP id g6so5558286ljn.11
- for <qemu-devel@nongnu.org>; Thu, 27 Aug 2020 02:11:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=fDHlh8kb9xxLWdRs7n7qhEa0ipMfi7lZ9cad/daw3mc=;
- b=czsSxRKLByekiY7e3cKsDu4bXhwrZSqdPklpkBDWzvoH0aeCM5sBGWz1qxhfXndpRE
- cZYQ1/vO4mVfiNguXp1hUMGiqDdp7U0kxy6qGM0gVaCZDd0y1fLF2aE/uGEjkE3nnYKC
- 9izKvlpyVbcNWqZUhY4fdiXixaL30JMZkwPhOiEEf/tong/qS4CLRwmjjxge8PK5GtQL
- Dd9nCOiiKBjLOumLrmHCbJiczqvwfByfihxCi89nFSoXfWu239Db6bwaQFf1ndsf4QXH
- rjKJkVkc8sHnck+Oe2dEEZMFG5pVHGlgFt5QdPFf/k+hktMzgJ2cVALmhmMeqnLCz4e4
- BVCQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=fDHlh8kb9xxLWdRs7n7qhEa0ipMfi7lZ9cad/daw3mc=;
- b=YG+b+1iJeQeyFCSAIsMbqUM3c5+JLv776Cp99d1kXrdfwtNhfSsAARUm05NhiZyvna
- IFoNty9qo7anLZsIjuj+6fCtZInH7+y/MLYajqtWzznY5xqolYkQKRscCHWnGjA/+bSc
- amL+idB/vGgCAE3Ze03Qc4J6Ko/olkZWq2iQ+29rhL5Q7kPx49E0qEbj5hD1IOfJAaZA
- JGT6RRbmfwqTQ8C6GojLPSIYuGAcwURcIoTADw9hhPUUjggbgbuHb9QlB+6Id6kN8d/W
- IreDw5+oIIoW0lqd6NuW7GAy8p7Zzdnvt9mjSWs4iAWMsLgouBMMWtdVw1flJlX3Hd1Q
- Qv5g==
-X-Gm-Message-State: AOAM532mrd80yvvIrEfZjUiPU3jj7P9KMk916e1HJu76aHlst6JsJ1lT
- BwjKsWGQWHhgNgJdnMxiQ4w=
-X-Google-Smtp-Source: ABdhPJw11Z3zdP5kOPracqhDEiJEV4Tx6W2Gkgbz5dLi7A/yswjNVa1WSc1B7XTQdorEK6D9LVEy1w==
-X-Received: by 2002:a2e:a0cd:: with SMTP id f13mr8594870ljm.393.1598519490679; 
- Thu, 27 Aug 2020 02:11:30 -0700 (PDT)
-Received: from gmail.com (81-231-232-130-no39.tbcn.telia.com. [81.231.232.130])
- by smtp.gmail.com with ESMTPSA id y26sm332416ljm.132.2020.08.27.02.11.29
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 27 Aug 2020 02:11:29 -0700 (PDT)
-Date: Thu, 27 Aug 2020 11:11:28 +0200
-From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-To: Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH 00/77] target/microblaze improvements
-Message-ID: <20200827091128.GK2954729@toto>
-References: <20200825205950.730499-1-richard.henderson@linaro.org>
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>)
+ id 1kBDwh-0001hb-CU; Thu, 27 Aug 2020 05:11:47 -0400
+Received: from smtpout1.mo529.mail-out.ovh.net ([178.32.125.2]:42149)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>)
+ id 1kBDwe-0001zk-8y; Thu, 27 Aug 2020 05:11:47 -0400
+Received: from mxplan5.mail.ovh.net (unknown [10.109.156.44])
+ by mo529.mail-out.ovh.net (Postfix) with ESMTPS id 21B9954810E7;
+ Thu, 27 Aug 2020 11:11:34 +0200 (CEST)
+Received: from kaod.org (37.59.142.99) by DAG4EX1.mxp5.local (172.16.2.31)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Thu, 27 Aug
+ 2020 11:11:32 +0200
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-99G0037ad0b0ec-b560-4631-aafb-8b451044cef8,
+ 618CF37EF0508A6B3BD090B4D8B11E595DDBE7AA) smtp.auth=clg@kaod.org
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: <qemu-devel@nongnu.org>
+Subject: [PATCH 2/2] m25p80: Add the n25q256a SFDP table
+Date: Thu, 27 Aug 2020 11:11:30 +0200
+Message-ID: <20200827091130.3525790-3-clg@kaod.org>
+X-Mailer: git-send-email 2.25.4
+In-Reply-To: <20200827091130.3525790-1-clg@kaod.org>
+References: <20200827091130.3525790-1-clg@kaod.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200825205950.730499-1-richard.henderson@linaro.org>
-Received-SPF: pass client-ip=2a00:1450:4864:20::244;
- envelope-from=edgar.iglesias@gmail.com; helo=mail-lj1-x244.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 10
-X-Spam_score: 1.0
-X-Spam_bar: +
-X-Spam_report: (1.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- FSL_HELO_FAKE=3.066, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [37.59.142.99]
+X-ClientProxiedBy: DAG7EX2.mxp5.local (172.16.2.62) To DAG4EX1.mxp5.local
+ (172.16.2.31)
+X-Ovh-Tracer-GUID: 5532ed18-4329-496b-b1f1-afc464dcf5aa
+X-Ovh-Tracer-Id: 8702361857402047340
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedruddvgedguddvucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvufffkffojghfgggtgfhisehtkeertdertdejnecuhfhrohhmpeevrogurhhitgcunfgvucfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepheehfeegjeeitdfffeetjeduveejueefuefgtdefueelueetveeliefhhffgtdelnecukfhppedtrddtrddtrddtpdefjedrheelrddugedvrdelleenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehmgihplhgrnhehrdhmrghilhdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtoheptghlgheskhgrohgurdhorhhg
+Received-SPF: pass client-ip=178.32.125.2; envelope-from=clg@kaod.org;
+ helo=smtpout1.mo529.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 05:11:34
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,60 +81,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jeffery <andrew@aj.id.au>,
+ Francisco Iglesias <frasse.iglesias@gmail.com>,
+ Alistair Francis <alistair@alistair23.me>, qemu-arm@nongnu.org,
+ Joel Stanley <joel@jms.id.au>,
+ =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Aug 25, 2020 at 01:58:33PM -0700, Richard Henderson wrote:
-> Well, this is larger than I expected.
-> 
-> I started off thinking conversion to decodetree would be quick,
-> after I reviewed the mttcg patches last week.  Then I realized
-> that this could also use conversion to the generic translation loop.
-> Then I realized that there were a number of bugs, and some
-> inefficiencies, that could be fixed by using tcg exception unwind
-> properly.
-> 
-> Hopefully most of these are small and easy to understand.
-> 
-> I begin by adding enough stuff to test/tcg to make use of a
-> self-built musl cross-environment.  I'll note that linuxtest
-> does not pass before or after this patch set -- I think that
-> linux-user/microblaze/signal.c needs work -- but that the
-> other tests do work.
-> 
-> I also have an old copy of a microblaze system test image,
-> which I think used to be hosted on our wiki.  After basic kernel
-> boot, it contains a "selftest" script which runs a bunch of
-> user-land isa tests.  That still works fine too.
-> 
-> HOWEVER: That's not nearly complete.  There are cpu config options
-> that aren't default and I don't know how to change or test.
-> 
-> In addition, the manual is really not clear on what's supposed to
-> happen under various edge conditions, especially with MSR[EE] unset.
-> E.g. unaligned access: Does the insn get nop-ed out?  Do the low
-> bits of the address get ignored?  Right now (before and after) the
-> access simply happens unaligned, which doesn't seem correct.
-> I assume the reason for having this configure option is to reduce
-> the size of the FPGA so that the unaligned access handling hw
-> simply isn't present.
-> 
-> Lemme know what you think.
+The same values were collected on 4 differents OpenPower systems,
+palmettos, romulus and tacoma.
 
-I merged this to our internal tree and run some of our tests,
-unfortunately it causes quite a few regressions. I'll try to
-get you details as I go and respond to individual patches if
-related otherwise here.
+Signed-off-by: Cédric Le Goater <clg@kaod.org>
+---
+ hw/block/m25p80_sfdp.h |  2 ++
+ hw/block/m25p80.c      |  6 ++++--
+ hw/block/m25p80_sfdp.c | 49 ++++++++++++++++++++++++++++++++++++++++++
+ hw/block/Makefile.objs |  2 +-
+ 4 files changed, 56 insertions(+), 3 deletions(-)
+ create mode 100644 hw/block/m25p80_sfdp.c
 
-So a first general regression is that opcode 0 no longer
-traps as an illegal instruction (seems to be treated as an
-add with all r0).
-
-Cheers,
-Edgar
-
-
+diff --git a/hw/block/m25p80_sfdp.h b/hw/block/m25p80_sfdp.h
+index b75fd0b0c13f..ca2658a676e0 100644
+--- a/hw/block/m25p80_sfdp.h
++++ b/hw/block/m25p80_sfdp.h
+@@ -12,4 +12,6 @@
+ 
+ #define M25P80_SFDP_AREA_SIZE 0x100
+ 
++extern const uint8_t m25p80_sfdp_n25q256a[M25P80_SFDP_AREA_SIZE];
++
+ #endif
+diff --git a/hw/block/m25p80.c b/hw/block/m25p80.c
+index 32925589ec7a..d053bdbb2805 100644
+--- a/hw/block/m25p80.c
++++ b/hw/block/m25p80.c
+@@ -233,11 +233,13 @@ static const FlashPartInfo known_devices[] = {
+     { INFO("n25q128a11",  0x20bb18,      0,  64 << 10, 256, ER_4K) },
+     { INFO("n25q128a13",  0x20ba18,      0,  64 << 10, 256, ER_4K) },
+     { INFO("n25q256a11",  0x20bb19,      0,  64 << 10, 512, ER_4K) },
+-    { INFO("n25q256a13",  0x20ba19,      0,  64 << 10, 512, ER_4K) },
++    { INFO("n25q256a13",  0x20ba19,      0,  64 << 10, 512, ER_4K),
++      .sfdp = m25p80_sfdp_n25q256a },
+     { INFO("n25q512a11",  0x20bb20,      0,  64 << 10, 1024, ER_4K) },
+     { INFO("n25q512a13",  0x20ba20,      0,  64 << 10, 1024, ER_4K) },
+     { INFO("n25q128",     0x20ba18,      0,  64 << 10, 256, 0) },
+-    { INFO("n25q256a",    0x20ba19,      0,  64 << 10, 512, ER_4K) },
++    { INFO("n25q256a",    0x20ba19,      0,  64 << 10, 512, ER_4K),
++      .sfdp = m25p80_sfdp_n25q256a },
+     { INFO("n25q512a",    0x20ba20,      0,  64 << 10, 1024, ER_4K) },
+     { INFO_STACKED("n25q00",    0x20ba21, 0x1000, 64 << 10, 2048, ER_4K, 4) },
+     { INFO_STACKED("n25q00a",   0x20bb21, 0x1000, 64 << 10, 2048, ER_4K, 4) },
+diff --git a/hw/block/m25p80_sfdp.c b/hw/block/m25p80_sfdp.c
+new file mode 100644
+index 000000000000..def94bd4ea02
+--- /dev/null
++++ b/hw/block/m25p80_sfdp.c
+@@ -0,0 +1,49 @@
++/*
++ * M25P80 Serial Flash Discoverable Parameter (SFDP)
++ *
++ * Copyright (c) 2020, IBM Corporation.
++ *
++ * This code is licensed under the GPL version 2 or later. See the
++ * COPYING file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++#include "m25p80_sfdp.h"
++
++/*
++ * Micron
++ */
++const uint8_t m25p80_sfdp_n25q256a[M25P80_SFDP_AREA_SIZE] = {
++    0x53, 0x46, 0x44, 0x50, 0x00, 0x01, 0x00, 0xff,
++    0x00, 0x00, 0x01, 0x09, 0x30, 0x00, 0x00, 0xff,
++    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++    0xe5, 0x20, 0xfb, 0xff, 0xff, 0xff, 0xff, 0x0f,
++    0x29, 0xeb, 0x27, 0x6b, 0x08, 0x3b, 0x27, 0xbb,
++    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x27, 0xbb,
++    0xff, 0xff, 0x29, 0xeb, 0x0c, 0x20, 0x10, 0xd8,
++    0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff,
++    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++};
+diff --git a/hw/block/Makefile.objs b/hw/block/Makefile.objs
+index 8855c2265639..b65a12c52b52 100644
+--- a/hw/block/Makefile.objs
++++ b/hw/block/Makefile.objs
+@@ -1,6 +1,6 @@
+ common-obj-y += block.o cdrom.o hd-geometry.o
+ common-obj-$(CONFIG_FDC) += fdc.o
+-common-obj-$(CONFIG_SSI_M25P80) += m25p80.o
++common-obj-$(CONFIG_SSI_M25P80) += m25p80.o m25p80_sfdp.o
+ common-obj-$(CONFIG_NAND) += nand.o
+ common-obj-$(CONFIG_PFLASH_CFI01) += pflash_cfi01.o
+ common-obj-$(CONFIG_PFLASH_CFI02) += pflash_cfi02.o
+-- 
+2.25.4
 
 
