@@ -7,43 +7,43 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB936C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 12:41:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A005C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 12:41:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 97FB322B40
+	by mail.kernel.org (Postfix) with ESMTPS id D09812177B
 	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 12:41:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97FB322B40
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D09812177B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46998 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47024 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBHDT-0004Y6-RE
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 08:41:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58928)
+	id 1kBHDU-0004Yd-20
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 08:41:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58958)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ysato@users.sourceforge.jp>)
- id 1kBHBR-0007xb-BS
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 08:39:13 -0400
-Received: from mail01.asahi-net.or.jp ([202.224.55.13]:47886)
+ id 1kBHBS-0007yC-83
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 08:39:14 -0400
+Received: from mail01.asahi-net.or.jp ([202.224.55.13]:47877)
  by eggs.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ysato@users.sourceforge.jp>) id 1kBHBO-0005vG-17
+ (envelope-from <ysato@users.sourceforge.jp>) id 1kBHBN-0005uA-Tb
  for qemu-devel@nongnu.org; Thu, 27 Aug 2020 08:39:13 -0400
 Received: from sakura.ysato.name (ik1-413-38519.vs.sakura.ne.jp
  [153.127.30.23]) (Authenticated sender: PQ4Y-STU)
- by mail01.asahi-net.or.jp (Postfix) with ESMTPA id 4C9D3108673;
- Thu, 27 Aug 2020 21:39:07 +0900 (JST)
+ by mail01.asahi-net.or.jp (Postfix) with ESMTPA id 045621080B5;
+ Thu, 27 Aug 2020 21:39:06 +0900 (JST)
 Received: from yo-satoh-debian.localdomain (ZM005235.ppp.dion.ne.jp
  [222.8.5.235])
- by sakura.ysato.name (Postfix) with ESMTPSA id F34F41C0792;
- Thu, 27 Aug 2020 21:39:06 +0900 (JST)
+ by sakura.ysato.name (Postfix) with ESMTPSA id B23DE1C0696;
+ Thu, 27 Aug 2020 21:39:05 +0900 (JST)
 From: Yoshinori Sato <ysato@users.sourceforge.jp>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 09/20] hw/timer: Remove renesas_cmt.
-Date: Thu, 27 Aug 2020 21:38:48 +0900
-Message-Id: <20200827123859.81793-10-ysato@users.sourceforge.jp>
+Subject: [PATCH 04/20] hw/rx: New firmware loader.
+Date: Thu, 27 Aug 2020 21:38:43 +0900
+Message-Id: <20200827123859.81793-5-ysato@users.sourceforge.jp>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200827123859.81793-1-ysato@users.sourceforge.jp>
 References: <20200827123859.81793-1-ysato@users.sourceforge.jp>
@@ -75,351 +75,247 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This module replaced to unified renesas_timer.
+Separate the loading of the firmware from the target definition
+ as it is an obstacle to adding more targets.
 
 Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
 ---
- include/hw/timer/renesas_cmt.h |  40 -----
- hw/timer/renesas_cmt.c         | 283 ---------------------------------
- 2 files changed, 323 deletions(-)
- delete mode 100644 include/hw/timer/renesas_cmt.h
- delete mode 100644 hw/timer/renesas_cmt.c
+ include/hw/rx/rx62n.h | 15 +++++++
+ hw/rx/rx-gdbsim.c     | 98 +++++++++++++++++++++----------------------
+ hw/rx/rx62n.c         | 25 -----------
+ 3 files changed, 64 insertions(+), 74 deletions(-)
 
-diff --git a/include/hw/timer/renesas_cmt.h b/include/hw/timer/renesas_cmt.h
-deleted file mode 100644
-index e28a15cb38..0000000000
---- a/include/hw/timer/renesas_cmt.h
-+++ /dev/null
-@@ -1,40 +0,0 @@
--/*
-- * Renesas Compare-match timer Object
-- *
-- * Copyright (c) 2019 Yoshinori Sato
-- *
-- * SPDX-License-Identifier: GPL-2.0-or-later
-- */
+diff --git a/include/hw/rx/rx62n.h b/include/hw/rx/rx62n.h
+index aa94758c27..32e460bbad 100644
+--- a/include/hw/rx/rx62n.h
++++ b/include/hw/rx/rx62n.h
+@@ -45,6 +45,21 @@
+ #define RX62N_NR_CMT    2
+ #define RX62N_NR_SCI    6
+ 
++typedef struct RX62NClass {
++    /*< private >*/
++    DeviceClass parent_class;
++    /*< public >*/
++    const char *name;
++    uint64_t ram_size;
++    uint64_t rom_flash_size;
++    uint64_t data_flash_size;
++} RX62NClass;
++
++#define RX62N_MCU_CLASS(klass) \
++    OBJECT_CLASS_CHECK(RX62NClass, (klass), TYPE_RX62N_MCU)
++#define RX62N_MCU_GET_CLASS(obj) \
++    OBJECT_GET_CLASS(RX62NClass, (obj), TYPE_RX62N_MCU)
++
+ typedef struct RX62NState {
+     /*< private >*/
+     DeviceState parent_obj;
+diff --git a/hw/rx/rx-gdbsim.c b/hw/rx/rx-gdbsim.c
+index 54992ebe57..02e03c797c 100644
+--- a/hw/rx/rx-gdbsim.c
++++ b/hw/rx/rx-gdbsim.c
+@@ -25,6 +25,7 @@
+ #include "hw/hw.h"
+ #include "hw/sysbus.h"
+ #include "hw/loader.h"
++#include "hw/rx/loader.h"
+ #include "hw/rx/rx62n.h"
+ #include "sysemu/sysemu.h"
+ #include "sysemu/qtest.h"
+@@ -40,6 +41,7 @@ typedef struct RxGdbSimMachineClass {
+     /*< public >*/
+     const char *mcu_name;
+     uint32_t xtal_freq_hz;
++    size_t romsize;
+ } RxGdbSimMachineClass;
+ 
+ typedef struct RxGdbSimMachineState {
+@@ -59,26 +61,39 @@ typedef struct RxGdbSimMachineState {
+ #define RX_GDBSIM_MACHINE_GET_CLASS(obj) \
+     OBJECT_GET_CLASS(RxGdbSimMachineClass, (obj), TYPE_RX_GDBSIM_MACHINE)
+ 
+-static void rx_load_image(RXCPU *cpu, const char *filename,
+-                          uint32_t start, uint32_t size)
++#define TINYBOOT_TOP (0xffffff00)
++
++static void set_bootstrap(hwaddr entry, hwaddr dtb)
+ {
+-    static uint32_t extable[32];
+-    long kernel_size;
++    /* Minimal hardware initialize for kernel requirement */
++    /* linux kernel only works little-endian mode */
++    static uint8_t tinyboot[256] = {
++        0xfb, 0x2e, 0x20, 0x00, 0x08,       /* mov.l #0x80020, r2 */
++        0xf8, 0x2e, 0x00, 0x01, 0x01,       /* mov.l #0x00010100, [r2] */
++        0xfb, 0x2e, 0x10, 0x00, 0x08,       /* mov.l #0x80010, r2 */
++        0xf8, 0x22, 0xdf, 0x7d, 0xff, 0xff, /* mov.l #0xffff7ddf, [r2] */
++        0x62, 0x42,                         /* add #4, r2 */
++        0xf8, 0x22, 0xff, 0x7f, 0xff, 0x7f, /* mov.l #0x7fff7fff, [r2] */
++        0xfb, 0x2e, 0x40, 0x82, 0x08,       /* mov.l #0x88240, r2 */
++        0x3c, 0x22, 0x00,                   /* mov.b #0, 2[r2] */
++        0x3c, 0x21, 0x4e,                   /* mov.b #78, 1[r2] */
++        0xfb, 0x22, 0x70, 0xff, 0xff, 0xff, /* mov.l #0xffffff70, r2 */
++        0xec, 0x21,                         /* mov.l [r2], r1 */
++        0xfb, 0x22, 0x74, 0xff, 0xff, 0xff, /* mov.l #0xffffff74, r2 */
++        0xec, 0x22,                         /* mov.l [r2], r2 */
++        0x7f, 0x02,                         /* jmp r2 */
++    };
+     int i;
+ 
+-    kernel_size = load_image_targphys(filename, start, size);
+-    if (kernel_size < 0) {
+-        fprintf(stderr, "qemu: could not load kernel '%s'\n", filename);
+-        exit(1);
+-    }
+-    cpu->env.pc = start;
++    *((uint32_t *)&tinyboot[0x70]) = cpu_to_le32(dtb);
++    *((uint32_t *)&tinyboot[0x74]) = cpu_to_le32(entry);
+ 
+     /* setup exception trap trampoline */
+-    /* linux kernel only works little-endian mode */
+-    for (i = 0; i < ARRAY_SIZE(extable); i++) {
+-        extable[i] = cpu_to_le32(0x10 + i * 4);
++    for (i = 0; i < 31; i++) {
++        *((uint32_t *)&tinyboot[0x40 + i * 4]) = cpu_to_le32(0x10 + i * 4);
+     }
+-    rom_add_blob_fixed("extable", extable, sizeof(extable), VECTOR_TABLE_BASE);
++    *((uint32_t *)&tinyboot[0xfc - 0x40]) = cpu_to_le32(TINYBOOT_TOP);
++    rom_add_blob_fixed("tinyboot", tinyboot, sizeof(tinyboot), TINYBOOT_TOP);
+ }
+ 
+ static void rx_gdbsim_init(MachineState *machine)
+@@ -86,10 +101,11 @@ static void rx_gdbsim_init(MachineState *machine)
+     MachineClass *mc = MACHINE_GET_CLASS(machine);
+     RxGdbSimMachineState *s = RX_GDBSIM_MACHINE(machine);
+     RxGdbSimMachineClass *rxc = RX_GDBSIM_MACHINE_GET_CLASS(machine);
++    RX62NClass *rx62nc;
+     MemoryRegion *sysmem = get_system_memory();
+     const char *kernel_filename = machine->kernel_filename;
+     const char *dtb_filename = machine->dtb;
 -
--#ifndef HW_TIMER_RENESAS_CMT_H
--#define HW_TIMER_RENESAS_CMT_H
++    rx_kernel_info_t kernel_info;
+     if (machine->ram_size < mc->default_ram_size) {
+         char *sz = size_to_str(mc->default_ram_size);
+         error_report("Invalid RAM size, should be more than %s", sz);
+@@ -101,49 +117,33 @@ static void rx_gdbsim_init(MachineState *machine)
+ 
+     /* Initialize MCU */
+     object_initialize_child(OBJECT(machine), "mcu", &s->mcu, rxc->mcu_name);
++    rx62nc = RX62N_MCU_GET_CLASS(&s->mcu);
+     object_property_set_link(OBJECT(&s->mcu), "main-bus", OBJECT(sysmem),
+                              &error_abort);
+     object_property_set_uint(OBJECT(&s->mcu), "xtal-frequency-hz",
+                              rxc->xtal_freq_hz, &error_abort);
+-    object_property_set_bool(OBJECT(&s->mcu), "load-kernel",
+-                             kernel_filename != NULL, &error_abort);
+-    qdev_realize(DEVICE(&s->mcu), NULL, &error_abort);
 -
--#include "qemu/timer.h"
--#include "hw/sysbus.h"
+     /* Load kernel and dtb */
+     if (kernel_filename) {
+-        ram_addr_t kernel_offset;
 -
--#define TYPE_RENESAS_CMT "renesas-cmt"
--#define RCMT(obj) OBJECT_CHECK(RCMTState, (obj), TYPE_RENESAS_CMT)
+-        /*
+-         * The kernel image is loaded into
+-         * the latter half of the SDRAM space.
+-         */
+-        kernel_offset = machine->ram_size / 2;
+-        rx_load_image(RXCPU(first_cpu), kernel_filename,
+-                      SDRAM_BASE + kernel_offset, kernel_offset);
+-        if (dtb_filename) {
+-            ram_addr_t dtb_offset;
+-            int dtb_size;
+-            void *dtb;
 -
--enum {
--    CMT_CH = 2,
--    CMT_NR_IRQ = 1 * CMT_CH
--};
--
--typedef struct RCMTState {
+-            dtb = load_device_tree(dtb_filename, &dtb_size);
+-            if (dtb == NULL) {
+-                error_report("Couldn't open dtb file %s", dtb_filename);
+-                exit(1);
+-            }
+-            if (machine->kernel_cmdline &&
+-                qemu_fdt_setprop_string(dtb, "/chosen", "bootargs",
+-                                        machine->kernel_cmdline) < 0) {
+-                error_report("Couldn't set /chosen/bootargs");
+-                exit(1);
++        kernel_info.ram_start = SDRAM_BASE;
++        kernel_info.ram_size = machine->ram_size;
++        kernel_info.filename = kernel_filename;
++        kernel_info.dtbname = dtb_filename;
++        kernel_info.cmdline = machine->kernel_cmdline;
++        if (!load_kernel(&kernel_info)) {
++            exit(1);
++        }
++        set_bootstrap(kernel_info.entry, kernel_info.dtb_address);
++    } else {
++        if (bios_name) {
++            if (!load_bios(bios_name, rx62nc->rom_flash_size, &error_abort)) {
++                exit(0);
+             }
+-            /* DTB is located at the end of SDRAM space. */
+-            dtb_offset = machine->ram_size - dtb_size;
+-            rom_add_blob_fixed("dtb", dtb, dtb_size,
+-                               SDRAM_BASE + dtb_offset);
+-            /* Set dtb address to R1 */
+-            RXCPU(first_cpu)->env.regs[1] = SDRAM_BASE + dtb_offset;
++        } else if (!qtest_enabled()) {
++            error_report("No bios or kernel specified");
++            exit(1);
+         }
+     }
++    qdev_realize(DEVICE(&s->mcu), NULL, &error_abort);
+ }
+ 
+ static void rx_gdbsim_class_init(ObjectClass *oc, void *data)
+diff --git a/hw/rx/rx62n.c b/hw/rx/rx62n.c
+index b9c217ebfa..4b5c3c1079 100644
+--- a/hw/rx/rx62n.c
++++ b/hw/rx/rx62n.c
+@@ -60,21 +60,6 @@
+ #define RX62N_XTAL_MAX_HZ (14 * 1000 * 1000)
+ #define RX62N_PCLK_MAX_HZ (50 * 1000 * 1000)
+ 
+-typedef struct RX62NClass {
 -    /*< private >*/
--    SysBusDevice parent_obj;
+-    DeviceClass parent_class;
 -    /*< public >*/
+-    const char *name;
+-    uint64_t ram_size;
+-    uint64_t rom_flash_size;
+-    uint64_t data_flash_size;
+-} RX62NClass;
 -
--    uint64_t input_freq;
--    MemoryRegion memory;
+-#define RX62N_MCU_CLASS(klass) \
+-    OBJECT_CLASS_CHECK(RX62NClass, (klass), TYPE_RX62N_MCU)
+-#define RX62N_MCU_GET_CLASS(obj) \
+-    OBJECT_GET_CLASS(RX62NClass, (obj), TYPE_RX62N_MCU)
 -
--    uint16_t cmstr;
--    uint16_t cmcr[CMT_CH];
--    uint16_t cmcnt[CMT_CH];
--    uint16_t cmcor[CMT_CH];
--    int64_t tick[CMT_CH];
--    qemu_irq cmi[CMT_CH];
--    QEMUTimer timer[CMT_CH];
--} RCMTState;
--
--#endif
-diff --git a/hw/timer/renesas_cmt.c b/hw/timer/renesas_cmt.c
-deleted file mode 100644
-index 2e0fd21a36..0000000000
---- a/hw/timer/renesas_cmt.c
-+++ /dev/null
-@@ -1,283 +0,0 @@
--/*
-- * Renesas 16bit Compare-match timer
-- *
-- * Datasheet: RX62N Group, RX621 Group User's Manual: Hardware
-- *            (Rev.1.40 R01UH0033EJ0140)
-- *
-- * Copyright (c) 2019 Yoshinori Sato
-- *
-- * SPDX-License-Identifier: GPL-2.0-or-later
-- *
-- * This program is free software; you can redistribute it and/or modify it
-- * under the terms and conditions of the GNU General Public License,
-- * version 2 or later, as published by the Free Software Foundation.
-- *
-- * This program is distributed in the hope it will be useful, but WITHOUT
-- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-- * more details.
-- *
-- * You should have received a copy of the GNU General Public License along with
-- * this program.  If not, see <http://www.gnu.org/licenses/>.
-- */
--
--#include "qemu/osdep.h"
--#include "qemu/log.h"
--#include "hw/irq.h"
--#include "hw/registerfields.h"
--#include "hw/qdev-properties.h"
--#include "hw/timer/renesas_cmt.h"
--#include "migration/vmstate.h"
--
--/*
-- *  +0 CMSTR - common control
-- *  +2 CMCR  - ch0
-- *  +4 CMCNT - ch0
-- *  +6 CMCOR - ch0
-- *  +8 CMCR  - ch1
-- * +10 CMCNT - ch1
-- * +12 CMCOR - ch1
-- * If we think that the address of CH 0 has an offset of +2,
-- * we can treat it with the same address as CH 1, so define it like that.
-- */
--REG16(CMSTR, 0)
--  FIELD(CMSTR, STR0, 0, 1)
--  FIELD(CMSTR, STR1, 1, 1)
--  FIELD(CMSTR, STR,  0, 2)
--/* This addeess is channel offset */
--REG16(CMCR, 0)
--  FIELD(CMCR, CKS,  0, 2)
--  FIELD(CMCR, CMIE, 6, 1)
--REG16(CMCNT, 2)
--REG16(CMCOR, 4)
--
--static void update_events(RCMTState *cmt, int ch)
--{
--    int64_t next_time;
--
--    if ((cmt->cmstr & (1 << ch)) == 0) {
--        /* count disable, so not happened next event. */
--        return ;
--    }
--    next_time = cmt->cmcor[ch] - cmt->cmcnt[ch];
--    next_time *= NANOSECONDS_PER_SECOND;
--    next_time /= cmt->input_freq;
--    /*
--     * CKS -> div rate
--     *  0 -> 8 (1 << 3)
--     *  1 -> 32 (1 << 5)
--     *  2 -> 128 (1 << 7)
--     *  3 -> 512 (1 << 9)
--     */
--    next_time *= 1 << (3 + FIELD_EX16(cmt->cmcr[ch], CMCR, CKS) * 2);
--    next_time += qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
--    timer_mod(&cmt->timer[ch], next_time);
--}
--
--static int64_t read_cmcnt(RCMTState *cmt, int ch)
--{
--    int64_t delta, now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
--
--    if (cmt->cmstr & (1 << ch)) {
--        delta = (now - cmt->tick[ch]);
--        delta /= NANOSECONDS_PER_SECOND;
--        delta /= cmt->input_freq;
--        delta /= 1 << (3 + FIELD_EX16(cmt->cmcr[ch], CMCR, CKS) * 2);
--        cmt->tick[ch] = now;
--        return cmt->cmcnt[ch] + delta;
--    } else {
--        return cmt->cmcnt[ch];
--    }
--}
--
--static uint64_t cmt_read(void *opaque, hwaddr offset, unsigned size)
--{
--    RCMTState *cmt = opaque;
--    int ch = offset / 0x08;
--    uint64_t ret;
--
--    if (offset == A_CMSTR) {
--        ret = 0;
--        ret = FIELD_DP16(ret, CMSTR, STR,
--                         FIELD_EX16(cmt->cmstr, CMSTR, STR));
--        return ret;
--    } else {
--        offset &= 0x07;
--        if (ch == 0) {
--            offset -= 0x02;
--        }
--        switch (offset) {
--        case A_CMCR:
--            ret = 0;
--            ret = FIELD_DP16(ret, CMCR, CKS,
--                             FIELD_EX16(cmt->cmstr, CMCR, CKS));
--            ret = FIELD_DP16(ret, CMCR, CMIE,
--                             FIELD_EX16(cmt->cmstr, CMCR, CMIE));
--            return ret;
--        case A_CMCNT:
--            return read_cmcnt(cmt, ch);
--        case A_CMCOR:
--            return cmt->cmcor[ch];
+ /*
+  * IRQ -> IPR mapping table
+  * 0x00 - 0x91: IPR no (IPR00 to IPR91)
+@@ -245,15 +230,6 @@ static void rx62n_realize(DeviceState *dev, Error **errp)
+                            rxc->rom_flash_size, &error_abort);
+     memory_region_add_subregion(s->sysmem, RX62N_CFLASH_BASE, &s->c_flash);
+ 
+-    if (!s->kernel) {
+-        if (bios_name) {
+-            rom_add_file_fixed(bios_name, RX62N_CFLASH_BASE, 0);
+-        }  else if (!qtest_enabled()) {
+-            error_report("No bios or kernel specified");
+-            exit(1);
 -        }
 -    }
--    qemu_log_mask(LOG_UNIMP, "renesas_cmt: Register 0x%" HWADDR_PRIX " "
--                             "not implemented\n",
--                  offset);
--    return UINT64_MAX;
--}
 -
--static void start_stop(RCMTState *cmt, int ch, int st)
--{
--    if (st) {
--        update_events(cmt, ch);
--    } else {
--        timer_del(&cmt->timer[ch]);
--    }
--}
--
--static void cmt_write(void *opaque, hwaddr offset, uint64_t val, unsigned size)
--{
--    RCMTState *cmt = opaque;
--    int ch = offset / 0x08;
--
--    if (offset == A_CMSTR) {
--        cmt->cmstr = FIELD_EX16(val, CMSTR, STR);
--        start_stop(cmt, 0, FIELD_EX16(cmt->cmstr, CMSTR, STR0));
--        start_stop(cmt, 1, FIELD_EX16(cmt->cmstr, CMSTR, STR1));
--    } else {
--        offset &= 0x07;
--        if (ch == 0) {
--            offset -= 0x02;
--        }
--        switch (offset) {
--        case A_CMCR:
--            cmt->cmcr[ch] = FIELD_DP16(cmt->cmcr[ch], CMCR, CKS,
--                                       FIELD_EX16(val, CMCR, CKS));
--            cmt->cmcr[ch] = FIELD_DP16(cmt->cmcr[ch], CMCR, CMIE,
--                                       FIELD_EX16(val, CMCR, CMIE));
--            break;
--        case 2:
--            cmt->cmcnt[ch] = val;
--            break;
--        case 4:
--            cmt->cmcor[ch] = val;
--            break;
--        default:
--            qemu_log_mask(LOG_UNIMP, "renesas_cmt: Register 0x%" HWADDR_PRIX " "
--                                     "not implemented\n",
--                          offset);
--            return;
--        }
--        if (FIELD_EX16(cmt->cmstr, CMSTR, STR) & (1 << ch)) {
--            update_events(cmt, ch);
--        }
--    }
--}
--
--static const MemoryRegionOps cmt_ops = {
--    .write = cmt_write,
--    .read  = cmt_read,
--    .endianness = DEVICE_NATIVE_ENDIAN,
--    .impl = {
--        .min_access_size = 2,
--        .max_access_size = 2,
--    },
--    .valid = {
--        .min_access_size = 2,
--        .max_access_size = 2,
--    },
--};
--
--static void timer_events(RCMTState *cmt, int ch)
--{
--    cmt->cmcnt[ch] = 0;
--    cmt->tick[ch] = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
--    update_events(cmt, ch);
--    if (FIELD_EX16(cmt->cmcr[ch], CMCR, CMIE)) {
--        qemu_irq_pulse(cmt->cmi[ch]);
--    }
--}
--
--static void timer_event0(void *opaque)
--{
--    RCMTState *cmt = opaque;
--
--    timer_events(cmt, 0);
--}
--
--static void timer_event1(void *opaque)
--{
--    RCMTState *cmt = opaque;
--
--    timer_events(cmt, 1);
--}
--
--static void rcmt_reset(DeviceState *dev)
--{
--    RCMTState *cmt = RCMT(dev);
--    cmt->cmstr = 0;
--    cmt->cmcr[0] = cmt->cmcr[1] = 0;
--    cmt->cmcnt[0] = cmt->cmcnt[1] = 0;
--    cmt->cmcor[0] = cmt->cmcor[1] = 0xffff;
--}
--
--static void rcmt_init(Object *obj)
--{
--    SysBusDevice *d = SYS_BUS_DEVICE(obj);
--    RCMTState *cmt = RCMT(obj);
--    int i;
--
--    memory_region_init_io(&cmt->memory, OBJECT(cmt), &cmt_ops,
--                          cmt, "renesas-cmt", 0x10);
--    sysbus_init_mmio(d, &cmt->memory);
--
--    for (i = 0; i < ARRAY_SIZE(cmt->cmi); i++) {
--        sysbus_init_irq(d, &cmt->cmi[i]);
--    }
--    timer_init_ns(&cmt->timer[0], QEMU_CLOCK_VIRTUAL, timer_event0, cmt);
--    timer_init_ns(&cmt->timer[1], QEMU_CLOCK_VIRTUAL, timer_event1, cmt);
--}
--
--static const VMStateDescription vmstate_rcmt = {
--    .name = "rx-cmt",
--    .version_id = 1,
--    .minimum_version_id = 1,
--    .fields = (VMStateField[]) {
--        VMSTATE_UINT16(cmstr, RCMTState),
--        VMSTATE_UINT16_ARRAY(cmcr, RCMTState, CMT_CH),
--        VMSTATE_UINT16_ARRAY(cmcnt, RCMTState, CMT_CH),
--        VMSTATE_UINT16_ARRAY(cmcor, RCMTState, CMT_CH),
--        VMSTATE_INT64_ARRAY(tick, RCMTState, CMT_CH),
--        VMSTATE_TIMER_ARRAY(timer, RCMTState, CMT_CH),
--        VMSTATE_END_OF_LIST()
--    }
--};
--
--static Property rcmt_properties[] = {
--    DEFINE_PROP_UINT64("input-freq", RCMTState, input_freq, 0),
--    DEFINE_PROP_END_OF_LIST(),
--};
--
--static void rcmt_class_init(ObjectClass *klass, void *data)
--{
--    DeviceClass *dc = DEVICE_CLASS(klass);
--
--    dc->vmsd = &vmstate_rcmt;
--    dc->reset = rcmt_reset;
--    device_class_set_props(dc, rcmt_properties);
--}
--
--static const TypeInfo rcmt_info = {
--    .name = TYPE_RENESAS_CMT,
--    .parent = TYPE_SYS_BUS_DEVICE,
--    .instance_size = sizeof(RCMTState),
--    .instance_init = rcmt_init,
--    .class_init = rcmt_class_init,
--};
--
--static void rcmt_register_types(void)
--{
--    type_register_static(&rcmt_info);
--}
--
--type_init(rcmt_register_types)
+     /* Initialize CPU */
+     object_initialize_child(OBJECT(s), "cpu", &s->cpu, TYPE_RX62N_CPU);
+     qdev_realize(DEVICE(&s->cpu), NULL, &error_abort);
+@@ -270,7 +246,6 @@ static void rx62n_realize(DeviceState *dev, Error **errp)
+ static Property rx62n_properties[] = {
+     DEFINE_PROP_LINK("main-bus", RX62NState, sysmem, TYPE_MEMORY_REGION,
+                      MemoryRegion *),
+-    DEFINE_PROP_BOOL("load-kernel", RX62NState, kernel, false),
+     DEFINE_PROP_UINT32("xtal-frequency-hz", RX62NState, xtal_freq_hz, 0),
+     DEFINE_PROP_END_OF_LIST(),
+ };
 -- 
 2.20.1
 
