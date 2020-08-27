@@ -7,77 +7,75 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB308C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 13:45:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EECE7C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 13:46:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 96BDA207CD
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 13:45:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BAC1322B40
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 13:46:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IlGpDjxw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96BDA207CD
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GVcAZt49"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BAC1322B40
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36624 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39936 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBIDD-0001Fk-RP
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 09:45:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48762)
+	id 1kBIEM-0002gu-1c
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 09:46:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48660)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kBI9P-00024R-AB
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 09:41:12 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:54003
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kBI9D-0001sw-Iy
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 09:40:59 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:46730
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kBI9M-0006Uh-Sl
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 09:41:11 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kBI9B-0006S5-CC
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 09:40:59 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598535668;
+ s=mimecast20190719; t=1598535656;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=V5iyYPg4tvRYFQ2+2ZkkR3GJS89VZ1RmchDLxqTL8l4=;
- b=IlGpDjxwBnDcSI5/UohwJZYZPaH97qjWQXnNg6bKSglBcvCi+NU1b3kNQioQFJDA6Ww+20
- m8w5ssN5zPaJa3qjvL+MqBG+BI3oPhmGkRNTx/mAHdD0syO+hvb/66EdTo06C+ElXaJ9ug
- nK8fRdNLRmNWOHlC5RY1OTAyOQVNK6g=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-315-uonY2XQeOAm58xzi07WmCw-1; Thu, 27 Aug 2020 09:41:06 -0400
-X-MC-Unique: uonY2XQeOAm58xzi07WmCw-1
-Received: by mail-wr1-f72.google.com with SMTP id d15so1555424wrp.10
- for <qemu-devel@nongnu.org>; Thu, 27 Aug 2020 06:41:06 -0700 (PDT)
+ bh=eeTgRITWczaxOM8QLYLDDpc4gdXDBgE13i+Oq96xfDM=;
+ b=GVcAZt49BFkS3ucIe6C+bNhKrCXMqWwqK/OdNaJ2OqBsMvLjKSsX/opwfEjHwmMkxOPULI
+ mg8zU8bYGqUBfUPuZbQuIFachxaJEEff3huGGl9jDlF7lWq4cgBjFFYZjxU+vfz2+LQsu3
+ CRgqziGZqlpTzSKnAOv59vFL2TtFFdo=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-116-bJzFqk6JMoqejOMxobftIg-1; Thu, 27 Aug 2020 09:40:51 -0400
+X-MC-Unique: bJzFqk6JMoqejOMxobftIg-1
+Received: by mail-wm1-f70.google.com with SMTP id p23so2156336wmc.2
+ for <qemu-devel@nongnu.org>; Thu, 27 Aug 2020 06:40:51 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=V5iyYPg4tvRYFQ2+2ZkkR3GJS89VZ1RmchDLxqTL8l4=;
- b=Dkd9seHsvrp/S8tpsPFQbyXrSEVZ0rfIaOPXixL7powALpbnPjOrvUbywmIVnQRjHV
- DSlCwFyAZTmcdEda8f5SeNbOUIRD34FzivYcFBqvvpvKT90RmqBJdjPj2mkq7KTLEmSr
- 7dYVGo1V7jEENIHO+2rSQJ2cve+sa4W0sKx4gdjlhYc0NGSq4DJEqguN2Kew/BaXscGL
- x1PtV1GRLn2jFE0SXlS7GjhaWthQnF9qaH8xI8W6k/4E2Ic8A5G5Y0ZUmbq5fIrqah7h
- 9OIzg4R6u9q3Y92xXJsEDWJ0qeFlmY2LuXl/fMOA84JQ+tBb8l325r8x4eg0L7RZcetC
- nB7w==
-X-Gm-Message-State: AOAM532r60cUHmaaz5KMLcmbjq4LvPYCL7f+ksIaqNl0arRhlLknax1Q
- w+TeD6Jza2/GkKwkX2dj4SZZU6Q4vMunKBHPCSDHnixgAC9eBqIqtTtKnm9EPwgV9hGWN5zymYZ
- wATsxF7DE6w6QBTs=
-X-Received: by 2002:a1c:24d5:: with SMTP id
- k204mr11611516wmk.159.1598535664788; 
- Thu, 27 Aug 2020 06:41:04 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxlSb3DopXh/xizCLqmbnn5CJfBDl3YM4tr1LGfvISz1IYrMPPVlPcpYM+xYAkicILlAsu1uQ==
-X-Received: by 2002:a1c:24d5:: with SMTP id
- k204mr11611502wmk.159.1598535664619; 
- Thu, 27 Aug 2020 06:41:04 -0700 (PDT)
+ bh=eeTgRITWczaxOM8QLYLDDpc4gdXDBgE13i+Oq96xfDM=;
+ b=XspNLo3fVQNcyYsGHm+0thyJwbz57a2FTwQPIGPPBPAEMl1TzNOb6fGPfMcZX/nG99
+ DE2e5yP8BmyNuF3SEPiO0kUyXPa+Jy6zncdPWrNdzZqI6QLOde2k9WUtDkKq3AT+MdkP
+ lLZM+aadd3q9mTRXTl+oAkYqUg96Qk/LXQ15ouGsTeMrVbub4COzUK0nk//sMGRgVa5r
+ 4PtRVwCCQkYla3wXKe77dqZStQ0Z+tAZ3WDKOoGFENUkF9SIqIH8/mQUZjDXla036Unp
+ 42BXBBHdGecQBae2KfboQsoCfK1V9fiK/Y4MLmZlkwYaUmegEVfFeio8F16O41zhKpS2
+ MjvQ==
+X-Gm-Message-State: AOAM532A9PTXUXKDebV4qRMqS/v7bmL6dTGNBVJeGXyGENYiH5isKRIj
+ WQ9Apg+hvfaRepnMPFdOZkS3TexLWOkC3/GRdfIi27TgWh2Sm4TkWqrYFrver+N2yDyLoaHDMId
+ CqI0KXCEyNDM13o4=
+X-Received: by 2002:a1c:16:: with SMTP id 22mr11761318wma.75.1598535650169;
+ Thu, 27 Aug 2020 06:40:50 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwBPqe6surZDr/kpUkY46n0krlW4IizizpUH1kCpWfC8UpTuUda5Oi9jcQkDJX4hnDkjFyOSw==
+X-Received: by 2002:a1c:16:: with SMTP id 22mr11761302wma.75.1598535649920;
+ Thu, 27 Aug 2020 06:40:49 -0700 (PDT)
 Received: from redhat.com ([192.117.173.58])
- by smtp.gmail.com with ESMTPSA id n24sm4946658wmi.36.2020.08.27.06.41.02
+ by smtp.gmail.com with ESMTPSA id d6sm1703515wrq.67.2020.08.27.06.40.47
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 27 Aug 2020 06:41:03 -0700 (PDT)
-Date: Thu, 27 Aug 2020 09:41:00 -0400
+ Thu, 27 Aug 2020 06:40:49 -0700 (PDT)
+Date: Thu, 27 Aug 2020 09:40:46 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 13/13] tests/bios-tables-test: add smbios cpu speed test
-Message-ID: <20200827133954.2118749-14-mst@redhat.com>
+Subject: [PULL 09/13] virtio-scsi-pci: default num_queues to -smp N
+Message-ID: <20200827133954.2118749-10-mst@redhat.com>
 References: <20200827133954.2118749-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20200827133954.2118749-1-mst@redhat.com>
@@ -85,13 +83,13 @@ X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
 X-Mutt-Fcc: =sent
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
-X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Spam-Score: 0.003
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=mst@redhat.com;
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=mst@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 02:56:52
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 00:13:19
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -112,113 +110,196 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Heyi Guo <guoheyi@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Ying Fang <fangying1@huawei.com>, Igor Mammedov <imammedo@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ Raphael Norwitz <raphael.norwitz@nutanix.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Ying Fang <fangying1@huawei.com>
+From: Stefan Hajnoczi <stefanha@redhat.com>
 
-Add smbios type 4 CPU speed check for we added new options to set
-smbios type 4 "max speed" and "current speed". The default value
-should be 2000 when no option is specified, just as the old version
-did.
+Automatically size the number of virtio-scsi-pci, vhost-scsi-pci, and
+vhost-user-scsi-pci request virtqueues to match the number of vCPUs.
+Other transports continue to default to 1 request virtqueue.
 
-We add the test case to one machine of each architecture, though it
-doesn't really run on aarch64 platform for smbios test can't run on
-uefi only platform yet.
+A 1:1 virtqueue:vCPU mapping ensures that completion interrupts are
+handled on the same vCPU that submitted the request.  No IPI is
+necessary to complete an I/O request and performance is improved.  The
+maximum number of MSI-X vectors and virtqueues limit are respected.
 
-Signed-off-by: Ying Fang <fangying1@huawei.com>
-Signed-off-by: Heyi Guo <guoheyi@huawei.com>
-Message-Id: <20200806035634.376-3-fangying1@huawei.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Message-Id: <20200818143348.310613-6-stefanha@redhat.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Reviewed-by: Raphael Norwitz <raphael.norwitz@nutanix.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- tests/qtest/bios-tables-test.c | 42 ++++++++++++++++++++++++++++++++++
- 1 file changed, 42 insertions(+)
+ include/hw/virtio/virtio-scsi.h |  2 ++
+ hw/core/machine.c               |  6 +++++-
+ hw/scsi/vhost-scsi.c            |  3 ++-
+ hw/scsi/vhost-user-scsi.c       |  3 ++-
+ hw/scsi/virtio-scsi.c           |  6 +++++-
+ hw/virtio/vhost-scsi-pci.c      | 10 +++++++---
+ hw/virtio/vhost-user-scsi-pci.c | 10 +++++++---
+ hw/virtio/virtio-scsi-pci.c     | 10 +++++++---
+ 8 files changed, 37 insertions(+), 13 deletions(-)
 
-diff --git a/tests/qtest/bios-tables-test.c b/tests/qtest/bios-tables-test.c
-index d25ff35492..504b810af5 100644
---- a/tests/qtest/bios-tables-test.c
-+++ b/tests/qtest/bios-tables-test.c
-@@ -80,6 +80,8 @@ typedef struct {
-     GArray *tables;
-     uint32_t smbios_ep_addr;
-     struct smbios_21_entry_point smbios_ep_table;
-+    uint16_t smbios_cpu_max_speed;
-+    uint16_t smbios_cpu_curr_speed;
-     uint8_t *required_struct_types;
-     int required_struct_types_len;
-     QTestState *qts;
-@@ -563,6 +565,31 @@ static inline bool smbios_single_instance(uint8_t type)
-     }
+diff --git a/include/hw/virtio/virtio-scsi.h b/include/hw/virtio/virtio-scsi.h
+index 9f293bcb80..c0b8e4dd7e 100644
+--- a/include/hw/virtio/virtio-scsi.h
++++ b/include/hw/virtio/virtio-scsi.h
+@@ -39,6 +39,8 @@
+ /* Number of virtqueues that are always present */
+ #define VIRTIO_SCSI_VQ_NUM_FIXED    2
+ 
++#define VIRTIO_SCSI_AUTO_NUM_QUEUES UINT32_MAX
++
+ typedef struct virtio_scsi_cmd_req VirtIOSCSICmdReq;
+ typedef struct virtio_scsi_cmd_resp VirtIOSCSICmdResp;
+ typedef struct virtio_scsi_ctrl_tmf_req VirtIOSCSICtrlTMFReq;
+diff --git a/hw/core/machine.c b/hw/core/machine.c
+index cf5f2dfaeb..9ee2aa0f7b 100644
+--- a/hw/core/machine.c
++++ b/hw/core/machine.c
+@@ -28,7 +28,11 @@
+ #include "hw/mem/nvdimm.h"
+ #include "migration/vmstate.h"
+ 
+-GlobalProperty hw_compat_5_1[] = {};
++GlobalProperty hw_compat_5_1[] = {
++    { "vhost-scsi", "num_queues", "1"},
++    { "vhost-user-scsi", "num_queues", "1"},
++    { "virtio-scsi-device", "num_queues", "1"},
++};
+ const size_t hw_compat_5_1_len = G_N_ELEMENTS(hw_compat_5_1);
+ 
+ GlobalProperty hw_compat_5_0[] = {
+diff --git a/hw/scsi/vhost-scsi.c b/hw/scsi/vhost-scsi.c
+index 13b05af29b..a83ffeefc8 100644
+--- a/hw/scsi/vhost-scsi.c
++++ b/hw/scsi/vhost-scsi.c
+@@ -270,7 +270,8 @@ static Property vhost_scsi_properties[] = {
+     DEFINE_PROP_STRING("vhostfd", VirtIOSCSICommon, conf.vhostfd),
+     DEFINE_PROP_STRING("wwpn", VirtIOSCSICommon, conf.wwpn),
+     DEFINE_PROP_UINT32("boot_tpgt", VirtIOSCSICommon, conf.boot_tpgt, 0),
+-    DEFINE_PROP_UINT32("num_queues", VirtIOSCSICommon, conf.num_queues, 1),
++    DEFINE_PROP_UINT32("num_queues", VirtIOSCSICommon, conf.num_queues,
++                       VIRTIO_SCSI_AUTO_NUM_QUEUES),
+     DEFINE_PROP_UINT32("virtqueue_size", VirtIOSCSICommon, conf.virtqueue_size,
+                        128),
+     DEFINE_PROP_BOOL("seg_max_adjust", VirtIOSCSICommon, conf.seg_max_adjust,
+diff --git a/hw/scsi/vhost-user-scsi.c b/hw/scsi/vhost-user-scsi.c
+index a8b821466f..7c0631656c 100644
+--- a/hw/scsi/vhost-user-scsi.c
++++ b/hw/scsi/vhost-user-scsi.c
+@@ -162,7 +162,8 @@ static void vhost_user_scsi_unrealize(DeviceState *dev)
+ static Property vhost_user_scsi_properties[] = {
+     DEFINE_PROP_CHR("chardev", VirtIOSCSICommon, conf.chardev),
+     DEFINE_PROP_UINT32("boot_tpgt", VirtIOSCSICommon, conf.boot_tpgt, 0),
+-    DEFINE_PROP_UINT32("num_queues", VirtIOSCSICommon, conf.num_queues, 1),
++    DEFINE_PROP_UINT32("num_queues", VirtIOSCSICommon, conf.num_queues,
++                       VIRTIO_SCSI_AUTO_NUM_QUEUES),
+     DEFINE_PROP_UINT32("virtqueue_size", VirtIOSCSICommon, conf.virtqueue_size,
+                        128),
+     DEFINE_PROP_UINT32("max_sectors", VirtIOSCSICommon, conf.max_sectors,
+diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
+index eecdd05af5..3a71ea7097 100644
+--- a/hw/scsi/virtio-scsi.c
++++ b/hw/scsi/virtio-scsi.c
+@@ -891,6 +891,9 @@ void virtio_scsi_common_realize(DeviceState *dev,
+     virtio_init(vdev, "virtio-scsi", VIRTIO_ID_SCSI,
+                 sizeof(VirtIOSCSIConfig));
+ 
++    if (s->conf.num_queues == VIRTIO_SCSI_AUTO_NUM_QUEUES) {
++        s->conf.num_queues = 1;
++    }
+     if (s->conf.num_queues == 0 ||
+             s->conf.num_queues > VIRTIO_QUEUE_MAX - VIRTIO_SCSI_VQ_NUM_FIXED) {
+         error_setg(errp, "Invalid number of queues (= %" PRIu32 "), "
+@@ -964,7 +967,8 @@ static void virtio_scsi_device_unrealize(DeviceState *dev)
  }
  
-+static bool smbios_cpu_test(test_data *data, uint32_t addr)
-+{
-+    uint16_t expect_speed[2];
-+    uint16_t real;
-+    int offset[2];
-+    int i;
+ static Property virtio_scsi_properties[] = {
+-    DEFINE_PROP_UINT32("num_queues", VirtIOSCSI, parent_obj.conf.num_queues, 1),
++    DEFINE_PROP_UINT32("num_queues", VirtIOSCSI, parent_obj.conf.num_queues,
++                       VIRTIO_SCSI_AUTO_NUM_QUEUES),
+     DEFINE_PROP_UINT32("virtqueue_size", VirtIOSCSI,
+                                          parent_obj.conf.virtqueue_size, 256),
+     DEFINE_PROP_BOOL("seg_max_adjust", VirtIOSCSI,
+diff --git a/hw/virtio/vhost-scsi-pci.c b/hw/virtio/vhost-scsi-pci.c
+index 06e814d30e..a6bb0dc60d 100644
+--- a/hw/virtio/vhost-scsi-pci.c
++++ b/hw/virtio/vhost-scsi-pci.c
+@@ -47,11 +47,15 @@ static void vhost_scsi_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
+ {
+     VHostSCSIPCI *dev = VHOST_SCSI_PCI(vpci_dev);
+     DeviceState *vdev = DEVICE(&dev->vdev);
+-    VirtIOSCSICommon *vs = VIRTIO_SCSI_COMMON(vdev);
++    VirtIOSCSIConf *conf = &dev->vdev.parent_obj.parent_obj.conf;
 +
-+    /* Check CPU speed for backward compatibility */
-+    offset[0] = offsetof(struct smbios_type_4, max_speed);
-+    offset[1] = offsetof(struct smbios_type_4, current_speed);
-+    expect_speed[0] = data->smbios_cpu_max_speed ? : 2000;
-+    expect_speed[1] = data->smbios_cpu_curr_speed ? : 2000;
++    if (conf->num_queues == VIRTIO_SCSI_AUTO_NUM_QUEUES) {
++        conf->num_queues =
++            virtio_pci_optimal_num_queues(VIRTIO_SCSI_VQ_NUM_FIXED);
++    }
+ 
+     if (vpci_dev->nvectors == DEV_NVECTORS_UNSPECIFIED) {
+-        vpci_dev->nvectors = vs->conf.num_queues +
+-                             VIRTIO_SCSI_VQ_NUM_FIXED + 1;
++        vpci_dev->nvectors = conf->num_queues + VIRTIO_SCSI_VQ_NUM_FIXED + 1;
+     }
+ 
+     qdev_realize(vdev, BUS(&vpci_dev->bus), errp);
+diff --git a/hw/virtio/vhost-user-scsi-pci.c b/hw/virtio/vhost-user-scsi-pci.c
+index ab6dfb71a9..25e97ca54e 100644
+--- a/hw/virtio/vhost-user-scsi-pci.c
++++ b/hw/virtio/vhost-user-scsi-pci.c
+@@ -53,11 +53,15 @@ static void vhost_user_scsi_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
+ {
+     VHostUserSCSIPCI *dev = VHOST_USER_SCSI_PCI(vpci_dev);
+     DeviceState *vdev = DEVICE(&dev->vdev);
+-    VirtIOSCSICommon *vs = VIRTIO_SCSI_COMMON(vdev);
++    VirtIOSCSIConf *conf = &dev->vdev.parent_obj.parent_obj.conf;
 +
-+    for (i = 0; i < 2; i++) {
-+        real = qtest_readw(data->qts, addr + offset[i]);
-+        if (real != expect_speed[i]) {
-+            fprintf(stderr, "Unexpected SMBIOS CPU speed: real %u expect %u\n",
-+                    real, expect_speed[i]);
-+            return false;
-+        }
++    if (conf->num_queues == VIRTIO_SCSI_AUTO_NUM_QUEUES) {
++        conf->num_queues =
++            virtio_pci_optimal_num_queues(VIRTIO_SCSI_VQ_NUM_FIXED);
++    }
+ 
+     if (vpci_dev->nvectors == DEV_NVECTORS_UNSPECIFIED) {
+-        vpci_dev->nvectors = vs->conf.num_queues +
+-                             VIRTIO_SCSI_VQ_NUM_FIXED + 1;
++        vpci_dev->nvectors = conf->num_queues + VIRTIO_SCSI_VQ_NUM_FIXED + 1;
+     }
+ 
+     qdev_realize(vdev, BUS(&vpci_dev->bus), errp);
+diff --git a/hw/virtio/virtio-scsi-pci.c b/hw/virtio/virtio-scsi-pci.c
+index 3ff9eb7ef6..fa4b3bfb50 100644
+--- a/hw/virtio/virtio-scsi-pci.c
++++ b/hw/virtio/virtio-scsi-pci.c
+@@ -46,13 +46,17 @@ static void virtio_scsi_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
+ {
+     VirtIOSCSIPCI *dev = VIRTIO_SCSI_PCI(vpci_dev);
+     DeviceState *vdev = DEVICE(&dev->vdev);
+-    VirtIOSCSICommon *vs = VIRTIO_SCSI_COMMON(vdev);
+     DeviceState *proxy = DEVICE(vpci_dev);
++    VirtIOSCSIConf *conf = &dev->vdev.parent_obj.conf;
+     char *bus_name;
+ 
++    if (conf->num_queues == VIRTIO_SCSI_AUTO_NUM_QUEUES) {
++        conf->num_queues =
++            virtio_pci_optimal_num_queues(VIRTIO_SCSI_VQ_NUM_FIXED);
 +    }
 +
-+    return true;
-+}
-+
- static void test_smbios_structs(test_data *data)
- {
-     DECLARE_BITMAP(struct_bitmap, SMBIOS_MAX_TYPE+1) = { 0 };
-@@ -585,6 +612,10 @@ static void test_smbios_structs(test_data *data)
-         }
-         set_bit(type, struct_bitmap);
+     if (vpci_dev->nvectors == DEV_NVECTORS_UNSPECIFIED) {
+-        vpci_dev->nvectors = vs->conf.num_queues +
+-                             VIRTIO_SCSI_VQ_NUM_FIXED + 1;
++        vpci_dev->nvectors = conf->num_queues + VIRTIO_SCSI_VQ_NUM_FIXED + 1;
+     }
  
-+        if (type == 4) {
-+            g_assert(smbios_cpu_test(data, addr));
-+        }
-+
-         /* seek to end of unformatted string area of this struct ("\0\0") */
-         prv = crt = 1;
-         while (prv || crt) {
-@@ -719,6 +750,11 @@ static void test_acpi_q35_tcg(void)
-     data.required_struct_types_len = ARRAY_SIZE(base_required_struct_types);
-     test_acpi_one(NULL, &data);
-     free_test_data(&data);
-+
-+    data.smbios_cpu_max_speed = 3000;
-+    data.smbios_cpu_curr_speed = 2600;
-+    test_acpi_one("-smbios type=4,max-speed=3000,current-speed=2600", &data);
-+    free_test_data(&data);
- }
- 
- static void test_acpi_q35_tcg_bridge(void)
-@@ -1084,6 +1120,12 @@ static void test_acpi_virt_tcg(void)
- 
-     test_acpi_one("-cpu cortex-a57", &data);
-     free_test_data(&data);
-+
-+    data.smbios_cpu_max_speed = 2900;
-+    data.smbios_cpu_curr_speed = 2700;
-+    test_acpi_one("-cpu cortex-a57 "
-+                  "-smbios type=4,max-speed=2900,current-speed=2700", &data);
-+    free_test_data(&data);
- }
- 
- int main(int argc, char *argv[])
+     /*
 -- 
 MST
 
