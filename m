@@ -2,93 +2,72 @@ Return-Path: <SRS0=k4hX=CF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A841C433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 09:12:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D21B4C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 09:13:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E43D5206F0
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 09:12:57 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O+vAlF8D"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E43D5206F0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9789020738
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 09:13:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9789020738
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34320 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35084 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBDxo-0003mE-Vq
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 05:12:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54090)
+	id 1kBDxv-00045X-Ot
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 05:13:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54424)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kBDve-0000Cj-O5
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 05:10:42 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:25660
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kBDvd-0001of-02
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 05:10:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598519439;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=xn5RMJreF8zU3L+NcAJXY9m/TKiflBqtg2h7oBhQrLo=;
- b=O+vAlF8DpkCNVVKzd/z7jFPbeOkqST4pTEGZufa9G4ZfQHy9A6agsckNnzIIcvoQ2HoqNo
- wte8gsj0Dq4OSeXHyPiAfxqGDhJGFhKu+t3EZkw32GlApzZHC7bCFr/7aOSKja7E5jVzL6
- pQSjNusI4GDRFRYgtxdk3ddrdBVCs+U=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-93-s63SDqxPOMqlkeJ9vO8lnA-1; Thu, 27 Aug 2020 05:10:38 -0400
-X-MC-Unique: s63SDqxPOMqlkeJ9vO8lnA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 802978015DB;
- Thu, 27 Aug 2020 09:10:36 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-56.ams2.redhat.com [10.36.112.56])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 00B116111F;
- Thu, 27 Aug 2020 09:10:33 +0000 (UTC)
-Subject: Re: [PATCH for-5.2 v2 3/9] pc-bios/s390-ccw: Introduce ENODEV define
- and remove guards of others
-To: Janosch Frank <frankja@linux.ibm.com>, qemu-s390x@nongnu.org,
- qemu-devel@nongnu.org
-References: <20200806105349.632-1-thuth@redhat.com>
- <20200806105349.632-4-thuth@redhat.com>
- <e279b0f7-daf7-8a9e-3009-a1677637ce90@linux.ibm.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <bffa0294-211d-23ea-b80c-0fbbfe0be6a8@redhat.com>
-Date: Thu, 27 Aug 2020 11:10:32 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>)
+ id 1kBDwg-0001fD-7W; Thu, 27 Aug 2020 05:11:46 -0400
+Received: from smtpout1.mo529.mail-out.ovh.net ([178.32.125.2]:41739)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>)
+ id 1kBDwe-0001zi-0B; Thu, 27 Aug 2020 05:11:45 -0400
+Received: from mxplan5.mail.ovh.net (unknown [10.109.156.44])
+ by mo529.mail-out.ovh.net (Postfix) with ESMTPS id F0BBF54810E6;
+ Thu, 27 Aug 2020 11:11:33 +0200 (CEST)
+Received: from kaod.org (37.59.142.99) by DAG4EX1.mxp5.local (172.16.2.31)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Thu, 27 Aug
+ 2020 11:11:32 +0200
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-99G003d6fa0ea9-06f3-4474-923a-91ee005d5c8c,
+ 618CF37EF0508A6B3BD090B4D8B11E595DDBE7AA) smtp.auth=clg@kaod.org
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: <qemu-devel@nongnu.org>
+Subject: [PATCH 1/2] m25p80: Add basic support for the SFDP command
+Date: Thu, 27 Aug 2020 11:11:29 +0200
+Message-ID: <20200827091130.3525790-2-clg@kaod.org>
+X-Mailer: git-send-email 2.25.4
+In-Reply-To: <20200827091130.3525790-1-clg@kaod.org>
+References: <20200827091130.3525790-1-clg@kaod.org>
 MIME-Version: 1.0
-In-Reply-To: <e279b0f7-daf7-8a9e-3009-a1677637ce90@linux.ibm.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=thuth@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 00:53:04
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -52
-X-Spam_score: -5.3
-X-Spam_bar: -----
-X-Spam_report: (-5.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.959,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-2.239, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [37.59.142.99]
+X-ClientProxiedBy: DAG7EX2.mxp5.local (172.16.2.62) To DAG4EX1.mxp5.local
+ (172.16.2.31)
+X-Ovh-Tracer-GUID: b5469d95-93aa-4455-a49e-f5c5e03ab007
+X-Ovh-Tracer-Id: 8702080382030482284
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedruddvgedguddvucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvufffkffojghfgggtgfhisehtkeertdertdejnecuhfhrohhmpeevrogurhhitgcunfgvucfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepheehfeegjeeitdfffeetjeduveejueefuefgtdefueelueetveeliefhhffgtdelnecukfhppedtrddtrddtrddtpdefjedrheelrddugedvrdelleenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehmgihplhgrnhehrdhmrghilhdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtoheptghlgheskhgrohgurdhorhhg
+Received-SPF: pass client-ip=178.32.125.2; envelope-from=clg@kaod.org;
+ helo=smtpout1.mo529.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 05:11:34
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -102,61 +81,158 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Jason J . Herne" <jjherne@linux.ibm.com>,
- Collin Walling <walling@linux.ibm.com>, qemu-block@nongnu.org,
- Cornelia Huck <cohuck@redhat.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jeffery <andrew@aj.id.au>,
+ Francisco Iglesias <frasse.iglesias@gmail.com>,
+ Alistair Francis <alistair@alistair23.me>, qemu-arm@nongnu.org,
+ Joel Stanley <joel@jms.id.au>,
+ =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 06/08/2020 15.27, Janosch Frank wrote:
-> On 8/6/20 12:53 PM, Thomas Huth wrote:
->> Remove the "#ifndef E..." guards from the defines here - the header
->> guard S390_CCW_H at the top of the file should avoid double definition,
->> and if the error code is defined in a different file already, we're in
->> trouble anyway, then it's better to see the error at compile time instead
->> of hunting weird behavior during runtime later.
->> Also define ENODEV - we will use this in a later patch.
->>
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> 
-> Would it make sense to use the errno.h numbers for the defines?
+JEDEC STANDARD JESD216 for Serial Flash Discovery Parameters (SFDP)
+provides a mean to describe the features of a serial flash device
+using a set of internal parameter tables.
 
-Which one? From Linux? From Windows? From BSD? ... I think it's likely
-best if we keep them separate to avoid confusion.
+This is the initial framework for the RDSFDP command giving access to
+a private SFDP area under the flash. This area now needs to be
+populated with the flash device characteristics, using a new 'sfdp'
+pointer under FlashPartInfo.
 
- Thomas
+Signed-off-by: Cédric Le Goater <clg@kaod.org>
+---
+ hw/block/m25p80_sfdp.h | 15 +++++++++++++++
+ hw/block/m25p80.c      | 33 +++++++++++++++++++++++++++++++++
+ hw/block/trace-events  |  1 +
+ 3 files changed, 49 insertions(+)
+ create mode 100644 hw/block/m25p80_sfdp.h
 
-
-> Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
-> 
->> ---
->>  pc-bios/s390-ccw/s390-ccw.h | 6 ++----
->>  1 file changed, 2 insertions(+), 4 deletions(-)
->>
->> diff --git a/pc-bios/s390-ccw/s390-ccw.h b/pc-bios/s390-ccw/s390-ccw.h
->> index 36b884cced..dbc4c64851 100644
->> --- a/pc-bios/s390-ccw/s390-ccw.h
->> +++ b/pc-bios/s390-ccw/s390-ccw.h
->> @@ -27,12 +27,10 @@ typedef unsigned long long __u64;
->>  #define false 0
->>  #define PAGE_SIZE 4096
->>  
->> -#ifndef EIO
->>  #define EIO     1
->> -#endif
->> -#ifndef EBUSY
->>  #define EBUSY   2
->> -#endif
->> +#define ENODEV  3
->> +
->>  #ifndef NULL
->>  #define NULL    0
->>  #endif
->>
-> 
-> 
+diff --git a/hw/block/m25p80_sfdp.h b/hw/block/m25p80_sfdp.h
+new file mode 100644
+index 000000000000..b75fd0b0c13f
+--- /dev/null
++++ b/hw/block/m25p80_sfdp.h
+@@ -0,0 +1,15 @@
++/*
++ * M25P80 SFDP
++ *
++ * Copyright (c) 2020, IBM Corporation.
++ *
++ * This code is licensed under the GPL version 2 or later. See the
++ * COPYING file in the top-level directory.
++ */
++
++#ifndef HW_M25P80_SFDP_H
++#define HW_M25P80_SFDP_H
++
++#define M25P80_SFDP_AREA_SIZE 0x100
++
++#endif
+diff --git a/hw/block/m25p80.c b/hw/block/m25p80.c
+index 82270884416e..32925589ec7a 100644
+--- a/hw/block/m25p80.c
++++ b/hw/block/m25p80.c
+@@ -33,6 +33,7 @@
+ #include "qemu/error-report.h"
+ #include "qapi/error.h"
+ #include "trace.h"
++#include "m25p80_sfdp.h"
+ 
+ /* Fields for FlashPartInfo->flags */
+ 
+@@ -72,6 +73,7 @@ typedef struct FlashPartInfo {
+      * This field inform how many die is in the chip.
+      */
+     uint8_t die_cnt;
++    const uint8_t *sfdp;
+ } FlashPartInfo;
+ 
+ /* adapted from linux */
+@@ -333,6 +335,7 @@ typedef enum {
+     BULK_ERASE = 0xc7,
+     READ_FSR = 0x70,
+     RDCR = 0x15,
++    RDSFDP = 0x5a,
+ 
+     READ = 0x03,
+     READ4 = 0x13,
+@@ -398,6 +401,7 @@ typedef enum {
+     STATE_COLLECTING_DATA,
+     STATE_COLLECTING_VAR_LEN_DATA,
+     STATE_READING_DATA,
++    STATE_READING_SFDP,
+ } CMDState;
+ 
+ typedef enum {
+@@ -619,6 +623,8 @@ static inline int get_addr_length(Flash *s)
+     }
+ 
+    switch (s->cmd_in_progress) {
++   case RDSFDP:
++       return 3;
+    case PP4:
+    case PP4_4:
+    case QPP_4:
+@@ -744,6 +750,17 @@ static void complete_collecting_data(Flash *s)
+                           " by device\n");
+         }
+         break;
++
++    case RDSFDP:
++        if (s->cur_addr < M25P80_SFDP_AREA_SIZE) {
++            s->state = STATE_READING_SFDP;
++        } else {
++            qemu_log_mask(LOG_GUEST_ERROR,
++                          "M25P80: Invalid SFDP address %#" PRIx32 "\n",
++                          s->cur_addr);
++        }
++        break;
++
+     default:
+         break;
+     }
+@@ -1160,6 +1177,16 @@ static void decode_new_cmd(Flash *s, uint32_t value)
+     case RSTQIO:
+         s->quad_enable = false;
+         break;
++    case RDSFDP:
++        if (s->pi->sfdp) {
++            s->needed_bytes = get_addr_length(s) + 1 ; /* SFDP addr + dummy */
++            s->pos = 0;
++            s->len = 0;
++            s->state = STATE_COLLECTING_DATA;
++            break;
++        }
++        /* Fallthrough */
++
+     default:
+         s->pos = 0;
+         s->len = 1;
+@@ -1256,6 +1283,12 @@ static uint32_t m25p80_transfer8(SSISlave *ss, uint32_t tx)
+             }
+         }
+         break;
++    case STATE_READING_SFDP:
++        assert(s->pi->sfdp);
++        r = s->pi->sfdp[s->cur_addr];
++        trace_m25p80_read_sfdp(s, s->cur_addr, (uint8_t)r);
++        s->cur_addr = (s->cur_addr + 1) & (M25P80_SFDP_AREA_SIZE - 1);
++        break;
+ 
+     default:
+     case STATE_IDLE:
+diff --git a/hw/block/trace-events b/hw/block/trace-events
+index 958fcc5508d1..53d377ca2b46 100644
+--- a/hw/block/trace-events
++++ b/hw/block/trace-events
+@@ -152,5 +152,6 @@ m25p80_page_program(void *s, uint32_t addr, uint8_t tx) "[%p] page program cur_a
+ m25p80_transfer(void *s, uint8_t state, uint32_t len, uint8_t needed, uint32_t pos, uint32_t cur_addr, uint8_t t) "[%p] Transfer state 0x%"PRIx8" len 0x%"PRIx32" needed 0x%"PRIx8" pos 0x%"PRIx32" addr 0x%"PRIx32" tx 0x%"PRIx8
+ m25p80_read_byte(void *s, uint32_t addr, uint8_t v) "[%p] Read byte 0x%"PRIx32"=0x%"PRIx8
+ m25p80_read_data(void *s, uint32_t pos, uint8_t v) "[%p] Read data 0x%"PRIx32"=0x%"PRIx8
++m25p80_read_sfdp(void *s, uint32_t addr, uint8_t v) "[%p] Read SFDP 0x%"PRIx32"=0x%"PRIx8
+ m25p80_binding(void *s) "[%p] Binding to IF_MTD drive"
+ m25p80_binding_no_bdrv(void *s) "[%p] No BDRV - binding to RAM"
+-- 
+2.25.4
 
 
