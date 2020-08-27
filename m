@@ -7,50 +7,50 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D271C433E3
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 12:40:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8809FC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 12:40:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 330442177B
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 12:40:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 330442177B
+	by mail.kernel.org (Postfix) with ESMTPS id 5D2772177B
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 12:40:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D2772177B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38828 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39184 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBHCB-0001CD-DH
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 08:39:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58912)
+	id 1kBHCE-0001Kt-FU
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 08:40:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58938)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ysato@users.sourceforge.jp>)
- id 1kBHBQ-0007xI-LS
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 08:39:12 -0400
-Received: from mail01.asahi-net.or.jp ([202.224.55.13]:47876)
+ id 1kBHBR-0007xe-IZ
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 08:39:13 -0400
+Received: from mail02.asahi-net.or.jp ([202.224.55.14]:56301)
  by eggs.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ysato@users.sourceforge.jp>) id 1kBHBN-0005u9-UT
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 08:39:12 -0400
+ (envelope-from <ysato@users.sourceforge.jp>) id 1kBHBN-0005u5-SJ
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 08:39:13 -0400
 Received: from sakura.ysato.name (ik1-413-38519.vs.sakura.ne.jp
  [153.127.30.23]) (Authenticated sender: PQ4Y-STU)
- by mail01.asahi-net.or.jp (Postfix) with ESMTPA id A3322108660;
+ by mail02.asahi-net.or.jp (Postfix) with ESMTPA id 84A9B25525;
  Thu, 27 Aug 2020 21:39:05 +0900 (JST)
 Received: from yo-satoh-debian.localdomain (ZM005235.ppp.dion.ne.jp
  [222.8.5.235])
- by sakura.ysato.name (Postfix) with ESMTPSA id 43B4C1C07A8;
+ by sakura.ysato.name (Postfix) with ESMTPSA id 0BBA51C0792;
  Thu, 27 Aug 2020 21:39:05 +0900 (JST)
 From: Yoshinori Sato <ysato@users.sourceforge.jp>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 02/20] include/elf.h: Add EM_RX.
-Date: Thu, 27 Aug 2020 21:38:41 +0900
-Message-Id: <20200827123859.81793-3-ysato@users.sourceforge.jp>
+Subject: [PATCH 01/20] loader.c: Add support Motrola S-record format.
+Date: Thu, 27 Aug 2020 21:38:40 +0900
+Message-Id: <20200827123859.81793-2-ysato@users.sourceforge.jp>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200827123859.81793-1-ysato@users.sourceforge.jp>
 References: <20200827123859.81793-1-ysato@users.sourceforge.jp>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: softfail client-ip=202.224.55.13;
- envelope-from=ysato@users.sourceforge.jp; helo=mail01.asahi-net.or.jp
+Received-SPF: softfail client-ip=202.224.55.14;
+ envelope-from=ysato@users.sourceforge.jp; helo=mail02.asahi-net.or.jp
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 08:39:06
 X-ACL-Warn: Detected OS   = ???
 X-Spam_score_int: -18
@@ -77,22 +77,251 @@ Sender: "Qemu-devel"
 
 Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
 ---
- include/elf.h | 2 ++
- 1 file changed, 2 insertions(+)
+ include/hw/loader.h |  14 +++
+ hw/core/loader.c    | 208 ++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 222 insertions(+)
 
-diff --git a/include/elf.h b/include/elf.h
-index c117a4d1ab..d9bf4a95d8 100644
---- a/include/elf.h
-+++ b/include/elf.h
-@@ -172,6 +172,8 @@ typedef struct mips_elf_abiflags_v0 {
+diff --git a/include/hw/loader.h b/include/hw/loader.h
+index a9eeea3952..6f1fb62ded 100644
+--- a/include/hw/loader.h
++++ b/include/hw/loader.h
+@@ -55,6 +55,20 @@ int load_image_targphys_as(const char *filename,
+  */
+ int load_targphys_hex_as(const char *filename, hwaddr *entry, AddressSpace *as);
  
- #define EM_UNICORE32    110     /* UniCore32 */
- 
-+#define EM_RX           173     /* Renesas RX family */
++/*
++ * load_targphys_srec_as:
++ * @filename: Path to the .hex file
++ * @entry: Store the entry point given by the .hex file
++ * @as: The AddressSpace to load the .hex file to. The value of
++ *      address_space_memory is used if nothing is supplied here.
++ *
++ * Load a fixed .srec file into memory.
++ *
++ * Returns the size of the loaded .hex file on success, -1 otherwise.
++ */
++int load_targphys_srec_as(const char *filename,
++                          hwaddr *entry, AddressSpace *as);
 +
- #define EM_RISCV        243     /* RISC-V */
- 
- #define EM_NANOMIPS     249     /* Wave Computing nanoMIPS */
+ /** load_image_targphys:
+  * Same as load_image_targphys_as(), but doesn't allow the caller to specify
+  * an AddressSpace.
+diff --git a/hw/core/loader.c b/hw/core/loader.c
+index 8bbb1797a4..6964b04ec7 100644
+--- a/hw/core/loader.c
++++ b/hw/core/loader.c
+@@ -1618,3 +1618,211 @@ int load_targphys_hex_as(const char *filename, hwaddr *entry, AddressSpace *as)
+     g_free(hex_blob);
+     return total_size;
+ }
++
++typedef enum {
++    SREC_SOH,
++    SREC_TYPE,
++    SREC_LEN,
++    SREC_ADDR,
++    SREC_DATA,
++    SREC_SKIP,
++    SREC_SUM,
++} srec_state;
++
++typedef struct {
++    srec_state state;
++    int nibble;
++    int total_size;
++    uint32_t address;
++    uint32_t topaddr;
++    uint32_t bufremain;
++    int length;
++    int addr_len;
++    int record_type;
++    uint8_t byte;
++    uint8_t data[DATA_FIELD_MAX_LEN];
++    uint8_t *datap;
++    uint8_t *bufptr;
++    uint8_t sum;
++} SrecLine;
++
++static bool parse_srec_line(SrecLine *line, char c)
++{
++    if (!g_ascii_isxdigit(c)) {
++        return false;
++    }
++    line->byte <<= 4;
++    line->byte |= g_ascii_xdigit_value(c);
++    line->nibble++;
++    if (line->nibble == 2) {
++        line->nibble = 0;
++        line->length--;
++        line->sum += line->byte;
++        switch (line->state) {
++        case SREC_SOH:
++        case SREC_TYPE:
++            /* first 2chars ignore parse */
++            break;
++        case SREC_LEN:
++            line->sum = line->length = line->byte;
++            if (line->addr_len > 0) {
++                line->state = SREC_ADDR;
++                line->address = 0;
++            } else {
++                line->state = SREC_SKIP;
++            }
++            break;
++        case SREC_ADDR:
++            line->address <<= 8;
++            line->address |= line->byte;
++            if (--line->addr_len == 0) {
++                if (line->length > 1) {
++                    if (line->record_type != 0) {
++                        line->state = SREC_DATA;
++                    } else {
++                        line->state = SREC_SKIP;
++                    }
++                    line->datap = line->data;
++                } else {
++                    line->state = SREC_SUM;
++                }
++            }
++            break;
++        case SREC_DATA:
++            *line->datap++ = line->byte;
++            /* fail through */
++        case SREC_SKIP:
++            if (line->length == 1) {
++                line->state = SREC_SUM;
++            }
++            break;
++        case SREC_SUM:
++            if ((line->sum & 0xff) != 0xff) {
++                return false;
++            }
++        }
++    }
++    return true;
++}
++
++#define SRECBUFSIZE 0x40000
++
++/* return size or -1 if error */
++static int parse_srec_blob(const char *filename, hwaddr *addr,
++                           uint8_t *hex_blob, size_t hex_blob_size,
++                           AddressSpace *as)
++{
++    SrecLine line;
++    size_t len;
++    int total_len = 0;
++    uint8_t *end = hex_blob + hex_blob_size;
++    rom_transaction_begin();
++    line.state = SREC_SOH;
++    line.bufptr = g_malloc(SRECBUFSIZE);
++    line.bufremain = SRECBUFSIZE;
++    line.topaddr = UINT32_MAX;
++    for (; hex_blob < end; ++hex_blob) {
++        switch (*hex_blob) {
++        case '\r':
++        case '\n':
++            if (line.state == SREC_SUM) {
++                switch (line.record_type) {
++                case 1:
++                case 2:
++                case 3:
++                    len = line.datap - line.data;
++                    if (line.topaddr == UINT32_MAX) {
++                        line.topaddr = line.address;
++                    }
++                    if (line.bufremain < len || line.address < line.topaddr) {
++                        rom_add_blob_fixed_as(filename, line.bufptr,
++                                              SRECBUFSIZE - line.bufremain,
++                                              line.topaddr, as);
++                        line.topaddr = line.address;
++                        line.bufremain = SRECBUFSIZE;
++                    }
++                    memcpy(line.bufptr + (line.address  - line.topaddr),
++                           line.data, len);
++                    line.bufremain -= len;
++                    total_len += len;
++                    break;
++                case 7:
++                case 8:
++                case 9:
++                    *addr = line.address;
++                    break;
++                }
++                line.state = SREC_SOH;
++            }
++            break;
++        /* start of a new record. */
++        case 'S':
++            if (line.state != SREC_SOH) {
++                total_len = -1;
++                goto out;
++            }
++            line.state = SREC_TYPE;
++            break;
++        /* decoding lines */
++        default:
++            if (line.state == SREC_TYPE) {
++                if (g_ascii_isdigit(*hex_blob)) {
++                    line.record_type = g_ascii_digit_value(*hex_blob);
++                    switch (line.record_type) {
++                    case 1:
++                    case 2:
++                    case 3:
++                        line.addr_len = 1 + line.record_type;
++                        break;
++                    case 0:
++                    case 5:
++                        line.addr_len = 2;
++                        break;
++                    case 7:
++                    case 8:
++                    case 9:
++                        line.addr_len = 11 - line.record_type;
++                        break;
++                    default:
++                        line.addr_len = 0;
++                    }
++                }
++                line.state = SREC_LEN;
++                line.nibble = 0;
++            } else {
++                if (!parse_srec_line(&line, *hex_blob)) {
++                    total_len = -1;
++                    goto out;
++                }
++            }
++            break;
++        }
++    }
++    if (line.bufremain < SRECBUFSIZE) {
++        rom_add_blob_fixed_as(filename, line.bufptr,
++                              SRECBUFSIZE - line.bufremain,
++                              line.topaddr, as);
++    }
++out:
++    rom_transaction_end(total_len != -1);
++    g_free(line.bufptr);
++    return total_len;
++}
++
++/* return size or -1 if error */
++int load_targphys_srec_as(const char *filename, hwaddr *entry, AddressSpace *as)
++{
++    gsize hex_blob_size;
++    gchar *hex_blob;
++    int total_size = 0;
++
++    if (!g_file_get_contents(filename, &hex_blob, &hex_blob_size, NULL)) {
++        return -1;
++    }
++
++    total_size = parse_srec_blob(filename, entry, (uint8_t *)hex_blob,
++                                 hex_blob_size, as);
++
++    g_free(hex_blob);
++    return total_size;
++}
 -- 
 2.20.1
 
