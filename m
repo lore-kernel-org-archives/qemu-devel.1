@@ -2,119 +2,68 @@ Return-Path: <SRS0=k4hX=CF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-8.0 required=3.0 tests=BAYES_00,DATE_IN_PAST_06_12,
+	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDEFAC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 09:37:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9A0DC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 09:49:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A1C0520738
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 09:37:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A6209207CD
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 09:49:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="YuNr+pG9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1C0520738
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Cm4xCDX+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6209207CD
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53488 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35164 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBELq-0001Vs-Qn
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 05:37:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60134)
+	id 1kBEWr-0006Vv-Uc
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 05:49:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33846)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <frankja@linux.ibm.com>)
- id 1kBELH-0000zT-39
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 05:37:11 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59036
- helo=mx0a-001b2d01.pphosted.com)
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1kBEVB-0005J1-7t; Thu, 27 Aug 2020 05:47:25 -0400
+Received: from ozlabs.org ([203.11.71.1]:55659)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <frankja@linux.ibm.com>)
- id 1kBELD-00055W-Rl
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 05:37:10 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 07R9VfBj032413
- for <qemu-devel@nongnu.org>; Thu, 27 Aug 2020 05:37:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
- h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=4DwvKU+klFJRrmZu4dlvRVnUY3gvooEZ199bNOhdDIA=;
- b=YuNr+pG9duMPgynx7FJ7vj1Wzg50ERKtjlj9ngsm8x5q9luLjjedRHGegal29K/OTuNR
- RJqTwjsZzKFQ5uK/nUWguaWnFHApglBFUVbjx/oL3GW5HxQG4Ab8h4cGzBM9GUc+JQN7
- zxCgeZHkkgmQzRMDKkCJ+hUC9JDWvp2WzqfjpKEQCApqRCzMvngh7GoKvWyPpIc8svRW
- aEiWXnUxKDsIXrvfJ736QdSuBNsB4b5O7Z1z/TsTSQYlCF0enIGX4P3oYDzPKeBQuC2F
- DBUDABhAxFIGfhuTJK4gH0klNUGNkBdnHVuZgDnuIvGkF1GWwaLmVaKeuJYCGel3uyV+ UA== 
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0b-001b2d01.pphosted.com with ESMTP id 336a2k8ej5-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Thu, 27 Aug 2020 05:37:06 -0400
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 07R9Vhar032597
- for <qemu-devel@nongnu.org>; Thu, 27 Aug 2020 05:37:06 -0400
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com
- [149.81.74.106])
- by mx0b-001b2d01.pphosted.com with ESMTP id 336a2k8eha-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 27 Aug 2020 05:37:06 -0400
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
- by ppma04fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 07R9IAeY029591;
- Thu, 27 Aug 2020 09:32:03 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com
- (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
- by ppma04fra.de.ibm.com with ESMTP id 332ujjuch8-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 27 Aug 2020 09:32:03 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
- by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 07R9W0XA28508424
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 27 Aug 2020 09:32:00 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 86BB94204B;
- Thu, 27 Aug 2020 09:32:00 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id E72EB42059;
- Thu, 27 Aug 2020 09:31:59 +0000 (GMT)
-Received: from linux01.pok.stglabs.ibm.com (unknown [9.114.17.81])
- by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Thu, 27 Aug 2020 09:31:59 +0000 (GMT)
-From: Janosch Frank <frankja@linux.ibm.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 1/4] pc-bios: s390x: Fix bootmap.c zipl component entry
- data handling
-Date: Thu, 27 Aug 2020 05:31:49 -0400
-Message-Id: <20200827093152.3026-2-frankja@linux.ibm.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200827093152.3026-1-frankja@linux.ibm.com>
-References: <20200827093152.3026-1-frankja@linux.ibm.com>
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1kBEV8-0006L3-6U; Thu, 27 Aug 2020 05:47:24 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 4BcdDc340wz9sRK; Thu, 27 Aug 2020 19:47:12 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1598521632;
+ bh=QbA8mg9xBSfBz7qPdjGJ/kb5wX1Q8jhV0L/unsNjgQI=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=Cm4xCDX+fnNt90Ok8LPzlHf3E8eZjIMEFPBPKSEii6CO/ckS7yUKVZzhgVdR9vdPn
+ jMW3RD/NDIL8a/IqfdQJuaktbeMOm+DP7zvy5DViG/PDCZxULylfImHS+2v59ffSCi
+ lFLsdy1zSLm8eFmVCHB+do+BMIH8kYmb1moHulcY=
+Date: Thu, 27 Aug 2020 10:01:24 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Subject: Re: [PATCH 7/8] ppce500: Use TYPE_PPC_E500_PCI_BRIDGE constant
+Message-ID: <20200827000124.GB2014948@yekko.fritz.box>
+References: <20200826184334.4120620-1-ehabkost@redhat.com>
+ <20200826184334.4120620-8-ehabkost@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
- definitions=2020-08-27_02:2020-08-27,
- 2020-08-27 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- lowpriorityscore=0
- malwarescore=0 adultscore=0 mlxlogscore=999 mlxscore=0 impostorscore=0
- priorityscore=1501 suspectscore=1 bulkscore=0 spamscore=0 clxscore=1015
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2008270068
-Received-SPF: pass client-ip=148.163.158.5; envelope-from=frankja@linux.ibm.com;
- helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 05:32:06
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
-X-Spam_score_int: -26
-X-Spam_score: -2.7
-X-Spam_bar: --
-X-Spam_report: (-2.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="U+BazGySraz5kW0T"
+Content-Disposition: inline
+In-Reply-To: <20200826184334.4120620-8-ehabkost@redhat.com>
+Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
+ helo=ozlabs.org
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 05:47:13
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -1
+X-Spam_score: -0.2
+X-Spam_bar: /
+X-Spam_report: (-0.2 / 5.0 requ) BAYES_00=-1.9, DATE_IN_PAST_06_12=1.543,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.25, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -127,83 +76,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: borntraeger@de.ibm.com, thuth@redhat.com, cohuck@redhat.com,
- david@redhat.com
+Cc: qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+ "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The two main types of zipl component entries are execute and
-load/data. The last member of the component entry struct therefore
-denotes either a PSW or an address. Let's make this a bit more clear
-by introducing a union and cleaning up the code that uses that struct
-member.
 
-The execute type component entries written by zipl contain short PSWs,
-not addresses. Let's mask them and only pass the address part to
-jump_to_IPL_code(uint64_t address) because it expects an address as
-visible by the name of the argument.
+--U+BazGySraz5kW0T
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
----
- pc-bios/s390-ccw/bootmap.c | 5 +++--
- pc-bios/s390-ccw/bootmap.h | 7 ++++++-
- 2 files changed, 9 insertions(+), 3 deletions(-)
+On Wed, Aug 26, 2020 at 02:43:33PM -0400, Eduardo Habkost wrote:
+> This will make future conversion to use OBJECT_DECLARE* easier.
+>=20
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 
-diff --git a/pc-bios/s390-ccw/bootmap.c b/pc-bios/s390-ccw/bootmap.c
-index 97205674e5..8747c4ea26 100644
---- a/pc-bios/s390-ccw/bootmap.c
-+++ b/pc-bios/s390-ccw/bootmap.c
-@@ -10,6 +10,7 @@
- 
- #include "libc.h"
- #include "s390-ccw.h"
-+#include "s390-arch.h"
- #include "bootmap.h"
- #include "virtio.h"
- #include "bswap.h"
-@@ -436,7 +437,7 @@ static void zipl_load_segment(ComponentEntry *entry)
-     char *blk_no = &err_msg[30]; /* where to print blockno in (those ZZs) */
- 
-     blockno = entry->data.blockno;
--    address = entry->load_address;
-+    address = entry->compdat.load_addr;
- 
-     debug_print_int("loading segment at block", blockno);
-     debug_print_int("addr", address);
-@@ -514,7 +515,7 @@ static void zipl_run(ScsiBlockPtr *pte)
-     IPL_assert(entry->component_type == ZIPL_COMP_ENTRY_EXEC, "No EXEC entry");
- 
-     /* should not return */
--    jump_to_IPL_code(entry->load_address);
-+    jump_to_IPL_code(entry->compdat.load_psw & PSW_MASK_SHORT_ADDR);
- }
- 
- static void ipl_scsi(void)
-diff --git a/pc-bios/s390-ccw/bootmap.h b/pc-bios/s390-ccw/bootmap.h
-index 12a0166aae..3946aa3f8d 100644
---- a/pc-bios/s390-ccw/bootmap.h
-+++ b/pc-bios/s390-ccw/bootmap.h
-@@ -64,11 +64,16 @@ typedef struct BootMapTable {
-     BootMapPointer entry[];
- } __attribute__ ((packed)) BootMapTable;
- 
-+typedef union ComponentEntryData {
-+    uint64_t load_psw;
-+    uint64_t load_addr;
-+} ComponentEntryData;
-+
- typedef struct ComponentEntry {
-     ScsiBlockPtr data;
-     uint8_t pad[7];
-     uint8_t component_type;
--    uint64_t load_address;
-+    ComponentEntryData compdat;
- } __attribute((packed)) ComponentEntry;
- 
- typedef struct ComponentHeader {
--- 
-2.25.1
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
 
+> ---
+> Cc: David Gibson <david@gibson.dropbear.id.au>
+> Cc: qemu-ppc@nongnu.org
+> Cc: qemu-devel@nongnu.org
+> ---
+>  hw/pci-host/ppce500.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/hw/pci-host/ppce500.c b/hw/pci-host/ppce500.c
+> index d71072731d..1a62b2f8cc 100644
+> --- a/hw/pci-host/ppce500.c
+> +++ b/hw/pci-host/ppce500.c
+> @@ -509,7 +509,7 @@ static void e500_host_bridge_class_init(ObjectClass *=
+klass, void *data)
+>  }
+> =20
+>  static const TypeInfo e500_host_bridge_info =3D {
+> -    .name          =3D "e500-host-bridge",
+> +    .name          =3D TYPE_PPC_E500_PCI_BRIDGE,
+>      .parent        =3D TYPE_PCI_DEVICE,
+>      .instance_size =3D sizeof(PPCE500PCIBridgeState),
+>      .class_init    =3D e500_host_bridge_class_init,
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--U+BazGySraz5kW0T
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl9G99QACgkQbDjKyiDZ
+s5LRiBAA0MBfVnlruBvn3xZqQIeRkqVvchHCBZ12nd2fA7Gzr0GGXaPdEXIsuWX9
+ilVO8vYo6ZRkEA8BJIQCgplmhwNZBJpFmMMrz2Ci1gX1cKlMjkA+t9KRn4Ls/qbO
+zgAO5zA/8A6yylydPhGY9dbTKG7dnPvNLa1g1WKJ66kjG8+V1m228hQqugAfng+o
+hNVop6hzwvFJjac9TSmEvcOkgjuB+to2p+c7vLBdqzYsjNe+SEcNr7aDTdwBMFEI
+codkAdMD5yHm+LlHnggromz4XywSqsjRuxnd+dNVqeZrgcfde+gh8uvS7PX7f5iY
+Oq6CWkUK8ZsLH8rvt/qauAS/l24zQNOI5BP/y/RqtrzK8epuOcUBS7tvs0MMif2x
+IMHj138TJvYZk2QneZEUF6rvzvrkPTTiqxvMCO8N3yhLcqcBhpYMz8nbSSjIzyVN
+v6zLXsfZfdOebBQwxXWIHHkRzKxP2g28jyDuv8xXyCIreAfhuBD1CAbf5wrYkkgJ
+am/FvqQeTtJPqdPoF5gMgWaBQhonhdQv7FVPZtNdVmjiW7S3SRoJ8XxmqYPBGsOE
+AIOMTc3AQwA61Tv0THsKQHnxbYG7BYKMb8dALWCc0khL3M28Xp58U7NfOyogwdx4
+eP3a4AmaUSp5DPplHeqIcZht7FBCBUG4oIMED+pcIWM9VkOYpY8=
+=IzUu
+-----END PGP SIGNATURE-----
+
+--U+BazGySraz5kW0T--
 
