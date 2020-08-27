@@ -7,41 +7,41 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92B31C433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 09:25:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CAB7CC433E3
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 09:25:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6818D2075B
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 09:25:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6818D2075B
+	by mail.kernel.org (Postfix) with ESMTPS id A39B82075B
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 09:25:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A39B82075B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36222 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36278 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBEAG-00089V-KD
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 05:25:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57030)
+	id 1kBEAH-0008Ap-Q9
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 05:25:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57046)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <jiangyifei@huawei.com>)
- id 1kBE7N-0002ig-Lo; Thu, 27 Aug 2020 05:22:49 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:4659 helo=huawei.com)
+ id 1kBE7O-0002lN-Iy; Thu, 27 Aug 2020 05:22:50 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:4660 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <jiangyifei@huawei.com>)
- id 1kBE7L-0003G5-Eb; Thu, 27 Aug 2020 05:22:49 -0400
+ id 1kBE7L-0003G4-Fc; Thu, 27 Aug 2020 05:22:50 -0400
 Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id B030E6AA5F5D63F4845C;
+ by Forcepoint Email with ESMTP id A2193869D6D927573166;
  Thu, 27 Aug 2020 17:22:42 +0800 (CST)
 Received: from huawei.com (10.174.187.31) by DGGEMS402-HUB.china.huawei.com
  (10.3.19.202) with Microsoft SMTP Server id 14.3.487.0; Thu, 27 Aug 2020
- 17:22:36 +0800
+ 17:22:35 +0800
 From: Yifei Jiang <jiangyifei@huawei.com>
 To: <qemu-devel@nongnu.org>, <qemu-riscv@nongnu.org>
-Subject: [PATCH RFC v3 14/14] target/riscv: Support virtual time context
- synchronization
-Date: Thu, 27 Aug 2020 17:21:37 +0800
-Message-ID: <20200827092137.479-15-jiangyifei@huawei.com>
+Subject: [PATCH RFC v3 13/14] target/riscv: Implement virtual time adjusting
+ with vm state changing
+Date: Thu, 27 Aug 2020 17:21:36 +0800
+Message-ID: <20200827092137.479-14-jiangyifei@huawei.com>
 X-Mailer: git-send-email 2.26.2.windows.1
 In-Reply-To: <20200827092137.479-1-jiangyifei@huawei.com>
 References: <20200827092137.479-1-jiangyifei@huawei.com>
@@ -82,49 +82,56 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add virtual time context description to vmstate_riscv_cpu. After cpu being
-loaded, virtual time context is updated to KVM.
+We hope that virtual time adjusts with vm state changing. When a vm
+is stopped, guest virtual time should stop counting and kvm_timer
+should be stopped. When the vm is resumed, guest virtual time should
+continue to count and kvm_timer should be restored.
 
 Signed-off-by: Yifei Jiang <jiangyifei@huawei.com>
 Signed-off-by: Yipeng Yin <yinyipeng1@huawei.com>
 ---
- target/riscv/cpu.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ target/riscv/kvm.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
-index b698f4adbb..c6b207d201 100644
---- a/target/riscv/cpu.c
-+++ b/target/riscv/cpu.c
-@@ -496,11 +496,19 @@ static void riscv_cpu_init(Object *obj)
-     cpu_set_cpustate_pointers(cpu);
+diff --git a/target/riscv/kvm.c b/target/riscv/kvm.c
+index 59c537b1cb..943d733539 100644
+--- a/target/riscv/kvm.c
++++ b/target/riscv/kvm.c
+@@ -40,6 +40,7 @@
+ #include "kvm_riscv.h"
+ #include "sbi_ecall_interface.h"
+ #include "chardev/char-fe.h"
++#include "sysemu/runstate.h"
+ 
+ static __u64 kvm_riscv_reg_id(__u64 type, __u64 idx)
+ {
+@@ -448,6 +449,17 @@ unsigned long kvm_arch_vcpu_id(CPUState *cpu)
+     return cpu->cpu_index;
  }
  
-+static int cpu_post_load(void *opaque, int version_id)
++static void kvm_riscv_vm_state_change(void *opaque, int running, RunState state)
 +{
-+    RISCVCPU *cpu = opaque;
-+    cpu->env.kvm_timer_dirty = true;
-+    return 0;
++    CPUState *cs = opaque;
++
++    if (running) {
++        kvm_riscv_put_regs_timer(cs);
++    } else {
++        kvm_riscv_get_regs_timer(cs);
++    }
 +}
 +
- #ifndef CONFIG_USER_ONLY
- static const VMStateDescription vmstate_riscv_cpu = {
-     .name = "cpu",
-     .version_id = 1,
-     .minimum_version_id = 1,
-+    .post_load = cpu_post_load,
-     .fields = (VMStateField[]) {
-         VMSTATE_UINTTL_ARRAY(env.gpr, RISCVCPU, 32),
-         VMSTATE_UINT64_ARRAY(env.fpr, RISCVCPU, 32),
-@@ -514,6 +522,9 @@ static const VMStateDescription vmstate_riscv_cpu = {
-         VMSTATE_UINTTL(env.sbadaddr, RISCVCPU),
-         VMSTATE_UINTTL(env.mip, RISCVCPU),
-         VMSTATE_UINTTL(env.satp, RISCVCPU),
-+        VMSTATE_UINT64(env.kvm_timer_time, RISCVCPU),
-+        VMSTATE_UINT64(env.kvm_timer_compare, RISCVCPU),
-+        VMSTATE_UINT64(env.kvm_timer_state, RISCVCPU),
-         VMSTATE_END_OF_LIST()
-     }
- };
+ void kvm_arch_init_irq_routing(KVMState *s)
+ {
+ }
+@@ -459,6 +471,8 @@ int kvm_arch_init_vcpu(CPUState *cs)
+     RISCVCPU *cpu = RISCV_CPU(cs);
+     __u64 id;
+ 
++    qemu_add_vm_change_state_handler(kvm_riscv_vm_state_change, cs);
++
+     id = kvm_riscv_reg_id(KVM_REG_RISCV_CONFIG, KVM_REG_RISCV_CONFIG_REG(isa));
+     ret = kvm_get_one_reg(cs, id, &isa);
+     if (ret) {
 -- 
 2.19.1
 
