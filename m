@@ -2,84 +2,92 @@ Return-Path: <SRS0=k4hX=CF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23812C433E3
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 17:03:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72F95C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 17:03:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F1B572087E
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 17:03:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1B572087E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 3FD362087E
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 17:03:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Lm4Vu/Fx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3FD362087E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45820 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47080 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBLJ4-0002YP-9k
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 13:03:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51228)
+	id 1kBLJG-00033Q-Dp
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 13:03:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50916)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kBLHG-0007az-F7
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 13:01:30 -0400
-Received: from indium.canonical.com ([91.189.90.7]:47690)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kBLHC-0005fx-KF
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 13:01:30 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kBLH7-0006zq-3g
- for <qemu-devel@nongnu.org>; Thu, 27 Aug 2020 17:01:21 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id A87ED2E80EF
- for <qemu-devel@nongnu.org>; Thu, 27 Aug 2020 17:01:20 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 27 Aug 2020 16:54:27 -0000
-From: Charlie Sharpsteen <1823790@bugs.launchpad.net>
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kBLGG-0006H1-JD
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 13:00:30 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:21131)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kBLGC-0005SV-Jp
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 13:00:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1598547623;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=KF9SiR0HyK9h6SoUntBhr4RRkjYw/qK9hQ054IRzsSs=;
+ b=Lm4Vu/FxUTf1ePSeABtginPKn0bOJ8AmrAAcjjSEBi8a0/tvNER80qt+L5/yNEU5BdFULc
+ GyotwDMBLAS7MFHAGkQQ5KS09kW4f6NUsI/NnCNJ3qiAL8wXDGT5E/wxjHR8eivXdy0hum
+ l2I3Q5fpAQUJJ0XsELs5R82nHABf5XE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-544-ZiiVvu8EOV-bRGREddRZZw-1; Thu, 27 Aug 2020 13:00:20 -0400
+X-MC-Unique: ZiiVvu8EOV-bRGREddRZZw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A9BAA100A63E
+ for <qemu-devel@nongnu.org>; Thu, 27 Aug 2020 17:00:18 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com
+ (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4536050B3F;
+ Thu, 27 Aug 2020 17:00:18 +0000 (UTC)
+From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
- assignee=Laurent@vivier.eu; 
-X-Launchpad-Bug-Tags: arm linux-user
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: anarchetic fritz-the-cat laurent-vivier m-luescher
- paelzer pmaydell sharpie tobijk zebul666
-X-Launchpad-Bug-Reporter: =?utf-8?q?Matthias_L=C3=BCscher_=28m-luescher=29?=
-X-Launchpad-Bug-Modifier: Charlie Sharpsteen (sharpie)
-References: <155475569461.20468.17957138207618410360.malonedeb@chaenomeles.canonical.com>
-Message-Id: <159854726739.15174.7359137326854846903.malone@soybean.canonical.com>
-Subject: [Bug 1823790] Re: QEMU mishandling of SO_PEERSEC forces systemd into
- tight loop
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="99c2d833c8d727fd05148486920aca032e908071"; Instance="production"
-X-Launchpad-Hash: 8dbe3ca72de4ffc3a7727b47de391e50a0ba86f4
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 13:01:22
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+Subject: [PULL 07/17] configure: default to PIE disabled on Windows platforms
+Date: Thu, 27 Aug 2020 12:59:46 -0400
+Message-Id: <20200827165956.12925-8-pbonzini@redhat.com>
+In-Reply-To: <20200827165956.12925-1-pbonzini@redhat.com>
+References: <20200827165956.12925-1-pbonzini@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 02:54:02
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.959,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -88,58 +96,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1823790 <1823790@bugs.launchpad.net>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ Thomas Huth <thuth@redhat.com>,
+ =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I can confirm that I see the same issue when trying to run Ubuntu 20.04
-aarch64 in a container, strace shows a tight loop on:
+From: Daniel P. Berrangé <berrange@redhat.com>
 
-getsockopt(31, SOL_SOCKET, SO_PEERGROUPS, 0x7ffdbd58941c, [4]) =3D -1
-ERANGE
+If Windows EXE files are built with -pie/-fpie they will fail to
+launch. Historically QEMU defaulted to disabling PIE for Windows,
+but this setting was accidentally lost when the configure summary
+text was removed in
 
-Re-building qemu-user-static with the patch has fixed Debian 10 armhf
-for me, but the same re-build does not seem to help with this Ubuntu
-issue.
+  commit f9332757898a764d85e19d339ec421236e885b68
+  Author: Paolo Bonzini <pbonzini@redhat.com>
+  Date:   Mon Feb 3 13:28:38 2020 +0100
 
--- =
+    meson: move summary to meson.build
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1823790
+    Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-Title:
-  QEMU mishandling of SO_PEERSEC forces systemd into tight loop
+Fixes: f9332757898a764d85e19d339ec421236e885b68
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ configure | 1 +
+ 1 file changed, 1 insertion(+)
 
-Status in QEMU:
-  Fix Released
+diff --git a/configure b/configure
+index a3f95f2b22..0b78577236 100755
+--- a/configure
++++ b/configure
+@@ -857,6 +857,7 @@ MINGW32*)
+     audio_drv_list=""
+   fi
+   supported_os="yes"
++  pie="no"
+ ;;
+ GNU/kFreeBSD)
+   bsd="yes"
+-- 
+2.26.2
 
-Bug description:
-  While building Debian images for embedded ARM target systems I
-  detected that QEMU seems to force newer systemd daemons into a tight
-  loop.
 
-  My setup is the following:
-
-  Host machine: Ubuntu 18.04, amd64
-  LXD container: Debian Buster, arm64, systemd 241
-  QEMU: qemu-aarch64-static, 4.0.0-rc2 (custom build) and 3.1.0 (Debian 1:3=
-.1+dfsg-7)
-
-  To easily reproduce the issue I have created the following repository:
-  https://github.com/lueschem/edi-qemu
-
-  The call where systemd gets looping is the following:
-  2837 getsockopt(3,1,31,274891889456,274887218756,274888927920) =3D -1 err=
-no=3D34 (Numerical result out of range)
-
-  Furthermore I also verified that the issue is not related to LXD.
-  The same behavior can be reproduced using systemd-nspawn.
-
-  This issue reported against systemd seems to be related:
-  https://github.com/systemd/systemd/issues/11557
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1823790/+subscriptions
 
