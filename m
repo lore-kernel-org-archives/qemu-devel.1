@@ -2,97 +2,90 @@ Return-Path: <SRS0=k4hX=CF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,UNPARSEABLE_RELAY autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AAC5BC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 07:29:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ADFABC433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 07:30:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 756ED22BEA
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 07:29:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 77638206EB
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 07:30:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=dme-org.20150623.gappssmtp.com header.i=@dme-org.20150623.gappssmtp.com header.b="irylW0Yb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 756ED22BEA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=dme.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f8l8UwsP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 77638206EB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37150 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39380 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBCM2-0004B6-PV
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 03:29:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56216)
+	id 1kBCN2-00059f-LB
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 03:30:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58182)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dme@dme.org>) id 1kBC4D-0005bU-VX
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 03:11:29 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:34219)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <dme@dme.org>) id 1kBC4B-0003oc-VK
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 03:11:25 -0400
-Received: by mail-wr1-x441.google.com with SMTP id f7so4291897wrw.1
- for <qemu-devel@nongnu.org>; Thu, 27 Aug 2020 00:11:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=dme-org.20150623.gappssmtp.com; s=20150623;
- h=to:cc:subject:in-reply-to:references:from:date:message-id
- :mime-version; bh=KlssIaCmydO2Kg8rJrK8/pP8mqF/5JVAB5ryn3q5dMk=;
- b=irylW0YbRomELYP21X8GHbUv3xesEY21JBvP63PXWMjiRVODCnFwQRr8DSPOv9ccwu
- yjkzqm+crClCTL7Vl9aNe9xHwoJkUrySG1Ezmv7Fsqo+Jiec5BI98kSRfx6//lS1Q71L
- hh7oVCX/PNYYr8o1x/YoUD16ee5OGSpykZFC2YNqOVmMi4xxvNPSp32BoGKn9NXpXUS9
- t/K9IVbizm7kfKmg4BW1O4zLWbubhO2ZeeLCvLtfRALThc7RQGYQ0x5D4gO8ufhQTif8
- x4LHD0Gp3KTz7EFsIoZ1hqWvEx95pBq3zJkApuyTO2IjrHDWfestRslWE81mIoSch9ly
- 8Avw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:to:cc:subject:in-reply-to:references:from:date
- :message-id:mime-version;
- bh=KlssIaCmydO2Kg8rJrK8/pP8mqF/5JVAB5ryn3q5dMk=;
- b=JbPkUS0oiFnAbBDLqWLyMlYfjGLrJ5k/yFPMpNWNfz7lYt3Q1lZ9wJbxpvCeE8hjHi
- 1/PscsymElA27LC0XsiJPsi3fGCtYFK3qqv6Y9HWIkzxfFEgULM5fAqLlyQP/DsIw6MW
- HmwjwxpzSXS3Jzul/5qUzAxl1Y9mEoH9Op7mmzUOHdcnnYNUhzpIV15OCVEldVUIWG3B
- ukdxKZulTjrSsVZD3dcjU0CQ1DXNHfKTEEcRklGiOn4BO21FCgAHP84zlRblm+XFnEXv
- 7GorAuH8q/myVmV+mD+wisWTZN8Pu0WmBAoLjKEJyu9kFbGUglmLFoGbFkMM05yvvvB1
- 3Gwg==
-X-Gm-Message-State: AOAM5312PaYj6wniG/DswlPYY3C0EhGkugeTg9qD34AowH/kPL1CX36C
- zB9pfFxT3UmyW60OwB3NqvQvOg==
-X-Google-Smtp-Source: ABdhPJxuNzYVppPii5zbjox8GL7w915z4HJPqq61w5SVV6sFKQc+R4O6Biju6AmN8xLrkwDfX/6c3Q==
-X-Received: by 2002:adf:8b12:: with SMTP id n18mr9075590wra.85.1598512281950; 
- Thu, 27 Aug 2020 00:11:21 -0700 (PDT)
-Received: from disaster-area.hh.sledj.net
- (8.a.e.d.0.0.0.0.0.0.0.0.4.6.0.0.0.4.1.7.1.7.b.b.0.b.8.0.1.0.0.2.ip6.arpa.
- [2001:8b0:bb71:7140:64::dea8])
- by smtp.gmail.com with ESMTPSA id m10sm3065761wmi.9.2020.08.27.00.11.20
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 27 Aug 2020 00:11:21 -0700 (PDT)
-Received: from localhost (disaster-area.hh.sledj.net [local])
- by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id 67f9e09b;
- Thu, 27 Aug 2020 07:11:20 +0000 (UTC)
-To: Zheng Chuan <zhengchuan@huawei.com>, "Dr. David Alan Gilbert"
- <dgilbert@redhat.com>
-Subject: Re: [PATCH v5 06/12] migration/dirtyrate: Record hash results for
- each sampled page
-In-Reply-To: <a86e273f-8bca-e789-d868-cb3832c162b4@huawei.com>
-References: <1598260480-64862-1-git-send-email-zhengchuan@huawei.com>
- <1598260480-64862-7-git-send-email-zhengchuan@huawei.com>
- <m2eentlogl.fsf@dme.org> <20200826123016.GA2727@work-vm>
- <a86e273f-8bca-e789-d868-cb3832c162b4@huawei.com>
-X-HGTTG: heart-of-gold
-From: David Edmondson <dme@dme.org>
-Date: Thu, 27 Aug 2020 08:11:20 +0100
-Message-ID: <m2lfi0k1gn.fsf@dme.org>
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kBCDR-0008U7-8Q
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 03:20:57 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:59755)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kBCDO-0004vg-NE
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 03:20:56 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1598512853;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=M/bf040rCDe7j7OEsP/dl7TxlH3lmLw+K/IXNq+U6mA=;
+ b=f8l8UwsP+c+CZDKfObQxDHjHEm3o6TjLvAxHydzqteSSpxFeIDukZAsdz4ndEek7Yqa2nh
+ hoE+n77Q6GddW5Cy259Rg7xPR3WcaUbIjXEv+TaR2kLE+SugqO/GyPR1Cv1o9Z2nv7IelW
+ 7OOaYUq+l6g1aDcBl45CG//mtzD56yk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-414-SkbRmXRIPSONQueWqSw7nw-1; Thu, 27 Aug 2020 03:20:51 -0400
+X-MC-Unique: SkbRmXRIPSONQueWqSw7nw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 51548185FD6A;
+ Thu, 27 Aug 2020 07:20:50 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-56.ams2.redhat.com [10.36.112.56])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id AAF4C1992F;
+ Thu, 27 Aug 2020 07:20:42 +0000 (UTC)
+Subject: Re: [PULL 0/3] Fixes 20200825 patches
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org,
+ Peter Maydell <peter.maydell@linaro.org>
+References: <20200825062008.6502-1-kraxel@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <128e42b3-3b0f-744b-91be-f4c52837c3a2@redhat.com>
+Date: Thu, 27 Aug 2020 09:20:42 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Type: text/plain
-Received-SPF: neutral client-ip=2a00:1450:4864:20::441;
- envelope-from=dme@dme.org; helo=mail-wr1-x441.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -10
-X-Spam_score: -1.1
-X-Spam_bar: -
-X-Spam_report: (-1.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_NEUTRAL=0.779, UNPARSEABLE_RELAY=0.001 autolearn=no autolearn_force=no
+In-Reply-To: <20200825062008.6502-1-kraxel@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
+X-Mimecast-Spam-Score: 0.003
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=thuth@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 02:54:02
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -52
+X-Spam_score: -5.3
+X-Spam_bar: -----
+X-Spam_report: (-5.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.959,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-2.239, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,40 +98,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: berrange@redhat.com, zhang.zhanghailiang@huawei.com, quintela@redhat.com,
- qemu-devel@nongnu.org, xiexiangyou@huawei.com, alex.chen@huawei.com,
- ann.zhuangyanying@huawei.com, fangying1@huawei.com
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, laurent@vivier.eu,
+ Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thursday, 2020-08-27 at 14:28:03 +08, Zheng Chuan wrote:
+On 25/08/2020 08.20, Gerd Hoffmann wrote:
+> The following changes since commit 30aa19446d82358a30eac3b556b4d6641e00b7c1:
+> 
+>   Merge remote-tracking branch 'remotes/cschoenebeck/tags/pull-9p-20200812' into staging (2020-08-24 16:39:53 +0100)
+> 
+> are available in the Git repository at:
+> 
+>   git://git.kraxel.org/qemu tags/fixes-20200825-pull-request
+> 
+> for you to fetch changes up to 9755c94a50c8b845ad133a6e660f55ca131b9c7a:
+> 
+>   meson: avoid compiling qemu-keymap by default (2020-08-25 08:12:19 +0200)
+> 
+> ----------------------------------------------------------------
+> meson: keymap fixes
+> 
+> ----------------------------------------------------------------
 
->>>> +static struct RamblockDirtyInfo *
->>>> +alloc_ramblock_dirty_info(int *block_index,
->>>> +                          struct RamblockDirtyInfo *block_dinfo)
->>>> +{
->>>> +    struct RamblockDirtyInfo *info = NULL;
->>>> +    int index = *block_index;
->>>> +
->>>> +    if (!block_dinfo) {
->>>> +        index = 0;
->>>> +        block_dinfo = g_try_new(struct RamblockDirtyInfo, 1);
->>>> +    } else {
->>>> +        index++;
->>>> +        block_dinfo = g_try_realloc(block_dinfo, (index + 1) *
->>>> +                                    sizeof(struct RamblockDirtyInfo));
->>>
->>> g_try_renew() instead of g_try_realloc()?
->>>
-> Hi,
-> I am not sure that because there only one place in qemu to use g_try_renew.
-> Could you tell me why, because i think g_try_realloc will also return NULL when error happen:)
+ Hi Gerd,
 
-Only suggested because it would make the two branches of the code more
-similar.
+if I've got that right, something in this pull request broke the gitlab
+CI, see:
 
-dme.
--- 
-And you can't hold me down, 'cause I belong to the hurricane.
+ https://gitlab.com/qemu-project/qemu/-/jobs/702680909
+
+216 (33/45)
+tests/acceptance/vnc.py:Vnc.test_change_password_requires_a_password:
+ERROR: Unexpected empty reply from server (0.08 s)
+217 (34/45) tests/acceptance/vnc.py:Vnc.test_change_password:  ERROR:
+Unexpected empty reply from server (0.06 s)
+
+Peter, what is still missing that you could use the gitlab CI as gating
+tests, too?
+
+ Thomas
+
 
