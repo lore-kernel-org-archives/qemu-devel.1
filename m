@@ -2,66 +2,68 @@ Return-Path: <SRS0=k4hX=CF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D19EC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 19:23:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB6E2C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 19:23:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E979F207CD
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 19:23:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E979F207CD
+	by mail.kernel.org (Postfix) with ESMTPS id 81362207CD
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 19:23:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 81362207CD
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39658 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39984 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBNUZ-0000Ox-4N
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 15:23:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33324)
+	id 1kBNUb-0000X7-LK
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 15:23:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33408)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kBNRs-0003kw-4y
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 15:20:36 -0400
-Received: from mout.kundenserver.de ([212.227.17.10]:45197)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kBNRv-0003qf-MR
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 15:20:39 -0400
+Received: from mout.kundenserver.de ([217.72.192.75]:56617)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kBNRq-00009L-6F
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 15:20:35 -0400
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kBNRt-0000A9-Q8
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 15:20:39 -0400
 Received: from localhost.localdomain ([82.252.135.186]) by
  mrelayeu.kundenserver.de (mreue109 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1MV6G0-1k4K8n3AM2-00S5h2; Thu, 27 Aug 2020 21:20:23 +0200
+ id 1MSbp1-1k0lN72dir-00SumF; Thu, 27 Aug 2020 21:20:28 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 00/18] Linux user for 5.2 patches
-Date: Thu, 27 Aug 2020 21:20:00 +0200
-Message-Id: <20200827192018.2442099-1-laurent@vivier.eu>
+Subject: [PULL 03/18] linux-user: syscall: ioctls: support
+ DRM_IOCTL_I915_GETPARAM
+Date: Thu, 27 Aug 2020 21:20:03 +0200
+Message-Id: <20200827192018.2442099-4-laurent@vivier.eu>
 X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200827192018.2442099-1-laurent@vivier.eu>
+References: <20200827192018.2442099-1-laurent@vivier.eu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:eF0OzeniPApHj7BXEfG1wWY10/FA5TDwVEaiYKH18qGxjIDhkaO
- SSymseN+Deyg/A20vFCn90nemxjhUM1XvrjMAD8wXQuU/nY8fxZkP34ps/u0ECSzge0Lz8d
- NGAK7uyma7Zg6W2yjijl7iffzDDp/wdatbh+ddwEfVvshlJ9yHBSgj1J+TXLRlEEjrd71Ic
- RtbM3oeMe5/R7ksOf31dw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:EtK/8wOqKH0=:LO/lLICnfnmYxySXyJlOTK
- onjQLL2Eq1OCOnQcSffDYRm4sTZDcGOx/hMYMKRUJvPnYyoQj1NzDLsDnzd159Dr9iQ3/adDH
- 5yuDMlRFQnqTwJ2B67nt3Tm7tIDTmc2fBa1nVAuLe2hH2uo+d8LQPPlcEnvrjWxoYdaSvEXAI
- OZyCH6+zSQs0R82b03/4hYm5cMAVp28GGc7Ik0WamqbvMnk02AxJRkaTTs4IeJ8x7+aQDQRW4
- kkCUjfduYysqf5H8U+dqVudm3Ts/mdGL0WqN/UU3+ezZovT8IXPbM/Sp7gVO3FkruAT7oEZ6d
- rcPj95ixdPggOuHjlxo/yEnLLrS/i2V739tncN/wIF1NI6JaVVMH2/oHsytR+rZfNfieZtsBi
- FSPyI+2U+G3aLpW3MAKTjEjwnwEDqwMjaEheYEiI3xrVghbbjS0idogfF6koc/DLpI2zkrM1Q
- FnTAP+vl4DCAmAh9r+r4GvTh/fS1FC658fjpBL6j1AKyee6KMrkUuoV+xClkhGcx1bqaILnOT
- IoIyIn4UjBHJ8Q9Yffthx/n05JQCxlReKL+SxiAuxH0WVAX06rpCNlWoqZv2mGuuCwnDYh5QL
- 8Rw8OgYficXCX9LbB+XUbIEsbgnQA3RZ1P5zMpKvaANnOeUTFpq3k4qnRfE5BJP4V0xonsDMV
- qeEhcMO0OeVi1pN2lQqoUC55l6pF4UwaFJS9LvBwNozeOH9ktkhXGEbIb3f/6WT0/zcOVFMqZ
- bFocgh0uGQzlhYtpb4fCORsYq3iKv5UqYaAvQlwUQGziHjZy9+AZv/T52D24o0UuWm/w/6i3f
- urzvWj709NPC5BHF5YQO3Vg8Q0iPZLwkqJLzJDq+vdUS13mCViiPLO0Z+83x7Ay4LqsPkvH
-Received-SPF: none client-ip=212.227.17.10; envelope-from=laurent@vivier.eu;
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:MXn0zVzwswKtcIarZsDaSOLtnC8aow9SWx4mBc5EyTfuO+ALaqa
+ 13cd+SlYJJemq1+Ea1H1feBZ17vwccj++5yIRuL7oyxNbMgCRnD2hLEu81nCnyh53gneCKN
+ dwlPU1fL9s+2BK9JaCbQ2W7vr+GD9touPtTp6nkT+pWtbhKVFgXOMQGUbdUuk5fWnLSR0g7
+ wk3enMTlTp7/8napEaL3w==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:ezbO9ETbV40=:wuJoyiAXLNRNU07JUOr12i
+ y4URvqmRtzytEShS58gUCQWrso5H4ebKNyQF5BnRMs+zewTCYujhiyJ6/kmVfsOxRsmJ6AySm
+ CEY2hVJFizczdhEnk4nDjoAmG7AY/peO5HCEEGXc1BTsT90ukBI/k0l6JzztMigVQJfOJhko8
+ CNib7qYA5UDZLF09TYnPwc1OEjTKKgjyN2JGi78icqT5RoyFxdeE9pe9pJNoWaQWxq3QkJ+Y9
+ w+lIRSK5RUMqV9eLMCf7LIb1L8HjLB2L9BnCOjedgfUbKouPCwYDmBOfleunexKF5sz02xOqB
+ 6Hc0nokKNkNso8Ya2e58s3gi1uDm+0dTffUPFHw4er74UJjnrEDRwWSIScdL6+OFIglCWfLUV
+ VgHQhC0izHRpWtvDOVKongmVk1XUED+F8GNKBQIdTYwCT4NuSXx8X+CNF4pGIjr6RdRFFBwcm
+ I60pzYm6vGsjPqDpllorYw5DOjBFAW4BDPMdp1cNPEBwNkmcfAEioj8qSkihzVM02vZgOTr9i
+ ZaQhZNlErC/1rSfSUGyACvu4yxjwiBsDY8nT7710XKmMgt5qR7B3yMYdl5ARAPeA0cYvq9roh
+ N8s5jEXC58W2jlR1JqWy46mhDIwmv89E5ucxb7/hZIC/ErOrh2AXKp89vIfxudyIGT2isF+tz
+ KYisXr9OqnuO0MwBAslZokugHsehpWojXowiWfluDX3QiIkQNZV8Exl29OEhhm3Pmf+pXcbLy
+ wJWBQuPYdfBGA3in7w1qUFQYB45SMmi9Z8QTNO4/Tbb2I9fvt2dEVYM8rC+E6rLIgwYLFmRGL
+ bk42opoDxjK8hKwj5A2G6DB/oShxk03qhm3f5ngR6gua7sWXbd3zZUDbtFPPmM1CcNZ1VOk
+Received-SPF: none client-ip=217.72.192.75; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 15:20:33
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 15:20:36
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
@@ -81,132 +83,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
+Cc: Chen Gang <chengang@emindsoft.com.cn>, Riku Voipio <riku.voipio@iki.fi>,
+ Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit 25f6dc28a3a8dd231c2c092a0e65bd796353c769=
-:=0D
-=0D
-  Merge remote-tracking branch 'remotes/maxreitz/tags/pull-block-2020-08-26=
-' =3D=0D
-into staging (2020-08-26 10:28:36 +0100)=0D
-=0D
-are available in the Git repository at:=0D
-=0D
-  git://github.com/vivier/qemu.git tags/linux-user-for-5.2-pull-request=0D
-=0D
-for you to fetch changes up to aa26eb42f5eaec54257aaceaeda50b9aa98756a5:=0D
-=0D
-  linux-user: Add support for utimensat_time64() and semtimedop_time64() (2=
-02=3D=0D
-0-08-27 12:29:51 +0200)=0D
-=0D
-----------------------------------------------------------------=0D
-add utimensat_time64, semtimedop_time64, rt_sigtimedwait_time64,=0D
-    sched_rr_get_interval_time64, clock_nanosleep_time64, clock_adjtime64,=
-=0D
-    mq_timedsend_time64, mq_timedreceive_time64=0D
-fix semop, semtimedop, clock_nanosleep, mq_timedsend, target_to_host_timesp=
-ec=3D=0D
-64=0D
-fix tembits.h=0D
-add more strace function=0D
-Add upport DRM_IOCTL_I915_GETPARAM=0D
-detect mismatched ELF ABI in qemu-mips[n32][el]=0D
-=0D
-----------------------------------------------------------------=0D
-=0D
-Carlo Marcelo Arenas Bel=3DC3=3DB3n (1):=0D
-  linux-user: detect mismatched ELF ABI in qemu-mips[n32][el]=0D
-=0D
-Chen Gang (1):=0D
-  linux-user: syscall: ioctls: support DRM_IOCTL_I915_GETPARAM=0D
-=0D
-Filip Bozuta (15):=0D
-  linux-user: Fix 'semop()' and 'semtimedop()' implementation=0D
-  linux-user: Fix 'clock_nanosleep()' implementation=0D
-  linux-user: Make cpu_env accessible in strace.c=0D
-  linux-user: Add strace support for printing arguments of=0D
-    truncate()/ftruncate() and getsid()=0D
-  linux-user: Add strace support for printing arguments of syscalls used=0D
-    to lock and unlock memory=0D
-  linux-user: Add an api to print enumareted argument values with strace=0D
-  linux-user: Add strace support for printing arguments of some clock=0D
-    and time functions=0D
-  linux-user: Add generic 'termbits.h' for some archs=0D
-  linux-user: Add missing termbits types and values definitions=0D
-  linux-user: Add strace support for printing arguments for ioctls used=0D
-    for terminals and serial lines=0D
-  linux-user: Fix 'mq_timedsend()' and 'mq_timedreceive()'=0D
-  linux-user: Add support for 'mq_timedsend_time64()' and=0D
-    'mq_timedreceive_time64()'=0D
-  linux-user: Add support for 'clock_nanosleep_time64()' and=0D
-    'clock_adjtime64()'=0D
-  linux-user: Add support for 'rt_sigtimedwait_time64()' and=0D
-    'sched_rr_get_interval_time64()'=0D
-  linux-user: Add support for utimensat_time64() and semtimedop_time64()=0D
-=0D
-Laurent Vivier (1):=0D
-  linux-user: fix target_to_host_timespec64()=0D
-=0D
- include/exec/user/thunk.h              |    1 +=0D
- linux-user/aarch64/target_syscall.h    |    5 +-=0D
- linux-user/aarch64/termbits.h          |  228 +----=0D
- linux-user/alpha/target_syscall.h      |    5 +-=0D
- linux-user/alpha/termbits.h            |    1 +=0D
- linux-user/arm/target_syscall.h        |    6 +-=0D
- linux-user/arm/termbits.h              |  223 +----=0D
- linux-user/cris/target_syscall.h       |    5 +-=0D
- linux-user/cris/termbits.h             |   18 +-=0D
- linux-user/elfload.c                   |   11 +=0D
- linux-user/generic/termbits.h          |  318 +++++++=0D
- linux-user/hppa/target_syscall.h       |    5 +-=0D
- linux-user/hppa/termbits.h             |   17 +-=0D
- linux-user/i386/target_syscall.h       |    5 +-=0D
- linux-user/i386/termbits.h             |  233 +-----=0D
- linux-user/ioctls.h                    |    3 +=0D
- linux-user/m68k/target_syscall.h       |    6 +-=0D
- linux-user/m68k/termbits.h             |  234 +-----=0D
- linux-user/microblaze/target_syscall.h |    5 +-=0D
- linux-user/microblaze/termbits.h       |  220 +----=0D
- linux-user/mips/target_syscall.h       |    5 +-=0D
- linux-user/mips/termbits.h             |   17 +-=0D
- linux-user/mips64/target_syscall.h     |    5 +-=0D
- linux-user/nios2/target_syscall.h      |    5 +-=0D
- linux-user/nios2/termbits.h            |  228 +----=0D
- linux-user/openrisc/target_syscall.h   |    5 +-=0D
- linux-user/openrisc/termbits.h         |  302 +------=0D
- linux-user/ppc/target_syscall.h        |    5 +-=0D
- linux-user/ppc/termbits.h              |   21 +-=0D
- linux-user/qemu.h                      |   40 +-=0D
- linux-user/riscv/target_syscall.h      |    5 +-=0D
- linux-user/riscv/termbits.h            |  228 +----=0D
- linux-user/s390x/target_syscall.h      |    5 +-=0D
- linux-user/s390x/termbits.h            |  289 +------=0D
- linux-user/sh4/target_syscall.h        |    5 +-=0D
- linux-user/sh4/termbits.h              |   19 +-=0D
- linux-user/sparc/target_syscall.h      |    5 +-=0D
- linux-user/sparc/termbits.h            |   18 +-=0D
- linux-user/sparc64/target_syscall.h    |    5 +-=0D
- linux-user/sparc64/termbits.h          |   18 +-=0D
- linux-user/strace.c                    | 1060 +++++++++++++++++-------=0D
- linux-user/strace.list                 |   35 +-=0D
- linux-user/syscall.c                   |  471 +++++++++--=0D
- linux-user/syscall_defs.h              |   41 +=0D
- linux-user/syscall_types.h             |    4 +=0D
- linux-user/tilegx/target_syscall.h     |    5 +-=0D
- linux-user/tilegx/termbits.h           |  276 +-----=0D
- linux-user/x86_64/target_syscall.h     |    5 +-=0D
- linux-user/x86_64/termbits.h           |  254 +-----=0D
- linux-user/xtensa/target_syscall.h     |    5 +-=0D
- linux-user/xtensa/termbits.h           |   55 +-=0D
- thunk.c                                |   23 +-=0D
- 52 files changed, 1790 insertions(+), 3223 deletions(-)=0D
- create mode 100644 linux-user/generic/termbits.h=0D
-=0D
---=3D20=0D
-2.26.2=0D
-=0D
+From: Chen Gang <chengang@emindsoft.com.cn>
+
+Another DRM_IOCTL_I915 patches will be sent next.
+
+Signed-off-by: Chen Gang <chengang@emindsoft.com.cn>
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Message-Id: <20200802133938.12055-1-chengang@emindsoft.com.cn>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
+ linux-user/ioctls.h        |  3 +++
+ linux-user/syscall.c       | 35 +++++++++++++++++++++++++++++++++++
+ linux-user/syscall_defs.h  |  8 ++++++++
+ linux-user/syscall_types.h |  4 ++++
+ 4 files changed, 50 insertions(+)
+
+diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
+index 0713ae131162..e2fc09b5a5ee 100644
+--- a/linux-user/ioctls.h
++++ b/linux-user/ioctls.h
+@@ -581,6 +581,9 @@
+ #ifdef HAVE_DRM_H
+   IOCTL_SPECIAL(DRM_IOCTL_VERSION, IOC_RW, do_ioctl_drm,
+                 MK_PTR(MK_STRUCT(STRUCT_drm_version)))
++
++  IOCTL_SPECIAL(DRM_IOCTL_I915_GETPARAM, IOC_RW, do_ioctl_drm_i915,
++                MK_PTR(MK_STRUCT(STRUCT_drm_i915_getparam)))
+ #endif
+ 
+ #ifdef TARGET_TIOCSTART
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index e387246d7196..efaa0a7b8365 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -114,6 +114,7 @@
+ #include <sound/asound.h>
+ #ifdef HAVE_DRM_H
+ #include <libdrm/drm.h>
++#include <libdrm/i915_drm.h>
+ #endif
+ #include "linux_loop.h"
+ #include "uname.h"
+@@ -5426,6 +5427,40 @@ static abi_long do_ioctl_drm(const IOCTLEntry *ie, uint8_t *buf_temp,
+     return -TARGET_ENOSYS;
+ }
+ 
++static abi_long do_ioctl_drm_i915_getparam(const IOCTLEntry *ie,
++                                           struct drm_i915_getparam *gparam,
++                                           int fd, abi_long arg)
++{
++    abi_long ret;
++    int value;
++    struct target_drm_i915_getparam *target_gparam;
++
++    if (!lock_user_struct(VERIFY_READ, target_gparam, arg, 0)) {
++        return -TARGET_EFAULT;
++    }
++
++    __get_user(gparam->param, &target_gparam->param);
++    gparam->value = &value;
++    ret = get_errno(safe_ioctl(fd, ie->host_cmd, gparam));
++    put_user_s32(value, target_gparam->value);
++
++    unlock_user_struct(target_gparam, arg, 0);
++    return ret;
++}
++
++static abi_long do_ioctl_drm_i915(const IOCTLEntry *ie, uint8_t *buf_temp,
++                                  int fd, int cmd, abi_long arg)
++{
++    switch (ie->host_cmd) {
++    case DRM_IOCTL_I915_GETPARAM:
++        return do_ioctl_drm_i915_getparam(ie,
++                                          (struct drm_i915_getparam *)buf_temp,
++                                          fd, arg);
++    default:
++        return -TARGET_ENOSYS;
++    }
++}
++
+ #endif
+ 
+ IOCTLEntry ioctl_entries[] = {
+diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
+index 9aa3bd724f0c..a6abc7e70be8 100644
+--- a/linux-user/syscall_defs.h
++++ b/linux-user/syscall_defs.h
+@@ -1177,6 +1177,9 @@ struct target_rtc_pll_info {
+ /* drm ioctls */
+ #define TARGET_DRM_IOCTL_VERSION      TARGET_IOWRU('d', 0x00)
+ 
++/* drm i915 ioctls */
++#define TARGET_DRM_IOCTL_I915_GETPARAM              TARGET_IOWRU('d', 0x46)
++
+ /* from asm/termbits.h */
+ 
+ #define TARGET_NCC 8
+@@ -2620,6 +2623,11 @@ struct target_drm_version {
+     abi_ulong desc;
+ };
+ 
++struct target_drm_i915_getparam {
++    int param;
++    abi_ulong value;
++};
++
+ #include "socket.h"
+ 
+ #include "errno_defs.h"
+diff --git a/linux-user/syscall_types.h b/linux-user/syscall_types.h
+index 3f1f0334649b..12bf3484e2bd 100644
+--- a/linux-user/syscall_types.h
++++ b/linux-user/syscall_types.h
+@@ -325,6 +325,10 @@ STRUCT(drm_version,
+        TYPE_ULONG, /* desc_len */
+        TYPE_PTRVOID) /* desc */
+ 
++STRUCT(drm_i915_getparam,
++       TYPE_INT, /* param */
++       TYPE_PTRVOID) /* value */
++
+ STRUCT(file_clone_range,
+        TYPE_LONGLONG, /* src_fd */
+        TYPE_ULONGLONG, /* src_offset */
+-- 
+2.26.2
+
 
