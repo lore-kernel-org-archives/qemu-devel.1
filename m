@@ -2,93 +2,94 @@ Return-Path: <SRS0=k4hX=CF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3195C433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 15:56:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BDA7C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 15:58:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BDDA52087D
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 15:56:16 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RUkt22ZL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDDA52087D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6202922B40
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 15:58:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6202922B40
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44194 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46346 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBKG8-0003jy-2a
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 11:56:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32934)
+	id 1kBKI7-0004uw-Ll
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 11:58:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33386)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1kBKFK-000383-1L
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 11:55:26 -0400
-Received: from mail-io1-xd31.google.com ([2607:f8b0:4864:20::d31]:34469)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1kBKFI-0002iS-Dx
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 11:55:25 -0400
-Received: by mail-io1-xd31.google.com with SMTP id w20so6368881iom.1
- for <qemu-devel@nongnu.org>; Thu, 27 Aug 2020 08:55:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=q1B9kk+5MosqY7eiNhAa3L1BMIITtrbcQ+a4wQ1HsV0=;
- b=RUkt22ZLtMd7MVEJbFmVWUBxutUc0gV2gVyZfH46+QILQY1k7liGEWj0vOdeQ2nAAh
- aLYBcPiBORuIU/o5JPegMwUcCMLRnGCBvHVReu2aKizKW3aatFaz8r7/4DK5TFwx3kfN
- rtQTHfqw5WwT+S7xFh+6c9Ev+HYeXjzRQYAJ+JR73x7rGDT0wleYfIOoqcuQtOATWuHy
- 50PvusqM7ZlIHVYaUW5Zav7xMETQy242PNBawcuYax2wQnV4QaY+NoST2DPnO2DM5Xa4
- mhMxqbmvsk6sFsdkGOFDqLb0aW/1cjxSa/dtGfqVyZg1J6vSwID9AH04hUP5QCbgMDzu
- JJSw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=q1B9kk+5MosqY7eiNhAa3L1BMIITtrbcQ+a4wQ1HsV0=;
- b=hFArDQ5yUAaQO7L+gC8cvc4WNS6daBpZTvsbXD9w66VX1dwy8/lY3qv3XZWKfnX0JQ
- HPtN9aCOt7tXMzvMv9tyzFXuy6/hZH4eLyvgsmIqEX6BCFID2zvhf7le9Hp1lzkaL8+a
- SsamMzMO8L3Xe2xHkzCC7WCW1mRBrQroFBOZhBJSyVtNqFT6PeQyZNUlsNiNnueSsi4h
- siJYuiWuOvacoCinHSZm+TwtRSuvursMzSQHzyNuX1/xOtOUYwAhDCkxmqo8Qy2IOwz4
- K0TQByfGLVFrDnG7L/AsEE/m1crYzywl/g8hTKMguqST5DRuf6CzpjKPRAtxzZxNHd4j
- Y9dQ==
-X-Gm-Message-State: AOAM533jnwx1sx6fIXz9byPVwR7fCBSbtdPwoNjs/VoYkFymwhek8gMS
- jGLleo4ZAPwiY15+46UwaE9cDosrKgH0PkV0vwk=
-X-Google-Smtp-Source: ABdhPJw12OUnZP1HBKc9wZwYojuIrXxSd6h6ciXdyu6r0A/T3InUKZPh6UIv2RcKyaeHLMKX5QytPP5dyKAaVeC40jM=
-X-Received: by 2002:a6b:400e:: with SMTP id k14mr17221463ioa.175.1598543722703; 
- Thu, 27 Aug 2020 08:55:22 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1kBKHP-0004QK-Gf
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 11:57:35 -0400
+Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:39398
+ helo=mail.default.ilande.uk0.bigv.io)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1kBKHN-0003DD-2V
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 11:57:35 -0400
+Received: from host217-42-19-185.range217-42.btcentralplus.com
+ ([217.42.19.185] helo=[192.168.1.65])
+ by mail.default.ilande.uk0.bigv.io with esmtpsa
+ (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
+ (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1kBKHi-0000iU-Nk; Thu, 27 Aug 2020 16:57:59 +0100
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+References: <20200826190245.22810-1-pbonzini@redhat.com>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
+ mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
+ 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
+ E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
+ PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
+ PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
+ AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
+ OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
+ NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
+ mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
+ z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
+ T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
+ DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
+ y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
+ 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
+ 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
+ YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
+ Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
+ BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
+ opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
+ NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
+ Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
+ KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
+ imgcU9TTGC5qd9g=
+Message-ID: <f04c27c7-84b1-c43c-6919-53fffcd5c360@ilande.co.uk>
+Date: Thu, 27 Aug 2020 16:57:16 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-References: <20200825184836.1282371-1-alistair.francis@wdc.com>
- <CAFEAcA8=Mf=EPh__tNhJyGv8+ouD-HH+MuMb+HhtTFes+XqUSQ@mail.gmail.com>
- <CAKmqyKNxURXyNSEePPU1jY7FzcZjRThr2qAvwR393+nqUXBxJQ@mail.gmail.com>
- <CAFEAcA8x=ck1mmJ8Y8o-0NQXWhRgOg5Gp7GvHNkNnLb6rDxygg@mail.gmail.com>
- <CAKmqyKP6OUoaR6iZ6SD6qZPvYF0bKqpB_rRNeQOteg8BtcqKeQ@mail.gmail.com>
- <CAEUhbmWN93n1JoGszsW6WrkGbdFD6VsGyi7Ji6bS6wF+DbMOBw@mail.gmail.com>
- <CAFEAcA9026WV-t5Q9EbV-nZi+6GZ3WoKCx2tA9QeAXu5iD5ryg@mail.gmail.com>
- <CAEUhbmWv52oeQb6z3JTpa16utD2NmB1sKZ-sT7uD1R8_3KwNMw@mail.gmail.com>
-In-Reply-To: <CAEUhbmWv52oeQb6z3JTpa16utD2NmB1sKZ-sT7uD1R8_3KwNMw@mail.gmail.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Thu, 27 Aug 2020 08:44:37 -0700
-Message-ID: <CAKmqyKPtrKfcdmEt6NSLa4ZqmjqVUHL_DHzLLZPUoB-xDek6Pw@mail.gmail.com>
-Subject: Re: [PULL 00/18] riscv-to-apply queue
-To: Bin Meng <bmeng.cn@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::d31;
- envelope-from=alistair23@gmail.com; helo=mail-io1-xd31.google.com
+In-Reply-To: <20200826190245.22810-1-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 217.42.19.185
+X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
+Subject: Re: [PATCH v2] configure: add --ninja option
+X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
+X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
+Received-SPF: pass client-ip=2001:41c9:1:41f::167;
+ envelope-from=mark.cave-ayland@ilande.co.uk;
+ helo=mail.default.ilande.uk0.bigv.io
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: -36
+X-Spam_score: -3.7
+X-Spam_bar: ---
+X-Spam_report: (-3.7 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-1.782,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,62 +102,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Alistair Francis <alistair.francis@wdc.com>,
- QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Aug 26, 2020 at 3:06 AM Bin Meng <bmeng.cn@gmail.com> wrote:
->
-> Hi Peter,
->
-> On Wed, Aug 26, 2020 at 5:25 PM Peter Maydell <peter.maydell@linaro.org> wrote:
-> >
-> > On Wed, 26 Aug 2020 at 04:21, Bin Meng <bmeng.cn@gmail.com> wrote:
-> > > On Wed, Aug 26, 2020 at 6:41 AM Alistair Francis <alistair23@gmail.com> wrote:
-> > > > Richard and Philippe review patches and some of the RISC-V patches get
-> > > > reviewed by the RISC-V community. The main problem (which is a common
-> > > > problem in open source) is that large technical patch series just get
-> > > > ignored.
-> > >
-> > > Yep, I am only comfortable reviewing patches which I have confidence
-> > > in. Right now I am not working on any H- or V - extension for RISC-V
-> > > so I cannot contribute to any review of these large numbers of H- or
-> > > V- extension related patches. Sorry!
-> >
-> > So, everybody has a ton of work they need to do and only a limited
-> > amount of time they might have for code review, so it's important to
-> > prioritise. But I would encourage you, and other people contributing
-> > to RISC-V parts of QEMU, to at least sometimes review changes that are
-> > a little bit out of your "comfort zone" if nobody else seems to be
-> > doing so. Review can find bugs, areas that are confusing or need
-> > comments, etc, even without a thorough knowledge of the relevant spec.
-> > (In fact, not knowing the spec can help in identifying where
-> > explanatory comments can help the reader!) And for the project it means
-> > we have more people who at least have some idea of what that bit of code
-> > is doing. Review that is limited to "this code seems to make sense but
-> > I haven't checked it against the spec" is better than patches getting
-> > no review at all, I think. And it's a good way to build your knowledge
-> > of the codebase and the architecture over time.
->
-> Agree. I really wanted to spend more time on this project but like you
-> said it's priorities.
->
-> One thing I do not understand is that according to MAINTAINTERS there
-> are 4 custodians for the RISC-V maintenance work but it looks to me so
-> far only Alistair is actively reviewing patches. I know Palmer used to
-> review patches but if it's only one person that might be some issues.
-> At least MAINTAINTERS can cross-review, and we have 4 there.
+On 26/08/2020 20:02, Paolo Bonzini wrote:
 
-Yeah, most of the people in the RISC-V MAINTAINERS file are inactive.
-Besides Palmer and myself I haven't seen an email from anyone.
+> On Windows it is not possible to invoke a Python script as $NINJA.
+> If ninja is present use it directly, while if it is not we can
+> keep using ninjatool.
+> 
+> Reported-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  configure | 16 +++++++++++++++-
+>  1 file changed, 15 insertions(+), 1 deletion(-)
+> 
+> diff --git a/configure b/configure
+> index 9db9bb89b9..6ecaff429b 100755
+> --- a/configure
+> +++ b/configure
+> @@ -568,6 +568,7 @@ rng_none="no"
+>  secret_keyring=""
+>  libdaxctl=""
+>  meson=""
+> +ninja=""
+>  skip_meson=no
+>  gettext=""
+>  
+> @@ -1052,6 +1053,8 @@ for opt do
+>    ;;
+>    --meson=*) meson="$optarg"
+>    ;;
+> +  --ninja=*) ninja="$optarg"
+> +  ;;
+>    --smbd=*) smbd="$optarg"
+>    ;;
+>    --extra-cflags=*)
+> @@ -1820,6 +1823,7 @@ Advanced options (experts only):
+>    --python=PYTHON          use specified python [$python]
+>    --sphinx-build=SPHINX    use specified sphinx-build [$sphinx_build]
+>    --meson=MESON            use specified meson [$meson]
+> +  --ninja=NINJA            use specified ninja [$ninja]
+>    --smbd=SMBD              use specified smbd [$smbd]
+>    --with-git=GIT           use specified git [$git]
+>    --static                 enable static build [$static]
+> @@ -2058,6 +2062,16 @@ case "$meson" in
+>      *) meson=$(command -v meson) ;;
+>  esac
+>  
+> +# Probe for ninja (used for compdb)
+> +
+> +if test -z "$ninja"; then
+> +    for c in ninja ninja-build samu; do
+> +        if has $c; then
+> +            ninja=$(command -v "$c")
+> +            break
+> +        fi
+> +    done
+> +fi
+>  
+>  # Check that the C compiler works. Doing this here before testing
+>  # the host CPU ensures that we had a valid CC to autodetect the
+> @@ -8197,7 +8211,7 @@ fi
+>  mv $cross config-meson.cross
+>  
+>  rm -rf meson-private meson-info meson-logs
+> -NINJA=$PWD/ninjatool $meson setup \
+> +NINJA=${ninja:-$PWD/ninjatool} $meson setup \
+>          --prefix "${pre_prefix}$prefix" \
+>          --libdir "${pre_prefix}$libdir" \
+>          --libexecdir "${pre_prefix}$libexecdir" \
 
-Alistair
+I've just tested this, but it gives me a python stacktrace if I run it without
+passing a --ninja argument to configure. With a bit of extra debugging added to see
+what is being generated:
+
+###XXX ['C:/msys64/mingw64/bin/ninja', '--version']
+Traceback (most recent call last):
+  File "C:/msys64/home/Mark/qemu/meson/mesonbuild/mesonmain.py", line 131, in run
+    return options.run_func(options)
+  File "C:/msys64/home/Mark/qemu/meson/mesonbuild/msetup.py", line 245, in run
+    app.generate()
+  File "C:/msys64/home/Mark/qemu/meson/mesonbuild/msetup.py", line 159, in generate
+    self._generate(env)
+  File "C:/msys64/home/Mark/qemu/meson/mesonbuild/msetup.py", line 215, in _generate
+    intr.backend.generate()
+  File "C:/msys64/home/Mark/qemu/meson/mesonbuild/backend/ninjabackend.py", line 483,
+in generate
+    ninja = environment.detect_ninja_command_and_version(log=True)
+  File "C:/msys64/home/Mark/qemu/meson/mesonbuild/environment.py", line 177, in
+detect_ninja_command_and_version
+    name = os.path.basename(n)
+  File "C:/msys64/mingw64/lib/python3.8/ntpath.py", line 231, in basename
+    return split(p)[1]
+  File "C:/msys64/mingw64/lib/python3.8/ntpath.py", line 200, in split
+    p = os.fspath(p)
+TypeError: expected str, bytes or os.PathLike object, not NoneType
+
+ERROR: meson setup failed
+
+It seems that it doesn't like parsing the discovered ninja path. I can make configure
+work by passing --ninja=ninja to configure which falls back to PATH and appears to do
+the right thing:
+
+###XXX ['ninja', '--version']
+Found ninja.EXE-1.10.1 at C:\msys64\mingw64\bin/ninja.EXE
+
+I tried a few other things too:
+
+ --ninja=C:/msys64/mingw64/bin/ninja - fails
+ --ninja=C:/msys64/mingw64/bin/ninja.exe - works
+ --ninja=ninja.exe - works
+ --ninja=/c/msys64/mingw64/bin/ninja - fails similar as above
+ --ninja=/c/msys64/mingw64/bin/ninja.exe - works
+ --ninja=C:\\msys64\\mingw64\\bin\\ninja - fails similar as above
+ --ninja=C:\\msys64\\mingw64\\bin\\ninja.exe - works
+
+From these tests it looks as if the .exe prefix is required when using a full path to
+the ninja executable.
 
 
->
-> Regards,
-> Bin
+ATB,
+
+Mark.
 
