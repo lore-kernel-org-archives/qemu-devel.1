@@ -2,74 +2,100 @@ Return-Path: <SRS0=k4hX=CF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 555E8C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 12:06:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AC46C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 12:08:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1452422B40
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 12:06:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3BB5922B40
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 12:08:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=walle.cc header.i=@walle.cc header.b="WhGjmAyU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1452422B40
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=walle.cc
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SbskRA/E"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3BB5922B40
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47256 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49348 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBGfv-0005Le-65
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 08:06:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49378)
+	id 1kBGhV-0006LV-Gp
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 08:08:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50690)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <michael@walle.cc>) id 1kBGbx-0002Jv-3l
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 08:02:33 -0400
-Received: from ssl.serverraum.org ([176.9.125.105]:57833)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <michael@walle.cc>) id 1kBGbp-00012E-TI
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 08:02:31 -0400
-Received: from [192.168.180.155] (p50998fbe.dip0.t-ipconnect.de
- [80.153.143.190])
- (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
- key-exchange ECDHE (P-384) server-signature RSA-PSS (2048 bits) server-digest
- SHA256) (No client certificate requested)
- by ssl.serverraum.org (Postfix) with ESMTPSA id 29E7B22F53;
- Thu, 27 Aug 2020 14:02:17 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=walle.cc;
- s=mail2016061301; t=1598529738;
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kBGgl-0005on-6q
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 08:07:31 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:40757
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kBGgj-0001gi-0T
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 08:07:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1598530047;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=UE8WhxeuQL2BJBpDscg3qP5GoRovosWz3UqAS9nwlnY=;
- b=WhGjmAyUAlX1ULz2zGMmY4NJhw15b+qUeohetKfCuwIoet5p+XiOF8UhBuM8i9M9Bw00Hh
- /hqtNz3nlZ/6bvSZIIaUHTaZ6nEqvC/h9qrND49p8Be7+w656aMqPnlBk1k0ZQ7NvqYXR4
- zWLbPJAEV8bbOP6HzGZ85F3Z4jsISMo=
-Date: Thu, 27 Aug 2020 14:02:14 +0200
-User-Agent: K-9 Mail for Android
-In-Reply-To: <20200827113259.25064-1-peter.maydell@linaro.org>
-References: <20200827113259.25064-1-peter.maydell@linaro.org>
+ bh=E0lrKIRwpk3fspP40Kgkcgsrt3UnRS77wqaXy4RP/9A=;
+ b=SbskRA/EFEJsdMWI4PYR0byALBN9PRy00j/47VO0EtEL4+JLB2+uCa++kWz+JBzuTu88Ld
+ jnVRNyViWgzdTJewFK4OtffdivX5Kp01vZ3jfd2KaVUuh7yHzRj1vX58BqBgFG+rYYWmer
+ mL9QBVc/MO4DwRLg7MVN/V1JE8fIrgM=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-530-vg0pVzrIMZGK38IGa7MUOg-1; Thu, 27 Aug 2020 08:07:25 -0400
+X-MC-Unique: vg0pVzrIMZGK38IGa7MUOg-1
+Received: by mail-wr1-f70.google.com with SMTP id i6so1456908wru.23
+ for <qemu-devel@nongnu.org>; Thu, 27 Aug 2020 05:07:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=E0lrKIRwpk3fspP40Kgkcgsrt3UnRS77wqaXy4RP/9A=;
+ b=FbrFcwpp4v24UTD0C0cY48tJYPmM3IcEvBbIZhyzRTs/mi7AWElIdeyeX/DIYzq8Wy
+ tCCfVEQJM4TNXdPrs+6ipWUr4xw1mWs4trcAwR3IUvyhpi/z28+/DHxx7yAVUKSD1Lo9
+ UhEkhw/gLi0jHZaBfsTUcCc4MdkILWvr7N2OMtzlN8/zdiHcCF5QbD/ruKMZcxKZi6va
+ 0xziavOSemf6CDLKaRlpM273/eyLwDh9t8qfqr6ORvcBetmVnIvQdcjW5b+EUo5E5bs6
+ 0Xk7+xIl7TMMj7XTmr9C1tsBJZ08D9gTavHpuCX3HhslS+tScmJ9BuAXF7azrhtODrUj
+ pjrg==
+X-Gm-Message-State: AOAM530g2l1miyw6hWUgW1AiXRaP4s0IJAuUpye01c9n1aA28b/pZSXj
+ eNjhTCobAOnx+DLuiplPhe4/ZkFZfx1KqoZ+jGa0IM/SNA5N9Yoz1iVYcB9eZ6Lq0ULE2mjoRa0
+ bW8FwBKFIWEcIlYU=
+X-Received: by 2002:a5d:60c5:: with SMTP id x5mr20486712wrt.67.1598530044133; 
+ Thu, 27 Aug 2020 05:07:24 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwguSvprA0Yx/RiuO+41QL/KmE5DXl08XKmj7YWP+gR/4VqFuGUhTVaT+hSap7enzTdL6bm8Q==
+X-Received: by 2002:a5d:60c5:: with SMTP id x5mr20486696wrt.67.1598530043944; 
+ Thu, 27 Aug 2020 05:07:23 -0700 (PDT)
+Received: from redhat.com (bzq-109-67-46-169.red.bezeqint.net. [109.67.46.169])
+ by smtp.gmail.com with ESMTPSA id m1sm4174221wmc.28.2020.08.27.05.07.15
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 27 Aug 2020 05:07:22 -0700 (PDT)
+Date: Thu, 27 Aug 2020 08:07:08 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Subject: Re: [PATCH 3/8] amd_iommu: Use TYPE_AMD_IOMMU_PCI constant
+Message-ID: <20200827080657-mutt-send-email-mst@kernel.org>
+References: <20200826184334.4120620-1-ehabkost@redhat.com>
+ <20200826184334.4120620-4-ehabkost@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH] Deprecate lm32 port
-To: Peter Maydell <peter.maydell@linaro.org>,qemu-devel@nongnu.org
-From: Michael Walle <michael@walle.cc>
-Message-ID: <AC5F071F-2965-4401-858C-2E4373C052E4@walle.cc>
-Received-SPF: pass client-ip=176.9.125.105; envelope-from=michael@walle.cc;
- helo=ssl.serverraum.org
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 08:02:21
+In-Reply-To: <20200826184334.4120620-4-ehabkost@redhat.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=mst@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 00:13:19
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -43
-X-Spam_score: -4.4
-X-Spam_bar: ----
-X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_NONE=0.001,
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.959,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -83,33 +109,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>,
- =?ISO-8859-1?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 27=2E August 2020 13:32:59 MESZ schrieb Peter Maydell <peter=2Emaydell@l=
-inaro=2Eorg>:
->Deprecate our lm32 target support=2E Michael Walle (former lm32
->maintainer)
->suggested that we do this in 2019:
-> https://www=2Email-archive=2Ecom/qemu-devel@nongnu=2Eorg/msg605024=2Ehtm=
-l
->because the only public user of the architecture is the many-years-dead
->milkymist project=2E (The Linux port to lm32 was never merged upstream=2E=
-)
->
->In commit 4b4d96c776f552e (March 2020) we marked it as 'orphan' in
->the MAINTAINERS file, but didn't officially deprecate it=2E Mark it
->deprecated now, with the intention of removing it from QEMU in
->mid-2021 before the 6=2E1 release=2E
->
->Signed-off-by: Peter Maydell <peter=2Emaydell@linaro=2Eorg>
+On Wed, Aug 26, 2020 at 02:43:29PM -0400, Eduardo Habkost wrote:
+> This will make future conversion to use OBJECT_DECLARE* easier.
+> 
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> ---
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Richard Henderson <rth@twiddle.net>
+> Cc: Eduardo Habkost <ehabkost@redhat.com>
+> Cc: qemu-devel@nongnu.org
 
-Acked-by: Michael Walle <michael@walle=2Ecc>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 
-Thanks,=20
--michael=20
+feel free to merge with the rest of the patch.
+
+> ---
+>  hw/i386/amd_iommu.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/hw/i386/amd_iommu.c b/hw/i386/amd_iommu.c
+> index 087f601666..18411f1dec 100644
+> --- a/hw/i386/amd_iommu.c
+> +++ b/hw/i386/amd_iommu.c
+> @@ -1622,7 +1622,7 @@ static const TypeInfo amdvi = {
+>  };
+>  
+>  static const TypeInfo amdviPCI = {
+> -    .name = "AMDVI-PCI",
+> +    .name = TYPE_AMD_IOMMU_PCI,
+>      .parent = TYPE_PCI_DEVICE,
+>      .instance_size = sizeof(AMDVIPCIState),
+>      .interfaces = (InterfaceInfo[]) {
+> -- 
+> 2.26.2
 
 
