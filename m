@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35CA8C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 19:23:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB36EC433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 19:23:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0C282207CD
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 19:23:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C282207CD
+	by mail.kernel.org (Postfix) with ESMTPS id 93110207CD
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 19:23:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93110207CD
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40114 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41536 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBNUh-0000aV-4D
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 15:23:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33438)
+	id 1kBNUv-0001CF-Ro
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 15:23:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33514)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kBNRy-0003zX-ME
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 15:20:42 -0400
-Received: from mout.kundenserver.de ([212.227.17.24]:55707)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kBNS5-0004FS-Au
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 15:20:49 -0400
+Received: from mout.kundenserver.de ([217.72.192.74]:53383)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kBNRw-0000Cj-9W
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 15:20:42 -0400
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kBNS2-0000HF-S2
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 15:20:49 -0400
 Received: from localhost.localdomain ([82.252.135.186]) by
  mrelayeu.kundenserver.de (mreue109 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1M1pk6-1k9BaR0PZg-002H6c; Thu, 27 Aug 2020 21:20:31 +0200
+ id 1Mzz6m-1kZF6511mw-00x0am; Thu, 27 Aug 2020 21:20:43 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 05/18] linux-user: Add strace support for printing arguments of
- truncate()/ftruncate() and getsid()
-Date: Thu, 27 Aug 2020 21:20:05 +0200
-Message-Id: <20200827192018.2442099-6-laurent@vivier.eu>
+Subject: [PULL 16/18] linux-user: Add support for 'clock_nanosleep_time64()'
+ and 'clock_adjtime64()'
+Date: Thu, 27 Aug 2020 21:20:16 +0200
+Message-Id: <20200827192018.2442099-17-laurent@vivier.eu>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200827192018.2442099-1-laurent@vivier.eu>
 References: <20200827192018.2442099-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:AC9QzEiU3l5K7Y84OMrSLLlg1eupkhANdkWxJkdNf3NHRtFln7M
- DuQym0UzeBlKpjTAxACsoXYIxEeNGNVEeg3PdEmNEKtyZcStYOnoeAp53VZhP8EkKq+zOMs
- 4XiFysvuo3UWETSFfyzRITibSnojD66CM3Lhxl8CUXshC3aUgUDTdXt8xzDku0+aLJUiGks
- q37/Ts3Cni9+GYpSmntwQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:WFEFUMwL2Yc=:Y2sBk66PPQVyFSqgHnAinX
- RKbM5O3Ub8M0pCGKAixI5NWa8mL2DaJuKemljx2b2q/MrMYSLqHybCgi4/9iNEDwlJhhaloLu
- XLRW1V6jQAAyTIl61mKEiV5PdvcpsXTS9Tr38w7AILDs9VCYylqtEwUZanml5HYYbOwYIfvbh
- K+8znLHonKzRnP/SWYy2XIcKF696YWVSHeJX/fI3RcLh3n8/0zEMI3pCKATXLcPcO7N+0m9RG
- e6xIaWWr8U44zNA2xtYJXUZ1movPraZbTetE6/6CxMQnrp9cob4bJZDUnUM6VxqjjJ3fMRiNM
- 4JDFFMoRrqtYWVoyuVhYpoaWwInLbYejZnO7rCBawjUa8U9zFG+GhDAlpNZgV0yqTZLSyspjh
- RqxZZwtF8xFndAJBiY+ozpoOSqBJOT8q1l70dGkSG5VswnNJbkwpKoFl1HWZj7/FdC4HIkQCz
- +4IgA8GUhWbIM8MHu27zaC027ZgZAwhdSQuqjRWP0WueSP3icMbzwQNUhNbP0PIlxjWt40lbi
- hkl9tFy8HlEyY8ISG/u2LUG49hr4F0Vq7xaQkw0nByuJ94JnasUirUh27vdpQgFSaL0uKEtPj
- HC5sDDgStUQgybYn4Gdi2XObeRhBTcpn72SESX4aT/AeW+kqfZbN9txfRPtLSHRH4hiEXyEeV
- sAbGjqksO8XXuYRt73ojlsoJz0EALdKJ4lz1U1uxMpk6KtGOvXxqg+VeHWAESbuPMvG00aUKC
- XvDr7u8MYt6n2nEMqjz07g4UYobnnHAvt76W9oiqdVnnR26nMNF+WPC4u2uwasqfL0XU2gMop
- spIk4r362GcSVg9hJbFUhzgHxAvXlRO4ljZ+KU/Jpv3oZEpj7gdwgS2XTvR34kxc7WnQbK4
-Received-SPF: none client-ip=212.227.17.24; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:FQdlanOCI9F6Hn+RFCg6gj3aQHq3mfBetIA49srNDIReYWrNSLN
+ pf3vC6cgnb5nkGZoXarfT20p7olWNmXf42rzYfkHdkuBy35v/lrp1n6Yu8bQeLC8/lQHPFY
+ IVTlRPQsCmCqYWjDBLXzWeGJjPkyqOYiV95UVaPrZF4jvVFzmVi0AcIq8A28CNc7X8Osr+5
+ +UxG7kCnr7W6gZLtXB0DQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:FjjA67XCBs8=:q7uzGAreb52A3Q/uJ/gwg5
+ RSw6JCLG6rSVUYNd57l2I6dgVNpJltM9+OfOW+mUni25fgbSOridSmjwDekDr+A8zfYXXO8Th
+ 5T665L8CnUeUm7KhA6FRpwSS+Elv8iMAKqdXgpAIpXHf2Xd8laDq97b8YbB8IfPcA+pS5PL1+
+ BYmikJcHl0v2JBD1TqPNUahnvG2vBil3qqTFB+dG3Vx+vTj3u5qv51fvGKDKJ1BpwdL6bVDqb
+ ovXYDj80nFF2KuBDeOuPW3oo6MZaVMv8TWfiLsDj1HHkFgPVS54TVwlbtern/ucSgbknzD9nE
+ NAvpIFBbJbfeIuK50aevDSak+AChcFN6A2agQA4IS97/L85ehrtGuYHVLAJL3BoAY6lqf+4bu
+ hwecMKiRED4/AiJ2KHrfZkl0fS5ncS0pMZjOwpXhdWiQSvZ4Xcf2DQ3TlVvrebdKa3ADYkS4S
+ OE1RMI3iw/ZcMp7HDXRwUu+E40eUqiPQ6A5gyCgTqOxbDKptHHaQnQkBLrSClwjYZcP3+rX17
+ 7J1Ay1pe+PnOn9M34AdBy5wX4Ff/wyqId/+htt2Jspebqkozy0ug8B4T/eq/OLZdE86rgMLHK
+ GGCCH491alUZK8Hy5LdxdhOevBlRDMSd8yOWlrz6nDrBRF2Whvb9UkN0B+5jQ6qVOnHvbm5EG
+ XNATzeue+N3u051wlPcE5eJlMbadGynKX+AEtett47aluP1agNZzyuVUOuTmdRxs4ETlhQt/n
+ MsISBIjxU2tlGaQdkSFiK5f3FBJqkBnhJwearBFdLQbcp/Q0KRjlBmV0OoGaqZQoXH3FLCOWu
+ F6B3SATQYrDR+PjbVbGwJAnewJutjjZjXoLfgbDlfAPJ75XubwxPkQiESFMpUJuzmQEORHl
+Received-SPF: none client-ip=217.72.192.74; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 15:20:34
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 15:20:33
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
@@ -91,231 +91,280 @@ Sender: "Qemu-devel"
 
 From: Filip Bozuta <Filip.Bozuta@syrmia.com>
 
-This patch implements strace argument printing functionality for following syscalls:
+This patch implements functionality for following time64 syscall:
 
-    * truncate, ftruncate - truncate a file to a specified length
+*clock_nanosleep_time64()
 
-        int truncate/truncate64(const char *path, off_t length)
-        int ftruncate/ftruncate64(int fd, off_t length)
-        man page: https://man7.org/linux/man-pages/man2/truncate.2.html
+    This is a year 2038 safe vairant of syscall:
+    int clock_nanosleep(clockid_t clockid, int flags,
+                        const struct timespec *request,
+                        struct timespec *remain)
+    --high-resolution sleep with specifiable clock--
+    man page: https://man7.org/linux/man-pages/man2/clock_nanosleep.2.html
 
-    * getsid - get session ID
+*clock_adjtime64()
 
-        pid_t getsid(pid_t pid)
-        man page: https://man7.org/linux/man-pages/man2/getsid.2.html
+    This is a year 2038 safe variant of syscall:
+    int clock_adjtime(clockid_t clk_id, struct timex *buf)
+    --tune kernel clock--
+    man page: https://man7.org/linux/man-pages/man2/clock_adjtime.2.html
 
 Implementation notes:
 
-    Syscalls truncate/truncate64 take string argument types and thus a
-    separate print function "print_truncate/print_truncate64" is stated in
-    file "strace.list". This function is defined and implemented in "strace.c"
-    by using an existing function used to print string arguments: "print_string()".
-    For syscall ftruncate64, a separate printing function was also stated in
-    "strace.c" as it requires a special kind of handling.
-    The other syscalls have only primitive argument types, so the rest of the
-    implementation was handled by stating an appropriate printing format in file
-    "strace.list".
-    Function "regpairs_aligned()" was cut & pasted from "syscall.c" to "qemu.h"
-    as it is used by functions "print_truncate64()" and "print_ftruncate64()"
-    to print the offset arguments of "truncate64()" and "ftruncate64()".
+    Syscall 'clock_nanosleep_time64()' was implemented similarly
+    to syscall 'clock_nanosleep()' except that 'host_to_target_timespec64()'
+    and 'target_to_host_timespec64()' were used instead of the regular
+    'host_to_target_timespec()' and 'target_to_host_timespec()'.
+
+    For 'clock_adjtime64()' a 64-bit target kernel version of 'struct timex'
+    was defined in 'syscall_defs.h': 'struct target__kernel_timex'.
+    This type was used to convert the values of 64-bit timex type between
+    host and target. For this purpose a 64-bit timex converting functions
+    'target_to_host_timex64()' and 'host_to_target_timex64()'. An existing
+    function 'copy_to_user_timeval64()' was used to convert the field
+    'time' which if of type 'struct timeval' from host to target.
+    Function 'copy_from_user_timveal64()' was added in this patch and
+    used to convert the 'time' field from target to host.
 
 Signed-off-by: Filip Bozuta <Filip.Bozuta@syrmia.com>
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <20200811164553.27713-3-Filip.Bozuta@syrmia.com>
+Message-Id: <20200824192116.65562-2-Filip.Bozuta@syrmia.com>
+[lv: add missing defined(TARGET_NR_clock_nanosleep_time64)]
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- linux-user/qemu.h      | 35 +++++++++++++++++++++++++++++++
- linux-user/strace.c    | 47 ++++++++++++++++++++++++++++++++++++++++++
- linux-user/strace.list | 10 ++++-----
- linux-user/syscall.c   | 32 ----------------------------
- 4 files changed, 87 insertions(+), 37 deletions(-)
+ linux-user/syscall.c      | 140 +++++++++++++++++++++++++++++++++++++-
+ linux-user/syscall_defs.h |  31 +++++++++
+ 2 files changed, 168 insertions(+), 3 deletions(-)
 
-diff --git a/linux-user/qemu.h b/linux-user/qemu.h
-index 63ddfe86fd8b..f431805e573f 100644
---- a/linux-user/qemu.h
-+++ b/linux-user/qemu.h
-@@ -706,6 +706,41 @@ static inline uint64_t target_offset64(uint64_t word0, uint64_t word1)
- }
- #endif /* TARGET_ABI_BITS != 32 */
- 
-+
-+/* ARM EABI and MIPS expect 64bit types aligned even on pairs or registers */
-+#ifdef TARGET_ARM
-+static inline int regpairs_aligned(void *cpu_env, int num)
-+{
-+    return ((((CPUARMState *)cpu_env)->eabi) == 1) ;
-+}
-+#elif defined(TARGET_MIPS) && (TARGET_ABI_BITS == 32)
-+static inline int regpairs_aligned(void *cpu_env, int num) { return 1; }
-+#elif defined(TARGET_PPC) && !defined(TARGET_PPC64)
-+/*
-+ * SysV AVI for PPC32 expects 64bit parameters to be passed on odd/even pairs
-+ * of registers which translates to the same as ARM/MIPS, because we start with
-+ * r3 as arg1
-+ */
-+static inline int regpairs_aligned(void *cpu_env, int num) { return 1; }
-+#elif defined(TARGET_SH4)
-+/* SH4 doesn't align register pairs, except for p{read,write}64 */
-+static inline int regpairs_aligned(void *cpu_env, int num)
-+{
-+    switch (num) {
-+    case TARGET_NR_pread64:
-+    case TARGET_NR_pwrite64:
-+        return 1;
-+
-+    default:
-+        return 0;
-+    }
-+}
-+#elif defined(TARGET_XTENSA)
-+static inline int regpairs_aligned(void *cpu_env, int num) { return 1; }
-+#else
-+static inline int regpairs_aligned(void *cpu_env, int num) { return 0; }
-+#endif
-+
- /**
-  * preexit_cleanup: housekeeping before the guest exits
-  *
-diff --git a/linux-user/strace.c b/linux-user/strace.c
-index 2dcc15496a6a..31c7be24ebfd 100644
---- a/linux-user/strace.c
-+++ b/linux-user/strace.c
-@@ -1962,6 +1962,53 @@ print_lseek(void *cpu_env, const struct syscallname *name,
- }
- #endif
- 
-+#ifdef TARGET_NR_truncate
-+static void
-+print_truncate(void *cpu_env, const struct syscallname *name,
-+               abi_long arg0, abi_long arg1, abi_long arg2,
-+               abi_long arg3, abi_long arg4, abi_long arg5)
-+{
-+    print_syscall_prologue(name);
-+    print_string(arg0, 0);
-+    print_raw_param(TARGET_ABI_FMT_ld, arg1, 1);
-+    print_syscall_epilogue(name);
-+}
-+#endif
-+
-+#ifdef TARGET_NR_truncate64
-+static void
-+print_truncate64(void *cpu_env, const struct syscallname *name,
-+                 abi_long arg0, abi_long arg1, abi_long arg2,
-+                 abi_long arg3, abi_long arg4, abi_long arg5)
-+{
-+    print_syscall_prologue(name);
-+    print_string(arg0, 0);
-+    if (regpairs_aligned(cpu_env, TARGET_NR_truncate64)) {
-+        arg1 = arg2;
-+        arg2 = arg3;
-+    }
-+    print_raw_param("%" PRIu64, target_offset64(arg1, arg2), 1);
-+    print_syscall_epilogue(name);
-+}
-+#endif
-+
-+#ifdef TARGET_NR_ftruncate64
-+static void
-+print_ftruncate64(void *cpu_env, const struct syscallname *name,
-+                  abi_long arg0, abi_long arg1, abi_long arg2,
-+                  abi_long arg3, abi_long arg4, abi_long arg5)
-+{
-+    print_syscall_prologue(name);
-+    print_raw_param("%d", arg0, 0);
-+    if (regpairs_aligned(cpu_env, TARGET_NR_ftruncate64)) {
-+        arg1 = arg2;
-+        arg2 = arg3;
-+    }
-+    print_raw_param("%" PRIu64, target_offset64(arg1, arg2), 1);
-+    print_syscall_epilogue(name);
-+}
-+#endif
-+
- #if defined(TARGET_NR_socket)
- static void
- print_socket(void *cpu_env, const struct syscallname *name,
-diff --git a/linux-user/strace.list b/linux-user/strace.list
-index a04706a524ae..8e5303d03500 100644
---- a/linux-user/strace.list
-+++ b/linux-user/strace.list
-@@ -258,10 +258,10 @@
- { TARGET_NR_ftime, "ftime" , NULL, NULL, NULL },
- #endif
- #ifdef TARGET_NR_ftruncate
--{ TARGET_NR_ftruncate, "ftruncate" , NULL, NULL, NULL },
-+{ TARGET_NR_ftruncate, "ftruncate" , "%s(%d," TARGET_ABI_FMT_ld ")", NULL, NULL },
- #endif
- #ifdef TARGET_NR_ftruncate64
--{ TARGET_NR_ftruncate64, "ftruncate64" , NULL, NULL, NULL },
-+{ TARGET_NR_ftruncate64, "ftruncate64" , NULL, print_ftruncate64, NULL },
- #endif
- #ifdef TARGET_NR_futex
- { TARGET_NR_futex, "futex" , NULL, print_futex, NULL },
-@@ -372,7 +372,7 @@
- { TARGET_NR_getrusage, "getrusage" , NULL, NULL, NULL },
- #endif
- #ifdef TARGET_NR_getsid
--{ TARGET_NR_getsid, "getsid" , NULL, NULL, NULL },
-+{ TARGET_NR_getsid, "getsid" , "%s(%d)", NULL, NULL },
- #endif
- #ifdef TARGET_NR_getsockname
- { TARGET_NR_getsockname, "getsockname" , NULL, NULL, NULL },
-@@ -1535,10 +1535,10 @@
- { TARGET_NR_tkill, "tkill" , NULL, print_tkill, NULL },
- #endif
- #ifdef TARGET_NR_truncate
--{ TARGET_NR_truncate, "truncate" , NULL, NULL, NULL },
-+{ TARGET_NR_truncate, "truncate" , NULL, print_truncate, NULL },
- #endif
- #ifdef TARGET_NR_truncate64
--{ TARGET_NR_truncate64, "truncate64" , NULL, NULL, NULL },
-+{ TARGET_NR_truncate64, "truncate64" , NULL, print_truncate64, NULL },
- #endif
- #ifdef TARGET_NR_tuxcall
- { TARGET_NR_tuxcall, "tuxcall" , NULL, NULL, NULL },
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 42107f37e397..ec7192112e9d 100644
+index b28c8edb421e..82414c08d655 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -495,38 +495,6 @@ static inline int next_free_host_timer(void)
+@@ -774,7 +774,8 @@ safe_syscall4(int, accept4, int, fd, struct sockaddr *, addr, socklen_t *, len,
+ safe_syscall2(int, nanosleep, const struct timespec *, req,
+               struct timespec *, rem)
+ #endif
+-#ifdef TARGET_NR_clock_nanosleep
++#if defined(TARGET_NR_clock_nanosleep) || \
++    defined(TARGET_NR_clock_nanosleep_time64)
+ safe_syscall4(int, clock_nanosleep, const clockid_t, clock, int, flags,
+               const struct timespec *, req, struct timespec *, rem)
+ #endif
+@@ -1177,8 +1178,25 @@ static inline abi_long copy_to_user_timeval(abi_ulong target_tv_addr,
+     return 0;
+ }
+ 
++static inline abi_long copy_from_user_timeval64(struct timeval *tv,
++                                                abi_ulong target_tv_addr)
++{
++    struct target__kernel_sock_timeval *target_tv;
++
++    if (!lock_user_struct(VERIFY_READ, target_tv, target_tv_addr, 1)) {
++        return -TARGET_EFAULT;
++    }
++
++    __get_user(tv->tv_sec, &target_tv->tv_sec);
++    __get_user(tv->tv_usec, &target_tv->tv_usec);
++
++    unlock_user_struct(target_tv, target_tv_addr, 0);
++
++    return 0;
++}
++
+ static inline abi_long copy_to_user_timeval64(abi_ulong target_tv_addr,
+-                                             const struct timeval *tv)
++                                              const struct timeval *tv)
+ {
+     struct target__kernel_sock_timeval *target_tv;
+ 
+@@ -1222,7 +1240,8 @@ static inline abi_long target_to_host_timespec(struct timespec *host_ts,
+     defined(TARGET_NR_timer_settime64) || \
+     defined(TARGET_NR_mq_timedsend_time64) || \
+     defined(TARGET_NR_mq_timedreceive_time64) || \
+-    (defined(TARGET_NR_timerfd_settime64) && defined(CONFIG_TIMERFD))
++    (defined(TARGET_NR_timerfd_settime64) && defined(CONFIG_TIMERFD)) || \
++    defined(TARGET_NR_clock_nanosleep_time64)
+ static inline abi_long target_to_host_timespec64(struct timespec *host_ts,
+                                                  abi_ulong target_addr)
+ {
+@@ -6953,6 +6972,87 @@ static inline abi_long host_to_target_timex(abi_long target_addr,
  }
  #endif
  
--/* ARM EABI and MIPS expect 64bit types aligned even on pairs or registers */
--#ifdef TARGET_ARM
--static inline int regpairs_aligned(void *cpu_env, int num)
--{
--    return ((((CPUARMState *)cpu_env)->eabi) == 1) ;
--}
--#elif defined(TARGET_MIPS) && (TARGET_ABI_BITS == 32)
--static inline int regpairs_aligned(void *cpu_env, int num) { return 1; }
--#elif defined(TARGET_PPC) && !defined(TARGET_PPC64)
--/* SysV AVI for PPC32 expects 64bit parameters to be passed on odd/even pairs
-- * of registers which translates to the same as ARM/MIPS, because we start with
-- * r3 as arg1 */
--static inline int regpairs_aligned(void *cpu_env, int num) { return 1; }
--#elif defined(TARGET_SH4)
--/* SH4 doesn't align register pairs, except for p{read,write}64 */
--static inline int regpairs_aligned(void *cpu_env, int num)
--{
--    switch (num) {
--    case TARGET_NR_pread64:
--    case TARGET_NR_pwrite64:
--        return 1;
--
--    default:
--        return 0;
--    }
--}
--#elif defined(TARGET_XTENSA)
--static inline int regpairs_aligned(void *cpu_env, int num) { return 1; }
--#else
--static inline int regpairs_aligned(void *cpu_env, int num) { return 0; }
--#endif
--
- #define ERRNO_TABLE_SIZE 1200
++
++#if defined(TARGET_NR_clock_adjtime64) && defined(CONFIG_CLOCK_ADJTIME)
++static inline abi_long target_to_host_timex64(struct timex *host_tx,
++                                              abi_long target_addr)
++{
++    struct target__kernel_timex *target_tx;
++
++    if (copy_from_user_timeval64(&host_tx->time, target_addr +
++                                 offsetof(struct target__kernel_timex,
++                                          time))) {
++        return -TARGET_EFAULT;
++    }
++
++    if (!lock_user_struct(VERIFY_READ, target_tx, target_addr, 1)) {
++        return -TARGET_EFAULT;
++    }
++
++    __get_user(host_tx->modes, &target_tx->modes);
++    __get_user(host_tx->offset, &target_tx->offset);
++    __get_user(host_tx->freq, &target_tx->freq);
++    __get_user(host_tx->maxerror, &target_tx->maxerror);
++    __get_user(host_tx->esterror, &target_tx->esterror);
++    __get_user(host_tx->status, &target_tx->status);
++    __get_user(host_tx->constant, &target_tx->constant);
++    __get_user(host_tx->precision, &target_tx->precision);
++    __get_user(host_tx->tolerance, &target_tx->tolerance);
++    __get_user(host_tx->tick, &target_tx->tick);
++    __get_user(host_tx->ppsfreq, &target_tx->ppsfreq);
++    __get_user(host_tx->jitter, &target_tx->jitter);
++    __get_user(host_tx->shift, &target_tx->shift);
++    __get_user(host_tx->stabil, &target_tx->stabil);
++    __get_user(host_tx->jitcnt, &target_tx->jitcnt);
++    __get_user(host_tx->calcnt, &target_tx->calcnt);
++    __get_user(host_tx->errcnt, &target_tx->errcnt);
++    __get_user(host_tx->stbcnt, &target_tx->stbcnt);
++    __get_user(host_tx->tai, &target_tx->tai);
++
++    unlock_user_struct(target_tx, target_addr, 0);
++    return 0;
++}
++
++static inline abi_long host_to_target_timex64(abi_long target_addr,
++                                              struct timex *host_tx)
++{
++    struct target__kernel_timex *target_tx;
++
++   if (copy_to_user_timeval64(target_addr +
++                              offsetof(struct target__kernel_timex, time),
++                              &host_tx->time)) {
++        return -TARGET_EFAULT;
++    }
++
++    if (!lock_user_struct(VERIFY_WRITE, target_tx, target_addr, 0)) {
++        return -TARGET_EFAULT;
++    }
++
++    __put_user(host_tx->modes, &target_tx->modes);
++    __put_user(host_tx->offset, &target_tx->offset);
++    __put_user(host_tx->freq, &target_tx->freq);
++    __put_user(host_tx->maxerror, &target_tx->maxerror);
++    __put_user(host_tx->esterror, &target_tx->esterror);
++    __put_user(host_tx->status, &target_tx->status);
++    __put_user(host_tx->constant, &target_tx->constant);
++    __put_user(host_tx->precision, &target_tx->precision);
++    __put_user(host_tx->tolerance, &target_tx->tolerance);
++    __put_user(host_tx->tick, &target_tx->tick);
++    __put_user(host_tx->ppsfreq, &target_tx->ppsfreq);
++    __put_user(host_tx->jitter, &target_tx->jitter);
++    __put_user(host_tx->shift, &target_tx->shift);
++    __put_user(host_tx->stabil, &target_tx->stabil);
++    __put_user(host_tx->jitcnt, &target_tx->jitcnt);
++    __put_user(host_tx->calcnt, &target_tx->calcnt);
++    __put_user(host_tx->errcnt, &target_tx->errcnt);
++    __put_user(host_tx->stbcnt, &target_tx->stbcnt);
++    __put_user(host_tx->tai, &target_tx->tai);
++
++    unlock_user_struct(target_tx, target_addr, 1);
++    return 0;
++}
++#endif
++
+ static inline abi_long target_to_host_sigevent(struct sigevent *host_sevp,
+                                                abi_ulong target_addr)
+ {
+@@ -9940,6 +10040,21 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+             }
+         }
+         return ret;
++#endif
++#if defined(TARGET_NR_clock_adjtime64) && defined(CONFIG_CLOCK_ADJTIME)
++    case TARGET_NR_clock_adjtime64:
++        {
++            struct timex htx;
++
++            if (target_to_host_timex64(&htx, arg2) != 0) {
++                return -TARGET_EFAULT;
++            }
++            ret = get_errno(clock_adjtime(arg1, &htx));
++            if (!is_error(ret) && host_to_target_timex64(arg2, &htx)) {
++                    return -TARGET_EFAULT;
++            }
++        }
++        return ret;
+ #endif
+     case TARGET_NR_getpgid:
+         return get_errno(getpgid(arg1));
+@@ -11911,6 +12026,25 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+         return ret;
+     }
+ #endif
++#ifdef TARGET_NR_clock_nanosleep_time64
++    case TARGET_NR_clock_nanosleep_time64:
++    {
++        struct timespec ts;
++
++        if (target_to_host_timespec64(&ts, arg3)) {
++            return -TARGET_EFAULT;
++        }
++
++        ret = get_errno(safe_clock_nanosleep(arg1, arg2,
++                                             &ts, arg4 ? &ts : NULL));
++
++        if (ret == -TARGET_EINTR && arg4 && arg2 != TIMER_ABSTIME &&
++            host_to_target_timespec64(arg4, &ts)) {
++            return -TARGET_EFAULT;
++        }
++        return ret;
++    }
++#endif
  
- /* target_to_host_errno_table[] is initialized from
+ #if defined(TARGET_NR_set_tid_address) && defined(__NR_set_tid_address)
+     case TARGET_NR_set_tid_address:
+diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
+index a6abc7e70be8..9d07991176b8 100644
+--- a/linux-user/syscall_defs.h
++++ b/linux-user/syscall_defs.h
+@@ -294,6 +294,37 @@ struct target_timex {
+     abi_int:32; abi_int:32; abi_int:32;
+ };
+ 
++struct target__kernel_timex {
++    abi_uint modes;               /* Mode selector */
++    abi_int: 32;                  /* pad */
++    abi_llong offset;             /* Time offset */
++    abi_llong freq;               /* Frequency offset */
++    abi_llong maxerror;           /* Maximum error (microseconds) */
++    abi_llong esterror;           /* Estimated error (microseconds) */
++    abi_int status;               /* Clock command/status */
++    abi_int: 32;                  /* pad */
++    abi_llong constant;           /* PLL (phase-locked loop) time constant */
++    abi_llong precision;          /* Clock precision (microseconds, ro) */
++    abi_llong tolerance;          /* Clock freq. tolerance (ppm, ro) */
++    struct target__kernel_sock_timeval time;  /* Current time */
++    abi_llong tick;               /* Microseconds between clock ticks */
++    abi_llong ppsfreq;            /* PPS (pulse per second) frequency */
++    abi_llong jitter;             /* PPS jitter (ro); nanoseconds */
++    abi_int shift;                /* PPS interval duration (seconds) */
++    abi_int: 32;                  /* pad */
++    abi_llong stabil;             /* PPS stability */
++    abi_llong jitcnt;             /* PPS jitter limit exceeded (ro) */
++    abi_llong calcnt;             /* PPS calibration intervals */
++    abi_llong errcnt;             /* PPS calibration errors */
++    abi_llong stbcnt;             /* PPS stability limit exceeded */
++    abi_int tai;                  /* TAI offset */
++
++    /* Further padding bytes to allow for future expansion */
++    abi_int:32; abi_int:32; abi_int:32; abi_int:32;
++    abi_int:32; abi_int:32; abi_int:32; abi_int:32;
++    abi_int:32; abi_int:32; abi_int:32;
++};
++
+ typedef abi_long target_clock_t;
+ 
+ #define TARGET_HZ 100
 -- 
 2.26.2
 
