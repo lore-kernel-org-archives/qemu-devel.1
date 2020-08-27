@@ -2,121 +2,90 @@ Return-Path: <SRS0=k4hX=CF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6D81C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 12:50:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A218C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 12:52:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7091B2073A
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 12:50:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 242442177B
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 12:52:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=openvz.org header.i=@openvz.org header.b="EW62omft"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7091B2073A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=openvz.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c72IvhiL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 242442177B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55124 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59858 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBHMW-0002XH-Os
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 08:50:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59598)
+	id 1kBHNy-0004UM-Ea
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 08:52:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60212)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <den@virtuozzo.com>)
- id 1kBHDb-0005LB-99; Thu, 27 Aug 2020 08:41:27 -0400
-Received: from mail-am6eur05on2109.outbound.protection.outlook.com
- ([40.107.22.109]:35407 helo=EUR05-AM6-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <den@virtuozzo.com>)
- id 1kBHDX-0006cM-IR; Thu, 27 Aug 2020 08:41:25 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=iH27l64eYahu9w/i7W/JCK815VUQ5VZ3pi6QIbYIAuFVB/zwJa0vc9RA65uQbIjVsUwmqk7x4DOh75Wdian0K3BwRposGBP6OOECADz0NF627Ys2oWFjsNzWdfgts9v6RKh6UEAJ7/GR8XXq0CubgPG2PwVmeuEKdySyw9/+SaQgWuaHWvcQwdDaoM7tQKyRDW/7qdCXzADN56ynnFXiod685VZSlJFErzrAS4miLV180SkmPQG44+uWHUCYuO7d6LusOowvjr/OKzfsnaG0iNPqOwOdz5FmlYWn74yqhTqZc6Hxk59R2tSL8ouZ4qbuKr06nB7d+VI0jAyPKS2JeQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=lHBKPtJch9EQNivoXVz5eP7WagRpBKNKmWMsiRIkkRU=;
- b=hwSAORezQiAONH7fKInSOIGKmYAFg49cxSlL0poIjou+D0CVAx+CwfV6HZVYav99TR8f3l1d6GtXgruKM19HYeNCU4dGDKI/38Pj3JMSDb56RMP6RfwaccDNKgvK2X8+3QAC75tGtvmIlyQmB4uuhHtiTkNWkWi4HVh9OkbcmalNK4lQDRwn0P3k+moKb99a8ESgRLOVNTIpD4m8BOpFvaSaRrgfwtGi1zImHSBapHCXLIEPXlLDjdiCsYHE+A1lK4QRMWULFmJ9MaSmtMq0p8odJ9G7r/KLGTZ6/rMcQn0W+mrzKXCLLkWRq9pFdUQh1KOny1RfUg01nngo8x4GuA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none header.from=openvz.org;
- dkim=pass header.d=openvz.org; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=openvz.org;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=lHBKPtJch9EQNivoXVz5eP7WagRpBKNKmWMsiRIkkRU=;
- b=EW62omftzUgbItbQiqDXUizb3ZtKCTEF4cNDSZLQrku71dnH9ZhEljoUaAg2FdgSIy1x8uHS5LAnji+L5eAXKts9CdKjiOs5jibSfxQUh5ZKX/rzyb5VT5W6BxvC49HSEEFXySoqf1IhA16q6f0H6ZJ6o+8Y5lABZs/24EIxBM8=
-Authentication-Results: virtuozzo.com; dkim=none (message not signed)
- header.d=none;virtuozzo.com; dmarc=none action=none header.from=openvz.org;
-Received: from AM6PR08MB4214.eurprd08.prod.outlook.com (2603:10a6:20b:8d::30)
- by AM6PR08MB5207.eurprd08.prod.outlook.com (2603:10a6:20b:ea::13)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3305.26; Thu, 27 Aug
- 2020 12:41:14 +0000
-Received: from AM6PR08MB4214.eurprd08.prod.outlook.com
- ([fe80::751c:fc78:625c:ea34]) by AM6PR08MB4214.eurprd08.prod.outlook.com
- ([fe80::751c:fc78:625c:ea34%4]) with mapi id 15.20.3305.032; Thu, 27 Aug 2020
- 12:41:14 +0000
-Subject: Re: [PATCH v8 0/6] block: seriously improve savevm/loadvm performance
-From: "Denis V. Lunev" <den@openvz.org>
-To: qemu-block@nongnu.org, qemu-devel@nongnu.org
-References: <20200709132644.28470-1-den@openvz.org>
- <a722fc99-b367-dbd8-fd45-de7fb1a18f5d@openvz.org>
-Message-ID: <2d738b26-d107-5f2c-0cfe-f20af71e7f6f@openvz.org>
-Date: Thu, 27 Aug 2020 15:41:11 +0300
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kBHFd-0000SF-Gl
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 08:43:33 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:23030
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kBHFa-0006ny-J0
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 08:43:32 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1598532209;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=S41Wa+SSgcZ+UTOYttg3gDAeVHbsRn/5fMCPyL1Cd9g=;
+ b=c72IvhiLISpietDfceM53RxQGBJkGLi7YODb6TdDPeLkB+m8y80ZahXkK/yZGfdYYRghvU
+ MzYOa7EHImsrgIsh+aTOvIEUvPkfGrGKLr9u4hOfDFpxJRrLNeyXl83ocmS4cnpTtvH1xk
+ Kx/505hQNm5m+K8aFPV626KARPxh8xM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-521-IasIJMt4OcedGJDA9dP-MQ-1; Thu, 27 Aug 2020 08:43:27 -0400
+X-MC-Unique: IasIJMt4OcedGJDA9dP-MQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4A2051DE09;
+ Thu, 27 Aug 2020 12:43:26 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-56.ams2.redhat.com [10.36.112.56])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C5732747BD;
+ Thu, 27 Aug 2020 12:43:21 +0000 (UTC)
+Subject: Re: [PATCH v2 2/4] pc-bios: s390x: Use reset PSW if avaliable
+To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
+References: <20200827093152.3026-1-frankja@linux.ibm.com>
+ <20200827093152.3026-3-frankja@linux.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <bb62946c-1acd-80d8-d3be-8ce104a5f47f@redhat.com>
+Date: Thu, 27 Aug 2020 14:43:20 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-In-Reply-To: <a722fc99-b367-dbd8-fd45-de7fb1a18f5d@openvz.org>
+ Thunderbird/68.6.0
+MIME-Version: 1.0
+In-Reply-To: <20200827093152.3026-3-frankja@linux.ibm.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-X-ClientProxiedBy: HE1PR05CA0131.eurprd05.prod.outlook.com
- (2603:10a6:7:28::18) To AM6PR08MB4214.eurprd08.prod.outlook.com
- (2603:10a6:20b:8d::30)
-MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.1.27] (31.148.204.195) by
- HE1PR05CA0131.eurprd05.prod.outlook.com (2603:10a6:7:28::18) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3326.19 via Frontend Transport; Thu, 27 Aug 2020 12:41:13 +0000
-X-Originating-IP: [31.148.204.195]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: e1d7c9bd-64b9-4f08-f8da-08d84a867c15
-X-MS-TrafficTypeDiagnostic: AM6PR08MB5207:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM6PR08MB520785C75710782C7F214CA6B6550@AM6PR08MB5207.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:3513;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: cej/9jowLb3GDtc1c620vgDm0STJyzmoXncBuL5RogoTNxTAr88E7zpUPmibc+PcJs+3WwKiVxI/0h+AZzzlPVynleZqHxt4vGdrSsVn4g2J36tOTi3IbRRj2BHebI+B+6e18mfMLm+M+5mwanBQpKcJkswY8SphP3RJXwQVbfhM3Hlt0oZr2mnnrYH/tMYAmFVVv7PSHkBSO27wXORq7oWeotXNjhOz13A9Vm14LYnX9TyNyy5K8aLzuHYISKS0QCf2ROKjGm9R53Jr6jyATe6tuTEMbImZC28stfm6pE9tJWNi9Uu3eE1qWxVFlL4jmjrWhdwxAnLB+Mo2oS/BvAjqd9paJZ8UY3a43pVrm9GaDgJM4Kbde5z5vuA5eQJAK2NZ7azbm/KcvsU+Wgcu56aGfBvF8nI2IYK1mrLPV7ojNegSh+6xLc28fhgVhyljVW6/2IgoXqRJfrfAiPPpVw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM6PR08MB4214.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(366004)(136003)(39840400004)(376002)(396003)(346002)(31696002)(31686004)(2616005)(107886003)(42882007)(4326008)(83170400001)(83380400001)(956004)(8676002)(2906002)(53546011)(186003)(66476007)(16526019)(66556008)(8936002)(36756003)(66946007)(26005)(6486002)(54906003)(16576012)(52116002)(478600001)(316002)(966005)(5660300002)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: g7TUwv1vaOTfHP9ufuy8uIu/OQwYjRYtJ+22D02TyeXQynnC5f3E2JU9se2h8gmFJ9m5d/5VPtdkYUL7waOPg5sD7EAJQwaPHHYWhJROVCUkpxjOs+8wpTo41qJ77W5sn6pfPRcIypSFfMF0owTTc9CtQrUUIo9vU9Afkje7/StZPrkoaqo4u5kBbcHMAV44VcQ99t2gQzNku3T1SzsAP5ud2uF4ba73ayh9fcs0x/bHjShw8in8qcoA6CVr2hxzK/EHBX3pXkrexgO2ZP7dGKoKa/cd/JenIjGzkpWaPaGUf9KKhgWRSQwYxEjpLxNTXU2IzC9xtQmnmSCjnQNB9TIgLduzq3TWWVQ9p+8w6ukm29gnMCJiWLKOjWuCwhsCQi1UwFsaHiAGXGyEDQpNnRow/GZ5H6Jo0jyag1scOE5ygipFvlQt2GHdueXBrfXIaJFUyLneHvbz2djtJ90qDMHUB5qd+YJPNN3BUSZbBhFzglWmAvAFCVzBkQ0KIGYs7TCyAKktab5P/m6KOq9OJrQFCRn8QtPpU6ib3LcaNHswgEzFEsp+TKQd05gx+Udhu/z5BBUCHicBEsMBSioVYiBhPAHB5OYy5jvvgQ1zw634aAs5kV75NXJhwOY0O+7Qgsi6GoriRheh1fjrpa26uA==
-X-OriginatorOrg: openvz.org
-X-MS-Exchange-CrossTenant-Network-Message-Id: e1d7c9bd-64b9-4f08-f8da-08d84a867c15
-X-MS-Exchange-CrossTenant-AuthSource: AM6PR08MB4214.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Aug 2020 12:41:14.2721 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: GHCdFXxqWhA/lzF3SbY6w/hJBE1dK6e9usyKStCTcHzxDNikoWYy31FNVsNSIj1LOHF/UX38BwfsnM88LGcWIQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB5207
-Received-SPF: pass client-ip=40.107.22.109; envelope-from=den@virtuozzo.com;
- helo=EUR05-AM6-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 08:41:19
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=thuth@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 00:53:04
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -47
+X-Spam_score: -4.8
 X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
- MSGID_FROM_MTA_HEADER=0.001, NICE_REPLY_A=-1.782, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
+X-Spam_report: (-4.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.959,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-1.782, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -130,90 +99,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Juan Quintela <quintela@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Denis Plotnikov <dplotnikov@virtuozzo.com>,
- Stefan Hajnoczi <stefanha@redhat.com>
+Cc: borntraeger@de.ibm.com, cohuck@redhat.com, david@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/20/20 10:42 AM, Denis V. Lunev wrote:
-> On 7/9/20 4:26 PM, Denis V. Lunev wrote:
->> This series do standard basic things:
->> - it creates intermediate buffer for all writes from QEMU migration code
->>   to QCOW2 image,
->> - this buffer is sent to disk asynchronously, allowing several writes to
->>   run in parallel.
->>
->> In general, migration code is fantastically inefficent (by observation),
->> buffers are not aligned and sent with arbitrary pieces, a lot of time
->> less than 100 bytes at a chunk, which results in read-modify-write
->> operations with non-cached operations. It should also be noted that all
->> operations are performed into unallocated image blocks, which also suffer
->> due to partial writes to such new clusters.
->>
->> This patch series is an implementation of idea discussed in the RFC
->> posted by Denis Plotnikov
->> https://lists.gnu.org/archive/html/qemu-devel/2020-04/msg01925.html
->> Results with this series over NVME are better than original code
->>                 original     rfc    this
->> cached:          1.79s      2.38s   1.27s
->> non-cached:      3.29s      1.31s   0.81s
->>
->> Changes from v7:
->> - dropped lock from LoadVMState
->> - fixed assert in last patch
->> - dropped patch 1 as queued
->>
->> Changes from v6:
->> - blk_load_vmstate kludges added (patchew problem fixed)
->>
->> Changes from v5:
->> - loadvm optimizations added with Vladimir comments included
->>
->> Changes from v4:
->> - added patch 4 with blk_save_vmstate() cleanup
->> - added R-By
->> - bdrv_flush_vmstate -> bdrv_finalize_vmstate
->> - fixed return code of bdrv_co_do_save_vmstate
->> - fixed typos in comments (Eric, thanks!)
->> - fixed patchew warnings
->>
->> Changes from v3:
->> - rebased to master
->> - added patch 3 which removes aio_task_pool_wait_one()
->> - added R-By to patch 1
->> - patch 4 is rewritten via bdrv_run_co
->> - error path in blk_save_vmstate() is rewritten to call bdrv_flush_vmstate
->>   unconditionally
->> - added some comments
->> - fixes initialization in bdrv_co_vmstate_save_task_entry as suggested
->>
->> Changes from v2:
->> - code moved from QCOW2 level to generic block level
->> - created bdrv_flush_vmstate helper to fix 022, 029 tests
->> - added recursive for bs->file in bdrv_co_flush_vmstate (fix 267)
->> - fixed blk_save_vmstate helper
->> - fixed coroutine wait as Vladimir suggested with waiting fixes from me
->>
->> Changes from v1:
->> - patchew warning fixed
->> - fixed validation that only 1 waiter is allowed in patch 1
->>
->> Signed-off-by: Denis V. Lunev <den@openvz.org>
->> CC: Kevin Wolf <kwolf@redhat.com>
->> CC: Max Reitz <mreitz@redhat.com>
->> CC: Stefan Hajnoczi <stefanha@redhat.com>
->> CC: Fam Zheng <fam@euphon.net>
->> CC: Juan Quintela <quintela@redhat.com>
->> CC: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->> CC: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> CC: Denis Plotnikov <dplotnikov@virtuozzo.com>
->>
->>
-> ping
-ping V2
+On 27/08/2020 11.31, Janosch Frank wrote:
+> If a blob provides a reset PSW then we should use it instead of
+> branching to the PSW address and using our own mask.
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> ---
+>  pc-bios/s390-ccw/bootmap.c  |  1 +
+>  pc-bios/s390-ccw/jump2ipl.c | 48 ++++++++++++++++++++++---------------
+>  pc-bios/s390-ccw/s390-ccw.h |  1 +
+>  3 files changed, 31 insertions(+), 19 deletions(-)
+> 
+> diff --git a/pc-bios/s390-ccw/bootmap.c b/pc-bios/s390-ccw/bootmap.c
+> index 8747c4ea26..0df9b3781d 100644
+> --- a/pc-bios/s390-ccw/bootmap.c
+> +++ b/pc-bios/s390-ccw/bootmap.c
+> @@ -515,6 +515,7 @@ static void zipl_run(ScsiBlockPtr *pte)
+>      IPL_assert(entry->component_type == ZIPL_COMP_ENTRY_EXEC, "No EXEC entry");
+>  
+>      /* should not return */
+> +    write_reset_psw(entry->compdat.load_psw);
+>      jump_to_IPL_code(entry->compdat.load_psw & PSW_MASK_SHORT_ADDR);
+
+Shouldn't that be jump_to_IPL_code(0) now? Wouldn't it be cleaner to
+have a jump_to_IPL_PSW() function instead?
+
+>  }
+>  
+> diff --git a/pc-bios/s390-ccw/jump2ipl.c b/pc-bios/s390-ccw/jump2ipl.c
+> index 767012bf0c..143d027bf7 100644
+> --- a/pc-bios/s390-ccw/jump2ipl.c
+> +++ b/pc-bios/s390-ccw/jump2ipl.c
+> @@ -13,20 +13,28 @@
+>  #define KERN_IMAGE_START 0x010000UL
+>  #define RESET_PSW_MASK (PSW_MASK_SHORTPSW | PSW_MASK_64)
+>  
+> -typedef struct ResetInfo {
+> -    uint64_t ipl_psw;
+> -    uint32_t ipl_continue;
+> -} ResetInfo;
+> -
+> -static ResetInfo save;
+> +uint64_t *reset_psw = 0, save_psw, ipl_continue;
+
+I think the patch would be better readable if you'd split it in two -
+first the ResetInfo rework, then the use-reset-PSW-if-available stuff ?
+
+>  static void jump_to_IPL_2(void)
+>  {
+> -    ResetInfo *current = 0;
+> +    /* Restore reset PSW and io and external new PSWs */
+> +    *reset_psw = save_psw;
+
+The comment talks about io and external new PSWs ... but where is it in
+the code?
+
+> -    void (*ipl)(void) = (void *) (uint64_t) current->ipl_continue;
+> -    *current = save;
+> -    ipl(); /* should not return */
+> +    /* No reset PSW, let's jump instead. */
+> +    if (ipl_continue) {
+> +        void (*ipl)(void) = (void *) (uint64_t) ipl_continue;
+
+Is it possible to mark a function pointer with __attribute__((noreturn)) ?
+
+> +        ipl();
+> +    }
+> +
+> +    /* Reset PSW available, let's load it */
+> +    asm volatile ("lpsw 0(%0)\n"
+> +        :  : "a" (0):);
+
+I've never tried. but maybe you could add __attribute__((noreturn)) to
+an inline asm statement, too?
+
+> +    /* should not return */
+> +}
+> +
+> +void write_reset_psw(uint64_t psw)
+> +{
+> +    *reset_psw = psw;
+>  }
+>  
+>  void jump_to_IPL_code(uint64_t address)
+> @@ -46,15 +54,12 @@ void jump_to_IPL_code(uint64_t address)
+>       * content of non-BIOS memory after we loaded the guest, so we
+>       * save the original content and restore it in jump_to_IPL_2.
+>       */
+> -    ResetInfo *current = 0;
+> +    save_psw = *reset_psw;
+> +    *reset_psw = (uint64_t) &jump_to_IPL_2;
+> +    *reset_psw |= RESET_PSW_MASK;
+> +    ipl_continue = address;
+>  
+> -    save = *current;
+> -
+> -    current->ipl_psw = (uint64_t) &jump_to_IPL_2;
+> -    current->ipl_psw |= RESET_PSW_MASK;
+> -    current->ipl_continue = address & PSW_MASK_SHORT_ADDR;
+> -
+> -    debug_print_int("set IPL addr to", current->ipl_continue);
+> +    debug_print_int("set IPL addr to", ipl_continue);
+>  
+>      /* Ensure the guest output starts fresh */
+>      sclp_print("\n");
+> @@ -84,7 +89,12 @@ void jump_to_low_kernel(void)
+>  
+>      /* Trying to get PSW at zero address */
+>      if (*((uint64_t *)0) & RESET_PSW_MASK) {
+> -        jump_to_IPL_code((*((uint64_t *)0)) & PSW_MASK_SHORT_ADDR);
+> +        /*
+> +         * Surely nobody will try running directly from lowcore, so
+> +         * let's use 0 as an indication that we want to load the reset
+> +         * psw at 0x0 and not jump to the entry.
+> +         */
+> +        jump_to_IPL_code(0);
+>      }
+>  
+>      /* No other option left, so use the Linux kernel start address */
+> diff --git a/pc-bios/s390-ccw/s390-ccw.h b/pc-bios/s390-ccw/s390-ccw.h
+> index 36b884cced..7090720422 100644
+> --- a/pc-bios/s390-ccw/s390-ccw.h
+> +++ b/pc-bios/s390-ccw/s390-ccw.h
+> @@ -78,6 +78,7 @@ int virtio_read(ulong sector, void *load_addr);
+>  void zipl_load(void);
+>  
+>  /* jump2ipl.c */
+> +void write_reset_psw(uint64_t psw);
+>  void jump_to_IPL_code(uint64_t address);
+>  void jump_to_low_kernel(void);
+>  
+> 
+
+ Thomas
+
 
