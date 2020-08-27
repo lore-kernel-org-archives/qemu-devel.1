@@ -2,80 +2,89 @@ Return-Path: <SRS0=k4hX=CF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FA46C433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 11:24:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD423C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 11:26:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 69E4622CBB
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 11:24:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69E4622CBB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 7814622CAE
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 11:26:55 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Z4vvp/Qc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7814622CAE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49524 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55570 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBG0g-00057Z-LJ
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 07:24:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59582)
+	id 1kBG3S-0007pN-OY
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 07:26:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33362)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kBFxa-000206-Mp
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 07:20:50 -0400
-Received: from indium.canonical.com ([91.189.90.7]:59022)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kBG2k-0006pu-Q9
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 07:26:10 -0400
+Received: from mail-ed1-x544.google.com ([2a00:1450:4864:20::544]:38633)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kBFxY-00027M-Ag
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 07:20:50 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kBFxW-00034u-9c
- for <qemu-devel@nongnu.org>; Thu, 27 Aug 2020 11:20:46 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 47BCD2E8025
- for <qemu-devel@nongnu.org>; Thu, 27 Aug 2020 11:20:46 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kBG2g-00030U-4i
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 07:26:10 -0400
+Received: by mail-ed1-x544.google.com with SMTP id b2so4568912edw.5
+ for <qemu-devel@nongnu.org>; Thu, 27 Aug 2020 04:26:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=n2fvNEvJVFGhZsX82sS8ZfWw/uOHiFyQ1KS69MXpzh8=;
+ b=Z4vvp/Qc60g8WBnZPknv34rH8KNUzCXRxyoEmleXWAx0NruznH3l/XkZT0oanAQ+en
+ fjXp2m330sPBoUVJrS+LOSYC0jpT/c4usyYE3gCdagO5nluGWhB9P7+hZ8hmv10+6jgM
+ 4u7BEZtq2OZgQt4VVzEVkGfvFgF8gqgCF/DdW6Sl6bvyKiMLJ5XzG8OmHeXN67gPOCgT
+ pmNvbcPspCG9cZkYkJhqndr4z27ZxHeQ37EzkH2JYTYb02Fd3mjfzIwIorwtrLVlev+a
+ Oksew+bDjuIjkIx4SkBtmAkcMMVufu6kHhSsYEd44+gjkRl/J1eUjAckA1hT90CrsZah
+ UBmw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=n2fvNEvJVFGhZsX82sS8ZfWw/uOHiFyQ1KS69MXpzh8=;
+ b=COYefMl7jTwb+mm28Uk8Pz0HRR//Q5x0i6ENefpuvI56OYWOCfLVjHu1E4DqkocIUR
+ ZhYtzPCVN4wPLnXc9CR4GUNCZgJDAxSPOFRM+gDO0hzSjpnRSijWlkriG4iWtKHgCe4T
+ NHEpBlULVdI3JgvDcnXH/UX+zCFnRjt9s1j8eJFpjPwMSj8L3yuJIDvS1Qa/3PjLbMmC
+ 4IA676nTw4iH/dIn98/nuXQsorH1DNIHlF4rSIx6ft82KWNlLGGskpte4Iv3ugKOVND5
+ 5cLcGtCi6qHwulaqhrEFk4IWsNg2QSMk9RskFT9VhbufZVEf2wfRJYALFWFiFzFLIjj1
+ XLUw==
+X-Gm-Message-State: AOAM530tgtHbyRMLXHv+QECgrqrZeIVXUbqu4Mvu0n6jyU6RJVSLzNfS
+ yiIwesp9HO3KbZQdY2Fiei2Qe2P13oPu/2rq/FGZDKbA2C5mfg==
+X-Google-Smtp-Source: ABdhPJxKjptkjbdqkM5eTceZOSFgDF34nV4pN/i49JS/Hd7eTpw60juot2m4LKLKhXOMfyvEgKoGWxrAww9rIs8+HSM=
+X-Received: by 2002:a50:ef11:: with SMTP id m17mr5431833eds.251.1598527564134; 
+ Thu, 27 Aug 2020 04:26:04 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 27 Aug 2020 11:06:29 -0000
-From: Mike Gelfand <1893010@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: linux-user
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: mike.dld
-X-Launchpad-Bug-Reporter: Mike Gelfand (mike.dld)
-X-Launchpad-Bug-Modifier: Mike Gelfand (mike.dld)
-References: <159843096085.1469.8304847352897420087.malonedeb@wampee.canonical.com>
-Message-Id: <159852638943.2805.14402921714287731444.malone@chaenomeles.canonical.com>
-Subject: [Bug 1893010] Re: qemu linux-user doesn't support OFD fcntl locks
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="99c2d833c8d727fd05148486920aca032e908071"; Instance="production"
-X-Launchpad-Hash: 42d37087f1f593214c6f56af77d09b55bc019c23
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 07:20:46
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+References: <20200810195019.25427-1-peter.maydell@linaro.org>
+In-Reply-To: <20200810195019.25427-1-peter.maydell@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 27 Aug 2020 12:25:53 +0100
+Message-ID: <CAFEAcA9cyKVwONYuzG3oPcQQ9sibpdtetCjcBe3133gd09Aa9w@mail.gmail.com>
+Subject: Re: [PATCH v5 00/20] Convert QAPI doc comments to generate rST
+ instead of texinfo
+To: QEMU Developers <qemu-devel@nongnu.org>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::544;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x544.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -84,42 +93,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1893010 <1893010@bugs.launchpad.net>
+Cc: Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-New patch version: fix target_to_host_fcntl_cmd mapping, avoid do_fcntl
-code duplication.
+On Mon, 10 Aug 2020 at 20:50, Peter Maydell <peter.maydell@linaro.org> wrote:
+> This series switches all our QAPI doc comments over from
+> texinfo format to rST. It then removes all the texinfo
+> machinery, because this was the last user of texinfo.
+>
+> This is largely just a rebase of patchset v4 to current master.
 
-** Patch added: "qemu-5.0.0-ofd-fcntl-2.patch"
-   https://bugs.launchpad.net/qemu/+bug/1893010/+attachment/5405156/+files/=
-qemu-5.0.0-ofd-fcntl-2.patch
+> There are a few things I have left out of this initial series:
 
--- =
+I realized there is something I forgot to add to this "left out" list:
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1893010
+Sphinx needs to know what all the input files which go into
+a document are, as it builds up dependencies to tell it whether
+to rebuild the output or not. The docs/sphinx/qapidoc.py
+plugin adds such a dependency on the file that the .rst
+docs reference (eg qapi/qapi-schema.json) but it does not
+have a mechanism for adding dependencies when that .json
+file uses an 'include' to pull in other .json files.
 
-Title:
-  qemu linux-user doesn't support OFD fcntl locks
+I'm not sure whether the scripts/qapi code supports telling
+a consumer of the parsed info about this -- is it sufficient
+for QAPISchemaGenRSTVisitor to implement the 'visit_include'
+method, find the path to the included .qapi file from the
+arguments and call Sphinx's env.notedependency(), or do we
+need to do something more complicated to get the list of
+all the included .qapi files ?
 
-Status in QEMU:
-  New
-
-Bug description:
-  "Open file description locks (non-POSIX)", as they are described in
-  fcntl(2) man page, aren't supported by qemu-user  and attempting to
-  use those results in EINVAL. I'm on Gentoo with latest QEMU version
-  currently available (5.0.0-r2), and trying to emulate ppc64 and s390x
-  on x86_64.
-
-  Looking at linux-user/syscall.c, I'm guessing the issue is in (at
-  least) `target_to_host_fcntl_cmd` where switch reaches the default
-  clause as there're no cases for F_OFD_SETLK / F_OFD_SETLKW /
-  F_OFD_GETLK.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1893010/+subscriptions
+thanks
+-- PMM
 
