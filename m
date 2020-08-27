@@ -2,97 +2,96 @@ Return-Path: <SRS0=k4hX=CF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9D3AC433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 18:20:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BCC7C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 18:22:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A91F42177B
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 18:20:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CC28A2087E
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 18:22:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="kh/uVLB4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A91F42177B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="uUZag/7b"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC28A2087E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36006 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42824 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBMVR-0001Nj-Ut
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 14:20:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42288)
+	id 1kBMXS-0004Fn-2U
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 14:22:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42438)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <elena.ufimtseva@oracle.com>)
- id 1kBMOv-0001Yt-Jw
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 14:13:29 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:60176)
+ id 1kBMPA-0001x8-Ey
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 14:13:44 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:50024)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <elena.ufimtseva@oracle.com>)
- id 1kBMOs-0007Hq-Dm
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 14:13:29 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
- by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 07RI5qft006330;
- Thu, 27 Aug 2020 18:13:20 GMT
+ id 1kBMP8-0007Ku-99
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 14:13:44 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+ by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 07RI5LLE074591;
+ Thu, 27 Aug 2020 18:13:36 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
  h=from : to : cc :
  subject : date : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=CwTGaOngjxFp5QgzfFTXns1cbMtfw+Zyde5QDwtFlls=;
- b=kh/uVLB4O1qauKnVczEaik2F5S2fJpOrGLKIhgBu7lY5qz0mRXWJUhYzxODR6yprukSX
- 58oO7nLMcDDHAGvxmwquHZDQ9aUkR1JHCFqozlBiZGiN0hhGMsPZgDBNm4ivtUFb64WQ
- cDu/G4PMzlJn1iSZ2uj/FBHOWn5t0BZxGIySyQvXfPHaMyQpqtKQj52AwkGuiGKDcKsW
- ml8D6KcXpLElnU8D77TtYwsabbZpdE7/NqhYpwGSYIf0BcT1+sBeVIr9ssmQSe9c46Vw
- Vj3j2NFpWtXz8cGcbTbTb9asBCK0DNAuW1OmVWW4+3b7PsHF0vvpovsGqmTtY/RJlKGN fw== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
- by aserp2120.oracle.com with ESMTP id 333dbs7y9n-1
+ content-transfer-encoding; s=corp-2020-01-29;
+ bh=C2zYlbgUjh78gb8/f0N4TRIumkzhBi1rRYVFiDcIxEc=;
+ b=uUZag/7bmK5RgQt7sYgFIZ5+FjV263uTlIX4IvWZQ4gWK3svtlSQZB0oYr7Z3QTmvrSx
+ C717wKcyz9/Hf0PD9vqwWAQdUHGwhrIfFwPPCBwXmoGVPIOd0/QERmBzh31v4dA3HhTE
+ mhCNwL9hKV+Myg6UQOvIQ0jf3iByZcObuRgeXiv7VHZbB/wzwbFVhO6HkLRJDWHjUtR+
+ orUeADjBn9uhgyRh00hMkZo4s3IMbv7aHWe4oq4KWXzkS/nuBLcaHJUWlttw19KasD47
+ NIE8iVf4/9u80Wv1nr02BjTDoTpv60sDLXKa1NoWj6Bm7V3+PyOPVcG1ya7HfFbNGq0z 9Q== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+ by userp2120.oracle.com with ESMTP id 333w6u6hm8-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
- Thu, 27 Aug 2020 18:13:20 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
- by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 07RI6Lc8157513;
- Thu, 27 Aug 2020 18:13:20 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
- by aserp3020.oracle.com with ESMTP id 333rudn6ha-1
+ Thu, 27 Aug 2020 18:13:36 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+ by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 07RI4tVa072660;
+ Thu, 27 Aug 2020 18:13:35 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+ by aserp3030.oracle.com with ESMTP id 333r9nr071-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 27 Aug 2020 18:13:19 +0000
+ Thu, 27 Aug 2020 18:13:35 +0000
 Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
- by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 07RIDJM6021548;
- Thu, 27 Aug 2020 18:13:19 GMT
+ by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 07RIDYGg025744;
+ Thu, 27 Aug 2020 18:13:34 GMT
 Received: from flaka.hsd1.ca.comcast.net (/10.159.136.159)
  by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Thu, 27 Aug 2020 11:13:17 -0700
+ with ESMTP ; Thu, 27 Aug 2020 11:13:34 -0700
 From: elena.ufimtseva@oracle.com
 To: qemu-devel@nongnu.org
-Subject: [PATCH v9 15/20] multi-process: Synchronize remote memory
-Date: Thu, 27 Aug 2020 11:12:26 -0700
-Message-Id: <20200827181231.22778-16-elena.ufimtseva@oracle.com>
+Subject: [PATCH v9 20/20] multi-process: add configure and usage information
+Date: Thu, 27 Aug 2020 11:12:31 -0700
+Message-Id: <20200827181231.22778-21-elena.ufimtseva@oracle.com>
 X-Mailer: git-send-email 2.25.GIT
 In-Reply-To: <20200827181231.22778-1-elena.ufimtseva@oracle.com>
 References: <20200827181231.22778-1-elena.ufimtseva@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9726
  signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999
- phishscore=0
- bulkscore=0 suspectscore=4 spamscore=0 mlxscore=0 adultscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2008270136
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0
+ mlxscore=0 bulkscore=0
+ adultscore=0 spamscore=0 mlxlogscore=999 phishscore=0 suspectscore=1
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2008270136
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9726
  signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0
- clxscore=1015
- priorityscore=1501 impostorscore=0 phishscore=0 malwarescore=0
- mlxlogscore=999 spamscore=0 mlxscore=0 lowpriorityscore=0 suspectscore=4
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2008270136
-Received-SPF: pass client-ip=141.146.126.78;
- envelope-from=elena.ufimtseva@oracle.com; helo=aserp2120.oracle.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 14:13:10
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0
+ impostorscore=0
+ mlxlogscore=999 suspectscore=1 phishscore=0 malwarescore=0 spamscore=0
+ priorityscore=1501 clxscore=1015 mlxscore=0 lowpriorityscore=0 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2008270136
+Received-SPF: pass client-ip=156.151.31.85;
+ envelope-from=elena.ufimtseva@oracle.com; helo=userp2120.oracle.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 14:08:28
 X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
 X-Spam_score_int: -53
 X-Spam_score: -5.4
@@ -125,376 +124,160 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Jagannathan Raman <jag.raman@oracle.com>
+From: Elena Ufimtseva <elena.ufimtseva@oracle.com>
 
-Add memory-listener object which is used to keep the view of the RAM
-in sync between QEMU and remote process.
-A MemoryListener is registered for system-memory AddressSpace. The
-listener sends SYNC_SYSMEM message to the remote process when memory
-listener commits the changes to memory, the remote process receives
-the message and processes it in the handler for SYNC_SYSMEM message.
-
+Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
 Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
 Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
-Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
 ---
- MAINTAINERS                  |   2 +
- hw/i386/remote-msg.c         |   4 +
- hw/pci/memory-sync.c         | 210 +++++++++++++++++++++++++++++++++++
- hw/pci/meson.build           |   2 +
- hw/pci/proxy.c               |   6 +
- include/hw/pci/memory-sync.h |  27 +++++
- include/hw/pci/proxy.h       |   3 +
- 7 files changed, 254 insertions(+)
- create mode 100644 hw/pci/memory-sync.c
- create mode 100644 include/hw/pci/memory-sync.h
+ MAINTAINERS                |  2 ++
+ docs/multi-process.rst     | 67 ++++++++++++++++++++++++++++++++++++++
+ scripts/mpqemu-launcher.py | 49 ++++++++++++++++++++++++++++
+ 3 files changed, 118 insertions(+)
+ create mode 100644 docs/multi-process.rst
+ create mode 100755 scripts/mpqemu-launcher.py
 
 diff --git a/MAINTAINERS b/MAINTAINERS
-index 7b2096b300..aa18f4fe86 100644
+index ffc4f321f6..acbe096976 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -3054,6 +3054,8 @@ F: include/hw/i386/remote-memory.h
- F: hw/i386/remote-memory.c
- F: hw/pci/proxy.c
- F: include/hw/pci/proxy.h
-+F: hw/pci/memory-sync.c
-+F: include/hw/pci/memory-sync.h
+@@ -3059,6 +3059,8 @@ F: include/hw/pci/memory-sync.h
+ F: hw/i386/remote-iohub.c
+ F: include/hw/i386/remote-iohub.h
+ F: docs/devel/multi-process.rst
++F: scripts/mpqemu-launcher.py
++F: scripts/mpqemu-launcher-perf-mode.py
  
  Build and test automation
  -------------------------
-diff --git a/hw/i386/remote-msg.c b/hw/i386/remote-msg.c
-index 841c681d76..017224505b 100644
---- a/hw/i386/remote-msg.c
-+++ b/hw/i386/remote-msg.c
-@@ -17,6 +17,7 @@
- #include "sysemu/runstate.h"
- #include "hw/pci/pci.h"
- #include "exec/memattrs.h"
-+#include "hw/i386/remote-memory.h"
- 
- static void process_config_write(QIOChannel *ioc, PCIDevice *dev,
-                                  MPQemuMsg *msg);
-@@ -71,6 +72,9 @@ gboolean mpqemu_process_msg(QIOChannel *ioc, GIOCondition cond,
-     case BAR_READ:
-         process_bar_read(ioc, &msg, &local_err);
-         break;
-+    case SYNC_SYSMEM:
-+        remote_sysmem_reconfig(&msg, &local_err);
-+        break;
-     default:
-         error_setg(&local_err,
-                    "Unknown command (%d) received for device %s (pid=%d)",
-diff --git a/hw/pci/memory-sync.c b/hw/pci/memory-sync.c
+diff --git a/docs/multi-process.rst b/docs/multi-process.rst
 new file mode 100644
-index 0000000000..26a8784af0
+index 0000000000..9dc55e37d1
 --- /dev/null
-+++ b/hw/pci/memory-sync.c
-@@ -0,0 +1,210 @@
-+/*
-+ * Copyright © 2018, 2020 Oracle and/or its affiliates.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
++++ b/docs/multi-process.rst
+@@ -0,0 +1,67 @@
++Multi-process QEMU
++==================
 +
-+#include "qemu/osdep.h"
-+#include "qemu-common.h"
++This document describes how to configure and use multi-process qemu.
++For the design document refer to docs/devel/qemu-multiprocess.
 +
-+#include "qemu/compiler.h"
-+#include "qemu/int128.h"
-+#include "qemu/range.h"
-+#include "exec/memory.h"
-+#include "exec/cpu-common.h"
-+#include "cpu.h"
-+#include "exec/ram_addr.h"
-+#include "exec/address-spaces.h"
-+#include "io/mpqemu-link.h"
-+#include "hw/pci/memory-sync.h"
++1) Configuration
++----------------
 +
-+static void proxy_ml_begin(MemoryListener *listener)
-+{
-+    RemoteMemSync *sync = container_of(listener, RemoteMemSync, listener);
-+    int mrs;
++To enable support for multi-process add --enable-mpqemu
++to the list of options for the "configure" script.
 +
-+    for (mrs = 0; mrs < sync->n_mr_sections; mrs++) {
-+        memory_region_unref(sync->mr_sections[mrs].mr);
-+    }
 +
-+    g_free(sync->mr_sections);
-+    sync->mr_sections = NULL;
-+    sync->n_mr_sections = 0;
-+}
++2) Usage
++--------
 +
-+static int get_fd_from_hostaddr(uint64_t host, ram_addr_t *offset)
-+{
-+    MemoryRegion *mr;
-+    ram_addr_t off;
++Multi-process QEMU requires an orchestrator to launch. Please refer to a
++light-weight python based orchestrator for mpqemu in
++scripts/mpqemu-launcher.py to lauch QEMU in multi-process mode.
 +
-+    /**
-+     * Assumes that the host address is a valid address as it's
-+     * coming from the MemoryListener system. In the case host
-+     * address is not valid, the following call would return
-+     * the default subregion of "system_memory" region, and
-+     * not NULL. So it's not possible to check for NULL here.
-+     */
-+    mr = memory_region_from_host((void *)(uintptr_t)host, &off);
++Following is a description of command-line used to launch mpqemu.
 +
-+    if (offset) {
-+        *offset = off;
-+    }
++* Orchestrator:
 +
-+    return memory_region_get_fd(mr);
-+}
++  - The Orchestrator creates a unix socketpair
 +
-+static bool proxy_mrs_can_merge(uint64_t host, uint64_t prev_host, size_t size)
-+{
-+    bool merge;
-+    int fd1, fd2;
++  - It launches the remote process and passes one of the
++    sockets to it via command-line.
 +
-+    fd1 = get_fd_from_hostaddr(host, NULL);
++  - It then launches QEMU and specifies the other socket as an option
++    to the Proxy device object
 +
-+    fd2 = get_fd_from_hostaddr(prev_host, NULL);
++* Remote Process:
 +
-+    merge = (fd1 == fd2);
++  - QEMU can enter remote process mode by using the "remote" machine
++    option.
 +
-+    merge &= ((prev_host + size) == host);
++  - The orchestrator creates a "remote-object" with details about
++    the device and the file descriptor for the device
 +
-+    return merge;
-+}
++  - The remaining options are no different from how one launches QEMU with
++    devices.
 +
-+static bool try_merge(RemoteMemSync *sync, MemoryRegionSection *section)
-+{
-+    uint64_t mrs_size, mrs_gpa, mrs_page;
-+    MemoryRegionSection *prev_sec;
-+    bool merged = false;
-+    uintptr_t mrs_host;
-+    RAMBlock *mrs_rb;
++  - Example command-line for the remote process is as follows:
 +
-+    if (!sync->n_mr_sections) {
-+        return false;
-+    }
++      /usr/bin/qemu-system-x86_64                                        \
++      -machine remote                                                    \
++      -device lsi53c895a,id=lsi0                                         \
++      -drive id=drive_image2,file=/build/ol7-nvme-test-1.qcow2           \
++      -device scsi-hd,id=drive2,drive=drive_image2,bus=lsi0.0,scsi-id=0  \
++      -object remote-object,id=robj1,devid=lsi1,fd=4,
 +
-+    mrs_rb = section->mr->ram_block;
-+    mrs_page = (uint64_t)qemu_ram_pagesize(mrs_rb);
-+    mrs_size = int128_get64(section->size);
-+    mrs_gpa = section->offset_within_address_space;
-+    mrs_host = (uintptr_t)memory_region_get_ram_ptr(section->mr) +
-+               section->offset_within_region;
++* QEMU:
 +
-+    if (get_fd_from_hostaddr(mrs_host, NULL) < 0) {
-+        return true;
-+    }
++  - Since parts of the RAM are shared between QEMU & remote process, a
++    memory-backend-memfd is required to facilitate this, as follows:
 +
-+    mrs_host = mrs_host & ~(mrs_page - 1);
-+    mrs_gpa = mrs_gpa & ~(mrs_page - 1);
-+    mrs_size = ROUND_UP(mrs_size, mrs_page);
++    -object memory-backend-memfd,id=mem,size=2G
 +
-+    prev_sec = sync->mr_sections + (sync->n_mr_sections - 1);
-+    uint64_t prev_gpa_start = prev_sec->offset_within_address_space;
-+    uint64_t prev_size = int128_get64(prev_sec->size);
-+    uint64_t prev_gpa_end   = range_get_last(prev_gpa_start, prev_size);
-+    uint64_t prev_host_start =
-+        (uintptr_t)memory_region_get_ram_ptr(prev_sec->mr) +
-+        prev_sec->offset_within_region;
-+    uint64_t prev_host_end = range_get_last(prev_host_start, prev_size);
++  - A "pci-proxy-dev" device is created for each of the PCI devices emulated
++    in the remote process. A "socket" sub-option specifies the other end of
++    unix channel created by orchestrator. The "id" sub-option must be specified
++    and should be the same as the "id" specified for the remote PCI device
 +
-+    if (mrs_gpa <= (prev_gpa_end + 1)) {
-+        g_assert(mrs_gpa > prev_gpa_start);
++  - Example commandline for QEMU is as follows:
 +
-+        if ((section->mr == prev_sec->mr) &&
-+            proxy_mrs_can_merge(mrs_host, prev_host_start,
-+                                (mrs_gpa - prev_gpa_start))) {
-+            uint64_t max_end = MAX(prev_host_end, mrs_host + mrs_size);
-+            merged = true;
-+            prev_sec->offset_within_address_space =
-+                MIN(prev_gpa_start, mrs_gpa);
-+            prev_sec->offset_within_region =
-+                MIN(prev_host_start, mrs_host) -
-+                (uintptr_t)memory_region_get_ram_ptr(prev_sec->mr);
-+            prev_sec->size = int128_make64(max_end - MIN(prev_host_start,
-+                                                         mrs_host));
-+        }
-+    }
-+
-+    return merged;
-+}
-+
-+static void proxy_ml_region_addnop(MemoryListener *listener,
-+                                   MemoryRegionSection *section)
-+{
-+    RemoteMemSync *sync = container_of(listener, RemoteMemSync, listener);
-+
-+    if (!(memory_region_is_ram(section->mr) &&
-+          !memory_region_is_rom(section->mr))) {
-+        return;
-+    }
-+
-+    if (try_merge(sync, section)) {
-+        return;
-+    }
-+
-+    ++sync->n_mr_sections;
-+    sync->mr_sections = g_renew(MemoryRegionSection, sync->mr_sections,
-+                                sync->n_mr_sections);
-+    sync->mr_sections[sync->n_mr_sections - 1] = *section;
-+    sync->mr_sections[sync->n_mr_sections - 1].fv = NULL;
-+    memory_region_ref(section->mr);
-+}
-+
-+static void proxy_ml_commit(MemoryListener *listener)
-+{
-+    RemoteMemSync *sync = container_of(listener, RemoteMemSync, listener);
-+    MPQemuMsg msg;
-+    MemoryRegionSection *section;
-+    ram_addr_t offset;
-+    uintptr_t host_addr;
-+    int region;
-+    Error *local_err = NULL;
-+
-+    memset(&msg, 0, sizeof(MPQemuMsg));
-+
-+    msg.cmd = SYNC_SYSMEM;
-+    msg.num_fds = sync->n_mr_sections;
-+    msg.size = sizeof(SyncSysmemMsg);
-+    if (msg.num_fds > REMOTE_MAX_FDS) {
-+        error_report("Number of fds is more than %d", REMOTE_MAX_FDS);
-+        return;
-+    }
-+
-+    for (region = 0; region < sync->n_mr_sections; region++) {
-+        section = &sync->mr_sections[region];
-+        msg.data.sync_sysmem.gpas[region] =
-+            section->offset_within_address_space;
-+        msg.data.sync_sysmem.sizes[region] = int128_get64(section->size);
-+        host_addr = (uintptr_t)memory_region_get_ram_ptr(section->mr) +
-+                    section->offset_within_region;
-+        msg.fds[region] = get_fd_from_hostaddr(host_addr, &offset);
-+        msg.data.sync_sysmem.offsets[region] = offset;
-+    }
-+    mpqemu_msg_send(&msg, sync->ioc, &local_err);
-+    if (local_err) {
-+        error_report("Error in sending command %d", msg.cmd);
-+    }
-+}
-+
-+void deconfigure_memory_sync(RemoteMemSync *sync)
-+{
-+    memory_listener_unregister(&sync->listener);
-+
-+    proxy_ml_begin(&sync->listener);
-+}
-+
-+void configure_memory_sync(RemoteMemSync *sync, QIOChannel *ioc)
-+{
-+    sync->n_mr_sections = 0;
-+    sync->mr_sections = NULL;
-+
-+    sync->ioc = ioc;
-+
-+    sync->listener.begin = proxy_ml_begin;
-+    sync->listener.commit = proxy_ml_commit;
-+    sync->listener.region_add = proxy_ml_region_addnop;
-+    sync->listener.region_nop = proxy_ml_region_addnop;
-+    sync->listener.priority = 10;
-+
-+    memory_listener_register(&sync->listener, &address_space_memory);
-+}
-diff --git a/hw/pci/meson.build b/hw/pci/meson.build
-index 0df30172b5..7947a6235e 100644
---- a/hw/pci/meson.build
-+++ b/hw/pci/meson.build
-@@ -18,3 +18,5 @@ softmmu_ss.add_all(when: 'CONFIG_PCI', if_true: pci_ss)
- 
- softmmu_ss.add(when: 'CONFIG_PCI', if_false: files('pci-stub.c'))
- softmmu_ss.add(when: 'CONFIG_ALL', if_true: files('pci-stub.c'))
-+
-+specific_ss.add(when: 'CONFIG_MPQEMU', if_true: files('memory-sync.c'))
-diff --git a/hw/pci/proxy.c b/hw/pci/proxy.c
-index d332c63bf3..3e13d7ea5e 100644
---- a/hw/pci/proxy.c
-+++ b/hw/pci/proxy.c
-@@ -17,6 +17,8 @@
- #include "monitor/monitor.h"
- #include "io/mpqemu-link.h"
- #include "qemu/error-report.h"
-+#include "hw/pci/memory-sync.h"
-+#include "qom/object.h"
- 
- static void proxy_set_socket(PCIProxyDev *pdev, int fd, Error **errp)
- {
-@@ -48,6 +50,8 @@ static void pci_proxy_dev_realize(PCIDevice *device, Error **errp)
- 
-     qemu_mutex_init(&dev->io_mutex);
-     qio_channel_set_blocking(dev->ioc, true, NULL);
-+
-+    configure_memory_sync(&dev->sync, dev->ioc);
- }
- 
- static void pci_proxy_dev_exit(PCIDevice *pdev)
-@@ -55,6 +59,8 @@ static void pci_proxy_dev_exit(PCIDevice *pdev)
-     PCIProxyDev *dev = PCI_PROXY_DEV(pdev);
- 
-     qio_channel_close(dev->ioc, NULL);
-+
-+    deconfigure_memory_sync(&dev->sync);
- }
- 
- static int config_op_send(PCIProxyDev *pdev, uint32_t addr, uint32_t *val,
-diff --git a/include/hw/pci/memory-sync.h b/include/hw/pci/memory-sync.h
-new file mode 100644
-index 0000000000..785f76a14c
++      -device pci-proxy-dev,id=lsi0,socket=3
+diff --git a/scripts/mpqemu-launcher.py b/scripts/mpqemu-launcher.py
+new file mode 100755
+index 0000000000..07b11c6f0d
 --- /dev/null
-+++ b/include/hw/pci/memory-sync.h
-@@ -0,0 +1,27 @@
-+/*
-+ * Copyright © 2018, 2020 Oracle and/or its affiliates.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
++++ b/scripts/mpqemu-launcher.py
+@@ -0,0 +1,49 @@
++#!/usr/bin/env python3
++import socket
++import os
++import subprocess
++import time
 +
-+#ifndef MEMORY_SYNC_H
-+#define MEMORY_SYNC_H
++PROC_QEMU='/usr/bin/qemu-system-x86_64'
 +
-+#include "exec/memory.h"
-+#include "io/channel.h"
++proxy, remote = socket.socketpair(socket.AF_UNIX, socket.SOCK_STREAM)
 +
-+typedef struct RemoteMemSync {
-+    MemoryListener listener;
++remote_cmd = [ PROC_QEMU,                                                     \
++               '-machine', 'remote',                                          \
++               '-device', 'lsi53c895a,id=lsi1',                               \
++               '-drive', 'id=drive_image1,file=/build/ol7-nvme-test-1.qcow2', \
++               '-device', 'scsi-hd,id=drive1,drive=drive_image1,bus=lsi1.0,'  \
++                              'scsi-id=0',                                    \
++               '-object',                                                     \
++               'remote-object,id=robj1,devid=lsi1,fd='+str(remote.fileno()),  \
++               '-nographic',                                                  \
++             ]
 +
-+    int n_mr_sections;
-+    MemoryRegionSection *mr_sections;
++proxy_cmd = [ PROC_QEMU,                                                      \
++              '-name', 'OL7.4',                                               \
++              '-machine', 'q35,accel=kvm',                                    \
++              '-smp', 'sockets=1,cores=1,threads=1',                          \
++              '-m', '2048',                                                   \
++              '-object', 'memory-backend-memfd,id=sysmem-file,size=2G',       \
++              '-numa', 'node,memdev=sysmem-file',                             \
++              '-device', 'virtio-scsi-pci,id=virtio_scsi_pci0',               \
++              '-drive', 'id=drive_image1,if=none,format=qcow2,'               \
++                            'file=/home/ol7-hdd-1.qcow2',                     \
++              '-device', 'scsi-hd,id=image1,drive=drive_image1,'              \
++                             'bus=virtio_scsi_pci0.0',                        \
++              '-boot', 'd',                                                   \
++              '-vnc', ':0',                                                   \
++              '-device', 'pci-proxy-dev,id=lsi1,fd='+str(proxy.fileno()),     \
++            ]
 +
-+    QIOChannel *ioc;
-+} RemoteMemSync;
 +
-+void configure_memory_sync(RemoteMemSync *sync, QIOChannel *ioc);
-+void deconfigure_memory_sync(RemoteMemSync *sync);
++pid = os.fork();
 +
-+#endif
-diff --git a/include/hw/pci/proxy.h b/include/hw/pci/proxy.h
-index e5e18f0b15..e3583dc6fe 100644
---- a/include/hw/pci/proxy.h
-+++ b/include/hw/pci/proxy.h
-@@ -11,6 +11,7 @@
- 
- #include "hw/pci/pci.h"
- #include "io/channel.h"
-+#include "hw/pci/memory-sync.h"
- 
- #define TYPE_PCI_PROXY_DEV "pci-proxy-dev"
- 
-@@ -40,6 +41,8 @@ struct PCIProxyDev {
-     QemuMutex io_mutex;
-     QIOChannel *ioc;
- 
-+    RemoteMemSync sync;
-+
-     ProxyMemoryRegion region[PCI_NUM_REGIONS];
- };
- 
++if pid:
++    # In Proxy
++    print('Launching QEMU with Proxy object');
++    process = subprocess.Popen(proxy_cmd, pass_fds=[proxy.fileno()])
++else:
++    # In remote
++    print('Launching Remote process');
++    process = subprocess.Popen(remote_cmd, pass_fds=[remote.fileno()])
 -- 
 2.25.GIT
 
