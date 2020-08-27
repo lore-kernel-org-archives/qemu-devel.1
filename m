@@ -2,90 +2,91 @@ Return-Path: <SRS0=k4hX=CF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 481A4C433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 04:43:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49542C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 04:50:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C6F2720786
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 04:43:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 185212078A
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 04:50:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DfzKbDnB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C6F2720786
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xv0CFgC/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 185212078A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46776 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51868 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kB9l1-0001A4-Rh
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 00:43:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58052)
+	id 1kB9rd-0003iN-7v
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 00:50:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59524)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kB9kK-0000dY-Jn
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 00:42:44 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:21521
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kB9kI-0002rV-Tc
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 00:42:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598503361;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=5mWqTRXdd/EAgzq0XIjS7Jj9FfIZBAxlx6NHJGSSato=;
- b=DfzKbDnBCnTehMuIpEEHWonkGHR7kZ5oI614GIrjkNNg1OOqokZ9rjFSRw2BwIxi8s1QF/
- bRKnTfgfFz6ojE3DvL4miC5cumv0Ff1KtxDrdkBi1w2RiXLFgeLo4Buuhs8sJ5gncLEQee
- mtAWdQXoCHG0GamvzvfibcHmitQ7GTg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-212-FcBd72tpPTKXlFjeKlbKIw-1; Thu, 27 Aug 2020 00:42:39 -0400
-X-MC-Unique: FcBd72tpPTKXlFjeKlbKIw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BBE2D8015C5;
- Thu, 27 Aug 2020 04:42:38 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-56.ams2.redhat.com [10.36.112.56])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 210B05D9E8;
- Thu, 27 Aug 2020 04:42:33 +0000 (UTC)
-Subject: Re: [PATCH 4/8] sclpconsole: Use TYPE_* constants
-To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
-References: <20200826184334.4120620-1-ehabkost@redhat.com>
- <20200826184334.4120620-5-ehabkost@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <0e627a97-f362-65fb-0683-2a8ff279092b@redhat.com>
-Date: Thu, 27 Aug 2020 06:42:33 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kB9qx-0002gJ-NF
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 00:49:35 -0400
+Received: from mail-pf1-x42d.google.com ([2607:f8b0:4864:20::42d]:42585)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kB9qw-0003gC-6R
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 00:49:35 -0400
+Received: by mail-pf1-x42d.google.com with SMTP id 17so2526897pfw.9
+ for <qemu-devel@nongnu.org>; Wed, 26 Aug 2020 21:49:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=T9/LRO7zs4o6nPW1yspDQXlHiJnUjoTK1K/OWRpCTE4=;
+ b=Xv0CFgC/yx0neW27nxRJRVIIoWxkBeZ6pBXWAUYq3VUcCE7ucZ8muvp1ee7BXn3xFf
+ vIohJ8PrwRZaLPRWvgCI+NY2HgsNM3llMvkluomppeJG3bMi0gvcgBentOYwh/lxDqk3
+ 4+aC/0+9UwI4QCE00dh1d87THxAZol+bMKRsLEzfD5Br1eps6Vxl9T8LttHZ57bOI1ab
+ kao0B9rMEz50rsF3/Z4A4EqcbbKcifkhawgCj0apydLaOiM1LKMUUxqiy4VOABxsNnOR
+ VnO+XuWfYXFUJD9JQq3k0pb9vyzDKE4rGy8/O4CxidzIqYEV7yjbSmlgnfXRZcBvYPMr
+ qgFQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=T9/LRO7zs4o6nPW1yspDQXlHiJnUjoTK1K/OWRpCTE4=;
+ b=MdPc58fPN9cZIOtrlNzY1BOI2jAnyGKY25GrcY7odqXFaeJczAGlTn3FeODXgMicAX
+ OQALDs9hEouxH9AabpPB+NnVQZ3QcJGoO7bC0LQNxsTXNnjuY3ZvMNBSEOqaXcKaL09Q
+ EOqa8AgudbjOHZgkvrp6KaeOhL5KwFP/ka0Poclf9taTb7Mi+ntkE4u1MS/8+3NPyWZi
+ TUzNMtYekEXzcaRPg2be5+Pg3yciJa+LDvxdOmeZzRTI+9l2tkIs+fZPJ50JRIfYWdY9
+ Kt2yeMlxJld9g+giDQpZ/6nQnQ/zYAX/HKh6bjim0knf9hJQqdAzhFSdhQh83Miuk7QL
+ FiKg==
+X-Gm-Message-State: AOAM533VcUcjgriLgGHXuzcjdrUwpeayHirc4eDvOVOt0oFZTIYsuDyW
+ hSwj0B+nggzUM/28IpkfE4tgtrWMYTNqsE+4uiw=
+X-Google-Smtp-Source: ABdhPJygy7vK6QY3RxiGsRCMj87CZBXALix/PBozR11JEjMAzO0dXtH7/YprHTx7wrTwCJ0bQTwdzw==
+X-Received: by 2002:a17:902:a503:: with SMTP id
+ s3mr14807195plq.190.1598503771967; 
+ Wed, 26 Aug 2020 21:49:31 -0700 (PDT)
+Received: from localhost.localdomain ([2401:c080:1c01:4fe:5400:2ff:fef1:b056])
+ by smtp.googlemail.com with ESMTPSA id
+ n26sm902296pff.30.2020.08.26.21.49.29
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 26 Aug 2020 21:49:31 -0700 (PDT)
+From: luoyonggang@gmail.com
+To: qemu-devel@nongnu.org
+Subject: [PATCH 0/6] *** Fixes msys2 building after the meson convert ***
+Date: Thu, 27 Aug 2020 12:49:11 +0800
+Message-Id: <20200827044917.1356-1-luoyonggang@gmail.com>
+X-Mailer: git-send-email 2.27.0.windows.1
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <20200826184334.4120620-5-ehabkost@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=thuth@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 00:42:41
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -52
-X-Spam_score: -5.3
-X-Spam_bar: -----
-X-Spam_report: (-5.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.959,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-2.239, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::42d;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pf1-x42d.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -99,61 +100,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Yonggang Luo <luoyonggang@gmail.com>,
+ =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 26/08/2020 20.43, Eduardo Habkost wrote:
-> This will make future conversion to use OBJECT_DECLARE* easier.
-> 
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> ---
-> Cc: Cornelia Huck <cohuck@redhat.com>
-> Cc: Halil Pasic <pasic@linux.ibm.com>
-> Cc: Christian Borntraeger <borntraeger@de.ibm.com>
-> Cc: Thomas Huth <thuth@redhat.com>
-> Cc: "Marc-André Lureau" <marcandre.lureau@redhat.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: qemu-s390x@nongnu.org
-> Cc: qemu-devel@nongnu.org
-> ---
->  hw/char/sclpconsole-lm.c | 2 +-
->  hw/char/sclpconsole.c    | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/char/sclpconsole-lm.c b/hw/char/sclpconsole-lm.c
-> index 2b5f37b6a2..5848b4e9c5 100644
-> --- a/hw/char/sclpconsole-lm.c
-> +++ b/hw/char/sclpconsole-lm.c
-> @@ -355,7 +355,7 @@ static void console_class_init(ObjectClass *klass, void *data)
->  }
->  
->  static const TypeInfo sclp_console_info = {
-> -    .name          = "sclplmconsole",
-> +    .name          = TYPE_SCLPLM_CONSOLE,
->      .parent        = TYPE_SCLP_EVENT,
->      .instance_size = sizeof(SCLPConsoleLM),
->      .class_init    = console_class_init,
-> diff --git a/hw/char/sclpconsole.c b/hw/char/sclpconsole.c
-> index 5c7664905e..d6f7da0818 100644
-> --- a/hw/char/sclpconsole.c
-> +++ b/hw/char/sclpconsole.c
-> @@ -271,7 +271,7 @@ static void console_class_init(ObjectClass *klass, void *data)
->  }
->  
->  static const TypeInfo sclp_console_info = {
-> -    .name          = "sclpconsole",
-> +    .name          = TYPE_SCLP_CONSOLE,
->      .parent        = TYPE_SCLP_EVENT,
->      .instance_size = sizeof(SCLPConsole),
->      .class_init    = console_class_init,
-> 
+From: Yonggang Luo <luoyonggang@gmail.com>=0D
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-
+msys2 environment=0D
+=0D
+*** BLURB HERE ***=0D
+=0D
+Yonggang Luo (6):=0D
+  meson: Fixes the ninjatool issue that E$$: are generated in=0D
+    Makefile.ninja=0D
+  meson: fixes relpath may fail on win32.=0D
+  meson: Mingw64 gcc doesn't recognize system include_type for sdl2=0D
+  configure: Fix include and linkage issue on msys2=0D
+  meson: Fixes ninjatool can not be recognized as script under=0D
+    Window/MSYS2=0D
+  meson: Convert undefsym.sh to undefsym.py=0D
+=0D
+ configure             | 28 ++++++++++++++-------=0D
+ meson.build           |  5 ++--=0D
+ scripts/mtest2make.py | 11 +++++++--=0D
+ scripts/ninjatool.py  |  2 +-=0D
+ scripts/undefsym.py   | 57 +++++++++++++++++++++++++++++++++++++++++++=0D
+ scripts/undefsym.sh   | 20 ---------------=0D
+ 6 files changed, 88 insertions(+), 35 deletions(-)=0D
+ create mode 100644 scripts/undefsym.py=0D
+ delete mode 100755 scripts/undefsym.sh=0D
+=0D
+-- =0D
+2.27.0.windows.1=0D
+=0D
 
