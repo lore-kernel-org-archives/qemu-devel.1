@@ -2,87 +2,86 @@ Return-Path: <SRS0=k4hX=CF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1B58C433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 10:11:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CBA9C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 10:21:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BE980207F7
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 10:11:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3849C2075B
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 10:21:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JVUmK0ng"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE980207F7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Lp0hR5gw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3849C2075B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33554 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36498 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBEsH-0001uB-1T
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 06:11:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39094)
+	id 1kBF2P-0003is-FL
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 06:21:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41298)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kBEqz-0000SC-S6
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 06:09:57 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:49698
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kBEqx-0000l7-RX
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 06:09:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598522993;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=TsBIZJLnVoaZxEs3CwZ2W3ho7vpt78LBeB2emBVihdk=;
- b=JVUmK0ng7QaMKRQeQI9SuBfvNy/rl2DGkQp8RI3Gy69tphg9cgvAUvpE/CBac2J3HStQtO
- NOaI9s3pQYDNH0AYVOpOxxlt9Ks4/plnUDHxphJnGgVFX0ssZQxUuOScYc+GPMx3KX1jmn
- ZubHLrILuGg9w9LhVu09f5qMqbFK1KQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-124-x2xG38TtPQum2AoqPBj7jg-1; Thu, 27 Aug 2020 06:09:49 -0400
-X-MC-Unique: x2xG38TtPQum2AoqPBj7jg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D6A828015FA;
- Thu, 27 Aug 2020 10:09:48 +0000 (UTC)
-Received: from localhost (ovpn-115-8.ams2.redhat.com [10.36.115.8])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6E1295D9CC;
- Thu, 27 Aug 2020 10:09:48 +0000 (UTC)
-Date: Thu, 27 Aug 2020 11:09:46 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: better file/line info for format string errors in trace events
-Message-ID: <20200827100946.GC16947@stefanha-x1.localdomain>
-References: <CAFEAcA9Z6V4ZkUfnpu-YY9AqU=YUK1Tb8cF-+4_CSPbGLbVHtQ@mail.gmail.com>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kBF1u-0003JW-0v
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 06:21:14 -0400
+Received: from mail-ej1-x62b.google.com ([2a00:1450:4864:20::62b]:45206)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kBF1q-00026Y-CR
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 06:21:13 -0400
+Received: by mail-ej1-x62b.google.com with SMTP id si26so6885347ejb.12
+ for <qemu-devel@nongnu.org>; Thu, 27 Aug 2020 03:21:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=NKWU+OOoiWBZuTEoC2pKTGjZu2CnQ+eY3iKC/pkfVxw=;
+ b=Lp0hR5gwxkP80IiW63Z4ulV5senJkyTBuH1aA8xUHBEUIlWaxGRRV2iBb8GRLcXjsl
+ 0pppg6owMPDrkpnWqQpeqHp7ZzzlQRfVBFm5gk8U9NL09sNMGMHXRU1ywSzX+bys+7Hy
+ yh0LvQCRKe8UkUfcf5DFNS8uZaHwL8w42aypICvAC+TAyug6etS9coIJOe6GxrFxI2OV
+ ay2rvQfwTTEi5QOiJj1Feno4iyCngNd5Hqa5uaCiLOmR5SmBJA7yj8oB9+ffYVHIMdc6
+ G6ZsSGkX9F1wbnc6wEDajsLbW7uzrai/F/cmtUfZYjWrDNdIVQQEeYfqzqCoDeTIj/Wv
+ 2uHA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=NKWU+OOoiWBZuTEoC2pKTGjZu2CnQ+eY3iKC/pkfVxw=;
+ b=NBT+Ug1tL9LbqmGhY87ZTN8jR25g1ZUjy5MA+URGq2S9qoaXBMWFp1yuNkKZe8xebF
+ fB17B2U1dqZr9Q+X65C9TKk41czKh6Hij7lslQSLlCW7p/dzFR8SjG5H+25+Z8GIoznY
+ OW05P+5CgZ9CjwaD7WP0GVAzcYftSJdJVqx7hFLAqJfp2F4axrLJnnnbL3G342qnZ7iJ
+ /CkM3rFZnXa0A8Y+LM4Y/RPouFkCd2Ju+XbmJeobjwBmx088AtkxKbtfm7kqiP3e64KY
+ irzPaJ6wcrVWLinNQv8/Hdho8SgDoQMqyoTpZu7L4LO4LA+9P1RPqmH+Udm2UdnQ/2P7
+ seGA==
+X-Gm-Message-State: AOAM532HUtYsbAeoPlBmKCMZ2O3CbNMia7BnWhYXCvZ3NZYXIpx5lXtC
+ 1k2cqmM+FkN+HgA/DZiEZ7a0jXnUyRHLqko4BUKKmw==
+X-Google-Smtp-Source: ABdhPJzGUTjMiNxv0+090avTXk6Bn9d6otwHJw6WByrNp4xcqdol4v0M97rmP/H3reF59LRUNrY7ceccPCI9rYmKfDU=
+X-Received: by 2002:a17:906:f28b:: with SMTP id
+ gu11mr19619000ejb.407.1598523668731; 
+ Thu, 27 Aug 2020 03:21:08 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9Z6V4ZkUfnpu-YY9AqU=YUK1Tb8cF-+4_CSPbGLbVHtQ@mail.gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="vEao7xgI/oilGqZ+"
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=stefanha@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 00:13:19
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.959,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+References: <20200826211345.14295-1-deller@gmx.de>
+In-Reply-To: <20200826211345.14295-1-deller@gmx.de>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 27 Aug 2020 11:20:56 +0100
+Message-ID: <CAFEAcA8bGLdjfJFd0WFWozv=6_wALSO7pz-AVNAKt3dZ38_sXg@mail.gmail.com>
+Subject: Re: [PULL v5 00/12] The following changes since commit
+ 3461487523b897d324e8d91f3fd20ed55f849544:
+To: Helge Deller <deller@gmx.de>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::62b;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x62b.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -96,64 +95,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---vEao7xgI/oilGqZ+
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Wed, 26 Aug 2020 at 22:13, Helge Deller <deller@gmx.de> wrote:
+>
+>   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20200727' into staging (2020-07-28 18:43:48 +0100)
+>
+> are available in the Git repository at:
+>
+>   git@github.com:hdeller/qemu-hppa.git tags/target-hppa-v3-pull-request
+>
+> for you to fetch changes up to 2f8cd515477edab1cbf38ecbdbfa2cac13ce1550:
+>
+>   hw/display/artist: Fix invalidation of lines near screen border (2020-08-26 23:04:00 +0200)
+>
+> ----------------------------------------------------------------
+> artist out of bounds fixes
+>
 
-On Tue, Aug 25, 2020 at 10:49:08PM +0100, Peter Maydell wrote:
-> If you have a format string error in a trace event it fails
-> like this:
->=20
-> In file included from ../../hw/block/trace.h:1:0,
->                  from ../../hw/block/fdc.c:48:
-> ./trace/trace-hw_block.h: In function '_nocheck__trace_pci_nvme_err_mdts'=
-:
-> ./trace/trace-hw_block.h:2162:18: error: format '%llu' expects
-> argument of type 'long long unsigned int', but argument 6 has type
-> 'size_t {aka unsigned int}' [-Werror=3Dformat=3D]
->          qemu_log("%d@%zu.%06zu:pci_nvme_err_mdts " "cid %"PRIu16" len
-> %"PRIu64"" "\n",
->                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> In file included from /home/peter.maydell/qemu/include/qemu/osdep.h:89:0,
->                  from ../../hw/block/fdc.c:30:
-> /usr/include/inttypes.h:105:34: note: format string is defined here
->  # define PRIu64  __PRI64_PREFIX "u"
->=20
->=20
-> which doesn't anywhere give the filename where the format
-> string is actually defined (hw/block/trace-events in this case),
-> let alone the line number in that file of the trace event.
->=20
-> Bit of a long shot, but I don't suppose it's possible for the
-> tracing subsystem to give more targeted error messages in this
-> situation ?
 
-I will send a patch to make tracetool emit #line directives:
-https://gcc.gnu.org/onlinedocs/gcc-10.2.0/cpp/Line-Control.html
+Applied, thanks.
 
-Stefan
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.2
+for any user-visible changes.
 
---vEao7xgI/oilGqZ+
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl9HhmoACgkQnKSrs4Gr
-c8jUvQf/fw+G/AdHW2soKrzAuYAtVAAngK+XwSwqvuXwPVe7hcWHqwWnHNVYid5/
-dFYhKSb4E4vrvO3Bbf40GxkeqsTO9Z5TmzUDlmxx/dJJZgA5sdo2LWSdW5JW8XwE
-DIml9agvx/ibxKP8AoFIDfocwznY/iQcRO+GCWZho4Qlya17O1euPx+xSVcBgHek
-EEwUjkxrnwerBqQDjoMMN/o57OfXvTQ8AS31ws5FJgXNED12kRjWUBSk1WjfVKnL
-/aZqDiyA/3+f66y3XwiCNHBGe93lx6L/XCi+rJr4yBI2z5DPCcg6LCysZyqtRE94
-oKWR4B3rMhvWAETvHrGH6baHvbottA==
-=jk07
------END PGP SIGNATURE-----
-
---vEao7xgI/oilGqZ+--
-
+-- PMM
 
