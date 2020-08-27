@@ -2,71 +2,91 @@ Return-Path: <SRS0=k4hX=CF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C28DCC433E3
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 08:03:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B00CCC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 08:08:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9A59022BF3
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 08:03:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A59022BF3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 78FEF20786
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 08:08:10 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P0RierbB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78FEF20786
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33584 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38526 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBCsL-0007b8-P1
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 04:03:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39200)
+	id 1kBCx7-0001N1-Jo
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 04:08:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40540)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
- id 1kBCrA-0006sq-6n
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 04:02:00 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:53654 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
- id 1kBCr3-0001pe-85
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 04:01:59 -0400
-Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id C298FFC916B0C5525B0C;
- Thu, 27 Aug 2020 16:01:47 +0800 (CST)
-Received: from [127.0.0.1] (10.174.186.4) by DGGEMS410-HUB.china.huawei.com
- (10.3.19.210) with Microsoft SMTP Server id 14.3.487.0; Thu, 27 Aug 2020
- 16:01:37 +0800
-Subject: Re: [PATCH v5 09/12] migration/dirtyrate: Implement
- get_sample_page_period() and block_sample_page_period()
-To: David Edmondson <dme@dme.org>, <quintela@redhat.com>, <eblake@redhat.com>, 
- <dgilbert@redhat.com>, <berrange@redhat.com>
-References: <1598260480-64862-1-git-send-email-zhengchuan@huawei.com>
- <1598260480-64862-10-git-send-email-zhengchuan@huawei.com>
- <m23649lni4.fsf@dme.org>
-From: Zheng Chuan <zhengchuan@huawei.com>
-Message-ID: <c044b58d-a211-9494-70f1-2648c7891576@huawei.com>
-Date: Thu, 27 Aug 2020 16:01:37 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kBCwa-0000x2-Vp
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 04:07:36 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:33784)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kBCwY-0002T5-0B
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 04:07:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1598515652;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=wbP7kfHwpttC44PD2HhEMLj3p9a3d3zF8ybkWyFsE4k=;
+ b=P0RierbBBSGi4tQpA8eGYcHqDSerDu4hm5Gt2TrVibYWxFnvsYD69oj770Q6xjK3Pd2j77
+ N3lIL08agihD/OBoavpp8ikFU/iV2L8MWidLxSkh9q4pD1fFeSfj2XVEc+POMItd5NZ+Ef
+ yl97AAWLzaCt9fcKiYrPwfVyJG+E8pk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-388-yVfgykO_O7uQ7_2djt8hvw-1; Thu, 27 Aug 2020 04:07:28 -0400
+X-MC-Unique: yVfgykO_O7uQ7_2djt8hvw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8FEAC873155;
+ Thu, 27 Aug 2020 08:07:27 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-56.ams2.redhat.com [10.36.112.56])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id AF31E712EB;
+ Thu, 27 Aug 2020 08:07:22 +0000 (UTC)
+Subject: Re: [PATCH v3 28/74] s390x: Move typedef SCLPEventFacility to
+ event-facility.h
+To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
+References: <20200825192110.3528606-1-ehabkost@redhat.com>
+ <20200825192110.3528606-29-ehabkost@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <11f256cd-3044-8ac6-d64b-b079430fcd47@redhat.com>
+Date: Thu, 27 Aug 2020 10:07:21 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <m23649lni4.fsf@dme.org>
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20200825192110.3528606-29-ehabkost@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.186.4]
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.32; envelope-from=zhengchuan@huawei.com;
- helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 02:28:14
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -63
-X-Spam_score: -6.4
-X-Spam_bar: ------
-X-Spam_report: (-6.4 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-2.239,
- RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=thuth@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 02:54:02
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -52
+X-Spam_score: -5.3
+X-Spam_bar: -----
+X-Spam_report: (-5.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.959,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-2.239, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -79,89 +99,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: zhang.zhanghailiang@huawei.com, qemu-devel@nongnu.org,
- xiexiangyou@huawei.com, alex.chen@huawei.com, ann.zhuangyanying@huawei.com,
- fangying1@huawei.com
+Cc: "Daniel P. Berrange" <berrange@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 25/08/2020 21.20, Eduardo Habkost wrote:
+> This will make future conversion to OBJECT_DECLARE* easier.
+> 
+> In sclp.h, use "struct SCLPEventFacility" to avoid introducing
+> unnecessary header dependencies.
+> 
+> Acked-by: Cornelia Huck <cohuck@redhat.com>
+> Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> ---
+> Changes v2 -> v3: none
+> 
+> Changes series v1 -> v2: new patch in series v2
+> 
+> Cc: Cornelia Huck <cohuck@redhat.com>
+> Cc: Halil Pasic <pasic@linux.ibm.com>
+> Cc: Christian Borntraeger <borntraeger@de.ibm.com>
+> Cc: Thomas Huth <thuth@redhat.com>
+> Cc: qemu-s390x@nongnu.org
+> Cc: qemu-devel@nongnu.org
+> ---
+>  include/hw/s390x/event-facility.h | 1 +
+>  include/hw/s390x/sclp.h           | 4 ++--
+>  2 files changed, 3 insertions(+), 2 deletions(-)
+> 
+> diff --git a/include/hw/s390x/event-facility.h b/include/hw/s390x/event-facility.h
+> index 700a610f33..e61c4651d7 100644
+> --- a/include/hw/s390x/event-facility.h
+> +++ b/include/hw/s390x/event-facility.h
+> @@ -195,6 +195,7 @@ typedef struct SCLPEventClass {
+>  } SCLPEventClass;
+>  
+>  #define TYPE_SCLP_EVENT_FACILITY "s390-sclp-event-facility"
+> +typedef struct SCLPEventFacility SCLPEventFacility;
+>  #define EVENT_FACILITY(obj) \
+>       OBJECT_CHECK(SCLPEventFacility, (obj), TYPE_SCLP_EVENT_FACILITY)
+>  #define EVENT_FACILITY_CLASS(klass) \
+> diff --git a/include/hw/s390x/sclp.h b/include/hw/s390x/sclp.h
+> index 822eff4396..a87ed2a0ab 100644
+> --- a/include/hw/s390x/sclp.h
+> +++ b/include/hw/s390x/sclp.h
+> @@ -185,12 +185,12 @@ typedef struct SCCB {
+>  #define SCLP_CLASS(oc) OBJECT_CLASS_CHECK(SCLPDeviceClass, (oc), TYPE_SCLP)
+>  #define SCLP_GET_CLASS(obj) OBJECT_GET_CLASS(SCLPDeviceClass, (obj), TYPE_SCLP)
+>  
+> -typedef struct SCLPEventFacility SCLPEventFacility;
+> +struct SCLPEventFacility;
+>  
+>  typedef struct SCLPDevice {
+>      /* private */
+>      DeviceState parent_obj;
+> -    SCLPEventFacility *event_facility;
+> +    struct SCLPEventFacility *event_facility;
+>      int increment_size;
+>  
+>      /* public */
+> 
 
-
-On 2020/8/26 18:17, David Edmondson wrote:
-> On Monday, 2020-08-24 at 17:14:37 +08, Chuan Zheng wrote:
-> 
->> Implement get_sample_page_period() and set_sample_page_period() to
->> sleep specific time between sample actions.
->>
->> Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
->> ---
->>  migration/dirtyrate.c | 24 ++++++++++++++++++++++++
->>  migration/dirtyrate.h |  2 ++
->>  2 files changed, 26 insertions(+)
->>
->> diff --git a/migration/dirtyrate.c b/migration/dirtyrate.c
->> index bd398b7..d1c0a78 100644
->> --- a/migration/dirtyrate.c
->> +++ b/migration/dirtyrate.c
->> @@ -28,6 +28,30 @@
->>  static int CalculatingState = DIRTY_RATE_STATUS_UNSTARTED;
->>  static struct DirtyRateStat DirtyStat;
->>  
->> +static int64_t set_sample_page_period(int64_t msec, int64_t initial_time)
->> +{
->> +    int64_t current_time;
->> +
->> +    current_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
->> +    if ((current_time - initial_time) >= msec) {
->> +        msec = current_time - initial_time;
->> +    } else {
->> +        g_usleep((msec + initial_time - current_time) * 1000);
->> +    }
->> +
->> +    return msec;
->> +}
->> +
->> +static int64_t get_sample_page_period(int64_t sec)
->> +{
->> +    if (sec <= MIN_FETCH_DIRTYRATE_TIME_SEC ||
-> 
-> Shouldn't the minimum value be allowed?
-> 
-> That is, this test should be "sec < MIN_FETCH_DIRTYRATE_TIME_SEC" and
-> MIN_FETCH_DIRTYRATE_TIME_SEC should be 1.
-> 
-Well, Actually we could measure dirtyrate within duration below 1s, like 0.5s.
-Howerver, I am reconsider that maybe taking 0.5s as MIN_FETCH_DIRTYRATE_TIME_SEC is better in case of someone to do nasty thing like setting
-a meaningless time duration which is close to 0:)
-
->> +        sec > MAX_FETCH_DIRTYRATE_TIME_SEC) {
->> +        sec = DEFAULT_FETCH_DIRTYRATE_TIME_SEC;
->> +    }
->> +
->> +    return sec;
->> +}
->> +
->>  static int dirtyrate_set_state(int *state, int old_state, int new_state)
->>  {
->>      assert(new_state < DIRTY_RATE_STATUS__MAX);
->> diff --git a/migration/dirtyrate.h b/migration/dirtyrate.h
->> index 41bc264..50a5636 100644
->> --- a/migration/dirtyrate.h
->> +++ b/migration/dirtyrate.h
->> @@ -51,6 +51,8 @@
->>  
->>  /* Take 1s as default for calculation duration */
->>  #define DEFAULT_FETCH_DIRTYRATE_TIME_SEC          1
->> +#define MIN_FETCH_DIRTYRATE_TIME_SEC              0
->> +#define MAX_FETCH_DIRTYRATE_TIME_SEC              60
->>  
->>  struct DirtyRateConfig {
->>      uint64_t sample_pages_per_gigabytes; /* sample pages per GB */
->> -- 
->> 1.8.3.1
-> 
-> dme.
-> 
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
 
