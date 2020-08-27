@@ -2,48 +2,51 @@ Return-Path: <SRS0=k4hX=CF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F12C4C433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 12:43:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BDC59C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 12:43:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C70212177B
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 12:43:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C70212177B
+	by mail.kernel.org (Postfix) with ESMTPS id 980E62177B
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 12:43:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 980E62177B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55194 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55346 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBHFR-0007qt-UY
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 08:43:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58916)
+	id 1kBHFT-0007ue-SM
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 08:43:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58990)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ysato@users.sourceforge.jp>)
- id 1kBHBQ-0007xK-PQ
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 08:39:12 -0400
-Received: from mail03.asahi-net.or.jp ([202.224.55.15]:39205)
+ id 1kBHBS-000800-RF
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 08:39:14 -0400
+Received: from mail03.asahi-net.or.jp ([202.224.55.15]:39222)
  by eggs.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ysato@users.sourceforge.jp>) id 1kBHBN-0005u4-UP
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 08:39:12 -0400
+ (envelope-from <ysato@users.sourceforge.jp>) id 1kBHBO-0005wU-AR
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 08:39:14 -0400
 Received: from sakura.ysato.name (ik1-413-38519.vs.sakura.ne.jp
  [153.127.30.23]) (Authenticated sender: PQ4Y-STU)
- by mail03.asahi-net.or.jp (Postfix) with ESMTPA id 60E8126938;
- Thu, 27 Aug 2020 21:39:05 +0900 (JST)
+ by mail03.asahi-net.or.jp (Postfix) with ESMTPA id 5EA3D26A0D;
+ Thu, 27 Aug 2020 21:39:09 +0900 (JST)
 Received: from yo-satoh-debian.localdomain (ZM005235.ppp.dion.ne.jp
  [222.8.5.235])
- by sakura.ysato.name (Postfix) with ESMTPSA id CFEF01C0696;
- Thu, 27 Aug 2020 21:39:04 +0900 (JST)
+ by sakura.ysato.name (Postfix) with ESMTPSA id 167771C0792;
+ Thu, 27 Aug 2020 21:39:09 +0900 (JST)
 From: Yoshinori Sato <ysato@users.sourceforge.jp>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 00/20] RX target update
-Date: Thu, 27 Aug 2020 21:38:39 +0900
-Message-Id: <20200827123859.81793-1-ysato@users.sourceforge.jp>
+Subject: [PATCH 17/20] hw/rx/rx62n: Add Ethernet support.
+Date: Thu, 27 Aug 2020 21:38:56 +0900
+Message-Id: <20200827123859.81793-18-ysato@users.sourceforge.jp>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200827123859.81793-1-ysato@users.sourceforge.jp>
+References: <20200827123859.81793-1-ysato@users.sourceforge.jp>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Received-SPF: softfail client-ip=202.224.55.15;
@@ -72,102 +75,121 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hello.
-This series Renesas RX updates.
+Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
+---
+ include/hw/rx/rx62n.h |  3 +++
+ hw/rx/rx62n.c         | 26 ++++++++++++++++++++++++++
+ hw/rx/Kconfig         |  3 ++-
+ 3 files changed, 31 insertions(+), 1 deletion(-)
 
-It consists of the following contents.
-* Update firmware loader.
-* Rewrite peripheal modules (Timer and SCI).
-  - Unified SH4 module.
-  - Using clock API
-* New peripheal modules.
-  - On-chip clock generator.
-  - Multi-function timer.
-  - Ethernet MAC.
-* New real hardware target.
-  - TokushudenshiKairo TKDN-RX62N-BRD.
-  - CQ publishing CQ-FRK-RX62N
-
-Yoshinori Sato (20):
-  loader.c: Add support Motrola S-record format.
-  include/elf.h: Add EM_RX.
-  hw/rx: Firmware and kernel loader.
-  hw/rx: New firmware loader.
-  hw/rx: Add RX62N Clock generator
-  hw/timer: Renesas 8bit timer emulation.
-  hw/rx: RX62N convert new 8bit timer.
-  hw/timer: Renesas TMU/CMT module.
-  hw/timer: Remove renesas_cmt.
-  hw/rx: Convert to renesas_timer
-  hw/char: Renesas SCI module.
-  hw/rx/rx62n: Use New SCI module.
-  hw/timer: Add Renesas MTU2
-  hw/rx/rx62n: RX62N Add MTU module
-  hw/net: Add generic Bit-bang MDIO PHY.
-  hw/net: Add Renesas On-chip Ethernet MAC
-  hw/rx/rx62n: Add Ethernet support.
-  hw/rx: Add Tokudenkairo TKDN-RX62N-BRD
-  hw/rx: Add CQ-FRK-RX62N target
-  MAINTAINERS: Update RX entry
-
- default-configs/rx-softmmu.mak   |    2 +
- include/elf.h                    |    2 +
- include/hw/char/renesas_sci.h    |  129 ++-
- include/hw/loader.h              |   14 +
- include/hw/net/mdio.h            |  126 +++
- include/hw/net/renesas_eth.h     |   57 ++
- include/hw/rx/loader.h           |   35 +
- include/hw/rx/rx62n-cpg.h        |   72 ++
- include/hw/rx/rx62n.h            |   36 +-
- include/hw/timer/renesas_cmt.h   |   40 -
- include/hw/timer/renesas_mtu.h   |   90 ++
- include/hw/timer/renesas_timer.h |  103 +++
- include/hw/timer/renesas_tmr.h   |   55 --
- include/hw/timer/renesas_tmr8.h  |   67 ++
- hw/char/renesas_sci.c            | 1040 ++++++++++++++++++-----
- hw/core/loader.c                 |  208 +++++
- hw/net/mdio.c                    |  264 ++++++
- hw/net/renesas_eth.c             |  875 ++++++++++++++++++++
- hw/rx/cq-frk-rx62n.c             |   94 +++
- hw/rx/loader.c                   |  182 +++++
- hw/rx/rx-gdbsim.c                |   98 +--
- hw/rx/rx62n-cpg.c                |  344 ++++++++
- hw/rx/rx62n.c                    |  140 ++--
- hw/rx/tkdn-rx62n.c               |  192 +++++
- hw/timer/renesas_cmt.c           |  283 -------
- hw/timer/renesas_mtu.c           | 1312 ++++++++++++++++++++++++++++++
- hw/timer/renesas_timer.c         |  639 +++++++++++++++
- hw/timer/renesas_tmr.c           |  477 -----------
- hw/timer/renesas_tmr8.c          |  540 ++++++++++++
- MAINTAINERS                      |    2 +
- hw/net/Kconfig                   |    8 +
- hw/net/meson.build               |    3 +
- hw/rx/Kconfig                    |   16 +-
- hw/rx/meson.build                |    5 +-
- hw/timer/Kconfig                 |    9 +-
- hw/timer/meson.build             |    5 +-
- 36 files changed, 6391 insertions(+), 1173 deletions(-)
- create mode 100644 include/hw/net/mdio.h
- create mode 100644 include/hw/net/renesas_eth.h
- create mode 100644 include/hw/rx/loader.h
- create mode 100644 include/hw/rx/rx62n-cpg.h
- delete mode 100644 include/hw/timer/renesas_cmt.h
- create mode 100644 include/hw/timer/renesas_mtu.h
- create mode 100644 include/hw/timer/renesas_timer.h
- delete mode 100644 include/hw/timer/renesas_tmr.h
- create mode 100644 include/hw/timer/renesas_tmr8.h
- create mode 100644 hw/net/mdio.c
- create mode 100644 hw/net/renesas_eth.c
- create mode 100644 hw/rx/cq-frk-rx62n.c
- create mode 100644 hw/rx/loader.c
- create mode 100644 hw/rx/rx62n-cpg.c
- create mode 100644 hw/rx/tkdn-rx62n.c
- delete mode 100644 hw/timer/renesas_cmt.c
- create mode 100644 hw/timer/renesas_mtu.c
- create mode 100644 hw/timer/renesas_timer.c
- delete mode 100644 hw/timer/renesas_tmr.c
- create mode 100644 hw/timer/renesas_tmr8.c
-
+diff --git a/include/hw/rx/rx62n.h b/include/hw/rx/rx62n.h
+index 170c8cb6fc..4f11ca3fd9 100644
+--- a/include/hw/rx/rx62n.h
++++ b/include/hw/rx/rx62n.h
+@@ -30,6 +30,7 @@
+ #include "hw/timer/renesas_timer.h"
+ #include "hw/timer/renesas_mtu.h"
+ #include "hw/char/renesas_sci.h"
++#include "hw/net/renesas_eth.h"
+ #include "hw/rx/rx62n-cpg.h"
+ #include "qemu/units.h"
+ 
+@@ -74,6 +75,8 @@ typedef struct RX62NState {
+     RenesasCMTState cmt[RX62N_NR_CMT];
+     RenesasMTU2State mtu[RX62N_NR_MTU];
+     RSCIAState sci[RX62N_NR_SCI];
++    RenesasEthState ether;
++    MDIOState *mdio;
+     RX62NCPGState cpg;
+ 
+     MemoryRegion *sysmem;
+diff --git a/hw/rx/rx62n.c b/hw/rx/rx62n.c
+index 344be846bc..8b41cdf90c 100644
+--- a/hw/rx/rx62n.c
++++ b/hw/rx/rx62n.c
+@@ -28,6 +28,7 @@
+ #include "hw/loader.h"
+ #include "hw/sysbus.h"
+ #include "hw/qdev-properties.h"
++#include "hw/net/mdio.h"
+ #include "sysemu/sysemu.h"
+ #include "sysemu/qtest.h"
+ #include "cpu.h"
+@@ -48,6 +49,8 @@
+ #define RX62N_CMT_BASE  0x00088000
+ #define RX62N_MTU_BASE  0x00088600
+ #define RX62N_SCI_BASE  0x00088240
++#define RX62N_EDMAC_BASE 0x000c0000
++#define RX62N_ETHER_BASE 0x000c0100
+ #define RX62N_CPG_BASE  0x00080010
+ 
+ /*
+@@ -58,6 +61,7 @@
+ #define RX62N_CMT_IRQ   28
+ #define RX62N_MTU_IRQ   114
+ #define RX62N_SCI_IRQ   214
++#define RX62N_EDMAC_IRQ 32
+ 
+ /*
+  * IRQ -> IPR mapping table
+@@ -236,6 +240,25 @@ static void register_sci(RX62NState *s, int unit)
+                           qdev_get_clock_out(DEVICE(&s->cpg), ckname));
+ }
+ 
++static void register_eth(RX62NState *s, NICInfo *nd)
++{
++    SysBusDevice *etherc;
++
++    qemu_check_nic_model(nd, TYPE_RENESAS_ETH);
++    object_initialize_child(OBJECT(s), "ether",
++                            &s->ether, TYPE_RENESAS_ETH);
++    etherc = SYS_BUS_DEVICE(&s->ether);
++    qdev_set_nic_properties(DEVICE(etherc), nd);
++    object_property_set_link(OBJECT(etherc), "mdio",
++                             OBJECT(s->mdio), &error_abort);
++    sysbus_realize(etherc, &error_abort);
++    sysbus_connect_irq(etherc, 0, s->irq[RX62N_EDMAC_IRQ]);
++    sysbus_mmio_map(etherc, 0, RX62N_ETHER_BASE);
++    sysbus_mmio_map(etherc, 1, RX62N_EDMAC_BASE);
++    qdev_connect_clock_in(DEVICE(etherc), "ick",
++                          qdev_get_clock_out(DEVICE(&s->cpg), "ick_edmac"));
++}
++
+ static void register_cpg(RX62NState *s)
+ {
+     SysBusDevice *cpg;
+@@ -277,6 +300,7 @@ static void rx62n_realize(DeviceState *dev, Error **errp)
+     register_mtu(s, 0);
+     register_mtu(s, 1);
+     register_sci(s, 0);
++    register_eth(s, nd_table);
+     sysbus_realize(SYS_BUS_DEVICE(&s->cpg), &error_abort);
+ }
+ 
+@@ -284,6 +308,8 @@ static Property rx62n_properties[] = {
+     DEFINE_PROP_LINK("main-bus", RX62NState, sysmem, TYPE_MEMORY_REGION,
+                      MemoryRegion *),
+     DEFINE_PROP_UINT32("xtal-frequency-hz", RX62NState, xtal_freq_hz, 0),
++    DEFINE_PROP_LINK("mdiodev", RX62NState, mdio, TYPE_ETHER_MDIO_BB,
++                     MDIOState *),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
+diff --git a/hw/rx/Kconfig b/hw/rx/Kconfig
+index 887a5782bb..f20ea63fd9 100644
+--- a/hw/rx/Kconfig
++++ b/hw/rx/Kconfig
+@@ -3,8 +3,9 @@ config RX62N_MCU
+     select RX_ICU
+     select RENESAS_TMR8
+     select RENESAS_TIMER
+-    select RENESAS_SCI
+     select RENESAS_MTU
++    select RENESAS_SCI
++    select RENESAS_ETH
+ 
+ config RX_GDBSIM
+     bool
 -- 
 2.20.1
 
