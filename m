@@ -2,48 +2,48 @@ Return-Path: <SRS0=k4hX=CF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77E18C433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 12:44:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BEF1C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 12:45:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 499AC2177B
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 12:44:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 499AC2177B
+	by mail.kernel.org (Postfix) with ESMTPS id E2B7222B4B
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 12:45:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2B7222B4B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58590 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35272 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBHGB-0000mr-F0
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 08:44:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59068)
+	id 1kBHHU-0002nr-5H
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 08:45:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59006)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ysato@users.sourceforge.jp>)
- id 1kBHBV-00087P-D0
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 08:39:17 -0400
-Received: from mail01.asahi-net.or.jp ([202.224.55.13]:47908)
+ id 1kBHBT-000825-GT
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 08:39:15 -0400
+Received: from mail01.asahi-net.or.jp ([202.224.55.13]:47889)
  by eggs.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ysato@users.sourceforge.jp>) id 1kBHBR-0005xg-F8
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 08:39:16 -0400
+ (envelope-from <ysato@users.sourceforge.jp>) id 1kBHBO-0005vN-BQ
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 08:39:15 -0400
 Received: from sakura.ysato.name (ik1-413-38519.vs.sakura.ne.jp
  [153.127.30.23]) (Authenticated sender: PQ4Y-STU)
- by mail01.asahi-net.or.jp (Postfix) with ESMTPA id F28311086DC;
+ by mail01.asahi-net.or.jp (Postfix) with ESMTPA id 5E1B41086BE;
  Thu, 27 Aug 2020 21:39:07 +0900 (JST)
 Received: from yo-satoh-debian.localdomain (ZM005235.ppp.dion.ne.jp
  [222.8.5.235])
- by sakura.ysato.name (Postfix) with ESMTPSA id B20451C0696;
+ by sakura.ysato.name (Postfix) with ESMTPSA id 36E431C0696;
  Thu, 27 Aug 2020 21:39:07 +0900 (JST)
 From: Yoshinori Sato <ysato@users.sourceforge.jp>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 12/20] hw/rx/rx62n: Use New SCI module.
-Date: Thu, 27 Aug 2020 21:38:51 +0900
-Message-Id: <20200827123859.81793-13-ysato@users.sourceforge.jp>
+Subject: [PATCH 10/20] hw/rx: Convert to renesas_timer
+Date: Thu, 27 Aug 2020 21:38:49 +0900
+Message-Id: <20200827123859.81793-11-ysato@users.sourceforge.jp>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200827123859.81793-1-ysato@users.sourceforge.jp>
 References: <20200827123859.81793-1-ysato@users.sourceforge.jp>
@@ -77,52 +77,45 @@ Sender: "Qemu-devel"
 
 Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
 ---
- include/hw/rx/rx62n.h | 2 +-
- hw/rx/rx62n.c         | 7 ++++++-
- 2 files changed, 7 insertions(+), 2 deletions(-)
+ include/hw/rx/rx62n.h | 4 ++--
+ hw/rx/Kconfig         | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/include/hw/rx/rx62n.h b/include/hw/rx/rx62n.h
-index 1182ca24de..f463148799 100644
+index 75945bae50..1182ca24de 100644
 --- a/include/hw/rx/rx62n.h
 +++ b/include/hw/rx/rx62n.h
-@@ -70,7 +70,7 @@ typedef struct RX62NState {
+@@ -27,7 +27,7 @@
+ #include "target/rx/cpu.h"
+ #include "hw/intc/rx_icu.h"
+ #include "hw/timer/renesas_tmr8.h"
+-#include "hw/timer/renesas_cmt.h"
++#include "hw/timer/renesas_timer.h"
+ #include "hw/char/renesas_sci.h"
+ #include "hw/rx/rx62n-cpg.h"
+ #include "qemu/units.h"
+@@ -69,7 +69,7 @@ typedef struct RX62NState {
+     RXCPU cpu;
      RXICUState icu;
      RenesasTMR8State tmr[RX62N_NR_TMR];
-     RenesasCMTState cmt[RX62N_NR_CMT];
--    RSCIState sci[RX62N_NR_SCI];
-+    RSCIAState sci[RX62N_NR_SCI];
+-    RCMTState cmt[RX62N_NR_CMT];
++    RenesasCMTState cmt[RX62N_NR_CMT];
+     RSCIState sci[RX62N_NR_SCI];
      RX62NCPGState cpg;
  
-     MemoryRegion *sysmem;
-diff --git a/hw/rx/rx62n.c b/hw/rx/rx62n.c
-index 0223396110..f61383a4c2 100644
---- a/hw/rx/rx62n.c
-+++ b/hw/rx/rx62n.c
-@@ -191,11 +191,13 @@ static void register_sci(RX62NState *s, int unit)
- {
-     SysBusDevice *sci;
-     int i, irqbase;
-+    char ckname[16];
+diff --git a/hw/rx/Kconfig b/hw/rx/Kconfig
+index 0406f27bee..d1812870ea 100644
+--- a/hw/rx/Kconfig
++++ b/hw/rx/Kconfig
+@@ -2,7 +2,7 @@ config RX62N_MCU
+     bool
+     select RX_ICU
+     select RENESAS_TMR8
+-    select RENESAS_CMT
++    select RENESAS_TIMER
+     select RENESAS_SCI
  
-     object_initialize_child(OBJECT(s), "sci[*]",
--                            &s->sci[unit], TYPE_RENESAS_SCI);
-+                            &s->sci[unit], TYPE_RENESAS_SCIA);
-     sci = SYS_BUS_DEVICE(&s->sci[unit]);
-     qdev_prop_set_chr(DEVICE(sci), "chardev", serial_hd(unit));
-+    qdev_prop_set_uint32(DEVICE(sci), "unit", unit);
-     sysbus_realize(sci, &error_abort);
- 
-     irqbase = RX62N_SCI_IRQ + SCI_NR_IRQ * unit;
-@@ -203,6 +205,9 @@ static void register_sci(RX62NState *s, int unit)
-         sysbus_connect_irq(sci, i, s->irq[irqbase + i]);
-     }
-     sysbus_mmio_map(sci, 0, RX62N_SCI_BASE + unit * 0x08);
-+    snprintf(ckname, sizeof(ckname), "pck_sci-%d", unit);
-+    qdev_connect_clock_in(DEVICE(sci), "pck",
-+                          qdev_get_clock_out(DEVICE(&s->cpg), ckname));
- }
- 
- static void register_cpg(RX62NState *s)
+ config RX_GDBSIM
 -- 
 2.20.1
 
