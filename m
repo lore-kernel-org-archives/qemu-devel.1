@@ -2,89 +2,75 @@ Return-Path: <SRS0=k4hX=CF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 493ACC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 19:26:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF817C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 19:27:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EB52F2087E
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 19:26:51 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QJYR3jzZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB52F2087E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 842A9207DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 19:27:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 842A9207DF
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57758 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59688 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBNXv-0007la-4N
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 15:26:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33964)
+	id 1kBNYA-00008d-MT
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 15:27:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33486)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kBNTF-0006ev-19
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 15:22:01 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:22499
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kBNTA-0000NT-Lw
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 15:22:00 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598556115;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=vMdcVRwhQd9CouGEQ6Nwb6Zou1IpZmtonS7yQKdyIqI=;
- b=QJYR3jzZwbbXb29OFdocAWMZ9u2Qj8wtUEiPdQbj0k+Gu1ZGZEJcUXAT5pNFiU+BVkCnRg
- uYDlSXMhYd/An6XbmXACVd/zQ1JXEZuGwiIin+AtnTkRnkTkxpLaphOcFTmXxJ+gsnnMRh
- ka9107j7NnidypWv1kc2e8go7WC6q2A=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-299-PxMRfwl-Oam7upEgykw6Xw-1; Thu, 27 Aug 2020 15:21:43 -0400
-X-MC-Unique: PxMRfwl-Oam7upEgykw6Xw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 24D748018A4;
- Thu, 27 Aug 2020 19:21:42 +0000 (UTC)
-Received: from localhost (unknown [10.10.67.254])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 18A2519D61;
- Thu, 27 Aug 2020 19:21:40 +0000 (UTC)
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: qemu-devel@nongnu.org,
-	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL 07/53] aspeed_soc: Rename memmap/irqmap enum constants
-Date: Thu, 27 Aug 2020 15:20:36 -0400
-Message-Id: <20200827192122.658035-8-ehabkost@redhat.com>
-In-Reply-To: <20200827192122.658035-1-ehabkost@redhat.com>
-References: <20200827192122.658035-1-ehabkost@redhat.com>
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kBNS2-00049B-Ly
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 15:20:46 -0400
+Received: from mout.kundenserver.de ([217.72.192.75]:49831)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kBNRz-0000EV-5c
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 15:20:46 -0400
+Received: from localhost.localdomain ([82.252.135.186]) by
+ mrelayeu.kundenserver.de (mreue109 [212.227.15.183]) with ESMTPSA (Nemesis)
+ id 1MWRZt-1k5jFC2c3v-00Xsar; Thu, 27 Aug 2020 21:20:34 +0200
+From: Laurent Vivier <laurent@vivier.eu>
+To: qemu-devel@nongnu.org
+Subject: [PULL 08/18] linux-user: Add strace support for printing arguments of
+ some clock and time functions
+Date: Thu, 27 Aug 2020 21:20:08 +0200
+Message-Id: <20200827192018.2442099-9-laurent@vivier.eu>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200827192018.2442099-1-laurent@vivier.eu>
+References: <20200827192018.2442099-1-laurent@vivier.eu>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=ehabkost@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 00:53:04
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.959,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Provags-ID: V03:K1:NB9938P+5opmnSzFZMuNXxDKGGhWCw6l5FGZtDqM5ZSbPCAW559
+ 3FnRcJGlKwt2cZHDrEkTtdsNLw+ZzLbmvI8eRWhe96Mojn+zUOlMWv8vXhSE+I/P7t+G91B
+ 9y7PWpWOd/p/xV+VQSrkQf77d6J2FXxmmRVNhXlRAXSCfUGGCrJ2IxpNPD2b/qQhW7dd0tA
+ A1sqjTjolCreJ6Dtvst7A==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:ZQX412ckV8k=:o9DBYbd/avRQ2Cdacs7nug
+ /OqYFE5LUbnRbGUOrl+VPakdMc8YVCXG445Or1vO0xWAfLN06qs9j8N/bagy/gUtJBFY/opOD
+ Rtpw1wezpEYDbFOGkkDFZc2tlr2GJ/dj+JSDzxH7bZ584eNRX6cAMwT2ejOWfy2w20BnJ4bGv
+ w1GWCHRlB/sHAyuWfczTR7oLLTCPdJkWM2xbbal+8bH8kBWb4ichj6SiJ9nDxpghl5khfpV2e
+ xYefPb6vTcLMEcb58GXzl6AKL2uz1nWVsk6CxZKcFWmX2CsC1FHkYwnmCoaSkPrWUn4Gcx48s
+ akOYR+jqyhq6TwTDrTHD5FRD1UKLyUzgzwiF7ZBWYUvduREcndbtxUuo3j4SWmgiGmqeT/c3C
+ KT9KbBhs545gDWYxqv116TRUROJzmON+Q6yKvLcnuCvy5PsuXHIjxlpuveLQw1O3TOB2F1YrH
+ 5haaxfnFHWfNhJVKFTqLq8IVOAWW6Iq5SJwqZPtebPPOpAxyodN6ML8OBejJ4do8CTEGATLnH
+ fADa63VVjv7SGyOP8T9GixCC1k8Z5PaLpC4XU+QzTmP/ZMO/DUoX/E5Tb8S9X2WhGbvXzjhWy
+ nSNSl4uybzXNAh+QGUb+PHRBESAn0R77Z3cQtaf0QFo7Ai84mXnbyTMwwbpVFP9KtrEYvPGYI
+ Q+GEyHem+g7XHugGNFJQz+bOAmq8BjsY5iDknbn3W6Ehc6FH1A+Q716gvA1GDDED6Usb4YA1r
+ tQ7NO5dPOdYUh3VmyfAbL2imvQpv/UUO3wTr7pxOwe76/tDgdvKtqFjkBCcHPglfr9BO32sWi
+ ZGVu1pSr1xAffWolRJKD0wMUgMI3E9X7yHBSV+D679zAyAz4xL6xTze6YQotINqhrUopCSJ
+Received-SPF: none client-ip=217.72.192.75; envelope-from=laurent@vivier.eu;
+ helo=mout.kundenserver.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 15:20:36
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,909 +83,488 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Roman Bolshakov <r.bolshakov@yadro.com>,
- =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
- Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>,
+ Filip Bozuta <Filip.Bozuta@syrmia.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Some of the enum constant names conflict with the QOM type check
-macros:
+From: Filip Bozuta <Filip.Bozuta@syrmia.com>
 
-ASPEED_GPIO
-ASPEED_I2C
-ASPEED_RTC
-ASPEED_SCU
-ASPEED_SDHCI
-ASPEED_SDMC
-ASPEED_VIC
-ASPEED_WDT
-ASPEED_XDMA
+This patch implements strace argument printing functionality for following syscalls:
 
-This needs to be addressed to allow us to transform the QOM type
-check macros into functions generated by OBJECT_DECLARE_TYPE().
+    * clock_getres, clock_gettime, clock_settime - clock and time functions
 
-Rename all the constants to ASPEED_DEV_*, to avoid conflicts.
+        int clock_getres(clockid_t clockid, struct timespec *res)
+        int clock_gettime(clockid_t clockid, struct timespec *tp)
+        int clock_settime(clockid_t clockid, const struct timespec *tp)
+        man page: https://man7.org/linux/man-pages/man2/clock_getres.2.html
 
-Reviewed-by: Cédric Le Goater <clg@kaod.org>
-Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Tested-By: Roman Bolshakov <r.bolshakov@yadro.com>
-Message-Id: <20200825192110.3528606-7-ehabkost@redhat.com>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+    * gettimeofday - get time
+
+        int gettimeofday(struct timeval *tv, struct timezone *tz)
+        man page: https://man7.org/linux/man-pages/man2/gettimeofday.2.html
+
+    * getitimer, setitimer - get or set value of an interval timer
+
+        int getitimer(int which, struct itimerval *curr_value)
+        int setitimer(int which, const struct itimerval *new_value,
+                      struct itimerval *old_value)
+        man page: https://man7.org/linux/man-pages/man2/getitimer.2.html
+
+Implementation notes:
+
+    All of the syscalls have some structue types as argument types and thus
+    a separate printing function was stated in file "strace.list" for each
+    of them. All of these functions use existing functions for their
+    appropriate structure types ("print_timeval()" and "print_timezone()").
+
+    Functions "print_timespec()" and "print_itimerval()" were added in this
+    patch so that they can be used to print types "struct timespec" and
+    "struct itimerval" used by some of the syscalls. Function "print_itimerval()"
+    uses the existing function "print_timeval()" to print fields of the
+    structure "struct itimerval" that are of type "struct timeval".
+
+    Function "print_enums()", which was introduced in the previous patch, is used
+    to print the interval timer type which is the first argument of "getitimer()"
+    and "setitimer()". Also, this function is used to print the clock id which
+    is the first argument of "clock_getres()" and "clock_gettime()". For that
+    reason, the existing function "print_clockid()" was removed in this patch.
+    Existing function "print_clock_adjtime()" was also changed for this reason
+    to use "print_enums()".
+
+    The existing function "print_timeval()" was changed a little so that it
+    prints the field names beside the values.
+
+    Syscalls "clock_getres()" and "clock_gettime()" have the same number
+    and types of arguments and thus their print functions "print_clock_getres"
+    and "print_clock_gettime" share a common definition in file "strace.c".
+
+Signed-off-by: Filip Bozuta <Filip.Bozuta@syrmia.com>
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Message-Id: <20200811164553.27713-6-Filip.Bozuta@syrmia.com>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- include/hw/arm/aspeed_soc.h |  92 +++++++--------
- hw/arm/aspeed.c             |   4 +-
- hw/arm/aspeed_ast2600.c     | 208 ++++++++++++++++----------------
- hw/arm/aspeed_soc.c         | 228 ++++++++++++++++++------------------
- 4 files changed, 266 insertions(+), 266 deletions(-)
+ linux-user/strace.c    | 287 +++++++++++++++++++++++++++++++----------
+ linux-user/strace.list |  17 ++-
+ 2 files changed, 232 insertions(+), 72 deletions(-)
 
-diff --git a/include/hw/arm/aspeed_soc.h b/include/hw/arm/aspeed_soc.h
-index 914115f3ef..d46f197cbe 100644
---- a/include/hw/arm/aspeed_soc.h
-+++ b/include/hw/arm/aspeed_soc.h
-@@ -87,52 +87,52 @@ typedef struct AspeedSoCClass {
-     OBJECT_GET_CLASS(AspeedSoCClass, (obj), TYPE_ASPEED_SOC)
+diff --git a/linux-user/strace.c b/linux-user/strace.c
+index d0731b888d29..c7ef948b9451 100644
+--- a/linux-user/strace.c
++++ b/linux-user/strace.c
+@@ -78,7 +78,9 @@ UNUSED static void print_string(abi_long, int);
+ UNUSED static void print_buf(abi_long addr, abi_long len, int last);
+ UNUSED static void print_raw_param(const char *, abi_long, int);
+ UNUSED static void print_timeval(abi_ulong, int);
++UNUSED static void print_timespec(abi_ulong, int);
+ UNUSED static void print_timezone(abi_ulong, int);
++UNUSED static void print_itimerval(abi_ulong, int);
+ UNUSED static void print_number(abi_long, int);
+ UNUSED static void print_signal(abi_ulong, int);
+ UNUSED static void print_sockaddr(abi_ulong, abi_long, int);
+@@ -582,69 +584,6 @@ print_fdset(int n, abi_ulong target_fds_addr)
+ }
+ #endif
  
- enum {
--    ASPEED_IOMEM,
--    ASPEED_UART1,
--    ASPEED_UART2,
--    ASPEED_UART3,
--    ASPEED_UART4,
--    ASPEED_UART5,
--    ASPEED_VUART,
--    ASPEED_FMC,
--    ASPEED_SPI1,
--    ASPEED_SPI2,
--    ASPEED_EHCI1,
--    ASPEED_EHCI2,
--    ASPEED_VIC,
--    ASPEED_SDMC,
--    ASPEED_SCU,
--    ASPEED_ADC,
--    ASPEED_VIDEO,
--    ASPEED_SRAM,
--    ASPEED_SDHCI,
--    ASPEED_GPIO,
--    ASPEED_GPIO_1_8V,
--    ASPEED_RTC,
--    ASPEED_TIMER1,
--    ASPEED_TIMER2,
--    ASPEED_TIMER3,
--    ASPEED_TIMER4,
--    ASPEED_TIMER5,
--    ASPEED_TIMER6,
--    ASPEED_TIMER7,
--    ASPEED_TIMER8,
--    ASPEED_WDT,
--    ASPEED_PWM,
--    ASPEED_LPC,
--    ASPEED_IBT,
--    ASPEED_I2C,
--    ASPEED_ETH1,
--    ASPEED_ETH2,
--    ASPEED_ETH3,
--    ASPEED_ETH4,
--    ASPEED_MII1,
--    ASPEED_MII2,
--    ASPEED_MII3,
--    ASPEED_MII4,
--    ASPEED_SDRAM,
--    ASPEED_XDMA,
--    ASPEED_EMMC,
-+    ASPEED_DEV_IOMEM,
-+    ASPEED_DEV_UART1,
-+    ASPEED_DEV_UART2,
-+    ASPEED_DEV_UART3,
-+    ASPEED_DEV_UART4,
-+    ASPEED_DEV_UART5,
-+    ASPEED_DEV_VUART,
-+    ASPEED_DEV_FMC,
-+    ASPEED_DEV_SPI1,
-+    ASPEED_DEV_SPI2,
-+    ASPEED_DEV_EHCI1,
-+    ASPEED_DEV_EHCI2,
-+    ASPEED_DEV_VIC,
-+    ASPEED_DEV_SDMC,
-+    ASPEED_DEV_SCU,
-+    ASPEED_DEV_ADC,
-+    ASPEED_DEV_VIDEO,
-+    ASPEED_DEV_SRAM,
-+    ASPEED_DEV_SDHCI,
-+    ASPEED_DEV_GPIO,
-+    ASPEED_DEV_GPIO_1_8V,
-+    ASPEED_DEV_RTC,
-+    ASPEED_DEV_TIMER1,
-+    ASPEED_DEV_TIMER2,
-+    ASPEED_DEV_TIMER3,
-+    ASPEED_DEV_TIMER4,
-+    ASPEED_DEV_TIMER5,
-+    ASPEED_DEV_TIMER6,
-+    ASPEED_DEV_TIMER7,
-+    ASPEED_DEV_TIMER8,
-+    ASPEED_DEV_WDT,
-+    ASPEED_DEV_PWM,
-+    ASPEED_DEV_LPC,
-+    ASPEED_DEV_IBT,
-+    ASPEED_DEV_I2C,
-+    ASPEED_DEV_ETH1,
-+    ASPEED_DEV_ETH2,
-+    ASPEED_DEV_ETH3,
-+    ASPEED_DEV_ETH4,
-+    ASPEED_DEV_MII1,
-+    ASPEED_DEV_MII2,
-+    ASPEED_DEV_MII3,
-+    ASPEED_DEV_MII4,
-+    ASPEED_DEV_SDRAM,
-+    ASPEED_DEV_XDMA,
-+    ASPEED_DEV_EMMC,
+-#ifdef TARGET_NR_clock_adjtime
+-/* IDs of the various system clocks */
+-#define TARGET_CLOCK_REALTIME              0
+-#define TARGET_CLOCK_MONOTONIC             1
+-#define TARGET_CLOCK_PROCESS_CPUTIME_ID    2
+-#define TARGET_CLOCK_THREAD_CPUTIME_ID     3
+-#define TARGET_CLOCK_MONOTONIC_RAW         4
+-#define TARGET_CLOCK_REALTIME_COARSE       5
+-#define TARGET_CLOCK_MONOTONIC_COARSE      6
+-#define TARGET_CLOCK_BOOTTIME              7
+-#define TARGET_CLOCK_REALTIME_ALARM        8
+-#define TARGET_CLOCK_BOOTTIME_ALARM        9
+-#define TARGET_CLOCK_SGI_CYCLE             10
+-#define TARGET_CLOCK_TAI                   11
+-
+-static void
+-print_clockid(int clockid, int last)
+-{
+-    switch (clockid) {
+-    case TARGET_CLOCK_REALTIME:
+-        qemu_log("CLOCK_REALTIME");
+-        break;
+-    case TARGET_CLOCK_MONOTONIC:
+-        qemu_log("CLOCK_MONOTONIC");
+-        break;
+-    case TARGET_CLOCK_PROCESS_CPUTIME_ID:
+-        qemu_log("CLOCK_PROCESS_CPUTIME_ID");
+-        break;
+-    case TARGET_CLOCK_THREAD_CPUTIME_ID:
+-        qemu_log("CLOCK_THREAD_CPUTIME_ID");
+-        break;
+-    case TARGET_CLOCK_MONOTONIC_RAW:
+-        qemu_log("CLOCK_MONOTONIC_RAW");
+-        break;
+-    case TARGET_CLOCK_REALTIME_COARSE:
+-        qemu_log("CLOCK_REALTIME_COARSE");
+-        break;
+-    case TARGET_CLOCK_MONOTONIC_COARSE:
+-        qemu_log("CLOCK_MONOTONIC_COARSE");
+-        break;
+-    case TARGET_CLOCK_BOOTTIME:
+-        qemu_log("CLOCK_BOOTTIME");
+-        break;
+-    case TARGET_CLOCK_REALTIME_ALARM:
+-        qemu_log("CLOCK_REALTIME_ALARM");
+-        break;
+-    case TARGET_CLOCK_BOOTTIME_ALARM:
+-        qemu_log("CLOCK_BOOTTIME_ALARM");
+-        break;
+-    case TARGET_CLOCK_SGI_CYCLE:
+-        qemu_log("CLOCK_SGI_CYCLE");
+-        break;
+-    case TARGET_CLOCK_TAI:
+-        qemu_log("CLOCK_TAI");
+-        break;
+-    default:
+-        qemu_log("%d", clockid);
+-        break;
+-    }
+-    qemu_log("%s", get_comma(last));
+-}
+-#endif
+-
+ /*
+  * Sysycall specific output functions
+  */
+@@ -843,6 +782,81 @@ print_syscall_ret_adjtimex(void *cpu_env, const struct syscallname *name,
+ }
+ #endif
+ 
++#if defined(TARGET_NR_clock_gettime) || defined(TARGET_NR_clock_getres)
++static void
++print_syscall_ret_clock_gettime(void *cpu_env, const struct syscallname *name,
++                                abi_long ret, abi_long arg0, abi_long arg1,
++                                abi_long arg2, abi_long arg3, abi_long arg4,
++                                abi_long arg5)
++{
++    if (!print_syscall_err(ret)) {
++        qemu_log(TARGET_ABI_FMT_ld, ret);
++        qemu_log(" (");
++        print_timespec(arg1, 1);
++        qemu_log(")");
++    }
++
++    qemu_log("\n");
++}
++#define print_syscall_ret_clock_getres     print_syscall_ret_clock_gettime
++#endif
++
++#ifdef TARGET_NR_gettimeofday
++static void
++print_syscall_ret_gettimeofday(void *cpu_env, const struct syscallname *name,
++                               abi_long ret, abi_long arg0, abi_long arg1,
++                               abi_long arg2, abi_long arg3, abi_long arg4,
++                               abi_long arg5)
++{
++    if (!print_syscall_err(ret)) {
++        qemu_log(TARGET_ABI_FMT_ld, ret);
++        qemu_log(" (");
++        print_timeval(arg0, 0);
++        print_timezone(arg1, 1);
++        qemu_log(")");
++    }
++
++    qemu_log("\n");
++}
++#endif
++
++#ifdef TARGET_NR_getitimer
++static void
++print_syscall_ret_getitimer(void *cpu_env, const struct syscallname *name,
++                            abi_long ret, abi_long arg0, abi_long arg1,
++                            abi_long arg2, abi_long arg3, abi_long arg4,
++                            abi_long arg5)
++{
++    if (!print_syscall_err(ret)) {
++        qemu_log(TARGET_ABI_FMT_ld, ret);
++        qemu_log(" (");
++        print_itimerval(arg1, 1);
++        qemu_log(")");
++    }
++
++    qemu_log("\n");
++}
++#endif
++
++
++#ifdef TARGET_NR_getitimer
++static void
++print_syscall_ret_setitimer(void *cpu_env, const struct syscallname *name,
++                            abi_long ret, abi_long arg0, abi_long arg1,
++                            abi_long arg2, abi_long arg3, abi_long arg4,
++                            abi_long arg5)
++{
++    if (!print_syscall_err(ret)) {
++        qemu_log(TARGET_ABI_FMT_ld, ret);
++        qemu_log(" (old_value = ");
++        print_itimerval(arg2, 1);
++        qemu_log(")");
++    }
++
++    qemu_log("\n");
++}
++#endif
++
+ #if defined(TARGET_NR_listxattr) || defined(TARGET_NR_llistxattr) \
+  || defined(TARGGET_NR_flistxattr)
+ static void
+@@ -1221,6 +1235,43 @@ UNUSED static struct flags mlockall_flags[] = {
+     FLAG_END,
  };
  
- #endif /* ASPEED_SOC_H */
-diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
-index fcb1a7cd87..8109cc6d2d 100644
---- a/hw/arm/aspeed.c
-+++ b/hw/arm/aspeed.c
-@@ -309,7 +309,7 @@ static void aspeed_machine_init(MachineState *machine)
-     qdev_realize(DEVICE(&bmc->soc), NULL, &error_abort);
- 
-     memory_region_add_subregion(get_system_memory(),
--                                sc->memmap[ASPEED_SDRAM],
-+                                sc->memmap[ASPEED_DEV_SDRAM],
-                                 &bmc->ram_container);
- 
-     max_ram_size = object_property_get_uint(OBJECT(&bmc->soc), "max-ram-size",
-@@ -360,7 +360,7 @@ static void aspeed_machine_init(MachineState *machine)
-     }
- 
-     aspeed_board_binfo.ram_size = ram_size;
--    aspeed_board_binfo.loader_start = sc->memmap[ASPEED_SDRAM];
-+    aspeed_board_binfo.loader_start = sc->memmap[ASPEED_DEV_SDRAM];
-     aspeed_board_binfo.nb_cpus = sc->num_cpus;
- 
-     if (amc->i2c_init) {
-diff --git a/hw/arm/aspeed_ast2600.c b/hw/arm/aspeed_ast2600.c
-index 3767f7d8d0..9d95e42143 100644
---- a/hw/arm/aspeed_ast2600.c
-+++ b/hw/arm/aspeed_ast2600.c
-@@ -24,43 +24,43 @@
- #define ASPEED_SOC_IOMEM_SIZE       0x00200000
- 
- static const hwaddr aspeed_soc_ast2600_memmap[] = {
--    [ASPEED_SRAM]      = 0x10000000,
-+    [ASPEED_DEV_SRAM]      = 0x10000000,
-     /* 0x16000000     0x17FFFFFF : AHB BUS do LPC Bus bridge */
--    [ASPEED_IOMEM]     = 0x1E600000,
--    [ASPEED_PWM]       = 0x1E610000,
--    [ASPEED_FMC]       = 0x1E620000,
--    [ASPEED_SPI1]      = 0x1E630000,
--    [ASPEED_SPI2]      = 0x1E641000,
--    [ASPEED_EHCI1]     = 0x1E6A1000,
--    [ASPEED_EHCI2]     = 0x1E6A3000,
--    [ASPEED_MII1]      = 0x1E650000,
--    [ASPEED_MII2]      = 0x1E650008,
--    [ASPEED_MII3]      = 0x1E650010,
--    [ASPEED_MII4]      = 0x1E650018,
--    [ASPEED_ETH1]      = 0x1E660000,
--    [ASPEED_ETH3]      = 0x1E670000,
--    [ASPEED_ETH2]      = 0x1E680000,
--    [ASPEED_ETH4]      = 0x1E690000,
--    [ASPEED_VIC]       = 0x1E6C0000,
--    [ASPEED_SDMC]      = 0x1E6E0000,
--    [ASPEED_SCU]       = 0x1E6E2000,
--    [ASPEED_XDMA]      = 0x1E6E7000,
--    [ASPEED_ADC]       = 0x1E6E9000,
--    [ASPEED_VIDEO]     = 0x1E700000,
--    [ASPEED_SDHCI]     = 0x1E740000,
--    [ASPEED_EMMC]      = 0x1E750000,
--    [ASPEED_GPIO]      = 0x1E780000,
--    [ASPEED_GPIO_1_8V] = 0x1E780800,
--    [ASPEED_RTC]       = 0x1E781000,
--    [ASPEED_TIMER1]    = 0x1E782000,
--    [ASPEED_WDT]       = 0x1E785000,
--    [ASPEED_LPC]       = 0x1E789000,
--    [ASPEED_IBT]       = 0x1E789140,
--    [ASPEED_I2C]       = 0x1E78A000,
--    [ASPEED_UART1]     = 0x1E783000,
--    [ASPEED_UART5]     = 0x1E784000,
--    [ASPEED_VUART]     = 0x1E787000,
--    [ASPEED_SDRAM]     = 0x80000000,
-+    [ASPEED_DEV_IOMEM]     = 0x1E600000,
-+    [ASPEED_DEV_PWM]       = 0x1E610000,
-+    [ASPEED_DEV_FMC]       = 0x1E620000,
-+    [ASPEED_DEV_SPI1]      = 0x1E630000,
-+    [ASPEED_DEV_SPI2]      = 0x1E641000,
-+    [ASPEED_DEV_EHCI1]     = 0x1E6A1000,
-+    [ASPEED_DEV_EHCI2]     = 0x1E6A3000,
-+    [ASPEED_DEV_MII1]      = 0x1E650000,
-+    [ASPEED_DEV_MII2]      = 0x1E650008,
-+    [ASPEED_DEV_MII3]      = 0x1E650010,
-+    [ASPEED_DEV_MII4]      = 0x1E650018,
-+    [ASPEED_DEV_ETH1]      = 0x1E660000,
-+    [ASPEED_DEV_ETH3]      = 0x1E670000,
-+    [ASPEED_DEV_ETH2]      = 0x1E680000,
-+    [ASPEED_DEV_ETH4]      = 0x1E690000,
-+    [ASPEED_DEV_VIC]       = 0x1E6C0000,
-+    [ASPEED_DEV_SDMC]      = 0x1E6E0000,
-+    [ASPEED_DEV_SCU]       = 0x1E6E2000,
-+    [ASPEED_DEV_XDMA]      = 0x1E6E7000,
-+    [ASPEED_DEV_ADC]       = 0x1E6E9000,
-+    [ASPEED_DEV_VIDEO]     = 0x1E700000,
-+    [ASPEED_DEV_SDHCI]     = 0x1E740000,
-+    [ASPEED_DEV_EMMC]      = 0x1E750000,
-+    [ASPEED_DEV_GPIO]      = 0x1E780000,
-+    [ASPEED_DEV_GPIO_1_8V] = 0x1E780800,
-+    [ASPEED_DEV_RTC]       = 0x1E781000,
-+    [ASPEED_DEV_TIMER1]    = 0x1E782000,
-+    [ASPEED_DEV_WDT]       = 0x1E785000,
-+    [ASPEED_DEV_LPC]       = 0x1E789000,
-+    [ASPEED_DEV_IBT]       = 0x1E789140,
-+    [ASPEED_DEV_I2C]       = 0x1E78A000,
-+    [ASPEED_DEV_UART1]     = 0x1E783000,
-+    [ASPEED_DEV_UART5]     = 0x1E784000,
-+    [ASPEED_DEV_VUART]     = 0x1E787000,
-+    [ASPEED_DEV_SDRAM]     = 0x80000000,
- };
- 
- #define ASPEED_A7MPCORE_ADDR 0x40460000
-@@ -69,41 +69,41 @@ static const hwaddr aspeed_soc_ast2600_memmap[] = {
- 
- /* Shared Peripheral Interrupt values below are offset by -32 from datasheet */
- static const int aspeed_soc_ast2600_irqmap[] = {
--    [ASPEED_UART1]     = 47,
--    [ASPEED_UART2]     = 48,
--    [ASPEED_UART3]     = 49,
--    [ASPEED_UART4]     = 50,
--    [ASPEED_UART5]     = 8,
--    [ASPEED_VUART]     = 8,
--    [ASPEED_FMC]       = 39,
--    [ASPEED_SDMC]      = 0,
--    [ASPEED_SCU]       = 12,
--    [ASPEED_ADC]       = 78,
--    [ASPEED_XDMA]      = 6,
--    [ASPEED_SDHCI]     = 43,
--    [ASPEED_EHCI1]     = 5,
--    [ASPEED_EHCI2]     = 9,
--    [ASPEED_EMMC]      = 15,
--    [ASPEED_GPIO]      = 40,
--    [ASPEED_GPIO_1_8V] = 11,
--    [ASPEED_RTC]       = 13,
--    [ASPEED_TIMER1]    = 16,
--    [ASPEED_TIMER2]    = 17,
--    [ASPEED_TIMER3]    = 18,
--    [ASPEED_TIMER4]    = 19,
--    [ASPEED_TIMER5]    = 20,
--    [ASPEED_TIMER6]    = 21,
--    [ASPEED_TIMER7]    = 22,
--    [ASPEED_TIMER8]    = 23,
--    [ASPEED_WDT]       = 24,
--    [ASPEED_PWM]       = 44,
--    [ASPEED_LPC]       = 35,
--    [ASPEED_IBT]       = 35,    /* LPC */
--    [ASPEED_I2C]       = 110,   /* 110 -> 125 */
--    [ASPEED_ETH1]      = 2,
--    [ASPEED_ETH2]      = 3,
--    [ASPEED_ETH3]      = 32,
--    [ASPEED_ETH4]      = 33,
-+    [ASPEED_DEV_UART1]     = 47,
-+    [ASPEED_DEV_UART2]     = 48,
-+    [ASPEED_DEV_UART3]     = 49,
-+    [ASPEED_DEV_UART4]     = 50,
-+    [ASPEED_DEV_UART5]     = 8,
-+    [ASPEED_DEV_VUART]     = 8,
-+    [ASPEED_DEV_FMC]       = 39,
-+    [ASPEED_DEV_SDMC]      = 0,
-+    [ASPEED_DEV_SCU]       = 12,
-+    [ASPEED_DEV_ADC]       = 78,
-+    [ASPEED_DEV_XDMA]      = 6,
-+    [ASPEED_DEV_SDHCI]     = 43,
-+    [ASPEED_DEV_EHCI1]     = 5,
-+    [ASPEED_DEV_EHCI2]     = 9,
-+    [ASPEED_DEV_EMMC]      = 15,
-+    [ASPEED_DEV_GPIO]      = 40,
-+    [ASPEED_DEV_GPIO_1_8V] = 11,
-+    [ASPEED_DEV_RTC]       = 13,
-+    [ASPEED_DEV_TIMER1]    = 16,
-+    [ASPEED_DEV_TIMER2]    = 17,
-+    [ASPEED_DEV_TIMER3]    = 18,
-+    [ASPEED_DEV_TIMER4]    = 19,
-+    [ASPEED_DEV_TIMER5]    = 20,
-+    [ASPEED_DEV_TIMER6]    = 21,
-+    [ASPEED_DEV_TIMER7]    = 22,
-+    [ASPEED_DEV_TIMER8]    = 23,
-+    [ASPEED_DEV_WDT]       = 24,
-+    [ASPEED_DEV_PWM]       = 44,
-+    [ASPEED_DEV_LPC]       = 35,
-+    [ASPEED_DEV_IBT]       = 35,    /* LPC */
-+    [ASPEED_DEV_I2C]       = 110,   /* 110 -> 125 */
-+    [ASPEED_DEV_ETH1]      = 2,
-+    [ASPEED_DEV_ETH2]      = 3,
-+    [ASPEED_DEV_ETH3]      = 32,
-+    [ASPEED_DEV_ETH4]      = 33,
- 
- };
- 
-@@ -232,11 +232,11 @@ static void aspeed_soc_ast2600_realize(DeviceState *dev, Error **errp)
-     qemu_irq irq;
- 
-     /* IO space */
--    create_unimplemented_device("aspeed_soc.io", sc->memmap[ASPEED_IOMEM],
-+    create_unimplemented_device("aspeed_soc.io", sc->memmap[ASPEED_DEV_IOMEM],
-                                 ASPEED_SOC_IOMEM_SIZE);
- 
-     /* Video engine stub */
--    create_unimplemented_device("aspeed.video", sc->memmap[ASPEED_VIDEO],
-+    create_unimplemented_device("aspeed.video", sc->memmap[ASPEED_DEV_VIDEO],
-                                 0x1000);
- 
-     /* CPU */
-@@ -295,21 +295,21 @@ static void aspeed_soc_ast2600_realize(DeviceState *dev, Error **errp)
-         return;
-     }
-     memory_region_add_subregion(get_system_memory(),
--                                sc->memmap[ASPEED_SRAM], &s->sram);
-+                                sc->memmap[ASPEED_DEV_SRAM], &s->sram);
- 
-     /* SCU */
-     if (!sysbus_realize(SYS_BUS_DEVICE(&s->scu), errp)) {
-         return;
-     }
--    sysbus_mmio_map(SYS_BUS_DEVICE(&s->scu), 0, sc->memmap[ASPEED_SCU]);
-+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->scu), 0, sc->memmap[ASPEED_DEV_SCU]);
- 
-     /* RTC */
-     if (!sysbus_realize(SYS_BUS_DEVICE(&s->rtc), errp)) {
-         return;
-     }
--    sysbus_mmio_map(SYS_BUS_DEVICE(&s->rtc), 0, sc->memmap[ASPEED_RTC]);
-+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->rtc), 0, sc->memmap[ASPEED_DEV_RTC]);
-     sysbus_connect_irq(SYS_BUS_DEVICE(&s->rtc), 0,
--                       aspeed_soc_get_irq(s, ASPEED_RTC));
-+                       aspeed_soc_get_irq(s, ASPEED_DEV_RTC));
- 
-     /* Timer */
-     object_property_set_link(OBJECT(&s->timerctrl), "scu", OBJECT(&s->scu),
-@@ -318,16 +318,16 @@ static void aspeed_soc_ast2600_realize(DeviceState *dev, Error **errp)
-         return;
-     }
-     sysbus_mmio_map(SYS_BUS_DEVICE(&s->timerctrl), 0,
--                    sc->memmap[ASPEED_TIMER1]);
-+                    sc->memmap[ASPEED_DEV_TIMER1]);
-     for (i = 0; i < ASPEED_TIMER_NR_TIMERS; i++) {
--        qemu_irq irq = aspeed_soc_get_irq(s, ASPEED_TIMER1 + i);
-+        qemu_irq irq = aspeed_soc_get_irq(s, ASPEED_DEV_TIMER1 + i);
-         sysbus_connect_irq(SYS_BUS_DEVICE(&s->timerctrl), i, irq);
-     }
- 
-     /* UART - attach an 8250 to the IO space as our UART5 */
-     if (serial_hd(0)) {
--        qemu_irq uart5 = aspeed_soc_get_irq(s, ASPEED_UART5);
--        serial_mm_init(get_system_memory(), sc->memmap[ASPEED_UART5], 2,
-+        qemu_irq uart5 = aspeed_soc_get_irq(s, ASPEED_DEV_UART5);
-+        serial_mm_init(get_system_memory(), sc->memmap[ASPEED_DEV_UART5], 2,
-                        uart5, 38400, serial_hd(0), DEVICE_LITTLE_ENDIAN);
-     }
- 
-@@ -337,10 +337,10 @@ static void aspeed_soc_ast2600_realize(DeviceState *dev, Error **errp)
-     if (!sysbus_realize(SYS_BUS_DEVICE(&s->i2c), errp)) {
-         return;
-     }
--    sysbus_mmio_map(SYS_BUS_DEVICE(&s->i2c), 0, sc->memmap[ASPEED_I2C]);
-+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->i2c), 0, sc->memmap[ASPEED_DEV_I2C]);
-     for (i = 0; i < ASPEED_I2C_GET_CLASS(&s->i2c)->num_busses; i++) {
-         qemu_irq irq = qdev_get_gpio_in(DEVICE(&s->a7mpcore),
--                                        sc->irqmap[ASPEED_I2C] + i);
-+                                        sc->irqmap[ASPEED_DEV_I2C] + i);
-         /*
-          * The AST2600 SoC has one IRQ per I2C bus. Skip the common
-          * IRQ (AST2400 and AST2500) and connect all bussses.
-@@ -352,17 +352,17 @@ static void aspeed_soc_ast2600_realize(DeviceState *dev, Error **errp)
-     object_property_set_link(OBJECT(&s->fmc), "dram", OBJECT(s->dram_mr),
-                              &error_abort);
-     if (!object_property_set_int(OBJECT(&s->fmc), "sdram-base",
--                                 sc->memmap[ASPEED_SDRAM], errp)) {
-+                                 sc->memmap[ASPEED_DEV_SDRAM], errp)) {
-         return;
-     }
-     if (!sysbus_realize(SYS_BUS_DEVICE(&s->fmc), errp)) {
-         return;
-     }
--    sysbus_mmio_map(SYS_BUS_DEVICE(&s->fmc), 0, sc->memmap[ASPEED_FMC]);
-+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->fmc), 0, sc->memmap[ASPEED_DEV_FMC]);
-     sysbus_mmio_map(SYS_BUS_DEVICE(&s->fmc), 1,
-                     s->fmc.ctrl->flash_window_base);
-     sysbus_connect_irq(SYS_BUS_DEVICE(&s->fmc), 0,
--                       aspeed_soc_get_irq(s, ASPEED_FMC));
-+                       aspeed_soc_get_irq(s, ASPEED_DEV_FMC));
- 
-     /* SPI */
-     for (i = 0; i < sc->spis_num; i++) {
-@@ -373,7 +373,7 @@ static void aspeed_soc_ast2600_realize(DeviceState *dev, Error **errp)
++/* IDs of the various system clocks */
++#define TARGET_CLOCK_REALTIME              0
++#define TARGET_CLOCK_MONOTONIC             1
++#define TARGET_CLOCK_PROCESS_CPUTIME_ID    2
++#define TARGET_CLOCK_THREAD_CPUTIME_ID     3
++#define TARGET_CLOCK_MONOTONIC_RAW         4
++#define TARGET_CLOCK_REALTIME_COARSE       5
++#define TARGET_CLOCK_MONOTONIC_COARSE      6
++#define TARGET_CLOCK_BOOTTIME              7
++#define TARGET_CLOCK_REALTIME_ALARM        8
++#define TARGET_CLOCK_BOOTTIME_ALARM        9
++#define TARGET_CLOCK_SGI_CYCLE             10
++#define TARGET_CLOCK_TAI                   11
++
++UNUSED static struct enums clockids[] = {
++    ENUM_TARGET(CLOCK_REALTIME),
++    ENUM_TARGET(CLOCK_MONOTONIC),
++    ENUM_TARGET(CLOCK_PROCESS_CPUTIME_ID),
++    ENUM_TARGET(CLOCK_THREAD_CPUTIME_ID),
++    ENUM_TARGET(CLOCK_MONOTONIC_RAW),
++    ENUM_TARGET(CLOCK_REALTIME_COARSE),
++    ENUM_TARGET(CLOCK_MONOTONIC_COARSE),
++    ENUM_TARGET(CLOCK_BOOTTIME),
++    ENUM_TARGET(CLOCK_REALTIME_ALARM),
++    ENUM_TARGET(CLOCK_BOOTTIME_ALARM),
++    ENUM_TARGET(CLOCK_SGI_CYCLE),
++    ENUM_TARGET(CLOCK_TAI),
++    ENUM_END,
++};
++
++UNUSED static struct enums itimer_types[] = {
++    ENUM_GENERIC(ITIMER_REAL),
++    ENUM_GENERIC(ITIMER_VIRTUAL),
++    ENUM_GENERIC(ITIMER_PROF),
++    ENUM_END,
++};
++
+ /*
+  * print_xxx utility functions.  These are used to print syscall
+  * parameters in certain format.  All of these have parameter
+@@ -1439,13 +1490,34 @@ print_timeval(abi_ulong tv_addr, int last)
+             print_pointer(tv_addr, last);
              return;
          }
-         sysbus_mmio_map(SYS_BUS_DEVICE(&s->spi[i]), 0,
--                        sc->memmap[ASPEED_SPI1 + i]);
-+                        sc->memmap[ASPEED_DEV_SPI1 + i]);
-         sysbus_mmio_map(SYS_BUS_DEVICE(&s->spi[i]), 1,
-                         s->spi[i].ctrl->flash_window_base);
-     }
-@@ -384,16 +384,16 @@ static void aspeed_soc_ast2600_realize(DeviceState *dev, Error **errp)
-             return;
-         }
-         sysbus_mmio_map(SYS_BUS_DEVICE(&s->ehci[i]), 0,
--                        sc->memmap[ASPEED_EHCI1 + i]);
-+                        sc->memmap[ASPEED_DEV_EHCI1 + i]);
-         sysbus_connect_irq(SYS_BUS_DEVICE(&s->ehci[i]), 0,
--                           aspeed_soc_get_irq(s, ASPEED_EHCI1 + i));
-+                           aspeed_soc_get_irq(s, ASPEED_DEV_EHCI1 + i));
-     }
- 
-     /* SDMC - SDRAM Memory Controller */
-     if (!sysbus_realize(SYS_BUS_DEVICE(&s->sdmc), errp)) {
-         return;
-     }
--    sysbus_mmio_map(SYS_BUS_DEVICE(&s->sdmc), 0, sc->memmap[ASPEED_SDMC]);
-+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->sdmc), 0, sc->memmap[ASPEED_DEV_SDMC]);
- 
-     /* Watch dog */
-     for (i = 0; i < sc->wdts_num; i++) {
-@@ -405,7 +405,7 @@ static void aspeed_soc_ast2600_realize(DeviceState *dev, Error **errp)
-             return;
-         }
-         sysbus_mmio_map(SYS_BUS_DEVICE(&s->wdt[i]), 0,
--                        sc->memmap[ASPEED_WDT] + i * awc->offset);
-+                        sc->memmap[ASPEED_DEV_WDT] + i * awc->offset);
-     }
- 
-     /* Net */
-@@ -416,9 +416,9 @@ static void aspeed_soc_ast2600_realize(DeviceState *dev, Error **errp)
-             return;
-         }
-         sysbus_mmio_map(SYS_BUS_DEVICE(&s->ftgmac100[i]), 0,
--                        sc->memmap[ASPEED_ETH1 + i]);
-+                        sc->memmap[ASPEED_DEV_ETH1 + i]);
-         sysbus_connect_irq(SYS_BUS_DEVICE(&s->ftgmac100[i]), 0,
--                           aspeed_soc_get_irq(s, ASPEED_ETH1 + i));
-+                           aspeed_soc_get_irq(s, ASPEED_DEV_ETH1 + i));
- 
-         object_property_set_link(OBJECT(&s->mii[i]), "nic",
-                                  OBJECT(&s->ftgmac100[i]), &error_abort);
-@@ -427,7 +427,7 @@ static void aspeed_soc_ast2600_realize(DeviceState *dev, Error **errp)
-         }
- 
-         sysbus_mmio_map(SYS_BUS_DEVICE(&s->mii[i]), 0,
--                        sc->memmap[ASPEED_MII1 + i]);
-+                        sc->memmap[ASPEED_DEV_MII1 + i]);
-     }
- 
-     /* XDMA */
-@@ -435,42 +435,42 @@ static void aspeed_soc_ast2600_realize(DeviceState *dev, Error **errp)
-         return;
-     }
-     sysbus_mmio_map(SYS_BUS_DEVICE(&s->xdma), 0,
--                    sc->memmap[ASPEED_XDMA]);
-+                    sc->memmap[ASPEED_DEV_XDMA]);
-     sysbus_connect_irq(SYS_BUS_DEVICE(&s->xdma), 0,
--                       aspeed_soc_get_irq(s, ASPEED_XDMA));
-+                       aspeed_soc_get_irq(s, ASPEED_DEV_XDMA));
- 
-     /* GPIO */
-     if (!sysbus_realize(SYS_BUS_DEVICE(&s->gpio), errp)) {
-         return;
-     }
--    sysbus_mmio_map(SYS_BUS_DEVICE(&s->gpio), 0, sc->memmap[ASPEED_GPIO]);
-+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->gpio), 0, sc->memmap[ASPEED_DEV_GPIO]);
-     sysbus_connect_irq(SYS_BUS_DEVICE(&s->gpio), 0,
--                       aspeed_soc_get_irq(s, ASPEED_GPIO));
-+                       aspeed_soc_get_irq(s, ASPEED_DEV_GPIO));
- 
-     if (!sysbus_realize(SYS_BUS_DEVICE(&s->gpio_1_8v), errp)) {
-         return;
-     }
-     sysbus_mmio_map(SYS_BUS_DEVICE(&s->gpio_1_8v), 0,
--                    sc->memmap[ASPEED_GPIO_1_8V]);
-+                    sc->memmap[ASPEED_DEV_GPIO_1_8V]);
-     sysbus_connect_irq(SYS_BUS_DEVICE(&s->gpio_1_8v), 0,
--                       aspeed_soc_get_irq(s, ASPEED_GPIO_1_8V));
-+                       aspeed_soc_get_irq(s, ASPEED_DEV_GPIO_1_8V));
- 
-     /* SDHCI */
-     if (!sysbus_realize(SYS_BUS_DEVICE(&s->sdhci), errp)) {
-         return;
-     }
-     sysbus_mmio_map(SYS_BUS_DEVICE(&s->sdhci), 0,
--                    sc->memmap[ASPEED_SDHCI]);
-+                    sc->memmap[ASPEED_DEV_SDHCI]);
-     sysbus_connect_irq(SYS_BUS_DEVICE(&s->sdhci), 0,
--                       aspeed_soc_get_irq(s, ASPEED_SDHCI));
-+                       aspeed_soc_get_irq(s, ASPEED_DEV_SDHCI));
- 
-     /* eMMC */
-     if (!sysbus_realize(SYS_BUS_DEVICE(&s->emmc), errp)) {
-         return;
-     }
--    sysbus_mmio_map(SYS_BUS_DEVICE(&s->emmc), 0, sc->memmap[ASPEED_EMMC]);
-+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->emmc), 0, sc->memmap[ASPEED_DEV_EMMC]);
-     sysbus_connect_irq(SYS_BUS_DEVICE(&s->emmc), 0,
--                       aspeed_soc_get_irq(s, ASPEED_EMMC));
-+                       aspeed_soc_get_irq(s, ASPEED_DEV_EMMC));
+-        qemu_log("{" TARGET_ABI_FMT_ld "," TARGET_ABI_FMT_ld "}%s",
+-            tswapal(tv->tv_sec), tswapal(tv->tv_usec), get_comma(last));
++        qemu_log("{tv_sec = " TARGET_ABI_FMT_ld
++                 ",tv_usec = " TARGET_ABI_FMT_ld "}%s",
++                 tswapal(tv->tv_sec), tswapal(tv->tv_usec), get_comma(last));
+         unlock_user(tv, tv_addr, 0);
+     } else
+         qemu_log("NULL%s", get_comma(last));
  }
  
- static void aspeed_soc_ast2600_class_init(ObjectClass *oc, void *data)
-diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
-index a1a8684216..35be126db6 100644
---- a/hw/arm/aspeed_soc.c
-+++ b/hw/arm/aspeed_soc.c
-@@ -27,97 +27,97 @@
- #define ASPEED_SOC_IOMEM_SIZE       0x00200000
- 
- static const hwaddr aspeed_soc_ast2400_memmap[] = {
--    [ASPEED_IOMEM]  = 0x1E600000,
--    [ASPEED_FMC]    = 0x1E620000,
--    [ASPEED_SPI1]   = 0x1E630000,
--    [ASPEED_EHCI1]  = 0x1E6A1000,
--    [ASPEED_VIC]    = 0x1E6C0000,
--    [ASPEED_SDMC]   = 0x1E6E0000,
--    [ASPEED_SCU]    = 0x1E6E2000,
--    [ASPEED_XDMA]   = 0x1E6E7000,
--    [ASPEED_VIDEO]  = 0x1E700000,
--    [ASPEED_ADC]    = 0x1E6E9000,
--    [ASPEED_SRAM]   = 0x1E720000,
--    [ASPEED_SDHCI]  = 0x1E740000,
--    [ASPEED_GPIO]   = 0x1E780000,
--    [ASPEED_RTC]    = 0x1E781000,
--    [ASPEED_TIMER1] = 0x1E782000,
--    [ASPEED_WDT]    = 0x1E785000,
--    [ASPEED_PWM]    = 0x1E786000,
--    [ASPEED_LPC]    = 0x1E789000,
--    [ASPEED_IBT]    = 0x1E789140,
--    [ASPEED_I2C]    = 0x1E78A000,
--    [ASPEED_ETH1]   = 0x1E660000,
--    [ASPEED_ETH2]   = 0x1E680000,
--    [ASPEED_UART1]  = 0x1E783000,
--    [ASPEED_UART5]  = 0x1E784000,
--    [ASPEED_VUART]  = 0x1E787000,
--    [ASPEED_SDRAM]  = 0x40000000,
-+    [ASPEED_DEV_IOMEM]  = 0x1E600000,
-+    [ASPEED_DEV_FMC]    = 0x1E620000,
-+    [ASPEED_DEV_SPI1]   = 0x1E630000,
-+    [ASPEED_DEV_EHCI1]  = 0x1E6A1000,
-+    [ASPEED_DEV_VIC]    = 0x1E6C0000,
-+    [ASPEED_DEV_SDMC]   = 0x1E6E0000,
-+    [ASPEED_DEV_SCU]    = 0x1E6E2000,
-+    [ASPEED_DEV_XDMA]   = 0x1E6E7000,
-+    [ASPEED_DEV_VIDEO]  = 0x1E700000,
-+    [ASPEED_DEV_ADC]    = 0x1E6E9000,
-+    [ASPEED_DEV_SRAM]   = 0x1E720000,
-+    [ASPEED_DEV_SDHCI]  = 0x1E740000,
-+    [ASPEED_DEV_GPIO]   = 0x1E780000,
-+    [ASPEED_DEV_RTC]    = 0x1E781000,
-+    [ASPEED_DEV_TIMER1] = 0x1E782000,
-+    [ASPEED_DEV_WDT]    = 0x1E785000,
-+    [ASPEED_DEV_PWM]    = 0x1E786000,
-+    [ASPEED_DEV_LPC]    = 0x1E789000,
-+    [ASPEED_DEV_IBT]    = 0x1E789140,
-+    [ASPEED_DEV_I2C]    = 0x1E78A000,
-+    [ASPEED_DEV_ETH1]   = 0x1E660000,
-+    [ASPEED_DEV_ETH2]   = 0x1E680000,
-+    [ASPEED_DEV_UART1]  = 0x1E783000,
-+    [ASPEED_DEV_UART5]  = 0x1E784000,
-+    [ASPEED_DEV_VUART]  = 0x1E787000,
-+    [ASPEED_DEV_SDRAM]  = 0x40000000,
- };
- 
- static const hwaddr aspeed_soc_ast2500_memmap[] = {
--    [ASPEED_IOMEM]  = 0x1E600000,
--    [ASPEED_FMC]    = 0x1E620000,
--    [ASPEED_SPI1]   = 0x1E630000,
--    [ASPEED_SPI2]   = 0x1E631000,
--    [ASPEED_EHCI1]  = 0x1E6A1000,
--    [ASPEED_EHCI2]  = 0x1E6A3000,
--    [ASPEED_VIC]    = 0x1E6C0000,
--    [ASPEED_SDMC]   = 0x1E6E0000,
--    [ASPEED_SCU]    = 0x1E6E2000,
--    [ASPEED_XDMA]   = 0x1E6E7000,
--    [ASPEED_ADC]    = 0x1E6E9000,
--    [ASPEED_VIDEO]  = 0x1E700000,
--    [ASPEED_SRAM]   = 0x1E720000,
--    [ASPEED_SDHCI]  = 0x1E740000,
--    [ASPEED_GPIO]   = 0x1E780000,
--    [ASPEED_RTC]    = 0x1E781000,
--    [ASPEED_TIMER1] = 0x1E782000,
--    [ASPEED_WDT]    = 0x1E785000,
--    [ASPEED_PWM]    = 0x1E786000,
--    [ASPEED_LPC]    = 0x1E789000,
--    [ASPEED_IBT]    = 0x1E789140,
--    [ASPEED_I2C]    = 0x1E78A000,
--    [ASPEED_ETH1]   = 0x1E660000,
--    [ASPEED_ETH2]   = 0x1E680000,
--    [ASPEED_UART1]  = 0x1E783000,
--    [ASPEED_UART5]  = 0x1E784000,
--    [ASPEED_VUART]  = 0x1E787000,
--    [ASPEED_SDRAM]  = 0x80000000,
-+    [ASPEED_DEV_IOMEM]  = 0x1E600000,
-+    [ASPEED_DEV_FMC]    = 0x1E620000,
-+    [ASPEED_DEV_SPI1]   = 0x1E630000,
-+    [ASPEED_DEV_SPI2]   = 0x1E631000,
-+    [ASPEED_DEV_EHCI1]  = 0x1E6A1000,
-+    [ASPEED_DEV_EHCI2]  = 0x1E6A3000,
-+    [ASPEED_DEV_VIC]    = 0x1E6C0000,
-+    [ASPEED_DEV_SDMC]   = 0x1E6E0000,
-+    [ASPEED_DEV_SCU]    = 0x1E6E2000,
-+    [ASPEED_DEV_XDMA]   = 0x1E6E7000,
-+    [ASPEED_DEV_ADC]    = 0x1E6E9000,
-+    [ASPEED_DEV_VIDEO]  = 0x1E700000,
-+    [ASPEED_DEV_SRAM]   = 0x1E720000,
-+    [ASPEED_DEV_SDHCI]  = 0x1E740000,
-+    [ASPEED_DEV_GPIO]   = 0x1E780000,
-+    [ASPEED_DEV_RTC]    = 0x1E781000,
-+    [ASPEED_DEV_TIMER1] = 0x1E782000,
-+    [ASPEED_DEV_WDT]    = 0x1E785000,
-+    [ASPEED_DEV_PWM]    = 0x1E786000,
-+    [ASPEED_DEV_LPC]    = 0x1E789000,
-+    [ASPEED_DEV_IBT]    = 0x1E789140,
-+    [ASPEED_DEV_I2C]    = 0x1E78A000,
-+    [ASPEED_DEV_ETH1]   = 0x1E660000,
-+    [ASPEED_DEV_ETH2]   = 0x1E680000,
-+    [ASPEED_DEV_UART1]  = 0x1E783000,
-+    [ASPEED_DEV_UART5]  = 0x1E784000,
-+    [ASPEED_DEV_VUART]  = 0x1E787000,
-+    [ASPEED_DEV_SDRAM]  = 0x80000000,
- };
- 
- static const int aspeed_soc_ast2400_irqmap[] = {
--    [ASPEED_UART1]  = 9,
--    [ASPEED_UART2]  = 32,
--    [ASPEED_UART3]  = 33,
--    [ASPEED_UART4]  = 34,
--    [ASPEED_UART5]  = 10,
--    [ASPEED_VUART]  = 8,
--    [ASPEED_FMC]    = 19,
--    [ASPEED_EHCI1]  = 5,
--    [ASPEED_EHCI2]  = 13,
--    [ASPEED_SDMC]   = 0,
--    [ASPEED_SCU]    = 21,
--    [ASPEED_ADC]    = 31,
--    [ASPEED_GPIO]   = 20,
--    [ASPEED_RTC]    = 22,
--    [ASPEED_TIMER1] = 16,
--    [ASPEED_TIMER2] = 17,
--    [ASPEED_TIMER3] = 18,
--    [ASPEED_TIMER4] = 35,
--    [ASPEED_TIMER5] = 36,
--    [ASPEED_TIMER6] = 37,
--    [ASPEED_TIMER7] = 38,
--    [ASPEED_TIMER8] = 39,
--    [ASPEED_WDT]    = 27,
--    [ASPEED_PWM]    = 28,
--    [ASPEED_LPC]    = 8,
--    [ASPEED_IBT]    = 8, /* LPC */
--    [ASPEED_I2C]    = 12,
--    [ASPEED_ETH1]   = 2,
--    [ASPEED_ETH2]   = 3,
--    [ASPEED_XDMA]   = 6,
--    [ASPEED_SDHCI]  = 26,
-+    [ASPEED_DEV_UART1]  = 9,
-+    [ASPEED_DEV_UART2]  = 32,
-+    [ASPEED_DEV_UART3]  = 33,
-+    [ASPEED_DEV_UART4]  = 34,
-+    [ASPEED_DEV_UART5]  = 10,
-+    [ASPEED_DEV_VUART]  = 8,
-+    [ASPEED_DEV_FMC]    = 19,
-+    [ASPEED_DEV_EHCI1]  = 5,
-+    [ASPEED_DEV_EHCI2]  = 13,
-+    [ASPEED_DEV_SDMC]   = 0,
-+    [ASPEED_DEV_SCU]    = 21,
-+    [ASPEED_DEV_ADC]    = 31,
-+    [ASPEED_DEV_GPIO]   = 20,
-+    [ASPEED_DEV_RTC]    = 22,
-+    [ASPEED_DEV_TIMER1] = 16,
-+    [ASPEED_DEV_TIMER2] = 17,
-+    [ASPEED_DEV_TIMER3] = 18,
-+    [ASPEED_DEV_TIMER4] = 35,
-+    [ASPEED_DEV_TIMER5] = 36,
-+    [ASPEED_DEV_TIMER6] = 37,
-+    [ASPEED_DEV_TIMER7] = 38,
-+    [ASPEED_DEV_TIMER8] = 39,
-+    [ASPEED_DEV_WDT]    = 27,
-+    [ASPEED_DEV_PWM]    = 28,
-+    [ASPEED_DEV_LPC]    = 8,
-+    [ASPEED_DEV_IBT]    = 8, /* LPC */
-+    [ASPEED_DEV_I2C]    = 12,
-+    [ASPEED_DEV_ETH1]   = 2,
-+    [ASPEED_DEV_ETH2]   = 3,
-+    [ASPEED_DEV_XDMA]   = 6,
-+    [ASPEED_DEV_SDHCI]  = 26,
- };
- 
- #define aspeed_soc_ast2500_irqmap aspeed_soc_ast2400_irqmap
-@@ -221,11 +221,11 @@ static void aspeed_soc_realize(DeviceState *dev, Error **errp)
-     Error *err = NULL;
- 
-     /* IO space */
--    create_unimplemented_device("aspeed_soc.io", sc->memmap[ASPEED_IOMEM],
-+    create_unimplemented_device("aspeed_soc.io", sc->memmap[ASPEED_DEV_IOMEM],
-                                 ASPEED_SOC_IOMEM_SIZE);
- 
-     /* Video engine stub */
--    create_unimplemented_device("aspeed.video", sc->memmap[ASPEED_VIDEO],
-+    create_unimplemented_device("aspeed.video", sc->memmap[ASPEED_DEV_VIDEO],
-                                 0x1000);
- 
-     /* CPU */
-@@ -243,19 +243,19 @@ static void aspeed_soc_realize(DeviceState *dev, Error **errp)
-         return;
++static void
++print_timespec(abi_ulong ts_addr, int last)
++{
++    if (ts_addr) {
++        struct target_timespec *ts;
++
++        ts = lock_user(VERIFY_READ, ts_addr, sizeof(*ts), 1);
++        if (!ts) {
++            print_pointer(ts_addr, last);
++            return;
++        }
++        qemu_log("{tv_sec = " TARGET_ABI_FMT_ld
++                 ",tv_nsec = " TARGET_ABI_FMT_ld "}%s",
++                 tswapal(ts->tv_sec), tswapal(ts->tv_nsec), get_comma(last));
++        unlock_user(ts, ts_addr, 0);
++    } else {
++        qemu_log("NULL%s", get_comma(last));
++    }
++}
++
+ static void
+ print_timezone(abi_ulong tz_addr, int last)
+ {
+@@ -1465,6 +1537,22 @@ print_timezone(abi_ulong tz_addr, int last)
      }
-     memory_region_add_subregion(get_system_memory(),
--                                sc->memmap[ASPEED_SRAM], &s->sram);
-+                                sc->memmap[ASPEED_DEV_SRAM], &s->sram);
- 
-     /* SCU */
-     if (!sysbus_realize(SYS_BUS_DEVICE(&s->scu), errp)) {
-         return;
-     }
--    sysbus_mmio_map(SYS_BUS_DEVICE(&s->scu), 0, sc->memmap[ASPEED_SCU]);
-+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->scu), 0, sc->memmap[ASPEED_DEV_SCU]);
- 
-     /* VIC */
-     if (!sysbus_realize(SYS_BUS_DEVICE(&s->vic), errp)) {
-         return;
-     }
--    sysbus_mmio_map(SYS_BUS_DEVICE(&s->vic), 0, sc->memmap[ASPEED_VIC]);
-+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->vic), 0, sc->memmap[ASPEED_DEV_VIC]);
-     sysbus_connect_irq(SYS_BUS_DEVICE(&s->vic), 0,
-                        qdev_get_gpio_in(DEVICE(&s->cpu), ARM_CPU_IRQ));
-     sysbus_connect_irq(SYS_BUS_DEVICE(&s->vic), 1,
-@@ -265,9 +265,9 @@ static void aspeed_soc_realize(DeviceState *dev, Error **errp)
-     if (!sysbus_realize(SYS_BUS_DEVICE(&s->rtc), errp)) {
-         return;
-     }
--    sysbus_mmio_map(SYS_BUS_DEVICE(&s->rtc), 0, sc->memmap[ASPEED_RTC]);
-+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->rtc), 0, sc->memmap[ASPEED_DEV_RTC]);
-     sysbus_connect_irq(SYS_BUS_DEVICE(&s->rtc), 0,
--                       aspeed_soc_get_irq(s, ASPEED_RTC));
-+                       aspeed_soc_get_irq(s, ASPEED_DEV_RTC));
- 
-     /* Timer */
-     object_property_set_link(OBJECT(&s->timerctrl), "scu", OBJECT(&s->scu),
-@@ -276,16 +276,16 @@ static void aspeed_soc_realize(DeviceState *dev, Error **errp)
-         return;
-     }
-     sysbus_mmio_map(SYS_BUS_DEVICE(&s->timerctrl), 0,
--                    sc->memmap[ASPEED_TIMER1]);
-+                    sc->memmap[ASPEED_DEV_TIMER1]);
-     for (i = 0; i < ASPEED_TIMER_NR_TIMERS; i++) {
--        qemu_irq irq = aspeed_soc_get_irq(s, ASPEED_TIMER1 + i);
-+        qemu_irq irq = aspeed_soc_get_irq(s, ASPEED_DEV_TIMER1 + i);
-         sysbus_connect_irq(SYS_BUS_DEVICE(&s->timerctrl), i, irq);
-     }
- 
-     /* UART - attach an 8250 to the IO space as our UART5 */
-     if (serial_hd(0)) {
--        qemu_irq uart5 = aspeed_soc_get_irq(s, ASPEED_UART5);
--        serial_mm_init(get_system_memory(), sc->memmap[ASPEED_UART5], 2,
-+        qemu_irq uart5 = aspeed_soc_get_irq(s, ASPEED_DEV_UART5);
-+        serial_mm_init(get_system_memory(), sc->memmap[ASPEED_DEV_UART5], 2,
-                        uart5, 38400, serial_hd(0), DEVICE_LITTLE_ENDIAN);
-     }
- 
-@@ -295,25 +295,25 @@ static void aspeed_soc_realize(DeviceState *dev, Error **errp)
-     if (!sysbus_realize(SYS_BUS_DEVICE(&s->i2c), errp)) {
-         return;
-     }
--    sysbus_mmio_map(SYS_BUS_DEVICE(&s->i2c), 0, sc->memmap[ASPEED_I2C]);
-+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->i2c), 0, sc->memmap[ASPEED_DEV_I2C]);
-     sysbus_connect_irq(SYS_BUS_DEVICE(&s->i2c), 0,
--                       aspeed_soc_get_irq(s, ASPEED_I2C));
-+                       aspeed_soc_get_irq(s, ASPEED_DEV_I2C));
- 
-     /* FMC, The number of CS is set at the board level */
-     object_property_set_link(OBJECT(&s->fmc), "dram", OBJECT(s->dram_mr),
-                              &error_abort);
-     if (!object_property_set_int(OBJECT(&s->fmc), "sdram-base",
--                                 sc->memmap[ASPEED_SDRAM], errp)) {
-+                                 sc->memmap[ASPEED_DEV_SDRAM], errp)) {
-         return;
-     }
-     if (!sysbus_realize(SYS_BUS_DEVICE(&s->fmc), errp)) {
-         return;
-     }
--    sysbus_mmio_map(SYS_BUS_DEVICE(&s->fmc), 0, sc->memmap[ASPEED_FMC]);
-+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->fmc), 0, sc->memmap[ASPEED_DEV_FMC]);
-     sysbus_mmio_map(SYS_BUS_DEVICE(&s->fmc), 1,
-                     s->fmc.ctrl->flash_window_base);
-     sysbus_connect_irq(SYS_BUS_DEVICE(&s->fmc), 0,
--                       aspeed_soc_get_irq(s, ASPEED_FMC));
-+                       aspeed_soc_get_irq(s, ASPEED_DEV_FMC));
- 
-     /* SPI */
-     for (i = 0; i < sc->spis_num; i++) {
-@@ -322,7 +322,7 @@ static void aspeed_soc_realize(DeviceState *dev, Error **errp)
-             return;
-         }
-         sysbus_mmio_map(SYS_BUS_DEVICE(&s->spi[i]), 0,
--                        sc->memmap[ASPEED_SPI1 + i]);
-+                        sc->memmap[ASPEED_DEV_SPI1 + i]);
-         sysbus_mmio_map(SYS_BUS_DEVICE(&s->spi[i]), 1,
-                         s->spi[i].ctrl->flash_window_base);
-     }
-@@ -333,16 +333,16 @@ static void aspeed_soc_realize(DeviceState *dev, Error **errp)
-             return;
-         }
-         sysbus_mmio_map(SYS_BUS_DEVICE(&s->ehci[i]), 0,
--                        sc->memmap[ASPEED_EHCI1 + i]);
-+                        sc->memmap[ASPEED_DEV_EHCI1 + i]);
-         sysbus_connect_irq(SYS_BUS_DEVICE(&s->ehci[i]), 0,
--                           aspeed_soc_get_irq(s, ASPEED_EHCI1 + i));
-+                           aspeed_soc_get_irq(s, ASPEED_DEV_EHCI1 + i));
-     }
- 
-     /* SDMC - SDRAM Memory Controller */
-     if (!sysbus_realize(SYS_BUS_DEVICE(&s->sdmc), errp)) {
-         return;
-     }
--    sysbus_mmio_map(SYS_BUS_DEVICE(&s->sdmc), 0, sc->memmap[ASPEED_SDMC]);
-+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->sdmc), 0, sc->memmap[ASPEED_DEV_SDMC]);
- 
-     /* Watch dog */
-     for (i = 0; i < sc->wdts_num; i++) {
-@@ -354,7 +354,7 @@ static void aspeed_soc_realize(DeviceState *dev, Error **errp)
-             return;
-         }
-         sysbus_mmio_map(SYS_BUS_DEVICE(&s->wdt[i]), 0,
--                        sc->memmap[ASPEED_WDT] + i * awc->offset);
-+                        sc->memmap[ASPEED_DEV_WDT] + i * awc->offset);
-     }
- 
-     /* Net */
-@@ -365,9 +365,9 @@ static void aspeed_soc_realize(DeviceState *dev, Error **errp)
-             return;
-         }
-         sysbus_mmio_map(SYS_BUS_DEVICE(&s->ftgmac100[i]), 0,
--                        sc->memmap[ASPEED_ETH1 + i]);
-+                        sc->memmap[ASPEED_DEV_ETH1 + i]);
-         sysbus_connect_irq(SYS_BUS_DEVICE(&s->ftgmac100[i]), 0,
--                           aspeed_soc_get_irq(s, ASPEED_ETH1 + i));
-+                           aspeed_soc_get_irq(s, ASPEED_DEV_ETH1 + i));
-     }
- 
-     /* XDMA */
-@@ -375,26 +375,26 @@ static void aspeed_soc_realize(DeviceState *dev, Error **errp)
-         return;
-     }
-     sysbus_mmio_map(SYS_BUS_DEVICE(&s->xdma), 0,
--                    sc->memmap[ASPEED_XDMA]);
-+                    sc->memmap[ASPEED_DEV_XDMA]);
-     sysbus_connect_irq(SYS_BUS_DEVICE(&s->xdma), 0,
--                       aspeed_soc_get_irq(s, ASPEED_XDMA));
-+                       aspeed_soc_get_irq(s, ASPEED_DEV_XDMA));
- 
-     /* GPIO */
-     if (!sysbus_realize(SYS_BUS_DEVICE(&s->gpio), errp)) {
-         return;
-     }
--    sysbus_mmio_map(SYS_BUS_DEVICE(&s->gpio), 0, sc->memmap[ASPEED_GPIO]);
-+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->gpio), 0, sc->memmap[ASPEED_DEV_GPIO]);
-     sysbus_connect_irq(SYS_BUS_DEVICE(&s->gpio), 0,
--                       aspeed_soc_get_irq(s, ASPEED_GPIO));
-+                       aspeed_soc_get_irq(s, ASPEED_DEV_GPIO));
- 
-     /* SDHCI */
-     if (!sysbus_realize(SYS_BUS_DEVICE(&s->sdhci), errp)) {
-         return;
-     }
-     sysbus_mmio_map(SYS_BUS_DEVICE(&s->sdhci), 0,
--                    sc->memmap[ASPEED_SDHCI]);
-+                    sc->memmap[ASPEED_DEV_SDHCI]);
-     sysbus_connect_irq(SYS_BUS_DEVICE(&s->sdhci), 0,
--                       aspeed_soc_get_irq(s, ASPEED_SDHCI));
-+                       aspeed_soc_get_irq(s, ASPEED_DEV_SDHCI));
  }
- static Property aspeed_soc_properties[] = {
-     DEFINE_PROP_LINK("dram", AspeedSoCState, dram_mr, TYPE_MEMORY_REGION,
+ 
++static void
++print_itimerval(abi_ulong it_addr, int last)
++{
++    if (it_addr) {
++        qemu_log("{it_interval=");
++        print_timeval(it_addr +
++                      offsetof(struct target_itimerval, it_interval), 0);
++        qemu_log("it_value=");
++        print_timeval(it_addr +
++                      offsetof(struct target_itimerval, it_value), 0);
++        qemu_log("}%s", get_comma(last));
++    } else {
++        qemu_log("NULL%s", get_comma(last));
++    }
++}
++
+ #undef UNUSED
+ 
+ #ifdef TARGET_NR_accept
+@@ -1577,7 +1665,7 @@ print_clock_adjtime(void *cpu_env, const struct syscallname *name,
+                     abi_long arg3, abi_long arg4, abi_long arg5)
+ {
+     print_syscall_prologue(name);
+-    print_clockid(arg0, 0);
++    print_enums(clockids, arg0, 0);
+     print_pointer(arg1, 1);
+     print_syscall_epilogue(name);
+ }
+@@ -1907,6 +1995,19 @@ print_futimesat(void *cpu_env, const struct syscallname *name,
+ }
+ #endif
+ 
++#ifdef TARGET_NR_gettimeofday
++static void
++print_gettimeofday(void *cpu_env, const struct syscallname *name,
++                   abi_long arg0, abi_long arg1, abi_long arg2,
++                   abi_long arg3, abi_long arg4, abi_long arg5)
++{
++    print_syscall_prologue(name);
++    print_pointer(arg0, 0);
++    print_pointer(arg1, 1);
++    print_syscall_epilogue(name);
++}
++#endif
++
+ #ifdef TARGET_NR_settimeofday
+ static void
+ print_settimeofday(void *cpu_env, const struct syscallname *name,
+@@ -1920,6 +2021,60 @@ print_settimeofday(void *cpu_env, const struct syscallname *name,
+ }
+ #endif
+ 
++#if defined(TARGET_NR_clock_gettime) || defined(TARGET_NR_clock_getres)
++static void
++print_clock_gettime(void *cpu_env, const struct syscallname *name,
++                    abi_long arg0, abi_long arg1, abi_long arg2,
++                    abi_long arg3, abi_long arg4, abi_long arg5)
++{
++    print_syscall_prologue(name);
++    print_enums(clockids, arg0, 0);
++    print_pointer(arg1, 1);
++    print_syscall_epilogue(name);
++}
++#define print_clock_getres     print_clock_gettime
++#endif
++
++#ifdef TARGET_NR_clock_settime
++static void
++print_clock_settime(void *cpu_env, const struct syscallname *name,
++                    abi_long arg0, abi_long arg1, abi_long arg2,
++                    abi_long arg3, abi_long arg4, abi_long arg5)
++{
++    print_syscall_prologue(name);
++    print_enums(clockids, arg0, 0);
++    print_timespec(arg1, 1);
++    print_syscall_epilogue(name);
++}
++#endif
++
++#ifdef TARGET_NR_getitimer
++static void
++print_getitimer(void *cpu_env, const struct syscallname *name,
++                abi_long arg0, abi_long arg1, abi_long arg2,
++                abi_long arg3, abi_long arg4, abi_long arg5)
++{
++    print_syscall_prologue(name);
++    print_enums(itimer_types, arg0, 0);
++    print_pointer(arg1, 1);
++    print_syscall_epilogue(name);
++}
++#endif
++
++#ifdef TARGET_NR_setitimer
++static void
++print_setitimer(void *cpu_env, const struct syscallname *name,
++                abi_long arg0, abi_long arg1, abi_long arg2,
++                abi_long arg3, abi_long arg4, abi_long arg5)
++{
++    print_syscall_prologue(name);
++    print_enums(itimer_types, arg0, 0);
++    print_itimerval(arg1, 0);
++    print_pointer(arg2, 1);
++    print_syscall_epilogue(name);
++}
++#endif
++
+ #ifdef TARGET_NR_link
+ static void
+ print_link(void *cpu_env, const struct syscallname *name,
+diff --git a/linux-user/strace.list b/linux-user/strace.list
+index d0ea7f3464b8..084048ab96dd 100644
+--- a/linux-user/strace.list
++++ b/linux-user/strace.list
+@@ -83,16 +83,18 @@
+ { TARGET_NR_clock_adjtime, "clock_adjtime" , NULL, print_clock_adjtime, NULL },
+ #endif
+ #ifdef TARGET_NR_clock_getres
+-{ TARGET_NR_clock_getres, "clock_getres" , NULL, NULL, NULL },
++{ TARGET_NR_clock_getres, "clock_getres" , NULL, print_clock_getres,
++                          print_syscall_ret_clock_getres },
+ #endif
+ #ifdef TARGET_NR_clock_gettime
+-{ TARGET_NR_clock_gettime, "clock_gettime" , NULL, NULL, NULL },
++{ TARGET_NR_clock_gettime, "clock_gettime" , NULL, print_clock_gettime,
++                           print_syscall_ret_clock_gettime },
+ #endif
+ #ifdef TARGET_NR_clock_nanosleep
+ { TARGET_NR_clock_nanosleep, "clock_nanosleep" , NULL, NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_clock_settime
+-{ TARGET_NR_clock_settime, "clock_settime" , NULL, NULL, NULL },
++{ TARGET_NR_clock_settime, "clock_settime" , NULL, print_clock_settime, NULL },
+ #endif
+ #ifdef TARGET_NR_clone
+ { TARGET_NR_clone, "clone" , NULL, print_clone, NULL },
+@@ -315,7 +317,8 @@
+ { TARGET_NR_gethostname, "gethostname" , NULL, NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_getitimer
+-{ TARGET_NR_getitimer, "getitimer" , NULL, NULL, NULL },
++{ TARGET_NR_getitimer, "getitimer" , NULL, print_getitimer,
++                       print_syscall_ret_getitimer },
+ #endif
+ #ifdef TARGET_NR_get_kernel_syms
+ { TARGET_NR_get_kernel_syms, "get_kernel_syms" , NULL, NULL, NULL },
+@@ -388,7 +391,8 @@
+ { TARGET_NR_gettid, "gettid" , "%s()", NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_gettimeofday
+-{ TARGET_NR_gettimeofday, "gettimeofday" , NULL, NULL, NULL },
++{ TARGET_NR_gettimeofday, "gettimeofday" , NULL, print_gettimeofday,
++                          print_syscall_ret_gettimeofday },
+ #endif
+ #ifdef TARGET_NR_getuid
+ { TARGET_NR_getuid, "getuid" , "%s()", NULL, NULL },
+@@ -1291,7 +1295,8 @@
+ { TARGET_NR_sethostname, "sethostname" , NULL, NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_setitimer
+-{ TARGET_NR_setitimer, "setitimer" , NULL, NULL, NULL },
++{ TARGET_NR_setitimer, "setitimer" , NULL, print_setitimer,
++                       print_syscall_ret_setitimer },
+ #endif
+ #ifdef TARGET_NR_set_mempolicy
+ { TARGET_NR_set_mempolicy, "set_mempolicy" , NULL, NULL, NULL },
 -- 
 2.26.2
 
