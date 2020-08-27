@@ -2,104 +2,84 @@ Return-Path: <SRS0=k4hX=CF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20CA9C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 18:27:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF9AEC433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 18:28:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D93842087C
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 18:27:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 873F82087C
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 18:28:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="hDA/hPj7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D93842087C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UrcTPrXf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 873F82087C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36512 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39908 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBMc8-0004x5-6P
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 14:27:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42742)
+	id 1kBMdD-0006Mz-RQ
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 14:28:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43868)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <elena.ufimtseva@oracle.com>)
- id 1kBMQC-0003X6-3l
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 14:14:48 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:50750)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <elena.ufimtseva@oracle.com>)
- id 1kBMQ9-0007R2-SL
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 14:14:47 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
- by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 07RI5aBR074709;
- Thu, 27 Aug 2020 18:14:40 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=corp-2020-01-29;
- bh=tHaOUP26nebgYRruxSr90qnJ+Qr3yqpsEPglBrzozvs=;
- b=hDA/hPj7f7dksQxyiptm3hrQccDJCndOeUQl/0eFzv6bX6rsHJxq17TvliEW5s83Q0CB
- UJah8zlQAoZEGkQJmi9g9PxSz9pYFetIYrxTXq5n3gx/X8s9IRqnsQ4u2oSX0wxQHox0
- LKzEjYtPMQVF4GzJCqZJ/RND0uPXpirFp8FDLHYgXzGWe/N9eb7ZE6p0R8KOB26qBR05
- ow1flrdaus2mGTRYABdg0AXiW3FJCz8yy3bj2AYzlZUSep6IF82HLJmwvI9AC5bY36B/
- 5SM5jEGhPaKrJEJY/eai/4rwff84ZH+Fd9njWcf6Gy/Z/pg52RtG58LmxFBVZIh2CVnJ Cg== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
- by userp2120.oracle.com with ESMTP id 333w6u6hsa-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
- Thu, 27 Aug 2020 18:14:40 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
- by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 07RI4ijH074797;
- Thu, 27 Aug 2020 18:12:39 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
- by userp3020.oracle.com with ESMTP id 333ru1sxkn-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 27 Aug 2020 18:12:39 +0000
-Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
- by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 07RICcnm020922;
- Thu, 27 Aug 2020 18:12:38 GMT
-Received: from flaka.hsd1.ca.comcast.net (/10.159.136.159)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Thu, 27 Aug 2020 11:12:37 -0700
-From: elena.ufimtseva@oracle.com
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kBMUQ-0000WI-QI
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 14:19:10 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:26849
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kBMUL-00083Q-KT
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 14:19:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1598552344;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=xq67xF1Ah1SkuP7oFrCV75JxzXmfxpuV8L0SN/RmBDk=;
+ b=UrcTPrXfMF47d9Fe4smV3Ogp+Qg9KmYkxbkLVxjucpUEYmci8z/hmBFsUqr5GPNp6ZJ6++
+ TzswGUs7NiHepqTfiCNvDIfX6gWeKA3aY+nYz4Y2YtUzKkQYjxczZRMpFNGPflEM9zbo8U
+ +4NZNeOF6YwwhefX7goACDL4MdfCCK4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-47-L87QBkKKNdqtVT7o2Yd_Pg-1; Thu, 27 Aug 2020 14:18:39 -0400
+X-MC-Unique: L87QBkKKNdqtVT7o2Yd_Pg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 79FCE1074650;
+ Thu, 27 Aug 2020 18:18:33 +0000 (UTC)
+Received: from localhost (unknown [10.10.67.254])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 233C35D9E8;
+ Thu, 27 Aug 2020 18:18:17 +0000 (UTC)
+Date: Thu, 27 Aug 2020 14:18:16 -0400
+From: Eduardo Habkost <ehabkost@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v9 01/20] memory: alloc RAM from file at offset
-Date: Thu, 27 Aug 2020 11:12:12 -0700
-Message-Id: <20200827181231.22778-2-elena.ufimtseva@oracle.com>
-X-Mailer: git-send-email 2.25.GIT
-In-Reply-To: <20200827181231.22778-1-elena.ufimtseva@oracle.com>
-References: <20200827181231.22778-1-elena.ufimtseva@oracle.com>
+Subject: Re: [PATCH v3 00/74] qom: Automated conversion of type checking
+ boilerplate
+Message-ID: <20200827181816.GI642093@habkost.net>
+References: <20200825192110.3528606-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9726
- signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=3
- adultscore=0
- phishscore=0 spamscore=0 bulkscore=0 mlxlogscore=999 malwarescore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2008270136
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9726
- signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0
- impostorscore=0
- mlxlogscore=999 suspectscore=3 phishscore=0 malwarescore=0 spamscore=0
- priorityscore=1501 clxscore=1015 mlxscore=0 lowpriorityscore=0 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2008270136
-Received-SPF: pass client-ip=156.151.31.85;
- envelope-from=elena.ufimtseva@oracle.com; helo=userp2120.oracle.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 14:08:28
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
-X-Spam_score_int: -53
-X-Spam_score: -5.4
-X-Spam_bar: -----
-X-Spam_report: (-5.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.959,
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200825192110.3528606-1-ehabkost@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=ehabkost@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 00:53:04
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.959,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001, UNPARSEABLE_RELAY=0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -112,231 +92,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: elena.ufimtseva@oracle.com, fam@euphon.net, swapnil.ingle@nutanix.com,
- john.g.johnson@oracle.com, kraxel@redhat.com, jag.raman@oracle.com,
- quintela@redhat.com, mst@redhat.com, armbru@redhat.com,
- kanth.ghatraju@oracle.com, felipe@nutanix.com, thuth@redhat.com,
- ehabkost@redhat.com, konrad.wilk@oracle.com, dgilbert@redhat.com,
- stefanha@redhat.com, thanos.makatos@nutanix.com, rth@twiddle.net,
- kwolf@redhat.com, berrange@redhat.com, mreitz@redhat.com,
- ross.lagerwall@citrix.com, marcandre.lureau@gmail.com, pbonzini@redhat.com
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+ Dmitry Fleytman <dmitry.fleytman@gmail.com>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ David Hildenbrand <david@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Laurent Vivier <laurent@vivier.eu>,
+ Alistair Francis <alistair.francis@wdc.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Sven Schnelle <svens@stackframe.org>, Paul Durrant <paul@xen.org>,
+ Hannes Reinecke <hare@suse.com>, Stefano Stabellini <sstabellini@kernel.org>,
+ Alberto Garcia <berto@igalia.com>, kvm@vger.kernel.org, qemu-block@nongnu.org,
+ Juan Quintela <quintela@redhat.com>, qemu-ppc@nongnu.org,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>,
+ Joel Stanley <joel@jms.id.au>, Anthony PERARD <anthony.perard@citrix.com>,
+ xen-devel@lists.xenproject.org, David Gibson <david@gibson.dropbear.id.au>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
+ Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Jiri Pirko <jiri@resnulli.us>, qemu-s390x@nongnu.org,
+ Niek Linnenbank <nieklinnenbank@gmail.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Cameron Esfahani <dirty@apple.com>, Beniamino Galvani <b.galvani@gmail.com>,
+ Roman Bolshakov <r.bolshakov@yadro.com>, qemu-arm@nongnu.org,
+ =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>,
+ =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
+ qemu-riscv@nongnu.org, John Snow <jsnow@redhat.com>,
+ Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>,
+ "Daniel P. Berrange" <berrange@redhat.com>, Andrew Jeffery <andrew@aj.id.au>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Amit Shah <amit@kernel.org>, Cornelia Huck <cohuck@redhat.com>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>,
+ Max Reitz <mreitz@redhat.com>, Thomas Huth <huth@tuxfamily.org>,
+ Palmer Dabbelt <palmer@dabbelt.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Jagannathan Raman <jag.raman@oracle.com>
+On Tue, Aug 25, 2020 at 03:19:56PM -0400, Eduardo Habkost wrote:
+> git tree for this series:
+> https://github.com/ehabkost/qemu-hacks/tree/work/qom-macros-autoconvert
+> 
+> This is an extension of the series previously submitted by
+> Daniel[1], including a script that will convert existing type
+> checker macros automatically.
+> 
+> [1] https://lore.kernel.org/qemu-devel/20200723181410.3145233-1-berrange@redh=
+> at.com/
 
-Allow RAM MemoryRegion to be created from an offset in a file, instead
-of allocating at offset of 0 by default. This is needed to synchronize
-RAM between QEMU & remote process.
+I'm queueing the following patches on machine-next:
 
-Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
-Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
-Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- backends/hostmem-memfd.c  |  2 +-
- exec.c                    | 11 +++++++----
- hw/misc/ivshmem.c         |  3 ++-
- include/exec/memory.h     |  2 ++
- include/exec/ram_addr.h   |  2 +-
- include/qemu/mmap-alloc.h |  3 ++-
- softmmu/memory.c          |  3 ++-
- util/mmap-alloc.c         |  7 ++++---
- util/oslib-posix.c        |  2 +-
- 9 files changed, 22 insertions(+), 13 deletions(-)
+[PATCH v3 01/74] e1000: Rename QOM class cast macros
+[PATCH v3 02/74] megasas: Rename QOM class cast macros
+[PATCH v3 03/74] vmw_pvscsi: Rename QOM class cast macros
+[PATCH v3 04/74] pl110: Rename pl110_version enum values
+[PATCH v3 05/74] allwinner-h3: Rename memmap enum constants
+[PATCH v3 06/74] aspeed_soc: Rename memmap/irqmap enum constants
+[PATCH v3 07/74] opentitan: Rename memmap enum constants
+[PATCH v3 10/74] aspeed_timer: Fix ASPEED_TIMER macro definition
+[PATCH v3 11/74] versatile: Fix typo in PCI_VPB_HOST definition
+[PATCH v3 12/74] virtio-ccw: Fix definition of VIRTIO_CCW_BUS_GET_CLASS
+[PATCH v3 13/74] hvf: Add missing include
+[PATCH v3 14/74] hcd-dwc2: Rename USB_*CLASS macros for consistency
+[PATCH v3 15/74] tulip: Move TulipState typedef to header
+[PATCH v3 16/74] throttle-groups: Move ThrottleGroup typedef to header
+[PATCH v3 17/74] pci: Move PCIBusClass typedef to pci.h
+[PATCH v3 18/74] i8254: Move PITCommonState/PITCommonClass typedefs to i8254.h
+[PATCH v3 19/74] hvf: Move HVFState typedef to hvf.h
+[PATCH v3 20/74] mcf_fec: Move mcf_fec_state typedef to header
+[PATCH v3 21/74] s390_flic: Move KVMS390FLICState typedef to header
+[PATCH v3 22/74] can_emu: Delete macros for non-existing typedef
+[PATCH v3 23/74] nubus: Delete unused NUBUS_BRIDGE macro
+[PATCH v3 24/74] platform-bus: Delete macros for non-existing typedef
+[PATCH v3 25/74] armsse: Rename QOM macros to avoid conflicts
+[PATCH v3 26/74] xen-legacy-backend: Add missing typedef XenLegacyDevice
+[PATCH v3 27/74] spapr: Move typedef SpaprMachineState to spapr.h
+[PATCH v3 28/74] s390x: Move typedef SCLPEventFacility to event-facility.h
+[PATCH v3 29/74] vhost-user-gpu: Move QOM macro to header
+[PATCH v3 30/74] ahci: Move QOM macros to header
+[PATCH v3 31/74] i8257: Move QOM macro to header
+[PATCH v3 32/74] ahci: Move QOM macro to header
+[PATCH v3 33/74] pckbd: Move QOM macro to header
+[PATCH v3 34/74] vmbus: Move QOM macros to vmbus.h
+[PATCH v3 35/74] virtio-serial-bus: Move QOM macros to header
+[PATCH v3 36/74] piix: Move QOM macros to header
+[PATCH v3 37/74] auxbus: Move QOM macros to header
+[PATCH v3 38/74] rocker: Move QOM macros to header
+[PATCH v3 39/74] pxa2xx: Move QOM macros to header
+[PATCH v3 40/74] mptsas: Move QOM macros to header
+[PATCH v3 41/74] kvm: Move QOM macros to kvm.h
+[PATCH v3 42/74] vfio/pci: Move QOM macros to header
+[PATCH v3 43/74] nubus: Rename class type checking macros
+[PATCH v3 48/74] s390-virtio-ccw: Rename S390_MACHINE_CLASS macro
+[PATCH v3 49/74] swim: Rename struct SWIM to Swim
+[PATCH v3 50/74] migration: Rename class type checking macros
 
-diff --git a/backends/hostmem-memfd.c b/backends/hostmem-memfd.c
-index 4c040a7541..19c4f63ddd 100644
---- a/backends/hostmem-memfd.c
-+++ b/backends/hostmem-memfd.c
-@@ -56,7 +56,7 @@ memfd_backend_memory_alloc(HostMemoryBackend *backend, Error **errp)
-     name = host_memory_backend_get_name(backend);
-     memory_region_init_ram_from_fd(&backend->mr, OBJECT(backend),
-                                    name, backend->size,
--                                   backend->share, fd, errp);
-+                                   backend->share, fd, 0, errp);
-     g_free(name);
- }
- 
-diff --git a/exec.c b/exec.c
-index 7683afb6a8..5d06d0de08 100644
---- a/exec.c
-+++ b/exec.c
-@@ -1832,6 +1832,7 @@ static void *file_ram_alloc(RAMBlock *block,
-                             ram_addr_t memory,
-                             int fd,
-                             bool truncate,
-+                            off_t offset,
-                             Error **errp)
- {
-     void *area;
-@@ -1882,7 +1883,8 @@ static void *file_ram_alloc(RAMBlock *block,
-     }
- 
-     area = qemu_ram_mmap(fd, memory, block->mr->align,
--                         block->flags & RAM_SHARED, block->flags & RAM_PMEM);
-+                         block->flags & RAM_SHARED, block->flags & RAM_PMEM,
-+                         offset);
-     if (area == MAP_FAILED) {
-         error_setg_errno(errp, errno,
-                          "unable to map backing store for guest RAM");
-@@ -2314,7 +2316,7 @@ static void ram_block_add(RAMBlock *new_block, Error **errp, bool shared)
- #ifdef CONFIG_POSIX
- RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
-                                  uint32_t ram_flags, int fd,
--                                 Error **errp)
-+                                 off_t offset, Error **errp)
- {
-     RAMBlock *new_block;
-     Error *local_err = NULL;
-@@ -2367,7 +2369,8 @@ RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
-     new_block->used_length = size;
-     new_block->max_length = size;
-     new_block->flags = ram_flags;
--    new_block->host = file_ram_alloc(new_block, size, fd, !file_size, errp);
-+    new_block->host = file_ram_alloc(new_block, size, fd, !file_size, offset,
-+                                     errp);
-     if (!new_block->host) {
-         g_free(new_block);
-         return NULL;
-@@ -2397,7 +2400,7 @@ RAMBlock *qemu_ram_alloc_from_file(ram_addr_t size, MemoryRegion *mr,
-         return NULL;
-     }
- 
--    block = qemu_ram_alloc_from_fd(size, mr, ram_flags, fd, errp);
-+    block = qemu_ram_alloc_from_fd(size, mr, ram_flags, fd, 0, errp);
-     if (!block) {
-         if (created) {
-             unlink(mem_path);
-diff --git a/hw/misc/ivshmem.c b/hw/misc/ivshmem.c
-index 2b6882face..5ffaa72562 100644
---- a/hw/misc/ivshmem.c
-+++ b/hw/misc/ivshmem.c
-@@ -492,7 +492,8 @@ static void process_msg_shmem(IVShmemState *s, int fd, Error **errp)
- 
-     /* mmap the region and map into the BAR2 */
-     memory_region_init_ram_from_fd(&s->server_bar2, OBJECT(s),
--                                   "ivshmem.bar2", size, true, fd, &local_err);
-+                                   "ivshmem.bar2", size, true, fd, 0,
-+                                   &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-         return;
-diff --git a/include/exec/memory.h b/include/exec/memory.h
-index 0cfe987ab4..dd5a59f68a 100644
---- a/include/exec/memory.h
-+++ b/include/exec/memory.h
-@@ -908,6 +908,7 @@ void memory_region_init_ram_from_file(MemoryRegion *mr,
-  * @size: size of the region.
-  * @share: %true if memory must be mmaped with the MAP_SHARED flag
-  * @fd: the fd to mmap.
-+ * @offset: offset within the file referenced by fd
-  * @errp: pointer to Error*, to store an error if it happens.
-  *
-  * Note that this function does not do anything to cause the data in the
-@@ -919,6 +920,7 @@ void memory_region_init_ram_from_fd(MemoryRegion *mr,
-                                     uint64_t size,
-                                     bool share,
-                                     int fd,
-+                                    ram_addr_t offset,
-                                     Error **errp);
- #endif
- 
-diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
-index 3ef729a23c..34b2bce924 100644
---- a/include/exec/ram_addr.h
-+++ b/include/exec/ram_addr.h
-@@ -121,7 +121,7 @@ RAMBlock *qemu_ram_alloc_from_file(ram_addr_t size, MemoryRegion *mr,
-                                    Error **errp);
- RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, MemoryRegion *mr,
-                                  uint32_t ram_flags, int fd,
--                                 Error **errp);
-+                                 off_t offset, Error **errp);
- 
- RAMBlock *qemu_ram_alloc_from_ptr(ram_addr_t size, void *host,
-                                   MemoryRegion *mr, Error **errp);
-diff --git a/include/qemu/mmap-alloc.h b/include/qemu/mmap-alloc.h
-index e786266b92..4f579858bc 100644
---- a/include/qemu/mmap-alloc.h
-+++ b/include/qemu/mmap-alloc.h
-@@ -25,7 +25,8 @@ void *qemu_ram_mmap(int fd,
-                     size_t size,
-                     size_t align,
-                     bool shared,
--                    bool is_pmem);
-+                    bool is_pmem,
-+                    off_t start);
- 
- void qemu_ram_munmap(int fd, void *ptr, size_t size);
- 
-diff --git a/softmmu/memory.c b/softmmu/memory.c
-index 70b93104e8..a20a649845 100644
---- a/softmmu/memory.c
-+++ b/softmmu/memory.c
-@@ -1576,6 +1576,7 @@ void memory_region_init_ram_from_fd(MemoryRegion *mr,
-                                     uint64_t size,
-                                     bool share,
-                                     int fd,
-+                                    ram_addr_t offset,
-                                     Error **errp)
- {
-     Error *err = NULL;
-@@ -1585,7 +1586,7 @@ void memory_region_init_ram_from_fd(MemoryRegion *mr,
-     mr->destructor = memory_region_destructor_ram;
-     mr->ram_block = qemu_ram_alloc_from_fd(size, mr,
-                                            share ? RAM_SHARED : 0,
--                                           fd, &err);
-+                                           fd, offset, &err);
-     mr->dirty_log_mask = tcg_enabled() ? (1 << DIRTY_MEMORY_CODE) : 0;
-     if (err) {
-         mr->size = int128_zero();
-diff --git a/util/mmap-alloc.c b/util/mmap-alloc.c
-index 27dcccd8ec..a28f7025f0 100644
---- a/util/mmap-alloc.c
-+++ b/util/mmap-alloc.c
-@@ -86,7 +86,8 @@ void *qemu_ram_mmap(int fd,
-                     size_t size,
-                     size_t align,
-                     bool shared,
--                    bool is_pmem)
-+                    bool is_pmem,
-+                    off_t start)
- {
-     int flags;
-     int map_sync_flags = 0;
-@@ -147,7 +148,7 @@ void *qemu_ram_mmap(int fd,
-     offset = QEMU_ALIGN_UP((uintptr_t)guardptr, align) - (uintptr_t)guardptr;
- 
-     ptr = mmap(guardptr + offset, size, PROT_READ | PROT_WRITE,
--               flags | map_sync_flags, fd, 0);
-+               flags | map_sync_flags, fd, start);
- 
-     if (ptr == MAP_FAILED && map_sync_flags) {
-         if (errno == ENOTSUP) {
-@@ -172,7 +173,7 @@ void *qemu_ram_mmap(int fd,
-          * we will remove these flags to handle compatibility.
-          */
-         ptr = mmap(guardptr + offset, size, PROT_READ | PROT_WRITE,
--                   flags, fd, 0);
-+                   flags, fd, start);
-     }
- 
-     if (ptr == MAP_FAILED) {
-diff --git a/util/oslib-posix.c b/util/oslib-posix.c
-index ad8001a4ad..72ad0b900c 100644
---- a/util/oslib-posix.c
-+++ b/util/oslib-posix.c
-@@ -227,7 +227,7 @@ void *qemu_memalign(size_t alignment, size_t size)
- void *qemu_anon_ram_alloc(size_t size, uint64_t *alignment, bool shared)
- {
-     size_t align = QEMU_VMALLOC_ALIGN;
--    void *ptr = qemu_ram_mmap(-1, size, align, shared, false);
-+    void *ptr = qemu_ram_mmap(-1, size, align, shared, false, 0);
- 
-     if (ptr == MAP_FAILED) {
-         return NULL;
 -- 
-2.25.GIT
+Eduardo
 
 
