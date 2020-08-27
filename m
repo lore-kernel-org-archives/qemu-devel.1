@@ -2,93 +2,102 @@ Return-Path: <SRS0=k4hX=CF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.3 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 395AEC433E3
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 16:41:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DEF4C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 16:44:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 04F0B2087C
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 16:41:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DD87E22CBE
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 16:44:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TN5d/aOE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04F0B2087C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Vr1fAyW0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD87E22CBE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48416 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52552 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBKxj-0006qn-7n
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 12:41:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45904)
+	id 1kBL13-0000I8-68
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 12:44:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46812)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <natechancellor@gmail.com>)
- id 1kBKwk-0005q1-Jr; Thu, 27 Aug 2020 12:40:18 -0400
-Received: from mail-qk1-x741.google.com ([2607:f8b0:4864:20::741]:41833)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <natechancellor@gmail.com>)
- id 1kBKwi-0002OH-Lr; Thu, 27 Aug 2020 12:40:18 -0400
-Received: by mail-qk1-x741.google.com with SMTP id o196so5913435qke.8;
- Thu, 27 Aug 2020 09:40:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=wz36r75++jBDk+X7iGm/asgKhKsbHqYMGXvCaatim6U=;
- b=TN5d/aOEwJ/ij0To/bsaMXOjoqadHAdUo5Ucf9ed8qA1w/rV4mCH0waFGp4kb5vmJz
- DMtQGGUH6kddZv2dZ4CM85uunk2n/DtnOXSXfC+OY3gfVtWv+3b1z+LKu8MIiuM9fkI+
- Um0Jh24t0lf8gSnWe7BXiLsBFTHNS1X12mfuZKXQbX9QsvsRQeELvGEjtavTgtRaxZ8A
- 3YCrk4wig2Wyu7E36YYwFAjevUV1m/IGKTi5Wva4j0mACz9EHo0ajyKP1V61QHvf73nH
- Wx9Z3YshwSpPjaJjLzVeGSEK6+wHbLn76uxvGKbKCd9ZkeVBlgVDV9dQURpLFPR6GDtc
- P0+Q==
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kBL0V-0008GT-RV
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 12:44:11 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:36670)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kBL0S-0002wq-P3
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 12:44:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1598546646;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=nPmsmHw0ACcgFGhsL5owajIbOa4VP6/EtnkFsqSMW5o=;
+ b=Vr1fAyW0kb4H5ppE0ym3Sy3UbHZ6dl4TF4TcZ+SLvjMP0qapfGslODZAj7xkulcnrMQFdv
+ K4Hf7NpEezTMPXd3pNe/Ovs2MD4mv/3LIJHs98EppIdrQVgzTqQhgYbtHjWGACt5TBi9N8
+ 2ba6dJkp2C1LSt4dg0Kga/jueKQGV/o=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-256-Tg9FR1v9OF2hXCF5FQPXMQ-1; Thu, 27 Aug 2020 12:43:56 -0400
+X-MC-Unique: Tg9FR1v9OF2hXCF5FQPXMQ-1
+Received: by mail-ed1-f72.google.com with SMTP id g20so2163266edj.15
+ for <qemu-devel@nongnu.org>; Thu, 27 Aug 2020 09:43:56 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=wz36r75++jBDk+X7iGm/asgKhKsbHqYMGXvCaatim6U=;
- b=I1skD5/bpSR0YjRJvXqmlKdsemze7uT7SMP5x+s2EBiRQ4Uk4Tg1b8KWLtkgbQ3CFO
- SPsO2juXpFwURWIRRKIAiXL148o4r0/AVkhrAgR7FY2PenBV2xd1uRaJSjHsLHowlNfk
- l8VDRoqSCGg6QX9uhPfQaFJzLzvP40xAGqFGyx/vl6vxZCgJ60ISYpIwQmG11dxSNs3/
- N/eTZ9N3K4I4tJzBnyvVgv6LsZhz5/ygNV6z6Uu4zg+eaQB3A2NNuygWh6Qn513yO+I4
- 7B0V6nc+RfHy8AC1Ek4aQsuhjYq7ncP6H0/vF7PWW4NS8sO+QyRkhm8ABvebME4+Xbpx
- ujbA==
-X-Gm-Message-State: AOAM530TxyAW7AkmNWeHqrv3XG2CH9Mw7uJsDaCfGEx+4kbMxEQesRrt
- Y0bRky5PrpWshqegNNJwstk=
-X-Google-Smtp-Source: ABdhPJwFLzspB9/inqOMDTndDTQNViYJJdQc6tHXmOwmAhianK1XFUAUubxcliMe5xQDaLycNiFgEg==
-X-Received: by 2002:a05:620a:a05:: with SMTP id
- i5mr4375180qka.102.1598546414842; 
- Thu, 27 Aug 2020 09:40:14 -0700 (PDT)
-Received: from ubuntu-n2-xlarge-x86 ([2604:1380:45d1:2600::1])
- by smtp.gmail.com with ESMTPSA id z23sm2076194qkj.118.2020.08.27.09.40.13
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 27 Aug 2020 09:40:14 -0700 (PDT)
-Date: Thu, 27 Aug 2020 09:40:12 -0700
-From: Nathan Chancellor <natechancellor@gmail.com>
-To: Alistair Francis <alistair23@gmail.com>
-Subject: Re: [PATCH] memory: Revert "memory: accept mismatching sizes in
- memory_region_access_valid"
-Message-ID: <20200827164012.GA2392870@ubuntu-n2-xlarge-x86>
-References: <20200610134731.1514409-1-mst@redhat.com>
- <20200827053216.GA1515751@ubuntu-n2-xlarge-x86>
- <CAKmqyKNYrpkN+JjDja+2YuSBTg9hVjTZsr+Zej0AFC-KWJr_eA@mail.gmail.com>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=nPmsmHw0ACcgFGhsL5owajIbOa4VP6/EtnkFsqSMW5o=;
+ b=mRkDiRyUxnlBh5oYP80xDiaak84+U4U69QnzlJx37VLigZVlz0wpHB2EE7NfgMZrak
+ VqnplTe+3BJp7yvxOjeD+tZhGgOi8whDG7jpEsDMmuKo5DLLy069TKX0t4uVFaKUdssb
+ mV6M6AX/kuTLwJKYa16taEjE0l1S1Q4C65HFPo0h6RcATTG03SXaBNcFwNnoPFbrf1CU
+ xHo0zxaocD0f7TBNVWrx43l5ZMEeUpk7UgswaMz0QJuEcR4EgQKIjEBJmiQGQSmOm4VC
+ 7+fi4zc32+RcCc5SnwZiaM6l9trSWL8iC9BFlJfa8xT32ie5MESCoXvDulG0ltLeIWAt
+ IVNQ==
+X-Gm-Message-State: AOAM533hAboNZXwD/4JVLaD0m0bx9sXV+xsgbds/WmII+sSecS5HhNX1
+ +e6GwaKQr9xBZj1nEnRjq9LFgie03QZt2CslmgcNMy0B21Ca4p8aDRdqpuJcgirEFexVK6SJdMJ
+ C2zK1IvK7HDbFAsmH9O3GZ1N3brqmNqM=
+X-Received: by 2002:a17:906:328d:: with SMTP id
+ 13mr22661590ejw.71.1598546635408; 
+ Thu, 27 Aug 2020 09:43:55 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxl5FrdZpOn00FOcaMv0ljQKPbXG7qtkwn7dAR94bM9bMvqOrZJggKD8qoOxaQigrq5srzr9MfdmPZzfiNxJFc=
+X-Received: by 2002:a17:906:328d:: with SMTP id
+ 13mr22661569ejw.71.1598546635206; 
+ Thu, 27 Aug 2020 09:43:55 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAKmqyKNYrpkN+JjDja+2YuSBTg9hVjTZsr+Zej0AFC-KWJr_eA@mail.gmail.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::741;
- envelope-from=natechancellor@gmail.com; helo=mail-qk1-x741.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+References: <20200825165341.520-1-luoyonggang@gmail.com>
+ <426ddc96-c26d-e762-0598-7ae61c711d8e@ilande.co.uk>
+ <CABgObfb4K8=5Ydkhx2px+kfDwb8SmQ97LFpsaNbRbU6U0rvXwA@mail.gmail.com>
+ <0abb8d9a-cf86-1c00-df8c-2dacf8f99d76@ilande.co.uk>
+In-Reply-To: <0abb8d9a-cf86-1c00-df8c-2dacf8f99d76@ilande.co.uk>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Thu, 27 Aug 2020 18:43:43 +0200
+Message-ID: <CABgObfboz=7tAT6_FfxMZ9M7Nu_RtCP_gwQeFT=X9pj=yTwaUQ@mail.gmail.com>
+Subject: Re: [PATCH 1/4] meson: Fixes the ninjatool issue that E$$: are
+ generated in Makefile.ninja
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0.0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/alternative; boundary="000000000000594da905addea493"
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 02:54:02
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.959,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -102,151 +111,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- qemu-stable@nongnu.org, Alistair Francis <Alistair.Francis@wdc.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Palmer Dabbelt <palmer@dabbelt.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: luoyonggang@gmail.com,
+ =?UTF-8?B?RGFuaWVsIFAgLiBCZXJyYW5n6IyF?= <berrange@redhat.com>,
+ qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Aug 27, 2020 at 08:53:30AM -0700, Alistair Francis wrote:
-> On Wed, Aug 26, 2020 at 11:26 PM Nathan Chancellor
-> <natechancellor@gmail.com> wrote:
-> >
-> > Hi all,
-> >
-> > Sorry for the duplicate reply, my first one was rejected by a mailing
-> > list administrator for being too long so I resent it with the error logs
-> > as a link instead of inline.
-> >
-> > On Wed, Jun 10, 2020 at 09:47:49AM -0400, Michael S. Tsirkin wrote:
-> > > Memory API documentation documents valid .min_access_size and .max_access_size
-> > > fields and explains that any access outside these boundaries is blocked.
-> > >
-> > > This is what devices seem to assume.
-> > >
-> > > However this is not what the implementation does: it simply
-> > > ignores the boundaries unless there's an "accepts" callback.
-> > >
-> > > Naturally, this breaks a bunch of devices.
-> > >
-> > > Revert to the documented behaviour.
-> > >
-> > > Devices that want to allow any access can just drop the valid field,
-> > > or add the impl field to have accesses converted to appropriate
-> > > length.
-> > >
-> > > Cc: qemu-stable@nongnu.org
-> > > Reviewed-by: Richard Henderson <rth@twiddle.net>
-> > > Fixes: CVE-2020-13754
-> > > Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1842363
-> > > Fixes: a014ed07bd5a ("memory: accept mismatching sizes in memory_region_access_valid")
-> > > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> > > ---
-> > >  memory.c | 29 +++++++++--------------------
-> > >  1 file changed, 9 insertions(+), 20 deletions(-)
-> > >
-> > > diff --git a/memory.c b/memory.c
-> > > index 91ceaf9fcf..3e9388fb74 100644
-> > > --- a/memory.c
-> > > +++ b/memory.c
-> > > @@ -1352,35 +1352,24 @@ bool memory_region_access_valid(MemoryRegion *mr,
-> > >                                  bool is_write,
-> > >                                  MemTxAttrs attrs)
-> > >  {
-> > > -    int access_size_min, access_size_max;
-> > > -    int access_size, i;
-> > > +    if (mr->ops->valid.accepts
-> > > +        && !mr->ops->valid.accepts(mr->opaque, addr, size, is_write, attrs)) {
-> > > +        return false;
-> > > +    }
-> > >
-> > >      if (!mr->ops->valid.unaligned && (addr & (size - 1))) {
-> > >          return false;
-> > >      }
-> > >
-> > > -    if (!mr->ops->valid.accepts) {
-> > > +    /* Treat zero as compatibility all valid */
-> > > +    if (!mr->ops->valid.max_access_size) {
-> > >          return true;
-> > >      }
-> > >
-> > > -    access_size_min = mr->ops->valid.min_access_size;
-> > > -    if (!mr->ops->valid.min_access_size) {
-> > > -        access_size_min = 1;
-> > > +    if (size > mr->ops->valid.max_access_size
-> > > +        || size < mr->ops->valid.min_access_size) {
-> > > +        return false;
-> > >      }
-> > > -
-> > > -    access_size_max = mr->ops->valid.max_access_size;
-> > > -    if (!mr->ops->valid.max_access_size) {
-> > > -        access_size_max = 4;
-> > > -    }
-> > > -
-> > > -    access_size = MAX(MIN(size, access_size_max), access_size_min);
-> > > -    for (i = 0; i < size; i += access_size) {
-> > > -        if (!mr->ops->valid.accepts(mr->opaque, addr + i, access_size,
-> > > -                                    is_write, attrs)) {
-> > > -            return false;
-> > > -        }
-> > > -    }
-> > > -
-> > >      return true;
-> > >  }
-> > >
-> > > --
-> > > MST
-> > >
-> > >
-> >
-> > I just ran into a regression with booting RISC-V kernels due to this
-> > commit. I can reproduce it with QEMU 5.1.0 and latest tip of tree
-> > (25f6dc28a3a8dd231c2c092a0e65bd796353c769 at the time of initially
-> > writing this).
-> >
-> > The error message, commands, and bisect logs are available here:
-> >
-> > https://gist.githubusercontent.com/nathanchance/c106dd22ec0c0e00f6a25daba106a1b9/raw/d929f2fff6da9126ded156affb0f19f359e9f693/qemu-5.1.0-issue-terminal-log.txt
-> 
-> From what I can tell the problem happens when you try to reboot the board right?
+--000000000000594da905addea493
+Content-Type: text/plain; charset="UTF-8"
 
-Yes, sorry, should have made that clear. All the rootfs does is print
-the version string and then runs 'poweroff' (not 'reboot'):
+Il gio 27 ago 2020, 18:05 Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+ha scritto:
 
-https://github.com/ClangBuiltLinux/boot-utils/blob/master/buildroot/overlay-poweroff/etc/init.d/S50yolo
-
-> You might want to try changing this line from 4 to 8:
-> https://github.com/qemu/qemu/blob/master/hw/riscv/sifive_test.c#L63
-
-Unfortunately, that did not work. For the record, I tried changing that
-field in all drivers in hw/riscv:
-
-$ sed -i 's/ \.max_access_size = .*/ \.max_access_size = 8/' hw/riscv/* &&
-./configure &&
-make -j"$(nproc)"
-
+> On 26/08/2020 07:45, Paolo Bonzini wrote:
+>
+> > On Tue, Aug 25, 2020 at 11:26 PM Mark Cave-Ayland
+> > <mark.cave-ayland@ilande.co.uk> wrote:
+> >> I've tested this and it changes build.ninja so instead of Windows paths
+> beginning C$$
+> >> they now begin C$ instead e.g.:
+> >>
+> >> build qemu-version.h: CUSTOM_COMMAND  |
+> >> C$:/msys64/home/Mark/qemu/scripts/qemu-version.sh PHONY
 > >
-> > I have attached the rootfs and kernel image used for these tests. If for
-> > some reason there is a problem receiving them, the kernel is just an
-> > arch/riscv/configs/defconfig kernel at Linux 5.9-rc2 and the rootfs is
-> > available here:
-> >
-> > https://github.com/ClangBuiltLinux/boot-utils/blob/3b21a5b71451742866349ba4f18638c5a754e660/images/riscv/rootfs.cpio.zst
-> >
-> > Please let me know if I can provide any follow up information or if I am
-> > doing something wrong.
-> 
-> Thanks for providing so much information and doing a bisect.
-> 
-> Alistair
-> 
-> >
-> > Cheers,
-> > Nathan
+> > The patch should not change build.ninja in any way, but indeed it will
+> > fix the transformation so that the (correct) ninja quoting is removed.
+>
+> It definitely changes build.ninja here, with the escaping changing from
+> C$$:\ to C$:\
+> in my tests.
+
+
+Yes, the ^ makes no difference but I missed that it also adds a $.
+
+Thanks for testing!!
+
+Paolo
+
+if you're saying that $: with just a single $ is the correct
+> escaping for colon then I guess the patch is fine (and indeed it works for
+> me with
+> the $ now being removed in the transformation to Makefile.ninja).
+>
+>
+> ATB,
+>
+> Mark.
+>
+>
+
+--000000000000594da905addea493
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"auto"><div><br><br><div class=3D"gmail_quote"><div dir=3D"ltr" =
+class=3D"gmail_attr">Il gio 27 ago 2020, 18:05 Mark Cave-Ayland &lt;<a href=
+=3D"mailto:mark.cave-ayland@ilande.co.uk">mark.cave-ayland@ilande.co.uk</a>=
+&gt; ha scritto:<br></div><blockquote class=3D"gmail_quote" style=3D"margin=
+:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">On 26/08/2020 07:4=
+5, Paolo Bonzini wrote:<br>
+<br>
+&gt; On Tue, Aug 25, 2020 at 11:26 PM Mark Cave-Ayland<br>
+&gt; &lt;<a href=3D"mailto:mark.cave-ayland@ilande.co.uk" target=3D"_blank"=
+ rel=3D"noreferrer">mark.cave-ayland@ilande.co.uk</a>&gt; wrote:<br>
+&gt;&gt; I&#39;ve tested this and it changes build.ninja so instead of Wind=
+ows paths beginning C$$<br>
+&gt;&gt; they now begin C$ instead e.g.:<br>
+&gt;&gt;<br>
+&gt;&gt; build qemu-version.h: CUSTOM_COMMAND=C2=A0 |<br>
+&gt;&gt; C$:/msys64/home/Mark/qemu/scripts/qemu-version.sh PHONY<br>
+&gt; <br>
+&gt; The patch should not change build.ninja in any way, but indeed it will=
+<br>
+&gt; fix the transformation so that the (correct) ninja quoting is removed.=
+<br>
+<br>
+It definitely changes build.ninja here, with the escaping changing from C$$=
+:\ to C$:\<br>
+in my tests.</blockquote></div></div><div dir=3D"auto"><br></div><div dir=
+=3D"auto">Yes, the ^ makes no difference but I missed that it also adds a $=
+.</div><div dir=3D"auto"><br></div><div dir=3D"auto">Thanks for testing!!</=
+div><div dir=3D"auto"><br></div><div dir=3D"auto">Paolo</div><div dir=3D"au=
+to"><br></div><div dir=3D"auto"><div class=3D"gmail_quote"><blockquote clas=
+s=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;pad=
+ding-left:1ex"> if you&#39;re saying that $: with just a single $ is the co=
+rrect<br>
+escaping for colon then I guess the patch is fine (and indeed it works for =
+me with<br>
+the $ now being removed in the transformation to Makefile.ninja).<br>
+<br>
+<br>
+ATB,<br>
+<br>
+Mark.<br>
+<br>
+</blockquote></div></div></div>
+
+--000000000000594da905addea493--
+
 
