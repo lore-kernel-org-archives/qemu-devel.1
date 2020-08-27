@@ -2,86 +2,96 @@ Return-Path: <SRS0=k4hX=CF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,UNPARSEABLE_RELAY autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF3CBC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 11:56:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D826BC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 11:59:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 983B22177B
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 11:56:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8A2302177B
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 11:59:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CqqzLn1t"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 983B22177B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=dme-org.20150623.gappssmtp.com header.i=@dme-org.20150623.gappssmtp.com header.b="vHPIayF4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A2302177B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=dme.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34150 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36310 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBGWB-0007Xy-Pa
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 07:56:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46846)
+	id 1kBGYz-0000GP-PJ
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 07:59:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47698)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
- id 1kBGVS-00070X-UR
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 07:55:50 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:51854
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
- id 1kBGVQ-0008JP-N9
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 07:55:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598529347;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=J6X82Iz+q40HK149GWOTkkeq809o+moGTCmrT+d0gr0=;
- b=CqqzLn1t6lKtEg5eGbfrcRhY+0TcCFq8FaugcaoXTdjZjU8JMj3EnScCdU6Kn/UVpzszqN
- oUHCsS/zlPqGgr2BHpMCxG3fIFhqjwWRoQqXuAHEddN7/5W9rhTxBkGig4KvrDnE0rff6I
- S1qbvuNtIXAwOXTVjv5LT+ljMcmSE+Y=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-252-aF_Iw6-NPzyLAjBdzzaEbw-1; Thu, 27 Aug 2020 07:55:42 -0400
-X-MC-Unique: aF_Iw6-NPzyLAjBdzzaEbw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BFC541015EC4;
- Thu, 27 Aug 2020 11:55:41 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-112-91.phx2.redhat.com
- [10.3.112.91])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8C6091002D48;
- Thu, 27 Aug 2020 11:55:39 +0000 (UTC)
-From: P J P <ppandit@redhat.com>
-To: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Subject: [PATCH] sd: sdhci: check data_count is within fifo_buffer
-Date: Thu, 27 Aug 2020 17:23:36 +0530
-Message-Id: <20200827115336.1851276-1-ppandit@redhat.com>
+ (Exim 4.90_1) (envelope-from <dme@dme.org>) id 1kBGYS-0008E4-0L
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 07:58:56 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:33826)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <dme@dme.org>) id 1kBGYQ-0000Az-3c
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 07:58:55 -0400
+Received: by mail-wr1-x442.google.com with SMTP id f7so5125040wrw.1
+ for <qemu-devel@nongnu.org>; Thu, 27 Aug 2020 04:58:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=dme-org.20150623.gappssmtp.com; s=20150623;
+ h=to:cc:subject:in-reply-to:references:from:date:message-id
+ :mime-version; bh=43pDmx6xDr2/6/hSxSmqLMTU81W7iOibc3api6w9ueM=;
+ b=vHPIayF4D1xjtBe4K3Ok2pnUn/jDW7L82IS+UOs2WPjW/bXCMCapILcS1iT6QLMzku
+ a5h/OZpCtSCEzwMWprlQWpSKCojRzzbuTeFbkiPQPvzLLXfk7/7F4aKHvD40de75hFjn
+ fo0dXnOoCPMjjmMucL7s9gNTX+v1zTV5ytK8UfR7iN/wk4MNhLdC5iRyGWfZLAZX4UN/
+ 3M0euvqxnw3iBH7bAaea3t79fUN3nqZ3UKq/UNYi2+Xk+FS/A3zg7fdW+r2Elu0NIzT/
+ 9DZ0TccTFGokFinnkYZ+dHBsOLYYxx28GvooTZH8KYEKEUPN1s4Q4oHgUsjIfPCelryB
+ RoEg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:to:cc:subject:in-reply-to:references:from:date
+ :message-id:mime-version;
+ bh=43pDmx6xDr2/6/hSxSmqLMTU81W7iOibc3api6w9ueM=;
+ b=RPh0Wx9eQ4Boz0fllfxhvpEbsp1eZjZki4GzR2RHHL5ZSIVdEmCmyiHemAXBQaq/S5
+ HskDtylRZzKwFmMWX6jnpcyBotqZFtX4V1TULnERgMJHTdf81MQ5qa4kbCEg2zl+pdik
+ fzLLaOXzMZwnSn9tTeC9trsv0kKYljA2SOS0fzQUj4NNnYQhvtwmAlhPVPCvZ3+SQW5n
+ hfNaSbr+0nsZcJToajyiYA1teDeW/uOpjKADbWdboSQY2VAXEVTjnHodeAHffOgXj05R
+ BIEFlfJoDcc4wvbbqnXt2cmNS3BYCWBFgY8GvkgOrzNcaMFCpluY0giTFEGdJK9MKx90
+ RdYw==
+X-Gm-Message-State: AOAM532V/km1/QKCnkf9DrPx0r20VZyolvks4crrFS6ms5qp2AuD+pgl
+ V7hoQuYRfST0Ipp8q7QBEiWROw==
+X-Google-Smtp-Source: ABdhPJwozNS2l6ZmNQHFe47laFA+VIyAVTaFBPqJarb7ovF+v/1MYWJKE2sYkw8aStQmFZZxxF4JJw==
+X-Received: by 2002:adf:ea0b:: with SMTP id q11mr17894010wrm.285.1598529531560; 
+ Thu, 27 Aug 2020 04:58:51 -0700 (PDT)
+Received: from disaster-area.hh.sledj.net
+ (8.a.e.d.0.0.0.0.0.0.0.0.4.6.0.0.0.4.1.7.1.7.b.b.0.b.8.0.1.0.0.2.ip6.arpa.
+ [2001:8b0:bb71:7140:64::dea8])
+ by smtp.gmail.com with ESMTPSA id 126sm5013679wme.42.2020.08.27.04.58.50
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 27 Aug 2020 04:58:50 -0700 (PDT)
+Received: from localhost (disaster-area.hh.sledj.net [local])
+ by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id 59782559;
+ Thu, 27 Aug 2020 11:58:48 +0000 (UTC)
+To: Zheng Chuan <zhengchuan@huawei.com>, quintela@redhat.com,
+ eblake@redhat.com, dgilbert@redhat.com, berrange@redhat.com
+Subject: Re: [PATCH v5 11/12] migration/dirtyrate: Implement
+ qmp_cal_dirty_rate()/qmp_get_dirty_rate() function
+In-Reply-To: <1a23d60c-186b-d5b5-c43a-a8512826409b@huawei.com>
+References: <1598260480-64862-1-git-send-email-zhengchuan@huawei.com>
+ <1598260480-64862-12-git-send-email-zhengchuan@huawei.com>
+ <m2wo1lk8j9.fsf@dme.org> <1a23d60c-186b-d5b5-c43a-a8512826409b@huawei.com>
+X-HGTTG: heart-of-gold
+From: David Edmondson <dme@dme.org>
+Date: Thu, 27 Aug 2020 12:58:48 +0100
+Message-ID: <m2d03cjo5j.fsf@dme.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ppandit@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=ppandit@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 07:16:16
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.959,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain
+Received-SPF: neutral client-ip=2a00:1450:4864:20::442;
+ envelope-from=dme@dme.org; helo=mail-wr1-x442.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -10
+X-Spam_score: -1.1
+X-Spam_bar: -
+X-Spam_report: (-1.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_NEUTRAL=0.779, UNPARSEABLE_RELAY=0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,68 +104,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Ruhr-University <bugs-syssec@rub.de>,
- QEMU Developers <qemu-devel@nongnu.org>, qemu-block@nongnu.org,
- Prasad J Pandit <pjp@fedoraproject.org>
+Cc: zhang.zhanghailiang@huawei.com, qemu-devel@nongnu.org,
+ xiexiangyou@huawei.com, alex.chen@huawei.com, ann.zhuangyanying@huawei.com,
+ fangying1@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Prasad J Pandit <pjp@fedoraproject.org>
+On Thursday, 2020-08-27 at 17:34:13 +08, Zheng Chuan wrote:
 
-While doing multi block SDMA, transfer block size may exceed
-the 's->fifo_buffer[s->buf_maxsz]' size. It may leave the
-current element pointer 's->data_count' pointing out of bounds.
-Leading the subsequent DMA r/w operation to OOB access issue.
-Add check to avoid it.
+>>> +    /*
+>>> +     * Only support query once for each calculation,
+>>> +     * reset as DIRTY_RATE_STATUS_UNSTARTED after query
+>>> +     */
+>>> +    (void)dirtyrate_set_state(&CalculatingState, CalculatingState,
+>>> +                              DIRTY_RATE_STATUS_UNSTARTED);
+>> 
+>> Is there a reason for this restriction? Removing it would require
+>> clarifying the state model, I suppose.
+>> 
+> We only support query once for each calculation.
+> Otherwise, it could always query dirtyrate, but maybe the dirtyrate is calculated
+> long time ago.
 
- -> https://ruhr-uni-bochum.sciebo.de/s/NNWP2GfwzYKeKwE?path=%2Fsdhci_oob_write1
- ==1459837==ERROR: AddressSanitizer: heap-buffer-overflow
- WRITE of size 54722048 at 0x61500001e280 thread T3
-    #0  __interceptor_memcpy (/lib64/libasan.so.6+0x3a71d)
-    #1  flatview_read_continue ../exec.c:3245
-    #2  flatview_read ../exec.c:3278
-    #3  address_space_read_full ../exec.c:3291
-    #4  address_space_rw ../exec.c:3319
-    #5  dma_memory_rw_relaxed ../include/sysemu/dma.h:87
-    #6  dma_memory_rw ../include/sysemu/dma.h:110
-    #7  dma_memory_read ../include/sysemu/dma.h:116
-    #8  sdhci_sdma_transfer_multi_blocks ../hw/sd/sdhci.c:629
-    #9  sdhci_write ../hw/sd/sdhci.c:1097
-    #10 memory_region_write_accessor ../softmmu/memory.c:483
-    ...
+There's nothing in the current interface that prevents this from being
+the case already - the caller could initiate a 1 second sample, then
+wait 24 hours to query the result.
 
-Reported-by: Ruhr-University <bugs-syssec@rub.de>
-Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
----
- hw/sd/sdhci.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+Obviously this would generally be regarded as "d'oh - don't do that",
+but the same argument would apply if the caller is allowed to query the
+results multiple times.
 
-diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
-index 1785d7e1f7..155e25ceee 100644
---- a/hw/sd/sdhci.c
-+++ b/hw/sd/sdhci.c
-@@ -604,6 +604,9 @@ static void sdhci_sdma_transfer_multi_blocks(SDHCIState *s)
-                     s->blkcnt--;
-                 }
-             }
-+            if (s->data_count <= begin || s->data_count > s->buf_maxsz) {
-+                break;
-+            }
-             dma_memory_write(s->dma_as, s->sdmasysad,
-                              &s->fifo_buffer[begin], s->data_count - begin);
-             s->sdmasysad += s->data_count - begin;
-@@ -626,6 +629,9 @@ static void sdhci_sdma_transfer_multi_blocks(SDHCIState *s)
-                 s->data_count = block_size;
-                 boundary_count -= block_size - begin;
-             }
-+            if (s->data_count <= begin || s->data_count > s->buf_maxsz) {
-+                break;
-+            }
-             dma_memory_read(s->dma_as, s->sdmasysad,
-                             &s->fifo_buffer[begin], s->data_count - begin);
-             s->sdmasysad += s->data_count - begin;
+Perhaps a complete solution would be to include information about the
+sample period with the result. The caller could then determine whether
+the sample is of adequate quality (sufficiently recent, taken over a
+sufficiently long time period) for its' intended use.
+
+dme.
 -- 
-2.26.2
-
+I walk like a building, I never get wet.
 
