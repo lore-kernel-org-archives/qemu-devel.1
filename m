@@ -7,60 +7,59 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC712C433E3
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 19:25:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BD1BC433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 19:25:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 762CB207CD
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 19:25:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 762CB207CD
+	by mail.kernel.org (Postfix) with ESMTPS id EF83E207CD
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 19:25:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF83E207CD
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51640 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51324 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBNWb-0005EE-Nv
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 15:25:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33482)
+	id 1kBNWa-00056X-3w
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 15:25:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33462)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kBNS1-00047B-S9
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 15:20:45 -0400
-Received: from mout.kundenserver.de ([217.72.192.75]:58907)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kBNS0-00044C-Jg
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 15:20:44 -0400
+Received: from mout.kundenserver.de ([217.72.192.75]:33051)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kBNRy-0000ER-SA
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 15:20:45 -0400
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kBNRv-0000Bk-Ij
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 15:20:44 -0400
 Received: from localhost.localdomain ([82.252.135.186]) by
  mrelayeu.kundenserver.de (mreue109 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1M9Frd-1kHiAK2vwt-006Q6b; Thu, 27 Aug 2020 21:20:32 +0200
+ id 1MMGZM-1jvUUW1fJG-00JFzM; Thu, 27 Aug 2020 21:20:36 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 06/18] linux-user: Add strace support for printing arguments of
- syscalls used to lock and unlock memory
-Date: Thu, 27 Aug 2020 21:20:06 +0200
-Message-Id: <20200827192018.2442099-7-laurent@vivier.eu>
+Subject: [PULL 09/18] linux-user: Add generic 'termbits.h' for some archs
+Date: Thu, 27 Aug 2020 21:20:09 +0200
+Message-Id: <20200827192018.2442099-10-laurent@vivier.eu>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200827192018.2442099-1-laurent@vivier.eu>
 References: <20200827192018.2442099-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:f0nRlCcWTzGwn9gK0ez3eLTyeo0HG0H/6rbwmTiga1TleANHppN
- PvaeZe2jFg6jR/IC9CtXiHMfylpyy0NSKbH4/TuN7Htbf3GFKTeNHMwU1Df/WP/UDlmdc8G
- TAKoYvpmsPJ0TFpsJqp1QczTEjXlZjvkCYsxmh9Ce7pUWWsc8KpPRxkqzBdDGWPtpz0USyO
- YJ7KmrT/m3A3hrnJat4rg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:fAcFz1Py0+A=:yOz1fVyDwnsQlP1x8xH9Nr
- 13mI+910JosTNv7qdqzkuXKNBwNEaMoU1yBcMOhxxg9S2Woxww2Qtg6/ARhb7cX1xLg1xsSgP
- UvTYRV1IkyisV0AJ4MrUfAwC0R7hkpatCNeNZf4Pab306+5EX6pdtvEXJ95VXY7uuP4ZROyav
- a9OqOYnaepFENRdvEcY/mP6ALLYktbeONgxUhe+wEw5aaDLNVdV+KgguKN7hSmtANxbAf7F/R
- 4wvO8MQrhgsDu70YT7vDdPlfgj4KLSzv+6++xyR1bL7y6+f+SQTnQwbpqTsP2JQrAuVvIde1/
- JHcqTANyjnn5121oPT4XmAbt2PkB6Mk7yDVRTc+lCghmBz3msgH6nNUIYdiVPM09pX50o9Lhq
- dmhVd0TKHyPOKE5E6FgtprOaz4kg1sU9crGkEMNTKpZzZZs6Xgt2ZVTFM/NH+3xWed5fBCYGK
- LQXDOQgXNH2F4QczHiSIzdNyUsJWmv5YYG3KODEpBuNFgf/Q03CUuDraYhoG6j5G3/i+X+r2a
- 3SFXRVtyvLj4KvrvW8LnY6C6f8/bB1ihj5qfbff+Zax3CsyXRoZjf9K4OXMTFJBOrjfSMcoBe
- 0zT8+9wvkzhiaMMJF500czIo/p9grICb1Q+dZ7JqPExK6A+lOQspj46kQItGKmCt/SVNLa9cG
- Exn9qw6pAhaM6peP1xDRn45elaDDlFNZRSfJX2pMCY7yuBwOCXZWUScCJ1yCTzUitnFJ3n/+Z
- jhhtA80wjLV2W1DnRzGbIh0nQiIa8oWErie5hhtKr0KRab67a4ZZx8r3ulGr8EWR37QpRW49r
- NaHXQq6t2/shtM9Y1s8lPJCuNOlQHhGnvsRgXj+b66sCu4Wg7DWRn8aL4dONnYiI91e2As5
+X-Provags-ID: V03:K1:BvCxYqimqDBWiFFj01f1pvoV7PvJ2d7BJxJUzCwqb48AW66gFEN
+ jk8pmo5H8b+r7qQaM48bthztsRnsaRD+5MRlzxurpSR0lDiRqn02vmsxEVM1NvtM6m2gSk3
+ H8Xfi+9S5/5b2XCvYHwNAO95oMYEOVFb0Mb+HC2gRZgRXIB2/ov6iolvRCd+lA5enJA8003
+ TIJDKDDRxjde+WR7srNDA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:Vam/Sq+HGoo=:7lP1h2zmN9PXa/dKhAjYu9
+ BezZnFGs9ftO1vOSPKi+TpvifY9OdWhVr6W1EZsBn7QqoLfQjDgeGd4dDWIbw/TrrxN9nqf5H
+ 2IWx7g0qi6/b7GveQJDWVIgQkn8dRPwIVmaA5iz4WoXOkYvAvDmpxqeihaGBBIlILeW0ki6gy
+ 4DlPbKfyriobHgJ2bZa0yu9FbhIWYzhhSEukjaVdE5PjsmUTJYRT31e5GP9wknfcdnzIoHZFC
+ 5oegeXmTsSGEYHgmoosTP/z6vjlZXk2tDO2OvFsSeoBb+wMAtZOZG18B0LBPFGisGwwSCrcfZ
+ AlAsQaEGwLLMrzqCOU70pd2RqZzaPM9ts6Qsz66p6okXX0MfpJt8ldAvC7MrM58x5ytfvUTAE
+ qjNXIgNSccwn5u//ramqrlSQ5QiACLKe09imFxjpRWwqvRg5H2FzRvymtxnKoIsvyEglHpowz
+ oKodMkWRP2eMxEDUovzx6Yyy9809YPBrxEpXk5JSZ8vtrzXShNVKVIsqaH0JQCE1R3aqxXSz0
+ M/rIAXmLfvvnNv3vMJDjCB9CoaIzOauPAyHjA4Pz9JBq7ZfcJhR4ZeVTGa3EStRoLwbWDlUGV
+ cxrtoUGPasWoVf+A93jV79v7nw7uIMh1gqOqTFWpGdq0MIxwdl2hIrrGZRBt+0KQS36MoIJ2u
+ Wf15/EWcs5QYGNSECdNKsFOtuWdKjDf3crAKJUzihLX9mtzmsWosY6i/6Vv9QmXPERrZoZStv
+ GMY7wHhPlondZltMJCmfWVCFkotf7NtMyrtFe8F/ZcD9zqRDRv+xRmupSXvdQcYQvoWRxsUE+
+ B29KlUa3r7wH/CYGOzKldUPgv7WTxcIPbz6agH2Qcy8PdvhkYIjgbpEUu+8wAAy2lfCV3+H
 Received-SPF: none client-ip=217.72.192.75; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 15:20:36
@@ -91,498 +90,3134 @@ Sender: "Qemu-devel"
 
 From: Filip Bozuta <Filip.Bozuta@syrmia.com>
 
-This patch implements strace argument printing functionality for following syscalls:
+This patch introduces a generic 'termbits.h' file for following
+archs: 'aarch64', 'arm', 'i386, 'm68k', 'microblaze', 'nios2',
+'openrisc', 'riscv', 's390x', 'x86_64'.
 
-    * mlock, munlock, mlockall, munlockall - lock and unlock memory
+Since all of these archs have the same termios flag values and
+same ioctl_tty numbers, there is no need for a separate 'termbits.h'
+file for each one of them. For that reason one generic 'termbits.h'
+file was added for all of them and an '#include' directive was
+added for this generic file in every arch 'termbits.h' file.
 
-       int mlock(const void *addr, size_t len)
-       int munlock(const void *addr, size_t len)
-       int mlockall(int flags)
-       int munlockall(void)
-       man page: https://man7.org/linux/man-pages/man2/mlock.2.html
-
-Implementation notes:
-
-    Syscall mlockall() takes an argument that is composed of predefined values
-    which represent flags that determine the type of locking operation that is
-    to be performed. For that reason, a printing function "print_mlockall" was
-    stated in file "strace.list". This printing function uses an already existing
-    function "print_flags()" to print the "flags" argument.  These flags are stated
-    inside an array "mlockall_flags" that contains values of type "struct flags".
-    These values are instantiated using an existing macro "FLAG_TARGET()" that
-    crates aproppriate target flag values based on those defined in files
-    '/target_syscall.h'. These target flag values were changed from
-    "TARGET_MLOCKALL_MCL*" to "TARGET_MCL_*" so that they can be aproppriately set
-    and recognised in "strace.c" with "FLAG_TARGET()". Value for "MCL_ONFAULT"
-    was added in this patch. This value was also added in "syscall.c" in function
-    "target_to_host_mlockall_arg()". Because this flag value was added in kernel
-    version 4.4, it is enwrapped in an #ifdef directive (both in "syscall.c" and
-    in "strace.c") as to support older kernel versions.
-    The other syscalls have only primitive argument types, so the
-    rest of the implementation was handled by stating an appropriate
-    printing format in file "strace.list". Syscall mlock2() is not implemented in
-    "syscall.c" and thus it's argument printing is not implemented in this patch.
+Also, some of the flag values that were missing were added in this
+generic file so that it matches the generic 'termibts.h' and 'ioctls.h'
+files from the kernel: 'asm-generic/termbits.h' and 'asm-generic/ioctls.h'.
 
 Signed-off-by: Filip Bozuta <Filip.Bozuta@syrmia.com>
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <20200811164553.27713-4-Filip.Bozuta@syrmia.com>
+Message-Id: <20200723210233.349690-2-Filip.Bozuta@syrmia.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- linux-user/aarch64/target_syscall.h    |  5 +++--
- linux-user/alpha/target_syscall.h      |  5 +++--
- linux-user/arm/target_syscall.h        |  6 ++++--
- linux-user/cris/target_syscall.h       |  5 +++--
- linux-user/hppa/target_syscall.h       |  5 +++--
- linux-user/i386/target_syscall.h       |  5 +++--
- linux-user/m68k/target_syscall.h       |  6 +++---
- linux-user/microblaze/target_syscall.h |  5 +++--
- linux-user/mips/target_syscall.h       |  5 +++--
- linux-user/mips64/target_syscall.h     |  5 +++--
- linux-user/nios2/target_syscall.h      |  5 +++--
- linux-user/openrisc/target_syscall.h   |  5 +++--
- linux-user/ppc/target_syscall.h        |  5 +++--
- linux-user/riscv/target_syscall.h      |  5 +++--
- linux-user/s390x/target_syscall.h      |  5 +++--
- linux-user/sh4/target_syscall.h        |  5 +++--
- linux-user/sparc/target_syscall.h      |  5 +++--
- linux-user/sparc64/target_syscall.h    |  5 +++--
- linux-user/strace.c                    | 21 +++++++++++++++++++++
- linux-user/strace.list                 |  8 ++++----
- linux-user/syscall.c                   | 10 ++++++++--
- linux-user/tilegx/target_syscall.h     |  5 +++--
- linux-user/x86_64/target_syscall.h     |  5 +++--
- linux-user/xtensa/target_syscall.h     |  5 +++--
- 24 files changed, 97 insertions(+), 49 deletions(-)
+ linux-user/aarch64/termbits.h    | 228 +---------------------
+ linux-user/arm/termbits.h        | 223 +---------------------
+ linux-user/generic/termbits.h    | 318 +++++++++++++++++++++++++++++++
+ linux-user/i386/termbits.h       | 233 +---------------------
+ linux-user/m68k/termbits.h       | 234 +----------------------
+ linux-user/microblaze/termbits.h | 220 +--------------------
+ linux-user/nios2/termbits.h      | 228 +---------------------
+ linux-user/openrisc/termbits.h   | 302 +----------------------------
+ linux-user/riscv/termbits.h      | 228 +---------------------
+ linux-user/s390x/termbits.h      | 289 +---------------------------
+ linux-user/tilegx/termbits.h     | 276 +--------------------------
+ linux-user/x86_64/termbits.h     | 254 +-----------------------
+ 12 files changed, 329 insertions(+), 2704 deletions(-)
+ create mode 100644 linux-user/generic/termbits.h
 
-diff --git a/linux-user/aarch64/target_syscall.h b/linux-user/aarch64/target_syscall.h
-index 995e475c73f8..3194e6b0093c 100644
---- a/linux-user/aarch64/target_syscall.h
-+++ b/linux-user/aarch64/target_syscall.h
-@@ -16,8 +16,9 @@ struct target_pt_regs {
- #define UNAME_MINIMUM_RELEASE "3.8.0"
- #define TARGET_CLONE_BACKWARDS
- #define TARGET_MINSIGSTKSZ       2048
--#define TARGET_MLOCKALL_MCL_CURRENT 1
--#define TARGET_MLOCKALL_MCL_FUTURE  2
-+#define TARGET_MCL_CURRENT 1
-+#define TARGET_MCL_FUTURE  2
-+#define TARGET_MCL_ONFAULT 4
- 
- #define TARGET_PR_SVE_SET_VL  50
- #define TARGET_PR_SVE_GET_VL  51
-diff --git a/linux-user/alpha/target_syscall.h b/linux-user/alpha/target_syscall.h
-index 3426cc5b4e4f..fd389422e31e 100644
---- a/linux-user/alpha/target_syscall.h
-+++ b/linux-user/alpha/target_syscall.h
-@@ -258,7 +258,8 @@ struct target_pt_regs {
- #define TARGET_UAC_NOFIX		2
- #define TARGET_UAC_SIGBUS		4
- #define TARGET_MINSIGSTKSZ              4096
--#define TARGET_MLOCKALL_MCL_CURRENT     0x2000
--#define TARGET_MLOCKALL_MCL_FUTURE      0x4000
-+#define TARGET_MCL_CURRENT     0x2000
-+#define TARGET_MCL_FUTURE      0x4000
-+#define TARGET_MCL_ONFAULT     0x8000
- 
- #endif /* ALPHA_TARGET_SYSCALL_H */
-diff --git a/linux-user/arm/target_syscall.h b/linux-user/arm/target_syscall.h
-index f85cbdaf56ff..e870ed7a5468 100644
---- a/linux-user/arm/target_syscall.h
-+++ b/linux-user/arm/target_syscall.h
-@@ -28,8 +28,10 @@ struct target_pt_regs {
- #define TARGET_CLONE_BACKWARDS
- 
- #define TARGET_MINSIGSTKSZ 2048
--#define TARGET_MLOCKALL_MCL_CURRENT 1
--#define TARGET_MLOCKALL_MCL_FUTURE  2
-+#define TARGET_MCL_CURRENT 1
-+#define TARGET_MCL_FUTURE  2
-+#define TARGET_MCL_ONFAULT 4
-+
- #define TARGET_WANT_OLD_SYS_SELECT
- 
- #define TARGET_FORCE_SHMLBA
-diff --git a/linux-user/cris/target_syscall.h b/linux-user/cris/target_syscall.h
-index 29d69009ffe8..d109a6b42a35 100644
---- a/linux-user/cris/target_syscall.h
-+++ b/linux-user/cris/target_syscall.h
-@@ -40,7 +40,8 @@ struct target_pt_regs {
- 
- #define TARGET_CLONE_BACKWARDS2
- #define TARGET_MINSIGSTKSZ 2048
--#define TARGET_MLOCKALL_MCL_CURRENT 1
--#define TARGET_MLOCKALL_MCL_FUTURE  2
-+#define TARGET_MCL_CURRENT 1
-+#define TARGET_MCL_FUTURE  2
-+#define TARGET_MCL_ONFAULT 4
- 
- #endif
-diff --git a/linux-user/hppa/target_syscall.h b/linux-user/hppa/target_syscall.h
-index e2f366839d80..f34e05edb57b 100644
---- a/linux-user/hppa/target_syscall.h
-+++ b/linux-user/hppa/target_syscall.h
-@@ -23,8 +23,9 @@ struct target_pt_regs {
- #define UNAME_MINIMUM_RELEASE "2.6.32"
- #define TARGET_CLONE_BACKWARDS
- #define TARGET_MINSIGSTKSZ       2048
--#define TARGET_MLOCKALL_MCL_CURRENT 1
--#define TARGET_MLOCKALL_MCL_FUTURE  2
-+#define TARGET_MCL_CURRENT 1
-+#define TARGET_MCL_FUTURE  2
-+#define TARGET_MCL_ONFAULT 4
- 
- #undef  TARGET_ENOMSG
- #define TARGET_ENOMSG          35
-diff --git a/linux-user/i386/target_syscall.h b/linux-user/i386/target_syscall.h
-index 2854758134d7..ed356b3908dc 100644
---- a/linux-user/i386/target_syscall.h
-+++ b/linux-user/i386/target_syscall.h
-@@ -151,8 +151,9 @@ struct target_vm86plus_struct {
- 
- #define TARGET_CLONE_BACKWARDS
- #define TARGET_MINSIGSTKSZ 2048
--#define TARGET_MLOCKALL_MCL_CURRENT 1
--#define TARGET_MLOCKALL_MCL_FUTURE  2
-+#define TARGET_MCL_CURRENT 1
-+#define TARGET_MCL_FUTURE  2
-+#define TARGET_MCL_ONFAULT 4
- #define TARGET_WANT_OLD_SYS_SELECT
- 
- #endif /* I386_TARGET_SYSCALL_H */
-diff --git a/linux-user/m68k/target_syscall.h b/linux-user/m68k/target_syscall.h
-index c0366b1c622d..23359a6299dd 100644
---- a/linux-user/m68k/target_syscall.h
-+++ b/linux-user/m68k/target_syscall.h
-@@ -21,9 +21,9 @@ struct target_pt_regs {
- #define UNAME_MINIMUM_RELEASE "2.6.32"
- 
- #define TARGET_MINSIGSTKSZ 2048
--#define TARGET_MLOCKALL_MCL_CURRENT 1
--#define TARGET_MLOCKALL_MCL_FUTURE  2
+diff --git a/linux-user/aarch64/termbits.h b/linux-user/aarch64/termbits.h
+index 0ab448d090e7..b1d4f4fedbcb 100644
+--- a/linux-user/aarch64/termbits.h
++++ b/linux-user/aarch64/termbits.h
+@@ -1,227 +1 @@
+-/* from asm/termbits.h */
+-/* NOTE: exactly the same as i386 */
 -
-+#define TARGET_MCL_CURRENT 1
-+#define TARGET_MCL_FUTURE  2
-+#define TARGET_MCL_ONFAULT 4
- #define TARGET_WANT_OLD_SYS_SELECT
- 
- #endif /* M68K_TARGET_SYSCALL_H */
-diff --git a/linux-user/microblaze/target_syscall.h b/linux-user/microblaze/target_syscall.h
-index 4141cbaa5ec2..7f653db34f87 100644
---- a/linux-user/microblaze/target_syscall.h
-+++ b/linux-user/microblaze/target_syscall.h
-@@ -50,8 +50,9 @@ struct target_pt_regs {
- 
- #define TARGET_CLONE_BACKWARDS
- #define TARGET_MINSIGSTKSZ      2048
--#define TARGET_MLOCKALL_MCL_CURRENT 1
--#define TARGET_MLOCKALL_MCL_FUTURE  2
-+#define TARGET_MCL_CURRENT 1
-+#define TARGET_MCL_FUTURE  2
-+#define TARGET_MCL_ONFAULT 4
- 
- #define TARGET_WANT_NI_OLD_SELECT
- 
-diff --git a/linux-user/mips/target_syscall.h b/linux-user/mips/target_syscall.h
-index d5509a34a7e2..dd6fd7af8eac 100644
---- a/linux-user/mips/target_syscall.h
-+++ b/linux-user/mips/target_syscall.h
-@@ -234,8 +234,9 @@ struct target_pt_regs {
- 
- #define TARGET_CLONE_BACKWARDS
- #define TARGET_MINSIGSTKSZ 2048
--#define TARGET_MLOCKALL_MCL_CURRENT 1
--#define TARGET_MLOCKALL_MCL_FUTURE  2
-+#define TARGET_MCL_CURRENT 1
-+#define TARGET_MCL_FUTURE  2
-+#define TARGET_MCL_ONFAULT 4
- 
- #define TARGET_FORCE_SHMLBA
- 
-diff --git a/linux-user/mips64/target_syscall.h b/linux-user/mips64/target_syscall.h
-index 8ccc46822c11..8594955eec26 100644
---- a/linux-user/mips64/target_syscall.h
-+++ b/linux-user/mips64/target_syscall.h
-@@ -231,8 +231,9 @@ struct target_pt_regs {
- 
- #define TARGET_CLONE_BACKWARDS
- #define TARGET_MINSIGSTKSZ      2048
--#define TARGET_MLOCKALL_MCL_CURRENT 1
--#define TARGET_MLOCKALL_MCL_FUTURE  2
-+#define TARGET_MCL_CURRENT 1
-+#define TARGET_MCL_FUTURE  2
-+#define TARGET_MCL_ONFAULT 4
- 
- #define TARGET_FORCE_SHMLBA
- 
-diff --git a/linux-user/nios2/target_syscall.h b/linux-user/nios2/target_syscall.h
-index f3b2a500f430..78006c24d479 100644
---- a/linux-user/nios2/target_syscall.h
-+++ b/linux-user/nios2/target_syscall.h
-@@ -31,7 +31,8 @@ struct target_pt_regs {
- };
- 
- #define TARGET_MINSIGSTKSZ 2048
--#define TARGET_MLOCKALL_MCL_CURRENT 1
--#define TARGET_MLOCKALL_MCL_FUTURE  2
-+#define TARGET_MCL_CURRENT 1
-+#define TARGET_MCL_FUTURE  2
-+#define TARGET_MCL_ONFAULT 4
- 
- #endif /* NIOS2_TARGET_SYSCALL_H */
-diff --git a/linux-user/openrisc/target_syscall.h b/linux-user/openrisc/target_syscall.h
-index d586d2a018a5..ef0d89a551d5 100644
---- a/linux-user/openrisc/target_syscall.h
-+++ b/linux-user/openrisc/target_syscall.h
-@@ -16,8 +16,9 @@ struct target_pt_regs {
- #define UNAME_MINIMUM_RELEASE "2.6.32"
- 
- #define TARGET_MINSIGSTKSZ 2048
--#define TARGET_MLOCKALL_MCL_CURRENT 1
--#define TARGET_MLOCKALL_MCL_FUTURE  2
-+#define TARGET_MCL_CURRENT 1
-+#define TARGET_MCL_FUTURE  2
-+#define TARGET_MCL_ONFAULT 4
- 
- #define MMAP_SHIFT TARGET_PAGE_BITS
- 
-diff --git a/linux-user/ppc/target_syscall.h b/linux-user/ppc/target_syscall.h
-index afc0570410d8..c461f878f2d6 100644
---- a/linux-user/ppc/target_syscall.h
-+++ b/linux-user/ppc/target_syscall.h
-@@ -72,8 +72,9 @@ struct target_revectored_struct {
- #define TARGET_CLONE_BACKWARDS
- 
- #define TARGET_MINSIGSTKSZ 2048
--#define TARGET_MLOCKALL_MCL_CURRENT 0x2000
--#define TARGET_MLOCKALL_MCL_FUTURE  0x4000
-+#define TARGET_MCL_CURRENT 0x2000
-+#define TARGET_MCL_FUTURE  0x4000
-+#define TARGET_MCL_ONFAULT 0x8000
- #define TARGET_WANT_NI_OLD_SELECT
- 
- #endif /* PPC_TARGET_SYSCALL_H */
-diff --git a/linux-user/riscv/target_syscall.h b/linux-user/riscv/target_syscall.h
-index a88e821f733d..dc597c897222 100644
---- a/linux-user/riscv/target_syscall.h
-+++ b/linux-user/riscv/target_syscall.h
-@@ -51,8 +51,9 @@ struct target_pt_regs {
- #define UNAME_MINIMUM_RELEASE "4.15.0"
- 
- #define TARGET_MINSIGSTKSZ 2048
--#define TARGET_MLOCKALL_MCL_CURRENT 1
--#define TARGET_MLOCKALL_MCL_FUTURE  2
-+#define TARGET_MCL_CURRENT 1
-+#define TARGET_MCL_FUTURE  2
-+#define TARGET_MCL_ONFAULT 4
- 
- /* clone(flags, newsp, ptidptr, tls, ctidptr) for RISC-V */
- /* This comes from linux/kernel/fork.c, CONFIG_CLONE_BACKWARDS */
-diff --git a/linux-user/s390x/target_syscall.h b/linux-user/s390x/target_syscall.h
-index 8d4f609eaa5d..94f84178db79 100644
---- a/linux-user/s390x/target_syscall.h
-+++ b/linux-user/s390x/target_syscall.h
-@@ -28,7 +28,8 @@ struct target_pt_regs {
- 
- #define TARGET_CLONE_BACKWARDS2
- #define TARGET_MINSIGSTKSZ        2048
--#define TARGET_MLOCKALL_MCL_CURRENT 1
--#define TARGET_MLOCKALL_MCL_FUTURE  2
-+#define TARGET_MCL_CURRENT 1
-+#define TARGET_MCL_FUTURE  2
-+#define TARGET_MCL_ONFAULT 4
- 
- #endif /* S390X_TARGET_SYSCALL_H */
-diff --git a/linux-user/sh4/target_syscall.h b/linux-user/sh4/target_syscall.h
-index 2b5f75be13d6..c1437adafefa 100644
---- a/linux-user/sh4/target_syscall.h
-+++ b/linux-user/sh4/target_syscall.h
-@@ -16,8 +16,9 @@ struct target_pt_regs {
- #define UNAME_MINIMUM_RELEASE "2.6.32"
- 
- #define TARGET_MINSIGSTKSZ 2048
--#define TARGET_MLOCKALL_MCL_CURRENT 1
--#define TARGET_MLOCKALL_MCL_FUTURE  2
-+#define TARGET_MCL_CURRENT 1
-+#define TARGET_MCL_FUTURE  2
-+#define TARGET_MCL_ONFAULT 4
- 
- #define TARGET_FORCE_SHMLBA
- 
-diff --git a/linux-user/sparc/target_syscall.h b/linux-user/sparc/target_syscall.h
-index b9160a771baa..d8ea04ea837a 100644
---- a/linux-user/sparc/target_syscall.h
-+++ b/linux-user/sparc/target_syscall.h
-@@ -21,8 +21,9 @@ struct target_pt_regs {
-  */
- #define TARGET_CLONE_BACKWARDS
- #define TARGET_MINSIGSTKSZ      4096
--#define TARGET_MLOCKALL_MCL_CURRENT 0x2000
--#define TARGET_MLOCKALL_MCL_FUTURE  0x4000
-+#define TARGET_MCL_CURRENT 0x2000
-+#define TARGET_MCL_FUTURE  0x4000
-+#define TARGET_MCL_ONFAULT 0x8000
- 
- /* For SPARC SHMLBA is determined at runtime in the kernel, and
-  * libc has to runtime-detect it using the hwcaps (see glibc
-diff --git a/linux-user/sparc64/target_syscall.h b/linux-user/sparc64/target_syscall.h
-index 3073a23e03ae..696a68b1ed4e 100644
---- a/linux-user/sparc64/target_syscall.h
-+++ b/linux-user/sparc64/target_syscall.h
-@@ -22,8 +22,9 @@ struct target_pt_regs {
-  */
- #define TARGET_CLONE_BACKWARDS
- #define TARGET_MINSIGSTKSZ      4096
--#define TARGET_MLOCKALL_MCL_CURRENT 0x2000
--#define TARGET_MLOCKALL_MCL_FUTURE  0x4000
-+#define TARGET_MCL_CURRENT 0x2000
-+#define TARGET_MCL_FUTURE  0x4000
-+#define TARGET_MCL_ONFAULT 0x8000
- 
- #define TARGET_FORCE_SHMLBA
- 
-diff --git a/linux-user/strace.c b/linux-user/strace.c
-index 31c7be24ebfd..4ac54ecffe9c 100644
---- a/linux-user/strace.c
-+++ b/linux-user/strace.c
-@@ -1198,6 +1198,15 @@ UNUSED static struct flags falloc_flags[] = {
- #endif
- };
- 
-+UNUSED static struct flags mlockall_flags[] = {
-+    FLAG_TARGET(MCL_CURRENT),
-+    FLAG_TARGET(MCL_FUTURE),
-+#ifdef MCL_ONFAULT
-+    FLAG_TARGET(MCL_ONFAULT),
-+#endif
-+    FLAG_END,
+-#ifndef LINUX_USER_AARCH64_TERMBITS_H
+-#define LINUX_USER_AARCH64_TERMBITS_H
+-
+-#define TARGET_NCCS 19
+-
+-struct target_termios {
+-    unsigned int c_iflag;               /* input mode flags */
+-    unsigned int c_oflag;               /* output mode flags */
+-    unsigned int c_cflag;               /* control mode flags */
+-    unsigned int c_lflag;               /* local mode flags */
+-    unsigned char c_line;                    /* line discipline */
+-    unsigned char c_cc[TARGET_NCCS];                /* control characters */
+-};
+-
+-/* c_iflag bits */
+-#define TARGET_IGNBRK  0000001
+-#define TARGET_BRKINT  0000002
+-#define TARGET_IGNPAR  0000004
+-#define TARGET_PARMRK  0000010
+-#define TARGET_INPCK   0000020
+-#define TARGET_ISTRIP  0000040
+-#define TARGET_INLCR   0000100
+-#define TARGET_IGNCR   0000200
+-#define TARGET_ICRNL   0000400
+-#define TARGET_IUCLC   0001000
+-#define TARGET_IXON    0002000
+-#define TARGET_IXANY   0004000
+-#define TARGET_IXOFF   0010000
+-#define TARGET_IMAXBEL 0020000
+-#define TARGET_IUTF8   0040000
+-
+-/* c_oflag bits */
+-#define TARGET_OPOST   0000001
+-#define TARGET_OLCUC   0000002
+-#define TARGET_ONLCR   0000004
+-#define TARGET_OCRNL   0000010
+-#define TARGET_ONOCR   0000020
+-#define TARGET_ONLRET  0000040
+-#define TARGET_OFILL   0000100
+-#define TARGET_OFDEL   0000200
+-#define TARGET_NLDLY   0000400
+-#define   TARGET_NL0   0000000
+-#define   TARGET_NL1   0000400
+-#define TARGET_CRDLY   0003000
+-#define   TARGET_CR0   0000000
+-#define   TARGET_CR1   0001000
+-#define   TARGET_CR2   0002000
+-#define   TARGET_CR3   0003000
+-#define TARGET_TABDLY  0014000
+-#define   TARGET_TAB0  0000000
+-#define   TARGET_TAB1  0004000
+-#define   TARGET_TAB2  0010000
+-#define   TARGET_TAB3  0014000
+-#define   TARGET_XTABS 0014000
+-#define TARGET_BSDLY   0020000
+-#define   TARGET_BS0   0000000
+-#define   TARGET_BS1   0020000
+-#define TARGET_VTDLY   0040000
+-#define   TARGET_VT0   0000000
+-#define   TARGET_VT1   0040000
+-#define TARGET_FFDLY   0100000
+-#define   TARGET_FF0   0000000
+-#define   TARGET_FF1   0100000
+-
+-/* c_cflag bit meaning */
+-#define TARGET_CBAUD   0010017
+-#define  TARGET_B0     0000000         /* hang up */
+-#define  TARGET_B50    0000001
+-#define  TARGET_B75    0000002
+-#define  TARGET_B110   0000003
+-#define  TARGET_B134   0000004
+-#define  TARGET_B150   0000005
+-#define  TARGET_B200   0000006
+-#define  TARGET_B300   0000007
+-#define  TARGET_B600   0000010
+-#define  TARGET_B1200  0000011
+-#define  TARGET_B1800  0000012
+-#define  TARGET_B2400  0000013
+-#define  TARGET_B4800  0000014
+-#define  TARGET_B9600  0000015
+-#define  TARGET_B19200 0000016
+-#define  TARGET_B38400 0000017
+-#define TARGET_EXTA B19200
+-#define TARGET_EXTB B38400
+-#define TARGET_CSIZE   0000060
+-#define   TARGET_CS5   0000000
+-#define   TARGET_CS6   0000020
+-#define   TARGET_CS7   0000040
+-#define   TARGET_CS8   0000060
+-#define TARGET_CSTOPB  0000100
+-#define TARGET_CREAD   0000200
+-#define TARGET_PARENB  0000400
+-#define TARGET_PARODD  0001000
+-#define TARGET_HUPCL   0002000
+-#define TARGET_CLOCAL  0004000
+-#define TARGET_CBAUDEX 0010000
+-#define  TARGET_B57600  0010001
+-#define  TARGET_B115200 0010002
+-#define  TARGET_B230400 0010003
+-#define  TARGET_B460800 0010004
+-#define TARGET_CIBAUD    002003600000  /* input baud rate (not used) */
+-#define TARGET_CMSPAR    010000000000  /* mark or space (stick) parity */
+-#define TARGET_CRTSCTS   020000000000  /* flow control */
+-
+-/* c_lflag bits */
+-#define TARGET_ISIG    0000001
+-#define TARGET_ICANON  0000002
+-#define TARGET_XCASE   0000004
+-#define TARGET_ECHO    0000010
+-#define TARGET_ECHOE   0000020
+-#define TARGET_ECHOK   0000040
+-#define TARGET_ECHONL  0000100
+-#define TARGET_NOFLSH  0000200
+-#define TARGET_TOSTOP  0000400
+-#define TARGET_ECHOCTL 0001000
+-#define TARGET_ECHOPRT 0002000
+-#define TARGET_ECHOKE  0004000
+-#define TARGET_FLUSHO  0010000
+-#define TARGET_PENDIN  0040000
+-#define TARGET_IEXTEN  0100000
+-
+-/* c_cc character offsets */
+-#define TARGET_VINTR    0
+-#define TARGET_VQUIT    1
+-#define TARGET_VERASE   2
+-#define TARGET_VKILL    3
+-#define TARGET_VEOF     4
+-#define TARGET_VTIME    5
+-#define TARGET_VMIN     6
+-#define TARGET_VSWTC    7
+-#define TARGET_VSTART   8
+-#define TARGET_VSTOP    9
+-#define TARGET_VSUSP    10
+-#define TARGET_VEOL     11
+-#define TARGET_VREPRINT 12
+-#define TARGET_VDISCARD 13
+-#define TARGET_VWERASE  14
+-#define TARGET_VLNEXT   15
+-#define TARGET_VEOL2    16
+-
+-/* ioctls */
+-
+-#define TARGET_TCGETS           0x5401
+-#define TARGET_TCSETS           0x5402
+-#define TARGET_TCSETSW          0x5403
+-#define TARGET_TCSETSF          0x5404
+-#define TARGET_TCGETA           0x5405
+-#define TARGET_TCSETA           0x5406
+-#define TARGET_TCSETAW          0x5407
+-#define TARGET_TCSETAF          0x5408
+-#define TARGET_TCSBRK           0x5409
+-#define TARGET_TCXONC           0x540A
+-#define TARGET_TCFLSH           0x540B
+-
+-#define TARGET_TIOCEXCL         0x540C
+-#define TARGET_TIOCNXCL         0x540D
+-#define TARGET_TIOCSCTTY        0x540E
+-#define TARGET_TIOCGPGRP        0x540F
+-#define TARGET_TIOCSPGRP        0x5410
+-#define TARGET_TIOCOUTQ         0x5411
+-#define TARGET_TIOCSTI          0x5412
+-#define TARGET_TIOCGWINSZ       0x5413
+-#define TARGET_TIOCSWINSZ       0x5414
+-#define TARGET_TIOCMGET         0x5415
+-#define TARGET_TIOCMBIS         0x5416
+-#define TARGET_TIOCMBIC         0x5417
+-#define TARGET_TIOCMSET         0x5418
+-#define TARGET_TIOCGSOFTCAR     0x5419
+-#define TARGET_TIOCSSOFTCAR     0x541A
+-#define TARGET_FIONREAD         0x541B
+-#define TARGET_TIOCINQ          TARGET_FIONREAD
+-#define TARGET_TIOCLINUX        0x541C
+-#define TARGET_TIOCCONS         0x541D
+-#define TARGET_TIOCGSERIAL      0x541E
+-#define TARGET_TIOCSSERIAL      0x541F
+-#define TARGET_TIOCPKT          0x5420
+-#define TARGET_FIONBIO          0x5421
+-#define TARGET_TIOCNOTTY        0x5422
+-#define TARGET_TIOCSETD         0x5423
+-#define TARGET_TIOCGETD         0x5424
+-#define TARGET_TCSBRKP          0x5425 /* Needed for POSIX tcsendbreak() */
+-#define TARGET_TIOCTTYGSTRUCT   0x5426 /* For debugging only */
+-#define TARGET_TIOCSBRK         0x5427 /* BSD compatibility */
+-#define TARGET_TIOCCBRK         0x5428 /* BSD compatibility */
+-#define TARGET_TIOCGSID         0x5429 /* Return the session ID of FD */
+-#define TARGET_TIOCGPTN         TARGET_IOR('T', 0x30, unsigned int)
+-        /* Get Pty Number (of pty-mux device) */
+-#define TARGET_TIOCSPTLCK       TARGET_IOW('T', 0x31, int)
+-        /* Lock/unlock Pty */
+-#define TARGET_TIOCGPTPEER      TARGET_IO('T', 0x41)
+-        /* Safely open the slave */
+-
+-#define TARGET_FIONCLEX         0x5450  /* these numbers need to be adjusted. */
+-#define TARGET_FIOCLEX          0x5451
+-#define TARGET_FIOASYNC         0x5452
+-#define TARGET_TIOCSERCONFIG    0x5453
+-#define TARGET_TIOCSERGWILD     0x5454
+-#define TARGET_TIOCSERSWILD     0x5455
+-#define TARGET_TIOCGLCKTRMIOS   0x5456
+-#define TARGET_TIOCSLCKTRMIOS   0x5457
+-#define TARGET_TIOCSERGSTRUCT   0x5458 /* For debugging only */
+-#define TARGET_TIOCSERGETLSR    0x5459 /* Get line status register */
+-#define TARGET_TIOCSERGETMULTI  0x545A /* Get multiport config  */
+-#define TARGET_TIOCSERSETMULTI  0x545B /* Set multiport config */
+-
+-#define TARGET_TIOCMIWAIT      0x545C
+-        /* wait for a change on serial input line(s) */
+-#define TARGET_TIOCGICOUNT     0x545D
+-        /* read serial port inline interrupt counts */
+-#define TARGET_TIOCGHAYESESP   0x545E  /* Get Hayes ESP configuration */
+-#define TARGET_TIOCSHAYESESP   0x545F  /* Set Hayes ESP configuration */
+-
+-/* Used for packet mode */
+-#define TARGET_TIOCPKT_DATA              0
+-#define TARGET_TIOCPKT_FLUSHREAD         1
+-#define TARGET_TIOCPKT_FLUSHWRITE        2
+-#define TARGET_TIOCPKT_STOP              4
+-#define TARGET_TIOCPKT_START             8
+-#define TARGET_TIOCPKT_NOSTOP           16
+-#define TARGET_TIOCPKT_DOSTOP           32
+-
+-#define TARGET_TIOCSER_TEMT    0x01 /* Transmitter physically empty */
+-
+-#endif
++#include "../generic/termbits.h"
+diff --git a/linux-user/arm/termbits.h b/linux-user/arm/termbits.h
+index e555cff1058c..b1d4f4fedbcb 100644
+--- a/linux-user/arm/termbits.h
++++ b/linux-user/arm/termbits.h
+@@ -1,222 +1 @@
+-/* from asm/termbits.h */
+-/* NOTE: exactly the same as i386 */
+-
+-#ifndef LINUX_USER_ARM_TERMBITS_H
+-#define LINUX_USER_ARM_TERMBITS_H
+-
+-#define TARGET_NCCS 19
+-
+-struct target_termios {
+-    unsigned int c_iflag;               /* input mode flags */
+-    unsigned int c_oflag;               /* output mode flags */
+-    unsigned int c_cflag;               /* control mode flags */
+-    unsigned int c_lflag;               /* local mode flags */
+-    unsigned char c_line;                    /* line discipline */
+-    unsigned char c_cc[TARGET_NCCS];                /* control characters */
+-};
+-
+-/* c_iflag bits */
+-#define TARGET_IGNBRK  0000001
+-#define TARGET_BRKINT  0000002
+-#define TARGET_IGNPAR  0000004
+-#define TARGET_PARMRK  0000010
+-#define TARGET_INPCK   0000020
+-#define TARGET_ISTRIP  0000040
+-#define TARGET_INLCR   0000100
+-#define TARGET_IGNCR   0000200
+-#define TARGET_ICRNL   0000400
+-#define TARGET_IUCLC   0001000
+-#define TARGET_IXON    0002000
+-#define TARGET_IXANY   0004000
+-#define TARGET_IXOFF   0010000
+-#define TARGET_IMAXBEL 0020000
+-#define TARGET_IUTF8   0040000
+-
+-/* c_oflag bits */
+-#define TARGET_OPOST   0000001
+-#define TARGET_OLCUC   0000002
+-#define TARGET_ONLCR   0000004
+-#define TARGET_OCRNL   0000010
+-#define TARGET_ONOCR   0000020
+-#define TARGET_ONLRET  0000040
+-#define TARGET_OFILL   0000100
+-#define TARGET_OFDEL   0000200
+-#define TARGET_NLDLY   0000400
+-#define   TARGET_NL0   0000000
+-#define   TARGET_NL1   0000400
+-#define TARGET_CRDLY   0003000
+-#define   TARGET_CR0   0000000
+-#define   TARGET_CR1   0001000
+-#define   TARGET_CR2   0002000
+-#define   TARGET_CR3   0003000
+-#define TARGET_TABDLY  0014000
+-#define   TARGET_TAB0  0000000
+-#define   TARGET_TAB1  0004000
+-#define   TARGET_TAB2  0010000
+-#define   TARGET_TAB3  0014000
+-#define   TARGET_XTABS 0014000
+-#define TARGET_BSDLY   0020000
+-#define   TARGET_BS0   0000000
+-#define   TARGET_BS1   0020000
+-#define TARGET_VTDLY   0040000
+-#define   TARGET_VT0   0000000
+-#define   TARGET_VT1   0040000
+-#define TARGET_FFDLY   0100000
+-#define   TARGET_FF0   0000000
+-#define   TARGET_FF1   0100000
+-
+-/* c_cflag bit meaning */
+-#define TARGET_CBAUD   0010017
+-#define  TARGET_B0     0000000         /* hang up */
+-#define  TARGET_B50    0000001
+-#define  TARGET_B75    0000002
+-#define  TARGET_B110   0000003
+-#define  TARGET_B134   0000004
+-#define  TARGET_B150   0000005
+-#define  TARGET_B200   0000006
+-#define  TARGET_B300   0000007
+-#define  TARGET_B600   0000010
+-#define  TARGET_B1200  0000011
+-#define  TARGET_B1800  0000012
+-#define  TARGET_B2400  0000013
+-#define  TARGET_B4800  0000014
+-#define  TARGET_B9600  0000015
+-#define  TARGET_B19200 0000016
+-#define  TARGET_B38400 0000017
+-#define TARGET_EXTA B19200
+-#define TARGET_EXTB B38400
+-#define TARGET_CSIZE   0000060
+-#define   TARGET_CS5   0000000
+-#define   TARGET_CS6   0000020
+-#define   TARGET_CS7   0000040
+-#define   TARGET_CS8   0000060
+-#define TARGET_CSTOPB  0000100
+-#define TARGET_CREAD   0000200
+-#define TARGET_PARENB  0000400
+-#define TARGET_PARODD  0001000
+-#define TARGET_HUPCL   0002000
+-#define TARGET_CLOCAL  0004000
+-#define TARGET_CBAUDEX 0010000
+-#define  TARGET_B57600  0010001
+-#define  TARGET_B115200 0010002
+-#define  TARGET_B230400 0010003
+-#define  TARGET_B460800 0010004
+-#define TARGET_CIBAUD    002003600000  /* input baud rate (not used) */
+-#define TARGET_CMSPAR    010000000000  /* mark or space (stick) parity */
+-#define TARGET_CRTSCTS   020000000000  /* flow control */
+-
+-/* c_lflag bits */
+-#define TARGET_ISIG    0000001
+-#define TARGET_ICANON  0000002
+-#define TARGET_XCASE   0000004
+-#define TARGET_ECHO    0000010
+-#define TARGET_ECHOE   0000020
+-#define TARGET_ECHOK   0000040
+-#define TARGET_ECHONL  0000100
+-#define TARGET_NOFLSH  0000200
+-#define TARGET_TOSTOP  0000400
+-#define TARGET_ECHOCTL 0001000
+-#define TARGET_ECHOPRT 0002000
+-#define TARGET_ECHOKE  0004000
+-#define TARGET_FLUSHO  0010000
+-#define TARGET_PENDIN  0040000
+-#define TARGET_IEXTEN  0100000
+-
+-/* c_cc character offsets */
+-#define TARGET_VINTR	0
+-#define TARGET_VQUIT	1
+-#define TARGET_VERASE	2
+-#define TARGET_VKILL	3
+-#define TARGET_VEOF	4
+-#define TARGET_VTIME	5
+-#define TARGET_VMIN	6
+-#define TARGET_VSWTC	7
+-#define TARGET_VSTART	8
+-#define TARGET_VSTOP	9
+-#define TARGET_VSUSP	10
+-#define TARGET_VEOL	11
+-#define TARGET_VREPRINT	12
+-#define TARGET_VDISCARD	13
+-#define TARGET_VWERASE	14
+-#define TARGET_VLNEXT	15
+-#define TARGET_VEOL2	16
+-
+-/* ioctls */
+-
+-#define TARGET_TCGETS		0x5401
+-#define TARGET_TCSETS		0x5402
+-#define TARGET_TCSETSW		0x5403
+-#define TARGET_TCSETSF		0x5404
+-#define TARGET_TCGETA		0x5405
+-#define TARGET_TCSETA		0x5406
+-#define TARGET_TCSETAW		0x5407
+-#define TARGET_TCSETAF		0x5408
+-#define TARGET_TCSBRK		0x5409
+-#define TARGET_TCXONC		0x540A
+-#define TARGET_TCFLSH		0x540B
+-
+-#define TARGET_TIOCEXCL	0x540C
+-#define TARGET_TIOCNXCL	0x540D
+-#define TARGET_TIOCSCTTY	0x540E
+-#define TARGET_TIOCGPGRP	0x540F
+-#define TARGET_TIOCSPGRP	0x5410
+-#define TARGET_TIOCOUTQ	0x5411
+-#define TARGET_TIOCSTI		0x5412
+-#define TARGET_TIOCGWINSZ	0x5413
+-#define TARGET_TIOCSWINSZ	0x5414
+-#define TARGET_TIOCMGET	0x5415
+-#define TARGET_TIOCMBIS	0x5416
+-#define TARGET_TIOCMBIC	0x5417
+-#define TARGET_TIOCMSET	0x5418
+-#define TARGET_TIOCGSOFTCAR	0x5419
+-#define TARGET_TIOCSSOFTCAR	0x541A
+-#define TARGET_FIONREAD	0x541B
+-#define TARGET_TIOCINQ		TARGET_FIONREAD
+-#define TARGET_TIOCLINUX	0x541C
+-#define TARGET_TIOCCONS	0x541D
+-#define TARGET_TIOCGSERIAL	0x541E
+-#define TARGET_TIOCSSERIAL	0x541F
+-#define TARGET_TIOCPKT		0x5420
+-#define TARGET_FIONBIO		0x5421
+-#define TARGET_TIOCNOTTY	0x5422
+-#define TARGET_TIOCSETD	0x5423
+-#define TARGET_TIOCGETD	0x5424
+-#define TARGET_TCSBRKP		0x5425	/* Needed for POSIX tcsendbreak() */
+-#define TARGET_TIOCTTYGSTRUCT	0x5426  /* For debugging only */
+-#define TARGET_TIOCSBRK	0x5427  /* BSD compatibility */
+-#define TARGET_TIOCCBRK	0x5428  /* BSD compatibility */
+-#define TARGET_TIOCGSID	0x5429  /* Return the session ID of FD */
+-#define TARGET_TIOCGPTN	TARGET_IOR('T',0x30, unsigned int) /* Get Pty Number (of pty-mux device) */
+-#define TARGET_TIOCSPTLCK	TARGET_IOW('T',0x31, int)  /* Lock/unlock Pty */
+-#define TARGET_TIOCGPTPEER      TARGET_IO('T', 0x41) /* Safely open the slave */
+-
+-#define TARGET_FIONCLEX	0x5450  /* these numbers need to be adjusted. */
+-#define TARGET_FIOCLEX		0x5451
+-#define TARGET_FIOASYNC	0x5452
+-#define TARGET_TIOCSERCONFIG	0x5453
+-#define TARGET_TIOCSERGWILD	0x5454
+-#define TARGET_TIOCSERSWILD	0x5455
+-#define TARGET_TIOCGLCKTRMIOS	0x5456
+-#define TARGET_TIOCSLCKTRMIOS	0x5457
+-#define TARGET_TIOCSERGSTRUCT	0x5458 /* For debugging only */
+-#define TARGET_TIOCSERGETLSR   0x5459 /* Get line status register */
+-#define TARGET_TIOCSERGETMULTI 0x545A /* Get multiport config  */
+-#define TARGET_TIOCSERSETMULTI 0x545B /* Set multiport config */
+-
+-#define TARGET_TIOCMIWAIT	0x545C	/* wait for a change on serial input line(s) */
+-#define TARGET_TIOCGICOUNT	0x545D	/* read serial port inline interrupt counts */
+-#define TARGET_TIOCGHAYESESP   0x545E  /* Get Hayes ESP configuration */
+-#define TARGET_TIOCSHAYESESP   0x545F  /* Set Hayes ESP configuration */
+-
+-/* Used for packet mode */
+-#define TARGET_TIOCPKT_DATA		 0
+-#define TARGET_TIOCPKT_FLUSHREAD	 1
+-#define TARGET_TIOCPKT_FLUSHWRITE	 2
+-#define TARGET_TIOCPKT_STOP		 4
+-#define TARGET_TIOCPKT_START		 8
+-#define TARGET_TIOCPKT_NOSTOP		16
+-#define TARGET_TIOCPKT_DOSTOP		32
+-
+-#define TARGET_TIOCSER_TEMT    0x01	/* Transmitter physically empty */
+-
+-#endif
++#include "../generic/termbits.h"
+diff --git a/linux-user/generic/termbits.h b/linux-user/generic/termbits.h
+new file mode 100644
+index 000000000000..6675e0d1abab
+--- /dev/null
++++ b/linux-user/generic/termbits.h
+@@ -0,0 +1,318 @@
++/* Derived from asm-generic/termbits.h */
++
++#ifndef GENERIC_TERMBITS_H
++#define GENERIC_TERMBITS_H
++
++typedef unsigned char   target_cc_t;        /* cc_t */
++typedef unsigned int    target_speed_t;     /* speed_t */
++typedef unsigned int    target_tcflag_t;    /* tcflag_t */
++
++#define TARGET_NCCS 19
++
++struct target_termios {
++    target_tcflag_t c_iflag;         /* input mode flags */
++    target_tcflag_t c_oflag;         /* output mode flags */
++    target_tcflag_t c_cflag;         /* control mode flags */
++    target_tcflag_t c_lflag;         /* local mode flags */
++    target_cc_t c_line;              /* line discipline */
++    target_cc_t c_cc[TARGET_NCCS];   /* control characters */
 +};
 +
- /*
-  * print_xxx utility functions.  These are used to print syscall
-  * parameters in certain format.  All of these have parameter
-@@ -2009,6 +2018,18 @@ print_ftruncate64(void *cpu_env, const struct syscallname *name,
- }
- #endif
- 
-+#ifdef TARGET_NR_mlockall
-+static void
-+print_mlockall(void *cpu_env, const struct syscallname *name,
-+               abi_long arg0, abi_long arg1, abi_long arg2,
-+               abi_long arg3, abi_long arg4, abi_long arg5)
-+{
-+    print_syscall_prologue(name);
-+    print_flags(mlockall_flags, arg0, 1);
-+    print_syscall_epilogue(name);
-+}
++struct target_termios2 {
++    target_tcflag_t c_iflag;       /* input mode flags */
++    target_tcflag_t c_oflag;       /* output mode flags */
++    target_tcflag_t c_cflag;       /* control mode flags */
++    target_tcflag_t c_lflag;       /* local mode flags */
++    target_cc_t c_line;            /* line discipline */
++    target_cc_t c_cc[TARGET_NCCS]; /* control characters */
++    target_speed_t c_ispeed;       /* input speed */
++    target_speed_t c_ospeed;       /* output speed */
++};
++
++struct target_ktermios {
++    target_tcflag_t c_iflag;       /* input mode flags */
++    target_tcflag_t c_oflag;       /* output mode flags */
++    target_tcflag_t c_cflag;       /* control mode flags */
++    target_tcflag_t c_lflag;       /* local mode flags */
++    target_cc_t c_line;            /* line discipline */
++    target_cc_t c_cc[TARGET_NCCS]; /* control characters */
++    target_speed_t c_ispeed;       /* input speed */
++    target_speed_t c_ospeed;       /* output speed */
++};
++
++/* c_cc character offsets */
++#define TARGET_VINTR    0
++#define TARGET_VQUIT    1
++#define TARGET_VERASE   2
++#define TARGET_VKILL    3
++#define TARGET_VEOF     4
++#define TARGET_VTIME    5
++#define TARGET_VMIN     6
++#define TARGET_VSWTC    7
++#define TARGET_VSTART   8
++#define TARGET_VSTOP    9
++#define TARGET_VSUSP    10
++#define TARGET_VEOL     11
++#define TARGET_VREPRINT 12
++#define TARGET_VDISCARD 13
++#define TARGET_VWERASE  14
++#define TARGET_VLNEXT   15
++#define TARGET_VEOL2    16
++
++/* c_iflag bits */
++#define TARGET_IGNBRK   0000001
++#define TARGET_BRKINT   0000002
++#define TARGET_IGNPAR   0000004
++#define TARGET_PARMRK   0000010
++#define TARGET_INPCK    0000020
++#define TARGET_ISTRIP   0000040
++#define TARGET_INLCR    0000100
++#define TARGET_IGNCR    0000200
++#define TARGET_ICRNL    0000400
++#define TARGET_IUCLC    0001000
++#define TARGET_IXON     0002000
++#define TARGET_IXANY    0004000
++#define TARGET_IXOFF    0010000
++#define TARGET_IMAXBEL  0020000
++#define TARGET_IUTF8    0040000
++
++/* c_oflag bits */
++#define TARGET_OPOST    0000001
++#define TARGET_OLCUC    0000002
++#define TARGET_ONLCR    0000004
++#define TARGET_OCRNL    0000010
++#define TARGET_ONOCR    0000020
++#define TARGET_ONLRET   0000040
++#define TARGET_OFILL    0000100
++#define TARGET_OFDEL    0000200
++#define TARGET_NLDLY    0000400
++#define  TARGET_NL0     0000000
++#define  TARGET_NL1     0000400
++#define TARGET_CRDLY    0003000
++#define  TARGET_CR0     0000000
++#define  TARGET_CR1     0001000
++#define  TARGET_CR2     0002000
++#define  TARGET_CR3     0003000
++#define TARGET_TABDLY   0014000
++#define  TARGET_TAB0    0000000
++#define  TARGET_TAB1    0004000
++#define  TARGET_TAB2    0010000
++#define  TARGET_TAB3    0014000
++#define  TARGET_XTABS   0014000
++#define TARGET_BSDLY    0020000
++#define  TARGET_BS0     0000000
++#define  TARGET_BS1     0020000
++#define TARGET_VTDLY    0040000
++#define  TARGET_VT0     0000000
++#define  TARGET_VT1     0040000
++#define TARGET_FFDLY    0100000
++#define  TARGET_FF0     0000000
++#define  TARGET_FF1     0100000
++
++/* c_cflag bit meaning */
++#define TARGET_CBAUD      0010017
++#define  TARGET_B0        0000000  /* hang up */
++#define  TARGET_B50       0000001
++#define  TARGET_B75       0000002
++#define  TARGET_B110      0000003
++#define  TARGET_B134      0000004
++#define  TARGET_B150      0000005
++#define  TARGET_B200      0000006
++#define  TARGET_B300      0000007
++#define  TARGET_B600      0000010
++#define  TARGET_B1200     0000011
++#define  TARGET_B1800     0000012
++#define  TARGET_B2400     0000013
++#define  TARGET_B4800     0000014
++#define  TARGET_B9600     0000015
++#define  TARGET_B19200    0000016
++#define  TARGET_B38400    0000017
++#define  TARGET_EXTA      TARGET_B19200
++#define  TARGET_EXTB      TARGET_B38400
++#define TARGET_CSIZE      0000060
++#define  TARGET_CS5       0000000
++#define  TARGET_CS6       0000020
++#define  TARGET_CS7       0000040
++#define  TARGET_CS8       0000060
++#define TARGET_CSTOPB     0000100
++#define TARGET_CREAD      0000200
++#define TARGET_PARENB     0000400
++#define TARGET_PARODD     0001000
++#define TARGET_HUPCL      0002000
++#define TARGET_CLOCAL     0004000
++#define TARGET_CBAUDEX    0010000
++#define  TARGET_BOTHER    0010000
++#define  TARGET_B57600    0010001
++#define  TARGET_B115200   0010002
++#define  TARGET_B230400   0010003
++#define  TARGET_B460800   0010004
++#define  TARGET_B500000   0010005
++#define  TARGET_B576000   0010006
++#define  TARGET_B921600   0010007
++#define  TARGET_B1000000  0010010
++#define  TARGET_B1152000  0010011
++#define  TARGET_B1500000  0010012
++#define  TARGET_B2000000  0010013
++#define  TARGET_B2500000  0010014
++#define  TARGET_B3000000  0010015
++#define  TARGET_B3500000  0010016
++#define  TARGET_B4000000  0010017
++#define TARGET_CIBAUD     002003600000  /* input baud rate (not used) */
++#define TARGET_CMSPAR     010000000000  /* mark or space (stick) parity */
++#define TARGET_CRTSCTS    020000000000  /* flow control */
++
++#define TARGET_IBSHIFT    16            /* Shift from CBAUD to CIBAUD */
++
++/* c_lflag bits */
++#define TARGET_ISIG       0000001
++#define TARGET_ICANON     0000002
++#define TARGET_XCASE      0000004
++#define TARGET_ECHO       0000010
++#define TARGET_ECHOE      0000020
++#define TARGET_ECHOK      0000040
++#define TARGET_ECHONL     0000100
++#define TARGET_NOFLSH     0000200
++#define TARGET_TOSTOP     0000400
++#define TARGET_ECHOCTL    0001000
++#define TARGET_ECHOPRT    0002000
++#define TARGET_ECHOKE     0004000
++#define TARGET_FLUSHO     0010000
++#define TARGET_PENDIN     0040000
++#define TARGET_IEXTEN     0100000
++#define TARGET_EXTPROC    0200000
++
++/* tcflow() and TCXONC use these */
++#define TARGET_TCOOFF          0
++#define TARGET_TCOON           1
++#define TARGET_TCIOFF          2
++#define TARGET_TCION           3
++
++/* tcflush() and TCFLSH use these */
++#define TARGET_TCIFLUSH        0
++#define TARGET_TCOFLUSH        1
++#define TARGET_TCIOFLUSH       2
++
++/* tcsetattr uses these */
++#define TARGET_TCSANOW         0
++#define TARGET_TCSADRAIN       1
++#define TARGET_TCSAFLUSH       2
++
++/* Derived from include/uapi/asm-generic/ioctls.h */
++
++#define TARGET_TCGETS           0x5401
++#define TARGET_TCSETS           0x5402
++#define TARGET_TCSETSW          0x5403
++#define TARGET_TCSETSF          0x5404
++#define TARGET_TCGETA           0x5405
++#define TARGET_TCSETA           0x5406
++#define TARGET_TCSETAW          0x5407
++#define TARGET_TCSETAF          0x5408
++#define TARGET_TCSBRK           0x5409
++#define TARGET_TCXONC           0x540A
++#define TARGET_TCFLSH           0x540B
++
++#define TARGET_TIOCEXCL         0x540C
++#define TARGET_TIOCNXCL         0x540D
++#define TARGET_TIOCSCTTY        0x540E
++#define TARGET_TIOCGPGRP        0x540F
++#define TARGET_TIOCSPGRP        0x5410
++#define TARGET_TIOCOUTQ         0x5411
++#define TARGET_TIOCSTI          0x5412
++#define TARGET_TIOCGWINSZ       0x5413
++#define TARGET_TIOCSWINSZ       0x5414
++#define TARGET_TIOCMGET         0x5415
++#define TARGET_TIOCMBIS         0x5416
++#define TARGET_TIOCMBIC         0x5417
++#define TARGET_TIOCMSET         0x5418
++#define TARGET_TIOCGSOFTCAR     0x5419
++#define TARGET_TIOCSSOFTCAR     0x541A
++#define TARGET_FIONREAD         0x541B
++#define TARGET_TIOCINQ          TARGET_FIONREAD
++#define TARGET_TIOCLINUX        0x541C
++#define TARGET_TIOCCONS         0x541D
++#define TARGET_TIOCGSERIAL      0x541E
++#define TARGET_TIOCSSERIAL      0x541F
++#define TARGET_TIOCPKT          0x5420
++#define TARGET_FIONBIO          0x5421
++#define TARGET_TIOCNOTTY        0x5422
++#define TARGET_TIOCSETD         0x5423
++#define TARGET_TIOCGETD         0x5424
++#define TARGET_TCSBRKP          0x5425 /* Needed for POSIX tcsendbreak() */
++#define TARGET_TIOCTTYGSTRUCT   0x5426 /* For debugging only */
++#define TARGET_TIOCSBRK         0x5427 /* BSD compatibility */
++#define TARGET_TIOCCBRK         0x5428 /* BSD compatibility */
++#define TARGET_TIOCGSID         0x5429 /* Return the session ID of FD */
++#define TARGET_TCGETS2          TARGET_IOR('T', 0x2A, struct target_termios2)
++#define TARGET_TCSETS2          TARGET_IOW('T', 0x2B, struct target_termios2)
++#define TARGET_TCSETSW2         TARGET_IOW('T', 0x2C, struct target_termios2)
++#define TARGET_TCSETSF2         TARGET_IOW('T', 0x2D, struct target_termios2)
++#define TARGET_TIOCGRS485       0x542E
++#ifndef TARGET_TIOCSRS485
++#define TARGET_TIOCSRS485       0x542F
++#endif
++/* Get Pty Number (of pty-mux device) */
++#define TARGET_TIOCGPTN         TARGET_IOR('T', 0x30, unsigned int)
++/* Lock/unlock Pty */
++#define TARGET_TIOCSPTLCK       TARGET_IOW('T', 0x31, int)
++
++/* Get primary device node of /dev/console */
++#define TARGET_TIOCGDEV        TARGET_IOR('T', 0x32, unsigned int)
++#define TARGET_TCGETX          0x5432 /* SYS5 TCGETX compatibility */
++#define TARGET_TCSETX          0x5433
++#define TARGET_TCSETXF         0x5434
++#define TARGET_TCSETXW         0x5435
++/* pty: generate signal */
++#define TARGET_TIOCSIG         TARGET_IOW('T', 0x36, int)
++#define TARGET_TIOCVHANGUP     0x5437
++/* Get packet mode state */
++#define TARGET_TIOCGPKT        TARGET_IOR('T', 0x38, int)
++/* Get Pty lock state */
++#define TARGET_TIOCGPTLCK      TARGET_IOR('T', 0x39, int)
++/* Get exclusive mode state */
++#define TARGET_TIOCGEXCL       TARGET_IOR('T', 0x40, int)
++/* Safely open the slave */
++#define TARGET_TIOCGPTPEER     TARGET_IO('T', 0x41)
++#define TARGET_TIOCGISO7816    TARGET_IOR('T', 0x42, struct serial_iso7816)
++#define TARGET_TIOCSISO7816    TARGET_IOWR('T', 0x43, struct serial_iso7816)
++
++#define TARGET_FIONCLEX         0x5450 /* these numbers need to be adjusted */
++#define TARGET_FIOCLEX          0x5451
++#define TARGET_FIOASYNC         0x5452
++#define TARGET_TIOCSERCONFIG    0x5453
++#define TARGET_TIOCSERGWILD     0x5454
++#define TARGET_TIOCSERSWILD     0x5455
++#define TARGET_TIOCGLCKTRMIOS   0x5456
++#define TARGET_TIOCSLCKTRMIOS   0x5457
++#define TARGET_TIOCSERGSTRUCT   0x5458 /* For debugging only */
++#define TARGET_TIOCSERGETLSR    0x5459 /* Get line status register */
++#define TARGET_TIOCSERGETMULTI  0x545A /* Get multiport config  */
++#define TARGET_TIOCSERSETMULTI  0x545B /* Set multiport config */
++
++/* wait for a change on serial input line(s) */
++#define TARGET_TIOCMIWAIT       0x545C
++/* read serial port inline interrupt counts */
++#define TARGET_TIOCGICOUNT      0x545D
++#define TARGET_TIOCGHAYESESP    0x545E  /* Get Hayes ESP configuration */
++#define TARGET_TIOCSHAYESESP    0x545F  /* Set Hayes ESP configuration */
++
++/*
++ * Some arches already define TARGET_FIOQSIZE due to a historical
++ * conflict with a Hayes modem-specific ioctl value.
++ */
++#ifndef TARGET_FIOQSIZE
++# define TARGET_FIOQSIZE        0x5460
 +#endif
 +
- #if defined(TARGET_NR_socket)
- static void
- print_socket(void *cpu_env, const struct syscallname *name,
-diff --git a/linux-user/strace.list b/linux-user/strace.list
-index 8e5303d03500..d0ea7f3464b8 100644
---- a/linux-user/strace.list
-+++ b/linux-user/strace.list
-@@ -568,13 +568,13 @@
- { TARGET_NR_mknodat, "mknodat" , NULL, print_mknodat, NULL },
- #endif
- #ifdef TARGET_NR_mlock
--{ TARGET_NR_mlock, "mlock" , NULL, NULL, NULL },
-+{ TARGET_NR_mlock, "mlock" , "%s(%p," TARGET_FMT_lu ")", NULL, NULL },
- #endif
- #ifdef TARGET_NR_mlock2
- { TARGET_NR_mlock2, "mlock2" , NULL, NULL, NULL },
- #endif
- #ifdef TARGET_NR_mlockall
--{ TARGET_NR_mlockall, "mlockall" , NULL, NULL, NULL },
-+{ TARGET_NR_mlockall, "mlockall" , NULL, print_mlockall, NULL },
- #endif
- #ifdef TARGET_NR_mmap
- { TARGET_NR_mmap, "mmap" , NULL, print_mmap, print_syscall_ret_addr },
-@@ -637,10 +637,10 @@
- { TARGET_NR_multiplexer, "multiplexer" , NULL, NULL, NULL },
- #endif
- #ifdef TARGET_NR_munlock
--{ TARGET_NR_munlock, "munlock" , NULL, NULL, NULL },
-+{ TARGET_NR_munlock, "munlock" , "%s(%p," TARGET_FMT_lu ")", NULL, NULL },
- #endif
- #ifdef TARGET_NR_munlockall
--{ TARGET_NR_munlockall, "munlockall" , NULL, NULL, NULL },
-+{ TARGET_NR_munlockall, "munlockall" , "%s()", NULL, NULL },
- #endif
- #ifdef TARGET_NR_munmap
- { TARGET_NR_munmap, "munmap" , NULL, print_munmap, NULL },
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index ec7192112e9d..027dea35af41 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -6975,12 +6975,18 @@ static inline int target_to_host_mlockall_arg(int arg)
- {
-     int result = 0;
- 
--    if (arg & TARGET_MLOCKALL_MCL_CURRENT) {
-+    if (arg & TARGET_MCL_CURRENT) {
-         result |= MCL_CURRENT;
-     }
--    if (arg & TARGET_MLOCKALL_MCL_FUTURE) {
-+    if (arg & TARGET_MCL_FUTURE) {
-         result |= MCL_FUTURE;
-     }
-+#ifdef MCL_ONFAULT
-+    if (arg & TARGET_MCL_ONFAULT) {
-+        result |= MCL_ONFAULT;
-+    }
-+#endif
++/* Used for packet mode */
++#define TARGET_TIOCPKT_DATA              0
++#define TARGET_TIOCPKT_FLUSHREAD         1
++#define TARGET_TIOCPKT_FLUSHWRITE        2
++#define TARGET_TIOCPKT_STOP              4
++#define TARGET_TIOCPKT_START             8
++#define TARGET_TIOCPKT_NOSTOP            16
++#define TARGET_TIOCPKT_DOSTOP            32
++#define TARGET_TIOCPKT_IOCTL             64
 +
-     return result;
- }
- #endif
-diff --git a/linux-user/tilegx/target_syscall.h b/linux-user/tilegx/target_syscall.h
-index d731acdafaa0..8e9db734b88b 100644
---- a/linux-user/tilegx/target_syscall.h
-+++ b/linux-user/tilegx/target_syscall.h
-@@ -34,8 +34,9 @@ struct target_pt_regs {
-     tilegx_reg_t pad[2];
- };
- 
--#define TARGET_MLOCKALL_MCL_CURRENT 1
--#define TARGET_MLOCKALL_MCL_FUTURE  2
-+#define TARGET_MCL_CURRENT 1
-+#define TARGET_MCL_FUTURE  2
-+#define TARGET_MCL_ONFAULT 4
- 
- /* For faultnum */
- #define TARGET_INT_SWINT_1            14
-diff --git a/linux-user/x86_64/target_syscall.h b/linux-user/x86_64/target_syscall.h
-index 5e221e1d9ddc..3ecccb72be2d 100644
---- a/linux-user/x86_64/target_syscall.h
-+++ b/linux-user/x86_64/target_syscall.h
-@@ -101,7 +101,8 @@ struct target_msqid64_ds {
- #define TARGET_ARCH_GET_FS 0x1003
- #define TARGET_ARCH_GET_GS 0x1004
- #define TARGET_MINSIGSTKSZ 2048
--#define TARGET_MLOCKALL_MCL_CURRENT 1
--#define TARGET_MLOCKALL_MCL_FUTURE  2
-+#define TARGET_MCL_CURRENT 1
-+#define TARGET_MCL_FUTURE  2
-+#define TARGET_MCL_ONFAULT 4
- 
- #endif /* X86_64_TARGET_SYSCALL_H */
-diff --git a/linux-user/xtensa/target_syscall.h b/linux-user/xtensa/target_syscall.h
-index 3866dad84930..afc86a153fc0 100644
---- a/linux-user/xtensa/target_syscall.h
-+++ b/linux-user/xtensa/target_syscall.h
-@@ -43,7 +43,8 @@ struct target_pt_regs {
-     xtensa_reg_t areg[16];
- };
- 
--#define TARGET_MLOCKALL_MCL_CURRENT 1
--#define TARGET_MLOCKALL_MCL_FUTURE  2
-+#define TARGET_MCL_CURRENT 1
-+#define TARGET_MCL_FUTURE  2
-+#define TARGET_MCL_ONFAULT 4
- 
- #endif
++#define TARGET_TIOCSER_TEMT     0x01 /* Transmitter physically empty */
++
++#endif
+diff --git a/linux-user/i386/termbits.h b/linux-user/i386/termbits.h
+index 88264bbde721..b1d4f4fedbcb 100644
+--- a/linux-user/i386/termbits.h
++++ b/linux-user/i386/termbits.h
+@@ -1,232 +1 @@
+-/* from asm/termbits.h */
+-
+-#ifndef LINUX_USER_I386_TERMBITS_H
+-#define LINUX_USER_I386_TERMBITS_H
+-
+-#define TARGET_NCCS 19
+-
+-struct target_termios {
+-    unsigned int c_iflag;               /* input mode flags */
+-    unsigned int c_oflag;               /* output mode flags */
+-    unsigned int c_cflag;               /* control mode flags */
+-    unsigned int c_lflag;               /* local mode flags */
+-    unsigned char c_line;                    /* line discipline */
+-    unsigned char c_cc[TARGET_NCCS];                /* control characters */
+-};
+-
+-/* c_iflag bits */
+-#define TARGET_IGNBRK  0000001
+-#define TARGET_BRKINT  0000002
+-#define TARGET_IGNPAR  0000004
+-#define TARGET_PARMRK  0000010
+-#define TARGET_INPCK   0000020
+-#define TARGET_ISTRIP  0000040
+-#define TARGET_INLCR   0000100
+-#define TARGET_IGNCR   0000200
+-#define TARGET_ICRNL   0000400
+-#define TARGET_IUCLC   0001000
+-#define TARGET_IXON    0002000
+-#define TARGET_IXANY   0004000
+-#define TARGET_IXOFF   0010000
+-#define TARGET_IMAXBEL 0020000
+-#define TARGET_IUTF8   0040000
+-
+-/* c_oflag bits */
+-#define TARGET_OPOST   0000001
+-#define TARGET_OLCUC   0000002
+-#define TARGET_ONLCR   0000004
+-#define TARGET_OCRNL   0000010
+-#define TARGET_ONOCR   0000020
+-#define TARGET_ONLRET  0000040
+-#define TARGET_OFILL   0000100
+-#define TARGET_OFDEL   0000200
+-#define TARGET_NLDLY   0000400
+-#define   TARGET_NL0   0000000
+-#define   TARGET_NL1   0000400
+-#define TARGET_CRDLY   0003000
+-#define   TARGET_CR0   0000000
+-#define   TARGET_CR1   0001000
+-#define   TARGET_CR2   0002000
+-#define   TARGET_CR3   0003000
+-#define TARGET_TABDLY  0014000
+-#define   TARGET_TAB0  0000000
+-#define   TARGET_TAB1  0004000
+-#define   TARGET_TAB2  0010000
+-#define   TARGET_TAB3  0014000
+-#define   TARGET_XTABS 0014000
+-#define TARGET_BSDLY   0020000
+-#define   TARGET_BS0   0000000
+-#define   TARGET_BS1   0020000
+-#define TARGET_VTDLY   0040000
+-#define   TARGET_VT0   0000000
+-#define   TARGET_VT1   0040000
+-#define TARGET_FFDLY   0100000
+-#define   TARGET_FF0   0000000
+-#define   TARGET_FF1   0100000
+-
+-/* c_cflag bit meaning */
+-#define TARGET_CBAUD   0010017
+-#define  TARGET_B0     0000000         /* hang up */
+-#define  TARGET_B50    0000001
+-#define  TARGET_B75    0000002
+-#define  TARGET_B110   0000003
+-#define  TARGET_B134   0000004
+-#define  TARGET_B150   0000005
+-#define  TARGET_B200   0000006
+-#define  TARGET_B300   0000007
+-#define  TARGET_B600   0000010
+-#define  TARGET_B1200  0000011
+-#define  TARGET_B1800  0000012
+-#define  TARGET_B2400  0000013
+-#define  TARGET_B4800  0000014
+-#define  TARGET_B9600  0000015
+-#define  TARGET_B19200 0000016
+-#define  TARGET_B38400 0000017
+-#define TARGET_EXTA B19200
+-#define TARGET_EXTB B38400
+-#define TARGET_CSIZE   0000060
+-#define   TARGET_CS5   0000000
+-#define   TARGET_CS6   0000020
+-#define   TARGET_CS7   0000040
+-#define   TARGET_CS8   0000060
+-#define TARGET_CSTOPB  0000100
+-#define TARGET_CREAD   0000200
+-#define TARGET_PARENB  0000400
+-#define TARGET_PARODD  0001000
+-#define TARGET_HUPCL   0002000
+-#define TARGET_CLOCAL  0004000
+-#define TARGET_CBAUDEX 0010000
+-#define  TARGET_B57600  0010001
+-#define  TARGET_B115200 0010002
+-#define  TARGET_B230400 0010003
+-#define  TARGET_B460800 0010004
+-#define  TARGET_B500000 0010005
+-#define  TARGET_B576000 0010006
+-#define  TARGET_B921600 0010007
+-#define  TARGET_B1000000 0010010
+-#define  TARGET_B1152000 0010011
+-#define  TARGET_B1500000 0010012
+-#define  TARGET_B2000000 0010013
+-#define  TARGET_B2500000 0010014
+-#define  TARGET_B3000000 0010015
+-#define  TARGET_B3500000 0010016
+-#define  TARGET_B4000000 0010017
+-#define TARGET_CIBAUD    002003600000  /* input baud rate (not used) */
+-#define TARGET_CMSPAR    010000000000  /* mark or space (stick) parity */
+-#define TARGET_CRTSCTS   020000000000  /* flow control */
+-
+-/* c_lflag bits */
+-#define TARGET_ISIG    0000001
+-#define TARGET_ICANON  0000002
+-#define TARGET_XCASE   0000004
+-#define TARGET_ECHO    0000010
+-#define TARGET_ECHOE   0000020
+-#define TARGET_ECHOK   0000040
+-#define TARGET_ECHONL  0000100
+-#define TARGET_NOFLSH  0000200
+-#define TARGET_TOSTOP  0000400
+-#define TARGET_ECHOCTL 0001000
+-#define TARGET_ECHOPRT 0002000
+-#define TARGET_ECHOKE  0004000
+-#define TARGET_FLUSHO  0010000
+-#define TARGET_PENDIN  0040000
+-#define TARGET_IEXTEN  0100000
+-
+-/* c_cc character offsets */
+-#define TARGET_VINTR	0
+-#define TARGET_VQUIT	1
+-#define TARGET_VERASE	2
+-#define TARGET_VKILL	3
+-#define TARGET_VEOF	4
+-#define TARGET_VTIME	5
+-#define TARGET_VMIN	6
+-#define TARGET_VSWTC	7
+-#define TARGET_VSTART	8
+-#define TARGET_VSTOP	9
+-#define TARGET_VSUSP	10
+-#define TARGET_VEOL	11
+-#define TARGET_VREPRINT	12
+-#define TARGET_VDISCARD	13
+-#define TARGET_VWERASE	14
+-#define TARGET_VLNEXT	15
+-#define TARGET_VEOL2	16
+-
+-/* ioctls */
+-
+-#define TARGET_TCGETS		0x5401
+-#define TARGET_TCSETS		0x5402
+-#define TARGET_TCSETSW		0x5403
+-#define TARGET_TCSETSF		0x5404
+-#define TARGET_TCGETA		0x5405
+-#define TARGET_TCSETA		0x5406
+-#define TARGET_TCSETAW		0x5407
+-#define TARGET_TCSETAF		0x5408
+-#define TARGET_TCSBRK		0x5409
+-#define TARGET_TCXONC		0x540A
+-#define TARGET_TCFLSH		0x540B
+-
+-#define TARGET_TIOCEXCL	0x540C
+-#define TARGET_TIOCNXCL	0x540D
+-#define TARGET_TIOCSCTTY	0x540E
+-#define TARGET_TIOCGPGRP	0x540F
+-#define TARGET_TIOCSPGRP	0x5410
+-#define TARGET_TIOCOUTQ	0x5411
+-#define TARGET_TIOCSTI		0x5412
+-#define TARGET_TIOCGWINSZ	0x5413
+-#define TARGET_TIOCSWINSZ	0x5414
+-#define TARGET_TIOCMGET	0x5415
+-#define TARGET_TIOCMBIS	0x5416
+-#define TARGET_TIOCMBIC	0x5417
+-#define TARGET_TIOCMSET	0x5418
+-#define TARGET_TIOCGSOFTCAR	0x5419
+-#define TARGET_TIOCSSOFTCAR	0x541A
+-#define TARGET_FIONREAD	0x541B
+-#define TARGET_TIOCINQ		TARGET_FIONREAD
+-#define TARGET_TIOCLINUX	0x541C
+-#define TARGET_TIOCCONS	0x541D
+-#define TARGET_TIOCGSERIAL	0x541E
+-#define TARGET_TIOCSSERIAL	0x541F
+-#define TARGET_TIOCPKT		0x5420
+-#define TARGET_FIONBIO		0x5421
+-#define TARGET_TIOCNOTTY	0x5422
+-#define TARGET_TIOCSETD	0x5423
+-#define TARGET_TIOCGETD	0x5424
+-#define TARGET_TCSBRKP		0x5425	/* Needed for POSIX tcsendbreak() */
+-#define TARGET_TIOCTTYGSTRUCT	0x5426  /* For debugging only */
+-#define TARGET_TIOCSBRK	0x5427  /* BSD compatibility */
+-#define TARGET_TIOCCBRK	0x5428  /* BSD compatibility */
+-#define TARGET_TIOCGSID	0x5429  /* Return the session ID of FD */
+-#define TARGET_TIOCGPTN	TARGET_IOR('T',0x30, unsigned int) /* Get Pty Number (of pty-mux device) */
+-#define TARGET_TIOCSPTLCK	TARGET_IOW('T',0x31, int)  /* Lock/unlock Pty */
+-#define TARGET_TIOCGPTPEER      TARGET_IO('T', 0x41) /* Safely open the slave */
+-
+-#define TARGET_FIONCLEX	0x5450  /* these numbers need to be adjusted. */
+-#define TARGET_FIOCLEX		0x5451
+-#define TARGET_FIOASYNC	0x5452
+-#define TARGET_TIOCSERCONFIG	0x5453
+-#define TARGET_TIOCSERGWILD	0x5454
+-#define TARGET_TIOCSERSWILD	0x5455
+-#define TARGET_TIOCGLCKTRMIOS	0x5456
+-#define TARGET_TIOCSLCKTRMIOS	0x5457
+-#define TARGET_TIOCSERGSTRUCT	0x5458 /* For debugging only */
+-#define TARGET_TIOCSERGETLSR   0x5459 /* Get line status register */
+-#define TARGET_TIOCSERGETMULTI 0x545A /* Get multiport config  */
+-#define TARGET_TIOCSERSETMULTI 0x545B /* Set multiport config */
+-
+-#define TARGET_TIOCMIWAIT	0x545C	/* wait for a change on serial input line(s) */
+-#define TARGET_TIOCGICOUNT	0x545D	/* read serial port inline interrupt counts */
+-#define TARGET_TIOCGHAYESESP   0x545E  /* Get Hayes ESP configuration */
+-#define TARGET_TIOCSHAYESESP   0x545F  /* Set Hayes ESP configuration */
+-
+-/* Used for packet mode */
+-#define TARGET_TIOCPKT_DATA		 0
+-#define TARGET_TIOCPKT_FLUSHREAD	 1
+-#define TARGET_TIOCPKT_FLUSHWRITE	 2
+-#define TARGET_TIOCPKT_STOP		 4
+-#define TARGET_TIOCPKT_START		 8
+-#define TARGET_TIOCPKT_NOSTOP		16
+-#define TARGET_TIOCPKT_DOSTOP		32
+-
+-#define TARGET_TIOCSER_TEMT    0x01	/* Transmitter physically empty */
+-
+-#endif
++#include "../generic/termbits.h"
+diff --git a/linux-user/m68k/termbits.h b/linux-user/m68k/termbits.h
+index 23840aa9688c..b1d4f4fedbcb 100644
+--- a/linux-user/m68k/termbits.h
++++ b/linux-user/m68k/termbits.h
+@@ -1,233 +1 @@
+-/* from asm/termbits.h */
+-/* NOTE: exactly the same as i386 */
+-
+-#ifndef LINUX_USER_M68K_TERMBITS_H
+-#define LINUX_USER_M68K_TERMBITS_H
+-
+-#define TARGET_NCCS 19
+-
+-struct target_termios {
+-    unsigned int c_iflag;               /* input mode flags */
+-    unsigned int c_oflag;               /* output mode flags */
+-    unsigned int c_cflag;               /* control mode flags */
+-    unsigned int c_lflag;               /* local mode flags */
+-    unsigned char c_line;                    /* line discipline */
+-    unsigned char c_cc[TARGET_NCCS];                /* control characters */
+-};
+-
+-/* c_iflag bits */
+-#define TARGET_IGNBRK  0000001
+-#define TARGET_BRKINT  0000002
+-#define TARGET_IGNPAR  0000004
+-#define TARGET_PARMRK  0000010
+-#define TARGET_INPCK   0000020
+-#define TARGET_ISTRIP  0000040
+-#define TARGET_INLCR   0000100
+-#define TARGET_IGNCR   0000200
+-#define TARGET_ICRNL   0000400
+-#define TARGET_IUCLC   0001000
+-#define TARGET_IXON    0002000
+-#define TARGET_IXANY   0004000
+-#define TARGET_IXOFF   0010000
+-#define TARGET_IMAXBEL 0020000
+-#define TARGET_IUTF8   0040000
+-
+-/* c_oflag bits */
+-#define TARGET_OPOST   0000001
+-#define TARGET_OLCUC   0000002
+-#define TARGET_ONLCR   0000004
+-#define TARGET_OCRNL   0000010
+-#define TARGET_ONOCR   0000020
+-#define TARGET_ONLRET  0000040
+-#define TARGET_OFILL   0000100
+-#define TARGET_OFDEL   0000200
+-#define TARGET_NLDLY   0000400
+-#define   TARGET_NL0   0000000
+-#define   TARGET_NL1   0000400
+-#define TARGET_CRDLY   0003000
+-#define   TARGET_CR0   0000000
+-#define   TARGET_CR1   0001000
+-#define   TARGET_CR2   0002000
+-#define   TARGET_CR3   0003000
+-#define TARGET_TABDLY  0014000
+-#define   TARGET_TAB0  0000000
+-#define   TARGET_TAB1  0004000
+-#define   TARGET_TAB2  0010000
+-#define   TARGET_TAB3  0014000
+-#define   TARGET_XTABS 0014000
+-#define TARGET_BSDLY   0020000
+-#define   TARGET_BS0   0000000
+-#define   TARGET_BS1   0020000
+-#define TARGET_VTDLY   0040000
+-#define   TARGET_VT0   0000000
+-#define   TARGET_VT1   0040000
+-#define TARGET_FFDLY   0100000
+-#define   TARGET_FF0   0000000
+-#define   TARGET_FF1   0100000
+-
+-/* c_cflag bit meaning */
+-#define TARGET_CBAUD   0010017
+-#define  TARGET_B0     0000000         /* hang up */
+-#define  TARGET_B50    0000001
+-#define  TARGET_B75    0000002
+-#define  TARGET_B110   0000003
+-#define  TARGET_B134   0000004
+-#define  TARGET_B150   0000005
+-#define  TARGET_B200   0000006
+-#define  TARGET_B300   0000007
+-#define  TARGET_B600   0000010
+-#define  TARGET_B1200  0000011
+-#define  TARGET_B1800  0000012
+-#define  TARGET_B2400  0000013
+-#define  TARGET_B4800  0000014
+-#define  TARGET_B9600  0000015
+-#define  TARGET_B19200 0000016
+-#define  TARGET_B38400 0000017
+-#define TARGET_EXTA B19200
+-#define TARGET_EXTB B38400
+-#define TARGET_CSIZE   0000060
+-#define   TARGET_CS5   0000000
+-#define   TARGET_CS6   0000020
+-#define   TARGET_CS7   0000040
+-#define   TARGET_CS8   0000060
+-#define TARGET_CSTOPB  0000100
+-#define TARGET_CREAD   0000200
+-#define TARGET_PARENB  0000400
+-#define TARGET_PARODD  0001000
+-#define TARGET_HUPCL   0002000
+-#define TARGET_CLOCAL  0004000
+-#define TARGET_CBAUDEX 0010000
+-#define  TARGET_B57600  0010001
+-#define  TARGET_B115200 0010002
+-#define  TARGET_B230400 0010003
+-#define  TARGET_B460800 0010004
+-#define  TARGET_B500000 0010005
+-#define  TARGET_B576000 0010006
+-#define  TARGET_B921600 0010007
+-#define  TARGET_B1000000 0010010
+-#define  TARGET_B1152000 0010011
+-#define  TARGET_B1500000 0010012
+-#define  TARGET_B2000000 0010013
+-#define  TARGET_B2500000 0010014
+-#define  TARGET_B3000000 0010015
+-#define  TARGET_B3500000 0010016
+-#define  TARGET_B4000000 0010017
+-#define TARGET_CIBAUD    002003600000  /* input baud rate (not used) */
+-#define TARGET_CMSPAR    010000000000  /* mark or space (stick) parity */
+-#define TARGET_CRTSCTS   020000000000  /* flow control */
+-
+-/* c_lflag bits */
+-#define TARGET_ISIG    0000001
+-#define TARGET_ICANON  0000002
+-#define TARGET_XCASE   0000004
+-#define TARGET_ECHO    0000010
+-#define TARGET_ECHOE   0000020
+-#define TARGET_ECHOK   0000040
+-#define TARGET_ECHONL  0000100
+-#define TARGET_NOFLSH  0000200
+-#define TARGET_TOSTOP  0000400
+-#define TARGET_ECHOCTL 0001000
+-#define TARGET_ECHOPRT 0002000
+-#define TARGET_ECHOKE  0004000
+-#define TARGET_FLUSHO  0010000
+-#define TARGET_PENDIN  0040000
+-#define TARGET_IEXTEN  0100000
+-
+-/* c_cc character offsets */
+-#define TARGET_VINTR	0
+-#define TARGET_VQUIT	1
+-#define TARGET_VERASE	2
+-#define TARGET_VKILL	3
+-#define TARGET_VEOF	4
+-#define TARGET_VTIME	5
+-#define TARGET_VMIN	6
+-#define TARGET_VSWTC	7
+-#define TARGET_VSTART	8
+-#define TARGET_VSTOP	9
+-#define TARGET_VSUSP	10
+-#define TARGET_VEOL	11
+-#define TARGET_VREPRINT	12
+-#define TARGET_VDISCARD	13
+-#define TARGET_VWERASE	14
+-#define TARGET_VLNEXT	15
+-#define TARGET_VEOL2	16
+-
+-/* ioctls */
+-
+-#define TARGET_TCGETS		0x5401
+-#define TARGET_TCSETS		0x5402
+-#define TARGET_TCSETSW		0x5403
+-#define TARGET_TCSETSF		0x5404
+-#define TARGET_TCGETA		0x5405
+-#define TARGET_TCSETA		0x5406
+-#define TARGET_TCSETAW		0x5407
+-#define TARGET_TCSETAF		0x5408
+-#define TARGET_TCSBRK		0x5409
+-#define TARGET_TCXONC		0x540A
+-#define TARGET_TCFLSH		0x540B
+-
+-#define TARGET_TIOCEXCL	0x540C
+-#define TARGET_TIOCNXCL	0x540D
+-#define TARGET_TIOCSCTTY	0x540E
+-#define TARGET_TIOCGPGRP	0x540F
+-#define TARGET_TIOCSPGRP	0x5410
+-#define TARGET_TIOCOUTQ	0x5411
+-#define TARGET_TIOCSTI		0x5412
+-#define TARGET_TIOCGWINSZ	0x5413
+-#define TARGET_TIOCSWINSZ	0x5414
+-#define TARGET_TIOCMGET	0x5415
+-#define TARGET_TIOCMBIS	0x5416
+-#define TARGET_TIOCMBIC	0x5417
+-#define TARGET_TIOCMSET	0x5418
+-#define TARGET_TIOCGSOFTCAR	0x5419
+-#define TARGET_TIOCSSOFTCAR	0x541A
+-#define TARGET_FIONREAD	0x541B
+-#define TARGET_TIOCINQ		TARGET_FIONREAD
+-#define TARGET_TIOCLINUX	0x541C
+-#define TARGET_TIOCCONS	0x541D
+-#define TARGET_TIOCGSERIAL	0x541E
+-#define TARGET_TIOCSSERIAL	0x541F
+-#define TARGET_TIOCPKT		0x5420
+-#define TARGET_FIONBIO		0x5421
+-#define TARGET_TIOCNOTTY	0x5422
+-#define TARGET_TIOCSETD	0x5423
+-#define TARGET_TIOCGETD	0x5424
+-#define TARGET_TCSBRKP		0x5425	/* Needed for POSIX tcsendbreak() */
+-#define TARGET_TIOCTTYGSTRUCT	0x5426  /* For debugging only */
+-#define TARGET_TIOCSBRK	0x5427  /* BSD compatibility */
+-#define TARGET_TIOCCBRK	0x5428  /* BSD compatibility */
+-#define TARGET_TIOCGSID	0x5429  /* Return the session ID of FD */
+-#define TARGET_TIOCGPTN	TARGET_IOR('T',0x30, unsigned int) /* Get Pty Number (of pty-mux device) */
+-#define TARGET_TIOCSPTLCK	TARGET_IOW('T',0x31, int)  /* Lock/unlock Pty */
+-#define TARGET_TIOCGPTPEER      TARGET_IO('T', 0x41) /* Safely open the slave */
+-
+-#define TARGET_FIONCLEX	0x5450  /* these numbers need to be adjusted. */
+-#define TARGET_FIOCLEX		0x5451
+-#define TARGET_FIOASYNC	0x5452
+-#define TARGET_TIOCSERCONFIG	0x5453
+-#define TARGET_TIOCSERGWILD	0x5454
+-#define TARGET_TIOCSERSWILD	0x5455
+-#define TARGET_TIOCGLCKTRMIOS	0x5456
+-#define TARGET_TIOCSLCKTRMIOS	0x5457
+-#define TARGET_TIOCSERGSTRUCT	0x5458 /* For debugging only */
+-#define TARGET_TIOCSERGETLSR   0x5459 /* Get line status register */
+-#define TARGET_TIOCSERGETMULTI 0x545A /* Get multiport config  */
+-#define TARGET_TIOCSERSETMULTI 0x545B /* Set multiport config */
+-
+-#define TARGET_TIOCMIWAIT	0x545C	/* wait for a change on serial input line(s) */
+-#define TARGET_TIOCGICOUNT	0x545D	/* read serial port inline interrupt counts */
+-#define TARGET_TIOCGHAYESESP   0x545E  /* Get Hayes ESP configuration */
+-#define TARGET_TIOCSHAYESESP   0x545F  /* Set Hayes ESP configuration */
+-
+-/* Used for packet mode */
+-#define TARGET_TIOCPKT_DATA		 0
+-#define TARGET_TIOCPKT_FLUSHREAD	 1
+-#define TARGET_TIOCPKT_FLUSHWRITE	 2
+-#define TARGET_TIOCPKT_STOP		 4
+-#define TARGET_TIOCPKT_START		 8
+-#define TARGET_TIOCPKT_NOSTOP		16
+-#define TARGET_TIOCPKT_DOSTOP		32
+-
+-#define TARGET_TIOCSER_TEMT    0x01	/* Transmitter physically empty */
+-
+-#endif
++#include "../generic/termbits.h"
+diff --git a/linux-user/microblaze/termbits.h b/linux-user/microblaze/termbits.h
+index 17db8a447369..b1d4f4fedbcb 100644
+--- a/linux-user/microblaze/termbits.h
++++ b/linux-user/microblaze/termbits.h
+@@ -1,219 +1 @@
+-/* from asm/termbits.h */
+-
+-#ifndef LINUX_USER_MICROBLAZE_TERMBITS_H
+-#define LINUX_USER_MICROBLAZE_TERMBITS_H
+-
+-#define TARGET_NCCS 19
+-
+-struct target_termios {
+-    unsigned int c_iflag;               /* input mode flags */
+-    unsigned int c_oflag;               /* output mode flags */
+-    unsigned int c_cflag;               /* control mode flags */
+-    unsigned int c_lflag;               /* local mode flags */
+-    unsigned char c_line;                    /* line discipline */
+-    unsigned char c_cc[TARGET_NCCS];                /* control characters */
+-};
+-
+-/* c_iflag bits */
+-#define TARGET_IGNBRK  0000001
+-#define TARGET_BRKINT  0000002
+-#define TARGET_IGNPAR  0000004
+-#define TARGET_PARMRK  0000010
+-#define TARGET_INPCK   0000020
+-#define TARGET_ISTRIP  0000040
+-#define TARGET_INLCR   0000100
+-#define TARGET_IGNCR   0000200
+-#define TARGET_ICRNL   0000400
+-#define TARGET_IUCLC   0001000
+-#define TARGET_IXON    0002000
+-#define TARGET_IXANY   0004000
+-#define TARGET_IXOFF   0010000
+-#define TARGET_IMAXBEL 0020000
+-
+-/* c_oflag bits */
+-#define TARGET_OPOST   0000001
+-#define TARGET_OLCUC   0000002
+-#define TARGET_ONLCR   0000004
+-#define TARGET_OCRNL   0000010
+-#define TARGET_ONOCR   0000020
+-#define TARGET_ONLRET  0000040
+-#define TARGET_OFILL   0000100
+-#define TARGET_OFDEL   0000200
+-#define TARGET_NLDLY   0000400
+-#define   TARGET_NL0   0000000
+-#define   TARGET_NL1   0000400
+-#define TARGET_CRDLY   0003000
+-#define   TARGET_CR0   0000000
+-#define   TARGET_CR1   0001000
+-#define   TARGET_CR2   0002000
+-#define   TARGET_CR3   0003000
+-#define TARGET_TABDLY  0014000
+-#define   TARGET_TAB0  0000000
+-#define   TARGET_TAB1  0004000
+-#define   TARGET_TAB2  0010000
+-#define   TARGET_TAB3  0014000
+-#define   TARGET_XTABS 0014000
+-#define TARGET_BSDLY   0020000
+-#define   TARGET_BS0   0000000
+-#define   TARGET_BS1   0020000
+-#define TARGET_VTDLY   0040000
+-#define   TARGET_VT0   0000000
+-#define   TARGET_VT1   0040000
+-#define TARGET_FFDLY   0100000
+-#define   TARGET_FF0   0000000
+-#define   TARGET_FF1   0100000
+-
+-/* c_cflag bit meaning */
+-#define TARGET_CBAUD   0010017
+-#define  TARGET_B0     0000000         /* hang up */
+-#define  TARGET_B50    0000001
+-#define  TARGET_B75    0000002
+-#define  TARGET_B110   0000003
+-#define  TARGET_B134   0000004
+-#define  TARGET_B150   0000005
+-#define  TARGET_B200   0000006
+-#define  TARGET_B300   0000007
+-#define  TARGET_B600   0000010
+-#define  TARGET_B1200  0000011
+-#define  TARGET_B1800  0000012
+-#define  TARGET_B2400  0000013
+-#define  TARGET_B4800  0000014
+-#define  TARGET_B9600  0000015
+-#define  TARGET_B19200 0000016
+-#define  TARGET_B38400 0000017
+-#define TARGET_EXTA B19200
+-#define TARGET_EXTB B38400
+-#define TARGET_CSIZE   0000060
+-#define   TARGET_CS5   0000000
+-#define   TARGET_CS6   0000020
+-#define   TARGET_CS7   0000040
+-#define   TARGET_CS8   0000060
+-#define TARGET_CSTOPB  0000100
+-#define TARGET_CREAD   0000200
+-#define TARGET_PARENB  0000400
+-#define TARGET_PARODD  0001000
+-#define TARGET_HUPCL   0002000
+-#define TARGET_CLOCAL  0004000
+-#define TARGET_CBAUDEX 0010000
+-#define  TARGET_B57600  0010001
+-#define  TARGET_B115200 0010002
+-#define  TARGET_B230400 0010003
+-#define  TARGET_B460800 0010004
+-#define TARGET_CIBAUD    002003600000  /* input baud rate (not used) */
+-#define TARGET_CRTSCTS   020000000000          /* flow control */
+-
+-/* c_lflag bits */
+-#define TARGET_ISIG    0000001
+-#define TARGET_ICANON  0000002
+-#define TARGET_XCASE   0000004
+-#define TARGET_ECHO    0000010
+-#define TARGET_ECHOE   0000020
+-#define TARGET_ECHOK   0000040
+-#define TARGET_ECHONL  0000100
+-#define TARGET_NOFLSH  0000200
+-#define TARGET_TOSTOP  0000400
+-#define TARGET_ECHOCTL 0001000
+-#define TARGET_ECHOPRT 0002000
+-#define TARGET_ECHOKE  0004000
+-#define TARGET_FLUSHO  0010000
+-#define TARGET_PENDIN  0040000
+-#define TARGET_IEXTEN  0100000
+-
+-/* c_cc character offsets */
+-#define TARGET_VINTR	0
+-#define TARGET_VQUIT	1
+-#define TARGET_VERASE	2
+-#define TARGET_VKILL	3
+-#define TARGET_VEOF	4
+-#define TARGET_VTIME	5
+-#define TARGET_VMIN	6
+-#define TARGET_VSWTC	7
+-#define TARGET_VSTART	8
+-#define TARGET_VSTOP	9
+-#define TARGET_VSUSP	10
+-#define TARGET_VEOL	11
+-#define TARGET_VREPRINT	12
+-#define TARGET_VDISCARD	13
+-#define TARGET_VWERASE	14
+-#define TARGET_VLNEXT	15
+-#define TARGET_VEOL2	16
+-
+-/* ioctls */
+-
+-#define TARGET_TCGETS		0x5401
+-#define TARGET_TCSETS		0x5402
+-#define TARGET_TCSETSW		0x5403
+-#define TARGET_TCSETSF		0x5404
+-#define TARGET_TCGETA		0x5405
+-#define TARGET_TCSETA		0x5406
+-#define TARGET_TCSETAW		0x5407
+-#define TARGET_TCSETAF		0x5408
+-#define TARGET_TCSBRK		0x5409
+-#define TARGET_TCXONC		0x540A
+-#define TARGET_TCFLSH		0x540B
+-
+-#define TARGET_TIOCEXCL	0x540C
+-#define TARGET_TIOCNXCL	0x540D
+-#define TARGET_TIOCSCTTY	0x540E
+-#define TARGET_TIOCGPGRP	0x540F
+-#define TARGET_TIOCSPGRP	0x5410
+-#define TARGET_TIOCOUTQ	0x5411
+-#define TARGET_TIOCSTI		0x5412
+-#define TARGET_TIOCGWINSZ	0x5413
+-#define TARGET_TIOCSWINSZ	0x5414
+-#define TARGET_TIOCMGET	0x5415
+-#define TARGET_TIOCMBIS	0x5416
+-#define TARGET_TIOCMBIC	0x5417
+-#define TARGET_TIOCMSET	0x5418
+-#define TARGET_TIOCGSOFTCAR	0x5419
+-#define TARGET_TIOCSSOFTCAR	0x541A
+-#define TARGET_FIONREAD	0x541B
+-#define TARGET_TIOCINQ		TARGET_FIONREAD
+-#define TARGET_TIOCLINUX	0x541C
+-#define TARGET_TIOCCONS	0x541D
+-#define TARGET_TIOCGSERIAL	0x541E
+-#define TARGET_TIOCSSERIAL	0x541F
+-#define TARGET_TIOCPKT		0x5420
+-#define TARGET_FIONBIO		0x5421
+-#define TARGET_TIOCNOTTY	0x5422
+-#define TARGET_TIOCSETD	0x5423
+-#define TARGET_TIOCGETD	0x5424
+-#define TARGET_TCSBRKP		0x5425	/* Needed for POSIX tcsendbreak() */
+-#define TARGET_TIOCTTYGSTRUCT	0x5426  /* For debugging only */
+-#define TARGET_TIOCSBRK	0x5427  /* BSD compatibility */
+-#define TARGET_TIOCCBRK	0x5428  /* BSD compatibility */
+-#define TARGET_TIOCGSID	0x5429  /* Return the session ID of FD */
+-#define TARGET_TIOCGPTN	TARGET_IOR('T',0x30, unsigned int) /* Get Pty Number (of pty-mux device) */
+-#define TARGET_TIOCSPTLCK	TARGET_IOW('T',0x31, int)  /* Lock/unlock Pty */
+-#define TARGET_TIOCGPTPEER      TARGET_IO('T', 0x41) /* Safely open the slave */
+-
+-#define TARGET_FIONCLEX	0x5450  /* these numbers need to be adjusted. */
+-#define TARGET_FIOCLEX		0x5451
+-#define TARGET_FIOASYNC	0x5452
+-#define TARGET_TIOCSERCONFIG	0x5453
+-#define TARGET_TIOCSERGWILD	0x5454
+-#define TARGET_TIOCSERSWILD	0x5455
+-#define TARGET_TIOCGLCKTRMIOS	0x5456
+-#define TARGET_TIOCSLCKTRMIOS	0x5457
+-#define TARGET_TIOCSERGSTRUCT	0x5458 /* For debugging only */
+-#define TARGET_TIOCSERGETLSR   0x5459 /* Get line status register */
+-#define TARGET_TIOCSERGETMULTI 0x545A /* Get multiport config  */
+-#define TARGET_TIOCSERSETMULTI 0x545B /* Set multiport config */
+-
+-#define TARGET_TIOCMIWAIT	0x545C	/* wait for a change on serial input line(s) */
+-#define TARGET_TIOCGICOUNT	0x545D	/* read serial port inline interrupt counts */
+-#define TARGET_TIOCGHAYESESP   0x545E  /* Get Hayes ESP configuration */
+-#define TARGET_TIOCSHAYESESP   0x545F  /* Set Hayes ESP configuration */
+-
+-/* Used for packet mode */
+-#define TARGET_TIOCPKT_DATA		 0
+-#define TARGET_TIOCPKT_FLUSHREAD	 1
+-#define TARGET_TIOCPKT_FLUSHWRITE	 2
+-#define TARGET_TIOCPKT_STOP		 4
+-#define TARGET_TIOCPKT_START		 8
+-#define TARGET_TIOCPKT_NOSTOP		16
+-#define TARGET_TIOCPKT_DOSTOP		32
+-
+-#define TARGET_TIOCSER_TEMT    0x01	/* Transmitter physically empty */
+-
+-#endif
++#include "../generic/termbits.h"
+diff --git a/linux-user/nios2/termbits.h b/linux-user/nios2/termbits.h
+index 425a2fe6ef60..b1d4f4fedbcb 100644
+--- a/linux-user/nios2/termbits.h
++++ b/linux-user/nios2/termbits.h
+@@ -1,227 +1 @@
+-/* from asm/termbits.h */
+-/* NOTE: exactly the same as i386 */
+-
+-#ifndef LINUX_USER_NIOS2_TERMBITS_H
+-#define LINUX_USER_NIOS2_TERMBITS_H
+-
+-#define TARGET_NCCS 19
+-
+-struct target_termios {
+-    unsigned int c_iflag;               /* input mode flags */
+-    unsigned int c_oflag;               /* output mode flags */
+-    unsigned int c_cflag;               /* control mode flags */
+-    unsigned int c_lflag;               /* local mode flags */
+-    unsigned char c_line;                    /* line discipline */
+-    unsigned char c_cc[TARGET_NCCS];                /* control characters */
+-};
+-
+-/* c_iflag bits */
+-#define TARGET_IGNBRK  0000001
+-#define TARGET_BRKINT  0000002
+-#define TARGET_IGNPAR  0000004
+-#define TARGET_PARMRK  0000010
+-#define TARGET_INPCK   0000020
+-#define TARGET_ISTRIP  0000040
+-#define TARGET_INLCR   0000100
+-#define TARGET_IGNCR   0000200
+-#define TARGET_ICRNL   0000400
+-#define TARGET_IUCLC   0001000
+-#define TARGET_IXON    0002000
+-#define TARGET_IXANY   0004000
+-#define TARGET_IXOFF   0010000
+-#define TARGET_IMAXBEL 0020000
+-#define TARGET_IUTF8   0040000
+-
+-/* c_oflag bits */
+-#define TARGET_OPOST   0000001
+-#define TARGET_OLCUC   0000002
+-#define TARGET_ONLCR   0000004
+-#define TARGET_OCRNL   0000010
+-#define TARGET_ONOCR   0000020
+-#define TARGET_ONLRET  0000040
+-#define TARGET_OFILL   0000100
+-#define TARGET_OFDEL   0000200
+-#define TARGET_NLDLY   0000400
+-#define   TARGET_NL0   0000000
+-#define   TARGET_NL1   0000400
+-#define TARGET_CRDLY   0003000
+-#define   TARGET_CR0   0000000
+-#define   TARGET_CR1   0001000
+-#define   TARGET_CR2   0002000
+-#define   TARGET_CR3   0003000
+-#define TARGET_TABDLY  0014000
+-#define   TARGET_TAB0  0000000
+-#define   TARGET_TAB1  0004000
+-#define   TARGET_TAB2  0010000
+-#define   TARGET_TAB3  0014000
+-#define   TARGET_XTABS 0014000
+-#define TARGET_BSDLY   0020000
+-#define   TARGET_BS0   0000000
+-#define   TARGET_BS1   0020000
+-#define TARGET_VTDLY   0040000
+-#define   TARGET_VT0   0000000
+-#define   TARGET_VT1   0040000
+-#define TARGET_FFDLY   0100000
+-#define   TARGET_FF0   0000000
+-#define   TARGET_FF1   0100000
+-
+-/* c_cflag bit meaning */
+-#define TARGET_CBAUD   0010017
+-#define  TARGET_B0     0000000         /* hang up */
+-#define  TARGET_B50    0000001
+-#define  TARGET_B75    0000002
+-#define  TARGET_B110   0000003
+-#define  TARGET_B134   0000004
+-#define  TARGET_B150   0000005
+-#define  TARGET_B200   0000006
+-#define  TARGET_B300   0000007
+-#define  TARGET_B600   0000010
+-#define  TARGET_B1200  0000011
+-#define  TARGET_B1800  0000012
+-#define  TARGET_B2400  0000013
+-#define  TARGET_B4800  0000014
+-#define  TARGET_B9600  0000015
+-#define  TARGET_B19200 0000016
+-#define  TARGET_B38400 0000017
+-#define TARGET_EXTA B19200
+-#define TARGET_EXTB B38400
+-#define TARGET_CSIZE   0000060
+-#define   TARGET_CS5   0000000
+-#define   TARGET_CS6   0000020
+-#define   TARGET_CS7   0000040
+-#define   TARGET_CS8   0000060
+-#define TARGET_CSTOPB  0000100
+-#define TARGET_CREAD   0000200
+-#define TARGET_PARENB  0000400
+-#define TARGET_PARODD  0001000
+-#define TARGET_HUPCL   0002000
+-#define TARGET_CLOCAL  0004000
+-#define TARGET_CBAUDEX 0010000
+-#define  TARGET_B57600  0010001
+-#define  TARGET_B115200 0010002
+-#define  TARGET_B230400 0010003
+-#define  TARGET_B460800 0010004
+-#define TARGET_CIBAUD    002003600000  /* input baud rate (not used) */
+-#define TARGET_CMSPAR    010000000000  /* mark or space (stick) parity */
+-#define TARGET_CRTSCTS   020000000000  /* flow control */
+-
+-/* c_lflag bits */
+-#define TARGET_ISIG    0000001
+-#define TARGET_ICANON  0000002
+-#define TARGET_XCASE   0000004
+-#define TARGET_ECHO    0000010
+-#define TARGET_ECHOE   0000020
+-#define TARGET_ECHOK   0000040
+-#define TARGET_ECHONL  0000100
+-#define TARGET_NOFLSH  0000200
+-#define TARGET_TOSTOP  0000400
+-#define TARGET_ECHOCTL 0001000
+-#define TARGET_ECHOPRT 0002000
+-#define TARGET_ECHOKE  0004000
+-#define TARGET_FLUSHO  0010000
+-#define TARGET_PENDIN  0040000
+-#define TARGET_IEXTEN  0100000
+-
+-/* c_cc character offsets */
+-#define TARGET_VINTR    0
+-#define TARGET_VQUIT    1
+-#define TARGET_VERASE   2
+-#define TARGET_VKILL    3
+-#define TARGET_VEOF     4
+-#define TARGET_VTIME    5
+-#define TARGET_VMIN     6
+-#define TARGET_VSWTC    7
+-#define TARGET_VSTART   8
+-#define TARGET_VSTOP    9
+-#define TARGET_VSUSP    10
+-#define TARGET_VEOL     11
+-#define TARGET_VREPRINT 12
+-#define TARGET_VDISCARD 13
+-#define TARGET_VWERASE  14
+-#define TARGET_VLNEXT   15
+-#define TARGET_VEOL2    16
+-
+-/* ioctls */
+-
+-#define TARGET_TCGETS           0x5401
+-#define TARGET_TCSETS           0x5402
+-#define TARGET_TCSETSW          0x5403
+-#define TARGET_TCSETSF          0x5404
+-#define TARGET_TCGETA           0x5405
+-#define TARGET_TCSETA           0x5406
+-#define TARGET_TCSETAW          0x5407
+-#define TARGET_TCSETAF          0x5408
+-#define TARGET_TCSBRK           0x5409
+-#define TARGET_TCXONC           0x540A
+-#define TARGET_TCFLSH           0x540B
+-
+-#define TARGET_TIOCEXCL         0x540C
+-#define TARGET_TIOCNXCL         0x540D
+-#define TARGET_TIOCSCTTY        0x540E
+-#define TARGET_TIOCGPGRP        0x540F
+-#define TARGET_TIOCSPGRP        0x5410
+-#define TARGET_TIOCOUTQ         0x5411
+-#define TARGET_TIOCSTI          0x5412
+-#define TARGET_TIOCGWINSZ       0x5413
+-#define TARGET_TIOCSWINSZ       0x5414
+-#define TARGET_TIOCMGET         0x5415
+-#define TARGET_TIOCMBIS         0x5416
+-#define TARGET_TIOCMBIC         0x5417
+-#define TARGET_TIOCMSET         0x5418
+-#define TARGET_TIOCGSOFTCAR     0x5419
+-#define TARGET_TIOCSSOFTCAR     0x541A
+-#define TARGET_FIONREAD         0x541B
+-#define TARGET_TIOCINQ          TARGET_FIONREAD
+-#define TARGET_TIOCLINUX        0x541C
+-#define TARGET_TIOCCONS         0x541D
+-#define TARGET_TIOCGSERIAL      0x541E
+-#define TARGET_TIOCSSERIAL      0x541F
+-#define TARGET_TIOCPKT          0x5420
+-#define TARGET_FIONBIO          0x5421
+-#define TARGET_TIOCNOTTY        0x5422
+-#define TARGET_TIOCSETD         0x5423
+-#define TARGET_TIOCGETD         0x5424
+-#define TARGET_TCSBRKP          0x5425 /* Needed for POSIX tcsendbreak() */
+-#define TARGET_TIOCTTYGSTRUCT   0x5426 /* For debugging only */
+-#define TARGET_TIOCSBRK         0x5427 /* BSD compatibility */
+-#define TARGET_TIOCCBRK         0x5428 /* BSD compatibility */
+-#define TARGET_TIOCGSID         0x5429 /* Return the session ID of FD */
+-#define TARGET_TIOCGPTN         TARGET_IOR('T', 0x30, unsigned int)
+-        /* Get Pty Number (of pty-mux device) */
+-#define TARGET_TIOCSPTLCK       TARGET_IOW('T', 0x31, int)
+-        /* Lock/unlock Pty */
+-#define TARGET_TIOCGPTPEER      TARGET_IO('T', 0x41)
+-        /* Safely open the slave */
+-
+-#define TARGET_FIONCLEX         0x5450  /* these numbers need to be adjusted. */
+-#define TARGET_FIOCLEX          0x5451
+-#define TARGET_FIOASYNC         0x5452
+-#define TARGET_TIOCSERCONFIG    0x5453
+-#define TARGET_TIOCSERGWILD     0x5454
+-#define TARGET_TIOCSERSWILD     0x5455
+-#define TARGET_TIOCGLCKTRMIOS   0x5456
+-#define TARGET_TIOCSLCKTRMIOS   0x5457
+-#define TARGET_TIOCSERGSTRUCT   0x5458 /* For debugging only */
+-#define TARGET_TIOCSERGETLSR    0x5459 /* Get line status register */
+-#define TARGET_TIOCSERGETMULTI  0x545A /* Get multiport config  */
+-#define TARGET_TIOCSERSETMULTI  0x545B /* Set multiport config */
+-
+-#define TARGET_TIOCMIWAIT      0x545C
+-        /* wait for a change on serial input line(s) */
+-#define TARGET_TIOCGICOUNT     0x545D
+-        /* read serial port inline interrupt counts */
+-#define TARGET_TIOCGHAYESESP   0x545E  /* Get Hayes ESP configuration */
+-#define TARGET_TIOCSHAYESESP   0x545F  /* Set Hayes ESP configuration */
+-
+-/* Used for packet mode */
+-#define TARGET_TIOCPKT_DATA              0
+-#define TARGET_TIOCPKT_FLUSHREAD         1
+-#define TARGET_TIOCPKT_FLUSHWRITE        2
+-#define TARGET_TIOCPKT_STOP              4
+-#define TARGET_TIOCPKT_START             8
+-#define TARGET_TIOCPKT_NOSTOP           16
+-#define TARGET_TIOCPKT_DOSTOP           32
+-
+-#define TARGET_TIOCSER_TEMT    0x01 /* Transmitter physically empty */
+-
+-#endif
++#include "../generic/termbits.h"
+diff --git a/linux-user/openrisc/termbits.h b/linux-user/openrisc/termbits.h
+index 7a635ffbc6fe..b1d4f4fedbcb 100644
+--- a/linux-user/openrisc/termbits.h
++++ b/linux-user/openrisc/termbits.h
+@@ -1,301 +1 @@
+-#ifndef LINUX_USER_OPENRISC_TERMBITS_H
+-#define LINUX_USER_OPENRISC_TERMBITS_H
+-
+-typedef unsigned char   target_openrisc_cc;        /*cc_t*/
+-typedef unsigned int    target_openrisc_speed;     /*speed_t*/
+-typedef unsigned int    target_openrisc_tcflag;    /*tcflag_t*/
+-
+-#define TARGET_NCCS 19
+-struct target_termios {
+-    target_openrisc_tcflag c_iflag;               /* input mode flags */
+-    target_openrisc_tcflag c_oflag;               /* output mode flags */
+-    target_openrisc_tcflag c_cflag;               /* control mode flags */
+-    target_openrisc_tcflag c_lflag;               /* local mode flags */
+-    target_openrisc_cc c_line;                    /* line discipline */
+-    target_openrisc_cc c_cc[TARGET_NCCS];         /* control characters */
+-};
+-
+-struct target_termios2 {
+-    target_openrisc_tcflag c_iflag;               /* input mode flags */
+-    target_openrisc_tcflag c_oflag;               /* output mode flags */
+-    target_openrisc_tcflag c_cflag;               /* control mode flags */
+-    target_openrisc_tcflag c_lflag;               /* local mode flags */
+-    target_openrisc_cc c_line;                    /* line discipline */
+-    target_openrisc_cc c_cc[TARGET_NCCS];         /* control characters */
+-    target_openrisc_speed c_ispeed;               /* input speed */
+-    target_openrisc_speed c_ospeed;               /* output speed */
+-};
+-
+-struct target_termios3 {
+-    target_openrisc_tcflag c_iflag;               /* input mode flags */
+-    target_openrisc_tcflag c_oflag;               /* output mode flags */
+-    target_openrisc_tcflag c_cflag;               /* control mode flags */
+-    target_openrisc_tcflag c_lflag;               /* local mode flags */
+-    target_openrisc_cc c_line;                    /* line discipline */
+-    target_openrisc_cc c_cc[TARGET_NCCS];         /* control characters */
+-    target_openrisc_speed c_ispeed;               /* input speed */
+-    target_openrisc_speed c_ospeed;               /* output speed */
+-};
+-
+-/* c_cc characters */
+-#define TARGET_VINTR 0
+-#define TARGET_VQUIT 1
+-#define TARGET_VERASE 2
+-#define TARGET_VKILL 3
+-#define TARGET_VEOF 4
+-#define TARGET_VTIME 5
+-#define TARGET_VMIN 6
+-#define TARGET_VSWTC 7
+-#define TARGET_VSTART 8
+-#define TARGET_VSTOP 9
+-#define TARGET_VSUSP 10
+-#define TARGET_VEOL 11
+-#define TARGET_VREPRINT 12
+-#define TARGET_VDISCARD 13
+-#define TARGET_VWERASE 14
+-#define TARGET_VLNEXT 15
+-#define TARGET_VEOL2 16
+-
+-/* c_iflag bits */
+-#define TARGET_IGNBRK  0000001
+-#define TARGET_BRKINT  0000002
+-#define TARGET_IGNPAR  0000004
+-#define TARGET_PARMRK  0000010
+-#define TARGET_INPCK   0000020
+-#define TARGET_ISTRIP  0000040
+-#define TARGET_INLCR   0000100
+-#define TARGET_IGNCR   0000200
+-#define TARGET_ICRNL   0000400
+-#define TARGET_IUCLC   0001000
+-#define TARGET_IXON    0002000
+-#define TARGET_IXANY   0004000
+-#define TARGET_IXOFF   0010000
+-#define TARGET_IMAXBEL 0020000
+-#define TARGET_IUTF8   0040000
+-
+-/* c_oflag bits */
+-#define TARGET_OPOST   0000001
+-#define TARGET_OLCUC   0000002
+-#define TARGET_ONLCR   0000004
+-#define TARGET_OCRNL   0000010
+-#define TARGET_ONOCR   0000020
+-#define TARGET_ONLRET  0000040
+-#define TARGET_OFILL   0000100
+-#define TARGET_OFDEL   0000200
+-#define TARGET_NLDLY   0000400
+-#define TARGET_NL0     0000000
+-#define TARGET_NL1     0000400
+-#define TARGET_CRDLY   0003000
+-#define TARGET_CR0     0000000
+-#define TARGET_CR1     0001000
+-#define TARGET_CR2     0002000
+-#define TARGET_CR3     0003000
+-#define TARGET_TABDLY  0014000
+-#define TARGET_TAB0    0000000
+-#define TARGET_TAB1    0004000
+-#define TARGET_TAB2    0010000
+-#define TARGET_TAB3    0014000
+-#define TARGET_XTABS   0014000
+-#define TARGET_BSDLY   0020000
+-#define TARGET_BS0     0000000
+-#define TARGET_BS1     0020000
+-#define TARGET_VTDLY   0040000
+-#define TARGET_VT0     0000000
+-#define TARGET_VT1     0040000
+-#define TARGET_FFDLY   0100000
+-#define TARGET_FF0     0000000
+-#define TARGET_FF1     0100000
+-
+-/* c_cflag bit meaning */
+-#define TARGET_CBAUD    0010017
+-#define TARGET_B0       0000000                /* hang up */
+-#define TARGET_B50      0000001
+-#define TARGET_B75      0000002
+-#define TARGET_B110     0000003
+-#define TARGET_B134     0000004
+-#define TARGET_B150     0000005
+-#define TARGET_B200     0000006
+-#define TARGET_B300     0000007
+-#define TARGET_B600     0000010
+-#define TARGET_B1200    0000011
+-#define TARGET_B1800    0000012
+-#define TARGET_B2400    0000013
+-#define TARGET_B4800    0000014
+-#define TARGET_B9600    0000015
+-#define TARGET_B19200   0000016
+-#define TARGET_B38400   0000017
+-#define TARGET_EXTA     B19200
+-#define TARGET_EXTB     B38400
+-#define TARGET_CSIZE    0000060
+-#define TARGET_CS5      0000000
+-#define TARGET_CS6      0000020
+-#define TARGET_CS7      0000040
+-#define TARGET_CS8      0000060
+-#define TARGET_CSTOPB   0000100
+-#define TARGET_CREAD    0000200
+-#define TARGET_PARENB   0000400
+-#define TARGET_PARODD   0001000
+-#define TARGET_HUPCL    0002000
+-#define TARGET_CLOCAL   0004000
+-#define TARGET_CBAUDEX  0010000
+-#define TARGET_BOTHER   0010000
+-#define TARGET_B57600   0010001
+-#define TARGET_B115200  0010002
+-#define TARGET_B230400  0010003
+-#define TARGET_B460800  0010004
+-#define TARGET_B500000  0010005
+-#define TARGET_B576000  0010006
+-#define TARGET_B921600  0010007
+-#define TARGET_B1000000 0010010
+-#define TARGET_B1152000 0010011
+-#define TARGET_B1500000 0010012
+-#define TARGET_B2000000 0010013
+-#define TARGET_B2500000 0010014
+-#define TARGET_B3000000 0010015
+-#define TARGET_B3500000 0010016
+-#define TARGET_B4000000 0010017
+-#define TARGET_CIBAUD   002003600000   /* input baud rate */
+-#define TARGET_CMSPAR   010000000000   /* mark or space (stick) parity */
+-#define TARGET_CRTSCTS  020000000000   /* flow control */
+-
+-#define TARGET_IBSHIFT   16            /* Shift from CBAUD to CIBAUD */
+-
+-/* c_lflag bits */
+-#define TARGET_ISIG    0000001
+-#define TARGET_ICANON  0000002
+-#define TARGET_XCASE   0000004
+-#define TARGET_ECHO    0000010
+-#define TARGET_ECHOE   0000020
+-#define TARGET_ECHOK   0000040
+-#define TARGET_ECHONL  0000100
+-#define TARGET_NOFLSH  0000200
+-#define TARGET_TOSTOP  0000400
+-#define TARGET_ECHOCTL 0001000
+-#define TARGET_ECHOPRT 0002000
+-#define TARGET_ECHOKE  0004000
+-#define TARGET_FLUSHO  0010000
+-#define TARGET_PENDIN  0040000
+-#define TARGET_IEXTEN  0100000
+-#define TARGET_EXTPROC 0200000
+-
+-/* tcflow() and TCXONC use these */
+-#define TARGET_TCOOFF          0
+-#define TARGET_TCOON           1
+-#define TARGET_TCIOFF          2
+-#define TARGET_TCION           3
+-
+-/* tcflush() and TCFLSH use these */
+-#define TARGET_TCIFLUSH        0
+-#define TARGET_TCOFLUSH        1
+-#define TARGET_TCIOFLUSH       2
+-
+-/* tcsetattr uses these */
+-#define TARGET_TCSANOW         0
+-#define TARGET_TCSADRAIN       1
+-#define TARGET_TCSAFLUSH       2
+-
+-/* ioctls */
+-#define TARGET_TCGETS          0x5401
+-#define TARGET_TCSETS          0x5402
+-#define TARGET_TCSETSW         0x5403
+-#define TARGET_TCSETSF         0x5404
+-#define TARGET_TCGETA          0x5405
+-#define TARGET_TCSETA          0x5406
+-#define TARGET_TCSETAW         0x5407
+-#define TARGET_TCSETAF         0x5408
+-#define TARGET_TCSBRK          0x5409
+-#define TARGET_TCXONC          0x540A
+-#define TARGET_TCFLSH          0x540B
+-#define TARGET_TIOCEXCL        0x540C
+-#define TARGET_TIOCNXCL        0x540D
+-#define TARGET_TIOCSCTTY       0x540E
+-#define TARGET_TIOCGPGRP       0x540F
+-#define TARGET_TIOCSPGRP       0x5410
+-#define TARGET_TIOCOUTQ        0x5411
+-#define TARGET_TIOCSTI         0x5412
+-#define TARGET_TIOCGWINSZ      0x5413
+-#define TARGET_TIOCSWINSZ      0x5414
+-#define TARGET_TIOCMGET        0x5415
+-#define TARGET_TIOCMBIS        0x5416
+-#define TARGET_TIOCMBIC        0x5417
+-#define TARGET_TIOCMSET        0x5418
+-#define TARGET_TIOCGSOFTCAR    0x5419
+-#define TARGET_TIOCSSOFTCAR    0x541A
+-#define TARGET_FIONREAD        0x541B
+-#define TARGET_TIOCINQ         FIONREAD
+-#define TARGET_TIOCLINUX       0x541C
+-#define TARGET_TIOCCONS        0x541D
+-#define TARGET_TIOCGSERIAL     0x541E
+-#define TARGET_TIOCSSERIAL     0x541F
+-#define TARGET_TIOCPKT         0x5420
+-#define TARGET_FIONBIO         0x5421
+-#define TARGET_TIOCNOTTY       0x5422
+-#define TARGET_TIOCSETD        0x5423
+-#define TARGET_TIOCGETD        0x5424
+-#define TARGET_TCSBRKP         0x5425  /* Needed for POSIX tcsendbreak() */
+-#define TARGET_TIOCSBRK        0x5427  /* BSD compatibility */
+-#define TARGET_TIOCCBRK        0x5428  /* BSD compatibility */
+-#define TARGET_TIOCGSID        0x5429  /* Return the session ID of FD */
+-#define TARGET_TCGETS2         TARGET_IOR('T', 0x2A, struct termios2)
+-#define TARGET_TCSETS2         TARGET_IOW('T', 0x2B, struct termios2)
+-#define TARGET_TCSETSW2        TARGET_IOW('T', 0x2C, struct termios2)
+-#define TARGET_TCSETSF2        TARGET_IOW('T', 0x2D, struct termios2)
+-#define TARGET_TIOCGRS485      0x542E
+-#ifndef TARGET_TIOCSRS485
+-#define TARGET_TIOCSRS485      0x542F
+-#endif
+-/* Get Pty Number (of pty-mux device) */
+-#define TARGET_TIOCGPTN        TARGET_IOR('T', 0x30, unsigned int)
+-/* Lock/unlock Pty */
+-#define TARGET_TIOCSPTLCK      TARGET_IOW('T', 0x31, int)
+-/* Safely open the slave */
+-#define TARGET_TIOCGPTPEER     TARGET_IO('T', 0x41)
+-/* Get primary device node of /dev/console */
+-#define TARGET_TIOCGDEV        TARGET_IOR('T', 0x32, unsigned int)
+-#define TARGET_TCGETX          0x5432 /* SYS5 TCGETX compatibility */
+-#define TARGET_TCSETX          0x5433
+-#define TARGET_TCSETXF         0x5434
+-#define TARGET_TCSETXW         0x5435
+-/* pty: generate signal */
+-#define TARGET_TIOCSIG         TARGET_IOW('T', 0x36, int)
+-#define TARGET_TIOCVHANGUP     0x5437
+-
+-#define TARGET_FIONCLEX        0x5450
+-#define TARGET_FIOCLEX         0x5451
+-#define TARGET_FIOASYNC        0x5452
+-#define TARGET_TIOCSERCONFIG   0x5453
+-#define TARGET_TIOCSERGWILD    0x5454
+-#define TARGET_TIOCSERSWILD    0x5455
+-#define TARGET_TIOCGLCKTRMIOS  0x5456
+-#define TARGET_TIOCSLCKTRMIOS  0x5457
+-#define TARGET_TIOCSERGSTRUCT  0x5458 /* For debugging only */
+-#define TARGET_TIOCSERGETLSR   0x5459 /* Get line status register */
+-#define TARGET_TIOCSERGETMULTI 0x545A /* Get multiport config  */
+-#define TARGET_TIOCSERSETMULTI 0x545B /* Set multiport config */
+-
+-/* wait for a change on serial input line(s) */
+-#define TARGET_TIOCMIWAIT      0x545C
+-/* read serial port inline interrupt counts */
+-#define TARGET_TIOCGICOUNT     0x545D
+-
+-/*
+- * Some arches already define TARGET_FIOQSIZE due to a historical
+- * conflict with a Hayes modem-specific ioctl value.
+- */
+-#ifndef TARGET_FIOQSIZE
+-#define TARGET_FIOQSIZE        0x5460
+-#endif
+-
+-/* Used for packet mode */
+-#define TARGET_TIOCPKT_DATA             0
+-#define TARGET_TIOCPKT_FLUSHREAD        1
+-#define TARGET_TIOCPKT_FLUSHWRITE       2
+-#define TARGET_TIOCPKT_STOP             4
+-#define TARGET_TIOCPKT_START            8
+-#define TARGET_TIOCPKT_NOSTOP          16
+-#define TARGET_TIOCPKT_DOSTOP          32
+-#define TARGET_TIOCPKT_IOCTL           64
+-
+-#define TARGET_TIOCSER_TEMT    0x01    /* Transmitter physically empty */
+-
+-#endif
++#include "../generic/termbits.h"
+diff --git a/linux-user/riscv/termbits.h b/linux-user/riscv/termbits.h
+index 5e0af0dd3f5c..b1d4f4fedbcb 100644
+--- a/linux-user/riscv/termbits.h
++++ b/linux-user/riscv/termbits.h
+@@ -1,227 +1 @@
+-/* from asm/termbits.h */
+-/* NOTE: exactly the same as i386 */
+-
+-#ifndef LINUX_USER_RISCV_TERMBITS_H
+-#define LINUX_USER_RISCV_TERMBITS_H
+-
+-#define TARGET_NCCS 19
+-
+-struct target_termios {
+-    unsigned int c_iflag;               /* input mode flags */
+-    unsigned int c_oflag;               /* output mode flags */
+-    unsigned int c_cflag;               /* control mode flags */
+-    unsigned int c_lflag;               /* local mode flags */
+-    unsigned char c_line;               /* line discipline */
+-    unsigned char c_cc[TARGET_NCCS];    /* control characters */
+-};
+-
+-/* c_iflag bits */
+-#define TARGET_IGNBRK  0000001
+-#define TARGET_BRKINT  0000002
+-#define TARGET_IGNPAR  0000004
+-#define TARGET_PARMRK  0000010
+-#define TARGET_INPCK   0000020
+-#define TARGET_ISTRIP  0000040
+-#define TARGET_INLCR   0000100
+-#define TARGET_IGNCR   0000200
+-#define TARGET_ICRNL   0000400
+-#define TARGET_IUCLC   0001000
+-#define TARGET_IXON    0002000
+-#define TARGET_IXANY   0004000
+-#define TARGET_IXOFF   0010000
+-#define TARGET_IMAXBEL 0020000
+-#define TARGET_IUTF8   0040000
+-
+-/* c_oflag bits */
+-#define TARGET_OPOST   0000001
+-#define TARGET_OLCUC   0000002
+-#define TARGET_ONLCR   0000004
+-#define TARGET_OCRNL   0000010
+-#define TARGET_ONOCR   0000020
+-#define TARGET_ONLRET  0000040
+-#define TARGET_OFILL   0000100
+-#define TARGET_OFDEL   0000200
+-#define TARGET_NLDLY   0000400
+-#define   TARGET_NL0   0000000
+-#define   TARGET_NL1   0000400
+-#define TARGET_CRDLY   0003000
+-#define   TARGET_CR0   0000000
+-#define   TARGET_CR1   0001000
+-#define   TARGET_CR2   0002000
+-#define   TARGET_CR3   0003000
+-#define TARGET_TABDLY  0014000
+-#define   TARGET_TAB0  0000000
+-#define   TARGET_TAB1  0004000
+-#define   TARGET_TAB2  0010000
+-#define   TARGET_TAB3  0014000
+-#define   TARGET_XTABS 0014000
+-#define TARGET_BSDLY   0020000
+-#define   TARGET_BS0   0000000
+-#define   TARGET_BS1   0020000
+-#define TARGET_VTDLY   0040000
+-#define   TARGET_VT0   0000000
+-#define   TARGET_VT1   0040000
+-#define TARGET_FFDLY   0100000
+-#define   TARGET_FF0   0000000
+-#define   TARGET_FF1   0100000
+-
+-/* c_cflag bit meaning */
+-#define TARGET_CBAUD   0010017
+-#define  TARGET_B0     0000000         /* hang up */
+-#define  TARGET_B50    0000001
+-#define  TARGET_B75    0000002
+-#define  TARGET_B110   0000003
+-#define  TARGET_B134   0000004
+-#define  TARGET_B150   0000005
+-#define  TARGET_B200   0000006
+-#define  TARGET_B300   0000007
+-#define  TARGET_B600   0000010
+-#define  TARGET_B1200  0000011
+-#define  TARGET_B1800  0000012
+-#define  TARGET_B2400  0000013
+-#define  TARGET_B4800  0000014
+-#define  TARGET_B9600  0000015
+-#define  TARGET_B19200 0000016
+-#define  TARGET_B38400 0000017
+-#define TARGET_EXTA B19200
+-#define TARGET_EXTB B38400
+-#define TARGET_CSIZE   0000060
+-#define   TARGET_CS5   0000000
+-#define   TARGET_CS6   0000020
+-#define   TARGET_CS7   0000040
+-#define   TARGET_CS8   0000060
+-#define TARGET_CSTOPB  0000100
+-#define TARGET_CREAD   0000200
+-#define TARGET_PARENB  0000400
+-#define TARGET_PARODD  0001000
+-#define TARGET_HUPCL   0002000
+-#define TARGET_CLOCAL  0004000
+-#define TARGET_CBAUDEX 0010000
+-#define  TARGET_B57600  0010001
+-#define  TARGET_B115200 0010002
+-#define  TARGET_B230400 0010003
+-#define  TARGET_B460800 0010004
+-#define TARGET_CIBAUD    002003600000  /* input baud rate (not used) */
+-#define TARGET_CMSPAR    010000000000  /* mark or space (stick) parity */
+-#define TARGET_CRTSCTS   020000000000  /* flow control */
+-
+-/* c_lflag bits */
+-#define TARGET_ISIG    0000001
+-#define TARGET_ICANON  0000002
+-#define TARGET_XCASE   0000004
+-#define TARGET_ECHO    0000010
+-#define TARGET_ECHOE   0000020
+-#define TARGET_ECHOK   0000040
+-#define TARGET_ECHONL  0000100
+-#define TARGET_NOFLSH  0000200
+-#define TARGET_TOSTOP  0000400
+-#define TARGET_ECHOCTL 0001000
+-#define TARGET_ECHOPRT 0002000
+-#define TARGET_ECHOKE  0004000
+-#define TARGET_FLUSHO  0010000
+-#define TARGET_PENDIN  0040000
+-#define TARGET_IEXTEN  0100000
+-
+-/* c_cc character offsets */
+-#define TARGET_VINTR    0
+-#define TARGET_VQUIT    1
+-#define TARGET_VERASE   2
+-#define TARGET_VKILL    3
+-#define TARGET_VEOF     4
+-#define TARGET_VTIME    5
+-#define TARGET_VMIN     6
+-#define TARGET_VSWTC    7
+-#define TARGET_VSTART   8
+-#define TARGET_VSTOP    9
+-#define TARGET_VSUSP    10
+-#define TARGET_VEOL     11
+-#define TARGET_VREPRINT 12
+-#define TARGET_VDISCARD 13
+-#define TARGET_VWERASE  14
+-#define TARGET_VLNEXT   15
+-#define TARGET_VEOL2    16
+-
+-/* ioctls */
+-
+-#define TARGET_TCGETS           0x5401
+-#define TARGET_TCSETS           0x5402
+-#define TARGET_TCSETSW          0x5403
+-#define TARGET_TCSETSF          0x5404
+-#define TARGET_TCGETA           0x5405
+-#define TARGET_TCSETA           0x5406
+-#define TARGET_TCSETAW          0x5407
+-#define TARGET_TCSETAF          0x5408
+-#define TARGET_TCSBRK           0x5409
+-#define TARGET_TCXONC           0x540A
+-#define TARGET_TCFLSH           0x540B
+-
+-#define TARGET_TIOCEXCL         0x540C
+-#define TARGET_TIOCNXCL         0x540D
+-#define TARGET_TIOCSCTTY        0x540E
+-#define TARGET_TIOCGPGRP        0x540F
+-#define TARGET_TIOCSPGRP        0x5410
+-#define TARGET_TIOCOUTQ         0x5411
+-#define TARGET_TIOCSTI          0x5412
+-#define TARGET_TIOCGWINSZ       0x5413
+-#define TARGET_TIOCSWINSZ       0x5414
+-#define TARGET_TIOCMGET         0x5415
+-#define TARGET_TIOCMBIS         0x5416
+-#define TARGET_TIOCMBIC         0x5417
+-#define TARGET_TIOCMSET         0x5418
+-#define TARGET_TIOCGSOFTCAR     0x5419
+-#define TARGET_TIOCSSOFTCAR     0x541A
+-#define TARGET_FIONREAD         0x541B
+-#define TARGET_TIOCINQ          TARGET_FIONREAD
+-#define TARGET_TIOCLINUX        0x541C
+-#define TARGET_TIOCCONS         0x541D
+-#define TARGET_TIOCGSERIAL      0x541E
+-#define TARGET_TIOCSSERIAL      0x541F
+-#define TARGET_TIOCPKT          0x5420
+-#define TARGET_FIONBIO          0x5421
+-#define TARGET_TIOCNOTTY        0x5422
+-#define TARGET_TIOCSETD         0x5423
+-#define TARGET_TIOCGETD         0x5424
+-#define TARGET_TCSBRKP          0x5425 /* Needed for POSIX tcsendbreak() */
+-#define TARGET_TIOCTTYGSTRUCT   0x5426 /* For debugging only */
+-#define TARGET_TIOCSBRK         0x5427 /* BSD compatibility */
+-#define TARGET_TIOCCBRK         0x5428 /* BSD compatibility */
+-#define TARGET_TIOCGSID         0x5429 /* Return the session ID of FD */
+-#define TARGET_TIOCGPTN         TARGET_IOR('T', 0x30, unsigned int)
+-        /* Get Pty Number (of pty-mux device) */
+-#define TARGET_TIOCSPTLCK       TARGET_IOW('T', 0x31, int)
+-        /* Lock/unlock Pty */
+-#define TARGET_TIOCGPTPEER      TARGET_IO('T', 0x41)
+-        /* Safely open the slave */
+-
+-#define TARGET_FIONCLEX         0x5450  /* these numbers need to be adjusted. */
+-#define TARGET_FIOCLEX          0x5451
+-#define TARGET_FIOASYNC         0x5452
+-#define TARGET_TIOCSERCONFIG    0x5453
+-#define TARGET_TIOCSERGWILD     0x5454
+-#define TARGET_TIOCSERSWILD     0x5455
+-#define TARGET_TIOCGLCKTRMIOS   0x5456
+-#define TARGET_TIOCSLCKTRMIOS   0x5457
+-#define TARGET_TIOCSERGSTRUCT   0x5458 /* For debugging only */
+-#define TARGET_TIOCSERGETLSR    0x5459 /* Get line status register */
+-#define TARGET_TIOCSERGETMULTI  0x545A /* Get multiport config  */
+-#define TARGET_TIOCSERSETMULTI  0x545B /* Set multiport config */
+-
+-#define TARGET_TIOCMIWAIT      0x545C
+-        /* wait for a change on serial input line(s) */
+-#define TARGET_TIOCGICOUNT     0x545D
+-        /* read serial port inline interrupt counts */
+-#define TARGET_TIOCGHAYESESP   0x545E  /* Get Hayes ESP configuration */
+-#define TARGET_TIOCSHAYESESP   0x545F  /* Set Hayes ESP configuration */
+-
+-/* Used for packet mode */
+-#define TARGET_TIOCPKT_DATA              0
+-#define TARGET_TIOCPKT_FLUSHREAD         1
+-#define TARGET_TIOCPKT_FLUSHWRITE        2
+-#define TARGET_TIOCPKT_STOP              4
+-#define TARGET_TIOCPKT_START             8
+-#define TARGET_TIOCPKT_NOSTOP           16
+-#define TARGET_TIOCPKT_DOSTOP           32
+-
+-#define TARGET_TIOCSER_TEMT    0x01 /* Transmitter physically empty */
+-
+-#endif
++#include "../generic/termbits.h"
+diff --git a/linux-user/s390x/termbits.h b/linux-user/s390x/termbits.h
+index 9affa8f41a70..b1d4f4fedbcb 100644
+--- a/linux-user/s390x/termbits.h
++++ b/linux-user/s390x/termbits.h
+@@ -1,288 +1 @@
+-/*
+- *  include/asm-s390/termbits.h
+- *
+- *  S390 version
+- *
+- *  Derived from "include/asm-i386/termbits.h"
+- */
+-
+-#ifndef LINUX_USER_S390X_TERMBITS_H
+-#define LINUX_USER_S390X_TERMBITS_H
+-
+-#define TARGET_NCCS 19
+-struct target_termios {
+-    unsigned int c_iflag;		/* input mode flags */
+-    unsigned int c_oflag;		/* output mode flags */
+-    unsigned int c_cflag;		/* control mode flags */
+-    unsigned int c_lflag;		/* local mode flags */
+-    unsigned char c_line;			/* line discipline */
+-    unsigned char c_cc[TARGET_NCCS];		/* control characters */
+-};
+-
+-struct target_termios2 {
+-    unsigned int c_iflag;		/* input mode flags */
+-    unsigned int c_oflag;		/* output mode flags */
+-    unsigned int c_cflag;		/* control mode flags */
+-    unsigned int c_lflag;		/* local mode flags */
+-    unsigned char c_line;			/* line discipline */
+-    unsigned char c_cc[TARGET_NCCS];		/* control characters */
+-    unsigned int c_ispeed;		/* input speed */
+-    unsigned int c_ospeed;		/* output speed */
+-};
+-
+-struct target_ktermios {
+-    unsigned int c_iflag;		/* input mode flags */
+-    unsigned int c_oflag;		/* output mode flags */
+-    unsigned int c_cflag;		/* control mode flags */
+-    unsigned int c_lflag;		/* local mode flags */
+-    unsigned char c_line;			/* line discipline */
+-    unsigned char c_cc[TARGET_NCCS];		/* control characters */
+-    unsigned int c_ispeed;		/* input speed */
+-    unsigned int c_ospeed;		/* output speed */
+-};
+-
+-/* c_cc characters */
+-#define TARGET_VINTR 0
+-#define TARGET_VQUIT 1
+-#define TARGET_VERASE 2
+-#define TARGET_VKILL 3
+-#define TARGET_VEOF 4
+-#define TARGET_VTIME 5
+-#define TARGET_VMIN 6
+-#define TARGET_VSWTC 7
+-#define TARGET_VSTART 8
+-#define TARGET_VSTOP 9
+-#define TARGET_VSUSP 10
+-#define TARGET_VEOL 11
+-#define TARGET_VREPRINT 12
+-#define TARGET_VDISCARD 13
+-#define TARGET_VWERASE 14
+-#define TARGET_VLNEXT 15
+-#define TARGET_VEOL2 16
+-
+-/* c_iflag bits */
+-#define TARGET_IGNBRK	0000001
+-#define TARGET_BRKINT	0000002
+-#define TARGET_IGNPAR	0000004
+-#define TARGET_PARMRK	0000010
+-#define TARGET_INPCK	0000020
+-#define TARGET_ISTRIP	0000040
+-#define TARGET_INLCR	0000100
+-#define TARGET_IGNCR	0000200
+-#define TARGET_ICRNL	0000400
+-#define TARGET_IUCLC	0001000
+-#define TARGET_IXON	0002000
+-#define TARGET_IXANY	0004000
+-#define TARGET_IXOFF	0010000
+-#define TARGET_IMAXBEL	0020000
+-#define TARGET_IUTF8	0040000
+-
+-/* c_oflag bits */
+-#define TARGET_OPOST	0000001
+-#define TARGET_OLCUC	0000002
+-#define TARGET_ONLCR	0000004
+-#define TARGET_OCRNL	0000010
+-#define TARGET_ONOCR	0000020
+-#define TARGET_ONLRET	0000040
+-#define TARGET_OFILL	0000100
+-#define TARGET_OFDEL	0000200
+-#define TARGET_NLDLY	0000400
+-#define TARGET_NL0	0000000
+-#define TARGET_NL1	0000400
+-#define TARGET_CRDLY	0003000
+-#define TARGET_CR0	0000000
+-#define TARGET_CR1	0001000
+-#define TARGET_CR2	0002000
+-#define TARGET_CR3	0003000
+-#define TARGET_TABDLY	0014000
+-#define TARGET_TAB0	0000000
+-#define TARGET_TAB1	0004000
+-#define TARGET_TAB2	0010000
+-#define TARGET_TAB3	0014000
+-#define TARGET_XTABS	0014000
+-#define TARGET_BSDLY	0020000
+-#define TARGET_BS0	0000000
+-#define TARGET_BS1	0020000
+-#define TARGET_VTDLY	0040000
+-#define TARGET_VT0	0000000
+-#define TARGET_VT1	0040000
+-#define TARGET_FFDLY	0100000
+-#define TARGET_FF0	0000000
+-#define TARGET_FF1	0100000
+-
+-/* c_cflag bit meaning */
+-#define TARGET_CBAUD	0010017
+-#define TARGET_B0	0000000		/* hang up */
+-#define TARGET_B50	0000001
+-#define TARGET_B75	0000002
+-#define TARGET_B110	0000003
+-#define TARGET_B134	0000004
+-#define TARGET_B150	0000005
+-#define TARGET_B200	0000006
+-#define TARGET_B300	0000007
+-#define TARGET_B600	0000010
+-#define TARGET_B1200	0000011
+-#define TARGET_B1800	0000012
+-#define TARGET_B2400	0000013
+-#define TARGET_B4800	0000014
+-#define TARGET_B9600	0000015
+-#define TARGET_B19200	0000016
+-#define TARGET_B38400	0000017
+-#define TARGET_EXTA B19200
+-#define TARGET_EXTB B38400
+-#define TARGET_CSIZE	0000060
+-#define TARGET_CS5	0000000
+-#define TARGET_CS6	0000020
+-#define TARGET_CS7	0000040
+-#define TARGET_CS8	0000060
+-#define TARGET_CSTOPB	0000100
+-#define TARGET_CREAD	0000200
+-#define TARGET_PARENB	0000400
+-#define TARGET_PARODD	0001000
+-#define TARGET_HUPCL	0002000
+-#define TARGET_CLOCAL	0004000
+-#define TARGET_CBAUDEX 0010000
+-#define TARGET_BOTHER  0010000
+-#define TARGET_B57600  0010001
+-#define TARGET_B115200 0010002
+-#define TARGET_B230400 0010003
+-#define TARGET_B460800 0010004
+-#define TARGET_B500000 0010005
+-#define TARGET_B576000 0010006
+-#define TARGET_B921600 0010007
+-#define TARGET_B1000000 0010010
+-#define TARGET_B1152000 0010011
+-#define TARGET_B1500000 0010012
+-#define TARGET_B2000000 0010013
+-#define TARGET_B2500000 0010014
+-#define TARGET_B3000000 0010015
+-#define TARGET_B3500000 0010016
+-#define TARGET_B4000000 0010017
+-#define TARGET_CIBAUD	  002003600000	/* input baud rate */
+-#define TARGET_CMSPAR	  010000000000		/* mark or space (stick) parity */
+-#define TARGET_CRTSCTS	  020000000000		/* flow control */
+-
+-#define TARGET_IBSHIFT	  16		/* Shift from CBAUD to CIBAUD */
+-
+-/* c_lflag bits */
+-#define TARGET_ISIG	0000001
+-#define TARGET_ICANON	0000002
+-#define TARGET_XCASE	0000004
+-#define TARGET_ECHO	0000010
+-#define TARGET_ECHOE	0000020
+-#define TARGET_ECHOK	0000040
+-#define TARGET_ECHONL	0000100
+-#define TARGET_NOFLSH	0000200
+-#define TARGET_TOSTOP	0000400
+-#define TARGET_ECHOCTL	0001000
+-#define TARGET_ECHOPRT	0002000
+-#define TARGET_ECHOKE	0004000
+-#define TARGET_FLUSHO	0010000
+-#define TARGET_PENDIN	0040000
+-#define TARGET_IEXTEN	0100000
+-
+-/* tcflow() and TCXONC use these */
+-#define	TARGET_TCOOFF		0
+-#define	TARGET_TCOON		1
+-#define	TARGET_TCIOFF		2
+-#define	TARGET_TCION		3
+-
+-/* tcflush() and TCFLSH use these */
+-#define	TARGET_TCIFLUSH	0
+-#define	TARGET_TCOFLUSH	1
+-#define	TARGET_TCIOFLUSH	2
+-
+-/* tcsetattr uses these */
+-#define	TARGET_TCSANOW		0
+-#define	TARGET_TCSADRAIN	1
+-#define	TARGET_TCSAFLUSH	2
+-
+-/*
+- *  include/asm-s390/ioctls.h
+- *
+- *  S390 version
+- *
+- *  Derived from "include/asm-i386/ioctls.h"
+- */
+-
+-/* 0x54 is just a magic number to make these relatively unique ('T') */
+-
+-#define TARGET_TCGETS		0x5401
+-#define TARGET_TCSETS		0x5402
+-#define TARGET_TCSETSW		0x5403
+-#define TARGET_TCSETSF		0x5404
+-#define TARGET_TCGETA		0x5405
+-#define TARGET_TCSETA		0x5406
+-#define TARGET_TCSETAW		0x5407
+-#define TARGET_TCSETAF		0x5408
+-#define TARGET_TCSBRK		0x5409
+-#define TARGET_TCXONC		0x540A
+-#define TARGET_TCFLSH		0x540B
+-#define TARGET_TIOCEXCL	0x540C
+-#define TARGET_TIOCNXCL	0x540D
+-#define TARGET_TIOCSCTTY	0x540E
+-#define TARGET_TIOCGPGRP	0x540F
+-#define TARGET_TIOCSPGRP	0x5410
+-#define TARGET_TIOCOUTQ	0x5411
+-#define TARGET_TIOCSTI		0x5412
+-#define TARGET_TIOCGWINSZ	0x5413
+-#define TARGET_TIOCSWINSZ	0x5414
+-#define TARGET_TIOCMGET	0x5415
+-#define TARGET_TIOCMBIS	0x5416
+-#define TARGET_TIOCMBIC	0x5417
+-#define TARGET_TIOCMSET	0x5418
+-#define TARGET_TIOCGSOFTCAR	0x5419
+-#define TARGET_TIOCSSOFTCAR	0x541A
+-#define TARGET_FIONREAD	0x541B
+-#define TARGET_TIOCINQ		FIONREAD
+-#define TARGET_TIOCLINUX	0x541C
+-#define TARGET_TIOCCONS	0x541D
+-#define TARGET_TIOCGSERIAL	0x541E
+-#define TARGET_TIOCSSERIAL	0x541F
+-#define TARGET_TIOCPKT		0x5420
+-#define TARGET_FIONBIO		0x5421
+-#define TARGET_TIOCNOTTY	0x5422
+-#define TARGET_TIOCSETD	0x5423
+-#define TARGET_TIOCGETD	0x5424
+-#define TARGET_TCSBRKP		0x5425	/* Needed for POSIX tcsendbreak() */
+-#define TARGET_TIOCSBRK	0x5427  /* BSD compatibility */
+-#define TARGET_TIOCCBRK	0x5428  /* BSD compatibility */
+-#define TARGET_TIOCGSID	0x5429  /* Return the session ID of FD */
+-#define TARGET_TCGETS2		_IOR('T',0x2A, struct termios2)
+-#define TARGET_TCSETS2		_IOW('T',0x2B, struct termios2)
+-#define TARGET_TCSETSW2	_IOW('T',0x2C, struct termios2)
+-#define TARGET_TCSETSF2	_IOW('T',0x2D, struct termios2)
+-#define TARGET_TIOCGPTN	_IOR('T',0x30, unsigned int) /* Get Pty Number (of pty-mux device) */
+-#define TARGET_TIOCSPTLCK	_IOW('T',0x31, int)  /* Lock/unlock Pty */
+-#define TARGET_TIOCGDEV	_IOR('T',0x32, unsigned int) /* Get real dev no below /dev/console */
+-#define TARGET_TIOCGPTPEER      TARGET_IO('T', 0x41) /* Safely open the slave */
+-
+-#define TARGET_FIONCLEX	0x5450  /* these numbers need to be adjusted. */
+-#define TARGET_FIOCLEX		0x5451
+-#define TARGET_FIOASYNC	0x5452
+-#define TARGET_TIOCSERCONFIG	0x5453
+-#define TARGET_TIOCSERGWILD	0x5454
+-#define TARGET_TIOCSERSWILD	0x5455
+-#define TARGET_TIOCGLCKTRMIOS	0x5456
+-#define TARGET_TIOCSLCKTRMIOS	0x5457
+-#define TARGET_TIOCSERGSTRUCT	0x5458 /* For debugging only */
+-#define TARGET_TIOCSERGETLSR   0x5459 /* Get line status register */
+-#define TARGET_TIOCSERGETMULTI 0x545A /* Get multiport config  */
+-#define TARGET_TIOCSERSETMULTI 0x545B /* Set multiport config */
+-
+-#define TARGET_TIOCMIWAIT	0x545C	/* wait for a change on serial input line(s) */
+-#define TARGET_TIOCGICOUNT	0x545D	/* read serial port inline interrupt counts */
+-#define TARGET_FIOQSIZE	0x545E
+-
+-/* Used for packet mode */
+-#define TARGET_TIOCPKT_DATA		 0
+-#define TARGET_TIOCPKT_FLUSHREAD	 1
+-#define TARGET_TIOCPKT_FLUSHWRITE	 2
+-#define TARGET_TIOCPKT_STOP		 4
+-#define TARGET_TIOCPKT_START		 8
+-#define TARGET_TIOCPKT_NOSTOP		16
+-#define TARGET_TIOCPKT_DOSTOP		32
+-
+-#define TARGET_TIOCSER_TEMT    0x01	/* Transmitter physically empty */
+-
+-#endif
++#include "../generic/termbits.h"
+diff --git a/linux-user/tilegx/termbits.h b/linux-user/tilegx/termbits.h
+index 966daec0880f..b1d4f4fedbcb 100644
+--- a/linux-user/tilegx/termbits.h
++++ b/linux-user/tilegx/termbits.h
+@@ -1,275 +1 @@
+-#ifndef TILEGX_TERMBITS_H
+-#define TILEGX_TERMBITS_H
+-
+-/* From asm-generic/termbits.h, which is used by tilegx */
+-
+-#define TARGET_NCCS 19
+-struct target_termios {
+-    unsigned int c_iflag;             /* input mode flags */
+-    unsigned int c_oflag;             /* output mode flags */
+-    unsigned int c_cflag;             /* control mode flags */
+-    unsigned int c_lflag;             /* local mode flags */
+-    unsigned char c_line;             /* line discipline */
+-    unsigned char c_cc[TARGET_NCCS];  /* control characters */
+-};
+-
+-struct target_termios2 {
+-    unsigned int c_iflag;             /* input mode flags */
+-    unsigned int c_oflag;             /* output mode flags */
+-    unsigned int c_cflag;             /* control mode flags */
+-    unsigned int c_lflag;             /* local mode flags */
+-    unsigned char c_line;             /* line discipline */
+-    unsigned char c_cc[TARGET_NCCS];  /* control characters */
+-    unsigned int c_ispeed;            /* input speed */
+-    unsigned int c_ospeed;            /* output speed */
+-};
+-
+-/* c_cc characters */
+-#define TARGET_VINTR     0
+-#define TARGET_VQUIT     1
+-#define TARGET_VERASE    2
+-#define TARGET_VKILL     3
+-#define TARGET_VEOF      4
+-#define TARGET_VTIME     5
+-#define TARGET_VMIN      6
+-#define TARGET_VSWTC     7
+-#define TARGET_VSTART    8
+-#define TARGET_VSTOP     9
+-#define TARGET_VSUSP     10
+-#define TARGET_VEOL      11
+-#define TARGET_VREPRINT  12
+-#define TARGET_VDISCARD  13
+-#define TARGET_VWERASE   14
+-#define TARGET_VLNEXT    15
+-#define TARGET_VEOL2     16
+-
+-/* c_iflag bits */
+-#define TARGET_IGNBRK    0000001
+-#define TARGET_BRKINT    0000002
+-#define TARGET_IGNPAR    0000004
+-#define TARGET_PARMRK    0000010
+-#define TARGET_INPCK     0000020
+-#define TARGET_ISTRIP    0000040
+-#define TARGET_INLCR     0000100
+-#define TARGET_IGNCR     0000200
+-#define TARGET_ICRNL     0000400
+-#define TARGET_IUCLC     0001000
+-#define TARGET_IXON      0002000
+-#define TARGET_IXANY     0004000
+-#define TARGET_IXOFF     0010000
+-#define TARGET_IMAXBEL   0020000
+-#define TARGET_IUTF8     0040000
+-
+-/* c_oflag bits */
+-#define TARGET_OPOST     0000001
+-#define TARGET_OLCUC     0000002
+-#define TARGET_ONLCR     0000004
+-#define TARGET_OCRNL     0000010
+-#define TARGET_ONOCR     0000020
+-#define TARGET_ONLRET    0000040
+-#define TARGET_OFILL     0000100
+-#define TARGET_OFDEL     0000200
+-#define TARGET_NLDLY     0000400
+-#define   TARGET_NL0     0000000
+-#define   TARGET_NL1     0000400
+-#define TARGET_CRDLY     0003000
+-#define   TARGET_CR0     0000000
+-#define   TARGET_CR1     0001000
+-#define   TARGET_CR2     0002000
+-#define   TARGET_CR3     0003000
+-#define TARGET_TABDLY    0014000
+-#define   TARGET_TAB0    0000000
+-#define   TARGET_TAB1    0004000
+-#define   TARGET_TAB2    0010000
+-#define   TARGET_TAB3    0014000
+-#define   TARGET_XTABS   0014000
+-#define TARGET_BSDLY     0020000
+-#define   TARGET_BS0     0000000
+-#define   TARGET_BS1     0020000
+-#define TARGET_VTDLY     0040000
+-#define   TARGET_VT0     0000000
+-#define   TARGET_VT1     0040000
+-#define TARGET_FFDLY     0100000
+-#define   TARGET_FF0     0000000
+-#define   TARGET_FF1     0100000
+-
+-/* c_cflag bit meaning */
+-#define TARGET_CBAUD     0010017
+-#define  TARGET_B0       0000000        /* hang up */
+-#define  TARGET_B50      0000001
+-#define  TARGET_B75      0000002
+-#define  TARGET_B110     0000003
+-#define  TARGET_B134     0000004
+-#define  TARGET_B150     0000005
+-#define  TARGET_B200     0000006
+-#define  TARGET_B300     0000007
+-#define  TARGET_B600     0000010
+-#define  TARGET_B1200    0000011
+-#define  TARGET_B1800    0000012
+-#define  TARGET_B2400    0000013
+-#define  TARGET_B4800    0000014
+-#define  TARGET_B9600    0000015
+-#define  TARGET_B19200   0000016
+-#define  TARGET_B38400   0000017
+-#define TARGET_EXTA      TARGET_B19200
+-#define TARGET_EXTB      TARGET_B38400
+-#define TARGET_CSIZE     0000060
+-#define   TARGET_CS5     0000000
+-#define   TARGET_CS6     0000020
+-#define   TARGET_CS7     0000040
+-#define   TARGET_CS8     0000060
+-#define TARGET_CSTOPB    0000100
+-#define TARGET_CREAD     0000200
+-#define TARGET_PARENB    0000400
+-#define TARGET_PARODD    0001000
+-#define TARGET_HUPCL     0002000
+-#define TARGET_CLOCAL    0004000
+-#define TARGET_CBAUDEX   0010000
+-#define    TARGET_BOTHER 0010000
+-#define    TARGET_B57600 0010001
+-#define   TARGET_B115200 0010002
+-#define   TARGET_B230400 0010003
+-#define   TARGET_B460800 0010004
+-#define   TARGET_B500000 0010005
+-#define   TARGET_B576000 0010006
+-#define   TARGET_B921600 0010007
+-#define  TARGET_B1000000 0010010
+-#define  TARGET_B1152000 0010011
+-#define  TARGET_B1500000 0010012
+-#define  TARGET_B2000000 0010013
+-#define  TARGET_B2500000 0010014
+-#define  TARGET_B3000000 0010015
+-#define  TARGET_B3500000 0010016
+-#define  TARGET_B4000000 0010017
+-#define TARGET_CIBAUD    002003600000    /* input baud rate */
+-#define TARGET_CMSPAR    010000000000    /* mark or space (stick) parity */
+-#define TARGET_CRTSCTS   020000000000    /* flow control */
+-
+-#define TARGET_IBSHIFT   16        /* Shift from CBAUD to CIBAUD */
+-
+-/* c_lflag bits */
+-#define TARGET_ISIG      0000001
+-#define TARGET_ICANON    0000002
+-#define TARGET_XCASE     0000004
+-#define TARGET_ECHO      0000010
+-#define TARGET_ECHOE     0000020
+-#define TARGET_ECHOK     0000040
+-#define TARGET_ECHONL    0000100
+-#define TARGET_NOFLSH    0000200
+-#define TARGET_TOSTOP    0000400
+-#define TARGET_ECHOCTL   0001000
+-#define TARGET_ECHOPRT   0002000
+-#define TARGET_ECHOKE    0004000
+-#define TARGET_FLUSHO    0010000
+-#define TARGET_PENDIN    0040000
+-#define TARGET_IEXTEN    0100000
+-#define TARGET_EXTPROC   0200000
+-
+-/* tcflow() and TCXONC use these */
+-#define TARGET_TCOOFF    0
+-#define TARGET_TCOON     1
+-#define TARGET_TCIOFF    2
+-#define TARGET_TCION     3
+-
+-/* tcflush() and TCFLSH use these */
+-#define TARGET_TCIFLUSH  0
+-#define TARGET_TCOFLUSH  1
+-#define TARGET_TCIOFLUSH 2
+-
+-/* tcsetattr uses these */
+-#define TARGET_TCSANOW   0
+-#define TARGET_TCSADRAIN 1
+-#define TARGET_TCSAFLUSH 2
+-
+-/* From asm-generic/ioctls.h, which is used by tilegx */
+-
+-#define TARGET_TCGETS                   0x5401
+-#define TARGET_TCSETS                   0x5402
+-#define TARGET_TCSETSW                  0x5403
+-#define TARGET_TCSETSF                  0x5404
+-#define TARGET_TCGETA                   0x5405
+-#define TARGET_TCSETA                   0x5406
+-#define TARGET_TCSETAW                  0x5407
+-#define TARGET_TCSETAF                  0x5408
+-#define TARGET_TCSBRK                   0x5409
+-#define TARGET_TCXONC                   0x540A
+-#define TARGET_TCFLSH                   0x540B
+-#define TARGET_TIOCEXCL                 0x540C
+-#define TARGET_TIOCNXCL                 0x540D
+-#define TARGET_TIOCSCTTY                0x540E
+-#define TARGET_TIOCGPGRP                0x540F
+-#define TARGET_TIOCSPGRP                0x5410
+-#define TARGET_TIOCOUTQ                 0x5411
+-#define TARGET_TIOCSTI                  0x5412
+-#define TARGET_TIOCGWINSZ               0x5413
+-#define TARGET_TIOCSWINSZ               0x5414
+-#define TARGET_TIOCMGET                 0x5415
+-#define TARGET_TIOCMBIS                 0x5416
+-#define TARGET_TIOCMBIC                 0x5417
+-#define TARGET_TIOCMSET                 0x5418
+-#define TARGET_TIOCGSOFTCAR             0x5419
+-#define TARGET_TIOCSSOFTCAR             0x541A
+-#define TARGET_FIONREAD                 0x541B
+-#define TARGET_TIOCINQ                  TARGET_FIONREAD
+-#define TARGET_TIOCLINUX                0x541C
+-#define TARGET_TIOCCONS                 0x541D
+-#define TARGET_TIOCGSERIAL              0x541E
+-#define TARGET_TIOCSSERIAL              0x541F
+-#define TARGET_TIOCPKT                  0x5420
+-#define TARGET_FIONBIO                  0x5421
+-#define TARGET_TIOCNOTTY                0x5422
+-#define TARGET_TIOCSETD                 0x5423
+-#define TARGET_TIOCGETD                 0x5424
+-#define TARGET_TCSBRKP                  0x5425
+-#define TARGET_TIOCSBRK                 0x5427
+-#define TARGET_TIOCCBRK                 0x5428
+-#define TARGET_TIOCGSID                 0x5429
+-#define TARGET_TCGETS2                  TARGET_IOR('T', 0x2A, struct termios2)
+-#define TARGET_TCSETS2                  TARGET_IOW('T', 0x2B, struct termios2)
+-#define TARGET_TCSETSW2                 TARGET_IOW('T', 0x2C, struct termios2)
+-#define TARGET_TCSETSF2                 TARGET_IOW('T', 0x2D, struct termios2)
+-#define TARGET_TIOCGRS485               0x542E
+-#define TARGET_TIOCSRS485               0x542F
+-#define TARGET_TIOCGPTN                 TARGET_IOR('T', 0x30, unsigned int)
+-#define TARGET_TIOCSPTLCK               TARGET_IOW('T', 0x31, int)
+-#define TARGET_TIOCGDEV                 TARGET_IOR('T', 0x32, unsigned int)
+-#define TARGET_TCGETX                   0x5432
+-#define TARGET_TCSETX                   0x5433
+-#define TARGET_TCSETXF                  0x5434
+-#define TARGET_TCSETXW                  0x5435
+-#define TARGET_TIOCSIG                  TARGET_IOW('T', 0x36, int)
+-#define TARGET_TIOCVHANGUP              0x5437
+-#define TARGET_TIOCGPKT                 TARGET_IOR('T', 0x38, int)
+-#define TARGET_TIOCGPTLCK               TARGET_IOR('T', 0x39, int)
+-#define TARGET_TIOCGEXCL                TARGET_IOR('T', 0x40, int)
+-#define TARGET_TIOCGPTPEER              TARGET_IO('T', 0x41)
+-
+-#define TARGET_FIONCLEX                 0x5450
+-#define TARGET_FIOCLEX                  0x5451
+-#define TARGET_FIOASYNC                 0x5452
+-#define TARGET_TIOCSERCONFIG            0x5453
+-#define TARGET_TIOCSERGWILD             0x5454
+-#define TARGET_TIOCSERSWILD             0x5455
+-#define TARGET_TIOCGLCKTRMIOS           0x5456
+-#define TARGET_TIOCSLCKTRMIOS           0x5457
+-#define TARGET_TIOCSERGSTRUCT           0x5458
+-#define TARGET_TIOCSERGETLSR            0x5459
+-#define TARGET_TIOCSERGETMULTI          0x545A
+-#define TARGET_TIOCSERSETMULTI          0x545B
+-
+-#define TARGET_TIOCMIWAIT               0x545C
+-#define TARGET_TIOCGICOUNT              0x545D
+-#define TARGET_FIOQSIZE                 0x5460
+-
+-#define TARGET_TIOCPKT_DATA             0
+-#define TARGET_TIOCPKT_FLUSHREAD        1
+-#define TARGET_TIOCPKT_FLUSHWRITE       2
+-#define TARGET_TIOCPKT_STOP             4
+-#define TARGET_TIOCPKT_START            8
+-#define TARGET_TIOCPKT_NOSTOP           16
+-#define TARGET_TIOCPKT_DOSTOP           32
+-#define TARGET_TIOCPKT_IOCTL            64
+-
+-#define TARGET_TIOCSER_TEMT             0x01
+-
+-#endif
++#include "../generic/termbits.h"
+diff --git a/linux-user/x86_64/termbits.h b/linux-user/x86_64/termbits.h
+index c8bb5996b1eb..b1d4f4fedbcb 100644
+--- a/linux-user/x86_64/termbits.h
++++ b/linux-user/x86_64/termbits.h
+@@ -1,253 +1 @@
+-#ifndef LINUX_USER_X86_64_TERMBITS_H
+-#define LINUX_USER_X86_64_TERMBITS_H
+-
+-#define TARGET_NCCS 19
+-
+-typedef unsigned char	target_cc_t;
+-typedef unsigned int	target_speed_t;
+-typedef unsigned int	target_tcflag_t;
+-struct target_termios {
+-	target_tcflag_t c_iflag;		/* input mode flags */
+-	target_tcflag_t c_oflag;		/* output mode flags */
+-	target_tcflag_t c_cflag;		/* control mode flags */
+-	target_tcflag_t c_lflag;		/* local mode flags */
+-	target_cc_t c_line;			/* line discipline */
+-	target_cc_t c_cc[TARGET_NCCS];		/* control characters */
+-};
+-
+-/* c_cc characters */
+-#define TARGET_VINTR 0
+-#define TARGET_VQUIT 1
+-#define TARGET_VERASE 2
+-#define TARGET_VKILL 3
+-#define TARGET_VEOF 4
+-#define TARGET_VTIME 5
+-#define TARGET_VMIN 6
+-#define TARGET_VSWTC 7
+-#define TARGET_VSTART 8
+-#define TARGET_VSTOP 9
+-#define TARGET_VSUSP 10
+-#define TARGET_VEOL 11
+-#define TARGET_VREPRINT 12
+-#define TARGET_VDISCARD 13
+-#define TARGET_VWERASE 14
+-#define TARGET_VLNEXT 15
+-#define TARGET_VEOL2 16
+-
+-/* c_iflag bits */
+-#define TARGET_IGNBRK	0000001
+-#define TARGET_BRKINT	0000002
+-#define TARGET_IGNPAR	0000004
+-#define TARGET_PARMRK	0000010
+-#define TARGET_INPCK	0000020
+-#define TARGET_ISTRIP	0000040
+-#define TARGET_INLCR	0000100
+-#define TARGET_IGNCR	0000200
+-#define TARGET_ICRNL	0000400
+-#define TARGET_IUCLC	0001000
+-#define TARGET_IXON	0002000
+-#define TARGET_IXANY	0004000
+-#define TARGET_IXOFF	0010000
+-#define TARGET_IMAXBEL	0020000
+-#define TARGET_IUTF8	0040000
+-
+-/* c_oflag bits */
+-#define TARGET_OPOST	0000001
+-#define TARGET_OLCUC	0000002
+-#define TARGET_ONLCR	0000004
+-#define TARGET_OCRNL	0000010
+-#define TARGET_ONOCR	0000020
+-#define TARGET_ONLRET	0000040
+-#define TARGET_OFILL	0000100
+-#define TARGET_OFDEL	0000200
+-#define TARGET_NLDLY	0000400
+-#define   TARGET_NL0	0000000
+-#define   TARGET_NL1	0000400
+-#define TARGET_CRDLY	0003000
+-#define   TARGET_CR0	0000000
+-#define   TARGET_CR1	0001000
+-#define   TARGET_CR2	0002000
+-#define   TARGET_CR3	0003000
+-#define TARGET_TABDLY	0014000
+-#define   TARGET_TAB0	0000000
+-#define   TARGET_TAB1	0004000
+-#define   TARGET_TAB2	0010000
+-#define   TARGET_TAB3	0014000
+-#define   TARGET_XTABS	0014000
+-#define TARGET_BSDLY	0020000
+-#define   TARGET_BS0	0000000
+-#define   TARGET_BS1	0020000
+-#define TARGET_VTDLY	0040000
+-#define   TARGET_VT0	0000000
+-#define   TARGET_VT1	0040000
+-#define TARGET_FFDLY	0100000
+-#define   TARGET_FF0	0000000
+-#define   TARGET_FF1	0100000
+-
+-/* c_cflag bit meaning */
+-#define TARGET_CBAUD	0010017
+-#define  TARGET_B0	0000000		/* hang up */
+-#define  TARGET_B50	0000001
+-#define  TARGET_B75	0000002
+-#define  TARGET_B110	0000003
+-#define  TARGET_B134	0000004
+-#define  TARGET_B150	0000005
+-#define  TARGET_B200	0000006
+-#define  TARGET_B300	0000007
+-#define  TARGET_B600	0000010
+-#define  TARGET_B1200	0000011
+-#define  TARGET_B1800	0000012
+-#define  TARGET_B2400	0000013
+-#define  TARGET_B4800	0000014
+-#define  TARGET_B9600	0000015
+-#define  TARGET_B19200	0000016
+-#define  TARGET_B38400	0000017
+-#define TARGET_EXTA B19200
+-#define TARGET_EXTB B38400
+-#define TARGET_CSIZE	0000060
+-#define   TARGET_CS5	0000000
+-#define   TARGET_CS6	0000020
+-#define   TARGET_CS7	0000040
+-#define   TARGET_CS8	0000060
+-#define TARGET_CSTOPB	0000100
+-#define TARGET_CREAD	0000200
+-#define TARGET_PARENB	0000400
+-#define TARGET_PARODD	0001000
+-#define TARGET_HUPCL	0002000
+-#define TARGET_CLOCAL	0004000
+-#define TARGET_CBAUDEX 0010000
+-#define	   TARGET_BOTHER 0010000		/* non standard rate */
+-#define    TARGET_B57600 0010001
+-#define   TARGET_B115200 0010002
+-#define   TARGET_B230400 0010003
+-#define   TARGET_B460800 0010004
+-#define   TARGET_B500000 0010005
+-#define   TARGET_B576000 0010006
+-#define   TARGET_B921600 0010007
+-#define  TARGET_B1000000 0010010
+-#define  TARGET_B1152000 0010011
+-#define  TARGET_B1500000 0010012
+-#define  TARGET_B2000000 0010013
+-#define  TARGET_B2500000 0010014
+-#define  TARGET_B3000000 0010015
+-#define  TARGET_B3500000 0010016
+-#define  TARGET_B4000000 0010017
+-#define TARGET_CIBAUD	  002003600000	/* input baud rate */
+-#define TARGET_CMSPAR	  010000000000		/* mark or space (stick) parity */
+-#define TARGET_CRTSCTS	  020000000000		/* flow control */
+-
+-#define TARGET_IBSHIFT	  8		/* Shift from CBAUD to CIBAUD */
+-
+-/* c_lflag bits */
+-#define TARGET_ISIG	0000001
+-#define TARGET_ICANON	0000002
+-#define TARGET_XCASE	0000004
+-#define TARGET_ECHO	0000010
+-#define TARGET_ECHOE	0000020
+-#define TARGET_ECHOK	0000040
+-#define TARGET_ECHONL	0000100
+-#define TARGET_NOFLSH	0000200
+-#define TARGET_TOSTOP	0000400
+-#define TARGET_ECHOCTL	0001000
+-#define TARGET_ECHOPRT	0002000
+-#define TARGET_ECHOKE	0004000
+-#define TARGET_FLUSHO	0010000
+-#define TARGET_PENDIN	0040000
+-#define TARGET_IEXTEN	0100000
+-
+-/* tcflow() and TCXONC use these */
+-#define	TARGET_TCOOFF		0
+-#define	TARGET_TCOON		1
+-#define	TARGET_TCIOFF		2
+-#define	TARGET_TCION		3
+-
+-/* tcflush() and TCFLSH use these */
+-#define	TARGET_TCIFLUSH	0
+-#define	TARGET_TCOFLUSH	1
+-#define	TARGET_TCIOFLUSH	2
+-
+-/* tcsetattr uses these */
+-#define	TARGET_TCSANOW		0
+-#define	TARGET_TCSADRAIN	1
+-#define	TARGET_TCSAFLUSH	2
+-
+-#define TARGET_TCGETS		0x5401
+-#define TARGET_TCSETS		0x5402
+-#define TARGET_TCSETSW		0x5403
+-#define TARGET_TCSETSF		0x5404
+-#define TARGET_TCGETA		0x5405
+-#define TARGET_TCSETA		0x5406
+-#define TARGET_TCSETAW		0x5407
+-#define TARGET_TCSETAF		0x5408
+-#define TARGET_TCSBRK		0x5409
+-#define TARGET_TCXONC		0x540A
+-#define TARGET_TCFLSH		0x540B
+-#define TARGET_TIOCEXCL	0x540C
+-#define TARGET_TIOCNXCL	0x540D
+-#define TARGET_TIOCSCTTY	0x540E
+-#define TARGET_TIOCGPGRP	0x540F
+-#define TARGET_TIOCSPGRP	0x5410
+-#define TARGET_TIOCOUTQ	0x5411
+-#define TARGET_TIOCSTI		0x5412
+-#define TARGET_TIOCGWINSZ	0x5413
+-#define TARGET_TIOCSWINSZ	0x5414
+-#define TARGET_TIOCMGET	0x5415
+-#define TARGET_TIOCMBIS	0x5416
+-#define TARGET_TIOCMBIC	0x5417
+-#define TARGET_TIOCMSET	0x5418
+-#define TARGET_TIOCGSOFTCAR	0x5419
+-#define TARGET_TIOCSSOFTCAR	0x541A
+-#define TARGET_FIONREAD	0x541B
+-#define TARGET_TIOCINQ		FIONREAD
+-#define TARGET_TIOCLINUX	0x541C
+-#define TARGET_TIOCCONS	0x541D
+-#define TARGET_TIOCGSERIAL	0x541E
+-#define TARGET_TIOCSSERIAL	0x541F
+-#define TARGET_TIOCPKT		0x5420
+-#define TARGET_FIONBIO		0x5421
+-#define TARGET_TIOCNOTTY	0x5422
+-#define TARGET_TIOCSETD	0x5423
+-#define TARGET_TIOCGETD	0x5424
+-#define TARGET_TCSBRKP		0x5425	/* Needed for POSIX tcsendbreak() */
+-#define TARGET_TIOCSBRK	0x5427  /* BSD compatibility */
+-#define TARGET_TIOCCBRK	0x5428  /* BSD compatibility */
+-#define TARGET_TIOCGSID	0x5429  /* Return the session ID of FD */
+-#define TARGET_TCGETS2          TARGET_IOR('T',0x2A, struct termios2)
+-#define TARGET_TCSETS2          TARGET_IOW('T',0x2B, struct termios2)
+-#define TARGET_TCSETSW2         TARGET_IOW('T',0x2C, struct termios2)
+-#define TARGET_TCSETSF2         TARGET_IOW('T',0x2D, struct termios2)
+-#define TARGET_TIOCGPTN         TARGET_IOR('T',0x30, unsigned int) /* Get Pty Number (of pty-mux device) */
+-#define TARGET_TIOCSPTLCK       TARGET_IOW('T',0x31, int)  /* Lock/unlock Pty */
+-#define TARGET_TIOCGPTPEER      TARGET_IO('T', 0x41) /* Safely open the slave */
+-
+-#define TARGET_FIONCLEX	0x5450  /* these numbers need to be adjusted. */
+-#define TARGET_FIOCLEX		0x5451
+-#define TARGET_FIOASYNC	0x5452
+-#define TARGET_TIOCSERCONFIG	0x5453
+-#define TARGET_TIOCSERGWILD	0x5454
+-#define TARGET_TIOCSERSWILD	0x5455
+-#define TARGET_TIOCGLCKTRMIOS	0x5456
+-#define TARGET_TIOCSLCKTRMIOS	0x5457
+-#define TARGET_TIOCSERGSTRUCT	0x5458 /* For debugging only */
+-#define TARGET_TIOCSERGETLSR   0x5459 /* Get line status register */
+-#define TARGET_TIOCSERGETMULTI 0x545A /* Get multiport config  */
+-#define TARGET_TIOCSERSETMULTI 0x545B /* Set multiport config */
+-
+-#define TARGET_TIOCMIWAIT	0x545C	/* wait for a change on serial input line(s) */
+-#define TARGET_TIOCGICOUNT	0x545D	/* read serial port inline interrupt counts */
+-#define TARGET_TIOCGHAYESESP   0x545E  /* Get Hayes ESP configuration */
+-#define TARGET_TIOCSHAYESESP   0x545F  /* Set Hayes ESP configuration */
+-#define TARGET_FIOQSIZE       0x5460
+-
+-/* Used for packet mode */
+-#define TARGET_TIOCPKT_DATA		 0
+-#define TARGET_TIOCPKT_FLUSHREAD	 1
+-#define TARGET_TIOCPKT_FLUSHWRITE	 2
+-#define TARGET_TIOCPKT_STOP		 4
+-#define TARGET_TIOCPKT_START		 8
+-#define TARGET_TIOCPKT_NOSTOP		16
+-#define TARGET_TIOCPKT_DOSTOP		32
+-
+-#define TARGET_TIOCSER_TEMT    0x01	/* Transmitter physically empty */
+-
+-#endif
++#include "../generic/termbits.h"
 -- 
 2.26.2
 
