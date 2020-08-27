@@ -7,59 +7,59 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2A30C433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 08:14:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A3BFC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 08:17:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B01022177B
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 08:14:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B01022177B
+	by mail.kernel.org (Postfix) with ESMTPS id 72F2322B47
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 08:17:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72F2322B47
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55824 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33228 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBD38-0000C4-UY
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 04:14:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41670)
+	id 1kBD6U-0002jL-OL
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 04:17:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42432)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
- id 1kBD1p-0007WK-7V
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 04:13:01 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:4657 helo=huawei.com)
+ id 1kBD5b-0001Xl-9w
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 04:16:56 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:4272 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
- id 1kBD1m-0003Di-0T
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 04:13:00 -0400
-Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id AF4F1B516FCFAB544C7F;
- Thu, 27 Aug 2020 16:12:51 +0800 (CST)
-Received: from [127.0.0.1] (10.174.186.4) by DGGEMS406-HUB.china.huawei.com
- (10.3.19.206) with Microsoft SMTP Server id 14.3.487.0; Thu, 27 Aug 2020
- 16:12:43 +0800
-Subject: Re: [PATCH v5 09/12] migration/dirtyrate: Implement
- get_sample_page_period() and block_sample_page_period()
-From: Zheng Chuan <zhengchuan@huawei.com>
+ id 1kBD5X-0003g0-Rf
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 04:16:55 -0400
+Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id 7E05873DD17458A1FD82;
+ Thu, 27 Aug 2020 16:16:43 +0800 (CST)
+Received: from [127.0.0.1] (10.174.186.4) by DGGEMS412-HUB.china.huawei.com
+ (10.3.19.212) with Microsoft SMTP Server id 14.3.487.0; Thu, 27 Aug 2020
+ 16:16:33 +0800
+Subject: Re: [PATCH v5 10/12] migration/dirtyrate: Implement
+ calculate_dirtyrate() function
 To: David Edmondson <dme@dme.org>, <quintela@redhat.com>, <eblake@redhat.com>, 
  <dgilbert@redhat.com>, <berrange@redhat.com>
 References: <1598260480-64862-1-git-send-email-zhengchuan@huawei.com>
- <1598260480-64862-10-git-send-email-zhengchuan@huawei.com>
- <m23649lni4.fsf@dme.org> <c044b58d-a211-9494-70f1-2648c7891576@huawei.com>
-Message-ID: <350d1f93-dcb2-dbbb-24eb-5063d2787dcc@huawei.com>
-Date: Thu, 27 Aug 2020 16:12:42 +0800
+ <1598260480-64862-11-git-send-email-zhengchuan@huawei.com>
+ <m2zh6hk8rf.fsf@dme.org>
+From: Zheng Chuan <zhengchuan@huawei.com>
+Message-ID: <0d7ec003-8248-5d82-8ca2-ac038b550065@huawei.com>
+Date: Thu, 27 Aug 2020 16:16:32 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <c044b58d-a211-9494-70f1-2648c7891576@huawei.com>
+In-Reply-To: <m2zh6hk8rf.fsf@dme.org>
 Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 X-Originating-IP: [10.174.186.4]
 X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.190;
+Received-SPF: pass client-ip=45.249.212.191;
  envelope-from=zhengchuan@huawei.com; helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 02:12:47
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 02:09:23
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
 X-Spam_score_int: -63
 X-Spam_score: -6.4
@@ -88,87 +88,98 @@ Sender: "Qemu-devel"
 
 
 
-On 2020/8/27 16:01, Zheng Chuan wrote:
+On 2020/8/26 18:21, David Edmondson wrote:
+> On Monday, 2020-08-24 at 17:14:38 +08, Chuan Zheng wrote:
 > 
+>> Implement calculate_dirtyrate() function.
+>>
+>> Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
+>> Signed-off-by: YanYing Zhuang <ann.zhuangyanying@huawei.com>
+>> ---
+>>  migration/dirtyrate.c | 45 +++++++++++++++++++++++++++++++++++++++++++--
+>>  1 file changed, 43 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/migration/dirtyrate.c b/migration/dirtyrate.c
+>> index d1c0a78..9f52f5f 100644
+>> --- a/migration/dirtyrate.c
+>> +++ b/migration/dirtyrate.c
+>> @@ -171,6 +171,21 @@ static void get_ramblock_dirty_info(RAMBlock *block,
+>>      strcpy(info->idstr, qemu_ram_get_idstr(block));
+>>  }
+>>  
+>> +static void free_ramblock_dirty_info(struct RamblockDirtyInfo *infos, int count)
+>> +{
+>> +    int i;
+>> +
+>> +    if (!infos) {
+>> +        return;
+>> +    }
+>> +
+>> +    for (i = 0; i < count; i++) {
+>> +        g_free(infos[i].sample_page_vfn);
+>> +        g_free(infos[i].hash_result);
+>> +    }
+>> +    g_free(infos);
+>> +}
+>> +
+>>  static struct RamblockDirtyInfo *
+>>  alloc_ramblock_dirty_info(int *block_index,
+>>                            struct RamblockDirtyInfo *block_dinfo)
+>> @@ -316,8 +331,34 @@ static int compare_page_hash_info(struct RamblockDirtyInfo *info,
+>>  
+>>  static void calculate_dirtyrate(struct DirtyRateConfig config)
+>>  {
+>> -    /* todo */
+>> -    return;
+>> +    struct RamblockDirtyInfo *block_dinfo = NULL;
+>> +    int block_index = 0;
+>> +    int64_t msec = 0;
+>> +    int64_t initial_time;
+>> +
+>> +    rcu_register_thread();
+>> +    reset_dirtyrate_stat();
+>> +    initial_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+>> +    rcu_read_lock();
 > 
-> On 2020/8/26 18:17, David Edmondson wrote:
->> On Monday, 2020-08-24 at 17:14:37 +08, Chuan Zheng wrote:
->>
->>> Implement get_sample_page_period() and set_sample_page_period() to
->>> sleep specific time between sample actions.
->>>
->>> Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
->>> ---
->>>  migration/dirtyrate.c | 24 ++++++++++++++++++++++++
->>>  migration/dirtyrate.h |  2 ++
->>>  2 files changed, 26 insertions(+)
->>>
->>> diff --git a/migration/dirtyrate.c b/migration/dirtyrate.c
->>> index bd398b7..d1c0a78 100644
->>> --- a/migration/dirtyrate.c
->>> +++ b/migration/dirtyrate.c
->>> @@ -28,6 +28,30 @@
->>>  static int CalculatingState = DIRTY_RATE_STATUS_UNSTARTED;
->>>  static struct DirtyRateStat DirtyStat;
->>>  
->>> +static int64_t set_sample_page_period(int64_t msec, int64_t initial_time)
->>> +{
->>> +    int64_t current_time;
->>> +
->>> +    current_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
->>> +    if ((current_time - initial_time) >= msec) {
->>> +        msec = current_time - initial_time;
->>> +    } else {
->>> +        g_usleep((msec + initial_time - current_time) * 1000);
->>> +    }
->>> +
->>> +    return msec;
->>> +}
->>> +
->>> +static int64_t get_sample_page_period(int64_t sec)
->>> +{
->>> +    if (sec <= MIN_FETCH_DIRTYRATE_TIME_SEC ||
->>
->> Shouldn't the minimum value be allowed?
->>
->> That is, this test should be "sec < MIN_FETCH_DIRTYRATE_TIME_SEC" and
->> MIN_FETCH_DIRTYRATE_TIME_SEC should be 1.
->>
-> Well, Actually we could measure dirtyrate within duration below 1s, like 0.5s.
-> Howerver, I am reconsider that maybe taking 0.5s as MIN_FETCH_DIRTYRATE_TIME_SEC is better in case of someone to do nasty thing like setting
-> a meaningless time duration which is close to 0:)
+> Page dirtying that happens while acquiring the lock will not be
+> accounted for, but is within the time window. Could we store the time
+> after acquiring the lock?
 > 
-Ouch, since i define sec as int64_t，it could never be 0.5s:-).
-I will take 1s as minimum value because it will take about 100ms for large vm to hash its result.
-Thanks for your review.
+Yes, it would be better.
+will fix in V6.
 
->>> +        sec > MAX_FETCH_DIRTYRATE_TIME_SEC) {
->>> +        sec = DEFAULT_FETCH_DIRTYRATE_TIME_SEC;
->>> +    }
->>> +
->>> +    return sec;
->>> +}
->>> +
->>>  static int dirtyrate_set_state(int *state, int old_state, int new_state)
->>>  {
->>>      assert(new_state < DIRTY_RATE_STATUS__MAX);
->>> diff --git a/migration/dirtyrate.h b/migration/dirtyrate.h
->>> index 41bc264..50a5636 100644
->>> --- a/migration/dirtyrate.h
->>> +++ b/migration/dirtyrate.h
->>> @@ -51,6 +51,8 @@
->>>  
->>>  /* Take 1s as default for calculation duration */
->>>  #define DEFAULT_FETCH_DIRTYRATE_TIME_SEC          1
->>> +#define MIN_FETCH_DIRTYRATE_TIME_SEC              0
->>> +#define MAX_FETCH_DIRTYRATE_TIME_SEC              60
->>>  
->>>  struct DirtyRateConfig {
->>>      uint64_t sample_pages_per_gigabytes; /* sample pages per GB */
->>> -- 
->>> 1.8.3.1
->>
->> dme.
->>
+>> +    if (record_ramblock_hash_info(&block_dinfo, config, &block_index) < 0) {
+>> +        goto out;
+>> +    }
+>> +    rcu_read_unlock();
+>> +
+>> +    msec = config.sample_period_seconds * 1000;
+>> +    msec = set_sample_page_period(msec, initial_time);
+>> +
+>> +    rcu_read_lock();
+>> +    if (compare_page_hash_info(block_dinfo, block_index) < 0) {
+>> +        goto out;
+>> +    }
+>> +
+>> +    update_dirtyrate(msec);
+>> +
+>> +out:
+>> +    rcu_read_unlock();
+> 
+> Is it necessary to hold the lock across update_dirtyrate()?
+> 
+There is no need for that.
+Will fix it in V6.
+
+>> +    free_ramblock_dirty_info(block_dinfo, block_index + 1);
+>> +    rcu_unregister_thread();
+>>  }
+>>  
+>>  void *get_dirtyrate_thread(void *arg)
+>> -- 
+>> 1.8.3.1
+> 
+> dme.
+> 
 
 
