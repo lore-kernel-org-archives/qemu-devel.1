@@ -7,41 +7,41 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6065DC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 11:09:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60520C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 11:10:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 22F0D22BF3
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 11:09:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22F0D22BF3
+	by mail.kernel.org (Postfix) with ESMTPS id E956222BF3
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 11:10:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E956222BF3
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36684 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39696 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBFmE-0004KN-9D
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 07:09:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51144)
+	id 1kBFnE-0005YT-RL
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 07:10:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51152)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <kuhn.chenqun@huawei.com>)
- id 1kBFiI-0004gL-Bw; Thu, 27 Aug 2020 07:05:02 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:4662 helo=huawei.com)
+ id 1kBFiJ-0004iU-9n; Thu, 27 Aug 2020 07:05:06 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:4663 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <kuhn.chenqun@huawei.com>)
- id 1kBFiG-0007aE-Ia; Thu, 27 Aug 2020 07:05:02 -0400
+ id 1kBFiG-0007aF-PP; Thu, 27 Aug 2020 07:05:03 -0400
 Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 59319B7F0F57BDD1D744;
+ by Forcepoint Email with ESMTP id 54DA8EB59F40A3DDEFF0;
  Thu, 27 Aug 2020 19:04:56 +0800 (CST)
 Received: from huawei.com (10.175.104.175) by DGGEMS408-HUB.china.huawei.com
  (10.3.19.208) with Microsoft SMTP Server id 14.3.487.0; Thu, 27 Aug 2020
- 19:04:47 +0800
+ 19:04:46 +0800
 From: Chen Qun <kuhn.chenqun@huawei.com>
 To: <qemu-devel@nongnu.org>, <qemu-trivial@nongnu.org>
-Subject: [PATCH v3 09/10] hw/intc: fix default registers value in
- exynos4210_combiner_read()
-Date: Thu, 27 Aug 2020 19:03:10 +0800
-Message-ID: <20200827110311.164316-10-kuhn.chenqun@huawei.com>
+Subject: [PATCH v3 08/10] usb/bus: Remove dead assignment in
+ usb_get_fw_dev_path()
+Date: Thu, 27 Aug 2020 19:03:09 +0800
+Message-ID: <20200827110311.164316-9-kuhn.chenqun@huawei.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20200827110311.164316-1-kuhn.chenqun@huawei.com>
 References: <20200827110311.164316-1-kuhn.chenqun@huawei.com>
@@ -72,42 +72,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, zhang.zhanghailiang@huawei.com,
- Igor Mitsyanko <i.mitsyanko@gmail.com>, pannengyuan@huawei.com,
+Cc: zhang.zhanghailiang@huawei.com, pannengyuan@huawei.com, Markus
+ Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
  Euler Robot <euler.robot@huawei.com>, Chen Qun <kuhn.chenqun@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Clang static code analyzer show warning:
-hw/intc/exynos4210_combiner.c:231:9: warning: Value stored to 'val' is never read
-        val = s->reg_set[offset >> 2];
-
-The default register return value should be return 'val'.
+qemu/hw/usb/bus.c:615:13: warning: Value stored to 'pos' is never read
+            pos += snprintf(fw_path + pos, fw_len - pos, "%s@%lx",
 
 Reported-by: Euler Robot <euler.robot@huawei.com>
 Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
 ---
-Cc: Igor Mitsyanko <i.mitsyanko@gmail.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>
 
-v2->v3: Change default register return value from '0' to 'val = s->reg_set[offset >> 2]'.
+v2->v3: The format of the snprintf statement is modified(Base on Markus review).
 ---
- hw/intc/exynos4210_combiner.c | 1 -
- 1 file changed, 1 deletion(-)
+ hw/usb/bus.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/hw/intc/exynos4210_combiner.c b/hw/intc/exynos4210_combiner.c
-index b8561e4180..59dd27fb16 100644
---- a/hw/intc/exynos4210_combiner.c
-+++ b/hw/intc/exynos4210_combiner.c
-@@ -229,7 +229,6 @@ exynos4210_combiner_read(void *opaque, hwaddr offset, unsigned size)
-                     TARGET_FMT_plx "offset\n", offset);
+diff --git a/hw/usb/bus.c b/hw/usb/bus.c
+index b17bda3b29..2b11041451 100644
+--- a/hw/usb/bus.c
++++ b/hw/usb/bus.c
+@@ -612,8 +612,8 @@ static char *usb_get_fw_dev_path(DeviceState *qdev)
+             in++;
+         } else {
+             /* the device itself */
+-            pos += snprintf(fw_path + pos, fw_len - pos, "%s@%lx",
+-                            qdev_fw_name(qdev), nr);
++            snprintf(fw_path + pos, fw_len - pos, "%s@%lx",
++                     qdev_fw_name(qdev), nr);
+             break;
          }
-         val = s->reg_set[offset >> 2];
--        return 0;
      }
-     return val;
- }
 -- 
 2.23.0
 
