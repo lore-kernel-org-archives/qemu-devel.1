@@ -6,87 +6,87 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
 	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BBECC433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 08:21:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5ADEDC433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 08:23:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1819D20738
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 08:21:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2736F20738
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 08:23:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dU4TkgdT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1819D20738
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PsIKFOZJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2736F20738
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38850 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41796 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBD9i-0005EJ-CB
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 04:21:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43004)
+	id 1kBDBg-0006Wk-Dy
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 04:23:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43504)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kBD8s-0004Qn-Cg
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 04:20:18 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:38445
+ id 1kBDB9-00066q-B1
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 04:22:39 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:53242
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kBD8q-0003vV-OT
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 04:20:18 -0400
+ id 1kBDB7-0004Ee-Qh
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 04:22:39 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598516414;
+ s=mimecast20190719; t=1598516556;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=2mWHmANSTKJc3pTQy4ki70s2Kr1oMpzTlkJnu+uHw30=;
- b=dU4TkgdTGpMF7clqxDi9IZOfV/mBqFQF3xou1oQdRumbHQQfAdJLn3h+JAt7cnpKkOVCyW
- rOsgy2XJcPMYTYE5Vs6gRz3xq+pKUSQX65rUaykrtpDIyoGV0zrv22Kv7wdREJLgwjsm/P
- TARygb1uqNAdznm/mckIPcD5s5LtEO4=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-476-pANAus4qMxaVkw8S-QvM_Q-1; Thu, 27 Aug 2020 04:20:10 -0400
-X-MC-Unique: pANAus4qMxaVkw8S-QvM_Q-1
-Received: by mail-ej1-f70.google.com with SMTP id n20so1852768eja.18
- for <qemu-devel@nongnu.org>; Thu, 27 Aug 2020 01:20:09 -0700 (PDT)
+ bh=jDjpiVojItjCevivgniLD3ESmTQtDrvY9SB5Mb2/ADE=;
+ b=PsIKFOZJlqZwnj8qIqsA78dqFk9IojZdBauO50Tg64UNj63u4tsrk6EYC4UFZERAVKABed
+ sWolaW4sjWT5WZ9sG7K5Ic5qjDgKB9t5b8nmnt3zHZ0uHHaUCJZ2k7Xu+NOlSiNfOfKfMp
+ Mz7VDYyF2Cc22Ws9W0FefJQXZt+Ygbk=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-521-8LoXB0-INo2LkA1V-AszCw-1; Thu, 27 Aug 2020 04:22:31 -0400
+X-MC-Unique: 8LoXB0-INo2LkA1V-AszCw-1
+Received: by mail-ed1-f69.google.com with SMTP id z11so1639365edj.3
+ for <qemu-devel@nongnu.org>; Thu, 27 Aug 2020 01:22:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=2mWHmANSTKJc3pTQy4ki70s2Kr1oMpzTlkJnu+uHw30=;
- b=BsImPWPwAfMI4gCis2d9Whi0qCQeTXO0RBCRmEueHk9llmUBkfL7+Z06XqNiHwkyrW
- CYsd3rgByhXiOPnhkKPI0v9AIFL2kwA88N72SQ+y2Cm/fSmWhrBhpzOLIhDOmNCM5Jqj
- xgRey0MdQHxby8Tt6uT8OqmIjXtw4qtqDPSpyvE50doycttNyNBBrkfcaMz2HU4+tzIV
- 9sYtvA+BTvjlimj26lNufbf4k5klm8UJAwIAwrZ75ZCQhDY3q/RGH64JSN9+pyYmuHtb
- +wMGtbUSAcAZQEYsjv0GcSFqFmshwdJ/hfqwDtcdDK8aU+Zb38OLvtJFE1+qLunW/fDc
- St3Q==
-X-Gm-Message-State: AOAM530Doi6dJdiTbaHQZTEo54a0UrDZHp5VS9MNOPxkQXZP7GQmHxiZ
- tLq4TLdDD8g67HL2H9Aet90I2gNTHGJXxaoXdUIN1KlGMyb66ZoAVIvh1YvvdmPD7Gbsu19eQ6L
- P/8DnzEJ1b5kzPzHSxnzvCoj5yKlmQIo=
-X-Received: by 2002:a50:ee96:: with SMTP id f22mr17857028edr.243.1598516408940; 
- Thu, 27 Aug 2020 01:20:08 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy9V0SZoMEOLpBxrYlppyhvRYMWDXEsmxKr4ek78Vv0x8m+BwsWLw1+GLCizwUuoOlvtK2jnSn0Vi9YGF/zX6o=
-X-Received: by 2002:a50:ee96:: with SMTP id f22mr17857018edr.243.1598516408710; 
- Thu, 27 Aug 2020 01:20:08 -0700 (PDT)
+ bh=jDjpiVojItjCevivgniLD3ESmTQtDrvY9SB5Mb2/ADE=;
+ b=JgvOWiaJcx2Szdbe+Xyh/8HWJXmgnyF/VznwS87BNka5FQ++MNdql7EwyKsCtA8AWZ
+ o3zkvqFCGrspyj7fJ4WQMkNPVdvohWbBJcZ2faHGk/t2ivhZCGZbjFaP+alROQtLZScA
+ XgXihrqgxOLhR6RgYUFlls4jbX+mijkM59HwXzJQYvDvdafYcNuGql5mxB+RfsrrBlq5
+ qZ6g29q1f6UELJnEXYCir/Ajjkmq3WBopbXKtggAqLpUbHf/BXKfo8tlrUOYJRNy1onh
+ J2FsB4Jb9RstVIMFDa1RKxyhQU1QdgHPpvY5deOksQYBs1FtKvkojYYR8AcvDOiPfJf1
+ t+jQ==
+X-Gm-Message-State: AOAM532ltHJjiq683KU3nQ07cIr3p/NcNoVDlieKbE36l0aksidh8aFZ
+ IlWVZGQlcscKNr6vHBrXsb814BzDRmiVc5Dx14WaEHBdScWJKxEKSS4CKQkgQDRM2L/qEDerAaO
+ HQYS9uYqRoDxfgiqvfa7zEJ9iz4/CwDI=
+X-Received: by 2002:a17:907:693:: with SMTP id
+ wn19mr10421647ejb.121.1598516550255; 
+ Thu, 27 Aug 2020 01:22:30 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxrDHLspTyNL6YkVHzXgzDx8AMcejxCKOFWfA95iT3h9Zsw7pW7Y1LzhqtxpHrO81nOrn94mLXTge4s426gO8M=
+X-Received: by 2002:a17:907:693:: with SMTP id
+ wn19mr10421637ejb.121.1598516550040; 
+ Thu, 27 Aug 2020 01:22:30 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200826070243.11969-1-pbonzini@redhat.com>
- <cc6af807-a24f-42bb-b1f7-8c8c5e59200b@redhat.com>
- <CABgObfYJ=6fRSzTz5C1A8dgbom7-QWtn1J1L7-8+4thkxNTvjA@mail.gmail.com>
- <80f0ce6c-0bc3-42c5-523c-f81f997a5ab5@redhat.com>
-In-Reply-To: <80f0ce6c-0bc3-42c5-523c-f81f997a5ab5@redhat.com>
+References: <20200826190128.22707-1-pbonzini@redhat.com>
+ <3c7ca48a-5eb0-cfd4-bac0-a2a7475eec39@vivier.eu>
+In-Reply-To: <3c7ca48a-5eb0-cfd4-bac0-a2a7475eec39@vivier.eu>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 27 Aug 2020 10:19:57 +0200
-Message-ID: <CABgObfb5hQr2aEbFUS2F7ys9NcBnjzVcAFUifZAAyPC8n0x4NQ@mail.gmail.com>
-Subject: Re: [PATCH] meson: move pixman detection to meson
-To: Thomas Huth <thuth@redhat.com>
+Date: Thu, 27 Aug 2020 10:22:19 +0200
+Message-ID: <CABgObfZhE1+N1XiHBaPx7SZHawUwNeA4yG5g1TPNQ5TMCO9xSA@mail.gmail.com>
+Subject: Re: [PATCH] ninjatool: quote dollars in variables
+To: Laurent Vivier <laurent@vivier.eu>
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0.0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/alternative; boundary="000000000000b59b6c05add79ae1"
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=pbonzini@redhat.com;
+Content-Type: multipart/alternative; boundary="0000000000002212b705add7a313"
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 00:42:41
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 00:53:04
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -108,64 +108,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>, Rafael Kitover <rkitover@gmail.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000b59b6c05add79ae1
+--0000000000002212b705add7a313
 Content-Type: text/plain; charset="UTF-8"
 
-Il gio 27 ago 2020, 09:28 Thomas Huth <thuth@redhat.com> ha scritto:
+Il gio 27 ago 2020, 09:33 Laurent Vivier <laurent@vivier.eu> ha scritto:
 
-> But I've tested the patch now, and it does not work:
->
-> .../qemu/meson.build:117:3: ERROR: Unknown variable "have_system".
->
-> Should the pixman test maybe be moved to a later spot in the file? It
-> currently shows up before the have_system variable is initialized...
+> This actually fixes the '-Wl,-rpath,$ORIGIN/', but doesn't fix the crash
+> with statically linked binaries.
 >
 
-There are some dependencies with other patches that were posted (I should
-have added Based-on), you can test the tags/for-upstream tag in my gitlab
-repository.
+I will try to reproduce when I am back; it works for Peter so there must be
+something different in the setup.
+
+In any case, if needed we can both momentarily hack around it in Makefiles,
+and fix it for good in Meson.
 
 Paolo
 
 
->  Thomas
+> Could we simply remove the the '-Wl,-rpath,$ORIGIN/' in the case of
+> "-static" build?
+>
+> Thanks,
+> Laurent
 >
 >
 
---000000000000b59b6c05add79ae1
+--0000000000002212b705add7a313
 Content-Type: text/html; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 <div dir=3D"auto"><div><br><br><div class=3D"gmail_quote"><div dir=3D"ltr" =
-class=3D"gmail_attr">Il gio 27 ago 2020, 09:28 Thomas Huth &lt;<a href=3D"m=
-ailto:thuth@redhat.com">thuth@redhat.com</a>&gt; ha scritto:<br></div><bloc=
-kquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #cc=
-c solid;padding-left:1ex">But I&#39;ve tested the patch now, and it does no=
-t work:<br>
+class=3D"gmail_attr">Il gio 27 ago 2020, 09:33 Laurent Vivier &lt;<a href=
+=3D"mailto:laurent@vivier.eu">laurent@vivier.eu</a>&gt; ha scritto:<br></di=
+v><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:=
+1px #ccc solid;padding-left:1ex">This actually fixes the &#39;-Wl,-rpath,$O=
+RIGIN/&#39;, but doesn&#39;t fix the crash<br>
+with statically linked binaries.<br></blockquote></div></div><div dir=3D"au=
+to"><br></div><div dir=3D"auto">I will try to reproduce when I am back; it =
+works for Peter so there must be something different in the setup.</div><di=
+v dir=3D"auto"><br></div><div dir=3D"auto">In any case, if needed we can bo=
+th momentarily hack around it in Makefiles, and fix it for good in Meson.</=
+div><div dir=3D"auto"><br></div><div dir=3D"auto">Paolo</div><div dir=3D"au=
+to"><br></div><div dir=3D"auto"><div class=3D"gmail_quote"><blockquote clas=
+s=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;pad=
+ding-left:1ex">
 <br>
-.../qemu/meson.build:117:3: ERROR: Unknown variable &quot;have_system&quot;=
-.<br>
+Could we simply remove the the &#39;-Wl,-rpath,$ORIGIN/&#39; in the case of=
 <br>
-Should the pixman test maybe be moved to a later spot in the file? It<br>
-currently shows up before the have_system variable is initialized...<br></b=
-lockquote></div></div><div dir=3D"auto"><br></div><div dir=3D"auto">There a=
-re some dependencies with other patches that were posted (I should have add=
-ed Based-on), you can test the tags/for-upstream tag in my gitlab repositor=
-y.</div><div dir=3D"auto"><br></div><div dir=3D"auto">Paolo</div><div dir=
-=3D"auto"><br></div><div dir=3D"auto"><div class=3D"gmail_quote"><blockquot=
-e class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc sol=
-id;padding-left:1ex">
+&quot;-static&quot; build?<br>
 <br>
-=C2=A0Thomas<br>
+Thanks,<br>
+Laurent<br>
 <br>
 </blockquote></div></div></div>
 
---000000000000b59b6c05add79ae1--
+--0000000000002212b705add7a313--
 
 
