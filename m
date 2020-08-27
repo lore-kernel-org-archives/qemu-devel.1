@@ -2,100 +2,96 @@ Return-Path: <SRS0=k4hX=CF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3F67C433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 09:20:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8AE3C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 09:21:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B72EC2080C
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 09:20:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B59D22177B
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 09:21:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g5nfTm4X"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B72EC2080C
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YSBvoR0Z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B59D22177B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47202 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50008 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBE51-0000wM-SX
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 05:20:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55128)
+	id 1kBE5z-00029K-2x
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 05:21:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56512)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kBDzx-0006WU-Ds
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 05:15:09 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:36622)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kBE5Q-0001ik-Fe
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 05:20:48 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:43457
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kBDzu-0002JP-SY
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 05:15:09 -0400
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kBE5O-00031G-5U
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 05:20:48 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598519705;
+ s=mimecast20190719; t=1598520045;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Oo05j2vAVfkCxshf61MLeyKwpa5ecwh11SF/M1AByfk=;
- b=g5nfTm4XOp+ZPF8Jze33aJpLdxHArk8vQJuDac/ULDa3kkNllNK65W0iJYImh3yA1IF8ft
- QgsQK5iQN3cfTV6WL2BXT3IRkgoqOVHHzkhUvGNrJ4x5NVQwbEyyBU0YMNedvdOsOFCt0y
- pGSvwNpKlNMyB7IQS4WFqNdkttc3NXI=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-554-hNay5M8FP7q4nSC6pqQaLw-1; Thu, 27 Aug 2020 05:15:03 -0400
-X-MC-Unique: hNay5M8FP7q4nSC6pqQaLw-1
-Received: by mail-ej1-f71.google.com with SMTP id n12so2326166ejz.6
- for <qemu-devel@nongnu.org>; Thu, 27 Aug 2020 02:15:02 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=Oo05j2vAVfkCxshf61MLeyKwpa5ecwh11SF/M1AByfk=;
- b=UwBjCoQJky6UDK9i76E/CiOeFzA4bffrvdh0T7iVLqjSPcsGyblHfu6EgFJXo+unYc
- jy7MJE4q4IoQGvXlgKcG7HSSMQVOojZgdlFCA6r8MYxxcvkF6IPSE3drCHvhQgWn7Lmb
- eVXcx3glDwnf6vSFgyip6Ihb6IArE4o7Sh6/VzwljuzVUlntJwRYHxQGdlZBxYFka4YE
- eGiUeb8K2QvP7c5+p2+0Hg27HLHYFh4uK5ua+60R4pMLUXZTvfx1txLKFI0ieVtvc5Cl
- ljJEBG6MgI+w7qjsxsxDyoH77IP++rcLKwH9ZuR97WMbPZ2CUWAm/PzoptngaizndZxz
- 4ieg==
-X-Gm-Message-State: AOAM533A8y+UXyyCrXnMpISMptGPcxdgYELxbuu5EgLoKbsbLS3ijva5
- HO69iZmQtxh1NvMJO47s5UPaJomkva0m83zhh+iEJPu4nemYshSCnQnchXxpfg4WXmsT9VdoXbl
- I0HLF/B3XznUtF5FRg3/qzOvOVCGAwlw=
-X-Received: by 2002:aa7:da8e:: with SMTP id q14mr17239950eds.359.1598519701470; 
- Thu, 27 Aug 2020 02:15:01 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyCfLL8pIuo3zJ6RtzQLfCWbjRgn6KiG6JkxJV1kevYBY6uGB4y5fJW6NMgr5ZD83CzxZHmpDB0pif2P0HoiKU=
-X-Received: by 2002:aa7:da8e:: with SMTP id q14mr17239939eds.359.1598519701299; 
- Thu, 27 Aug 2020 02:15:01 -0700 (PDT)
+ bh=fVfqujiv4NoNGtDo53U2kioxibVaTcU+jJqIejDIvlg=;
+ b=YSBvoR0ZAPAdA7PlqZShejr+sXXrkGoU64lKlhMnUZ9ttNDxKyam0aMlc5svsrZnn7zQvd
+ ub+jMNhZ/jbOG7oo5vIktlSYrEr0iWQ/Ro5Kw0K9IJHGKNWHdJ0meXY0q55VptpdFV5wB6
+ V4PP/QiWBAS97C+SIH9kzFM3pNZ7UhA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-399-MR_otvD5P9Gc67AAXakvvQ-1; Thu, 27 Aug 2020 05:20:43 -0400
+X-MC-Unique: MR_otvD5P9Gc67AAXakvvQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4FB4A189E614;
+ Thu, 27 Aug 2020 09:20:42 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-56.ams2.redhat.com [10.36.112.56])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B848110013C1;
+ Thu, 27 Aug 2020 09:20:37 +0000 (UTC)
+Subject: Re: [PATCH] pc-bios: s390x: Add a comment to the io and external new
+ PSW setup
+To: Janosch Frank <frankja@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org
+References: <033b0db7-7b7d-6eb0-9018-bcc342f13509@de.ibm.com>
+ <20200715140820.3401-1-frankja@linux.ibm.com>
+ <3216babd-433b-4ec7-5333-43a75df2e331@de.ibm.com>
+ <d493a0c2-c0df-4ed5-27af-34a9fc82927d@linux.ibm.com>
+ <2e6134fb-3e34-4d3a-1bf8-1665ceffef38@de.ibm.com>
+ <cd2c8bb2-413f-b6b9-ae16-e79e838b503d@linux.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <741c77bc-1f0d-c613-9c74-832f797db5aa@redhat.com>
+Date: Thu, 27 Aug 2020 11:20:36 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-References: <20200826190128.22707-1-pbonzini@redhat.com>
- <3c7ca48a-5eb0-cfd4-bac0-a2a7475eec39@vivier.eu>
- <CABgObfZhE1+N1XiHBaPx7SZHawUwNeA4yG5g1TPNQ5TMCO9xSA@mail.gmail.com>
- <CABgObfas4KFFc=0r9o_N8BYC0jHUoVx=iS0VYFU+zSCj-9yVQg@mail.gmail.com>
-In-Reply-To: <CABgObfas4KFFc=0r9o_N8BYC0jHUoVx=iS0VYFU+zSCj-9yVQg@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 27 Aug 2020 11:14:49 +0200
-Message-ID: <CABgObfYrFxgUSx2MYDf_uJA_cDXe_befjTm8GuiCBENzRttkOw@mail.gmail.com>
-Subject: Re: [PATCH] ninjatool: quote dollars in variables
-To: Laurent Vivier <laurent@vivier.eu>
+In-Reply-To: <cd2c8bb2-413f-b6b9-ae16-e79e838b503d@linux.ibm.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0.0
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
+X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/alternative; boundary="000000000000f6860e05add85e01"
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 02:54:02
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=thuth@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 02:56:52
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.959,
+X-Spam_score_int: -52
+X-Spam_score: -5.3
+X-Spam_bar: -----
+X-Spam_report: (-5.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.959,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ NICE_REPLY_A=-2.239, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -108,105 +104,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
+Cc: cohuck@redhat.com, david@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000f6860e05add85e01
-Content-Type: text/plain; charset="UTF-8"
-
-... and actually it's fixed in 0.55.1. We can therefore just update the
-submodule and declare 0.55.1 the minimum required version for QEMU.
-
-Paolo
-
-Il gio 27 ago 2020, 11:10 Paolo Bonzini <pbonzini@redhat.com> ha scritto:
-
-> Found; https://github.com/mesonbuild/Meson/issues/5191.
->
-> (With the fix there's no rpath at all in the QEMU build process).
->
-> Let's ask for a backport to 0.55.2.
->
-> Paolo
->
-> Il gio 27 ago 2020, 10:22 Paolo Bonzini <pbonzini@redhat.com> ha scritto:
->
+On 22/07/2020 10.05, Janosch Frank wrote:
+> On 7/22/20 9:39 AM, Christian Borntraeger wrote:
 >>
 >>
->> Il gio 27 ago 2020, 09:33 Laurent Vivier <laurent@vivier.eu> ha scritto:
->>
->>> This actually fixes the '-Wl,-rpath,$ORIGIN/', but doesn't fix the crash
->>> with statically linked binaries.
+>> On 22.07.20 09:24, Janosch Frank wrote:
+>>> On 7/22/20 8:43 AM, Christian Borntraeger wrote:
+>>>>
+>>>>
+>>>> On 15.07.20 16:08, Janosch Frank wrote:
+>>>>> Normally they don't need to be set up before waiting for an interrupt
+>>>>> but are set up on boot. The BIOS however might overwrite the lowcore
+>>>>> (and hence the PSWs) when loading a blob into memory and therefore
+>>>>> needs to set up those PSWs more often.
+>>>>
+>>>> Now when I read the new comment this actually inidicates a bug. 
+>>>> When do we restore the original content? If the loaded program
+>>>> does have interrupt handlers in the original image and relies on that
+>>>> then we are broken, no?
 >>>
->>
->> I will try to reproduce when I am back; it works for Peter so there must
->> be something different in the setup.
->>
->> In any case, if needed we can both momentarily hack around it in
->> Makefiles, and fix it for good in Meson.
->>
->> Paolo
->>
->>
->>> Could we simply remove the the '-Wl,-rpath,$ORIGIN/' in the case of
->>> "-static" build?
+>>> I haven't seen references to a save/restore functionality for those
+>>> PSWs. And I also think it's not that easy to do because we have multiple
+>>> ways of loading data and if we want to print when loading we might end
+>>> up overwriting and then saving the written value for a later restore.
 >>>
->>> Thanks,
->>> Laurent
+>>> I need to have a closer look at how virtio works, but wouldn't we have a
+>>> chicken - egg problem with IO interrupts for IO that writes the prefix?
 >>>
->>>
+>>> The BIOS often has "interesting" solutions to problems.
+>>> If you have a quick fix, be my guest and send it. If not I'd put it on
+>>> my todo list or let Stefan make it a proper dev item.
+>>
+>> Maybe a global fixup table in BIOS memory that restores all the memory that
+>> we messed with when we hand over control? Can you at least change the comment
+>> here to add a fixme?
+> 
+> Sure
 
---000000000000f6860e05add85e01
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Hi Janosch!
 
-<div dir=3D"auto">... and actually it&#39;s fixed in 0.55.1. We can therefo=
-re just update the submodule and declare 0.55.1 the minimum required versio=
-n for QEMU.<div dir=3D"auto"><br></div><div dir=3D"auto">Paolo</div></div><=
-br><div class=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">Il gio =
-27 ago 2020, 11:10 Paolo Bonzini &lt;<a href=3D"mailto:pbonzini@redhat.com"=
->pbonzini@redhat.com</a>&gt; ha scritto:<br></div><blockquote class=3D"gmai=
-l_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left=
-:1ex"><div dir=3D"auto">Found; <a href=3D"https://github.com/mesonbuild/Mes=
-on/issues/5191" target=3D"_blank" rel=3D"noreferrer">https://github.com/mes=
-onbuild/Meson/issues/5191</a>.<div dir=3D"auto"><br></div><div dir=3D"auto"=
->(With the fix there&#39;s no rpath at all in the QEMU build process).</div=
-><div dir=3D"auto"><br></div><div dir=3D"auto">Let&#39;s ask for a backport=
- to 0.55.2.</div><div dir=3D"auto"><br></div><div dir=3D"auto">Paolo</div><=
-/div><br><div class=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">I=
-l gio 27 ago 2020, 10:22 Paolo Bonzini &lt;<a href=3D"mailto:pbonzini@redha=
-t.com" target=3D"_blank" rel=3D"noreferrer">pbonzini@redhat.com</a>&gt; ha =
-scritto:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .=
-8ex;border-left:1px #ccc solid;padding-left:1ex"><div dir=3D"auto"><div><br=
-><br><div class=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">Il gi=
-o 27 ago 2020, 09:33 Laurent Vivier &lt;<a href=3D"mailto:laurent@vivier.eu=
-" rel=3D"noreferrer noreferrer" target=3D"_blank">laurent@vivier.eu</a>&gt;=
- ha scritto:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0 0=
- 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">This actually fixes th=
-e &#39;-Wl,-rpath,$ORIGIN/&#39;, but doesn&#39;t fix the crash<br>
-with statically linked binaries.<br></blockquote></div></div><div dir=3D"au=
-to"><br></div><div dir=3D"auto">I will try to reproduce when I am back; it =
-works for Peter so there must be something different in the setup.</div><di=
-v dir=3D"auto"><br></div><div dir=3D"auto">In any case, if needed we can bo=
-th momentarily hack around it in Makefiles, and fix it for good in Meson.</=
-div><div dir=3D"auto"><br></div><div dir=3D"auto">Paolo</div><div dir=3D"au=
-to"><br></div><div dir=3D"auto"><div class=3D"gmail_quote"><blockquote clas=
-s=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;pad=
-ding-left:1ex">
-<br>
-Could we simply remove the the &#39;-Wl,-rpath,$ORIGIN/&#39; in the case of=
-<br>
-&quot;-static&quot; build?<br>
-<br>
-Thanks,<br>
-Laurent<br>
-<br>
-</blockquote></div></div></div>
-</blockquote></div>
-</blockquote></div>
+Did you ever send a new version of this patch with the FIXME added? I
+can't find it right now... Or shall I add a FIXME when picking this up?
+(If so, could you please suggest a text?)
 
---000000000000f6860e05add85e01--
+ Thomas
 
 
