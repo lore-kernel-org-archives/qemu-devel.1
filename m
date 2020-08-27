@@ -2,83 +2,96 @@ Return-Path: <SRS0=k4hX=CF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD423C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 11:26:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5833C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 11:27:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7814622CAE
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 11:26:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9E6D922CAE
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 11:27:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Z4vvp/Qc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7814622CAE
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="J0hsQ7/d"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E6D922CAE
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55570 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56558 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBG3S-0007pN-OY
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 07:26:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33362)
+	id 1kBG45-0008Fc-S0
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 07:27:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33480)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kBG2k-0006pu-Q9
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 07:26:10 -0400
-Received: from mail-ed1-x544.google.com ([2a00:1450:4864:20::544]:38633)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kBG32-0007Gk-Ik
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 07:26:28 -0400
+Received: from mail-io1-xd44.google.com ([2607:f8b0:4864:20::d44]:35344)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kBG2g-00030U-4i
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 07:26:10 -0400
-Received: by mail-ed1-x544.google.com with SMTP id b2so4568912edw.5
- for <qemu-devel@nongnu.org>; Thu, 27 Aug 2020 04:26:05 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kBG31-000348-07
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 07:26:28 -0400
+Received: by mail-io1-xd44.google.com with SMTP id s2so5427201ioo.2
+ for <qemu-devel@nongnu.org>; Thu, 27 Aug 2020 04:26:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=n2fvNEvJVFGhZsX82sS8ZfWw/uOHiFyQ1KS69MXpzh8=;
- b=Z4vvp/Qc60g8WBnZPknv34rH8KNUzCXRxyoEmleXWAx0NruznH3l/XkZT0oanAQ+en
- fjXp2m330sPBoUVJrS+LOSYC0jpT/c4usyYE3gCdagO5nluGWhB9P7+hZ8hmv10+6jgM
- 4u7BEZtq2OZgQt4VVzEVkGfvFgF8gqgCF/DdW6Sl6bvyKiMLJ5XzG8OmHeXN67gPOCgT
- pmNvbcPspCG9cZkYkJhqndr4z27ZxHeQ37EzkH2JYTYb02Fd3mjfzIwIorwtrLVlev+a
- Oksew+bDjuIjkIx4SkBtmAkcMMVufu6kHhSsYEd44+gjkRl/J1eUjAckA1hT90CrsZah
- UBmw==
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=wiVq44xaI5lMEHpRW4cY2wbZWjxgkKYOPZ16WwudzpE=;
+ b=J0hsQ7/dmCgjuLxL7UHi35rW7kzCoDfoJA4nH99CnCvOVOfaynw/kaKeuOOwjbAfiE
+ voJ/REd0Blpn9CGdwcKeTekqben9wPArCmaE6NCQupe1tBGgBxPgRgZfqaikgLntdJ5a
+ u7QIXv5nKM6di11IpcCr5+7QHGQPk84U3ySChFx72DGITiuHKhMIcFwDLIv8ZTA57xnM
+ EFF0dNDrnCj0h3Ui26MfE48iFgcOKjvkWPOike+bhDDeZPG4E1tL33eDDI4MRMUrhv3K
+ JkHPPWReKz44go6sPrudxhLNAD9JBBAVU/gYDPREOJvWE3MXcT9PeHD2oEXELZfExNnV
+ ihbg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=n2fvNEvJVFGhZsX82sS8ZfWw/uOHiFyQ1KS69MXpzh8=;
- b=COYefMl7jTwb+mm28Uk8Pz0HRR//Q5x0i6ENefpuvI56OYWOCfLVjHu1E4DqkocIUR
- ZhYtzPCVN4wPLnXc9CR4GUNCZgJDAxSPOFRM+gDO0hzSjpnRSijWlkriG4iWtKHgCe4T
- NHEpBlULVdI3JgvDcnXH/UX+zCFnRjt9s1j8eJFpjPwMSj8L3yuJIDvS1Qa/3PjLbMmC
- 4IA676nTw4iH/dIn98/nuXQsorH1DNIHlF4rSIx6ft82KWNlLGGskpte4Iv3ugKOVND5
- 5cLcGtCi6qHwulaqhrEFk4IWsNg2QSMk9RskFT9VhbufZVEf2wfRJYALFWFiFzFLIjj1
- XLUw==
-X-Gm-Message-State: AOAM530tgtHbyRMLXHv+QECgrqrZeIVXUbqu4Mvu0n6jyU6RJVSLzNfS
- yiIwesp9HO3KbZQdY2Fiei2Qe2P13oPu/2rq/FGZDKbA2C5mfg==
-X-Google-Smtp-Source: ABdhPJxKjptkjbdqkM5eTceZOSFgDF34nV4pN/i49JS/Hd7eTpw60juot2m4LKLKhXOMfyvEgKoGWxrAww9rIs8+HSM=
-X-Received: by 2002:a50:ef11:: with SMTP id m17mr5431833eds.251.1598527564134; 
- Thu, 27 Aug 2020 04:26:04 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=wiVq44xaI5lMEHpRW4cY2wbZWjxgkKYOPZ16WwudzpE=;
+ b=sYzgSdMR2zt+DLtWDdXpa5UueGMuLOPuCvBVjE2RICLXhek/ksVD4NYTP0jLiw6wvH
+ zlEohkZI28Ef09e2XPFjwsRA7Aim7G0w20rqCbtn++eUFxNwZE5Lx5aFC8ZmQVvts2Xd
+ QcepjKP0N0Tk2j7q8c1qKqqAQR632u/nr1s8PteXy3LO2d5+6pfKBscPXXAr+pq0Ytc5
+ STnrfI9wyrVK955jYGK3QiJ18gAXSiReNn8rCmE6b1zFd9e4OJFh7jDnGcqpaqnfPUpN
+ bhLJyV5bHQpTDxTRUth27aoRxpnC3J4wskhNthOSo2L9RbIvOKY/sKOHhaKsR2vb4jMj
+ ifoA==
+X-Gm-Message-State: AOAM531NnqmUSFdpZjrrkyRQ2mJwJI7SdBaUpkLEjrG8KwmXyWcPsttP
+ 9FgbvJl3SX6M3zsVKiVe60Qprquz3WC6Hw==
+X-Google-Smtp-Source: ABdhPJwmmBdTbiSAS504JzPE5CLzgrnpDMZMJBqQRoDgvRV7iDBnWOaNreMJoqJ/M5F9dPZBIhHasg==
+X-Received: by 2002:a63:f305:: with SMTP id l5mr13470173pgh.421.1598527194643; 
+ Thu, 27 Aug 2020 04:19:54 -0700 (PDT)
+Received: from [192.168.101.174] ([75.147.178.105])
+ by smtp.gmail.com with ESMTPSA id d8sm2105576pgt.19.2020.08.27.04.19.53
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 27 Aug 2020 04:19:54 -0700 (PDT)
+Subject: Re: [PATCH 00/77] target/microblaze improvements
+To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+References: <20200825205950.730499-1-richard.henderson@linaro.org>
+ <20200827091128.GK2954729@toto>
+ <1628c0ac-db22-ef9d-22e2-6a167ceaaf55@linaro.org>
+ <20200827102217.GN2954729@toto>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <5a787d85-a75f-60cf-0c99-a40c84222b35@linaro.org>
+Date: Thu, 27 Aug 2020 04:19:44 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-References: <20200810195019.25427-1-peter.maydell@linaro.org>
-In-Reply-To: <20200810195019.25427-1-peter.maydell@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 27 Aug 2020 12:25:53 +0100
-Message-ID: <CAFEAcA9cyKVwONYuzG3oPcQQ9sibpdtetCjcBe3133gd09Aa9w@mail.gmail.com>
-Subject: Re: [PATCH v5 00/20] Convert QAPI doc comments to generate rST
- instead of texinfo
-To: QEMU Developers <qemu-devel@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::544;
- envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x544.google.com
+In-Reply-To: <20200827102217.GN2954729@toto>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::d44;
+ envelope-from=richard.henderson@linaro.org; helo=mail-io1-xd44.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+X-Spam_score_int: -38
+X-Spam_score: -3.9
+X-Spam_bar: ---
+X-Spam_report: (-3.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-1.782,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -93,38 +106,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 10 Aug 2020 at 20:50, Peter Maydell <peter.maydell@linaro.org> wrote:
-> This series switches all our QAPI doc comments over from
-> texinfo format to rST. It then removes all the texinfo
-> machinery, because this was the last user of texinfo.
->
-> This is largely just a rebase of patchset v4 to current master.
+On 8/27/20 3:22 AM, Edgar E. Iglesias wrote:
+> Thanks. Here's another issue, it seems some branches are jumping
+> to the wrong address.
+> 
+> This is a disasm from a failing case:
+> 
+> 0x00000000ffd033a0:  brlid      r15, -636       // 0xffffffffffd03124
+> 0x00000000ffd033a4:  or r0, r0, r0
+> 
+> 0x00000000ffa73124:  Address 0xffa73124 is out of bounds.
 
-> There are a few things I have left out of this initial series:
+That's a weird one.
 
-I realized there is something I forgot to add to this "left out" list:
+My guess is that IMM_FLAG is set in iflags incorrectly.
+Can you verify this with -d in_asm,op,exec?
 
-Sphinx needs to know what all the input files which go into
-a document are, as it builds up dependencies to tell it whether
-to rebuild the output or not. The docs/sphinx/qapidoc.py
-plugin adds such a dependency on the file that the .rst
-docs reference (eg qapi/qapi-schema.json) but it does not
-have a mechanism for adding dependencies when that .json
-file uses an 'include' to pull in other .json files.
+When IMM_FLAG is set, you'll see in in iflags: bit 0 will be set in the second
+word of the insn_data.  E.g.:
 
-I'm not sure whether the scripts/qapi code supports telling
-a consumer of the parsed info about this -- is it sufficient
-for QAPISchemaGenRSTVisitor to implement the 'visit_include'
-method, find the path to the included .qapi file from the
-arguments and call Sphinx's env.notedependency(), or do we
-need to do something more complicated to get the list of
-all the included .qapi files ?
+ ---- 00000000ffd033a0 0000000000000001
 
-thanks
--- PMM
+It would also show up in the tb_flags of the exec lines.  E.g.
+
+Trace 0: 0x7f38a4000940 [0000000000000000/0000000090000058/0]
+
+where the format is host_pc [cs_base/pc/tb_flags].
+
+
+If so, then we'll need to check where iflags got out of sync.
+
+
+r~
 
