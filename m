@@ -7,60 +7,60 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8D8CC433E4
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 19:30:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B21DC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 19:30:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BE0D120714
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 19:30:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE0D120714
+	by mail.kernel.org (Postfix) with ESMTPS id 1624420714
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 19:30:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1624420714
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47250 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47506 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBNbW-0006fF-UC
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 15:30:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33596)
+	id 1kBNba-0006lf-8L
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 15:30:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33582)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kBNSE-0004NG-6G
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 15:20:58 -0400
-Received: from mout.kundenserver.de ([217.72.192.73]:34095)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kBNSB-0004JO-96
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 15:20:55 -0400
+Received: from mout.kundenserver.de ([217.72.192.73]:51089)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kBNSB-0000IV-7n
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 15:20:57 -0400
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kBNS9-0000IJ-3e
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 15:20:54 -0400
 Received: from localhost.localdomain ([82.252.135.186]) by
  mrelayeu.kundenserver.de (mreue109 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1MBltK-1kJ7Dt0r1Q-00CCjq; Thu, 27 Aug 2020 21:20:45 +0200
+ id 1M8QNy-1kFnIo2N7I-004V66; Thu, 27 Aug 2020 21:20:42 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 18/18] linux-user: Add support for utimensat_time64() and
- semtimedop_time64()
-Date: Thu, 27 Aug 2020 21:20:18 +0200
-Message-Id: <20200827192018.2442099-19-laurent@vivier.eu>
+Subject: [PULL 15/18] linux-user: Add support for 'mq_timedsend_time64()' and
+ 'mq_timedreceive_time64()'
+Date: Thu, 27 Aug 2020 21:20:15 +0200
+Message-Id: <20200827192018.2442099-16-laurent@vivier.eu>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200827192018.2442099-1-laurent@vivier.eu>
 References: <20200827192018.2442099-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:U937he2HJjSldhdXjydrkc9vCgsqhPOmmrtMXmEkuldqRGJSA0L
- Rz6yHOs18DZV68YXISavhv1CivdsoT/T25I+06IAaOUCdDmFFJDUWgJoDKVxSfdgQmp++3z
- E0E4LKthFhKwnrlx9h+E27akL+okrbgv0ypRAuVNtzu4IT4tczCbaeJE1fmy+XxjlD+f4G1
- 8meCvDfGZTQXsj6rgOeSw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:9NhQBiUnkdY=:+H7wd2/pc7iOq7rqESWWHp
- QClGtMbUv3rYx1JofOshLSqFvcv57EKCTEIGGkRaoT+oyL0b8wiU7CeYk+3RLZeFpQNRkRLjO
- ikscgLWwfegTcZcSOSIoi0u0H0716/kOgmqkGGfAyjS6hZp3RKVBihdhOU4HktMnNOomeq9qf
- uGg7Yp5YQmXbj2bxppn+E9UAyRhQiAp6w8QtbmimPrc+zgu6iS8DkABytMdw0OqgdpHuAzCnc
- FRVwbmwJ+3RDkSnGYYqvo3/5e78NQv5JzWZ8c35DNoypkimukCRXPzqeDHHN8mTzsVhSt1o6e
- E6pUCBEOx2u8bqeq0dZ6wZGduf+6UayAUKEt+sWX2+kw0KHn4LimL6ZL1H6wKJyP4tPN/Cz+u
- 41bbMViXUPUy+ocQN0jhiBi3n9WgMK/hQr0uKXMQUXsX8cQbck8HNPMTJmk1hnWeeX3hrHMJv
- Ul+um/sh10ADzgSlOrw9fztHlLklmbuMZtKbf3zhez+25g6l8P0itlIp7FrdIPD7UpaA3omlr
- +JA3eaUeSX6cuBGqcKsmAk2vfCxeilScgVpxeUV+0STac5Pr6hCA7sHxTqIDkLdDlb3l77T61
- EjcE7hIEaLq6vMfBz6Wvjxuw9TSu9If/lFwCbs2wOGZax1/B4vLggv5sD5Bu33nbcp2rIjUO4
- dw/30IP87c2uRLZrdc+xSrEdvTnxclWCvDqs53BsIVfE639ifiK7O5F3Owoh7dMgaQYf1bQFz
- 9sWFdLOf27jjQjQBCWfRmT9dAbfr9ZG1owBySkwSKcavg2ha+RIlbdmBnjmY4L0oWro2n9BlH
- OYLI0/vpzHO/iQxE1Ckrz1XwSdDkxDiKu87cOS8S2BFWGgaAIazeJK+y0MvMNkI0dKkbaLi
+X-Provags-ID: V03:K1:uv4eOu/tNfyzww5wB/LIXMENRklNHb+76HLgBz+ZSqV9+a96s/u
+ YGyZ+hfxh+9fAG5vWx1LqWyo00EV1yfhnPJoImtyb+RmQ/jvqFqEzTuNESDj67C5aMOtnXH
+ yIUWMRCiFFD1Tq/4oGX0mOoezR2cr2IdJiGXyqlG8A1IxiYnSS1N+1eBvDb/4PXoEciWOW6
+ rFAKe3i0Uz7kfuVBUpSDw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:tJTvFyXWkLs=:WFD7KveHIPkQ2mAsmq0di7
+ +B3d3v74cQlcr4HIF7+uEsCCfZ+uZC3K1Grd9s18ve9mSkIck1YD7eGYfUL5TCoqKtZZxg6bq
+ tzdrWl3dgnfBl7F9CSHWhcF99P/udWBgSCBcOATGjMAPwlVsGWb9El5idYLq7DPP5d+hCpq7p
+ WAaDDkeDpA7cjY8QGoh8iSin4KQM/e6EeAZFDA8oDya/X/YrCh/6kxKHsuR23Hncr4I8bCb4m
+ omzUEwTMy/73uL0GZkcthahOGMrStV4bDwUZ9anka5+rorlyvFII1GywLM4l7/kGPiOLi8Uzs
+ H6DoM9IsvY1n8Ukbn+IcQlJvT75nsZtpAQaWKORsxwmpEaKmu5syAI9y0KD35stVliZqF1WeS
+ Tp1tZCuECXkXT/jlrIq/omBoeQp/IldxMKunWidsfHqB0A8Z7MtqwRPC6jfyzcsjLQlksaeWP
+ TSKqSFXsGoySdXSt4spQKNZCZ7t0VlSQSl1NKEQEZ0YeLNWmgmC+CjdPRphDQB7iENaK0BKaC
+ FnyYFC0oiItSzUxqjMRaJ0hxjpwVNLmGbVZfC7UFDFjDcGRHViQuWb0l2x1W22qxGeoBGQ4gK
+ MFUJg80/mBDR8Xi3fmmkFcLdYt0RZj6tC1fsz3Gv0yKdnsyKbqVT9zgbV18b5G5dVtTvOPe9n
+ JhEah4mvK0bdGC4aBIXBJSM8D5hgbH6IYgLchnDw443TgZqkEi06cZJFJKyjqWrTQpjMIlPpE
+ NwA6mGu0nQNtEOURBw2TJac63LgAMYqT1Z5v4IGdaAV3rV0uXiaAlYj3FLxzinfUU0LgIrTtr
+ zzWcPmQssYfZJK08baqKUW/GPRbB7c+cIYuUU8et+T1IFq4jZJa5NelxNHiSnbUaUVAeL46
 Received-SPF: none client-ip=217.72.192.73; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 15:20:29
@@ -91,178 +91,135 @@ Sender: "Qemu-devel"
 
 From: Filip Bozuta <Filip.Bozuta@syrmia.com>
 
-This patch introduces functionality for following time64 syscalls:
+This patch implements functionality for following time64 syscalls:
 
-*utimensat_time64()
+*mq_timedsend_time64()
 
-    int utimensat(int dirfd, const char *pathname,
-                  const struct timespec times[2], int flags);
-    -- change file timestamps with nanosecond precision --
-    man page: https://man7.org/linux/man-pages/man2/utimensat.2.html
+    This is a year 2038 safe vairant of syscall:
 
-*semtimedop_time64()
+    int mq_timedsend(mqd_t mqdes, const char *msg_ptr,
+                     size_t msg_len, unsigned int msg_prio,
+                     const struct timespec *abs_timeout)
+    --send a message to a message queue--
+    man page: https://www.man7.org/linux/man-pages/man2/mq_timedsend.2.html
 
-    int semtimedop(int semid, struct sembuf *sops, size_t nsops,
-                   const struct timespec *timeout);
-    -- System V semaphore operations --
-    man page: https://www.man7.org/linux/man-pages/man2/semtimedop.2.html
+*mq_timedreceive_time64()
+
+    This is a year 2038 safe variant of syscall:
+
+    ssize_t mq_timedreceive(mqd_t mqdes, char *msg_ptr,
+                            size_t msg_len, unsigned int *msg_prio,
+                            const struct timespec *abs_timeout)
+    --receive a message from a message queue--
+    man page: https://man7.org/linux/man-pages/man3/mq_receive.3.html
 
 Implementation notes:
 
-   Syscall 'utimensat_time64()' is implemented in similar way as its
-   regular variants only difference being that time64 converting function
-   is used to convert values of 'struct timespec' between host and target
-   ('target_to_host_timespec64()').
-
-   For syscall 'semtimedop_time64()' and additional argument is added
-   in function 'do_semtimedop()' through which the aproppriate 'struct timespec'
-   converting function is called (false for regular target_to_host_timespec()
-   and true for target_to_host_timespec64()). For 'do_ipc()' a
-   check was added as that additional argument: 'TARGET_ABI_BITS == 64'.
+    These syscalls were implemented in similar ways like
+    'mq_timedsend()' and 'mq_timedreceive' except that
+    functions 'target_to_host_timespec64()' and
+    'host_to_target_timespec64()' were used to convert
+    values of 'struct timespec' between host and target.
 
 Signed-off-by: Filip Bozuta <Filip.Bozuta@syrmia.com>
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <20200824223050.92032-3-Filip.Bozuta@syrmia.com>
+Message-Id: <20200824193752.67950-3-Filip.Bozuta@syrmia.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- linux-user/syscall.c | 64 ++++++++++++++++++++++++++++++++++++--------
- 1 file changed, 53 insertions(+), 11 deletions(-)
+ linux-user/syscall.c | 56 ++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 54 insertions(+), 2 deletions(-)
 
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 9d7376734ad4..e93cecb0cb8e 100644
+index 3b725bbe2513..b28c8edb421e 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -391,7 +391,7 @@ static bitmask_transtbl fcntl_flags_tbl[] = {
+@@ -799,11 +799,13 @@ safe_syscall5(int, msgrcv, int, msgid, void *, msgp, size_t, sz,
+ safe_syscall4(int, semtimedop, int, semid, struct sembuf *, tsops,
+               unsigned, nsops, const struct timespec *, timeout)
+ #endif
+-#ifdef TARGET_NR_mq_timedsend
++#if defined(TARGET_NR_mq_timedsend) || \
++    defined(TARGET_NR_mq_timedsend_time64)
+ safe_syscall5(int, mq_timedsend, int, mqdes, const char *, msg_ptr,
+               size_t, len, unsigned, prio, const struct timespec *, timeout)
+ #endif
+-#ifdef TARGET_NR_mq_timedreceive
++#if defined(TARGET_NR_mq_timedreceive) || \
++    defined(TARGET_NR_mq_timedreceive_time64)
+ safe_syscall5(int, mq_timedreceive, int, mqdes, char *, msg_ptr,
+               size_t, len, unsigned *, prio, const struct timespec *, timeout)
+ #endif
+@@ -1218,6 +1220,8 @@ static inline abi_long target_to_host_timespec(struct timespec *host_ts,
  
- _syscall2(int, sys_getcwd1, char *, buf, size_t, size)
- 
--#ifdef TARGET_NR_utimensat
-+#if defined(TARGET_NR_utimensat) || defined(TARGET_NR_utimensat_time64)
- #if defined(__NR_utimensat)
- #define __NR_sys_utimensat __NR_utimensat
- _syscall4(int,sys_utimensat,int,dirfd,const char *,pathname,
-@@ -1242,7 +1242,10 @@ static inline abi_long target_to_host_timespec(struct timespec *host_ts,
-     defined(TARGET_NR_mq_timedreceive_time64) || \
-     (defined(TARGET_NR_timerfd_settime64) && defined(CONFIG_TIMERFD)) || \
-     defined(TARGET_NR_clock_nanosleep_time64) || \
--    defined(TARGET_NR_rt_sigtimedwait_time64)
-+    defined(TARGET_NR_rt_sigtimedwait_time64) || \
-+    defined(TARGET_NR_utimensat) || \
-+    defined(TARGET_NR_utimensat_time64) || \
-+    defined(TARGET_NR_semtimedop_time64)
+ #if defined(TARGET_NR_clock_settime64) || defined(TARGET_NR_futex_time64) || \
+     defined(TARGET_NR_timer_settime64) || \
++    defined(TARGET_NR_mq_timedsend_time64) || \
++    defined(TARGET_NR_mq_timedreceive_time64) || \
+     (defined(TARGET_NR_timerfd_settime64) && defined(CONFIG_TIMERFD))
  static inline abi_long target_to_host_timespec64(struct timespec *host_ts,
                                                   abi_ulong target_addr)
- {
-@@ -3877,7 +3880,7 @@ static inline abi_long target_to_host_sembuf(struct sembuf *host_sembuf,
- }
- 
- #if defined(TARGET_NR_ipc) || defined(TARGET_NR_semop) || \
--    defined(TARGET_NR_semtimedop)
-+    defined(TARGET_NR_semtimedop) || defined(TARGET_NR_semtimedop_time64)
- 
- /*
-  * This macro is required to handle the s390 variants, which passes the
-@@ -3894,7 +3897,7 @@ static inline abi_long target_to_host_sembuf(struct sembuf *host_sembuf,
- static inline abi_long do_semtimedop(int semid,
-                                      abi_long ptr,
-                                      unsigned nsops,
--                                     abi_long timeout)
-+                                     abi_long timeout, bool time64)
- {
-     struct sembuf *sops;
-     struct timespec ts, *pts = NULL;
-@@ -3902,8 +3905,14 @@ static inline abi_long do_semtimedop(int semid,
- 
-     if (timeout) {
-         pts = &ts;
--        if (target_to_host_timespec(pts, timeout)) {
--            return -TARGET_EFAULT;
-+        if (time64) {
-+            if (target_to_host_timespec64(pts, timeout)) {
-+                return -TARGET_EFAULT;
-+            }
-+        } else {
-+            if (target_to_host_timespec(pts, timeout)) {
-+                return -TARGET_EFAULT;
-+            }
-         }
-     }
- 
-@@ -4426,7 +4435,7 @@ static abi_long do_ipc(CPUArchState *cpu_env,
- 
-     switch (call) {
-     case IPCOP_semop:
--        ret = do_semtimedop(first, ptr, second, 0);
-+        ret = do_semtimedop(first, ptr, second, 0, false);
-         break;
-     case IPCOP_semtimedop:
-     /*
-@@ -4436,9 +4445,9 @@ static abi_long do_ipc(CPUArchState *cpu_env,
-      * to a struct timespec where the generic variant uses fifth parameter.
-      */
- #if defined(TARGET_S390X)
--        ret = do_semtimedop(first, ptr, second, third);
-+        ret = do_semtimedop(first, ptr, second, third, TARGET_ABI_BITS == 64);
- #else
--        ret = do_semtimedop(first, ptr, second, fifth);
-+        ret = do_semtimedop(first, ptr, second, fifth, TARGET_ABI_BITS == 64);
- #endif
-         break;
- 
-@@ -9947,11 +9956,15 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
- #endif
- #ifdef TARGET_NR_semop
-     case TARGET_NR_semop:
--        return do_semtimedop(arg1, arg2, arg3, 0);
-+        return do_semtimedop(arg1, arg2, arg3, 0, false);
- #endif
- #ifdef TARGET_NR_semtimedop
-     case TARGET_NR_semtimedop:
--        return do_semtimedop(arg1, arg2, arg3, arg4);
-+        return do_semtimedop(arg1, arg2, arg3, arg4, false);
-+#endif
-+#ifdef TARGET_NR_semtimedop_time64
-+    case TARGET_NR_semtimedop_time64:
-+        return do_semtimedop(arg1, arg2, arg3, arg4, true);
- #endif
- #ifdef TARGET_NR_semctl
-     case TARGET_NR_semctl:
-@@ -12158,6 +12171,35 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+@@ -12059,6 +12063,27 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
          }
          return ret;
  #endif
-+#ifdef TARGET_NR_utimensat_time64
-+    case TARGET_NR_utimensat_time64:
++#ifdef TARGET_NR_mq_timedsend_time64
++    case TARGET_NR_mq_timedsend_time64:
 +        {
-+            struct timespec *tsp, ts[2];
-+            if (!arg3) {
-+                tsp = NULL;
++            struct timespec ts;
++
++            p = lock_user(VERIFY_READ, arg2, arg3, 1);
++            if (arg5 != 0) {
++                if (target_to_host_timespec64(&ts, arg5)) {
++                    return -TARGET_EFAULT;
++                }
++                ret = get_errno(safe_mq_timedsend(arg1, p, arg3, arg4, &ts));
++                if (!is_error(ret) && host_to_target_timespec64(arg5, &ts)) {
++                    return -TARGET_EFAULT;
++                }
 +            } else {
-+                if (target_to_host_timespec64(ts, arg3)) {
-+                    return -TARGET_EFAULT;
-+                }
-+                if (target_to_host_timespec64(ts + 1, arg3 +
-+                                     sizeof(struct target__kernel_timespec))) {
-+                    return -TARGET_EFAULT;
-+                }
-+                tsp = ts;
++                ret = get_errno(safe_mq_timedsend(arg1, p, arg3, arg4, NULL));
 +            }
-+            if (!arg2)
-+                ret = get_errno(sys_utimensat(arg1, NULL, tsp, arg4));
-+            else {
-+                p = lock_user_string(arg2);
-+                if (!p) {
++            unlock_user(p, arg2, arg3);
++        }
++        return ret;
++#endif
+ 
+ #ifdef TARGET_NR_mq_timedreceive
+     case TARGET_NR_mq_timedreceive:
+@@ -12086,6 +12111,33 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+         }
+         return ret;
+ #endif
++#ifdef TARGET_NR_mq_timedreceive_time64
++    case TARGET_NR_mq_timedreceive_time64:
++        {
++            struct timespec ts;
++            unsigned int prio;
++
++            p = lock_user(VERIFY_READ, arg2, arg3, 1);
++            if (arg5 != 0) {
++                if (target_to_host_timespec64(&ts, arg5)) {
 +                    return -TARGET_EFAULT;
 +                }
-+                ret = get_errno(sys_utimensat(arg1, path(p), tsp, arg4));
-+                unlock_user(p, arg2, 0);
++                ret = get_errno(safe_mq_timedreceive(arg1, p, arg3,
++                                                     &prio, &ts));
++                if (!is_error(ret) && host_to_target_timespec64(arg5, &ts)) {
++                    return -TARGET_EFAULT;
++                }
++            } else {
++                ret = get_errno(safe_mq_timedreceive(arg1, p, arg3,
++                                                     &prio, NULL));
++            }
++            unlock_user(p, arg2, arg3);
++            if (arg4 != 0) {
++                put_user_u32(prio, arg4);
 +            }
 +        }
 +        return ret;
 +#endif
- #ifdef TARGET_NR_futex
-     case TARGET_NR_futex:
-         return do_futex(arg1, arg2, arg3, arg4, arg5, arg6);
+ 
+     /* Not implemented for now... */
+ /*     case TARGET_NR_mq_notify: */
 -- 
 2.26.2
 
