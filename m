@@ -2,70 +2,97 @@ Return-Path: <SRS0=k4hX=CF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F04FC433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 06:13:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE82EC433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 06:15:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2A13120786
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 06:13:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A13120786
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 143982078A
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 06:15:29 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OGwVseR2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 143982078A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51598 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54456 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBBAC-00076p-DM
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 02:13:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46516)
+	id 1kBBC4-0008Kb-UE
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 02:15:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46822)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
- id 1kBB9Z-0006GH-4o
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 02:12:53 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:4655 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
- id 1kBB9X-0005N3-96
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 02:12:52 -0400
-Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 84907E0D8F4C86FF17E1;
- Thu, 27 Aug 2020 14:12:45 +0800 (CST)
-Received: from [127.0.0.1] (10.174.186.4) by DGGEMS408-HUB.china.huawei.com
- (10.3.19.208) with Microsoft SMTP Server id 14.3.487.0; Thu, 27 Aug 2020
- 14:12:30 +0800
-Subject: Re: [PATCH v5 04/12] migration/dirtyrate: Add dirtyrate statistics
- series functions
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-References: <1598319650-36762-1-git-send-email-zhengchuan@huawei.com>
- <1598319650-36762-5-git-send-email-zhengchuan@huawei.com>
- <20200826120912.GF2726@work-vm>
-From: Zheng Chuan <zhengchuan@huawei.com>
-Message-ID: <ff1af456-6dc5-574b-5c8f-43759a65a025@huawei.com>
-Date: Thu, 27 Aug 2020 14:12:29 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kBBBC-0007sR-Pr
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 02:14:34 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:46321
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kBBBB-0005Us-9Q
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 02:14:34 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1598508872;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=hGbR62hatY0tG41UFmN0X9XuoDxItnp1gFfdFM0KLZ4=;
+ b=OGwVseR2CyEjXe219ZCvyCabz3C893LXVHQLX/dJ7hZbBZHdaMVTGx//BnbPtFfYlGfnWK
+ GJunVfkV8yRkJxeZFbCCAHSST5SUFDq7NeXXiWjVgydyd5pBsXJMW7i9mlsDF2mQAU/yuQ
+ qS2hDg5LMBtrZIb6yW07Bw574mz1arw=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-174-nFCSdP47MJi6wNMO31k-Ug-1; Thu, 27 Aug 2020 02:14:28 -0400
+X-MC-Unique: nFCSdP47MJi6wNMO31k-Ug-1
+Received: by mail-ej1-f72.google.com with SMTP id dr9so1690582ejc.19
+ for <qemu-devel@nongnu.org>; Wed, 26 Aug 2020 23:14:27 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=hGbR62hatY0tG41UFmN0X9XuoDxItnp1gFfdFM0KLZ4=;
+ b=ltU9V/31coq0ySRtz3qIcEDjv7oOPcZRZ6JiwRLY9Rjey3salWttbqLsSMzxTAMo4M
+ hjNXFtgckW0D7fWz7czgeuF17Z6mycGuohQjge36qx/ytvPVvtrni3jbrR6Zkbb284+6
+ d6NyWnsiNYfK+e00IFi8nva+h2T6i+rFHWtey72eUMykEEjTS6ALZ9eIwp7rpaV//JId
+ dWH5k74WW7yaVC/8SUXa71VTBY64ErVp22NaJl4eRNFkaVeRqy/9b8opv97I+p9EE+qp
+ 68KQ0sez+WXJ5R4ipoq9wA1pmrviesBSiCNOK4lzq1kmzp9RX7aEFslnf041uO7EYdmG
+ 9lpg==
+X-Gm-Message-State: AOAM530bJR0unZhfDWtfq5lTLYR+Fo/WLt++5eeC3WR4vsW4d7zZUvj1
+ eStQTeJONl3SF5vgMPk/rbCAgLf5RZs4vrKmCOjwex3gxsK+pOwPcdj8QUE8li69w2XqAPybTwE
+ Cyc/xt5OkJh86/K4EuvtziDBEXHwHt6U=
+X-Received: by 2002:a50:fd84:: with SMTP id o4mr18181027edt.76.1598508866834; 
+ Wed, 26 Aug 2020 23:14:26 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxXvD4V3ZIoJFMvGpQ+1WykGh2bhW/ChUi3UxK/o7yXfuwJ1lF8lNF7hHwavabyW9n0dx35jrjgK1muQgq/sSc=
+X-Received: by 2002:a50:fd84:: with SMTP id o4mr18181012edt.76.1598508866629; 
+ Wed, 26 Aug 2020 23:14:26 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200826120912.GF2726@work-vm>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.186.4]
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.190;
- envelope-from=zhengchuan@huawei.com; helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 02:12:47
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -63
-X-Spam_score: -6.4
-X-Spam_bar: ------
-X-Spam_report: (-6.4 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-2.239,
- RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+References: <20200826070243.11969-1-pbonzini@redhat.com>
+ <cc6af807-a24f-42bb-b1f7-8c8c5e59200b@redhat.com>
+In-Reply-To: <cc6af807-a24f-42bb-b1f7-8c8c5e59200b@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Thu, 27 Aug 2020 08:14:15 +0200
+Message-ID: <CABgObfYJ=6fRSzTz5C1A8dgbom7-QWtn1J1L7-8+4thkxNTvjA@mail.gmail.com>
+Subject: Re: [PATCH] meson: move pixman detection to meson
+To: Thomas Huth <thuth@redhat.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0.0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/alternative; boundary="0000000000002a86e405add5d952"
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 00:13:19
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.959,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -78,106 +105,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: berrange@redhat.com, zhang.zhanghailiang@huawei.com, quintela@redhat.com,
- qemu-devel@nongnu.org, xiexiangyou@huawei.com, alex.chen@huawei.com,
- ann.zhuangyanying@huawei.com, fangying1@huawei.com
+Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ qemu-devel <qemu-devel@nongnu.org>, Rafael Kitover <rkitover@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+--0000000000002a86e405add5d952
+Content-Type: text/plain; charset="UTF-8"
+
+Il gio 27 ago 2020, 06:53 Thomas Huth <thuth@redhat.com> ha scritto:
+
+> > -else
+> > -  error_exit "pixman >= 0.21.8 not present." \
+> > -      "Please install the pixman devel package."
+> > -fi
+>
+> The "else" part now got completely lost, didn't it?
 
 
-On 2020/8/26 20:09, Dr. David Alan Gilbert wrote:
-> * Chuan Zheng (zhengchuan@huawei.com) wrote:
->> Add dirtyrate statistics to record/update dirtyrate info.
->>
->> Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
->> ---
->>  migration/dirtyrate.c | 29 +++++++++++++++++++++++++++++
->>  migration/dirtyrate.h | 10 ++++++++++
->>  2 files changed, 39 insertions(+)
->>
->> diff --git a/migration/dirtyrate.c b/migration/dirtyrate.c
->> index 91987c5..0d7163f 100644
->> --- a/migration/dirtyrate.c
->> +++ b/migration/dirtyrate.c
->> @@ -24,6 +24,7 @@
->>  #include "dirtyrate.h"
->>  
->>  static int CalculatingState = DIRTY_RATE_STATUS_UNSTARTED;
->> +static struct DirtyRateStat DirtyStat;
->>  
->>  static int dirtyrate_set_state(int *state, int old_state, int new_state)
->>  {
->> @@ -35,6 +36,34 @@ static int dirtyrate_set_state(int *state, int old_state, int new_state)
->>      }
->>  }
->>  
->> +static void reset_dirtyrate_stat(void)
->> +{
->> +    DirtyStat.total_dirty_samples = 0;
->> +    DirtyStat.total_sample_count = 0;
->> +    DirtyStat.total_block_mem_MB = 0;
->> +    DirtyStat.dirty_rate = 0;
->> +}
->> +
->> +static void update_dirtyrate_stat(struct RamblockDirtyInfo *info)
->> +{
->> +    DirtyStat.total_dirty_samples += info->sample_dirty_count;
->> +    DirtyStat.total_sample_count += info->sample_pages_count;
->> +    /* size of 4K pages in MB */
->> +    DirtyStat.total_block_mem_MB += info->ramblock_pages / 256;
-> 
-> You need to be consistent with your use of constants, you have
-> a DIRTYRATE_SAMPLE_PAGE_SIZE in a later patch; so use it rather than
-> hard coding 256 here.
-> 
-> Dave
-> 
-Sure.
-I may take as
-'DirtyStat.total_block_mem_MB += (info->ramblock_pages * DIRTYRATE_SAMPLE_PAGE_SIZE) >> 20';
+It's replaced by "required: have_system" in meson.build. We can add a
+custom "not found" message, but if the current one is not enough we should
+improve Meson so that it figures out a good one from the version
+requirement.
 
->> +}
->> +
->> +static void update_dirtyrate(uint64_t msec)
->> +{
->> +    uint64_t dirtyrate;
->> +    uint64_t total_dirty_samples = DirtyStat.total_dirty_samples;
->> +    uint64_t total_sample_count = DirtyStat.total_sample_count;
->> +    uint64_t total_block_mem_MB = DirtyStat.total_block_mem_MB;
->> +
->> +    dirtyrate = total_dirty_samples * total_block_mem_MB *
->> +                 1000 / (total_sample_count * msec);
->> +
->> +    DirtyStat.dirty_rate = dirtyrate;
->> +}
->>  
->>  static void calculate_dirtyrate(struct DirtyRateConfig config)
->>  {
->> diff --git a/migration/dirtyrate.h b/migration/dirtyrate.h
->> index dc45419..8e25d93 100644
->> --- a/migration/dirtyrate.h
->> +++ b/migration/dirtyrate.h
->> @@ -45,6 +45,16 @@ struct RamblockDirtyInfo {
->>      uint32_t *hash_result; /* array of hash result for sampled pages */
->>  };
->>  
->> +/*
->> + * Store calculation statistics for each measure.
->> + */
->> +struct DirtyRateStat {
->> +    uint64_t total_dirty_samples; /* total dirty sampled page */
->> +    uint64_t total_sample_count; /* total sampled pages */
->> +    uint64_t total_block_mem_MB; /* size of total sampled pages in MB */
->> +    int64_t dirty_rate; /* dirty rate in MB/s */
->> +};
->> +
->>  void *get_dirtyrate_thread(void *arg);
->>  #endif
->>  
->> -- 
->> 1.8.3.1
->>
+--0000000000002a86e405add5d952
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"auto"><div><br><br><div class=3D"gmail_quote"><div dir=3D"ltr" =
+class=3D"gmail_attr">Il gio 27 ago 2020, 06:53 Thomas Huth &lt;<a href=3D"m=
+ailto:thuth@redhat.com">thuth@redhat.com</a>&gt; ha scritto:<br></div><bloc=
+kquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #cc=
+c solid;padding-left:1ex">&gt; -else<br>
+&gt; -=C2=A0 error_exit &quot;pixman &gt;=3D 0.21.8 not present.&quot; \<br=
+>
+&gt; -=C2=A0 =C2=A0 =C2=A0 &quot;Please install the pixman devel package.&q=
+uot;<br>
+&gt; -fi<br>
+<br>
+The &quot;else&quot; part now got completely lost, didn&#39;t it?</blockquo=
+te></div></div><div dir=3D"auto"><br></div><div dir=3D"auto">It&#39;s repla=
+ced by &quot;required: have_system&quot; in meson.build. We can add a custo=
+m &quot;not found&quot; message, but if the current one is not enough we sh=
+ould improve Meson so that it figures out a good one from the version requi=
+rement.</div></div>
+
+--0000000000002a86e405add5d952--
 
 
