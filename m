@@ -2,88 +2,91 @@ Return-Path: <SRS0=k4hX=CF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0724EC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 12:52:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C8A7C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 12:53:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C394922BF5
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 12:52:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ED41F2177B
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 12:53:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nuviainc-com.20150623.gappssmtp.com header.i=@nuviainc-com.20150623.gappssmtp.com header.b="hV97SJc9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C394922BF5
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nuviainc.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LQHjhqGK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED41F2177B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34512 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38480 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBHOf-0005fe-3k
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 08:52:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60342)
+	id 1kBHPY-0007Kc-6z
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 08:53:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35366)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <leif@nuviainc.com>) id 1kBHFo-0000nM-9f
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 08:43:44 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:34431)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <leif@nuviainc.com>) id 1kBHFl-0006ou-7R
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 08:43:43 -0400
-Received: by mail-wr1-x443.google.com with SMTP id f7so5264862wrw.1
- for <qemu-devel@nongnu.org>; Thu, 27 Aug 2020 05:43:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=nuviainc-com.20150623.gappssmtp.com; s=20150623;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=PeTro//U+ItdJy/4VEWKF3xKEFMPV5pkE6n1z5mnbVE=;
- b=hV97SJc9WGYDc4jLr0S3i3IIbkI3t8pg4F8eAtcbiRx7Ceb8jqifJ3bjAG4vQh3HIw
- 0wqx73nA9bzP+VPbEQ0IJQ36lBGs5x+HROQvyNiE9Xv0j9FZj4fAqF/LrFb79yXFXs0I
- BpB1rbK6kJJqt6ve+cnSFqwQOF/FExZiV6FIPFqVkVNZ/PXg8dvfSo6xVe4XzLL4WkXy
- KgBubXULaetxU2Bd7QXMgdv2m3r2nYFHg5kLqDmz5FBlwFvk0e1w6+3z90lQc1Snn5gv
- XIyOB9Kq/74uCaGLvYNG/swmm3+KqUXZ3m0UaCp451t+Km/VvRgDXguDQ2cOK7EGhnVL
- Qk5Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=PeTro//U+ItdJy/4VEWKF3xKEFMPV5pkE6n1z5mnbVE=;
- b=nLvUGRL0SsyhKQLSbcs/5Fbt2+xb560dYjwnDfl9XzYkR1T33qWx/03NcFh1RyDda/
- 6OUaNKFgiRdPJQQZQN86hF9v95LszfV+PV5B7OAAeiCUL3u0KY7dMAO0vLqq9MYpCHxY
- Q9hMUqH9n5gG5xSBCGusf4XOfumqBzbf1hD6hfIDC4EZYNYlM9+AFZZv3Unqzwt12a5R
- ohJXOTp73Hm3aD+4b8J/RBtDpeDZh0LCEQg6cieNGwUexp4OsDJl6dh56cBbonMatEhl
- xdKPWerbqRmUvT73cVWbzunk1ijnH5K/xVYhYQRCCs3wuse82Q23TB+Ys7E5Z4EvSWEz
- eyiQ==
-X-Gm-Message-State: AOAM5302DVp96UoKxb9Db865SNxHn4KUpOlJiqUIdmQyfRJ50NKB7f3A
- 0FQbaGZ8X9pTaa6z20vQlAlkYA==
-X-Google-Smtp-Source: ABdhPJzQYOkmZn7TJDBdXntVHQfheOZLJpuvVE6vyUzE5ZzGlVu+Nk3rtaQcaqtWRYoNnpqaicKtFg==
-X-Received: by 2002:adf:db43:: with SMTP id f3mr21876595wrj.219.1598532216872; 
- Thu, 27 Aug 2020 05:43:36 -0700 (PDT)
-Received: from vanye.hemma.eciton.net
- (cpc92302-cmbg19-2-0-cust304.5-4.cable.virginm.net. [82.1.209.49])
- by smtp.gmail.com with ESMTPSA id c205sm3889262wmd.33.2020.08.27.05.43.35
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 27 Aug 2020 05:43:36 -0700 (PDT)
-From: Leif Lindholm <leif@nuviainc.com>
-To: qemu-arm@nongnu.org
-Subject: [PATCH v2] hw/arm/sbsa-ref: add "reg" property to DT cpu nodes
-Date: Thu, 27 Aug 2020 13:43:35 +0100
-Message-Id: <20200827124335.30586-1-leif@nuviainc.com>
-X-Mailer: git-send-email 2.20.1
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kBHOw-0006TL-C5
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 08:53:10 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29626
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kBHOt-0008It-QS
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 08:53:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1598532786;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=IrcXHUT313JfdzoUXTD7PE3y99SPkBmWvVDaZExauKE=;
+ b=LQHjhqGKH0wkgeE7m0Jg8mIdpn9EetiRctJK5lcYGDxJjtny60kKtJTXMlPnYmI8e+1Hz4
+ 3Umj8vAyB+/A3P0CMCOkOzCMXh1Y+1RfyOqsHEWSlfYmvRKYiKzhKzTqiG25slSXEMipmw
+ JBWuTsxbpe6LgQpGWTCK3GAitLji++Y=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-342-Lc1QO1MfM6G7qMwEam-B7w-1; Thu, 27 Aug 2020 08:53:02 -0400
+X-MC-Unique: Lc1QO1MfM6G7qMwEam-B7w-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DF7C980BCB0;
+ Thu, 27 Aug 2020 12:53:01 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-56.ams2.redhat.com [10.36.112.56])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2B9781974D;
+ Thu, 27 Aug 2020 12:52:56 +0000 (UTC)
+Subject: Re: [PATCH RFC v2 3/4] pc-bios: s390x: Save io and external new PSWs
+ before overwriting them
+To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
+References: <20200827093152.3026-1-frankja@linux.ibm.com>
+ <20200827093152.3026-4-frankja@linux.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <c5190ed1-a4f9-45c3-97b3-4924cff5da31@redhat.com>
+Date: Thu, 27 Aug 2020 14:52:55 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
+In-Reply-To: <20200827093152.3026-4-frankja@linux.ibm.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::443;
- envelope-from=leif@nuviainc.com; helo=mail-wr1-x443.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+Content-Language: en-US
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=thuth@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 00:13:19
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -47
+X-Spam_score: -4.8
+X-Spam_bar: ----
+X-Spam_report: (-4.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.959,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-1.782, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,99 +99,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Graeme Gregory <graeme@nuviainc.com>,
- Peter Maydell <peter.maydell@linaro.org>,
- Tanmay Jagdale <tanmay.jagdale@linaro.org>,
- Radoslaw Biernacki <rad@semihalf.com>, qemu-devel@nongnu.org
+Cc: borntraeger@de.ibm.com, cohuck@redhat.com, david@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The sbsa-ref platform uses a minimal device tree to pass amount of memory
-as well as number of cpus to the firmware. However, when dumping that
-minimal dtb (with -M sbsa-virt,dumpdtb=<file>), the resulting blob
-generates a warning when decompiled by dtc due to lack of reg property.
+On 27/08/2020 11.31, Janosch Frank wrote:
+> Currently we always overwrite the mentioned exception new PSWs before
+> loading the enabled wait PSW. Let's save the PSW before overwriting
+> and restore it right before starting the loaded kernel.
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> ---
+> 
+> Maybe we should rather statically allocate a lowcore so we don't dirty
+> 0x0 at all.
+> 
+> ---
+>  pc-bios/s390-ccw/jump2ipl.c |  3 ++
+>  pc-bios/s390-ccw/start.S    | 62 +++++++++++++++++++++++++++----------
+>  2 files changed, 48 insertions(+), 17 deletions(-)
+> 
+> diff --git a/pc-bios/s390-ccw/jump2ipl.c b/pc-bios/s390-ccw/jump2ipl.c
+> index 143d027bf7..a44f3ab5b3 100644
+> --- a/pc-bios/s390-ccw/jump2ipl.c
+> +++ b/pc-bios/s390-ccw/jump2ipl.c
+> @@ -13,12 +13,15 @@
+>  #define KERN_IMAGE_START 0x010000UL
+>  #define RESET_PSW_MASK (PSW_MASK_SHORTPSW | PSW_MASK_64)
+>  
+> +extern uint64_t *psw_save_io, *psw_save_ext;
 
-Add a simple reg property per cpu, representing a 64-bit MPIDR_EL1.
+I think that should be
 
-This also ends up being cleaner than having the firmware calculating its
-own IDs for generating APCI.
+ extern uint64_t psw_save_io[], psw_save_ext[];
 
-Signed-off-by: Leif Lindholm <leif@nuviainc.com>
----
+instead ... otherwise you'll end up with some funny bugs here, won't you?
 
-As per Graeme's feedback, properly represent the MPIDR topology info
-in the reg property rather than just counting cores (and update the
-commit message on why this is useful).
-I'm using the local helper function sbsa_ref_cpu_mp_affinity() for this,
-and moving it up somewhat rather than adding a forward declaration.
+>  uint64_t *reset_psw = 0, save_psw, ipl_continue;
+>  
+>  static void jump_to_IPL_2(void)
+>  {
+>      /* Restore reset PSW and io and external new PSWs */
 
- hw/arm/sbsa-ref.c | 29 +++++++++++++++++++++++------
- 1 file changed, 23 insertions(+), 6 deletions(-)
+Ok, now the comment makes sense :-)
 
-diff --git a/hw/arm/sbsa-ref.c b/hw/arm/sbsa-ref.c
-index f030a416fd..3e65ded9a0 100644
---- a/hw/arm/sbsa-ref.c
-+++ b/hw/arm/sbsa-ref.c
-@@ -138,6 +138,12 @@ static const int sbsa_ref_irqmap[] = {
-     [SBSA_EHCI] = 11,
- };
- 
-+static uint64_t sbsa_ref_cpu_mp_affinity(SBSAMachineState *sms, int idx)
-+{
-+    uint8_t clustersz = ARM_DEFAULT_CPUS_PER_CLUSTER;
-+    return arm_cpu_mp_affinity(idx, clustersz);
-+}
-+
- /*
-  * Firmware on this machine only uses ACPI table to load OS, these limited
-  * device tree nodes are just to let firmware know the info which varies from
-@@ -183,14 +189,31 @@ static void create_fdt(SBSAMachineState *sms)
-         g_free(matrix);
-     }
- 
-+    /*
-+     * From Documentation/devicetree/bindings/arm/cpus.yaml
-+     *  On ARM v8 64-bit systems this property is required
-+     *    and matches the MPIDR_EL1 register affinity bits.
-+     *
-+     *    * If cpus node's #address-cells property is set to 2
-+     *
-+     *      The first reg cell bits [7:0] must be set to
-+     *      bits [39:32] of MPIDR_EL1.
-+     *
-+     *      The second reg cell bits [23:0] must be set to
-+     *      bits [23:0] of MPIDR_EL1.
-+     */
-     qemu_fdt_add_subnode(sms->fdt, "/cpus");
-+    qemu_fdt_setprop_cell(sms->fdt, "/cpus", "#address-cells", 2);
-+    qemu_fdt_setprop_cell(sms->fdt, "/cpus", "#size-cells", 0x0);
- 
-     for (cpu = sms->smp_cpus - 1; cpu >= 0; cpu--) {
-         char *nodename = g_strdup_printf("/cpus/cpu@%d", cpu);
-         ARMCPU *armcpu = ARM_CPU(qemu_get_cpu(cpu));
-         CPUState *cs = CPU(armcpu);
-+        uint64_t mpidr = sbsa_ref_cpu_mp_affinity(sms, cpu);
- 
-         qemu_fdt_add_subnode(sms->fdt, nodename);
-+        qemu_fdt_setprop_u64(sms->fdt, nodename, "reg", mpidr);
- 
-         if (ms->possible_cpus->cpus[cs->cpu_index].props.has_node_id) {
-             qemu_fdt_setprop_cell(sms->fdt, nodename, "numa-node-id",
-@@ -717,12 +740,6 @@ static void sbsa_ref_init(MachineState *machine)
-     arm_load_kernel(ARM_CPU(first_cpu), machine, &sms->bootinfo);
- }
- 
--static uint64_t sbsa_ref_cpu_mp_affinity(SBSAMachineState *sms, int idx)
--{
--    uint8_t clustersz = ARM_DEFAULT_CPUS_PER_CLUSTER;
--    return arm_cpu_mp_affinity(idx, clustersz);
--}
--
- static const CPUArchIdList *sbsa_ref_possible_cpu_arch_ids(MachineState *ms)
- {
-     unsigned int max_cpus = ms->smp.max_cpus;
--- 
-2.20.1
+>      *reset_psw = save_psw;
+> +    memcpy((void *)0x1f0, psw_save_io, 16);
+> +    memcpy((void *)0x1b0, psw_save_ext, 16);
+
+Could you use &lowcore->external_new_psw and &lowcore->io_new_psw
+instead of the magic numbers?
+
+ Thomas
+
 
 
