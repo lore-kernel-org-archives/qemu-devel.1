@@ -2,70 +2,86 @@ Return-Path: <SRS0=k4hX=CF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 374E6C433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 06:42:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FAAFC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 06:47:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0B28E22B47
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 06:42:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B28E22B47
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1C72F22B4D
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 06:47:34 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eO/5vYes"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C72F22B4D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33594 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36250 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBBcV-00055K-A0
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 02:42:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51254)
+	id 1kBBh7-0006YL-Cs
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 02:47:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51954)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
- id 1kBBbj-0004dc-2H
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 02:41:59 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:4271 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
- id 1kBBbg-0000gB-EK
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 02:41:58 -0400
-Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id BEF4C8A60AC010E0CE2B;
- Thu, 27 Aug 2020 14:41:48 +0800 (CST)
-Received: from [127.0.0.1] (10.174.186.4) by DGGEMS407-HUB.china.huawei.com
- (10.3.19.207) with Microsoft SMTP Server id 14.3.487.0; Thu, 27 Aug 2020
- 14:41:39 +0800
-Subject: Re: [PATCH v5 06/12] migration/dirtyrate: Record hash results for
- each sampled page
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-References: <1598319650-36762-1-git-send-email-zhengchuan@huawei.com>
- <1598319650-36762-7-git-send-email-zhengchuan@huawei.com>
- <20200826123501.GG2726@work-vm>
-From: Zheng Chuan <zhengchuan@huawei.com>
-Message-ID: <3a61c786-ca80-5658-d307-4ae638ad9de0@huawei.com>
-Date: Thu, 27 Aug 2020 14:41:39 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kBBgV-00066l-Qn
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 02:46:55 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:38450
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kBBgT-0001Ce-AC
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 02:46:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1598510811;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=kJlznFq6vxh1OBE29iALNUMP+it7Bix+4YNxmkdBaLY=;
+ b=eO/5vYes8iBnxgbX3t4O0b8FEDB9xDSDAIoKBwVtGKHj+FIZSAKnTWByD5JSrFqN1JFJnu
+ vFss5T9MV2mEmHNdjVsbh5SbfjqHMn35Q+f1Idhv6vb40KV8zHYtdpqROpD22NEOlpPZI6
+ bAHANBJ051NEZF4CcsWrIFnymYDjNh4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-176-j6lrIf8TMeqL6wXjfwh3rA-1; Thu, 27 Aug 2020 02:46:48 -0400
+X-MC-Unique: j6lrIf8TMeqL6wXjfwh3rA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 607DD85C733
+ for <qemu-devel@nongnu.org>; Thu, 27 Aug 2020 06:46:47 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-112-54.ams2.redhat.com
+ [10.36.112.54])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4CE0E1972A;
+ Thu, 27 Aug 2020 06:46:44 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 40ECE942; Thu, 27 Aug 2020 08:46:43 +0200 (CEST)
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] meson: fix qxl module build
+Date: Thu, 27 Aug 2020 08:46:29 +0200
+Message-Id: <20200827064629.23080-1-kraxel@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200826123501.GG2726@work-vm>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.186.4]
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.191;
- envelope-from=zhengchuan@huawei.com; helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 02:09:23
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -63
-X-Spam_score: -6.4
-X-Spam_bar: ------
-X-Spam_report: (-6.4 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-2.239,
- RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 00:42:41
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.959,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -78,233 +94,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: berrange@redhat.com, zhang.zhanghailiang@huawei.com, quintela@redhat.com,
- qemu-devel@nongnu.org, xiexiangyou@huawei.com, alex.chen@huawei.com,
- ann.zhuangyanying@huawei.com, fangying1@huawei.com
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Drop qxl object from softmmu source set, it is built as module.
 
+Also drop CONFIG_QXL condition from qxl_ss.add.  First because it is
+pointless, the whole thing is wrapped into "has_key('CONFIG_QXL')".
+Second because it doesn't work for some reason.  Looks like the source
+files are not added to the set for some reason and we end up with an
+empty hw-display-qxl.so.
 
-On 2020/8/26 20:35, Dr. David Alan Gilbert wrote:
-> * Chuan Zheng (zhengchuan@huawei.com) wrote:
->> Record hash results for each sampled page, crc32 is taken to calculate
->> hash results for each sampled 4K-page.
->>
->> Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
->> Signed-off-by: YanYing Zhuang <ann.zhuangyanying@huawei.com>
->> ---
->>  migration/dirtyrate.c | 136 ++++++++++++++++++++++++++++++++++++++++++++++++++
->>  migration/dirtyrate.h |  15 ++++++
->>  2 files changed, 151 insertions(+)
->>
->> diff --git a/migration/dirtyrate.c b/migration/dirtyrate.c
->> index f6a94d8..66de426 100644
->> --- a/migration/dirtyrate.c
->> +++ b/migration/dirtyrate.c
->> @@ -10,6 +10,7 @@
->>   * See the COPYING file in the top-level directory.
->>   */
->>  
->> +#include <zlib.h>
->>  #include "qemu/osdep.h"
->>  #include "qapi/error.h"
->>  #include "crypto/hash.h"
->> @@ -66,6 +67,141 @@ static void update_dirtyrate(uint64_t msec)
->>      DirtyStat.dirty_rate = dirtyrate;
->>  }
->>  
->> +/*
->> + * get hash result for the sampled memory with length of 4K byte in ramblock,
->> + * which starts from ramblock base address.
->> + */
->> +static uint32_t get_ramblock_vfn_hash(struct RamblockDirtyInfo *info,
->> +                                      uint64_t vfn)
->> +{
->> +    struct iovec iov_array;
->> +    uint32_t crc;
->> +
->> +    iov_array.iov_base = info->ramblock_addr +
->> +                         vfn * DIRTYRATE_SAMPLE_PAGE_SIZE;
->> +    iov_array.iov_len = DIRTYRATE_SAMPLE_PAGE_SIZE;
->> +
->> +    crc = crc32(0, iov_array.iov_base, iov_array.iov_len);
->> +
->> +    return crc;
->> +}
->> +
->> +static int save_ramblock_hash(struct RamblockDirtyInfo *info)
->> +{
->> +    unsigned int sample_pages_count;
->> +    int i;
->> +    int ret = -1;
->> +    GRand *rand = g_rand_new();
->> +
->> +    sample_pages_count = info->sample_pages_count;
->> +
->> +    /* ramblock size less than one page, return success to skip this ramblock */
->> +    if (unlikely(info->ramblock_pages == 0 || sample_pages_count == 0)) {
->> +        ret = 0;
->> +        goto out;
->> +    }
->> +
->> +    info->hash_result = g_try_malloc0_n(sample_pages_count,
->> +                                        sizeof(uint32_t));
->> +    if (!info->hash_result) {
->> +        ret = -1;
->> +        goto out;
->> +    }
->> +
->> +    info->sample_page_vfn = g_try_malloc0_n(sample_pages_count,
->> +                                            sizeof(uint64_t));
->> +    if (!info->sample_page_vfn) {
->> +        g_free(info->hash_result);
->> +        ret = -1;
->> +        goto out;
->> +    }
->> +
->> +    for (i = 0; i < sample_pages_count; i++) {
->> +        info->sample_page_vfn[i] = g_rand_int_range(rand, 0,
->> +                                                    info->ramblock_pages - 1);
->> +        info->hash_result[i] = get_ramblock_vfn_hash(info,
->> +                                                     info->sample_page_vfn[i]);
->> +    }
->> +    ret = 0;
->> +
->> +out:
->> +    g_rand_free(rand);
->> +    return ret;
->> +}
->> +
->> +static void get_ramblock_dirty_info(RAMBlock *block,
->> +                                    struct RamblockDirtyInfo *info,
->> +                                    struct DirtyRateConfig *config)
->> +{
->> +    uint64_t sample_pages_per_gigabytes = config->sample_pages_per_gigabytes;
->> +
->> +    /* Right shift 30 bits to calc block size in GB */
->> +    info->sample_pages_count = (qemu_ram_get_used_length(block) *
->> +                                sample_pages_per_gigabytes) >>
->> +                                DIRTYRATE_PAGE_SHIFT_GB;
->> +
->> +    /* Right shift 12 bits to calc page count in 4KB */
->> +    info->ramblock_pages = qemu_ram_get_used_length(block) >>
->> +                           DIRTYRATE_PAGE_SHIFT_KB;
->> +    info->ramblock_addr = qemu_ram_get_host_addr(block);
->> +    strcpy(info->idstr, qemu_ram_get_idstr(block));
->> +}
->> +
->> +static struct RamblockDirtyInfo *
->> +alloc_ramblock_dirty_info(int *block_index,
->> +                          struct RamblockDirtyInfo *block_dinfo)
->> +{
->> +    struct RamblockDirtyInfo *info = NULL;
->> +    int index = *block_index;
->> +
->> +    if (!block_dinfo) {
->> +        index = 0;
->> +        block_dinfo = g_try_new(struct RamblockDirtyInfo, 1);
->> +    } else {
->> +        index++;
->> +        block_dinfo = g_try_realloc(block_dinfo, (index + 1) *
->> +                                    sizeof(struct RamblockDirtyInfo));
->> +    }
->> +    if (!block_dinfo) {
->> +        return NULL;
->> +    }
->> +
->> +    info = &block_dinfo[index];
->> +    *block_index = index;
->> +    memset(info, 0, sizeof(struct RamblockDirtyInfo));
->> +
->> +    return block_dinfo;
->> +}
->> +
->> +static int record_ramblock_hash_info(struct RamblockDirtyInfo **block_dinfo,
->> +                                     struct DirtyRateConfig config,
->> +                                     int *block_index)
->> +{
->> +    struct RamblockDirtyInfo *info = NULL;
->> +    struct RamblockDirtyInfo *dinfo = NULL;
->> +    RAMBlock *block = NULL;
->> +    int index = 0;
->> +
->> +    RAMBLOCK_FOREACH_MIGRATABLE(block) {
->> +        dinfo = alloc_ramblock_dirty_info(&index, dinfo);
->> +        if (dinfo == NULL) {
->> +            return -1;
->> +        }
->> +        info = &dinfo[index];
->> +        get_ramblock_dirty_info(block, info, &config);
->> +        if (save_ramblock_hash(info) < 0) {
->> +            *block_dinfo = dinfo;
->> +            *block_index = index;
->> +            return -1;
->> +        }
->> +    }
->> +
->> +    *block_dinfo = dinfo;
->> +    *block_index = index;
->> +
->> +    return 0;
->> +}
->> +
->>  static void calculate_dirtyrate(struct DirtyRateConfig config)
->>  {
->>      /* todo */
->> diff --git a/migration/dirtyrate.h b/migration/dirtyrate.h
->> index 8e25d93..e3adead 100644
->> --- a/migration/dirtyrate.h
->> +++ b/migration/dirtyrate.h
->> @@ -24,6 +24,21 @@
->>   */
->>  #define RAMBLOCK_INFO_MAX_LEN                     256
->>  
->> +/*
->> + * Sample page size 4K as default.
->> + */
->> +#define DIRTYRATE_SAMPLE_PAGE_SIZE                4096
->> +
->> +/*
->> + * Sample page size 4K shift
->> + */
->> +#define DIRTYRATE_PAGE_SHIFT_KB                   12
->> +
->> +/*
->> + * Sample page size 1G shift
->> + */
->> +#define DIRTYRATE_PAGE_SHIFT_GB                   30
-> 
-> Your naming is really odd here;  'PAGE_SHIFT_KB' divides
-> by 4KB, where as 'PAGE_SHIFT_GB' divices by 1KB.
-> 
-> Simplify this;  you can just do >>30 for GB because it's well known;
-> you don't need a #define constant for simple KB,MB,GB since
-> we all know them.
-> 
-Hi, Dave.
-Thank you for review.
-OK, i will fix that in V6:)
-> Also, I've asked before - do you really want 4KB explicitly - or
-> should you just use TARGET_PAGE_SIZE and TARGET_PAGE_BITS ?
-> 
-> Dave
->
-TARGET_PAGE_SIZE will be 2M or 1G for HugePage.
-As you see, what we get is hash result of every 'virtual' 4K-page.
-We care about if it is dirty within 4K length in ramblock, which would be more
-accurate than TARGET_PAGE_SIZE which could be 2M or 1G.
-On the other hand, the hugepage will be broken up into 4K during migration.
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ hw/display/meson.build | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-I think it is better we do hash at 'virtual' 4K-page granularity.
-
->> +
->>  /* Take 1s as default for calculation duration */
->>  #define DEFAULT_FETCH_DIRTYRATE_TIME_SEC          1
->>  
->> -- 
->> 1.8.3.1
->>
+diff --git a/hw/display/meson.build b/hw/display/meson.build
+index 78adaf9db463..becbedd24c23 100644
+--- a/hw/display/meson.build
++++ b/hw/display/meson.build
+@@ -41,12 +41,10 @@ specific_ss.add(when: 'CONFIG_VGA', if_true: files('vga.c'))
+ 
+ if config_all_devices.has_key('CONFIG_QXL')
+   qxl_ss = ss.source_set()
+-  qxl_ss.add(when: 'CONFIG_QXL', if_true: files('qxl.c', 'qxl-logger.c', 'qxl-render.c'))
++  qxl_ss.add(files('qxl.c', 'qxl-logger.c', 'qxl-render.c'))
+   hw_display_modules += {'qxl': qxl_ss}
+ endif
+ 
+-softmmu_ss.add(when: 'CONFIG_QXL', if_true: files('qxl.c', 'qxl-logger.c', 'qxl-render.c'))
+-
+ softmmu_ss.add(when: 'CONFIG_DPCD', if_true: files('dpcd.c'))
+ softmmu_ss.add(when: 'CONFIG_XLNX_ZYNQMP_ARM', if_true: files('xlnx_dp.c'))
+ 
+-- 
+2.27.0
 
 
