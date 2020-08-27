@@ -2,91 +2,76 @@ Return-Path: <SRS0=k4hX=CF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C31CC433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 08:09:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63968C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 08:10:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EAE3920786
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 08:09:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2B45F20786
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 08:10:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ADau5dkr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EAE3920786
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=posteo.de header.i=@posteo.de header.b="Pjol1y0U"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B45F20786
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=posteo.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42984 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46236 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBCyG-0003BS-9T
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 04:09:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40730)
+	id 1kBCz9-0004Wt-DW
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 04:10:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40832)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kBCxR-000243-7V
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 04:08:29 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:54227)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kBCxP-0002Wk-LQ
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 04:08:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598515706;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=FROCTVvlWj1n9DsUQigcshmRnyeGhYdB6D4GIPXhDXw=;
- b=ADau5dkr9WczUoXHUmOld91m/VkPzWMm7kPLy0JU/VYwdrut9DGr5lELXUeVcBq3kyp2cQ
- +nmK+Rx8S1s5vMGcpIBTOyZaAb3/ED/ZFQxP0AOjPRsou1rYKbfwztG9u9z3Ku96aRSOFB
- +GbeFRYj7qzKFl4XCPGyXbkhZhZWgpk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-5-I1eFt_HpNuueq-rtOo3h5A-1; Thu, 27 Aug 2020 04:08:22 -0400
-X-MC-Unique: I1eFt_HpNuueq-rtOo3h5A-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 29934107464C;
- Thu, 27 Aug 2020 08:08:21 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-56.ams2.redhat.com [10.36.112.56])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3225660FC2;
- Thu, 27 Aug 2020 08:08:09 +0000 (UTC)
-Subject: Re: [PATCH v3 21/74] s390_flic: Move KVMS390FLICState typedef to
- header
+ (Exim 4.90_1) (envelope-from <th.huth@posteo.de>) id 1kBCy9-0003Fl-T6
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 04:09:14 -0400
+Received: from mout01.posteo.de ([185.67.36.65]:41668)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <th.huth@posteo.de>) id 1kBCy7-0002co-FQ
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 04:09:13 -0400
+Received: from submission (posteo.de [89.146.220.130]) 
+ by mout01.posteo.de (Postfix) with ESMTPS id 03866160063
+ for <qemu-devel@nongnu.org>; Thu, 27 Aug 2020 10:09:07 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=posteo.de; s=2017;
+ t=1598515748; bh=jN24SPAZ/2evUSql6i+TkrJg4i0SKVW8QMpUGDhoT0k=;
+ h=Subject:To:Cc:From:Date:From;
+ b=Pjol1y0Uc/nkRIn97V/5JZW/iu7ImoIajmi2UFh7BZdSd2YIPZh7lEn2EXMiUWVnz
+ fi1TKBMZUcQFC1Sr03MHoeFzkZaGX1N4N1KZ7qAV8WovGf40Jcjgh4WphKrTOfNTIT
+ hDd8PbDw3zdxXpKFQ1T9qoC9DYFkUYxjrdDyS08BOtARh8snq3amv9W3lyu2rQcZEo
+ pxoCzXKYcbuNdoHCQW0369mU85UTsOHWDJX3lygqOmblFS3N/+/424mpiGNfs3aJDC
+ Fc3AvU38UOe3HV+TtrjJi78ha+fjhYgOFDHfZVoaEk0g2m/F33j6qMbL00uj+DNGCz
+ QlN6qoJ8QeQgQ==
+Received: from customer (localhost [127.0.0.1])
+ by submission (posteo.de) with ESMTPSA id 4Bcb3Q3yZfz6tmR;
+ Thu, 27 Aug 2020 10:09:06 +0200 (CEST)
+Subject: Re: [PATCH v2 20/58] mcf_fec: Move mcf_fec_state typedef to header
 To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
-References: <20200825192110.3528606-1-ehabkost@redhat.com>
- <20200825192110.3528606-22-ehabkost@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <c3d48cf4-9461-5d52-3174-90581cc7d84a@redhat.com>
-Date: Thu, 27 Aug 2020 10:08:09 +0200
+References: <20200820001236.1284548-1-ehabkost@redhat.com>
+ <20200820001236.1284548-21-ehabkost@redhat.com>
+From: Thomas Huth <th.huth@posteo.de>
+Message-ID: <2ccb85c1-ee1b-bb0a-8a19-a9516325b878@posteo.de>
+Date: Thu, 27 Aug 2020 10:09:06 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20200825192110.3528606-22-ehabkost@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <20200820001236.1284548-21-ehabkost@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=thuth@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 02:10:07
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -52
-X-Spam_score: -5.3
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=185.67.36.65; envelope-from=th.huth@posteo.de;
+ helo=mout01.posteo.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 02:36:42
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -49
+X-Spam_score: -5.0
 X-Spam_bar: -----
-X-Spam_report: (-5.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.959,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-2.239, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+X-Spam_report: (-5.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-2.239,
+ RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,71 +84,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: Thomas Huth <huth@tuxfamily.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ Jason Wang <jasowang@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 25/08/2020 21.20, Eduardo Habkost wrote:
+On 20/08/2020 02.11, Eduardo Habkost wrote:
 > Move typedef closer to the type check macros, to make it easier
 > to convert the code to OBJECT_DEFINE_TYPE() in the future.
 > 
-> Acked-by: Cornelia Huck <cohuck@redhat.com>
 > Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
 > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 > ---
-> Changes v2 -> v3: none
-> 
 > Changes v1 -> v2: none
 > 
 > ---
-> Cc: Cornelia Huck <cohuck@redhat.com>
-> Cc: Thomas Huth <thuth@redhat.com>
-> Cc: Halil Pasic <pasic@linux.ibm.com>
-> Cc: Christian Borntraeger <borntraeger@de.ibm.com>
-> Cc: qemu-s390x@nongnu.org
+> Cc: Thomas Huth <huth@tuxfamily.org>
+> Cc: Jason Wang <jasowang@redhat.com>
 > Cc: qemu-devel@nongnu.org
 > ---
->  include/hw/s390x/s390_flic.h | 1 +
->  hw/intc/s390_flic_kvm.c      | 4 ++--
+>  include/hw/m68k/mcf_fec.h | 1 +
+>  hw/net/mcf_fec.c          | 4 ++--
 >  2 files changed, 3 insertions(+), 2 deletions(-)
 > 
-> diff --git a/include/hw/s390x/s390_flic.h b/include/hw/s390x/s390_flic.h
-> index 4687ecfe83..df11de9b20 100644
-> --- a/include/hw/s390x/s390_flic.h
-> +++ b/include/hw/s390x/s390_flic.h
-> @@ -75,6 +75,7 @@ typedef struct S390FLICStateClass {
->  } S390FLICStateClass;
+> diff --git a/include/hw/m68k/mcf_fec.h b/include/hw/m68k/mcf_fec.h
+> index eeb471f9c9..c09e33a57c 100644
+> --- a/include/hw/m68k/mcf_fec.h
+> +++ b/include/hw/m68k/mcf_fec.h
+> @@ -11,6 +11,7 @@
+>  #define HW_M68K_MCF_FEC_H
 >  
->  #define TYPE_KVM_S390_FLIC "s390-flic-kvm"
-> +typedef struct KVMS390FLICState KVMS390FLICState;
->  #define KVM_S390_FLIC(obj) \
->      OBJECT_CHECK(KVMS390FLICState, (obj), TYPE_KVM_S390_FLIC)
+>  #define TYPE_MCF_FEC_NET "mcf-fec"
+> +typedef struct mcf_fec_state mcf_fec_state;
+>  #define MCF_FEC_NET(obj) OBJECT_CHECK(mcf_fec_state, (obj), TYPE_MCF_FEC_NET)
 >  
-> diff --git a/hw/intc/s390_flic_kvm.c b/hw/intc/s390_flic_kvm.c
-> index a306b26faa..dbd4e682ce 100644
-> --- a/hw/intc/s390_flic_kvm.c
-> +++ b/hw/intc/s390_flic_kvm.c
-> @@ -29,12 +29,12 @@
->  #define FLIC_FAILED (-1UL)
->  #define FLIC_SAVEVM_VERSION 1
+>  #define FEC_NUM_IRQ 13
+> diff --git a/hw/net/mcf_fec.c b/hw/net/mcf_fec.c
+> index 281345862c..25e3e453ab 100644
+> --- a/hw/net/mcf_fec.c
+> +++ b/hw/net/mcf_fec.c
+> @@ -32,7 +32,7 @@ do { printf("mcf_fec: " fmt , ## __VA_ARGS__); } while (0)
+>  #define FEC_MAX_FRAME_SIZE 2032
+>  #define FEC_MIB_SIZE 64
 >  
-> -typedef struct KVMS390FLICState {
-> +struct KVMS390FLICState{
->      S390FLICState parent_obj;
+> -typedef struct {
+> +struct mcf_fec_state {
+>      SysBusDevice parent_obj;
 >  
->      uint32_t fd;
->      bool clear_io_supported;
-> -} KVMS390FLICState;
+>      MemoryRegion iomem;
+> @@ -56,7 +56,7 @@ typedef struct {
+>      uint32_t etdsr;
+>      uint32_t emrbr;
+>      uint32_t mib[FEC_MIB_SIZE];
+> -} mcf_fec_state;
 > +};
 >  
->  static KVMS390FLICState *s390_get_kvm_flic(S390FLICState *fs)
->  {
+>  #define FEC_INT_HB   0x80000000
+>  #define FEC_INT_BABR 0x40000000
 > 
 
 Reviewed-by: Thomas Huth <thuth@redhat.com>
-
 
