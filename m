@@ -2,97 +2,94 @@ Return-Path: <SRS0=k4hX=CF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-5.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	FSL_HELO_FAKE,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FD4BC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 19:08:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CE4AC433E3
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 19:18:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D8A13207CD
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 19:08:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5DC35207CD
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 19:18:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DD3biJR8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8A13207CD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bvZAg91t"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5DC35207CD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46122 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54786 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBNGS-0007De-5f
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 15:08:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58162)
+	id 1kBNPN-0002vA-MV
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 15:18:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60870)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kBNFk-0006lf-Lc
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 15:08:04 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:56154
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kBNFi-0006hd-9N
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 15:08:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598555281;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=FmLBlYC3RK3yZv508eyFChqFdZV6JB9A5hLMbREdZgA=;
- b=DD3biJR8FfsgU3MQNCwXOiTN13ELJN/cTAYtRcdNOjMcaivHbwsJrrg75o1nweF3umv/uB
- IGWru1afgtfT9UD9d9wlERzcXi8k9rpWcy3lNmCR/c4cGjNZrhPEo3XtchND7mZNnxYevk
- HgDcOlhzAkK1+z2eUdxAmzV5+Xq52qE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-457-YAxmpIQgNZ-_CDIdQInV6w-1; Thu, 27 Aug 2020 15:07:59 -0400
-X-MC-Unique: YAxmpIQgNZ-_CDIdQInV6w-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ECDF51054F8A;
- Thu, 27 Aug 2020 19:07:57 +0000 (UTC)
-Received: from localhost (unknown [10.10.67.254])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 78DD1747BD;
- Thu, 27 Aug 2020 19:07:53 +0000 (UTC)
-Date: Thu, 27 Aug 2020 15:07:52 -0400
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Igor Mammedov <imammedo@redhat.com>
-Subject: Re: [PATCH v5 0/8] Remove EPYC mode apicid decode and use generic
- decode
-Message-ID: <20200827190752.GK642093@habkost.net>
-References: <159804762216.39954.15502128500494116468.stgit@naples-babu.amd.com>
- <20200826143849.59f6970b@redhat.com>
- <20200826125059.GN168515@redhat.com>
- <20200826153034.115126cb@redhat.com>
- <20200826133638.GO168515@redhat.com>
- <20200826160258.0e9047f4@redhat.com>
- <20200826150340.GP168515@redhat.com>
- <20200827190314.717ec788@imammedo-mac>
+ (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
+ id 1kBNOp-0002Ud-AF
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 15:17:27 -0400
+Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:33771)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
+ id 1kBNOn-0008Fw-Ha
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 15:17:27 -0400
+Received: by mail-lj1-x244.google.com with SMTP id r13so4284681ljm.0
+ for <qemu-devel@nongnu.org>; Thu, 27 Aug 2020 12:17:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=5MmcG2WUG/QravcvfaUdLtMrqeg1UHkiH48156QYyvI=;
+ b=bvZAg91tMR+2JG88g9JOpE7++I3kfEWMq4WuqLbABbqFh8zyAguSzTs6mQJY/uzvy7
+ mWwrQg0ld5KefnZCOY+udrtkdnp7AFQK/HqnZh0xdYnVSzu4kSJCvgyV6DfcjF1Jk1OS
+ x7yw8lqjQF01t6HEHeFvdSByEkc7CKYpdYuYSHbBeeTDQXZDI8Cz3gDf2/4mT9N2aqHm
+ SvS0Hao8nTYKIjuO4oKQpGNNqFJeovrNl2USden04WkSmKa2fQ4ADuEO+9XjYhlVDq75
+ Hk5uibIitBb1d0FFA+UjoR0E50hS57LjX6zJ1IWmT2QShGPKVCDj1xcM2jSbg9CZ17Bq
+ VE1w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=5MmcG2WUG/QravcvfaUdLtMrqeg1UHkiH48156QYyvI=;
+ b=tpurUPeCx3AkTUGTyc7VIYix6EHKxdAnFGpY12kIwynZt1KqtEickRdHL8eECg3rPd
+ yXnDzWxhT1ONMxQH2H20Ad8YVTlkXQl+q1d5T5wPQGJ1uM3UwNl9pTRiR7AALuPk/i9e
+ wFtFbUP4MfLGzA2LL/5BjspDW9qY77lHz4YJiLCnNDZybPAlwwt9pvlEmT0NPYN0WduQ
+ XT2+wt4XQU8gZQU8/XnxEqUWE7vFH9CFRiiqup7yZ4HXw4Gg5asOruElWxFOmLo0it76
+ 70XehMUzqzKQqAmL0jAZR9SFViGgrF13fHuGHchCqxmp2+9jxIIHhwJUWCzEm4RJnSXX
+ C4Pg==
+X-Gm-Message-State: AOAM531U7jlqJLJAIjeaPM7w0VHx17skxUMM3EfGGrWgjoF/75+NHbiR
+ 2dg5lesOzTeuqEQt+HRDRz4=
+X-Google-Smtp-Source: ABdhPJzbmufDVzp6wOK0DJYSsOPBcuTBp6uvKcPbFAozPRJOVH3Ig2+sika7SpZruGCwHYkweg7lOw==
+X-Received: by 2002:a2e:8ed4:: with SMTP id e20mr11120851ljl.403.1598555843505; 
+ Thu, 27 Aug 2020 12:17:23 -0700 (PDT)
+Received: from gmail.com (81-231-232-130-no39.tbcn.telia.com. [81.231.232.130])
+ by smtp.gmail.com with ESMTPSA id l133sm716839lfd.74.2020.08.27.12.17.22
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 27 Aug 2020 12:17:22 -0700 (PDT)
+Date: Thu, 27 Aug 2020 21:17:22 +0200
+From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Subject: Re: [PATCH 62/77] target/microblaze: Try to keep imm and delay slot
+ together
+Message-ID: <20200827191722.GP2954729@toto>
+References: <20200825205950.730499-1-richard.henderson@linaro.org>
+ <20200825205950.730499-63-richard.henderson@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20200827190314.717ec788@imammedo-mac>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=ehabkost@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 02:56:52
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.959,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200825205950.730499-63-richard.henderson@linaro.org>
+Received-SPF: pass client-ip=2a00:1450:4864:20::244;
+ envelope-from=edgar.iglesias@gmail.com; helo=mail-lj1-x244.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 18
+X-Spam_score: 1.8
+X-Spam_bar: +
+X-Spam_report: (1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ FSL_HELO_FAKE=3.899, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,131 +102,158 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- mst@redhat.com, Michal Privoznik <mprivozn@redhat.com>, qemu-devel@nongnu.org,
- Babu Moger <babu.moger@amd.com>, pbonzini@redhat.com, rth@twiddle.net
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Aug 27, 2020 at 07:03:14PM +0200, Igor Mammedov wrote:
-> On Wed, 26 Aug 2020 16:03:40 +0100
-> Daniel P. Berrangé <berrange@redhat.com> wrote:
+On Tue, Aug 25, 2020 at 01:59:35PM -0700, Richard Henderson wrote:
+> If the last insn on a page is imm, or a branch with delay slot,
+> then end a tb early if this has not begun the tb.  If it has
+> begun the tb, then we can allow the tb to span two pages as if
+> the imm plus its consumer, or branch plus delay, or imm plus
+> branch plus delay, are a single insn.
 > 
-> > On Wed, Aug 26, 2020 at 04:02:58PM +0200, Igor Mammedov wrote:
-> > > On Wed, 26 Aug 2020 14:36:38 +0100
-> > > Daniel P. Berrangé <berrange@redhat.com> wrote:
-> > > 
-> > > > On Wed, Aug 26, 2020 at 03:30:34PM +0200, Igor Mammedov wrote:
-> > > > > On Wed, 26 Aug 2020 13:50:59 +0100
-> > > > > Daniel P. Berrangé <berrange@redhat.com> wrote:
-> > > > >   
-> > > > > > On Wed, Aug 26, 2020 at 02:38:49PM +0200, Igor Mammedov wrote:  
-> > > > > > > On Fri, 21 Aug 2020 17:12:19 -0500
-> > > > > > > Babu Moger <babu.moger@amd.com> wrote:
-> > > > > > >     
-> > > > > > > > To support some of the complex topology, we introduced EPYC mode apicid decode.
-> > > > > > > > But, EPYC mode decode is running into problems. Also it can become quite a
-> > > > > > > > maintenance problem in the future. So, it was decided to remove that code and
-> > > > > > > > use the generic decode which works for majority of the topology. Most of the
-> > > > > > > > SPECed configuration would work just fine. With some non-SPECed user inputs,
-> > > > > > > > it will create some sub-optimal configuration.
-> > > > > > > > Here is the discussion thread.
-> > > > > > > > https://lore.kernel.org/qemu-devel/c0bcc1a6-1d84-a6e7-e468-d5b437c1b254@amd.com/
-> > > > > > > > 
-> > > > > > > > This series removes all the EPYC mode specific apicid changes and use the generic
-> > > > > > > > apicid decode.    
-> > > > > > > 
-> > > > > > > the main difference between EPYC and all other CPUs is that
-> > > > > > > it requires numa configuration (it's not optional)
-> > > > > > > so we need an extra patch on top of this series to enfoce that, i.e:
-> > > > > > > 
-> > > > > > >  if (epyc && !numa) 
-> > > > > > >     error("EPYC cpu requires numa to be configured")    
-> > > > > > 
-> > > > > > Please no. This will break 90% of current usage of the EPYC CPU in
-> > > > > > real world QEMU deployments. That is way too user hostile to introduce
-> > > > > > as a requirement.
-> > > > > > 
-> > > > > > Why do we need to force this ?  People have been successfuly using
-> > > > > > EPYC CPUs without NUMA in QEMU for years now.
-> > > > > > 
-> > > > > > It might not match behaviour of bare metal silicon, but that hasn't
-> > > > > > obviously caused the world to come crashing down.  
-> > > > > So far it produces warning in linux kernel (RHBZ1728166),
-> > > > > (resulting performance might be suboptimal), but I haven't seen
-> > > > > anyone reporting crashes yet.
-> > > > > 
-> > > > > 
-> > > > > What other options do we have?
-> > > > > Perhaps we can turn on strict check for new machine types only,
-> > > > > so old configs can keep broken topology (CPUID),
-> > > > > while new ones would require -numa and produce correct topology.  
-> > > > 
-> > > > No, tieing this to machine types is not viable either. That is still
-> > > > going to break essentially every single management application that
-> > > > exists today using QEMU.
-> > > for that we have deprecation process, so users could switch to new CLI
-> > > that would be required.
-> > 
-> > We could, but I don't find the cost/benefit tradeoff is compelling.
-> > 
-> > There are so many places where we diverge from what bare metal would
-> > do, that I don't see a good reason to introduce this breakage, even
-> > if we notify users via a deprecation message. 
-> I find (3) and (4) good enough reasons to use deprecation.
+> If the insn in the delay slot faults, then the exception handler
+> will have reset the PC to the beginning of this sequence anyway,
+> via the stored D_FLAG and BIMM_FLAG bits.
 > 
-> > If QEMU wants to require NUMA for EPYC, then QEMU could internally
-> > create a single NUMA node if none was specified for new machine
-> > types, such that there is no visible change or breakage to any
-> > mgmt apps.  
-> 
-> (1) for configs that started without -numa &&|| without -smp dies>1,
->       QEMU can do just that (enable auto_enable_numa).
+> Disable all of this when single-stepping.
 
-Why exactly do we need auto_enable_numa with dies=1?
 
-If I understand correctly, Babu said earlier in this thread[1]
-that we don't need auto_enable_numa.
+Hi Richard,
 
-[1] https://lore.kernel.org/qemu-devel/11489e5f-2285-ddb4-9c35-c9f522d603a0@amd.com/
+We've got a Linux boot that fails after applying this patch.
+It goes from always working to only working like 1 out of 3 times.
+It fails deep in user-space so I don't have a good log for it.
+
+I guess we'll have to review this patch more.
+
+I can share images but the machine is (DTB) dynamic so it only runs with
+Xilinx QEMU 5.1 branch (I've backported your series for testing).
+
+Cheers,
+Edgar
 
 > 
-> (2) As for configs that are out of spec, I do not care much (junk in - junk out)
-> (though not having to spend time on bug reports and debug issues, just to say
-> it's not supported in the end, makes deprecation sound like a reasonable
-> choice)
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/microblaze/translate.c | 65 ++++++++++++++++++++++++++++++-----
+>  1 file changed, 56 insertions(+), 9 deletions(-)
 > 
-> (3) However if config matches bare metal i.e. CPU has more than 1 die and within
-> dies limits (spec wise), QEMU has to produce valid CPUs.
-> In this case QEMU can't make up multiple numa nodes and mappings of RAM/CPUs
-> on user's behalf. That's where we have to error out and ask for explicit
-> numa configuration.
+> diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
+> index 4675326083..fcfc1ac184 100644
+> --- a/target/microblaze/translate.c
+> +++ b/target/microblaze/translate.c
+> @@ -530,11 +530,50 @@ static void gen_idivu(TCGv_i32 out, TCGv_i32 ina, TCGv_i32 inb)
+>  DO_TYPEA_CFG(idiv, use_div, true, gen_idiv)
+>  DO_TYPEA_CFG(idivu, use_div, true, gen_idivu)
+>  
+> +/*
+> + * Try to keep the current instruction with the one following.
+> + * So if this insn is the last in the TB, and is not the first
+> + * in the TB, and we are not singlestepping, then back up and
+> + * exit the current TB.
+> + */
+> +static bool wait_for_next_tb(DisasContext *dc)
+> +{
+> +    if (dc->base.num_insns >= dc->base.max_insns
+> +        && !dc->base.singlestep_enabled) {
+> +        /* Also consider if this insn (e.g. brid) itself uses an imm. */
+> +        int ninsns = (dc->tb_flags & IMM_FLAG ? 2 : 1);
+> +
+> +        /*
+> +         * If this is not the first insn in the TB, back up and
+> +         * start again with a new TB.
+> +         */
+> +        if (dc->base.num_insns > ninsns) {
+> +            dc->base.pc_next -= ninsns * 4;
+> +            dc->base.num_insns -= ninsns;
+> +            dc->base.is_jmp = DISAS_TOO_MANY;
+> +            return true;
+> +        }
+> +
+> +        /*
+> +         * Correspondingly, if this is the first insn of the TB,
+> +         * then extend the TB as necessary to keep it with the
+> +         * next insn.  Do this by *reducing* the number of insns
+> +         * processed by this TB so that icount does fail an assertion.
+> +         */
+> +        if (dc->base.num_insns == ninsns) {
+> +            dc->base.num_insns = 0;
+> +        }
+> +    }
+> +    return false;
+> +}
+> +
+>  static bool trans_imm(DisasContext *dc, arg_imm *arg)
+>  {
+> -    dc->ext_imm = arg->imm << 16;
+> -    tcg_gen_movi_i32(cpu_imm, dc->ext_imm);
+> -    dc->tb_flags_to_set = IMM_FLAG;
+> +    if (!wait_for_next_tb(dc)) {
+> +        dc->ext_imm = arg->imm << 16;
+> +        tcg_gen_movi_i32(cpu_imm, dc->ext_imm);
+> +        dc->tb_flags_to_set = IMM_FLAG;
+> +    }
+>      return true;
+>  }
+>  
+> @@ -1311,12 +1350,17 @@ static void eval_cond_jmp(DisasContext *dc, TCGv_i32 pc_true, TCGv_i32 pc_false)
+>      tcg_temp_free_i32(zero);
+>  }
+>  
+> -static void dec_setup_dslot(DisasContext *dc)
+> +static bool dec_setup_dslot(DisasContext *dc)
+>  {
+> +    if (wait_for_next_tb(dc)) {
+> +        return true;
+> +    }
+> +
+>      dc->tb_flags_to_set |= D_FLAG;
+>      if (dc->type_b && (dc->tb_flags & IMM_FLAG)) {
+>          dc->tb_flags_to_set |= BIMM_FLAG;
+>      }
+> +    return false;
+>  }
+>  
+>  static void dec_bcc(DisasContext *dc)
+> @@ -1327,8 +1371,8 @@ static void dec_bcc(DisasContext *dc)
+>      cc = EXTRACT_FIELD(dc->ir, 21, 23);
+>      dslot = dc->ir & (1 << 25);
+>  
+> -    if (dslot) {
+> -        dec_setup_dslot(dc);
+> +    if (dslot && dec_setup_dslot(dc)) {
+> +        return;
+>      }
+>  
+>      if (dc->type_b) {
+> @@ -1402,9 +1446,10 @@ static void dec_br(DisasContext *dc)
+>          }
+>      }
+>  
+> -    if (dslot) {
+> -        dec_setup_dslot(dc);
+> +    if (dslot && dec_setup_dslot(dc)) {
+> +        return;
+>      }
+> +
+>      if (link && dc->rd) {
+>          tcg_gen_movi_i32(cpu_R[dc->rd], dc->base.pc_next);
+>      }
+> @@ -1513,7 +1558,9 @@ static void dec_rts(DisasContext *dc)
+>          return;
+>      }
+>  
+> -    dec_setup_dslot(dc);
+> +    if (dec_setup_dslot(dc)) {
+> +        return;
+> +    }
+>  
+>      if (i_bit) {
+>          dc->tb_flags |= DRTI_FLAG;
+> -- 
+> 2.25.1
 > 
-> For such configs, current code (since 5.0), will produce in the best case
-> performance issues  due to mismatching data in APICID, CPUID and ACPI tables,
-> in the worst case issues might be related to invalid APIC ID if running on EPYC host
-> and HW takes in account subfields of APIC ID (according to Babu real CPU uses
-> die_id(aka node_id) internally).
-> I'd rather error out on nonsense configs earlier than debug such issues
-> and than error out anyways later (upsetting more users).
-> 
-
-The requirements are not clear to me.  Is this just about making
-CPU die_id match the NUMA node ID, or are there additional
-constraints?
-
-
-> (4)
-> If I were non hobby user, I'd hate if QEMU allowed me to start invalid config,
-> that I'd have to spend time on debugging issues (including performance ones),
-> instead of clearly telling me what's wrong and how config should be corrected.
-> I'd probably jump to another hypervisor that does the job right,
-> instead of digging into QEMU codebase and CPU specs to figure out how
-> to hack and configure it.
-> 
-
--- 
-Eduardo
-
 
