@@ -2,89 +2,89 @@ Return-Path: <SRS0=k4hX=CF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E811C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 19:50:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86565C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 19:51:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 67A27207DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 19:50:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 515352080C
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 19:51:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HIwzGeIE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67A27207DF
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jDxas//h"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 515352080C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49942 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53346 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBNv1-0000OB-N6
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 15:50:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34584)
+	id 1kBNvr-0001jv-Il
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 15:51:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34428)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kBNUI-000094-DB
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 15:23:06 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:25227
- helo=us-smtp-1.mimecast.com)
+ id 1kBNTw-0007gT-MF
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 15:22:45 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:57070
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kBNUG-0000XC-6q
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 15:23:06 -0400
+ id 1kBNTr-0000V2-6j
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 15:22:44 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598556183;
+ s=mimecast20190719; t=1598556157;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=mBmnDkuEVMNVkcADTPvtKNeMp0nFpsqcBD6Cr7Tv/hc=;
- b=HIwzGeIEJoVNjnV7v0xoeHoXwYTs6BLipCGY0Z7j89AerKlTfYW3uR5EYvKJHJZK7l81wy
- XcNkOO6rH/uzigjVCDV2h35m3WEl7U3FHheFvi/c9qvti1UAu7YMDcjR7eGvxwavzT2OBw
- OP6JPRVJJJNXoHhdR3QMOwMCXDDU6gM=
+ bh=P847TqoNJFzJB2K8e6REplRN3E3O2/fiCQfD92kksM8=;
+ b=jDxas//h14yYIOnhZu+nLVrKqa2M4liE+ao3+tLo4vltWUhYHoz4WFp3YkNw/fAJq1iUiD
+ fdV660fhWUoJc1jVy3xXJda0GMwZ+h1v4y0wPNf81IjR6BlaXi8Pru7jo1+3H/gHa1R96O
+ GAgOE/E/zHMQAQNOfZXGWZIEjuZrD9Y=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-458-pykBTZoONk-xBdIYPNYmaA-1; Thu, 27 Aug 2020 15:23:01 -0400
-X-MC-Unique: pykBTZoONk-xBdIYPNYmaA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-390-ISvVBzAMMo-NrwHLB6XuSA-1; Thu, 27 Aug 2020 15:22:35 -0400
+X-MC-Unique: ISvVBzAMMo-NrwHLB6XuSA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DB3B81084C84;
- Thu, 27 Aug 2020 19:22:59 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 04F81189E616;
+ Thu, 27 Aug 2020 19:22:34 +0000 (UTC)
 Received: from localhost (unknown [10.10.67.254])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9B1485D9FC;
- Thu, 27 Aug 2020 19:22:59 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B7BAA19D61;
+ Thu, 27 Aug 2020 19:22:33 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: qemu-devel@nongnu.org,
 	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL 44/53] swim: Rename struct SWIM to Swim
-Date: Thu, 27 Aug 2020 15:21:13 -0400
-Message-Id: <20200827192122.658035-45-ehabkost@redhat.com>
+Subject: [PULL 33/53] vmbus: Move QOM macros to vmbus.h
+Date: Thu, 27 Aug 2020 15:21:02 -0400
+Message-Id: <20200827192122.658035-34-ehabkost@redhat.com>
 In-Reply-To: <20200827192122.658035-1-ehabkost@redhat.com>
 References: <20200827192122.658035-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
-X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=ehabkost@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 00:13:19
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=ehabkost@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 07:16:16
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.959,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,98 +97,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Laurent Vivier <laurent@vivier.eu>, Roman Bolshakov <r.bolshakov@yadro.com>,
- Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ Roman Bolshakov <r.bolshakov@yadro.com>,
+ =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Currently we have a SWIM typedef and a SWIM type checking macro,
-but OBJECT_DECLARE* would transform the SWIM macro into a
-function, and the function name would conflict with the SWIM
-typedef name.
+Move all declarations related to TYPE_VMBUS to the same place in
+vmbus.h.
 
-Rename the struct and typedef to "Swim". This will make future
-conversion to OBJECT_DECLARE* easier.
+This will make future conversion to OBJECT_DECLARE* easier.
 
+Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Acked-by: Laurent Vivier <laurent@vivier.eu>
 Tested-By: Roman Bolshakov <r.bolshakov@yadro.com>
-Message-Id: <20200825192110.3528606-50-ehabkost@redhat.com>
+Message-Id: <20200825192110.3528606-35-ehabkost@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- include/hw/block/swim.h |  6 +++---
- hw/block/swim.c         | 10 +++++-----
- 2 files changed, 8 insertions(+), 8 deletions(-)
+ include/hw/hyperv/vmbus-bridge.h | 3 +--
+ include/hw/hyperv/vmbus.h        | 4 ++++
+ hw/hyperv/vmbus.c                | 3 ---
+ 3 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/include/hw/block/swim.h b/include/hw/block/swim.h
-index 6add3499d0..9d8b65c561 100644
---- a/include/hw/block/swim.h
-+++ b/include/hw/block/swim.h
-@@ -67,10 +67,10 @@ struct SWIMCtrl {
- };
+diff --git a/include/hw/hyperv/vmbus-bridge.h b/include/hw/hyperv/vmbus-bridge.h
+index 33f93de64d..fe90bda01b 100644
+--- a/include/hw/hyperv/vmbus-bridge.h
++++ b/include/hw/hyperv/vmbus-bridge.h
+@@ -11,11 +11,10 @@
+ #define HW_HYPERV_VMBUS_BRIDGE_H
  
- #define TYPE_SWIM "swim"
--#define SWIM(obj) OBJECT_CHECK(SWIM, (obj), TYPE_SWIM)
-+#define SWIM(obj) OBJECT_CHECK(Swim, (obj), TYPE_SWIM)
+ #include "hw/sysbus.h"
++#include "hw/hyperv/vmbus.h"
  
--typedef struct SWIM {
-+typedef struct Swim {
+ #define TYPE_VMBUS_BRIDGE "vmbus-bridge"
+ 
+-typedef struct VMBus VMBus;
+-
+ typedef struct VMBusBridge {
      SysBusDevice parent_obj;
-     SWIMCtrl     ctrl;
--} SWIM;
-+} Swim;
- #endif
-diff --git a/hw/block/swim.c b/hw/block/swim.c
-index 74f56e8f46..20133a814c 100644
---- a/hw/block/swim.c
-+++ b/hw/block/swim.c
-@@ -387,7 +387,7 @@ static const MemoryRegionOps swimctrl_mem_ops = {
  
- static void sysbus_swim_reset(DeviceState *d)
- {
--    SWIM *sys = SWIM(d);
-+    Swim *sys = SWIM(d);
-     SWIMCtrl *ctrl = &sys->ctrl;
-     int i;
+diff --git a/include/hw/hyperv/vmbus.h b/include/hw/hyperv/vmbus.h
+index 40e8417eec..cd98ec24e7 100644
+--- a/include/hw/hyperv/vmbus.h
++++ b/include/hw/hyperv/vmbus.h
+@@ -26,6 +26,10 @@
+ #define VMBUS_DEVICE_GET_CLASS(obj) \
+     OBJECT_GET_CLASS(VMBusDeviceClass, (obj), TYPE_VMBUS_DEVICE)
  
-@@ -408,7 +408,7 @@ static void sysbus_swim_reset(DeviceState *d)
- static void sysbus_swim_init(Object *obj)
- {
-     SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
--    SWIM *sbs = SWIM(obj);
-+    Swim *sbs = SWIM(obj);
-     SWIMCtrl *swimctrl = &sbs->ctrl;
++#define TYPE_VMBUS "vmbus"
++typedef struct VMBus VMBus;
++#define VMBUS(obj) OBJECT_CHECK(VMBus, (obj), TYPE_VMBUS)
++
+ /*
+  * Object wrapping a GPADL -- GPA Descriptor List -- an array of guest physical
+  * pages, to be used for various buffers shared between the host and the guest.
+diff --git a/hw/hyperv/vmbus.c b/hw/hyperv/vmbus.c
+index 34392e892a..75af6b83dd 100644
+--- a/hw/hyperv/vmbus.c
++++ b/hw/hyperv/vmbus.c
+@@ -20,9 +20,6 @@
+ #include "cpu.h"
+ #include "trace.h"
  
-     memory_region_init_io(&swimctrl->iomem, obj, &swimctrl_mem_ops, swimctrl,
-@@ -418,7 +418,7 @@ static void sysbus_swim_init(Object *obj)
- 
- static void sysbus_swim_realize(DeviceState *dev, Error **errp)
- {
--    SWIM *sys = SWIM(dev);
-+    Swim *sys = SWIM(dev);
-     SWIMCtrl *swimctrl = &sys->ctrl;
- 
-     qbus_create_inplace(&swimctrl->bus, sizeof(SWIMBus), TYPE_SWIM_BUS, dev,
-@@ -460,7 +460,7 @@ static const VMStateDescription vmstate_sysbus_swim = {
-     .name = "SWIM",
-     .version_id = 1,
-     .fields = (VMStateField[]) {
--        VMSTATE_STRUCT(ctrl, SWIM, 0, vmstate_swim, SWIMCtrl),
-+        VMSTATE_STRUCT(ctrl, Swim, 0, vmstate_swim, SWIMCtrl),
-         VMSTATE_END_OF_LIST()
-     }
- };
-@@ -477,7 +477,7 @@ static void sysbus_swim_class_init(ObjectClass *oc, void *data)
- static const TypeInfo sysbus_swim_info = {
-     .name          = TYPE_SWIM,
-     .parent        = TYPE_SYS_BUS_DEVICE,
--    .instance_size = sizeof(SWIM),
-+    .instance_size = sizeof(Swim),
-     .instance_init = sysbus_swim_init,
-     .class_init    = sysbus_swim_class_init,
- };
+-#define TYPE_VMBUS "vmbus"
+-#define VMBUS(obj) OBJECT_CHECK(VMBus, (obj), TYPE_VMBUS)
+-
+ enum {
+     VMGPADL_INIT,
+     VMGPADL_ALIVE,
 -- 
 2.26.2
 
