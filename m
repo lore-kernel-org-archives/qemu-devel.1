@@ -8,79 +8,80 @@ X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0E1BC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 04:51:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57723C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 04:52:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8AB032078A
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 04:51:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 23A692078A
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 04:52:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C0m1ka4n"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8AB032078A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mnYqXqsK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 23A692078A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60730 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33494 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kB9tA-0007KZ-R4
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 00:51:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59572)
+	id 1kB9tZ-0007jS-EV
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 00:52:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59616)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kB9r8-0002uj-Di
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 00:49:46 -0400
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:46108)
+ id 1kB9rM-0003SB-D2
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 00:50:00 -0400
+Received: from mail-pf1-x431.google.com ([2607:f8b0:4864:20::431]:41134)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kB9r5-0003gk-Qs
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 00:49:46 -0400
-Received: by mail-pg1-x544.google.com with SMTP id 31so2446534pgy.13
- for <qemu-devel@nongnu.org>; Wed, 26 Aug 2020 21:49:43 -0700 (PDT)
+ id 1kB9rK-0003if-TC
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 00:50:00 -0400
+Received: by mail-pf1-x431.google.com with SMTP id t9so2524262pfq.8
+ for <qemu-devel@nongnu.org>; Wed, 26 Aug 2020 21:49:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=7+MsaJjYLlKc/kuo4dhCFuDpn67NQClb7RmuHL3RlA8=;
- b=C0m1ka4nMOIT8pbURzi32/XLZXhAAVj/llq5s7GnnlYPsVjBuzyUf647/wcrQxfECB
- shePWwDQBmS9T3WJhd3Oq9/vck9BCmcJvp1sTaf01DHOxtpBF0P1IO6jvf0d6bsux1Wz
- J8yCj6YDPQl+fmfH5Xssk7FVqq20ijww/51e7SDGo3I80VD3/DNgmSXk4v8wlhP4WFV/
- RKJKucHsUr96aQRn9GIPjJwZgSt+lZ88nQEAI7cCFi3FD4c7Tnz3C98iWsvhCBpESsDR
- zOgK/ILy4yogUhy5sJPpxSzZ/D/3tLjTUFco4n7bIGkbpL22jzdZXtJR6Yoq5R2kYZYc
- j5sA==
+ bh=kZmgaDEBNjpxaFbsHI9krVOWSzauPOV79k08lIpZd10=;
+ b=mnYqXqsKTtbQIH6/GS/xi23dYMopeW/QeA0sIyy+n9jIMxPIcAgdtMDb1Ik4JSaeKv
+ 0KsI1ywEcNzYst2JHICcrBt5tqLyAkzFKD21TDQYx5BPQcY+0HDcle9HszXAiEQtzpC8
+ gGPtUeVl9Es7bc44JlhHnCBq3B70TO5Wix8NcSGYrmKT8MpnfUzlkhj7FIrdmaNXIxOJ
+ 1CmMW1fTIbm6pOZ+0OiLJW+eRTwgvhM2wCiFTw8MuqQexI8T6quSpeRlRMnRYbBZ4PDA
+ KiUvFXDs04sj46TR9zP1LuD7cJ76zXrLW61GsVu2/TiGCquiydD1GYnEtgeUw78PgYE3
+ gw8w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=7+MsaJjYLlKc/kuo4dhCFuDpn67NQClb7RmuHL3RlA8=;
- b=GPSvHtbkBDJcN6uN2pvaOSMr1eblAa6s5+dRtmfAxHoqGzhcWsnI1Yuciog6knM394
- czgKzd6oWOklVQ+owWdP6VMSr7gyS6dHWjtiv1xqhW4bedyClwDojE3Pdy2zHwrBzQyL
- S629NtGwF9nAesk3/FftdXQ/5mx7i5CzmHrRFmXrMlq/fu4r1SmaZJF4BPQlCscMABYF
- AGt1l3sZOhZbfV8+tgMDZZmVo0kaUZwxbXVgVHchp9/YD2hzQR5NryR/o2ak5n8FV0jx
- PK8uBA9clX99DU3a9WlxKzicjwL+Q3s0CPf6gOpXdL1Xw0P29gHNfzT5w788wLKqxOUy
- otFQ==
-X-Gm-Message-State: AOAM532PKUT76WjOUs6BjwL3X5SeEJ8yNP9hKjqa+m/AzwaNL0mrTjKt
- HiwbbOZXjXjtxG7KuCzwcZduF50wzeNdXb7VZiU=
-X-Google-Smtp-Source: ABdhPJygoErTZpcYOEEZIwnw2ndhPQz3lOJ5nJTBI3YErIW/Z5+AEZKvx+BSQtXWbF/NPceT0FmMFw==
-X-Received: by 2002:a17:902:bf01:: with SMTP id
- bi1mr14688209plb.118.1598503781986; 
- Wed, 26 Aug 2020 21:49:41 -0700 (PDT)
+ bh=kZmgaDEBNjpxaFbsHI9krVOWSzauPOV79k08lIpZd10=;
+ b=sudiQBUAeGcZsyJlnwUlzNKRBe6uW75DiI1Ie8EqA8T5PB1KCTUBYGm55l89JO1TYF
+ zVw7IEhEp1LembyNqz36jORxjN3qT6KDq475hUPKj6KXayFjvAuEsGDWvqISAuEEHH7X
+ 6c0iILKuOu1gNh6xohBfFPI9fdo6+1jY4doiO0GrfAoVCQwHPmTxktTNPndZsnWPiOuj
+ dy8Xg6Z9LJQplsX/ri49tz5FpQQ6dBe12Sv1J0rwbIv+HhFo+XwDhMpB+bJD3yu5t44P
+ OXbq03cDJxAFTLMvJTHcqVZleFHEIlKeCP7HDFHSs8eUEwKBxuArl3jQHaLyatZ2ArSH
+ Wyew==
+X-Gm-Message-State: AOAM530mg602/qQgLnUQ3sMFN8zvCIj1gdSf1rtzkNNlZYplZwxP3KSX
+ iBGc819oz1mzxFYa71WipkSJUgl30AL0SLtBFxU=
+X-Google-Smtp-Source: ABdhPJyB7jUpg2txTcOAjfkTu1Uhd106g3LZjOCTGz3xYHrZZhAVdzUlj1GjfLUNLrEEEdQNzpowrQ==
+X-Received: by 2002:a17:902:9690:: with SMTP id
+ n16mr11900274plp.305.1598503797093; 
+ Wed, 26 Aug 2020 21:49:57 -0700 (PDT)
 Received: from localhost.localdomain ([2401:c080:1c01:4fe:5400:2ff:fef1:b056])
  by smtp.googlemail.com with ESMTPSA id
- n26sm902296pff.30.2020.08.26.21.49.38
+ n26sm902296pff.30.2020.08.26.21.49.53
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 26 Aug 2020 21:49:41 -0700 (PDT)
+ Wed, 26 Aug 2020 21:49:56 -0700 (PDT)
 From: luoyonggang@gmail.com
 To: qemu-devel@nongnu.org
-Subject: [PATCH 2/6] meson: fixes relpath may fail on win32.
-Date: Thu, 27 Aug 2020 12:49:13 +0800
-Message-Id: <20200827044917.1356-3-luoyonggang@gmail.com>
+Subject: [PATCH 5/6] meson: Fixes ninjatool can not be recognized as script
+ under Window/MSYS2
+Date: Thu, 27 Aug 2020 12:49:16 +0800
+Message-Id: <20200827044917.1356-6-luoyonggang@gmail.com>
 X-Mailer: git-send-email 2.27.0.windows.1
 In-Reply-To: <20200827044917.1356-1-luoyonggang@gmail.com>
 References: <20200827044917.1356-1-luoyonggang@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::544;
- envelope-from=luoyonggang@gmail.com; helo=mail-pg1-x544.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::431;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pf1-x431.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -110,38 +111,26 @@ Sender: "Qemu-devel"
 
 From: Yonggang Luo <luoyonggang@gmail.com>
 
-On win32, os.path.relpath would raise exception when do the following relpath:
-C:/msys64/mingw64/x.exe relative to E:/path/qemu-build would fail.
-So we try catch it for stopping it from raise exception on msys2
+use ninja instead ${build_path}/ninjatool
 
 Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
 ---
- scripts/mtest2make.py | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+ configure | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/scripts/mtest2make.py b/scripts/mtest2make.py
-index bdb257bbd9..d7a51bf97e 100644
---- a/scripts/mtest2make.py
-+++ b/scripts/mtest2make.py
-@@ -53,9 +53,16 @@ i = 0
- for test in json.load(sys.stdin):
-     env = ' '.join(('%s=%s' % (shlex.quote(k), shlex.quote(v))
-                     for k, v in test['env'].items()))
--    executable = os.path.relpath(test['cmd'][0])
-+    executable = test['cmd'][0]
-+    try:
-+        executable = os.path.relpath(executable)
-+    except:
-+        pass
-     if test['workdir'] is not None:
--        test['cmd'][0] = os.path.relpath(test['cmd'][0], test['workdir'])
-+        try:
-+            test['cmd'][0] = os.path.relpath(executable, test['workdir'])
-+        except:
-+            test['cmd'][0] = executable
-     else:
-         test['cmd'][0] = executable
-     cmd = '$(.test.env) %s %s' % (env, ' '.join((shlex.quote(x) for x in test['cmd'])))
+diff --git a/configure b/configure
+index 3b9e79923d..2ad0c58492 100755
+--- a/configure
++++ b/configure
+@@ -8222,7 +8222,7 @@ fi
+ mv $cross config-meson.cross
+ 
+ rm -rf meson-private meson-info meson-logs
+-NINJA="${build_path}/ninjatool" $meson setup \
++NINJA="ninja" $meson setup \
+         --prefix "${pre_prefix}$prefix" \
+         --libdir "${pre_prefix}$libdir" \
+         --libexecdir "${pre_prefix}$libexecdir" \
 -- 
 2.27.0.windows.1
 
