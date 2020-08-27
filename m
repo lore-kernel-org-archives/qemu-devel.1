@@ -2,126 +2,93 @@ Return-Path: <SRS0=k4hX=CF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,RCVD_ILLEGAL_IP,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74218C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 15:54:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3195C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 15:56:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 374522087D
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 15:54:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BDDA52087D
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 15:56:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="GROkznrg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 374522087D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RUkt22ZL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDDA52087D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41986 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44194 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBKE4-0002Uk-Dz
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 11:54:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60686)
+	id 1kBKG8-0003jy-2a
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 11:56:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32934)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <Thomas.Lendacky@amd.com>)
- id 1kBKDI-0001qz-VG
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 11:53:21 -0400
-Received: from mail-eopbgr690075.outbound.protection.outlook.com
- ([40.107.69.75]:44934 helo=NAM04-CO1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <Thomas.Lendacky@amd.com>)
- id 1kBKDG-0002GU-Nb
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 11:53:20 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=G4L7Dpz+wCu6jnDwkYgrxjhcL2XBdsn5v6BXnO78vJzB0UXYrRq9tASKEpMAwC72vzV5geF43SJ3TsyUdRar4kS3j2CErY2azVzFjghRPc7jhjyGq/CdbMG55mIXRyng1+X69uQHonfkAAKyf0sMfLyfdqjKNQ45bxMv9aiIFZrYuBFFGIuKvoKsJmYaxbjbJahChz7xlvrB92VES3+kWj+CAX9507DoJHB37Ejb2QaGbBRe4j0T1moCNDkzCUr2uyH3JGBD3Eqt8hIiBIuN0mCL52cyDL5a0Y1mGv4LExEH2Q0DniaK5+5ugGGlLKAw/iRZT2zMbHf0mYok+yvXSQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TmX5UKo4Sh5d3rsLlCaDrFwq6J5U68wIG+U3QNRBYZU=;
- b=jWUZsoZKOwmBiL+tJnqxr5AK+dEKC1d5mgcDBPMZNoITnEYQd9xLC/BXo/ntC9F0f7nBmygmUdc0lXJkVPzTkXBguNaDFhiubJA704O0xUtdBIkbarRwnFAuJX5rmPiUL4IVE49LIs0LFXvpYpHReBa4KvJwbWBpb5C1Eel/s0wm/IndEH03gxyxjj/yS/Eqzyr/LOD6sGrKweuyEFWw1hV5TYh17jEWOGtRy4KsmrMaxdzul49exWPQ2pvJjkL869LmnSck82Hl6adwpPCidUOzv5VFEYMRw7tXhpvXqNOt5ZSgDW/X/PFRlB4MwIdRUp3dpFpJoU+P1BejzsKVwQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TmX5UKo4Sh5d3rsLlCaDrFwq6J5U68wIG+U3QNRBYZU=;
- b=GROkznrgYWwfCDvgpuZRA3mrFC24mAWGejogCbv5GngpumrING2x9Ex/YxfSKrS2uH74SBW+c7Yod1O0XnLs3hSmW0Wpvuy3yA+iWSMF92TvBKY7tSOEQMcphWuDpwpHjuq68ZfgFsGbdNWZVcDJX+qV0fphldbm2MmpD1k02t4=
-Authentication-Results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=amd.com;
-Received: from DM5PR12MB1355.namprd12.prod.outlook.com (2603:10b6:3:6e::7) by
- DM6PR12MB3082.namprd12.prod.outlook.com (2603:10b6:5:11b::12) with
- Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3326.19; Thu, 27 Aug 2020 15:53:15 +0000
-Received: from DM5PR12MB1355.namprd12.prod.outlook.com
- ([fe80::299a:8ed2:23fc:6346]) by DM5PR12MB1355.namprd12.prod.outlook.com
- ([fe80::299a:8ed2:23fc:6346%3]) with mapi id 15.20.3305.032; Thu, 27 Aug 2020
- 15:53:15 +0000
-Subject: Re: [PATCH 0/4] SEV-ES guest support
-From: Tom Lendacky <thomas.lendacky@amd.com>
-To: qemu-devel@nongnu.org, kvm@vger.kernel.org
-References: <cover.1598382343.git.thomas.lendacky@amd.com>
-Message-ID: <4a529793-5448-458e-d9a8-31a8aa39f67c@amd.com>
-Date: Thu, 27 Aug 2020 10:53:13 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-In-Reply-To: <cover.1598382343.git.thomas.lendacky@amd.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SN4PR0501CA0128.namprd05.prod.outlook.com
- (2603:10b6:803:42::45) To DM5PR12MB1355.namprd12.prod.outlook.com
- (2603:10b6:3:6e::7)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1kBKFK-000383-1L
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 11:55:26 -0400
+Received: from mail-io1-xd31.google.com ([2607:f8b0:4864:20::d31]:34469)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1kBKFI-0002iS-Dx
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 11:55:25 -0400
+Received: by mail-io1-xd31.google.com with SMTP id w20so6368881iom.1
+ for <qemu-devel@nongnu.org>; Thu, 27 Aug 2020 08:55:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=q1B9kk+5MosqY7eiNhAa3L1BMIITtrbcQ+a4wQ1HsV0=;
+ b=RUkt22ZLtMd7MVEJbFmVWUBxutUc0gV2gVyZfH46+QILQY1k7liGEWj0vOdeQ2nAAh
+ aLYBcPiBORuIU/o5JPegMwUcCMLRnGCBvHVReu2aKizKW3aatFaz8r7/4DK5TFwx3kfN
+ rtQTHfqw5WwT+S7xFh+6c9Ev+HYeXjzRQYAJ+JR73x7rGDT0wleYfIOoqcuQtOATWuHy
+ 50PvusqM7ZlIHVYaUW5Zav7xMETQy242PNBawcuYax2wQnV4QaY+NoST2DPnO2DM5Xa4
+ mhMxqbmvsk6sFsdkGOFDqLb0aW/1cjxSa/dtGfqVyZg1J6vSwID9AH04hUP5QCbgMDzu
+ JJSw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=q1B9kk+5MosqY7eiNhAa3L1BMIITtrbcQ+a4wQ1HsV0=;
+ b=hFArDQ5yUAaQO7L+gC8cvc4WNS6daBpZTvsbXD9w66VX1dwy8/lY3qv3XZWKfnX0JQ
+ HPtN9aCOt7tXMzvMv9tyzFXuy6/hZH4eLyvgsmIqEX6BCFID2zvhf7le9Hp1lzkaL8+a
+ SsamMzMO8L3Xe2xHkzCC7WCW1mRBrQroFBOZhBJSyVtNqFT6PeQyZNUlsNiNnueSsi4h
+ siJYuiWuOvacoCinHSZm+TwtRSuvursMzSQHzyNuX1/xOtOUYwAhDCkxmqo8Qy2IOwz4
+ K0TQByfGLVFrDnG7L/AsEE/m1crYzywl/g8hTKMguqST5DRuf6CzpjKPRAtxzZxNHd4j
+ Y9dQ==
+X-Gm-Message-State: AOAM533jnwx1sx6fIXz9byPVwR7fCBSbtdPwoNjs/VoYkFymwhek8gMS
+ jGLleo4ZAPwiY15+46UwaE9cDosrKgH0PkV0vwk=
+X-Google-Smtp-Source: ABdhPJw12OUnZP1HBKc9wZwYojuIrXxSd6h6ciXdyu6r0A/T3InUKZPh6UIv2RcKyaeHLMKX5QytPP5dyKAaVeC40jM=
+X-Received: by 2002:a6b:400e:: with SMTP id k14mr17221463ioa.175.1598543722703; 
+ Thu, 27 Aug 2020 08:55:22 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from 255.255.255.255 (255.255.255.255) by
- SN4PR0501CA0128.namprd05.prod.outlook.com (2603:10b6:803:42::45) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3326.10 via Frontend
- Transport; Thu, 27 Aug 2020 15:53:14 +0000
-X-Originating-IP: [67.79.209.213]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: d9366339-f740-49f6-0102-08d84aa14ef6
-X-MS-TrafficTypeDiagnostic: DM6PR12MB3082:
-X-Microsoft-Antispam-PRVS: <DM6PR12MB3082BA0F1F57149437EB15E0EC550@DM6PR12MB3082.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:6430;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 4HR5gJNRBl8EEAckCBu1CGHGVE8JaY0nv4+EK2GYL9TNQpg9pcDdwZxFLuGvAgm9Rfu+4dV1sA/QbkljiOmM7s2Cx7RXDuGcsHqTyyD6EdWnzH1baWf6UZOOBHAQ9vCzcWcam3ZqW3KhkKdZOPS5SFQRyAdPhaM/IN+pYwGDHJuADKz4ZNwmNd9gptpe4zk5njSYmKrZQqeUeEMCknp7Db2+zFsqSA/shGd1iHrldc+NMv1h9b7SDA9fBXCbLEnUbf8iBOBTNX7ADRTmN7BrjtnNfu5zPXRqZb/uZepPUa+gduhQ/DKL7SuBydjZFE8KktdyeEhkRjswXDmc89oky0h2ijIdrTgYFzUYMkV/mhu9vLzrax1Fm5ub1Uq6b7YvqMfqs1XHupfGKMLGP/KsEccKbAOW0yCMS+mUyb6ZmXrEPCqrFhnj9a6x4uEKQVddwlKry4ceI+yWPbjG1WsghA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:DM5PR12MB1355.namprd12.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(346002)(376002)(39860400002)(136003)(396003)(366004)(2906002)(5660300002)(6486002)(54906003)(36756003)(966005)(478600001)(31686004)(53546011)(186003)(83380400001)(52116002)(26005)(4326008)(8936002)(2616005)(8676002)(956004)(66556008)(7416002)(316002)(86362001)(16576012)(66946007)(31696002)(66476007)(43740500002);
- DIR:OUT; SFP:1101; 
-X-MS-Exchange-AntiSpam-MessageData: OTfGjScodq1nlHOiQ2ESv0QY0fcl+sS1OIrSRIkdxLKrzm5N3Ec804v950hiMmP+4w2VThstEpESClqFj3YtsulzE293xbog6cECUe7Lkpuxf18JZX7vwlRvyWnHfTbFnq4z3J3YWtGWtRh+Bdh9DuHkqkYoA4D03/QJcPW5G1h3cATdSqKoEh6hF12cK2vfiSBwL5AtOEs5YXNH50fnJXA/RAInisKmlVT4zHEiPPuhkp44eU0u/xW3yuvxBc9GQn/Im5QDIc/IeMsu1EGE0B91BHcFREizJ6PpBAuxmtNz1BONQtn7/7dmNRL49xdo2Uf2X74HUPw0a+ybK2QOXtp26C84BDRF5Mm7BYlqpEGMiJhUpnGV0hcyefwpqK9pVsVvXcQOxrb7wHpo51hYij+hV5e57MPyvktTxlTmUe+7g5G4FwngwFBNA29BiRIk5W5SJ1EVQZ3ZATprcc6gz59N76dZWw/lur4yB1zM2c9wWZAASgtw/exMINfg9zqE6+5jMRB7eWxeOfqynF3RLaFKNZiSbI8xEyJlrPZXuLI7CwqBlyawh7GHqRVlv4V+oB4aMm6ip2MLl4RfDCxGfrgo1gzdLtYzHCw1ddGYLmHNHbu7PT32eWH57d0VWP98utfADxE2gEQMNbmZ4vrm9Q==
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d9366339-f740-49f6-0102-08d84aa14ef6
-X-MS-Exchange-CrossTenant-AuthSource: DM5PR12MB1355.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Aug 2020 15:53:15.0850 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: LWgjoN21iZTkyW5ibepV1eIGphzwFzq8Pb793CUYox6KQej2Gkda94Ukcm5iRb2DCtMLiXt/kMaq6QRk4uXEnw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3082
-Received-SPF: none client-ip=40.107.69.75;
- envelope-from=Thomas.Lendacky@amd.com;
- helo=NAM04-CO1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 11:53:16
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -13
-X-Spam_score: -1.4
+References: <20200825184836.1282371-1-alistair.francis@wdc.com>
+ <CAFEAcA8=Mf=EPh__tNhJyGv8+ouD-HH+MuMb+HhtTFes+XqUSQ@mail.gmail.com>
+ <CAKmqyKNxURXyNSEePPU1jY7FzcZjRThr2qAvwR393+nqUXBxJQ@mail.gmail.com>
+ <CAFEAcA8x=ck1mmJ8Y8o-0NQXWhRgOg5Gp7GvHNkNnLb6rDxygg@mail.gmail.com>
+ <CAKmqyKP6OUoaR6iZ6SD6qZPvYF0bKqpB_rRNeQOteg8BtcqKeQ@mail.gmail.com>
+ <CAEUhbmWN93n1JoGszsW6WrkGbdFD6VsGyi7Ji6bS6wF+DbMOBw@mail.gmail.com>
+ <CAFEAcA9026WV-t5Q9EbV-nZi+6GZ3WoKCx2tA9QeAXu5iD5ryg@mail.gmail.com>
+ <CAEUhbmWv52oeQb6z3JTpa16utD2NmB1sKZ-sT7uD1R8_3KwNMw@mail.gmail.com>
+In-Reply-To: <CAEUhbmWv52oeQb6z3JTpa16utD2NmB1sKZ-sT7uD1R8_3KwNMw@mail.gmail.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Thu, 27 Aug 2020 08:44:37 -0700
+Message-ID: <CAKmqyKPtrKfcdmEt6NSLa4ZqmjqVUHL_DHzLLZPUoB-xDek6Pw@mail.gmail.com>
+Subject: Re: [PULL 00/18] riscv-to-apply queue
+To: Bin Meng <bmeng.cn@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::d31;
+ envelope-from=alistair23@gmail.com; helo=mail-io1-xd31.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
 X-Spam_bar: -
-X-Spam_report: (-1.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, FORGED_SPF_HELO=1, MSGID_FROM_MTA_HEADER=0.001,
- NICE_REPLY_A=-1.782, RCVD_ILLEGAL_IP=1.3, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
- SPF_NONE=0.001 autolearn=no autolearn_force=no
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -134,106 +101,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S . Tsirkin" <mst@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Jiri Slaby <jslaby@suse.cz>,
- Richard Henderson <rth@twiddle.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/25/20 2:05 PM, Tom Lendacky wrote:
-> From: Tom Lendacky <thomas.lendacky@amd.com>
-> 
-> This patch series provides support for launching an SEV-ES guest.
+On Wed, Aug 26, 2020 at 3:06 AM Bin Meng <bmeng.cn@gmail.com> wrote:
+>
+> Hi Peter,
+>
+> On Wed, Aug 26, 2020 at 5:25 PM Peter Maydell <peter.maydell@linaro.org> wrote:
+> >
+> > On Wed, 26 Aug 2020 at 04:21, Bin Meng <bmeng.cn@gmail.com> wrote:
+> > > On Wed, Aug 26, 2020 at 6:41 AM Alistair Francis <alistair23@gmail.com> wrote:
+> > > > Richard and Philippe review patches and some of the RISC-V patches get
+> > > > reviewed by the RISC-V community. The main problem (which is a common
+> > > > problem in open source) is that large technical patch series just get
+> > > > ignored.
+> > >
+> > > Yep, I am only comfortable reviewing patches which I have confidence
+> > > in. Right now I am not working on any H- or V - extension for RISC-V
+> > > so I cannot contribute to any review of these large numbers of H- or
+> > > V- extension related patches. Sorry!
+> >
+> > So, everybody has a ton of work they need to do and only a limited
+> > amount of time they might have for code review, so it's important to
+> > prioritise. But I would encourage you, and other people contributing
+> > to RISC-V parts of QEMU, to at least sometimes review changes that are
+> > a little bit out of your "comfort zone" if nobody else seems to be
+> > doing so. Review can find bugs, areas that are confusing or need
+> > comments, etc, even without a thorough knowledge of the relevant spec.
+> > (In fact, not knowing the spec can help in identifying where
+> > explanatory comments can help the reader!) And for the project it means
+> > we have more people who at least have some idea of what that bit of code
+> > is doing. Review that is limited to "this code seems to make sense but
+> > I haven't checked it against the spec" is better than patches getting
+> > no review at all, I think. And it's a good way to build your knowledge
+> > of the codebase and the architecture over time.
+>
+> Agree. I really wanted to spend more time on this project but like you
+> said it's priorities.
+>
+> One thing I do not understand is that according to MAINTAINTERS there
+> are 4 custodians for the RISC-V maintenance work but it looks to me so
+> far only Alistair is actively reviewing patches. I know Palmer used to
+> review patches but if it's only one person that might be some issues.
+> At least MAINTAINTERS can cross-review, and we have 4 there.
 
-I've made the changes associated with the checkpatch script output. I'll 
-wait a few more days for other feedback before submitting a v2.
+Yeah, most of the people in the RISC-V MAINTAINERS file are inactive.
+Besides Palmer and myself I haven't seen an email from anyone.
 
-Sorry about the miss in regards to running checkpatch.
+Alistair
 
-Thanks,
-Tom
 
-> 
-> Secure Encrypted Virtualization - Encrypted State (SEV-ES) expands on the
-> SEV support to protect the guest register state from the hypervisor. See
-> "AMD64 Architecture Programmer's Manual Volume 2: System Programming",
-> section "15.35 Encrypted State (SEV-ES)" [1].
-> 
-> In order to allow a hypervisor to perform functions on behalf of a guest,
-> there is architectural support for notifying a guest's operating system
-> when certain types of VMEXITs are about to occur. This allows the guest to
-> selectively share information with the hypervisor to satisfy the requested
-> function. The notification is performed using a new exception, the VMM
-> Communication exception (#VC). The information is shared through the
-> Guest-Hypervisor Communication Block (GHCB) using the VMGEXIT instruction.
-> The GHCB format and the protocol for using it is documented in "SEV-ES
-> Guest-Hypervisor Communication Block Standardization" [2].
-> 
-> The main areas of the Qemu code that are updated to support SEV-ES are
-> around the SEV guest launch process and AP booting in order to support
-> booting multiple vCPUs.
-> 
-> There are no new command line switches required. Instead, the desire for
-> SEV-ES is presented using the SEV policy object. Bit 2 of the SEV policy
-> object indicates that SEV-ES is required.
-> 
-> The SEV launch process is updated in two ways. The first is that a the
-> KVM_SEV_ES_INIT ioctl is used to initialize the guest instead of the
-> standard KVM_SEV_INIT ioctl. The second is that before the SEV launch
-> measurement is calculated, the LAUNCH_UPDATE_VMSA SEV API is invoked for
-> each vCPU that Qemu has created. Once the LAUNCH_UPDATE_VMSA API has been
-> invoked, no direct changes to the guest register state can be made.
-> 
-> AP booting poses some interesting challenges. The INIT-SIPI-SIPI sequence
-> is typically used to boot the APs. However, the hypervisor is not allowed
-> to update the guest registers. For the APs, the reset vector must be known
-> in advance. An OVMF method to provide a known reset vector address exists
-> by providing an SEV information block, identified by UUID, near the end of
-> the firmware [3]. OVMF will program the jump to the actual reset vector in
-> this area of memory. Since the memory location is known in advance, an AP
-> can be created with the known reset vector address as its starting CS:IP.
-> The GHCB document [2] talks about how SMP booting under SEV-ES is
-> performed.
-> 
-> [1] https://www.amd.com/system/files/TechDocs/24593.pdf
-> [2] https://developer.amd.com/wp-content/resources/56421.pdf
-> [3] 30937f2f98c4 ("OvmfPkg: Use the SEV-ES work area for the SEV-ES AP reset vector")
->      https://github.com/tianocore/edk2/commit/30937f2f98c42496f2f143fe8374ae7f7e684847
-> 
-> ---
-> 
-> These patches are based on commit:
-> d0ed6a69d3 ("Update version for v5.1.0 release")
-> 
-> (I tried basing on the latest Qemu commit, but I was having build issues
-> that level)
-> 
-> A version of the tree can be found at:
-> https://github.com/AMDESE/qemu/tree/sev-es-v9
-> 
-> Tom Lendacky (4):
->    sev/i386: Add initial support for SEV-ES
->    sev/i386: Allow AP booting under SEV-ES
->    sev/i386: Don't allow a system reset under an SEV-ES guest
->    sev/i386: Enable an SEV-ES guest based on SEV policy
-> 
->   accel/kvm/kvm-all.c       | 68 ++++++++++++++++++++++++++++
->   accel/stubs/kvm-stub.c    |  5 +++
->   hw/i386/pc_sysfw.c        | 10 ++++-
->   include/sysemu/cpus.h     |  2 +
->   include/sysemu/hw_accel.h |  4 ++
->   include/sysemu/kvm.h      | 18 ++++++++
->   include/sysemu/sev.h      |  2 +
->   softmmu/cpus.c            |  5 +++
->   softmmu/vl.c              |  5 ++-
->   target/i386/cpu.c         |  1 +
->   target/i386/kvm.c         |  2 +
->   target/i386/sev-stub.c    |  5 +++
->   target/i386/sev.c         | 95 ++++++++++++++++++++++++++++++++++++++-
->   target/i386/sev_i386.h    |  1 +
->   14 files changed, 219 insertions(+), 4 deletions(-)
-> 
+>
+> Regards,
+> Bin
 
