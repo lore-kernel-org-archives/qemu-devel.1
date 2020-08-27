@@ -2,93 +2,84 @@ Return-Path: <SRS0=k4hX=CF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5BA0C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 16:17:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F1E8C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 16:19:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AF3FE2177B
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 16:17:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 574232087C
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 16:19:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BpiDuNHe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF3FE2177B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UzjJ92++"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 574232087C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60520 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35856 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBKan-0006zx-Td
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 12:17:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39210)
+	id 1kBKcY-0008VK-IR
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 12:19:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39684)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kBKaF-0006Zb-Sg
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 12:17:03 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:51465
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <marcandre.lureau@redhat.com>)
+ id 1kBKbs-0007bP-Ma
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 12:18:44 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:39269
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kBKaD-0006w5-Id
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 12:17:03 -0400
+ (Exim 4.90_1) (envelope-from <marcandre.lureau@redhat.com>)
+ id 1kBKbq-00076w-0o
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 12:18:44 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598545020;
+ s=mimecast20190719; t=1598545120;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=wvjIJZtqLcW4H7zem9wdtUQ/NTkZKhpBp9YluL5XSWs=;
- b=BpiDuNHecm+L70nZEOUJogcIlONlK3tJMXXMJOks//31sxNpekUBba1xQf7DY/nDq1ndAo
- RZEx+mJM4SXJ28edaCCsU0MgKdvMnc6I5ivc+HCyB+0QTq1PUjU0sYTaR/aN1X7BdgJ5IE
- WMoKDINsUXkPdPy+3mBOIts0At9RR3w=
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=v4vUinftXWf3bEhPQgaqHWCzjCJ1ZRzAaGWx9OJziI4=;
+ b=UzjJ92++C1C1G7IXJHfzjQjqcrNr4btX3sa/0UcXj1dR3qkwZljEkLWDTeL9FUcVL6yZE0
+ ECHMZL+56XKnbKLD8LaK1m64qw/WVuznzYNRvyKNVqHt3vLDuCQjAiZnh7TQ48/ipUH1Fq
+ duTDdo3aCLZ4syxtFYInCiVCCa49K6c=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-161-_xU0mbSCNgyrN3Bwv0DhnA-1; Thu, 27 Aug 2020 12:16:57 -0400
-X-MC-Unique: _xU0mbSCNgyrN3Bwv0DhnA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-472-A9tBrpJWP3SoiZvrmzHS5A-1; Thu, 27 Aug 2020 12:18:38 -0400
+X-MC-Unique: A9tBrpJWP3SoiZvrmzHS5A-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 89D671DDFF;
- Thu, 27 Aug 2020 16:16:56 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-56.ams2.redhat.com [10.36.112.56])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E0D1C10013D0;
- Thu, 27 Aug 2020 16:16:55 +0000 (UTC)
-Subject: Re: [PATCH RFC v2 3/4] pc-bios: s390x: Save io and external new PSWs
- before overwriting them
-To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
-References: <20200827093152.3026-1-frankja@linux.ibm.com>
- <20200827093152.3026-4-frankja@linux.ibm.com>
- <c5190ed1-a4f9-45c3-97b3-4924cff5da31@redhat.com>
- <3428e0f6-43a1-b509-d804-fad083c21cb8@linux.ibm.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <741b1d4f-1d01-2ec8-77b7-183e08a56aec@redhat.com>
-Date: Thu, 27 Aug 2020 18:16:55 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7A36E18BA288
+ for <qemu-devel@nongnu.org>; Thu, 27 Aug 2020 16:18:37 +0000 (UTC)
+Received: from localhost (unknown [10.36.110.10])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E68FF7A4D0;
+ Thu, 27 Aug 2020 16:18:29 +0000 (UTC)
+From: marcandre.lureau@redhat.com
+To: qemu-devel@nongnu.org
+Subject: [PATCH] test-vmstate: fix bad GTree usage, use-after-free
+Date: Thu, 27 Aug 2020 20:18:26 +0400
+Message-Id: <20200827161826.1165971-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <3428e0f6-43a1-b509-d804-fad083c21cb8@linux.ibm.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=marcandre.lureau@redhat.com
 X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=thuth@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 00:53:04
+Received-SPF: pass client-ip=205.139.110.120;
+ envelope-from=marcandre.lureau@redhat.com; helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 00:13:19
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -47
-X-Spam_score: -4.8
-X-Spam_bar: ----
-X-Spam_report: (-4.8 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.959,
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.959,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-1.782, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -102,105 +93,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ Eric Auger <eric.auger@redhat.com>, quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 27/08/2020 16.30, Janosch Frank wrote:
-> On 8/27/20 2:52 PM, Thomas Huth wrote:
->> On 27/08/2020 11.31, Janosch Frank wrote:
->>> Currently we always overwrite the mentioned exception new PSWs before
->>> loading the enabled wait PSW. Let's save the PSW before overwriting
->>> and restore it right before starting the loaded kernel.
->>>
->>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->>> ---
->>>
->>> Maybe we should rather statically allocate a lowcore so we don't dirty
->>> 0x0 at all.
->>>
->>> ---
->>>  pc-bios/s390-ccw/jump2ipl.c |  3 ++
->>>  pc-bios/s390-ccw/start.S    | 62 +++++++++++++++++++++++++++----------
->>>  2 files changed, 48 insertions(+), 17 deletions(-)
->>>
->>> diff --git a/pc-bios/s390-ccw/jump2ipl.c b/pc-bios/s390-ccw/jump2ipl.c
->>> index 143d027bf7..a44f3ab5b3 100644
->>> --- a/pc-bios/s390-ccw/jump2ipl.c
->>> +++ b/pc-bios/s390-ccw/jump2ipl.c
->>> @@ -13,12 +13,15 @@
->>>  #define KERN_IMAGE_START 0x010000UL
->>>  #define RESET_PSW_MASK (PSW_MASK_SHORTPSW | PSW_MASK_64)
->>>  
->>> +extern uint64_t *psw_save_io, *psw_save_ext;
->>
->> I think that should be
->>
->>  extern uint64_t psw_save_io[], psw_save_ext[];
->>
->> instead ... otherwise you'll end up with some funny bugs here, won't you?
-> 
-> What kind of bugs are you expecting?
+From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
-Well, "extern uint64_t var[];" and "extern uint64_t *var;" are two
-different kind of things. One is an array, one is a pointer variable.
-Looking at your assembler code, you obviously tried to declare an array
-there, not a pointer variable.
+According to g_tree_foreach() documentation:
+"The tree may not be modified while iterating over it (you can't
+add/remove items)."
 
-Have a try with this test program:
+Fixes: 9a85e4b8f6 ("migration: Support gtree migration")
+Cc: Eric Auger <eric.auger@redhat.com>
+Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+---
+ tests/test-vmstate.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
- #include <string.h>
-
- extern unsigned long *var;
-
- void main(void)
- {
-	asm volatile (" nop ; nop ; nop "); /* marker */
-	memcpy((void *)0x1f0, var, 16);
-	asm volatile (" nop ; nop ; nop "); /* marker */
+diff --git a/tests/test-vmstate.c b/tests/test-vmstate.c
+index f7b3868881..31aefa78f0 100644
+--- a/tests/test-vmstate.c
++++ b/tests/test-vmstate.c
+@@ -1078,7 +1078,6 @@ static gboolean diff_tree(gpointer key, gpointer value, gpointer data)
+     struct match_node_data d = {tp->tree2, key, value};
+ 
+     g_tree_foreach(tp->tree2, tp->match_node, &d);
+-    g_tree_remove(tp->tree1, key);
+     return false;
  }
-
-After compiling that with -O2, and disassembling the corresponding .o
-file, I get this code between the nops:
-
-   c:	c4 18 00 00 00 00 	lgrl	%r1,c <main+0xc>
-			e: R_390_PC32DBL	var+0x2
-  12:	e7 00 10 00 00 06 	vl	%v0,0(%r1)
-  18:	e7 00 01 f0 00 0e 	vst	%v0,496
-
-The "lgrl %r1,var" is likely not what you wanted here.
-
-If you now replace the "*var" with "var[]", you get this instead:
-
-   c:	c0 10 00 00 00 00 	larl	%r1,c <main+0xc>
-			e: R_390_PC32DBL	var+0x2
-  12:	e7 00 10 00 00 06 	vl	%v0,0(%r1)
-  18:	e7 00 01 f0 00 0e 	vst	%v0,496
-
-"larl" looks better now, doesn't it?
-
->>
->>>  uint64_t *reset_psw = 0, save_psw, ipl_continue;
->>>  
->>>  static void jump_to_IPL_2(void)
->>>  {
->>>      /* Restore reset PSW and io and external new PSWs */
->>
->> Ok, now the comment makes sense :-)
->>>      *reset_psw = save_psw;
->>> +    memcpy((void *)0x1f0, psw_save_io, 16);
->>> +    memcpy((void *)0x1b0, psw_save_ext, 16);
->>
->> Could you use &lowcore->external_new_psw and &lowcore->io_new_psw
->> instead of the magic numbers?
-> 
-> I can, but that means that I need to declare lowcore in netmain.c as
-> well as including s390-arch.h
-
-If that does not cause any other big hurdles, I think I'd prefer that
-instead of using magic numbers.
-
- Thanks,
-  Thomas
+ 
+@@ -1088,7 +1087,7 @@ static void compare_trees(GTree *tree1, GTree *tree2,
+     struct tree_cmp_data tp = {tree1, tree2, function};
+ 
+     g_tree_foreach(tree1, diff_tree, &tp);
+-    assert(g_tree_nnodes(tree1) == 0);
++    g_tree_destroy(g_tree_ref(tree1));
+     assert(g_tree_nnodes(tree2) == 0);
+ }
+ 
+-- 
+2.26.2
 
 
