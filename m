@@ -7,75 +7,74 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11DA4C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 11:18:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2A4EC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 11:19:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CE5DD22B40
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 11:18:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7685E22B40
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 11:19:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RYjPEzPw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE5DD22B40
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gsb3ceBN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7685E22B40
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35214 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38770 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBFv4-00078w-3B
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 07:18:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54466)
+	id 1kBFwD-0000KL-MQ
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 07:19:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54318)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kBFti-00056A-7P
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 07:16:50 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59727)
+ id 1kBFtR-0004Uy-0Y
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 07:16:33 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:22408)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kBFtg-0000rU-Bi
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 07:16:49 -0400
+ id 1kBFtP-0000oP-5q
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 07:16:32 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598527007;
+ s=mimecast20190719; t=1598526990;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=6MTm9GZUU94JUI9HFeqfI2EzkRE/Yym1IGbvVhzy8w4=;
- b=RYjPEzPw49f4tcDFlEX9SsT8ZtiUsohEBSiDlSDzRG9/njSOfwmMR+dEAfPMKaUOSB9SMB
- bHFSAMt4nP/i7Ho4GYVR52o2Te0A74QanFVxf0WxOdA+d3x3dVuFZdUZSnwzOSMR6DRpyt
- tuZYqEFmt0kYnEl/XyBxS8a/sPzMdiE=
+ bh=B4NDq7xY/p5nEHU+fj0NRxwrZ3KkfBVlXtATn0X/fuM=;
+ b=gsb3ceBNGH1vz4NDZRFHZtjPS+yln66epCW/OlBJbqgPyTf/+mitybAFa1ueoX6/6lo/MB
+ 9fnjqyzkqxnJVsAeU+fm8uPO7LUJsYjWilNH1X1tBytwuaREsVc3/Cj4oNonxgS86j3VVL
+ XiNWulOV1P3jkh5OkqfGLLfATWHUenc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-29-rScVcUjHNaWZOyj3V8CQGA-1; Thu, 27 Aug 2020 07:16:45 -0400
-X-MC-Unique: rScVcUjHNaWZOyj3V8CQGA-1
+ us-mta-456-ywK183ZVPm-1VzSDJyqixQ-1; Thu, 27 Aug 2020 07:16:28 -0400
+X-MC-Unique: ywK183ZVPm-1VzSDJyqixQ-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8A8FE801AEB;
- Thu, 27 Aug 2020 11:16:44 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B08E6420EA;
+ Thu, 27 Aug 2020 11:16:27 +0000 (UTC)
 Received: from localhost.localdomain.com (unknown [10.36.110.51])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 62FF578370;
- Thu, 27 Aug 2020 11:16:38 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1066978370;
+ Thu, 27 Aug 2020 11:16:23 +0000 (UTC)
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 6/7] iotests: add support for capturing and matching QMP
- events
-Date: Thu, 27 Aug 2020 12:16:05 +0100
-Message-Id: <20200827111606.1408275-7-berrange@redhat.com>
+Subject: [PATCH v3 3/7] migration: stop returning errno from load_snapshot()
+Date: Thu, 27 Aug 2020 12:16:02 +0100
+Message-Id: <20200827111606.1408275-4-berrange@redhat.com>
 In-Reply-To: <20200827111606.1408275-1-berrange@redhat.com>
 References: <20200827111606.1408275-1-berrange@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
-X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Spam-Score: 0.003
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=berrange@redhat.com;
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=berrange@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 02:10:07
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 02:54:02
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -108,165 +107,84 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When using the _launch_qemu and _send_qemu_cmd functions from
-common.qemu, any QMP events get mixed in with the output from
-the commands and responses.
+None of the callers care about the errno value since there is a full
+Error object populated. This gives consistency with save_snapshot()
+which already just returns -1.
 
-This makes it difficult to write a test case as the ordering
-of events in the output is not stable.
-
-This introduces a variable 'capture_events' which can be set
-to a list of event names. Any events listed in this variable
-will not be printed, instead collected in the $QEMU_EVENTS
-environment variable.
-
-A new '_wait_event' function can be invoked to collect events
-at a fixed point in time. The function will first pull events
-cached in $QEMU_EVENTS variable, and if none are found, will
-then read more from QMP.
-
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
 ---
- tests/qemu-iotests/common.qemu | 107 ++++++++++++++++++++++++++++++++-
- 1 file changed, 106 insertions(+), 1 deletion(-)
+ migration/savevm.c | 17 ++++++++---------
+ 1 file changed, 8 insertions(+), 9 deletions(-)
 
-diff --git a/tests/qemu-iotests/common.qemu b/tests/qemu-iotests/common.qemu
-index de680cf1c7..87d7a54001 100644
---- a/tests/qemu-iotests/common.qemu
-+++ b/tests/qemu-iotests/common.qemu
-@@ -53,6 +53,15 @@ _in_fd=4
- # If $mismatch_only is set, only non-matching responses will
- # be echoed.
- #
-+# If $capture_events is non-empty, then any QMP event names it lists
-+# will not be echoed out, but instead collected in the $QEMU_EVENTS
-+# variable. The _wait_event function can later be used to received
-+# the cached events.
-+#
-+# If $only_capture_events is set to anything but an empty string,
-+# when an error will be raised if a QMP message is seen which is
-+# not an event listed in $capture_events.
-+#
- # If $success_or_failure is set, the meaning of the arguments is
- # changed as follows:
- # $2: A string to search for in the response; if found, this indicates
-@@ -78,6 +87,32 @@ _timed_wait_for()
-     QEMU_STATUS[$h]=0
-     while IFS= read -t ${QEMU_COMM_TIMEOUT} resp <&${QEMU_OUT[$h]}
-     do
-+        if [ -n "$capture_events" ]; then
-+            capture=0
-+            local evname
-+            for evname in $capture_events
-+            do
-+                grep -q "\"event\": \"${evname}\"" < <(echo "${resp}")
-+                if [ $? -eq 0 ]; then
-+                    capture=1
-+                fi
-+            done
-+            if [ $capture = 1 ];
-+            then
-+                ev=$(echo "${resp}" | tr -d '\r' | tr % .)
-+                QEMU_EVENTS="${QEMU_EVENTS:+${QEMU_EVENTS}%}${ev}"
-+                if [ -n "$only_capture_events" ]; then
-+                    return
-+                else
-+                    continue
-+                fi
-+            fi
-+        fi
-+        if [ -n "$only_capture_events" ]; then
-+            echo "Only expected $capture_events but got ${resp}"
-+            exit 1
-+        fi
-+
-         if [ -z "${silent}" ] && [ -z "${mismatch_only}" ]; then
-             echo "${resp}" | _filter_testdir | _filter_qemu \
-                            | _filter_qemu_io | _filter_qmp | _filter_hmp
-@@ -177,12 +212,82 @@ _send_qemu_cmd()
-         let count--;
-     done
-     if [ ${QEMU_STATUS[$h]} -ne 0 ] && [ -z "${qemu_error_no_exit}" ]; then
--        echo "Timeout waiting for ${1} on handle ${h}"
-+        echo "Timeout waiting for command ${1} response on handle ${h}"
-         exit 1 #Timeout means the test failed
-     fi
+diff --git a/migration/savevm.c b/migration/savevm.c
+index 3826c437cc..711137bcbe 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -2870,20 +2870,20 @@ int load_snapshot(const char *name, Error **errp)
+     if (!replay_can_snapshot()) {
+         error_setg(errp, "Record/replay does not allow loading snapshot "
+                    "right now. Try once more later.");
+-        return -EINVAL;
++        return -1;
+     }
+ 
+     if (!bdrv_all_can_snapshot(errp)) {
+-        return -ENOTSUP;
++        return -1;
+     }
+     ret = bdrv_all_find_snapshot(name, errp);
+     if (ret < 0) {
+-        return ret;
++        return -1;
+     }
+ 
+     bs_vm_state = bdrv_all_find_vmstate_bs(errp);
+     if (!bs_vm_state) {
+-        return -ENOTSUP;
++        return -1;
+     }
+     aio_context = bdrv_get_aio_context(bs_vm_state);
+ 
+@@ -2892,11 +2892,11 @@ int load_snapshot(const char *name, Error **errp)
+     ret = bdrv_snapshot_find(bs_vm_state, &sn, name);
+     aio_context_release(aio_context);
+     if (ret < 0) {
+-        return ret;
++        return -1;
+     } else if (sn.vm_state_size == 0) {
+         error_setg(errp, "This is a disk-only snapshot. Revert to it "
+                    " offline using qemu-img");
+-        return -EINVAL;
++        return -1;
+     }
+ 
+     /* Flush all IO requests so they don't interfere with the new state.  */
+@@ -2911,7 +2911,6 @@ int load_snapshot(const char *name, Error **errp)
+     f = qemu_fopen_bdrv(bs_vm_state, 0);
+     if (!f) {
+         error_setg(errp, "Could not open VM state file");
+-        ret = -EINVAL;
+         goto err_drain;
+     }
+ 
+@@ -2927,14 +2926,14 @@ int load_snapshot(const char *name, Error **errp)
+ 
+     if (ret < 0) {
+         error_setg(errp, "Error %d while loading VM state", ret);
+-        return ret;
++        return -1;
+     }
+ 
+     return 0;
+ 
+ err_drain:
+     bdrv_drain_all_end();
+-    return ret;
++    return -1;
  }
  
- 
-+# Check event cache for a named QMP event
-+#
-+# Input parameters:
-+# $1:       Name of the QMP event to check for
-+#
-+# Checks if the named QMP event that was previously captured
-+# into $QEMU_EVENTS. When matched, the QMP event will be echoed
-+# and the $matched variable set to 1.
-+#
-+# _wait_event is more suitable for test usage in most cases
-+_check_cached_events()
-+{
-+    local evname=${1}
-+
-+    local match="\"event\": \"$evname\""
-+
-+    matched=0
-+    if [ -n "$QEMU_EVENTS" ]; then
-+        CURRENT_QEMU_EVENTS=$QEMU_EVENTS
-+        QEMU_EVENTS=
-+        old_IFS=$IFS
-+        IFS="%"
-+        for ev in $CURRENT_QEMU_EVENTS
-+        do
-+                grep -q "$match" < <(echo "${ev}")
-+            if [ $? -eq 0 -a $matched = 0 ]; then
-+                echo "${ev}" | _filter_testdir | _filter_qemu \
-+                           | _filter_qemu_io | _filter_qmp | _filter_hmp
-+                matched=1
-+            else
-+                QEMU_EVENTS="${QEMU_EVENTS:+${QEMU_EVENTS}%}${ev}"
-+            fi
-+        done
-+        IFS=$old_IFS
-+    fi
-+}
-+
-+# Wait for a named QMP event
-+#
-+# Input parameters:
-+# $1:       QEMU handle to use
-+# $2:       Name of the QMP event to wait for
-+#
-+# Checks if the named QMP event that was previously captured
-+# into $QEMU_EVENTS. If none are present, then waits for the
-+# event to arrive on the QMP channel. When matched, the QMP
-+# event will be echoed
-+_wait_event()
-+{
-+    local h=${1}
-+    local evname=${2}
-+
-+    while true
-+    do
-+        _check_cached_events $evname
-+
-+        if [ $matched = 1 ];
-+        then
-+            return
-+        fi
-+
-+        only_capture_events=1 qemu_error_no_exit=1 _timed_wait_for ${h}
-+
-+        if [ ${QEMU_STATUS[$h]} -ne 0 ] ; then
-+            echo "Timeout waiting for event ${evname} on handle ${h}"
-+            exit 1 #Timeout means the test failed
-+        fi
-+    done
-+}
-+
- # Launch a QEMU process.
- #
- # Input parameters:
+ void vmstate_register_ram(MemoryRegion *mr, DeviceState *dev)
 -- 
 2.26.2
 
