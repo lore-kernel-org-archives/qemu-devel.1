@@ -2,96 +2,86 @@ Return-Path: <SRS0=k4hX=CF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,UNPARSEABLE_RELAY autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D826BC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 11:59:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE705C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 12:02:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8A2302177B
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 11:59:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A4B0622B40
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 12:02:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=dme-org.20150623.gappssmtp.com header.i=@dme-org.20150623.gappssmtp.com header.b="vHPIayF4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A2302177B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=dme.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CobZojqg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A4B0622B40
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36310 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40530 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBGYz-0000GP-PJ
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 07:59:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47698)
+	id 1kBGcG-0002PS-NC
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 08:02:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49072)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dme@dme.org>) id 1kBGYS-0008E4-0L
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 07:58:56 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:33826)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <dme@dme.org>) id 1kBGYQ-0000Az-3c
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 07:58:55 -0400
-Received: by mail-wr1-x442.google.com with SMTP id f7so5125040wrw.1
- for <qemu-devel@nongnu.org>; Thu, 27 Aug 2020 04:58:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=dme-org.20150623.gappssmtp.com; s=20150623;
- h=to:cc:subject:in-reply-to:references:from:date:message-id
- :mime-version; bh=43pDmx6xDr2/6/hSxSmqLMTU81W7iOibc3api6w9ueM=;
- b=vHPIayF4D1xjtBe4K3Ok2pnUn/jDW7L82IS+UOs2WPjW/bXCMCapILcS1iT6QLMzku
- a5h/OZpCtSCEzwMWprlQWpSKCojRzzbuTeFbkiPQPvzLLXfk7/7F4aKHvD40de75hFjn
- fo0dXnOoCPMjjmMucL7s9gNTX+v1zTV5ytK8UfR7iN/wk4MNhLdC5iRyGWfZLAZX4UN/
- 3M0euvqxnw3iBH7bAaea3t79fUN3nqZ3UKq/UNYi2+Xk+FS/A3zg7fdW+r2Elu0NIzT/
- 9DZ0TccTFGokFinnkYZ+dHBsOLYYxx28GvooTZH8KYEKEUPN1s4Q4oHgUsjIfPCelryB
- RoEg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:to:cc:subject:in-reply-to:references:from:date
- :message-id:mime-version;
- bh=43pDmx6xDr2/6/hSxSmqLMTU81W7iOibc3api6w9ueM=;
- b=RPh0Wx9eQ4Boz0fllfxhvpEbsp1eZjZki4GzR2RHHL5ZSIVdEmCmyiHemAXBQaq/S5
- HskDtylRZzKwFmMWX6jnpcyBotqZFtX4V1TULnERgMJHTdf81MQ5qa4kbCEg2zl+pdik
- fzLLaOXzMZwnSn9tTeC9trsv0kKYljA2SOS0fzQUj4NNnYQhvtwmAlhPVPCvZ3+SQW5n
- hfNaSbr+0nsZcJToajyiYA1teDeW/uOpjKADbWdboSQY2VAXEVTjnHodeAHffOgXj05R
- BIEFlfJoDcc4wvbbqnXt2cmNS3BYCWBFgY8GvkgOrzNcaMFCpluY0giTFEGdJK9MKx90
- RdYw==
-X-Gm-Message-State: AOAM532V/km1/QKCnkf9DrPx0r20VZyolvks4crrFS6ms5qp2AuD+pgl
- V7hoQuYRfST0Ipp8q7QBEiWROw==
-X-Google-Smtp-Source: ABdhPJwozNS2l6ZmNQHFe47laFA+VIyAVTaFBPqJarb7ovF+v/1MYWJKE2sYkw8aStQmFZZxxF4JJw==
-X-Received: by 2002:adf:ea0b:: with SMTP id q11mr17894010wrm.285.1598529531560; 
- Thu, 27 Aug 2020 04:58:51 -0700 (PDT)
-Received: from disaster-area.hh.sledj.net
- (8.a.e.d.0.0.0.0.0.0.0.0.4.6.0.0.0.4.1.7.1.7.b.b.0.b.8.0.1.0.0.2.ip6.arpa.
- [2001:8b0:bb71:7140:64::dea8])
- by smtp.gmail.com with ESMTPSA id 126sm5013679wme.42.2020.08.27.04.58.50
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 27 Aug 2020 04:58:50 -0700 (PDT)
-Received: from localhost (disaster-area.hh.sledj.net [local])
- by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id 59782559;
- Thu, 27 Aug 2020 11:58:48 +0000 (UTC)
-To: Zheng Chuan <zhengchuan@huawei.com>, quintela@redhat.com,
- eblake@redhat.com, dgilbert@redhat.com, berrange@redhat.com
-Subject: Re: [PATCH v5 11/12] migration/dirtyrate: Implement
- qmp_cal_dirty_rate()/qmp_get_dirty_rate() function
-In-Reply-To: <1a23d60c-186b-d5b5-c43a-a8512826409b@huawei.com>
-References: <1598260480-64862-1-git-send-email-zhengchuan@huawei.com>
- <1598260480-64862-12-git-send-email-zhengchuan@huawei.com>
- <m2wo1lk8j9.fsf@dme.org> <1a23d60c-186b-d5b5-c43a-a8512826409b@huawei.com>
-X-HGTTG: heart-of-gold
-From: David Edmondson <dme@dme.org>
-Date: Thu, 27 Aug 2020 12:58:48 +0100
-Message-ID: <m2d03cjo5j.fsf@dme.org>
+ (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
+ id 1kBGbD-0001qj-5j
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 08:01:47 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:38601
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
+ id 1kBGbB-0000vz-7P
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 08:01:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1598529704;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=zE5Z/PVgsTj3IeGXFdZQDTapzomPjiQH8ioVEUKuTf8=;
+ b=CobZojqg4DWDWabXxHr5amEOsMu3KuxPZVHHmAoM+Ahcyt3Qzvg1d1Xw4lTBRurJIrUp31
+ uaO5yJeosrB0/P3yrXFTf0QKMAZNuumkGE33lO2WK9/iDHhE3qElzfrqcyPQYumAJGj23/
+ 0TU2C17vlchO5Q/1LieP4PQnGqRqve4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-419-H2Oic-H5NwuXdCzwIkt3kQ-1; Thu, 27 Aug 2020 08:01:39 -0400
+X-MC-Unique: H2Oic-H5NwuXdCzwIkt3kQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 929F21DE10;
+ Thu, 27 Aug 2020 12:01:38 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-112-91.phx2.redhat.com
+ [10.3.112.91])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id ABC667B9F3;
+ Thu, 27 Aug 2020 12:01:36 +0000 (UTC)
+From: P J P <ppandit@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Subject: [PATCH] xhci: check return value from usb_packet_map
+Date: Thu, 27 Aug 2020 17:29:33 +0530
+Message-Id: <20200827115933.1851563-1-ppandit@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Received-SPF: neutral client-ip=2a00:1450:4864:20::442;
- envelope-from=dme@dme.org; helo=mail-wr1-x442.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -10
-X-Spam_score: -1.1
-X-Spam_bar: -
-X-Spam_report: (-1.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_NEUTRAL=0.779, UNPARSEABLE_RELAY=0.001 autolearn=no autolearn_force=no
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ppandit@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=ppandit@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 02:56:52
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.959,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -104,43 +94,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: zhang.zhanghailiang@huawei.com, qemu-devel@nongnu.org,
- xiexiangyou@huawei.com, alex.chen@huawei.com, ann.zhuangyanying@huawei.com,
- fangying1@huawei.com
+Cc: Ruhr-University <bugs-syssec@rub.de>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Prasad J Pandit <pjp@fedoraproject.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thursday, 2020-08-27 at 17:34:13 +08, Zheng Chuan wrote:
+From: Prasad J Pandit <pjp@fedoraproject.org>
 
->>> +    /*
->>> +     * Only support query once for each calculation,
->>> +     * reset as DIRTY_RATE_STATUS_UNSTARTED after query
->>> +     */
->>> +    (void)dirtyrate_set_state(&CalculatingState, CalculatingState,
->>> +                              DIRTY_RATE_STATUS_UNSTARTED);
->> 
->> Is there a reason for this restriction? Removing it would require
->> clarifying the state model, I suppose.
->> 
-> We only support query once for each calculation.
-> Otherwise, it could always query dirtyrate, but maybe the dirtyrate is calculated
-> long time ago.
+While setting up a packet in xhci_setup_packet() routine,
+usb_packet_map() may return an error. Check this return value
+before further processing the packet, to avoid use-after-free
+issue.
 
-There's nothing in the current interface that prevents this from being
-the case already - the caller could initiate a 1 second sample, then
-wait 24 hours to query the result.
+ -> https://ruhr-uni-bochum.sciebo.de/s/NNWP2GfwzYKeKwE?path=%2Fxhci_uaf_2
+  #0  __interceptor_free (/lib64/libasan.so.6+0xb0307)
+  #1  qemu_vfree ../util/oslib-posix.c:247
+  #2  address_space_unmap ../exec.c:3635
+  #3  dma_memory_unmap ../include/sysemu/dma.h:145
+  #4  usb_packet_unmap ../hw/usb/libhw.c:65
+  #5  usb_packet_map ../hw/usb/libhw.c:54
+  #6  xhci_setup_packet ../hw/usb/hcd-xhci.c:1618
+  #7  xhci_fire_ctl_transfer ../hw/usb/hcd-xhci.c:1722
+  #8  xhci_kick_epctx ../hw/usb/hcd-xhci.c:1991
+  #9  xhci_kick_ep ../hw/usb/hcd-xhci.c:1861
+  #10 xhci_doorbell_write ../hw/usb/hcd-xhci.c:3162
+  ...
 
-Obviously this would generally be regarded as "d'oh - don't do that",
-but the same argument would apply if the caller is allowed to query the
-results multiple times.
+Reported-by: Ruhr-University <bugs-syssec@rub.de>
+Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+---
+ hw/usb/hcd-xhci.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-Perhaps a complete solution would be to include information about the
-sample period with the result. The caller could then determine whether
-the sample is of adequate quality (sufficiently recent, taken over a
-sufficiently long time period) for its' intended use.
-
-dme.
+diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
+index 67a18fe2b6..848e7e935f 100644
+--- a/hw/usb/hcd-xhci.c
++++ b/hw/usb/hcd-xhci.c
+@@ -1615,7 +1615,14 @@ static int xhci_setup_packet(XHCITransfer *xfer)
+     xhci_xfer_create_sgl(xfer, dir == USB_TOKEN_IN); /* Also sets int_req */
+     usb_packet_setup(&xfer->packet, dir, ep, xfer->streamid,
+                      xfer->trbs[0].addr, false, xfer->int_req);
+-    usb_packet_map(&xfer->packet, &xfer->sgl);
++    if (usb_packet_map(&xfer->packet, &xfer->sgl) < 0) {
++        DPRINTF("xhci: setup packet failed: pid: 0x%x addr %d ep %d\n",
++                xfer->packet.pid, ep->dev->addr, ep->nr);
++        usb_packet_cleanup(&xfer->packet);
++        qemu_sglist_destroy(&xfer->sgl);
++        return -1;
++    }
++
+     DPRINTF("xhci: setup packet pid 0x%x addr %d ep %d\n",
+             xfer->packet.pid, ep->dev->addr, ep->nr);
+     return 0;
 -- 
-I walk like a building, I never get wet.
+2.26.2
+
 
