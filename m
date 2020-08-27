@@ -2,89 +2,97 @@ Return-Path: <SRS0=k4hX=CF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 063CCC433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 08:29:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB064C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 08:31:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C658320738
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 08:29:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 74F4422B47
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 08:31:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UiGf6w20"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C658320738
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=dme-org.20150623.gappssmtp.com header.i=@dme-org.20150623.gappssmtp.com header.b="BPxC3I8D"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74F4422B47
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=dme.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49886 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53942 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBDHH-0001cI-VO
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 04:28:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44822)
+	id 1kBDJM-0003Oc-P4
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 04:31:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45274)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kBDGl-0001D8-4b
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 04:28:27 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23418
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kBDGi-0004tj-74
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 04:28:26 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598516903;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=/NQS5QWY4+fBQ42BHQ/QIyus1BwFx075lO+8qmpb1Zo=;
- b=UiGf6w20JPJQcc4q7IpBZ4co0NqlF9e06X0Fwkz/z4EpR9qRVITZ3oz8GR77JLzBC+sWyk
- FiCltx8hLxWnlipq0Y+K25BnccTYdo4LW5u2l0QzORaCHrrS/1PrEZ4zL2xmZ+JHka8oGm
- y40tYAVp01Db007+BMwa9KRu+gu/s98=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-388--2_DtodWNg-18gqrNXFNOA-1; Thu, 27 Aug 2020 04:28:21 -0400
-X-MC-Unique: -2_DtodWNg-18gqrNXFNOA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A24DF10ABDA1;
- Thu, 27 Aug 2020 08:28:20 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-56.ams2.redhat.com [10.36.112.56])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 697BC60FC2;
- Thu, 27 Aug 2020 08:28:19 +0000 (UTC)
-Subject: Re: [PATCH] meson: move pixman detection to meson
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-References: <20200826070243.11969-1-pbonzini@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <eb719289-1d8d-45a7-1851-f6c60d47e7cc@redhat.com>
-Date: Thu, 27 Aug 2020 10:28:18 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ (Exim 4.90_1) (envelope-from <dme@dme.org>) id 1kBDIQ-0002sT-Ua
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 04:30:10 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:46091)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <dme@dme.org>) id 1kBDIO-00059F-SL
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 04:30:10 -0400
+Received: by mail-wr1-x443.google.com with SMTP id r15so4463309wrp.13
+ for <qemu-devel@nongnu.org>; Thu, 27 Aug 2020 01:30:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=dme-org.20150623.gappssmtp.com; s=20150623;
+ h=to:cc:subject:in-reply-to:references:from:date:message-id
+ :mime-version; bh=Xd8jV2EuKljqkFZCnuKljnsxEvipTvwQ7SBrt1N2yuI=;
+ b=BPxC3I8DWWcDFY/GbMEmOom3kcp50G3Vdj9VIqyVbC7K2mZpUiG7XfcRBnPhoTU2LH
+ snonBaF9td7B7cCdklXSq+VWc6guL0CizvGp+XGpTTPlfettP5KJ1HlNMAkMv5UaRU+f
+ 3JAbie1O9cGSz5eRnKYZ2TOp3etrVxEomQyxWHX6A+YybTafg93M09xH1V7r5PU//gwe
+ hgKj65noKuuUbehtla67NGDLvxv2zYIeNoclI8V7HH3kI09gajhbdRmMcAB184d7DOP9
+ Ejte9l91d5B0rGo5A346mVLXTDyKVjGkbhafWGJTTIzHFkZw7ZyAZCIF8HF7tlvuDjog
+ MKgw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:to:cc:subject:in-reply-to:references:from:date
+ :message-id:mime-version;
+ bh=Xd8jV2EuKljqkFZCnuKljnsxEvipTvwQ7SBrt1N2yuI=;
+ b=khy56u9/nY/6rmdWB7R4ofQ5J6HoH2OYmSNuWKIj4w3EwFZgU7VoToQtlYebzAk4/t
+ beQsU5kWdecLW3J0BMGWADRl7/T6/SkXDAXYnhYf5dTUxGMk6jWUJvqVhHAe1SRHPvV7
+ jj8a+T7z9HxmTwYyEIRY2OeL8E2DtsGlFsKtCWNTJpW6YqSFvrtOyRr4YP0tUtN7E8Lu
+ NkuIq73GkzFLnjBUTxxbwROGgSiMnEiQgPnx4WKU/0MTGUx56dDfRC9to9JLVGFBr+oT
+ rfgTC022FzLP2M1+BrfLNYeMFLtbXCbPa32zmkSR9tAjlAJbYMk6LIriEo+98/+TAWgI
+ P//g==
+X-Gm-Message-State: AOAM5309EpsKJx6ecdmeD/fgzTXzdyWbG+SQjpsYUMZAZGSB0G36b/+q
+ lWidgbsI6YZukuwdDZOXjxENZg==
+X-Google-Smtp-Source: ABdhPJwP0I3DzaYQ2onS7LcgY0viRcRV0+pEBzg5iEnhs0TQ3TDS8zetodnSoec0wdzgN/v3u3AtdA==
+X-Received: by 2002:a5d:45c8:: with SMTP id b8mr14104616wrs.381.1598517006016; 
+ Thu, 27 Aug 2020 01:30:06 -0700 (PDT)
+Received: from disaster-area.hh.sledj.net
+ (8.a.e.d.0.0.0.0.0.0.0.0.4.6.0.0.0.4.1.7.1.7.b.b.0.b.8.0.1.0.0.2.ip6.arpa.
+ [2001:8b0:bb71:7140:64::dea8])
+ by smtp.gmail.com with ESMTPSA id j8sm4523188wrs.22.2020.08.27.01.30.04
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 27 Aug 2020 01:30:05 -0700 (PDT)
+Received: from localhost (disaster-area.hh.sledj.net [local])
+ by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id f7d79cc8;
+ Thu, 27 Aug 2020 08:30:04 +0000 (UTC)
+To: Zheng Chuan <zhengchuan@huawei.com>, quintela@redhat.com,
+ eblake@redhat.com, dgilbert@redhat.com, berrange@redhat.com
+Subject: Re: [PATCH v5 09/12] migration/dirtyrate: Implement
+ get_sample_page_period() and block_sample_page_period()
+In-Reply-To: <c044b58d-a211-9494-70f1-2648c7891576@huawei.com>
+References: <1598260480-64862-1-git-send-email-zhengchuan@huawei.com>
+ <1598260480-64862-10-git-send-email-zhengchuan@huawei.com>
+ <m23649lni4.fsf@dme.org> <c044b58d-a211-9494-70f1-2648c7891576@huawei.com>
+X-HGTTG: heart-of-gold
+From: David Edmondson <dme@dme.org>
+Date: Thu, 27 Aug 2020 09:30:04 +0100
+Message-ID: <m2ft88jxtf.fsf@dme.org>
 MIME-Version: 1.0
-In-Reply-To: <20200826070243.11969-1-pbonzini@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=thuth@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 00:13:19
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -52
-X-Spam_score: -5.3
-X-Spam_bar: -----
-X-Spam_report: (-5.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.959,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-2.239, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain
+Received-SPF: neutral client-ip=2a00:1450:4864:20::443;
+ envelope-from=dme@dme.org; helo=mail-wr1-x443.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -10
+X-Spam_score: -1.1
+X-Spam_bar: -
+X-Spam_report: (-1.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_NEUTRAL=0.779, UNPARSEABLE_RELAY=0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,110 +105,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Rafael Kitover <rkitover@gmail.com>
+Cc: zhang.zhanghailiang@huawei.com, qemu-devel@nongnu.org,
+ xiexiangyou@huawei.com, alex.chen@huawei.com, ann.zhuangyanying@huawei.com,
+ fangying1@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 26/08/2020 09.02, Paolo Bonzini wrote:
-> When pixman is not installed (or too old), but virglrenderer is available
-> and "configure" has been run with "--disable-system", the build currently
-> aborts when trying to compile vhost-user-gpu (since it requires pixman).
-> 
-> Let's skip the build of vhost-user-gpu when pixman is not installed or
-> too old.  Instead of adding CONFIG_PIXMAN, it is simpler to move the
-> detection to pixman.
-> 
-> Based on a patch by Thomas Huth. <thuth@redhat.com>
-> 
-> Fixes: 9b52b17ba5 ("configure: Allow to build tools without pixman")
-> Reported-by: Rafael Kitover <rkitover@gmail.com>
-> Reported-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  configure                          | 21 ++-------------------
->  contrib/vhost-user-gpu/meson.build |  3 ++-
->  meson.build                        | 12 +++++++-----
->  3 files changed, 11 insertions(+), 25 deletions(-)
-> 
-> diff --git a/configure b/configure
-> index a5fa472c64..51b6164f69 100755
-> --- a/configure
-> +++ b/configure
-> @@ -3923,20 +3923,6 @@ if test "$modules" = yes; then
->      fi
->  fi
->  
-> -##########################################
-> -# pixman support probe
-> -
-> -if test "$softmmu" = "no"; then
-> -  pixman_cflags=
-> -  pixman_libs=
-> -elif $pkg_config --atleast-version=0.21.8 pixman-1 > /dev/null 2>&1; then
-> -  pixman_cflags=$($pkg_config --cflags pixman-1)
-> -  pixman_libs=$($pkg_config --libs pixman-1)
-> -else
-> -  error_exit "pixman >= 0.21.8 not present." \
-> -      "Please install the pixman devel package."
-> -fi
-> -
->  ##########################################
->  # libmpathpersist probe
->  
-> @@ -6649,8 +6635,8 @@ echo_version() {
->      fi
->  }
->  
-> -# prepend pixman and ftd flags after all config tests are done
-> -QEMU_CFLAGS="$pixman_cflags $fdt_cflags $QEMU_CFLAGS"
-> +# prepend ftd flags after all config tests are done
-> +QEMU_CFLAGS="$fdt_cflags $QEMU_CFLAGS"
->  QEMU_LDFLAGS="$fdt_ldflags $QEMU_LDFLAGS"
->  
->  config_host_mak="config-host.mak"
-> @@ -8053,9 +8039,6 @@ fi
->  
->  done # for target in $targets
->  
-> -echo "PIXMAN_CFLAGS=$pixman_cflags" >> $config_host_mak
-> -echo "PIXMAN_LIBS=$pixman_libs" >> $config_host_mak
-> -
->  if [ "$fdt" = "git" ]; then
->    subdirs="$subdirs dtc"
->  fi
-> diff --git a/contrib/vhost-user-gpu/meson.build b/contrib/vhost-user-gpu/meson.build
-> index 8df4c13bc5..7d9b29da8b 100644
-> --- a/contrib/vhost-user-gpu/meson.build
-> +++ b/contrib/vhost-user-gpu/meson.build
-> @@ -1,5 +1,6 @@
->  if 'CONFIG_TOOLS' in config_host and 'CONFIG_VIRGL' in config_host \
-> -    and 'CONFIG_GBM' in config_host and 'CONFIG_LINUX' in config_host
-> +    and 'CONFIG_GBM' in config_host and 'CONFIG_LINUX' in config_host \
-> +    and pixman.found()
->    executable('vhost-user-gpu', files('vhost-user-gpu.c', 'virgl.c', 'vugbm.c'),
->               link_with: libvhost_user,
->               dependencies: [qemuutil, pixman, gbm, virgl],
-> diff --git a/meson.build b/meson.build
-> index bcd39b39da..57c2fe2b65 100644
-> --- a/meson.build
-> +++ b/meson.build
-> @@ -114,8 +114,11 @@ if 'CONFIG_GNUTLS' in config_host
->    gnutls = declare_dependency(compile_args: config_host['GNUTLS_CFLAGS'].split(),
->                                link_args: config_host['GNUTLS_LIBS'].split())
->  endif
-> -pixman = declare_dependency(compile_args: config_host['PIXMAN_CFLAGS'].split(),
-> -                            link_args: config_host['PIXMAN_LIBS'].split())
-> +pixman = not_found
-> +if have_system or have_tools
-> +  pixman = dependency('pixman', required: have_system, version:'>=0.21.8',
-> +                      static: enable_static)
-> +endif
+On Thursday, 2020-08-27 at 16:01:37 +08, Zheng Chuan wrote:
 
-With the dependency from another patch that have_system and have_tools
-are initialized earlier in this file:
+> On 2020/8/26 18:17, David Edmondson wrote:
+>> On Monday, 2020-08-24 at 17:14:37 +08, Chuan Zheng wrote:
+>> 
+>>> Implement get_sample_page_period() and set_sample_page_period() to
+>>> sleep specific time between sample actions.
+>>>
+>>> Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
+>>> ---
+>>>  migration/dirtyrate.c | 24 ++++++++++++++++++++++++
+>>>  migration/dirtyrate.h |  2 ++
+>>>  2 files changed, 26 insertions(+)
+>>>
+>>> diff --git a/migration/dirtyrate.c b/migration/dirtyrate.c
+>>> index bd398b7..d1c0a78 100644
+>>> --- a/migration/dirtyrate.c
+>>> +++ b/migration/dirtyrate.c
+>>> @@ -28,6 +28,30 @@
+>>>  static int CalculatingState = DIRTY_RATE_STATUS_UNSTARTED;
+>>>  static struct DirtyRateStat DirtyStat;
+>>>  
+>>> +static int64_t set_sample_page_period(int64_t msec, int64_t initial_time)
+>>> +{
+>>> +    int64_t current_time;
+>>> +
+>>> +    current_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+>>> +    if ((current_time - initial_time) >= msec) {
+>>> +        msec = current_time - initial_time;
+>>> +    } else {
+>>> +        g_usleep((msec + initial_time - current_time) * 1000);
+>>> +    }
+>>> +
+>>> +    return msec;
+>>> +}
+>>> +
+>>> +static int64_t get_sample_page_period(int64_t sec)
+>>> +{
+>>> +    if (sec <= MIN_FETCH_DIRTYRATE_TIME_SEC ||
+>> 
+>> Shouldn't the minimum value be allowed?
+>> 
+>> That is, this test should be "sec < MIN_FETCH_DIRTYRATE_TIME_SEC" and
+>> MIN_FETCH_DIRTYRATE_TIME_SEC should be 1.
+>> 
+> Well, Actually we could measure dirtyrate within duration below 1s, like 0.5s.
+> Howerver, I am reconsider that maybe taking 0.5s as MIN_FETCH_DIRTYRATE_TIME_SEC is better in case of someone to do nasty thing like setting
+> a meaningless time duration which is close to 0:)
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+I think that a minimum of 1 second is fine. My concern is only that if
+you say "the minimum is X" but then don't let me choose X, it seems
+weird.
 
+>>> +        sec > MAX_FETCH_DIRTYRATE_TIME_SEC) {
+>>> +        sec = DEFAULT_FETCH_DIRTYRATE_TIME_SEC;
+>>> +    }
+>>> +
+>>> +    return sec;
+>>> +}
+>>> +
+>>>  static int dirtyrate_set_state(int *state, int old_state, int new_state)
+>>>  {
+>>>      assert(new_state < DIRTY_RATE_STATUS__MAX);
+>>> diff --git a/migration/dirtyrate.h b/migration/dirtyrate.h
+>>> index 41bc264..50a5636 100644
+>>> --- a/migration/dirtyrate.h
+>>> +++ b/migration/dirtyrate.h
+>>> @@ -51,6 +51,8 @@
+>>>  
+>>>  /* Take 1s as default for calculation duration */
+>>>  #define DEFAULT_FETCH_DIRTYRATE_TIME_SEC          1
+>>> +#define MIN_FETCH_DIRTYRATE_TIME_SEC              0
+>>> +#define MAX_FETCH_DIRTYRATE_TIME_SEC              60
+>>>  
+>>>  struct DirtyRateConfig {
+>>>      uint64_t sample_pages_per_gigabytes; /* sample pages per GB */
+>>> -- 
+>>> 1.8.3.1
+>> 
+>> dme.
+>> 
+
+dme.
+-- 
+Hello? Is anybody home? Well, you don't know me, but I know you.
 
