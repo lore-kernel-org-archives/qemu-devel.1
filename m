@@ -2,98 +2,86 @@ Return-Path: <SRS0=k4hX=CF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,UNPARSEABLE_RELAY autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16E19C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 15:38:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18918C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 15:38:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CDE0A2177B
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 15:38:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D81D52177B
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 15:38:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=dme-org.20150623.gappssmtp.com header.i=@dme-org.20150623.gappssmtp.com header.b="URfusXV/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CDE0A2177B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=dme.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="efYzcAnA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D81D52177B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43700 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45396 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBJyc-0007GK-1T
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 11:38:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55554)
+	id 1kBJz2-0007wx-5m
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 11:38:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55674)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dme@dme.org>) id 1kBJxL-0006VS-FO
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 11:36:51 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:40548)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <dme@dme.org>) id 1kBJxI-0007yl-Tv
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 11:36:51 -0400
-Received: by mail-wr1-x442.google.com with SMTP id b18so5804494wrs.7
- for <qemu-devel@nongnu.org>; Thu, 27 Aug 2020 08:36:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=dme-org.20150623.gappssmtp.com; s=20150623;
- h=to:cc:subject:in-reply-to:references:from:date:message-id
- :mime-version; bh=BeOcvmwAWgnHeFQeBo35PZI2Sg6m4dhDarRj4GCNKHY=;
- b=URfusXV//BbSgQr1OUBrGS0bK/XzyTvXxY3/rGoKwUfejqih031TGvNiAkoy3Bjbeh
- CRytncjzYBhPxmpM2B8c4sQcYkouloqDkjx+5P/zthJTEEYXrRL6oMt/mhdBAZ0MfpIk
- FCurhZNliz9TezITqMggZKnZdFqwvFbWRygwkeO2iLeAQ0Q25/Eup/NfFJbouW+7WnY8
- cYPxfF6YfeDsRySnT7urWfYbsl3TvPIILEgCSQ3zEPC7N8qufmrjDBKXyIpTvujLvca9
- RZCfSQKMus5XktBvlSKG0pSPRgi/zgI/Zb2XqkJN8gI8T4+LQGJGLvOZJtPcnqpCxaCv
- +VfQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:to:cc:subject:in-reply-to:references:from:date
- :message-id:mime-version;
- bh=BeOcvmwAWgnHeFQeBo35PZI2Sg6m4dhDarRj4GCNKHY=;
- b=evLxS59COxDntWI+EpdRhG76sdI1KKaYkagXZpiuIL12PxfKmKyL2F2DO9ixdvDbq2
- 7dRJKmGxqWSEs6lcg1Z/qvCFLR6nTkNjQ9gY07gA8GQhwjTDljz+DWB2/P6mK8LQfoiR
- rh2PED5Q0wBGALBXrpOophz7YePqWk0DweEcj0l0RWVSQKmo9JJGh165xQ9nYO0GyjE7
- V8XOpGmfbmif12ip4+lLIaSRKs5z0wQAWdsOBvFckFogAzu9QCwd02sTa5yU8CLmsY5G
- kZg16hygUy3TScsYbu1OMP8+D9tHrIEvNp/UU/qv2xrroukWTsgnpT4PHnzuSruT8GcZ
- WLeQ==
-X-Gm-Message-State: AOAM530LdIDdOhekzMzH5XxOF+LlBf+ksmKldPX21x7wN2jwxDtQIhhC
- 0Y5Bm5qlrNVGvxPeEmqVlK26nw==
-X-Google-Smtp-Source: ABdhPJxRODa8wZT7CDYuH90aukH4TXfXiyZ7oFnHNxN4VO3K+0ghECRXjvS18eBXRU2Ndvy8TDv/3g==
-X-Received: by 2002:a5d:4210:: with SMTP id n16mr21656339wrq.426.1598542606813; 
- Thu, 27 Aug 2020 08:36:46 -0700 (PDT)
-Received: from disaster-area.hh.sledj.net
- (8.a.e.d.0.0.0.0.0.0.0.0.4.6.0.0.0.4.1.7.1.7.b.b.0.b.8.0.1.0.0.2.ip6.arpa.
- [2001:8b0:bb71:7140:64::dea8])
- by smtp.gmail.com with ESMTPSA id g14sm5436299wmk.37.2020.08.27.08.36.45
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 27 Aug 2020 08:36:46 -0700 (PDT)
-Received: from localhost (disaster-area.hh.sledj.net [local])
- by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id 3dd9d397;
- Thu, 27 Aug 2020 15:36:45 +0000 (UTC)
-To: Zheng Chuan <zhengchuan@huawei.com>, quintela@redhat.com,
- eblake@redhat.com, dgilbert@redhat.com, berrange@redhat.com
-Subject: Re: [PATCH v5 11/12] migration/dirtyrate: Implement
- qmp_cal_dirty_rate()/qmp_get_dirty_rate() function
-In-Reply-To: <5e3fc626-531a-4383-2f61-f274e2c1357a@huawei.com>
-References: <1598260480-64862-1-git-send-email-zhengchuan@huawei.com>
- <1598260480-64862-12-git-send-email-zhengchuan@huawei.com>
- <m2wo1lk8j9.fsf@dme.org> <1a23d60c-186b-d5b5-c43a-a8512826409b@huawei.com>
- <m2d03cjo5j.fsf@dme.org> <e578c320-4864-863a-f54c-be1d6ab9d1bd@huawei.com>
- <m2a6ygjkzq.fsf@dme.org> <5e3fc626-531a-4383-2f61-f274e2c1357a@huawei.com>
-X-HGTTG: heart-of-gold
-From: David Edmondson <dme@dme.org>
-Date: Thu, 27 Aug 2020 16:36:45 +0100
-Message-ID: <m23648je2a.fsf@dme.org>
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1kBJxi-0006j5-Nf
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 11:37:14 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:51679)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1kBJxe-00082j-Ml
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 11:37:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1598542628;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=3pT7yM8sF334B20UH+dfchA4yGZwR0dLTpAKDiuiUik=;
+ b=efYzcAnACe4wKQV3Qdv+0T/jW8lsU2wtKyzXR6CBsbMfCKBfjSTQA1BISadVAdo4q/DcEs
+ HQ6FFgOAaKPF8Y8QnGRpZ66U7SWeFRuxMMDy62mLSzUBYDMeRXu5u8B8u694UaXCCtkdRV
+ 0zftYp1wZHMB4mTOg8FP98VV6U8amik=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-246-oRXB8_j4O0qA-zX8WvSTaw-1; Thu, 27 Aug 2020 11:37:07 -0400
+X-MC-Unique: oRXB8_j4O0qA-zX8WvSTaw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 21C301DDFF
+ for <qemu-devel@nongnu.org>; Thu, 27 Aug 2020 15:37:06 +0000 (UTC)
+Received: from dgilbert-t580.localhost (ovpn-114-163.ams2.redhat.com
+ [10.36.114.163])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 85CEC5D9E8;
+ Thu, 27 Aug 2020 15:36:58 +0000 (UTC)
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org, vgoyal@redhat.com, stefanha@redhat.com,
+ virtio-fs@redhat.com
+Subject: [PATCH v2 0/6] virtiofsd xattr name mappings
+Date: Thu, 27 Aug 2020 16:36:51 +0100
+Message-Id: <20200827153657.111098-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Received-SPF: neutral client-ip=2a00:1450:4864:20::442;
- envelope-from=dme@dme.org; helo=mail-wr1-x442.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -10
-X-Spam_score: -1.1
-X-Spam_bar: -
-X-Spam_report: (-1.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_NEUTRAL=0.779, UNPARSEABLE_RELAY=0.001 autolearn=no autolearn_force=no
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
+X-Mimecast-Spam-Score: 0.0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 02:54:02
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.959,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -106,123 +94,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: zhang.zhanghailiang@huawei.com, qemu-devel@nongnu.org,
- xiexiangyou@huawei.com, alex.chen@huawei.com, ann.zhuangyanying@huawei.com,
- fangying1@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thursday, 2020-08-27 at 22:47:15 +08, Zheng Chuan wrote:
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-> On 2020/8/27 21:07, David Edmondson wrote:
->> On Thursday, 2020-08-27 at 20:55:51 +08, Zheng Chuan wrote:
->> 
->>> On 2020/8/27 19:58, David Edmondson wrote:
->>>> On Thursday, 2020-08-27 at 17:34:13 +08, Zheng Chuan wrote:
->>>>
->>>>>>> +    /*
->>>>>>> +     * Only support query once for each calculation,
->>>>>>> +     * reset as DIRTY_RATE_STATUS_UNSTARTED after query
->>>>>>> +     */
->>>>>>> +    (void)dirtyrate_set_state(&CalculatingState, CalculatingState,
->>>>>>> +                              DIRTY_RATE_STATUS_UNSTARTED);
->>>>>>
->>>>>> Is there a reason for this restriction? Removing it would require
->>>>>> clarifying the state model, I suppose.
->>>>>>
->>>>> We only support query once for each calculation.
->>>>> Otherwise, it could always query dirtyrate, but maybe the dirtyrate is calculated
->>>>> long time ago.
->>>>
->>>> There's nothing in the current interface that prevents this from being
->>>> the case already - the caller could initiate a 1 second sample, then
->>>> wait 24 hours to query the result.
->>>>
->>>> Obviously this would generally be regarded as "d'oh - don't do that",
->>>> but the same argument would apply if the caller is allowed to query the
->>>> results multiple times.
->>>>
->>>> Perhaps a complete solution would be to include information about the
->>>> sample period with the result. The caller could then determine whether
->>>> the sample is of adequate quality (sufficiently recent, taken over a
->>>> sufficiently long time period) for its' intended use.
->>>>
->>> You mean add timestamp when i calculate?
->> 
->> You already have a timestamp, though I'm not sure if it is one that is
->> appropriate to report to a user.
->> 
->> I was thinking that you would include both the start time and duration
->> of the sample in the output of the query-dirty-rate QMP command, as well
->> as the dirty rate itself. That way the caller can make a decision about
->> whether the data is useful.
->> 
-> OK, i understand.
-> I may add it like this:
-> +##
-> +{ 'struct': 'DirtyRateInfo',
-> +  'data': {'dirty-rate': 'int64',
-> +           'status': 'DirtyRateStatus',
-> +           'start-timestamp': 'int64',
-> +           'calc-time': 'int64'} }
-> +
-> +##
-> the stat-timestamp would be initial_time which gets from qemu_clock_get_ms(QEMU_CLOCK_REALTIME)
-> at the beginning of calculation while calc_time is time-duration in microsecond.
+  This is a second cut of a xattr name mapping option for virtiofsd.
+It allows the user of virtiofsd to define a fairly flexible mapping
+from the view of the xattr names the host fs has and the ones that the
+guest sees.
 
-The calc-time reported here should be in the same units as when it is
-specified in calc-dirty-rate (seconds for both seems fine).
+  The hope is this allows things like:
+    a) Different selinux attributes on host/guest
+    b) separation of trusted. attributes that clash on overlayfs
+    c) support for privileged xattr's in guests running with an
+       unprivileged virtiofsd.
 
-I suspect that providing the start-timestamp in seconds would also be
-fine - it's not obvious that knowing the value in milliseconds adds much
-value.
+There's no apparent standard for this kind of mapping, so I made
+it flexible by specifying a mapping rule in the option.
 
-> But i reconsider that, it maybe still need to reset the CalculatingState as DIRTY_RATE_STATUS_UNSTARTED
-> here?
->
-> Initialization like:
-> void qmp_calc_dirty_rate(int64_t calc_time, Error **errp)
-> {
->    XXXX
->
->     if (CalculatingState == DIRTY_RATE_STATUS_MEASURING) {
->         return;
->     }
->
->
->     (void)dirtyrate_set_state(&CalculatingState, CalculatingState,
->                               DIRTY_RATE_STATUS_UNSTARTED);
->     XXXX
-> }
->
-> It could not prevent concurrent scene which may lead to disorder state:(
+Prefix's can be added (selectively or globally), xattr's can be
+dropped in either direction or passed through.
 
-It should be possible to initiate measurement when the state is either
-UNSTARTED or MEASURED - only MEASURING should rule it out.
+Dave
 
->
->
->>> Actually, I do not want make it complicate for qemu code,
->>> maybe it could be left for user to implement both two qmp commands
->>> like in libvirt-api.
->> 
->> Sorry, I didn't understand this comment.
->> 
->>> On the other hand, it really bother me that we need to reset calculating state
->>> to make sure the state model could be restart in next calculation.
->>>
->>> For now, i put it after query_dirty_rate_info is finished as you see, it should not be a good idea:(
->>>
->>> Maybe it is better to initialize at the beginning of qmp_calc_dirty_rate().
->>>
->>>> dme.
->>>>
->> 
->> dme.
->> 
+v2
+  Switch from cryptic single letter codes to full words in rules
+  Allow rules to use any separator character
+  Add examples to doc
+  Add a couple of fixups for a gcc warning and make gcc spot my
+  format errors.
 
-dme.
+Dr. David Alan Gilbert (6):
+  virtiofsd: Silence gcc warning
+  virtiofsd: Add printf checking to fuse_log
+  tools/virtiofsd: xattr name mappings: Add option
+  tools/virtiofsd: xattr name mappings: Map client xattr names
+  tools/virtiofsd: xattr name mappings: Map server xattr names
+  tools/virtiofsd: xattr name mapping examples
+
+ docs/tools/virtiofsd.rst         | 104 ++++++++++
+ tools/virtiofsd/fuse_log.h       |   2 +
+ tools/virtiofsd/passthrough_ll.c | 340 ++++++++++++++++++++++++++++++-
+ 3 files changed, 442 insertions(+), 4 deletions(-)
+
 -- 
-Everyone I know, goes away in the end.
+2.26.2
+
 
