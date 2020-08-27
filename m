@@ -2,72 +2,69 @@ Return-Path: <SRS0=k4hX=CF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7131AC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 07:05:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF271C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 07:07:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 439FB20786
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 07:05:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 439FB20786
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id B1FCC20786
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 07:07:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1FCC20786
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47522 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49694 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBByZ-0003pv-FH
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 03:05:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55054)
+	id 1kBC07-0004kU-1j
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 03:07:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55402)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kBBxx-0003JS-6e
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 03:04:57 -0400
-Received: from mout.kundenserver.de ([217.72.192.73]:34337)
+ (Exim 4.90_1) (envelope-from <pannengyuan@huawei.com>)
+ id 1kBBzY-0004Ks-Cv
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 03:06:36 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:4656 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kBBxv-00032a-Gl
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 03:04:56 -0400
-Received: from localhost.localdomain ([82.252.135.186]) by
- mrelayeu.kundenserver.de (mreue106 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1M7KG2-1kGfbr3nQa-007mk5; Thu, 27 Aug 2020 09:04:52 +0200
-From: Laurent Vivier <laurent@vivier.eu>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] linux-user: fix target_to_host_timespec64()
-Date: Thu, 27 Aug 2020 09:04:49 +0200
-Message-Id: <20200827070449.2386007-1-laurent@vivier.eu>
-X-Mailer: git-send-email 2.26.2
+ (Exim 4.90_1) (envelope-from <pannengyuan@huawei.com>)
+ id 1kBBzW-0003KZ-IX
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 03:06:36 -0400
+Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id A5DFD7A2C7C666F173D5;
+ Thu, 27 Aug 2020 15:06:22 +0800 (CST)
+Received: from [127.0.0.1] (10.174.187.46) by DGGEMS408-HUB.china.huawei.com
+ (10.3.19.208) with Microsoft SMTP Server id 14.3.487.0; Thu, 27 Aug 2020
+ 15:06:13 +0800
+Subject: Re: [PATCH 06/12] ui/gtk-gl-area: Plug memleak in
+ gd_gl_area_create_context()
+To: Li Qiang <liq3ea@gmail.com>
+References: <20200814160241.7915-1-pannengyuan@huawei.com>
+ <20200814160241.7915-7-pannengyuan@huawei.com>
+ <CAKXe6SJ-=AbZMQ+8snQcPjnZ-r-2+FSHVCVkA2tkba6ujpJCbg@mail.gmail.com>
+From: Pan Nengyuan <pannengyuan@huawei.com>
+Message-ID: <0f8c0192-da25-d5a9-dd9e-2ef72f3f8a6c@huawei.com>
+Date: Thu, 27 Aug 2020 15:06:12 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
+In-Reply-To: <CAKXe6SJ-=AbZMQ+8snQcPjnZ-r-2+FSHVCVkA2tkba6ujpJCbg@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:G7OPZrBRQRQHcu2wyT9YPc1XscLC/AwcuwWuQiwmf1BNv3Ng/DO
- 1ONMMaXsDCiuXW+RCX4DgQ8b4iPQZPkI0vY1Z7H53JYYdA6CsNACn4f8DRse+0cigo+FsRB
- YHBpYLYsnz6PFjEwX1liTUWftNxK59GrmNX9tHBwsI1BBTGk6UVYzuDnx0Ucuxy3wnYFksh
- N2deTP2yuPIm/qdoNfB/g==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:wZURAucVs3U=:jqWGFYK/MTnm4STATtTiQN
- Zhkk9JXVj6Ia+tAMTBuSrenIsQXqvJNHPoGX29u7qOEUcNHI3/yu6pJmvd9BgsaXOoDo77G+X
- g4gqagRl/6L3js24jxJO/hyVGWeVDsbNx7xdQB2xR2l5dQDEScwJKlA8FKFhyO2J5bs9gQoBi
- N1TSe8wjqS3q98lcNQJK2JKyV7a6RJQcj1lYITym03c9eUP9oZ5KkwMqmlcP9tmFKDffOwrU2
- a04H4sUZNnpkWDWUosnArLWRyYpe8R5c2eo1bKl+MT3A/QteJVgSPpV/orNcp7vvyc/ZWa1YJ
- t9CmiCkhk0RhzCerk9N7H2gJ/n76SYQSdPQgnOfDtI07zRB6QXJYMd0F3bv/01Hn2oA+4NA0C
- Onyo3dtjPV4h9GppiBTvBolxwPcXXaqzTage9gFz/8VikQ2kbs6F64TFJ0LA2xf6jrSn2JuuM
- oa6r8IbcErqIMjbU6rFor4xXnjC/m4WYne3gwvnT8SZwXnQ3edEmSCcqnS23dG3v76aXgBBqo
- SkUdworVw6c5Ho2e2BmCOcGeWD6wEqZPwaCx4ISmKFrdptAI2wmaRgc6Ic1Nn/IrGvBgLLi7e
- /W3pKGBRB5R11SL3qVl5KUZxNMAu2tUIsIx48c5QKJDeb5dqbHMicTUhPj0J7/1GPC7/chMBH
- fDTISXTH8miiSTgc/7rdent6UNZO+VzYyFbyqpPAJoixMJVz9w1IuK4z5SaS0LYPW6+qGOw5T
- o61S920Bhnt9TrSeinS8c39iJbAn+1LBcgElcAnOoEegtMSD9YK+EKFk94U15MPW15pRxaIZu
- cZ9Y7w7UlSvACQhqI66bRiGn0eqiwWI2pdCKQwNOxANsBMgdPThQCHqSxV4wS0qVOl8nTX0
-Received-SPF: none client-ip=217.72.192.73; envelope-from=laurent@vivier.eu;
- helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 03:04:53
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+X-Originating-IP: [10.174.187.46]
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.190;
+ envelope-from=pannengyuan@huawei.com; helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 02:12:47
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -63
+X-Spam_score: -6.4
+X-Spam_bar: ------
+X-Spam_report: (-6.4 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-2.239,
+ RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -80,34 +77,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <laurent@vivier.eu>, Filip Bozuta <Filip.Bozuta@syrmia.com>
+Cc: Chen Qun <kuhn.chenqun@huawei.com>,
+ zhanghailiang <zhang.zhanghailiang@huawei.com>,
+ Euler Robot <euler.robot@huawei.com>, Qemu Developers <qemu-devel@nongnu.org>,
+ Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-in 32 bit mode, drop the padding in tv_nsec. If host is 64bit and target
-is 32bit, the padding bytes will be copied from the target and as the
-kernel checks the value, the syscall exits with EINVAL.
 
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
----
- linux-user/syscall.c | 2 ++
- 1 file changed, 2 insertions(+)
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index c82b73e03234..9d7376734ad4 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -1253,6 +1253,8 @@ static inline abi_long target_to_host_timespec64(struct timespec *host_ts,
-     }
-     __get_user(host_ts->tv_sec, &target_ts->tv_sec);
-     __get_user(host_ts->tv_nsec, &target_ts->tv_nsec);
-+    /* in 32bit mode, this drops the padding */
-+    host_ts->tv_nsec = (long)(abi_long)host_ts->tv_nsec;
-     unlock_user_struct(target_ts, target_addr, 0);
-     return 0;
+On 2020/8/26 20:20, Li Qiang wrote:
+> Pan Nengyuan <pannengyuan@huawei.com> 于2020年8月14日周五 下午6:15写道：
+>>
+>> Receiving error in local variable err, and forgot to free it.
+>> Considering that there is no place to deal with it. Clean up.
+>>
+>> Reported-by: Euler Robot <euler.robot@huawei.com>
+>> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
+>> ---
+>> Cc: Gerd Hoffmann <kraxel@redhat.com>
+>> ---
+>>  ui/gtk-gl-area.c | 5 ++---
+>>  1 file changed, 2 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/ui/gtk-gl-area.c b/ui/gtk-gl-area.c
+>> index 85f9d14c51..c740a7eb14 100644
+>> --- a/ui/gtk-gl-area.c
+>> +++ b/ui/gtk-gl-area.c
+>> @@ -142,15 +142,14 @@ QEMUGLContext gd_gl_area_create_context(DisplayChangeListener *dcl,
+>>      VirtualConsole *vc = container_of(dcl, VirtualConsole, gfx.dcl);
+>>      GdkWindow *window;
+>>      GdkGLContext *ctx;
+>> -    GError *err = NULL;
+>>
+>>      gtk_gl_area_make_current(GTK_GL_AREA(vc->gfx.drawing_area));
+>>      window = gtk_widget_get_window(vc->gfx.drawing_area);
+>> -    ctx = gdk_window_create_gl_context(window, &err);
+>> +    ctx = gdk_window_create_gl_context(window, NULL);
+>>      gdk_gl_context_set_required_version(ctx,
+>>                                          params->major_ver,
+>>                                          params->minor_ver);
+>> -    gdk_gl_context_realize(ctx, &err);
+>> +    gdk_gl_context_realize(ctx, NULL);
+>>      return ctx;
+>>  }
+> 
+> Maybe we should check the return value of  'gdk_window_create_gl_context'
+> and 'gdk_gl_context_realize' instead of omitting it?
+
+OK, Agree with you.
+
+How about check the value like the below?
+(Return NULL when error happens in gdk_gl_context_realize. It's different from the original.)
+
+Thanks.
+
+--------
+diff --git a/ui/gtk-gl-area.c b/ui/gtk-gl-area.c
+index 85f9d14c51..98c22d23f5 100644
+--- a/ui/gtk-gl-area.c
++++ b/ui/gtk-gl-area.c
+@@ -147,10 +147,21 @@ QEMUGLContext gd_gl_area_create_context(DisplayChangeListener *dcl,
+     gtk_gl_area_make_current(GTK_GL_AREA(vc->gfx.drawing_area));
+     window = gtk_widget_get_window(vc->gfx.drawing_area);
+     ctx = gdk_window_create_gl_context(window, &err);
++    if (err) {
++        g_printerr("Create gdk gl context failed: %s\n", err->message);
++        g_error_free(err);
++        return NULL;
++    }
+     gdk_gl_context_set_required_version(ctx,
+                                         params->major_ver,
+                                         params->minor_ver);
+     gdk_gl_context_realize(ctx, &err);
++    if (err) {
++        g_printerr("Realize gdk gl context failed: %s\n", err->message);
++        g_error_free(err);
++        g_clear_object(&ctx);
++        return NULL;
++    }
+     return ctx;
  }
--- 
-2.26.2
+
+
+> 
+> Thanks,
+> Li Qiang
+> 
+>>
+> 
+>> --
+>> 2.18.2
+>>
+>>
+> .
+> 
 
 
