@@ -2,62 +2,122 @@ Return-Path: <SRS0=k4hX=CF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59091C433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 12:49:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6D81C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 12:50:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0B86322CAE
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 12:49:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B86322CAE
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
+	by mail.kernel.org (Postfix) with ESMTPS id 7091B2073A
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 12:50:41 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=openvz.org header.i=@openvz.org header.b="EW62omft"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7091B2073A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=openvz.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51142 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55124 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBHLY-0000tn-Bd
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 08:49:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59124)
+	id 1kBHMW-0002XH-Os
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 08:50:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59598)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ysato@users.sourceforge.jp>)
- id 1kBHBY-0008H1-KF
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 08:39:20 -0400
-Received: from mail01.asahi-net.or.jp ([202.224.55.13]:47912)
- by eggs.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ysato@users.sourceforge.jp>) id 1kBHBS-0005y4-31
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 08:39:20 -0400
-Received: from sakura.ysato.name (ik1-413-38519.vs.sakura.ne.jp
- [153.127.30.23]) (Authenticated sender: PQ4Y-STU)
- by mail01.asahi-net.or.jp (Postfix) with ESMTPA id 66DA5108926;
- Thu, 27 Aug 2020 21:39:08 +0900 (JST)
-Received: from yo-satoh-debian.localdomain (ZM005235.ppp.dion.ne.jp
- [222.8.5.235])
- by sakura.ysato.name (Postfix) with ESMTPSA id DFE8D1C0792;
- Thu, 27 Aug 2020 21:39:07 +0900 (JST)
-From: Yoshinori Sato <ysato@users.sourceforge.jp>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 13/20] hw/timer: Add Renesas MTU2
-Date: Thu, 27 Aug 2020 21:38:52 +0900
-Message-Id: <20200827123859.81793-14-ysato@users.sourceforge.jp>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200827123859.81793-1-ysato@users.sourceforge.jp>
-References: <20200827123859.81793-1-ysato@users.sourceforge.jp>
+ (Exim 4.90_1) (envelope-from <den@virtuozzo.com>)
+ id 1kBHDb-0005LB-99; Thu, 27 Aug 2020 08:41:27 -0400
+Received: from mail-am6eur05on2109.outbound.protection.outlook.com
+ ([40.107.22.109]:35407 helo=EUR05-AM6-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <den@virtuozzo.com>)
+ id 1kBHDX-0006cM-IR; Thu, 27 Aug 2020 08:41:25 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=iH27l64eYahu9w/i7W/JCK815VUQ5VZ3pi6QIbYIAuFVB/zwJa0vc9RA65uQbIjVsUwmqk7x4DOh75Wdian0K3BwRposGBP6OOECADz0NF627Ys2oWFjsNzWdfgts9v6RKh6UEAJ7/GR8XXq0CubgPG2PwVmeuEKdySyw9/+SaQgWuaHWvcQwdDaoM7tQKyRDW/7qdCXzADN56ynnFXiod685VZSlJFErzrAS4miLV180SkmPQG44+uWHUCYuO7d6LusOowvjr/OKzfsnaG0iNPqOwOdz5FmlYWn74yqhTqZc6Hxk59R2tSL8ouZ4qbuKr06nB7d+VI0jAyPKS2JeQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=lHBKPtJch9EQNivoXVz5eP7WagRpBKNKmWMsiRIkkRU=;
+ b=hwSAORezQiAONH7fKInSOIGKmYAFg49cxSlL0poIjou+D0CVAx+CwfV6HZVYav99TR8f3l1d6GtXgruKM19HYeNCU4dGDKI/38Pj3JMSDb56RMP6RfwaccDNKgvK2X8+3QAC75tGtvmIlyQmB4uuhHtiTkNWkWi4HVh9OkbcmalNK4lQDRwn0P3k+moKb99a8ESgRLOVNTIpD4m8BOpFvaSaRrgfwtGi1zImHSBapHCXLIEPXlLDjdiCsYHE+A1lK4QRMWULFmJ9MaSmtMq0p8odJ9G7r/KLGTZ6/rMcQn0W+mrzKXCLLkWRq9pFdUQh1KOny1RfUg01nngo8x4GuA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none header.from=openvz.org;
+ dkim=pass header.d=openvz.org; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=openvz.org;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=lHBKPtJch9EQNivoXVz5eP7WagRpBKNKmWMsiRIkkRU=;
+ b=EW62omftzUgbItbQiqDXUizb3ZtKCTEF4cNDSZLQrku71dnH9ZhEljoUaAg2FdgSIy1x8uHS5LAnji+L5eAXKts9CdKjiOs5jibSfxQUh5ZKX/rzyb5VT5W6BxvC49HSEEFXySoqf1IhA16q6f0H6ZJ6o+8Y5lABZs/24EIxBM8=
+Authentication-Results: virtuozzo.com; dkim=none (message not signed)
+ header.d=none;virtuozzo.com; dmarc=none action=none header.from=openvz.org;
+Received: from AM6PR08MB4214.eurprd08.prod.outlook.com (2603:10a6:20b:8d::30)
+ by AM6PR08MB5207.eurprd08.prod.outlook.com (2603:10a6:20b:ea::13)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3305.26; Thu, 27 Aug
+ 2020 12:41:14 +0000
+Received: from AM6PR08MB4214.eurprd08.prod.outlook.com
+ ([fe80::751c:fc78:625c:ea34]) by AM6PR08MB4214.eurprd08.prod.outlook.com
+ ([fe80::751c:fc78:625c:ea34%4]) with mapi id 15.20.3305.032; Thu, 27 Aug 2020
+ 12:41:14 +0000
+Subject: Re: [PATCH v8 0/6] block: seriously improve savevm/loadvm performance
+From: "Denis V. Lunev" <den@openvz.org>
+To: qemu-block@nongnu.org, qemu-devel@nongnu.org
+References: <20200709132644.28470-1-den@openvz.org>
+ <a722fc99-b367-dbd8-fd45-de7fb1a18f5d@openvz.org>
+Message-ID: <2d738b26-d107-5f2c-0cfe-f20af71e7f6f@openvz.org>
+Date: Thu, 27 Aug 2020 15:41:11 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+In-Reply-To: <a722fc99-b367-dbd8-fd45-de7fb1a18f5d@openvz.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-ClientProxiedBy: HE1PR05CA0131.eurprd05.prod.outlook.com
+ (2603:10a6:7:28::18) To AM6PR08MB4214.eurprd08.prod.outlook.com
+ (2603:10a6:20b:8d::30)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: softfail client-ip=202.224.55.13;
- envelope-from=ysato@users.sourceforge.jp; helo=mail01.asahi-net.or.jp
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 08:39:06
-X-ACL-Warn: Detected OS   = ???
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
- SPF_HELO_NONE=0.001, SPF_SOFTFAIL=0.665 autolearn=no autolearn_force=no
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.1.27] (31.148.204.195) by
+ HE1PR05CA0131.eurprd05.prod.outlook.com (2603:10a6:7:28::18) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3326.19 via Frontend Transport; Thu, 27 Aug 2020 12:41:13 +0000
+X-Originating-IP: [31.148.204.195]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: e1d7c9bd-64b9-4f08-f8da-08d84a867c15
+X-MS-TrafficTypeDiagnostic: AM6PR08MB5207:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM6PR08MB520785C75710782C7F214CA6B6550@AM6PR08MB5207.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:3513;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: cej/9jowLb3GDtc1c620vgDm0STJyzmoXncBuL5RogoTNxTAr88E7zpUPmibc+PcJs+3WwKiVxI/0h+AZzzlPVynleZqHxt4vGdrSsVn4g2J36tOTi3IbRRj2BHebI+B+6e18mfMLm+M+5mwanBQpKcJkswY8SphP3RJXwQVbfhM3Hlt0oZr2mnnrYH/tMYAmFVVv7PSHkBSO27wXORq7oWeotXNjhOz13A9Vm14LYnX9TyNyy5K8aLzuHYISKS0QCf2ROKjGm9R53Jr6jyATe6tuTEMbImZC28stfm6pE9tJWNi9Uu3eE1qWxVFlL4jmjrWhdwxAnLB+Mo2oS/BvAjqd9paJZ8UY3a43pVrm9GaDgJM4Kbde5z5vuA5eQJAK2NZ7azbm/KcvsU+Wgcu56aGfBvF8nI2IYK1mrLPV7ojNegSh+6xLc28fhgVhyljVW6/2IgoXqRJfrfAiPPpVw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM6PR08MB4214.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(4636009)(366004)(136003)(39840400004)(376002)(396003)(346002)(31696002)(31686004)(2616005)(107886003)(42882007)(4326008)(83170400001)(83380400001)(956004)(8676002)(2906002)(53546011)(186003)(66476007)(16526019)(66556008)(8936002)(36756003)(66946007)(26005)(6486002)(54906003)(16576012)(52116002)(478600001)(316002)(966005)(5660300002)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: g7TUwv1vaOTfHP9ufuy8uIu/OQwYjRYtJ+22D02TyeXQynnC5f3E2JU9se2h8gmFJ9m5d/5VPtdkYUL7waOPg5sD7EAJQwaPHHYWhJROVCUkpxjOs+8wpTo41qJ77W5sn6pfPRcIypSFfMF0owTTc9CtQrUUIo9vU9Afkje7/StZPrkoaqo4u5kBbcHMAV44VcQ99t2gQzNku3T1SzsAP5ud2uF4ba73ayh9fcs0x/bHjShw8in8qcoA6CVr2hxzK/EHBX3pXkrexgO2ZP7dGKoKa/cd/JenIjGzkpWaPaGUf9KKhgWRSQwYxEjpLxNTXU2IzC9xtQmnmSCjnQNB9TIgLduzq3TWWVQ9p+8w6ukm29gnMCJiWLKOjWuCwhsCQi1UwFsaHiAGXGyEDQpNnRow/GZ5H6Jo0jyag1scOE5ygipFvlQt2GHdueXBrfXIaJFUyLneHvbz2djtJ90qDMHUB5qd+YJPNN3BUSZbBhFzglWmAvAFCVzBkQ0KIGYs7TCyAKktab5P/m6KOq9OJrQFCRn8QtPpU6ib3LcaNHswgEzFEsp+TKQd05gx+Udhu/z5BBUCHicBEsMBSioVYiBhPAHB5OYy5jvvgQ1zw634aAs5kV75NXJhwOY0O+7Qgsi6GoriRheh1fjrpa26uA==
+X-OriginatorOrg: openvz.org
+X-MS-Exchange-CrossTenant-Network-Message-Id: e1d7c9bd-64b9-4f08-f8da-08d84a867c15
+X-MS-Exchange-CrossTenant-AuthSource: AM6PR08MB4214.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Aug 2020 12:41:14.2721 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: GHCdFXxqWhA/lzF3SbY6w/hJBE1dK6e9usyKStCTcHzxDNikoWYy31FNVsNSIj1LOHF/UX38BwfsnM88LGcWIQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB5207
+Received-SPF: pass client-ip=40.107.22.109; envelope-from=den@virtuozzo.com;
+ helo=EUR05-AM6-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 08:41:19
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
+ MSGID_FROM_MTA_HEADER=0.001, NICE_REPLY_A=-1.782, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -70,1458 +130,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Yoshinori Sato <ysato@users.sourceforge.jp>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Juan Quintela <quintela@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Denis Plotnikov <dplotnikov@virtuozzo.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
----
- include/hw/timer/renesas_mtu.h |   90 +++
- hw/timer/renesas_mtu.c         | 1312 ++++++++++++++++++++++++++++++++
- hw/timer/Kconfig               |    2 +
- hw/timer/meson.build           |    1 +
- 4 files changed, 1405 insertions(+)
- create mode 100644 include/hw/timer/renesas_mtu.h
- create mode 100644 hw/timer/renesas_mtu.c
-
-diff --git a/include/hw/timer/renesas_mtu.h b/include/hw/timer/renesas_mtu.h
-new file mode 100644
-index 0000000000..27df14b308
---- /dev/null
-+++ b/include/hw/timer/renesas_mtu.h
-@@ -0,0 +1,90 @@
-+/*
-+ * Renesas Multi-function Timer Uint Object
-+ *
-+ * Copyright (c) 2020 Yoshinori Sato
-+ *
-+ * This code is licensed under the GPL version 2 or later.
-+ *
-+ */
-+
-+#ifndef HW_RENESAS_MTU_H
-+#define HW_RENESAS_MTU_H
-+
-+#include "hw/sysbus.h"
-+#include "hw/qdev-clock.h"
-+
-+#define TYPE_RENESAS_MTU2 "renesas-mtu2"
-+#define RenesasMTU2(obj) \
-+    OBJECT_CHECK(RenesasMTU2State, (obj), TYPE_RENESAS_MTU2)
-+
-+#define MTU2Class(klass) \
-+    OBJECT_CLASS_CHECK(RenesasMTU2Class, klass, TYPE_RENESAS_MTU2)
-+
-+enum {
-+    NR_MAX_IRQ = 7,
-+    MTU_NR_IRQ = 7 + 4 + 4 + 5 + 5 + 3,
-+};
-+
-+struct RenesasMTU2State;
-+
-+typedef struct {
-+    uint8_t tcr;
-+    uint8_t tmdr;
-+    uint8_t tsr;
-+    uint16_t tior;
-+    uint16_t tier;
-+    uint32_t tcnt;
-+    uint16_t tgr[6];
-+
-+    int num_gr;
-+    int64_t base;
-+    int64_t next;
-+    int64_t clk;
-+    bool start;
-+    bool cntclr;
-+    bool ier;
-+    QEMUTimer *timer;
-+    int ch;
-+    qemu_irq irq[NR_MAX_IRQ];
-+    int next_cnt;
-+    struct RenesasMTU2State *mtu;
-+} RenesasMTURegs;
-+
-+typedef struct RenesasMTU2State {
-+    SysBusDevice parent_obj;
-+    RenesasMTURegs r[5];
-+    RenesasMTURegs r5[3];
-+    uint8_t tbtm;
-+    uint8_t ticcr;
-+    uint16_t tadcr;
-+    uint16_t tadcor[2];
-+    uint16_t tadcobr[2];
-+    /* CH A registers */
-+    uint8_t toer;
-+    uint8_t tgcr;
-+    uint8_t tocr[2];
-+    uint16_t tcdr;
-+    uint16_t tddr;
-+    uint16_t tcnts;
-+    uint16_t tcbr;
-+    uint8_t titcr;
-+    uint8_t titcnt;
-+    uint8_t tbter;
-+    uint8_t tder;
-+    uint8_t tolbr;
-+    uint8_t twcr;
-+    uint8_t trwer;
-+    uint8_t tsyr;
-+
-+    Clock *pck;
-+    int64_t input_freq;
-+    MemoryRegion memory[3];
-+    uint8_t trwer_r;
-+    uint32_t unit;
-+} RenesasMTU2State;
-+
-+typedef struct {
-+    SysBusDeviceClass parent;
-+} RenesasMTU2Class;
-+
-+#endif
-diff --git a/hw/timer/renesas_mtu.c b/hw/timer/renesas_mtu.c
-new file mode 100644
-index 0000000000..fc204f10ce
---- /dev/null
-+++ b/hw/timer/renesas_mtu.c
-@@ -0,0 +1,1312 @@
-+/*
-+ * Renesas Multi-function Timer Uint
-+ *
-+ * Datasheet: RX62N Group, RX621 Group User's Manual: Hardware
-+ * (Rev.1.40 R01UH0033EJ0140)
-+ *
-+ * Copyright (c) 2019 Yoshinori Sato
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2 or later, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-+ * more details.
-+ *
-+ * You should have received a copy of the GNU General Public License along with
-+ * this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu-common.h"
-+#include "qemu/log.h"
-+#include "qapi/error.h"
-+#include "qemu/timer.h"
-+#include "hw/hw.h"
-+#include "hw/irq.h"
-+#include "hw/sysbus.h"
-+#include "hw/registerfields.h"
-+#include "hw/qdev-properties.h"
-+#include "hw/timer/renesas_mtu.h"
-+#include "qemu/error-report.h"
-+
-+REG8(TCR_012, 0)
-+REG8(TMDR_012, 1)
-+REG8(TIORH_012, 2)
-+REG8(TIORL_012, 3)
-+REG8(TIER_012, 4)
-+REG8(TSR_012, 5)
-+REG16(TCNT_012, 6)
-+REG16(TGRA_012, 8)
-+REG16(TGRB_012, 10)
-+REG16(TGRC_012, 12)
-+REG16(TGRD_012, 14)
-+REG8(TICCR_1, 16)
-+REG16(TGRE_0, 32)
-+REG16(TGRF_0, 34)
-+REG8(TIER2_0, 36)
-+REG8(TBTM_0, 38)
-+
-+REG8(TCR_3, 0)
-+REG8(TCR_4, 1)
-+REG8(TMDR_3, 2)
-+REG8(TMDR_4, 3)
-+REG8(TIORH_3, 4)
-+REG8(TIORL_3, 5)
-+REG8(TIORH_4, 6)
-+REG8(TIORL_4, 7)
-+REG8(TIER_3, 8)
-+REG8(TIER_4, 9)
-+REG8(TOER, 10)
-+  FIELD(TOER, OE3B, 0, 1)
-+  FIELD(TOER, OE4A, 1, 1)
-+  FIELD(TOER, OE4B, 2, 1)
-+  FIELD(TOER, OE3D, 3, 1)
-+  FIELD(TOER, OE4C, 4, 1)
-+  FIELD(TOER, OE4D, 5, 1)
-+REG8(TGCR, 13)
-+  FIELD(TGCR, BDC, 6, 1)
-+  FIELD(TGCR, N, 5, 1)
-+  FIELD(TGCR, P, 4, 1)
-+  FIELD(TGCR, FB, 3, 1)
-+  FIELD(TGCR, WF, 2, 1)
-+  FIELD(TGCR, VF, 1, 1)
-+  FIELD(TGCR, UF, 0, 1)
-+REG8(TOCR1, 14)
-+  FIELD(TOCR1, OLSP, 0, 1)
-+  FIELD(TOCR1, OLSN, 1, 1)
-+  FIELD(TOCR1, TOCS, 2, 1)
-+  FIELD(TOCR1, TOCL, 3, 1)
-+  FIELD(TOCR1, PSYE, 6, 1)
-+REG8(TOCR2, 15)
-+  FIELD(TOCR2, OLS1P, 0, 1)
-+  FIELD(TOCR2, OLS1N, 1, 1)
-+  FIELD(TOCR2, OLS2P, 2, 1)
-+  FIELD(TOCR2, OLS2N, 3, 1)
-+  FIELD(TOCR2, OLS3P, 4, 1)
-+  FIELD(TOCR2, OLS3N, 5, 1)
-+  FIELD(TOCR2, BF, 6, 2)
-+REG16(TCNT_3, 16)
-+REG16(TCNT_4, 18)
-+REG16(TCDR, 20)
-+REG16(TDDR, 22)
-+REG16(TGRA_3, 24)
-+REG16(TGRB_3, 26)
-+REG16(TGRA_4, 28)
-+REG16(TGRB_4, 30)
-+REG16(TCNTS, 32)
-+REG16(TCBR, 34)
-+REG16(TGRC_3, 36)
-+REG16(TGRD_3, 38)
-+REG16(TGRC_4, 40)
-+REG16(TGRD_4, 42)
-+REG8(TSR_3, 44)
-+REG8(TSR_4, 45)
-+REG8(TITCR, 48)
-+  FIELD(TITCR, T4VCOR, 0, 3)
-+  FIELD(TITCR, T4VEN, 3, 1)
-+  FIELD(TITCR, T3ACOR, 4, 3)
-+  FIELD(TITCR, T3AEN, 7, 1)
-+REG8(TITCNT, 49)
-+  FIELD(TITCNT, T4VCNT, 0, 3)
-+  FIELD(TITCNT, T3ACNT, 4, 3)
-+REG8(TBTER, 50)
-+  FIELD(TBTER, BTE, 0, 2)
-+REG8(TDER, 52)
-+  FIELD(TDER, TDER, 0, 1)
-+REG8(TOLBR, 54)
-+  FIELD(TOLBR, OLS1P, 0, 1)
-+  FIELD(TOLBR, OLS1N, 1, 1)
-+  FIELD(TOLBR, OLS2P, 2, 1)
-+  FIELD(TOLBR, OLS2N, 3, 1)
-+  FIELD(TOLBR, OLS3P, 4, 1)
-+  FIELD(TOLBR, OLS3N, 5, 1)
-+REG8(TBTM_3, 56)
-+REG8(TBTM_4, 57)
-+REG16(TADCR_4, 64)
-+REG16(TADCORA_4, 68)
-+REG16(TADCORB_4, 70)
-+REG16(TADCOBRA_4, 72)
-+REG16(TADCOBRB_4, 74)
-+REG8(TWCR, 96)
-+  FIELD(TWCR, WRE, 0, 1)
-+  FIELD(TWCR, CCE, 7, 1)
-+REG8(TSTR, 128)
-+  FIELD(TSTR, CST0, 0, 1)
-+  FIELD(TSTR, CST1, 1, 1)
-+  FIELD(TSTR, CST2, 2, 1)
-+  FIELD(TSTR, CSTL, 0, 3)
-+  FIELD(TSTR, CST3, 6, 1)
-+  FIELD(TSTR, CST4, 7, 1)
-+  FIELD(TSTR, CSTH, 6, 2)
-+REG8(TSYR, 129)
-+  FIELD(TSYR, SYNC0, 0, 1)
-+  FIELD(TSYR, SYNC1, 1, 1)
-+  FIELD(TSYR, SYNC2, 2, 1)
-+  FIELD(TSYR, SYNC3, 6, 1)
-+  FIELD(TSYR, SYNC4, 7, 1)
-+REG8(TRWER, 132)
-+  FIELD(TRWER, RWE, 0, 1)
-+
-+REG16(TCNTU_5, 0)
-+REG16(TGRU_5, 2)
-+REG16(TCRU_5, 4)
-+REG8(TIORU_5, 6)
-+REG16(TCNTV_5, 16)
-+REG16(TGRV_5, 18)
-+REG8(TCRV_5, 20)
-+REG8(TIORV_5, 22)
-+REG16(TCNTW_5, 32)
-+REG16(TGRW_5, 34)
-+REG8(TCRW_5, 36)
-+REG8(TIORW_5, 38)
-+REG8(TIER_5, 50)
-+  FIELD(TIER_5, TGIEW5, 0, 1)
-+  FIELD(TIER_5, TGIEV5, 1, 1)
-+  FIELD(TIER_5, TGIEU5, 2, 1)
-+  FIELD(TIER_5, TGIE5,  0, 3)
-+REG8(TSTR_5, 52)
-+  FIELD(TSTR_5, CSTW5, 0, 1)
-+  FIELD(TSTR_5, CSTV5, 1, 1)
-+  FIELD(TSTR_5, CSTU5, 2, 1)
-+  FIELD(TSTR_5, CST5,  0, 3)
-+REG8(TCNTCMPCLR_5, 54)
-+  FIELD(TCNTCMPCLR_5, CMPCLRW5, 0, 1)
-+  FIELD(TCNTCMPCLR_5, CMPCLRV5, 1, 1)
-+  FIELD(TCNTCMPCLR_5, CMPCLRU5, 2, 1)
-+  FIELD(TCNTCMPCLR_5, CMPCLR5,  0, 3)
-+
-+REG8(TCR, 1)
-+  FIELD(TCR, TPSC, 0, 3)
-+  FIELD(TCR, CKEG, 3, 2)
-+  FIELD(TCR, CCLR, 5, 3)
-+REG8(TMDR, 2)
-+  FIELD(TMDR, MD,  0, 4)
-+  FIELD(TMDR, BFA, 4, 1)
-+  FIELD(TMDR, BFB, 5, 1)
-+  FIELD(TMDR, BFE, 6, 1)
-+REG16(TIOR, 3)
-+  FIELD(TIOR, IOA,  0, 3)
-+  FIELD(TIOR, IOB,  4, 3)
-+  FIELD(TIOR, IOC,  8, 3)
-+  FIELD(TIOR, IOD, 12, 3)
-+REG8(TIOR5, 4)
-+  FIELD(TIOR5, IOC,  0, 4)
-+REG8(TCNTCMPCLR, 5)
-+  FIELD(TCNTCMPCLR, CMPCLR5W, 0, 1)
-+  FIELD(TCNTCMPCLR, CMPCLR5V, 1, 1)
-+  FIELD(TCNTCMPCLR, CMPCLR5U, 2, 1)
-+  FIELD(TCNTCMPCLR, CMPCLR5,  0, 3)
-+REG8(TIER, 6)
-+  FIELD(TIER, TGIEA, 0, 1)
-+  FIELD(TIER, TGIEB, 1, 1)
-+  FIELD(TIER, TGIEC, 2, 1)
-+  FIELD(TIER, TGIED, 3, 1)
-+  FIELD(TIER, TGIE,  0, 4)
-+  FIELD(TIER, TCIEV, 4, 1)
-+  FIELD(TIER, TCIEU, 5, 1)
-+  FIELD(TIER, TTGE2, 6, 1)
-+  FIELD(TIER, TTGE,  7, 1)
-+REG8(TIER2, 7)
-+  FIELD(TIER2, TGIEE, 0, 1)
-+  FIELD(TIER2, TGIEF, 1, 1)
-+  FIELD(TIER2, TGIE,  0, 2)
-+REG8(TSR, 8)
-+  FIELD(TSR, TCFD, 7, 1)
-+REG8(TBTM, 9)
-+  FIELD(TBTM, TTSA, 0, 1)
-+  FIELD(TBTM, TTSB, 1, 1)
-+  FIELD(TBTM, TTSE, 2, 1)
-+REG8(TICCR, 10)
-+  FIELD(TICCR, I1AE, 0, 1)
-+  FIELD(TICCR, I1BE, 1, 1)
-+  FIELD(TICCR, I2AE, 2, 1)
-+  FIELD(TICCR, I2BE, 3, 1)
-+REG16(TADCR, 11)
-+  FIELD(TADCR, ITB4VE, 0, 1)
-+  FIELD(TADCR, ITB3AE, 1, 1)
-+  FIELD(TADCR, ITA4VE, 2, 1)
-+  FIELD(TADCR, ITA3AE, 3, 1)
-+  FIELD(TADCR, DT4BE,  4, 1)
-+  FIELD(TADCR, UT4BE,  5, 1)
-+  FIELD(TADCR, DT4AE,  6, 1)
-+  FIELD(TADCR, UT4AE,  7, 1)
-+  FIELD(TADCR, BF,     0, 1)
-+REG16(TCNT, 12)
-+REG16(TGRA, 13)
-+REG16(TGRB, 14)
-+REG16(TGRC, 15)
-+REG16(TGRD, 16)
-+REG16(TGRE, 17)
-+REG16(TGRF, 18)
-+REG8(TIORH, 19)
-+REG8(TIORL, 20)
-+REG16(TADCOBRA, 21)
-+REG16(TADCOBRB, 22)
-+REG16(TADCORA, 23)
-+REG16(TADCORB, 24)
-+
-+static const int div_rate[6][8] = {
-+    [0] = {1, 4, 16, 64, 0, 0, 0, 0, },
-+    [1] = {1, 4, 16, 64, 0, 0, 256, 0, },
-+    [2] = {1, 4, 16, 64, 0, 0, 0, 1024, },
-+    [3] = {1, 4, 16, 64, 256, 1024, 0, 0, },
-+    [4] = {1, 4, 16, 64, 256, 1024, 0, 0, },
-+    [5] = {1, 4, 16, 64, 0, 0, 0, 0, },
-+};
-+
-+static bool is_cascade(RenesasMTU2State *mtu)
-+{
-+    if (mtu == NULL) {
-+        return false;
-+    }
-+    if (FIELD_EX8(mtu->r[1].tcr, TCR, TPSC) != 7 ||
-+        mtu->r[2].ier) {
-+        return false;
-+    }
-+    return true;
-+}
-+
-+static void mtu2_event(void *opaque);
-+static void set_next_event(RenesasMTURegs *r)
-+{
-+    int gr;
-+    int64_t next;
-+    uint32_t wcnt;
-+    int ch = r->ch;
-+    RenesasMTU2State *mtu = r->mtu;
-+
-+    if (ch == 1 && is_cascade(mtu)) {
-+        /* If cascade count mode, skip ch1 event */
-+        return;
-+    }
-+    if (r->start) {
-+        if (ch != 2 || !is_cascade(mtu)) {
-+            /* normal counter */
-+            r->next_cnt = 0x10000;
-+            for (gr = 0; gr < r->num_gr; gr++) {
-+                if (r->tcnt <= r->tgr[gr]) {
-+                    r->next_cnt = MIN(r->next_cnt, r->tgr[gr] + 1);
-+                }
-+            }
-+            next = (r->next_cnt - r->tcnt) * r->clk;
-+            g_assert(next > 0);
-+        } else {
-+            /* 32bit freerun counter */
-+            wcnt = mtu->r[2].tcnt;
-+            wcnt = deposit32(wcnt, 16, 16, mtu->r[1].tcnt);
-+            next = (0x100000000LL - wcnt) * r->clk;
-+         }
-+        g_assert(next > 0);
-+        r->next = r->base + next;
-+        if (r->timer == NULL) {
-+            r->timer = timer_new_ns(QEMU_CLOCK_VIRTUAL,
-+                                    mtu2_event, r);
-+        }
-+        timer_mod(r->timer, r->next);
-+    } else {
-+        if (r->timer) {
-+            timer_del(r->timer);
-+        }
-+    }
-+}
-+
-+static void mtu2_5_event(void *opaque);
-+static void set_next_event5(RenesasMTURegs *r)
-+{
-+    int64_t next;
-+
-+    r->next_cnt = r->cntclr ? r->tgr[0] : 0x10000;
-+    if (r->start) {
-+        next = (r->next_cnt - r->tcnt) * r->clk;
-+        g_assert(next > 0);
-+        r->next = r->base + next;
-+        if (r->timer == NULL) {
-+            r->timer = timer_new_ns(QEMU_CLOCK_VIRTUAL,
-+                                    mtu2_5_event, r);
-+        }
-+        timer_mod(r->timer, r->next);
-+    } else {
-+        if (r->timer) {
-+            timer_del(r->timer);
-+        }
-+    }
-+}
-+
-+static void tgr_match(RenesasMTURegs *r, int clr_gr)
-+{
-+    int gr;
-+
-+    for (gr = 0; gr < r->num_gr; gr++) {
-+        if (r->next_cnt == r->tgr[gr]) {
-+            /* TGR match */
-+            if (clr_gr == gr) {
-+                r->tcnt = 0;
-+            } else {
-+                r->tcnt = r->next_cnt;
-+            }
-+            if (extract16(r->tier, (gr < 4 ? gr : gr + 4), 1)) {
-+                qemu_irq_pulse(r->irq[gr]);
-+            }
-+        }
-+    }
-+}
-+
-+static int clr_gr(uint8_t tcr, int ch)
-+{
-+    switch (FIELD_EX8(tcr, TCR, CCLR)) {
-+    case 1:
-+        return 0;
-+    case 2:
-+        return 1;
-+    case 5:
-+        return 2;
-+    case 6:
-+        return 3;
-+    default:
-+        return -1;
-+    }
-+}
-+
-+static void mtu2_event(void *opaque)
-+{
-+    RenesasMTURegs *r = opaque;
-+    RenesasMTU2State *mtu = r->mtu;
-+    uint32_t sync;
-+    int ch;
-+
-+    if (r->ch != 2 || !is_cascade(mtu)) {
-+        tgr_match(r, clr_gr(r->tcr, r->ch));
-+        if (r->next_cnt == 0x10000) {
-+            /* Count overflow */
-+            r->tcnt = 0;
-+            r->base = r->next;
-+            if (FIELD_EX16(r->tier, TIER, TCIEV)) {
-+                qemu_irq_pulse(r->irq[r->num_gr]);
-+            }
-+            if (r->ch == 2 && FIELD_EX8(mtu->r[1].tcr, TCR, TPSC) == 7) {
-+                mtu->r[1].tcnt++;
-+                tgr_match(&mtu->r[1], clr_gr(mtu->r[1].tcr, 1));
-+                if (mtu->r[1].tcnt >= 0x10000) {
-+                    mtu->r[1].tcnt = 0;
-+                    if (FIELD_EX16(mtu->r[1].tier, TIER, TCIEV)) {
-+                        qemu_irq_pulse(mtu->r[1].irq[mtu->r[1].num_gr]);
-+                    }
-+                }
-+            }
-+        }
-+    } else {
-+        r->tcnt = 0;
-+        mtu->r[1].tcnt = 0;
-+        r->base = r->next;
-+        if (FIELD_EX16(mtu->r[1].tier, TIER, TCIEV)) {
-+            qemu_irq_pulse(mtu->r[1].irq[mtu->r[1].num_gr]);
-+        }
-+    }
-+    set_next_event(r);
-+    if (r->tcnt == 0) {
-+        sync = extract8(mtu->tsyr, 0, 3);
-+        sync = deposit32(sync, 3, 2, extract8(mtu->tsyr, 6, 2));
-+        if (extract32(sync, r->ch, 1)) {
-+            /* Syncronus clear */
-+            for (ch = 0; ch < 5; ch++) {
-+                if (ch == r->ch || !extract8(sync, ch, 1)) {
-+                    continue;
-+                }
-+                if ((FIELD_EX8(mtu->r[ch].tcr, TCR, CCLR) & 3) == 3) {
-+                    mtu->r[ch].tcnt = 0;
-+                    set_next_event(&mtu->r[ch]);
-+                }
-+            }
-+        }
-+    }
-+}
-+
-+static void mtu2_5_event(void *opaque)
-+{
-+    RenesasMTURegs *r = opaque;
-+
-+    if (r->next_cnt < 0x10000) {
-+        if (r->ier) {
-+            qemu_irq_pulse(r->irq[0]);
-+        }
-+        if (r->cntclr) {
-+            r->tcnt = 0;
-+            r->base = r->next;
-+        }
-+    } else {
-+        r->tcnt = 0;
-+        r->base = r->next;
-+    }
-+    set_next_event5(r);
-+}
-+
-+static uint16_t read_tcnt(RenesasMTURegs *r)
-+{
-+    int64_t now;
-+    uint32_t wcnt;
-+
-+    if (r->start) {
-+        now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+        if (!is_cascade(r->mtu)) {
-+            if (r->ch == 1 && FIELD_EX8(r->mtu->r[1].tcr, TCR, TPSC) == 7) {
-+                return r->tcnt;
-+            } else {
-+                return (r->tcnt + (now - r->base) / r->clk) & 0xffff;
-+            }
-+        } else {
-+            wcnt = r->mtu->r[2].tcnt;
-+            wcnt = deposit32(wcnt, 16, 16, r->mtu->r[1].tcnt);
-+            wcnt += (now - r->mtu->r[2].base) / r->mtu->r[2].clk;
-+            switch (r->ch) {
-+            case 1:
-+                return extract32(wcnt, 16, 16);
-+            case 2:
-+                return extract32(wcnt, 0, 16);
-+            default:
-+                g_assert_not_reached();
-+            }
-+        }
-+    } else {
-+        return r->tcnt;
-+    }
-+}
-+
-+static void mtu_pck_update(void *opaque)
-+{
-+    RenesasMTU2State *mtu = RenesasMTU2(opaque);
-+    int ch;
-+    for (ch = 0; ch < 5; ch++) {
-+        mtu->r[ch].tcnt = read_tcnt(&mtu->r[ch]);
-+    }
-+    for (ch = 0; ch < 3; ch++) {
-+        mtu->r5[ch].tcnt = read_tcnt(&mtu->r5[ch]);
-+    }
-+    mtu->input_freq = clock_get_hz(mtu->pck);
-+    if (clock_is_enabled(mtu->pck)) {
-+        for (ch = 0; ch < 5; ch++) {
-+            set_next_event(&mtu->r[ch]);
-+        }
-+        for (ch = 0; ch < 3; ch++) {
-+            set_next_event5(&mtu->r5[ch]);
-+        }
-+    } else {
-+        for (ch = 0; ch < 5; ch++) {
-+            if (mtu->r[ch].timer) {
-+                timer_del(mtu->r[ch].timer);
-+            }
-+        }
-+        for (ch = 0; ch < 3; ch++) {
-+            if (mtu->r5[ch].timer) {
-+                timer_del(mtu->r5[ch].timer);
-+            }
-+        }
-+    }
-+}
-+
-+static bool mtu2_low_valid_size(hwaddr addr, unsigned size)
-+{
-+    if ((A_TCNT_012 <= addr && addr < (A_TGRD_012 + 2)) ||
-+        (A_TGRE_0 <= addr && addr < (A_TGRF_0 + 2))) {
-+        if (size == 2) {
-+            return true;
-+        }
-+    } else {
-+        if (size == 1) {
-+            return true;
-+        }
-+    }
-+    return false;
-+}
-+
-+static uint64_t mtu2_low_read(void *opaque, hwaddr addr, unsigned size)
-+{
-+    RenesasMTU2State *mtu = RenesasMTU2(opaque);
-+    int gr;
-+    int ch = (addr >> 7) & 3;
-+    addr &= 0x7f;
-+
-+    if (!mtu2_low_valid_size(addr, size)) {
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "renesas_mtu: Invalid access size %d of 0x%"
-+                      HWADDR_PRIX "\n", size, addr);
-+        return UINT64_MAX;
-+    }
-+    if (!clock_is_enabled(mtu->pck)) {
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "renesas_mtu: Unit %d is stopped.\n", mtu->unit);
-+        return UINT64_MAX;
-+    }
-+    switch (addr) {
-+    case A_TCR_012:
-+        return mtu->r[ch].tcr;
-+    case A_TMDR_012:
-+        return mtu->r[ch].tmdr;
-+    case A_TIORL_012:
-+        return extract16(mtu->r[ch].tior, 0, 8);
-+    case A_TIORH_012:
-+        return extract16(mtu->r[ch].tior, 8, 8);
-+    case A_TIER_012:
-+        return extract16(mtu->r[ch].tier, 0, 8);
-+    case A_TIER2_0:
-+        if (ch == 0) {
-+            return extract16(mtu->r[ch].tier, 8, 8);
-+        } else {
-+            goto no_register;
-+        }
-+    case A_TSR_012:
-+        return mtu->r[ch].tsr;
-+    case A_TBTM_0:
-+        if (ch == 0) {
-+            return mtu->tbtm;
-+        } else {
-+            goto no_register;
-+        }
-+    case A_TICCR_1:
-+        if (ch == 1) {
-+            return mtu->ticcr;
-+        } else {
-+            goto no_register;
-+        }
-+    case A_TCNT_012:
-+        return read_tcnt(&mtu->r[ch]);
-+    case A_TGRA_012:
-+    case A_TGRB_012:
-+    case A_TGRC_012:
-+    case A_TGRD_012:
-+        gr = ((addr - A_TGRA_012) >> 1) & 3;
-+        if (gr < mtu->r[ch].num_gr) {
-+            return mtu->r[ch].tgr[gr];
-+        } else {
-+            goto no_register;
-+        }
-+    case A_TGRE_0:
-+    case A_TGRF_0:
-+        if (ch == 0) {
-+            gr = (((addr - A_TGRE_0) >> 1) & 2) + 4;
-+            return mtu->r[0].tgr[gr];
-+        } else {
-+            goto no_register;
-+        }
-+    no_register:
-+    default:
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "renesas_mtu: Unknown register %08lx\n",
-+                      addr);
-+        return UINT64_MAX;
-+    }
-+}
-+
-+static bool mtu2_high_valid_size(hwaddr addr, unsigned size)
-+{
-+    if ((A_TCNT_3 <= addr && addr < (A_TGRD_4 + 2)) ||
-+        (A_TADCR <= addr && addr < (A_TADCORB + 2)) ||
-+        (A_TCDR <= addr && addr < (A_TCBR + 2))) {
-+        if (size == 2) {
-+            return true;
-+        }
-+    } else {
-+        if (size == 1) {
-+            return true;
-+        }
-+    }
-+    return false;
-+}
-+
-+static uint64_t mtu2_high_read(void *opaque, hwaddr addr, unsigned size)
-+{
-+    RenesasMTU2State *mtu = RenesasMTU2(opaque);
-+    int ch = 3 + (addr & 1);
-+    int ch_w = 3 + ((addr >> 1) & 1);
-+    uint32_t ret;
-+
-+    if (!mtu2_high_valid_size(addr, size)) {
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "renesas_mtu: Invalid access size %d\n",
-+                      size);
-+        return UINT64_MAX;
-+    }
-+    if (addr < 0x20 && ((mtu->trwer & 1) == 0)) {
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "renesas_mtu: register read protected "
-+                      "0x%" HWADDR_PRIX "\n", addr);
-+        return UINT64_MAX;
-+    }
-+    if (!clock_is_enabled(mtu->pck)) {
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "renesas_mtu: Unit %d is stopped.\n", mtu->unit);
-+        return UINT64_MAX;
-+    }
-+    switch (addr) {
-+    case A_TCR_3:
-+    case A_TCR_4:
-+        return mtu->r[ch].tcr;
-+    case A_TMDR_3:
-+    case A_TMDR_4:
-+        return mtu->r[ch].tmdr;
-+    case A_TIORL_3:
-+    case A_TIORL_4:
-+        return extract32(mtu->r[ch_w].tior, 0, 8);
-+    case A_TIORH_3:
-+    case A_TIORH_4:
-+        return extract32(mtu->r[ch_w].tior, 8, 8);
-+    case A_TIER_3:
-+    case A_TIER_4:
-+        return mtu->r[ch].tier;
-+    case A_TSR_3:
-+    case A_TSR_4:
-+        return mtu->r[ch].tsr;
-+    case A_TCNT_3:
-+    case A_TCNT_4:
-+        return read_tcnt(&mtu->r[ch]);
-+    case A_TGRA_3:
-+    case A_TGRB_3:
-+    case A_TGRA_4:
-+    case A_TGRB_4:
-+        return mtu->r[3 + ((addr >> 2) & 1)].tgr[(addr >> 1) & 1];
-+    case A_TGRC_3:
-+    case A_TGRD_3:
-+    case A_TGRC_4:
-+    case A_TGRD_4:
-+        return mtu->r[3 + ((addr >> 2) & 1)].tgr[2 + ((addr >> 1) & 1)];
-+    case A_TADCR_4:
-+        return mtu->tadcr;
-+    case A_TADCOBRA_4:
-+    case A_TADCOBRB_4:
-+        return mtu->tadcobr[(addr >> 1) & 1];
-+    case A_TADCORA_4:
-+    case A_TADCORB_4:
-+        return mtu->tadcor[(addr >> 1) & 1];
-+    case A_TOER:
-+        return mtu->toer;
-+    case A_TGCR:
-+        return mtu->tgcr;
-+    case A_TOCR1:
-+    case A_TOCR2:
-+        return mtu->tocr[addr & 1];
-+    case A_TCDR:
-+        return mtu->tcdr;
-+    case A_TDDR:
-+        return mtu->tddr;
-+    case A_TCNTS:
-+        return mtu->tcnts;
-+    case A_TCBR:
-+        return mtu->tcbr;
-+    case A_TITCR:
-+        return mtu->titcr;
-+    case A_TITCNT:
-+        return mtu->titcnt;
-+    case A_TBTER:
-+        return mtu->tbter;
-+    case A_TDER:
-+        return mtu->tder;
-+    case A_TOLBR:
-+        return mtu->tolbr;
-+    case A_TWCR:
-+        return mtu->twcr;
-+    case A_TSTR:
-+        ret = 0;
-+        for (ch = 0; ch < 5; ch++) {
-+            ret = deposit32(ret, (ch < 3 ? ch : ch + 3), 1, mtu->r[ch].start);
-+        }
-+        return ret;
-+    case A_TSYR:
-+        return mtu->tsyr;
-+    case A_TRWER:
-+        mtu->trwer_r = mtu->trwer;
-+        return mtu->trwer;
-+    default:
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "renesas_mtu: Unknown register 0x%" HWADDR_PRIX "\n",
-+                      addr);
-+        return UINT64_MAX;
-+    }
-+}
-+
-+static bool mtu2_5_valid_size(hwaddr addr, unsigned size)
-+{
-+    if (addr < A_TIER_5) {
-+        addr &= 0x0f;
-+        if (addr < A_TCRU_5) {
-+            if (size == 2) {
-+                return true;
-+            }
-+        } else {
-+            if (size == 1) {
-+                return true;
-+            }
-+        }
-+    } else {
-+        if (size == 1) {
-+            return true;
-+        }
-+    }
-+    return false;
-+}
-+
-+static uint64_t mtu2_5_read(void *opaque, hwaddr addr, unsigned size)
-+{
-+    RenesasMTU2State *mtu = RenesasMTU2(opaque);
-+    int ch;
-+    uint32_t ret;
-+    ch = addr >> 4;
-+    if (!mtu2_5_valid_size(addr, size)) {
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "renesas_mtu: Invalid access size at "
-+                      "0x%" HWADDR_PRIX "\n", addr);
-+    }
-+    if (!clock_is_enabled(mtu->pck)) {
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "renesas_mtu: Unit %d is stopped.\n", mtu->unit);
-+        return UINT64_MAX;
-+    }
-+    if (ch < 3) {
-+        switch (addr & 0x0f) {
-+        case A_TCNTU_5:
-+            return read_tcnt(&mtu->r5[ch]);
-+        case A_TGRU_5:
-+            return mtu->r5[ch].tgr[0];
-+        case A_TCRU_5:
-+            return mtu->r5[ch].tcr;
-+        case A_TIORU_5:
-+            return mtu->r5[ch].tior;
-+        }
-+    } else {
-+        switch (addr) {
-+        case A_TIER_5:
-+            ret = 0;
-+            for (ch = 0; ch < 3; ch++) {
-+                ret = deposit32(ret, ch, 1, mtu->r5[ch].ier);
-+            }
-+            return ret;
-+        case A_TSTR_5:
-+            ret = 0;
-+            for (ch = 0; ch < 3; ch++) {
-+                ret = deposit32(ret, ch, 1, mtu->r5[ch].start);
-+            }
-+            return ret;
-+        case A_TCNTCMPCLR_5:
-+            ret = 0;
-+            for (ch = 0; ch < 3; ch++) {
-+                ret = deposit32(ret, ch, 1, mtu->r5[ch].cntclr);
-+            }
-+            return ret;
-+        }
-+    }
-+    qemu_log_mask(LOG_GUEST_ERROR,
-+                  "renesas_mtu: Unknown register "
-+                  "0x%" HWADDR_PRIX "\n", addr);
-+    return UINT64_MAX;
-+}
-+
-+static bool is_ext_clock(int ch, int tcr)
-+{
-+    int tpsc = FIELD_EX8(tcr, TCR, TPSC);
-+    if (ch == 1 && tcr == 7) {
-+        return false;
-+    } else {
-+        return div_rate[ch][tpsc] == 0;
-+    }
-+}
-+
-+static void set_cnt_clock(int64_t input_freq, RenesasMTURegs *r)
-+{
-+    int tpsc = FIELD_EX8(r->tcr, TCR, TPSC);
-+    int ckeg = FIELD_EX8(r->tcr, TCR, CKEG);
-+    int div = div_rate[r->ch][tpsc];
-+    int64_t clk;
-+
-+    if (div >= 4 && ckeg >= 2) {
-+        div /= 2;
-+    }
-+    if (div > 0) {
-+        clk = NANOSECONDS_PER_SECOND / input_freq;
-+        r->clk = clk * div;
-+    }
-+}
-+
-+#define NOT_SUPPORT_REG_VAL(val, name)                                  \
-+    if (val != 0) {                                                     \
-+        qemu_log_mask(LOG_UNIMP,                                        \
-+                      "renesas_mtu: " #name " %02x is not supported.\n", \
-+                      (uint8_t)val);                                    \
-+    }
-+
-+static void mtu2_low_write(void *opaque, hwaddr addr,
-+                           uint64_t val, unsigned size)
-+{
-+    RenesasMTU2State *mtu = RenesasMTU2(opaque);
-+    int ch = (addr >> 7) & 3;
-+    addr &= 0x7f;
-+    if (!mtu2_low_valid_size(addr, size)) {
-+            qemu_log_mask(LOG_GUEST_ERROR,
-+                          "renesas_mtu: Invalid access size %d of "
-+                          "0x%" HWADDR_PRIX "\n", size, addr);
-+            return;
-+    }
-+    if (!clock_is_enabled(mtu->pck)) {
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "renesas_mtu: Unit %d is stopped.\n", mtu->unit);
-+        return;
-+    }
-+
-+    switch (addr) {
-+    case A_TCR_012:
-+        if (mtu->r[ch].start) {
-+            qemu_log_mask(LOG_GUEST_ERROR,
-+                          "renesas_mtu: CH %d is already started.\n", ch);
-+        }
-+        if (is_ext_clock(ch, val)) {
-+            qemu_log_mask(LOG_UNIMP,
-+                          "renesas_mtu: External clock not supported.\n");
-+        }
-+        mtu->r[ch].tcr = val;
-+        set_cnt_clock(mtu->input_freq, &mtu->r[ch]);
-+        set_next_event(&mtu->r[ch]);
-+        break;
-+    case A_TMDR_012:
-+        mtu->r[ch].tmdr = val;
-+        break;
-+    case A_TIORL_012:
-+        mtu->r[ch].tior = deposit32(mtu->r[ch].tior, 0, 8, val);
-+        NOT_SUPPORT_REG_VAL(val, TIORL);
-+        break;
-+    case A_TIORH_012:
-+        mtu->r[ch].tior = deposit32(mtu->r[ch].tior, 8, 8, val);
-+        NOT_SUPPORT_REG_VAL(val, TIORH);
-+        break;
-+    case A_TIER_012:
-+        mtu->r[ch].tier = deposit32(mtu->r[ch].tier, 0, 8, val);
-+        break;
-+    case A_TIER2_0:
-+        if (ch == 0) {
-+            mtu->r[ch].tier = deposit32(mtu->r[ch].tior, 8, 8, val);
-+        } else {
-+            goto no_register;
-+        }
-+        break;
-+    case A_TSR_012:
-+        mtu->r[ch].tsr = deposit32(mtu->r[ch].tsr, 6, 1, extract32(val, 6, 1));
-+        break;
-+    case A_TBTM_0:
-+        if (ch == 0) {
-+            mtu->tbtm = val;
-+            break;
-+        } else {
-+            goto no_register;
-+        }
-+    case A_TICCR_1:
-+        if (ch == 1) {
-+            mtu->ticcr = val;
-+            break;
-+        } else {
-+            goto no_register;
-+        }
-+    case A_TCNT_012:
-+        mtu->r[ch].tcnt = val;
-+        if (mtu->r[ch].start) {
-+            mtu->r[ch].base = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+        }
-+        set_next_event(&mtu->r[ch]);
-+        break;
-+    case A_TGRA_012:
-+    case A_TGRB_012:
-+    case A_TGRC_012:
-+    case A_TGRD_012:
-+        mtu->r[ch].tgr[((addr - A_TGRA_012) >> 1) & 3] = val;
-+        set_next_event(&mtu->r[ch]);
-+        break;
-+    case A_TGRE_0:
-+    case A_TGRF_0:
-+        if (ch == 0) {
-+            mtu->r[ch].tgr[(((addr - A_TGRE_0) >> 1) & 2) + 4] = val;
-+            set_next_event(&mtu->r[ch]);
-+            break;
-+        } else {
-+            goto no_register;
-+        }
-+    default:
-+    no_register:
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "renesas_mtu: Unknown register 0x%" HWADDR_PRIX "\n",
-+                      addr);
-+        break;
-+    }
-+}
-+
-+static void mtu2_high_write(void *opaque, hwaddr addr,
-+                            uint64_t val, unsigned size)
-+{
-+    RenesasMTU2State *mtu = RenesasMTU2(opaque);
-+    int ch = 3 + (addr & 1);
-+    int ch_w = 3 + ((addr >> 1) & 1);
-+    int64_t now;
-+
-+    if (!mtu2_high_valid_size(addr, size)) {
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "renesas_mtu: Invalid access size %d\n",
-+                      size);
-+        return;
-+    }
-+    if (addr < 0x20 && ((mtu->trwer & 1) == 0)) {
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "renesas_mtu: register write protected "
-+                      "0x%" HWADDR_PRIX "\n", addr);
-+        return;
-+    }
-+    if (!clock_is_enabled(mtu->pck)) {
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "renesas_mtu: Unit %d is stopped.\n", mtu->unit);
-+        return;
-+    }
-+
-+    switch (addr) {
-+    case A_TCR_3:
-+    case A_TCR_4:
-+        if (mtu->r[ch].start) {
-+            qemu_log_mask(LOG_GUEST_ERROR,
-+                          "renesas_mtu: CH %d is already started.\n", ch);
-+        }
-+        if (is_ext_clock(ch, val)) {
-+            qemu_log_mask(LOG_UNIMP,
-+                          "renesas_mtu: External clock not supported.\n");
-+        }
-+        mtu->r[ch].tcr = val;
-+        set_cnt_clock(mtu->input_freq, &mtu->r[ch]);
-+        set_next_event(&mtu->r[ch]);
-+        break;
-+    case A_TMDR_3:
-+    case A_TMDR_4:
-+        mtu->r[ch].tmdr = val;
-+        NOT_SUPPORT_REG_VAL(val, TMDR);
-+        break;
-+    case A_TIORL_3:
-+    case A_TIORL_4:
-+        mtu->r[ch_w].tior = deposit32(mtu->r[ch_w].tior, 0, 8, val);
-+        NOT_SUPPORT_REG_VAL(val, TIORL);
-+        break;
-+    case A_TIORH_3:
-+    case A_TIORH_4:
-+        mtu->r[ch_w].tior = deposit32(mtu->r[ch_w].tior, 8, 8, val);
-+        NOT_SUPPORT_REG_VAL(val, TIORH);
-+        break;
-+    case A_TIER_3:
-+    case A_TIER_4:
-+        mtu->r[ch].tier = val;
-+        set_next_event(&mtu->r[ch]);
-+        break;
-+    case A_TSR_3:
-+    case A_TSR_4:
-+        mtu->r[ch].tsr = val;
-+        break;
-+    case A_TCNT_3:
-+    case A_TCNT_4:
-+        mtu->r[ch_w].tcnt = val;
-+        if (mtu->r[ch].start) {
-+            mtu->r[ch].base = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+        }
-+        set_next_event(&mtu->r[ch]);
-+        break;
-+    case A_TGRA_3:
-+    case A_TGRA_4:
-+    case A_TGRB_3:
-+    case A_TGRB_4:
-+        mtu->r[3 + ((addr >> 2) & 1)].tgr[(addr >> 1) & 1] = val;
-+        set_next_event(&mtu->r[3 + ((addr >> 2) & 1)]);
-+        break;
-+    case A_TGRC_3:
-+    case A_TGRD_3:
-+    case A_TGRC_4:
-+    case A_TGRD_4:
-+        mtu->r[3 + ((addr >> 2) & 1)].tgr[2 + ((addr >> 1) & 1)] = val;
-+        set_next_event(&mtu->r[3 + ((addr >> 2) & 1)]);
-+        break;
-+    case A_TADCR_4:
-+        mtu->tadcr = val;
-+        NOT_SUPPORT_REG_VAL(val, TADCR);
-+        break;
-+    case A_TADCOBRA_4:
-+    case A_TADCOBRB_4:
-+        mtu->tadcobr[(addr >> 1) & 1] = val;
-+    case A_TADCORA_4:
-+    case A_TADCORB_4:
-+        mtu->tadcor[(addr >> 1) & 1] = val;
-+    case A_TOER:
-+        mtu->toer = val;
-+        break;
-+    case A_TGCR:
-+        mtu->tgcr = val;
-+        break;
-+    case A_TOCR1:
-+    case A_TOCR2:
-+        mtu->tocr[addr & 1] = val;
-+        break;
-+    case A_TCDR:
-+        mtu->tcdr = val;
-+        break;
-+    case A_TDDR:
-+        mtu->tddr = val;
-+        break;
-+    case A_TCNTS:
-+        mtu->tcnts = val;
-+        break;
-+    case A_TCBR:
-+        mtu->tcbr = val;
-+        break;
-+    case A_TITCR:
-+        mtu->titcr = val;
-+        break;
-+    case A_TITCNT:
-+        mtu->titcnt = val;
-+        break;
-+    case A_TBTER:
-+        mtu->tbter = val;
-+        break;
-+    case A_TDER:
-+        mtu->tder = val;
-+        break;
-+    case A_TOLBR:
-+        mtu->tolbr = val;
-+        break;
-+    case A_TWCR:
-+        mtu->twcr = val;
-+        break;
-+    case A_TSTR:
-+        val = deposit64(val, 3, 2, extract64(val, 6, 2));
-+        now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+        for (ch = 0; ch < 5; ch++) {
-+            if (mtu->r[ch].start != extract32(val, ch, 1)) {
-+                mtu->r[ch].start = extract32(val, ch, 1);
-+                if (mtu->r[ch].start) {
-+                    mtu->r[ch].base = now;
-+                }
-+                set_next_event(&mtu->r[ch]);
-+            }
-+        }
-+        break;
-+    case A_TSYR:
-+        mtu->tsyr = val;
-+        break;
-+    case A_TRWER:
-+        if (mtu->trwer_r) {
-+            mtu->trwer = FIELD_DP8(mtu->trwer, TRWER, RWE,
-+                                   FIELD_EX8(val, TRWER, RWE));
-+            mtu->trwer_r = 0;
-+        } else {
-+            qemu_log_mask(LOG_GUEST_ERROR,
-+                          "renesas_mtu: TRWER protected.\n");
-+        }
-+        break;
-+    default:
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "renesas_mtu: Unknown register "
-+                      "0x%" HWADDR_PRIX "\n", addr);
-+        break;
-+    }
-+}
-+
-+static void mtu2_5_write(void *opaque, hwaddr addr, uint64_t val, unsigned size)
-+{
-+    RenesasMTU2State *mtu = RenesasMTU2(opaque);
-+    int ch;
-+    int64_t now;
-+
-+    ch = addr >> 4;
-+    if (!mtu2_5_valid_size(addr, size)) {
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "renesas_mtu: Invalid access size at "
-+                      "0x%" HWADDR_PRIX "\n", addr);
-+        return;
-+    }
-+    if (!clock_is_enabled(mtu->pck)) {
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "renesas_mtu: Unit %d is stopped.\n", mtu->unit);
-+        return;
-+    }
-+    if (ch < 3) {
-+        switch (addr & 0x0f) {
-+        case A_TCNTU_5:
-+            mtu->r5[ch].tcnt = val;
-+            set_next_event5(&mtu->r5[ch]);
-+            break;
-+        case A_TGRU_5:
-+            mtu->r5[ch].tgr[0] = val;
-+            set_next_event5(&mtu->r5[ch]);
-+            break;
-+        case A_TCRU_5:
-+            mtu->r5[ch].tcr = val;
-+            set_next_event5(&mtu->r5[ch]);
-+            break;
-+        case A_TIORU_5:
-+            mtu->r5[ch].tior = val;
-+            break;
-+        default:
-+            qemu_log_mask(LOG_GUEST_ERROR,
-+                          "renesas_mtu: Unknown register 0x%"
-+                          HWADDR_PRIX "\n", addr);
-+            break;
-+        }
-+    } else {
-+        switch (addr & 0xff) {
-+        case A_TIER_5:
-+            for (ch = 0; ch < 3; ch++) {
-+                mtu->r5[ch].ier = extract64(val, ch, 1);
-+            }
-+            break;
-+        case A_TSTR_5:
-+            now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-+            for (ch = 0; ch < 3; ch++) {
-+                if (mtu->r5[ch].start != extract64(val, ch, 1)) {
-+                    mtu->r5[ch].start = extract64(val, ch, 1);
-+                    if (mtu->r5[ch].start) {
-+                        mtu->r5[ch].base = now;
-+                    }
-+                    set_next_event5(&mtu->r5[ch]);
-+                }
-+            }
-+            break;
-+        case A_TCNTCMPCLR_5:
-+            for (ch = 0; ch < 3; ch++) {
-+                if (mtu->r5[ch].cntclr != extract64(val, ch, 1)) {
-+                    mtu->r5[ch].cntclr = extract64(val, ch, 1);
-+                    set_next_event5(&mtu->r5[ch]);
-+                }
-+            }
-+            break;
-+        default:
-+            qemu_log_mask(LOG_GUEST_ERROR,
-+                          "renesas_mtu: Unknown register %08lx\n",
-+                          addr);
-+            break;
-+        }
-+    }
-+}
-+
-+static const MemoryRegionOps mtu2_low_ops = {
-+    .write = mtu2_low_write,
-+    .read  = mtu2_low_read,
-+    .endianness = DEVICE_NATIVE_ENDIAN,
-+    .impl = {
-+        .min_access_size = 1,
-+        .max_access_size = 2,
-+    },
-+};
-+
-+static const MemoryRegionOps mtu2_high_ops = {
-+    .write = mtu2_high_write,
-+    .read  = mtu2_high_read,
-+    .endianness = DEVICE_NATIVE_ENDIAN,
-+    .impl = {
-+        .min_access_size = 1,
-+        .max_access_size = 2,
-+    },
-+};
-+
-+static const MemoryRegionOps mtu2_5_ops = {
-+    .write = mtu2_5_write,
-+    .read  = mtu2_5_read,
-+    .endianness = DEVICE_NATIVE_ENDIAN,
-+    .impl = {
-+        .min_access_size = 1,
-+        .max_access_size = 2,
-+    },
-+};
-+
-+static void mtu_reg_init(int channel, RenesasMTU2State *mtu, RenesasMTURegs *r)
-+{
-+    int grn;
-+    static const int gr[] = {6, 2, 2, 4, 4};
-+    r->ch = channel;
-+    r->mtu = mtu;
-+    r->tsr = 0xc0;
-+    r->num_gr = gr[channel];
-+    for (grn = 0; grn < r->num_gr; grn++) {
-+        r->tgr[grn] = 0xffff;
-+    }
-+}
-+
-+static void mtu2_realize(DeviceState *dev, Error **errp)
-+{
-+    int ch;
-+    RenesasMTU2State *mtu = RenesasMTU2(dev);
-+
-+    for (ch = 0; ch < 5; ch++) {
-+        mtu_reg_init(ch, mtu, &mtu->r[ch]);
-+        if (clock_is_enabled(mtu->pck)) {
-+            set_cnt_clock(mtu->input_freq, &mtu->r[ch]);
-+        }
-+    }
-+    for (ch = 0; ch < 3; ch++) {
-+        mtu->r5[ch].mtu = NULL;
-+        mtu->r5[ch].tgr[0] = 0xffff;
-+        if (clock_is_enabled(mtu->pck)) {
-+            set_cnt_clock(mtu->input_freq, &mtu->r5[ch]);
-+        }
-+    }
-+    mtu->ticcr = 0x00;
-+    mtu->toer = 0xc0;
-+    mtu->tgcr = 0x80;
-+    mtu->tcdr = mtu->tddr = 0xffff;
-+    mtu->tcbr = 0xffff;
-+    mtu->tder = 0x01;
-+    mtu->trwer = 0x01;
-+}
-+
-+static void mtu2_init(Object *obj)
-+{
-+    int ch, irq;
-+    static int nr_irq[] = {7, 4, 4, 5, 5};
-+    SysBusDevice *d = SYS_BUS_DEVICE(obj);
-+    RenesasMTU2State *mtu = RenesasMTU2(obj);
-+
-+    memory_region_init_io(&mtu->memory[0], OBJECT(mtu), &mtu2_low_ops,
-+                          mtu, "renesas-mtu2-low", 0x180);
-+    sysbus_init_mmio(d, &mtu->memory[0]);
-+    memory_region_init_io(&mtu->memory[1], OBJECT(mtu), &mtu2_high_ops,
-+                          mtu, "renesas-mtu2-high", 0x90);
-+    sysbus_init_mmio(d, &mtu->memory[1]);
-+    memory_region_init_io(&mtu->memory[2], OBJECT(mtu), &mtu2_5_ops,
-+                          mtu, "renesas-mtu2-5", 0x40);
-+    sysbus_init_mmio(d, &mtu->memory[2]);
-+    for (ch = 0; ch < 5; ch++) {
-+        for (irq = 0; irq < nr_irq[ch]; irq++) {
-+            sysbus_init_irq(d, &mtu->r[ch].irq[irq]);
-+        }
-+    }
-+    for (ch = 0; ch < 3; ch++) {
-+        sysbus_init_irq(d, &mtu->r5[ch].irq[0]);
-+    }
-+    mtu->pck = qdev_init_clock_in(DEVICE(d), "pck",
-+                                  mtu_pck_update, mtu);
-+}
-+
-+static Property mtu_properties[] = {
-+    DEFINE_PROP_UINT32("unit", RenesasMTU2State, unit, 0),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void mtu2_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->realize = mtu2_realize;
-+    device_class_set_props(dc, mtu_properties);
-+}
-+
-+static const TypeInfo renesas_mtu_info = {
-+    .name       = TYPE_RENESAS_MTU2,
-+    .parent     = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(RenesasMTU2State),
-+    .instance_init = mtu2_init,
-+    .class_init = mtu2_class_init,
-+    .class_size = sizeof(RenesasMTU2Class),
-+};
-+
-+static void mtu_register_types(void)
-+{
-+    type_register_static(&renesas_mtu_info);
-+}
-+
-+type_init(mtu_register_types)
-diff --git a/hw/timer/Kconfig b/hw/timer/Kconfig
-index 4d21b50ab0..b4553d7847 100644
---- a/hw/timer/Kconfig
-+++ b/hw/timer/Kconfig
-@@ -45,3 +45,5 @@ config AVR_TIMER16
- config RENESAS_TIMER
-     bool
- 
-+config RENESAS_MTU
-+    bool
-diff --git a/hw/timer/meson.build b/hw/timer/meson.build
-index 6aed6d1e5f..4d16a59c02 100644
---- a/hw/timer/meson.build
-+++ b/hw/timer/meson.build
-@@ -10,6 +10,7 @@ softmmu_ss.add(when: 'CONFIG_CMSDK_APB_DUALTIMER', if_true: files('cmsdk-apb-dua
- softmmu_ss.add(when: 'CONFIG_CMSDK_APB_TIMER', if_true: files('cmsdk-apb-timer.c'))
- softmmu_ss.add(when: 'CONFIG_RENESAS_TMR8', if_true: files('renesas_tmr8.c'))
- softmmu_ss.add(when: 'CONFIG_RENESAS_TIMER', if_true: files('renesas_timer.c'))
-+softmmu_ss.add(when: 'CONFIG_RENESAS_MTU', if_true: files('renesas_mtu.c'))
- softmmu_ss.add(when: 'CONFIG_DIGIC', if_true: files('digic-timer.c'))
- softmmu_ss.add(when: 'CONFIG_ETRAXFS', if_true: files('etraxfs_timer.c'))
- softmmu_ss.add(when: 'CONFIG_EXYNOS4', if_true: files('exynos4210_mct.c'))
--- 
-2.20.1
-
+On 8/20/20 10:42 AM, Denis V. Lunev wrote:
+> On 7/9/20 4:26 PM, Denis V. Lunev wrote:
+>> This series do standard basic things:
+>> - it creates intermediate buffer for all writes from QEMU migration code
+>>   to QCOW2 image,
+>> - this buffer is sent to disk asynchronously, allowing several writes to
+>>   run in parallel.
+>>
+>> In general, migration code is fantastically inefficent (by observation),
+>> buffers are not aligned and sent with arbitrary pieces, a lot of time
+>> less than 100 bytes at a chunk, which results in read-modify-write
+>> operations with non-cached operations. It should also be noted that all
+>> operations are performed into unallocated image blocks, which also suffer
+>> due to partial writes to such new clusters.
+>>
+>> This patch series is an implementation of idea discussed in the RFC
+>> posted by Denis Plotnikov
+>> https://lists.gnu.org/archive/html/qemu-devel/2020-04/msg01925.html
+>> Results with this series over NVME are better than original code
+>>                 original     rfc    this
+>> cached:          1.79s      2.38s   1.27s
+>> non-cached:      3.29s      1.31s   0.81s
+>>
+>> Changes from v7:
+>> - dropped lock from LoadVMState
+>> - fixed assert in last patch
+>> - dropped patch 1 as queued
+>>
+>> Changes from v6:
+>> - blk_load_vmstate kludges added (patchew problem fixed)
+>>
+>> Changes from v5:
+>> - loadvm optimizations added with Vladimir comments included
+>>
+>> Changes from v4:
+>> - added patch 4 with blk_save_vmstate() cleanup
+>> - added R-By
+>> - bdrv_flush_vmstate -> bdrv_finalize_vmstate
+>> - fixed return code of bdrv_co_do_save_vmstate
+>> - fixed typos in comments (Eric, thanks!)
+>> - fixed patchew warnings
+>>
+>> Changes from v3:
+>> - rebased to master
+>> - added patch 3 which removes aio_task_pool_wait_one()
+>> - added R-By to patch 1
+>> - patch 4 is rewritten via bdrv_run_co
+>> - error path in blk_save_vmstate() is rewritten to call bdrv_flush_vmstate
+>>   unconditionally
+>> - added some comments
+>> - fixes initialization in bdrv_co_vmstate_save_task_entry as suggested
+>>
+>> Changes from v2:
+>> - code moved from QCOW2 level to generic block level
+>> - created bdrv_flush_vmstate helper to fix 022, 029 tests
+>> - added recursive for bs->file in bdrv_co_flush_vmstate (fix 267)
+>> - fixed blk_save_vmstate helper
+>> - fixed coroutine wait as Vladimir suggested with waiting fixes from me
+>>
+>> Changes from v1:
+>> - patchew warning fixed
+>> - fixed validation that only 1 waiter is allowed in patch 1
+>>
+>> Signed-off-by: Denis V. Lunev <den@openvz.org>
+>> CC: Kevin Wolf <kwolf@redhat.com>
+>> CC: Max Reitz <mreitz@redhat.com>
+>> CC: Stefan Hajnoczi <stefanha@redhat.com>
+>> CC: Fam Zheng <fam@euphon.net>
+>> CC: Juan Quintela <quintela@redhat.com>
+>> CC: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>> CC: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> CC: Denis Plotnikov <dplotnikov@virtuozzo.com>
+>>
+>>
+> ping
+ping V2
 
