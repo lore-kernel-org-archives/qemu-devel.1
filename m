@@ -2,90 +2,88 @@ Return-Path: <SRS0=k4hX=CF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FDEEC433E3
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 07:47:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97B2BC433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 08:01:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EAB8F20786
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 07:47:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 63BF222BF3
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 08:01:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="B41J3jCj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EAB8F20786
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C5L2M7Ji"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63BF222BF3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49726 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59536 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBCdV-0001q7-5m
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 03:47:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35738)
+	id 1kBCr3-0006eT-KW
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 04:01:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38926)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <green.wan@sifive.com>)
- id 1kBCci-0000SP-U2
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 03:47:04 -0400
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:33252)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <green.wan@sifive.com>)
- id 1kBCch-0008IX-8D
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 03:47:04 -0400
-Received: by mail-pf1-x444.google.com with SMTP id u20so2867892pfn.0
- for <qemu-devel@nongnu.org>; Thu, 27 Aug 2020 00:47:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=c2pBcp/mbPtnLHyvPGQngbikpywJkc4V5//cOK1jHUU=;
- b=B41J3jCjLolFLLB8OysyMPhtaZUxNKijGltGIm1kNGbQbrBgcuLeSHhKIDZXmyElQ/
- ggVn1+ca2POnsK3rnlsrrnspF0CKVvM0DF9T48hSe6LJ+S0JjQKzY+L3NnbYa9VYj6B7
- VXZrRvo+BxzuoEB4DE+3aK0HmFyrF2ECOKzO9M4R1A1HAixOtsSg2GVAQkXSH+MNx49x
- XQTGkH2a5IGI8zMr/3vobseKhNczB3rKIm5eCYWL/W6F+gDQTePfpyzYXMLcJ7MV7pU3
- HmBDNEgyeikFsG/doLDBj8OAjUsQxinqzwzf1lsZjgw6tBviFuBo3CBxa+ZoOBQrLKBn
- /8nw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=c2pBcp/mbPtnLHyvPGQngbikpywJkc4V5//cOK1jHUU=;
- b=WqN1S2D9SAQspUyJy3sBnFfz4pUNGsg19DJfkLdGg5RcldOMA4O/9BH/IuxvDLaqzr
- UW91smP5YAbVqZOjdieoGHtaC3NSgjv0065y5Cc0k2qrM/F5IDSA4LhAC9J8NDvsqJZ/
- UsuTyjX5YL/86GjXFB0i0updP+7mvw1OStYSic3Vnz7NE4JkTtJtJ7Kf9TPgxElADKeF
- UTkpSNa4ACxmwKJZ//nEt+Cac3GbWAxPSvN8nllroHgaCXI/s+Ksw4y6UhyZRh/3jwsu
- qGhNKf5a/OBjiiQom0EcrbhgNKojMq78CDHzdAW3dXErHep2NFkVoCJ0a34GwzPSUosz
- cTqA==
-X-Gm-Message-State: AOAM532x+5V+lVLTmrWvzQYaOH9+USVJ8VwqEcU6ejf+9q31SbXUhHwn
- Z3VuRJoZm+EnVUHS/HmUyDozgQ==
-X-Google-Smtp-Source: ABdhPJxuUOqhfyXURZWLXW9IXqc+OgpTUFD6kalyDP5WnrGHnjQcs4yBxRa5WhDTifwR2hiwjIwLNA==
-X-Received: by 2002:a17:902:a412:: with SMTP id
- p18mr15192445plq.3.1598514421952; 
- Thu, 27 Aug 2020 00:47:01 -0700 (PDT)
-Received: from localhost.localdomain (111-241-121-209.dynamic-ip.hinet.net.
- [111.241.121.209])
- by smtp.gmail.com with ESMTPSA id k17sm431032pfg.99.2020.08.27.00.47.00
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 27 Aug 2020 00:47:01 -0700 (PDT)
-From: Green Wan <green.wan@sifive.com>
-To: 
-Subject: [RFC PATCH v4 2/2] hw/riscv: sifive_u: Add write-once protection
-Date: Thu, 27 Aug 2020 15:46:38 +0800
-Message-Id: <20200827074638.21451-3-green.wan@sifive.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200827074638.21451-1-green.wan@sifive.com>
-References: <20200827074638.21451-1-green.wan@sifive.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::444;
- envelope-from=green.wan@sifive.com; helo=mail-pf1-x444.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kBCqL-0005sp-Vy
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 04:01:10 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:50343
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kBCqF-0001go-NO
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 04:01:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1598515261;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=uGYlMkdObzIPtDER9gAmCZ3DZ4ZfBqIwIRqr0C2Xtv0=;
+ b=C5L2M7JidjzRp5H8zawKPH+HijlcGLFXU0j1zv01HE2pI6yK9cCinxmFQ25j1pxWtYkYQl
+ NFzFB1If1AIoeJrxopMvYLJnuIGHbjTOUUs7CoarRjw/iDTOf8EJKv5OI3KeLikQxEah6B
+ xn13dRgtla7/40fs8RVu1eMLLJ8y8+Q=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-98-Gd5bpH0bM1WbQipZTkRL4A-1; Thu, 27 Aug 2020 04:00:55 -0400
+X-MC-Unique: Gd5bpH0bM1WbQipZTkRL4A-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2C5EA801AAE;
+ Thu, 27 Aug 2020 08:00:54 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-112-54.ams2.redhat.com
+ [10.36.112.54])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BA6F07A40C;
+ Thu, 27 Aug 2020 08:00:53 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 793F3991; Thu, 27 Aug 2020 10:00:52 +0200 (CEST)
+Date: Thu, 27 Aug 2020 10:00:52 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: Diego Viola <diego.viola@gmail.com>
+Subject: Re: Help with usb-host hostdevice property
+Message-ID: <20200827080052.aquvggd5beedfizt@sirius.home.kraxel.org>
+References: <CA+ToGPGh2JwaHC_6mmJcsiEDn6Qp4=zMD+UTGfiKo-yeHjxKKQ@mail.gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <CA+ToGPGh2JwaHC_6mmJcsiEDn6Qp4=zMD+UTGfiKo-yeHjxKKQ@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 00:42:41
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.959,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,83 +96,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-riscv@nongnu.org, Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, qemu-devel@nongnu.org,
- Green Wan <green.wan@sifive.com>, Alistair Francis <Alistair.Francis@wdc.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, bmeng.cn@gmail.com
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add array to store the 'written' status for all bit of OTP to block
-the write operation to the same bit. Ignore the control register
-offset from 0x0 to 0x38 of OTP memory mapping.
+  Hi,
 
-Signed-off-by: Green Wan <green.wan@sifive.com>
----
- hw/riscv/sifive_u_otp.c         | 21 +++++++++++++++++++++
- include/hw/riscv/sifive_u_otp.h |  1 +
- 2 files changed, 22 insertions(+)
+> usb 1-1: Invalid ep0 maxpacket: 64
+> usb usb1-port1: unable to enumerate USB device
 
-diff --git a/hw/riscv/sifive_u_otp.c b/hw/riscv/sifive_u_otp.c
-index aab2220494..e9605b9ae9 100644
---- a/hw/riscv/sifive_u_otp.c
-+++ b/hw/riscv/sifive_u_otp.c
-@@ -27,6 +27,12 @@
- #include "sysemu/blockdev.h"
- #include "sysemu/block-backend.h"
- 
-+#define SET_WRITTEN_BIT(map, idx, bit)    \
-+    (map[idx] |= (0x1 << bit))
-+
-+#define GET_WRITTEN_BIT(map, idx, bit)    \
-+    ((map[idx] >> bit) & 0x1)
-+
- static uint64_t sifive_u_otp_read(void *opaque, hwaddr addr, unsigned int size)
- {
-     SiFiveUOTPState *s = opaque;
-@@ -135,6 +141,18 @@ static void sifive_u_otp_write(void *opaque, hwaddr addr,
-         s->ptrim = val32;
-         break;
-     case SIFIVE_U_OTP_PWE:
-+        /* Keep written state for data only and PWE is enabled. Ignore PAS=1 */
-+        if ((s->pa > SIFIVE_U_OTP_PWE) && (val32 & 0x1) && !s->pas) {
-+            if (GET_WRITTEN_BIT(s->fuse_wo, s->pa, s->paio)) {
-+                qemu_log_mask(LOG_GUEST_ERROR,
-+                              "Error: write idx<%u>, bit<%u>\n",
-+                              s->pa, s->paio);
-+                break;
-+            }
-+
-+            SET_WRITTEN_BIT(s->fuse_wo, s->pa, s->paio);
-+        }
-+
-         /* write to backend */
-         if (s->blk) {
-             blk_pwrite(s->blk, s->pa * SIFIVE_U_OTP_FUSE_WORD, &val32,
-@@ -215,6 +233,9 @@ static void sifive_u_otp_reset(DeviceState *dev)
-     /* Make a valid content of serial number */
-     s->fuse[SIFIVE_U_OTP_SERIAL_ADDR] = s->serial;
-     s->fuse[SIFIVE_U_OTP_SERIAL_ADDR + 1] = ~(s->serial);
-+
-+    /* Initialize write-once map */
-+    memset(s->fuse_wo, 0x00, sizeof(s->fuse_wo));
- }
- 
- static void sifive_u_otp_class_init(ObjectClass *klass, void *data)
-diff --git a/include/hw/riscv/sifive_u_otp.h b/include/hw/riscv/sifive_u_otp.h
-index 13d2552e43..49d40a6430 100644
---- a/include/hw/riscv/sifive_u_otp.h
-+++ b/include/hw/riscv/sifive_u_otp.h
-@@ -74,6 +74,7 @@ typedef struct SiFiveUOTPState {
-     uint32_t ptrim;
-     uint32_t pwe;
-     uint32_t fuse[SIFIVE_U_OTP_NUM_FUSES];
-+    uint32_t fuse_wo[SIFIVE_U_OTP_NUM_FUSES];
-     /* config */
-     uint32_t serial;
-     BlockBackend *blk;
--- 
-2.17.1
+https://patchwork.ozlabs.org/project/qemu-devel/patch/20200826145239.6077-18-kraxel@redhat.com/
+
+HTH,
+  Gerd
 
 
