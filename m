@@ -2,70 +2,72 @@ Return-Path: <SRS0=k4hX=CF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C104C433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 07:27:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96909C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 07:28:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 125D122BEA
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 07:27:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 125D122BEA
+	by mail.kernel.org (Postfix) with ESMTPS id 6256922BEA
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 07:28:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6256922BEA
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58604 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34736 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBCJL-0001KT-7Z
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 03:27:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49018)
+	id 1kBCL8-0003Am-Mh
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 03:28:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54162)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
- id 1kBBOa-00023E-8G
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 02:28:24 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:49270 helo=huawei.com)
+ (Exim 4.90_1) (envelope-from <kuhn.chenqun@huawei.com>)
+ id 1kBBuL-00035O-CH; Thu, 27 Aug 2020 03:01:13 -0400
+Received: from szxga08-in.huawei.com ([45.249.212.255]:47832 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
- id 1kBBOX-0007BO-4w
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 02:28:23 -0400
-Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id 7C7CD1869C1F422EE26F;
- Thu, 27 Aug 2020 14:28:13 +0800 (CST)
-Received: from [127.0.0.1] (10.174.186.4) by DGGEMS405-HUB.china.huawei.com
- (10.3.19.205) with Microsoft SMTP Server id 14.3.487.0; Thu, 27 Aug 2020
- 14:28:04 +0800
-From: Zheng Chuan <zhengchuan@huawei.com>
-Subject: Re: [PATCH v5 06/12] migration/dirtyrate: Record hash results for
- each sampled page
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, David Edmondson
- <dme@dme.org>
-References: <1598260480-64862-1-git-send-email-zhengchuan@huawei.com>
- <1598260480-64862-7-git-send-email-zhengchuan@huawei.com>
- <m2eentlogl.fsf@dme.org> <20200826123016.GA2727@work-vm>
-Message-ID: <a86e273f-8bca-e789-d868-cb3832c162b4@huawei.com>
-Date: Thu, 27 Aug 2020 14:28:03 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
-MIME-Version: 1.0
-In-Reply-To: <20200826123016.GA2727@work-vm>
+ (Exim 4.90_1) (envelope-from <kuhn.chenqun@huawei.com>)
+ id 1kBBuH-0002m2-Oq; Thu, 27 Aug 2020 03:01:13 -0400
+Received: from DGGEMM402-HUB.china.huawei.com (unknown [172.30.72.53])
+ by Forcepoint Email with ESMTP id 6506E1FDF67428F7D126;
+ Thu, 27 Aug 2020 15:00:56 +0800 (CST)
+Received: from DGGEMM424-HUB.china.huawei.com (10.1.198.41) by
+ DGGEMM402-HUB.china.huawei.com (10.3.20.210) with Microsoft SMTP Server (TLS)
+ id 14.3.487.0; Thu, 27 Aug 2020 15:00:56 +0800
+Received: from DGGEMM511-MBX.china.huawei.com ([169.254.1.141]) by
+ dggemm424-hub.china.huawei.com ([10.1.198.41]) with mapi id 14.03.0487.000;
+ Thu, 27 Aug 2020 15:00:47 +0800
+From: "Chenqun (kuhn)" <kuhn.chenqun@huawei.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: RE: [PATCH v2 09/10] hw/intc: Remove redundant statement in
+ exynos4210_combiner_read()
+Thread-Topic: [PATCH v2 09/10] hw/intc: Remove redundant statement in
+ exynos4210_combiner_read()
+Thread-Index: AQHWetKNgmqjr7ls9UKOtUz3l3Xb5qlIPmkAgAM/MOA=
+Date: Thu, 27 Aug 2020 07:00:46 +0000
+Message-ID: <7412CDE03601674DA8197E2EBD8937E83B8E58BD@dggemm511-mbx.china.huawei.com>
+References: <20200825112447.126308-1-kuhn.chenqun@huawei.com>
+ <20200825112447.126308-10-kuhn.chenqun@huawei.com>
+ <CAFEAcA_SLjM28bHH8WxBdHAFdLgE6zgqNAj9EpOVp77WL-iqKg@mail.gmail.com>
+In-Reply-To: <CAFEAcA_SLjM28bHH8WxBdHAFdLgE6zgqNAj9EpOVp77WL-iqKg@mail.gmail.com>
+Accept-Language: en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.174.187.50]
 Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.186.4]
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
 X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.32; envelope-from=zhengchuan@huawei.com;
- helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 02:28:14
+Received-SPF: pass client-ip=45.249.212.255;
+ envelope-from=kuhn.chenqun@huawei.com; helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 03:00:57
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -63
-X-Spam_score: -6.4
-X-Spam_bar: ------
-X-Spam_report: (-6.4 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-2.239,
- RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
  SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -79,256 +81,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: berrange@redhat.com, zhang.zhanghailiang@huawei.com, quintela@redhat.com,
- qemu-devel@nongnu.org, xiexiangyou@huawei.com, alex.chen@huawei.com,
- ann.zhuangyanying@huawei.com, fangying1@huawei.com
+Cc: Zhanghailiang <zhang.zhanghailiang@huawei.com>,
+ QEMU Trivial <qemu-trivial@nongnu.org>, Pannengyuan <pannengyuan@huawei.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Igor Mitsyanko <i.mitsyanko@gmail.com>, Euler Robot <euler.robot@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-
-On 2020/8/26 20:30, Dr. David Alan Gilbert wrote:
-> * David Edmondson (dme@dme.org) wrote:
->> On Monday, 2020-08-24 at 17:14:34 +08, Chuan Zheng wrote:
->>
->>> Record hash results for each sampled page, crc32 is taken to calculate
->>> hash results for each sampled 4K-page.
->>>
->>> Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
->>> Signed-off-by: YanYing Zhuang <ann.zhuangyanying@huawei.com>
->>> ---
->>>  migration/dirtyrate.c | 136 ++++++++++++++++++++++++++++++++++++++++++++++++++
->>>  migration/dirtyrate.h |  15 ++++++
->>>  2 files changed, 151 insertions(+)
->>>
->>> diff --git a/migration/dirtyrate.c b/migration/dirtyrate.c
->>> index f6a94d8..66de426 100644
->>> --- a/migration/dirtyrate.c
->>> +++ b/migration/dirtyrate.c
->>> @@ -10,6 +10,7 @@
->>>   * See the COPYING file in the top-level directory.
->>>   */
->>>  
->>> +#include <zlib.h>
->>>  #include "qemu/osdep.h"
->>>  #include "qapi/error.h"
->>>  #include "crypto/hash.h"
->>> @@ -66,6 +67,141 @@ static void update_dirtyrate(uint64_t msec)
->>>      DirtyStat.dirty_rate = dirtyrate;
->>>  }
->>>  
->>> +/*
->>> + * get hash result for the sampled memory with length of 4K byte in ramblock,
->>> + * which starts from ramblock base address.
->>> + */
->>> +static uint32_t get_ramblock_vfn_hash(struct RamblockDirtyInfo *info,
->>> +                                      uint64_t vfn)
->>> +{
->>> +    struct iovec iov_array;
->>
->> There's no need for an iovec now that crc32() is being used.
->>
-OK, will take two variables instead to represent base address and length.
-
->>> +    uint32_t crc;
->>> +
->>> +    iov_array.iov_base = info->ramblock_addr +
->>> +                         vfn * DIRTYRATE_SAMPLE_PAGE_SIZE;
->>> +    iov_array.iov_len = DIRTYRATE_SAMPLE_PAGE_SIZE;
->>> +
->>> +    crc = crc32(0, iov_array.iov_base, iov_array.iov_len);
->>> +
->>> +    return crc;
->>> +}
->>> +
->>> +static int save_ramblock_hash(struct RamblockDirtyInfo *info)
->>> +{
->>> +    unsigned int sample_pages_count;
->>> +    int i;
->>> +    int ret = -1;
->>
->> There's no need to initialise "ret".
->>
->>> +    GRand *rand = g_rand_new();
->>
->> Calling g_rand_new() when the result may not be used (because of the
->> various conditions immediately below) seems as though it might waste
->> entropy. Could this be pushed down just above the loop? It would even
->> get rid of the gotos ;-)
->>
-OK, i'll try it.
-
->>> +    sample_pages_count = info->sample_pages_count;
->>> +
->>> +    /* ramblock size less than one page, return success to skip this ramblock */
->>> +    if (unlikely(info->ramblock_pages == 0 || sample_pages_count == 0)) {
->>> +        ret = 0;
->>> +        goto out;
->>> +    }
->>> +
->>> +    info->hash_result = g_try_malloc0_n(sample_pages_count,
->>> +                                        sizeof(uint32_t));
->>> +    if (!info->hash_result) {
->>> +        ret = -1;
->>> +        goto out;
->>> +    }
->>> +
->>> +    info->sample_page_vfn = g_try_malloc0_n(sample_pages_count,
->>> +                                            sizeof(uint64_t));
->>> +    if (!info->sample_page_vfn) {
->>> +        g_free(info->hash_result);
->>> +        ret = -1;
->>> +        goto out;
->>> +    }
->>> +
->>> +    for (i = 0; i < sample_pages_count; i++) {
->>> +        info->sample_page_vfn[i] = g_rand_int_range(rand, 0,
->>> +                                                    info->ramblock_pages - 1);
->>> +        info->hash_result[i] = get_ramblock_vfn_hash(info,
->>> +                                                     info->sample_page_vfn[i]);
->>> +    }
->>> +    ret = 0;
->>> +
->>> +out:
->>> +    g_rand_free(rand);
->>> +    return ret;
->>> +}
->>> +
->>> +static void get_ramblock_dirty_info(RAMBlock *block,
->>> +                                    struct RamblockDirtyInfo *info,
->>> +                                    struct DirtyRateConfig *config)
->>> +{
->>> +    uint64_t sample_pages_per_gigabytes = config->sample_pages_per_gigabytes;
->>> +
->>> +    /* Right shift 30 bits to calc block size in GB */
->>> +    info->sample_pages_count = (qemu_ram_get_used_length(block) *
->>> +                                sample_pages_per_gigabytes) >>
->>> +                                DIRTYRATE_PAGE_SHIFT_GB;
->>
->> Doing the calculation this way around seems odd. Why was it not:
->>
->>     info->sample_pages_count = (qemu_ram_get_used_length(block) >>
->>                                 DIRTYRATE_PAGE_SHIFT_GB) *
->>                                 sample_pages_per_gigabytes;
->>
->> ?
-> 
-> Because that would give 0 for a 0.5GB block
-> 
-> Dave
-> 
->>> +
->>> +    /* Right shift 12 bits to calc page count in 4KB */
->>> +    info->ramblock_pages = qemu_ram_get_used_length(block) >>
->>> +                           DIRTYRATE_PAGE_SHIFT_KB;
->>> +    info->ramblock_addr = qemu_ram_get_host_addr(block);
->>> +    strcpy(info->idstr, qemu_ram_get_idstr(block));
->>> +}
->>> +
->>> +static struct RamblockDirtyInfo *
->>> +alloc_ramblock_dirty_info(int *block_index,
->>> +                          struct RamblockDirtyInfo *block_dinfo)
->>> +{
->>> +    struct RamblockDirtyInfo *info = NULL;
->>> +    int index = *block_index;
->>> +
->>> +    if (!block_dinfo) {
->>> +        index = 0;
->>> +        block_dinfo = g_try_new(struct RamblockDirtyInfo, 1);
->>> +    } else {
->>> +        index++;
->>> +        block_dinfo = g_try_realloc(block_dinfo, (index + 1) *
->>> +                                    sizeof(struct RamblockDirtyInfo));
->>
->> g_try_renew() instead of g_try_realloc()?
->>
-Hi,
-I am not sure that because there only one place in qemu to use g_try_renew.
-Could you tell me why, because i think g_try_realloc will also return NULL when error happen:)
-
->>> +    }
->>> +    if (!block_dinfo) {
->>> +        return NULL;
->>> +    }
->>> +
->>> +    info = &block_dinfo[index];
->>> +    *block_index = index;
->>> +    memset(info, 0, sizeof(struct RamblockDirtyInfo));
->>> +
->>> +    return block_dinfo;
->>> +}
->>> +
->>> +static int record_ramblock_hash_info(struct RamblockDirtyInfo **block_dinfo,
->>> +                                     struct DirtyRateConfig config,
->>> +                                     int *block_index)
->>> +{
->>> +    struct RamblockDirtyInfo *info = NULL;
->>> +    struct RamblockDirtyInfo *dinfo = NULL;
->>> +    RAMBlock *block = NULL;
->>
->> There's no need to initialise "info" or "block".
->>
-OK, will remove unused initialization in V6.
->> The declaration of "info" could be pushed into the loop.
->>
->>> +    int index = 0;
->>> +
->>> +    RAMBLOCK_FOREACH_MIGRATABLE(block) {
->>> +        dinfo = alloc_ramblock_dirty_info(&index, dinfo);
->>> +        if (dinfo == NULL) {
->>> +            return -1;
->>> +        }
->>> +        info = &dinfo[index];
->>> +        get_ramblock_dirty_info(block, info, &config);
->>> +        if (save_ramblock_hash(info) < 0) {
->>> +            *block_dinfo = dinfo;
->>> +            *block_index = index;
->>> +            return -1;
->>> +        }
->>> +    }
->>> +
->>> +    *block_dinfo = dinfo;
->>> +    *block_index = index;
->>> +
->>> +    return 0;
->>> +}
->>> +
->>>  static void calculate_dirtyrate(struct DirtyRateConfig config)
->>>  {
->>>      /* todo */
->>> diff --git a/migration/dirtyrate.h b/migration/dirtyrate.h
->>> index 9db269d..5050add 100644
->>> --- a/migration/dirtyrate.h
->>> +++ b/migration/dirtyrate.h
->>> @@ -24,6 +24,21 @@
->>>   */
->>>  #define RAMBLOCK_INFO_MAX_LEN                     256
->>>  
->>> +/*
->>> + * Sample page size 4K as default.
->>> + */
->>> +#define DIRTYRATE_SAMPLE_PAGE_SIZE                4096
->>> +
->>> +/*
->>> + * Sample page size 4K shift
->>> + */
->>> +#define DIRTYRATE_PAGE_SHIFT_KB                   12
->>> +
->>> +/*
->>> + * Sample page size 1G shift
->>> + */
->>> +#define DIRTYRATE_PAGE_SHIFT_GB                   30
->>> +
->>>  /* Take 1s as default for calculation duration */
->>>  #define DEFAULT_FETCH_DIRTYRATE_TIME_SEC          1
->>>  
->>> -- 
->>> 1.8.3.1
->>
->> dme.
->> -- 
->> You bring light in.
->>
-
+PiBTdWJqZWN0OiBSZTogW1BBVENIIHYyIDA5LzEwXSBody9pbnRjOiBSZW1vdmUgcmVkdW5kYW50
+IHN0YXRlbWVudCBpbg0KPiBleHlub3M0MjEwX2NvbWJpbmVyX3JlYWQoKQ0KPiANCj4gT24gVHVl
+LCAyNSBBdWcgMjAyMCBhdCAxMjoyNiwgQ2hlbiBRdW4gPGt1aG4uY2hlbnF1bkBodWF3ZWkuY29t
+PiB3cm90ZToNCj4gPg0KPiA+IENsYW5nIHN0YXRpYyBjb2RlIGFuYWx5emVyIHNob3cgd2Fybmlu
+ZzoNCj4gPiBody9pbnRjL2V4eW5vczQyMTBfY29tYmluZXIuYzoyMzE6OTogd2FybmluZzogVmFs
+dWUgc3RvcmVkIHRvICd2YWwnIGlzIG5ldmVyDQo+IHJlYWQNCj4gPiAgICAgICAgIHZhbCA9IHMt
+PnJlZ19zZXRbb2Zmc2V0ID4+IDJdOw0KPiA+DQo+ID4gVGhlIGRlZmF1bHQgdmFsdWUgb2YgJ3Zh
+bCcgaXMgJzAnLCBzbyB3ZSBjYW4gYnJlYWsgdGhlICdkZWZhdWx0JyBicmFuY2ggYW5kIHJldHVy
+bg0KPiAndmFsJy4NCj4gPg0KPiA+IFJlcG9ydGVkLWJ5OiBFdWxlciBSb2JvdCA8ZXVsZXIucm9i
+b3RAaHVhd2VpLmNvbT4NCj4gPiBTaWduZWQtb2ZmLWJ5OiBDaGVuIFF1biA8a3Vobi5jaGVucXVu
+QGh1YXdlaS5jb20+DQo+ID4gLS0tDQo+ID4gQ2M6IElnb3IgTWl0c3lhbmtvIDxpLm1pdHN5YW5r
+b0BnbWFpbC5jb20+DQo+ID4gQ2M6IFBldGVyIE1heWRlbGwgPHBldGVyLm1heWRlbGxAbGluYXJv
+Lm9yZz4NCj4gPiAtLS0NCj4gPiAgaHcvaW50Yy9leHlub3M0MjEwX2NvbWJpbmVyLmMgfCAzICst
+LQ0KPiA+ICAxIGZpbGUgY2hhbmdlZCwgMSBpbnNlcnRpb24oKyksIDIgZGVsZXRpb25zKC0pDQo+
+ID4NCj4gPiBkaWZmIC0tZ2l0IGEvaHcvaW50Yy9leHlub3M0MjEwX2NvbWJpbmVyLmMNCj4gPiBi
+L2h3L2ludGMvZXh5bm9zNDIxMF9jb21iaW5lci5jIGluZGV4IGI4NTYxZTQxODAuLmUyZTc0NWJi
+YWEgMTAwNjQ0DQo+ID4gLS0tIGEvaHcvaW50Yy9leHlub3M0MjEwX2NvbWJpbmVyLmMNCj4gPiAr
+KysgYi9ody9pbnRjL2V4eW5vczQyMTBfY29tYmluZXIuYw0KPiA+IEBAIC0yMjgsOCArMjI4LDcg
+QEAgZXh5bm9zNDIxMF9jb21iaW5lcl9yZWFkKHZvaWQgKm9wYXF1ZSwgaHdhZGRyDQo+IG9mZnNl
+dCwgdW5zaWduZWQgc2l6ZSkNCj4gPiAgICAgICAgICAgICAgaHdfZXJyb3IoImV4eW5vczQyMTAu
+Y29tYmluZXI6IG92ZXJmbG93IG9mIHJlZ19zZXQgYnkgMHgiDQo+ID4gICAgICAgICAgICAgICAg
+ICAgICAgVEFSR0VUX0ZNVF9wbHggIm9mZnNldFxuIiwgb2Zmc2V0KTsNCj4gPiAgICAgICAgICB9
+DQo+ID4gLSAgICAgICAgdmFsID0gcy0+cmVnX3NldFtvZmZzZXQgPj4gMl07DQo+ID4gLSAgICAg
+ICAgcmV0dXJuIDA7DQo+ID4gKyAgICAgICAgYnJlYWs7DQo+ID4gICAgICB9DQo+ID4gICAgICBy
+ZXR1cm4gdmFsOw0KPiA+ICB9DQo+IA0KPiBUaGUgY29kZSBhcyBpdCBzdGFuZHMgaXMgZGVmaW5p
+dGVseSB3cm9uZywgYnV0IEknbSBub3Qgc3VyZSB0aGlzIGlzIHRoZSBjb3JyZWN0IGZpeC4NCj4g
+U3VyZWx5IHRoZSBpbnRlbnRpb24gbXVzdCBoYXZlIGJlZW4gdG8gcmV0dXJuIHRoZSBhY3R1YWwg
+cmVnaXN0ZXIgdmFsdWUgZnJvbQ0KPiB0aGUgcmVnX3NldFtdIGFycmF5LCBub3QgdG8gcmV0dXJu
+IDAgPw0KPiANCj4gSSBzdXNwZWN0IHRoZSBjb3JyZWN0IGZpeCBoZXJlIGlzIHNpbXBseSB0byBk
+ZWxldGUgdGhlICJyZXR1cm4gMCIgbGluZSBhbmQgbGVhdmUNCj4gdGhlIGFzc2lnbm1lbnQgdG8g
+dmFsIGFzIGl0IGlzLg0KDQpIaSBQZXRlciwNCiAgSSB0aGluayB5b3UncmUgcmlnaHQuDQoNCj4g
+SWRlYWxseSB5b3Ugc2hvdWxkIGNoZWNrIHRoZSBoL3cgZGF0YXNoZWV0IHRvIGNvbmZpcm0uDQog
+SSBjaGVja2VkIHRoZSBFeHlub3MgNDIxMCBkYXRhc2hlZXQgYW5kIGZvdW5kIHRoYXQgJ0ludGVy
+cnVwdCBDb21iaW5lciBPcGVyYXRpb24nIGhhZCBvbmx5IGZpdmUgdHlwZXMgb2YgcmVnaXN0ZXJz
+Lg0KDQpSZWdpc3RlciAgICAgICAgICAgICBEZXNjcmlwdGlvbiAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICBUeXBlDQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQpJ
+RVNSKDAvMS8yLzMpICAgSW50ZXJydXB0IEVuYWJsZSBTZXQgUmVnaXN0ZXIgZm9yIEdyb3VwICgw
+fjMvIDQgfjcvIDh+IDExLyAxMn4gMTUpICAgICAgICAgUlcNCklFQ1IoMC8xLzIvMykgICBJbnRl
+cnJ1cHQgRW5hYmxlIENsZWFyIFJlZ2lzdGVyIGZvciBHcm91cCAoMH4zLyA0IH43LyA4fiAxMS8g
+MTJ+IDE1KSAgICAgICBSVw0KSVNUUigwLzEvMi8zKSAgIEludGVycnVwdCBTdGF0dXMgUmVnaXN0
+ZXIgZm9yIEdyb3VwICgwfjMvIDQgfjcvIDh+IDExLyAxMn4gMTUpICAgICAgICAgICAgIFINCklN
+U1IoMC8xLzIvMykgIEludGVycnVwdCBNYXNrZWQgU3RhdHVzIFJlZ2lzdGVyIGZvciBHcm91cCgw
+fjMvIDQgfjcvIDh+IDExLyAxMn4gMTUpICAgICAgIFINCkNJUFNSMCAgICAgICAgQ29tYmluZWQg
+SW50ZXJydXB0IFBlbmRpbmcgU3RhdHVzMCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICBSDQoNClRoZSBleHlub3M0MjEwX2NvbWJpbmVyX3dyaXRlKCkgZnVuY3Rpb24gaGFzIHdyaXRl
+IG9wZXJhdGlvbnMgZm9yIElFU1IgYW5kIElFQ1IuDQpUaGUgQ0lQU1IsIElTVFIsIGFuZCBJTVNS
+IHJlYWQgb3BlcmF0aW9ucyBhcmUgc3BlY2lmaWVkIGluIHRoZSBleHlub3M0MjEwX2NvbWJpbmVy
+X3JlYWQoKSBmdW5jdGlvbi4NCg0KU28sIFRoaXMgJ2RlZmF1bHQnIGJyYW5jaCBpbiBleHlub3M0
+MjEwX2NvbWJpbmVyX3JlYWQoKSBmdW5jdGlvbiByZWFkIG9wZXJhdGlvbiBpcyBvbmx5IGZvciBJ
+RVNSIGFuZCBJRUNSLg0KDQpBbmQsIGluIHRoZSBleHlub3M0MjEwX2NvbWJpbmVyX3dyaXRlIGZ1
+bmN0aW9uLCB0aGUgZGVmYXVsdCBhc3NpZ25tZW50IHN0YXRlbWVudCBmb3IgSUVTUiBhbmQgSUVD
+UiBpcyAiIHMtPnJlZ19zZXRbb2Zmc2V0ID4+IDJdID0gdmFsOyIuDQpUaGVyZWZvcmUsIGlmIHdl
+IHJlYWQgdGhlIHR3byByZWdpc3RlcihJRVNSIGFuZCBJRUNSKSB2YWx1ZXMsIHdlIGNhbiBkaXJl
+Y3RseSB1c2UgdGhpcyBhc3NpZ25tZW50IHN0YXRlbWVudCAidmFsID0gcy0+cmVnX3NldFtvZmZz
+ZXQgPj4gMl07Ii4NCg0KUGxlYXNlIGNvbmZpcm0gdGhhdCBpZiB0aGVyZSBpcyBubyBwcm9ibGVt
+LCBJIHdpbGwgbW9kaWZ5IGl0IGluIGxhdGVyIHZlcnNpb24uDQoNClRoYW5rcywNCkNoZW4gUXVu
+DQoNCg0KDQoNCg==
 
