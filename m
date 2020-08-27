@@ -2,78 +2,85 @@ Return-Path: <SRS0=k4hX=CF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 856E5C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 10:27:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3907C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 10:31:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4CAAB2074A
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 10:27:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6B3532080C
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 10:31:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Lawe+AqT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4CAAB2074A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jnpis0Vy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B3532080C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45590 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48958 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBF7p-0007jc-TK
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 06:27:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42660)
+	id 1kBFC1-0000yQ-Ay
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 06:31:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43430)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kBF6y-0006sB-Qj
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 06:26:28 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:48845
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kBFAp-0000AC-86
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 06:30:27 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57399
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kBF6w-0002xY-K4
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 06:26:28 -0400
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kBFAn-0003Ma-L6
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 06:30:26 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598523984;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=kQD9S08pmk0/yxZ7AMs+abBIbMg0NLRVHkw0V2BGGJs=;
- b=Lawe+AqTstdkDvvH9dHtFi1mTpjMlOSuhmibNCXyeM+pbATuu+yz+Du7q7lOQ7Jh5Lx5Z7
- /3DEnluPtnK+yMAbsuQNiGnVk52drJRzivkbsUxp0emJSamzI3cxpNKjoelw+bwxJ6PwTZ
- dUpdYLy7qBHhU1NFe4OgcVg8UX4QAuU=
+ s=mimecast20190719; t=1598524224;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=kiiSNG5syyxu6LBl07X1hjYzz+bpcnYG9rapmiWfL+E=;
+ b=Jnpis0Vy+eUlQBSnZCtpO24sS9Fd7unYcAUDKTePcdccrwBDBDm6Kc2qiPxZKXXopKtqDE
+ cA8jaG9qHz0G9dLRj5m/ficzV+lJo16vFBB5wv+YQg0QwDNefCPqh76SY8rMsav5SOf/Y0
+ 0g1W3MhjfFIb/m35d0BGAgXbEprc02A=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-23-p4Pz0Q0HOkiwjBWjHIjT1Q-1; Thu, 27 Aug 2020 06:26:23 -0400
-X-MC-Unique: p4Pz0Q0HOkiwjBWjHIjT1Q-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-138-KdP7DsLeNHmSnNeHFtS-Ag-1; Thu, 27 Aug 2020 06:30:16 -0400
+X-MC-Unique: KdP7DsLeNHmSnNeHFtS-Ag-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1F15485C708
- for <qemu-devel@nongnu.org>; Thu, 27 Aug 2020 10:26:22 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-112-54.ams2.redhat.com
- [10.36.112.54])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1C189776E8;
- Thu, 27 Aug 2020 10:26:19 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 12932991; Thu, 27 Aug 2020 12:26:17 +0200 (CEST)
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] meson: fix keymaps witout qemu-keymap
-Date: Thu, 27 Aug 2020 12:26:17 +0200
-Message-Id: <20200827102617.14448-1-kraxel@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 92545801AC2;
+ Thu, 27 Aug 2020 10:30:15 +0000 (UTC)
+Received: from redhat.com (ovpn-114-113.ams2.redhat.com [10.36.114.113])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5AE801002D5A;
+ Thu, 27 Aug 2020 10:30:05 +0000 (UTC)
+Date: Thu, 27 Aug 2020 11:30:02 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Lukas Straub <lukasstraub2@web.de>
+Subject: Re: [PATCH v7 8/8] tests/test-char.c: Wait for the chardev to
+ connect in char_socket_client_dupid_test
+Message-ID: <20200827103002.GI192458@redhat.com>
+References: <cover.1596528468.git.lukasstraub2@web.de>
+ <0c2f168afb1f66ccadef7ed623808aabf604fb65.1596528468.git.lukasstraub2@web.de>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <0c2f168afb1f66ccadef7ed623808aabf604fb65.1596528468.git.lukasstraub2@web.de>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
-X-Mimecast-Spam-Score: 0.0
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=kraxel@redhat.com;
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=berrange@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 02:56:52
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 00:13:19
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -94,73 +101,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block <qemu-block@nongnu.org>,
+ Juan Quintela <quintela@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In case the qemu-keymap tool generating them is neither installed on the
-system nor built from sources (due to xkbcommon not being available)
-qemu will not find the keymaps when started directly from the build
-tree,
+On Tue, Aug 04, 2020 at 10:12:01AM +0200, Lukas Straub wrote:
+> A connecting chardev object has an additional reference by the connecting
+> thread, so if the chardev is still connecting by the end of the test,
+> then the chardev object won't be freed. This in turn means that the yank
+> instance won't be unregistered and when running the next test-case
+> yank_register_instance will abort, because the yank instance is
+> already/still registered.
+> 
+> Signed-off-by: Lukas Straub <lukasstraub2@web.de>
+> ---
+>  tests/test-char.c | 1 +
+>  1 file changed, 1 insertion(+)
 
-This happens because commit ddcf607fa3d6 ("meson: drop keymaps symlink")
-removed the symlink to the source tree, and the special handling for
-install doesn't help in case we do not install qemu.
+Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
 
-Lets fix that by simply copying over the file from the source tree as
-fallback.
 
-Reported-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- pc-bios/keymaps/meson.build | 28 +++++++++++++++++++---------
- 1 file changed, 19 insertions(+), 9 deletions(-)
-
-diff --git a/pc-bios/keymaps/meson.build b/pc-bios/keymaps/meson.build
-index b737c8223031..e102dd56b454 100644
---- a/pc-bios/keymaps/meson.build
-+++ b/pc-bios/keymaps/meson.build
-@@ -38,19 +38,29 @@ if meson.is_cross_build() or 'CONFIG_XKBCOMMON' not in config_host
- else
-   native_qemu_keymap = qemu_keymap
- endif
-+
- t = []
- foreach km, args: keymaps
--  t += custom_target(km,
--                     build_by_default: true,
--                     output: km,
--                     command: [native_qemu_keymap, '-f', '@OUTPUT@', args.split()],
--                     install_dir: config_host['qemu_datadir'] / 'keymaps')
-+  if native_qemu_keymap.found()
-+    # generate with qemu-kvm
-+    t += custom_target(km,
-+                       build_by_default: true,
-+                       output: km,
-+                       command: [native_qemu_keymap, '-f', '@OUTPUT@', args.split()],
-+                       install_dir: config_host['qemu_datadir'] / 'keymaps')
-+  else
-+    # copy from source tree
-+    t += custom_target(km,
-+                       build_by_default: true,
-+		       input: km,
-+                       output: km,
-+                       command: ['cp', '@INPUT@', '@OUTPUT@'],
-+                       install_dir: config_host['qemu_datadir'] / 'keymaps')
-+  endif
- endforeach
--if t.length() > 0
-+
-+if native_qemu_keymap.found()
-   alias_target('update-keymaps', t)
--else
--  # install from the source tree
--  install_data(keymaps.keys(), install_dir: config_host['qemu_datadir'] / 'keymaps')
- endif
- 
- install_data(['sl', 'sv'], install_dir: config_host['qemu_datadir'] / 'keymaps')
+Regards,
+Daniel
 -- 
-2.27.0
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
