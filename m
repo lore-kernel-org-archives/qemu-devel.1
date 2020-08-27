@@ -2,63 +2,94 @@ Return-Path: <SRS0=k4hX=CF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	FSL_HELO_FAKE,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C609EC433E4
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 09:27:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B20FC433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 09:27:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9E02E2075B
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 09:27:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E02E2075B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 17C1722BEA
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 09:27:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NUbQaIB1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17C1722BEA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44462 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46180 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBEBd-000345-Ha
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 05:27:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57052)
+	id 1kBEC2-0003l9-B6
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 05:27:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57402)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jiangyifei@huawei.com>)
- id 1kBE7O-0002m0-Qm; Thu, 27 Aug 2020 05:22:50 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:4658 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jiangyifei@huawei.com>)
- id 1kBE7L-0003G6-C9; Thu, 27 Aug 2020 05:22:50 -0400
-Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id B6E1D77AE83A698E6BD4;
- Thu, 27 Aug 2020 17:22:42 +0800 (CST)
-Received: from huawei.com (10.174.187.31) by DGGEMS402-HUB.china.huawei.com
- (10.3.19.202) with Microsoft SMTP Server id 14.3.487.0; Thu, 27 Aug 2020
- 17:22:33 +0800
-From: Yifei Jiang <jiangyifei@huawei.com>
-To: <qemu-devel@nongnu.org>, <qemu-riscv@nongnu.org>
-Subject: [PATCH RFC v3 10/14] target/riscv: Add sifive_plic vmstate
-Date: Thu, 27 Aug 2020 17:21:33 +0800
-Message-ID: <20200827092137.479-11-jiangyifei@huawei.com>
-X-Mailer: git-send-email 2.26.2.windows.1
-In-Reply-To: <20200827092137.479-1-jiangyifei@huawei.com>
-References: <20200827092137.479-1-jiangyifei@huawei.com>
+ (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
+ id 1kBE8p-00060E-7e
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 05:24:19 -0400
+Received: from mail-lf1-x144.google.com ([2a00:1450:4864:20::144]:41925)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
+ id 1kBE8m-0003Sb-Gp
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 05:24:18 -0400
+Received: by mail-lf1-x144.google.com with SMTP id y17so1509130lfa.8
+ for <qemu-devel@nongnu.org>; Thu, 27 Aug 2020 02:24:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=jAc9QkYcpJS5T0cX52ZPY/FDmlfraaU2jvBIDWWbuuw=;
+ b=NUbQaIB19Gu4DGFCkfGQgKBIZwI7MvZTtRoUYXftvckqDMP0kBUenUfsy2MOuwB9NI
+ xCgtxMSiRTDGIMqoY8DPRab5/PypID2szF/Y1JWzfOxDjbPoHK7uN5aoXxTQcpwUB6hW
+ 32jbDlPrC0gAKqi5rUhajnS9Eraen8Kib01FSYUJEUKdDvTrRK0WxM+Gd1A62vBv9JjE
+ uleIoqI2tnAKEsMqbTZGDB57x8mwYRwdcZ1/pyI0CsuyQzVuiELgszc7UuKl9S9Qo+xS
+ bvGyeXUzWV8PT69gD8J5BJjnAsB7R/UtMDiAF8wliL9it22+8118JYm2OObWpdRjHaFZ
+ d06g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=jAc9QkYcpJS5T0cX52ZPY/FDmlfraaU2jvBIDWWbuuw=;
+ b=MOjZ8fTafT8d32j6tPUZDcYrgp2TnJcESOLGeUz7Wk5eI4UExO39UdxBMFUlunqZWQ
+ yWokCWkuivYVmpO6UsiDGXjCzkELz+e6GBnVKsK3yitEvYsZogedBaqsJAiFCvJR9c6Q
+ IFmuFhMLLvduPoweoS9U7HHA2+VN/bgliSgvnuQN1XJlgJFbichv6/HBXochTTr3YIOf
+ zAO213Hzs/AgeuKd5nkx2Q/pAjVkc0khmNFsimAGpE3rZRfFhni8IDomcRpLQNBbfBA3
+ Kc6+1oMPpa0gi3S/HpyyM7mpxMgXsR9egJKu0Y4Asbi+eUEvFjn2d2OFNw4Nmsxav+od
+ XxrQ==
+X-Gm-Message-State: AOAM532a5WeB8shgjLAIWxKGfLQhlEoDkNVm2z/KJpKSxJaOCVhHAP0n
+ an5BmAOJX5MkYLW3uF7E0Io=
+X-Google-Smtp-Source: ABdhPJxUVaOwT5gSxkrPcrgbTidibTdJSexkROKuOvpdESP8X8vBUhQ+6EA8YwQGTwMU/9sVnPbL/Q==
+X-Received: by 2002:a05:6512:31c3:: with SMTP id
+ j3mr9548125lfe.204.1598520254456; 
+ Thu, 27 Aug 2020 02:24:14 -0700 (PDT)
+Received: from gmail.com (81-231-232-130-no39.tbcn.telia.com. [81.231.232.130])
+ by smtp.gmail.com with ESMTPSA id 10sm345251ljn.22.2020.08.27.02.24.13
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 27 Aug 2020 02:24:13 -0700 (PDT)
+Date: Thu, 27 Aug 2020 11:24:13 +0200
+From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Subject: Re: [PATCH 64/77] target/microblaze: Convert mbar to decodetree
+Message-ID: <20200827092413.GL2954729@toto>
+References: <20200825205950.730499-1-richard.henderson@linaro.org>
+ <20200825205950.730499-65-richard.henderson@linaro.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain
-X-Originating-IP: [10.174.187.31]
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.190;
- envelope-from=jiangyifei@huawei.com; helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 02:12:47
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200825205950.730499-65-richard.henderson@linaro.org>
+Received-SPF: pass client-ip=2a00:1450:4864:20::144;
+ envelope-from=edgar.iglesias@gmail.com; helo=mail-lf1-x144.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: 10
+X-Spam_score: 1.0
+X-Spam_bar: +
+X-Spam_report: (1.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ FSL_HELO_FAKE=3.066, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -71,101 +102,151 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: victor.zhangxiaofeng@huawei.com, sagark@eecs.berkeley.edu,
- kvm@vger.kernel.org, libvir-list@redhat.com, kbastian@mail.uni-paderborn.de,
- anup.patel@wdc.com, yinyipeng1@huawei.com, Alistair.Francis@wdc.com,
- Yifei Jiang <jiangyifei@huawei.com>, kvm-riscv@lists.infradead.org,
- palmer@dabbelt.com, dengkai1@huawei.com, wu.wubin@huawei.com,
- zhang.zhanghailiang@huawei.com
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add sifive_plic vmstate for supporting sifive_plic migration.
-Current vmstate framework only supports one structure parameter
-as num field to describe variable length arrays, so introduce
-num_enables.
+On Tue, Aug 25, 2020 at 01:59:37PM -0700, Richard Henderson wrote:
+> Split this out of the normal branch instructions, as it requires
+> special handling.  End the TB only for an instruction barrier.
+> 
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/microblaze/insns.decode |  2 +
+>  target/microblaze/translate.c  | 81 ++++++++++++++++++----------------
+>  2 files changed, 45 insertions(+), 38 deletions(-)
+> 
+> diff --git a/target/microblaze/insns.decode b/target/microblaze/insns.decode
+> index 53da2b75aa..77b073be9e 100644
+> --- a/target/microblaze/insns.decode
+> +++ b/target/microblaze/insns.decode
+> @@ -124,6 +124,8 @@ lwea            110010 ..... ..... ..... 0001 000 0000  @typea
+>  lwx             110010 ..... ..... ..... 1000 000 0000  @typea
+>  lwi             111010 ..... ..... ................     @typeb
+>  
+> +mbar            101110 imm:5 00010 0000 0000 0000 0100
+> +
+>  mul             010000 ..... ..... ..... 000 0000 0000  @typea
+>  mulh            010000 ..... ..... ..... 000 0000 0001  @typea
+>  mulhu           010000 ..... ..... ..... 000 0000 0011  @typea
+> diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
+> index fc1c661368..a391e80fb9 100644
+> --- a/target/microblaze/translate.c
+> +++ b/target/microblaze/translate.c
+> @@ -1166,6 +1166,48 @@ static bool trans_brki(DisasContext *dc, arg_typeb_br *arg)
+>      return true;
+>  }
+>  
+> +static bool trans_mbar(DisasContext *dc, arg_mbar *arg)
+> +{
+> +    int mbar_imm = arg->imm;
+> +
+> +    /*
+> +     * Instruction access memory barrier.
+> +     * End the TB so that we recognize self-modified code immediately.
+> +     */
+> +    if (mbar_imm & 1) {
+> +        dc->cpustate_changed = 1;
+> +    }
 
-Signed-off-by: Yifei Jiang <jiangyifei@huawei.com>
-Signed-off-by: Yipeng Yin <yinyipeng1@huawei.com>
----
- hw/riscv/sifive_plic.c         | 24 +++++++++++++++++++++++-
- include/hw/riscv/sifive_plic.h |  1 +
- 2 files changed, 24 insertions(+), 1 deletion(-)
+This should be (mbar_imm & 1) == 0
+But even with that fixed it fails some of our tests because interrupts
+that should become visible within a couple of cycles after a
+memory data barrier can now be delayed longer.
 
-diff --git a/hw/riscv/sifive_plic.c b/hw/riscv/sifive_plic.c
-index 9c5a131e0f..897dc289a0 100644
---- a/hw/riscv/sifive_plic.c
-+++ b/hw/riscv/sifive_plic.c
-@@ -32,6 +32,7 @@
- #include "hw/riscv/sifive_plic.h"
- #include "sysemu/kvm.h"
- #include "kvm_riscv.h"
-+#include "migration/vmstate.h"
- 
- #define RISCV_DEBUG_PLIC 0
- 
-@@ -460,11 +461,12 @@ static void sifive_plic_realize(DeviceState *dev, Error **errp)
-                           TYPE_SIFIVE_PLIC, plic->aperture_size);
-     parse_hart_config(plic);
-     plic->bitfield_words = (plic->num_sources + 31) >> 5;
-+    plic->num_enables = plic->bitfield_words * plic->num_addrs;
-     plic->source_priority = g_new0(uint32_t, plic->num_sources);
-     plic->target_priority = g_new(uint32_t, plic->num_addrs);
-     plic->pending = g_new0(uint32_t, plic->bitfield_words);
-     plic->claimed = g_new0(uint32_t, plic->bitfield_words);
--    plic->enable = g_new0(uint32_t, plic->bitfield_words * plic->num_addrs);
-+    plic->enable = g_new0(uint32_t, plic->num_enables);
-     sysbus_init_mmio(SYS_BUS_DEVICE(dev), &plic->mmio);
-     qdev_init_gpio_in(dev, sifive_plic_irq_request, plic->num_sources);
- 
-@@ -484,12 +486,32 @@ static void sifive_plic_realize(DeviceState *dev, Error **errp)
-     msi_nonbroken = true;
- }
- 
-+static const VMStateDescription vmstate_sifive_plic = {
-+    .name = "riscv_sifive_plic",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+            VMSTATE_VARRAY_UINT32(source_priority, SiFivePLICState, num_sources, 0,
-+                                  vmstate_info_uint32, uint32_t),
-+            VMSTATE_VARRAY_UINT32(target_priority, SiFivePLICState, num_addrs, 0,
-+                                  vmstate_info_uint32, uint32_t),
-+            VMSTATE_VARRAY_UINT32(pending, SiFivePLICState, bitfield_words, 0,
-+                                  vmstate_info_uint32, uint32_t),
-+            VMSTATE_VARRAY_UINT32(claimed, SiFivePLICState, bitfield_words, 0,
-+                                  vmstate_info_uint32, uint32_t),
-+            VMSTATE_VARRAY_UINT32(enable, SiFivePLICState, num_enables, 0,
-+                                  vmstate_info_uint32, uint32_t),
-+            VMSTATE_END_OF_LIST()
-+        }
-+};
-+
- static void sifive_plic_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(klass);
- 
-     device_class_set_props(dc, sifive_plic_properties);
-     dc->realize = sifive_plic_realize;
-+    dc->vmsd = &vmstate_sifive_plic;
- }
- 
- static const TypeInfo sifive_plic_info = {
-diff --git a/include/hw/riscv/sifive_plic.h b/include/hw/riscv/sifive_plic.h
-index 4421e81249..130df0cf1c 100644
---- a/include/hw/riscv/sifive_plic.h
-+++ b/include/hw/riscv/sifive_plic.h
-@@ -49,6 +49,7 @@ typedef struct SiFivePLICState {
-     MemoryRegion mmio;
-     uint32_t num_addrs;
-     uint32_t bitfield_words;
-+    uint32_t num_enables;
-     PLICAddr *addr_config;
-     uint32_t *source_priority;
-     uint32_t *target_priority;
--- 
-2.19.1
+I think we should always break the TB.
+
+> +    /* Data access memory barrier.  */
+> +    if (mbar_imm & 2) {
+> +        tcg_gen_mb(TCG_BAR_SC | TCG_MO_ALL);
+> +    }
+
+This should be (mbar_imm & 2) == 0
 
 
+> +
+> +    /* Sleep. */
+> +    if (mbar_imm & 16) {
+> +        TCGv_i32 tmp_1;
+> +
+> +        if (trap_userspace(dc, true)) {
+> +            /* Sleep is a privileged instruction.  */
+> +            return true;
+> +        }
+> +
+> +        t_sync_flags(dc);
+> +
+> +        tmp_1 = tcg_const_i32(1);
+> +        tcg_gen_st_i32(tmp_1, cpu_env,
+> +                       -offsetof(MicroBlazeCPU, env)
+> +                       +offsetof(CPUState, halted));
+> +        tcg_temp_free_i32(tmp_1);
+> +
+> +        tcg_gen_movi_i32(cpu_pc, dc->base.pc_next + 4);
+> +
+> +        gen_raise_exception(dc, EXCP_HLT);
+> +    }
+> +    return true;
+> +}
+> +
+> +
+>  static void msr_read(DisasContext *dc, TCGv_i32 d)
+>  {
+>      TCGv_i32 t;
+> @@ -1447,50 +1489,13 @@ static void dec_bcc(DisasContext *dc)
+>  
+>  static void dec_br(DisasContext *dc)
+>  {
+> -    unsigned int dslot, link, abs, mbar;
+> +    unsigned int dslot, link, abs;
+>      uint32_t add_pc;
+>  
+>      dslot = dc->ir & (1 << 20);
+>      abs = dc->ir & (1 << 19);
+>      link = dc->ir & (1 << 18);
+>  
+> -    /* Memory barrier.  */
+> -    mbar = (dc->ir >> 16) & 31;
+> -    if (mbar == 2 && dc->imm == 4) {
+> -        uint16_t mbar_imm = dc->rd;
+> -
+> -        /* Data access memory barrier.  */
+> -        if ((mbar_imm & 2) == 0) {
+> -            tcg_gen_mb(TCG_BAR_SC | TCG_MO_ALL);
+> -        }
+> -
+> -        /* mbar IMM & 16 decodes to sleep.  */
+> -        if (mbar_imm & 16) {
+> -            TCGv_i32 tmp_1;
+> -
+> -            if (trap_userspace(dc, true)) {
+> -                /* Sleep is a privileged instruction.  */
+> -                return;
+> -            }
+> -
+> -            t_sync_flags(dc);
+> -
+> -            tmp_1 = tcg_const_i32(1);
+> -            tcg_gen_st_i32(tmp_1, cpu_env,
+> -                           -offsetof(MicroBlazeCPU, env)
+> -                           +offsetof(CPUState, halted));
+> -            tcg_temp_free_i32(tmp_1);
+> -
+> -            tcg_gen_movi_i32(cpu_pc, dc->base.pc_next + 4);
+> -
+> -            gen_raise_exception(dc, EXCP_HLT);
+> -            return;
+> -        }
+> -        /* Break the TB.  */
+> -        dc->cpustate_changed = 1;
+> -        return;
+> -    }
+> -
+>      if (dslot && dec_setup_dslot(dc)) {
+>          return;
+>      }
+> -- 
+> 2.25.1
+> 
 
