@@ -2,92 +2,95 @@ Return-Path: <SRS0=k4hX=CF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-4.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B109C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 21:19:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9F5AC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 21:20:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4705320825
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 21:19:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6E70D20825
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 21:20:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uVSTBFYM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4705320825
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bWNb58mc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E70D20825
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60990 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35414 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBPIw-0004GX-GS
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 17:19:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58958)
+	id 1kBPJi-0005NV-NF
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 17:20:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59050)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kBPIK-0003pq-Fb
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 17:18:52 -0400
-Received: from mail-pj1-x1032.google.com ([2607:f8b0:4864:20::1032]:50239)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kBPII-0006bl-R6
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 17:18:52 -0400
-Received: by mail-pj1-x1032.google.com with SMTP id i13so3311351pjv.0
- for <qemu-devel@nongnu.org>; Thu, 27 Aug 2020 14:18:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=to:from:subject:message-id:date:user-agent:mime-version
- :content-language;
- bh=Dt0N+ePf7hKrxt/rXK/IQVXTqKR4hijiYCr568leI9k=;
- b=uVSTBFYMtmm+2XSyr2RBOvYz9All9FAmnoeAr/XZcV06XGMqGpi1J1ht896COrw1Nt
- YCEWatugUVUE7JRHeo0n15Dy0XEudoqx3iAog72mS46G2pOStOVgnVOnvT08rskNxPBx
- pKbbJfktBusR4dxQHMAZbPe4sQ4XlUJTLcA5tDAHUdQI4nlTy5y87lypsaJcZlkWCkFc
- dEir+5BUMf3tul+q+qsqa58H2AfEtTh+U8nWqBKd0cX3aVWeRx2lT6ut6l8Yem8FVMei
- s/ya3VphWWFAz036/m72Bigx52khxHjfeseVo+CHKlGxjnri9FQ9Ynp+RVBuFYUAmZJp
- EgXg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:to:from:subject:message-id:date:user-agent
- :mime-version:content-language;
- bh=Dt0N+ePf7hKrxt/rXK/IQVXTqKR4hijiYCr568leI9k=;
- b=h9rSZu3SLjq5S2S0tA0dXVYpODD/ZgB/V1irMXVxry9b7bRzRanfIhgddtTpSCb22a
- ljwoVcVAKm7uFMEhvr6doqjCrSZkTtOpKm6Y6hezBo81LvWBK6eqPbzi+Y7p929rMaIc
- H2QTfnCqbFPx3W8dyUT5vof21DPyajRozB7JmeiRW1hECIzUors4P6ImPnqSZmCAGBQw
- YvIKfDNbmgtrBJztxmAh9h6TEL4FUKuvuvQpceDnjmzGlIstR8DF5X/WUQ6omQQkigyV
- 0mCXo7zGmGfqEN7WbYVl9YJ/P1ilbgbBQC8xJVGeVc0+Gp/DXQloBmt1I8wqYKXBVVdv
- V/2A==
-X-Gm-Message-State: AOAM5308i9AmxrbdrtpjgFxGIy7m81mnz/eveJOIAO8cQhpFpXQpNPNz
- yfYjykuoqC1D0YUofDT3ZK5dTcpOQOLLFQ==
-X-Google-Smtp-Source: ABdhPJyPZ2cYQM+GdhSmkj4xWBQ6OBa4dbct5u2/p225zwAxrQIIohfc9DMJtcLesJUcnS6Nde8wWw==
-X-Received: by 2002:a17:90a:384c:: with SMTP id
- l12mr635410pjf.27.1598563128947; 
- Thu, 27 Aug 2020 14:18:48 -0700 (PDT)
-Received: from [192.168.1.11] ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id l5sm3429899pga.43.2020.08.27.14.18.47
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 27 Aug 2020 14:18:47 -0700 (PDT)
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Subject: build broken with --enable-gcrypt
-Message-ID: <046eb29c-9c68-1baf-846e-decd65f567e0@linaro.org>
-Date: Thu, 27 Aug 2020 14:18:46 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1kBPIv-0004RG-RD
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 17:19:29 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:33901)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1kBPIs-0006d1-Ih
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 17:19:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1598563164;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=3gOATi5rpuupAxWMRCi83Qi5B3fTJWaSMskUyY74W2w=;
+ b=bWNb58mcCZD7v2qdKbWV/keAC2xh5JDcP3W/5nGkf7TQwfmdVOMflNMB1SCh4jU+XzZBDX
+ MtHzQakKgsC0htxfejIVCg9SknMVuAjxxVPHrvkmtDVTyZRT5+eeEWFfRglLrasSdfJhKG
+ VbnclY+1ox+GXMzKm2IuRiczn/1anx4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-94-xHKKN6RePZOQiQf3C5DGTg-1; Thu, 27 Aug 2020 17:19:20 -0400
+X-MC-Unique: xHKKN6RePZOQiQf3C5DGTg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 22CC610ABDBF;
+ Thu, 27 Aug 2020 21:19:19 +0000 (UTC)
+Received: from imammedo-mac (unknown [10.40.192.85])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3BAB47EB70;
+ Thu, 27 Aug 2020 21:19:10 +0000 (UTC)
+Date: Thu, 27 Aug 2020 23:19:07 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Subject: Re: [PATCH v5 0/8] Remove EPYC mode apicid decode and use generic
+ decode
+Message-ID: <20200827231907.10cfe4b7@imammedo-mac>
+In-Reply-To: <20200826141046.GB2727@work-vm>
+References: <159804762216.39954.15502128500494116468.stgit@naples-babu.amd.com>
+ <20200824184112.GB2688@work-vm>
+ <f602852c-b6af-694e-3e32-47974722e144@amd.com>
+ <20200825081504.GA2646@work-vm>
+ <20200825163846.10185087@redhat.com>
+ <20200825152521.GA3574@work-vm>
+ <20200826144324.56335302@redhat.com>
+ <20200826141046.GB2727@work-vm>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="------------EDCCB028FFC23CF97BE90812"
-Content-Language: en-US
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1032;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1032.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=imammedo@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=imammedo@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 02:54:02
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.959,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,56 +103,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: ehabkost@redhat.com, mst@redhat.com, qemu-devel@nongnu.org,
+ Babu Moger <babu.moger@amd.com>, pbonzini@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is a multi-part message in MIME format.
---------------EDCCB028FFC23CF97BE90812
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+On Wed, 26 Aug 2020 15:10:46 +0100
+"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
 
-The meson conversion seems to have not been properly accomplished for the
-gcrypt option: we fail to link against -lgcrypt.
+> * Igor Mammedov (imammedo@redhat.com) wrote:
+> > On Tue, 25 Aug 2020 16:25:21 +0100
+> > "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> > 
+> > > * Igor Mammedov (imammedo@redhat.com) wrote:
+> > > > On Tue, 25 Aug 2020 09:15:04 +0100
+> > > > "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> > > >   
+> > > > > * Babu Moger (babu.moger@amd.com) wrote:  
+> > > > > > Hi Dave,
+> > > > > > 
+> > > > > > On 8/24/20 1:41 PM, Dr. David Alan Gilbert wrote:    
+> > > > > > > * Babu Moger (babu.moger@amd.com) wrote:    
+> > > > > > >> To support some of the complex topology, we introduced EPYC mode apicid decode.
+> > > > > > >> But, EPYC mode decode is running into problems. Also it can become quite a
+> > > > > > >> maintenance problem in the future. So, it was decided to remove that code and
+> > > > > > >> use the generic decode which works for majority of the topology. Most of the
+> > > > > > >> SPECed configuration would work just fine. With some non-SPECed user inputs,
+> > > > > > >> it will create some sub-optimal configuration.
+> > > > > > >> Here is the discussion thread.
+> > > > > > >> https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Flore.kernel.org%2Fqemu-devel%2Fc0bcc1a6-1d84-a6e7-e468-d5b437c1b254%40amd.com%2F&amp;data=02%7C01%7Cbabu.moger%40amd.com%7C74d90724af9c4adcc75008d8485d4d16%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637338912853492167&amp;sdata=GTsMKcpeYXAA0CvpLTirPHKdNSdlJE3RuPjCtSyWtGQ%3D&amp;reserved=0
+> > > > > > >>
+> > > > > > >> This series removes all the EPYC mode specific apicid changes and use the generic
+> > > > > > >> apicid decode.    
+> > > > > > > 
+> > > > > > > Hi Babu,
+> > > > > > >   This does simplify things a lot!
+> > > > > > > One worry, what happens about a live migration of a VM from an old qemu
+> > > > > > > that was using the node-id to a qemu with this new scheme?    
+> > > > > > 
+> > > > > > The node_id which we introduced was only used internally. This wasn't
+> > > > > > exposed outside. I don't think live migration will be an issue.    
+> > > > > 
+> > > > > Didn't it become part of the APIC ID visible to the guest?  
+> > > > 
+> > > > Daniel asked similar question wrt hard error on start up,
+> > > > when CLI is not sufficient to create EPYC cpu.
+> > > > 
+> > > > https://www.mail-archive.com/qemu-devel@nongnu.org/msg728536.html
+> > > > 
+> > > > Migration might fall into the same category.
+> > > > Also looking at the history, 5.0 commit 
+> > > >   247b18c593ec29 target/i386: Enable new apic id encoding for EPYC based cpus models
+> > > > silently broke APIC ID (without versioning), for all EPYC models (that's were 1 new and 1 old one).
+> > > > 
+> > > > (I'm not aware of somebody complaining about it)
+> > > > 
+> > > > Another commit ed78467a21459, changed CPUID_8000_001E without versioning as well.
+> > > > 
+> > > > 
+> > > > With current EPYC apicid code, if all starts align (no numa or 1 numa node only on
+> > > > CLI and no -smp dies=) it might produce a valid CPU (apicid+CPUID_8000_001E).
+> > > > No numa is gray area, since EPYC spec implies that it has to be numa machine in case of real EPYC cpus.
+> > > > Multi-node configs would be correct only if user assigns cpus to numa nodes
+> > > > by duplicating internal node_id algorithm that this series removes.
+> > > > 
+> > > > There might be other broken cases that I don't recall anymore
+> > > > (should be mentioned in previous versions of this series)
+> > > > 
+> > > > 
+> > > > To summarize from migration pov (ignoring ed78467a21459 change):
+> > > > 
+> > > >  1) old qemu pre-5.0 ==>  qemu 5.0, 5.1 - broken migration  
+> > > 
+> > > Oh ....
+> > > 
+> > > >  2) with this series (lets call it qemu 5.2)
+> > > >      pre-5.0 ==> qemu 5.2 - should work as series basically rollbacks current code to pre-5.0
+> > > >      qemu 5.0, 5.1 ==> qemu 5.2 - broken
+> > > > 
+> > > > It's all about picking which poison to choose,
+> > > > I'd preffer 2nd case as it lets drop a lot of complicated code that
+> > > > doesn't work as expected.  
+> > > 
+> > > I think that would make our lives easier for other reasons; so I'm happy
+> > > to go with that.
+> > 
+> > to make things less painful for users, me wonders if there is a way
+> > to block migration if epyc and specific QEMU versions are used?
+> 
+> We have no way to block based on version - and that's a pretty painful
+> thing to do; we can block based on machine type.
+> 
+> But before we get there; can we understand in which combinations that
+> things break and why exactly - would it break on a 1 or 2 vCPU guest -
+> or would it only break when we get to the point the upper bits start
+> being used for example?  Why exaclty would it break - i.e. is it going
+> to change the name of sections in the migration stream - or are the
+> values we need actually going to migrate OK?
 
-I tried aping the nettle bits, like the following, but it has no effect.  I
-don't understand how the "nettle" token works, honestly, since it doesn't
-appear to be used at all.
+it's values of APIC ID, where 4.2 and 5.0 QEMU use different values
+if numa is enabled.
+I'd expect guest to be very confused in when this happens.
+
+here is an example:
+qemu-4.2 -cpu EPYC -smp 8,sockets=1,cores=8 -numa node,cpus=0-3 -numa node,cpus=4-7
+
+(QEMU) qom-get path=/machine/unattached/device[8] property=apic-id
+{
+    "return": 7
+}
+
+vs
+
+qemu-5.1 -cpu EPYC -smp 8,sockets=1,cores=8 -numa node,cpus=0-3 -numa node,cpus=4-7
+(QEMU) qom-get path=/machine/unattached/device[8] property=apic-id
+{
+    "return": 15
+}
+
+we probably can't do anything based on machine type versions, as
+4.2 and older versions on qemu-5.0 and newer use different algorithm to calculate apic-id.
+
+Hence was suggestion to leave 5.0/5.1 with broken apic id and revert back to
+4.2 algorithm, which should encode APIC ID correctly when '-smp dies' is used. 
 
 
-r~
+> Dave
+> 
+> 
+> > > > PS:
+> > > >  I didn't review it yet, but with this series we aren't
+> > > >  making up internal node_ids that should match user provided numa node ids somehow.
+> > > >  It seems series lost the patch that would enforce numa in case -smp dies>1,
+> > > >  but otherwise it heads in the right direction.  
+> > > 
+> > > Dave
+> > > 
+> > > > > 
+> > > > > Dave
+> > > > >   
+> > > >   
+> > 
 
-
-
-
---------------EDCCB028FFC23CF97BE90812
-Content-Type: text/plain; charset=UTF-8;
- name="z.txt"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment;
- filename="z.txt"
-
-ZGlmZiAtLWdpdCBhL2NvbmZpZ3VyZSBiL2NvbmZpZ3VyZQppbmRleCBiMWUxMTM5N2E4Li40
-ZmQ1MGMwMjc1IDEwMDc1NQotLS0gYS9jb25maWd1cmUKKysrIGIvY29uZmlndXJlCkBAIC02
-OTcyLDYgKzY5NzIsOCBAQCBpZiB0ZXN0ICIkZ2NyeXB0IiA9ICJ5ZXMiIDsgdGhlbgogICBp
-ZiB0ZXN0ICIkZ2NyeXB0X2htYWMiID0gInllcyIgOyB0aGVuCiAgICAgZWNobyAiQ09ORklH
-X0dDUllQVF9ITUFDPXkiID4+ICRjb25maWdfaG9zdF9tYWsKICAgZmkKKyAgZWNobyAiR0NS
-WVBUX0NGTEFHUz0kZ2NyeXB0X2NmbGFncyIgPj4gJGNvbmZpZ19ob3N0X21haworICBlY2hv
-ICJHQ1JZUFRfTElCUz0kZ2NyeXB0X2xpYnMiID4+ICRjb25maWdfaG9zdF9tYWsKIGZpCiBp
-ZiB0ZXN0ICIkbmV0dGxlIiA9ICJ5ZXMiIDsgdGhlbgogICBlY2hvICJDT05GSUdfTkVUVExF
-PXkiID4+ICRjb25maWdfaG9zdF9tYWsKZGlmZiAtLWdpdCBhL21lc29uLmJ1aWxkIGIvbWVz
-b24uYnVpbGQKaW5kZXggZjBmZTVmODc5OS4uZDQ1YzU0ODE5MSAxMDA2NDQKLS0tIGEvbWVz
-b24uYnVpbGQKKysrIGIvbWVzb24uYnVpbGQKQEAgLTEwOCw2ICsxMDgsMTEgQEAgaWYgJ0NP
-TkZJR19ORVRUTEUnIGluIGNvbmZpZ19ob3N0CiAgIG5ldHRsZSA9IGRlY2xhcmVfZGVwZW5k
-ZW5jeShjb21waWxlX2FyZ3M6IGNvbmZpZ19ob3N0WydORVRUTEVfQ0ZMQUdTJ10uc3BsaXQo
-KSwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGxpbmtfYXJnczogY29uZmlnX2hv
-c3RbJ05FVFRMRV9MSUJTJ10uc3BsaXQoKSkKIGVuZGlmCitnY3J5cHQgPSBub3RfZm91bmQK
-K2lmICdDT05GSUdfR0NSWVBUJyBpbiBjb25maWdfaG9zdAorICBnY3J5cHQgPSBkZWNsYXJl
-X2RlcGVuZGVuY3koY29tcGlsZV9hcmdzOiBjb25maWdfaG9zdFsnR0NSWVBUX0NGTEFHUydd
-LnNwbGl0KCksCisgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBsaW5rX2FyZ3M6IGNv
-bmZpZ19ob3N0WydHQ1JZUFRfTElCUyddLnNwbGl0KCkpCitlbmRpZgogZ251dGxzID0gbm90
-X2ZvdW5kCiBpZiAnQ09ORklHX0dOVVRMUycgaW4gY29uZmlnX2hvc3QKICAgZ251dGxzID0g
-ZGVjbGFyZV9kZXBlbmRlbmN5KGNvbXBpbGVfYXJnczogY29uZmlnX2hvc3RbJ0dOVVRMU19D
-RkxBR1MnXS5zcGxpdCgpLAo=
---------------EDCCB028FFC23CF97BE90812--
 
