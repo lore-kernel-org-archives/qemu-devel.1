@@ -7,60 +7,60 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE7CAC433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 19:25:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC712C433E3
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 19:25:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 899C4207CD
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 19:25:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 899C4207CD
+	by mail.kernel.org (Postfix) with ESMTPS id 762CB207CD
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 19:25:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 762CB207CD
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49462 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51640 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBNW8-0004ML-QP
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 15:25:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33552)
+	id 1kBNWb-0005EE-Nv
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 15:25:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33482)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kBNS7-0004Hl-H8
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 15:20:53 -0400
-Received: from mout.kundenserver.de ([217.72.192.75]:47725)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kBNS1-00047B-S9
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 15:20:45 -0400
+Received: from mout.kundenserver.de ([217.72.192.75]:58907)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kBNS4-0000Hd-16
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 15:20:51 -0400
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kBNRy-0000ER-SA
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 15:20:45 -0400
 Received: from localhost.localdomain ([82.252.135.186]) by
  mrelayeu.kundenserver.de (mreue109 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1Myb8N-1kWmFs2PIj-00yvbX; Thu, 27 Aug 2020 21:20:38 +0200
+ id 1M9Frd-1kHiAK2vwt-006Q6b; Thu, 27 Aug 2020 21:20:32 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 10/18] linux-user: Add missing termbits types and values
- definitions
-Date: Thu, 27 Aug 2020 21:20:10 +0200
-Message-Id: <20200827192018.2442099-11-laurent@vivier.eu>
+Subject: [PULL 06/18] linux-user: Add strace support for printing arguments of
+ syscalls used to lock and unlock memory
+Date: Thu, 27 Aug 2020 21:20:06 +0200
+Message-Id: <20200827192018.2442099-7-laurent@vivier.eu>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200827192018.2442099-1-laurent@vivier.eu>
 References: <20200827192018.2442099-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:Y+sY9KuLKv6w3ax14hGN/Ki47Yey+tevoZDfqy7rFvfur8lUI50
- Zfsj8t36xXZzFktg/WClO4GyeNF8PzjHsgPsgR5prpN122PgryP5YGj+Sj1X3xDJ3FOzUKK
- 6CXiLnQ3gY1BBPTfzduEyLxEwR4DQAlod4+ItrId5H5dbckm5uXk2IVaL9p24ChpSdnyLXw
- fobJS45aYaf4hruFA4iKA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:LTBaspZAbWk=:5jFq/AHiLRFnm/GHFo3dGf
- QDXOoBbJ+vJtp+BwE+FqWa7aV3Zd81xaGpG14BDSKBVZSc3pw6Z/EGa6+q75Rpy9UG0j/De0+
- E7i2/G5RvZK0DMJcYfHludcFaIl0ttg6m24s/chwCvdtkYYyOIjidutxV44we3dzX7IPzPjR4
- 6dsdDM14Bl7Q6yDi2VAOuMuIDa7RLDw5s7lJ2N26PV1TdoXVnLgx2mQEOd0ehZkDiu0U51ewy
- 0jwGXHwapz+kt7EubDNtEs6nfoHiNRIK/6V3+T0nf3VQ5DjeDswVyAPQwowcjeuDLqPFmzN2p
- IvSkIlW8qRD9FbMz/rYm1bbk1j06fCeOf3Qm/leXtlWtciuNQLaLhR13Hkmsa0IRtZD65YKIl
- Tr+94FLnFPRh9FJZfLyKqwEQbUXNhkkJDZKeea7PrsM9E2Sf763ZxAUwzH04rpmxkpz+i7K8G
- lHV94KJt7Gq6/o8my8bR8mreSIU4qUTuRxIlNjVcERF5KO8B9pdajOXqzLStdvDVNbuyeRhXd
- N1nW7To/OtoN5t4KQFCJGkZuOcwqaXk6Z5qiCHkVr0Kmsa4AWKapSBcKLhDS8TTfRaW9anBJ+
- jNKEq5kZt3kPBD+7WPyduKgx6wwP4g/NLUF3iEh7WgH4RfaxPSY0MYZ5yZOB1sfXPzkJJjzLu
- gvO6kC+AZTmmR7rXaeYd11YSzcrG7yC/tYvQDGw85weC/3hskm/8kJefmDqwrEz3HYJPSyCje
- mNPMy1h1eKsV1I8hHpsC4zVRbZzVir1eRqGdCFcdxgk4oL1U1/J88IRxsQA5syTIp7t0Q/4St
- mkuJbEGe8gH2BZB2btMs445u951vfqohCon72AC2Ym5HjSkfKL6MQsxaFCheU8QrfJSMiFu
+X-Provags-ID: V03:K1:f0nRlCcWTzGwn9gK0ez3eLTyeo0HG0H/6rbwmTiga1TleANHppN
+ PvaeZe2jFg6jR/IC9CtXiHMfylpyy0NSKbH4/TuN7Htbf3GFKTeNHMwU1Df/WP/UDlmdc8G
+ TAKoYvpmsPJ0TFpsJqp1QczTEjXlZjvkCYsxmh9Ce7pUWWsc8KpPRxkqzBdDGWPtpz0USyO
+ YJ7KmrT/m3A3hrnJat4rg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:fAcFz1Py0+A=:yOz1fVyDwnsQlP1x8xH9Nr
+ 13mI+910JosTNv7qdqzkuXKNBwNEaMoU1yBcMOhxxg9S2Woxww2Qtg6/ARhb7cX1xLg1xsSgP
+ UvTYRV1IkyisV0AJ4MrUfAwC0R7hkpatCNeNZf4Pab306+5EX6pdtvEXJ95VXY7uuP4ZROyav
+ a9OqOYnaepFENRdvEcY/mP6ALLYktbeONgxUhe+wEw5aaDLNVdV+KgguKN7hSmtANxbAf7F/R
+ 4wvO8MQrhgsDu70YT7vDdPlfgj4KLSzv+6++xyR1bL7y6+f+SQTnQwbpqTsP2JQrAuVvIde1/
+ JHcqTANyjnn5121oPT4XmAbt2PkB6Mk7yDVRTc+lCghmBz3msgH6nNUIYdiVPM09pX50o9Lhq
+ dmhVd0TKHyPOKE5E6FgtprOaz4kg1sU9crGkEMNTKpZzZZs6Xgt2ZVTFM/NH+3xWed5fBCYGK
+ LQXDOQgXNH2F4QczHiSIzdNyUsJWmv5YYG3KODEpBuNFgf/Q03CUuDraYhoG6j5G3/i+X+r2a
+ 3SFXRVtyvLj4KvrvW8LnY6C6f8/bB1ihj5qfbff+Zax3CsyXRoZjf9K4OXMTFJBOrjfSMcoBe
+ 0zT8+9wvkzhiaMMJF500czIo/p9grICb1Q+dZ7JqPExK6A+lOQspj46kQItGKmCt/SVNLa9cG
+ Exn9qw6pAhaM6peP1xDRn45elaDDlFNZRSfJX2pMCY7yuBwOCXZWUScCJ1yCTzUitnFJ3n/+Z
+ jhhtA80wjLV2W1DnRzGbIh0nQiIa8oWErie5hhtKr0KRab67a4ZZx8r3ulGr8EWR37QpRW49r
+ NaHXQq6t2/shtM9Y1s8lPJCuNOlQHhGnvsRgXj+b66sCu4Wg7DWRn8aL4dONnYiI91e2As5
 Received-SPF: none client-ip=217.72.192.75; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 15:20:36
@@ -83,459 +83,506 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Max Filippov <jcmvbkbc@gmail.com>, Riku Voipio <riku.voipio@iki.fi>,
- Laurent Vivier <laurent@vivier.eu>, Filip Bozuta <Filip.Bozuta@syrmia.com>
+Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>,
+ Filip Bozuta <Filip.Bozuta@syrmia.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: Filip Bozuta <Filip.Bozuta@syrmia.com>
 
-This patch introduces missing target types ('target_flag_t', 'target_cc_t',
-'target_speed_t') in a few 'termibts.h' header files. Also, two missing
-values ('TARGET_IUTF8' and 'TARGET_EXTPROC') were also added. These values
-were also added in file 'syscall.c' in bitmask tables 'iflag_tbl[]' and
-'lflag_tbl[]' which are used to convert values of 'struct termios' between
-target and host.
+This patch implements strace argument printing functionality for following syscalls:
+
+    * mlock, munlock, mlockall, munlockall - lock and unlock memory
+
+       int mlock(const void *addr, size_t len)
+       int munlock(const void *addr, size_t len)
+       int mlockall(int flags)
+       int munlockall(void)
+       man page: https://man7.org/linux/man-pages/man2/mlock.2.html
+
+Implementation notes:
+
+    Syscall mlockall() takes an argument that is composed of predefined values
+    which represent flags that determine the type of locking operation that is
+    to be performed. For that reason, a printing function "print_mlockall" was
+    stated in file "strace.list". This printing function uses an already existing
+    function "print_flags()" to print the "flags" argument.  These flags are stated
+    inside an array "mlockall_flags" that contains values of type "struct flags".
+    These values are instantiated using an existing macro "FLAG_TARGET()" that
+    crates aproppriate target flag values based on those defined in files
+    '/target_syscall.h'. These target flag values were changed from
+    "TARGET_MLOCKALL_MCL*" to "TARGET_MCL_*" so that they can be aproppriately set
+    and recognised in "strace.c" with "FLAG_TARGET()". Value for "MCL_ONFAULT"
+    was added in this patch. This value was also added in "syscall.c" in function
+    "target_to_host_mlockall_arg()". Because this flag value was added in kernel
+    version 4.4, it is enwrapped in an #ifdef directive (both in "syscall.c" and
+    in "strace.c") as to support older kernel versions.
+    The other syscalls have only primitive argument types, so the
+    rest of the implementation was handled by stating an appropriate
+    printing format in file "strace.list". Syscall mlock2() is not implemented in
+    "syscall.c" and thus it's argument printing is not implemented in this patch.
 
 Signed-off-by: Filip Bozuta <Filip.Bozuta@syrmia.com>
-Reviewed-by: Max Filippov <jcmvbkbc@gmail.com>
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <20200723210233.349690-3-Filip.Bozuta@syrmia.com>
-[lv: keep TARGET_NCCS definition in xtensa/termbits.h]
+Message-Id: <20200811164553.27713-4-Filip.Bozuta@syrmia.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- linux-user/alpha/termbits.h   |  1 +
- linux-user/cris/termbits.h    | 18 ++++++++----
- linux-user/hppa/termbits.h    | 17 +++++++----
- linux-user/mips/termbits.h    | 17 +++++++----
- linux-user/ppc/termbits.h     | 21 ++++++++-----
- linux-user/sh4/termbits.h     | 19 ++++++++----
- linux-user/sparc/termbits.h   | 18 ++++++++----
- linux-user/sparc64/termbits.h | 18 ++++++++----
- linux-user/syscall.c          | 34 ++++++++++++----------
- linux-user/xtensa/termbits.h  | 55 ++++++++++++++++++-----------------
- 10 files changed, 132 insertions(+), 86 deletions(-)
+ linux-user/aarch64/target_syscall.h    |  5 +++--
+ linux-user/alpha/target_syscall.h      |  5 +++--
+ linux-user/arm/target_syscall.h        |  6 ++++--
+ linux-user/cris/target_syscall.h       |  5 +++--
+ linux-user/hppa/target_syscall.h       |  5 +++--
+ linux-user/i386/target_syscall.h       |  5 +++--
+ linux-user/m68k/target_syscall.h       |  6 +++---
+ linux-user/microblaze/target_syscall.h |  5 +++--
+ linux-user/mips/target_syscall.h       |  5 +++--
+ linux-user/mips64/target_syscall.h     |  5 +++--
+ linux-user/nios2/target_syscall.h      |  5 +++--
+ linux-user/openrisc/target_syscall.h   |  5 +++--
+ linux-user/ppc/target_syscall.h        |  5 +++--
+ linux-user/riscv/target_syscall.h      |  5 +++--
+ linux-user/s390x/target_syscall.h      |  5 +++--
+ linux-user/sh4/target_syscall.h        |  5 +++--
+ linux-user/sparc/target_syscall.h      |  5 +++--
+ linux-user/sparc64/target_syscall.h    |  5 +++--
+ linux-user/strace.c                    | 21 +++++++++++++++++++++
+ linux-user/strace.list                 |  8 ++++----
+ linux-user/syscall.c                   | 10 ++++++++--
+ linux-user/tilegx/target_syscall.h     |  5 +++--
+ linux-user/x86_64/target_syscall.h     |  5 +++--
+ linux-user/xtensa/target_syscall.h     |  5 +++--
+ 24 files changed, 97 insertions(+), 49 deletions(-)
 
-diff --git a/linux-user/alpha/termbits.h b/linux-user/alpha/termbits.h
-index a71425174a97..4a4b1e96f21c 100644
---- a/linux-user/alpha/termbits.h
-+++ b/linux-user/alpha/termbits.h
-@@ -159,6 +159,7 @@ struct target_termios {
- #define TARGET_FLUSHO	0x00800000
- #define TARGET_PENDIN	0x20000000
- #define TARGET_IEXTEN	0x00000400
-+#define TARGET_EXTPROC  0x10000000
+diff --git a/linux-user/aarch64/target_syscall.h b/linux-user/aarch64/target_syscall.h
+index 995e475c73f8..3194e6b0093c 100644
+--- a/linux-user/aarch64/target_syscall.h
++++ b/linux-user/aarch64/target_syscall.h
+@@ -16,8 +16,9 @@ struct target_pt_regs {
+ #define UNAME_MINIMUM_RELEASE "3.8.0"
+ #define TARGET_CLONE_BACKWARDS
+ #define TARGET_MINSIGSTKSZ       2048
+-#define TARGET_MLOCKALL_MCL_CURRENT 1
+-#define TARGET_MLOCKALL_MCL_FUTURE  2
++#define TARGET_MCL_CURRENT 1
++#define TARGET_MCL_FUTURE  2
++#define TARGET_MCL_ONFAULT 4
  
- #define TARGET_FIOCLEX		TARGET_IO('f', 1)
- #define TARGET_FIONCLEX	TARGET_IO('f', 2)
-diff --git a/linux-user/cris/termbits.h b/linux-user/cris/termbits.h
-index 475ee70fed37..0c8d8fc05164 100644
---- a/linux-user/cris/termbits.h
-+++ b/linux-user/cris/termbits.h
-@@ -5,13 +5,17 @@
+ #define TARGET_PR_SVE_SET_VL  50
+ #define TARGET_PR_SVE_GET_VL  51
+diff --git a/linux-user/alpha/target_syscall.h b/linux-user/alpha/target_syscall.h
+index 3426cc5b4e4f..fd389422e31e 100644
+--- a/linux-user/alpha/target_syscall.h
++++ b/linux-user/alpha/target_syscall.h
+@@ -258,7 +258,8 @@ struct target_pt_regs {
+ #define TARGET_UAC_NOFIX		2
+ #define TARGET_UAC_SIGBUS		4
+ #define TARGET_MINSIGSTKSZ              4096
+-#define TARGET_MLOCKALL_MCL_CURRENT     0x2000
+-#define TARGET_MLOCKALL_MCL_FUTURE      0x4000
++#define TARGET_MCL_CURRENT     0x2000
++#define TARGET_MCL_FUTURE      0x4000
++#define TARGET_MCL_ONFAULT     0x8000
  
- #define TARGET_NCCS 19
+ #endif /* ALPHA_TARGET_SYSCALL_H */
+diff --git a/linux-user/arm/target_syscall.h b/linux-user/arm/target_syscall.h
+index f85cbdaf56ff..e870ed7a5468 100644
+--- a/linux-user/arm/target_syscall.h
++++ b/linux-user/arm/target_syscall.h
+@@ -28,8 +28,10 @@ struct target_pt_regs {
+ #define TARGET_CLONE_BACKWARDS
  
-+typedef unsigned char   target_cc_t;        /* cc_t */
-+typedef unsigned int    target_speed_t;     /* speed_t */
-+typedef unsigned int    target_tcflag_t;    /* tcflag_t */
+ #define TARGET_MINSIGSTKSZ 2048
+-#define TARGET_MLOCKALL_MCL_CURRENT 1
+-#define TARGET_MLOCKALL_MCL_FUTURE  2
++#define TARGET_MCL_CURRENT 1
++#define TARGET_MCL_FUTURE  2
++#define TARGET_MCL_ONFAULT 4
 +
- struct target_termios {
--    unsigned int c_iflag;               /* input mode flags */
--    unsigned int c_oflag;               /* output mode flags */
--    unsigned int c_cflag;               /* control mode flags */
--    unsigned int c_lflag;               /* local mode flags */
--    unsigned char c_line;                    /* line discipline */
--    unsigned char c_cc[TARGET_NCCS];                /* control characters */
-+    target_tcflag_t c_iflag;               /* input mode flags */
-+    target_tcflag_t c_oflag;               /* output mode flags */
-+    target_tcflag_t c_cflag;               /* control mode flags */
-+    target_tcflag_t c_lflag;               /* local mode flags */
-+    target_cc_t c_line;                    /* line discipline */
-+    target_cc_t c_cc[TARGET_NCCS];         /* control characters */
+ #define TARGET_WANT_OLD_SYS_SELECT
+ 
+ #define TARGET_FORCE_SHMLBA
+diff --git a/linux-user/cris/target_syscall.h b/linux-user/cris/target_syscall.h
+index 29d69009ffe8..d109a6b42a35 100644
+--- a/linux-user/cris/target_syscall.h
++++ b/linux-user/cris/target_syscall.h
+@@ -40,7 +40,8 @@ struct target_pt_regs {
+ 
+ #define TARGET_CLONE_BACKWARDS2
+ #define TARGET_MINSIGSTKSZ 2048
+-#define TARGET_MLOCKALL_MCL_CURRENT 1
+-#define TARGET_MLOCKALL_MCL_FUTURE  2
++#define TARGET_MCL_CURRENT 1
++#define TARGET_MCL_FUTURE  2
++#define TARGET_MCL_ONFAULT 4
+ 
+ #endif
+diff --git a/linux-user/hppa/target_syscall.h b/linux-user/hppa/target_syscall.h
+index e2f366839d80..f34e05edb57b 100644
+--- a/linux-user/hppa/target_syscall.h
++++ b/linux-user/hppa/target_syscall.h
+@@ -23,8 +23,9 @@ struct target_pt_regs {
+ #define UNAME_MINIMUM_RELEASE "2.6.32"
+ #define TARGET_CLONE_BACKWARDS
+ #define TARGET_MINSIGSTKSZ       2048
+-#define TARGET_MLOCKALL_MCL_CURRENT 1
+-#define TARGET_MLOCKALL_MCL_FUTURE  2
++#define TARGET_MCL_CURRENT 1
++#define TARGET_MCL_FUTURE  2
++#define TARGET_MCL_ONFAULT 4
+ 
+ #undef  TARGET_ENOMSG
+ #define TARGET_ENOMSG          35
+diff --git a/linux-user/i386/target_syscall.h b/linux-user/i386/target_syscall.h
+index 2854758134d7..ed356b3908dc 100644
+--- a/linux-user/i386/target_syscall.h
++++ b/linux-user/i386/target_syscall.h
+@@ -151,8 +151,9 @@ struct target_vm86plus_struct {
+ 
+ #define TARGET_CLONE_BACKWARDS
+ #define TARGET_MINSIGSTKSZ 2048
+-#define TARGET_MLOCKALL_MCL_CURRENT 1
+-#define TARGET_MLOCKALL_MCL_FUTURE  2
++#define TARGET_MCL_CURRENT 1
++#define TARGET_MCL_FUTURE  2
++#define TARGET_MCL_ONFAULT 4
+ #define TARGET_WANT_OLD_SYS_SELECT
+ 
+ #endif /* I386_TARGET_SYSCALL_H */
+diff --git a/linux-user/m68k/target_syscall.h b/linux-user/m68k/target_syscall.h
+index c0366b1c622d..23359a6299dd 100644
+--- a/linux-user/m68k/target_syscall.h
++++ b/linux-user/m68k/target_syscall.h
+@@ -21,9 +21,9 @@ struct target_pt_regs {
+ #define UNAME_MINIMUM_RELEASE "2.6.32"
+ 
+ #define TARGET_MINSIGSTKSZ 2048
+-#define TARGET_MLOCKALL_MCL_CURRENT 1
+-#define TARGET_MLOCKALL_MCL_FUTURE  2
+-
++#define TARGET_MCL_CURRENT 1
++#define TARGET_MCL_FUTURE  2
++#define TARGET_MCL_ONFAULT 4
+ #define TARGET_WANT_OLD_SYS_SELECT
+ 
+ #endif /* M68K_TARGET_SYSCALL_H */
+diff --git a/linux-user/microblaze/target_syscall.h b/linux-user/microblaze/target_syscall.h
+index 4141cbaa5ec2..7f653db34f87 100644
+--- a/linux-user/microblaze/target_syscall.h
++++ b/linux-user/microblaze/target_syscall.h
+@@ -50,8 +50,9 @@ struct target_pt_regs {
+ 
+ #define TARGET_CLONE_BACKWARDS
+ #define TARGET_MINSIGSTKSZ      2048
+-#define TARGET_MLOCKALL_MCL_CURRENT 1
+-#define TARGET_MLOCKALL_MCL_FUTURE  2
++#define TARGET_MCL_CURRENT 1
++#define TARGET_MCL_FUTURE  2
++#define TARGET_MCL_ONFAULT 4
+ 
+ #define TARGET_WANT_NI_OLD_SELECT
+ 
+diff --git a/linux-user/mips/target_syscall.h b/linux-user/mips/target_syscall.h
+index d5509a34a7e2..dd6fd7af8eac 100644
+--- a/linux-user/mips/target_syscall.h
++++ b/linux-user/mips/target_syscall.h
+@@ -234,8 +234,9 @@ struct target_pt_regs {
+ 
+ #define TARGET_CLONE_BACKWARDS
+ #define TARGET_MINSIGSTKSZ 2048
+-#define TARGET_MLOCKALL_MCL_CURRENT 1
+-#define TARGET_MLOCKALL_MCL_FUTURE  2
++#define TARGET_MCL_CURRENT 1
++#define TARGET_MCL_FUTURE  2
++#define TARGET_MCL_ONFAULT 4
+ 
+ #define TARGET_FORCE_SHMLBA
+ 
+diff --git a/linux-user/mips64/target_syscall.h b/linux-user/mips64/target_syscall.h
+index 8ccc46822c11..8594955eec26 100644
+--- a/linux-user/mips64/target_syscall.h
++++ b/linux-user/mips64/target_syscall.h
+@@ -231,8 +231,9 @@ struct target_pt_regs {
+ 
+ #define TARGET_CLONE_BACKWARDS
+ #define TARGET_MINSIGSTKSZ      2048
+-#define TARGET_MLOCKALL_MCL_CURRENT 1
+-#define TARGET_MLOCKALL_MCL_FUTURE  2
++#define TARGET_MCL_CURRENT 1
++#define TARGET_MCL_FUTURE  2
++#define TARGET_MCL_ONFAULT 4
+ 
+ #define TARGET_FORCE_SHMLBA
+ 
+diff --git a/linux-user/nios2/target_syscall.h b/linux-user/nios2/target_syscall.h
+index f3b2a500f430..78006c24d479 100644
+--- a/linux-user/nios2/target_syscall.h
++++ b/linux-user/nios2/target_syscall.h
+@@ -31,7 +31,8 @@ struct target_pt_regs {
  };
  
- /* c_iflag bits */
-@@ -29,6 +33,7 @@ struct target_termios {
- #define TARGET_IXANY   0004000
- #define TARGET_IXOFF   0010000
- #define TARGET_IMAXBEL 0020000
-+#define TARGET_IUTF8   0040000
+ #define TARGET_MINSIGSTKSZ 2048
+-#define TARGET_MLOCKALL_MCL_CURRENT 1
+-#define TARGET_MLOCKALL_MCL_FUTURE  2
++#define TARGET_MCL_CURRENT 1
++#define TARGET_MCL_FUTURE  2
++#define TARGET_MCL_ONFAULT 4
  
- /* c_oflag bits */
- #define TARGET_OPOST   0000001
-@@ -118,6 +123,7 @@ struct target_termios {
- #define TARGET_FLUSHO  0010000
- #define TARGET_PENDIN  0040000
- #define TARGET_IEXTEN  0100000
-+#define TARGET_EXTPROC 0200000
+ #endif /* NIOS2_TARGET_SYSCALL_H */
+diff --git a/linux-user/openrisc/target_syscall.h b/linux-user/openrisc/target_syscall.h
+index d586d2a018a5..ef0d89a551d5 100644
+--- a/linux-user/openrisc/target_syscall.h
++++ b/linux-user/openrisc/target_syscall.h
+@@ -16,8 +16,9 @@ struct target_pt_regs {
+ #define UNAME_MINIMUM_RELEASE "2.6.32"
  
- /* c_cc character offsets */
- #define TARGET_VINTR	0
-diff --git a/linux-user/hppa/termbits.h b/linux-user/hppa/termbits.h
-index 8fba839dd4e6..11fd4eed6232 100644
---- a/linux-user/hppa/termbits.h
-+++ b/linux-user/hppa/termbits.h
-@@ -5,13 +5,17 @@
+ #define TARGET_MINSIGSTKSZ 2048
+-#define TARGET_MLOCKALL_MCL_CURRENT 1
+-#define TARGET_MLOCKALL_MCL_FUTURE  2
++#define TARGET_MCL_CURRENT 1
++#define TARGET_MCL_FUTURE  2
++#define TARGET_MCL_ONFAULT 4
  
- #define TARGET_NCCS 19
+ #define MMAP_SHIFT TARGET_PAGE_BITS
  
-+typedef unsigned char   target_cc_t;        /* cc_t */
-+typedef unsigned int    target_speed_t;     /* speed_t */
-+typedef unsigned int    target_tcflag_t;    /* tcflag_t */
-+
- struct target_termios {
--    unsigned int c_iflag;               /* input mode flags */
--    unsigned int c_oflag;               /* output mode flags */
--    unsigned int c_cflag;               /* control mode flags */
--    unsigned int c_lflag;               /* local mode flags */
--    unsigned char c_line;                    /* line discipline */
--    unsigned char c_cc[TARGET_NCCS];                /* control characters */
-+    target_tcflag_t c_iflag;               /* input mode flags */
-+    target_tcflag_t c_oflag;               /* output mode flags */
-+    target_tcflag_t c_cflag;               /* control mode flags */
-+    target_tcflag_t c_lflag;               /* local mode flags */
-+    target_cc_t c_line;                    /* line discipline */
-+    target_cc_t c_cc[TARGET_NCCS];         /* control characters */
+diff --git a/linux-user/ppc/target_syscall.h b/linux-user/ppc/target_syscall.h
+index afc0570410d8..c461f878f2d6 100644
+--- a/linux-user/ppc/target_syscall.h
++++ b/linux-user/ppc/target_syscall.h
+@@ -72,8 +72,9 @@ struct target_revectored_struct {
+ #define TARGET_CLONE_BACKWARDS
+ 
+ #define TARGET_MINSIGSTKSZ 2048
+-#define TARGET_MLOCKALL_MCL_CURRENT 0x2000
+-#define TARGET_MLOCKALL_MCL_FUTURE  0x4000
++#define TARGET_MCL_CURRENT 0x2000
++#define TARGET_MCL_FUTURE  0x4000
++#define TARGET_MCL_ONFAULT 0x8000
+ #define TARGET_WANT_NI_OLD_SELECT
+ 
+ #endif /* PPC_TARGET_SYSCALL_H */
+diff --git a/linux-user/riscv/target_syscall.h b/linux-user/riscv/target_syscall.h
+index a88e821f733d..dc597c897222 100644
+--- a/linux-user/riscv/target_syscall.h
++++ b/linux-user/riscv/target_syscall.h
+@@ -51,8 +51,9 @@ struct target_pt_regs {
+ #define UNAME_MINIMUM_RELEASE "4.15.0"
+ 
+ #define TARGET_MINSIGSTKSZ 2048
+-#define TARGET_MLOCKALL_MCL_CURRENT 1
+-#define TARGET_MLOCKALL_MCL_FUTURE  2
++#define TARGET_MCL_CURRENT 1
++#define TARGET_MCL_FUTURE  2
++#define TARGET_MCL_ONFAULT 4
+ 
+ /* clone(flags, newsp, ptidptr, tls, ctidptr) for RISC-V */
+ /* This comes from linux/kernel/fork.c, CONFIG_CLONE_BACKWARDS */
+diff --git a/linux-user/s390x/target_syscall.h b/linux-user/s390x/target_syscall.h
+index 8d4f609eaa5d..94f84178db79 100644
+--- a/linux-user/s390x/target_syscall.h
++++ b/linux-user/s390x/target_syscall.h
+@@ -28,7 +28,8 @@ struct target_pt_regs {
+ 
+ #define TARGET_CLONE_BACKWARDS2
+ #define TARGET_MINSIGSTKSZ        2048
+-#define TARGET_MLOCKALL_MCL_CURRENT 1
+-#define TARGET_MLOCKALL_MCL_FUTURE  2
++#define TARGET_MCL_CURRENT 1
++#define TARGET_MCL_FUTURE  2
++#define TARGET_MCL_ONFAULT 4
+ 
+ #endif /* S390X_TARGET_SYSCALL_H */
+diff --git a/linux-user/sh4/target_syscall.h b/linux-user/sh4/target_syscall.h
+index 2b5f75be13d6..c1437adafefa 100644
+--- a/linux-user/sh4/target_syscall.h
++++ b/linux-user/sh4/target_syscall.h
+@@ -16,8 +16,9 @@ struct target_pt_regs {
+ #define UNAME_MINIMUM_RELEASE "2.6.32"
+ 
+ #define TARGET_MINSIGSTKSZ 2048
+-#define TARGET_MLOCKALL_MCL_CURRENT 1
+-#define TARGET_MLOCKALL_MCL_FUTURE  2
++#define TARGET_MCL_CURRENT 1
++#define TARGET_MCL_FUTURE  2
++#define TARGET_MCL_ONFAULT 4
+ 
+ #define TARGET_FORCE_SHMLBA
+ 
+diff --git a/linux-user/sparc/target_syscall.h b/linux-user/sparc/target_syscall.h
+index b9160a771baa..d8ea04ea837a 100644
+--- a/linux-user/sparc/target_syscall.h
++++ b/linux-user/sparc/target_syscall.h
+@@ -21,8 +21,9 @@ struct target_pt_regs {
+  */
+ #define TARGET_CLONE_BACKWARDS
+ #define TARGET_MINSIGSTKSZ      4096
+-#define TARGET_MLOCKALL_MCL_CURRENT 0x2000
+-#define TARGET_MLOCKALL_MCL_FUTURE  0x4000
++#define TARGET_MCL_CURRENT 0x2000
++#define TARGET_MCL_FUTURE  0x4000
++#define TARGET_MCL_ONFAULT 0x8000
+ 
+ /* For SPARC SHMLBA is determined at runtime in the kernel, and
+  * libc has to runtime-detect it using the hwcaps (see glibc
+diff --git a/linux-user/sparc64/target_syscall.h b/linux-user/sparc64/target_syscall.h
+index 3073a23e03ae..696a68b1ed4e 100644
+--- a/linux-user/sparc64/target_syscall.h
++++ b/linux-user/sparc64/target_syscall.h
+@@ -22,8 +22,9 @@ struct target_pt_regs {
+  */
+ #define TARGET_CLONE_BACKWARDS
+ #define TARGET_MINSIGSTKSZ      4096
+-#define TARGET_MLOCKALL_MCL_CURRENT 0x2000
+-#define TARGET_MLOCKALL_MCL_FUTURE  0x4000
++#define TARGET_MCL_CURRENT 0x2000
++#define TARGET_MCL_FUTURE  0x4000
++#define TARGET_MCL_ONFAULT 0x8000
+ 
+ #define TARGET_FORCE_SHMLBA
+ 
+diff --git a/linux-user/strace.c b/linux-user/strace.c
+index 31c7be24ebfd..4ac54ecffe9c 100644
+--- a/linux-user/strace.c
++++ b/linux-user/strace.c
+@@ -1198,6 +1198,15 @@ UNUSED static struct flags falloc_flags[] = {
+ #endif
  };
  
- /* c_iflag bits */
-@@ -120,6 +124,7 @@ struct target_termios {
- #define TARGET_FLUSHO  0010000
- #define TARGET_PENDIN  0040000
- #define TARGET_IEXTEN  0100000
-+#define TARGET_EXTPROC 0200000
- 
- /* c_cc character offsets */
- #define TARGET_VINTR    0
-diff --git a/linux-user/mips/termbits.h b/linux-user/mips/termbits.h
-index 3287cf6df8b8..e8b4b58d878d 100644
---- a/linux-user/mips/termbits.h
-+++ b/linux-user/mips/termbits.h
-@@ -5,13 +5,17 @@
- 
- #define TARGET_NCCS 23
- 
-+typedef unsigned char   target_cc_t;        /* cc_t */
-+typedef unsigned int    target_speed_t;     /* speed_t */
-+typedef unsigned int    target_tcflag_t;    /* tcflag_t */
++UNUSED static struct flags mlockall_flags[] = {
++    FLAG_TARGET(MCL_CURRENT),
++    FLAG_TARGET(MCL_FUTURE),
++#ifdef MCL_ONFAULT
++    FLAG_TARGET(MCL_ONFAULT),
++#endif
++    FLAG_END,
++};
 +
- struct target_termios {
--    unsigned int c_iflag;               /* input mode flags */
--    unsigned int c_oflag;               /* output mode flags */
--    unsigned int c_cflag;               /* control mode flags */
--    unsigned int c_lflag;               /* local mode flags */
--    unsigned char c_line;                    /* line discipline */
--    unsigned char c_cc[TARGET_NCCS];                /* control characters */
-+    target_tcflag_t c_iflag;               /* input mode flags */
-+    target_tcflag_t c_oflag;               /* output mode flags */
-+    target_tcflag_t c_cflag;               /* control mode flags */
-+    target_tcflag_t c_lflag;               /* local mode flags */
-+    target_cc_t c_line;                    /* line discipline */
-+    target_cc_t c_cc[TARGET_NCCS];         /* control characters */
- };
+ /*
+  * print_xxx utility functions.  These are used to print syscall
+  * parameters in certain format.  All of these have parameter
+@@ -2009,6 +2018,18 @@ print_ftruncate64(void *cpu_env, const struct syscallname *name,
+ }
+ #endif
  
- /* c_iflag bits */
-@@ -133,6 +137,7 @@ struct target_termios {
- #define TARGET_PENDIN  0040000
- #define TARGET_TOSTOP  0100000
- #define TARGET_ITOSTOP TARGET_TOSTOP
-+#define TARGET_EXTPROC 0200000
- 
- /* c_cc character offsets */
- #define TARGET_VINTR	0
-diff --git a/linux-user/ppc/termbits.h b/linux-user/ppc/termbits.h
-index 19e4c6eda86c..7066d1e5523d 100644
---- a/linux-user/ppc/termbits.h
-+++ b/linux-user/ppc/termbits.h
-@@ -5,15 +5,19 @@
- 
- #define TARGET_NCCS 19
- 
-+typedef unsigned char   target_cc_t;        /* cc_t */
-+typedef unsigned int    target_speed_t;     /* speed_t */
-+typedef unsigned int    target_tcflag_t;    /* tcflag_t */
++#ifdef TARGET_NR_mlockall
++static void
++print_mlockall(void *cpu_env, const struct syscallname *name,
++               abi_long arg0, abi_long arg1, abi_long arg2,
++               abi_long arg3, abi_long arg4, abi_long arg5)
++{
++    print_syscall_prologue(name);
++    print_flags(mlockall_flags, arg0, 1);
++    print_syscall_epilogue(name);
++}
++#endif
 +
- struct target_termios {
--    unsigned int c_iflag;               /* input mode flags */
--    unsigned int c_oflag;               /* output mode flags */
--    unsigned int c_cflag;               /* control mode flags */
--    unsigned int c_lflag;               /* local mode flags */
--    unsigned char c_cc[TARGET_NCCS];                /* control characters */
--    unsigned char c_line;                    /* line discipline */
--    unsigned int c_ispeed;		/* input speed */
--    unsigned int c_ospeed;		/* output speed */
-+    target_tcflag_t c_iflag;               /* input mode flags */
-+    target_tcflag_t c_oflag;               /* output mode flags */
-+    target_tcflag_t c_cflag;               /* control mode flags */
-+    target_tcflag_t c_lflag;               /* local mode flags */
-+    target_cc_t c_line;                    /* line discipline */
-+    target_cc_t c_cc[TARGET_NCCS];         /* control characters */
-+    target_speed_t c_ispeed;               /* input speed */
-+    target_speed_t c_ospeed;               /* output speed */
- };
- 
- /* c_cc character offsets */
-@@ -158,6 +162,7 @@ struct target_termios {
- #define TARGET_FLUSHO	0x00800000
- #define TARGET_PENDIN	0x20000000
- #define TARGET_IEXTEN	0x00000400
-+#define TARGET_EXTPROC  0x10000000
- 
- /* ioctls */
- 
-diff --git a/linux-user/sh4/termbits.h b/linux-user/sh4/termbits.h
-index dd125b6a2b2a..f91b5c51cf83 100644
---- a/linux-user/sh4/termbits.h
-+++ b/linux-user/sh4/termbits.h
-@@ -5,15 +5,20 @@
- 
- #define TARGET_NCCS 19
- 
-+typedef unsigned char   target_cc_t;        /* cc_t */
-+typedef unsigned int    target_speed_t;     /* speed_t */
-+typedef unsigned int    target_tcflag_t;    /* tcflag_t */
-+
- struct target_termios {
--	unsigned int c_iflag;			/* input mode flags */
--	unsigned int c_oflag;			/* output mode flags */
--	unsigned int c_cflag;			/* control mode flags */
--	unsigned int c_lflag;			/* local mode flags */
--	unsigned char c_line;			/* line discipline */
--	unsigned char c_cc[TARGET_NCCS];	/* control characters */
-+    target_tcflag_t c_iflag;               /* input mode flags */
-+    target_tcflag_t c_oflag;               /* output mode flags */
-+    target_tcflag_t c_cflag;               /* control mode flags */
-+    target_tcflag_t c_lflag;               /* local mode flags */
-+    target_cc_t c_line;                    /* line discipline */
-+    target_cc_t c_cc[TARGET_NCCS];         /* control characters */
- };
- 
-+
- /* c_cc characters */
- #define TARGET_VINTR 0
- #define TARGET_VQUIT 1
-@@ -150,6 +155,8 @@ struct target_termios {
- #define TARGET_FLUSHO	0010000
- #define TARGET_PENDIN	0040000
- #define TARGET_IEXTEN	0100000
-+#define TARGET_EXTPROC  0200000
-+
- 
- /* tcflow() and TCXONC use these */
- #define TARGET_TCOOFF		0
-diff --git a/linux-user/sparc/termbits.h b/linux-user/sparc/termbits.h
-index f85219ed7112..704bee1c427e 100644
---- a/linux-user/sparc/termbits.h
-+++ b/linux-user/sparc/termbits.h
-@@ -5,15 +5,20 @@
- 
- #define TARGET_NCCS 19
- 
-+typedef unsigned char   target_cc_t;        /* cc_t */
-+typedef unsigned int    target_speed_t;     /* speed_t */
-+typedef unsigned int    target_tcflag_t;    /* tcflag_t */
-+
- struct target_termios {
--    unsigned int c_iflag;               /* input mode flags */
--    unsigned int c_oflag;               /* output mode flags */
--    unsigned int c_cflag;               /* control mode flags */
--    unsigned int c_lflag;               /* local mode flags */
--    unsigned char c_line;                    /* line discipline */
--    unsigned char c_cc[TARGET_NCCS];                /* control characters */
-+    target_tcflag_t c_iflag;               /* input mode flags */
-+    target_tcflag_t c_oflag;               /* output mode flags */
-+    target_tcflag_t c_cflag;               /* control mode flags */
-+    target_tcflag_t c_lflag;               /* local mode flags */
-+    target_cc_t c_line;                    /* line discipline */
-+    target_cc_t c_cc[TARGET_NCCS];         /* control characters */
- };
- 
-+
- /* c_cc characters */
- #define TARGET_VINTR    0
- #define TARGET_VQUIT    1
-@@ -170,6 +175,7 @@ struct target_termios {
- #define TARGET_FLUSHO	0x00002000
- #define TARGET_PENDIN	0x00004000
- #define TARGET_IEXTEN	0x00008000
-+#define TARGET_EXTPROC  0x00010000
- 
- /* ioctls */
- 
-diff --git a/linux-user/sparc64/termbits.h b/linux-user/sparc64/termbits.h
-index 11b5abcf8439..1ab1e80db548 100644
---- a/linux-user/sparc64/termbits.h
-+++ b/linux-user/sparc64/termbits.h
-@@ -5,15 +5,20 @@
- 
- #define TARGET_NCCS 19
- 
-+typedef unsigned char   target_cc_t;        /* cc_t */
-+typedef unsigned int    target_speed_t;     /* speed_t */
-+typedef unsigned int    target_tcflag_t;    /* tcflag_t */
-+
- struct target_termios {
--    unsigned int c_iflag;               /* input mode flags */
--    unsigned int c_oflag;               /* output mode flags */
--    unsigned int c_cflag;               /* control mode flags */
--    unsigned int c_lflag;               /* local mode flags */
--    unsigned char c_line;                    /* line discipline */
--    unsigned char c_cc[TARGET_NCCS];                /* control characters */
-+    target_tcflag_t c_iflag;               /* input mode flags */
-+    target_tcflag_t c_oflag;               /* output mode flags */
-+    target_tcflag_t c_cflag;               /* control mode flags */
-+    target_tcflag_t c_lflag;               /* local mode flags */
-+    target_cc_t c_line;                    /* line discipline */
-+    target_cc_t c_cc[TARGET_NCCS];         /* control characters */
- };
- 
-+
- /* c_cc characters */
- #define TARGET_VINTR    0
- #define TARGET_VQUIT    1
-@@ -170,6 +175,7 @@ struct target_termios {
- #define TARGET_FLUSHO	0x00002000
- #define TARGET_PENDIN	0x00004000
- #define TARGET_IEXTEN	0x00008000
-+#define TARGET_EXTPROC  0x00010000
- 
- /* ioctls */
- 
+ #if defined(TARGET_NR_socket)
+ static void
+ print_socket(void *cpu_env, const struct syscallname *name,
+diff --git a/linux-user/strace.list b/linux-user/strace.list
+index 8e5303d03500..d0ea7f3464b8 100644
+--- a/linux-user/strace.list
++++ b/linux-user/strace.list
+@@ -568,13 +568,13 @@
+ { TARGET_NR_mknodat, "mknodat" , NULL, print_mknodat, NULL },
+ #endif
+ #ifdef TARGET_NR_mlock
+-{ TARGET_NR_mlock, "mlock" , NULL, NULL, NULL },
++{ TARGET_NR_mlock, "mlock" , "%s(%p," TARGET_FMT_lu ")", NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_mlock2
+ { TARGET_NR_mlock2, "mlock2" , NULL, NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_mlockall
+-{ TARGET_NR_mlockall, "mlockall" , NULL, NULL, NULL },
++{ TARGET_NR_mlockall, "mlockall" , NULL, print_mlockall, NULL },
+ #endif
+ #ifdef TARGET_NR_mmap
+ { TARGET_NR_mmap, "mmap" , NULL, print_mmap, print_syscall_ret_addr },
+@@ -637,10 +637,10 @@
+ { TARGET_NR_multiplexer, "multiplexer" , NULL, NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_munlock
+-{ TARGET_NR_munlock, "munlock" , NULL, NULL, NULL },
++{ TARGET_NR_munlock, "munlock" , "%s(%p," TARGET_FMT_lu ")", NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_munlockall
+-{ TARGET_NR_munlockall, "munlockall" , NULL, NULL, NULL },
++{ TARGET_NR_munlockall, "munlockall" , "%s()", NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_munmap
+ { TARGET_NR_munmap, "munmap" , NULL, print_munmap, NULL },
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 027dea35af41..3a7eced7d858 100644
+index ec7192112e9d..027dea35af41 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -5549,6 +5549,7 @@ static const bitmask_transtbl iflag_tbl[] = {
-         { TARGET_IXANY, TARGET_IXANY, IXANY, IXANY },
-         { TARGET_IXOFF, TARGET_IXOFF, IXOFF, IXOFF },
-         { TARGET_IMAXBEL, TARGET_IMAXBEL, IMAXBEL, IMAXBEL },
-+        { TARGET_IUTF8, TARGET_IUTF8, IUTF8, IUTF8},
-         { 0, 0, 0, 0 }
- };
+@@ -6975,12 +6975,18 @@ static inline int target_to_host_mlockall_arg(int arg)
+ {
+     int result = 0;
  
-@@ -5616,22 +5617,23 @@ static const bitmask_transtbl cflag_tbl[] = {
- };
- 
- static const bitmask_transtbl lflag_tbl[] = {
--	{ TARGET_ISIG, TARGET_ISIG, ISIG, ISIG },
--	{ TARGET_ICANON, TARGET_ICANON, ICANON, ICANON },
--	{ TARGET_XCASE, TARGET_XCASE, XCASE, XCASE },
--	{ TARGET_ECHO, TARGET_ECHO, ECHO, ECHO },
--	{ TARGET_ECHOE, TARGET_ECHOE, ECHOE, ECHOE },
--	{ TARGET_ECHOK, TARGET_ECHOK, ECHOK, ECHOK },
--	{ TARGET_ECHONL, TARGET_ECHONL, ECHONL, ECHONL },
--	{ TARGET_NOFLSH, TARGET_NOFLSH, NOFLSH, NOFLSH },
--	{ TARGET_TOSTOP, TARGET_TOSTOP, TOSTOP, TOSTOP },
--	{ TARGET_ECHOCTL, TARGET_ECHOCTL, ECHOCTL, ECHOCTL },
--	{ TARGET_ECHOPRT, TARGET_ECHOPRT, ECHOPRT, ECHOPRT },
--	{ TARGET_ECHOKE, TARGET_ECHOKE, ECHOKE, ECHOKE },
--	{ TARGET_FLUSHO, TARGET_FLUSHO, FLUSHO, FLUSHO },
--	{ TARGET_PENDIN, TARGET_PENDIN, PENDIN, PENDIN },
--	{ TARGET_IEXTEN, TARGET_IEXTEN, IEXTEN, IEXTEN },
--	{ 0, 0, 0, 0 }
-+  { TARGET_ISIG, TARGET_ISIG, ISIG, ISIG },
-+  { TARGET_ICANON, TARGET_ICANON, ICANON, ICANON },
-+  { TARGET_XCASE, TARGET_XCASE, XCASE, XCASE },
-+  { TARGET_ECHO, TARGET_ECHO, ECHO, ECHO },
-+  { TARGET_ECHOE, TARGET_ECHOE, ECHOE, ECHOE },
-+  { TARGET_ECHOK, TARGET_ECHOK, ECHOK, ECHOK },
-+  { TARGET_ECHONL, TARGET_ECHONL, ECHONL, ECHONL },
-+  { TARGET_NOFLSH, TARGET_NOFLSH, NOFLSH, NOFLSH },
-+  { TARGET_TOSTOP, TARGET_TOSTOP, TOSTOP, TOSTOP },
-+  { TARGET_ECHOCTL, TARGET_ECHOCTL, ECHOCTL, ECHOCTL },
-+  { TARGET_ECHOPRT, TARGET_ECHOPRT, ECHOPRT, ECHOPRT },
-+  { TARGET_ECHOKE, TARGET_ECHOKE, ECHOKE, ECHOKE },
-+  { TARGET_FLUSHO, TARGET_FLUSHO, FLUSHO, FLUSHO },
-+  { TARGET_PENDIN, TARGET_PENDIN, PENDIN, PENDIN },
-+  { TARGET_IEXTEN, TARGET_IEXTEN, IEXTEN, IEXTEN },
-+  { TARGET_EXTPROC, TARGET_EXTPROC, EXTPROC, EXTPROC},
-+  { 0, 0, 0, 0 }
- };
- 
- static void target_to_host_termios (void *dst, const void *src)
-diff --git a/linux-user/xtensa/termbits.h b/linux-user/xtensa/termbits.h
-index d1e09e61a69b..ce6fb081e355 100644
---- a/linux-user/xtensa/termbits.h
-+++ b/linux-user/xtensa/termbits.h
-@@ -15,40 +15,42 @@
- 
- #include <linux/posix_types.h>
- 
--typedef unsigned char   cc_t;
--typedef unsigned int    speed_t;
--typedef unsigned int    tcflag_t;
--
- #define TARGET_NCCS 19
+-    if (arg & TARGET_MLOCKALL_MCL_CURRENT) {
++    if (arg & TARGET_MCL_CURRENT) {
+         result |= MCL_CURRENT;
+     }
+-    if (arg & TARGET_MLOCKALL_MCL_FUTURE) {
++    if (arg & TARGET_MCL_FUTURE) {
+         result |= MCL_FUTURE;
+     }
++#ifdef MCL_ONFAULT
++    if (arg & TARGET_MCL_ONFAULT) {
++        result |= MCL_ONFAULT;
++    }
++#endif
 +
-+typedef unsigned char   target_cc_t;        /* cc_t */
-+typedef unsigned int    target_speed_t;     /* speed_t */
-+typedef unsigned int    target_tcflag_t;    /* tcflag_t */
-+
- struct target_termios {
--    tcflag_t c_iflag;       /* input mode flags */
--    tcflag_t c_oflag;       /* output mode flags */
--    tcflag_t c_cflag;       /* control mode flags */
--    tcflag_t c_lflag;       /* local mode flags */
--    cc_t c_line;            /* line discipline */
--    cc_t c_cc[TARGET_NCCS]; /* control characters */
-+    target_tcflag_t c_iflag;               /* input mode flags */
-+    target_tcflag_t c_oflag;               /* output mode flags */
-+    target_tcflag_t c_cflag;               /* control mode flags */
-+    target_tcflag_t c_lflag;               /* local mode flags */
-+    target_cc_t c_line;                    /* line discipline */
-+    target_cc_t c_cc[TARGET_NCCS];         /* control characters */
+     return result;
+ }
+ #endif
+diff --git a/linux-user/tilegx/target_syscall.h b/linux-user/tilegx/target_syscall.h
+index d731acdafaa0..8e9db734b88b 100644
+--- a/linux-user/tilegx/target_syscall.h
++++ b/linux-user/tilegx/target_syscall.h
+@@ -34,8 +34,9 @@ struct target_pt_regs {
+     tilegx_reg_t pad[2];
  };
  
-+
- struct target_termios2 {
--    tcflag_t c_iflag;       /* input mode flags */
--    tcflag_t c_oflag;       /* output mode flags */
--    tcflag_t c_cflag;       /* control mode flags */
--    tcflag_t c_lflag;       /* local mode flags */
--    cc_t c_line;            /* line discipline */
--    cc_t c_cc[TARGET_NCCS]; /* control characters */
--    speed_t c_ispeed;       /* input speed */
--    speed_t c_ospeed;       /* output speed */
-+    target_tcflag_t c_iflag;       /* input mode flags */
-+    target_tcflag_t c_oflag;       /* output mode flags */
-+    target_tcflag_t c_cflag;       /* control mode flags */
-+    target_tcflag_t c_lflag;       /* local mode flags */
-+    target_cc_t c_line;            /* line discipline */
-+    target_cc_t c_cc[TARGET_NCCS]; /* control characters */
-+    target_speed_t c_ispeed;       /* input speed */
-+    target_speed_t c_ospeed;       /* output speed */
+-#define TARGET_MLOCKALL_MCL_CURRENT 1
+-#define TARGET_MLOCKALL_MCL_FUTURE  2
++#define TARGET_MCL_CURRENT 1
++#define TARGET_MCL_FUTURE  2
++#define TARGET_MCL_ONFAULT 4
+ 
+ /* For faultnum */
+ #define TARGET_INT_SWINT_1            14
+diff --git a/linux-user/x86_64/target_syscall.h b/linux-user/x86_64/target_syscall.h
+index 5e221e1d9ddc..3ecccb72be2d 100644
+--- a/linux-user/x86_64/target_syscall.h
++++ b/linux-user/x86_64/target_syscall.h
+@@ -101,7 +101,8 @@ struct target_msqid64_ds {
+ #define TARGET_ARCH_GET_FS 0x1003
+ #define TARGET_ARCH_GET_GS 0x1004
+ #define TARGET_MINSIGSTKSZ 2048
+-#define TARGET_MLOCKALL_MCL_CURRENT 1
+-#define TARGET_MLOCKALL_MCL_FUTURE  2
++#define TARGET_MCL_CURRENT 1
++#define TARGET_MCL_FUTURE  2
++#define TARGET_MCL_ONFAULT 4
+ 
+ #endif /* X86_64_TARGET_SYSCALL_H */
+diff --git a/linux-user/xtensa/target_syscall.h b/linux-user/xtensa/target_syscall.h
+index 3866dad84930..afc86a153fc0 100644
+--- a/linux-user/xtensa/target_syscall.h
++++ b/linux-user/xtensa/target_syscall.h
+@@ -43,7 +43,8 @@ struct target_pt_regs {
+     xtensa_reg_t areg[16];
  };
  
- struct target_ktermios {
--    tcflag_t c_iflag;       /* input mode flags */
--    tcflag_t c_oflag;       /* output mode flags */
--    tcflag_t c_cflag;       /* control mode flags */
--    tcflag_t c_lflag;       /* local mode flags */
--    cc_t c_line;            /* line discipline */
--    cc_t c_cc[TARGET_NCCS]; /* control characters */
--    speed_t c_ispeed;       /* input speed */
--    speed_t c_ospeed;       /* output speed */
-+    target_tcflag_t c_iflag;       /* input mode flags */
-+    target_tcflag_t c_oflag;       /* output mode flags */
-+    target_tcflag_t c_cflag;       /* control mode flags */
-+    target_tcflag_t c_lflag;       /* local mode flags */
-+    target_cc_t c_line;            /* line discipline */
-+    target_cc_t c_cc[TARGET_NCCS]; /* control characters */
-+    target_speed_t c_ispeed;       /* input speed */
-+    target_speed_t c_ospeed;       /* output speed */
- };
+-#define TARGET_MLOCKALL_MCL_CURRENT 1
+-#define TARGET_MLOCKALL_MCL_FUTURE  2
++#define TARGET_MCL_CURRENT 1
++#define TARGET_MCL_FUTURE  2
++#define TARGET_MCL_ONFAULT 4
  
- /* c_cc characters */
-@@ -195,6 +197,7 @@ struct target_ktermios {
- #define TARGET_FLUSHO   0010000
- #define TARGET_PENDIN   0040000
- #define TARGET_IEXTEN   0100000
-+#define TARGET_EXTPROC  0200000
- 
- /* tcflow() and TCXONC use these */
- 
+ #endif
 -- 
 2.26.2
 
