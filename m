@@ -2,69 +2,67 @@ Return-Path: <SRS0=k4hX=CF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C520EC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 19:28:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 719A9C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 19:28:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9EE80207CD
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 19:28:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EE80207CD
+	by mail.kernel.org (Postfix) with ESMTPS id 47A3C207CD
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 19:28:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47A3C207CD
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39310 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39530 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBNZo-0003PE-TM
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 15:28:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33546)
+	id 1kBNZr-0003Uj-Hz
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 15:28:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33580)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kBNS7-0004Gr-8F
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 15:20:51 -0400
-Received: from mout.kundenserver.de ([217.72.192.75]:51841)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kBNSA-0004Ie-On
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 15:20:54 -0400
+Received: from mout.kundenserver.de ([217.72.192.74]:48915)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kBNS4-0000Hj-NC
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 15:20:50 -0400
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kBNS6-0000Hs-3E
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 15:20:54 -0400
 Received: from localhost.localdomain ([82.252.135.186]) by
  mrelayeu.kundenserver.de (mreue109 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1M26j1-1k9SZi438j-002YDn; Thu, 27 Aug 2020 21:20:40 +0200
+ id 1MRmsG-1k12PK3FPu-00TBcq; Thu, 27 Aug 2020 21:20:41 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 12/18] linux-user: detect mismatched ELF ABI in
- qemu-mips[n32][el]
-Date: Thu, 27 Aug 2020 21:20:12 +0200
-Message-Id: <20200827192018.2442099-13-laurent@vivier.eu>
+Subject: [PULL 13/18] linux-user: Fix 'mq_timedsend()' and 'mq_timedreceive()'
+Date: Thu, 27 Aug 2020 21:20:13 +0200
+Message-Id: <20200827192018.2442099-14-laurent@vivier.eu>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200827192018.2442099-1-laurent@vivier.eu>
 References: <20200827192018.2442099-1-laurent@vivier.eu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:3a5cuka67oPdds3oSYa2QogLjTh7BMJaWm8nEX7axOnKbErVT+y
- KMaBf2RC1lqP4dHHdQHqkYpcZAFb5taHh6poQzRYB8eE5MuLzwSnOeWDMvoX2uE1vX3xGwu
- +C/1lnQVq85WX1krLD0qtUBIueMKNIeRQMRcnDpmocyTAIeHVBp/+vozMXU9bCTogQwreCW
- oenu5tRfvO+6ufsOwvK2A==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:cNgmMd3JTFs=:lGhZnAP5N7cqL++s3PriZf
- PFigbpeWjyBwwiGN/aapMjA6jk+c3dGQev2Gm2jrls0VvizWstEcF1+ws26apOAWF981bFFlX
- 0xVEfOwxNCyOjllHuyaJTBPA6hr5YcfW9si5CIGXPTI0We9Y+NgnGUhr8lM1rRFbKJcypfFHx
- GfUeLZlGyHEzTzY5Cue/ng9/7GEDI/8pE6W9J6gomrzouhyblj1dUtCyKbw2gqHEXLAk8P+9I
- B9koHu+wndxg/hxu87kf7fyNL5QagNi6vBdhg+/nSyqHS5kDdygKxf0s4vBTn9QuGuCEKiLhJ
- cx/SyVZEQbKcJopt4oKgh1XGmgTOCtJPvhd6nDOQeuCwvJcSI6ygm8l+AvEdf4omNIutgor9F
- XGwCGgldSoBEE7mQuwrErLQLQyJjbbiomsagY/tQhL7mWr0SjfXNmiO2awqwHdsr4UjglKnlD
- AUQNYvG8bUimXDZXNYlTyHY/9+PUBUzLlOiEYp9Ie/yzYMEK7RbXAWjSlVUnbjtGuAHI1XhLj
- oYBdSkP/lA93GkTmTxDMYTBjxco8gTKVDptS5YKgkQEL3vsn/xa8DgeDnB1Q/GeV9J9UeE3cy
- tW11avF//8Xd8mUSe85j1u/QlDp7K6El5o2YZZG9hynLxQhUhoyVlJSWHpl81wEhj1Aisb8lW
- YIyOoWjsH9f9LTsVjAUtgyvcM8ILjdyvulvYyaDoYN35TH6uDWr3OyzVnDGFGLowuHnPRfOH+
- ZzKMCsbEq2D861u3DBxAizlPgL20NS4SRHHCepFVDYJrcBUcluTXScXgc967JT2illSTcnegH
- /jZALvoc/l8JegYJX5IpgsGXPTYknlodJxB/9NHxF1D8KuxHX9wnbcJK7SlHvu216b8HR8e
-Received-SPF: none client-ip=217.72.192.75; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:5dyNkvOh6Z1u0ZcfiYHQ9lBcwo5/HgdFcUFLCj7x+AR83Ht23CU
+ cEpov2qXrAikOMzcAen9W2NZiKUfN5ZudJsww4NFvuum+OPDAUC9z9iS8JAHsAt5KhN+LC7
+ cG2Dsld0DOMqOesHdQqflBrcojPif08YjaSBsGQIwQvyuKJXS6YX+woyJgI0pAtmGcHTSuH
+ eq8Ngws2esKF9WpSr34Iw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:YtvA9Vr2q9k=:cFUQ3jZdjsawVGl0wt6DZG
+ ujPOV2asFZUAowjUKstfPJywpj085Fsg7U7O05IJuLEnh+2KBkjuQdWRcC2pQnaO/pxl3h3TU
+ Ame8aTyZMJ3WmUqnM6l3k0dFwvP4qzgKlVjo2J1tXmTaYR5E+lk5o9NiJrTcBuxc7AJYIazuL
+ eXCjfVSm0UUsS5k3u8ou+ZBR6S4X3XsMvkaR0Boone7/EHtgLjr1CnW/ktbG3tPJ98ACBvVFC
+ 9ZSOno6OLsvJnWnoaQO2dVl8GCa5EcTBd12reOtwYMnQSyfifU5OfXFCk7K30ldoqRi+JwI2w
+ dq7Zd760oFH2Yvqr36y4KnVpTlFq/wxoWgRJcpE6jTZBX6CCE/VGsbGqntTr42QlHYlRiugvX
+ SqR8ypEOTb9CaZiPpP79X6d4PDikq275gPodHqDOqHj4iO0ZxIg9tuCzDm3c9B2l74nHF9aCz
+ JZpgoGvJTCKd5BNNZk3bi6OTK9MQj9GWu7GE5FnwgaabJR3smENHXlJ8NrnvqgI2OYae/LQ3A
+ DFNX07o+v2GVOJNbsS1waZqxO7EkNGmTJzRzlxuTnViqlModwFdHLFMUDLQt/I7RXF1Y42A3b
+ ktPLSgZBP2KgDS6ybUKBssUo9/VX9PTA62YzWStE6fSyDfL69UJPvTRvgyzumMaYfNNKJ3hyJ
+ ZWD0EspyeSXkUuuCr4Nbzgsbk9vf8qbLWZJQW+3/a8tr8jfee6w0uULs1RxXHB8YL/u/fqMD8
+ MghNYNUD2moAbqY5eQQs1owWCTvXPhEcmI0sQenPqmFdWOtRuU+x+2vDh3DI3XFIqhyoJSifL
+ u74UCJt3fpYS7Le/SmvA64cEooAqLynmlRszLF3V1wXukXVpxTxLW7a6zCSdeP6xa2Jph/M
+Received-SPF: none client-ip=217.72.192.74; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 15:20:36
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 15:20:33
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
@@ -84,74 +82,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Carlo=20Marcelo=20Arenas=20Bel=C3=B3n?= <carenas@gmail.com>,
- Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
+Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>,
+ Filip Bozuta <Filip.Bozuta@syrmia.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Carlo Marcelo Arenas Belón <carenas@gmail.com>
+From: Filip Bozuta <Filip.Bozuta@syrmia.com>
 
-MIPS provides 2 ILP32 ABIs, and therefore 4 possible qemu-mips binaries
-with 2 pairs using the same endianess and bitness.
+Implementations of syscalls 'mq_timedsend()' and 'mq_timedreceive()'
+in 'syscall.c' use functions 'target_to_host_timespec()' and
+'host_to_target_timespec()' to transfer the value of 'struct timespec'
+between target and host. However, the implementations don't check whether
+this conversion succeeds and thus can cause an unaproppriate error instead
+of the 'EFAULT (Bad address)' which is supposed to be set if the conversion
+from target to host fails. This was confirmed with the modified LTP
+test suite where test cases with a bad adress for 'timespec' were
+added. This modified test suite can be found at:
+https://github.com/bozutaf/ltp
 
-This could lead to an O32 image loading in the N32 binary or vice versa
-and in cryptic errors (if lucky that the CPU doesn't match the FPU used)
-like :
+Without the changes from this patch the bad adress testcase for 'mq_timedsend()'
+succeds unexpectedly, while the test returns errno 'ETIMEOUT' for
+'mq_timedreceive()':
 
-  qemu: Unexpected FPU mode       (o32 ELF loaded to qemu-mipsn32[el])
-  ELF binary's NaN mode not supported by CPU    (n32 -> qemu-mips[el])
+mq_timedsend01.c:190: FAIL: mq_timedsend() returned 0, expected -1: SUCCESS (0)
+mq_timedreceive01.c:178: FAIL: mq_timedreceive() failed unexpectedly,
+expected EFAULT: ETIMEDOUT (110)
 
-Add an ABI check macro that could be used while checking the ELF header
-that relies in the ABI2 flag to identify n32 binaries and abort instead
-early with a more descriptive error :
+After the changes from this patch, testcases for both syscalls fail with EFAULT
+as expected, which is the same test result that is received with native execution:
 
-  Invalid ELF image for this architecture
+mq_timedsend01.c:187: PASS: mq_timedsend() failed expectedly: EFAULT (14)
+mq_timedreceive01.c:180: PASS: mq_timedreceive() failed expectedly: EFAULT (14)
 
-Signed-off-by: Carlo Marcelo Arenas Belón <carenas@gmail.com>
+(Patch with this new test case will be sent to LTP mailing list soon)
+
+Signed-off-by: Filip Bozuta <Filip.Bozuta@syrmia.com>
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <20200823101703.18451-1-carenas@gmail.com>
+Message-Id: <20200824193752.67950-2-Filip.Bozuta@syrmia.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- linux-user/elfload.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ linux-user/syscall.c | 16 ++++++++++++----
+ 1 file changed, 12 insertions(+), 4 deletions(-)
 
-diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-index fe9dfe795ddd..69936dcd4595 100644
---- a/linux-user/elfload.c
-+++ b/linux-user/elfload.c
-@@ -918,6 +918,12 @@ static void elf_core_copy_regs(target_elf_gregset_t *regs, const CPUPPCState *en
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 78e404c23cad..fd13e72305de 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -12043,9 +12043,13 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
  
- #define elf_check_arch(x) ((x) == EM_MIPS || (x) == EM_NANOMIPS)
+             p = lock_user (VERIFY_READ, arg2, arg3, 1);
+             if (arg5 != 0) {
+-                target_to_host_timespec(&ts, arg5);
++                if (target_to_host_timespec(&ts, arg5)) {
++                    return -TARGET_EFAULT;
++                }
+                 ret = get_errno(safe_mq_timedsend(arg1, p, arg3, arg4, &ts));
+-                host_to_target_timespec(arg5, &ts);
++                if (!is_error(ret) && host_to_target_timespec(arg5, &ts)) {
++                    return -TARGET_EFAULT;
++                }
+             } else {
+                 ret = get_errno(safe_mq_timedsend(arg1, p, arg3, arg4, NULL));
+             }
+@@ -12062,10 +12066,14 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
  
-+#ifdef TARGET_ABI_MIPSN32
-+#define elf_check_abi(x) ((x) & EF_MIPS_ABI2)
-+#else
-+#define elf_check_abi(x) (!((x) & EF_MIPS_ABI2))
-+#endif
-+
- static inline void init_thread(struct target_pt_regs *regs,
-                                struct image_info *infop)
- {
-@@ -1487,6 +1493,10 @@ static void elf_core_copy_regs(target_elf_gregset_t *regs,
- #define elf_check_arch(x) ((x) == ELF_ARCH)
- #endif
- 
-+#ifndef elf_check_abi
-+#define elf_check_abi(x) (1)
-+#endif
-+
- #ifndef ELF_HWCAP
- #define ELF_HWCAP 0
- #endif
-@@ -1644,6 +1654,7 @@ static bool elf_check_ident(struct elfhdr *ehdr)
- static bool elf_check_ehdr(struct elfhdr *ehdr)
- {
-     return (elf_check_arch(ehdr->e_machine)
-+            && elf_check_abi(ehdr->e_flags)
-             && ehdr->e_ehsize == sizeof(struct elfhdr)
-             && ehdr->e_phentsize == sizeof(struct elf_phdr)
-             && (ehdr->e_type == ET_EXEC || ehdr->e_type == ET_DYN));
+             p = lock_user (VERIFY_READ, arg2, arg3, 1);
+             if (arg5 != 0) {
+-                target_to_host_timespec(&ts, arg5);
++                if (target_to_host_timespec(&ts, arg5)) {
++                    return -TARGET_EFAULT;
++                }
+                 ret = get_errno(safe_mq_timedreceive(arg1, p, arg3,
+                                                      &prio, &ts));
+-                host_to_target_timespec(arg5, &ts);
++                if (!is_error(ret) && host_to_target_timespec(arg5, &ts)) {
++                    return -TARGET_EFAULT;
++                }
+             } else {
+                 ret = get_errno(safe_mq_timedreceive(arg1, p, arg3,
+                                                      &prio, NULL));
 -- 
 2.26.2
 
